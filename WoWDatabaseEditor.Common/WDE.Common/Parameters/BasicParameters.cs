@@ -1,5 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
+using System.Threading;
+using System.Threading.Tasks;
+using WDE.Common.Managers;
+using WDE.Common.Services;
 
 namespace WDE.Common.Parameters
 {
@@ -60,18 +64,45 @@ namespace WDE.Common.Parameters
         }
     }
     
-    public class StringParameter : GenericBaseParameter<string>
+    public class StringParameter : GenericBaseParameter<string>, ICustomPickerParameter<string>
     {
-        public static StringParameter Instance { get; } = new StringParameter();
+        private readonly IWindowManager windowManager;
+        private static StringParameter? instance;
+        public static StringParameter Instance
+        {
+            get
+            {
+                instance ??= DI.Resolve<StringParameter>();
+                return instance;
+            }
+        }
+
+        public StringParameter(IWindowManager windowManager)
+        {
+            this.windowManager = windowManager;
+        }
         
         public override string ToString(string value) => value;
+
+        public override bool HasItems => true;
+
+        public async Task<(string, bool)> PickValue(string value)
+        {
+            var vm = new StringPickerViewModel(value, true, true);
+            if (await windowManager.ShowDialog(vm))
+            {
+                return (vm.Content, true);
+            }
+            return ("", false);
+        }
     }
 
     public class SwitchStringParameter : GenericBaseParameter<string>
     {
-        public SwitchStringParameter(Dictionary<string, SelectOption> options)
+        public SwitchStringParameter(Dictionary<string, SelectOption> options, string? prefix = null)
         {
             Items = options;
+            Prefix = prefix;
         }
 
         public override string ToString(string value)
@@ -96,21 +127,38 @@ namespace WDE.Common.Parameters
     
     public class FlagParameter : Parameter
     {
+        private static ThreadLocal<List<string>> temp = new ThreadLocal<List<string>>(() => new List<string>());
+        
         public override string ToString(long value)
         {
             if (Items == null)
                 return value.ToString();
-            var flags = new List<string>();
+            
             if (value == 0 && Items.TryGetValue(0, out var zero))
                 return zero.Name;
-            for (var i = 0; i < 31; ++i)
+            else if (value == 0)
+                return "";
+            
+            var flags = temp.Value!;
+            flags.Clear();
+            
+            foreach (var item in Items)
             {
-                if (((1 << i) & value) > 0)
+                if (item.Key > 0 && (item.Key & value) == item.Key)
                 {
-                    if (Items.ContainsKey(1 << i))
-                        flags.Add(Items[1 << i].Name);
-                    else
+                    flags.Add(item.Value.Name);
+                    value &= ~item.Key;
+                }
+            }
+
+            if (value > 0)
+            {
+                for (var i = 0; i < 31; ++i)
+                {
+                    if (((1 << i) & value) > 0)
+                    {
                         flags.Add("Flag unknown " + (1 << i));
+                    }
                 }
             }
 

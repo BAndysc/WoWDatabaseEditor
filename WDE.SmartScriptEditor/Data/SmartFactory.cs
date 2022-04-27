@@ -1,7 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using Prism.Ioc;
+using WDE.Common;
+using WDE.Common.CoreVersion;
 using WDE.Common.Database;
 using WDE.Common.Parameters;
+using WDE.Common.Providers;
+using WDE.Common.Services;
 using WDE.Conditions.Data;
 using WDE.Module.Attributes;
 using WDE.SmartScriptEditor.Models;
@@ -16,27 +21,50 @@ namespace WDE.SmartScriptEditor.Data
         private readonly IParameterFactory parameterFactory;
         private readonly ISmartDataManager smartDataManager;
         private readonly IConditionDataManager conditionDataManager;
+        private readonly ICurrentCoreVersion currentCoreVersion;
 
         public SmartFactory(IParameterFactory parameterFactory, 
             ISmartDataManager smartDataManager, 
             IDatabaseProvider databaseProvider,
-            IConditionDataManager conditionDataManager)
+            IConditionDataManager conditionDataManager,
+            ITableEditorPickerService tableEditorPickerService,
+            IItemFromListProvider itemFromListProvider,
+            ICurrentCoreVersion currentCoreVersion,
+            IQuestEntryProviderService questEntryProviderService,
+            IContainerProvider containerProvider)
         {
             this.parameterFactory = parameterFactory;
             this.smartDataManager = smartDataManager;
             this.conditionDataManager = conditionDataManager;
+            this.currentCoreVersion = currentCoreVersion;
 
             if (!parameterFactory.IsRegisteredLong("StoredTargetParameter"))
             {
+                parameterFactory.Register("EventScriptParameter", new Parameter());
+                parameterFactory.Register("TimedActionListParameter", new Parameter());
+                parameterFactory.Register("GossipMenuOptionParameter", new GossipMenuOptionParameter(databaseProvider, tableEditorPickerService, itemFromListProvider));
+                parameterFactory.Register("CreatureTextParameter", new CreatureTextParameter(databaseProvider, tableEditorPickerService, itemFromListProvider));
+                parameterFactory.Register("QuestStarterParameter", new QuestStarterEnderParameter(databaseProvider, tableEditorPickerService, questEntryProviderService, true));
+                parameterFactory.Register("QuestEnderParameter", new QuestStarterEnderParameter(databaseProvider, tableEditorPickerService, questEntryProviderService, false));
                 parameterFactory.Register("CreatureSpawnKeyParameter", new CreatureSpawnKeyParameter(databaseProvider));
                 parameterFactory.Register("GameobjectSpawnKeyParameter", new GameObjectSpawnKeyParameter(databaseProvider));
-                parameterFactory.Register("StoredTargetParameter", new VariableContextualParameter(GlobalVariableType.StoredTarget, "storedTarget"));
-                parameterFactory.Register("DataVariableParameter", new VariableContextualParameter(GlobalVariableType.DataVariable, "data"));
-                parameterFactory.Register("TimedEventParameter", new VariableContextualParameter(GlobalVariableType.TimedEvent, "timedEvent"));
-                parameterFactory.Register("DoActionParameter", new VariableContextualParameter(GlobalVariableType.Action, "action"));
-                parameterFactory.Register("DoFunctionParameter", new VariableContextualParameter(GlobalVariableType.Function, "function"));
-                parameterFactory.Register("StoredPointParameter", new VariableContextualParameter(GlobalVariableType.StoredPoint, "storedPoint"));
-                parameterFactory.Register("DatabasePointParameter", new VariableContextualParameter(GlobalVariableType.DatabasePoint, "databasePoint"));   
+                var storedTarget = parameterFactory.Register("StoredTargetParameter", containerProvider.Resolve<VariableContextualParameter>(
+                    (typeof(GlobalVariableType), GlobalVariableType.StoredTarget), (typeof(string), "storedTarget")));
+                parameterFactory.Register("DataVariableParameter", containerProvider.Resolve<VariableContextualParameter>(
+                    (typeof(GlobalVariableType), GlobalVariableType.DataVariable), (typeof(string), "data")));
+                parameterFactory.Register("TimedEventParameter", containerProvider.Resolve<VariableContextualParameter>(
+                    (typeof(GlobalVariableType), GlobalVariableType.TimedEvent), (typeof(string), "timedEvent")));
+                parameterFactory.Register("DoActionParameter", containerProvider.Resolve<VariableContextualParameter>(
+                    (typeof(GlobalVariableType), GlobalVariableType.Action), (typeof(string), "action")));
+                parameterFactory.Register("DoFunctionParameter", containerProvider.Resolve<VariableContextualParameter>(
+                    (typeof(GlobalVariableType), GlobalVariableType.Function), (typeof(string), "function")));
+                parameterFactory.Register("StoredPointParameter", containerProvider.Resolve<VariableContextualParameter>(
+                    (typeof(GlobalVariableType), GlobalVariableType.StoredPoint), (typeof(string), "storedPoint")));
+                parameterFactory.Register("DatabasePointParameter", containerProvider.Resolve<VariableContextualParameter>(
+                    (typeof(GlobalVariableType), GlobalVariableType.DatabasePoint), (typeof(string), "databasePoint")));
+                var actor = parameterFactory.Register("ActorParameter", containerProvider.Resolve<VariableContextualParameter>(
+                    (typeof(GlobalVariableType), GlobalVariableType.Actor), (typeof(string), "actor")));
+                parameterFactory.Register("StoredTargetOrActorParameter", new StoredTargetOrActorParameter(storedTarget, actor));
             }
         }
 
@@ -84,7 +112,7 @@ namespace WDE.SmartScriptEditor.Data
             if (!conditionDataManager.HasConditionData(id))
                 throw new NullReferenceException("No data for condition id " + id);
 
-            SmartCondition ev = new(id);
+            SmartCondition ev = new(id, currentCoreVersion.Current.SmartScriptFeatures.SupportsConditionTargetVictim);
             var raw = conditionDataManager.GetConditionData(id);
             SetParameterObjects(ev, raw);
 
@@ -324,12 +352,8 @@ namespace WDE.SmartScriptEditor.Data
             for (var i = 0; i < data.Parameters.Count; ++i)
             {
                 string key = data.Parameters[i].Type;
-                if (data.Parameters[i].Values != null)
-                {
-                    key = $"{data.Name}_{i}";
-                    if (!parameterFactory.IsRegisteredLong(key))
-                        parameterFactory.Register(key, data.Parameters[i].Type == "FlagParameter" ? new FlagParameter(){Items = data.Parameters[i].Values} : new Parameter(){Items = data.Parameters[i].Values});
-                }
+                if (!parameterFactory.IsRegisteredLong(key))
+                    Console.WriteLine("Parameter type " + key + " is not registered");
                 
                 IParameter<long> parameter = parameterFactory.Factory(key);
                 element.GetParameter(i).Name = data.Parameters[i].Name;
@@ -357,13 +381,8 @@ namespace WDE.SmartScriptEditor.Data
             for (var i = 0; i < data.Parameters.Count; ++i)
             {
                 string key = data.Parameters[i].Type;
-                if (data.Parameters[i].Values != null)
-                {
-                    key = $"{data.Name}_{i}";
-                    if (!parameterFactory.IsRegisteredLong(key))
-                        parameterFactory.Register(key, new Parameter(){Items = data.Parameters[i].Values});
-                }
-                
+                if (!parameterFactory.IsRegisteredLong(key))
+                    Console.WriteLine("Parameter type " + key + " is not registered");
                 IParameter<long> parameter = parameterFactory.Factory(key);
 
                 element.GetParameter(i).Name = data.Parameters[i].Name;

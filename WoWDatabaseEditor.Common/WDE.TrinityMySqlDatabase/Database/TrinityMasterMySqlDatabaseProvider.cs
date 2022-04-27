@@ -37,13 +37,13 @@ public class TrinityMasterMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvid
     public override async Task<List<IGossipMenuOption>> GetGossipMenuOptionsAsync(uint menuId)
     {
         await using var model = Database();
-        return await (from t in model.SplitGossipMenuOptions
-            join actions in model.SplitGossipMenuOptionActions on t.MenuId equals actions.MenuId into adn
-            from subaddon in adn.DefaultIfEmpty()
-            join boxes in model.SplitGossipMenuOptionBoxes on t.MenuId equals boxes.MenuId into box
-            from subaddon2 in box.DefaultIfEmpty()
-            orderby t.MenuId
-            select t.SetAction(subaddon).SetBox(subaddon2)).ToListAsync<IGossipMenuOption>();
+        return await model.GossipMenuOptions.Where(option => option.MenuId == menuId).ToListAsync<IGossipMenuOption>();
+    }
+    
+    public override List<IGossipMenuOption> GetGossipMenuOptions(uint menuId)
+    {
+        using var model = Database();
+        return model.GossipMenuOptions.Where(option => option.MenuId == menuId).ToList<IGossipMenuOption>();
     }
     
     public override async Task<List<IBroadcastText>> GetBroadcastTextsAsync()
@@ -82,6 +82,18 @@ public class TrinityMasterMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvid
     {
         using var model = Database();
         return model.Creature.OrderBy(t => t.Entry).ToList<ICreature>();
+    }
+
+    public override async Task<IList<ICreature>> GetCreaturesByEntryAsync(uint entry)
+    {
+        await using var model = Database();
+        return await model.Creature.Where(g => g.Entry == entry).ToListAsync<ICreature>();
+    }
+
+    public override async Task<IList<IGameObject>> GetGameObjectsByEntryAsync(uint entry)
+    {
+        await using var model = Database();
+        return await model.GameObject.Where(g => g.Entry == entry).ToListAsync<IGameObject>();
     }
 
     public override async Task<List<ICreature>> GetCreaturesAsync()
@@ -154,5 +166,27 @@ public class TrinityMasterMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvid
     {
         await using var model = Database();
         return await model.GameObject.Where(c => c.Map == map).ToListAsync<IGameObject>();
+    }
+    
+    protected IQueryable<MySqlMasterQuestTemplate> GetMasterQuestsQuery(BaseTrinityDatabase model)
+    {
+        return (from t in model.MasterQuestTemplate
+            join addon in model.QuestTemplateAddon on t.Entry equals addon.Entry into adn
+            from subaddon in adn.DefaultIfEmpty()
+            orderby t.Entry
+            select t.SetAddon(subaddon));
+    }
+    
+    public override IEnumerable<IQuestTemplate> GetQuestTemplates()
+    {
+        using var model = Database();
+
+        return GetMasterQuestsQuery(model).ToList<IQuestTemplate>();
+    }
+
+    public override async Task<List<IQuestTemplate>> GetQuestTemplatesAsync()
+    {
+        await using var model = Database();
+        return await GetMasterQuestsQuery(model).ToListAsync<IQuestTemplate>();
     }
 }

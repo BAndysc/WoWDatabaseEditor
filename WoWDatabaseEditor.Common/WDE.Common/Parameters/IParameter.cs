@@ -6,6 +6,7 @@ namespace WDE.Common.Parameters
 {
     public interface IParameter
     {
+        string? Prefix { get; }
         bool HasItems { get; }
         bool AllowUnknownItems => false;
         Func<Task<object?>>? SpecialCommand => null;
@@ -20,6 +21,11 @@ namespace WDE.Common.Parameters
         Dictionary<T, SelectOption>? Items { get; }
     }
 
+    public interface IParameterFromString<T>
+    {
+        T? FromString(string value);
+    }
+
     public struct ToStringOptions
     {
         public bool WithNumber;
@@ -30,5 +36,15 @@ namespace WDE.Common.Parameters
         string ToString(T value, R context);
         System.Type ContextType => typeof(R);
         Dictionary<T, SelectOption>? ItemsForContext(R context) => null;
+    }
+
+    public interface ICustomPickerContextualParameter<T> : IParameter<T> where T : notnull
+    {
+        Task<(T, bool)> PickValue(T value, object context);
+    }
+    
+    public interface ICustomPickerParameter<T> : IParameter<T> where T : notnull
+    {
+        Task<(T, bool)> PickValue(T value);
     }
 }

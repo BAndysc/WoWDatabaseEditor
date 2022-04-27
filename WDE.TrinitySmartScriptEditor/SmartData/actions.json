@@ -12,7 +12,7 @@
         "name": "SMART_ACTION_TALK",
         "parameters": [
             {
-                "type": "Parameter",
+                "type": "CreatureTextParameter",
                 "name": "Group ID",
                 "description": "Group id from table creature_text. Random text will be said if multiple rows with the same group"
             },
@@ -96,7 +96,7 @@
         "name": "SMART_ACTION_PLAY_EMOTE",
         "parameters": [
             {
-                "type": "EmoteParameter",
+                "type": "EmoteOneShotParameter",
                 "name": "Emote ID",
                 "description": "Emote id to play"
             }
@@ -161,7 +161,8 @@
         "id": 9,
         "name": "SMART_ACTION_ACTIVATE_GOBJECT",
         "description": "{source}: Activate gameobject",
-        "name_readable": "Activate gobject",
+        "name_readable": "Activate gobject (legacy)",
+        "deprecated": true,
         "target_types": ["GameObject"],
         "target_is_source": true
     },
@@ -448,7 +449,7 @@
         "name": "SMART_ACTION_SET_EMOTE_STATE",
         "parameters": [
             {
-                "type": "EmoteParameter",
+                "type": "EmoteStateParameter",
                 "name": "Emote ID"
             }
         ],
@@ -683,6 +684,13 @@
         "target_is_source": true
     },
     {
+        "id": 27,
+        "name": "SMART_ACTION_COMBAT_STOP",
+        "description": "{source}: Stop combat",
+        "name_readable": "Combat stop",
+        "implicit_source": "SMART_TARGET_SELF"
+    },
+    {
         "id": 28,
         "name": "SMART_ACTION_REMOVEAURASFROMSPELL",
         "parameters": [
@@ -904,7 +912,7 @@
     {
         "id": 38,
         "name": "SMART_ACTION_SET_IN_COMBAT_WITH_ZONE_335_CATA",
-        "tags": ["TrinityWrath", "TrinityCata"],
+        "tags": ["TrinityWrath", "TrinityCata", "TrinityMaster"],
         "description": "{target}: Set in combat with current zone",
         "name_readable": "Set in combat with zone",
         "implicit_source": "SMART_TARGET_SELF",
@@ -914,7 +922,7 @@
     {
         "id": 38,
         "name": "SMART_ACTION_SET_IN_COMBAT_WITH_ZONE",
-        "tags": ["Azeroth", "TrinityMaster"],
+        "tags": ["Azeroth"],
         "description": "{target}: Set in combat with current zone",
         "name_readable": "Set in combat with zone",
         "target_types": ["Creature"],
@@ -923,7 +931,7 @@
     {
         "id": 39,
         "name": "SMART_ACTION_CALL_FOR_HELP_335_CATA",
-        "tags": ["TrinityCata", "TrinityWrath"],
+        "tags": ["TrinityCata", "TrinityWrath", "TrinityMaster"],
         "parameters": [
             {
                 "type": "Parameter",
@@ -942,7 +950,7 @@
     {
         "id": 39,
         "name": "SMART_ACTION_CALL_FOR_HELP",
-        "tags": ["TrinityMaster", "Azeroth"],
+        "tags": ["Azeroth"],
         "parameters": [
             {
                 "type": "Parameter",
@@ -1025,6 +1033,21 @@
         "description": "{source}: {pram1value:choose(0):{pram2value:choose(0):Dismount|Mount to model {pram2}}|{pram2value:choose(0):Mount to creature {pram1}|Invalid mount ({pram1}, {pram2}}}",
         "name_readable": "Mount to entry or model",
         "target_types": ["Creature", "Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 44,
+        "name": "SMART_ACTION_SET_INGAME_PHASE_MASK",
+        "tags": ["TrinityWrath", "Azeroth"],
+        "parameters": [
+            {
+                "type": "PhaseMaskParameter",
+                "name": "Phase mask"
+            }
+        ],
+        "description": "{source}: Set phasemask {pram1}",
+        "name_readable": "Set phasemask",
+        "target_types": ["Creature", "GameObject", "Player"],
         "target_is_source": true
     },
     {
@@ -1173,7 +1196,7 @@
         "name": "SMART_ACTION_ACTIVATE_TAXI",
         "parameters": [
             {
-                "type": "Parameter",
+                "type": "TaxiPathParameter",
                 "name": "Taxi ID"
             }
         ],
@@ -1685,7 +1708,7 @@
     {
         "id": 70,
         "name": "SMART_ACTION_ENABLE_TEMP_GOBJ",
-        "tags": ["TrinityWrath", "TrinityCata"],
+        "tags": ["TrinityWrath", "TrinityCata", "TrinityMaster"],
         "parameters": [
             {
                 "type": "Parameter",
@@ -1700,7 +1723,7 @@
     {
         "id": 70,
         "name": "SMART_ACTION_RESPAWN_TARGET",
-        "tags": ["Azeroth", "TrinityMaster"],
+        "tags": ["Azeroth"],
         "parameters": [
             {
                 "type": "Parameter",
@@ -1801,7 +1824,24 @@
     },
     {
         "id": 75,
+        "name": "SMART_ACTION_ADD_AURA_WRATH",
+        "tags": ["TrinityWrath"],
+        "parameters": [
+            {
+                "type": "SpellParameter",
+                "name": "Spell",
+                "required": true
+            }
+        ],
+        "description": "{source}: Add aura {pram1}",
+        "name_readable": "Add aura",
+        "target_types": ["Creature", "Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 75,
         "name": "SMART_ACTION_ADD_AURA",
+        "tags": ["Azeroth", "TrinityCata", "TrinityMaster"],
         "parameters": [
             {
                 "type": "SpellParameter",
@@ -1863,7 +1903,7 @@
         "name": "SMART_ACTION_CALL_TIMED_ACTIONLIST",
         "parameters": [
             {
-                "type": "Parameter",
+                "type": "TimedActionListParameter",
                 "name": "ID"
             },
             {
@@ -1932,7 +1972,7 @@
         "name": "SMART_ACTION_SIMPLE_TALK",
         "parameters": [
             {
-                "type": "Parameter",
+                "type": "CreatureTextParameter",
                 "name": "Group ID",
                 "description": "Makes target say its line from creature_text. If player, line from creature_text from this entry will be said. Doesn't trigger TEXT_OVER"
             }
@@ -2003,27 +2043,27 @@
         "name": "SMART_ACTION_CALL_RANDOM_TIMED_ACTIONLIST",
         "parameters": [
             {
-                "type": "Parameter",
+                "type": "TimedActionListParameter",
                 "name": "Action List ID 1"
             },
             {
-                "type": "Parameter",
+                "type": "TimedActionListParameter",
                 "name": "Action List ID 2"
             },
             {
-                "type": "Parameter",
+                "type": "TimedActionListParameter",
                 "name": "Action List ID 3"
             },
             {
-                "type": "Parameter",
+                "type": "TimedActionListParameter",
                 "name": "Action List ID 4"
             },
             {
-                "type": "Parameter",
+                "type": "TimedActionListParameter",
                 "name": "Action List ID 5"
             },
             {
-                "type": "Parameter",
+                "type": "TimedActionListParameter",
                 "name": "Action List ID 6"
             }
         ],
@@ -2037,11 +2077,11 @@
         "name": "SMART_ACTION_CALL_RANDOM_RANGE_TIMED_ACTIONLIST",
         "parameters": [
             {
-                "type": "Parameter",
+                "type": "TimedActionListParameter",
                 "name": "Action List ID min"
             },
             {
-                "type": "Parameter",
+                "type": "TimedActionListParameter",
                 "name": "Action List ID max"
             },
             {
@@ -2171,7 +2211,7 @@
                 "name": "Instant"
             }
         ],
-        "description": "{source}: Interrupt casted spell {pram2}",
+        "description": "{source}: Interrupt {pram2value:choose(0):any |}casted spell{pram2value:choose(0):| {pram2}}",
         "name_readable": "Interrupt spell",
         "target_types": ["Creature", "Player"],
         "target_is_source": true
@@ -2351,7 +2391,7 @@
         "id": 101,
         "name": "SMART_ACTION_SET_HOME_POS",
         "description": "{source}: Set home position to {sourceid:choose(1|8):current position|{targetcoords}|current position}",
-        "name_readable": "Send home position",
+        "name_readable": "Set home position",
         "target_types": ["Creature"],
         "target_is_source": true,
         "uses_target_position": true
@@ -2812,7 +2852,7 @@
     {
         "id": 127,
         "name": "SMART_ACTION_PAUSE_MOVEMENT",
-        "tags": ["TrinityWrath"],
+        "tags": ["TrinityWrath", "TrinityMaster"],
         "parameters": [
             {
                 "type": "Parameter",
@@ -2835,7 +2875,7 @@
     {
         "id": 127,
         "name": "SMART_ACTION_STOP_MOTION",
-        "tags": ["TrinityCata", "TrinityMaster"],
+        "tags": ["TrinityCata"],
         "parameters": [
             {
                 "type": "BoolParameter",
@@ -2919,20 +2959,20 @@
         "name": "SMART_ACTION_SPAWN_SPAWNGROUP",
         "parameters": [
             {
-                "type": "Parameter",
-                "name": "GroupID"
+                "type": "SpawnGroupTemplateParameter",
+                "name": "Group"
             },
             {
                 "type": "Parameter",
-                "name": "minDelay"
+                "name": "Min delay"
             },
             {
                 "type": "Parameter",
-                "name": "maxDelay"
+                "name": "Max delay"
             },
             {
                 "type": "FlagParameter",
-                "name": "Spawnflags",
+                "name": "Spawn flags",
                 "values": {
                     "0": { "name": "SMARTAI_SPAWN_FLAG_NONE" },
                     "1": { "name": "SMARTAI_SPAWN_FLAG_IGNORE_RESPAWN" },
@@ -2941,7 +2981,7 @@
                 }
             }
         ],
-        "description": "{source}: Spawn spawn group with Id: {pram1}{pram2value:choose(0):| in {pram2}-{pram3} ms}{pram4value:choose(0):| with flags {pram4}}",
+        "description": "Spawn spawn group {pram1}{pram2value:choose(0):| in {pram2}-{pram3} ms}{pram4value:choose(0):| with flags {pram4}}",
         "name_readable": "Spawn Spawngroup",
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF"
@@ -2951,20 +2991,20 @@
         "name": "SMART_ACTION_DESPAWN_SPAWNGROUP",
         "parameters": [
             {
-                "type": "Parameter",
-                "name": "GroupID"
+                "type": "SpawnGroupTemplateParameter",
+                "name": "Group"
             },
             {
                 "type": "Parameter",
-                "name": "minDelay"
+                "name": "Min delay"
             },
             {
                 "type": "Parameter",
-                "name": "maxDelay"
+                "name": "Max delay"
             },
             {
                 "type": "FlagParameter",
-                "name": "Spawnflags",
+                "name": "Spawn flags",
                 "values": {
                     "0": { "name": "SMARTAI_SPAWN_FLAG_NONE" },
                     "1": { "name": "SMARTAI_SPAWN_FLAG_IGNORE_RESPAWN" },
@@ -2973,7 +3013,7 @@
                 }
             }
         ],
-        "description": "{source}: Despawn spawn group with Id: {pram1}{pram2value:choose(0):| in {pram2}-{pram3} ms}{pram4value:choose(0):| with flags {pram4}}",
+        "description": "Despawn spawn group {pram1}{pram2value:choose(0):| in {pram2}-{pram3} ms}{pram4value:choose(0):| with flags {pram4}}",
         "name_readable": "Despawn Spawngroup",
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF"
@@ -3110,7 +3150,7 @@
     {
         "id": 138,
         "name": "SMART_ACTION_OVERRIDE_LIGHT",
-        "tags": ["TrinityWrath", "TrinityCata"],
+        "tags": ["TrinityWrath", "TrinityCata", "TrinityMaster"],
         "parameters": [
             {
                 "type": "ZoneAreaParameter",
@@ -3136,7 +3176,7 @@
     {
         "id": 139,
         "name": "SMART_ACTION_OVERRIDE_WEATHER",
-        "tags": ["TrinityWrath", "TrinityCata"],
+        "tags": ["TrinityWrath", "TrinityCata", "TrinityMaster"],
         "parameters": [
             {
                 "type": "ZoneAreaParameter",
@@ -3222,7 +3262,7 @@
     {
         "id": 144,
         "name": "SMART_ACTION_SET_IMMUNE_PC",
-        "tags": ["TrinityWrath"],
+        "tags": ["TrinityWrath", "TrinityMaster"],
         "parameters": [
             {
                 "type": "BoolParameter",
@@ -3237,7 +3277,7 @@
     {
         "id": 145,
         "name": "SMART_ACTION_SET_IMMUNE_NPC",
-        "tags": ["TrinityWrath"],
+        "tags": ["TrinityWrath", "TrinityMaster"],
         "parameters": [
             {
                 "type": "BoolParameter",
@@ -3252,7 +3292,7 @@
     {
         "id": 146,
         "name": "SMART_ACTION_SET_UNINTERACTIBLE",
-        "tags": ["TrinityWrath"],
+        "tags": ["TrinityWrath", "TrinityMaster"],
         "parameters": [
             {
                 "type": "BoolParameter",
@@ -3265,6 +3305,88 @@
         "target_is_source": true
     },
     
+    {
+        "id": 147,
+        "name": "SMART_ACTION_ACTIVATE_GAMEOBJECT",
+        "tags": ["TrinityWrath"],
+        "parameters": [
+            {
+                "type": "GameObjectActionParameter",
+                "name": "Action type"
+            }
+        ],
+        "description": "{source}: {pram1}",
+        "name_readable": "Activate gobject",
+        "target_types": ["GameObject"],
+        "target_is_source": true
+    },
+    {
+        "id": 148,
+        "name": "SMART_ACTION_ADD_TO_STORED_TARGET_LIST",
+        "tags": ["TrinityMaster"],
+        "parameters": [
+            {
+                "type": "StoredTargetParameter",
+                "name": "Variable ID"
+            }
+        ],
+        "description": "{source}: Add {target} to {pram1}",
+        "name_readable": "Add to stored target list",
+        "target_types": ["Creature", "Player", "GameObject"],
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_SELF"
+    },
+    {
+        "id": 149,
+        "name": "SMART_ACTION_BECOME_PERSONAL_CLONE_FOR_PLAYER",
+        "tags": ["TrinityMaster"],
+        "parameters": [
+            {
+                "type": "SummonTypeParameter",
+                "name": "Summon Type",
+                "required": true,
+                "defaultVal": 8
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Duration",
+                "description": "In ms"
+            }
+        ],
+        "description": "{source}: Become personal clone for {targetid:choose(8):[p]Action invoker[/p]|{target}}{targetid:choose(8): at position {targetcoords}|} for {pram2} seconds ({pram1})",
+        "name_readable": "Summon creature",
+        "target_types": ["Creature", "Player", "GameObject", "Position"],
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_SELF",
+        "uses_target_position": true
+    },
+
+    {
+      "id": 150,
+      "tags": [ "TrinityMaster" ],
+      "name": "SMART_ACTION_TRIGGER_GAME_EVENT",
+      "parameters": [
+        {
+          "type": "Parameter",
+          "name": "Event Id"
+        },
+        {
+          "type": "BoolParameter",
+          "name": "Use Target as Game Event Source"
+        }
+      ],
+      "implicit_source": "SMART_TARGET_SELF",
+      "description": "{pram2value:choose(0):{source}|{target}}: Trigger game event id {pram1} with target {pram2value:choose(0):{target}|{source}}",
+      "description_rules": [
+          {
+              "description": "{pram2value:choose(0):[s]Triggering player[/s]|{target}}: Trigger game event id {pram1} with target {pram2value:choose(0):{target}|[s]Triggering player[/s]}",
+              "condition": "script.source_type == 2 || script.source_type == 11 || script.source_type == 12"
+          }
+      ],
+      "name_readable": "Trigger Game Event",
+      "target_types": [ "Creature", "Player", "GameObject" ]
+    },
+
     {
         "id": 201,
         "name": "SMART_ACTION_MOVE_TO_POS_TARGET_AC",

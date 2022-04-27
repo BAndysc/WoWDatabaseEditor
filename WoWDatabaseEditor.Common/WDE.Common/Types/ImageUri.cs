@@ -19,7 +19,9 @@ namespace WDE.Common.Types
             Assembly = null;
             Uri = relativePath;
         }
-        
+
+        public static ImageUri Empty { get; } = new ImageUri("Icons/empty.png");
+
         public bool Equals(ImageUri other)
         {
             return Equals(Assembly, other.Assembly) && Uri == other.Uri;

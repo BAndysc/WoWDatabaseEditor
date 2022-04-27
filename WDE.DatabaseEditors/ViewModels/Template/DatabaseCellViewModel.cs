@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows.Input;
 using WDE.DatabaseEditors.Models;
 using WDE.MVVM;
 using WDE.MVVM.Observable;
@@ -8,24 +9,24 @@ namespace WDE.DatabaseEditors.ViewModels.Template
     public class DatabaseCellViewModel : BaseDatabaseCellViewModel
     {
         public DatabaseRowViewModel Parent { get; }
-        public DatabaseEntity ParentEntity { get; }
         public IDatabaseField? TableField { get; }
         public bool IsVisible { get; private set; } = true;
-        public bool IsModified { get; private set; }
+        public bool IsModified => TableField?.IsModified ?? false;
         public string? OriginalValueTooltip { get; private set; }
         public bool CanBeNull => Parent.CanBeNull;
         public bool CanBeSetToNull => CanBeNull && !Parent.IsReadOnly;
         public bool CanBeReverted => !Parent.IsReadOnly;
+        public string? ActionLabel { get; }
+        public ICommand? ActionCommand { get; }
         private bool inConstructor = true;
 
         public DatabaseCellViewModel(DatabaseRowViewModel parent, 
             DatabaseEntity parentEntity, 
             IDatabaseField tableField, 
             IParameterValue parameterValue, 
-            IObservable<bool>? cellIsVisible)
+            IObservable<bool>? cellIsVisible) : base(parentEntity)
         {
-            Link(tableField, tf => tf.IsModified, () => IsModified);
-            ParentEntity = parentEntity;
+            Watch(tableField, tf => tf.IsModified, nameof(IsModified));
             Parent = parent;
             TableField = tableField;
             ParameterValue = parameterValue;
@@ -61,9 +62,8 @@ namespace WDE.DatabaseEditors.ViewModels.Template
 
         public DatabaseCellViewModel(DatabaseRowViewModel parent, 
             DatabaseEntity parentEntity,
-            IParameterValue parameterValue)
+            IParameterValue parameterValue) : base(parentEntity)
         {
-            ParentEntity = parentEntity;
             Parent = parent;
             ParameterValue = parameterValue;
 
@@ -72,6 +72,17 @@ namespace WDE.DatabaseEditors.ViewModels.Template
                 if (!inConstructor)
                     parent.AnyFieldModified();
             }));
+            inConstructor = false;
+        }
+
+        public DatabaseCellViewModel(DatabaseRowViewModel parent, 
+            DatabaseEntity parentEntity,
+            ICommand command,
+            string actionLabel) : base(parentEntity)
+        {
+            Parent = parent;
+            ActionCommand = command;
+            ActionLabel = actionLabel;
             inConstructor = false;
         }
     }

@@ -1,0 +1,38 @@
+{
+  "id": "player_xp_for_level",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Player Xp For Level",
+  "single_solution_name": "Player Xp For Level Table",
+  "multi_solution_name": "Player Xp For Level Table",
+  "description": "Includes information on how much experience needed for next level. Comes from sniffs.",
+  "table_name": "player_xp_for_level",
+  "table_index_name": "Level",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Advanced",
+  "picker": "",
+  "primary_key": [
+    "Level"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Level",
+          "db_column_name": "Level",
+          "value_type": "uint",
+          "preferred_width": 70.0
+        },
+        {
+          "name": "Experience",
+          "db_column_name": "Experience",
+          "value_type": "uint",
+          "preferred_width": 100.0
+        }
+      ]
+    }
+  ]
+}

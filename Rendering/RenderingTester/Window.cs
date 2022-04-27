@@ -54,8 +54,32 @@ public class DummyMessageBox : IMessageBoxService
     }
 }
 
-public class MainThread : IMainThread
+public class MainThread : SynchronizationContext, IMainThread
 {
+    private List<(TimeSpan delay, Action action)> delayed = new();
+
+    private List<(SendOrPostCallback d, object? state)> posts = new();
+    
+    public override void Post(SendOrPostCallback d, object? state)
+    {
+        posts.Add((d, state));
+    }
+
+    public override void Send(SendOrPostCallback d, object? state)
+    {
+        d(state);
+    }
+
+    public override int Wait(IntPtr[] waitHandles, bool waitAll, int millisecondsTimeout)
+    {
+        return base.Wait(waitHandles, waitAll, millisecondsTimeout);
+    }
+
+    public void Delay(Action action, TimeSpan delay)
+    {
+        delayed.Add((delay, action));
+    }
+
     public void Dispatch(Action action)
     {
         action();
@@ -64,5 +88,35 @@ public class MainThread : IMainThread
     public Task Dispatch(Func<Task> action)
     {
         return action();
+    }
+
+    public void Tick(TimeSpan time)
+    {
+        for (int i = posts.Count - 1; i >= 0; --i)
+        {
+            posts[i].d(posts[i].state);
+            posts.RemoveAt(i);
+        }
+        
+        for (int i = 0; i < delayed.Count; ++i)
+        {
+            if (delayed[i].delay <= time)
+            {
+                var action = delayed[i].action;
+                if (i != delayed.Count - 1)
+                {
+                    delayed[i] = delayed[^1];
+                    --i;
+                }
+                delayed.RemoveAt(delayed.Count - 1);
+                
+                action();
+            }
+            else
+            {
+                var newDelay = delayed[i].delay - time;
+                delayed[i] = (newDelay, delayed[i].action);
+            }
+        }
     }
 }

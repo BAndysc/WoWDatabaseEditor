@@ -7,5 +7,6 @@ namespace WDE.DbcStore.Data
         public DBCVersions DBCVersion;
         public string Path;
         public bool SkipLoading;
+        public DBCLocales DBCLocale;
     }
 }

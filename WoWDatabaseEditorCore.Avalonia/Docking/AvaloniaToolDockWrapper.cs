@@ -25,6 +25,9 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
 
         public override bool OnClose()
         {
+            if (!ViewModel.CanClose())
+                return false;
+            
             IsClosed = true;
             ViewModel.Visibility = false;
             return true;

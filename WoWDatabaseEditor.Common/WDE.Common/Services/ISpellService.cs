@@ -862,6 +862,7 @@ namespace WDE.Common.Services
         SpellEffectType GetSpellEffectType(uint spellId, int index);
         (SpellTarget a, SpellTarget b) GetSpellEffectTargetType(uint spellId, int index);
         uint GetSpellEffectMiscValueA(uint spellId, int index);
+        uint GetSpellEffectTriggerSpell(uint spellId, int index);
     }
 
     public static class Extensions

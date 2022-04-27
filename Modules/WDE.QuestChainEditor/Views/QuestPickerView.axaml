@@ -1,0 +1,49 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:WDE.QuestChainEditor.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:QuestPickerViewModel"
+             x:Class="WDE.QuestChainEditor.Views.QuestPickerView">
+    <UserControl.Styles>
+        <Style Selector="TextBox /template/ Border#PART_BorderElement">
+            <Setter Property="Background" Value="Transparent" />
+        </Style>
+        <Style Selector="TextBox:pointerover /template/ Border#PART_BorderElement">
+            <Setter Property="Background" Value="Transparent" />
+        </Style>
+        <Style Selector="TextBox:focus /template/ Border#PART_BorderElement">
+            <Setter Property="Background" Value="Transparent" />
+        </Style>
+    </UserControl.Styles>
+    <DockPanel>
+        <Border BorderThickness="0,0,0,1"
+                BorderBrush="BlueViolet"
+            DockPanel.Dock="Top">
+            <TextBox Text="{CompiledBinding SearchText, Mode=TwoWay}" HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                     BorderThickness="0,0,0,0"
+                     Background="Transparent"
+                     Foreground="#e0e0e0"
+                     x:Name="SearchBox" />
+        </Border>
+        <ListBox Background="Transparent"
+                 BorderThickness="0" 
+                 x:Name="ResultsList"
+                 Items="{CompiledBinding Quests}">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <DockPanel LastChildFill="True">
+                        <TextBlock Foreground="#e0e0e0" Opacity="0.7" Text="{CompiledBinding Entry}" DockPanel.Dock="Right" />
+                        <TextBlock Foreground="#e0e0e0" Text="{CompiledBinding Title}" />
+                    </DockPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+            <ListBox.Styles>
+                <Style Selector="ListBoxItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                </Style>
+            </ListBox.Styles>
+        </ListBox>
+    </DockPanel>
+</UserControl>

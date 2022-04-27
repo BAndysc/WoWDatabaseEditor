@@ -17,6 +17,7 @@ namespace WDE.Conditions
                     {
                         var factory = containerProvider.Resolve<IParameterFactory>();
                         factory.Register("ConditionObjectEntryParameter", new ConditionObjectEntryParameter(factory));
+                        factory.Register("ConditionObjectGuidParameter", new Parameter());
                     },
                     ThreadOption.PublisherThread,
                     true);

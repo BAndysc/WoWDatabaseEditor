@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using WDE.Common.Services.QueryParser.Models;
 
 namespace WDE.SqlInterpreter.Extensions
 {
@@ -26,14 +28,18 @@ namespace WDE.SqlInterpreter.Extensions
             return quotedText;
         }
     
-        public static object? ToType(this string? str)
+        public static object? ToType(this string? str, Dictionary<string, object> variables)
         {
             if (str == null)
                 return null;
             if (str == "NULL")
                 return null;
             if (str.StartsWith("@"))
+            {
+                if (variables.TryGetValue(str, out var variable))
+                    return variable;
                 return str;
+            }
             if (str.IsStringLiteral())
                 return str.DropQuotes();
             if (long.TryParse(str, out var lng))
@@ -42,7 +48,9 @@ namespace WDE.SqlInterpreter.Extensions
                 return ulng;
             if (float.TryParse(str, out var flt))
                 return flt;
-            throw new Exception("Do not understand " + str);
+            if (str.StartsWith("FROM_UNIXTIME(") && long.TryParse(str.Substring(14, str.Length - 15), out var unixTime))
+                return unixTime;
+            return new UnknownSqlThing(str);
         }
     }
 }

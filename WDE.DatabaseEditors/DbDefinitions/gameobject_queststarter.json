@@ -1,0 +1,39 @@
+{
+  "id": "gameobject_queststarter",
+  "compatibility": [
+    "TrinityWrath", "Azeroth", "TrinityMaster", "TrinityCata"
+  ],
+  "name": "Game object Quest Starter",
+  "single_solution_name": "Game object {name} quest starter",
+  "multi_solution_name": "Multiple game objects quest starter",
+  "description": "Holds GO quest giver relations on which gameobject start which quests.",
+  "table_name": "gameobject_queststarter",
+  "table_index_name": "id",
+  "record_mode": "MultiRecord",
+  "icon_path": "Icons/document_queststarter.png",
+  "reload_command": "reload gameobject_queststarter",
+  "group_name": "Quests",
+  "picker": "GameobjectParameter",
+  "primary_key": [
+    "id",
+    "quest"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Id",
+          "db_column_name": "id",
+          "value_type": "GameobjectParameter"
+        },
+        {
+          "name": "Quest",
+          "db_column_name": "quest",
+          "value_type": "QuestParameter",
+          "preferred_width": 300
+        }
+      ]
+    }
+  ]
+}

@@ -51,8 +51,10 @@
     <Application.Styles>
         <appearanceService:AvaloniaThemeStyle />
         <StyleInclude Source="avares://AvaloniaEdit/AvaloniaEdit.xaml" />
+        <StyleInclude Source="avares://AvaloniaGraph/Style.axaml" />
         <StyleInclude Source="avares://WDE.Common.Avalonia/Themes/Generic.axaml" />
         <StyleInclude Source="avares://WDE.SmartScriptEditor.Avalonia/Themes/Generic.axaml"/>
+        <StyleInclude Source="avares://AvaloniaStyles/Controls/FastTableView/Style.axaml" />
         <Style Selector="ListBox /template/ ItemsPresenter#PART_ItemsPresenter">
             <Setter Property="(KeyboardNavigation.TabNavigation)" Value="Continue" />
         </Style>

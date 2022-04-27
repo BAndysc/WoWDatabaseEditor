@@ -1,0 +1,58 @@
+{
+  "id": "playercreateinfo_skills",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Player createinfo Skills",
+  "single_solution_name": "Player createinfo Skills",
+  "multi_solution_name": "Player createinfo Skills",
+  "description": "This table holds information on what skills newly created characters should start out with. A character in this table is defined by his/her race and class combination.",
+  "table_name": "playercreateinfo_skills",
+  "table_index_name": "raceMask",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Player create info",
+  "picker": "Parameter",
+  "primary_key": [
+    "raceMask",
+    "classMask",
+    "skill"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Race Mask",
+          "db_column_name": "raceMask",
+          "value_type": "RaceMaskParameter",
+          "preferred_width": 165.0
+        },
+        {
+          "name": "Class Mask",
+          "db_column_name": "classMask",
+          "value_type": "ClassMaskParameter",
+          "preferred_width": 190.0
+        },
+        {
+          "name": "Skill",
+          "db_column_name": "skill",
+          "value_type": "SkillParameter",
+          "preferred_width": 185.0
+        },
+        {
+          "name": "Rank",
+          "db_column_name": "rank",
+          "value_type": "uint"
+        },
+        {
+          "name": "Comment",
+          "db_column_name": "comment",
+          "value_type": "string",
+          "can_be_null": true,
+          "preferred_width": 320.0
+        }
+      ]
+    }
+  ]
+}

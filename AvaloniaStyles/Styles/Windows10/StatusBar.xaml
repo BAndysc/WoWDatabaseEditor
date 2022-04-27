@@ -22,8 +22,15 @@
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="TextBlock.Foreground" Value="White" />
     </Style>
+    <Style Selector="controls|StatusBar Button /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="Transparent" />
+    </Style>
+    <Style Selector="controls|StatusBar Button /template/ Border#BorderElement">
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
     <Style Selector="controls|StatusBar Button:disabled /template/ ContentPresenter#PART_ContentPresenter">
         <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Opacity" Value="1" />
         <Setter Property="TextBlock.Foreground" Value="White" />
     </Style>
     <Style Selector="controls|StatusBar Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">

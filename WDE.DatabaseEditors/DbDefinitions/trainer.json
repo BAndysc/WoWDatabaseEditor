@@ -1,0 +1,64 @@
+{
+  "id": "trainer",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Trainer",
+  "single_solution_name": "Trainer Table",
+  "multi_solution_name": "Trainer Table",
+  "description": "Define trainers templates",
+  "table_name": "trainer",
+  "table_index_name": "Id",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Trainers",
+  "reload_command": "reload trainer",
+  "icon_path": "Icons/document_book.png",
+  "primary_key": [
+    "Id"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Id",
+          "db_column_name": "Id",
+          "value_type": "uint",
+          "preferred_width": 65.0
+        },
+        {
+          "name": "Type",
+          "db_column_name": "Type",
+          "value_type": "TrainerTypeParameter",
+          "default": 2,
+          "preferred_width": 130.0
+        },
+        {
+          "name": "Requirement",
+          "db_column_name": "Requirement",
+          "value_type": "TrainerRequirementParameter",
+          "preferred_width": 145.0
+        },
+        {
+          "name": "Spells",
+          "is_meta": true,
+          "meta": "table:trainer_spell;`TrainerId` = {Id}"
+        },
+        {
+          "name": "Greeting",
+          "db_column_name": "Greeting",
+          "value_type": "string",
+          "can_be_null": true,
+          "preferred_width": 360.0
+        },
+        {
+          "name": "Verified Build",
+          "db_column_name": "VerifiedBuild",
+          "value_type": "int",
+          "can_be_null": true
+        }
+      ]
+    }
+  ]
+}

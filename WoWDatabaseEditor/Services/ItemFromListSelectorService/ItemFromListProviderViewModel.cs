@@ -81,18 +81,20 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
             ShowItemsList = items?.Count > 0;
             DesiredHeight = ShowItemsList ? 670 : 130;
             DesiredWidth = ShowItemsList ? 800 : 400;
-            Accept = new DelegateCommand(() =>
+            accept = new DelegateCommand(() =>
             {
                 if (SelectedItem == null && FilteredItems.Count == 1)
                     SelectedItem = FilteredItems[0];
                 CloseOk?.Invoke();
-            }, () => asFlags || SelectedItem != null || FilteredItems.Count == 1 || int.TryParse(SearchText, out _));
+            }, () => asFlags || SelectedItem != null || FilteredItems.Count == 1 || CanChooseText(SearchText));
             Cancel = new DelegateCommand(() => CloseCancel?.Invoke());
             
-            FilteredItems.ObserveCollectionChanges().Subscribe(_ => Accept.RaiseCanExecuteChanged());
-            this.WhenPropertyChanged(t => t.SearchText).Subscribe(_ => Accept.RaiseCanExecuteChanged());
-            this.WhenPropertyChanged(t => t.SelectedItem).Subscribe(_ => Accept.RaiseCanExecuteChanged());
+            FilteredItems.ObserveCollectionChanges().Subscribe(_ => accept.RaiseCanExecuteChanged());
+            this.WhenPropertyChanged(t => t.SearchText).Subscribe(_ => accept.RaiseCanExecuteChanged());
+            this.WhenPropertyChanged(t => t.SelectedItem).Subscribe(_ => accept.RaiseCanExecuteChanged());
         }
+
+        protected abstract bool CanChooseText(string searchText);
 
         public ObservableCollection<ColumnDescriptor> Columns { get; set; }
         public ReadOnlyObservableCollection<CheckableSelectOption<T>> FilteredItems { get; }
@@ -143,7 +145,8 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
         protected abstract bool StringToT(string str, out T result);
 
         public bool ShowItemsList { get; }
-        public DelegateCommand Accept { get; }
+        private DelegateCommand accept;
+        public ICommand Accept => accept;
         public ICommand Cancel { get; }
         public int DesiredWidth { get; }
         public int DesiredHeight { get; }
@@ -155,6 +158,8 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
 
     public class LongItemFromListProviderViewModel : ItemFromListProviderViewModel<long>
     {
+        protected override bool CanChooseText(string searchText) => long.TryParse(SearchText, out _);
+
         public override long GetEntry()
         {
             if (asFlags)
@@ -200,6 +205,8 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
     
     public class StringItemFromListProviderViewModel : ItemFromListProviderViewModel<string>
     {
+        protected override bool CanChooseText(string searchText) => true;
+
         public override string GetEntry()
         {
             if (asFlags)
@@ -250,6 +257,8 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
                 , _ => false, false, current, title)
         {
         }
+
+        protected override bool CanChooseText(string searchText) => float.TryParse(SearchText, out _);
 
         public override float GetEntry()
         {

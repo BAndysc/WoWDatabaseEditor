@@ -23,7 +23,7 @@ namespace WoWDatabaseEditorCore.ViewModels
         private readonly IEventAggregator eventAggregator;
         private readonly IWindowManager windowManager;
         private readonly ICurrentCoreVersion currentCoreVersion;
-        public ObservableCollection<ViewModel> List { get; } = new();
+        public ObservableCollection<RelatedSolutionItemViewModel> List { get; } = new();
 
         private CancellationTokenSource? tokenSource;
         
@@ -73,7 +73,7 @@ namespace WoWDatabaseEditorCore.ViewModels
                 if (token.IsCancellationRequested)
                     return;
                 
-                List.Add(new ViewModel(provider.GetName(), provider.GetImage(), new AsyncAutoCommand(async () =>
+                List.Add(new RelatedSolutionItemViewModel(provider.GetName(), provider.GetImage(), new AsyncAutoCommand(async () =>
                 {
                     var newItem = await provider.CreateRelatedSolutionItem(related.Value);
                     if (newItem == null)
@@ -86,7 +86,7 @@ namespace WoWDatabaseEditorCore.ViewModels
                 related.Value.Type == RelatedSolutionItem.RelatedType.GameobjectEntry ||
                 related.Value.Type == RelatedSolutionItem.RelatedType.QuestEntry)
             {
-                List.Add(new ViewModel("Open wowhead in a browser", new ImageUri("icons/icon_head_red.png"), new AsyncAutoCommand(async () =>
+                List.Add(new RelatedSolutionItemViewModel("Open wowhead in a browser", new ImageUri("icons/icon_head_red.png"), new AsyncAutoCommand(async () =>
                 {
                     var type = related.Value.Type == RelatedSolutionItem.RelatedType.CreatureEntry ? "npc" : "object";
                     if (related.Value.Type == RelatedSolutionItem.RelatedType.QuestEntry)
@@ -95,19 +95,19 @@ namespace WoWDatabaseEditorCore.ViewModels
                 })));
             }
         }
+    }
         
-        public class ViewModel
+    public class RelatedSolutionItemViewModel
+    {
+        public RelatedSolutionItemViewModel(string name, ImageUri icon, ICommand createCommand)
         {
-            public ViewModel(string name, ImageUri icon, ICommand createCommand)
-            {
-                Name = name;
-                Icon = icon;
-                CreateCommand = createCommand;
-            }
-
-            public string Name { get; }
-            public ImageUri Icon { get; }
-            public ICommand CreateCommand { get; }
+            Name = name;
+            Icon = icon;
+            CreateCommand = createCommand;
         }
+
+        public string Name { get; }
+        public ImageUri Icon { get; }
+        public ICommand CreateCommand { get; }
     }
 }

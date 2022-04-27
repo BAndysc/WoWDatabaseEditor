@@ -41,7 +41,7 @@ namespace WDE.SmartScriptEditor.Models
             target.Parent = this;
             source.OnChanged += SourceOnOnChanged;
             target.OnChanged += SourceOnOnChanged;
-            comment = new ParameterValueHolder<string>("Comment", new StringParameter(), "");
+            comment = new ParameterValueHolder<string>("Comment", StringParameter.Instance, "");
             comment.PropertyChanged += (_, _) =>
             {
                 CallOnChanged();

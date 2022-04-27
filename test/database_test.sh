@@ -9,7 +9,7 @@ URLs=( 'https://github.com/TrinityCore/TrinityCore' 'https://github.com/TrinityC
 BRANCHEs=( 'master' '3.3.5' 'master' 'master')
 UPDATEs=( 'master' '3.3.5' '4.3.4' '')
 COREs=( 'TrinityMaster' 'TrinityWrath' 'TrinityCata' 'Azeroth' )
-SKIP=( false false false false )
+SKIP=( false false false true )
 
 for index in ${!URLs[*]}; do
 
@@ -40,17 +40,17 @@ for index in ${!URLs[*]}; do
 
         for i in sql/updates/world/${UPDATEs[$index]}/*.sql
         do
-            "${MYSQL_PATH}" -u ${USER} -p${PASSWORD} temp_CI < ${i}
+            "${MYSQL_PATH}" -u ${USER} -p${PASSWORD} temp_CI < "${i}"
         done
     else
         for i in data/sql/base/db_world/*.sql
         do
-            "${MYSQL_PATH}" -u ${USER} -p${PASSWORD} temp_CI < ${i}
+            "${MYSQL_PATH}" -u ${USER} -p${PASSWORD} temp_CI < "${i}"
         done
 
         for i in data/sql/updates/db_world/*.sql
         do
-            "${MYSQL_PATH}" -u ${USER} -p${PASSWORD} temp_CI < ${i}
+            "${MYSQL_PATH}" -u ${USER} -p${PASSWORD} temp_CI < "${i}"
         done
     fi
 

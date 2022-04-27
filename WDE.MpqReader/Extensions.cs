@@ -22,7 +22,12 @@ namespace WDE.MpqReader
                 return null;
 
             var buf = new PooledArray<byte>(size.Value);
-            archive.ReadFile(buf.AsArray(), path);
+            int? read = archive.ReadFile(buf.AsArray(), path);
+            if (read != size)
+            {
+                buf.Dispose();
+                throw new Exception("Couldn't load file " + path);
+            }
             return buf;
         }
     }

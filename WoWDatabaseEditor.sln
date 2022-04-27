@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 17.0.31903.59
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AvaloniaGraph", "Modules\AvaloniaGraph\AvaloniaGraph.csproj", "{173E0418-F924-4525-81FF-A1F0684824CA}"
+EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LoaderAvalonia", "LoaderAvalonia\LoaderAvalonia.csproj", "{8B25EEAE-2DDD-4D62-A426-619FE21D2711}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WoWDatabaseEditorCore", "WoWDatabaseEditor\WoWDatabaseEditorCore.csproj", "{99C9E82C-C594-446D-AA59-8FFBC43AD226}"
@@ -194,6 +196,10 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DBCD", "DBCD\DBCD\DBCD.csproj", "{574C8F09-713E-4C2E-BC7B-2338132AE433}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DBFileReaderLib", "DBCD\DBFileReaderLib\DBFileReaderLib.csproj", "{47A1A37F-9563-4DE7-AEDE-3A77CB61ED51}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.AnniversaryInfo", "Modules\WDE.AnniversaryInfo\WDE.AnniversaryInfo.csproj", "{BBB03A57-B7C8-468D-8A85-F8538F63BC5B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.EventScriptsEditor", "Modules\WDE.EventScriptsEditor\WDE.EventScriptsEditor.csproj", "{7431ED24-207C-44B0-871A-FFF037C92EAF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -537,7 +543,20 @@ Global
 		{47A1A37F-9563-4DE7-AEDE-3A77CB61ED51}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{47A1A37F-9563-4DE7-AEDE-3A77CB61ED51}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{47A1A37F-9563-4DE7-AEDE-3A77CB61ED51}.Release|Any CPU.Build.0 = Release|Any CPU
-	EndGlobalSection
+		{BBB03A57-B7C8-468D-8A85-F8538F63BC5B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BBB03A57-B7C8-468D-8A85-F8538F63BC5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BBB03A57-B7C8-468D-8A85-F8538F63BC5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BBB03A57-B7C8-468D-8A85-F8538F63BC5B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7431ED24-207C-44B0-871A-FFF037C92EAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7431ED24-207C-44B0-871A-FFF037C92EAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7431ED24-207C-44B0-871A-FFF037C92EAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7431ED24-207C-44B0-871A-FFF037C92EAF}.Release|Any CPU.Build.0 = Release|Any CPU
+	        {173E0418-F924-4525-81FF-A1F0684824CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{173E0418-F924-4525-81FF-A1F0684824CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{173E0418-F924-4525-81FF-A1F0684824CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{173E0418-F924-4525-81FF-A1F0684824CA}.Release|Any CPU.Build.0 = Release|Any CPU
+		
+EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
@@ -605,6 +624,7 @@ Global
 		{F63A6DDA-874A-41FF-A707-3B95862036A5} = {4C553308-1140-42F2-B99C-90402248A983}
 		{DC3C17DD-7B7B-483D-B6F0-08B196AF87C0} = {5B4101BE-5A22-4B88-9E94-FFC484E04BDE}
 		{B8A8B30B-93C1-4CCD-85D3-3178F3536AEB} = {C9F8B770-A4E7-479A-A8A0-0DE5A1838AFD}
+		{7431ED24-207C-44B0-871A-FFF037C92EAF} = {106EEB05-E9AB-453A-ADD0-96505F405D76}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3E63D4A5-8159-4344-B556-1E1D8D63DA99}

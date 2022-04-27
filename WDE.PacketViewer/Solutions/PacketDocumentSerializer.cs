@@ -10,7 +10,7 @@ namespace WDE.PacketViewer.Solutions
     public class PacketDocumentSerializer : ISolutionItemSerializer<PacketDocumentSolutionItem>,
         ISolutionItemDeserializer<PacketDocumentSolutionItem>
     {
-        public ISmartScriptProjectItem Serialize(PacketDocumentSolutionItem item)
+        public ISmartScriptProjectItem Serialize(PacketDocumentSolutionItem item, bool forMostRecentlyUsed)
         {
             return new AbstractSmartScriptProjectItem()
             {

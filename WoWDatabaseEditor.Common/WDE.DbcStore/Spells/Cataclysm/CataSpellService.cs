@@ -296,7 +296,7 @@ namespace WDE.DbcStore.Spells.Cataclysm
                 spell.SpellEffects.Length > index)
             {
                 effect = spell.SpellEffects[index];
-                return true;
+                return effect != null;
             }
             return false;
         }
@@ -326,6 +326,13 @@ namespace WDE.DbcStore.Spells.Cataclysm
         {
             if (TryGetEffect(spellId, index, out var effect))
                 return effect.EffectMiscValueA;
+            return 0;
+        }
+
+        public uint GetSpellEffectTriggerSpell(uint spellId, int index)
+        {
+            if (TryGetEffect(spellId, index, out var effect))
+                return effect.EffectTriggerSpell;
             return 0;
         }
     }

@@ -138,7 +138,7 @@ namespace WDE.PacketViewer.Processing.Processors
                 int maxId = -1;
                 if (asDiff)
                 {
-                    var existing = await databaseProvider.GetCreatureTextsByEntry(entry.Key);
+                    var existing = await databaseProvider.GetCreatureTextsByEntryAsync(entry.Key);
                     foreach (var text in existing)
                     {
                         if (text.Text == null)

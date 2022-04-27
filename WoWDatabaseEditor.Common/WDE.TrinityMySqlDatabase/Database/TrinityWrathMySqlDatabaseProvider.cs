@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using LinqToDB;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;
+using WDE.Common.DBC;
 using WDE.MySqlDatabaseCommon.Providers;
 using WDE.MySqlDatabaseCommon.Services;
 using WDE.TrinityMySqlDatabase.Models;
@@ -40,6 +41,12 @@ public class TrinityWrathMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvide
         return await model.GossipMenuOptions.Where(option => option.MenuId == menuId).ToListAsync<IGossipMenuOption>();
     }
     
+    public override List<IGossipMenuOption> GetGossipMenuOptions(uint menuId)
+    {
+        using var model = Database();
+        return model.GossipMenuOptions.Where(option => option.MenuId == menuId).ToList<IGossipMenuOption>();
+    }
+
     public override async Task<List<IBroadcastText>> GetBroadcastTextsAsync()
     {
         await using var model = Database();
@@ -80,6 +87,18 @@ public class TrinityWrathMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvide
     {
         using var model = Database();
         return model.Creature.OrderBy(t => t.Entry).ToList<ICreature>();
+    }
+
+    public override async Task<IList<ICreature>> GetCreaturesByEntryAsync(uint entry)
+    {
+        await using var model = Database();
+        return await model.Creature.Where(g => g.Entry == entry).ToListAsync<ICreature>();
+    }
+
+    public override async Task<IList<IGameObject>> GetGameObjectsByEntryAsync(uint entry)
+    {
+        await using var model = Database();
+        return await model.GameObject.Where(g => g.Entry == entry).ToListAsync<IGameObject>();
     }
 
     public override async Task<List<ICreature>> GetCreaturesAsync()
@@ -152,5 +171,17 @@ public class TrinityWrathMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvide
     {
         await using var model = Database();
         return await model.GameObject.Where(c => c.Map == map).ToListAsync<IGameObject>();
+    }
+
+    public override async Task<IList<IItem>?> GetItemTemplatesAsync()
+    {
+        await using var model = Database();
+        return await model.ItemTemplate.ToListAsync<IItem>();
+    }
+        
+    public async Task<IList<ISpawnGroupTemplate>?> GetSpawnGroupTemplatesAsync()
+    {
+        await using var model = Database();
+        return await model.SpawnGroupTemplate.ToListAsync<ISpawnGroupTemplate>();
     }
 }

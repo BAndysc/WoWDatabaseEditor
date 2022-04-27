@@ -1,0 +1,73 @@
+{
+  "id": "areatrigger_teleport",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Areatrigger Teleport",
+  "single_solution_name": "Areatrigger Teleport",
+  "multi_solution_name": "Areatrigger Teleport",
+  "description": "Contains all the teleport triggers definition. This table is used to complete .dbc file information.",
+  "table_name": "areatrigger_teleport",
+  "table_index_name": "ID",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Areatriggers",
+  "icon_path": "Icons/document_areatrigger.png",
+  "reload_command": "reload areatrigger_teleport",
+  "picker": "",
+  "primary_key": [
+    "ID"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "ID",
+          "db_column_name": "ID",
+          "value_type": "AreaTriggerParameter",
+          "preferred_width": 170.0
+        },
+        {
+          "name": "Name",
+          "db_column_name": "Name",
+          "value_type": "string",
+          "can_be_null": true,
+          "preferred_width": 130.0
+        },
+        {
+          "name": "Target Map",
+          "db_column_name": "target_map",
+          "value_type": "MapParameter",
+          "preferred_width": 185.0
+        },
+        {
+          "name": "X",
+          "db_column_name": "target_position_x",
+          "value_type": "float"
+        },
+        {
+          "name": "Y",
+          "db_column_name": "target_position_y",
+          "value_type": "float"
+        },
+        {
+          "name": "Z",
+          "db_column_name": "target_position_z",
+          "value_type": "float"
+        },
+        {
+          "name": "Orientation",
+          "db_column_name": "target_orientation",
+          "value_type": "float"
+        },
+        {
+          "name": "Verified Build",
+          "db_column_name": "VerifiedBuild",
+          "value_type": "int",
+          "can_be_null": true
+        }
+      ]
+    }
+  ]
+}

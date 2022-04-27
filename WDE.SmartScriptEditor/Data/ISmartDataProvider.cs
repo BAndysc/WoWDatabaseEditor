@@ -12,20 +12,6 @@ namespace WDE.SmartScriptEditor.Data
         string GetEventsGroupsJson();
         string GetActionsGroupsJson();
         string GetTargetsGroupsJson();
-
-        void SaveEvents(string json);
-        Task SaveEventsAsync(string json);
-        void SaveActions(string json);
-        Task SaveActionsAsync(string json);
-        void SaveTargets(string json);
-        Task SaveTargetsAsync(string json);
-
-        void SaveEventsGroups(string json);
-        Task SaveEventsGroupsAsync(string json);
-        void SaveActionsGroups(string json);
-        Task SaveActionsGroupsAsync(string json);
-        void SaveTargetsGroups(string json);
-        Task SaveTargetsGroupsAsync(string json);
     }
     
     public interface ISmartRawDataProvider
@@ -36,13 +22,6 @@ namespace WDE.SmartScriptEditor.Data
         IEnumerable<SmartGroupsJsonData> GetEventsGroups();
         IEnumerable<SmartGroupsJsonData> GetActionsGroups();
         IEnumerable<SmartGroupsJsonData> GetTargetsGroups();
-
-        Task SaveEvents(List<SmartGenericJsonData> events);
-        Task SaveActions(List<SmartGenericJsonData> actions);
-        Task SaveTargets(List<SmartGenericJsonData> targets);
-        Task SaveEventGroups(List<SmartGroupsJsonData> groups);
-        Task SaveActionsGroups(List<SmartGroupsJsonData> groups);
-        Task SaveTargetsGroups(List<SmartGroupsJsonData> groups);
     }
     
     public interface ISmartDataProvider

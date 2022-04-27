@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using KTrie;
 using Prism.Events;
 using WDE.Common.Database;
+using WDE.Common.DBC;
 using WDE.Common.Events;
 using WDE.Common.Managers;
 using WDE.Common.Parameters;
@@ -28,6 +29,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         private List<IQuestTemplate>? questTemplateCache;
         private Dictionary<uint, IQuestTemplate> questTemplateByEntry = new();
+        
+        private Dictionary<uint, IReadOnlyList<ICreatureText>?> creatureTextsCache = new();
 
         private List<IAreaTriggerTemplate>? areaTriggerTemplates;
         private List<IGameEvent>? gameEventsCache;
@@ -68,6 +71,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
                     Refresh(RefreshGossipMenu);
                 else if (tableName == "npc_text")
                     Refresh(RefreshNpcTexts);
+                else if (tableName == "creature_text")
+                    Refresh(RefreshCreatureTexts);
             }, true);
         }
 
@@ -85,6 +90,12 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             npcTextsCache = await nonCachedDatabase.GetNpcTextsAsync().ConfigureAwait(false);
             npcTextsByIdCache = npcTextsCache.ToDictionary(npcText => npcText.Id);
             return typeof(INpcText);
+        }
+        
+        private async Task<Type> RefreshCreatureTexts()
+        {
+            creatureTextsCache.Clear();
+            return typeof(ICreatureText);
         }
         
         private async Task<Type> RefreshGossipMenu()
@@ -155,12 +166,19 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             return nonCachedDatabase.GetGameObjectTemplates();
         }
 
+        public Task<IAreaTriggerScript?> GetAreaTriggerScript(int entry) => nonCachedDatabase.GetAreaTriggerScript(entry);
+
         public IEnumerable<ICreatureTemplate> GetCreatureTemplates()
         {
             if (creatureTemplateCache != null)
                 return creatureTemplateCache;
 
             return nonCachedDatabase.GetCreatureTemplates();
+        }
+
+        public Task<IList<IGameObject>> GetGameObjectsByEntryAsync(uint entry)
+        {
+            return nonCachedDatabase.GetGameObjectsByEntryAsync(entry);
         }
 
         public IEnumerable<ICreature> GetCreatures()
@@ -191,6 +209,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             return nonCachedDatabase.GetQuestTemplates();
         }
 
+        public Task<IQuestRequestItem?> GetQuestRequestItem(uint entry) => nonCachedDatabase.GetQuestRequestItem(entry);
+
         public IEnumerable<ICreatureClassLevelStat> GetCreatureClassLevelStats() =>
             creatureClassLevelStatsCache ?? nonCachedDatabase.GetCreatureClassLevelStats();
 
@@ -205,6 +225,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             : Task.FromResult(gossipMenusCache);
 
         public Task<List<IGossipMenuOption>> GetGossipMenuOptionsAsync(uint menuId) => nonCachedDatabase.GetGossipMenuOptionsAsync(menuId);
+        public List<IGossipMenuOption> GetGossipMenuOptions(uint menuId) => nonCachedDatabase.GetGossipMenuOptions(menuId);
 
         public IEnumerable<INpcText> GetNpcTexts() => npcTextsCache ?? nonCachedDatabase.GetNpcTexts();
 
@@ -218,8 +239,22 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public Task<List<IPointOfInterest>> GetPointsOfInterestsAsync() => nonCachedDatabase.GetPointsOfInterestsAsync();
 
-        public Task<List<ICreatureText>> GetCreatureTextsByEntry(uint entry) => nonCachedDatabase.GetCreatureTextsByEntry(entry);
-       
+        public Task<List<ICreatureText>> GetCreatureTextsByEntryAsync(uint entry) => nonCachedDatabase.GetCreatureTextsByEntryAsync(entry);
+
+        public Task<IList<IItem>?> GetItemTemplatesAsync() => nonCachedDatabase.GetItemTemplatesAsync();
+        public Task<IList<ISmartScriptLine>> FindSmartScriptLinesBy(IEnumerable<(IDatabaseProvider.SmartLinePropertyType what, int whatValue, int parameterIndex, long valueToSearch)> conditions) => nonCachedDatabase.FindSmartScriptLinesBy(conditions);
+
+        public Task<IList<ISpawnGroupTemplate>?> GetSpawnGroupTemplatesAsync() => nonCachedDatabase.GetSpawnGroupTemplatesAsync();
+
+        public IReadOnlyList<ICreatureText>? GetCreatureTextsByEntry(uint entry)
+        {
+            if (creatureTextsCache.TryGetValue(entry, out var texts))
+                return texts;
+
+            creatureTextsCache[entry] = texts = nonCachedDatabase.GetCreatureTextsByEntry(entry);
+            return texts;
+        }
+
         public Task<IList<ISmartScriptLine>> GetLinesCallingSmartTimedActionList(int timedActionList) => nonCachedDatabase.GetLinesCallingSmartTimedActionList(timedActionList);
 
         public IEnumerable<IAreaTriggerTemplate> GetAreaTriggerTemplates() =>
@@ -283,7 +318,11 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         }
 
         public Task<IBroadcastText?> GetBroadcastTextByIdAsync(uint id) => nonCachedDatabase.GetBroadcastTextByIdAsync(id);
-        
+
+        public Task<List<IEventScriptLine>> FindEventScriptLinesBy(IReadOnlyList<(uint command, int dataIndex, long valueToSearch)> conditions) => nonCachedDatabase.FindEventScriptLinesBy(conditions);
+
+        public Task<List<IEventScriptLine>> GetEventScript(EventScriptType type, uint id) => nonCachedDatabase.GetEventScript(type, id);
+
         public Task<IList<IDatabaseSpellDbc>> GetSpellDbcAsync()
         {
             if (databaseSpellDbcCache != null)
@@ -299,6 +338,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public IEnumerable<ICreature> GetCreaturesByEntry(uint entry) => nonCachedDatabase.GetCreaturesByEntry(entry);
 
         public IEnumerable<IGameObject> GetGameObjectsByEntry(uint entry) => nonCachedDatabase.GetGameObjectsByEntry(entry);
+        
+        public Task<IList<ICreature>> GetCreaturesByEntryAsync(uint entry) => nonCachedDatabase.GetCreaturesByEntryAsync(entry);
 
         public IEnumerable<ICoreCommandHelp> GetCommands() => nonCachedDatabase.GetCommands();
 

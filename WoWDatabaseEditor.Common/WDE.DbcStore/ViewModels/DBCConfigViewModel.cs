@@ -8,21 +8,24 @@ using WDE.Common.Managers;
 using WDE.DbcStore.Data;
 using WDE.DbcStore.Providers;
 using WDE.Module.Attributes;
+using WDE.MVVM;
 
 namespace WDE.DbcStore.ViewModels
 {
     [AutoRegister]
-    public class DBCConfigViewModel : BindableBase, IConfigurable
+    public class DBCConfigViewModel : ObservableBase, IConfigurable
     {
         private DBCVersions dbcVersion;
         private string path;
         private bool skipLoading;
+        private DBCLocales dbcLocale;
 
         public DBCConfigViewModel(IDbcSettingsProvider dbcSettings, IWindowManager windowManager)
         {
             path = dbcSettings.GetSettings().Path;
             skipLoading = dbcSettings.GetSettings().SkipLoading;
             dbcVersion = dbcSettings.GetSettings().DBCVersion;
+            dbcLocale = dbcSettings.GetSettings().DBCLocale;
             
             PickFolder = new DelegateCommand(async () =>
             {
@@ -32,12 +35,17 @@ namespace WDE.DbcStore.ViewModels
             });
             Save = new DelegateCommand(() =>
             {
-                dbcSettings.UpdateSettings(new DBCSettings {Path = Path, SkipLoading = SkipLoading, DBCVersion = DBCVersion});
+                dbcSettings.UpdateSettings(new DBCSettings {Path = Path, SkipLoading = SkipLoading, DBCVersion = DBCVersion, DBCLocale = DBCLocale});
                 IsModified = false;
             });
 
             DBCVersions = new ObservableCollection<DBCVersions>(Enum.GetValues<DBCVersions>());
+            DBCLocales = new ObservableCollection<DBCLocales>(Enum.GetValues<DBCLocales>());
+            
+            Watch(() => DBCVersion, () => CanPickLocale);
         }
+        
+        public bool CanPickLocale => DBCVersion == global::WDE.DbcStore.DBCVersions.WOTLK_12340;
 
         public string Path
         {
@@ -69,6 +77,16 @@ namespace WDE.DbcStore.ViewModels
             }
         }
 
+        public DBCLocales DBCLocale
+        {
+            get => dbcLocale;
+            set
+            {
+                SetProperty(ref dbcLocale, value);
+                IsModified = true;
+            }
+        }
+
         private bool isModified;
         public string ShortDescription => "To get all editor features, you need to use DBC (client database) files. This should be the path to extracted DBC files, the same the server uses.";
         
@@ -79,6 +97,7 @@ namespace WDE.DbcStore.ViewModels
         }
         
         public ObservableCollection<DBCVersions> DBCVersions { get; }
+        public ObservableCollection<DBCLocales> DBCLocales { get; }
         
         public string Name => "DBC";
 

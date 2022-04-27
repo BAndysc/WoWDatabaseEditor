@@ -8,6 +8,7 @@ using WDE.Common.Database;
 using WDE.Common.DBC;
 using WDE.Common.Parameters;
 using WDE.Common.Services;
+using WDE.Common.Utils;
 using WDE.Module.Attributes;
 using WDE.PacketViewer.Processing.Processors.Utils;
 using WowPacketParser.Proto;
@@ -17,8 +18,8 @@ using WDE.PacketViewer.Utils;
 namespace WDE.PacketViewer.Processing.Processors
 {
     [AutoRegister]
-    public class StoryTellerDumper : CompoundProcessor<bool, IWaypointProcessor, IChatEmoteSoundProcessor, IRandomMovementDetector, IDespawnDetector>,
-        IPacketTextDumper, ITwoStepPacketBoolProcessor, IUnfilteredPacketProcessor
+    public class StoryTellerDumper : CompoundProcessor<bool, IWaypointProcessor, IChatEmoteSoundProcessor, IRandomMovementDetector, IDespawnDetector, ISpellCastProcessor, IAuraSlotTracker>,
+        IPacketTextDumper, ITwoStepPacketBoolProcessor, IUnfilteredPacketProcessor, IUnfilteredTwoStepPacketBoolProcessor
     {
         private class WriterBuilder
         {
@@ -49,14 +50,16 @@ namespace WDE.PacketViewer.Processing.Processors
         private readonly ISpellService spellService;
         private readonly IUpdateObjectFollower updateObjectFollower;
         private readonly IPlayerGuidFollower playerGuidFollower;
+        private readonly ISpellCastProcessor spellCastProcessor;
         private readonly PrettyFlagParameter prettyFlagParameter;
+        private readonly IFromGuidSpawnTimeProcessor fromGuidSpawnTimeProcessor;
+        private readonly IAuraSlotTracker auraSlotTracker;
         private readonly HighLevelUpdateDump highLevelUpdateDump;
         private readonly IDespawnDetector despawnDetector;
         private WriterBuilder? writer = null;
         private Dictionary<UniversalGuid, WriterBuilder>? perGuidWriter = null;
         private readonly Dictionary<UniversalGuid, int> guids = new();
         private int currentShortGuid;
-        private readonly Dictionary<UniversalGuid, Dictionary<int, uint>> auras = new();
         private readonly Dictionary<uint, Dictionary<uint, string>> gossips = new();
 
         public bool RequiresSplitUpdateObject => true;
@@ -73,8 +76,11 @@ namespace WDE.PacketViewer.Processing.Processors
             HighLevelUpdateDump highLevelUpdateDump,
             IDespawnDetector despawnDetector,
             IPlayerGuidFollower playerGuidFollower,
+            ISpellCastProcessor spellCastProcessor,
             PrettyFlagParameter prettyFlagParameter,
-            bool perGuid) : base(waypointProcessor, chatProcessor, randomMovementDetector, despawnDetector)
+            IFromGuidSpawnTimeProcessor fromGuidSpawnTimeProcessor,
+            IAuraSlotTracker auraSlotTracker,
+            bool perGuid) : base(waypointProcessor, chatProcessor, randomMovementDetector, despawnDetector, spellCastProcessor, auraSlotTracker)
         {
             this.databaseProvider = databaseProvider;
             this.dbcStore = dbcStore;
@@ -85,7 +91,10 @@ namespace WDE.PacketViewer.Processing.Processors
             this.spellService = spellService;
             this.updateObjectFollower = updateObjectFollower;
             this.playerGuidFollower = playerGuidFollower;
+            this.spellCastProcessor = spellCastProcessor;
             this.prettyFlagParameter = prettyFlagParameter;
+            this.fromGuidSpawnTimeProcessor = fromGuidSpawnTimeProcessor;
+            this.auraSlotTracker = auraSlotTracker;
             this.highLevelUpdateDump = highLevelUpdateDump;
             this.despawnDetector = despawnDetector;
 
@@ -135,7 +144,10 @@ namespace WDE.PacketViewer.Processing.Processors
                     state.writer.WriteLine();
                     if (perGuidWriter != null)
                         state.writer.Write("   ");
-                    state.writer.WriteLine("After " + diff.TotalMilliseconds + " ms");
+                    if (diff.TotalMilliseconds > 60000)
+                        state.writer.WriteLine($"After {diff.ToNiceString()} ({diff.TotalMilliseconds} ms)");
+                    else
+                        state.writer.WriteLine($"After {diff.TotalMilliseconds} ms");
                     state.lastTime = packet.Time.ToDateTime();
                 }
             }
@@ -244,30 +256,56 @@ namespace WDE.PacketViewer.Processing.Processors
 
         protected override bool Process(PacketBase basePacket, PacketAuraUpdate packet)
         {
-            if (!auras.ContainsKey(packet.Unit))
-                auras[packet.Unit] = new Dictionary<int, uint>();
-            SetAppendOnNext(NiceGuid(packet.Unit) + " auras update:");
-            foreach (var update in packet.Updates)
+            if (packet.Updates.Count == 1)
             {
-                if (update.Remove && auras[packet.Unit].ContainsKey(update.Slot))
+                var update = packet.Updates[0];
+                if (update.Remove)
                 {
-                    if (spellService.Exists(auras[packet.Unit][update.Slot]))
-                        AppendLine(basePacket, packet.Unit,
-                        "    removed aura: " + GetSpellName(auras[packet.Unit][update.Slot]));
-                    auras[packet.Unit].Remove(update.Slot);
+                    var spellId = auraSlotTracker.GetSpellForAuraSlot(packet.Unit, update.Slot);
+                    if (spellId.HasValue && spellService.Exists(spellId.Value))
+                        AppendLine(basePacket, packet.Unit, NiceGuid(packet.Unit) + $" removed aura: {GetSpellName(spellId.Value)}");
                 }
-                else if (!update.Remove)
-                {
-                    auras[packet.Unit][update.Slot] = update.Spell;
-                    
-                    if (spellService.Exists(update.Spell))
-                        AppendLine(basePacket, packet.Unit, "    applied aura: " + GetSpellName(update.Spell));
-                }
+                else if (spellService.Exists(update.Spell))
+                    AppendLine(basePacket, packet.Unit, NiceGuid(packet.Unit) + $" applied aura: {GetSpellName(update.Spell)}");
             }
-            SetAppendOnNext(null);
+            else
+            {
+                SetAppendOnNext(NiceGuid(packet.Unit) + " auras update:");
+                foreach (var update in packet.Updates)
+                {
+                    if (update.Remove)
+                    {               
+                        var spellId = auraSlotTracker.GetSpellForAuraSlot(packet.Unit, update.Slot);
+                        if (spellId.HasValue && spellService.Exists(spellId.Value))
+                            AppendLine(basePacket, packet.Unit, "    removed aura: " + GetSpellName(spellId.Value));
+                    }
+                    else if (!update.Remove)
+                    {
+                        if (spellService.Exists(update.Spell))
+                            AppendLine(basePacket, packet.Unit, "    applied aura: " + GetSpellName(update.Spell));
+                    }
+                }
+                SetAppendOnNext(null);   
+            }
             return base.Process(basePacket, packet);
         }
 
+        protected override bool Process(PacketBase basePacket, PacketSpellStart packet)
+        {
+            if (!spellService.Exists(packet.Data.Spell))
+                return false;
+
+            if (spellCastProcessor.HasFinishedCastingAt(packet.Data.CastGuid, basePacket))
+                return false;
+            
+            string verb = " starts casting: ";
+            if (spellCastProcessor.HasFailedCastingAt(packet.Data.CastGuid, basePacket))
+                verb = " tries to cast and fails: ";
+
+            AppendLine(basePacket, packet.Data.Caster, NiceGuid(packet.Data.Caster) + verb + GetSpellName(packet.Data.Spell));
+            return true;
+        }
+        
         protected override bool Process(PacketBase basePacket, PacketSpellGo packet)
         {
             if (!spellService.Exists(packet.Data.Spell))
@@ -293,7 +331,35 @@ namespace WDE.PacketViewer.Processing.Processors
                 targetLine += "\n       }";
             }
 
-            AppendLine(basePacket, packet.Data.Caster, NiceGuid(packet.Data.Caster) + " casts: " + GetSpellName(packet.Data.Spell) + " " + targetLine);
+            string verb = "finishes casting";
+            if (spellCastProcessor.HasStartedCastingAt(packet.Data.CastGuid, basePacket))
+                verb = "starts and finishes casting";
+            
+            AppendLine(basePacket, packet.Data.Caster, NiceGuid(packet.Data.Caster) + $" {verb}: " + GetSpellName(packet.Data.Spell) + " " + targetLine);
+            return base.Process(basePacket, packet);
+        }
+
+        protected override bool Process(PacketBase basePacket, PacketSpellFailure packet)
+        {
+            if (!spellService.Exists(packet.Spell))
+                return false;
+
+            if (spellCastProcessor.HasStartedCastingAt(packet.CastGuid, basePacket))
+                return false;
+            
+            AppendLine(basePacket, packet.Caster, NiceGuid(packet.Caster) + $" failed casting spell " + GetSpellName(packet.Spell));
+            return base.Process(basePacket, packet);
+        }
+
+        protected override bool Process(PacketBase basePacket, PacketSpellCastFailed packet)
+        {
+            if (!spellService.Exists(packet.Spell))
+                return false;
+
+            if (spellCastProcessor.HasStartedCastingAt(packet.CastGuid, basePacket))
+                return false;
+
+            AppendLine(basePacket, null, $"Casting spell " + GetSpellName(packet.Spell) + " failed");
             return base.Process(basePacket, packet);
         }
 
@@ -384,6 +450,13 @@ namespace WDE.PacketViewer.Processing.Processors
                 sb.Append("enters " +
                           (packet.TransportGuid.Type == UniversalHighGuid.Vehicle ? "vehicle" : "transport") + " " +
                           NiceGuid(packet.TransportGuid) + " on seat " + packet.VehicleSeat);
+            else if (packet.Flags.HasFlag(UniversalSplineFlag.Parabolic) &&
+                     packet.Points.Count == 1 && packet.PackedPoints.Count == 0 &&
+                     packet.Jump != null)
+            {
+                var dest = packet.Points[0];
+                sb.Append($"jumps to ({dest.X}, {dest.Y}, {dest.Z}) with gravity {packet.Jump.Gravity}");
+            }
             else if (packet.Flags.HasFlag(UniversalSplineFlag.TransportExit))
                 sb.Append("exits vehicle/transport");
             else if (packet.Points.Count > 0)
@@ -397,7 +470,7 @@ namespace WDE.PacketViewer.Processing.Processors
                     return true;
 
                 int i = 1;
-                sb.AppendLine($"goes by waypoints [{path.TotalMoveTime} ms]: {{");
+                sb.AppendLine($"goes by waypoints [{TimeSpan.FromMilliseconds(path.TotalMoveTime).ToNiceString()} ({path.TotalMoveTime} ms)]: {{");
                 foreach (var segment in path.Segments)
                 {
                     sb.AppendLine($"     Segment {i++}, dist: {segment.OriginalDistance}, average speed: {segment.OriginalDistance / segment.MoveTime * 1000} yd/s");
@@ -444,6 +517,16 @@ namespace WDE.PacketViewer.Processing.Processors
                         sb.AppendLine($" with destination ({packet.Points[0].X}, {packet.Points[0].Y}, {packet.Points[0].Z})");
                     }
                 }*/
+                
+                
+                if (packet.Jump != null && (packet.Flags & UniversalSplineFlag.Parabolic) != 0)
+                {
+                    if (sb.Length > 0)
+                        sb.Append("\n    then ");
+                
+                    sb.Append($"after [special time] jump with gravity {packet.Jump.Gravity}");
+                    sb.Append("\n    (explanation: this packet is both a path and a jump. Check the packet text view manually, because story teller doesn't support it fully)");
+                }
             }
 
             var skipOrientation = lastPathSegmentHadOrientation &&
@@ -453,13 +536,13 @@ namespace WDE.PacketViewer.Processing.Processors
                 if (sb.Length > 0)
                     sb.Append("\n    then ");
                 if (packet.FacingCase == PacketMonsterMove.FacingOneofCase.LookOrientation)
-                    sb.Append("looks at " + packet.LookOrientation);
+                    sb.Append("set orientation to " + packet.LookOrientation);
                 else if (packet.FacingCase == PacketMonsterMove.FacingOneofCase.LookTarget)
                     sb.Append("looks at " + NiceGuid(packet.LookTarget.Target));
                 else if (packet.FacingCase == PacketMonsterMove.FacingOneofCase.LookPosition)
                     sb.Append($"looks at ({packet.LookPosition.X}, {packet.LookPosition.Y}, {packet.LookPosition.Z})");   
             }
-
+            
             if (sb.Length == 0)
                 sb.Append("stops");
 
@@ -542,8 +625,10 @@ namespace WDE.PacketViewer.Processing.Processors
                     continue;
                 var spawnTime = despawnDetector.GetSpawnLength(created.Guid, basePacket.Number);
                 var createType = created.CreateType == CreateObjectType.InRange ? "In range " : "Spawned ";
+                var spawnedAgo = fromGuidSpawnTimeProcessor.TryGetSpawnTime(created.Guid, basePacket.Time.ToDateTime());
                 SetAppendOnNext(createType + NiceGuid(created.Guid) + " at " + VecToString(created.Movement?.Position ?? created.Stationary?.Position, created.Movement?.Orientation ?? created.Stationary?.Orientation) +
-                                (spawnTime == null ? "" : $" (despawned in {spawnTime.Value.TotalSeconds} seconds)"));
+                                (spawnTime == null ? "" : $" (will be destroyed in {spawnTime.Value.ToNiceString()})") +
+                                (spawnedAgo.HasValue && (spawnedAgo.Value.TotalMilliseconds > 1000 || created.CreateType == CreateObjectType.InRange) ? $" (spawned {spawnedAgo.Value.ToNiceString()} ago)" : ""));
                 PrintValues(basePacket, created.Guid, created.Values, false);
                 SetAppendOnNext(null);
             }
@@ -552,7 +637,7 @@ namespace WDE.PacketViewer.Processing.Processors
             {
                 if (updated.Guid.Type is UniversalHighGuid.Item or UniversalHighGuid.DynamicObject)
                     continue;
-                if (updated.Values.Ints.TryGetValue("UNIT_FIELD_HEALTH", out var hp) &&
+                if (updated.Values.TryGetInt("UNIT_FIELD_HEALTH", out var hp) &&
                     hp == 0)
                 {
                     var oldHp = updateObjectFollower.GetInt(updated.Guid, "UNIT_FIELD_HEALTH") ?? 1;
@@ -560,7 +645,7 @@ namespace WDE.PacketViewer.Processing.Processors
                         AppendLine(basePacket, updated.Guid, NiceGuid(updated.Guid) + " dies");
                 }
                 
-                if (updated.Values.Ints.TryGetValue("UNIT_FIELD_FLAGS", out var unitFlags))
+                if (updated.Values.TryGetInt("UNIT_FIELD_FLAGS", out var unitFlags))
                 {
                     long old = 0;
                     updateObjectFollower.TryGetIntOrDefault(updated.Guid, "UNIT_FIELD_FLAGS", out old);
@@ -621,7 +706,7 @@ namespace WDE.PacketViewer.Processing.Processors
 
         private void PrintValues(PacketBase basePacket, UniversalGuid guid, UpdateValues values, bool isUpdate)
         {
-            foreach (var val in values.Ints)
+            foreach (var val in values.Ints())
             {
                 if (!IsUpdateFieldInteresting(val.Key, isUpdate))
                     continue;
@@ -651,7 +736,7 @@ namespace WDE.PacketViewer.Processing.Processors
                 }
             }
             
-            foreach (var val in values.Floats)
+            foreach (var val in values.Floats())
             {
                 if (!IsUpdateFieldInteresting(val.Key, isUpdate))
                     continue;
@@ -662,7 +747,7 @@ namespace WDE.PacketViewer.Processing.Processors
                     AppendLine(basePacket, guid, $"     {val.Key} = {val.Value} (old: {intValue})", true);
             }
             
-            foreach (var val in values.Guids)
+            foreach (var val in values.Guids())
             {
                 if (!IsUpdateFieldInteresting(val.Key, isUpdate))
                     continue;
@@ -745,6 +830,11 @@ namespace WDE.PacketViewer.Processing.Processors
         {
             if (unfiltered.KindCase == PacketHolder.KindOneofCase.UpdateObject)
                 updateObjectFollower.Process(unfiltered);
+        }
+
+        public bool UnfilteredPreProcess(PacketHolder packet)
+        {
+            return fromGuidSpawnTimeProcessor.Process(packet);
         }
     }
 }

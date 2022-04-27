@@ -1,0 +1,39 @@
+{
+  "id": "creature_queststarter",
+  "compatibility": [
+    "TrinityWrath", "Azeroth", "TrinityMaster", "TrinityCata"
+  ],
+  "name": "Creature Quest Starter",
+  "single_solution_name": "Creature {name} quest starter",
+  "multi_solution_name": "Multiple creature quest starter",
+  "description": "Holds NPC quest giver relations on which NPCs start which quests.",
+  "table_name": "creature_queststarter",
+  "table_index_name": "id",
+  "record_mode": "MultiRecord",
+  "icon_path": "Icons/document_queststarter.png",
+  "reload_command": "reload creature_queststarter",
+  "group_name": "Quests",
+  "picker": "CreatureParameter",
+  "primary_key": [
+    "id",
+    "quest"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Id",
+          "db_column_name": "id",
+          "value_type": "CreatureParameter"
+        },
+        {
+          "name": "Quest",
+          "db_column_name": "quest",
+          "value_type": "QuestParameter",
+          "preferred_width": 300
+        }
+      ]
+    }
+  ]
+}

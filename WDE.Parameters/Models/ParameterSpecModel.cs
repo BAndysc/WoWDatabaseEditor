@@ -19,12 +19,19 @@ namespace WDE.Parameters.Models
         [JsonProperty(PropertyName = "inmenu")]
         public bool InMenu { get; set; }
 
+        [JsonProperty(PropertyName = "quickaccess")]
+        public QuickAccessMode QuickAccess { get; set; }
+
         [JsonProperty(PropertyName = "prefix")]
         public string Prefix { get; set; }
 
         [JsonProperty(PropertyName = "values")]
+        [JsonConverter(typeof(ParameterValuesJsonConverter))]
         public Dictionary<long, SelectOption>? Values { get; set; }
 
+        [JsonProperty(PropertyName = "mask_from")]
+        public ParameterMaskFrom? MaskFrom { get; set; }
+        
         [JsonProperty(PropertyName = "stringValues")]
         public Dictionary<string, SelectOption>? StringValues { get; set; }
 
@@ -32,5 +39,14 @@ namespace WDE.Parameters.Models
         {
             return Name;
         }
+    }
+
+    public struct ParameterMaskFrom
+    {
+        [JsonProperty(PropertyName = "name")]
+        public string Name { get; set; }
+        
+        [JsonProperty(PropertyName = "offset")]
+        public int Offset { get; set; }
     }
 }

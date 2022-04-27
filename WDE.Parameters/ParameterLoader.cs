@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Reactive.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Prism.Events;
 using WDE.Common.Database;
@@ -9,8 +12,10 @@ using WDE.Common.Parameters;
 using WDE.Common.Providers;
 using WDE.Common.Services;
 using WDE.MVVM.Observable;
+using WDE.Parameters.Models;
 using WDE.Parameters.Parameters;
 using WDE.Parameters.Providers;
+using WDE.Parameters.QuickAccess;
 
 namespace WDE.Parameters
 {
@@ -22,15 +27,17 @@ namespace WDE.Parameters
         private readonly IItemFromListProvider itemFromListProvider;
         private readonly IEventAggregator eventAggregator;
         private readonly ILoadingEventAggregator loadingEventAggregator;
+        private readonly IQuickAccessRegisteredParameters quickAccessRegisteredParameters;
 
         private Dictionary<Type, List<IDatabaseObserver>> reloadable = new();
         private List<LateLoadParameter> databaseParameters = new();
-        public ParameterLoader(IDatabaseProvider database, 
+        internal ParameterLoader(IDatabaseProvider database, 
             IParameterDefinitionProvider parameterDefinitionProvider,
             IServerIntegration serverIntegration,
             IItemFromListProvider itemFromListProvider,
             IEventAggregator eventAggregator,
-            ILoadingEventAggregator loadingEventAggregator)
+            ILoadingEventAggregator loadingEventAggregator,
+            IQuickAccessRegisteredParameters quickAccessRegisteredParameters)
         {
             this.database = database;
             this.parameterDefinitionProvider = parameterDefinitionProvider;
@@ -38,6 +45,7 @@ namespace WDE.Parameters
             this.itemFromListProvider = itemFromListProvider;
             this.eventAggregator = eventAggregator;
             this.loadingEventAggregator = loadingEventAggregator;
+            this.quickAccessRegisteredParameters = quickAccessRegisteredParameters;
         }
 
         public void Load(ParameterFactory factory)
@@ -46,32 +54,56 @@ namespace WDE.Parameters
             {
                 if (pair.Value.StringValues != null)
                 {
-                    SwitchStringParameter stringParameter = new SwitchStringParameter(pair.Value.StringValues);
+                    SwitchStringParameter stringParameter = new SwitchStringParameter(pair.Value.StringValues, pair.Value.Prefix);
                     factory.Register(pair.Key, stringParameter);
                 }
                 else if (pair.Value.Values != null)
                 {
                     Parameter p = pair.Value.IsFlag ? new FlagParameter() : new Parameter();
                     p.Items = pair.Value.Values;
-                    factory.Register(pair.Key, p);   
+                    p.Prefix = pair.Value.Prefix;
+                    factory.Register(pair.Key, p);
                 }
+                else if (pair.Value.MaskFrom != null)
+                {
+                    Parameter p = new FlagParameter();
+                    var other = factory.Factory(pair.Value.MaskFrom.Value.Name);
+                    Debug.Assert(other.Items != null);
+                    p.Items = new Dictionary<long, SelectOption>();
+                    foreach (var arg in other.Items)
+                    {
+                        var key = 1L << (int)(arg.Key + pair.Value.MaskFrom.Value.Offset);
+                        if (arg.Key == 0 && pair.Value.MaskFrom.Value.Offset < 0)
+                            key = 0;
+                        p.Items.Add(key, arg.Value);
+                    }
+                    factory.Register(pair.Key, p);
+                }
+                
+                if (pair.Value.QuickAccess != QuickAccessMode.None)
+                    quickAccessRegisteredParameters.Register(pair.Value.QuickAccess, pair.Key, pair.Value.Name);
             }
 
+            factory.Register("InvalidParameter", new InvalidParameter<long>());
             factory.Register("FloatParameter", new FloatIntParameter(1000));
             factory.Register("DecifloatParameter", new FloatIntParameter(100));
-            factory.Register("GameEventParameter", AddDatabaseParameter(new GameEventParameter(database)));
-            factory.Register("CreatureParameter", AddDatabaseParameter(new CreatureParameter(database, serverIntegration)));
+            factory.Register("GameEventParameter", AddDatabaseParameter(new GameEventParameter(database)), QuickAccessMode.Limited);
+            factory.Register("CreatureParameter", AddDatabaseParameter(new CreatureParameter(database, serverIntegration)), QuickAccessMode.Limited);
             factory.Register("CreatureGameobjectNameParameter", AddDatabaseParameter(new CreatureGameobjectNameParameter(database)));
             factory.Register("CreatureGameobjectParameter", AddDatabaseParameter(new CreatureGameobjectParameter(database)));
-            factory.Register("QuestParameter", AddDatabaseParameter(new QuestParameter(database)));
+            factory.Register("QuestParameter", AddDatabaseParameter(new QuestParameter(database)), QuickAccessMode.Limited);
             factory.Register("PrevQuestParameter", AddDatabaseParameter(new PrevQuestParameter(database)));
-            factory.Register("GameobjectParameter", AddDatabaseParameter(new GameobjectParameter(database, serverIntegration, itemFromListProvider)));
+            factory.Register("GameobjectParameter", AddDatabaseParameter(new GameobjectParameter(database, serverIntegration, itemFromListProvider)), QuickAccessMode.Limited);
             factory.Register("GossipMenuParameter", AddDatabaseParameter(new GossipMenuParameter(database)));
             factory.Register("NpcTextParameter", AddDatabaseParameter(new NpcTextParameter(database)));
             factory.Register("ConversationTemplateParameter", new ConversationTemplateParameter(database));
             factory.Register("BoolParameter", new BoolParameter());
             factory.Register("FlagParameter", new FlagParameter());
             factory.Register("PercentageParameter", new PercentageParameter());
+            factory.Register("MoneyParameter", new MoneyParameter());
+            factory.Register("MinuteIntervalParameter", new MinuteIntervalParameter());
+            factory.Register("UnixTimestampParameter", new UnixTimestampParameter(0));
+            factory.Register("UnixTimestampSince2000Parameter", new UnixTimestampParameter(946681200));
             factory.Register("GameobjectBytes1Parameter", new GameObjectBytes1Parameter());
             factory.RegisterCombined("UnitBytes0Parameter", "RaceParameter",  "ClassParameter","GenderParameter", "PowerParameter", 
                 (race, @class, gender, power) => new UnitBytesParameter(race, @class, gender, power));
@@ -115,6 +147,141 @@ namespace WDE.Parameters
         public override string ToString(long key)
         {
             return key + "%";
+        }
+    }
+
+    public class MinuteIntervalParameter : Parameter, IParameterFromString<long?>
+    {
+        public override string ToString(long minutes)
+        {
+            int years = (int) (minutes / 525600);
+            minutes -= years * 525600;
+            int months = (int) (minutes / 43200);
+            minutes -= months * 43200;
+            int days = (int) (minutes / 1440);
+            minutes -= days * 1440;
+            int hours = (int) (minutes / 60);
+            minutes -= hours * 60;
+            StringBuilder sb = new();
+             if (years > 0)
+                sb.Append(years).Append("y ");
+             if (months > 0)
+                sb.Append(months).Append("m ");
+             if (days > 0)
+                sb.Append(days).Append("d ");
+             if (hours > 0)
+                sb.Append(hours).Append("h ");
+             if (minutes > 0)
+                sb.Append(minutes).Append("min ");
+            
+            return sb.ToString();
+        }
+
+        public long? FromString(string value)
+        {
+            if (long.TryParse(value, out var val))
+                return val;
+            var parts = value.Split(' ');
+            long minutes = 0;
+            for (int i = 0; i < parts.Length; i++)
+            {
+                var part = parts[i];
+                if (!long.TryParse(part[..^1], out var num) &&
+                    !long.TryParse(part[..^4], out num))
+                    return null;
+                if (part.EndsWith("y"))
+                    minutes += num * 525600;
+                else if (part.EndsWith("m"))
+                    minutes += num * 43200;
+                else if (part.EndsWith("d"))
+                    minutes += num * 1440;
+                else if (part.EndsWith("h"))
+                    minutes += num * 60;
+                else if (part.EndsWith("min"))
+                    minutes += num;
+                else
+                    return null;
+            }
+            return minutes;
+        }
+    }
+
+    public class InvalidParameter<T> : IParameter<T> where T : notnull
+    {
+        public string? Prefix => null;
+        public bool HasItems => false;
+        public string ToString(T value) => "INVALID VALUE";
+        public Dictionary<T, SelectOption>? Items => null;
+    }
+
+    public class MoneyParameter : Parameter, IParameterFromString<long?>
+    {
+        public override string ToString(long key)
+        {
+            int gold = (int) (key / 10000);
+            int silver = (int) ((key % 10000) / 100);
+            int copper = (int) (key % 100);
+            if (gold > 0 && silver > 0 && copper > 0)
+                return $"{gold}g {silver}s {copper}c";
+            if (gold > 0 && silver > 0)
+                return $"{gold}g {silver}s";
+            if (gold > 0 && copper > 0)
+                return $"{gold}g {copper}c";
+            if (gold > 0)
+                return $"{gold}g";
+            if (silver > 0 && copper > 0)
+                return $"{silver}s {copper}c";
+            if (silver > 0)
+                return $"{silver}s";
+            return $"{copper}c";
+        }
+
+        public long? FromString(string value)
+        {
+            if (long.TryParse(value, out var val))
+                return val;
+            long total = 0;
+            var parts = value.Split(' ');
+            foreach (var part in parts)
+            {
+                if (part.Length < 2)
+                    return null;
+                var unit = part[^1];
+                var amount = part.Substring(0, part.Length - 1);
+                if (!long.TryParse(amount, out var amountLong))
+                    return null;
+                switch (unit)
+                {
+                    case 'g':
+                        total += amountLong * 10000;
+                        break;
+                    case 's':
+                        total += amountLong * 100;
+                        break;
+                    case 'c':
+                        total += amountLong;
+                        break;
+                    default:
+                        return null;
+                }
+            }
+
+            return total;
+        }
+    }
+
+    public class UnixTimestampParameter : Parameter
+    {
+        private readonly long startOffset;
+
+        public UnixTimestampParameter(long startOffset)
+        {
+            this.startOffset = startOffset;
+        }
+        
+        public override string ToString(long key)
+        {
+            return DateTime.UnixEpoch.AddSeconds(startOffset + key).ToString("yyyy-MM-dd HH:mm:ss");
         }
     }
 

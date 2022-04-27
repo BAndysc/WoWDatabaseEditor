@@ -1,0 +1,166 @@
+[
+  {
+    "id": 0,
+    "name": "SCRIPT_COMMAND_TALK",
+    "description": "{source}: {datalong} text {dataint}",
+    "datalong": "EventScriptTalkTypeParameter",
+    "dataint": "TableReference(broadcast_text#ID)Parameter"
+  },
+  {
+    "id": 1,
+    "name": "SCRIPT_COMMAND_EMOTE",
+    "description": "{sourceOrTargetCreature}: {datalong2value:choose(0):play emote|set emote state} {datalong}",
+    "datalong": "EmoteParameter",
+    "datalong2": "BoolParameter"
+  },
+  {
+    "id": 2,
+    "name": "SCRIPT_COMMAND_FIELD_SET",
+    "description": "{sourceOrTargetCreature}: set field {datalong} to {datalong2}"
+  },
+  {
+    "id": 3,
+    "name": "SCRIPT_COMMAND_MOVE_TO",
+    "description": "{source}: go to ({x}, {y}, {z}) in {datalong2} milliseconds"
+  },
+  {
+    "id": 4,
+    "name": "SCRIPT_COMMAND_FLAG_SET",
+    "description": "{sourceOrTargetCreature}: set flag {datalong} to {datalong2}"
+  },
+  {
+    "id": 5,
+    "name": "SCRIPT_COMMAND_FLAG_REMOVE",
+    "description": "{sourceOrTargetCreature}: remove flag {datalong} to {datalong2}"
+  },
+  {
+    "id": 6,
+    "name": "SCRIPT_COMMAND_TELEPORT_TO",
+    "description": "{datalong2value:choose(0):{sourceOrTargetPlayer}|{sourceOrTargetCreature}}: teleport to ({x}, {y}, {z}, {o})"
+  },
+  {
+    "id": 7,
+    "name": "SCRIPT_COMMAND_QUEST_EXPLORED",
+    "description": "{sourceOrTargetPlayer}: Set quest {datalong} explored (if distance to source <= {datalong2})",
+    "datalong": "QuestParameter"
+  },
+  {
+    "id": 8,
+    "name": "SCRIPT_COMMAND_KILL_CREDIT",
+    "description": "{datalong2value:choose(0):{sourceOrTargetPlayer}|{sourceOrTargetPlayer}'s group}: Give {datalong} kill credit",
+    "datalong": "CreatureParameter"
+  },
+  {
+    "id": 9,
+    "name": "SCRIPT_COMMAND_RESPAWN_GAMEOBJECT",
+    "description": "Respawn gameobject {datalong} and despawn in {datalong2} milliseconds",
+    "datalong": "TableReference(gameobject#guid)Parameter"
+  },
+  {
+    "id": 10,
+    "name": "SCRIPT_COMMAND_TEMP_SUMMON_CREATURE",
+    "description": "{source}: Summon creature {datalong} at ({x}, {y}, {z}) for {datalong2} milliseconds",
+    "datalong": "CreatureParameter"
+  },
+  {
+    "id": 11,
+    "name": "SCRIPT_COMMAND_OPEN_DOOR",
+    "description": "Open door with guid {datalong} and close in {datalong2} milliseconds",
+    "datalong": "TableReference(gameobject#guid)Parameter"
+  },
+  {
+    "id": 12,
+    "name": "SCRIPT_COMMAND_CLOSE_DOOR",
+    "description": "Close door with guid {datalong} and open in {datalong2} milliseconds",
+    "datalong": "TableReference(gameobject#guid)Parameter"
+  },
+  {
+    "id": 13,
+    "name": "SCRIPT_COMMAND_ACTIVATE_OBJECT",
+    "description": "{source}: Activate gameobject {target}"
+  },
+  {
+    "id": 14,
+    "name": "SCRIPT_COMMAND_REMOVE_AURA",
+    "description": "{datalong2value:choose(0):{target}|{source}}: Remove aura {datalong}",
+    "datalong": "SpellParameter"
+  },
+  {
+    "id": 15,
+    "name": "SCRIPT_COMMAND_CAST_SPELL",
+    "description": "{datalong2value:choose(0|1|2|3):{source}|{source}|{target}|{target}|{source}}: Cast spell {datalong} on {datalong2value:choose(0|1|2|3):{target}|{source}|{target}|{source}|{dataintvalue:choose(0):|Closest creature {dataint} in {x} yd}}",
+    "datalong": "SpellParameter",
+    "dataint": "CreatureParameter"
+  },
+  {
+    "id": 16,
+    "name": "SCRIPT_COMMAND_PLAY_SOUND",
+    "description": "Play sound {datalong}",
+    "datalong": "SoundParameter"
+  },
+  {
+    "id": 17,
+    "name": "SCRIPT_COMMAND_CREATE_ITEM",
+    "description": "{source}: Add {datalong2value:choose(0|1):item|item|{datalong2} copies of} item {datalong}",
+    "datalong": "ItemParameter"
+  },
+  {
+    "id": 18,
+    "name": "SCRIPT_COMMAND_DESPAWN_SELF",
+    "description": "{source}: Despawn in {datalong} milliseconds"
+  },
+  {
+    "id": 20,
+    "name": "SCRIPT_COMMAND_LOAD_PATH",
+    "description": "{source}: Start path {datalong}{datalong2value:choose(0):| (repeat)}"
+  },
+  {
+    "id": 21,
+    "name": "SCRIPT_COMMAND_CALLSCRIPT_TO_UNIT",
+    "description": "Creature {datalong} start {dataintvalue:choose(3|5|6):spell_script|event_script|waypoint_script|[INVALID VALUE]} {datalong2}",
+    "datalong": "CreatureParameter"
+  },
+  {
+    "id": 22,
+    "name": "SCRIPT_COMMAND_KILL",
+    "description": "{source}: Kill self{dataintvalue:choose(1): (and remove corpse)|}"
+  },
+  {
+    "id": 30,
+    "name": "SCRIPT_COMMAND_ORIENTATION",
+    "description": "{source}: {datalongvalue:choose(0):Set orientation to {o}|Look at {target}}"
+  },
+  {
+    "id": 31,
+    "name": "SCRIPT_COMMAND_EQUIP",
+    "description": "{source}: Equip equipment {datalong}"
+  },
+  {
+    "id": 32,
+    "name": "SCRIPT_COMMAND_MODEL",
+    "description": "{source}: Set model {datalong}",
+    "datalong": "CreatureModelDataParameter"
+  },
+  {
+    "id": 33,
+    "name": "SCRIPT_COMMAND_CLOSE_GOSSIP",
+    "description": "{source}: Close gossip"
+  },
+  {
+    "id": 34,
+    "name": "SCRIPT_COMMAND_PLAYMOVIE",
+    "description": "{source}: Play movie {datalong}",
+    "datalong": "MovieParameter"
+  },
+  {
+    "id": 35,
+    "name": "SCRIPT_COMMAND_MOVEMENT",
+    "description": "{source}: {datalongvalue:choose(0|1|2):Stay in place|Move random in {datalong2} yd|Start path {dataint}|[Invalid move type]}",
+    "datalong": "DatabaseMovementTypeParameter"
+  },
+  {
+    "id": 36,
+    "name": "SCRIPT_COMMAND_PLAY_ANIMKIT",
+    "description": "{source}: Play animkit {datalong}"
+  }
+]

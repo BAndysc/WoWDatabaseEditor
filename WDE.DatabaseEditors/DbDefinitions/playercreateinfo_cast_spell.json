@@ -1,0 +1,53 @@
+{
+  "id": "playercreateinfo_cast_spell",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Player createinfo Cast Spell",
+  "single_solution_name": "Player createinfo Cast Spell",
+  "multi_solution_name": "Player createinfo Cast Spell",
+  "description": "What spells should be casted on a brand fresh new creature",
+  "table_name": "playercreateinfo_cast_spell",
+  "table_index_name": "raceMask",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Player create info",
+  "picker": "Parameter",
+  "primary_key": [
+    "raceMask",
+    "classMask",
+    "spell"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Race Mask",
+          "db_column_name": "raceMask",
+          "value_type": "RaceMaskParameter",
+          "preferred_width": 145.0
+        },
+        {
+          "name": "Class Mask",
+          "db_column_name": "classMask",
+          "value_type": "ClassMaskParameter",
+          "preferred_width": 135.0
+        },
+        {
+          "name": "Spell",
+          "db_column_name": "spell",
+          "value_type": "SpellParameter",
+          "preferred_width": 205.0
+        },
+        {
+          "name": "Note",
+          "db_column_name": "note",
+          "value_type": "string",
+          "can_be_null": true,
+          "preferred_width": 300.0
+        }
+      ]
+    }
+  ]
+}

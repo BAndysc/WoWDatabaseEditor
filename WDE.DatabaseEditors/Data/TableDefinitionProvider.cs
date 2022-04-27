@@ -11,10 +11,12 @@ namespace WDE.DatabaseEditors.Data
     [AutoRegister]
     public class TableDefinitionProvider : ITableDefinitionProvider
     {
+        private readonly List<DatabaseTableDefinitionJson> incompatibleDefinitionList = new();
         private readonly Dictionary<string, DatabaseTableDefinitionJson> incompatibleDefinitions = new();
         private readonly Dictionary<string, DatabaseTableDefinitionJson> definitions = new();
         private readonly Dictionary<string, DatabaseTableDefinitionJson> definitionsByTableName = new();
-        
+        private readonly Dictionary<string, DatabaseTableDefinitionJson> definitionsByForeignTableName = new();
+
         public TableDefinitionProvider(ITableDefinitionDeserializer serializationProvider,
             ITableDefinitionJsonProvider jsonProvider,
             ICurrentCoreVersion currentCoreVersion)
@@ -34,6 +36,15 @@ namespace WDE.DatabaseEditors.Data
                 var definition =
                     serializationProvider.DeserializeTableDefinition<DatabaseTableDefinitionJson>(source.content);
 
+                if (string.IsNullOrEmpty(definition.MultiSolutionName))
+                    definition.MultiSolutionName = definition.Name;
+
+                if (string.IsNullOrEmpty(definition.SingleSolutionName))
+                    definition.SingleSolutionName = definition.Name;
+
+                if (string.IsNullOrEmpty(definition.IconPath))
+                    definition.IconPath = "Icons/document_table.png";
+                
                 definition.TableColumns = new Dictionary<string, DatabaseColumnJson>();
                 foreach (var group in definition.Groups)
                 {
@@ -60,9 +71,17 @@ namespace WDE.DatabaseEditors.Data
                 {
                     definitions[definition.Id] = definition;
                     definitionsByTableName[definition.TableName] = definition;
+                    if (definition.ForeignTable != null)
+                    {
+                        foreach (var foreign in definition.ForeignTable)
+                            definitionsByForeignTableName[foreign.TableName] = definition;
+                    }
                 }
                 else
+                {
                     incompatibleDefinitions[definition.Id] = definition;
+                    incompatibleDefinitionList.Add(definition);
+                }
             }
         }
 
@@ -84,6 +103,17 @@ namespace WDE.DatabaseEditors.Data
             return null;
         }
         
+        public DatabaseTableDefinitionJson? GetDefinitionByForeignTableName(string? tableName)
+        {
+            if (tableName == null)
+                return null;
+            
+            if (definitionsByForeignTableName.TryGetValue(tableName, out var definition))
+                return definition;
+            
+            return null;
+        }
+
         public DatabaseTableDefinitionJson? GetDefinition(string? definitionId)
         {
             if (definitionId != null && definitions.TryGetValue(definitionId, out var definition))
@@ -93,7 +123,7 @@ namespace WDE.DatabaseEditors.Data
 
         public IEnumerable<DatabaseTableDefinitionJson> IncompatibleDefinitions => incompatibleDefinitions.Values;
         public IEnumerable<DatabaseTableDefinitionJson> AllDefinitions =>
-            definitions.Values.Concat(IncompatibleDefinitions);
+            definitions.Values.Concat(incompatibleDefinitionList);
         public IEnumerable<DatabaseTableDefinitionJson> Definitions => definitions.Values;
     }
 }

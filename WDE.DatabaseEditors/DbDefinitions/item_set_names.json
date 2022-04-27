@@ -1,0 +1,52 @@
+{
+  "id": "item_set_names",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Item Set Names",
+  "single_solution_name": "Item Set Names",
+  "multi_solution_name": "Item Set Names",
+  "description": "",
+  "table_name": "item_set_names",
+  "table_index_name": "entry",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Advanced",
+  "reload_command": "reload item_set_names",
+  "picker": "",
+  "primary_key": [
+    "entry"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Set",
+          "db_column_name": "entry",
+          "value_type": "ItemSetParameter",
+          "preferred_width": 140.0
+        },
+        {
+          "name": "Inventory Type",
+          "db_column_name": "InventoryType",
+          "value_type": "InventoryTypeParameter",
+          "preferred_width": 235.0
+        },
+        {
+          "name": "Name",
+          "db_column_name": "name",
+          "value_type": "string",
+          "default": "",
+          "preferred_width": 250.0
+        },
+        {
+          "name": "Verified Build",
+          "db_column_name": "VerifiedBuild",
+          "value_type": "int",
+          "can_be_null": true
+        }
+      ]
+    }
+  ]
+}

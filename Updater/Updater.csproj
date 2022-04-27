@@ -6,7 +6,6 @@
         <Nullable>enable</Nullable>
         <Configurations>Debug;Release</Configurations>
         <Platforms>AnyCPU</Platforms>
-        <TargetName>_Updater</TargetName>
     </PropertyGroup>
     <PropertyGroup>
         <OutputPath>..\bin\$(Configuration)\</OutputPath>

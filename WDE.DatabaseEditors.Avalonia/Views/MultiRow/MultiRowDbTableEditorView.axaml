@@ -10,9 +10,11 @@
              xmlns:multiRow="clr-namespace:WDE.DatabaseEditors.Avalonia.Views.MultiRow"
              xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia"
              xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
+             xmlns:vm="clr-namespace:WDE.DatabaseEditors.ViewModels.MultiRow;assembly=WDE.DatabaseEditors"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              Name="rootWindow"
-             IsEnabled="{Binding TaskInProgress, Converter={x:Static converters:InverseBoolConverter.Instance}}"
+             x:DataType="vm:MultiRowDbTableEditorViewModel"
+             IsEnabled="{CompiledBinding TaskInProgress, Converter={x:Static converters:InverseBoolConverter.Instance}}"
              x:Class="WDE.DatabaseEditors.Avalonia.Views.MultiRow.MultiRowDbTableEditorView">
     <UserControl.Resources>
         <converters:BoolToIntegerConverter x:Key="BoolToInt2" TrueValue="2" FalseValue="0" />
@@ -58,30 +60,30 @@
                 KeyboardNavigation.TabNavigation="Continue"
                 MaximumColumnsCount="{Binding #rootWindow.DataContext.SplitHorizontal, Converter={StaticResource BoolToInt1Max}}" ColumnWidth="400" HorizontalSpacing="10" Spacing="5"></controls:DynamicColumnsPanel>
         </ItemsPanelTemplate>
-        <DataTemplate x:Key="RowTemplate">
+        <DataTemplate x:Key="RowTemplate" x:DataType="vm:DatabaseEntityViewModel">
             <multiRow:SelectablePanel>
                 <ItemsPresenter 
                     KeyboardNavigation.TabNavigation="Continue"
-                    Items="{Binding Cells, Mode=OneTime}" 
+                    Items="{CompiledBinding Cells, Mode=OneTime}" 
                     ItemsPanel="{StaticResource HorizontalRowPanel}">
                     <ItemsPresenter.Styles>
-                        <Style Selector="Grid > ContentPresenter">
-                            <Setter Property="(Grid.Column)" Value="{Binding ColumnIndex}" />
+                        <Style Selector="Grid > ContentPresenter" x:DataType="vm:DatabaseCellViewModel">
+                            <Setter Property="(Grid.Column)" Value="{CompiledBinding ColumnIndex}" />
                         </Style>
                     </ItemsPresenter.Styles>
                 </ItemsPresenter>
             </multiRow:SelectablePanel>
         </DataTemplate>
-        <DataTemplate x:Key="VerticalRowTemplate">
+        <DataTemplate x:Key="VerticalRowTemplate" DataType="vm:DatabaseEntityViewModel">
             <ItemsPresenter 
                 KeyboardNavigation.TabNavigation="Continue"
-                Items="{Binding Cells, Mode=OneWay}"
+                Items="{CompiledBinding Cells, Mode=OneWay}"
                 ItemsPanel="{StaticResource VerticalRowPanel}">
                 <ItemsPresenter.ItemTemplate>
-                    <DataTemplate>
+                    <DataTemplate x:DataType="vm:DatabaseCellViewModel">
                         <DockPanel LastChildFill="True">
-                            <TextBlock Text="{Binding ColumnName, StringFormat={}{0}: }" Opacity="0.7" VerticalAlignment="Center" Width="100" FontWeight="Bold" />
-                            <ContentPresenter Background="{DynamicResource ContentBackground}" BorderThickness="1" BorderBrush="Gray" Content="{Binding}" Margin="20,0,0,0" />
+                            <TextBlock Text="{CompiledBinding ColumnName, StringFormat={}{0}: }" Opacity="0.7" VerticalAlignment="Center" Width="100" FontWeight="Bold" />
+                            <ContentPresenter Background="{DynamicResource ContentBackground}" BorderThickness="1" CornerRadius="4" BorderBrush="{DynamicResource TextControlBorderBrush}" Content="{CompiledBinding}" Margin="20,0,0,0" />
                         </DockPanel>
 
                     </DataTemplate>
@@ -121,7 +123,7 @@
                     <ControlTemplate>
                         <Border BorderThickness="0,0,1,0" 
                                 Background="Transparent"
-                                BorderBrush="{DynamicResource TextControlBorderBrush}" />
+                                BorderBrush="#3F000000" />
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
@@ -147,78 +149,79 @@
                 </DataTemplate>
             </helpers:FieldValueTemplateSelector.CommandTemplate>
             <helpers:FieldValueTemplateSelector.BoolTemplate>
-                <DataTemplate>
+                <DataTemplate x:DataType="vm:DatabaseCellViewModel">
                     <controls2:FastBoolCellView Height="24"
-                        ToolTip.Tip="{Binding OriginalValueTooltip}"
+                        ToolTip.Tip="{CompiledBinding OriginalValueTooltip}"
                         IsActive="True"
-                        IsReadOnly="{Binding IsReadOnly, Mode=OneTime}"
-                        Value="{Binding AsBoolValue}"/>
+                        IsReadOnly="{CompiledBinding IsReadOnly, Mode=OneTime}"
+                        Value="{CompiledBinding AsBoolValue}"/>
                 </DataTemplate>
             </helpers:FieldValueTemplateSelector.BoolTemplate>
             <helpers:FieldValueTemplateSelector.FlagsTemplate>
-                <DataTemplate>
+                <DataTemplate x:DataType="vm:DatabaseCellViewModel">
                     <controls2:FastFlagCellView
                         Height="24"
-                        SelectedItem="{Binding OptionValue, Mode=TwoWay}"
-                        SelectedValue="{Binding AsLongValue, Mode=TwoWay}"
-                        Flags="{Binding Flags}"
+                        SelectedItem="{CompiledBinding OptionValue, Mode=TwoWay}"
+                        SelectedValue="{CompiledBinding AsLongValue, Mode=TwoWay}"
+                        Flags="{CompiledBinding Flags}"
                         Padding="5,0,0,0"
-                        StringValue="{Binding ParameterValue.String}">
+                        StringValue="{CompiledBinding ParameterValue.String, FallbackValue=''}">
                     </controls2:FastFlagCellView>
                 </DataTemplate>
             </helpers:FieldValueTemplateSelector.FlagsTemplate>
             <helpers:FieldValueTemplateSelector.ItemsTemplate>
-                <DataTemplate>
+                <DataTemplate x:DataType="vm:DatabaseCellViewModel">
                     <controls2:FastItemCellView
                         Height="24"
                         Value="{Binding ParameterValue.Value}"
-                        SelectedItem="{Binding OptionValue, Mode=TwoWay}"
-                        Items="{Binding Items}"
+                        SelectedItem="{CompiledBinding OptionValue, Mode=TwoWay}"
+                        Items="{CompiledBinding Items}"
                         Padding="5,0,0,0"
-                        StringValue="{Binding ParameterValue.String}">
+                        StringValue="{CompiledBinding ParameterValue.String, FallbackValue=''}">
                     </controls2:FastItemCellView>
                 </DataTemplate>
             </helpers:FieldValueTemplateSelector.ItemsTemplate>
             <helpers:FieldValueTemplateSelector.GenericTemplate>
-                <DataTemplate>
+                <DataTemplate x:DataType="vm:DatabaseCellViewModel">
                     <controls2:FastCellView Height="24"
-                        ToolTip.Tip="{Binding OriginalValueTooltip}"
+                        ToolTip.Tip="{CompiledBinding OriginalValueTooltip}"
                         IsActive="True"
                         ShowChooseButton="{Binding ParameterValue.Parameter.HasItems, Mode=OneTime}"
-                        IsReadOnly="{Binding IsReadOnly, Mode=OneTime}"
+                        IsReadOnly="{CompiledBinding IsReadOnly, Mode=OneTime}"
                         Value="{Binding ParameterValue.Value}"
                         Padding="5,0,0,0"
                         ChooseParameterCommand="{Binding ElementName=rootWindow, Path=DataContext.OpenParameterWindow, Mode=OneTime}"
-                        StringValue="{Binding ParameterValue.String}">
+                        StringValue="{CompiledBinding ParameterValue.String, FallbackValue=''}">
                     </controls2:FastCellView>
                 </DataTemplate>
             </helpers:FieldValueTemplateSelector.GenericTemplate>
         </helpers:FieldValueTemplateSelector>
     </UserControl.DataTemplates>
     
-    <Grid utils:GridUtils.DynamicRows="{Binding SplitVertical, Converter={StaticResource RowsConverter}}"
-          utils:GridUtils.DynamicColumns="{Binding SplitHorizontal, Converter={StaticResource ColumnsConverter}}"
+    <Grid utils:GridUtils.DynamicRows="{CompiledBinding SplitVertical, Converter={StaticResource RowsConverter}}"
+          utils:GridUtils.DynamicColumns="{CompiledBinding SplitHorizontal, Converter={StaticResource ColumnsConverter}}"
     >
         <ScrollViewer HorizontalScrollBarVisibility="Auto" AllowAutoHide="False">
             <DockPanel Grid.IsSharedSizeScope="True" LastChildFill="True">
                 <Border Classes="header" DockPanel.Dock="Top">
-                    <Grid helpers:GridColumnsBinder.ColumnsWithHeader="{Binding Columns, Mode=OneTime}" />
+                    <Grid helpers:GridColumnsBinder.ColumnsWithHeader="{CompiledBinding Columns, Mode=OneTime}" />
                 </Border>
-                <ItemsPresenter Items="{Binding Rows, Mode=OneTime}">
+                <ItemsPresenter Items="{CompiledBinding Rows, Mode=OneTime}">
                     <ItemsPresenter.ItemTemplate>
-                        <DataTemplate>
+                        <DataTemplate x:DataType="vm:DatabaseEntityViewModel">
                             <StackPanel
                                 KeyboardNavigation.TabNavigation="Continue">
                                 <controls1:GroupingHeader GroupName="{Binding Name, Mode=OneTime}">
                                     <controls1:GroupingHeader.CustomContent>
-                                        <Button Command="{Binding ElementName=rootWindow, Path=DataContext.AddRowCommand, Mode=OneTime}" CommandParameter="{Binding ., Mode=OneTime}">+</Button>
+                                        <Button Command="{Binding ElementName=rootWindow, Path=DataContext.AddRowCommand, Mode=OneTime}" CommandParameter="{CompiledBinding ., Mode=OneTime}">+</Button>
                                     </controls1:GroupingHeader.CustomContent>
                                 </controls1:GroupingHeader>
                                 <controls:AlternatingItemsControl multiRow:SelectablePanel.SelectedItem="{Binding #rootWindow.DataContext.SelectedRow, Mode=TwoWay}" 
                                                                   multiRow:SelectablePanel.ObserveItems="True"
-                                                                  Items="{Binding ., Mode=OneTime}" 
+                                                                  Items="{CompiledBinding ., Mode=OneTime}" 
                                                                   ClipToBounds="False"
                                                                   MinHeight="20" 
+                                                                  utils:FocusUtils.FocusFirst="True"
                                                                   ItemTemplate="{StaticResource RowTemplate}" />
                             </StackPanel>
                         </DataTemplate>
@@ -227,6 +230,7 @@
             </DockPanel>
             <ScrollViewer.Styles>
                 <Style Selector="GridSplitter">
+                    <Setter Property="Focusable" Value="False"></Setter>
                     <Setter Property="Template">
                         <ControlTemplate>
                             <Border 
@@ -238,18 +242,18 @@
                 </Style>
             </ScrollViewer.Styles>
         </ScrollViewer>
-        <GridSplitter IsVisible="{Binding SplitView}"
+        <GridSplitter IsVisible="{CompiledBinding SplitView}"
                       Background="#CCC"
-                      Grid.Row="{Binding SplitVertical, Converter={StaticResource BoolToInt1}}" 
-                      Grid.Column="{Binding SplitHorizontal, Converter={StaticResource BoolToInt1}}"  />
-        <Border IsVisible="{Binding SplitView}"
-                Grid.Row="{Binding SplitVertical, Converter={StaticResource BoolToInt2}}" 
-                Grid.Column="{Binding SplitHorizontal, Converter={StaticResource BoolToInt2}}" 
+                      Grid.Row="{CompiledBinding SplitVertical, Converter={StaticResource BoolToInt1}}" 
+                      Grid.Column="{CompiledBinding SplitHorizontal, Converter={StaticResource BoolToInt1}}"  />
+        <Border IsVisible="{CompiledBinding SplitView}"
+                Grid.Row="{CompiledBinding SplitVertical, Converter={StaticResource BoolToInt2}}" 
+                Grid.Column="{CompiledBinding SplitHorizontal, Converter={StaticResource BoolToInt2}}" 
                 Background="{DynamicResource SlightlyDifferentBackground}" Padding="3">
             <DockPanel LastChildFill="True">
                 <controls1:GroupingHeader GroupName="Selected row" DockPanel.Dock="Top" />
                 <ScrollViewer AllowAutoHide="False" HorizontalScrollBarVisibility="Disabled" Padding="0,0,16,0">
-                    <ContentControl ContentTemplate="{StaticResource VerticalRowTemplate}" Content="{Binding SelectedRow}">
+                    <ContentControl ContentTemplate="{StaticResource VerticalRowTemplate}" Content="{CompiledBinding SelectedRow}">
             
                     </ContentControl>
                 </ScrollViewer>

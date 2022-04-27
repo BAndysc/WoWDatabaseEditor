@@ -1,0 +1,25 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:WDE.DatabaseEditors.ViewModels;assembly=WDE.DatabaseEditors"
+             xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:RowPickerViewModel"
+             Background="{DynamicResource ContentBackground}"
+             x:Class="WDE.DatabaseEditors.Avalonia.Views.RowPickerView">
+    <ContentPresenter DataContext="{CompiledBinding MainViewModel}" Content="{Binding}" ContentTemplate="{x:Static utils:ViewDataTemplate.Template}">
+        <ContentPresenter.KeyBindings>
+            <BetterKeyBinding Gesture="Ctrl+C" CustomCommand="{CompiledBinding Copy}" />
+            <BetterKeyBinding Gesture="Ctrl+V" CustomCommand="{CompiledBinding Paste}" />
+            <BetterKeyBinding Gesture="Ctrl+X" CustomCommand="{CompiledBinding Cut}" />
+            <BetterKeyBinding Gesture="Ctrl+Z" CustomCommand="{CompiledBinding Undo}" />
+            <BetterKeyBinding Gesture="Ctrl+Y" CustomCommand="{CompiledBinding Redo}" />
+            <BetterKeyBinding Gesture="Cmd+C" CustomCommand="{CompiledBinding Copy}" />
+            <BetterKeyBinding Gesture="Cmd+V" CustomCommand="{CompiledBinding Paste}" />
+            <BetterKeyBinding Gesture="Cmd+X" CustomCommand="{CompiledBinding Cut}" />
+            <BetterKeyBinding Gesture="Cmd+Z" CustomCommand="{CompiledBinding Undo}" />
+            <BetterKeyBinding Gesture="Cmd+Y" CustomCommand="{CompiledBinding Redo}" />
+        </ContentPresenter.KeyBindings>
+    </ContentPresenter>
+</UserControl>

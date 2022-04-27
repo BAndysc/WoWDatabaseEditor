@@ -919,65 +919,73 @@ namespace TheMaths
         //     return result;
         // }
 
+        /// <summary>
+        /// Creates a right-handed, look-at quaternion.
+        /// </summary>
+        /// <param name="forward">The direction of looking.</param>
+        /// <param name="up">The camera's up vector.</param>
+        /// <param name="result">When the method completes, contains the created look-at quaternion.</param>
         public static Quaternion LookRotation(Vector3 forward, Vector3 up)
         {
-            forward.Normalize();
- 
-            Vector3 vector = Vector3.Normalize(forward);
-            Vector3 vector2 = Vector3.Normalize(Vector3.Cross(up, vector));
-            Vector3 vector3 = Vector3.Cross(vector, vector2);
-            var m00 = vector2.X;
-            var m01 = vector2.Y;
-            var m02 = vector2.Z;
-            var m10 = vector3.X;
-            var m11 = vector3.Y;
-            var m12 = vector3.Z;
-            var m20 = vector.X;
-            var m21 = vector.Y;
-            var m22 = vector.Z;
- 
- 
-            float num8 = (m00 + m11) + m22;
+            if (Vector3.Dot(forward, up) > 0.9999f)
+                return FromEuler(270, 0, 0);
+            if (Vector3.Dot(forward, up) < -0.9999f)
+                return FromEuler(90, 0, 0);
+            forward = Vector3.Normalize(forward);
+            Vector3 right = Vector3.Normalize(Vector3.Cross(forward, up));
+            up = Vector3.Cross(right, forward);
+            
+            var rightX = -right.Y;
+            var rightY = right.Z;
+            var rightZ = right.X;
+            var upX = -up.Y;
+            var upY = up.Z;
+            var upZ = up.X;
+            var forwardX = -forward.Y;
+            var forwardY = forward.Z;
+            var forwardZ = forward.X;
+            
+            float diagonal = rightX + upY + forwardZ;
             var quaternion = new Quaternion();
-            if (num8 > 0f)
+            if (diagonal > 0f)
             {
-                var num = (float)Math.Sqrt(num8 + 1f);
+                var num = (float)Math.Sqrt(diagonal + 1f);
                 quaternion.W = num * 0.5f;
                 num = 0.5f / num;
-                quaternion.X = (m12 - m21) * num;
-                quaternion.Y = (m20 - m02) * num;
-                quaternion.Z = (m01 - m10) * num;
+                quaternion.X = -(rightY - upX) * num;
+                quaternion.Y = (upZ - forwardY) * num;
+                quaternion.Z = -(forwardX - rightZ) * num;
                 return quaternion;
             }
-            if ((m00 >= m11) && (m00 >= m22))
+            if ((rightX >= upY) && (rightX >= forwardZ))
             {
-                var num7 = (float)Math.Sqrt(((1f + m00) - m11) - m22);
+                var num7 = (float)Math.Sqrt(((1f + rightX) - upY) - forwardZ);
                 var num4 = 0.5f / num7;
-                quaternion.X = 0.5f * num7;
-                quaternion.Y = (m01 + m10) * num4;
-                quaternion.Z = (m02 + m20) * num4;
-                quaternion.W = (m12 - m21) * num4;
+                quaternion.X = -(rightZ + forwardX) * num4;
+                quaternion.Y = 0.5f * num7;
+                quaternion.Z = -(rightY + upX) * num4;
+                quaternion.W = (upZ - forwardY) * num4;
                 return quaternion;
             }
-            if (m11 > m22)
+            if (upY > forwardZ)
             {
-                var num6 = (float)Math.Sqrt(((1f + m11) - m00) - m22);
+                var num6 = (float)Math.Sqrt(((1f + upY) - rightX) - forwardZ);
                 var num3 = 0.5f / num6;
-                quaternion.X = (m10+ m01) * num3;
-                quaternion.Y = 0.5f * num6;
-                quaternion.Z = (m21 + m12) * num3;
-                quaternion.W = (m20 - m02) * num3;
+                quaternion.X = -(forwardY + upZ) * num3;
+                quaternion.Y = (upX + rightY) * num3;
+                quaternion.Z = -0.5f * num6;
+                quaternion.W = (forwardX - rightZ) * num3;
                 return quaternion; 
             }
-            var num5 = (float)Math.Sqrt(((1f + m22) - m00) - m11);
+            var num5 = (float)Math.Sqrt(((1f + forwardZ) - rightX) - upY);
             var num2 = 0.5f / num5;
-            quaternion.X = (m20 + m02) * num2;
-            quaternion.Y = (m21 + m12) * num2;
-            quaternion.Z = 0.5f * num5;
-            quaternion.W = (m01 - m10) * num2;
+            quaternion.X = -0.5f * num5;
+            quaternion.Y = (forwardX + rightZ) * num2;
+            quaternion.Z = -(forwardY + upZ) * num2;
+            quaternion.W = (rightY - upX) * num2;
             return quaternion;
         }
-        
+
         /// <summary>
         /// Creates a left-handed, look-at quaternion.
         /// </summary>
@@ -1492,17 +1500,17 @@ namespace TheMaths
             return Equals(ref strongValue);
         }
 
-        public static Quaternion FromEuler(double yaw, double pitch, double roll)
+        public static Quaternion FromEuler(double yaw, double roll, double pitch)
         {
+            roll = roll * Math.PI / 180;
             yaw = yaw * Math.PI / 180;
             pitch = pitch * Math.PI / 180;
-            roll = roll * Math.PI / 180;
-            double cy = Math.Cos(yaw * 0.5);
-            double sy = Math.Sin(yaw * 0.5);
-            double cp = Math.Cos(pitch * 0.5);
-            double sp = Math.Sin(pitch * 0.5);
-            double cr = Math.Cos(roll * 0.5);
-            double sr = Math.Sin(roll * 0.5);
+            double cy = Math.Cos(roll * 0.5);
+            double sy = Math.Sin(roll * 0.5);
+            double cp = Math.Cos(yaw * 0.5);
+            double sp = Math.Sin(yaw * 0.5);
+            double cr = Math.Cos(pitch * 0.5);
+            double sr = Math.Sin(pitch * 0.5);
 
             Quaternion q = new Quaternion((float)(sr * cp * cy - cr * sp * sy),
                 (float)(cr * sp * cy + sr * cp * sy),

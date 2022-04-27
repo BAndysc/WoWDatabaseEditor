@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using WDE.Common.Database;
 using WDE.Common.Parameters;
+using WDE.Common.Services;
 using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Expressions;
 using WDE.DatabaseEditors.Extensions;
 using WDE.DatabaseEditors.Models;
+using WDE.DatabaseEditors.ViewModels.SingleRow;
 using WDE.Module.Attributes;
 using WDE.SqlQueryGenerator;
 
@@ -29,56 +32,124 @@ namespace WDE.DatabaseEditors.QueryGenerators
             this.conditionQueryGenerator = conditionQueryGenerator;
         }
         
-        public IQuery GenerateQuery(ICollection<uint> keys, IDatabaseTableData tableData)
+        public IQuery GenerateQuery(IReadOnlyList<DatabaseKey> keys, IReadOnlyList<DatabaseKey>? deletedKeys, IDatabaseTableData tableData)
         {
             if (tableData.TableDefinition.IsOnlyConditionsTable)
                 return BuildConditions(keys, tableData);
-            if (tableData.TableDefinition.IsMultiRecord)
+            if (tableData.TableDefinition.RecordMode == RecordMode.MultiRecord)
                 return GenerateInsertQuery(keys, tableData);
+            if (tableData.TableDefinition.RecordMode == RecordMode.SingleRow)
+                return GenerateSingleRecordQuery(keys, deletedKeys, tableData);
             return GenerateUpdateQuery(tableData);
         }
-
-        public IQuery GenerateDeleteQuery(DatabaseTableDefinitionJson table, ICollection<uint> keys)
+        
+        public IQuery GenerateSingleRecordQuery(IReadOnlyList<DatabaseKey> keys, IReadOnlyList<DatabaseKey>? deletedKeys, IDatabaseTableData tableData)
         {
-            if (keys.Count == 1)
-                return GenerateDeleteQuery(table, keys.First());
             var query = Queries.BeginTransaction();
-            if (table.ForeignTable != null)
-                foreach (var foreign in table.ForeignTable)
-                {
-                    query
-                        .Table(foreign.TableName)
-                        .WhereIn(foreign.ForeignKeys[0], keys.Distinct())
-                        .Delete();
-                }
+
+            // delete
+            GeneratePrimaryKeyDeletion(tableData.TableDefinition, deletedKeys, query);
             
-            query
-                .Table(table.TableName)
-                .WhereIn(table.TablePrimaryKeyColumnName, keys.Distinct())
-                .Delete();
+            //insert
+            query.Add(GenerateInsertQuery(tableData.Entities.Where(e => !e.ExistInDatabase).Select(e => e.GenerateKey(tableData.TableDefinition)).ToList(), tableData));
+            
+            //update
+            foreach (var entity in tableData.Entities)
+            {
+                if (entity.ExistInDatabase)
+                    query.Add(GenerateUpdateQuery(tableData.TableDefinition, entity));
+            }
+
+            return query.Close();
+        }
+
+        private static IWhere GenerateWherePrimaryKey(IList<string> keys, ITable table, DatabaseKey key)
+        {
+            Debug.Assert(keys.Count == key.Count);
+
+            if (key.Count == 1)
+                return table.Where(r => r.Column<long>(keys[0]) == key[0]);
+            else
+            {
+                var where = table.Where(r => r.Column<long>(keys[0]) == key[0]);
+                for (int i = 1; i < keys.Count; i++)
+                {
+                    int index = i;
+                    where = where.Where(r => r.Column<long>(keys[index]) == key[index]);
+                }
+
+                return where;
+            }
+        }
+        
+        private static IWhere GenerateWherePrimaryKey(DatabaseTableDefinitionJson definition, ITable table, DatabaseKey key)
+        {
+            return GenerateWherePrimaryKey(definition.GroupByKeys, table, key);
+        }
+
+        private static void GeneratePrimaryKeyDeletion(DatabaseTableDefinitionJson definition, IReadOnlyList<DatabaseKey>? keys,
+            IMultiQuery query)
+        {
+            if (keys == null || keys.Count == 0)
+                return;
+
+            ITable table;
+
+            if (definition.ForeignTable != null)
+            {
+                foreach (var foreign in definition.ForeignTable)
+                {
+                    table = query.Table(foreign.TableName);
+                    if (keys.Count > 1 && keys[0].Count == 1)
+                    {
+                        foreach (var chunk in keys.Select(k => k[0]).Chunk(128))
+                            table.WhereIn(foreign.ForeignKeys[0], chunk).Delete();
+                    }
+                    else
+                    {
+                        foreach (var key in keys)
+                            GenerateWherePrimaryKey(foreign.ForeignKeys, table, key).Delete();
+                    }
+                }
+            }
+            
+            table = query.Table(definition.TableName);
+            if (keys.Count > 1 && keys[0].Count == 1)
+            {
+                foreach (var chunk in keys.Select(k => k[0]).Chunk(128))
+                    table.WhereIn(definition.TablePrimaryKeyColumnName, chunk).Delete();
+            }
+            else
+            {
+                foreach (var key in keys)
+                    GenerateWherePrimaryKey(definition, table, key).Delete();
+            }
+        }
+
+        public IQuery GenerateDeleteQuery(DatabaseTableDefinitionJson table, IReadOnlyList<DatabaseKey> keys)
+        {
+            var query = Queries.BeginTransaction();
+            GeneratePrimaryKeyDeletion(table, keys.Distinct().ToList(), query);
             return query.Close();
         }
 
         public IQuery GenerateDeleteQuery(DatabaseTableDefinitionJson table, DatabaseEntity entity) =>
-            GenerateDeleteQuery(table, entity.Key);
+            GenerateDeleteQuery(table, entity.GenerateKey(table));
         
-        public IQuery GenerateDeleteQuery(DatabaseTableDefinitionJson table, uint key)
+        public IQuery GenerateDeleteQuery(DatabaseTableDefinitionJson table, DatabaseKey key)
         {
             var query = Queries.BeginTransaction();
             if (table.ForeignTable != null)
+            {
                 foreach (var foreign in table.ForeignTable)
                 {
                     var tableKey = foreign.ForeignKeys[0];
-                    query
-                        .Table(foreign.TableName)
-                        .Where(row => row.Column<uint>(tableKey) == key)
-                        .Delete();
+                    GenerateWherePrimaryKey(foreign.ForeignKeys.Take(table.GroupByKeys.Count).ToList(), query
+                            .Table(foreign.TableName), key).Delete();
                 }
-            
-            query
-                .Table(table.TableName)
-                .Where(r => r.Column<uint>(table.TablePrimaryKeyColumnName) == key)
-                .Delete();
+            }
+
+            GenerateWherePrimaryKey(table, query.Table(table.TableName), key).Delete();
             return query.Close();
         }
 
@@ -97,10 +168,12 @@ namespace WDE.DatabaseEditors.QueryGenerators
                 if (ReferenceEquals(null, y)) return 1;
                 if (ReferenceEquals(null, x)) return -1;
 
-                if (definition.SortBy == null || definition.SortBy.Length == 0)
+                var sortByList = definition.SortBy ?? definition.PrimaryKey;
+                
+                if (sortByList == null || sortByList.Count == 0)
                     return 0;
 
-                foreach (var sortBy in definition.SortBy)
+                foreach (var sortBy in sortByList)
                 {
                     var comparisonResult = x.GetCell(sortBy)?.CompareTo(y.GetCell(sortBy)) ?? 0;
                     if (comparisonResult != 0) 
@@ -109,11 +182,11 @@ namespace WDE.DatabaseEditors.QueryGenerators
                 
                 var existInDatabaseComparison = x.ExistInDatabase.CompareTo(y.ExistInDatabase);
                 if (existInDatabaseComparison != 0) return existInDatabaseComparison;
-                return x.Key.CompareTo(y.Key);
+                return x.Phantom || y.Phantom ? 0 : x.Key.CompareTo(y.Key);
             }
         }
 
-        private IQuery GenerateInsertQuery(ICollection<uint> keys, IDatabaseTableData tableData)
+        public IQuery GenerateInsertQuery(IReadOnlyList<DatabaseKey> keys, IDatabaseTableData tableData)
         {
             if (keys.Count == 0)
                 return Queries.Empty();
@@ -138,9 +211,14 @@ namespace WDE.DatabaseEditors.QueryGenerators
             var comparer = new EntityComparer(tableData.TableDefinition);
             foreach (var entity in tableData.Entities.OrderBy(t => t, comparer))
             {
+                if (!entity.Phantom && !keys.Contains(entity.Key))
+                    continue;
+                
                 bool duplicate = tableData.TableDefinition.PrimaryKey != null && !entityKeys.Add(new EntityKey(entity, tableData.TableDefinition));
                 foreach (var table in columns)
                 {
+                    bool isDefault = true;
+                    bool isMainTable = table.Key == tableData.TableDefinition.TableName;
                     var cells = table.Value.ToDictionary(c => c.DbColumnName, c =>
                     {
                         var cell = entity.GetCell(c.DbColumnName)!;
@@ -151,16 +229,30 @@ namespace WDE.DatabaseEditors.QueryGenerators
                             if (comment is string s)
                                 return s.AddComment(sField.Current.Value);
                         }
-                        return cell.Object;
+
+                        var columnDefinition = tableData.TableDefinition.TableColumns[cell.FieldName];
+                        if (!columnDefinition.CanBeNull && cell.Object is null)
+                            return columnDefinition.Default ?? 0L;
+                        if (columnDefinition.CanBeNull && cell.Object is null)
+                            return null;
+                        if (!isMainTable && columnDefinition.IsTypeFloat && ((cell.Object == null && columnDefinition.Default != null) || cell.Object != null && !cell.Object.Equals(columnDefinition.Default ?? 0f)))
+                            isDefault = false;
+                        if (!isMainTable && columnDefinition.IsTypeLong && ((cell.Object == null && columnDefinition.Default != null) || cell.Object != null && !cell.Object.Equals(columnDefinition.Default ?? 0L)))
+                            isDefault = false;
+                        return FixUnixTimestampAndNullability(columnDefinition, cell.Object);
                     });
-                    if (table.Key != tableData.TableDefinition.TableName)
+                    if (!isMainTable)
                     {
-                        if (cells.All(c => c.Value == null))
+                        if (isDefault)
                             continue;
-                        
-                        var foreignKeys = tableData.TableDefinition.ForeignTableByName[table.Key].ForeignKeys;
+
+                        var newCells = new Dictionary<string, object?>();
+                        var foreignKeys = tableData.TableDefinition.ForeignTableByName![table.Key].ForeignKeys;
                         for (int i = 0; i < foreignKeys.Length; ++i)
-                            cells[foreignKeys[i]] = entity.GetTypedValueOrThrow<long>(tableData.TableDefinition.PrimaryKey![i]);
+                            newCells[foreignKeys[i]] = entity.GetTypedValueOrThrow<long>(tableData.TableDefinition.PrimaryKey![i]);
+                        foreach (var old in cells)
+                            newCells[old.Key] = old.Value;
+                        cells = newCells;
                     }
 
                     if (duplicate)
@@ -195,7 +287,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
             return query.Close();
         }
 
-        private IQuery BuildConditions(ICollection<uint> keys, IDatabaseTableData tableData)
+        private IQuery BuildConditions(IReadOnlyList<DatabaseKey> keys, IDatabaseTableData tableData)
         {
             if (tableData.TableDefinition.Condition == null)
                 return Queries.Empty();
@@ -237,7 +329,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
             return query.Close();
         }
 
-        private IQuery BuildConditionsDeleteQuery(ICollection<uint> keys, IDatabaseTableData tableData)
+        private IQuery BuildConditionsDeleteQuery(IReadOnlyList<DatabaseKey> keys, IDatabaseTableData tableData)
         {
             if (tableData.TableDefinition.Condition == null)
                 return Queries.Empty();
@@ -268,86 +360,144 @@ namespace WDE.DatabaseEditors.QueryGenerators
         {
             var column = table.TableColumns[field.FieldName];
 
-            var q = Queries.Table(table.TableName);
+            var q = Queries.Table(column.ForeignTable ?? table.TableName);
             var where = GenerateConditionsForSingleRow(q, table, column.ForeignTable ?? table.TableName, entity);
             return where
-                .Set(field.FieldName, field.Object)
+                .Set(field.FieldName, FixUnixTimestampAndNullability(column, field.Object))
                 .Update();
         }
 
+        private object? FixUnixTimestampAndNullability(DatabaseColumnJson column, object? value)
+        {
+            if (!column.CanBeNull && value == null)
+            {
+                if (column.Default != null)
+                    return column.Default;
+                if (column.IsTypeLong)
+                    return 0L;
+                if (column.IsTypeFloat)
+                    return 0f;
+                if (column.IsTypeString)
+                    return "";
+            }
+            if (!column.IsUnixTimestamp)
+                return value;
+            if (value is long l)
+                return new SqlTimestamp(l);
+            return value;
+        }
+
+        private IQuery GenerateUpdateQuery(DatabaseTableDefinitionJson definition, DatabaseEntity entity)
+        {
+            IMultiQuery query = Queries.BeginTransaction();
+            Dictionary<string, List<IDatabaseField>> fieldsByTable = entity.Fields
+                .Select(ef => (ef, definition.TableColumns[ef.FieldName]))
+                .Where(pair => !pair.Item2.IsMetaColumn && !pair.Item2.IsConditionColumn)
+                .GroupBy(pair => pair.Item2.ForeignTable ?? definition.TableName)
+                .ToDictionary(g => g.Key, g => g.Select(f => f.ef).ToList());
+
+            if (definition.ForeignTable != null)
+            {
+                foreach (var foreign in definition.ForeignTable)
+                {
+                    for (var index = foreign.ForeignKeys.Length - 1; index >= 0; index--)
+                    {
+                        var foreignKey = foreign.ForeignKeys[index];
+                        var thisKey = definition.PrimaryKey![index];
+                        
+                        fieldsByTable[foreign.TableName].Insert(0,
+                            new DatabaseField<long>(foreignKey, new ValueHolder<long>(entity.GetTypedValueOrThrow<long>(thisKey), false)));
+                    }
+                }
+            }
+            
+            if (entity.ExistInDatabase)
+            {
+                foreach (var table in fieldsByTable)
+                {
+                    if (!table.Value.Any(f => f.IsModified))
+                        continue;
+
+                    var updates = table.Value
+                        .Where(f => f.IsModified)
+                        .ToList();
+                    
+                    IList<string> groupByKeys = definition.GroupByKeys;
+                    if (table.Key != definition.TableName)
+                    {
+                        groupByKeys = definition.ForeignTableByName![table.Key].ForeignKeys.Take(groupByKeys.Count).ToList();
+                        query.Table(table.Key)
+                            .InsertIgnore(
+                                definition.ForeignTableByName[table.Key].ForeignKeys
+                                    .Zip(definition.PrimaryKey!)
+                                    .ToDictionary<(string, string), string, object?>(
+                                    key => key.Item1,
+                                    key => entity.GetTypedValueOrThrow<long>(key.Item2))
+                                );
+                    }
+
+                    var where = GenerateWherePrimaryKey(groupByKeys, query.Table(table.Key), entity.Key);
+                    IUpdateQuery update = where
+                        .Set(updates[0].FieldName, FixUnixTimestampAndNullability(definition.TableColumns[updates[0].FieldName], updates[0].Object));
+                    for (int i = 1; i < updates.Count; ++i)
+                        update = update.Set(updates[i].FieldName, FixUnixTimestampAndNullability(definition.TableColumns[updates[i].FieldName], updates[i].Object));
+
+                    update.Update();
+                }
+            }
+            else
+            {
+                foreach (var table in fieldsByTable.Reverse())
+                {
+                    var where = GenerateConditionsForSingleRow(query.Table(table.Key), definition, table.Key, entity);
+                    where.Delete();
+                }
+                foreach (var table in fieldsByTable)
+                {
+                    if (table.Key == definition.TableName)
+                    {
+                        query.Table(table.Key)
+                            .Insert(table.Value.ToDictionary(t => t.FieldName, t => t.Object));
+                    }
+                    else
+                    {
+                        var isModified = table.Value.Any(f => f.IsModified);
+                        if (isModified)
+                        {
+                            var updates = table.Value
+                                .Where(f => f.IsModified)
+                                .ToList();
+                            var primaryKeyColumn = definition.ForeignTableByName![table.Key].ForeignKeys.Take(definition.GroupByKeys.Count).ToList();
+                            query.Table(table.Key)
+                                .InsertIgnore(
+                                    definition.ForeignTableByName[table.Key].ForeignKeys
+                                        .Zip(definition.PrimaryKey!)
+                                        .ToDictionary<(string, string), string, object?>(
+                                            key => key.Item1,
+                                            key => entity.GetTypedValueOrThrow<long>(key.Item2))
+                                );
+                            var where = GenerateWherePrimaryKey(primaryKeyColumn, query.Table(table.Key), entity.GenerateKey(definition));
+                            IUpdateQuery update = where
+                                .Set(updates[0].FieldName, FixUnixTimestampAndNullability(definition.TableColumns[updates[0].FieldName], updates[0].Object));
+                            for (int i = 1; i < updates.Count; ++i)
+                                update = update.Set(updates[i].FieldName, FixUnixTimestampAndNullability(definition.TableColumns[updates[i].FieldName], updates[i].Object));
+
+                            update.Update();
+                        }
+                    }
+                }
+            }
+
+            return query.Close();
+        }
+        
         private IQuery GenerateUpdateQuery(IDatabaseTableData tableData)
         {
             IMultiQuery query = Queries.BeginTransaction();
             
             foreach (var entity in tableData.Entities)
             {
-                Dictionary<string, List<IDatabaseField>> fieldsByTable = entity.Fields
-                    .Select(ef => (ef, tableData.TableDefinition.TableColumns[ef.FieldName]))
-                    .Where(pair => !pair.Item2.IsMetaColumn && !pair.Item2.IsConditionColumn)
-                    .GroupBy(pair => pair.Item2.ForeignTable ?? tableData.TableDefinition.TableName)
-                    .ToDictionary(g => g.Key, g => g.Select(f => f.ef).ToList());
-
-                if (tableData.TableDefinition.ForeignTable != null)
-                {
-                    foreach (var foreign in tableData.TableDefinition.ForeignTable)
-                    {
-                        for (var index = foreign.ForeignKeys.Length - 1; index >= 0; index--)
-                        {
-                            var foreignKey = foreign.ForeignKeys[index];
-                            var thisKey = tableData.TableDefinition.PrimaryKey![index];
-                            
-                            fieldsByTable[foreign.TableName].Insert(0,
-                                new DatabaseField<long>(foreignKey, new ValueHolder<long>(entity.GetTypedValueOrThrow<long>(thisKey), false)));
-                        }
-                    }
-                }
-                
-                if (entity.ExistInDatabase)
-                {
-                    foreach (var table in fieldsByTable)
-                    {
-                        if (!table.Value.Any(f => f.IsModified))
-                            continue;
-
-                        var updates = table.Value
-                            .Where(f => f.IsModified)
-                            .ToList();
-                        
-                        string primaryKeyColumn = tableData.TableDefinition.TablePrimaryKeyColumnName;
-                        if (table.Key != tableData.TableDefinition.TableName)
-                        {
-                            primaryKeyColumn = tableData.TableDefinition.ForeignTableByName[table.Key].ForeignKeys[0];
-                            query.Table(table.Key)
-                                .InsertIgnore(
-                                    tableData.TableDefinition.ForeignTableByName[table.Key].ForeignKeys
-                                        .Zip(tableData.TableDefinition.PrimaryKey!)
-                                        .ToDictionary<(string, string), string, object?>(
-                                        key => key.Item1,
-                                        key => entity.GetTypedValueOrThrow<long>(key.Item2))
-                                    );
-                        }
-
-                        IUpdateQuery update = query.Table(table.Key)
-                            .Where(row => row.Column<uint>(primaryKeyColumn) == entity.Key)
-                            .Set(updates[0].FieldName, updates[0].Object);
-                        for (int i = 1; i < updates.Count; ++i)
-                            update = update.Set(updates[i].FieldName, updates[i].Object);
-
-                        update.Update();
-                    }
-                }
-                else
-                {
-                    foreach (var table in fieldsByTable)
-                    {
-                        var q = query.Table(table.Key);
-                        var where = GenerateConditionsForSingleRow(q, tableData.TableDefinition, table.Key, entity);
-                        where.Delete();
-
-                        query.Table(table.Key)
-                            .Insert(table.Value.ToDictionary(t => t.FieldName, t => t.Object));
-                    }
-                }
+                query.Add(GenerateUpdateQuery(tableData.TableDefinition, entity));
             }
 
             return query.Close();
@@ -355,14 +505,14 @@ namespace WDE.DatabaseEditors.QueryGenerators
 
         private IWhere GenerateConditionsForSingleRow(ITable table, DatabaseTableDefinitionJson definition, string tableName, DatabaseEntity entity)
         {
+            // todo: this might not be good after change to DatabaseKeys
             if (tableName == definition.TableName)
             {
-                return table.Where(row =>
-                    row.Column<uint>(definition.TablePrimaryKeyColumnName) == entity.Key);
+                return GenerateWherePrimaryKey(definition, table, entity.GenerateKey(definition));
             } 
             else
             {
-                var foreignKeys = definition.ForeignTableByName[tableName].ForeignKeys;
+                var foreignKeys = definition.ForeignTableByName![tableName].ForeignKeys;
 
                 var where = table
                     .Where(row =>

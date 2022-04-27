@@ -1,0 +1,83 @@
+{
+  "id": "achievement_reward",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Achievement Reward",
+  "single_solution_name": "Achievement Reward",
+  "multi_solution_name": "Achievement Reward",
+  "description": "This table describes the reward that you will receive when you obtain a given achievement.",
+  "table_name": "achievement_reward",
+  "table_index_name": "ID",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Achievements",
+  "reload_command": "reload achievement_reward",
+  "icon_path": "Icons/document_achievement.png",
+  "primary_key": [
+    "ID"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "ID",
+          "db_column_name": "ID",
+          "value_type": "AchievementParameter",
+          "preferred_width": 240.0
+        },
+        {
+          "name": "Title A",
+          "db_column_name": "TitleA",
+          "value_type": "CharTitleParameter",
+          "preferred_width": 130.0,
+          "zero_is_blank": true
+        },
+        {
+          "name": "Title H",
+          "db_column_name": "TitleH",
+          "value_type": "CharTitleParameter",
+          "preferred_width": 155.0,
+          "zero_is_blank": true
+        },
+        {
+          "name": "Item",
+          "db_column_name": "ItemID",
+          "value_type": "ItemParameter",
+          "preferred_width": 115.0,
+          "zero_is_blank": true
+        },
+        {
+          "name": "Sender",
+          "db_column_name": "Sender",
+          "value_type": "CreatureParameter",
+          "preferred_width": 130.0,
+          "zero_is_blank": true
+        },
+        {
+          "name": "Subject",
+          "db_column_name": "Subject",
+          "value_type": "string",
+          "can_be_null": true,
+          "preferred_width": 155.0
+        },
+        {
+          "name": "Body",
+          "db_column_name": "Body",
+          "value_type": "string",
+          "can_be_null": true,
+          "preferred_width": 135.0
+        },
+        {
+          "name": "Mail Template",
+          "db_column_name": "MailTemplateID",
+          "value_type": "MailTemplateParameter",
+          "can_be_null": true,
+          "preferred_width": 175.0,
+          "zero_is_blank": true
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "id": "disables",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Disables",
+  "single_solution_name": "Disables",
+  "multi_solution_name": "Disables",
+  "description": "This table is used to disable dungeons/bgs/spells/etc.",
+  "table_name": "disables",
+  "table_index_name": "sourceType",
+  "record_mode": "SingleRow",
+  "group_name": "Advanced",
+  "icon_path": "Icons/document_access_requirements.png",
+  "reload_command": "reload disables",
+  "picker": "Parameter",
+  "primary_key": [
+    "sourceType",
+    "entry"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Source Type",
+          "db_column_name": "sourceType",
+          "value_type": "DisableTypeParameter",
+          "preferred_width": 115.0
+        },
+        {
+          "name": "Entry",
+          "db_column_name": "entry",
+          "value_type": "DisablesEntryParameter",
+          "preferred_width": 220.0
+        },
+        {
+          "name": "Flags",
+          "db_column_name": "flags",
+          "value_type": "DisablesFlagsParameter",
+          "preferred_width": 190.0
+        },
+        {
+          "name": "Params 0",
+          "db_column_name": "params_0",
+          "value_type": "string",
+          "default": "",
+          "preferred_width": 85.0
+        },
+        {
+          "name": "Params 1",
+          "db_column_name": "params_1",
+          "value_type": "string",
+          "default": ""
+        },
+        {
+          "name": "Comment",
+          "db_column_name": "comment",
+          "value_type": "string",
+          "default": "",
+          "preferred_width": 370.0
+        }
+      ]
+    }
+  ]
+}

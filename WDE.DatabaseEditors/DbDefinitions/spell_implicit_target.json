@@ -9,7 +9,7 @@
   "description": "Use to define what shall be spell implicit target",
   "table_name": "spell_implicit_target",
   "table_index_name": "spell_id",
-  "multi_record": true,
+  "record_mode": "MultiRecord",
   "icon_path": "Icons/document_spell_implicit_target.png",
   "group_name": "Common scripting tables",
   "picker": "SpellParameter",
@@ -45,7 +45,8 @@
         {
           "name": "Spell effect",
           "db_column_name": "spell_effect",
-          "value_type": "SpellEffectMaskParameter"
+          "value_type": "SpellEffectMaskNo0Parameter",
+          "default": 7
         },
         {
           "is_condition": true,

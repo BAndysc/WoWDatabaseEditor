@@ -28,6 +28,7 @@ namespace WDE.MPQ.Services
             if (settings.Path == null)
                 return new EmptyMpqArchive();
             var files = Directory.EnumerateFiles(Path.Join(settings.Path, "Data"), "*.mpq", SearchOption.AllDirectories).ToList();
+            files.Sort(MpqSortingFunc);
             List<IMpqArchive> archives = new();
             foreach (var file in files)
             {
@@ -42,6 +43,31 @@ namespace WDE.MPQ.Services
                 }
             }
             return new MpqArchiveSet(archives.ToArray());
+        }
+
+
+        private int GetOrderFunc(string filename)
+        {
+            if (filename.Contains("patch"))
+            {
+                int num = filename.FirstOrDefault(char.IsNumber);
+                return 10 - num;
+            }
+
+            if (filename.Contains("lichking"))
+                return 11;
+
+            if (filename.Contains("expansion"))
+                return 20;
+
+            return 30;
+        }
+
+        private int MpqSortingFunc(string x, string y)
+        {
+            var a = Path.GetFileNameWithoutExtension(x).ToLowerInvariant();
+            var b = Path.GetFileNameWithoutExtension(y).ToLowerInvariant();
+            return GetOrderFunc(a).CompareTo(GetOrderFunc(b));
         }
 
         private class EmptyMpqArchive : IMpqArchive

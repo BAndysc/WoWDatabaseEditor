@@ -7,6 +7,7 @@ using WDE.Common.Events;
 using WDE.Common.Managers;
 using WDE.Common.Solution;
 using WDE.Module.Attributes;
+using WDE.SqlQueryGenerator;
 
 namespace WDE.Solutions.Manager
 {
@@ -28,7 +29,7 @@ namespace WDE.Solutions.Manager
                 Register((dynamic) provider);
         }
 
-        public Task<string> GenerateSql(ISolutionItem item)
+        public Task<IQuery> GenerateSql(ISolutionItem item)
         {
             foreach (var document in documentManager.Value.OpenedDocuments)
             {
@@ -43,7 +44,7 @@ namespace WDE.Solutions.Manager
             return GenerateSql((dynamic) item);
         }
 
-        public async Task<IList<(ISolutionItem, string)>> GenerateSplitSql(ISolutionItem item)
+        public async Task<IList<(ISolutionItem, IQuery)>> GenerateSplitSql(ISolutionItem item)
         {
             foreach (var document in documentManager.Value.OpenedDocuments)
             {
@@ -55,11 +56,11 @@ namespace WDE.Solutions.Manager
                 {
                     if (solutionItemDocument is ISplitSolutionItemQueryGenerator splitGenerator)
                         return await splitGenerator.GenerateSplitQuery();
-                    return new List<(ISolutionItem, string)>(){(item, await solutionItemDocument.GenerateQuery())};
+                    return new List<(ISolutionItem, IQuery)>(){(item, await solutionItemDocument.GenerateQuery())};
                 }
             }
 
-            return new List<(ISolutionItem, string)>(){(item, await GenerateSql((dynamic) item))};
+            return new List<(ISolutionItem, IQuery)>(){(item, await GenerateSql((dynamic) item))};
         }
 
         private void Register<T>(ISolutionItemSqlProvider<T> provider) where T : ISolutionItem
@@ -67,7 +68,7 @@ namespace WDE.Solutions.Manager
             sqlProviders.Add(typeof(T), provider);
         }
 
-        private async Task<string> GenerateSql<T>(T item) where T : ISolutionItem
+        private async Task<IQuery> GenerateSql<T>(T item) where T : ISolutionItem
         {
             if (sqlProviders.TryGetValue(item.GetType(), out var provider))
             {
@@ -75,8 +76,7 @@ namespace WDE.Solutions.Manager
             }
             else
             {
-                return
-                    $"--- INTERNAL WoW Database Editor ERROR ---\n\n{item.GetType()} unknown SQL generator. Development info: You need to register class implementing ISolutionItemSqlProvider<T> interface";
+                return Queries.Raw($"--- INTERNAL WoW Database Editor ERROR ---\n\n{item.GetType()} unknown SQL generator. Development info: You need to register class implementing ISolutionItemSqlProvider<T> interface");
             }
         }
     }

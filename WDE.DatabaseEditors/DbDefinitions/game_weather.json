@@ -1,0 +1,112 @@
+{
+  "id": "game_weather",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Game Weather",
+  "single_solution_name": "Game Weather",
+  "multi_solution_name": "Game Weather",
+  "description": "This table holds the percent chances for weather changes to occur in various zones. Not all zones can have their weather changed.",
+  "table_name": "game_weather",
+  "table_index_name": "zone",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Advanced",
+  "icon_path": "Icons/document_weather.png",
+  "primary_key": [
+    "zone"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Zone",
+          "db_column_name": "zone",
+          "value_type": "ZoneAreaParameter",
+          "preferred_width": 210.0
+        },
+        {
+          "name": "Spring Rain Chance",
+          "db_column_name": "spring_rain_chance",
+          "value_type": "uint",
+          "default": 25,
+          "preferred_width": 120.0
+        },
+        {
+          "name": "Spring Snow Chance",
+          "db_column_name": "spring_snow_chance",
+          "value_type": "uint",
+          "default": 25,
+          "preferred_width": 95.0
+        },
+        {
+          "name": "Spring Storm Chance",
+          "db_column_name": "spring_storm_chance",
+          "value_type": "uint",
+          "default": 25
+        },
+        {
+          "name": "Summer Rain Chance",
+          "db_column_name": "summer_rain_chance",
+          "value_type": "uint",
+          "default": 25
+        },
+        {
+          "name": "Summer Snow Chance",
+          "db_column_name": "summer_snow_chance",
+          "value_type": "uint",
+          "default": 25
+        },
+        {
+          "name": "Summer Storm Chance",
+          "db_column_name": "summer_storm_chance",
+          "value_type": "uint",
+          "default": 25
+        },
+        {
+          "name": "Fall Rain Chance",
+          "db_column_name": "fall_rain_chance",
+          "value_type": "uint",
+          "default": 25
+        },
+        {
+          "name": "Fall Snow Chance",
+          "db_column_name": "fall_snow_chance",
+          "value_type": "uint",
+          "default": 25
+        },
+        {
+          "name": "Fall Storm Chance",
+          "db_column_name": "fall_storm_chance",
+          "value_type": "uint",
+          "default": 25
+        },
+        {
+          "name": "Winter Rain Chance",
+          "db_column_name": "winter_rain_chance",
+          "value_type": "uint",
+          "default": 25
+        },
+        {
+          "name": "Winter Snow Chance",
+          "db_column_name": "winter_snow_chance",
+          "value_type": "uint",
+          "default": 25
+        },
+        {
+          "name": "Winter Storm Chance",
+          "db_column_name": "winter_storm_chance",
+          "value_type": "uint",
+          "default": 25
+        },
+        {
+          "name": "Script Name",
+          "db_column_name": "ScriptName",
+          "value_type": "string",
+          "default": ""
+        }
+      ]
+    }
+  ]
+}

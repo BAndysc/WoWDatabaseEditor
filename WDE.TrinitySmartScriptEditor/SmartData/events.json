@@ -160,16 +160,16 @@
       },
       {
         "type": "Parameter",
-        "name": "Repeat Minimum",
-        "description": "Core will check whether this event should fire every min - max milliseconds"
+        "name": "Cooldown Minimum",
+        "description": "Minimum delay after this event can be triggered again"
       },
       {
         "type": "Parameter",
-        "name": "Repeat Maximum",
-        "description": "Core will check whether this event should fire every min - max milliseconds"
+        "name": "Cooldown Maximum",
+        "description": "Maximum delay after this event can be triggered again"
       }
     ],
-    "description": "When health between {pram1}-{pram2}% {pram4value:choose(0):(check once)|(check every {pram3} - {pram4} ms)}",
+    "description": "When health between {pram1}-{pram2}% {pram4value:choose(0):(once)|(cooldown {pram3} - {pram4} ms)}",
     "name_readable": "When health between",
     "builtin_rules": [
       "minmax(1, 2)",
@@ -195,16 +195,16 @@
       },
       {
         "type": "Parameter",
-        "name": "Repeat Minimum",
-        "description": "Core will check whether this event should fire every min - max milliseconds"
+        "name": "Cooldown Minimum",
+        "description": "Minimum delay after this event can be triggered again"
       },
       {
         "type": "Parameter",
-        "name": "Repeat Maximum",
-        "description": "Core will check whether this event should fire every min - max milliseconds"
+        "name": "Cooldown Maximum",
+        "description": "Maximum delay after this event can be triggered again"
       }
     ],
-    "description": "When mana between {pram1}-{pram2}% {pram4value:choose(0):(check once)|(check every {pram3} - {pram4} ms)}",
+    "description": "When mana between {pram1}-{pram2}% {pram4value:choose(0):(once)|(cooldown {pram3} - {pram4} ms)}",
     "name_readable": "When mana between",
     "builtin_rules": [
       "minmax(1, 2)",
@@ -369,16 +369,16 @@
       },
       {
         "type": "Parameter",
-        "name": "Repeat Min",
-        "description": "Minimum timer value to check for event"
+        "name": "Cooldown Minimum",
+        "description": "Minimum delay after this event can be triggered again"
       },
       {
         "type": "Parameter",
-        "name": "Repeat Max",
-        "description": "Maximum timer value to check for event"
+        "name": "Cooldown Maximum",
+        "description": "Maximum delay after this event can be triggered again"
       }
     ],
-    "description": "When victim in range {pram1} - {pram2} yards {pram4value:choose(0):(check once)|(check every {pram3} - {pram4} ms)}",
+    "description": "When victim in range {pram1} - {pram2} yards {pram4value:choose(0):(once)|(cooldown {pram3} - {pram4} ms)}",
     "name_readable": "Range",
     "invoker": {
       "name": "Victim",
@@ -492,13 +492,13 @@
       },
       {
         "type": "Parameter",
-        "name": "Repeat Minimum",
-        "description": "Core will check whether this event should fire every min - max milliseconds"
+        "name": "Cooldown Minimum",
+        "description": "Minimum delay after this event can be triggered again"
       },
       {
         "type": "Parameter",
-        "name": "Repeat Maximum",
-        "description": "Core will check whether this event should fire every min - max milliseconds"
+        "name": "Cooldown Maximum",
+        "description": "Maximum delay after this event can be triggered again"
       }
     ],
     "builtin_rules": [
@@ -506,7 +506,7 @@
       "minmax(3, 4)",
       "is_repeat(4)"
     ],
-    "description": "When victim health between {pram1} - {pram2} {pram4value:choose(0):(check once)|(check every {pram3} - {pram4} ms)}",
+    "description": "When victim health between {pram1} - {pram2} {pram4value:choose(0):(once)|(cooldown {pram3} - {pram4} ms)}",
     "name_readable": "When victim's health between",
     "invoker": {
       "name": "Victim",
@@ -526,13 +526,13 @@
     "parameters": [
       {
         "type": "Parameter",
-        "name": "Repeat Min",
-        "description": "Example"
+        "name": "Cooldown Minimum",
+        "description": "Minimum delay after this event can be triggered again"
       },
       {
         "type": "Parameter",
-        "name": "Repeat Max",
-        "description": "Example"
+        "name": "Cooldown Maximum",
+        "description": "Maximum delay after this event can be triggered again"
       },
       {
         "type": "SpellParameter",
@@ -544,7 +544,7 @@
       "minmax(1, 2)",
       "is_repeat(2)"
     ],
-    "description": "When victim is casting {pram3value:choose(0):any|}spell{pram3value:choose(0):| {pram3}} {pram4value:choose(0):(check once)|(check every {pram3} - {pram4} ms)}",
+    "description": "When victim is casting {pram3value:choose(0):any|}spell{pram3value:choose(0):| {pram3}} {pram4value:choose(0):(once)|(cooldown {pram3} - {pram4} ms)}",
     "name_readable": "When victim is casting",
     "invoker": {
       "name": "Victim",
@@ -575,20 +575,20 @@
       },
       {
         "type": "Parameter",
-        "name": "Repeat Minimum",
-        "description": "Core will check whether this event should fire every min - max milliseconds"
+        "name": "Cooldown Minimum",
+        "description": "Minimum delay after this event can be triggered again"
       },
       {
         "type": "Parameter",
-        "name": "Repeat Maximum",
-        "description": "Core will check whether this event should fire every min - max milliseconds"
+        "name": "Cooldown Maximum",
+        "description": "Maximum delay after this event can be triggered again"
       }
     ],
     "builtin_rules": [
       "minmax(3, 4)",
       "is_repeat(4)"
     ],
-    "description": "When friendly unit in range {pram2} yards has lost more than {pram1} hp {pram4value:choose(0):(check once)|(check every {pram3} - {pram4} ms)}",
+    "description": "When friendly unit in range {pram2} yards has lost more than {pram1} hp {pram4value:choose(0):(once)|(cooldown {pram3} - {pram4} ms)}",
     "name_readable": "When nerby unit health between",
     "invoker": {
       "name": "Friendly unit",
@@ -613,20 +613,20 @@
       },
       {
         "type": "Parameter",
-        "name": "Repeat Minimum",
-        "description": "Core will check whether this event should fire every min - max milliseconds"
+        "name": "Cooldown Minimum",
+        "description": "Minimum delay after this event can be triggered again"
       },
       {
         "type": "Parameter",
-        "name": "Repeat Maximum",
-        "description": "Core will check whether this event should fire every min - max milliseconds"
+        "name": "Cooldown Maximum",
+        "description": "Maximum delay after this event can be triggered again"
       }
     ],
     "builtin_rules": [
       "is_repeat(3)",
       "minmax(2, 3)"
     ],
-    "description": "When friendly unit in range {pram1} yards is either: feared, charmed, stunned, frozen or confused {pram4value:choose(0):(check once)|(check every {pram3} - {pram4} ms)}",
+    "description": "When friendly unit in range {pram1} yards is either: feared, charmed, stunned, frozen or confused {pram4value:choose(0):(once)|(cooldown {pram3} - {pram4} ms)}",
     "name_readable": "When nearby unit is CC",
     "invoker": {
       "name": "Friendly unit",
@@ -656,20 +656,20 @@
       },
       {
         "type": "Parameter",
-        "name": "Repeat Minimum",
-        "description": "Core will check whether this event should fire every min - max milliseconds"
+        "name": "Cooldown Minimum",
+        "description": "Minimum delay after this event can be triggered again"
       },
       {
         "type": "Parameter",
-        "name": "Repeat Maximum",
-        "description": "Core will check whether this event should fire every min - max milliseconds"
+        "name": "Cooldown Maximum",
+        "description": "Maximum delay after this event can be triggered again"
       }
     ],
     "builtin_rules": [
       "minmax(3, 4)",
       "is_repeat(4)"
     ],
-    "description": "When friendly unit in range {pram2} yards has not got aura {pram1} {pram4value:choose(0):(check once)|(check every {pram3} - {pram4} ms)}",
+    "description": "When friendly unit in range {pram2} yards has not got aura {pram1} {pram4value:choose(0):(once)|(cooldown {pram3} - {pram4} ms)}",
     "name_readable": "When nearby friendly missing buff",
     "invoker": {
       "name": "Friendly unit",
@@ -734,13 +734,13 @@
       },
       {
         "type": "Parameter",
-        "name": "Repeat Minimum",
-        "description": "Core will check whether this event should fire every min - max milliseconds"
+        "name": "Cooldown Minimum",
+        "description": "Minimum delay after this event can be triggered again"
       },
       {
         "type": "Parameter",
-        "name": "Repeat Maximum",
-        "description": "Core will check whether this event should fire every min - max milliseconds"
+        "name": "Cooldown Maximum",
+        "description": "Maximum delay after this event can be triggered again"
       }
     ],
     "builtin_rules": [
@@ -748,7 +748,7 @@
       "minmax(3, 4)",
       "is_repeat(4)"
     ],
-    "description": "When victim has mana between {pram1} - {pram2}% {pram4value:choose(0):(check once)|(check every {pram3} - {pram4} ms)}",
+    "description": "When victim has mana between {pram1} - {pram2}% {pram4value:choose(0):(once)|(cooldown {pram3} - {pram4} ms)}",
     "name_readable": "When victim mana between",
     "invoker": {
       "name": "Victim",
@@ -767,7 +767,7 @@
     "name": "SMART_EVENT_ACCEPTED_QUEST",
     "parameters": [
       {
-        "type": "QuestParameter",
+        "type": "QuestStarterParameter",
         "name": "Quest",
         "description": "If 0, any quest will trigger the event"
       },
@@ -800,7 +800,7 @@
     "name": "SMART_EVENT_REWARD_QUEST",
     "parameters": [
       {
-        "type": "QuestParameter",
+        "type": "QuestEnderParameter",
         "name": "Quest",
         "description": "If 0, any quest will trigger the event"
       },
@@ -888,20 +888,20 @@
       },
       {
         "type": "Parameter",
-        "name": "Repeat Minimum",
-        "description": "Core will check whether this event should fire every min - max milliseconds"
+        "name": "Cooldown Minimum",
+        "description": "Minimum delay after this event can be triggered again"
       },
       {
         "type": "Parameter",
-        "name": "Repeat Maximum",
-        "description": "Core will check whether this event should fire every min - max milliseconds"
+        "name": "Cooldown Maximum",
+        "description": "Maximum delay after this event can be triggered again"
       }
     ],
     "builtin_rules": [
       "minmax(3, 4)",
       "is_repeat(4)"
     ],
-    "description": "When creature has{pram2value:choose(0):| {pram2} stacks of} aura {pram1} {pram4value:choose(0):(check once)|(check every {pram3} - {pram4} ms)}",
+    "description": "When creature has{pram2value:choose(0):| {pram2} stacks of} aura {pram1} {pram4value:choose(0):(once)|(cooldown {pram3} - {pram4} ms)}",
     "name_readable": "When has aura"
   },
   {
@@ -923,20 +923,20 @@
       },
       {
         "type": "Parameter",
-        "name": "Repeat Minimum",
-        "description": "Core will check whether this event should fire every min - max milliseconds"
+        "name": "Cooldown Minimum",
+        "description": "Minimum delay after this event can be triggered again"
       },
       {
         "type": "Parameter",
-        "name": "Repeat Maximum",
-        "description": "Core will check whether this event should fire every min - max milliseconds"
+        "name": "Cooldown Maximum",
+        "description": "Maximum delay after this event can be triggered again"
       }
     ],
     "builtin_rules": [
       "minmax(3, 4)",
       "is_repeat(4)"
     ],
-    "description": "When victim has at least {pram2} stacks of aura {pram1} {pram4value:choose(0):(check once)|(check every {pram3} - {pram4} ms)}",
+    "description": "When victim has at least {pram2} stacks of aura {pram1} {pram4value:choose(0):(once)|(cooldown {pram3} - {pram4} ms)}",
     "name_readable": "When target has aura"
   },
   {
@@ -1876,12 +1876,12 @@
         "description": "Menu ID (gossip_menu)"
       },
       {
-        "type": "Parameter",
+        "type": "GossipMenuOptionParameter",
         "name": "Action ID",
         "description": "Option ID (gossip_menu_option)"
       }
     ],
-    "description": "On gossip action {pram2} from menu {pram1value} selected",
+    "description": "On gossip action {pram2}{pram1value:choose(0):| from menu [p=0]{pram1value}[/p] selected}",
     "name_readable": "On gossip select",
     "invoker": {
       "name": "Gossip player",
@@ -1992,18 +1992,20 @@
     "parameters": [
       {
         "type": "FloatParameter",
-        "name": "Repeat Minimum"
+        "name": "Cooldown Minimum",
+        "description": "Minimum delay after this event can be triggered again"
       },
       {
         "type": "FloatParameter",
-        "name": "Repeat Maximum"
+        "name": "Cooldown Maximum",
+        "description": "Maximum delay after this event can be triggered again"
       }
     ],
     "builtin_rules": [
       "minmax(1, 2)",
       "is_repeat(2)"
     ],
-    "description": "When victim is behind me {pram2value:choose(0):(check once)|(check every {pram1}-{pram2} seconds)}",
+    "description": "When victim is behind me {pram2value:choose(0):(once)|(cooldown {pram1}-{pram2} seconds)}",
     "name_readable": "When is behind victim"
   },
   {
@@ -2086,7 +2088,7 @@
     "name": "SMART_EVENT_GO_EVENT_INFORM",
     "parameters": [
       {
-        "type": "Parameter",
+        "type": "EventScriptParameter",
         "name": "Event ID",
         "description": "For example, gameobject of type \"gobber\""
       }
@@ -2146,13 +2148,13 @@
       },
       {
         "type": "Parameter",
-        "name": "Repeat Minimum",
-        "description": "Core will check whether this event should fire every min - max milliseconds"
+        "name": "Cooldown Minimum",
+        "description": "Minimum delay after this event can be triggered again"
       },
       {
         "type": "Parameter",
-        "name": "Repeat Maximum",
-        "description": "Core will check whether this event should fire every min - max milliseconds"
+        "name": "Cooldown Maximum",
+        "description": "Maximum delay after this event can be triggered again"
       }
     ],
     "builtin_rules": [
@@ -2160,7 +2162,7 @@
       "minmax(3, 4)",
       "is_repeat(4)"
     ],
-    "description": "When target has HP between {pram1} - {pram2} {pram4value:choose(0):(check once)|(check every {pram3} - {pram4} ms)}",
+    "description": "When target has HP between {pram1} - {pram2} {pram4value:choose(0):(once)|(cooldown {pram3} - {pram4} ms)}",
     "name_readable": "Targets health %",
     "invoker": {
       "name": "Friendly unit",
@@ -2196,8 +2198,7 @@
       },
       {
         "type": "Parameter",
-        "name": "Repeat Minimum",
-        "description": "Core will check whether this event should fire every min - max milliseconds"
+        "name": "Cooldown"
       }
     /*,
       {
@@ -2211,7 +2212,7 @@
       "minmax(3, 4)",
       "is_repeat(4)"
     ],
-    "description": "When nearby friendly unit in {pram3} yd has HP between {pram1} - {pram2} {pram5value:choose(0):(check once)|(check every {pram4} - {pram5} ms)}",
+    "description": "When nearby friendly unit in {pram3} yd has HP between {pram1} - {pram2} {pram5value:choose(0):(once)|(cooldown {pram4} - {pram5} ms)}",
     "name_readable": "Targets health %",
     "invoker": {
       "name": "Friendly unit",
@@ -2244,14 +2245,14 @@
       },
       {
         "type": "FloatParameter",
-        "name": "Check every",
+        "name": "Cooldown",
         "description": "Core will check whether the event should fire every [parameter] seconds"
       }
     ],
     "builtin_rules": [
       "is_repeat(4)"
     ],
-    "description": "When creature {pram1value:choose(0):{pram2}| with guid {pram1}} in range {pram3} {pram4value:choose(0):(check once)|(check every {pram4} seconds)}",
+    "description": "When creature {pram1value:choose(0):{pram2}| with guid {pram1}} in range {pram3} {pram4value:choose(0):(once)|(cooldown {pram4} sec)}",
     "name_readable": "When creature in range",
     "invoker": {
       "name": "Found creature",
@@ -2282,7 +2283,7 @@
       },
       {
         "type": "FloatParameter",
-        "name": "Check every",
+        "name": "Cooldown",
         "description": "Core will check whether the event should fire every [parameter] seconds"
       }
     ],
@@ -2290,7 +2291,7 @@
       "nonzero(3)",
       "is_repeat(4)"
     ],
-    "description": "When gameobject {pram1value:choose(0):{pram2}| with guid {pram1}} in range {pram3} {pram4value:choose(0):(check once)|(check every {pram4} seconds)}",
+    "description": "When gameobject {pram1value:choose(0):{pram2}| with guid {pram1}} in range {pram3} {pram4value:choose(0):(once)|(cooldown {pram4} seconds)}",
     "name_readable": "When gameobject in range",
     "invoker": {
       "name": "Found gameobject",
@@ -2368,7 +2369,123 @@
         "Creature"
       ]
     }
-  },  
+  },
+  {
+    "id": 83,
+    "usable_with_script_types": [
+      "Creature",
+      "Gameobject"
+    ],
+    "name": "SMART_EVENT_ON_SPELL_CAST",
+    "tags": [ "TrinityWrath", "TrinityMaster" ],
+    "parameters": [
+      {
+        "type": "SpellParameter",
+        "name": "Spell",
+        "description": "If 0, any spell will trigger the event"
+      },
+      {
+        "type": "Parameter",
+        "name": "Cooldown Minimum",
+        "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
+      },
+      {
+        "type": "Parameter",
+        "name": "Cooldown Maximum",
+        "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
+      }
+    ],
+    "builtin_rules": [
+      "minmax(2, 3)"
+    ],
+    "description": "On {pram1value:choose(0):any spell|spell {pram1}} cast {pram2value:choose(0):|(wait {pram2} - {pram3} ms before next trigger)}",
+    "name_readable": "On spell cast",
+    "invoker": {
+      "name": "Caster",
+      "types": [
+        "Player",
+        "Creature"
+      ]
+    }
+  },
+
+  {
+    "id": 84,
+    "usable_with_script_types": [
+      "Creature",
+      "Gameobject"
+    ],
+    "name": "SMART_EVENT_ON_SPELL_FAILED",
+    "tags": [ "TrinityWrath", "TrinityMaster" ],
+    "parameters": [
+      {
+        "type": "SpellParameter",
+        "name": "Spell",
+        "description": "If 0, any spell will trigger the event"
+      },
+      {
+        "type": "Parameter",
+        "name": "Cooldown Minimum",
+        "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
+      },
+      {
+        "type": "Parameter",
+        "name": "Cooldown Maximum",
+        "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
+      }
+    ],
+    "builtin_rules": [
+      "minmax(2, 3)"
+    ],
+    "description": "On {pram1value:choose(0):any spell|spell {pram1}} failed {pram2value:choose(0):|(wait {pram2} - {pram3} ms before next trigger)}",
+    "name_readable": "On spell failed",
+    "invoker": {
+      "name": "Caster",
+      "types": [
+        "Player",
+        "Creature"
+      ]
+    }
+  },
+
+  {
+    "id": 85,
+    "usable_with_script_types": [
+      "Creature",
+      "Gameobject"
+    ],
+    "name": "SMART_EVENT_ON_SPELL_START",
+    "tags": [ "TrinityWrath", "TrinityMaster" ],
+    "parameters": [
+      {
+        "type": "SpellParameter",
+        "name": "Spell",
+        "description": "If 0, any spell will trigger the event"
+      },
+      {
+        "type": "Parameter",
+        "name": "Cooldown Minimum",
+        "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
+      },
+      {
+        "type": "Parameter",
+        "name": "Cooldown Maximum",
+        "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
+      }
+    ],
+    "builtin_rules": [
+      "minmax(2, 3)"
+    ],
+    "description": "On {pram1value:choose(0):any spell|spell {pram1}} start {pram2value:choose(0):|(wait {pram2} - {pram3} ms before next trigger)}",
+    "name_readable": "On spell start",
+    "invoker": {
+      "name": "Caster",
+      "types": [
+        "Player",
+        "Creature"
+      ]
+    }
+  },
   {
     "id": 101,
     "name": "SMART_EVENT_NEAR_PLAYERS_AC",
@@ -2391,7 +2508,7 @@
       },
       {
         "type": "FloatParameter",
-        "name": "Check cooldown"
+        "name": "Cooldown"
       }
     ],
     "usable_with_script_types": [
@@ -2399,7 +2516,7 @@
       "Gameobject"
     ],
     "is_timed": true,
-    "description": "When {pram1value:choose(0|1):any player|any player|at least {pram1} players} within {pram2} yd nearby {pram4value:choose(0):(check once)|(check every {pram4} seconds)}"
+    "description": "When {pram1value:choose(0|1):any player|any player|at least {pram1} players} within {pram2} yd nearby {pram4value:choose(0):(once)|(cooldown {pram4} seconds)}"
   },
   {
     "id": 102,
@@ -2423,7 +2540,7 @@
       },
       {
         "type": "FloatParameter",
-        "name": "Check cooldown"
+        "name": "Cooldown"
       }
     ],
     "usable_with_script_types": [
@@ -2431,6 +2548,6 @@
       "Gameobject"
     ],
     "is_timed": true,
-    "description": "When {pram1value:choose(0|1):no players|at most 1 player|at most {pram1} players} within {pram2} yd nearby {pram4value:choose(0):(check once)|(check every {pram4} seconds)}"
+    "description": "When {pram1value:choose(0|1):no players|at most 1 player|at most {pram1} players} within {pram2} yd nearby {pram4value:choose(0):(once)|(cooldown {pram4} seconds)}"
   }
 ]

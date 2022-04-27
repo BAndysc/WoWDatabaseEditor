@@ -8,31 +8,43 @@ namespace WDE.DatabaseEditors.ViewModels
 {
     public class BaseDatabaseCellViewModel : ObservableBase
     {
+        public BaseDatabaseCellViewModel(DatabaseEntity parentEntity)
+        {
+            ParentEntity = parentEntity;
+        }
+
+        public DatabaseEntity ParentEntity { get; }
         public IParameterValue? ParameterValue { get; init; }
         
         public IList<object>? Items
         {
             get
             {
-                if (ParameterValue is not ParameterValue<long> p)
-                    return null;
-                return p.Parameter.HasItems
-                    ? p.Parameter.Items!.Select(pair => (object)new ParameterOption(pair.Key, pair.Value.Name)).ToList()
-                    : null;
+                if (ParameterValue is IParameterValue<long> p)
+                    return p.Items?.Select(pair => (object)new ParameterOption(pair.Key, pair.Value.Name)).ToList();
+                if (ParameterValue is IParameterValue<string> s)
+                    return s.Items?.Select(pair => (object)new ParameterStringOption(pair.Key, pair.Value.Name)).ToList();
+                return null;
             }
         }
 
-        public Dictionary<long, SelectOption>? Flags => ParameterValue is ParameterValue<long> p ? p.Parameter.Items : null;
+        public Dictionary<long, SelectOption>? Flags => ParameterValue is IParameterValue<long> p ? p.Items : null;
 
-        public ParameterOption? OptionValue
+        public object? OptionValue
         {
             get
             {
-                if (ParameterValue is ParameterValue<long> p)
+                if (ParameterValue is IParameterValue<long> p)
                 {
-                    if (p.Parameter.Items != null && p.Parameter.Items.TryGetValue(p.Value, out var option))
+                    if (p.Items != null && p.Items.TryGetValue(p.Value, out var option))
                         return new ParameterOption(p.Value, option.Name);
                     return new ParameterOption(p.Value, "Unknown");
+                }
+
+                if (ParameterValue is IParameterValue<string> s)
+                {
+                    if (s.Items != null && s.Items.TryGetValue(s.Value ?? "", out var option))
+                        return new ParameterStringOption(s.Value!, option.Name);
                 }
                 return null;
             }
@@ -40,9 +52,13 @@ namespace WDE.DatabaseEditors.ViewModels
             {
                 if (value != null)
                 {
-                    if (ParameterValue is ParameterValue<long> p)
+                    if (ParameterValue is IParameterValue<long> p)
                     {
-                        p.Value = value.Value;
+                        p.Value = ((ParameterOption)value).Value;
+                    }
+                    if (ParameterValue is IParameterValue<string> s)
+                    {
+                        s.Value = ((ParameterStringOption)value).Key;
                     }
                 }
             }
@@ -64,13 +80,31 @@ namespace WDE.DatabaseEditors.ViewModels
                 return $"{Name} ({Value})";
             }
         }
+        
+        public class ParameterStringOption
+        {
+            public readonly string Key;
+
+            public ParameterStringOption(string key, string value)
+            {
+                Key = key;
+                Value = value;
+            }
+
+            public string Value { get; }
+
+            public override string ToString()
+            {
+                return Value;
+            }
+        }
 
         public long AsLongValue
         {
-            get => ((ParameterValue as ParameterValue<long>)?.Value ?? 0);
+            get => ((ParameterValue as IParameterValue<long>)?.Value ?? 0);
             set
             {
-                if (ParameterValue is ParameterValue<long> longParam)
+                if (ParameterValue is IParameterValue<long> longParam)
                 {
                     longParam.Value = value;
                 }
@@ -81,13 +115,13 @@ namespace WDE.DatabaseEditors.ViewModels
         {
             get
             {
-                if (ParameterValue is ParameterValue<long> longParam)
+                if (ParameterValue is IParameterValue<long> longParam)
                     return longParam.IsNull ? null : longParam.Value > 0;
                 return null;
             }
             set
             {
-                if (ParameterValue is ParameterValue<long> longParam)
+                if (ParameterValue is IParameterValue<long> longParam)
                 {
                     if (value.HasValue)
                         longParam.Value = value.Value ? 1 : 0;
@@ -97,7 +131,11 @@ namespace WDE.DatabaseEditors.ViewModels
             }
         }
 
-        public bool UseItemPicker => (ParameterValue is ParameterValue<long> vm) && vm.Parameter.HasItems && vm.Parameter.Items!.Count < 300;
-        public bool UseFlagsPicker => (ParameterValue is ParameterValue<long> vm) && vm.Parameter.HasItems && vm.Parameter is FlagParameter;
+        public bool HasItems => ParameterValue?.BaseParameter.HasItems ?? false;
+
+        public bool UseItemPicker =>
+            (ParameterValue is IParameterValue<long> vm) && vm.Items != null && vm.Items.Count < 300 ||
+            (ParameterValue is IParameterValue<string> vm2) && vm2.Items != null && vm2.Items.Count < 300;
+        public bool UseFlagsPicker => (ParameterValue is IParameterValue<long> vm) && vm.Parameter.HasItems && vm.Parameter is FlagParameter;
     }
 }

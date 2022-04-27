@@ -13,4 +13,8 @@ namespace WDE.Common.Services
     public interface ILoadingEvent
     {
     }
+
+    public struct EditorLoaded : ILoadingEvent
+    {
+    }
 }

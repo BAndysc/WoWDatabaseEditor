@@ -115,7 +115,7 @@ namespace WDE.SourceCodeIntegrationEditor.ViewModels
                 {
                     statusBar.PublishNotification(new PlainNotification(NotificationType.Error, "Error while executing query. Check Database Query Debug window"));
                 }
-            }, _ => worldExecutor.IsConnected || authExecutor.IsConnected);
+            }, () => worldExecutor.IsConnected || authExecutor.IsConnected);
             
             SaveSqlCommand = new AsyncAutoCommand(async () =>
             {

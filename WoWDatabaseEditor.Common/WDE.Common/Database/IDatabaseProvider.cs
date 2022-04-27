@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using WDE.Common.DBC;
 using WDE.Module.Attributes;
 
 namespace WDE.Common.Database
@@ -16,23 +17,27 @@ namespace WDE.Common.Database
         IGameObjectTemplate? GetGameObjectTemplate(uint entry);
         IEnumerable<IGameObjectTemplate> GetGameObjectTemplates();
 
+        Task<IAreaTriggerScript?> GetAreaTriggerScript(int entry);
         IEnumerable<IAreaTriggerTemplate> GetAreaTriggerTemplates();
 
         IEnumerable<ICreatureClassLevelStat> GetCreatureClassLevelStats();
 
         IQuestTemplate? GetQuestTemplate(uint entry);
         IEnumerable<IQuestTemplate> GetQuestTemplates();
+        Task<IQuestRequestItem?> GetQuestRequestItem(uint entry);
 
         IEnumerable<IGameEvent> GetGameEvents();
         IEnumerable<IConversationTemplate> GetConversationTemplates();
         IEnumerable<IGossipMenu> GetGossipMenus();
         Task<List<IGossipMenu>> GetGossipMenusAsync();
+        List<IGossipMenuOption> GetGossipMenuOptions(uint menuId);
         Task<List<IGossipMenuOption>> GetGossipMenuOptionsAsync(uint menuId);
         IEnumerable<INpcText> GetNpcTexts();
         INpcText? GetNpcText(uint entry);
         Task<List<IPointOfInterest>> GetPointsOfInterestsAsync();
 
-        Task<List<ICreatureText>> GetCreatureTextsByEntry(uint entry);
+        Task<List<ICreatureText>> GetCreatureTextsByEntryAsync(uint entry);
+        IReadOnlyList<ICreatureText>? GetCreatureTextsByEntry(uint entry);
         
         Task<IList<ISmartScriptLine>> GetLinesCallingSmartTimedActionList(int timedActionList);
         IEnumerable<ISmartScriptLine> GetScriptFor(int entryOrGuid, SmartScriptType type);
@@ -59,6 +64,8 @@ namespace WDE.Common.Database
         IGameObject? GetGameObjectByGuid(uint guid);
         IEnumerable<ICreature> GetCreaturesByEntry(uint entry);
         IEnumerable<IGameObject> GetGameObjectsByEntry(uint entry);
+        Task<IList<ICreature>> GetCreaturesByEntryAsync(uint entry);
+        Task<IList<IGameObject>> GetGameObjectsByEntryAsync(uint entry);
         IEnumerable<ICreature> GetCreatures();
         Task<IList<ICreature>> GetCreaturesByMapAsync(uint map);
         Task<IList<IGameObject>> GetGameObjectsByMapAsync(uint map);
@@ -67,7 +74,23 @@ namespace WDE.Common.Database
         IEnumerable<ICoreCommandHelp> GetCommands();
         Task<IList<ITrinityString>> GetStringsAsync();
         Task<IList<IDatabaseSpellDbc>> GetSpellDbcAsync();
+        Task<IList<ISpawnGroupTemplate>?> GetSpawnGroupTemplatesAsync() => Task.FromResult<IList<ISpawnGroupTemplate>?>(null);
 
+        Task<IList<IItem>?> GetItemTemplatesAsync() => Task.FromResult<IList<IItem>?>(null);
+
+        Task<IList<ISmartScriptLine>> FindSmartScriptLinesBy(IEnumerable<(SmartLinePropertyType what, int whatValue, int parameterIndex, long valueToSearch)> conditions);
+
+        Task<List<IEventScriptLine>> GetEventScript(EventScriptType type, uint id) => Task.FromResult(new List<IEventScriptLine>());
+        Task<List<IEventScriptLine>> FindEventScriptLinesBy(IReadOnlyList<(uint command, int dataIndex, long valueToSearch)> conditions) => Task.FromResult(new List<IEventScriptLine>());
+
+        public enum SmartLinePropertyType
+        {
+            Event,
+            Action,
+            Target,
+            Source
+        }
+        
         [Flags]
         public enum ConditionKeyMask
         {

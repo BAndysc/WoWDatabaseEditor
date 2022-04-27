@@ -1,6 +1,11 @@
+using System;
 using NSubstitute;
 using NUnit.Framework;
+using WDE.Common;
 using WDE.Common.Parameters;
+using WDE.Common.QuickAccess;
+using WDE.Common.Services;
+using WDE.Parameters.QuickAccess;
 
 namespace WDE.Parameters.Test
 {
@@ -11,7 +16,8 @@ namespace WDE.Parameters.Test
         [SetUp]
         public void SetUp()
         {
-            parameterFactory = new ParameterFactory();
+            parameterFactory = new ParameterFactory(Substitute.For<IQuickAccessRegisteredParameters>(),
+                new Lazy<ITableEditorPickerService>());
         }
 
         private IParameter<long> Register(string name)

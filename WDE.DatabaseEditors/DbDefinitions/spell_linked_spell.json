@@ -1,7 +1,7 @@
 {
     "id": "spell_linked_spell",
     "compatibility": [
-      "TrinityWrath", "TrinityCata"
+      "TrinityWrath", "TrinityCata", "TrinityMaster"
     ],
     "name": "Spell Linked Spell",
     "single_solution_name": "{name} linked spell editor",
@@ -9,9 +9,10 @@
     "description": "This table provides data for spell linking system, telling it which spells trigger what, and under which conditions.",
     "table_name": "spell_linked_spell",
     "table_index_name": "spell_trigger",
-    "multi_record": true,
+    "record_mode": "MultiRecord",
     "reload_command": "reload spell_linked_spell",
     "icon_path": "Icons/document_spell_linked.png",
+    "group_name": "Spells",
     "picker": "SpellParameter",
     "primary_key": [
       "spell_trigger",

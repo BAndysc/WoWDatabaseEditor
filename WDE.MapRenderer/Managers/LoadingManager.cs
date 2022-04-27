@@ -35,6 +35,7 @@ public class LoadingManager : IDisposable
     private readonly ChunkManager chunkManager;
     private readonly CreatureManager creatureManager;
     private readonly GameObjectManager gameObjectManager;
+    private readonly GlobalWorldMapObjectManager globalWorldMapObjectManager;
     private readonly WorldManager worldManager;
     private int? currentLoadedMap;
     private LoadingToken? loadingToken;
@@ -46,6 +47,7 @@ public class LoadingManager : IDisposable
         ChunkManager chunkManager, 
         CreatureManager creatureManager,
         GameObjectManager gameObjectManager,
+        GlobalWorldMapObjectManager globalWorldMapObjectManager,
         WorldManager worldManager)
     {
         this.gameContext = gameContext;
@@ -53,6 +55,7 @@ public class LoadingManager : IDisposable
         this.chunkManager = chunkManager;
         this.creatureManager = creatureManager;
         this.gameObjectManager = gameObjectManager;
+        this.globalWorldMapObjectManager = globalWorldMapObjectManager;
         this.worldManager = worldManager;
     }
 
@@ -77,6 +80,8 @@ public class LoadingManager : IDisposable
                 yield return null; // wait for previous loading to finish
         }
         
+        yield return globalWorldMapObjectManager.Unload();
+        
         yield return chunkManager.UnloadAllChunks();
 
         yield return worldManager.LoadMap(newToken.CancellationToken);
@@ -87,6 +92,8 @@ public class LoadingManager : IDisposable
         
         if (loadingToken == newToken)
             EssentialLoadingInProgress = false;
+
+        yield return globalWorldMapObjectManager.Load();
         
         yield return worldManager.LoadOptionals(newToken.CancellationToken);
 

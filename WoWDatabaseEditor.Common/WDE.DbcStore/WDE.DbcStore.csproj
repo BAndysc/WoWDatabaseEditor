@@ -11,6 +11,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\DBCD\DBCD\DBCD.csproj" />
+    <ProjectReference Include="..\..\WDE.MVVM\WDE.MVVM.csproj" />
     <ProjectReference Include="..\WDE.Common\WDE.Common.csproj" />
   </ItemGroup>
   <ItemGroup>

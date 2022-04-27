@@ -1,17 +1,22 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using WDE.Common.Annotations;
 using WDE.Common.Database;
 using WDE.Common.History;
+using WDE.Common.Services;
+using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.History;
 
 namespace WDE.DatabaseEditors.Models
 {
     public class DatabaseEntity : INotifyPropertyChanged
     {
+        private DatabaseKey key;
+        
         public Dictionary<string, IDatabaseField> Cells { get; }
 
         private IReadOnlyList<ICondition>? conditions;
@@ -23,7 +28,7 @@ namespace WDE.DatabaseEditors.Models
             {
                 var old = conditions;
                 conditions = value;
-                OnAction?.Invoke(new DatabaseEntityConditionsChangedHistoryAction(this, old, value));
+                OnConditionsChanged?.Invoke(this, old, value);
                 OnPropertyChanged();
             }
         }
@@ -31,23 +36,52 @@ namespace WDE.DatabaseEditors.Models
         public IEnumerable<IDatabaseField> Fields => Cells.Values;
 
         public event System.Action<IHistoryAction>? OnAction;
+        public event Action<DatabaseEntity, string, Action<IValueHolder>, Action<IValueHolder>>? FieldValueChanged;
+        
+        public event System.Action<DatabaseEntity, IReadOnlyList<ICondition>?, IReadOnlyList<ICondition>?>? OnConditionsChanged;
         
         public bool ExistInDatabase { get; set; }
-        
-        public uint Key { get; }
-        
-        public DatabaseEntity(bool existInDatabase, uint key, Dictionary<string, IDatabaseField> cells, IReadOnlyList<ICondition>? conditions)
+
+        public DatabaseKey GenerateKey(DatabaseTableDefinitionJson definition)
         {
+            return Phantom ? new DatabaseKey(definition.PrimaryKey.Select(GetTypedValueOrThrow<long>)) : Key;
+        }
+        
+        public DatabaseKey Key
+        {
+            get
+            {
+                if (!key.IsPhantomKey)
+                    return key;
+                throw new Exception("Phantom key can't be generated");
+            }
+        }
+
+        public bool Phantom => key.IsPhantomKey;
+        
+        public DatabaseEntity(bool existInDatabase, 
+            DatabaseKey key,
+            Dictionary<string, IDatabaseField> cells,
+            IReadOnlyList<ICondition>? conditions)
+        {
+            Debug.Assert(!(existInDatabase && key.IsPhantomKey)); // phantom keys can never exist in the database!!
             ExistInDatabase = existInDatabase;
-            Key = key;
+            this.key = key;
             Cells = cells;
             Conditions = conditions;
             foreach (var databaseField in Cells)
             {
                 databaseField.Value.OnChanged += action =>
                 {
-                    OnAction?.Invoke(action);
+                    if (action is IDatabaseFieldHistoryAction a)
+                        OnAction?.Invoke(new DatabaseFieldWithKeyHistoryAction(a, key));
+                    else
+                        OnAction?.Invoke(action);
                 };
+                databaseField.Value.ValueChanged += ((columnName, undo, redo) =>
+                {
+                    FieldValueChanged?.Invoke(this, columnName, undo, redo);
+                });
             }
         }
 
@@ -80,13 +114,13 @@ namespace WDE.DatabaseEditors.Models
             return typed.Current.Value;
         }
 
-        public DatabaseEntity Clone()
+        public DatabaseEntity Clone(DatabaseKey? newKey = null, bool? existInDatabase = null)
         {
-            var fields = new Dictionary<string, IDatabaseField>();
+            var fields = new Dictionary<string, IDatabaseField>(StringComparer.InvariantCultureIgnoreCase);
             foreach (var field in Cells)
                 fields[field.Key] = field.Value.Clone();
             
-            return new DatabaseEntity(ExistInDatabase, Key, fields, Conditions == null ? null : CloneConditions(Conditions));
+            return new DatabaseEntity(existInDatabase ?? ExistInDatabase, newKey ?? Key, fields, Conditions == null ? null : CloneConditions(Conditions));
         }
 
         private IReadOnlyList<ICondition> CloneConditions(IReadOnlyList<ICondition> conditions)

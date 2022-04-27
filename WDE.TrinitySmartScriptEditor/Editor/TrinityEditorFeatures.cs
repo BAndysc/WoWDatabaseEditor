@@ -7,6 +7,7 @@ namespace WDE.TrinitySmartScriptEditor.Editor
     [SingleInstance]
     public class TrinityEditorFeatures : IEditorFeatures
     {
+        public string Name => "TC";
         public bool SupportsSource => false;
         public bool SupportsEventCooldown => false;
         public bool SupportsTargetCondition => false;

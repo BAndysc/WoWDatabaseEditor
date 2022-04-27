@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using WDE.Common.Database;
 using WDE.Common.Parameters;
+using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
 using WDE.DatabaseEditors.Data.Interfaces;
 using WDE.DatabaseEditors.Data.Structs;
@@ -30,10 +32,10 @@ namespace WDE.DatabaseEditors.Data
             this.databaseFieldFactory = databaseFieldFactory;
         }
         
-        public DatabaseEntity CreateEmptyEntity(DatabaseTableDefinitionJson definition, uint key)
+        public DatabaseEntity CreateEmptyEntity(DatabaseTableDefinitionJson definition, DatabaseKey key, bool phantomEntity)
         {
-            Dictionary<string, IDatabaseField> columns = new();
-            
+            Dictionary<string, IDatabaseField> columns = new(StringComparer.InvariantCultureIgnoreCase);
+
             foreach (var column in definition.Groups.SelectMany(t => t.Fields)
                 .Distinct(
                     EqualityComparerFactory.Create<DatabaseColumnJson>(
@@ -54,35 +56,43 @@ namespace WDE.DatabaseEditors.Data
                 {
                     valueHolder = new ValueHolder<float>(column.Default is float f ? f : 0.0f, column.CanBeNull && column.Default == null);
                 }
-                else if (type == "int" || type == "uint")
+                else if (type is "int" or "uint" or "long")
                 {
-                    if (column.DbColumnName == definition.TablePrimaryKeyColumnName)
-                        valueHolder = new ValueHolder<long>(key, false);
-                    else
-                        valueHolder = new ValueHolder<long>(column.Default is long f ? f : 0, column.CanBeNull && column.Default == null);
+                    valueHolder = new ValueHolder<long>(column.Default is long f ? f : 0, column.CanBeNull && column.Default == null);
                 }
                 else
                     valueHolder = new ValueHolder<string>(column.Default is string f ? f : "", column.CanBeNull && column.Default == null);
-
-
+                
                 columns[column.DbColumnName] = databaseFieldFactory.CreateField(column.DbColumnName, valueHolder);
+            }
+
+            Debug.Assert(phantomEntity == key.IsPhantomKey);
+            if (!phantomEntity)
+            {
+                int keyIndex = 0;
+                foreach (var name in definition.GroupByKeys)
+                {
+                    if (columns[name] is not DatabaseField<long> field)
+                        throw new Exception("Only long keys are supported now");
+                    field.Current.Value = key[keyIndex++];
+                }   
             }
 
             return new DatabaseEntity(false, key, columns, null);
         }
         
         public IDatabaseTableData? CreateDatabaseTable(DatabaseTableDefinitionJson tableDefinition,
-            uint[] keys,
+            DatabaseKey[]? keys,
             IList<Dictionary<string, (System.Type type, object value)>> fieldsFromDb)
         {
-            HashSet<uint> providedKeys = new();
+            HashSet<DatabaseKey> providedKeys = new();
 
             IList<IConditionLine>? conditions = null;
             List<DatabaseEntity> rows = new();
             foreach (var entity in fieldsFromDb)
             {
-                uint? key = null;
-                Dictionary<string, IDatabaseField> columns = new();
+                DatabaseKey? key = null;
+                Dictionary<string, IDatabaseField> columns = new(StringComparer.InvariantCultureIgnoreCase);
                 foreach (var column in entity)
                 {
                     IValueHolder valueHolder = null!;
@@ -141,27 +151,29 @@ namespace WDE.DatabaseEditors.Data
                         throw new NotImplementedException("Unknown column type " + column.Value.type);
                     }
 
-                    if (column.Key == tableDefinition.TablePrimaryKeyColumnName)
-                    {
-                        if (valueHolder is ValueHolder<long> longKey)
-                        {
-                            key = (uint)longKey.Value;
-                            providedKeys.Add(key.Value);
-                        }
-                    }
-                    
                     columns[column.Key] = databaseFieldFactory.CreateField(column.Key, valueHolder);
                 }
+
+                key = new DatabaseKey(tableDefinition.GroupByKeys.Select(key =>
+                {
+                    if (columns[key] is DatabaseField<long> field)
+                        return field.Current.Value;
+                    throw new Exception("");
+                }));
                 if (key.HasValue)
+                {
                     rows.Add(new DatabaseEntity(true, key.Value, columns, conditions?.ToList<ICondition>()));
+                    providedKeys.Add(key.Value);
+                }
             }
 
-            if (!tableDefinition.IsMultiRecord)
+            if (tableDefinition.RecordMode == RecordMode.Template)
             {
+                Debug.Assert(keys != null);
                 foreach (var key in keys)
                 {
                     if (!providedKeys.Contains(key))
-                        rows.Add(CreateEmptyEntity(tableDefinition, key));
+                        rows.Add(CreateEmptyEntity(tableDefinition, key, false));
                 }   
             }
 

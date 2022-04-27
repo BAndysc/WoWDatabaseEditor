@@ -10,8 +10,8 @@
   </Design.PreviewWith>
   <Style Selector="TabControl">
     <Setter Property="Padding" Value="6"></Setter>
+    <Setter Property="CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
     <Setter Property="Template">
-      <!--      CornerRadius="{TemplateBinding CornerRadius}"-->
       <ControlTemplate>
         <Border BorderBrush="{TemplateBinding BorderBrush}"
                 BorderThickness="{TemplateBinding BorderThickness}"
@@ -26,7 +26,7 @@
                             Margin="0,0,0,-1"
                             ZIndex="1"
                             DockPanel.Dock="{TemplateBinding TabStripPlacement}"/>
-            <Border Name="PART_SelectedContentHostBorder" ZIndex="0">
+            <Border Name="PART_SelectedContentHostBorder" ZIndex="0" CornerRadius="{TemplateBinding CornerRadius}">
               <ContentPresenter Name="PART_SelectedContentHost"
                                 Margin="{TemplateBinding Padding}"
                                 HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
@@ -44,7 +44,7 @@
   </Style>
   <Style Selector="TabControl /template/ Border#PART_SelectedContentHostBorder">
     <Setter Property="BorderThickness" Value="1" />
-    <Setter Property="BorderBrush" Value="{DynamicResource TabControlBorder}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource TabControlBorderSelected}" />
     <Setter Property="Background" Value="{DynamicResource TabItemHeaderBackgroundSelected}" />
   </Style>
   
@@ -55,16 +55,17 @@
     <Setter Property="FontWeight" Value="{DynamicResource TabItemHeaderThemeFontWeight}" />
     <Setter Property="Background" Value="{DynamicResource TabItemHeaderBackgroundUnselected}" />
     <Setter Property="Foreground" Value="{DynamicResource TabItemHeaderForegroundUnselected}" />
+    <Setter Property="CornerRadius" Value="{DynamicResource ControlCornerTopRadius}" />
     <Setter Property="Padding" Value="10,6" />
-    <Setter Property="Margin" Value="-1,0,0,0" />
+    <Setter Property="Margin" Value="-1,0,5,0" />
     <Setter Property="MinHeight" Value="0" />
     <Setter Property="VerticalContentAlignment" Value="Center" />
     <Setter Property="Template">
       <ControlTemplate>
-        <!--      CornerRadius="{TemplateBinding CornerRadius}"-->
         <Panel>
           <Border Name="PART_LayoutRoot"
                   BorderBrush="{TemplateBinding BorderBrush}"
+                  CornerRadius="{TemplateBinding CornerRadius}"
                   BorderThickness="{TemplateBinding BorderThickness}"
                   Padding="{TemplateBinding Padding}">
             <ContentPresenter Name="PART_ContentPresenter"

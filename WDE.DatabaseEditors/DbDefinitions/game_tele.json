@@ -1,0 +1,67 @@
+{
+  "id": "game_tele",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Game Tele",
+  "single_solution_name": "Game Tele",
+  "multi_solution_name": "Game Tele",
+  "description": "This table contains a list of teleport locations that can be used with the .tele command in-game.",
+  "table_name": "game_tele",
+  "table_index_name": "id",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Advanced",
+  "reload_command": "reload game_tele",
+  "picker": "",
+  "primary_key": [
+    "id"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Id",
+          "db_column_name": "id",
+          "value_type": "uint",
+          "read_only": true,
+          "preferred_width": 70.0
+        },
+        {
+          "name": "X",
+          "db_column_name": "position_x",
+          "value_type": "float"
+        },
+        {
+          "name": "Y",
+          "db_column_name": "position_y",
+          "value_type": "float"
+        },
+        {
+          "name": "Z",
+          "db_column_name": "position_z",
+          "value_type": "float"
+        },
+        {
+          "name": "Orientation",
+          "db_column_name": "orientation",
+          "value_type": "float"
+        },
+        {
+          "name": "Map",
+          "db_column_name": "map",
+          "value_type": "MapParameter",
+          "preferred_width": 235.0
+        },
+        {
+          "name": "Name",
+          "db_column_name": "name",
+          "value_type": "string",
+          "default": "",
+          "preferred_width": 220.0
+        }
+      ]
+    }
+  ]
+}

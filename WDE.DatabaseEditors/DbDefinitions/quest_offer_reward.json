@@ -1,0 +1,102 @@
+{
+  "id": "quest_offer_reward",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Quest Offer Reward",
+  "single_solution_name": "Quest Offer Reward Table",
+  "multi_solution_name": "Quest Offer Reward Table",
+  "description": "This table is used for quests offering rewards without any required quest items (no item delivery involved).",
+  "table_name": "quest_offer_reward",
+  "table_index_name": "ID",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Quests",
+  "reload_command": "reload quest_template",
+  "picker": "QuestParameter",
+  "icon_path": "Icons/document_quest.png",
+  "primary_key": [
+    "ID"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "ID",
+          "db_column_name": "ID",
+          "value_type": "QuestParameter",
+          "preferred_width": 260.0
+        },
+        {
+          "name": "Emote 1",
+          "db_column_name": "Emote1",
+          "value_type": "EmoteParameter",
+          "zero_is_blank": true,
+          "preferred_width": 165.0
+        },
+        {
+          "name": "Emote Delay 1",
+          "db_column_name": "EmoteDelay1",
+          "value_type": "uint",
+          "zero_is_blank": true,
+          "preferred_width": 50.0
+        },
+        {
+          "name": "Emote 2",
+          "db_column_name": "Emote2",
+          "value_type": "EmoteParameter",
+          "zero_is_blank": true,
+          "preferred_width": 85.0
+        },
+        {
+          "name": "Emote Delay 2",
+          "db_column_name": "EmoteDelay2",
+          "value_type": "uint",
+          "zero_is_blank": true,
+          "preferred_width": 55.0
+        },
+        {
+          "name": "Emote 3",
+          "db_column_name": "Emote3",
+          "value_type": "EmoteParameter",
+          "zero_is_blank": true,
+          "preferred_width": 55.0
+        },
+        {
+          "name": "Emote Delay 3",
+          "db_column_name": "EmoteDelay3",
+          "value_type": "uint",
+          "zero_is_blank": true,
+          "preferred_width": 50.0
+        },
+        {
+          "name": "Emote 4",
+          "db_column_name": "Emote4",
+          "value_type": "EmoteParameter",
+          "zero_is_blank": true,
+          "preferred_width": 55.0
+        },
+        {
+          "name": "Emote Delay 4",
+          "db_column_name": "EmoteDelay4",
+          "value_type": "uint",
+          "zero_is_blank": true,
+          "preferred_width": 70.0
+        },
+        {
+          "name": "Reward Text",
+          "db_column_name": "RewardText",
+          "value_type": "string",
+          "can_be_null": true,
+          "preferred_width": 255.0
+        },
+        {
+          "name": "Verified Build",
+          "db_column_name": "VerifiedBuild",
+          "value_type": "int"
+        }
+      ]
+    }
+  ]
+}

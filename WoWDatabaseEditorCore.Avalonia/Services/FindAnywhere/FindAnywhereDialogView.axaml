@@ -1,0 +1,31 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:findAnywhere="clr-namespace:WoWDatabaseEditorCore.Services.FindAnywhere;assembly=WoWDatabaseEditorCore"
+             xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="findAnywhere:FindAnywhereDialogViewModel"
+             x:Class="WoWDatabaseEditorCore.Avalonia.Services.FindAnywhere.FindAnywhereDialogView">
+    <DockPanel Margin="10">
+        <DockPanel DockPanel.Dock="Bottom">
+            <Button DockPanel.Dock="Right"
+                    HorizontalAlignment="Right"
+                    Command="{CompiledBinding FindCommand}"
+                    >Find</Button>
+        </DockPanel>
+        <StackPanel Spacing="10">
+            <TextBlock>Search for: </TextBlock>
+            <ComboBox Items="{CompiledBinding Sources}"
+                      HorizontalAlignment="Stretch"
+                      SelectedItem="{CompiledBinding SelectedSource}"
+            />
+            <DockPanel>
+                <Button DockPanel.Dock="Right" 
+                        Command="{CompiledBinding PickValue}"
+                        Content=" ... " />
+                <TextBox utils:FocusUtils.FocusFirst="True"  Margin="0,0,10,0" Text="{CompiledBinding SearchText}" />                
+            </DockPanel>
+        </StackPanel>
+    </DockPanel>
+</UserControl>

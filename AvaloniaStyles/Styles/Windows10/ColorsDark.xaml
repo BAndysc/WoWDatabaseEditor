@@ -25,7 +25,7 @@
         <SolidColorBrush Color="#2D2D30" x:Key="WindowContentBackground" />
         <SolidColorBrush Color="#2D2D30" x:Key="MainWindowContentBackground" />
         
-        <SolidColorBrush Color="#E1E1E1" x:Key="SystemControlForegroundBaseHighBrush" />
+        <SolidColorBrush Color="#d4d4d4" x:Key="SystemControlForegroundBaseHighBrush" />
         
         <SolidColorBrush Color="#999999" x:Key="TitleBarForeground" />
         
@@ -41,6 +41,7 @@
         <SolidColorBrush x:Key="MessageBoxBottomPanelBorder" Color="#686868" />
         
         <!-- buttons -->
+        <CornerRadius x:Key="ControlCornerTopRadius">0</CornerRadius>
         <CornerRadius x:Key="ControlCornerRadius">0</CornerRadius>
         <Thickness x:Key="ListBoxItemPadding">7,5,7,7</Thickness>
         <Thickness x:Key="ButtonPadding">8,5,8,6</Thickness>

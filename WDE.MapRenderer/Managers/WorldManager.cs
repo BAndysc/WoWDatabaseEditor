@@ -28,11 +28,13 @@ public class WorldManager : System.IDisposable
         this.notificationsCenter = notificationsCenter;
         this.areaTableStore = areaTableStore;
     }
+    
+    public WDT? CurrentWdt { get; private set; }
 
     private uint? prevAreaId;
     public void Update(float delta)
     {
-        var areaId = GetAreaId(cameraManager.Position.ToWoWPosition());
+        var areaId = GetAreaId(cameraManager.Position);
         if (areaId != prevAreaId)
         {
             prevAreaId = areaId;
@@ -104,11 +106,11 @@ public class WorldManager : System.IDisposable
 
         ClearData();
         
-        var wdt = new WDT(new MemoryBinaryReader(wdtBytes));
+        CurrentWdt = new WDT(new MemoryBinaryReader(wdtBytes));
 
         Vector3 middlePosSum = Vector3.Zero;
         int chunks = 0;
-        foreach (var chunk in wdt.Chunks)
+        foreach (var chunk in CurrentWdt.Chunks)
         {
             presentChunks[chunk.Y, chunk.X] = chunk.HasAdt;
             if (chunk.HasAdt)
@@ -125,10 +127,17 @@ public class WorldManager : System.IDisposable
                 // this is just for debugging
                 // since the beginning this was the initial position in Kalimdor
                 // and it is quite nice starting position
-                cameraManager.Relocate(new Vector3(285.396f, -4746.17f, 9.48428f + 20).ToOpenGlPosition());
+                cameraManager.Relocate(new Vector3(285.396f, -4746.17f, 9.48428f + 20));
             }
             else
-                cameraManager.Relocate(avg.ToOpenGlPosition().WithY(100));
+                cameraManager.Relocate(avg.WithZ(100));
+        }
+        else
+        {
+            if (CurrentWdt.WorldMapObject != null)
+            {
+                cameraManager.Relocate(CurrentWdt.WorldMapObject.pos.WithZ(100));
+            }
         }
     }
 
@@ -146,5 +155,10 @@ public class WorldManager : System.IDisposable
 
     public void Dispose()
     {
+    }
+
+    public bool IsChunkPresent(int chunkX, int chunkY)
+    {
+        return chunkX >= 0 && chunkX < 64 && chunkY >= 0 && chunkY < 64 && presentChunks[chunkY, chunkY];
     }
 }

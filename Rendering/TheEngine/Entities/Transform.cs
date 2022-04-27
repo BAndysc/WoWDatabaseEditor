@@ -39,7 +39,7 @@ namespace TheEngine.Entities
             }
         }
 
-        public Vector3 Forward => Vector3.Transform(Vector3.ForwardWoW, Rotation);
+        public Vector3 Forward => Vector3.Transform(Vector3.Forward, Rotation);
 
         public Transform()
         {

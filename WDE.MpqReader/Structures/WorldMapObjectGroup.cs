@@ -44,9 +44,9 @@ namespace WDE.MpqReader.Structures
                 else if (chunkName == "MOVI")
                     Indices = ParseIndices(partialReader, size, Polygons);
                 else if (chunkName == "MOVT")
-                    Vertices = ReadVectors3(partialReader, openGlCoords, size);
+                    Vertices = ReadVectors3(partialReader, size);
                 else if (chunkName == "MONR")
-                    Normals = ReadVectors3(partialReader, openGlCoords, size);
+                    Normals = ReadVectors3(partialReader, size);
                 else if (chunkName == "MOTV")
                     UVs.Add(ReadVectors2(partialReader, size));
                 else if (chunkName == "MOBA")
@@ -136,13 +136,13 @@ namespace WDE.MpqReader.Structures
             return vertices;
         }
 
-        private static PooledArray<Vector3> ReadVectors3(IBinaryReader reader, bool openGlCoords, int size)
+        private static PooledArray<Vector3> ReadVectors3(IBinaryReader reader, int size)
         {
             PooledArray<Vector3> vertices = new PooledArray<Vector3>(size / 12); // each vector has 12 bytes
             int i = 0;
             while (!reader.IsFinished())
             {
-                vertices[i++] = openGlCoords ? reader.ReadOpenGlVector3() : reader.ReadVector3();
+                vertices[i++] = reader.ReadVector3();
             }
 
             return vertices;

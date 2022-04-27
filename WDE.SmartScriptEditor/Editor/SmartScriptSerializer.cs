@@ -117,6 +117,7 @@ namespace WDE.SmartScriptEditor.Exporter
             SmartScriptType scriptSourceType,
             int id)
         {
+            var entry = gv.Entry == 0 ? "" : $" entry: {gv.Entry}";
             return new AbstractSmartScriptLine()
             {
                 EntryOrGuid = scriptEntryOrGuid,
@@ -125,7 +126,7 @@ namespace WDE.SmartScriptEditor.Exporter
                 LineId = -1,
                 EventType = SmartConstants.EventAiInitialize,
                 ActionType = SmartConstants.ActionNone,
-                Comment = string.IsNullOrEmpty(gv.Comment) ? $"#define {gv.VariableType} {gv.Key} {gv.Name}" : $"#define {gv.VariableType} {gv.Key} {gv.Name} -- {gv.Comment}"
+                Comment = string.IsNullOrEmpty(gv.Comment) ? $"#define {gv.VariableType} {gv.Key}{entry} {gv.Name}" : $"#define {gv.VariableType} {gv.Key} {gv.Name} -- {gv.Comment}"
             };
         }
 

@@ -1,0 +1,48 @@
+{
+  "id": "pool_template",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Pool Template",
+  "single_solution_name": "Pool Template Table",
+  "multi_solution_name": "Pool Template Table",
+  "description": "Each unique pool is defined in this table.",
+  "table_name": "pool_template",
+  "table_index_name": "entry",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Pooling",
+  "icon_path": "Icons/document_pool.png",
+  "primary_key": [
+    "entry"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Entry",
+          "db_column_name": "entry",
+          "value_type": "uint"
+        },
+        {
+          "name": "Max Limit",
+          "db_column_name": "max_limit",
+          "value_type": "uint"
+        },
+        {
+          "name": "Members",
+          "is_meta": true,
+          "meta": "table:pool_members;`poolSpawnId` = {entry}"
+        },
+        {
+          "name": "Description",
+          "db_column_name": "description",
+          "value_type": "string",
+          "can_be_null": true,
+          "preferred_width": 440.0
+        }
+      ]
+    }
+  ]
+}

@@ -17,6 +17,7 @@ using WDE.Module.Attributes;
 using WDE.MVVM;
 using WDE.MVVM.Observable;
 using WDE.SQLEditor.Solutions;
+using WDE.SqlQueryGenerator;
 
 namespace WDE.SQLEditor.ViewModels
 {
@@ -102,9 +103,9 @@ namespace WDE.SQLEditor.ViewModels
 
         public IHistoryManager History { get; } = null;
         public ISolutionItem SolutionItem { get; }
-        public Task<string> GenerateQuery()
+        public Task<IQuery> GenerateQuery()
         {
-            return Task.FromResult(code.ToString());
+            return Task.FromResult(Queries.Raw(code.ToString()));
         }
     }
 }

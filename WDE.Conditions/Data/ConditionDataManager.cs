@@ -17,6 +17,8 @@ namespace WDE.Conditions.Data
         ConditionJsonData GetConditionData(int id);
         ConditionJsonData GetConditionData(string name);
         IEnumerable<ConditionGroupsJsonData> GetConditionGroups();
+        IEnumerable<ConditionJsonData> AllConditionData { get; }
+        IEnumerable<ConditionSourcesJsonData> AllConditionSourceData { get; }
 
         bool HasConditionData(int id);
         bool HasConditionData(string typeName);
@@ -146,5 +148,8 @@ namespace WDE.Conditions.Data
         }
 
         public IEnumerable<ConditionGroupsJsonData> GetConditionGroups() => provider.GetConditionGroups();
+
+        public IEnumerable<ConditionJsonData> AllConditionData => conditionDataByName.Values;
+        public IEnumerable<ConditionSourcesJsonData> AllConditionSourceData => conditionSourceData.Values;
     }
 }

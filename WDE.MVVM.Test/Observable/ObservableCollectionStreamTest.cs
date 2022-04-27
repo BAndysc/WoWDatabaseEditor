@@ -64,30 +64,7 @@ namespace WDE.MVVM.Test.Observable
             CollectionAssert.AreEqual(new []{0, 2}, receivedRemoved);
             CollectionAssert.AreEqual(new []{0, 1}, indices);
         }
-        
-        [Test]
-        public void RemoveAllTest()
-        {
-            ObservableCollection<int> ints = new() {0, 1, 2, 3, 4, 5};
 
-            List<int> receivedRemoved = new();
-            List<int> indices = new();
-            using var disp = ints.ToStream(false)
-                .SubscribeAction(e =>
-                {
-                    if (e.Type == CollectionEventType.Add)
-                        return;
-                    
-                    receivedRemoved.Add(e.Item);
-                    indices.Add(e.Index);
-                });
-            
-            ints.RemoveAll();
-            
-            CollectionAssert.AreEqual(new []{5, 4, 3, 2, 1, 0}, receivedRemoved);
-            CollectionAssert.AreEqual(new []{5, 4, 3, 2, 1, 0}, indices);
-        }
-        
         [Test]
         public void ReplaceTest()
         {

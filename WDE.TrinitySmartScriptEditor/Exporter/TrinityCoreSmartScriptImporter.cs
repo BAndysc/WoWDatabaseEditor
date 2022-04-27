@@ -12,6 +12,7 @@ using WDE.SmartScriptEditor;
 using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Editor;
 using WDE.SmartScriptEditor.Models;
+using WDE.SmartScriptEditor.Utils;
 
 namespace WDE.TrinitySmartScriptEditor.Exporter
 {
@@ -41,28 +42,13 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                 return false;
             if (line.ActionType != SmartConstants.ActionNone)
                 return false;
-            if (!line.Comment.StartsWith("#define"))
-                return false;
-            
-            Match match = Regex.Match(line.Comment, @"#define ([A-Za-z]+) (\d+) (.*?)(?: -- (.*?))?$", RegexOptions.IgnoreCase);
-            if (!match.Success)
-                return false;
-
-            if (!Enum.TryParse(typeof(GlobalVariableType), match.Groups[1].Value, out var enm) || enm == null)
-                return false;
-
-            if (!long.TryParse(match.Groups[2].Value, out var key))
-                return false;
-
-            var variable = new GlobalVariable()
+            if (line.Comment.TryParseGlobalVariable(out var variable))
             {
-                Name = match.Groups[3].Value,
-                Comment = match.Groups.Count == 5 ? match.Groups[4].Value : null,
-                Key = key,
-                VariableType = (GlobalVariableType)enm
-            };
-            script.GlobalVariables.Add(variable);
-            return true;
+                script.GlobalVariables.Add(variable);
+                return true;
+            }
+
+            return false;
         }
 
         public async Task Import(SmartScript script, bool doNotTouchIfPossible, IList<ISmartScriptLine> lines, IList<IConditionLine> conditions, IList<IConditionLine> targetConditions)

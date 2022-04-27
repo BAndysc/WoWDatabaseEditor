@@ -86,7 +86,7 @@ namespace WDE.MpqReader.Readers
 
         public byte ReadByte()
         {
-            //Debug.Assert(currentPos < bytes.Length, "Trying to read byte " + currentPos + " of " + bytes.Length + " len buff");
+            //Debug.Assert(debugArray == null || !debugArray.IsDisposed, "pooled array is disposed!!! That's so bad");
             return bytes[currentPos++];
         }
 
@@ -96,7 +96,7 @@ namespace WDE.MpqReader.Readers
             set => Seek(value);
         }
 
-        public int Size => bytes.Length;
+        public int Size => end;
 
         internal void Seek(int offI)
         {

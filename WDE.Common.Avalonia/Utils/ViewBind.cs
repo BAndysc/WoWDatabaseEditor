@@ -78,4 +78,31 @@ namespace WDE.Common.Avalonia.Utils
             return data is not IControl && data is not string;
         }
     }
+    
+    public class ViewDataTemplate : IDataTemplate
+    {
+        public static IDataTemplate Template { get; } = new ViewDataTemplate();
+        public IControl Build(object param)
+        {
+            if (ViewBind.AppViewLocator != null && param != null &&
+                ViewBind.AppViewLocator.TryResolve(param.GetType(), out var viewType))
+            {
+                try
+                {
+                    return (IControl)Activator.CreateInstance(viewType)!;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    return new TextBlock() { Text = e.ToString() };
+                }
+            }
+            return new Control();
+        }
+
+        public bool Match(object data)
+        {
+            return data is not IControl && data is not string;
+        }
+    }
 }

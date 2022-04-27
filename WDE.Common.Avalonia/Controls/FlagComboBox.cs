@@ -59,6 +59,8 @@ namespace WDE.Common.Avalonia.Controls
                 {
                     if (string.IsNullOrEmpty(str))
                         return box.options;
+                    if (long.TryParse(str, out var longValue))
+                        return box.options.Where(o => (o.OptionValue & longValue) != 0);
                     return Process.ExtractSorted(str, box.options.Select(s => s.TextWithNumber), cutoff: 51)
                         .Select(s => box.options[s.Index]);
                 };
@@ -146,10 +148,10 @@ namespace WDE.Common.Avalonia.Controls
                 {
                     if (completionBoxReference.TryGetTarget(out var completionBox))
                     {
-                        if (OptionValue == 0 && completionBox.SelectedValue == 0)
-                            return true;
+                        if (OptionValue == 0)
+                            return completionBox.SelectedValue == 0;
                         
-                        return (completionBox.SelectedValue & OptionValue) > 0;
+                        return (completionBox.SelectedValue & OptionValue) == OptionValue;
                     }
 
                     return false;

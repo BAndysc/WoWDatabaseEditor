@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
@@ -20,7 +21,7 @@ namespace WoWDatabaseEditorCore.Test.Services.UserSettingsService
         {
             fileSystem = Substitute.For<IFileSystem>();
             statusBar = Substitute.For<IStatusBar>();
-            userSettings = new UserSettings(fileSystem, statusBar);
+            userSettings = new UserSettings(fileSystem, new Lazy<IStatusBar>(statusBar));
         }
         
         [Test]

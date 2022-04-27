@@ -39,7 +39,14 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
         public static readonly DirectProperty<FastCellViewBase, ICommand?> RemoveTemplateCommandProperty = AvaloniaProperty.RegisterDirect<FastCellViewBase, ICommand?>(nameof(RemoveTemplateCommand), o => o.RemoveTemplateCommand, (o, v) => o.RemoveTemplateCommand = v);
         private ICommand? duplicateCommand;
         public static readonly DirectProperty<FastCellViewBase, ICommand?> DuplicateCommandProperty = AvaloniaProperty.RegisterDirect<FastCellViewBase, ICommand?>(nameof(DuplicateCommand), o => o.DuplicateCommand, (o, v) => o.DuplicateCommand = v);
+        private ICommand? chooseParameterCommand;
+        public static readonly DirectProperty<FastCellViewBase, ICommand?> ChooseParameterCommandProperty = AvaloniaProperty.RegisterDirect<FastCellViewBase, ICommand?>("ChooseParameterCommand", o => o.ChooseParameterCommand, (o, v) => o.ChooseParameterCommand = v);
         
+        public ICommand? ChooseParameterCommand
+        {
+            get => chooseParameterCommand;
+            set => SetAndRaise(ChooseParameterCommandProperty, ref chooseParameterCommand, value);
+        }
         public ICommand? DuplicateCommand
         {
             get => duplicateCommand;

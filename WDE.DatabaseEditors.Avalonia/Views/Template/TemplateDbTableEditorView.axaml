@@ -49,6 +49,11 @@
                     </controls:FastItemCellView>
                 </DataTemplate>
             </helpers:FieldValueTemplateSelector.ItemsTemplate>
+            <helpers:FieldValueTemplateSelector.CommandTemplate>
+                <DataTemplate>
+                    <controls:ButtonFastCellView Width="300" />
+                </DataTemplate>
+            </helpers:FieldValueTemplateSelector.CommandTemplate>
             <helpers:FieldValueTemplateSelector.GenericTemplate>
                 <DataTemplate>
                     <controls:FastCellView Width="300" Margin="0,0,10,0"

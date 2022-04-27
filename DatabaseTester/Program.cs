@@ -1,4 +1,5 @@
-﻿using NSubstitute;
+﻿using System.Reflection;
+using NSubstitute;
 using Prism.Events;
 using Prism.Ioc;
 using Unity;
@@ -11,7 +12,14 @@ using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Tasks;
 using WDE.Common.Utils;
+using WDE.DatabaseEditors.Data;
+using WDE.DatabaseEditors.Data.Interfaces;
+using WDE.DatabaseEditors.Factories;
+using WDE.DatabaseEditors.Loaders;
+using WDE.MySqlDatabaseCommon.Database;
 using WDE.MySqlDatabaseCommon.Providers;
+using WDE.MySqlDatabaseCommon.Services;
+using WDE.SqlInterpreter;
 using WDE.Trinity;
 using WDE.TrinityMySqlDatabase;
 using WDE.TrinityMySqlDatabase.Data;
@@ -20,6 +28,26 @@ namespace DatabaseTester;
 
 public class Program
 {
+    public class SyncMainThread : IMainThread
+    {
+        public void Delay(Action action, TimeSpan delay)
+        {
+            Console.Write(" -- no waiting -- ");
+            action();
+        }
+
+        public void Dispatch(Action action)
+        {
+            action();
+        }
+
+        public Task Dispatch(Func<Task> action)
+        {
+            action().Wait();
+            return Task.CompletedTask;
+        }
+    }
+    
     public static int Test<T>(string[] args, params ICoreVersion[] cores) where T : class, IDatabaseProvider
     {
         if (args.Length < 6)
@@ -30,6 +58,8 @@ public class Program
         }
 
         var core = cores.First(c => c.Tag == args[^1]);
+        
+        Console.WriteLine($" -- TESTING {core} -- ");
 
         var dbSettings = Substitute.For<IWorldDatabaseSettingsProvider>();
         dbSettings.Settings.ReturnsForAnyArgs(new DbAccess()
@@ -44,6 +74,10 @@ public class Program
         var currentCoreVersion = Substitute.For<ICurrentCoreVersion>();
         currentCoreVersion.Current.ReturnsForAnyArgs(core);
 
+        var databaseConn = Substitute.For<IMySqlWorldConnectionStringProvider>();
+        var connString = $"Server={dbSettings.Settings.Host};Port={dbSettings.Settings.Port ?? 3306};Database={dbSettings.Settings.Database};Uid={dbSettings.Settings.User};Pwd={dbSettings.Settings.Password};AllowUserVariables=True";
+        databaseConn.ConnectionString.ReturnsForAnyArgs(connString);
+        
         var ioc = new UnityContainer();
         ioc.RegisterInstance<IContainerProvider>(new UnityContainerProvider(ioc));
         ioc.RegisterInstance<IMessageBoxService>(new ConsoleMessageBoxService());
@@ -56,9 +90,32 @@ public class Program
         ioc.RegisterInstance<IStatusBar>(Substitute.For<IStatusBar>());
         ioc.RegisterInstance<IParameterFactory>(Substitute.For<IParameterFactory>());
 
+        ioc.RegisterInstance<IMySqlWorldConnectionStringProvider>(databaseConn);
+        ioc.RegisterInstance<IMainThread>(new SyncMainThread());
+        ioc.RegisterSingleton<DatabaseLogger>();
+        ioc.RegisterInstance<IQueryEvaluator>(Substitute.For<IQueryEvaluator>());
+        
+        ioc.RegisterSingleton<IMySqlExecutor, MySqlExecutor>();
+        ioc.RegisterSingleton<IDatabaseTableDataProvider, DatabaseTableDataProvider>();
+        ioc.RegisterSingleton<IDatabaseTableModelGenerator, DatabaseTableModelGenerator>();
+        ioc.RegisterSingleton<IDatabaseFieldFactory, DatabaseFieldFactory>();
+        
+        ioc.RegisterSingleton<ITableDefinitionDeserializer, TableDefinitionDeserializer>();
+        ioc.RegisterSingleton<ITableDefinitionJsonProvider, TableDefinitionJsonProvider>();
+        ioc.RegisterSingleton<ITableDefinitionProvider, TableDefinitionProvider>();
 
         var worldDb = ioc.Resolve<T>();
+        ioc.RegisterInstance<IDatabaseProvider>(worldDb);
 
+        var allDefinitions = ioc.Resolve<ITableDefinitionProvider>().Definitions;
+        var loader = ioc.Resolve<IDatabaseTableDataProvider>();
+        foreach (var definition in allDefinitions)
+        {
+            Console.WriteLine("Table editor: " + definition.TableName);
+            var task = loader.Load(definition.Id, null, null, null, new[]{new DatabaseKey(definition.GroupByKeys.Select(x => 1L))});
+            task.Wait();
+        }
+        
         var allMethods = typeof(T).GetMethods();
         foreach (var method in allMethods)
         {
@@ -91,8 +148,19 @@ public class Program
         return 0;
     }
     
+    private static void FixCurrentDirectory()
+    {
+        var path = Assembly.GetExecutingAssembly().Location;
+        if (string.IsNullOrEmpty(path))
+            path = System.AppContext.BaseDirectory;
+        var exePath = new FileInfo(path);
+        if (exePath.Directory != null)
+            Directory.SetCurrentDirectory(exePath.Directory.FullName);
+    }
+    
     public static int Main(string[] args)
     {
+        FixCurrentDirectory();
         return Test<WorldDatabaseProvider>(args, new AzerothCoreVersion(), new TrinityCataclysmVersion(), new TrinityMasterVersion(), new TrinityWrathVersion());
     }
 }

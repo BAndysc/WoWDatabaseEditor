@@ -13,8 +13,8 @@
   </PropertyGroup>
   <Import Project="..\Module.props" />
   <ItemGroup>
-    <None Update="Parameters\parameters.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Update="Parameters\*.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -42,5 +42,6 @@
     <PackageReference Include="Unity.RegistrationByConvention">
       <Version>5.11.1</Version>
     </PackageReference>
+    <PackageReference Include="FuzzySharp" Version="2.0.2" />
   </ItemGroup>
 </Project>

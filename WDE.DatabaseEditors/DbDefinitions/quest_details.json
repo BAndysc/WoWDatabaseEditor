@@ -1,0 +1,89 @@
+{
+  "id": "quest_details",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Quest Details",
+  "single_solution_name": "Quest Details Table",
+  "multi_solution_name": "Quest Details Table",
+  "description": "Here insert short description what is quest_details for",
+  "table_name": "quest_details",
+  "table_index_name": "ID",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Quests",
+  "reload_command": "reload quest_template",
+  "picker": "QuestParameter",
+  "icon_path": "Icons/document_quest.png",
+  "primary_key": [
+    "ID"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "ID",
+          "db_column_name": "ID",
+          "value_type": "QuestParameter",
+          "preferred_width": 215.0
+        },
+        {
+          "name": "Emote 1",
+          "db_column_name": "Emote1",
+          "value_type": "EmoteParameter",
+          "preferred_width": 160.0,
+          "zero_is_blank": true
+        },
+        {
+          "name": "Emote Delay 1",
+          "db_column_name": "EmoteDelay1",
+          "value_type": "uint",
+          "preferred_width": 75.0,
+          "zero_is_blank": true
+        },
+        {
+          "name": "Emote 2",
+          "db_column_name": "Emote2",
+          "value_type": "EmoteParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Emote Delay 2",
+          "db_column_name": "EmoteDelay2",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Emote 3",
+          "db_column_name": "Emote3",
+          "value_type": "EmoteParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Emote Delay 3",
+          "db_column_name": "EmoteDelay3",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Emote 4",
+          "db_column_name": "Emote4",
+          "value_type": "EmoteParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Emote Delay 4",
+          "db_column_name": "EmoteDelay4",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Verified Build",
+          "db_column_name": "VerifiedBuild",
+          "value_type": "int"
+        }
+      ]
+    }
+  ]
+}

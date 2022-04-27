@@ -1,0 +1,46 @@
+{
+  "id": "gameobject_overrides",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Gameobject Overrides",
+  "single_solution_name": "Gameobject Overrides",
+  "multi_solution_name": "Gameobject Overrides",
+  "description": "",
+  "table_name": "gameobject_overrides",
+  "table_index_name": "spawnId",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Gameobjects",
+  "picker": "",
+  "primary_key": [
+    "spawnId"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Spawn Id",
+          "db_column_name": "spawnId",
+          "value_type": "GameobjectGUIDParameter",
+          "preferred_width": 105.0
+        },
+        {
+          "name": "Faction",
+          "db_column_name": "faction",
+          "value_type": "FactionParameter",
+          "preferred_width": 160.0,
+          "zero_is_blank": true
+        },
+        {
+          "name": "Flags",
+          "db_column_name": "flags",
+          "value_type": "GameObjectFlagParameter",
+          "preferred_width": 300.0,
+          "zero_is_blank": true
+        }
+      ]
+    }
+  ]
+}

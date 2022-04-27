@@ -1,0 +1,41 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:WDE.EventScriptsEditor.ViewModels"
+             xmlns:styles="clr-namespace:AvaloniaStyles.Styles;assembly=AvaloniaStyles"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:EventScriptViewerViewModel"
+             x:Class="WDE.EventScriptsEditor.Views.EventScriptViewerView">
+    <UserControl.Styles>
+        <styles:StyleIncludeColorAware DarkSource="avares://WDE.EventScriptsEditor/Views/Dark.axaml" LightSource="avares://WDE.EventScriptsEditor/Views/Light.axaml" />
+    </UserControl.Styles>
+    <DockPanel>
+        <Border DockPanel.Dock="Top"
+                Background="{DynamicResource EventScript_WarningBackground}"
+                BorderThickness="0,0,0,1"
+                BorderBrush="{DynamicResource EventScript_WarningBorderBrush}"
+                Padding="8"
+                >
+            <TextBlock>WoW Database Editor can only view the script in the read only mode.</TextBlock>
+        </Border>
+        <ScrollViewer Padding="10">
+            <ItemsRepeater Items="{CompiledBinding Lines}">
+                <ItemsRepeater.Layout>
+                    <StackLayout Spacing="15" />
+                </ItemsRepeater.Layout>
+                <ItemsRepeater.ItemTemplate>
+                    <DataTemplate DataType="viewModels:EventScriptLineViewModel">
+                        <DockPanel>
+                            <Border Margin="0,0,10,0" Background="#3399ff" Width="7" DockPanel.Dock="Left" />
+                            <StackPanel VerticalAlignment="Center" Margin="0,5,0,5">
+                                <TextBlock FontWeight="Bold" Text="{CompiledBinding Text}" />
+                                <TextBlock IsVisible="{CompiledBinding HasComment}" Opacity="0.8" Text="{CompiledBinding Comment, StringFormat=Comment: {0}}" />
+                            </StackPanel>
+                        </DockPanel>
+                    </DataTemplate>
+                </ItemsRepeater.ItemTemplate>
+            </ItemsRepeater>
+        </ScrollViewer>
+    </DockPanel>
+</UserControl>

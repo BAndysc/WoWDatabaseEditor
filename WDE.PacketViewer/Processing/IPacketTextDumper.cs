@@ -14,9 +14,18 @@ namespace WDE.PacketViewer.Processing
     {
     }
     
+    public interface IUnfilteredTwoStepPacketBoolProcessor : IUnfilteredTwoStepPacketProcessor<bool>
+    {
+    }
+    
     public interface ITwoStepPacketProcessor<T>
     {
         T? PreProcess(PacketHolder packet);
+    }
+
+    public interface IUnfilteredTwoStepPacketProcessor<T>
+    {
+        T? UnfilteredPreProcess(PacketHolder packet);
     }
 
     public interface IUnfilteredPacketProcessor

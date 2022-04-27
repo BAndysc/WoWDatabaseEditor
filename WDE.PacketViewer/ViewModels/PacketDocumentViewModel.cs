@@ -38,6 +38,7 @@ using WDE.PacketViewer.Services;
 using WDE.PacketViewer.Settings;
 using WDE.PacketViewer.Solutions;
 using WDE.PacketViewer.Utils;
+using WDE.SqlQueryGenerator;
 using WowPacketParser.Proto;
 using WowPacketParser.Proto.Processing;
 
@@ -253,7 +254,7 @@ namespace WDE.PacketViewer.ViewModels
                 FilteringInProgress = false;
                 currentActionToken = null;
 
-            }, _ => Processors.Any(c => c.IsChecked));
+            }, () => Processors.Any(c => c.IsChecked));
             
             foreach (var proc in Processors)
                 AutoDispose(proc.ToObservable(p => p.IsChecked)
@@ -468,7 +469,7 @@ namespace WDE.PacketViewer.ViewModels
                         continue;
                     PossibleActions.Add(new PossibleActionViewModel(selectedPacket.Packet.BaseData, action.chance, "", actionHappened.Value));
                 }
-            }, _ => ReasonPanelVisibility);
+            }, () => ReasonPanelVisibility);
 
             On(() => ReasonPanelVisibility, isVisible =>
             {
@@ -527,7 +528,7 @@ namespace WDE.PacketViewer.ViewModels
 
                 if (jumpToId.HasValue)
                     SelectedPacket = filteredPackets[jumpToId.Value];
-            }, _ => filteredPackets.Count > 0);
+            }, () => filteredPackets.Count > 0);
 
             AutoDispose(this.ToObservable(o => o.FilteredPackets)
                 .SubscribeAction(_ => GoToPacketCommand.RaiseCanExecuteChanged()));
@@ -635,6 +636,29 @@ namespace WDE.PacketViewer.ViewModels
                         {
                             i++;
                             preprocessor.PreProcess(packet.Packet);
+                            if ((i % 100) == 0)
+                            {
+                                if (cancellationToken.IsCancellationRequested)
+                                    break;
+                                Report(i * 1.0f / packetsCount);
+                            }
+                        }
+                    }
+                    
+                    // ReSharper disable once SuspiciousTypeConversion.Global
+                    if (pair.dumper is IUnfilteredTwoStepPacketBoolProcessor unfilteredPreprocessor)
+                    {
+                        var all = splitUpdate ? AllPacketsSplit! : AllPackets!;
+                        packetsCount += all.Count;
+                        for (var index = 0; index < all.Count; index++)
+                        {
+                            var packet = all[index];
+                            i++;
+                            if (!unfilteredPreprocessor.UnfilteredPreProcess(packet.Packet))
+                            {
+                                i += all.Count - index;
+                                break;
+                            }
                             if ((i % 100) == 0)
                             {
                                 if (cancellationToken.IsCancellationRequested)
@@ -850,7 +874,7 @@ namespace WDE.PacketViewer.ViewModels
 
         private bool IsPlayerMovePacket(PacketViewModel packetViewModel)
         {
-            return packetViewModel.Opcode.StartsWith("CMSG_MOVE_") ||
+            return (packetViewModel.Opcode.StartsWith("CMSG_MOVE_") && !packetViewModel.Opcode.StartsWith("CMSG_MOVE_DISMISS_VEHICLE")) ||
                    packetViewModel.Opcode.StartsWith("SMSG_MOVE_");
         }
 
@@ -1023,7 +1047,7 @@ namespace WDE.PacketViewer.ViewModels
         public IHistoryManager? History { get; }
         public UpdateHistoryViewModel UpdateHistoryViewModel { get; }
         public ISolutionItem SolutionItem { get; }
-        public Task<string> GenerateQuery() => Task.FromResult("");
+        public Task<IQuery> GenerateQuery() => Task.FromResult(Queries.Empty());
 
         public bool ShowExportToolbarButtons => false;
     }

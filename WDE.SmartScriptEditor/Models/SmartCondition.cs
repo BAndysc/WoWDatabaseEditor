@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using SmartFormat;
 using WDE.Common.Parameters;
+using WDE.Parameters;
 using WDE.Parameters.Models;
 
 namespace WDE.SmartScriptEditor.Models
@@ -23,15 +24,14 @@ namespace WDE.SmartScriptEditor.Models
         private ParameterValueHolder<long> inverted;
         private ParameterValueHolder<long> conditionTarget;
 
-        public SmartCondition(int id) : base(SmartConditionParametersCount, id, that => new ConstContextParameterValueHolder<long, SmartBaseElement>(Parameter.Instance, 0, that))
+        public SmartCondition(int id, bool supportsVictimTarget) : base(SmartConditionParametersCount, id, that => new ConstContextParameterValueHolder<long, SmartBaseElement>(Parameter.Instance, 0, that))
         {
-            var invertedParam = new Parameter();
-            invertedParam.Items = new Dictionary<long, SelectOption>() {[0] = new("False"), [1] = new("True")};
-            
             var conditionTargetParam = new Parameter();
             conditionTargetParam.Items = new Dictionary<long, SelectOption>() {[0] = new("Action invoker"), [1] = new("Object")};
+            if (supportsVictimTarget)
+                conditionTargetParam.Items.Add(2, new SelectOption("Victim"));
 
-            inverted = new ParameterValueHolder<long>("Inverted", invertedParam, 0);
+            inverted = new ParameterValueHolder<long>("Inverted", BoolParameter.Instance, 0);
             conditionTarget = new ParameterValueHolder<long>("Condition target", conditionTargetParam, 0);
             inverted.PropertyChanged += ((sender, value) =>
             {
@@ -116,7 +116,7 @@ namespace WDE.SmartScriptEditor.Models
 
         public SmartCondition Copy()
         {
-            SmartCondition se = new(Id);
+            SmartCondition se = new(Id, conditionTarget.Parameter.Items?.Count >= 3);
             se.Comment = Comment;
             se.ReadableHint = ReadableHint;
             se.DescriptionRules = DescriptionRules;

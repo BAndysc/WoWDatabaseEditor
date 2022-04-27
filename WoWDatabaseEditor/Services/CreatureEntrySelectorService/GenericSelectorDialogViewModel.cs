@@ -50,7 +50,7 @@ namespace WoWDatabaseEditorCore.Services.CreatureEntrySelectorService
 
             items.AddRange(collection);
 
-            Accept = new DelegateCommand(() =>
+            accept = new DelegateCommand(() =>
             {
                 if (SelectedItem == null && FilteredItems.Count == 1)
                     SelectedItem = FilteredItems[0];
@@ -58,9 +58,9 @@ namespace WoWDatabaseEditorCore.Services.CreatureEntrySelectorService
             }, () => SelectedItem != null || FilteredItems.Count == 1 || int.TryParse(SearchText, out _));
             Cancel = new DelegateCommand(() => CloseCancel?.Invoke());
 
-            FilteredItems.ObserveCollectionChanges().Subscribe(_ => Accept.RaiseCanExecuteChanged());
-            this.WhenPropertyChanged(t => t.SearchText).Subscribe(_ => Accept.RaiseCanExecuteChanged());
-            this.WhenPropertyChanged(t => t.SelectedItem).Subscribe(_ => Accept.RaiseCanExecuteChanged());
+            FilteredItems.ObserveCollectionChanges().Subscribe(_ => accept.RaiseCanExecuteChanged());
+            this.WhenPropertyChanged(t => t.SearchText).Subscribe(_ => accept.RaiseCanExecuteChanged());
+            this.WhenPropertyChanged(t => t.SelectedItem).Subscribe(_ => accept.RaiseCanExecuteChanged());
         }
 
         public ObservableCollection<ColumnDescriptor> Columns { get; set; }
@@ -89,7 +89,8 @@ namespace WoWDatabaseEditorCore.Services.CreatureEntrySelectorService
             return res;
         }
 
-        public DelegateCommand Accept { get; }
+        private DelegateCommand accept;
+        public ICommand Accept => accept;
         public ICommand Cancel { get; }
         public int DesiredWidth => 380;
         public int DesiredHeight => 500;

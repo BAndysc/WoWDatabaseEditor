@@ -1,0 +1,40 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:quickAccess="clr-namespace:WoWDatabaseEditorCore.Services.QuickAccess;assembly=WoWDatabaseEditorCore"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             ClipToBounds="False"
+             x:DataType="quickAccess:QuickAccessViewModel"
+             x:Class="WoWDatabaseEditorCore.Avalonia.Services.QuickAccess.QuickAccessView">
+    <Border Background="White" BorderBrush="{DynamicResource ContentBorderBrush}" BorderThickness="1"
+            Width="500"
+            BoxShadow="0 0 60 15 #60000000">
+        <DockPanel>
+            <TextBox Text="{CompiledBinding SearchText, Mode=TwoWay}" HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                     BorderThickness="0,0,0,1"
+                     DockPanel.Dock="Top"
+                     x:Name="SearchBox"
+            ></TextBox>
+            <ListBox Background="{DynamicResource SlightlyHighlightedBackground}" MaxHeight="350" BorderThickness="0" 
+                     x:Name="ResultsList"
+                     Items="{CompiledBinding Items}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <DockPanel LastChildFill="True">
+                            <WdeImage Margin="0,0,5,0" Width="16" Height="16" Image="{CompiledBinding Icon}" />
+                            <TextBlock Opacity="0.5" Text="{CompiledBinding ActionText}" DockPanel.Dock="Right" />
+                            <TextBlock Opacity="0.5" Text="{CompiledBinding BottomText}" DockPanel.Dock="Bottom" />
+                            <TextBlock Text="{CompiledBinding MainText}"></TextBlock>
+                        </DockPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+                <ListBox.Styles>
+                    <Style Selector="ListBoxItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                    </Style>
+                </ListBox.Styles>
+            </ListBox>
+        </DockPanel>
+    </Border>
+</UserControl>

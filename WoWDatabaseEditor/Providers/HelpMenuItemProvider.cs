@@ -18,6 +18,8 @@ namespace WoWDatabaseEditorCore.Providers
     {
         private readonly Func<AboutViewModel> aboutViewModelCreator;
         private readonly Func<DebugConsoleViewModel> debugConsole;
+        private readonly ITextDocumentService textDocumentService;
+        private readonly IAnniversarySummaryService anniversarySummaryService;
         public IDocumentManager DocumentManager { get; }
         
         public string ItemName { get; } = "_Help";
@@ -25,19 +27,32 @@ namespace WoWDatabaseEditorCore.Providers
         public MainMenuItemSortPriority SortPriority { get; } = MainMenuItemSortPriority.PriorityLow;
 
         public HelpMenuItemProvider(IDocumentManager documentManager, IConfigureService settings,
-            Func<AboutViewModel> aboutViewModelCreator, Func<DebugConsoleViewModel> debugConsole, IReportBugService reportBugService)
+            Func<AboutViewModel> aboutViewModelCreator, 
+            Func<DebugConsoleViewModel> debugConsole,
+            ITextDocumentService textDocumentService,
+            IReportBugService reportBugService,
+            IAnniversarySummaryService anniversarySummaryService)
         {
             DocumentManager = documentManager;
             this.aboutViewModelCreator = aboutViewModelCreator;
             this.debugConsole = debugConsole;
+            this.textDocumentService = textDocumentService;
+            this.anniversarySummaryService = anniversarySummaryService;
             SubItems = new List<IMenuItem>();
             SubItems.Add(new ModuleMenuItem("Report a bug", new DelegateCommand(reportBugService.ReportBug)));
             SubItems.Add(new ModuleMenuItem("Send feedback", new DelegateCommand(reportBugService.SendFeedback)));
             SubItems.Add(new ModuleManuSeparatorItem());
             SubItems.Add(new ModuleMenuItem("Open debug console", new DelegateCommand(OpenDebugConsole)));
             SubItems.Add(new ModuleMenuItem("Debug clear unused memory", new DelegateCommand(CallGC)));
+            SubItems.Add(new ModuleMenuItem("Open debug SQL console", new DelegateCommand(OpenDebugSqlConsole)));
             SubItems.Add(new ModuleManuSeparatorItem());
+            SubItems.Add(new ModuleMenuItem("Open 2021 Summary", new DelegateCommand(anniversarySummaryService.OpenSummary)));
             SubItems.Add(new ModuleMenuItem("About", new DelegateCommand(OpenAbout)));
+        }
+
+        private void OpenDebugSqlConsole()
+        {
+            DocumentManager.OpenDocument(textDocumentService.CreateDocument( $"Debug SQL console", "", "sql", true));
         }
 
         private void CallGC()

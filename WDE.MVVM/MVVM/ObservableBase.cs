@@ -52,7 +52,22 @@ namespace WDE.MVVM
             if (obj == null)
                 return;
 
-            Link(obj.ToObservable(getter), getSetter);
+            Link<R>(obj.ToObservable(getter), getSetter);
+        }
+        
+        /// <summary>
+        /// Subscribes into `this` property extracted via `source` (using INotifyPropertyChanged)
+        /// every time the property is updated, OnPropertyChanged will be called on a property from getter
+        ///
+        /// AutoDisposes when this class is disposed 
+        /// </summary>
+        /// <param name="source">Property getter of this. Must be always only single property getter p => p.PropertyMember</param>
+        /// <param name="getter">Accessor to property in this class to be RaisedNotify. Must be always only a single property getter p => p.PropertyMember. This property have to have a getter</param>
+        /// <typeparam name="T">Type of property we will watch</typeparam>
+        /// <typeparam name="R">Type of property we OnPropertyChanged</typeparam>
+        protected void Watch<T, R>(Expression<Func<T>> source, Expression<Func<R>> getter)
+        {
+            Watch(this.ToObservable(source), getter);
         }
         
         /// <summary>
@@ -83,6 +98,32 @@ namespace WDE.MVVM
                     setter!.Invoke(this, new object?[] {next});
                     RaisePropertyChanged(propertyName);
                 }));
+        }
+        /// <summary>
+        /// Subscribes into given observable, each time observable produces a value,
+        /// OnPropertyChanged is fired for given property in getter
+        /// </summary>
+        /// <param name="observable">Observable to subscribe to</param>
+        /// <param name="getter">Accessor to property in this class to be updated. Must be always only a single property getter p => p.PropertyMember. This property have to have a getter</param>
+        /// <exception cref="Exception">Throws an exception when getSetter is in wrong form</exception>
+        protected void Watch<T, R>(IObservable<T> observable, Expression<Func<R>> getter)
+        {
+            if (!(getter.Body is MemberExpression me))
+                throw new Exception();
+            
+            if ((me.Member.MemberType & MemberTypes.Property) == 0)
+                throw new Exception();
+
+            var propertyName = me.Member.Name;
+            var property = GetType().GetProperty(propertyName);
+            
+            if (property == null || !property.CanRead)
+                throw new Exception();
+            
+            AutoDispose(observable.SubscribeAction(next =>
+            {
+                RaisePropertyChanged(propertyName);
+            }));
         }
 
         protected void On<T, R>(T obj, Expression<Func<T, R>> property, Action<R> action) where T : INotifyPropertyChanged
@@ -138,6 +179,9 @@ namespace WDE.MVVM
         
         public void Dispose()
         {
+            if (disposed)
+                return;
+            
             while (disposables.Count > 0)
             {
                 disposables[^1].Dispose();

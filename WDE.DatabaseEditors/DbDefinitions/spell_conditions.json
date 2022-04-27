@@ -9,7 +9,7 @@
   "description": "Use to define when the spells can be casted",
   "table_name": "spell_condition",
   "table_index_name": "spell_id",
-  "multi_record": true,
+  "record_mode": "MultiRecord",
   "icon_path": "Icons/document_spell_conditions.png",
   "group_name": "Common scripting tables",
   "picker": "SpellParameter",

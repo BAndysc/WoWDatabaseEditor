@@ -9,6 +9,6 @@ namespace WDE.Common.Database
         uint Flags { get; }
         uint Importance { get; }
         string Name { get; }
-        short? VerifiedBuild { get; }
+        int? VerifiedBuild { get; }
     }
 }

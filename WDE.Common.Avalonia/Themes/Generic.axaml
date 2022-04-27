@@ -95,4 +95,17 @@
     <Style Selector="ImageToggleButton:pointerover /template/ WdeImage">
         <Setter Property="Opacity" Value="1" />
     </Style>
+    
+    <Style Selector="EditableTextBlock">
+        <Setter Property="Cursor" Value="IBeam" />
+        <Setter Property="VerticalAlignment" Value="Stretch" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Panel Background="Transparent" Name="PART_Panel">
+                    <TextBlock HorizontalAlignment="Stretch" VerticalAlignment="Center" TextAlignment="Left" Text="{TemplateBinding Text}"></TextBlock>
+                </Panel>
+            </ControlTemplate>
+        </Setter>
+    </Style>
 </Styles>

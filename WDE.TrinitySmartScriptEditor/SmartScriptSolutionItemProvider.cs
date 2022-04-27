@@ -56,7 +56,7 @@ namespace WDE.TrinitySmartScriptEditor
     }
 
     [AutoRegisterToParentScopeAttribute]
-    public class SmartScriptCreatureProvider : SmartScriptSolutionItemProvider, IRelatedSolutionItemCreator
+    public class SmartScriptCreatureProvider : SmartScriptSolutionItemProvider, IRelatedSolutionItemCreator, INumberSolutionItemProvider
     {
         private readonly Lazy<ICreatureEntryOrGuidProviderService> creatureEntryProvider;
 
@@ -86,10 +86,18 @@ namespace WDE.TrinitySmartScriptEditor
         {
             return related.Type == RelatedSolutionItem.RelatedType.CreatureEntry;
         }
+
+        public Task<ISolutionItem?> CreateSolutionItem(long number)
+        {
+            return Task.FromResult<ISolutionItem>(
+                new SmartScriptSolutionItem((int)number, SmartScriptType.Creature));
+        }
+
+        public string ParameterName => "CreatureParameter";
     }
 
     [AutoRegisterToParentScopeAttribute]
-    public class SmartScriptGameobjectProvider : SmartScriptSolutionItemProvider, IRelatedSolutionItemCreator
+    public class SmartScriptGameobjectProvider : SmartScriptSolutionItemProvider, IRelatedSolutionItemCreator, INumberSolutionItemProvider
     {
         private readonly Lazy<IGameobjectEntryOrGuidProviderService> goProvider;
 
@@ -119,6 +127,14 @@ namespace WDE.TrinitySmartScriptEditor
         {
             return related.Type == RelatedSolutionItem.RelatedType.GameobjectEntry;
         }
+
+        public Task<ISolutionItem?> CreateSolutionItem(long number)
+        {
+            return Task.FromResult<ISolutionItem>(
+                new SmartScriptSolutionItem((int)number, SmartScriptType.GameObject));
+        }
+
+        public string ParameterName => "GameobjectParameter";
     }
 
     [AutoRegisterToParentScopeAttribute]
@@ -282,7 +298,7 @@ namespace WDE.TrinitySmartScriptEditor
         }
     }
     
-    [AutoRegisterToParentScopeAttribute]
+    // [AutoRegisterToParentScopeAttribute]
     public class SmartScriptAreaTriggerEntityListProvider : SmartScriptAreaTriggerEntityListProviderBase
     {
         public SmartScriptAreaTriggerEntityListProvider(
@@ -298,7 +314,7 @@ namespace WDE.TrinitySmartScriptEditor
             false) {}
     }
     
-    [AutoRegisterToParentScopeAttribute]
+    // [AutoRegisterToParentScopeAttribute]
     public class SmartScriptServerSideAreaTriggerEntityListProvider : SmartScriptAreaTriggerEntityListProviderBase
     {
         public SmartScriptServerSideAreaTriggerEntityListProvider(

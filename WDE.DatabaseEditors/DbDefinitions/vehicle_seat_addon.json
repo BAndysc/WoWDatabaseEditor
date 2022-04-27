@@ -1,0 +1,68 @@
+{
+  "id": "vehicle_seat_addon",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Vehicle Seat Addon",
+  "single_solution_name": "Vehicle Seat Addon Table",
+  "multi_solution_name": "Vehicle Seat Addon Table",
+  "description": "Extra data for vehicle seats",
+  "table_name": "vehicle_seat_addon",
+  "table_index_name": "SeatEntry",
+  "record_mode": "SingleRow",
+  "group_name": "Vehicles",
+  "reload_command": "reload vehicle_seat_addon",
+  "icon_path": "Icons/document_vehicle_template.png",
+  "skip_quick_load": true,
+  "primary_key": [
+    "SeatEntry"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Seat Entry",
+          "db_column_name": "SeatEntry",
+          "value_type": "uint"
+        },
+        {
+          "name": "Seat Orientation",
+          "db_column_name": "SeatOrientation",
+          "value_type": "float",
+          "can_be_null": true
+        },
+        {
+          "name": "Exit Param X",
+          "db_column_name": "ExitParamX",
+          "value_type": "float",
+          "can_be_null": true
+        },
+        {
+          "name": "Exit Param Y",
+          "db_column_name": "ExitParamY",
+          "value_type": "float",
+          "can_be_null": true
+        },
+        {
+          "name": "Exit Param Z",
+          "db_column_name": "ExitParamZ",
+          "value_type": "float",
+          "can_be_null": true
+        },
+        {
+          "name": "Exit Param O",
+          "db_column_name": "ExitParamO",
+          "value_type": "float",
+          "can_be_null": true
+        },
+        {
+          "name": "Exit Param Value",
+          "db_column_name": "ExitParamValue",
+          "value_type": "int",
+          "can_be_null": true
+        }
+      ]
+    }
+  ]
+}

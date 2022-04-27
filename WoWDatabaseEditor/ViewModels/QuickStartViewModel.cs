@@ -39,6 +39,7 @@ namespace WoWDatabaseEditorCore.ViewModels
         private readonly IMostRecentlyUsedService mostRecentlyUsedService;
         private readonly IDotNetService dotNetService;
         private bool showGiveStarBox;
+        private bool showAnniversaryBox;
         public AboutViewModel AboutViewModel { get; }
         public ObservableCollection<NewItemPrototypeInfo> FlatItemPrototypes { get; } = new();
         public ObservableCollection<MostRecentlyUsedViewModel> MostRecentlyUsedItems { get; } = new();
@@ -54,13 +55,10 @@ namespace WoWDatabaseEditorCore.ViewModels
             set => SetProperty(ref showGiveStarBox, value);
         }
 
-        public bool IsWindows7
+        public bool ShowAnniversaryBox
         {
-            get
-            {
-                var os = System.Environment.OSVersion;
-                return os.Platform == PlatformID.Win32NT && os.Version.Major <= 6 && os.Version.Minor <= 1;
-            }
+            get => showAnniversaryBox;
+            set => SetProperty(ref showAnniversaryBox, value);
         }
 
         public string ProgramTitle { get; }
@@ -85,7 +83,8 @@ namespace WoWDatabaseEditorCore.ViewModels
             IWindowManager windowManager,
             IProgramNameService programNameService,
             IQuickLoadSettings quickLoadSettings,
-            AboutViewModel aboutViewModel)
+            AboutViewModel aboutViewModel,
+            IAnniversarySummaryService anniversarySummaryService)
         {
             this.iconRegistry = iconRegistry;
             this.nameRegistry = nameRegistry;
@@ -155,8 +154,16 @@ namespace WoWDatabaseEditorCore.ViewModels
                 urlOpenService.OpenUrl("https://github.com/BAndysc/WoWDatabaseEditor");
                 DismissCommand.Execute(null);
             });
+
+            OpenYearlySummary = new DelegateCommand(anniversarySummaryService.OpenSummary);
+
+            CloseAnniversaryBox = new DelegateCommand(() =>
+            {
+                anniversarySummaryService.HideAnniversaryBox();
+                ShowAnniversaryBox = false;
+            });
             
-            parameterFactory.OnRegister().SubscribeAction(_ =>
+            parameterFactory.OnRegister().Safe().SubscribeAction(_ =>
             {
                 ReloadMruList();
             });
@@ -166,28 +173,20 @@ namespace WoWDatabaseEditorCore.ViewModels
                 mainThread.Dispatch(ReloadMruList);
             }, true));
 
-            OpenDotNet6Website = new AsyncAutoCommand(async () =>
-            {
-                var url = dotNetService.DownloadDotNet6Link;
-                windowManager.OpenUrl(url.ToString());
-            });
-
-            CheckDotNet().ListenErrors();
+            ShowAnniversaryBox = anniversarySummaryService.ShowAnniversaryBox;
             
             ShowGiveStarBox = statisticsService.RunCounter > 20 &&
                               !applicationReleaseConfiguration.GetBool("SKIP_STAR_BOX").GetValueOrDefault() &&
                               !userSettings.Get<QuickStartSettings>().DismissedLeaveStarBox;
 
-            ReloadMruList();
+            try
+            {
+                ReloadMruList();
+            } catch (Exception)
+            {
+            }
         }
 
-        private async Task CheckDotNet()
-        {
-            var isInstalled = await dotNetService.IsDotNet6Installed();
-            IsDotNet6Installed = isInstalled;
-            RaisePropertyChanged(nameof(IsDotNet6Installed));
-        }
-        
         private void ReloadMruList()
         {
             MostRecentlyUsedItems.Clear();
@@ -201,11 +200,11 @@ namespace WoWDatabaseEditorCore.ViewModels
             }
         }
 
-        public bool IsDotNet6Installed { get; private set; } = true;
-        public AsyncAutoCommand OpenDotNet6Website { get; }
         public AsyncAutoCommand<NewItemPrototypeInfo> LoadItemCommand { get; }
         public AsyncAutoCommand<IWizardProvider> LoadWizard { get; }
         public AsyncAutoCommand<MostRecentlyUsedViewModel> OpenMostRecentlyUsedCommand { get; }
+        public ICommand OpenYearlySummary { get; }
+        public ICommand CloseAnniversaryBox { get; }
         
         public ImageUri? Icon => new ImageUri("Icons/wde_icon.png");
         public string Title => "Quick start";

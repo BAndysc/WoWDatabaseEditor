@@ -36,7 +36,7 @@ namespace WDE.Common.Database
 
         int ActionType { get; set; }
 
-        int ActionParam1 { get; set; }
+        long ActionParam1 { get; set; }
 
         int ActionParam2 { get; set; }
 
@@ -97,7 +97,7 @@ namespace WDE.Common.Database
         public int EventCooldownMin { get; set; }
         public int EventCooldownMax { get; set; }
         public int ActionType { get; set; }
-        public int ActionParam1 { get; set; }
+        public long ActionParam1 { get; set; }
         public int ActionParam2 { get; set; }
         public int ActionParam3 { get; set; }
         public int ActionParam4 { get; set; }

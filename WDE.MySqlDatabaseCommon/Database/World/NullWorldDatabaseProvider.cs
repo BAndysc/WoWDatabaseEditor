@@ -16,10 +16,14 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public IGameObjectTemplate? GetGameObjectTemplate(uint entry) => null;
 
         public IEnumerable<IGameObjectTemplate> GetGameObjectTemplates() => Enumerable.Empty<IGameObjectTemplate>();
+        
+        public Task<IAreaTriggerScript?> GetAreaTriggerScript(int entry) => Task.FromResult<IAreaTriggerScript?>(null);
 
         public IQuestTemplate? GetQuestTemplate(uint entry) => null;
 
         public IEnumerable<IQuestTemplate> GetQuestTemplates() => Enumerable.Empty<IQuestTemplate>();
+        
+        public Task<IQuestRequestItem?> GetQuestRequestItem(uint entry) => Task.FromResult<IQuestRequestItem?>(null);
 
         public IEnumerable<IAreaTriggerTemplate> GetAreaTriggerTemplates() => Enumerable.Empty<IAreaTriggerTemplate>();
 
@@ -31,13 +35,17 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         
         public IEnumerable<ICreatureClassLevelStat> GetCreatureClassLevelStats() => Enumerable.Empty<ICreatureClassLevelStat>();
 
+        public List<IGossipMenuOption> GetGossipMenuOptions(uint menuId) => new();
+
         public Task<List<IGossipMenuOption>> GetGossipMenuOptionsAsync(uint menuId) =>
             Task.FromResult(new List<IGossipMenuOption>());
 
         public IEnumerable<INpcText> GetNpcTexts() => Enumerable.Empty<INpcText>();
         public INpcText? GetNpcText(uint entry) => null;
         public Task<List<IPointOfInterest>> GetPointsOfInterestsAsync() => Task.FromResult(new List<IPointOfInterest>());
-        public Task<List<ICreatureText>> GetCreatureTextsByEntry(uint entry) => Task.FromResult(new List<ICreatureText>());
+        public Task<List<ICreatureText>> GetCreatureTextsByEntryAsync(uint entry) => Task.FromResult(new List<ICreatureText>());
+        public IReadOnlyList<ICreatureText>? GetCreatureTextsByEntry(uint entry) => null;
+
         public Task<IList<ISmartScriptLine>> GetLinesCallingSmartTimedActionList(int timedActionList) => Task.FromResult<IList<ISmartScriptLine>>(new List<ISmartScriptLine>());
 
         public IEnumerable<ISmartScriptLine> GetScriptFor(int entryOrGuid, SmartScriptType type) => Enumerable.Empty<ISmartScriptLine>();
@@ -71,12 +79,16 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         
         public IEnumerable<ICreature> GetCreaturesByEntry(uint entry) => Enumerable.Empty<ICreature>();
 
+        public Task<IList<IGameObject>> GetGameObjectsByEntryAsync(uint entry) => Task.FromResult<IList<IGameObject>>(new List<IGameObject>());
+
         public IEnumerable<ICreature> GetCreatures() => Enumerable.Empty<ICreature>();
         public Task<IList<ICreature>> GetCreaturesByMapAsync(uint map) => Task.FromResult<IList<ICreature>>(new List<ICreature>());
         
         public Task<IList<IGameObject>> GetGameObjectsByMapAsync(uint map) => Task.FromResult<IList<IGameObject>>(new List<IGameObject>());
 
         public IEnumerable<IGameObject> GetGameObjectsByEntry(uint entry) => Enumerable.Empty<IGameObject>();
+
+        public Task<IList<ICreature>> GetCreaturesByEntryAsync(uint entry) => Task.FromResult<IList<ICreature>>(new List<ICreature>());
 
         public IEnumerable<IGameObject> GetGameObjects() => Enumerable.Empty<IGameObject>();
 
@@ -85,7 +97,9 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public Task<IList<ITrinityString>> GetStringsAsync() => Task.FromResult<IList<ITrinityString>>(new List<ITrinityString>());
         
         public Task<IList<IDatabaseSpellDbc>> GetSpellDbcAsync() => Task.FromResult<IList<IDatabaseSpellDbc>>(new List<IDatabaseSpellDbc>());
-        
+       
+        public Task<IList<ISmartScriptLine>> FindSmartScriptLinesBy(IEnumerable<(IDatabaseProvider.SmartLinePropertyType what, int whatValue, int parameterIndex, long valueToSearch)> conditions) => Task.FromResult<IList<ISmartScriptLine>>(new List<ISmartScriptLine>());
+
         public Task<List<ICreatureTemplate>> GetCreatureTemplatesAsync() => Task.FromResult(new List<ICreatureTemplate>());
 
         public Task<List<ICreature>> GetCreaturesAsync() => Task.FromResult(new List<ICreature>());
@@ -110,5 +124,6 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public Task<List<IBroadcastText>> GetBroadcastTextsAsync() => Task.FromResult(new List<IBroadcastText>());
 
+        public Task<List<IEventScriptLine>> GetEventScript(EventScriptType type, uint id) => Task.FromResult(new List<IEventScriptLine>());
     }
 }

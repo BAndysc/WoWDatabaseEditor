@@ -1,0 +1,42 @@
+{
+  "id": "spell_group_stack_rules",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Spell Group Stack Rules",
+  "single_solution_name": "Spell Group Stack Rules Table",
+  "multi_solution_name": "Spell Group Stack Rules Table",
+  "description": "Table defines if auras in one spell_group can't stack with each other.",
+  "table_name": "spell_group_stack_rules",
+  "table_index_name": "group_id",
+  "record_mode": "SingleRow",
+  "group_name": "Spells",
+  "reload_command": "reload spell_group_stack_rules",
+  "skip_quick_load": true,
+  "icon_path": "Icons/document_magic.png",
+  "primary_key": [
+    "group_id"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Group Id",
+          "db_column_name": "group_id",
+          "value_type": "TableReference(spell_group#id)Parameter"
+        },
+        {
+          "name": "Stack Rule",
+          "db_column_name": "stack_rule",
+          "value_type": "SpellGroupStackRule"
+        },
+        {
+          "name": "Spells",
+          "is_meta": true,
+          "meta": "table:spell_group;`id` = {group_id}"
+        }
+      ]
+    }
+  ]
+}

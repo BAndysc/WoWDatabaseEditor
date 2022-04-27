@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
+using WDE.Common.Parameters;
 using WDE.Module.Attributes;
+using WDE.SmartScriptEditor.Editor;
 
 namespace WDE.SmartScriptEditor.Data
 {
@@ -40,13 +42,48 @@ namespace WDE.SmartScriptEditor.Data
         private readonly Dictionary<SmartType, Dictionary<int, SmartGenericJsonData>> smartIdData = new();
         private readonly Dictionary<SmartType, Dictionary<string, SmartGenericJsonData>> smartNameData = new();
         private readonly ISmartDataProvider provider;
-        
-        public SmartDataManager(ISmartDataProvider provider)
+        private readonly IEditorFeatures editorFeatures;
+        private readonly IParameterFactory parameterFactory;
+
+        public SmartDataManager(ISmartDataProvider provider, 
+            IEditorFeatures editorFeatures,
+            IParameterFactory parameterFactory)
         {
             Load(SmartType.SmartEvent, provider.GetEvents());
             Load(SmartType.SmartAction, provider.GetActions());
             Load(SmartType.SmartTarget, provider.GetTargets());
             this.provider = provider;
+            this.editorFeatures = editorFeatures;
+            this.parameterFactory = parameterFactory;
+
+            foreach (var (key, value) in smartIdData)
+                RegisterDynamicParameters(key, value.Values);
+        }
+        
+        private void RegisterDynamicParameters(SmartType type, ICollection<SmartGenericJsonData> datas)
+        {
+            foreach (var data in datas)
+            {
+                if (data.Parameters == null)
+                    continue;
+
+                for (var index = 0; index < data.Parameters.Count; index++)
+                {
+                    var param = data.Parameters[index];
+                    if (param.Values == null || param.Values.Count == 0)
+                        continue;
+
+                    string key = $"{editorFeatures.Name}_{type}_{data.Name}_{index}";
+                    if (!parameterFactory.IsRegisteredLong(key))
+                        parameterFactory.Register(key,
+                            param.Type == "FlagParameter"
+                                ? new FlagParameter() {Items = param.Values}
+                                : new Parameter() {Items = param.Values});
+
+                    param.Type = key;
+                    data.Parameters[index] = param;
+                }
+            }
         }
 
         public bool Contains(SmartType type, int id)

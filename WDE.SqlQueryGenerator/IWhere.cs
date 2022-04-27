@@ -4,5 +4,6 @@ namespace WDE.SqlQueryGenerator
     {
         ITable Table { get; }
         string Condition { get; }
+        bool IsEmpty { get; }
     }
 }

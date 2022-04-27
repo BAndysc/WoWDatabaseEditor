@@ -19,6 +19,7 @@ using WDE.Common.Avalonia;
 using WDE.Common.Avalonia.Utils;
 using WDE.Common.Events;
 using WDE.Common.Managers;
+using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Tasks;
 using WDE.Common.Utils;
@@ -101,6 +102,7 @@ namespace WoWDatabaseEditorCore.Avalonia
             var mainScope = new ScopedContainer(container, unity);
             container.RegisterInstance<IScopedContainer>(mainScope);
             ViewBind.ContainerProvider = container;
+            DI.Container = unity;
             return container;
         }
         
@@ -109,7 +111,7 @@ namespace WoWDatabaseEditorCore.Avalonia
             containerRegistry.RegisterInstance(Container);
             var vfs = new VirtualFileSystem();
             var fs = new FileSystem(vfs);
-            var userSettings = new UserSettings(fs, new DummyStatusBar());
+            var userSettings = new UserSettings(fs, new Lazy<IStatusBar>(new DummyStatusBar()));
             var currentCoreSettings = new CurrentCoreSettings(userSettings);
             
             modulesManager = new ModulesManager(currentCoreSettings);
@@ -155,8 +157,8 @@ namespace WoWDatabaseEditorCore.Avalonia
                 var bRequires = b.GetCustomAttributes(typeof(ModuleRequiresCoreAttribute), false);
                 return bRequires.Length.CompareTo(aRequires.Length);
             }));
-            
-            List<Assembly> loadAssemblies = AppDomain.CurrentDomain.GetAssemblies()
+
+            List<Assembly> loadAssemblies = allAssemblies
                 .Where(modulesManager!.ShouldLoad)
                 .ToList();
 
@@ -275,6 +277,7 @@ namespace WoWDatabaseEditorCore.Avalonia
             
             IEventAggregator? eventAggregator = Container.Resolve<IEventAggregator>();
             eventAggregator.GetEvent<AllModulesLoaded>().Publish();
+            Container.Resolve<ILoadingEventAggregator>().Publish<EditorLoaded>();
         }
 
         private class Conflict
@@ -291,6 +294,11 @@ namespace WoWDatabaseEditorCore.Avalonia
     }
     public class MainThread : IMainThread
     {
+        public void Delay(Action action, TimeSpan delay)
+        {
+            DispatcherTimer.RunOnce(action, delay);
+        }
+
         public void Dispatch(Action action)
         {
             Dispatcher.UIThread.Post(action);

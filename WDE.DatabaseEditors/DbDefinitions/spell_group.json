@@ -1,0 +1,41 @@
+{
+  "id": "spell_group",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Spell Group",
+  "single_solution_name": "Spell Group table",
+  "multi_solution_name": "Spell Group table",
+  "description": "Table used to group spells for varius checks in the core. One spell may be added to many groups, but can occur in one group only once.",
+  "table_name": "spell_group",
+  "table_index_name": "id",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Spells",
+  "icon_path": "Icons/document_magic.png",
+  "reload_command": "reload spell_group",
+  "picker": "Parameter",
+  "primary_key": [
+    "id",
+    "spell_id"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Id",
+          "db_column_name": "id",
+          "value_type": "uint",
+          "preferred_width": 60.0
+        },
+        {
+          "name": "Spell Id",
+          "db_column_name": "spell_id",
+          "value_type": "SpellParameter",
+          "preferred_width": 400.0
+        }
+      ]
+    }
+  ]
+}

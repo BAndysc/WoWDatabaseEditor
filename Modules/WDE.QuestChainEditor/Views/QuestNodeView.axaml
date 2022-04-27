@@ -1,0 +1,71 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:AvaloniaGraph.Controls;assembly=AvaloniaGraph"
+             xmlns:viewModels="clr-namespace:WDE.QuestChainEditor.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:QuestViewModel"
+             MaxWidth="145"
+             x:Class="WDE.QuestChainEditor.Views.QuestNodeView">
+    <UserControl.Styles>
+        <Style Selector="TextBlock">
+            <Setter Property="Foreground" Value="White" />
+        </Style>
+
+        <Style Selector="Border.selected">
+            <Setter Property="BorderBrush" Value="Yellow" />
+        </Style>
+    </UserControl.Styles>
+
+    <Border Classes.selected="{CompiledBinding IsSelected}"
+            BorderThickness="2" Padding="2" CornerRadius="4">
+        <Border CornerRadius="4" Background="#FF0F0F0F">
+            <DockPanel LastChildFill="True">
+                
+                <controls:ConnectorItem DockPanel.Dock="Top" DataContext="{CompiledBinding RequiresConnector}" AttachMode="Top" />
+                <controls:ConnectorItem DockPanel.Dock="Bottom" DataContext="{CompiledBinding IsRequiredByConnector}" AttachMode="Bottom" />
+                
+                
+                <controls:ConnectorItem DockPanel.Dock="Left" DataContext="{CompiledBinding LeftInputConnector}" AttachMode="Middle" />
+                <controls:ConnectorItem DockPanel.Dock="Right" DataContext="{CompiledBinding RightOutputConnector}" AttachMode="Middle" />
+
+                
+                <Border Padding="5 2 2 2" BorderBrush="DodgerBlue" BorderThickness="0 0 0 0" CornerRadius="2 2 0 0">
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock HorizontalAlignment="Center" TextWrapping="WrapWithOverflow" Text="{CompiledBinding Name}" />
+                        <TextBlock HorizontalAlignment="Center" Text="{CompiledBinding Entry}" Foreground="LightGray" FontSize="9" />
+                        
+                        <!-- races -->
+                        <ItemsPresenter HorizontalAlignment="Center" Items="{CompiledBinding Races}">
+                            <ItemsPresenter.ItemTemplate>
+                                <DataTemplate DataType="viewModels:MiniIconViewModel">
+                                    <WdeImage ToolTip.Tip="{CompiledBinding Name}" Image="{CompiledBinding Icon}" Width="16" Height="16" />
+                                </DataTemplate>
+                            </ItemsPresenter.ItemTemplate>
+                            <ItemsPresenter.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Spacing="2" Orientation="Horizontal" />
+                                </ItemsPanelTemplate>
+                            </ItemsPresenter.ItemsPanel>
+                        </ItemsPresenter>
+                        
+                        <!-- classes -->
+                        <ItemsPresenter HorizontalAlignment="Center" Items="{CompiledBinding Classes}">
+                            <ItemsPresenter.ItemTemplate>
+                                <DataTemplate DataType="viewModels:MiniIconViewModel">
+                                    <WdeImage ToolTip.Tip="{CompiledBinding Name}" Image="{CompiledBinding Icon}" Width="16" Height="16" />
+                                </DataTemplate>
+                            </ItemsPresenter.ItemTemplate>
+                            <ItemsPresenter.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Spacing="2" Orientation="Horizontal" />
+                                </ItemsPanelTemplate>
+                            </ItemsPresenter.ItemsPanel>
+                        </ItemsPresenter>
+                    </StackPanel>
+                </Border>
+            </DockPanel>
+        </Border>
+    </Border>
+</UserControl>

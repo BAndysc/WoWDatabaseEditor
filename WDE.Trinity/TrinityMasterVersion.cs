@@ -8,12 +8,13 @@ namespace WDE.Trinity
 {
     [AutoRegister]
     [SingleInstance]
-    public class TrinityMasterVersion : ICoreVersion, IDatabaseFeatures, ISmartScriptFeatures, IConditionFeatures
+    public class TrinityMasterVersion : ICoreVersion, IDatabaseFeatures, ISmartScriptFeatures, IConditionFeatures, IGameVersionFeatures
     {
         public string Tag => "TrinityMaster";
         public string FriendlyName => "TrinityCore Shadowlands";
         public ISmartScriptFeatures SmartScriptFeatures => this;
         public IConditionFeatures ConditionFeatures => this;
+        public IGameVersionFeatures GameVersionFeatures => this;
         public IDatabaseFeatures DatabaseFeatures => this;
 
         public ISet<Type> UnsupportedTables { get; } = new HashSet<Type>() {typeof(INpcText), typeof(ICreatureClassLevelStat), typeof(IBroadcastText)};
@@ -34,5 +35,8 @@ namespace WDE.Trinity
         public string ConditionsFile => "SmartData/conditions.json";
         public string ConditionGroupsFile => "SmartData/conditions_groups.json";
         public string ConditionSourcesFile => "SmartData/condition_sources.json";
+        public CharacterRaces AllRaces => CharacterRaces.AllShadowlands;
+        public CharacterClasses AllClasses => CharacterClasses.AllShadowlands;
+        public bool SupportsEventScripts => true;
     }
 }

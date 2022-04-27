@@ -1,0 +1,12 @@
+{
+  "name": "PoolMemberSpawnIdParameter",
+  "simple_switch": {
+    "column": "type",
+    "default": "Parameter",
+    "values": {
+      "0": "CreatureGUIDParameter",
+      "1": "GameobjectGUIDParameter",
+      "2": "TableReference(pool_template#entry)Parameter"
+    }
+  }
+}

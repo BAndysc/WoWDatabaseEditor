@@ -1,0 +1,14 @@
+{
+  "name": "DisablesEntryParameter",
+  "simple_switch": {
+    "column": "sourceType",
+    "default": "Parameter",
+    "values": {
+      "0": "SpellParameter",
+      "1": "QuestParameter",
+      "2": "MapParameter",
+      "3": "BattlegroundParameter",
+      "4": "AchievementCriteriaParameter"
+    }
+  }
+}

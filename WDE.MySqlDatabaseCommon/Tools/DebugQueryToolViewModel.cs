@@ -70,7 +70,7 @@ namespace WDE.MySqlDatabaseCommon.Tools
         {
             mainThread.Dispatch(() =>
             {
-                Text.Append($"[{tl}]: {arg2}\n{arg1}");
+                Text.Append($"[{tl}]: {arg2}\n{arg1}\n");
                 ScrollToEnd.Invoke();
             });
         }

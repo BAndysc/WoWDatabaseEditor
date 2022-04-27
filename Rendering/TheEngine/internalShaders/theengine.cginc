@@ -150,8 +150,8 @@ uniform samplerBuffer InstancingInverseModels;
 
 vec3 lighting(vec3 col, vec3 normal)
 {
-	float diff = max(dot(normal, lightDir.xyz), 0.0);
-	float diff2 = max(dot(normal, secondaryLightDir.xyz), 0.0);
+	float diff = max(dot(-normal, lightDir.xyz), 0.0);
+	float diff2 = max(dot(-normal, secondaryLightDir.xyz), 0.0);
 	vec3 diffuse = diff * lightColor * lightIntensity + diff2 * secondaryLightColor * secondaryLightIntensity;
 	vec3 ambient = ambientColor.rgb;
 	return col * min(diffuse + ambient, vec3(1.2));

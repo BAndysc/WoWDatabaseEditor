@@ -93,6 +93,10 @@ namespace WDE.Updater.Test.Data
             provider = new UpdateServerDataProvider(config);
             Assert.AreEqual(Platforms.MacOs, provider.Platform);
             
+            Setup("http://localhost", "abc", "def", "MacOsArm");
+            provider = new UpdateServerDataProvider(config);
+            Assert.AreEqual(Platforms.MacOsArm, provider.Platform);
+
             Setup("http://localhost", "abc", "def", "WindowsWpf");
             provider = new UpdateServerDataProvider(config);
             Assert.AreEqual(Platforms.WindowsWpf, provider.Platform);

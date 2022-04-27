@@ -43,7 +43,7 @@ void main()
     color += AddGradient(justAboveHorizon, justAboveHorizon, 0, 0.40, TexCoord.y);
     
     // sun
-    float sunStrength = distance(lightDir.xyz, -Normal.xyz);   
+    float sunStrength = distance(lightDir.xyz, Normal.xyz);   
     color = mix(color, sunColor.rgb, (step(1.5, acos(sunStrength))) * (smoothstep(0.45, 0.5, TexCoord.y)));
     
 

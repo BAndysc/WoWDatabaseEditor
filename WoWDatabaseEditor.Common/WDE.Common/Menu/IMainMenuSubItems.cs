@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Input;
 using WDE.Common.Managers;
@@ -40,13 +41,18 @@ namespace WDE.Common.Menu
     {
         public string Key { get; set; }
         public bool Control { get; set; }
+        public bool Shift { get; set; }
 
         public string InputShortcutText
         {
             get
             {
-                if (Control)
+                if (Control && Shift)
+                    return $"Ctrl+Shift+{Key}";
+                else if (Control)
                     return $"Ctrl+{Key}";
+                else if (Shift)
+                    return $"Shift+{Key}";
                 else
                     return Key;
             }
@@ -59,11 +65,25 @@ namespace WDE.Common.Menu
             {
                 Key = key;
                 Control = false;
+                Shift = false;
             }
             else
             {
-                Key = key.Substring(plus + 1);
-                Control = true;
+                var plus2 = key.IndexOf('+', plus + 1);
+                if (plus2 == -1)
+                {
+                    Key = key.Substring(plus + 1);
+                    Control = string.Equals(key.Substring(0, plus), "Control", StringComparison.OrdinalIgnoreCase);
+                    Shift = string.Equals(key.Substring(0, plus), "Shift", StringComparison.OrdinalIgnoreCase);
+                }
+                else
+                {
+                    Key = key.Substring(plus2 + 1);
+                    var firstKey = key.Substring(0, plus);
+                    var secondKey = key.Substring(plus + 1, plus2 - plus - 1);
+                    Control = firstKey == "Control" || secondKey == "Control";
+                    Shift = firstKey == "Shift" || secondKey == "Shift";
+                }
             }
         }
     }

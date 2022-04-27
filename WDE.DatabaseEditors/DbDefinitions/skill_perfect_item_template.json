@@ -1,0 +1,51 @@
+{
+  "id": "skill_perfect_item_template",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Skill Perfect Item Template",
+  "single_solution_name": "Skill Perfect Item Template",
+  "multi_solution_name": "Skill Perfect Item Template",
+  "description": "",
+  "table_name": "skill_perfect_item_template",
+  "table_index_name": "spellId",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Spells",
+  "icon_path": "Icons/document_magic.png",
+  "picker": "",
+  "primary_key": [
+    "spellId"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Spell",
+          "db_column_name": "spellId",
+          "value_type": "SpellParameter",
+          "preferred_width": 265.0
+        },
+        {
+          "name": "Required Specialization",
+          "db_column_name": "requiredSpecialization",
+          "value_type": "uint",
+          "preferred_width": 160.0
+        },
+        {
+          "name": "Perfect Create Chance",
+          "db_column_name": "perfectCreateChance",
+          "value_type": "float",
+          "preferred_width": 140.0
+        },
+        {
+          "name": "Perfect Item Type",
+          "db_column_name": "perfectItemType",
+          "value_type": "uint",
+          "preferred_width": 255.0
+        }
+      ]
+    }
+  ]
+}

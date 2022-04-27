@@ -13,6 +13,8 @@ namespace WDE.SmartScriptEditor.Parameters
         {
             this.databaseProvider = databaseProvider;
         }
+
+        public string? Prefix => null;
         
         public bool HasItems => true;
         

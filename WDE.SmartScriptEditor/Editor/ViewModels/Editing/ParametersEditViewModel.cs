@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows.Input;
 using DynamicData;
 using DynamicData.Binding;
 using Prism.Commands;
 using WDE.Common.CoreVersion;
 using WDE.Common.Managers;
+using WDE.Common.Parameters;
 using WDE.MVVM.Observable;
 using WDE.MVVM;
 using WDE.Common.Providers;
@@ -17,8 +19,11 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
 {
     public class ParametersEditViewModel : ObservableBase, IDialog
     {
+        private readonly IParameterPickerService parameterPickerService;
+
         public ParametersEditViewModel(IItemFromListProvider itemFromListProvider,
             ICurrentCoreVersion currentCoreVersion,
+            IParameterPickerService parameterPickerService,
             SmartBaseElement element,
             bool focusFirst,
             IEnumerable<(ParameterValueHolder<long> parameter, string name)>? parameters,
@@ -26,8 +31,10 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
             IEnumerable<(ParameterValueHolder<string> parameter, string name)>? stringParameters = null,
             IEnumerable<EditableActionData>? actionParameters = null,
             System.Action? saveAction = null,
-            string? focusFirstGroup = null)
+            string? focusFirstGroup = null,
+            object? context = null)
         {
+            this.parameterPickerService = parameterPickerService;
             HashSet<IEditableParameterViewModel> visible = new();
             SourceList<IEditableParameterViewModel> visibleParameters = new();
             List<IEditableParameterViewModel> allParameters = new();
@@ -44,7 +51,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
                 {
                     var canFocusThis = first && (focusFirstGroup == null || focusFirstGroup == parameter.name);
                     var focusThis = canFocusThis && parameter.parameter.IsUsed;
-                    allParameters.Add(AutoDispose(new EditableParameterViewModel<long>(parameter.parameter, parameter.name, itemFromListProvider, currentCoreVersion){FocusFirst = focusThis}));
+                    allParameters.Add(AutoDispose(new EditableParameterViewModel<long>(parameter.parameter, parameter.name, itemFromListProvider, currentCoreVersion, parameterPickerService, context){FocusFirst = focusThis}));
                     if (focusThis)
                         first = false;
                 }
@@ -53,13 +60,13 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
             if (floatParameters != null)
                 foreach (var parameter in floatParameters)
                 {
-                    allParameters.Add(AutoDispose(new EditableParameterViewModel<float>(parameter.parameter, parameter.name, itemFromListProvider, currentCoreVersion){FocusFirst = first}));
+                    allParameters.Add(AutoDispose(new EditableParameterViewModel<float>(parameter.parameter, parameter.name, itemFromListProvider, currentCoreVersion, parameterPickerService){FocusFirst = first}));
                     first = false;
                 }
 
             if (stringParameters != null)
                 foreach (var parameter in stringParameters)
-                    allParameters.Add(AutoDispose(new EditableParameterViewModel<string>(parameter.parameter, parameter.name, itemFromListProvider, currentCoreVersion){FocusFirst=focusFirst}));
+                    allParameters.Add(AutoDispose(new EditableParameterViewModel<string>(parameter.parameter, parameter.name, itemFromListProvider, currentCoreVersion, parameterPickerService){FocusFirst=focusFirst}));
 
             foreach (IEditableParameterViewModel parameter in allParameters)
             {
@@ -102,8 +109,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
         public string Readable { get; private set; } = "";
         public bool ShowCloseButtons { get; set; } = true;
 
-        public DelegateCommand Accept { get; }
-        public DelegateCommand Cancel { get; }
+        public ICommand Accept { get; }
+        public ICommand Cancel { get; }
         public int DesiredWidth => 545;
         public int DesiredHeight => 625;
         public string Title => "Edit";

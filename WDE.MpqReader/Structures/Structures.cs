@@ -506,10 +506,10 @@ namespace WDE.MpqReader.Structures
         {
             return new M2Vertex()
             {
-                pos = reader.ReadOpenGlVector3(),
+                pos = reader.ReadVector3(),
                 bone_weights = reader.ReadBytes(4),
                 bone_indices = reader.ReadBytes(4),
-                normal = reader.ReadOpenGlVector3(),
+                normal = reader.ReadVector3(),
                 tex_coords = new[] { reader.ReadVector2(), reader.ReadVector2() }
             };
         }
@@ -740,15 +740,6 @@ namespace WDE.MpqReader.Structures
             return new Vector3(reader.ReadFloat(), reader.ReadFloat(), reader.ReadFloat());
         }
 
-        // returns OpenGL oriented wow vector
-        public static Vector3 ReadOpenGlVector3(this IBinaryReader reader)
-        {
-            var x = reader.ReadFloat();
-            var y = reader.ReadFloat();
-            var z = reader.ReadFloat();
-            return new Vector3(y, z, -x);
-        }
-    
         public static string ReadChunkName(this IBinaryReader reader)
         {
             Span<char> array = stackalloc char[4];

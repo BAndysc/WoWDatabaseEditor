@@ -17,6 +17,8 @@ namespace WDE.TrinityMySqlDatabase.Models
         public ITable<MySqlSmartScriptLine> SmartScript => GetTable<MySqlSmartScriptLine>();
         public ITable<MySqlGameObjectTemplate> GameObjectTemplate => GetTable<MySqlGameObjectTemplate>();
         public ITable<MySqlQuestTemplate> QuestTemplate => GetTable<MySqlQuestTemplate>();
+        public ITable<MySqlQuestRequestItem> QuestRequestItems => GetTable<MySqlQuestRequestItem>();
+        public ITable<MySqlMasterQuestTemplate> MasterQuestTemplate => GetTable<MySqlMasterQuestTemplate>();
         public ITable<MySqlQuestTemplateAddon> QuestTemplateAddon => GetTable<MySqlQuestTemplateAddon>();
         public ITable<MySqlQuestTemplateAddonWithScriptName> QuestTemplateAddonWithScriptName => GetTable<MySqlQuestTemplateAddonWithScriptName>();
         public ITable<MySqlAreaTriggerTemplate> AreaTriggerTemplate => GetTable<MySqlAreaTriggerTemplate>();
@@ -34,5 +36,8 @@ namespace WDE.TrinityMySqlDatabase.Models
         public ITable<CoreCommandHelp> Commands => GetTable<CoreCommandHelp>();
         public ITable<MySqlPointOfInterest> PointsOfInterest => GetTable<MySqlPointOfInterest>();
         public ITable<MySqlCreatureText> CreatureTexts => GetTable<MySqlCreatureText>();
+        public ITable<MySqlEventScriptLine> EventScripts => GetTable<MySqlEventScriptLine>();
+        public ITable<MySqlWaypointScriptLine> WaypointScripts => GetTable<MySqlWaypointScriptLine>();
+        public ITable<MySqlSpellScriptLine> SpellScripts => GetTable<MySqlSpellScriptLine>();
     }
 }

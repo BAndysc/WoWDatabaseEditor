@@ -10,7 +10,7 @@ namespace WDE.SmartScriptEditor.Validation
         public int ActionParametersCount { get; }
         public int ActionSourceParametersCount { get; }
         public int ActionTargetParametersCount { get; }
-        
+        public long GetEventFlags();
         public long GetEventParameter(int index);
         public long GetActionParameter(int index);
         public long GetActionSourceParameter(int index);

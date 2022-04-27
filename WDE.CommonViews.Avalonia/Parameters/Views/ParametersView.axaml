@@ -12,7 +12,7 @@
             <ColumnDefinition Width="2*" />
         </Grid.ColumnDefinitions>
         <ListBox BorderBrush="Transparent" Items="{Binding Parameters}" SelectedItem="{Binding Selected}" VirtualizationMode="None" />
-        <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" />
+        <GridSplitter Classes="vertical" Grid.Column="1" Width="5" HorizontalAlignment="Stretch" />
         <Grid Grid.Column="2" IsEnabled="{Binding HasSelected}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />

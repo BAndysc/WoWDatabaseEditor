@@ -30,6 +30,7 @@
                                   Background="{TemplateBinding Background}"
                                   Padding="{TemplateBinding Padding}"
                                   VerticalAlignment="Stretch"
+                                  HorizontalContentAlignment="Left"
                                   Name="PART_Button"
                                   IsChecked="{TemplateBinding IsDropDownOpen, Mode=TwoWay}" ContentTemplate="{TemplateBinding ButtonItemTemplate}"></ToggleButton>
                     <Popup Name="PART_Popup"

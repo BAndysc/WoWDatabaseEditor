@@ -1,0 +1,84 @@
+{
+  "id": "trainer_spell",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Trainer Spell",
+  "single_solution_name": "Trainer Spell Table",
+  "multi_solution_name": "Trainer Spell Table",
+  "description": "Used to setup what spells trainers can teach",
+  "table_name": "trainer_spell",
+  "table_index_name": "TrainerId",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Trainers",
+  "reload_command": "reload trainer",
+  "icon_path": "Icons/document_book.png",
+  "primary_key": [
+    "TrainerId",
+    "SpellId"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Trainer Id",
+          "db_column_name": "TrainerId",
+          "value_type": "TableReference(trainer#Id)Parameter",
+          "preferred_width": 50.0
+        },
+        {
+          "name": "Spell",
+          "db_column_name": "SpellId",
+          "value_type": "SpellParameter",
+          "preferred_width": 145.0
+        },
+        {
+          "name": "Money Cost",
+          "db_column_name": "MoneyCost",
+          "value_type": "MoneyParameter",
+          "preferred_width": 115.0
+        },
+        {
+          "name": "Req Skill Line",
+          "db_column_name": "ReqSkillLine",
+          "value_type": "SkillParameter",
+          "preferred_width": 205.0
+        },
+        {
+          "name": "Req Skill Rank",
+          "db_column_name": "ReqSkillRank",
+          "value_type": "uint"
+        },
+        {
+          "name": "Req Ability 1",
+          "db_column_name": "ReqAbility1",
+          "value_type": "SpellParameter",
+          "preferred_width": 135.0
+        },
+        {
+          "name": "Req Ability 2",
+          "db_column_name": "ReqAbility2",
+          "value_type": "SpellParameter"
+        },
+        {
+          "name": "Req Ability 3",
+          "db_column_name": "ReqAbility3",
+          "value_type": "SpellParameter"
+        },
+        {
+          "name": "Req Level",
+          "db_column_name": "ReqLevel",
+          "value_type": "uint"
+        },
+        {
+          "name": "Verified Build",
+          "db_column_name": "VerifiedBuild",
+          "value_type": "int",
+          "can_be_null": true
+        }
+      ]
+    }
+  ]
+}

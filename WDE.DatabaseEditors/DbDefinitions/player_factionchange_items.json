@@ -1,0 +1,54 @@
+{
+  "id": "player_factionchange_items",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Player Faction Change Items",
+  "single_solution_name": "Player Faction Change Items",
+  "multi_solution_name": "Player Faction Change Items",
+  "description": "Defines what items should be converted to their faction specific counterparts when a player changes faction.",
+  "table_name": "player_factionchange_items",
+  "table_index_name": "alliance_id",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Faction changing",
+  "icon_path": "Icons/document_faction_change.png",
+  "picker": "Parameter",
+  "primary_key": [
+    "alliance_id",
+    "horde_id"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Alliance Item",
+          "db_column_name": "alliance_id",
+          "value_type": "ItemParameter",
+          "preferred_width": 295.0
+        },
+        {
+          "name": "Horde Item",
+          "db_column_name": "horde_id",
+          "value_type": "ItemParameter",
+          "preferred_width": 280.0
+        },
+        {
+          "name": "Comment Alliance",
+          "db_column_name": "commentA",
+          "value_type": "string",
+          "can_be_null": true,
+          "preferred_width": 170.0
+        },
+        {
+          "name": "Comment Horde",
+          "db_column_name": "commentH",
+          "value_type": "string",
+          "can_be_null": true,
+          "preferred_width": 165.0
+        }
+      ]
+    }
+  ]
+}

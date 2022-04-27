@@ -9,7 +9,6 @@
                         <FontFamily x:Key="MainFontSans">avares://AvaloniaStyles/Styles/Assets#Lato</FontFamily>
                 </Style.Resources>
         </Style>
-        <StyleInclude Source="avares://Dock.Avalonia/Themes/DockFluentTheme.axaml"/>
         <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
         <StyleInclude Source="avares://AvaloniaStyles/Controls/CompletionComboBox.axaml" />
         <StyleInclude Source="avares://AvaloniaStyles/Controls/GridViewStyle.axaml" />
@@ -18,11 +17,8 @@
         <StyleInclude Source="avares://AvaloniaStyles/Controls/DropDownButton.axaml" />
         
         <!--<StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/TabStrip.xaml" />-->
-        <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/NativeMenuBar.xaml" />
-        <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/WindowControlButtons.axaml" />
+        <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/GridSplitter.axaml" />
         <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/SideBar.xaml" />
-        <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/Window.xaml" />
-        <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/StatusBar.xaml" />
         <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/ToolsTabControl.xaml" />
         <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/Button.axaml" />
         <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/ListBox.xaml" />
@@ -36,4 +32,9 @@
         <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/TreeViewItem.axaml" />
         <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/ToolbarPanel.axaml" />
         <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/CompletionComboBox.axaml" />
+        <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/NativeMenuBar.xaml" />
+        <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/WindowControlButtons.axaml" />
+        <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/Window.xaml" />
+        <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/StatusBar.xaml" />
+        <StyleInclude Source="avares://Dock.Avalonia/Themes/DockFluentTheme.axaml"/>
 </Styles>

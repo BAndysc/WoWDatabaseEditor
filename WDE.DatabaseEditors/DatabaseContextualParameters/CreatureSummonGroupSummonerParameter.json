@@ -1,0 +1,12 @@
+{
+    "name": "CreatureSummonGroupSummonerParameter",
+    "simple_switch": {
+        "column": "summonerType",
+        "default": "Parameter",
+        "values": {
+            "0": "CreatureParameter",
+            "1": "GameobjectParameter",
+            "2": "MapParameter"
+        }
+    }
+}

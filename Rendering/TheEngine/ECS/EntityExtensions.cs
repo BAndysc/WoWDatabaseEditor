@@ -58,6 +58,19 @@ namespace TheEngine.ECS
             }
         }
 
+        public static void ForEach<N1, T1>(this Archetype archetype, 
+            System.Action<IChunkDataIterator, int, int, ComponentDataAccess<N1>, ManagedComponentDataAccess<T1>> process)
+            where N1 : unmanaged, IComponentData
+            where T1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            foreach (var itr in iterator)
+            {
+                process(itr, 0, itr.Length, itr.DataAccess<N1>(), itr.ManagedDataAccess<T1>());
+            }
+        }
+        
         private static void RunThreads(int start, int total, Action<int, int> action)
         {
             int threads = Environment.ProcessorCount;

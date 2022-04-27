@@ -1,16 +1,21 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Prism.Ioc;
 using WDE.Common;
 using WDE.Common.Services;
+using WDE.Common.Services.QueryParser;
+using WDE.Common.Services.QueryParser.Models;
 using WDE.Common.Sessions;
+using WDE.Common.Utils;
 using WDE.DatabaseEditors.Data.Interfaces;
+using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Loaders;
 using WDE.DatabaseEditors.Solution;
 using WDE.Module.Attributes;
 using WDE.SqlInterpreter;
-using WDE.SqlInterpreter.Models;
 
 namespace WDE.DatabaseEditors.Services
 {
@@ -18,120 +23,98 @@ namespace WDE.DatabaseEditors.Services
     [SingleInstance]
     public class QueryParserService : IQueryParserService
     {
-        private readonly ITableDefinitionProvider tableDefinitionProvider;
         private readonly IQueryEvaluator queryEvaluator;
-        private readonly ISessionService sessionService;
-        private readonly IDatabaseTableDataProvider loader;
+        private readonly Func<Context> contextGenerator;
 
         public QueryParserService(
-            ITableDefinitionProvider tableDefinitionProvider,
             IQueryEvaluator queryEvaluator,
-            ISessionService sessionService,
-            IDatabaseTableDataProvider loader)
+            Func<Context> contextGenerator)
         {
-            this.tableDefinitionProvider = tableDefinitionProvider;
             this.queryEvaluator = queryEvaluator;
-            this.sessionService = sessionService;
-            this.loader = loader;
+            this.contextGenerator = contextGenerator;
         }
-    
-        public async Task<(IList<ISolutionItem> items, IList<string> errors)> GenerateItemsForQuery(string query)
+
+        public Task<(IList<ISolutionItem> items, IList<string> errors)> GenerateItemsForQuery(string query)
         {
-            IList<ISolutionItem> found = new List<ISolutionItem>();
-            IList<string> errors = new List<string>();
-            HashSet<string> missingTables = new HashSet<string>();
-            foreach (var q in queryEvaluator.Extract(query))
+            var context = contextGenerator();
+            return context.GenerateItemsForQuery(query);
+        }
+
+        [AutoRegister]
+        public class Context : IQueryParsingContext
+        {
+            private readonly IQueryEvaluator queryEvaluator;
+            private readonly IList<IQueryParserProvider> parsers;
+            private HashSet<string> missingTables = new();
+            private List<ISolutionItem> found = new();
+            private List<string> errors = new();
+
+            public Context(IQueryEvaluator queryEvaluator,
+                IEnumerable<IQueryParserProvider> parsers)
             {
-                if (q is UpdateQuery updateQuery)
-                {
-                    var defi = tableDefinitionProvider.GetDefinitionByTableName(updateQuery.TableName);
-                    if (defi == null)
-                    {
-                        missingTables.Add(updateQuery.TableName);
-                        continue;
-                    }
-                
-                    if (!updateQuery.Where.ColumnName.Equals(defi.TablePrimaryKeyColumnName,
-                        StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        missingTables.Add(updateQuery.TableName);
-                        continue;
-                    }
-
-                    foreach (var key in updateQuery.Where.Values)
-                    {
-                        if (key is not long lkey)
-                            continue;
-                        var old = await loader.Load(defi.Id, (uint)lkey);
-                        if (old == null || old.Entities.Count != 1 || !old.Entities[0].ExistInDatabase)
-                        {
-                            errors.Add($"{defi.TableName} where {defi.TablePrimaryKeyColumnName} = {lkey} not found, no update");
-                            continue;
-                        }
-                        var item = new DatabaseTableSolutionItem(defi.Id);
-                        item.Entries.Add(new SolutionItemDatabaseEntity((uint)lkey, true));
-                        var savedItem = sessionService.Find(item);
-                        if (savedItem != null)
-                            item = (DatabaseTableSolutionItem)savedItem.Clone();
-
-                        var originals = item.Entries[0].OriginalValues ??= new();
-                        foreach (var upd in updateQuery.Updates)
-                        {
-                            var cell = old.Entities[0].GetCell(upd.ColumnName);
-                            if (cell == null)
-                                continue;
-                            if (originals.Any(o => o.ColumnName == upd.ColumnName))
-                                continue;
-                            var original = new EntityOrigianlField()
-                            {
-                                ColumnName = upd.ColumnName,
-                                OriginalValue = cell.OriginalValue
-                            };
-                            originals.Add(original);
-                        }
-                        found.Add(item);
-                    }
-                }
-                else if (q is InsertQuery insertQuery)
-                {
-                    var defi = tableDefinitionProvider.GetDefinitionByTableName(insertQuery.TableName);
-                    if (defi == null)
-                    {
-                        missingTables.Add(insertQuery.TableName);
-                        continue;
-                    }
-                
-                    int indexOf = -1;
-                    for (int i = 0; i < insertQuery.Columns.Count; ++i)
-                    {
-                        if (insertQuery.Columns[i].Equals(defi.TablePrimaryKeyColumnName,
-                            StringComparison.InvariantCultureIgnoreCase))
-                        {
-                            indexOf = i;
-                            break;
-                        }
-                    }
-
-                    if (indexOf == -1)
-                    {
-                        missingTables.Add(insertQuery.TableName);
-                        continue;
-                    }
-
-                    foreach (var line in insertQuery.Inserts)
-                    {
-                        if (line[indexOf] is not long lkey)
-                            continue;
-                        var item = new DatabaseTableSolutionItem(defi.Id);
-                        item.Entries.Add(new SolutionItemDatabaseEntity((uint)lkey, false));
-                        found.Add(item);
-                    }
-                }
+                this.queryEvaluator = queryEvaluator;
+                this.parsers = parsers.ToList();
             }
-            foreach (var missing in missingTables)
-                errors.Add($"Table `{missing}` is not supported in WDE, no item added to the session.");
+
+            public async Task<(IList<ISolutionItem> items, IList<string> errors)> GenerateItemsForQuery(string query)
+            {
+                foreach (var q in queryEvaluator.Extract(query))
+                {
+                    bool parsed = false;
+                    foreach (var parser in parsers)
+                    {
+                        if (q is UpdateQuery updateQuery)
+                        {
+                            if (await parser.ParseUpdate(updateQuery, this))
+                            {
+                                parsed = true;
+                                break;
+                            }
+                        }
+                        else if (q is DeleteQuery deleteQuery)
+                        {
+                            if (await parser.ParseDelete(deleteQuery, this))
+                            {
+                                parsed = true;
+                                break;
+                            }
+                        }
+                        else if (q is InsertQuery insertQuery)
+                        {
+                            if (await parser.ParseInsert(insertQuery, this))
+                            {
+                                parsed = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!parsed)
+                    {                            
+                        missingTables.Add(q.TableName);
+                    }
+                }
+
+                foreach (var parser in parsers)
+                {
+                    parser.Finish(this);
+                }
+
+                foreach (var missing in missingTables)
+                    errors.Add($"Table `{missing}` is not supported in WDE, no item added to the session.");
         
-            return (found, errors);
+                return (found, errors);
+            }
+            
+            public void AddError(string error)
+            {
+                errors.Add(error);
+            }
+
+            public void ProduceItem(ISolutionItem item)
+            {
+                found.Add(item);
+            }
         }
     }
 }

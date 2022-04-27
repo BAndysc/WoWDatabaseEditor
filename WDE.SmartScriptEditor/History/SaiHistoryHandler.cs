@@ -33,6 +33,7 @@ namespace WDE.SmartScriptEditor.History
                     e.Item.VariableTypeChanged += OnGlobalVariableTypeChanged;
                     e.Item.NameChanged += OnGlobalVariableNameChanged;
                     e.Item.KeyChanged += OnGlobalVariableKeyChanged;
+                    e.Item.EntryChanged += OnGlobalVariableEntryChanged;
                 }
                 else
                 {
@@ -40,6 +41,7 @@ namespace WDE.SmartScriptEditor.History
                     e.Item.VariableTypeChanged -= OnGlobalVariableTypeChanged;
                     e.Item.NameChanged -= OnGlobalVariableNameChanged;
                     e.Item.KeyChanged -= OnGlobalVariableKeyChanged;
+                    e.Item.EntryChanged -= OnGlobalVariableEntryChanged;
                 }
             });
             
@@ -66,6 +68,11 @@ namespace WDE.SmartScriptEditor.History
         private void OnGlobalVariableKeyChanged(GlobalVariable variable, long old, long newValue)
         {
             PushAction(new GlobalVariableKeyChangedAction(variable, old, newValue));
+        }
+        
+        private void OnGlobalVariableEntryChanged(GlobalVariable variable, uint old, uint newValue)
+        {
+            PushAction(new GlobalVariableEntryChangedAction(variable, old, newValue));
         }
 
         private void OnGlobalVariableTypeChanged(GlobalVariable variable, GlobalVariableType old, GlobalVariableType newValue)
@@ -752,6 +759,32 @@ namespace WDE.SmartScriptEditor.History
         }
     }
     
+    public class GlobalVariableEntryChangedAction : IHistoryAction
+    {
+        private readonly uint old;
+        private readonly uint newName;
+        private readonly GlobalVariable variable;
+
+        public GlobalVariableEntryChangedAction(GlobalVariable variable, uint old, uint newName)
+        {
+            this.variable = variable;
+            this.old = old;
+            this.newName = newName;
+        }
+
+        public string GetDescription() => "Global variable entry changed";
+
+        public void Redo()
+        {
+            variable.Entry = newName;
+        }
+
+        public void Undo()
+        {
+            variable.Entry = old;
+        }
+    }
+
     public class GlobalVariableTypeChangedAction : IHistoryAction
     {
         private readonly GlobalVariableType old;

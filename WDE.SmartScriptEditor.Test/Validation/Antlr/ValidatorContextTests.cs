@@ -33,6 +33,13 @@ namespace WDE.SmartScriptEditor.Test.Validation.Antlr
         }
         
         [Test]
+        public void TestEventFlags()
+        {
+            Assert.True(new SmartValidator($"(event.flags & 1) == 1").Evaluate(context));
+            Assert.True(new SmartValidator($"(event.flags & 2) == 0").Evaluate(context));
+        }
+        
+        [Test]
         public void TestEventInvalidParams()
         {
             Assert.Throws<ValidationParseException>(() => new SmartValidator($"event.param(0) == 2").Evaluate(context));
@@ -92,7 +99,8 @@ namespace WDE.SmartScriptEditor.Test.Validation.Antlr
             public int ActionParametersCount => 6;
             public int ActionSourceParametersCount => 3;
             public int ActionTargetParametersCount => 3;
-            
+            public long GetEventFlags() => 5;
+
             public long GetEventParameter(int index)
             {
                 if (index < 0 || index >= EventParametersCount)

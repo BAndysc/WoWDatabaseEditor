@@ -1,0 +1,39 @@
+{
+  "id": "spell_script_names",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Spell Script Names",
+  "single_solution_name": "Spell Script Names",
+  "multi_solution_name": "Spell Script Names",
+  "description": "This table assigns a script name to the spell.",
+  "table_name": "spell_script_names",
+  "table_index_name": "spell_id",
+  "record_mode": "MultiRecord",
+  "group_name": "Spells",
+  "reload_command": "reload spell_script_names",
+  "skip_quick_load": true,
+  "icon_path": "Icons/document_magic.png",
+  "picker": "SpellParameter",
+  "primary_key": [
+    "spell_id"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Spell",
+          "db_column_name": "spell_id",
+          "value_type": "SpellParameter",
+          "read_only": true
+        },
+        {
+          "name": "Script Name",
+          "db_column_name": "ScriptName",
+          "value_type": "string"
+        }
+      ]
+    }
+  ]
+}

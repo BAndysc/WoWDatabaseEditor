@@ -1,4 +1,5 @@
 ﻿using LinqToDB.Mapping;
+using WDE.Common.Database;
 
 namespace WDE.TrinityMySqlDatabase.Models
 {
@@ -17,8 +18,21 @@ namespace WDE.TrinityMySqlDatabase.Models
 
         [Column(Name = "ExclusiveGroup")]
         public int ExclusiveGroup { get; set; }
+        
+        [Column(Name = "BreadcrumbForQuestId")]
+        public int BreadcrumbForQuest { get; set; }
+
+        [Column(Name = "AllowableClasses")]
+        public uint AllowableClasses { get; set; }
     }
     
+    [Table(Name = "quest_template_addon")]
+    public class MySqlCataQuestTemplateAddon : MySqlQuestTemplateAddon
+    {
+        [Column(Name="AllowableRaces")]
+        public CharacterRaces AllowableRaces { get; set; }
+    }
+
     [Table(Name = "quest_template_addon")]
     public class MySqlQuestTemplateAddonWithScriptName : MySqlQuestTemplateAddon
     {

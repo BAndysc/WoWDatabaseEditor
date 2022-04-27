@@ -19,8 +19,15 @@ namespace WDE.Common
         bool IsContainer => false;
         bool ShowInQuickStart(ICoreVersion core) => true;
         bool IsCompatibleWithCore(ICoreVersion core);
+        bool ByDefaultHideFromQuickStart => false;
 
         Task<ISolutionItem?> CreateSolutionItem();
+    }
+
+    public interface INumberSolutionItemProvider : ISolutionItemProvider
+    {
+        Task<ISolutionItem?> CreateSolutionItem(long number);
+        string ParameterName { get; }
     }
 
     [NonUniqueProvider]

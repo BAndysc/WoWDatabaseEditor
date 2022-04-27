@@ -1,0 +1,60 @@
+{
+  "id": "achievement_criteria_data",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Achievement Criteria Data",
+  "single_solution_name": "Achievement Criteria Data",
+  "multi_solution_name": "Achievement Criteria Data",
+  "description": "This table contains the data that a player needs to obtain / complete in order to receive a given achievement.",
+  "table_name": "achievement_criteria_data",
+  "table_index_name": "criteria_id",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Achievements",
+  "icon_path": "Icons/document_achievement.png",
+  "reload_command": "reload achievement_criteria_data",
+  "picker": "Parameter",
+  "primary_key": [
+    "criteria_id",
+    "type"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Criteria Id",
+          "db_column_name": "criteria_id",
+          "value_type": "AchievementCriteriaParameter",
+          "preferred_width": 270.0
+        },
+        {
+          "name": "Type",
+          "db_column_name": "type",
+          "value_type": "AchievementCriteriaTypeParameter",
+          "preferred_width": 195.0
+        },
+        {
+          "name": "Value 1",
+          "db_column_name": "value1",
+          "value_type": "AchievementValue1Parameter",
+          "preferred_width": 240.0
+        },
+        {
+          "name": "Value 2",
+          "db_column_name": "value2",
+          "value_type": "AchievementValue2Parameter",
+          "preferred_width": 80.0
+        },
+        {
+          "name": "Script Name",
+          "db_column_name": "ScriptName",
+          "value_type": "string",
+          "default": "",
+          "preferred_width": 305.0
+        }
+      ]
+    }
+  ]
+}

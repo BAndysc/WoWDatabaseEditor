@@ -310,5 +310,12 @@ namespace WDE.DbcStore.Spells.Wrath
                 return spell.EffectMiscValue[index];
             return 0;
         }
+
+        public uint GetSpellEffectTriggerSpell(uint spellId, int index)
+        {
+            if (spells.TryGetValue(spellId, out var spell))
+                return spell.EffectTriggerSpell[index];
+            return 0;
+        }
     }
 }

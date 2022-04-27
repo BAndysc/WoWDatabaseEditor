@@ -2,9 +2,14 @@ namespace WDE.SqlQueryGenerator
 {
     internal class Query : IQuery
     {
+        public Query( string query)
+        {
+            QueryString = query;
+        }
+
         public Query(ITable table, string query)
         {
-            table.CurrentQuery?.Add(this);
+            table?.CurrentQuery?.Add(this);
             QueryString = query;
         }
         

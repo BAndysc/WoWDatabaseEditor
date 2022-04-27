@@ -26,4 +26,35 @@ namespace WDE.Common.Managers
         // Indicated whether active document should be brought to front (False) or not (True)
         bool BackgroundMode { get; }
     }
+
+    public static class DocumentManagerExtensions
+    {
+        public static T? TryFindDocumentEditor<T>(this IDocumentManager documentManager, Func<T, bool> selector) where T : class
+        {
+            foreach (var docu in documentManager.OpenedDocuments)
+            {
+                if (docu is T t)
+                {
+                    if (selector(t))
+                        return t;
+                }
+            }
+
+            return null;
+        }
+        
+        public static ISolutionItemDocument? TryFindDocument(this IDocumentManager documentManager, ISolutionItem item)
+        {
+            foreach (var docu in documentManager.OpenedDocuments)
+            {
+                if (docu is ISolutionItemDocument solutionItemDocument)
+                {
+                    if (solutionItemDocument.SolutionItem.Equals(item))
+                        return solutionItemDocument;
+                }
+            }
+
+            return null;
+        }
+    }
 }

@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <Configurations>Debug;Release</Configurations>
+        <Platforms>AnyCPU</Platforms>
+        <Nullable>enable</Nullable>
+        <WarningsAsErrors>nullable</WarningsAsErrors>
+    </PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\..\WDE.Common.Avalonia\WDE.Common.Avalonia.csproj" />
+        <ProjectReference Include="..\..\WDE.MVVM\WDE.MVVM.csproj" />
+        <ProjectReference Include="..\..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />
+    </ItemGroup>
+    <Import Project="..\..\Avalonia.props" />
+</Project>

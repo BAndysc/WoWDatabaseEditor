@@ -9,6 +9,7 @@ using WDE.Common.Managers;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Windows;
 using WDE.Common.Menu;
+using WDE.Common.QuickAccess;
 using WDE.Common.Services;
 using WDE.Common.Sessions;
 using WDE.Common.Solution;
@@ -20,6 +21,7 @@ using WDE.MVVM.Observable;
 using WoWDatabaseEditor.Providers;
 using WoWDatabaseEditorCore.Managers;
 using WoWDatabaseEditorCore.Services;
+using WoWDatabaseEditorCore.Services.QuickAccess;
 
 namespace WoWDatabaseEditorCore.ViewModels
 {
@@ -31,6 +33,8 @@ namespace WoWDatabaseEditorCore.ViewModels
         private readonly Func<AboutViewModel> aboutViewModelCreator;
         private readonly Func<QuickStartViewModel> quickStartCreator;
         private readonly Func<TextDocumentViewModel> textDocumentCreator;
+        private readonly ISolutionTasksService solutionTasksService;
+        private readonly ITablesToolService tablesToolService;
 
         private readonly Dictionary<string, ITool> toolById = new();
 
@@ -51,7 +55,9 @@ namespace WoWDatabaseEditorCore.ViewModels
             ITaskRunner taskRunner,
             IEventAggregator eventAggregator,
             IProgramNameService programNameService,
-            IMainThread mainThread)
+            IMainThread mainThread,
+            IQuickAccessViewModel quickAccessViewModel,
+            ITablesToolService tablesToolService)
         {
             DocumentManager = documentManager;
             StatusBar = statusBar;
@@ -59,6 +65,8 @@ namespace WoWDatabaseEditorCore.ViewModels
             this.aboutViewModelCreator = aboutViewModelCreator;
             this.quickStartCreator = quickStartCreator;
             this.textDocumentCreator = textDocumentCreator;
+            this.solutionTasksService = solutionTasksService;
+            this.tablesToolService = tablesToolService;
             Title = programNameService.Title;
             Subtitle = programNameService.Subtitle;
             OpenDocument = new DelegateCommand<IMenuDocumentItem>(ShowDocument);
@@ -68,23 +76,7 @@ namespace WoWDatabaseEditorCore.ViewModels
                 if (item == null)
                     return;
 
-                if (DocumentManager.ActiveSolutionItemDocument!.Save?.CanExecute(null) ?? false)
-                {
-                    DocumentManager.ActiveSolutionItemDocument.Save.Execute(null);
-
-                    if (solutionTasksService.CanReloadRemotely)
-                        solutionTasksService.ReloadSolutionRemotelyTask(item);
-                }
-                else
-                {
-                    if (solutionTasksService.CanSaveAndReloadRemotely)
-                        solutionTasksService.SaveAndReloadSolutionTask(item);
-                    else if (solutionTasksService.CanSaveToDatabase)
-                        solutionTasksService.SaveSolutionToDatabaseTask(item);
-                }
-                
-                taskRunner.ScheduleTask("Update session", async () => await sessionService.UpdateQuery(item));
-
+                solutionTasksService.Save(DocumentManager.ActiveSolutionItemDocument!);
             }, () => DocumentManager.ActiveSolutionItemDocument != null &&
                      (solutionTasksService.CanSaveAndReloadRemotely || solutionTasksService.CanSaveToDatabase));
 
@@ -96,11 +88,11 @@ namespace WoWDatabaseEditorCore.ViewModels
                         async () =>
                         {
                             var sql = await queryGeneratorRegistry.GenerateSql(sid.SolutionItem);
-                            clipboardService.SetText(sql);
+                            clipboardService.SetText(sql.QueryString);
                             statusBar.PublishNotification(new PlainNotification(NotificationType.Success, "SQL copied!"));
                         });
                 }
-            }, _ => DocumentManager.ActiveDocument != null && DocumentManager.ActiveDocument is ISolutionItemDocument);
+            }, () => DocumentManager.ActiveDocument != null && DocumentManager.ActiveDocument is ISolutionItemDocument);
             
             GenerateCurrentSqlCommand = new DelegateCommand(() =>
             {
@@ -118,6 +110,7 @@ namespace WoWDatabaseEditorCore.ViewModels
             
             TasksViewModel = tasksViewModel;
             RelatedSolutionItems = relatedSolutionItems;
+            QuickAccessViewModel = quickAccessViewModel;
 
             MenuItemProviders = menuItemProvider.GetItems();
 
@@ -133,6 +126,7 @@ namespace WoWDatabaseEditorCore.ViewModels
             
             Watch(DocumentManager, dm => dm.ActiveSolutionItemDocument, nameof(ShowExportButtons));
             Watch(DocumentManager, dm => dm.ActiveSolutionItemDocument, nameof(ShowPlayButtons));
+            Watch(tablesToolService, serv => serv.Visibility, nameof(ShowTablesList));
             
             eventAggregator.GetEvent<AllModulesLoaded>()
                 .Subscribe(OpenFatalLogIfExists, ThreadOption.PublisherThread, true);
@@ -160,6 +154,7 @@ namespace WoWDatabaseEditorCore.ViewModels
 
         public TasksViewModel TasksViewModel { get; }
         public RelatedSolutionItems RelatedSolutionItems { get; }
+        public IQuickAccessViewModel QuickAccessViewModel { get; }
 
         public List<IMainMenuItem> MenuItemProviders { get; }
 
@@ -179,6 +174,18 @@ namespace WoWDatabaseEditorCore.ViewModels
         public AsyncAutoCommand CopyCurrentSqlCommand { get; }
         
         public DelegateCommand GenerateCurrentSqlCommand { get; }
+
+        public bool ShowTablesList
+        {
+            get => tablesToolService.Visibility;
+            set
+            {
+                if (value)
+                    tablesToolService.Open();
+                else
+                    tablesToolService.Close();
+            }
+        }
         
         private void ShowAbout()
         {
@@ -248,7 +255,16 @@ namespace WoWDatabaseEditorCore.ViewModels
 
                     if (result == MessageBoxButtonType.Yes)
                     {
+                        if (editor is IBeforeSaveConfirmDocument before)
+                        {
+                            if (await before.ShallSavePreventClosing())
+                                return false;
+                        }
                         editor.Save.Execute(null);
+                        if (editor is ISolutionItemDocument solutionItemDocument)
+                            await solutionTasksService.Save(solutionItemDocument);
+                        else
+                            editor.Save.Execute(null);
                         modifiedDocuments.RemoveAt(modifiedDocuments.Count - 1);
                         DocumentManager.OpenedDocuments.Remove(editor);
                     }
@@ -260,7 +276,19 @@ namespace WoWDatabaseEditorCore.ViewModels
                     else if (result == MessageBoxButtonType.CustomA)
                     {
                         foreach (var m in modifiedDocuments)
-                            m.Save.Execute(null);
+                        {
+                            if (m is IBeforeSaveConfirmDocument before)
+                            {
+                                if (await before.ShallSavePreventClosing())
+                                {
+                                    return false;
+                                }
+                            }
+                            if (m is ISolutionItemDocument solutionItemDocument)
+                                await solutionTasksService.Save(solutionItemDocument);
+                            else
+                                m.Save.Execute(null);
+                        }
                         modifiedDocuments.Clear();
                     }
                     else if (result == MessageBoxButtonType.CustomB)

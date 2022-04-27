@@ -1,0 +1,39 @@
+{
+  "id": "gameobject_questender",
+  "compatibility": [
+    "TrinityWrath", "Azeroth", "TrinityMaster", "TrinityCata"
+  ],
+  "name": "Game object Quest Ender",
+  "single_solution_name": "Game object {name} quest ender",
+  "multi_solution_name": "Multiple game objects quest ender",
+  "description": "Holds GO quest giver relations on which gameobjects end which quests.",
+  "table_name": "gameobject_questender",
+  "table_index_name": "id",
+  "record_mode": "MultiRecord",
+  "icon_path": "Icons/document_questender.png",
+  "reload_command": "reload gameobject_questender",
+  "group_name": "Quests",
+  "picker": "GameobjectParameter",
+  "primary_key": [
+    "id",
+    "quest"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Id",
+          "db_column_name": "id",
+          "value_type": "GameobjectParameter"
+        },
+        {
+          "name": "Quest",
+          "db_column_name": "quest",
+          "value_type": "QuestParameter",
+          "preferred_width": 300
+        }
+      ]
+    }
+  ]
+}

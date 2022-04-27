@@ -1,0 +1,58 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:helpers="clr-namespace:WDE.DatabaseEditors.Avalonia.Helpers"
+                    xmlns:controls="clr-namespace:WDE.DatabaseEditors.Avalonia.Controls">
+    <helpers:FieldValueTemplateSelector x:Key="FieldValueDataTemplate">
+        <helpers:FieldValueTemplateSelector.CommandTemplate>
+            <DataTemplate>
+                <controls:ButtonFastCellView />
+            </DataTemplate>
+        </helpers:FieldValueTemplateSelector.CommandTemplate>
+        <helpers:FieldValueTemplateSelector.BoolTemplate>
+            <DataTemplate>
+                <controls:FastBoolCellView Height="24"
+                    ToolTip.Tip="{Binding OriginalValueTooltip}"
+                    IsActive="True"
+                    IsReadOnly="{Binding IsReadOnly, Mode=OneTime}"
+                    Value="{Binding AsBoolValue}"/>
+            </DataTemplate>
+        </helpers:FieldValueTemplateSelector.BoolTemplate>
+        <helpers:FieldValueTemplateSelector.FlagsTemplate>
+            <DataTemplate>
+                <controls:FastFlagCellView
+                    Height="24"
+                    SelectedItem="{Binding OptionValue, Mode=TwoWay}"
+                    SelectedValue="{Binding AsLongValue, Mode=TwoWay}"
+                    Flags="{Binding Flags}"
+                    Padding="15,0,0,0"
+                    StringValue="{Binding ParameterValue.String}">
+                </controls:FastFlagCellView>
+            </DataTemplate>
+        </helpers:FieldValueTemplateSelector.FlagsTemplate>
+        <helpers:FieldValueTemplateSelector.ItemsTemplate>
+            <DataTemplate>
+                <controls:FastItemCellView
+                    Height="24"
+                    Value="{Binding ParameterValue.Value}"
+                    SelectedItem="{Binding OptionValue, Mode=TwoWay}"
+                    Items="{Binding Items}"
+                    Padding="15,0,0,0"
+                    StringValue="{Binding ParameterValue.String}">
+                </controls:FastItemCellView>
+            </DataTemplate>
+        </helpers:FieldValueTemplateSelector.ItemsTemplate>
+        <helpers:FieldValueTemplateSelector.GenericTemplate>
+            <DataTemplate>
+                <controls:FastCellView Height="24"
+                    ToolTip.Tip="{Binding OriginalValueTooltip}"
+                    IsActive="True"
+                    ShowChooseButton="{Binding ParameterValue.Parameter.HasItems, Mode=OneTime}"
+                    IsReadOnly="{Binding IsReadOnly, Mode=OneTime}"
+                    Value="{Binding ParameterValue.Value}"
+                    Padding="15,0,0,0"
+                    StringValue="{Binding ParameterValue.String}">
+                </controls:FastCellView>
+            </DataTemplate>
+        </helpers:FieldValueTemplateSelector.GenericTemplate>
+    </helpers:FieldValueTemplateSelector>
+</ResourceDictionary>

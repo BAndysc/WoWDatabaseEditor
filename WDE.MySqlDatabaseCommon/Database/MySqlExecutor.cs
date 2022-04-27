@@ -155,7 +155,7 @@ namespace WDE.MySqlDatabaseCommon.Database
         
         public async Task ExecuteSql(string query)
         {
-            if (string.IsNullOrEmpty(query) || !IsConnected)
+            if (string.IsNullOrWhiteSpace(query) || !IsConnected)
                 return;
 
             databaseLogger.Log(query, null, TraceLevel.Info);
@@ -179,6 +179,12 @@ namespace WDE.MySqlDatabaseCommon.Database
                 MySqlCommand cmd = new(query, conn, transaction);
                 await cmd.ExecuteNonQueryAsync();
                 await transaction.CommitAsync();
+            }
+            catch (MySqlConnector.MySqlException e)
+            {
+                await transaction.RollbackAsync();
+                await conn.CloseAsync();
+                throw new IMySqlExecutor.QueryFailedDatabaseException(e.Message, e);
             }
             catch (Exception ex)
             {
@@ -218,6 +224,11 @@ namespace WDE.MySqlDatabaseCommon.Database
             {
                 MySqlCommand cmd = new(query, conn);
                 reader = await cmd.ExecuteReaderAsync();
+            }
+            catch (MySqlConnector.MySqlException e)
+            {
+                await conn.CloseAsync();
+                throw new IMySqlExecutor.QueryFailedDatabaseException(e.Message, e);
             }
             catch (Exception ex)
             {

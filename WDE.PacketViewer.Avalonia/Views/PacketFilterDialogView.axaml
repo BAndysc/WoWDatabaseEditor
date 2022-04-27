@@ -27,7 +27,7 @@
                                      VerticalContentAlignment="Top" 
                                      AcceptsReturn="True" />
 
-                            <GridSplitter Grid.Column="1" Grid.RowSpan="2" />
+                            <GridSplitter Grid.Column="1" Grid.RowSpan="2" Classes="vertical"  />
                             
                             <controls:GroupingHeader Grid.Row="0" Grid.Column="2" GroupName="Included" />
                             <TextBox Grid.Row="1" Grid.Column="2"  Text="{Binding IncludedEntries}" 
@@ -50,7 +50,7 @@
                                      VerticalContentAlignment="Top" 
                                      AcceptsReturn="True" />
                     
-                            <GridSplitter Grid.Column="1" Grid.RowSpan="2" />
+                            <GridSplitter Grid.Column="1" Grid.RowSpan="2" Classes="vertical" />
                             
                             <controls:GroupingHeader Grid.Row="0" Grid.Column="2" GroupName="Included" />
                             <TextBox Grid.Row="1" Grid.Column="2"  Text="{Binding IncludedOpcodes}" 
@@ -93,7 +93,7 @@
                                 </ListBox.ItemTemplate>
                             </ListBox>
                     
-                            <GridSplitter Grid.Column="1" Grid.RowSpan="2" />
+                            <GridSplitter Grid.Column="1" Grid.RowSpan="2" Classes="vertical" />
                             
                             <controls:GroupingHeader Grid.Row="0" Grid.Column="2" GroupName="Included" />
                     

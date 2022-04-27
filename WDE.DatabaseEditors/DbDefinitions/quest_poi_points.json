@@ -1,0 +1,61 @@
+{
+  "id": "quest_poi_points",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Quest Poi Points",
+  "single_solution_name": "{name} poi points",
+  "multi_solution_name": "Multiple quests poi_points",
+  "description": "Comes from sniffs. Visually speaking, this table is used to identify the X and Y coordinates on the map (not the minimap - the main map) where a quest's question mark should appear.",
+  "table_name": "quest_poi_points",
+  "table_index_name": "QuestID",
+  "record_mode": "MultiRecord",
+  "group_name": "Quests",
+  "picker": "QuestParameter",
+  "skip_quick_load": true,
+  "icon_path": "Icons/document_quest.png",
+  "primary_key": [
+    "QuestID",
+    "Idx1",
+    "Idx2"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Quest ID",
+          "db_column_name": "QuestID",
+          "value_type": "QuestParameter",
+          "read_only": true
+        },
+        {
+          "name": "Idx 1",
+          "db_column_name": "Idx1",
+          "value_type": "uint"
+        },
+        {
+          "name": "Idx 2",
+          "db_column_name": "Idx2",
+          "value_type": "uint"
+        },
+        {
+          "name": "X",
+          "db_column_name": "X",
+          "value_type": "int"
+        },
+        {
+          "name": "Y",
+          "db_column_name": "Y",
+          "value_type": "int"
+        },
+        {
+          "name": "Verified Build",
+          "db_column_name": "VerifiedBuild",
+          "value_type": "int",
+          "can_be_null": true
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "id": "game_event_prerequisite",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Game Event Prerequisite",
+  "single_solution_name": "Game Event Prerequisite",
+  "multi_solution_name": "Game Event Prerequisite",
+  "description": "his table contains events that must have been completed to start the given event. You can have more than one event that must be completed before the next will start.",
+  "table_name": "game_event_prerequisite",
+  "table_index_name": "eventEntry",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Game events",
+  "icon_path": "Icons/document_gameevent.png",
+  "primary_key": [
+    "eventEntry",
+    "prerequisite_event"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Event Entry",
+          "db_column_name": "eventEntry",
+          "value_type": "GameEventParameter",
+          "preferred_width": 205.0
+        },
+        {
+          "name": "Prerequisite Event",
+          "db_column_name": "prerequisite_event",
+          "value_type": "GameEventParameter",
+          "preferred_width": 175.0
+        }
+      ]
+    }
+  ]
+}

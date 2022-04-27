@@ -1,5 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Windows.Input;
+using Prism.Commands;
 
 namespace WDE.Common.History
 {
@@ -21,7 +23,34 @@ namespace WDE.Common.History
         void MarkNoSave();
 
         T AddHandler<T>(T handler) where T : HistoryHandler;
+        void RemoveHandler(HistoryHandler handler);
         void Clear();
         void LimitStack(int limit);
+    }
+
+    public static class HistoryExtension
+    {
+        public static ICommand UndoCommand(this IHistoryManager historyManager)
+        {
+            var cmd = new DelegateCommand(historyManager.Undo, () => historyManager.CanUndo);
+            historyManager.PropertyChanged += (sender, args) =>
+            {
+                if (args.PropertyName == nameof(historyManager.CanUndo))
+                    cmd.RaiseCanExecuteChanged();
+            };
+            return cmd;
+        }
+        
+        public static ICommand RedoCommand(this IHistoryManager historyManager)
+        {
+            var cmd = new DelegateCommand(historyManager.Redo, () => historyManager.CanRedo);
+            historyManager.PropertyChanged += (sender, args) =>
+            {
+                if (args.PropertyName == nameof(historyManager.CanRedo))
+                    cmd.RaiseCanExecuteChanged();
+            };
+
+            return cmd;
+        }
     }
 }

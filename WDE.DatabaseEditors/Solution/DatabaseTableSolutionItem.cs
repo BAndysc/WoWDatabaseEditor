@@ -4,20 +4,24 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Newtonsoft.Json;
 using WDE.Common;
+using WDE.Common.Services;
+using WDE.DatabaseEditors.Models;
 
 namespace WDE.DatabaseEditors.Solution
 {
     public class DatabaseTableSolutionItem : ISolutionItem
     {
-        public DatabaseTableSolutionItem(uint entry, bool existsInDatabase, string definitionId)
+        public DatabaseTableSolutionItem(DatabaseKey entry, bool existsInDatabase, string definitionId, bool ignoreEquality)
         {
             Entries.Add(new SolutionItemDatabaseEntity(entry, existsInDatabase));
             DefinitionId = definitionId;
+            IgnoreEquality = ignoreEquality;
         }
 
-        public DatabaseTableSolutionItem(string definitionId)
+        public DatabaseTableSolutionItem(string definitionId, bool ignoreEquality)
         {
             DefinitionId = definitionId;
+            IgnoreEquality = ignoreEquality;
         }
 
         public DatabaseTableSolutionItem()
@@ -25,14 +29,21 @@ namespace WDE.DatabaseEditors.Solution
             DefinitionId = null!;
         }
 
-        public ISolutionItem Clone() => new DatabaseTableSolutionItem(DefinitionId)
-            { Entries = Entries.Select(e => new SolutionItemDatabaseEntity(e)).ToList() };
+        public ISolutionItem Clone() => new DatabaseTableSolutionItem(DefinitionId, IgnoreEquality)
+        {
+            Entries = Entries.Select(e => new SolutionItemDatabaseEntity(e)).ToList(),
+            DeletedEntries = DeletedEntries.ToList()
+        };
 
+        public List<DatabaseKey> DeletedEntries { get; set; } = new();
         public List<SolutionItemDatabaseEntity> Entries { get; set; } = new();
 
         [JsonProperty]
         public readonly string DefinitionId;
 
+        [JsonProperty]
+        public readonly bool IgnoreEquality;
+        
         [JsonIgnore]
         public bool IsContainer => false;
 
@@ -40,23 +51,32 @@ namespace WDE.DatabaseEditors.Solution
         public ObservableCollection<ISolutionItem>? Items { get; } = null;
         
         [JsonIgnore]
-        public string ExtraId => string.Join(", ", Entries);
+        public string? ExtraId => IgnoreEquality ? null : string.Join(", ", Entries);
 
         [JsonIgnore]
         public bool IsExportable => true;
 
         private bool Equals(DatabaseTableSolutionItem other)
         {
-            if (Entries.Count != other.Entries.Count)
+            if (DefinitionId != other.DefinitionId)
                 return false;
 
-            if (DefinitionId != other.DefinitionId)
+            if (IgnoreEquality)
+                return true;
+         
+            if (Entries.Count != other.Entries.Count)
                 return false;
 
             if (other.Entries.Any(e => !Entries.Contains(e)))
                 return false;
             
             if (Entries.Any(e => !other.Entries.Contains(e)))
+                return false;
+
+            if (other.DeletedEntries.Any(e => !DeletedEntries.Contains(e)))
+                return false;
+            
+            if (DeletedEntries.Any(e => !other.DeletedEntries.Contains(e)))
                 return false;
             
             return true;
@@ -79,15 +99,19 @@ namespace WDE.DatabaseEditors.Solution
     public class SolutionItemDatabaseEntity
     {
         [JsonConstructor]
-        public SolutionItemDatabaseEntity(uint key, bool existsInDatabase, List<EntityOrigianlField>? originalValues = null)
+        public SolutionItemDatabaseEntity(DatabaseKey key, bool existsInDatabase, List<EntityOrigianlField>? originalValues = null)
         {
             Key = key;
             ExistsInDatabase = existsInDatabase;
             OriginalValues = originalValues;
         }
 
-        public readonly uint Key;
-        public readonly bool ExistsInDatabase;
+        [JsonProperty("k")] public readonly DatabaseKey Key;
+        [JsonProperty("e")] public readonly bool ExistsInDatabase;
+
+        [JsonProperty("v")] public List<EntityOrigianlField>? OriginalValues { get; set; }
+        // legacy names, now using one byte property names for space saving
+        //[JsonProperty("OriginalValues")] private string _OriginalValues { set => OriginalValues = value; }
 
         public SolutionItemDatabaseEntity(SolutionItemDatabaseEntity copy)
         {
@@ -95,8 +119,6 @@ namespace WDE.DatabaseEditors.Solution
             ExistsInDatabase = copy.ExistsInDatabase;
             OriginalValues = copy.OriginalValues?.Select(c => new EntityOrigianlField(c)).ToList();
         }
-
-        public List<EntityOrigianlField>? OriginalValues { get; set; }
 
         public override string ToString()
         {

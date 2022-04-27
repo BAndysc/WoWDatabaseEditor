@@ -290,8 +290,8 @@ namespace TheEngine.PhysicsSystem
         
         public static bool RayIntersectsTriangleOnlyFront(in Ray ray,  
             in Vector3 vertex0, 
-            in Vector3 vertex2, // change vertex order to get back face culling
-            in Vector3 vertex1,
+            in Vector3 vertex1, // change vertex order to get back face culling
+            in Vector3 vertex2,
             out Vector3 outIntersectionPoint)
         {
             outIntersectionPoint = default;

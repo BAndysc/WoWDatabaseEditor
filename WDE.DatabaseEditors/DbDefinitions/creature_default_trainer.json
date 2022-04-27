@@ -1,0 +1,38 @@
+{
+  "id": "creature_default_trainer",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Creature Default Trainer",
+  "single_solution_name": "Creature Default Trainer",
+  "multi_solution_name": "Creature Default Trainer",
+  "description": "Assign default trainer type to creatures.",
+  "table_name": "creature_default_trainer",
+  "table_index_name": "CreatureId",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Advanced",
+  "picker": "",
+  "primary_key": [
+    "CreatureId"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Creature",
+          "db_column_name": "CreatureId",
+          "value_type": "CreatureParameter",
+          "preferred_width": 245.0
+        },
+        {
+          "name": "Trainer Id",
+          "db_column_name": "TrainerId",
+          "value_type": "TableReference(trainer#Id)Parameter",
+          "preferred_width": 145.0
+        }
+      ]
+    }
+  ]
+}

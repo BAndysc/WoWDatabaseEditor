@@ -4,16 +4,36 @@
     <Color name="Header" foreground="#2980b9" fontWeight="bold" />
     <Color name="Digits" foreground="#1e90ff" />
     <Color name="Coords" foreground="#27ae60" />
+    <Color name="Spells" foreground="#6500FF" />
+    <Color name="SpellsBold" foreground="#6500FF" fontWeight="bold"/>
     <Color name="UpdateField" foreground="#8e44ad" fontWeight="bold"/>
+    <Color name="Normal" foreground="Black" />
     <RuleSet ignoreCase="true">
+        <!-- we want to match texts after aura:, but not match 'aura:' itself, we want to make numbers in () in bold -->
+        <Span>
+            <Begin>aura:|Out\sof\srange:|Destroyed|casting:|emote:|fails:</Begin>
+            <End>\[|at\starget</End>
+            <RuleSet>
+                <Span color="Spells">
+                    <Begin>.</Begin>
+                    <RuleSet>
+                        <Rule color="SpellsBold">\(\d+\)</Rule>
+                        <Rule color="Digits">\[\d+\]</Rule>
+                    </RuleSet>
+                </Span>
+            </RuleSet>
+        </Span>
         <Rule color="UpdateField">
             [A-Z_0-9]+(\s\+\s\d+)?\s=
         </Rule>
         <Rule color="Header">
-            After\s*(\d)+\s*ms
+            After\s*(\d)+\s*ms|After.+ms\)
         </Rule>
         <Rule color="Coords">
             \(-?\d+\.\d+,\s*-?\d+\.\d+,\s*-?\d+\.\d+\)
+        </Rule>
+        <Rule color="Spells">
+            applied aura:.*\[|removed aura:.*\[
         </Rule>
         <Rule color="Punctuation">
             [?,.;()\[\]{}+\-/%*&lt;&gt;^=~!&amp;]+

@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using LinqKit;
 using LinqToDB;
 using LinqToDB.Data;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;
+using WDE.Common.DBC;
+using WDE.MySqlDatabaseCommon.CommonModels;
 using WDE.MySqlDatabaseCommon.Database;
 using WDE.MySqlDatabaseCommon.Database.World;
 using WDE.MySqlDatabaseCommon.Providers;
@@ -36,7 +39,7 @@ namespace WDE.TrinityMySqlDatabase.Database
 
         protected T Database() => new();
         
-        public async Task<List<ICreatureText>> GetCreatureTextsByEntry(uint entry)
+        public async Task<List<ICreatureText>> GetCreatureTextsByEntryAsync(uint entry)
         {
             await using var model = Database();
             return await model.CreatureTexts.Where(t => t.CreatureId == entry)
@@ -45,6 +48,15 @@ namespace WDE.TrinityMySqlDatabase.Database
                 .ToListAsync<ICreatureText>();
         }
 
+        public IReadOnlyList<ICreatureText>? GetCreatureTextsByEntry(uint entry)
+        {
+            using var model = Database();
+            return model.CreatureTexts.Where(t => t.CreatureId == entry)
+                .OrderBy(t => t.GroupId)
+                .ThenBy(t => t.Id)
+                .ToList<ICreatureText>();
+        }
+        
         public async Task<IList<ISmartScriptLine>> GetLinesCallingSmartTimedActionList(int timedActionList)
         {
             await using var model = Database();
@@ -59,6 +71,12 @@ namespace WDE.TrinityMySqlDatabase.Database
         {
             using var model = Database();
             return model.SmartScript.Where(line => line.EntryOrGuid == entryOrGuid && line.ScriptSourceType == (int) type).ToList();
+        }
+
+        public async Task<IQuestRequestItem?> GetQuestRequestItem(uint entry)
+        {
+            await using var model = Database();
+            return await model.QuestRequestItems.FirstOrDefaultAsync<IQuestRequestItem>(quest => quest.Entry == entry);
         }
 
         public IEnumerable<IGameEvent> GetGameEvents()
@@ -139,6 +157,7 @@ namespace WDE.TrinityMySqlDatabase.Database
         }
 
         public abstract Task<List<IGossipMenuOption>> GetGossipMenuOptionsAsync(uint menuId);
+        public abstract List<IGossipMenuOption> GetGossipMenuOptions(uint menuId);
 
         public INpcText? GetNpcText(uint entry)
         {
@@ -165,6 +184,12 @@ namespace WDE.TrinityMySqlDatabase.Database
             
             await using var model = Database();
             return await (from t in model.NpcTexts orderby t.Id select t).ToListAsync<INpcText>();
+        }
+        
+        public async Task<IAreaTriggerScript?> GetAreaTriggerScript(int entry)
+        {
+            await using var model = Database();
+            return await model.AreaTriggerScript.FirstOrDefaultAsync(script => script.Entry == entry);
         }
 
         public IEnumerable<IAreaTriggerTemplate> GetAreaTriggerTemplates()
@@ -219,7 +244,7 @@ namespace WDE.TrinityMySqlDatabase.Database
 
         public abstract Task<List<IGameObject>> GetGameObjectsAsync();
 
-        private IQueryable<MySqlQuestTemplate> GetQuestsQuery(BaseTrinityDatabase model)
+        protected virtual IQueryable<MySqlQuestTemplate> GetQuestsQuery(BaseTrinityDatabase model)
         {
             return (from t in model.QuestTemplate
                 join addon in model.QuestTemplateAddon on t.Entry equals addon.Entry into adn
@@ -228,30 +253,30 @@ namespace WDE.TrinityMySqlDatabase.Database
                 select t.SetAddon(subaddon));
         }
         
-        public IEnumerable<IQuestTemplate> GetQuestTemplates()
+        public virtual IEnumerable<IQuestTemplate> GetQuestTemplates()
         {
             using var model = Database();
 
             return GetQuestsQuery(model).ToList<IQuestTemplate>();
         }
 
-        public async Task<List<IQuestTemplate>> GetQuestTemplatesAsync()
+        public virtual async Task<List<IQuestTemplate>> GetQuestTemplatesAsync()
         {
             await using var model = Database();
             return await GetQuestsQuery(model).ToListAsync<IQuestTemplate>();
+        }
+
+        public virtual IQuestTemplate? GetQuestTemplate(uint entry)
+        {
+            using var model = Database();
+            MySqlQuestTemplateAddon? addon = model.QuestTemplateAddon.FirstOrDefault(addon => addon.Entry == entry);
+            return model.QuestTemplate.FirstOrDefault(q => q.Entry == entry)?.SetAddon(addon);
         }
 
         public IGameObjectTemplate? GetGameObjectTemplate(uint entry)
         {
             using var model = Database();
             return model.GameObjectTemplate.FirstOrDefault(g => g.Entry == entry);
-        }
-
-        public IQuestTemplate? GetQuestTemplate(uint entry)
-        {
-            using var model = Database();
-            MySqlQuestTemplateAddon? addon = model.QuestTemplateAddon.FirstOrDefault(addon => addon.Entry == entry);
-            return model.QuestTemplate.FirstOrDefault(q => q.Entry == entry)?.SetAddon(addon);
         }
 
         public async Task InstallScriptFor(int entryOrGuid, SmartScriptType type, IList<ISmartScriptLine> script)
@@ -315,18 +340,22 @@ namespace WDE.TrinityMySqlDatabase.Database
                         .UpdateAsync();
                     break;
                 case SmartScriptType.AreaTrigger:
-                    await model.AreaTriggerScript.Where(p => p.Id == entryOrGuid).DeleteAsync();
-                    await model.AreaTriggerScript.InsertAsync(() => new MySqlAreaTriggerScript(){Id = entryOrGuid, ScriptName = "SmartTrigger"});
+                    await model.AreaTriggerScript.Where(p => p.Entry == entryOrGuid).DeleteAsync();
+                    await model.AreaTriggerScript.InsertAsync(() => new MySqlAreaTriggerScript(){Entry = entryOrGuid, ScriptName = "SmartTrigger"});
                     break;
                 case SmartScriptType.AreaTriggerEntity:
-                    await model.AreaTriggerTemplate.Where(p => p.Id == (uint) entryOrGuid && p.IsServerSide == false)
-                        .Set(p => p.ScriptName, "SmartAreaTriggerAI")
-                        .UpdateAsync();
+                    throw new Exception(
+                                "New AreaTrigger system is currently (temporarily) not supported.");
+                    // await model.AreaTriggerTemplate.Where(p => p.Id == (uint) entryOrGuid && p.IsServerSide == false)
+                    //     .Set(p => p.ScriptName, "SmartAreaTriggerAI")
+                    //     .UpdateAsync();
                     break;
                 case SmartScriptType.AreaTriggerEntityServerSide:
-                    await model.AreaTriggerTemplate.Where(p => p.Id == (uint) entryOrGuid && p.IsServerSide == true)
-                        .Set(p => p.ScriptName, "SmartAreaTriggerAI")
-                        .UpdateAsync();
+                    throw new Exception(
+                                "New AreaTrigger system is currently (temporarily) not supported.");
+                    // await model.AreaTriggerTemplate.Where(p => p.Id == (uint) entryOrGuid && p.IsServerSide == true)
+                    //     .Set(p => p.ScriptName, "SmartAreaTriggerAI")
+                    //     .UpdateAsync();
                     break;
             }
             
@@ -418,7 +447,9 @@ namespace WDE.TrinityMySqlDatabase.Database
         public abstract IGameObject? GetGameObjectByGuid(uint guid);
 
         public abstract IEnumerable<IGameObject> GetGameObjectsByEntry(uint entry);
-        
+        public abstract Task<IList<ICreature>> GetCreaturesByEntryAsync(uint entry);
+        public abstract Task<IList<IGameObject>> GetGameObjectsByEntryAsync(uint entry);
+
         public abstract IEnumerable<ICreature> GetCreaturesByEntry(uint entry);
 
 
@@ -451,6 +482,93 @@ namespace WDE.TrinityMySqlDatabase.Database
         public abstract Task<IBroadcastText?> GetBroadcastTextByTextAsync(string text);
         public abstract Task<IBroadcastText?> GetBroadcastTextByIdAsync(uint id);
 
+        public async Task<IList<ISmartScriptLine>> FindSmartScriptLinesBy(IEnumerable<(IDatabaseProvider.SmartLinePropertyType what, int whatValue, int parameterIndex, long valueToSearch)> conditions)
+        {
+            await using var model = Database();
+            var predicate = PredicateBuilder.New<MySqlSmartScriptLine>();
+            foreach (var value in conditions)
+            {
+                if (value.what == IDatabaseProvider.SmartLinePropertyType.Action)
+                {
+                    if (value.parameterIndex == 1)
+                        predicate = predicate.Or(o => o.ActionType == value.whatValue && o.ActionParam1 == value.valueToSearch);
+                    else if (value.parameterIndex == 2)
+                        predicate = predicate.Or(o => o.ActionType == value.whatValue && o.ActionParam2 == value.valueToSearch);
+                    else if (value.parameterIndex == 3)
+                        predicate = predicate.Or(o => o.ActionType == value.whatValue && o.ActionParam3 == value.valueToSearch);
+                    else if (value.parameterIndex == 4)
+                        predicate = predicate.Or(o => o.ActionType == value.whatValue && o.ActionParam4 == value.valueToSearch);
+                    else if (value.parameterIndex == 5)
+                        predicate = predicate.Or(o => o.ActionType == value.whatValue && o.ActionParam5 == value.valueToSearch);
+                    else if (value.parameterIndex == 6)
+                        predicate = predicate.Or(o => o.ActionType == value.whatValue && o.ActionParam6 == value.valueToSearch);
+                }
+                else if (value.what == IDatabaseProvider.SmartLinePropertyType.Event)
+                {
+                    if (value.parameterIndex == 1)
+                        predicate = predicate.Or(o => o.EventType == value.whatValue && o.EventParam1 == value.valueToSearch);
+                    else if (value.parameterIndex == 2)
+                        predicate = predicate.Or(o => o.EventType == value.whatValue && o.EventParam2 == value.valueToSearch);
+                    else if (value.parameterIndex == 3)
+                        predicate = predicate.Or(o => o.EventType == value.whatValue && o.EventParam3 == value.valueToSearch);
+                    else if (value.parameterIndex == 4)
+                        predicate = predicate.Or(o => o.EventType == value.whatValue && o.EventParam4 == value.valueToSearch);
+                }
+                else if (value.what == IDatabaseProvider.SmartLinePropertyType.Target)
+                {
+                    if (value.parameterIndex == 1)
+                        predicate = predicate.Or(o => o.TargetType == value.whatValue && o.TargetParam1 == value.valueToSearch);
+                    else if (value.parameterIndex == 2)
+                        predicate = predicate.Or(o => o.TargetType == value.whatValue && o.TargetParam2 == value.valueToSearch);
+                    else if (value.parameterIndex == 3)
+                        predicate = predicate.Or(o => o.TargetType == value.whatValue && o.TargetParam3 == value.valueToSearch);
+                }
+            }
+            return await model.SmartScript.Where(predicate).ToListAsync<ISmartScriptLine>();    
+        }
+        
+        public virtual Task<IList<IItem>?> GetItemTemplatesAsync() => Task.FromResult<IList<IItem>?>(null);
+
+        private ExpressionStarter<T> GenerateWhereConditionsForEventScript<T>(IEnumerable<(uint command, int dataIndex, long valueToSearch)> conditions) where T : IEventScriptLine
+        {
+            var predicate = PredicateBuilder.New<T>();
+            foreach (var value in conditions)
+            {
+                if (value.dataIndex == 0)
+                    predicate = predicate.Or(o => o.Command == value.command && o.DataLong1 == (ulong)value.valueToSearch);
+                else if (value.dataIndex == 1)
+                    predicate = predicate.Or(o => o.Command == value.command && o.DataLong2 == (ulong)value.valueToSearch);
+                else if (value.dataIndex == 2)
+                    predicate = predicate.Or(o => o.Command == value.command && o.DataInt == (int)value.valueToSearch);
+            }
+            return predicate;
+        }
+
+        public async Task<List<IEventScriptLine>> FindEventScriptLinesBy(IReadOnlyList<(uint command, int dataIndex, long valueToSearch)> conditions)
+        {
+            await using var model = Database();
+            var events = await model.EventScripts.Where(GenerateWhereConditionsForEventScript<MySqlEventScriptLine>(conditions)).ToListAsync<IEventScriptLine>();
+            var spells = await model.SpellScripts.Where(GenerateWhereConditionsForEventScript<MySqlSpellScriptLine>(conditions)).ToListAsync<IEventScriptLine>();
+            var waypoints = await model.WaypointScripts.Where(GenerateWhereConditionsForEventScript<MySqlWaypointScriptLine>(conditions)).ToListAsync<IEventScriptLine>();
+            return events.Concat(spells).Concat(waypoints).ToList();
+        }
+        
+        public async Task<List<IEventScriptLine>> GetEventScript(EventScriptType type, uint id)
+        {
+            await using var model = Database();
+            switch (type)
+            {
+                case EventScriptType.Event:
+                    return await model.EventScripts.Where(s => s.Id == id).ToListAsync<IEventScriptLine>();
+                case EventScriptType.Spell:
+                    return await model.SpellScripts.Where(s => s.Id == id).ToListAsync<IEventScriptLine>();
+                case EventScriptType.Waypoint:
+                    return await model.WaypointScripts.Where(s => s.Id == id).ToListAsync<IEventScriptLine>();
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+            }
+        }
+        
         public async Task<IList<IAuthRbacPermission>> GetRbacPermissionsAsync()
         {
             if (!Supports<IAuthRbacPermission>())

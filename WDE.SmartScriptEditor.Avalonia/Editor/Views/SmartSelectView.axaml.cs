@@ -34,7 +34,12 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.Views
                 vm.SelectFirstVisible();
                 ListBox? listBox = this.FindControl<ListBox>("ListBox");
                 if (listBox != null)
-                    FocusManager.Instance.Focus(listBox.ItemContainerGenerator.ContainerFromIndex(listBox.SelectedIndex), NavigationMethod.Tab);
+                {
+                    var index = listBox.SelectedIndex;
+                    if (index < 0 || index >= listBox.ItemCount)
+                        index = 0;
+                    FocusManager.Instance.Focus(listBox.ItemContainerGenerator.ContainerFromIndex(index), NavigationMethod.Tab);
+                }
                 e.Handled = true;
             }
         }

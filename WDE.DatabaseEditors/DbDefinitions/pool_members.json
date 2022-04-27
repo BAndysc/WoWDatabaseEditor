@@ -1,0 +1,58 @@
+{
+  "id": "pool_members",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Pool Members",
+  "single_solution_name": "Pool Members",
+  "multi_solution_name": "Pool Members",
+  "description": "This table holds the contents of pools created in pool_template.",
+  "table_name": "pool_members",
+  "table_index_name": "spawnId",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Pooling",
+  "reload_command": "reload pool_members",
+  "icon_path": "Icons/document_pool_creature.png",
+  "picker": "Parameter",
+  "primary_key": [
+    "type",
+    "spawnId"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Spawn Id",
+          "db_column_name": "spawnId",
+          "value_type": "PoolMemberSpawnIdParameter",
+          "preferred_width": 100.0
+        },
+        {
+          "name": "Type",
+          "db_column_name": "type",
+          "value_type": "PoolMemberTypeParameter"
+        },
+        {
+          "name": "Pool Id",
+          "db_column_name": "poolSpawnId",
+          "value_type": "TableReference(pool_template#entry)Parameter",
+          "preferred_width": 95.0
+        },
+        {
+          "name": "Chance",
+          "db_column_name": "chance",
+          "value_type": "float"
+        },
+        {
+          "name": "Description",
+          "db_column_name": "description",
+          "value_type": "string",
+          "can_be_null": true,
+          "preferred_width": 395.0
+        }
+      ]
+    }
+  ]
+}

@@ -24,7 +24,7 @@ void main()
     ChunkId = gl_VertexID / 145;
     
     Normal = vec4(normalize(normalHeight.xyz), 1);
-    WorldPos = model * vec4(position.xyz + vec3(0, normalHeight.w, 0), 1.0);
+    WorldPos = model * vec4(position.xyz + vec3(0, 0, normalHeight.w), 1.0);
     gl_Position = projection * view * WorldPos;
     Color = color;
     TexCoord = vec4(uv1, 0, 0);

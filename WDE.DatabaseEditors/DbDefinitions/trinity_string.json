@@ -1,0 +1,96 @@
+{
+  "id": "trinity_string",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Trinity String",
+  "single_solution_name": "Trinity String Table",
+  "multi_solution_name": "Trinity String Table",
+  "description": "Table used for strings used in C++ scrips",
+  "table_name": "trinity_string",
+  "table_index_name": "entry",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Advanced",
+  "reload_command": "reload trinity_string",
+  "picker": "",
+  "primary_key": [
+    "entry"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Entry",
+          "db_column_name": "entry",
+          "value_type": "uint",
+          "read_only": true,
+          "preferred_width": 70.0
+        },
+        {
+          "name": "Content Default",
+          "db_column_name": "content_default",
+          "value_type": "string",
+          "preferred_width": 345.0
+        },
+        {
+          "name": "Content Loc 1",
+          "db_column_name": "content_loc1",
+          "value_type": "string",
+          "can_be_null": true,
+          "preferred_width": 70.0
+        },
+        {
+          "name": "Content Loc 2",
+          "db_column_name": "content_loc2",
+          "value_type": "string",
+          "can_be_null": true,
+          "preferred_width": 65.0
+        },
+        {
+          "name": "Content Loc 3",
+          "db_column_name": "content_loc3",
+          "value_type": "string",
+          "can_be_null": true,
+          "preferred_width": 65.0
+        },
+        {
+          "name": "Content Loc 4",
+          "db_column_name": "content_loc4",
+          "value_type": "string",
+          "can_be_null": true,
+          "preferred_width": 45.0
+        },
+        {
+          "name": "Content Loc 5",
+          "db_column_name": "content_loc5",
+          "value_type": "string",
+          "can_be_null": true,
+          "preferred_width": 60.0
+        },
+        {
+          "name": "Content Loc 6",
+          "db_column_name": "content_loc6",
+          "value_type": "string",
+          "can_be_null": true,
+          "preferred_width": 50.0
+        },
+        {
+          "name": "Content Loc 7",
+          "db_column_name": "content_loc7",
+          "value_type": "string",
+          "can_be_null": true,
+          "preferred_width": 45.0
+        },
+        {
+          "name": "Content Loc 8",
+          "db_column_name": "content_loc8",
+          "value_type": "string",
+          "can_be_null": true,
+          "preferred_width": 55.0
+        }
+      ]
+    }
+  ]
+}

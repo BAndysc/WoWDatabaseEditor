@@ -13,9 +13,17 @@ namespace WDE.Common.CoreVersion
         IDatabaseFeatures DatabaseFeatures { get; }
         ISmartScriptFeatures SmartScriptFeatures { get; }
         IConditionFeatures ConditionFeatures { get; }
+        IGameVersionFeatures GameVersionFeatures { get; }
         bool SupportsRbac => true;
         bool SupportsSpecialCommands => false;
         bool SupportsReverseCommands => false;
+        bool SupportsEventScripts => false;
+    }
+    
+    public interface IGameVersionFeatures
+    {
+        CharacterRaces AllRaces { get; }
+        CharacterClasses AllClasses { get; }
     }
 
     public interface IConditionFeatures
@@ -37,10 +45,18 @@ namespace WDE.Common.CoreVersion
         ISet<SmartScriptType> SupportedTypes { get; }
         bool SupportsCreatingTimedEventsInsideTimedEvents => false;
         bool ProposeSmartScriptOnMainPage => true;
+        bool SupportsConditionTargetVictim => false;
         string CreatureSmartAiName => "SmartAI";
         string GameObjectSmartAiName => "SmartGameObjectAI";
 
         string? ForceLoadTag => null;
         string TableName { get; }
+
+        string? ActionsPath => null;
+        string? EventsPath => null;
+        string? TargetsPath => null;
+        string? ActionGroupPath => null;
+        string? EventGroupPath => null;
+        string? TargetGroupPath => null;
     }
 }

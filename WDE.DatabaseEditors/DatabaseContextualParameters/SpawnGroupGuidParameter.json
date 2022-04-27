@@ -1,0 +1,11 @@
+{
+    "name": "SpawnGroupGuidParameter",
+    "simple_switch": {
+        "column": "spawnType",
+        "default": "Parameter",
+        "values": {
+            "0": "CreatureGUIDParameter",
+            "1": "GameobjectGUIDParameter"
+        }
+    }
+}

@@ -8,10 +8,12 @@ namespace WDE.PacketViewer.Processing.Processors
     public class SpellNameProcessor : PacketProcessor<IEnumerable<(string prefix, string name, uint entry)>>
     {
         private readonly ISpellStore spellStore;
+        private readonly IDbcStore dbcStore;
 
-        public SpellNameProcessor(ISpellStore spellStore)
+        public SpellNameProcessor(ISpellStore spellStore, IDbcStore dbcStore)
         {
             this.spellStore = spellStore;
+            this.dbcStore = dbcStore;
         }
         
         protected override IEnumerable<(string prefix, string name, uint entry)> Process(PacketBase basePacket, PacketSpellGo packet)
@@ -36,6 +38,18 @@ namespace WDE.PacketViewer.Processing.Processors
                 if (spellStore.HasSpell(update.Spell))
                     yield return ("Spell", spellStore.GetName(update.Spell)!, update.Spell);
             }
+        }
+
+        protected override IEnumerable<(string prefix, string name, uint entry)>? Process(PacketBase basePacket, PacketPlaySound packet)
+        {
+            if (dbcStore.SoundStore.TryGetValue(packet.Sound, out var name))
+                yield return ("Sound", name, packet.Sound);
+        }
+
+        protected override IEnumerable<(string prefix, string name, uint entry)>? Process(PacketBase basePacket, PacketPlayObjectSound packet)
+        {
+            if (dbcStore.SoundStore.TryGetValue(packet.Sound, out var name))
+                yield return ("Sound", name, packet.Sound);
         }
     }
 }

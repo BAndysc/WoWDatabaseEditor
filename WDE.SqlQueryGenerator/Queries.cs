@@ -14,7 +14,12 @@ namespace WDE.SqlQueryGenerator
 
         public static IQuery Empty()
         {
-            return new Query(new Table(""), "");
+            return new Query("");
+        }
+
+        public static IQuery Raw(string sql)
+        {
+            return new Query(sql);
         }
     }
 }

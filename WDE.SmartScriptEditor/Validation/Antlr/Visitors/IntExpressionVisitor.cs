@@ -107,6 +107,11 @@ namespace WDE.SmartScriptEditor.Validation.Antlr.Visitors
             return smartContext.GetEventParameter(asInt - 1);
         }
 
+        public override long VisitEEventFlags(SmartScriptValidationParser.EEventFlagsContext context)
+        {
+            return smartContext.GetEventFlags();
+        }
+
         public override long VisitChildren(IRuleNode node)
         {
             throw new ValidationParseException($"Unexpected node: {node.GetText()}");

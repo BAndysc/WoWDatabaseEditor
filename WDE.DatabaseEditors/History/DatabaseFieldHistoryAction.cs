@@ -1,10 +1,52 @@
 ﻿using System;
 using WDE.Common.History;
+using WDE.Common.Services;
 using WDE.DatabaseEditors.Models;
 
 namespace WDE.DatabaseEditors.History
 {
-    public class DatabaseFieldHistoryAction<T> : IHistoryAction where T : IComparable<T>
+    public interface IDatabaseFieldHistoryAction : IHistoryAction
+    {
+        public string Property { get; }
+    }
+    
+    public interface IDatabaseFieldWithKeyHistoryAction : IDatabaseFieldHistoryAction
+    {
+        public DatabaseKey Key { get; }
+    }
+
+    public class DatabaseFieldWithKeyHistoryAction : IDatabaseFieldWithKeyHistoryAction
+    {
+        private IDatabaseFieldHistoryAction impl;
+        private readonly DatabaseKey key;
+
+        public DatabaseFieldWithKeyHistoryAction(IDatabaseFieldHistoryAction impl, DatabaseKey key)
+        {
+            this.impl = impl;
+            this.key = key;
+        }
+
+        public void Undo()
+        {
+            impl.Undo();
+        }
+
+        public void Redo()
+        {
+            impl.Redo();
+        }
+
+        public string GetDescription()
+        {
+            return impl.GetDescription();
+        }
+
+        public string Property => impl.Property;
+
+        public DatabaseKey Key => key;
+    }
+    
+    public class DatabaseFieldHistoryAction<T> : IDatabaseFieldHistoryAction where T : IComparable<T>
     {
         private readonly DatabaseField<T> tableField;
         private readonly string property;
@@ -44,5 +86,7 @@ namespace WDE.DatabaseEditors.History
             var value = isNull || newValue == null ? "(null)" : newValue.ToString();
             return $"Changed value of {property} to {value}";
         }
+
+        public string Property => property;
     }
 }

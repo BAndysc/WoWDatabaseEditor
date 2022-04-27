@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using WDE.Common.Services.Processes;
 using WDE.Module.Attributes;
 using WoWDatabaseEditorCore.Services.Processes;
 

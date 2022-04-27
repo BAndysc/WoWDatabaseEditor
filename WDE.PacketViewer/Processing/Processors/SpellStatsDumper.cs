@@ -78,7 +78,7 @@ namespace WDE.PacketViewer.Processing.Processors
                 if (state == null)
                     continue;
 
-                if (obj.Values.Ints.TryGetValue("UNIT_FIELD_FLAGS", out var flags))
+                if (obj.Values.TryGetInt("UNIT_FIELD_FLAGS", out var flags))
                 {
                     state.InCombat = (flags & (uint)GameDefines.UnitFlags.InCombat) == (uint)GameDefines.UnitFlags.InCombat;
                     state.LastCombatEnterTime = basePacket.Time.ToDateTime();
@@ -96,7 +96,7 @@ namespace WDE.PacketViewer.Processing.Processors
                 if (state == null)
                     continue;
 
-                if (obj.Values.Ints.TryGetValue("UNIT_FIELD_FLAGS", out var flags))
+                if (obj.Values.TryGetInt("UNIT_FIELD_FLAGS", out var flags))
                 {
                     var nowInCombat = (flags & (uint)GameDefines.UnitFlags.InCombat) == (uint)GameDefines.UnitFlags.InCombat;
                     if (state.InCombat != nowInCombat)

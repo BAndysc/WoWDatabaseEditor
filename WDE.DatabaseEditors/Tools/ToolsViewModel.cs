@@ -21,12 +21,15 @@ namespace WDE.DatabaseEditors.Tools
 
         public DefinitionGeneratorViewModel Definitions { get; }
         public CompatibilityCheckerViewModel Compatibility { get; }
+        public CoverageViewModel Coverage { get; }
         
         public ToolsViewModel(DefinitionGeneratorViewModel definitionGeneratorViewModel,
-            CompatibilityCheckerViewModel compatibilityCheckerViewModel)
+            CompatibilityCheckerViewModel compatibilityCheckerViewModel,
+            CoverageViewModel coverageViewModel)
         {
             Definitions = definitionGeneratorViewModel;
             Compatibility = compatibilityCheckerViewModel;
+            Coverage = coverageViewModel;
         }
         
         public void ConfigurableOpened()

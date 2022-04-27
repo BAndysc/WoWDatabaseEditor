@@ -1,0 +1,136 @@
+{
+  "id": "game_event",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Game Event",
+  "single_solution_name": "Game Event",
+  "multi_solution_name": "Game Event",
+  "description": "This table holds definitions for all game events that are activated or deactivated automatically by the Game Event System in the core.",
+  "table_name": "game_event",
+  "table_index_name": "eventEntry",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Game events",
+  "icon_path": "Icons/document_gameevent2.png",
+  "primary_key": [
+    "eventEntry"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Event Entry",
+          "db_column_name": "eventEntry",
+          "value_type": "uint",
+          "read_only": true,
+          "preferred_width": 50.0
+        },
+        {
+          "name": "Start Time",
+          "db_column_name": "start_time",
+          "value_type": "UnixTimestampParameter",
+          "can_be_null": true,
+          "preferred_width": 170.0
+        },
+        {
+          "name": "End Time",
+          "db_column_name": "end_time",
+          "value_type": "UnixTimestampParameter",
+          "can_be_null": true,
+          "preferred_width": 170.0
+        },
+        {
+          "name": "Occurence",
+          "db_column_name": "occurence",
+          "value_type": "MinuteIntervalParameter",
+          "preferred_width": 90.0
+        },
+        {
+          "name": "Length",
+          "db_column_name": "length",
+          "value_type": "MinuteIntervalParameter",
+          "preferred_width": 110.0
+        },
+        {
+          "name": "Holiday",
+          "db_column_name": "holiday",
+          "value_type": "HolidaysParameter",
+          "preferred_width": 220.0
+        },
+        {
+          "name": "Holiday Stage",
+          "db_column_name": "holidayStage",
+          "value_type": "uint",
+          "preferred_width": 100.0
+        },
+        {
+          "name": "Description",
+          "db_column_name": "description",
+          "value_type": "string",
+          "can_be_null": true,
+          "preferred_width": 145.0
+        },
+        {
+          "name": "World Event",
+          "db_column_name": "world_event",
+          "value_type": "BoolParameter",
+          "preferred_width": 135.0
+        },
+        {
+          "name": "Announce",
+          "db_column_name": "announce",
+          "value_type": "GameEventAnnounceParameter",
+          "default": 2,
+          "can_be_null": true,
+          "preferred_width": 165.0
+        },
+        {
+          "name": "Creatures",
+          "meta": "table:game_event_creature;`eventEntry` = {eventEntry}"
+        },
+        {
+          "name": "Gameobjects",
+          "meta": "table:game_event_gameobject;`eventEntry` = {eventEntry}"
+        },
+        {
+          "name": "Creature quests",
+          "meta": "table:game_event_creature_quest;`eventEntry` = {eventEntry}"
+        },
+        {
+          "name": "Gameobject quests",
+          "meta": "table:game_event_gameobject_quest;`eventEntry` = {eventEntry}"
+        },
+        {
+          "name": "Creature npcflags",
+          "meta": "table:game_event_npcflag;`eventEntry` = {eventEntry}"
+        },
+        {
+          "name": "Creature models/equip",
+          "meta": "table:game_event_model_equip;`eventEntry` = {eventEntry}"
+        },
+        {
+          "name": "Required events",
+          "meta": "table:game_event_prerequisite;`eventEntry` = {eventEntry}"
+        },
+        {
+          "name": "Is required by",
+          "meta": "table:game_event_prerequisite;`prerequisite_event` = {eventEntry}"
+        },
+        {
+          "name": "Arena season",
+          "meta": "table:game_event_arena_seasons;`eventEntry` = {eventEntry}"
+        },
+        {
+          "name": "Battleground",
+          "meta": "table:game_event_battleground_holiday;`EventEntry` = {eventEntry}"
+        },
+        {
+          "name": "Conditions",
+          "meta": "table:game_event_condition;`eventEntry` = {eventEntry}"
+        }
+      ]
+    }
+  ]
+}

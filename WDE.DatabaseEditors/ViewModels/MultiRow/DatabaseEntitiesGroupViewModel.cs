@@ -1,14 +1,15 @@
 using DynamicData.Binding;
+using WDE.Common.Services;
 using WDE.DatabaseEditors.Models;
 
 namespace WDE.DatabaseEditors.ViewModels.MultiRow
 {
     public class DatabaseEntitiesGroupViewModel : ObservableCollectionExtended<DatabaseEntityViewModel>
     {
-        public uint Key { get; }
+        public DatabaseKey Key { get; }
         public string Name { get; }
 
-        public DatabaseEntitiesGroupViewModel(uint key, string name)
+        public DatabaseEntitiesGroupViewModel(DatabaseKey key, string name)
         {
             Key = key;
             Name = name;

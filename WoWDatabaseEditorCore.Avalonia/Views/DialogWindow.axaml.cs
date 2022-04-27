@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using Avalonia;
 using Avalonia.Markup.Xaml;
 using AvaloniaStyles.Controls;
@@ -11,6 +12,8 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
     /// </summary>
     public class DialogWindow : ExtendedWindow
     {
+        private bool reallyCloseNow = false;
+        
         public DialogWindow()
         {
             InitializeComponent();
@@ -50,12 +53,27 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
         
         private void DialogWindowOnCloseOk()
         {
+            reallyCloseNow = true;
             Close(true);
         }
 
         private void DialogWindowOnCloseCancel()
         {
+            reallyCloseNow = true;
             Close(false);
+        }
+
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            base.OnClosing(e);
+            if (reallyCloseNow)
+                return;
+            
+            if (DataContext is IClosableDialog closable)
+            {
+                e.Cancel = true;
+                closable.OnClose();
+            }
         }
     }
     

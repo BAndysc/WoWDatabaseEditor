@@ -1,0 +1,43 @@
+{
+  "id": "spawn_group_template",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Spawn Group Template",
+  "single_solution_name": "Spawn Group Template",
+  "multi_solution_name": "Spawn Group Template",
+  "description": "This table contains Spawn Group names and flags.",
+  "table_name": "spawn_group_template",
+  "table_index_name": "groupId",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "icon_path": "Icons/document.png",
+  "picker": "",
+  "primary_key": [
+    "groupId"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Group Id",
+          "db_column_name": "groupId",
+          "value_type": "uint",
+          "preferred_width": 60.0
+        },
+        {
+          "name": "Group Name",
+          "db_column_name": "groupName",
+          "value_type": "string",
+          "preferred_width": 280.0
+        },
+        {
+          "name": "Group Flags",
+          "db_column_name": "groupFlags",
+          "value_type": "uint"
+        }
+      ]
+    }
+  ]
+}

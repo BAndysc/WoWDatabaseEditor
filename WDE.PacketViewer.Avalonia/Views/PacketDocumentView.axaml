@@ -128,7 +128,7 @@
                                        FontStyle="Italic">Filter packets... e.g. packet.opcode == SMSG.SPELL_START</TextBlock>
                         </Panel>
                     </DockPanel>
-                    <GridSplitter Grid.Row="1" />
+                    <GridSplitter Grid.Row="1" Classes="horizontal" />
                     
                     <!-- packets view -->
                     <DockPanel LastChildFill="True" Grid.Row="2">
@@ -189,7 +189,7 @@
                     </DockPanel>
                 </Grid>
                 
-                <GridSplitter Grid.Column="1" />
+                <GridSplitter Grid.Column="1" Classes="vertical" />
                 
                 <!-- right panel -->
                 <Grid Grid.Column="2" RowDefinitions="*,5,50" Name="RightPanel">
@@ -205,7 +205,7 @@
                         Name="PacketPreview"
                         FontFamily="Consolas,Menlo,Courier,Courier New" />
                     
-                    <GridSplitter Grid.Row="1" />
+                    <GridSplitter Grid.Row="1" Classes="horizontal" />
 
                     <!-- packet details -->
                     <TabControl Name="PacketDetailsTab" Grid.Row="2">

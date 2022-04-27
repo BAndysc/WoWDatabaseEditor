@@ -121,7 +121,7 @@ namespace TheEngine
             try
             {
 #if USE_OPENTK
-            engine = new Engine(new OpenTKDevice(), new Configuration(), this);
+            engine = new Engine(new OpenTKDevice(), new Configuration(), this, true);
 #else
                 IDevice device;
                 var real = new RealDevice(gl);
@@ -150,7 +150,14 @@ namespace TheEngine
 
         protected override void OnOpenGlRender(GlInterface gl, int fb)
         {
-            if (engine == null || delayedDispose)
+            if (delayedDispose)
+            {
+                Cleanup();
+                delayedDispose = false;
+                return;
+            }
+            
+            if (engine == null || disposed)
                 return;
             
             engine.statsManager.PixelSize = new Vector2(PixelSize.Item1, PixelSize.Item2);
@@ -175,6 +182,7 @@ namespace TheEngine
                 engine.renderManager.PrepareRendering(fb);
                 engine.renderManager.RenderWorld(fb);
                 Render(delta);
+                engine.Render();
                 engine.renderManager.FinalizeRendering(fb);
                 
                 if (engine.inputManager.Keyboard.JustPressed(Key.R))
@@ -259,13 +267,14 @@ namespace TheEngine
             game?.Update(delta);
         }
 
+        private bool disposed;
         private bool delayedDispose;
         private void GameOnRequestDispose()
         {
             if (game != null)
                 game.RequestDispose -= GameOnRequestDispose;
             delayedDispose = true;
-            Cleanup();
+            disposed = true;
         }
 
         protected virtual void Render(float delta)

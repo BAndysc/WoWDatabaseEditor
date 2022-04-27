@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using DynamicData.Binding;
 using Prism.Commands;
 using WDE.Common.Managers;
@@ -11,11 +12,13 @@ using WDE.Conditions.Data;
 using WDE.MVVM;
 using WDE.MVVM.Observable;
 using WDE.SmartScriptEditor.Data;
+using WDE.SmartScriptEditor.Services;
 
 namespace WDE.SmartScriptEditor.Editor.ViewModels
 {
     public class SmartSelectViewModel : ObservableBase, IDialog
     {
+        private readonly IFavouriteSmartsService favourites;
         private bool anyVisible => visibleCount > 0;
         private int visibleCount = 0;
         private CancellationTokenSource? currentToken;
@@ -24,7 +27,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         {
             while (currentToken != null)
             {
-                await Task.Run(() => Thread.Sleep(50)).ConfigureAwait(true);
+                await Task.Delay(50, cancellationToken);
                 currentToken = tokenSource;
             }
             
@@ -81,7 +84,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             var filtered = AllItems.OrderByDescending(f => string.IsNullOrEmpty(lower) ? -f.Order : f.Score).ToList();
             Items.OverrideWith(filtered);
             
-            SelectedItem ??= Items.FirstOrDefault();
+            SelectFirstVisible();
             currentToken = null;
         }
 
@@ -91,8 +94,10 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             Func<SmartGenericJsonData, bool> predicate,
             List<(int, string)>? customItems,
             ISmartDataManager smartDataManager,
-            IConditionDataManager conditionDataManager)
+            IConditionDataManager conditionDataManager,
+            IFavouriteSmartsService favourites)
         {
+            this.favourites = favourites;
             Title = title;
             MakeItems(type, predicate, customItems, smartDataManager, conditionDataManager);
 
@@ -109,10 +114,10 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 }));
 
             if (Items.Count > 0)
-                SelectedItem = Items[0];
+                SelectFirstVisible();
 
             Cancel = new DelegateCommand(() => CloseCancel?.Invoke());
-            Accept = new DelegateCommand(() =>
+            accept = new DelegateCommand(() =>
             {
                 if (selectedItem == null)
                     SelectedItem = FindExactMatching() ?? Items.FirstOrDefault();
@@ -121,6 +126,11 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             }, () => selectedItem != null || (visibleCount == 1 || FindExactMatching() != null))
                 .ObservesProperty(() => SearchBox)
                 .ObservesProperty(() => SelectedItem);
+            
+            ToggleFavouriteCommand = new DelegateCommand<SmartItem>(item =>
+            {
+                item.IsFavourite = !item.IsFavourite;
+            });
         }
 
         private SmartItem? FindExactMatching()
@@ -141,7 +151,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         
         public void SelectFirstVisible()
         {
-            SelectedItem = Items.FirstOrDefault();
+            SelectedItem = Items.FirstOrDefault(i => i.IsFavourite && i.ShowItem) ?? Items.FirstOrDefault(i => i.ShowItem);
         }
         
         public List<SmartItem> AllItems { get; } = new();
@@ -161,7 +171,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             set
             {
                 SetProperty(ref selectedItem, value);
-                Accept?.RaiseCanExecuteChanged();
+                accept?.RaiseCanExecuteChanged();
             }
         }
         
@@ -182,9 +192,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                         if (predicate != null && !predicate(data))
                             continue;
 
-                        SmartItem i = new()
+                        SmartItem i = new(smartDataGroup.Name, favourites.IsFavourite(data.Name), (item, @is) => favourites.SetFavourite(item.EnumName, @is))
                         {
-                            Group = smartDataGroup.Name,
                             Name = data.NameReadable,
                             SearchName = data.SearchTags == null ? data.NameReadable : $"{data.NameReadable} {data.SearchTags}",
                             Id = data.Id,
@@ -205,9 +214,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             {
                 foreach (var customItem in customItems)
                 {
-                    SmartItem i = new()
+                    SmartItem i = new("Custom", false, null)
                     {
-                        Group = "Custom",
                         Name = customItem.name,
                         SearchName = customItem.name,
                         CustomId = customItem.id,
@@ -231,9 +239,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                         {
                             ConditionJsonData data = conditionDataManager.GetConditionData(member);
 
-                            SmartItem i = new()
+                            SmartItem i = new(conditionDataGroup.Name, favourites.IsFavourite(data.Name), (item, @is) => favourites.SetFavourite(item.EnumName, @is))
                             {
-                                Group = conditionDataGroup.Name,
                                 SearchName = data.NameReadable,
                                 Name = data.NameReadable,
                                 Id = data.Id,
@@ -251,8 +258,10 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             }
         }
 
-        public DelegateCommand Cancel { get; }
-        public DelegateCommand Accept { get; }
+        public DelegateCommand<SmartItem> ToggleFavouriteCommand { get; }
+        public ICommand Cancel { get; }
+        private DelegateCommand accept { get; }
+        public ICommand Accept => accept;
         public int DesiredWidth => 750;
         public int DesiredHeight => 650;
         public string Title { get; }

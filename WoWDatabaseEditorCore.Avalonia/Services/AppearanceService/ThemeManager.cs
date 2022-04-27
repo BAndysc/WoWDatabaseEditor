@@ -20,6 +20,11 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.AppearanceService
             var settings = themeSettings.GetSettings();
             string currentThemeName = settings.Name;
 
+            if (currentThemeName == "Windows10Dark")
+                currentThemeName = "DarkWindows11";
+            else if (currentThemeName == "Windows10Light")
+                currentThemeName = "LightWindows11";
+            
             Theme theme = new(currentThemeName);
 
             if (!IsValidTheme(theme))

@@ -6,27 +6,28 @@
              xmlns:worldMap="clr-namespace:WDE.WorldMap;assembly=WDE.WorldMap"
              xmlns:mapRenderer="clr-namespace:WDE.MapRenderer"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="mapRenderer:GameViewModel"
              x:Class="WDE.MapRenderer.GameView">
     <UserControl.Styles>
         <StyleInclude Source="avares://WDE.WorldMap/WoWMapViewer.axaml" />
     </UserControl.Styles>
     <UserControl.KeyBindings>
-        <KeyBinding Gesture="M" Command="{Binding ToggleMapVisibilityCommand}" />
-        <KeyBinding Gesture="R" Command="{Binding ToggleStatsVisibilityCommand}" />
+        <KeyBinding Gesture="M" Command="{CompiledBinding ToggleMapVisibilityCommand}" />
+        <KeyBinding Gesture="R" Command="{CompiledBinding ToggleStatsVisibilityCommand}" />
     </UserControl.KeyBindings>
     <DockPanel LastChildFill="True">
         <mapRenderer:GameToolBar DockPanel.Dock="Top" />
         <Panel>
-            <theEngine:TheEnginePanel Name="TheEnginePanel" Game="{Binding  Game}"/>
-            <Border Margin="100,40" IsVisible="{Binding IsMapVisible}" BorderThickness="10" BorderBrush="DarkGray">
-                <worldMap:WoWMapViewer MapViewModel="{Binding   }"
-                                       MapsPath="{Binding MapData.Path}"
-                                       Map="{Binding SelectedMap.MapPath}">
+            <theEngine:TheEnginePanel Name="TheEnginePanel" Game="{CompiledBinding  CurrentGame}"/>
+            <Border Margin="100,40" IsVisible="{CompiledBinding IsMapVisible}" BorderThickness="10" BorderBrush="DarkGray">
+                <worldMap:WoWMapViewer MapViewModel="{CompiledBinding   }"
+                                       MapsPath="{CompiledBinding MapData.Path}"
+                                       Map="{CompiledBinding SelectedMap.MapPath}">
                     <mapRenderer:MiniMapRenderer Context2="{Binding .}" PointerPressed="InputElement_OnPointerPressed"/>
                 </worldMap:WoWMapViewer>
             </Border>
             <TextBlock Text="{Binding #TheEnginePanel.FrameRate, StringFormat={}{0:0}}" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="14" FontWeight="Bold" Background="Black" Foreground="White" FontFamily="Consolas,Menlo,Courier,Courier New" />
-            <TextBlock IsVisible="{Binding DisplayStats}" Text="{Binding Stats}" Padding="2" HorizontalAlignment="Right" VerticalAlignment="Bottom" FontSize="13" FontWeight="Bold" Background="Black" Foreground="White" FontFamily="Consolas,Menlo,Courier,Courier New" />
+            <TextBlock IsVisible="{CompiledBinding DisplayStats}" Text="{CompiledBinding Stats}" Padding="2" HorizontalAlignment="Right" VerticalAlignment="Bottom" FontSize="13" FontWeight="Bold" Background="Black" Foreground="White" FontFamily="Consolas,Menlo,Courier,Courier New" />
         </Panel>
     </DockPanel>
 </UserControl>

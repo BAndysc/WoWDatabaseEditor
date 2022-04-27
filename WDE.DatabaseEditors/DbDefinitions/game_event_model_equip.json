@@ -1,0 +1,52 @@
+{
+  "id": "game_event_model_equip",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Game Event Model Equip",
+  "single_solution_name": "Game Event Model Equip",
+  "multi_solution_name": "Game Event Model Equip",
+  "description": "Contains all creature instances that need to change display id and/or equipment during defined game events.",
+  "table_name": "game_event_model_equip",
+  "table_index_name": "guid",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Game events",
+  "icon_path": "Icons/document_gameevent.png",
+  "primary_key": [
+    "guid"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Event Entry",
+          "db_column_name": "eventEntry",
+          "value_type": "GameEventParameter",
+          "preferred_width": 140.0
+        },
+        {
+          "name": "Guid",
+          "db_column_name": "guid",
+          "value_type": "CreatureGUIDParameter",
+          "preferred_width": 140.0
+        },
+        {
+          "name": "Modelid",
+          "db_column_name": "modelid",
+          "value_type": "CreatureModelDataParameter",
+          "zero_is_blank": true,
+          "preferred_width": 135.0
+        },
+        {
+          "name": "Equipment Id",
+          "db_column_name": "equipment_id",
+          "value_type": "uint",
+          "zero_is_blank": true,
+          "preferred_width": 125.0
+        }
+      ]
+    }
+  ]
+}

@@ -8,9 +8,15 @@ options {
 @lexer::namespace { WDE.PacketViewer.Filtering.Antlr }
 
 expr
-    : '!' expr                              # ENegate
+    : '(' expr ')'                      # EParen
+    | expr ('in' | 'IN') expr          # EIn
     | ID '.' ID            # EFieldValue
     | ID '(' (expr (',' expr)*)? ')' #EFuncAppl
+    | 'true'                                # ETrue
+    | 'false'                               # EFalse
+    | INT                                   # EInt
+    | STRING                   #EStr
+    | '!' expr                         # ENegate
     | expr '*' expr                 # EMulOp
     | expr '/' expr                 # EDivOp
     | expr '+' expr                 # EPlusOp
@@ -18,16 +24,10 @@ expr
     | expr '<=' expr                  # ELessEquals
     | expr '>' expr                   # EGreaterThan
     | expr '>=' expr                  # EGreaterEquals
-    | expr ('in' | 'IN') expr          # EIn
     | expr '==' expr                  # EEquals
     | expr '!=' expr                  # ENotEquals
     | <assoc=right> expr ('&&' | 'and' | 'AND' ) expr  # EAnd
     | <assoc=right> expr ('||' | 'or' | 'OR' ) expr  # EOr
-    | 'true'                                # ETrue
-    | 'false'                               # EFalse
-    | INT                                   # EInt
-    | STRING                   #EStr
-    | '(' expr ')'                      # EParen
     ;
     
 fragment Letter  : Capital | Small ;

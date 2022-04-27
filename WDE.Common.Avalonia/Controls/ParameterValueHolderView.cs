@@ -6,7 +6,11 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using Prism.Commands;
+using WDE.Common.Avalonia.Utils;
+using WDE.Common.Parameters;
 using WDE.Common.Utils;
+using WDE.Parameters.Models;
 
 namespace WDE.Common.Avalonia.Controls
 {
@@ -57,6 +61,16 @@ namespace WDE.Common.Avalonia.Controls
 
         public ParameterValueHolderView()
         {
+            var pickerService = ViewBind.ResolveViewModel<IParameterPickerService>();
+            PickCommand = new AsyncAutoCommand(async () =>
+            {
+                if (DataContext is ParameterValueHolder<long> context)
+                {
+                    var result = await pickerService.PickParameter(context.Parameter, context.Value);
+                    if (result.ok)
+                        context.Value = result.value;
+                }
+            });
             PickSpecial = new AsyncAutoCommand(async () =>
             {
                 if (SpecialCommand == null)

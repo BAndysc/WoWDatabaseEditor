@@ -15,7 +15,7 @@ using IDocument = WDE.Common.Managers.IDocument;
 
 namespace WDE.SQLEditor.ViewModels
 {
-    public class SqlEditorViewModel : BindableBase, IDocument
+    public class SqlEditorViewModel : BindableBase, IDocument, IDialog
     {
         private INativeTextDocument code;
         public ImageUri? Icon { get; } = new("Icons/document_sql.png");
@@ -50,6 +50,7 @@ namespace WDE.SQLEditor.ViewModels
             {
                 ExecuteSql.Execute(null);
             });
+            Accept = Cancel = new DelegateCommand(() => CloseOk?.Invoke());
         }
 
         public SqlEditorViewModel(IMySqlExecutor mySqlExecutor, 
@@ -66,7 +67,7 @@ namespace WDE.SQLEditor.ViewModels
                 {
                     StringBuilder sb = new();
                     foreach (var subitem in item.ItemsToGenerate)
-                        sb.AppendLine(await sqlGeneratorsRegistry.GenerateSql(subitem));
+                        sb.AppendLine((await sqlGeneratorsRegistry.GenerateSql(subitem)).QueryString);
                     string sql = sb.ToString();
                     
                     Code.FromString(sql);
@@ -92,7 +93,15 @@ namespace WDE.SQLEditor.ViewModels
             get => isLoading;
             set => SetProperty(ref isLoading, value);
         }
-        public string Title { get; } = "SQL Output";
+
+        public int DesiredWidth => 700;
+        public int DesiredHeight => 500;
+        public string Title => "SQL Output";
+        public bool Resizeable => true;
+        public ICommand Accept { get; }
+        public ICommand Cancel { get; }
+        public event Action CloseCancel;
+        public event Action CloseOk;
         public ICommand Undo { get; } = AlwaysDisabledCommand.Command;
         public ICommand Redo { get; } = AlwaysDisabledCommand.Command;
         public ICommand Copy { get; } = AlwaysDisabledCommand.Command;

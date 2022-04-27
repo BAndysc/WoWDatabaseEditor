@@ -2,19 +2,20 @@
 using System.Threading.Tasks;
 using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;
+using Prism.Commands;
 using WDE.Common.Annotations;
 using WDE.Common.Tasks;
 
 namespace WDE.Common.Utils
 {
-    public class AsyncAutoCommand : ICommand
+    public class AsyncAutoCommand : ICommand, IAsyncCommand
     {
         private bool isBusy;
 
         private readonly AsyncCommand command;
-
+        
         public AsyncAutoCommand(Func<Task> execute,
-            Func<object?, bool>? canExecute = null,
+            Func<bool>? canExecute = null,
             Action<Exception>? onException = null,
             bool continueOnCapturedContext = false)
         {
@@ -24,7 +25,7 @@ namespace WDE.Common.Utils
                     await execute();
                     IsBusy = false;
                 },
-                a => !isBusy && (canExecute?.Invoke(a) ?? true),
+                _ => !isBusy && (canExecute?.Invoke() ?? true),
                 e =>
                 {
                     IsBusy = false;
@@ -54,6 +55,11 @@ namespace WDE.Common.Utils
             ((ICommand) command).Execute(parameter);
         }
 
+        public Task ExecuteAsync()
+        {
+            return command.ExecuteAsync();
+        }
+
         public void RaiseCanExecuteChanged()
         {
             command.RaiseCanExecuteChanged();
@@ -74,7 +80,7 @@ namespace WDE.Common.Utils
 
         public AsyncAutoCommand([NotNull]
             Func<T, Task> execute,
-            Func<object?, bool>? canExecute = null,
+            Func<T?, bool>? canExecute = null,
             Action<Exception>? onException = null,
             bool continueOnCapturedContext = false)
         {
@@ -84,7 +90,7 @@ namespace WDE.Common.Utils
                     await execute(t);
                     IsBusy = false;
                 },
-                a => !isBusy && (canExecute?.Invoke(a) ?? true),
+                a => !isBusy && (canExecute?.Invoke((T?)a) ?? true),
                 e =>
                 {
                     IsBusy = false;

@@ -1,16 +1,15 @@
 {
   "id": "instance_template",
-  "compatibility": ["TrinityWrath", "TrinityMaster", "TrinityCata", "Azeroth"],
+  "compatibility": ["TrinityWrath", "TrinityCata", "Azeroth"],
   "name": "Instance Template",
   "description": "Edit or create instance templates",
   "table_name": "instance_template",
   "table_index_name": "map",
+  "record_mode": "SingleRow",
   "table_name_source_field": "script",
-  "single_solution_name": "Instance {name} template",
-  "multi_solution_name": "Multiple instances template",
   "icon_path": "Icons/document_instance_template.png",
   "picker": "MapParameter",
-  "group_name": "Templates",
+  "group_name": "Instance",
   "primary_key": [
     "map"
   ],
@@ -21,8 +20,7 @@
         {
           "name": "Map",
           "db_column_name": "map",
-          "value_type": "MapParameter",
-          "read_only": true
+          "value_type": "MapParameter"
         },
         {
           "name": "Parent map",

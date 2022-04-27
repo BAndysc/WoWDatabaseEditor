@@ -27,10 +27,17 @@ namespace WDE.MpqReader
         }
         
         public int Length => length;
-    
+        public bool IsDisposed => disposed;
+
         public T this[int index]
         {
-            get => array[index];
+            get
+            {
+                #if DEBUG
+                Debug.Assert(!disposed, "Trying to read disposed PooledArray");
+                #endif
+                return array[index];
+            }
             set => array[index] = value;
         }
 

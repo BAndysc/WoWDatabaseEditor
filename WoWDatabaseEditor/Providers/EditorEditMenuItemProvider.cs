@@ -1,11 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Prism.Commands;
 using WDE.Common.Annotations;
 using WDE.Common.Managers;
 using WDE.Common.Menu;
+using WDE.Common.QuickAccess;
+using WDE.Common.Services;
+using WDE.Common.Utils;
 using WDE.Module.Attributes;
+using WoWDatabaseEditorCore.Services.FindAnywhere;
 
 namespace WoWDatabaseEditorCore.Providers
 {
@@ -17,7 +22,8 @@ namespace WoWDatabaseEditorCore.Providers
         public MainMenuItemSortPriority SortPriority => MainMenuItemSortPriority.PriorityHigh;
         public IDocumentManager DocumentManager { get; }
 
-        public EditorEditMenuItemProvider(IDocumentManager documentManager)
+        public EditorEditMenuItemProvider(IDocumentManager documentManager,
+            ITablesToolService tablesToolService)
         {
             DocumentManager = documentManager;
             SubItems = new List<IMenuItem>();
@@ -51,6 +57,18 @@ namespace WoWDatabaseEditorCore.Providers
                 new DelegateCommand(() => DocumentManager.ActiveDocument?.Paste.Execute(null),
                 () => DocumentManager.ActiveDocument?.Paste.CanExecute(null) ?? false)
                     .ObservesProperty(() => DocumentManager.ActiveDocument), new("Control+V")));
+            
+            SubItems.Add(new ModuleManuSeparatorItem());
+            
+            SubItems.Add(new ModuleMenuItem("Toggle tables view",
+                new DelegateCommand(() =>
+                {
+                    if (tablesToolService.Visibility)
+                        tablesToolService.Close();
+                    else
+                        tablesToolService.Open();
+                }),
+                new("Control+T")));
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;

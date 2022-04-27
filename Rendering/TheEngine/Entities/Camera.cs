@@ -11,7 +11,7 @@ namespace TheEngine.Entities
         public float NearClip { get; set; }
         public float FarClip { get; set; }
         public float Aspect { get; set; }
-        public Matrix ProjectionMatrix => Matrix.PerspectiveFovLH(MathUtil.DegreesToRadians(FOV), Aspect, NearClip, FarClip);
+        public Matrix ProjectionMatrix => Matrix.PerspectiveFovRH(MathUtil.DegreesToRadians(FOV), Aspect, NearClip, FarClip);
         public Matrix ViewMatrix => Transform.WorldToLocalMatrix;
         public Matrix InverseViewMatrix => Transform.LocalToWorldMatrix;
 

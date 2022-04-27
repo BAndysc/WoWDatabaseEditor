@@ -1,0 +1,46 @@
+{
+  "id": "battlefield_template",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Battlefield Template",
+  "single_solution_name": "Battlefield Template",
+  "multi_solution_name": "Battlefield Template",
+  "description": "",
+  "table_name": "battlefield_template",
+  "table_index_name": "TypeId",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "PVP",
+  "icon_path": "Icons/document_bg.png",
+  "picker": "",
+  "primary_key": [
+    "TypeId"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Zone",
+          "db_column_name": "TypeId",
+          "value_type": "BattlefieldParameter",
+          "preferred_width": 125.0
+        },
+        {
+          "name": "Script Name",
+          "db_column_name": "ScriptName",
+          "value_type": "string",
+          "default": "",
+          "preferred_width": 260.0
+        },
+        {
+          "name": "Comment",
+          "db_column_name": "comment",
+          "value_type": "string",
+          "can_be_null": true
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,70 @@
+{
+  "id": "lfg_dungeon_template",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "LFG Dungeon Template",
+  "single_solution_name": "LFG Dungeon Template",
+  "multi_solution_name": "LFG Dungeon Template",
+  "description": "Defines LFG Dungeon teleport coords",
+  "table_name": "lfg_dungeon_template",
+  "table_index_name": "dungeonId",
+  "record_mode": "SingleRow",
+  "skip_quick_load": true,
+  "group_name": "Instance",
+  "picker": "",
+  "primary_key": [
+    "dungeonId"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Dungeon",
+          "db_column_name": "dungeonId",
+          "value_type": "LFGDungeonParameter",
+          "preferred_width": 335.0
+        },
+        {
+          "name": "Position X",
+          "db_column_name": "position_x",
+          "value_type": "float",
+          "preferred_width": 70.0
+        },
+        {
+          "name": "Position Y",
+          "db_column_name": "position_y",
+          "value_type": "float",
+          "preferred_width": 85.0
+        },
+        {
+          "name": "Position Z",
+          "db_column_name": "position_z",
+          "value_type": "float",
+          "preferred_width": 85.0
+        },
+        {
+          "name": "Orientation",
+          "db_column_name": "orientation",
+          "value_type": "float",
+          "preferred_width": 80.0
+        },
+        {
+          "name": "Verified Build",
+          "db_column_name": "VerifiedBuild",
+          "value_type": "int",
+          "can_be_null": true,
+          "preferred_width": 80.0
+        },
+        {
+          "name": "Comment (name)",
+          "db_column_name": "name",
+          "value_type": "string",
+          "can_be_null": true,
+          "preferred_width": 155.0
+        }
+      ]
+    }
+  ]
+}

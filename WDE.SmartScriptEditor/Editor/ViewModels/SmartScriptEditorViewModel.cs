@@ -36,6 +36,7 @@ using WDE.SmartScriptEditor.Exporter;
 using WDE.SmartScriptEditor.Models;
 using WDE.SmartScriptEditor.History;
 using WDE.SmartScriptEditor.Inspections;
+using WDE.SqlQueryGenerator;
 
 namespace WDE.SmartScriptEditor.Editor.ViewModels
 {
@@ -55,6 +56,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         private readonly IConditionEditService conditionEditService;
         private readonly ICurrentCoreVersion currentCoreVersion;
         private readonly ISmartScriptInspectorService inspectorService;
+        private readonly IParameterPickerService parameterPickerService;
         private readonly ISmartDataManager smartDataManager;
         private readonly IConditionDataManager conditionDataManager;
         private readonly ISmartFactory smartFactory;
@@ -108,7 +110,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             ISolutionItemIconRegistry iconRegistry,
             IConditionEditService conditionEditService,
             ICurrentCoreVersion currentCoreVersion,
-            ISmartScriptInspectorService inspectorService)
+            ISmartScriptInspectorService inspectorService,
+            IParameterPickerService parameterPickerService)
         {
             History = history;
             this.database = databaseProvider;
@@ -131,6 +134,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             this.conditionEditService = conditionEditService;
             this.currentCoreVersion = currentCoreVersion;
             this.inspectorService = inspectorService;
+            this.parameterPickerService = parameterPickerService;
             this.conditionDataManager = conditionDataManager;
             script = null!;
             this.item = null!;
@@ -336,6 +340,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                         variable.VariableType = vm.VariableType;
                         variable.Name = vm.Name;
                         variable.Comment = vm.Comment;
+                        variable.Entry = vm.Entry;
                     }
                 }
             });
@@ -356,17 +361,25 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     variable.VariableType = vm.VariableType;
                     variable.Name = vm.Name;
                     variable.Comment = vm.Comment;
+                    variable.Entry = vm.Entry;
                     script.GlobalVariables.Add(variable);
                 }
             });
             
             DirectEditParameter = new DelegateCommand<object>(async obj =>
             {
-                if (obj is ParameterValueHolder<long> param)
+                if (obj is ParameterWithContext param)
                 {
-                    long? val = await itemFromListProvider.GetItemFromList(param.Parameter.Items ?? new Dictionary<long, SelectOption>(), param.Parameter is FlagParameter, param.Value);
-                    if (val.HasValue)
-                        param.Value = val.Value;   
+                    (long? val, bool ok) = await parameterPickerService.PickParameter(param.Parameter.Parameter, param.Parameter.Value, param.Context);
+                    if (ok)
+                    {
+                        param.Parameter.Value = val.Value;
+                        if (param.Parameter.Parameter is ICustomPickerContextualParameter<long>) // custom pickers can save to database, which makes a delay when the value will be ready
+                        {
+                            param.Parameter.ForceRefresh();
+                            mainThread.Delay(() => param.Context.InvalidateReadable(), TimeSpan.FromMilliseconds(50));
+                        }
+                    }
                 } 
                 else if (obj is MetaSmartSourceTargetEdit sourceTargetEdit)
                 {
@@ -941,7 +954,26 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             SetSolutionItem(item);
         }
 
-        public Task<string> GenerateQuery()
+        private class CustomMsgBox : IMessageBoxService
+        {
+            private readonly int entry;
+            private readonly SmartScriptType type;
+
+            public CustomMsgBox(int entry, SmartScriptType type)
+            {
+                this.entry = entry;
+                this.type = type;
+            }
+            
+            public Task<T?> ShowDialog<T>(IMessageBox<T> messageBox)
+            {
+                if (messageBox.MainInstruction != "Script with multiple links")
+                    Console.WriteLine($"[{entry}, {type}]" + messageBox.Content + ": " + messageBox.MainInstruction);
+                return Task.FromResult<T?>(default(T));
+            }
+        }
+        
+        public Task<IQuery> GenerateQuery()
         {
             return Task.FromResult(smartScriptExporter.GenerateSql(item, script));
         }
@@ -1208,7 +1240,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
             SmartTarget? target = null;
 
-            if (!actionData.TargetIsSource && (actionData.TargetTypes?.Count ?? 0) > 0)
+            if (!actionData.TargetIsSource && !actionData.DoNotProposeTarget && (actionData.TargetTypes?.Count ?? 0) > 0)
             {
                 var targetPick = await ShowTargetPicker(e, actionData);
 
@@ -1453,7 +1485,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                             dialog.SetContent($"Selected source can be one of: {string.Join(", ", sourceData.Types ?? Enumerable.Empty<string>())}. However, current action requires one of: {string.Join(", ", actionData.TargetTypes  ?? Enumerable.Empty<string>())}");
                         else
                             dialog.SetContent($"In TrinityCore some actions do not support some sources, this is one of the case. Following action will ignore chosen source and will use source: {actionData.ImplicitSource}");
-                        messageBoxService.ShowDialog(dialog.SetIcon(MessageBoxIcon.Information).Build());
+                        await messageBoxService.ShowDialog(dialog.SetIcon(MessageBoxIcon.Information).Build());
                     }
                     
                     smartFactory.UpdateSource(obj.Source, newId);
@@ -1508,6 +1540,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
             ParametersEditViewModel viewModel = new(itemFromListProvider, 
                 currentCoreVersion,
+                parameterPickerService,
                 obj, 
                 !editOriginal,
                 parametersList, 
@@ -1556,7 +1589,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
                         originalAction.Comment = obj.Comment;
                     }
-                });
+                }, context: obj, focusFirstGroup: "Action");
             return viewModel;
         }
 
@@ -1596,6 +1629,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             
             ParametersEditViewModel viewModel = new(itemFromListProvider, 
                 currentCoreVersion,
+                parameterPickerService,
                 obj, 
                 !editOriginal,
                 parametersList, 
@@ -1667,6 +1701,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
             ParametersEditViewModel viewModel = new(itemFromListProvider, 
                 currentCoreVersion,
+                parameterPickerService,
                 ev,
                 !editOriginal,
                 parametersList,
@@ -1689,7 +1724,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                                 originalEvent.GetParameter(i).Value = ev.GetParameter(i).Value;
                         }
                     },
-                "Event specific");
+                "Event specific", context: ev);
 
             return viewModel;
         }
