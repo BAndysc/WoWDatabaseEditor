@@ -7,6 +7,51 @@ using WDE.SmartScriptEditor.Models;
 
 namespace WDE.SmartScriptEditor.Parameters
 {
+    public class StoredTargetOrActorParameter : IContextualParameter<long, SmartBaseElement>, ICustomPickerContextualParameter<long>
+    {
+        private readonly VariableContextualParameter storedTarget;
+        private readonly VariableContextualParameter actor;
+
+        public StoredTargetOrActorParameter(VariableContextualParameter storedTarget, VariableContextualParameter actor)
+        {
+            this.storedTarget = storedTarget;
+            this.actor = actor;
+        }
+        
+        private static SmartScriptBase? GetScript(SmartBaseElement? element)
+        {
+            if (element is SmartSource source)
+                return source.Parent?.Parent?.Parent;
+            if (element is SmartAction action)
+                return action.Parent?.Parent;
+            if (element is SmartEvent @event)
+                return @event.Parent;
+            if (element is SmartCondition @condition)
+                return @condition.Parent?.Parent;
+            return null;
+        }
+
+        public Task<(long, bool)> PickValue(long value, object context)
+        {
+            return GetScript(context as SmartBaseElement) is SmartScript
+                ? storedTarget.PickValue(value, context)
+                : actor.PickValue(value, context);
+        }
+        
+        public string ToString(long value, SmartBaseElement context)
+        {
+            return GetScript(context) is SmartScript
+                ? storedTarget.ToString(value, context)
+                : actor.ToString(value, context);
+        }
+
+        public bool AllowUnknownItems => true;
+        public string? Prefix => null;
+        public bool HasItems => true;
+        public string ToString(long value) => value.ToString();
+        public Dictionary<long, SelectOption>? Items => null;
+    }
+    
     public class VariableContextualParameter : IContextualParameter<long, SmartBaseElement>, ICustomPickerContextualParameter<long>
     {
         private readonly GlobalVariableType type;
@@ -89,6 +134,8 @@ namespace WDE.SmartScriptEditor.Parameters
                 }   
             }
 
+            if (type == GlobalVariableType.Actor)
+                return $"Actor #{value}";
             return $"{name}\\[{value}\\]";
         }
 

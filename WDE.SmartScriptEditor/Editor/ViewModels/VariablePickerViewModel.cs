@@ -59,6 +59,7 @@ public partial class VariablePickerViewModel : ObservableBase, IDialog
                         existing.Key = item.Id;
                         existing.Name = item.Name;
                         existing.Comment = item.Comment;
+                        existing.Entry = item.Entry;
                         dict.Remove(item.OriginalId ?? item.Id);
                     }
                     else
@@ -73,7 +74,8 @@ public partial class VariablePickerViewModel : ObservableBase, IDialog
                     Key = pair.Key,
                     Name = pair.Value.Name,
                     Comment = pair.Value.Comment,
-                    VariableType = type
+                    VariableType = type,
+                    Entry = pair.Value.Entry
                 });
             }
 
@@ -119,6 +121,7 @@ public partial class VariablePickerViewModel : ObservableBase, IDialog
 public partial class VariableItemViewModel : ObservableBase
 {
     [Notify] private long id;
+    [Notify] private uint entry;
     [Notify] private string name;
     [Notify] private string? comment;
     [Notify] private bool isPhantom;
@@ -140,6 +143,7 @@ public partial class VariableItemViewModel : ObservableBase
         id = variable.Key;
         name = variable.Name;
         comment = variable.Comment;
+        entry = variable.Entry;
         OriginalId = id;
     }
 

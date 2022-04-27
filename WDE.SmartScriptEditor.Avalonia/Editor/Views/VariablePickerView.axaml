@@ -37,6 +37,15 @@
                         </DataTemplate>
                     </GridColumnDefinition.DataTemplate>
                 </GridColumnDefinition>
+                <GridColumnDefinition Name="Entry"
+                                      Property="Entry"
+                                      PreferedWidth="80">
+                    <GridColumnDefinition.DataTemplate>
+                        <DataTemplate DataType="viewModels:VariableItemViewModel">
+                            <EditableTextBlock Opacity="{CompiledBinding IsPhantom, Converter={StaticResource BoolToDoubleConverter}}" Text="{CompiledBinding Entry}"></EditableTextBlock>
+                        </DataTemplate>
+                    </GridColumnDefinition.DataTemplate>
+                </GridColumnDefinition>
                 <GridColumnDefinition Name="Comment"
                                       Property="Comment"
                                       PreferedWidth="350">

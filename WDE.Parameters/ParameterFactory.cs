@@ -74,7 +74,7 @@ namespace WDE.Parameters
             return stringParameters.ContainsKey(type);
         }
 
-        public void Register(string key, IParameter<long> parameter, QuickAccessMode quickAccessMode = QuickAccessMode.None)
+        public T Register<T>(string key, T parameter, QuickAccessMode quickAccessMode = QuickAccessMode.None) where T : IParameter<long>
         {
             parameters.Add(key, parameter);
             if (pendingObservables.TryGetValue(key, out var pending))
@@ -83,6 +83,7 @@ namespace WDE.Parameters
                 pending2.Publish(parameter);
             registration.OnNext(parameter);
             quickAccessRegisteredParameters.Register(quickAccessMode, key, key.Replace("Parameter", "").ToTitleCase());
+            return parameter;
         }
 
         public void Register(string key, IParameter<string> parameter)

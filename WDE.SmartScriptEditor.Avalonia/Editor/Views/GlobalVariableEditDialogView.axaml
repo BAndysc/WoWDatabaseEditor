@@ -3,7 +3,9 @@
                          xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                          xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                          xmlns:controls="clr-namespace:WDE.Common.Avalonia.Controls;assembly=WDE.Common.Avalonia"
+                         xmlns:viewModels="clr-namespace:WDE.SmartScriptEditor.Editor.ViewModels;assembly=WDE.SmartScriptEditor"
                          mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+                         x:DataType="viewModels:GlobalVariableEditDialogViewModel"
                          x:Class="WDE.SmartScriptEditor.Avalonia.Editor.Views.GlobalVariableEditDialogView">
     <Grid>
         <Grid.RowDefinitions>
@@ -23,20 +25,25 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="10" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="10" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
         
             <TextBlock VerticalAlignment="Center" Grid.Row="0" Grid.Column="0">Variable type:</TextBlock>
-            <ComboBox HorizontalAlignment="Stretch" Grid.Row="0" Grid.Column="1" Items="{Binding VariableTypes, Mode=OneTime}" SelectedItem="{Binding VariableType, Mode=TwoWay}">
+            <ComboBox HorizontalAlignment="Stretch" Grid.Row="0" Grid.Column="1" Items="{CompiledBinding VariableTypes, Mode=OneTime}" SelectedItem="{Binding VariableType, Mode=TwoWay}">
             </ComboBox>
         
             <TextBlock VerticalAlignment="Center" Grid.Row="2" Grid.Column="0">Number:</TextBlock>
-            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Key, Mode=TwoWay}"></TextBox>
+            <TextBox Grid.Row="2" Grid.Column="1" Text="{CompiledBinding Key, Mode=TwoWay}"></TextBox>
             
             <TextBlock VerticalAlignment="Center" Grid.Row="4" Grid.Column="0">Name:</TextBlock>
-            <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding Name, Mode=TwoWay}"></TextBox>
+            <TextBox Grid.Row="4" Grid.Column="1" Text="{CompiledBinding Name, Mode=TwoWay}"></TextBox>
             
-            <TextBlock VerticalAlignment="Center" Grid.Row="6" Grid.Column="0" TextWrapping="WrapWithOverflow">Comment (optional):</TextBlock>
-            <TextBox Grid.Row="6" Grid.Column="1" Text="{Binding Comment, Mode=TwoWay}"></TextBox>
+            <TextBlock VerticalAlignment="Center" Grid.Row="6" Grid.Column="0">Creature entry:</TextBlock>
+            <TextBox Grid.Row="4" Grid.Column="1" Text="{CompiledBinding Entry, Mode=TwoWay}"></TextBox>
+            
+            <TextBlock VerticalAlignment="Center" Grid.Row="8" Grid.Column="0" TextWrapping="WrapWithOverflow">Comment (optional):</TextBlock>
+            <TextBox Grid.Row="6" Grid.Column="1" Text="{CompiledBinding Comment, Mode=TwoWay}"></TextBox>
         </Grid>
     
         <Grid Grid.Row="1">

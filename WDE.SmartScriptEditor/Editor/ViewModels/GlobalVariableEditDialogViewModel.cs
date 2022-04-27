@@ -37,6 +37,13 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             set => SetProperty(ref name, value);
         }
 
+        private uint entry;
+        public uint Entry
+        {
+            get => entry;
+            set => SetProperty(ref entry, value);
+        }
+
         private string? comment;
         public string? Comment
         {
@@ -57,6 +64,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             variableType = toEdit.VariableType;
             name = toEdit.Name;
             comment = toEdit.Comment;
+            entry = toEdit.Entry;
             
             Accept = new DelegateCommand(() =>
             {

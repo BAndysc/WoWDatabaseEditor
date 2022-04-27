@@ -340,6 +340,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                         variable.VariableType = vm.VariableType;
                         variable.Name = vm.Name;
                         variable.Comment = vm.Comment;
+                        variable.Entry = vm.Entry;
                     }
                 }
             });
@@ -360,6 +361,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     variable.VariableType = vm.VariableType;
                     variable.Name = vm.Name;
                     variable.Comment = vm.Comment;
+                    variable.Entry = vm.Entry;
                     script.GlobalVariables.Add(variable);
                 }
             });

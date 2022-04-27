@@ -27,16 +27,16 @@ public class CreatureTextParameter : IContextualParameter<long, SmartBaseElement
 
     public bool AllowUnknownItems => true;
     
-    private static SmartScript? GetScript(SmartBaseElement? element)
+    private static SmartScriptBase? GetScript(SmartBaseElement? element)
     {
         if (element is SmartSource source)
-            return source.Parent?.Parent?.Parent as SmartScript;
+            return source.Parent?.Parent?.Parent;
         if (element is SmartAction action)
-            return action.Parent?.Parent as SmartScript;
+            return action.Parent?.Parent;
         if (element is SmartEvent @event)
-            return @event.Parent as SmartScript;
+            return @event.Parent;
         if (element is SmartCondition @condition)
-            return @condition.Parent?.Parent as SmartScript;
+            return @condition.Parent?.Parent;
         return null;
     }
 
@@ -47,13 +47,14 @@ public class CreatureTextParameter : IContextualParameter<long, SmartBaseElement
             return null;
         if (element is SmartAction action)
         {
-            if (action.GetParameter(2).Value != 0 ||
+            if ((action.GetParameter(2).Value != 0 ||
                 action.Source.Id == SmartConstants.SourceNone ||
                 action.Source.Id == SmartConstants.SourceSelf)
+                && script is SmartScript smartScript)
             {
-                if (script.EntryOrGuid >= 0)
-                    return (uint)script.EntryOrGuid;
-                return databaseProvider.GetCreatureByGuid((uint)(-script.EntryOrGuid))?.Entry;
+                if (smartScript.EntryOrGuid >= 0)
+                    return (uint)smartScript.EntryOrGuid;
+                return databaseProvider.GetCreatureByGuid((uint)(-smartScript.EntryOrGuid))?.Entry;
             }
             else if (action.Source.Id == 9 || action.Source.Id == 59) // creature range or creature by spawn key
                 return (uint)action.Source.GetParameter(0).Value;
@@ -63,6 +64,13 @@ public class CreatureTextParameter : IContextualParameter<long, SmartBaseElement
                 return (uint)action.Source.GetParameter(0).Value;
             else if (action.Source.Id == 19) // closest creature
                 return (uint)action.Source.GetParameter(0).Value;
+            else if (action.Source.Id == 12 || action.Source.Id == 58) // stored target / actor
+            {
+                var val = action.Source.GetParameter(0).Value;
+                var type = action.Source.Id == 12 ? GlobalVariableType.StoredTarget : GlobalVariableType.Actor;
+                var found = script.GlobalVariables.FirstOrDefault(x => x.Key == val && x.VariableType == type);
+                return found == null || found.Entry == 0 ? null : found.Entry;
+            }
         }
         return null;
     }

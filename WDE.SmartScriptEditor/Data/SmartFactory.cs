@@ -48,7 +48,7 @@ namespace WDE.SmartScriptEditor.Data
                 parameterFactory.Register("QuestEnderParameter", new QuestStarterEnderParameter(databaseProvider, tableEditorPickerService, questEntryProviderService, false));
                 parameterFactory.Register("CreatureSpawnKeyParameter", new CreatureSpawnKeyParameter(databaseProvider));
                 parameterFactory.Register("GameobjectSpawnKeyParameter", new GameObjectSpawnKeyParameter(databaseProvider));
-                parameterFactory.Register("StoredTargetParameter", containerProvider.Resolve<VariableContextualParameter>(
+                var storedTarget = parameterFactory.Register("StoredTargetParameter", containerProvider.Resolve<VariableContextualParameter>(
                     (typeof(GlobalVariableType), GlobalVariableType.StoredTarget), (typeof(string), "storedTarget")));
                 parameterFactory.Register("DataVariableParameter", containerProvider.Resolve<VariableContextualParameter>(
                     (typeof(GlobalVariableType), GlobalVariableType.DataVariable), (typeof(string), "data")));
@@ -62,6 +62,9 @@ namespace WDE.SmartScriptEditor.Data
                     (typeof(GlobalVariableType), GlobalVariableType.StoredPoint), (typeof(string), "storedPoint")));
                 parameterFactory.Register("DatabasePointParameter", containerProvider.Resolve<VariableContextualParameter>(
                     (typeof(GlobalVariableType), GlobalVariableType.DatabasePoint), (typeof(string), "databasePoint")));
+                var actor = parameterFactory.Register("ActorParameter", containerProvider.Resolve<VariableContextualParameter>(
+                    (typeof(GlobalVariableType), GlobalVariableType.Actor), (typeof(string), "actor")));
+                parameterFactory.Register("StoredTargetOrActorParameter", new StoredTargetOrActorParameter(storedTarget, actor));
             }
         }
 

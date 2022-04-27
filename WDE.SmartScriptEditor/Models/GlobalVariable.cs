@@ -38,6 +38,22 @@ namespace WDE.SmartScriptEditor.Models
             }
         }
         
+        private uint entry;
+        public uint Entry
+        {
+            get => entry;
+            set
+            {
+                if (entry == value)
+                    return;
+                var old = entry;
+                entry = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(Entry));
+                EntryChanged?.Invoke(this, old, entry);
+            }
+        }
+        
         private string name = "";
         public string Name
         {
@@ -102,6 +118,8 @@ namespace WDE.SmartScriptEditor.Models
                         return $"Define storedPoint[{Key}] as {Name}";
                     case GlobalVariableType.DatabasePoint:
                         return $"Define databasePoint[{Key}] as {Name}";
+                    case GlobalVariableType.Actor:
+                        return $"Define actor[{Key}] as {Name}";
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
@@ -110,6 +128,7 @@ namespace WDE.SmartScriptEditor.Models
 
         public event System.Action<GlobalVariable, string?, string?>? CommentChanged; 
         public event System.Action<GlobalVariable, long, long>? KeyChanged; 
+        public event System.Action<GlobalVariable, uint, uint>? EntryChanged; 
         public event System.Action<GlobalVariable, string, string>? NameChanged; 
         public event System.Action<GlobalVariable, GlobalVariableType, GlobalVariableType>? VariableTypeChanged; 
         
@@ -130,5 +149,6 @@ namespace WDE.SmartScriptEditor.Models
         Function,
         StoredPoint,
         DatabasePoint,
+        Actor
     }
 }
