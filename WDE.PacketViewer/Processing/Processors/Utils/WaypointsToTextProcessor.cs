@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -40,7 +41,8 @@ namespace WDE.PacketViewer.Processing.Processors.Utils
 
                 var randomness = waypointProcessor.RandomMovementPacketRatio(unit.Key);
                 sb.AppendLine("Creature " + unit.Key.ToWowParserString() + $" (entry: {unit.Key.Entry})  randomness: {(randomness) * 100:0.00}%");
-                int i = 0;
+                int pathId = 0;
+                int segmentId = 0;
                 DateTime? prevPathFinishedTime = null;
                 foreach (var path in unit.Value.Paths)
                 {
@@ -53,20 +55,32 @@ namespace WDE.PacketViewer.Processing.Processors.Utils
                     {
                         var wait = (path.PathStartTime - prevPathFinishedTime.Value);
                         if (wait.TotalSeconds < 10)
-                            sb.AppendLine($"    (wait {(ulong)wait.TotalMilliseconds} ms)");
+                            sb.AppendLine($"    (after {(ulong)wait.TotalMilliseconds} ms)");
                         else
-                            sb.AppendLine($"    (wait {wait.ToNiceString()} [{(ulong)wait.TotalMilliseconds} ms])");
+                            sb.AppendLine($"    (after {wait.ToNiceString()} [{(ulong)wait.TotalMilliseconds} ms])");
                     }
-                    
-                    sb.AppendLine("* Path " + i++);
 
-                    int j = 0;
+                    sb.AppendLine("* Path " + pathId++);
+                    segmentId = 0;
+
                     foreach (var segment in path.Segments)
                     {
-                        sb.AppendLine("   Segment " + j++);
-                        foreach (var p in segment.Waypoints)
+                        if (segment.Wait.HasValue)
+                            sb.AppendLine($"    wait {(ulong)segment.Wait.Value.TotalMilliseconds} ms");
+                        
+                        sb.AppendLine("   Segment " + segmentId++);
+                        if (segment.JumpGravity.HasValue)
                         {
-                            sb.AppendLine($"    ({p.X}, {p.Y}, {p.Z})");
+                            Debug.Assert(segment.Waypoints.Count == 1);
+                            var p = segment.Waypoints[0];
+                            sb.AppendLine($"    jump to ({p.X}, {p.Y}, {p.Z}) gravity: {segment.JumpGravity.Value} move time: {segment.MoveTime}");
+                        }
+                        else
+                        {
+                            foreach (var p in segment.Waypoints)
+                            {
+                                sb.AppendLine($"    ({p.X}, {p.Y}, {p.Z})");
+                            }   
                         }
                     }
 

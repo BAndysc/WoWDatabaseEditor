@@ -473,14 +473,25 @@ namespace WDE.PacketViewer.Processing.Processors
                 sb.AppendLine($"goes by waypoints [{TimeSpan.FromMilliseconds(path.TotalMoveTime).ToNiceString()} ({path.TotalMoveTime} ms)]: {{");
                 foreach (var segment in path.Segments)
                 {
-                    sb.AppendLine($"     Segment {i++}, dist: {segment.OriginalDistance}, average speed: {segment.OriginalDistance / segment.MoveTime * 1000} yd/s");
-                    for (var j = 0; j < segment.Waypoints.Count; j++)
+                    if (segment.Wait.HasValue)
+                        sb.AppendLine($"     wait {(uint)segment.Wait.Value.TotalMilliseconds} ms");
+                    var length = segment.FinalLength();
+                    sb.AppendLine($"     Segment {i++}, dist: {length}, average speed: {length / segment.MoveTime * 1000} yd/s");
+                    if (segment.JumpGravity.HasValue)
                     {
-                        var waypoint = segment.Waypoints[j];
-                        if (segment.FinalOrientation.HasValue && j == segment.Waypoints.Count - 1)
-                            sb.AppendLine($"               ({waypoint.X}, {waypoint.Y}, {waypoint.Z}, {segment.FinalOrientation.Value})");
-                        else
-                            sb.AppendLine($"               ({waypoint.X}, {waypoint.Y}, {waypoint.Z})");
+                        var waypoint = segment.Waypoints[^1];
+                        sb.AppendLine($"               jump to ({waypoint.X}, {waypoint.Y}, {waypoint.Z}) gravity: {segment.JumpGravity.Value} move time: {segment.MoveTime}");
+                    }
+                    else
+                    {
+                        for (var j = 0; j < segment.Waypoints.Count; j++)
+                        {
+                            var waypoint = segment.Waypoints[j];
+                            if (segment.FinalOrientation.HasValue && j == segment.Waypoints.Count - 1)
+                                sb.AppendLine($"               ({waypoint.X}, {waypoint.Y}, {waypoint.Z}, {segment.FinalOrientation.Value})");
+                            else
+                                sb.AppendLine($"               ({waypoint.X}, {waypoint.Y}, {waypoint.Z})");
+                        }
                     }
 
                     lastPathSegmentHadOrientation = segment.FinalOrientation.HasValue;
