@@ -121,7 +121,7 @@ namespace TheEngine
             try
             {
 #if USE_OPENTK
-            engine = new Engine(new OpenTKDevice(), new Configuration(), this, false);
+            engine = new Engine(new OpenTKDevice(), new Configuration(), this, true);
 #else
                 IDevice device;
                 var real = new RealDevice(gl);
