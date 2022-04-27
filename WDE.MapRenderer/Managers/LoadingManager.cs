@@ -33,6 +33,7 @@ public class LoadingManager : IDisposable
     private readonly IGameContext gameContext;
     private readonly IUIManager uiManager;
     private readonly ChunkManager chunkManager;
+    private readonly GlobalWorldMapObjectManager globalWorldMapObjectManager;
     private readonly WorldManager worldManager;
     private int? currentLoadedMap;
     private LoadingToken? loadingToken;
@@ -41,11 +42,14 @@ public class LoadingManager : IDisposable
     
     public LoadingManager(IGameContext gameContext,
         IUIManager uiManager,
-        ChunkManager chunkManager, WorldManager worldManager)
+        ChunkManager chunkManager, 
+        GlobalWorldMapObjectManager globalWorldMapObjectManager,
+        WorldManager worldManager)
     {
         this.gameContext = gameContext;
         this.uiManager = uiManager;
         this.chunkManager = chunkManager;
+        this.globalWorldMapObjectManager = globalWorldMapObjectManager;
         this.worldManager = worldManager;
     }
 
@@ -70,12 +74,16 @@ public class LoadingManager : IDisposable
                 yield return null; // wait for previous loading to finish
         }
         
+        yield return globalWorldMapObjectManager.Unload();
+        
         yield return chunkManager.UnloadAllChunks();
 
         yield return worldManager.LoadMap(newToken.CancellationToken);
         
         if (loadingToken == newToken)
             EssentialLoadingInProgress = false;
+
+        yield return globalWorldMapObjectManager.Load();
         
         yield return worldManager.LoadOptionals(newToken.CancellationToken);
 
