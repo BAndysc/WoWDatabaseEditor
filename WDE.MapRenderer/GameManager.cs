@@ -3,6 +3,7 @@ using Prism.Ioc;
 using TheEngine.Coroutines;
 using TheEngine.Interfaces;
 using TheEngine.PhysicsSystem;
+using TheMaths;
 using WDE.MapRenderer.Managers;
 using WDE.MpqReader.Structures;
 
@@ -150,11 +151,12 @@ namespace WDE.MapRenderer
             timeManager.RenderGUI();
         }
 
-        public void SetMap(int mapId)
+        public void SetMap(int mapId, Vector3? position = null)
         {
             if (dbcManager.MapStore.Contains(mapId) && CurrentMap.Id != mapId)
             {
                 CurrentMap = dbcManager.MapStore[mapId];
+                worldManager?.SetNextTeleportPosition(position);
                 ChangedMap?.Invoke(mapId);
             }
         }
