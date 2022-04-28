@@ -57,6 +57,8 @@ namespace WDE.PacketViewer.Processing.Processors
             public Vec3 InitialNpcPosition { get; }
             public List<Vec3> Waypoints { get; } = new();
             public float OriginalDistance { get; }
+            public float? JumpGravity { get; set; }
+            public TimeSpan? Wait { get; set; }
 
             public float FinalLength()
             {
@@ -113,8 +115,14 @@ namespace WDE.PacketViewer.Processing.Processors
             //}
 
             var timeSinceLastMovement = basePacket.Time.ToDateTime() - state.LastMovement;
+            // if > 0, then it has finished, if < 0 it hasn't finished yet
+            var timeAfterLastMovementShallFinish = timeSinceLastMovement.TotalMilliseconds - state.LastMoveTime;
 
-            bool resumeAfterPause = timeSinceLastMovement.TotalMilliseconds >= state.LastMoveTime;
+            // if wait is longer than arbitrary chosen pause time, then we treat it as separate paths
+            const int PAUSE_MIN_TIME = 800;
+            
+            TimeSpan? waitAfterTheLast = timeAfterLastMovementShallFinish > 0 && timeAfterLastMovementShallFinish < PAUSE_MIN_TIME ? TimeSpan.FromMilliseconds(timeAfterLastMovementShallFinish) : null;
+            bool resumeAfterPause = timeAfterLastMovementShallFinish >= PAUSE_MIN_TIME;
             bool firstMovementAfterSpawn = state.LastDestroyed > 0;
             state.LastDestroyed = 0;
             
@@ -127,7 +135,7 @@ namespace WDE.PacketViewer.Processing.Processors
                 state.Paths[^1].IsFirstPathAfterSpawn = state.Paths.Count == 1 && state.JustSpawned;
                 state.LastSegment = null;
             }
-            else if (state.Paths.Count > 0 && !resumeAfterPause)
+            else if (state.Paths.Count > 0 && !resumeAfterPause && !waitAfterTheLast.HasValue)
             {
                 Debug.Assert(state.LastSegment != null);
                 PacketToOriginalSplinePacket[basePacket.Number] = state.Paths[^1].FirstPacketNumber;
@@ -177,7 +185,8 @@ namespace WDE.PacketViewer.Processing.Processors
                 ? packet.LookOrientation
                 : null;
             state.Paths[^1].Segments.Add(new IWaypointProcessor.Segment(packet.MoveTime, distance, packet.Position, finalOrientation));
-            state.LastSegment = state.Paths[^1].Segments[^1];            
+            state.LastSegment = state.Paths[^1].Segments[^1];
+            state.LastSegment.Wait = waitAfterTheLast;
 
             if (packet.PackedPoints.Count > 0)
             {
@@ -192,6 +201,11 @@ namespace WDE.PacketViewer.Processing.Processors
             else if (packet.Points.Count >= 1)
             {
                 state.Paths[^1].Segments[^1].Waypoints.AddRange(packet.Points);
+            }
+
+            if ((packet.Flags & UniversalSplineFlag.Parabolic) != 0 && packet.Jump != null)
+            {
+                state.Paths[^1].Segments[^1].JumpGravity = packet.Jump.Gravity;
             }
 
             state.LastMovement = basePacket.Time.ToDateTime();
