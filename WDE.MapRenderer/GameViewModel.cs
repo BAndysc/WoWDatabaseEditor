@@ -282,7 +282,7 @@ Tris: " + stats.TrianglesDrawn;
             
             On(() => Visibility, @is =>
             {
-                if (@is)
+                if (@is && CurrentGame == null)
                 {
                     CurrentGame = gameCreator();
                     state = 1;
