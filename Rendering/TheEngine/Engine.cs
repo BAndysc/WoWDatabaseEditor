@@ -90,7 +90,7 @@ namespace TheEngine
             uiManager = new UIManager(this);
         }
 
-        public void Render()
+        public void RenderGUI()
         {
             uiManager.Render();
         }

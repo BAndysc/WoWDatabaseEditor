@@ -127,6 +127,11 @@ public class Game : IGame
         manager?.Render(delta);
     }
 
+    public void RenderTransparent(float delta)
+    {
+        manager?.RenderTransparent(delta);
+    }
+
     public void RenderGUI(float delta)
     {
         manager?.RenderGui(delta);

@@ -139,6 +139,10 @@ namespace WDE.MapRenderer
             renderManager.ViewDistanceModifier = gameProperties.ViewDistanceModifier;
             moduleManager.Render();
             lightingManager.Render();
+        }
+
+        public void RenderTransparent(float delta)
+        {
             areaTriggerManager.Render();
         }
 
