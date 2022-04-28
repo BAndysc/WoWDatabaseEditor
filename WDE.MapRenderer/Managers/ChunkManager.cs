@@ -178,6 +178,8 @@ namespace WDE.MapRenderer.Managers
             chunks.Add(chunk);
             chunksXY[(y, x)] = chunk;
 
+            var WDTflag = worldManager.CurrentWdt?.Header.flags;
+
             var fullName = gameFiles.Adt(gameContext.CurrentMap.Directory, x, y);
             var file = gameFiles.ReadFile(fullName);
             yield return file;
@@ -206,7 +208,7 @@ namespace WDE.MapRenderer.Managers
 
                 try
                 {
-                    adt = new ADT(new MemoryBinaryReader(file.Result));
+                    adt = new ADT(new MemoryBinaryReader(file.Result), WDTflag);
                 }
                 catch (Exception e)
                 {

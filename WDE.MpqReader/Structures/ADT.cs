@@ -72,7 +72,7 @@ namespace WDE.MpqReader.Structures
         public ADTSplat[] Splats { get; } = new ADTSplat[4];
         public uint AreaId { get; }
     
-        public AdtChunk(IBinaryReader reader)
+        public AdtChunk(IBinaryReader reader, WdtFlags? wdtFlags)
         {
             var chunkFlags = reader.ReadInt32();
             var ix = reader.ReadInt32();
@@ -176,7 +176,17 @@ namespace WDE.MpqReader.Structures
                             }
                         }
                     }
-                    else if (length != 4096) // if 2048 uncompressed mode
+                    else if ((wdtFlags & WdtFlags.AdtHasBigAlpha) != 0) // 4096 uncompressed mode  if 0x4 or 0x80 set
+                    {
+                        for (int y = 0; y < 64; ++y)
+                        {
+                            for (int x = 0; x < 64; ++x)
+                            {
+                                SplatMap[x, y, k] = reader.ReadByte();
+                            }
+                        }
+                    }
+                    else //if (length != 4096) // if 2048 uncompressed mode
                     {
                         for (int y = 0; y < 64; ++y)
                         {
@@ -196,16 +206,6 @@ namespace WDE.MpqReader.Structures
                                 SplatMap[63, j, k] = SplatMap[62, j, k];
                             }
                             SplatMap[63, 63, k] = SplatMap[62, 62, k];
-                        }
-                    }
-                    else // 4096 uncompressed mode  if 0x4 or 0x80 set
-                    {
-                        for (int x = 0; x < 64; ++x)
-                        {
-                            for (int y = 0; y < 64; ++y)
-                            {
-                                SplatMap[x, y, k] = reader.ReadByte();
-                            }
                         }
                     }
 
@@ -320,7 +320,7 @@ namespace WDE.MpqReader.Structures
         public SMChunkInfo[] ChunkInfo { get; } = new SMChunkInfo[16 * 16];
         public AdtChunk[] Chunks { get; } = new AdtChunk[16 * 16];
     
-        public ADT(IBinaryReader reader)
+        public ADT(IBinaryReader reader, WdtFlags? wdtFlags)
         {
             string[]? worldMapObjectsIds = null;
             string[]? m2Ids = null;
@@ -360,7 +360,7 @@ namespace WDE.MpqReader.Structures
                 {
                     Debug.Assert(ChunkInfo[chunkId].Offset == offset - 8);
                     Debug.Assert(ChunkInfo[chunkId].Size == size + 8);
-                    Chunks[chunkId++] = new AdtChunk(partialReader);
+                    Chunks[chunkId++] = new AdtChunk(partialReader, wdtFlags);
                 }
             
                 reader.Offset = offset + size;
