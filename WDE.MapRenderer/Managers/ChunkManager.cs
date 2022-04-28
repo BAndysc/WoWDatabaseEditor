@@ -476,10 +476,10 @@ namespace WDE.MapRenderer.Managers
             yield return LoadWorldMapObjects(adt, chunk, cancellationToken);
 
             yield return LoadM2(adt, chunk, cancellationToken);
+            
+            //yield return creatureManager.LoadCreatures(chunk.Creatures, chunk.X, chunk.Z, cancellationToken);
 
-            yield return creatureManager.LoadCreatures(chunk.Creatures, chunk.X, chunk.Z, cancellationToken);
-
-            yield return gameObjectManager.LoadGameObjects(chunk.GameObjects, chunk.X, chunk.Z, cancellationToken);
+            //yield return gameObjectManager.LoadGameObjects(chunk.GameObjects, chunk.X, chunk.Z, cancellationToken);
         }
 
         private IEnumerator LoadM2(ADT adt, ChunkInstance chunk, CancellationToken cancellationToken)
