@@ -184,7 +184,7 @@ namespace WDE.MpqReader.Structures
             // initialise the block input
             int sourceBlock_pos = 0;
             int bytesPerBlock = (flags & DXTFlags.DXT1) != 0 ? 8 : 16;
-            byte[] targetRGBA = new byte[4 * 16];
+            Span<byte> targetRGBA = stackalloc byte[4 * 16];
 
             // loop over blocks
             for (int y = 0; y < height; y += 4)

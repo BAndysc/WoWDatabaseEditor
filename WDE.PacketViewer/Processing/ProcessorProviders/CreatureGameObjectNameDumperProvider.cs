@@ -6,7 +6,7 @@ using WDE.PacketViewer.Processing.Processors;
 namespace WDE.PacketViewer.Processing.ProcessorProviders
 {
     [AutoRegister]
-    public class CreatureGameObjectNameDumperProvider : IPacketDumperProvider
+    public class CreatureGameObjectNameDumperProvider : ITextPacketDumperProvider
     {
         public CreatureGameObjectNameDumperProvider()
         {

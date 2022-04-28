@@ -180,9 +180,12 @@ namespace TheEngine
 
                 // render pass
                 engine.renderManager.PrepareRendering(fb);
-                engine.renderManager.RenderWorld(fb);
-                Render(delta);
-                engine.Render();
+                engine.renderManager.RenderOpaque(fb);
+                game?.Render(delta);
+                engine.renderManager.RenderTransparent(fb);
+                game?.RenderTransparent(delta);
+                game?.RenderGUI(delta);
+                engine.RenderGUI();
                 engine.renderManager.FinalizeRendering(fb);
                 
                 if (engine.inputManager.Keyboard.JustPressed(Key.R))
@@ -276,13 +279,7 @@ namespace TheEngine
             delayedDispose = true;
             disposed = true;
         }
-
-        protected virtual void Render(float delta)
-        {
-            game?.Render(delta);
-            game?.RenderGUI(delta);
-        }
-
+        
         public float WindowWidth => PixelSize.Item1;
         public float WindowHeight => PixelSize.Item2;
         public float DpiScaling => 1;

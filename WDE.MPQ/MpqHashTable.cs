@@ -9,21 +9,19 @@ namespace WDE.MPQ
 {
     public class MpqHashTable : IMpqHashTable
     {
+        private Dictionary<(ulong, ulong), HashTableEntry> table = new();
+        
         public MpqHashTable(IEnumerable<HashTableEntry> entries)
         {
-            Entries = entries.ToList().AsReadOnly();
+            foreach (var e in entries)
+                table[(e.FilePathHashA, e.FilePathHashB)] = e;
         }
-
-        public IList<HashTableEntry> Entries { get; private set; }
 
         public HashTableEntry? FindEntry(ulong hashA, ulong hashB)
         {
-            foreach (var entry in Entries)
-            {
-                if (hashA == (ulong) entry.FilePathHashA && hashB == (ulong) entry.FilePathHashB)
-                    return entry;
-            }
-
+            if (table.TryGetValue((hashA, hashB), out var entry))
+                return entry;
+            
             return null;
         }
     }

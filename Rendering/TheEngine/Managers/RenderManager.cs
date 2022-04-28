@@ -283,10 +283,12 @@ namespace TheEngine.Managers
             //pixelShaderSceneBuffer.Activate(Constants.PIXEL_SCENE_BUFFER_INDEX);
 
             objectBuffer.Activate(Constants.OBJECT_BUFFER_INDEX);
+            engine.Device.device.CheckError("Before render all");
         }
 
         public void FinalizeRendering(int dstFrameBuffer)
         {
+            ClearDirtyEntityBit();
             engine.Device.SetRenderTexture(null, dstFrameBuffer);
 
             engine.Device.device.CheckError("Blitz");
@@ -305,13 +307,10 @@ namespace TheEngine.Managers
 
         private RenderStats Stats;
         
-        internal void RenderWorld(int dstFrameBuffer)
+        internal void RenderOpaque(int dstFrameBuffer)
         {
             //defaultSampler.Activate(Constants.DEFAULT_SAMPLER);
-
-            engine.Device.device.CheckError("Before render all");
             RenderEntities();
-            ClearDirtyEntityBit();
 
             //engine.Device.RenderClearBuffer();
             //engine.Device.SetRenderTexture(outlineTexture);
@@ -319,6 +318,11 @@ namespace TheEngine.Managers
 
             //RenderAll(unlitMaterial);
             //engine.Device.RenderBlitBuffer();
+        }
+        
+        internal void RenderTransparent(int dstFrameBuffer)
+        {
+            RenderTransparent();
         }
 
         private void ClearDirtyEntityBit()
@@ -393,6 +397,10 @@ namespace TheEngine.Managers
 
         private LocalToWorld[] localToWorlds = new LocalToWorld[10000];
         private MeshRenderer[] renderers = new MeshRenderer[10000];
+        private int opaque;
+        private int transparent;
+        private int totalToDraw;
+
         private void RenderEntities()
         {
             var cameraPosition = cameraManager.MainCamera.Transform.Position;
@@ -453,9 +461,9 @@ namespace TheEngine.Managers
                 }
                 count.Value = (opaque, transparent);
             });
-            var opaque = count.Values.Sum(i => i.opaque);
-            var transparent = count.Values.Sum(i => i.transparent);
-            int totalToDraw = opaque + transparent;
+            opaque = count.Values.Sum(i => i.opaque);
+            transparent = count.Values.Sum(i => i.transparent);
+            totalToDraw = opaque + transparent;
             if (localToWorlds.Length < totalToDraw)
             {
                 localToWorlds = new LocalToWorld[totalToDraw];
@@ -485,8 +493,18 @@ namespace TheEngine.Managers
                 }
             });
 
+            Render(0, opaque);
+        }
+
+        private void RenderTransparent()
+        {
+            Render(opaque, totalToDraw);
+        }
+
+        private void Render(int start, int end)
+        {
             sw.Restart();
-            for (int i = 0; i < totalToDraw; ++i)
+            for (int i = start; i < end; ++i)
             {
                 var mr = renderers[i];
                 var material = engine.materialManager.GetMaterialByHandle(mr.MaterialHandle);
@@ -522,7 +540,7 @@ namespace TheEngine.Managers
                 objectBuffer.UpdateBuffer(ref objectData);
                 //buffertimer.Stop();
 #if DEBUG
-                    currentShader.Validate();
+                currentShader.Validate();
 #endif
                 //draw.Start();
                 var indicesCount = mesh.IndexCount(meshId);

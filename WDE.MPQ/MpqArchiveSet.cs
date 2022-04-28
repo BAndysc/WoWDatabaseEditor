@@ -14,6 +14,11 @@ namespace WDE.MPQ
             this.list = list;
         }
     
+        public IMpqArchive Clone()
+        {
+            return new MpqArchiveSet(list.Select(l => l.Clone()).ToArray());
+        }
+        
         public void Dispose()
         {
             foreach (var l in list)

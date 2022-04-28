@@ -1,5 +1,6 @@
 using Prism.Ioc;
 using TheEngine;
+using TheEngine.Coroutines;
 using TheEngine.ECS;
 using TheEngine.Interfaces;
 using TheEngine.PhysicsSystem;
@@ -91,6 +92,9 @@ public class Game : IGame
         registry.RegisterSingleton<AreaTriggerManager>();
         registry.RegisterSingleton<RaycastSystem>();
         registry.RegisterSingleton<ModuleManager>();
+        registry.RegisterSingleton<CreatureManager>();
+        registry.RegisterSingleton<GameObjectManager>();
+        registry.RegisterSingleton<CoroutineManager>();
         registry.RegisterSingleton<IGameFiles, GameFiles>();
         
         manager = (GameManager)provider.Resolve(typeof(GameManager));
@@ -121,6 +125,11 @@ public class Game : IGame
     public void Render(float delta)
     {
         manager?.Render(delta);
+    }
+
+    public void RenderTransparent(float delta)
+    {
+        manager?.RenderTransparent(delta);
     }
 
     public void RenderGUI(float delta)

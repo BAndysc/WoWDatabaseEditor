@@ -1,4 +1,5 @@
 using System.Collections;
+using TheMaths;
 using WDE.MpqReader;
 using WDE.MpqReader.Structures;
 
@@ -18,7 +19,7 @@ namespace WDE.MapRenderer.Managers
     {
         event Action<int>? ChangedMap;
         Map CurrentMap { get; }
-        void SetMap(int id);
+        void SetMap(int id, Vector3? position = null);
         void StartCoroutine(IEnumerator coroutine);
     }
 }

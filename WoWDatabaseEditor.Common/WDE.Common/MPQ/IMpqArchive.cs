@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace WDE.Common.MPQ
 {
@@ -12,5 +13,7 @@ namespace WDE.Common.MPQ
 
         IMpqArchiveDetails Details { get; }
         IMpqUserDataHeader UserDataHeader { get; }
+
+        IMpqArchive Clone();
     }
 }

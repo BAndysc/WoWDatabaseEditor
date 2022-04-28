@@ -78,6 +78,7 @@ namespace WDE.MPQ.Services
             public int? GetFileSize(string path) => null;
             public IMpqArchiveDetails Details => null!;
             public IMpqUserDataHeader UserDataHeader => null!;
+            public IMpqArchive Clone() => new EmptyMpqArchive();
         }
     }
 }

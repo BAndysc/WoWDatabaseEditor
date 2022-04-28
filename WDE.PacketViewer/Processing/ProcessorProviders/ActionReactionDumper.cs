@@ -10,7 +10,7 @@ namespace WDE.PacketViewer.Processing.ProcessorProviders
 #if DEBUG
     [AutoRegister]
 #endif
-    public class ActionReactionDumperProvider : IPacketDumperProvider
+    public class ActionReactionDumperProvider : ITextPacketDumperProvider
     {
         private readonly IActionReactionProcessorCreator creator;
 

@@ -8,12 +8,13 @@ using WDE.MpqReader.Readers;
 
 namespace WDE.MpqReader.Structures
 {
+    [Flags]
     public enum M2Flags
     {
-        FLAG_TILT_X,
-        FLAG_TILT_Y,
-        UNK0,
-        FLAG_USE_TEXTURE_COMBINER_COMBOS
+        FLAG_TILT_X = 1,
+        FLAG_TILT_Y = 2,
+        UNK0 = 4,
+        FLAG_USE_TEXTURE_COMBINER_COMBOS = 8
     }
 
     public class M2
@@ -24,22 +25,22 @@ namespace WDE.MpqReader.Structures
         public M2Flags global_flags { get; init; }
 /*0x014*/  public M2Array<uint> global_loops { get; init; }                        // Timestamps used in global looping animations.
 /*0x01C*/  public M2Array<M2Sequence> sequences { get; init; }                       // Information about the animations in the model.
-/*0x024*/  public M2Array<ushort> sequenceIdxHashById { get; init; }               // Mapping of sequence IDs to the entries in the Animation sequences block.
+/*0x024*/  public M2Array<ushort> sequenceIdToAnimationId { get; init; }               // Mapping of sequence IDs to the entries in the Animation sequences block.
 /*0x02C*/  public M2Array<M2CompBone> bones { get; init; }                           // MAX_BONES = 0x100 => Creature\SlimeGiant\GiantSlime.M2 has 312 bones (Wrath)
 /*0x034*/  public M2Array<ushort> boneIndicesById { get; init; }                   //Lookup table for key skeletal bones. (alt. name: key_bone_lookup)
 /*0x03C*/  public M2Array<M2Vertex> vertices { get; init; }
 /*0x044*/  public uint num_skin_profiles { get; init; }                           // Views (LOD) are now in .skins.
 /*0x048*/  public M2Array<M2Color> colors { get; init; }                             // Color and alpha animations definitions.
 /*0x050*/  public M2Array<M2Texture> textures { get; init; }
-/*0x058*/  public M2Array<M2TextureWeight> texture_weights { get; init; }            // Transparency of textures.
+/*0x058*/  public M2Array<M2TextureWeight> textureWeights { get; init; }            // Transparency of textures.
 /*0x060*/  public M2Array<M2TextureTransform> texture_transforms { get; init; }
 /*0x068*/  public M2Array<ushort> textureIndicesById { get; init; }                // (alt. name: replacable_texture_lookup)
 /*0x070*/  public M2Array<M2Material> materials { get; init; }                       // Blending modes / render flags.
 /*0x078*/  public M2Array<ushort> boneCombos { get; init; }                        // (alt. name: bone_lookup_table)
-/*0x080*/  public M2Array<short> textureCombos { get; init; }                     // (alt. name: texture_lookup_table)
-/*0x088*/  public M2Array<ushort> textureTransformBoneMap { get; init; }           // (alt. name: tex_unit_lookup_table)
-/*0x090*/  public M2Array<ushort> textureWeightCombos { get; init; }               // (alt. name: transparency_lookup_table)
-/*0x098*/  public M2Array<ushort> textureTransformCombos { get; init; }            // (alt. name: texture_transforms_lookup_table)
+/*0x080*/  public M2Array<short> textureLookupTable { get; init; }                     // (alt. name: texture_lookup_table)
+/*0x088*/  public M2Array<ushort> textureUnitLookupTable { get; init; }           // (alt. name: tex_unit_lookup_table)
+/*0x090*/  public M2Array<ushort> textureTransparencyLookupTable { get; init; }               // (alt. name: transparency_lookup_table)
+/*0x098*/  public M2Array<ushort> textureUVAnimationLookup { get; init; }            // (alt. name: texture_transforms_lookup_table)
 /*0x0A0*/  public CAaBox bounding_box { get; init; }                                 // min/max( [1].z, 2.0277779f ) - 0.16f seems to be the maximum camera height
 /*0x0B8*/  public float bounding_sphere_radius { get; init; }                         // detail doodad draw dist = clamp (bounding_sphere_radius * detailDoodadDensityFade * detailDoodadDist, …)
 /*0x0BC*/  public CAaBox collision_box { get; init; }
@@ -55,50 +56,53 @@ namespace WDE.MpqReader.Structures
 /*0x118*/  public M2Array<ushort> cameraIndicesById { get; init; }                   // (alt. name: camera_lookup_table)
 /*0x120*/  public M2Array<M2Ribbon> ribbon_emitters { get; init; }                     // Things swirling around. See the CoT-entrance for light-trails.
         ///*0x128*/  M2Array<M2Particleⁱ> particle_emitters { get; init; }
+           public M2Array<ushort>? textureCombinerCombos { get; init; }
 
-        private M2(){}
+        private M2(IBinaryReader reader)
+        {
+            magic = reader.ReadUInt32();
+            version = reader.ReadUInt32();
+            name = reader.ReadArray(r => (char)r.ReadByte());
+            global_flags = (M2Flags)reader.ReadUInt32();
+            global_loops = reader.ReadArrayUInt32();
+            sequences = reader.ReadArray(M2Sequence.Read);
+            sequenceIdToAnimationId = reader.ReadArrayUInt16();
+            bones = reader.ReadArray(M2CompBone.Read);
+            boneIndicesById = reader.ReadArrayUInt16();
+            vertices = reader.ReadArray(M2Vertex.Read);
+            num_skin_profiles = reader.ReadUInt32();
+            colors = reader.ReadArray(M2Color.Read);
+            textures = reader.ReadArray(M2Texture.Read);
+            textureWeights = reader.ReadArray(M2TextureWeight.Read);
+            texture_transforms = reader.ReadArray(M2TextureTransform.Read);
+            textureIndicesById = reader.ReadArrayUInt16();
+            materials = reader.ReadArray(M2Material.Read);
+            boneCombos = reader.ReadArrayUInt16();
+            textureLookupTable = reader.ReadArrayInt16();
+            textureUnitLookupTable = reader.ReadArrayUInt16();
+            textureTransparencyLookupTable = reader.ReadArrayUInt16();
+            textureUVAnimationLookup = reader.ReadArrayUInt16();
+            bounding_box = CAaBox.Read(reader);
+            bounding_sphere_radius = reader.ReadFloat();
+            collision_box = CAaBox.Read(reader);
+            collision_sphere_radius = reader.ReadFloat();
+            collisionIndices = reader.ReadArrayUInt16();
+            collisionPositions = reader.ReadArrayVector3();
+            collisionFaceNormals = reader.ReadArrayVector3();
+            attachments = reader.ReadArray(M2Attachment.Read);
+            attachmentIndicesById = reader.ReadArrayUInt16();
+            events = reader.ReadArray(M2Event.Read);
+            lights = reader.ReadArray(M2Light.Read);
+            cameras = reader.ReadArray(M2Camera.Read);
+            cameraIndicesById = reader.ReadArrayUInt16();
+            ribbon_emitters = reader.ReadArray(M2Ribbon.Read);
+            reader.SkipM2Array();
+            textureCombinerCombos = (global_flags & M2Flags.FLAG_USE_TEXTURE_COMBINER_COMBOS) != 0 ? reader.ReadArrayUInt16() : null;
+        }
 
         public static M2 Read(IBinaryReader reader)
         {
-            return new M2()
-            {
-                magic = reader.ReadUInt32(),
-                version = reader.ReadUInt32(),
-                name = reader.ReadArray(r => (char)r.ReadByte()),
-                global_flags = (M2Flags)reader.ReadUInt32(),
-                global_loops = reader.ReadArrayUInt32(),
-                sequences = reader.ReadArray(M2Sequence.Read),
-                sequenceIdxHashById = reader.ReadArrayUInt16(),
-                bones = reader.ReadArray(M2CompBone.Read),
-                boneIndicesById = reader.ReadArrayUInt16(),
-                vertices = reader.ReadArray(M2Vertex.Read),
-                num_skin_profiles = reader.ReadUInt32(),
-                colors = reader.ReadArray(M2Color.Read),
-                textures = reader.ReadArray(M2Texture.Read),
-                texture_weights = reader.ReadArray(M2TextureWeight.Read),
-                texture_transforms = reader.ReadArray(M2TextureTransform.Read),
-                textureIndicesById = reader.ReadArrayUInt16(),
-                materials = reader.ReadArray(M2Material.Read),
-                boneCombos = reader.ReadArrayUInt16(),
-                textureCombos = reader.ReadArrayInt16(),
-                textureTransformBoneMap = reader.ReadArrayUInt16(),
-                textureWeightCombos = reader.ReadArrayUInt16(),
-                textureTransformCombos = reader.ReadArrayUInt16(),
-                bounding_box = CAaBox.Read(reader),
-                bounding_sphere_radius = reader.ReadFloat(),
-                collision_box = CAaBox.Read(reader),
-                collision_sphere_radius = reader.ReadFloat(),
-                collisionIndices = reader.ReadArrayUInt16(),
-                collisionPositions = reader.ReadArrayVector3(),
-                collisionFaceNormals = reader.ReadArrayVector3(),
-                attachments = reader.ReadArray(M2Attachment.Read),
-                attachmentIndicesById = reader.ReadArrayUInt16(),
-                events = reader.ReadArray(M2Event.Read),
-                lights = reader.ReadArray(M2Light.Read),
-                cameras = reader.ReadArray(M2Camera.Read),
-                cameraIndicesById = reader.ReadArrayUInt16(),
-                ribbon_emitters = reader.ReadArray(M2Ribbon.Read),
-            };
+            return new M2(reader);
         }
     }
 
@@ -273,13 +277,13 @@ namespace WDE.MpqReader.Structures
     public enum M2Blend
     {
         M2BlendOpaque = 0,
-        M2BlendAlphaKey,
-        M2BlendAlpha,
-        M2BlendNoAlphaAdd,
-        M2BlendAdd,
-        M2BlendMod,
-        M2BlendMod2X,
-        M2BlendBlendAdd
+        M2BlendAlphaKey = 1,
+        M2BlendAlpha = 2,
+        M2BlendNoAlphaAdd = 3,
+        M2BlendAdd = 4,
+        M2BlendMod = 5,
+        M2BlendMod2X = 6,
+        M2BlendBlendAdd = 7
     }
 
     public struct M2Material
@@ -376,6 +380,75 @@ namespace WDE.MpqReader.Structures
         }
     }
 
+    /*struct M2Particle
+    {
+        uint particleId;
+        uint flags;
+
+        Vector3 position;
+        ushort bone;
+
+        ushort texture;
+
+        M2Array<char> geometryModelFileName;
+        M2Array<char> recursionModelFileName;
+
+        byte blendingType;
+        byte emitterType;
+        ushort particleColorIndex;
+
+        byte particleType;
+        byte headOrTail;
+
+        ushort textureTileRotation;
+        ushort textureDImensionsRows;
+        ushort textureDImensionsColumns;
+
+        M2Track<float> emissionSpeed;
+        M2Track<float> speedVariation;
+        M2Track<float> verticalRange;
+        M2Track<float> horizontalRange;
+        M2Track<float> gravity;
+        M2Track<float> lifespan;
+        float lifespanVariation;
+        M2Track<float> emissionRate;
+        float emissionRateVariation;
+        M2Track<float> emissionAreaLength;
+        M2Track<float> emissionAreaWidth;
+        M2Track<float> zSource;
+
+        FBlock<Vector3> colorTrack;
+        FBlock<short> alphaTrack; // This is referred to as a "Fixed16" basically divide by 0x7FFF to get the f32 value
+        FBlock<Vector2> scaleTrack;
+        Vector2 scaleVariation;
+        FBlock<ushort> headCellTrack;
+        FBlock<ushort> tailCellTrack;
+
+        float tailLength = 0;
+        float twinkleSpeed = 0;
+        float twinklePercent = 0;
+        float twinkleScaleMin = 0;
+        float twinkleScaleMax = 0;
+        float burstMultiplier = 0;
+        float drag = 0;
+        float baseSpin = 0;
+        float baseSpinVariation = 0;
+        float spin = 0;
+        float spinVariation = 0;
+
+        CAaBox tumble;
+        Vector3 windVector;
+        float windTime;
+
+        float followSpeed1;
+        float followScale1;
+        float followSpeed2;
+        float followScale2;
+
+        M2Array<Vector3> splinePoints;
+        M2Track<byte> enabledIn;
+    }*/
+    
     public class M2Ribbon
     {
         public uint ribbonId { get; init; }                  // Always (as I have seen): -1.
@@ -613,8 +686,8 @@ namespace WDE.MpqReader.Structures
     {
         public M2Array<ushort> Vertices { get; init; }
         public M2Array<ushort> Indices{ get; init; }
-        public M2Array<uint> Bones { get; init; }  // note: in fact those are 4 bytes
-        public M2Array<M2SkinSection> SkinSections { get; init; }
+        public M2Array<uint> BoneIndices { get; init; }  // note: in fact those are 4 bytes
+        public M2Array<M2SkinSection> SubMeshes { get; init; }
         public M2Array<M2Batch> Batches { get; init; }
         public uint BonesMaxCount { get; init; }
     
@@ -627,8 +700,8 @@ namespace WDE.MpqReader.Structures
             {
                 Vertices = reader.ReadArrayUInt16(),
                 Indices = reader.ReadArrayUInt16(),
-                Bones = reader.ReadArrayUInt32(),
-                SkinSections = reader.ReadArray(M2SkinSection.Read),
+                BoneIndices = reader.ReadArrayUInt32(),
+                SubMeshes = reader.ReadArray(M2SkinSection.Read),
                 Batches = reader.ReadArray(M2Batch.Read),
                 BonesMaxCount = reader.ReadUInt32(),
             };
@@ -639,17 +712,17 @@ namespace WDE.MpqReader.Structures
     {
         public byte flags;                       // Usually 16 for static textures, and 0 for animated textures. &0x1: materials invert something; &0x2: transform &0x4: projected texture; &0x10: something batch compatible; &0x20: projected texture?; &0x40: possibly don't multiply transparency by texture weight transparency to get final transparency value(?)
         public sbyte priorityPlane;
-        public ushort shader_id;                  // See below.
+        public ushort shaderId;                  // See below.
         public ushort skinSectionIndex;           // A duplicate entry of a submesh from the list above.
         public ushort geosetIndex;                // See below. New name: flags2. 0x2 - projected. 0x8 - EDGF chunk in m2 is mandatory and data from is applied to this mesh
         public short colorIndex;                 // A Color out of the Colors-Block or -1 if none.
         public ushort materialIndex;              // The renderflags used on this texture-unit.
         public ushort materialLayer;              // Capped at 7 (see CM2Scene::BeginDraw)
         public ushort textureCount;               // 1 to 4. See below. Also seems to be the number of textures to load, starting at the texture lookup in the next field (0x10).
-        public ushort textureComboIndex;          // Index into Texture lookup table
-        public ushort textureCoordComboIndex;     // Index into the texture unit lookup table.
-        public short transparencyIndex;         // Index into transparency lookup table.
-        public ushort textureAnimIndex;          // Index into uvanimation lookup table. 
+        public ushort textureLookupId;          // Index into Texture lookup table
+        public ushort textureUnitLookupId;     // Index into the texture unit lookup table.
+        public short textureTransparencyLookupId;         // Index into transparency lookup table.
+        public ushort textureUVAnimationLookupId;          // Index into uvanimation lookup table. 
 
         private M2Batch(){}
 
@@ -659,17 +732,17 @@ namespace WDE.MpqReader.Structures
             {
                 flags = binaryReader.ReadByte(),
                 priorityPlane = (sbyte)binaryReader.ReadByte(),
-                shader_id = binaryReader.ReadUInt16(),
+                shaderId = binaryReader.ReadUInt16(),
                 skinSectionIndex = binaryReader.ReadUInt16(),
                 geosetIndex = binaryReader.ReadUInt16(),
                 colorIndex = binaryReader.ReadInt16(),
                 materialIndex = binaryReader.ReadUInt16(),
                 materialLayer = binaryReader.ReadUInt16(),
                 textureCount = binaryReader.ReadUInt16(),
-                textureComboIndex = binaryReader.ReadUInt16(),
-                textureCoordComboIndex = binaryReader.ReadUInt16(),
-                transparencyIndex = binaryReader.ReadInt16(),
-                textureAnimIndex = binaryReader.ReadUInt16()
+                textureLookupId = binaryReader.ReadUInt16(),
+                textureUnitLookupId = binaryReader.ReadUInt16(),
+                textureTransparencyLookupId = binaryReader.ReadInt16(),
+                textureUVAnimationLookupId = binaryReader.ReadUInt16()
             };
         }
     };
@@ -786,6 +859,12 @@ namespace WDE.MpqReader.Structures
         {
             return binaryReader.ReadArray(br => br.ReadUInt32());
         }
+
+        public static IBinaryReader SkipM2Array(this IBinaryReader reader)
+        {
+            reader.Offset += 8; // size + offset (uint32 + uint32)
+            return reader;
+        }
     
         public static M2Array<T> ReadArray<T>(this IBinaryReader binaryReader, System.Func<IBinaryReader, T> read)
         {
@@ -825,6 +904,29 @@ namespace WDE.MpqReader.Structures
         }
     };
  
+    public class FBlock<T>
+    {
+        public uint timestampsNum;
+        public uint timestmapsOffset;
+        public uint keysNum;
+        public uint keysOffset;
+
+        M2Array<M2Array<T>> values;
+        
+        protected FBlock(){}
+
+        public static FBlock<T> Read(IBinaryReader reader, System.Func<IBinaryReader, T> read)
+        {
+            return new FBlock<T>()
+            {
+                timestampsNum = reader.ReadUInt32(),
+                timestmapsOffset = reader.ReadUInt32(),
+                keysNum = reader.ReadUInt32(),
+                keysOffset = reader.ReadUInt32(),
+                values = reader.ReadArray(r => r.ReadArray(read))
+            };
+        }
+    }
 
     public class M2Track<T> : M2TrackBase
     {

@@ -71,7 +71,7 @@ namespace WDE.MPQ
                 throw new MpqParsingException("Invalid MPQ format. Must be '1' or '3'.");
         }
 
-        private IEnumerable<T> ReadTableEntires<T>(string name, uint tableOffset, uint numberOfEntries)
+        private IEnumerable<T> ReadTableEntries<T>(string name, uint tableOffset, uint numberOfEntries)
         {
             SeekToArchiveOffset(tableOffset);
 

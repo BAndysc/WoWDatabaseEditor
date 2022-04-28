@@ -17,15 +17,18 @@ namespace TheEngine.Coroutines
     
     public class CoroutineManager
     {
+        public IReadOnlyList<CoroutineState> DebugList => coroutines;
+
         private List<CoroutineState> coroutines = new();
         
-        private class CoroutineState
+        public class CoroutineState
         {
             public IEnumerator Coroutine;
             public bool Active;
             public CoroutineState? Parent;
             public Exception? NestedException;
             public bool IgnoreNestedExceptions;
+            public Task? WaitingForTask;
         }
 
         public int PendingCoroutines => coroutines.Count;
@@ -101,20 +104,17 @@ namespace TheEngine.Coroutines
                         return CoroutineStep(state);
                     }
                 }
-                else if (cur is WaitForTask waitForTask)
+                else if (cur is WaitForTask || cur is Task)
                 {
                     state.Active = false;
-                    waitForTask.Task.ContinueWith(t =>
+                    Task task = cur is WaitForTask w ? w.Task : (Task)cur;
+                    state.WaitingForTask = task;
+                    task.ContinueWith(t =>
                     {
+                        if (t.Exception != null)
+                            Console.WriteLine(t.Exception);
                         state.Active = true;
-                    });
-                } 
-                else if (cur is Task t)
-                {
-                    state.Active = false;
-                    t.ContinueWith(_ =>
-                    {
-                        state.Active = true;
+                        state.WaitingForTask = null;
                     });
                 } else
                     throw new Exception("You can only yield null (For the next frame) or WaitForTask or another IEnumerator");

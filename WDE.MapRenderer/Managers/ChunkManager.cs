@@ -33,6 +33,9 @@ namespace WDE.MapRenderer.Managers
         public List<StaticRenderHandle> renderHandles = new();
         public List<Entity> entities = new();
 
+        public CreatureManager.CreatureChunkData Creatures = new();
+        public GameObjectManager.GameObjectChunkData GameObjects = new();
+
         public ChunkInstance(int x, int z)
         {
             X = x;
@@ -77,6 +80,8 @@ namespace WDE.MapRenderer.Managers
         private readonly Lazy<LoadingManager> loadingManager;
         private readonly Engine engine;
         private readonly IGameContext gameContext;
+        private readonly CreatureManager creatureManager;
+        private readonly GameObjectManager gameObjectManager;
         private readonly Archetypes archetypes;
         private HashSet<(int, int)> loadedChunks = new();
         private List<ChunkInstance> chunks = new();
@@ -134,6 +139,8 @@ namespace WDE.MapRenderer.Managers
             WmoManager wmoManager,
             WorldManager worldManager,
             IGameContext gameContext,
+            CreatureManager creatureManager,
+            GameObjectManager gameObjectManager,
             Archetypes archetypes,
             Lazy<LoadingManager> loadingManager,
             Engine engine)
@@ -152,6 +159,8 @@ namespace WDE.MapRenderer.Managers
             this.wmoManager = wmoManager;
             this.worldManager = worldManager;
             this.gameContext = gameContext;
+            this.creatureManager = creatureManager;
+            this.gameObjectManager = gameObjectManager;
             this.archetypes = archetypes;
             this.loadingManager = loadingManager;
             this.engine = engine;
@@ -168,6 +177,8 @@ namespace WDE.MapRenderer.Managers
             chunk.chunkLoading = tasksource.Task;
             chunks.Add(chunk);
             chunksXY[(y, x)] = chunk;
+
+            var WDTflag = worldManager.CurrentWdt?.Header.flags;
 
             var fullName = gameFiles.Adt(gameContext.CurrentMap.Directory, x, y);
             var file = gameFiles.ReadFile(fullName);
@@ -197,7 +208,7 @@ namespace WDE.MapRenderer.Managers
 
                 try
                 {
-                    adt = new ADT(new MemoryBinaryReader(file.Result));
+                    adt = new ADT(new MemoryBinaryReader(file.Result), WDTflag);
                 }
                 catch (Exception e)
                 {
@@ -465,6 +476,10 @@ namespace WDE.MapRenderer.Managers
             yield return LoadWorldMapObjects(adt, chunk, cancellationToken);
 
             yield return LoadM2(adt, chunk, cancellationToken);
+            
+            //yield return creatureManager.LoadCreatures(chunk.Creatures, chunk.X, chunk.Z, cancellationToken);
+
+            //yield return gameObjectManager.LoadGameObjects(chunk.GameObjects, chunk.X, chunk.Z, cancellationToken);
         }
 
         private IEnumerator LoadM2(ADT adt, ChunkInstance chunk, CancellationToken cancellationToken)
@@ -575,7 +590,6 @@ namespace WDE.MapRenderer.Managers
             for (int i = -D; i <= D; ++i)
             {
                 for (int j = -D; j <= D; ++j)
-                    if (worldManager.IsChunkPresent(chunk.x + i, chunk.y + j))
                        gameContext.StartCoroutine(LoadChunk(chunk.x + i, chunk.y + j, false));
             }
             
@@ -606,6 +620,9 @@ namespace WDE.MapRenderer.Managers
                 chunk.loading.Cancel();
                 yield return chunk.chunkLoading;
             }
+
+            yield return creatureManager.UnloadChunk(chunk.Creatures);
+            yield return gameObjectManager.UnloadChunk(chunk.GameObjects);
             
             foreach (var obj in chunk.renderHandles)
                 renderManager.UnregisterStaticRenderer(obj);

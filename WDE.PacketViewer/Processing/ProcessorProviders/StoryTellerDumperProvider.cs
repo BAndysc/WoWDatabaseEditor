@@ -7,7 +7,7 @@ using WDE.PacketViewer.Processing.Processors;
 namespace WDE.PacketViewer.Processing.ProcessorProviders
 {
     [AutoRegister]
-    public class StoryTellerDumperProvider : IPacketDumperProvider
+    public class StoryTellerDumperProvider : ITextPacketDumperProvider
     {
         private readonly IContainerProvider containerProvider;
 
@@ -24,7 +24,7 @@ namespace WDE.PacketViewer.Processing.ProcessorProviders
     }
     
     [AutoRegister]
-    public class PerGuidStoryTellerDumperProvider : IPacketDumperProvider
+    public class PerGuidStoryTellerDumperProvider : ITextPacketDumperProvider
     {
         private readonly IContainerProvider containerProvider;
 

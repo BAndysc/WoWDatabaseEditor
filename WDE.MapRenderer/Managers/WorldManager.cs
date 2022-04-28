@@ -15,6 +15,7 @@ public class WorldManager : System.IDisposable
     private readonly AreaTableStore areaTableStore;
     private uint[,]?[,] areaTable = new uint[,]?[64,64];
     private bool[,] presentChunks = new bool[64, 64];
+    private Vector3? teleportPosition;
     
     public WorldManager(IGameFiles gameFiles,
         IGameContext gameContext,
@@ -119,7 +120,13 @@ public class WorldManager : System.IDisposable
                 chunks++;
             }
         }
-        if (chunks > 0)
+        
+        if (teleportPosition.HasValue)
+        {
+            cameraManager.Relocate(teleportPosition.Value);
+            teleportPosition = null;
+        }
+        else if (chunks > 0)
         {
             var avg = middlePosSum / chunks;
             if (gameContext.CurrentMap.Id == 1)
@@ -161,4 +168,6 @@ public class WorldManager : System.IDisposable
     {
         return chunkX >= 0 && chunkX < 64 && chunkY >= 0 && chunkY < 64 && presentChunks[chunkY, chunkY];
     }
+
+    public void SetNextTeleportPosition(Vector3? teleportPosition) => this.teleportPosition = teleportPosition;
 }

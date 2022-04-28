@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Nito.AsyncEx;
 using WDE.Common.MPQ;
 using WDE.Common.Services.MessageBox;
@@ -7,10 +8,12 @@ namespace WDE.MapRenderer.Managers;
 
 public class GameFiles : IGameFiles, IDisposable
 {
-    private AsyncMonitor monitor = new ();
+    private static SemaphoreSlim semaphore = new(20);
     private readonly IMpqService mpqService;
     private readonly IMessageBoxService messageBoxService;
-    private IMpqArchive mpq, mpqSync;
+    private IMpqArchive mpqSync;
+    
+    private List<IMpqArchive> mpqPool = new List<IMpqArchive>();
 
     public GameFiles(IMpqService mpqService,
         IMessageBoxService messageBoxService)
@@ -21,17 +24,17 @@ public class GameFiles : IGameFiles, IDisposable
 
     public bool Initialize()
     {
-        return TryOpenMpq(out mpq, out mpqSync);
+        return TryOpenMpq(mpqPool, semaphore.CurrentCount, out mpqSync);
     }
 
-    private bool TryOpenMpq(out IMpqArchive m, out IMpqArchive m2) // we open two archive, once for async loading, second for sync loading
+    private bool TryOpenMpq(List<IMpqArchive> archives, int asyncCount, out IMpqArchive syncArchive)
     {
-        m = null!;
-        m2 = null!;
+        syncArchive = null!;
         try
         {
-            m = mpqService.Open();
-            m2 = mpqService.Open();
+            syncArchive = mpqService.Open();
+            for (int i = 0; i < asyncCount; ++i)
+                archives.Add(syncArchive.Clone());
             return true;
         }
         catch (Exception e)
@@ -42,17 +45,24 @@ public class GameFiles : IGameFiles, IDisposable
                 .SetContent(e.Message + "\n\nAre you using modified game files?")
                 .WithButton("Ok", false)
                 .Build());
-            m?.Dispose();
-            m = null!;
-            m2 = null!;
+            foreach (var arch in archives)
+                arch.Dispose();
+            archives.Clear();
+            syncArchive = null!;
             return false;
         }
     }
 
     public async Task<PooledArray<byte>?> ReadFile(string fileName)
     {
-        using var _ = await monitor.EnterAsync();
-        var bytes = await Task.Run(() => mpq.ReadFilePool(fileName));
+        await semaphore.WaitAsync();
+        Debug.Assert(mpqPool.Count > 0);
+        IMpqArchive archive = mpqPool[^1];
+        mpqPool.RemoveAt(mpqPool.Count - 1);
+        var bytes = await Task.Run(() => archive.ReadFilePool(fileName));
+        mpqPool.Add(archive);
+        semaphore.Release();
+        
         if (bytes == null)
             Console.WriteLine("File " + fileName + " is unreadable");
         return bytes;
@@ -80,7 +90,9 @@ public class GameFiles : IGameFiles, IDisposable
 
     public void Dispose()
     {
-        mpq.Dispose();
+        foreach (var arch in mpqPool)
+            arch.Dispose();
+        mpqPool.Clear();
         mpqSync.Dispose();
     }
 }

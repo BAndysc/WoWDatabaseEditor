@@ -3,6 +3,7 @@ using Prism.Ioc;
 using TheEngine.Coroutines;
 using TheEngine.Interfaces;
 using TheEngine.PhysicsSystem;
+using TheMaths;
 using WDE.MapRenderer.Managers;
 using WDE.MpqReader.Structures;
 
@@ -34,6 +35,8 @@ namespace WDE.MapRenderer
         private UpdateManager updateLoop = null!;
         private WorldManager worldManager = null!;
         private LoadingManager loadingManager = null!;
+        private CreatureManager creatureManager = null!;
+        private GameObjectManager gameObjectManager = null!;
         
         public event Action<int>? ChangedMap;
         public Map CurrentMap { get; private set; } = Map.Empty;
@@ -58,7 +61,8 @@ namespace WDE.MapRenderer
             {
                 return false;
             }
-            coroutineManager = new();
+
+            coroutineManager = ResolveOrCreate<CoroutineManager>();
 
             dbcManager = ResolveOrCreate<DbcManager>();
             SetMap(1);
@@ -81,6 +85,8 @@ namespace WDE.MapRenderer
             areaTriggerManager = ResolveOrCreate<AreaTriggerManager>();
             raycastSystem = ResolveOrCreate<RaycastSystem>();
             moduleManager = ResolveOrCreate<ModuleManager>();
+            creatureManager = ResolveOrCreate<CreatureManager>();
+            gameObjectManager = ResolveOrCreate<GameObjectManager>();
             
             IsInitialized = true;
             return true;
@@ -133,6 +139,10 @@ namespace WDE.MapRenderer
             renderManager.ViewDistanceModifier = gameProperties.ViewDistanceModifier;
             moduleManager.Render();
             lightingManager.Render();
+        }
+
+        public void RenderTransparent(float delta)
+        {
             areaTriggerManager.Render();
         }
 
@@ -146,11 +156,12 @@ namespace WDE.MapRenderer
             timeManager.RenderGUI();
         }
 
-        public void SetMap(int mapId)
+        public void SetMap(int mapId, Vector3? position = null)
         {
             if (dbcManager.MapStore.Contains(mapId) && CurrentMap.Id != mapId)
             {
                 CurrentMap = dbcManager.MapStore[mapId];
+                worldManager?.SetNextTeleportPosition(position);
                 ChangedMap?.Invoke(mapId);
             }
         }

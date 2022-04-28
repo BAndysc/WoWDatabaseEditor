@@ -40,10 +40,12 @@ public class TheEngineOpenTkWindow : GameWindow, IWindowHost
         engine.statsManager.Counters.FrameTime.Add(args.Time * 1000);
         engine.renderManager.BeginFrame();
         engine.renderManager.PrepareRendering(0);
-        engine.renderManager.RenderWorld(0);
-        engine.Render();
+        engine.renderManager.RenderOpaque(0);
         game.Render((float)args.Time * 1000);
+        engine.renderManager.RenderTransparent(0);
+        game.RenderTransparent((float)args.Time * 1000);
         game.RenderGUI((float)args.Time * 1000);
+        engine.RenderGUI();
         engine.renderManager.FinalizeRendering(0);
         base.OnRenderFrame(args);
         SwapBuffers();

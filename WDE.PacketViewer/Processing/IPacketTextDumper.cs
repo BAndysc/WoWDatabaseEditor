@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using WDE.Common.Managers;
 using WowPacketParser.Proto;
 using WowPacketParser.Proto.Processing;
 
@@ -7,9 +8,17 @@ namespace WDE.PacketViewer.Processing
     public interface IPacketTextDumper : IPacketProcessor<bool>
     {
         bool RequiresSplitUpdateObject => false;
+        Task Process() => Task.CompletedTask;
         Task<string> Generate();
     }
     
+    public interface IPacketDocumentDumper : IPacketProcessor<bool>
+    {
+        bool RequiresSplitUpdateObject => false;
+        Task Process() => Task.CompletedTask;
+        IDocument Generate();
+    }
+
     public interface ITwoStepPacketBoolProcessor : ITwoStepPacketProcessor<bool>
     {
     }

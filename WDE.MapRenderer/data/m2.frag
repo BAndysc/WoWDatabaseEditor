@@ -17,125 +17,148 @@ uniform int unlit;
 uniform int pixel_shader;
 uniform vec4 mesh_color;
 
+vec4 ShadeCModel(int pixelId, vec4 texture1, vec4 texture2)
+{
+    vec4 result = vec4(0, 0, 0, 0) + mesh_color * 0.00001;
+    vec4 diffuseColor = vec4(1, 1, 1, 1);
+    vec3 specular = vec3(0, 0, 0);
+
+    if (pixelId == 0)
+    {
+        result.rgb = diffuseColor.rgb * texture1.rgb;
+        result.a = diffuseColor.a;
+    }
+    else if (pixelId == 1) // CModelPixelShaderID::Opaque_Opaque
+    {
+        result.rgb = diffuseColor.rgb * texture1.rgb * texture2.rgb;
+        result.a = diffuseColor.a;
+    }
+    else if (pixelId == 2) // CModelPixelShaderID::Opaque_Mod
+    {
+        result.rgb = diffuseColor.rgb * texture1.rgb * texture2.rgb;
+        result.a = texture2.a * diffuseColor.a;
+    }
+    else if (pixelId == 3) // CModelPixelShaderID::Opaque_Mod2x
+    {
+        result.rgb = diffuseColor.rgb * 2.0f * texture1.rgb * texture2.rgb;
+        result.a = diffuseColor.a * 2.0f * texture2.a;
+    }
+    else if (pixelId == 4) // CModelPixelShaderID::Opaque_Mod2xNA
+    {
+        result.rgb = diffuseColor.rgb * 2.0f * texture1.rgb * texture2.rgb;
+        result.a = diffuseColor.a;
+    }
+    else if (pixelId == 5) // CModelPixelShaderID::Opaque_Add)
+    {
+        result.rgb = diffuseColor.rgb * texture1.rgb + texture2.rgb;
+        result.a = diffuseColor.a + texture1.a;
+    }
+    else if (pixelId == 6) // CModelPixelShaderID::Opaque_AddNA)
+    {
+        result.rgb = diffuseColor.rgb * texture1.rgb + texture2.rgb;
+        result.a = diffuseColor.a;
+    }
+    else if (pixelId == 7) //CModelPixelShaderID::Opaque_AddAlpha)
+    {
+        result.rgb = diffuseColor.rgb * texture1.rgb;
+        result.a = diffuseColor.a;
+
+        specular = texture2.rgb * texture2.a;
+    }
+    else if (pixelId == 8)//CModelPixelShaderID::Opaque_AddAlpha_Alpha)
+    {
+        result.rgb = diffuseColor.rgb * texture1.rgb;
+        result.a = diffuseColor.a;
+
+        specular = texture2.rgb * texture2.a * (1.0f - texture1.a);
+    }
+    else if (pixelId == 9)//CModelPixelShaderID::Opaque_Mod2xNA_Alpha)
+    {
+        result.rgb = diffuseColor.rgb * mix(texture1.rgb * texture2.rgb * 2.0f, texture1.rgb, texture1.aaa);
+        result.a = diffuseColor.a;
+    }
+    else if (pixelId == 10)//CModelPixelShaderID::Mod)
+    {
+        result.rgb = diffuseColor.rgb * texture1.rgb;
+        result.a = diffuseColor.a * texture1.a;
+    }
+    else if (pixelId == 11)//CModelPixelShaderID::Mod_Opaque)
+    {
+        result.rgb = diffuseColor.rgb * texture1.rgb * texture2.rgb;
+        result.a = diffuseColor.a * texture1.a;
+    }
+    else if (pixelId == 12)//CModelPixelShaderID::Mod_Mod)
+    {
+        result.rgb = diffuseColor.rgb * texture1.rgb * texture2.rgb;
+        result.a = diffuseColor.a * texture1.a * texture2.a;
+    }
+    else if (pixelId == 13)//CModelPixelShaderID::Mod_Mod2x)
+    {
+        result.rgb = diffuseColor.rgb * 2.0f * texture1.rgb * texture2.rgb;
+        result.a = diffuseColor.a * 2.0f * texture1.a * texture2.a;
+    }
+    else if (pixelId == 14)//CModelPixelShaderID::Mod_Mod2xNA)
+    {
+        result.rgb = diffuseColor.rgb * 2.0f * texture1.rgb * texture2.rgb;
+        result.a = texture1.a * diffuseColor.a;
+    }
+    else if (pixelId == 15)//CModelPixelShaderID::Mod_Add)
+    {
+        result.rgb = diffuseColor.rgb * texture1.rgb;
+        result.a = diffuseColor.a * (texture1.a + texture2.a);
+
+        specular = texture2.rgb;
+    }
+    else if (pixelId == 17)//CModelPixelShaderID::Mod_AddNA)
+    {
+        result.rgb = diffuseColor.rgb * texture1.rgb;
+        result.a = texture1.a * diffuseColor.a;
+
+        specular = texture2.rgb;
+    }
+    else if (pixelId == 18)//CModelPixelShaderID::Mod2x)
+    {
+        result.rgb = diffuseColor.rgb * 2.0f * texture1.rgb;
+        result.a = diffuseColor.a * 2.0f * texture1.a;
+    }
+    else if (pixelId == 19)//CModelPixelShaderID::Mod2x_Mod)
+    {
+        result.rgb = diffuseColor.rgb * 2.0f * texture1.rgb * texture2.rgb;
+        result.a = diffuseColor.a * 2.0f * texture1.a * texture2.a;
+    }
+    else if (pixelId == 20)//CModelPixelShaderID::Mod2x_Mod2x)
+    {
+        result = diffuseColor * 4.0f * texture1 * texture2;
+    }
+    else if (pixelId == 21)//CModelPixelShaderID::Add)
+    {
+        result = diffuseColor + texture1;
+    }
+    else if (pixelId == 22)//CModelPixelShaderID::Add_Mod)
+    {
+        result.rgb = (diffuseColor.rgb + texture1.rgb) * texture2.a;
+        result.a = (diffuseColor.a + texture1.a) * texture2.a;
+    }
+    else if (pixelId == 23)//CModelPixelShaderID::Fade)
+    {
+        result.rgb = (texture1.rgb - diffuseColor.rgb) * diffuseColor.a + diffuseColor.rgb;
+        result.a = diffuseColor.a;
+    }
+    else if (pixelId == 24)//CModelPixelShaderID::Decal)
+    {
+        result.rgb = (diffuseColor.rgb - texture1.rgb) * diffuseColor.a + texture1.rgb;
+        result.a = diffuseColor.a;
+    }
+
+    return result;
+}
+
 void main()
 {
     vec4 tex1 = texture(texture1, TexCoord.xy);
     vec4 tex2 = texture(texture2, TexCoord2.xy);
 
-    vec4 color = vec4(0, 0, 0, 0);
-    
-    // code from Deamon87 and https://wowdev.wiki/M2/Rendering#Pixel_Shaders
-    if (pixel_shader == 0) //Combiners_Opaque
-    { 
-        color.rgb = tex1.rgb * mesh_color.rgb;
-        color.a = mesh_color.a;
-        if (tex1.a < alphaTest)
-            discard;
-    } 
-    else if (pixel_shader == 1) // Combiners_Decal
-    { 
-        color.rgb = mix(mesh_color.rgb, tex1.rgb, mesh_color.a);
-        color.a = mesh_color.a;
-    } 
-    else if (pixel_shader == 2) // Combiners_Add
-    { 
-        color.rgba = tex1.rgba + mesh_color.rgba;
-    } 
-    else if (pixel_shader == 3) // Combiners_Mod2x
-    { 
-        color.rgb = tex1.rgb * mesh_color.rgb * vec3(2.0);
-        color.a = tex1.a * mesh_color.a * 2.0;
-    } 
-    else if (pixel_shader == 4) // Combiners_Fade
-    { 
-        color.rgb = mix(tex1.rgb, mesh_color.rgb, mesh_color.a);
-        color.a = mesh_color.a;
-    } 
-    else if (pixel_shader == 5) // Combiners_Mod
-    { 
-        color.rgba = tex1.rgba * mesh_color.rgba;
-    } 
-    else if (pixel_shader == 6) // Combiners_Opaque_Opaque
-    { 
-        color.rgb = tex1.rgb * tex2.rgb * mesh_color.rgb;
-        color.a = mesh_color.a;
-    } 
-    else if (pixel_shader == 7) // Combiners_Opaque_Add
-    { 
-        color.rgb = tex2.rgb + tex1.rgb * mesh_color.rgb;
-        color.a = mesh_color.a + tex1.a;
-    } 
-    else if (pixel_shader == 8) // Combiners_Opaque_Mod2x
-    { 
-        color.rgb = tex1.rgb * mesh_color.rgb * tex2.rgb * vec3(2.0);
-        color.a  = tex2.a * mesh_color.a * 2.0;
-    } 
-    else if (pixel_shader == 9)  // Combiners_Opaque_Mod2xNA
-    {
-        color.rgb = tex1.rgb * mesh_color.rgb * tex2.rgb * vec3(2.0);
-        color.a  = mesh_color.a;
-    } 
-    else if (pixel_shader == 10) // Combiners_Opaque_AddNA
-    { 
-        color.rgb = tex2.rgb + tex1.rgb * mesh_color.rgb;
-        color.a = mesh_color.a;
-    } 
-    else if (pixel_shader == 11) // Combiners_Opaque_Mod
-    { 
-        color.rgb = tex1.rgb * tex2.rgb * mesh_color.rgb;
-        color.a = tex2.a * mesh_color.a;
-    } 
-    else if (pixel_shader == 12) // Combiners_Mod_Opaque
-    { 
-        color.rgb = tex1.rgb * tex2.rgb * mesh_color.rgb;
-        color.a = tex1.a;
-    } 
-    else if (pixel_shader == 13) // Combiners_Mod_Add
-    { 
-        color.rgba = tex2.rgba + tex1.rgba * mesh_color.rgba;
-    } 
-    else if (pixel_shader == 14) // Combiners_Mod_Mod2x
-    { 
-        color.rgba = tex1.rgba * tex2.rgba * mesh_color.rgba * vec4(2.0);
-    } 
-    else if (pixel_shader == 15) // Combiners_Mod_Mod2xNA
-    { 
-        color.rgb = tex1.rgb * tex2.rgb * mesh_color.rgb * vec3(2.0);
-        color.a = tex1.a * mesh_color.a;
-    } 
-    else if (pixel_shader == 16) // Combiners_Mod_AddNA
-    { 
-        color.rgb = tex2.rgb + tex1.rgb * mesh_color.rgb;
-        color.a = tex1.a * mesh_color.a;
-    } 
-    else if (pixel_shader == 17) // Combiners_Mod_Mod
-    { 
-        color.rgba = tex1.rgba * tex2.rgba * mesh_color.rgba;
-    } 
-    else if (pixel_shader == 18) // Combiners_Add_Mod
-    { 
-        color.rgb = (tex1.rgb + mesh_color.rgb) * tex2.a;
-        color.a = (tex1.a + mesh_color.a) * tex2.a;
-    } 
-    else if (pixel_shader == 19) // Combiners_Mod2x_Mod2x
-    {
-        color.rgba = tex1.rgba * tex2.rgba * mesh_color.rgba * vec4(4.0);
-    }
-    else if (pixel_shader == 20)  // Combiners_Opaque_Mod2xNA_Alpha
-    {
-        color.rgb = (mesh_color.rgb * tex1.rgb) * mix(tex2.rgb * 2.0, vec3(1.0), tex1.a);
-        color.a = mesh_color.a;
-    }
-    else if (pixel_shader == 21)   //Combiners_Opaque_AddAlpha
-    {
-        color.rgb = (mesh_color.rgb * tex1.rgb) + (tex2.rgb * tex2.a);
-        color.a = mesh_color.a;
-    }
-    else if (pixel_shader == 22)   // Combiners_Opaque_AddAlpha_Alpha
-    {
-        color.rgb = (mesh_color.rgb * tex1.rgb) + (tex2.rgb * tex2.a * tex1.a);
-        color.a = mesh_color.a;
-    }
+    vec4 color = ShadeCModel(pixel_shader, tex1, tex2);
 
     if (color.a < alphaTest) 
         discard;
