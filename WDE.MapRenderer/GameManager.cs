@@ -61,7 +61,8 @@ namespace WDE.MapRenderer
             {
                 return false;
             }
-            coroutineManager = new();
+
+            coroutineManager = ResolveOrCreate<CoroutineManager>();
 
             dbcManager = ResolveOrCreate<DbcManager>();
             SetMap(1);
