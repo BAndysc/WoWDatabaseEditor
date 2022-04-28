@@ -1,3 +1,4 @@
+using TheEngine.Coroutines;
 using TheEngine.Interfaces;
 using TheMaths;
 using WDE.MapRenderer;
@@ -7,13 +8,16 @@ namespace RenderingTester;
 public class StandaloneCustomGameModule : IGameModule 
 {
     private readonly IUIManager uiManager;
+    private readonly CoroutineManager coroutineManager;
     private readonly IStatsManager statsManager;
     public object? ViewModel => null;
 
     public StandaloneCustomGameModule(IUIManager uiManager,
+        CoroutineManager coroutineManager,
         IStatsManager statsManager)
     {
         this.uiManager = uiManager;
+        this.coroutineManager = coroutineManager;
         this.statsManager = statsManager;
     }
     
@@ -39,5 +43,6 @@ public class StandaloneCustomGameModule : IGameModule
         using var ui = uiManager.BeginImmediateDrawRel(1, 0, 1, 0);
         ui.BeginVerticalBox(new Vector4(0, 0, 0, 1), 2);
         ui.Text("calibri", $"{fps:0.00}", 14, Vector4.One);
+        ui.Text("calibri", $"{coroutineManager.PendingCoroutines} active tasks", 14, Vector4.One);
     }
 }

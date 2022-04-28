@@ -1,4 +1,5 @@
-﻿using System.Reactive.Disposables;
+﻿using System.Diagnostics;
+using System.Reactive.Disposables;
 using Prism.Ioc;
 using WDE.Common.Managers;
 using WDE.Common.Services.MessageBox;
@@ -54,26 +55,9 @@ public class DummyMessageBox : IMessageBoxService
     }
 }
 
-public class MainThread : SynchronizationContext, IMainThread
+public class MainThread : IMainThread
 {
     private List<(TimeSpan delay, Action action)> delayed = new();
-
-    private List<(SendOrPostCallback d, object? state)> posts = new();
-    
-    public override void Post(SendOrPostCallback d, object? state)
-    {
-        posts.Add((d, state));
-    }
-
-    public override void Send(SendOrPostCallback d, object? state)
-    {
-        d(state);
-    }
-
-    public override int Wait(IntPtr[] waitHandles, bool waitAll, int millisecondsTimeout)
-    {
-        return base.Wait(waitHandles, waitAll, millisecondsTimeout);
-    }
 
     public void Delay(Action action, TimeSpan delay)
     {
@@ -92,12 +76,6 @@ public class MainThread : SynchronizationContext, IMainThread
 
     public void Tick(TimeSpan time)
     {
-        for (int i = posts.Count - 1; i >= 0; --i)
-        {
-            posts[i].d(posts[i].state);
-            posts.RemoveAt(i);
-        }
-        
         for (int i = 0; i < delayed.Count; ++i)
         {
             if (delayed[i].delay <= time)

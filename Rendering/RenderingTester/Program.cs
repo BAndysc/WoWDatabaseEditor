@@ -6,8 +6,10 @@ using Prism.Ioc;
 using RenderingTester;
 using TheEngine;
 using TheMaths;
-using Unity;using WDE.AzerothCore;
+using Unity;
+using WDE.AzerothCore;
 using WDE.Common.CoreVersion;
+using WDE.Common.Database;
 using WDE.Common.DBC;
 using WDE.Common.Managers;
 using WDE.Common.Services.MessageBox;
@@ -53,8 +55,10 @@ new ParametersModule().RegisterTypes(registry);
 new TrinityModule().RegisterTypes(registry);
 new AzerothModule().RegisterTypes(registry);
 
-SynchronizationContext.SetSynchronizationContext(mainThread);
+var context = new SingleThreadSynchronizationContext(Thread.CurrentThread.ManagedThreadId);
+
+SynchronizationContext.SetSynchronizationContext(context);
 
 var game = provider.Resolve<Game>();
-using var window = new GameStandaloneWindow(GameWindowSettings.Default, nativeWindowSettings, game, mainThread);
+using var window = new GameStandaloneWindow(GameWindowSettings.Default, nativeWindowSettings, game, mainThread, context);
 window.Run();
