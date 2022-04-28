@@ -1,7 +1,4 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using TheEngine.Coroutines;
 using TheEngine.Data;
 using TheEngine.Entities;
@@ -11,36 +8,47 @@ using TheMaths;
 using WDE.MpqReader;
 using WDE.MpqReader.Readers;
 using WDE.MpqReader.Structures;
-using WDE.MapRenderer.Managers;
-using System.IO;
+// ReSharper disable InconsistentNaming
 
 namespace WDE.MapRenderer.Managers
 {
+    enum ModelVertexShader
+    {
+        Diffuse_T1,
+        Diffuse_T2,
+        Diffuse_Env,
+        Diffuse_T1_T2,
+        Diffuse_T1_Env,
+        Diffuse_Env_T2,
+        Diffuse_Env_Env,
+    };
+    
     enum ModelPixelShader
     {
-        Combiners_Opaque = 0,
-        Combiners_Decal,
-        Combiners_Add,
-        Combiners_Mod2x,
-        Combiners_Fade,
-        Combiners_Mod,
-        Combiners_Opaque_Opaque,
-        Combiners_Opaque_Add,
-        Combiners_Opaque_Mod2x,
-        Combiners_Opaque_Mod2xNA,
-        Combiners_Opaque_AddNA,
-        Combiners_Opaque_Mod,
-        Combiners_Mod_Opaque,
-        Combiners_Mod_Add,
-        Combiners_Mod_Mod2x,
-        Combiners_Mod_Mod2xNA,
-        Combiners_Mod_AddNA,
-        Combiners_Mod_Mod,
-        Combiners_Add_Mod,
-        Combiners_Mod2x_Mod2x,
-        Combiners_Opaque_Mod2xNA_Alpha,
-        Combiners_Opaque_AddAlpha,
-        Combiners_Opaque_AddAlpha_Alpha,
+        Opaque = 0,
+        Opaque_Opaque,
+        Opaque_Mod,
+        Opaque_Mod2x,
+        Opaque_Mod2xNA,
+        Opaque_Add,
+        Opaque_AddNA,
+        Opaque_AddAlpha,
+        Opaque_AddAlpha_Alpha,
+        Opaque_Mod2xNA_Alpha,
+        Mod,
+        Mod_Opaque,
+        Mod_Mod,
+        Mod_Mod2x,
+        Mod_Mod2xNA,
+        Mod_Add,
+        Mod_AddNA,
+        Mod2x,
+        Mod2x_Mod,
+        Mod2x_Mod2x,
+        Add,
+        Add_Mod,
+        Fade,
+        Decal
     };
 
     
@@ -341,13 +349,13 @@ namespace WDE.MapRenderer.Managers
             {
                 if (batch.skinSectionIndex == ushort.MaxValue ||
                     batch.materialIndex >= m2.materials.Length ||
-                    batch.skinSectionIndex >= skin.SkinSections.Length)
+                    batch.skinSectionIndex >= skin.SubMeshes.Length)
                 {
                     Console.WriteLine("Sth wrong with batch " + j + " in model " + displayid);
                     continue;
                 }
 
-                var section = skin.SkinSections[batch.skinSectionIndex];
+                var section = skin.SubMeshes[batch.skinSectionIndex];
 
                 // titi, check if element is active
                 // loading all meshes for non humanoids (crdisplayinfoextra users), might need tob e tweaked
@@ -364,7 +372,7 @@ namespace WDE.MapRenderer.Managers
                 TextureHandle? th2 = null;
                 for (int i = 0; i < (batch.textureCount >= 5 ? 1 : batch.textureCount); ++i)
                 {
-                    if (batch.textureComboIndex + i >= m2.textureCombos.Length)
+                    if (batch.textureLookupId + i >= m2.textureLookupTable.Length)
                     {
                         if (th.HasValue)
                             th2 = textureManager.EmptyTexture;
@@ -373,7 +381,7 @@ namespace WDE.MapRenderer.Managers
                         Console.WriteLine("File " + displayid + " batch " + j + " tex " + i + " out of range");
                         continue;
                     }
-                    var texId = m2.textureCombos[batch.textureComboIndex + i];
+                    var texId = m2.textureLookupTable[batch.textureLookupId + i];
                     if (texId == -1)
                     {
                         if (th.HasValue)
@@ -483,16 +491,18 @@ namespace WDE.MapRenderer.Managers
                         trans = m2.colors[batch.colorIndex].alpha.values[0][0].Value;
                 }
 
-                if (batch.transparencyIndex != -1 && m2.texture_weights.Length < batch.transparencyIndex)
+                if (batch.textureTransparencyLookupId != -1 && m2.textureWeights.Length < batch.textureTransparencyLookupId)
                 {
-                    if (m2.texture_weights[batch.transparencyIndex].weight.values.Length > 0 && m2.texture_weights[batch.transparencyIndex].weight.values[0].Length > 0)
-                        trans *= m2.texture_weights[batch.transparencyIndex].weight.values[0][0].Value;
+                    if (m2.textureWeights[batch.textureTransparencyLookupId].weight.values.Length > 0 && m2.textureWeights[batch.textureTransparencyLookupId].weight.values[0].Length > 0)
+                        trans *= m2.textureWeights[batch.textureTransparencyLookupId].weight.values[0][0].Value;
                 }
                 
                 Vector4 mesh_color = new Vector4(1.0f, 1.0f, 1.0f, trans);
     
                 material.SetUniform("mesh_color", mesh_color);
-                material.SetUniformInt("pixel_shader", (int)(M2GetPixelShaderID(batch.textureCount, batch.shader_id) ?? ModelPixelShader.Combiners_Opaque));
+                batch.shaderId = ResolveShaderID1(batch.shaderId, m2, batch, (m2.global_flags & M2Flags.FLAG_USE_TEXTURE_COMBINER_COMBOS) != 0, (int)materialDef.blending_mode);
+                var shaders = ConvertShaderIDs(m2, batch);
+                material.SetUniformInt("pixel_shader", (int)shaders.Item2);
                 //Console.WriteLine(path + " INDEX: " + j + " Pixel shader: " + M2GetPixelShaderID(batch.textureCount, batch.shader_id) + " tex count: " + batch.textureCount + " shader id: " + batch.shader_id + " blend: " + materialDef.blending_mode + " priority " + batch.priorityPlane + " start ");
                 
                 material.SetUniform("highlight", 0);
@@ -649,13 +659,13 @@ namespace WDE.MapRenderer.Managers
             {
                 if (batch.skinSectionIndex == ushort.MaxValue ||
                     batch.materialIndex >= m2.materials.Length ||
-                    batch.skinSectionIndex >= skin.SkinSections.Length)
+                    batch.skinSectionIndex >= skin.SubMeshes.Length)
                 {
                     Console.WriteLine("Sth wrong with batch " + j + " in model " + path);
                     continue;
                 }
 
-                var section = skin.SkinSections[batch.skinSectionIndex];
+                var section = skin.SubMeshes[batch.skinSectionIndex];
                 
 
                 using var indices = new PooledArray<int>(section.indexCount);
@@ -670,7 +680,7 @@ namespace WDE.MapRenderer.Managers
                 TextureHandle? th2 = null;
                 for (int i = 0; i < (batch.textureCount >= 5 ? 1 : batch.textureCount); ++i)
                 {
-                    if (batch.textureComboIndex + i >= m2.textureCombos.Length)
+                    if (batch.textureLookupId + i >= m2.textureLookupTable.Length)
                     {
                         if (th.HasValue)
                             th2 = textureManager.EmptyTexture;
@@ -679,7 +689,7 @@ namespace WDE.MapRenderer.Managers
                         Console.WriteLine("File " + path + " batch " + j + " tex " + i + " out of range");
                         continue;
                     }
-                    var texId = m2.textureCombos[batch.textureComboIndex + i];
+                    var texId = m2.textureLookupTable[batch.textureLookupId + i];
                     if (texId == -1)
                     {
                         if (th.HasValue)
@@ -716,16 +726,19 @@ namespace WDE.MapRenderer.Managers
                         trans = m2.colors[batch.colorIndex].alpha.values[0][0].Value;
                 }
 
-                if (batch.transparencyIndex != -1 && m2.texture_weights.Length < batch.transparencyIndex)
+                if (batch.textureTransparencyLookupId != -1 && m2.textureWeights.Length < batch.textureTransparencyLookupId)
                 {
-                    if (m2.texture_weights[batch.transparencyIndex].weight.values.Length > 0 && m2.texture_weights[batch.transparencyIndex].weight.values[0].Length > 0)
-                        trans *= m2.texture_weights[batch.transparencyIndex].weight.values[0][0].Value;
+                    if (m2.textureWeights[batch.textureTransparencyLookupId].weight.values.Length > 0 && m2.textureWeights[batch.textureTransparencyLookupId].weight.values[0].Length > 0)
+                        trans *= m2.textureWeights[batch.textureTransparencyLookupId].weight.values[0][0].Value;
                 }
                 
                 Vector4 mesh_color = new Vector4(1.0f, 1.0f, 1.0f, trans);
     
                 material.SetUniform("mesh_color", mesh_color);
-                material.SetUniformInt("pixel_shader", (int)(M2GetPixelShaderID(batch.textureCount, batch.shader_id) ?? ModelPixelShader.Combiners_Opaque));
+                batch.shaderId = ResolveShaderID1(batch.shaderId, m2, batch, (m2.global_flags & M2Flags.FLAG_USE_TEXTURE_COMBINER_COMBOS) != 0, (int)materialDef.blending_mode);
+                var shaders = ConvertShaderIDs(m2, batch);
+                material.SetUniformInt("pixel_shader", (int)shaders.Item2);
+                //material.SetUniformInt("pixel_shader", (int)(M2GetPixelShaderID(batch.textureCount, batch.shaderId) ?? ModelPixelShader.Mod));
                 //Console.WriteLine(path + " INDEX: " + j + " Pixel shader: " + M2GetPixelShaderID(batch.textureCount, batch.shader_id) + " tex count: " + batch.textureCount + " shader id: " + batch.shader_id + " blend: " + materialDef.blending_mode + " priority " + batch.priorityPlane + " start ");
                 
                 material.SetUniform("highlight", 0);
@@ -803,142 +816,266 @@ namespace WDE.MapRenderer.Managers
             result.SetResult(mdx);
         }
         
-        
-        // https://wowdev.wiki/M2/.skin/WotLK_shader_selection
-        ModelPixelShader? GetPixelShader(ushort texture_count, ushort shader_id)
+        ushort ResolveShaderID1(ushort shaderId, M2 m2, M2Batch textureUnit, bool Use_Texture_Combiner_Combos, int blendingMode)
         {
-            ushort texture1_fragment_mode = (ushort)((shader_id >> 4) & 7);
-              ushort texture2_fragment_mode = (ushort)(shader_id & 7);
-          // uint16_t texture1_env_map = (shader_id >> 4) & 8;
-          // uint16_t texture2_env_map = shader_id & 8;
+            // According to Wowdev.wiki textureUnits with shaderID 0x8000 should not be rendered
+            if ((shaderId & 0x8000) != 0)
+                return shaderId;
 
-          ModelPixelShader? pixel_shader = null;
+            ushort shaderID = shaderId;
 
-          if (texture_count == 1)
-          {
-            switch (texture1_fragment_mode)
+            if (!Use_Texture_Combiner_Combos)
             {
-            case 0:
-              pixel_shader = ModelPixelShader.Combiners_Opaque;
-              break;
-            case 2:
-              pixel_shader = ModelPixelShader.Combiners_Decal;
-              break;
-            case 3:
-              pixel_shader = ModelPixelShader.Combiners_Add;
-              break;
-            case 4:
-              pixel_shader = ModelPixelShader.Combiners_Mod2x;
-              break;
-            case 5:
-              pixel_shader = ModelPixelShader.Combiners_Fade;
-              break;
-            default:
-              pixel_shader = ModelPixelShader.Combiners_Mod;
-              break;
-            }
-          }
-          else
-          {
-            if (texture1_fragment_mode == 0)
-            {
-              switch (texture2_fragment_mode)
-              {
-              case 0:
-                pixel_shader = ModelPixelShader.Combiners_Opaque_Opaque;
-                break;
-              case 3:
-                pixel_shader = ModelPixelShader.Combiners_Opaque_Add;
-                break;
-              case 4:
-                pixel_shader = ModelPixelShader.Combiners_Opaque_Mod2x;
-                break;
-              case 6:
-                pixel_shader = ModelPixelShader.Combiners_Opaque_Mod2xNA;
-                break;
-              case 7:
-                pixel_shader = ModelPixelShader.Combiners_Opaque_AddNA;
-                break;
-              default:
-                pixel_shader = ModelPixelShader.Combiners_Opaque_Mod;
-                break;
-              }
-            }
-            else if (texture1_fragment_mode == 1)
-            {
-              switch (texture2_fragment_mode)
-              {
-              case 0:
-                pixel_shader = ModelPixelShader.Combiners_Mod_Opaque;
-                break;
-              case 3:
-                pixel_shader = ModelPixelShader.Combiners_Mod_Add;
-                break;
-              case 4:
-                pixel_shader = ModelPixelShader.Combiners_Mod_Mod2x;
-                break;
-              case 6:
-                pixel_shader = ModelPixelShader.Combiners_Mod_Mod2xNA;
-                break;
-              case 7:
-                pixel_shader = ModelPixelShader.Combiners_Mod_AddNA;
-                break;
-              default:
-                pixel_shader = ModelPixelShader.Combiners_Mod_Mod;
-                break;
-              }
-            }
-            else if (texture1_fragment_mode == 3)
-            {
-              if (texture2_fragment_mode == 1)
-              {
-                pixel_shader = ModelPixelShader.Combiners_Add_Mod;
-              }
-            }
-            else if (texture1_fragment_mode == 4 && texture2_fragment_mode == 4)
-            {
-              pixel_shader = ModelPixelShader.Combiners_Mod2x_Mod2x;
-            }
-            else if (texture2_fragment_mode == 1)
-            {
-              pixel_shader = ModelPixelShader.Combiners_Mod_Mod2x;
-            }
-          }
-         
+                ushort textureUnitValue = m2.textureUnitLookupTable[textureUnit.textureUnitLookupId];
 
-          return pixel_shader;
-        }
-        
-        ModelPixelShader? M2GetPixelShaderID(ushort texture_count, ushort shader_id)
-        {
-            ModelPixelShader? pixel_shader = null;
+                bool envMapped = textureUnitValue == short.MaxValue;
+                bool isTransparent = blendingMode != 0;
 
-            if ((shader_id & 0x8000) == 0)
-            {
-                pixel_shader = GetPixelShader(texture_count, shader_id);
-
-                if (!pixel_shader.HasValue)
+                if (isTransparent)
                 {
-                    pixel_shader = GetPixelShader(texture_count, 0x11);
+                    shaderID = 0x01;
+
+                    if (envMapped)
+                        shaderID |= 0x08;
+
+                    shaderID *= 0x10;
+                }
+
+                if (textureUnitValue == 1)
+                {
+                    shaderID |= 0x4000;
                 }
             }
             else
             {
-                switch (shader_id & 0x7FFF)
+                // Name is guessed based on usage below
+                Span<int> blendOverrideModifier = stackalloc int[2];
+
+                for (int i = 0; i < textureUnit.textureCount; i++)
                 {
-                    case 1:
-                        pixel_shader = ModelPixelShader.Combiners_Opaque_Mod2xNA_Alpha;
-                        break;
-                    case 2:
-                        pixel_shader = ModelPixelShader.Combiners_Opaque_AddAlpha;
-                        break;
-                    case 3:
-                        pixel_shader = ModelPixelShader.Combiners_Opaque_AddAlpha_Alpha;
-                        break;
-                }  
+                    int blendOverride = m2.textureCombinerCombos![i + textureUnit.shaderId];
+
+                    if (i == 0 && blendingMode == 0)
+                        blendOverride = 0;
+
+                    ushort textureUnitValue = m2.textureUnitLookupTable[i + textureUnit.textureUnitLookupId];
+                    bool isEnvMapped = textureUnitValue == short.MaxValue;
+                    bool isTransparent = textureUnitValue == 1;
+
+                    blendOverrideModifier[i] = blendOverride | ((isEnvMapped ? 1 : 0) * 8);
+
+                    if (isTransparent && i + 1 == textureUnit.textureCount)
+                        shaderID |= 0x4000;
+
+                }
+
+                shaderID |= (ushort)((blendOverrideModifier[0] * 16) | blendOverrideModifier[1]);
             }
 
-            return pixel_shader;
+            return shaderID;
+        }
+        
+        (ModelVertexShader, ModelPixelShader) ConvertShaderIDs(M2 m2, M2Batch batch)
+        {
+            // If the shaderId is 0x8000 we don't need to map anything
+            if (batch.shaderId == 0x8000)
+                return (ModelVertexShader.Diffuse_T1, ModelPixelShader.Opaque);
+
+            ushort shaderId = (ushort)(batch.shaderId & 0x7FFF);
+            ushort textureCount = batch.textureCount;
+
+            ModelPixelShader ps = ModelPixelShader.Mod;
+            ModelVertexShader vs = ModelVertexShader.Diffuse_Env;
+            
+            if ((batch.shaderId & 0x8000) != 0)
+            {
+                if (shaderId == 1)
+                {
+                    vs = ModelVertexShader.Diffuse_T1_Env;
+                    ps = ModelPixelShader.Opaque_Mod2xNA_Alpha;
+                }
+                else if (shaderId == 2)
+                {
+                    vs = ModelVertexShader.Diffuse_T1_Env;
+                    ps = ModelPixelShader.Opaque_AddAlpha;
+                }
+                else if (shaderId == 3)
+                {
+                    vs = ModelVertexShader.Diffuse_T1_Env;
+                    ps = ModelPixelShader.Opaque_AddAlpha_Alpha;
+                }
+                else
+                {
+                    Console.WriteLine("Wrong shader id..?");
+                }
+            }
+            else
+            {
+                if (textureCount == 0)
+                {
+                    Console.WriteLine("Fatal: batch has 0 textures");
+                }
+
+                ushort t1PixelMode = (ushort)((shaderId >> 4) & 0x7);
+                bool t1EnvMapped = ((shaderId >> 4) & 0x8) != 0;
+                ushort textureUnitValue = m2.textureUnitLookupTable[batch.textureUnitLookupId];
+
+                if (textureCount == 1)
+                {
+                    // Resolve Vertex Shader Id
+                    {
+                        if (t1PixelMode != 0)
+                        {
+                            vs = ModelVertexShader.Diffuse_Env;
+                        }
+                        else if (textureUnitValue == 0)
+                        {
+                            vs = ModelVertexShader.Diffuse_T1;
+                        }
+                        else
+                        {
+                            vs = ModelVertexShader.Diffuse_T2;
+                        }
+                    }
+
+                    // Resolve Pixel Shader Id
+                    {
+                        if (t1PixelMode == 0)
+                        {
+                            ps = ModelPixelShader.Opaque;
+                        }
+                        /*else if (t1PixelMode == 1)
+                        {
+                            textureUnit.pixelShaderId = PixelShaderID::Mod;
+                        }*/
+                        else if (t1PixelMode == 2)
+                        {
+                            ps = ModelPixelShader.Decal;
+                        }
+                        else if (t1PixelMode == 3)
+                        {
+                            ps = ModelPixelShader.Add;
+                        }
+                        else if (t1PixelMode == 4)
+                        {
+                            ps = ModelPixelShader.Mod2x;
+                        }
+                        else if (t1PixelMode == 5)
+                        {
+                            ps = ModelPixelShader.Fade;
+                        }
+                        else
+                        {
+                            ps = ModelPixelShader.Mod;
+                        }
+                    }
+                }
+                else
+                {
+                    ushort t2PixelMode = (ushort)(shaderId & 0x7);
+                    bool t2EnvMapped = (shaderId & 0x8) != 0;
+
+                    // Resolve Vertex Shader Id
+                    {
+                        if (t1EnvMapped && !t2EnvMapped)
+                        {
+                            vs = ModelVertexShader.Diffuse_Env_T2;
+                        }
+                        else if (!t1EnvMapped && t2EnvMapped)
+                        {
+                            vs = ModelVertexShader.Diffuse_T1_Env;
+                        }
+                        else if (t1EnvMapped && t2EnvMapped)
+                        {
+                            vs = ModelVertexShader.Diffuse_Env_Env;
+                        }
+                        else
+                        {
+                            vs = ModelVertexShader.Diffuse_T1_T2;
+                        }
+                    }
+
+                    // Resolve Pixel Shader Id
+                    {
+                        if (t1PixelMode == 0)
+                        {
+                            if (t2PixelMode == 0)
+                            {
+                                ps = ModelPixelShader.Opaque_Opaque;
+                            }
+                            /*else if (t2PixelMode == 1)
+                            {
+                                textureUnit.pixelShaderId = PixelShaderID::Opaque_Mod;
+                            }*/
+                            else if (t2PixelMode == 3)
+                            {
+                                ps = ModelPixelShader.Opaque_Add;
+                            }
+                            else if (t2PixelMode == 4)
+                            {
+                                ps = ModelPixelShader.Mod2x;
+                            }
+                            else if (t2PixelMode == 6)
+                            {
+                                ps = ModelPixelShader.Opaque_Mod2xNA;
+                            }
+                            else if (t2PixelMode == 7)
+                            {
+                                ps = ModelPixelShader.Opaque_AddNA;
+                            }
+                            else
+                            {
+                                ps = ModelPixelShader.Opaque_Mod;
+                            }
+                        }
+                        else if (t1PixelMode == 1)
+                        {
+                            if (t2PixelMode == 0)
+                            {
+                                ps = ModelPixelShader.Mod_Opaque;
+                            }
+                            else if (t2PixelMode == 3)
+                            {
+                                ps = ModelPixelShader.Mod_Add;
+                            }
+                            else if (t2PixelMode == 4)
+                            {
+                                ps = ModelPixelShader.Mod_Mod2x;
+                            }
+                            else if (t2PixelMode == 6)
+                            {
+                                ps = ModelPixelShader.Mod_Mod2xNA;
+                            }
+                            else if (t2PixelMode == 7)
+                            {
+                                ps = ModelPixelShader.Mod_AddNA;
+                            }
+                            else
+                            {
+                                ps = ModelPixelShader.Mod_Mod;
+                            }
+                        }
+                        else if (t1PixelMode == 3 && t2PixelMode == 1)
+                        {
+                            ps = ModelPixelShader.Add_Mod;
+                        }
+                        else if (t1PixelMode == 4 && t2PixelMode == 1)
+                        {
+                            ps = ModelPixelShader.Mod2x_Mod;
+                        }
+                        else if (t1PixelMode == 4 && t2PixelMode == 4)
+                        {
+                            ps = ModelPixelShader.Mod2x_Mod2x;
+                        }
+                        else
+                        {
+                            Console.WriteLine("Unknown pixel shader combination: {0}, {1} shader: {2}", t1PixelMode, t2PixelMode, shaderId);
+                        }
+                    }
+                }
+            }
+
+            return (vs, ps);
         }
         
         public void Dispose()

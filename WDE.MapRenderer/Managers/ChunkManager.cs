@@ -590,7 +590,6 @@ namespace WDE.MapRenderer.Managers
             for (int i = -D; i <= D; ++i)
             {
                 for (int j = -D; j <= D; ++j)
-                    if (worldManager.IsChunkPresent(chunk.x + i, chunk.y + j))
                        gameContext.StartCoroutine(LoadChunk(chunk.x + i, chunk.y + j, false));
             }
             
