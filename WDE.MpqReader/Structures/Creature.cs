@@ -63,9 +63,18 @@ namespace WDE.MpqReader.Structures
         public static CreatureDisplayInfo Empty => new CreatureDisplayInfo();
     }
 
-    public class CreatureDisplayInfoStore : IEnumerable<CreatureDisplayInfo>
+    public abstract class BaseDbcStore<TKey, TVal> : IEnumerable<TVal> where TKey : notnull
     {
-        private Dictionary<uint, CreatureDisplayInfo> store = new();
+        protected Dictionary<TKey, TVal> store = new();
+        public bool TryGetValue(TKey id, out TVal val) => store.TryGetValue(id, out val!);
+        public bool Contains(TKey id) => store.ContainsKey(id);
+        public TVal this[TKey id] => store[id];
+        public IEnumerator<TVal> GetEnumerator() => store.Values.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => store.Values.GetEnumerator();
+    }
+
+    public class CreatureDisplayInfoStore : BaseDbcStore<uint, CreatureDisplayInfo>
+    {
         public CreatureDisplayInfoStore(IEnumerable<IDbcIterator> rows)
         {
             foreach (var row in rows)
@@ -74,16 +83,11 @@ namespace WDE.MpqReader.Structures
                 store[o.Id] = o;
             }
         }
-
-        public bool Contains(uint id) => store.ContainsKey(id);
-        public CreatureDisplayInfo this[uint id] => store[id];
-        public IEnumerator<CreatureDisplayInfo> GetEnumerator() => store.Values.GetEnumerator();
-        IEnumerator IEnumerable.GetEnumerator() => store.Values.GetEnumerator();
     }
 
     public class CreatureModelData
     {
-        public readonly int Id;
+        public readonly uint Id;
         public readonly int Flags;
         public readonly string ModelName;
         public readonly int SizeClass;
@@ -114,7 +118,7 @@ namespace WDE.MpqReader.Structures
 
         public CreatureModelData(IDbcIterator dbcIterator)
         {
-            Id = dbcIterator.GetInt(0);
+            Id = dbcIterator.GetUInt(0);
             Flags = dbcIterator.GetInt(1);
             ModelName = dbcIterator.GetString(2);
             SizeClass = dbcIterator.GetInt(3);
@@ -146,7 +150,7 @@ namespace WDE.MpqReader.Structures
 
         private CreatureModelData()
         {
-            Id = -1;
+            Id = 0;
             Flags = 0;
             ModelName = "";
             SizeClass = 0;
@@ -179,9 +183,8 @@ namespace WDE.MpqReader.Structures
         public static CreatureModelData Empty => new CreatureModelData();
     }
 
-    public class CreatureModelDataStore : IEnumerable<CreatureModelData>
+    public class CreatureModelDataStore : BaseDbcStore<uint, CreatureModelData>
     {
-        private Dictionary<int, CreatureModelData> store = new();
         public CreatureModelDataStore(IEnumerable<IDbcIterator> rows)
         {
             foreach (var row in rows)
@@ -190,11 +193,6 @@ namespace WDE.MpqReader.Structures
                 store[o.Id] = o;
             }
         }
-
-        public bool Contains(int id) => store.ContainsKey(id);
-        public CreatureModelData this[int id] => store[id];
-        public IEnumerator<CreatureModelData> GetEnumerator() => store.Values.GetEnumerator();
-        IEnumerator IEnumerable.GetEnumerator() => store.Values.GetEnumerator();
     }
 
     public class CreatureDisplayInfoExtra
@@ -278,9 +276,8 @@ namespace WDE.MpqReader.Structures
         public static CreatureDisplayInfoExtra Empty => new CreatureDisplayInfoExtra();
     }
 
-    public class CreatureDisplayInfoExtraStore : IEnumerable<CreatureDisplayInfoExtra>
+    public class CreatureDisplayInfoExtraStore : BaseDbcStore<uint, CreatureDisplayInfoExtra>
     {
-        private Dictionary<uint, CreatureDisplayInfoExtra> store = new();
         public CreatureDisplayInfoExtraStore(IEnumerable<IDbcIterator> rows)
         {
             foreach (var row in rows)
@@ -289,11 +286,6 @@ namespace WDE.MpqReader.Structures
                 store[o.Id] = o;
             }
         }
-
-        public bool Contains(uint id) => store.ContainsKey(id);
-        public CreatureDisplayInfoExtra this[uint id] => store[id];
-        public IEnumerator<CreatureDisplayInfoExtra> GetEnumerator() => store.Values.GetEnumerator();
-        IEnumerator IEnumerable.GetEnumerator() => store.Values.GetEnumerator();
     }
 
 

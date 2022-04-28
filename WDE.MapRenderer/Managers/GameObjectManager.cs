@@ -120,22 +120,16 @@ namespace WDE.MapRenderer.Managers
             foreach (var gameobject in gameObjectDataPerChunk[chunkX, chunkY]!)
             {
                 // check phasemask
-                if ((gameobject.PhaseMask & 1) != 1)
+                if (gameobject.PhaseMask != null && (gameobject.PhaseMask & 1) != 1)
                     continue;
 
                 var gameObjectPosition = new Vector3(gameobject.X, gameobject.Y, gameobject.Z);
-
-                t.Position = gameObjectPosition.ToOpenGlPosition();
                 float height = 0;
 
                 // if ((gameContext.CameraManager.Position - t.Position).LengthSquared() > GameObjectVisibilityDistanceSquare)
                 //     continue;
 
                 IGameObjectTemplate gotemplate = gameobjectstemplates.First(x => x.Entry == gameobject.Entry);
-
-                t.Scale = new Vector3(gotemplate.Size);
-                // TODO : apply rotation +  orientation
-                t.Rotation = Quaternion.FromEuler(0, MathUtil.RadiansToDegrees(-gameobject.Orientation), 0.0f);
 
                 // t.Rotation = new Quaternion(gameobject.Rotation0, gameobject.Rotation1, gameobject.Rotation2, gameobject.Rotation3);
                 
@@ -157,13 +151,20 @@ namespace WDE.MapRenderer.Managers
                         var instance = mdx.Task.Result;
                         height = instance.mesh.Bounds.Height / 2;
                         // position, rotation
+                        
+                        t.Position = gameObjectPosition;
+                
+                        t.Scale = new Vector3(gotemplate.Size);
+                        // TODO : apply rotation +  orientation
+                        t.Rotation = Quaternion.FromEuler(0, MathUtil.RadiansToDegrees(-gameobject.Orientation), 0.0f);
+
                         foreach (var material in instance.materials)
                             chunk.registeredEntities.Add(renderManager.RegisterStaticRenderer(instance.mesh.Handle, material, i++, t));
 
-                        t.Scale = instance.mesh.Bounds.Size /2 ;
-                        t.Position += instance.mesh.Bounds.Center;
+                        //t.Scale = instance.mesh.Bounds.Size /2 ;
+                        //t.Position += instance.mesh.Bounds.Center;
                         // t.Scale = new Vector3(instance.mesh.Bounds.Width, instance.mesh.Bounds.Depth, instance.mesh.Bounds.Height); 
-                        chunk.registeredEntities.Add(renderManager.RegisterStaticRenderer(BoxMesh.Handle, transcluentMaterial, 0, t));
+                        //chunk.registeredEntities.Add(renderManager.RegisterStaticRenderer(BoxMesh.Handle, transcluentMaterial, 0, t));
 
                         // gameContext.Engine.Ui.DrawWorldText("calibri", new Vector2(0.5f, 1f), gotemplate.Name, 2.5f, Matrix.TRS(t.Position + Vector3.Up * height, in Quaternion.Identity, in Vector3.One));
                     }
