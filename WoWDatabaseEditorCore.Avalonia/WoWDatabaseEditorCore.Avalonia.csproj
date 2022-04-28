@@ -21,6 +21,7 @@
     </ItemGroup>
     <Import Project="..\Avalonia.props" />
     <ItemGroup>
+        <PackageReference Include="Avalonia.Controls.TreeDataGrid" Version="0.10.10" />
         <PackageReference Include="Avalonia.Diagnostics" Version="$(AvaloniaVersion)" />
         <PackageReference Include="Avalonia.Controls.DataGrid" Version="$(AvaloniaVersion)" />
         <PackageReference Include="Prism.Core" Version="7.2.0.1422" />

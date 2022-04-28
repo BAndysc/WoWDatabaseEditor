@@ -9,8 +9,19 @@ namespace WDE.PacketViewer.Processing.ProcessorProviders
     {
         string Name { get; }
         string Description { get; }
-        string Extension { get; }
         ImageUri? Image => null;
+    }
+    
+    [NonUniqueProvider]
+    public interface ITextPacketDumperProvider : IPacketDumperProvider
+    {
+        string Extension { get; }
         Task<IPacketTextDumper> CreateDumper();
+    }
+    
+    [NonUniqueProvider]
+    public interface IDocumentPacketDumperProvider : IPacketDumperProvider
+    {
+        Task<IPacketDocumentDumper> CreateDumper();
     }
 }

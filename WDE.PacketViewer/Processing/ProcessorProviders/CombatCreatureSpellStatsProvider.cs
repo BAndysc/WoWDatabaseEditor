@@ -7,7 +7,7 @@ using WDE.PacketViewer.Processing.Processors;
 namespace WDE.PacketViewer.Processing.ProcessorProviders
 {
     [AutoRegister]
-    public class CombatCreatureSpellStatsProvider : IPacketDumperProvider
+    public class CombatCreatureSpellStatsProvider : ITextPacketDumperProvider
     {
         private readonly Func<SpellStatsDumper> dumper;
         public string Name => "Creature combat spell stats";

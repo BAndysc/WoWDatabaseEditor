@@ -7,7 +7,7 @@ using WDE.PacketViewer.Processing.Processors;
 namespace WDE.PacketViewer.Processing.ProcessorProviders
 {
     [AutoRegister]
-    public class GossipExtractProvider : IPacketDumperProvider
+    public class GossipExtractProvider : ITextPacketDumperProvider
     {
         private readonly Func<GossipExtractProcessor> processor;
 

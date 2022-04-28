@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Prism.Mvvm;
 using WDE.Common.Types;
@@ -9,11 +10,24 @@ namespace WDE.PacketViewer.ViewModels
     public class ProcessorViewModel : BindableBase
     {
         private readonly IPacketDumperProvider dumperProvider;
+        private readonly ITextPacketDumperProvider? textProvider;
+        private readonly IDocumentPacketDumperProvider? documentProvider;
         private bool isChecked;
 
         public ProcessorViewModel(IPacketDumperProvider dumperProvider)
         {
             this.dumperProvider = dumperProvider;
+            if (dumperProvider is ITextPacketDumperProvider textProvider)
+            {
+                this.textProvider = textProvider;
+                Extension = textProvider.Extension;
+            }
+            else if (dumperProvider is IDocumentPacketDumperProvider documentProvider)
+            {
+                this.documentProvider = documentProvider;
+            }
+            else
+                throw new Exception($"Unexpected dumper type (neither text dumper not document dumper, got: {dumperProvider.GetType()})");
         }
 
         public bool IsChecked
@@ -22,11 +36,14 @@ namespace WDE.PacketViewer.ViewModels
             set => SetProperty(ref isChecked, value);
         }
 
+        public string? Extension { get; }
         public string Name => dumperProvider.Name;
-        public string Extension => dumperProvider.Extension;
         public string? Description => dumperProvider.Description;
-        public string? Format => dumperProvider.Extension == "txt" ? "text" : dumperProvider.Extension;
+        public string? Format => Extension == "txt" ? "text" : Extension;
         public ImageUri Image => dumperProvider.Image ?? new ImageUri("Icons/document_sniff.png");
-        public Task<IPacketTextDumper> CreateProcessor() => dumperProvider.CreateDumper();
+        public Task<IPacketTextDumper> CreateTextProcessor() => textProvider!.CreateDumper();
+        public Task<IPacketDocumentDumper> CreateDocumentProcessor() => documentProvider!.CreateDumper();
+        public bool IsTextDumper => textProvider != null;
+        public bool IsDocumentDumper => documentProvider != null;
     }
 }

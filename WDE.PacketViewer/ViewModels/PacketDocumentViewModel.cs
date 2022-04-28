@@ -37,9 +37,7 @@ using WDE.PacketViewer.Processing.Processors.Utils;
 using WDE.PacketViewer.Services;
 using WDE.PacketViewer.Settings;
 using WDE.PacketViewer.Solutions;
-using WDE.PacketViewer.Utils;
 using WDE.SqlQueryGenerator;
-using WowPacketParser.Proto;
 using WowPacketParser.Proto.Processing;
 
 namespace WDE.PacketViewer.ViewModels
@@ -51,6 +49,8 @@ namespace WDE.PacketViewer.ViewModels
         private readonly IMainThread mainThread;
         private readonly IMessageBoxService messageBoxService;
         private readonly IPacketFilteringService filteringService;
+        private readonly IDocumentManager documentManager;
+        private readonly ITextDocumentService textDocumentService;
         private readonly IActionReactionProcessorCreator actionReactionProcessorCreator;
         private readonly IRelatedPacketsFinder relatedPacketsFinder;
         private readonly ISniffLoader sniffLoader;
@@ -84,6 +84,8 @@ namespace WDE.PacketViewer.ViewModels
             this.mainThread = mainThread;
             this.messageBoxService = messageBoxService;
             this.filteringService = filteringService;
+            this.documentManager = documentManager;
+            this.textDocumentService = textDocumentService;
             this.actionReactionProcessorCreator = actionReactionProcessorCreator;
             this.relatedPacketsFinder = relatedPacketsFinder;
             this.sniffLoader = sniffLoader;
@@ -192,10 +194,7 @@ namespace WDE.PacketViewer.ViewModels
                     AssertNoOnGoingTask();
                     currentActionToken = tokenSource;
 
-                    var output = await RunProcessorsThreaded(new List<ProcessorViewModel>(){processor}, tokenSource.Token).ConfigureAwait(true);
-
-                    if (output != null && !tokenSource.IsCancellationRequested)
-                        documentManager.OpenDocument(textDocumentService.CreateDocument( $"{processor.Name} ({Title})", output,  processor.Extension, true));
+                    await RunProcessorsAndOpenResults(new List<ProcessorViewModel>() { processor }, tokenSource.Token);
                 }
                 catch (Exception e)
                 {
@@ -228,15 +227,7 @@ namespace WDE.PacketViewer.ViewModels
                     AssertNoOnGoingTask();
                     currentActionToken = tokenSource;
 
-                    var output = await RunProcessorsThreaded(processors, tokenSource.Token).ConfigureAwait(true);
-
-                    if (output != null && !tokenSource.IsCancellationRequested)
-                    {
-                        var extension = processors.Select(p => p.Extension).Distinct().Count() == 1
-                            ? processors[0].Extension
-                            : "txt";
-                        documentManager.OpenDocument(textDocumentService.CreateDocument( $"{processors[0].Name} ({Title})", output,  extension, true));
-                    }
+                    await RunProcessorsAndOpenResults(processors, tokenSource.Token).ConfigureAwait(true);
                 }
                 catch (Exception e)
                 {
@@ -315,12 +306,12 @@ namespace WDE.PacketViewer.ViewModels
             {
                 var start = SelectedPacket != null ? VisiblePackets.IndexOf(SelectedPacket) : 0;
                 await Find(searchText, start, -1);
-            }, str => str is string s && !string.IsNullOrEmpty(s));
+            }, str => str is { } s && !string.IsNullOrEmpty(s));
             FindNextCommand = new AsyncAutoCommand<string>(async searchText =>
             {
                 var start = SelectedPacket != null ? VisiblePackets.IndexOf(SelectedPacket) : 0;
                 await Find(searchText, start, 1);
-            }, str => str is string s && !string.IsNullOrEmpty(s));
+            }, str => str is { } s && !string.IsNullOrEmpty(s));
 
             FindRelatedPacketsCommands = new AsyncAutoCommand(async () =>
             {
@@ -380,7 +371,7 @@ namespace WDE.PacketViewer.ViewModels
                 
                 FilterData.ExcludeEntry(vm.Entry);
                 await ApplyFilterCommand.ExecuteAsync();
-            }, vm => vm is PacketViewModel pvm && pvm.Entry != 0);
+            }, vm => vm is { } pvm && pvm.Entry != 0);
 
             IncludeEntryCommand = new AsyncAutoCommand<PacketViewModel?>(async vm =>
             {
@@ -389,7 +380,7 @@ namespace WDE.PacketViewer.ViewModels
                 
                 FilterData.IncludeEntry(vm.Entry);
                 await ApplyFilterCommand.ExecuteAsync();
-            }, vm => vm is PacketViewModel pvm && pvm.Entry != 0);
+            }, vm => vm is { } pvm && pvm.Entry != 0);
             
             ExcludeGuidCommand = new AsyncAutoCommand<PacketViewModel?>(async vm =>
             {
@@ -398,7 +389,7 @@ namespace WDE.PacketViewer.ViewModels
                 
                 FilterData.ExcludeGuid(vm.MainActor);
                 await ApplyFilterCommand.ExecuteAsync();
-            }, vm => vm is PacketViewModel pvm && pvm.MainActor != null);
+            }, vm => vm is { } pvm && pvm.MainActor != null);
             
             IncludeGuidCommand = new AsyncAutoCommand<PacketViewModel?>(async vm =>
             {
@@ -407,7 +398,7 @@ namespace WDE.PacketViewer.ViewModels
                 
                 FilterData.IncludeGuid(vm.MainActor);
                 await ApplyFilterCommand.ExecuteAsync();
-            }, vm => vm is PacketViewModel pvm && pvm.MainActor != null);
+            }, vm => vm is { } pvm && pvm.MainActor != null);
             
             ExcludeOpcodeCommand = new AsyncAutoCommand<PacketViewModel?>(async vm =>
             {
@@ -611,103 +602,64 @@ namespace WDE.PacketViewer.ViewModels
             });
         }
 
-        public async Task<string?> RunProcessorsThreaded(IList<ProcessorViewModel> processors, CancellationToken cancellationToken)
+        private async Task RunProcessorsAndOpenResults(IReadOnlyList<ProcessorViewModel> processors, CancellationToken token)
         {
-            List<(ProcessorViewModel viewModel, IPacketTextDumper dumper)> dumpers = new();
-            foreach (var processor in processors)
-                dumpers.Add((processor, await processor.CreateProcessor()));
+            var textOutput = await RunProcessorsThreaded(processors, token);
 
-            if (dumpers.Any(d => d.dumper.RequiresSplitUpdateObject))
+            if (token.IsCancellationRequested)
+                return;
+            
+            var documents = await RunDocumentProcessorsThreaded(processors, token);
+            
+            if (token.IsCancellationRequested)
+                return;
+
+            if (textOutput != null)
+            {
+                var name = processors.FirstOrDefault(p => p.IsTextDumper)?.Name;
+                var extension = processors.Where(p => p.IsTextDumper)
+                    .Select(p => p.Extension).Distinct().Count() == 1
+                    ? processors.First(p => p.IsTextDumper).Extension
+                    : "txt";
+                documentManager.OpenDocument(textDocumentService.CreateDocument( $"{name} ({Title})", textOutput,  extension!, true));
+            }
+
+            if (documents != null)
+            {
+                foreach (var doc in documents)
+                    documentManager.OpenDocument(doc);
+            }
+        }
+
+        public async Task<string?> RunProcessorsThreaded(IReadOnlyList<ProcessorViewModel> processors, CancellationToken cancellationToken)
+        {
+            List<(ProcessorViewModel viewModel, IPacketTextDumper dumper)> textDumpers = new();
+            foreach (var processor in processors)
+            {
+                if (processor.IsTextDumper)
+                   textDumpers.Add((processor, await processor.CreateTextProcessor()));
+            }
+
+            if (textDumpers.Any(d => d.dumper.RequiresSplitUpdateObject))
                 if (!await EnsureSplitOrDismiss())
                     return null;
 
             return await Task.Run(() =>
             {
                 StringBuilder output = new();
-                var packetsCount = (long)FilteredPackets.Count * processors.Count;
-                long i = 0;
-                foreach (var pair in dumpers)
+                float totalProgress = textDumpers.Count;
+                float processed = 0;
+                foreach (var pair in textDumpers)
                 {
-                    // ReSharper disable once SuspiciousTypeConversion.Global
-                    if (pair.dumper is ITwoStepPacketBoolProcessor preprocessor)
+                    RunProcessor(cancellationToken, pair.dumper, new Progress<float>(i =>
                     {
-                        packetsCount *= 2;
-                        foreach (var packet in FilteredPackets)
-                        {
-                            i++;
-                            preprocessor.PreProcess(packet.Packet);
-                            if ((i % 100) == 0)
-                            {
-                                if (cancellationToken.IsCancellationRequested)
-                                    break;
-                                Report(i * 1.0f / packetsCount);
-                            }
-                        }
-                    }
-                    
-                    // ReSharper disable once SuspiciousTypeConversion.Global
-                    if (pair.dumper is IUnfilteredTwoStepPacketBoolProcessor unfilteredPreprocessor)
-                    {
-                        var all = splitUpdate ? AllPacketsSplit! : AllPackets!;
-                        packetsCount += all.Count;
-                        for (var index = 0; index < all.Count; index++)
-                        {
-                            var packet = all[index];
-                            i++;
-                            if (!unfilteredPreprocessor.UnfilteredPreProcess(packet.Packet))
-                            {
-                                i += all.Count - index;
-                                break;
-                            }
-                            if ((i % 100) == 0)
-                            {
-                                if (cancellationToken.IsCancellationRequested)
-                                    break;
-                                Report(i * 1.0f / packetsCount);
-                            }
-                        }
-                    }
-
-                    if (pair.dumper is IUnfilteredPacketProcessor unfilteredPacketProcessor)
-                    {
-                        int j = 0;
-                        var all = splitUpdate ? AllPacketsSplit! : AllPackets!;
-                        for (var index = 0; index < FilteredPackets.Count; index++)
-                        {
-                            var packet = FilteredPackets[index];
-
-                            while (j < all.Count && all[j].Id < packet.Id)
-                            {
-                                unfilteredPacketProcessor.ProcessUnfiltered(all[j++].Packet);
-                            }
-                                
-                            i++;
-                            j++;
-                            pair.dumper.Process(packet.Packet);
-                            if ((i % 100) == 0)
-                            {
-                                if (cancellationToken.IsCancellationRequested)
-                                    break;
-                                Report(i * 1.0f / packetsCount);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        foreach (var packet in FilteredPackets)
-                        {
-                            i++;
-                            pair.dumper.Process(packet.Packet);
-                            if ((i % 100) == 0)
-                            {
-                                if (cancellationToken.IsCancellationRequested)
-                                    break;
-                                Report(i * 1.0f / packetsCount);
-                            }
-                        }
-                    }
+                        Report((processed + i) / totalProgress);
+                    }));
+                    processed += 1;
 
                     Report(-1);
+
+                    pair.dumper.Process().Wait(cancellationToken);
                     
                     var task = pair.dumper.Generate();
                     task.Wait(cancellationToken);
@@ -722,6 +674,138 @@ namespace WDE.PacketViewer.ViewModels
 
                 return output.ToString();
             }, cancellationToken).ConfigureAwait(true);
+        }
+
+        public async Task<List<IDocument>?> RunDocumentProcessorsThreaded(IReadOnlyList<ProcessorViewModel> processors, CancellationToken cancellationToken)
+        {
+            List<IDocument> documents = new();
+            List<(ProcessorViewModel viewModel, IPacketDocumentDumper dumper)> documentsDumpers = new();
+            foreach (var processor in processors)
+            {
+                if (processor.IsDocumentDumper)
+                    documentsDumpers.Add((processor, await processor.CreateDocumentProcessor()));
+            }
+
+            if (documentsDumpers.Any(d => d.dumper.RequiresSplitUpdateObject))
+                if (!await EnsureSplitOrDismiss())
+                    return null;
+
+            await Task.Run(() =>
+            {
+                float totalProgress = documentsDumpers.Count;
+                float processed = 0;
+                foreach (var pair in documentsDumpers)
+                {
+                    RunProcessor(cancellationToken, pair.dumper, new Progress<float>(i =>
+                    {
+                        Report((processed + i) / totalProgress);
+                    }));
+                    processed += 1;
+
+                    if (cancellationToken.IsCancellationRequested)
+                        return;
+                    
+                    Report(-1);
+
+                    pair.dumper.Process().Wait(cancellationToken);
+                }
+            }, cancellationToken).ConfigureAwait(true);
+            
+            if (cancellationToken.IsCancellationRequested)
+                return null;
+            
+            foreach (var pair in documentsDumpers)
+                documents.Add(pair.dumper.Generate());
+
+            if (cancellationToken.IsCancellationRequested)
+                return null;
+            
+            return documents;
+        }
+
+        private void RunProcessor(CancellationToken cancellationToken, IPacketProcessor<bool> dumper, IProgress<float> progress)
+        {
+            var packetsCount = (long)FilteredPackets.Count;
+            long processed = 0;
+            // ReSharper disable once SuspiciousTypeConversion.Global
+            if (dumper is ITwoStepPacketBoolProcessor preprocessor)
+            {
+                packetsCount *= 2;
+                foreach (var packet in FilteredPackets)
+                {
+                    processed++;
+                    preprocessor.PreProcess(packet.Packet);
+                    if ((processed % 100) == 0)
+                    {
+                        if (cancellationToken.IsCancellationRequested)
+                            break;
+                        progress.Report(processed * 1.0f / packetsCount);
+                    }
+                }
+            }
+
+            // ReSharper disable once SuspiciousTypeConversion.Global
+            if (dumper is IUnfilteredTwoStepPacketBoolProcessor unfilteredPreprocessor)
+            {
+                var all = splitUpdate ? AllPacketsSplit! : AllPackets;
+                packetsCount += all.Count;
+                for (var index = 0; index < all.Count; index++)
+                {
+                    var packet = all[index];
+                    processed++;
+                    if (!unfilteredPreprocessor.UnfilteredPreProcess(packet.Packet))
+                    {
+                        processed += all.Count - index;
+                        break;
+                    }
+
+                    if ((processed % 100) == 0)
+                    {
+                        if (cancellationToken.IsCancellationRequested)
+                            break;
+                        Report(processed * 1.0f / packetsCount);
+                    }
+                }
+            }
+
+            if (dumper is IUnfilteredPacketProcessor unfilteredPacketProcessor)
+            {
+                int j = 0;
+                var all = splitUpdate ? AllPacketsSplit! : AllPackets;
+                for (var index = 0; index < FilteredPackets.Count; index++)
+                {
+                    var packet = FilteredPackets[index];
+
+                    while (j < all.Count && all[j].Id < packet.Id)
+                    {
+                        unfilteredPacketProcessor.ProcessUnfiltered(all[j++].Packet);
+                    }
+
+                    processed++;
+                    j++;
+                    dumper.Process(packet.Packet);
+                    if ((processed % 100) == 0)
+                    {
+                        if (cancellationToken.IsCancellationRequested)
+                            break;
+                        Report(processed * 1.0f / packetsCount);
+                    }
+                }
+            }
+            else
+            {
+                foreach (var packet in FilteredPackets)
+                {
+                    processed++;
+                    dumper.Process(packet.Packet);
+                    if ((processed % 100) == 0)
+                    {
+                        if (cancellationToken.IsCancellationRequested)
+                            break;
+                        Report(processed * 1.0f / packetsCount);
+                    }
+                }
+            }
         }
 
         public void Report(float value)
@@ -792,7 +876,7 @@ namespace WDE.PacketViewer.ViewModels
         {
             try
             {
-                var all = splitUpdate ? AllPacketsSplit! : AllPackets!;
+                var all = splitUpdate ? AllPacketsSplit! : AllPackets;
                 return await Task.Run(() =>
                     relatedPacketsFinder.Find(filteredPackets, all, start, token), token);
             }

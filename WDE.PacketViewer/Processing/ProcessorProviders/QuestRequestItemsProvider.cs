@@ -9,7 +9,7 @@ using WDE.PacketViewer.Processing.Processors.Utils;
 namespace WDE.PacketViewer.Processing.ProcessorProviders;
 
 [AutoRegister]
-public class QuestRequestItemsProvider : IPacketDumperProvider
+public class QuestRequestItemsProvider : ITextPacketDumperProvider
 {
     private readonly Func<QuestRequestItemsProcessor> creator;
 

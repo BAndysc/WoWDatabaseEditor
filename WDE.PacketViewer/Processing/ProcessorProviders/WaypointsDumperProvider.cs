@@ -7,7 +7,7 @@ using WDE.PacketViewer.Processing.Processors.Utils;
 namespace WDE.PacketViewer.Processing.ProcessorProviders
 {
     [AutoRegister]
-    public class WaypointsDumperProvider : IPacketDumperProvider
+    public class WaypointsDumperProvider : ITextPacketDumperProvider
     {
         public WaypointsDumperProvider()
         {

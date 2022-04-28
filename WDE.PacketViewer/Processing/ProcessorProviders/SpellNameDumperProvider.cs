@@ -8,7 +8,7 @@ using WDE.PacketViewer.Processing.Processors;
 namespace WDE.PacketViewer.Processing.ProcessorProviders
 {
     [AutoRegister]
-    public class SpellNameDumperProvider : IPacketDumperProvider
+    public class SpellNameDumperProvider : ITextPacketDumperProvider
     {
         private readonly Func<SpellNameProcessor> processor;
 

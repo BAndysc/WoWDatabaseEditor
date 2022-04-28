@@ -7,7 +7,7 @@ using WDE.PacketViewer.Processing.Processors;
 namespace WDE.PacketViewer.Processing.ProcessorProviders
 {
     [AutoRegister]
-    public class QuestPacketRangesProvider : IPacketDumperProvider
+    public class QuestPacketRangesProvider : ITextPacketDumperProvider
     {
         private readonly Func<QuestPacketRangesProcessor> creator;
 
