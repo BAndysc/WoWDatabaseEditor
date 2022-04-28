@@ -19,6 +19,7 @@ namespace WDE.MPQ
         public int SectorSize { get; private set; }
 
         public IMpqUserDataHeader UserDataHeader { get; private set; }
+
         public ArchiveHeader ArchiveHeader { get; private set; }
         public IMpqHashTable HashTable { get; private set; }
         public IList<BlockTableEntry> BlockTable { get; private set; }
@@ -29,6 +30,25 @@ namespace WDE.MPQ
         private bool _cleanupStreamOnDispose;
         private IList<string>? _knownFiles;
 
+        public IMpqArchive Clone()
+        {
+            return new MpqArchive(this);
+        }
+
+        protected MpqArchive(MpqArchive archive)
+        {
+            this.path = archive.path;
+            
+            _reader = new BinaryReader(File.OpenRead(path), Encoding.UTF8);
+            _cleanupStreamOnDispose = archive._cleanupStreamOnDispose;
+
+            UserDataHeader = archive.UserDataHeader;
+            SectorSize = archive.SectorSize;
+            BlockTable = archive.BlockTable;
+            ArchiveHeader = archive.ArchiveHeader;
+            HashTable = archive.HashTable;
+        }
+            
         protected MpqArchive(string path, Stream stream, bool cleanupStreamOnDispose)
         {
             this.path = path;
@@ -44,15 +64,15 @@ namespace WDE.MPQ
 
             SectorSize = 512 << ArchiveHeader.SectorSizeShift;
 
-            var hashTableEntries = ReadTableEntires<HashTableEntry>("(hash table)", ArchiveHeader.HashTableOffset,
+            var hashTableEntries = ReadTableEntries<HashTableEntry>("(hash table)", ArchiveHeader.HashTableOffset,
                 ArchiveHeader.HashTableEntryCount);
-            var blockTableEntries = ReadTableEntires<BlockTableEntry>("(block table)", ArchiveHeader.BlockTableOffset,
+            var blockTableEntries = ReadTableEntries<BlockTableEntry>("(block table)", ArchiveHeader.BlockTableOffset,
                 ArchiveHeader.BlockTableEntryCount);
 
             BlockTable = blockTableEntries.ToList().AsReadOnly();
-            HashTable = new MpqHashTable(hashTableEntries.ToArray());
+            HashTable = new MpqHashTable(hashTableEntries);
         }
-
+        
         public static IMpqUserDataHeader? ParseUserDataHeader(string path)
         {
             if (path == null) throw new ArgumentNullException("path");

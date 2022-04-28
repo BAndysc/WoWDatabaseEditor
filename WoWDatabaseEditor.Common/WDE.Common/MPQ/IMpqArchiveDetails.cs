@@ -13,7 +13,6 @@ namespace WDE.Common.MPQ
     }
     public interface IMpqHashTable
     {
-        IList<HashTableEntry> Entries { get; }
         HashTableEntry? FindEntry(ulong hashA, ulong hashB);
     }
 

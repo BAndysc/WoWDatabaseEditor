@@ -28,8 +28,10 @@ namespace WDE.MPQ.Parsing
                 seed1 = ((~seed1 << 0x15) + 0x11111111) | (seed1 >> 0x0b);
                 seed2 = value + seed2 + (seed2 << 5) + 3;
 
-                var bytes = BitConverter.GetBytes(value);
-                Array.Copy(bytes, 0, data, i, sizeof (uint));
+                data[i] = (byte)((value) & 0xFF);
+                data[i + 1] = (byte)((value >> 8) & 0xFF);
+                data[i + 2] = (byte)((value >> 16) & 0xFF);
+                data[i + 3] = (byte)((value >> 24) & 0xFF);
             }
         }
 
