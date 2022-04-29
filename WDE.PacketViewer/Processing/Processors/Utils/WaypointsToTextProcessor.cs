@@ -71,8 +71,7 @@ namespace WDE.PacketViewer.Processing.Processors.Utils
                         sb.AppendLine("   Segment " + segmentId++);
                         if (segment.JumpGravity.HasValue)
                         {
-                            Debug.Assert(segment.Waypoints.Count == 1);
-                            var p = segment.Waypoints[0];
+                            var p = segment.Waypoints[^1];
                             sb.AppendLine($"    jump to ({p.X}, {p.Y}, {p.Z}) gravity: {segment.JumpGravity.Value} move time: {segment.MoveTime}");
                         }
                         else
