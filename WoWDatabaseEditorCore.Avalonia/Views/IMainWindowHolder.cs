@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Avalonia.Controls;
@@ -34,13 +35,22 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
         public Task<T> ShowDialog<T>(Window window)
         {
             var parent = WindowStack.Peek();
-            window.Closed += (sender, args) =>
-            {
-                Debug.Assert(WindowStack.Peek() == window);
-                WindowStack.Pop();
-            };
+            window.Closed += WindowOnClosed;
             WindowStack.Push(window);
             return window.ShowDialog<T>(parent);
+        }
+
+        private void WindowOnClosed(object? sender, EventArgs e)
+        {
+            var window = (sender as Window)!;
+            if (!ReferenceEquals(WindowStack.Peek(), window))
+            {
+                Debug.Assert(false, "Dialog window closed in wrong order?!!");
+                var stackTrace = new StackTrace(true);
+                Console.WriteLine("Dialog window closed in wrong order?!\n" + stackTrace);
+            }
+            WindowStack.Pop();
+            window.Closed -= WindowOnClosed;
         }
     }
 }
