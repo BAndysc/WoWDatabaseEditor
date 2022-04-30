@@ -667,12 +667,20 @@ namespace WDE.DbcStore
                 }
 
                 if (count == 1)
-                    return AreaStore[row.GetUInt(start)];
+                {
+                    if (AreaStore.TryGetValue(row.GetUInt(start), out var name))
+                        return name;
+                    return "Area " + row.GetUInt(start);
+                }
                 
                 StringBuilder sb = new();
                 for (int i = start; i < start + count; ++i)
                 {
-                    sb.Append(AreaStore[row.GetUInt(i)]);
+                    if (AreaStore.TryGetValue(row.GetUInt(start), out var name))
+                        sb.Append(name);
+                    else
+                        sb.Append("Area " + row.GetUInt(i));
+                    
                     if (i != start + count - 1)
                         sb.Append(", ");
                 }
