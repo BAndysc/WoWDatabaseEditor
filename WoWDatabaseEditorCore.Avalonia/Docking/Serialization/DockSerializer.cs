@@ -84,12 +84,72 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking.Serialization
 
             if (serializedDock.Children == null)
                 return;
+
+            double totalProportion = 0;
+            int proportionalDockables = 0;
             
             foreach (var dockable in serializedDock.Children)
             {
                 var deserialized = DeserializeDockable(dockable);
+
+                if (deserialized is IDock d)
+                {
+                    totalProportion += d.Proportion;
+                    proportionalDockables++;
+                }
+                
                 if (deserialized != null)
                     dock.VisibleDockables.Add(deserialized);
+            }
+
+            if (proportionalDockables > 0)
+            {
+                // shrink too big docks
+                if (totalProportion > 1)
+                {
+                    var surplusProportion = totalProportion - 1;
+                    foreach (var visible in dock.VisibleDockables)
+                    {
+                        if (visible is IDock d)
+                        {
+                            d.Proportion -= surplusProportion * d.Proportion / totalProportion;
+                        }
+                    }
+                }
+            
+                // enlarge too small docks
+                var minProportionPerDockable = Math.Min(0.025, 1.0 / proportionalDockables);
+                double additionalProportionToRemove = 0;
+                double docksBigEnoughSize = 0;
+                int docksTooSmall = 0;
+                int docksBigEnough = 0;
+                foreach (var visible in dock.VisibleDockables)
+                {
+                    if (visible is IDock d)
+                    {
+                        if (d.Proportion < minProportionPerDockable)
+                        {
+                            docksTooSmall++;
+                            additionalProportionToRemove = minProportionPerDockable - d.Proportion;
+                        }
+                        else
+                        {
+                            docksBigEnoughSize += d.Proportion;
+                            docksBigEnough++;
+                        }
+                    }
+                }
+
+                foreach (var visible in dock.VisibleDockables)
+                {
+                    if (visible is IDock d)
+                    {
+                        if (d.Proportion < minProportionPerDockable)
+                            d.Proportion = minProportionPerDockable;
+                        else
+                            d.Proportion -= additionalProportionToRemove * (d.Proportion / docksBigEnoughSize);
+                    }
+                }
             }
         }
 
