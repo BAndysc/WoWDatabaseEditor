@@ -135,20 +135,29 @@ namespace TheEngine.Coroutines
             var inactive = 0;
             for (int i = coroutines.Count - 1; i >= 0; --i)
             {
-                if (coroutines[i].Active)
+                try
                 {
-                    active++;
-                    if (!CoroutineStep(coroutines[i]))
+                    if (coroutines[i].Active)
+                    {
+                        active++;
+                        if (!CoroutineStep(coroutines[i]))
+                            coroutines.RemoveAt(i);
+                    }
+                    else if (coroutines[i].NestedException != null)
+                    {
+                        if (coroutines[i].Parent != null && !coroutines[i].Parent.IgnoreNestedExceptions)
+                            coroutines[i].Parent.NestedException = coroutines[i].NestedException; // propagate
                         coroutines.RemoveAt(i);
+                    }
+                    else
+                        inactive++;
                 }
-                else if (coroutines[i].NestedException != null)
+                catch (Exception e)
                 {
-                    if (coroutines[i].Parent != null && !coroutines[i].Parent.IgnoreNestedExceptions)
-                        coroutines[i].Parent.NestedException = coroutines[i].NestedException; // propagate
+                    Console.WriteLine("Exception in a coroutine. The corotuine will be removed!");
+                    Console.WriteLine(e);
                     coroutines.RemoveAt(i);
                 }
-                else
-                    inactive++;
             }
         }
     }

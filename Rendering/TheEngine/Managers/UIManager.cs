@@ -15,6 +15,7 @@ namespace TheEngine.Managers
     public class UIManager : IUIManager, System.IDisposable
     {
         private readonly Engine engine;
+        private readonly ICameraManager cameraManager;
         private readonly IEntityManager entityManager;
         private readonly ShaderHandle textShader;
         private readonly Material material;
@@ -33,6 +34,7 @@ namespace TheEngine.Managers
             public Vector2 pivot;
             public string text;
             public float fontSize;
+            public float visibilityDistanceSquare;
         }
         
         private Archetype persistentTextArchetype;
@@ -41,6 +43,7 @@ namespace TheEngine.Managers
         {
             this.engine = engine;
             entityManager = engine.EntityManager;
+            cameraManager = engine.CameraManager;
             persistentTextArchetype = entityManager.NewArchetype()
                 .WithManagedComponentData<DrawTextData>()
                 .WithComponentData<LocalToWorld>();
@@ -91,13 +94,15 @@ namespace TheEngine.Managers
 
         internal void Render()
         {
+            var cameraPos = cameraManager.MainCamera.Transform.Position;
             persistentTextArchetype.ForEach<LocalToWorld, DrawTextData>((itr, start, end, matrices, datas) =>
             {
                 for (int i = start; i < end; ++i)
                 {
                     var data = datas[i];
                     var matrix = matrices[i];
-                    DrawWorldText(data.font, data.pivot, data.text, data.fontSize, matrix);
+                    if ((matrix.Position - cameraPos).LengthSquared() < data.visibilityDistanceSquare)
+                        DrawWorldText(data.font, data.pivot, data.text, data.fontSize, matrix);
                 }
             });
         }
@@ -115,7 +120,7 @@ namespace TheEngine.Managers
             engine.RenderManager.RenderInstancedIndirect(quad, material, 0, 1);
         }
 
-        public Entity DrawPersistentWorldText(string font, Vector2 pivot, string text, float fontSize, Matrix localToWorld)
+        public Entity DrawPersistentWorldText(string font, Vector2 pivot, string text, float fontSize, Matrix localToWorld, float visibilityDistance)
         {
             var entity = entityManager.CreateEntity(persistentTextArchetype);
 
@@ -124,7 +129,8 @@ namespace TheEngine.Managers
                 font = font,
                 fontSize = fontSize,
                 pivot = pivot,
-                text = text
+                text = text,
+                visibilityDistanceSquare = visibilityDistance * visibilityDistance
             });
             entityManager.GetComponent<LocalToWorld>(entity).Matrix = localToWorld;
             
