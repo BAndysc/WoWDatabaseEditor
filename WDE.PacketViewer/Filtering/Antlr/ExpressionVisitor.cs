@@ -9,10 +9,13 @@ namespace WDE.PacketViewer.Filtering.Antlr
         private PacketViewModel? packet;
         private static IsPacketPlayerProcessor isPlayerProcessor = new();
         private IsPacketSpecificPlayerProcessor isPacketSpecificPlayerProcessor;
+        private readonly PacketViewModelStore store;
 
-        public ExpressionVisitor(IsPacketSpecificPlayerProcessor isPacketSpecificPlayerProcessor)
+        public ExpressionVisitor(IsPacketSpecificPlayerProcessor isPacketSpecificPlayerProcessor,
+            PacketViewModelStore store)
         {
             this.isPacketSpecificPlayerProcessor = isPacketSpecificPlayerProcessor;
+            this.store = store;
         }
 
         public void SetContext(PacketViewModel packet)
@@ -132,7 +135,7 @@ namespace WDE.PacketViewer.Filtering.Antlr
                     case "opcode":
                         return packet.Opcode;
                     case "text":
-                        return packet.Text;
+                        return store.GetText(packet);
                     case "id":
                         return (long) packet.Id;
                     case "original_id":

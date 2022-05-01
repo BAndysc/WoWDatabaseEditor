@@ -23,7 +23,8 @@ namespace WDE.PacketViewer.ViewModels
 
         private UniversalGuid? playerGuid;
 
-        public PacketViewModelFactory(IDatabaseProvider databaseProvider, ISpellStore spellStore)
+        public PacketViewModelFactory(IDatabaseProvider databaseProvider, 
+            ISpellStore spellStore)
         {
             this.databaseProvider = databaseProvider;
             this.spellStore = spellStore;

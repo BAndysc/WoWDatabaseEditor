@@ -11,7 +11,6 @@ namespace WDE.PacketViewer.ViewModels
         public int OriginalId { get; }
         public int Id => Packet.BaseData.Number;
         public string Opcode => Packet.BaseData.Opcode;
-        public string Text => Packet.BaseData.StringData;
         public PacketHolder Packet { get; }
         public DateTime Time => Packet.BaseData.Time.ToDateTime();
 

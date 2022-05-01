@@ -16,7 +16,7 @@ namespace WDE.PacketViewer.Filtering
     [SingleInstance]
     public class ParallelPacketFilteringService : IPacketFilteringService
     {
-        private bool AcceptFilterData(PacketViewModel packet, IReadOnlyFilterData filterData)
+        private bool AcceptFilterData(PacketViewModelStore store, PacketViewModel packet, IReadOnlyFilterData filterData)
         {
             if (filterData.ForceIncludePacketNumbers != null)
             {
@@ -79,7 +79,7 @@ namespace WDE.PacketViewer.Filtering
             {
                 foreach (var guid in filterData.IncludedGuids)
                 {
-                    if ((packet.MainActor?.Equals(guid) ?? false) || packet.Text.Contains(guid.ToHexString()))
+                    if ((packet.MainActor?.Equals(guid) ?? false) || store.GetText(packet).Contains(guid.ToHexString()))
                         return true;
                 }
 
@@ -89,7 +89,7 @@ namespace WDE.PacketViewer.Filtering
             {
                 foreach (var guid in filterData.ExcludedGuids)
                 {
-                    if (packet.Text.Contains(guid.ToHexString()))
+                    if (store.GetText(packet).Contains(guid.ToHexString()))
                         return false;
                 }
 
@@ -100,6 +100,7 @@ namespace WDE.PacketViewer.Filtering
         }
         
         public async Task<ObservableCollection<PacketViewModel>?> Filter(IList<PacketViewModel> all, 
+            PacketViewModelStore store,
             string filter, 
             IReadOnlyFilterData? filterData,
             CancellationToken cancellationToken,
@@ -124,7 +125,7 @@ namespace WDE.PacketViewer.Filtering
                     {
                         foreach (var packet in all)
                         {
-                            if (AcceptFilterData(packet, filterData))
+                            if (AcceptFilterData(store, packet, filterData))
                                 filtered.Add(packet);
                         }
                     }
@@ -142,13 +143,13 @@ namespace WDE.PacketViewer.Filtering
                     int CPU = j;
                     tasks[j] = Task.Run(() =>
                     {
-                        var evaluator = new DatabaseExpressionEvaluator(filter, playerLogin?.PlayerGuid ?? new UniversalGuid());
+                        var evaluator = new DatabaseExpressionEvaluator(filter, playerLogin?.PlayerGuid ?? new UniversalGuid(), store);
                         var partialResult = new List<PacketViewModel>(packetsPerThread);
                         var upTo = CPU == threads - 1 ? count : (CPU + 1) * packetsPerThread;
                     
                         for (int index = CPU * packetsPerThread; index < upTo; ++index)
                         {
-                            if (filterData == null || AcceptFilterData(all[index], filterData))
+                            if (filterData == null || AcceptFilterData(store, all[index], filterData))
                             {
                                 if (evaluator.Evaluate(all[index]) is true)
                                     partialResult.Add(all[index]);

@@ -28,6 +28,7 @@ namespace WDE.PacketViewer.PacketParserIntegration
         ConnectionIndexes,
         Fusion,
         UniversalProto,
-        UniversalProtoWithText
+        UniversalProtoWithText,
+        UniversalProtoWithSeparateText
     }
 }

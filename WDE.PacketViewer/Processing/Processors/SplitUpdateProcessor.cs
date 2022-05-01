@@ -146,7 +146,7 @@ namespace WDE.PacketViewer.Processing.Processors
                 fake.Destroyed.Add(destroyed);
                 yield return (new PacketHolder()
                 {
-                    BaseData = new PacketBase(basePacket){StringData = GenerateText(basePacket, destroyed.Text)},
+                    BaseData = new PacketBase(basePacket){StringData = GenerateText(basePacket, destroyed.Text), TextStartOffset = basePacket.TextStartOffset, TextLength = basePacket.TextLength},
                     UpdateObject = fake
                 }, basePacket.Number);
             }
@@ -157,7 +157,7 @@ namespace WDE.PacketViewer.Processing.Processors
                 fake.OutOfRange.Add(outOfRange);
                 yield return (new PacketHolder()
                 {
-                    BaseData = new PacketBase(basePacket){StringData = GenerateText(basePacket, outOfRange.Text)},
+                    BaseData = new PacketBase(basePacket){StringData = GenerateText(basePacket, outOfRange.Text), TextStartOffset = basePacket.TextStartOffset, TextLength = basePacket.TextLength},
                     UpdateObject = fake
                 }, basePacket.Number);
             }
@@ -168,7 +168,7 @@ namespace WDE.PacketViewer.Processing.Processors
                 fake.Created.Add(created);
                 yield return (new PacketHolder()
                 {
-                    BaseData = new PacketBase(basePacket){StringData = GenerateText(basePacket, created.Text)},
+                    BaseData = new PacketBase(basePacket){StringData = GenerateText(basePacket, created.Text), TextStartOffset = basePacket.TextStartOffset, TextLength = basePacket.TextLength},
                     UpdateObject = fake
                 }, basePacket.Number);
             }
@@ -179,7 +179,7 @@ namespace WDE.PacketViewer.Processing.Processors
                 fake.Updated.Add(updated);
                 yield return (new PacketHolder()
                 {
-                    BaseData = new PacketBase(basePacket){StringData = GenerateText(basePacket, updated.Text)},
+                    BaseData = new PacketBase(basePacket){StringData = GenerateText(basePacket, updated.Text), TextStartOffset = basePacket.TextStartOffset, TextLength = basePacket.TextLength},
                     UpdateObject = fake
                 }, basePacket.Number);
             }

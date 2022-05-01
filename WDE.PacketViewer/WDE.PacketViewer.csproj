@@ -17,6 +17,7 @@
     </PropertyGroup>
     <Import Project="..\Module.props" />    
     <ItemGroup>
+        <PackageReference Include="Nito.AsyncEx.Coordination" Version="5.1.2" />
         <PackageReference Include="System.Runtime.Experimental" Version="6.0.0" />
 
         <PackageReference Include="Antlr4.Runtime.Standard">

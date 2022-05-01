@@ -13,6 +13,7 @@ namespace WDE.PacketViewer.Filtering
     public interface IPacketFilteringService
     {
         Task<ObservableCollection<PacketViewModel>?> Filter(IList<PacketViewModel> all, 
+            PacketViewModelStore store,
             string filter, 
             IReadOnlyFilterData? filterData,
             CancellationToken cancellationToken,

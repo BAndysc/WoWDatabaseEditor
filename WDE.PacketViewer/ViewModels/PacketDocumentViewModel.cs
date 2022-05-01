@@ -98,6 +98,7 @@ namespace WDE.PacketViewer.ViewModels
             FilterText = nativeTextDocumentCreator();
             SelectedPacketPreview = nativeTextDocumentCreator();
             SelectedPacketPreview.DisableUndo();
+            packetStore = AutoDispose(new PacketViewModelStore(solutionItem.File));
             Watch(this, t => t.FilteringProgress, nameof(ProgressUnknown));
 
             AutoDispose(history.AddHandler(new SelectedPacketHistory(this)));
@@ -138,7 +139,7 @@ namespace WDE.PacketViewer.ViewModels
                     int count = FilteredPackets.Count;
                     foreach (var packet in FilteredPackets)
                     {
-                        await writer.WriteLineAsync(packet.Text);
+                        await writer.WriteLineAsync(await packetStore.GetTextAsync(packet));
                         if ((i % 100) == 0)
                             Report(i * 1.0f / count);
                     }
@@ -162,7 +163,7 @@ namespace WDE.PacketViewer.ViewModels
             On(() => SelectedPacket, doc =>
             {
                 if (doc != null)
-                    SelectedPacketPreview.FromString(doc.Text);
+                    SelectedPacketPreview.FromString(packetStore.GetText(doc));
             });
 
             On(() => SplitUpdate, _ =>
@@ -285,7 +286,8 @@ namespace WDE.PacketViewer.ViewModels
                 var searchToLower = searchText.ToLower();
                 foreach (var i in GetFindEnumerator(start, count, direction, true))
                 {
-                    if (VisiblePackets[i].Text.Contains(searchToLower, StringComparison.InvariantCultureIgnoreCase))
+                    var text = await packetStore.GetTextAsync(VisiblePackets[i]);
+                    if (text.Contains(searchToLower, StringComparison.InvariantCultureIgnoreCase))
                     {
                         SelectedPacket = VisiblePackets[i];
                         return;
@@ -614,7 +616,7 @@ namespace WDE.PacketViewer.ViewModels
             if (token.IsCancellationRequested)
                 return;
 
-            if (textOutput != null)
+            if (textOutput != null && !string.IsNullOrEmpty(textOutput))
             {
                 var name = processors.FirstOrDefault(p => p.IsTextDumper)?.Name;
                 var extension = processors.Where(p => p.IsTextDumper)
@@ -824,7 +826,9 @@ namespace WDE.PacketViewer.ViewModels
             try
             {
                 var packets = await sniffLoader.LoadSniff(solutionItem.File, solutionItem.CustomVersion, currentActionToken.Token, this);
-
+                if (!packetStore.Load((DumpFormatType)packets.DumpType))
+                    await messageBoxService.SimpleDialog("Error", "Failed to load packet text output", "Failed to load _parsed.txt output file. Without this file, text output will be missing in the packets.");
+                
                 if (currentActionToken.IsCancellationRequested)
                 {
                     LoadingInProgress = false;
@@ -908,7 +912,7 @@ namespace WDE.PacketViewer.ViewModels
             try
             {
                 var previouslySelected = selectedPacket;
-                var result = await filteringService.Filter(splitUpdate && AllPacketsSplit != null ? AllPacketsSplit : AllPackets, DisableFilters ? "" : filter, DisableFilters ? null : FilterData, tokenSource.Token, this);
+                var result = await filteringService.Filter(splitUpdate && AllPacketsSplit != null ? AllPacketsSplit : AllPackets, packetStore, DisableFilters ? "" : filter, DisableFilters ? null : FilterData, tokenSource.Token, this);
                 if (result != null)
                 {
                     FilteredPackets = result;
@@ -985,6 +989,8 @@ namespace WDE.PacketViewer.ViewModels
         }
 
         private ActionReactionProcessor? actionReactionProcessor;
+
+        private PacketViewModelStore packetStore;
         
         private ObservableCollection<PacketViewModel> filteredPackets;
         public ObservableCollection<PacketViewModel> FilteredPackets

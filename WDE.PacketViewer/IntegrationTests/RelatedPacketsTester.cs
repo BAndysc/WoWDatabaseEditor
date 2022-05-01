@@ -72,7 +72,9 @@ namespace WDE.PacketViewer.IntegrationTests
         
         public async Task RunSingleTestCase(string basePath, RelatedPacketsTestCaseGroup testCaseGroup)
         {
-            var sniff = await sniffLoader.LoadSniff(Path.Combine(basePath, testCaseGroup.SniffFilePath), null, CancellationToken.None, new Progress<float>());
+            var sniffPath = Path.Combine(basePath, testCaseGroup.SniffFilePath);
+            var sniff = await sniffLoader.LoadSniff(sniffPath, null, CancellationToken.None, new Progress<float>());
+            var store = new PacketViewModelStore(sniffPath);
             var splitter = new SplitUpdateProcessor(new GuidExtractorProcessor());
             List<PacketViewModel> split = new();
             foreach (var packet in sniff.Packets_)
@@ -94,7 +96,7 @@ namespace WDE.PacketViewer.IntegrationTests
             {
                 try
                 {
-                    TestSingle(@group, split);
+                    TestSingle(store, @group, split);
                 }
                 catch (Exception e)
                 {
@@ -110,10 +112,10 @@ namespace WDE.PacketViewer.IntegrationTests
             }
         }
 
-        private void TestSingle(RelatedPacketsTestCase @group, List<PacketViewModel> split)
+        private void TestSingle(PacketViewModelStore store, RelatedPacketsTestCase @group, List<PacketViewModel> split)
         {
             Console.WriteLine("\n\n" + @group.TestName);
-            var startPackets = FindPacket(split, @group.SearchTextStartPacket);
+            var startPackets = FindPacket(store, split, @group.SearchTextStartPacket);
             Console.WriteLine($"Text: '{@group.SearchTextStartPacket}' found in packet id {startPackets!.Id}");
             var result = relatedPacketsFinder.Find(split, split, startPackets!.Id, CancellationToken.None);
 
@@ -156,11 +158,11 @@ namespace WDE.PacketViewer.IntegrationTests
             }
         }
 
-        private PacketViewModel? FindPacket(ICollection<PacketViewModel> packets, string text)
+        private PacketViewModel? FindPacket(PacketViewModelStore store, ICollection<PacketViewModel> packets, string text)
         {
             foreach (var p in packets)
             {
-                if (p.Text.Contains(text, StringComparison.InvariantCultureIgnoreCase))
+                if (store.GetText(p).Contains(text, StringComparison.InvariantCultureIgnoreCase))
                     return p;
             }
 

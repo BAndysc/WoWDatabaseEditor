@@ -7,20 +7,22 @@ namespace WDE.PacketViewer.Filtering
 {
     public class DatabaseExpressionEvaluator
     {
+        private readonly PacketViewModelStore store;
         private SyntaxLexer lexer;
         private CommonTokenStream tokens;
         private SyntaxParser parser;
         private ExpressionVisitor visitor;
         
-        public DatabaseExpressionEvaluator(string expression, UniversalGuid playerGuid)
+        public DatabaseExpressionEvaluator(string expression, UniversalGuid playerGuid, PacketViewModelStore store)
         {
+            this.store = store;
             lexer = new SyntaxLexer(new AntlrInputStream(expression));
             tokens = new CommonTokenStream(lexer);
             parser = new SyntaxParser(tokens);
             parser.BuildParseTree = true;
             parser.RemoveErrorListeners();
 
-            visitor = new ExpressionVisitor(new IsPacketSpecificPlayerProcessor(playerGuid));
+            visitor = new ExpressionVisitor(new IsPacketSpecificPlayerProcessor(playerGuid), store);
         }
 
         public object? Evaluate(PacketViewModel entity)

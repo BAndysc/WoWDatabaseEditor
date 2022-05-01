@@ -10,6 +10,16 @@ namespace WDE.Common.Services.MessageBox
 
     public static class MessageBoxServiceExtensions
     {
+        public static Task SimpleDialog(this IMessageBoxService service, string title, string header, string content)
+        {
+            return service.ShowDialog(new MessageBoxFactory<bool>()
+                .SetTitle(title)
+                .SetMainInstruction(header)
+                .SetContent(content)
+                .WithOkButton(true)
+                .Build());
+        }
+    
         public static async Task WrapError(this IMessageBoxService service, Func<Task> task)
         {
             try
