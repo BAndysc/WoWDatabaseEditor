@@ -79,8 +79,6 @@ namespace WDE.MapRenderer
             Dispatcher.UIThread.Post(() => Visibility = false, DispatcherPriority.Background);
         }
 
-        public event Action? RequestDispose;
-
         private MapViewModel? selectedMap;
         
         public MapViewModel? SelectedMap
@@ -258,11 +256,6 @@ Tris: " + stats.TrianglesDrawn;
 
             gameView.RegisterGameModule(container => container.Resolve<GameProxy>((typeof(GameViewModel), this)));
             
-            AutoDispose(new ActionDisposable(() =>
-            {
-                RequestDispose?.Invoke();
-            }));
-
             taskRunner.ScheduleTask("Loading maps", async () =>
             {
                 maps = dbcStore.MapDirectoryStore

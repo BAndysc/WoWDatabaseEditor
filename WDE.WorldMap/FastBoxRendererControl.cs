@@ -25,6 +25,8 @@ namespace WDE.WorldMap
         private bool renderMarkers = true;
         public static readonly DirectProperty<FastBoxRendererControl<T, R>, bool> RenderMarkersProperty = AvaloniaProperty.RegisterDirect<FastBoxRendererControl<T, R>, bool>("RenderMarkers", o => o.RenderMarkers, (o, v) => o.RenderMarkers = v);
 
+        private bool isAttachedToVisualTree;
+        
         static FastBoxRendererControl()
         {
             AffectsRender<FastBoxRendererControl<T, R>>(ZoomBiasProperty, RenderMarkersProperty);
@@ -38,7 +40,7 @@ namespace WDE.WorldMap
                 if (context != null)
                     Unbind(context);
                 SetAndRaise(ContextProperty, ref context, value);
-                if (value != null && Parent != null)
+                if (value != null && Parent != null && isAttachedToVisualTree)
                     Bind(value);
             }
         }
@@ -87,10 +89,13 @@ namespace WDE.WorldMap
                     attached = Bind(ZoomBiasProperty, map.GetBindingObservable(WoWMapViewer.ZoomProperty));
                 }
             }
+
+            isAttachedToVisualTree = true;
         }
 
         protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
         {
+            isAttachedToVisualTree = false;
             attached?.Dispose();
             attached = null;
             if (context != null)
