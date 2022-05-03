@@ -311,6 +311,11 @@ namespace WoWDatabaseEditorCore.Avalonia
             return tcs.Task;
         }
 
+        public IDisposable StartTimer(Func<bool> action, TimeSpan interval)
+        {
+            return DispatcherTimer.Run(action, interval);
+        }
+
         private async Task Do(Func<Task> action, TaskCompletionSource tcs)
         {
             try

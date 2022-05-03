@@ -46,6 +46,11 @@ public class Program
             action().Wait();
             return Task.CompletedTask;
         }
+
+        public IDisposable StartTimer(Func<bool> action, TimeSpan interval)
+        {
+            throw new Exception("Operation not supported");
+        }
     }
     
     public static int Test<T>(string[] args, params ICoreVersion[] cores) where T : class, IDatabaseProvider

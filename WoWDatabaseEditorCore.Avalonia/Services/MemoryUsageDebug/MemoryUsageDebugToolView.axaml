@@ -1,0 +1,76 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:memoryUsageDebug="clr-namespace:WoWDatabaseEditorCore.Services.MemoryUsageDebug;assembly=WoWDatabaseEditorCore"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="memoryUsageDebug:MemoryUsageDebugToolViewModel"
+             x:Class="WoWDatabaseEditorCore.Avalonia.Services.MemoryUsageDebug.MemoryUsageDebugToolView">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition MaxHeight="150" />
+            
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition MaxHeight="150" />
+            
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition MaxHeight="150"  />
+            
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition MaxHeight="150" />
+        </Grid.RowDefinitions>
+        
+        <ToolbarPanel><Button Command="{CompiledBinding ForceGC}">Force GC</Button></ToolbarPanel>
+        
+        <GroupingHeader Grid.Row="1"  GroupName="Total GC memory" />
+        <TextBlock Grid.Row="2"  Text="{CompiledBinding TotalGCMemory, Converter={x:Static NumberToNiceBytesConverter.Instance}}" />
+        
+        <SimpleGraph  Grid.Row="3" Foreground="#400040AA" Length="{CompiledBinding TotalGCMemoryGraph.Elements}" 
+                      SourceDataArray="{CompiledBinding TotalGCMemoryGraph.Memory}" 
+                      SourceStartOffset="{CompiledBinding TotalGCMemoryGraph.OffsetStart}" 
+                      MinY="{CompiledBinding TotalGCMemoryGraph.Min}" 
+                      MaxY="{CompiledBinding TotalGCMemoryGraph.Max}" />
+        
+        
+        
+        <GroupingHeader Grid.Row="4"  GroupName="Allocated bytes (per second)" />
+        <TextBlock Grid.Row="5"  Text="{CompiledBinding AllocatedBytesPerSecond, Converter={x:Static NumberToNiceBytesConverter.Instance}}" />
+        
+        <SimpleGraph  Grid.Row="6" Foreground="#400040AA" Length="{CompiledBinding AllocatedBytesPerSecondGraph.Elements}" 
+                      SourceDataArray="{CompiledBinding AllocatedBytesPerSecondGraph.Memory}" 
+                      SourceStartOffset="{CompiledBinding AllocatedBytesPerSecondGraph.OffsetStart}" 
+                      MinY="{CompiledBinding AllocatedBytesPerSecondGraph.Min}" 
+                      MaxY="{CompiledBinding AllocatedBytesPerSecondGraph.Max}" />
+        
+        
+        
+        <GroupingHeader Grid.Row="7" GroupName="Heap bytes" />
+        <TextBlock Grid.Row="8" Text="{CompiledBinding HeapBytes, Converter={x:Static NumberToNiceBytesConverter.Instance}}" />
+        
+        <SimpleGraph  Grid.Row="9" Foreground="#400040AA" Length="{CompiledBinding HeapBytesGraph.Elements}" 
+                      SourceDataArray="{CompiledBinding HeapBytesGraph.Memory}" 
+                      SourceStartOffset="{CompiledBinding HeapBytesGraph.OffsetStart}" 
+                      MinY="{CompiledBinding HeapBytesGraph.Min}" 
+                      MaxY="{CompiledBinding HeapBytesGraph.Max}" />
+        
+        
+        
+        
+        <GroupingHeader Grid.Row="10"  GroupName="Total memory" />
+        <TextBlock Grid.Row="11"  Text="{CompiledBinding TotalMemory, Converter={x:Static NumberToNiceBytesConverter.Instance}}" />
+        
+        <SimpleGraph  Grid.Row="12" Foreground="#400040AA" Length="{CompiledBinding TotalMemoryGraph.Elements}" 
+                      SourceDataArray="{CompiledBinding TotalMemoryGraph.Memory}" 
+                      SourceStartOffset="{CompiledBinding TotalMemoryGraph.OffsetStart}" 
+                      MinY="{CompiledBinding TotalMemoryGraph.Min}" 
+                      MaxY="{CompiledBinding TotalMemoryGraph.Max}" />
+
+    </Grid>
+</UserControl>

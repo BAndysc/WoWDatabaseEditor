@@ -74,6 +74,11 @@ public class MainThread : IMainThread
         return action();
     }
 
+    public IDisposable StartTimer(Func<bool> action, TimeSpan interval)
+    {
+        throw new Exception("Operation not supported, but could be implemented");
+    }
+
     public void Tick(TimeSpan time)
     {
         for (int i = 0; i < delayed.Count; ++i)
