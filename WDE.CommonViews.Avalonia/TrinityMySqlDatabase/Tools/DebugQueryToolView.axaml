@@ -8,6 +8,8 @@
              xmlns:avaloniaEdit="https://github.com/avaloniaui/avaloniaedit"
              xmlns:components="clr-namespace:WDE.Common.Avalonia.Components;assembly=WDE.Common.Avalonia"
              xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
+             xmlns:tools="clr-namespace:WDE.MySqlDatabaseCommon.Tools;assembly=WDE.MySqlDatabaseCommon"
+             x:DataType="tools:DebugQueryToolViewModel"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300">
     <components:ToolView.Icon>
@@ -44,12 +46,9 @@
         </controls:MonochromaticIcon>
     </components:ToolView.Icon>
     
-    <components:ToolView.Resources>
-        <converters:NativeTextDocumentConverter x:Key="DocumentConverter" />
-    </components:ToolView.Resources>
     <DockPanel LastChildFill="True">
-        <Button Command="{Binding ClearConsole}" DockPanel.Dock="Top">Clear</Button>
-        <avaloniaEdit:TextEditor IsReadOnly="True" Document="{Binding Text, Converter={StaticResource DocumentConverter}}" BorderThickness="0" x:Name="MyAvalonEdit"
+        <Button Command="{CompiledBinding ClearConsole}" DockPanel.Dock="Top">Clear</Button>
+        <avaloniaEdit:TextEditor IsReadOnly="True" Document="{CompiledBinding Text, Converter={x:Static NativeTextDocumentConverter.Instance}}" BorderThickness="0" x:Name="MyAvalonEdit"
                                FontFamily="Consolas,Menlo,Courier,Courier New"/>
         
     </DockPanel>

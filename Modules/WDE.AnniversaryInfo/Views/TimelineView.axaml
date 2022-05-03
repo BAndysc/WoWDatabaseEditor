@@ -80,7 +80,7 @@
                                                                Text="{CompiledBinding Text}"></TextBlock>
                                                 </DataTemplate>
                                                 <DataTemplate DataType="viewModels:ButtonContentItem">
-                                                    <Button Command="{CompiledBinding Command}" Content="{Binding Text}" />
+                                                    <Button Command="{CompiledBinding Command}" Content="{CompiledBinding Text}" />
                                                 </DataTemplate>
                                                 <DataTemplate DataType="viewModels:ImageContentItem">
                                                     <Image Cursor="Hand" x:Name="Img" Source="{CompiledBinding Image}">
@@ -108,7 +108,7 @@
         <Border x:Name="Border" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="#A0000000" Padding="25"
                 IsVisible="{CompiledBinding BigImage, Converter={x:Static NullConverter.IsNotNull}}">
             <Interaction.Behaviors>
-                <EventTriggerBehavior EventName="PointerPressed" SourceObject="{Binding #Border}">
+                <EventTriggerBehavior EventName="PointerPressed" SourceObject="{CompiledBinding #Border}">
                     <InvokeCommandAction Command="{Binding #Root.DataContext.CloseBigImage}" />
                 </EventTriggerBehavior>
             </Interaction.Behaviors>

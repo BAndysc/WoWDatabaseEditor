@@ -4,9 +4,12 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:viewModels="clr-namespace:WDE.Updater.ViewModels;assembly=WDE.Updater"
              xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia"
+             xmlns:models="clr-namespace:WDE.Updater.Models;assembly=WDE.Updater"
+             xmlns:system="clr-namespace:System;assembly=System.Runtime"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              d:DataContext="{d:DesignInstance viewModels:ChangeLogViewModel}"
              Padding="15"
+             x:DataType="viewModels:ChangeLogViewModel"
              x:Class="WDE.CommonViews.Avalonia.Updater.Views.ChangeLogView">
     <UserControl.Resources>
         <converters:DataTimeToStringConverter Format="m" x:Key="TimeConverter"/>
@@ -17,23 +20,23 @@
                        FontSize="34"
                        FontFamily="Segoe UI Light" 
                        TextWrapping="WrapWithOverflow"
-                       Text="{Binding Title}"/>
+                       Text="{CompiledBinding Title}"/>
         </Border>
         <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-            <ItemsPresenter Items="{Binding Changes}">
+            <ItemsPresenter Items="{CompiledBinding Changes}">
                 <ItemsPresenter.ItemTemplate>
-                    <DataTemplate>
+                    <DataTemplate x:DataType="models:ChangeLogEntry">
                         <StackPanel Margin="0,10,0,0">
                             <DockPanel>
-                                <TextBlock Text="{Binding Title}" FontSize="17"/>
-                                <TextBlock TextAlignment="Right" Text="{Binding Date, Converter={StaticResource TimeConverter}}" FontSize="14" DockPanel.Dock="Right"/>
+                                <TextBlock Text="{CompiledBinding Title}" FontSize="17"/>
+                                <TextBlock TextAlignment="Right" Text="{CompiledBinding Date, Converter={StaticResource TimeConverter}}" FontSize="14" DockPanel.Dock="Right"/>
                             </DockPanel>
-                            <ItemsPresenter Items="{Binding Changes}" Margin="10,0,0,0">
+                            <ItemsPresenter Items="{CompiledBinding Changes}" Margin="10,0,0,0">
                                 <ItemsPresenter.ItemTemplate>
-                                    <DataTemplate>
+                                    <DataTemplate x:DataType="system:String">
                                         <DockPanel LastChildFill="True">
                                             <Ellipse Width="4" Height="4" VerticalAlignment="Top" Margin="0,4,8,0" Fill="#FF5FA2DA" DockPanel.Dock="Left" />
-                                            <TextBlock Margin="0,0,0,5" FontSize="14" Text="{Binding .}" TextWrapping="WrapWithOverflow"></TextBlock>
+                                            <TextBlock Margin="0,0,0,5" FontSize="14" Text="{CompiledBinding .}" TextWrapping="WrapWithOverflow"></TextBlock>
                                         </DockPanel>
                                     </DataTemplate>
                                 </ItemsPresenter.ItemTemplate>

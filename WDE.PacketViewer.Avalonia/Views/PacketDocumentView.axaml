@@ -7,7 +7,7 @@
              xmlns:avaloniaEdit="https://github.com/avaloniaui/avaloniaedit"
              xmlns:codeCompletion="clr-namespace:AvaloniaEdit.CodeCompletion;assembly=AvaloniaEdit"
              xmlns:views="clr-namespace:WDE.PacketViewer.Avalonia.Views"
-             d:DataContext="{d:DesignInstance viewModels:PacketDocumentViewModel, IsDesignTimeCreatable=False}"
+             x:DataType="viewModels:PacketDocumentViewModel"
              xmlns:controls1="clr-namespace:WDE.Common.Avalonia.Controls;assembly=WDE.Common.Avalonia"
              xmlns:components="clr-namespace:WDE.Common.Avalonia.Components;assembly=WDE.Common.Avalonia"
              xmlns:viewModels="clr-namespace:WDE.PacketViewer.ViewModels;assembly=WDE.PacketViewer"
@@ -22,10 +22,10 @@
         <views:EntryToNiceBackgroundConverter x:Key="EntryToNiceBackgroundConverter" />
     </UserControl.Resources>
     <UserControl.KeyBindings>
-        <KeyBinding Command="{Binding GoToPacketCommand}" Gesture="Ctrl+G" />
-        <KeyBinding Command="{Binding GoToPacketCommand}" Gesture="Cmd+G" />
-        <KeyBinding Command="{Binding ToggleFindCommand}" Gesture="Ctrl+F" />
-        <KeyBinding Command="{Binding ToggleFindCommand}" Gesture="Cmd+F" />
+        <KeyBinding Command="{CompiledBinding GoToPacketCommand}" Gesture="Ctrl+G" />
+        <KeyBinding Command="{CompiledBinding GoToPacketCommand}" Gesture="Cmd+G" />
+        <KeyBinding Command="{CompiledBinding ToggleFindCommand}" Gesture="Ctrl+F" />
+        <KeyBinding Command="{CompiledBinding ToggleFindCommand}" Gesture="Cmd+F" />
     </UserControl.KeyBindings>
     <UserControl.Styles>
         <StyleInclude Source="avares://WDE.PacketViewer.Avalonia/Views/SearchControl.axaml" />
@@ -92,14 +92,14 @@
         <DockPanel LastChildFill="True" >
             <!-- search panel -->
             <views:SearchControl  DockPanel.Dock="Top" 
-                                  FindPreviousCommand="{Binding FindPreviousCommand}"
-                                  FindNextCommand="{Binding FindNextCommand}"
-                                  IsVisible="{Binding FindPanelEnabled}"
-                                  IsEnabled="{Binding FilteringInProgress, Converter={StaticResource InversedBoolConverter}}"
-                                  CloseCommand="{Binding CloseFindCommand}" />
+                                  FindPreviousCommand="{CompiledBinding FindPreviousCommand}"
+                                  FindNextCommand="{CompiledBinding FindNextCommand}"
+                                  IsVisible="{CompiledBinding FindPanelEnabled}"
+                                  IsEnabled="{CompiledBinding FilteringInProgress, Converter={StaticResource InversedBoolConverter}}"
+                                  CloseCommand="{CompiledBinding CloseFindCommand}" />
             
             <Grid ColumnDefinitions="*,5,*" 
-                  IsEnabled="{Binding LoadingInProgress, Converter={StaticResource InversedBoolConverter}}">
+                  IsEnabled="{CompiledBinding LoadingInProgress, Converter={StaticResource InversedBoolConverter}}">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" MinHeight="30" />
@@ -110,19 +110,19 @@
                     <DockPanel LastChildFill="True" DockPanel.Dock="Top" Margin="0,5,0,0">
                         <ComboBox Classes="ComboDropDown" Margin="0,0,5,0" VerticalAlignment="Stretch"
                                   Width="32"
-                                  DockPanel.Dock="Left" Items="{Binding MostRecentlySearched}"
-                                  SelectedItem="{Binding MostRecentlySearchedItem}" />
-                        <Button DockPanel.Dock="Right" Command="{Binding OpenFilterDialogCommand}">
+                                  DockPanel.Dock="Left" Items="{CompiledBinding MostRecentlySearched}"
+                                  SelectedItem="{CompiledBinding MostRecentlySearchedItem}" />
+                        <Button DockPanel.Dock="Right" Command="{CompiledBinding OpenFilterDialogCommand}">
                             <components:WdeImage ImageUri="Icons/icon_filter.png" Width="24" Height="24" />
                         </Button>
                         <Panel>
-                            <views:FilterTextEditor Document="{Binding FilterText, Converter={StaticResource DocumentConverter}}"
+                            <views:FilterTextEditor Document="{CompiledBinding FilterText, Converter={StaticResource DocumentConverter}}"
                                                 BorderThickness="0"
                                                 Background="Transparent"
                                                 Padding="0"
                                                 Name="TextEditor" />
                             <TextBlock FontFamily="Consolas,Menlo,Courier,Courier New" 
-                                       IsVisible="{Binding #TextEditor.Document.TextLength, Converter={StaticResource IntToBoolConverter}}"
+                                       IsVisible="{CompiledBinding #TextEditor.Document.TextLength, Converter={StaticResource IntToBoolConverter}}"
                                        Opacity="0.5"
                                        IsHitTestVisible="False"
                                        FontStyle="Italic">Filter packets... e.g. packet.opcode == SMSG.SPELL_START</TextBlock>
@@ -135,13 +135,13 @@
                         <ProgressBar Height="2"
                                      Minimum="0"
                                      Maximum="100"
-                                     IsIndeterminate="{Binding ProgressUnknown}"
+                                     IsIndeterminate="{CompiledBinding ProgressUnknown}"
                                      DockPanel.Dock="Bottom"
-                                     Value="{Binding FilteringProgress, Mode=OneWay}"
-                                     IsVisible="{Binding FilteringInProgress}" />
-                        <controls:GridView Items="{Binding VisiblePackets}"
-                                           SelectedItem="{Binding SelectedPacket, Mode=TwoWay}"
-                                           IsEnabled="{Binding FilteringInProgress, Converter={StaticResource InversedBoolConverter}}"
+                                     Value="{CompiledBinding FilteringProgress, Mode=OneWay}"
+                                     IsVisible="{CompiledBinding FilteringInProgress}" />
+                        <controls:GridView Items="{CompiledBinding VisiblePackets}"
+                                           SelectedItem="{CompiledBinding SelectedPacket, Mode=TwoWay}"
+                                           IsEnabled="{CompiledBinding FilteringInProgress, Converter={StaticResource InversedBoolConverter}}"
                                            HorizontalAlignment="Stretch"
                                            VerticalAlignment="Stretch">
                             <controls:GridView.Columns>
@@ -165,19 +165,19 @@
                                 <Style Selector="ListBoxItem:selected TextBlock">
                                     <Setter Property="FontWeight" Value="Bold" />
                                 </Style>
-                                <Style Selector="ListBoxItem">
-                                    <Setter Property="Background" Value="{Binding Entry, Converter={StaticResource EntryToNiceBackgroundConverter}}" />
+                                <Style Selector="ListBoxItem" x:DataType="viewModels:PacketViewModel">
+                                    <Setter Property="Background" Value="{CompiledBinding Entry, Converter={StaticResource EntryToNiceBackgroundConverter}}" />
                                     <Setter Property="ContextFlyout">
                                         <Setter.Value>
                                             <MenuFlyout>
-                                                <MenuItem Header="Exclude entry" CommandParameter="{Binding .}" Command="{Binding #Root.DataContext.ExcludeEntryCommand}" />
-                                                <MenuItem Header="Include entry" CommandParameter="{Binding .}" Command="{Binding #Root.DataContext.IncludeEntryCommand}" />
+                                                <MenuItem Header="Exclude entry" CommandParameter="{CompiledBinding .}" Command="{Binding #Root.DataContext.ExcludeEntryCommand}" />
+                                                <MenuItem Header="Include entry" CommandParameter="{CompiledBinding .}" Command="{Binding #Root.DataContext.IncludeEntryCommand}" />
                                                 <MenuItem Header="-" />
-                                                <MenuItem Header="Exclude guid" CommandParameter="{Binding .}" Command="{Binding #Root.DataContext.ExcludeGuidCommand}" />
-                                                <MenuItem Header="Include guid" CommandParameter="{Binding .}" Command="{Binding #Root.DataContext.IncludeGuidCommand}" />
+                                                <MenuItem Header="Exclude guid" CommandParameter="{CompiledBinding .}" Command="{Binding #Root.DataContext.ExcludeGuidCommand}" />
+                                                <MenuItem Header="Include guid" CommandParameter="{CompiledBinding .}" Command="{Binding #Root.DataContext.IncludeGuidCommand}" />
                                                 <MenuItem Header="-" />
-                                                <MenuItem Header="Exclude opcode" CommandParameter="{Binding .}" Command="{Binding #Root.DataContext.ExcludeOpcodeCommand}" />
-                                                <MenuItem Header="Include opcode" CommandParameter="{Binding .}" Command="{Binding #Root.DataContext.IncludeOpcodeCommand}" />
+                                                <MenuItem Header="Exclude opcode" CommandParameter="{CompiledBinding .}" Command="{Binding #Root.DataContext.ExcludeOpcodeCommand}" />
+                                                <MenuItem Header="Include opcode" CommandParameter="{CompiledBinding .}" Command="{Binding #Root.DataContext.IncludeOpcodeCommand}" />
                                                 <MenuItem Header="-" />
                                                 <MenuItem Header="Find related packets" Command="{Binding #Root.DataContext.FindRelatedPacketsCommands}" />
                                             </MenuFlyout>
@@ -197,9 +197,9 @@
                     <avaloniaEdit:TextEditor
                         BorderThickness="0"
                         Padding="2"
-                        Document="{Binding SelectedPacketPreview, Converter={StaticResource DocumentConverter}}"
+                        Document="{CompiledBinding SelectedPacketPreview, Converter={StaticResource DocumentConverter}}"
                         ShowLineNumbers="True"
-                        HorizontalScrollBarVisibility="{Binding WrapLines, Converter={StaticResource BoolToScrollBarVisibilityConverter}}"
+                        HorizontalScrollBarVisibility="{CompiledBinding WrapLines, Converter={StaticResource BoolToScrollBarVisibilityConverter}}"
                         VerticalScrollBarVisibility="Auto"
                         controls1:AvalonEditExtra.Syntax="Resources/PacketTextViewSyntax.xml"
                         Name="PacketPreview"
@@ -212,13 +212,13 @@
                         <TabItem Header="Update values">
                             <DockPanel LastChildFill="True">
                                 <controls:GroupingHeader GroupName="Objects current values" DockPanel.Dock="Top" />
-                                <views:UpdateHistoryView DataContext="{Binding UpdateHistoryViewModel}" />
+                                <views:UpdateHistoryView DataContext="{CompiledBinding UpdateHistoryViewModel}" />
                             </DockPanel>
                         </TabItem>
-                        <TabItem Header="Reason predictions" IsEnabled="{Binding ReasonPanelVisibility}">
+                        <TabItem Header="Reason predictions" IsEnabled="{CompiledBinding ReasonPanelVisibility}">
                             <DockPanel>
                                 <controls:GroupingHeader GroupName="What are the possible reasons for sending the packet" DockPanel.Dock="Top" />
-                                <ListBox Items="{Binding Predictions}"
+                                <ListBox Items="{CompiledBinding Predictions}"
                                          Name="ActionReasonsView">
                                     <ListBox.Styles>
                                         <Style Selector="ListBoxItem">
@@ -228,11 +228,11 @@
                                     <ListBox.ItemTemplate>
                                         <DataTemplate>
                                             <DockPanel>
-                                                <TextBlock Margin="0,0,5,0" Text="{Binding PacketNumber}" FontSize="13" FontWeight="Bold" VerticalAlignment="Center" />
+                                                <TextBlock Margin="0,0,5,0" Text="{CompiledBinding PacketNumber}" FontSize="13" FontWeight="Bold" VerticalAlignment="Center" />
                                                 <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,*,Auto">
-                                                    <TextBlock Grid.Column="0" Text="{Binding Chance, StringFormat=Score: {0}}" DockPanel.Dock="Left" />
-                                                    <TextBlock Grid.Column="2" Padding="0,0,20,0" Text="{Binding Diff, StringFormat=Diff: {0} ms}" DockPanel.Dock="Right" />
-                                                    <TextBlock Grid.Row="1" Grid.ColumnSpan="3" TextWrapping="WrapWithOverflow" Opacity="0.6" Text="{Binding Description}" />
+                                                    <TextBlock Grid.Column="0" Text="{CompiledBinding Chance, StringFormat=Score: {0}}" DockPanel.Dock="Left" />
+                                                    <TextBlock Grid.Column="2" Padding="0,0,20,0" Text="{CompiledBinding Diff, StringFormat=Diff: {0} ms}" DockPanel.Dock="Right" />
+                                                    <TextBlock Grid.Row="1" Grid.ColumnSpan="3" TextWrapping="WrapWithOverflow" Opacity="0.6" Text="{CompiledBinding Description}" />
                                                 </Grid>
                                             </DockPanel>
                                         </DataTemplate>
@@ -245,10 +245,10 @@
                                 </ListBox>
                             </DockPanel>
                         </TabItem>
-                        <TabItem Header="Possible actions" IsEnabled="{Binding ReasonPanelVisibility}">
+                        <TabItem Header="Possible actions" IsEnabled="{CompiledBinding ReasonPanelVisibility}">
                             <DockPanel>
                                 <controls:GroupingHeader GroupName="What other packets may have been sent because of this packet" DockPanel.Dock="Top" />
-                                <ListBox Items="{Binding PossibleActions}"
+                                <ListBox Items="{CompiledBinding PossibleActions}"
                                          Name="PossibleActionsView">
                                     <ListBox.Styles>
                                         <Style Selector="ListBoxItem">
@@ -258,24 +258,24 @@
                                     <ListBox.ItemTemplate>
                                         <DataTemplate>
                                             <DockPanel>
-                                                <TextBlock Margin="0,0,5,0" Text="{Binding PacketNumber}" FontSize="13" FontWeight="Bold" VerticalAlignment="Center" />
+                                                <TextBlock Margin="0,0,5,0" Text="{CompiledBinding PacketNumber}" FontSize="13" FontWeight="Bold" VerticalAlignment="Center" />
                                                 <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="Auto,*,Auto">
-                                                    <TextBlock Grid.Column="0" Text="{Binding Chance, StringFormat=Score: {0}}" DockPanel.Dock="Left" />
-                                                    <TextBlock Grid.Column="2" Padding="0,0,20,0" Text="{Binding Diff, StringFormat=Diff: {0} ms}" DockPanel.Dock="Right" />
-                                                    <TextBlock Grid.Row="1" Grid.ColumnSpan="3" TextWrapping="WrapWithOverflow" Opacity="0.6" Text="{Binding Description}" />
+                                                    <TextBlock Grid.Column="0" Text="{CompiledBinding Chance, StringFormat=Score: {0}}" DockPanel.Dock="Left" />
+                                                    <TextBlock Grid.Column="2" Padding="0,0,20,0" Text="{CompiledBinding Diff, StringFormat=Diff: {0} ms}" DockPanel.Dock="Right" />
+                                                    <TextBlock Grid.Row="1" Grid.ColumnSpan="3" TextWrapping="WrapWithOverflow" Opacity="0.6" Text="{CompiledBinding Description}" />
                                                 </Grid>
                                             </DockPanel>
                                         </DataTemplate>
                                     </ListBox.ItemTemplate>
                                     <Interaction.Behaviors>
                                         <EventTriggerBehavior EventName="DoubleTapped">
-                                            <InvokeCommandAction CommandParameter="{Binding #PossibleActionsView.SelectedItem.PacketNumber, FallbackValue={x:Null}}" Command="{Binding JumpToPacketCommand}" />
+                                            <InvokeCommandAction CommandParameter="{Binding #PossibleActionsView.SelectedItem.PacketNumber, FallbackValue={x:Null}}" Command="{CompiledBinding JumpToPacketCommand}" />
                                         </EventTriggerBehavior>
                                     </Interaction.Behaviors>
                                 </ListBox>
                             </DockPanel>
                         </TabItem>
-                        <TabItem Header="Detected actions" IsEnabled="{Binding ReasonPanelVisibility}">
+                        <TabItem Header="Detected actions" IsEnabled="{CompiledBinding ReasonPanelVisibility}">
                             <DockPanel>
                                 <controls:GroupingHeader GroupName="What actions have been detected in this packet" DockPanel.Dock="Top" />
                                 <ScrollViewer HorizontalScrollBarVisibility="Disabled">
@@ -284,19 +284,19 @@
                                             <Setter Property="TextWrapping" Value="WrapWithOverflow" />
                                         </Style>
                                     </ScrollViewer.Styles>
-                                    <ItemsControl Items="{Binding DetectedActions}">
+                                    <ItemsControl Items="{CompiledBinding DetectedActions}">
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
                                                 <StackPanel Orientation="Vertical" Margin="0,0,0,10">
-                                                    <TextBlock Text="{Binding ActionKind, StringFormat=Action: {0}}" FontWeight="Bold" />
-                                                    <TextBlock Text="{Binding Description}" />
-                                                    <TextBlock IsVisible="{Binding MainActor, Converter={x:Static converters:CommonConverters.InversedNullToBoolConverter}}"
-                                                               Text="{Binding MainActor, StringFormat=Actor: {0}}" Opacity="0.6" />
-                                                    <TextBlock IsVisible="{Binding Location, Converter={x:Static converters:CommonConverters.InversedNullToBoolConverter}}"
-                                                               Text="{Binding Location, StringFormat=Position of action: {0}}" Opacity="0.6" />
-                                                    <TextBlock Text="Additional actors:" IsVisible="{Binding AdditionalActors, Converter={x:Static converters:CommonConverters.InversedNullToBoolConverter}}" />
-                                                    <ItemsPresenter IsVisible="{Binding AdditionalActors, Converter={x:Static converters:CommonConverters.InversedNullToBoolConverter}}"
-                                                                    Items="{Binding AdditionalActors}">
+                                                    <TextBlock Text="{CompiledBinding ActionKind, StringFormat=Action: {0}}" FontWeight="Bold" />
+                                                    <TextBlock Text="{CompiledBinding Description}" />
+                                                    <TextBlock IsVisible="{CompiledBinding MainActor, Converter={x:Static converters:CommonConverters.InversedNullToBoolConverter}}"
+                                                               Text="{CompiledBinding MainActor, StringFormat=Actor: {0}}" Opacity="0.6" />
+                                                    <TextBlock IsVisible="{CompiledBinding Location, Converter={x:Static converters:CommonConverters.InversedNullToBoolConverter}}"
+                                                               Text="{CompiledBinding Location, StringFormat=Position of action: {0}}" Opacity="0.6" />
+                                                    <TextBlock Text="Additional actors:" IsVisible="{CompiledBinding AdditionalActors, Converter={x:Static converters:CommonConverters.InversedNullToBoolConverter}}" />
+                                                    <ItemsPresenter IsVisible="{CompiledBinding AdditionalActors, Converter={x:Static converters:CommonConverters.InversedNullToBoolConverter}}"
+                                                                    Items="{CompiledBinding AdditionalActors}">
                                                         <ItemsPresenter.ItemsPanel>
                                                             <ItemsPanelTemplate>
                                                                 <StackPanel Margin="10,0,0,0 "/>
@@ -310,7 +310,7 @@
                                 </ScrollViewer>
                             </DockPanel>
                         </TabItem>
-                        <TabItem Header="Detected events" IsEnabled="{Binding ReasonPanelVisibility}">
+                        <TabItem Header="Detected events" IsEnabled="{CompiledBinding ReasonPanelVisibility}">
                             <DockPanel>
                                 <controls:GroupingHeader GroupName="What events (reasons) have been detected in this packet" DockPanel.Dock="Top" />
                                 <ScrollViewer HorizontalScrollBarVisibility="Disabled">
@@ -319,19 +319,19 @@
                                             <Setter Property="TextWrapping" Value="WrapWithOverflow" />
                                         </Style>
                                     </ScrollViewer.Styles>
-                                    <ItemsControl Items="{Binding DetectedEvents}">
+                                    <ItemsControl Items="{CompiledBinding DetectedEvents}">
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
                                                 <StackPanel Orientation="Vertical" Margin="0,0,0,10">
-                                                    <TextBlock Text="{Binding EventKind, StringFormat=Event: {0}}" FontWeight="Bold" />
-                                                    <TextBlock Text="{Binding Description}" />
-                                                    <TextBlock IsVisible="{Binding MainActor, Converter={x:Static converters:CommonConverters.InversedNullToBoolConverter}}"
-                                                               Text="{Binding MainActor, StringFormat=Actor: {0}}" Opacity="0.6" />
-                                                    <TextBlock IsVisible="{Binding Location, Converter={x:Static converters:CommonConverters.InversedNullToBoolConverter}}"
-                                                               Text="{Binding Location, StringFormat=Position of event: {0}}" Opacity="0.6" />
-                                                    <TextBlock Text="Additional actors:" IsVisible="{Binding AdditionalActors, Converter={x:Static converters:CommonConverters.InversedNullToBoolConverter}}" />
-                                                    <ItemsPresenter IsVisible="{Binding AdditionalActors, Converter={x:Static converters:CommonConverters.InversedNullToBoolConverter}}"
-                                                                    Items="{Binding AdditionalActors}">
+                                                    <TextBlock Text="{CompiledBinding EventKind, StringFormat=Event: {0}}" FontWeight="Bold" />
+                                                    <TextBlock Text="{CompiledBinding Description}" />
+                                                    <TextBlock IsVisible="{CompiledBinding MainActor, Converter={x:Static converters:CommonConverters.InversedNullToBoolConverter}}"
+                                                               Text="{CompiledBinding MainActor, StringFormat=Actor: {0}}" Opacity="0.6" />
+                                                    <TextBlock IsVisible="{CompiledBinding Location, Converter={x:Static converters:CommonConverters.InversedNullToBoolConverter}}"
+                                                               Text="{CompiledBinding Location, StringFormat=Position of event: {0}}" Opacity="0.6" />
+                                                    <TextBlock Text="Additional actors:" IsVisible="{CompiledBinding AdditionalActors, Converter={x:Static converters:CommonConverters.InversedNullToBoolConverter}}" />
+                                                    <ItemsPresenter IsVisible="{CompiledBinding AdditionalActors, Converter={x:Static converters:CommonConverters.InversedNullToBoolConverter}}"
+                                                                    Items="{CompiledBinding AdditionalActors}">
                                                         <ItemsPresenter.ItemsPanel>
                                                             <ItemsPanelTemplate>
                                                                 <StackPanel Margin="10,0,0,0 "/>
@@ -350,6 +350,6 @@
             </Grid>
         </DockPanel>
             
-        <controls:TeachingTip IsOpened="{Binding ShowSplitUpdateTip}" VerticalAlignment="Bottom" Margin="20" Header="Split UPDATE_OBJECT">Important info: splitting update_object not only splits packets into many, but also renumber them and can change the order among packets sent in the same millisecond!&#xA;&#xA;Please note 'Number: ' in the text view is not updated tho!</controls:TeachingTip>
+        <controls:TeachingTip IsOpened="{CompiledBinding ShowSplitUpdateTip}" VerticalAlignment="Bottom" Margin="20" Header="Split UPDATE_OBJECT">Important info: splitting update_object not only splits packets into many, but also renumber them and can change the order among packets sent in the same millisecond!&#xA;&#xA;Please note 'Number: ' in the text view is not updated tho!</controls:TeachingTip>
     </Panel>
 </UserControl>

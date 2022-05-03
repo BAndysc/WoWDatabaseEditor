@@ -30,7 +30,7 @@
             </Grid.RowDefinitions>
         
             <TextBlock VerticalAlignment="Center" Grid.Row="0" Grid.Column="0">Variable type:</TextBlock>
-            <ComboBox HorizontalAlignment="Stretch" Grid.Row="0" Grid.Column="1" Items="{CompiledBinding VariableTypes, Mode=OneTime}" SelectedItem="{Binding VariableType, Mode=TwoWay}">
+            <ComboBox HorizontalAlignment="Stretch" Grid.Row="0" Grid.Column="1" Items="{CompiledBinding VariableTypes, Mode=OneTime}" SelectedItem="{CompiledBinding VariableType, Mode=TwoWay}">
             </ComboBox>
         
             <TextBlock VerticalAlignment="Center" Grid.Row="2" Grid.Column="0">Number:</TextBlock>
@@ -52,8 +52,8 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="80" />
             </Grid.ColumnDefinitions>
-            <Button Content="Cancel" Command="{Binding Cancel}"  />
-            <Button Command="{Binding Accept}" Grid.Column="2" Content="Accept" />
+            <Button Content="Cancel" Command="{CompiledBinding Cancel}"  />
+            <Button Command="{CompiledBinding Accept}" Grid.Column="2" Content="Accept" />
         </Grid>
     </Grid>
 </controls:DialogViewBase>

@@ -7,7 +7,7 @@
              xmlns:viewmodels="clr-namespace:WDE.PacketViewer.ViewModels"
              xmlns:viewModels="clr-namespace:WDE.PacketViewer.ViewModels;assembly=WDE.PacketViewer"
              xmlns:controls="clr-namespace:WDE.Common.Avalonia.Controls;assembly=WDE.Common.Avalonia"
-             d:DataContext="{d:DesignInstance viewModels:PacketViewerConfigurationViewModel, IsDesignTimeCreatable=False}"
+             x:DataType="viewModels:PacketViewerConfigurationViewModel"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="WDE.PacketViewer.Avalonia.Views.PacketViewerConfigurationView">
     <UserControl.Resources>
@@ -26,49 +26,49 @@
         <StackPanel>
             <controls:SettingsHeader Text="Defaults" />
             <StackPanel Orientation="Vertical" Margin="15,0,0,0">
-                <CheckBox IsChecked="{Binding AlwaysSplitUpdates, Mode=TwoWay}">Always split UPDATE_OBJECT</CheckBox>
+                <CheckBox IsChecked="{CompiledBinding AlwaysSplitUpdates, Mode=TwoWay}">Always split UPDATE_OBJECT</CheckBox>
                 <TextBlock TextWrapping="WrapWithOverflow" Opacity="0.7" Margin="20,0,0,0">If you want to filter individual updates, you have to split UPDATE_OBJECT packets. This option can be also manually triggered for each sniff, however you may enable it globally be default. Note: it DOES increase memory usage.</TextBlock>
 
-                <CheckBox Margin="0,10,0,0" IsChecked="{Binding AlwaysHidePlayerMovePackets, Mode=TwoWay}">Always hide player move packets</CheckBox>
+                <CheckBox Margin="0,10,0,0" IsChecked="{CompiledBinding AlwaysHidePlayerMovePackets, Mode=TwoWay}">Always hide player move packets</CheckBox>
                 <TextBlock TextWrapping="WrapWithOverflow" Opacity="0.7" Margin="20,0,0,0">If you enable this, CMSG_MOVE* and SMSG_MOVE* opcodes will be hidden. They usually doesn't contain useful information anyway.</TextBlock>
 
-                <CheckBox Margin="0,10,0,0" IsChecked="{Binding WrapLines, Mode=TwoWay}">Wrap lines</CheckBox>
+                <CheckBox Margin="0,10,0,0" IsChecked="{CompiledBinding WrapLines, Mode=TwoWay}">Wrap lines</CheckBox>
                 <DockPanel LastChildFill="True">
                     <TextBlock Classes="Label">Default filter</TextBlock>
-                    <views:FilterTextEditor Document="{Binding DefaultFilterText, Converter={StaticResource DocumentConverter}}" />
+                    <views:FilterTextEditor Document="{CompiledBinding DefaultFilterText, Converter={StaticResource DocumentConverter}}" />
                 </DockPanel>
                 <TextBlock TextWrapping="WrapWithOverflow" Opacity="0.7" Margin="20,0,0,0">If you use some filter often, you may want to set it as a default filter.</TextBlock>
             </StackPanel>
             
             
             <controls:SettingsHeader Text="WoW Packet Parser settings" />
-            <ItemsControl Items="{Binding ParserSettings}" Margin="15,0,0,0">
+            <ItemsControl Items="{CompiledBinding ParserSettings}" Margin="15,0,0,0">
                 <ItemsControl.DataTemplates>
                     <DataTemplate DataType="viewModels:ParserBoolSettingViewModel">
                         <StackPanel>
-                            <CheckBox IsChecked="{Binding Value, Mode=TwoWay}" Content="{Binding Name}" />
-                            <TextBlock TextWrapping="WrapWithOverflow" Opacity="0.7" Margin="20,0,0,0" Text="{Binding Help}" IsVisible="{Binding Help, Converter={StaticResource NullConverter}}"/>
+                            <CheckBox IsChecked="{CompiledBinding Value, Mode=TwoWay}" Content="{CompiledBinding Name}" />
+                            <TextBlock TextWrapping="WrapWithOverflow" Opacity="0.7" Margin="20,0,0,0" Text="{CompiledBinding Help}" IsVisible="{CompiledBinding Help, Converter={StaticResource NullConverter}}"/>
                         </StackPanel>
                     </DataTemplate>
                     <DataTemplate DataType="viewModels:ParserStringSettingViewModel">
                         <StackPanel Margin="0,0,0,12">
                             <DockPanel LastChildFill="True">
-                                <TextBlock Text="{Binding Name}"
+                                <TextBlock Text="{CompiledBinding Name}"
                                            Classes="Label" />
-                                <TextBox Text="{Binding Value, Mode=TwoWay}" />
+                                <TextBox Text="{CompiledBinding Value, Mode=TwoWay}" />
                             </DockPanel>
-                            <TextBlock TextWrapping="WrapWithOverflow" Opacity="0.7" Margin="20,0,0,0" Text="{Binding Help}" IsVisible="{Binding Help, Converter={StaticResource NullConverter}}"/>
+                            <TextBlock TextWrapping="WrapWithOverflow" Opacity="0.7" Margin="20,0,0,0" Text="{CompiledBinding Help}" IsVisible="{CompiledBinding Help, Converter={StaticResource NullConverter}}"/>
                         </StackPanel>
                     </DataTemplate>
                 </ItemsControl.DataTemplates>
             </ItemsControl>
             
-            <StackPanel IsVisible="{Binding IsDebugBuild, Mode=OneTime}">
+            <StackPanel IsVisible="{CompiledBinding IsDebugBuild, Mode=OneTime}">
                 <controls:SettingsHeader Text="[Development] Integration test" />
                 <CheckBox Name="ShowIntegrationTest">This is only for development purposes</CheckBox>
-                <DockPanel IsVisible="{Binding #ShowIntegrationTest.IsChecked}">
-                    <Button DockPanel.Dock="Right" Command="{Binding RunTestsCommand}">Run tests</Button>
-                    <TextBox IsReadOnly="True" Text="{Binding DefaultTestCasePath}" />
+                <DockPanel IsVisible="{CompiledBinding #ShowIntegrationTest.IsChecked}">
+                    <Button DockPanel.Dock="Right" Command="{CompiledBinding RunTestsCommand}">Run tests</Button>
+                    <TextBox IsReadOnly="True" Text="{CompiledBinding DefaultTestCasePath}" />
                 </DockPanel>
             </StackPanel>
         </StackPanel>

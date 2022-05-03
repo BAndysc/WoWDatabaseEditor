@@ -5,7 +5,10 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:components="clr-namespace:WDE.Common.Avalonia.Components;assembly=WDE.Common.Avalonia"
              xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
+             xmlns:history="clr-namespace:WDE.History;assembly=WDE.History"
+             xmlns:viewModels="clr-namespace:WDE.HistoryWindow.ViewModels;assembly=WDE.History"
              mc:Ignorable="d"
+             x:DataType="viewModels:HistoryViewModel"
              d:DesignHeight="450" d:DesignWidth="800">
     
     <components:ToolView.Icon>
@@ -36,13 +39,13 @@
         </controls:MonochromaticIcon>
     </components:ToolView.Icon>
     
-    <ListBox Items="{Binding Items}" BorderThickness="0" Background="Transparent">
+    <ListBox Items="{CompiledBinding Items}" BorderThickness="0" Background="Transparent">
         <ListBox.ItemTemplate>
             <DataTemplate>
                 <WrapPanel>
-                    <TextBlock Text="{Binding Name}">
+                    <TextBlock Text="{CompiledBinding Name}">
                         <Interaction.Behaviors>
-                            <DataTriggerBehavior Binding="{Binding IsFromFuture}" ComparisonCondition="Equal" Value="True">
+                            <DataTriggerBehavior Binding="{CompiledBinding IsFromFuture}" ComparisonCondition="Equal" Value="True">
                                 <ChangePropertyAction TargetObject="{Binding #TextBlock}" PropertyName="Foreground" Value="Gray"/>
                             </DataTriggerBehavior>
                         </Interaction.Behaviors>

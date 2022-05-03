@@ -117,7 +117,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 SelectFirstVisible();
 
             Cancel = new DelegateCommand(() => CloseCancel?.Invoke());
-            accept = new DelegateCommand(() =>
+            _accept = new DelegateCommand(() =>
             {
                 if (selectedItem == null)
                     SelectedItem = FindExactMatching() ?? Items.FirstOrDefault();
@@ -171,7 +171,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             set
             {
                 SetProperty(ref selectedItem, value);
-                accept?.RaiseCanExecuteChanged();
+                _accept?.RaiseCanExecuteChanged();
             }
         }
         
@@ -260,8 +260,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
         public DelegateCommand<SmartItem> ToggleFavouriteCommand { get; }
         public ICommand Cancel { get; }
-        private DelegateCommand accept { get; }
-        public ICommand Accept => accept;
+        private DelegateCommand _accept { get; }
+        public ICommand Accept => _accept;
         public int DesiredWidth => 750;
         public int DesiredHeight => 650;
         public string Title { get; }

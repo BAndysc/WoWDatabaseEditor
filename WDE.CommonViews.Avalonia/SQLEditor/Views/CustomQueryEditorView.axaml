@@ -7,11 +7,10 @@
              xmlns:avalonia="clr-namespace:WDE.Common.Avalonia;assembly=WDE.Common.Avalonia"
              xmlns:controls="clr-namespace:WDE.Common.Avalonia.Controls;assembly=WDE.Common.Avalonia"
              xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
+             xmlns:viewModels="clr-namespace:WDE.SQLEditor.ViewModels;assembly=WDE.SQLEditor"
+             x:DataType="viewModels:CustomQueryEditorViewModel"
              Name="SqlUserControl">
-    <UserControl.Resources>
-        <converters:NativeTextDocumentConverter x:Key="DocumentConverter" />
-    </UserControl.Resources>
-    <avaloniaEdit:TextEditor controls:AvalonEditExtra.SyntaxExtension="sql" Document="{Binding Code, Converter={StaticResource DocumentConverter}}" Padding="5" x:Name="MyAvalonEdit"
+    <avaloniaEdit:TextEditor controls:AvalonEditExtra.SyntaxExtension="sql" Document="{CompiledBinding Code, Converter={x:Static NativeTextDocumentConverter.Instance}}" Padding="5" x:Name="MyAvalonEdit"
                              ShowLineNumbers="True"
                              BorderThickness="0"
                              utils:FocusUtils.FocusFirst="True"

@@ -6,12 +6,12 @@
              xmlns:components="clr-namespace:WDE.Common.Avalonia.Components;assembly=WDE.Common.Avalonia"
              xmlns:viewModels="clr-namespace:WDE.PacketViewer.ViewModels;assembly=WDE.PacketViewer"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             d:DataContext="{d:DesignInstance viewModels:PacketFilterDialogViewModel, IsDesignTimeCreatable=False}"
+             x:DataType="viewModels:PacketFilterDialogViewModel"
              x:Class="WDE.PacketViewer.Avalonia.Views.PacketFilterDialogToolBar">
     <controls:ToolbarPanel>
-        <components:ButtonImage Command="{Binding  CopyFiltersCommand}" Image="Icons/icon_copy.png" Text="Copy filter" />
-        <components:ButtonImage Command="{Binding  PasteFiltersCommand}" Image="Icons/icon_paste.png" Text="Paste filter" />
+        <components:ButtonImage Command="{CompiledBinding  CopyFiltersCommand}" Image="Icons/icon_copy.png" Text="Copy filter" />
+        <components:ButtonImage Command="{CompiledBinding  PasteFiltersCommand}" Image="Icons/icon_paste.png" Text="Paste filter" />
         <controls:ToolbarSpacer />
-        <components:ButtonImage Command="{Binding  ClearFiltersCommand}" Image="Icons/icon_delete.png" Text="Clear filters" />
+        <components:ButtonImage Command="{CompiledBinding  ClearFiltersCommand}" Image="Icons/icon_delete.png" Text="Clear filters" />
     </controls:ToolbarPanel>
 </UserControl>

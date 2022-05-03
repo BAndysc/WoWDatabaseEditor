@@ -6,10 +6,8 @@
              xmlns:components="clr-namespace:WDE.Common.Avalonia.Components;assembly=WDE.Common.Avalonia"
              xmlns:sessions="clr-namespace:WDE.Solutions.Sessions;assembly=WDE.Solutions"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="sessions:SessionToolViewModel"
              x:Class="WDE.CommonViews.Avalonia.Sessions.SessionToolView">
-    <Design.DataContext>
-        <sessions:SessionToolViewModel />
-    </Design.DataContext>
     <UserControl.Styles>
         <Style Selector="ListBoxItem">
             <Setter Property="Padding" Value="7,2" />
@@ -17,42 +15,42 @@
     </UserControl.Styles>
     <DockPanel>
        <controls:ToolbarPanel DockPanel.Dock="Top">
-           <components:ButtonImage Command="{Binding NewSessionCommand, Mode=OneTime}" Image="Icons/icon_new.png" ToolTip.Tip="New session" />
-           <components:ButtonImage Command="{Binding SaveCurrentCurrent, Mode=OneTime}" Image="Icons/icon_save.png" ToolTip.Tip="Save session" />
-           <components:ButtonImage Command="{Binding PreviewCurrentCommand}" Image="Icons/icon_to_sql.png" ToolTip.Tip="Preview current total SQL" />
-           <components:ButtonImage Command="{Binding ForgetCurrentCurrent}" Image="Icons/icon_trash.png" ToolTip.Tip="Forget session" />
+           <components:ButtonImage Command="{CompiledBinding NewSessionCommand, Mode=OneTime}" Image="Icons/icon_new.png" ToolTip.Tip="New session" />
+           <components:ButtonImage Command="{CompiledBinding SaveCurrentCurrent, Mode=OneTime}" Image="Icons/icon_save.png" ToolTip.Tip="Save session" />
+           <components:ButtonImage Command="{CompiledBinding PreviewCurrentCommand}" Image="Icons/icon_to_sql.png" ToolTip.Tip="Preview current total SQL" />
+           <components:ButtonImage Command="{CompiledBinding ForgetCurrentCurrent}" Image="Icons/icon_trash.png" ToolTip.Tip="Forget session" />
            <controls:ToolbarSpacer />
-           <components:ButtonImage Command="{Binding DeleteSelectedItem}" Image="Icons/icon_delete.png" ToolTip.Tip="Remove item" />
-           <components:ButtonImage ToolTip.Tip="Open sessions help website" Command="{Binding OpenHelpCommand}" Image="Icons/icon_help.png" />
+           <components:ButtonImage Command="{CompiledBinding DeleteSelectedItem}" Image="Icons/icon_delete.png" ToolTip.Tip="Remove item" />
+           <components:ButtonImage ToolTip.Tip="Open sessions help website" Command="{CompiledBinding OpenHelpCommand}" Image="Icons/icon_help.png" />
        </controls:ToolbarPanel>
        <ComboBox DockPanel.Dock="Top" HorizontalAlignment="Stretch" 
-                 IsVisible="{Binding HasAnySessions}"
-                 Items="{Binding Sessions}" SelectedItem="{Binding SelectedSession, Mode=TwoWay}">
+                 IsVisible="{CompiledBinding HasAnySessions}"
+                 Items="{CompiledBinding Sessions}" SelectedItem="{CompiledBinding SelectedSession, Mode=TwoWay}">
            <ComboBox.ItemTemplate>
                <DataTemplate>
-                   <TextBlock Text="{Binding Name}" />
+                   <TextBlock Text="{CompiledBinding Name}" />
                </DataTemplate>
            </ComboBox.ItemTemplate>
        </ComboBox>
-       <ListBox Items="{Binding CurrentSolutionItems}"
+       <ListBox Items="{CompiledBinding CurrentSolutionItems}"
                 BorderThickness="0" 
-                SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
+                SelectedItem="{CompiledBinding SelectedItem, Mode=TwoWay}"
                 DoubleTapped="Tv_OnDoubleTapped">
            <ListBox.ItemTemplate>
                <DataTemplate>
                    <DockPanel LastChildFill="True" Height="26" Background="Transparent">
-                       <components:WdeImage Width="14" Height="14" Stretch="Fill" Margin="0,0,6,0" Image="{Binding Icon}" />
-                       <TextBlock Padding="2" VerticalAlignment="Center" Text="{Binding ExtraId}"
+                       <components:WdeImage Width="14" Height="14" Stretch="Fill" Margin="0,0,6,0" Image="{CompiledBinding Icon}" />
+                       <TextBlock Padding="2" VerticalAlignment="Center" Text="{CompiledBinding ExtraId}"
                                   FontFamily="Consolas,Menlo,Courier,Courier New" Background="{DynamicResource ContentSpecialBackground}"
                                   Foreground="{DynamicResource ContentSpecialForeground}" Margin="0,0,7,0">
                            <Interaction.Behaviors>
-                               <DataTriggerBehavior Binding="{Binding ExtraId}" ComparisonCondition="Equal" Value="{x:Null}">
+                               <DataTriggerBehavior Binding="{CompiledBinding ExtraId}" ComparisonCondition="Equal" Value="{x:Null}">
                                    <ChangePropertyAction TargetObject="TextBlock" PropertyName="IsVisible" Value="False"/>
                                </DataTriggerBehavior>
                            </Interaction.Behaviors>
                        </TextBlock>
                        <TextBlock Margin="0,0,0,0" Padding="0,0,0,0" VerticalAlignment="Center"
-                                  Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
+                                  Text="{CompiledBinding Name}" TextTrimming="CharacterEllipsis" />
                    </DockPanel>
                </DataTemplate>
            </ListBox.ItemTemplate>

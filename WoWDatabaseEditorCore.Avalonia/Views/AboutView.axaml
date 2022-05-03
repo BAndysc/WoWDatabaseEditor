@@ -1,13 +1,15 @@
 ﻿<UserControl x:Class="WoWDatabaseEditorCore.Avalonia.Views.AboutView"
              xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia">
+             x:DataType="viewModels:AboutViewModel"
+             xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia"
+             xmlns:viewModels="clr-namespace:WoWDatabaseEditorCore.ViewModels;assembly=WoWDatabaseEditorCore">
     <UserControl.Resources>
         <converters:InverseBoolConverter x:Key="InversedBoolConverter" />
     </UserControl.Resources>
     <ScrollViewer HorizontalScrollBarVisibility="Disabled">
         <DockPanel Margin="20" LastChildFill="True">
-            <TextBlock DockPanel.Dock="Bottom" IsVisible="{Binding VersionKnown}" Text="{Binding ReleaseData}" TextWrapping="WrapWithOverflow" />
+            <TextBlock DockPanel.Dock="Bottom" IsVisible="{CompiledBinding VersionKnown}" Text="{CompiledBinding ReleaseData}" TextWrapping="WrapWithOverflow" />
             <StackPanel>
                 <Border BorderThickness="0,0,0,2" BorderBrush="#FF5FA2DA">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">

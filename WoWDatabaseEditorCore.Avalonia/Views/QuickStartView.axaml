@@ -94,7 +94,7 @@
                               IsVisible="{CompiledBinding ShowAnniversaryBox, Converter={x:Static BoolConverters.Not}}"
                               Width="32" Height="32" Margin="0,0,0,5" ToolTip.Tip="Open 2021 Summary">
                         <Interaction.Behaviors>
-                            <EventTriggerBehavior EventName="PointerPressed" SourceObject="{Binding #Party2021}">
+                            <EventTriggerBehavior EventName="PointerPressed" SourceObject="{CompiledBinding #Party2021}">
                                 <InvokeCommandAction Command="{Binding #Root.DataContext.OpenYearlySummary}" />
                             </EventTriggerBehavior>
                         </Interaction.Behaviors>
@@ -122,7 +122,7 @@
                         <TextBlock Cursor="Hand" TextWrapping="WrapWithOverflow" x:Name="Text"
                                    Text="Click here to see the history of the editor (including old screenshots 🤩)">
                             <Interaction.Behaviors>
-                                <EventTriggerBehavior EventName="PointerPressed" SourceObject="{Binding #Text}">
+                                <EventTriggerBehavior EventName="PointerPressed" SourceObject="{CompiledBinding #Text}">
                                     <InvokeCommandAction Command="{Binding #Root.DataContext.OpenYearlySummary}" />
                                 </EventTriggerBehavior>
                             </Interaction.Behaviors>

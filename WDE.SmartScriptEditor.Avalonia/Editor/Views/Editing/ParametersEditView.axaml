@@ -7,7 +7,7 @@
              xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:viewModels="clr-namespace:WDE.SmartScriptEditor.Editor.ViewModels.Editing;assembly=WDE.SmartScriptEditor"
-             d:DataContext="{d:DesignInstance viewModels:ParametersEditViewModel, IsDesignTimeCreatable=False}"
+             x:DataType="viewModels:ParametersEditViewModel"
              mvvm:ViewModelLocator.AutoWireViewModel="False">
     
     <Grid Margin="6">
@@ -18,10 +18,10 @@
         </Grid.RowDefinitions>
         <controls:FormattedTextBlock
             IsHitTestVisible="False"
-            Text="{Binding Readable}"
+            Text="{CompiledBinding Readable}"
             Margin="0,0,0,10" />
         <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Grid.Row="1">
-            <ItemsPresenter Focusable="False" KeyboardNavigation.TabNavigation="Continue" Items="{Binding FilteredParameters}" x:Name="Parameters">
+            <ItemsPresenter Focusable="False" KeyboardNavigation.TabNavigation="Continue" Items="{CompiledBinding FilteredParameters}" x:Name="Parameters">
                 <ItemsPresenter.ItemTemplate>
                     <DataTemplate>
                         <StackPanel>
@@ -40,14 +40,14 @@
                 </ItemsPresenter.ItemTemplate>
             </ItemsPresenter>
         </ScrollViewer>
-        <Grid Grid.Row="2" IsVisible="{Binding ShowCloseButtons}">
+        <Grid Grid.Row="2" IsVisible="{CompiledBinding ShowCloseButtons}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="80" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="80" />
             </Grid.ColumnDefinitions>
-            <Button Command="{Binding Cancel}"  Content="Cancel" />
-            <Button Command="{Binding Accept}" Grid.Column="2" Content="Ok" />
+            <Button Command="{CompiledBinding Cancel}"  Content="Cancel" />
+            <Button Command="{CompiledBinding Accept}" Grid.Column="2" Content="Ok" />
         </Grid>
     </Grid>
 </UserControl>

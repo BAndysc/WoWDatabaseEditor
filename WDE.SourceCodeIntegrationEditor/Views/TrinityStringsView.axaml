@@ -8,15 +8,17 @@
              xmlns:avaloniaEdit="https://github.com/avaloniaui/avaloniaedit"
              xmlns:controls1="clr-namespace:WDE.Common.Avalonia.Controls;assembly=WDE.Common.Avalonia"
              xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia"
+             xmlns:viewModels="clr-namespace:WDE.SourceCodeIntegrationEditor.ViewModels"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:TrinityStringsViewModel"
              x:Class="WDE.SourceCodeIntegrationEditor.Views.TrinityStringsView">
     <UserControl.Resources>
         <converters:NativeTextDocumentConverter x:Key="DocumentConverter" />
     </UserControl.Resources>
-    <controls:WizardPanel IsLoading="{Binding IsLoading}"
-                          CurrentStepIndex="{Binding WizardStep}" 
-                          NextStepCommand="{Binding CommandNextStep}" 
-                          PreviousStepCommand="{Binding CommandPreviousStep}">
+    <controls:WizardPanel IsLoading="{CompiledBinding IsLoading}"
+                          CurrentStepIndex="{CompiledBinding WizardStep}" 
+                          NextStepCommand="{CompiledBinding CommandNextStep}" 
+                          PreviousStepCommand="{CompiledBinding CommandPreviousStep}">
         <controls:WizardPanel.TitleTemplate>
             <DataTemplate>
                 <StackPanel Orientation="Horizontal">
@@ -31,13 +33,13 @@
         <ScrollViewer controls:WizardPanel.StepTitle="Choose strings to generate sql for">
             <StackPanel>
                 <controls:GroupingHeader GroupName="Trinity strings not defined in database" />
-                <ItemsControl Padding="10,0" Items="{Binding TrinityStringsNoDatabase}">
+                <ItemsControl Padding="10,0" Items="{CompiledBinding TrinityStringsNoDatabase}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <CheckBox DockPanel.Dock="Left" IsChecked="{Binding IsSelected, Mode=TwoWay}" Margin="0,0,0,7">
+                            <CheckBox DockPanel.Dock="Left" IsChecked="{CompiledBinding IsSelected, Mode=TwoWay}" Margin="0,0,0,7">
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="{Binding Id}" Width="50" />
-                                    <TextBlock Text="{Binding EnumName}" FontFamily="Consolas,Menlo,Courier,Courier New" FontWeight="Bold" />
+                                    <TextBlock Text="{CompiledBinding Id}" Width="50" />
+                                    <TextBlock Text="{CompiledBinding EnumName}" FontFamily="Consolas,Menlo,Courier,Courier New" FontWeight="Bold" />
                                 </StackPanel>
                             </CheckBox>
                         </DataTemplate>
@@ -47,7 +49,7 @@
         </ScrollViewer>
         
         <ScrollViewer controls:WizardPanel.StepTitle="Specify strings details">
-            <ItemsControl Items="{Binding ChosenStrings}">
+            <ItemsControl Items="{CompiledBinding ChosenStrings}">
                 <ItemsControl.Styles>
                     <Style Selector="ItemsControl:empty">
                         <Setter Property="Template">
@@ -64,11 +66,11 @@
                                 <ColumnDefinition Width="150" MinWidth="150" />
                                 <ColumnDefinition />
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" FontSize="13" TextAlignment="Right" Text="{Binding Id}" VerticalAlignment="Bottom" Margin="0,0,8,0" FontWeight="Bold" />
-                            <TextBlock Grid.Column="1" FontSize="16" Text="{Binding EnumName}" FontWeight="Bold" />
+                            <TextBlock Grid.Column="0" FontSize="13" TextAlignment="Right" Text="{CompiledBinding Id}" VerticalAlignment="Bottom" Margin="0,0,8,0" FontWeight="Bold" />
+                            <TextBlock Grid.Column="1" FontSize="16" Text="{CompiledBinding EnumName}" FontWeight="Bold" />
 
                             <TextBlock Classes="Label"  Grid.Row="1">Content default:</TextBlock>
-                            <TextBox AcceptsReturn="True" Margin="0,2" Grid.Row="1" Grid.Column="1" Text="{Binding ContentDefault, Mode=TwoWay}" />
+                            <TextBox AcceptsReturn="True" Margin="0,2" Grid.Row="1" Grid.Column="1" Text="{CompiledBinding ContentDefault, Mode=TwoWay}" />
                         </Grid>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
@@ -86,10 +88,10 @@
         
         <DockPanel LastChildFill="True" controls:WizardPanel.StepTitle="Generated SQL">
             <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="10,0,0,0">
-                <Button Command="{Binding SaveSqlCommand}" Margin="0,0,10,0">Save to sql/updates/ folder</Button>
-                <Button Command="{Binding ExecuteSqlCommand}">Execute SQL</Button>
+                <Button Command="{CompiledBinding SaveSqlCommand}" Margin="0,0,10,0">Save to sql/updates/ folder</Button>
+                <Button Command="{CompiledBinding ExecuteSqlCommand}">Execute SQL</Button>
             </StackPanel>
-            <avaloniaEdit:TextEditor  controls1:AvalonEditExtra.SyntaxExtension="sql"  Document="{Binding ResultCode, Converter={StaticResource DocumentConverter}}" 
+            <avaloniaEdit:TextEditor  controls1:AvalonEditExtra.SyntaxExtension="sql"  Document="{CompiledBinding ResultCode, Converter={StaticResource DocumentConverter}}" 
                                       BorderThickness="0" x:Name="MyAvalonEdit"
                                       ShowLineNumbers="True"
                                       IsReadOnly="True"

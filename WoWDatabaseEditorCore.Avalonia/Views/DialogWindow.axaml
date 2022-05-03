@@ -4,21 +4,23 @@
              xmlns:prism="http://prismlibrary.com/"
              xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
              xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
+             xmlns:managers="clr-namespace:WDE.Common.Managers;assembly=WDE.Common"
              WindowStartupLocation="CenterOwner"
              ShowInTaskbar="False"
-             CanResize="{Binding Resizeable}"
-             utils:ViewBind.Model="{Binding}"
-             Title="{Binding Title}"
+             CanResize="{CompiledBinding Resizeable}"
+             utils:ViewBind.Model="{CompiledBinding}"
+             Title="{CompiledBinding Title}"
              Name="ThisWindow"
+             x:DataType="managers:IDialog"
              prism:ViewModelLocator.AutoWireViewModel="False">
     <controls:ExtendedWindow.KeyBindings>
-        <KeyBinding Gesture="Escape" Command="{Binding Cancel}" />
-        <KeyBinding Gesture="Enter" Command="{Binding Accept}" />
+        <KeyBinding Gesture="Escape" Command="{CompiledBinding Cancel}" />
+        <KeyBinding Gesture="Enter" Command="{CompiledBinding Accept}" />
     </controls:ExtendedWindow.KeyBindings>
     <controls:ExtendedWindow.ToolBar>
         <controls:ToolBar>
             <controls:ToolBar.MiddleContent>
-                <ContentPresenter DataContext="{Binding #ThisWindow.DataContext}" Content="{Binding}" ContentTemplate="{x:Static utils:ToolbarDataTemplate.Template}" />
+                <ContentPresenter DataContext="{CompiledBinding #ThisWindow.DataContext}" Content="{CompiledBinding}" ContentTemplate="{x:Static utils:ToolbarDataTemplate.Template}" />
             </controls:ToolBar.MiddleContent>
         </controls:ToolBar>
     </controls:ExtendedWindow.ToolBar>

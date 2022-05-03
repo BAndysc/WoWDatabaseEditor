@@ -4,19 +4,21 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
              xmlns:components="clr-namespace:WDE.Common.Avalonia.Components;assembly=WDE.Common.Avalonia"
+             xmlns:viewModels="clr-namespace:WDE.Conditions.ViewModels;assembly=WDE.Conditions"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:ConditionsEditorViewModel"
              x:Class="WDE.Conditions.Avalonia.Views.ConditionsEditorToolBar">
     <controls:ToolbarPanel>
-        <components:ButtonImage Image="Icons/icon_left.png" Command="{Binding UndoCommand}" />
-        <components:ButtonImage Image="Icons/icon_right.png" Command="{Binding RedoCommand}" />
+        <components:ButtonImage Image="Icons/icon_left.png" Command="{CompiledBinding UndoCommand}" />
+        <components:ButtonImage Image="Icons/icon_right.png" Command="{CompiledBinding RedoCommand}" />
         <Panel Width="20" />
             
-        <components:ButtonImage Image="Icons/icon_copy.png" Command="{Binding CopyCommand}" />
-        <components:ButtonImage Image="Icons/icon_cut.png" Command="{Binding CutCommand}" />
-        <components:ButtonImage Image="Icons/icon_paste.png" Command="{Binding PasteCommand}" />
+        <components:ButtonImage Image="Icons/icon_copy.png" Command="{CompiledBinding CopyCommand}" />
+        <components:ButtonImage Image="Icons/icon_cut.png" Command="{CompiledBinding CutCommand}" />
+        <components:ButtonImage Image="Icons/icon_paste.png" Command="{CompiledBinding PasteCommand}" />
         <Panel Width="20" />
 
-        <components:ButtonImage Image="Icons/icon_add.png" Command="{Binding AddItemCommand}" />
-        <components:ButtonImage Image="Icons/icon_delete.png" Command="{Binding RemoveItemCommand}" />
+        <components:ButtonImage Image="Icons/icon_add.png" Command="{CompiledBinding AddItemCommand}" />
+        <components:ButtonImage Image="Icons/icon_delete.png" Command="{CompiledBinding RemoveItemCommand}" />
     </controls:ToolbarPanel>
 </UserControl>

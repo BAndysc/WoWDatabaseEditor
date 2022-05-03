@@ -65,7 +65,7 @@
         
         <ListBox Items="{CompiledBinding Items}"
                  Grid.Row="1" Grid.ColumnSpan="2"  
-                 SelectedItem="{Binding SelectedItem}"
+                 SelectedItem="{CompiledBinding SelectedItem}"
                  Name="ListBox"
                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                  VirtualizationMode="Simple"
@@ -77,24 +77,22 @@
                 </ItemsPanelTemplate>
             </ListBox.ItemsPanel>
             <ListBox.Styles>
-                <Style Selector="ListBoxItem">
-                    <Setter Property="(editor:FastGroupingWrapPanel.Group)" Value="{Binding Group}" />
-                    <Setter Property="IsVisible" Value="{Binding ShowItem}"></Setter>
+                <Style Selector="ListBoxItem" x:DataType="viewModels:SmartItem">
+                    <Setter Property="(editor:FastGroupingWrapPanel.Group)" Value="{CompiledBinding Group}" />
+                    <Setter Property="IsVisible" Value="{CompiledBinding ShowItem}"></Setter>
                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                     <Setter Property="ClipToBounds" Value="False" />
                     <Setter Property="Padding" Value="7,5,2,7"></Setter>
+                    <Setter Property="ContextMenu">
+                        <ContextMenu>
+                            <MenuItem Header="Toggle favourite" CommandParameter="{CompiledBinding}" Command="{Binding #Root.DataContext.ToggleFavouriteCommand}" />
+                        </ContextMenu>
+                    </Setter>
                 </Style>
                 <Style Selector="ListBoxItem Path">
                     <Setter Property="ClipToBounds" Value="False" />
                     <Setter Property="MinWidth" Value="20" />
                     <Setter Property="MinHeight" Value="20" />
-                </Style>
-                <Style Selector="ListBoxItem">
-                    <Setter Property="ContextMenu">
-                        <ContextMenu>
-                            <MenuItem Header="Toggle favourite" CommandParameter="{Binding}" Command="{Binding #Root.DataContext.ToggleFavouriteCommand}" />
-                        </ContextMenu>
-                    </Setter>
                 </Style>
             </ListBox.Styles>
             <ListBox.ItemTemplate>
@@ -119,10 +117,10 @@
                         </Path>
                         <TextBlock Text="{CompiledBinding Name}" VerticalAlignment="Center">
                             <Interaction.Behaviors>
-                                <DataTriggerBehavior Binding="{Binding Deprecated}" Value="True">
+                                <DataTriggerBehavior Binding="{CompiledBinding Deprecated}" Value="True">
                                     <ChangePropertyAction PropertyName="Foreground" Value="Gray" />
                                 </DataTriggerBehavior>
-                                <DataTriggerBehavior Binding="{Binding Deprecated}" Value="False">
+                                <DataTriggerBehavior Binding="{CompiledBinding Deprecated}" Value="False">
                                     <ChangePropertyAction PropertyName="Foreground" Value="{Binding #Root.Foreground}" />
                                 </DataTriggerBehavior>
                             </Interaction.Behaviors>
@@ -145,7 +143,7 @@
             </Grid.ColumnDefinitions>
             <Button Content="Cancel" Command="{CompiledBinding Cancel}"  />
             <TextBlock Grid.Column="1" FontSize="9" VerticalAlignment="Center" HorizontalAlignment="Center" Opacity="0.3">Right click on an item to mark as favourite.</TextBlock>
-            <Button Command="{Binding Accept}" Grid.Column="2" Content="Next" />
+            <Button Command="{CompiledBinding Accept}" Grid.Column="2" Content="Next" />
         </Grid>
     </Grid>
 </controls:DialogViewBase>

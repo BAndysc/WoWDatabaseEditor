@@ -9,12 +9,12 @@
                 xmlns:converters="clr-namespace:WDE.PacketViewer.Avalonia.Views.Converters"
                 mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
                 Name="Root"
-                d:DataContext="{d:DesignInstance viewModels:PacketFilterDialogViewModel, IsDesignTimeCreatable=False}"
+                x:DataType="viewModels:PacketFilterDialogViewModel"
                 x:Class="WDE.PacketViewer.Avalonia.Views.PacketFilterDialogView">
     <Grid RowDefinitions="Auto,*,Auto">
         <ScrollViewer Grid.Row="1">
             <StackPanel Spacing="10">
-                <Expander Header="{Binding EntriesHeader}" HorizontalContentAlignment="Stretch">
+                <Expander Header="{CompiledBinding EntriesHeader}" HorizontalContentAlignment="Stretch">
                     <StackPanel>
                         <TextBlock TextWrapping="WrapWithOverflow">
                             Comma separated list of entries. If "include entry" list is not empty, only packets with "included" entries will be displayed. If included is empty, all packets with those entries will be skipped (warning: some packets do not have entry in the viewer).
@@ -22,7 +22,7 @@
                         
                         <Grid ColumnDefinitions="*,5,*" RowDefinitions="Auto,*" MinHeight="300">
                             <controls:GroupingHeader Grid.Row="0" Grid.Column="0" GroupName="Excluded" />
-                            <TextBox Grid.Row="1" Grid.Column="0"  Text="{Binding ExcludedEntries}" 
+                            <TextBox Grid.Row="1" Grid.Column="0"  Text="{CompiledBinding ExcludedEntries}" 
                                      TextWrapping="WrapWithOverflow" 
                                      VerticalContentAlignment="Top" 
                                      AcceptsReturn="True" />
@@ -30,14 +30,14 @@
                             <GridSplitter Grid.Column="1" Grid.RowSpan="2" Classes="vertical"  />
                             
                             <controls:GroupingHeader Grid.Row="0" Grid.Column="2" GroupName="Included" />
-                            <TextBox Grid.Row="1" Grid.Column="2"  Text="{Binding IncludedEntries}" 
+                            <TextBox Grid.Row="1" Grid.Column="2"  Text="{CompiledBinding IncludedEntries}" 
                                      TextWrapping="WrapWithOverflow" 
                                      VerticalContentAlignment="Top" 
                                      AcceptsReturn="True" />
                         </Grid>
                     </StackPanel>
                 </Expander>
-                <Expander Header="{Binding OpcodesHeader}" HorizontalContentAlignment="Stretch">
+                <Expander Header="{CompiledBinding OpcodesHeader}" HorizontalContentAlignment="Stretch">
                     <StackPanel>
                         <TextBlock TextWrapping="WrapWithOverflow">
                             Comma separated list of opcodes. If included list is non empty, only packets with those opcodes will be displayed. If included is empty, all packets with opcodes in excluded list will be skipped.
@@ -45,7 +45,7 @@
                         
                         <Grid ColumnDefinitions="*,5,*" RowDefinitions="Auto,*" MinHeight="300">
                             <controls:GroupingHeader Grid.Row="0" Grid.Column="0" GroupName="Excluded" />
-                            <TextBox Grid.Row="1" Grid.Column="0"  Text="{Binding ExcludedOpcodes}" 
+                            <TextBox Grid.Row="1" Grid.Column="0"  Text="{CompiledBinding ExcludedOpcodes}" 
                                      TextWrapping="WrapWithOverflow" 
                                      VerticalContentAlignment="Top" 
                                      AcceptsReturn="True" />
@@ -53,14 +53,14 @@
                             <GridSplitter Grid.Column="1" Grid.RowSpan="2" Classes="vertical" />
                             
                             <controls:GroupingHeader Grid.Row="0" Grid.Column="2" GroupName="Included" />
-                            <TextBox Grid.Row="1" Grid.Column="2"  Text="{Binding IncludedOpcodes}" 
+                            <TextBox Grid.Row="1" Grid.Column="2"  Text="{CompiledBinding IncludedOpcodes}" 
                                      TextWrapping="WrapWithOverflow" 
                                      VerticalContentAlignment="Top" 
                                      AcceptsReturn="True" />
                         </Grid>
                     </StackPanel>
                 </Expander>
-                <Expander Header="{Binding GuidsHeader}" HorizontalContentAlignment="Stretch">
+                <Expander Header="{CompiledBinding GuidsHeader}" HorizontalContentAlignment="Stretch">
                     <StackPanel>
                         <TextBlock TextWrapping="WrapWithOverflow">
                             If included list is non empty, only packets with those GUIDs in them will be displayed. If included is empty, all packets with guid in excluded list will be skipped.
@@ -70,17 +70,17 @@
                     
                             <ListBox Grid.Row="1" Grid.Column="0"
                                      SelectionMode="Multiple"
-                                     Items="{Binding  ExcludedGuids}">
+                                     Items="{CompiledBinding  ExcludedGuids}">
                                 <ListBox.KeyBindings>
-                                    <KeyBinding Gesture="Back" Command="{Binding DeleteExcludedGuid}" CommandParameter="{Binding $self.SelectedItem}" />
-                                    <KeyBinding Gesture="Delete" Command="{Binding DeleteExcludedGuid}" CommandParameter="{Binding $self.SelectedItem}" />
+                                    <KeyBinding Gesture="Back" Command="{CompiledBinding DeleteExcludedGuid}" CommandParameter="{Binding $self.SelectedItem}" />
+                                    <KeyBinding Gesture="Delete" Command="{CompiledBinding DeleteExcludedGuid}" CommandParameter="{Binding $self.SelectedItem}" />
                                 </ListBox.KeyBindings>
                                 <ListBox.Styles>
                                     <Style Selector="ListBoxItem">
                                         <Setter Property="ContextFlyout">
                                             <Setter.Value>
                                                 <MenuFlyout>
-                                                    <MenuItem Header="Delete" CommandParameter="{Binding .}" Command="{Binding #Root.DataContext.DeleteExcludedGuid}" />
+                                                    <MenuItem Header="Delete" CommandParameter="{CompiledBinding .}" Command="{Binding #Root.DataContext.DeleteExcludedGuid}" />
                                                 </MenuFlyout>
                                             </Setter.Value>
                                         </Setter>
@@ -88,7 +88,7 @@
                                 </ListBox.Styles>
                                 <ListBox.ItemTemplate>
                                     <DataTemplate>
-                                        <TextBlock Text="{Binding ., Converter={x:Static converters:UniversalGuidToHexConverter.Instance}}" />
+                                        <TextBlock Text="{CompiledBinding ., Converter={x:Static converters:UniversalGuidToHexConverter.Instance}}" />
                                     </DataTemplate>
                                 </ListBox.ItemTemplate>
                             </ListBox>
@@ -99,17 +99,17 @@
                     
                             <ListBox Grid.Row="1" Grid.Column="2"
                                      SelectionMode="Multiple"
-                                     Items="{Binding IncludedGuids}">
+                                     Items="{CompiledBinding IncludedGuids}">
                                 <ListBox.KeyBindings>
-                                    <KeyBinding Gesture="Back" Command="{Binding DeleteIncludedGuid}" CommandParameter="{Binding $self.SelectedItem}" />
-                                    <KeyBinding Gesture="Delete" Command="{Binding DeleteIncludedGuid}" CommandParameter="{Binding $self.SelectedItem}" />
+                                    <KeyBinding Gesture="Back" Command="{CompiledBinding DeleteIncludedGuid}" CommandParameter="{Binding $self.SelectedItem}" />
+                                    <KeyBinding Gesture="Delete" Command="{CompiledBinding DeleteIncludedGuid}" CommandParameter="{Binding $self.SelectedItem}" />
                                 </ListBox.KeyBindings>
                                 <ListBox.Styles>
                                     <Style Selector="ListBoxItem">
                                         <Setter Property="ContextFlyout">
                                             <Setter.Value>
                                                 <MenuFlyout>
-                                                    <MenuItem Header="Delete" CommandParameter="{Binding .}" Command="{Binding #Root.DataContext.DeleteIncludedGuid}" />
+                                                    <MenuItem Header="Delete" CommandParameter="{CompiledBinding .}" Command="{Binding #Root.DataContext.DeleteIncludedGuid}" />
                                                 </MenuFlyout>
                                             </Setter.Value>
                                         </Setter>
@@ -117,7 +117,7 @@
                                 </ListBox.Styles>
                                 <ListBox.ItemTemplate>
                                     <DataTemplate>
-                                        <TextBlock Text="{Binding ., Converter={x:Static converters:UniversalGuidToHexConverter.Instance}}" />
+                                        <TextBlock Text="{CompiledBinding ., Converter={x:Static converters:UniversalGuidToHexConverter.Instance}}" />
                                     </DataTemplate>
                                 </ListBox.ItemTemplate>
                             </ListBox>
@@ -131,11 +131,11 @@
                             Minimum and maximum packet number to include in the list.
                         </TextBlock>
                         <Grid ColumnDefinitions="Auto,5,*,20,Auto,5,*">
-                            <CheckBox IsChecked="{Binding HasMinPacketNumber}" />
-                            <TextBox Text="{Binding MinPacketNumber}" IsEnabled="{Binding HasMinPacketNumber}" Grid.Column="2" />
+                            <CheckBox IsChecked="{CompiledBinding HasMinPacketNumber}" />
+                            <TextBox Text="{CompiledBinding MinPacketNumber}" IsEnabled="{CompiledBinding HasMinPacketNumber}" Grid.Column="2" />
                         
-                            <CheckBox IsChecked="{Binding HasMaxPacketNumber}" Grid.Column="4" />
-                            <TextBox Text="{Binding MaxPacketNumber}" IsEnabled="{Binding HasMaxPacketNumber}" Grid.Column="6" />
+                            <CheckBox IsChecked="{CompiledBinding HasMaxPacketNumber}" Grid.Column="4" />
+                            <TextBox Text="{CompiledBinding MaxPacketNumber}" IsEnabled="{CompiledBinding HasMaxPacketNumber}" Grid.Column="6" />
                         </Grid>
                     </StackPanel>
                 </Expander>
@@ -145,7 +145,7 @@
                         <TextBlock TextWrapping="WrapWithOverflow">
                             Comma separated list of packet numbers that will be included, even if other conditions fail.
                         </TextBlock>
-                        <TextBox Text="{Binding CommaSeparatedPackets}" TextWrapping="WrapWithOverflow" VerticalContentAlignment="Top" AcceptsReturn="True" Grid.Row="1" />
+                        <TextBox Text="{CompiledBinding CommaSeparatedPackets}" TextWrapping="WrapWithOverflow" VerticalContentAlignment="Top" AcceptsReturn="True" Grid.Row="1" />
                     </Grid>
                 </Expander>
             </StackPanel>
@@ -156,8 +156,8 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="80" />
             </Grid.ColumnDefinitions>
-            <Button Command="{Binding Cancel}"  Content="Cancel" />
-            <Button Command="{Binding Accept}" Grid.Column="2" Content="Ok" />
+            <Button Command="{CompiledBinding Cancel}"  Content="Cancel" />
+            <Button Command="{CompiledBinding Accept}" Grid.Column="2" Content="Ok" />
         </Grid>
     </Grid>
 </controls1:DialogViewBase>

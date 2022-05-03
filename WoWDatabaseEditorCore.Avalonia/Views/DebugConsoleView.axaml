@@ -4,12 +4,11 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:avaloniaEdit="https://github.com/avaloniaui/avaloniaedit"
              xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia"
+             xmlns:viewModels="clr-namespace:WoWDatabaseEditorCore.ViewModels;assembly=WoWDatabaseEditorCore"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:DebugConsoleViewModel"
              x:Class="WoWDatabaseEditorCore.Avalonia.Views.DebugConsoleView">
-    <UserControl.Resources>
-        <converters:NativeTextDocumentConverter x:Key="DocumentConverter" />
-    </UserControl.Resources>
-    <avaloniaEdit:TextEditor Document="{Binding ConsoleLog, Converter={StaticResource DocumentConverter}}" 
+    <avaloniaEdit:TextEditor Document="{CompiledBinding ConsoleLog, Converter={x:Static NativeTextDocumentConverter.Instance}}" 
                              BorderThickness="0"
                              ShowLineNumbers="True" FontFamily="Consolas,Menlo,Courier,Courier New" />
 </UserControl>

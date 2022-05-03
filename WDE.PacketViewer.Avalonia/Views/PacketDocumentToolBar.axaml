@@ -6,39 +6,35 @@
              xmlns:components="clr-namespace:WDE.Common.Avalonia.Components;assembly=WDE.Common.Avalonia"
              xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia"
              xmlns:viewModels="clr-namespace:WDE.PacketViewer.ViewModels;assembly=WDE.PacketViewer"
-             d:DataContext="{d:DesignInstance viewModels:PacketDocumentViewModel, IsDesignTimeCreatable=False}"
+             x:DataType="viewModels:PacketDocumentViewModel"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              Name="Root"
              x:Class="WDE.PacketViewer.Avalonia.Views.PacketDocumentToolBar">
-    
-    <UserControl.Resources>
-        <converters:InverseBoolConverter x:Key="InversedBoolConverter" />
-    </UserControl.Resources>
     <controls:ToolbarPanel DockPanel.Dock="Top"
-                           IsEnabled="{Binding FilteringInProgress, Converter={StaticResource InversedBoolConverter}}">
-        <components:ButtonImage ToolTip.Tip="Saves to text file filtered packets" Command="{Binding SaveToFileCommand}" Image="Icons/icon_save_to_txt.png" />
+                           IsEnabled="{CompiledBinding FilteringInProgress, Converter={x:Static BoolConverters.Not}}">
+        <components:ButtonImage ToolTip.Tip="Saves to text file filtered packets" Command="{CompiledBinding SaveToFileCommand}" Image="Icons/icon_save_to_txt.png" />
 
-        <ToggleButton ToolTip.Tip="Find" IsChecked="{Binding FindPanelEnabled, Mode=TwoWay}">
+        <ToggleButton ToolTip.Tip="Find" IsChecked="{CompiledBinding FindPanelEnabled, Mode=TwoWay}">
             <components:WdeImage ImageUri="Icons/icon_find.png" />
         </ToggleButton>
         
         <Border Width="15" />
 
-        <components:ButtonImage ToolTip.Tip="Select previous packet&#xA;&#xA;Shortcut: Control + Z" Command="{Binding UndoCommand}" Image="Icons/icon_left.png" />
+        <components:ButtonImage ToolTip.Tip="Select previous packet&#xA;&#xA;Shortcut: Control + Z" Command="{CompiledBinding UndoCommand}" Image="Icons/icon_left.png" />
 
-        <components:ButtonImage ToolTip.Tip="Select next packet&#xA;&#xA;Shortcut: Control + Shift + Z" Command="{Binding RedoCommand}" Image="Icons/icon_right.png" />
+        <components:ButtonImage ToolTip.Tip="Select next packet&#xA;&#xA;Shortcut: Control + Shift + Z" Command="{CompiledBinding RedoCommand}" Image="Icons/icon_right.png" />
         
-        <components:ButtonImage ToolTip.Tip="Go to packet&#xA;&#xA;Shortcut: Control + G" Image="Icons/icon_goto_packet.png" Command="{Binding GoToPacketCommand}" />
+        <components:ButtonImage ToolTip.Tip="Go to packet&#xA;&#xA;Shortcut: Control + G" Image="Icons/icon_goto_packet.png" Command="{CompiledBinding GoToPacketCommand}" />
         
-        <ToggleButton ToolTip.Tip="Toggle 'reason panel' visibility. This panel shows what is most likely trigger of the action inside the packet." IsChecked="{Binding ReasonPanelVisibility, Mode=TwoWay}">
+        <ToggleButton ToolTip.Tip="Toggle 'reason panel' visibility. This panel shows what is most likely trigger of the action inside the packet." IsChecked="{CompiledBinding ReasonPanelVisibility, Mode=TwoWay}">
             <components:WdeImage ImageUri="Icons/icon_bulb.png" />
         </ToggleButton>
         
-        <ToggleButton ToolTip.Tip="Wrap/don't wrap lines in the preview" IsChecked="{Binding WrapLines, Mode=TwoWay}">
+        <ToggleButton ToolTip.Tip="Wrap/don't wrap lines in the preview" IsChecked="{CompiledBinding WrapLines, Mode=TwoWay}">
             <components:WdeImage ImageUri="Icons/icon_word_wrap.png" />
         </ToggleButton>
 
-        <ToggleButton ToolTip.Tip="Temporarily disable filters" IsChecked="{Binding DisableFilters, Mode=TwoWay}">
+        <ToggleButton ToolTip.Tip="Temporarily disable filters" IsChecked="{CompiledBinding DisableFilters, Mode=TwoWay}">
             <components:WdeImage ImageUri="Icons/icon_filters_disable.png" />
         </ToggleButton>
         
@@ -52,23 +48,23 @@
                 </StackPanel>
             </controls:DropDownButton.Button>
             <StackPanel Orientation="Vertical">
-                <ItemsPresenter Items="{Binding Processors}">
+                <ItemsPresenter Items="{CompiledBinding Processors}">
                     <ItemsPresenter.ItemTemplate>
-                        <DataTemplate>
-                            <CheckBox IsChecked="{Binding IsChecked}" Margin="0,0,0,12" HorizontalAlignment="Stretch">
+                        <DataTemplate x:DataType="viewModels:ProcessorViewModel">
+                            <CheckBox IsChecked="{CompiledBinding IsChecked}" Margin="0,0,0,12" HorizontalAlignment="Stretch">
                                 <DockPanel>
-                                    <components:WdeImage Image="{Binding Image}" Width="24" Height="24" VerticalAlignment="Center" />
+                                    <components:WdeImage Image="{CompiledBinding Image}" Width="24" Height="24" VerticalAlignment="Center" />
                                     <StackPanel Orientation="Vertical" Margin="3,0,0,0">
-                                        <TextBlock FontWeight="Bold" Text="{Binding Name}" />
-                                        <TextBlock Text="{Binding Description}" />
-                                        <TextBlock Opacity="0.7" Text="{Binding Format, StringFormat=Format: {0}}" />
+                                        <TextBlock FontWeight="Bold" Text="{CompiledBinding Name}" />
+                                        <TextBlock Text="{CompiledBinding Description}" />
+                                        <TextBlock Opacity="0.7" Text="{CompiledBinding Format, StringFormat=Format: {0}}" />
                                     </StackPanel>
                                 </DockPanel>
                             </CheckBox>
                         </DataTemplate>
                     </ItemsPresenter.ItemTemplate>
                 </ItemsPresenter>
-                <Button ClickMode="Press" Command="{Binding RunProcessors}" Content="Execute">
+                <Button ClickMode="Press" Command="{CompiledBinding RunProcessors}" Content="Execute">
                     <Interaction.Behaviors>
                         <controls:DismissPopupBehaviour/>
                     </Interaction.Behaviors>
@@ -78,13 +74,13 @@
         
         <Border Width="15" />
         
-        <ItemsPresenter Items="{Binding Processors}">
+        <ItemsPresenter Items="{CompiledBinding Processors}">
             <ItemsPresenter.ItemTemplate>
-                <DataTemplate>
+                <DataTemplate x:DataType="viewModels:ProcessorViewModel">
                     <Button Command="{Binding #Root.DataContext.QuickRunProcessor}"
-                            CommandParameter="{Binding .}"
-                        ToolTip.Tip="{Binding Name}">
-                        <components:WdeImage Image="{Binding Image}" />
+                            CommandParameter="{CompiledBinding .}"
+                        ToolTip.Tip="{CompiledBinding Name}">
+                        <components:WdeImage Image="{CompiledBinding Image}" />
                     </Button>
                 </DataTemplate>
             </ItemsPresenter.ItemTemplate>
@@ -98,11 +94,11 @@
         <controls:ToolbarSpacer />
 
         <CheckBox ToolTip.Tip="If enabled, CMSG_MOVE* and SMSG_MOVE* packets will be hidden. Note: SMSG_ON_MONSTER_MOVE will be still displayed." 
-                  IsChecked="{Binding HidePlayerMove}">Hide player MOVE</CheckBox>
+                  IsChecked="{CompiledBinding HidePlayerMove}">Hide player MOVE</CheckBox>
                   
         <CheckBox ToolTip.Tip="If enabled, UPDATE_OBJECT packets will be split for each update, what makes filtering way easier (because you can filter individual updates)." 
-                  IsChecked="{Binding SplitUpdate}">Split UPDATE_OBJECT</CheckBox>
+                  IsChecked="{CompiledBinding SplitUpdate}">Split UPDATE_OBJECT</CheckBox>
         
-        <components:ButtonImage ToolTip.Tip="Opens Packet Viewer help website" Command="{Binding OpenHelpCommand}" Image="Icons/icon_help.png" />
+        <components:ButtonImage ToolTip.Tip="Opens Packet Viewer help website" Command="{CompiledBinding OpenHelpCommand}" Image="Icons/icon_help.png" />
     </controls:ToolbarPanel>
 </UserControl>

@@ -8,6 +8,7 @@
              xmlns:userControls="clr-namespace:WDE.SmartScriptEditor.Avalonia.Editor.UserControls"
              xmlns:models="clr-namespace:WDE.SmartScriptEditor.Models;assembly=WDE.SmartScriptEditor"
              xmlns:viewModels1="clr-namespace:WDE.SmartScriptEditor.Editor.ViewModels;assembly=WDE.SmartScriptEditor"
+             x:DataType="viewModels1:SmartScriptEditorViewModel"
              mc:Ignorable="d" x:Name="Rooot"
              d:DesignHeight="300" d:DesignWidth="300">
     <UserControl.Resources>
@@ -15,18 +16,18 @@
         <system:Boolean x:Key="TrueValue">True</system:Boolean>
     </UserControl.Resources>
     <UserControl.KeyBindings>
-        <KeyBinding Gesture="Back" Command="{Binding DeleteSelected}" />
-        <KeyBinding Gesture="Delete" Command="{Binding DeleteSelected}" />
-        <KeyBinding Gesture="Enter" Command="{Binding EditSelected}" />
-        <KeyBinding Gesture="Ctrl+A" Command="{Binding SelectAll}" />
-        <KeyBinding Gesture="Up" Command="{Binding SelectionUp}" CommandParameter="{StaticResource FalseValue}" />
-        <KeyBinding Gesture="Down" Command="{Binding SelectionDown}" CommandParameter="{StaticResource FalseValue}" />
-        <KeyBinding Gesture="Ctrl+Up" Command="{Binding SelectionUp}"
+        <KeyBinding Gesture="Back" Command="{CompiledBinding DeleteSelected}" />
+        <KeyBinding Gesture="Delete" Command="{CompiledBinding DeleteSelected}" />
+        <KeyBinding Gesture="Enter" Command="{CompiledBinding EditSelected}" />
+        <KeyBinding Gesture="Ctrl+A" Command="{CompiledBinding SelectAll}" />
+        <KeyBinding Gesture="Up" Command="{CompiledBinding SelectionUp}" CommandParameter="{StaticResource FalseValue}" />
+        <KeyBinding Gesture="Down" Command="{CompiledBinding SelectionDown}" CommandParameter="{StaticResource FalseValue}" />
+        <KeyBinding Gesture="Ctrl+Up" Command="{CompiledBinding SelectionUp}"
                     CommandParameter="{StaticResource TrueValue}" />
-        <KeyBinding Gesture="Ctrl+Down" Command="{Binding SelectionDown}"
+        <KeyBinding Gesture="Ctrl+Down" Command="{CompiledBinding SelectionDown}"
                     CommandParameter="{StaticResource TrueValue}" />
-        <KeyBinding Gesture="Right" Command="{Binding SelectionRight}" />
-        <KeyBinding Gesture="Left" Command="{Binding SelectionLeft}" />
+        <KeyBinding Gesture="Right" Command="{CompiledBinding SelectionRight}" />
+        <KeyBinding Gesture="Left" Command="{CompiledBinding SelectionLeft}" />
     </UserControl.KeyBindings>
     
     <UserControl.Styles>
@@ -52,29 +53,29 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" MinHeight="30" />
         </Grid.RowDefinitions>
-        <ItemsControl Focusable="False" Items="{Binding Together}" IsHitTestVisible="True" DockPanel.Dock="Top"
+        <ItemsControl Focusable="False" Items="{CompiledBinding Together}" IsHitTestVisible="True" DockPanel.Dock="Top"
                       Margin="7,0,7,0">
             <ItemsControl.DataTemplates>
                 <DataTemplate DataType="{x:Type models:SmartEvent}">
                     <userControls:SmartEventView
-                        Selected="{Binding IsSelected, Mode=TwoWay}"
-                        userControls:SmartScriptPanelLayout.Selected="{Binding IsSelected, Mode=TwoWay}"
+                        Selected="{CompiledBinding IsSelected, Mode=TwoWay}"
+                        userControls:SmartScriptPanelLayout.Selected="{CompiledBinding IsSelected, Mode=TwoWay}"
                         DirectEditParameter="{Binding DataContext.DirectEditParameter, ElementName=Rooot}"
                         DeselectActionsOfDeselectedEventsRequest="{Binding DataContext.DeselectAllButEvents, ElementName=Rooot}"
                         DeselectAllRequest="{Binding DataContext.DeselectAll, ElementName=Rooot}"
-                        IsSelected="{Binding IsSelected, Mode=TwoWay}"
+                        IsSelected="{CompiledBinding IsSelected, Mode=TwoWay}"
                         EditEventCommand="{Binding DataContext.EditEvent, ElementName=Rooot}"
                         IsHitTestVisible="True"/>
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type models:SmartAction}">
                     <userControls:SmartActionView
-                        Indent="{Binding Indent}"
+                        Indent="{CompiledBinding Indent}"
                         DirectEditParameter="{Binding DataContext.DirectEditParameter, ElementName=Rooot}"
                         userControls:SelectableTemplatedControl.DeselectAllRequest="{Binding DataContext.DeselectAll, ElementName=Rooot}"
                         DeselectAllButActionsRequest="{Binding DataContext.DeselectAllButActions, ElementName=Rooot}"
                         EditActionCommand="{Binding DataContext.EditAction, ElementName=Rooot}"
-                        IsSelected="{Binding IsSelected, Mode=TwoWay}"
-                        userControls:SmartScriptPanelLayout.Selected="{Binding IsSelected, Mode=TwoWay}"
+                        IsSelected="{CompiledBinding IsSelected, Mode=TwoWay}"
+                        userControls:SmartScriptPanelLayout.Selected="{CompiledBinding IsSelected, Mode=TwoWay}"
                     />
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type models:SmartCondition}">
@@ -83,8 +84,8 @@
                         DeselectAllRequest="{Binding DataContext.DeselectAll, ElementName=Rooot}"
                         DeselectAllButConditionsRequest="{Binding DataContext.DeselectAllButConditions, ElementName=Rooot}"
                         EditConditionCommand="{Binding DataContext.EditCondition, ElementName=Rooot}"
-                        userControls:SmartScriptPanelLayout.Selected="{Binding IsSelected, Mode=TwoWay}"
-                        IsSelected="{Binding IsSelected, Mode=TwoWay}"
+                        userControls:SmartScriptPanelLayout.Selected="{CompiledBinding IsSelected, Mode=TwoWay}"
+                        IsSelected="{CompiledBinding IsSelected, Mode=TwoWay}"
                         />
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type models:GlobalVariable}">
@@ -92,8 +93,8 @@
                         DeselectAllRequest="{Binding DataContext.DeselectAll, ElementName=Rooot}"
                         EditGlobalVariableCommand="{Binding DataContext.EditGlobalVariable, ElementName=Rooot}"
                         DeselectAllButGlobalVariablesRequest="{Binding DataContext.DeselectAllButGlobalVariables, ElementName=Rooot}"
-                        userControls:SmartScriptPanelLayout.Selected="{Binding IsSelected, Mode=TwoWay}"
-                        IsSelected="{Binding IsSelected, Mode=TwoWay}"
+                        userControls:SmartScriptPanelLayout.Selected="{CompiledBinding IsSelected, Mode=TwoWay}"
+                        IsSelected="{CompiledBinding IsSelected, Mode=TwoWay}"
                     />
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type viewModels1:NewActionViewModel}">
@@ -101,7 +102,7 @@
                             Content="Add action"
                             Opacity="0.5"
                             Command="{Binding DataContext.AddAction, ElementName=Rooot}"
-                            CommandParameter="{Binding}">
+                            CommandParameter="{CompiledBinding}">
                     </Button>
                 </DataTemplate>
             
@@ -110,7 +111,7 @@
                         Content="Add condition"
                         Opacity="0.5"
                         Command="{Binding DataContext.AddCondition, ElementName=Rooot}"
-                        CommandParameter="{Binding}">
+                        CommandParameter="{CompiledBinding}">
                     </Button>
                 </DataTemplate>
             </ItemsControl.DataTemplates>
@@ -119,11 +120,11 @@
                 <ItemsPanelTemplate>
                     <userControls:SmartScriptPanelLayout Background="Transparent"
                                                          Focusable="True"
-                                                  Script="{Binding Script}" 
-                                                  Problems="{Binding ProblematicLines}" 
-                                                  DropItems="{Binding OnDropItems}"
-                                                  DropActions="{Binding OnDropActions}"
-                                                  DropConditions="{Binding OnDropConditions}"
+                                                  Script="{CompiledBinding Script}" 
+                                                  Problems="{CompiledBinding ProblematicLines}" 
+                                                  DropItems="{CompiledBinding OnDropItems}"
+                                                  DropActions="{CompiledBinding OnDropActions}"
+                                                  DropConditions="{CompiledBinding OnDropConditions}"
                                                   />
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
@@ -133,11 +134,11 @@
             Classes="FlatButton"
             Opacity="0.5"
             Content="Add event"
-            Command="{Binding AddEvent}">
+            Command="{CompiledBinding AddEvent}">
             <Button.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Define global variable" 
-                              Command="{Binding DefineGlobalVariable}" />
+                              Command="{CompiledBinding DefineGlobalVariable}" />
                     </ContextMenu>
             </Button.ContextMenu>
         </Button>

@@ -3,10 +3,12 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
+             xmlns:viewModels="clr-namespace:WoWDatabaseEditorCore.ViewModels;assembly=WoWDatabaseEditorCore"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:DebugConsoleViewModel"
              x:Class="WoWDatabaseEditorCore.Avalonia.Views.DebugConsoleToolBar">
     <controls:ToolbarPanel>
-        <Button Command="{Binding CrashCommand}">Crash the app (debug)</Button>
-        <Button Command="{Binding CrashAsyncCommand}">Crash the app async (debug)</Button>
+        <Button Command="{CompiledBinding CrashCommand}">Crash the app (debug)</Button>
+        <Button Command="{CompiledBinding CrashAsyncCommand}">Crash the app async (debug)</Button>
     </controls:ToolbarPanel>
 </UserControl>

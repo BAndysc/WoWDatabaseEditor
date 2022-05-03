@@ -7,4 +7,5 @@ public interface IQuickAccessViewModel
 {
     void OpenSearch(string? text);
     void CloseSearch();
+    bool IsOpened { get; }
 }

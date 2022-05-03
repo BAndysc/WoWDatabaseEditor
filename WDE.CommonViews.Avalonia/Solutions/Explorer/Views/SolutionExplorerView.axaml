@@ -8,6 +8,8 @@
           xmlns:components="clr-namespace:WDE.Common.Avalonia.Components;assembly=WDE.Common.Avalonia"
           xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
           xmlns:dnD="clr-namespace:WDE.Common.Avalonia.DnD;assembly=WDE.Common.Avalonia"
+          xmlns:viewModels="clr-namespace:WDE.Solutions.Explorer.ViewModels;assembly=WDE.Solutions"
+          x:DataType="viewModels:SolutionExplorerViewModel"
           prism:ViewModelLocator.AutoWireViewModel="False" x:Name="UC">
     
     <components:ToolView.Icon>
@@ -45,14 +47,14 @@
     </components:ToolView.Styles>
     
     <TreeView x:Name="tv" Margin="0" 
-              Items="{Binding Root}" 
+              Items="{CompiledBinding Root}" 
               SelectionMode="Multiple"
-              SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
-              SelectedItems="{Binding SelectedItems, Mode=TwoWay}"
+              SelectedItem="{CompiledBinding SelectedItem, Mode=TwoWay}"
+              SelectedItems="{CompiledBinding SelectedItems, Mode=TwoWay}"
               ScrollViewer.HorizontalScrollBarVisibility="Disabled"
               AutoScrollToSelectedItem="False"
               PointerReleased="Tv_OnPointerReleased"
-              dnD:DragAndDrop.IsDropTarget="True" dnD:DragAndDrop.DropHandler="{Binding }" dnD:DragAndDrop.IsDragSource="True"
+              dnD:DragAndDrop.IsDropTarget="True" dnD:DragAndDrop.DropHandler="{CompiledBinding }" dnD:DragAndDrop.IsDragSource="True"
               DoubleTapped="Tv_OnDoubleTapped">
         <TreeView.ContextMenu>
             <ContextMenu>
@@ -62,13 +64,13 @@
                           Classes="Parent"
                           Items="{Binding #tv.DataContext.AddItems}">
                     <MenuItem.Styles>
-                        <Style Selector="MenuItem.Parent > MenuItem">
-                            <Setter Property="Header" Value="{Binding Name}"/>
-                            <Setter Property="Items" Value="{Binding Items}"/>
+                        <Style Selector="MenuItem.Parent > MenuItem" x:DataType="viewModels:AddItemCategoryMenuViewModel">
+                            <Setter Property="Header" Value="{CompiledBinding Name}"/>
+                            <Setter Property="Items" Value="{CompiledBinding Items}"/>
                         </Style>
-                        <Style Selector="MenuItem.Parent > MenuItem > MenuItem">
-                            <Setter Property="Header" Value="{Binding Name}"/>
-                            <Setter Property="Command" Value="{Binding Command}"/>
+                        <Style Selector="MenuItem.Parent > MenuItem > MenuItem" x:DataType="viewModels:SolutionItemMenuViewModel">
+                            <Setter Property="Header" Value="{CompiledBinding Name}"/>
+                            <Setter Property="Command" Value="{CompiledBinding Command}"/>
                         </Style>
                     </MenuItem.Styles>
                 </MenuItem>
@@ -94,20 +96,20 @@
             </ContextMenu>
         </TreeView.ContextMenu>
         <TreeView.Styles>
-            <Style Selector="TreeViewItem">
-                <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
-                <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"/>
+            <Style Selector="TreeViewItem" x:DataType="viewModels:SolutionItemViewModel">
+                <Setter Property="IsExpanded" Value="{CompiledBinding IsExpanded, Mode=TwoWay}"/>
+                <Setter Property="IsSelected" Value="{CompiledBinding IsSelected, Mode=TwoWay}"/>
             </Style>
         </TreeView.Styles>
         <TreeView.DataTemplates>
-            <TreeDataTemplate ItemsSource="{Binding Children}">
+            <TreeDataTemplate ItemsSource="{CompiledBinding Children}">
                 <DockPanel Classes="TreeViewItemRow" LastChildFill="True" Height="26" Background="Transparent">
-                    <components:WdeImage Width="14" Height="14" Stretch="Fill" Margin="0,0,6,0" Image="{Binding Icon}" />
-                    <TextBlock Padding="2" VerticalAlignment="Center" Text="{Binding ExtraId}"
+                    <components:WdeImage Width="14" Height="14" Stretch="Fill" Margin="0,0,6,0" Image="{CompiledBinding Icon}" />
+                    <TextBlock Padding="2" VerticalAlignment="Center" Text="{CompiledBinding ExtraId}"
                                FontFamily="Consolas,Menlo,Courier,Courier New" Background="{DynamicResource ContentSpecialBackground}"
                                Foreground="{DynamicResource ContentSpecialForeground}" Margin="0,0,7,0">
                         <Interaction.Behaviors>
-                            <DataTriggerBehavior Binding="{Binding ExtraId}" ComparisonCondition="Equal" Value="{x:Null}">
+                            <DataTriggerBehavior Binding="{CompiledBinding ExtraId}" ComparisonCondition="Equal" Value="{x:Null}">
                                 <ChangePropertyAction TargetObject="TextBlock" PropertyName="IsVisible" Value="False"/>
                             </DataTriggerBehavior>
                         </Interaction.Behaviors>
@@ -116,12 +118,12 @@
                             Width="16" Height="16" 
                             Background="Transparent" BorderThickness="0"
                             Command="{Binding #tv.DataContext.ExportToServerItem, Mode=OneTime}"
-                            CommandParameter="{Binding .}"
+                            CommandParameter="{CompiledBinding .}"
                             Margin="0,0,6,0">
                         <components:WdeImage ImageUri="Resources/icon_reload.png" Width="16" Height="16" />
                     </Button>
                     <TextBlock Margin="0,0,0,0" Padding="0,0,0,0" VerticalAlignment="Center"
-                               Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
+                               Text="{CompiledBinding Name}" TextTrimming="CharacterEllipsis" />
                 </DockPanel>
             </TreeDataTemplate>
         </TreeView.DataTemplates>

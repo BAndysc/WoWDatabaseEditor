@@ -4,9 +4,11 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
              xmlns:components="clr-namespace:WDE.Common.Avalonia.Components;assembly=WDE.Common.Avalonia"
+             xmlns:viewModels="clr-namespace:WDE.SQLEditor.ViewModels;assembly=WDE.SQLEditor"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:SqlEditorViewModel"
              x:Class="WDE.CommonViews.Avalonia.SQLEditor.Views.SqlEditorToolBar">
     <controls:ToolbarPanel>
-        <components:ButtonImage Image="Icons/icon_play.png" Command="{Binding ExecuteSql}" /> 
+        <components:ButtonImage Image="Icons/icon_play.png" Command="{CompiledBinding ExecuteSql}" /> 
     </controls:ToolbarPanel>
 </UserControl>

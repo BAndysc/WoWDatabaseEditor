@@ -17,7 +17,7 @@
         <GridView 
             Margin="0,0,0,10"
             Items="{CompiledBinding Items}"
-            SelectedItem="{Binding SelectedItem}">
+            SelectedItem="{CompiledBinding SelectedItem}">
             <GridView.Columns>
                 <GridColumnDefinition Name="Id"
                                        Property="Id"

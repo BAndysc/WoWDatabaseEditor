@@ -4,23 +4,25 @@
              xmlns:prism="http://prismlibrary.com/"
              xmlns:controls="clr-namespace:WDE.Common.Avalonia.Controls;assembly=WDE.Common.Avalonia"
              xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia"
+             xmlns:viewModels="clr-namespace:WoWDatabaseEditorCore.Avalonia.Services.AppearanceService.ViewModels"
+             x:DataType="viewModels:ThemeConfigViewModel"
              prism:ViewModelLocator.AutoWireViewModel="False">
     <StackPanel>
         <controls:SettingsHeader Text="Themes" />
-        <TextBlock VerticalAlignment="Center"  Text="{Binding CurrentThemeName, StringFormat=Current: {0}}" />
+        <TextBlock VerticalAlignment="Center"  Text="{CompiledBinding CurrentThemeName, StringFormat=Current: {0}}" />
         <TextBlock VerticalAlignment="Center"  Text="All:" />
-        <ComboBox Margin="30,0,0,0" VerticalAlignment="Top" Items="{Binding Themes}"
-                  SelectedItem="{Binding ThemeName, Mode=TwoWay}" />
+        <ComboBox Margin="30,0,0,0" VerticalAlignment="Top" Items="{CompiledBinding Themes}"
+                  SelectedItem="{CompiledBinding ThemeName, Mode=TwoWay}" />
         
         <controls:SettingsHeader Text="Scaling" />
-        <TextBlock VerticalAlignment="Center"  Text="{Binding RecommendedScalingPercentage, StringFormat=Recommended scaling: {0}%}" />
+        <TextBlock VerticalAlignment="Center"  Text="{CompiledBinding RecommendedScalingPercentage, StringFormat=Recommended scaling: {0}%}" />
         <TextBlock VerticalAlignment="Center"  Text="Custom scaling [EXPERIMENTAL]:" />
-        <CheckBox IsEnabled="{Binding AllowCustomScaling}" Margin="30,0,0,0" IsChecked="{Binding UseCustomScaling}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
-            <Grid ColumnDefinitions="Auto,*" IsEnabled="{Binding UseCustomScaling}">
-                <TextBlock Width="90" VerticalAlignment="Center" Text="{Binding ScalingValuePercentage, StringFormat={}{0}%}"></TextBlock>
-                <Slider Grid.Column="1" HorizontalAlignment="Stretch" Name="ScalingSlider" Minimum="0.5" Maximum="4" Value="{Binding ScalingValue, Mode=TwoWay}" SmallChange="0.1" LargeChange="0.5" />
+        <CheckBox IsEnabled="{CompiledBinding AllowCustomScaling}" Margin="30,0,0,0" IsChecked="{CompiledBinding UseCustomScaling}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+            <Grid ColumnDefinitions="Auto,*" IsEnabled="{CompiledBinding UseCustomScaling}">
+                <TextBlock Width="90" VerticalAlignment="Center" Text="{CompiledBinding ScalingValuePercentage, StringFormat={}{0}%}"></TextBlock>
+                <Slider Grid.Column="1" HorizontalAlignment="Stretch" Name="ScalingSlider" Minimum="0.5" Maximum="4" Value="{CompiledBinding ScalingValue, Mode=TwoWay}" SmallChange="0.1" LargeChange="0.5" />
             </Grid>
         </CheckBox>
-        <TextBlock IsVisible="{Binding AllowCustomScaling, Converter={x:Static converters:InverseBoolConverter.Instance}}">Info: Custom scaling is available only on Windows</TextBlock>
+        <TextBlock IsVisible="{CompiledBinding AllowCustomScaling, Converter={x:Static BoolConverters.Not}}">Info: Custom scaling is available only on Windows</TextBlock>
     </StackPanel>
 </UserControl>

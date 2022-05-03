@@ -11,7 +11,7 @@ using WoWDatabaseEditorCore.Extensions;
 namespace WoWDatabaseEditorCore.ModulesManagement.Configuration.ViewModels
 {
     [AutoRegister]
-    internal class ModulesConfigViewModel : BindableBase, IConfigurable
+    public class ModulesConfigViewModel : BindableBase, IConfigurable
     {
         public ModulesConfigViewModel(IModulesManager modulesManager)
         {
@@ -43,7 +43,7 @@ namespace WoWDatabaseEditorCore.ModulesManagement.Configuration.ViewModels
         public ConfigurableGroup Group => ConfigurableGroup.Advanced;
     }
 
-    internal class ModuleConfigModel
+    public class ModuleConfigModel
     {
         public ModuleConfigModel(bool isEnabled, string name, bool isLoaded, string details)
         {

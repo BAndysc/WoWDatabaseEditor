@@ -5,8 +5,7 @@
              x:DataType="managers:StatusBar"
              xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia"
              xmlns:managers="clr-namespace:WoWDatabaseEditorCore.Managers;assembly=WoWDatabaseEditorCore"
-             xmlns:managers1="clr-namespace:WDE.Common.Managers;assembly=WDE.Common"
-             xmlns:behaviors="clr-namespace:WDE.Common.Avalonia.Behaviors;assembly=WDE.Common.Avalonia">
+             xmlns:managers1="clr-namespace:WDE.Common.Managers;assembly=WDE.Common">
     <UserControl.Resources>
         <converters:NullConverter Inverted="True" x:Key="NullConverter" />
         

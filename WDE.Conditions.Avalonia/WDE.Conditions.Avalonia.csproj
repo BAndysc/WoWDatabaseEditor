@@ -10,6 +10,7 @@
     </PropertyGroup>
     <ItemGroup>
         <ProjectReference Include="..\WDE.Common.Avalonia\WDE.Common.Avalonia.csproj" />
+        <ProjectReference Include="..\WDE.Conditions\WDE.Conditions.csproj" />
         <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />
     </ItemGroup>
     <Import Project="..\Avalonia.props" />

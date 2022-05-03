@@ -7,9 +7,8 @@
           xmlns:views="clr-namespace:WoWDatabaseEditorCore.Avalonia.Views"
           xmlns:components="clr-namespace:WDE.Common.Avalonia.Components;assembly=WDE.Common.Avalonia"
           xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
-          xmlns:idc="clr-namespace:Dock.Avalonia.Controls;assembly=Dock.Avalonia"
-          xmlns:docking="clr-namespace:WoWDatabaseEditorCore.Avalonia.Docking"
           xmlns:quickAccess="clr-namespace:WoWDatabaseEditorCore.Avalonia.Services.QuickAccess"
+          xmlns:viewModels="clr-namespace:WoWDatabaseEditorCore.ViewModels;assembly=WoWDatabaseEditorCore"
           mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
           mvvm:ViewModelLocator.AutoWireViewModel="True"
           x:Name="Root"
@@ -19,21 +18,22 @@
           ManagedIcon="../Icon.png"
           ExtendClientAreaTitleBarHeightHint="38"
           ExtendClientAreaToDecorationsHint="True"
-          utils:MenuBind.MenuItemsGestures="{Binding MenuItemProviders}"
-          SubTitle="{Binding Subtitle}"
-          Title="{Binding Title}">
+          x:DataType="viewModels:MainWindowViewModel"
+          utils:MenuBind.MenuItemsGestures="{CompiledBinding MenuItemProviders}"
+          SubTitle="{CompiledBinding Subtitle}"
+          Title="{CompiledBinding Title}">
 
     <NativeMenu.Menu>
-        <NativeMenu utils:MenuBind.MenuItems="{Binding MenuItemProviders}">
+        <NativeMenu utils:MenuBind.MenuItems="{CompiledBinding MenuItemProviders}">
             
         </NativeMenu>
     </NativeMenu.Menu>
     
     <controls:ExtendedWindow.SideBar>
-        <views:WdeToolsTabControl Items="{Binding DocumentManager.AllTools}" Name="Tools">
+        <views:WdeToolsTabControl Items="{CompiledBinding DocumentManager.AllTools}" Name="Tools">
             <views:WdeToolsTabControl.Styles>
                 <Style Selector="TabItem">
-                    <Setter Property="(controls:ToolsTabControl.ToolTitle)" Value="{Binding Title}" />
+                    <Setter Property="(controls:ToolsTabControl.ToolTitle)" Value="{CompiledBinding Title}" />
                 </Style>
             </views:WdeToolsTabControl.Styles>
         </views:WdeToolsTabControl>
@@ -43,13 +43,13 @@
         <controls:ToolBar>
             <controls:ToolBar.LeftContent>
                 <controls:ToolbarPanel>
-                    <Button Command="{Binding ExecuteChangedCommand}" IsVisible="{Binding ShowPlayButtons}">
+                    <Button Command="{CompiledBinding ExecuteChangedCommand}" IsVisible="{CompiledBinding ShowPlayButtons}">
                         <Border Background="Transparent"
                                 Width="12"
                                 Height="12"
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center">
-                            <Path Fill="{Binding $parent[Button].Foreground}"
+                            <Path Fill="{CompiledBinding $parent[Button].Foreground}"
                                   HorizontalAlignment="Center"
                                   VerticalAlignment="Center"
                                   Data="M 0 0 L 6 3.5 L 0 7 Z"/>
@@ -58,16 +58,16 @@
                 </controls:ToolbarPanel>
             </controls:ToolBar.LeftContent>
             <controls:ToolBar.MiddleContent>
-                <ContentPresenter DataContext="{Binding DocumentManager.ActiveDocument}" Content="{Binding}" ContentTemplate="{x:Static utils:ToolbarDataTemplate.Template}" />
+                <ContentPresenter DataContext="{CompiledBinding DocumentManager.ActiveDocument}" Content="{CompiledBinding}" ContentTemplate="{x:Static utils:ToolbarDataTemplate.Template}" />
             </controls:ToolBar.MiddleContent>
             <controls:ToolBar.RightContent>
                 <controls:ToolbarPanel>
-                    <ItemsPresenter Items="{Binding RelatedSolutionItems.List}">
+                    <ItemsPresenter Items="{CompiledBinding RelatedSolutionItems.List}">
                         <ItemsPresenter.ItemTemplate>
-                            <DataTemplate>
-                                <Button Command="{Binding CreateCommand}"
-                                        ToolTip.Tip="{Binding Name}">
-                                    <components:WdeImage Image="{Binding Icon}" />
+                            <DataTemplate x:DataType="viewModels:RelatedSolutionItemViewModel">
+                                <Button Command="{CompiledBinding CreateCommand}"
+                                        ToolTip.Tip="{CompiledBinding Name}">
+                                    <components:WdeImage Image="{CompiledBinding Icon}" />
                                 </Button>
                             </DataTemplate>
                         </ItemsPresenter.ItemTemplate>
@@ -77,9 +77,9 @@
                             </ItemsPanelTemplate>
                         </ItemsPresenter.ItemsPanel>
                     </ItemsPresenter>
-                    <components:ButtonImage IsVisible="{Binding ShowExportButtons}" Command="{Binding GenerateCurrentSqlCommand}" Text="SQL" />
-                    <components:ButtonImage Command="{Binding CopyCurrentSqlCommand}"
-                                            IsVisible="{Binding ShowExportButtons}"
+                    <components:ButtonImage IsVisible="{CompiledBinding ShowExportButtons}" Command="{CompiledBinding GenerateCurrentSqlCommand}" Text="SQL" />
+                    <components:ButtonImage Command="{CompiledBinding CopyCurrentSqlCommand}"
+                                            IsVisible="{CompiledBinding ShowExportButtons}"
                                             ToolTip.Tip="Copy SQL" 
                                             Image="Icons/icon_copy_sql.png" />
                 </controls:ToolbarPanel>
@@ -89,26 +89,26 @@
     
     <controls:ExtendedWindow.StatusBar>
         <controls:StatusBar>
-            <views:StatusBarView DockPanel.Dock="Bottom" Height="30" DataContext="{Binding StatusBar}" />
+            <views:StatusBarView DockPanel.Dock="Bottom" Height="30" DataContext="{CompiledBinding StatusBar}" />
         </controls:StatusBar>
     </controls:ExtendedWindow.StatusBar>
     
     <controls:ExtendedWindow.TabStrip>
         <TabStrip DockPanel.Dock="Top" 
-                  SelectedItem="{Binding DocumentManager.ActiveDocument}"
-                  Items="{Binding DocumentManager.OpenedDocuments}">
+                  SelectedItem="{CompiledBinding DocumentManager.ActiveDocument}"
+                  Items="{CompiledBinding DocumentManager.OpenedDocuments}">
             <TabStrip.ItemTemplate>
                 <DataTemplate>
                     <DockPanel LastChildFill="True">
-                        <Button Command="{Binding CloseCommand}" Classes="closeButton">Close</Button>
+                        <Button Command="{CompiledBinding CloseCommand}" Classes="closeButton">Close</Button>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                            <TextBlock Text="{Binding Title}" />
-                            <TextBlock Text="*" IsVisible="{Binding IsModified}" />
+                            <TextBlock Text="{CompiledBinding Title}" />
+                            <TextBlock Text="*" IsVisible="{CompiledBinding IsModified}" />
                             <Interaction.Behaviors>
-                                <DataTriggerBehavior Binding="{Binding IsModified}" ComparisonCondition="Equal" Value="False">
+                                <DataTriggerBehavior Binding="{CompiledBinding IsModified}" ComparisonCondition="Equal" Value="False">
                                     <ChangePropertyAction TargetObject="{Binding #StackPanel}" PropertyName="StackPanel.FontWeight" Value="Normal"/>
                                 </DataTriggerBehavior>
-                                <DataTriggerBehavior Binding="{Binding IsModified}" ComparisonCondition="Equal" Value="True">
+                                <DataTriggerBehavior Binding="{CompiledBinding IsModified}" ComparisonCondition="Equal" Value="True">
                                     <ChangePropertyAction TargetObject="{Binding #StackPanel}" PropertyName="StackPanel.FontWeight" Value="Bold"/>
                                 </DataTriggerBehavior>
                             </Interaction.Behaviors>
@@ -121,24 +121,24 @@
     
     <controls:ExtendedWindow.Overlay>
         <Panel>
-            <views:TasksPanel DataContext="{Binding TasksViewModel}"
+            <views:TasksPanel DataContext="{CompiledBinding TasksViewModel}"
                               Margin="0,0,5,0"
                               HorizontalAlignment="Right"
                               VerticalAlignment="Bottom"
                               ClipToBounds="False"
-                              IsVisible="{Binding IsPanelVisible, Mode=OneWay}" />
+                              IsVisible="{CompiledBinding IsPanelVisible, Mode=OneWay}" />
             <quickAccess:QuickAccessView 
-                IsVisible="{Binding IsOpened, Mode=OneWay}"
+                IsVisible="{CompiledBinding IsOpened, Mode=OneWay}"
                 HorizontalAlignment="Center"
                 Margin="0,200,0,0"
                 VerticalAlignment="Top"
-                DataContext="{Binding QuickAccessViewModel, Mode=OneTime}" />
+                DataContext="{CompiledBinding QuickAccessViewModel, Mode=OneTime}" />
         </Panel>
     </controls:ExtendedWindow.Overlay>
     
     <components:MultiViewModelContentPresenter
-        ViewModels="{Binding DocumentManager.OpenedDocuments}"
-        SelectedViewModel="{Binding DocumentManager.ActiveDocument}">
+        ViewModels="{CompiledBinding DocumentManager.OpenedDocuments}"
+        SelectedViewModel="{CompiledBinding DocumentManager.ActiveDocument}">
         <components:MultiViewModelContentPresenter.Styles>
             <Style Selector="components|MultiViewModelContentPresenter">
                 <Setter Property="Template">

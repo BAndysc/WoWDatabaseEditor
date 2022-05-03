@@ -5,23 +5,21 @@
              xmlns:sessions="clr-namespace:WDE.Solutions.Sessions;assembly=WDE.Solutions"
              xmlns:controls="clr-namespace:WDE.Common.Avalonia.Controls;assembly=WDE.Common.Avalonia"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="sessions:SessionsConfigurationViewModel"
              x:Class="WDE.CommonViews.Avalonia.Sessions.SessionsConfigurationView">
-    <Design.DataContext>
-        <sessions:SessionsConfigurationViewModel />
-    </Design.DataContext>
     <ScrollViewer>
         <StackPanel>
             <controls:SettingsHeader Text="Configuration" />
-            <CheckBox IsThreeState="True" IsChecked="{Binding DeleteOnSave}">After saving, always delete the session?</CheckBox>
+            <CheckBox IsThreeState="True" IsChecked="{CompiledBinding DeleteOnSave}">After saving, always delete the session?</CheckBox>
             <controls:SettingsHeader Text="Recently deleted sessions" />
-            <Button Command="{Binding RestoreSelectedSession}">Restore</Button>
-            <ListBox Items="{Binding DeletedSessions}" 
-                     SelectedItem="{Binding SelectedItem, Mode=TwoWay}">
+            <Button Command="{CompiledBinding RestoreSelectedSession}">Restore</Button>
+            <ListBox Items="{CompiledBinding DeletedSessions}" 
+                     SelectedItem="{CompiledBinding SelectedItem, Mode=TwoWay}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Grid RowDefinitions="Auto,Auto">
-                            <TextBlock Text="{Binding Name, Mode=OneTime}" FontWeight="Bold" />
-                            <TextBlock Grid.Row="1" Text="{Binding LastModified, Mode=OneTime, StringFormat=Last modified: {0}}" />
+                            <TextBlock Text="{CompiledBinding Name, Mode=OneTime}" FontWeight="Bold" />
+                            <TextBlock Grid.Row="1" Text="{CompiledBinding LastModified, Mode=OneTime, StringFormat=Last modified: {0}}" />
                         </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>

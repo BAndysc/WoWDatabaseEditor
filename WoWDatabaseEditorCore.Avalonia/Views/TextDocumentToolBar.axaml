@@ -4,11 +4,13 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
              xmlns:components="clr-namespace:WDE.Common.Avalonia.Components;assembly=WDE.Common.Avalonia"
+             xmlns:viewModels="clr-namespace:WoWDatabaseEditorCore.ViewModels;assembly=WoWDatabaseEditorCore"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:TextDocumentViewModel"
              x:Class="WoWDatabaseEditorCore.Avalonia.Views.TextDocumentToolBar">
     <controls:ToolbarPanel>
-        <components:ButtonImage Image="Icons/icon_save.png" Command="{Binding SaveCommand}" />
-        <components:ButtonImage Image="Icons/icon_play_save.png" ToolTip.Tip="Execute SQL and save items in the current session" IsVisible="{Binding IsSqlText}" Command="{Binding ExecuteSqlSaveSession}" />
-        <components:ButtonImage Image="Icons/icon_play.png" ToolTip.Tip="Execute SQL without saving items in a session" IsVisible="{Binding IsSqlText}" Command="{Binding ExecuteSql}" /> 
+        <components:ButtonImage Image="Icons/icon_save.png" Command="{CompiledBinding SaveCommand}" />
+        <components:ButtonImage Image="Icons/icon_play_save.png" ToolTip.Tip="Execute SQL and save items in the current session" IsVisible="{CompiledBinding IsSqlText}" Command="{CompiledBinding ExecuteSqlSaveSession}" />
+        <components:ButtonImage Image="Icons/icon_play.png" ToolTip.Tip="Execute SQL without saving items in a session" IsVisible="{CompiledBinding IsSqlText}" Command="{CompiledBinding ExecuteSql}" /> 
     </controls:ToolbarPanel>
 </UserControl>

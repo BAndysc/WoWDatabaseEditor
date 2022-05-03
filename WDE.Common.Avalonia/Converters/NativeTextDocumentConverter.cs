@@ -8,6 +8,8 @@ namespace WDE.Common.Avalonia.Converters
 {
     public class NativeTextDocumentConverter : IValueConverter
     {
+        public static readonly NativeTextDocumentConverter Instance = new();
+        
         public object? Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is NativeTextDocument text)

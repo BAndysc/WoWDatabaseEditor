@@ -20,18 +20,18 @@
           Icon="../Icon.png"
           ManagedIcon="../Icon.png"
           Name="Root"
-          SubTitle="{Binding Subtitle}"
+          SubTitle="{CompiledBinding Subtitle}"
           Classes="MainWindow"
           x:DataType="viewModels:MainWindowViewModel"
-          utils:MenuBind.MenuItemsGestures="{Binding MenuItemProviders}"
-          Title="{Binding Title}">
+          utils:MenuBind.MenuItemsGestures="{CompiledBinding MenuItemProviders}"
+          Title="{CompiledBinding Title}">
 
     <controls:ExtendedWindow.Resources>
         <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
     </controls:ExtendedWindow.Resources>
     
     <NativeMenu.Menu>
-        <NativeMenu utils:MenuBind.MenuItems="{Binding MenuItemProviders}">
+        <NativeMenu utils:MenuBind.MenuItems="{CompiledBinding MenuItemProviders}">
         </NativeMenu>
     </NativeMenu.Menu>
     
@@ -102,15 +102,15 @@
                               IsVisible="{CompiledBinding IsPanelVisible, Mode=OneWay}" />
             <Panel Name="Panel" 
                    DataContext="{CompiledBinding QuickAccessViewModel, Mode=OneWay}"
-                   IsVisible="{Binding IsOpened, Mode=OneWay}"
+                   IsVisible="{CompiledBinding IsOpened, Mode=OneWay}"
                    Background="Transparent">
                 <quickAccess:QuickAccessView 
                     HorizontalAlignment="Center"
-                    IsVisible="{Binding IsOpened, Mode=OneWay}"
+                    IsVisible="{CompiledBinding IsOpened, Mode=OneWay}"
                     Margin="0,200,0,0"
                     VerticalAlignment="Top"/>
                 <Interaction.Behaviors>
-                    <EventTriggerBehavior EventName="PointerPressed" SourceObject="{Binding #Panel}">
+                    <EventTriggerBehavior EventName="PointerPressed" SourceObject="{CompiledBinding #Panel}">
                         <InvokeCommandAction Command="{Binding CloseQuickAccessCommand}" />
                     </EventTriggerBehavior>
                 </Interaction.Behaviors>

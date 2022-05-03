@@ -4,7 +4,9 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              xmlns:prism="http://prismlibrary.com/"
+             xmlns:viewModels="clr-namespace:WDE.RemoteSOAP.ViewModels;assembly=WDE.RemoteSOAP"
              prism:ViewModelLocator.AutoWireViewModel="False"
+             x:DataType="viewModels:SoapConfigViewModel"
              x:Class="WDE.CommonViews.Avalonia.RemoteSOAP.Views.SoapConfigView">
     <ScrollViewer>
         <Grid>
@@ -25,13 +27,13 @@
             <TextBlock Text="Port" Grid.Row="1" VerticalAlignment="Center" />
             <TextBlock Text="User" Grid.Row="2" VerticalAlignment="Center" />
             <TextBlock Text="Password" Grid.Row="3" VerticalAlignment="Center" />
-            <TextBox Margin="5" Grid.Column="1" Grid.Row="0" Text="{Binding Host, Mode=TwoWay}" />
-            <TextBox Margin="5" Grid.Column="1" Grid.Row="1" Text="{Binding Port, Mode=TwoWay}" />
-            <TextBox Margin="5" Grid.Column="1" Grid.Row="2" Text="{Binding User, Mode=TwoWay}" />
-            <TextBox Margin="5" Grid.Column="1" Grid.Row="3" Text="{Binding Password, Mode=TwoWay}" />
+            <TextBox Margin="5" Grid.Column="1" Grid.Row="0" Text="{CompiledBinding Host, Mode=TwoWay}" />
+            <TextBox Margin="5" Grid.Column="1" Grid.Row="1" Text="{CompiledBinding Port, Mode=TwoWay}" />
+            <TextBox Margin="5" Grid.Column="1" Grid.Row="2" Text="{CompiledBinding User, Mode=TwoWay}" />
+            <TextBox Margin="5" Grid.Column="1" Grid.Row="3" Text="{CompiledBinding Password, Mode=TwoWay}" />
         
-            <Button Grid.Row="5" Grid.Column="1" Content="Test connection" Command="{Binding TestConnection}" />
-            <TextBox IsReadOnly="True" BorderThickness="0" Grid.ColumnSpan="2" Grid.Row="6" Text="{Binding TestConnectionOutput}" /> 
+            <Button Grid.Row="5" Grid.Column="1" Content="Test connection" Command="{CompiledBinding TestConnection}" />
+            <TextBox IsReadOnly="True" BorderThickness="0" Grid.ColumnSpan="2" Grid.Row="6" Text="{CompiledBinding TestConnectionOutput}" /> 
         </Grid>
     </ScrollViewer>
 </UserControl>

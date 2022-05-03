@@ -11,16 +11,17 @@
              xmlns:viewModels="clr-namespace:WDE.SourceCodeIntegrationEditor.ViewModels"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              Name="Root"
+             x:DataType="viewModels:CommandsDocumentViewModel"
              x:Class="WDE.SourceCodeIntegrationEditor.Views.CommandsDocumentView">
     <UserControl.Resources>
         <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
         <converters:NativeTextDocumentConverter x:Key="DocumentConverter" />
     </UserControl.Resources>
     <DockPanel LastChildFill="True">
-        <controls:WizardPanel IsLoading="{Binding IsLoading}"
-                              CurrentStepIndex="{Binding WizardStep}" 
-                              NextStepCommand="{Binding CommandNextStep}" 
-                              PreviousStepCommand="{Binding CommandPreviousStep}">
+        <controls:WizardPanel IsLoading="{CompiledBinding IsLoading}"
+                              CurrentStepIndex="{CompiledBinding WizardStep}" 
+                              NextStepCommand="{CompiledBinding CommandNextStep}" 
+                              PreviousStepCommand="{CompiledBinding CommandPreviousStep}">
             <controls:WizardPanel.TitleTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">
@@ -35,16 +36,16 @@
             <ScrollViewer controls:WizardPanel.StepTitle="Choose commands to generate sql for">
                 <StackPanel>
                     <controls:GroupingHeader GroupName="Commands with no RBAC defined in database" />
-                    <ItemsControl Padding="10,0" Items="{Binding CommandsNoRbac}" />
+                    <ItemsControl Padding="10,0" Items="{CompiledBinding CommandsNoRbac}" />
                     <controls:GroupingHeader GroupName="Commands with RBAC, but not defined in commands table" />
-                    <ItemsControl Padding="10,0" Items="{Binding Commands}" />
+                    <ItemsControl Padding="10,0" Items="{CompiledBinding Commands}" />
                 </StackPanel>
                 <ScrollViewer.DataTemplates>
                     <DataTemplate DataType="{x:Type viewModels:CommandViewModel}">
-                        <CheckBox DockPanel.Dock="Left" IsChecked="{Binding IsSelected, Mode=TwoWay}">
+                        <CheckBox DockPanel.Dock="Left" IsChecked="{CompiledBinding IsSelected, Mode=TwoWay}">
                             <StackPanel>
-                                <TextBlock Text="{Binding NameWithDot}" FontWeight="Bold" DockPanel.Dock="Top"/>
-                                <TextBlock Text="{Binding PermissionText}" DockPanel.Dock="Top"/>
+                                <TextBlock Text="{CompiledBinding NameWithDot}" FontWeight="Bold" DockPanel.Dock="Top"/>
+                                <TextBlock Text="{CompiledBinding PermissionText}" DockPanel.Dock="Top"/>
                             </StackPanel>
                         </CheckBox>
                     </DataTemplate>
@@ -52,7 +53,7 @@
             </ScrollViewer>
             
             <ScrollViewer controls:WizardPanel.StepTitle="Specify commands settings">
-                <ItemsControl Items="{Binding ChosenCommands}">
+                <ItemsControl Items="{CompiledBinding ChosenCommands}">
                     <ItemsControl.Styles>
                         <Style Selector="ItemsControl:empty">
                             <Setter Property="Template">
@@ -69,17 +70,17 @@
                                     <ColumnDefinition Width="150" MinWidth="150" />
                                     <ColumnDefinition />
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="1" FontSize="16" Text="{Binding NameWithDot}" FontWeight="Bold" />
+                                <TextBlock Grid.Column="1" FontSize="16" Text="{CompiledBinding NameWithDot}" FontWeight="Bold" />
 
                                 <TextBlock Classes="Label" Grid.Row="1">Permission:</TextBlock>
-                                <TextBlock VerticalAlignment="Center" Grid.Column="1" Grid.Row="1" Text="{Binding PermissionText}" />
+                                <TextBlock VerticalAlignment="Center" Grid.Column="1" Grid.Row="1" Text="{CompiledBinding PermissionText}" />
 
                                 <TextBlock Classes="Label" Grid.Row="2">Permission group:</TextBlock>
                                 <ComboBox Margin="0,2" 
-                                          IsEnabled="{Binding IsRbacDefined, Converter={StaticResource InverseBoolConverter}}"
+                                          IsEnabled="{CompiledBinding IsRbacDefined, Converter={StaticResource InverseBoolConverter}}"
                                           Grid.Row="2" Grid.Column="1" 
                                           Items="{Binding #Root.DataContext.PossibleParentPermissions}" 
-                                          SelectedItem="{Binding PermissionViewModel.Parent, Mode=TwoWay}">
+                                          SelectedItem="{CompiledBinding PermissionViewModel.Parent, Mode=TwoWay}">
                                     <ComboBox.ItemTemplate>
                                         <DataTemplate>
                                             <TextBlock Text="{Binding PermissionText}" />
@@ -88,10 +89,10 @@
                                 </ComboBox>
 
                                 <TextBlock Classes="Label" Grid.Row="3">Permission readable name:</TextBlock>
-                                <TextBox Margin="0,2" IsEnabled="{Binding IsRbacDefined, Converter={StaticResource InverseBoolConverter}}" Grid.Row="3" Grid.Column="1" Text="{Binding PermissionViewModel.PermissionReadableName, Mode=TwoWay}" />
+                                <TextBox Margin="0,2" IsEnabled="{CompiledBinding IsRbacDefined, Converter={StaticResource InverseBoolConverter}}" Grid.Row="3" Grid.Column="1" Text="{CompiledBinding PermissionViewModel.PermissionReadableName, Mode=TwoWay}" />
 
                                 <TextBlock Classes="Label"  Grid.Row="4">Command help:</TextBlock>
-                                <TextBox AcceptsReturn="True" Margin="0,2" Grid.Row="4" Grid.Column="1" Text="{Binding CommandHelp, Mode=TwoWay}" />
+                                <TextBox AcceptsReturn="True" Margin="0,2" Grid.Row="4" Grid.Column="1" Text="{CompiledBinding CommandHelp, Mode=TwoWay}" />
                             </Grid>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
@@ -109,10 +110,10 @@
             
             <DockPanel LastChildFill="True" controls:WizardPanel.StepTitle="Generated SQL">
                 <StackPanel Orientation="Horizontal" DockPanel.Dock="Top" Margin="10,0,0,0">
-                    <Button Command="{Binding SaveSqlCommand}" Margin="0,0,10,0">Save to sql/updates/ folder</Button>
-                    <Button Command="{Binding ExecuteSqlCommand}">Execute SQL</Button>
+                    <Button Command="{CompiledBinding SaveSqlCommand}" Margin="0,0,10,0">Save to sql/updates/ folder</Button>
+                    <Button Command="{CompiledBinding ExecuteSqlCommand}">Execute SQL</Button>
                 </StackPanel>
-                <avaloniaEdit:TextEditor  controls1:AvalonEditExtra.SyntaxExtension="sql"  Document="{Binding ResultCode, Converter={StaticResource DocumentConverter}}" 
+                <avaloniaEdit:TextEditor  controls1:AvalonEditExtra.SyntaxExtension="sql"  Document="{CompiledBinding ResultCode, Converter={StaticResource DocumentConverter}}" 
                                           BorderThickness="0" x:Name="MyAvalonEdit"
                                           ShowLineNumbers="True"
                                           IsReadOnly="True"
