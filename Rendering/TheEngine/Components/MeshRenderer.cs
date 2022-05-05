@@ -1,4 +1,5 @@
 using TheEngine.ECS;
+using TheEngine.Entities;
 using TheEngine.Handles;
 
 namespace TheEngine.Components
@@ -9,5 +10,14 @@ namespace TheEngine.Components
         public bool Opaque;
         public MeshHandle MeshHandle;
         public MaterialHandle MaterialHandle;
+
+        public Material Material
+        {
+            set
+            {
+                MaterialHandle = value.Handle;
+                Opaque = !value.BlendingEnabled;
+            }
+        }
     }
 }

@@ -454,6 +454,45 @@ namespace TheMaths
             get { return this.Equals(Identity); }
         }
 
+        public Quaternion Rotation
+        {
+            get
+            {
+                Vector3 scale;
+                //Scaling is the length of the rows.
+                scale.X = (float)Math.Sqrt((M11 * M11) + (M12 * M12) + (M13 * M13));
+                scale.Y = (float)Math.Sqrt((M21 * M21) + (M22 * M22) + (M23 * M23));
+                scale.Z = (float)Math.Sqrt((M31 * M31) + (M32 * M32) + (M33 * M33));
+
+                //If any of the scaling factors are zero, than the rotation matrix can not exist.
+                if (MathUtil.IsZero(scale.X) ||
+                    MathUtil.IsZero(scale.Y) ||
+                    MathUtil.IsZero(scale.Z))
+                {
+                    return Quaternion.Identity;
+                }
+
+                //The rotation is the left over matrix after dividing out the scaling.
+                Matrix rotationmatrix = new Matrix();
+                rotationmatrix.M11 = M11 / scale.X;
+                rotationmatrix.M12 = M12 / scale.X;
+                rotationmatrix.M13 = M13 / scale.X;
+
+                rotationmatrix.M21 = M21 / scale.Y;
+                rotationmatrix.M22 = M22 / scale.Y;
+                rotationmatrix.M23 = M23 / scale.Y;
+
+                rotationmatrix.M31 = M31 / scale.Z;
+                rotationmatrix.M32 = M32 / scale.Z;
+                rotationmatrix.M33 = M33 / scale.Z;
+
+                rotationmatrix.M44 = 1f;
+
+                Quaternion.RotationMatrix(ref rotationmatrix, out var rotation);
+                return rotation;
+            }
+        }
+
         /// <summary>
         /// Gets or sets the component at the specified index.
         /// </summary>

@@ -65,8 +65,10 @@ namespace TheEngine.ECS
         public unsafe ComponentDataAccess<T> DataAccess<T>() where T : unmanaged, IComponentData
         {
             int i = 0;
-            foreach (var c in Archetype.Components)
+            var componentsCount = Archetype.Components.Count;
+            for (int j = 0; j < componentsCount; ++j)
             {
+                var c = Archetype.Components[j];
                 if (c.DataType == typeof(T))
                     return new ComponentDataAccess<T>(componentData[i], sparseReverseEntityMapping);
                 i++;

@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 
 namespace TheEngine.ECS
 {
-    public sealed class ComponentDataAccess<T> where T : unmanaged, IComponentData
+    public readonly struct ComponentDataAccess<T> where T : unmanaged, IComponentData
     {
         private readonly unsafe byte* data;
         private readonly int[] sparseReverseEntityMapping;

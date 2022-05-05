@@ -53,11 +53,11 @@ namespace WDE.MapRenderer.Managers
                            inputManager.Keyboard.GetAxis(Vector3.Backward, Key.A, Key.D) + 
                            inputManager.Keyboard.GetAxis(Vector3.Left, Key.E, Key.Q);
             movement.Normalize();
-            float modifier = 1;
+            float modifier = 0.4f;
             if (inputManager.Keyboard.IsDown(Key.LeftShift))
                 modifier = 15;
             if (inputManager.Keyboard.IsDown(Key.N))
-                modifier = 0.2f;
+                modifier = 0.1f;
             float speed = 1 * (delta / 16.0f) * modifier;
             Position += movement * Rotation * speed;
 

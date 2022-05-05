@@ -205,12 +205,12 @@ namespace TheEngine.Entities
             {
                 shader.SetUniform(floats.Key, floats.Value);
             }
-            engine.Device.device.CheckError("before set int uniform");
+            
             foreach (var ints in intUniforms)
             {
                 shader.SetUniformInt(ints.Key, ints.Value);
             }
-            engine.Device.device.CheckError("after set int uniforms");
+            
             foreach (var vector in vector4Uniforms)
             {
                 shader.SetUniform(vector.Key, vector.Value.X, vector.Value.Y, vector.Value.Z, vector.Value.W);

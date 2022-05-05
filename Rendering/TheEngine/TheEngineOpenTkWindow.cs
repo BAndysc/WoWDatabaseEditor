@@ -180,8 +180,10 @@ public class TheEngineOpenTkWindow : GameWindow, IWindowHost
         engine.inputManager.Update();
         UpdateKeyboard();
         UpdateMouse();
-            
+
         game?.Update((float)args.Time * 1000);
+        engine.renderManager.UpdateTransforms();
+            
         engine.inputManager.PostUpdate();
         base.OnUpdateFrame(args);
     }

@@ -268,6 +268,7 @@ namespace TheEngine
                 }
             }
             game?.Update(delta);
+            engine?.renderManager.UpdateTransforms();
         }
 
         private bool disposed;

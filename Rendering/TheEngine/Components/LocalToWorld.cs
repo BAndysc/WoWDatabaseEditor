@@ -4,6 +4,11 @@ using TheMaths;
 
 namespace TheEngine.Components
 {
+    public struct CopyParentTransform : IComponentData
+    {
+        public Entity Parent { get; set; }
+    }
+
     public struct LocalToWorld : IComponentData
     {
         private Matrix matrix;
@@ -39,6 +44,12 @@ namespace TheEngine.Components
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get => matrix.ScaleVector;
+        }
+
+        public Quaternion Rotation
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => matrix.Rotation;
         }
 
         public static implicit operator Matrix(LocalToWorld d) => d.matrix;

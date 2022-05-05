@@ -9,6 +9,9 @@ namespace TheEngine.Interfaces
         StaticRenderHandle RegisterStaticRenderer(MeshHandle mesh, Material material, int subMesh, Transform t);
         StaticRenderHandle RegisterStaticRenderer(MeshHandle mesh, Material material, int subMesh, Matrix localToWorld);
         void UnregisterStaticRenderer(StaticRenderHandle staticRenderHandle);
+        DynamicRenderHandle RegisterDynamicRenderer(MeshHandle mesh, Material material, int subMesh, Transform t);
+        DynamicRenderHandle RegisterDynamicRenderer(MeshHandle mesh, Material material, int subMesh, Matrix localToWorld);
+        void UnregisterDynamicRenderer(DynamicRenderHandle staticRenderHandle);
         void DrawLine(Vector3 start, Vector3 end);
         void Render(IMesh mesh, Material material, int submesh, Transform transform);
         void Render(IMesh mesh, Material material, int submesh, Matrix localToWorld, Matrix? worldToLocal = null);

@@ -71,6 +71,8 @@ namespace TheEngine.Managers
         private Archetype staticRendererArchetype;
         private Archetype dynamicRendererArchetype;
 
+        private Archetype parentedEntitiesArchetype;
+
         internal RenderManager(Engine engine, bool flipY)
         {
             this.engine = engine;
@@ -79,6 +81,10 @@ namespace TheEngine.Managers
 
             dirtEntities = engine.entityManager.NewArchetype()
                 .WithComponentData<DirtyPosition>();
+
+            parentedEntitiesArchetype = engine.entityManager.NewArchetype()
+                .WithComponentData<CopyParentTransform>()
+                .WithComponentData<LocalToWorld>();
             
             staticRendererArchetype = engine.EntityManager.NewArchetype()
                 .WithComponentData<RenderEnabledBit>()
@@ -325,6 +331,22 @@ namespace TheEngine.Managers
             RenderTransparent();
         }
 
+        public void UpdateTransforms()
+        {
+            var entityManager = engine.entityManager;
+            parentedEntitiesArchetype.ParallelForEach<CopyParentTransform, LocalToWorld, DirtyPosition>((itr, start, end, parents, localToWorld, dirtyPosition) =>
+            {
+                for (int i = start; i < end; ++i)
+                {
+                    if (!dirtyPosition[i] && !entityManager.GetComponent<DirtyPosition>(parents[i].Parent))
+                        continue;
+                    ref var parentLocalToWorld = ref entityManager.GetComponent<LocalToWorld>(parents[i].Parent);
+                    localToWorld[i] = parentLocalToWorld;
+                    dirtyPosition[i].Enable();
+                }
+            });
+        }
+        
         private void ClearDirtyEntityBit()
         {
             dirtEntities.ParallelForEach<DirtyPosition>((itr, start, end, dirty) =>
@@ -683,6 +705,31 @@ namespace TheEngine.Managers
         }
 
         public void UnregisterStaticRenderer(StaticRenderHandle handle)
+        {
+            engine.EntityManager.DestroyEntity(handle.Handle);
+        }
+        
+        public DynamicRenderHandle RegisterDynamicRenderer(MeshHandle mesh, Material material, int subMesh, Transform t)
+        {
+            return RegisterDynamicRenderer(mesh, material, subMesh, t.LocalToWorldMatrix);
+        }
+
+        public DynamicRenderHandle RegisterDynamicRenderer(MeshHandle meshHandle, Material material, int subMesh, Matrix localToWorld)
+        {
+            var l2w = new LocalToWorld() { Matrix = localToWorld };
+            var mesh = engine.meshManager.GetMeshByHandle(meshHandle);
+            var entity = engine.EntityManager.CreateEntity(dynamicRendererArchetype);
+            engine.EntityManager.GetComponent<LocalToWorld>(entity) = l2w;
+            engine.EntityManager.GetComponent<MeshRenderer>(entity).SubMeshId = subMesh;
+            engine.EntityManager.GetComponent<MeshRenderer>(entity).MaterialHandle = material.Handle;
+            engine.EntityManager.GetComponent<MeshRenderer>(entity).MeshHandle = meshHandle;
+            engine.EntityManager.GetComponent<MeshRenderer>(entity).Opaque = !material.BlendingEnabled;
+            engine.EntityManager.GetComponent<DirtyPosition>(entity).Enable();
+            engine.EntityManager.GetComponent<MeshBounds>(entity) = (MeshBounds)mesh.Bounds;
+            return new DynamicRenderHandle(entity);
+        }
+
+        public void UnregisterDynamicRenderer(DynamicRenderHandle handle)
         {
             engine.EntityManager.DestroyEntity(handle.Handle);
         }

@@ -11,4 +11,15 @@ namespace TheEngine.Handles
             Handle = id;
         }
     }
+    
+    public struct DynamicRenderHandle
+    {
+        internal Entity Handle { get; }
+
+        internal DynamicRenderHandle(Entity id)
+        {
+            Handle = id;
+        }
+    }
+    
 }
