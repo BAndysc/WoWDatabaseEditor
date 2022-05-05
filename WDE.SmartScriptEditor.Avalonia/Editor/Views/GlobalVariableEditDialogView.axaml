@@ -40,10 +40,10 @@
             <TextBox Grid.Row="4" Grid.Column="1" Text="{CompiledBinding Name, Mode=TwoWay}"></TextBox>
             
             <TextBlock VerticalAlignment="Center" Grid.Row="6" Grid.Column="0">Creature entry:</TextBlock>
-            <TextBox Grid.Row="4" Grid.Column="1" Text="{CompiledBinding Entry, Mode=TwoWay}"></TextBox>
+            <TextBox Grid.Row="6" Grid.Column="1" Text="{CompiledBinding Entry, Mode=TwoWay}"></TextBox>
             
             <TextBlock VerticalAlignment="Center" Grid.Row="8" Grid.Column="0" TextWrapping="WrapWithOverflow">Comment (optional):</TextBlock>
-            <TextBox Grid.Row="6" Grid.Column="1" Text="{CompiledBinding Comment, Mode=TwoWay}"></TextBox>
+            <TextBox Grid.Row="8" Grid.Column="1" Text="{CompiledBinding Comment, Mode=TwoWay}"></TextBox>
         </Grid>
     
         <Grid Grid.Row="1">
