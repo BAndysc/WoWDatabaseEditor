@@ -47,7 +47,7 @@ namespace TheEngine.Managers
             persistentTextArchetype = entityManager.NewArchetype()
                 .WithManagedComponentData<DrawTextData>()
                 .WithComponentData<LocalToWorld>();
-            textShader = engine.ShaderManager.LoadShader("internalShaders/sdf.json");
+            textShader = engine.ShaderManager.LoadShader("internalShaders/sdf.json", false);
             worldMaterial = engine.MaterialManager.CreateMaterial("internalShaders/world_text.json");
             worldMaterial.BlendingEnabled = true;
             worldMaterial.SourceBlending = Blending.SrcAlpha;
@@ -56,7 +56,7 @@ namespace TheEngine.Managers
             worldMaterial.ZWrite = false;
             worldMaterial.DepthTesting = DepthCompare.Always;
 
-            material = engine.MaterialManager.CreateMaterial(textShader);
+            material = engine.MaterialManager.CreateMaterial(textShader, null);
             material.BlendingEnabled = true;
             material.SourceBlending = Blending.SrcAlpha;
             material.DestinationBlending = Blending.OneMinusSrcAlpha;

@@ -5,7 +5,7 @@ namespace TheEngine.Interfaces
 {
     public interface IMaterialManager
     {
-        Material CreateMaterial(ShaderHandle shader);
+        Material CreateMaterial(ShaderHandle shader, ShaderHandle? instancedShader);
         Material CreateMaterial(string shaderPath);
         Material GetMaterialByHandle(MaterialHandle handle);
     }

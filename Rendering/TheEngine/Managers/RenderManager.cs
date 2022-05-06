@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading;
+﻿using System.Diagnostics;
+using Avalonia.Input;
 using OpenGLBindings;
 using TheAvaloniaOpenGL;
 using TheAvaloniaOpenGL.Resources;
@@ -26,6 +23,7 @@ namespace TheEngine.Managers
         //private NativeBuffer<PixelShaderSceneBuffer> pixelShaderSceneBuffer;
         private NativeBuffer<Matrix> instancesBuffer;
         private NativeBuffer<Matrix> instancesInverseBuffer;
+        private MaterialInstanceRenderData instancingRenderData = new();
 
         private ObjectBuffer objectData;
         private SceneBuffer sceneData;
@@ -147,9 +145,9 @@ namespace TheEngine.Managers
 
             lineMesh = (Mesh)engine.MeshManager.CreateMesh(new Vector3[2]{Vector3.Zero, Vector3.Zero}, new int[]{});
 
-            blitShader = engine.ShaderManager.LoadShader("internalShaders/blit.json");
+            blitShader = engine.ShaderManager.LoadShader("internalShaders/blit.json", false);
             engine.Device.device.CheckError("load shader");
-            blitMaterial = engine.MaterialManager.CreateMaterial(blitShader);
+            blitMaterial = engine.MaterialManager.CreateMaterial(blitShader, null);
             blitMaterial.SetUniformInt("flipY", flipY ? 1 : 0);
 
             unlitMaterial = engine.MaterialManager.CreateMaterial("internalShaders/unlit.json");
@@ -269,6 +267,8 @@ namespace TheEngine.Managers
         private bool inRenderingLoop = false;
         public void PrepareRendering(int dstFrameBuffer)
         {
+            engine.shaderManager.Update();
+
             inRenderingLoop = true;
             engine.Device.device.CheckError("pre UpdateSceneBuffer");
             UpdateSceneBuffer();
@@ -305,7 +305,7 @@ namespace TheEngine.Managers
 
             engine.Device.device.CheckError("Blitz");
             blitMaterial.Shader.Activate();
-            blitMaterial.ActivateUniforms();
+            blitMaterial.ActivateUniforms(false);
             SetDepth(true, DepthCompare.Always);
             renderTexture.Activate(0);
             //outlineTexture.Activate(1);
@@ -362,12 +362,12 @@ namespace TheEngine.Managers
             });
         }
 
-        private void EnableMaterial(Material material, MaterialInstanceRenderData? instanceData = null)
+        private void EnableMaterial(Material material, bool instancing, MaterialInstanceRenderData? instanceData = null)
         {
             SetDepth(material.ZWrite, material.DepthTesting);
             SetCulling(material.Culling);
             SetBlending(material.BlendingEnabled, material.SourceBlending, material.DestinationBlending);
-            material.ActivateUniforms(instanceData);
+            material.ActivateUniforms(instancing, instanceData);
             Stats.MaterialActivations++;
         }
 
@@ -423,9 +423,9 @@ namespace TheEngine.Managers
         Stopwatch draw = new Stopwatch();
         private float viewDistanceModifier = 8;
 
-        private LocalToWorld[] localToWorlds = new LocalToWorld[10000];
+        private (LocalToWorld, MaterialInstanceRenderData?)[] localToWorlds = new (LocalToWorld, MaterialInstanceRenderData?)[10000];
+        //private MaterialInstanceRenderData?[] materialInstanceData = new MaterialInstanceRenderData?[10000];
         private MeshRenderer[] renderers = new MeshRenderer[10000];
-        private MaterialInstanceRenderData?[] materialInstanceData = new MaterialInstanceRenderData?[10000];
         private int opaque;
         private int transparent;
         private int totalToDraw;
@@ -495,9 +495,9 @@ namespace TheEngine.Managers
             totalToDraw = opaque + transparent;
             if (localToWorlds.Length < totalToDraw)
             {
-                localToWorlds = new LocalToWorld[totalToDraw];
+                localToWorlds = new (LocalToWorld, MaterialInstanceRenderData?)[totalToDraw];
                 renderers = new MeshRenderer[totalToDraw];
-                materialInstanceData = new MaterialInstanceRenderData[totalToDraw];
+                //materialInstanceData = new MaterialInstanceRenderData[totalToDraw];
             }
             int opaqueIndex = 0;
             int transparentIndex = opaque;
@@ -513,19 +513,38 @@ namespace TheEngine.Managers
                     if (renderer.Opaque)
                     {
                         renderers[opaqueIndex] = renderer;
-                        materialInstanceData[opaqueIndex] = materialData?[i];
-                        localToWorlds[opaqueIndex++] = l2w[i];
+                        //materialInstanceData[opaqueIndex] = materialData?[i];
+                        localToWorlds[opaqueIndex++] = (l2w[i], materialData?[i]);
                     }
                     else
                     {
                         renderers[transparentIndex] = renderer;
-                        materialInstanceData[transparentIndex] = materialData?[i];
-                        localToWorlds[transparentIndex++] = l2w[i];
+                        //materialInstanceData[transparentIndex] = materialData?[i];
+                        localToWorlds[transparentIndex++] = (l2w[i], materialData?[i]);
                     }
                 }
             });
 
+            SortRenderersByMesh(0, opaque);
+            SortRenderersByMesh(opaque + 1, totalToDraw);
+
             Render(0, opaque);
+        }
+
+        private void SortRenderersByMesh(int start, int end)
+        {
+            if (end <= start)
+                return;
+            Array.Sort(renderers, localToWorlds, start, end - start, Comparer<MeshRenderer>.Create((a, b) =>
+            {
+                if (a.MeshHandle == b.MeshHandle)
+                {
+                    if (a.SubMeshId == b.SubMeshId)
+                        return a.MaterialHandle.Handle.CompareTo(b.MaterialHandle.Handle);
+                    return a.SubMeshId.CompareTo(b.SubMeshId);
+                }
+                return a.MeshHandle.Handle.CompareTo(b.MeshHandle.Handle);
+            }));
         }
 
         private void RenderTransparent()
@@ -533,9 +552,12 @@ namespace TheEngine.Managers
             Render(opaque, totalToDraw);
         }
 
+        private bool enableInstancing = true;
+
         private void Render(int start, int end)
         {
             sw.Restart();
+            int savedByInstancing = 0;
             for (int i = start; i < end; ++i)
             {
                 var mr = renderers[i];
@@ -544,46 +566,134 @@ namespace TheEngine.Managers
                 var mesh = engine.meshManager.GetMeshByHandle(mr.MeshHandle);
                 var meshId = mr.SubMeshId;
 
-                if (currentShader != shader)
+                var toBatch = 0;
+                if (material.InstancedShader != null && // shader supports instancing
+                    enableInstancing &&                 // instancing is enabled
+                    localToWorlds[i].Item2 == null)     // no material per instance data
                 {
-                    Stats.ShaderSwitches++;
-                    currentShader = shader;
-                    //shadertimer.Start();
-                    shader.Activate();
-                    //shadertimer.Stop();
+                    int j = i + 1;
+                    while (j < end && renderers[j].MeshHandle == mr.MeshHandle &&
+                           renderers[j].SubMeshId == mr.SubMeshId &&
+                           renderers[j].MaterialHandle == mr.MaterialHandle &&
+                           localToWorlds[j].Item2 == null)
+                    {
+                        toBatch++;
+                        j++;
+                    }   
                 }
 
-                if (currentMesh != mesh)
+                if (toBatch <= 1)
                 {
-                    Stats.MeshSwitches++;
-                    currentMesh = mesh;
-                    //meshtimer.Start();
-                    mesh.Activate();
-                    //meshtimer.Stop();
-                }
+                    if (currentShader != shader)
+                    {
+                        Stats.ShaderSwitches++;
+                        currentShader = shader;
+                        //shadertimer.Start();
+                        shader.Activate();
+                        //shadertimer.Stop();
+                    }
+
+                    if (currentMesh != mesh)
+                    {
+                        Stats.MeshSwitches++;
+                        currentMesh = mesh;
+                        //meshtimer.Start();
+                        mesh.Activate();
+                        //meshtimer.Stop();
+                    }
+                
+                    //materialtimer.Start();
+                    EnableMaterial(material, false, localToWorlds[i].Item2);
+                    //materialtimer.Stop();
                     
-                //materialtimer.Start();
-                EnableMaterial(material, materialInstanceData[i]);
-                //materialtimer.Stop();
-
-                //buffertimer.Start();
-                objectData.WorldMatrix = localToWorlds[i];
-                objectData.InverseWorldMatrix = localToWorlds[i].Inverse;
-                objectBuffer.UpdateBuffer(ref objectData);
-                //buffertimer.Stop();
+                    //buffertimer.Start();
+                    objectData.WorldMatrix = localToWorlds[i].Item1;
+                    objectData.InverseWorldMatrix = localToWorlds[i].Item1.Inverse;
+                    objectBuffer.UpdateBuffer(ref objectData);
+                    //buffertimer.Stop();
 #if DEBUG
                 currentShader.Validate();
 #endif
-                //draw.Start();
-                var indicesCount = mesh.IndexCount(meshId);
-                Stats.IndicesDrawn += indicesCount;
-                Stats.TrianglesDrawn += indicesCount / 3;
-                Stats.NonInstancedDraws++;
-                engine.Device.DrawIndexed(indicesCount, mesh.IndexStart(meshId), 0);
-                //draw.Stop();
+                    //draw.Start();
+                    var indicesCount = mesh.IndexCount(meshId);
+                    Stats.IndicesDrawn += indicesCount;
+                    Stats.TrianglesDrawn += indicesCount / 3;
+                    Stats.NonInstancedDraws++;
+                    engine.Device.DrawIndexed(indicesCount, mesh.IndexStart(meshId), 0);
+                    //draw.Stop();
+                }
+                else
+                {
+                    savedByInstancing += toBatch;
+                    if (renderers[i + toBatch].MaterialHandle != renderers[i].MaterialHandle)
+                    {
+                        Console.WriteLine(" no zjebane xd");
+                    }
+
+                    if (instancesArray.Length < toBatch + 1)
+                    {
+                        instancesArray = new Matrix[toBatch + 1];
+                        inverseInstancesArray = new Matrix[toBatch + 1];
+                    }
+                    
+                    for (int k = 0; k < toBatch + 1; ++k)
+                    {
+                        instancesArray[k] = localToWorlds[i + k].Item1.Matrix;
+                        inverseInstancesArray[k] = localToWorlds[i + k].Item1.Inverse;
+                    }
+
+                    //buffertimer.Start();
+                    //var instancesBuffer =
+                    //    engine.CreateBuffer<Matrix>(BufferTypeEnum.StructuredBufferVertexOnly, worldMatrices, BufferInternalFormat.Float4);
+                    //var instancesInverseBuffer =
+                    //    engine.CreateBuffer<Matrix>(BufferTypeEnum.StructuredBufferVertexOnly, inerseWorldMatrices, BufferInternalFormat.Float4);
+                    instancesBuffer.UpdateBuffer(instancesArray.AsSpan(0, toBatch + 1));
+                    instancesInverseBuffer.UpdateBuffer(inverseInstancesArray.AsSpan(0, toBatch + 1));
+                    //buffertimer.Stop();
+
+                    shader = material.InstancedShader!;
+                    
+                    if (currentShader != shader)
+                    {
+                        Stats.ShaderSwitches++;
+                        currentShader = shader;
+                        //shadertimer.Start();
+                        shader.Activate();
+                        //shadertimer.Stop();
+                    }
+
+                    if (currentMesh != mesh)
+                    {
+                        Stats.MeshSwitches++;
+                        currentMesh = mesh;
+                        //meshtimer.Start();
+                        mesh.Activate();
+                        //meshtimer.Stop();
+                    }
+                
+                    //materialtimer.Start();
+                    instancingRenderData.Clear();
+                    instancingRenderData.SetInstancedBuffer(material, "InstancingModels", instancesBuffer);
+                    instancingRenderData.SetInstancedBuffer(material, "InstancingInverseModels", instancesInverseBuffer);
+                    EnableMaterial(material, true, instancingRenderData);
+                    //materialtimer.Stop();
+                    
+#if DEBUG
+                currentShader.Validate();
+#endif
+                    //draw.Start();
+                    var indicesCount = mesh.IndexCount(meshId);
+                    Stats.IndicesDrawn += indicesCount * (toBatch + 1);
+                    Stats.TrianglesDrawn += (indicesCount / 3) * (toBatch + 1);
+                    Stats.InstancedDraws++;
+                    engine.Device.DrawIndexedInstanced(indicesCount,  toBatch + 1, mesh.IndexStart(meshId), 0, 0);
+                    
+                    i += toBatch;
+                }
             }
             sw.Stop();
             engine.statsManager.Counters.Drawing.Add(sw.Elapsed.TotalMilliseconds);
+            Stats.InstancedDrawSaved += savedByInstancing;
         }
 
         public void Render(IMesh mesh, Material material, int submesh, Matrix localToWorld, Matrix? worldToLocal = null)
@@ -597,7 +707,7 @@ namespace TheEngine.Managers
                 currentShader = material.Shader;
                 currentShader.Activate();
             }
-            EnableMaterial(material);
+            EnableMaterial(material, false);
             currentMesh = (Mesh)mesh;
             mesh.Activate();
             objectData.WorldMatrix = localToWorld;
@@ -617,7 +727,7 @@ namespace TheEngine.Managers
                 currentShader = unlitMaterial.Shader;
                 currentShader.Activate();
             }
-            EnableMaterial(unlitMaterial);
+            EnableMaterial(unlitMaterial, false);
             currentMesh = (Mesh)lineMesh;
             lineMesh.Activate();
             objectData.WorldMatrix = Matrix.Identity;
@@ -642,7 +752,7 @@ namespace TheEngine.Managers
             if (!worldToLocal.HasValue)
                 worldToLocal = Matrix.Invert(localToWorld);
             material.Shader.Activate();
-            EnableMaterial(material);
+            EnableMaterial(material, false);
             objectData.WorldMatrix = localToWorld;
             objectData.InverseWorldMatrix = worldToLocal.Value;
             objectBuffer.UpdateBuffer(ref objectData);
@@ -656,7 +766,7 @@ namespace TheEngine.Managers
         public void RenderInstancedIndirect(IMesh mesh, Material material, int submesh, int instancesCount)
         {
             material.Shader.Activate();
-            EnableMaterial(material);
+            EnableMaterial(material, false);
             mesh.Activate();
             var start = mesh.IndexStart(submesh);
             var count = mesh.IndexCount(submesh);

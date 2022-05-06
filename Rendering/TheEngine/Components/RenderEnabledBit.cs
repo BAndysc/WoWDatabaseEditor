@@ -1,33 +1,67 @@
 using TheAvaloniaOpenGL.Resources;
 using TheEngine.ECS;
 using TheEngine.Entities;
+using TheMaths;
 
 namespace TheEngine.Components
 {
     public class MaterialInstanceRenderData : IManagedComponentData
     {
         public Dictionary<int, INativeBuffer>? structuredBuffers { get; private set; }
+        public Dictionary<int, INativeBuffer>? instancedStructuredBuffers { get; private set; }
 
         public void SetBuffer(Material material, string name, INativeBuffer buffer)
         {
+            SetInstancedBuffer(material, name, buffer);
             var loc = material.GetUniformLocation(name);
             if (loc == -1)
                 return;
             structuredBuffers ??= new();
             structuredBuffers[loc] = buffer;
         }
-
-        public void Activate(Material material, int slot)
+        
+        public void SetInstancedBuffer(Material material, string name, INativeBuffer buffer)
         {
-            if (structuredBuffers == null)
-                return;
-            
-            foreach (var buffer in structuredBuffers)
+            var instancedLoc = material.GetInstancedUniformLocation(name);
+            if (instancedLoc.HasValue && instancedLoc != -1)
             {
-                buffer.Value.Activate(slot);
-                material.Shader.SetUniformInt(buffer.Key, slot);
-                slot++;
+                instancedStructuredBuffers ??= new();
+                instancedStructuredBuffers[instancedLoc.Value] = buffer;
             }
+        }
+        
+        public void Activate(Material material, bool instanced, int slot)
+        {
+            if (instanced)
+            {
+                if (instancedStructuredBuffers == null)
+                    return;
+            
+                foreach (var buffer in instancedStructuredBuffers)
+                {
+                    buffer.Value.Activate(slot);
+                    material.Shader.SetUniformInt(buffer.Key, slot);
+                    slot++;
+                }
+            }
+            else
+            {
+                if (structuredBuffers == null)
+                    return;
+            
+                foreach (var buffer in structuredBuffers)
+                {
+                    buffer.Value.Activate(slot);
+                    material.Shader.SetUniformInt(buffer.Key, slot);
+                    slot++;
+                }
+            }
+        }
+
+        public void Clear()
+        {
+            instancedStructuredBuffers?.Clear();
+            structuredBuffers?.Clear();
         }
     }
     

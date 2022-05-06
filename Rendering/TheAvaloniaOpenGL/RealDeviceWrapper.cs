@@ -303,6 +303,11 @@ namespace TheAvaloniaOpenGL
             device.ActiveTextureUnit(slot);
         }
 
+        public void DeleteProgram(int program)
+        {
+            device.DeleteProgram(program);
+        }
+
         public unsafe void DeleteTexture(int name)
         {
             device.DeleteTexture(name);

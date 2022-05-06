@@ -57,8 +57,10 @@ namespace TheEngine.Entities
     {
         private readonly Engine engine;
         private readonly ShaderHandle shaderHandle;
+        private readonly ShaderHandle? instancedShaderHandle;
 
         private Shader shader;
+        private Shader? instancedShader;
         public bool ZWrite = true;
         public DepthCompare DepthTesting = DepthCompare.Lequal;
         public CullingMode Culling = CullingMode.Back;
@@ -67,60 +69,78 @@ namespace TheEngine.Entities
         public Blending DestinationBlending = Blending.Zero;
 
         internal Shader Shader => shader;
+        internal Shader? InstancedShader => instancedShader;
 
         public MaterialHandle Handle { get; }
         public ShaderHandle ShaderHandle => shaderHandle;
 
         internal Dictionary<int, TextureHandle> textureHandles { get; } = new();
-        internal Dictionary<int, INativeBuffer> structuredBuffers { get; }
+        internal Dictionary<int, INativeBuffer> structuredBuffers { get; } = new();
         internal Dictionary<int, int> intUniforms { get; } = new();
         internal Dictionary<int, float> floatUniforms { get; } = new();
         internal Dictionary<int, Vector4> vector4Uniforms { get; } = new();
         internal Dictionary<int, Vector3> vector3Uniforms { get; } = new();
-        internal Dictionary<int, INativeBuffer> structuredVertexBuffers { get; }
-        internal Dictionary<int, INativeBuffer> structuredPixelsBuffers { get; }
-
-        internal int SlotCount => textureHandles.Count + structuredBuffers.Count + structuredPixelsBuffers.Count +
-                                  structuredPixelsBuffers.Count;
-
-        internal Material(Engine engine, ShaderHandle shaderHandle, MaterialHandle materialHandle)
+        
+        
+        internal Dictionary<int, TextureHandle> instancedTextureHandles { get; } = new();
+        internal Dictionary<int, INativeBuffer> instancedStructuredBuffers { get; } = new();
+        internal Dictionary<int, int> instancedIntUniforms { get; } = new();
+        internal Dictionary<int, float> instancedFloatUniforms { get; } = new();
+        internal Dictionary<int, Vector4> instancedVector4Uniforms { get; } = new();
+        internal Dictionary<int, Vector3> instancedVector3Uniforms { get; } = new();
+        
+        internal Material(Engine engine, ShaderHandle shaderHandle, ShaderHandle? instancedShaderHandle, MaterialHandle materialHandle)
         {
             this.engine = engine;
             Handle = materialHandle;
             this.shaderHandle = shaderHandle;
+            this.instancedShaderHandle = instancedShaderHandle;
             this.shader = engine.shaderManager.GetShaderByHandle(shaderHandle);
+            this.instancedShader = instancedShaderHandle.HasValue ? engine.shaderManager.GetShaderByHandle(instancedShaderHandle.Value) : null;
             ZWrite = shader.ZWrite;
             DepthTesting = (DepthCompare)shader.DepthTest;
-
-            structuredBuffers = new Dictionary<int, INativeBuffer>();
-            structuredVertexBuffers = new Dictionary<int, INativeBuffer>();
-            structuredPixelsBuffers = new Dictionary<int, INativeBuffer>();
         }
 
-        public void SetStructuredBuffer<T>(int index, T[] data, StructuredBufferMode mode = StructuredBufferMode.VertexPixel) where T : unmanaged
+        public void InvalidateShaderCache()
         {
-            var bufferMode = BufferTypeEnum.StructuredBuffer;
-            if (mode == StructuredBufferMode.PixelOnly)
-                bufferMode = BufferTypeEnum.StructuredBufferPixelOnly;
-            else if (mode == StructuredBufferMode.VertexOnly)
-                bufferMode = BufferTypeEnum.StructuredBufferVertexOnly;
-
-            INativeBuffer buffer = engine.Device.CreateBuffer<T>(bufferMode, data);
-
-            if (mode == StructuredBufferMode.PixelOnly)
-            {
-                structuredPixelsBuffers[index] = buffer;
-            }
-            else if (mode == StructuredBufferMode.VertexOnly)
-            {
-                structuredVertexBuffers[index] = buffer;
-            }
-            else
-            {
-                structuredBuffers[index] = buffer;
-            }
+            shader = engine.shaderManager.GetShaderByHandle(shaderHandle);
+            instancedShader = instancedShaderHandle.HasValue ? engine.shaderManager.GetShaderByHandle(instancedShaderHandle.Value) : null;
         }
 
+        // public void SetStructuredBuffer<T>(int index, T[] data, StructuredBufferMode mode = StructuredBufferMode.VertexPixel) where T : unmanaged
+        // {
+        //     var bufferMode = BufferTypeEnum.StructuredBuffer;
+        //     if (mode == StructuredBufferMode.PixelOnly)
+        //         bufferMode = BufferTypeEnum.StructuredBufferPixelOnly;
+        //     else if (mode == StructuredBufferMode.VertexOnly)
+        //         bufferMode = BufferTypeEnum.StructuredBufferVertexOnly;
+        //
+        //     INativeBuffer buffer = engine.Device.CreateBuffer<T>(bufferMode, data);
+        //
+        //     if (mode == StructuredBufferMode.PixelOnly)
+        //     {
+        //         structuredPixelsBuffers[index] = buffer;
+        //     }
+        //     else if (mode == StructuredBufferMode.VertexOnly)
+        //     {
+        //         structuredVertexBuffers[index] = buffer;
+        //     }
+        //     else
+        //     {
+        //         structuredBuffers[index] = buffer;
+        //     }
+        // }
+        
+        public int? GetInstancedUniformLocation(string name)
+        {
+            if (instancedShader == null)
+                return null;
+            var instancedLoc = instancedShader.GetUniformLocation(name);
+            if (!instancedLoc.HasValue)
+                throw new Exception("Location " + name + " not found");
+            return instancedLoc.Value;
+        }
+        
         public int GetUniformLocation(string name)
         {
             var loc = shader.GetUniformLocation(name);
@@ -129,52 +149,44 @@ namespace TheEngine.Entities
             return loc.Value;
         }
 
-        public void SetBuffer<T>(string name, NativeBuffer<T> buffer) where T : unmanaged
+        private void Set<T>(Dictionary<int, T> dict, Dictionary<int, T> instanced, string name, T type)
         {
             var loc = GetUniformLocation(name);
-            if (loc == -1)
-                return;
-            structuredBuffers[loc] = buffer;
+            if (loc != -1)
+                dict[loc] = type;
+            var instLoc = GetInstancedUniformLocation(name);
+            if (instLoc.HasValue && instLoc != -1)
+                instanced[instLoc.Value] = type;
+        }
+
+        public void SetBuffer<T>(string name, NativeBuffer<T> buffer) where T : unmanaged
+        {
+            Set(structuredBuffers, instancedStructuredBuffers, name, buffer);
         }
         
         public void SetUniformInt(string name, int value)
         {
-            var loc = GetUniformLocation(name);
-            if (loc == -1)
-                return;
-            intUniforms[loc] = value;
+            Set(intUniforms, instancedIntUniforms, name, value);
         }
 
         public void SetUniform(string name, float value)
         {
-            var loc = GetUniformLocation(name);
-            if (loc == -1)
-                return;
-            floatUniforms[loc] = value;
+            Set(floatUniforms, instancedFloatUniforms, name, value);
         }
         
         public void SetUniform(string name, Vector3 value)
         {
-            var loc = GetUniformLocation(name);
-            if (loc == -1)
-                return;
-            vector3Uniforms[loc] = value;
+            Set(vector3Uniforms, instancedVector3Uniforms, name, value);
         }
         
         public void SetUniform(string name, Vector4 value)
         {
-            var loc = GetUniformLocation(name);
-            if (loc == -1)
-                return;
-            vector4Uniforms[loc] = value;
+            Set(vector4Uniforms, instancedVector4Uniforms, name, value);
         }
         
         public void SetTexture(string name, TextureHandle texture)
         {
-            var loc = GetUniformLocation(name);
-            if (loc == -1)
-                return;
-            textureHandles[loc] = texture;
+            Set(textureHandles, instancedTextureHandles, name, texture);
         }
 
         public TextureHandle GetTexture(string name)
@@ -182,49 +194,93 @@ namespace TheEngine.Entities
             return textureHandles[GetUniformLocation(name)];
         }
         
-        public void ActivateUniforms(MaterialInstanceRenderData? instanceData = null)
+        public void ActivateUniforms(bool instanced, MaterialInstanceRenderData? instanceData = null)
         {
             int slot = 0;
-
             // done in RenderManager
             // shader.Activate();
-            foreach (var buffer in structuredBuffers)
-            {
-                if (instanceData != null && instanceData.structuredBuffers != null &&
-                    instanceData.structuredBuffers.ContainsKey(buffer.Key))
-                    continue;
-                buffer.Value.Activate(slot);
-                shader.SetUniformInt(buffer.Key, slot);
-                slot++;
-            }
-            foreach (var pair in textureHandles)
-            {
-                var texture = engine.textureManager.GetTextureByHandle(pair.Value);
-                texture.Activate(slot);
-                shader.SetUniformInt(pair.Key, slot);
-                slot++;
-            }
 
-            foreach (var floats in floatUniforms)
+            if (instanced)
             {
-                shader.SetUniform(floats.Key, floats.Value);
+                foreach (var buffer in instancedStructuredBuffers)
+                {
+                    if (instanceData != null && instanceData.instancedStructuredBuffers != null &&
+                        instanceData.instancedStructuredBuffers.ContainsKey(buffer.Key))
+                        continue;
+                    buffer.Value.Activate(slot);
+                    instancedShader!.SetUniformInt(buffer.Key, slot);
+                    slot++;
+                }
+                foreach (var pair in instancedTextureHandles)
+                {
+                    var texture = engine.textureManager.GetTextureByHandle(pair.Value);
+                    texture.Activate(slot);
+                    instancedShader!.SetUniformInt(pair.Key, slot);
+                    slot++;
+                }
+
+                foreach (var floats in instancedFloatUniforms)
+                {
+                    instancedShader!.SetUniform(floats.Key, floats.Value);
+                }
+            
+                foreach (var ints in instancedIntUniforms)
+                {
+                    instancedShader!.SetUniformInt(ints.Key, ints.Value);
+                }
+            
+                foreach (var vector in instancedVector4Uniforms)
+                {
+                    instancedShader!.SetUniform(vector.Key, vector.Value.X, vector.Value.Y, vector.Value.Z, vector.Value.W);
+                }
+            
+                foreach (var vector in instancedVector3Uniforms)
+                {
+                    instancedShader!.SetUniform(vector.Key, vector.Value.X, vector.Value.Y, vector.Value.Z);
+                }
+            }
+            else
+            {
+                foreach (var buffer in structuredBuffers)
+                {
+                    if (instanceData != null && instanceData.structuredBuffers != null &&
+                        instanceData.structuredBuffers.ContainsKey(buffer.Key))
+                        continue;
+                    buffer.Value.Activate(slot);
+                    shader.SetUniformInt(buffer.Key, slot);
+                    slot++;
+                }
+                foreach (var pair in textureHandles)
+                {
+                    var texture = engine.textureManager.GetTextureByHandle(pair.Value);
+                    texture.Activate(slot);
+                    shader.SetUniformInt(pair.Key, slot);
+                    slot++;
+                }
+
+                foreach (var floats in floatUniforms)
+                {
+                    shader.SetUniform(floats.Key, floats.Value);
+                }
+            
+                foreach (var ints in intUniforms)
+                {
+                    shader.SetUniformInt(ints.Key, ints.Value);
+                }
+            
+                foreach (var vector in vector4Uniforms)
+                {
+                    shader.SetUniform(vector.Key, vector.Value.X, vector.Value.Y, vector.Value.Z, vector.Value.W);
+                }
+            
+                foreach (var vector in vector3Uniforms)
+                {
+                    shader.SetUniform(vector.Key, vector.Value.X, vector.Value.Y, vector.Value.Z);
+                }
             }
             
-            foreach (var ints in intUniforms)
-            {
-                shader.SetUniformInt(ints.Key, ints.Value);
-            }
             
-            foreach (var vector in vector4Uniforms)
-            {
-                shader.SetUniform(vector.Key, vector.Value.X, vector.Value.Y, vector.Value.Z, vector.Value.W);
-            }
-            
-            foreach (var vector in vector3Uniforms)
-            {
-                shader.SetUniform(vector.Key, vector.Value.X, vector.Value.Y, vector.Value.Z);
-            }
-            instanceData?.Activate(this, slot);
+            instanceData?.Activate(this, instanced, slot);
         }
         
         public enum StructuredBufferMode

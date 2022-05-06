@@ -22,6 +22,7 @@ namespace TheEngine.Interfaces
         public RollingAverage Drawing;
         public RollingAverage TotalRender;
         public RollingAverage FrameTime;
+        public RollingAverage UpdateTime;
         public RollingAverage PresentTime;
     }
     

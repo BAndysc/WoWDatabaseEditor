@@ -73,6 +73,7 @@ namespace TheAvaloniaOpenGL
         int GenTexture();
         void ActiveTextureUnit(uint slot);
         void ActiveTextureUnit(int slot);
+        void DeleteProgram(int program);
         unsafe void DeleteTexture(int name);
         unsafe void DeleteBuffer(int name);
         unsafe int GenFramebuffer();

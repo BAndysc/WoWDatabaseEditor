@@ -140,9 +140,9 @@ namespace TheAvaloniaOpenGL
         }
 
         // Safe multithread call
-        public Shader CreateShader(string path, string[] includePaths)
+        public Shader CreateShader(string path, string[] includePaths, bool instanced)
         {
-            return new Shader(device, path, includePaths);
+            return new Shader(device, path, includePaths, instanced);
         }
 
         // Safe multithread call

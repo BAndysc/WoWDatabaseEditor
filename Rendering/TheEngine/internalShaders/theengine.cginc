@@ -134,7 +134,7 @@ uniform samplerBuffer InstancingInverseModels;
 #endif
 
 
-#ifdef INSTANCING
+#ifdef Instancing
 #define VERTEX_SETUP_INSTANCING mat4 model = mat4(texelFetch(InstancingModels, gl_InstanceID * 4), texelFetch(InstancingModels, gl_InstanceID * 4 + 1), texelFetch(InstancingModels, gl_InstanceID * 4 + 2), texelFetch(InstancingModels, gl_InstanceID * 4 + 3)); mat4 inverseModel = mat4(texelFetch(InstancingInverseModels, gl_InstanceID * 4), texelFetch(InstancingInverseModels, gl_InstanceID * 4 + 1), texelFetch(InstancingInverseModels, gl_InstanceID * 4 + 2), texelFetch(InstancingInverseModels, gl_InstanceID * 4 + 3)); 
 #else
 #define VERTEX_SETUP_INSTANCING ;

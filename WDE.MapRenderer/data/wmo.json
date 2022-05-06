@@ -3,7 +3,7 @@
     "Path": "data/wmo.frag"
   },
   "ZWrite": true,
-  "Instancing": false,
+  "Instancing": true,
   "Vertex": {
     "Path": "data/wmo.vert",
     "Input": [

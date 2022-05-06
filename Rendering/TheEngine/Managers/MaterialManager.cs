@@ -16,16 +16,20 @@ namespace TheEngine.Managers
             this.engine = engine;
         }
 
-        public Material CreateMaterial(ShaderHandle shader)
+        public Material CreateMaterial(ShaderHandle shader, ShaderHandle? instancedShader)
         {
-            var m = new Material(engine, shader, new MaterialHandle(materials.Count));
+            var m = new Material(engine, shader, instancedShader, new MaterialHandle(materials.Count));
             materials.Add(m);
             return m;
         }
 
         public Material CreateMaterial(string shaderPath)
         {
-            return CreateMaterial(engine.ShaderManager.LoadShader(shaderPath));
+            var shader = engine.ShaderManager.LoadShader(shaderPath, false);
+            ShaderHandle? instanced = engine.ShaderManager.LoadShader(shaderPath, true);
+            if (!engine.shaderManager.GetShaderByHandle(instanced.Value).Instancing)
+                instanced = null;
+            return CreateMaterial(shader, instanced);
         }
 
         public void Dispose()
@@ -36,6 +40,14 @@ namespace TheEngine.Managers
         public Material GetMaterialByHandle(MaterialHandle handle)
         {
             return materials[handle.Handle];
+        }
+
+        public void InvalidateShaderCache()
+        {
+            foreach (var material in materials)
+            {
+                material.InvalidateShaderCache();
+            }
         }
     }
 }

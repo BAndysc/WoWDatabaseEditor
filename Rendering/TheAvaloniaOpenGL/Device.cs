@@ -451,6 +451,10 @@ namespace TheAvaloniaOpenGL
         public delegate int GlCreateProgram();
         [GlEntryPoint("glCreateProgram")]
         public GlCreateProgram CreateProgram { get; }
+        
+        public delegate void GlDeleteProgram(int program);
+        [GlEntryPoint("glDeleteProgram")]
+        public GlDeleteProgram DeleteProgram { get; }
 
         public delegate void GlAttachShader(int program, int shader);
         [GlEntryPoint("glAttachShader")]

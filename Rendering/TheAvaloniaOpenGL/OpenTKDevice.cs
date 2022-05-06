@@ -407,6 +407,11 @@ namespace TheAvaloniaOpenGL
             GL.ActiveTexture((OpenTK.Graphics.OpenGL4.TextureUnit.Texture0) + slot);
         }
 
+        public void DeleteProgram(int program)
+        {
+            GL.DeleteProgram(program);
+        }
+
         public unsafe void DeleteTexture(int name)
         {
             GL.DeleteTexture(name);

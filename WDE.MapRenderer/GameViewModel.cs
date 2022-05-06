@@ -205,7 +205,14 @@ namespace WDE.MapRenderer
                 float w = statsManager.PixelSize.X;
                 float h = statsManager.PixelSize.Y;
                 vm.Stats =
-                    $"[{w:0}x{h:0}]\nTotal frame time: {counters.FrameTime.Average:0.00} ms\n - Render time: {counters.TotalRender.Average:0.00}\n  - Bounds: {counters.BoundsCalc.Average:0.00}ms\n  - Culling: {counters.Culling.Average:0.00}ms\n  - Drawing: {counters.Drawing.Average:0.00}ms\n  - Present time: {counters.PresentTime.Average:0.00} ms";
+                    $@"[{w:0}x{h:0}]
+Total frame time: {counters.FrameTime.Average:0.00} ms
+ - Update time: {counters.UpdateTime.Average:0.00} ms
+ - Render time: {counters.TotalRender.Average:0.00} ms
+   - Bounds: {counters.BoundsCalc.Average:0.00}ms
+   - Culling: {counters.Culling.Average:0.00}ms
+   - Drawing: {counters.Drawing.Average:0.00}ms
+   - Present time: {counters.PresentTime.Average:0.00} ms";
 
                 vm.Stats += "\n" + @"Shaders: " + stats.ShaderSwitches + @"
 Materials: " + stats.MaterialActivations + @"

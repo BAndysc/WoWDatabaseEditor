@@ -1,10 +1,13 @@
 using TheEngine.Coroutines;
 using System.Collections;
+using Avalonia.Input;
+using JetBrains.Profiler.Api;
 using TheEngine.Entities;
 using TheEngine.Interfaces;
 using TheMaths;
 using WDE.MapRenderer;
 using WDE.MapRenderer.Managers;
+using IInputManager = TheEngine.Interfaces.IInputManager;
 
 namespace RenderingTester;
 
@@ -16,6 +19,7 @@ public class StandaloneCustomGameModule : IGameModule
     private readonly CameraManager cameraManager;
     private readonly IGameContext gameContext;
     private readonly IRenderManager renderManager;
+    private readonly IInputManager inputManager;
     private readonly MdxManager mdxManager;
     public object? ViewModel => null;
 
@@ -25,6 +29,7 @@ public class StandaloneCustomGameModule : IGameModule
         CameraManager cameraManager,
         IGameContext gameContext,
         IRenderManager renderManager,
+        IInputManager inputManager,
         MdxManager mdxManager)
     {
         this.uiManager = uiManager;
@@ -33,6 +38,7 @@ public class StandaloneCustomGameModule : IGameModule
         this.cameraManager = cameraManager;
         this.gameContext = gameContext;
         this.renderManager = renderManager;
+        this.inputManager = inputManager;
         this.mdxManager = mdxManager;
     }
     
@@ -42,27 +48,24 @@ public class StandaloneCustomGameModule : IGameModule
 
     public void Initialize()
     {
-        //cameraManager.Relocate(new Vector3());
-        //gameContext.StartCoroutine(LoadModel());
+        gameContext.SetMap(571);
     }
 
-    private IEnumerator LoadModel()
-    {
-        var task = new TaskCompletionSource<MdxManager.MdxInstance?>();
-        //"world\\generic\\activedoodads\\trollchest\\trollchest.m2"
-        yield return mdxManager.LoadM2Mesh("creature\\rocketchicken\\rocketchicken.m2", task);//"creature\\rocketchicken\\rocketchicken.m2", task);
-        int i = 0;
-        Transform transform = new();
-        transform.Scale *= 5;
-        var materials = task.Task.Result.materials;
-        foreach (var pair in materials)
-        {
-            renderManager.RegisterStaticRenderer(task.Task.Result.mesh.Handle, pair, i++, transform);
-        }
-    }
+    private bool profiling = false;
 
     public void Update(float delta)
     {
+        if (profiling)
+        {
+            MeasureProfiler.StopCollectingData();
+            MeasureProfiler.SaveData();
+            profiling = false;
+        }
+        if (inputManager.Keyboard.JustPressed(Key.P))
+        {
+            MeasureProfiler.StartCollectingData();
+            profiling = true;
+        }
     }
 
     public void Render()
@@ -76,5 +79,27 @@ public class StandaloneCustomGameModule : IGameModule
         ui.BeginVerticalBox(new Vector4(0, 0, 0, 1), 2);
         ui.Text("calibri", $"{fps:0.00}", 14, Vector4.One);
         ui.Text("calibri", $"{coroutineManager.PendingCoroutines} active tasks", 14, Vector4.One);
+
+        using var ui2 = uiManager.BeginImmediateDrawRel(1, 1, 1, 1);
+        ref var counters = ref statsManager.Counters;
+        ref var stats = ref statsManager.RenderStats;
+        float w = statsManager.PixelSize.X;
+        float h = statsManager.PixelSize.Y;
+        
+        ui2.BeginVerticalBox(new Vector4(0, 0, 0, 0.5f), 2);
+        ui2.Text("calibri", $"[{w:0}x{h:0}]", 12, Vector4.One);
+        ui2.Text("calibri", $"Total frame time: {counters.FrameTime.Average:0.00} ms", 12, Vector4.One);
+        ui2.Text("calibri", $" - Update time: {counters.UpdateTime.Average:0.00} ms", 12, Vector4.One);
+        ui2.Text("calibri", $" - Render time: {counters.TotalRender.Average:0.00} ms", 12, Vector4.One);
+        ui2.Text("calibri", $"   - Bounds: {counters.BoundsCalc.Average:0.00}ms", 12, Vector4.One);
+        ui2.Text("calibri", $"   - Culling: {counters.Culling.Average:0.00}ms", 12, Vector4.One);
+        ui2.Text("calibri", $"   - Drawing: {counters.Drawing.Average:0.00}ms", 12, Vector4.One);
+        ui2.Text("calibri", $"   - Present time: {counters.PresentTime.Average:0.00} ms", 12, Vector4.One);
+        ui2.Text("calibri", "Shaders: " + stats.ShaderSwitches, 12, Vector4.One);
+        ui2.Text("calibri", $"Materials: " + stats.MaterialActivations, 12, Vector4.One);
+        ui2.Text("calibri", $"Meshes: " + stats.MeshSwitches, 12, Vector4.One);
+        ui2.Text("calibri", $"Batches: " + (stats.NonInstancedDraws + stats.InstancedDraws), 12, Vector4.One);
+        ui2.Text("calibri", $"Batches saved by instancing: " + stats.InstancedDrawSaved, 12, Vector4.One);
+        ui2.Text("calibri", $"Tris: " + stats.TrianglesDrawn, 12, Vector4.One);
     }
 }

@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Avalonia.Input;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
@@ -13,6 +14,7 @@ public class TheEngineOpenTkWindow : GameWindow, IWindowHost
 {
     private readonly IGame game;
     private Engine engine = null!;
+    private Stopwatch updateStopwatch = new();
 
     public TheEngineOpenTkWindow(GameWindowSettings gameWindowSettings,
         NativeWindowSettings nativeWindowSettings,
@@ -177,6 +179,7 @@ public class TheEngineOpenTkWindow : GameWindow, IWindowHost
 
     protected override void OnUpdateFrame(FrameEventArgs args)
     {
+        updateStopwatch.Restart();
         engine.inputManager.Update();
         UpdateKeyboard();
         UpdateMouse();
@@ -186,6 +189,8 @@ public class TheEngineOpenTkWindow : GameWindow, IWindowHost
             
         engine.inputManager.PostUpdate();
         base.OnUpdateFrame(args);
+        updateStopwatch.Stop();
+        engine.statsManager.Counters.UpdateTime.Add(updateStopwatch.Elapsed.TotalMilliseconds);
     }
 
     private bool wasLeftDown = false;

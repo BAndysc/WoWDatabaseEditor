@@ -74,7 +74,7 @@ namespace TheAvaloniaOpenGL.Resources
         public DepthFunction DepthTest { get; }
 
         public bool WriteMask { get; }
-
+        
         private Dictionary<int, float> uniformFloatValues = new();
         private Dictionary<int, Vector4> uniformVectorValues = new();
         private Dictionary<int, int> uniformIntValues = new();
@@ -113,7 +113,7 @@ namespace TheAvaloniaOpenGL.Resources
         }
 */
         
-        internal Shader(IDevice device, string shaderFile, string[] includePaths)
+        internal Shader(IDevice device, string shaderFile, string[] includePaths, bool instanced)
         {
             var shaderContent = File.ReadAllText(shaderFile);
             var shaderData = JsonConvert.DeserializeObject<ShaderData>(shaderContent);
@@ -122,13 +122,13 @@ namespace TheAvaloniaOpenGL.Resources
 
             ZWrite = shaderData.ZWrite;
             DepthTest = shaderData.DepthTest ?? DepthFunction.Lequal;
-            Instancing = shaderData.Instancing;
+            Instancing = shaderData.Instancing && instanced;
             var defines = new List<string>() { "VERTEX_SHADER" };
             if (Instancing)
+            {
                 defines.Add("Instancing");
-
+            }
             
-
             VertexShader = device.CreateShader(ShaderType.VertexShader);
             var vertexSource = ShaderSource.ParseShader(shaderData.Vertex.Path, true, defines.ToArray());
             var result = device.CompileShaderAndGetError(VertexShader, vertexSource);
@@ -278,6 +278,7 @@ namespace TheAvaloniaOpenGL.Resources
 
         public void Dispose()
         {
+            device.DeleteProgram(ProgramHandle);
             //PixelShader.Dispose();
             //VertexShader.Dispose();
             //ShaderInputLayout.Dispose();

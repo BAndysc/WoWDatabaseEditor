@@ -33,6 +33,7 @@ namespace TheEngine
         protected Engine? engine;
         private Stopwatch sw = new Stopwatch();
         private Stopwatch renderStopwatch = new Stopwatch();
+        private Stopwatch updateStopwatch = new();
         private int frame = 0;
         public float FrameRate => 1000.0f / framerate.Average;
         
@@ -162,7 +163,6 @@ namespace TheEngine
             
             engine.statsManager.PixelSize = new Vector2(PixelSize.Item1, PixelSize.Item2);
             engine.statsManager.Counters.PresentTime.Add(PresentTime);
-            renderStopwatch.Restart();
             try
             {
                 engine.Device.device.CheckError("start OnOpenGlRender");
@@ -176,9 +176,13 @@ namespace TheEngine
                 sw.Restart();
                 Dispatcher.UIThread.Post(() => RaisePropertyChanged(FrameRateProperty, Optional<float>.Empty, FrameRate), DispatcherPriority.Render);
 
+                updateStopwatch.Restart();
                 Update(delta);
+                updateStopwatch.Stop();
+                engine.statsManager.Counters.UpdateTime.Add(updateStopwatch.Elapsed.TotalMilliseconds);
 
                 // render pass
+                renderStopwatch.Restart();
                 engine.renderManager.PrepareRendering(fb);
                 engine.renderManager.RenderOpaque(fb);
                 game?.Render(delta);
@@ -187,6 +191,8 @@ namespace TheEngine
                 game?.RenderGUI(delta);
                 engine.RenderGUI();
                 engine.renderManager.FinalizeRendering(fb);
+                renderStopwatch.Stop();
+                engine.statsManager.Counters.TotalRender.Add(renderStopwatch.Elapsed.Milliseconds);
                 
                 if (engine.inputManager.Keyboard.JustPressed(Key.R))
                 {
@@ -210,8 +216,6 @@ namespace TheEngine
                 engine.Device.device.ActiveTextureUnit(0);
                 engine.Device.device.CheckError("post render");
             }
-            renderStopwatch.Stop();
-            engine.statsManager.Counters.TotalRender.Add(renderStopwatch.Elapsed.Milliseconds);
             frame++;
         }
 

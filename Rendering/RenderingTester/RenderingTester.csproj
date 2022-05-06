@@ -8,6 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="JetBrains.Profiler.Api" Version="1.2.0-preview2" />
       <PackageReference Include="OpenTK" Version="4.6.4" />
     </ItemGroup>
 

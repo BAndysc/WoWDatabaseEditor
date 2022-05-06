@@ -306,6 +306,13 @@ namespace TheAvaloniaOpenGL
             Report($"CreateProgram");
             return device.CreateProgram();
         }
+        
+        public void DeleteProgram(int program)
+        {
+            Report($"DeleteProgram({program})");
+            device.DeleteProgram(program);
+        }
+        
         public void AttachShader(int program, int shader)
         {
             Report($"AttachShader");
