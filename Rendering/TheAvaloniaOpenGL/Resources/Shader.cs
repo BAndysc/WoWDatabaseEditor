@@ -134,6 +134,12 @@ namespace TheAvaloniaOpenGL.Resources
             var result = device.CompileShaderAndGetError(VertexShader, vertexSource);
             if (!string.IsNullOrEmpty(result))
             {
+                int o = 0;
+                foreach (var line in vertexSource.Split('\n'))
+                {
+                    o++;
+                    Console.WriteLine($"{o.ToString():-5}: {line}");
+                }
                 Console.WriteLine("Error while compiling " + shaderData.Vertex.Path);
                 Console.WriteLine(result);
             }

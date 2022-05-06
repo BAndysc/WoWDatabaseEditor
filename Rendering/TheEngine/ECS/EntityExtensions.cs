@@ -43,6 +43,21 @@ namespace TheEngine.ECS
             }
         }
         
+        public static void ForEachRRRO<T1, T2, T3, N1>(this Archetype archetype, 
+            System.Action<IChunkDataIterator, int, int, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N1>?> process)
+            where T1 : unmanaged, IComponentData
+            where T2 : unmanaged, IComponentData
+            where T3 : unmanaged, IComponentData
+            where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            foreach (var itr in iterator)
+            {
+                process(itr, 0, itr.Length, itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.OptionalManagedDataAccess<N1>());
+            }
+        }
+        
         public static void ForEach<T1, T2, T3, T4>(this Archetype archetype, 
             System.Action<IChunkDataIterator, int, int, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>> process)
             where T1 : unmanaged, IComponentData
@@ -58,24 +73,36 @@ namespace TheEngine.ECS
             }
         }
 
-        public static void ForEach<N1, T1>(this Archetype archetype, 
-            System.Action<IChunkDataIterator, int, int, ComponentDataAccess<N1>, ManagedComponentDataAccess<T1>> process)
-            where N1 : unmanaged, IComponentData
-            where T1 : IManagedComponentData
+        public static void ForEach<N1>(this Archetype archetype, 
+            System.Action<IChunkDataIterator, int, int, ManagedComponentDataAccess<N1>> process)
+            where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
             foreach (var itr in iterator)
             {
-                process(itr, 0, itr.Length, itr.DataAccess<N1>(), itr.ManagedDataAccess<T1>());
+                process(itr, 0, itr.Length, itr.ManagedDataAccess<N1>());
+            }
+        }
+
+        public static void ForEach<T1, N1>(this Archetype archetype, 
+            System.Action<IChunkDataIterator, int, int, ComponentDataAccess<T1>, ManagedComponentDataAccess<N1>> process)
+            where T1 : unmanaged, IComponentData
+            where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            foreach (var itr in iterator)
+            {
+                process(itr, 0, itr.Length, itr.DataAccess<T1>(), itr.ManagedDataAccess<N1>());
             }
         }
         
         private static void RunThreads(int start, int total, Action<int, int> action)
         {
             int threads = Environment.ProcessorCount;
-            if (total < threads * 1000)
-                threads = Math.Clamp(total / 1000, 1, threads);
+            if (total < threads * 500)
+                threads = Math.Clamp(total / 500, 1, threads);
             int perThread = total / threads;
 
             if (threads == 1)
@@ -101,7 +128,7 @@ namespace TheEngine.ECS
                 }
 
                 foreach (var t in alloc)
-                    t.Join();   
+                    t.Join();
             }
         }
         
@@ -118,6 +145,19 @@ namespace TheEngine.ECS
             }
         }
         
+        public static void ParallelForEach<N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, ManagedComponentDataAccess<N1>> process)
+            where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            foreach (var itr in iterator)
+            {
+                var a1 = itr.ManagedDataAccess<N1>();
+                RunThreads(0, itr.Length, (s, e) => process(itr, s, e, a1));
+            }
+        }
+
         public static void ParallelForEach<T1, T2>(this Archetype archetype, 
             Action<IChunkDataIterator, int, int, ComponentDataAccess<T1>, ComponentDataAccess<T2>> process)
             where T1 : unmanaged, IComponentData
@@ -129,6 +169,22 @@ namespace TheEngine.ECS
             {
                 var a1 = itr.DataAccess<T1>();
                 var a2 = itr.DataAccess<T2>();
+                RunThreads(0, itr.Length, (s, e) => process(itr, s, e, a1, a2));
+            }
+        }
+        
+        
+        public static void ParallelForEach<T1, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, ComponentDataAccess<T1>, ManagedComponentDataAccess<N1>> process)
+            where T1 : unmanaged, IComponentData
+            where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            foreach (var itr in iterator)
+            {
+                var a1 = itr.DataAccess<T1>();
+                var a2 = itr.ManagedDataAccess<N1>();
                 RunThreads(0, itr.Length, (s, e) => process(itr, s, e, a1, a2));
             }
         }
@@ -146,6 +202,24 @@ namespace TheEngine.ECS
                 var a1 = itr.DataAccess<T1>();
                 var a2 = itr.DataAccess<T2>();
                 var a3 = itr.DataAccess<T3>();
+                RunThreads(0, itr.Length, (s, e) => process(itr, s, e, a1, a2, a3));
+            }
+        }
+        
+        
+        public static void ParallelForEach<T1, T2, N1>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N1>> process)
+            where T1 : unmanaged, IComponentData
+            where T2 : unmanaged, IComponentData
+            where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            foreach (var itr in iterator)
+            {
+                var a1 = itr.DataAccess<T1>();
+                var a2 = itr.DataAccess<T2>();
+                var a3 = itr.ManagedDataAccess<N1>();
                 RunThreads(0, itr.Length, (s, e) => process(itr, s, e, a1, a2, a3));
             }
         }

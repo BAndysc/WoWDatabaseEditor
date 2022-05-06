@@ -32,6 +32,7 @@ namespace WDE.MapRenderer.Managers
 
         public List<StaticRenderHandle> renderHandles = new();
         public List<Entity> entities = new();
+        public List<NativeBuffer<Matrix>> animationBuffers = new();
 
         public CreatureManager.CreatureChunkData Creatures = new();
         public GameObjectManager.GameObjectChunkData GameObjects = new();
@@ -50,6 +51,9 @@ namespace WDE.MapRenderer.Managers
             textureManager.DisposeTexture(splatMapTex);
             textureManager.DisposeTexture(holesMapTex);
             heightsNormalBuffer?.Dispose();
+            foreach (var buffer in animationBuffers)
+                buffer.Dispose();
+            animationBuffers.Clear();
         }
 
         public uint GetAreaId(Vector3 wowPosition)
@@ -506,19 +510,42 @@ namespace WDE.MapRenderer.Managers
                 t.Rotation = Quaternion.FromEuler(m2.Rotation.X, m2.Rotation.Y + 180,  m2.Rotation.Z);
 
                 int j = 0;
+                Entity entity;
+                NativeBuffer<Matrix>? bones = null;
+                if (m.HasAnimations)
+                {
+                    bones = engine.CreateBuffer<Matrix>(BufferTypeEnum.StructuredBuffer, 1, BufferInternalFormat.Float4);
+                    bones.UpdateBuffer(AnimationSystem.IdentityBones(m.model.bones.Length).Span);
+                    chunk.animationBuffers.Add(bones);
+                }
+
+                bool first = true;
+
                 foreach (var material in m.materials)
                 {
-                    //
-                    // var entity = entityManager.CreateEntity(renderEntityArchetype);
-                    // entityManager.GetComponent<LocalToWorld>(entity).Matrix = t.LocalToWorldMatrix;
-                    // entityManager.GetComponent<MeshRenderer>(entity).SubMeshId = j++;
-                    // entityManager.GetComponent<MeshRenderer>(entity).MaterialHandle = material.Handle;
-                    // entityManager.GetComponent<MeshRenderer>(entity).MeshHandle = m.mesh.Handle;
-                    // entityManager.GetComponent<MeshBounds>(entity) = (MeshBounds)m.mesh.Bounds;
-                    // entityManager.GetComponent<DirtyPosition>(entity).Enable();
-                    // chunk.objectHandles2.Add(entity);
-                    //
-                    chunk.renderHandles.Add(renderManager.RegisterStaticRenderer(m.mesh.Handle, material, j++, t));
+                    if (m.HasAnimations)
+                    {
+                        entity = entityManager.CreateEntity(first ? archetypes.StaticM2WorldObjectAnimatedMasterArchetype : archetypes.StaticM2WorldObjectAnimatedArchetype);
+                        // only one renderer has to update the animation, because the animation is the same among all renderers
+                        if (first)
+                        {
+                            entityManager.SetManagedComponent(entity, new M2AnimationComponentData(m.model)
+                            {
+                                SetNewAnimation = 0,
+                                _buffer = bones!
+                            });   
+                        }
+                        var instanceRenderer = new MaterialInstanceRenderData();
+                        instanceRenderer.SetBuffer(material, "boneMatrices", bones!);
+                        entityManager.SetManagedComponent(entity, instanceRenderer);
+                    }
+                    else
+                        entity = entityManager.CreateEntity(archetypes.StaticM2WorldObjectArchetype);
+                    
+                    renderManager.SetupRendererEntity(entity, m.mesh.Handle, material, j++, t.LocalToWorldMatrix);
+                    
+                    chunk.entities.Add(entity);
+                    first = false;
                 }
 
                 index++;
@@ -628,7 +655,11 @@ namespace WDE.MapRenderer.Managers
                 renderManager.UnregisterStaticRenderer(obj);
             foreach (var entity in chunk.entities)
                 entityManager.DestroyEntity(entity);
+            foreach (var buffer in chunk.animationBuffers)
+                buffer.Dispose();
             
+            chunk.animationBuffers.Clear();
+
             chunk.Dispose(textureManager);
         }
 

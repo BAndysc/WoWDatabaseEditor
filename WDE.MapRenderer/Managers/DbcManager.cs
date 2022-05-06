@@ -12,6 +12,7 @@ namespace WDE.MapRenderer.Managers
         public AreaTriggerStore AreaTriggerStore { get; }
         public CreatureDisplayInfoStore CreatureDisplayInfoStore { get; }
         public CreatureDisplayInfoExtraStore CreatureDisplayInfoExtraStore { get; }
+        public EmoteStore EmoteStore { get; }
         public ItemDisplayInfoStore ItemDisplayInfoStore { get; }
         public CreatureModelDataStore CreatureModelDataStore { get; }
         public GameObjectDisplayInfoStore GameObjectDisplayInfoStore { get; }
@@ -39,6 +40,7 @@ namespace WDE.MapRenderer.Managers
             CreatureDisplayInfoStore = new(OpenDbc("CreatureDisplayInfo"));
             CreatureDisplayInfoExtraStore = new(OpenDbc("CreatureDisplayInfoExtra")); // for humanoids
             CreatureModelDataStore = new(OpenDbc("CreatureModelData"));
+            EmoteStore = new(OpenDbc("Emotes"));
             GameObjectDisplayInfoStore = new(OpenDbc("GameObjectDisplayInfo"));
             ItemDisplayInfoStore = new(OpenDbc("ItemDisplayInfo"));
             CharSectionsStore = new(OpenDbc("CharSections"));

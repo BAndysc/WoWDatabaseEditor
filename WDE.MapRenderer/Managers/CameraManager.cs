@@ -29,6 +29,7 @@ namespace WDE.MapRenderer.Managers
             Position = new Vector3(285.396f, -4746.17f, 9.48428f + 20);
             Rotation = Quaternion.LookRotation(
                 new Vector3(223.698f, -4745.11f, 10.1022f + 20) - Position, Vector3.Up);
+            
             engineCamera.MainCamera.FOV = 75;
         }
 
@@ -47,7 +48,7 @@ namespace WDE.MapRenderer.Managers
                 pitch += inputManager.Mouse.Delta.X;
                 yaw = Math.Clamp(yaw, 0, 179);
             }
-
+            
             Rotation = Quaternion.FromEuler(0, pitch, yaw);
             var movement = inputManager.Keyboard.GetAxis(Vector3.Down, Key.W, Key.S) + 
                            inputManager.Keyboard.GetAxis(Vector3.Backward, Key.A, Key.D) + 

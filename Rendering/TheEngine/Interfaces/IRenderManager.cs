@@ -1,4 +1,5 @@
-﻿using TheEngine.Entities;
+﻿using TheEngine.ECS;
+using TheEngine.Entities;
 using TheEngine.Handles;
 using TheMaths;
 
@@ -6,6 +7,7 @@ namespace TheEngine.Interfaces
 {
     public interface IRenderManager
     {
+        void SetupRendererEntity(Entity entity, MeshHandle mesh, Material material, int subMesh, Matrix localToWorld);
         StaticRenderHandle RegisterStaticRenderer(MeshHandle mesh, Material material, int subMesh, Transform t);
         StaticRenderHandle RegisterStaticRenderer(MeshHandle mesh, Material material, int subMesh, Matrix localToWorld);
         void UnregisterStaticRenderer(StaticRenderHandle staticRenderHandle);

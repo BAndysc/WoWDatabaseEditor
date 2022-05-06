@@ -2474,7 +2474,7 @@ namespace TheMaths
         /// </summary>
         /// <param name="scale">Scaling factor for all three axes.</param>
         /// <param name="result">When the method completes, contains the created scaling matrix.</param>
-        public static void Scaling(ref Vector3 scale, out Matrix result)
+        public static void Scaling(in Vector3 scale, out Matrix result)
         {
             Scaling(scale.X, scale.Y, scale.Z, out result);
         }
@@ -2484,10 +2484,10 @@ namespace TheMaths
         /// </summary>
         /// <param name="scale">Scaling factor for all three axes.</param>
         /// <returns>The created scaling matrix.</returns>
-        public static Matrix Scaling(Vector3 scale)
+        public static Matrix Scaling(in Vector3 scale)
         {
             Matrix result;
-            Scaling(ref scale, out result);
+            Scaling(in scale, out result);
             return result;
         }
 
@@ -2680,7 +2680,7 @@ namespace TheMaths
         /// </summary>
         /// <param name="rotation">The quaternion to use to build the matrix.</param>
         /// <param name="result">The created rotation matrix.</param>
-        public static void RotationQuaternion(ref Quaternion rotation, out Matrix result)
+        public static void RotationQuaternion(in Quaternion rotation, out Matrix result)
         {
             float xx = rotation.X * rotation.X;
             float yy = rotation.Y * rotation.Y;
@@ -2709,10 +2709,10 @@ namespace TheMaths
         /// </summary>
         /// <param name="rotation">The quaternion to use to build the matrix.</param>
         /// <returns>The created rotation matrix.</returns>
-        public static Matrix RotationQuaternion(Quaternion rotation)
+        public static Matrix RotationQuaternion(in Quaternion rotation)
         {
             Matrix result;
-            RotationQuaternion(ref rotation, out result);
+            RotationQuaternion(in rotation, out result);
             return result;
         }
 
@@ -2727,7 +2727,7 @@ namespace TheMaths
         {
             Quaternion quaternion = new Quaternion();
             Quaternion.RotationYawPitchRoll(yaw, pitch, roll, out quaternion);
-            RotationQuaternion(ref quaternion, out result);
+            RotationQuaternion(in quaternion, out result);
         }
 
         /// <summary>
@@ -2749,7 +2749,7 @@ namespace TheMaths
         /// </summary>
         /// <param name="value">The offset for all three coordinate planes.</param>
         /// <param name="result">When the method completes, contains the created translation matrix.</param>
-        public static void Translation(ref Vector3 value, out Matrix result)
+        public static void Translation(in Vector3 value, out Matrix result)
         {
             Translation(value.X, value.Y, value.Z, out result);
         }
@@ -2759,10 +2759,10 @@ namespace TheMaths
         /// </summary>
         /// <param name="value">The offset for all three coordinate planes.</param>
         /// <returns>The created translation matrix.</returns>
-        public static Matrix Translation(Vector3 value)
+        public static Matrix Translation(in Vector3 value)
         {
             Matrix result;
-            Translation(ref value, out result);
+            Translation(in value, out result);
             return result;
         }
 

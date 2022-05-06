@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using OpenGLBindings;
 using TheAvaloniaOpenGL.Resources;
+using TheEngine.Components;
 using TheEngine.Handles;
 using TheMaths;
 
@@ -181,7 +182,7 @@ namespace TheEngine.Entities
             return textureHandles[GetUniformLocation(name)];
         }
         
-        public void ActivateUniforms()
+        public void ActivateUniforms(MaterialInstanceRenderData? instanceData = null)
         {
             int slot = 0;
 
@@ -189,6 +190,9 @@ namespace TheEngine.Entities
             // shader.Activate();
             foreach (var buffer in structuredBuffers)
             {
+                if (instanceData != null && instanceData.structuredBuffers != null &&
+                    instanceData.structuredBuffers.ContainsKey(buffer.Key))
+                    continue;
                 buffer.Value.Activate(slot);
                 shader.SetUniformInt(buffer.Key, slot);
                 slot++;
@@ -220,6 +224,7 @@ namespace TheEngine.Entities
             {
                 shader.SetUniform(vector.Key, vector.Value.X, vector.Value.Y, vector.Value.Z);
             }
+            instanceData?.Activate(this, slot);
         }
         
         public enum StructuredBufferMode

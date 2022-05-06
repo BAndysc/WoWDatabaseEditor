@@ -28,7 +28,7 @@ namespace TheAvaloniaOpenGL.Resources
         void Activate(int slot);
     }
 
-    public class NativeBuffer<T> : IDisposable, INativeBuffer where T : unmanaged
+    public sealed class NativeBuffer<T> : IDisposable, INativeBuffer where T : unmanaged
     {
         private static bool UseStorageBuffer = false;
         
@@ -63,6 +63,14 @@ namespace TheAvaloniaOpenGL.Resources
             CreateBufferWithData(data);
         }
 
+        ~NativeBuffer()
+        {
+            if (BufferHandle != -1)
+            {
+                Console.WriteLine("Native buffer leaked!");
+            }
+        }
+
         private bool IsStructuredBuffer => BufferType == BufferTypeEnum.StructuredBuffer || BufferType == BufferTypeEnum.StructuredBufferPixelOnly || BufferType == BufferTypeEnum.StructuredBufferVertexOnly;
 
         public bool IsUsingBufferTexture => IsStructuredBuffer && !UseStorageBuffer;
@@ -95,7 +103,7 @@ namespace TheAvaloniaOpenGL.Resources
         private BufferUsageHint UsageHint =>
             IsStructuredBuffer ? BufferUsageHint.DynamicDraw : BufferUsageHint.StaticDraw;
 
-        public unsafe void UpdateBuffer(T[] newData)
+        public unsafe void UpdateBuffer(Span<T> newData)
         {
             device.BindBuffer(GlBufferType, BufferHandle);
             if (Length < newData.Length || true)

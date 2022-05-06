@@ -1,7 +1,36 @@
+using TheAvaloniaOpenGL.Resources;
 using TheEngine.ECS;
+using TheEngine.Entities;
 
 namespace TheEngine.Components
 {
+    public class MaterialInstanceRenderData : IManagedComponentData
+    {
+        public Dictionary<int, INativeBuffer>? structuredBuffers { get; private set; }
+
+        public void SetBuffer(Material material, string name, INativeBuffer buffer)
+        {
+            var loc = material.GetUniformLocation(name);
+            if (loc == -1)
+                return;
+            structuredBuffers ??= new();
+            structuredBuffers[loc] = buffer;
+        }
+
+        public void Activate(Material material, int slot)
+        {
+            if (structuredBuffers == null)
+                return;
+            
+            foreach (var buffer in structuredBuffers)
+            {
+                buffer.Value.Activate(slot);
+                material.Shader.SetUniformInt(buffer.Key, slot);
+                slot++;
+            }
+        }
+    }
+    
     public struct RenderEnabledBit : IComponentData
     {
         private byte enabled;

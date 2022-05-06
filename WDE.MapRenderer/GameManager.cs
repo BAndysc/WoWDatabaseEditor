@@ -37,7 +37,9 @@ namespace WDE.MapRenderer
         private LoadingManager loadingManager = null!;
         private CreatureManager creatureManager = null!;
         private GameObjectManager gameObjectManager = null!;
-        
+        private AnimationSystem animationSystem = null!;
+
+        public float Delta { get; private set; }
         public event Action<int>? ChangedMap;
         public Map CurrentMap { get; private set; } = Map.Empty;
         public bool IsInitialized { get; private set; }
@@ -87,6 +89,7 @@ namespace WDE.MapRenderer
             moduleManager = ResolveOrCreate<ModuleManager>();
             creatureManager = ResolveOrCreate<CreatureManager>();
             gameObjectManager = ResolveOrCreate<GameObjectManager>();
+            animationSystem = ResolveOrCreate<AnimationSystem>();
             
             IsInitialized = true;
             return true;
@@ -113,11 +116,15 @@ namespace WDE.MapRenderer
                 return;
             }
 
+            Delta = delta;
+            
             loadingManager.Update(delta);
             coroutineManager.Step();
 
             timeManager.Update(delta);
             worldManager.Update(delta);
+            
+            animationSystem.Update(delta);
             
             cameraManager.Update(delta);
             lightingManager.Update(delta);
@@ -154,6 +161,7 @@ namespace WDE.MapRenderer
             cameraManager.RenderGUI();
             loadingManager.RenderGUI();
             timeManager.RenderGUI();
+            mdxManager.RenderGUI();
         }
 
         public void SetMap(int mapId, Vector3? position = null)

@@ -34,7 +34,7 @@
                 <CheckBox IsChecked="{Binding OverrideLighting, Mode=TwoWay}">Disable lightning</CheckBox>
                 <DockPanel LastChildFill="True">
                     <TextBlock VerticalAlignment="Center">View distance: </TextBlock>
-                    <Slider Minimum="1" Maximum="32" SmallChange="1" LargeChange="1" Value="{Binding ViewDistance}" />
+                    <Slider Minimum="1" Maximum="24" SmallChange="0.1" LargeChange="1" Value="{Binding ViewDistance}" />
                 </DockPanel>
             </StackPanel>
         </DropDownButton>

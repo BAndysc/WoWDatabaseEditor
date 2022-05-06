@@ -64,6 +64,7 @@ namespace TheEngine.Managers
         
         private Shader currentShader = null;
 
+        private Archetype renderBitArchetype;
         private Archetype toRenderArchetype;
         private Archetype updateWorldBoundsArchetype;
         private Archetype dirtEntities;
@@ -105,6 +106,11 @@ namespace TheEngine.Managers
                 .WithComponentData<WorldMeshBounds>()
                 .WithComponentData<DirtyPosition>()
                 .WithComponentData<MeshBounds>();
+
+            renderBitArchetype = engine.entityManager.NewArchetype()
+                    .WithComponentData<RenderEnabledBit>()
+                    .WithComponentData<LocalToWorld>()
+                    .WithComponentData<WorldMeshBounds>();
 
             toRenderArchetype = engine.entityManager.NewArchetype()
                 .WithComponentData<RenderEnabledBit>()
@@ -356,12 +362,12 @@ namespace TheEngine.Managers
             });
         }
 
-        private void EnableMaterial(Material material)
+        private void EnableMaterial(Material material, MaterialInstanceRenderData? instanceData = null)
         {
             SetDepth(material.ZWrite, material.DepthTesting);
             SetCulling(material.Culling);
             SetBlending(material.BlendingEnabled, material.SourceBlending, material.DestinationBlending);
-            material.ActivateUniforms();
+            material.ActivateUniforms(instanceData);
             Stats.MaterialActivations++;
         }
 
@@ -419,6 +425,7 @@ namespace TheEngine.Managers
 
         private LocalToWorld[] localToWorlds = new LocalToWorld[10000];
         private MeshRenderer[] renderers = new MeshRenderer[10000];
+        private MaterialInstanceRenderData?[] materialInstanceData = new MaterialInstanceRenderData?[10000];
         private int opaque;
         private int transparent;
         private int totalToDraw;
@@ -445,7 +452,7 @@ namespace TheEngine.Managers
             
             culler.Restart();
             float mod = viewDistanceModifier * viewDistanceModifier;
-            toRenderArchetype.ParallelForEach<LocalToWorld, RenderEnabledBit, WorldMeshBounds>((itr, start, end, l2w, bits, worldMeshBounds) =>
+            renderBitArchetype.ParallelForEach<LocalToWorld, RenderEnabledBit, WorldMeshBounds>((itr, start, end, l2w, bits, worldMeshBounds) =>
             {
                 for (int i = start; i < end; ++i)
                 {
@@ -453,8 +460,8 @@ namespace TheEngine.Managers
                     var pos = l2w[i].Position;
                     var boundingBoxSize = boundingBox.Size;
                     var size = boundingBoxSize.X + boundingBoxSize.Y + boundingBoxSize.Z;
-                    size = Math.Max(size, 60);
-                    bool doRender = (pos - cameraPosition).LengthSquared() < (size) * (size) * mod;
+                    size = MathF.Sqrt(Math.Max(size, 10));
+                    bool doRender = (pos - cameraPosition).LengthSquared() < (size) * (size) * (size) * mod;
                     if (doRender)
                     {
                         bits[i] = (RenderEnabledBit)(frustum.Contains(ref boundingBox) != ContainmentType.Disjoint);
@@ -490,10 +497,11 @@ namespace TheEngine.Managers
             {
                 localToWorlds = new LocalToWorld[totalToDraw];
                 renderers = new MeshRenderer[totalToDraw];
+                materialInstanceData = new MaterialInstanceRenderData[totalToDraw];
             }
             int opaqueIndex = 0;
             int transparentIndex = opaque;
-            toRenderArchetype.ForEach<LocalToWorld, RenderEnabledBit, MeshRenderer>((itr, start, end, l2w, render, meshRenderer) =>
+            toRenderArchetype.ForEachRRRO<LocalToWorld, RenderEnabledBit, MeshRenderer, MaterialInstanceRenderData>((itr, start, end, l2w, render, meshRenderer, materialData) =>
             {
                 for (int i = start; i < end; ++i)
                 {
@@ -505,11 +513,13 @@ namespace TheEngine.Managers
                     if (renderer.Opaque)
                     {
                         renderers[opaqueIndex] = renderer;
+                        materialInstanceData[opaqueIndex] = materialData?[i];
                         localToWorlds[opaqueIndex++] = l2w[i];
                     }
                     else
                     {
                         renderers[transparentIndex] = renderer;
+                        materialInstanceData[transparentIndex] = materialData?[i];
                         localToWorlds[transparentIndex++] = l2w[i];
                     }
                 }
@@ -553,7 +563,7 @@ namespace TheEngine.Managers
                 }
                     
                 //materialtimer.Start();
-                EnableMaterial(material);
+                EnableMaterial(material, materialInstanceData[i]);
                 //materialtimer.Stop();
 
                 //buffertimer.Start();
@@ -690,17 +700,22 @@ namespace TheEngine.Managers
             return RegisterStaticRenderer(mesh, material, subMesh, t.LocalToWorldMatrix);
         }
 
-        public StaticRenderHandle RegisterStaticRenderer(MeshHandle meshHandle, Material material, int subMesh, Matrix localToWorld)
+        public void SetupRendererEntity(Entity entity, MeshHandle meshHandle, Material material, int subMesh, Matrix localToWorld)
         {
             var l2w = new LocalToWorld() { Matrix = localToWorld };
             var mesh = engine.meshManager.GetMeshByHandle(meshHandle);
-            var entity = engine.EntityManager.CreateEntity(staticRendererArchetype);
             engine.EntityManager.GetComponent<LocalToWorld>(entity) = l2w;
             engine.EntityManager.GetComponent<MeshRenderer>(entity).SubMeshId = subMesh;
             engine.EntityManager.GetComponent<MeshRenderer>(entity).MaterialHandle = material.Handle;
             engine.EntityManager.GetComponent<MeshRenderer>(entity).MeshHandle = meshHandle;
             engine.EntityManager.GetComponent<MeshRenderer>(entity).Opaque = !material.BlendingEnabled;
             engine.EntityManager.GetComponent<WorldMeshBounds>(entity) = LocalToWorld((MeshBounds)mesh.Bounds, l2w);
+        }
+        
+        public StaticRenderHandle RegisterStaticRenderer(MeshHandle meshHandle, Material material, int subMesh, Matrix localToWorld)
+        {
+            var entity = engine.EntityManager.CreateEntity(staticRendererArchetype);
+            SetupRendererEntity(entity, meshHandle, material, subMesh, localToWorld);
             return new StaticRenderHandle(entity);
         }
 

@@ -170,4 +170,5 @@ void main()
     FragColor = mix(FragColor, highglighted, highlight);
     
     FragColor = vec4(mix(FragColor.rgb, vec3(1, 0, 0), notSupported), color.a);
+    //FragColor = vec4(Color.a, 0, 0, FragColor.a);
 }

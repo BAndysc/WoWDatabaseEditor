@@ -50,7 +50,7 @@ namespace TheEngine.ECS
             get => entityMapping[index];
         }
 
-        public ManagedComponentDataAccess<T> ManagedDataAccess<T>() where T : IManagedComponentData
+        public ManagedComponentDataAccess<T>? OptionalManagedDataAccess<T>() where T : IManagedComponentData
         {
             int i = 0;
             foreach (var c in Archetype.ManagedComponents)
@@ -59,10 +59,11 @@ namespace TheEngine.ECS
                     return new ManagedComponentDataAccess<T>(managedComponentData[i], sparseReverseEntityMapping);
                 i++;
             }
-            throw new Exception("There is no component data + " + typeof(T) + " in this archetype");
+
+            return null;
         }
         
-        public unsafe ComponentDataAccess<T> DataAccess<T>() where T : unmanaged, IComponentData
+        public unsafe ComponentDataAccess<T>? OptionalDataAccess<T>() where T : unmanaged, IComponentData
         {
             int i = 0;
             var componentsCount = Archetype.Components.Count;
@@ -73,7 +74,18 @@ namespace TheEngine.ECS
                     return new ComponentDataAccess<T>(componentData[i], sparseReverseEntityMapping);
                 i++;
             }
-            throw new Exception("There is no component data + " + typeof(T) + " in this archetype");
+
+            return null;
+        }
+        
+        public ManagedComponentDataAccess<T> ManagedDataAccess<T>() where T : IManagedComponentData
+        {
+            return OptionalManagedDataAccess<T>() ?? throw new Exception("There is no component data + " + typeof(T) + " in this archetype");
+        }
+        
+        public ComponentDataAccess<T> DataAccess<T>() where T : unmanaged, IComponentData
+        {
+            return OptionalDataAccess<T>() ?? throw new Exception("There is no component data + " + typeof(T) + " in this archetype");
         }
 
         private static unsafe void AllocOrRealloc(ref byte* addr, ulong size)

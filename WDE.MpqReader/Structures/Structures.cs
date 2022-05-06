@@ -58,7 +58,7 @@ namespace WDE.MpqReader.Structures
         ///*0x128*/  M2Array<M2Particleⁱ> particle_emitters { get; init; }
            public M2Array<ushort>? textureCombinerCombos { get; init; }
 
-        private M2(IBinaryReader reader)
+        private M2(IBinaryReader reader, string path, Func<string, IBinaryReader?> opener)
         {
             magic = reader.ReadUInt32();
             version = reader.ReadUInt32();
@@ -67,7 +67,19 @@ namespace WDE.MpqReader.Structures
             global_loops = reader.ReadArrayUInt32();
             sequences = reader.ReadArray(M2Sequence.Read);
             sequenceIdToAnimationId = reader.ReadArrayUInt16();
-            bones = reader.ReadArray(M2CompBone.Read);
+            Dictionary<(int, int), IBinaryReader> animReaders = new();
+            for (int i = 0; i < sequences.Length; ++i)
+            {
+                if (!sequences[i].flags.HasFlag(M2SequenceFlags.HasEmbeddedAnimationData))
+                {
+                    var animPath = Path.ChangeExtension(path, null);
+                    animPath = animPath + sequences[i].id.ToString().PadLeft(4, '0') + "-" + sequences[i].variationIndex.ToString().PadLeft(2, '0') +".anim";
+                    var contentReader = opener(animPath);
+                    if (contentReader != null)
+                        animReaders[(sequences[i].id, sequences[i].variationIndex)] = contentReader;
+                }
+            }
+            bones = reader.ReadArray(r => new M2CompBone(r, sequences, animReaders));
             boneIndicesById = reader.ReadArrayUInt16();
             vertices = reader.ReadArray(M2Vertex.Read);
             num_skin_profiles = reader.ReadUInt32();
@@ -100,9 +112,9 @@ namespace WDE.MpqReader.Structures
             textureCombinerCombos = (global_flags & M2Flags.FLAG_USE_TEXTURE_COMBINER_COMBOS) != 0 ? reader.ReadArrayUInt16() : null;
         }
 
-        public static M2 Read(IBinaryReader reader)
+        public static M2 Read(IBinaryReader reader, string path, Func<string, IBinaryReader?> opener)
         {
-            return new M2(reader);
+            return new M2(reader, path, opener);
         }
     }
 
@@ -169,6 +181,7 @@ namespace WDE.MpqReader.Structures
         }
     };
 
+    [Flags]
     public enum M2CompBoneFlag
     {
         ignoreParentTranslate = 0x1,
@@ -594,11 +607,11 @@ namespace WDE.MpqReader.Structures
         private short y;
         private short z;
         private short w;
+        private Quaternion value;
+        
+        public static M2CompQuat Identity  => new M2CompQuat(32767, 32767, 32767, -1);
 
-        public Quaternion Value => new Quaternion((x < 0 ? x + 32768 : x - 32767) / 32767.0f,
-            (y < 0 ? y + 32768 : y - 32767) / 32767.0f,
-            (z < 0 ? z + 32768 : z - 32767) / 32767.0f,
-            (w < 0 ? w + 32768 : w - 32767) / 32767.0f);
+        public Quaternion Value => value;
 
         public M2CompQuat(short x, short y, short z, short w)
         {
@@ -606,6 +619,10 @@ namespace WDE.MpqReader.Structures
             this.y = y;
             this.z = z;
             this.w = w;
+            value = new Quaternion((x < 0 ? x + 32768 : x - 32767) / 32767.0f,
+                (y < 0 ? y + 32768 : y - 32767) / 32767.0f,
+                (z < 0 ? z + 32768 : z - 32767) / 32767.0f,
+                (w < 0 ? w + 32768 : w - 32767) / 32767.0f);
         }
 
         public static M2CompQuat Read(IBinaryReader reader)
@@ -614,44 +631,45 @@ namespace WDE.MpqReader.Structures
         }
     }
 
-    public class M2CompBone
+    public struct M2CompBone
     {
-        public int key_bone_id { get; init; }            // Back-reference to the key bone lookup table. -1 if this is no key bone.
-        public M2CompBoneFlag flags { get; init; }                 
-        public short parent_bone { get; init; }            // Parent bone ID or -1 if there is none.
-        public ushort submesh_id { get; init; }            // Mesh part ID OR uDistToParent?
-        public int boneNameCRC { get; init; }
-        public M2Track<Vector3> translation { get; init; }
-        public M2Track<M2CompQuat> rotation { get; init; }   // compressed values, default is (32767,32767,32767,65535) == (0,0,0,1) == identity
-        public M2Track<Vector3> scale { get; init; }
-        public Vector3 pivot { get; init; }                 // The pivot point of that bone.
-    
-        private M2CompBone() {}
-
-        public static M2CompBone Read(IBinaryReader reader)
+        public readonly int key_bone_id;            // Back-reference to the key bone lookup table. -1 if this is no key bone.
+        public readonly M2CompBoneFlag flags;
+        public readonly short parent_bone;            // Parent bone ID or -1 if there is none.
+        public readonly ushort submesh_id;            // Mesh part ID OR uDistToParent?
+        public readonly int boneNameCRC;
+        public M2Track<Vector3> translation;
+        public M2Track<Quaternion> rotation;   // compressed values, default is (32767,32767,32767,65535) == (0,0,0,1) == identity
+        public M2Track<Vector3> scale;
+        public Vector3 pivot;                 // The pivot point of that bone.
+        
+        public M2CompBone(IBinaryReader reader, in M2Array<M2Sequence> sequences, Dictionary<(int, int), IBinaryReader> readers)
         {
-            return new M2CompBone()
-            {
-                key_bone_id = reader.ReadInt32(),
-                flags = (M2CompBoneFlag)reader.ReadInt32(),
-                parent_bone = reader.ReadInt16(),
-                submesh_id = reader.ReadUInt16(),
-                boneNameCRC = reader.ReadInt32(),
-                translation = M2Track<Vector3>.ReadVector3(reader),
-                rotation = M2Track<M2CompQuat>.Read(reader, M2CompQuat.Read),
-                scale = M2Track<Vector3>.ReadVector3(reader),
-                pivot = reader.ReadVector3()
-            };
+            key_bone_id = reader.ReadInt32();
+            flags = (M2CompBoneFlag)reader.ReadInt32();
+            parent_bone = reader.ReadInt16();
+            submesh_id = reader.ReadUInt16();
+            boneNameCRC = reader.ReadInt32();
+            translation = M2Track<Vector3>.Read(readers, reader, sequences, r => r.ReadVector3());
+            rotation = M2Track<Quaternion>.Read(readers, reader, sequences, r => M2CompQuat.Read(r).Value);
+            scale = M2Track<Vector3>.Read(readers, reader, sequences, r => r.ReadVector3());
+            pivot = reader.ReadVector3();
         }
     }
 
+    [Flags]
+    public enum M2SequenceFlags
+    {
+        HasEmbeddedAnimationData = 0x20,
+    }
+    
     public class M2Sequence
     {
         public ushort id { get; init; }                   // Animation id in AnimationData.dbc
         public ushort variationIndex { get; init; }       // Sub-animation id: Which number in a row of animations this one is.
         public uint duration { get; init; }             // The length of this animation sequence in milliseconds.
         public float movespeed { get; init; }               // This is the speed the character moves with in this animation.
-        public uint flags { get; init; }                // See below.
+        public M2SequenceFlags flags { get; init; }                // See below.
         public short frequency { get; init; }             // This is used to determine how often the animation is played. For all animations of the same type, this adds up to 0x7FFF (32767).
         public ushort _padding { get; init; }
         public M2Range replay { get; init; }                // May both be 0 to not repeat. Client will pick a random number of repetitions within bounds if given.
@@ -670,7 +688,7 @@ namespace WDE.MpqReader.Structures
                 variationIndex = reader.ReadUInt16(),
                 duration = reader.ReadUInt32(),
                 movespeed = reader.ReadFloat(),
-                flags = reader.ReadUInt32(),
+                flags = (M2SequenceFlags)reader.ReadUInt32(),
                 frequency = reader.ReadInt16(),
                 _padding = reader.ReadUInt16(),
                 replay = M2Range.Read(reader),
@@ -686,7 +704,7 @@ namespace WDE.MpqReader.Structures
     {
         public M2Array<ushort> Vertices { get; init; }
         public M2Array<ushort> Indices{ get; init; }
-        public M2Array<uint> BoneIndices { get; init; }  // note: in fact those are 4 bytes
+        public M2Array<Uint8x4> BoneIndices { get; init; }  // note: in fact those are 4 bytes
         public M2Array<M2SkinSection> SubMeshes { get; init; }
         public M2Array<M2Batch> Batches { get; init; }
         public uint BonesMaxCount { get; init; }
@@ -700,11 +718,31 @@ namespace WDE.MpqReader.Structures
             {
                 Vertices = reader.ReadArrayUInt16(),
                 Indices = reader.ReadArrayUInt16(),
-                BoneIndices = reader.ReadArrayUInt32(),
+                BoneIndices = reader.ReadArray(r => new Uint8x4(r.ReadByte(), r.ReadByte(), r.ReadByte(), r.ReadByte())),
                 SubMeshes = reader.ReadArray(M2SkinSection.Read),
                 Batches = reader.ReadArray(M2Batch.Read),
                 BonesMaxCount = reader.ReadUInt32(),
             };
+        }
+    }
+    
+    public struct Uint8x4
+    {
+        public byte a, b, c, d;
+        public Uint8x4(uint val)
+        {
+            a = (byte)(val & 0xFF);
+            b = (byte)((val >> 8) & 0xFF);
+            c = (byte)((val >> 16) & 0xFF);
+            d = (byte)((val >> 24) & 0xFF);
+        }
+        
+        public Uint8x4(byte a, byte b, byte c, byte d)
+        {
+            this.a = a;
+            this.b = b;
+            this.c = c;
+            this.d = d;
         }
     }
 
@@ -745,7 +783,7 @@ namespace WDE.MpqReader.Structures
                 textureUVAnimationLookupId = binaryReader.ReadUInt16()
             };
         }
-    };
+    }
 
     public class M2SkinSection
     {
@@ -868,16 +906,21 @@ namespace WDE.MpqReader.Structures
     
         public static M2Array<T> ReadArray<T>(this IBinaryReader binaryReader, System.Func<IBinaryReader, T> read)
         {
+            return ReadArrayDataFromSeparateReader(binaryReader, binaryReader, (_, br) => read(br));
+        }
+        
+        public static M2Array<T> ReadArrayDataFromSeparateReader<T>(this IBinaryReader binaryReader, IBinaryReader contentReader, System.Func<int, IBinaryReader, T> read)
+        {
             var size = binaryReader.ReadInt32();
             var offset = binaryReader.ReadInt32();
             var currentOffset = binaryReader.Offset;
 
-            binaryReader.Offset = offset;
+            contentReader.Offset = offset;
             T[] array = new T[size];
 
             for (int i = 0; i < size; ++i)
             {
-                array[i] = read(binaryReader);
+                array[i] = read(i, contentReader);
             }
 
             binaryReader.Offset = currentOffset;
@@ -902,7 +945,7 @@ namespace WDE.MpqReader.Structures
                 timestamps = reader.ReadArray(r => r.ReadArrayUInt32())
             };
         }
-    };
+    }
  
     public class FBlock<T>
     {
@@ -928,13 +971,14 @@ namespace WDE.MpqReader.Structures
         }
     }
 
-    public class M2Track<T> : M2TrackBase
+    public struct M2Track<T> // : M2TrackBase
     {
-        public M2Array<M2Array<T>> values { get; init; }
-    
-        protected M2Track(){}
+        public ushort interpolation_type { get; init; }
+        public ushort global_sequence { get; init; }
+        public M2Array<M2Array<uint>> timestamps;
+        public M2Array<M2Array<T>> values;
 
-        public static M2Track<T> Read(IBinaryReader reader, System.Func<IBinaryReader, T> read)
+        public static M2Track<T> Read(IBinaryReader reader, Func<IBinaryReader, T> read)
         {
             return new M2Track<T>()
             {
@@ -944,6 +988,61 @@ namespace WDE.MpqReader.Structures
                 values = reader.ReadArray(r => r.ReadArray(read))
             };
         }
+        
+        public static M2Track<T> Read(Dictionary<(int, int), IBinaryReader> readers, IBinaryReader reader, M2Array<M2Sequence> sequences, Func<IBinaryReader, T> read)
+        {
+            var interpolation_type = reader.ReadUInt16();
+            var global_sequence = reader.ReadUInt16();
+            var timestamps = reader.ReadArrayDataFromSeparateReader(reader, (idx, r) =>
+            {
+                if (sequences[idx].flags.HasFlag(M2SequenceFlags.HasEmbeddedAnimationData))
+                    return r.ReadArrayUInt32();
+                else
+                {
+                    if (!readers.TryGetValue((sequences[idx].id, sequences[idx].variationIndex), out var contentReader))
+                    {
+                        r.SkipM2Array();
+                        return new M2Array<uint>(0, 0, Array.Empty<uint>());
+                    }
+                    return r.ReadArrayDataFromSeparateReader(contentReader, (_, r2) => r2.ReadUInt32());
+                } 
+            });
+            var values = reader.ReadArrayDataFromSeparateReader(reader, (idx, r) =>
+            {
+                if (sequences[idx].flags.HasFlag(M2SequenceFlags.HasEmbeddedAnimationData))
+                    return r.ReadArray(read);
+                else
+                {
+                    if (!readers.TryGetValue((sequences[idx].id, sequences[idx].variationIndex), out var contentReader))
+                    {
+                        r.SkipM2Array();
+                        return new M2Array<T>(0, 0, Array.Empty<T>());
+                    }
+                    return r.ReadArrayDataFromSeparateReader(contentReader, (_, r2) => read(r2));
+                }
+            });
+            return new M2Track<T>()
+            {
+                interpolation_type = interpolation_type,
+                global_sequence = global_sequence,
+                timestamps = timestamps,
+                values = values
+            };
+        }
+        // public M2Array<M2Array<T>> values { get; init; }
+        //
+        // protected M2Track(){}
+        //
+        // public static M2Track<T> Read(IBinaryReader reader, System.Func<IBinaryReader, T> read)
+        // {
+        //     return new M2Track<T>()
+        //     {
+        //         interpolation_type = reader.ReadUInt16(),
+        //         global_sequence = reader.ReadUInt16(),
+        //         timestamps = reader.ReadArray(r => r.ReadArrayUInt32()),
+        //         values = reader.ReadArray(r => r.ReadArray(read))
+        //     };
+        // }
 
         public static M2Track<M2SplineKey<T>> ReadSplineKey<T>(IBinaryReader reader, System.Func<IBinaryReader, T> read)
         {
@@ -959,9 +1058,9 @@ namespace WDE.MpqReader.Structures
         {
             return M2Track<float>.Read(reader, r => r.ReadFloat());
         }
-    };
+    }
 
-    public class M2Array<T> : IEnumerable<T>
+    public readonly struct M2Array<T> : IEnumerable<T>
     {
         private readonly int offset;
         private readonly T[] array;
@@ -977,7 +1076,7 @@ namespace WDE.MpqReader.Structures
     
         internal T[] Raw => array;
 
-        public T this[int i] => array[i];
+        public ref readonly T this[int i] => ref array[i];
 
         public IEnumerator<T> GetEnumerator()
         {

@@ -1,4 +1,6 @@
 using System.Collections;
+using TheAvaloniaOpenGL.Resources;
+using TheEngine;
 using TheEngine.Coroutines;
 using TheEngine.Data;
 using TheEngine.Entities;
@@ -8,6 +10,8 @@ using TheMaths;
 using WDE.MpqReader;
 using WDE.MpqReader.Readers;
 using WDE.MpqReader.Structures;
+using IInputManager = TheEngine.Interfaces.IInputManager;
+
 // ReSharper disable InconsistentNaming
 
 namespace WDE.MapRenderer.Managers
@@ -58,6 +62,9 @@ namespace WDE.MapRenderer.Managers
         {
             public IMesh mesh;
             public Material[] materials;
+            public M2 model;
+
+            public bool HasAnimations => model.sequences.Length > 0;
 
             public void Dispose(IMeshManager meshManager)
             {
@@ -80,6 +87,12 @@ namespace WDE.MapRenderer.Managers
         private readonly CharacterFacialHairStylesStore characterFacialHairStylesStore;
         private readonly CharSectionsStore charSectionsStore;
         private readonly CreatureModelDataStore creatureModelDataStore;
+        private readonly Engine engine;
+        private readonly IGameContext gameContext;
+        private readonly IInputManager inputManager;
+        private readonly IUIManager uiManager;
+
+        private NativeBuffer<Matrix> identityBonesBuffer;
 
         public MdxManager(IGameFiles gameFiles, 
             IMeshManager meshManager, 
@@ -91,7 +104,11 @@ namespace WDE.MapRenderer.Managers
             CharHairGeosetsStore charHairGeosetsStore,
             CharacterFacialHairStylesStore characterFacialHairStylesStore,
             CharSectionsStore charSectionsStore,
-            CreatureModelDataStore creatureModelDataStore)
+            CreatureModelDataStore creatureModelDataStore,
+            Engine engine,
+            IGameContext gameContext,
+            IInputManager inputManager,
+            IUIManager uiManager)
         {
             this.gameFiles = gameFiles;
             this.meshManager = meshManager;
@@ -104,6 +121,21 @@ namespace WDE.MapRenderer.Managers
             this.characterFacialHairStylesStore = characterFacialHairStylesStore;
             this.charSectionsStore = charSectionsStore;
             this.creatureModelDataStore = creatureModelDataStore;
+            this.engine = engine;
+            this.gameContext = gameContext;
+            this.inputManager = inputManager;
+            this.uiManager = uiManager;
+            identityBonesBuffer = engine.CreateBuffer<Matrix>(BufferTypeEnum.StructuredBufferVertexOnly, AnimationSystem.MAX_BONES, BufferInternalFormat.Float4);
+            identityBonesBuffer.UpdateBuffer(AnimationSystem.IdentityBones(AnimationSystem.MAX_BONES).Span);
+        }
+
+        private static float UintAsFloat(uint i)
+        {
+            unsafe
+            {
+                uint* iRef = &i;
+                return *((float*)iRef);
+            }
         }
 
         // Sources : wowdev.wiki/DB/ItemDisplayInfo#Geoset_Group_Field_Meaning and wowdev.wiki/Character_Customization#Geosets
@@ -196,10 +228,18 @@ namespace WDE.MapRenderer.Managers
             Vector3[] normals = null!;
             Vector2[] uv1 = null!;
             Vector2[] uv2 = null!;
+            Vector4[] packedBones = null!;
             
             yield return new WaitForTask(Task.Run(() =>
             {
-                m2 = M2.Read(new MemoryBinaryReader(file.Result));
+                m2 = M2.Read(new MemoryBinaryReader(file.Result), m2FilePath, p =>
+                {
+                    // TODO: can I use ReadFileSync? Can be problematic...
+                    var bytes = gameFiles.ReadFileSyncLocked(p);
+                    if (bytes == null)
+                        return null;
+                    return new MemoryBinaryReader(bytes);
+                });
                 file.Result.Dispose();
                 skin = M2Skin.Read(new MemoryBinaryReader(skinFile.Result));
                 skinFile.Result.Dispose();
@@ -208,6 +248,7 @@ namespace WDE.MapRenderer.Managers
                 normals = new Vector3[count];
                 uv1 = new Vector2[count];
                 uv2 = new Vector2[count];
+                packedBones = new Vector4[count];
 
                 for (int i = 0; i < count; ++i)
                 {
@@ -216,10 +257,18 @@ namespace WDE.MapRenderer.Managers
                     normals[i] = vert.normal;
                     uv1[i] = vert.tex_coords[0];
                     uv2[i] = vert.tex_coords[1];
+                    var packedWeights = (uint)vert.bone_weights[0] | ((uint)vert.bone_weights[1] << 8) |
+                                        ((uint)vert.bone_weights[2] << 16) | ((uint)vert.bone_weights[3] << 24);
+                    var packetWeightsFloat = UintAsFloat(packedWeights);
+                    
+                    var packedIndices = (uint)vert.bone_indices[0] | ((uint)vert.bone_indices[1] << 8) |
+                                        ((uint)vert.bone_indices[2] << 16) | ((uint)vert.bone_indices[3] << 24);
+                    var packedIndicesFloat = UintAsFloat(packedIndices);
+                    packedBones[i] = new Vector4(packedIndicesFloat, packetWeightsFloat, 0, 0);
                 }
             }));
             
-            var md = new MeshData(vertices, normals, uv1, new int[] { }, null, null, uv2);
+            var md = new MeshData(vertices, normals, uv1, new int[] { }, null, null, uv2, packedBones);
             var mesh = meshManager.CreateMesh(md);
             mesh.SetSubmeshCount(skin.Batches.Length);
             // 1 : load items to define active geosets
@@ -479,6 +528,7 @@ namespace WDE.MapRenderer.Managers
                 var materialDef = m2.materials[batch.materialIndex];
                 var material = materialManager.CreateMaterial("data/m2.json");
 
+                material.SetBuffer("boneMatrices", identityBonesBuffer);
                 material.SetTexture("texture1", th ?? textureManager.EmptyTexture);
                 material.SetTexture("texture2", th2 ?? textureManager.EmptyTexture);
 
@@ -572,7 +622,8 @@ namespace WDE.MapRenderer.Managers
             var mdx = new MdxInstance
             {
                 mesh = mesh,
-                materials = materials.AsSpan(0, j).ToArray()
+                materials = materials.AsSpan(0, j).ToArray(),
+                model = m2
             };
             creaturemeshes.Add(displayid, mdx); // titi test
             completion.SetResult(mdx);
@@ -625,10 +676,18 @@ namespace WDE.MapRenderer.Managers
             Vector3[] normals = null!;
             Vector2[] uv1 = null!;
             Vector2[] uv2 = null!;
+            Vector4[] packedBones = null!;
 
             yield return new WaitForTask(Task.Run(() =>
             {
-                m2 = M2.Read(new MemoryBinaryReader(file.Result));
+                m2 = M2.Read(new MemoryBinaryReader(file.Result), m2FilePath, p =>
+                {
+                    // TODO: can I use ReadFileSync? Can be problematic...
+                    var bytes = gameFiles.ReadFileSyncLocked(p);
+                    if (bytes == null)
+                        return null;
+                    return new MemoryBinaryReader(bytes);
+                });
                 file.Result.Dispose();
                 skin = M2Skin.Read(new MemoryBinaryReader(skinFile.Result));
                 skinFile.Result.Dispose();
@@ -637,7 +696,8 @@ namespace WDE.MapRenderer.Managers
                 normals = new Vector3[count];
                 uv1 = new Vector2[count];
                 uv2 = new Vector2[count];
-
+                packedBones = new Vector4[count];
+                
                 for (int i = 0; i < count; ++i)
                 {
                     var vert = m2.vertices[skin.Vertices[i]];
@@ -645,10 +705,18 @@ namespace WDE.MapRenderer.Managers
                     normals[i] = vert.normal;
                     uv1[i] = vert.tex_coords[0];
                     uv2[i] = vert.tex_coords[1];
+                    var packedWeights = (uint)vert.bone_weights[0] | ((uint)vert.bone_weights[1] << 8) |
+                                        ((uint)vert.bone_weights[2] << 16) | ((uint)vert.bone_weights[3] << 24);
+                    var packetWeightsFloat = UintAsFloat(packedWeights);
+                    
+                    var packedIndices = (uint)vert.bone_indices[0] | ((uint)vert.bone_indices[1] << 8) |
+                                        ((uint)vert.bone_indices[2] << 16) | ((uint)vert.bone_indices[3] << 24);
+                    var packedIndicesFloat = UintAsFloat(packedIndices);
+                    packedBones[i] = new Vector4(packedIndicesFloat, packetWeightsFloat, 0, 0);
                 }
             }));
-
-            var md = new MeshData(vertices, normals, uv1, new int[] { }, null, null, uv2);
+            
+            var md = new MeshData(vertices, normals, uv1, new int[] { }, null, null, uv2, packedBones);
             
             var mesh = meshManager.CreateMesh(md);
             mesh.SetSubmeshCount(skin.Batches.Length);
@@ -714,6 +782,7 @@ namespace WDE.MapRenderer.Managers
                 var materialDef = m2.materials[batch.materialIndex];
                 var material = materialManager.CreateMaterial("data/m2.json");
 
+                material.SetBuffer("boneMatrices", identityBonesBuffer);
                 material.SetTexture("texture1", th ?? textureManager.EmptyTexture);
                 material.SetTexture("texture2", th2 ?? textureManager.EmptyTexture);
 
@@ -808,12 +877,17 @@ namespace WDE.MapRenderer.Managers
             var mdx = new MdxInstance
             {
                 mesh = mesh,
-                materials = materials.AsSpan(0, j).ToArray()
+                materials = materials.AsSpan(0, j).ToArray(),
+                model = m2
             };
             meshes.Add(path, mdx);
             completion.SetResult(null);
             meshesCurrentlyLoaded.Remove(path);
             result.SetResult(mdx);
+        }
+        
+        public void RenderGUI()
+        {
         }
         
         ushort ResolveShaderID1(ushort shaderId, M2 m2, M2Batch textureUnit, bool Use_Texture_Combiner_Combos, int blendingMode)
@@ -853,7 +927,7 @@ namespace WDE.MapRenderer.Managers
 
                 for (int i = 0; i < textureUnit.textureCount; i++)
                 {
-                    int blendOverride = m2.textureCombinerCombos![i + textureUnit.shaderId];
+                    int blendOverride = m2.textureCombinerCombos!.Value[i + textureUnit.shaderId];
 
                     if (i == 0 && blendingMode == 0)
                         blendOverride = 0;
@@ -1080,6 +1154,8 @@ namespace WDE.MapRenderer.Managers
         
         public void Dispose()
         {
+            identityBonesBuffer.Dispose();
+            
             foreach (var mesh in meshes.Values)
                 mesh?.Dispose(meshManager);
 

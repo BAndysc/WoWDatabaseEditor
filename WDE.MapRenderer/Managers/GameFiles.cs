@@ -76,6 +76,18 @@ public class GameFiles : IGameFiles, IDisposable
         return bytes;
     }
 
+    public byte[]? ReadFileSyncLocked(string fileName)
+    {
+        byte[]? bytes;
+        lock (mpqSync)
+        {
+            bytes = mpqSync.ReadFile(fileName);
+        }
+        if (bytes == null)
+            Console.WriteLine("File " + fileName + " is unreadable");
+        return bytes;
+    }
+
     public string Adt(string mapName, int x, int y) => $"World\\Maps\\{mapName}\\{mapName}_{x}_{y}.adt";
     
     public string Wdt(string mapName) => $"World\\Maps\\{mapName}\\{mapName}.wdt";
