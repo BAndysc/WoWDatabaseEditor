@@ -43,6 +43,20 @@ namespace TheEngine.ECS
             }
         }
         
+        public static void ForEach<T1, T2, N1>(this Archetype archetype, 
+            System.Action<IChunkDataIterator, int, int, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ManagedComponentDataAccess<N1>> process)
+            where T1 : unmanaged, IComponentData
+            where T2 : unmanaged, IComponentData
+            where N1 : IManagedComponentData
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            foreach (var itr in iterator)
+            {
+                process(itr, 0, itr.Length, itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.ManagedDataAccess<N1>());
+            }
+        }
+        
         public static void ForEachRRRO<T1, T2, T3, N1>(this Archetype archetype, 
             System.Action<IChunkDataIterator, int, int, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ManagedComponentDataAccess<N1>?> process)
             where T1 : unmanaged, IComponentData

@@ -1,4 +1,6 @@
-﻿using TheEngine.ECS;
+﻿using TheAvaloniaOpenGL.Resources;
+using TheEngine.Components;
+using TheEngine.ECS;
 using TheEngine.Entities;
 using TheEngine.Handles;
 using TheMaths;
@@ -16,11 +18,15 @@ namespace TheEngine.Interfaces
         void UnregisterDynamicRenderer(DynamicRenderHandle staticRenderHandle);
         void DrawLine(Vector3 start, Vector3 end);
         void Render(IMesh mesh, Material material, int submesh, Transform transform);
-        void Render(IMesh mesh, Material material, int submesh, Matrix localToWorld, Matrix? worldToLocal = null);
+        void Render(IMesh mesh, Material material, int submesh, Matrix localToWorld, Matrix? worldToLocal = null, MaterialInstanceRenderData? instanceData = null);
+        void Render(MeshHandle mesh, MaterialHandle material, int submesh, Matrix localToWorld, Matrix? worldToLocal = null, MaterialInstanceRenderData? instanceData = null);
         void Render(IMesh mesh, Material material, int submesh, Vector3 position);
+        void ActivateDefaultRenderTexture();
+        void ActivateRenderTexture(RenderTexture rt);
         void RenderInstancedIndirect(IMesh mesh, Material material, int submesh, int count, Matrix localToWorld, Matrix? worldToLocal = null);
         void RenderInstancedIndirect(IMesh mesh, Material material, int submesh, int count);
         float ViewDistanceModifier { get; set; }
+        void AddPostprocess(Material postProcess);
     }
 
     public static class RenderManagerExtensions

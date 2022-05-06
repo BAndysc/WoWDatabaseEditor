@@ -1,0 +1,17 @@
+{
+  "Pixel": {
+    "Path": "data/unlit_flat_m2.frag"
+  },
+  "ZWrite": true,
+  "Instancing": true,
+  "Vertex": {
+    "Path": "data/unlit_flat_m2.vert",
+    "Input": [
+      {"Type": "Float4"},
+      {"Type": "Float4"},
+      {"Type": "Float4"},
+      {"Type": "Float2"},
+      {"Type": "Float2"}
+    ]
+  }
+}

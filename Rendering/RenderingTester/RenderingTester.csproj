@@ -22,4 +22,16 @@
       <ProjectReference Include="..\..\WoWDatabaseEditor\WoWDatabaseEditorCore.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="data\*.frag">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="data\*.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="data\*.vert">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>

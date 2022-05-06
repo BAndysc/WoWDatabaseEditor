@@ -97,6 +97,7 @@ namespace TheEngine
         
         public NativeBuffer<T> CreateBuffer<T>(BufferTypeEnum bufferType, ReadOnlySpan<T> data, BufferInternalFormat format = BufferInternalFormat.None) where T : unmanaged => Device.CreateBuffer<T>(bufferType, data, format);
         public NativeBuffer<T> CreateBuffer<T>(BufferTypeEnum bufferType, int size, BufferInternalFormat format = BufferInternalFormat.None) where T : unmanaged => Device.CreateBuffer<T>(bufferType, size, format);
+        public RenderTexture CreateRenderTexture(int width, int height) => Device.CreateRenderTexture(width, height);
 
         public void Dispose()
         {

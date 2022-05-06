@@ -265,8 +265,10 @@ namespace TheEngine.Managers
         }
 
         private bool inRenderingLoop = false;
+        private int currentFrameBuffer;
         public void PrepareRendering(int dstFrameBuffer)
         {
+            currentFrameBuffer = dstFrameBuffer;
             engine.shaderManager.Update();
 
             inRenderingLoop = true;
@@ -285,7 +287,7 @@ namespace TheEngine.Managers
                 renderTexture = engine.Device.CreateRenderTexture((int)engine.WindowHost.WindowWidth, (int)engine.WindowHost.WindowHeight);
             }
             
-            engine.Device.SetRenderTexture(renderTexture, dstFrameBuffer);
+            ActivateDefaultRenderTexture();
             renderTexture.Clear(1, 1, 1, 1);
 
             sceneBuffer.UpdateBuffer(ref sceneData);
@@ -298,11 +300,39 @@ namespace TheEngine.Managers
             engine.Device.device.CheckError("Before render all");
         }
 
+        public void ActivateRenderTexture(RenderTexture rt)
+        {
+            if (inRenderingLoop)
+                engine.Device.SetRenderTexture(rt, currentFrameBuffer);
+        }
+        
+        public void ActivateDefaultRenderTexture()
+        {
+            if (inRenderingLoop)
+                engine.Device.SetRenderTexture(renderTexture, currentFrameBuffer);
+        }
+
+        private List<Material> postProcesses = new();
+        public void AddPostprocess(Material postProcess)
+        {
+            postProcesses.Add(postProcess);
+        }
+        
         public void FinalizeRendering(int dstFrameBuffer)
         {
             ClearDirtyEntityBit();
-            engine.Device.SetRenderTexture(null, dstFrameBuffer);
 
+            foreach (var post in postProcesses)
+            {
+                post.SetTexture("_MainTex", renderTexture);
+                post.Shader.Activate();
+                EnableMaterial(post, false);
+                SetDepth(true, DepthCompare.Always);
+                planeMesh.Activate();
+                engine.Device.DrawIndexed(engine.meshManager.GetMeshByHandle(planeMesh.Handle).IndexCount(0), 0, 0);
+            }
+            engine.Device.SetRenderTexture(null, dstFrameBuffer);
+            
             engine.Device.device.CheckError("Blitz");
             blitMaterial.Shader.Activate();
             blitMaterial.ActivateUniforms(false);
@@ -699,7 +729,14 @@ namespace TheEngine.Managers
             Stats.InstancedDrawSaved += savedByInstancing;
         }
 
-        public void Render(IMesh mesh, Material material, int submesh, Matrix localToWorld, Matrix? worldToLocal = null)
+        public void Render(MeshHandle meshHandle, MaterialHandle materialHandle, int submesh, Matrix localToWorld, Matrix? worldToLocal = null, MaterialInstanceRenderData? instanceData = null)
+        {
+            var mesh = engine.meshManager.GetMeshByHandle(meshHandle);
+            var material = engine.materialManager.GetMaterialByHandle(materialHandle);
+            Render(mesh, material, submesh, localToWorld, worldToLocal, instanceData);
+        }
+        
+        public void Render(IMesh mesh, Material material, int submesh, Matrix localToWorld, Matrix? worldToLocal = null, MaterialInstanceRenderData? instanceData = null)
         {
             if (worldToLocal == null)
                 worldToLocal = Matrix.Invert(localToWorld);
@@ -710,7 +747,7 @@ namespace TheEngine.Managers
                 currentShader = material.Shader;
                 currentShader.Activate();
             }
-            EnableMaterial(material, false);
+            EnableMaterial(material, false, instanceData);
             currentMesh = (Mesh)mesh;
             mesh.Activate();
             objectData.WorldMatrix = localToWorld;

@@ -7,15 +7,25 @@ namespace TheEngine.Components
 {
     public class MaterialInstanceRenderData : IManagedComponentData
     {
+        public Dictionary<string, INativeBuffer>? bufferByName { get; private set; }
         public Dictionary<int, INativeBuffer>? structuredBuffers { get; private set; }
         public Dictionary<int, INativeBuffer>? instancedStructuredBuffers { get; private set; }
-
+        
+        public INativeBuffer? GetBuffer(string name)
+        {
+            if (bufferByName != null && bufferByName.TryGetValue(name, out var buf))
+                return buf;
+            return null;
+        }
+        
         public void SetBuffer(Material material, string name, INativeBuffer buffer)
         {
             SetInstancedBuffer(material, name, buffer);
             var loc = material.GetUniformLocation(name);
             if (loc == -1)
                 return;
+            bufferByName ??= new();
+            bufferByName[name] = buffer;
             structuredBuffers ??= new();
             structuredBuffers[loc] = buffer;
         }
@@ -62,6 +72,7 @@ namespace TheEngine.Components
         {
             instancedStructuredBuffers?.Clear();
             structuredBuffers?.Clear();
+            bufferByName?.Clear();
         }
     }
     

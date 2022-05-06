@@ -17,6 +17,7 @@ namespace TheEngine.Managers
         private readonly Engine engine;
 
         private readonly FileSystemWatcher watcher;
+        private readonly FileSystemWatcher watcher2;
 
         private volatile bool reloadAllShaders = false;
 
@@ -27,7 +28,15 @@ namespace TheEngine.Managers
             this.engine = engine;
 
             watcher = new FileSystemWatcher();
-            watcher.Path = Path.Combine(Directory.GetCurrentDirectory(), "data");
+            SetupWatcher(watcher, "data");
+            
+            watcher2 = new FileSystemWatcher();
+            SetupWatcher(watcher2, "internalShaders");
+        }
+
+        private void SetupWatcher(FileSystemWatcher watcher, string path)
+        {
+            watcher.Path = Path.Combine(Directory.GetCurrentDirectory(), path);
             Console.WriteLine("Observing " + watcher.Path);
 
             watcher.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName;
@@ -35,7 +44,7 @@ namespace TheEngine.Managers
             watcher.Changed += Watcher_Changed;
             watcher.EnableRaisingEvents = true;
         }
-        
+
         private void Watcher_Changed(object sender, FileSystemEventArgs e)
         {
             reloadAllShaders = true;
@@ -99,6 +108,7 @@ namespace TheEngine.Managers
             shaderHandles.Clear();
 
             watcher.Dispose();
+            watcher2.Dispose();
         }
 
         internal Shader GetShaderByHandle(ShaderHandle materialHandle)

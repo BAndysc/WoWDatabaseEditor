@@ -63,8 +63,48 @@ namespace WDE.MapRenderer.Managers
             public IMesh mesh;
             public Material[] materials;
             public M2 model;
+            private bool? hasAnimations;
 
-            public bool HasAnimations => model.sequences.Length > 0;
+            public bool HasAnimations
+            {
+                get
+                {
+                    if (hasAnimations.HasValue)
+                        return hasAnimations.Value;
+                    
+                    if (model.sequences.Length == 0)
+                        return false;
+
+                    if (model.bones.Length == 0)
+                        return false;
+
+                    bool anyHas = false;
+                    foreach (var b in model.bones)
+                    {
+                        if (b.translation.timestamps.Length > 0 &&
+                            b.translation.timestamps[0].Length > 0)
+                        {
+                            anyHas  = true;
+                            break;
+                        }
+                        if (b.rotation.timestamps.Length > 0 &&
+                            b.rotation.timestamps[0].Length > 0)
+                        {
+                            anyHas  = true;
+                            break;
+                        }
+                        if (b.scale.timestamps.Length > 0 &&
+                            b.scale.timestamps[0].Length > 0)
+                        {
+                            anyHas  = true;
+                            break;
+                        }
+                    }
+
+                    hasAnimations = anyHas;
+                    return  anyHas;
+                }
+            }
 
             public void Dispose(IMeshManager meshManager)
             {
