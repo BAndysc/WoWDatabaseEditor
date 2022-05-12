@@ -457,7 +457,7 @@ namespace TheEngine.Managers
                 for (int i = start; i < end; ++i)
                 {
                     var boundingBox = worldMeshBounds[i].box;
-                    var pos = l2w[i].Position;
+                    var pos = boundingBox.Center;
                     var boundingBoxSize = boundingBox.Size;
                     var size = boundingBoxSize.X + boundingBoxSize.Y + boundingBoxSize.Z;
                     size = MathF.Sqrt(Math.Max(size, 10));
@@ -488,7 +488,10 @@ namespace TheEngine.Managers
                     else
                         transparent++;
                 }
-                count.Value = (opaque, transparent);
+                if (count.IsValueCreated)
+                    count.Value = (opaque + count.Value.opaque, transparent + count.Value.transparent);
+                else
+                    count.Value = (opaque, transparent);
             });
             opaque = count.Values.Sum(i => i.opaque);
             transparent = count.Values.Sum(i => i.transparent);

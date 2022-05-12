@@ -70,7 +70,12 @@ namespace TheEngine.PhysicsSystem
                 }
 
                 if (result != null)
-                    localEntities.Value = result;
+                {
+                    if (localEntities.IsValueCreated && localEntities.Value != null)
+                        localEntities.Value.AddRange(result);
+                    else
+                        localEntities.Value = result;
+                }
             });
 
             if (localEntities.Values.Count == 0)

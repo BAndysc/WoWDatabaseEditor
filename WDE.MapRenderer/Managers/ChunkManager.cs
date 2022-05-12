@@ -228,7 +228,7 @@ namespace WDE.MapRenderer.Managers
                 yield break;
             
             float minHeight = float.MaxValue;
-            float maxHeight = float.MaxValue;
+            float maxHeight = float.MinValue;
             int k = 0;
             int k2 = 0;
             using var chunksEnumerator2 = ((IEnumerable<AdtChunk>)adt.Chunks).GetEnumerator();
