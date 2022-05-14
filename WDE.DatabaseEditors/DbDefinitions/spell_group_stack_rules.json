@@ -29,7 +29,7 @@
         {
           "name": "Stack Rule",
           "db_column_name": "stack_rule",
-          "value_type": "SpellGroupStackRule"
+          "value_type": "SpellGroupStackRuleParameter"
         },
         {
           "name": "Spells",
