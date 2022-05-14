@@ -68,8 +68,8 @@ namespace TheEngine.Entities
             Debug.Assert(vertices != null);
             Debug.Assert(indices != null);
             int start = IndexStart(submesh);
-            int end = IndexCount(submesh);
-            for (int i = start; i < start + end; i += 3)
+            int count = IndexCount(submesh);
+            for (int i = start; i + 2 < start + count; i += 3)
             {
                 if (vertices.Length > indices[i] &&
                     vertices.Length > indices[i + 1] &&
@@ -216,9 +216,11 @@ namespace TheEngine.Entities
                 throw new Exception("Submesh out of range");
         }
 
-        public void SetVertices(Vector3[] vertices)
+        public void SetVertices(ReadOnlySpan<Vector3> vertices)
         {
-            this.vertices = vertices.Select(t => new UniversalVertex() { position = new Vector4(t, 1) }).ToArray();
+            this.vertices = new UniversalVertex[vertices.Length];
+            for (int i = 0; i < vertices.Length; ++i)
+                this.vertices[i] = new UniversalVertex() { position = new Vector4(vertices[i], 1) };
         }
 
         public void BuildBoundingBox() => BuildBoundingBox(vertices);

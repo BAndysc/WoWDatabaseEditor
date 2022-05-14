@@ -74,7 +74,6 @@ namespace TheEngine.Entities
         public MaterialHandle Handle { get; }
         public ShaderHandle ShaderHandle => shaderHandle;
 
-        internal Dictionary<int, RenderTexture> renderTexture { get; } = new();
         internal Dictionary<int, TextureHandle> textureHandles { get; } = new();
         internal Dictionary<int, INativeBuffer> structuredBuffers { get; } = new();
         internal Dictionary<int, int> intUniforms { get; } = new();
@@ -82,7 +81,6 @@ namespace TheEngine.Entities
         internal Dictionary<int, Vector4> vector4Uniforms { get; } = new();
         internal Dictionary<int, Vector3> vector3Uniforms { get; } = new();
         
-        internal Dictionary<int, RenderTexture> instancedRenderTexture { get; } = new();
         internal Dictionary<int, TextureHandle> instancedTextureHandles { get; } = new();
         internal Dictionary<int, INativeBuffer> instancedStructuredBuffers { get; } = new();
         internal Dictionary<int, int> instancedIntUniforms { get; } = new();
@@ -190,11 +188,6 @@ namespace TheEngine.Entities
             Set(textureHandles, instancedTextureHandles, name, texture);
         }
         
-        public void SetTexture(string name, RenderTexture texture)
-        {
-            Set(renderTexture, instancedRenderTexture, name, texture);
-        }
-
         public TextureHandle GetTexture(string name)
         {
             return textureHandles[GetUniformLocation(name)];
@@ -203,6 +196,11 @@ namespace TheEngine.Entities
         public INativeBuffer GetBuffer(string name)
         {
             return structuredBuffers[GetUniformLocation(name)];
+        }
+
+        public float GetUniformFloat(string name)
+        {
+            return floatUniforms[GetUniformLocation(name)];
         }
         
         public void ActivateUniforms(bool instanced, MaterialInstanceRenderData? instanceData = null)
@@ -230,13 +228,6 @@ namespace TheEngine.Entities
                     slot++;
                 }
                 
-                foreach (var pair in instancedRenderTexture)
-                {
-                    pair.Value.Activate(slot);
-                    instancedShader!.SetUniformInt(pair.Key, slot);
-                    slot++;
-                }
-
                 foreach (var floats in instancedFloatUniforms)
                 {
                     instancedShader!.SetUniform(floats.Key, floats.Value);
@@ -273,12 +264,6 @@ namespace TheEngine.Entities
                     var texture = engine.textureManager.GetTextureByHandle(pair.Value);
                     texture.Activate(slot);
                     shader.SetUniformInt(pair.Key, slot);
-                    slot++;
-                }
-                foreach (var pair in renderTexture)
-                {
-                    pair.Value.Activate(slot);
-                    shader!.SetUniformInt(pair.Key, slot);
                     slot++;
                 }
                 foreach (var floats in floatUniforms)

@@ -21,12 +21,15 @@ namespace TheEngine.Interfaces
         void Render(IMesh mesh, Material material, int submesh, Matrix localToWorld, Matrix? worldToLocal = null, MaterialInstanceRenderData? instanceData = null);
         void Render(MeshHandle mesh, MaterialHandle material, int submesh, Matrix localToWorld, Matrix? worldToLocal = null, MaterialInstanceRenderData? instanceData = null);
         void Render(IMesh mesh, Material material, int submesh, Vector3 position);
+        void RenderFullscreenPlane(Material material);
         void ActivateDefaultRenderTexture();
-        void ActivateRenderTexture(RenderTexture rt);
+        void ActivateRenderTexture(TextureHandle rt, Color4? color = null);
         void RenderInstancedIndirect(IMesh mesh, Material material, int submesh, int count, Matrix localToWorld, Matrix? worldToLocal = null);
         void RenderInstancedIndirect(IMesh mesh, Material material, int submesh, int count);
         float ViewDistanceModifier { get; set; }
-        void AddPostprocess(Material postProcess);
+        void AddPostprocess(IPostProcess postProcess);
+        void RemovePostprocess(IPostProcess postProcess);
+        void SetDynamicResolutionScale(float scale);
     }
 
     public static class RenderManagerExtensions

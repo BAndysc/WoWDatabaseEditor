@@ -41,7 +41,7 @@ namespace TheAvaloniaOpenGL.Resources
             device.BindTexture(textureTarget, Handle);
         }
 
-        protected void GenerateMipmaps()
+        protected internal void GenerateMipmaps()
         {
             BindTexture();
             device.GenerateMipmap(textureTarget);

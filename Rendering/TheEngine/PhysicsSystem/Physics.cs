@@ -117,7 +117,7 @@ namespace TheEngine.PhysicsSystem
                     }
                 }
 
-                if (touchEntity.HasValue)
+                if (touchEntity.HasValue && (!localEntities.IsValueCreated || localEntities.Value.Item2 > minDist))
                 {
                     localEntities.Value = (touchEntity.Value, minDist, intersectionPoint);
                 }

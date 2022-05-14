@@ -146,7 +146,7 @@ namespace TheAvaloniaOpenGL
         }
 
         // Safe multithread call
-        public RenderTexture CreateRenderTexture(int width, int height)
+        internal RenderTexture CreateRenderTexture(int width, int height)
         {
             return new RenderTexture(device, width, height);
         }
@@ -201,12 +201,12 @@ namespace TheAvaloniaOpenGL
         /// call only from render thread
         /// </summary>
         /// <param name="renderTexture">render texture or null, then it resets to back buffer</param>
-        public void SetRenderTexture(RenderTexture renderTexture, int destFramebuffer)
+        internal void SetRenderTexture(RenderTexture? renderTexture, int destFramebuffer)
         {
             if (renderTexture == null)
                 device.BindFramebuffer(FramebufferTarget.Framebuffer, destFramebuffer);   
             else
-                renderTexture.ActivateFrameBuffer();
+                renderTexture.ActivateFrameBuffer(1);
             //RenderTargetView view = renderTexture == null ? renderTargetView : renderTexture.TargetView;
             //device.ImmediateContext.OutputMerger.SetTargets(depthStencilView, view);
         }

@@ -10,12 +10,13 @@ out vec4 FragColor;
 
 uniform sampler2D texture1;
 uniform vec4 mesh_color;
+uniform float alphaTest;
 
 void main()
 {
     vec4 tex1 = texture(texture1, TexCoord.xy);
 
-    if (tex1.a < 0.5) 
+    if (tex1.a < alphaTest) 
         discard;
     
     FragColor = mesh_color;

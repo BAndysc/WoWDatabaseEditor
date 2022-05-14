@@ -5,16 +5,16 @@
              xmlns:mapRenderer="clr-namespace:WDE.MapRenderer"
              xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450" 
-             d:DataContext="{d:DesignInstance mapRenderer:GameViewModel, IsDesignTimeCreatable=False}"
+             x:DataType="mapRenderer:GameViewModel"
             x:Class="WDE.MapRenderer.GameToolBar">
     <ToolbarPanel>
         <TextBlock Margin="0,0,10,0" VerticalAlignment="Center">Map:</TextBlock>
-        <ComboBox Items="{Binding Maps}" SelectedItem="{Binding SelectedMap, Mode=TwoWay}" />
+        <ComboBox Items="{CompiledBinding Maps}" SelectedItem="{CompiledBinding SelectedMap, Mode=TwoWay}" />
         <ToolbarSpacer />
-        <ToggleButton ToolTip.Tip="Toggle areatriggers visibility" IsChecked="{Binding ShowAreaTriggers, Mode=TwoWay}">
+        <ToggleButton ToolTip.Tip="Toggle areatriggers visibility" IsChecked="{CompiledBinding ShowAreaTriggers, Mode=TwoWay}">
             <WdeImage ImageUri="Icons/icon_areatrigger.png" />
         </ToggleButton>
-        <ToggleButton ToolTip.Tip="Toggle map chunk visibility" IsChecked="{Binding ShowGrid, Mode=TwoWay}">
+        <ToggleButton ToolTip.Tip="Toggle map chunk visibility" IsChecked="{CompiledBinding ShowGrid, Mode=TwoWay}">
             <WdeImage ImageUri="Icons/icon_grid.png" />
         </ToggleButton>
         <DropDownButton>
@@ -22,19 +22,23 @@
                 <WdeImage ImageUri="Icons/icon_day_night.png" />
             </DropDownButton.Button>
             <StackPanel Orientation="Vertical" Width="400">
-                <CheckBox Name="TimeFlow" IsChecked="{Binding DisableTimeFlow, Mode=TwoWay}">Disable time flow</CheckBox>
+                <CheckBox Name="TimeFlow" IsChecked="{CompiledBinding DisableTimeFlow, Mode=TwoWay}">Disable time flow</CheckBox>
                 <DockPanel LastChildFill="True" IsEnabled="{Binding #TimeFlow.IsChecked, Converter={x:Static InverseBoolConverter.Instance}}">
                     <TextBlock VerticalAlignment="Center">Time speed: </TextBlock>
-                    <Slider Minimum="0" Maximum="6" IsSnapToTickEnabled="False" SmallChange="1" LargeChange="1" Value="{Binding TimeSpeedMultiplier}" />
+                    <Slider Minimum="0" Maximum="6" IsSnapToTickEnabled="False" SmallChange="1" LargeChange="1" Value="{CompiledBinding TimeSpeedMultiplier}" />
                 </DockPanel>
                 <DockPanel LastChildFill="True">
                     <TextBlock VerticalAlignment="Center">Time: </TextBlock>
-                    <Slider Minimum="0" Maximum="1439" Value="{Binding CurrentTime}" />
+                    <Slider Minimum="0" Maximum="1439" Value="{CompiledBinding CurrentTime}" />
                 </DockPanel>
-                <CheckBox IsChecked="{Binding OverrideLighting, Mode=TwoWay}">Disable lightning</CheckBox>
+                <CheckBox IsChecked="{CompiledBinding OverrideLighting, Mode=TwoWay}">Disable lightning</CheckBox>
                 <DockPanel LastChildFill="True">
                     <TextBlock VerticalAlignment="Center">View distance: </TextBlock>
-                    <Slider Minimum="1" Maximum="24" SmallChange="0.1" LargeChange="1" Value="{Binding ViewDistance}" />
+                    <Slider Minimum="1" Maximum="24" SmallChange="0.1" LargeChange="1" Value="{CompiledBinding ViewDistance}" />
+                </DockPanel>
+                <DockPanel LastChildFill="True">
+                    <TextBlock VerticalAlignment="Center">Dynamic resolution scale: </TextBlock>
+                    <Slider Minimum="0.5" Maximum="1" SmallChange="0.1" LargeChange="0.1" Value="{CompiledBinding DynamicResolution}" />
                 </DockPanel>
             </StackPanel>
         </DropDownButton>

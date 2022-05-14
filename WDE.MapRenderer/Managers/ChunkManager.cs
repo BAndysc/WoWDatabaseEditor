@@ -1,3 +1,4 @@
+using System.Buffers;
 using System.Collections;
 using SixLabors.ImageSharp.PixelFormats;
 using TheAvaloniaOpenGL.Resources;
@@ -246,7 +247,7 @@ namespace WDE.MapRenderer.Managers
                     chunk.areaIds[i, j] = chunksEnumerator2.Current.AreaId;
                     var basePos = chunksEnumerator2.Current.BasePosition;
                     int k_ = 0;
-                    Vector3[] subVertices = new Vector3[145];
+                    var subVertices = ArrayPool<Vector3>.Shared.Rent(145);
                     for (int cy = 0; cy < 17; ++cy)
                     {
                         for (int cx = 0; cx < (cy % 2 == 0 ? 9 : 8); cx++)
@@ -283,7 +284,7 @@ namespace WDE.MapRenderer.Managers
                         }
                     }
 
-                    int[] indices = new int[4 * 8 * 8 * 3];
+                    int[] indices = ArrayPool<int>.Shared.Rent(4 * 8 * 8 * 4);
                     int k__ = 0;
                     for (int cx = 0; cx < 8; cx++)
                     {
@@ -312,7 +313,9 @@ namespace WDE.MapRenderer.Managers
                             indices[k__++] = br;
                         }
                     }
-                    var subChunkMesh = meshManager.CreateManagedOnlyMesh(subVertices, indices);
+                    var subChunkMesh = meshManager.CreateManagedOnlyMesh(subVertices.AsSpan(0, 145), indices.AsSpan(0, 4 * 8 * 8 * 4));
+                    ArrayPool<Vector3>.Shared.Return(subVertices);
+                    ArrayPool<int>.Shared.Return(indices);
                     var entity = entityManager.CreateEntity(archetypes.CollisionOnlyArchetype);
                     entityManager.GetComponent<LocalToWorld>(entity).Matrix = Matrix.Identity;
                     entityManager.GetComponent<MeshRenderer>(entity).SubMeshId = 0;

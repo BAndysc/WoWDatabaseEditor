@@ -13,6 +13,7 @@ public interface IGameProperties
     Time CurrentTime { get; set; }
     float ViewDistanceModifier { get; }
     bool ShowAreaTriggers { get; }
+    float DynamicResolution { get; }
 }
 
 [AutoRegister]
@@ -26,4 +27,5 @@ public class GameProperties : IGameProperties
     public Time CurrentTime { get; set; }
     public float ViewDistanceModifier { get; set; }
     public bool ShowAreaTriggers { get; set; }
+    public float DynamicResolution { get; set; } = 1;
 }

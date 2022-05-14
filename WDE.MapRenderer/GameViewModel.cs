@@ -381,7 +381,18 @@ Tris: " + stats.TrianglesDrawn;
             set
             {
                 Properties.ViewDistanceModifier = value;
+                settings.ViewDistanceModifier = value;
                 RaisePropertyChanged(nameof(ViewDistance));
+            }
+        }
+        
+        public float DynamicResolution
+        {
+            get => Properties.DynamicResolution;
+            set
+            {
+                Properties.DynamicResolution = value;
+                RaisePropertyChanged(nameof(DynamicResolution));
             }
         }
         

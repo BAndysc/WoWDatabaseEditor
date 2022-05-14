@@ -223,6 +223,18 @@ namespace WDE.MpqReader.Structures
             Sound = iterator.GetUInt(6);
         }
     }
+
+    public class AnimationData
+    {
+        public readonly uint Id;
+        public readonly uint Fallback;
+        
+        public AnimationData(IDbcIterator iterator)
+        {
+            Id = iterator.GetUInt(0);
+            Fallback = iterator.GetUInt(5);
+        }
+    }
     
     public class CreatureDisplayInfoExtra
     {
@@ -324,6 +336,18 @@ namespace WDE.MpqReader.Structures
             foreach (var row in rows)
             {
                 var o = new Emote(row);
+                store[o.Id] = o;
+            }
+        }
+    }
+    
+    public class AnimationDataStore : BaseDbcStore<uint, AnimationData>
+    {
+        public AnimationDataStore(IEnumerable<IDbcIterator> rows)
+        {
+            foreach (var row in rows)
+            {
+                var o = new AnimationData(row);
                 store[o.Id] = o;
             }
         }

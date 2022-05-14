@@ -84,7 +84,7 @@ namespace TheEngine.Managers
 #endif
         }
 
-        public IMesh CreateManagedOnlyMesh(Vector3[] vertices, int[] indices)
+        public IMesh CreateManagedOnlyMesh(ReadOnlySpan<Vector3> vertices, ReadOnlySpan<int> indices)
         {
             var handle = new MeshHandle(meshes.Count);
 

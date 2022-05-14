@@ -105,7 +105,7 @@ namespace WDE.MapRenderer
             public int CurrentTime;
             public float ViewDistanceModifier;
             
-            [DefaultValue(true)]            
+            [DefaultValue(true)]
             [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
             public bool ShowAreaTriggers;
         }

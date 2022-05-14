@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using OpenGLBindings;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using TheAvaloniaOpenGL.Resources;
@@ -71,7 +72,7 @@ namespace TheEngine.Managers
 #endif
             return textureHandle;            
         }
-        
+
         public void DisposeTexture(TextureHandle handle)
         {
             if (handle.Handle == 0)
@@ -163,6 +164,12 @@ namespace TheEngine.Managers
             return AddTexture(texture);
         }
         
+        public TextureHandle CreateRenderTexture(int width, int height)
+        {
+            var texture = engine.Device.CreateRenderTexture(width, height);
+            return AddTexture(texture);
+        }
+
         public TextureHandle CreateDummyHandle()
         {
             return CreateTexture(new Rgba32[][] { new Rgba32[] { new Rgba32(255, 255, 255, 255) } }, 1, 1, false);
@@ -181,6 +188,27 @@ namespace TheEngine.Managers
         public void SetWrapping(TextureHandle handle, WrapMode mode)
         {
             GetTextureByHandle(handle).SetWrapping(mode);
+        }
+
+        public void BlitFramebuffers(TextureHandle src, TextureHandle dst, int srcX0, int srcY0, int srcX1, int srcY1, int dstX0, int dstY0, int dstX1, int dstY1, ClearBufferMask mask, BlitFramebufferFilter filter)
+        {
+            var srcTex = GetTextureByHandle(src) as RenderTexture;
+            var dstTex = GetTextureByHandle(dst) as RenderTexture;
+            
+            srcTex!.ActivateSourceFrameBuffer();
+            dstTex!.ActivateRenderFrameBuffer();
+            engine.Device.device.BlitFramebuffer(srcX0, srcY0, srcX1, srcY1,  dstX0, dstY0,  dstX1,  dstY1, mask, filter);
+        }
+        
+        public void BlitRenderTextures(TextureHandle src, TextureHandle dst)
+        {
+            var srcTex = GetTextureByHandle(src) as RenderTexture;
+            var dstTex = GetTextureByHandle(dst) as RenderTexture;
+            
+            srcTex!.ActivateSourceFrameBuffer();
+            dstTex!.ActivateRenderFrameBuffer();
+            engine.Device.device.BlitFramebuffer(0, 0, srcTex.Width, srcTex.Height, 0, 0, dstTex.Width, dstTex.Height, ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Linear);
+            engine.Device.device.BlitFramebuffer(0, 0, srcTex.Width, srcTex.Height, 0, 0, dstTex.Width, dstTex.Height, ClearBufferMask.DepthBufferBit, BlitFramebufferFilter.Nearest);
         }
     }
 }

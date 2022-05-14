@@ -188,6 +188,7 @@ namespace TheEngine
                 game?.Render(delta);
                 engine.renderManager.RenderTransparent(fb);
                 game?.RenderTransparent(delta);
+                engine.renderManager.RenderPostProcess();
                 game?.RenderGUI(delta);
                 engine.RenderGUI();
                 engine.renderManager.FinalizeRendering(fb);

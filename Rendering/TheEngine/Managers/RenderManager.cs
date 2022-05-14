@@ -44,10 +44,14 @@ namespace TheEngine.Managers
         private CullingMode? currentCulling;
         private (bool enabled, Blending? source, Blending? dest)? currentBlending;
 
-        private RenderTexture renderTexture;
-
-        private RenderTexture outlineTexture;
-
+        private int currentBackBufferWidth = -1;
+        private int currentBackBufferHeight = -1;
+        private TextureHandle[] backBuffers = new TextureHandle[2];
+        private int currentBackBufferIndex = 0;
+        private TextureHandle CurrentBackBuffer => backBuffers[currentBackBufferIndex];
+        private TextureHandle OtherBackBuffer => backBuffers[1 - currentBackBufferIndex];
+        private void SwapBackBuffers() => currentBackBufferIndex = (currentBackBufferIndex + 1) % 2;
+        
         private IMesh planeMesh;
 
         private ShaderHandle blitShader;
@@ -135,10 +139,9 @@ namespace TheEngine.Managers
             depthStencilNoZWrite = engine.Device.CreateDepthStencilState(false);
             engine.Device.device.CheckError("create depth stencil");
 
-            renderTexture = engine.Device.CreateRenderTexture((int)engine.WindowHost.WindowWidth, (int)engine.WindowHost.WindowHeight);
+            for (int i = 0; i < backBuffers.Length; ++i)
+                backBuffers[i] = engine.textureManager.CreateRenderTexture((int)engine.WindowHost.WindowWidth, (int)engine.WindowHost.WindowHeight);
             engine.Device.device.CheckError("create render tex");
-
-            //outlineTexture = engine.Device.CreateRenderTexture((int)engine.WindowHost.WindowWidth, (int)engine.WindowHost.WindowHeight);
 
             planeMesh = engine.MeshManager.CreateMesh(in ScreenPlane.Instance);
             engine.Device.device.CheckError("create mesh");
@@ -148,6 +151,10 @@ namespace TheEngine.Managers
             blitShader = engine.ShaderManager.LoadShader("internalShaders/blit.json", false);
             engine.Device.device.CheckError("load shader");
             blitMaterial = engine.MaterialManager.CreateMaterial(blitShader, null);
+            blitMaterial.SourceBlending = Blending.One;
+            blitMaterial.DestinationBlending = Blending.Zero;
+            blitMaterial.ZWrite = true;
+            blitMaterial.DepthTesting = DepthCompare.Always;
             blitMaterial.SetUniformInt("flipY", flipY ? 1 : 0);
 
             unlitMaterial = engine.MaterialManager.CreateMaterial("internalShaders/unlit.json");
@@ -160,7 +167,8 @@ namespace TheEngine.Managers
             //outlineTexture.Dispose();
             engine.meshManager.DisposeMesh(lineMesh);
             engine.meshManager.DisposeMesh(planeMesh);
-            renderTexture.Dispose();
+            foreach (var t in backBuffers)
+                engine.textureManager.DisposeTexture(t);
 
             depthStencilZWrite.Dispose();
             depthStencilNoZWrite.Dispose();
@@ -265,9 +273,18 @@ namespace TheEngine.Managers
         }
 
         private bool inRenderingLoop = false;
+        private bool inCoreRenderingLoop = false;
         private int currentFrameBuffer;
         public void PrepareRendering(int dstFrameBuffer)
         {
+            // dynamic - auto scale
+            // var drawTime = engine.statsManager.Counters.FrameTime.Average;
+            // if (drawTime > 22)
+            //     dynamicScale /= 1.02f;
+            // else if (drawTime <= 18)
+            //     dynamicScale *= 1.02f;
+            // dynamicScale = Math.Clamp(dynamicScale, 0.25, 1);
+        
             currentFrameBuffer = dstFrameBuffer;
             engine.shaderManager.Update();
 
@@ -280,15 +297,36 @@ namespace TheEngine.Managers
             
             engine.Device.RenderClearBuffer();
 
-            if (renderTexture.Width != (int)engine.WindowHost.WindowWidth ||
-                renderTexture.Height != (int)engine.WindowHost.WindowHeight)
+            if (currentBackBufferWidth != (int)engine.WindowHost.WindowWidth ||
+                currentBackBufferHeight != (int)engine.WindowHost.WindowHeight)
             {
-                renderTexture.Dispose();
-                renderTexture = engine.Device.CreateRenderTexture((int)engine.WindowHost.WindowWidth, (int)engine.WindowHost.WindowHeight);
+                currentBackBufferWidth = (int)engine.WindowHost.WindowWidth;
+                currentBackBufferHeight = (int)engine.WindowHost.WindowHeight;
+                for (var index = 0; index < backBuffers.Length; index++)
+                {
+                    engine.textureManager.DisposeTexture(backBuffers[index]);
+                    backBuffers[index] = engine.textureManager.CreateRenderTexture(currentBackBufferWidth, currentBackBufferHeight);
+                }
             }
+
+            if (pendingDynamicScale.HasValue)
+            {
+                if (Math.Abs(pendingDynamicScale.Value - 1) < 0.01f)
+                {
+                    useDynamicScale = false;
+                }
+                else
+                {
+                    dynamicScale = pendingDynamicScale.Value;
+                    useDynamicScale = true;
+                }
+                pendingDynamicScale = null;
+            }
+
+            inCoreRenderingLoop = true;
+            currentBackBufferIndex = 0;
             
-            ActivateDefaultRenderTexture();
-            renderTexture.Clear(1, 1, 1, 1);
+            ActivateRenderTexture(CurrentBackBuffer, Color4.White);
 
             sceneBuffer.UpdateBuffer(ref sceneData);
             sceneBuffer.Activate(Constants.SCENE_BUFFER_INDEX);
@@ -300,49 +338,58 @@ namespace TheEngine.Managers
             engine.Device.device.CheckError("Before render all");
         }
 
-        public void ActivateRenderTexture(RenderTexture rt)
+        private bool useDynamicScale = false;
+        private float dynamicScale = 1;
+        private float? pendingDynamicScale;
+        private int DynamicWidth => useDynamicScale ? Math.Max(1, (int)(currentBackBufferWidth * dynamicScale)) : currentBackBufferWidth;
+        private int DynamicHeight => useDynamicScale ? Math.Max(1, (int)(currentBackBufferHeight * dynamicScale)) : currentBackBufferHeight;
+
+        public void ActivateRenderTexture(TextureHandle rt, Color4? color = null)
         {
             if (inRenderingLoop)
-                engine.Device.SetRenderTexture(rt, currentFrameBuffer);
+            {
+                var tex = engine.textureManager.GetTextureByHandle(rt) as RenderTexture;
+                tex!.ActivateFrameBuffer(inCoreRenderingLoop && rt == CurrentBackBuffer && useDynamicScale ? dynamicScale : 1);
+                if (color.HasValue)
+                    tex!.Clear(color.Value.Red, color.Value.Green, color.Value.Blue, color.Value.Alpha);
+            }
         }
         
         public void ActivateDefaultRenderTexture()
         {
-            if (inRenderingLoop)
-                engine.Device.SetRenderTexture(renderTexture, currentFrameBuffer);
+            ActivateRenderTexture(CurrentBackBuffer);
         }
 
-        private List<Material> postProcesses = new();
-        public void AddPostprocess(Material postProcess)
+        private readonly List<IPostProcess> postProcesses = new();
+        
+        public void AddPostprocess(IPostProcess postProcess) => postProcesses.Add(postProcess);
+
+        public void RemovePostprocess(IPostProcess postProcess) => postProcesses.Remove(postProcess);
+        
+        public void SetDynamicResolutionScale(float scale)
         {
-            postProcesses.Add(postProcess);
+            pendingDynamicScale = scale;
+        }
+
+        public void RenderFullscreenPlane(Material material)
+        {
+            material.Shader.Activate();
+            EnableMaterial(material, false, null);
+            planeMesh.Activate();
+            engine.Device.DrawIndexed(engine.meshManager.GetMeshByHandle(planeMesh.Handle).IndexCount(0), 0, 0);
         }
         
         public void FinalizeRendering(int dstFrameBuffer)
         {
             ClearDirtyEntityBit();
 
-            foreach (var post in postProcesses)
-            {
-                post.SetTexture("_MainTex", renderTexture);
-                post.Shader.Activate();
-                EnableMaterial(post, false);
-                SetDepth(true, DepthCompare.Always);
-                planeMesh.Activate();
-                engine.Device.DrawIndexed(engine.meshManager.GetMeshByHandle(planeMesh.Handle).IndexCount(0), 0, 0);
-            }
             engine.Device.SetRenderTexture(null, dstFrameBuffer);
+            engine.Device.device.Viewport(0, 0, (int)engine.WindowHost.WindowWidth, (int)engine.WindowHost.WindowHeight);
             
             engine.Device.device.CheckError("Blitz");
-            blitMaterial.Shader.Activate();
-            blitMaterial.ActivateUniforms(false);
-            SetDepth(true, DepthCompare.Always);
-            renderTexture.Activate(0);
-            //outlineTexture.Activate(1);
-            planeMesh.Activate();
-            SetBlending(false, Blending.One, Blending.Zero);
-            engine.Device.DrawIndexed(engine.meshManager.GetMeshByHandle(planeMesh.Handle).IndexCount(0), 0, 0);
-
+            blitMaterial.SetTexture("texture1", CurrentBackBuffer);
+            RenderFullscreenPlane(blitMaterial);
+            
             inRenderingLoop = false;
             engine.statsManager.RenderStats = Stats;
         }
@@ -365,6 +412,26 @@ namespace TheEngine.Managers
         internal void RenderTransparent(int dstFrameBuffer)
         {
             RenderTransparent();
+        }
+
+        internal void RenderPostProcess()
+        {
+            inCoreRenderingLoop = false;
+            if (useDynamicScale)
+            {
+                engine.textureManager.BlitFramebuffers(CurrentBackBuffer, OtherBackBuffer, 0, 0, DynamicWidth, DynamicHeight, 0, 0, currentBackBufferWidth, currentBackBufferHeight, ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Linear);
+                engine.textureManager.BlitFramebuffers(CurrentBackBuffer, OtherBackBuffer, 0, 0, DynamicWidth, DynamicHeight, 0, 0, currentBackBufferWidth, currentBackBufferHeight, ClearBufferMask.DepthBufferBit, BlitFramebufferFilter.Nearest);
+
+                SwapBackBuffers();
+                ActivateDefaultRenderTexture(); // to make sure we set the correct viewport
+            }
+            
+            foreach (var post in postProcesses)
+            {
+                ActivateRenderTexture(OtherBackBuffer, Color4.White);
+                post.RenderPostprocess(this, CurrentBackBuffer);
+                SwapBackBuffers();
+            }
         }
 
         public void UpdateTransforms()

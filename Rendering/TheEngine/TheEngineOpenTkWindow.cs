@@ -46,6 +46,7 @@ public class TheEngineOpenTkWindow : GameWindow, IWindowHost
         game.Render((float)args.Time * 1000);
         engine.renderManager.RenderTransparent(0);
         game.RenderTransparent((float)args.Time * 1000);
+        engine.renderManager.RenderPostProcess();
         game.RenderGUI((float)args.Time * 1000);
         engine.RenderGUI();
         engine.renderManager.FinalizeRendering(0);

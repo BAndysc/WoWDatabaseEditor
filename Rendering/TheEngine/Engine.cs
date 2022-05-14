@@ -83,9 +83,9 @@ namespace TheEngine
             materialManager = new MaterialManager(this);
             shaderManager = new ShaderManager(this);
             meshManager = new MeshManager(this);
+            textureManager = new TextureManager(this);
             renderManager = new RenderManager(this, flipY);
 
-            textureManager = new TextureManager(this);
             fontManager = new FontManager(this);
             uiManager = new UIManager(this);
         }
@@ -97,8 +97,7 @@ namespace TheEngine
         
         public NativeBuffer<T> CreateBuffer<T>(BufferTypeEnum bufferType, ReadOnlySpan<T> data, BufferInternalFormat format = BufferInternalFormat.None) where T : unmanaged => Device.CreateBuffer<T>(bufferType, data, format);
         public NativeBuffer<T> CreateBuffer<T>(BufferTypeEnum bufferType, int size, BufferInternalFormat format = BufferInternalFormat.None) where T : unmanaged => Device.CreateBuffer<T>(bufferType, size, format);
-        public RenderTexture CreateRenderTexture(int width, int height) => Device.CreateRenderTexture(width, height);
-
+        
         public void Dispose()
         {
             isDisposing = true;

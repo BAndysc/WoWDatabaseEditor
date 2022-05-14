@@ -4,6 +4,7 @@ using Avalonia.OpenGL;
 using Avalonia.Platform.Interop;
 using OpenGLBindings;
 using OpenTK.Graphics.ES11;
+using BlitFramebufferFilter = OpenGLBindings.BlitFramebufferFilter;
 using ClearBufferMask = OpenGLBindings.ClearBufferMask;
 using CullFaceMode = OpenGLBindings.CullFaceMode;
 using DepthFunction = OpenGLBindings.DepthFunction;
@@ -482,6 +483,11 @@ namespace TheAvaloniaOpenGL
         [GlMinVersionEntryPoint("glBlendFunc", 2, 0)]
         public GlBlendFunc BlendFunc { get; }
 
+
+        public delegate void GlBlitFramebuffer(int srcX0, int srcY0, int srcX1, int srcY1, int dstX0, int dstY0, int dstX1, int dstY1, ClearBufferMask mask, BlitFramebufferFilter filter);
+        [GlMinVersionEntryPoint("glBlitFramebuffer", 3, 0)]
+        public GlBlitFramebuffer BlitFramebuffer { get; }
+        
         public delegate void GlDepthFunc(DepthFunction func);
         [GlMinVersionEntryPoint("glDepthFunc", 2, 0)]
         public GlDepthFunc DepthFunc { get; }
