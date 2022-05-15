@@ -46,6 +46,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         private readonly IConditionEditService conditionEditService;
         private readonly IDatabaseEditorsSettings editorSettings;
         private readonly ITablePersonalSettings tablePersonalSettings;
+        private readonly IMetaColumnsSupportService metaColumnsSupportService;
         private readonly IDatabaseTableDataProvider tableDataProvider;
 
         private Dictionary<DatabaseKey, DatabaseEntitiesGroupViewModel> byEntryGroups = new();
@@ -134,7 +135,8 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             ISessionService sessionService, IDatabaseEditorsSettings editorSettings,
             IDatabaseTableCommandService commandService,
             IParameterPickerService parameterPickerService,
-            IStatusBar statusBar, ITablePersonalSettings tablePersonalSettings) 
+            IStatusBar statusBar, ITablePersonalSettings tablePersonalSettings,
+            IMetaColumnsSupportService metaColumnsSupportService) 
             : base(history, solutionItem, solutionItemName, 
             solutionManager, solutionTasksService, eventAggregator, 
             queryGenerator, tableDataProvider, messageBoxService, taskRunner, parameterFactory,
@@ -152,6 +154,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             this.conditionEditService = conditionEditService;
             this.editorSettings = editorSettings;
             this.tablePersonalSettings = tablePersonalSettings;
+            this.metaColumnsSupportService = metaColumnsSupportService;
 
             splitMode = editorSettings.MultiRowSplitMode;
 
@@ -426,6 +429,11 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                 {
                     var label = entity.ToObservable(e => e.Conditions).Select(c => "Edit (" + (c?.Count ?? 0) + ")");
                     cellViewModel = AutoDispose(new DatabaseCellViewModel(columnIndex, "Conditions", EditConditionsCommand, row, entity, label));
+                }
+                else if (column.IsMetaColumn)
+                {
+                    var (command, title) = metaColumnsSupportService.GenerateCommand(column.Meta!, entity, entity.GenerateKey(TableDefinition));
+                    cellViewModel = AutoDispose(new DatabaseCellViewModel(columnIndex, column.Name, command, row, entity, title));
                 }
                 else
                 {

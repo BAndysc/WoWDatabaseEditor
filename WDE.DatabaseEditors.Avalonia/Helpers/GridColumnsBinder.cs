@@ -49,7 +49,7 @@ namespace WDE.DatabaseEditors.Avalonia.Helpers
                 foreach (var column in newList)
                 {
                     var definition = new ColumnDefinition();
-                    definition.SharedSizeGroup = column.DatabaseName;
+                    definition.SharedSizeGroup = column.ColumnIdForUi;
                     grid.ColumnDefinitions.Add(definition);
 
                     definition = new ColumnDefinition(5, GridUnitType.Pixel);
@@ -75,7 +75,7 @@ namespace WDE.DatabaseEditors.Avalonia.Helpers
                     foreach (var column in newList)
                     {
                         var definition = new ColumnDefinition(column.Width, GridUnitType.Pixel);
-                        definition.SharedSizeGroup = column.DatabaseName;
+                        definition.SharedSizeGroup = column.ColumnIdForUi;
                         definition.MinWidth = 30;
                         column.AutoDispose(definition.GetObservable(ColumnDefinition.WidthProperty).SubscribeAction(
                         width =>

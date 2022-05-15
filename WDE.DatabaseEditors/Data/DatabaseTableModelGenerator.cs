@@ -36,6 +36,9 @@ namespace WDE.DatabaseEditors.Data
         {
             Dictionary<string, IDatabaseField> columns = new(StringComparer.InvariantCultureIgnoreCase);
 
+            if (!phantomEntity && key.Count != definition.GroupByKeys.Count)
+                throw new Exception($"Trying to create entity with a partial key! (expected: {definition.GroupByKeys.Count} elements in key, got {key.Count})");
+            
             foreach (var column in definition.Groups.SelectMany(t => t.Fields)
                 .Distinct(
                     EqualityComparerFactory.Create<DatabaseColumnJson>(

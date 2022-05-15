@@ -71,7 +71,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             }
         }
 
-        public DatabaseCellViewModel(int columnIndex, string columnName, ICommand action, DatabaseEntityViewModel parent, DatabaseEntity entity, System.IObservable<string> label) : base(entity)
+        public DatabaseCellViewModel(int columnIndex, string columnName, ICommand action, DatabaseEntityViewModel parent, DatabaseEntity entity, string label) : base(entity)
         {
             Parent = parent;
             ColumnIndex = columnIndex * 2;
@@ -80,6 +80,12 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             ColumnName = columnName;
             OriginalValueTooltip = null;
             ActionCommand = action;
+            ActionLabel = label;
+        }
+
+        public DatabaseCellViewModel(int columnIndex, string columnName, ICommand action, DatabaseEntityViewModel parent, DatabaseEntity entity, System.IObservable<string> label) : 
+            this(columnIndex, columnName, action, parent, entity, "")
+        {
             AutoDispose(label.SubscribeAction(s =>
             {
                 ActionLabel = s;

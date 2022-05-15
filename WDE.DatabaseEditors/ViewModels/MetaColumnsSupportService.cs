@@ -69,6 +69,19 @@ public class MetaColumnsSupportService : IMetaColumnsSupportService
                     tableEditorPickerService.ShowForeignKey1To1(table, entity.Key).ListenErrors();
                 }, () => !entity.Phantom), "Open");
         }
+        if (metaColumn.StartsWith("one2one_dynamic_key:"))
+        {
+            var table = metaColumn.Substring(20);
+            return (new DelegateCommand(
+                () =>
+                {
+                    var definition = definitionProvider.GetDefinition(table);
+                    if (definition == null)
+                        throw new UnsupportedTableException(table);
+                    var generatedKey = entity.ForceGenerateKey(definition);
+                    tableEditorPickerService.ShowForeignKey1To1(table, generatedKey).ListenErrors();
+                }, () => !entity.Phantom), "Open");
+        }
         if (metaColumn.StartsWith("invoke:"))
         {
             var command = metaColumn.Substring(7);

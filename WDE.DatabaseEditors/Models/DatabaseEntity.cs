@@ -13,7 +13,7 @@ using WDE.DatabaseEditors.History;
 
 namespace WDE.DatabaseEditors.Models
 {
-    public class DatabaseEntity : INotifyPropertyChanged
+    public sealed class DatabaseEntity : INotifyPropertyChanged
     {
         private DatabaseKey key;
         
@@ -44,7 +44,12 @@ namespace WDE.DatabaseEditors.Models
 
         public DatabaseKey GenerateKey(DatabaseTableDefinitionJson definition)
         {
-            return Phantom ? new DatabaseKey(definition.PrimaryKey.Select(GetTypedValueOrThrow<long>)) : Key;
+            return Phantom ? ForceGenerateKey(definition) : Key;
+        }
+        
+        public DatabaseKey ForceGenerateKey(DatabaseTableDefinitionJson definition)
+        {
+            return new DatabaseKey(definition.PrimaryKey.Select(GetTypedValueOrThrow<long>));
         }
         
         public DatabaseKey Key
@@ -131,7 +136,7 @@ namespace WDE.DatabaseEditors.Models
         public event PropertyChangedEventHandler? PropertyChanged;
 
         [NotifyPropertyChangedInvocator]
-        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+        private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
