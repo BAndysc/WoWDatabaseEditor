@@ -51,6 +51,7 @@ namespace TheAvaloniaOpenGL.Resources
     
             if (generateMips)
                 GenerateMipmaps();
+            SetFiltering(FilteringMode.Linear);
             UnbindTexture();
         }
         

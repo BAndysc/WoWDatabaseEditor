@@ -89,5 +89,11 @@ namespace WDE.MapRenderer.Managers
             foreach (var module in modules)
                 module.Item2.RenderGUI();
         }
+
+        public void RenderTransparent()
+        {
+            foreach (var module in modules)
+                module.Item2.RenderTransparent();
+        }
     }
 }

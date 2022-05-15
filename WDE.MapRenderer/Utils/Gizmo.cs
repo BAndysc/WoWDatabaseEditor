@@ -104,8 +104,8 @@ namespace WDE.MapRenderer.Utils
 
         public void Render(ICameraManager cameraManager, IRenderManager renderManager)
         {
-            InternalRender(cameraManager, renderManager, true);
             InternalRender(cameraManager, renderManager, false);
+            InternalRender(cameraManager, renderManager, true);
         }
 
         private void InternalRender(ICameraManager cameraManager, IRenderManager renderManager, bool transparent)
@@ -115,7 +115,7 @@ namespace WDE.MapRenderer.Utils
                 material.BlendingEnabled = true;
                 material.SourceBlending = Blending.SrcAlpha;
                 material.DestinationBlending = Blending.OneMinusSrcAlpha;
-                material.DepthTesting = DepthCompare.Always;
+                material.DepthTesting = DepthCompare.Greater;
                 material.ZWrite = false;
             }
             else

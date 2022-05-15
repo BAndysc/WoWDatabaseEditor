@@ -25,7 +25,7 @@ namespace WDE.MpqReader.Structures
         public M2Flags global_flags { get; init; }
 /*0x014*/  public M2Array<uint> global_loops { get; init; }                        // Timestamps used in global looping animations.
 /*0x01C*/  public M2Array<M2Sequence> sequences { get; init; }                       // Information about the animations in the model.
-/*0x024*/  public M2Array<ushort> sequenceIdToAnimationId { get; init; }               // Mapping of sequence IDs to the entries in the Animation sequences block.
+/*0x024*/  public M2Array<short> sequenceIdToAnimationId { get; init; }               // Mapping of sequence IDs to the entries in the Animation sequences block.
 /*0x02C*/  public M2Array<M2CompBone> bones { get; init; }                           // MAX_BONES = 0x100 => Creature\SlimeGiant\GiantSlime.M2 has 312 bones (Wrath)
 /*0x034*/  public M2Array<ushort> boneIndicesById { get; init; }                   //Lookup table for key skeletal bones. (alt. name: key_bone_lookup)
 /*0x03C*/  public M2Array<M2Vertex> vertices { get; init; }
@@ -58,6 +58,32 @@ namespace WDE.MpqReader.Structures
         ///*0x128*/  M2Array<M2Particleⁱ> particle_emitters { get; init; }
            public M2Array<ushort>? textureCombinerCombos { get; init; }
 
+        public int? GetAnimationIndexByAnimationId(int anim_id)
+        {
+            if (sequenceIdToAnimationId.Length == 0 && anim_id == 0 && sequences.Length >= 1)
+                return 0;
+            
+            if (anim_id == -1 || sequenceIdToAnimationId.Length == 0)
+                return null;
+            int i = anim_id % sequenceIdToAnimationId.Length;
+  
+            for (int stride = 1; true; ++stride)
+            {
+                if (sequenceIdToAnimationId[i] == -1)
+                {
+                    return null;
+                }
+                if (sequences[sequenceIdToAnimationId[i]].id == anim_id)
+                {
+                    return sequenceIdToAnimationId[i];
+                }
+
+                i = (i + stride * stride) % sequenceIdToAnimationId.Length;
+                // so original_i + 1, original_i + 1 + 4, original_i + 1 + 4 + 9, …
+            }
+            // unreachable
+        }
+
         private M2(IBinaryReader reader, string path, Func<string, IBinaryReader?> opener)
         {
             magic = reader.ReadUInt32();
@@ -66,7 +92,7 @@ namespace WDE.MpqReader.Structures
             global_flags = (M2Flags)reader.ReadUInt32();
             global_loops = reader.ReadArrayUInt32();
             sequences = reader.ReadArray(M2Sequence.Read);
-            sequenceIdToAnimationId = reader.ReadArrayUInt16();
+            sequenceIdToAnimationId = reader.ReadArrayInt16();
             Dictionary<(int, int), IBinaryReader> animReaders = new();
             for (int i = 0; i < sequences.Length; ++i)
             {

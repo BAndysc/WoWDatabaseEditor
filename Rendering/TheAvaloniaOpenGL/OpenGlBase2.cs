@@ -57,6 +57,7 @@ namespace Avalonia.OpenGL.Controls
                 // new
                 sw.Restart();
                 _attachment.Present(); // old
+                _context.GlInterface.Finish();
                 PresentTime = (float)sw.Elapsed.TotalMilliseconds;
                 //end new
             }

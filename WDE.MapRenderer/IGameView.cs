@@ -18,7 +18,8 @@ namespace WDE.MapRenderer
         object? ViewModel { get; }
         void Initialize();
         void Update(float delta);
-        void Render();
-        void RenderGUI();
+        void Render() { }
+        void RenderTransparent() { }
+        void RenderGUI() { }
     }
 }

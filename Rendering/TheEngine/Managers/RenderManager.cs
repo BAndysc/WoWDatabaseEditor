@@ -74,7 +74,7 @@ namespace TheEngine.Managers
         private Archetype staticRendererArchetype;
         private Archetype dynamicRendererArchetype;
 
-        private Archetype parentedEntitiesArchetype;
+        private Archetype dynamicParentedEntitiesArchetype;
 
         internal RenderManager(Engine engine, bool flipY)
         {
@@ -85,8 +85,9 @@ namespace TheEngine.Managers
             dirtEntities = engine.entityManager.NewArchetype()
                 .WithComponentData<DirtyPosition>();
 
-            parentedEntitiesArchetype = engine.entityManager.NewArchetype()
+            dynamicParentedEntitiesArchetype = engine.entityManager.NewArchetype()
                 .WithComponentData<CopyParentTransform>()
+                .WithComponentData<DirtyPosition>()
                 .WithComponentData<LocalToWorld>();
             
             staticRendererArchetype = engine.EntityManager.NewArchetype()
@@ -437,7 +438,7 @@ namespace TheEngine.Managers
         public void UpdateTransforms()
         {
             var entityManager = engine.entityManager;
-            parentedEntitiesArchetype.ParallelForEach<CopyParentTransform, LocalToWorld, DirtyPosition>((itr, start, end, parents, localToWorld, dirtyPosition) =>
+            dynamicParentedEntitiesArchetype.ParallelForEach<CopyParentTransform, LocalToWorld, DirtyPosition>((itr, start, end, parents, localToWorld, dirtyPosition) =>
             {
                 for (int i = start; i < end; ++i)
                 {

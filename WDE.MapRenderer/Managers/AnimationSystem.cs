@@ -168,25 +168,35 @@ public class AnimationSystem
 
                 if (animationData._currentAnimation != animationData.SetNewAnimation)
                 {
-                    bool found = false;
-                    for (int j = 0; j < animationData.Model.sequences.Length; ++j)
+                    int? lookup = animationData.Model.GetAnimationIndexByAnimationId(animationData.SetNewAnimation);
+                    if (!lookup.HasValue)
                     {
-                        if (animationData.Model.sequences[j].id == animationData.SetNewAnimation)
-                        {
-                            found = true;
-                            animationData._animInternalIndex = j;
-                            animationData._length = animationData.Model.sequences[j].duration;
-                            break;
-                        }
-                    }
-
-                    if (!found)
                         animationData._currentAnimation = -1;
+                    }
                     else
                     {
+                        animationData._animInternalIndex = lookup.Value;
+                        animationData._length = animationData.Model.sequences[lookup.Value].duration;
                         animationData._currentAnimation = animationData.SetNewAnimation;
-                        animationData._time = 0;                        
+                        animationData._time = 0;
                     }
+                    // bool found = false;
+                    // for (int j = 0; j < animationData.Model.sequences.Length; ++j)
+                    // {
+                    //     if (animationData.Model.sequences[j].id == animationData.SetNewAnimation)
+                    //     {
+                    //         found = true;
+                    //         animationData._animInternalIndex = j;
+                    //         animationData._length = animationData.Model.sequences[j].duration;
+                    //         break;
+                    //     }
+                    // }
+
+                    // if (!found)
+                    //     
+                    // else
+                    // {                 
+                    // }
                 }
 
                 if (animationData._currentAnimation == -1)

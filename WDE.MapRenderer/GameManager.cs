@@ -152,6 +152,7 @@ namespace WDE.MapRenderer
         public void RenderTransparent(float delta)
         {
             areaTriggerManager.Render();
+            moduleManager.RenderTransparent();
         }
 
         public void RenderGui(float delta)
