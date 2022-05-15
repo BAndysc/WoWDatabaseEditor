@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
 using TheEngine.ECS;
 
@@ -205,6 +206,38 @@ namespace TheEngine.Test.ECS
             Assert.IsTrue(entityManager.Is(entityMixed, archetypeOnlyManaged));
             Assert.IsTrue(entityManager.Is(entityMixed, archetypeOnlyA));
             Assert.IsTrue(entityManager.Is(entityMixed, archetypeAAndManaged));
+        }
+        
+        [Test]
+        public void AddComponentTest()
+        {
+            var entityA = entityManager.CreateEntity(archetypeOnlyA);
+            
+            Assert.IsTrue(entityManager.Is(entityA, archetypeOnlyA));
+            Assert.IsFalse(entityManager.Is(entityA, archetypeOnlyB));
+            Assert.IsFalse(entityManager.Is(entityA, archetype));
+            
+            entityManager.AddComponent(entityA, new ComponentB());
+            
+            Assert.IsTrue(entityManager.Is(entityA, archetypeOnlyA));
+            Assert.IsTrue(entityManager.Is(entityA, archetypeOnlyB));
+            Assert.IsTrue(entityManager.Is(entityA, archetype));
+
+            int totalCount = 0;
+            archetypeOnlyB.ForEach<ComponentB>((itr, start, end, componentsB) =>
+            {
+                totalCount += end - start;
+            });
+            Assert.AreEqual(1, totalCount);
+            
+            totalCount = 0;
+            archetypeOnlyA.ForEach<ComponentA>((itr, start, end, componentsB) =>
+            {
+                totalCount += end - start;
+            });
+            Assert.AreEqual(1, totalCount);
+            
+            var archetypes = entityManager.ArchetypeIterator(archetypeOnlyB).ToList();
         }
     }
 }

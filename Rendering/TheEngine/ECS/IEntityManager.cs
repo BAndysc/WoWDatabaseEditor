@@ -5,6 +5,12 @@ namespace TheEngine.ECS
     public interface IEntityManager
     {
         Entity CreateEntity(Archetype archetype);
+        /**
+         * Adds a component to entity, even if the component is NOT in the archetype
+         * this will move the entity to a new archetype, which is an expensive operation
+         * so you are not expected to do it every frame!!
+         */
+        void AddComponent<T>(Entity entity, in T component) where T : unmanaged, IComponentData;
         void DestroyEntity(Entity entity);
         bool Exist(Entity entity);
         ref T GetComponent<T>(Entity entity) where T : unmanaged, IComponentData;
@@ -15,5 +21,6 @@ namespace TheEngine.ECS
         IManagedComponentTypeData ManagedTypeData<T>() where T : class, IManagedComponentData;
         Archetype NewArchetype();
         bool Is(Entity entity, Archetype archetype);
+        void InstallArchetype(Archetype archetype);
     }
 }

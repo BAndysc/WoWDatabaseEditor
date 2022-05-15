@@ -120,7 +120,45 @@ namespace TheEngine.ECS
             if (sparseReverseEntityMapping.Length <= entity.Id)
                 Array.Resize(ref sparseReverseEntityMapping, Math.Max((int)entity.Id + 1, sparseReverseEntityMapping.Length * 2 + 1));
         }
+        
+        /**
+         * The entity must be present in the Data Manager!
+         */
+        internal unsafe void UnsafeCopy(Entity entity, ChunkDataManager oldData, IComponentTypeData component)
+        {
+            var newIndex = Archetype.Components.IndexOf(component);
+            var oldIndex = oldData.Archetype.Components.IndexOf(component);
+            
+            if (newIndex == -1 || oldIndex == -1)
+                throw new Exception("trying to unsafe copy component which is not present either in the old or new ComponentDataManager");
+            
+            var newArray = componentData[newIndex];
+            var oldArray = oldData.componentData[oldIndex];
 
+            var newEntityIndex = sparseReverseEntityMapping[entity.Id] - 1;
+            var oldEntityIndex = oldData.sparseReverseEntityMapping[entity.Id] - 1;
+
+            for (int j = 0; j < component.SizeBytes; ++j)
+                newArray[newEntityIndex * component.SizeBytes + j] = oldArray[oldEntityIndex * component.SizeBytes + j];
+        }
+
+        internal void UnsafeCopy(Entity entity, ChunkDataManager oldData, IManagedComponentTypeData component)
+        {
+            var newIndex = Archetype.ManagedComponents.IndexOf(component);
+            var oldIndex = oldData.Archetype.ManagedComponents.IndexOf(component);
+            
+            if (newIndex == -1 || oldIndex == -1)
+                throw new Exception("trying to unsafe copy component which is not present either in the old or new ComponentDataManager");
+            
+            var newArray = managedComponentData[newIndex];
+            var oldArray = oldData.managedComponentData[oldIndex];
+
+            var newEntityIndex = sparseReverseEntityMapping[entity.Id] - 1;
+            var oldEntityIndex = oldData.sparseReverseEntityMapping[entity.Id] - 1;
+
+            newArray[newEntityIndex] = oldArray[oldEntityIndex];
+        }
+        
         public unsafe void AddEntity(Entity entity)
         {
             ResizeIfNeeded(entity);

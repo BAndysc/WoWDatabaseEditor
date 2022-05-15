@@ -19,6 +19,7 @@ namespace TheEngine.ECS
         private uint used;
         private readonly Dictionary<System.Type, int> typeToIndexMapping = new();
         private readonly Dictionary<System.Type, int> typeToManagedIndexMapping = new();
+        private readonly Dictionary<ulong, Archetype> archetypes = new();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void ResizeIfNeeded()
@@ -48,6 +49,26 @@ namespace TheEngine.ECS
             entitiesArchetype[newEntity.Id] = archetype.Hash;
             dataManager.AddEntity(newEntity, archetype);
             return newEntity;
+        }
+
+        public void AddComponent<T>(Entity entity, in T component) where T : unmanaged, IComponentData
+        {
+            ulong currentArchetypeHash = entitiesArchetype[entity.Id];
+            var componentTypeData = TypeData<T>();
+
+            var entityAlreadyHasComponent = (currentArchetypeHash & componentTypeData.GlobalHash) != 0;
+            if (entityAlreadyHasComponent)
+            {
+                Console.WriteLine("The entity has already the component, consider using GetComponent<T>() = value for more performance");
+            }
+            else
+            {
+                var oldArchetype = archetypes[currentArchetypeHash];
+                var newArchetype = oldArchetype.WithComponentData<T>();
+                dataManager.MoveEntity(entity, oldArchetype, newArchetype);
+                entitiesArchetype[entity.Id] = newArchetype.Hash;
+            }
+            GetComponent<T>(entity) = component;
         }
 
         public void DestroyEntity(Entity entity)
@@ -82,6 +103,11 @@ namespace TheEngine.ECS
         public bool Is(Entity entity, Archetype archetype)
         {
             return (entitiesArchetype[entity.Id] & archetype.Hash) == archetype.Hash;
+        }
+
+        public void InstallArchetype(Archetype archetype)
+        {
+            archetypes[archetype.Hash] = archetype;
         }
 
         public IEnumerable<IChunkDataIterator> ArchetypeIterator(Archetype archetype)

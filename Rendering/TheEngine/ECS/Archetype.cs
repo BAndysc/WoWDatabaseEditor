@@ -32,7 +32,10 @@ namespace TheEngine.ECS
             var typeData = EntityManager.ManagedTypeData<T>();
             n.managedComponents.Add(typeData);
             n.usedManagedComponents = usedManagedComponents;
-            n.usedManagedComponents[(1 << typeData.Index)] = true;
+            n.usedManagedComponents[(int)typeData.Hash] = true;
+
+            EntityManager.InstallArchetype(n);
+            
             return n;
         }
 
@@ -46,7 +49,10 @@ namespace TheEngine.ECS
             var typeData = EntityManager.TypeData<T>();
             n.components.Add(typeData);
             n.usedComponents = usedComponents;
-            n.usedComponents[(1 << typeData.Index)] = true;
+            n.usedComponents[(int)typeData.Hash] = true;
+            
+            EntityManager.InstallArchetype(n);
+            
             return n;
         }
 
