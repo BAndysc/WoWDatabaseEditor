@@ -1,5 +1,6 @@
 using TheEngine.Interfaces;
 using TheMaths;
+using WDE.MpqReader.DBC;
 using WDE.MpqReader.Structures;
 
 namespace WDE.MapRenderer.Managers

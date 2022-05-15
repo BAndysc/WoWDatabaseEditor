@@ -8,6 +8,7 @@ using TheEngine.Handles;
 using TheEngine.Interfaces;
 using TheMaths;
 using WDE.MpqReader;
+using WDE.MpqReader.DBC;
 using WDE.MpqReader.Readers;
 using WDE.MpqReader.Structures;
 using IInputManager = TheEngine.Interfaces.IInputManager;

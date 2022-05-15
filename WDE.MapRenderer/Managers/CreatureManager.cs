@@ -15,6 +15,7 @@ using WDE.MpqReader.Structures;
 using WDE.Common.Database;
 using WDE.MapRenderer;
 using WDE.MapRenderer.Utils;
+using WDE.MpqReader.DBC;
 
 namespace WDE.MapRenderer.Managers
 {

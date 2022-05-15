@@ -5,6 +5,7 @@ using TheEngine.Interfaces;
 using TheEngine.PhysicsSystem;
 using TheMaths;
 using WDE.MapRenderer.Managers;
+using WDE.MpqReader.DBC;
 using WDE.MpqReader.Structures;
 
 namespace WDE.MapRenderer

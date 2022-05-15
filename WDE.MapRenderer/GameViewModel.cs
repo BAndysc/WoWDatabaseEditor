@@ -19,6 +19,7 @@ using WDE.Common.Windows;
 using WDE.MapRenderer.Managers;
 using WDE.MapRenderer.StaticData;
 using WDE.Module.Attributes;
+using WDE.MpqReader.DBC;
 using WDE.MpqReader.Structures;
 using WDE.MVVM;
 using WDE.MVVM.Observable;

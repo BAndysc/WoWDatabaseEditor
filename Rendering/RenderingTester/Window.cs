@@ -6,6 +6,7 @@ using WDE.Common.Services.MessageBox;
 using WDE.Common.Tasks;
 using WDE.MapRenderer;
 using WDE.MapRenderer.Managers;
+using WDE.MpqReader.DBC;
 using WDE.MpqReader.Structures;
 
 namespace RenderingTester;

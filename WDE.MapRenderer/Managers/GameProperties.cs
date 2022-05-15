@@ -1,4 +1,5 @@
 using WDE.Module.Attributes;
+using WDE.MpqReader.DBC;
 using WDE.MpqReader.Structures;
 
 namespace WDE.MapRenderer.Managers;
