@@ -167,6 +167,7 @@ namespace WDE.MapRenderer.Utils
         private readonly IRenderManager renderManager;
         private readonly RaycastSystem raycastSystem;
         private readonly IInputManager inputManager = null!;
+        private readonly uint collisionMask;
         private Gizmo gizmo = null!;
         
         private DragMode dragging = DragMode.NoDragging;
@@ -183,7 +184,8 @@ namespace WDE.MapRenderer.Utils
             ICameraManager cameraManager,
             IRenderManager renderManager,
             RaycastSystem raycastSystem,
-            IInputManager inputManager)
+            IInputManager inputManager,
+            uint collisionMask)
         {
             this.meshManager = meshManager;
             this.materialManager = materialManager;
@@ -191,6 +193,7 @@ namespace WDE.MapRenderer.Utils
             this.renderManager = renderManager;
             this.raycastSystem = raycastSystem;
             this.inputManager = inputManager;
+            this.collisionMask = collisionMask;
             Initialize();
         }
 
@@ -264,7 +267,7 @@ namespace WDE.MapRenderer.Utils
                 foreach (var dragged in draggable)
                 {
                     var position = GetPosition(dragged.item);
-                    raycastSystem.RaycastAll(new Ray(position.WithZ(4000), Vector3.Down), position, result);
+                    raycastSystem.RaycastAll(new Ray(position.WithZ(4000), Vector3.Down), position, result, collisionMask);
                     if (result.Count > 0)
                     {
                         float minDistance = float.MaxValue;

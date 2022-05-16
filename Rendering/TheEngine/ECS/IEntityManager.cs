@@ -11,6 +11,7 @@ namespace TheEngine.ECS
          * so you are not expected to do it every frame!!
          */
         void AddComponent<T>(Entity entity, in T component) where T : unmanaged, IComponentData;
+        void AddManagedComponent<T>(Entity entity, T component) where T : class, IManagedComponentData;
         void DestroyEntity(Entity entity);
         bool Exist(Entity entity);
         ref T GetComponent<T>(Entity entity) where T : unmanaged, IComponentData;

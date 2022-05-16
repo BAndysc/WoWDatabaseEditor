@@ -40,6 +40,16 @@ public class Archetypes
     public Archetype StaticM2WorldObjectAnimatedArchetype;       // <-- renderer which is animated
     public Archetype StaticM2WorldObjectAnimatedMasterArchetype; // <-- actually updates animation
 
+    public Archetype CullingArchetype; // objects that are culled by AABB
+    public Archetype DynamicObjectArchetype; // object that can move around (DirtyPosition)
+    
+    public Archetype WorldObjectCollider;
+
+    public Archetype WorldObjectArchetype;
+    public Archetype AttachmentsAnimationRootArchetype;
+    public Archetype WorldObjectMeshRendererArchetype;
+
+    
     public Archetypes(IEntityManager entityManager)
     {
         this.entityManager = entityManager;
@@ -66,18 +76,54 @@ public class Archetypes
             .WithComponentData<Collider>()
             .WithComponentData<WorldMeshBounds>()
             .WithComponentData<MeshRenderer>();
+            
         TerrainEntityArchetype = entityManager.NewArchetype()
             .WithComponentData<RenderEnabledBit>()
             .WithComponentData<LocalToWorld>()
             .WithComponentData<WorldMeshBounds>()
             .WithComponentData<MeshRenderer>();
+        
         RenderEntityArchetype = entityManager.NewArchetype()
             .WithComponentData<RenderEnabledBit>()
             .WithComponentData<LocalToWorld>()
             .WithComponentData<MeshBounds>()
             .WithComponentData<DirtyPosition>()
-//                .WithComponentData<Collider>()
             .WithComponentData<WorldMeshBounds>()
             .WithComponentData<MeshRenderer>();
+
+        CullingArchetype = entityManager.NewArchetype()
+            .WithComponentData<RenderEnabledBit>()
+            .WithComponentData<WorldMeshBounds>();
+
+        DynamicObjectArchetype = entityManager.NewArchetype()
+            .WithComponentData<DirtyPosition>();
+
+        WorldObjectCollider = CollisionOnlyArchetype
+            .WithComponentData<MeshBounds>()
+            .WithComponentData<DirtyPosition>()
+            .WithComponentData<CopyParentTransform>();
+
+        WorldObjectArchetype = entityManager.NewArchetype()
+            .WithComponentData<DirtyPosition>()
+            .WithComponentData<MeshBounds>()
+            .WithComponentData<RenderEnabledBit>()
+            .WithComponentData<WorldMeshBounds>()
+            .WithManagedComponentData<M2AnimationComponentData>()
+            .WithComponentData<LocalToWorld>();
+
+        AttachmentsAnimationRootArchetype = entityManager.NewArchetype()
+            .Includes(CullingArchetype)
+            .Includes(DynamicObjectArchetype)
+            .WithComponentData<LocalToWorld>()
+            .WithComponentData<CopyParentTransform>()
+            .WithComponentData<MeshBounds>()
+            .WithManagedComponentData<M2AnimationComponentData>();
+        
+        WorldObjectMeshRendererArchetype = entityManager.NewArchetype()
+            .Includes(DynamicObjectArchetype)
+            .Includes(CullingArchetype)
+            .Includes(RenderEntityArchetype)
+            .Includes(StaticM2WorldObjectAnimatedArchetype)
+            .WithComponentData<CopyParentTransform>();
     }
 }

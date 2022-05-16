@@ -38,16 +38,16 @@ namespace TheEngine.PhysicsSystem
                 .WithComponentData<WorldMeshBounds>();
         }
 
-        public List<(Entity, Vector3)>? RaycastAll(Ray ray, Vector3? customOrigin)
+        public List<(Entity, Vector3)>? RaycastAll(Ray ray, Vector3? customOrigin, uint collisionMask = 0)
         {
             List<(Entity, Vector3)> destinationList = new();
-            RaycastAll(ray, customOrigin, destinationList);
+            RaycastAll(ray, customOrigin, destinationList, collisionMask);
             if (destinationList.Count == 0)
                 return null;
             return destinationList;
         }
         
-        public void RaycastAll(Ray ray, Vector3? customOrigin, List<(Entity, Vector3)> destinationList)
+        public void RaycastAll(Ray ray, Vector3? customOrigin, List<(Entity, Vector3)> destinationList, uint collisionMask = 0)
         {
             ThreadLocal<List<(Entity, Vector3)>?> localEntities = new ThreadLocal<List<(Entity, Vector3)>?>(true);
             colliders.ParallelForEach<Collider, WorldMeshBounds, MeshRenderer, LocalToWorld>((itr, start, end, colliders, meshBounds, renderer, localToWorld) =>
@@ -55,6 +55,8 @@ namespace TheEngine.PhysicsSystem
                 List<(Entity, Vector3)>? result = null;
                 for (int i = start; i < end; ++i)
                 {
+                    if (collisionMask != 0 && (colliders[i].CollisionMask & collisionMask) == 0)
+                        continue;
                     //if (!doRender[i])
                     //    continue;
                     var intersects = IntersectsBoundingBox(in ray, ref meshBounds[i]);

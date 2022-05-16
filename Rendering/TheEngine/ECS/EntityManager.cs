@@ -70,10 +70,33 @@ namespace TheEngine.ECS
             }
             GetComponent<T>(entity) = component;
         }
+        
+        public void AddManagedComponent<T>(Entity entity, T component) where T : class, IManagedComponentData
+        {
+            ulong currentArchetypeHash = entitiesArchetype[entity.Id];
+            var componentTypeData = ManagedTypeData<T>();
+
+            var entityAlreadyHasComponent = (currentArchetypeHash & componentTypeData.GlobalHash) != 0;
+            if (entityAlreadyHasComponent)
+            {
+                Console.WriteLine("The entity has already the component, consider using SetManagedComponent<T>(value) for more performance");
+            }
+            else
+            {
+                var oldArchetype = archetypes[currentArchetypeHash];
+                var newArchetype = oldArchetype.WithManagedComponentData<T>();
+                dataManager.MoveEntity(entity, oldArchetype, newArchetype);
+                entitiesArchetype[entity.Id] = newArchetype.Hash;
+            }
+            SetManagedComponent<T>(entity, component);
+        }
 
         public void DestroyEntity(Entity entity)
         {
-            dataManager.RemoveEntity(entity, entitiesArchetype[entity.Id]);
+            if (entities[entity.Id].Version != entity.Version)
+                throw new Exception("Double remove entity, that's not allowed!");
+            var archetypeHash = entitiesArchetype[entity.Id];
+            dataManager.RemoveEntity(entity, archetypeHash);
             freeEntities.Add(entity);
             entities[entity.Id] = Entity.Empty;
             entitiesArchetype[entity.Id] = 0;

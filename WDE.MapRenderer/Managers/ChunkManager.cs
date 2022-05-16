@@ -10,6 +10,7 @@ using TheEngine.Handles;
 using TheEngine.Interfaces;
 using TheEngine.Managers;
 using TheMaths;
+using WDE.MapRenderer.Managers.Entities;
 using WDE.MapRenderer.StaticData;
 using WDE.MpqReader;
 using WDE.MpqReader.Readers;
@@ -317,6 +318,7 @@ namespace WDE.MapRenderer.Managers
                     ArrayPool<Vector3>.Shared.Return(subVertices);
                     ArrayPool<int>.Shared.Return(indices);
                     var entity = entityManager.CreateEntity(archetypes.CollisionOnlyArchetype);
+                    entityManager.GetComponent<Collider>(entity).CollisionMask = Collisions.COLLISION_MASK_TERRAIN;
                     entityManager.GetComponent<LocalToWorld>(entity).Matrix = Matrix.Identity;
                     entityManager.GetComponent<MeshRenderer>(entity).SubMeshId = 0;
                     entityManager.GetComponent<MeshRenderer>(entity).MeshHandle = subChunkMesh.Handle;
@@ -587,6 +589,7 @@ namespace WDE.MapRenderer.Managers
                         {
                             var entity = entityManager.CreateEntity(archetypes.CollisionOnlyArchetype);
                             entityManager.GetComponent<LocalToWorld>(entity).Matrix = wmoTransform.LocalToWorldMatrix;
+                            entityManager.GetComponent<Collider>(entity).CollisionMask = Collisions.COLLISION_MASK_WMO;
                             entityManager.GetComponent<MeshRenderer>(entity).SubMeshId = i - 1;
                             entityManager.GetComponent<MeshRenderer>(entity).MeshHandle = mesh.Item1.Handle;
                             entityManager.GetComponent<WorldMeshBounds>(entity) = RenderManager.LocalToWorld((MeshBounds)mesh.Item1.Bounds, new LocalToWorld() { Matrix = wmoTransform.LocalToWorldMatrix });   

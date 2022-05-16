@@ -1,4 +1,9 @@
 using System.Collections;
+using TheEngine;
+using TheEngine.Coroutines;
+using TheEngine.ECS;
+using TheEngine.Interfaces;
+using TheEngine.PhysicsSystem;
 using TheMaths;
 using WDE.MpqReader;
 using WDE.MpqReader.DBC;
@@ -24,5 +29,34 @@ namespace WDE.MapRenderer.Managers
         Map CurrentMap { get; }
         void SetMap(int id, Vector3? position = null);
         void StartCoroutine(IEnumerator coroutine);
+        
+        CoroutineManager CoroutineManager { get; }
+        NotificationsCenter NotificationsCenter { get; }
+        TimeManager TimeManager { get; }
+        ScreenSpaceSelector ScreenSpaceSelector { get; }
+        WoWMeshManager MeshManager { get; }
+        WoWTextureManager TextureManager { get; }
+        ChunkManager ChunkManager { get; }
+        ModuleManager ModuleManager { get; }
+        MdxManager MdxManager { get; }
+        WmoManager WmoManager { get; }
+        CameraManager CameraManager { get; }
+        RaycastSystem RaycastSystem { get; }
+        DbcManager DbcManager { get; }
+        LightingManager LightingManager { get; }
+        AreaTriggerManager AreaTriggerManager { get; }
+        UpdateManager UpdateLoop { get; }
+        WorldManager WorldManager { get; }
+        LoadingManager LoadingManager { get; }
+        CreatureManager CreatureManager { get; }
+        GameObjectManager GameObjectManager { get; }
+        AnimationSystem AnimationSystem { get; }
+        IEntityManager EntityManager { get; }
+        ITextureManager EngineTextureManager { get; }
+        IMeshManager EngineMeshManager { get; }
+        IMaterialManager MaterialManager { get; }
+        Archetypes Archetypes { get; }
+        Engine Engine { get; }
+        IUIManager UiManager { get; }
     }
 }

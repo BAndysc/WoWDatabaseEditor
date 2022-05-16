@@ -46,18 +46,27 @@ namespace TheEngine.Components
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get => matrix.TranslationVector;
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            set => matrix = Matrix.TRS(value, Rotation, Scale);
         }
 
         public Vector3 Scale
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get => matrix.ScaleVector;
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            set => matrix = Matrix.TRS(Position, Rotation, value);
         }
 
         public Quaternion Rotation
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get => matrix.Rotation;
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            set => matrix = Matrix.TRS(Position, value, Scale);
         }
 
         public static implicit operator Matrix(LocalToWorld d) => d.matrix;

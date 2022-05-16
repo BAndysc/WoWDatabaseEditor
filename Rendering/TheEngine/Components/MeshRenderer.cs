@@ -32,11 +32,12 @@ namespace TheEngine.Components
             entityManager.GetComponent<MeshBounds>(entity).box = mesh.Bounds;
         }
         
-        public static void SetCollider(this Entity entity, IEntityManager entityManager, IMesh mesh, int subMesh)
+        public static void SetCollider(this Entity entity, IEntityManager entityManager, IMesh mesh, int subMesh, uint collisionMask)
         {
             entityManager.GetComponent<MeshRenderer>(entity).MeshHandle = mesh.Handle;
             entityManager.GetComponent<MeshRenderer>(entity).SubMeshId = subMesh;
             entityManager.GetComponent<MeshBounds>(entity).box = mesh.Bounds;
+            entityManager.GetComponent<Collider>(entity).CollisionMask = collisionMask;
         }
     }
 }

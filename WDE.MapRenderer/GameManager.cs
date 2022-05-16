@@ -1,6 +1,8 @@
 using System.Collections;
 using Prism.Ioc;
+using TheEngine;
 using TheEngine.Coroutines;
+using TheEngine.ECS;
 using TheEngine.Interfaces;
 using TheEngine.PhysicsSystem;
 using TheMaths;
@@ -40,6 +42,35 @@ namespace WDE.MapRenderer
         private GameObjectManager gameObjectManager = null!;
         private AnimationSystem animationSystem = null!;
 
+        public CoroutineManager CoroutineManager => coroutineManager;
+        public NotificationsCenter NotificationsCenter => notificationsCenter;
+        public TimeManager TimeManager => timeManager;
+        public ScreenSpaceSelector ScreenSpaceSelector => screenSpaceSelector;
+        public WoWMeshManager MeshManager => meshManager;
+        public WoWTextureManager TextureManager => textureManager;
+        public ChunkManager ChunkManager => chunkManager;
+        public ModuleManager ModuleManager => moduleManager;
+        public MdxManager MdxManager => mdxManager;
+        public WmoManager WmoManager => wmoManager;
+        public CameraManager CameraManager => cameraManager;
+        public RaycastSystem RaycastSystem => raycastSystem;
+        public DbcManager DbcManager => dbcManager;
+        public LightingManager LightingManager => lightingManager;
+        public AreaTriggerManager AreaTriggerManager => areaTriggerManager;
+        public UpdateManager UpdateLoop => updateLoop;
+        public WorldManager WorldManager => worldManager;
+        public LoadingManager LoadingManager => loadingManager;
+        public CreatureManager CreatureManager => creatureManager;
+        public GameObjectManager GameObjectManager => gameObjectManager;
+        public AnimationSystem AnimationSystem => animationSystem;
+        public Engine Engine { get; }
+        public IEntityManager EntityManager { get; }
+        public ITextureManager EngineTextureManager { get; }
+        public IMeshManager EngineMeshManager { get; }
+        public IMaterialManager MaterialManager { get; }
+        public IUIManager UiManager { get; }
+        public Archetypes Archetypes { get; }
+
         public float Delta { get; private set; }
         public event Action<int>? ChangedMap;
         public Map CurrentMap { get; private set; } = Map.Empty;
@@ -47,13 +78,27 @@ namespace WDE.MapRenderer
         
         public GameManager(IContainerProvider containerProvider, 
             IContainerRegistry registry,
+            Engine engine,
             IGameProperties gameProperties,
-            IRenderManager renderManager)
+            IRenderManager renderManager,
+            IEntityManager entityManager,
+            ITextureManager engineTextureManager,
+            IMeshManager engineMeshManager,
+            IMaterialManager materialManager,
+            IUIManager uiManager,
+            Archetypes archetypes)
         {
             this.containerProvider = containerProvider;
             this.registry = registry;
             this.gameProperties = gameProperties;
             this.renderManager = renderManager;
+            Engine = engine;
+            EntityManager = entityManager;
+            EngineTextureManager = engineTextureManager;
+            EngineMeshManager = engineMeshManager;
+            MaterialManager = materialManager;
+            UiManager = uiManager;
+            Archetypes = archetypes;
             updateLoop = new UpdateManager();
         }
         

@@ -27,6 +27,15 @@ namespace TheEngine.Components
     
     public struct Collider : IComponentData
     {
+        public uint CollisionMask;
+    }
+    
+    public static class ColliderExtensions
+    {
+        public static void SetColliderMask(this Entity entity, IEntityManager entityManager, uint mask)
+        {
+            entityManager.GetComponent<Collider>(entity).CollisionMask = mask;
+        }
     }
     
     public static class DirtyPositionExtensions
