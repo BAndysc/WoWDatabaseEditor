@@ -223,6 +223,73 @@ namespace WDE.MpqReader.Structures
         something_sequence_id = 0x2000, // <=bfa+, parent_bone+submesh_id are a sequence id instead?!
     }
 
+    public enum M2AttachmentType
+    {
+        ItemVisual0 = 0,
+        MountMain = 0,
+        Shield = 0,
+        HandRight = 1,
+        ItemVisual1 = 1,
+        HandLeft = 2,
+        ItemVisual2 = 2,
+        ElbowRight = 3,
+        ItemVisual3 = 3,
+        ElbowLeft = 4,
+        ItemVisual4 = 4,
+        ShoulderRight = 5,
+        ShoulderLeft = 6,
+        KneeRight = 7,
+        KneeLeft = 8,
+        HipRight = 9,
+        HipLeft = 10,
+        Helm = 11,
+        Back = 12,
+        ShoulderFlapRight = 13,
+        ShoulderFlapLeft = 14,
+        ChestBloodFront = 15,
+        ChestBloodBack = 16,
+        Breath = 17,
+        PlayerName = 18,
+        Base = 19,
+        Head = 20,
+        SpellLeftHand = 21,
+        SpellRightHand = 22,
+        Special1 = 23,
+        Special2 = 24,
+        Special3 = 25,
+        SheathMainHand = 26,
+        SheathOffHand = 27,
+        SheathShield = 28,
+        PlayerNameMounted = 29,
+        LargeWeaponLeft = 30,
+        LargeWeaponRight = 31,
+        HipWeaponLeft = 32,
+        HipWeaponRight = 33,
+        Chest = 34,
+        HandArrow = 35,
+        Bullet = 36,
+        SpellHandOmni = 37,
+        SpellHandDirected = 38,
+        VehicleSeat1 = 39,
+        VehicleSeat2 = 40,
+        VehicleSeat3 = 41,
+        VehicleSeat4 = 42,
+        VehicleSeat5 = 43,
+        VehicleSeat6 = 44,
+        VehicleSeat7 = 45,
+        VehicleSeat8 = 46,
+        LeftFoot = 47,
+        RightFoot = 48,
+        ShieldNoGlove = 49,
+        SpineLow = 50,
+        AlteredShoulderR = 51,
+        AlteredShoulderL = 52,
+        BeltBuckle = 53,
+        SheathCrossbow = 54,
+        HeadTop = 55,
+        VirtualSpellDirected = 57,
+        Unknown = 60
+    }
 
     public class M2Texture
     {
@@ -342,8 +409,8 @@ namespace WDE.MpqReader.Structures
 
     public class M2Attachment
     {
-        public uint id { get; init; }                      // Referenced in the lookup-block below.
-        public ushort bone { get; init; }                    // attachment base
+        public M2AttachmentType id { get; init; }                      // Referenced in the lookup-block below.
+        public short bone { get; init; }                    // attachment base
         public ushort unknown { get; init; }                 // see BogBeast.m2 in vanilla for a model having values here
         public Vector3 position { get; init; }               // relative to bone; Often this value is the same as bone's pivot point 
         public M2Track<char> animate_attached { get; init; }  // whether or not the attached model is animated when this model is. only a bool is used. default is true.
@@ -354,8 +421,8 @@ namespace WDE.MpqReader.Structures
         {
             return new M2Attachment()
             {
-                id = reader.ReadUInt32(),
-                bone = reader.ReadUInt16(),
+                id = (M2AttachmentType)reader.ReadUInt32(),
+                bone = reader.ReadInt16(),
                 unknown = reader.ReadUInt16(),
                 position = reader.ReadVector3(),
                 animate_attached = M2Track<char>.Read(reader, r => (char)r.ReadByte())

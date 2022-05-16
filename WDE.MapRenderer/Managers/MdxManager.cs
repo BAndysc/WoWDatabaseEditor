@@ -65,6 +65,7 @@ namespace WDE.MapRenderer.Managers
             public Material[] materials;
             public M2 model;
             private bool? hasAnimations;
+            public List<(M2AttachmentType, MdxInstance)>? attachments;
 
             public bool HasAnimations
             {
@@ -114,9 +115,11 @@ namespace WDE.MapRenderer.Managers
         }
 
         private Dictionary<string, MdxInstance?> meshes = new();
-        private Dictionary<uint, MdxInstance?> creaturemeshes = new();
         private Dictionary<string, Task<MdxInstance?>> meshesCurrentlyLoaded = new();
+        private Dictionary<uint, MdxInstance?> creaturemeshes = new();
         private Dictionary<uint, Task<MdxInstance?>> creatureMeshesCurrentlyLoaded = new();
+        private Dictionary<(uint displayId, bool right), MdxInstance?> itemMeshes = new();
+        private Dictionary<(uint displayId, bool right), Task<MdxInstance?>> itemMeshesCurrentlyLoaded = new();
         private readonly IGameFiles gameFiles;
         private readonly IMeshManager meshManager;
         private readonly IMaterialManager materialManager;
@@ -276,7 +279,7 @@ namespace WDE.MapRenderer.Managers
                 m2 = M2.Read(new MemoryBinaryReader(file.Result), m2FilePath, p =>
                 {
                     // TODO: can I use ReadFileSync? Can be problematic...
-                    var bytes = gameFiles.ReadFileSyncLocked(p);
+                    var bytes = gameFiles.ReadFileSyncLocked(p, true);
                     if (bytes == null)
                         return null;
                     return new MemoryBinaryReader(bytes);
@@ -317,10 +320,15 @@ namespace WDE.MapRenderer.Managers
             bool isCharacterModel = false;
             HashSet<int>? activeGeosets = null;
             
+            List<(M2AttachmentType, MdxInstance)>? attachments = null;
+            
             if (creatureDisplayInfo.ExtendedDisplayInfoID > 0)
             {
                 if (creatureDisplayInfoExtraStore.TryGetValue(creatureDisplayInfo.ExtendedDisplayInfoID, out var displayinfoextra))
                 {
+                    attachments = new();
+                    var itemModelPromise = new TaskCompletionSource<MdxInstance?>();
+
                     isCharacterModel = true;
                     int geosetSkin = 0;
                     int geosetHair = 1;
@@ -376,21 +384,46 @@ namespace WDE.MapRenderer.Managers
                     }
 
                     if (displayinfoextra.Helm > 0)
-                        geosetHelm = 2702 + itemDisplayInfoStore[(uint)displayinfoextra.Helm].geosetGroup1;
+                    {
                         // geoset group 2 ? some enable/disable 2100 (head) ?
+                        geosetHelm = 2702 + itemDisplayInfoStore[displayinfoextra.Helm].geosetGroup1;
+                        yield return LoadItemMesh(displayinfoextra.Helm, false, itemModelPromise);
+                        if (itemModelPromise.Task.Result != null)
+                            attachments.Add((M2AttachmentType.Helm, itemModelPromise.Task.Result));
+                        itemModelPromise = new();
+                    }
 
                     if (displayinfoextra.Shoulder > 0)
+                    {
                         geosetShoulders = 2601 + itemDisplayInfoStore[(uint)displayinfoextra.Shoulder].geosetGroup1;
+                        yield return LoadItemMesh(displayinfoextra.Shoulder, false, itemModelPromise);
+                        if (itemModelPromise.Task.Result != null)
+                            attachments.Add((M2AttachmentType.ShoulderLeft, itemModelPromise.Task.Result));
+                        itemModelPromise = new();
+                        
+                        yield return LoadItemMesh(displayinfoextra.Shoulder, true, itemModelPromise);
+                        if (itemModelPromise.Task.Result != null)
+                            attachments.Add((M2AttachmentType.ShoulderRight, itemModelPromise.Task.Result));
+                        itemModelPromise = new();
+                    }
 
                     if (displayinfoextra.Shirt > 0)
                     {
                         geosetSleeves = 801 + itemDisplayInfoStore[(uint)displayinfoextra.Shirt].geosetGroup1;
                         geosetChest = 1001 + itemDisplayInfoStore[(uint)displayinfoextra.Shirt].geosetGroup2;
+                        yield return LoadItemMesh(displayinfoextra.Shirt, false, itemModelPromise);
+                        if (itemModelPromise.Task.Result != null)
+                            attachments.Add((M2AttachmentType.Chest, itemModelPromise.Task.Result));
+                        itemModelPromise = new();
                     }
                     if (displayinfoextra.Cuirass > 0)
                     {
                         geosetSleeves = 801 + itemDisplayInfoStore[(uint)displayinfoextra.Cuirass].geosetGroup1;
                         geosetChest = 1001 + itemDisplayInfoStore[(uint)displayinfoextra.Cuirass].geosetGroup2;
+                        yield return LoadItemMesh(displayinfoextra.Cuirass, false, itemModelPromise);
+                        if (itemModelPromise.Task.Result != null)
+                            attachments.Add((M2AttachmentType.Chest, itemModelPromise.Task.Result));
+                        itemModelPromise = new();
                         // 1301 trousers set below
                         // in later expensions, geoset group 4 and 5 ?
                     }
@@ -400,27 +433,63 @@ namespace WDE.MapRenderer.Managers
                         geosetpants = 801 + itemDisplayInfoStore[(uint)displayinfoextra.Legs].geosetGroup1;
                         geosetlegcuffs = 1001 + itemDisplayInfoStore[(uint)displayinfoextra.Legs].geosetGroup2;
                         geosetTrousers = 1301 + itemDisplayInfoStore[(uint)displayinfoextra.Legs].geosetGroup3;
+                        yield return LoadItemMesh(displayinfoextra.Legs, false, itemModelPromise);
+                        if (itemModelPromise.Task.Result != null)
+                            attachments.Add((M2AttachmentType.Base, itemModelPromise.Task.Result)); // base?
+                        itemModelPromise = new();
                     }
 
                     if (displayinfoextra.Boots > 0)
                     {
                         geosetBoots = 501 + itemDisplayInfoStore[(uint)displayinfoextra.Boots].geosetGroup1;
                         geosetFeet = 2002 + itemDisplayInfoStore[(uint)displayinfoextra.Boots].geosetGroup2;
+                        yield return LoadItemMesh(displayinfoextra.Boots, false, itemModelPromise);
+                        if (itemModelPromise.Task.Result != null)
+                            attachments.Add((M2AttachmentType.LeftFoot, itemModelPromise.Task.Result));
+                        itemModelPromise = new();
                     }
 
                     if (displayinfoextra.Gloves > 0)
                     {
                         geosetGlove = 401 + itemDisplayInfoStore[(uint)displayinfoextra.Gloves].geosetGroup1;
                         geosetHandsAttachments = 2301 + itemDisplayInfoStore[(uint)displayinfoextra.Gloves].geosetGroup2;
+                        yield return LoadItemMesh(displayinfoextra.Gloves, false, itemModelPromise);
+                        if (itemModelPromise.Task.Result != null)
+                            attachments.Add((M2AttachmentType.HandLeft, itemModelPromise.Task.Result));
+                        itemModelPromise = new();
+                        yield return LoadItemMesh(displayinfoextra.Gloves, true, itemModelPromise);
+                        if (itemModelPromise.Task.Result != null)
+                            attachments.Add((M2AttachmentType.HandRight, itemModelPromise.Task.Result));
+                        itemModelPromise = new();
                     }
+
                     if (displayinfoextra.Cape > 0)
+                    {
                         geosetCloak = 1501 + itemDisplayInfoStore[(uint)displayinfoextra.Cape].geosetGroup1;
+                        yield return LoadItemMesh(displayinfoextra.Cape, false, itemModelPromise);
+                        if (itemModelPromise.Task.Result != null)
+                            attachments.Add((M2AttachmentType.Base, itemModelPromise.Task.Result));
+                        itemModelPromise = new();
+                    }
 
                     if (displayinfoextra.Tabard > 0)
+                    {
                         geosetTabard = 1201 + itemDisplayInfoStore[(uint)displayinfoextra.Tabard].geosetGroup1;
+                        yield return LoadItemMesh(displayinfoextra.Tabard, false, itemModelPromise);
+                        if (itemModelPromise.Task.Result != null)
+                            attachments.Add((M2AttachmentType.Base, itemModelPromise.Task.Result));
+                        itemModelPromise = new();
+                    }
 
                     if (displayinfoextra.Belt > 0) // priority : belt > tabard
+                    {
                         geosetBelt = 1801 + itemDisplayInfoStore[(uint)displayinfoextra.Belt].geosetGroup1;
+                        
+                        yield return LoadItemMesh(displayinfoextra.Belt, false, itemModelPromise);
+                        if (itemModelPromise.Task.Result != null)
+                            attachments.Add((M2AttachmentType.Base, itemModelPromise.Task.Result));
+                        itemModelPromise = new();
+                    }
 
                     // Priority : Chest geosetGroup[2] (1301 set) > Pants geosetGroup[2] (1301 set) > Boots geosetGroup[0] (501 set) > Pants geosetGroup[1] (901 set)
                     if (displayinfoextra.Cuirass > 0)
@@ -566,94 +635,7 @@ namespace WDE.MapRenderer.Managers
                     }
                 }
 
-                var materialDef = m2.materials[batch.materialIndex];
-                var material = materialManager.CreateMaterial("data/m2.json");
-
-                material.SetBuffer("boneMatrices", identityBonesBuffer);
-                material.SetTexture("texture1", th ?? textureManager.EmptyTexture);
-                material.SetTexture("texture2", th2 ?? textureManager.EmptyTexture);
-
-                var trans = 1.0f;
-                if (batch.colorIndex != -1 && m2.colors.Length < batch.colorIndex)
-                {
-                    if (m2.colors[batch.colorIndex].alpha.values.Length == 0 || m2.colors[batch.colorIndex].alpha.values[0].Length == 0)
-                        trans = 1;
-                    else
-                        trans = m2.colors[batch.colorIndex].alpha.values[0][0].Value;
-                }
-
-                if (batch.textureTransparencyLookupId != -1 && m2.textureWeights.Length < batch.textureTransparencyLookupId)
-                {
-                    if (m2.textureWeights[batch.textureTransparencyLookupId].weight.values.Length > 0 && m2.textureWeights[batch.textureTransparencyLookupId].weight.values[0].Length > 0)
-                        trans *= m2.textureWeights[batch.textureTransparencyLookupId].weight.values[0][0].Value;
-                }
-                
-                Vector4 mesh_color = new Vector4(1.0f, 1.0f, 1.0f, trans);
-    
-                material.SetUniform("mesh_color", mesh_color);
-                batch.shaderId = ResolveShaderID1(batch.shaderId, m2, batch, (m2.global_flags & M2Flags.FLAG_USE_TEXTURE_COMBINER_COMBOS) != 0, (int)materialDef.blending_mode);
-                var shaders = ConvertShaderIDs(m2, batch);
-                material.SetUniformInt("pixel_shader", (int)shaders.Item2);
-                //Console.WriteLine(path + " INDEX: " + j + " Pixel shader: " + M2GetPixelShaderID(batch.textureCount, batch.shader_id) + " tex count: " + batch.textureCount + " shader id: " + batch.shader_id + " blend: " + materialDef.blending_mode + " priority " + batch.priorityPlane + " start ");
-                
-                material.SetUniform("highlight", 0);
-                material.SetUniform("notSupported", 0);
-                if (materialDef.blending_mode == M2Blend.M2BlendOpaque)
-                {
-                    material.BlendingEnabled = false;
-                    material.SetUniform("alphaTest", -1);
-                }
-                else if (materialDef.blending_mode == M2Blend.M2BlendAlphaKey)
-                {
-                    material.BlendingEnabled = false;
-                    //material.SourceBlending = Blending.One;
-                    //material.DestinationBlending = Blending.Zero;
-                    material.SetUniform("alphaTest", 224.0f / 255.0f);
-                }
-                else if (materialDef.blending_mode == M2Blend.M2BlendAlpha)
-                {
-                    material.BlendingEnabled = true;
-                    material.SourceBlending = Blending.SrcAlpha;
-                    material.DestinationBlending = Blending.OneMinusSrcAlpha;
-                    material.SetUniform("alphaTest", 1.0f / 255.0f);
-                }
-                else if (materialDef.blending_mode == M2Blend.M2BlendNoAlphaAdd)
-                {
-                    material.BlendingEnabled = true;
-                    material.SourceBlending = Blending.One;
-                    material.DestinationBlending = Blending.One;
-                    material.SetUniform("alphaTest", 1.0f / 255.0f);
-                }
-                else if (materialDef.blending_mode == M2Blend.M2BlendAdd)
-                {
-                    material.BlendingEnabled = true;
-                    material.SourceBlending = Blending.SrcAlpha;
-                    material.DestinationBlending = Blending.One;
-                    material.SetUniform("alphaTest", 1.0f / 255.0f);
-                }
-                else if (materialDef.blending_mode == M2Blend.M2BlendMod)
-                {
-                    material.BlendingEnabled = true;
-                    material.SourceBlending = Blending.DstColor;
-                    material.DestinationBlending = Blending.Zero;
-                    material.SetUniform("alphaTest", 1.0f / 255.0f);
-                }
-                else if (materialDef.blending_mode == M2Blend.M2BlendMod2X)
-                {
-                    material.BlendingEnabled = true;
-                    material.SourceBlending = Blending.DstColor;
-                    material.DestinationBlending = Blending.SrcColor;
-                    material.SetUniform("alphaTest", 1.0f / 255.0f);
-                }
-                else
-                    material.SetUniform("notSupported", 1);
-
-                material.ZWrite = !material.BlendingEnabled;
-                //material.DepthTesting = materialDef.flags.HasFlag(M2MaterialFlags.DepthTest); // produces wrong results :thonk:
-
-                if (materialDef.flags.HasFlag(M2MaterialFlags.TwoSided))
-                    material.Culling = CullingMode.Off;
-                material.SetUniformInt("unlit", materialDef.flags.HasFlag(M2MaterialFlags.Unlit) ? 1 : 0);
+                var material = CreateMaterial(m2, batch, th, th2);
 
                 materials[j - 1] = material;
             }
@@ -664,12 +646,328 @@ namespace WDE.MapRenderer.Managers
             {
                 mesh = mesh,
                 materials = materials.AsSpan(0, j).ToArray(),
-                model = m2
+                model = m2,
+                attachments = attachments
             };
             creaturemeshes.Add(displayid, mdx); // titi test
             completion.SetResult(mdx);
             creatureMeshesCurrentlyLoaded.Remove(displayid);
             result.SetResult(mdx);    
+        }
+
+        private Material CreateMaterial(M2 m2, M2Batch batch, TextureHandle? textureHandle1, TextureHandle? textureHandle2)
+        {
+            var materialDef = m2.materials[batch.materialIndex];
+            var material = materialManager.CreateMaterial("data/m2.json");
+
+            material.SetBuffer("boneMatrices", identityBonesBuffer);
+            material.SetTexture("texture1", textureHandle1 ?? textureManager.EmptyTexture);
+            material.SetTexture("texture2", textureHandle2 ?? textureManager.EmptyTexture);
+
+            var trans = 1.0f;
+            if (batch.colorIndex != -1 && m2.colors.Length < batch.colorIndex)
+            {
+                if (m2.colors[batch.colorIndex].alpha.values.Length == 0 ||
+                    m2.colors[batch.colorIndex].alpha.values[0].Length == 0)
+                    trans = 1;
+                else
+                    trans = m2.colors[batch.colorIndex].alpha.values[0][0].Value;
+            }
+
+            if (batch.textureTransparencyLookupId != -1 && m2.textureWeights.Length < batch.textureTransparencyLookupId)
+            {
+                if (m2.textureWeights[batch.textureTransparencyLookupId].weight.values.Length > 0 &&
+                    m2.textureWeights[batch.textureTransparencyLookupId].weight.values[0].Length > 0)
+                    trans *= m2.textureWeights[batch.textureTransparencyLookupId].weight.values[0][0].Value;
+            }
+
+            Vector4 mesh_color = new Vector4(1.0f, 1.0f, 1.0f, trans);
+
+            material.SetUniform("mesh_color", mesh_color);
+            batch.shaderId = ResolveShaderID1(batch.shaderId, m2, batch,
+                (m2.global_flags & M2Flags.FLAG_USE_TEXTURE_COMBINER_COMBOS) != 0, (int)materialDef.blending_mode);
+            var shaders = ConvertShaderIDs(m2, batch);
+            material.SetUniformInt("pixel_shader", (int)shaders.Item2);
+            //Console.WriteLine(path + " INDEX: " + j + " Pixel shader: " + M2GetPixelShaderID(batch.textureCount, batch.shader_id) + " tex count: " + batch.textureCount + " shader id: " + batch.shader_id + " blend: " + materialDef.blending_mode + " priority " + batch.priorityPlane + " start ");
+
+            material.SetUniform("highlight", 0);
+            material.SetUniform("notSupported", 0);
+            if (materialDef.blending_mode == M2Blend.M2BlendOpaque)
+            {
+                material.BlendingEnabled = false;
+                material.SetUniform("alphaTest", -1);
+            }
+            else if (materialDef.blending_mode == M2Blend.M2BlendAlphaKey)
+            {
+                material.BlendingEnabled = false;
+                //material.SourceBlending = Blending.One;
+                //material.DestinationBlending = Blending.Zero;
+                material.SetUniform("alphaTest", 224.0f / 255.0f);
+            }
+            else if (materialDef.blending_mode == M2Blend.M2BlendAlpha)
+            {
+                material.BlendingEnabled = true;
+                material.SourceBlending = Blending.SrcAlpha;
+                material.DestinationBlending = Blending.OneMinusSrcAlpha;
+                material.SetUniform("alphaTest", 1.0f / 255.0f);
+            }
+            else if (materialDef.blending_mode == M2Blend.M2BlendNoAlphaAdd)
+            {
+                material.BlendingEnabled = true;
+                material.SourceBlending = Blending.One;
+                material.DestinationBlending = Blending.One;
+                material.SetUniform("alphaTest", 1.0f / 255.0f);
+            }
+            else if (materialDef.blending_mode == M2Blend.M2BlendAdd)
+            {
+                material.BlendingEnabled = true;
+                material.SourceBlending = Blending.SrcAlpha;
+                material.DestinationBlending = Blending.One;
+                material.SetUniform("alphaTest", 1.0f / 255.0f);
+            }
+            else if (materialDef.blending_mode == M2Blend.M2BlendMod)
+            {
+                material.BlendingEnabled = true;
+                material.SourceBlending = Blending.DstColor;
+                material.DestinationBlending = Blending.Zero;
+                material.SetUniform("alphaTest", 1.0f / 255.0f);
+            }
+            else if (materialDef.blending_mode == M2Blend.M2BlendMod2X)
+            {
+                material.BlendingEnabled = true;
+                material.SourceBlending = Blending.DstColor;
+                material.DestinationBlending = Blending.SrcColor;
+                material.SetUniform("alphaTest", 1.0f / 255.0f);
+            }
+            else
+                material.SetUniform("notSupported", 1);
+
+            material.ZWrite = !material.BlendingEnabled;
+            //material.DepthTesting = materialDef.flags.HasFlag(M2MaterialFlags.DepthTest); // produces wrong results :thonk:
+
+            if (materialDef.flags.HasFlag(M2MaterialFlags.TwoSided))
+                material.Culling = CullingMode.Off;
+            material.SetUniformInt("unlit", materialDef.flags.HasFlag(M2MaterialFlags.Unlit) ? 1 : 0);
+            return material;
+        }
+
+        public IEnumerator LoadItemMesh(uint displayid, bool right, TaskCompletionSource<MdxInstance?> result)
+        {
+            if (itemMeshes.ContainsKey((displayid, right)))
+            {
+                result.SetResult(itemMeshes[(displayid, right)]);
+                yield break;
+            }
+
+            if (itemMeshesCurrentlyLoaded.TryGetValue((displayid, right), out var loadInProgress))
+            {
+                yield return new WaitForTask(loadInProgress);
+                result.SetResult(itemMeshes[(displayid, right)]);
+                yield break;
+            }
+
+            var completion = new TaskCompletionSource<MdxInstance?>();
+            itemMeshesCurrentlyLoaded[(displayid, right)] = completion.Task;
+
+            if (!itemDisplayInfoStore.TryGetValue(displayid, out var displayInfo))
+            {
+                Console.WriteLine("Cannot find item display id " + displayid);
+                itemMeshes[(displayid, right)] = null;
+                completion.SetResult(null);
+                itemMeshesCurrentlyLoaded.Remove((displayid, right));
+                result.SetResult(null);
+                yield break;
+            }
+
+            if ((string.IsNullOrEmpty(displayInfo.LeftModel) && !right) ||
+                (string.IsNullOrEmpty(displayInfo.RightModel) && right))
+            {
+                itemMeshes[(displayid, right)] = null;
+                completion.SetResult(null);
+                itemMeshesCurrentlyLoaded.Remove((displayid, right));
+                result.SetResult(null);
+                yield break;
+            }
+
+            // don't know what is the right way to determine the folder name
+            // that works for 3.3.5 tho
+            var folderPath = "ITEM\\OBJECTCOMPONENTS\\";
+            var model = right ? displayInfo.RightModel : displayInfo.LeftModel;
+            var texture = right ? displayInfo.RightModelTexture : displayInfo.LeftModelTexture;
+
+            if (model.StartsWith("Arrow") || model.StartsWith("Bullet"))
+                folderPath += "AMMO\\";
+            else if (model.StartsWith("Helm"))
+            {
+                folderPath += "HELM\\";
+                model = Path.ChangeExtension(model, null) + "_m.M2";
+            }
+            else if (model.StartsWith("Pouch"))
+                folderPath += "Pouch\\";
+            else if (model.StartsWith("Shield") || model.StartsWith("Buckler"))
+                folderPath += "Shield\\";
+            else if (model.StartsWith("LShoulder") || model.StartsWith("RShoulder"))
+                folderPath += "Shoulder\\";
+            else
+                folderPath += "WEAPON\\";
+            
+            var m2FilePath = folderPath + model;
+            var texturePath = folderPath + texture + ".blp";
+            
+            m2FilePath = m2FilePath.Replace("mdx", "M2", StringComparison.InvariantCultureIgnoreCase);
+            m2FilePath = m2FilePath.Replace("mdl", "M2", StringComparison.InvariantCultureIgnoreCase); // apaprently there are still some MDL models
+            
+            var skinFilePath = m2FilePath.Replace(".m2", "00.skin", StringComparison.InvariantCultureIgnoreCase);
+            var file = gameFiles.ReadFile(m2FilePath);
+
+            yield return new WaitForTask(file);
+
+            var skinFile = gameFiles.ReadFile(skinFilePath);
+            
+            yield return new WaitForTask(skinFile);
+            
+            if (file.Result == null || skinFile.Result == null)
+            {
+                Console.WriteLine("Cannot find model " + m2FilePath);
+                itemMeshes[(displayid, right)] = null;
+                completion.SetResult(null);
+                itemMeshesCurrentlyLoaded.Remove((displayid, right));
+                result.SetResult(null);
+                yield break;
+            }
+
+            M2 m2 = null!;
+            M2Skin skin = null!;
+            Vector3[] vertices = null!;
+            Vector3[] normals = null!;
+            Vector2[] uv1 = null!;
+            Vector2[] uv2 = null!;
+            Vector4[] packedBones = null!;
+
+            yield return new WaitForTask(Task.Run(() =>
+            {
+                m2 = M2.Read(new MemoryBinaryReader(file.Result), m2FilePath, p =>
+                {
+                    // TODO: can I use ReadFileSync? Can be problematic...
+                    var bytes = gameFiles.ReadFileSyncLocked(p, true);
+                    if (bytes == null)
+                        return null;
+                    return new MemoryBinaryReader(bytes);
+                });
+                file.Result.Dispose();
+                skin = M2Skin.Read(new MemoryBinaryReader(skinFile.Result));
+                skinFile.Result.Dispose();
+                var count = m2.vertices.Length;
+                vertices = new Vector3[count];
+                normals = new Vector3[count];
+                uv1 = new Vector2[count];
+                uv2 = new Vector2[count];
+                packedBones = new Vector4[count];
+                
+                for (int i = 0; i < count; ++i)
+                {
+                    var vert = m2.vertices[skin.Vertices[i]];
+                    vertices[i] = vert.pos;
+                    normals[i] = vert.normal;
+                    uv1[i] = vert.tex_coords[0];
+                    uv2[i] = vert.tex_coords[1];
+                    var packedWeights = (uint)vert.bone_weights[0] | ((uint)vert.bone_weights[1] << 8) |
+                                        ((uint)vert.bone_weights[2] << 16) | ((uint)vert.bone_weights[3] << 24);
+                    var packetWeightsFloat = UintAsFloat(packedWeights);
+                    
+                    var packedIndices = (uint)vert.bone_indices[0] | ((uint)vert.bone_indices[1] << 8) |
+                                        ((uint)vert.bone_indices[2] << 16) | ((uint)vert.bone_indices[3] << 24);
+                    var packedIndicesFloat = UintAsFloat(packedIndices);
+                    packedBones[i] = new Vector4(packedIndicesFloat, packetWeightsFloat, 0, 0);
+                }
+            }));
+            
+            var md = new MeshData(vertices, normals, uv1, new int[] { }, null, null, uv2, packedBones);
+            
+            var mesh = meshManager.CreateMesh(md);
+            mesh.SetSubmeshCount(skin.Batches.Length);
+
+            Material[] materials = new Material[skin.Batches.Length];
+            int j = 0;
+            foreach (var batch in skin.Batches)
+            {
+                if (batch.skinSectionIndex == ushort.MaxValue ||
+                    batch.materialIndex >= m2.materials.Length ||
+                    batch.skinSectionIndex >= skin.SubMeshes.Length)
+                {
+                    Console.WriteLine("Sth wrong with batch " + j + " in model " + m2FilePath);
+                    continue;
+                }
+
+                var section = skin.SubMeshes[batch.skinSectionIndex];
+
+                using var indices = new PooledArray<int>(section.indexCount);
+                for (int i = 0; i < Math.Min(section.indexCount, skin.Indices.Length - section.indexStart); ++i)
+                {
+                    indices[i] = skin.Indices[section.indexStart + i];
+                }
+
+                mesh.SetIndices(indices.AsSpan(), j++);
+
+                TextureHandle? th = null;
+                TextureHandle? th2 = null;
+                for (int i = 0; i < (batch.textureCount >= 5 ? 1 : batch.textureCount); ++i)
+                {
+                    if (batch.textureLookupId + i >= m2.textureLookupTable.Length)
+                    {
+                        if (th.HasValue)
+                            th2 = textureManager.EmptyTexture;
+                        else
+                            th = textureManager.EmptyTexture;
+                        Console.WriteLine("File " + m2FilePath + " batch " + j + " tex " + i + " out of range");
+                        continue;
+                    }
+                    var texId = m2.textureLookupTable[batch.textureLookupId + i];
+                    if (texId == -1)
+                    {
+                        if (th.HasValue)
+                            th2 = textureManager.EmptyTexture;
+                        else
+                            th = textureManager.EmptyTexture;
+                    }
+                    else
+                    {
+                        var textureDef = m2.textures[texId];
+                        string texFile = "";
+                        if (textureDef.type == 0) // if tetx is hardcoded
+                            texFile = textureDef.filename.AsString();
+                        else
+                        {
+                            if (textureDef.type != M2Texture.TextureType.TEX_COMPONENT_OBJECT_SKIN)
+                                Console.WriteLine("okay, so there is model " + m2FilePath + " which has texture type: " + textureDef.type + ". What is it?");
+                            texFile = texturePath;
+                        }
+                        
+                        var tcs = new TaskCompletionSource<TextureHandle>();
+                        yield return textureManager.GetTexture(texFile, tcs);
+                        var resTex = tcs.Task.Result;
+                        if (th.HasValue)
+                            th2 = resTex;
+                        else
+                            th = resTex;
+                    }
+                }
+
+                materials[j - 1] = CreateMaterial(m2, batch, th, th2);
+            }
+
+            mesh.Rebuild();
+
+            var mdx = new MdxInstance
+            {
+                mesh = mesh,
+                materials = materials.AsSpan(0, j).ToArray(),
+                model = m2
+            };
+            itemMeshes.Add((displayid, right), mdx);
+            completion.SetResult(null);
+            itemMeshesCurrentlyLoaded.Remove((displayid, right));
+            result.SetResult(mdx);
         }
         
         public IEnumerator LoadM2Mesh(string path, TaskCompletionSource<MdxInstance?> result)
@@ -724,7 +1022,7 @@ namespace WDE.MapRenderer.Managers
                 m2 = M2.Read(new MemoryBinaryReader(file.Result), m2FilePath, p =>
                 {
                     // TODO: can I use ReadFileSync? Can be problematic...
-                    var bytes = gameFiles.ReadFileSyncLocked(p);
+                    var bytes = gameFiles.ReadFileSyncLocked(p, true);
                     if (bytes == null)
                         return null;
                     return new MemoryBinaryReader(bytes);
@@ -820,97 +1118,7 @@ namespace WDE.MapRenderer.Managers
                     }
                 }
 
-                var materialDef = m2.materials[batch.materialIndex];
-                var material = materialManager.CreateMaterial("data/m2.json");
-
-                material.SetBuffer("boneMatrices", identityBonesBuffer);
-                material.SetTexture("texture1", th ?? textureManager.EmptyTexture);
-                material.SetTexture("texture2", th2 ?? textureManager.EmptyTexture);
-
-                var trans = 1.0f;
-                if (batch.colorIndex != -1 && m2.colors.Length < batch.colorIndex)
-                {
-                    if (m2.colors[batch.colorIndex].alpha.values.Length == 0 || m2.colors[batch.colorIndex].alpha.values[0].Length == 0)
-                        trans = 1;
-                    else
-                        trans = m2.colors[batch.colorIndex].alpha.values[0][0].Value;
-                }
-
-                if (batch.textureTransparencyLookupId != -1 && m2.textureWeights.Length < batch.textureTransparencyLookupId)
-                {
-                    if (m2.textureWeights[batch.textureTransparencyLookupId].weight.values.Length > 0 && m2.textureWeights[batch.textureTransparencyLookupId].weight.values[0].Length > 0)
-                        trans *= m2.textureWeights[batch.textureTransparencyLookupId].weight.values[0][0].Value;
-                }
-                
-                Vector4 mesh_color = new Vector4(1.0f, 1.0f, 1.0f, trans);
-    
-                material.SetUniform("mesh_color", mesh_color);
-                batch.shaderId = ResolveShaderID1(batch.shaderId, m2, batch, (m2.global_flags & M2Flags.FLAG_USE_TEXTURE_COMBINER_COMBOS) != 0, (int)materialDef.blending_mode);
-                var shaders = ConvertShaderIDs(m2, batch);
-                material.SetUniformInt("pixel_shader", (int)shaders.Item2);
-                //material.SetUniformInt("pixel_shader", (int)(M2GetPixelShaderID(batch.textureCount, batch.shaderId) ?? ModelPixelShader.Mod));
-                //Console.WriteLine(path + " INDEX: " + j + " Pixel shader: " + M2GetPixelShaderID(batch.textureCount, batch.shader_id) + " tex count: " + batch.textureCount + " shader id: " + batch.shader_id + " blend: " + materialDef.blending_mode + " priority " + batch.priorityPlane + " start ");
-                
-                material.SetUniform("highlight", 0);
-                material.SetUniform("notSupported", 0);
-                if (materialDef.blending_mode == M2Blend.M2BlendOpaque)
-                {
-                    material.BlendingEnabled = false;
-                    material.SetUniform("alphaTest", -1);
-                }
-                else if (materialDef.blending_mode == M2Blend.M2BlendAlphaKey)
-                {
-                    material.BlendingEnabled = false;
-                    //material.SourceBlending = Blending.One;
-                    //material.DestinationBlending = Blending.Zero;
-                    material.SetUniform("alphaTest", 224.0f / 255.0f);
-                }
-                else if (materialDef.blending_mode == M2Blend.M2BlendAlpha)
-                {
-                    material.BlendingEnabled = true;
-                    material.SourceBlending = Blending.SrcAlpha;
-                    material.DestinationBlending = Blending.OneMinusSrcAlpha;
-                    material.SetUniform("alphaTest", 1.0f / 255.0f);
-                }
-                else if (materialDef.blending_mode == M2Blend.M2BlendNoAlphaAdd)
-                {
-                    material.BlendingEnabled = true;
-                    material.SourceBlending = Blending.One;
-                    material.DestinationBlending = Blending.One;
-                    material.SetUniform("alphaTest", 1.0f / 255.0f);
-                }
-                else if (materialDef.blending_mode == M2Blend.M2BlendAdd)
-                {
-                    material.BlendingEnabled = true;
-                    material.SourceBlending = Blending.SrcAlpha;
-                    material.DestinationBlending = Blending.One;
-                    material.SetUniform("alphaTest", 1.0f / 255.0f);
-                }
-                else if (materialDef.blending_mode == M2Blend.M2BlendMod)
-                {
-                    material.BlendingEnabled = true;
-                    material.SourceBlending = Blending.DstColor;
-                    material.DestinationBlending = Blending.Zero;
-                    material.SetUniform("alphaTest", 1.0f / 255.0f);
-                }
-                else if (materialDef.blending_mode == M2Blend.M2BlendMod2X)
-                {
-                    material.BlendingEnabled = true;
-                    material.SourceBlending = Blending.DstColor;
-                    material.DestinationBlending = Blending.SrcColor;
-                    material.SetUniform("alphaTest", 1.0f / 255.0f);
-                }
-                else
-                    material.SetUniform("notSupported", 1);
-
-                material.ZWrite = !material.BlendingEnabled;
-                //material.DepthTesting = materialDef.flags.HasFlag(M2MaterialFlags.DepthTest); // produces wrong results :thonk:
-
-                if (materialDef.flags.HasFlag(M2MaterialFlags.TwoSided))
-                    material.Culling = CullingMode.Off;
-                material.SetUniformInt("unlit", materialDef.flags.HasFlag(M2MaterialFlags.Unlit) ? 1 : 0);
-
-                materials[j - 1] = material;
+                materials[j - 1] = CreateMaterial(m2, batch, th, th2);
             }
 
             mesh.Rebuild();

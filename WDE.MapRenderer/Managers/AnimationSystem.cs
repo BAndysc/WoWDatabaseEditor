@@ -5,6 +5,7 @@ using TheEngine.Components;
 using TheEngine.ECS;
 using TheEngine.Interfaces;
 using TheMaths;
+using WDE.MpqReader.DBC;
 using WDE.MpqReader.Structures;
 
 namespace WDE.MapRenderer.Managers;
@@ -15,6 +16,8 @@ public class AnimationSystem
     public static int MAX_BONES = 312; // Creature\SlimeGiant\GiantSlime.M2 has 312 bones
     private readonly Archetypes archetypes;
     private readonly ICameraManager cameraManager;
+    private readonly EmoteStore emoteStore;
+    private readonly AnimationDataStore animationDataStore;
 
     // private readonly ThreadLocal<Matrix[]> bones = new ThreadLocal<Matrix[]>(() =>
     // {
@@ -34,10 +37,14 @@ public class AnimationSystem
     public static Memory<Matrix> IdentityBones(int count) => staticIdentityBones.AsMemory(0, count);
     
     public AnimationSystem(Archetypes archetypes,
-        ICameraManager cameraManager)
+        ICameraManager cameraManager,
+        EmoteStore emoteStore,
+        AnimationDataStore animationDataStore)
     {
         this.archetypes = archetypes;
         this.cameraManager = cameraManager;
+        this.emoteStore = emoteStore;
+        this.animationDataStore = animationDataStore;
     }
     
     private Vector3 GetFirstOrDefaultVector3(int IDX, in M2Track<Vector3> track, Vector3 def, float t)
@@ -106,7 +113,7 @@ public class AnimationSystem
         return Quaternion.Slerp(prev, nextValue, pct);
     }
 
-    private Matrix GetBoneMatrix(M2 m2, Matrix[] calculatedBones, int boneIndex, float t, int IDX)
+    private Matrix GetBoneMatrixWithoutParent(M2 m2, int boneIndex, float t, int IDX)
     {
         Matrix boneMatrix;
         ref readonly var boneData = ref m2.bones[boneIndex];
@@ -134,6 +141,14 @@ public class AnimationSystem
             boneMatrix = mInvPivot * boneMatrix * mPivot;            
         }
 
+        return boneMatrix;
+    }
+    
+    private Matrix GetBoneMatrix(M2 m2, Matrix[] calculatedBones, int boneIndex, float t, int IDX)
+    {
+        Matrix boneMatrix = GetBoneMatrixWithoutParent(m2, boneIndex, t, IDX);
+        ref readonly var boneData = ref m2.bones[boneIndex];
+        
         if (boneData.parent_bone >= 0)
         {
             if (boneData.parent_bone > boneIndex)
@@ -148,6 +163,18 @@ public class AnimationSystem
         return boneMatrix;
     }
     
+    // slower, but not additional array required
+    private Matrix GetBoneMatrixRecursive(M2 m2, int boneIndex, float t, int IDX)
+    {
+        Matrix boneMatrix = GetBoneMatrixWithoutParent(m2, boneIndex, t, IDX);
+        ref readonly var boneData = ref m2.bones[boneIndex];
+        
+        if (boneData.parent_bone >= 0)
+            boneMatrix *= GetBoneMatrixRecursive(m2, boneData.parent_bone, t, IDX);
+
+        return boneMatrix;
+    }
+    
     public void Update(float delta)
     {
         sw.Restart();
@@ -155,20 +182,20 @@ public class AnimationSystem
         ThreadLocal<long> counter = new(true);
         var cameraPosition = cameraManager.MainCamera.Transform.Position;
         ThreadLocal<List<(NativeBuffer<Matrix>, int, Matrix[])>> updates = new ThreadLocal<List<(NativeBuffer<Matrix>, int, Matrix[])>>(() => new(), true);
-        archetypes.AnimatedEntityArchetype.ParallelForEach<RenderEnabledBit, LocalToWorld, M2AnimationComponentData>((itr, start, end, renderEnabledAccess, localToWorldAccess, animationAccess) =>
+        archetypes.AnimatedEntityArchetype.ParallelForEach<RenderEnabledBit, LocalToWorld, MeshBounds, M2AnimationComponentData>((itr, start, end, renderEnabledAccess, localToWorldAccess, meshBoundsAccess, animationAccess) =>
         {
             int sum = 0;
             for (int i = start; i < end; ++i)
             {
                 if (!renderEnabledAccess[i] ||
-                    Vector3.Distance(cameraPosition, localToWorldAccess[i].Position) > 100)
-                    continue;
+                     Vector3.Distance(cameraPosition, localToWorldAccess[i].Position) > 100)
+                     continue;
                 sum++;
                 var animationData = animationAccess[i];
 
-                if (animationData._currentAnimation != animationData.SetNewAnimation)
+                if (animationData._currentAnimation != (int)animationData.SetNewAnimation)
                 {
-                    int? lookup = animationData.Model.GetAnimationIndexByAnimationId(animationData.SetNewAnimation);
+                    int? lookup = animationData.Model.GetAnimationIndexByAnimationId((int)animationData.SetNewAnimation);
                     if (!lookup.HasValue)
                     {
                         animationData._currentAnimation = -1;
@@ -177,26 +204,12 @@ public class AnimationSystem
                     {
                         animationData._animInternalIndex = lookup.Value;
                         animationData._length = animationData.Model.sequences[lookup.Value].duration;
-                        animationData._currentAnimation = animationData.SetNewAnimation;
+                        animationData._currentAnimation = (int)animationData.SetNewAnimation;
                         animationData._time = 0;
-                    }
-                    // bool found = false;
-                    // for (int j = 0; j < animationData.Model.sequences.Length; ++j)
-                    // {
-                    //     if (animationData.Model.sequences[j].id == animationData.SetNewAnimation)
-                    //     {
-                    //         found = true;
-                    //         animationData._animInternalIndex = j;
-                    //         animationData._length = animationData.Model.sequences[j].duration;
-                    //         break;
-                    //     }
-                    // }
 
-                    // if (!found)
-                    //     
-                    // else
-                    // {                 
-                    // }
+                        var bounds = animationData.Model.sequences[lookup.Value].bounds;
+                        meshBoundsAccess[i].box = new BoundingBox(bounds.extent.min, bounds.extent.max);
+                    }
                 }
 
                 if (animationData._currentAnimation == -1)
@@ -214,6 +227,31 @@ public class AnimationSystem
                     var boneMatrix = GetBoneMatrix(animationData.Model, localBones, j, animationData._time, animationData._animInternalIndex);
                     localBones[j] = boneMatrix;
                 }
+                
+                if (animationData.AttachmentType.HasValue)
+                {
+                    int attachedToBone = -1;
+                    Vector3 offset = Vector3.Zero;
+                    foreach (var attachment in animationData!.AttachedTo.Model.attachments)
+                    {
+                        if (attachment.id == animationData.AttachmentType.Value)
+                        {
+                            attachedToBone = attachment.bone;
+                            offset = attachment.position;
+                            break;
+                        }
+                    }
+
+                    if (attachedToBone != -1)
+                    {
+                        var parentMatrix = GetBoneMatrixRecursive(animationData.AttachedTo.Model, attachedToBone, animationData.AttachedTo._time, animationData.AttachedTo._animInternalIndex);
+                        for (int j = 0; j < bonesLength; ++j)
+                        {
+                            localBones[j] *= Matrix.Translation(offset) * parentMatrix;
+                        }
+                    }
+                }
+                
                 updates.Value!.Add((animationData._buffer, bonesLength, localBones));
                 //animationData._buffer.UpdateBuffer(localBones.AsSpan(0, bonesLength));
             }
@@ -225,5 +263,42 @@ public class AnimationSystem
             ArrayPool<Matrix>.Shared.Return(tuple.Item3);
         }
         sw.Stop();
+    }
+
+    public M2AnimationType? GetAnimationType(uint? emoteState, uint? standState)
+    {
+        M2AnimationType? animationId = null;
+        if (emoteState.HasValue)
+        {
+            var emote = emoteStore[emoteState.Value];
+            animationId = (M2AnimationType)emote.AnimId;
+            if (animationDataStore.TryGetValue((uint)animationId, out var animationData))
+            {
+                if (animationData.Fallback != 0)
+                    animationId = (M2AnimationType)animationData.Fallback;
+            }
+        }
+        else if (standState.HasValue)
+        {
+            if (standState.Value == 1)
+                animationId = M2AnimationType.SitGround;
+            else if (standState.Value == 2)
+                animationId = M2AnimationType.SitChairMed;
+            else if (standState.Value == 3)
+                animationId = M2AnimationType.Sleep;
+            else if (standState.Value == 4)
+                animationId = M2AnimationType.SitChairLow;
+            else if (standState.Value == 5)
+                animationId = M2AnimationType.SitChairMed;
+            else if (standState.Value == 6)
+                animationId = M2AnimationType.SitChairHigh;
+            else if (standState.Value == 7)
+                animationId = M2AnimationType.Dead;
+            else if (standState.Value == 8)
+                animationId = M2AnimationType.KneelLoop;
+            else if (standState.Value == 9)
+                animationId = M2AnimationType.Submerged;
+        }
+        return animationId;
     }
 }

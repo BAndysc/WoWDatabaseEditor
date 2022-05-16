@@ -76,14 +76,14 @@ public class GameFiles : IGameFiles, IDisposable
         return bytes;
     }
 
-    public byte[]? ReadFileSyncLocked(string fileName)
+    public byte[]? ReadFileSyncLocked(string fileName, bool silent = false)
     {
         byte[]? bytes;
         lock (mpqSync)
         {
             bytes = mpqSync.ReadFile(fileName);
         }
-        if (bytes == null)
+        if (bytes == null && !silent)
             Console.WriteLine("File " + fileName + " is unreadable");
         return bytes;
     }

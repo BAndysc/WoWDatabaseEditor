@@ -11,7 +11,7 @@ namespace WDE.MapRenderer.Managers
         Task<PooledArray<byte>?> ReadFile(string fileName);
         PooledArray<byte>? ReadFileSyncPool(string fileName);
         byte[]? ReadFileSync(string fileName);
-        byte[]? ReadFileSyncLocked(string fileName);
+        byte[]? ReadFileSyncLocked(string fileName, bool silent = false);
         string Adt(string mapName, int x, int y);
         string Wdt(string mapName);
         bool Initialize();

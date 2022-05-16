@@ -1,0 +1,63 @@
+<#@ template language="C#" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ assembly name="System.Core" #>
+
+namespace TheEngine.ECS;
+
+public static partial class EntityExtensions
+{
+
+<#
+    for (int UNMANAGED = 0; UNMANAGED <= 6; UNMANAGED++)
+    {
+        for (int MANAGED = 0; MANAGED <= 3; MANAGED++)
+        {
+            if (UNMANAGED + MANAGED == 0)
+                continue;
+
+            for (int mode = 0; mode <= 1; ++mode)
+            {
+                bool parallel = mode == 1;
+#>
+
+        public static void <#= parallel ? "ParallelForEach" : "ForEach"  #><<#=
+                        string.Join(", ",
+                            Enumerable.Range(0, UNMANAGED).Select(i => "T" + i).Concat(
+                                Enumerable.Range(0, MANAGED).Select(i => "N" + i))) #>>(this Archetype archetype, 
+            Action<IChunkDataIterator, int, int, <#=
+                        string.Join(", ",
+                            Enumerable.Range(0, UNMANAGED).Select(i => $"ComponentDataAccess<T{i}>").Concat(
+                                Enumerable.Range(0, MANAGED).Select(i => $"ManagedComponentDataAccess<N{i}>"))) #>> process)<#=
+                        string.Join("\n",
+                            Enumerable.Range(0, UNMANAGED).Select(i => $"where T{i} : unmanaged, IComponentData").Concat
+                                (Enumerable.Range(0, MANAGED).Select(i => $"where N{i} : IManagedComponentData"))) #>
+        {
+            var entityManager = archetype.EntityManager;
+            var iterator = entityManager.ArchetypeIterator(archetype);
+            foreach (var itr in iterator)
+            {
+<# if (parallel) { #>
+                    RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
+<# } else {#>
+                    process(itr, 0, itr.Length, 
+<# } #>
+<#=
+                        string.Join(", ",
+                            Enumerable.Range(0, UNMANAGED).Select(i => $"itr.DataAccess<T{i}>()").Concat(
+                                Enumerable.Range(0, MANAGED).Select(i => $"itr.ManagedDataAccess<N{i}>()"))) #>
+<# if (parallel) { #>
+));
+<# } else {#>
+                    );
+<# } #>
+            }
+        }
+<#
+            }
+        }
+    }
+#>
+
+}

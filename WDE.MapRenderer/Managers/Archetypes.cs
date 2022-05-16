@@ -9,7 +9,10 @@ namespace WDE.MapRenderer.Managers;
 public class M2AnimationComponentData : IManagedComponentData
 {
     public readonly M2 Model;
-    public int SetNewAnimation;
+    public readonly M2AnimationComponentData? AttachedTo;
+
+    public M2AnimationType SetNewAnimation;
+    public readonly M2AttachmentType? AttachmentType;
     // don't touch those fields outside of animation system
     public int _currentAnimation;
     public uint _length;
@@ -17,9 +20,11 @@ public class M2AnimationComponentData : IManagedComponentData
     public float _time;
     public NativeBuffer<Matrix> _buffer = null!;
 
-    public M2AnimationComponentData(M2 model)
+    public M2AnimationComponentData(M2 model, M2AnimationComponentData? attachedTo = null, M2AttachmentType? attachmentType = null)
     {
         Model = model;
+        AttachedTo = attachedTo;
+        AttachmentType = attachmentType;
         _currentAnimation = -1;
     }
 }
@@ -39,7 +44,10 @@ public class Archetypes
     {
         this.entityManager = entityManager;
         AnimatedEntityArchetype = entityManager.NewArchetype()
-                .WithManagedComponentData<M2AnimationComponentData>();
+            .WithComponentData<RenderEnabledBit>()
+            .WithComponentData<MeshBounds>()
+            .WithComponentData<LocalToWorld>()
+            .WithManagedComponentData<M2AnimationComponentData>();
                 
         StaticM2WorldObjectArchetype = entityManager.NewArchetype()
                 .WithComponentData<RenderEnabledBit>()

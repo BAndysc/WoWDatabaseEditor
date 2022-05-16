@@ -28,4 +28,12 @@ namespace TheEngine.Components
     public struct Collider : IComponentData
     {
     }
+    
+    public static class DirtyPositionExtensions
+    {
+        public static void SetDirtyPosition(this Entity entity, IEntityManager entityManager)
+        {
+            entityManager.GetComponent<DirtyPosition>(entity).Enable();
+        }
+    }
 }

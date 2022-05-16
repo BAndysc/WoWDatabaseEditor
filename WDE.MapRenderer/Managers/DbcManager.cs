@@ -15,6 +15,7 @@ namespace WDE.MapRenderer.Managers
         public CreatureDisplayInfoExtraStore CreatureDisplayInfoExtraStore { get; }
         public EmoteStore EmoteStore { get; }
         public AnimationDataStore AnimationDataStore { get; }
+        public ItemStore ItemStore { get; }
         public ItemDisplayInfoStore ItemDisplayInfoStore { get; }
         public CreatureModelDataStore CreatureModelDataStore { get; }
         public GameObjectDisplayInfoStore GameObjectDisplayInfoStore { get; }
@@ -45,6 +46,7 @@ namespace WDE.MapRenderer.Managers
             EmoteStore = new(OpenDbc("Emotes"));
             AnimationDataStore = new(OpenDbc("AnimationData"));
             GameObjectDisplayInfoStore = new(OpenDbc("GameObjectDisplayInfo"));
+            ItemStore = new(OpenDbc("Item"));
             ItemDisplayInfoStore = new(OpenDbc("ItemDisplayInfo"));
             CharSectionsStore = new(OpenDbc("CharSections"));
             // ChrRacesStore = new(OpenDbc("ChrRaces"));

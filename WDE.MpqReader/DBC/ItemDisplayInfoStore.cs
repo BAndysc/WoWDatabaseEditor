@@ -3,9 +3,8 @@ using WDE.Common.DBC;
 
 namespace WDE.MpqReader.DBC;
 
-public class ItemDisplayInfoStore : IEnumerable<ItemDisplayInfo>
+public class ItemDisplayInfoStore : BaseDbcStore<uint, ItemDisplayInfo>
 {
-    private Dictionary<uint, ItemDisplayInfo> store = new();
     public ItemDisplayInfoStore(IEnumerable<IDbcIterator> rows)
     {
         foreach (var row in rows)
@@ -14,9 +13,4 @@ public class ItemDisplayInfoStore : IEnumerable<ItemDisplayInfo>
             store[o.Id] = o;
         }
     }
-
-    public bool Contains(uint id) => store.ContainsKey(id);
-    public ItemDisplayInfo this[uint id] => store[id];
-    public IEnumerator<ItemDisplayInfo> GetEnumerator() => store.Values.GetEnumerator();
-    IEnumerator IEnumerable.GetEnumerator() => store.Values.GetEnumerator();
 }

@@ -71,6 +71,11 @@ namespace TheEngine.Entities
             int count = IndexCount(submesh);
             for (int i = start; i + 2 < start + count; i += 3)
             {
+                if (i >= indices.Length)
+                {
+                    Console.WriteLine("eeeee");
+                    break;
+                }
                 if (vertices.Length > indices[i] &&
                     vertices.Length > indices[i + 1] &&
                     vertices.Length > indices[i + 2])
