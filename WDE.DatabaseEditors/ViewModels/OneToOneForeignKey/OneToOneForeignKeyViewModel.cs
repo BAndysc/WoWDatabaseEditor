@@ -407,8 +407,8 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
         History.AddHandler(handler);
     }
     
-    public int DesiredWidth => 400;
-    public int DesiredHeight => 500;
+    public int DesiredWidth => 600;
+    public int DesiredHeight => 800;
     public string Title { get; }
     public ICommand Copy => new AlwaysDisabledCommand();
     public ICommand Cut => new AlwaysDisabledCommand();

@@ -5,6 +5,7 @@ using TheEngine.Components;
 using TheEngine.ECS;
 using TheEngine.Interfaces;
 using TheMaths;
+using WDE.Common.Database;
 using WDE.MpqReader.DBC;
 using WDE.MpqReader.Structures;
 
@@ -271,13 +272,14 @@ public class AnimationSystem
         sw.Stop();
     }
 
-    public M2AnimationType? GetAnimationType(uint? emoteState, uint? standState)
+    public M2AnimationType? GetAnimationType(M2? model, uint? emoteState, uint? standState, AnimTier? animTier)
     {
         M2AnimationType? animationId = null;
         if (emoteState.HasValue && emoteState.Value != 0)
         {
             var emote = emoteStore[emoteState.Value];
             animationId = (M2AnimationType)emote.AnimId;
+
             if (animationDataStore.TryGetValue((uint)animationId, out var animationData))
             {
                 if (animationData.Fallback != 0)
@@ -304,6 +306,30 @@ public class AnimationSystem
                 animationId = M2AnimationType.KneelLoop;
             else if (standState.Value == 9)
                 animationId = M2AnimationType.Submerged;
+        }
+
+        if (!animationId.HasValue && animTier.HasValue)
+        {
+            switch (animTier)
+            {
+                case AnimTier.Ground:
+                    animationId = M2AnimationType.Stand;
+                    break;
+                case AnimTier.Swim:
+                    animationId = M2AnimationType.Swim;
+                    break;
+                case AnimTier.Hover:
+                    animationId = M2AnimationType.Hover;
+                    break;
+                case AnimTier.Fly:
+                    animationId = M2AnimationType.FlyStand;
+                    break;
+                case AnimTier.Submerged:
+                    animationId = M2AnimationType.Submerged;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(animTier), animTier, null);
+            }
         }
         return animationId;
     }

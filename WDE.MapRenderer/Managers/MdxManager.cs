@@ -64,6 +64,7 @@ namespace WDE.MapRenderer.Managers
             public IMesh mesh;
             public Material[] materials;
             public M2 model;
+            public float scale = 1;
             private bool? hasAnimations;
             public List<(M2AttachmentType, MdxInstance)>? attachments;
 
@@ -647,7 +648,8 @@ namespace WDE.MapRenderer.Managers
                 mesh = mesh,
                 materials = materials.AsSpan(0, j).ToArray(),
                 model = m2,
-                attachments = attachments
+                attachments = attachments,
+                scale = creatureDisplayInfo.CreatureModelScale
             };
             creaturemeshes.Add(displayid, mdx); // titi test
             completion.SetResult(mdx);

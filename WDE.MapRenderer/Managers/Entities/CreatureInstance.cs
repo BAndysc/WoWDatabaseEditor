@@ -55,6 +55,8 @@ public class CreatureInstance : System.IDisposable
     {
         set => gameContext.EntityManager.GetManagedComponent<M2AnimationComponentData>(objectEntity).SetNewAnimation = (int)value;
     }
+    
+    public M2? Model { get; private set; }
 
     public MdxManager.MdxInstance Mount
     {
@@ -134,8 +136,10 @@ public class CreatureInstance : System.IDisposable
             instance = completion.Task.Result!;
         }
 
+        Model = instance.model;
+
         objectEntity = entityManager.CreateEntity(archetypes.WorldObjectArchetype);
-        objectEntity.SetTRS(entityManager, Vector3.Zero, Quaternion.Identity, Vector3.One);
+        objectEntity.SetTRS(entityManager, Vector3.Zero, Quaternion.Identity, instance.scale * creatureTemplate.Scale * Vector3.One);
         objectEntity.SetDirtyPosition(entityManager);
 
         var boneMatricesBuffer = gameContext.Engine.CreateBuffer<Matrix>(BufferTypeEnum.StructuredBufferVertexOnly, 1, BufferInternalFormat.Float4);
@@ -241,6 +245,7 @@ public class CreatureInstance : System.IDisposable
         {
             throw new Exception("Double dispose!");
         }
+        Model = null;
         
         var entityManager = gameContext.EntityManager;
         
