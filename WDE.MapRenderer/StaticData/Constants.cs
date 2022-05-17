@@ -8,6 +8,6 @@ namespace WDE.MapRenderer.StaticData
         public static int ChunksInBlockY = 16;
         public static int ChunksInBlock = ChunksInBlockX * ChunksInBlockY;
         public static int Blocks = 64;
-        public static int VerticesInChunk = 9 * 9 + 8 * 8;
+        public static ushort VerticesInChunk = 9 * 9 + 8 * 8;
     }
 }

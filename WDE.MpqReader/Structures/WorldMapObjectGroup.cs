@@ -10,10 +10,10 @@ namespace WDE.MpqReader.Structures
     {
         public WorldMapObjectGroupHeader Header { get; init; }
         public PooledArray<WorldMapObjectPoly> Polygons { get; set; }
-        public PooledArray<int> Indices { get; init; }
+        public PooledArray<uint> Indices { get; init; }
         public PooledArray<Vector3> Vertices { get; init; }
         public PooledArray<Vector4>? VertexColors { get; init; }
-        public int[] CollisionOnlyIndices { get; init; }
+        public uint[] CollisionOnlyIndices { get; init; }
         public PooledArray<Vector3> Normals { get; init; }
         public List<PooledArray<Vector2>> UVs { get; init; } = new();
         public WorldMapObjectBatch[] Batches { get; init; }
@@ -60,10 +60,10 @@ namespace WDE.MpqReader.Structures
             }
         }
 
-        private static int[] BuildCollisionOnlyIndices(PooledArray<WorldMapObjectPoly>? polygons, PooledArray<int>? indices)
+        private static uint[] BuildCollisionOnlyIndices(PooledArray<WorldMapObjectPoly>? polygons, PooledArray<uint>? indices)
         {
             if (polygons == null || indices == null)
-                return new int[] { };
+                return new uint[] { };
             int triangles = 0;
             for (int i = 0; i < polygons.Length; ++i)
             {
@@ -71,7 +71,7 @@ namespace WDE.MpqReader.Structures
                     triangles++;
             }
 
-            var collisionOnlyIndices = new int[triangles * 3];
+            var collisionOnlyIndices = new uint[triangles * 3];
             int j = 0;
             for (int i = 0; i < polygons.Length; ++i)
             {
@@ -148,9 +148,9 @@ namespace WDE.MpqReader.Structures
             return vertices;
         }
 
-        private static PooledArray<int> ParseIndices(IBinaryReader reader, int size, PooledArray<WorldMapObjectPoly> polygons)
+        private static PooledArray<uint> ParseIndices(IBinaryReader reader, int size, PooledArray<WorldMapObjectPoly> polygons)
         {
-            PooledArray<int> indices = new PooledArray<int>(size / 2);
+            PooledArray<uint> indices = new PooledArray<uint>(size / 2);
             int i = 0;
             while (!reader.IsFinished())
             {

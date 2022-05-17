@@ -30,6 +30,7 @@ namespace TheEngine.Interfaces
         void AddPostprocess(IPostProcess postProcess);
         void RemovePostprocess(IPostProcess postProcess);
         void SetDynamicResolutionScale(float scale);
+        void DrawSphere(Vector3 center, float radius, Vector4 color);
     }
 
     public static class RenderManagerExtensions

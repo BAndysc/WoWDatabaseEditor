@@ -193,9 +193,9 @@ public class AnimationSystem
                 sum++;
                 var animationData = animationAccess[i];
 
-                if (animationData._currentAnimation != (int)animationData.SetNewAnimation)
+                if (animationData._currentAnimation != animationData.SetNewAnimation)
                 {
-                    int? lookup = animationData.Model.GetAnimationIndexByAnimationId((int)animationData.SetNewAnimation);
+                    int? lookup = animationData.Model.GetAnimationIndexByAnimationId(animationData.SetNewAnimation);
                     if (!lookup.HasValue)
                     {
                         animationData._currentAnimation = -1;
@@ -204,7 +204,7 @@ public class AnimationSystem
                     {
                         animationData._animInternalIndex = lookup.Value;
                         animationData._length = animationData.Model.sequences[lookup.Value].duration;
-                        animationData._currentAnimation = (int)animationData.SetNewAnimation;
+                        animationData._currentAnimation = animationData.SetNewAnimation;
                         animationData._time = 0;
 
                         var bounds = animationData.Model.sequences[lookup.Value].bounds;
@@ -230,25 +230,31 @@ public class AnimationSystem
                 
                 if (animationData.AttachmentType.HasValue)
                 {
-                    int attachedToBone = -1;
-                    Vector3 offset = Vector3.Zero;
-                    foreach (var attachment in animationData!.AttachedTo.Model.attachments)
+                    var attachedTo = animationData.AttachedTo;
+                    var attachmentType = animationData.AttachmentType.Value;
+                    while (attachedTo != null)
                     {
-                        if (attachment.id == animationData.AttachmentType.Value)
+                        int attachedToBone = -1;
+                        Vector3 offset = Vector3.Zero;
+                        foreach (var attachment in attachedTo.Model.attachments)
                         {
-                            attachedToBone = attachment.bone;
-                            offset = attachment.position;
-                            break;
+                            if (attachment.id == attachmentType)
+                            {
+                                attachedToBone = attachment.bone;
+                                offset = attachment.position;
+                                break;
+                            }
                         }
-                    }
 
-                    if (attachedToBone != -1)
-                    {
-                        var parentMatrix = GetBoneMatrixRecursive(animationData.AttachedTo.Model, attachedToBone, animationData.AttachedTo._time, animationData.AttachedTo._animInternalIndex);
-                        for (int j = 0; j < bonesLength; ++j)
+                        if (attachedToBone != -1)
                         {
-                            localBones[j] *= Matrix.Translation(offset) * parentMatrix;
+                            var parentMatrix = GetBoneMatrixRecursive(attachedTo.Model, attachedToBone, attachedTo._time, attachedTo._animInternalIndex);
+                            for (int j = 0; j < bonesLength; ++j)
+                                localBones[j] *= Matrix.Translation(offset) * parentMatrix;
                         }
+
+                        attachmentType = attachedTo.AttachmentType ?? M2AttachmentType.ItemVisual0;
+                        attachedTo = attachedTo.AttachedTo;
                     }
                 }
                 
@@ -268,7 +274,7 @@ public class AnimationSystem
     public M2AnimationType? GetAnimationType(uint? emoteState, uint? standState)
     {
         M2AnimationType? animationId = null;
-        if (emoteState.HasValue)
+        if (emoteState.HasValue && emoteState.Value != 0)
         {
             var emote = emoteStore[emoteState.Value];
             animationId = (M2AnimationType)emote.AnimId;

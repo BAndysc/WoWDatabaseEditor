@@ -38,7 +38,7 @@ namespace TheEngine.Managers
 
         internal ITexture? this[TextureHandle handle]
         {
-            get => allTextures[handle.Handle - 1];
+            get => handle.Handle == 0 ? null : allTextures[handle.Handle - 1];
             set => allTextures[handle.Handle - 1] = value;
         }
         
@@ -209,6 +209,11 @@ namespace TheEngine.Managers
             dstTex!.ActivateRenderFrameBuffer();
             engine.Device.device.BlitFramebuffer(0, 0, srcTex.Width, srcTex.Height, 0, 0, dstTex.Width, dstTex.Height, ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Linear);
             engine.Device.device.BlitFramebuffer(0, 0, srcTex.Width, srcTex.Height, 0, 0, dstTex.Width, dstTex.Height, ClearBufferMask.DepthBufferBit, BlitFramebufferFilter.Nearest);
+        }
+
+        public bool TextureExists(TextureHandle handle)
+        {
+            return allTextures.Count > handle.Handle && allTextures[handle.Handle] != null;
         }
     }
 }

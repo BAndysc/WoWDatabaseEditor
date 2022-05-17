@@ -97,7 +97,7 @@ namespace WDE.MapRenderer.Managers
 
             foreach (var group in groups)
             {
-                int[] indices = new int[group.Indices.Length + group.CollisionOnlyIndices.Length];
+                uint[] indices = new uint[group.Indices.Length + group.CollisionOnlyIndices.Length];
                 Array.Copy(group.Indices.AsArray(), indices, group.Indices.Length);
                 Array.Copy(group.CollisionOnlyIndices, 0, indices, group.Indices.Length, group.CollisionOnlyIndices.Length);
                 var wmoMeshData = new MeshData(group.Vertices.AsArray(), group.Normals.AsArray(), group.UVs[0].AsArray(),

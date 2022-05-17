@@ -3,6 +3,7 @@
     public struct TextureHandle
     {
         internal int Handle { get; }
+        public bool IsEmpty => Handle == 0;
 
         public bool Equals(TextureHandle other)
         {

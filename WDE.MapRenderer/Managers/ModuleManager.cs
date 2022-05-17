@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.ObjectModel;
 using Prism.Ioc;
 using WDE.Common.Utils;
@@ -28,6 +29,18 @@ namespace WDE.MapRenderer.Managers
             gameView.ModuleRemoved += GameViewOnModuleRemoved;
         }
 
+        public void ForEach(Action<IGameModule> action)
+        {
+            foreach (var mod in modules)
+                action(mod.Item2);
+        }
+        
+        public IEnumerator ForEach(Func<IGameModule, IEnumerator> action)
+        {
+            foreach (var mod in modules)
+                yield return action(mod.Item2);
+        }
+        
         public void Update(float delta)
         {
             foreach (var m in modulesToAdd)

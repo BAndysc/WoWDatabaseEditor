@@ -78,6 +78,8 @@ namespace TheEngine.Components
     
     public struct RenderEnabledBit : IComponentData
     {
+        // bit 0 - is actually enabled
+        // bit 1 - is force disabled
         private byte enabled;
 
         private RenderEnabledBit(bool b)
@@ -87,15 +89,40 @@ namespace TheEngine.Components
 
         public void Enable()
         {
-            enabled = 1;
+            enabled |= 1;
         }
 
         public void Disable()
         {
-            enabled = 0;
+            enabled &= 0b10;
+        }
+
+        public bool IsForceDisabled()
+        {
+            return (enabled & 0b10) == 0b10;
+        }
+
+        public void SetDisabled(bool disabled)
+        {
+            if (disabled)
+            {
+                enabled |= 10;
+            }
+            else
+            {
+                enabled &= 0b01;
+            }
         }
 
         public static implicit operator bool(RenderEnabledBit d) => d.enabled == 1;
         public static explicit operator RenderEnabledBit(bool b) => new RenderEnabledBit(b);
+    }
+
+    public static class RenderEnabledBitExtensions
+    {
+        public static void SetForceDisabledRendering(this Entity entity, IEntityManager entityManager, bool disabled)
+        {
+            entityManager.GetComponent<RenderEnabledBit>(entity).SetDisabled(disabled);
+        }
     }
 }

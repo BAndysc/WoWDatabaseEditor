@@ -219,6 +219,7 @@ namespace WDE.MapRenderer.Utils
         public abstract Vector3 GetPosition(T item);
         protected abstract void Move(T item, Vector3 position);
         protected abstract IReadOnlyList<T>? PointsToDrag();
+        protected abstract void FinishDragging(IEnumerable<T> objects);
 
         public bool Update(float f)
         {
@@ -264,10 +265,12 @@ namespace WDE.MapRenderer.Utils
             {
                 dragging = DragMode.NoDragging;
                 List<(Entity, Vector3)> result = new();
-                foreach (var dragged in draggable)
+                for (var index = 0; index < draggable.Count; index++)
                 {
+                    var dragged = draggable[index];
                     var position = GetPosition(dragged.item);
-                    raycastSystem.RaycastAll(new Ray(position.WithZ(4000), Vector3.Down), position, result, collisionMask);
+                    raycastSystem.RaycastAll(new Ray(position.WithZ(4000), Vector3.Down), position, result,
+                        collisionMask);
                     if (result.Count > 0)
                     {
                         float minDistance = float.MaxValue;
@@ -277,12 +280,16 @@ namespace WDE.MapRenderer.Utils
                             if (diff < minDistance)
                             {
                                 minDistance = diff;
-                                Move(dragged.item, new Vector3(position.X, position.Y, r.Item2.Z));
+                                var destPosition = new Vector3(position.X, position.Y, r.Item2.Z);
+                                draggable[index] = (dragged.item, dragged.original_position, destPosition - dragged.original_position);
+                                Move(dragged.item, destPosition);
                             }
                         }
+
                         result.Clear();
                     }
                 }
+
                 FinishDrag();
                 return false;
             }
@@ -321,6 +328,7 @@ namespace WDE.MapRenderer.Utils
 
         private void FinishDrag()
         {
+            FinishDragging(draggable.Select(x => x.item));
             draggable.Clear();
         }
 

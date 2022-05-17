@@ -79,11 +79,11 @@ namespace TheEngine.Data
             List<Vector3> realNormals = new List<Vector3>();
             List<Vector2> realUVs = new List<Vector2>();
 
-            List<int> indices = new List<int>();
+            List<uint> indices = new List<uint>();
 
-            int vertexCount = 0;
+            uint vertexCount = 0;
 
-            Dictionary<Node, int> nodeToId = new Dictionary<Node, int>();
+            Dictionary<Node, uint> nodeToId = new Dictionary<Node, uint>();
 
             foreach (var face in Faces)
             {

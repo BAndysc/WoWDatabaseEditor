@@ -47,6 +47,7 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
     private readonly IMessageBoxService messageBoxService;
     private readonly IParameterPickerService parameterPickerService;
     private readonly ISolutionTasksService solutionTasksService;
+    private readonly IMetaColumnsSupportService metaColumnsSupportService;
     private readonly DatabaseTableDefinitionJson tableDefinition;
     private readonly DatabaseKey key;
     private readonly bool noSaveMode;
@@ -87,6 +88,7 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
         IHistoryManager history,
         IParameterPickerService parameterPickerService,
         ISolutionTasksService solutionTasksService,
+        IMetaColumnsSupportService metaColumnsSupportService,
         DatabaseTableDefinitionJson tableDefinition,
         DatabaseKey key,
         bool noSaveMode)
@@ -105,6 +107,7 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
         this.messageBoxService = messageBoxService;
         this.parameterPickerService = parameterPickerService;
         this.solutionTasksService = solutionTasksService;
+        this.metaColumnsSupportService = metaColumnsSupportService;
         this.tableDefinition = tableDefinition;
         this.History = history;
         this.key = key;
@@ -199,13 +202,13 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
             
         if (parameterValue is IParameterValue<long> valueHolder)
         {
-            var result = await parameterPickerService.PickParameter<long>(valueHolder.Parameter, valueHolder.Value);
+            var result = await parameterPickerService.PickParameter<long>(valueHolder.Parameter, valueHolder.Value, Row.Entity);
             if (result.ok)
                 valueHolder.Value = result.value;
         }
         else if (parameterValue is IParameterValue<string> stringValueHolder)
         {
-            var result = await parameterPickerService.PickParameter<string>(stringValueHolder.Parameter, stringValueHolder.Value ?? "");
+            var result = await parameterPickerService.PickParameter<string>(stringValueHolder.Parameter, stringValueHolder.Value ?? "", Row.Entity);
             if (result.ok)
                 stringValueHolder.Value = result.value;             
         }
@@ -334,8 +337,9 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
                 throw new Exception("One to one conditions editing not supported (but it could be, but is there a need?)");
             }
             else if (column.IsMetaColumn)
-            {              
-                throw new Exception("One to one meta column opening not supported (but it could be, but is there a need?)");
+            {
+                var (cmd, name) = metaColumnsSupportService.GenerateCommand(column.Meta!, entity, key);
+                cellViewModel = new SingleRecordDatabaseCellViewModel(columnIndex, column.Name, cmd, row, entity, name);
             }
             else
             {

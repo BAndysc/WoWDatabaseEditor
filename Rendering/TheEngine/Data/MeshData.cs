@@ -9,14 +9,14 @@ namespace TheEngine.Data
         public readonly Vector2[]? UV { get; }
         public readonly Vector2[]? UV2 { get; }
         public readonly Vector4[]? Colors { get; }
-        public readonly int[] Indices { get; }
+        public readonly uint[] Indices { get; }
         public readonly int VerticesCount { get; }
         public readonly int IndicesCount { get; }
 
         public MeshData(Vector3[] vertices, 
             Vector3[]? normals, 
             Vector2[]? uvs, 
-            int[] indices,
+            uint[] indices,
             int? verticesCount = null,
             int? indicesCount = null,
             Vector2[]? uvs2 = null,

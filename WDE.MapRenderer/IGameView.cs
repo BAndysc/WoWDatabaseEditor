@@ -1,3 +1,4 @@
+using System.Collections;
 using Prism.Ioc;
 using WDE.Module.Attributes;
 
@@ -21,5 +22,13 @@ namespace WDE.MapRenderer
         void Render() { }
         void RenderTransparent() { }
         void RenderGUI() { }
+        IEnumerator LoadChunk(int mapId, int chunkX, int chunkZ, CancellationToken cancellationToken)
+        {
+            yield break;
+        }
+        IEnumerator UnloadChunk(int chunkX, int chunkZ)
+        {
+            yield break;
+        }
     }
 }

@@ -13,6 +13,7 @@ public class ScreenRenderTexture : System.IDisposable
     {
         this.engine = engine;
         this.scale = scale;
+        Update();
     }
     
     public TextureHandle Handle { get; private set; }
@@ -22,12 +23,13 @@ public class ScreenRenderTexture : System.IDisposable
     public void Update()
     {
         if (width != (int)engine.WindowHost.WindowWidth ||
-            height != (int)engine.WindowHost.WindowHeight)
+            height != (int)engine.WindowHost.WindowHeight ||
+            Handle.IsEmpty)
         {
             width = (int)engine.WindowHost.WindowWidth;
             height = (int)engine.WindowHost.WindowHeight;
             engine.TextureManager.DisposeTexture(Handle);
-            Handle = engine.textureManager.CreateRenderTexture((int)(width * scale), (int)(height * scale));
+            Handle = engine.textureManager.CreateRenderTexture(Math.Max(1, (int)(width * scale)),Math.Max(1, (int)(height * scale)));
         }
     }
     

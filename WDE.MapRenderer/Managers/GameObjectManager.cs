@@ -39,7 +39,7 @@ namespace WDE.MapRenderer.Managers
         private readonly CameraManager cameraManager;
         private readonly IDatabaseProvider database;
 
-        private PerChunkHolder<IList<IGameObject>> gameObjectDataPerChunk = new();
+        private PerChunkHolder<List<IGameObject>> gameObjectDataPerChunk = new();
         private IList<IGameObjectTemplate> gameobjectstemplates;
         private Transform t = new Transform();
         private IMesh BoxMesh;

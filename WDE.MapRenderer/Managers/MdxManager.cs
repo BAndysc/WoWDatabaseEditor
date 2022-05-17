@@ -312,7 +312,7 @@ namespace WDE.MapRenderer.Managers
                 }
             }));
             
-            var md = new MeshData(vertices, normals, uv1, new int[] { }, null, null, uv2, packedBones);
+            var md = new MeshData(vertices, normals, uv1, new uint[] { }, null, null, uv2, packedBones);
             var mesh = meshManager.CreateMesh(md);
             mesh.SetSubmeshCount(skin.Batches.Length);
             // 1 : load items to define active geosets
@@ -521,7 +521,7 @@ namespace WDE.MapRenderer.Managers
                 if (isCharacterModel && !activeGeosets!.Contains(section.skinSectionId))
                     continue;
 
-                using var indices = new PooledArray<int>(section.indexCount);
+                using var indices = new PooledArray<uint>(section.indexCount);
                 for (int i = 0; i < Math.Min(section.indexCount, skin.Indices.Length - section.indexStart); ++i)
                     indices[i] = skin.Indices[section.indexStart + i];
                 
@@ -882,7 +882,7 @@ namespace WDE.MapRenderer.Managers
                 }
             }));
             
-            var md = new MeshData(vertices, normals, uv1, new int[] { }, null, null, uv2, packedBones);
+            var md = new MeshData(vertices, normals, uv1, new uint[] { }, null, null, uv2, packedBones);
             
             var mesh = meshManager.CreateMesh(md);
             mesh.SetSubmeshCount(skin.Batches.Length);
@@ -901,7 +901,7 @@ namespace WDE.MapRenderer.Managers
 
                 var section = skin.SubMeshes[batch.skinSectionIndex];
 
-                using var indices = new PooledArray<int>(section.indexCount);
+                using var indices = new PooledArray<uint>(section.indexCount);
                 for (int i = 0; i < Math.Min(section.indexCount, skin.Indices.Length - section.indexStart); ++i)
                 {
                     indices[i] = skin.Indices[section.indexStart + i];
@@ -1055,7 +1055,7 @@ namespace WDE.MapRenderer.Managers
                 }
             }));
             
-            var md = new MeshData(vertices, normals, uv1, new int[] { }, null, null, uv2, packedBones);
+            var md = new MeshData(vertices, normals, uv1, new uint[] { }, null, null, uv2, packedBones);
             
             var mesh = meshManager.CreateMesh(md);
             mesh.SetSubmeshCount(skin.Batches.Length);
@@ -1075,7 +1075,7 @@ namespace WDE.MapRenderer.Managers
                 var section = skin.SubMeshes[batch.skinSectionIndex];
                 
 
-                using var indices = new PooledArray<int>(section.indexCount);
+                using var indices = new PooledArray<uint>(section.indexCount);
                 for (int i = 0; i < Math.Min(section.indexCount, skin.Indices.Length - section.indexStart); ++i)
                 {
                     indices[i] = skin.Indices[section.indexStart + i];

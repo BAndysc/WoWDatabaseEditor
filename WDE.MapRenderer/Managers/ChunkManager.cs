@@ -84,6 +84,7 @@ namespace WDE.MapRenderer.Managers
         private readonly WmoManager wmoManager;
         private readonly WorldManager worldManager;
         private readonly Lazy<LoadingManager> loadingManager;
+        private readonly ModuleManager moduleManager;
         private readonly Engine engine;
         private readonly IGameContext gameContext;
         private readonly CreatureManager creatureManager;
@@ -149,6 +150,7 @@ namespace WDE.MapRenderer.Managers
             GameObjectManager gameObjectManager,
             Archetypes archetypes,
             Lazy<LoadingManager> loadingManager,
+            ModuleManager moduleManager,
             Engine engine)
         {
             this.entityManager = entityManager;
@@ -169,6 +171,7 @@ namespace WDE.MapRenderer.Managers
             this.gameObjectManager = gameObjectManager;
             this.archetypes = archetypes;
             this.loadingManager = loadingManager;
+            this.moduleManager = moduleManager;
             this.engine = engine;
         }
 
@@ -192,6 +195,7 @@ namespace WDE.MapRenderer.Managers
             if (file.Result == null)
             {
                 tasksource.SetResult();
+                yield return LoadModules(chunk, cancelationToken);
                 chunk.loading = null;
                 yield break;
             }
@@ -285,17 +289,17 @@ namespace WDE.MapRenderer.Managers
                         }
                     }
 
-                    int[] indices = ArrayPool<int>.Shared.Rent(4 * 8 * 8 * 4);
+                    uint[] indices = ArrayPool<uint>.Shared.Rent(4 * 8 * 8 * 4);
                     int k__ = 0;
-                    for (int cx = 0; cx < 8; cx++)
+                    for (uint cx = 0; cx < 8; cx++)
                     {
-                        for (int cy = 0; cy < 8; cy++)
+                        for (uint cy = 0; cy < 8; cy++)
                         {
-                            int tl = cy * 17 + cx;
-                            int tr = tl + 1;
-                            int middle = tl + 9;
-                            int bl = middle + 8;
-                            int br = bl + 1;
+                            uint tl = cy * 17 + cx;
+                            uint tr = tl + 1;
+                            uint middle = tl + 9;
+                            uint bl = middle + 8;
+                            uint br = bl + 1;
 
                             indices[k__++] = tl;
                             indices[k__++] = middle;
@@ -316,7 +320,7 @@ namespace WDE.MapRenderer.Managers
                     }
                     var subChunkMesh = meshManager.CreateManagedOnlyMesh(subVertices.AsSpan(0, 145), indices.AsSpan(0, 4 * 8 * 8 * 4));
                     ArrayPool<Vector3>.Shared.Return(subVertices);
-                    ArrayPool<int>.Shared.Return(indices);
+                    ArrayPool<uint>.Shared.Return(indices);
                     var entity = entityManager.CreateEntity(archetypes.CollisionOnlyArchetype);
                     entityManager.GetComponent<Collider>(entity).CollisionMask = Collisions.COLLISION_MASK_TERRAIN;
                     entityManager.GetComponent<LocalToWorld>(entity).Matrix = Matrix.Identity;
@@ -475,9 +479,21 @@ namespace WDE.MapRenderer.Managers
             }
             
             yield return LoadObjects(adt, chunk, cancelationToken);
+
+            yield return LoadModules(chunk, cancelationToken);
             
             tasksource.SetResult();
             chunk.loading = null; 
+        }
+
+        private IEnumerator LoadModules(ChunkInstance chunk, CancellationToken cancellationToken)
+        {
+            IEnumerator LoadModuleChunk(IGameModule arg)
+            {
+                yield return arg.LoadChunk(gameContext.CurrentMap.Id, chunk.X, chunk.Z, cancellationToken);
+            }
+            
+            yield return moduleManager.ForEach(LoadModuleChunk);
         }
 
         private IEnumerator LoadObjects(ADT adt, ChunkInstance chunk, CancellationToken cancellationToken)
@@ -623,7 +639,7 @@ namespace WDE.MapRenderer.Managers
             for (int i = -D; i <= D; ++i)
             {
                 for (int j = -D; j <= D; ++j)
-                       gameContext.StartCoroutine(LoadChunk(chunk.x + i, chunk.y + j, false));
+                    gameContext.StartCoroutine(LoadChunk(chunk.x + i, chunk.y + j, false));
             }
             
             UnloadChunks();
@@ -636,7 +652,7 @@ namespace WDE.MapRenderer.Managers
             {
                 var c = chunks[index];
                 var midPoint = new Vector2(c.MiddlePoint.X, c.MiddlePoint.Z);
-                if ((midPoint - camera).LengthSquared() > 7500 * 7500)
+                if ((midPoint - camera).LengthSquared() > 5500 * 5500)
                 {
                     chunksXY.Remove((c.X, c.Z));
                     loadedChunks.Remove((c.X, c.Z));
@@ -653,6 +669,13 @@ namespace WDE.MapRenderer.Managers
                 chunk.loading.Cancel();
                 yield return chunk.chunkLoading;
             }
+            
+            IEnumerator UnloadModuleChunk(IGameModule arg)
+            {
+                yield return arg.UnloadChunk(chunk.X, chunk.Z);
+            }
+            
+            yield return moduleManager.ForEach(UnloadModuleChunk);
 
             yield return creatureManager.UnloadChunk(chunk.Creatures);
             yield return gameObjectManager.UnloadChunk(chunk.GameObjects);

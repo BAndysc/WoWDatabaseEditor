@@ -34,7 +34,7 @@ namespace WDE.MapRenderer.Managers
         private readonly MdxManager mdxManager;
         private readonly IUIManager uiManager;
         private readonly IDatabaseProvider database;
-        private PerChunkHolder<IList<ICreature>> CreatureDataPerChunk = new();
+        private PerChunkHolder<List<ICreature>> CreatureDataPerChunk = new();
         private Transform transform = new Transform();
         private IMesh BoxMesh;
         private Material BoxMaterial;

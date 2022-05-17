@@ -9,10 +9,10 @@ namespace WDE.MapRenderer.Managers;
 public class M2AnimationComponentData : IManagedComponentData
 {
     public readonly M2 Model;
-    public readonly M2AnimationComponentData? AttachedTo;
+    public M2AnimationComponentData? AttachedTo;
 
-    public M2AnimationType SetNewAnimation;
-    public readonly M2AttachmentType? AttachmentType;
+    public int SetNewAnimation;
+    public M2AttachmentType? AttachmentType;
     // don't touch those fields outside of animation system
     public int _currentAnimation;
     public uint _length;
@@ -62,6 +62,7 @@ public class Archetypes
         StaticM2WorldObjectArchetype = entityManager.NewArchetype()
                 .WithComponentData<RenderEnabledBit>()
                 .WithComponentData<LocalToWorld>()
+                .WithComponentData<MeshBounds>() // generally not required, but animation system requires it :S
                 .WithComponentData<WorldMeshBounds>()
                 .WithComponentData<MeshRenderer>();
 
@@ -101,6 +102,7 @@ public class Archetypes
         WorldObjectCollider = CollisionOnlyArchetype
             .WithComponentData<MeshBounds>()
             .WithComponentData<DirtyPosition>()
+            .WithComponentData<DisabledObjectBit>()
             .WithComponentData<CopyParentTransform>();
 
         WorldObjectArchetype = entityManager.NewArchetype()

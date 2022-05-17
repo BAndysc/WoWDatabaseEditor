@@ -9,8 +9,8 @@ namespace WDE.MapRenderer.StaticData
         {
             Vector3[] vertices = new Vector3[Constants.ChunksInBlock * Constants.VerticesInChunk];
             Vector2[] uvs = new Vector2[Constants.ChunksInBlock * Constants.VerticesInChunk];
-            int[] indices = new int[Constants.ChunksInBlock * 4 * 8 * 8 * 3];
-            int globalVertexOffset = 0;
+            uint[] indices = new uint[Constants.ChunksInBlock * 4 * 8 * 8 * 3];
+            uint globalVertexOffset = 0;
             int globalIndicesOffset = 0;
             for (int i = 0; i < Constants.ChunksInBlockY; ++i)
             {
@@ -42,15 +42,15 @@ namespace WDE.MapRenderer.StaticData
                         }
                     }
 
-                    for (int cx = 0; cx < 8; cx++)
+                    for (uint cx = 0; cx < 8; cx++)
                     {
-                        for (int cy = 0; cy < 8; cy++)
+                        for (uint cy = 0; cy < 8; cy++)
                         {
-                            int tl = globalVertexOffset + cy * 17 + cx;
-                            int tr = tl + 1;
-                            int middle = tl + 9;
-                            int bl = middle + 8;
-                            int br = bl + 1;
+                            uint tl = globalVertexOffset + cy * 17 + cx;
+                            uint tr = tl + 1;
+                            uint middle = tl + 9;
+                            uint bl = middle + 8;
+                            uint br = bl + 1;
 
                             indices[globalIndicesOffset++] = tl;
                             indices[globalIndicesOffset++] = middle;

@@ -19,11 +19,11 @@ namespace TheEngine.Entities
 
         internal int VertexArrayObject { get; }
         internal NativeBuffer<UniversalVertex>? VerticesBuffer { get; private set; }
-        internal NativeBuffer<int>? IndicesBuffer { get; private set; }
+        internal NativeBuffer<uint>? IndicesBuffer { get; private set; }
 
         private BoundingBox bounds;
         private UniversalVertex[]? vertices;
-        private int[]? indices;
+        private uint[]? indices;
         private int indicesCount = 0;
         private (int start, int length)[]? submeshesRange;
 
@@ -69,6 +69,7 @@ namespace TheEngine.Entities
             Debug.Assert(indices != null);
             int start = IndexStart(submesh);
             int count = IndexCount(submesh);
+            int beginningLength = indices.Length;
             for (int i = start; i + 2 < start + count; i += 3)
             {
                 if (i >= indices.Length)
@@ -76,10 +77,26 @@ namespace TheEngine.Entities
                     Console.WriteLine("eeeee");
                     break;
                 }
-                if (vertices.Length > indices[i] &&
-                    vertices.Length > indices[i + 1] &&
-                    vertices.Length > indices[i + 2])
-                    yield return (vertices[indices[i]].position, vertices[indices[i + 1]].position, vertices[indices[i + 2]].position);
+
+                if (beginningLength > indices.Length)
+                    throw new Exception("no dobra, jednak jest błąd");
+
+                if (i + 2 >= indices.Length)
+                    throw new Exception("no dobra, jest błąd");
+
+                uint j = indices[i];
+                uint k = indices[i+1];
+                uint l = indices[i+2];
+                
+                if (vertices.Length > j &&
+                    vertices.Length > k &&
+                    vertices.Length > l)
+                {
+                    var v1 = vertices[j].position;
+                    var v2 = vertices[k].position;
+                    var v3 = vertices[l].position;
+                    yield return (v1, v2, v3);
+                }
             }
         }
 
@@ -92,7 +109,7 @@ namespace TheEngine.Entities
             if (!managedOnly)
             {
                 VerticesBuffer = engine.Device.CreateBuffer<UniversalVertex>(BufferTypeEnum.Vertex, 1);
-                IndicesBuffer = engine.Device.CreateBuffer<int>(BufferTypeEnum.Index, 1);
+                IndicesBuffer = engine.Device.CreateBuffer<uint>(BufferTypeEnum.Index, 1);
                 VertexArrayObject = engine.Device.device.GenVertexArray();
                 engine.Device.device.BindVertexArray(VertexArrayObject);
                 VerticesBuffer.Activate(0);
@@ -118,7 +135,7 @@ namespace TheEngine.Entities
             }
         }
 
-        internal Mesh(Engine engine, MeshHandle handle, UniversalVertex[] vertices, int[] indices, int indicesCount, bool ownVerticesArray, bool managedOnly)
+        internal Mesh(Engine engine, MeshHandle handle, UniversalVertex[] vertices, uint[] indices, int indicesCount, bool ownVerticesArray, bool managedOnly)
         {
             this.engine = engine;
             Handle = handle;
@@ -130,7 +147,7 @@ namespace TheEngine.Entities
             if (!managedOnly)
             {
                 VerticesBuffer = engine.Device.CreateBuffer<UniversalVertex>(BufferTypeEnum.Vertex, vertices);
-                IndicesBuffer = engine.Device.CreateBuffer<int>(BufferTypeEnum.Index, indices.AsSpan(0, indicesCount));
+                IndicesBuffer = engine.Device.CreateBuffer<uint>(BufferTypeEnum.Index, indices.AsSpan(0, indicesCount));
                 VertexArrayObject = engine.Device.device.GenVertexArray();
                 engine.Device.device.BindVertexArray(VertexArrayObject);
                 VerticesBuffer.Activate(0);
@@ -190,7 +207,7 @@ namespace TheEngine.Entities
                 submeshesRange[submesh] = (start, length);
         }
 
-        public void SetIndices(ReadOnlySpan<int> indices, int submesh)
+        public void SetIndices(ReadOnlySpan<uint> indices, int submesh)
         {
             if (submeshesRange == null && submesh == 0)
             {
@@ -204,7 +221,7 @@ namespace TheEngine.Entities
                 var existingIndices = submeshesRange[submesh];
                 if (existingIndices.length == 0) // no indices so far
                 {
-                    var newIndices = new int[indicesCount + indices.Length];
+                    var newIndices = new uint[indicesCount + indices.Length];
                     Array.Copy(this.indices, newIndices, indicesCount);
                     indices.CopyTo(newIndices.AsSpan(indicesCount, indices.Length));
                     //Array.Copy(indices, 0, newIndices, this.indices.Length, indices.Length);

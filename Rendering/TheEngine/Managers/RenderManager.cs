@@ -4,6 +4,7 @@ using OpenGLBindings;
 using TheAvaloniaOpenGL;
 using TheAvaloniaOpenGL.Resources;
 using TheEngine.Components;
+using TheEngine.Data;
 using TheEngine.ECS;
 using TheEngine.Entities;
 using TheEngine.Handles;
@@ -59,6 +60,11 @@ namespace TheEngine.Managers
         private Material blitMaterial;
 
         private Material unlitMaterial;
+        
+        // utils
+        private IMesh sphereMesh = null!;
+        private Material wireframe = null!;
+        // end utils
 
         private Mesh currentMesh = null;
 
@@ -147,7 +153,7 @@ namespace TheEngine.Managers
             planeMesh = engine.MeshManager.CreateMesh(in ScreenPlane.Instance);
             engine.Device.device.CheckError("create mesh");
 
-            lineMesh = (Mesh)engine.MeshManager.CreateMesh(new Vector3[2]{Vector3.Zero, Vector3.Zero}, new int[]{});
+            lineMesh = (Mesh)engine.MeshManager.CreateMesh(new Vector3[2]{Vector3.Zero, Vector3.Zero}, new uint[]{});
 
             blitShader = engine.ShaderManager.LoadShader("internalShaders/blit.json", false);
             engine.Device.device.CheckError("load shader");
@@ -161,10 +167,20 @@ namespace TheEngine.Managers
             unlitMaterial = engine.MaterialManager.CreateMaterial("internalShaders/unlit.json");
             unlitMaterial.ZWrite = false;
             unlitMaterial.DepthTesting = DepthCompare.Always;
+            
+            // utils
+            sphereMesh = engine.meshManager.CreateMesh(ObjParser.LoadObj("meshes/sphere.obj").MeshData);
+        
+            wireframe = engine.MaterialManager.CreateMaterial("data/wireframe.json");
+            wireframe.SetUniform("Width", 1);
+            wireframe.SetUniform("Color", new Vector4(1, 1, 1, 1));
+            wireframe.ZWrite = false;
+            wireframe.DepthTesting = DepthCompare.Always;
         }
 
         public void Dispose()
         {
+            engine.meshManager.DisposeMesh(sphereMesh);
             //outlineTexture.Dispose();
             engine.meshManager.DisposeMesh(lineMesh);
             engine.meshManager.DisposeMesh(planeMesh);
@@ -372,6 +388,12 @@ namespace TheEngine.Managers
             pendingDynamicScale = scale;
         }
 
+        public void DrawSphere(Vector3 center, float radius, Vector4 color)
+        {
+            wireframe.SetUniform("Color", color);
+            Render(sphereMesh, wireframe, 0, Matrix.TRS(center, Quaternion.Identity, Vector3.One * radius));
+        }
+
         public void RenderFullscreenPlane(Material material)
         {
             material.Shader.Activate();
@@ -554,6 +576,9 @@ namespace TheEngine.Managers
             {
                 for (int i = start; i < end; ++i)
                 {
+                    if (bits[i].IsForceDisabled())
+                        continue;
+                    
                     var boundingBox = worldMeshBounds[i].box;
                     var pos = boundingBox.Center;
                     var boundingBoxSize = boundingBox.Size;

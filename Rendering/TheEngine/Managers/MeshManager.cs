@@ -29,7 +29,7 @@ namespace TheEngine.Managers
         }
 
         // @todo: not thread safe!
-        public IMesh CreateMesh(Vector3[] vertices, int[] indices)
+        public IMesh CreateMesh(Vector3[] vertices, uint[] indices)
         {
             var handle = new MeshHandle(meshes.Count);
 
@@ -84,7 +84,7 @@ namespace TheEngine.Managers
 #endif
         }
 
-        public IMesh CreateManagedOnlyMesh(ReadOnlySpan<Vector3> vertices, ReadOnlySpan<int> indices)
+        public IMesh CreateManagedOnlyMesh(ReadOnlySpan<Vector3> vertices, ReadOnlySpan<uint> indices)
         {
             var handle = new MeshHandle(meshes.Count);
 
