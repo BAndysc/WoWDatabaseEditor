@@ -2,11 +2,12 @@
 {
     public interface IGameObjectTemplate
     {
-        uint Entry { get; set; }
-        uint DisplayId { get; set; }
-        float Size { get; set; }
-        string Name { get; set; }
-        string AIName { get; set; }
-        string ScriptName { get; set; }
+        uint Entry { get; }
+        uint DisplayId { get; }
+        float Size { get; }
+        public uint FlagsExtra => 0;
+        string Name { get; }
+        string AIName { get; }
+        string ScriptName { get; }
     }
 }

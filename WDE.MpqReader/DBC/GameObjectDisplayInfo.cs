@@ -4,7 +4,7 @@ namespace WDE.MpqReader.DBC
 {
     public class GameObjectDisplayInfo
     {
-        public readonly int Id;
+        public readonly uint Id;
         public readonly string ModelName;
         public readonly int Sound;
         public readonly float GeoBoxMinX;
@@ -17,7 +17,7 @@ namespace WDE.MpqReader.DBC
 
         public GameObjectDisplayInfo(IDbcIterator dbcIterator)
         {
-            Id = dbcIterator.GetInt(0);
+            Id = dbcIterator.GetUInt(0);
             ModelName = dbcIterator.GetString(1);
             Sound = dbcIterator.GetInt(2);
             GeoBoxMinX = dbcIterator.GetFloat(3);
@@ -31,7 +31,7 @@ namespace WDE.MpqReader.DBC
 
         private GameObjectDisplayInfo()
         {
-            Id = -1;
+            Id = 0;
             ModelName = "";
             Sound = -1;
             GeoBoxMinX = 0;

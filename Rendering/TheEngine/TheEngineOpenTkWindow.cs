@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Avalonia.Input;
+using OpenTK.Graphics.OpenGL4;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
@@ -15,6 +16,7 @@ public class TheEngineOpenTkWindow : GameWindow, IWindowHost
     private readonly IGame game;
     private Engine engine = null!;
     private Stopwatch updateStopwatch = new();
+    private Stopwatch renderStopwatch = new Stopwatch();
 
     public TheEngineOpenTkWindow(GameWindowSettings gameWindowSettings,
         NativeWindowSettings nativeWindowSettings,
@@ -39,7 +41,9 @@ public class TheEngineOpenTkWindow : GameWindow, IWindowHost
 
     protected override void OnRenderFrame(FrameEventArgs args)
     {
+        VSync = VSyncMode.Off;
         engine.statsManager.Counters.FrameTime.Add(args.Time * 1000);
+        renderStopwatch.Restart();
         engine.renderManager.BeginFrame();
         engine.renderManager.PrepareRendering(0);
         engine.renderManager.RenderOpaque(0);
@@ -51,6 +55,9 @@ public class TheEngineOpenTkWindow : GameWindow, IWindowHost
         engine.RenderGUI();
         engine.renderManager.FinalizeRendering(0);
         base.OnRenderFrame(args);
+        renderStopwatch.Stop();
+        GL.Finish();
+        engine.statsManager.Counters.TotalRender.Add(renderStopwatch.Elapsed.Milliseconds);
         SwapBuffers();
     }
 
@@ -215,12 +222,14 @@ public class TheEngineOpenTkWindow : GameWindow, IWindowHost
         wasRightDown = isRightDown;
     }
 
+    private static Keys[] StaticCachedKeys = Enum.GetValues<Keys>();
+
     private void UpdateKeyboard()
     {
         var keys = KeyboardState.GetSnapshot();
         if (previousState != null)
         {
-            foreach (var key in Enum.GetValues<Keys>())
+            foreach (var key in StaticCachedKeys)
             {
                 if (key == Keys.Unknown)
                     continue;

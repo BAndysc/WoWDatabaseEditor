@@ -118,6 +118,8 @@ namespace WDE.MapRenderer.Managers
         private Dictionary<string, MdxInstance?> meshes = new();
         private Dictionary<string, Task<MdxInstance?>> meshesCurrentlyLoaded = new();
         private Dictionary<uint, MdxInstance?> creaturemeshes = new();
+        private Dictionary<uint, Task<MdxInstance?>> gameObjectMeshesCurrentlyLoaded = new();
+        private Dictionary<uint, MdxInstance?> gameObjectmeshes = new();
         private Dictionary<uint, Task<MdxInstance?>> creatureMeshesCurrentlyLoaded = new();
         private Dictionary<(uint displayId, bool right), MdxInstance?> itemMeshes = new();
         private Dictionary<(uint displayId, bool right), Task<MdxInstance?>> itemMeshesCurrentlyLoaded = new();
@@ -132,6 +134,7 @@ namespace WDE.MapRenderer.Managers
         private readonly CharacterFacialHairStylesStore characterFacialHairStylesStore;
         private readonly CharSectionsStore charSectionsStore;
         private readonly CreatureModelDataStore creatureModelDataStore;
+        private readonly GameObjectDisplayInfoStore gameObjectDisplayInfoStore;
         private readonly Engine engine;
         private readonly IGameContext gameContext;
         private readonly IInputManager inputManager;
@@ -150,6 +153,7 @@ namespace WDE.MapRenderer.Managers
             CharacterFacialHairStylesStore characterFacialHairStylesStore,
             CharSectionsStore charSectionsStore,
             CreatureModelDataStore creatureModelDataStore,
+            GameObjectDisplayInfoStore gameObjectDisplayInfoStore,
             Engine engine,
             IGameContext gameContext,
             IInputManager inputManager,
@@ -166,6 +170,7 @@ namespace WDE.MapRenderer.Managers
             this.characterFacialHairStylesStore = characterFacialHairStylesStore;
             this.charSectionsStore = charSectionsStore;
             this.creatureModelDataStore = creatureModelDataStore;
+            this.gameObjectDisplayInfoStore = gameObjectDisplayInfoStore;
             this.engine = engine;
             this.gameContext = gameContext;
             this.inputManager = inputManager;
@@ -969,6 +974,181 @@ namespace WDE.MapRenderer.Managers
             itemMeshes.Add((displayid, right), mdx);
             completion.SetResult(null);
             itemMeshesCurrentlyLoaded.Remove((displayid, right));
+            result.SetResult(mdx);
+        }
+        
+        public IEnumerator LoadGameObjectModel(uint gameObjectDisplayId, TaskCompletionSource<MdxInstance?> result)
+        {
+            if (gameObjectmeshes.ContainsKey(gameObjectDisplayId))
+            {
+                result.SetResult(gameObjectmeshes[gameObjectDisplayId]);
+                yield break;
+            }
+
+            if (gameObjectMeshesCurrentlyLoaded.TryGetValue(gameObjectDisplayId, out var loadInProgress))
+            {
+                yield return new WaitForTask(loadInProgress);
+                result.SetResult(gameObjectmeshes[gameObjectDisplayId]);
+                yield break;
+            }
+
+            var completion = new TaskCompletionSource<MdxInstance?>();
+            gameObjectMeshesCurrentlyLoaded[gameObjectDisplayId] = completion.Task;
+
+            if (!gameObjectDisplayInfoStore.TryGetValue(gameObjectDisplayId, out var displayInfo))
+            {
+                Console.WriteLine("Cannot find model " + gameObjectDisplayId);
+                gameObjectmeshes[gameObjectDisplayId] = null;
+                completion.SetResult(null);
+                gameObjectMeshesCurrentlyLoaded.Remove(gameObjectDisplayId);
+                result.SetResult(null);
+                yield break;
+            }
+            
+            var m2FilePath = displayInfo.ModelName.Replace("mdx", "M2", StringComparison.InvariantCultureIgnoreCase);
+            m2FilePath = m2FilePath.Replace("mdl", "M2", StringComparison.InvariantCultureIgnoreCase); // apparently there are still some MDL models	
+            var skinFilePath = m2FilePath.Replace(".m2", "00.skin", StringComparison.InvariantCultureIgnoreCase);
+            var file = gameFiles.ReadFile(m2FilePath);
+
+            yield return new WaitForTask(file);
+
+            var skinFile = gameFiles.ReadFile(skinFilePath);
+            
+            yield return new WaitForTask(skinFile);
+            
+            if (file.Result == null || skinFile.Result == null)
+            {
+                Console.WriteLine("Cannot find path " + displayInfo.ModelName);
+                gameObjectmeshes[gameObjectDisplayId] = null;
+                completion.SetResult(null);
+                gameObjectMeshesCurrentlyLoaded.Remove(gameObjectDisplayId);
+                result.SetResult(null);
+                yield break;
+            }
+
+            M2 m2 = null!;
+            M2Skin skin = null!;
+            Vector3[] vertices = null!;
+            Vector3[] normals = null!;
+            Vector2[] uv1 = null!;
+            Vector2[] uv2 = null!;
+            Vector4[] packedBones = null!;
+
+            yield return new WaitForTask(Task.Run(() =>
+            {
+                m2 = M2.Read(new MemoryBinaryReader(file.Result), m2FilePath, p =>
+                {
+                    // TODO: can I use ReadFileSync? Can be problematic...
+                    var bytes = gameFiles.ReadFileSyncLocked(p, true);
+                    if (bytes == null)
+                        return null;
+                    return new MemoryBinaryReader(bytes);
+                });
+                file.Result.Dispose();
+                skin = M2Skin.Read(new MemoryBinaryReader(skinFile.Result));
+                skinFile.Result.Dispose();
+                var count = m2.vertices.Length;
+                vertices = new Vector3[count];
+                normals = new Vector3[count];
+                uv1 = new Vector2[count];
+                uv2 = new Vector2[count];
+                packedBones = new Vector4[count];
+                
+                for (int i = 0; i < count; ++i)
+                {
+                    var vert = m2.vertices[skin.Vertices[i]];
+                    vertices[i] = vert.pos;
+                    normals[i] = vert.normal;
+                    uv1[i] = vert.tex_coords[0];
+                    uv2[i] = vert.tex_coords[1];
+                    var packedWeights = (uint)vert.bone_weights[0] | ((uint)vert.bone_weights[1] << 8) |
+                                        ((uint)vert.bone_weights[2] << 16) | ((uint)vert.bone_weights[3] << 24);
+                    var packetWeightsFloat = UintAsFloat(packedWeights);
+                    
+                    var packedIndices = (uint)vert.bone_indices[0] | ((uint)vert.bone_indices[1] << 8) |
+                                        ((uint)vert.bone_indices[2] << 16) | ((uint)vert.bone_indices[3] << 24);
+                    var packedIndicesFloat = UintAsFloat(packedIndices);
+                    packedBones[i] = new Vector4(packedIndicesFloat, packetWeightsFloat, 0, 0);
+                }
+            }));
+            
+            var md = new MeshData(vertices, normals, uv1, new uint[] { }, null, null, uv2, packedBones);
+            
+            var mesh = meshManager.CreateMesh(md);
+            mesh.SetSubmeshCount(skin.Batches.Length);
+
+            Material[] materials = new Material[skin.Batches.Length];
+            int j = 0;
+            foreach (var batch in skin.Batches)
+            {
+                if (batch.skinSectionIndex == ushort.MaxValue ||
+                    batch.materialIndex >= m2.materials.Length ||
+                    batch.skinSectionIndex >= skin.SubMeshes.Length)
+                {
+                    Console.WriteLine("Sth wrong with batch " + j + " in model " + gameObjectDisplayId);
+                    continue;
+                }
+
+                var section = skin.SubMeshes[batch.skinSectionIndex];
+                
+
+                using var indices = new PooledArray<uint>(section.indexCount);
+                for (int i = 0; i < Math.Min(section.indexCount, skin.Indices.Length - section.indexStart); ++i)
+                {
+                    indices[i] = skin.Indices[section.indexStart + i];
+                }
+
+                mesh.SetIndices(indices.AsSpan(), j++);
+
+                TextureHandle? th = null;
+                TextureHandle? th2 = null;
+                for (int i = 0; i < (batch.textureCount >= 5 ? 1 : batch.textureCount); ++i)
+                {
+                    if (batch.textureLookupId + i >= m2.textureLookupTable.Length)
+                    {
+                        if (th.HasValue)
+                            th2 = textureManager.EmptyTexture;
+                        else
+                            th = textureManager.EmptyTexture;
+                        Console.WriteLine("File " + gameObjectDisplayId + " batch " + j + " tex " + i + " out of range");
+                        continue;
+                    }
+                    var texId = m2.textureLookupTable[batch.textureLookupId + i];
+                    if (texId == -1)
+                    {
+                        if (th.HasValue)
+                            th2 = textureManager.EmptyTexture;
+                        else
+                            th = textureManager.EmptyTexture;
+                    }
+                    else
+                    {
+                        var textureDef = m2.textures[texId];
+                        var texFile = textureDef.filename.AsString();
+                        var tcs = new TaskCompletionSource<TextureHandle>();
+                        yield return textureManager.GetTexture(texFile, tcs);
+                        var resTex = tcs.Task.Result;
+                        if (th.HasValue)
+                            th2 = resTex;
+                        else
+                            th = resTex;
+                    }
+                }
+
+                materials[j - 1] = CreateMaterial(m2, batch, th, th2);
+            }
+
+            mesh.Rebuild();
+
+            var mdx = new MdxInstance
+            {
+                mesh = mesh,
+                materials = materials.AsSpan(0, j).ToArray(),
+                model = m2
+            };
+            gameObjectmeshes.Add(gameObjectDisplayId, mdx);
+            completion.SetResult(null);
+            gameObjectMeshesCurrentlyLoaded.Remove(gameObjectDisplayId);
             result.SetResult(mdx);
         }
         

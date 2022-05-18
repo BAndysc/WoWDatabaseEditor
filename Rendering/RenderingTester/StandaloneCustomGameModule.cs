@@ -125,31 +125,6 @@ public class StandaloneCustomGameModule : IGameModule, IPostProcess
         RT_downscaled.Update();
         outlineMaterial.SetTexture("outlineTex", RT_downscaled);
         outlineMaterial.SetTexture("outlineTexUnBlurred", RT);
-        renderManager.ActivateRenderTexture(RT, Color4.TransparentBlack);
-        
-        archetypes.StaticM2WorldObjectAnimatedArchetype.ForEach<LocalToWorld, MeshRenderer, MaterialInstanceRenderData>(
-        (itr, start, end, localToWorldAccess, rendererAccess, materialInstanceData) =>
-        {
-            for (int i = start; i < end; ++i)
-            {
-                var localToWorld = localToWorldAccess[i];
-                var renderer = rendererAccess[i];
-                var instanceData = materialInstanceData[i];
-
-                var oldMaterial = materialManager.GetMaterialByHandle(renderer.MaterialHandle);
-                replacementMaterial.Culling = oldMaterial.Culling;
-                replacementMaterial.SetUniform("alphaTest", oldMaterial.GetUniformFloat("alphaTest"));
-                replacementMaterial.SetTexture("texture1", oldMaterial.GetTexture("texture1"));
-                replacementMaterial.SetBuffer("boneMatrices", instanceData.GetBuffer("boneMatrices")!);
-                
-                renderManager.Render(renderer.MeshHandle, replacementMaterial.Handle, renderer.SubMeshId, localToWorld.Matrix, localToWorld.Inverse);
-            }
-        });
-
-        // downscale for fake and fast "blur"
-        textureManager.BlitRenderTextures(RT, RT_downscaled);
-
-        renderManager.ActivateDefaultRenderTexture();
     }
     
     public void RenderGUI()

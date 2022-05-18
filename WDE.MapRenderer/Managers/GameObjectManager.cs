@@ -18,6 +18,7 @@ using TheEngine.Handles;
 using WDE.Common.Database;
 using WDE.MapRenderer;
 using WDE.MapRenderer.Managers;
+using WDE.MapRenderer.Managers.Entities;
 
 namespace WDE.MapRenderer.Managers
 {
@@ -25,7 +26,7 @@ namespace WDE.MapRenderer.Managers
     {
         public class GameObjectChunkData
         {
-            public List<StaticRenderHandle> registeredEntities = new();
+            public List<GameObjectInstance> Objects = new();
         }
         
         private readonly IGameContext gameContext;
@@ -40,13 +41,9 @@ namespace WDE.MapRenderer.Managers
         private readonly IDatabaseProvider database;
 
         private PerChunkHolder<List<IGameObject>> gameObjectDataPerChunk = new();
-        private IList<IGameObjectTemplate> gameobjectstemplates;
-        private Transform t = new Transform();
         private IMesh BoxMesh;
         private Material transcluentMaterial;
 
-        public static float GameObjectVisibilityDistanceSquare = 900 * 900;
-        
         public GameObjectManager(IGameContext gameContext, 
             IMeshManager meshManager,
             IMaterialManager materialManager,
@@ -66,7 +63,6 @@ namespace WDE.MapRenderer.Managers
             this.dbcManager = dbcManager;
             this.cameraManager = cameraManager;
             this.database = database;
-            gameobjectstemplates = database.GetGameObjectTemplates().ToList();
 
             BoxMesh = meshManager.CreateMesh(ObjParser.LoadObj("meshes/box.obj").MeshData);
             transcluentMaterial = materialManager.CreateMaterial("data/gizmo.json");
@@ -104,10 +100,12 @@ namespace WDE.MapRenderer.Managers
         
         public IEnumerator UnloadChunk(GameObjectChunkData chunk)
         {
-            foreach (var gameObject in chunk.registeredEntities)
+            foreach (var gameObject in chunk.Objects)
             {
-                renderManager.UnregisterStaticRenderer(gameObject);
+                gameObject.Dispose();
             }
+            
+            chunk.Objects.Clear();
 
             yield break;
         }
@@ -123,52 +121,18 @@ namespace WDE.MapRenderer.Managers
                 if (gameobject.PhaseMask != null && (gameobject.PhaseMask & 1) != 1)
                     continue;
 
-                var gameObjectPosition = new Vector3(gameobject.X, gameobject.Y, gameobject.Z);
-                float height = 0;
+                IGameObjectTemplate? gotemplate = database.GetGameObjectTemplate(gameobject.Entry);
 
-                // if ((gameContext.CameraManager.Position - t.Position).LengthSquared() > GameObjectVisibilityDistanceSquare)
-                //     continue;
+                if (gotemplate == null)
+                    continue;
 
-                IGameObjectTemplate gotemplate = gameobjectstemplates.First(x => x.Entry == gameobject.Entry);
+                var gameObjectInstance = new GameObjectInstance(gameContext, gotemplate, null);
 
-                // t.Rotation = new Quaternion(gameobject.Rotation0, gameobject.Rotation1, gameobject.Rotation2, gameobject.Rotation3);
+                yield return gameObjectInstance.Load();
                 
-                string M2Path = "";
+                gameObjectInstance.Position = new Vector3(gameobject.X, gameobject.Y, gameobject.Z);
 
-                if (dbcManager.GameObjectDisplayInfoStore.Contains((int)gotemplate.DisplayId))
-                {
-                    M2Path = dbcManager.GameObjectDisplayInfoStore[(int)gotemplate.DisplayId].ModelName;
-
-                    TaskCompletionSource<MdxManager.MdxInstance?> mdx = new();
-                    yield return mdxManager.LoadM2Mesh(M2Path, mdx);
-                    if (mdx.Task.Result == null)
-                    {
-                        System.Diagnostics.Debug.WriteLine($"Can't load {M2Path}"); //could not load mdx
-                    }
-                    else
-                    {
-                        int i = 0;
-                        var instance = mdx.Task.Result;
-                        height = instance.mesh.Bounds.Height / 2;
-                        // position, rotation
-                        
-                        t.Position = gameObjectPosition;
-                
-                        t.Scale = new Vector3(gotemplate.Size);
-                        // TODO : apply rotation +  orientation
-                        t.Rotation = Quaternion.FromEuler(0, MathUtil.RadiansToDegrees(-gameobject.Orientation), 0.0f);
-
-                        foreach (var material in instance.materials)
-                            chunk.registeredEntities.Add(renderManager.RegisterStaticRenderer(instance.mesh.Handle, material, i++, t));
-
-                        //t.Scale = instance.mesh.Bounds.Size /2 ;
-                        //t.Position += instance.mesh.Bounds.Center;
-                        // t.Scale = new Vector3(instance.mesh.Bounds.Width, instance.mesh.Bounds.Depth, instance.mesh.Bounds.Height); 
-                        //chunk.registeredEntities.Add(renderManager.RegisterStaticRenderer(BoxMesh.Handle, transcluentMaterial, 0, t));
-
-                        // gameContext.Engine.Ui.DrawWorldText("calibri", new Vector2(0.5f, 1f), gotemplate.Name, 2.5f, Matrix.TRS(t.Position + Vector3.Up * height, in Quaternion.Identity, in Vector3.One));
-                    }
-                }
+                gameObjectInstance.Rotation = new Quaternion(gameobject.Rotation0, gameobject.Rotation1, gameobject.Rotation2, gameobject.Rotation3);
             }
         }
 

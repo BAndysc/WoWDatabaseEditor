@@ -15,6 +15,10 @@ namespace WDE.Common.Database
         public float Rotation1 { get; }
         public float Rotation2 { get; }
         public float Rotation3 { get; }
+        public float ParentRotation0 { get; }
+        public float ParentRotation1 { get; }
+        public float ParentRotation2 { get; }
+        public float ParentRotation3 { get; }
 
         uint SpawnKey => 0;
     }

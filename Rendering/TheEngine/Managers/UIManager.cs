@@ -234,7 +234,7 @@ namespace TheEngine.Managers
             glyphPositionsBuffer.UpdateBuffer(glyphPositions);
             glyphUVsBuffer.UpdateBuffer(glyphUVs);
             engine.RenderManager.RenderInstancedIndirect(quad, material, 0, glyphsCount);
-            engine.RenderManager.Render(quad, material, 0, new Transform());
+            engine.RenderManager.Render(quad, material, 0,  Matrix.Identity);
         }
 
         public Vector2 MeasureText(string font, ReadOnlySpan<char> text, float fontSize)

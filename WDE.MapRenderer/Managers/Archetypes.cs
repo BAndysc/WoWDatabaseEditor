@@ -2,6 +2,7 @@ using TheAvaloniaOpenGL.Resources;
 using TheEngine.Components;
 using TheEngine.ECS;
 using TheMaths;
+using WDE.MpqReader.DBC;
 using WDE.MpqReader.Structures;
 
 namespace WDE.MapRenderer.Managers;
@@ -10,6 +11,7 @@ public class M2AnimationComponentData : IManagedComponentData
 {
     public readonly M2 Model;
     public M2AnimationComponentData? AttachedTo;
+    public AnimationDataFlags Flags = AnimationDataFlags.None;
 
     public int SetNewAnimation;
     public M2AttachmentType? AttachmentType;

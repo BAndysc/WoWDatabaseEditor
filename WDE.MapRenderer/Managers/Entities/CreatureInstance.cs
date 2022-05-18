@@ -10,40 +10,19 @@ using WDE.MpqReader.Structures;
 
 namespace WDE.MapRenderer.Managers.Entities;
 
-public class CreatureInstance : System.IDisposable
+public class CreatureInstance : WorldObjectInstance
 {
-    private readonly IGameContext gameContext;
     private readonly ICreatureTemplate creatureTemplate;
     private readonly uint creatureDisplayId;
     private List<INativeBuffer> bonesBuffers = new();
-    private List<Entity> handles = new();
-    private List<Entity> renderers = new();
-    private List<Entity> colliders = new();
     private M2AnimationComponentData masterAnimation = null!;
-
-    private Entity objectEntity;
-    private Entity textEntity;
-    
-    public IReadOnlyList<Entity> Renderers => renderers;
-    public Entity WorldObjectEntity => objectEntity;
 
     public CreatureInstance(IGameContext gameContext,
         ICreatureTemplate creatureTemplate,
-        uint? creatureDisplayId)
+        uint? creatureDisplayId) : base(gameContext)
     {
-        this.gameContext = gameContext;
         this.creatureTemplate = creatureTemplate;
         this.creatureDisplayId = creatureDisplayId ?? creatureTemplate.GetRandomModel();
-    }
-
-    public Vector3 Position
-    {
-        get => gameContext.EntityManager.GetComponent<LocalToWorld>(objectEntity).Position;
-        set
-        {
-            gameContext.EntityManager.GetComponent<LocalToWorld>(objectEntity).Position = value;
-            objectEntity.SetDirtyPosition(gameContext.EntityManager);
-        }
     }
 
     public float Orientation
@@ -53,9 +32,32 @@ public class CreatureInstance : System.IDisposable
 
     public M2AnimationType Animation
     {
-        set => gameContext.EntityManager.GetManagedComponent<M2AnimationComponentData>(objectEntity).SetNewAnimation = (int)value;
+        set
+        {
+            // todo: move to animation system
+            AnimationDataFlags flags = AnimationDataFlags.None;
+            uint animId = (uint)value;
+            if (Model != null)
+            {
+                var animStore = gameContext.DbcManager.AnimationDataStore;
+                while (animStore.TryGetValue(animId, out var animationData) &&
+                       Model.GetAnimationIndexByAnimationId((int)animId) == null)
+                {
+                    if (animationData.Fallback != 0)
+                    {
+                        animId = animationData.Fallback;
+                        flags = animationData.Flags;
+                    }
+                    else
+                        break;
+                }
+            }
+            var animData =  gameContext.EntityManager.GetManagedComponent<M2AnimationComponentData>(objectEntity);
+            animData.SetNewAnimation = (int)animId;
+            animData.Flags = flags;
+        }
     }
-    
+
     public M2? Model { get; private set; }
 
     public MdxManager.MdxInstance Mount
@@ -100,21 +102,6 @@ public class CreatureInstance : System.IDisposable
             masterAnimation.AttachedTo = mountAnimationData;
             masterAnimation.AttachmentType = M2AttachmentType.MountMain;
             Animation = M2AnimationType.Mount;
-        }
-    }
-
-    private bool isRenderingEnabled = true;
-    public bool EnableRendering
-    {
-        set
-        {
-            isRenderingEnabled = value;
-            objectEntity.SetForceDisabledRendering(gameContext.EntityManager, !value);
-            foreach (var renderer in renderers)
-                renderer.SetForceDisabledRendering(gameContext.EntityManager, !value);
-            foreach (var collider in colliders)
-                collider.SetDisabledObject(gameContext.EntityManager, !value);
-            textEntity.SetDisabledObject(gameContext.EntityManager, !value);
         }
     }
 
@@ -239,7 +226,7 @@ public class CreatureInstance : System.IDisposable
         AddAttachment(slot is 0 or 2 ? M2AttachmentType.ItemVisual1 : M2AttachmentType.ItemVisual0, weaponModel);
     }
     
-    public void Dispose()
+    public override void Dispose()
     {
         if (objectEntity == Entity.Empty)
         {

@@ -177,6 +177,7 @@ namespace WDE.MapRenderer.Utils
         private readonly List<(T item, Vector3 original_position, Vector3 offset)> draggable = new();
         private Vector3 originalTouch;
         public bool IsEnabled { get; set; }
+        public bool CanRotate { get; set; }
         public Vector3 GizmoPosition { get; set; }
         
         public Dragger(IMeshManager meshManager,

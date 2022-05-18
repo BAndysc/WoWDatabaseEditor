@@ -216,9 +216,25 @@ public class AnimationSystem
                 if (animationData._currentAnimation == -1)
                     continue;
 
-                animationData._time += delta;
-                while (animationData._time > animationData._length)
-                    animationData._time -= animationData._length;
+                if ((animationData.Flags & AnimationDataFlags.FallbackPlayBackwards) != 0)
+                    animationData._time -= delta;
+                else    
+                    animationData._time += delta;
+
+                if ((animationData.Flags & AnimationDataFlags.FallbackHoldsLastFrame) != 0)
+                {
+                    if (animationData._time > animationData._length)
+                        animationData._time = animationData._length;
+                    else if (animationData._time < 0)
+                        animationData._time = 0;
+                }
+                else
+                {
+                    while (animationData._time > animationData._length)
+                        animationData._time -= animationData._length;
+                    if (animationData._time < 0)
+                        animationData._time = animationData._length;
+                }
 
                 var bonesLength = animationData.Model.bones.Length;
                 var localBones = ArrayPool<Matrix>.Shared.Rent(bonesLength);
@@ -279,12 +295,6 @@ public class AnimationSystem
         {
             var emote = emoteStore[emoteState.Value];
             animationId = (M2AnimationType)emote.AnimId;
-
-            if (animationDataStore.TryGetValue((uint)animationId, out var animationData))
-            {
-                if (animationData.Fallback != 0)
-                    animationId = (M2AnimationType)animationData.Fallback;
-            }
         }
         else if (standState.HasValue)
         {
@@ -322,8 +332,13 @@ public class AnimationSystem
                     animationId = M2AnimationType.Hover;
                     break;
                 case AnimTier.Fly:
-                    animationId = M2AnimationType.FlyStand;
+                {
+                    if (model?.GetAnimationIndexByAnimationId((int)M2AnimationType.FlyStand) == null)
+                        animationId = M2AnimationType.Fly;
+                    else
+                        animationId = M2AnimationType.FlyStand;
                     break;
+                }
                 case AnimTier.Submerged:
                     animationId = M2AnimationType.Submerged;
                     break;
@@ -331,6 +346,7 @@ public class AnimationSystem
                     throw new ArgumentOutOfRangeException(nameof(animTier), animTier, null);
             }
         }
+
         return animationId;
     }
 }
