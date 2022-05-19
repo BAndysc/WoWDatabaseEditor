@@ -340,14 +340,14 @@ namespace WDE.MapRenderer.Managers
 
                     isCharacterModel = true;
                     int geosetSkin = 0;
-                    int geosetHair = 1;
-                    int geosetFacial1 = 101;
-                    int geosetFacial2 = 201;
-                    int geosetFacial3 = 301;
+                    int geosetHair = 0; // Hair: { 1 - 21: various hairstyles}
+                    int geosetFacial1 = 100; // Facial1: {1-8: varies} (usually beard, but not always)
+                    int geosetFacial2 = 200; // Facial2: {1: none (DNE), 2-6: varies} (usually mustacheᵘ, but not always)
+                    int geosetFacial3 = 300; // Facial3: { 1: none(DNE), 2 - 11: varies} (usually sideburnsᵘ, but not always)
                     int geosetGlove = 401;  // {0: No Geoset; 1: Default; 2: Thin; 3: Folded; 4: Thick}
                     int geosetBoots = 501; // {0: No Geoset; 1: Default; 2: High Boot; 3: Folded Boot; 4: Puffed; 5: Boot 4}
                     int geosetTail = 600; 
-                    int geosetEars = 700;
+                    int geosetEars = 702; // {1: none (DNE), 2: ears}
                     int geosetSleeves = 801; // {1: Default (No Geoset); 2: Flared Sleeve; 3: Puffy Sleeve; 4: Panda Collar Shirt}
                     int geosetlegcuffs = 901; // {1: Default (No Geoset); 2: Flared Pant Cuff; 3: Knickers; 4: Panda Pants}
                     int geosetChest = 1001; // {1: Default (No Geoset); 2: Doublet; 3: Body 2; 4: Body 3}
@@ -376,7 +376,7 @@ namespace WDE.MapRenderer.Managers
                     // hair
                     if (displayinfoextra.HairStyle > 0)
                     {
-                        int hairstyle = charHairGeosetsStore.First(x => x.RaceID == displayinfoextra.Race && x.SexId == displayinfoextra.Gender && x.VariationId + 1 == displayinfoextra.HairStyle).GeosetId; // maybe +1 like beards ?
+                        int hairstyle = charHairGeosetsStore.First(x => x.RaceID == displayinfoextra.Race && x.SexId == displayinfoextra.Gender && x.VariationId == displayinfoextra.HairStyle).GeosetId; // maybe +1 like beards ?
                         geosetHair += hairstyle;
                         // use CharHairGeosetsStore.ShowScalp (bald) or is it only some client stuff ?
                     }
@@ -384,12 +384,18 @@ namespace WDE.MapRenderer.Managers
                     // facial hair
                     if (displayinfoextra.BeardStyle > 0)
                     {
-                        CharacterFacialHairStyles facialhairstyle = characterFacialHairStylesStore.First(x => x.RaceID == displayinfoextra.Race && x.SexId == displayinfoextra.Gender && x.VariationId +1 == displayinfoextra.BeardStyle );
-                        geosetFacial1 += facialhairstyle.Geoset1;
-                        geosetFacial2 += facialhairstyle.Geoset3; // apparently this is group 3 ? verify in game.
-                        geosetFacial3 += facialhairstyle.Geoset2;
-                        geosetNoseEarrings += facialhairstyle.Geoset4;
-                        geosetEyeglows += facialhairstyle.Geoset5;
+                        // using first of default because it seems some NPCs use invalid variation id
+                        CharacterFacialHairStyles facialhairstyle = characterFacialHairStylesStore.FirstOrDefault(x => x.RaceID == displayinfoextra.Race && x.SexId == displayinfoextra.Gender && x.VariationId == displayinfoextra.BeardStyle); // maybe variation +1
+                        
+                        if (facialhairstyle != null)
+                        {
+                            geosetFacial1 += facialhairstyle.Geoset1;
+                            geosetFacial2 += facialhairstyle.Geoset3; // apparently this is group 3 ? verify in game.
+                            geosetFacial3 += facialhairstyle.Geoset2;
+                            geosetNoseEarrings += facialhairstyle.Geoset4;
+                            geosetEyeglows += facialhairstyle.Geoset5;
+                        }
+                        else Console.WriteLine("invalid facialhairstyle id for display id " + creatureDisplayInfo.Id);
                     }
 
                     if (displayinfoextra.Helm > 0)
