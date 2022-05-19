@@ -817,7 +817,7 @@ namespace WDE.MapRenderer.Managers
             else if (model.StartsWith("Helm"))
             {
                 folderPath += "HEAD\\";
-                if (racesStore.TryGetValue(raceGenderKey, out var raceInfo))
+                if (racesStore.TryGetValue(race, out var raceInfo))
                 {
                     model = Path.ChangeExtension(model, null) + "_" + raceInfo.ClientPrefix + (gender == 0 ? "M" : "F") + ".M2";
                 }
