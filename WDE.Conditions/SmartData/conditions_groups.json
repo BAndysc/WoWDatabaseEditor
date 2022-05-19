@@ -26,7 +26,8 @@
             "CONDITION_AREAID",
             "CONDITION_ZONEID",
             "CONDITION_TERRAIN_SWAP",
-            "CONDITION_DIFFICULTY_ID"
+            "CONDITION_DIFFICULTY_ID",
+            "CONDITION_SCENARIO_STEP"
         ]
     },
     {
@@ -41,7 +42,6 @@
             "CONDITION_OBJECT_ENTRY_GUID_MASTER",
             "CONDITION_TYPE_MASK_MASTER",
             "CONDITION_CREATURE_FAMILY",
-            "CONDITION_CREATURE_SUBFAMILY",
             "CONDITION_CREATURE_TYPE",
             "CONDITION_STAND_STATE",
             "CONDITION_CHARMED"
@@ -52,7 +52,8 @@
         "group_members": [
             "CONDITION_WORLD_STATE",
             "CONDITION_ACTIVE_EVENT",
-            "CONDITION_INSTANCE_INFO"
+            "CONDITION_INSTANCE_INFO",
+            "CONDITION_SCENARIO_STEP"
         ]
     },
     {
