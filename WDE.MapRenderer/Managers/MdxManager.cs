@@ -569,7 +569,7 @@ namespace WDE.MapRenderer.Managers
                         var textureDef = m2.textures[texId];
                         string texFile = "";
                         
-                        if (textureDef.type == 0) // if tetx is hardcoded
+                        if (textureDef.type == 0) // if texture is hardcoded
                             texFile = textureDef.filename.AsString();
 
                         // character models
@@ -578,7 +578,6 @@ namespace WDE.MapRenderer.Managers
                             CreatureDisplayInfoExtra displayinfoextra = creatureDisplayInfoExtraStore[
                                 creatureDisplayInfoStore[displayid].ExtendedDisplayInfoID];
 
-                            // how the fuck to differenciate between body and face ?
                             if (textureDef.type == M2Texture.TextureType.TEX_COMPONENT_SKIN) // character skin
                             {
                                 // This is for player characters... Creatures always come with a baked texture.
@@ -605,9 +604,27 @@ namespace WDE.MapRenderer.Managers
                                 // var pathsplit = m2FilePath.Split('\\');
                                 // texFile = pathsplit[0] + "\\" + pathsplit[1] + "\\Hair00_" + hairid + ".blp";
 
-                                // 2nd way : 
-                                texFile = charSectionsStore.First(x => x.RaceID == displayinfoextra.Race && x.SexId == displayinfoextra.Gender
+                                
+                                if (section.skinSectionId >= 100) // facial hair :: 100-400
+                                {
+                                    // https://wowdev.wiki/DB/CharSections#Field_Descriptions
+
+                                    // need to combine lower and upper ?
+                                    // issue : many of the textures referenced in charSections don't actually exist
+                                    // texFile = charSectionsStore.First(x => x.RaceID == displayinfoextra.Race && x.SexId == displayinfoextra.Gender
+                                    // && x.ColorIndex == displayinfoextra.HairColor && x.VariationIndex == displayinfoextra.BeardStyle && x.BaseSection == 2).TextureName2;
+
+                                    // this makes no sense but it works, use the hair section but use beard style to get the variation
+                                    texFile = charSectionsStore.First(x => x.RaceID == displayinfoextra.Race && x.SexId == displayinfoextra.Gender
+                                    && x.ColorIndex == displayinfoextra.HairColor && x.VariationIndex == displayinfoextra.BeardStyle && x.BaseSection == 3).TextureName1;
+
+                                }
+                                else // hair < 100
+                                {
+                                    texFile = charSectionsStore.First(x => x.RaceID == displayinfoextra.Race && x.SexId == displayinfoextra.Gender
                                     &&  x.ColorIndex == displayinfoextra.HairColor && x.VariationIndex == displayinfoextra.HairStyle && x.BaseSection == 3).TextureName1;
+                                }
+
                             }
                         }
 
