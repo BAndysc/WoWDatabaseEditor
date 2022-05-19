@@ -851,7 +851,7 @@ namespace TheEngine.Managers
             engine.Device.DrawIndexed(count, start, 0);
         }
 
-        public void DrawLine(Vector3 start, Vector3 end)
+        public void DrawLine(Vector3 start, Vector3 end, Vector4 color)
         {
             lineMesh.SetVertices(new Vector3[2]{start, end});
             lineMesh.Rebuild();
@@ -860,6 +860,7 @@ namespace TheEngine.Managers
                 currentShader = unlitMaterial.Shader;
                 currentShader.Activate();
             }
+            unlitMaterial.SetUniform("color", color);
             EnableMaterial(unlitMaterial, false);
             currentMesh = (Mesh)lineMesh;
             lineMesh.Activate();
@@ -997,9 +998,9 @@ namespace TheEngine.Managers
     {
         public static void DrawRay(this IRenderManager renderManager, Ray ray)
         {
-            renderManager.DrawLine(ray.Position, ray.Position + ray.Direction);
-            renderManager.DrawLine(ray.Position + ray.Direction - Vector3.Left * 0.5f, ray.Position + ray.Direction);
-            renderManager.DrawLine(ray.Position + ray.Direction - Vector3.Forward * 0.5f, ray.Position + ray.Direction);
+            renderManager.DrawLine(ray.Position, ray.Position + ray.Direction, Color4.White);
+            renderManager.DrawLine(ray.Position + ray.Direction - Vector3.Left * 0.5f, ray.Position + ray.Direction, Color4.White);
+            renderManager.DrawLine(ray.Position + ray.Direction - Vector3.Forward * 0.5f, ray.Position + ray.Direction, Color4.White);
         }
     }
 }

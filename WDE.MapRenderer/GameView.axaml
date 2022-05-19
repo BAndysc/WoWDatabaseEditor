@@ -13,7 +13,7 @@
     </UserControl.Styles>
     <UserControl.KeyBindings>
         <KeyBinding Gesture="M" Command="{CompiledBinding ToggleMapVisibilityCommand}" />
-        <KeyBinding Gesture="R" Command="{CompiledBinding ToggleStatsVisibilityCommand}" />
+        <KeyBinding Gesture="B" Command="{CompiledBinding ToggleStatsVisibilityCommand}" />
     </UserControl.KeyBindings>
     <DockPanel LastChildFill="True">
         <mapRenderer:GameToolBar DockPanel.Dock="Top" />

@@ -65,7 +65,10 @@ namespace WDE.MapRenderer.Utils
             TranslateZ,
             TranslateXY,
             TranslateY,
-            TranslateXZ
+            TranslateXZ,
+            RotationX,
+            RotationY,
+            RotationZ,
         }
 
         public HitType HitTest(IInputManager inputManager, ICameraManager cameraManager, out Vector3 intersectionPoint)
@@ -152,11 +155,12 @@ namespace WDE.MapRenderer.Utils
         }
     }
     
-    internal enum DragMode
+    internal enum GizmoMode
     {
         NoDragging,
         MouseDrag,
-        KeyboardDrag
+        KeyboardDrag,
+        Rotation
     }
     
     public abstract class Dragger<T>
@@ -170,10 +174,11 @@ namespace WDE.MapRenderer.Utils
         private readonly uint collisionMask;
         private Gizmo gizmo = null!;
         
-        private DragMode dragging = DragMode.NoDragging;
+        private GizmoMode dragging = GizmoMode.NoDragging;
 
         private Plane plane;
         private Vector3? axis;
+        private readonly List<(T item, Quaternion original_rotation)> rotable = new();
         private readonly List<(T item, Vector3 original_position, Vector3 offset)> draggable = new();
         private Vector3 originalTouch;
         public bool IsEnabled { get; set; }
@@ -215,38 +220,56 @@ namespace WDE.MapRenderer.Utils
             
             gizmo.position.Position = GizmoPosition + Vector3.Up;
             gizmo.Render(cameraManager, renderManager);
+
+            if (dragging == GizmoMode.Rotation)
+            {
+                var from = GizmoPosition - axis.Value * 1000;
+                var to = GizmoPosition + axis.Value * 1000;
+                renderManager.DrawLine(from, to, new Vector4(1, 0, 0, 1));
+            }
         }
 
+        public abstract Quaternion GetRotation(T item);
         public abstract Vector3 GetPosition(T item);
         protected abstract void Move(T item, Vector3 position);
+        protected abstract void Rotate(T item, Quaternion rotation);
         protected abstract IReadOnlyList<T>? PointsToDrag();
+        protected abstract void FinishRotation(IEnumerable<T> objects);
         protected abstract void FinishDragging(IEnumerable<T> objects);
 
         public bool Update(float f)
         {
             var ray = cameraManager.MainCamera.NormalizedScreenPointToRay(inputManager.Mouse.NormalizedPosition);
+
+            var stopDrag = (dragging == GizmoMode.MouseDrag && !inputManager.Mouse.IsMouseDown(MouseButton.Left)) ||
+                           (dragging == GizmoMode.KeyboardDrag && inputManager.Mouse.HasJustClicked(MouseButton.Left));
+            var stopRotate = (dragging == GizmoMode.Rotation && inputManager.Mouse.HasJustClicked(MouseButton.Left));
             
-            var stopDrag = (dragging == DragMode.MouseDrag && !inputManager.Mouse.IsMouseDown(MouseButton.Left)) ||
-                           (dragging == DragMode.KeyboardDrag && inputManager.Mouse.HasJustClicked(MouseButton.Left));
-            if (stopDrag)
-                dragging = DragMode.NoDragging;
+            if (stopDrag || stopRotate)
+                dragging = GizmoMode.NoDragging;
 
             if (draggable.Count > 0 && stopDrag)
             {
                 FinishDrag();
                 return true;
             }
+
+            if (rotable.Count > 0 && stopRotate)
+            {
+                FinishRotation();
+                return true;
+            }
             
-            if (dragging != DragMode.NoDragging && inputManager.Keyboard.JustPressed(Key.Escape))
+            if (dragging != GizmoMode.NoDragging && inputManager.Keyboard.JustPressed(Key.Escape))
             {
                 foreach (var d in draggable)
-                {
                     Move(d.item, d.original_position);
-                }
-                dragging = DragMode.NoDragging;
+                foreach (var r in rotable)
+                    Rotate(r.item, r.original_rotation);
+                dragging = GizmoMode.NoDragging;
             }
 
-            if (IsEnabled && dragging != DragMode.NoDragging)
+            if (IsEnabled && dragging is GizmoMode.KeyboardDrag or GizmoMode.MouseDrag)
             {
                 if (plane.Intersects(ref ray, out Vector3 originalTouch))
                 {
@@ -262,9 +285,22 @@ namespace WDE.MapRenderer.Utils
                 }
             }
 
-            if (dragging == DragMode.KeyboardDrag && inputManager.Keyboard.JustPressed(Key.G))
+            if (IsEnabled && dragging is GizmoMode.Rotation)
             {
-                dragging = DragMode.NoDragging;
+                if (plane.Intersects(ref ray, out Vector3 touch))
+                {
+                    for (var index = 0; index < rotable.Count; index++)
+                    {
+                        var item = rotable[index];
+                        var rot = Quaternion.RotationAxis(axis.Value, Vector3.Dot(touch - originalTouch, axis.Value)) * item.original_rotation;
+                        Rotate(item.item, rot);
+                    }
+                }
+            }
+
+            if (dragging == GizmoMode.KeyboardDrag && inputManager.Keyboard.JustPressed(Key.G))
+            {
+                dragging = GizmoMode.NoDragging;
                 List<(Entity, Vector3)> result = new();
                 for (var index = 0; index < draggable.Count; index++)
                 {
@@ -295,12 +331,27 @@ namespace WDE.MapRenderer.Utils
                 return false;
             }
             
-            if (dragging == DragMode.NoDragging && inputManager.Keyboard.JustPressed(Key.G))
+            if (dragging == GizmoMode.NoDragging && inputManager.Keyboard.JustPressed(Key.G))
             {
-                StartDragging(Gizmo.HitType.TranslateXY, ref ray, DragMode.KeyboardDrag);
+                StartDragging(Gizmo.HitType.TranslateXY, ref ray, GizmoMode.KeyboardDrag);
             }
 
-            if (dragging == DragMode.KeyboardDrag)
+            if (dragging == GizmoMode.NoDragging && CanRotate && inputManager.Keyboard.JustPressed(Key.R))
+            {
+                StartRotation(Gizmo.HitType.RotationZ, ref ray, GizmoMode.Rotation);
+            }
+
+            if (dragging == GizmoMode.Rotation)
+            {
+                if (inputManager.Keyboard.JustPressed(Key.X))
+                    StartRotation(Gizmo.HitType.RotationX, ref ray, GizmoMode.Rotation);
+                else if (inputManager.Keyboard.JustPressed(Key.Y))
+                    StartRotation(Gizmo.HitType.RotationY, ref ray, GizmoMode.Rotation);
+                else if (inputManager.Keyboard.JustPressed(Key.Z))
+                    StartRotation(Gizmo.HitType.RotationZ, ref ray, GizmoMode.Rotation);
+            }
+
+            if (dragging == GizmoMode.KeyboardDrag)
             {
                 Gizmo.HitType hitType = Gizmo.HitType.None;
                 if (inputManager.Keyboard.JustPressed(Key.X))
@@ -311,22 +362,28 @@ namespace WDE.MapRenderer.Utils
                     hitType = inputManager.Keyboard.IsDown(Key.LeftShift) ? Gizmo.HitType.TranslateXY : Gizmo.HitType.TranslateZ;
                 
                 if (hitType != Gizmo.HitType.None)
-                    StartDragging(hitType, ref ray, DragMode.KeyboardDrag);
+                    StartDragging(hitType, ref ray, GizmoMode.KeyboardDrag);
             }
 
             if (inputManager.Mouse.HasJustClicked(MouseButton.Left) && !stopDrag)
             {
-                if (IsEnabled && dragging == DragMode.NoDragging)
+                if (IsEnabled && dragging == GizmoMode.NoDragging)
                 {
                     var result = gizmo.HitTest(inputManager, cameraManager, out _);
                     if (result != Gizmo.HitType.None)
-                        StartDragging(result, ref ray, DragMode.MouseDrag);
+                        StartDragging(result, ref ray, GizmoMode.MouseDrag);
                 }
             }
 
             return IsDragging();
         }
 
+        private void FinishRotation()
+        {
+            FinishRotation(rotable.Select(x => x.item));
+            rotable.Clear();
+        }
+        
         private void FinishDrag()
         {
             FinishDragging(draggable.Select(x => x.item));
@@ -360,6 +417,15 @@ namespace WDE.MapRenderer.Utils
                     axis = null;
                     plane = new Plane(gizmo.position.Position, new Vector3(0, 1, 0));
                     break;
+                case Gizmo.HitType.RotationX:
+                    axis = new Vector3(1, 0, 0);
+                    break;
+                case Gizmo.HitType.RotationZ:
+                    axis = new Vector3(0, 0, 1);
+                    break;
+                case Gizmo.HitType.RotationY:
+                    axis = new Vector3(0, 1, 0);
+                    break;
             }
 
             if (axis.HasValue)
@@ -370,17 +436,17 @@ namespace WDE.MapRenderer.Utils
             }
         }
 
-        private void StartDragging(Gizmo.HitType hitType, ref Ray ray, DragMode dragMode)
+        private void StartDragging(Gizmo.HitType hitType, ref Ray ray, GizmoMode gizmoMode)
         {
             GetDragAxisAndPlane(hitType, out var axis, out var plane);
             if (plane.Intersects(ref ray, out Vector3 touchPoint))
-                StartDragging(touchPoint, axis, plane, dragMode);
+                StartDragging(touchPoint, axis, plane, gizmoMode);
         }
         
-        private void StartDragging(Vector3 startTouchPoint, Vector3? axis, Plane plane, DragMode dragMode)
+        private void StartDragging(Vector3 startTouchPoint, Vector3? axis, Plane plane, GizmoMode gizmoMode)
         {
             originalTouch = startTouchPoint;
-            dragging = dragMode;
+            dragging = gizmoMode;
             this.axis = axis;
             this.plane = plane;
             draggable.Clear();
@@ -395,9 +461,34 @@ namespace WDE.MapRenderer.Utils
             }
         }
 
+        private void StartRotation(Gizmo.HitType hitType, ref Ray ray, GizmoMode gizmoMode)
+        {
+            GetDragAxisAndPlane(hitType, out var axis, out var plane);
+            if (plane.Intersects(ref ray, out Vector3 touchPoint))
+                StartRotation(touchPoint, axis, plane, gizmoMode);
+        }
+        
+        private void StartRotation(Vector3 startTouchPoint, Vector3? axis, Plane plane, GizmoMode gizmoMode)
+        {
+            rotable.Clear();
+            originalTouch = startTouchPoint;
+            this.axis = axis;
+            this.plane = plane;
+            dragging = gizmoMode;
+            var toDrag = PointsToDrag();
+            if (toDrag != null)
+            {
+                foreach (var selected in toDrag)
+                {
+                    var originalRotation = GetRotation(selected);
+                    rotable.Add((selected, originalRotation));
+                }
+            }
+        }
+
         public bool IsDragging()
         {
-            return dragging != DragMode.NoDragging;
+            return dragging != GizmoMode.NoDragging;
         }
     }
 }

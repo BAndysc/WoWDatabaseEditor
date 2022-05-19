@@ -1499,6 +1499,56 @@ namespace TheMaths
             var strongValue = (Quaternion)value;
             return Equals(ref strongValue);
         }
+        
+        private static Vector3 NormalizeAngles(Vector3 angles)
+        {
+            angles.X = NormalizeAngle(angles.X);
+            angles.Y = NormalizeAngle(angles.Y);
+            angles.Z = NormalizeAngle(angles.Z);
+            return angles;
+        }
+        
+        private static float NormalizeAngle(float angle)
+        {
+            while (angle > 360)
+                angle -= 360;
+            while (angle < 0)
+                angle += 360;
+            return angle;
+        }
+
+        public Vector3 ToEulerRad() => ToEulerDeg() * MathUtil.Deg2Rad;
+        
+        public Vector3 ToEulerDeg()
+        {
+            float sqw = this.W * this.W;
+            float sqx = this.X * this.X;
+            float sqy = this.Y * this.Y;
+            float sqz = this.Z * this.Z;
+            float unit = sqx + sqy + sqz + sqw; // if normalised is one, otherwise is correction factor
+            float test = X * W - Y * Z;
+            Vector3 v;
+
+            if (test > 0.4995f * unit)
+            { // singularity at north pole
+                v.Y = 2f * (float)Math.Atan2(Y, X);
+                v.X = MathUtil.PI / 2;
+                v.Z = 0;
+                return NormalizeAngles(v * MathUtil.Rad2Deg);
+            }
+            if (test < -0.4995f * unit)
+            { // singularity at south pole
+                v.Y = -2f * (float)Math.Atan2(Y, X);
+                v.X = -MathUtil.PI / 2;
+                v.Z = 0;
+                return NormalizeAngles(v * MathUtil.Rad2Deg);
+            }
+            Quaternion q = new Quaternion(W, Z, X, Y);
+            v.Y = (float)System.Math.Atan2(2f * q.X * q.W + 2f * q.Y * q.Z, 1 - 2f * (q.Z * q.Z + q.W * q.W));     // Yaw
+            v.X = (float)System.Math.Asin(2f * (q.X * q.Z - q.W * q.Y));                             // Pitch
+            v.Z = (float)System.Math.Atan2(2f * q.X * q.Y + 2f * q.Z * q.W, 1 - 2f * (q.Y * q.Y + q.Z * q.Z));      // Roll
+            return NormalizeAngles(v * MathUtil.Rad2Deg);
+        }
 
         public static Quaternion FromEuler(double yaw, double roll, double pitch)
         {

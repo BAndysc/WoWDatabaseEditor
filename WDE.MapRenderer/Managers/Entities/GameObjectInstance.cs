@@ -23,14 +23,14 @@ public class GameObjectInstance : WorldObjectInstance
         this.gameObjectDisplayId = gameObjectDisplayId ?? gameObjectTemplate.DisplayId;
     }
 
-    public float Orientation
-    {
-        set => gameContext.EntityManager.GetComponent<LocalToWorld>(objectEntity).Rotation = Quaternion.FromEuler(0, MathUtil.RadiansToDegrees(value), 0);
-    }
-
     public Quaternion Rotation
     {
-        set => gameContext.EntityManager.GetComponent<LocalToWorld>(objectEntity).Rotation = value;
+        get => gameContext.EntityManager.GetComponent<LocalToWorld>(objectEntity).Rotation;
+        set
+        {
+            gameContext.EntityManager.GetComponent<LocalToWorld>(objectEntity).Rotation = value;
+            WorldObjectEntity.SetDirtyPosition(gameContext.EntityManager);
+        }
     }
 
     public M2? Model { get; private set; }
