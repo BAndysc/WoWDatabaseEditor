@@ -121,8 +121,8 @@ namespace WDE.MapRenderer.Managers
         private Dictionary<uint, Task<MdxInstance?>> gameObjectMeshesCurrentlyLoaded = new();
         private Dictionary<uint, MdxInstance?> gameObjectmeshes = new();
         private Dictionary<uint, Task<MdxInstance?>> creatureMeshesCurrentlyLoaded = new();
-        private Dictionary<(uint displayId, bool right), MdxInstance?> itemMeshes = new();
-        private Dictionary<(uint displayId, bool right), Task<MdxInstance?>> itemMeshesCurrentlyLoaded = new();
+        private Dictionary<(uint displayId, bool right, ushort raceGender), MdxInstance?> itemMeshes = new();
+        private Dictionary<(uint displayId, bool right, ushort raceGender), Task<MdxInstance?>> itemMeshesCurrentlyLoaded = new();
         private readonly IGameFiles gameFiles;
         private readonly IMeshManager meshManager;
         private readonly IMaterialManager materialManager;
@@ -135,6 +135,7 @@ namespace WDE.MapRenderer.Managers
         private readonly CharSectionsStore charSectionsStore;
         private readonly CreatureModelDataStore creatureModelDataStore;
         private readonly GameObjectDisplayInfoStore gameObjectDisplayInfoStore;
+        private readonly ChrRacesStore racesStore;
         private readonly Engine engine;
         private readonly IGameContext gameContext;
         private readonly IInputManager inputManager;
@@ -154,6 +155,7 @@ namespace WDE.MapRenderer.Managers
             CharSectionsStore charSectionsStore,
             CreatureModelDataStore creatureModelDataStore,
             GameObjectDisplayInfoStore gameObjectDisplayInfoStore,
+            ChrRacesStore racesStore,
             Engine engine,
             IGameContext gameContext,
             IInputManager inputManager,
@@ -171,6 +173,7 @@ namespace WDE.MapRenderer.Managers
             this.charSectionsStore = charSectionsStore;
             this.creatureModelDataStore = creatureModelDataStore;
             this.gameObjectDisplayInfoStore = gameObjectDisplayInfoStore;
+            this.racesStore = racesStore;
             this.engine = engine;
             this.gameContext = gameContext;
             this.inputManager = inputManager;
@@ -393,7 +396,7 @@ namespace WDE.MapRenderer.Managers
                     {
                         // geoset group 2 ? some enable/disable 2100 (head) ?
                         geosetHelm = 2702 + itemDisplayInfoStore[displayinfoextra.Helm].geosetGroup1;
-                        yield return LoadItemMesh(displayinfoextra.Helm, false, itemModelPromise);
+                        yield return LoadItemMesh(displayinfoextra.Helm, false, displayinfoextra.Race, displayinfoextra.Gender, itemModelPromise);
                         if (itemModelPromise.Task.Result != null)
                             attachments.Add((M2AttachmentType.Helm, itemModelPromise.Task.Result));
                         itemModelPromise = new();
@@ -402,12 +405,12 @@ namespace WDE.MapRenderer.Managers
                     if (displayinfoextra.Shoulder > 0)
                     {
                         geosetShoulders = 2601 + itemDisplayInfoStore[(uint)displayinfoextra.Shoulder].geosetGroup1;
-                        yield return LoadItemMesh(displayinfoextra.Shoulder, false, itemModelPromise);
+                        yield return LoadItemMesh(displayinfoextra.Shoulder, false, 0, 0, itemModelPromise);
                         if (itemModelPromise.Task.Result != null)
                             attachments.Add((M2AttachmentType.ShoulderLeft, itemModelPromise.Task.Result));
                         itemModelPromise = new();
                         
-                        yield return LoadItemMesh(displayinfoextra.Shoulder, true, itemModelPromise);
+                        yield return LoadItemMesh(displayinfoextra.Shoulder, true, 0, 0, itemModelPromise);
                         if (itemModelPromise.Task.Result != null)
                             attachments.Add((M2AttachmentType.ShoulderRight, itemModelPromise.Task.Result));
                         itemModelPromise = new();
@@ -417,7 +420,7 @@ namespace WDE.MapRenderer.Managers
                     {
                         geosetSleeves = 801 + itemDisplayInfoStore[(uint)displayinfoextra.Shirt].geosetGroup1;
                         geosetChest = 1001 + itemDisplayInfoStore[(uint)displayinfoextra.Shirt].geosetGroup2;
-                        yield return LoadItemMesh(displayinfoextra.Shirt, false, itemModelPromise);
+                        yield return LoadItemMesh(displayinfoextra.Shirt, false, 0, 0, itemModelPromise);
                         if (itemModelPromise.Task.Result != null)
                             attachments.Add((M2AttachmentType.Chest, itemModelPromise.Task.Result));
                         itemModelPromise = new();
@@ -426,7 +429,7 @@ namespace WDE.MapRenderer.Managers
                     {
                         geosetSleeves = 801 + itemDisplayInfoStore[(uint)displayinfoextra.Cuirass].geosetGroup1;
                         geosetChest = 1001 + itemDisplayInfoStore[(uint)displayinfoextra.Cuirass].geosetGroup2;
-                        yield return LoadItemMesh(displayinfoextra.Cuirass, false, itemModelPromise);
+                        yield return LoadItemMesh(displayinfoextra.Cuirass, false, 0, 0, itemModelPromise);
                         if (itemModelPromise.Task.Result != null)
                             attachments.Add((M2AttachmentType.Chest, itemModelPromise.Task.Result));
                         itemModelPromise = new();
@@ -439,7 +442,7 @@ namespace WDE.MapRenderer.Managers
                         geosetpants = 801 + itemDisplayInfoStore[(uint)displayinfoextra.Legs].geosetGroup1;
                         geosetlegcuffs = 1001 + itemDisplayInfoStore[(uint)displayinfoextra.Legs].geosetGroup2;
                         geosetTrousers = 1301 + itemDisplayInfoStore[(uint)displayinfoextra.Legs].geosetGroup3;
-                        yield return LoadItemMesh(displayinfoextra.Legs, false, itemModelPromise);
+                        yield return LoadItemMesh(displayinfoextra.Legs, false,  0, 0, itemModelPromise);
                         if (itemModelPromise.Task.Result != null)
                             attachments.Add((M2AttachmentType.Base, itemModelPromise.Task.Result)); // base?
                         itemModelPromise = new();
@@ -449,7 +452,7 @@ namespace WDE.MapRenderer.Managers
                     {
                         geosetBoots = 501 + itemDisplayInfoStore[(uint)displayinfoextra.Boots].geosetGroup1;
                         geosetFeet = 2002 + itemDisplayInfoStore[(uint)displayinfoextra.Boots].geosetGroup2;
-                        yield return LoadItemMesh(displayinfoextra.Boots, false, itemModelPromise);
+                        yield return LoadItemMesh(displayinfoextra.Boots, false,  0, 0, itemModelPromise);
                         if (itemModelPromise.Task.Result != null)
                             attachments.Add((M2AttachmentType.LeftFoot, itemModelPromise.Task.Result));
                         itemModelPromise = new();
@@ -459,11 +462,11 @@ namespace WDE.MapRenderer.Managers
                     {
                         geosetGlove = 401 + itemDisplayInfoStore[(uint)displayinfoextra.Gloves].geosetGroup1;
                         geosetHandsAttachments = 2301 + itemDisplayInfoStore[(uint)displayinfoextra.Gloves].geosetGroup2;
-                        yield return LoadItemMesh(displayinfoextra.Gloves, false, itemModelPromise);
+                        yield return LoadItemMesh(displayinfoextra.Gloves, false, 0, 0, itemModelPromise);
                         if (itemModelPromise.Task.Result != null)
                             attachments.Add((M2AttachmentType.HandLeft, itemModelPromise.Task.Result));
                         itemModelPromise = new();
-                        yield return LoadItemMesh(displayinfoextra.Gloves, true, itemModelPromise);
+                        yield return LoadItemMesh(displayinfoextra.Gloves, true, 0, 0, itemModelPromise);
                         if (itemModelPromise.Task.Result != null)
                             attachments.Add((M2AttachmentType.HandRight, itemModelPromise.Task.Result));
                         itemModelPromise = new();
@@ -472,7 +475,7 @@ namespace WDE.MapRenderer.Managers
                     if (displayinfoextra.Cape > 0)
                     {
                         geosetCloak = 1501 + itemDisplayInfoStore[(uint)displayinfoextra.Cape].geosetGroup1;
-                        yield return LoadItemMesh(displayinfoextra.Cape, false, itemModelPromise);
+                        yield return LoadItemMesh(displayinfoextra.Cape, false, 0, 0, itemModelPromise);
                         if (itemModelPromise.Task.Result != null)
                             attachments.Add((M2AttachmentType.Base, itemModelPromise.Task.Result));
                         itemModelPromise = new();
@@ -481,7 +484,7 @@ namespace WDE.MapRenderer.Managers
                     if (displayinfoextra.Tabard > 0)
                     {
                         geosetTabard = 1201 + itemDisplayInfoStore[(uint)displayinfoextra.Tabard].geosetGroup1;
-                        yield return LoadItemMesh(displayinfoextra.Tabard, false, itemModelPromise);
+                        yield return LoadItemMesh(displayinfoextra.Tabard, false, 0, 0, itemModelPromise);
                         if (itemModelPromise.Task.Result != null)
                             attachments.Add((M2AttachmentType.Base, itemModelPromise.Task.Result));
                         itemModelPromise = new();
@@ -491,7 +494,7 @@ namespace WDE.MapRenderer.Managers
                     {
                         geosetBelt = 1801 + itemDisplayInfoStore[(uint)displayinfoextra.Belt].geosetGroup1;
                         
-                        yield return LoadItemMesh(displayinfoextra.Belt, false, itemModelPromise);
+                        yield return LoadItemMesh(displayinfoextra.Belt, false, 0, 0, itemModelPromise);
                         if (itemModelPromise.Task.Result != null)
                             attachments.Add((M2AttachmentType.Base, itemModelPromise.Task.Result));
                         itemModelPromise = new();
@@ -758,30 +761,31 @@ namespace WDE.MapRenderer.Managers
             return material;
         }
 
-        public IEnumerator LoadItemMesh(uint displayid, bool right, TaskCompletionSource<MdxInstance?> result)
+        public IEnumerator LoadItemMesh(uint displayid, bool right, uint race, uint gender, TaskCompletionSource<MdxInstance?> result)
         {
-            if (itemMeshes.ContainsKey((displayid, right)))
+            ushort raceGenderKey = (ushort)(race << 1 | gender);
+            if (itemMeshes.ContainsKey((displayid, right, raceGenderKey)))
             {
-                result.SetResult(itemMeshes[(displayid, right)]);
+                result.SetResult(itemMeshes[(displayid, right, raceGenderKey)]);
                 yield break;
             }
 
-            if (itemMeshesCurrentlyLoaded.TryGetValue((displayid, right), out var loadInProgress))
+            if (itemMeshesCurrentlyLoaded.TryGetValue((displayid, right, raceGenderKey), out var loadInProgress))
             {
                 yield return new WaitForTask(loadInProgress);
-                result.SetResult(itemMeshes[(displayid, right)]);
+                result.SetResult(itemMeshes[(displayid, right, raceGenderKey)]);
                 yield break;
             }
 
             var completion = new TaskCompletionSource<MdxInstance?>();
-            itemMeshesCurrentlyLoaded[(displayid, right)] = completion.Task;
+            itemMeshesCurrentlyLoaded[(displayid, right, raceGenderKey)] = completion.Task;
 
             if (!itemDisplayInfoStore.TryGetValue(displayid, out var displayInfo))
             {
                 Console.WriteLine("Cannot find item display id " + displayid);
-                itemMeshes[(displayid, right)] = null;
+                itemMeshes[(displayid, right, raceGenderKey)] = null;
                 completion.SetResult(null);
-                itemMeshesCurrentlyLoaded.Remove((displayid, right));
+                itemMeshesCurrentlyLoaded.Remove((displayid, right, raceGenderKey));
                 result.SetResult(null);
                 yield break;
             }
@@ -789,9 +793,9 @@ namespace WDE.MapRenderer.Managers
             if ((string.IsNullOrEmpty(displayInfo.LeftModel) && !right) ||
                 (string.IsNullOrEmpty(displayInfo.RightModel) && right))
             {
-                itemMeshes[(displayid, right)] = null;
+                itemMeshes[(displayid, right, raceGenderKey)] = null;
                 completion.SetResult(null);
-                itemMeshesCurrentlyLoaded.Remove((displayid, right));
+                itemMeshesCurrentlyLoaded.Remove((displayid, right, raceGenderKey));
                 result.SetResult(null);
                 yield break;
             }
@@ -806,8 +810,16 @@ namespace WDE.MapRenderer.Managers
                 folderPath += "AMMO\\";
             else if (model.StartsWith("Helm"))
             {
-                folderPath += "HELM\\";
-                model = Path.ChangeExtension(model, null) + "_m.M2";
+                folderPath += "HEAD\\";
+                if (racesStore.TryGetValue(raceGenderKey, out var raceInfo))
+                {
+                    model = Path.ChangeExtension(model, null) + "_" + raceInfo.ClientPrefix + (gender == 0 ? "M" : "F") + ".M2";
+                }
+                else
+                {
+                    model = Path.ChangeExtension(model, null) + "_m.M2";
+                    Console.WriteLine("Trying to load a helm, without race!");
+                }
             }
             else if (model.StartsWith("Pouch"))
                 folderPath += "Pouch\\";
@@ -836,9 +848,9 @@ namespace WDE.MapRenderer.Managers
             if (file.Result == null || skinFile.Result == null)
             {
                 Console.WriteLine("Cannot find model " + m2FilePath);
-                itemMeshes[(displayid, right)] = null;
+                itemMeshes[(displayid, right, raceGenderKey)] = null;
                 completion.SetResult(null);
-                itemMeshesCurrentlyLoaded.Remove((displayid, right));
+                itemMeshesCurrentlyLoaded.Remove((displayid, right, raceGenderKey));
                 result.SetResult(null);
                 yield break;
             }
@@ -971,9 +983,9 @@ namespace WDE.MapRenderer.Managers
                 materials = materials.AsSpan(0, j).ToArray(),
                 model = m2
             };
-            itemMeshes.Add((displayid, right), mdx);
+            itemMeshes.Add((displayid, right, raceGenderKey), mdx);
             completion.SetResult(null);
-            itemMeshesCurrentlyLoaded.Remove((displayid, right));
+            itemMeshesCurrentlyLoaded.Remove((displayid, right, raceGenderKey));
             result.SetResult(mdx);
         }
         

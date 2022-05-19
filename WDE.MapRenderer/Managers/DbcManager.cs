@@ -20,7 +20,7 @@ namespace WDE.MapRenderer.Managers
         public CreatureModelDataStore CreatureModelDataStore { get; }
         public GameObjectDisplayInfoStore GameObjectDisplayInfoStore { get; }
         public CharSectionsStore CharSectionsStore { get; }
-        // public ChrRacesStore ChrRacesStore { get; }
+        public ChrRacesStore ChrRacesStore { get; }
         public CharacterFacialHairStylesStore CharacterFacialHairStylesStore { get; }
         public CharHairGeosetsStore CharHairGeosetsStore { get; }
         public MapStore MapStore { get; }
@@ -49,7 +49,7 @@ namespace WDE.MapRenderer.Managers
             ItemStore = new(OpenDbc("Item"));
             ItemDisplayInfoStore = new(OpenDbc("ItemDisplayInfo"));
             CharSectionsStore = new(OpenDbc("CharSections"));
-            // ChrRacesStore = new(OpenDbc("ChrRaces"));
+            ChrRacesStore = new(OpenDbc("ChrRaces"));
             CharacterFacialHairStylesStore = new(OpenDbc("CharacterFacialHairStyles"));
             CharHairGeosetsStore = new(OpenDbc("CharHairGeosets"));
             MapStore = new (OpenDbc("Map"));

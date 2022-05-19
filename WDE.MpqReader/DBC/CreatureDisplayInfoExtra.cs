@@ -5,9 +5,8 @@ namespace WDE.MpqReader.DBC;
 public class CreatureDisplayInfoExtra
 {
     public readonly uint Id;
-    public readonly int Race;
-    public readonly int CreatureType;
-    public readonly int Gender;
+    public readonly uint Race;
+    public readonly uint Gender;
     public readonly int SkinColor;
     public readonly int FaceType;
     public readonly int HairStyle;
@@ -31,9 +30,9 @@ public class CreatureDisplayInfoExtra
     public CreatureDisplayInfoExtra(IDbcIterator dbcIterator)
     {
         Id = dbcIterator.GetUInt(0);
-        Race = dbcIterator.GetInt(1);
+        Race = dbcIterator.GetUInt(1);
         // CreatureType = dbcIterator.GetInt(2);
-        Gender = dbcIterator.GetInt(2);
+        Gender = dbcIterator.GetUInt(2);
         SkinColor = dbcIterator.GetInt(3);
         FaceType = dbcIterator.GetInt(4);
         HairStyle = dbcIterator.GetInt(5);
@@ -58,7 +57,6 @@ public class CreatureDisplayInfoExtra
     {
         Id = 0;
         Race = 0;
-        CreatureType = 0;
         Gender = 0;
         SkinColor = 0;
         FaceType = 0;

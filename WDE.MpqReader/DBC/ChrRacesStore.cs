@@ -3,9 +3,8 @@ using WDE.Common.DBC;
 
 namespace WDE.MpqReader.DBC;
 
-public class ChrRacesStore : IEnumerable<ChrRaces>
+public class ChrRacesStore : BaseDbcStore<uint, ChrRaces>
 {
-    private Dictionary<uint, ChrRaces> store = new();
     public ChrRacesStore(IEnumerable<IDbcIterator> rows)
     {
         foreach (var row in rows)
@@ -14,9 +13,4 @@ public class ChrRacesStore : IEnumerable<ChrRaces>
             store[o.Id] = o;
         }
     }
-
-    public bool Contains(uint id) => store.ContainsKey(id);
-    public ChrRaces this[uint id] => store[id];
-    public IEnumerator<ChrRaces> GetEnumerator() => store.Values.GetEnumerator();
-    IEnumerator IEnumerable.GetEnumerator() => store.Values.GetEnumerator();
 }

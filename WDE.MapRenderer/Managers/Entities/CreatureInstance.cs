@@ -216,7 +216,7 @@ public class CreatureInstance : WorldObjectInstance
     public IEnumerator SetVirtualItem(int slot, Item itemInfo)
     {
         var weaponModelCompletion = new TaskCompletionSource<MdxManager.MdxInstance?>();
-        yield return gameContext.MdxManager.LoadItemMesh(itemInfo.DisplayId, false, weaponModelCompletion);
+        yield return gameContext.MdxManager.LoadItemMesh(itemInfo.DisplayId, false, 0, 0, weaponModelCompletion);
 
         var weaponModel = weaponModelCompletion.Task.Result;
 

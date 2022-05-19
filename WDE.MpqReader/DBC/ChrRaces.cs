@@ -16,15 +16,15 @@ public class ChrRaces
     public readonly int ResSicknessSpellID;
     public readonly int SplashSoundID;
     public readonly string ClientFilestring;
-    public readonly int CinematicSequenceID;
-    public readonly int Alliance;
-    public readonly string Name_Lang;
-    public readonly string Name_Female_Lang;
-    public readonly string Name_Male_Lang;
-    public readonly string FacialHairCustomization1;
-    public readonly string FacialHairCustomization2;
-    public readonly string HairCustomization;
-    public readonly int Required_Expansion;
+    // public readonly int CinematicSequenceID;
+    // public readonly int Alliance;
+    // public readonly string Name_Lang;
+    // public readonly string Name_Female_Lang;
+    // public readonly string Name_Male_Lang;
+    // public readonly string FacialHairCustomization1;
+    // public readonly string FacialHairCustomization2;
+    // public readonly string HairCustomization;
+    // public readonly int Required_Expansion;
 
     public ChrRaces(IDbcIterator dbcIterator)
     {
@@ -65,15 +65,15 @@ public class ChrRaces
         ResSicknessSpellID = 0;
         SplashSoundID = 0;
         ClientFilestring = "";
-        CinematicSequenceID = 0;
-        Alliance = 0;
-        Name_Lang = "";
-        Name_Female_Lang = "";
-        Name_Male_Lang = "";
-        FacialHairCustomization1 = "";
-        FacialHairCustomization2 = "";
-        HairCustomization = "";
-        Required_Expansion = 0;
+        // CinematicSequenceID = 0;
+        // Alliance = 0;
+        // Name_Lang = "";
+        // Name_Female_Lang = "";
+        // Name_Male_Lang = "";
+        // FacialHairCustomization1 = "";
+        // FacialHairCustomization2 = "";
+        // HairCustomization = "";
+        // Required_Expansion = 0;
     }
 
     public static ChrRaces Empty => new ChrRaces();
