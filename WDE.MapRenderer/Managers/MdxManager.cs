@@ -810,12 +810,12 @@ namespace WDE.MapRenderer.Managers
             // don't know what is the right way to determine the folder name
             // that works for 3.3.5 tho
             var folderPath = "ITEM\\OBJECTCOMPONENTS\\";
-            var model = right ? displayInfo.RightModel : displayInfo.LeftModel;
+            var model = (right ? displayInfo.RightModel : displayInfo.LeftModel).ToLower();
             var texture = right ? displayInfo.RightModelTexture : displayInfo.LeftModelTexture;
 
-            if (model.StartsWith("Arrow") || model.StartsWith("Bullet"))
+            if (model.StartsWith("arrow") || model.StartsWith("bullet"))
                 folderPath += "AMMO\\";
-            else if (model.StartsWith("Helm"))
+            else if (model.StartsWith("helm"))
             {
                 folderPath += "HEAD\\";
                 if (racesStore.TryGetValue(race, out var raceInfo))
@@ -828,11 +828,11 @@ namespace WDE.MapRenderer.Managers
                     Console.WriteLine("Trying to load a helm, without race!");
                 }
             }
-            else if (model.StartsWith("Pouch"))
+            else if (model.StartsWith("pouch"))
                 folderPath += "Pouch\\";
-            else if (model.StartsWith("Shield") || model.StartsWith("Buckler"))
+            else if (model.StartsWith("shield") || model.StartsWith("buckler"))
                 folderPath += "Shield\\";
-            else if (model.StartsWith("LShoulder") || model.StartsWith("RShoulder"))
+            else if (model.StartsWith("lshoulder") || model.StartsWith("rshoulder"))
                 folderPath += "Shoulder\\";
             else
                 folderPath += "WEAPON\\";
