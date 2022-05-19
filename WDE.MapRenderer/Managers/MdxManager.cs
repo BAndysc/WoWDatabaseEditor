@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using TheAvaloniaOpenGL.Resources;
 using TheEngine;
 using TheEngine.Coroutines;
@@ -374,29 +374,30 @@ namespace WDE.MapRenderer.Managers
                     // TODO :  CharHairGeosets.dbc
 
                     // hair
-                    if (displayinfoextra.HairStyle > 0)
+                    CharHairGeosets hairstyle = charHairGeosetsStore.FirstOrDefault(x => x.RaceID == displayinfoextra.Race && x.SexId == displayinfoextra.Gender && x.VariationId == displayinfoextra.HairStyle); // maybe +1 like beards ?
+                    if (hairstyle != null)
                     {
-                        int hairstyle = charHairGeosetsStore.First(x => x.RaceID == displayinfoextra.Race && x.SexId == displayinfoextra.Gender && x.VariationId == displayinfoextra.HairStyle).GeosetId; // maybe +1 like beards ?
-                        geosetHair += hairstyle;
+                        geosetHair += hairstyle.GeosetId;
                         // use CharHairGeosetsStore.ShowScalp (bald) or is it only some client stuff ?
+                        // showscalp seems to be used for some races like goblins that don't use normal variations, but how ?
                     }
+                    //else Console.WriteLine("invalid hairstyle id for display id " + creatureDisplayInfo.Id + " race " + displayinfoextra.Race + " gender " + displayinfoextra.Gender);
+                    // goblin males require to always lookup hairstyle even with default because their scalp geoset is an edditional geoset defined in charHairGeosetsStore variation 0
+                    // but goblin females don't have an entry in it at all and will error there
+
 
                     // facial hair
-                    if (displayinfoextra.BeardStyle > 0)
+                    // using first of default because it seems some NPCs use invalid variation id
+                    CharacterFacialHairStyles facialhairstyle = characterFacialHairStylesStore.FirstOrDefault(x => x.RaceID == displayinfoextra.Race && x.SexId == displayinfoextra.Gender && x.VariationId == displayinfoextra.BeardStyle); // maybe variation +1
+                    if (facialhairstyle != null)
                     {
-                        // using first of default because it seems some NPCs use invalid variation id
-                        CharacterFacialHairStyles facialhairstyle = characterFacialHairStylesStore.FirstOrDefault(x => x.RaceID == displayinfoextra.Race && x.SexId == displayinfoextra.Gender && x.VariationId == displayinfoextra.BeardStyle); // maybe variation +1
-                        
-                        if (facialhairstyle != null)
-                        {
-                            geosetFacial1 += facialhairstyle.Geoset1;
-                            geosetFacial2 += facialhairstyle.Geoset3; // apparently this is group 3 ? verify in game.
-                            geosetFacial3 += facialhairstyle.Geoset2;
-                            geosetNoseEarrings += facialhairstyle.Geoset4;
-                            geosetEyeglows += facialhairstyle.Geoset5;
-                        }
-                        else Console.WriteLine("invalid facialhairstyle id for display id " + creatureDisplayInfo.Id);
+                        geosetFacial1 += facialhairstyle.Geoset1;
+                        geosetFacial2 += facialhairstyle.Geoset3; // apparently this is group 3 ? verify in game.
+                        geosetFacial3 += facialhairstyle.Geoset2;
+                        geosetNoseEarrings += facialhairstyle.Geoset4;
+                        geosetEyeglows += facialhairstyle.Geoset5;
                     }
+                    // else Console.WriteLine("invalid facialhairstyle id for display id " + creatureDisplayInfo.Id + " race " + displayinfoextra.Race + " gender " + displayinfoextra.Gender);
 
                     if (displayinfoextra.Helm > 0)
                     {
