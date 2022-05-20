@@ -79,11 +79,11 @@ namespace TheEngine.Data
             List<Vector3> realNormals = new List<Vector3>();
             List<Vector2> realUVs = new List<Vector2>();
 
-            List<uint> indices = new List<uint>();
+            List<ushort> indices = new List<ushort>();
 
-            uint vertexCount = 0;
+            ushort vertexCount = 0;
 
-            Dictionary<Node, uint> nodeToId = new Dictionary<Node, uint>();
+            Dictionary<Node, ushort> nodeToId = new Dictionary<Node, ushort>();
 
             foreach (var face in Faces)
             {
@@ -93,6 +93,9 @@ namespace TheEngine.Data
                     if (!nodeToId.ContainsKey(node))
                     {
                         nodeToId[node] = vertexCount++;
+                        
+                        if (vertexCount == ushort.MaxValue)
+                            throw new Exception("Too many vertices!");
 
                         realVertices.Add(Vertices[node.Vertex - 1]);
                         realNormals.Add(Normals[node.Normal - 1]);

@@ -7,7 +7,7 @@ namespace TheEngine.Interfaces
 {
     public interface IMesh
     {
-        void SetIndices(ReadOnlySpan<uint> indices, int submesh);
+        void SetIndices(ReadOnlySpan<ushort> indices, int submesh);
         void SetSubmeshIndicesRange(int submesh, int start, int length);
         void Rebuild();
         void Activate();

@@ -185,14 +185,14 @@ namespace TheAvaloniaOpenGL
         // call only form render thread
         public void DrawIndexed(int indexCount, int startIndexLocation, int baseVertexLocation)
         {
-            device.DrawElements(PrimitiveType.Triangles, indexCount, DrawElementsType.UnsignedInt, new IntPtr(startIndexLocation * 4));
+            device.DrawElements(PrimitiveType.Triangles, indexCount, DrawElementsType.UnsignedShort, new IntPtr(startIndexLocation * 2));
             //device.ImmediateContext.DrawIndexed(indexCount, startIndexLocation, baseVertexLocation);
         }
 
         // call only form render thread
         public void DrawIndexedInstanced(int indexCountPerInstance, int instanceCount, int startIndexLocation, int baseVertexLocation, int startInstanceLocation)
         {
-            device.DrawElementsInstanced(PrimitiveType.Triangles, indexCountPerInstance, DrawElementsType.UnsignedInt, new IntPtr(startIndexLocation * 4), instanceCount);
+            device.DrawElementsInstanced(PrimitiveType.Triangles, indexCountPerInstance, DrawElementsType.UnsignedShort, new IntPtr(startIndexLocation * 2), instanceCount);
             //device.ImmediateContext.DrawIndexedInstanced(indexCountPerInstance, instanceCount, startIndexLocation, baseVertexLocation, startInstanceLocation);
         }
 

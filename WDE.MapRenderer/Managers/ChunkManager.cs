@@ -289,7 +289,7 @@ namespace WDE.MapRenderer.Managers
                         }
                     }
 
-                    uint[] indices = ArrayPool<uint>.Shared.Rent(4 * 8 * 8 * 4);
+                    ushort[] indices = ArrayPool<ushort>.Shared.Rent(4 * 8 * 8 * 4);
                     int k__ = 0;
                     for (uint cx = 0; cx < 8; cx++)
                     {
@@ -301,26 +301,29 @@ namespace WDE.MapRenderer.Managers
                             uint bl = middle + 8;
                             uint br = bl + 1;
 
-                            indices[k__++] = tl;
-                            indices[k__++] = middle;
-                            indices[k__++] = tr;
+                            if (br > ushort.MaxValue)
+                                throw new Exception("Too many vertices");
+
+                            indices[k__++] = (ushort)tl;
+                            indices[k__++] = (ushort)middle;
+                            indices[k__++] = (ushort)tr;
                             //
-                            indices[k__++] = tl;
-                            indices[k__++] = bl;
-                            indices[k__++] = middle;
+                            indices[k__++] = (ushort)tl;
+                            indices[k__++] = (ushort)bl;
+                            indices[k__++] = (ushort)middle;
                             //
-                            indices[k__++] = tr;
-                            indices[k__++] = middle;
-                            indices[k__++] = br;
+                            indices[k__++] = (ushort)tr;
+                            indices[k__++] = (ushort)middle;
+                            indices[k__++] = (ushort)br;
                             //
-                            indices[k__++] = middle;
-                            indices[k__++] = bl;
-                            indices[k__++] = br;
+                            indices[k__++] = (ushort)middle;
+                            indices[k__++] = (ushort)bl;
+                            indices[k__++] = (ushort)br;
                         }
                     }
                     var subChunkMesh = meshManager.CreateManagedOnlyMesh(subVertices.AsSpan(0, 145), indices.AsSpan(0, 4 * 8 * 8 * 4));
                     ArrayPool<Vector3>.Shared.Return(subVertices);
-                    ArrayPool<uint>.Shared.Return(indices);
+                    ArrayPool<ushort>.Shared.Return(indices);
                     var entity = entityManager.CreateEntity(archetypes.CollisionOnlyArchetype);
                     entityManager.GetComponent<Collider>(entity).CollisionMask = Collisions.COLLISION_MASK_TERRAIN;
                     entityManager.GetComponent<LocalToWorld>(entity).Matrix = Matrix.Identity;

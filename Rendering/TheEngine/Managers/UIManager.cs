@@ -76,7 +76,7 @@ namespace TheEngine.Managers
                 new(1, 1),
                 new(1, 0),
                 new(0, 0),
-            }, new uint[] { 0, 1,2, 2, 3, 0 }));
+            }, new ushort[] { 0, 1,2, 2, 3, 0 }));
             glyphPositionsBuffer = engine.Device.CreateBuffer<Vector4>(BufferTypeEnum.StructuredBufferVertexOnly, 1, BufferInternalFormat.Float4);
             glyphUVsBuffer = engine.Device.CreateBuffer<Vector4>(BufferTypeEnum.StructuredBufferVertexOnly, 1, BufferInternalFormat.Float4);
             material.SetBuffer("glpyhUVs", glyphUVsBuffer);
