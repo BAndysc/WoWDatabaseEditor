@@ -78,7 +78,7 @@ public class GameObjectInstance : WorldObjectInstance
         foreach (var material in instance.materials)
         {
             var collider = entityManager.CreateEntity(archetypes.WorldObjectCollider);
-            collider.SetCollider(entityManager, instance.mesh, i, Collisions.COLLISION_MASK_CREATURE);
+            collider.SetCollider(entityManager, instance.mesh, i, Collisions.COLLISION_MASK_GAMEOBJECT);
             collider.SetCopyParentTransform(entityManager, objectEntity);
             collider.SetDirtyPosition(entityManager);
             

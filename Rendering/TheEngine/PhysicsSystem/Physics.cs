@@ -94,14 +94,14 @@ namespace TheEngine.PhysicsSystem
             }
         }
         
-        public (Entity, Vector3)? RaycastMouse()
+        public (Entity, Vector3)? RaycastMouse(uint collisionMask = 0)
         {
             var camera = engine.CameraManager;
             var ray = camera.MainCamera.NormalizedScreenPointToRay(engine.InputManager.Mouse.NormalizedPosition);
-            return Raycast(ray, null, true);
+            return Raycast(ray, null, true, collisionMask);
         }
         
-        public (Entity, Vector3)? Raycast(Ray ray, Vector3? customOrigin, bool onlyRendered = false)
+        public (Entity, Vector3)? Raycast(Ray ray, Vector3? customOrigin, bool onlyRendered = false, uint collisionMask = 0)
         {
             ThreadLocal<(Entity, float, Vector3)> localEntities = new ThreadLocal<(Entity, float, Vector3)>(true);
             colliders.ParallelForEachRRRROO<Collider, WorldMeshBounds, MeshRenderer, LocalToWorld, RenderEnabledBit, DisabledObjectBit>((itr, start, end, colliders, meshBounds, renderer, localToWorld, renderEnabledAccess, disabledAccess) =>
@@ -111,6 +111,8 @@ namespace TheEngine.PhysicsSystem
                 Vector3 intersectionPoint = default;
                 for (int i = start; i < end; ++i)
                 {
+                    if (collisionMask != 0 && (colliders[i].CollisionMask & collisionMask) == 0)
+                        continue;
                     if (onlyRendered && renderEnabledAccess != null && !renderEnabledAccess.Value[i])
                         continue;
                     if (disabledAccess.HasValue && disabledAccess.Value[i])
