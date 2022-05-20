@@ -18,7 +18,7 @@ namespace WDE.MpqReader.Structures
         public List<PooledArray<Vector2>> UVs { get; init; } = new();
         public WorldMapObjectBatch[] Batches { get; init; }
     
-        public WorldMapObjectGroup(IBinaryReader reader, bool openGlCoords)
+        public WorldMapObjectGroup(IBinaryReader reader)
         {
             var firstChunkName = reader.ReadBytes(4);
             Debug.Assert(firstChunkName[0] == 'R' && firstChunkName[1] == 'E' && firstChunkName[2] == 'V' && firstChunkName[3] == 'M');
