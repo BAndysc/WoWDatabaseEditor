@@ -3229,7 +3229,7 @@
     {
         "id": 142,
         "name": "SMART_ACTION_SET_HEALTH_PCT",
-        "tags": ["TrinityWrath"],
+        "tags": ["TrinityWrath", "TrinityMaster"],
         "parameters": [
             {
                 "type": "Parameter",
