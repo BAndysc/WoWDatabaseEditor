@@ -88,8 +88,12 @@ namespace WDE.MapRenderer.Managers
                 if (bytesGroup.Result == null)
                     continue;
 
-                var group = new WorldMapObjectGroup(new MemoryBinaryReader(bytesGroup.Result), true);
+                var group = new WorldMapObjectGroup(new MemoryBinaryReader(bytesGroup.Result));
                 bytesGroup.Result.Dispose();
+                // bazaarfacade03 and cathy_facade01 - LODs for stormwind used by portal culling,
+                // but gives poor results without portal culling
+                if (group.Header.uniqueID is 2625 or 2624)
+                    continue;
                 groups.Add(group);
             }
 
@@ -97,7 +101,7 @@ namespace WDE.MapRenderer.Managers
 
             foreach (var group in groups)
             {
-                uint[] indices = new uint[group.Indices.Length + group.CollisionOnlyIndices.Length];
+                ushort[] indices = new ushort[group.Indices.Length + group.CollisionOnlyIndices.Length];
                 Array.Copy(group.Indices.AsArray(), indices, group.Indices.Length);
                 Array.Copy(group.CollisionOnlyIndices, 0, indices, group.Indices.Length, group.CollisionOnlyIndices.Length);
                 var wmoMeshData = new MeshData(group.Vertices.AsArray(), group.Normals.AsArray(), group.UVs[0].AsArray(),

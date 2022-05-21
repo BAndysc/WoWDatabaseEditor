@@ -19,11 +19,11 @@ namespace TheEngine.Entities
 
         internal int VertexArrayObject { get; }
         internal NativeBuffer<UniversalVertex>? VerticesBuffer { get; private set; }
-        internal NativeBuffer<uint>? IndicesBuffer { get; private set; }
+        internal NativeBuffer<ushort>? IndicesBuffer { get; private set; }
 
         private BoundingBox bounds;
         private UniversalVertex[]? vertices;
-        private uint[]? indices;
+        private ushort[]? indices;
         private int indicesCount = 0;
         private (int start, int length)[]? submeshesRange;
 
@@ -69,24 +69,11 @@ namespace TheEngine.Entities
             Debug.Assert(indices != null);
             int start = IndexStart(submesh);
             int count = IndexCount(submesh);
-            int beginningLength = indices.Length;
             for (int i = start; i + 2 < start + count; i += 3)
             {
-                if (i >= indices.Length)
-                {
-                    Console.WriteLine("eeeee");
-                    break;
-                }
-
-                if (beginningLength > indices.Length)
-                    throw new Exception("no dobra, jednak jest błąd");
-
-                if (i + 2 >= indices.Length)
-                    throw new Exception("no dobra, jest błąd");
-
-                uint j = indices[i];
-                uint k = indices[i+1];
-                uint l = indices[i+2];
+                ushort j = indices[i];
+                ushort k = indices[i+1];
+                ushort l = indices[i+2];
                 
                 if (vertices.Length > j &&
                     vertices.Length > k &&
@@ -109,7 +96,7 @@ namespace TheEngine.Entities
             if (!managedOnly)
             {
                 VerticesBuffer = engine.Device.CreateBuffer<UniversalVertex>(BufferTypeEnum.Vertex, 1);
-                IndicesBuffer = engine.Device.CreateBuffer<uint>(BufferTypeEnum.Index, 1);
+                IndicesBuffer = engine.Device.CreateBuffer<ushort>(BufferTypeEnum.Index, 1);
                 VertexArrayObject = engine.Device.device.GenVertexArray();
                 engine.Device.device.BindVertexArray(VertexArrayObject);
                 VerticesBuffer.Activate(0);
@@ -135,7 +122,7 @@ namespace TheEngine.Entities
             }
         }
 
-        internal Mesh(Engine engine, MeshHandle handle, UniversalVertex[] vertices, uint[] indices, int indicesCount, bool ownVerticesArray, bool managedOnly)
+        internal Mesh(Engine engine, MeshHandle handle, UniversalVertex[] vertices, ushort[] indices, int indicesCount, bool ownVerticesArray, bool managedOnly)
         {
             this.engine = engine;
             Handle = handle;
@@ -147,7 +134,7 @@ namespace TheEngine.Entities
             if (!managedOnly)
             {
                 VerticesBuffer = engine.Device.CreateBuffer<UniversalVertex>(BufferTypeEnum.Vertex, vertices);
-                IndicesBuffer = engine.Device.CreateBuffer<uint>(BufferTypeEnum.Index, indices.AsSpan(0, indicesCount));
+                IndicesBuffer = engine.Device.CreateBuffer<ushort>(BufferTypeEnum.Index, indices.AsSpan(0, indicesCount));
                 VertexArrayObject = engine.Device.device.GenVertexArray();
                 engine.Device.device.BindVertexArray(VertexArrayObject);
                 VerticesBuffer.Activate(0);
@@ -207,7 +194,7 @@ namespace TheEngine.Entities
                 submeshesRange[submesh] = (start, length);
         }
 
-        public void SetIndices(ReadOnlySpan<uint> indices, int submesh)
+        public void SetIndices(ReadOnlySpan<ushort> indices, int submesh)
         {
             if (submeshesRange == null && submesh == 0)
             {
@@ -221,7 +208,7 @@ namespace TheEngine.Entities
                 var existingIndices = submeshesRange[submesh];
                 if (existingIndices.length == 0) // no indices so far
                 {
-                    var newIndices = new uint[indicesCount + indices.Length];
+                    var newIndices = new ushort[indicesCount + indices.Length];
                     Array.Copy(this.indices, newIndices, indicesCount);
                     indices.CopyTo(newIndices.AsSpan(indicesCount, indices.Length));
                     //Array.Copy(indices, 0, newIndices, this.indices.Length, indices.Length);

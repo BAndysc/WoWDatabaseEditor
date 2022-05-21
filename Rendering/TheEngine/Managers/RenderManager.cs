@@ -153,7 +153,7 @@ namespace TheEngine.Managers
             planeMesh = engine.MeshManager.CreateMesh(in ScreenPlane.Instance);
             engine.Device.device.CheckError("create mesh");
 
-            lineMesh = (Mesh)engine.MeshManager.CreateMesh(new Vector3[2]{Vector3.Zero, Vector3.Zero}, new uint[]{});
+            lineMesh = (Mesh)engine.MeshManager.CreateMesh(new Vector3[2]{Vector3.Zero, Vector3.Zero}, new ushort[]{});
 
             blitShader = engine.ShaderManager.LoadShader("internalShaders/blit.json", false);
             engine.Device.device.CheckError("load shader");

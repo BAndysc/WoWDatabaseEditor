@@ -10,15 +10,15 @@ namespace WDE.MpqReader.Structures
     {
         public WorldMapObjectGroupHeader Header { get; init; }
         public PooledArray<WorldMapObjectPoly> Polygons { get; set; }
-        public PooledArray<uint> Indices { get; init; }
+        public PooledArray<ushort> Indices { get; init; }
         public PooledArray<Vector3> Vertices { get; init; }
         public PooledArray<Vector4>? VertexColors { get; init; }
-        public uint[] CollisionOnlyIndices { get; init; }
+        public ushort[] CollisionOnlyIndices { get; init; }
         public PooledArray<Vector3> Normals { get; init; }
         public List<PooledArray<Vector2>> UVs { get; init; } = new();
         public WorldMapObjectBatch[] Batches { get; init; }
     
-        public WorldMapObjectGroup(IBinaryReader reader, bool openGlCoords)
+        public WorldMapObjectGroup(IBinaryReader reader)
         {
             var firstChunkName = reader.ReadBytes(4);
             Debug.Assert(firstChunkName[0] == 'R' && firstChunkName[1] == 'E' && firstChunkName[2] == 'V' && firstChunkName[3] == 'M');
@@ -59,11 +59,11 @@ namespace WDE.MpqReader.Structures
                 reader.Offset = offset + size;
             }
         }
-
-        private static uint[] BuildCollisionOnlyIndices(PooledArray<WorldMapObjectPoly>? polygons, PooledArray<uint>? indices)
+        
+        private static ushort[] BuildCollisionOnlyIndices(PooledArray<WorldMapObjectPoly>? polygons, PooledArray<ushort>? indices)
         {
             if (polygons == null || indices == null)
-                return new uint[] { };
+                return new ushort[] { };
             int triangles = 0;
             for (int i = 0; i < polygons.Length; ++i)
             {
@@ -71,7 +71,7 @@ namespace WDE.MpqReader.Structures
                     triangles++;
             }
 
-            var collisionOnlyIndices = new uint[triangles * 3];
+            var collisionOnlyIndices = new ushort[triangles * 3];
             int j = 0;
             for (int i = 0; i < polygons.Length; ++i)
             {
@@ -148,9 +148,9 @@ namespace WDE.MpqReader.Structures
             return vertices;
         }
 
-        private static PooledArray<uint> ParseIndices(IBinaryReader reader, int size, PooledArray<WorldMapObjectPoly> polygons)
+        private static PooledArray<ushort> ParseIndices(IBinaryReader reader, int size, PooledArray<WorldMapObjectPoly> polygons)
         {
-            PooledArray<uint> indices = new PooledArray<uint>(size / 2);
+            PooledArray<ushort> indices = new PooledArray<ushort>(size / 2);
             int i = 0;
             while (!reader.IsFinished())
             {
