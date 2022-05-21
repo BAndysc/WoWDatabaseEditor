@@ -449,6 +449,13 @@ namespace WDE.MapRenderer.Managers
                         geosetpants = 801 + itemDisplayInfoStore[(uint)displayinfoextra.Legs].geosetGroup1;
                         geosetlegcuffs = 1001 + itemDisplayInfoStore[(uint)displayinfoextra.Legs].geosetGroup2;
                         geosetTrousers = 1301 + itemDisplayInfoStore[(uint)displayinfoextra.Legs].geosetGroup3;
+
+                        // Chest Robes set legs trousers in priority
+                        // Priority : Chest geosetGroup[2] (1301 set) > Pants geosetGroup[2] (1301 set)
+                        if (displayinfoextra.Cuirass > 0)
+                            if (itemDisplayInfoStore[(uint)displayinfoextra.Cuirass].geosetGroup3 > 0)
+                                geosetTrousers = 1301 + itemDisplayInfoStore[(uint)displayinfoextra.Cuirass].geosetGroup3;
+
                         yield return LoadItemMesh(displayinfoextra.Legs, false,  0, 0, itemModelPromise);
                         if (itemModelPromise.Task.Result != null)
                             attachments.Add((M2AttachmentType.Base, itemModelPromise.Task.Result)); // base?
@@ -506,10 +513,7 @@ namespace WDE.MapRenderer.Managers
                             attachments.Add((M2AttachmentType.Base, itemModelPromise.Task.Result));
                         itemModelPromise = new();
                     }
-
                     // Priority : Chest geosetGroup[2] (1301 set) > Pants geosetGroup[2] (1301 set) > Boots geosetGroup[0] (501 set) > Pants geosetGroup[1] (901 set)
-                    if (displayinfoextra.Cuirass > 0)
-                        geosetTrousers = 1301 + itemDisplayInfoStore[(uint)displayinfoextra.Cuirass].geosetGroup3;
                     
                     
                     activeGeosets = new HashSet<int>(){ geosetSkin, geosetHair, geosetFacial1, geosetFacial2, geosetFacial3, geosetGlove, geosetBoots, geosetTail, geosetEars,
