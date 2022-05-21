@@ -573,7 +573,7 @@ namespace WDE.MapRenderer.Managers
                             texFile = textureDef.filename.AsString();
 
                         // character models
-                        if (isCharacterModel)
+                        else if (isCharacterModel) // doesn't have a CreatureDisplayInfoExtra entry
                         {
                             CreatureDisplayInfoExtra displayinfoextra = creatureDisplayInfoExtraStore[
                                 creatureDisplayInfoStore[displayid].ExtendedDisplayInfoID];
@@ -586,13 +586,34 @@ namespace WDE.MapRenderer.Managers
                                 texFile = "textures\\BakedNpcTextures\\" + displayinfoextra.Texture;
                             }
 
-                            // else if (textureDef.type == M2Texture.TextureType.TEX_COMPONENT_SKIN_EXTRA) // character skin
-                            // {
-                            //     texFile = charSectionsStore.First(x => x.RaceID == displayinfoextra.Race
-                            //     && x.BaseSection == 0 && x.ColorIndex == displayinfoextra.SkinColor).TextureName2;
-                            // }
+                            // only seen for tauren female facial features
+                            else if (textureDef.type == M2Texture.TextureType.TEX_COMPONENT_SKIN_EXTRA)
+                            {
+                                // Console.WriteLine("skin extra extdisp id : " + displayinfoextra.Id);
+                                // use skin color or hair color ?
+                                texFile = charSectionsStore.First(x => x.RaceID == displayinfoextra.Race && x.SexId == displayinfoextra.Gender
+                                && x.ColorIndex == displayinfoextra.SkinColor && x.BaseSection == 0).TextureName2;
+                            }
 
-                            else if (textureDef.type == M2Texture.TextureType.TEX_COMPONENT_CHAR_HAIR) // character skin
+                            // mostly used for cloaks
+                            else if (textureDef.type == M2Texture.TextureType.TEX_COMPONENT_OBJECT_SKIN)
+                            {
+                                // cloak
+                                if (1500 <= section.skinSectionId && section.skinSectionId <= 1599)
+                                {
+                                    var capedisplayinfo = itemDisplayInfoStore.First(x => x.Id == displayinfoextra.Cape);
+                                    texFile = "Item\\ObjectComponents\\Cape\\" + capedisplayinfo.LeftModelTexture + ".blp";
+                                    if (string.IsNullOrEmpty(texFile))
+                                        Console.WriteLine("Couldn't get Cape texture from displayextra : " + displayinfoextra);
+                                }
+                                else
+                                {
+                                    // there are probably other object skin types than capes
+                                    Console.WriteLine("geoset group not implemented for TEX_COMPONENT_SKIN_EXTRA : " + section.skinSectionId);
+                                }
+                            }
+
+                            else if (textureDef.type == M2Texture.TextureType.TEX_COMPONENT_CHAR_HAIR || textureDef.type == M2Texture.TextureType.TEX_COMPONENT_CHAR_FACIAL_HAIR) // character skin
                             {
                                 // CharHairTextures or charsection ?
                                 // 1st version, it's awful.
@@ -656,9 +677,21 @@ namespace WDE.MapRenderer.Managers
                             }
                         }
 
+                        else
+                        {
+                            // Console.WriteLine("Wasn't able to set texture for display id " + displayid);
+                            // Console.WriteLine("texture type : " + textureDef.type + " not implemented yet");
+                        }
+
                         // System.Diagnostics.Debug.WriteLine($"M2 texture path :  {texFile}");
                         // var texFile = textureDef.filename.AsString();
                         var tcs = new TaskCompletionSource<TextureHandle>();
+                        if (string.IsNullOrWhiteSpace(texFile))
+                        {
+                            Console.WriteLine("texture path is empty for display id : " + displayid + " dispextra : " + creatureDisplayInfoStore[displayid].ExtendedDisplayInfoID);
+                            Console.WriteLine("texture type : " + textureDef.type);
+                            Console.WriteLine("skin section id : " + section.skinSectionId);
+                        }
                         yield return textureManager.GetTexture(texFile, tcs);
                         var resTex = tcs.Task.Result;
                         if (th.HasValue)
