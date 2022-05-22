@@ -910,16 +910,16 @@
 
 	{
 		"id": 54,
-		"name": "CONDITION_CREATURE_SUBFAMILY",
-		"name_readable": "Is of subfamily",
-		"help": "Condition is met if target is creature of subfamily",
+		"name": "CONDITION_SCENARIO_STEP",
+		"name_readable": "Is at Scenario Step",
+		"help": "Condition is met if target is at Scenario with Step",
 		"parameters": [
 			{
 				"type": "Parameter",
-				"name": "Subfamily"
+				"name": "ScenarioStep ID"
 			}
 		],
-		"description": "{target} {negate:is|is not} of subfamily {pram1}"
+		"description": "{target} {negate:is|is not} at Scenario with Step {pram1}"
 	}
 
 ]
