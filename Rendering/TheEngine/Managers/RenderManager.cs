@@ -72,7 +72,8 @@ namespace TheEngine.Managers
         
         private Shader currentShader = null;
 
-        private Archetype renderBitArchetype;
+        private Archetype toCullArchetype;
+        private Archetype entitiesSharingRenderingArchetype;
         private Archetype toRenderArchetype;
         private Archetype updateWorldBoundsArchetype;
         private Archetype dirtEntities;
@@ -91,6 +92,10 @@ namespace TheEngine.Managers
             dirtEntities = engine.entityManager.NewArchetype()
                 .WithComponentData<DirtyPosition>();
 
+            entitiesSharingRenderingArchetype = engine.entityManager.NewArchetype()
+                .WithComponentData<ShareRenderEnabledBit>()
+                .WithComponentData<RenderEnabledBit>();
+
             dynamicParentedEntitiesArchetype = engine.entityManager.NewArchetype()
                 .WithComponentData<CopyParentTransform>()
                 .WithComponentData<DirtyPosition>()
@@ -98,12 +103,14 @@ namespace TheEngine.Managers
             
             staticRendererArchetype = engine.EntityManager.NewArchetype()
                 .WithComponentData<RenderEnabledBit>()
+                .WithComponentData<PerformCullingBit>()
                 .WithComponentData<LocalToWorld>()
                 .WithComponentData<WorldMeshBounds>()
                 .WithComponentData<MeshRenderer>();
 
             dynamicRendererArchetype = engine.EntityManager.NewArchetype()
                 .WithComponentData<RenderEnabledBit>()
+                .WithComponentData<PerformCullingBit>()
                 .WithComponentData<LocalToWorld>()
                 .WithComponentData<MeshBounds>()
                 .WithComponentData<DirtyPosition>()
@@ -116,9 +123,10 @@ namespace TheEngine.Managers
                 .WithComponentData<DirtyPosition>()
                 .WithComponentData<MeshBounds>();
 
-            renderBitArchetype = engine.entityManager.NewArchetype()
+            toCullArchetype = engine.entityManager.NewArchetype()
                     .WithComponentData<RenderEnabledBit>()
                     .WithComponentData<LocalToWorld>()
+                    .WithComponentData<PerformCullingBit>()
                     .WithComponentData<WorldMeshBounds>();
 
             toRenderArchetype = engine.entityManager.NewArchetype()
@@ -554,6 +562,7 @@ namespace TheEngine.Managers
         {
             var cameraPosition = cameraManager.MainCamera.Transform.Position;
             var frustum = new BoundingFrustum(cameraManager.MainCamera.ViewMatrix * cameraManager.MainCamera.ProjectionMatrix);
+            var entityManager = engine.EntityManager;
 
             boundsUpdate.Restart();
             updateWorldBoundsArchetype.ParallelForEach<LocalToWorld, MeshBounds, WorldMeshBounds, DirtyPosition>((itr, start, end, l2w, meshBounds, worldMeshBounds, dirtyBit) =>
@@ -572,7 +581,7 @@ namespace TheEngine.Managers
             
             culler.Restart();
             float mod = viewDistanceModifier * viewDistanceModifier;
-            renderBitArchetype.ParallelForEach<LocalToWorld, RenderEnabledBit, WorldMeshBounds>((itr, start, end, l2w, bits, worldMeshBounds) =>
+            toCullArchetype.ParallelForEach<LocalToWorld, PerformCullingBit, RenderEnabledBit, WorldMeshBounds>((itr, start, end, l2w, _ , bits, worldMeshBounds) =>
             {
                 for (int i = start; i < end; ++i)
                 {
@@ -593,6 +602,24 @@ namespace TheEngine.Managers
                         bits[i] = (RenderEnabledBit)false;
                 }
             });
+            dynamicParentedEntitiesArchetype.WithComponentData<RenderEnabledBit>().ParallelForEach<RenderEnabledBit, CopyParentTransform>((itr, start, end, renderBit, cpt) =>
+            {
+                for (int i = start; i < end; ++i)
+                {
+                    var parent = cpt[i];
+                    if (parent.Parent != Entity.Empty)
+                        renderBit[i] = engine.entityManager.GetComponent<RenderEnabledBit>(parent.Parent);
+                }
+            });
+            entitiesSharingRenderingArchetype.ParallelForEach<RenderEnabledBit, ShareRenderEnabledBit>(
+                (itr, start, end, renderBits, shareRenderBits) =>
+                {
+                    for (int i = start; i < end; ++i)
+                    {
+                        if (!renderBits[i])
+                            renderBits[i] = entityManager.GetComponent<RenderEnabledBit>(shareRenderBits[i].OtherEntity);
+                    }
+                });
             culler.Stop();
             engine.statsManager.Counters.Culling.Add(culler.Elapsed.TotalMilliseconds);
 
@@ -954,6 +981,8 @@ namespace TheEngine.Managers
             engine.EntityManager.GetComponent<MeshRenderer>(entity).MeshHandle = meshHandle;
             engine.EntityManager.GetComponent<MeshRenderer>(entity).Opaque = !material.BlendingEnabled;
             engine.EntityManager.GetComponent<WorldMeshBounds>(entity) = LocalToWorld((MeshBounds)mesh.Bounds, l2w);
+            if (engine.EntityManager.HasComponent<MeshBounds>(entity))
+                engine.EntityManager.GetComponent<MeshBounds>(entity).box = mesh.Bounds;
         }
         
         public StaticRenderHandle RegisterStaticRenderer(MeshHandle meshHandle, Material material, int subMesh, Matrix localToWorld)

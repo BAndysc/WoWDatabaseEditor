@@ -57,16 +57,15 @@ public class Archetypes
         this.entityManager = entityManager;
         AnimatedEntityArchetype = entityManager.NewArchetype()
             .WithComponentData<RenderEnabledBit>()
-            .WithComponentData<MeshBounds>()
             .WithComponentData<LocalToWorld>()
-            .WithComponentData<DirtyPosition>()
             .WithManagedComponentData<M2AnimationComponentData>();
                 
         StaticM2WorldObjectArchetype = entityManager.NewArchetype()
                 .WithComponentData<RenderEnabledBit>()
                 .WithComponentData<LocalToWorld>()
-                .WithComponentData<MeshBounds>() // generally not required, but animation system requires it :S
+                .WithComponentData<PerformCullingBit>()
                 .WithComponentData<WorldMeshBounds>()
+                .WithComponentData<MeshBounds>()
                 .WithComponentData<MeshRenderer>();
 
         StaticM2WorldObjectAnimatedArchetype = StaticM2WorldObjectArchetype
@@ -84,6 +83,7 @@ public class Archetypes
         TerrainEntityArchetype = entityManager.NewArchetype()
             .WithComponentData<RenderEnabledBit>()
             .WithComponentData<LocalToWorld>()
+            .WithComponentData<PerformCullingBit>()
             .WithComponentData<WorldMeshBounds>()
             .WithComponentData<MeshRenderer>();
         
@@ -97,6 +97,7 @@ public class Archetypes
 
         CullingArchetype = entityManager.NewArchetype()
             .WithComponentData<RenderEnabledBit>()
+            .WithComponentData<PerformCullingBit>()
             .WithComponentData<WorldMeshBounds>();
 
         DynamicObjectArchetype = entityManager.NewArchetype()
@@ -112,6 +113,7 @@ public class Archetypes
             .WithComponentData<DirtyPosition>()
             .WithComponentData<MeshBounds>()
             .WithComponentData<RenderEnabledBit>()
+            .WithComponentData<PerformCullingBit>()
             .WithComponentData<WorldMeshBounds>()
             .WithManagedComponentData<M2AnimationComponentData>()
             .WithComponentData<LocalToWorld>();

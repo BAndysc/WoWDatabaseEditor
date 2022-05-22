@@ -23,5 +23,6 @@ namespace TheEngine.ECS
         Archetype NewArchetype();
         bool Is(Entity entity, Archetype archetype);
         void InstallArchetype(Archetype archetype);
+        bool HasComponent<T>(Entity entity) where T : unmanaged, IComponentData;
     }
 }

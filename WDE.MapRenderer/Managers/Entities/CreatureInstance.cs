@@ -82,8 +82,10 @@ public class CreatureInstance : WorldObjectInstance
                 SetNewAnimation = 0,
                 _buffer = itemBoneMatricesBuffer
             });
+            entityManager.AddComponent(mountAnimationEntity, new ShareRenderEnabledBit(){OtherEntity = WorldObjectEntity});
+            entityManager.AddComponent(WorldObjectEntity, new ShareRenderEnabledBit(){OtherEntity = mountAnimationEntity});
             handles.Add(mountAnimationEntity);
-        
+
             int j = 0;
             foreach (var material in value.materials)
             {

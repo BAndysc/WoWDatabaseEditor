@@ -4,6 +4,7 @@ using TheAvaloniaOpenGL.Resources;
 using TheEngine.Components;
 using TheEngine.ECS;
 using TheEngine.Interfaces;
+using TheEngine.Managers;
 using TheMaths;
 using WDE.Common.Database;
 using WDE.MpqReader.DBC;
@@ -183,13 +184,13 @@ public class AnimationSystem
         ThreadLocal<long> counter = new(true);
         var cameraPosition = cameraManager.MainCamera.Transform.Position;
         ThreadLocal<List<(NativeBuffer<Matrix>, int, Matrix[])>> updates = new ThreadLocal<List<(NativeBuffer<Matrix>, int, Matrix[])>>(() => new(), true);
-        archetypes.AnimatedEntityArchetype.ParallelForEach<RenderEnabledBit, LocalToWorld, MeshBounds, M2AnimationComponentData>((itr, start, end, renderEnabledAccess, localToWorldAccess, meshBoundsAccess, animationAccess) =>
+    
+        archetypes.AnimatedEntityArchetype.ParallelForEachRRROOO<RenderEnabledBit, LocalToWorld, M2AnimationComponentData, MeshBounds, DirtyPosition, WorldMeshBounds>((itr, start, end, renderEnabledAccess, localToWorldAccess, animationAccess, meshBoundsAccess, dirtPositionAccess, worldMeshBounds) =>
         {
             int sum = 0;
             for (int i = start; i < end; ++i)
             {
-                if (!renderEnabledAccess[i] ||
-                     Vector3.Distance(cameraPosition, localToWorldAccess[i].Position) > 100)
+                if (!renderEnabledAccess[i] || Vector3.Distance(cameraPosition, localToWorldAccess[i].Position) > 100)
                      continue;
                 sum++;
                 var animationData = animationAccess[i];
@@ -209,7 +210,17 @@ public class AnimationSystem
                         animationData._time = 0;
 
                         var bounds = animationData.Model.sequences[lookup.Value].bounds;
-                        meshBoundsAccess[i].box = new BoundingBox(bounds.extent.min, bounds.extent.max);
+                        var bb = new BoundingBox(bounds.extent.min, bounds.extent.max);
+                        if (meshBoundsAccess.HasValue)
+                        {
+                            meshBoundsAccess.Value[i].box = bb;
+                        }
+                        if (worldMeshBounds.HasValue)
+                        {
+                            worldMeshBounds.Value[i].box = RenderManager.LocalToWorld((MeshBounds)bb, in localToWorldAccess[i]);
+                        }
+                        if (dirtPositionAccess.HasValue)
+                            dirtPositionAccess.Value[i].Enable();
                     }
                 }
 

@@ -133,6 +133,11 @@ namespace TheEngine.ECS
             archetypes[archetype.Hash] = archetype;
         }
 
+        public bool HasComponent<T>(Entity entity) where T : unmanaged, IComponentData
+        {
+            return (entitiesArchetype[entity.Id] & TypeData<T>().GlobalHash) != 0;
+        }
+
         public IEnumerable<IChunkDataIterator> ArchetypeIterator(Archetype archetype)
         {
             foreach (var a in dataManager.Archetypes)

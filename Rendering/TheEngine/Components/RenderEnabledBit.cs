@@ -75,7 +75,12 @@ namespace TheEngine.Components
             bufferByName?.Clear();
         }
     }
-    
+
+    public struct ShareRenderEnabledBit : IComponentData
+    {
+        public Entity OtherEntity;
+    }
+
     public struct RenderEnabledBit : IComponentData
     {
         // bit 0 - is actually enabled
@@ -124,5 +129,9 @@ namespace TheEngine.Components
         {
             entityManager.GetComponent<RenderEnabledBit>(entity).SetDisabled(disabled);
         }
+    }
+    
+    public struct PerformCullingBit : IComponentData
+    {
     }
 }

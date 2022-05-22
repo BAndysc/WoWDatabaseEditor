@@ -557,7 +557,7 @@ namespace WDE.MapRenderer.Managers
                             {
                                 SetNewAnimation = 0,
                                 _buffer = bones!
-                            });   
+                            });
                         }
                         var instanceRenderer = new MaterialInstanceRenderData();
                         instanceRenderer.SetBuffer(material, "boneMatrices", bones!);
