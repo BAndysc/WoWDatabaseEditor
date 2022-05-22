@@ -59,6 +59,7 @@ public class Archetypes
             .WithComponentData<RenderEnabledBit>()
             .WithComponentData<MeshBounds>()
             .WithComponentData<LocalToWorld>()
+            .WithComponentData<DirtyPosition>()
             .WithManagedComponentData<M2AnimationComponentData>();
                 
         StaticM2WorldObjectArchetype = entityManager.NewArchetype()

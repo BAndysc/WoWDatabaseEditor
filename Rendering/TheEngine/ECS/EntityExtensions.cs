@@ -17,6 +17,21 @@ public static partial class EntityExtensions
         }
     }
     
+    public static void ForEachRRRO<T1, T2, T3, T4>(this Archetype archetype, 
+        System.Action<IChunkDataIterator, int, int, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>?> process)
+        where T1 : unmanaged, IComponentData
+        where T2 : unmanaged, IComponentData
+        where T3 : unmanaged, IComponentData
+        where T4 : unmanaged, IComponentData
+    {
+        var entityManager = archetype.EntityManager;
+        var iterator = entityManager.ArchetypeIterator(archetype);
+        foreach (var itr in iterator)
+        {
+            process(itr, 0, itr.Length, itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.OptionalDataAccess<T4>());
+        }
+    }
+    
     public static void ParallelForEachRRRRO<T0, T1, T2, T3, T4>(this Archetype archetype, 
         Action<IChunkDataIterator, int, int, ComponentDataAccess<T0>, ComponentDataAccess<T1>, ComponentDataAccess<T2>, ComponentDataAccess<T3>, ComponentDataAccess<T4>?> process)where T0 : unmanaged, IComponentData
         where T1 : unmanaged, IComponentData

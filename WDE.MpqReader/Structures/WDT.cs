@@ -92,25 +92,18 @@ namespace WDE.MpqReader.Structures
     {
         public WdtFlags flags { get; init; }
         public uint unknown { get; init; }
-        public uint[] unused { get; init; }
 
         private WDTHeader() { }
 
         public static WDTHeader Read(IBinaryReader reader)
         {
+            var flags = (WdtFlags)reader.ReadUInt32();
+            var unknown = reader.ReadUInt32();
+            reader.Offset += 4 * 6; // padding;
             return new WDTHeader()
             {
-                flags = (WdtFlags)reader.ReadUInt32(),
-                unknown = reader.ReadUInt32(),
-                unused = new uint[6]
-                {
-                    reader.ReadUInt32(),
-                    reader.ReadUInt32(),
-                    reader.ReadUInt32(),
-                    reader.ReadUInt32(),
-                    reader.ReadUInt32(),
-                    reader.ReadUInt32()
-                }
+                flags = flags,
+                unknown = unknown
             };
         }
     }

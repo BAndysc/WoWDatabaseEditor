@@ -308,8 +308,8 @@ namespace WDE.MapRenderer.Managers
                     var vert = m2.vertices[skin.Vertices[i]];
                     vertices[i] = vert.pos;
                     normals[i] = vert.normal;
-                    uv1[i] = vert.tex_coords[0];
-                    uv2[i] = vert.tex_coords[1];
+                    uv1[i] = vert.tex_coord1;
+                    uv2[i] = vert.tex_coord2;
                     var packedWeights = (uint)vert.bone_weights[0] | ((uint)vert.bone_weights[1] << 8) |
                                         ((uint)vert.bone_weights[2] << 16) | ((uint)vert.bone_weights[3] << 24);
                     var packetWeightsFloat = UintAsFloat(packedWeights);
@@ -949,8 +949,8 @@ namespace WDE.MapRenderer.Managers
                     var vert = m2.vertices[skin.Vertices[i]];
                     vertices[i] = vert.pos;
                     normals[i] = vert.normal;
-                    uv1[i] = vert.tex_coords[0];
-                    uv2[i] = vert.tex_coords[1];
+                    uv1[i] = vert.tex_coord1;
+                    uv2[i] = vert.tex_coord2;
                     var packedWeights = (uint)vert.bone_weights[0] | ((uint)vert.bone_weights[1] << 8) |
                                         ((uint)vert.bone_weights[2] << 16) | ((uint)vert.bone_weights[3] << 24);
                     var packetWeightsFloat = UintAsFloat(packedWeights);
@@ -1132,8 +1132,8 @@ namespace WDE.MapRenderer.Managers
                     var vert = m2.vertices[skin.Vertices[i]];
                     vertices[i] = vert.pos;
                     normals[i] = vert.normal;
-                    uv1[i] = vert.tex_coords[0];
-                    uv2[i] = vert.tex_coords[1];
+                    uv1[i] = vert.tex_coord1;
+                    uv2[i] = vert.tex_coord2;
                     var packedWeights = (uint)vert.bone_weights[0] | ((uint)vert.bone_weights[1] << 8) |
                                         ((uint)vert.bone_weights[2] << 16) | ((uint)vert.bone_weights[3] << 24);
                     var packetWeightsFloat = UintAsFloat(packedWeights);
@@ -1297,8 +1297,8 @@ namespace WDE.MapRenderer.Managers
                     var vert = m2.vertices[skin.Vertices[i]];
                     vertices[i] = vert.pos;
                     normals[i] = vert.normal;
-                    uv1[i] = vert.tex_coords[0];
-                    uv2[i] = vert.tex_coords[1];
+                    uv1[i] = vert.tex_coord1;
+                    uv2[i] = vert.tex_coord2;
                     var packedWeights = (uint)vert.bone_weights[0] | ((uint)vert.bone_weights[1] << 8) |
                                         ((uint)vert.bone_weights[2] << 16) | ((uint)vert.bone_weights[3] << 24);
                     var packetWeightsFloat = UintAsFloat(packedWeights);

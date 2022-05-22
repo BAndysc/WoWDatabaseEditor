@@ -671,13 +671,44 @@ namespace WDE.MpqReader.Structures
         }
     }
 
+    public struct Byte4Array
+    {
+        private readonly uint num;
+
+        private Byte4Array(uint num)
+        {
+            this.num = num;
+        }
+
+        public byte this[int i]
+        {
+            get
+            {
+                if (i == 0)
+                    return (byte)(num & 0xff);
+                else if (i == 1)
+                    return (byte)((num >> 8) & 0xff);
+                else if (i == 2)
+                    return (byte)((num >> 16) & 0xff);
+                else
+                    return (byte)((num >> 24) & 0xff);
+            }
+        }
+
+        public static implicit operator Byte4Array(uint num)
+        {
+            return new Byte4Array(num);
+        }
+    }
+
     public class M2Vertex
     {
         public Vector3 pos { get; init; }
-        public byte[] bone_weights { get; init; }
-        public byte[] bone_indices { get; init; }
+        public Byte4Array bone_weights { get; init; }
+        public Byte4Array bone_indices { get; init; }
         public Vector3 normal { get; init; }
-        public Vector2[] tex_coords { get; init; }  // two textures, depending on shader used
+        public Vector2 tex_coord1 { get; init; }
+        public Vector2 tex_coord2 { get; init; }  // two textures, depending on shader used
     
         private M2Vertex(){}
 
@@ -686,10 +717,11 @@ namespace WDE.MpqReader.Structures
             return new M2Vertex()
             {
                 pos = reader.ReadVector3(),
-                bone_weights = reader.ReadBytes(4),
-                bone_indices = reader.ReadBytes(4),
+                bone_weights = reader.ReadUInt32(),
+                bone_indices = reader.ReadUInt32(),
                 normal = reader.ReadVector3(),
-                tex_coords = new[] { reader.ReadVector2(), reader.ReadVector2() }
+                tex_coord1 = reader.ReadVector2(),
+                tex_coord2 = reader.ReadVector2()
             };
         }
     }
@@ -700,11 +732,13 @@ namespace WDE.MpqReader.Structures
         private short y;
         private short z;
         private short w;
-        private Quaternion value;
         
         public static M2CompQuat Identity  => new M2CompQuat(32767, 32767, 32767, -1);
 
-        public Quaternion Value => value;
+        public Quaternion Value => new Quaternion((x < 0 ? x + 32768 : x - 32767) / 32767.0f,
+            (y < 0 ? y + 32768 : y - 32767) / 32767.0f,
+            (z < 0 ? z + 32768 : z - 32767) / 32767.0f,
+            (w < 0 ? w + 32768 : w - 32767) / 32767.0f);
 
         public M2CompQuat(short x, short y, short z, short w)
         {
@@ -712,10 +746,6 @@ namespace WDE.MpqReader.Structures
             this.y = y;
             this.z = z;
             this.w = w;
-            value = new Quaternion((x < 0 ? x + 32768 : x - 32767) / 32767.0f,
-                (y < 0 ? y + 32768 : y - 32767) / 32767.0f,
-                (z < 0 ? z + 32768 : z - 32767) / 32767.0f,
-                (w < 0 ? w + 32768 : w - 32767) / 32767.0f);
         }
 
         public static M2CompQuat Read(IBinaryReader reader)
@@ -732,7 +762,7 @@ namespace WDE.MpqReader.Structures
         public readonly ushort submesh_id;            // Mesh part ID OR uDistToParent?
         public readonly int boneNameCRC;
         public M2Track<Vector3> translation;
-        public M2Track<Quaternion> rotation;   // compressed values, default is (32767,32767,32767,65535) == (0,0,0,1) == identity
+        public M2Track<M2CompQuat> rotation;   // compressed values, default is (32767,32767,32767,65535) == (0,0,0,1) == identity
         public M2Track<Vector3> scale;
         public Vector3 pivot;                 // The pivot point of that bone.
         
@@ -744,7 +774,7 @@ namespace WDE.MpqReader.Structures
             submesh_id = reader.ReadUInt16();
             boneNameCRC = reader.ReadInt32();
             translation = M2Track<Vector3>.Read(readers, reader, sequences, r => r.ReadVector3());
-            rotation = M2Track<Quaternion>.Read(readers, reader, sequences, r => M2CompQuat.Read(r).Value);
+            rotation = M2Track<M2CompQuat>.Read(readers, reader, sequences, r => M2CompQuat.Read(r));
             scale = M2Track<Vector3>.Read(readers, reader, sequences, r => r.ReadVector3());
             pivot = reader.ReadVector3();
         }

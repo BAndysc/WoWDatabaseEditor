@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Diagnostics;
 using TheMaths;
 using WDE.MpqReader.Readers;

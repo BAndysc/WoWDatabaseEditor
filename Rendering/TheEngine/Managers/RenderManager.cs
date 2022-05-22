@@ -853,7 +853,7 @@ namespace TheEngine.Managers
 
         public void DrawLine(Vector3 start, Vector3 end, Vector4 color)
         {
-            lineMesh.SetVertices(new Vector3[2]{start, end});
+            lineMesh.SetVertices(start, end);
             lineMesh.Rebuild();
             if (currentShader != unlitMaterial.Shader)
             {

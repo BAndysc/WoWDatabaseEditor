@@ -244,7 +244,7 @@ namespace WDE.MpqReader.Structures
         public ushort extBatchCount;
         public ushort padding_or_batch_type_d; // probably padding, but might be data?
 
-        public byte[] fogIds;                // ids in MFOG
+        public Byte4Array fogIds;                // ids in MFOG
         public uint groupLiquid;             // see below in the MLIQ chunk
 
         public uint uniqueID;
@@ -264,7 +264,7 @@ namespace WDE.MpqReader.Structures
             intBatchCount = reader.ReadUInt16();
             extBatchCount = reader.ReadUInt16();
             padding_or_batch_type_d = reader.ReadUInt16();
-            fogIds = new byte[] { reader.ReadByte(), reader.ReadByte(), reader.ReadByte(), reader.ReadByte() };
+            fogIds = reader.ReadUInt32();
             groupLiquid = reader.ReadUInt32();
             uniqueID = reader.ReadUInt32();
             flags2 = reader.ReadUInt32();

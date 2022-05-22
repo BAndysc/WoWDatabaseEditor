@@ -90,7 +90,7 @@ public class AnimationSystem
         return st > array.Length - 1 ? array.Length - 1 : st; // or return end + 1
     }
     
-    private Quaternion GetFirstOrDefaultQuaternion(int IDX, in M2Track<Quaternion> track, Quaternion def, float t)
+    private Quaternion GetFirstOrDefaultQuaternion(int IDX, in M2Track<M2CompQuat> track, Quaternion def, float t)
     {
         if (track.values.Length <= IDX)
             return def;
@@ -98,12 +98,12 @@ public class AnimationSystem
         if (values.Length == 0)
             return def;
         if (values.Length == 1)
-            return track.values[IDX][0];
+            return track.values[IDX][0].Value;
 
         int firstIndexGreaterThan = FirstIndexGreaterThan(in track.timestamps[IDX], (uint)t);
         if (firstIndexGreaterThan == 0)
         {
-            return values[firstIndexGreaterThan];
+            return values[firstIndexGreaterThan].Value;
         }
         
         var prev = values[firstIndexGreaterThan - 1];
@@ -111,7 +111,7 @@ public class AnimationSystem
         var start = track.timestamps[IDX][firstIndexGreaterThan - 1];
         var end = track.timestamps[IDX][firstIndexGreaterThan];
         var pct = (t - start) / (end - start);
-        return Quaternion.Slerp(prev, nextValue, pct);
+        return Quaternion.Slerp(prev.Value, nextValue.Value, pct);
     }
 
     private Matrix GetBoneMatrixWithoutParent(M2 m2, int boneIndex, float t, int IDX)
@@ -253,8 +253,9 @@ public class AnimationSystem
                     {
                         int attachedToBone = -1;
                         Vector3 offset = Vector3.Zero;
-                        foreach (var attachment in attachedTo.Model.attachments)
+                        for (var index = 0; index < attachedTo.Model.attachments.Length; index++)
                         {
+                            var attachment = attachedTo.Model.attachments[index];
                             if (attachment.id == attachmentType)
                             {
                                 attachedToBone = attachment.bone;

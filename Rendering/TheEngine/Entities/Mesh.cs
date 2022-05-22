@@ -22,9 +22,10 @@ namespace TheEngine.Entities
         internal NativeBuffer<ushort>? IndicesBuffer { get; private set; }
 
         private BoundingBox bounds;
-        private UniversalVertex[]? vertices;
+        private UniversalVertex[]? vertices = Array.Empty<UniversalVertex>();
         private ushort[]? indices;
         private int indicesCount = 0;
+        private int verticesCount = 0;
         private (int start, int length)[]? submeshesRange;
 
         public BoundingBox Bounds => bounds;
@@ -75,9 +76,9 @@ namespace TheEngine.Entities
                 ushort k = indices[i+1];
                 ushort l = indices[i+2];
                 
-                if (vertices.Length > j &&
-                    vertices.Length > k &&
-                    vertices.Length > l)
+                if (verticesCount > j &&
+                    verticesCount > k &&
+                    verticesCount > l)
                 {
                     var v1 = vertices[j].position;
                     var v2 = vertices[k].position;
@@ -127,6 +128,7 @@ namespace TheEngine.Entities
             this.engine = engine;
             Handle = handle;
             this.vertices = ownVerticesArray ? vertices : vertices.ToArray();
+            this.verticesCount = this.vertices.Length;
             this.indices = indices;
             this.indicesCount = indicesCount;
             this.managedOnly = managedOnly;
@@ -227,23 +229,36 @@ namespace TheEngine.Entities
 
         public void SetVertices(ReadOnlySpan<Vector3> vertices)
         {
-            this.vertices = new UniversalVertex[vertices.Length];
-            for (int i = 0; i < vertices.Length; ++i)
+            if (this.vertices.Length < vertices.Length)
+                Array.Resize(ref this.vertices, vertices.Length);
+            verticesCount = vertices.Length;
+            for (int i = 0; i < verticesCount; ++i)
                 this.vertices[i] = new UniversalVertex() { position = new Vector4(vertices[i], 1) };
         }
+        
+        // no alloc method
+        public void SetVertices(Vector3 v1, Vector3 v2)
+        {
+            if (vertices.Length < 2)
+                Array.Resize(ref vertices, 2);
+            verticesCount = 2;
+            vertices[0] = new UniversalVertex() { position = new Vector4(v1, 1) };
+            vertices[1] = new UniversalVertex() { position = new Vector4(v2, 1) };
+        }
 
-        public void BuildBoundingBox() => BuildBoundingBox(vertices);
+        public void BuildBoundingBox() => BuildBoundingBox(vertices.AsSpan(0, verticesCount));
 
-        private void BuildBoundingBox(UniversalVertex[] vertices)
+        private void BuildBoundingBox(ReadOnlySpan<UniversalVertex> vertices)
         {
             Vector3 max = new Vector3(float.MinValue, float.MinValue, float.MinValue);
             Vector3 min = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
-            foreach (var v in vertices)
+            for (var index = 0; index < vertices.Length; index++)
             {
+                var v = vertices[index];
                 min.X = Math.Min(v.position.X, min.X);
                 min.Y = Math.Min(v.position.Y, min.Y);
                 min.Z = Math.Min(v.position.Z, min.Z);
-                
+
                 max.X = Math.Max(v.position.X, max.X);
                 max.Y = Math.Max(v.position.Y, max.Y);
                 max.Z = Math.Max(v.position.Z, max.Z);
@@ -257,9 +272,9 @@ namespace TheEngine.Entities
             Debug.Assert(!managedOnly);
             Debug.Assert(vertices != null);
             Debug.Assert(indices != null);
-            BuildBoundingBox(vertices);
-            VerticesBuffer.UpdateBuffer(vertices);
-            IndicesBuffer.UpdateBuffer(indices);
+            BuildBoundingBox(vertices.AsSpan(0, verticesCount));
+            VerticesBuffer?.UpdateBuffer(vertices.AsSpan(0, verticesCount));
+            IndicesBuffer?.UpdateBuffer(indices.AsSpan(0, indicesCount));
             //vertices = null;
             //indices = null;
         }
@@ -271,8 +286,8 @@ namespace TheEngine.Entities
             disposed = true;
             if (!IsManagedOnly)
             {
-                VerticesBuffer.Dispose();
-                IndicesBuffer.Dispose();
+                VerticesBuffer?.Dispose();
+                IndicesBuffer?.Dispose();
             }
             
             VerticesBuffer = null;
