@@ -92,6 +92,10 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public Task<IList<ITrinityString>> GetStringsAsync() => impl.GetStringsAsync();
         public Task<IList<IDatabaseSpellDbc>> GetSpellDbcAsync() => impl.GetSpellDbcAsync();
         public Task<List<IEventScriptLine>> FindEventScriptLinesBy(IReadOnlyList<(uint command, int dataIndex, long valueToSearch)> conditions) => impl.FindEventScriptLinesBy(conditions);
+        public Task<IList<ICreatureModelInfo>> GetCreatureModelInfoAsync() => impl.GetCreatureModelInfoAsync();
+
+        public ICreatureModelInfo? GetCreatureModelInfo(uint displayId) => impl.GetCreatureModelInfo(displayId);
+
         public Task<List<IEventScriptLine>> GetEventScript(EventScriptType type, uint id) => impl.GetEventScript(type, id);
     }
 }

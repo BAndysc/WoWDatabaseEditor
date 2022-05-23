@@ -552,7 +552,19 @@ namespace WDE.TrinityMySqlDatabase.Database
             var waypoints = await model.WaypointScripts.Where(GenerateWhereConditionsForEventScript<MySqlWaypointScriptLine>(conditions)).ToListAsync<IEventScriptLine>();
             return events.Concat(spells).Concat(waypoints).ToList();
         }
-        
+
+        public async Task<IList<ICreatureModelInfo>> GetCreatureModelInfoAsync()
+        {
+            await using var model = Database();
+            return await model.CreatureModelInfo.ToListAsync<ICreatureModelInfo>();
+        }
+
+        public ICreatureModelInfo? GetCreatureModelInfo(uint displayId)
+        {
+            using var model = Database();
+            return model.CreatureModelInfo.FirstOrDefault(x => x.DisplayId == displayId);
+        }
+
         public async Task<List<IEventScriptLine>> GetEventScript(EventScriptType type, uint id)
         {
             await using var model = Database();
