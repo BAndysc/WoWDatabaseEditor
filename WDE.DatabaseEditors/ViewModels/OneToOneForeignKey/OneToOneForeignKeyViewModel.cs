@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -55,6 +56,8 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
     private bool wasPresentInDatabase;
     [Notify] private bool presentInDatabase;
     private DatabaseEntityViewModel row;
+    
+    private HashSet<string> forceUpdateCells = new HashSet<string>();
 
     public DatabaseEntityViewModel Row
     {
@@ -134,6 +137,7 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
             UpdateSolutionItemWithEverything();
             await taskRunner.ScheduleTask("Update session", async () => await sessionService.UpdateQuery(this));
             History.MarkAsSaved();
+            forceUpdateCells.Clear();
         });
         CopyCurrentSqlCommand = new AsyncAutoCommand(async () =>
         {
@@ -311,9 +315,31 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
         if (!wasPresentInDatabase && !PresentInDatabase)
             return Queries.Empty();
 
-        return queryGenerator.GenerateQuery(new[] { key }, null, new DatabaseTableData(tableDefinition, new[] { Row!.Entity }));
+        var query = queryGenerator.GenerateQuery(new[] { key }, null, new DatabaseTableData(tableDefinition, new[] { Row!.Entity }));
+        
+        IMultiQuery multi = Queries.BeginTransaction();
+        multi.Add(query);
+        foreach (var pair in forceUpdateCells)
+        {
+            var entity = row.Entity;
+            var field = entity.GetCell(pair);
+            if (field == null)
+                continue;
+            multi.Add(queryGenerator.GenerateUpdateFieldQuery(tableDefinition, entity, field));
+        }
+        return multi.Close();
     }
-
+    
+    private void OnRowChangedCell(DatabaseEntityViewModel entity, SingleRecordDatabaseCellViewModel cell, string columnName)
+    {
+        if (!cell.IsModified && entity.Entity.ExistInDatabase)
+        {
+            Debug.Assert(!entity.Entity.Phantom);
+            forceUpdateCells.Add(columnName);
+            History.MarkNoSave();
+        }
+    }
+    
     private DatabaseEntityViewModel Create(DatabaseEntity entity)
     {
         var pseudoItem = new DatabaseTableSolutionItem(tableDefinition.Id, tableDefinition.IgnoreEquality);
@@ -322,6 +348,11 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
             savedTableItem.UpdateEntitiesWithOriginalValues(new List<DatabaseEntity>() { entity });
 
         var row = new DatabaseEntityViewModel(entity);
+        row.ChangedCell += OnRowChangedCell;
+        AutoDispose(new ActionDisposable(() =>
+        {
+            row.ChangedCell -= OnRowChangedCell;
+        }));
         var columns = tableDefinition.Groups.SelectMany(g => g.Fields).ToList();
 
         int columnIndex = 0;
