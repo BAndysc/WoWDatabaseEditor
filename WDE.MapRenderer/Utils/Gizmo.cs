@@ -162,6 +162,14 @@ namespace WDE.MapRenderer.Utils
         KeyboardDrag,
         Rotation
     }
+
+    public enum RotationLockType
+    {
+        None,
+        RotationX,
+        RotationY,
+        RotationZ,
+    }
     
     public abstract class Dragger<T>
     {
@@ -181,8 +189,10 @@ namespace WDE.MapRenderer.Utils
         private readonly List<(T item, Quaternion original_rotation)> rotable = new();
         private readonly List<(T item, Vector3 original_position, Vector3 offset)> draggable = new();
         private Vector3 originalTouch;
+        private Vector2 originalTouch2D;
         public bool IsEnabled { get; set; }
         public bool CanRotate { get; set; }
+        public RotationLockType RotationLock { get; set; }
         public Vector3 GizmoPosition { get; set; }
         
         public Dragger(IMeshManager meshManager,
@@ -463,6 +473,21 @@ namespace WDE.MapRenderer.Utils
 
         private void StartRotation(Gizmo.HitType hitType, ref Ray ray, GizmoMode gizmoMode)
         {
+            if (RotationLock != RotationLockType.None)
+            {
+                switch (RotationLock)
+                {
+                    case RotationLockType.RotationX:
+                        hitType = Gizmo.HitType.RotationX;
+                        break;
+                    case RotationLockType.RotationY:
+                        hitType = Gizmo.HitType.RotationY;
+                        break;
+                    case RotationLockType.RotationZ:
+                        hitType = Gizmo.HitType.RotationZ;
+                        break;
+                }
+            }
             GetDragAxisAndPlane(hitType, out var axis, out var plane);
             if (plane.Intersects(ref ray, out Vector3 touchPoint))
                 StartRotation(touchPoint, axis, plane, gizmoMode);
@@ -471,6 +496,7 @@ namespace WDE.MapRenderer.Utils
         private void StartRotation(Vector3 startTouchPoint, Vector3? axis, Plane plane, GizmoMode gizmoMode)
         {
             rotable.Clear();
+            originalTouch2D = inputManager.Mouse.NormalizedPosition;
             originalTouch = startTouchPoint;
             this.axis = axis;
             this.plane = plane;

@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Windows.Input;
 using Prism.Ioc;
 using TheEngine;
 using TheEngine.Coroutines;
@@ -235,6 +236,21 @@ namespace WDE.MapRenderer
         public T? ResolveInstance<T>()
         {
             return containerProvider.Resolve<T>();
+        }
+
+        public List<(string, ICommand)>? GenerateContextMenu()
+        {
+            List<(string, ICommand)>? allItems = null;
+            moduleManager.ForEach(mod =>
+            {
+                var items = mod.GenerateContextMenu();
+                if (items != null)
+                {
+                    allItems ??= new List<(string, ICommand)>();
+                    allItems.AddRange(items);
+                }
+            });
+            return allItems.Count == 0 ? null : allItems;
         }
     }
 }

@@ -1018,6 +1018,21 @@ namespace TheMaths
 
             result = new Vector3(((1.0f + v.X) * 0.5f * width) + x, ((1.0f - v.Y) * 0.5f * height) + y, (v.Z * (maxZ - minZ)) + minZ);
         }
+        
+        // Projects a vector onto another vector.
+        public static Vector3 Project(Vector3 vector, Vector3 onNormal)
+        {
+            float sqrMag = Dot(onNormal, onNormal);
+            if (sqrMag < float.Epsilon)
+                return Vector3.Zero;
+            else
+            {
+                var dot = Dot(vector, onNormal);
+                return new Vector3(onNormal.X * dot / sqrMag,
+                    onNormal.Y * dot / sqrMag,
+                    onNormal.Z * dot / sqrMag);
+            }
+        }
 
         /// <summary>
         /// Projects a 3D vector from object space into screen space. 

@@ -1,3 +1,4 @@
+using System.Windows.Input;
 using Prism.Ioc;
 using TheEngine;
 using TheEngine.Coroutines;
@@ -153,5 +154,10 @@ public class Game : IGame
     public T? Resolve<T>() where T : class
     {
         return manager?.ResolveInstance<T>();
+    }
+
+    public List<(string, ICommand)>? GenerateContextMenu()
+    {
+        return manager?.GenerateContextMenu();
     }
 }

@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Windows.Input;
 using Prism.Ioc;
 using WDE.Module.Attributes;
 
@@ -30,5 +31,7 @@ namespace WDE.MapRenderer
         {
             yield break;
         }
+
+        IEnumerable<(string, ICommand)>? GenerateContextMenu() => null;
     }
 }

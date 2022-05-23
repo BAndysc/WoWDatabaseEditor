@@ -27,7 +27,16 @@ public class CreatureInstance : WorldObjectInstance
 
     public float Orientation
     {
-        set => gameContext.EntityManager.GetComponent<LocalToWorld>(objectEntity).Rotation = Quaternion.FromEuler(0, MathUtil.RadiansToDegrees(value), 0);
+        get
+        {
+            var rot = gameContext.EntityManager.GetComponent<LocalToWorld>(objectEntity).Rotation;
+            return rot.Angle * rot.Axis.Z;
+        }
+        set
+        {
+            gameContext.EntityManager.GetComponent<LocalToWorld>(objectEntity).Rotation = Quaternion.FromEuler(0, MathUtil.RadiansToDegrees(value), 0);
+            objectEntity.SetDirtyPosition(gameContext.EntityManager);
+        }
     }
 
     public M2AnimationType Animation
