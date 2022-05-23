@@ -37,8 +37,11 @@ namespace WDE.MapRenderer.Managers
         
         public IEnumerator ForEach(Func<IGameModule, IEnumerator> action)
         {
-            foreach (var mod in modules)
+            for (var index = 0; index < modules.Count; index++)
+            {
+                var mod = modules[index];
                 yield return action(mod.Item2);
+            }
         }
         
         public void Update(float delta)
