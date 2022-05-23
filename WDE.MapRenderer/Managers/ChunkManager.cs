@@ -9,6 +9,7 @@ using TheEngine.Entities;
 using TheEngine.Handles;
 using TheEngine.Interfaces;
 using TheEngine.Managers;
+using TheEngine.PhysicsSystem;
 using TheMaths;
 using WDE.MapRenderer.Managers.Entities;
 using WDE.MapRenderer.StaticData;
@@ -85,6 +86,7 @@ namespace WDE.MapRenderer.Managers
         private readonly WorldManager worldManager;
         private readonly Lazy<LoadingManager> loadingManager;
         private readonly ModuleManager moduleManager;
+        private readonly RaycastSystem raycastSystem;
         private readonly Engine engine;
         private readonly IGameContext gameContext;
         private readonly CreatureManager creatureManager;
@@ -123,6 +125,14 @@ namespace WDE.MapRenderer.Managers
         
         public float? HeightAtPosition(float x, float y)
         {
+            var ret = raycastSystem.Raycast(new Ray(new Vector3(x, y, 4000), Vector3.Down), null, false, Collisions.COLLISION_MASK_STATIC);
+            if (ret.HasValue)
+                return ret.Value.Item2.Z;
+            return null;
+        }
+        
+        private float? FastHeightAtPosition(float x, float y)
+        {
             Vector3 wowPos = new Vector3(x, y, 0);
             PosToChunkHeightCoords(wowPos, out var chunk, out int xIndex, out int yIndex);
 
@@ -151,6 +161,7 @@ namespace WDE.MapRenderer.Managers
             Archetypes archetypes,
             Lazy<LoadingManager> loadingManager,
             ModuleManager moduleManager,
+            RaycastSystem raycastSystem,
             Engine engine)
         {
             this.entityManager = entityManager;
@@ -172,6 +183,7 @@ namespace WDE.MapRenderer.Managers
             this.archetypes = archetypes;
             this.loadingManager = loadingManager;
             this.moduleManager = moduleManager;
+            this.raycastSystem = raycastSystem;
             this.engine = engine;
         }
 

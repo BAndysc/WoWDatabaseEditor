@@ -13,7 +13,7 @@ namespace WDE.MapRenderer.Managers.Entities;
 public class CreatureInstance : WorldObjectInstance
 {
     private readonly ICreatureTemplate creatureTemplate;
-    private readonly uint creatureDisplayId;
+    public readonly uint CreatureDisplayId;
     private List<INativeBuffer> bonesBuffers = new();
     private M2AnimationComponentData masterAnimation = null!;
 
@@ -22,7 +22,7 @@ public class CreatureInstance : WorldObjectInstance
         uint? creatureDisplayId) : base(gameContext)
     {
         this.creatureTemplate = creatureTemplate;
-        this.creatureDisplayId = creatureDisplayId ?? creatureTemplate.GetRandomModel();
+        this.CreatureDisplayId = creatureDisplayId ?? creatureTemplate.GetRandomModel();
     }
 
     public float Orientation
@@ -122,7 +122,7 @@ public class CreatureInstance : WorldObjectInstance
         var archetypes = gameContext.Archetypes;
         
         var completion = new TaskCompletionSource<MdxManager.MdxInstance?>();
-        yield return gameContext.MdxManager.LoadCreatureModel(creatureDisplayId, completion);
+        yield return gameContext.MdxManager.LoadCreatureModel(CreatureDisplayId, completion);
 
         var instance = completion.Task.Result;
 

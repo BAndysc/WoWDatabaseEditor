@@ -730,6 +730,16 @@ namespace WDE.MapRenderer.Managers
                 materials[j - 1] = material;
             }
 
+            if (j == 0)
+            {
+                Console.WriteLine("Model " + m2FilePath + " has 0 materials");
+                creaturemeshes[displayid] = null;
+                completion.SetResult(null);
+                creatureMeshesCurrentlyLoaded.Remove(displayid);
+                result.SetResult(null);
+                yield break;
+            }
+
             mesh.Rebuild();
 
             var mdx = new MdxInstance
@@ -1055,6 +1065,16 @@ namespace WDE.MapRenderer.Managers
 
                 materials[j - 1] = CreateMaterial(m2, batch, th, th2);
             }
+            
+            if (j == 0)
+            {
+                Console.WriteLine("Model " + m2FilePath + " has 0 materials");
+                itemMeshes[(displayid, right, raceGenderKey)] = null;
+                completion.SetResult(null);
+                itemMeshesCurrentlyLoaded.Remove((displayid, right, raceGenderKey));
+                result.SetResult(null);
+                yield break;
+            }
 
             mesh.Rebuild();
 
@@ -1091,6 +1111,16 @@ namespace WDE.MapRenderer.Managers
             if (!gameObjectDisplayInfoStore.TryGetValue(gameObjectDisplayId, out var displayInfo))
             {
                 Console.WriteLine("Cannot find model " + gameObjectDisplayId);
+                gameObjectmeshes[gameObjectDisplayId] = null;
+                completion.SetResult(null);
+                gameObjectMeshesCurrentlyLoaded.Remove(gameObjectDisplayId);
+                result.SetResult(null);
+                yield break;
+            }
+
+            if (displayInfo.ModelName.EndsWith("wmo", StringComparison.InvariantCultureIgnoreCase))
+            {
+                Console.WriteLine("Gameobject display id " + gameObjectDisplayId + " is WMO, not M2. this is NOT YET supported!! path: " + displayInfo.ModelName);
                 gameObjectmeshes[gameObjectDisplayId] = null;
                 completion.SetResult(null);
                 gameObjectMeshesCurrentlyLoaded.Remove(gameObjectDisplayId);
@@ -1231,6 +1261,16 @@ namespace WDE.MapRenderer.Managers
                 materials[j - 1] = CreateMaterial(m2, batch, th, th2);
             }
 
+            if (j == 0)
+            {
+                Console.WriteLine("Model " + m2FilePath + " has 0 materials");
+                gameObjectmeshes[gameObjectDisplayId] = null;
+                completion.SetResult(null);
+                gameObjectMeshesCurrentlyLoaded.Remove(gameObjectDisplayId);
+                result.SetResult(null);
+                yield break;
+            }
+            
             mesh.Rebuild();
 
             var mdx = new MdxInstance
@@ -1394,6 +1434,16 @@ namespace WDE.MapRenderer.Managers
                 }
 
                 materials[j - 1] = CreateMaterial(m2, batch, th, th2);
+            }
+            
+            if (j == 0)
+            {
+                Console.WriteLine("Model " + m2FilePath + " has 0 materials");
+                meshes[path] = null;
+                completion.SetResult(null);
+                meshesCurrentlyLoaded.Remove(path);
+                result.SetResult(null);
+                yield break;
             }
 
             mesh.Rebuild();
@@ -1681,6 +1731,12 @@ namespace WDE.MapRenderer.Managers
             identityBonesBuffer.Dispose();
             
             foreach (var mesh in meshes.Values)
+                mesh?.Dispose(meshManager);
+
+            foreach (var mesh in itemMeshes.Values)
+                mesh?.Dispose(meshManager);
+
+            foreach (var mesh in gameObjectmeshes.Values)
                 mesh?.Dispose(meshManager);
 
             // titi test
