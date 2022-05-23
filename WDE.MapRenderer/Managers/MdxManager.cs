@@ -133,6 +133,7 @@ namespace WDE.MapRenderer.Managers
         private readonly CharHairGeosetsStore charHairGeosetsStore;
         private readonly CharacterFacialHairStylesStore characterFacialHairStylesStore;
         private readonly CharSectionsStore charSectionsStore;
+        private readonly HelmetGeosetVisDataStore helmetGeosetVisDataStore;
         private readonly CreatureModelDataStore creatureModelDataStore;
         private readonly GameObjectDisplayInfoStore gameObjectDisplayInfoStore;
         private readonly ChrRacesStore racesStore;
@@ -153,6 +154,7 @@ namespace WDE.MapRenderer.Managers
             CharHairGeosetsStore charHairGeosetsStore,
             CharacterFacialHairStylesStore characterFacialHairStylesStore,
             CharSectionsStore charSectionsStore,
+            HelmetGeosetVisDataStore helmetGeosetVisDataStore,
             CreatureModelDataStore creatureModelDataStore,
             GameObjectDisplayInfoStore gameObjectDisplayInfoStore,
             ChrRacesStore racesStore,
@@ -171,6 +173,7 @@ namespace WDE.MapRenderer.Managers
             this.charHairGeosetsStore = charHairGeosetsStore;
             this.characterFacialHairStylesStore = characterFacialHairStylesStore;
             this.charSectionsStore = charSectionsStore;
+            this.helmetGeosetVisDataStore = helmetGeosetVisDataStore;
             this.creatureModelDataStore = creatureModelDataStore;
             this.gameObjectDisplayInfoStore = gameObjectDisplayInfoStore;
             this.racesStore = racesStore;
@@ -370,9 +373,6 @@ namespace WDE.MapRenderer.Managers
                     int geosetHelm = 2701; // {1: Default (No Geoset); 2: Helm 1; SL+ 3: Non-Mythic only; 4: Mythic}
                     int geosetUNK28 = 2801; // {0: No Geoset; 1: Default}
 
-                    // TODO : SKIN SECTIONS !!!!!!!
-                    // TODO :  CharHairGeosets.dbc
-
                     // hair
                     CharHairGeosets hairstyle = charHairGeosetsStore.FirstOrDefault(x => x.RaceID == displayinfoextra.Race && x.SexId == displayinfoextra.Gender && x.VariationId == displayinfoextra.HairStyle); // maybe +1 like beards ?
                     if (hairstyle != null)
@@ -392,8 +392,8 @@ namespace WDE.MapRenderer.Managers
                     if (facialhairstyle != null)
                     {
                         geosetFacial1 += facialhairstyle.Geoset1;
-                        geosetFacial2 += facialhairstyle.Geoset3; // apparently this is group 3 ? verify in game.
-                        geosetFacial3 += facialhairstyle.Geoset2;
+                        geosetFacial2 += facialhairstyle.Geoset2; // apparently this is group 3 ? verify in game.
+                        geosetFacial3 += facialhairstyle.Geoset3;
                         geosetNoseEarrings += facialhairstyle.Geoset4;
                         geosetEyeglows += facialhairstyle.Geoset5;
                     }
@@ -401,11 +401,68 @@ namespace WDE.MapRenderer.Managers
 
                     if (displayinfoextra.Helm > 0)
                     {
+                        ItemDisplayInfo helmDisplayInfo = itemDisplayInfoStore[displayinfoextra.Helm];
                         // geoset group 2 ? some enable/disable 2100 (head) ?
-                        geosetHelm = 2702 + itemDisplayInfoStore[displayinfoextra.Helm].geosetGroup1;
+                        geosetHelm = 2702 + helmDisplayInfo.geosetGroup1;
                         yield return LoadItemMesh(displayinfoextra.Helm, false, displayinfoextra.Race, displayinfoextra.Gender, itemModelPromise);
                         if (itemModelPromise.Task.Result != null)
+                        {
                             attachments.Add((M2AttachmentType.Helm, itemModelPromise.Task.Result));
+
+                            // set helm geoset visibility
+                            // todo : figure out what negative hidegeoset numbers means
+                            // do we restore default or set none ?
+                            int helmetGeosetVisDataId = 0;
+
+                            if (displayinfoextra.Gender == 1) // female
+                                    helmetGeosetVisDataId = helmDisplayInfo.helmetGeosetVisFemale;
+                            else // male
+                                    helmetGeosetVisDataId = helmDisplayInfo.helmetGeosetVisMale;
+
+                            if (helmetGeosetVisDataId > 0)
+                            {
+                                HelmetGeosetVisData helmetGeosetVisData = helmetGeosetVisDataStore[(uint)helmetGeosetVisDataId];
+                                for (int i = 0; i < 32; i++)
+                                {
+                                    uint maskPow = (uint)Math.Pow(2, i-1);
+                                    // if the current set hair geoset is this flag
+                                    if (geosetHair == i)
+                                    { // check if this flag is set to be hidden in helmetGeosetVisData
+                                        if ((helmetGeosetVisData.HairFlags & maskPow) != 0)
+                                            geosetHair = 1;
+                                    }
+                                    if ((geosetEars - 700) == i) // ears
+                                    {
+                                        if ((helmetGeosetVisData.EarsFlags & maskPow) != 0)
+                                            geosetEars = 701; // no ears. maybe 700(don't render at all)
+                                    }
+                                    if ((geosetFacial1 - 100) == i) // facial1
+                                        if ((helmetGeosetVisData.Facial1Flags & maskPow) != 0)
+                                            geosetFacial1 = 101;
+                                    if ((geosetFacial2 - 200) == i) // facial2
+                                    {
+                                        if ((helmetGeosetVisData.Facial2Flags & maskPow) != 0)
+                                            geosetFacial2 = 201;
+                                    }
+                                    if ((geosetFacial3 - 300) == i) // facial3
+                                    {
+                                        if ((helmetGeosetVisData.Facial3Flags & maskPow) != 0)
+                                            geosetFacial3 = 301;
+                                    }
+                                    if ((geosetEyeglows - 1700) == i) // eyes
+                                    {
+                                        if ((helmetGeosetVisData.EyesFlags & maskPow) != 0)
+                                            geosetEyeglows = 1700;
+                                    }
+                                    // guessed MiscFlags is geosetNoseEarrings, could be wrong, no documentation available.
+                                    if ((geosetNoseEarrings - 1600) == i) // eyes
+                                    {
+                                        if ((helmetGeosetVisData.MiscFlags & maskPow) != 0)
+                                            geosetNoseEarrings = 1600;
+                                    }
+                                }
+                            }
+                        }
                         itemModelPromise = new();
                     }
 
@@ -427,19 +484,11 @@ namespace WDE.MapRenderer.Managers
                     {
                         geosetSleeves = 801 + itemDisplayInfoStore[(uint)displayinfoextra.Shirt].geosetGroup1;
                         geosetChest = 1001 + itemDisplayInfoStore[(uint)displayinfoextra.Shirt].geosetGroup2;
-                        yield return LoadItemMesh(displayinfoextra.Shirt, false, 0, 0, itemModelPromise);
-                        if (itemModelPromise.Task.Result != null)
-                            attachments.Add((M2AttachmentType.Chest, itemModelPromise.Task.Result));
-                        itemModelPromise = new();
                     }
                     if (displayinfoextra.Cuirass > 0)
                     {
                         geosetSleeves = 801 + itemDisplayInfoStore[(uint)displayinfoextra.Cuirass].geosetGroup1;
                         geosetChest = 1001 + itemDisplayInfoStore[(uint)displayinfoextra.Cuirass].geosetGroup2;
-                        yield return LoadItemMesh(displayinfoextra.Cuirass, false, 0, 0, itemModelPromise);
-                        if (itemModelPromise.Task.Result != null)
-                            attachments.Add((M2AttachmentType.Chest, itemModelPromise.Task.Result));
-                        itemModelPromise = new();
                         // 1301 trousers set below
                         // in later expensions, geoset group 4 and 5 ?
                     }
@@ -456,62 +505,33 @@ namespace WDE.MapRenderer.Managers
                             if (itemDisplayInfoStore[(uint)displayinfoextra.Cuirass].geosetGroup3 > 0)
                                 geosetTrousers = 1301 + itemDisplayInfoStore[(uint)displayinfoextra.Cuirass].geosetGroup3;
 
-                        yield return LoadItemMesh(displayinfoextra.Legs, false,  0, 0, itemModelPromise);
-                        if (itemModelPromise.Task.Result != null)
-                            attachments.Add((M2AttachmentType.Base, itemModelPromise.Task.Result)); // base?
-                        itemModelPromise = new();
                     }
 
                     if (displayinfoextra.Boots > 0)
                     {
                         geosetBoots = 501 + itemDisplayInfoStore[(uint)displayinfoextra.Boots].geosetGroup1;
                         geosetFeet = 2002 + itemDisplayInfoStore[(uint)displayinfoextra.Boots].geosetGroup2;
-                        yield return LoadItemMesh(displayinfoextra.Boots, false,  0, 0, itemModelPromise);
-                        if (itemModelPromise.Task.Result != null)
-                            attachments.Add((M2AttachmentType.LeftFoot, itemModelPromise.Task.Result));
-                        itemModelPromise = new();
                     }
 
                     if (displayinfoextra.Gloves > 0)
                     {
                         geosetGlove = 401 + itemDisplayInfoStore[(uint)displayinfoextra.Gloves].geosetGroup1;
                         geosetHandsAttachments = 2301 + itemDisplayInfoStore[(uint)displayinfoextra.Gloves].geosetGroup2;
-                        yield return LoadItemMesh(displayinfoextra.Gloves, false, 0, 0, itemModelPromise);
-                        if (itemModelPromise.Task.Result != null)
-                            attachments.Add((M2AttachmentType.HandLeft, itemModelPromise.Task.Result));
-                        itemModelPromise = new();
-                        yield return LoadItemMesh(displayinfoextra.Gloves, true, 0, 0, itemModelPromise);
-                        if (itemModelPromise.Task.Result != null)
-                            attachments.Add((M2AttachmentType.HandRight, itemModelPromise.Task.Result));
-                        itemModelPromise = new();
                     }
 
                     if (displayinfoextra.Cape > 0)
                     {
                         geosetCloak = 1501 + itemDisplayInfoStore[(uint)displayinfoextra.Cape].geosetGroup1;
-                        yield return LoadItemMesh(displayinfoextra.Cape, false, 0, 0, itemModelPromise);
-                        if (itemModelPromise.Task.Result != null)
-                            attachments.Add((M2AttachmentType.Base, itemModelPromise.Task.Result));
-                        itemModelPromise = new();
                     }
 
                     if (displayinfoextra.Tabard > 0)
                     {
                         geosetTabard = 1201 + itemDisplayInfoStore[(uint)displayinfoextra.Tabard].geosetGroup1;
-                        yield return LoadItemMesh(displayinfoextra.Tabard, false, 0, 0, itemModelPromise);
-                        if (itemModelPromise.Task.Result != null)
-                            attachments.Add((M2AttachmentType.Base, itemModelPromise.Task.Result));
-                        itemModelPromise = new();
                     }
 
                     if (displayinfoextra.Belt > 0) // priority : belt > tabard
                     {
                         geosetBelt = 1801 + itemDisplayInfoStore[(uint)displayinfoextra.Belt].geosetGroup1;
-                        
-                        yield return LoadItemMesh(displayinfoextra.Belt, false, 0, 0, itemModelPromise);
-                        if (itemModelPromise.Task.Result != null)
-                            attachments.Add((M2AttachmentType.Base, itemModelPromise.Task.Result));
-                        itemModelPromise = new();
                     }
                     // Priority : Chest geosetGroup[2] (1301 set) > Pants geosetGroup[2] (1301 set) > Boots geosetGroup[0] (501 set) > Pants geosetGroup[1] (901 set)
                     
