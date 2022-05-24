@@ -247,6 +247,12 @@ namespace WDE.MapRenderer.Utils
         protected abstract void FinishRotation(IEnumerable<T> objects);
         protected abstract void FinishDragging(IEnumerable<T> objects);
 
+        public void StartXYDrag()
+        {
+            var ray = cameraManager.MainCamera.NormalizedScreenPointToRay(inputManager.Mouse.NormalizedPosition);
+            StartDragging(Gizmo.HitType.TranslateXY, ref ray, GizmoMode.KeyboardDrag);
+        }
+        
         public bool Update(float f)
         {
             var ray = cameraManager.MainCamera.NormalizedScreenPointToRay(inputManager.Mouse.NormalizedPosition);
