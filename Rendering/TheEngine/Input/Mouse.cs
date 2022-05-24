@@ -68,10 +68,10 @@ namespace TheEngine.Input
 
         internal void MouseUp(MouseButton button)
         {
-            leftJustUp = button.HasFlag(MouseButton.Left);
-            rightJustUp = button.HasFlag(MouseButton.Right);
-            leftDown = leftJustUp;
-            rightDown = rightJustUp;
+            leftJustUp = leftDown && !button.HasFlag(MouseButton.Left);
+            rightJustUp = rightDown && !button.HasFlag(MouseButton.Right);
+            leftDown = button.HasFlag(MouseButton.Left);
+            rightDown = button.HasFlag(MouseButton.Right);
         }
 
         public bool IsMouseDown(MouseButton button)
