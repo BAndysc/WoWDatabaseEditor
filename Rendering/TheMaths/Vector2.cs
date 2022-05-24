@@ -1577,5 +1577,15 @@ namespace TheMaths
         // {
         //     return *(Vector2*)&value;
         // }
+
+        public float Angle(Vector2 other)
+        {
+            return (float)Math.Acos(Dot(other, this) / other.Length() / Length());
+        }
+
+        public float SignedAngle(Vector2 other)
+        {
+            return Math.Sign(X * other.Y - Y * other.X) * Angle(other);
+        }
     }
 }

@@ -123,12 +123,34 @@ namespace WDE.MapRenderer.Managers
             yIndex = Math.Clamp((int)(yInt / 533.0 * maxIndex), 0, maxIndex);
         }
         
-        public float? HeightAtPosition(float x, float y)
+        private List<(Entity, Vector3)> outRaycast = new();
+        public float? HeightAtPosition(float x, float y, float? closestToZ)
         {
-            var ret = raycastSystem.Raycast(new Ray(new Vector3(x, y, 4000), Vector3.Down), null, false, Collisions.COLLISION_MASK_STATIC);
-            if (ret.HasValue)
-                return ret.Value.Item2.Z;
+            var origin = new Vector3(x, y, closestToZ ?? 4000);
+            raycastSystem.RaycastAll(new Ray(origin.WithZ(4000), Vector3.Down), origin, outRaycast, Collisions.COLLISION_MASK_STATIC);
+            if (outRaycast.Count > 0)
+            {
+                float minDiff = float.MaxValue;
+                float bestHeight = 0;
+                for (int i = 0; i < outRaycast.Count; ++i)
+                {
+                    var diff = Math.Abs(outRaycast[i].Item2.Z - origin.Z);
+                    if (diff < minDiff)
+                    {
+                        minDiff = diff;
+                        bestHeight = outRaycast[i].Item2.Z;
+                    }
+                }
+                outRaycast.Clear();
+                return bestHeight;
+            }
+
             return null;
+
+            // var ret = raycastSystem.Raycast(new Ray(new Vector3(x, y, 4000), Vector3.Down), null, false, Collisions.COLLISION_MASK_STATIC);
+            // if (ret.HasValue)
+            //     return ret.Value.Item2.Z;
+            // return null;
         }
         
         private float? FastHeightAtPosition(float x, float y)
