@@ -228,6 +228,11 @@ namespace WDE.SqlQueryGenerator
         {
             return new UpdateQuery(query, key, value.ToSql());
         }
+        
+        public static IUpdateQuery Set<T>(this IUpdateQuery query, string key, T? value)
+        {
+            return new UpdateQuery(query, key, value.ToSql());
+        }
 
         public static IQuery Update(this IUpdateQuery query, string? comment = null)
         {
@@ -263,7 +268,7 @@ namespace WDE.SqlQueryGenerator
             return new RawText(text);
         }
         
-        internal static string ToSql(this object? o)
+        internal static string ToSql<T>(this T? o)
         {
             if (o is null)
                 return "NULL";
