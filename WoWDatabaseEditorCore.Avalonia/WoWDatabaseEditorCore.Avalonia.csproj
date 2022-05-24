@@ -33,6 +33,7 @@
         <ProjectReference Include="..\AvaloniaStyles\AvaloniaStyles.csproj" />
         <ProjectReference Include="..\Modules\AvaloniaGraph\AvaloniaGraph.csproj" />
         <ProjectReference Include="..\Prism.Avalonia\src\Prism.Unity.Avalonia\Prism.Unity.Avalonia.csproj" />
+        <ProjectReference Include="..\Rendering\TheEngine\TheEngine.csproj" />
         <ProjectReference Include="..\WDE.Common.Avalonia\WDE.Common.Avalonia.csproj" />
         <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />
         <ProjectReference Include="..\WoWDatabaseEditor\WoWDatabaseEditorCore.csproj" />

@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 using TheEngine;
@@ -16,6 +17,12 @@ namespace WDE.MapRenderer
         {
             InitializeComponent();
             enginePanel = this.FindControl<TheEnginePanel>("TheEnginePanel");
+            enginePanel.ContextMenu!.MenuClosed += ContextMenuOnMenuClosed;
+        }
+
+        private void ContextMenuOnMenuClosed(object? sender, RoutedEventArgs e)
+        {
+            enginePanel.ContextMenu!.Items = Array.Empty<MenuItem>();
         }
 
         private void InitializeComponent()
@@ -48,11 +55,17 @@ namespace WDE.MapRenderer
                     e.Handled = true;
                 else
                 {
-                    enginePanel.ContextMenu!.Items = items.Select(i => new MenuItem()
+                    enginePanel.ContextMenu!.Items = items.Select(i =>
                     {
-                        Header = i.Item1,
-                        Command = i.Item2
-                    });  
+                        if (i.Item1 == "-")
+                            return (object)new Separator();
+                        return new MenuItem()
+                        {
+                            Header = i.Item1,
+                            Command = i.Item2,
+                            CommandParameter = i.Item3!
+                        };
+                    }).ToList();
                 }
             }
         }

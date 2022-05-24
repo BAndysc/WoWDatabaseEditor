@@ -1,3 +1,6 @@
+
+using TheEngine.Utils;
+
 namespace TheEngine.ECS;
 
 public static partial class EntityExtensions
@@ -16,14 +19,15 @@ public static partial class EntityExtensions
         }
         else
         {
-            Parallel.For(0, threads, (i, state) =>
+            NaiveThreadPool.Pool.InvokeParallel((i, count) =>
             {
+                int perThread = total / count;
                 var start = i * perThread;
                 if (i == threads - 1)
                     perThread = total - start;
                     
                 action(start, start + perThread);
-            });
+            }, threads);
         }
     }
 }

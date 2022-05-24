@@ -238,19 +238,19 @@ namespace WDE.MapRenderer
             return containerProvider.Resolve<T>();
         }
 
-        public List<(string, ICommand)>? GenerateContextMenu()
+        public List<(string, ICommand, object?)>? GenerateContextMenu()
         {
-            List<(string, ICommand)>? allItems = null;
+            List<(string, ICommand, object?)>? allItems = null;
             moduleManager.ForEach(mod =>
             {
                 var items = mod.GenerateContextMenu();
                 if (items != null)
                 {
-                    allItems ??= new List<(string, ICommand)>();
+                    allItems ??= new List<(string, ICommand, object?)>();
                     allItems.AddRange(items);
                 }
             });
-            return allItems.Count == 0 ? null : allItems;
+            return allItems == null || allItems.Count == 0 ? null : allItems;
         }
     }
 }

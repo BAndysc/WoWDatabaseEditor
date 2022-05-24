@@ -156,7 +156,7 @@ public class Game : IGame
         return manager?.ResolveInstance<T>();
     }
 
-    public List<(string, ICommand)>? GenerateContextMenu()
+    public List<(string, ICommand, object?)>? GenerateContextMenu()
     {
         return manager?.GenerateContextMenu();
     }

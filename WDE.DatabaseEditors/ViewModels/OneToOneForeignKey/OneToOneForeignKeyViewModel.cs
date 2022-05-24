@@ -127,7 +127,7 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
             CloseCancel?.Invoke();
         });
         Save = noSaveMode ? AlwaysDisabledCommand.Command : new AsyncAutoCommand(SaveData);
-        ExecuteChangedCommand = noSaveMode ? AlwaysDisabledCommand.Command : new AsyncAutoCommand(async () =>
+        ExecuteChangedCommand = noSaveMode ? new AsyncAutoCommand(() => Task.CompletedTask, () => false) : new AsyncAutoCommand(async () =>
         {
             await SaveData();
             eventAggregator.GetEvent<DatabaseTableChanged>().Publish(tableDefinition.TableName);
@@ -454,7 +454,7 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
     public bool Resizeable => true;
     public ICommand Accept { get; set; }
     public ICommand Cancel { get; set; }
-    public ICommand ExecuteChangedCommand { get; }
+    public IAsyncCommand ExecuteChangedCommand { get; }
     public ICommand GenerateCurrentSqlCommand { get; }
     public ICommand CopyCurrentSqlCommand { get; }
 
@@ -465,6 +465,7 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
     private HistoryHandler handler = new();
     public IHistoryManager History { get; }
     public bool IsModified => !History.IsSaved;
+    public Task? PendingSaveTask { get; private set; } = Task.CompletedTask;
     
     private async Task AskIfSave(bool cancel)
     {
@@ -481,8 +482,9 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
             if (result == 0)
                 return;
             if (result == 2)
-                ExecuteChangedCommand.Execute(null);
+                PendingSaveTask = ExecuteChangedCommand.ExecuteAsync();
         }
+        
         if (cancel)
             CloseCancel?.Invoke();
         else

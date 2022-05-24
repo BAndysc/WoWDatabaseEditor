@@ -32,6 +32,6 @@ namespace WDE.MapRenderer
             yield break;
         }
 
-        IEnumerable<(string, ICommand)>? GenerateContextMenu() => null;
+        IEnumerable<(string, ICommand, object?)>? GenerateContextMenu() => null;
     }
 }
