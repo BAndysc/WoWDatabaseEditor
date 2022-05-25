@@ -6,6 +6,7 @@ in vec2 TexCoords;
 uniform sampler2D outlineTex;
 uniform sampler2D outlineTexUnBlurred;
 uniform sampler2D _MainTex;
+uniform vec4 outlineColor;
 
 void main()
 { 
@@ -30,7 +31,7 @@ void main()
     else
     {
         float line = smoothstep(0, 0.5, outline.w);
-        FragColor = vec4(1, 0.5, 0, 1) * line + tex * (1-line);
+        FragColor = vec4(outlineColor.xyz, 1) * line + tex * (1-line);
     }
     //FragColor = outline + outlineNoBlur * 0.0001;
 }

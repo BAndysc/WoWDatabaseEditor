@@ -266,7 +266,7 @@ public class AnimationSystem
                         Vector3 offset = Vector3.Zero;
                         for (var index = 0; index < attachedTo.Model.attachments.Length; index++)
                         {
-                            var attachment = attachedTo.Model.attachments[index];
+                            ref readonly var attachment = ref attachedTo.Model.attachments[index];
                             if (attachment.id == attachmentType)
                             {
                                 attachedToBone = attachment.bone;

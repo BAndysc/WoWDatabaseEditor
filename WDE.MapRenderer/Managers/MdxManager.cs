@@ -7,7 +7,6 @@ using TheEngine.Entities;
 using TheEngine.Handles;
 using TheEngine.Interfaces;
 using TheMaths;
-using WDE.MpqReader;
 using WDE.MpqReader.DBC;
 using WDE.MpqReader.Readers;
 using WDE.MpqReader.Structures;
@@ -279,7 +278,7 @@ namespace WDE.MapRenderer.Managers
             }
             
             M2 m2 = null!;
-            M2Skin skin = null!;
+            M2Skin skin = new();
             Vector3[] vertices = null!;
             Vector3[] normals = null!;
             Vector2[] uv1 = null!;
@@ -297,7 +296,7 @@ namespace WDE.MapRenderer.Managers
                     return new MemoryBinaryReader(bytes);
                 });
                 file.Result.Dispose();
-                skin = M2Skin.Read(new MemoryBinaryReader(skinFile.Result));
+                skin = new M2Skin(new MemoryBinaryReader(skinFile.Result));
                 skinFile.Result.Dispose();
                 var count = m2.vertices.Length;
                 vertices = new Vector3[count];
@@ -308,7 +307,7 @@ namespace WDE.MapRenderer.Managers
 
                 for (int i = 0; i < count; ++i)
                 {
-                    var vert = m2.vertices[skin.Vertices[i]];
+                    ref readonly var vert = ref m2.vertices[skin.Vertices[i]];
                     vertices[i] = vert.pos;
                     normals[i] = vert.normal;
                     uv1[i] = vert.tex_coord1;
@@ -554,18 +553,16 @@ namespace WDE.MapRenderer.Managers
                     continue;
                 }
 
-                var section = skin.SubMeshes[batch.skinSectionIndex];
+                var sectionSkinSectionId = skin.SubMeshes[batch.skinSectionIndex].skinSectionId;
+                var sectionIndexCount = skin.SubMeshes[batch.skinSectionIndex].indexCount;
+                var sectionIndexStart = skin.SubMeshes[batch.skinSectionIndex].indexStart;
 
                 // titi, check if element is active
                 // loading all meshes for non humanoids (crdisplayinfoextra users), might need tob e tweaked
-                if (isCharacterModel && !activeGeosets!.Contains(section.skinSectionId))
+                if (isCharacterModel && !activeGeosets!.Contains(sectionSkinSectionId))
                     continue;
 
-                using var indices = new PooledArray<ushort>(section.indexCount);
-                for (int i = 0; i < Math.Min(section.indexCount, skin.Indices.Length - section.indexStart); ++i)
-                    indices[i] = skin.Indices[section.indexStart + i];
-                
-                mesh.SetIndices(indices.AsSpan(), j++);
+                mesh.SetIndices(skin.Indices.AsSpan(sectionIndexStart, Math.Min(sectionIndexCount, skin.Indices.Length - sectionIndexStart)), j++);
 
                 TextureHandle? th = null;
                 TextureHandle? th2 = null;
@@ -590,11 +587,12 @@ namespace WDE.MapRenderer.Managers
                     }
                     else
                     {
-                        var textureDef = m2.textures[texId];
-                        string texFile = "";
+                        var textureDefType = m2.textures[texId].type;
                         
-                        if (textureDef.type == 0) // if texture is hardcoded
-                            texFile = textureDef.filename.AsString();
+                        string? texFile = null;
+                        
+                        if (textureDefType == 0) // if texture is hardcoded
+                            texFile = m2.textures[texId].filename.AsString();
 
                         // character models
                         else if (isCharacterModel) // doesn't have a CreatureDisplayInfoExtra entry
@@ -602,7 +600,7 @@ namespace WDE.MapRenderer.Managers
                             CreatureDisplayInfoExtra displayinfoextra = creatureDisplayInfoExtraStore[
                                 creatureDisplayInfoStore[displayid].ExtendedDisplayInfoID];
 
-                            if (textureDef.type == M2Texture.TextureType.TEX_COMPONENT_SKIN) // character skin
+                            if (textureDefType == M2Texture.TextureType.TEX_COMPONENT_SKIN) // character skin
                             {
                                 // This is for player characters... Creatures always come with a baked texture.
                                 // texFile = charSectionsStore.First(x => x.RaceID == displayinfoextra.Race
@@ -611,19 +609,19 @@ namespace WDE.MapRenderer.Managers
                             }
 
                             // only seen for tauren female facial features
-                            else if (textureDef.type == M2Texture.TextureType.TEX_COMPONENT_SKIN_EXTRA)
+                            else if (textureDefType == M2Texture.TextureType.TEX_COMPONENT_SKIN_EXTRA)
                             {
                                 // Console.WriteLine("skin extra extdisp id : " + displayinfoextra.Id);
                                 // use skin color or hair color ?
-                                texFile = charSectionsStore.First(x => x.RaceID == displayinfoextra.Race && x.SexId == displayinfoextra.Gender
-                                && x.ColorIndex == displayinfoextra.SkinColor && x.BaseSection == 0).TextureName2;
+                                texFile = charSectionsStore.FirstOrDefault(x => x.RaceID == displayinfoextra.Race && x.SexId == displayinfoextra.Gender
+                                && x.ColorIndex == displayinfoextra.SkinColor && x.BaseSection == 0)?.TextureName2;
                             }
 
                             // mostly used for cloaks
-                            else if (textureDef.type == M2Texture.TextureType.TEX_COMPONENT_OBJECT_SKIN)
+                            else if (textureDefType == M2Texture.TextureType.TEX_COMPONENT_OBJECT_SKIN)
                             {
                                 // cloak
-                                if (1500 <= section.skinSectionId && section.skinSectionId <= 1599)
+                                if (1500 <= sectionSkinSectionId && sectionSkinSectionId <= 1599)
                                 {
                                     var capedisplayinfo = itemDisplayInfoStore.First(x => x.Id == displayinfoextra.Cape);
                                     texFile = "Item\\ObjectComponents\\Cape\\" + capedisplayinfo.LeftModelTexture + ".blp";
@@ -633,11 +631,11 @@ namespace WDE.MapRenderer.Managers
                                 else
                                 {
                                     // there are probably other object skin types than capes
-                                    Console.WriteLine("geoset group not implemented for TEX_COMPONENT_SKIN_EXTRA : " + section.skinSectionId);
+                                    Console.WriteLine("geoset group not implemented for TEX_COMPONENT_SKIN_EXTRA : " + sectionSkinSectionId);
                                 }
                             }
 
-                            else if (textureDef.type == M2Texture.TextureType.TEX_COMPONENT_CHAR_HAIR || textureDef.type == M2Texture.TextureType.TEX_COMPONENT_CHAR_FACIAL_HAIR) // character skin
+                            else if (textureDefType == M2Texture.TextureType.TEX_COMPONENT_CHAR_HAIR || textureDefType == M2Texture.TextureType.TEX_COMPONENT_CHAR_FACIAL_HAIR) // character skin
                             {
                                 // CharHairTextures or charsection ?
                                 // 1st version, it's awful.
@@ -650,7 +648,7 @@ namespace WDE.MapRenderer.Managers
                                 // texFile = pathsplit[0] + "\\" + pathsplit[1] + "\\Hair00_" + hairid + ".blp";
 
                                 
-                                if (section.skinSectionId >= 100) // facial hair :: 100-400
+                                if (sectionSkinSectionId >= 100) // facial hair :: 100-400
                                 {
                                     // https://wowdev.wiki/DB/CharSections#Field_Descriptions
 
@@ -660,21 +658,21 @@ namespace WDE.MapRenderer.Managers
                                     // && x.ColorIndex == displayinfoextra.HairColor && x.VariationIndex == displayinfoextra.BeardStyle && x.BaseSection == 2).TextureName2;
 
                                     // this makes no sense but it works, use the hair section but use beard style to get the variation
-                                    texFile = charSectionsStore.First(x => x.RaceID == displayinfoextra.Race && x.SexId == displayinfoextra.Gender
-                                    && x.ColorIndex == displayinfoextra.HairColor && x.VariationIndex == displayinfoextra.BeardStyle && x.BaseSection == 3).TextureName1;
+                                    texFile = charSectionsStore.FirstOrDefault(x => x.RaceID == displayinfoextra.Race && x.SexId == displayinfoextra.Gender
+                                    && x.ColorIndex == displayinfoextra.HairColor && x.VariationIndex == displayinfoextra.BeardStyle && x.BaseSection == 3)?.TextureName1;
 
                                 }
                                 else // hair < 100
                                 {
-                                    texFile = charSectionsStore.First(x => x.RaceID == displayinfoextra.Race && x.SexId == displayinfoextra.Gender
-                                    &&  x.ColorIndex == displayinfoextra.HairColor && x.VariationIndex == displayinfoextra.HairStyle && x.BaseSection == 3).TextureName1;
+                                    texFile = charSectionsStore.FirstOrDefault(x => x.RaceID == displayinfoextra.Race && x.SexId == displayinfoextra.Gender
+                                    &&  x.ColorIndex == displayinfoextra.HairColor && x.VariationIndex == displayinfoextra.HairStyle && x.BaseSection == 3)?.TextureName1;
                                 }
 
                             }
                         }
 
                         // TITI, set creature texture
-                        else if (textureDef.type == M2Texture.TextureType.TEX_COMPONENT_MONSTER_1) // creature skin1
+                        else if (textureDefType == M2Texture.TextureType.TEX_COMPONENT_MONSTER_1) // creature skin1
                         {
                             if (creatureDisplayInfoStore.Contains(displayid))
                             {
@@ -683,7 +681,7 @@ namespace WDE.MapRenderer.Managers
                             }
                         }
 
-                        else if (textureDef.type == M2Texture.TextureType.TEX_COMPONENT_MONSTER_2) // creature skin2
+                        else if (textureDefType == M2Texture.TextureType.TEX_COMPONENT_MONSTER_2) // creature skin2
                         {
                             if (creatureDisplayInfoStore.Contains(displayid))
                             {
@@ -692,7 +690,7 @@ namespace WDE.MapRenderer.Managers
                             }
                         }
 
-                        else if (textureDef.type == M2Texture.TextureType.TEX_COMPONENT_MONSTER_3) // creature skin3
+                        else if (textureDefType == M2Texture.TextureType.TEX_COMPONENT_MONSTER_3) // creature skin3
                         {
                             if (creatureDisplayInfoStore.Contains(displayid))
                             {
@@ -704,7 +702,7 @@ namespace WDE.MapRenderer.Managers
                         else
                         {
                             // Console.WriteLine("Wasn't able to set texture for display id " + displayid);
-                            // Console.WriteLine("texture type : " + textureDef.type + " not implemented yet");
+                            // Console.WriteLine("texture type : " + textureDefType + " not implemented yet");
                         }
 
                         // System.Diagnostics.Debug.WriteLine($"M2 texture path :  {texFile}");
@@ -713,10 +711,10 @@ namespace WDE.MapRenderer.Managers
                         if (string.IsNullOrWhiteSpace(texFile))
                         {
                             Console.WriteLine("texture path is empty for display id : " + displayid + " dispextra : " + creatureDisplayInfoStore[displayid].ExtendedDisplayInfoID);
-                            Console.WriteLine("texture type : " + textureDef.type);
-                            Console.WriteLine("skin section id : " + section.skinSectionId);
+                            Console.WriteLine("texture type : " + textureDefType);
+                            Console.WriteLine("skin section id : " + sectionSkinSectionId);
                         }
-                        yield return textureManager.GetTexture(texFile, tcs);
+                        yield return textureManager.GetTexture(texFile ?? "", tcs);
                         var resTex = tcs.Task.Result;
                         if (th.HasValue)
                             th2 = resTex;
@@ -725,7 +723,7 @@ namespace WDE.MapRenderer.Managers
                     }
                 }
 
-                var material = CreateMaterial(m2, batch, th, th2);
+                var material = CreateMaterial(m2, in batch, th, th2);
 
                 materials[j - 1] = material;
             }
@@ -756,9 +754,9 @@ namespace WDE.MapRenderer.Managers
             result.SetResult(mdx);    
         }
 
-        private Material CreateMaterial(M2 m2, M2Batch batch, TextureHandle? textureHandle1, TextureHandle? textureHandle2)
+        private Material CreateMaterial(M2 m2, in M2Batch batch, TextureHandle? textureHandle1, TextureHandle? textureHandle2)
         {
-            var materialDef = m2.materials[batch.materialIndex];
+            ref readonly var materialDef = ref m2.materials[batch.materialIndex];
             var material = materialManager.CreateMaterial("data/m2.json");
 
             material.SetBuffer("boneMatrices", identityBonesBuffer);
@@ -785,9 +783,8 @@ namespace WDE.MapRenderer.Managers
             Vector4 mesh_color = new Vector4(1.0f, 1.0f, 1.0f, trans);
 
             material.SetUniform("mesh_color", mesh_color);
-            batch.shaderId = ResolveShaderID1(batch.shaderId, m2, batch,
-                (m2.global_flags & M2Flags.FLAG_USE_TEXTURE_COMBINER_COMBOS) != 0, (int)materialDef.blending_mode);
-            var shaders = ConvertShaderIDs(m2, batch);
+            var shaderId = ResolveShaderID1(batch.shaderId, m2, in batch, (m2.global_flags & M2Flags.FLAG_USE_TEXTURE_COMBINER_COMBOS) != 0, (int)materialDef.blending_mode);
+            var shaders = ConvertShaderIDs(m2, in batch, shaderId);
             material.SetUniformInt("pixel_shader", (int)shaders.Item2);
             //Console.WriteLine(path + " INDEX: " + j + " Pixel shader: " + M2GetPixelShaderID(batch.textureCount, batch.shader_id) + " tex count: " + batch.textureCount + " shader id: " + batch.shader_id + " blend: " + materialDef.blending_mode + " priority " + batch.priorityPlane + " start ");
 
@@ -947,7 +944,7 @@ namespace WDE.MapRenderer.Managers
             }
 
             M2 m2 = null!;
-            M2Skin skin = null!;
+            M2Skin skin = new();
             Vector3[] vertices = null!;
             Vector3[] normals = null!;
             Vector2[] uv1 = null!;
@@ -965,7 +962,7 @@ namespace WDE.MapRenderer.Managers
                     return new MemoryBinaryReader(bytes);
                 });
                 file.Result.Dispose();
-                skin = M2Skin.Read(new MemoryBinaryReader(skinFile.Result));
+                skin = new M2Skin(new MemoryBinaryReader(skinFile.Result));
                 skinFile.Result.Dispose();
                 var count = m2.vertices.Length;
                 vertices = new Vector3[count];
@@ -976,7 +973,7 @@ namespace WDE.MapRenderer.Managers
                 
                 for (int i = 0; i < count; ++i)
                 {
-                    var vert = m2.vertices[skin.Vertices[i]];
+                    ref readonly var vert = ref m2.vertices[skin.Vertices[i]];
                     vertices[i] = vert.pos;
                     normals[i] = vert.normal;
                     uv1[i] = vert.tex_coord1;
@@ -1009,16 +1006,11 @@ namespace WDE.MapRenderer.Managers
                     continue;
                 }
 
-                var section = skin.SubMeshes[batch.skinSectionIndex];
+                var sectionIndexCount = skin.SubMeshes[batch.skinSectionIndex].indexCount;
+                var sectionIndexStart = skin.SubMeshes[batch.skinSectionIndex].indexStart;
 
-                using var indices = new PooledArray<ushort>(section.indexCount);
-                for (int i = 0; i < Math.Min(section.indexCount, skin.Indices.Length - section.indexStart); ++i)
-                {
-                    indices[i] = skin.Indices[section.indexStart + i];
-                }
-
-                mesh.SetIndices(indices.AsSpan(), j++);
-
+                mesh.SetIndices(skin.Indices.AsSpan(sectionIndexStart, Math.Min(sectionIndexCount, skin.Indices.Length - sectionIndexStart)), j++);
+                
                 TextureHandle? th = null;
                 TextureHandle? th2 = null;
                 for (int i = 0; i < (batch.textureCount >= 5 ? 1 : batch.textureCount); ++i)
@@ -1042,14 +1034,14 @@ namespace WDE.MapRenderer.Managers
                     }
                     else
                     {
-                        var textureDef = m2.textures[texId];
+                        var textureDefType = m2.textures[texId].type;
                         string texFile = "";
-                        if (textureDef.type == 0) // if tetx is hardcoded
-                            texFile = textureDef.filename.AsString();
+                        if (textureDefType == 0) // if tetx is hardcoded
+                            texFile = m2.textures[texId].filename.AsString();
                         else
                         {
-                            if (textureDef.type != M2Texture.TextureType.TEX_COMPONENT_OBJECT_SKIN)
-                                Console.WriteLine("okay, so there is model " + m2FilePath + " which has texture type: " + textureDef.type + ". What is it?");
+                            if (textureDefType != M2Texture.TextureType.TEX_COMPONENT_OBJECT_SKIN)
+                                Console.WriteLine("okay, so there is model " + m2FilePath + " which has texture type: " + textureDefType + ". What is it?");
                             texFile = texturePath;
                         }
                         
@@ -1063,7 +1055,7 @@ namespace WDE.MapRenderer.Managers
                     }
                 }
 
-                materials[j - 1] = CreateMaterial(m2, batch, th, th2);
+                materials[j - 1] = CreateMaterial(m2, in batch, th, th2);
             }
             
             if (j == 0)
@@ -1150,7 +1142,7 @@ namespace WDE.MapRenderer.Managers
             }
 
             M2 m2 = null!;
-            M2Skin skin = null!;
+            M2Skin skin = new();
             Vector3[] vertices = null!;
             Vector3[] normals = null!;
             Vector2[] uv1 = null!;
@@ -1168,7 +1160,7 @@ namespace WDE.MapRenderer.Managers
                     return new MemoryBinaryReader(bytes);
                 });
                 file.Result.Dispose();
-                skin = M2Skin.Read(new MemoryBinaryReader(skinFile.Result));
+                skin = new M2Skin(new MemoryBinaryReader(skinFile.Result));
                 skinFile.Result.Dispose();
                 var count = m2.vertices.Length;
                 vertices = new Vector3[count];
@@ -1179,7 +1171,7 @@ namespace WDE.MapRenderer.Managers
                 
                 for (int i = 0; i < count; ++i)
                 {
-                    var vert = m2.vertices[skin.Vertices[i]];
+                    ref readonly var vert = ref m2.vertices[skin.Vertices[i]];
                     vertices[i] = vert.pos;
                     normals[i] = vert.normal;
                     uv1[i] = vert.tex_coord1;
@@ -1212,17 +1204,11 @@ namespace WDE.MapRenderer.Managers
                     continue;
                 }
 
-                var section = skin.SubMeshes[batch.skinSectionIndex];
+                var sectionIndexCount = skin.SubMeshes[batch.skinSectionIndex].indexCount;
+                var sectionIndexStart = skin.SubMeshes[batch.skinSectionIndex].indexStart;
                 
-
-                using var indices = new PooledArray<ushort>(section.indexCount);
-                for (int i = 0; i < Math.Min(section.indexCount, skin.Indices.Length - section.indexStart); ++i)
-                {
-                    indices[i] = skin.Indices[section.indexStart + i];
-                }
-
-                mesh.SetIndices(indices.AsSpan(), j++);
-
+                mesh.SetIndices(skin.Indices.AsSpan(sectionIndexStart, Math.Min(sectionIndexCount, skin.Indices.Length - sectionIndexStart)), j++);
+                
                 TextureHandle? th = null;
                 TextureHandle? th2 = null;
                 for (int i = 0; i < (batch.textureCount >= 5 ? 1 : batch.textureCount); ++i)
@@ -1246,8 +1232,7 @@ namespace WDE.MapRenderer.Managers
                     }
                     else
                     {
-                        var textureDef = m2.textures[texId];
-                        var texFile = textureDef.filename.AsString();
+                        var texFile = m2.textures[texId].filename.AsString();
                         var tcs = new TaskCompletionSource<TextureHandle>();
                         yield return textureManager.GetTexture(texFile, tcs);
                         var resTex = tcs.Task.Result;
@@ -1258,7 +1243,7 @@ namespace WDE.MapRenderer.Managers
                     }
                 }
 
-                materials[j - 1] = CreateMaterial(m2, batch, th, th2);
+                materials[j - 1] = CreateMaterial(m2, in batch, th, th2);
             }
 
             if (j == 0)
@@ -1325,7 +1310,7 @@ namespace WDE.MapRenderer.Managers
             }
 
             M2 m2 = null!;
-            M2Skin skin = null!;
+            M2Skin skin = new();
             Vector3[] vertices = null!;
             Vector3[] normals = null!;
             Vector2[] uv1 = null!;
@@ -1343,7 +1328,7 @@ namespace WDE.MapRenderer.Managers
                     return new MemoryBinaryReader(bytes);
                 });
                 file.Result.Dispose();
-                skin = M2Skin.Read(new MemoryBinaryReader(skinFile.Result));
+                skin = new M2Skin(new MemoryBinaryReader(skinFile.Result));
                 skinFile.Result.Dispose();
                 var count = m2.vertices.Length;
                 vertices = new Vector3[count];
@@ -1354,7 +1339,7 @@ namespace WDE.MapRenderer.Managers
                 
                 for (int i = 0; i < count; ++i)
                 {
-                    var vert = m2.vertices[skin.Vertices[i]];
+                    ref readonly var vert = ref m2.vertices[skin.Vertices[i]];
                     vertices[i] = vert.pos;
                     normals[i] = vert.normal;
                     uv1[i] = vert.tex_coord1;
@@ -1387,16 +1372,10 @@ namespace WDE.MapRenderer.Managers
                     continue;
                 }
 
-                var section = skin.SubMeshes[batch.skinSectionIndex];
+                var sectionIndexCount = skin.SubMeshes[batch.skinSectionIndex].indexCount;
+                var sectionIndexStart = skin.SubMeshes[batch.skinSectionIndex].indexStart;
                 
-
-                using var indices = new PooledArray<ushort>(section.indexCount);
-                for (int i = 0; i < Math.Min(section.indexCount, skin.Indices.Length - section.indexStart); ++i)
-                {
-                    indices[i] = skin.Indices[section.indexStart + i];
-                }
-
-                mesh.SetIndices(indices.AsSpan(), j++);
+                mesh.SetIndices(skin.Indices.AsSpan(sectionIndexStart, Math.Min(sectionIndexCount, skin.Indices.Length - sectionIndexStart)), j++);
 
                 TextureHandle? th = null;
                 TextureHandle? th2 = null;
@@ -1421,8 +1400,7 @@ namespace WDE.MapRenderer.Managers
                     }
                     else
                     {
-                        var textureDef = m2.textures[texId];
-                        var texFile = textureDef.filename.AsString();
+                        var texFile = m2.textures[texId].filename.AsString();
                         var tcs = new TaskCompletionSource<TextureHandle>();
                         yield return textureManager.GetTexture(texFile, tcs);
                         var resTex = tcs.Task.Result;
@@ -1433,7 +1411,7 @@ namespace WDE.MapRenderer.Managers
                     }
                 }
 
-                materials[j - 1] = CreateMaterial(m2, batch, th, th2);
+                materials[j - 1] = CreateMaterial(m2, in batch, th, th2);
             }
             
             if (j == 0)
@@ -1464,7 +1442,7 @@ namespace WDE.MapRenderer.Managers
         {
         }
         
-        ushort ResolveShaderID1(ushort shaderId, M2 m2, M2Batch textureUnit, bool Use_Texture_Combiner_Combos, int blendingMode)
+        ushort ResolveShaderID1(ushort shaderId, M2 m2, in M2Batch textureUnit, bool Use_Texture_Combiner_Combos, int blendingMode)
         {
             // According to Wowdev.wiki textureUnits with shaderID 0x8000 should not be rendered
             if ((shaderId & 0x8000) != 0)
@@ -1501,7 +1479,7 @@ namespace WDE.MapRenderer.Managers
 
                 for (int i = 0; i < textureUnit.textureCount; i++)
                 {
-                    int blendOverride = m2.textureCombinerCombos!.Value[i + textureUnit.shaderId];
+                    int blendOverride = m2.textureCombinerCombos!.Value[i + shaderId];
 
                     if (i == 0 && blendingMode == 0)
                         blendOverride = 0;
@@ -1523,19 +1501,19 @@ namespace WDE.MapRenderer.Managers
             return shaderID;
         }
         
-        (ModelVertexShader, ModelPixelShader) ConvertShaderIDs(M2 m2, M2Batch batch)
+        (ModelVertexShader, ModelPixelShader) ConvertShaderIDs(M2 m2, in M2Batch batch, ushort batchShaderId)
         {
             // If the shaderId is 0x8000 we don't need to map anything
-            if (batch.shaderId == 0x8000)
+            if (batchShaderId == 0x8000)
                 return (ModelVertexShader.Diffuse_T1, ModelPixelShader.Opaque);
 
-            ushort shaderId = (ushort)(batch.shaderId & 0x7FFF);
+            var shaderId = (ushort)(batchShaderId & 0x7FFF);
             ushort textureCount = batch.textureCount;
 
             ModelPixelShader ps = ModelPixelShader.Mod;
             ModelVertexShader vs = ModelVertexShader.Diffuse_Env;
             
-            if ((batch.shaderId & 0x8000) != 0)
+            if ((batchShaderId & 0x8000) != 0)
             {
                 if (shaderId == 1)
                 {
