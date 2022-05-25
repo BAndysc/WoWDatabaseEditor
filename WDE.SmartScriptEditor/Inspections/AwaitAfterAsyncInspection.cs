@@ -15,11 +15,11 @@ namespace WDE.SmartScriptEditor.Inspections
         {
             foreach (var a in smartDataManager.GetAllData(SmartType.SmartAction))
             {
-                if (a.Flags.HasFlag(ActionFlags.Async))
+                if (a.Flags.HasFlagFast(ActionFlags.Async))
                     asyncActions.Add(a.Id);
-                if (a.Flags.HasFlag(ActionFlags.BeginAwait))
+                if (a.Flags.HasFlagFast(ActionFlags.BeginAwait))
                     beginAwait = a.Id;
-                if (a.Flags.HasFlag(ActionFlags.Await))
+                if (a.Flags.HasFlagFast(ActionFlags.Await))
                     finalizeAwait = a.Id;
             }
         }

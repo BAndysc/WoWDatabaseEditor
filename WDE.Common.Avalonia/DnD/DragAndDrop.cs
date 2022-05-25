@@ -456,7 +456,7 @@ namespace WDE.Common.Avalonia.DnD
             else
                 indexOfDrop = treeView.ItemCount;
 
-            if (insertPosition.HasFlag(RelativeInsertPosition.AfterTargetItem) &&
+            if (insertPosition.HasFlagFast(RelativeInsertPosition.AfterTargetItem) &&
                 (dropElement?.IsExpanded ?? false) &&
                 dropElement.ItemCount > 0)
             {
@@ -594,10 +594,10 @@ namespace WDE.Common.Avalonia.DnD
             }
             else
             {
-                if (dropInfo.InsertPosition.HasFlag(RelativeInsertPosition.TargetItemCenter)
+                if (dropInfo.InsertPosition.HasFlagFast(RelativeInsertPosition.TargetItemCenter)
                     && dropInfo.DropTargetAdorner == DropTargetAdorners.Highlight)
                     drawRect = new Rect(container.Bounds.X + 1, container.Bounds.Y, container.Bounds.Width - 2, container.Bounds.Height);
-                else if (dropInfo.InsertPosition.HasFlag(RelativeInsertPosition.BeforeTargetItem))
+                else if (dropInfo.InsertPosition.HasFlagFast(RelativeInsertPosition.BeforeTargetItem))
                     drawRect = new Rect(container.Bounds.X, container.Bounds.Top, container.Bounds.Width, 1);
                 else
                     drawRect = new Rect(container.Bounds.X, container.Bounds.Bottom, container.Bounds.Width, 1);
@@ -643,10 +643,10 @@ namespace WDE.Common.Avalonia.DnD
                 double top = container.TranslatePoint(new Point(0, 0), treeView)?.Y ?? 0;
                 double bottom = container.TranslatePoint(new Point(0, height), treeView)?.Y ?? 0;
                 
-                if (dropInfo.InsertPosition.HasFlag(RelativeInsertPosition.TargetItemCenter)
+                if (dropInfo.InsertPosition.HasFlagFast(RelativeInsertPosition.TargetItemCenter)
                     && dropInfo.DropTargetAdorner == DropTargetAdorners.Highlight)
                     drawRect = new Rect(container.Bounds.X + 1, top, container.Bounds.Width - 2, container.Bounds.Height);
-                else if (dropInfo.InsertPosition.HasFlag(RelativeInsertPosition.BeforeTargetItem))
+                else if (dropInfo.InsertPosition.HasFlagFast(RelativeInsertPosition.BeforeTargetItem))
                     drawRect = new Rect(container.Bounds.X, top, container.Bounds.Width, 1);
                 else
                     drawRect = new Rect(container.Bounds.X, bottom, container.Bounds.Width, 1);

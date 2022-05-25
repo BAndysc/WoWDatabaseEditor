@@ -200,7 +200,7 @@ namespace AvaloniaStyles.Controls
              * and this item is selected. This fixes that behaviour, using non public ListBox API, this can break
              * in future Avalonia versions.
              */
-            if (SelectionMode.HasFlag(SelectionMode.Multiple))
+            if (SelectionMode.HasFlagFast(SelectionMode.Multiple))
             {
                 handlersDisposable = listBox.AddDisposableHandler(PointerPressedEvent, (_, e) =>
                 {

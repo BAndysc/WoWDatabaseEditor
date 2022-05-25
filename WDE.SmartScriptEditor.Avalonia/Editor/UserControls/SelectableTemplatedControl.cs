@@ -37,7 +37,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
 
         private bool IsMultiSelect(KeyModifiers modifiers)
         {
-            return modifiers.HasFlag(MultiselectGesture);
+            return modifiers.HasFlagFast(MultiselectGesture);
         }
 
         private ulong lastPressedTimestamp = 0;

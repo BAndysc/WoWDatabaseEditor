@@ -117,7 +117,7 @@ namespace WDE.DbcStore.Spells.Wrath
         public uint MinimumMs;
     }
     
-    public class SpellStructure
+    public struct SpellStructure
     {
         public uint Id;
         public uint Category;

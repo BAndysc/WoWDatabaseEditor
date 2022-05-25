@@ -102,9 +102,9 @@ public class MiniIcons : IMiniIcons
     {
         this.coreVersion = coreVersion;
         SupportedClasses = AllClasses
-            .Where(@class => coreVersion.Current.GameVersionFeatures.AllClasses.HasFlag(@class.Class)).ToList();
+            .Where(@class => coreVersion.Current.GameVersionFeatures.AllClasses.HasFlagFast(@class.Class)).ToList();
         SupportedRaces = AllRaces
-            .Where(race => coreVersion.Current.GameVersionFeatures.AllRaces.HasFlag(race.Race)).ToList();
+            .Where(race => coreVersion.Current.GameVersionFeatures.AllRaces.HasFlagFast(race.Race)).ToList();
     }
 
     public IEnumerable<RaceMiniIconViewModel> SupportedRaces { get; }
@@ -146,7 +146,7 @@ public class MiniIcons : IMiniIcons
         {
             foreach (var classMiniIconViewModel in SupportedRaces)
             {
-                if (races.HasFlag(classMiniIconViewModel.Race))
+                if (races.HasFlagFast(classMiniIconViewModel.Race))
                     yield return classMiniIconViewModel;
             }   
         }
@@ -212,7 +212,7 @@ public class QuestViewModel : NodeViewModelBase<QuestViewModel, QuestConnectionV
             Classes = new();
             foreach (var classMiniIconViewModel in miniIcons.SupportedClasses)
             {
-                if (template.AllowableClasses.HasFlag(classMiniIconViewModel.Class))
+                if (template.AllowableClasses.HasFlagFast(classMiniIconViewModel.Class))
                     Classes.Add(classMiniIconViewModel);
             }
         }

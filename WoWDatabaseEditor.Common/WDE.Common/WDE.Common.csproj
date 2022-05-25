@@ -7,6 +7,7 @@
     <Platforms>AnyCPU</Platforms>
     <Nullable>enable</Nullable>
     <WarningsAsErrors>nullable</WarningsAsErrors>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup>
       <OutputPath>..\..\bin\$(Configuration)\</OutputPath>

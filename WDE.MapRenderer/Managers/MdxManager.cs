@@ -841,11 +841,11 @@ namespace WDE.MapRenderer.Managers
                 material.SetUniform("notSupported", 1);
 
             material.ZWrite = !material.BlendingEnabled;
-            //material.DepthTesting = materialDef.flags.HasFlag(M2MaterialFlags.DepthTest); // produces wrong results :thonk:
+            //material.DepthTesting = materialDef.flags.HasFlagFast(M2MaterialFlags.DepthTest); // produces wrong results :thonk:
 
-            if (materialDef.flags.HasFlag(M2MaterialFlags.TwoSided))
+            if (materialDef.flags.HasFlagFast(M2MaterialFlags.TwoSided))
                 material.Culling = CullingMode.Off;
-            material.SetUniformInt("unlit", materialDef.flags.HasFlag(M2MaterialFlags.Unlit) ? 1 : 0);
+            material.SetUniformInt("unlit", materialDef.flags.HasFlagFast(M2MaterialFlags.Unlit) ? 1 : 0);
             return material;
         }
 

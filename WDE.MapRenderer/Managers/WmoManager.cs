@@ -172,11 +172,11 @@ namespace WDE.MapRenderer.Managers
 
                     mat.ZWrite = !mat.BlendingEnabled;
                     mat.SetUniform("alphaTest", alphaTest);
-                    mat.SetUniformInt("unlit", materialDef.flags.HasFlag(WorldMapObjectMaterial.Flags.unlit) ? 1 : 0);
-                    mat.SetUniformInt("brightAtNight", materialDef.flags.HasFlag(WorldMapObjectMaterial.Flags.brightAtNight) ? 1 : 0);
+                    mat.SetUniformInt("unlit", materialDef.flags.HasFlagFast(WorldMapObjectMaterial.Flags.unlit) ? 1 : 0);
+                    mat.SetUniformInt("brightAtNight", materialDef.flags.HasFlagFast(WorldMapObjectMaterial.Flags.brightAtNight) ? 1 : 0);
                     mat.SetUniformInt("interior", (group.Header.flags & 0x2000) == 0x2000 && group.VertexColors != null ? 1 : 0);
 
-                    if (materialDef.flags.HasFlag(WorldMapObjectMaterial.Flags.unculled))
+                    if (materialDef.flags.HasFlagFast(WorldMapObjectMaterial.Flags.unculled))
                         mat.Culling = CullingMode.Off;
 
                     if (materialDef.texture1Name != null)

@@ -103,12 +103,12 @@ namespace WDE.SmartScriptEditor.Models
                     int indent = 0;
                     foreach (var a in e.Actions)
                     {
-                        if (a.ActionFlags.HasFlag(ActionFlags.DecreaseIndent) && indent > 0)
+                        if (a.ActionFlags.HasFlagFast(ActionFlags.DecreaseIndent) && indent > 0)
                             indent--;
                         
                         a.Indent = indent;
                         
-                        if (a.ActionFlags.HasFlag(ActionFlags.IncreaseIndent))
+                        if (a.ActionFlags.HasFlagFast(ActionFlags.IncreaseIndent))
                             indent++;
                         
                         a.LineId = index;

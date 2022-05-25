@@ -95,7 +95,7 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                 return true;
             
             if (!spellService.Exists(spellId) ||
-                !spellService.GetAttributes<SpellAttr0>(spellId).HasFlag(SpellAttr0.DoNotDisplaySpellBookAuraIconCombatLog))
+                !spellService.GetAttributes<SpellAttr0>(spellId).HasFlagFast(SpellAttr0.DoNotDisplaySpellBookAuraIconCombatLog))
                 return false;
 
             return true;
@@ -250,9 +250,9 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                     yield break;
 
                 if (!(spellService.GetAttributes<SpellAttr0>(packet.Data.Spell)
-                        .HasFlag(SpellAttr0.DoNotDisplaySpellBookAuraIconCombatLog) ||
+                        .HasFlagFast(SpellAttr0.DoNotDisplaySpellBookAuraIconCombatLog) ||
                      spellService.GetAttributes<SpellAttr0>(packet.Data.Spell)
-                         .HasFlag(SpellAttr0.DoNotLog)))
+                         .HasFlagFast(SpellAttr0.DoNotLog)))
                     yield break;   
             }
 

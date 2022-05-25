@@ -96,7 +96,7 @@ namespace WDE.MpqReader.Structures
             Dictionary<(int, int), IBinaryReader> animReaders = new();
             for (int i = 0; i < sequences.Length; ++i)
             {
-                if (!sequences[i].flags.HasFlag(M2SequenceFlags.HasEmbeddedAnimationData))
+                if (!sequences[i].flags.HasFlagFast(M2SequenceFlags.HasEmbeddedAnimationData))
                 {
                     var animPath = Path.ChangeExtension(path, null);
                     animPath = animPath + sequences[i].id.ToString().PadLeft(4, '0') + "-" + sequences[i].variationIndex.ToString().PadLeft(2, '0') +".anim";
@@ -1104,7 +1104,7 @@ namespace WDE.MpqReader.Structures
             var global_sequence = reader.ReadUInt16();
             var timestamps = reader.ReadArrayDataFromSeparateReader(reader, (idx, r) =>
             {
-                if (sequences[idx].flags.HasFlag(M2SequenceFlags.HasEmbeddedAnimationData))
+                if (sequences[idx].flags.HasFlagFast(M2SequenceFlags.HasEmbeddedAnimationData))
                     return r.ReadArrayUInt32();
                 else
                 {
@@ -1118,7 +1118,7 @@ namespace WDE.MpqReader.Structures
             });
             var values = reader.ReadArrayDataFromSeparateReader(reader, (idx, r) =>
             {
-                if (sequences[idx].flags.HasFlag(M2SequenceFlags.HasEmbeddedAnimationData))
+                if (sequences[idx].flags.HasFlagFast(M2SequenceFlags.HasEmbeddedAnimationData))
                     return r.ReadArray(read);
                 else
                 {
