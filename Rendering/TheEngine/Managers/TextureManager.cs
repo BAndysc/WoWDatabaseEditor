@@ -24,6 +24,7 @@ namespace TheEngine.Managers
         #endif
         
         public TextureHandle EmptyTexture { get; private set; }
+        private ITexture emptyTextureImpl { get; set; }
         
         private List<ITexture?> allTextures;
 
@@ -34,6 +35,7 @@ namespace TheEngine.Managers
             this.engine = engine;
 
             EmptyTexture = CreateTexture(new uint[] { 0xFFFFFFFF }, 1, 1);
+            emptyTextureImpl = GetTextureByHandle(EmptyTexture)!;
         }
 
         internal ITexture? this[TextureHandle handle]
@@ -44,10 +46,10 @@ namespace TheEngine.Managers
         
         public void Dispose()
         {
-            DisposeTexture(EmptyTexture);
+            emptyTextureImpl.Dispose();
             foreach (var tex in allTextures)
             {
-                if (tex == null)
+                if (tex == null || tex == emptyTextureImpl)
                     continue;
                 #if DEBUG_CREATE_CALLSTACK
                 Console.WriteLine("Texture not disposed! Created: " + createCallStack[tex].ToString());
@@ -62,15 +64,23 @@ namespace TheEngine.Managers
             texturesByPath.Clear();
 #endif
         }
+        
+        private TextureHandle AllocHandle() => new TextureHandle(allTextures.Count + 1);
+
+        public TextureHandle CreateDummyHandle()
+        {
+            return AddTexture(emptyTextureImpl);
+        }
 
         private TextureHandle AddTexture(ITexture texture)
         {
-            var textureHandle = new TextureHandle(allTextures.Count + 1);
+            var textureHandle = AllocHandle();
             allTextures.Add(texture);
 #if DEBUG_CREATE_CALLSTACK
-            createCallStack[texture] = new System.Diagnostics.StackTrace(2, true);
+            if (texture != emptyTextureImpl)
+                createCallStack[texture] = new System.Diagnostics.StackTrace(2, true);
 #endif
-            return textureHandle;            
+            return textureHandle;
         }
 
         public void DisposeTexture(TextureHandle handle)
@@ -90,7 +100,8 @@ namespace TheEngine.Managers
             }
             
             var tex = GetTextureByHandle(handle);
-            tex.Dispose();
+            if (tex != emptyTextureImpl)
+                tex?.Dispose();
 #if DEBUG_CREATE_CALLSTACK
             createCallStack.Remove(tex);
 #endif
@@ -102,7 +113,8 @@ namespace TheEngine.Managers
             var oldTexture = GetTextureByHandle(old);
             var newTexture = GetTextureByHandle(@new);
             this[old] = newTexture;
-            oldTexture.Dispose();
+            if (oldTexture != emptyTextureImpl)
+                oldTexture.Dispose();
 #if DEBUG_CREATE_CALLSTACK
             createCallStack.Remove(oldTexture);
 #endif
@@ -168,11 +180,6 @@ namespace TheEngine.Managers
         {
             var texture = engine.Device.CreateRenderTexture(width, height);
             return AddTexture(texture);
-        }
-
-        public TextureHandle CreateDummyHandle()
-        {
-            return CreateTexture(new Rgba32[][] { new Rgba32[] { new Rgba32(255, 255, 255, 255) } }, 1, 1, false);
         }
 
         internal ITexture? GetTextureByHandle(TextureHandle textureHandle)
