@@ -97,7 +97,7 @@ void main()
     //FragColor = vec4(mix(FragColor.rgb, FOG_COLOR, fogFactor), 1);
     
     float isBorderOfChunk = - min(0, sign(fract(WorldPos.x / 533.333) * 533.333 - 0.5)) + 
-        - min(0, sign(fract(WorldPos.z / 533.333) * 533.333 - 0.5));
+        - min(0, sign(fract(WorldPos.y / 533.333) * 533.333 - 0.5));
     
     FragColor = mix(FragColor, FragColor + vec4(0.4, 0.4, 0.4, 0), clamp(isBorderOfChunk * showGrid, 0, 1));
     

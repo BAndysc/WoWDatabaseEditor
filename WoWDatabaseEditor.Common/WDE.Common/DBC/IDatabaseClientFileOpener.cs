@@ -6,7 +6,7 @@ namespace WDE.Common.DBC
     [UniqueProvider]
     public interface IDatabaseClientFileOpener
     {
-        IEnumerable<IDbcIterator> Open(byte[] data);
-        IEnumerable<IDbcIterator> Open(string path);
+        IDBC Open(byte[] data);
+        IDBC Open(string path);
     }
 }

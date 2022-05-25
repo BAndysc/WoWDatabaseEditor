@@ -9,7 +9,7 @@ namespace WDE.DbcStore.FastReader
     [AutoRegister]
     public class DatabaseClientFileOpener : IDatabaseClientFileOpener
     {
-        public IEnumerable<IDbcIterator> Open(byte[] data)
+        public IDBC Open(byte[] data)
         {
             uint magic = BitConverter.ToUInt32(data);
             if (magic == FastDbcReader.WDBC)
@@ -21,7 +21,7 @@ namespace WDE.DbcStore.FastReader
             throw new Exception("Only dbc and db2 supported");
         }
         
-        public IEnumerable<IDbcIterator> Open(string path)
+        public IDBC Open(string path)
         {
             byte[] buffer = new byte[4];
             using FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read);

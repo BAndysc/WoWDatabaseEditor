@@ -271,8 +271,6 @@ namespace WoWDatabaseEditorCore.Avalonia
                 ((IContainerRegistry)Container).RegisterSingleton<MainWindow>();
                 MainApp = Container.Resolve<MainWindow>();
             }
-
-            MainApp.Closed += (sender, args) => TheEngine.TheEngine.Deinit();
             MainApp.DataContext = Container.Resolve<MainWindowViewModel>();
             this.InitializeShell(MainApp);
 
