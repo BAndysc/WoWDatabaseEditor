@@ -124,6 +124,7 @@ namespace WDE.MapRenderer
             screenSpaceSelector = ResolveOrCreate<ScreenSpaceSelector>();
             loadingManager = ResolveOrCreate<LoadingManager>();
             textureManager = ResolveOrCreate<WoWTextureManager>();
+            textureManager.SetQuality(gameProperties.TextureQuality);
             meshManager = ResolveOrCreate<WoWMeshManager>();
             mdxManager = ResolveOrCreate<MdxManager>();
             wmoManager = ResolveOrCreate<WmoManager>();

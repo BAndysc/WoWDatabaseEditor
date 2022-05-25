@@ -40,6 +40,11 @@
                     <TextBlock VerticalAlignment="Center">Dynamic resolution scale: </TextBlock>
                     <Slider Minimum="0.5" Maximum="1" SmallChange="0.1" LargeChange="0.1" Value="{CompiledBinding DynamicResolution}" />
                 </DockPanel>
+                <DockPanel LastChildFill="True">
+                    <TextBlock VerticalAlignment="Center">Textures quality: </TextBlock>
+                    <TextBlock DockPanel.Dock="Bottom" Opacity="0.5" IsVisible="{CompiledBinding ShowTextureQualityWarning}">Restart the game view to apply the change</TextBlock>
+                    <Slider TickFrequency="1" IsSnapToTickEnabled="True" Minimum="0" Maximum="6" SmallChange="1" LargeChange="1" Value="{CompiledBinding TextureQuality}" />
+                </DockPanel>
             </StackPanel>
         </DropDownButton>
     </ToolbarPanel>

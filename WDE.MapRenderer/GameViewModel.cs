@@ -261,6 +261,7 @@ Tris: " + stats.TrianglesDrawn;
             Properties.ShowGrid = settings.ShowGrid;
             Properties.ViewDistanceModifier = settings.ViewDistanceModifier;
             Properties.ShowAreaTriggers = settings.ShowAreaTriggers;
+            Properties.TextureQuality = settings.TextureQuality;
 
             gameView.RegisterGameModule(container => container.Resolve<GameProxy>((typeof(GameViewModel), this)));
             
@@ -384,6 +385,21 @@ Tris: " + stats.TrianglesDrawn;
                 Properties.ViewDistanceModifier = value;
                 settings.ViewDistanceModifier = value;
                 RaisePropertyChanged(nameof(ViewDistance));
+            }
+        }
+        
+        public bool ShowTextureQualityWarning { get; set; }
+
+        public int TextureQuality
+        {
+            get => Properties.TextureQuality;
+            set
+            {
+                Properties.TextureQuality = value;
+                settings.TextureQuality = value;
+                ShowTextureQualityWarning = true;
+                RaisePropertyChanged(nameof(ShowTextureQualityWarning));
+                RaisePropertyChanged(nameof(TextureQuality));
             }
         }
         

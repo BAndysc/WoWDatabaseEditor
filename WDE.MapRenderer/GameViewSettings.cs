@@ -85,6 +85,16 @@ namespace WDE.MapRenderer
                 settings.Update(current);
             }
         }
+
+        public int TextureQuality
+        {
+            get => current.TextureQuality;
+            set
+            {
+                current.TextureQuality = value;
+                settings.Update(current);
+            }
+        }
         
         public float ViewDistanceModifier
         {
@@ -102,6 +112,7 @@ namespace WDE.MapRenderer
             public bool DisableTimeFlow;
             public int TimeSpeedMultiplier;
             public bool ShowGrid;
+            public int TextureQuality;
             public int CurrentTime;
             public float ViewDistanceModifier;
             
