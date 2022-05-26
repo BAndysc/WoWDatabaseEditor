@@ -309,17 +309,24 @@ Tris: " + stats.TrianglesDrawn;
             if (state == 1)
             {
                 currentGame?.DoDispose();
+                if (currentGame != null)
+                    currentGame.OnAfterDisposed += CurrentGameOnOnAfterDisposed;
                 currentGame = null;
                 state = 2;
-                mainThread.Delay(() =>
-                {
-                    Visibility = false;
-                }, TimeSpan.FromMilliseconds(10));
                 return false;
             }
 
             state = 0;
             return true;
+        }
+
+        private void CurrentGameOnOnAfterDisposed(Game game)
+        {
+            game.OnAfterDisposed -= CurrentGameOnOnAfterDisposed;
+            mainThread.Delay(() =>
+            {
+                Visibility = false;
+            }, TimeSpan.FromMilliseconds(10));
         }
 
         public bool OverrideLighting

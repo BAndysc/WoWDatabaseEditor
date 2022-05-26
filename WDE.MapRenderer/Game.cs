@@ -139,6 +139,7 @@ public class Game : IGame
     }
 
     public event Action? RequestDispose;
+    public event Action<Game>? OnAfterDisposed;
         
     public void DoDispose()
     {
@@ -148,6 +149,7 @@ public class Game : IGame
     public void DisposeGame()
     {
         manager?.DisposeGame();
+        OnAfterDisposed?.Invoke(this);
         waitForInitialized = new();
     }
 

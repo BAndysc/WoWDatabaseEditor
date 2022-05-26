@@ -54,6 +54,8 @@ namespace Avalonia.OpenGL.Controls
                     return;
                 
                 OnOpenGlRender(_context.GlInterface, _fb);
+                if (_disposed)
+                    return;
                 // new
                 sw.Restart();
                 _attachment.Present(); // old

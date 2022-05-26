@@ -44,6 +44,7 @@ public class DummyGameProperties : IGameProperties
     public Time CurrentTime { get; set; } = Time.FromMinutes(720);
     public float ViewDistanceModifier => 16;
     public bool ShowAreaTriggers => false;
+    public int TextureQuality => 0;
     public float DynamicResolution => 1;
 }
 
