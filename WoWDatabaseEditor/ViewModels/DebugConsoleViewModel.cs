@@ -5,6 +5,7 @@ using AsyncAwaitBestPractices.MVVM;
 using Prism.Commands;
 using WDE.Common.History;
 using WDE.Common.Managers;
+using WDE.Common.Tasks;
 using WDE.Common.Types;
 using WDE.Common.Utils;
 using WDE.Module.Attributes;
@@ -17,13 +18,17 @@ namespace WoWDatabaseEditorCore.ViewModels
     public class DebugConsoleViewModel : ObservableBase, IDocument
     {
         private readonly IDebugConsole debugConsole;
+        private readonly IMainThread mainThread;
         public INativeTextDocument ConsoleLog { get; }
         public ICommand CrashCommand { get; }
         public ICommand CrashAsyncCommand { get; }
 
-        public DebugConsoleViewModel(IDebugConsole debugConsole, INativeTextDocument textDocument)
+        public DebugConsoleViewModel(IDebugConsole debugConsole, 
+            INativeTextDocument textDocument,
+            IMainThread mainThread)
         {
             this.debugConsole = debugConsole;
+            this.mainThread = mainThread;
             ConsoleLog = textDocument;
             textDocument.FromString(debugConsole.Log);
             debugConsole.WrittenText += DebugConsoleOnWrittenText;
@@ -46,7 +51,10 @@ namespace WoWDatabaseEditorCore.ViewModels
 
         private void DebugConsoleOnWrittenText()
         {
-            ConsoleLog.FromString(debugConsole.Log);
+            mainThread.Dispatch(() =>
+            {
+                ConsoleLog.FromString(debugConsole.Log);
+            });
         }
 
         public string Title => "Debug console";
