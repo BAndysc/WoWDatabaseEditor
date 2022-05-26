@@ -49,17 +49,19 @@ public class AnimationSystem
         this.animationDataStore = animationDataStore;
     }
     
-    private Vector3 GetFirstOrDefaultVector3(int IDX, in M2Track<Vector3> track, Vector3 def, float t)
+    private Vector3 GetFirstOrDefaultVector3(int IDX, MutableM2Track<Vector3> track, Vector3 def, float t)
     {
-        if (track.values.Length <= IDX)
+        if (track.Length <= IDX)
             return def;
-        var values = track.values[IDX];
+        ref readonly var values = ref track.GetValues(IDX);
         if (values.Length == 0)
             return def;
         if (values.Length == 1)
-            return track.values[IDX][0];
+            return values[0];
+            
+        ref readonly var timestamps = ref track.GetTimestamps(IDX);
         
-        int firstIndexGreaterThan = FirstIndexGreaterThan(in track.timestamps[IDX], (uint)t);
+        int firstIndexGreaterThan = FirstIndexGreaterThan(in timestamps, (uint)t);
         if (firstIndexGreaterThan == 0)
         {
             return values[firstIndexGreaterThan];
@@ -67,13 +69,13 @@ public class AnimationSystem
         
         var prev = values[firstIndexGreaterThan - 1];
         var nextValue = values[firstIndexGreaterThan];
-        var start = track.timestamps[IDX][firstIndexGreaterThan - 1];
-        var end = track.timestamps[IDX][firstIndexGreaterThan];
+        var start = timestamps[firstIndexGreaterThan - 1];
+        var end = timestamps[firstIndexGreaterThan];
         var pct = (t - start) / (end - start);
         return Vector3.Lerp(prev, nextValue, pct);
     }
 
-    private int FirstIndexGreaterThan(in M2Array<uint> array, uint target)
+    private int FirstIndexGreaterThan(in MutableM2Array<uint> array, uint target)
     {
         if (target >= array[array.Length - 1])
             return array.Length - 1;
@@ -91,17 +93,19 @@ public class AnimationSystem
         return st > array.Length - 1 ? array.Length - 1 : st; // or return end + 1
     }
     
-    private Quaternion GetFirstOrDefaultQuaternion(int IDX, in M2Track<M2CompQuat> track, Quaternion def, float t)
+    private Quaternion GetFirstOrDefaultQuaternion(int IDX, MutableM2Track<M2CompQuat> track, Quaternion def, float t)
     {
-        if (track.values.Length <= IDX)
+        if (track.Length <= IDX)
             return def;
-        var values = track.values[IDX];
+        ref readonly var values = ref track.GetValues(IDX);
         if (values.Length == 0)
             return def;
         if (values.Length == 1)
-            return track.values[IDX][0].Value;
+            return values[0].Value;
 
-        int firstIndexGreaterThan = FirstIndexGreaterThan(in track.timestamps[IDX], (uint)t);
+        ref readonly var timestamps = ref track.GetTimestamps(IDX);
+        
+        int firstIndexGreaterThan = FirstIndexGreaterThan(in timestamps, (uint)t);
         if (firstIndexGreaterThan == 0)
         {
             return values[firstIndexGreaterThan].Value;
@@ -109,8 +113,8 @@ public class AnimationSystem
         
         var prev = values[firstIndexGreaterThan - 1];
         var nextValue = values[firstIndexGreaterThan];
-        var start = track.timestamps[IDX][firstIndexGreaterThan - 1];
-        var end = track.timestamps[IDX][firstIndexGreaterThan];
+        var start = timestamps[firstIndexGreaterThan - 1];
+        var end = timestamps[firstIndexGreaterThan];
         var pct = (t - start) / (end - start);
         return Quaternion.Slerp(prev.Value, nextValue.Value, pct);
     }
@@ -122,9 +126,9 @@ public class AnimationSystem
 
         if ((boneData.flags & M2CompBoneFlag.transformed) != 0)// || true)
         {
-            var position = GetFirstOrDefaultVector3(IDX, in boneData.translation, Vector3.Zero, t);
-            var scaling = GetFirstOrDefaultVector3(IDX, in boneData.scale, Vector3.One, t);
-            var rotation = GetFirstOrDefaultQuaternion(IDX, in boneData.rotation, Quaternion.Identity, t);
+            var position = GetFirstOrDefaultVector3(IDX, boneData.translation, Vector3.Zero, t);
+            var scaling = GetFirstOrDefaultVector3(IDX, boneData.scale, Vector3.One, t);
+            var rotation = GetFirstOrDefaultQuaternion(IDX, boneData.rotation, Quaternion.Identity, t);
             boneMatrix = Matrix.RotationQuaternion(in rotation);
             if (scaling.X != 1 || scaling.Y != 1 || scaling.Z != 1)
                 boneMatrix *= Matrix.Scaling(in scaling);

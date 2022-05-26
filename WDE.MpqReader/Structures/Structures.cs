@@ -93,19 +93,16 @@ namespace WDE.MpqReader.Structures
             global_loops = reader.ReadArrayUInt32();
             sequences = reader.ReadArray(r => new M2Sequence(r));
             sequenceIdToAnimationId = reader.ReadArrayInt16();
-            Dictionary<(int, int), IBinaryReader> animReaders = new();
-            for (int i = 0; i < sequences.Length; ++i)
+            Func<int, IBinaryReader?> openAnimFile = (idx) =>
             {
-                if (!sequences[i].flags.HasFlagFast(M2SequenceFlags.HasEmbeddedAnimationData))
-                {
-                    var animPath = Path.ChangeExtension(path, null);
-                    animPath = animPath + sequences[i].id.ToString().PadLeft(4, '0') + "-" + sequences[i].variationIndex.ToString().PadLeft(2, '0') +".anim";
-                    var contentReader = opener(animPath);
-                    if (contentReader != null)
-                        animReaders[(sequences[i].id, sequences[i].variationIndex)] = contentReader;
-                }
-            }
-            bones = reader.ReadArray(r => new M2CompBone(r, sequences, animReaders));
+                var animId = sequences[idx].id;
+                var animVariation = sequences[idx].variationIndex;
+                var animPath = Path.ChangeExtension(path, null);
+                animPath = animPath + animId.ToString().PadLeft(4, '0') + "-" + animVariation.ToString().PadLeft(2, '0') +".anim";
+                var contentReader = opener(animPath);
+                return contentReader;
+            };
+            bones = reader.ReadArray(r => new M2CompBone(r, sequences, openAnimFile));
             boneIndicesById = reader.ReadArrayUInt16();
             vertices = reader.ReadArray(M2Vertex.Read);
             num_skin_profiles = reader.ReadUInt32();
@@ -757,21 +754,21 @@ namespace WDE.MpqReader.Structures
         public readonly short parent_bone;            // Parent bone ID or -1 if there is none.
         public readonly ushort submesh_id;            // Mesh part ID OR uDistToParent?
         public readonly int boneNameCRC;
-        public M2Track<Vector3> translation;
-        public M2Track<M2CompQuat> rotation;   // compressed values, default is (32767,32767,32767,65535) == (0,0,0,1) == identity
-        public M2Track<Vector3> scale;
+        public MutableM2Track<Vector3> translation;
+        public MutableM2Track<M2CompQuat> rotation;   // compressed values, default is (32767,32767,32767,65535) == (0,0,0,1) == identity
+        public MutableM2Track<Vector3> scale;
         public Vector3 pivot;                 // The pivot point of that bone.
         
-        public M2CompBone(IBinaryReader reader, in M2Array<M2Sequence> sequences, Dictionary<(int, int), IBinaryReader> readers)
+        public M2CompBone(IBinaryReader reader, in M2Array<M2Sequence> sequences, Func<int, IBinaryReader?> externalAnimOpener)
         {
             key_bone_id = reader.ReadInt32();
             flags = (M2CompBoneFlag)reader.ReadInt32();
             parent_bone = reader.ReadInt16();
             submesh_id = reader.ReadUInt16();
             boneNameCRC = reader.ReadInt32();
-            translation = M2Track<Vector3>.Read(readers, reader, sequences, r => r.ReadVector3());
-            rotation = M2Track<M2CompQuat>.Read(readers, reader, sequences, r => M2CompQuat.Read(r));
-            scale = M2Track<Vector3>.Read(readers, reader, sequences, r => r.ReadVector3());
+            translation = MutableM2Track<Vector3>.Read(externalAnimOpener, reader, sequences, r => r.ReadVector3());
+            rotation = MutableM2Track<M2CompQuat>.Read(externalAnimOpener, reader, sequences, r => M2CompQuat.Read(r));
+            scale = MutableM2Track<Vector3>.Read(externalAnimOpener, reader, sequences, r => r.ReadVector3());
             pivot = reader.ReadVector3();
         }
     }
@@ -1035,6 +1032,42 @@ namespace WDE.MpqReader.Structures
             binaryReader.Offset = currentOffset;
             return new M2Array<T>(size, offset, array);
         }
+        
+        
+        public static MutableM2Array<T> ReadMutableArray<T>(this IBinaryReader binaryReader, System.Func<IBinaryReader, T> read)
+        {
+            return ReadMutableArrayDataFromSeparateReader(binaryReader, binaryReader, (_, br) => read(br));
+        }
+        
+        public static MutableM2Array<T> ReadMutableArrayContent<T>(this IBinaryReader binaryReader, int size, int offset, System.Func<IBinaryReader, T> read)
+        {
+            binaryReader.Offset = offset;
+            T[] array = new T[size];
+
+            for (int i = 0; i < size; ++i)
+            {
+                array[i] = read(binaryReader);
+            }
+            return new MutableM2Array<T>(size, offset, array);
+        }
+        
+        public static MutableM2Array<T> ReadMutableArrayDataFromSeparateReader<T>(this IBinaryReader binaryReader, IBinaryReader contentReader, System.Func<int, IBinaryReader, T> read)
+        {
+            var size = binaryReader.ReadInt32();
+            var offset = binaryReader.ReadInt32();
+            var currentOffset = binaryReader.Offset;
+
+            contentReader.Offset = offset;
+            T[] array = new T[size];
+
+            for (int i = 0; i < size; ++i)
+            {
+                array[i] = read(i, contentReader);
+            }
+
+            binaryReader.Offset = currentOffset;
+            return new MutableM2Array<T>(size, offset, array);
+        }
     }
 
     public class M2TrackBase
@@ -1076,6 +1109,86 @@ namespace WDE.MpqReader.Structures
                 keysNum = reader.ReadUInt32(),
                 keysOffset = reader.ReadUInt32(),
                 values = reader.ReadArray(r => r.ReadArray(read))
+            };
+        }
+    }
+
+    public class MutableM2Track<T>
+    {
+        public ushort interpolation_type { get; init; }
+        public ushort global_sequence { get; init; }
+        private MutableM2Array<MutableM2Array<uint>> timestamps;
+        private MutableM2Array<MutableM2Array<T>> values;
+        private Func<int, IBinaryReader?> externalAnimOpener;
+        private Func<IBinaryReader, T> reader;
+        public BitArray loadedValues;
+        public int Length => values.Length;
+
+        public ref readonly MutableM2Array<uint> GetTimestamps(int idx)
+        {
+#if DEBUG
+            if (!loadedValues[idx])
+            {
+                throw new Exception("Call GetValues first, before GetTimestamps");
+            }
+#endif
+            return ref timestamps[idx];
+        }
+
+        public ref readonly MutableM2Array<T> GetValues(int idx)
+        {
+            if (!loadedValues[idx])
+            {
+                var opener = externalAnimOpener(idx);
+                if (opener == null)
+                {
+                    timestamps[idx] = new MutableM2Array<uint>(0, 0, Array.Empty<uint>());
+                    values[idx] = new MutableM2Array<T>(0, 0, Array.Empty<T>());
+                }
+                else
+                {
+                    timestamps[idx] = opener.ReadMutableArrayContent(timestamps[idx].Length, timestamps[idx].Offset, r => r.ReadUInt32());
+                    values[idx] = opener.ReadMutableArrayContent<T>(values[idx].Length, values[idx].Offset, reader);
+                }
+                loadedValues[idx] = true;
+            }
+            return ref values[idx];
+        }
+        
+        public static MutableM2Track<T> Read(Func<int, IBinaryReader?> externalAnimOpener, IBinaryReader reader, M2Array<M2Sequence> sequences, Func<IBinaryReader, T> read)
+        {
+            var interpolation_type = reader.ReadUInt16();
+            var global_sequence = reader.ReadUInt16();
+            var loadedValues = new BitArray(sequences.Length);
+            var timestamps = reader.ReadMutableArrayDataFromSeparateReader(reader, (idx, r) =>
+            {
+                if (sequences[idx].flags.HasFlagFast(M2SequenceFlags.HasEmbeddedAnimationData))
+                {
+                    loadedValues[idx] = true;
+                    return r.ReadMutableArray(r2 => r2.ReadUInt32());
+                }
+                else
+                {
+                    loadedValues[idx] = false;
+                    return new MutableM2Array<uint>(r.ReadInt32(), r.ReadInt32(), null);
+                }
+            });
+            var values = reader.ReadMutableArrayDataFromSeparateReader(reader, (idx, r) =>
+            {
+                if (sequences[idx].flags.HasFlagFast(M2SequenceFlags.HasEmbeddedAnimationData))
+                    return r.ReadMutableArray(read);
+                else
+                    return new MutableM2Array<T>(r.ReadInt32(), r.ReadInt32(), null);
+            });
+            return new MutableM2Track<T>()
+            {
+                interpolation_type = interpolation_type,
+                global_sequence = global_sequence,
+                timestamps = timestamps,
+                values = values,
+                loadedValues = loadedValues,
+                externalAnimOpener = externalAnimOpener,
+                reader = read
             };
         }
     }
@@ -1166,6 +1279,46 @@ namespace WDE.MpqReader.Structures
         public static M2Track<float> ReadFloat(IBinaryReader reader)
         {
             return M2Track<float>.Read(reader, r => r.ReadFloat());
+        }
+    }
+    
+    // lazy version of M2Array that can hot load data
+    public struct MutableM2Array<T> : IEnumerable<T>
+    {
+        private int offset;
+        private int size;
+        private T?[] array;
+
+        public MutableM2Array(int size, int offset, T?[] array)
+        {
+            this.offset = offset;
+            this.size = size;
+            this.array = array;
+        }
+
+        public int Length => size;
+
+        public bool IsLoaded => array != null;
+    
+        internal T?[] Raw => array;
+        public int Offset => offset;
+
+        public ref T this[int i] => ref array![i];
+
+        public IEnumerator<T> GetEnumerator()
+        {
+            foreach (var e in array)
+                yield return e;
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return array.GetEnumerator();
+        }
+
+        public ReadOnlySpan<T> AsSpan(int start, int length)
+        {
+            return array.AsSpan(start, length)!;
         }
     }
 
