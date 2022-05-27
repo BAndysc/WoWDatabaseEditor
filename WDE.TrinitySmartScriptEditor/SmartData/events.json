@@ -2487,6 +2487,36 @@
     }
   },
   {
+    "id": 78,
+    "usable_with_script_types": [
+      "Scene",
+    ],
+    "name": "SMART_EVENT_SCENE_START",
+    "tags": [ "TrinityMaster" ],
+    "description": "On Scene Start",
+    "name_readable": "On scene start"
+  },
+  {
+    "id": 80,
+    "usable_with_script_types": [
+      "Scene",
+    ],
+    "name": "SMART_EVENT_SCENE_CANCEL",
+    "tags": [ "TrinityMaster" ],
+    "description": "On Scene Cancel",
+    "name_readable": "On scene canceled"
+  },
+  {
+    "id": 81,
+    "usable_with_script_types": [
+      "Scene",
+    ],
+    "name": "SMART_EVENT_SCENE_COMPLETE",
+    "tags": [ "TrinityMaster" ],
+    "description": "On Scene Complete",
+    "name_readable": "On scene completed"
+  },
+  {
     "id": 101,
     "name": "SMART_EVENT_NEAR_PLAYERS_AC",
     "name_readable": "When at least x players nearby",

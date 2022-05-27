@@ -183,5 +183,13 @@
         "group_members": [
             "SMART_EVENT_INSTANCE_PLAYER_ENTER"
         ]
+    },
+    {
+        "name" : "Scene",
+        "group_members" : [
+            "SMART_EVENT_SCENE_START",
+            "SMART_EVENT_SCENE_CANCEL",
+            "SMART_EVENT_SCENE_COMPLETE"
+        ]
     }
 ]
