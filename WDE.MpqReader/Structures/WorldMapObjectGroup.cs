@@ -12,7 +12,7 @@ namespace WDE.MpqReader.Structures
         public PooledArray<WorldMapObjectPoly> Polygons { get; set; }
         public PooledArray<ushort> Indices { get; init; }
         public PooledArray<Vector3> Vertices { get; init; }
-        public PooledArray<Vector4>? VertexColors { get; init; }
+        public PooledArray<Color>? VertexColors { get; init; }
         public ushort[] CollisionOnlyIndices { get; init; }
         public PooledArray<Vector3> Normals { get; init; }
         public List<PooledArray<Vector2>> UVs { get; init; } = new();
@@ -86,17 +86,17 @@ namespace WDE.MpqReader.Structures
             return collisionOnlyIndices;
         }
 
-        private PooledArray<Vector4> ReadVertexColors(IBinaryReader reader, int size)
+        private PooledArray<Color> ReadVertexColors(IBinaryReader reader, int size)
         {
-            PooledArray<Vector4> colors = new PooledArray<Vector4>(size / 4);
+            PooledArray<Color> colors = new PooledArray<Color>(size / 4);
             int i = 0;
             while (!reader.IsFinished())
             {
-                var b = reader.ReadByte() / 255.0f;
-                var g = reader.ReadByte() / 255.0f;
-                var r = reader.ReadByte() / 255.0f;
-                var a = reader.ReadByte() / 255.0f;
-                colors[i++] = new Vector4(r, g, b, a);
+                var b = reader.ReadByte();
+                var g = reader.ReadByte();
+                var r = reader.ReadByte();
+                var a = reader.ReadByte();
+                colors[i++] = new Color(r, g, b, a);
             }
 
             return colors;

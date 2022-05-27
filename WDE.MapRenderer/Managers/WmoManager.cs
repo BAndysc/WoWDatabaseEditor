@@ -203,7 +203,7 @@ namespace WDE.MapRenderer.Managers
                 if (group.CollisionOnlyIndices.Length > 0)
                     wmoMesh.SetSubmeshIndicesRange(j++, group.Indices.Length, group.CollisionOnlyIndices.Length);
 
-                wmoMesh.Rebuild();
+                wmoMesh.RebuildIndices();
                 wmoInstance.meshes.Add((wmoMesh, materials));
                 group.Dispose();
             }

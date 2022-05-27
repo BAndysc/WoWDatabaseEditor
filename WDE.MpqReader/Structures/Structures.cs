@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Text;
 using TheMaths;
 using WDE.MpqReader.Readers;
@@ -699,8 +700,8 @@ namespace WDE.MpqReader.Structures
     public struct M2Vertex
     {
         public Vector3 pos { get; init; }
-        public Byte4Array bone_weights { get; init; }
-        public Byte4Array bone_indices { get; init; }
+        public Color bone_weights { get; init; }
+        public Color bone_indices { get; init; }
         public Vector3 normal { get; init; }
         public Vector2 tex_coord1 { get; init; }
         public Vector2 tex_coord2 { get; init; }  // two textures, depending on shader used
@@ -710,8 +711,8 @@ namespace WDE.MpqReader.Structures
             return new M2Vertex()
             {
                 pos = reader.ReadVector3(),
-                bone_weights = reader.ReadUInt32(),
-                bone_indices = reader.ReadUInt32(),
+                bone_weights = new Color(reader.ReadUInt32()),
+                bone_indices = new Color(reader.ReadUInt32()),
                 normal = reader.ReadVector3(),
                 tex_coord1 = reader.ReadVector2(),
                 tex_coord2 = reader.ReadVector2()

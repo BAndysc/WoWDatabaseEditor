@@ -17,12 +17,12 @@ namespace TheEngine.Entities
         private readonly Engine engine;
         private readonly bool managedOnly;
 
-        internal int VertexArrayObject { get; }
+        internal int VertexArrayObject { get; private set; }
         internal NativeBuffer<UniversalVertex>? VerticesBuffer { get; private set; }
         internal NativeBuffer<ushort>? IndicesBuffer { get; private set; }
 
         private BoundingBox bounds;
-        private UniversalVertex[]? vertices = Array.Empty<UniversalVertex>();
+        private Vector3[]? positions = null;
         private ushort[]? indices;
         private int indicesCount = 0;
         private int verticesCount = 0;
@@ -66,7 +66,7 @@ namespace TheEngine.Entities
         {
             if (disposed)
                 throw new Exception("Mesh is disposed");
-            Debug.Assert(vertices != null);
+            Debug.Assert(positions != null);
             Debug.Assert(indices != null);
             int start = IndexStart(submesh);
             int count = IndexCount(submesh);
@@ -80,10 +80,10 @@ namespace TheEngine.Entities
                     verticesCount > k &&
                     verticesCount > l)
                 {
-                    var v1 = vertices[j].position;
-                    var v2 = vertices[k].position;
-                    var v3 = vertices[l].position;
-                    yield return (v1, v2, v3);
+                    var v1 = positions[j];
+                    var v2 = positions[k];
+                    var v3 = positions[l];
+                    yield return (new Vector4(v1, 1), new Vector4(v2, 1), new Vector4(v3, 1));
                 }
             }
         }
@@ -98,28 +98,7 @@ namespace TheEngine.Entities
             {
                 VerticesBuffer = engine.Device.CreateBuffer<UniversalVertex>(BufferTypeEnum.Vertex, 1);
                 IndicesBuffer = engine.Device.CreateBuffer<ushort>(BufferTypeEnum.Index, 1);
-                VertexArrayObject = engine.Device.device.GenVertexArray();
-                engine.Device.device.BindVertexArray(VertexArrayObject);
-                VerticesBuffer.Activate(0);
-                IndicesBuffer.Activate(0);
-                int location = 0;
-                int accumulatedSize = 0;
-                int stride = 4 * 4 * 3 + 2 * 4 * 2;
-                engine.Device.device.VertexAttribPointer(0, 4, VertexAttribPointerType.Float, false, stride, new IntPtr(0));
-                engine.Device.device.EnableVertexAttribArray(0);
-                
-                engine.Device.device.VertexAttribPointer(1, 4, VertexAttribPointerType.Float, false, stride, new IntPtr(16));
-                engine.Device.device.EnableVertexAttribArray(1);
-                
-                engine.Device.device.VertexAttribPointer(2, 4, VertexAttribPointerType.Float, false, stride, new IntPtr(32));
-                engine.Device.device.EnableVertexAttribArray(2);
-                
-                engine.Device.device.VertexAttribPointer(3, 2, VertexAttribPointerType.Float, false, stride, new IntPtr(48));
-                engine.Device.device.EnableVertexAttribArray(3);
-                
-                engine.Device.device.VertexAttribPointer(4, 2, VertexAttribPointerType.Float, false, stride, new IntPtr(56));
-                engine.Device.device.EnableVertexAttribArray(4);
-                engine.Device.device.BindVertexArray(0);
+                SetupDeviceBuffers(engine);
             }
         }
 
@@ -127,39 +106,47 @@ namespace TheEngine.Entities
         {
             this.engine = engine;
             Handle = handle;
-            this.vertices = ownVerticesArray ? vertices : vertices.ToArray();
-            this.verticesCount = this.vertices.Length;
+            positions = vertices.Select(x => x.position).ToArray();
+            this.verticesCount = vertices.Length;
             this.indices = indices;
             this.indicesCount = indicesCount;
             this.managedOnly = managedOnly;
-            BuildBoundingBox(vertices);
+            BuildBoundingBox();
             if (!managedOnly)
             {
                 VerticesBuffer = engine.Device.CreateBuffer<UniversalVertex>(BufferTypeEnum.Vertex, vertices);
                 IndicesBuffer = engine.Device.CreateBuffer<ushort>(BufferTypeEnum.Index, indices.AsSpan(0, indicesCount));
-                VertexArrayObject = engine.Device.device.GenVertexArray();
-                engine.Device.device.BindVertexArray(VertexArrayObject);
-                VerticesBuffer.Activate(0);
-                IndicesBuffer.Activate(0);
-                int location = 0;
-                int accumulatedSize = 0;
-                int stride = 4 * 4 * 3 + 2 * 4 * 2;
-                engine.Device.device.VertexAttribPointer(0, 4, VertexAttribPointerType.Float, false, stride, new IntPtr(0));
-                engine.Device.device.EnableVertexAttribArray(0);
-            
-                engine.Device.device.VertexAttribPointer(1, 4, VertexAttribPointerType.Float, false, stride, new IntPtr(16));
-                engine.Device.device.EnableVertexAttribArray(1);
-            
-                engine.Device.device.VertexAttribPointer(2, 4, VertexAttribPointerType.Float, false, stride, new IntPtr(32));
-                engine.Device.device.EnableVertexAttribArray(2);
-            
-                engine.Device.device.VertexAttribPointer(3, 2, VertexAttribPointerType.Float, false, stride, new IntPtr(48));
-                engine.Device.device.EnableVertexAttribArray(3);
-            
-                engine.Device.device.VertexAttribPointer(4, 2, VertexAttribPointerType.Float, false, stride, new IntPtr(56));
-                engine.Device.device.EnableVertexAttribArray(4);
-                engine.Device.device.BindVertexArray(0);
+                SetupDeviceBuffers(engine);
             }
+        }
+
+        private void SetupDeviceBuffers(Engine engine)
+        {
+            VertexArrayObject = engine.Device.device.GenVertexArray();
+            engine.Device.device.BindVertexArray(VertexArrayObject);
+            VerticesBuffer.Activate(0);
+            IndicesBuffer.Activate(0);
+            int location = 0;
+            int accumulatedSize = 0;
+            int stride = 3 * 4 + 3 * 4 + 2 * 4 + 2 * 4 + 4 + 4; // 4 * 4 * 3 + 2 * 4 * 2;
+            engine.Device.device.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, stride, new IntPtr(0));
+            engine.Device.device.EnableVertexAttribArray(0);
+
+            engine.Device.device.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, stride, new IntPtr(12));
+            engine.Device.device.EnableVertexAttribArray(1);
+
+            engine.Device.device.VertexAttribPointer(2, 2, VertexAttribPointerType.Float, false, stride, new IntPtr(24));
+            engine.Device.device.EnableVertexAttribArray(2);
+
+            engine.Device.device.VertexAttribPointer(3, 2, VertexAttribPointerType.Float, false, stride, new IntPtr(32));
+            engine.Device.device.EnableVertexAttribArray(3);
+
+            engine.Device.device.VertexAttribPointer(4, 4, VertexAttribPointerType.UnsignedByte, true, stride, new IntPtr(40));
+            engine.Device.device.EnableVertexAttribArray(4);
+
+            engine.Device.device.VertexAttribPointer(5, 4, VertexAttribPointerType.UnsignedByte, true, stride, new IntPtr(44));
+            engine.Device.device.EnableVertexAttribArray(5);
+            engine.Device.device.BindVertexArray(0);
         }
 
         public void SetSubmeshCount(int count)
@@ -229,51 +216,82 @@ namespace TheEngine.Entities
 
         public void SetVertices(ReadOnlySpan<Vector3> vertices)
         {
-            if (this.vertices.Length < vertices.Length)
-                Array.Resize(ref this.vertices, vertices.Length);
+            if (positions == null || positions.Length < vertices.Length)
+                positions = new Vector3[vertices.Length];
+                    
             verticesCount = vertices.Length;
-            for (int i = 0; i < verticesCount; ++i)
-                this.vertices[i] = new UniversalVertex() { position = new Vector4(vertices[i], 1) };
+            vertices.CopyTo(positions.AsSpan());
+            
+            if (!managedOnly)
+            {
+                if (verticesCount < 50)
+                {
+                    Span<UniversalVertex> temp = stackalloc UniversalVertex[verticesCount];
+                    for (int i = 0; i < verticesCount; ++i)
+                        temp[i] = new UniversalVertex() { position = vertices[i] };
+                    VerticesBuffer?.UpdateBuffer(temp);
+                }
+                else
+                {
+                    var temp = new UniversalVertex[verticesCount];
+                    for (int i = 0; i < verticesCount; ++i)
+                        temp[i] = new UniversalVertex() { position = vertices[i] };
+                    VerticesBuffer?.UpdateBuffer(temp.AsSpan(0, verticesCount));
+                }
+            }
         }
         
         // no alloc method
         public void SetVertices(Vector3 v1, Vector3 v2)
         {
-            if (vertices.Length < 2)
-                Array.Resize(ref vertices, 2);
+            if (positions == null || positions.Length < 2)
+                positions = new Vector3[2];
+                    
             verticesCount = 2;
-            vertices[0] = new UniversalVertex() { position = new Vector4(v1, 1) };
-            vertices[1] = new UniversalVertex() { position = new Vector4(v2, 1) };
+            positions[0] = v1;
+            positions[1] = v2;
+            
+            if (!managedOnly)
+            {
+                Span<UniversalVertex> temp = stackalloc UniversalVertex[2];
+                temp[0] = new UniversalVertex() { position = v1 };
+                temp[1] = new UniversalVertex() { position = v2 };
+                VerticesBuffer?.UpdateBuffer(temp);
+            }
         }
 
-        public void BuildBoundingBox() => BuildBoundingBox(vertices.AsSpan(0, verticesCount));
+        public void BuildBoundingBox()
+        {
+            BuildBoundingBox(positions.AsSpan(0, verticesCount));
+        }
 
-        private void BuildBoundingBox(ReadOnlySpan<UniversalVertex> vertices)
+        private void BuildBoundingBox(ReadOnlySpan<Vector3> vertices)
         {
             Vector3 max = new Vector3(float.MinValue, float.MinValue, float.MinValue);
             Vector3 min = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
             for (var index = 0; index < vertices.Length; index++)
             {
                 var v = vertices[index];
-                min.X = Math.Min(v.position.X, min.X);
-                min.Y = Math.Min(v.position.Y, min.Y);
-                min.Z = Math.Min(v.position.Z, min.Z);
+                min.X = Math.Min(v.X, min.X);
+                min.Y = Math.Min(v.Y, min.Y);
+                min.Z = Math.Min(v.Z, min.Z);
 
-                max.X = Math.Max(v.position.X, max.X);
-                max.Y = Math.Max(v.position.Y, max.Y);
-                max.Z = Math.Max(v.position.Z, max.Z);
+                max.X = Math.Max(v.X, max.X);
+                max.Y = Math.Max(v.Y, max.Y);
+                max.Z = Math.Max(v.Z, max.Z);
             }
 
             bounds = new BoundingBox(min, max);
         }
         
-        public void Rebuild()
+        public void RebuildIndices()
         {
+            if (managedOnly)
+                throw new Exception("You may call rebuild only on unmanaged meshes");
             Debug.Assert(!managedOnly);
-            Debug.Assert(vertices != null);
+            Debug.Assert(positions != null);
             Debug.Assert(indices != null);
-            BuildBoundingBox(vertices.AsSpan(0, verticesCount));
-            VerticesBuffer?.UpdateBuffer(vertices.AsSpan(0, verticesCount));
+            BuildBoundingBox();
             IndicesBuffer?.UpdateBuffer(indices.AsSpan(0, indicesCount));
             //vertices = null;
             //indices = null;

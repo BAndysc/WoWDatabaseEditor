@@ -36,7 +36,7 @@ namespace TheEngine.Managers
             var mesh = new Mesh(engine, handle, false);
             mesh.SetVertices(vertices);
             mesh.SetIndices(indices, 0);
-            mesh.Rebuild();
+            mesh.RebuildIndices();
 
             meshes.Add(mesh);
             #if TRACK_ALLOCATIONS
@@ -56,11 +56,12 @@ namespace TheEngine.Managers
             {
                 vertices[i] = new UniversalVertex()
                 {
-                    position = new Vector4(meshData.Vertices[i], 1),
-                    normal = meshData.Normals == null ? Vector4.One : new Vector4(meshData.Normals[i], 0),
+                    position = meshData.Vertices[i],
+                    normal = meshData.Normals == null ? Vector3.One : meshData.Normals[i],
                     uv1 = meshData.UV == null ? Vector2.Zero : meshData.UV[i],
                     uv2 = meshData.UV2 == null ? Vector2.Zero : meshData.UV2[i],
-                    color = meshData.Colors == null ? Vector4.Zero : meshData.Colors[i]
+                    color = meshData.Colors == null ? 0 : meshData.Colors[i].ToRgba(),
+                    color2 = meshData.Colors2 == null ? 0 : meshData.Colors2[i].ToRgba()
                 };
             }
             

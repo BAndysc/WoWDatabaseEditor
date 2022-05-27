@@ -881,7 +881,7 @@ namespace TheEngine.Managers
         public void DrawLine(Vector3 start, Vector3 end, Vector4 color)
         {
             lineMesh.SetVertices(start, end);
-            lineMesh.Rebuild();
+            lineMesh.RebuildIndices();
             if (currentShader != unlitMaterial.Shader)
             {
                 currentShader = unlitMaterial.Shader;

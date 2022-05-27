@@ -285,7 +285,8 @@ namespace WDE.MapRenderer.Managers
             Vector3[] normals = null!;
             Vector2[] uv1 = null!;
             Vector2[] uv2 = null!;
-            Vector4[] packedBones = null!;
+            Color[] boneWeights = null!;
+            Color[] boneIndices = null!;
             
             yield return new WaitForTask(Task.Run(() =>
             {
@@ -305,7 +306,8 @@ namespace WDE.MapRenderer.Managers
                 normals = new Vector3[count];
                 uv1 = new Vector2[count];
                 uv2 = new Vector2[count];
-                packedBones = new Vector4[count];
+                boneWeights = new Color[count];
+                boneIndices = new Color[count];
 
                 for (int i = 0; i < count; ++i)
                 {
@@ -314,18 +316,12 @@ namespace WDE.MapRenderer.Managers
                     normals[i] = vert.normal;
                     uv1[i] = vert.tex_coord1;
                     uv2[i] = vert.tex_coord2;
-                    var packedWeights = (uint)vert.bone_weights[0] | ((uint)vert.bone_weights[1] << 8) |
-                                        ((uint)vert.bone_weights[2] << 16) | ((uint)vert.bone_weights[3] << 24);
-                    var packetWeightsFloat = UintAsFloat(packedWeights);
-                    
-                    var packedIndices = (uint)vert.bone_indices[0] | ((uint)vert.bone_indices[1] << 8) |
-                                        ((uint)vert.bone_indices[2] << 16) | ((uint)vert.bone_indices[3] << 24);
-                    var packedIndicesFloat = UintAsFloat(packedIndices);
-                    packedBones[i] = new Vector4(packedIndicesFloat, packetWeightsFloat, 0, 0);
+                    boneWeights[i] = vert.bone_weights;
+                    boneIndices[i] = vert.bone_indices;
                 }
             }));
             
-            var md = new MeshData(vertices, normals, uv1, new ushort[] { }, null, null, uv2, packedBones);
+            var md = new MeshData(vertices, normals, uv1, new ushort[] { }, null, null, uv2, boneWeights, boneIndices);
             var mesh = meshManager.CreateMesh(md);
             mesh.SetSubmeshCount(skin.Batches.Length);
             // 1 : load items to define active geosets
@@ -740,7 +736,7 @@ namespace WDE.MapRenderer.Managers
                 yield break;
             }
 
-            mesh.Rebuild();
+            mesh.RebuildIndices();
 
             var mdx = new MdxInstance
             {
@@ -951,7 +947,8 @@ namespace WDE.MapRenderer.Managers
             Vector3[] normals = null!;
             Vector2[] uv1 = null!;
             Vector2[] uv2 = null!;
-            Vector4[] packedBones = null!;
+            Color[] boneWeights = null!;
+            Color[] boneIndices = null!;
 
             yield return new WaitForTask(Task.Run(() =>
             {
@@ -971,7 +968,8 @@ namespace WDE.MapRenderer.Managers
                 normals = new Vector3[count];
                 uv1 = new Vector2[count];
                 uv2 = new Vector2[count];
-                packedBones = new Vector4[count];
+                boneWeights = new Color[count];
+                boneIndices = new Color[count];
                 
                 for (int i = 0; i < count; ++i)
                 {
@@ -980,18 +978,12 @@ namespace WDE.MapRenderer.Managers
                     normals[i] = vert.normal;
                     uv1[i] = vert.tex_coord1;
                     uv2[i] = vert.tex_coord2;
-                    var packedWeights = (uint)vert.bone_weights[0] | ((uint)vert.bone_weights[1] << 8) |
-                                        ((uint)vert.bone_weights[2] << 16) | ((uint)vert.bone_weights[3] << 24);
-                    var packetWeightsFloat = UintAsFloat(packedWeights);
-                    
-                    var packedIndices = (uint)vert.bone_indices[0] | ((uint)vert.bone_indices[1] << 8) |
-                                        ((uint)vert.bone_indices[2] << 16) | ((uint)vert.bone_indices[3] << 24);
-                    var packedIndicesFloat = UintAsFloat(packedIndices);
-                    packedBones[i] = new Vector4(packedIndicesFloat, packetWeightsFloat, 0, 0);
+                    boneWeights[i] = vert.bone_weights;
+                    boneIndices[i] = vert.bone_indices;
                 }
             }));
             
-            var md = new MeshData(vertices, normals, uv1, new ushort[] { }, null, null, uv2, packedBones);
+            var md = new MeshData(vertices, normals, uv1, new ushort[] { }, null, null, uv2, boneWeights, boneIndices);
             
             var mesh = meshManager.CreateMesh(md);
             mesh.SetSubmeshCount(skin.Batches.Length);
@@ -1070,7 +1062,7 @@ namespace WDE.MapRenderer.Managers
                 yield break;
             }
 
-            mesh.Rebuild();
+            mesh.RebuildIndices();
 
             var mdx = new MdxInstance
             {
@@ -1149,7 +1141,8 @@ namespace WDE.MapRenderer.Managers
             Vector3[] normals = null!;
             Vector2[] uv1 = null!;
             Vector2[] uv2 = null!;
-            Vector4[] packedBones = null!;
+            Color[] boneWeights = null!;
+            Color[] boneIndices = null!;
 
             yield return new WaitForTask(Task.Run(() =>
             {
@@ -1169,7 +1162,8 @@ namespace WDE.MapRenderer.Managers
                 normals = new Vector3[count];
                 uv1 = new Vector2[count];
                 uv2 = new Vector2[count];
-                packedBones = new Vector4[count];
+                boneWeights = new Color[count];
+                boneIndices = new Color[count];
                 
                 for (int i = 0; i < count; ++i)
                 {
@@ -1178,18 +1172,12 @@ namespace WDE.MapRenderer.Managers
                     normals[i] = vert.normal;
                     uv1[i] = vert.tex_coord1;
                     uv2[i] = vert.tex_coord2;
-                    var packedWeights = (uint)vert.bone_weights[0] | ((uint)vert.bone_weights[1] << 8) |
-                                        ((uint)vert.bone_weights[2] << 16) | ((uint)vert.bone_weights[3] << 24);
-                    var packetWeightsFloat = UintAsFloat(packedWeights);
-                    
-                    var packedIndices = (uint)vert.bone_indices[0] | ((uint)vert.bone_indices[1] << 8) |
-                                        ((uint)vert.bone_indices[2] << 16) | ((uint)vert.bone_indices[3] << 24);
-                    var packedIndicesFloat = UintAsFloat(packedIndices);
-                    packedBones[i] = new Vector4(packedIndicesFloat, packetWeightsFloat, 0, 0);
+                    boneWeights[i] = vert.bone_weights;
+                    boneIndices[i] = vert.bone_indices;
                 }
             }));
             
-            var md = new MeshData(vertices, normals, uv1, new ushort[] { }, null, null, uv2, packedBones);
+            var md = new MeshData(vertices, normals, uv1, new ushort[] { }, null, null, uv2, boneWeights, boneIndices);
             
             var mesh = meshManager.CreateMesh(md);
             mesh.SetSubmeshCount(skin.Batches.Length);
@@ -1258,7 +1246,7 @@ namespace WDE.MapRenderer.Managers
                 yield break;
             }
             
-            mesh.Rebuild();
+            mesh.RebuildIndices();
 
             var mdx = new MdxInstance
             {
@@ -1317,7 +1305,8 @@ namespace WDE.MapRenderer.Managers
             Vector3[] normals = null!;
             Vector2[] uv1 = null!;
             Vector2[] uv2 = null!;
-            Vector4[] packedBones = null!;
+            Color[] boneWeights = null!;
+            Color[] boneIndices = null!;
 
             yield return new WaitForTask(Task.Run(() =>
             {
@@ -1337,7 +1326,8 @@ namespace WDE.MapRenderer.Managers
                 normals = new Vector3[count];
                 uv1 = new Vector2[count];
                 uv2 = new Vector2[count];
-                packedBones = new Vector4[count];
+                boneWeights = new Color[count];
+                boneIndices = new Color[count];
                 
                 for (int i = 0; i < count; ++i)
                 {
@@ -1346,18 +1336,12 @@ namespace WDE.MapRenderer.Managers
                     normals[i] = vert.normal;
                     uv1[i] = vert.tex_coord1;
                     uv2[i] = vert.tex_coord2;
-                    var packedWeights = (uint)vert.bone_weights[0] | ((uint)vert.bone_weights[1] << 8) |
-                                        ((uint)vert.bone_weights[2] << 16) | ((uint)vert.bone_weights[3] << 24);
-                    var packetWeightsFloat = UintAsFloat(packedWeights);
-                    
-                    var packedIndices = (uint)vert.bone_indices[0] | ((uint)vert.bone_indices[1] << 8) |
-                                        ((uint)vert.bone_indices[2] << 16) | ((uint)vert.bone_indices[3] << 24);
-                    var packedIndicesFloat = UintAsFloat(packedIndices);
-                    packedBones[i] = new Vector4(packedIndicesFloat, packetWeightsFloat, 0, 0);
+                    boneWeights[i] = vert.bone_weights;
+                    boneIndices[i] = vert.bone_indices;
                 }
             }));
             
-            var md = new MeshData(vertices, normals, uv1, new ushort[] { }, null, null, uv2, packedBones);
+            var md = new MeshData(vertices, normals, uv1, new ushort[] { }, null, null, uv2, boneWeights, boneIndices);
             
             var mesh = meshManager.CreateMesh(md);
             mesh.SetSubmeshCount(skin.Batches.Length);
@@ -1426,7 +1410,7 @@ namespace WDE.MapRenderer.Managers
                 yield break;
             }
 
-            mesh.Rebuild();
+            mesh.RebuildIndices();
 
             var mdx = new MdxInstance
             {

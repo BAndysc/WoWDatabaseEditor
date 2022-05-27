@@ -305,14 +305,14 @@ namespace TheMaths
         /// Converts the color into a packed integer.
         /// </summary>
         /// <returns>A packed integer containing all four color components.</returns>
-        public int ToRgba()
+        public uint ToRgba()
         {
             int value = R;
             value |= G << 8;
             value |= B << 16;
             value |= A << 24;
 
-            return (int)value;
+            return (uint)value;
         }
 
         /// <summary>
@@ -1131,7 +1131,7 @@ namespace TheMaths
         /// <returns>
         /// The result of the conversion.
         /// </returns>
-        public static explicit operator int(Color value)
+        public static explicit operator uint(Color value)
         {
             return value.ToRgba();
         }

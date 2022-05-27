@@ -14,20 +14,12 @@ void main()
 {
     VERTEX_SETUP_INSTANCING;
 
-    uint packedBoneIndices = floatBitsToUint(color.r);
-    uint packedBoneWeights = floatBitsToUint(color.g);
-    
     int boneIndices[4];
-    boneIndices[0] = floatBitsToInt(uintBitsToFloat( packedBoneIndices & 0xFFu));
-    boneIndices[1] = floatBitsToInt(uintBitsToFloat( (packedBoneIndices >> 8) & 0xFFu));
-    boneIndices[2] = floatBitsToInt(uintBitsToFloat( (packedBoneIndices >> 16) & 0xFFu));
-    boneIndices[3] = floatBitsToInt(uintBitsToFloat( (packedBoneIndices >> 24) & 0xFFu));
-    
-    float boneWeights[4];
-    boneWeights[0] = (packedBoneWeights & 0xFFu) / 255.0f;
-    boneWeights[1] = ((packedBoneWeights >> 8) & 0xFFu) / 255.0f;
-    boneWeights[2] = ((packedBoneWeights >> 16) & 0xFFu) / 255.0f;
-    boneWeights[3] = ((packedBoneWeights >> 24) & 0xFFu) / 255.0f;
+    boneIndices[0] = int(color2.x * 255);
+    boneIndices[1] = int(color2.y * 255);
+    boneIndices[2] = int(color2.z * 255);
+    boneIndices[3] = int(color2.w * 255);
+    vec4 boneWeights = color;
 
     mat4 boneMatricesArray[4];
     for (int i = 0; i < 4; i++)
