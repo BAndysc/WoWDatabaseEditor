@@ -350,7 +350,7 @@ namespace WDE.TrinitySmartScriptEditor
 
         public override async Task<ISolutionItem> CreateSolutionItem()
         {
-            var scenes = dbcStore.Value.SceneStore.ToDictionary(scene => scene.Key, scene => new SelectOption($"Scene { scene.Key }"));
+            var scenes = dbcStore.Value.SceneStore.ToDictionary(scene => scene.Key, scene => new SelectOption($"Scene { scene.Value }"));
             long? entry = await itemFromListProvider.Value.GetItemFromList(scenes, false);
             if (!entry.HasValue)
                 return null;
