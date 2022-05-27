@@ -329,4 +329,33 @@ namespace WDE.TrinitySmartScriptEditor
             SmartScriptType.AreaTriggerEntityServerSide,
             true) {}
     }
+
+    [AutoRegisterToParentScopeAttribute]
+    public class SmartScriptSceneListProvider : SmartScriptSolutionItemProvider
+    {
+        private readonly Lazy<IItemFromListProvider> itemFromListProvider;
+        private readonly Lazy<IDbcStore> dbcStore;
+
+        public SmartScriptSceneListProvider(
+            Lazy<IItemFromListProvider> itemFromListProvider,
+            Lazy<IDbcStore> dbcStore
+        ) : base("Scene Script",
+            "The script from Scene from client database (DBC)",
+            "document_cinematic_big",
+            SmartScriptType.Scene)
+        {
+            this.itemFromListProvider = itemFromListProvider;
+            this.dbcStore = dbcStore;
+        }
+
+        public override async Task<ISolutionItem> CreateSolutionItem()
+        {
+            var scenes = dbcStore.Value.SceneStore.ToDictionary(scene => scene.Key, scene => new SelectOption($"Scene { scene.Key }"));
+            long? entry = await itemFromListProvider.Value.GetItemFromList(scenes, false);
+            if (!entry.HasValue)
+                return null;
+
+            return new SmartScriptSolutionItem((int)entry.Value, SmartScriptType.Scene);
+        }
+    }
 }
