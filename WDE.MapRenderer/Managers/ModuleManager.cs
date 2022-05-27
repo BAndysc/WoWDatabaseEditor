@@ -15,6 +15,7 @@ namespace WDE.MapRenderer.Managers
         private HashSet<Func<IContainerProvider, IGameModule>> modulesToRemove = new();
         private List<(Func<IContainerProvider, IGameModule>, IGameModule, object?)> modules = new();
         public ObservableCollection<object> ViewModels { get; } = new();
+        public ObservableCollection<object> ToolBars { get; } = new();
 
         public ModuleManager(IContainerProvider containerProvider,
             IGameView gameView)
@@ -53,6 +54,8 @@ namespace WDE.MapRenderer.Managers
                 modules.Add((m, moduleInstance, moduleInstance.ViewModel));
                 if (moduleInstance.ViewModel != null)
                     ViewModels.Add(moduleInstance.ViewModel);
+                if (moduleInstance.ToolBar != null)
+                    ToolBars.Add(moduleInstance.ToolBar);
             }
             modulesToAdd.Clear();
             foreach (var toRemove in modulesToRemove)
@@ -64,6 +67,8 @@ namespace WDE.MapRenderer.Managers
                         modules[i].Item2.Dispose();
                         if (modules[i].Item3 != null)
                             ViewModels.Remove(modules[i].Item3);
+                        if (modules[i].Item2.ToolBar != null)
+                            ToolBars.Remove(modules[i].Item2.ToolBar);
                         modules.RemoveAt(i);
                         break;
                     }

@@ -51,7 +51,7 @@ namespace WDE.MapRenderer
     }
     
     [AutoRegister]
-    public class GameViewModel : ObservableBase, ITool, IMapContext<GameCameraViewModel>
+    public partial class GameViewModel : ObservableBase, ITool, IMapContext<GameCameraViewModel>
     {
         private readonly Lazy<IDocumentManager> documentManager;
         private readonly GameViewSettings settings;
@@ -99,6 +99,17 @@ namespace WDE.MapRenderer
             set => SetProperty(ref maps, value);
         }
         
+        private ObservableCollection<object> toolBars  = new();
+        public ObservableCollection<object> ToolBars
+        {
+            get => toolBars;
+            set
+            {
+                toolBars = value;
+                RaisePropertyChanged();
+            }
+        }
+
         public string Stats { get; private set; }
         
         private GameProperties Properties { get; }
@@ -147,6 +158,7 @@ namespace WDE.MapRenderer
 
             public void Dispose()
             {
+                vm.ToolBars = new();
                 mapSub?.Dispose();
                 activationSub?.Dispose();
                 if (registeredViewModels != null)
@@ -185,6 +197,7 @@ namespace WDE.MapRenderer
                     {
                         gameContext.SetMap((int)map!.Id);
                     });
+                vm.ToolBars = moduleManager.ToolBars;
             }
 
             public void Update(float delta)
@@ -311,7 +324,6 @@ Tris: " + stats.TrianglesDrawn;
                 currentGame?.DoDispose();
                 if (currentGame != null)
                     currentGame.OnAfterDisposed += CurrentGameOnOnAfterDisposed;
-                currentGame = null;
                 state = 2;
                 return false;
             }
@@ -326,6 +338,7 @@ Tris: " + stats.TrianglesDrawn;
             mainThread.Delay(() =>
             {
                 Visibility = false;
+                CurrentGame = null;
             }, TimeSpan.FromMilliseconds(10));
         }
 

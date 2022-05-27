@@ -177,7 +177,7 @@ namespace WDE.MVVM
             }
         }
         
-        public void Dispose()
+        public virtual void Dispose()
         {
             if (disposed)
                 return;

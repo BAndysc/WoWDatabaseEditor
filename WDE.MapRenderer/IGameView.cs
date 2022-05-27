@@ -18,6 +18,7 @@ namespace WDE.MapRenderer
     public interface IGameModule : System.IDisposable
     {
         object? ViewModel { get; }
+        object? ToolBar => null;
         void Initialize();
         void Update(float delta);
         void Render() { }

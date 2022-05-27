@@ -11,6 +11,19 @@
         <TextBlock Margin="0,0,10,0" VerticalAlignment="Center">Map:</TextBlock>
         <ComboBox Items="{CompiledBinding Maps}" SelectedItem="{CompiledBinding SelectedMap, Mode=TwoWay}" />
         <ToolbarSpacer />
+            <ItemsPresenter Items="{CompiledBinding ToolBars}">
+                <ItemsPresenter.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal"></StackPanel>
+                    </ItemsPanelTemplate>
+                </ItemsPresenter.ItemsPanel>
+                <ItemsPresenter.ItemTemplate>
+                    <DataTemplate>
+                        <ContentPresenter HorizontalAlignment="Left" DataContext="{Binding .}" Content="{Binding}" ContentTemplate="{x:Static utils:ToolbarDataTemplate.Template}" />
+                    </DataTemplate>
+                </ItemsPresenter.ItemTemplate>
+            </ItemsPresenter>
+        <ToolbarSpacer />
         <ToggleButton ToolTip.Tip="Toggle areatriggers visibility" IsChecked="{CompiledBinding ShowAreaTriggers, Mode=TwoWay}">
             <WdeImage ImageUri="Icons/icon_areatrigger.png" />
         </ToggleButton>
