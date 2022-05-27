@@ -225,6 +225,12 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                         .Set("ScriptName", "SmartAreaTriggerAI")
                         .Update();
                     break;
+                case SmartScriptType.Scene:
+                    query.Table("scene_template")
+                        .Where(r => r.Column<int>("SceneId") == r.Variable<int>("ENTRY"))
+                        .Set("ScriptName", "SmartScene")
+                        .Update();
+                    break;
             }
         }
 

@@ -28,7 +28,8 @@ namespace WDE.Trinity
             SmartScriptType.AreaTrigger,
             SmartScriptType.TimedActionList,
             SmartScriptType.AreaTriggerEntity,
-            SmartScriptType.AreaTriggerEntityServerSide
+            SmartScriptType.AreaTriggerEntityServerSide,
+            SmartScriptType.Scene
         };
 
         public string TableName => "smart_scripts";

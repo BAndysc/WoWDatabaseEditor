@@ -116,6 +116,7 @@ namespace WDE.DbcStore
         public Dictionary<long, string> GameObjectDisplayInfoStore {get; internal set; } = new();
         public Dictionary<long, string> MapDirectoryStore { get; internal set;} = new();
         public Dictionary<long, string> QuestSortStore { get; internal set;} = new();
+        public Dictionary<long, string> SceneStore { get; internal set; } = new();
         
         internal void Load()
         {            
@@ -183,6 +184,8 @@ namespace WDE.DbcStore
             public Dictionary<long, string> AchievementCriteriaStore { get; internal set;} = new();
             public Dictionary<long, string> ItemDbcStore { get; internal set;} = new(); // item.dbc, not item-sparse.dbc
             
+            public Dictionary<long, string> SceneStore { get; internal set;} = new();
+
             public string Name => "DBC Loading";
             public bool WaitForOtherTasks => false;
             private DatabaseClientFileOpener opener;
@@ -319,6 +322,7 @@ namespace WDE.DbcStore
                 store.GameObjectDisplayInfoStore = GameObjectDisplayInfoStore;
                 store.MapDirectoryStore = MapDirectoryStore;
                 store.QuestSortStore = QuestSortStore;
+                store.SceneStore = SceneStore;
                 
                 parameterFactory.Register("AchievementParameter", new DbcParameter(AchievementStore), QuickAccessMode.Full);
                 parameterFactory.Register("MovieParameter", new DbcParameter(MovieStore), QuickAccessMode.Limited);
@@ -360,7 +364,8 @@ namespace WDE.DbcStore
                 parameterFactory.Register("BattlegroundParameter", new DbcParameter(BattlegroundStore));
                 parameterFactory.Register("AchievementCriteriaParameter", new DbcParameter(AchievementCriteriaStore));
                 parameterFactory.Register("ItemVisualParameter", new DbcParameter(ItemDbcStore));
-                
+                parameterFactory.Register("SceneScriptPackage", new DbcParameter(SceneStore));
+
                 switch (dbcSettingsProvider.GetSettings().DBCVersion)
                 {
                     case DBCVersions.WOTLK_12340:
@@ -598,6 +603,7 @@ namespace WDE.DbcStore
                         Load("Map.db2", "MapName_lang", MapDirectoryStore);
                         Load("Faction.db2", "Name_lang", FactionStore);
                         Load("FactionTemplate.db2", "Faction", FactionTemplateStore);
+                        Load("SceneScriptPackage.db2", "Name", SceneStore);
                         Load("SpellFocusObject.db2", "Name_lang", SpellFocusObjectStore);
                         Load("QuestInfo.db2", "InfoName_lang", QuestInfoStore);
                         Load("CharTitles.db2", "Name_lang", CharTitleStore);
