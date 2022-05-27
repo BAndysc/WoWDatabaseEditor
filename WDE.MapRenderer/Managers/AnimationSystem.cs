@@ -53,13 +53,13 @@ public class AnimationSystem
     {
         if (track.Length <= IDX)
             return def;
-        ref readonly var values = ref track.GetValues(IDX);
+        ref readonly var values = ref track.Values(IDX);
         if (values.Length == 0)
             return def;
         if (values.Length == 1)
             return values[0];
             
-        ref readonly var timestamps = ref track.GetTimestamps(IDX);
+        ref readonly var timestamps = ref track.Timestamps(IDX);
         
         int firstIndexGreaterThan = FirstIndexGreaterThan(in timestamps, (uint)t);
         if (firstIndexGreaterThan == 0)
@@ -97,13 +97,13 @@ public class AnimationSystem
     {
         if (track.Length <= IDX)
             return def;
-        ref readonly var values = ref track.GetValues(IDX);
+        ref readonly var values = ref track.Values(IDX);
         if (values.Length == 0)
             return def;
         if (values.Length == 1)
             return values[0].Value;
 
-        ref readonly var timestamps = ref track.GetTimestamps(IDX);
+        ref readonly var timestamps = ref track.Timestamps(IDX);
         
         int firstIndexGreaterThan = FirstIndexGreaterThan(in timestamps, (uint)t);
         if (firstIndexGreaterThan == 0)
@@ -212,6 +212,8 @@ public class AnimationSystem
                         animationData._length = animationData.Model.sequences[lookup.Value].duration;
                         animationData._currentAnimation = animationData.SetNewAnimation;
                         animationData._time = 0;
+                        
+                        animationData.Model.bones.LoadAnimation(animationData._animInternalIndex);
 
                         var bounds = animationData.Model.sequences[lookup.Value].bounds;
                         var bb = new BoundingBox(bounds.extent.min, bounds.extent.max);

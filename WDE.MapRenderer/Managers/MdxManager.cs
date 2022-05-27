@@ -80,23 +80,25 @@ namespace WDE.MapRenderer.Managers
                     if (model.bones.Length == 0)
                         return false;
 
+                    model.bones.LoadAnimation(0);
+
                     bool anyHas = false;
-                    foreach (var b in model.bones)
+                    for (int boneIndex = 0; boneIndex < model.bones.Length; ++boneIndex)
                     {
-                        if (b.translation.Length > 0 &&
-                            b.translation.GetTimestamps(0).Length > 0)
+                        if (model.bones[boneIndex].translation.Length > 0 &&
+                            model.bones[boneIndex].translation.Timestamps(0).Length > 0)
                         {
                             anyHas  = true;
                             break;
                         }
-                        if (b.rotation.Length > 0 &&
-                            b.rotation.GetTimestamps(0).Length > 0)
+                        if (model.bones[boneIndex].rotation.Length > 0 &&
+                            model.bones[boneIndex].rotation.Timestamps(0).Length > 0)
                         {
                             anyHas  = true;
                             break;
                         }
-                        if (b.scale.Length > 0 &&
-                            b.scale.GetTimestamps(0).Length > 0)
+                        if (model.bones[boneIndex].scale.Length > 0 &&
+                            model.bones[boneIndex].scale.Timestamps(0).Length > 0)
                         {
                             anyHas  = true;
                             break;

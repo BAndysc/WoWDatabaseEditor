@@ -21,22 +21,22 @@ namespace WDE.MpqReader.Structures
     {
         public uint magic { get; init; }                                       // "MD20". Legion uses a chunked file format starting with MD21.
         public uint version { get; init; }
-        public M2Array<char> name { get; init; }                                   // should be globally unique, used to reload by name in internal clients
+        // public M2Array<char> name { get; init; }                                   // should be globally unique, used to reload by name in internal clients
         public M2Flags global_flags { get; init; }
-/*0x014*/  public readonly M2Array<uint> global_loops;                        // Timestamps used in global looping animations.
+/*0x014*/  //public readonly M2Array<uint> global_loops;                        // Timestamps used in global looping animations.
 /*0x01C*/  public readonly M2Array<M2Sequence> sequences;                       // Information about the animations in the model.
 /*0x024*/  public readonly M2Array<short> sequenceIdToAnimationId;               // Mapping of sequence IDs to the entries in the Animation sequences block.
-/*0x02C*/  public readonly M2Array<M2CompBone> bones;                           // MAX_BONES = 0x100 => Creature\SlimeGiant\GiantSlime.M2 has 312 bones (Wrath)
+/*0x02C*/  public readonly M2CompBoneArray bones;                           // MAX_BONES = 0x100 => Creature\SlimeGiant\GiantSlime.M2 has 312 bones (Wrath)
 /*0x034*/  public readonly M2Array<ushort> boneIndicesById;                   //Lookup table for key skeletal bones. (alt. name: key_bone_lookup)
 /*0x03C*/  public readonly M2Array<M2Vertex> vertices;
 /*0x044*/  public readonly uint num_skin_profiles;                           // Views (LOD) are now in .skins.
 /*0x048*/  public readonly M2Array<M2Color> colors;                             // Color and alpha animations definitions.
 /*0x050*/  public readonly M2Array<M2Texture> textures;
 /*0x058*/  public readonly M2Array<M2TextureWeight> textureWeights;            // Transparency of textures.
-/*0x060*/  public readonly M2Array<M2TextureTransform> texture_transforms;
+/*0x060*/  //public readonly M2Array<M2TextureTransform> texture_transforms;
 /*0x068*/  public readonly M2Array<ushort> textureIndicesById;                // (alt. name: replacable_texture_lookup)
 /*0x070*/  public readonly M2Array<M2Material> materials;                       // Blending modes / render flags.
-/*0x078*/  public readonly M2Array<ushort> boneCombos;                        // (alt. name: bone_lookup_table)
+/*0x078*/  // public readonly M2Array<ushort> boneCombos;                        // (alt. name: bone_lookup_table)
 /*0x080*/  public readonly M2Array<short> textureLookupTable;                     // (alt. name: texture_lookup_table)
 /*0x088*/  public readonly M2Array<ushort> textureUnitLookupTable;           // (alt. name: tex_unit_lookup_table)
 /*0x090*/  public readonly M2Array<ushort> textureTransparencyLookupTable;               // (alt. name: transparency_lookup_table)
@@ -88,9 +88,9 @@ namespace WDE.MpqReader.Structures
         {
             magic = reader.ReadUInt32();
             version = reader.ReadUInt32();
-            name = reader.ReadArray(r => (char)r.ReadByte());
+            reader.SkipM2Array(); // name = reader.ReadArray(r => (char)r.ReadByte());
             global_flags = (M2Flags)reader.ReadUInt32();
-            global_loops = reader.ReadArrayUInt32();
+            reader.SkipM2Array(); // global_loops = reader.ReadArrayUInt32();
             sequences = reader.ReadArray(r => new M2Sequence(r));
             sequenceIdToAnimationId = reader.ReadArrayInt16();
             Func<int, IBinaryReader?> openAnimFile = (idx) =>
@@ -102,17 +102,17 @@ namespace WDE.MpqReader.Structures
                 var contentReader = opener(animPath);
                 return contentReader;
             };
-            bones = reader.ReadArray(r => new M2CompBone(r, sequences, openAnimFile));
+            bones = new M2CompBoneArray(reader, in sequences, openAnimFile);
             boneIndicesById = reader.ReadArrayUInt16();
             vertices = reader.ReadArray(M2Vertex.Read);
             num_skin_profiles = reader.ReadUInt32();
             colors = reader.ReadArray(r => new M2Color(r));
             textures = reader.ReadArray(M2Texture.Read);
             textureWeights = reader.ReadArray(M2TextureWeight.Read);
-            texture_transforms = reader.ReadArray(M2TextureTransform.Read);
+            reader.SkipM2Array(); // texture_transforms = reader.ReadArray(M2TextureTransform.Read);
             textureIndicesById = reader.ReadArrayUInt16();
             materials = reader.ReadArray(M2Material.Read);
-            boneCombos = reader.ReadArrayUInt16();
+            reader.SkipM2Array(); //boneCombos = reader.ReadArrayUInt16();
             textureLookupTable = reader.ReadArrayInt16();
             textureUnitLookupTable = reader.ReadArrayUInt16();
             textureTransparencyLookupTable = reader.ReadArrayUInt16();
@@ -759,16 +759,16 @@ namespace WDE.MpqReader.Structures
         public MutableM2Track<Vector3> scale;
         public Vector3 pivot;                 // The pivot point of that bone.
         
-        public M2CompBone(IBinaryReader reader, in M2Array<M2Sequence> sequences, Func<int, IBinaryReader?> externalAnimOpener)
+        public M2CompBone(IBinaryReader reader, BitArray embeddedValues)
         {
             key_bone_id = reader.ReadInt32();
             flags = (M2CompBoneFlag)reader.ReadInt32();
             parent_bone = reader.ReadInt16();
             submesh_id = reader.ReadUInt16();
             boneNameCRC = reader.ReadInt32();
-            translation = MutableM2Track<Vector3>.Read(externalAnimOpener, reader, sequences, r => r.ReadVector3());
-            rotation = MutableM2Track<M2CompQuat>.Read(externalAnimOpener, reader, sequences, r => M2CompQuat.Read(r));
-            scale = MutableM2Track<Vector3>.Read(externalAnimOpener, reader, sequences, r => r.ReadVector3());
+            translation = MutableM2Track<Vector3>.Read(reader, embeddedValues, r => r.ReadVector3());
+            rotation = MutableM2Track<M2CompQuat>.Read(reader, embeddedValues, M2CompQuat.Read);
+            scale = MutableM2Track<Vector3>.Read(reader, embeddedValues, r => r.ReadVector3());
             pivot = reader.ReadVector3();
         }
     }
@@ -1119,63 +1119,36 @@ namespace WDE.MpqReader.Structures
         public ushort global_sequence { get; init; }
         private MutableM2Array<MutableM2Array<uint>> timestamps;
         private MutableM2Array<MutableM2Array<T>> values;
-        private Func<int, IBinaryReader?> externalAnimOpener;
-        private Func<IBinaryReader, T> reader;
-        public BitArray loadedValues;
         public int Length => values.Length;
 
-        public ref readonly MutableM2Array<uint> GetTimestamps(int idx)
+        public ref MutableM2Array<uint> Timestamps(int idx)
         {
-#if DEBUG
-            if (!loadedValues[idx])
-            {
-                throw new Exception("Call GetValues first, before GetTimestamps");
-            }
-#endif
             return ref timestamps[idx];
         }
 
-        public ref readonly MutableM2Array<T> GetValues(int idx)
+        public ref MutableM2Array<T> Values(int idx)
         {
-            if (!loadedValues[idx])
-            {
-                var opener = externalAnimOpener(idx);
-                if (opener == null)
-                {
-                    timestamps[idx] = new MutableM2Array<uint>(0, 0, Array.Empty<uint>());
-                    values[idx] = new MutableM2Array<T>(0, 0, Array.Empty<T>());
-                }
-                else
-                {
-                    timestamps[idx] = opener.ReadMutableArrayContent(timestamps[idx].Length, timestamps[idx].Offset, r => r.ReadUInt32());
-                    values[idx] = opener.ReadMutableArrayContent<T>(values[idx].Length, values[idx].Offset, reader);
-                }
-                loadedValues[idx] = true;
-            }
             return ref values[idx];
         }
         
-        public static MutableM2Track<T> Read(Func<int, IBinaryReader?> externalAnimOpener, IBinaryReader reader, M2Array<M2Sequence> sequences, Func<IBinaryReader, T> read)
+        public static MutableM2Track<T> Read(IBinaryReader reader, BitArray embeddedValues, Func<IBinaryReader, T> read)
         {
             var interpolation_type = reader.ReadUInt16();
             var global_sequence = reader.ReadUInt16();
-            var loadedValues = new BitArray(sequences.Length);
             var timestamps = reader.ReadMutableArrayDataFromSeparateReader(reader, (idx, r) =>
             {
-                if (sequences[idx].flags.HasFlagFast(M2SequenceFlags.HasEmbeddedAnimationData))
+                if (embeddedValues[idx])
                 {
-                    loadedValues[idx] = true;
                     return r.ReadMutableArray(r2 => r2.ReadUInt32());
                 }
                 else
                 {
-                    loadedValues[idx] = false;
                     return new MutableM2Array<uint>(r.ReadInt32(), r.ReadInt32(), null);
                 }
             });
             var values = reader.ReadMutableArrayDataFromSeparateReader(reader, (idx, r) =>
             {
-                if (sequences[idx].flags.HasFlagFast(M2SequenceFlags.HasEmbeddedAnimationData))
+                if (embeddedValues[idx])
                     return r.ReadMutableArray(read);
                 else
                     return new MutableM2Array<T>(r.ReadInt32(), r.ReadInt32(), null);
@@ -1185,10 +1158,7 @@ namespace WDE.MpqReader.Structures
                 interpolation_type = interpolation_type,
                 global_sequence = global_sequence,
                 timestamps = timestamps,
-                values = values,
-                loadedValues = loadedValues,
-                externalAnimOpener = externalAnimOpener,
-                reader = read
+                values = values
             };
         }
     }
@@ -1304,7 +1274,15 @@ namespace WDE.MpqReader.Structures
         public int Offset => offset;
 
         public ref T this[int i] => ref array![i];
-
+        
+        public void LoadContent(IBinaryReader reader, Func<IBinaryReader, T> read)
+        {
+            reader.Offset = offset;
+            array = new T[size];
+            for (int i = 0; i < size; ++i)
+                array[i] = read(reader);
+        }
+        
         public IEnumerator<T> GetEnumerator()
         {
             foreach (var e in array)
