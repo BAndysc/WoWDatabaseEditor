@@ -1,6 +1,7 @@
 using System;
 using OpenTK.Graphics.OpenGL4;
 using ActiveUniformType = OpenGLBindings.ActiveUniformType;
+using BlendEquationMode = OpenGLBindings.BlendEquationMode;
 using BlendingFactorDest = OpenGLBindings.BlendingFactorDest;
 using BlendingFactorSrc = OpenGLBindings.BlendingFactorSrc;
 using BufferRangeTarget = OpenGLBindings.BufferRangeTarget;
@@ -319,6 +320,11 @@ namespace TheAvaloniaOpenGL
             return str;
         }
 
+        public void BlendEquation(BlendEquationMode mode)
+        {
+            GL.BlendEquation((OpenTK.Graphics.OpenGL4.BlendEquationMode)mode);
+        }
+
         public int CreateProgram()
         {
             return GL.CreateProgram();
@@ -342,6 +348,11 @@ namespace TheAvaloniaOpenGL
         public void BlendFunc(BlendingFactorSrc src, BlendingFactorDest dst)
         {
             GL.BlendFunc((BlendingFactor)src, (BlendingFactor)dst);
+        }
+
+        public void BlendFuncSeparate(BlendingFactorSrc srcRGB, BlendingFactorDest dstRGB, BlendingFactorSrc srcAlpha, BlendingFactorDest dstAlpha)
+        {
+            GL.BlendFuncSeparate((OpenTK.Graphics.OpenGL4.BlendingFactorSrc)srcRGB, (OpenTK.Graphics.OpenGL4.BlendingFactorDest)dstRGB, (OpenTK.Graphics.OpenGL4.BlendingFactorSrc)srcAlpha, (OpenTK.Graphics.OpenGL4.BlendingFactorDest)dstAlpha);
         }
 
         public unsafe string CompileShaderAndGetError(int shader, string source)

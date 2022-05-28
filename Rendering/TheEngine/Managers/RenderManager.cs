@@ -361,6 +361,7 @@ namespace TheEngine.Managers
 
             objectBuffer.Activate(Constants.OBJECT_BUFFER_INDEX);
             engine.Device.device.CheckError("Before render all");
+            engine.Device.device.BlendEquation(BlendEquationMode.FuncAdd);
         }
 
         private bool useDynamicScale = false;

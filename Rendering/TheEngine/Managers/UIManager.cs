@@ -59,7 +59,7 @@ namespace TheEngine.Managers
 
             material = engine.MaterialManager.CreateMaterial(textShader, null);
             material.BlendingEnabled = true;
-            material.SourceBlending = Blending.SrcAlpha;
+            material.SourceBlending = Blending.One;
             material.DestinationBlending = Blending.OneMinusSrcAlpha;
             material.Culling = CullingMode.Off;
             material.ZWrite = false;

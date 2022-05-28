@@ -308,6 +308,19 @@ namespace TheAvaloniaOpenGL
             Report($"GetProgramInfoLog");
             return device.GetProgramInfoLog(program, maxLength);
         }
+
+        public void BlendEquation(BlendEquationMode mode)
+        {
+            Report($"BlendEquation({mode})");
+            device.BlendEquation(mode);
+        }
+
+        public void BlendFuncSeparate(BlendingFactorSrc srcRGB, BlendingFactorDest dstRGB, BlendingFactorSrc srcAlpha, BlendingFactorDest dstAlpha)
+        {
+            Report($"BlendFuncSeparate({srcRGB}, {dstRGB}, {srcAlpha}, {dstAlpha})");
+            device.BlendFuncSeparate(srcRGB, dstRGB, srcAlpha, dstAlpha);
+        }
+
         public int CreateProgram()
         {
             Report($"CreateProgram");

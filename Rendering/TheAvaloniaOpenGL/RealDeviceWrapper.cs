@@ -248,6 +248,17 @@ namespace TheAvaloniaOpenGL
         {
             return device.GetProgramInfoLog(program, maxLength);
         }
+
+        public void BlendEquation(BlendEquationMode mode)
+        { 
+            device.BlendEquation(mode);
+        }
+
+        public void BlendFuncSeparate(BlendingFactorSrc srcRGB, BlendingFactorDest dstRGB, BlendingFactorSrc srcAlpha, BlendingFactorDest dstAlpha)
+        {
+            device.BlendFuncSeparate(srcRGB, dstRGB, srcAlpha, dstAlpha);
+        }
+
         public int CreateProgram()
         {
             return device.CreateProgram();
