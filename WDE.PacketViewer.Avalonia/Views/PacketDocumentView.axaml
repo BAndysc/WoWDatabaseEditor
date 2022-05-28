@@ -167,9 +167,9 @@
                                 </Style>
                                 <Style Selector="ListBoxItem" x:DataType="viewModels:PacketViewModel">
                                     <Setter Property="Background" Value="{CompiledBinding Entry, Converter={StaticResource EntryToNiceBackgroundConverter}}" />
-                                    <Setter Property="ContextFlyout">
+                                    <Setter Property="ContextMenu">
                                         <Setter.Value>
-                                            <MenuFlyout>
+                                            <ContextMenu>
                                                 <MenuItem Header="Exclude entry" CommandParameter="{CompiledBinding .}" Command="{Binding #Root.DataContext.ExcludeEntryCommand}" />
                                                 <MenuItem Header="Include entry" CommandParameter="{CompiledBinding .}" Command="{Binding #Root.DataContext.IncludeEntryCommand}" />
                                                 <MenuItem Header="-" />
@@ -180,7 +180,7 @@
                                                 <MenuItem Header="Include opcode" CommandParameter="{CompiledBinding .}" Command="{Binding #Root.DataContext.IncludeOpcodeCommand}" />
                                                 <MenuItem Header="-" />
                                                 <MenuItem Header="Find related packets" Command="{Binding #Root.DataContext.FindRelatedPacketsCommands}" />
-                                            </MenuFlyout>
+                                            </ContextMenu>
                                         </Setter.Value>
                                     </Setter>
                                 </Style>

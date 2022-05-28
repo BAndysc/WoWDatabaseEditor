@@ -1,7 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
-using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 using TheEngine;
@@ -17,13 +16,8 @@ namespace WDE.MapRenderer
         {
             InitializeComponent();
             enginePanel = this.FindControl<TheEnginePanel>("TheEnginePanel");
-            enginePanel.ContextMenu!.MenuClosed += ContextMenuOnMenuClosed;
         }
 
-        private void ContextMenuOnMenuClosed(object? sender, RoutedEventArgs e)
-        {
-            enginePanel.ContextMenu!.Items = Array.Empty<MenuItem>();
-        }
 
         private void InitializeComponent()
         {
@@ -36,6 +30,14 @@ namespace WDE.MapRenderer
             {
                 this.FindControl<TheEnginePanel>("TheEnginePanel").Focus();
             }, TimeSpan.FromMilliseconds(1));
+            enginePanel.ContextMenu = new ContextMenu();
+        }
+
+        protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+        {
+            base.OnDetachedFromVisualTree(e);
+            // workaround for https://github.com/AvaloniaUI/Avalonia/issues/8214 (confirmed)
+            enginePanel.ContextMenu = null;
         }
 
         private void InputElement_OnPointerPressed(object? sender, PointerPressedEventArgs e)
@@ -53,12 +55,13 @@ namespace WDE.MapRenderer
                 var items = ((GameViewModel)DataContext!).CurrentGame!.GenerateContextMenu();
                 if (items == null)
                     e.Handled = true;
-                else
+                else if (enginePanel.ContextMenu != null)
                 {
-                    enginePanel.ContextMenu!.Items = items.Select(i =>
+                    enginePanel.ContextMenu.Items = items.Select(i =>
                     {
                         if (i.Item1 == "-")
                             return (object)new Separator();
+
                         return new MenuItem()
                         {
                             Header = i.Item1,

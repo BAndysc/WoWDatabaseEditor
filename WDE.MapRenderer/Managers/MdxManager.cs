@@ -116,6 +116,9 @@ namespace WDE.MapRenderer.Managers
             }
         }
 
+        private Dictionary<string, (M2, M2Skin)?> m2s = new();
+        private Dictionary<string, Task<(M2, M2Skin)?>> m2sCurrentlyLoaded = new();
+        
         private Dictionary<string, MdxInstance?> meshes = new();
         private Dictionary<string, Task<MdxInstance?>> meshesCurrentlyLoaded = new();
         private Dictionary<uint, MdxInstance?> creaturemeshes = new();
@@ -256,31 +259,23 @@ namespace WDE.MapRenderer.Managers
                 result.SetResult(null);
                 yield break;
             }
-            
-            var m2FilePath = modelData.ModelName.Replace("mdx", "M2", StringComparison.InvariantCultureIgnoreCase);
-            m2FilePath = m2FilePath.Replace("mdl", "M2", StringComparison.InvariantCultureIgnoreCase); // apaprently there are still some MDL models
 
-            var skinFilePath = m2FilePath.Replace(".m2", "00.skin", StringComparison.InvariantCultureIgnoreCase);
-            var file = gameFiles.ReadFile(m2FilePath);
+            var m2FilePath = modelData.ModelName;
+            TaskCompletionSource<(M2, M2Skin)?> m2File = new();
+            yield return LoadM2File(m2FilePath, m2File);
 
-            yield return new WaitForTask(file);
-
-            var skinFile = gameFiles.ReadFile(skinFilePath);
-            
-            yield return new WaitForTask(skinFile);
-
-            if (file.Result == null || skinFile.Result == null)
+            if (!m2File.Task.Result.HasValue)
             {
-                Console.WriteLine("Cannot find model " + displayid);
+                Console.WriteLine("Cannot find model " + displayid + " (" + m2FilePath + ")");
                 creaturemeshes[displayid] = null;
                 completion.SetResult(null);
                 creatureMeshesCurrentlyLoaded.Remove(displayid);
                 result.SetResult(null);
                 yield break;
             }
-            
-            M2 m2 = null!;
-            M2Skin skin = new();
+
+            M2 m2 = m2File.Task.Result.Value.Item1;
+            M2Skin skin = m2File.Task.Result.Value.Item2;
             Vector3[] vertices = null!;
             Vector3[] normals = null!;
             Vector2[] uv1 = null!;
@@ -290,17 +285,6 @@ namespace WDE.MapRenderer.Managers
             
             yield return new WaitForTask(Task.Run(() =>
             {
-                m2 = M2.Read(new MemoryBinaryReader(file.Result), m2FilePath, p =>
-                {
-                    // TODO: can I use ReadFileSync? Can be problematic...
-                    var bytes = gameFiles.ReadFileSyncLocked(p, true);
-                    if (bytes == null)
-                        return null;
-                    return new MemoryBinaryReader(bytes);
-                });
-                file.Result.Dispose();
-                skin = new M2Skin(new MemoryBinaryReader(skinFile.Result));
-                skinFile.Result.Dispose();
                 var count = m2.vertices.Length;
                 vertices = new Vector3[count];
                 normals = new Vector3[count];
@@ -919,19 +903,10 @@ namespace WDE.MapRenderer.Managers
             var m2FilePath = folderPath + model;
             var texturePath = folderPath + texture + ".blp";
             
-            m2FilePath = m2FilePath.Replace("mdx", "M2", StringComparison.InvariantCultureIgnoreCase);
-            m2FilePath = m2FilePath.Replace("mdl", "M2", StringComparison.InvariantCultureIgnoreCase); // apaprently there are still some MDL models
-            
-            var skinFilePath = m2FilePath.Replace(".m2", "00.skin", StringComparison.InvariantCultureIgnoreCase);
-            var file = gameFiles.ReadFile(m2FilePath);
+            TaskCompletionSource<(M2, M2Skin)?> m2File = new();
+            yield return LoadM2File(m2FilePath, m2File);
 
-            yield return new WaitForTask(file);
-
-            var skinFile = gameFiles.ReadFile(skinFilePath);
-            
-            yield return new WaitForTask(skinFile);
-            
-            if (file.Result == null || skinFile.Result == null)
+            if (!m2File.Task.Result.HasValue)
             {
                 Console.WriteLine("Cannot find model " + m2FilePath);
                 itemMeshes[(displayid, right, raceGenderKey)] = null;
@@ -941,8 +916,9 @@ namespace WDE.MapRenderer.Managers
                 yield break;
             }
 
-            M2 m2 = null!;
-            M2Skin skin = new();
+            M2 m2 = m2File.Task.Result.Value.Item1;
+            M2Skin skin = m2File.Task.Result.Value.Item2;
+            
             Vector3[] vertices = null!;
             Vector3[] normals = null!;
             Vector2[] uv1 = null!;
@@ -952,17 +928,6 @@ namespace WDE.MapRenderer.Managers
 
             yield return new WaitForTask(Task.Run(() =>
             {
-                m2 = M2.Read(new MemoryBinaryReader(file.Result), m2FilePath, p =>
-                {
-                    // TODO: can I use ReadFileSync? Can be problematic...
-                    var bytes = gameFiles.ReadFileSyncLocked(p, true);
-                    if (bytes == null)
-                        return null;
-                    return new MemoryBinaryReader(bytes);
-                });
-                file.Result.Dispose();
-                skin = new M2Skin(new MemoryBinaryReader(skinFile.Result));
-                skinFile.Result.Dispose();
                 var count = m2.vertices.Length;
                 vertices = new Vector3[count];
                 normals = new Vector3[count];
@@ -1113,19 +1078,13 @@ namespace WDE.MapRenderer.Managers
                 result.SetResult(null);
                 yield break;
             }
-            
-            var m2FilePath = displayInfo.ModelName.Replace("mdx", "M2", StringComparison.InvariantCultureIgnoreCase);
-            m2FilePath = m2FilePath.Replace("mdl", "M2", StringComparison.InvariantCultureIgnoreCase); // apparently there are still some MDL models	
-            var skinFilePath = m2FilePath.Replace(".m2", "00.skin", StringComparison.InvariantCultureIgnoreCase);
-            var file = gameFiles.ReadFile(m2FilePath);
 
-            yield return new WaitForTask(file);
+            var m2FilePath = displayInfo.ModelName;
+            
+            TaskCompletionSource<(M2, M2Skin)?> m2File = new();
+            yield return LoadM2File(m2FilePath, m2File);
 
-            var skinFile = gameFiles.ReadFile(skinFilePath);
-            
-            yield return new WaitForTask(skinFile);
-            
-            if (file.Result == null || skinFile.Result == null)
+            if (!m2File.Task.Result.HasValue)
             {
                 Console.WriteLine("Cannot find path " + displayInfo.ModelName);
                 gameObjectmeshes[gameObjectDisplayId] = null;
@@ -1135,8 +1094,8 @@ namespace WDE.MapRenderer.Managers
                 yield break;
             }
 
-            M2 m2 = null!;
-            M2Skin skin = new();
+            M2 m2 = m2File.Task.Result.Value.Item1;
+            M2Skin skin = m2File.Task.Result.Value.Item2;
             Vector3[] vertices = null!;
             Vector3[] normals = null!;
             Vector2[] uv1 = null!;
@@ -1146,17 +1105,6 @@ namespace WDE.MapRenderer.Managers
 
             yield return new WaitForTask(Task.Run(() =>
             {
-                m2 = M2.Read(new MemoryBinaryReader(file.Result), m2FilePath, p =>
-                {
-                    // TODO: can I use ReadFileSync? Can be problematic...
-                    var bytes = gameFiles.ReadFileSyncLocked(p, true);
-                    if (bytes == null)
-                        return null;
-                    return new MemoryBinaryReader(bytes);
-                });
-                file.Result.Dispose();
-                skin = new M2Skin(new MemoryBinaryReader(skinFile.Result));
-                skinFile.Result.Dispose();
                 var count = m2.vertices.Length;
                 vertices = new Vector3[count];
                 normals = new Vector3[count];
@@ -1278,18 +1226,12 @@ namespace WDE.MapRenderer.Managers
             var completion = new TaskCompletionSource<MdxInstance?>();
             meshesCurrentlyLoaded[path] = completion.Task;
 
-            var m2FilePath = path.Replace("mdx", "M2", StringComparison.InvariantCultureIgnoreCase);
-            m2FilePath = m2FilePath.Replace("mdl", "M2", StringComparison.InvariantCultureIgnoreCase); // apparently there are still some MDL models	
-            var skinFilePath = m2FilePath.Replace(".m2", "00.skin", StringComparison.InvariantCultureIgnoreCase);
-            var file = gameFiles.ReadFile(m2FilePath);
-
-            yield return new WaitForTask(file);
-
-            var skinFile = gameFiles.ReadFile(skinFilePath);
+            var m2FilePath = path;
             
-            yield return new WaitForTask(skinFile);
-            
-            if (file.Result == null || skinFile.Result == null)
+            TaskCompletionSource<(M2, M2Skin)?> m2File = new();
+            yield return LoadM2File(m2FilePath, m2File);
+
+            if (!m2File.Task.Result.HasValue)
             {
                 Console.WriteLine("Cannot find model " + path);
                 meshes[path] = null;
@@ -1299,8 +1241,9 @@ namespace WDE.MapRenderer.Managers
                 yield break;
             }
 
-            M2 m2 = null!;
-            M2Skin skin = new();
+            M2 m2 = m2File.Task.Result.Value.Item1;
+            M2Skin skin = m2File.Task.Result.Value.Item2;
+            
             Vector3[] vertices = null!;
             Vector3[] normals = null!;
             Vector2[] uv1 = null!;
@@ -1310,17 +1253,6 @@ namespace WDE.MapRenderer.Managers
 
             yield return new WaitForTask(Task.Run(() =>
             {
-                m2 = M2.Read(new MemoryBinaryReader(file.Result), m2FilePath, p =>
-                {
-                    // TODO: can I use ReadFileSync? Can be problematic...
-                    var bytes = gameFiles.ReadFileSyncLocked(p, true);
-                    if (bytes == null)
-                        return null;
-                    return new MemoryBinaryReader(bytes);
-                });
-                file.Result.Dispose();
-                skin = new M2Skin(new MemoryBinaryReader(skinFile.Result));
-                skinFile.Result.Dispose();
                 var count = m2.vertices.Length;
                 vertices = new Vector3[count];
                 normals = new Vector3[count];
@@ -1422,6 +1354,70 @@ namespace WDE.MapRenderer.Managers
             completion.SetResult(null);
             meshesCurrentlyLoaded.Remove(path);
             result.SetResult(mdx);
+        }
+        
+        public IEnumerator LoadM2File(string path, TaskCompletionSource<(M2, M2Skin)?> result)
+        {          
+            path = path.Replace("mdx", "M2", StringComparison.InvariantCultureIgnoreCase);
+            path = path.Replace("mdl", "M2", StringComparison.InvariantCultureIgnoreCase); // apparently there are still some MDL models	
+            
+            if (m2s.ContainsKey(path))
+            {
+                result.SetResult(m2s[path]);
+                yield break;
+            }
+
+            if (m2sCurrentlyLoaded.TryGetValue(path, out var loadInProgress))
+            {
+                yield return new WaitForTask(loadInProgress);
+                result.SetResult(m2s[path]);
+                yield break;
+            }
+
+            var completion = new TaskCompletionSource<(M2, M2Skin)?>();
+            m2sCurrentlyLoaded[path] = completion.Task;
+
+            var skinFilePath = path.Replace(".m2", "00.skin", StringComparison.InvariantCultureIgnoreCase);
+            var file = gameFiles.ReadFile(path);
+
+            yield return new WaitForTask(file);
+
+            var skinFile = gameFiles.ReadFile(skinFilePath);
+            
+            yield return new WaitForTask(skinFile);
+            
+            if (file.Result == null || skinFile.Result == null)
+            {
+                Console.WriteLine("Cannot find model " + path);
+                meshes[path] = null;
+                completion.SetResult(null);
+                meshesCurrentlyLoaded.Remove(path);
+                result.SetResult(null);
+                yield break;
+            }
+
+            M2 m2 = null!;
+            M2Skin skin = new();
+            
+            yield return new WaitForTask(Task.Run(() =>
+            {
+                m2 = M2.Read(new MemoryBinaryReader(file.Result), path, p =>
+                {
+                    // TODO: can I use ReadFileSync? Can be problematic...
+                    var bytes = gameFiles.ReadFileSyncLocked(p, true);
+                    if (bytes == null)
+                        return null;
+                    return new MemoryBinaryReader(bytes);
+                });
+                file.Result.Dispose();
+                skin = new M2Skin(new MemoryBinaryReader(skinFile.Result));
+                skinFile.Result.Dispose();
+            }));
+            
+            m2s.Add(path, (m2, skin));
+            completion.SetResult(null);
+            m2sCurrentlyLoaded.Remove(path);
+            result.SetResult((m2, skin));
         }
         
         public void RenderGUI()

@@ -24,8 +24,6 @@
                                       PointerMoved="TheEnginePanel_OnPointerMoved"
                                       ContextRequested="TheEnginePanel_OnContextRequested">
                 <theEngine:TheEnginePanel.ContextMenu>
-                    <ContextMenu>
-                    </ContextMenu>
                 </theEngine:TheEnginePanel.ContextMenu>
             </theEngine:TheEnginePanel>
             <Border Margin="100,40" IsVisible="{CompiledBinding IsMapVisible}" BorderThickness="10" BorderBrush="DarkGray">
