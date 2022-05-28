@@ -61,7 +61,7 @@ namespace WDE.MapRenderer.Managers
         public class MdxInstance
         {
             public IMesh mesh;
-            public Material[] materials;
+            public (Material material, int submesh)[] materials;
             public M2 model;
             public float scale = 1;
             private bool? hasAnimations;
@@ -109,15 +109,13 @@ namespace WDE.MapRenderer.Managers
                     return  anyHas;
                 }
             }
-
-            public void Dispose(IMeshManager meshManager)
-            {
-                meshManager.DisposeMesh(mesh);
-            }
         }
 
         private Dictionary<string, (M2, M2Skin)?> m2s = new();
         private Dictionary<string, Task<(M2, M2Skin)?>> m2sCurrentlyLoaded = new();
+        
+        private Dictionary<string, (IMesh, M2, M2Skin)?> internalMeshes = new();
+        private Dictionary<string, Task<(IMesh, M2, M2Skin)?>> internalMeshesCurrentlyLoaded = new();
         
         private Dictionary<string, MdxInstance?> meshes = new();
         private Dictionary<string, Task<MdxInstance?>> meshesCurrentlyLoaded = new();
@@ -189,15 +187,6 @@ namespace WDE.MapRenderer.Managers
             identityBonesBuffer.UpdateBuffer(AnimationSystem.IdentityBones(AnimationSystem.MAX_BONES).Span);
         }
 
-        private static float UintAsFloat(uint i)
-        {
-            unsafe
-            {
-                uint* iRef = &i;
-                return *((float*)iRef);
-            }
-        }
-
         // Sources : wowdev.wiki/DB/ItemDisplayInfo#Geoset_Group_Field_Meaning and wowdev.wiki/Character_Customization#Geosets
         private readonly int geosetSkin = 0;
         private readonly int geosetHair = 1;
@@ -261,8 +250,8 @@ namespace WDE.MapRenderer.Managers
             }
 
             var m2FilePath = modelData.ModelName;
-            TaskCompletionSource<(M2, M2Skin)?> m2File = new();
-            yield return LoadM2File(m2FilePath, m2File);
+            TaskCompletionSource<(IMesh, M2, M2Skin)?> m2File = new();
+            yield return InternalLoadM2Mesh(m2FilePath, m2File);
 
             if (!m2File.Task.Result.HasValue)
             {
@@ -274,40 +263,10 @@ namespace WDE.MapRenderer.Managers
                 yield break;
             }
 
-            M2 m2 = m2File.Task.Result.Value.Item1;
-            M2Skin skin = m2File.Task.Result.Value.Item2;
-            Vector3[] vertices = null!;
-            Vector3[] normals = null!;
-            Vector2[] uv1 = null!;
-            Vector2[] uv2 = null!;
-            Color[] boneWeights = null!;
-            Color[] boneIndices = null!;
-            
-            yield return new WaitForTask(Task.Run(() =>
-            {
-                var count = m2.vertices.Length;
-                vertices = new Vector3[count];
-                normals = new Vector3[count];
-                uv1 = new Vector2[count];
-                uv2 = new Vector2[count];
-                boneWeights = new Color[count];
-                boneIndices = new Color[count];
+            var mesh = m2File.Task.Result.Value.Item1;
+            M2 m2 = m2File.Task.Result.Value.Item2;
+            M2Skin skin = m2File.Task.Result.Value.Item3;
 
-                for (int i = 0; i < count; ++i)
-                {
-                    ref readonly var vert = ref m2.vertices[skin.Vertices[i]];
-                    vertices[i] = vert.pos;
-                    normals[i] = vert.normal;
-                    uv1[i] = vert.tex_coord1;
-                    uv2[i] = vert.tex_coord2;
-                    boneWeights[i] = vert.bone_weights;
-                    boneIndices[i] = vert.bone_indices;
-                }
-            }));
-            
-            var md = new MeshData(vertices, normals, uv1, new ushort[] { }, null, null, uv2, boneWeights, boneIndices);
-            var mesh = meshManager.CreateMesh(md);
-            mesh.SetSubmeshCount(skin.Batches.Length);
             // 1 : load items to define active geosets
             // 2 : if no item, set default geosets
             bool isCharacterModel = false;
@@ -523,7 +482,7 @@ namespace WDE.MapRenderer.Managers
                 }
             }
             
-            Material[] materials = new Material[skin.Batches.Length];
+            (Material, int)[] materials = new (Material, int)[skin.Batches.Length];
             int j = 0;
             foreach (var batch in skin.Batches)
             {
@@ -538,13 +497,13 @@ namespace WDE.MapRenderer.Managers
                 var sectionSkinSectionId = skin.SubMeshes[batch.skinSectionIndex].skinSectionId;
                 var sectionIndexCount = skin.SubMeshes[batch.skinSectionIndex].indexCount;
                 var sectionIndexStart = skin.SubMeshes[batch.skinSectionIndex].indexStart;
-
+                
                 // titi, check if element is active
                 // loading all meshes for non humanoids (crdisplayinfoextra users), might need tob e tweaked
                 if (isCharacterModel && !activeGeosets!.Contains(sectionSkinSectionId))
                     continue;
 
-                mesh.SetIndices(skin.Indices.AsSpan(sectionIndexStart, Math.Min(sectionIndexCount, skin.Indices.Length - sectionIndexStart)), j++);
+                j++;
 
                 TextureHandle? th = null;
                 TextureHandle? th2 = null;
@@ -707,7 +666,7 @@ namespace WDE.MapRenderer.Managers
 
                 var material = CreateMaterial(m2, in batch, th, th2);
 
-                materials[j - 1] = material;
+                materials[j - 1] = (material, batch.skinSectionIndex);
             }
 
             if (j == 0)
@@ -719,8 +678,6 @@ namespace WDE.MapRenderer.Managers
                 result.SetResult(null);
                 yield break;
             }
-
-            mesh.RebuildIndices();
 
             var mdx = new MdxInstance
             {
@@ -903,8 +860,8 @@ namespace WDE.MapRenderer.Managers
             var m2FilePath = folderPath + model;
             var texturePath = folderPath + texture + ".blp";
             
-            TaskCompletionSource<(M2, M2Skin)?> m2File = new();
-            yield return LoadM2File(m2FilePath, m2File);
+            TaskCompletionSource<(IMesh, M2, M2Skin)?> m2File = new();
+            yield return InternalLoadM2Mesh(m2FilePath, m2File);
 
             if (!m2File.Task.Result.HasValue)
             {
@@ -916,44 +873,11 @@ namespace WDE.MapRenderer.Managers
                 yield break;
             }
 
-            M2 m2 = m2File.Task.Result.Value.Item1;
-            M2Skin skin = m2File.Task.Result.Value.Item2;
+            var mesh = m2File.Task.Result.Value.Item1;
+            M2 m2 = m2File.Task.Result.Value.Item2;
+            M2Skin skin = m2File.Task.Result.Value.Item3;
             
-            Vector3[] vertices = null!;
-            Vector3[] normals = null!;
-            Vector2[] uv1 = null!;
-            Vector2[] uv2 = null!;
-            Color[] boneWeights = null!;
-            Color[] boneIndices = null!;
-
-            yield return new WaitForTask(Task.Run(() =>
-            {
-                var count = m2.vertices.Length;
-                vertices = new Vector3[count];
-                normals = new Vector3[count];
-                uv1 = new Vector2[count];
-                uv2 = new Vector2[count];
-                boneWeights = new Color[count];
-                boneIndices = new Color[count];
-                
-                for (int i = 0; i < count; ++i)
-                {
-                    ref readonly var vert = ref m2.vertices[skin.Vertices[i]];
-                    vertices[i] = vert.pos;
-                    normals[i] = vert.normal;
-                    uv1[i] = vert.tex_coord1;
-                    uv2[i] = vert.tex_coord2;
-                    boneWeights[i] = vert.bone_weights;
-                    boneIndices[i] = vert.bone_indices;
-                }
-            }));
-            
-            var md = new MeshData(vertices, normals, uv1, new ushort[] { }, null, null, uv2, boneWeights, boneIndices);
-            
-            var mesh = meshManager.CreateMesh(md);
-            mesh.SetSubmeshCount(skin.Batches.Length);
-
-            Material[] materials = new Material[skin.Batches.Length];
+            (Material, int)[] materials = new (Material, int)[skin.Batches.Length];
             int j = 0;
             foreach (var batch in skin.Batches)
             {
@@ -967,9 +891,9 @@ namespace WDE.MapRenderer.Managers
 
                 var sectionIndexCount = skin.SubMeshes[batch.skinSectionIndex].indexCount;
                 var sectionIndexStart = skin.SubMeshes[batch.skinSectionIndex].indexStart;
-
-                mesh.SetIndices(skin.Indices.AsSpan(sectionIndexStart, Math.Min(sectionIndexCount, skin.Indices.Length - sectionIndexStart)), j++);
                 
+                j++;
+
                 TextureHandle? th = null;
                 TextureHandle? th2 = null;
                 for (int i = 0; i < (batch.textureCount >= 5 ? 1 : batch.textureCount); ++i)
@@ -1014,7 +938,7 @@ namespace WDE.MapRenderer.Managers
                     }
                 }
 
-                materials[j - 1] = CreateMaterial(m2, in batch, th, th2);
+                materials[j - 1] = (CreateMaterial(m2, in batch, th, th2), batch.skinSectionIndex);
             }
             
             if (j == 0)
@@ -1026,8 +950,6 @@ namespace WDE.MapRenderer.Managers
                 result.SetResult(null);
                 yield break;
             }
-
-            mesh.RebuildIndices();
 
             var mdx = new MdxInstance
             {
@@ -1081,8 +1003,8 @@ namespace WDE.MapRenderer.Managers
 
             var m2FilePath = displayInfo.ModelName;
             
-            TaskCompletionSource<(M2, M2Skin)?> m2File = new();
-            yield return LoadM2File(m2FilePath, m2File);
+            TaskCompletionSource<(IMesh, M2, M2Skin)?> m2File = new();
+            yield return InternalLoadM2Mesh(m2FilePath, m2File);
 
             if (!m2File.Task.Result.HasValue)
             {
@@ -1094,43 +1016,11 @@ namespace WDE.MapRenderer.Managers
                 yield break;
             }
 
-            M2 m2 = m2File.Task.Result.Value.Item1;
-            M2Skin skin = m2File.Task.Result.Value.Item2;
-            Vector3[] vertices = null!;
-            Vector3[] normals = null!;
-            Vector2[] uv1 = null!;
-            Vector2[] uv2 = null!;
-            Color[] boneWeights = null!;
-            Color[] boneIndices = null!;
+            var mesh = m2File.Task.Result.Value.Item1;
+            M2 m2 = m2File.Task.Result.Value.Item2;
+            M2Skin skin = m2File.Task.Result.Value.Item3;
 
-            yield return new WaitForTask(Task.Run(() =>
-            {
-                var count = m2.vertices.Length;
-                vertices = new Vector3[count];
-                normals = new Vector3[count];
-                uv1 = new Vector2[count];
-                uv2 = new Vector2[count];
-                boneWeights = new Color[count];
-                boneIndices = new Color[count];
-                
-                for (int i = 0; i < count; ++i)
-                {
-                    ref readonly var vert = ref m2.vertices[skin.Vertices[i]];
-                    vertices[i] = vert.pos;
-                    normals[i] = vert.normal;
-                    uv1[i] = vert.tex_coord1;
-                    uv2[i] = vert.tex_coord2;
-                    boneWeights[i] = vert.bone_weights;
-                    boneIndices[i] = vert.bone_indices;
-                }
-            }));
-            
-            var md = new MeshData(vertices, normals, uv1, new ushort[] { }, null, null, uv2, boneWeights, boneIndices);
-            
-            var mesh = meshManager.CreateMesh(md);
-            mesh.SetSubmeshCount(skin.Batches.Length);
-
-            Material[] materials = new Material[skin.Batches.Length];
+            (Material, int)[] materials = new (Material, int)[skin.Batches.Length];
             int j = 0;
             foreach (var batch in skin.Batches)
             {
@@ -1145,7 +1035,7 @@ namespace WDE.MapRenderer.Managers
                 var sectionIndexCount = skin.SubMeshes[batch.skinSectionIndex].indexCount;
                 var sectionIndexStart = skin.SubMeshes[batch.skinSectionIndex].indexStart;
                 
-                mesh.SetIndices(skin.Indices.AsSpan(sectionIndexStart, Math.Min(sectionIndexCount, skin.Indices.Length - sectionIndexStart)), j++);
+                j++;
                 
                 TextureHandle? th = null;
                 TextureHandle? th2 = null;
@@ -1181,7 +1071,7 @@ namespace WDE.MapRenderer.Managers
                     }
                 }
 
-                materials[j - 1] = CreateMaterial(m2, in batch, th, th2);
+                materials[j - 1] = (CreateMaterial(m2, in batch, th, th2), batch.skinSectionIndex);
             }
 
             if (j == 0)
@@ -1193,8 +1083,6 @@ namespace WDE.MapRenderer.Managers
                 result.SetResult(null);
                 yield break;
             }
-            
-            mesh.RebuildIndices();
 
             var mdx = new MdxInstance
             {
@@ -1228,8 +1116,8 @@ namespace WDE.MapRenderer.Managers
 
             var m2FilePath = path;
             
-            TaskCompletionSource<(M2, M2Skin)?> m2File = new();
-            yield return LoadM2File(m2FilePath, m2File);
+            TaskCompletionSource<(IMesh, M2, M2Skin)?> m2File = new();
+            yield return InternalLoadM2Mesh(m2FilePath, m2File);
 
             if (!m2File.Task.Result.HasValue)
             {
@@ -1237,6 +1125,119 @@ namespace WDE.MapRenderer.Managers
                 meshes[path] = null;
                 completion.SetResult(null);
                 meshesCurrentlyLoaded.Remove(path);
+                result.SetResult(null);
+                yield break;
+            }
+            
+            var mesh = m2File.Task.Result.Value.Item1;
+            M2 m2 = m2File.Task.Result.Value.Item2;
+            M2Skin skin = m2File.Task.Result.Value.Item3;
+
+            (Material, int)[] materials = new (Material, int)[skin.Batches.Length];
+            int j = 0;
+            foreach (var batch in skin.Batches)
+            {
+                if (batch.skinSectionIndex == ushort.MaxValue ||
+                    batch.materialIndex >= m2.materials.Length ||
+                    batch.skinSectionIndex >= skin.SubMeshes.Length)
+                {
+                    Console.WriteLine("Sth wrong with batch " + j + " in model " + path);
+                    continue;
+                }
+
+                var sectionIndexCount = skin.SubMeshes[batch.skinSectionIndex].indexCount;
+                var sectionIndexStart = skin.SubMeshes[batch.skinSectionIndex].indexStart;
+
+                j++;
+
+                TextureHandle? th = null;
+                TextureHandle? th2 = null;
+                for (int i = 0; i < (batch.textureCount >= 5 ? 1 : batch.textureCount); ++i)
+                {
+                    if (batch.textureLookupId + i >= m2.textureLookupTable.Length)
+                    {
+                        if (th.HasValue)
+                            th2 = textureManager.EmptyTexture;
+                        else
+                            th = textureManager.EmptyTexture;
+                        Console.WriteLine("File " + path + " batch " + j + " tex " + i + " out of range");
+                        continue;
+                    }
+                    var texId = m2.textureLookupTable[batch.textureLookupId + i];
+                    if (texId == -1)
+                    {
+                        if (th.HasValue)
+                            th2 = textureManager.EmptyTexture;
+                        else
+                            th = textureManager.EmptyTexture;
+                    }
+                    else
+                    {
+                        var texFile = m2.textures[texId].filename.AsString();
+                        var tcs = new TaskCompletionSource<TextureHandle>();
+                        yield return textureManager.GetTexture(texFile, tcs);
+                        var resTex = tcs.Task.Result;
+                        if (th.HasValue)
+                            th2 = resTex;
+                        else
+                            th = resTex;
+                    }
+                }
+
+                materials[j - 1] = (CreateMaterial(m2, in batch, th, th2), batch.skinSectionIndex);
+            }
+            
+            if (j == 0)
+            {
+                Console.WriteLine("Model " + m2FilePath + " has 0 materials");
+                meshes[path] = null;
+                completion.SetResult(null);
+                meshesCurrentlyLoaded.Remove(path);
+                result.SetResult(null);
+                yield break;
+            }
+
+            var mdx = new MdxInstance
+            {
+                mesh = mesh,
+                materials = materials.AsSpan(0, j).ToArray(),
+                model = m2
+            };
+            meshes.Add(path, mdx);
+            completion.SetResult(null);
+            meshesCurrentlyLoaded.Remove(path);
+            result.SetResult(mdx);
+        }
+        
+        private IEnumerator InternalLoadM2Mesh(string path, TaskCompletionSource<(IMesh, M2, M2Skin)?> result)
+        {
+            if (internalMeshes.ContainsKey(path))
+            {
+                result.SetResult(internalMeshes[path]);
+                yield break;
+            }
+
+            if (internalMeshesCurrentlyLoaded.TryGetValue(path, out var loadInProgress))
+            {
+                yield return new WaitForTask(loadInProgress);
+                result.SetResult(internalMeshes[path]);
+                yield break;
+            }
+
+            var completion = new TaskCompletionSource<(IMesh, M2, M2Skin)?>();
+            internalMeshesCurrentlyLoaded[path] = completion.Task;
+
+            var m2FilePath = path;
+            
+            TaskCompletionSource<(M2, M2Skin)?> m2File = new();
+            yield return LoadM2File(m2FilePath, m2File);
+
+            if (!m2File.Task.Result.HasValue)
+            {
+                Console.WriteLine("Cannot find model " + path);
+                internalMeshes[path] = null;
+                completion.SetResult(null);
+                internalMeshesCurrentlyLoaded.Remove(path);
                 result.SetResult(null);
                 yield break;
             }
@@ -1276,84 +1277,22 @@ namespace WDE.MapRenderer.Managers
             var md = new MeshData(vertices, normals, uv1, new ushort[] { }, null, null, uv2, boneWeights, boneIndices);
             
             var mesh = meshManager.CreateMesh(md);
-            mesh.SetSubmeshCount(skin.Batches.Length);
+            mesh.SetSubmeshCount(skin.SubMeshes.Length);
 
-            Material[] materials = new Material[skin.Batches.Length];
             int j = 0;
-            foreach (var batch in skin.Batches)
+            foreach (var subMesh in skin.SubMeshes)
             {
-                if (batch.skinSectionIndex == ushort.MaxValue ||
-                    batch.materialIndex >= m2.materials.Length ||
-                    batch.skinSectionIndex >= skin.SubMeshes.Length)
-                {
-                    Console.WriteLine("Sth wrong with batch " + j + " in model " + path);
-                    continue;
-                }
-
-                var sectionIndexCount = skin.SubMeshes[batch.skinSectionIndex].indexCount;
-                var sectionIndexStart = skin.SubMeshes[batch.skinSectionIndex].indexStart;
-                
+                var sectionIndexCount = subMesh.indexCount;
+                var sectionIndexStart = subMesh.indexStart;
                 mesh.SetIndices(skin.Indices.AsSpan(sectionIndexStart, Math.Min(sectionIndexCount, skin.Indices.Length - sectionIndexStart)), j++);
-
-                TextureHandle? th = null;
-                TextureHandle? th2 = null;
-                for (int i = 0; i < (batch.textureCount >= 5 ? 1 : batch.textureCount); ++i)
-                {
-                    if (batch.textureLookupId + i >= m2.textureLookupTable.Length)
-                    {
-                        if (th.HasValue)
-                            th2 = textureManager.EmptyTexture;
-                        else
-                            th = textureManager.EmptyTexture;
-                        Console.WriteLine("File " + path + " batch " + j + " tex " + i + " out of range");
-                        continue;
-                    }
-                    var texId = m2.textureLookupTable[batch.textureLookupId + i];
-                    if (texId == -1)
-                    {
-                        if (th.HasValue)
-                            th2 = textureManager.EmptyTexture;
-                        else
-                            th = textureManager.EmptyTexture;
-                    }
-                    else
-                    {
-                        var texFile = m2.textures[texId].filename.AsString();
-                        var tcs = new TaskCompletionSource<TextureHandle>();
-                        yield return textureManager.GetTexture(texFile, tcs);
-                        var resTex = tcs.Task.Result;
-                        if (th.HasValue)
-                            th2 = resTex;
-                        else
-                            th = resTex;
-                    }
-                }
-
-                materials[j - 1] = CreateMaterial(m2, in batch, th, th2);
             }
             
-            if (j == 0)
-            {
-                Console.WriteLine("Model " + m2FilePath + " has 0 materials");
-                meshes[path] = null;
-                completion.SetResult(null);
-                meshesCurrentlyLoaded.Remove(path);
-                result.SetResult(null);
-                yield break;
-            }
-
             mesh.RebuildIndices();
-
-            var mdx = new MdxInstance
-            {
-                mesh = mesh,
-                materials = materials.AsSpan(0, j).ToArray(),
-                model = m2
-            };
-            meshes.Add(path, mdx);
+            
+            internalMeshes.Add(path, (mesh, m2, skin));
             completion.SetResult(null);
-            meshesCurrentlyLoaded.Remove(path);
-            result.SetResult(mdx);
+            internalMeshesCurrentlyLoaded.Remove(path);
+            result.SetResult((mesh, m2, skin));
         }
         
         public IEnumerator LoadM2File(string path, TaskCompletionSource<(M2, M2Skin)?> result)
@@ -1690,18 +1629,8 @@ namespace WDE.MapRenderer.Managers
         {
             identityBonesBuffer.Dispose();
             
-            foreach (var mesh in meshes.Values)
-                mesh?.Dispose(meshManager);
-
-            foreach (var mesh in itemMeshes.Values)
-                mesh?.Dispose(meshManager);
-
-            foreach (var mesh in gameObjectmeshes.Values)
-                mesh?.Dispose(meshManager);
-
-            // titi test
-            foreach (var creaturemesh in creaturemeshes.Values)
-                creaturemesh?.Dispose(meshManager);
+            foreach (var mesh in internalMeshes.Values)
+                meshManager.DisposeMesh(mesh.Value.Item1);
         }
     }
 }

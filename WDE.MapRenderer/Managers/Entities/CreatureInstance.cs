@@ -81,7 +81,7 @@ public class CreatureInstance : WorldObjectInstance
             itemBoneMatricesBuffer.UpdateBuffer(AnimationSystem.IdentityBones(value.model.bones.Length).Span);
                
             MaterialInstanceRenderData itemMaterialInstanceRenderData = new MaterialInstanceRenderData();
-            itemMaterialInstanceRenderData.SetBuffer(value.materials[0], "boneMatrices", itemBoneMatricesBuffer);
+            itemMaterialInstanceRenderData.SetBuffer(value.materials[0].material, "boneMatrices", itemBoneMatricesBuffer);
 
             var mountAnimationEntity = entityManager.CreateEntity(archetypes.AttachmentsAnimationRootArchetype);
             mountAnimationEntity.SetCopyParentTransform(entityManager, objectEntity);
@@ -95,11 +95,10 @@ public class CreatureInstance : WorldObjectInstance
             entityManager.AddComponent(WorldObjectEntity, new ShareRenderEnabledBit(){OtherEntity = mountAnimationEntity});
             handles.Add(mountAnimationEntity);
 
-            int j = 0;
             foreach (var material in value.materials)
             {
                 var itemRenderer = entityManager.CreateEntity(archetypes.WorldObjectMeshRendererArchetype);
-                itemRenderer.SetRenderer(entityManager, value.mesh, j, material);
+                itemRenderer.SetRenderer(entityManager, value.mesh, material.submesh, material.material);
                 itemRenderer.SetCopyParentTransform(entityManager, objectEntity);
                 itemRenderer.SetDirtyPosition(entityManager);
                 entityManager.SetManagedComponent(itemRenderer, itemMaterialInstanceRenderData);
@@ -107,7 +106,6 @@ public class CreatureInstance : WorldObjectInstance
                     itemRenderer.SetForceDisabledRendering(entityManager, true);
 
                 renderers.Add(itemRenderer);
-                j++;
             }
 
             masterAnimation.AttachedTo = mountAnimationData;
@@ -153,7 +151,7 @@ public class CreatureInstance : WorldObjectInstance
 
         // optimization here, we can share the render data, because we know all the materials will be the same shader
         MaterialInstanceRenderData materialInstanceRenderData = new MaterialInstanceRenderData();
-        materialInstanceRenderData.SetBuffer(instance.materials[0], "boneMatrices", boneMatricesBuffer);
+        materialInstanceRenderData.SetBuffer(instance.materials[0].material, "boneMatrices", boneMatricesBuffer);
 
         if (instance.attachments != null)
         {
@@ -161,23 +159,21 @@ public class CreatureInstance : WorldObjectInstance
                 AddAttachment(attachmentType, itemModel);
         }
         
-        int i = 0;
         foreach (var material in instance.materials)
         {
             var collider = entityManager.CreateEntity(archetypes.WorldObjectCollider);
-            collider.SetCollider(entityManager, instance.mesh, i, Collisions.COLLISION_MASK_CREATURE);
+            collider.SetCollider(entityManager, instance.mesh, material.submesh, Collisions.COLLISION_MASK_CREATURE);
             collider.SetCopyParentTransform(entityManager, objectEntity);
             collider.SetDirtyPosition(entityManager);
             
             var renderer = entityManager.CreateEntity(archetypes.WorldObjectMeshRendererArchetype);
-            renderer.SetRenderer(entityManager, instance.mesh, i, material);
+            renderer.SetRenderer(entityManager, instance.mesh, material.submesh, material.material);
             renderer.SetCopyParentTransform(entityManager, objectEntity);
             renderer.SetDirtyPosition(entityManager);
             entityManager.SetManagedComponent(renderer, materialInstanceRenderData);
             
             renderers.Add(renderer);
             colliders.Add(collider);
-            i++;
         }
 
         textEntity = gameContext.UiManager.DrawPersistentWorldText("calibri", new Vector2(0.5f, 0.5f), creatureTemplate.Name, 0.25f, Matrix.Identity, 50);
@@ -196,7 +192,7 @@ public class CreatureInstance : WorldObjectInstance
         itemBoneMatricesBuffer.UpdateBuffer(AnimationSystem.IdentityBones(itemModel.model.bones.Length).Span);
                
         MaterialInstanceRenderData itemMaterialInstanceRenderData = new MaterialInstanceRenderData();
-        itemMaterialInstanceRenderData.SetBuffer(itemModel.materials[0], "boneMatrices", itemBoneMatricesBuffer);
+        itemMaterialInstanceRenderData.SetBuffer(itemModel.materials[0].material, "boneMatrices", itemBoneMatricesBuffer);
 
         var itemAnimationEntity = entityManager.CreateEntity(archetypes.AttachmentsAnimationRootArchetype);
         itemAnimationEntity.SetCopyParentTransform(entityManager, objectEntity);
@@ -208,11 +204,10 @@ public class CreatureInstance : WorldObjectInstance
         });
         handles.Add(itemAnimationEntity);
         
-        int j = 0;
         foreach (var material in itemModel.materials)
         {
             var itemRenderer = entityManager.CreateEntity(archetypes.WorldObjectMeshRendererArchetype);
-            itemRenderer.SetRenderer(entityManager, itemModel.mesh, j, material);
+            itemRenderer.SetRenderer(entityManager, itemModel.mesh, material.submesh, material.material);
             itemRenderer.SetCopyParentTransform(entityManager, objectEntity);
             itemRenderer.SetDirtyPosition(entityManager);
             entityManager.SetManagedComponent(itemRenderer, itemMaterialInstanceRenderData);
@@ -220,7 +215,6 @@ public class CreatureInstance : WorldObjectInstance
                 itemRenderer.SetForceDisabledRendering(entityManager, true);
 
             renderers.Add(itemRenderer);
-            j++;
         }
     }
 

@@ -72,25 +72,23 @@ public class GameObjectInstance : WorldObjectInstance
 
         // optimization here, we can share the render data, because we know all the materials will be the same shader
         MaterialInstanceRenderData materialInstanceRenderData = new MaterialInstanceRenderData();
-        materialInstanceRenderData.SetBuffer(instance.materials[0], "boneMatrices", boneMatricesBuffer);
+        materialInstanceRenderData.SetBuffer(instance.materials[0].material, "boneMatrices", boneMatricesBuffer);
         
-        int i = 0;
         foreach (var material in instance.materials)
         {
             var collider = entityManager.CreateEntity(archetypes.WorldObjectCollider);
-            collider.SetCollider(entityManager, instance.mesh, i, Collisions.COLLISION_MASK_GAMEOBJECT);
+            collider.SetCollider(entityManager, instance.mesh, material.submesh, Collisions.COLLISION_MASK_GAMEOBJECT);
             collider.SetCopyParentTransform(entityManager, objectEntity);
             collider.SetDirtyPosition(entityManager);
             
             var renderer = entityManager.CreateEntity(archetypes.WorldObjectMeshRendererArchetype);
-            renderer.SetRenderer(entityManager, instance.mesh, i, material);
+            renderer.SetRenderer(entityManager, instance.mesh, material.submesh, material.material);
             renderer.SetCopyParentTransform(entityManager, objectEntity);
             renderer.SetDirtyPosition(entityManager);
             entityManager.SetManagedComponent(renderer, materialInstanceRenderData);
             
             renderers.Add(renderer);
             colliders.Add(collider);
-            i++;
         }
 
         textEntity = gameContext.UiManager.DrawPersistentWorldText("calibri", new Vector2(0.5f, 0.5f), gameObjectTemplate.Name, 0.25f, Matrix.Identity, 50);

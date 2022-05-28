@@ -567,7 +567,6 @@ namespace WDE.MapRenderer.Managers
                 t.Scale = Vector3.One * m2.Scale;
                 t.Rotation = Quaternion.FromEuler(m2.Rotation.X, m2.Rotation.Y + 180,  m2.Rotation.Z);
 
-                int j = 0;
                 Entity entity;
                 NativeBuffer<Matrix>? bones = null;
                 if (m.HasAnimations)
@@ -594,13 +593,13 @@ namespace WDE.MapRenderer.Managers
                             });
                         }
                         var instanceRenderer = new MaterialInstanceRenderData();
-                        instanceRenderer.SetBuffer(material, "boneMatrices", bones!);
+                        instanceRenderer.SetBuffer(material.material, "boneMatrices", bones!);
                         entityManager.SetManagedComponent(entity, instanceRenderer);
                     }
                     else
                         entity = entityManager.CreateEntity(archetypes.StaticM2WorldObjectArchetype);
                     
-                    renderManager.SetupRendererEntity(entity, m.mesh.Handle, material, j++, t.LocalToWorldMatrix);
+                    renderManager.SetupRendererEntity(entity, m.mesh.Handle, material.material, material.submesh, t.LocalToWorldMatrix);
                     
                     chunk.entities.Add(entity);
                     first = false;
