@@ -57,7 +57,7 @@
                 "description": "Use 0 for both to reset"
             },
             {
-                "type": "Parameter",
+                "type": "CreatureModelDataParameter",
                 "name": "Model id",
                 "description": "Use 0 for both to reset"
             }
