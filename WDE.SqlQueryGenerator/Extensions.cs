@@ -219,12 +219,7 @@ namespace WDE.SqlQueryGenerator
             return new UpdateQuery(query);
         }
         
-        public static IUpdateQuery Set(this IWhere query, string key, object? value)
-        {
-            return new UpdateQuery(query, key, value.ToSql());
-        }
-        
-        public static IUpdateQuery Set(this IUpdateQuery query, string key, object? value)
+        public static IUpdateQuery Set<T>(this IWhere query, string key, T? value)
         {
             return new UpdateQuery(query, key, value.ToSql());
         }

@@ -39,7 +39,7 @@ namespace WDE.Common.Utils
             return default;
         }
         
-        public static int IndexIf(this IList list, Func<object?, bool> pred)
+        public static int IndexIfObject(this IList list, Func<object?, bool> pred)
         {
             for (int i = 0; i < list.Count; i++)
             {
