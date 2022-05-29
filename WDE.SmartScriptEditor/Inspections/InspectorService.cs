@@ -56,6 +56,8 @@ namespace WDE.SmartScriptEditor.Inspections
             eventInspections.Add(new NoActionInspection());
             eventInspections.Add(new NoActionInvokerAfterWaitInspection());
             eventInspections.Add(new AwaitAfterAsyncInspection(smartDataManager));
+            eventInspections.Add(new NeedsAwaitInspection(smartDataManager));
+            eventInspections.Add(new MustBeLastInspection(smartDataManager));
             eventInspections.Add(new IndentationInspection());
             eventInspections.Add(new BeginInlineActionListOnlyOnceInspection());
             eventInspections.Add(new MovementAwaitOnlyAfterMovement());

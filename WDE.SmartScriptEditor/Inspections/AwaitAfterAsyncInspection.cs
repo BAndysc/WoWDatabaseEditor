@@ -31,7 +31,7 @@ namespace WDE.SmartScriptEditor.Inspections
             {
                 bool nextIsAwait = i < e.Actions.Count - 1 && e.Actions[i + 1].Id == finalizeAwait;
 
-                if (e.Id == beginAwait)
+                if (e.Actions[i].Id == beginAwait)
                     inAwaitBlock = true;
 
                 if ((inAwaitBlock || nextIsAwait) && !asyncActions.Contains(e.Actions[i].Id))
