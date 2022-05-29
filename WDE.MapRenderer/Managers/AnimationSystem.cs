@@ -208,14 +208,24 @@ public class AnimationSystem
                     }
                     else
                     {
-                        animationData._animInternalIndex = lookup.Value;
-                        animationData._length = animationData.Model.sequences[lookup.Value].duration;
+
+                        var internalIndex = lookup.Value;
+                        do
+                        {
+                            bool isAlias = animationData.Model.sequences[internalIndex].flags.HasFlagFast(M2SequenceFlags.IsAlias);
+                            if (!isAlias || animationData.Model.sequences[internalIndex].aliasNext == internalIndex)
+                                break;
+                            internalIndex = animationData.Model.sequences[internalIndex].aliasNext;
+                        } while (true);
+                        
+                        animationData._animInternalIndex = internalIndex;
+                        animationData._length = animationData.Model.sequences[internalIndex].duration;
                         animationData._currentAnimation = animationData.SetNewAnimation;
                         animationData._time = 0;
                         
                         animationData.Model.bones.LoadAnimation(animationData._animInternalIndex);
 
-                        var bounds = animationData.Model.sequences[lookup.Value].bounds;
+                        var bounds = animationData.Model.sequences[internalIndex].bounds;
                         var bb = new BoundingBox(bounds.extent.min, bounds.extent.max);
                         if (meshBoundsAccess.HasValue)
                         {

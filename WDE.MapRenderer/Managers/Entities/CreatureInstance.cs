@@ -61,7 +61,7 @@ public class CreatureInstance : WorldObjectInstance
                         break;
                 }
             }
-            var animData =  gameContext.EntityManager.GetManagedComponent<M2AnimationComponentData>(objectEntity);
+            var animData = gameContext.EntityManager.GetManagedComponent<M2AnimationComponentData>(objectEntity);
             animData.SetNewAnimation = (int)animId;
             animData.Flags = flags;
         }

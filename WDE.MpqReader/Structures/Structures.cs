@@ -27,6 +27,7 @@ namespace WDE.MpqReader.Structures
 /*0x014*/  //public readonly M2Array<uint> global_loops;                        // Timestamps used in global looping animations.
 /*0x01C*/  public readonly M2Array<M2Sequence> sequences;                       // Information about the animations in the model.
 /*0x024*/  public readonly M2Array<short> sequenceIdToAnimationId;               // Mapping of sequence IDs to the entries in the Animation sequences block.
+           public readonly short[] sequenceIdToAnimationLookup; // custom lookup table, because the algorithm for sequenceIdToAnimationId is not always correct
 /*0x02C*/  public readonly M2CompBoneArray bones;                           // MAX_BONES = 0x100 => Creature\SlimeGiant\GiantSlime.M2 has 312 bones (Wrath)
 /*0x034*/  public readonly M2Array<ushort> boneIndicesById;                   //Lookup table for key skeletal bones. (alt. name: key_bone_lookup)
 /*0x03C*/  public readonly M2Array<M2Vertex> vertices;
@@ -66,6 +67,13 @@ namespace WDE.MpqReader.Structures
             
             if (anim_id == -1 || sequenceIdToAnimationId.Length == 0)
                 return null;
+
+            if (anim_id >= sequenceIdToAnimationLookup.Length)
+                return null;
+
+            return sequenceIdToAnimationLookup[anim_id];
+            
+            // this algorithm doesn't always work, it needs to be researched more
             int i = anim_id % sequenceIdToAnimationId.Length;
   
             for (int stride = 1; true; ++stride)
@@ -93,6 +101,12 @@ namespace WDE.MpqReader.Structures
             global_flags = (M2Flags)reader.ReadUInt32();
             reader.SkipM2Array(); // global_loops = reader.ReadArrayUInt32();
             sequences = reader.ReadArray(r => new M2Sequence(r));
+            var maxAnimId = 0;
+            for (int i = sequences.Length - 1; i >= 0; --i)
+                maxAnimId = (short)Math.Max(maxAnimId, sequences[i].id);
+            sequenceIdToAnimationLookup = new short[maxAnimId + 1];
+            for (int i = sequences.Length - 1; i >= 0; --i)
+                sequenceIdToAnimationLookup[sequences[i].id] = (short)i;
             sequenceIdToAnimationId = reader.ReadArrayInt16();
             Func<int, IBinaryReader?> openAnimFile = (idx) =>
             {
@@ -778,6 +792,7 @@ namespace WDE.MpqReader.Structures
     public enum M2SequenceFlags
     {
         HasEmbeddedAnimationData = 0x20,
+        IsAlias = 0x40,
     }
     
     public readonly struct M2Sequence
