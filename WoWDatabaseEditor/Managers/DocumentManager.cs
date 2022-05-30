@@ -187,8 +187,6 @@ namespace WoWDatabaseEditorCore.Managers
                         if (origCommand != null)
                             await origCommand.ExecuteAsync();
                         OpenedDocuments.Remove(editor);
-                        if (ActiveDocument == editor)
-                            ActiveDocument = OpenedDocuments.Count > 0 ? OpenedDocuments[0] : null;
                         eventAggregator.GetEvent<DocumentClosedEvent>().Publish(editor);
                         editor.CloseCommand = origCommand;
                     }
