@@ -9,7 +9,7 @@ namespace WDE.TrinitySmartScriptEditor.Providers
     [AutoRegisterToParentScopeAttribute]
     public class SmartScriptNameProvider : SmartScriptNameProviderBase<SmartScriptSolutionItem>
     {
-        public SmartScriptNameProvider(IDatabaseProvider database, ISpellStore spellStore) : base(database, spellStore)
+        public SmartScriptNameProvider(IDatabaseProvider database, ISpellStore spellStore, IDbcStore dbcStore) : base(database, spellStore, dbcStore)
         {
         }
         

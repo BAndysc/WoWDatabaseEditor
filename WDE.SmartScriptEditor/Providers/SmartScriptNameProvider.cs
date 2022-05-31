@@ -9,11 +9,13 @@ namespace WDE.SmartScriptEditor.Providers
     {
         private readonly IDatabaseProvider database;
         private readonly ISpellStore spellStore;
+        private readonly IDbcStore dbcStore;
 
-        public SmartScriptNameProviderBase(IDatabaseProvider database, ISpellStore spellStore)
+        public SmartScriptNameProviderBase(IDatabaseProvider database, ISpellStore spellStore, IDbcStore dbcStore)
         {
             this.database = database;
             this.spellStore = spellStore;
+            this.dbcStore = dbcStore;
         }
 
         private string? TryGetName(int entryOrGuid, SmartScriptType type)
@@ -45,6 +47,12 @@ namespace WDE.SmartScriptEditor.Providers
                 case SmartScriptType.Spell:
                     if (spellStore.HasSpell((uint) entryOrGuid))
                         return spellStore.GetName((uint) entryOrGuid);
+                    break;
+                case SmartScriptType.Scene:
+                    entry = database.GetSceneTemplate((uint)entryOrGuid)?.ScriptPackageId;
+
+                    if (entry.HasValue && dbcStore.SceneStore.ContainsKey((uint)entry))
+                        return dbcStore.SceneStore[(uint)entry];
                     break;
                 default:
                     return null;
