@@ -23,7 +23,9 @@ namespace WDE.AzerothCore
             typeof(IConversationTemplate),
             typeof(IAuthRbacPermission),
             typeof(IAuthRbacLinkedPermission),
-            typeof(IPointOfInterest)
+            typeof(IPointOfInterest),
+            typeof(ISceneTemplate), 
+            typeof(IAreaTriggerCreateProperties)
         };
         
         public ISet<SmartScriptType> SupportedTypes { get; } = new HashSet<SmartScriptType>

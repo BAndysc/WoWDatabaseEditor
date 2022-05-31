@@ -576,18 +576,24 @@ namespace WDE.TrinityMySqlDatabase.Database
 
         public ISceneTemplate? GetSceneTemplate(uint sceneId)
         {
+            if (!Supports<ISceneTemplate>())
+                return null;
             using var model = Database();
             return model.SceneTemplates.FirstOrDefault(x => x.SceneId == sceneId);
         }
         
         public async Task<ISceneTemplate?> GetSceneTemplateAsync(uint sceneId)
         {
+            if (!Supports<ISceneTemplate>())
+                return null;
             await using var model = Database();
             return await model.SceneTemplates.FirstOrDefaultAsync(x => x.SceneId == sceneId);
         }
 
         public async Task<IList<ISceneTemplate>?> GetSceneTemplatesAsync()
         {
+            if (!Supports<ISceneTemplate>())
+                return null; 
             await using var model = Database();
             return await model.SceneTemplates.ToListAsync<ISceneTemplate>();
         }
