@@ -178,4 +178,16 @@ public class AzerothhMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvider<Az
         await using var model = Database();
         return await model.ItemTemplate.ToListAsync<IItem>();
     }
+    
+    public override async Task<IList<ICreatureModelInfo>> GetCreatureModelInfoAsync()
+    {
+        await using var model = Database();
+        return await model.CreatureModelInfo.ToListAsync<ICreatureModelInfo>();
+    }
+
+    public override ICreatureModelInfo? GetCreatureModelInfo(uint displayId)
+    {
+        using var model = Database();
+        return model.CreatureModelInfo.FirstOrDefault(x => x.DisplayId == displayId);
+    }
 }

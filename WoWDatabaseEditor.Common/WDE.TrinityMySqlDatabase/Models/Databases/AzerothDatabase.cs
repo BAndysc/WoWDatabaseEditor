@@ -12,4 +12,5 @@ public class AzerothDatabase : BaseTrinityDatabase
     public ITable<AzerothMySqlSpellDbc> SpellDbc => GetTable<AzerothMySqlSpellDbc>();
     public ITable<MySqlGameObjectWrath> GameObject => GetTable<MySqlGameObjectWrath>();
     public ITable<MySqlItemTemplate> ItemTemplate => GetTable<MySqlItemTemplate>();
+    public ITable<MySqlCreatureModelInfo> CreatureModelInfo => GetTable<MySqlCreatureModelInfo>();
 }

@@ -554,17 +554,9 @@ namespace WDE.TrinityMySqlDatabase.Database
             return events.Concat(spells).Concat(waypoints).ToList();
         }
 
-        public async Task<IList<ICreatureModelInfo>> GetCreatureModelInfoAsync()
-        {
-            await using var model = Database();
-            return await model.CreatureModelInfo.ToListAsync<ICreatureModelInfo>();
-        }
+        public abstract Task<IList<ICreatureModelInfo>> GetCreatureModelInfoAsync();
 
-        public ICreatureModelInfo? GetCreatureModelInfo(uint displayId)
-        {
-            using var model = Database();
-            return model.CreatureModelInfo.FirstOrDefault(x => x.DisplayId == displayId);
-        }
+        public abstract ICreatureModelInfo? GetCreatureModelInfo(uint displayId);
 
         public async Task<List<IEventScriptLine>> GetEventScript(EventScriptType type, uint id)
         {

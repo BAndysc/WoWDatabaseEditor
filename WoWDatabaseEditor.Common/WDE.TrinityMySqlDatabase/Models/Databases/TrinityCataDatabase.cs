@@ -14,4 +14,5 @@ public class TrinityCataDatabase : BaseTrinityDatabase
     public ITable<MySqlGameObjectCata> GameObject => GetTable<MySqlGameObjectCata>();
     public ITable<MySqlCataQuestTemplate> CataQuestTemplate => GetTable<MySqlCataQuestTemplate>();
     public ITable<MySqlCataQuestTemplateAddon> CataQuestTemplateAddon => GetTable<MySqlCataQuestTemplateAddon>();
+    public ITable<MySqlCreatureModelInfo> CreatureModelInfo => GetTable<MySqlCreatureModelInfo>();
 }

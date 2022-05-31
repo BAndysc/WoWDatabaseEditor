@@ -184,4 +184,16 @@ public class TrinityWrathMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvide
         await using var model = Database();
         return await model.SpawnGroupTemplate.ToListAsync<ISpawnGroupTemplate>();
     }
+    
+    public override async Task<IList<ICreatureModelInfo>> GetCreatureModelInfoAsync()
+    {
+        await using var model = Database();
+        return await model.CreatureModelInfo.ToListAsync<ICreatureModelInfo>();
+    }
+
+    public override ICreatureModelInfo? GetCreatureModelInfo(uint displayId)
+    {
+        using var model = Database();
+        return model.CreatureModelInfo.FirstOrDefault(x => x.DisplayId == displayId);
+    }
 }
