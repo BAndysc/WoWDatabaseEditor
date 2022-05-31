@@ -344,18 +344,14 @@ namespace WDE.TrinityMySqlDatabase.Database
                     await model.AreaTriggerScript.InsertAsync(() => new MySqlAreaTriggerScript(){Entry = entryOrGuid, ScriptName = "SmartTrigger"});
                     break;
                 case SmartScriptType.AreaTriggerEntity:
-                    throw new Exception(
-                                "New AreaTrigger system is currently (temporarily) not supported.");
-                    // await model.AreaTriggerTemplate.Where(p => p.Id == (uint) entryOrGuid && p.IsServerSide == false)
-                    //     .Set(p => p.ScriptName, "SmartAreaTriggerAI")
-                    //     .UpdateAsync();
+                    await model.AreaTriggerCreateProperties.Where(p => p.Id == (uint)entryOrGuid)
+                        .Set(p => p.ScriptName, "SmartAreaTriggerAI")
+                        .UpdateAsync();
                     break;
                 case SmartScriptType.AreaTriggerEntityServerSide:
-                    throw new Exception(
-                                "New AreaTrigger system is currently (temporarily) not supported.");
-                    // await model.AreaTriggerTemplate.Where(p => p.Id == (uint) entryOrGuid && p.IsServerSide == true)
-                    //     .Set(p => p.ScriptName, "SmartAreaTriggerAI")
-                    //     .UpdateAsync();
+                    await model.AreaTriggerCreateProperties.Where(p => p.Id == (uint)entryOrGuid)
+                        .Set(p => p.ScriptName, "SmartAreaTriggerAI")
+                        .UpdateAsync();
                     break;
             }
             
