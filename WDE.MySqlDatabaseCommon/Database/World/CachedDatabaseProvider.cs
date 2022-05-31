@@ -333,6 +333,12 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             return null;
         }
 
+        public ISceneTemplate? GetSceneTemplate(uint sceneId) => nonCachedDatabase.GetSceneTemplate(sceneId);
+
+        public Task<ISceneTemplate?> GetSceneTemplateAsync(uint sceneId) => nonCachedDatabase.GetSceneTemplateAsync(sceneId);
+
+        public Task<IList<ISceneTemplate>?> GetSceneTemplatesAsync() => nonCachedDatabase.GetSceneTemplatesAsync();
+
         public Task<List<IEventScriptLine>> GetEventScript(EventScriptType type, uint id) => nonCachedDatabase.GetEventScript(type, id);
 
         public Task<IList<IDatabaseSpellDbc>> GetSpellDbcAsync()

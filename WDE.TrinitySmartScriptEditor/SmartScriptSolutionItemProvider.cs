@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using WDE.Common;
@@ -335,10 +336,12 @@ namespace WDE.TrinitySmartScriptEditor
     {
         private readonly Lazy<IItemFromListProvider> itemFromListProvider;
         private readonly Lazy<IDbcStore> dbcStore;
+        private readonly Lazy<IDatabaseProvider> databaseProvider;
 
         public SmartScriptSceneListProvider(
             Lazy<IItemFromListProvider> itemFromListProvider,
-            Lazy<IDbcStore> dbcStore
+            Lazy<IDbcStore> dbcStore,
+            Lazy<IDatabaseProvider> databaseProvider
         ) : base("Scene Script",
             "The script from Scene from client database (DBC)",
             "document_cinematic_big",
@@ -346,11 +349,24 @@ namespace WDE.TrinitySmartScriptEditor
         {
             this.itemFromListProvider = itemFromListProvider;
             this.dbcStore = dbcStore;
+            this.databaseProvider = databaseProvider;
         }
 
         public override async Task<ISolutionItem> CreateSolutionItem()
         {
-            var scenes = dbcStore.Value.SceneStore.ToDictionary(scene => scene.Key, scene => new SelectOption($"Scene { scene.Value }"));
+            var sceneTemplates = await databaseProvider.Value.GetSceneTemplatesAsync();
+            Dictionary<long, SelectOption> scenes = new();
+            if (sceneTemplates != null)
+            {
+                var sceneNameStore = dbcStore.Value.SceneStore;
+                foreach (var sceneTemplate in sceneTemplates)
+                {
+                    if (sceneNameStore.TryGetValue(sceneTemplate.ScriptPackageId, out var name))
+                        scenes.Add(sceneTemplate.SceneId, new SelectOption($"{name} ({sceneTemplate.ScriptPackageId})"));
+                    else
+                        scenes.Add(sceneTemplate.SceneId, new SelectOption($"unknown name ({sceneTemplate.ScriptPackageId})"));
+                }
+            }
             long? entry = await itemFromListProvider.Value.GetItemFromList(scenes, false);
             if (!entry.HasValue)
                 return null;

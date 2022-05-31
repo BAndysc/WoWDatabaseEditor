@@ -95,6 +95,9 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public Task<IList<ICreatureModelInfo>> GetCreatureModelInfoAsync() => impl.GetCreatureModelInfoAsync();
 
         public ICreatureModelInfo? GetCreatureModelInfo(uint displayId) => impl.GetCreatureModelInfo(displayId);
+        public ISceneTemplate? GetSceneTemplate(uint sceneId) => impl.GetSceneTemplate(sceneId);
+        public Task<ISceneTemplate?> GetSceneTemplateAsync(uint sceneId) => impl.GetSceneTemplateAsync(sceneId);
+        public Task<IList<ISceneTemplate>?> GetSceneTemplatesAsync() => impl.GetSceneTemplatesAsync();
 
         public Task<List<IEventScriptLine>> GetEventScript(EventScriptType type, uint id) => impl.GetEventScript(type, id);
     }

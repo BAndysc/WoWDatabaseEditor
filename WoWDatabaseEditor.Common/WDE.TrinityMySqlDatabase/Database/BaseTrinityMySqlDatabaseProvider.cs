@@ -353,6 +353,11 @@ namespace WDE.TrinityMySqlDatabase.Database
                         .Set(p => p.ScriptName, "SmartAreaTriggerAI")
                         .UpdateAsync();
                     break;
+                case SmartScriptType.Scene:
+                    await model.SceneTemplates.Where(p => p.SceneId == (uint)entryOrGuid)
+                        .Set(p => p.ScriptName, "SmartScene")
+                        .UpdateAsync();
+                    break;
             }
             
             await model.SmartScript.BulkCopyAsync(script.Select(l => new MySqlSmartScriptLine(l)));
@@ -576,7 +581,25 @@ namespace WDE.TrinityMySqlDatabase.Database
                     throw new ArgumentOutOfRangeException(nameof(type), type, null);
             }
         }
+
+        public ISceneTemplate? GetSceneTemplate(uint sceneId)
+        {
+            using var model = Database();
+            return model.SceneTemplates.FirstOrDefault(x => x.SceneId == sceneId);
+        }
         
+        public async Task<ISceneTemplate?> GetSceneTemplateAsync(uint sceneId)
+        {
+            await using var model = Database();
+            return await model.SceneTemplates.FirstOrDefaultAsync(x => x.SceneId == sceneId);
+        }
+
+        public async Task<IList<ISceneTemplate>?> GetSceneTemplatesAsync()
+        {
+            await using var model = Database();
+            return await model.SceneTemplates.ToListAsync<ISceneTemplate>();
+        }
+
         public async Task<IList<IAuthRbacPermission>> GetRbacPermissionsAsync()
         {
             if (!Supports<IAuthRbacPermission>())

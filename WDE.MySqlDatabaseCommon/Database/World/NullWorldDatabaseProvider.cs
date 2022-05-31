@@ -134,5 +134,9 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         {
             return null;
         }
+        
+        public ISceneTemplate? GetSceneTemplate(uint sceneId) => null;
+        public Task<ISceneTemplate?> GetSceneTemplateAsync(uint sceneId) => Task.FromResult<ISceneTemplate?>(null);
+        public Task<IList<ISceneTemplate>?> GetSceneTemplatesAsync() => Task.FromResult<IList<ISceneTemplate>?>(null);
     }
 }

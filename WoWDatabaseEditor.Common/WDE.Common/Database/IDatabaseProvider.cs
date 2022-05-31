@@ -85,7 +85,11 @@ namespace WDE.Common.Database
 
         Task<IList<ICreatureModelInfo>> GetCreatureModelInfoAsync();
         ICreatureModelInfo? GetCreatureModelInfo(uint displayId);
-        
+
+        ISceneTemplate? GetSceneTemplate(uint sceneId);
+        Task<ISceneTemplate?> GetSceneTemplateAsync(uint sceneId);
+        Task<IList<ISceneTemplate>?> GetSceneTemplatesAsync();
+
         public enum SmartLinePropertyType
         {
             Event,
