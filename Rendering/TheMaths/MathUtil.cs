@@ -54,6 +54,12 @@ namespace TheMaths
         /// </summary>
         public const float ZeroTolerance = 1e-6f; // Value a 8x higher than 1.19209290E-07F
 
+        public const float PI = (float)Math.PI;
+        
+        public const float Rad2Deg = 180 / PI;
+        
+        public const float Deg2Rad = PI / 180;
+        
         /// <summary>
         /// A value specifying the approximation of π which is 180 degrees.
         /// </summary>

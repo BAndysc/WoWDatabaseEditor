@@ -7,6 +7,7 @@
         <SolidColorBrush x:Key="FastTableView.HeaderBackground" Color="#101010" />
         <SolidColorBrush x:Key="FastTableView.TextBrush" Color="#D2D2D2" />
         <SolidColorBrush x:Key="FastTableView.FocusTextBrush" Color="#D2D2D2" />
+        <SolidColorBrush x:Key="FastTableView.HoverRowBackground" Color="#577CDB" />
         <Pen Thickness="1" x:Key="FastTableView.HeaderBorderBackground" Brush="#343434" />
         <Pen Thickness="1" x:Key="FastTableView.BorderPen" Brush="White" />
         <Pen Thickness="2" x:Key="FastTableView.FocusPen" Brush="White" />

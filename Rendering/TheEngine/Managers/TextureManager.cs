@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using OpenGLBindings;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using TheAvaloniaOpenGL.Resources;
@@ -23,6 +24,7 @@ namespace TheEngine.Managers
         #endif
         
         public TextureHandle EmptyTexture { get; private set; }
+        private ITexture emptyTextureImpl { get; set; }
         
         private List<ITexture?> allTextures;
 
@@ -33,20 +35,21 @@ namespace TheEngine.Managers
             this.engine = engine;
 
             EmptyTexture = CreateTexture(new uint[] { 0xFFFFFFFF }, 1, 1);
+            emptyTextureImpl = GetTextureByHandle(EmptyTexture)!;
         }
 
         internal ITexture? this[TextureHandle handle]
         {
-            get => allTextures[handle.Handle - 1];
+            get => handle.Handle == 0 ? null : allTextures[handle.Handle - 1];
             set => allTextures[handle.Handle - 1] = value;
         }
         
         public void Dispose()
         {
-            DisposeTexture(EmptyTexture);
+            emptyTextureImpl.Dispose();
             foreach (var tex in allTextures)
             {
-                if (tex == null)
+                if (tex == null || tex == emptyTextureImpl)
                     continue;
                 #if DEBUG_CREATE_CALLSTACK
                 Console.WriteLine("Texture not disposed! Created: " + createCallStack[tex].ToString());
@@ -61,17 +64,25 @@ namespace TheEngine.Managers
             texturesByPath.Clear();
 #endif
         }
+        
+        private TextureHandle AllocHandle() => new TextureHandle(allTextures.Count + 1);
+
+        public TextureHandle CreateDummyHandle()
+        {
+            return AddTexture(emptyTextureImpl);
+        }
 
         private TextureHandle AddTexture(ITexture texture)
         {
-            var textureHandle = new TextureHandle(allTextures.Count + 1);
+            var textureHandle = AllocHandle();
             allTextures.Add(texture);
 #if DEBUG_CREATE_CALLSTACK
-            createCallStack[texture] = new System.Diagnostics.StackTrace(2, true);
+            if (texture != emptyTextureImpl)
+                createCallStack[texture] = new System.Diagnostics.StackTrace(2, true);
 #endif
-            return textureHandle;            
+            return textureHandle;
         }
-        
+
         public void DisposeTexture(TextureHandle handle)
         {
             if (handle.Handle == 0)
@@ -89,7 +100,8 @@ namespace TheEngine.Managers
             }
             
             var tex = GetTextureByHandle(handle);
-            tex.Dispose();
+            if (tex != emptyTextureImpl)
+                tex?.Dispose();
 #if DEBUG_CREATE_CALLSTACK
             createCallStack.Remove(tex);
 #endif
@@ -101,7 +113,8 @@ namespace TheEngine.Managers
             var oldTexture = GetTextureByHandle(old);
             var newTexture = GetTextureByHandle(@new);
             this[old] = newTexture;
-            oldTexture.Dispose();
+            if (oldTexture != emptyTextureImpl)
+                oldTexture.Dispose();
 #if DEBUG_CREATE_CALLSTACK
             createCallStack.Remove(oldTexture);
 #endif
@@ -163,9 +176,10 @@ namespace TheEngine.Managers
             return AddTexture(texture);
         }
         
-        public TextureHandle CreateDummyHandle()
+        public TextureHandle CreateRenderTexture(int width, int height)
         {
-            return CreateTexture(new Rgba32[][] { new Rgba32[] { new Rgba32(255, 255, 255, 255) } }, 1, 1, false);
+            var texture = engine.Device.CreateRenderTexture(width, height);
+            return AddTexture(texture);
         }
 
         internal ITexture? GetTextureByHandle(TextureHandle textureHandle)
@@ -181,6 +195,32 @@ namespace TheEngine.Managers
         public void SetWrapping(TextureHandle handle, WrapMode mode)
         {
             GetTextureByHandle(handle).SetWrapping(mode);
+        }
+
+        public void BlitFramebuffers(TextureHandle src, TextureHandle dst, int srcX0, int srcY0, int srcX1, int srcY1, int dstX0, int dstY0, int dstX1, int dstY1, ClearBufferMask mask, BlitFramebufferFilter filter)
+        {
+            var srcTex = GetTextureByHandle(src) as RenderTexture;
+            var dstTex = GetTextureByHandle(dst) as RenderTexture;
+            
+            srcTex!.ActivateSourceFrameBuffer();
+            dstTex!.ActivateRenderFrameBuffer();
+            engine.Device.device.BlitFramebuffer(srcX0, srcY0, srcX1, srcY1,  dstX0, dstY0,  dstX1,  dstY1, mask, filter);
+        }
+        
+        public void BlitRenderTextures(TextureHandle src, TextureHandle dst)
+        {
+            var srcTex = GetTextureByHandle(src) as RenderTexture;
+            var dstTex = GetTextureByHandle(dst) as RenderTexture;
+            
+            srcTex!.ActivateSourceFrameBuffer();
+            dstTex!.ActivateRenderFrameBuffer();
+            engine.Device.device.BlitFramebuffer(0, 0, srcTex.Width, srcTex.Height, 0, 0, dstTex.Width, dstTex.Height, ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Linear);
+            engine.Device.device.BlitFramebuffer(0, 0, srcTex.Width, srcTex.Height, 0, 0, dstTex.Width, dstTex.Height, ClearBufferMask.DepthBufferBit, BlitFramebufferFilter.Nearest);
+        }
+
+        public bool TextureExists(TextureHandle handle)
+        {
+            return allTextures.Count > handle.Handle && allTextures[handle.Handle] != null;
         }
     }
 }

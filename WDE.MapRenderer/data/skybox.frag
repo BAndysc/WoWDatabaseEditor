@@ -44,7 +44,7 @@ void main()
     
     // sun
     float sunStrength = distance(lightDir.xyz, Normal.xyz);   
-    color = mix(color, sunColor.rgb, (step(1.5, acos(sunStrength))) * (smoothstep(0.45, 0.5, TexCoord.y)));
+    color = mix(color, sunColor.rgb, (step(sunStrength, 0.1)) * (smoothstep(0.45, 0.5, TexCoord.y)));
     
 
     // stars

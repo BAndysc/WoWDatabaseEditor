@@ -15,6 +15,8 @@ namespace TheEngine.Interfaces
         TextureHandle CreateTexture(uint[] pixels, int width, int height);
         TextureHandle CreateTexture(float[] pixels, int width, int height); 
         TextureHandle CreateTexture(Vector4[] pixels, int width, int height);
+        TextureHandle CreateRenderTexture(int width, int height);
+        void BlitRenderTextures(TextureHandle src, TextureHandle dst);
         void DisposeTexture(TextureHandle handle);
         void SetFiltering(TextureHandle handle, FilteringMode mode);
         void SetWrapping(TextureHandle handle, WrapMode mode);
@@ -24,5 +26,6 @@ namespace TheEngine.Interfaces
          * @new handle becomes invalid
          */
         void ReplaceHandles(TextureHandle old, TextureHandle @new);
+
     }
 }

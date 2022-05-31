@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Reactive.Linq;
 using Avalonia.Collections;
 using Avalonia.Controls;
+using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Templates;
 using Avalonia.VisualTree;
 using WDE.Common.Avalonia.Utils;
-using WDE.Common.Disposables;
 using WDE.Common.Managers;
 using WDE.Common.Windows;
 using WDE.MVVM;
@@ -83,6 +83,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
                 DocumentManager.OpenedDocuments.ToStream(false).Where(e => e.Type == CollectionEventType.Remove)
                     .SubscribeAction(item =>
                     {
+                        RemoveContextMenus(documents[item.Item]);
                         documents.Remove(item.Item);
                     });
                 foreach (var tool in DocumentManager.AllTools)
@@ -93,6 +94,40 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
                             if (!toolVisibility)
                                 tools.Remove(tool);
                         });
+                }
+            }
+        }
+
+        // This might fix https://github.com/AvaloniaUI/Avalonia/issues/8214 in some cases, but dunno
+        private void RemoveContextMenus(IControl item)
+        {
+            Queue<(IControl, int)> queue = new();
+            queue.Enqueue((item, 0));
+            while (queue.Count > 0)
+            {
+                var (elem, level) = queue.Dequeue();
+                if (elem is ContentControl cc && cc.Content is IControl ic2)
+                {
+                    queue.Enqueue((ic2, level));
+                }
+                else if (elem is ContentPresenter cp && cp.Content is IControl ic3)
+                {
+                    queue.Enqueue((ic3, level));
+                }
+                if (elem is Control c)
+                {
+                    if (c.ContextMenu != null)
+                        c.ContextMenu = null;
+                    if (c.ContextFlyout != null)
+                        c.ContextFlyout = null;
+                }
+
+                foreach (var child in elem.GetVisualChildren())
+                {
+                    if (child is IControl ic)
+                    {
+                        queue.Enqueue((ic, level + 1));
+                    }
                 }
             }
         }

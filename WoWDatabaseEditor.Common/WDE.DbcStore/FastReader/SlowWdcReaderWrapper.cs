@@ -8,9 +8,10 @@ using WDE.Common.DBC;
 
 namespace WDE.DbcStore.FastReader
 {
-    public class SlowWdcReaderWrapper : IEnumerable<IDbcIterator>
+    public class SlowWdcReaderWrapper : IDBC
     {
         private readonly string path;
+        private int recordCount = -1;
 
         public SlowWdcReaderWrapper(string path)
         {
@@ -21,6 +22,7 @@ namespace WDE.DbcStore.FastReader
         {
             DBReader r = new();
             DBEntry dbEntry = r.Read(path);
+            recordCount = dbEntry.Data.Rows.Count;
             foreach (DataRow row in dbEntry.Data.Rows)
             {
                 yield return new Iterator(row);
@@ -60,6 +62,16 @@ namespace WDE.DbcStore.FastReader
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
+        }
+
+        public uint RecordCount
+        {
+            get
+            {
+                if (recordCount < 0)
+                    throw new Exception("You can't get record count before enumerating");
+                return (uint)recordCount;
+            }
         }
     }
 }

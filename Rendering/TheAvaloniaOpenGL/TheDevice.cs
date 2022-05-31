@@ -146,7 +146,7 @@ namespace TheAvaloniaOpenGL
         }
 
         // Safe multithread call
-        public RenderTexture CreateRenderTexture(int width, int height)
+        internal RenderTexture CreateRenderTexture(int width, int height)
         {
             return new RenderTexture(device, width, height);
         }
@@ -185,14 +185,14 @@ namespace TheAvaloniaOpenGL
         // call only form render thread
         public void DrawIndexed(int indexCount, int startIndexLocation, int baseVertexLocation)
         {
-            device.DrawElements(PrimitiveType.Triangles, indexCount, DrawElementsType.UnsignedInt, new IntPtr(startIndexLocation * 4));
+            device.DrawElements(PrimitiveType.Triangles, indexCount, DrawElementsType.UnsignedShort, new IntPtr(startIndexLocation * 2));
             //device.ImmediateContext.DrawIndexed(indexCount, startIndexLocation, baseVertexLocation);
         }
 
         // call only form render thread
         public void DrawIndexedInstanced(int indexCountPerInstance, int instanceCount, int startIndexLocation, int baseVertexLocation, int startInstanceLocation)
         {
-            device.DrawElementsInstanced(PrimitiveType.Triangles, indexCountPerInstance, DrawElementsType.UnsignedInt, new IntPtr(startIndexLocation * 4), instanceCount);
+            device.DrawElementsInstanced(PrimitiveType.Triangles, indexCountPerInstance, DrawElementsType.UnsignedShort, new IntPtr(startIndexLocation * 2), instanceCount);
             //device.ImmediateContext.DrawIndexedInstanced(indexCountPerInstance, instanceCount, startIndexLocation, baseVertexLocation, startInstanceLocation);
         }
 
@@ -201,12 +201,12 @@ namespace TheAvaloniaOpenGL
         /// call only from render thread
         /// </summary>
         /// <param name="renderTexture">render texture or null, then it resets to back buffer</param>
-        public void SetRenderTexture(RenderTexture renderTexture, int destFramebuffer)
+        internal void SetRenderTexture(RenderTexture? renderTexture, int destFramebuffer)
         {
             if (renderTexture == null)
                 device.BindFramebuffer(FramebufferTarget.Framebuffer, destFramebuffer);   
             else
-                renderTexture.ActivateFrameBuffer();
+                renderTexture.ActivateFrameBuffer(1);
             //RenderTargetView view = renderTexture == null ? renderTargetView : renderTexture.TargetView;
             //device.ImmediateContext.OutputMerger.SetTargets(depthStencilView, view);
         }

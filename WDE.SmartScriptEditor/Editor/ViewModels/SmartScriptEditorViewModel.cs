@@ -1452,7 +1452,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             var actionDataObservable = obj.ToObservable(e => e.Id)
                 .Select(id => smartDataManager.GetRawData(SmartType.SmartAction, id));
             var canPickConditions =
-                actionDataObservable.Select(ad => !ad.Flags.HasFlag(ActionFlags.ConditionInParameter1));
+                actionDataObservable.Select(ad => !ad.Flags.HasFlagFast(ActionFlags.ConditionInParameter1));
             var canPickTarget = actionDataObservable.Select(actionData => !actionData.TargetIsSource && (actionData.TargetTypes?.Count ?? 0) > 0);
 
             actionList.Add(new EditableActionData("Conditions", "Action", async () =>
@@ -1584,7 +1584,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                             originalAction.Target.Conditions = obj.Target.Conditions;
                         }
                         
-                        if (actionData.Flags.HasFlag(ActionFlags.ConditionInParameter1))
+                        if (actionData.Flags.HasFlagFast(ActionFlags.ConditionInParameter1))
                             originalAction.Conditions = obj.Conditions;
 
                         originalAction.Comment = obj.Comment;

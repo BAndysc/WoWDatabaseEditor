@@ -606,12 +606,30 @@ namespace WDE.PacketViewer.ViewModels
 
         private async Task RunProcessorsAndOpenResults(IReadOnlyList<ProcessorViewModel> processors, CancellationToken token)
         {
-            var textOutput = await RunProcessorsThreaded(processors, token);
+            string? textOutput;
+            try
+            {
+                textOutput = await RunProcessorsThreaded(processors, token);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
 
             if (token.IsCancellationRequested)
                 return;
-            
-            var documents = await RunDocumentProcessorsThreaded(processors, token);
+
+            List<IDocument>? documents;
+            try
+            {
+                documents = await RunDocumentProcessorsThreaded(processors, token);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
             
             if (token.IsCancellationRequested)
                 return;

@@ -7,7 +7,7 @@ using WDE.Common.DBC;
 
 namespace WDE.DbcStore.FastReader
 {
-    public class FastDb2Reader : IEnumerable<IDbcIterator>
+    public class FastDb2Reader : IDBC
     {
         public static readonly uint WDB2 = 0x32424457;
         private readonly byte[] bytes;
@@ -94,5 +94,7 @@ namespace WDE.DbcStore.FastReader
         {
             return GetEnumerator();
         }
+
+        public uint RecordCount => recordCount;
     }
 }

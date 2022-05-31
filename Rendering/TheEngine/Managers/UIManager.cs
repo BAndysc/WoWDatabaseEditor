@@ -46,6 +46,7 @@ namespace TheEngine.Managers
             cameraManager = engine.CameraManager;
             persistentTextArchetype = entityManager.NewArchetype()
                 .WithManagedComponentData<DrawTextData>()
+                .WithComponentData<DisabledObjectBit>()
                 .WithComponentData<LocalToWorld>();
             textShader = engine.ShaderManager.LoadShader("internalShaders/sdf.json", false);
             worldMaterial = engine.MaterialManager.CreateMaterial("internalShaders/world_text.json");
@@ -58,7 +59,7 @@ namespace TheEngine.Managers
 
             material = engine.MaterialManager.CreateMaterial(textShader, null);
             material.BlendingEnabled = true;
-            material.SourceBlending = Blending.SrcAlpha;
+            material.SourceBlending = Blending.One;
             material.DestinationBlending = Blending.OneMinusSrcAlpha;
             material.Culling = CullingMode.Off;
             material.ZWrite = false;
@@ -75,7 +76,7 @@ namespace TheEngine.Managers
                 new(1, 1),
                 new(1, 0),
                 new(0, 0),
-            }, new int[] { 0, 1,2, 2, 3, 0 }));
+            }, new ushort[] { 0, 1,2, 2, 3, 0 }));
             glyphPositionsBuffer = engine.Device.CreateBuffer<Vector4>(BufferTypeEnum.StructuredBufferVertexOnly, 1, BufferInternalFormat.Float4);
             glyphUVsBuffer = engine.Device.CreateBuffer<Vector4>(BufferTypeEnum.StructuredBufferVertexOnly, 1, BufferInternalFormat.Float4);
             material.SetBuffer("glpyhUVs", glyphUVsBuffer);
@@ -95,10 +96,12 @@ namespace TheEngine.Managers
         internal void Render()
         {
             var cameraPos = cameraManager.MainCamera.Transform.Position;
-            persistentTextArchetype.ForEach<LocalToWorld, DrawTextData>((itr, start, end, matrices, datas) =>
+            persistentTextArchetype.ForEach<LocalToWorld, DisabledObjectBit, DrawTextData>((itr, start, end, matrices, disabledAccess, datas) =>
             {
                 for (int i = start; i < end; ++i)
                 {
+                    if (disabledAccess[i])
+                        continue;
                     var data = datas[i];
                     var matrix = matrices[i];
                     if ((matrix.Position - cameraPos).LengthSquared() < data.visibilityDistanceSquare)
@@ -231,7 +234,7 @@ namespace TheEngine.Managers
             glyphPositionsBuffer.UpdateBuffer(glyphPositions);
             glyphUVsBuffer.UpdateBuffer(glyphUVs);
             engine.RenderManager.RenderInstancedIndirect(quad, material, 0, glyphsCount);
-            engine.RenderManager.Render(quad, material, 0, new Transform());
+            engine.RenderManager.Render(quad, material, 0,  Matrix.Identity);
         }
 
         public Vector2 MeasureText(string font, ReadOnlySpan<char> text, float fontSize)

@@ -23,12 +23,12 @@ namespace TheAvaloniaOpenGL.Resources
         Int4
     }
 
-    public interface INativeBuffer
+    public interface INativeBuffer : IDisposable
     {
         void Activate(int slot);
     }
 
-    public sealed class NativeBuffer<T> : IDisposable, INativeBuffer where T : unmanaged
+    public sealed class NativeBuffer<T> : INativeBuffer where T : unmanaged
     {
         private static bool UseStorageBuffer = false;
         

@@ -1,4 +1,5 @@
 using WDE.Common.DBC;
+using WDE.MpqReader.DBC;
 using WDE.MpqReader.Structures;
 
 namespace WDE.MapRenderer.Managers
@@ -13,11 +14,14 @@ namespace WDE.MapRenderer.Managers
         public CreatureDisplayInfoStore CreatureDisplayInfoStore { get; }
         public CreatureDisplayInfoExtraStore CreatureDisplayInfoExtraStore { get; }
         public EmoteStore EmoteStore { get; }
+        public AnimationDataStore AnimationDataStore { get; }
+        public ItemStore ItemStore { get; }
         public ItemDisplayInfoStore ItemDisplayInfoStore { get; }
         public CreatureModelDataStore CreatureModelDataStore { get; }
         public GameObjectDisplayInfoStore GameObjectDisplayInfoStore { get; }
+        public HelmetGeosetVisDataStore HelmetGeosetVisDataStore { get; }
         public CharSectionsStore CharSectionsStore { get; }
-        // public ChrRacesStore ChrRacesStore { get; }
+        public ChrRacesStore ChrRacesStore { get; }
         public CharacterFacialHairStylesStore CharacterFacialHairStylesStore { get; }
         public CharHairGeosetsStore CharHairGeosetsStore { get; }
         public MapStore MapStore { get; }
@@ -41,10 +45,13 @@ namespace WDE.MapRenderer.Managers
             CreatureDisplayInfoExtraStore = new(OpenDbc("CreatureDisplayInfoExtra")); // for humanoids
             CreatureModelDataStore = new(OpenDbc("CreatureModelData"));
             EmoteStore = new(OpenDbc("Emotes"));
+            AnimationDataStore = new(OpenDbc("AnimationData"));
             GameObjectDisplayInfoStore = new(OpenDbc("GameObjectDisplayInfo"));
+            ItemStore = new(OpenDbc("Item"));
             ItemDisplayInfoStore = new(OpenDbc("ItemDisplayInfo"));
+            HelmetGeosetVisDataStore = new(OpenDbc("HelmetGeosetVisData"));
             CharSectionsStore = new(OpenDbc("CharSections"));
-            // ChrRacesStore = new(OpenDbc("ChrRaces"));
+            ChrRacesStore = new(OpenDbc("ChrRaces"));
             CharacterFacialHairStylesStore = new(OpenDbc("CharacterFacialHairStyles"));
             CharHairGeosetsStore = new(OpenDbc("CharHairGeosets"));
             MapStore = new (OpenDbc("Map"));

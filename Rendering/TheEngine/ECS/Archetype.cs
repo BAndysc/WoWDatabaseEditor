@@ -32,7 +32,10 @@ namespace TheEngine.ECS
             var typeData = EntityManager.ManagedTypeData<T>();
             n.managedComponents.Add(typeData);
             n.usedManagedComponents = usedManagedComponents;
-            n.usedManagedComponents[(1 << typeData.Index)] = true;
+            n.usedManagedComponents[(int)typeData.Hash] = true;
+
+            EntityManager.InstallArchetype(n);
+            
             return n;
         }
 
@@ -46,7 +49,40 @@ namespace TheEngine.ECS
             var typeData = EntityManager.TypeData<T>();
             n.components.Add(typeData);
             n.usedComponents = usedComponents;
-            n.usedComponents[(1 << typeData.Index)] = true;
+            n.usedComponents[(int)typeData.Hash] = true;
+            
+            EntityManager.InstallArchetype(n);
+            
+            return n;
+        }
+
+        public Archetype Includes(Archetype other)
+        {
+            var n = new Archetype(EntityManager);
+            n.managedComponents.AddRange(managedComponents);
+            n.usedManagedComponents = usedManagedComponents;
+            n.components.AddRange(components);
+            n.usedComponents = usedComponents;
+            
+            foreach (var component in other.Components)
+            {
+                if (!n.usedComponents[(int)component.Hash])
+                {
+                    n.components.Add(component);
+                    n.usedComponents[(int)component.Hash] = true;   
+                }
+            }
+            
+            foreach (var component in other.ManagedComponents)
+            {
+                if (!n.usedManagedComponents[(int)component.Hash])
+                {
+                    n.managedComponents.Add(component);
+                    n.usedManagedComponents[(int)component.Hash] = true;   
+                }
+            }
+            
+            EntityManager.InstallArchetype(n);
             return n;
         }
 

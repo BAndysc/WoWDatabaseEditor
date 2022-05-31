@@ -111,11 +111,12 @@ float Noise(vec2 UV, float Scale)
 
 
 #ifdef VERTEX_SHADER
-layout (location = 0) in vec4 position;
-layout (location = 1) in vec4 color;
-layout (location = 2) in vec4 normal;
-layout (location = 3) in vec2 uv1;
-layout (location = 4) in vec2 uv2;
+layout (location = 0) in vec3 position;
+layout (location = 1) in vec3 normal;
+layout (location = 2) in vec2 uv1;
+layout (location = 3) in vec2 uv2;
+layout (location = 4) in vec4 color;
+layout (location = 5) in vec4 color2;
 
 layout (std140) uniform ObjectData
 {

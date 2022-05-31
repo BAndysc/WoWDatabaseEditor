@@ -6,6 +6,7 @@ using WDE.Common.Services.MessageBox;
 using WDE.Common.Tasks;
 using WDE.MapRenderer;
 using WDE.MapRenderer.Managers;
+using WDE.MpqReader.DBC;
 using WDE.MpqReader.Structures;
 
 namespace RenderingTester;
@@ -42,7 +43,9 @@ public class DummyGameProperties : IGameProperties
     public bool ShowGrid => false;
     public Time CurrentTime { get; set; } = Time.FromMinutes(720);
     public float ViewDistanceModifier => 16;
-    public bool ShowAreaTriggers => true;
+    public bool ShowAreaTriggers => false;
+    public int TextureQuality => 0;
+    public float DynamicResolution => 1;
 }
 
 public class DummyMessageBox : IMessageBoxService

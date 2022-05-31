@@ -1,4 +1,5 @@
 using WDE.Module.Attributes;
+using WDE.MpqReader.DBC;
 using WDE.MpqReader.Structures;
 
 namespace WDE.MapRenderer.Managers;
@@ -13,6 +14,8 @@ public interface IGameProperties
     Time CurrentTime { get; set; }
     float ViewDistanceModifier { get; }
     bool ShowAreaTriggers { get; }
+    int TextureQuality { get; }
+    float DynamicResolution { get; }
 }
 
 [AutoRegister]
@@ -25,5 +28,7 @@ public class GameProperties : IGameProperties
     public bool ShowGrid { get; set; }
     public Time CurrentTime { get; set; }
     public float ViewDistanceModifier { get; set; }
+    public int TextureQuality { get; set; }
     public bool ShowAreaTriggers { get; set; }
+    public float DynamicResolution { get; set; } = 1;
 }

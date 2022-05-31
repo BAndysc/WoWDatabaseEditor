@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace WDE.Common.Utils
@@ -38,7 +39,20 @@ namespace WDE.Common.Utils
             return default;
         }
         
-        public static int IndexIf<T>(this IList<T> list, Func<T, bool> pred)
+        public static int IndexIfObject(this IList list, Func<object?, bool> pred)
+        {
+            for (int i = 0; i < list.Count; i++)
+            {
+                if (pred(list[i]))
+                {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+
+        public static int IndexIf<T>(this IReadOnlyList<T> list, Func<T, bool> pred)
         {
             for (int i = 0; i < list.Count; i++)
             {

@@ -263,7 +263,7 @@ public class GenericTableQueryParserProvider : IQueryParserProvider
             DatabaseTableSolutionItem? existing = null;
             if (!byTable.TryGetValue(toDelete.Key, out existing))
             {
-                var phantom = new DatabaseTableSolutionItem(toDelete.Key, false); // false, because we only have SingleRow here
+                var phantom = new DatabaseTableSolutionItem(toDelete.Key, true); // true, because we only have SingleRow here
                 existing = (sessionService.CurrentSession?.Find(phantom) as DatabaseTableSolutionItem) ?? phantom;
                 context.ProduceItem(existing);
             }

@@ -270,7 +270,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
         {
             var systemWideControlModifier = AvaloniaLocator.Current
                 .GetService<PlatformHotkeyConfiguration>()?.CommandModifiers ?? KeyModifiers.Control;
-            isCopying = key.HasFlag(systemWideControlModifier);
+            isCopying = key.HasFlagFast(systemWideControlModifier);
         }
 
         protected override void OnPointerReleased(PointerReleasedEventArgs e)

@@ -19,6 +19,7 @@ namespace TheEngine.ECS
         private uint used;
         private readonly Dictionary<System.Type, int> typeToIndexMapping = new();
         private readonly Dictionary<System.Type, int> typeToManagedIndexMapping = new();
+        private readonly Dictionary<ulong, Archetype> archetypes = new();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void ResizeIfNeeded()
@@ -50,9 +51,52 @@ namespace TheEngine.ECS
             return newEntity;
         }
 
+        public void AddComponent<T>(Entity entity, in T component) where T : unmanaged, IComponentData
+        {
+            ulong currentArchetypeHash = entitiesArchetype[entity.Id];
+            var componentTypeData = TypeData<T>();
+
+            var entityAlreadyHasComponent = (currentArchetypeHash & componentTypeData.GlobalHash) != 0;
+            if (entityAlreadyHasComponent)
+            {
+                Console.WriteLine("The entity has already the component, consider using GetComponent<T>() = value for more performance");
+            }
+            else
+            {
+                var oldArchetype = archetypes[currentArchetypeHash];
+                var newArchetype = oldArchetype.WithComponentData<T>();
+                dataManager.MoveEntity(entity, oldArchetype, newArchetype);
+                entitiesArchetype[entity.Id] = newArchetype.Hash;
+            }
+            GetComponent<T>(entity) = component;
+        }
+        
+        public void AddManagedComponent<T>(Entity entity, T component) where T : class, IManagedComponentData
+        {
+            ulong currentArchetypeHash = entitiesArchetype[entity.Id];
+            var componentTypeData = ManagedTypeData<T>();
+
+            var entityAlreadyHasComponent = (currentArchetypeHash & componentTypeData.GlobalHash) != 0;
+            if (entityAlreadyHasComponent)
+            {
+                Console.WriteLine("The entity has already the component, consider using SetManagedComponent<T>(value) for more performance");
+            }
+            else
+            {
+                var oldArchetype = archetypes[currentArchetypeHash];
+                var newArchetype = oldArchetype.WithManagedComponentData<T>();
+                dataManager.MoveEntity(entity, oldArchetype, newArchetype);
+                entitiesArchetype[entity.Id] = newArchetype.Hash;
+            }
+            SetManagedComponent<T>(entity, component);
+        }
+
         public void DestroyEntity(Entity entity)
         {
-            dataManager.RemoveEntity(entity, entitiesArchetype[entity.Id]);
+            if (entities[entity.Id].Version != entity.Version)
+                throw new Exception("Double remove entity, that's not allowed!");
+            var archetypeHash = entitiesArchetype[entity.Id];
+            dataManager.RemoveEntity(entity, archetypeHash);
             freeEntities.Add(entity);
             entities[entity.Id] = Entity.Empty;
             entitiesArchetype[entity.Id] = 0;
@@ -82,6 +126,21 @@ namespace TheEngine.ECS
         public bool Is(Entity entity, Archetype archetype)
         {
             return (entitiesArchetype[entity.Id] & archetype.Hash) == archetype.Hash;
+        }
+
+        public void InstallArchetype(Archetype archetype)
+        {
+            archetypes[archetype.Hash] = archetype;
+        }
+
+        public bool HasComponent<T>(Entity entity) where T : unmanaged, IComponentData
+        {
+            return (entitiesArchetype[entity.Id] & TypeData<T>().GlobalHash) != 0;
+        }
+
+        public bool HasManagedComponent<T>(Entity entity) where T : class, IManagedComponentData
+        {
+            return (entitiesArchetype[entity.Id] & ManagedTypeData<T>().GlobalHash) != 0;
         }
 
         public IEnumerable<IChunkDataIterator> ArchetypeIterator(Archetype archetype)

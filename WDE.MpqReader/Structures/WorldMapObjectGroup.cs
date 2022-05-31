@@ -10,15 +10,15 @@ namespace WDE.MpqReader.Structures
     {
         public WorldMapObjectGroupHeader Header { get; init; }
         public PooledArray<WorldMapObjectPoly> Polygons { get; set; }
-        public PooledArray<int> Indices { get; init; }
+        public PooledArray<ushort> Indices { get; init; }
         public PooledArray<Vector3> Vertices { get; init; }
-        public PooledArray<Vector4>? VertexColors { get; init; }
-        public int[] CollisionOnlyIndices { get; init; }
+        public PooledArray<Color>? VertexColors { get; init; }
+        public ushort[] CollisionOnlyIndices { get; init; }
         public PooledArray<Vector3> Normals { get; init; }
         public List<PooledArray<Vector2>> UVs { get; init; } = new();
         public WorldMapObjectBatch[] Batches { get; init; }
     
-        public WorldMapObjectGroup(IBinaryReader reader, bool openGlCoords)
+        public WorldMapObjectGroup(IBinaryReader reader)
         {
             var firstChunkName = reader.ReadBytes(4);
             Debug.Assert(firstChunkName[0] == 'R' && firstChunkName[1] == 'E' && firstChunkName[2] == 'V' && firstChunkName[3] == 'M');
@@ -59,11 +59,11 @@ namespace WDE.MpqReader.Structures
                 reader.Offset = offset + size;
             }
         }
-
-        private static int[] BuildCollisionOnlyIndices(PooledArray<WorldMapObjectPoly>? polygons, PooledArray<int>? indices)
+        
+        private static ushort[] BuildCollisionOnlyIndices(PooledArray<WorldMapObjectPoly>? polygons, PooledArray<ushort>? indices)
         {
             if (polygons == null || indices == null)
-                return new int[] { };
+                return new ushort[] { };
             int triangles = 0;
             for (int i = 0; i < polygons.Length; ++i)
             {
@@ -71,7 +71,7 @@ namespace WDE.MpqReader.Structures
                     triangles++;
             }
 
-            var collisionOnlyIndices = new int[triangles * 3];
+            var collisionOnlyIndices = new ushort[triangles * 3];
             int j = 0;
             for (int i = 0; i < polygons.Length; ++i)
             {
@@ -86,17 +86,17 @@ namespace WDE.MpqReader.Structures
             return collisionOnlyIndices;
         }
 
-        private PooledArray<Vector4> ReadVertexColors(IBinaryReader reader, int size)
+        private PooledArray<Color> ReadVertexColors(IBinaryReader reader, int size)
         {
-            PooledArray<Vector4> colors = new PooledArray<Vector4>(size / 4);
+            PooledArray<Color> colors = new PooledArray<Color>(size / 4);
             int i = 0;
             while (!reader.IsFinished())
             {
-                var b = reader.ReadByte() / 255.0f;
-                var g = reader.ReadByte() / 255.0f;
-                var r = reader.ReadByte() / 255.0f;
-                var a = reader.ReadByte() / 255.0f;
-                colors[i++] = new Vector4(r, g, b, a);
+                var b = reader.ReadByte();
+                var g = reader.ReadByte();
+                var r = reader.ReadByte();
+                var a = reader.ReadByte();
+                colors[i++] = new Color(r, g, b, a);
             }
 
             return colors;
@@ -148,9 +148,9 @@ namespace WDE.MpqReader.Structures
             return vertices;
         }
 
-        private static PooledArray<int> ParseIndices(IBinaryReader reader, int size, PooledArray<WorldMapObjectPoly> polygons)
+        private static PooledArray<ushort> ParseIndices(IBinaryReader reader, int size, PooledArray<WorldMapObjectPoly> polygons)
         {
-            PooledArray<int> indices = new PooledArray<int>(size / 2);
+            PooledArray<ushort> indices = new PooledArray<ushort>(size / 2);
             int i = 0;
             while (!reader.IsFinished())
             {
@@ -244,7 +244,7 @@ namespace WDE.MpqReader.Structures
         public ushort extBatchCount;
         public ushort padding_or_batch_type_d; // probably padding, but might be data?
 
-        public byte[] fogIds;                // ids in MFOG
+        public Byte4Array fogIds;                // ids in MFOG
         public uint groupLiquid;             // see below in the MLIQ chunk
 
         public uint uniqueID;
@@ -264,7 +264,7 @@ namespace WDE.MpqReader.Structures
             intBatchCount = reader.ReadUInt16();
             extBatchCount = reader.ReadUInt16();
             padding_or_batch_type_d = reader.ReadUInt16();
-            fogIds = new byte[] { reader.ReadByte(), reader.ReadByte(), reader.ReadByte(), reader.ReadByte() };
+            fogIds = reader.ReadUInt32();
             groupLiquid = reader.ReadUInt32();
             uniqueID = reader.ReadUInt32();
             flags2 = reader.ReadUInt32();

@@ -439,8 +439,12 @@ namespace TheMaths
         /// </summary>
         public Vector3 ScaleVector
         {
-            get { return new Vector3(M11, M22, M33); }
-            set { M11 = value.X; M22 = value.Y; M33 = value.Z; }
+            get
+            {
+                return new Vector3((float)Math.Sqrt((M11 * M11) + (M12 * M12) + (M13 * M13)),
+                    (float)Math.Sqrt((M21 * M21) + (M22 * M22) + (M23 * M23)),
+                    (float)Math.Sqrt((M31 * M31) + (M32 * M32) + (M33 * M33)));
+            }
         }
 
         /// <summary>

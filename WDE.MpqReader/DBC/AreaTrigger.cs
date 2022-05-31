@@ -1,14 +1,7 @@
-﻿using System.Collections;
-using WDE.Common.DBC;
+﻿using WDE.Common.DBC;
 
-namespace WDE.MpqReader.Structures
+namespace WDE.MpqReader.DBC
 {
-    public enum AreaTriggerShape
-    {
-        Box,
-        Sphere
-    }
-    
     public class AreaTrigger
     {
         public readonly int Id;
@@ -53,23 +46,5 @@ namespace WDE.MpqReader.Structures
         }
 
         public static AreaTrigger Empty => new AreaTrigger();
-    }
-
-    public class AreaTriggerStore : IEnumerable<AreaTrigger>
-    {
-        private Dictionary<int, AreaTrigger> store = new();
-        public AreaTriggerStore(IEnumerable<IDbcIterator> rows)
-        {
-            foreach (var row in rows)
-            {
-                var o = new AreaTrigger(row);
-                store[o.Id] = o;
-            }
-        }
-
-        public bool Contains(int id) => store.ContainsKey(id);
-        public AreaTrigger this[int id] => store[id];
-        public IEnumerator<AreaTrigger> GetEnumerator() => store.Values.GetEnumerator();
-        IEnumerator IEnumerable.GetEnumerator() => store.Values.GetEnumerator();
     }
 }

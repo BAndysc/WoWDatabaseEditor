@@ -39,6 +39,7 @@ namespace WoWDatabaseEditorCore.Avalonia
             {
                 FatalErrorHandler.ExceptionOccured(e);
             }
+            TheEngine.TheEngine.Deinit();
         }
 
         private static void FixCurrentDirectory()

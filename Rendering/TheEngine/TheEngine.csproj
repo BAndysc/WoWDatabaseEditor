@@ -37,10 +37,22 @@
       <None Update="fonts\calibri.png">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
+      <None Update="ECS\EntityExtensionsCodeGen.tt">
+        <Generator>TextTemplatingFileGenerator</Generator>
+        <LastGenOutput>EntityExtensionsCodeGen.cs</LastGenOutput>
+      </None>
     </ItemGroup>
     
     <ItemGroup>
       <PackageReference Include="OpenTK.Windowing.Desktop" Version="4.6.4" />
+    </ItemGroup>
+    
+    <ItemGroup>
+      <Compile Update="ECS\EntityExtensionsCodeGen.cs">
+        <AutoGen>True</AutoGen>
+        <DesignTime>True</DesignTime>
+        <DependentUpon>EntityExtensionsCodeGen.tt</DependentUpon>
+      </Compile>
     </ItemGroup>
 
 </Project>

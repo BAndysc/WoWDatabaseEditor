@@ -319,7 +319,7 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                 return true;
             
             if (!spellService.Exists(spellId) ||
-                !spellService.GetAttributes<SpellAttr0>(spellId).HasFlag(SpellAttr0.DoNotDisplaySpellBookAuraIconCombatLog))
+                !spellService.GetAttributes<SpellAttr0>(spellId).HasFlagFast(SpellAttr0.DoNotDisplaySpellBookAuraIconCombatLog))
                 return false;
 
             return true;

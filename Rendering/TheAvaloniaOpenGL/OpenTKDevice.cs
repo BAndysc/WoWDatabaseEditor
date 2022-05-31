@@ -1,6 +1,7 @@
 using System;
 using OpenTK.Graphics.OpenGL4;
 using ActiveUniformType = OpenGLBindings.ActiveUniformType;
+using BlendEquationMode = OpenGLBindings.BlendEquationMode;
 using BlendingFactorDest = OpenGLBindings.BlendingFactorDest;
 using BlendingFactorSrc = OpenGLBindings.BlendingFactorSrc;
 using BufferRangeTarget = OpenGLBindings.BufferRangeTarget;
@@ -319,6 +320,11 @@ namespace TheAvaloniaOpenGL
             return str;
         }
 
+        public void BlendEquation(BlendEquationMode mode)
+        {
+            GL.BlendEquation((OpenTK.Graphics.OpenGL4.BlendEquationMode)mode);
+        }
+
         public int CreateProgram()
         {
             return GL.CreateProgram();
@@ -342,6 +348,11 @@ namespace TheAvaloniaOpenGL
         public void BlendFunc(BlendingFactorSrc src, BlendingFactorDest dst)
         {
             GL.BlendFunc((BlendingFactor)src, (BlendingFactor)dst);
+        }
+
+        public void BlendFuncSeparate(BlendingFactorSrc srcRGB, BlendingFactorDest dstRGB, BlendingFactorSrc srcAlpha, BlendingFactorDest dstAlpha)
+        {
+            GL.BlendFuncSeparate((OpenTK.Graphics.OpenGL4.BlendingFactorSrc)srcRGB, (OpenTK.Graphics.OpenGL4.BlendingFactorDest)dstRGB, (OpenTK.Graphics.OpenGL4.BlendingFactorSrc)srcAlpha, (OpenTK.Graphics.OpenGL4.BlendingFactorDest)dstAlpha);
         }
 
         public unsafe string CompileShaderAndGetError(int shader, string source)
@@ -475,6 +486,11 @@ namespace TheAvaloniaOpenGL
         public void DepthFunction(DepthFunction func)
         {
             GL.DepthFunc((OpenTK.Graphics.OpenGL4.DepthFunction)func);
+        }
+        
+        public void BlitFramebuffer(int srcX0, int srcY0, int srcX1, int srcY1, int dstX0, int dstY0, int dstX1, int dstY1, ClearBufferMask mask, OpenGLBindings.BlitFramebufferFilter filter)
+        {
+            GL.BlitFramebuffer(srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, (OpenTK.Graphics.OpenGL4.ClearBufferMask)mask, (BlitFramebufferFilter)filter);
         }
     }
 }

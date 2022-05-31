@@ -2,7 +2,7 @@ using WDE.MapRenderer.StaticData;
 
 namespace WDE.MapRenderer.Managers;
 
-public class PerChunkHolder<T>
+public class PerChunkHolder<T> where T : new()
 {
     private T?[,] array = new T?[Constants.Blocks, Constants.Blocks];
 
@@ -14,7 +14,12 @@ public class PerChunkHolder<T>
     
     public T? this[int x, int y]
     {
-        get => array[x, y];
+        get
+        {
+            if (array[x, y] == null)
+                return array[x, y] = new T();
+            return array[x, y];
+        }
         set => array[x, y] = value;
     }
     

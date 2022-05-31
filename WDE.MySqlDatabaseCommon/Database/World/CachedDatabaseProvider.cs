@@ -30,6 +30,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         private List<IQuestTemplate>? questTemplateCache;
         private Dictionary<uint, IQuestTemplate> questTemplateByEntry = new();
         
+        private Dictionary<uint, ICreatureModelInfo>? creatureModelInfos;
+        
         private Dictionary<uint, IReadOnlyList<ICreatureText>?> creatureTextsCache = new();
 
         private List<IAreaTriggerTemplate>? areaTriggerTemplates;
@@ -320,6 +322,16 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public Task<IBroadcastText?> GetBroadcastTextByIdAsync(uint id) => nonCachedDatabase.GetBroadcastTextByIdAsync(id);
 
         public Task<List<IEventScriptLine>> FindEventScriptLinesBy(IReadOnlyList<(uint command, int dataIndex, long valueToSearch)> conditions) => nonCachedDatabase.FindEventScriptLinesBy(conditions);
+        public Task<IList<ICreatureModelInfo>> GetCreatureModelInfoAsync() => nonCachedDatabase.GetCreatureModelInfoAsync();
+
+        public ICreatureModelInfo? GetCreatureModelInfo(uint displayId)
+        {
+            if (creatureModelInfos == null)
+                return nonCachedDatabase.GetCreatureModelInfo(displayId);
+            if (creatureModelInfos.TryGetValue(displayId, out var info))
+                return info;
+            return null;
+        }
 
         public Task<List<IEventScriptLine>> GetEventScript(EventScriptType type, uint id) => nonCachedDatabase.GetEventScript(type, id);
 
@@ -417,6 +429,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
                     Dictionary<uint, ICreatureTemplate> creatureTemplateByEntry = new();
                     Dictionary<uint, IGameObjectTemplate> gameObjectTemplateByEntry = new();
                     Dictionary<uint, IQuestTemplate> questTemplateByEntry = new();
+                    Dictionary<uint, ICreatureModelInfo> creatureModelInfos = new();
 
                     foreach (var entity in cache.creatureTemplateCache)
                         creatureTemplateByEntry[entity.Entry] = entity;
@@ -427,9 +440,13 @@ namespace WDE.MySqlDatabaseCommon.Database.World
                     foreach (var entity in cache.questTemplateCache)
                         questTemplateByEntry[entity.Entry] = entity;
 
+                    foreach (var entity in (await cache.nonCachedDatabase.GetCreatureModelInfoAsync()))
+                        creatureModelInfos[entity.DisplayId] = entity;
+                    
                     cache.creatureTemplateByEntry = creatureTemplateByEntry;
                     cache.gameObjectTemplateByEntry = gameObjectTemplateByEntry;
                     cache.questTemplateByEntry = questTemplateByEntry;
+                    cache.creatureModelInfos = creatureModelInfos;
                 }
                 catch (Exception e)
                 {

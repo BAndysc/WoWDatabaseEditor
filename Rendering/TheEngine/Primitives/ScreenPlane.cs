@@ -28,7 +28,7 @@ namespace TheEngine.Primitives
         };
 
 
-        private static int[] indices =
+        private static ushort[] indices =
         {
             0, 1, 2,
             0, 2, 3

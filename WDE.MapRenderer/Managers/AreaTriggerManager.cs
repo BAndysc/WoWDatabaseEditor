@@ -3,6 +3,7 @@ using TheEngine.Entities;
 using TheEngine.Interfaces;
 using TheMaths;
 using WDE.MapRenderer.StaticData;
+using WDE.MpqReader.DBC;
 using WDE.MpqReader.Structures;
 
 namespace WDE.MapRenderer.Managers

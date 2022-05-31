@@ -377,9 +377,9 @@ namespace WDE.TrinityMySqlDatabase.Database
 
             var conditions = conditionLines?.ToList() ?? new List<IConditionLine>();
             List<(int SourceType, int? SourceGroup, int? SourceEntry, int? SourceId)> keys = conditions.Select(c =>
-                    (c.SourceType, keyMask.HasFlag(IDatabaseProvider.ConditionKeyMask.SourceGroup) ? (int?) c.SourceGroup : null,
-                        keyMask.HasFlag(IDatabaseProvider.ConditionKeyMask.SourceEntry) ? (int?) c.SourceEntry : null,
-                        keyMask.HasFlag(IDatabaseProvider.ConditionKeyMask.SourceId) ? (int?) c.SourceId : null))
+                    (c.SourceType, keyMask.HasFlagFast(IDatabaseProvider.ConditionKeyMask.SourceGroup) ? (int?) c.SourceGroup : null,
+                        keyMask.HasFlagFast(IDatabaseProvider.ConditionKeyMask.SourceEntry) ? (int?) c.SourceEntry : null,
+                        keyMask.HasFlagFast(IDatabaseProvider.ConditionKeyMask.SourceId) ? (int?) c.SourceId : null))
                 .Union(manualKey.HasValue
                     ? new[]
                     {
@@ -419,9 +419,9 @@ namespace WDE.TrinityMySqlDatabase.Database
             await using var model = Database();
 
             return await model.Conditions.Where(x => x.SourceType == key.SourceType &&
-                                                     (!keyMask.HasFlag(IDatabaseProvider.ConditionKeyMask.SourceGroup) || x.SourceGroup == (key.SourceGroup ?? 0)) &&
-                                                     (!keyMask.HasFlag(IDatabaseProvider.ConditionKeyMask.SourceEntry)  || x.SourceEntry == (key.SourceEntry ?? 0)) &&
-                                                     (!keyMask.HasFlag(IDatabaseProvider.ConditionKeyMask.SourceId)  || x.SourceId == (key.SourceId ?? 0)))
+                                                     (!keyMask.HasFlagFast(IDatabaseProvider.ConditionKeyMask.SourceGroup) || x.SourceGroup == (key.SourceGroup ?? 0)) &&
+                                                     (!keyMask.HasFlagFast(IDatabaseProvider.ConditionKeyMask.SourceEntry)  || x.SourceEntry == (key.SourceEntry ?? 0)) &&
+                                                     (!keyMask.HasFlagFast(IDatabaseProvider.ConditionKeyMask.SourceId)  || x.SourceId == (key.SourceId ?? 0)))
                 .ToListAsync<IConditionLine>();
         }
 
@@ -552,7 +552,19 @@ namespace WDE.TrinityMySqlDatabase.Database
             var waypoints = await model.WaypointScripts.Where(GenerateWhereConditionsForEventScript<MySqlWaypointScriptLine>(conditions)).ToListAsync<IEventScriptLine>();
             return events.Concat(spells).Concat(waypoints).ToList();
         }
-        
+
+        public async Task<IList<ICreatureModelInfo>> GetCreatureModelInfoAsync()
+        {
+            await using var model = Database();
+            return await model.CreatureModelInfo.ToListAsync<ICreatureModelInfo>();
+        }
+
+        public ICreatureModelInfo? GetCreatureModelInfo(uint displayId)
+        {
+            using var model = Database();
+            return model.CreatureModelInfo.FirstOrDefault(x => x.DisplayId == displayId);
+        }
+
         public async Task<List<IEventScriptLine>> GetEventScript(EventScriptType type, uint id)
         {
             await using var model = Database();

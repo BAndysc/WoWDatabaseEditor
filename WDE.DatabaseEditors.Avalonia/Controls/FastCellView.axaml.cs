@@ -11,6 +11,7 @@ using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Threading;
+using Prism.Commands;
 
 namespace WDE.DatabaseEditors.Avalonia.Controls
 {
@@ -65,19 +66,19 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
             textBox.MinHeight = 0;
             textBox.Margin = new Thickness(partText?.Margin.Left ?? 0,partText?.Margin.Top ?? 0, 0, 0);
             textBox.Padding = new Thickness(partText?.Padding.Left ?? 0,partText?.Padding.Top ?? 0, 0, 0);
+            textBox.KeyBindings.Add(new KeyBinding()
+            {
+                Gesture = new KeyGesture(Key.Enter),
+                Command = new DelegateCommand(() => EndEditing(true))
+            });
+            textBox.KeyBindings.Add(new KeyBinding()
+            {
+                Gesture = new KeyGesture(Key.Escape),
+                Command = new DelegateCommand(() => EndEditing(false))
+            });
             var disposable1 = textBox.AddDisposableHandler(KeyDownEvent, (sender, args) =>
             {
                 HandleMoveLeftRightUpBottom(args, false);
-                if (args.Key is Key.Return or Key.Enter)
-                {
-                    EndEditing();
-                    args.Handled = true;
-                }
-                else if (args.Key == Key.Escape)
-                {
-                    EndEditing(false);
-                    args.Handled = true;
-                }
             });
             var disposable2 = textBox.AddDisposableHandler(LostFocusEvent, (sender, args) =>
             {

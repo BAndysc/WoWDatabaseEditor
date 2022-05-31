@@ -1,3 +1,4 @@
+using System.Buffers;
 using System.Collections;
 using SixLabors.ImageSharp.PixelFormats;
 using TheAvaloniaOpenGL.Resources;
@@ -8,7 +9,9 @@ using TheEngine.Entities;
 using TheEngine.Handles;
 using TheEngine.Interfaces;
 using TheEngine.Managers;
+using TheEngine.PhysicsSystem;
 using TheMaths;
+using WDE.MapRenderer.Managers.Entities;
 using WDE.MapRenderer.StaticData;
 using WDE.MpqReader;
 using WDE.MpqReader.Readers;
@@ -82,6 +85,8 @@ namespace WDE.MapRenderer.Managers
         private readonly WmoManager wmoManager;
         private readonly WorldManager worldManager;
         private readonly Lazy<LoadingManager> loadingManager;
+        private readonly ModuleManager moduleManager;
+        private readonly RaycastSystem raycastSystem;
         private readonly Engine engine;
         private readonly IGameContext gameContext;
         private readonly CreatureManager creatureManager;
@@ -118,7 +123,37 @@ namespace WDE.MapRenderer.Managers
             yIndex = Math.Clamp((int)(yInt / 533.0 * maxIndex), 0, maxIndex);
         }
         
-        public float? HeightAtPosition(float x, float y)
+        private List<(Entity, Vector3)> outRaycast = new();
+        public float? HeightAtPosition(float x, float y, float? closestToZ)
+        {
+            var origin = new Vector3(x, y, closestToZ ?? 4000);
+            raycastSystem.RaycastAll(new Ray(origin.WithZ(4000), Vector3.Down), origin, outRaycast, Collisions.COLLISION_MASK_STATIC);
+            if (outRaycast.Count > 0)
+            {
+                float minDiff = float.MaxValue;
+                float bestHeight = 0;
+                for (int i = 0; i < outRaycast.Count; ++i)
+                {
+                    var diff = Math.Abs(outRaycast[i].Item2.Z - origin.Z);
+                    if (diff < minDiff)
+                    {
+                        minDiff = diff;
+                        bestHeight = outRaycast[i].Item2.Z;
+                    }
+                }
+                outRaycast.Clear();
+                return bestHeight;
+            }
+
+            return null;
+
+            // var ret = raycastSystem.Raycast(new Ray(new Vector3(x, y, 4000), Vector3.Down), null, false, Collisions.COLLISION_MASK_STATIC);
+            // if (ret.HasValue)
+            //     return ret.Value.Item2.Z;
+            // return null;
+        }
+        
+        private float? FastHeightAtPosition(float x, float y)
         {
             Vector3 wowPos = new Vector3(x, y, 0);
             PosToChunkHeightCoords(wowPos, out var chunk, out int xIndex, out int yIndex);
@@ -147,6 +182,8 @@ namespace WDE.MapRenderer.Managers
             GameObjectManager gameObjectManager,
             Archetypes archetypes,
             Lazy<LoadingManager> loadingManager,
+            ModuleManager moduleManager,
+            RaycastSystem raycastSystem,
             Engine engine)
         {
             this.entityManager = entityManager;
@@ -167,6 +204,8 @@ namespace WDE.MapRenderer.Managers
             this.gameObjectManager = gameObjectManager;
             this.archetypes = archetypes;
             this.loadingManager = loadingManager;
+            this.moduleManager = moduleManager;
+            this.raycastSystem = raycastSystem;
             this.engine = engine;
         }
 
@@ -190,6 +229,7 @@ namespace WDE.MapRenderer.Managers
             if (file.Result == null)
             {
                 tasksource.SetResult();
+                yield return LoadModules(chunk, cancelationToken);
                 chunk.loading = null;
                 yield break;
             }
@@ -246,7 +286,7 @@ namespace WDE.MapRenderer.Managers
                     chunk.areaIds[i, j] = chunksEnumerator2.Current.AreaId;
                     var basePos = chunksEnumerator2.Current.BasePosition;
                     int k_ = 0;
-                    Vector3[] subVertices = new Vector3[145];
+                    var subVertices = ArrayPool<Vector3>.Shared.Rent(145);
                     for (int cy = 0; cy < 17; ++cy)
                     {
                         for (int cx = 0; cx < (cy % 2 == 0 ? 9 : 8); cx++)
@@ -283,37 +323,43 @@ namespace WDE.MapRenderer.Managers
                         }
                     }
 
-                    int[] indices = new int[4 * 8 * 8 * 3];
+                    ushort[] indices = ArrayPool<ushort>.Shared.Rent(4 * 8 * 8 * 4);
                     int k__ = 0;
-                    for (int cx = 0; cx < 8; cx++)
+                    for (uint cx = 0; cx < 8; cx++)
                     {
-                        for (int cy = 0; cy < 8; cy++)
+                        for (uint cy = 0; cy < 8; cy++)
                         {
-                            int tl = cy * 17 + cx;
-                            int tr = tl + 1;
-                            int middle = tl + 9;
-                            int bl = middle + 8;
-                            int br = bl + 1;
+                            uint tl = cy * 17 + cx;
+                            uint tr = tl + 1;
+                            uint middle = tl + 9;
+                            uint bl = middle + 8;
+                            uint br = bl + 1;
 
-                            indices[k__++] = tl;
-                            indices[k__++] = middle;
-                            indices[k__++] = tr;
+                            if (br > ushort.MaxValue)
+                                throw new Exception("Too many vertices");
+
+                            indices[k__++] = (ushort)tl;
+                            indices[k__++] = (ushort)middle;
+                            indices[k__++] = (ushort)tr;
                             //
-                            indices[k__++] = tl;
-                            indices[k__++] = bl;
-                            indices[k__++] = middle;
+                            indices[k__++] = (ushort)tl;
+                            indices[k__++] = (ushort)bl;
+                            indices[k__++] = (ushort)middle;
                             //
-                            indices[k__++] = tr;
-                            indices[k__++] = middle;
-                            indices[k__++] = br;
+                            indices[k__++] = (ushort)tr;
+                            indices[k__++] = (ushort)middle;
+                            indices[k__++] = (ushort)br;
                             //
-                            indices[k__++] = middle;
-                            indices[k__++] = bl;
-                            indices[k__++] = br;
+                            indices[k__++] = (ushort)middle;
+                            indices[k__++] = (ushort)bl;
+                            indices[k__++] = (ushort)br;
                         }
                     }
-                    var subChunkMesh = meshManager.CreateManagedOnlyMesh(subVertices, indices);
+                    var subChunkMesh = meshManager.CreateManagedOnlyMesh(subVertices.AsSpan(0, 145), indices.AsSpan(0, 4 * 8 * 8 * 4));
+                    ArrayPool<Vector3>.Shared.Return(subVertices);
+                    ArrayPool<ushort>.Shared.Return(indices);
                     var entity = entityManager.CreateEntity(archetypes.CollisionOnlyArchetype);
+                    entityManager.GetComponent<Collider>(entity).CollisionMask = Collisions.COLLISION_MASK_TERRAIN;
                     entityManager.GetComponent<LocalToWorld>(entity).Matrix = Matrix.Identity;
                     entityManager.GetComponent<MeshRenderer>(entity).SubMeshId = 0;
                     entityManager.GetComponent<MeshRenderer>(entity).MeshHandle = subChunkMesh.Handle;
@@ -470,9 +516,21 @@ namespace WDE.MapRenderer.Managers
             }
             
             yield return LoadObjects(adt, chunk, cancelationToken);
+
+            yield return LoadModules(chunk, cancelationToken);
             
             tasksource.SetResult();
             chunk.loading = null; 
+        }
+
+        private IEnumerator LoadModules(ChunkInstance chunk, CancellationToken cancellationToken)
+        {
+            IEnumerator LoadModuleChunk(IGameModule arg)
+            {
+                yield return arg.LoadChunk(gameContext.CurrentMap.Id, chunk.X, chunk.Z, cancellationToken);
+            }
+            
+            yield return moduleManager.ForEach(LoadModuleChunk);
         }
 
         private IEnumerator LoadObjects(ADT adt, ChunkInstance chunk, CancellationToken cancellationToken)
@@ -509,7 +567,6 @@ namespace WDE.MapRenderer.Managers
                 t.Scale = Vector3.One * m2.Scale;
                 t.Rotation = Quaternion.FromEuler(m2.Rotation.X, m2.Rotation.Y + 180,  m2.Rotation.Z);
 
-                int j = 0;
                 Entity entity;
                 NativeBuffer<Matrix>? bones = null;
                 if (m.HasAnimations)
@@ -533,16 +590,16 @@ namespace WDE.MapRenderer.Managers
                             {
                                 SetNewAnimation = 0,
                                 _buffer = bones!
-                            });   
+                            });
                         }
                         var instanceRenderer = new MaterialInstanceRenderData();
-                        instanceRenderer.SetBuffer(material, "boneMatrices", bones!);
+                        instanceRenderer.SetBuffer(material.material, "boneMatrices", bones!);
                         entityManager.SetManagedComponent(entity, instanceRenderer);
                     }
                     else
                         entity = entityManager.CreateEntity(archetypes.StaticM2WorldObjectArchetype);
                     
-                    renderManager.SetupRendererEntity(entity, m.mesh.Handle, material, j++, t.LocalToWorldMatrix);
+                    renderManager.SetupRendererEntity(entity, m.mesh.Handle, material.material, material.submesh, t.LocalToWorldMatrix);
                     
                     chunk.entities.Add(entity);
                     first = false;
@@ -584,6 +641,7 @@ namespace WDE.MapRenderer.Managers
                         {
                             var entity = entityManager.CreateEntity(archetypes.CollisionOnlyArchetype);
                             entityManager.GetComponent<LocalToWorld>(entity).Matrix = wmoTransform.LocalToWorldMatrix;
+                            entityManager.GetComponent<Collider>(entity).CollisionMask = Collisions.COLLISION_MASK_WMO;
                             entityManager.GetComponent<MeshRenderer>(entity).SubMeshId = i - 1;
                             entityManager.GetComponent<MeshRenderer>(entity).MeshHandle = mesh.Item1.Handle;
                             entityManager.GetComponent<WorldMeshBounds>(entity) = RenderManager.LocalToWorld((MeshBounds)mesh.Item1.Bounds, new LocalToWorld() { Matrix = wmoTransform.LocalToWorldMatrix });   
@@ -617,7 +675,7 @@ namespace WDE.MapRenderer.Managers
             for (int i = -D; i <= D; ++i)
             {
                 for (int j = -D; j <= D; ++j)
-                       gameContext.StartCoroutine(LoadChunk(chunk.x + i, chunk.y + j, false));
+                    gameContext.StartCoroutine(LoadChunk(chunk.x + i, chunk.y + j, false));
             }
             
             UnloadChunks();
@@ -630,7 +688,7 @@ namespace WDE.MapRenderer.Managers
             {
                 var c = chunks[index];
                 var midPoint = new Vector2(c.MiddlePoint.X, c.MiddlePoint.Z);
-                if ((midPoint - camera).LengthSquared() > 7500 * 7500)
+                if ((midPoint - camera).LengthSquared() > 5500 * 5500)
                 {
                     chunksXY.Remove((c.X, c.Z));
                     loadedChunks.Remove((c.X, c.Z));
@@ -647,6 +705,13 @@ namespace WDE.MapRenderer.Managers
                 chunk.loading.Cancel();
                 yield return chunk.chunkLoading;
             }
+            
+            IEnumerator UnloadModuleChunk(IGameModule arg)
+            {
+                yield return arg.UnloadChunk(chunk.X, chunk.Z);
+            }
+            
+            yield return moduleManager.ForEach(UnloadModuleChunk);
 
             yield return creatureManager.UnloadChunk(chunk.Creatures);
             yield return gameObjectManager.UnloadChunk(chunk.GameObjects);

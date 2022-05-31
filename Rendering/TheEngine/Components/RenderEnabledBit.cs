@@ -7,15 +7,25 @@ namespace TheEngine.Components
 {
     public class MaterialInstanceRenderData : IManagedComponentData
     {
+        public Dictionary<string, INativeBuffer>? bufferByName { get; private set; }
         public Dictionary<int, INativeBuffer>? structuredBuffers { get; private set; }
         public Dictionary<int, INativeBuffer>? instancedStructuredBuffers { get; private set; }
-
+        
+        public INativeBuffer? GetBuffer(string name)
+        {
+            if (bufferByName != null && bufferByName.TryGetValue(name, out var buf))
+                return buf;
+            return null;
+        }
+        
         public void SetBuffer(Material material, string name, INativeBuffer buffer)
         {
             SetInstancedBuffer(material, name, buffer);
             var loc = material.GetUniformLocation(name);
             if (loc == -1)
                 return;
+            bufferByName ??= new();
+            bufferByName[name] = buffer;
             structuredBuffers ??= new();
             structuredBuffers[loc] = buffer;
         }
@@ -62,11 +72,19 @@ namespace TheEngine.Components
         {
             instancedStructuredBuffers?.Clear();
             structuredBuffers?.Clear();
+            bufferByName?.Clear();
         }
     }
-    
+
+    public struct ShareRenderEnabledBit : IComponentData
+    {
+        public Entity OtherEntity;
+    }
+
     public struct RenderEnabledBit : IComponentData
     {
+        // bit 0 - is actually enabled
+        // bit 1 - is force disabled
         private byte enabled;
 
         private RenderEnabledBit(bool b)
@@ -76,15 +94,44 @@ namespace TheEngine.Components
 
         public void Enable()
         {
-            enabled = 1;
+            enabled |= 1;
         }
 
         public void Disable()
         {
-            enabled = 0;
+            enabled &= 0b10;
+        }
+
+        public bool IsForceDisabled()
+        {
+            return (enabled & 0b10) == 0b10;
+        }
+
+        public void SetDisabled(bool disabled)
+        {
+            if (disabled)
+            {
+                enabled |= 10;
+            }
+            else
+            {
+                enabled &= 0b01;
+            }
         }
 
         public static implicit operator bool(RenderEnabledBit d) => d.enabled == 1;
         public static explicit operator RenderEnabledBit(bool b) => new RenderEnabledBit(b);
+    }
+
+    public static class RenderEnabledBitExtensions
+    {
+        public static void SetForceDisabledRendering(this Entity entity, IEntityManager entityManager, bool disabled)
+        {
+            entityManager.GetComponent<RenderEnabledBit>(entity).SetDisabled(disabled);
+        }
+    }
+    
+    public struct PerformCullingBit : IComponentData
+    {
     }
 }

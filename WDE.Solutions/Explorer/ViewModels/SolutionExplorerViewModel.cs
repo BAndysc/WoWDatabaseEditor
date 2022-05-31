@@ -292,7 +292,7 @@ namespace WDE.Solutions.Explorer.ViewModels
 
             if (sourceItem != null)
             {
-                bool highlight = dropInfo.InsertPosition.HasFlag(RelativeInsertPosition.TargetItemCenter) &&
+                bool highlight = dropInfo.InsertPosition.HasFlagFast(RelativeInsertPosition.TargetItemCenter) &&
                                  (targetItem?.IsContainer ?? false);
 
                 dropInfo.DropTargetAdorner = highlight ? DropTargetAdorners.Highlight : DropTargetAdorners.Insert;

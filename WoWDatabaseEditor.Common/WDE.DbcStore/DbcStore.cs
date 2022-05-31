@@ -889,7 +889,7 @@ namespace WDE.DbcStore
             
             foreach (CharacterRaces race in Enum.GetValues<CharacterRaces>())
             {
-                if (IsPowerOfTwo((ulong)race) && allowableRaces.HasFlag(race))
+                if (IsPowerOfTwo((ulong)race) && allowableRaces.HasFlagFast(race))
                 {
                     Items.Add((long)race, new SelectOption(race.ToString().ToTitleCase()));
                 }

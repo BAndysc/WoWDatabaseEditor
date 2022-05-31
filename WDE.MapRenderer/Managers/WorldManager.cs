@@ -1,6 +1,7 @@
 using System.Collections;
 using TheMaths;
 using WDE.MapRenderer.StaticData;
+using WDE.MpqReader.DBC;
 using WDE.MpqReader.Readers;
 using WDE.MpqReader.Structures;
 

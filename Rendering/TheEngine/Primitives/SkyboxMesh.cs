@@ -27,7 +27,7 @@ namespace TheEngine.Primitives
             new Vector3(SIZE, SIZE, -SIZE),
         };
         
-        private static int[] indices =
+        private static ushort[] indices =
         {
             0,3,1,
             1,3,2,

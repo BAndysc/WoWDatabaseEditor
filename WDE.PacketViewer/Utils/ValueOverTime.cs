@@ -1,9 +1,10 @@
+using System;
 using System.Collections.Generic;
 
 namespace WDE.PacketViewer.Utils;
 
 
-public class ValueOverTime<T>
+public class ValueOverTime<T> where T : unmanaged
 {
     private bool set;
     public T Value { get; private set; }
@@ -21,6 +22,8 @@ public class ValueOverTime<T>
         Value = value;
         set = true;
     }
+
+    public T? AsNullable => HasValue ? Value : null;
     
     public void Update(T value)
     {

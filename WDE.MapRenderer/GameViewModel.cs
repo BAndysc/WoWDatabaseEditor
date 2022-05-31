@@ -19,6 +19,7 @@ using WDE.Common.Windows;
 using WDE.MapRenderer.Managers;
 using WDE.MapRenderer.StaticData;
 using WDE.Module.Attributes;
+using WDE.MpqReader.DBC;
 using WDE.MpqReader.Structures;
 using WDE.MVVM;
 using WDE.MVVM.Observable;
@@ -50,7 +51,7 @@ namespace WDE.MapRenderer
     }
     
     [AutoRegister]
-    public class GameViewModel : ObservableBase, ITool, IMapContext<GameCameraViewModel>
+    public partial class GameViewModel : ObservableBase, ITool, IMapContext<GameCameraViewModel>
     {
         private readonly Lazy<IDocumentManager> documentManager;
         private readonly GameViewSettings settings;
@@ -98,6 +99,17 @@ namespace WDE.MapRenderer
             set => SetProperty(ref maps, value);
         }
         
+        private ObservableCollection<object> toolBars  = new();
+        public ObservableCollection<object> ToolBars
+        {
+            get => toolBars;
+            set
+            {
+                toolBars = value;
+                RaisePropertyChanged();
+            }
+        }
+
         public string Stats { get; private set; }
         
         private GameProperties Properties { get; }
@@ -146,6 +158,7 @@ namespace WDE.MapRenderer
 
             public void Dispose()
             {
+                vm.ToolBars = new();
                 mapSub?.Dispose();
                 activationSub?.Dispose();
                 if (registeredViewModels != null)
@@ -184,6 +197,7 @@ namespace WDE.MapRenderer
                     {
                         gameContext.SetMap((int)map!.Id);
                     });
+                vm.ToolBars = moduleManager.ToolBars;
             }
 
             public void Update(float delta)
@@ -260,6 +274,7 @@ Tris: " + stats.TrianglesDrawn;
             Properties.ShowGrid = settings.ShowGrid;
             Properties.ViewDistanceModifier = settings.ViewDistanceModifier;
             Properties.ShowAreaTriggers = settings.ShowAreaTriggers;
+            Properties.TextureQuality = settings.TextureQuality;
 
             gameView.RegisterGameModule(container => container.Resolve<GameProxy>((typeof(GameViewModel), this)));
             
@@ -307,17 +322,24 @@ Tris: " + stats.TrianglesDrawn;
             if (state == 1)
             {
                 currentGame?.DoDispose();
-                currentGame = null;
+                if (currentGame != null)
+                    currentGame.OnAfterDisposed += CurrentGameOnOnAfterDisposed;
                 state = 2;
-                mainThread.Delay(() =>
-                {
-                    Visibility = false;
-                }, TimeSpan.FromMilliseconds(10));
                 return false;
             }
 
             state = 0;
             return true;
+        }
+
+        private void CurrentGameOnOnAfterDisposed(Game game)
+        {
+            game.OnAfterDisposed -= CurrentGameOnOnAfterDisposed;
+            mainThread.Delay(() =>
+            {
+                Visibility = false;
+                CurrentGame = null;
+            }, TimeSpan.FromMilliseconds(10));
         }
 
         public bool OverrideLighting
@@ -381,7 +403,33 @@ Tris: " + stats.TrianglesDrawn;
             set
             {
                 Properties.ViewDistanceModifier = value;
+                settings.ViewDistanceModifier = value;
                 RaisePropertyChanged(nameof(ViewDistance));
+            }
+        }
+        
+        public bool ShowTextureQualityWarning { get; set; }
+
+        public int TextureQuality
+        {
+            get => Properties.TextureQuality;
+            set
+            {
+                Properties.TextureQuality = value;
+                settings.TextureQuality = value;
+                ShowTextureQualityWarning = true;
+                RaisePropertyChanged(nameof(ShowTextureQualityWarning));
+                RaisePropertyChanged(nameof(TextureQuality));
+            }
+        }
+        
+        public float DynamicResolution
+        {
+            get => Properties.DynamicResolution;
+            set
+            {
+                Properties.DynamicResolution = value;
+                RaisePropertyChanged(nameof(DynamicResolution));
             }
         }
         

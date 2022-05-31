@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using OpenGLBindings;
 
+[assembly: InternalsVisibleTo("TheEngine")]
 namespace TheAvaloniaOpenGL.Resources
 {
-    public class RenderTexture : IDisposable, ITexture
+    internal class RenderTexture : IDisposable, ITexture
     {
         private Texture underlyingTexture;
 
@@ -56,10 +58,20 @@ namespace TheAvaloniaOpenGL.Resources
             //device.ImmediateContext.ClearRenderTargetView(TargetView, new Color4(r, g, b, a));
         }
 
-        public void ActivateFrameBuffer()
+        public void ActivateFrameBuffer(float viewPortScale = 1)
         {
             device.BindFramebuffer(FramebufferTarget.Framebuffer, handle);
-            device.Viewport(0, 0, (int)Width, (int)Height);
+            device.Viewport(0, 0, (int)Math.Max(1, Width * viewPortScale), (int)Math.Max(1, Height * viewPortScale));
+        }
+        
+        public void ActivateSourceFrameBuffer()
+        {
+            device.BindFramebuffer(FramebufferTarget.ReadFramebuffer, handle);
+        }
+        
+        public void ActivateRenderFrameBuffer()
+        {
+            device.BindFramebuffer(FramebufferTarget.DrawFramebuffer, handle);
         }
 
         public void Dispose()

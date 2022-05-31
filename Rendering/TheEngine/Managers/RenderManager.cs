@@ -4,6 +4,7 @@ using OpenGLBindings;
 using TheAvaloniaOpenGL;
 using TheAvaloniaOpenGL.Resources;
 using TheEngine.Components;
+using TheEngine.Data;
 using TheEngine.ECS;
 using TheEngine.Entities;
 using TheEngine.Handles;
@@ -44,10 +45,14 @@ namespace TheEngine.Managers
         private CullingMode? currentCulling;
         private (bool enabled, Blending? source, Blending? dest)? currentBlending;
 
-        private RenderTexture renderTexture;
-
-        private RenderTexture outlineTexture;
-
+        private int currentBackBufferWidth = -1;
+        private int currentBackBufferHeight = -1;
+        private TextureHandle[] backBuffers = new TextureHandle[2];
+        private int currentBackBufferIndex = 0;
+        private TextureHandle CurrentBackBuffer => backBuffers[currentBackBufferIndex];
+        private TextureHandle OtherBackBuffer => backBuffers[1 - currentBackBufferIndex];
+        private void SwapBackBuffers() => currentBackBufferIndex = (currentBackBufferIndex + 1) % 2;
+        
         private IMesh planeMesh;
 
         private ShaderHandle blitShader;
@@ -55,6 +60,11 @@ namespace TheEngine.Managers
         private Material blitMaterial;
 
         private Material unlitMaterial;
+        
+        // utils
+        private IMesh sphereMesh = null!;
+        private Material wireframe = null!;
+        // end utils
 
         private Mesh currentMesh = null;
 
@@ -62,7 +72,8 @@ namespace TheEngine.Managers
         
         private Shader currentShader = null;
 
-        private Archetype renderBitArchetype;
+        private Archetype toCullArchetype;
+        private Archetype entitiesSharingRenderingArchetype;
         private Archetype toRenderArchetype;
         private Archetype updateWorldBoundsArchetype;
         private Archetype dirtEntities;
@@ -70,7 +81,7 @@ namespace TheEngine.Managers
         private Archetype staticRendererArchetype;
         private Archetype dynamicRendererArchetype;
 
-        private Archetype parentedEntitiesArchetype;
+        private Archetype dynamicParentedEntitiesArchetype;
 
         internal RenderManager(Engine engine, bool flipY)
         {
@@ -81,18 +92,25 @@ namespace TheEngine.Managers
             dirtEntities = engine.entityManager.NewArchetype()
                 .WithComponentData<DirtyPosition>();
 
-            parentedEntitiesArchetype = engine.entityManager.NewArchetype()
+            entitiesSharingRenderingArchetype = engine.entityManager.NewArchetype()
+                .WithComponentData<ShareRenderEnabledBit>()
+                .WithComponentData<RenderEnabledBit>();
+
+            dynamicParentedEntitiesArchetype = engine.entityManager.NewArchetype()
                 .WithComponentData<CopyParentTransform>()
+                .WithComponentData<DirtyPosition>()
                 .WithComponentData<LocalToWorld>();
             
             staticRendererArchetype = engine.EntityManager.NewArchetype()
                 .WithComponentData<RenderEnabledBit>()
+                .WithComponentData<PerformCullingBit>()
                 .WithComponentData<LocalToWorld>()
                 .WithComponentData<WorldMeshBounds>()
                 .WithComponentData<MeshRenderer>();
 
             dynamicRendererArchetype = engine.EntityManager.NewArchetype()
                 .WithComponentData<RenderEnabledBit>()
+                .WithComponentData<PerformCullingBit>()
                 .WithComponentData<LocalToWorld>()
                 .WithComponentData<MeshBounds>()
                 .WithComponentData<DirtyPosition>()
@@ -105,9 +123,10 @@ namespace TheEngine.Managers
                 .WithComponentData<DirtyPosition>()
                 .WithComponentData<MeshBounds>();
 
-            renderBitArchetype = engine.entityManager.NewArchetype()
+            toCullArchetype = engine.entityManager.NewArchetype()
                     .WithComponentData<RenderEnabledBit>()
                     .WithComponentData<LocalToWorld>()
+                    .WithComponentData<PerformCullingBit>()
                     .WithComponentData<WorldMeshBounds>();
 
             toRenderArchetype = engine.entityManager.NewArchetype()
@@ -135,32 +154,46 @@ namespace TheEngine.Managers
             depthStencilNoZWrite = engine.Device.CreateDepthStencilState(false);
             engine.Device.device.CheckError("create depth stencil");
 
-            renderTexture = engine.Device.CreateRenderTexture((int)engine.WindowHost.WindowWidth, (int)engine.WindowHost.WindowHeight);
+            for (int i = 0; i < backBuffers.Length; ++i)
+                backBuffers[i] = engine.textureManager.CreateRenderTexture((int)engine.WindowHost.WindowWidth, (int)engine.WindowHost.WindowHeight);
             engine.Device.device.CheckError("create render tex");
-
-            //outlineTexture = engine.Device.CreateRenderTexture((int)engine.WindowHost.WindowWidth, (int)engine.WindowHost.WindowHeight);
 
             planeMesh = engine.MeshManager.CreateMesh(in ScreenPlane.Instance);
             engine.Device.device.CheckError("create mesh");
 
-            lineMesh = (Mesh)engine.MeshManager.CreateMesh(new Vector3[2]{Vector3.Zero, Vector3.Zero}, new int[]{});
+            lineMesh = (Mesh)engine.MeshManager.CreateMesh(new Vector3[2]{Vector3.Zero, Vector3.Zero}, new ushort[]{});
 
             blitShader = engine.ShaderManager.LoadShader("internalShaders/blit.json", false);
             engine.Device.device.CheckError("load shader");
             blitMaterial = engine.MaterialManager.CreateMaterial(blitShader, null);
+            blitMaterial.SourceBlending = Blending.One;
+            blitMaterial.DestinationBlending = Blending.Zero;
+            blitMaterial.ZWrite = true;
+            blitMaterial.DepthTesting = DepthCompare.Always;
             blitMaterial.SetUniformInt("flipY", flipY ? 1 : 0);
 
             unlitMaterial = engine.MaterialManager.CreateMaterial("internalShaders/unlit.json");
             unlitMaterial.ZWrite = false;
             unlitMaterial.DepthTesting = DepthCompare.Always;
+            
+            // utils
+            sphereMesh = engine.meshManager.CreateMesh(ObjParser.LoadObj("meshes/sphere.obj").MeshData);
+        
+            wireframe = engine.MaterialManager.CreateMaterial("data/wireframe.json");
+            wireframe.SetUniform("Width", 1);
+            wireframe.SetUniform("Color", new Vector4(1, 1, 1, 1));
+            wireframe.ZWrite = false;
+            wireframe.DepthTesting = DepthCompare.Always;
         }
 
         public void Dispose()
         {
+            engine.meshManager.DisposeMesh(sphereMesh);
             //outlineTexture.Dispose();
             engine.meshManager.DisposeMesh(lineMesh);
             engine.meshManager.DisposeMesh(planeMesh);
-            renderTexture.Dispose();
+            foreach (var t in backBuffers)
+                engine.textureManager.DisposeTexture(t);
 
             depthStencilZWrite.Dispose();
             depthStencilNoZWrite.Dispose();
@@ -265,8 +298,19 @@ namespace TheEngine.Managers
         }
 
         private bool inRenderingLoop = false;
+        private bool inCoreRenderingLoop = false;
+        private int currentFrameBuffer;
         public void PrepareRendering(int dstFrameBuffer)
         {
+            // dynamic - auto scale
+            // var drawTime = engine.statsManager.Counters.FrameTime.Average;
+            // if (drawTime > 22)
+            //     dynamicScale /= 1.02f;
+            // else if (drawTime <= 18)
+            //     dynamicScale *= 1.02f;
+            // dynamicScale = Math.Clamp(dynamicScale, 0.25, 1);
+        
+            currentFrameBuffer = dstFrameBuffer;
             engine.shaderManager.Update();
 
             inRenderingLoop = true;
@@ -278,15 +322,36 @@ namespace TheEngine.Managers
             
             engine.Device.RenderClearBuffer();
 
-            if (renderTexture.Width != (int)engine.WindowHost.WindowWidth ||
-                renderTexture.Height != (int)engine.WindowHost.WindowHeight)
+            if (currentBackBufferWidth != (int)engine.WindowHost.WindowWidth ||
+                currentBackBufferHeight != (int)engine.WindowHost.WindowHeight)
             {
-                renderTexture.Dispose();
-                renderTexture = engine.Device.CreateRenderTexture((int)engine.WindowHost.WindowWidth, (int)engine.WindowHost.WindowHeight);
+                currentBackBufferWidth = (int)engine.WindowHost.WindowWidth;
+                currentBackBufferHeight = (int)engine.WindowHost.WindowHeight;
+                for (var index = 0; index < backBuffers.Length; index++)
+                {
+                    engine.textureManager.DisposeTexture(backBuffers[index]);
+                    backBuffers[index] = engine.textureManager.CreateRenderTexture(currentBackBufferWidth, currentBackBufferHeight);
+                }
             }
+
+            if (pendingDynamicScale.HasValue)
+            {
+                if (Math.Abs(pendingDynamicScale.Value - 1) < 0.01f)
+                {
+                    useDynamicScale = false;
+                }
+                else
+                {
+                    dynamicScale = pendingDynamicScale.Value;
+                    useDynamicScale = true;
+                }
+                pendingDynamicScale = null;
+            }
+
+            inCoreRenderingLoop = true;
+            currentBackBufferIndex = 0;
             
-            engine.Device.SetRenderTexture(renderTexture, dstFrameBuffer);
-            renderTexture.Clear(1, 1, 1, 1);
+            ActivateRenderTexture(CurrentBackBuffer, Color4.White);
 
             sceneBuffer.UpdateBuffer(ref sceneData);
             sceneBuffer.Activate(Constants.SCENE_BUFFER_INDEX);
@@ -296,23 +361,67 @@ namespace TheEngine.Managers
 
             objectBuffer.Activate(Constants.OBJECT_BUFFER_INDEX);
             engine.Device.device.CheckError("Before render all");
+            engine.Device.device.BlendEquation(BlendEquationMode.FuncAdd);
         }
 
+        private bool useDynamicScale = false;
+        private float dynamicScale = 1;
+        private float? pendingDynamicScale;
+        private int DynamicWidth => useDynamicScale ? Math.Max(1, (int)(currentBackBufferWidth * dynamicScale)) : currentBackBufferWidth;
+        private int DynamicHeight => useDynamicScale ? Math.Max(1, (int)(currentBackBufferHeight * dynamicScale)) : currentBackBufferHeight;
+
+        public void ActivateRenderTexture(TextureHandle rt, Color4? color = null)
+        {
+            if (inRenderingLoop)
+            {
+                var tex = engine.textureManager.GetTextureByHandle(rt) as RenderTexture;
+                tex!.ActivateFrameBuffer(inCoreRenderingLoop && rt == CurrentBackBuffer && useDynamicScale ? dynamicScale : 1);
+                if (color.HasValue)
+                    tex!.Clear(color.Value.Red, color.Value.Green, color.Value.Blue, color.Value.Alpha);
+            }
+        }
+        
+        public void ActivateDefaultRenderTexture()
+        {
+            ActivateRenderTexture(CurrentBackBuffer);
+        }
+
+        private readonly List<IPostProcess> postProcesses = new();
+        
+        public void AddPostprocess(IPostProcess postProcess) => postProcesses.Add(postProcess);
+
+        public void RemovePostprocess(IPostProcess postProcess) => postProcesses.Remove(postProcess);
+        
+        public void SetDynamicResolutionScale(float scale)
+        {
+            pendingDynamicScale = scale;
+        }
+
+        public void DrawSphere(Vector3 center, float radius, Vector4 color)
+        {
+            wireframe.SetUniform("Color", color);
+            Render(sphereMesh, wireframe, 0, Matrix.TRS(center, Quaternion.Identity, Vector3.One * radius));
+        }
+
+        public void RenderFullscreenPlane(Material material)
+        {
+            material.Shader.Activate();
+            EnableMaterial(material, false, null);
+            planeMesh.Activate();
+            engine.Device.DrawIndexed(engine.meshManager.GetMeshByHandle(planeMesh.Handle).IndexCount(0), 0, 0);
+        }
+        
         public void FinalizeRendering(int dstFrameBuffer)
         {
             ClearDirtyEntityBit();
+
             engine.Device.SetRenderTexture(null, dstFrameBuffer);
-
+            engine.Device.device.Viewport(0, 0, (int)engine.WindowHost.WindowWidth, (int)engine.WindowHost.WindowHeight);
+            
             engine.Device.device.CheckError("Blitz");
-            blitMaterial.Shader.Activate();
-            blitMaterial.ActivateUniforms(false);
-            SetDepth(true, DepthCompare.Always);
-            renderTexture.Activate(0);
-            //outlineTexture.Activate(1);
-            planeMesh.Activate();
-            SetBlending(false, Blending.One, Blending.Zero);
-            engine.Device.DrawIndexed(engine.meshManager.GetMeshByHandle(planeMesh.Handle).IndexCount(0), 0, 0);
-
+            blitMaterial.SetTexture("texture1", CurrentBackBuffer);
+            RenderFullscreenPlane(blitMaterial);
+            
             inRenderingLoop = false;
             engine.statsManager.RenderStats = Stats;
         }
@@ -337,10 +446,30 @@ namespace TheEngine.Managers
             RenderTransparent();
         }
 
+        internal void RenderPostProcess()
+        {
+            inCoreRenderingLoop = false;
+            if (useDynamicScale)
+            {
+                engine.textureManager.BlitFramebuffers(CurrentBackBuffer, OtherBackBuffer, 0, 0, DynamicWidth, DynamicHeight, 0, 0, currentBackBufferWidth, currentBackBufferHeight, ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Linear);
+                engine.textureManager.BlitFramebuffers(CurrentBackBuffer, OtherBackBuffer, 0, 0, DynamicWidth, DynamicHeight, 0, 0, currentBackBufferWidth, currentBackBufferHeight, ClearBufferMask.DepthBufferBit, BlitFramebufferFilter.Nearest);
+
+                SwapBackBuffers();
+                ActivateDefaultRenderTexture(); // to make sure we set the correct viewport
+            }
+            
+            foreach (var post in postProcesses)
+            {
+                ActivateRenderTexture(OtherBackBuffer, Color4.White);
+                post.RenderPostprocess(this, CurrentBackBuffer);
+                SwapBackBuffers();
+            }
+        }
+
         public void UpdateTransforms()
         {
             var entityManager = engine.entityManager;
-            parentedEntitiesArchetype.ParallelForEach<CopyParentTransform, LocalToWorld, DirtyPosition>((itr, start, end, parents, localToWorld, dirtyPosition) =>
+            dynamicParentedEntitiesArchetype.ParallelForEach<CopyParentTransform, LocalToWorld, DirtyPosition>((itr, start, end, parents, localToWorld, dirtyPosition) =>
             {
                 for (int i = start; i < end; ++i)
                 {
@@ -434,6 +563,7 @@ namespace TheEngine.Managers
         {
             var cameraPosition = cameraManager.MainCamera.Transform.Position;
             var frustum = new BoundingFrustum(cameraManager.MainCamera.ViewMatrix * cameraManager.MainCamera.ProjectionMatrix);
+            var entityManager = engine.EntityManager;
 
             boundsUpdate.Restart();
             updateWorldBoundsArchetype.ParallelForEach<LocalToWorld, MeshBounds, WorldMeshBounds, DirtyPosition>((itr, start, end, l2w, meshBounds, worldMeshBounds, dirtyBit) =>
@@ -452,10 +582,13 @@ namespace TheEngine.Managers
             
             culler.Restart();
             float mod = viewDistanceModifier * viewDistanceModifier;
-            renderBitArchetype.ParallelForEach<LocalToWorld, RenderEnabledBit, WorldMeshBounds>((itr, start, end, l2w, bits, worldMeshBounds) =>
+            toCullArchetype.ParallelForEach<LocalToWorld, PerformCullingBit, RenderEnabledBit, WorldMeshBounds>((itr, start, end, l2w, _ , bits, worldMeshBounds) =>
             {
                 for (int i = start; i < end; ++i)
                 {
+                    if (bits[i].IsForceDisabled())
+                        continue;
+                    
                     var boundingBox = worldMeshBounds[i].box;
                     var pos = boundingBox.Center;
                     var boundingBoxSize = boundingBox.Size;
@@ -470,6 +603,24 @@ namespace TheEngine.Managers
                         bits[i] = (RenderEnabledBit)false;
                 }
             });
+            dynamicParentedEntitiesArchetype.WithComponentData<RenderEnabledBit>().ParallelForEach<RenderEnabledBit, CopyParentTransform>((itr, start, end, renderBit, cpt) =>
+            {
+                for (int i = start; i < end; ++i)
+                {
+                    var parent = cpt[i];
+                    if (parent.Parent != Entity.Empty)
+                        renderBit[i] = engine.entityManager.GetComponent<RenderEnabledBit>(parent.Parent);
+                }
+            });
+            entitiesSharingRenderingArchetype.ParallelForEach<RenderEnabledBit, ShareRenderEnabledBit>(
+                (itr, start, end, renderBits, shareRenderBits) =>
+                {
+                    for (int i = start; i < end; ++i)
+                    {
+                        if (!renderBits[i])
+                            renderBits[i] = entityManager.GetComponent<RenderEnabledBit>(shareRenderBits[i].OtherEntity);
+                    }
+                });
             culler.Stop();
             engine.statsManager.Counters.Culling.Add(culler.Elapsed.TotalMilliseconds);
 
@@ -699,7 +850,14 @@ namespace TheEngine.Managers
             Stats.InstancedDrawSaved += savedByInstancing;
         }
 
-        public void Render(IMesh mesh, Material material, int submesh, Matrix localToWorld, Matrix? worldToLocal = null)
+        public void Render(MeshHandle meshHandle, MaterialHandle materialHandle, int submesh, Matrix localToWorld, Matrix? worldToLocal = null, MaterialInstanceRenderData? instanceData = null)
+        {
+            var mesh = engine.meshManager.GetMeshByHandle(meshHandle);
+            var material = engine.materialManager.GetMaterialByHandle(materialHandle);
+            Render(mesh, material, submesh, localToWorld, worldToLocal, instanceData);
+        }
+        
+        public void Render(IMesh mesh, Material material, int submesh, Matrix localToWorld, Matrix? worldToLocal = null, MaterialInstanceRenderData? instanceData = null)
         {
             if (worldToLocal == null)
                 worldToLocal = Matrix.Invert(localToWorld);
@@ -710,7 +868,7 @@ namespace TheEngine.Managers
                 currentShader = material.Shader;
                 currentShader.Activate();
             }
-            EnableMaterial(material, false);
+            EnableMaterial(material, false, instanceData);
             currentMesh = (Mesh)mesh;
             mesh.Activate();
             objectData.WorldMatrix = localToWorld;
@@ -721,15 +879,16 @@ namespace TheEngine.Managers
             engine.Device.DrawIndexed(count, start, 0);
         }
 
-        public void DrawLine(Vector3 start, Vector3 end)
+        public void DrawLine(Vector3 start, Vector3 end, Vector4 color)
         {
-            lineMesh.SetVertices(new Vector3[2]{start, end});
-            lineMesh.Rebuild();
+            lineMesh.SetVertices(start, end);
+            lineMesh.RebuildIndices();
             if (currentShader != unlitMaterial.Shader)
             {
                 currentShader = unlitMaterial.Shader;
                 currentShader.Activate();
             }
+            unlitMaterial.SetUniform("color", color);
             EnableMaterial(unlitMaterial, false);
             currentMesh = (Mesh)lineMesh;
             lineMesh.Activate();
@@ -823,6 +982,8 @@ namespace TheEngine.Managers
             engine.EntityManager.GetComponent<MeshRenderer>(entity).MeshHandle = meshHandle;
             engine.EntityManager.GetComponent<MeshRenderer>(entity).Opaque = !material.BlendingEnabled;
             engine.EntityManager.GetComponent<WorldMeshBounds>(entity) = LocalToWorld((MeshBounds)mesh.Bounds, l2w);
+            if (engine.EntityManager.HasComponent<MeshBounds>(entity))
+                engine.EntityManager.GetComponent<MeshBounds>(entity).box = mesh.Bounds;
         }
         
         public StaticRenderHandle RegisterStaticRenderer(MeshHandle meshHandle, Material material, int subMesh, Matrix localToWorld)
@@ -867,9 +1028,9 @@ namespace TheEngine.Managers
     {
         public static void DrawRay(this IRenderManager renderManager, Ray ray)
         {
-            renderManager.DrawLine(ray.Position, ray.Position + ray.Direction);
-            renderManager.DrawLine(ray.Position + ray.Direction - Vector3.Left * 0.5f, ray.Position + ray.Direction);
-            renderManager.DrawLine(ray.Position + ray.Direction - Vector3.Forward * 0.5f, ray.Position + ray.Direction);
+            renderManager.DrawLine(ray.Position, ray.Position + ray.Direction, Color4.White);
+            renderManager.DrawLine(ray.Position + ray.Direction - Vector3.Left * 0.5f, ray.Position + ray.Direction, Color4.White);
+            renderManager.DrawLine(ray.Position + ray.Direction - Vector3.Forward * 0.5f, ray.Position + ray.Direction, Color4.White);
         }
     }
 }

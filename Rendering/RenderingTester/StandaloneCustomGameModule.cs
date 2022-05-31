@@ -2,8 +2,15 @@ using TheEngine.Coroutines;
 using System.Collections;
 using Avalonia.Input;
 using JetBrains.Profiler.Api;
+using OpenTK.Platform.Windows;
+using TheAvaloniaOpenGL.Resources;
+using TheEngine;
+using TheEngine.Components;
+using TheEngine.ECS;
 using TheEngine.Entities;
+using TheEngine.Handles;
 using TheEngine.Interfaces;
+using TheEngine.Utils;
 using TheMaths;
 using WDE.MapRenderer;
 using WDE.MapRenderer.Managers;
@@ -11,7 +18,7 @@ using IInputManager = TheEngine.Interfaces.IInputManager;
 
 namespace RenderingTester;
 
-public class StandaloneCustomGameModule : IGameModule 
+public class StandaloneCustomGameModule : IGameModule, IPostProcess
 {
     private readonly IUIManager uiManager;
     private readonly CoroutineManager coroutineManager;
@@ -20,6 +27,11 @@ public class StandaloneCustomGameModule : IGameModule
     private readonly IGameContext gameContext;
     private readonly IRenderManager renderManager;
     private readonly IInputManager inputManager;
+    private readonly Engine engine;
+    private readonly IMaterialManager materialManager;
+    private readonly ITextureManager textureManager;
+    private readonly IMeshManager meshManager;
+    private readonly Archetypes archetypes;
     private readonly MdxManager mdxManager;
     public object? ViewModel => null;
 
@@ -30,6 +42,11 @@ public class StandaloneCustomGameModule : IGameModule
         IGameContext gameContext,
         IRenderManager renderManager,
         IInputManager inputManager,
+        Engine engine,
+        IMaterialManager materialManager,
+        ITextureManager textureManager,
+        IMeshManager meshManager,
+        Archetypes archetypes,
         MdxManager mdxManager)
     {
         this.uiManager = uiManager;
@@ -39,8 +56,17 @@ public class StandaloneCustomGameModule : IGameModule
         this.gameContext = gameContext;
         this.renderManager = renderManager;
         this.inputManager = inputManager;
+        this.engine = engine;
+        this.materialManager = materialManager;
+        this.textureManager = textureManager;
+        this.meshManager = meshManager;
+        this.archetypes = archetypes;
         this.mdxManager = mdxManager;
     }
+
+    private Material blurMaterial = null!;
+    private Material replacementMaterial = null!;
+    private Material outlineMaterial = null!;
     
     public void Dispose()
     {
@@ -48,7 +74,29 @@ public class StandaloneCustomGameModule : IGameModule
 
     public void Initialize()
     {
-        gameContext.SetMap(571);
+        //gameContext.SetMap(571);
+        replacementMaterial = materialManager.CreateMaterial("data/unlit_flat_m2.json");
+        replacementMaterial.SetUniform("mesh_color", new Vector4(1, 0, 0, 1));
+
+        outlineMaterial = materialManager.CreateMaterial("data/outline.json");
+        outlineMaterial.BlendingEnabled = false;
+        outlineMaterial.SourceBlending = Blending.One;
+        outlineMaterial.DestinationBlending = Blending.Zero;
+        outlineMaterial.DepthTesting = DepthCompare.Always;
+        
+        blurMaterial = materialManager.CreateMaterial("data/blur.json");
+        blurMaterial.BlendingEnabled = true;
+        blurMaterial.SourceBlending = Blending.SrcAlpha;
+        blurMaterial.DestinationBlending = Blending.OneMinusSrcAlpha;
+        blurMaterial.DepthTesting = DepthCompare.Always;
+        blurMaterial.SetUniform("blurSize", 0.125f/4);
+        //blurMaterial.SetUniformInt("horizontalPass", 0);
+        //blurMaterial.SetUniform("sigma", 4);
+
+        RT = new ScreenRenderTexture(engine);
+        RT_downscaled = new ScreenRenderTexture(engine, 0.25f);
+        
+        renderManager.AddPostprocess(this);
     }
 
     private bool profiling = false;
@@ -68,8 +116,15 @@ public class StandaloneCustomGameModule : IGameModule
         }
     }
 
+    private ScreenRenderTexture RT = null!;
+    private ScreenRenderTexture RT_downscaled = null!;
+    
     public void Render()
     {
+        RT.Update();
+        RT_downscaled.Update();
+        outlineMaterial.SetTexture("outlineTex", RT_downscaled);
+        outlineMaterial.SetTexture("outlineTexUnBlurred", RT);
     }
     
     public void RenderGUI()
@@ -101,5 +156,11 @@ public class StandaloneCustomGameModule : IGameModule
         ui2.Text("calibri", $"Batches: " + (stats.NonInstancedDraws + stats.InstancedDraws), 12, Vector4.One);
         ui2.Text("calibri", $"Batches saved by instancing: " + stats.InstancedDrawSaved, 12, Vector4.One);
         ui2.Text("calibri", $"Tris: " + stats.TrianglesDrawn, 12, Vector4.One);
+    }
+
+    public void RenderPostprocess(IRenderManager context, TextureHandle currentImage)
+    {
+        outlineMaterial.SetTexture("_MainTex", currentImage);
+        context.RenderFullscreenPlane(outlineMaterial);
     }
 }

@@ -27,12 +27,12 @@ public class QuestRequestItemsProcessor : PacketProcessor<bool>, IPacketTextDump
     protected override bool Process(PacketBase basePacket, PacketQuestGiverRequestItems packet)
     {
         completionTexts[packet.QuestId] = packet.CompletionText;
-        bool isComplete = packet.StatusFlags.HasFlag(PacketQuestStatusFlags.KillCreditComplete) &&
-                          packet.StatusFlags.HasFlag(PacketQuestStatusFlags.CollectableComplete) &&
-                          packet.StatusFlags.HasFlag(PacketQuestStatusFlags.QuestStatusUnk8) &&
-                          packet.StatusFlags.HasFlag(PacketQuestStatusFlags.QuestStatusUnk16) &&
-                          packet.StatusFlags.HasFlag(PacketQuestStatusFlags.QuestStatusUnk64) &&
-                          packet.StatusFlags.HasFlag(PacketQuestStatusFlags.QuestStatusUnk128);
+        bool isComplete = packet.StatusFlags.HasFlagFast(PacketQuestStatusFlags.KillCreditComplete) &&
+                          packet.StatusFlags.HasFlagFast(PacketQuestStatusFlags.CollectableComplete) &&
+                          packet.StatusFlags.HasFlagFast(PacketQuestStatusFlags.QuestStatusUnk8) &&
+                          packet.StatusFlags.HasFlagFast(PacketQuestStatusFlags.QuestStatusUnk16) &&
+                          packet.StatusFlags.HasFlagFast(PacketQuestStatusFlags.QuestStatusUnk64) &&
+                          packet.StatusFlags.HasFlagFast(PacketQuestStatusFlags.QuestStatusUnk128);
         titles[packet.QuestId] = packet.QuestTitle;
         if (isComplete)
             emotesCompleted[packet.QuestId] = packet.EmoteType;

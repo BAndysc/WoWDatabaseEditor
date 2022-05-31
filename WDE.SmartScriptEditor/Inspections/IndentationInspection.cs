@@ -11,7 +11,7 @@ namespace WDE.SmartScriptEditor.Inspections
             int indentation = 0;
             foreach (var action in e.Actions)
             {
-                if (action.ActionFlags.HasFlag(ActionFlags.DecreaseIndent))
+                if (action.ActionFlags.HasFlagFast(ActionFlags.DecreaseIndent))
                 {
                     if (indentation <= 0)
                     {
@@ -25,7 +25,7 @@ namespace WDE.SmartScriptEditor.Inspections
                     indentation--;
                 }
 
-                if (action.ActionFlags.HasFlag(ActionFlags.IncreaseIndent))
+                if (action.ActionFlags.HasFlagFast(ActionFlags.IncreaseIndent))
                     indentation++;
             }
 

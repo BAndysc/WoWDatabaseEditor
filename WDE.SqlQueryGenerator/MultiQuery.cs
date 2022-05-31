@@ -18,9 +18,10 @@ namespace WDE.SqlQueryGenerator
             return new Table(name) { CurrentQuery = this };
         }
 
-        public void Add(IQuery query)
+        public void Add(IQuery? query)
         {
-            queries.Add(query);
+            if (query != null)
+                queries.Add(query);
         }
 
         public IQuery Close()
@@ -31,7 +32,7 @@ namespace WDE.SqlQueryGenerator
 
     internal class DummyMultiQuery : IMultiQuery
     {
-        public void Add(IQuery query)
+        public void Add(IQuery? query)
         {
         }
 

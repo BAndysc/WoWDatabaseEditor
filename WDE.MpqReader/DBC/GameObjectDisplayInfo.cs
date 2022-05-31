@@ -1,11 +1,10 @@
-﻿using System.Collections;
-using WDE.Common.DBC;
+﻿using WDE.Common.DBC;
 
-namespace WDE.MpqReader.Structures
+namespace WDE.MpqReader.DBC
 {
     public class GameObjectDisplayInfo
     {
-        public readonly int Id;
+        public readonly uint Id;
         public readonly string ModelName;
         public readonly int Sound;
         public readonly float GeoBoxMinX;
@@ -18,7 +17,7 @@ namespace WDE.MpqReader.Structures
 
         public GameObjectDisplayInfo(IDbcIterator dbcIterator)
         {
-            Id = dbcIterator.GetInt(0);
+            Id = dbcIterator.GetUInt(0);
             ModelName = dbcIterator.GetString(1);
             Sound = dbcIterator.GetInt(2);
             GeoBoxMinX = dbcIterator.GetFloat(3);
@@ -32,7 +31,7 @@ namespace WDE.MpqReader.Structures
 
         private GameObjectDisplayInfo()
         {
-            Id = -1;
+            Id = 0;
             ModelName = "";
             Sound = -1;
             GeoBoxMinX = 0;
@@ -47,23 +46,4 @@ namespace WDE.MpqReader.Structures
 
         public static GameObjectDisplayInfo Empty => new GameObjectDisplayInfo();
     }
-
-    public class GameObjectDisplayInfoStore : IEnumerable<GameObjectDisplayInfo>
-    {
-        private Dictionary<int, GameObjectDisplayInfo> store = new();
-        public GameObjectDisplayInfoStore(IEnumerable<IDbcIterator> rows)
-        {
-            foreach (var row in rows)
-            {
-                var o = new GameObjectDisplayInfo(row);
-                store[o.Id] = o;
-            }
-        }
-
-        public bool Contains(int id) => store.ContainsKey(id);
-        public GameObjectDisplayInfo this[int id] => store[id];
-        public IEnumerator<GameObjectDisplayInfo> GetEnumerator() => store.Values.GetEnumerator();
-        IEnumerator IEnumerable.GetEnumerator() => store.Values.GetEnumerator();
-    }
-
 }

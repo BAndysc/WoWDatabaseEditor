@@ -7,6 +7,7 @@ namespace TheEngine.Interfaces
     {
         bool IsMouseDown(MouseButton button);
         bool HasJustClicked(MouseButton button);
+        bool HasJustReleased(MouseButton button);
         Vector2 Delta { get; }
         short WheelDelta { get; }
         Vector2 NormalizedPosition { get; }

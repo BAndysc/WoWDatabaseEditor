@@ -13,6 +13,9 @@ namespace TheEngine.Input
         
         private volatile bool leftJustDown;
         private volatile bool rightJustDown;
+        
+        private volatile bool leftJustUp;
+        private volatile bool rightJustUp;
 
         private volatile short mouseWheelDelta;
 
@@ -50,13 +53,13 @@ namespace TheEngine.Input
 
         internal void MouseDown(MouseButton button)
         {
-            if (button.HasFlag(MouseButton.Left))
+            if ((button & MouseButton.Left) != 0)
             {
                 leftDown = true;
                 leftJustDown = true;
             }
 
-            if (button.HasFlag(MouseButton.Right))
+            if ((button & MouseButton.Right) != 0)
             {
                 rightDown = true;
                 rightJustDown = true;
@@ -65,8 +68,10 @@ namespace TheEngine.Input
 
         internal void MouseUp(MouseButton button)
         {
-            leftDown = button.HasFlag(MouseButton.Left);
-            rightDown = button.HasFlag(MouseButton.Right);
+            leftJustUp = leftDown && (button & MouseButton.Left) == 0;
+            rightJustUp = rightDown && (button & MouseButton.Right) == 0;
+            leftDown = ((button & MouseButton.Left) != 0);
+            rightDown = ((button & MouseButton.Right) != 0);
         }
 
         public bool IsMouseDown(MouseButton button)
@@ -84,6 +89,14 @@ namespace TheEngine.Input
 
             return rightJustDown;
         }
+        
+        public bool HasJustReleased(MouseButton button)
+        {
+            if (((int)button & (int)MouseButton.Left) > 0)
+                return leftJustUp;
+
+            return rightJustUp;
+        }
 
         public void PointerMoved(double x, double y, double width, double height)
         {
@@ -95,6 +108,8 @@ namespace TheEngine.Input
         {
             leftJustDown = false;
             rightJustDown = false;
+            leftJustUp = false;
+            rightJustUp = false;
         }
     }
 

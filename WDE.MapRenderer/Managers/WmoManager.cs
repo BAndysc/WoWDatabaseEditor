@@ -88,8 +88,12 @@ namespace WDE.MapRenderer.Managers
                 if (bytesGroup.Result == null)
                     continue;
 
-                var group = new WorldMapObjectGroup(new MemoryBinaryReader(bytesGroup.Result), true);
+                var group = new WorldMapObjectGroup(new MemoryBinaryReader(bytesGroup.Result));
                 bytesGroup.Result.Dispose();
+                // bazaarfacade03 and cathy_facade01 - LODs for stormwind used by portal culling,
+                // but gives poor results without portal culling
+                if (group.Header.uniqueID is 2625 or 2624)
+                    continue;
                 groups.Add(group);
             }
 
@@ -97,7 +101,7 @@ namespace WDE.MapRenderer.Managers
 
             foreach (var group in groups)
             {
-                int[] indices = new int[group.Indices.Length + group.CollisionOnlyIndices.Length];
+                ushort[] indices = new ushort[group.Indices.Length + group.CollisionOnlyIndices.Length];
                 Array.Copy(group.Indices.AsArray(), indices, group.Indices.Length);
                 Array.Copy(group.CollisionOnlyIndices, 0, indices, group.Indices.Length, group.CollisionOnlyIndices.Length);
                 var wmoMeshData = new MeshData(group.Vertices.AsArray(), group.Normals.AsArray(), group.UVs[0].AsArray(),
@@ -168,11 +172,11 @@ namespace WDE.MapRenderer.Managers
 
                     mat.ZWrite = !mat.BlendingEnabled;
                     mat.SetUniform("alphaTest", alphaTest);
-                    mat.SetUniformInt("unlit", materialDef.flags.HasFlag(WorldMapObjectMaterial.Flags.unlit) ? 1 : 0);
-                    mat.SetUniformInt("brightAtNight", materialDef.flags.HasFlag(WorldMapObjectMaterial.Flags.brightAtNight) ? 1 : 0);
+                    mat.SetUniformInt("unlit", materialDef.flags.HasFlagFast(WorldMapObjectMaterial.Flags.unlit) ? 1 : 0);
+                    mat.SetUniformInt("brightAtNight", materialDef.flags.HasFlagFast(WorldMapObjectMaterial.Flags.brightAtNight) ? 1 : 0);
                     mat.SetUniformInt("interior", (group.Header.flags & 0x2000) == 0x2000 && group.VertexColors != null ? 1 : 0);
 
-                    if (materialDef.flags.HasFlag(WorldMapObjectMaterial.Flags.unculled))
+                    if (materialDef.flags.HasFlagFast(WorldMapObjectMaterial.Flags.unculled))
                         mat.Culling = CullingMode.Off;
 
                     if (materialDef.texture1Name != null)
@@ -199,7 +203,7 @@ namespace WDE.MapRenderer.Managers
                 if (group.CollisionOnlyIndices.Length > 0)
                     wmoMesh.SetSubmeshIndicesRange(j++, group.Indices.Length, group.CollisionOnlyIndices.Length);
 
-                wmoMesh.Rebuild();
+                wmoMesh.RebuildIndices();
                 wmoInstance.meshes.Add((wmoMesh, materials));
                 group.Dispose();
             }

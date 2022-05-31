@@ -22,4 +22,20 @@
       <ProjectReference Include="..\..\WoWDatabaseEditor\WoWDatabaseEditorCore.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="data\*.frag">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="data\*.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="data\*.vert">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="data" />
+    </ItemGroup>
+
 </Project>

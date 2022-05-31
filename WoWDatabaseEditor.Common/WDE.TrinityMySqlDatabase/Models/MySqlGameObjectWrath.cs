@@ -42,6 +42,19 @@ namespace WDE.TrinityMySqlDatabase.Models
 
         [Column(Name = "rotation3")]
         public float Rotation3 { get; set; }
+
+        // in addon
+        //[Column(Name = "parent_rotation0")]
+        public float ParentRotation0 { get; set; }
+
+        //[Column(Name = "parent_rotation1")]
+        public float ParentRotation1 { get; set; }
+
+        //[Column(Name = "parent_rotation2")]
+        public float ParentRotation2 { get; set; }
+
+        //[Column(Name = "parent_rotation3")]
+        public float ParentRotation3 { get; set; }
     }
     
     
@@ -83,5 +96,18 @@ namespace WDE.TrinityMySqlDatabase.Models
 
         [Column(Name = "rotation3")]
         public float Rotation3 { get; set; }
+
+        // in addon
+        //[Column(Name = "parent_rotation0")]
+        public float ParentRotation0 { get; set; }
+
+        //[Column(Name = "parent_rotation1")]
+        public float ParentRotation1 { get; set; }
+
+        //[Column(Name = "parent_rotation2")]
+        public float ParentRotation2 { get; set; }
+
+        //[Column(Name = "parent_rotation3")]
+        public float ParentRotation3 { get; set; }
     }
 }

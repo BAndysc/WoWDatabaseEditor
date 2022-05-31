@@ -34,6 +34,8 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
 
         public Task<T> ShowDialog<T>(Window window)
         {
+            if (this.window.WindowState == WindowState.Minimized)
+                this.window.WindowState = WindowState.Normal;
             var parent = WindowStack.Peek();
             window.Closed += WindowOnClosed;
             WindowStack.Push(window);

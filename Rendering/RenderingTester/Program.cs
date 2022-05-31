@@ -62,3 +62,4 @@ SynchronizationContext.SetSynchronizationContext(context);
 var game = provider.Resolve<Game>();
 using var window = new GameStandaloneWindow(GameWindowSettings.Default, nativeWindowSettings, game, mainThread, context);
 window.Run();
+TheEngine.TheEngine.Deinit();

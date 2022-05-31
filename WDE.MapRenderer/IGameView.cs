@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Windows.Input;
 using Prism.Ioc;
 using WDE.Module.Attributes;
 
@@ -16,9 +18,21 @@ namespace WDE.MapRenderer
     public interface IGameModule : System.IDisposable
     {
         object? ViewModel { get; }
+        object? ToolBar => null;
         void Initialize();
         void Update(float delta);
-        void Render();
-        void RenderGUI();
+        void Render() { }
+        void RenderTransparent() { }
+        void RenderGUI() { }
+        IEnumerator LoadChunk(int mapId, int chunkX, int chunkZ, CancellationToken cancellationToken)
+        {
+            yield break;
+        }
+        IEnumerator UnloadChunk(int chunkX, int chunkZ)
+        {
+            yield break;
+        }
+
+        IEnumerable<(string, ICommand, object?)>? GenerateContextMenu() => null;
     }
 }

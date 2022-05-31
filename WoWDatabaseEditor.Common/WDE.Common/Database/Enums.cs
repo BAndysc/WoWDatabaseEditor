@@ -21,4 +21,13 @@
         
         ActionList,  // can be any id, do not delete
     }
+    
+    public enum AnimTier : byte
+    {
+        Ground = 0,
+        Swim = 1,
+        Hover = 2,
+        Fly = 3,
+        Submerged = 4
+    }
 }

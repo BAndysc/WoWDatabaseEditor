@@ -195,6 +195,9 @@ public class TableEditorPickerService : ITableEditorPickerService
             (typeof(DatabaseTableDefinitionJson), definition));
 
         await windowManager.ShowDialog(viewModel);
+
+        if (viewModel.PendingSaveTask != null)
+            await viewModel.PendingSaveTask;
     }
     
     private bool IsItemAlreadyOpened(DatabaseTableSolutionItem fakeSolutionItem, out ISolutionItemDocument document)

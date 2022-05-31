@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -47,6 +48,7 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
     private readonly IMessageBoxService messageBoxService;
     private readonly IParameterPickerService parameterPickerService;
     private readonly ISolutionTasksService solutionTasksService;
+    private readonly IMetaColumnsSupportService metaColumnsSupportService;
     private readonly DatabaseTableDefinitionJson tableDefinition;
     private readonly DatabaseKey key;
     private readonly bool noSaveMode;
@@ -54,6 +56,8 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
     private bool wasPresentInDatabase;
     [Notify] private bool presentInDatabase;
     private DatabaseEntityViewModel row;
+    
+    private HashSet<string> forceUpdateCells = new HashSet<string>();
 
     public DatabaseEntityViewModel Row
     {
@@ -87,6 +91,7 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
         IHistoryManager history,
         IParameterPickerService parameterPickerService,
         ISolutionTasksService solutionTasksService,
+        IMetaColumnsSupportService metaColumnsSupportService,
         DatabaseTableDefinitionJson tableDefinition,
         DatabaseKey key,
         bool noSaveMode)
@@ -105,6 +110,7 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
         this.messageBoxService = messageBoxService;
         this.parameterPickerService = parameterPickerService;
         this.solutionTasksService = solutionTasksService;
+        this.metaColumnsSupportService = metaColumnsSupportService;
         this.tableDefinition = tableDefinition;
         this.History = history;
         this.key = key;
@@ -121,7 +127,7 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
             CloseCancel?.Invoke();
         });
         Save = noSaveMode ? AlwaysDisabledCommand.Command : new AsyncAutoCommand(SaveData);
-        ExecuteChangedCommand = noSaveMode ? AlwaysDisabledCommand.Command : new AsyncAutoCommand(async () =>
+        ExecuteChangedCommand = noSaveMode ? new AsyncAutoCommand(() => Task.CompletedTask, () => false) : new AsyncAutoCommand(async () =>
         {
             await SaveData();
             eventAggregator.GetEvent<DatabaseTableChanged>().Publish(tableDefinition.TableName);
@@ -131,6 +137,7 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
             UpdateSolutionItemWithEverything();
             await taskRunner.ScheduleTask("Update session", async () => await sessionService.UpdateQuery(this));
             History.MarkAsSaved();
+            forceUpdateCells.Clear();
         });
         CopyCurrentSqlCommand = new AsyncAutoCommand(async () =>
         {
@@ -199,13 +206,13 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
             
         if (parameterValue is IParameterValue<long> valueHolder)
         {
-            var result = await parameterPickerService.PickParameter<long>(valueHolder.Parameter, valueHolder.Value);
+            var result = await parameterPickerService.PickParameter<long>(valueHolder.Parameter, valueHolder.Value, Row.Entity);
             if (result.ok)
                 valueHolder.Value = result.value;
         }
         else if (parameterValue is IParameterValue<string> stringValueHolder)
         {
-            var result = await parameterPickerService.PickParameter<string>(stringValueHolder.Parameter, stringValueHolder.Value ?? "");
+            var result = await parameterPickerService.PickParameter<string>(stringValueHolder.Parameter, stringValueHolder.Value ?? "", Row.Entity);
             if (result.ok)
                 stringValueHolder.Value = result.value;             
         }
@@ -308,9 +315,31 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
         if (!wasPresentInDatabase && !PresentInDatabase)
             return Queries.Empty();
 
-        return queryGenerator.GenerateQuery(new[] { key }, null, new DatabaseTableData(tableDefinition, new[] { Row!.Entity }));
+        var query = queryGenerator.GenerateQuery(new[] { key }, null, new DatabaseTableData(tableDefinition, new[] { Row!.Entity }));
+        
+        IMultiQuery multi = Queries.BeginTransaction();
+        multi.Add(query);
+        foreach (var pair in forceUpdateCells)
+        {
+            var entity = row.Entity;
+            var field = entity.GetCell(pair);
+            if (field == null)
+                continue;
+            multi.Add(queryGenerator.GenerateUpdateFieldQuery(tableDefinition, entity, field));
+        }
+        return multi.Close();
     }
-
+    
+    private void OnRowChangedCell(DatabaseEntityViewModel entity, SingleRecordDatabaseCellViewModel cell, string columnName)
+    {
+        if (!cell.IsModified && entity.Entity.ExistInDatabase)
+        {
+            Debug.Assert(!entity.Entity.Phantom);
+            forceUpdateCells.Add(columnName);
+            History.MarkNoSave();
+        }
+    }
+    
     private DatabaseEntityViewModel Create(DatabaseEntity entity)
     {
         var pseudoItem = new DatabaseTableSolutionItem(tableDefinition.Id, tableDefinition.IgnoreEquality);
@@ -319,6 +348,11 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
             savedTableItem.UpdateEntitiesWithOriginalValues(new List<DatabaseEntity>() { entity });
 
         var row = new DatabaseEntityViewModel(entity);
+        row.ChangedCell += OnRowChangedCell;
+        AutoDispose(new ActionDisposable(() =>
+        {
+            row.ChangedCell -= OnRowChangedCell;
+        }));
         var columns = tableDefinition.Groups.SelectMany(g => g.Fields).ToList();
 
         int columnIndex = 0;
@@ -334,8 +368,9 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
                 throw new Exception("One to one conditions editing not supported (but it could be, but is there a need?)");
             }
             else if (column.IsMetaColumn)
-            {              
-                throw new Exception("One to one meta column opening not supported (but it could be, but is there a need?)");
+            {
+                var (cmd, name) = metaColumnsSupportService.GenerateCommand(column.Meta!, entity, key);
+                cellViewModel = new SingleRecordDatabaseCellViewModel(columnIndex, column.Name, cmd, row, entity, name);
             }
             else
             {
@@ -403,8 +438,8 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
         History.AddHandler(handler);
     }
     
-    public int DesiredWidth => 400;
-    public int DesiredHeight => 500;
+    public int DesiredWidth => 600;
+    public int DesiredHeight => 800;
     public string Title { get; }
     public ICommand Copy => new AlwaysDisabledCommand();
     public ICommand Cut => new AlwaysDisabledCommand();
@@ -419,7 +454,7 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
     public bool Resizeable => true;
     public ICommand Accept { get; set; }
     public ICommand Cancel { get; set; }
-    public ICommand ExecuteChangedCommand { get; }
+    public IAsyncCommand ExecuteChangedCommand { get; }
     public ICommand GenerateCurrentSqlCommand { get; }
     public ICommand CopyCurrentSqlCommand { get; }
 
@@ -430,6 +465,7 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
     private HistoryHandler handler = new();
     public IHistoryManager History { get; }
     public bool IsModified => !History.IsSaved;
+    public Task? PendingSaveTask { get; private set; } = Task.CompletedTask;
     
     private async Task AskIfSave(bool cancel)
     {
@@ -446,8 +482,9 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
             if (result == 0)
                 return;
             if (result == 2)
-                ExecuteChangedCommand.Execute(null);
+                PendingSaveTask = ExecuteChangedCommand.ExecuteAsync();
         }
+        
         if (cancel)
             CloseCancel?.Invoke();
         else

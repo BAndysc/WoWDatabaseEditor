@@ -125,5 +125,14 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public Task<List<IBroadcastText>> GetBroadcastTextsAsync() => Task.FromResult(new List<IBroadcastText>());
 
         public Task<List<IEventScriptLine>> GetEventScript(EventScriptType type, uint id) => Task.FromResult(new List<IEventScriptLine>());
+        public Task<IList<ICreatureModelInfo>> GetCreatureModelInfoAsync()
+        {
+            return Task.FromResult<IList<ICreatureModelInfo>>(new List<ICreatureModelInfo>());
+        }
+
+        public ICreatureModelInfo? GetCreatureModelInfo(uint displayId)
+        {
+            return null;
+        }
     }
 }

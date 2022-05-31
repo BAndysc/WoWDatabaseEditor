@@ -12,7 +12,7 @@ namespace WDE.SmartScriptEditor.Inspections
         {
             foreach (var a in smartDataManager.GetAllData(SmartType.SmartAction))
             {
-                if (a.Flags.HasFlag(ActionFlags.WaitAction))
+                if (a.Flags.HasFlagFast(ActionFlags.WaitAction))
                     waitActionId = a.Id;
             }
         }

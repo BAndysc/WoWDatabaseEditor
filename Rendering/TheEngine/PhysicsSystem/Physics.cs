@@ -24,11 +24,13 @@ namespace TheEngine.PhysicsSystem
 
     public class RaycastSystem
     {
+        private readonly Engine engine;
         private Archetype colliders;
         private MeshManager meshManager;
 
         public RaycastSystem(Engine engine)
         {
+            this.engine = engine;
             meshManager = engine.meshManager;
             colliders = engine.EntityManager.NewArchetype()
                 .WithComponentData<Collider>()
@@ -38,23 +40,27 @@ namespace TheEngine.PhysicsSystem
                 .WithComponentData<WorldMeshBounds>();
         }
 
-        public List<(Entity, Vector3)>? RaycastAll(Ray ray, Vector3? customOrigin)
+        public List<(Entity, Vector3)>? RaycastAll(Ray ray, Vector3? customOrigin, uint collisionMask = 0)
         {
             List<(Entity, Vector3)> destinationList = new();
-            RaycastAll(ray, customOrigin, destinationList);
+            RaycastAll(ray, customOrigin, destinationList, collisionMask);
             if (destinationList.Count == 0)
                 return null;
             return destinationList;
         }
         
-        public void RaycastAll(Ray ray, Vector3? customOrigin, List<(Entity, Vector3)> destinationList)
+        public void RaycastAll(Ray ray, Vector3? customOrigin, List<(Entity, Vector3)> destinationList, uint collisionMask = 0)
         {
             ThreadLocal<List<(Entity, Vector3)>?> localEntities = new ThreadLocal<List<(Entity, Vector3)>?>(true);
-            colliders.ParallelForEach<Collider, WorldMeshBounds, MeshRenderer, LocalToWorld>((itr, start, end, colliders, meshBounds, renderer, localToWorld) =>
+            colliders.ParallelForEachRRRRO<Collider, WorldMeshBounds, MeshRenderer, LocalToWorld, DisabledObjectBit>((itr, start, end, colliders, meshBounds, renderer, localToWorld, disableAccess) =>
             {
                 List<(Entity, Vector3)>? result = null;
                 for (int i = start; i < end; ++i)
                 {
+                    if (collisionMask != 0 && (colliders[i].CollisionMask & collisionMask) == 0)
+                        continue;
+                    if (disableAccess != null && disableAccess.Value[i])
+                        continue;
                     //if (!doRender[i])
                     //    continue;
                     var intersects = IntersectsBoundingBox(in ray, ref meshBounds[i]);
@@ -88,18 +94,29 @@ namespace TheEngine.PhysicsSystem
             }
         }
         
-        public (Entity, Vector3)? Raycast(Ray ray, Vector3? customOrigin)
+        public (Entity, Vector3)? RaycastMouse(uint collisionMask = 0)
+        {
+            var camera = engine.CameraManager;
+            var ray = camera.MainCamera.NormalizedScreenPointToRay(engine.InputManager.Mouse.NormalizedPosition);
+            return Raycast(ray, null, true, collisionMask);
+        }
+        
+        public (Entity, Vector3)? Raycast(Ray ray, Vector3? customOrigin, bool onlyRendered = false, uint collisionMask = 0)
         {
             ThreadLocal<(Entity, float, Vector3)> localEntities = new ThreadLocal<(Entity, float, Vector3)>(true);
-            colliders.ParallelForEach<Collider, WorldMeshBounds, MeshRenderer, LocalToWorld>((itr, start, end, colliders, meshBounds, renderer, localToWorld) =>
+            colliders.ParallelForEachRRRROO<Collider, WorldMeshBounds, MeshRenderer, LocalToWorld, RenderEnabledBit, DisabledObjectBit>((itr, start, end, colliders, meshBounds, renderer, localToWorld, renderEnabledAccess, disabledAccess) =>
             {
                 Entity? touchEntity = null;
                 float minDist = float.MaxValue;
                 Vector3 intersectionPoint = default;
                 for (int i = start; i < end; ++i)
                 {
-                    //if (!doRender[i])
-                    //    continue;
+                    if (collisionMask != 0 && (colliders[i].CollisionMask & collisionMask) == 0)
+                        continue;
+                    if (onlyRendered && renderEnabledAccess != null && !renderEnabledAccess.Value[i])
+                        continue;
+                    if (disabledAccess.HasValue && disabledAccess.Value[i])
+                        continue;
                     var intersects = IntersectsBoundingBox(in ray, ref meshBounds[i]);
                     if (intersects)
                     {
@@ -117,7 +134,7 @@ namespace TheEngine.PhysicsSystem
                     }
                 }
 
-                if (touchEntity.HasValue)
+                if (touchEntity.HasValue && (!localEntities.IsValueCreated || localEntities.Value.Item2 > minDist))
                 {
                     localEntities.Value = (touchEntity.Value, minDist, intersectionPoint);
                 }
@@ -205,7 +222,7 @@ namespace TheEngine.PhysicsSystem
                     }
                 }
             });
-            File.WriteAllText("/Users/bartek/mesh.obj", vertices.ToString() + "\n" + indices.ToString());
+            File.WriteAllText("~/mesh.obj", vertices.ToString() + "\n" + indices.ToString());
         }
     }
     

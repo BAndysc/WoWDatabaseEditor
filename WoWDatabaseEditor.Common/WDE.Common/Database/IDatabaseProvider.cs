@@ -83,6 +83,9 @@ namespace WDE.Common.Database
         Task<List<IEventScriptLine>> GetEventScript(EventScriptType type, uint id) => Task.FromResult(new List<IEventScriptLine>());
         Task<List<IEventScriptLine>> FindEventScriptLinesBy(IReadOnlyList<(uint command, int dataIndex, long valueToSearch)> conditions) => Task.FromResult(new List<IEventScriptLine>());
 
+        Task<IList<ICreatureModelInfo>> GetCreatureModelInfoAsync();
+        ICreatureModelInfo? GetCreatureModelInfo(uint displayId);
+        
         public enum SmartLinePropertyType
         {
             Event,

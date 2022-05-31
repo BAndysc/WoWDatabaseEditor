@@ -305,14 +305,14 @@ namespace TheMaths
         /// Converts the color into a packed integer.
         /// </summary>
         /// <returns>A packed integer containing all four color components.</returns>
-        public int ToRgba()
+        public uint ToRgba()
         {
             int value = R;
             value |= G << 8;
             value |= B << 16;
             value |= A << 24;
 
-            return (int)value;
+            return (uint)value;
         }
 
         /// <summary>
@@ -351,7 +351,7 @@ namespace TheMaths
         /// Converts the color into a four component vector.
         /// </summary>
         /// <returns>A four component vector containing all four color components.</returns>
-        public Vector4 ToVector4()
+        public readonly Vector4 ToVector4()
         {
             return new Vector4(R / 255.0f, G / 255.0f, B / 255.0f, A / 255.0f);
         }
@@ -1131,7 +1131,7 @@ namespace TheMaths
         /// <returns>
         /// The result of the conversion.
         /// </returns>
-        public static explicit operator int(Color value)
+        public static explicit operator uint(Color value)
         {
             return value.ToRgba();
         }

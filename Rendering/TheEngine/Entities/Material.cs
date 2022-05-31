@@ -81,7 +81,6 @@ namespace TheEngine.Entities
         internal Dictionary<int, Vector4> vector4Uniforms { get; } = new();
         internal Dictionary<int, Vector3> vector3Uniforms { get; } = new();
         
-        
         internal Dictionary<int, TextureHandle> instancedTextureHandles { get; } = new();
         internal Dictionary<int, INativeBuffer> instancedStructuredBuffers { get; } = new();
         internal Dictionary<int, int> instancedIntUniforms { get; } = new();
@@ -159,7 +158,7 @@ namespace TheEngine.Entities
                 instanced[instLoc.Value] = type;
         }
 
-        public void SetBuffer<T>(string name, NativeBuffer<T> buffer) where T : unmanaged
+        public void SetBuffer(string name, INativeBuffer buffer)
         {
             Set(structuredBuffers, instancedStructuredBuffers, name, buffer);
         }
@@ -188,10 +187,20 @@ namespace TheEngine.Entities
         {
             Set(textureHandles, instancedTextureHandles, name, texture);
         }
-
+        
         public TextureHandle GetTexture(string name)
         {
             return textureHandles[GetUniformLocation(name)];
+        }
+        
+        public INativeBuffer GetBuffer(string name)
+        {
+            return structuredBuffers[GetUniformLocation(name)];
+        }
+
+        public float GetUniformFloat(string name)
+        {
+            return floatUniforms[GetUniformLocation(name)];
         }
         
         public void ActivateUniforms(bool instanced, MaterialInstanceRenderData? instanceData = null)
@@ -218,7 +227,7 @@ namespace TheEngine.Entities
                     instancedShader!.SetUniformInt(pair.Key, slot);
                     slot++;
                 }
-
+                
                 foreach (var floats in instancedFloatUniforms)
                 {
                     instancedShader!.SetUniform(floats.Key, floats.Value);
@@ -257,7 +266,6 @@ namespace TheEngine.Entities
                     shader.SetUniformInt(pair.Key, slot);
                     slot++;
                 }
-
                 foreach (var floats in floatUniforms)
                 {
                     shader.SetUniform(floats.Key, floats.Value);
