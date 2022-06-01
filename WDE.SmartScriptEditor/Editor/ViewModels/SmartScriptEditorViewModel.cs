@@ -1398,7 +1398,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             var result = await smartTypeListProvider.Get(SmartType.SmartAction,
                 data =>
                 {
-                    if (data.UsableWithEventTypes != null && parentEvent != null && data.UsableWithEventTypes.Contains(parentEvent.Id))
+                    if (data.UsableWithEventTypes != null && parentEvent != null && !data.UsableWithEventTypes.Contains(parentEvent.Id))
                         return false;
                     
                     return (data.UsableWithScriptTypes == null ||
