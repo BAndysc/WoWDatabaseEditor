@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using WDE.Common.Managers;
+using WDE.PacketViewer.ViewModels;
 using WowPacketParser.Proto;
 using WowPacketParser.Proto.Processing;
 
@@ -16,7 +17,7 @@ namespace WDE.PacketViewer.Processing
     {
         bool RequiresSplitUpdateObject => false;
         Task Process() => Task.CompletedTask;
-        IDocument Generate();
+        IDocument Generate(PacketDocumentViewModel packetDocumentViewModel);
     }
 
     public interface ITwoStepPacketBoolProcessor : ITwoStepPacketProcessor<bool>

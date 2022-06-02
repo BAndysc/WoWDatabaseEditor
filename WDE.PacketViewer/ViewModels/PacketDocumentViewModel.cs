@@ -735,7 +735,7 @@ namespace WDE.PacketViewer.ViewModels
                 return null;
             
             foreach (var pair in documentsDumpers)
-                documents.Add(pair.dumper.Generate());
+                documents.Add(pair.dumper.Generate(this));
 
             if (cancellationToken.IsCancellationRequested)
                 return null;
