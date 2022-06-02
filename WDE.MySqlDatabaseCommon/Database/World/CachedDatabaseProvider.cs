@@ -67,8 +67,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             {
                 if (tableName == "creature_template")
                     Refresh(RefreshCreatureTemplate);
-                if (tableName == "creature")
-                    Refresh(RefreshCreature);
+                //if (tableName == "creature")
+                //    Refresh(RefreshCreature);
                 else if (tableName == "gossip_menu")
                     Refresh(RefreshGossipMenu);
                 else if (tableName == "npc_text")
