@@ -1,0 +1,38 @@
+﻿{
+  "id": "instance_template",
+  "compatibility": ["TrinityMaster"],
+  "name": "Instance Template",
+  "description": "Edit or create instance templates",
+  "table_name": "instance_template",
+  "table_index_name": "map",
+  "record_mode": "SingleRow",
+  "table_name_source_field": "script",
+  "icon_path": "Icons/document_instance_template.png",
+  "picker": "MapParameter",
+  "group_name": "Instance",
+  "primary_key": [
+    "map"
+  ],
+  "groups": [
+    {
+      "group_name": "Instance",
+      "fields": [
+        {
+          "name": "Map",
+          "db_column_name": "map",
+          "value_type": "MapParameter"
+        },
+        {
+          "name": "Parent map",
+          "db_column_name": "parent",
+          "value_type": "MapParameter"
+        },
+        {
+          "name": "Script name",
+          "db_column_name": "script",
+          "value_type": "string"
+        },
+      ]
+    }
+  ]
+}

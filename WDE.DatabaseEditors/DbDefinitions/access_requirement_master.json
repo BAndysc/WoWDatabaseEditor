@@ -1,0 +1,111 @@
+﻿{
+  "id": "access_requirement",
+  "compatibility": [
+    "TrinityMaster"
+  ],
+  "name": "Access Requirement",
+  "single_solution_name": "Access Requirement",
+  "multi_solution_name": "Access Requirement",
+  "description": "This table contains the access requirements to enter an instance.",
+  "table_name": "access_requirement",
+  "table_index_name": "mapId",
+  "record_mode": "SingleRow",
+  "group_name": "Advanced",
+  "icon_path": "Icons/document_access_requirements.png",
+  "reload_command": "reload access_requirement",
+  "picker": "Parameter",
+  "primary_key": [
+    "mapId",
+    "difficulty"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Map Id",
+          "db_column_name": "mapId",
+          "value_type": "MapParameter",
+          "preferred_width": 170.0
+        },
+        {
+          "name": "Difficulty",
+          "db_column_name": "difficulty",
+          "value_type": "MapDifficultyParameter",
+          "preferred_width": 130.0
+        },
+        {
+          "name": "Level Min",
+          "help": "The minimum level that you must be in order to enter the instance.",
+          "db_column_name": "level_min",
+          "value_type": "uint",
+          "zero_is_blank": true,
+          "preferred_width": 40.0
+        },
+        {
+          "name": "Level Max",
+          "help": "The maximum level that you can be in order to enter the instance.",
+          "db_column_name": "level_max",
+          "value_type": "uint",
+          "zero_is_blank": true,
+          "preferred_width": 70.0
+        },
+        {
+          "name": "Item",
+          "help": "An item that you must have in your inventory to enter the instance. This item can not be in the bank.",
+          "db_column_name": "item",
+          "value_type": "ItemParameter",
+          "zero_is_blank": true,
+          "preferred_width": 100.0
+        },
+        {
+          "name": "Item 2",
+          "help": "A second item that you must have in your inventory. This item can not be in the bank.",
+          "db_column_name": "item2",
+          "value_type": "ItemParameter",
+          "zero_is_blank": true,
+          "preferred_width": 60.0
+        },
+        {
+          "name": "Quest Done (Ally)",
+          "help": "A quest that you must have completed. This field is only for alliance.",
+          "db_column_name": "quest_done_A",
+          "value_type": "QuestParameter",
+          "zero_is_blank": true,
+          "preferred_width": 105.0
+        },
+        {
+          "name": "Quest Done (Horde)",
+          "help": "A quest that you must have completed. This field is only for horde.",
+          "db_column_name": "quest_done_H",
+          "value_type": "QuestParameter",
+          "zero_is_blank": true,
+          "preferred_width": 110.0
+        },
+        {
+          "name": "Completed Achievement",
+          "help": "An achievement that must be completed by the player to enter an instance.",
+          "db_column_name": "completed_achievement",
+          "value_type": "AchievementParameter",
+          "zero_is_blank": true,
+          "preferred_width": 115.0
+        },
+        {
+          "name": "Quest Failed Text",
+          "help": "The text that is shown if you try and enter the instance without having completed the quest.",
+          "db_column_name": "quest_failed_text",
+          "value_type": "string",
+          "can_be_null": true
+        },
+        {
+          "name": "Comment",
+          "help": "This field is for any comment you want to make about the requirements. It is arbitrary text.",
+          "db_column_name": "comment",
+          "value_type": "string",
+          "can_be_null": true,
+          "preferred_width": 175.0
+        }
+      ]
+    }
+  ]
+}
