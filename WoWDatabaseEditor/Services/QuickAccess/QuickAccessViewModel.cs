@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using Prism.Commands;
 using WDE.Common.QuickAccess;
+using WDE.Common.Tasks;
 using WDE.Common.Types;
 using WDE.Common.Utils;
 using WDE.Module.Attributes;
@@ -19,6 +20,7 @@ namespace WoWDatabaseEditorCore.Services.QuickAccess;
 public class QuickAccessViewModel : ObservableBase, IQuickAccessViewModel
 {
     private readonly IQuickAccessService quickAccessService;
+    private readonly IMainThread mainThread;
     private string searchText = "";
     public ObservableCollection<QuickAccessItemViewModel> Items { get; } = new();
 
@@ -40,12 +42,14 @@ public class QuickAccessViewModel : ObservableBase, IQuickAccessViewModel
     
     private bool isOpened;
 
-    public QuickAccessViewModel(IQuickAccessService quickAccessService)
+    public QuickAccessViewModel(IQuickAccessService quickAccessService, IMainThread mainThread)
     {
         this.quickAccessService = quickAccessService;
+        this.mainThread = mainThread;
         AutoDispose(this
             .ToObservable(x => x.SearchText)
             .Throttle(TimeSpan.FromMilliseconds(100))
+            .ObserveOn(SynchronizationContext.Current!)
             .Subscribe(text =>
         {
             pendingSearch?.Cancel();
@@ -68,15 +72,17 @@ public class QuickAccessViewModel : ObservableBase, IQuickAccessViewModel
             await quickAccessService.Search(text, item =>
             {
                 if (pendingSearch == token)
-                    Items.Add(new QuickAccessItemViewModel(item));
+                    mainThread.Dispatch(() => Items.Add(new QuickAccessItemViewModel(item)));
             }, token.Token);
             if (token.IsCancellationRequested)
                 return;
-            if (Items.Count < 20)
-            {
-                Items.Sort((x, y) => x!.Score.CompareTo(y!.Score));
-            }
         });
+        if (token.IsCancellationRequested)
+            return;
+        if (Items.Count < 20)
+        {
+            Items.Sort((x, y) => x!.Score.CompareTo(y!.Score));
+        }
     }
 
     public void OpenSearch(string? text)
