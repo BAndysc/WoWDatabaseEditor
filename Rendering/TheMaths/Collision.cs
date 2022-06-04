@@ -180,15 +180,15 @@ namespace TheMaths
         /// <param name="box">The box to test.</param>
         /// <param name="point">The point to test.</param>
         /// <param name="result">When the method completes, contains the closest point between the two objects.</param>
-        public static void ClosestPointBoxPoint(ref BoundingBox box, ref Vector3 point, out Vector3 result)
-        {
-            //Source: Real-Time Collision Detection by Christer Ericson
-            //Reference: Page 130
-
-            Vector3 temp;
-            Vector3.Max(ref point, ref box.Minimum, out temp);
-            Vector3.Min(ref temp, ref box.Maximum, out result);
-        }
+        // public static void ClosestPointBoxPoint(ref BoundingBox box, ref Vector3 point, out Vector3 result)
+        // {
+        //     //Source: Real-Time Collision Detection by Christer Ericson
+        //     //Reference: Page 130
+        //
+        //     Vector3 temp;
+        //     Vector3.Max(ref point, box.Minimum, out temp);
+        //     Vector3.Min(ref temp, ref box.Maximum, out result);
+        // }
 
         /// <summary>
         /// Determines the closest point between a <see cref="BoundingSphere"/> and a point.
@@ -1120,7 +1120,7 @@ namespace TheMaths
             //Reference: Page 166
 
             Vector3 vector;
-            Vector3.Clamp(ref sphere.Center, ref box.Minimum, ref box.Maximum, out vector);
+            vector = Vector3.Clamp(sphere.Center, box.Minimum, box.Maximum);
             float distance = Vector3.DistanceSquared(sphere.Center, vector);
 
             return distance <= sphere.Radius * sphere.Radius;
@@ -1240,7 +1240,7 @@ namespace TheMaths
         public static ContainmentType BoxContainsSphere(ref BoundingBox box, ref BoundingSphere sphere)
         {
             Vector3 vector;
-            Vector3.Clamp(ref sphere.Center, ref box.Minimum, ref box.Maximum, out vector);
+            vector = Vector3.Clamp(sphere.Center, box.Minimum,  box.Maximum);
             float distance = Vector3.DistanceSquared(sphere.Center, vector);
 
             if (distance > sphere.Radius * sphere.Radius)

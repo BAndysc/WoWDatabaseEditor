@@ -315,7 +315,7 @@ namespace TheMaths
         /// <param name="result">When the method completes, the newly constructed bounding sphere.</param>
         public static void FromBox(ref BoundingBox box, out BoundingSphere result)
         {
-            Vector3.Lerp(ref box.Minimum, ref box.Maximum, 0.5f, out result.Center);
+            result.Center = Vector3.Lerp(box.Minimum, box.Maximum, 0.5f);
 
             float x = box.Minimum.X - box.Maximum.X;
             float y = box.Minimum.Y - box.Maximum.Y;

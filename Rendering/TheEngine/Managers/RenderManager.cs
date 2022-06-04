@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using Avalonia.Input;
 using OpenGLBindings;
 using TheAvaloniaOpenGL;
@@ -466,16 +467,40 @@ namespace TheEngine.Managers
             }
         }
 
+        private struct CachedComponentDataAccess<T> where T : unmanaged, IComponentData
+        {
+            private IEntityManager entityManager;
+            private ComponentDataAccess<T> cache = default;
+
+            public CachedComponentDataAccess(IEntityManager em)
+            {
+                entityManager = em;
+            }
+            
+            public ref T this[Entity entity]
+            {
+                [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                get
+                {
+                    if (!cache.IsInitialized || !cache.Has(entity))
+                        cache = entityManager.GetDataAccessByEntity<T>(entity);
+                    return ref cache[entity];
+                }
+            }
+        }
+
         public void UpdateTransforms()
         {
             var entityManager = engine.entityManager;
             dynamicParentedEntitiesArchetype.ParallelForEach<CopyParentTransform, LocalToWorld, DirtyPosition>((itr, start, end, parents, localToWorld, dirtyPosition) =>
             {
+                CachedComponentDataAccess<DirtyPosition> cachedDirtPosition = new CachedComponentDataAccess<DirtyPosition>(entityManager);
+                CachedComponentDataAccess<LocalToWorld> cacheLocalToWorld = new CachedComponentDataAccess<LocalToWorld>(entityManager);
                 for (int i = start; i < end; ++i)
                 {
-                    if (!dirtyPosition[i] && !entityManager.GetComponent<DirtyPosition>(parents[i].Parent))
+                    if (!dirtyPosition[i] && !cachedDirtPosition[parents[i].Parent])
                         continue;
-                    ref var parentLocalToWorld = ref entityManager.GetComponent<LocalToWorld>(parents[i].Parent);
+                    ref var parentLocalToWorld = ref cacheLocalToWorld[parents[i].Parent];
                     localToWorld[i] = parentLocalToWorld;
                     dirtyPosition[i].Enable();
                 }
@@ -589,7 +614,7 @@ namespace TheEngine.Managers
                     if (bits[i].IsForceDisabled())
                         continue;
                     
-                    var boundingBox = worldMeshBounds[i].box;
+                    ref var boundingBox = ref worldMeshBounds[i].box;
                     var pos = boundingBox.Center;
                     var boundingBoxSize = boundingBox.Size;
                     var size = boundingBoxSize.X + boundingBoxSize.Y + boundingBoxSize.Z;
@@ -605,20 +630,22 @@ namespace TheEngine.Managers
             });
             dynamicParentedEntitiesArchetype.WithComponentData<RenderEnabledBit>().ParallelForEach<RenderEnabledBit, CopyParentTransform>((itr, start, end, renderBit, cpt) =>
             {
+                CachedComponentDataAccess<RenderEnabledBit> cache = new CachedComponentDataAccess<RenderEnabledBit>(entityManager);
                 for (int i = start; i < end; ++i)
                 {
                     var parent = cpt[i];
                     if (parent.Parent != Entity.Empty)
-                        renderBit[i] = engine.entityManager.GetComponent<RenderEnabledBit>(parent.Parent);
+                        renderBit[i] = cache[parent.Parent];
                 }
             });
             entitiesSharingRenderingArchetype.ParallelForEach<RenderEnabledBit, ShareRenderEnabledBit>(
                 (itr, start, end, renderBits, shareRenderBits) =>
                 {
+                    CachedComponentDataAccess<RenderEnabledBit> cache = new CachedComponentDataAccess<RenderEnabledBit>(entityManager);
                     for (int i = start; i < end; ++i)
                     {
                         if (!renderBits[i])
-                            renderBits[i] = entityManager.GetComponent<RenderEnabledBit>(shareRenderBits[i].OtherEntity);
+                            renderBits[i] = cache[shareRenderBits[i].OtherEntity];
                     }
                 });
             culler.Stop();

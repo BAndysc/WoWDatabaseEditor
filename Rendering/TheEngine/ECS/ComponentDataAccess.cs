@@ -14,6 +14,10 @@ namespace TheEngine.ECS
             this.data = data;
             this.sparseReverseEntityMapping = sparseReverseEntityMapping;
         }
+
+        public unsafe bool IsInitialized => data != (byte*)0;
+        
+        public bool Has(Entity e) => e.Id < sparseReverseEntityMapping.Length && sparseReverseEntityMapping[e.Id] != 0;
         
         public unsafe ref T this[int index]
         {

@@ -59,13 +59,24 @@ namespace TheMaths
         /// <summary>
         /// The minimum point of the box.
         /// </summary>
-        public Vector3 Minimum;
+        public Vector3 Minimum => Center - Size / 2;
 
         /// <summary>
         /// The maximum point of the box.
         /// </summary>
-        public Vector3 Maximum;
+        public Vector3 Maximum => Center + Size / 2;
 
+
+        /// <summary>
+        /// Returns the size of the bounding box
+        /// </summary>
+        public Vector3 Size;
+
+        /// <summary>
+        /// Returns the size of the bounding box
+        /// </summary>
+        public Vector3 Center;
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="BoundingBox"/> struct.
         /// </summary>
@@ -73,8 +84,8 @@ namespace TheMaths
         /// <param name="maximum">The maximum vertex of the bounding box.</param>
         public BoundingBox(Vector3 minimum, Vector3 maximum)
         {
-            this.Minimum = minimum;
-            this.Maximum = maximum;
+            this.Center = (minimum + maximum) / 2;
+            this.Size = maximum - minimum;
         }
 
         public static BoundingBox FromCenterSize(Vector3 center, Vector3 size)
@@ -109,22 +120,6 @@ namespace TheMaths
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get { return this.Maximum.Z - this.Minimum.Z; }
-        }
-
-        /// <summary>
-        /// Returns the size of the bounding box
-        /// </summary>
-        public Vector3 Size
-        {
-            get { return this.Maximum - this.Minimum; }
-        }
-
-        /// <summary>
-        /// Returns the size of the bounding box
-        /// </summary>
-        public Vector3 Center
-        {
-            get { return (this.Maximum + this.Minimum) * 0.5f; }
         }
 
         /// <summary>
@@ -378,24 +373,24 @@ namespace TheMaths
         /// </summary>
         /// <param name="sphere">The sphere that will designate the extents of the box.</param>
         /// <param name="result">When the method completes, contains the newly constructed bounding box.</param>
-        public static void FromSphere(ref BoundingSphere sphere, out BoundingBox result)
-        {
-            result.Minimum = new Vector3(sphere.Center.X - sphere.Radius, sphere.Center.Y - sphere.Radius, sphere.Center.Z - sphere.Radius);
-            result.Maximum = new Vector3(sphere.Center.X + sphere.Radius, sphere.Center.Y + sphere.Radius, sphere.Center.Z + sphere.Radius);
-        }
+        // public static void FromSphere(ref BoundingSphere sphere, out BoundingBox result)
+        // {
+        //     result.Minimum = new Vector3(sphere.Center.X - sphere.Radius, sphere.Center.Y - sphere.Radius, sphere.Center.Z - sphere.Radius);
+        //     result.Maximum = new Vector3(sphere.Center.X + sphere.Radius, sphere.Center.Y + sphere.Radius, sphere.Center.Z + sphere.Radius);
+        // }
 
         /// <summary>
         /// Constructs a <see cref="BoundingBox"/> from a given sphere.
         /// </summary>
         /// <param name="sphere">The sphere that will designate the extents of the box.</param>
         /// <returns>The newly constructed bounding box.</returns>
-        public static BoundingBox FromSphere(BoundingSphere sphere)
-        {
-            BoundingBox box;
-            box.Minimum = new Vector3(sphere.Center.X - sphere.Radius, sphere.Center.Y - sphere.Radius, sphere.Center.Z - sphere.Radius);
-            box.Maximum = new Vector3(sphere.Center.X + sphere.Radius, sphere.Center.Y + sphere.Radius, sphere.Center.Z + sphere.Radius);
-            return box;
-        }
+        // public static BoundingBox FromSphere(BoundingSphere sphere)
+        // {
+        //     BoundingBox box;
+        //     box.Minimum = new Vector3(sphere.Center.X - sphere.Radius, sphere.Center.Y - sphere.Radius, sphere.Center.Z - sphere.Radius);
+        //     box.Maximum = new Vector3(sphere.Center.X + sphere.Radius, sphere.Center.Y + sphere.Radius, sphere.Center.Z + sphere.Radius);
+        //     return box;
+        // }
 
         /// <summary>
         /// Constructs a <see cref="BoundingBox"/> that is as large as the total combined area of the two specified boxes.
@@ -405,8 +400,9 @@ namespace TheMaths
         /// <param name="result">When the method completes, contains the newly constructed bounding box.</param>
         public static void Merge(ref BoundingBox value1, ref BoundingBox value2, out BoundingBox result)
         {
-            Vector3.Min(ref value1.Minimum, ref value2.Minimum, out result.Minimum);
-            Vector3.Max(ref value1.Maximum, ref value2.Maximum, out result.Maximum);
+            var min = Vector3.Min( value1.Minimum, value2.Minimum);
+            var max = Vector3.Max(value1.Maximum, value2.Maximum);
+            result = new BoundingBox(min, max);
         }
 
         /// <summary>
@@ -417,10 +413,9 @@ namespace TheMaths
         /// <returns>The newly constructed bounding box.</returns>
         public static BoundingBox Merge(BoundingBox value1, BoundingBox value2)
         {
-            BoundingBox box;
-            Vector3.Min(ref value1.Minimum, ref value2.Minimum, out box.Minimum);
-            Vector3.Max(ref value1.Maximum, ref value2.Maximum, out box.Maximum);
-            return box;
+            var min = Vector3.Min(value1.Minimum, value2.Minimum);
+            var max = Vector3.Max(value1.Maximum, value2.Maximum);
+            return new BoundingBox(min, max);
         }
 
         /// <summary>

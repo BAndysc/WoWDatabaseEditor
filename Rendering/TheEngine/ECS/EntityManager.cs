@@ -107,9 +107,14 @@ namespace TheEngine.ECS
             return entities.Length > entity.Id && entities[entity.Id] == entity;
         }
 
+        public ComponentDataAccess<T> GetDataAccessByEntity<T>(Entity entity) where T : unmanaged, IComponentData
+        {
+            return dataManager[entitiesArchetype[entity.Id]].DataAccess<T>();
+        }
+        
         public ref T GetComponent<T>(Entity entity) where T : unmanaged, IComponentData
         {
-            return ref dataManager[entitiesArchetype[entity.Id]].DataAccess<T>()[entity];
+            return ref GetDataAccessByEntity<T>(entity)[entity];
         }
 
         public T GetManagedComponent<T>(Entity entity) where T : IManagedComponentData

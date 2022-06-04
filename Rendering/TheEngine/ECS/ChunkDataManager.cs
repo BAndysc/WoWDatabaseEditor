@@ -190,6 +190,7 @@ namespace TheEngine.ECS
 
             entityMapping[index] = swapWithEntity;
             sparseReverseEntityMapping[swapWithEntity.Id] = index + 1;
+            sparseReverseEntityMapping[entity.Id] = 0;
 
             int i = 0;
             foreach (var c in Archetype.Components)
