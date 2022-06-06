@@ -401,7 +401,7 @@ namespace TheEngine.Managers
         public void DrawSphere(Vector3 center, float radius, Vector4 color)
         {
             wireframe.SetUniform("Color", color);
-            Render(sphereMesh, wireframe, 0, Matrix.TRS(center, Quaternion.Identity, Vector3.One * radius));
+            Render(sphereMesh, wireframe, 0, Utilities.TRS(center, Quaternion.Identity, Vector3.One * radius));
         }
 
         public void RenderFullscreenPlane(Material material)
@@ -547,8 +547,8 @@ namespace TheEngine.Managers
             for (int j = 0; j < 8; ++j)
             {
                 var vec4 = new Vector4(corners[j], 1);
-                Vector4.Transform(ref vec4, ref matrix, out var worldspace);
-                corners[j] = worldspace.XYZ;
+                var worldspace = Vector4.Transform(vec4, matrix);
+                corners[j] = worldspace.XYZ();
             }
 
             min = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
@@ -887,7 +887,10 @@ namespace TheEngine.Managers
         public void Render(IMesh mesh, Material material, int submesh, Matrix localToWorld, Matrix? worldToLocal = null, MaterialInstanceRenderData? instanceData = null)
         {
             if (worldToLocal == null)
-                worldToLocal = Matrix.Invert(localToWorld);
+            {
+                Matrix.Invert(localToWorld, out var  worldToLocal_);
+                worldToLocal = worldToLocal_;
+            }
             
             Debug.Assert(inRenderingLoop);
             if (currentShader != material.Shader)
@@ -932,14 +935,17 @@ namespace TheEngine.Managers
 
         public void Render(IMesh mesh, Material material, int submesh, Vector3 position)
         {
-            var matrix = Matrix.Translation(position);
+            var matrix = Matrix.CreateTranslation(position);
             Render(mesh, material, submesh, matrix);
         }
 
         public void RenderInstancedIndirect(IMesh mesh, Material material, int submesh, int instancesCount, Matrix localToWorld, Matrix? worldToLocal = null)
         {
             if (!worldToLocal.HasValue)
-                worldToLocal = Matrix.Invert(localToWorld);
+            {
+                Matrix.Invert(localToWorld, out var worldToLocal_);
+                worldToLocal = worldToLocal_;
+            }
             material.Shader.Activate();
             EnableMaterial(material, false);
             objectData.WorldMatrix = localToWorld;
@@ -982,11 +988,11 @@ namespace TheEngine.Managers
             sceneData.ProjectionMatrix = proj;
             sceneData.LightPosition = engine.lightManager.MainLight.LightPosition;
             sceneData.CameraPosition = new Vector4(engine.CameraManager.MainCamera.Transform.Position, 1);
-            sceneData.LightDirection = new Vector4((Vector3.Forward * engine.lightManager.MainLight.LightRotation).Normalized, 0);
-            sceneData.LightColor = engine.lightManager.MainLight.LightColor.XYZ;
-            sceneData.LightIntensity = engine.lightManager.MainLight.LightIntensity;
-            sceneData.SecondaryLightDirection = new Vector4(Vector3.Forward * engine.lightManager.SecondaryLight.LightRotation, 0);
-            sceneData.SecondaryLightColor = engine.lightManager.SecondaryLight.LightColor.XYZ;
+            sceneData.LightDirection = new Vector4(Vectors.Normalize((Vectors.Forward.Multiply(engine.lightManager.MainLight.LightRotation))), 0);
+            sceneData.LightColor = engine.lightManager.MainLight.LightColor.XYZ();
+            sceneData.LightIntensity = engine.lightManager.MainLight.LightIntensity; 
+            sceneData.SecondaryLightDirection = new Vector4(Vectors.Forward.Multiply(engine.lightManager.SecondaryLight.LightRotation), 0);
+            sceneData.SecondaryLightColor = engine.lightManager.SecondaryLight.LightColor.XYZ();
             sceneData.SecondaryLightIntensity = engine.lightManager.SecondaryLight.LightIntensity;
             sceneData.AmbientColor = engine.lightManager.MainLight.AmbientColor;
             sceneData.Time = (float)engine.TotalTime;
@@ -1056,8 +1062,8 @@ namespace TheEngine.Managers
         public static void DrawRay(this IRenderManager renderManager, Ray ray)
         {
             renderManager.DrawLine(ray.Position, ray.Position + ray.Direction, Color4.White);
-            renderManager.DrawLine(ray.Position + ray.Direction - Vector3.Left * 0.5f, ray.Position + ray.Direction, Color4.White);
-            renderManager.DrawLine(ray.Position + ray.Direction - Vector3.Forward * 0.5f, ray.Position + ray.Direction, Color4.White);
+            renderManager.DrawLine(ray.Position + ray.Direction - Vectors.Left * 0.5f, ray.Position + ray.Direction, Color4.White);
+            renderManager.DrawLine(ray.Position + ray.Direction - Vectors.Forward * 0.5f, ray.Position + ray.Direction, Color4.White);
         }
     }
 }

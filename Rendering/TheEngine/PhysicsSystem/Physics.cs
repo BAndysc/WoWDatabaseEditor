@@ -210,9 +210,9 @@ namespace TheEngine.PhysicsSystem
                         var v1 = face.Item1;
                         var v2 = face.Item2;
                         var v3 = face.Item3;
-                        Vector4.Transform(ref v1, ref l2w, out var v1_w);
-                        Vector4.Transform(ref v2, ref l2w, out var v2_w);
-                        Vector4.Transform(ref v3, ref l2w, out var v3_w);
+                        var v1_w = Vector4.Transform(v1, l2w);
+                        var v2_w = Vector4.Transform(v2, l2w);
+                        var v3_w = Vector4.Transform(v3, l2w);
 
                         vertices.AppendLine($"v {v1_w.X} {v1_w.Y} {v1_w.Z}");
                         vertices.AppendLine($"v {v2_w.X} {v2_w.Y} {v2_w.Z}");
@@ -240,11 +240,11 @@ namespace TheEngine.PhysicsSystem
                 var v2 = triangle.Item2;
                 var v3 = triangle.Item3;
 
-                Vector4.Transform(ref v1, ref localToWorld, out var v1_w);
-                Vector4.Transform(ref v2, ref localToWorld, out var v2_w);
-                Vector4.Transform(ref v3, ref localToWorld, out var v3_w);
+                var v1_w = Vector4.Transform(v1, localToWorld);
+                var v2_w = Vector4.Transform(v2, localToWorld);
+                var v3_w = Vector4.Transform(v3, localToWorld);
 
-                if (RayIntersectsTriangleOnlyFront(in ray, v1_w.XYZ, v2_w.XYZ, v3_w.XYZ, out var inte))
+                if (RayIntersectsTriangleOnlyFront(in ray, v1_w.XYZ(), v2_w.XYZ(), v3_w.XYZ(), out var inte))
                 {
                     if (!intersects)
                     {

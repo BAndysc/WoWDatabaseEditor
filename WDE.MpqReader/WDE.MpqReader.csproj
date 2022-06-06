@@ -13,4 +13,5 @@
         <PackageReference Include="SixLabors.ImageSharp" Version="1.0.4" />
     </ItemGroup>
 
+    <Import Project="..\Rendering\lib3d.props" />
 </Project>

@@ -51,114 +51,114 @@ using System.Runtime.InteropServices;
 namespace TheMaths
 {
     /// <summary>
-    /// Represents a 4x4 mathematical matrix.
+    /// Represents a 4x4 mathematical OldMatrix.
     /// </summary>
     [StructLayout(LayoutKind.Sequential, Pack = 4)]
-    public struct Matrix : IEquatable<Matrix>, IFormattable
+    public struct OldMatrix : IEquatable<OldMatrix>, IFormattable
     {
         /// <summary>
-        /// The size of the <see cref="Matrix"/> type, in bytes.
+        /// The size of the <see cref="OldMatrix"/> type, in bytes.
         /// </summary>
         public static readonly int SizeInBytes = 4 * 4 * sizeof(float);
 
         /// <summary>
-        /// A <see cref="Matrix"/> with all of its components set to zero.
+        /// A <see cref="OldMatrix"/> with all of its components set to zero.
         /// </summary>
-        public static readonly Matrix Zero = new Matrix();
+        public static readonly OldMatrix Zero = new OldMatrix();
 
         /// <summary>
-        /// The identity <see cref="Matrix"/>.
+        /// The identity <see cref="OldMatrix"/>.
         /// </summary>
-        public static readonly Matrix Identity = new Matrix() { M11 = 1.0f, M22 = 1.0f, M33 = 1.0f, M44 = 1.0f };
+        public static readonly OldMatrix Identity = new OldMatrix() { M11 = 1.0f, M22 = 1.0f, M33 = 1.0f, M44 = 1.0f };
 
         /// <summary>
-        /// Value at row 1 column 1 of the matrix.
+        /// Value at row 1 column 1 of the OldMatrix.
         /// </summary>
         public float M11;
 
         /// <summary>
-        /// Value at row 1 column 2 of the matrix.
+        /// Value at row 1 column 2 of the OldMatrix.
         /// </summary>
         public float M12;
 
         /// <summary>
-        /// Value at row 1 column 3 of the matrix.
+        /// Value at row 1 column 3 of the OldMatrix.
         /// </summary>
         public float M13;
 
         /// <summary>
-        /// Value at row 1 column 4 of the matrix.
+        /// Value at row 1 column 4 of the OldMatrix.
         /// </summary>
         public float M14;
 
         /// <summary>
-        /// Value at row 2 column 1 of the matrix.
+        /// Value at row 2 column 1 of the OldMatrix.
         /// </summary>
         public float M21;
 
         /// <summary>
-        /// Value at row 2 column 2 of the matrix.
+        /// Value at row 2 column 2 of the OldMatrix.
         /// </summary>
         public float M22;
 
         /// <summary>
-        /// Value at row 2 column 3 of the matrix.
+        /// Value at row 2 column 3 of the OldMatrix.
         /// </summary>
         public float M23;
 
         /// <summary>
-        /// Value at row 2 column 4 of the matrix.
+        /// Value at row 2 column 4 of the OldMatrix.
         /// </summary>
         public float M24;
 
         /// <summary>
-        /// Value at row 3 column 1 of the matrix.
+        /// Value at row 3 column 1 of the OldMatrix.
         /// </summary>
         public float M31;
 
         /// <summary>
-        /// Value at row 3 column 2 of the matrix.
+        /// Value at row 3 column 2 of the OldMatrix.
         /// </summary>
         public float M32;
 
         /// <summary>
-        /// Value at row 3 column 3 of the matrix.
+        /// Value at row 3 column 3 of the OldMatrix.
         /// </summary>
         public float M33;
 
         /// <summary>
-        /// Value at row 3 column 4 of the matrix.
+        /// Value at row 3 column 4 of the OldMatrix.
         /// </summary>
         public float M34;
 
         /// <summary>
-        /// Value at row 4 column 1 of the matrix.
+        /// Value at row 4 column 1 of the OldMatrix.
         /// </summary>
         public float M41;
 
         /// <summary>
-        /// Value at row 4 column 2 of the matrix.
+        /// Value at row 4 column 2 of the OldMatrix.
         /// </summary>
         public float M42;
 
         /// <summary>
-        /// Value at row 4 column 3 of the matrix.
+        /// Value at row 4 column 3 of the OldMatrix.
         /// </summary>
         public float M43;
 
         /// <summary>
-        /// Value at row 4 column 4 of the matrix.
+        /// Value at row 4 column 4 of the OldMatrix.
         /// </summary>
         public float M44;
      
         /// <summary>
-        /// Gets or sets the up <see cref="Vector3"/> of the matrix; that is M21, M22, and M23.
+        /// Gets or sets the up <see cref="OldVector3"/> of the OldMatrix; that is M21, M22, and M23.
         /// </summary>
-        public Vector3 Up
+        public OldVector3 Up
         {
           get
           {
-            Vector3 vector3;
+            OldVector3 vector3;
             vector3.X = this.M21;
             vector3.Y = this.M22;
             vector3.Z = this.M23;
@@ -173,13 +173,13 @@ namespace TheMaths
         }
     
         /// <summary>
-        /// Gets or sets the down <see cref="Vector3"/> of the matrix; that is -M21, -M22, and -M23.
+        /// Gets or sets the down <see cref="OldVector3"/> of the OldMatrix; that is -M21, -M22, and -M23.
         /// </summary>
-        public Vector3 Down
+        public OldVector3 Down
         {
           get
           {
-            Vector3 vector3;
+            OldVector3 vector3;
             vector3.X = -this.M21;
             vector3.Y = -this.M22;
             vector3.Z = -this.M23;
@@ -194,13 +194,13 @@ namespace TheMaths
         }
     
         /// <summary>
-        /// Gets or sets the right <see cref="Vector3"/> of the matrix; that is M11, M12, and M13.
+        /// Gets or sets the right <see cref="OldVector3"/> of the OldMatrix; that is M11, M12, and M13.
         /// </summary>
-        public Vector3 Right
+        public OldVector3 Right
         {
           get
           {
-            Vector3 vector3;
+            OldVector3 vector3;
             vector3.X = this.M11;
             vector3.Y = this.M12;
             vector3.Z = this.M13;
@@ -215,13 +215,13 @@ namespace TheMaths
         }
     
         /// <summary>
-        /// Gets or sets the left <see cref="Vector3"/> of the matrix; that is -M11, -M12, and -M13.
+        /// Gets or sets the left <see cref="OldVector3"/> of the OldMatrix; that is -M11, -M12, and -M13.
         /// </summary>
-        public Vector3 Left
+        public OldVector3 Left
         {
           get
           {
-            Vector3 vector3;
+            OldVector3 vector3;
             vector3.X = -this.M11;
             vector3.Y = -this.M12;
             vector3.Z = -this.M13;
@@ -236,13 +236,13 @@ namespace TheMaths
         }
         
         /// <summary>
-        /// Gets or sets the forward <see cref="Vector3"/> of the matrix; that is -M31, -M32, and -M33.
+        /// Gets or sets the forward <see cref="OldVector3"/> of the OldMatrix; that is -M31, -M32, and -M33.
         /// </summary>
-        public Vector3 Forward
+        public OldVector3 Forward
         {
           get
           {
-            Vector3 vector3;
+            OldVector3 vector3;
             vector3.X = -this.M31;
             vector3.Y = -this.M32;
             vector3.Z = -this.M33;
@@ -257,13 +257,13 @@ namespace TheMaths
         }
         
         /// <summary>
-        /// Gets or sets the backward <see cref="Vector3"/> of the matrix; that is M31, M32, and M33.
+        /// Gets or sets the backward <see cref="OldVector3"/> of the OldMatrix; that is M31, M32, and M33.
         /// </summary>
-        public Vector3 Backward
+        public OldVector3 Backward
         {
           get
           {
-            Vector3 vector3;
+            OldVector3 vector3;
             vector3.X = this.M31;
             vector3.Y = this.M32;
             vector3.Z = this.M33;
@@ -278,10 +278,10 @@ namespace TheMaths
         }
         
         /// <summary>
-        /// Initializes a new instance of the <see cref="Matrix"/> struct.
+        /// Initializes a new instance of the <see cref="OldMatrix"/> struct.
         /// </summary>
         /// <param name="value">The value that will be assigned to all components.</param>
-        public Matrix(float value)
+        public OldMatrix(float value)
         {
             M11 = M12 = M13 = M14 =
             M21 = M22 = M23 = M24 =
@@ -290,25 +290,25 @@ namespace TheMaths
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Matrix"/> struct.
+        /// Initializes a new instance of the <see cref="OldMatrix"/> struct.
         /// </summary>
-        /// <param name="M11">The value to assign at row 1 column 1 of the matrix.</param>
-        /// <param name="M12">The value to assign at row 1 column 2 of the matrix.</param>
-        /// <param name="M13">The value to assign at row 1 column 3 of the matrix.</param>
-        /// <param name="M14">The value to assign at row 1 column 4 of the matrix.</param>
-        /// <param name="M21">The value to assign at row 2 column 1 of the matrix.</param>
-        /// <param name="M22">The value to assign at row 2 column 2 of the matrix.</param>
-        /// <param name="M23">The value to assign at row 2 column 3 of the matrix.</param>
-        /// <param name="M24">The value to assign at row 2 column 4 of the matrix.</param>
-        /// <param name="M31">The value to assign at row 3 column 1 of the matrix.</param>
-        /// <param name="M32">The value to assign at row 3 column 2 of the matrix.</param>
-        /// <param name="M33">The value to assign at row 3 column 3 of the matrix.</param>
-        /// <param name="M34">The value to assign at row 3 column 4 of the matrix.</param>
-        /// <param name="M41">The value to assign at row 4 column 1 of the matrix.</param>
-        /// <param name="M42">The value to assign at row 4 column 2 of the matrix.</param>
-        /// <param name="M43">The value to assign at row 4 column 3 of the matrix.</param>
-        /// <param name="M44">The value to assign at row 4 column 4 of the matrix.</param>
-        public Matrix(float M11, float M12, float M13, float M14,
+        /// <param name="M11">The value to assign at row 1 column 1 of the OldMatrix.</param>
+        /// <param name="M12">The value to assign at row 1 column 2 of the OldMatrix.</param>
+        /// <param name="M13">The value to assign at row 1 column 3 of the OldMatrix.</param>
+        /// <param name="M14">The value to assign at row 1 column 4 of the OldMatrix.</param>
+        /// <param name="M21">The value to assign at row 2 column 1 of the OldMatrix.</param>
+        /// <param name="M22">The value to assign at row 2 column 2 of the OldMatrix.</param>
+        /// <param name="M23">The value to assign at row 2 column 3 of the OldMatrix.</param>
+        /// <param name="M24">The value to assign at row 2 column 4 of the OldMatrix.</param>
+        /// <param name="M31">The value to assign at row 3 column 1 of the OldMatrix.</param>
+        /// <param name="M32">The value to assign at row 3 column 2 of the OldMatrix.</param>
+        /// <param name="M33">The value to assign at row 3 column 3 of the OldMatrix.</param>
+        /// <param name="M34">The value to assign at row 3 column 4 of the OldMatrix.</param>
+        /// <param name="M41">The value to assign at row 4 column 1 of the OldMatrix.</param>
+        /// <param name="M42">The value to assign at row 4 column 2 of the OldMatrix.</param>
+        /// <param name="M43">The value to assign at row 4 column 3 of the OldMatrix.</param>
+        /// <param name="M44">The value to assign at row 4 column 4 of the OldMatrix.</param>
+        public OldMatrix(float M11, float M12, float M13, float M14,
             float M21, float M22, float M23, float M24,
             float M31, float M32, float M33, float M34,
             float M41, float M42, float M43, float M44)
@@ -320,17 +320,17 @@ namespace TheMaths
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Matrix"/> struct.
+        /// Initializes a new instance of the <see cref="OldMatrix"/> struct.
         /// </summary>
-        /// <param name="values">The values to assign to the components of the matrix. This must be an array with sixteen elements.</param>
+        /// <param name="values">The values to assign to the components of the OldMatrix. This must be an array with sixteen elements.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="values"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="values"/> contains more or less than sixteen elements.</exception>
-        public Matrix(float[] values)
+        public OldMatrix(float[] values)
         {
             if (values == null)
                 throw new ArgumentNullException("values");
             if (values.Length != 16)
-                throw new ArgumentOutOfRangeException("values", "There must be sixteen and only sixteen input values for Matrix.");
+                throw new ArgumentOutOfRangeException("values", "There must be sixteen and only sixteen input values for OldMatrix.");
 
             M11 = values[0];
             M12 = values[1];
@@ -354,145 +354,145 @@ namespace TheMaths
         }
 
         /// <summary>
-        /// Gets or sets the first row in the matrix; that is M11, M12, M13, and M14.
+        /// Gets or sets the first row in the OldMatrix; that is M11, M12, M13, and M14.
         /// </summary>
-        public Vector4 Row1
+        public OldVector4 Row1
         {
-            get { return new Vector4(M11, M12, M13, M14); }
+            get { return new OldVector4(M11, M12, M13, M14); }
             set { M11 = value.X; M12 = value.Y; M13 = value.Z; M14 = value.W; }
         }
 
         /// <summary>
-        /// Gets or sets the second row in the matrix; that is M21, M22, M23, and M24.
+        /// Gets or sets the second row in the OldMatrix; that is M21, M22, M23, and M24.
         /// </summary>
-        public Vector4 Row2
+        public OldVector4 Row2
         {
-            get { return new Vector4(M21, M22, M23, M24); }
+            get { return new OldVector4(M21, M22, M23, M24); }
             set { M21 = value.X; M22 = value.Y; M23 = value.Z; M24 = value.W; }
         }
 
         /// <summary>
-        /// Gets or sets the third row in the matrix; that is M31, M32, M33, and M34.
+        /// Gets or sets the third row in the OldMatrix; that is M31, M32, M33, and M34.
         /// </summary>
-        public Vector4 Row3
+        public OldVector4 Row3
         {
-            get { return new Vector4(M31, M32, M33, M34); }
+            get { return new OldVector4(M31, M32, M33, M34); }
             set { M31 = value.X; M32 = value.Y; M33 = value.Z; M34 = value.W; }
         }
 
         /// <summary>
-        /// Gets or sets the fourth row in the matrix; that is M41, M42, M43, and M44.
+        /// Gets or sets the fourth row in the OldMatrix; that is M41, M42, M43, and M44.
         /// </summary>
-        public Vector4 Row4
+        public OldVector4 Row4
         {
-            get { return new Vector4(M41, M42, M43, M44); }
+            get { return new OldVector4(M41, M42, M43, M44); }
             set { M41 = value.X; M42 = value.Y; M43 = value.Z; M44 = value.W; }
         }
 
         /// <summary>
-        /// Gets or sets the first column in the matrix; that is M11, M21, M31, and M41.
+        /// Gets or sets the first column in the OldMatrix; that is M11, M21, M31, and M41.
         /// </summary>
-        public Vector4 Column1
+        public OldVector4 Column1
         {
-            get { return new Vector4(M11, M21, M31, M41); }
+            get { return new OldVector4(M11, M21, M31, M41); }
             set { M11 = value.X; M21 = value.Y; M31 = value.Z; M41 = value.W; }
         }
 
         /// <summary>
-        /// Gets or sets the second column in the matrix; that is M12, M22, M32, and M42.
+        /// Gets or sets the second column in the OldMatrix; that is M12, M22, M32, and M42.
         /// </summary>
-        public Vector4 Column2
+        public OldVector4 Column2
         {
-            get { return new Vector4(M12, M22, M32, M42); }
+            get { return new OldVector4(M12, M22, M32, M42); }
             set { M12 = value.X; M22 = value.Y; M32 = value.Z; M42 = value.W; }
         }
 
         /// <summary>
-        /// Gets or sets the third column in the matrix; that is M13, M23, M33, and M43.
+        /// Gets or sets the third column in the OldMatrix; that is M13, M23, M33, and M43.
         /// </summary>
-        public Vector4 Column3
+        public OldVector4 Column3
         {
-            get { return new Vector4(M13, M23, M33, M43); }
+            get { return new OldVector4(M13, M23, M33, M43); }
             set { M13 = value.X; M23 = value.Y; M33 = value.Z; M43 = value.W; }
         }
 
         /// <summary>
-        /// Gets or sets the fourth column in the matrix; that is M14, M24, M34, and M44.
+        /// Gets or sets the fourth column in the OldMatrix; that is M14, M24, M34, and M44.
         /// </summary>
-        public Vector4 Column4
+        public OldVector4 Column4
         {
-            get { return new Vector4(M14, M24, M34, M44); }
+            get { return new OldVector4(M14, M24, M34, M44); }
             set { M14 = value.X; M24 = value.Y; M34 = value.Z; M44 = value.W; }
         }
 
         /// <summary>
-        /// Gets or sets the translation of the matrix; that is M41, M42, and M43.
+        /// Gets or sets the translation of the OldMatrix; that is M41, M42, and M43.
         /// </summary>
-        public Vector3 TranslationVector
+        public OldVector3 TranslationVector
         {
-            get { return new Vector3(M41, M42, M43); }
+            get { return new OldVector3(M41, M42, M43); }
             set { M41 = value.X; M42 = value.Y; M43 = value.Z; }
         }
 
         /// <summary>
-        /// Gets or sets the scale of the matrix; that is M11, M22, and M33.
+        /// Gets or sets the scale of the OldMatrix; that is M11, M22, and M33.
         /// </summary>
-        public Vector3 ScaleVector
+        public OldVector3 ScaleVector
         {
             get
             {
-                return new Vector3((float)Math.Sqrt((M11 * M11) + (M12 * M12) + (M13 * M13)),
+                return new OldVector3((float)Math.Sqrt((M11 * M11) + (M12 * M12) + (M13 * M13)),
                     (float)Math.Sqrt((M21 * M21) + (M22 * M22) + (M23 * M23)),
                     (float)Math.Sqrt((M31 * M31) + (M32 * M32) + (M33 * M33)));
             }
         }
 
         /// <summary>
-        /// Gets a value indicating whether this instance is an identity matrix.
+        /// Gets a value indicating whether this instance is an identity OldMatrix.
         /// </summary>
         /// <value>
-        /// <c>true</c> if this instance is an identity matrix; otherwise, <c>false</c>.
+        /// <c>true</c> if this instance is an identity OldMatrix; otherwise, <c>false</c>.
         /// </value>
         public bool IsIdentity
         {
             get { return this.Equals(Identity); }
         }
 
-        public Quaternion Rotation
+        public OldQuaternion Rotation
         {
             get
             {
-                Vector3 scale;
+                OldVector3 scale;
                 //Scaling is the length of the rows.
                 scale.X = (float)Math.Sqrt((M11 * M11) + (M12 * M12) + (M13 * M13));
                 scale.Y = (float)Math.Sqrt((M21 * M21) + (M22 * M22) + (M23 * M23));
                 scale.Z = (float)Math.Sqrt((M31 * M31) + (M32 * M32) + (M33 * M33));
 
-                //If any of the scaling factors are zero, than the rotation matrix can not exist.
+                //If any of the scaling factors are zero, than the rotation OldMatrix can not exist.
                 if (MathUtil.IsZero(scale.X) ||
                     MathUtil.IsZero(scale.Y) ||
                     MathUtil.IsZero(scale.Z))
                 {
-                    return Quaternion.Identity;
+                    return OldQuaternion.Identity;
                 }
 
-                //The rotation is the left over matrix after dividing out the scaling.
-                Matrix rotationmatrix = new Matrix();
-                rotationmatrix.M11 = M11 / scale.X;
-                rotationmatrix.M12 = M12 / scale.X;
-                rotationmatrix.M13 = M13 / scale.X;
+                //The rotation is the left over OldMatrix after dividing out the scaling.
+                OldMatrix rotationOldMatrix = new OldMatrix();
+                rotationOldMatrix.M11 = M11 / scale.X;
+                rotationOldMatrix.M12 = M12 / scale.X;
+                rotationOldMatrix.M13 = M13 / scale.X;
 
-                rotationmatrix.M21 = M21 / scale.Y;
-                rotationmatrix.M22 = M22 / scale.Y;
-                rotationmatrix.M23 = M23 / scale.Y;
+                rotationOldMatrix.M21 = M21 / scale.Y;
+                rotationOldMatrix.M22 = M22 / scale.Y;
+                rotationOldMatrix.M23 = M23 / scale.Y;
 
-                rotationmatrix.M31 = M31 / scale.Z;
-                rotationmatrix.M32 = M32 / scale.Z;
-                rotationmatrix.M33 = M33 / scale.Z;
+                rotationOldMatrix.M31 = M31 / scale.Z;
+                rotationOldMatrix.M32 = M32 / scale.Z;
+                rotationOldMatrix.M33 = M33 / scale.Z;
 
-                rotationmatrix.M44 = 1f;
+                rotationOldMatrix.M44 = 1f;
 
-                Quaternion.RotationMatrix(ref rotationmatrix, out var rotation);
+                OldQuaternion.RotationMatrix(ref rotationOldMatrix, out var rotation);
                 return rotation;
             }
         }
@@ -500,7 +500,7 @@ namespace TheMaths
         /// <summary>
         /// Gets or sets the component at the specified index.
         /// </summary>
-        /// <value>The value of the matrix component, depending on the index.</value>
+        /// <value>The value of the OldMatrix component, depending on the index.</value>
         /// <param name="index">The zero-based index of the component to access.</param>
         /// <returns>The value of the component at the specified index.</returns>
         /// <exception cref="System.ArgumentOutOfRangeException">Thrown when the <paramref name="index"/> is out of the range [0, 15].</exception>
@@ -528,7 +528,7 @@ namespace TheMaths
                     case 15: return M44;
                 }
 
-                throw new ArgumentOutOfRangeException("index", "Indices for Matrix run from 0 to 15, inclusive.");
+                throw new ArgumentOutOfRangeException("index", "Indices for OldMatrix run from 0 to 15, inclusive.");
             }
 
             set
@@ -551,7 +551,7 @@ namespace TheMaths
                     case 13: M42 = value; break;
                     case 14: M43 = value; break;
                     case 15: M44 = value; break;
-                    default: throw new ArgumentOutOfRangeException("index", "Indices for Matrix run from 0 to 15, inclusive.");
+                    default: throw new ArgumentOutOfRangeException("index", "Indices for OldMatrix run from 0 to 15, inclusive.");
                 }
             }
         }
@@ -559,9 +559,9 @@ namespace TheMaths
         /// <summary>
         /// Gets or sets the component at the specified index.
         /// </summary>
-        /// <value>The value of the matrix component, depending on the index.</value>
-        /// <param name="row">The row of the matrix to access.</param>
-        /// <param name="column">The column of the matrix to access.</param>
+        /// <value>The value of the OldMatrix component, depending on the index.</value>
+        /// <param name="row">The row of the OldMatrix to access.</param>
+        /// <param name="column">The column of the OldMatrix to access.</param>
         /// <returns>The value of the component at the specified index.</returns>
         /// <exception cref="System.ArgumentOutOfRangeException">Thrown when the <paramref name="row"/> or <paramref name="column"/>is out of the range [0, 3].</exception>
         public float this[int row, int column]
@@ -588,9 +588,9 @@ namespace TheMaths
         }
 
         /// <summary>
-        /// Calculates the determinant of the matrix.
+        /// Calculates the determinant of the OldMatrix.
         /// </summary>
-        /// <returns>The determinant of the matrix.</returns>
+        /// <returns>The determinant of the OldMatrix.</returns>
         public float Determinant()
         {
             float temp1 = (M33 * M44) - (M34 * M43);
@@ -606,7 +606,7 @@ namespace TheMaths
         }
 
         /// <summary>
-        /// Inverts the matrix.
+        /// Inverts the OldMatrix.
         /// </summary>
         public void Invert()
         {
@@ -614,7 +614,7 @@ namespace TheMaths
         }
 
         /// <summary>
-        /// Transposes the matrix.
+        /// Transposes the OldMatrix.
         /// </summary>
         public void Transpose()
         {
@@ -622,16 +622,16 @@ namespace TheMaths
         }
 
         /// <summary>
-        /// Orthogonalizes the specified matrix.
+        /// Orthogonalizes the specified OldMatrix.
         /// </summary>
         /// <remarks>
         /// <para>Orthogonalization is the process of making all rows orthogonal to each other. This
-        /// means that any given row in the matrix will be orthogonal to any other given row in the
-        /// matrix.</para>
-        /// <para>Because this method uses the modified Gram-Schmidt process, the resulting matrix
+        /// means that any given row in the OldMatrix will be orthogonal to any other given row in the
+        /// OldMatrix.</para>
+        /// <para>Because this method uses the modified Gram-Schmidt process, the resulting OldMatrix
         /// tends to be numerically unstable. The numeric stability decreases according to the rows
         /// so that the first row is the most stable and the last row is the least stable.</para>
-        /// <para>This operation is performed on the rows of the matrix rather than the columns.
+        /// <para>This operation is performed on the rows of the OldMatrix rather than the columns.
         /// If you wish for this operation to be performed on the columns, first transpose the
         /// input and than transpose the output.</para>
         /// </remarks>
@@ -641,7 +641,7 @@ namespace TheMaths
         }
 
         /// <summary>
-        /// Orthonormalizes the specified matrix.
+        /// Orthonormalizes the specified OldMatrix.
         /// </summary>
         /// <remarks>
         /// <para>Orthonormalization is the process of making all rows and columns orthogonal to each
@@ -649,10 +649,10 @@ namespace TheMaths
         /// be orthogonal to any other given row and any given column will be orthogonal to any other
         /// given column. Any given row will not be orthogonal to any given column. Every row and every
         /// column will be of unit length.</para>
-        /// <para>Because this method uses the modified Gram-Schmidt process, the resulting matrix
+        /// <para>Because this method uses the modified Gram-Schmidt process, the resulting OldMatrix
         /// tends to be numerically unstable. The numeric stability decreases according to the rows
         /// so that the first row is the most stable and the last row is the least stable.</para>
-        /// <para>This operation is performed on the rows of the matrix rather than the columns.
+        /// <para>This operation is performed on the rows of the OldMatrix rather than the columns.
         /// If you wish for this operation to be performed on the columns, first transpose the
         /// input and than transpose the output.</para>
         /// </remarks>
@@ -662,68 +662,68 @@ namespace TheMaths
         }
 
         /// <summary>
-        /// Decomposes a matrix into an orthonormalized matrix Q and a right triangular matrix R.
+        /// Decomposes a OldMatrix into an orthonormalized OldMatrix Q and a right triangular OldMatrix R.
         /// </summary>
-        /// <param name="Q">When the method completes, contains the orthonormalized matrix of the decomposition.</param>
-        /// <param name="R">When the method completes, contains the right triangular matrix of the decomposition.</param>
-        public void DecomposeQR(out Matrix Q, out Matrix R)
+        /// <param name="Q">When the method completes, contains the orthonormalized OldMatrix of the decomposition.</param>
+        /// <param name="R">When the method completes, contains the right triangular OldMatrix of the decomposition.</param>
+        public void DecomposeQR(out OldMatrix Q, out OldMatrix R)
         {
-            Matrix temp = this;
+            OldMatrix temp = this;
             temp.Transpose();
             Orthonormalize(ref temp, out Q);
             Q.Transpose();
 
-            R = new Matrix();
-            R.M11 = Vector4.Dot(Q.Column1, Column1);
-            R.M12 = Vector4.Dot(Q.Column1, Column2);
-            R.M13 = Vector4.Dot(Q.Column1, Column3);
-            R.M14 = Vector4.Dot(Q.Column1, Column4);
+            R = new OldMatrix();
+            R.M11 = OldVector4.Dot(Q.Column1, Column1);
+            R.M12 = OldVector4.Dot(Q.Column1, Column2);
+            R.M13 = OldVector4.Dot(Q.Column1, Column3);
+            R.M14 = OldVector4.Dot(Q.Column1, Column4);
 
-            R.M22 = Vector4.Dot(Q.Column2, Column2);
-            R.M23 = Vector4.Dot(Q.Column2, Column3);
-            R.M24 = Vector4.Dot(Q.Column2, Column4);
+            R.M22 = OldVector4.Dot(Q.Column2, Column2);
+            R.M23 = OldVector4.Dot(Q.Column2, Column3);
+            R.M24 = OldVector4.Dot(Q.Column2, Column4);
 
-            R.M33 = Vector4.Dot(Q.Column3, Column3);
-            R.M34 = Vector4.Dot(Q.Column3, Column4);
+            R.M33 = OldVector4.Dot(Q.Column3, Column3);
+            R.M34 = OldVector4.Dot(Q.Column3, Column4);
 
-            R.M44 = Vector4.Dot(Q.Column4, Column4);
+            R.M44 = OldVector4.Dot(Q.Column4, Column4);
         }
 
         /// <summary>
-        /// Decomposes a matrix into a lower triangular matrix L and an orthonormalized matrix Q.
+        /// Decomposes a OldMatrix into a lower triangular OldMatrix L and an orthonormalized OldMatrix Q.
         /// </summary>
-        /// <param name="L">When the method completes, contains the lower triangular matrix of the decomposition.</param>
-        /// <param name="Q">When the method completes, contains the orthonormalized matrix of the decomposition.</param>
-        public void DecomposeLQ(out Matrix L, out Matrix Q)
+        /// <param name="L">When the method completes, contains the lower triangular OldMatrix of the decomposition.</param>
+        /// <param name="Q">When the method completes, contains the orthonormalized OldMatrix of the decomposition.</param>
+        public void DecomposeLQ(out OldMatrix L, out OldMatrix Q)
         {
             Orthonormalize(ref this, out Q);
 
-            L = new Matrix();
-            L.M11 = Vector4.Dot(Q.Row1, Row1);
+            L = new OldMatrix();
+            L.M11 = OldVector4.Dot(Q.Row1, Row1);
             
-            L.M21 = Vector4.Dot(Q.Row1, Row2);
-            L.M22 = Vector4.Dot(Q.Row2, Row2);
+            L.M21 = OldVector4.Dot(Q.Row1, Row2);
+            L.M22 = OldVector4.Dot(Q.Row2, Row2);
             
-            L.M31 = Vector4.Dot(Q.Row1, Row3);
-            L.M32 = Vector4.Dot(Q.Row2, Row3);
-            L.M33 = Vector4.Dot(Q.Row3, Row3);
+            L.M31 = OldVector4.Dot(Q.Row1, Row3);
+            L.M32 = OldVector4.Dot(Q.Row2, Row3);
+            L.M33 = OldVector4.Dot(Q.Row3, Row3);
             
-            L.M41 = Vector4.Dot(Q.Row1, Row4);
-            L.M42 = Vector4.Dot(Q.Row2, Row4);
-            L.M43 = Vector4.Dot(Q.Row3, Row4);
-            L.M44 = Vector4.Dot(Q.Row4, Row4);
+            L.M41 = OldVector4.Dot(Q.Row1, Row4);
+            L.M42 = OldVector4.Dot(Q.Row2, Row4);
+            L.M43 = OldVector4.Dot(Q.Row3, Row4);
+            L.M44 = OldVector4.Dot(Q.Row4, Row4);
         }
 
         /// <summary>
-        /// Decomposes a matrix into a scale, rotation, and translation.
+        /// Decomposes a OldMatrix into a scale, rotation, and translation.
         /// </summary>
-        /// <param name="scale">When the method completes, contains the scaling component of the decomposed matrix.</param>
-        /// <param name="rotation">When the method completes, contains the rotation component of the decomposed matrix.</param>
-        /// <param name="translation">When the method completes, contains the translation component of the decomposed matrix.</param>
+        /// <param name="scale">When the method completes, contains the scaling component of the decomposed OldMatrix.</param>
+        /// <param name="rotation">When the method completes, contains the rotation component of the decomposed OldMatrix.</param>
+        /// <param name="translation">When the method completes, contains the translation component of the decomposed OldMatrix.</param>
         /// <remarks>
-        /// This method is designed to decompose an SRT transformation matrix only.
+        /// This method is designed to decompose an SRT transformation OldMatrix only.
         /// </remarks>
-        public bool Decompose(out Vector3 scale, out Quaternion rotation, out Vector3 translation)
+        public bool Decompose(out OldVector3 scale, out OldQuaternion rotation, out OldVector3 translation)
         {
             //Source: Unknown
             //References: http://www.gamedev.net/community/forums/topic.asp?topic_id=441695
@@ -738,85 +738,85 @@ namespace TheMaths
             scale.Y = (float)Math.Sqrt((M21 * M21) + (M22 * M22) + (M23 * M23));
             scale.Z = (float)Math.Sqrt((M31 * M31) + (M32 * M32) + (M33 * M33));
 
-            //If any of the scaling factors are zero, than the rotation matrix can not exist.
+            //If any of the scaling factors are zero, than the rotation OldMatrix can not exist.
             if (MathUtil.IsZero(scale.X) ||
                 MathUtil.IsZero(scale.Y) ||
                 MathUtil.IsZero(scale.Z))
             {
-                rotation = Quaternion.Identity;
+                rotation = OldQuaternion.Identity;
                 return false;
             }
 
-            //The rotation is the left over matrix after dividing out the scaling.
-            Matrix rotationmatrix = new Matrix();
-            rotationmatrix.M11 = M11 / scale.X;
-            rotationmatrix.M12 = M12 / scale.X;
-            rotationmatrix.M13 = M13 / scale.X;
+            //The rotation is the left over OldMatrix after dividing out the scaling.
+            OldMatrix rotationOldMatrix = new OldMatrix();
+            rotationOldMatrix.M11 = M11 / scale.X;
+            rotationOldMatrix.M12 = M12 / scale.X;
+            rotationOldMatrix.M13 = M13 / scale.X;
 
-            rotationmatrix.M21 = M21 / scale.Y;
-            rotationmatrix.M22 = M22 / scale.Y;
-            rotationmatrix.M23 = M23 / scale.Y;
+            rotationOldMatrix.M21 = M21 / scale.Y;
+            rotationOldMatrix.M22 = M22 / scale.Y;
+            rotationOldMatrix.M23 = M23 / scale.Y;
 
-            rotationmatrix.M31 = M31 / scale.Z;
-            rotationmatrix.M32 = M32 / scale.Z;
-            rotationmatrix.M33 = M33 / scale.Z;
+            rotationOldMatrix.M31 = M31 / scale.Z;
+            rotationOldMatrix.M32 = M32 / scale.Z;
+            rotationOldMatrix.M33 = M33 / scale.Z;
 
-            rotationmatrix.M44 = 1f;
+            rotationOldMatrix.M44 = 1f;
 
-            Quaternion.RotationMatrix(ref rotationmatrix, out rotation);
+            OldQuaternion.RotationMatrix(ref rotationOldMatrix, out rotation);
             return true;
         }
 
         /// <summary>
-        /// Decomposes a uniform scale matrix into a scale, rotation, and translation.
-        /// A uniform scale matrix has the same scale in every axis.
+        /// Decomposes a uniform scale OldMatrix into a scale, rotation, and translation.
+        /// A uniform scale OldMatrix has the same scale in every axis.
         /// </summary>
-        /// <param name="scale">When the method completes, contains the scaling component of the decomposed matrix.</param>
-        /// <param name="rotation">When the method completes, contains the rotation component of the decomposed matrix.</param>
-        /// <param name="translation">When the method completes, contains the translation component of the decomposed matrix.</param>
+        /// <param name="scale">When the method completes, contains the scaling component of the decomposed OldMatrix.</param>
+        /// <param name="rotation">When the method completes, contains the rotation component of the decomposed OldMatrix.</param>
+        /// <param name="translation">When the method completes, contains the translation component of the decomposed OldMatrix.</param>
         /// <remarks>
-        /// This method is designed to decompose only an SRT transformation matrix that has the same scale in every axis.
+        /// This method is designed to decompose only an SRT transformation OldMatrix that has the same scale in every axis.
         /// </remarks>
-        public bool DecomposeUniformScale(out float scale, out Quaternion rotation, out Vector3 translation)
+        public bool DecomposeUniformScale(out float scale, out OldQuaternion rotation, out OldVector3 translation)
         {
             //Get the translation.
             translation.X = this.M41;
             translation.Y = this.M42;
             translation.Z = this.M43;
 
-            //Scaling is the length of the rows. ( just take one row since this is a uniform matrix)
+            //Scaling is the length of the rows. ( just take one row since this is a uniform OldMatrix)
             scale = (float)Math.Sqrt((M11 * M11) + (M12 * M12) + (M13 * M13));
             var inv_scale = 1f / scale;
 
-            //If any of the scaling factors are zero, then the rotation matrix can not exist.
+            //If any of the scaling factors are zero, then the rotation OldMatrix can not exist.
             if (Math.Abs(scale) < MathUtil.ZeroTolerance)
             {
-                rotation = Quaternion.Identity;
+                rotation = OldQuaternion.Identity;
                 return false;
             }
 
-            //The rotation is the left over matrix after dividing out the scaling.
-            Matrix rotationmatrix = new Matrix();
-            rotationmatrix.M11 = M11 * inv_scale;
-            rotationmatrix.M12 = M12 * inv_scale;
-            rotationmatrix.M13 = M13 * inv_scale;
+            //The rotation is the left over OldMatrix after dividing out the scaling.
+            OldMatrix rotationOldMatrix = new OldMatrix();
+            rotationOldMatrix.M11 = M11 * inv_scale;
+            rotationOldMatrix.M12 = M12 * inv_scale;
+            rotationOldMatrix.M13 = M13 * inv_scale;
 
-            rotationmatrix.M21 = M21 * inv_scale;
-            rotationmatrix.M22 = M22 * inv_scale;
-            rotationmatrix.M23 = M23 * inv_scale;
+            rotationOldMatrix.M21 = M21 * inv_scale;
+            rotationOldMatrix.M22 = M22 * inv_scale;
+            rotationOldMatrix.M23 = M23 * inv_scale;
 
-            rotationmatrix.M31 = M31 * inv_scale;
-            rotationmatrix.M32 = M32 * inv_scale;
-            rotationmatrix.M33 = M33 * inv_scale;
+            rotationOldMatrix.M31 = M31 * inv_scale;
+            rotationOldMatrix.M32 = M32 * inv_scale;
+            rotationOldMatrix.M33 = M33 * inv_scale;
 
-            rotationmatrix.M44 = 1f;
+            rotationOldMatrix.M44 = 1f;
 
-            Quaternion.RotationMatrix(ref rotationmatrix, out rotation);
+            OldQuaternion.RotationMatrix(ref rotationOldMatrix, out rotation);
             return true;
         }
 
         /// <summary>
-        /// Exchanges two rows in the matrix.
+        /// Exchanges two rows in the OldMatrix.
         /// </summary>
         /// <param name="firstRow">The first row to exchange. This is an index of the row starting at zero.</param>
         /// <param name="secondRow">The second row to exchange. This is an index of the row starting at zero.</param>
@@ -851,7 +851,7 @@ namespace TheMaths
         }
 
         /// <summary>
-        /// Exchanges two columns in the matrix.
+        /// Exchanges two columns in the OldMatrix.
         /// </summary>
         /// <param name="firstColumn">The first column to exchange. This is an index of the column starting at zero.</param>
         /// <param name="secondColumn">The second column to exchange. This is an index of the column starting at zero.</param>
@@ -886,9 +886,9 @@ namespace TheMaths
         }
 
         /// <summary>
-        /// Creates an array containing the elements of the matrix.
+        /// Creates an array containing the elements of the OldMatrix.
         /// </summary>
-        /// <returns>A sixteen-element array containing the components of the matrix.</returns>
+        /// <returns>A sixteen-element array containing the components of the OldMatrix.</returns>
         public float[] ToArray()
         {
             return new[] { M11, M12, M13, M14, M21, M22, M23, M24, M31, M32, M33, M34, M41, M42, M43, M44 };
@@ -897,10 +897,10 @@ namespace TheMaths
         /// <summary>
         /// Determines the sum of two matrices.
         /// </summary>
-        /// <param name="left">The first matrix to add.</param>
-        /// <param name="right">The second matrix to add.</param>
+        /// <param name="left">The first OldMatrix to add.</param>
+        /// <param name="right">The second OldMatrix to add.</param>
         /// <param name="result">When the method completes, contains the sum of the two matrices.</param>
-        public static void Add(ref Matrix left, ref Matrix right, out Matrix result)
+        public static void Add(ref OldMatrix left, ref OldMatrix right, out OldMatrix result)
         {
             result.M11 = left.M11 + right.M11;
             result.M12 = left.M12 + right.M12;
@@ -923,12 +923,12 @@ namespace TheMaths
         /// <summary>
         /// Determines the sum of two matrices.
         /// </summary>
-        /// <param name="left">The first matrix to add.</param>
-        /// <param name="right">The second matrix to add.</param>
+        /// <param name="left">The first OldMatrix to add.</param>
+        /// <param name="right">The second OldMatrix to add.</param>
         /// <returns>The sum of the two matrices.</returns>
-        public static Matrix Add(Matrix left, Matrix right)
+        public static OldMatrix Add(OldMatrix left, OldMatrix right)
         {
-            Matrix result;
+            OldMatrix result;
             Add(ref left, ref right, out result);
             return result;
         }
@@ -936,10 +936,10 @@ namespace TheMaths
         /// <summary>
         /// Determines the difference between two matrices.
         /// </summary>
-        /// <param name="left">The first matrix to subtract.</param>
-        /// <param name="right">The second matrix to subtract.</param>
+        /// <param name="left">The first OldMatrix to subtract.</param>
+        /// <param name="right">The second OldMatrix to subtract.</param>
         /// <param name="result">When the method completes, contains the difference between the two matrices.</param>
-        public static void Subtract(ref Matrix left, ref Matrix right, out Matrix result)
+        public static void Subtract(ref OldMatrix left, ref OldMatrix right, out OldMatrix result)
         {
             result.M11 = left.M11 - right.M11;
             result.M12 = left.M12 - right.M12;
@@ -962,23 +962,23 @@ namespace TheMaths
         /// <summary>
         /// Determines the difference between two matrices.
         /// </summary>
-        /// <param name="left">The first matrix to subtract.</param>
-        /// <param name="right">The second matrix to subtract.</param>
+        /// <param name="left">The first OldMatrix to subtract.</param>
+        /// <param name="right">The second OldMatrix to subtract.</param>
         /// <returns>The difference between the two matrices.</returns>
-        public static Matrix Subtract(Matrix left, Matrix right)
+        public static OldMatrix Subtract(OldMatrix left, OldMatrix right)
         {
-            Matrix result;
+            OldMatrix result;
             Subtract(ref left, ref right, out result);
             return result;
         }
 
         /// <summary>
-        /// Scales a matrix by the given value.
+        /// Scales a OldMatrix by the given value.
         /// </summary>
-        /// <param name="left">The matrix to scale.</param>
+        /// <param name="left">The OldMatrix to scale.</param>
         /// <param name="right">The amount by which to scale.</param>
-        /// <param name="result">When the method completes, contains the scaled matrix.</param>
-        public static void Multiply(ref Matrix left, float right, out Matrix result)
+        /// <param name="result">When the method completes, contains the scaled OldMatrix.</param>
+        public static void Multiply(ref OldMatrix left, float right, out OldMatrix result)
         {
             result.M11 = left.M11 * right;
             result.M12 = left.M12 * right;
@@ -999,14 +999,14 @@ namespace TheMaths
         }
 
         /// <summary>
-        /// Scales a matrix by the given value.
+        /// Scales a OldMatrix by the given value.
         /// </summary>
-        /// <param name="left">The matrix to scale.</param>
+        /// <param name="left">The OldMatrix to scale.</param>
         /// <param name="right">The amount by which to scale.</param>
-        /// <returns>The scaled matrix.</returns>
-        public static Matrix Multiply(Matrix left, float right)
+        /// <returns>The scaled OldMatrix.</returns>
+        public static OldMatrix Multiply(OldMatrix left, float right)
         {
-            Matrix result;
+            OldMatrix result;
             Multiply(ref left, right, out result);
             return result;
         }
@@ -1014,12 +1014,12 @@ namespace TheMaths
         /// <summary>
         /// Determines the product of two matrices.
         /// </summary>
-        /// <param name="left">The first matrix to multiply.</param>
-        /// <param name="right">The second matrix to multiply.</param>
+        /// <param name="left">The first OldMatrix to multiply.</param>
+        /// <param name="right">The second OldMatrix to multiply.</param>
         /// <param name="result">The product of the two matrices.</param>
-        public static void Multiply(ref Matrix left, ref Matrix right, out Matrix result)
+        public static void Multiply(ref OldMatrix left, ref OldMatrix right, out OldMatrix result)
         {
-            Matrix temp = new Matrix();
+            OldMatrix temp = new OldMatrix();
             temp.M11 = (left.M11 * right.M11) + (left.M12 * right.M21) + (left.M13 * right.M31) + (left.M14 * right.M41);
             temp.M12 = (left.M11 * right.M12) + (left.M12 * right.M22) + (left.M13 * right.M32) + (left.M14 * right.M42);
             temp.M13 = (left.M11 * right.M13) + (left.M12 * right.M23) + (left.M13 * right.M33) + (left.M14 * right.M43);
@@ -1042,23 +1042,23 @@ namespace TheMaths
         /// <summary>
         /// Determines the product of two matrices.
         /// </summary>
-        /// <param name="left">The first matrix to multiply.</param>
-        /// <param name="right">The second matrix to multiply.</param>
+        /// <param name="left">The first OldMatrix to multiply.</param>
+        /// <param name="right">The second OldMatrix to multiply.</param>
         /// <returns>The product of the two matrices.</returns>
-        public static Matrix Multiply(Matrix left, Matrix right)
+        public static OldMatrix Multiply(OldMatrix left, OldMatrix right)
         {
-            Matrix result;
+            OldMatrix result;
             Multiply(ref left, ref right, out result);
             return result;
         }
 
         /// <summary>
-        /// Scales a matrix by the given value.
+        /// Scales a OldMatrix by the given value.
         /// </summary>
-        /// <param name="left">The matrix to scale.</param>
+        /// <param name="left">The OldMatrix to scale.</param>
         /// <param name="right">The amount by which to scale.</param>
-        /// <param name="result">When the method completes, contains the scaled matrix.</param>
-        public static void Divide(ref Matrix left, float right, out Matrix result)
+        /// <param name="result">When the method completes, contains the scaled OldMatrix.</param>
+        public static void Divide(ref OldMatrix left, float right, out OldMatrix result)
         {
             float inv = 1.0f / right;
 
@@ -1081,14 +1081,14 @@ namespace TheMaths
         }
 
         /// <summary>
-        /// Scales a matrix by the given value.
+        /// Scales a OldMatrix by the given value.
         /// </summary>
-        /// <param name="left">The matrix to scale.</param>
+        /// <param name="left">The OldMatrix to scale.</param>
         /// <param name="right">The amount by which to scale.</param>
-        /// <returns>The scaled matrix.</returns>
-        public static Matrix Divide(Matrix left, float right)
+        /// <returns>The scaled OldMatrix.</returns>
+        public static OldMatrix Divide(OldMatrix left, float right)
         {
-            Matrix result;
+            OldMatrix result;
             Divide(ref left, right, out result);
             return result;
         }
@@ -1096,10 +1096,10 @@ namespace TheMaths
         /// <summary>
         /// Determines the quotient of two matrices.
         /// </summary>
-        /// <param name="left">The first matrix to divide.</param>
-        /// <param name="right">The second matrix to divide.</param>
+        /// <param name="left">The first OldMatrix to divide.</param>
+        /// <param name="right">The second OldMatrix to divide.</param>
         /// <param name="result">When the method completes, contains the quotient of the two matrices.</param>
-        public static void Divide(ref Matrix left, ref Matrix right, out Matrix result)
+        public static void Divide(ref OldMatrix left, ref OldMatrix right, out OldMatrix result)
         {
             result.M11 = left.M11 / right.M11;
             result.M12 = left.M12 / right.M12;
@@ -1122,34 +1122,34 @@ namespace TheMaths
         /// <summary>
         /// Determines the quotient of two matrices.
         /// </summary>
-        /// <param name="left">The first matrix to divide.</param>
-        /// <param name="right">The second matrix to divide.</param>
+        /// <param name="left">The first OldMatrix to divide.</param>
+        /// <param name="right">The second OldMatrix to divide.</param>
         /// <returns>The quotient of the two matrices.</returns>
-        public static Matrix Divide(Matrix left, Matrix right)
+        public static OldMatrix Divide(OldMatrix left, OldMatrix right)
         {
-            Matrix result;
+            OldMatrix result;
             Divide(ref left, ref right, out result);
             return result;
         }
 
         /// <summary>
-        /// Performs the exponential operation on a matrix.
+        /// Performs the exponential operation on a OldMatrix.
         /// </summary>
-        /// <param name="value">The matrix to perform the operation on.</param>
-        /// <param name="exponent">The exponent to raise the matrix to.</param>
-        /// <param name="result">When the method completes, contains the exponential matrix.</param>
+        /// <param name="value">The OldMatrix to perform the operation on.</param>
+        /// <param name="exponent">The exponent to raise the OldMatrix to.</param>
+        /// <param name="result">When the method completes, contains the exponential OldMatrix.</param>
         /// <exception cref="System.ArgumentOutOfRangeException">Thrown when the <paramref name="exponent"/> is negative.</exception>
-        public static void Exponent(ref Matrix value, int exponent, out Matrix result)
+        public static void Exponent(ref OldMatrix value, int exponent, out OldMatrix result)
         {
             //Source: http://rosettacode.org
-            //Reference: http://rosettacode.org/wiki/Matrix-exponentiation_operator
+            //Reference: http://rosettacode.org/wiki/OldMatrix-exponentiation_operator
 
             if (exponent < 0)
                 throw new ArgumentOutOfRangeException("exponent", "The exponent can not be negative.");
 
             if (exponent == 0)
             {
-                result = Matrix.Identity;
+                result = OldMatrix.Identity;
                 return;
             }
 
@@ -1159,8 +1159,8 @@ namespace TheMaths
                 return;
             }
 
-            Matrix identity = Matrix.Identity;
-            Matrix temp = value;
+            OldMatrix identity = OldMatrix.Identity;
+            OldMatrix temp = value;
 
             while (true)
             {
@@ -1179,25 +1179,25 @@ namespace TheMaths
         }
 
         /// <summary>
-        /// Performs the exponential operation on a matrix.
+        /// Performs the exponential operation on a OldMatrix.
         /// </summary>
-        /// <param name="value">The matrix to perform the operation on.</param>
-        /// <param name="exponent">The exponent to raise the matrix to.</param>
-        /// <returns>The exponential matrix.</returns>
+        /// <param name="value">The OldMatrix to perform the operation on.</param>
+        /// <param name="exponent">The exponent to raise the OldMatrix to.</param>
+        /// <returns>The exponential OldMatrix.</returns>
         /// <exception cref="System.ArgumentOutOfRangeException">Thrown when the <paramref name="exponent"/> is negative.</exception>
-        public static Matrix Exponent(Matrix value, int exponent)
+        public static OldMatrix Exponent(OldMatrix value, int exponent)
         {
-            Matrix result;
+            OldMatrix result;
             Exponent(ref value, exponent, out result);
             return result;
         }
 
         /// <summary>
-        /// Negates a matrix.
+        /// Negates a OldMatrix.
         /// </summary>
-        /// <param name="value">The matrix to be negated.</param>
-        /// <param name="result">When the method completes, contains the negated matrix.</param>
-        public static void Negate(ref Matrix value, out Matrix result)
+        /// <param name="value">The OldMatrix to be negated.</param>
+        /// <param name="result">When the method completes, contains the negated OldMatrix.</param>
+        public static void Negate(ref OldMatrix value, out OldMatrix result)
         {
             result.M11 = -value.M11;
             result.M12 = -value.M12;
@@ -1218,13 +1218,13 @@ namespace TheMaths
         }
 
         /// <summary>
-        /// Negates a matrix.
+        /// Negates a OldMatrix.
         /// </summary>
-        /// <param name="value">The matrix to be negated.</param>
-        /// <returns>The negated matrix.</returns>
-        public static Matrix Negate(Matrix value)
+        /// <param name="value">The OldMatrix to be negated.</param>
+        /// <returns>The negated OldMatrix.</returns>
+        public static OldMatrix Negate(OldMatrix value)
         {
-            Matrix result;
+            OldMatrix result;
             Negate(ref value, out result);
             return result;
         }
@@ -1232,14 +1232,14 @@ namespace TheMaths
         /// <summary>
         /// Performs a linear interpolation between two matrices.
         /// </summary>
-        /// <param name="start">Start matrix.</param>
-        /// <param name="end">End matrix.</param>
+        /// <param name="start">Start OldMatrix.</param>
+        /// <param name="end">End OldMatrix.</param>
         /// <param name="amount">Value between 0 and 1 indicating the weight of <paramref name="end"/>.</param>
         /// <param name="result">When the method completes, contains the linear interpolation of the two matrices.</param>
         /// <remarks>
         /// Passing <paramref name="amount"/> a value of 0 will cause <paramref name="start"/> to be returned; a value of 1 will cause <paramref name="end"/> to be returned. 
         /// </remarks>
-        public static void Lerp(ref Matrix start, ref Matrix end, float amount, out Matrix result)
+        public static void Lerp(ref OldMatrix start, ref OldMatrix end, float amount, out OldMatrix result)
         {
             result.M11 = MathUtil.Lerp(start.M11, end.M11, amount);
             result.M12 = MathUtil.Lerp(start.M12, end.M12, amount);
@@ -1262,16 +1262,16 @@ namespace TheMaths
         /// <summary>
         /// Performs a linear interpolation between two matrices.
         /// </summary>
-        /// <param name="start">Start matrix.</param>
-        /// <param name="end">End matrix.</param>
+        /// <param name="start">Start OldMatrix.</param>
+        /// <param name="end">End OldMatrix.</param>
         /// <param name="amount">Value between 0 and 1 indicating the weight of <paramref name="end"/>.</param>
         /// <returns>The linear interpolation of the two matrices.</returns>
         /// <remarks>
         /// Passing <paramref name="amount"/> a value of 0 will cause <paramref name="start"/> to be returned; a value of 1 will cause <paramref name="end"/> to be returned. 
         /// </remarks>
-        public static Matrix Lerp(Matrix start, Matrix end, float amount)
+        public static OldMatrix Lerp(OldMatrix start, OldMatrix end, float amount)
         {
-            Matrix result;
+            OldMatrix result;
             Lerp(ref start, ref end, amount, out result);
             return result;
         }
@@ -1279,11 +1279,11 @@ namespace TheMaths
         /// <summary>
         /// Performs a cubic interpolation between two matrices.
         /// </summary>
-        /// <param name="start">Start matrix.</param>
-        /// <param name="end">End matrix.</param>
+        /// <param name="start">Start OldMatrix.</param>
+        /// <param name="end">End OldMatrix.</param>
         /// <param name="amount">Value between 0 and 1 indicating the weight of <paramref name="end"/>.</param>
         /// <param name="result">When the method completes, contains the cubic interpolation of the two matrices.</param>
-        public static void SmoothStep(ref Matrix start, ref Matrix end, float amount, out Matrix result)
+        public static void SmoothStep(ref OldMatrix start, ref OldMatrix end, float amount, out OldMatrix result)
         {
             amount = MathUtil.SmoothStep(amount);
             Lerp(ref start, ref end, amount, out result);
@@ -1292,25 +1292,25 @@ namespace TheMaths
         /// <summary>
         /// Performs a cubic interpolation between two matrices.
         /// </summary>
-        /// <param name="start">Start matrix.</param>
-        /// <param name="end">End matrix.</param>
+        /// <param name="start">Start OldMatrix.</param>
+        /// <param name="end">End OldMatrix.</param>
         /// <param name="amount">Value between 0 and 1 indicating the weight of <paramref name="end"/>.</param>
         /// <returns>The cubic interpolation of the two matrices.</returns>
-        public static Matrix SmoothStep(Matrix start, Matrix end, float amount)
+        public static OldMatrix SmoothStep(OldMatrix start, OldMatrix end, float amount)
         {
-            Matrix result;
+            OldMatrix result;
             SmoothStep(ref start, ref end, amount, out result);
             return result;
         }
 
         /// <summary>
-        /// Calculates the transpose of the specified matrix.
+        /// Calculates the transpose of the specified OldMatrix.
         /// </summary>
-        /// <param name="value">The matrix whose transpose is to be calculated.</param>
-        /// <param name="result">When the method completes, contains the transpose of the specified matrix.</param>
-        public static void Transpose(ref Matrix value, out Matrix result)
+        /// <param name="value">The OldMatrix whose transpose is to be calculated.</param>
+        /// <param name="result">When the method completes, contains the transpose of the specified OldMatrix.</param>
+        public static void Transpose(ref OldMatrix value, out OldMatrix result)
         {
-            Matrix temp = new Matrix();
+            OldMatrix temp = new OldMatrix();
             temp.M11 = value.M11;
             temp.M12 = value.M21;
             temp.M13 = value.M31;
@@ -1332,11 +1332,11 @@ namespace TheMaths
         }
 
         /// <summary>
-        /// Calculates the transpose of the specified matrix.
+        /// Calculates the transpose of the specified OldMatrix.
         /// </summary>
-        /// <param name="value">The matrix whose transpose is to be calculated.</param>
-        /// <param name="result">When the method completes, contains the transpose of the specified matrix.</param>
-        public static void TransposeByRef(ref Matrix value, ref Matrix result)
+        /// <param name="value">The OldMatrix whose transpose is to be calculated.</param>
+        /// <param name="result">When the method completes, contains the transpose of the specified OldMatrix.</param>
+        public static void TransposeByRef(ref OldMatrix value, ref OldMatrix result)
         {
             result.M11 = value.M11;
             result.M12 = value.M21;
@@ -1357,23 +1357,23 @@ namespace TheMaths
         }
 
         /// <summary>
-        /// Calculates the transpose of the specified matrix.
+        /// Calculates the transpose of the specified OldMatrix.
         /// </summary>
-        /// <param name="value">The matrix whose transpose is to be calculated.</param>
-        /// <returns>The transpose of the specified matrix.</returns>
-        public static Matrix Transpose(Matrix value)
+        /// <param name="value">The OldMatrix whose transpose is to be calculated.</param>
+        /// <returns>The transpose of the specified OldMatrix.</returns>
+        public static OldMatrix Transpose(OldMatrix value)
         {
-            Matrix result;
+            OldMatrix result;
             Transpose(ref value, out result);
             return result;
         }
 
         /// <summary>
-        /// Calculates the inverse of the specified matrix.
+        /// Calculates the inverse of the specified OldMatrix.
         /// </summary>
-        /// <param name="value">The matrix whose inverse is to be calculated.</param>
-        /// <param name="result">When the method completes, contains the inverse of the specified matrix.</param>
-        public static void Invert(ref Matrix value, out Matrix result)
+        /// <param name="value">The OldMatrix whose inverse is to be calculated.</param>
+        /// <param name="result">When the method completes, contains the inverse of the specified OldMatrix.</param>
+        public static void Invert(ref OldMatrix value, out OldMatrix result)
         {
             float b0 = (value.M31 * value.M42) - (value.M32 * value.M41);
             float b1 = (value.M31 * value.M43) - (value.M33 * value.M41);
@@ -1390,7 +1390,7 @@ namespace TheMaths
             float det = value.M11 * d11 - value.M12 * d12 + value.M13 * d13 - value.M14 * d14;
             if (Math.Abs(det) == 0.0f)
             {
-                result = Matrix.Zero;
+                result = OldMatrix.Zero;
                 return;
             }
 
@@ -1425,33 +1425,33 @@ namespace TheMaths
         }
 
         /// <summary>
-        /// Calculates the inverse of the specified matrix.
+        /// Calculates the inverse of the specified OldMatrix.
         /// </summary>
-        /// <param name="value">The matrix whose inverse is to be calculated.</param>
-        /// <returns>The inverse of the specified matrix.</returns>
-        public static Matrix Invert(Matrix value)
+        /// <param name="value">The OldMatrix whose inverse is to be calculated.</param>
+        /// <returns>The inverse of the specified OldMatrix.</returns>
+        public static OldMatrix Invert(OldMatrix value)
         {
             value.Invert();
             return value;
         }
 
         /// <summary>
-        /// Orthogonalizes the specified matrix.
+        /// Orthogonalizes the specified OldMatrix.
         /// </summary>
-        /// <param name="value">The matrix to orthogonalize.</param>
-        /// <param name="result">When the method completes, contains the orthogonalized matrix.</param>
+        /// <param name="value">The OldMatrix to orthogonalize.</param>
+        /// <param name="result">When the method completes, contains the orthogonalized OldMatrix.</param>
         /// <remarks>
         /// <para>Orthogonalization is the process of making all rows orthogonal to each other. This
-        /// means that any given row in the matrix will be orthogonal to any other given row in the
-        /// matrix.</para>
-        /// <para>Because this method uses the modified Gram-Schmidt process, the resulting matrix
+        /// means that any given row in the OldMatrix will be orthogonal to any other given row in the
+        /// OldMatrix.</para>
+        /// <para>Because this method uses the modified Gram-Schmidt process, the resulting OldMatrix
         /// tends to be numerically unstable. The numeric stability decreases according to the rows
         /// so that the first row is the most stable and the last row is the least stable.</para>
-        /// <para>This operation is performed on the rows of the matrix rather than the columns.
+        /// <para>This operation is performed on the rows of the OldMatrix rather than the columns.
         /// If you wish for this operation to be performed on the columns, first transpose the
         /// input and than transpose the output.</para>
         /// </remarks>
-        public static void Orthogonalize(ref Matrix value, out Matrix result)
+        public static void Orthogonalize(ref OldMatrix value, out OldMatrix result)
         {
             //Uses the modified Gram-Schmidt process.
             //q1 = m1
@@ -1462,58 +1462,58 @@ namespace TheMaths
             //By separating the above algorithm into multiple lines, we actually increase accuracy.
             result = value;
 
-            result.Row2 = result.Row2 - (Vector4.Dot(result.Row1, result.Row2) / Vector4.Dot(result.Row1, result.Row1)) * result.Row1;
+            result.Row2 = result.Row2 - (OldVector4.Dot(result.Row1, result.Row2) / OldVector4.Dot(result.Row1, result.Row1)) * result.Row1;
 
-            result.Row3 = result.Row3 - (Vector4.Dot(result.Row1, result.Row3) / Vector4.Dot(result.Row1, result.Row1)) * result.Row1;
-            result.Row3 = result.Row3 - (Vector4.Dot(result.Row2, result.Row3) / Vector4.Dot(result.Row2, result.Row2)) * result.Row2;
+            result.Row3 = result.Row3 - (OldVector4.Dot(result.Row1, result.Row3) / OldVector4.Dot(result.Row1, result.Row1)) * result.Row1;
+            result.Row3 = result.Row3 - (OldVector4.Dot(result.Row2, result.Row3) / OldVector4.Dot(result.Row2, result.Row2)) * result.Row2;
 
-            result.Row4 = result.Row4 - (Vector4.Dot(result.Row1, result.Row4) / Vector4.Dot(result.Row1, result.Row1)) * result.Row1;
-            result.Row4 = result.Row4 - (Vector4.Dot(result.Row2, result.Row4) / Vector4.Dot(result.Row2, result.Row2)) * result.Row2;
-            result.Row4 = result.Row4 - (Vector4.Dot(result.Row3, result.Row4) / Vector4.Dot(result.Row3, result.Row3)) * result.Row3;
+            result.Row4 = result.Row4 - (OldVector4.Dot(result.Row1, result.Row4) / OldVector4.Dot(result.Row1, result.Row1)) * result.Row1;
+            result.Row4 = result.Row4 - (OldVector4.Dot(result.Row2, result.Row4) / OldVector4.Dot(result.Row2, result.Row2)) * result.Row2;
+            result.Row4 = result.Row4 - (OldVector4.Dot(result.Row3, result.Row4) / OldVector4.Dot(result.Row3, result.Row3)) * result.Row3;
         }
 
         /// <summary>
-        /// Orthogonalizes the specified matrix.
+        /// Orthogonalizes the specified OldMatrix.
         /// </summary>
-        /// <param name="value">The matrix to orthogonalize.</param>
-        /// <returns>The orthogonalized matrix.</returns>
+        /// <param name="value">The OldMatrix to orthogonalize.</param>
+        /// <returns>The orthogonalized OldMatrix.</returns>
         /// <remarks>
         /// <para>Orthogonalization is the process of making all rows orthogonal to each other. This
-        /// means that any given row in the matrix will be orthogonal to any other given row in the
-        /// matrix.</para>
-        /// <para>Because this method uses the modified Gram-Schmidt process, the resulting matrix
+        /// means that any given row in the OldMatrix will be orthogonal to any other given row in the
+        /// OldMatrix.</para>
+        /// <para>Because this method uses the modified Gram-Schmidt process, the resulting OldMatrix
         /// tends to be numerically unstable. The numeric stability decreases according to the rows
         /// so that the first row is the most stable and the last row is the least stable.</para>
-        /// <para>This operation is performed on the rows of the matrix rather than the columns.
+        /// <para>This operation is performed on the rows of the OldMatrix rather than the columns.
         /// If you wish for this operation to be performed on the columns, first transpose the
         /// input and than transpose the output.</para>
         /// </remarks>
-        public static Matrix Orthogonalize(Matrix value)
+        public static OldMatrix Orthogonalize(OldMatrix value)
         {
-            Matrix result;
+            OldMatrix result;
             Orthogonalize(ref value, out result);
             return result;
         }
 
         /// <summary>
-        /// Orthonormalizes the specified matrix.
+        /// Orthonormalizes the specified OldMatrix.
         /// </summary>
-        /// <param name="value">The matrix to orthonormalize.</param>
-        /// <param name="result">When the method completes, contains the orthonormalized matrix.</param>
+        /// <param name="value">The OldMatrix to orthonormalize.</param>
+        /// <param name="result">When the method completes, contains the orthonormalized OldMatrix.</param>
         /// <remarks>
         /// <para>Orthonormalization is the process of making all rows and columns orthogonal to each
         /// other and making all rows and columns of unit length. This means that any given row will
         /// be orthogonal to any other given row and any given column will be orthogonal to any other
         /// given column. Any given row will not be orthogonal to any given column. Every row and every
         /// column will be of unit length.</para>
-        /// <para>Because this method uses the modified Gram-Schmidt process, the resulting matrix
+        /// <para>Because this method uses the modified Gram-Schmidt process, the resulting OldMatrix
         /// tends to be numerically unstable. The numeric stability decreases according to the rows
         /// so that the first row is the most stable and the last row is the least stable.</para>
-        /// <para>This operation is performed on the rows of the matrix rather than the columns.
+        /// <para>This operation is performed on the rows of the OldMatrix rather than the columns.
         /// If you wish for this operation to be performed on the columns, first transpose the
         /// input and than transpose the output.</para>
         /// </remarks>
-        public static void Orthonormalize(ref Matrix value, out Matrix result)
+        public static void Orthonormalize(ref OldMatrix value, out OldMatrix result)
         {
             //Uses the modified Gram-Schmidt process.
             //Because we are making unit vectors, we can optimize the math for orthonormalization
@@ -1526,58 +1526,58 @@ namespace TheMaths
             //By separating the above algorithm into multiple lines, we actually increase accuracy.
             result = value;
 
-            result.Row1 = Vector4.Normalize(result.Row1);
+            result.Row1 = OldVector4.Normalize(result.Row1);
 
-            result.Row2 = result.Row2 - Vector4.Dot(result.Row1, result.Row2) * result.Row1;
-            result.Row2 = Vector4.Normalize(result.Row2);
+            result.Row2 = result.Row2 - OldVector4.Dot(result.Row1, result.Row2) * result.Row1;
+            result.Row2 = OldVector4.Normalize(result.Row2);
 
-            result.Row3 = result.Row3 - Vector4.Dot(result.Row1, result.Row3) * result.Row1;
-            result.Row3 = result.Row3 - Vector4.Dot(result.Row2, result.Row3) * result.Row2;
-            result.Row3 = Vector4.Normalize(result.Row3);
+            result.Row3 = result.Row3 - OldVector4.Dot(result.Row1, result.Row3) * result.Row1;
+            result.Row3 = result.Row3 - OldVector4.Dot(result.Row2, result.Row3) * result.Row2;
+            result.Row3 = OldVector4.Normalize(result.Row3);
 
-            result.Row4 = result.Row4 - Vector4.Dot(result.Row1, result.Row4) * result.Row1;
-            result.Row4 = result.Row4 - Vector4.Dot(result.Row2, result.Row4) * result.Row2;
-            result.Row4 = result.Row4 - Vector4.Dot(result.Row3, result.Row4) * result.Row3;
-            result.Row4 = Vector4.Normalize(result.Row4);
+            result.Row4 = result.Row4 - OldVector4.Dot(result.Row1, result.Row4) * result.Row1;
+            result.Row4 = result.Row4 - OldVector4.Dot(result.Row2, result.Row4) * result.Row2;
+            result.Row4 = result.Row4 - OldVector4.Dot(result.Row3, result.Row4) * result.Row3;
+            result.Row4 = OldVector4.Normalize(result.Row4);
         }
 
         /// <summary>
-        /// Orthonormalizes the specified matrix.
+        /// Orthonormalizes the specified OldMatrix.
         /// </summary>
-        /// <param name="value">The matrix to orthonormalize.</param>
-        /// <returns>The orthonormalized matrix.</returns>
+        /// <param name="value">The OldMatrix to orthonormalize.</param>
+        /// <returns>The orthonormalized OldMatrix.</returns>
         /// <remarks>
         /// <para>Orthonormalization is the process of making all rows and columns orthogonal to each
         /// other and making all rows and columns of unit length. This means that any given row will
         /// be orthogonal to any other given row and any given column will be orthogonal to any other
         /// given column. Any given row will not be orthogonal to any given column. Every row and every
         /// column will be of unit length.</para>
-        /// <para>Because this method uses the modified Gram-Schmidt process, the resulting matrix
+        /// <para>Because this method uses the modified Gram-Schmidt process, the resulting OldMatrix
         /// tends to be numerically unstable. The numeric stability decreases according to the rows
         /// so that the first row is the most stable and the last row is the least stable.</para>
-        /// <para>This operation is performed on the rows of the matrix rather than the columns.
+        /// <para>This operation is performed on the rows of the OldMatrix rather than the columns.
         /// If you wish for this operation to be performed on the columns, first transpose the
         /// input and than transpose the output.</para>
         /// </remarks>
-        public static Matrix Orthonormalize(Matrix value)
+        public static OldMatrix Orthonormalize(OldMatrix value)
         {
-            Matrix result;
+            OldMatrix result;
             Orthonormalize(ref value, out result);
             return result;
         }
 
         /// <summary>
-        /// Brings the matrix into upper triangular form using elementary row operations.
+        /// Brings the OldMatrix into upper triangular form using elementary row operations.
         /// </summary>
-        /// <param name="value">The matrix to put into upper triangular form.</param>
-        /// <param name="result">When the method completes, contains the upper triangular matrix.</param>
+        /// <param name="value">The OldMatrix to put into upper triangular form.</param>
+        /// <param name="result">When the method completes, contains the upper triangular OldMatrix.</param>
         /// <remarks>
-        /// If the matrix is not invertible (i.e. its determinant is zero) than the result of this
-        /// method may produce Single.Nan and Single.Inf values. When the matrix represents a system
+        /// If the OldMatrix is not invertible (i.e. its determinant is zero) than the result of this
+        /// method may produce Single.Nan and Single.Inf values. When the OldMatrix represents a system
         /// of linear equations, than this often means that either no solution exists or an infinite
         /// number of solutions exist.
         /// </remarks>
-        public static void UpperTriangularForm(ref Matrix value, out Matrix result)
+        public static void UpperTriangularForm(ref OldMatrix value, out OldMatrix result)
         {
             //Adapted from the row echelon code.
             result = value;
@@ -1629,39 +1629,39 @@ namespace TheMaths
         }
 
         /// <summary>
-        /// Brings the matrix into upper triangular form using elementary row operations.
+        /// Brings the OldMatrix into upper triangular form using elementary row operations.
         /// </summary>
-        /// <param name="value">The matrix to put into upper triangular form.</param>
-        /// <returns>The upper triangular matrix.</returns>
+        /// <param name="value">The OldMatrix to put into upper triangular form.</param>
+        /// <returns>The upper triangular OldMatrix.</returns>
         /// <remarks>
-        /// If the matrix is not invertible (i.e. its determinant is zero) than the result of this
-        /// method may produce Single.Nan and Single.Inf values. When the matrix represents a system
+        /// If the OldMatrix is not invertible (i.e. its determinant is zero) than the result of this
+        /// method may produce Single.Nan and Single.Inf values. When the OldMatrix represents a system
         /// of linear equations, than this often means that either no solution exists or an infinite
         /// number of solutions exist.
         /// </remarks>
-        public static Matrix UpperTriangularForm(Matrix value)
+        public static OldMatrix UpperTriangularForm(OldMatrix value)
         {
-            Matrix result;
+            OldMatrix result;
             UpperTriangularForm(ref value, out result);
             return result;
         }
 
         /// <summary>
-        /// Brings the matrix into lower triangular form using elementary row operations.
+        /// Brings the OldMatrix into lower triangular form using elementary row operations.
         /// </summary>
-        /// <param name="value">The matrix to put into lower triangular form.</param>
-        /// <param name="result">When the method completes, contains the lower triangular matrix.</param>
+        /// <param name="value">The OldMatrix to put into lower triangular form.</param>
+        /// <param name="result">When the method completes, contains the lower triangular OldMatrix.</param>
         /// <remarks>
-        /// If the matrix is not invertible (i.e. its determinant is zero) than the result of this
-        /// method may produce Single.Nan and Single.Inf values. When the matrix represents a system
+        /// If the OldMatrix is not invertible (i.e. its determinant is zero) than the result of this
+        /// method may produce Single.Nan and Single.Inf values. When the OldMatrix represents a system
         /// of linear equations, than this often means that either no solution exists or an infinite
         /// number of solutions exist.
         /// </remarks>
-        public static void LowerTriangularForm(ref Matrix value, out Matrix result)
+        public static void LowerTriangularForm(ref OldMatrix value, out OldMatrix result)
         {
             //Adapted from the row echelon code.
-            Matrix temp = value;
-            Matrix.Transpose(ref temp, out result);
+            OldMatrix temp = value;
+            OldMatrix.Transpose(ref temp, out result);
 
             int lead = 0;
             int rowcount = 4;
@@ -1709,33 +1709,33 @@ namespace TheMaths
                 lead++;
             }
 
-            Matrix.Transpose(ref result, out result);
+            OldMatrix.Transpose(ref result, out result);
         }
 
         /// <summary>
-        /// Brings the matrix into lower triangular form using elementary row operations.
+        /// Brings the OldMatrix into lower triangular form using elementary row operations.
         /// </summary>
-        /// <param name="value">The matrix to put into lower triangular form.</param>
-        /// <returns>The lower triangular matrix.</returns>
+        /// <param name="value">The OldMatrix to put into lower triangular form.</param>
+        /// <returns>The lower triangular OldMatrix.</returns>
         /// <remarks>
-        /// If the matrix is not invertible (i.e. its determinant is zero) than the result of this
-        /// method may produce Single.Nan and Single.Inf values. When the matrix represents a system
+        /// If the OldMatrix is not invertible (i.e. its determinant is zero) than the result of this
+        /// method may produce Single.Nan and Single.Inf values. When the OldMatrix represents a system
         /// of linear equations, than this often means that either no solution exists or an infinite
         /// number of solutions exist.
         /// </remarks>
-        public static Matrix LowerTriangularForm(Matrix value)
+        public static OldMatrix LowerTriangularForm(OldMatrix value)
         {
-            Matrix result;
+            OldMatrix result;
             LowerTriangularForm(ref value, out result);
             return result;
         }
 
         /// <summary>
-        /// Brings the matrix into row echelon form using elementary row operations;
+        /// Brings the OldMatrix into row echelon form using elementary row operations;
         /// </summary>
-        /// <param name="value">The matrix to put into row echelon form.</param>
-        /// <param name="result">When the method completes, contains the row echelon form of the matrix.</param>
-        public static void RowEchelonForm(ref Matrix value, out Matrix result)
+        /// <param name="value">The OldMatrix to put into row echelon form.</param>
+        /// <param name="result">When the method completes, contains the row echelon form of the OldMatrix.</param>
+        public static void RowEchelonForm(ref OldMatrix value, out OldMatrix result)
         {
             //Source: Wikipedia pseudo code
             //Reference: http://en.wikipedia.org/wiki/Row_echelon_form#Pseudocode
@@ -1793,64 +1793,64 @@ namespace TheMaths
         }
 
         /// <summary>
-        /// Brings the matrix into row echelon form using elementary row operations;
+        /// Brings the OldMatrix into row echelon form using elementary row operations;
         /// </summary>
-        /// <param name="value">The matrix to put into row echelon form.</param>
-        /// <returns>When the method completes, contains the row echelon form of the matrix.</returns>
-        public static Matrix RowEchelonForm(Matrix value)
+        /// <param name="value">The OldMatrix to put into row echelon form.</param>
+        /// <returns>When the method completes, contains the row echelon form of the OldMatrix.</returns>
+        public static OldMatrix RowEchelonForm(OldMatrix value)
         {
-            Matrix result;
+            OldMatrix result;
             RowEchelonForm(ref value, out result);
             return result;
         }
 
         /// <summary>
-        /// Brings the matrix into reduced row echelon form using elementary row operations.
+        /// Brings the OldMatrix into reduced row echelon form using elementary row operations.
         /// </summary>
-        /// <param name="value">The matrix to put into reduced row echelon form.</param>
-        /// <param name="augment">The fifth column of the matrix.</param>
-        /// <param name="result">When the method completes, contains the resultant matrix after the operation.</param>
-        /// <param name="augmentResult">When the method completes, contains the resultant fifth column of the matrix.</param>
+        /// <param name="value">The OldMatrix to put into reduced row echelon form.</param>
+        /// <param name="augment">The fifth column of the OldMatrix.</param>
+        /// <param name="result">When the method completes, contains the resultant OldMatrix after the operation.</param>
+        /// <param name="augmentResult">When the method completes, contains the resultant fifth column of the OldMatrix.</param>
         /// <remarks>
-        /// <para>The fifth column is often called the augmented part of the matrix. This is because the fifth
-        /// column is really just an extension of the matrix so that there is a place to put all of the
+        /// <para>The fifth column is often called the augmented part of the OldMatrix. This is because the fifth
+        /// column is really just an extension of the OldMatrix so that there is a place to put all of the
         /// non-zero components after the operation is complete.</para>
-        /// <para>Often times the resultant matrix will the identity matrix or a matrix similar to the identity
-        /// matrix. Sometimes, however, that is not possible and numbers other than zero and one may appear.</para>
+        /// <para>Often times the resultant OldMatrix will the identity OldMatrix or a OldMatrix similar to the identity
+        /// OldMatrix. Sometimes, however, that is not possible and numbers other than zero and one may appear.</para>
         /// <para>This method can be used to solve systems of linear equations. Upon completion of this method,
         /// the <paramref name="augmentResult"/> will contain the solution for the system. It is up to the user
         /// to analyze both the input and the result to determine if a solution really exists.</para>
         /// </remarks>
-        public static void ReducedRowEchelonForm(ref Matrix value, ref Vector4 augment, out Matrix result, out Vector4 augmentResult)
+        public static void ReducedRowEchelonForm(ref OldMatrix value, ref OldVector4 augment, out OldMatrix result, out OldVector4 augmentResult)
         {
             //Source: http://rosettacode.org
             //Reference: http://rosettacode.org/wiki/Reduced_row_echelon_form
 
-            float[,] matrix = new float[4, 5];
+            float[,] OldMatrix = new float[4, 5];
 
-            matrix[0, 0] = value[0, 0];
-            matrix[0, 1] = value[0, 1];
-            matrix[0, 2] = value[0, 2];
-            matrix[0, 3] = value[0, 3];
-            matrix[0, 4] = augment[0];
+            OldMatrix[0, 0] = value[0, 0];
+            OldMatrix[0, 1] = value[0, 1];
+            OldMatrix[0, 2] = value[0, 2];
+            OldMatrix[0, 3] = value[0, 3];
+            OldMatrix[0, 4] = augment[0];
 
-            matrix[1, 0] = value[1, 0];
-            matrix[1, 1] = value[1, 1];
-            matrix[1, 2] = value[1, 2];
-            matrix[1, 3] = value[1, 3];
-            matrix[1, 4] = augment[1];
+            OldMatrix[1, 0] = value[1, 0];
+            OldMatrix[1, 1] = value[1, 1];
+            OldMatrix[1, 2] = value[1, 2];
+            OldMatrix[1, 3] = value[1, 3];
+            OldMatrix[1, 4] = augment[1];
 
-            matrix[2, 0] = value[2, 0];
-            matrix[2, 1] = value[2, 1];
-            matrix[2, 2] = value[2, 2];
-            matrix[2, 3] = value[2, 3];
-            matrix[2, 4] = augment[2];
+            OldMatrix[2, 0] = value[2, 0];
+            OldMatrix[2, 1] = value[2, 1];
+            OldMatrix[2, 2] = value[2, 2];
+            OldMatrix[2, 3] = value[2, 3];
+            OldMatrix[2, 4] = augment[2];
 
-            matrix[3, 0] = value[3, 0];
-            matrix[3, 1] = value[3, 1];
-            matrix[3, 2] = value[3, 2];
-            matrix[3, 3] = value[3, 3];
-            matrix[3, 4] = augment[3];
+            OldMatrix[3, 0] = value[3, 0];
+            OldMatrix[3, 1] = value[3, 1];
+            OldMatrix[3, 2] = value[3, 2];
+            OldMatrix[3, 3] = value[3, 3];
+            OldMatrix[3, 4] = augment[3];
 
             int lead = 0;
             int rowcount = 4;
@@ -1863,7 +1863,7 @@ namespace TheMaths
 
                 int i = r;
 
-                while (matrix[i, lead] == 0)
+                while (OldMatrix[i, lead] == 0)
                 {
                     i++;
 
@@ -1879,54 +1879,54 @@ namespace TheMaths
 
                 for (int j = 0; j < columncount; j++)
                 {
-                    float temp = matrix[r, j];
-                    matrix[r, j] = matrix[i, j];
-                    matrix[i, j] = temp;
+                    float temp = OldMatrix[r, j];
+                    OldMatrix[r, j] = OldMatrix[i, j];
+                    OldMatrix[i, j] = temp;
                 }
 
-                float div = matrix[r, lead];
+                float div = OldMatrix[r, lead];
 
                 for (int j = 0; j < columncount; j++)
                 {
-                    matrix[r, j] /= div;
+                    OldMatrix[r, j] /= div;
                 }
 
                 for (int j = 0; j < rowcount; j++)
                 {
                     if (j != r)
                     {
-                        float sub = matrix[j, lead];
-                        for (int k = 0; k < columncount; k++) matrix[j, k] -= (sub * matrix[r, k]);
+                        float sub = OldMatrix[j, lead];
+                        for (int k = 0; k < columncount; k++) OldMatrix[j, k] -= (sub * OldMatrix[r, k]);
                     }
                 }
 
                 lead++;
             }
 
-            result.M11 = matrix[0, 0];
-            result.M12 = matrix[0, 1];
-            result.M13 = matrix[0, 2];
-            result.M14 = matrix[0, 3];
+            result.M11 = OldMatrix[0, 0];
+            result.M12 = OldMatrix[0, 1];
+            result.M13 = OldMatrix[0, 2];
+            result.M14 = OldMatrix[0, 3];
 
-            result.M21 = matrix[1, 0];
-            result.M22 = matrix[1, 1];
-            result.M23 = matrix[1, 2];
-            result.M24 = matrix[1, 3];
+            result.M21 = OldMatrix[1, 0];
+            result.M22 = OldMatrix[1, 1];
+            result.M23 = OldMatrix[1, 2];
+            result.M24 = OldMatrix[1, 3];
 
-            result.M31 = matrix[2, 0];
-            result.M32 = matrix[2, 1];
-            result.M33 = matrix[2, 2];
-            result.M34 = matrix[2, 3];
+            result.M31 = OldMatrix[2, 0];
+            result.M32 = OldMatrix[2, 1];
+            result.M33 = OldMatrix[2, 2];
+            result.M34 = OldMatrix[2, 3];
 
-            result.M41 = matrix[3, 0];
-            result.M42 = matrix[3, 1];
-            result.M43 = matrix[3, 2];
-            result.M44 = matrix[3, 3];
+            result.M41 = OldMatrix[3, 0];
+            result.M42 = OldMatrix[3, 1];
+            result.M43 = OldMatrix[3, 2];
+            result.M44 = OldMatrix[3, 3];
 
-            augmentResult.X = matrix[0, 4];
-            augmentResult.Y = matrix[1, 4];
-            augmentResult.Z = matrix[2, 4];
-            augmentResult.W = matrix[3, 4];
+            augmentResult.X = OldMatrix[0, 4];
+            augmentResult.Y = OldMatrix[1, 4];
+            augmentResult.Z = OldMatrix[2, 4];
+            augmentResult.W = OldMatrix[3, 4];
         }
 
         /// <summary>
@@ -1936,12 +1936,12 @@ namespace TheMaths
         /// <param name="cameraPosition">The position of the camera.</param>
         /// <param name="cameraUpVector">The up vector of the camera.</param>
         /// <param name="cameraForwardVector">The forward vector of the camera.</param>
-        /// <param name="result">When the method completes, contains the created billboard matrix.</param>
-        public static void BillboardLH(ref Vector3 objectPosition, ref Vector3 cameraPosition, ref Vector3 cameraUpVector, ref Vector3 cameraForwardVector, out Matrix result)
+        /// <param name="result">When the method completes, contains the created billboard OldMatrix.</param>
+        public static void BillboardLH(ref OldVector3 objectPosition, ref OldVector3 cameraPosition, ref OldVector3 cameraUpVector, ref OldVector3 cameraForwardVector, out OldMatrix result)
         {
-            Vector3 crossed;
-            Vector3 final;
-            Vector3 difference = cameraPosition - objectPosition;
+            OldVector3 crossed;
+            OldVector3 final;
+            OldVector3 difference = cameraPosition - objectPosition;
 
             float lengthSq = difference.LengthSquared();
             if (MathUtil.IsZero(lengthSq))
@@ -1949,9 +1949,9 @@ namespace TheMaths
             else
                 difference *= (float)(1.0 / Math.Sqrt(lengthSq));
 
-            Vector3.Cross(ref cameraUpVector, ref difference, out crossed);
+            OldVector3.Cross(ref cameraUpVector, ref difference, out crossed);
             crossed.Normalize();
-            Vector3.Cross(ref difference, ref crossed, out final);
+            OldVector3.Cross(ref difference, ref crossed, out final);
 
             result.M11 = crossed.X;
             result.M12 = crossed.Y;
@@ -1978,10 +1978,10 @@ namespace TheMaths
         /// <param name="cameraPosition">The position of the camera.</param>
         /// <param name="cameraUpVector">The up vector of the camera.</param>
         /// <param name="cameraForwardVector">The forward vector of the camera.</param>
-        /// <returns>The created billboard matrix.</returns>
-        public static Matrix BillboardLH(Vector3 objectPosition, Vector3 cameraPosition, Vector3 cameraUpVector, Vector3 cameraForwardVector)
+        /// <returns>The created billboard OldMatrix.</returns>
+        public static OldMatrix BillboardLH(OldVector3 objectPosition, OldVector3 cameraPosition, OldVector3 cameraUpVector, OldVector3 cameraForwardVector)
         {
-            Matrix result;
+            OldMatrix result;
             BillboardLH(ref objectPosition, ref cameraPosition, ref cameraUpVector, ref cameraForwardVector, out result);
             return result;
         }
@@ -1993,12 +1993,12 @@ namespace TheMaths
         /// <param name="cameraPosition">The position of the camera.</param>
         /// <param name="cameraUpVector">The up vector of the camera.</param>
         /// <param name="cameraForwardVector">The forward vector of the camera.</param>
-        /// <param name="result">When the method completes, contains the created billboard matrix.</param>
-        public static void BillboardRH(ref Vector3 objectPosition, ref Vector3 cameraPosition, ref Vector3 cameraUpVector, ref Vector3 cameraForwardVector, out Matrix result)
+        /// <param name="result">When the method completes, contains the created billboard OldMatrix.</param>
+        public static void BillboardRH(ref OldVector3 objectPosition, ref OldVector3 cameraPosition, ref OldVector3 cameraUpVector, ref OldVector3 cameraForwardVector, out OldMatrix result)
         {
-            Vector3 crossed;
-            Vector3 final;
-            Vector3 difference = objectPosition - cameraPosition;
+            OldVector3 crossed;
+            OldVector3 final;
+            OldVector3 difference = objectPosition - cameraPosition;
 
             float lengthSq = difference.LengthSquared();
             if (MathUtil.IsZero(lengthSq))
@@ -2006,9 +2006,9 @@ namespace TheMaths
             else
                 difference *= (float)(1.0 / Math.Sqrt(lengthSq));
 
-            Vector3.Cross(ref cameraUpVector, ref difference, out crossed);
+            OldVector3.Cross(ref cameraUpVector, ref difference, out crossed);
             crossed.Normalize();
-            Vector3.Cross(ref difference, ref crossed, out final);
+            OldVector3.Cross(ref difference, ref crossed, out final);
 
             result.M11 = crossed.X;
             result.M12 = crossed.Y;
@@ -2035,35 +2035,35 @@ namespace TheMaths
         /// <param name="cameraPosition">The position of the camera.</param>
         /// <param name="cameraUpVector">The up vector of the camera.</param>
         /// <param name="cameraForwardVector">The forward vector of the camera.</param>
-        /// <returns>The created billboard matrix.</returns>
-        public static Matrix BillboardRH(Vector3 objectPosition, Vector3 cameraPosition, Vector3 cameraUpVector, Vector3 cameraForwardVector) {
-            Matrix result;
+        /// <returns>The created billboard OldMatrix.</returns>
+        public static OldMatrix BillboardRH(OldVector3 objectPosition, OldVector3 cameraPosition, OldVector3 cameraUpVector, OldVector3 cameraForwardVector) {
+            OldMatrix result;
             BillboardRH(ref objectPosition, ref cameraPosition, ref cameraUpVector, ref cameraForwardVector, out result);
             return result;
         }
 
         /// <summary>
-        /// Creates a left-handed, look-at matrix.
+        /// Creates a left-handed, look-at OldMatrix.
         /// </summary>
         /// <param name="eye">The position of the viewer's eye.</param>
         /// <param name="target">The camera look-at target.</param>
         /// <param name="up">The camera's up vector.</param>
-        /// <param name="result">When the method completes, contains the created look-at matrix.</param>
-        public static void LookAtLH(ref Vector3 eye, ref Vector3 target, ref Vector3 up, out Matrix result)
+        /// <param name="result">When the method completes, contains the created look-at OldMatrix.</param>
+        public static void LookAtLH(ref OldVector3 eye, ref OldVector3 target, ref OldVector3 up, out OldMatrix result)
         {
-            Vector3 xaxis, yaxis, zaxis;
-            Vector3.Subtract(ref target, ref eye, out zaxis); zaxis.Normalize();
-            Vector3.Cross(ref up, ref zaxis, out xaxis); xaxis.Normalize();
-            Vector3.Cross(ref zaxis, ref xaxis, out yaxis);
+            OldVector3 xaxis, yaxis, zaxis;
+            OldVector3.Subtract(ref target, ref eye, out zaxis); zaxis.Normalize();
+            OldVector3.Cross(ref up, ref zaxis, out xaxis); xaxis.Normalize();
+            OldVector3.Cross(ref zaxis, ref xaxis, out yaxis);
 
-            result = Matrix.Identity;
+            result = OldMatrix.Identity;
             result.M11 = xaxis.X; result.M21 = xaxis.Y; result.M31 = xaxis.Z;
             result.M12 = yaxis.X; result.M22 = yaxis.Y; result.M32 = yaxis.Z;
             result.M13 = zaxis.X; result.M23 = zaxis.Y; result.M33 = zaxis.Z;
 
-            Vector3.Dot(ref xaxis, ref eye, out result.M41);
-            Vector3.Dot(ref yaxis, ref eye, out result.M42);
-            Vector3.Dot(ref zaxis, ref eye, out result.M43);
+            OldVector3.Dot(ref xaxis, ref eye, out result.M41);
+            OldVector3.Dot(ref yaxis, ref eye, out result.M42);
+            OldVector3.Dot(ref zaxis, ref eye, out result.M43);
 
             result.M41 = -result.M41;
             result.M42 = -result.M42;
@@ -2071,41 +2071,41 @@ namespace TheMaths
         }
 
         /// <summary>
-        /// Creates a left-handed, look-at matrix.
+        /// Creates a left-handed, look-at OldMatrix.
         /// </summary>
         /// <param name="eye">The position of the viewer's eye.</param>
         /// <param name="target">The camera look-at target.</param>
         /// <param name="up">The camera's up vector.</param>
-        /// <returns>The created look-at matrix.</returns>
-        public static Matrix LookAtLH(Vector3 eye, Vector3 target, Vector3 up)
+        /// <returns>The created look-at OldMatrix.</returns>
+        public static OldMatrix LookAtLH(OldVector3 eye, OldVector3 target, OldVector3 up)
         {
-            Matrix result;
+            OldMatrix result;
             LookAtLH(ref eye, ref target, ref up, out result);
             return result;
         }
 
         /// <summary>
-        /// Creates a right-handed, look-at matrix.
+        /// Creates a right-handed, look-at OldMatrix.
         /// </summary>
         /// <param name="eye">The position of the viewer's eye.</param>
         /// <param name="target">The camera look-at target.</param>
         /// <param name="up">The camera's up vector.</param>
-        /// <param name="result">When the method completes, contains the created look-at matrix.</param>
-        public static void LookAtRH(ref Vector3 eye, ref Vector3 target, ref Vector3 up, out Matrix result)
+        /// <param name="result">When the method completes, contains the created look-at OldMatrix.</param>
+        public static void LookAtRH(ref OldVector3 eye, ref OldVector3 target, ref OldVector3 up, out OldMatrix result)
         {
-            Vector3 xaxis, yaxis, zaxis;
-            Vector3.Subtract(ref eye, ref target, out zaxis); zaxis.Normalize();
-            Vector3.Cross(ref up, ref zaxis, out xaxis); xaxis.Normalize();
-            Vector3.Cross(ref zaxis, ref xaxis, out yaxis);
+            OldVector3 xaxis, yaxis, zaxis;
+            OldVector3.Subtract(ref eye, ref target, out zaxis); zaxis.Normalize();
+            OldVector3.Cross(ref up, ref zaxis, out xaxis); xaxis.Normalize();
+            OldVector3.Cross(ref zaxis, ref xaxis, out yaxis);
 
-            result = Matrix.Identity;
+            result = OldMatrix.Identity;
             result.M11 = xaxis.X; result.M21 = xaxis.Y; result.M31 = xaxis.Z;
             result.M12 = yaxis.X; result.M22 = yaxis.Y; result.M32 = yaxis.Z;
             result.M13 = zaxis.X; result.M23 = zaxis.Y; result.M33 = zaxis.Z;
 
-            Vector3.Dot(ref xaxis, ref eye, out result.M41);
-            Vector3.Dot(ref yaxis, ref eye, out result.M42);
-            Vector3.Dot(ref zaxis, ref eye, out result.M43);
+            OldVector3.Dot(ref xaxis, ref eye, out result.M41);
+            OldVector3.Dot(ref yaxis, ref eye, out result.M42);
+            OldVector3.Dot(ref zaxis, ref eye, out result.M43);
 
             result.M41 = -result.M41;
             result.M42 = -result.M42;
@@ -2113,28 +2113,28 @@ namespace TheMaths
         }
 
         /// <summary>
-        /// Creates a right-handed, look-at matrix.
+        /// Creates a right-handed, look-at OldMatrix.
         /// </summary>
         /// <param name="eye">The position of the viewer's eye.</param>
         /// <param name="target">The camera look-at target.</param>
         /// <param name="up">The camera's up vector.</param>
-        /// <returns>The created look-at matrix.</returns>
-        public static Matrix LookAtRH(Vector3 eye, Vector3 target, Vector3 up)
+        /// <returns>The created look-at OldMatrix.</returns>
+        public static OldMatrix LookAtRH(OldVector3 eye, OldVector3 target, OldVector3 up)
         {
-            Matrix result;
+            OldMatrix result;
             LookAtRH(ref eye, ref target, ref up, out result);
             return result;
         }
 
         /// <summary>
-        /// Creates a left-handed, orthographic projection matrix.
+        /// Creates a left-handed, orthographic projection OldMatrix.
         /// </summary>
         /// <param name="width">Width of the viewing volume.</param>
         /// <param name="height">Height of the viewing volume.</param>
         /// <param name="znear">Minimum z-value of the viewing volume.</param>
         /// <param name="zfar">Maximum z-value of the viewing volume.</param>
-        /// <param name="result">When the method completes, contains the created projection matrix.</param>
-        public static void OrthoLH(float width, float height, float znear, float zfar, out Matrix result)
+        /// <param name="result">When the method completes, contains the created projection OldMatrix.</param>
+        public static void OrthoLH(float width, float height, float znear, float zfar, out OldMatrix result)
         {
             float halfWidth = width * 0.5f;
             float halfHeight = height * 0.5f;
@@ -2143,29 +2143,29 @@ namespace TheMaths
         }
 
         /// <summary>
-        /// Creates a left-handed, orthographic projection matrix.
+        /// Creates a left-handed, orthographic projection OldMatrix.
         /// </summary>
         /// <param name="width">Width of the viewing volume.</param>
         /// <param name="height">Height of the viewing volume.</param>
         /// <param name="znear">Minimum z-value of the viewing volume.</param>
         /// <param name="zfar">Maximum z-value of the viewing volume.</param>
-        /// <returns>The created projection matrix.</returns>
-        public static Matrix OrthoLH(float width, float height, float znear, float zfar)
+        /// <returns>The created projection OldMatrix.</returns>
+        public static OldMatrix OrthoLH(float width, float height, float znear, float zfar)
         {
-            Matrix result;
+            OldMatrix result;
             OrthoLH(width, height, znear, zfar, out result);
             return result;
         }
 
         /// <summary>
-        /// Creates a right-handed, orthographic projection matrix.
+        /// Creates a right-handed, orthographic projection OldMatrix.
         /// </summary>
         /// <param name="width">Width of the viewing volume.</param>
         /// <param name="height">Height of the viewing volume.</param>
         /// <param name="znear">Minimum z-value of the viewing volume.</param>
         /// <param name="zfar">Maximum z-value of the viewing volume.</param>
-        /// <param name="result">When the method completes, contains the created projection matrix.</param>
-        public static void OrthoRH(float width, float height, float znear, float zfar, out Matrix result)
+        /// <param name="result">When the method completes, contains the created projection OldMatrix.</param>
+        public static void OrthoRH(float width, float height, float znear, float zfar, out OldMatrix result)
         {
             float halfWidth = width * 0.5f;
             float halfHeight = height * 0.5f;
@@ -2174,22 +2174,22 @@ namespace TheMaths
         }
 
         /// <summary>
-        /// Creates a right-handed, orthographic projection matrix.
+        /// Creates a right-handed, orthographic projection OldMatrix.
         /// </summary>
         /// <param name="width">Width of the viewing volume.</param>
         /// <param name="height">Height of the viewing volume.</param>
         /// <param name="znear">Minimum z-value of the viewing volume.</param>
         /// <param name="zfar">Maximum z-value of the viewing volume.</param>
-        /// <returns>The created projection matrix.</returns>
-        public static Matrix OrthoRH(float width, float height, float znear, float zfar)
+        /// <returns>The created projection OldMatrix.</returns>
+        public static OldMatrix OrthoRH(float width, float height, float znear, float zfar)
         {
-            Matrix result;
+            OldMatrix result;
             OrthoRH(width, height, znear, zfar, out result);
             return result;
         }
 
         /// <summary>
-        /// Creates a left-handed, customized orthographic projection matrix.
+        /// Creates a left-handed, customized orthographic projection OldMatrix.
         /// </summary>
         /// <param name="left">Minimum x-value of the viewing volume.</param>
         /// <param name="right">Maximum x-value of the viewing volume.</param>
@@ -2197,12 +2197,12 @@ namespace TheMaths
         /// <param name="top">Maximum y-value of the viewing volume.</param>
         /// <param name="znear">Minimum z-value of the viewing volume.</param>
         /// <param name="zfar">Maximum z-value of the viewing volume.</param>
-        /// <param name="result">When the method completes, contains the created projection matrix.</param>
-        public static void OrthoOffCenterLH(float left, float right, float bottom, float top, float znear, float zfar, out Matrix result)
+        /// <param name="result">When the method completes, contains the created projection OldMatrix.</param>
+        public static void OrthoOffCenterLH(float left, float right, float bottom, float top, float znear, float zfar, out OldMatrix result)
         {
             float zRange = 1.0f / (zfar - znear);
 
-            result = Matrix.Identity;
+            result = OldMatrix.Identity;
             result.M11 = 2.0f / (right - left);
             result.M22 = 2.0f / (top - bottom);
             result.M33 = zRange;
@@ -2212,7 +2212,7 @@ namespace TheMaths
         }
 
         /// <summary>
-        /// Creates a left-handed, customized orthographic projection matrix.
+        /// Creates a left-handed, customized orthographic projection OldMatrix.
         /// </summary>
         /// <param name="left">Minimum x-value of the viewing volume.</param>
         /// <param name="right">Maximum x-value of the viewing volume.</param>
@@ -2220,16 +2220,16 @@ namespace TheMaths
         /// <param name="top">Maximum y-value of the viewing volume.</param>
         /// <param name="znear">Minimum z-value of the viewing volume.</param>
         /// <param name="zfar">Maximum z-value of the viewing volume.</param>
-        /// <returns>The created projection matrix.</returns>
-        public static Matrix OrthoOffCenterLH(float left, float right, float bottom, float top, float znear, float zfar)
+        /// <returns>The created projection OldMatrix.</returns>
+        public static OldMatrix OrthoOffCenterLH(float left, float right, float bottom, float top, float znear, float zfar)
         {
-            Matrix result;
+            OldMatrix result;
             OrthoOffCenterLH(left, right, bottom, top, znear, zfar, out result);
             return result;
         }
 
         /// <summary>
-        /// Creates a right-handed, customized orthographic projection matrix.
+        /// Creates a right-handed, customized orthographic projection OldMatrix.
         /// </summary>
         /// <param name="left">Minimum x-value of the viewing volume.</param>
         /// <param name="right">Maximum x-value of the viewing volume.</param>
@@ -2237,15 +2237,15 @@ namespace TheMaths
         /// <param name="top">Maximum y-value of the viewing volume.</param>
         /// <param name="znear">Minimum z-value of the viewing volume.</param>
         /// <param name="zfar">Maximum z-value of the viewing volume.</param>
-        /// <param name="result">When the method completes, contains the created projection matrix.</param>
-        public static void OrthoOffCenterRH(float left, float right, float bottom, float top, float znear, float zfar, out Matrix result)
+        /// <param name="result">When the method completes, contains the created projection OldMatrix.</param>
+        public static void OrthoOffCenterRH(float left, float right, float bottom, float top, float znear, float zfar, out OldMatrix result)
         {
             OrthoOffCenterLH(left, right, bottom, top, znear, zfar, out result);
             result.M33 *= -1.0f;
         }
 
         /// <summary>
-        /// Creates a right-handed, customized orthographic projection matrix.
+        /// Creates a right-handed, customized orthographic projection OldMatrix.
         /// </summary>
         /// <param name="left">Minimum x-value of the viewing volume.</param>
         /// <param name="right">Maximum x-value of the viewing volume.</param>
@@ -2253,23 +2253,23 @@ namespace TheMaths
         /// <param name="top">Maximum y-value of the viewing volume.</param>
         /// <param name="znear">Minimum z-value of the viewing volume.</param>
         /// <param name="zfar">Maximum z-value of the viewing volume.</param>
-        /// <returns>The created projection matrix.</returns>
-        public static Matrix OrthoOffCenterRH(float left, float right, float bottom, float top, float znear, float zfar)
+        /// <returns>The created projection OldMatrix.</returns>
+        public static OldMatrix OrthoOffCenterRH(float left, float right, float bottom, float top, float znear, float zfar)
         {
-            Matrix result;
+            OldMatrix result;
             OrthoOffCenterRH(left, right, bottom, top, znear, zfar, out result);
             return result;
         }
 
         /// <summary>
-        /// Creates a left-handed, perspective projection matrix.
+        /// Creates a left-handed, perspective projection OldMatrix.
         /// </summary>
         /// <param name="width">Width of the viewing volume.</param>
         /// <param name="height">Height of the viewing volume.</param>
         /// <param name="znear">Minimum z-value of the viewing volume.</param>
         /// <param name="zfar">Maximum z-value of the viewing volume.</param>
-        /// <param name="result">When the method completes, contains the created projection matrix.</param>
-        public static void PerspectiveLH(float width, float height, float znear, float zfar, out Matrix result)
+        /// <param name="result">When the method completes, contains the created projection OldMatrix.</param>
+        public static void PerspectiveLH(float width, float height, float znear, float zfar, out OldMatrix result)
         {
             float halfWidth = width * 0.5f;
             float halfHeight = height * 0.5f;
@@ -2278,29 +2278,29 @@ namespace TheMaths
         }
 
         /// <summary>
-        /// Creates a left-handed, perspective projection matrix.
+        /// Creates a left-handed, perspective projection OldMatrix.
         /// </summary>
         /// <param name="width">Width of the viewing volume.</param>
         /// <param name="height">Height of the viewing volume.</param>
         /// <param name="znear">Minimum z-value of the viewing volume.</param>
         /// <param name="zfar">Maximum z-value of the viewing volume.</param>
-        /// <returns>The created projection matrix.</returns>
-        public static Matrix PerspectiveLH(float width, float height, float znear, float zfar)
+        /// <returns>The created projection OldMatrix.</returns>
+        public static OldMatrix PerspectiveLH(float width, float height, float znear, float zfar)
         {
-            Matrix result;
+            OldMatrix result;
             PerspectiveLH(width, height, znear, zfar, out result);
             return result;
         }
 
         /// <summary>
-        /// Creates a right-handed, perspective projection matrix.
+        /// Creates a right-handed, perspective projection OldMatrix.
         /// </summary>
         /// <param name="width">Width of the viewing volume.</param>
         /// <param name="height">Height of the viewing volume.</param>
         /// <param name="znear">Minimum z-value of the viewing volume.</param>
         /// <param name="zfar">Maximum z-value of the viewing volume.</param>
-        /// <param name="result">When the method completes, contains the created projection matrix.</param>
-        public static void PerspectiveRH(float width, float height, float znear, float zfar, out Matrix result)
+        /// <param name="result">When the method completes, contains the created projection OldMatrix.</param>
+        public static void PerspectiveRH(float width, float height, float znear, float zfar, out OldMatrix result)
         {
             float halfWidth = width * 0.5f;
             float halfHeight = height * 0.5f;
@@ -2309,34 +2309,34 @@ namespace TheMaths
         }
 
         /// <summary>
-        /// Creates a right-handed, perspective projection matrix.
+        /// Creates a right-handed, perspective projection OldMatrix.
         /// </summary>
         /// <param name="width">Width of the viewing volume.</param>
         /// <param name="height">Height of the viewing volume.</param>
         /// <param name="znear">Minimum z-value of the viewing volume.</param>
         /// <param name="zfar">Maximum z-value of the viewing volume.</param>
-        /// <returns>The created projection matrix.</returns>
-        public static Matrix PerspectiveRH(float width, float height, float znear, float zfar)
+        /// <returns>The created projection OldMatrix.</returns>
+        public static OldMatrix PerspectiveRH(float width, float height, float znear, float zfar)
         {
-            Matrix result;
+            OldMatrix result;
             PerspectiveRH(width, height, znear, zfar, out result);
             return result;
         }
 
         /// <summary>
-        /// Creates a left-handed, perspective projection matrix based on a field of view.
+        /// Creates a left-handed, perspective projection OldMatrix based on a field of view.
         /// </summary>
         /// <param name="fov">Field of view in the y direction, in radians.</param>
         /// <param name="aspect">Aspect ratio, defined as view space width divided by height.</param>
         /// <param name="znear">Minimum z-value of the viewing volume.</param>
         /// <param name="zfar">Maximum z-value of the viewing volume.</param>
-        /// <param name="result">When the method completes, contains the created projection matrix.</param>
-        public static void PerspectiveFovLH(float fov, float aspect, float znear, float zfar, out Matrix result)
+        /// <param name="result">When the method completes, contains the created projection OldMatrix.</param>
+        public static void PerspectiveFovLH(float fov, float aspect, float znear, float zfar, out OldMatrix result)
         {
             float yScale = (float)(1.0f / Math.Tan(fov * 0.5f));
             float q = zfar / (zfar - znear);
 
-            result = new Matrix();
+            result = new OldMatrix();
             result.M11 = yScale / aspect;
             result.M22 = yScale;
             result.M33 = q;
@@ -2345,34 +2345,34 @@ namespace TheMaths
         }
 
         /// <summary>
-        /// Creates a left-handed, perspective projection matrix based on a field of view.
+        /// Creates a left-handed, perspective projection OldMatrix based on a field of view.
         /// </summary>
         /// <param name="fov">Field of view in the y direction, in radians.</param>
         /// <param name="aspect">Aspect ratio, defined as view space width divided by height.</param>
         /// <param name="znear">Minimum z-value of the viewing volume.</param>
         /// <param name="zfar">Maximum z-value of the viewing volume.</param>
-        /// <returns>The created projection matrix.</returns>
-        public static Matrix PerspectiveFovLH(float fov, float aspect, float znear, float zfar)
+        /// <returns>The created projection OldMatrix.</returns>
+        public static OldMatrix PerspectiveFovLH(float fov, float aspect, float znear, float zfar)
         {
-            Matrix result;
+            OldMatrix result;
             PerspectiveFovLH(fov, aspect, znear, zfar, out result);
             return result;
         }
 
         /// <summary>
-        /// Creates a right-handed, perspective projection matrix based on a field of view.
+        /// Creates a right-handed, perspective projection OldMatrix based on a field of view.
         /// </summary>
         /// <param name="fov">Field of view in the y direction, in radians.</param>
         /// <param name="aspect">Aspect ratio, defined as view space width divided by height.</param>
         /// <param name="znear">Minimum z-value of the viewing volume.</param>
         /// <param name="zfar">Maximum z-value of the viewing volume.</param>
-        /// <param name="result">When the method completes, contains the created projection matrix.</param>
-        public static void PerspectiveFovRH(float fov, float aspect, float znear, float zfar, out Matrix result)
+        /// <param name="result">When the method completes, contains the created projection OldMatrix.</param>
+        public static void PerspectiveFovRH(float fov, float aspect, float znear, float zfar, out OldMatrix result)
         {
             float yScale = (float)(1.0f / Math.Tan(fov * 0.5f));
             float q = zfar / (znear - zfar);
 
-            result = new Matrix();
+            result = new OldMatrix();
             result.M11 = yScale / aspect;
             result.M22 = yScale;
             result.M33 = q;
@@ -2381,22 +2381,22 @@ namespace TheMaths
         }
 
         /// <summary>
-        /// Creates a right-handed, perspective projection matrix based on a field of view.
+        /// Creates a right-handed, perspective projection OldMatrix based on a field of view.
         /// </summary>
         /// <param name="fov">Field of view in the y direction, in radians.</param>
         /// <param name="aspect">Aspect ratio, defined as view space width divided by height.</param>
         /// <param name="znear">Minimum z-value of the viewing volume.</param>
         /// <param name="zfar">Maximum z-value of the viewing volume.</param>
-        /// <returns>The created projection matrix.</returns>
-        public static Matrix PerspectiveFovRH(float fov, float aspect, float znear, float zfar)
+        /// <returns>The created projection OldMatrix.</returns>
+        public static OldMatrix PerspectiveFovRH(float fov, float aspect, float znear, float zfar)
         {
-            Matrix result;
+            OldMatrix result;
             PerspectiveFovRH(fov, aspect, znear, zfar, out result);
             return result;
         }
 
         /// <summary>
-        /// Creates a left-handed, customized perspective projection matrix.
+        /// Creates a left-handed, customized perspective projection OldMatrix.
         /// </summary>
         /// <param name="left">Minimum x-value of the viewing volume.</param>
         /// <param name="right">Maximum x-value of the viewing volume.</param>
@@ -2404,12 +2404,12 @@ namespace TheMaths
         /// <param name="top">Maximum y-value of the viewing volume.</param>
         /// <param name="znear">Minimum z-value of the viewing volume.</param>
         /// <param name="zfar">Maximum z-value of the viewing volume.</param>
-        /// <param name="result">When the method completes, contains the created projection matrix.</param>
-        public static void PerspectiveOffCenterLH(float left, float right, float bottom, float top, float znear, float zfar, out Matrix result)
+        /// <param name="result">When the method completes, contains the created projection OldMatrix.</param>
+        public static void PerspectiveOffCenterLH(float left, float right, float bottom, float top, float znear, float zfar, out OldMatrix result)
         {
             float zRange = zfar / (zfar - znear);
 
-            result = new Matrix();
+            result = new OldMatrix();
             result.M11 = 2.0f * znear / (right - left);
             result.M22 = 2.0f * znear / (top - bottom);
             result.M31 = (left + right) / (left - right);
@@ -2420,7 +2420,7 @@ namespace TheMaths
         }
 
         /// <summary>
-        /// Creates a left-handed, customized perspective projection matrix.
+        /// Creates a left-handed, customized perspective projection OldMatrix.
         /// </summary>
         /// <param name="left">Minimum x-value of the viewing volume.</param>
         /// <param name="right">Maximum x-value of the viewing volume.</param>
@@ -2428,16 +2428,16 @@ namespace TheMaths
         /// <param name="top">Maximum y-value of the viewing volume.</param>
         /// <param name="znear">Minimum z-value of the viewing volume.</param>
         /// <param name="zfar">Maximum z-value of the viewing volume.</param>
-        /// <returns>The created projection matrix.</returns>
-        public static Matrix PerspectiveOffCenterLH(float left, float right, float bottom, float top, float znear, float zfar)
+        /// <returns>The created projection OldMatrix.</returns>
+        public static OldMatrix PerspectiveOffCenterLH(float left, float right, float bottom, float top, float znear, float zfar)
         {
-            Matrix result;
+            OldMatrix result;
             PerspectiveOffCenterLH(left, right, bottom, top, znear, zfar, out result);
             return result;
         }
 
         /// <summary>
-        /// Creates a right-handed, customized perspective projection matrix.
+        /// Creates a right-handed, customized perspective projection OldMatrix.
         /// </summary>
         /// <param name="left">Minimum x-value of the viewing volume.</param>
         /// <param name="right">Maximum x-value of the viewing volume.</param>
@@ -2445,8 +2445,8 @@ namespace TheMaths
         /// <param name="top">Maximum y-value of the viewing volume.</param>
         /// <param name="znear">Minimum z-value of the viewing volume.</param>
         /// <param name="zfar">Maximum z-value of the viewing volume.</param>
-        /// <param name="result">When the method completes, contains the created projection matrix.</param>
-        public static void PerspectiveOffCenterRH(float left, float right, float bottom, float top, float znear, float zfar, out Matrix result)
+        /// <param name="result">When the method completes, contains the created projection OldMatrix.</param>
+        public static void PerspectiveOffCenterRH(float left, float right, float bottom, float top, float znear, float zfar, out OldMatrix result)
         {
             PerspectiveOffCenterLH(left, right, bottom, top, znear, zfar, out result);
             result.M31 *= -1.0f;
@@ -2456,7 +2456,7 @@ namespace TheMaths
         }
 
         /// <summary>
-        /// Creates a right-handed, customized perspective projection matrix.
+        /// Creates a right-handed, customized perspective projection OldMatrix.
         /// </summary>
         /// <param name="left">Minimum x-value of the viewing volume.</param>
         /// <param name="right">Maximum x-value of the viewing volume.</param>
@@ -2464,100 +2464,100 @@ namespace TheMaths
         /// <param name="top">Maximum y-value of the viewing volume.</param>
         /// <param name="znear">Minimum z-value of the viewing volume.</param>
         /// <param name="zfar">Maximum z-value of the viewing volume.</param>
-        /// <returns>The created projection matrix.</returns>
-        public static Matrix PerspectiveOffCenterRH(float left, float right, float bottom, float top, float znear, float zfar)
+        /// <returns>The created projection OldMatrix.</returns>
+        public static OldMatrix PerspectiveOffCenterRH(float left, float right, float bottom, float top, float znear, float zfar)
         {
-            Matrix result;
+            OldMatrix result;
             PerspectiveOffCenterRH(left, right, bottom, top, znear, zfar, out result);
             return result;
         }
 
 
         /// <summary>
-        /// Creates a matrix that scales along the x-axis, y-axis, and y-axis.
+        /// Creates a OldMatrix that scales along the x-axis, y-axis, and y-axis.
         /// </summary>
         /// <param name="scale">Scaling factor for all three axes.</param>
-        /// <param name="result">When the method completes, contains the created scaling matrix.</param>
-        public static void Scaling(in Vector3 scale, out Matrix result)
+        /// <param name="result">When the method completes, contains the created scaling OldMatrix.</param>
+        public static void Scaling(in OldVector3 scale, out OldMatrix result)
         {
             Scaling(scale.X, scale.Y, scale.Z, out result);
         }
 
         /// <summary>
-        /// Creates a matrix that scales along the x-axis, y-axis, and y-axis.
+        /// Creates a OldMatrix that scales along the x-axis, y-axis, and y-axis.
         /// </summary>
         /// <param name="scale">Scaling factor for all three axes.</param>
-        /// <returns>The created scaling matrix.</returns>
-        public static Matrix Scaling(in Vector3 scale)
+        /// <returns>The created scaling OldMatrix.</returns>
+        public static OldMatrix Scaling(in OldVector3 scale)
         {
-            Matrix result;
+            OldMatrix result;
             Scaling(in scale, out result);
             return result;
         }
 
         /// <summary>
-        /// Creates a matrix that scales along the x-axis, y-axis, and y-axis.
+        /// Creates a OldMatrix that scales along the x-axis, y-axis, and y-axis.
         /// </summary>
         /// <param name="x">Scaling factor that is applied along the x-axis.</param>
         /// <param name="y">Scaling factor that is applied along the y-axis.</param>
         /// <param name="z">Scaling factor that is applied along the z-axis.</param>
-        /// <param name="result">When the method completes, contains the created scaling matrix.</param>
-        public static void Scaling(float x, float y, float z, out Matrix result)
+        /// <param name="result">When the method completes, contains the created scaling OldMatrix.</param>
+        public static void Scaling(float x, float y, float z, out OldMatrix result)
         {
-            result = Matrix.Identity;
+            result = OldMatrix.Identity;
             result.M11 = x;
             result.M22 = y;
             result.M33 = z;
         }
 
         /// <summary>
-        /// Creates a matrix that scales along the x-axis, y-axis, and y-axis.
+        /// Creates a OldMatrix that scales along the x-axis, y-axis, and y-axis.
         /// </summary>
         /// <param name="x">Scaling factor that is applied along the x-axis.</param>
         /// <param name="y">Scaling factor that is applied along the y-axis.</param>
         /// <param name="z">Scaling factor that is applied along the z-axis.</param>
-        /// <returns>The created scaling matrix.</returns>
-        public static Matrix Scaling(float x, float y, float z)
+        /// <returns>The created scaling OldMatrix.</returns>
+        public static OldMatrix Scaling(float x, float y, float z)
         {
-            Matrix result;
+            OldMatrix result;
             Scaling(x, y, z, out result);
             return result;
         }
 
         /// <summary>
-        /// Creates a matrix that uniformly scales along all three axis.
+        /// Creates a OldMatrix that uniformly scales along all three axis.
         /// </summary>
         /// <param name="scale">The uniform scale that is applied along all axis.</param>
-        /// <param name="result">When the method completes, contains the created scaling matrix.</param>
-        public static void Scaling(float scale, out Matrix result)
+        /// <param name="result">When the method completes, contains the created scaling OldMatrix.</param>
+        public static void Scaling(float scale, out OldMatrix result)
         {
-            result = Matrix.Identity;
+            result = OldMatrix.Identity;
             result.M11 = result.M22 = result.M33 = scale;
         }
 
         /// <summary>
-        /// Creates a matrix that uniformly scales along all three axis.
+        /// Creates a OldMatrix that uniformly scales along all three axis.
         /// </summary>
         /// <param name="scale">The uniform scale that is applied along all axis.</param>
-        /// <returns>The created scaling matrix.</returns>
-        public static Matrix Scaling(float scale)
+        /// <returns>The created scaling OldMatrix.</returns>
+        public static OldMatrix Scaling(float scale)
         {
-            Matrix result;
+            OldMatrix result;
             Scaling(scale, out result);
             return result;
         }
 
         /// <summary>
-        /// Creates a matrix that rotates around the x-axis.
+        /// Creates a OldMatrix that rotates around the x-axis.
         /// </summary>
         /// <param name="angle">Angle of rotation in radians. Angles are measured clockwise when looking along the rotation axis toward the origin.</param>
-        /// <param name="result">When the method completes, contains the created rotation matrix.</param>
-        public static void RotationX(float angle, out Matrix result)
+        /// <param name="result">When the method completes, contains the created rotation OldMatrix.</param>
+        public static void RotationX(float angle, out OldMatrix result)
         {
             float cos = (float)Math.Cos(angle);
             float sin = (float)Math.Sin(angle);
 
-            result = Matrix.Identity;
+            result = OldMatrix.Identity;
             result.M22 = cos;
             result.M23 = sin;
             result.M32 = -sin;
@@ -2565,28 +2565,28 @@ namespace TheMaths
         }
 
         /// <summary>
-        /// Creates a matrix that rotates around the x-axis.
+        /// Creates a OldMatrix that rotates around the x-axis.
         /// </summary>
         /// <param name="angle">Angle of rotation in radians. Angles are measured clockwise when looking along the rotation axis toward the origin.</param>
-        /// <returns>The created rotation matrix.</returns>
-        public static Matrix RotationX(float angle)
+        /// <returns>The created rotation OldMatrix.</returns>
+        public static OldMatrix RotationX(float angle)
         {
-            Matrix result;
+            OldMatrix result;
             RotationX(angle, out result);
             return result;
         }
 
         /// <summary>
-        /// Creates a matrix that rotates around the y-axis.
+        /// Creates a OldMatrix that rotates around the y-axis.
         /// </summary>
         /// <param name="angle">Angle of rotation in radians. Angles are measured clockwise when looking along the rotation axis toward the origin.</param>
-        /// <param name="result">When the method completes, contains the created rotation matrix.</param>
-        public static void RotationY(float angle, out Matrix result)
+        /// <param name="result">When the method completes, contains the created rotation OldMatrix.</param>
+        public static void RotationY(float angle, out OldMatrix result)
         {
             float cos = (float)Math.Cos(angle);
             float sin = (float)Math.Sin(angle);
 
-            result = Matrix.Identity;
+            result = OldMatrix.Identity;
             result.M11 = cos;
             result.M13 = -sin;
             result.M31 = sin;
@@ -2594,28 +2594,28 @@ namespace TheMaths
         }
 
         /// <summary>
-        /// Creates a matrix that rotates around the y-axis.
+        /// Creates a OldMatrix that rotates around the y-axis.
         /// </summary>
         /// <param name="angle">Angle of rotation in radians. Angles are measured clockwise when looking along the rotation axis toward the origin.</param>
-        /// <returns>The created rotation matrix.</returns>
-        public static Matrix RotationY(float angle)
+        /// <returns>The created rotation OldMatrix.</returns>
+        public static OldMatrix RotationY(float angle)
         {
-            Matrix result;
+            OldMatrix result;
             RotationY(angle, out result);
             return result;
         }
 
         /// <summary>
-        /// Creates a matrix that rotates around the z-axis.
+        /// Creates a OldMatrix that rotates around the z-axis.
         /// </summary>
         /// <param name="angle">Angle of rotation in radians. Angles are measured clockwise when looking along the rotation axis toward the origin.</param>
-        /// <param name="result">When the method completes, contains the created rotation matrix.</param>
-        public static void RotationZ(float angle, out Matrix result)
+        /// <param name="result">When the method completes, contains the created rotation OldMatrix.</param>
+        public static void RotationZ(float angle, out OldMatrix result)
         {
             float cos = (float)Math.Cos(angle);
             float sin = (float)Math.Sin(angle);
 
-            result = Matrix.Identity;
+            result = OldMatrix.Identity;
             result.M11 = cos;
             result.M12 = sin;
             result.M21 = -sin;
@@ -2623,24 +2623,24 @@ namespace TheMaths
         }
 
         /// <summary>
-        /// Creates a matrix that rotates around the z-axis.
+        /// Creates a OldMatrix that rotates around the z-axis.
         /// </summary>
         /// <param name="angle">Angle of rotation in radians. Angles are measured clockwise when looking along the rotation axis toward the origin.</param>
-        /// <returns>The created rotation matrix.</returns>
-        public static Matrix RotationZ(float angle)
+        /// <returns>The created rotation OldMatrix.</returns>
+        public static OldMatrix RotationZ(float angle)
         {
-            Matrix result;
+            OldMatrix result;
             RotationZ(angle, out result);
             return result;
         }
 
         /// <summary>
-        /// Creates a matrix that rotates around an arbitrary axis.
+        /// Creates a OldMatrix that rotates around an arbitrary axis.
         /// </summary>
         /// <param name="axis">The axis around which to rotate. This parameter is assumed to be normalized.</param>
         /// <param name="angle">Angle of rotation in radians. Angles are measured clockwise when looking along the rotation axis toward the origin.</param>
-        /// <param name="result">When the method completes, contains the created rotation matrix.</param>
-        public static void RotationAxis(ref Vector3 axis, float angle, out Matrix result)
+        /// <param name="result">When the method completes, contains the created rotation OldMatrix.</param>
+        public static void RotationAxis(ref OldVector3 axis, float angle, out OldMatrix result)
         {
             float x = axis.X;
             float y = axis.Y;
@@ -2654,7 +2654,7 @@ namespace TheMaths
             float xz = x * z;
             float yz = y * z;
 
-            result = Matrix.Identity;
+            result = OldMatrix.Identity;
             result.M11 = xx + (cos * (1.0f - xx));
             result.M12 = (xy - (cos * xy)) + (sin * z);
             result.M13 = (xz - (cos * xz)) - (sin * y);
@@ -2667,24 +2667,24 @@ namespace TheMaths
         }
 
         /// <summary>
-        /// Creates a matrix that rotates around an arbitrary axis.
+        /// Creates a OldMatrix that rotates around an arbitrary axis.
         /// </summary>
         /// <param name="axis">The axis around which to rotate. This parameter is assumed to be normalized.</param>
         /// <param name="angle">Angle of rotation in radians. Angles are measured clockwise when looking along the rotation axis toward the origin.</param>
-        /// <returns>The created rotation matrix.</returns>
-        public static Matrix RotationAxis(Vector3 axis, float angle)
+        /// <returns>The created rotation OldMatrix.</returns>
+        public static OldMatrix RotationAxis(OldVector3 axis, float angle)
         {
-            Matrix result;
+            OldMatrix result;
             RotationAxis(ref axis, angle, out result);
             return result;
         }
 
         /// <summary>
-        /// Creates a rotation matrix from a quaternion.
+        /// Creates a rotation OldMatrix from a quaternion.
         /// </summary>
-        /// <param name="rotation">The quaternion to use to build the matrix.</param>
-        /// <param name="result">The created rotation matrix.</param>
-        public static void RotationQuaternion(in Quaternion rotation, out Matrix result)
+        /// <param name="rotation">The quaternion to use to build the OldMatrix.</param>
+        /// <param name="result">The created rotation OldMatrix.</param>
+        public static void RotationQuaternion(in OldQuaternion rotation, out OldMatrix result)
         {
             float xx = rotation.X * rotation.X;
             float yy = rotation.Y * rotation.Y;
@@ -2696,7 +2696,7 @@ namespace TheMaths
             float yz = rotation.Y * rotation.Z;
             float xw = rotation.X * rotation.W;
 
-            result = Matrix.Identity;
+            result = OldMatrix.Identity;
             result.M11 = 1.0f - (2.0f * (yy + zz));
             result.M12 = 2.0f * (xy + zw);
             result.M13 = 2.0f * (zx - yw);
@@ -2709,118 +2709,118 @@ namespace TheMaths
         }
 
         /// <summary>
-        /// Creates a rotation matrix from a quaternion.
+        /// Creates a rotation OldMatrix from a quaternion.
         /// </summary>
-        /// <param name="rotation">The quaternion to use to build the matrix.</param>
-        /// <returns>The created rotation matrix.</returns>
-        public static Matrix RotationQuaternion(in Quaternion rotation)
+        /// <param name="rotation">The quaternion to use to build the OldMatrix.</param>
+        /// <returns>The created rotation OldMatrix.</returns>
+        public static OldMatrix RotationQuaternion(in OldQuaternion rotation)
         {
-            Matrix result;
+            OldMatrix result;
             RotationQuaternion(in rotation, out result);
             return result;
         }
 
         /// <summary>
-        /// Creates a rotation matrix with a specified yaw, pitch, and roll.
+        /// Creates a rotation OldMatrix with a specified yaw, pitch, and roll.
         /// </summary>
         /// <param name="yaw">Yaw around the y-axis, in radians.</param>
         /// <param name="pitch">Pitch around the x-axis, in radians.</param>
         /// <param name="roll">Roll around the z-axis, in radians.</param>
-        /// <param name="result">When the method completes, contains the created rotation matrix.</param>
-        public static void RotationYawPitchRoll(float yaw, float pitch, float roll, out Matrix result)
+        /// <param name="result">When the method completes, contains the created rotation OldMatrix.</param>
+        public static void RotationYawPitchRoll(float yaw, float pitch, float roll, out OldMatrix result)
         {
-            Quaternion quaternion = new Quaternion();
-            Quaternion.RotationYawPitchRoll(yaw, pitch, roll, out quaternion);
+            OldQuaternion quaternion = new OldQuaternion();
+            OldQuaternion.RotationYawPitchRoll(yaw, pitch, roll, out quaternion);
             RotationQuaternion(in quaternion, out result);
         }
 
         /// <summary>
-        /// Creates a rotation matrix with a specified yaw, pitch, and roll.
+        /// Creates a rotation OldMatrix with a specified yaw, pitch, and roll.
         /// </summary>
         /// <param name="yaw">Yaw around the y-axis, in radians.</param>
         /// <param name="pitch">Pitch around the x-axis, in radians.</param>
         /// <param name="roll">Roll around the z-axis, in radians.</param>
-        /// <returns>The created rotation matrix.</returns>
-        public static Matrix RotationYawPitchRoll(float yaw, float pitch, float roll)
+        /// <returns>The created rotation OldMatrix.</returns>
+        public static OldMatrix RotationYawPitchRoll(float yaw, float pitch, float roll)
         {
-            Matrix result;
+            OldMatrix result;
             RotationYawPitchRoll(yaw, pitch, roll, out result);
             return result;
         }
 
         /// <summary>
-        /// Creates a translation matrix using the specified offsets.
+        /// Creates a translation OldMatrix using the specified offsets.
         /// </summary>
         /// <param name="value">The offset for all three coordinate planes.</param>
-        /// <param name="result">When the method completes, contains the created translation matrix.</param>
-        public static void Translation(in Vector3 value, out Matrix result)
+        /// <param name="result">When the method completes, contains the created translation OldMatrix.</param>
+        public static void Translation(in OldVector3 value, out OldMatrix result)
         {
             Translation(value.X, value.Y, value.Z, out result);
         }
 
         /// <summary>
-        /// Creates a translation matrix using the specified offsets.
+        /// Creates a translation OldMatrix using the specified offsets.
         /// </summary>
         /// <param name="value">The offset for all three coordinate planes.</param>
-        /// <returns>The created translation matrix.</returns>
-        public static Matrix Translation(in Vector3 value)
+        /// <returns>The created translation OldMatrix.</returns>
+        public static OldMatrix Translation(in OldVector3 value)
         {
-            Matrix result;
+            OldMatrix result;
             Translation(in value, out result);
             return result;
         }
 
         /// <summary>
-        /// Creates a translation matrix using the specified offsets.
+        /// Creates a translation OldMatrix using the specified offsets.
         /// </summary>
         /// <param name="x">X-coordinate offset.</param>
         /// <param name="y">Y-coordinate offset.</param>
         /// <param name="z">Z-coordinate offset.</param>
-        /// <param name="result">When the method completes, contains the created translation matrix.</param>
-        public static void Translation(float x, float y, float z, out Matrix result)
+        /// <param name="result">When the method completes, contains the created translation OldMatrix.</param>
+        public static void Translation(float x, float y, float z, out OldMatrix result)
         {
-            result = Matrix.Identity;
+            result = OldMatrix.Identity;
             result.M41 = x;
             result.M42 = y;
             result.M43 = z;
         }
 
         /// <summary>
-        /// Creates a translation matrix using the specified offsets.
+        /// Creates a translation OldMatrix using the specified offsets.
         /// </summary>
         /// <param name="x">X-coordinate offset.</param>
         /// <param name="y">Y-coordinate offset.</param>
         /// <param name="z">Z-coordinate offset.</param>
-        /// <returns>The created translation matrix.</returns>
-        public static Matrix Translation(float x, float y, float z)
+        /// <returns>The created translation OldMatrix.</returns>
+        public static OldMatrix Translation(float x, float y, float z)
         {
-            Matrix result;
+            OldMatrix result;
             Translation(x, y, z, out result);
             return result;
         }
 
         /// <summary>
-        /// Creates a skew/shear matrix by means of a translation vector, a rotation vector, and a rotation angle.
+        /// Creates a skew/shear OldMatrix by means of a translation vector, a rotation vector, and a rotation angle.
         /// shearing is performed in the direction of translation vector, where translation vector and rotation vector define the shearing plane.
         /// The effect is such that the skewed rotation vector has the specified angle with rotation itself.
         /// </summary>
         /// <param name="angle">The rotation angle.</param>
         /// <param name="rotationVec">The rotation vector</param>
         /// <param name="transVec">The translation vector</param>
-        /// <param name="matrix">Contains the created skew/shear matrix. </param>
-        public static void Skew(float angle, ref Vector3 rotationVec, ref Vector3 transVec, out Matrix matrix)
+        /// <param name="OldMatrix">Contains the created skew/shear OldMatrix. </param>
+        public static void Skew(float angle, ref OldVector3 rotationVec, ref OldVector3 transVec, out OldMatrix OldMatrix)
         {
             //http://elckerlyc.ewi.utwente.nl/browser/Elckerlyc/Hmi/HmiMath/src/hmi/math/Mat3f.java
             float MINIMAL_SKEW_ANGLE = 0.000001f;
 
-            Vector3 e0 = rotationVec;
-            Vector3 e1 = Vector3.Normalize(transVec);
+            OldVector3 e0 = rotationVec;
+            OldVector3 e1 = OldVector3.Normalize(transVec);
 
             float rv1;
-            Vector3.Dot(ref rotationVec, ref  e1, out rv1);
+            OldVector3.Dot(ref rotationVec, ref  e1, out rv1);
             e0 += rv1 * e1;
             float rv0;
-            Vector3.Dot(ref rotationVec, ref e0, out rv0);
+            OldVector3.Dot(ref rotationVec, ref e0, out rv0);
             float cosa = (float)Math.Cos(angle);
             float sina = (float)Math.Sin(angle);
             float rr0 = rv0 * cosa - rv1 * sina;
@@ -2831,130 +2831,130 @@ namespace TheMaths
 
             float d = (rr1 / rr0) - (rv1 / rv0);
 
-            matrix = Matrix.Identity;
-            matrix.M11 = d * e1[0] * e0[0] + 1.0f;
-            matrix.M12 = d * e1[0] * e0[1];
-            matrix.M13 = d * e1[0] * e0[2];
-            matrix.M21 = d * e1[1] * e0[0];
-            matrix.M22 = d * e1[1] * e0[1] + 1.0f;
-            matrix.M23 = d * e1[1] * e0[2];
-            matrix.M31 = d * e1[2] * e0[0];
-            matrix.M32 = d * e1[2] * e0[1];
-            matrix.M33 = d * e1[2] * e0[2] + 1.0f;
+            OldMatrix = OldMatrix.Identity;
+            OldMatrix.M11 = d * e1[0] * e0[0] + 1.0f;
+            OldMatrix.M12 = d * e1[0] * e0[1];
+            OldMatrix.M13 = d * e1[0] * e0[2];
+            OldMatrix.M21 = d * e1[1] * e0[0];
+            OldMatrix.M22 = d * e1[1] * e0[1] + 1.0f;
+            OldMatrix.M23 = d * e1[1] * e0[2];
+            OldMatrix.M31 = d * e1[2] * e0[0];
+            OldMatrix.M32 = d * e1[2] * e0[1];
+            OldMatrix.M33 = d * e1[2] * e0[2] + 1.0f;
         }
 
         /// <summary>
-        /// Creates a 3D affine transformation matrix.
+        /// Creates a 3D affine transformation OldMatrix.
         /// </summary>
         /// <param name="scaling">Scaling factor.</param>
         /// <param name="rotation">The rotation of the transformation.</param>
         /// <param name="translation">The translation factor of the transformation.</param>
-        /// <param name="result">When the method completes, contains the created affine transformation matrix.</param>
-        public static void AffineTransformation(float scaling, ref Quaternion rotation, ref Vector3 translation, out Matrix result)
+        /// <param name="result">When the method completes, contains the created affine transformation OldMatrix.</param>
+        public static void AffineTransformation(float scaling, ref OldQuaternion rotation, ref OldVector3 translation, out OldMatrix result)
         {
             result = Scaling(scaling) * RotationQuaternion(rotation) * Translation(translation);
         }
 
         /// <summary>
-        /// Creates a 3D affine transformation matrix.
+        /// Creates a 3D affine transformation OldMatrix.
         /// </summary>
         /// <param name="scaling">Scaling factor.</param>
         /// <param name="rotation">The rotation of the transformation.</param>
         /// <param name="translation">The translation factor of the transformation.</param>
-        /// <returns>The created affine transformation matrix.</returns>
-        public static Matrix AffineTransformation(float scaling, Quaternion rotation, Vector3 translation)
+        /// <returns>The created affine transformation OldMatrix.</returns>
+        public static OldMatrix AffineTransformation(float scaling, OldQuaternion rotation, OldVector3 translation)
         {
-            Matrix result;
+            OldMatrix result;
             AffineTransformation(scaling, ref rotation, ref translation, out result);
             return result;
         }
 
         /// <summary>
-        /// Creates a 3D affine transformation matrix.
+        /// Creates a 3D affine transformation OldMatrix.
         /// </summary>
         /// <param name="scaling">Scaling factor.</param>
         /// <param name="rotationCenter">The center of the rotation.</param>
         /// <param name="rotation">The rotation of the transformation.</param>
         /// <param name="translation">The translation factor of the transformation.</param>
-        /// <param name="result">When the method completes, contains the created affine transformation matrix.</param>
-        public static void AffineTransformation(float scaling, ref Vector3 rotationCenter, ref Quaternion rotation, ref Vector3 translation, out Matrix result)
+        /// <param name="result">When the method completes, contains the created affine transformation OldMatrix.</param>
+        public static void AffineTransformation(float scaling, ref OldVector3 rotationCenter, ref OldQuaternion rotation, ref OldVector3 translation, out OldMatrix result)
         {
             result = Scaling(scaling) * Translation(-rotationCenter) * RotationQuaternion(rotation) *
                 Translation(rotationCenter) * Translation(translation);
         }
 
         /// <summary>
-        /// Creates a 3D affine transformation matrix.
+        /// Creates a 3D affine transformation OldMatrix.
         /// </summary>
         /// <param name="scaling">Scaling factor.</param>
         /// <param name="rotationCenter">The center of the rotation.</param>
         /// <param name="rotation">The rotation of the transformation.</param>
         /// <param name="translation">The translation factor of the transformation.</param>
-        /// <returns>The created affine transformation matrix.</returns>
-        public static Matrix AffineTransformation(float scaling, Vector3 rotationCenter, Quaternion rotation, Vector3 translation)
+        /// <returns>The created affine transformation OldMatrix.</returns>
+        public static OldMatrix AffineTransformation(float scaling, OldVector3 rotationCenter, OldQuaternion rotation, OldVector3 translation)
         {
-            Matrix result;
+            OldMatrix result;
             AffineTransformation(scaling, ref rotationCenter, ref rotation, ref translation, out result);
             return result;
         }
 
         /// <summary>
-        /// Creates a 2D affine transformation matrix.
+        /// Creates a 2D affine transformation OldMatrix.
         /// </summary>
         /// <param name="scaling">Scaling factor.</param>
         /// <param name="rotation">The rotation of the transformation.</param>
         /// <param name="translation">The translation factor of the transformation.</param>
-        /// <param name="result">When the method completes, contains the created affine transformation matrix.</param>
-        public static void AffineTransformation2D(float scaling, float rotation, ref Vector2 translation, out Matrix result)
+        /// <param name="result">When the method completes, contains the created affine transformation OldMatrix.</param>
+        public static void AffineTransformation2D(float scaling, float rotation, ref OldVector2 translation, out OldMatrix result)
         {
-            result = Scaling(scaling, scaling, 1.0f) * RotationZ(rotation) * Translation((Vector3)translation);
+            result = Scaling(scaling, scaling, 1.0f) * RotationZ(rotation) * Translation((OldVector3)translation);
         }
 
         /// <summary>
-        /// Creates a 2D affine transformation matrix.
+        /// Creates a 2D affine transformation OldMatrix.
         /// </summary>
         /// <param name="scaling">Scaling factor.</param>
         /// <param name="rotation">The rotation of the transformation.</param>
         /// <param name="translation">The translation factor of the transformation.</param>
-        /// <returns>The created affine transformation matrix.</returns>
-        public static Matrix AffineTransformation2D(float scaling, float rotation, Vector2 translation)
+        /// <returns>The created affine transformation OldMatrix.</returns>
+        public static OldMatrix AffineTransformation2D(float scaling, float rotation, OldVector2 translation)
         {
-            Matrix result;
+            OldMatrix result;
             AffineTransformation2D(scaling, rotation, ref translation, out result);
             return result;
         }
 
         /// <summary>
-        /// Creates a 2D affine transformation matrix.
+        /// Creates a 2D affine transformation OldMatrix.
         /// </summary>
         /// <param name="scaling">Scaling factor.</param>
         /// <param name="rotationCenter">The center of the rotation.</param>
         /// <param name="rotation">The rotation of the transformation.</param>
         /// <param name="translation">The translation factor of the transformation.</param>
-        /// <param name="result">When the method completes, contains the created affine transformation matrix.</param>
-        public static void AffineTransformation2D(float scaling, ref Vector2 rotationCenter, float rotation, ref Vector2 translation, out Matrix result)
+        /// <param name="result">When the method completes, contains the created affine transformation OldMatrix.</param>
+        public static void AffineTransformation2D(float scaling, ref OldVector2 rotationCenter, float rotation, ref OldVector2 translation, out OldMatrix result)
         {
-            result = Scaling(scaling, scaling, 1.0f) * Translation((Vector3)(-rotationCenter)) * RotationZ(rotation) *
-                Translation((Vector3)rotationCenter) * Translation((Vector3)translation);
+            result = Scaling(scaling, scaling, 1.0f) * Translation((OldVector3)(-rotationCenter)) * RotationZ(rotation) *
+                Translation((OldVector3)rotationCenter) * Translation((OldVector3)translation);
         }
 
         /// <summary>
-        /// Creates a 2D affine transformation matrix.
+        /// Creates a 2D affine transformation OldMatrix.
         /// </summary>
         /// <param name="scaling">Scaling factor.</param>
         /// <param name="rotationCenter">The center of the rotation.</param>
         /// <param name="rotation">The rotation of the transformation.</param>
         /// <param name="translation">The translation factor of the transformation.</param>
-        /// <returns>The created affine transformation matrix.</returns>
-        public static Matrix AffineTransformation2D(float scaling, Vector2 rotationCenter, float rotation, Vector2 translation)
+        /// <returns>The created affine transformation OldMatrix.</returns>
+        public static OldMatrix AffineTransformation2D(float scaling, OldVector2 rotationCenter, float rotation, OldVector2 translation)
         {
-            Matrix result;
+            OldMatrix result;
             AffineTransformation2D(scaling, ref rotationCenter, rotation, ref translation, out result);
             return result;
         }
 
         /// <summary>
-        /// Creates a transformation matrix.
+        /// Creates a transformation OldMatrix.
         /// </summary>
         /// <param name="scalingCenter">Center point of the scaling operation.</param>
         /// <param name="scalingRotation">Scaling rotation amount.</param>
@@ -2962,17 +2962,17 @@ namespace TheMaths
         /// <param name="rotationCenter">The center of the rotation.</param>
         /// <param name="rotation">The rotation of the transformation.</param>
         /// <param name="translation">The translation factor of the transformation.</param>
-        /// <param name="result">When the method completes, contains the created transformation matrix.</param>
-        public static void Transformation(in Vector3 scalingCenter, in Quaternion scalingRotation, in Vector3 scaling, in Vector3 rotationCenter, in Quaternion rotation, in Vector3 translation, out Matrix result)
+        /// <param name="result">When the method completes, contains the created transformation OldMatrix.</param>
+        public static void Transformation(in OldVector3 scalingCenter, in OldQuaternion scalingRotation, in OldVector3 scaling, in OldVector3 rotationCenter, in OldQuaternion rotation, in OldVector3 translation, out OldMatrix result)
         {
-            Matrix sr = RotationQuaternion(scalingRotation);
+            OldMatrix sr = RotationQuaternion(scalingRotation);
 
             result = Translation(-scalingCenter) * Transpose(sr) * Scaling(scaling) * sr * Translation(scalingCenter) * Translation(-rotationCenter) *
                 RotationQuaternion(rotation) * Translation(rotationCenter) * Translation(translation);       
         }
 
         /// <summary>
-        /// Creates a transformation matrix.
+        /// Creates a transformation OldMatrix.
         /// </summary>
         /// <param name="scalingCenter">Center point of the scaling operation.</param>
         /// <param name="scalingRotation">Scaling rotation amount.</param>
@@ -2980,21 +2980,21 @@ namespace TheMaths
         /// <param name="rotationCenter">The center of the rotation.</param>
         /// <param name="rotation">The rotation of the transformation.</param>
         /// <param name="translation">The translation factor of the transformation.</param>
-        /// <returns>The created transformation matrix.</returns>
-        public static Matrix Transformation(in Vector3 scalingCenter, in Quaternion scalingRotation, in Vector3 scaling, in Vector3 rotationCenter, in Quaternion rotation, in Vector3 translation)
+        /// <returns>The created transformation OldMatrix.</returns>
+        public static OldMatrix Transformation(in OldVector3 scalingCenter, in OldQuaternion scalingRotation, in OldVector3 scaling, in OldVector3 rotationCenter, in OldQuaternion rotation, in OldVector3 translation)
         {
-            Matrix result;
+            OldMatrix result;
             Transformation(in scalingCenter, in scalingRotation, in scaling, in rotationCenter, in rotation, in translation, out result);
             return result;
         }
 
-        public static Matrix TRS(in Vector3 position, in Quaternion rotation, in Vector3 scale)
+        public static OldMatrix TRS(in OldVector3 position, in OldQuaternion rotation, in OldVector3 scale)
         {
-            return Transformation(in Vector3.Zero, in Quaternion.Identity, in scale, in Vector3.Zero, in rotation, in position);
+            return Transformation(in OldVector3.Zero, in OldQuaternion.Identity, in scale, in OldVector3.Zero, in rotation, in position);
         }
 
         /// <summary>
-        /// Creates a 2D transformation matrix.
+        /// Creates a 2D transformation OldMatrix.
         /// </summary>
         /// <param name="scalingCenter">Center point of the scaling operation.</param>
         /// <param name="scalingRotation">Scaling rotation amount.</param>
@@ -3002,18 +3002,18 @@ namespace TheMaths
         /// <param name="rotationCenter">The center of the rotation.</param>
         /// <param name="rotation">The rotation of the transformation.</param>
         /// <param name="translation">The translation factor of the transformation.</param>
-        /// <param name="result">When the method completes, contains the created transformation matrix.</param>
-        public static void Transformation2D(ref Vector2 scalingCenter, float scalingRotation, ref Vector2 scaling, ref Vector2 rotationCenter, float rotation, ref Vector2 translation, out Matrix result)
+        /// <param name="result">When the method completes, contains the created transformation OldMatrix.</param>
+        public static void Transformation2D(ref OldVector2 scalingCenter, float scalingRotation, ref OldVector2 scaling, ref OldVector2 rotationCenter, float rotation, ref OldVector2 translation, out OldMatrix result)
         {
-            result = Translation((Vector3)(-scalingCenter)) * RotationZ(-scalingRotation) * Scaling((Vector3)scaling) * RotationZ(scalingRotation) * Translation((Vector3)scalingCenter) * 
-                Translation((Vector3)(-rotationCenter)) * RotationZ(rotation) * Translation((Vector3)rotationCenter) * Translation((Vector3)translation);
+            result = Translation((OldVector3)(-scalingCenter)) * RotationZ(-scalingRotation) * Scaling((OldVector3)scaling) * RotationZ(scalingRotation) * Translation((OldVector3)scalingCenter) * 
+                Translation((OldVector3)(-rotationCenter)) * RotationZ(rotation) * Translation((OldVector3)rotationCenter) * Translation((OldVector3)translation);
 
             result.M33 = 1f;
             result.M44 = 1f;
         }
 
         /// <summary>
-        /// Creates a 2D transformation matrix.
+        /// Creates a 2D transformation OldMatrix.
         /// </summary>
         /// <param name="scalingCenter">Center point of the scaling operation.</param>
         /// <param name="scalingRotation">Scaling rotation amount.</param>
@@ -3021,10 +3021,10 @@ namespace TheMaths
         /// <param name="rotationCenter">The center of the rotation.</param>
         /// <param name="rotation">The rotation of the transformation.</param>
         /// <param name="translation">The translation factor of the transformation.</param>
-        /// <returns>The created transformation matrix.</returns>
-        public static Matrix Transformation2D(Vector2 scalingCenter, float scalingRotation, Vector2 scaling, Vector2 rotationCenter, float rotation, Vector2 translation)
+        /// <returns>The created transformation OldMatrix.</returns>
+        public static OldMatrix Transformation2D(OldVector2 scalingCenter, float scalingRotation, OldVector2 scaling, OldVector2 rotationCenter, float rotation, OldVector2 translation)
         {
-            Matrix result;
+            OldMatrix result;
             Transformation2D(ref scalingCenter, scalingRotation, ref scaling, ref rotationCenter, rotation, ref translation, out result);
             return result;
         }
@@ -3032,22 +3032,22 @@ namespace TheMaths
         /// <summary>
         /// Adds two matrices.
         /// </summary>
-        /// <param name="left">The first matrix to add.</param>
-        /// <param name="right">The second matrix to add.</param>
+        /// <param name="left">The first OldMatrix to add.</param>
+        /// <param name="right">The second OldMatrix to add.</param>
         /// <returns>The sum of the two matrices.</returns>
-        public static Matrix operator +(Matrix left, Matrix right)
+        public static OldMatrix operator +(OldMatrix left, OldMatrix right)
         {
-            Matrix result;
+            OldMatrix result;
             Add(ref left, ref right, out result);
             return result;
         }
 
         /// <summary>
-        /// Assert a matrix (return it unchanged).
+        /// Assert a OldMatrix (return it unchanged).
         /// </summary>
-        /// <param name="value">The matrix to assert (unchanged).</param>
-        /// <returns>The asserted (unchanged) matrix.</returns>
-        public static Matrix operator +(Matrix value)
+        /// <param name="value">The OldMatrix to assert (unchanged).</param>
+        /// <returns>The asserted (unchanged) OldMatrix.</returns>
+        public static OldMatrix operator +(OldMatrix value)
         {
             return value;
         }
@@ -3055,50 +3055,50 @@ namespace TheMaths
         /// <summary>
         /// Subtracts two matrices.
         /// </summary>
-        /// <param name="left">The first matrix to subtract.</param>
-        /// <param name="right">The second matrix to subtract.</param>
+        /// <param name="left">The first OldMatrix to subtract.</param>
+        /// <param name="right">The second OldMatrix to subtract.</param>
         /// <returns>The difference between the two matrices.</returns>
-        public static Matrix operator -(Matrix left, Matrix right)
+        public static OldMatrix operator -(OldMatrix left, OldMatrix right)
         {
-            Matrix result;
+            OldMatrix result;
             Subtract(ref left, ref right, out result);
             return result;
         }
 
         /// <summary>
-        /// Negates a matrix.
+        /// Negates a OldMatrix.
         /// </summary>
-        /// <param name="value">The matrix to negate.</param>
-        /// <returns>The negated matrix.</returns>
-        public static Matrix operator -(Matrix value)
+        /// <param name="value">The OldMatrix to negate.</param>
+        /// <returns>The negated OldMatrix.</returns>
+        public static OldMatrix operator -(OldMatrix value)
         {
-            Matrix result;
+            OldMatrix result;
             Negate(ref value, out result);
             return result;
         }
 
         /// <summary>
-        /// Scales a matrix by a given value.
+        /// Scales a OldMatrix by a given value.
         /// </summary>
-        /// <param name="right">The matrix to scale.</param>
+        /// <param name="right">The OldMatrix to scale.</param>
         /// <param name="left">The amount by which to scale.</param>
-        /// <returns>The scaled matrix.</returns>
-        public static Matrix operator *(float left, Matrix right)
+        /// <returns>The scaled OldMatrix.</returns>
+        public static OldMatrix operator *(float left, OldMatrix right)
         {
-            Matrix result;
+            OldMatrix result;
             Multiply(ref right, left, out result);
             return result;
         }
 
         /// <summary>
-        /// Scales a matrix by a given value.
+        /// Scales a OldMatrix by a given value.
         /// </summary>
-        /// <param name="left">The matrix to scale.</param>
+        /// <param name="left">The OldMatrix to scale.</param>
         /// <param name="right">The amount by which to scale.</param>
-        /// <returns>The scaled matrix.</returns>
-        public static Matrix operator *(Matrix left, float right)
+        /// <returns>The scaled OldMatrix.</returns>
+        public static OldMatrix operator *(OldMatrix left, float right)
         {
-            Matrix result;
+            OldMatrix result;
             Multiply(ref left, right, out result);
             return result;
         }
@@ -3106,25 +3106,25 @@ namespace TheMaths
         /// <summary>
         /// Multiplies two matrices.
         /// </summary>
-        /// <param name="left">The first matrix to multiply.</param>
-        /// <param name="right">The second matrix to multiply.</param>
+        /// <param name="left">The first OldMatrix to multiply.</param>
+        /// <param name="right">The second OldMatrix to multiply.</param>
         /// <returns>The product of the two matrices.</returns>
-        public static Matrix operator *(Matrix left, Matrix right)
+        public static OldMatrix operator *(OldMatrix left, OldMatrix right)
         {
-            Matrix result;
+            OldMatrix result;
             Multiply(ref left, ref right, out result);
             return result;
         }
 
         /// <summary>
-        /// Scales a matrix by a given value.
+        /// Scales a OldMatrix by a given value.
         /// </summary>
-        /// <param name="left">The matrix to scale.</param>
+        /// <param name="left">The OldMatrix to scale.</param>
         /// <param name="right">The amount by which to scale.</param>
-        /// <returns>The scaled matrix.</returns>
-        public static Matrix operator /(Matrix left, float right)
+        /// <returns>The scaled OldMatrix.</returns>
+        public static OldMatrix operator /(OldMatrix left, float right)
         {
-            Matrix result;
+            OldMatrix result;
             Divide(ref left, right, out result);
             return result;
         }
@@ -3132,12 +3132,12 @@ namespace TheMaths
         /// <summary>
         /// Divides two matrices.
         /// </summary>
-        /// <param name="left">The first matrix to divide.</param>
-        /// <param name="right">The second matrix to divide.</param>
+        /// <param name="left">The first OldMatrix to divide.</param>
+        /// <param name="right">The second OldMatrix to divide.</param>
         /// <returns>The quotient of the two matrices.</returns>
-        public static Matrix operator /(Matrix left, Matrix right)
+        public static OldMatrix operator /(OldMatrix left, OldMatrix right)
         {
-            Matrix result;
+            OldMatrix result;
             Divide(ref left, ref right, out result);
             return result;
         }
@@ -3149,7 +3149,7 @@ namespace TheMaths
         /// <param name="right">The second value to compare.</param>
         /// <returns><c>true</c> if <paramref name="left"/> has the same value as <paramref name="right"/>; otherwise, <c>false</c>.</returns>
         [MethodImpl((MethodImplOptions)0x100)] // MethodImplOptions.AggressiveInlining
-        public static bool operator ==(Matrix left, Matrix right)
+        public static bool operator ==(OldMatrix left, OldMatrix right)
         {
             return left.Equals(ref right);
         }
@@ -3161,7 +3161,7 @@ namespace TheMaths
         /// <param name="right">The second value to compare.</param>
         /// <returns><c>true</c> if <paramref name="left"/> has a different value than <paramref name="right"/>; otherwise, <c>false</c>.</returns>
         [MethodImpl((MethodImplOptions)0x100)] // MethodImplOptions.AggressiveInlining
-        public static bool operator !=(Matrix left, Matrix right)
+        public static bool operator !=(OldMatrix left, OldMatrix right)
         {
             return !left.Equals(ref right);
         }
@@ -3264,13 +3264,13 @@ namespace TheMaths
         }
 
         /// <summary>
-        /// Determines whether the specified <see cref="Matrix"/> is equal to this instance.
+        /// Determines whether the specified <see cref="OldMatrix"/> is equal to this instance.
         /// </summary>
-        /// <param name="other">The <see cref="Matrix"/> to compare with this instance.</param>
+        /// <param name="other">The <see cref="OldMatrix"/> to compare with this instance.</param>
         /// <returns>
-        /// <c>true</c> if the specified <see cref="Matrix"/> is equal to this instance; otherwise, <c>false</c>.
+        /// <c>true</c> if the specified <see cref="OldMatrix"/> is equal to this instance; otherwise, <c>false</c>.
         /// </returns>
-        public bool Equals(ref Matrix other)
+        public bool Equals(ref OldMatrix other)
         {
             return (MathUtil.NearEqual(other.M11, M11) &&
                 MathUtil.NearEqual(other.M12, M12) &&
@@ -3291,14 +3291,14 @@ namespace TheMaths
         }
 
         /// <summary>
-        /// Determines whether the specified <see cref="Matrix"/> is equal to this instance.
+        /// Determines whether the specified <see cref="OldMatrix"/> is equal to this instance.
         /// </summary>
-        /// <param name="other">The <see cref="Matrix"/> to compare with this instance.</param>
+        /// <param name="other">The <see cref="OldMatrix"/> to compare with this instance.</param>
         /// <returns>
-        /// <c>true</c> if the specified <see cref="Matrix"/> is equal to this instance; otherwise, <c>false</c>.
+        /// <c>true</c> if the specified <see cref="OldMatrix"/> is equal to this instance; otherwise, <c>false</c>.
         /// </returns>
         [MethodImpl((MethodImplOptions)0x100)] // MethodImplOptions.AggressiveInlining
-        public bool Equals(Matrix other)
+        public bool Equals(OldMatrix other)
         {
             return Equals(ref other);
         }
@@ -3312,31 +3312,31 @@ namespace TheMaths
         /// </returns>
         public override bool Equals(object value)
         {
-            if (!(value is Matrix))
+            if (!(value is OldMatrix))
                 return false;
 
-            var strongValue = (Matrix)value;
+            var strongValue = (OldMatrix)value;
             return Equals(ref strongValue);
         }
 
         // /// <summary>
-        // /// Performs an implicit conversion from <see cref="Matrix"/> to <see cref="RawMatrix"/>.
+        // /// Performs an implicit conversion from <see cref="OldMatrix"/> to <see cref="RawOldMatrix"/>.
         // /// </summary>
         // /// <param name="value">The value.</param>
         // /// <returns>The result of the conversion.</returns>
-        // public unsafe static implicit operator RawMatrix(Matrix value)
+        // public unsafe static implicit operator RawOldMatrix(OldMatrix value)
         // {
-        //     return *(RawMatrix*)&value;
+        //     return *(RawOldMatrix*)&value;
         // }
         //
         // /// <summary>
-        // /// Performs an implicit conversion from <see cref="RawMatrix"/> to <see cref="Matrix"/>.
+        // /// Performs an implicit conversion from <see cref="RawOldMatrix"/> to <see cref="OldMatrix"/>.
         // /// </summary>
         // /// <param name="value">The value.</param>
         // /// <returns>The result of the conversion.</returns>
-        // public unsafe static implicit operator Matrix(RawMatrix value)
+        // public unsafe static implicit operator OldMatrix(RawOldMatrix value)
         // {
-        //     return *(Matrix*)&value;
+        //     return *(OldMatrix*)&value;
         // }
     }
 }

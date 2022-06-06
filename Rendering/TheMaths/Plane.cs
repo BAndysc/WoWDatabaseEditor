@@ -716,7 +716,7 @@ namespace TheMaths
             float d = plane.D;
 
             Matrix inverse;
-            Matrix.Invert(ref transformation, out inverse);
+            Matrix.Invert(transformation, out inverse);
 
             result.Normal.X = (((x * inverse.M11) + (y * inverse.M12)) + (z * inverse.M13)) + (d * inverse.M14);
             result.Normal.Y = (((x * inverse.M21) + (y * inverse.M22)) + (z * inverse.M23)) + (d * inverse.M24);
@@ -738,7 +738,7 @@ namespace TheMaths
             float z = plane.Normal.Z;
             float d = plane.D;
 
-            transformation.Invert();
+            Matrix.Invert(transformation, out transformation);
             result.Normal.X = (((x * transformation.M11) + (y * transformation.M12)) + (z * transformation.M13)) + (d * transformation.M14);
             result.Normal.Y = (((x * transformation.M21) + (y * transformation.M22)) + (z * transformation.M23)) + (d * transformation.M24);
             result.Normal.Z = (((x * transformation.M31) + (y * transformation.M32)) + (z * transformation.M33)) + (d * transformation.M34);
@@ -759,7 +759,7 @@ namespace TheMaths
                 throw new ArgumentNullException("planes");
 
             Matrix inverse;
-            Matrix.Invert(ref transformation, out inverse);
+            Matrix.Invert(transformation, out inverse);
 
             for (int i = 0; i < planes.Length; ++i)
             {

@@ -17,6 +17,8 @@
     <ItemGroup>
       <Folder Include="GUI" />
     </ItemGroup>
+
+    <Import Project="..\lib3d.props" />
     
     <ItemGroup>
       <None Update="internalShaders\theengine.cginc">

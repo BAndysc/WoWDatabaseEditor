@@ -1,7 +1,4 @@
-﻿using System.IO;
-using TheMaths;
-
-namespace WDE.MpqReader.Readers
+﻿namespace WDE.MpqReader.Readers
 {
     public class FileBinaryReader : IBinaryReader
     {

@@ -62,7 +62,7 @@ namespace TheAvaloniaOpenGL
                 _attachment = null;
                 _bitmap?.Dispose();
                 _bitmap = null;
-                _bitmap = new OpenGlBitmap(GetPixelSize(), new Vector(96, 96));
+                _bitmap = new OpenGlBitmap(GetPixelSize(), new Avalonia.Vector(96, 96));
                 _attachment = _bitmap.CreateFramebufferAttachment(_context);
             }
         }
@@ -239,7 +239,7 @@ namespace TheAvaloniaOpenGL
             return true;
         }
 
-        private Vector GetDpi() => new Vector(96, 96);
+        private Avalonia.Vector GetDpi() => new Avalonia.Vector(96, 96);
         
         private PixelSize GetPixelSize()
         {

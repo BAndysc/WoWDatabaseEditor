@@ -294,8 +294,8 @@ namespace TheMaths
         {
             //http://knol.google.com/k/view-frustum
 
-            lookDir = Vector3.Normalize(lookDir);
-            upDir = Vector3.Normalize(upDir);
+            lookDir = Vectors.Normalize(lookDir);
+            upDir = Vectors.Normalize(upDir);
 
             Vector3 nearCenter = cameraPos + lookDir * znear;
             Vector3 farCenter = cameraPos + lookDir * zfar;
@@ -304,7 +304,7 @@ namespace TheMaths
             float nearHalfWidth = nearHalfHeight * aspect;
             float farHalfWidth = farHalfHeight * aspect;
 
-            Vector3 rightDir = Vector3.Normalize(Vector3.Cross(upDir, lookDir));
+            Vector3 rightDir = Vectors.Normalize(Vector3.Cross(upDir, lookDir));
             Vector3 Near1 = nearCenter - nearHalfHeight * upDir + nearHalfWidth * rightDir;
             Vector3 Near2 = nearCenter + nearHalfHeight * upDir + nearHalfWidth * rightDir;
             Vector3 Near3 = nearCenter + nearHalfHeight * upDir - nearHalfWidth * rightDir;
@@ -329,7 +329,7 @@ namespace TheMaths
             result.pTop.Normalize();
             result.pBottom.Normalize();
 
-            result.pMatrix = Matrix.LookAtLH(cameraPos, cameraPos + lookDir * 10, upDir) * Matrix.PerspectiveFovLH(fov, aspect, znear, zfar);
+            result.pMatrix = Matrix.CreateLookAt(cameraPos, cameraPos + lookDir * 10, upDir) * Matrix.CreatePerspectiveFieldOfView(fov, aspect, znear, zfar);
 
             return result;
         }
@@ -394,7 +394,7 @@ namespace TheMaths
             var cameraParam = new FrustumCameraParams();
             cameraParam.Position = Get3PlanesInterPoint(ref pRight, ref pTop, ref pLeft);
             cameraParam.LookAtDir = pNear.Normal;
-            cameraParam.UpDir = Vector3.Normalize(Vector3.Cross(pRight.Normal, pNear.Normal));
+            cameraParam.UpDir = Vectors.Normalize(Vector3.Cross(pRight.Normal, pNear.Normal));
             cameraParam.FOV = (float)((Math.PI / 2.0 - Math.Acos(Vector3.Dot(pNear.Normal, pTop.Normal))) * 2);
             cameraParam.AspectRatio = (corners[6] - corners[5]).Length() / (corners[4] - corners[5]).Length();
             cameraParam.ZNear = (cameraParam.Position + (pNear.Normal * pNear.D)).Length();

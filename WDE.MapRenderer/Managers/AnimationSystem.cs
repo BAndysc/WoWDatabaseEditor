@@ -129,21 +129,21 @@ public class AnimationSystem
             var position = GetFirstOrDefaultVector3(IDX, boneData.translation, Vector3.Zero, t);
             var scaling = GetFirstOrDefaultVector3(IDX, boneData.scale, Vector3.One, t);
             var rotation = GetFirstOrDefaultQuaternion(IDX, boneData.rotation, Quaternion.Identity, t);
-            boneMatrix = Matrix.RotationQuaternion(in rotation);
+            boneMatrix = Matrix.CreateFromQuaternion(rotation);
             if (scaling.X != 1 || scaling.Y != 1 || scaling.Z != 1)
-                boneMatrix *= Matrix.Scaling(in scaling);
-            if (!position.IsZero)
-                boneMatrix *= Matrix.Translation(in position);
+                boneMatrix *= Matrix.CreateScale(scaling);
+            if (position.X != 0 || position.Y != 0 || position.Z != 0)
+                boneMatrix *= Matrix.CreateTranslation(position);
         }
         else
         {
             boneMatrix = Matrix.Identity;
         }
 
-        if (!boneData.pivot.IsZero)
+        if (boneData.pivot.X != 0 || boneData.pivot.Y != 0 || boneData.pivot.Z != 0)
         {
-            var mPivot = Matrix.Translation(boneData.pivot);
-            var mInvPivot = Matrix.Translation(-boneData.pivot);
+            var mPivot = Matrix.CreateTranslation(boneData.pivot);
+            var mInvPivot = Matrix.CreateTranslation(-boneData.pivot);
             boneMatrix = mInvPivot * boneMatrix * mPivot;            
         }
 
@@ -295,7 +295,7 @@ public class AnimationSystem
                         {
                             var parentMatrix = GetBoneMatrixRecursive(attachedTo.Model, attachedToBone, attachedTo._time, attachedTo._animInternalIndex);
                             for (int j = 0; j < bonesLength; ++j)
-                                localBones[j] *= Matrix.Translation(offset) * parentMatrix;
+                                localBones[j] *= Matrix.CreateTranslation(offset) * parentMatrix;
                         }
 
                         attachmentType = attachedTo.AttachmentType ?? M2AttachmentType.ItemVisual0;

@@ -237,8 +237,8 @@ namespace TheMaths
         public Vector3 Project(Vector3 source, Matrix projection, Matrix view, Matrix world)
         {
             Matrix matrix;
-            Matrix.Multiply(ref world, ref view, out matrix);
-            Matrix.Multiply(ref matrix, ref projection, out matrix);
+            matrix = Matrix.Multiply(world, view);
+            matrix = Matrix.Multiply(matrix, projection);
 
             Vector3 vector;
             Project(ref source, ref matrix, out vector);
@@ -253,7 +253,7 @@ namespace TheMaths
         /// <param name="vector">The projected vector.</param>
         public void Project(ref Vector3 source, ref Matrix matrix, out Vector3 vector)
         {
-            Vector3.Transform(ref source, ref matrix, out vector);
+            vector = Vector3.Transform(source, matrix);
             float a = (((source.X * matrix.M14) + (source.Y * matrix.M24)) + (source.Z * matrix.M34)) + matrix.M44;
 
             if (!MathUtil.IsOne(a))
@@ -277,9 +277,9 @@ namespace TheMaths
         public Vector3 Unproject(Vector3 source, Matrix projection, Matrix view, Matrix world)
         {
             Matrix matrix;
-            Matrix.Multiply(ref world, ref view, out matrix);
-            Matrix.Multiply(ref matrix, ref projection, out matrix);
-            Matrix.Invert(ref matrix, out matrix);
+            matrix = Matrix.Multiply(world, view);
+            matrix = Matrix.Multiply(matrix, projection);
+            Matrix.Invert(matrix, out matrix);
 
             Vector3 vector;
             Unproject(ref source, ref matrix, out vector);
@@ -299,7 +299,7 @@ namespace TheMaths
             vector.Z = (source.Z - MinDepth) / (MaxDepth - MinDepth);
 
             float a = (((vector.X * matrix.M14) + (vector.Y * matrix.M24)) + (vector.Z * matrix.M34)) + matrix.M44;
-            Vector3.Transform(ref vector, ref matrix, out vector);
+            vector = Vector3.Transform(vector, matrix);
 
             if (!MathUtil.IsOne(a))
             {

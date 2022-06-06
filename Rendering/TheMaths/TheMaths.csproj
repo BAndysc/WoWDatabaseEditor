@@ -7,4 +7,5 @@
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
+    <Import Project="..\lib3d.props" />
 </Project>

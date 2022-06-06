@@ -27,8 +27,7 @@ namespace TheEngine.Components
             set
             {
                 matrix = value;
-                inv = matrix;
-                inv.Invert();
+                Matrix.Invert(matrix, out inv);
             }
         }
         private Matrix inv;
@@ -38,35 +37,34 @@ namespace TheEngine.Components
         private LocalToWorld(Matrix matrix)
         {
             this.matrix = matrix;
-            inv = matrix;
-            inv.Invert();
+            Matrix.Invert(matrix, out inv);
         }
 
         public Vector3 Position
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => matrix.TranslationVector;
+            get => matrix.Translation;
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            set => matrix = Matrix.TRS(value, Rotation, Scale);
+            set => matrix = Utilities.TRS(value, Rotation, Scale);
         }
 
         public Vector3 Scale
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => matrix.ScaleVector;
+            get => matrix.ScaleVector();
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            set => matrix = Matrix.TRS(Position, Rotation, value);
+            set => matrix = Utilities.TRS(Position, Rotation, value);
         }
 
         public Quaternion Rotation
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => matrix.Rotation;
+            get => matrix.Rotation();
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            set => matrix = Matrix.TRS(Position, value, Scale);
+            set => matrix = Utilities.TRS(Position, value, Scale);
         }
 
         public static implicit operator Matrix(LocalToWorld d) => d.matrix;
@@ -82,7 +80,7 @@ namespace TheEngine.Components
         
         public static void SetTRS(this Entity entity, IEntityManager entityManager, in Vector3 position, in Quaternion rotation, in Vector3 scale)
         {
-            entityManager.GetComponent<LocalToWorld>(entity).Matrix = Matrix.TRS(in position, in rotation, in scale);
+            entityManager.GetComponent<LocalToWorld>(entity).Matrix = Utilities.TRS(in position, in rotation, in scale);
         }
     }
 }

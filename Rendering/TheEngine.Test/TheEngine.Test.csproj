@@ -17,5 +17,6 @@
     <ItemGroup>
       <ProjectReference Include="..\TheEngine\TheEngine.csproj" />
     </ItemGroup>
-
+    
+    <Import Project="..\lib3d.props" />
 </Project>

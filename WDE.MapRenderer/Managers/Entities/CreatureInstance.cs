@@ -30,11 +30,11 @@ public class CreatureInstance : WorldObjectInstance
         get
         {
             var rot = gameContext.EntityManager.GetComponent<LocalToWorld>(objectEntity).Rotation;
-            return rot.Angle * rot.Axis.Z;
+            return rot.Angle() * rot.Axis().Z;
         }
         set
         {
-            gameContext.EntityManager.GetComponent<LocalToWorld>(objectEntity).Rotation = Quaternion.FromEuler(0, MathUtil.RadiansToDegrees(value), 0);
+            gameContext.EntityManager.GetComponent<LocalToWorld>(objectEntity).Rotation = Utilities.FromEuler(0, MathUtil.RadiansToDegrees(value), 0);
             objectEntity.SetDirtyPosition(gameContext.EntityManager);
         }
     }

@@ -22,7 +22,6 @@ using WDE.MPQ;
 using WDE.Parameters;
 using WDE.Trinity;
 using WDE.TrinityMySqlDatabase;
-using Vector3 = TheMaths.Vector3;
 
 var nativeWindowSettings = new NativeWindowSettings()
 {

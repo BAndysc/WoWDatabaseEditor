@@ -48,13 +48,13 @@ namespace WDE.MapRenderer.Utils
             this.material = material;
         }
 
-        private static readonly Quaternion ArrowX = Quaternion.LookRotation(Vector3.Left, Vector3.Up);
-        private static readonly Quaternion ArrowY = Quaternion.LookRotation(Vector3.Backward, Vector3.Up);
-        private static readonly Quaternion ArrowZ = Quaternion.FromEuler(0, 0, -90);
+        private static readonly Quaternion ArrowX = Utilities.LookRotation(Vectors.Left, Vectors.Up);
+        private static readonly Quaternion ArrowY = Utilities.LookRotation(Vectors.Backward, Vectors.Up);
+        private static readonly Quaternion ArrowZ = Utilities.FromEuler(0, 0, -90);
         
-        private static readonly Quaternion PlaneZ = Quaternion.LookRotation(Vector3.Forward, Vector3.Up);
-        private static readonly Quaternion PlaneY = Quaternion.FromEuler(-90, 0, -90);
-        private static readonly Quaternion PlaneX = Quaternion.LookRotation(Vector3.Up, Vector3.Up);
+        private static readonly Quaternion PlaneZ = Utilities.LookRotation(Vectors.Forward, Vectors.Up);
+        private static readonly Quaternion PlaneY = Utilities.FromEuler(-90, 0, -90);
+        private static readonly Quaternion PlaneX = Utilities.LookRotation(Vectors.Up, Vectors.Up);
 
         // wow direction hit test
         public enum HitType
@@ -184,7 +184,7 @@ namespace WDE.MapRenderer.Utils
         
         private GizmoMode dragging = GizmoMode.NoDragging;
 
-        private Plane plane;
+        private TheMaths.Plane plane;
         private Vector3? axis;
         private readonly List<(T item, Quaternion original_rotation)> rotable = new();
         private readonly List<(T item, Vector3 original_position, Vector3 offset)> draggable = new();
@@ -228,7 +228,7 @@ namespace WDE.MapRenderer.Utils
             if (!IsEnabled)
                 return;
             
-            gizmo.position.Position = GizmoPosition + Vector3.Up;
+            gizmo.position.Position = GizmoPosition + Vectors.Up;
             gizmo.Render(cameraManager, renderManager);
 
             if (dragging == GizmoMode.Rotation)
@@ -308,7 +308,7 @@ namespace WDE.MapRenderer.Utils
                     for (var index = 0; index < rotable.Count; index++)
                     {
                         var item = rotable[index];
-                        var rot = Quaternion.RotationAxis(axis.Value, Vector3.Dot(touch - originalTouch, axis.Value)) * item.original_rotation;
+                        var rot = Quaternion.CreateFromAxisAngle(axis.Value, Vector3.Dot(touch - originalTouch, axis.Value)) * item.original_rotation;
                         Rotate(item.item, rot);
                     }
                 }
@@ -322,7 +322,7 @@ namespace WDE.MapRenderer.Utils
                 {
                     var dragged = draggable[index];
                     var position = GetPosition(dragged.item);
-                    raycastSystem.RaycastAll(new Ray(position.WithZ(4000), Vector3.Down), position, result,
+                    raycastSystem.RaycastAll(new Ray(position.WithZ(4000), Vectors.Down), position, result,
                         collisionMask);
                     if (result.Count > 0)
                     {
@@ -406,7 +406,7 @@ namespace WDE.MapRenderer.Utils
             draggable.Clear();
         }
 
-        private void GetDragAxisAndPlane(Gizmo.HitType mode, out Vector3? axis, out Plane plane)
+        private void GetDragAxisAndPlane(Gizmo.HitType mode, out Vector3? axis, out TheMaths.Plane plane)
         {
             axis = null;
             plane = default;
@@ -417,21 +417,21 @@ namespace WDE.MapRenderer.Utils
                     break;
                 case Gizmo.HitType.TranslateZY:
                     axis = null;
-                    plane = new Plane(gizmo.position.Position, new Vector3(1, 0, 0));
+                    plane = new TheMaths.Plane(gizmo.position.Position, new Vector3(1, 0, 0));
                     break;
                 case Gizmo.HitType.TranslateZ:
                     axis = new Vector3(0, 0, 1);
                     break;
                 case Gizmo.HitType.TranslateXY:
                     axis = null;
-                    plane = new Plane(gizmo.position.Position, new Vector3(0, 0, 1));
+                    plane = new TheMaths.Plane(gizmo.position.Position, new Vector3(0, 0, 1));
                     break;
                 case Gizmo.HitType.TranslateY:
                     axis = new Vector3(0, 1, 0);
                     break;
                 case Gizmo.HitType.TranslateXZ:
                     axis = null;
-                    plane = new Plane(gizmo.position.Position, new Vector3(0, 1, 0));
+                    plane = new TheMaths.Plane(gizmo.position.Position, new Vector3(0, 1, 0));
                     break;
                 case Gizmo.HitType.RotationX:
                     axis = new Vector3(1, 0, 0);
@@ -448,7 +448,7 @@ namespace WDE.MapRenderer.Utils
             {
                 Vector3 planeTangent = Vector3.Cross(axis.Value, gizmo.position.Position - cameraManager.MainCamera.Transform.Position);
                 Vector3 planeNormal = Vector3.Cross(axis.Value, planeTangent);
-                plane = new Plane(gizmo.position.Position, planeNormal);
+                plane = new TheMaths.Plane(gizmo.position.Position, planeNormal);
             }
         }
 
@@ -459,7 +459,7 @@ namespace WDE.MapRenderer.Utils
                 StartDragging(touchPoint, axis, plane, gizmoMode);
         }
         
-        private void StartDragging(Vector3 startTouchPoint, Vector3? axis, Plane plane, GizmoMode gizmoMode)
+        private void StartDragging(Vector3 startTouchPoint, Vector3? axis, TheMaths.Plane plane, GizmoMode gizmoMode)
         {
             originalTouch = startTouchPoint;
             dragging = gizmoMode;
@@ -499,7 +499,7 @@ namespace WDE.MapRenderer.Utils
                 StartRotation(touchPoint, axis, plane, gizmoMode);
         }
         
-        private void StartRotation(Vector3 startTouchPoint, Vector3? axis, Plane plane, GizmoMode gizmoMode)
+        private void StartRotation(Vector3 startTouchPoint, Vector3? axis, TheMaths.Plane plane, GizmoMode gizmoMode)
         {
             rotable.Clear();
             originalTouch2D = inputManager.Mouse.NormalizedPosition;

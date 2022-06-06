@@ -254,7 +254,7 @@ namespace TheMaths
             Vector3 center = Vector3.Zero;
             for (int i = start; i < upperEnd; ++i)
             {
-                Vector3.Add(ref points[i], ref center, out center);
+                center = Vector3.Add(points[i], center);
             }
 
             //This is the center of our sphere.
@@ -267,7 +267,7 @@ namespace TheMaths
                 //We are doing a relative distance comparison to find the maximum distance
                 //from the center of our sphere.
                 float distance;
-                Vector3.DistanceSquared(ref center, ref points[i], out distance);
+                distance = Vector3.DistanceSquared(center, points[i]);
 
                 if (distance > radius)
                     radius = distance;

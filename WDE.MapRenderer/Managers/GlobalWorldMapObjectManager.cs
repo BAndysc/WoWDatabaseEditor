@@ -51,7 +51,7 @@ public class GlobalWorldMapObjectManager
         
         var wmoTransform = new Transform();
         wmoTransform.Position = wmo.pos;
-        wmoTransform.Rotation = Quaternion.FromEuler(wmo.rot.X,  wmo.rot.Y + 180, wmo.rot.Z);
+        wmoTransform.Rotation = Utilities.FromEuler(wmo.rot.X,  wmo.rot.Y + 180, wmo.rot.Z);
                 
         foreach (var mesh in tcs.Task.Result.Meshes)
         {

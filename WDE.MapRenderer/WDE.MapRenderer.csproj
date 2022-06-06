@@ -11,8 +11,10 @@
     <PropertyGroup>
         <OutputPath>..\bin\$(Configuration)\</OutputPath>
     </PropertyGroup>
-    <Import Project="..\Module.props" />    
-
+    <Import Project="..\Module.props" />
+    
+    <Import Project="..\Rendering\lib3d.props" />
+    
     <ItemGroup>
         <ProjectReference Include="..\WDE.WorldMap\WDE.WorldMap.csproj" />
         <ProjectReference Include="..\WDE.Common.Avalonia\WDE.Common.Avalonia.csproj" />

@@ -96,7 +96,7 @@ namespace WDE.MapRenderer.Managers
                 {
                     height = areaTrigger.BoxHeight / 2;
                     t.Scale = new Vector3( areaTrigger.BoxLength / 2, areaTrigger.BoxWidth / 2, areaTrigger.BoxHeight/2);
-                    t.Rotation = Quaternion.FromEuler(0, MathUtil.RadiansToDegrees(areaTrigger.BoxYaw), 0.0f);
+                    t.Rotation = Utilities.FromEuler(0, MathUtil.RadiansToDegrees(areaTrigger.BoxYaw), 0.0f);
                     
                     renderManager.Render(boxMesh, transcluentMaterial, 0, t);
                     renderManager.Render(boxMesh, wireframe, 0, t);
@@ -112,7 +112,7 @@ namespace WDE.MapRenderer.Managers
                     renderManager.Render(sphereMesh, wireframeBehind, 0, t);
                 }
                 
-                uiManager.DrawWorldText("calibri", new Vector2(0.5f, 1f), "Areatrigger " + areaTrigger.Id, 2.5f, Matrix.TRS(t.Position + Vector3.Up * height, in Quaternion.Identity, in Vector3.One));
+                uiManager.DrawWorldText("calibri", new Vector2(0.5f, 1f), "Areatrigger " + areaTrigger.Id, 2.5f, Utilities.TRS(t.Position + Vectors.Up * height, Quaternion.Identity, Vector3.One));
             }
         }
     }

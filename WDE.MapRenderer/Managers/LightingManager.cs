@@ -103,15 +103,15 @@ namespace WDE.MapRenderer.Managers
             var sin = (float)Math.Sin(angle);
             var cos = (float)Math.Cos(angle);
             Vector3 sunPosition = new Vector3(0, -cos, sin);//sin * 30);//sin * 20, cos * 10, cos * 20);
-            var sunForward = (Vector3.Zero - sunPosition).Normalized;
+            var sunForward = Vectors.Normalize(Vector3.Zero - sunPosition);
             var moonForward = -sunForward;
 
             lightManager.MainLight.LightPosition = sunPosition;
-            lightManager.MainLight.LightRotation = Quaternion.LookRotation(sunForward, Vector3.Up);
-            lightManager.MainLight.LightIntensity = Math.Max(Vector3.Dot(Vector3.Down, sunForward), 0);
+            lightManager.MainLight.LightRotation = Utilities.LookRotation(sunForward, Vectors.Up);
+            lightManager.MainLight.LightIntensity = Math.Max(Vector3.Dot(Vectors.Down, sunForward), 0);
             
-            lightManager.SecondaryLight.LightRotation = Quaternion.LookRotation(moonForward, Vector3.Up);
-            lightManager.SecondaryLight.LightIntensity = 0.5f * Math.Max(Vector3.Dot(Vector3.Down, moonForward), 0);
+            lightManager.SecondaryLight.LightRotation = Utilities.LookRotation(moonForward, Vectors.Up);
+            lightManager.SecondaryLight.LightIntensity = 0.5f * Math.Max(Vector3.Dot(Vectors.Down, moonForward), 0);
         }
 
         public void Render()

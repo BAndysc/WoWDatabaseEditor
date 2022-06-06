@@ -52,7 +52,7 @@ namespace TheMaths
         {
             var Center = bb.Minimum + (bb.Maximum - bb.Minimum) / 2f;
             Extents = bb.Maximum - Center;
-            Transformation = Matrix.Translation(Center);
+            Transformation = Matrix.CreateTranslation(Center);
         }
 
         /// <summary>
@@ -67,7 +67,7 @@ namespace TheMaths
         {
             var Center = minimum + (maximum - minimum) / 2f;
             Extents = maximum - Center;
-            Transformation = Matrix.Translation(Center);
+            Transformation = Matrix.CreateTranslation(Center);
         }
 
         /// <summary>
@@ -88,13 +88,13 @@ namespace TheMaths
 
             for (int i = 0; i < points.Length; ++i)
             {
-                Vector3.Min(ref minimum, ref points[i], out minimum);
-                Vector3.Max(ref maximum, ref points[i], out maximum);
+                minimum = Vector3.Min(minimum, points[i]);
+                maximum = Vector3.Max(maximum, points[i]);
             }
 
             var Center = minimum + (maximum - minimum) / 2f;
             Extents = maximum - Center;
-            Transformation = Matrix.Translation(Center);
+            Transformation = Matrix.CreateTranslation(Center);
         }
 
         /// <summary>
@@ -106,11 +106,11 @@ namespace TheMaths
             var xv = new Vector3(Extents.X, 0, 0);
             var yv = new Vector3(0, Extents.Y, 0);
             var zv = new Vector3(0, 0, Extents.Z);
-            Vector3.TransformNormal(ref xv, ref Transformation, out xv);
-            Vector3.TransformNormal(ref yv, ref Transformation, out yv);
-            Vector3.TransformNormal(ref zv, ref Transformation, out zv);
+            xv = Vector3.TransformNormal(xv, Transformation);
+            yv = Vector3.TransformNormal(yv, Transformation);
+            zv = Vector3.TransformNormal(zv, Transformation);
 
-            var center = Transformation.TranslationVector;
+            var center = Transformation.Translation;
 
             var corners = new Vector3[8];
             corners[0] = center + xv + yv + zv;
@@ -187,7 +187,7 @@ namespace TheMaths
         /// <param name="translation">the translation vector.</param>
         public void Translate(ref Vector3 translation)
         {
-            Transformation.TranslationVector += translation;
+            Transformation.Translation += translation;
         }
 
         /// <summary>
@@ -196,7 +196,7 @@ namespace TheMaths
         /// <param name="translation">the translation vector.</param>
         public void Translate(Vector3 translation)
         {
-            Transformation.TranslationVector += translation;
+            Transformation.Translation += translation;
         }
 
         /// <summary>
@@ -227,9 +227,9 @@ namespace TheMaths
             var xv = new Vector3(Extents.X * 2, 0, 0);
             var yv = new Vector3(0, Extents.Y * 2, 0);
             var zv = new Vector3(0, 0, Extents.Z * 2);
-            Vector3.TransformNormal(ref xv, ref Transformation, out xv);
-            Vector3.TransformNormal(ref yv, ref Transformation, out yv);
-            Vector3.TransformNormal(ref zv, ref Transformation, out zv);
+            xv = Vector3.TransformNormal(xv, Transformation);
+            yv = Vector3.TransformNormal(yv, Transformation);
+            zv = Vector3.TransformNormal(zv, Transformation);
 
             return new Vector3(xv.Length(), yv.Length(), zv.Length());
         }
@@ -243,9 +243,9 @@ namespace TheMaths
             var xv = new Vector3(Extents.X * 2, 0, 0);
             var yv = new Vector3(0, Extents.Y * 2, 0);
             var zv = new Vector3(0, 0, Extents.Z * 2);
-            Vector3.TransformNormal(ref xv, ref Transformation, out xv);
-            Vector3.TransformNormal(ref yv, ref Transformation, out yv);
-            Vector3.TransformNormal(ref zv, ref Transformation, out zv);
+            xv = Vector3.TransformNormal(xv, Transformation);
+            yv = Vector3.TransformNormal(yv, Transformation);
+            zv = Vector3.TransformNormal(zv, Transformation);
 
             return new Vector3(xv.LengthSquared(), yv.LengthSquared(), zv.LengthSquared());
         }
@@ -257,7 +257,7 @@ namespace TheMaths
         {
             get
             {
-                return Transformation.TranslationVector;
+                return Transformation.Translation;
             }
         }
 
@@ -270,10 +270,10 @@ namespace TheMaths
         {
             // Transform the point into the obb coordinates
             Matrix invTrans;
-            Matrix.Invert(ref Transformation, out invTrans);
+            Matrix.Invert(Transformation, out invTrans);
 
             Vector3 locPoint;
-            Vector3.TransformCoordinate(ref point, ref invTrans, out locPoint);
+            locPoint = Utilities.TransformCoordinate(point, invTrans);
 
             locPoint.X = Math.Abs(locPoint.X);
             locPoint.Y = Math.Abs(locPoint.Y);
@@ -306,7 +306,7 @@ namespace TheMaths
         public ContainmentType Contains(Vector3[] points)
         {
             Matrix invTrans;
-            Matrix.Invert(ref Transformation, out invTrans);
+            Matrix.Invert(Transformation, out invTrans);
 
             var containsAll = true;
             var containsAny = false;
@@ -314,7 +314,7 @@ namespace TheMaths
             for (int i = 0; i < points.Length; i++)
             {
                 Vector3 locPoint;
-                Vector3.TransformCoordinate(ref points[i], ref invTrans, out locPoint);
+                locPoint = Utilities.TransformCoordinate(points[i], invTrans);
 
                 locPoint.X = Math.Abs(locPoint.X);
                 locPoint.Y = Math.Abs(locPoint.Y);
@@ -352,11 +352,11 @@ namespace TheMaths
         public ContainmentType Contains(BoundingSphere sphere, bool IgnoreScale = false)
         {
             Matrix invTrans;
-            Matrix.Invert(ref Transformation, out invTrans);
+            Matrix.Invert(Transformation, out invTrans);
 
             // Transform sphere center into the obb coordinates
             Vector3 locCenter;
-            Vector3.TransformCoordinate(ref sphere.Center, ref invTrans, out locCenter);
+            locCenter = Utilities.TransformCoordinate(sphere.Center, invTrans);
 
             float locRadius;
             if (IgnoreScale)
@@ -365,14 +365,14 @@ namespace TheMaths
             {
                 // Transform sphere radius into the obb coordinates
                 Vector3 vRadius = Vector3.UnitX * sphere.Radius;
-                Vector3.TransformNormal(ref vRadius, ref invTrans, out vRadius);
+                vRadius = Vector3.TransformNormal(vRadius, invTrans);
                 locRadius = vRadius.Length();
             }
 
             //Perform regular BoundingBox to BoundingSphere containment check
             Vector3 minusExtens = -Extents;
             Vector3 vector;
-            Vector3.Clamp(ref locCenter, ref minusExtens, ref Extents, out vector);
+            vector = Vector3.Clamp(locCenter, minusExtens, Extents);
             float distance = Vector3.DistanceSquared(locCenter, vector);
 
             if (distance > locRadius * locRadius)
@@ -428,8 +428,8 @@ namespace TheMaths
             for (i = 0; i < 3; i++)
                 for (k = 0; k < 3; k++)
                 {
-                    R[i, k] = Vector3.Dot(RotA[i], RotB[k]);
-                    AR[i, k] = Math.Abs(R[i, k]);
+                    R.Index(i, k) = Vector3.Dot(RotA[i], RotB[k]);
+                    AR.Index(i, k) = Math.Abs(R.Index(i, k));
                 }
 
 
@@ -441,9 +441,9 @@ namespace TheMaths
             // Test if any of A's basis vectors separate the box
             for (i = 0; i < 3; i++)
             {
-                ExtentA = SizeA[i];
-                ExtentB = Vector3.Dot(SizeB, new Vector3(AR[i, 0], AR[i, 1], AR[i, 2]));
-                Separation = Math.Abs(vSepA[i]);
+                ExtentA = SizeA.Index(i);
+                ExtentB = Vector3.Dot(SizeB, new Vector3(AR.Index(i, 0), AR.Index(i, 1), AR.Index(i, 2)));
+                Separation = Math.Abs(vSepA.Index(i));
 
                 if (Separation > ExtentA + ExtentB)
                     return ContainmentType.Disjoint;
@@ -452,9 +452,9 @@ namespace TheMaths
             // Test if any of B's basis vectors separate the box
             for (k = 0; k < 3; k++)
             {
-                ExtentA = Vector3.Dot(SizeA, new Vector3(AR[0, k], AR[1, k], AR[2, k]));
-                ExtentB = SizeB[k];
-                Separation = Math.Abs(Vector3.Dot(vSepA, new Vector3(R[0, k], R[1, k], R[2, k])));
+                ExtentA = Vector3.Dot(SizeA, new Vector3(AR.Index(0, k), AR.Index(1, k), AR.Index(2, k)));
+                ExtentB = SizeB.Index(k);
+                Separation = Math.Abs(Vector3.Dot(vSepA, new Vector3(R.Index(0, k), R.Index(1, k), R.Index(2, k))));
 
                 if (Separation > ExtentA + ExtentB)
                     return ContainmentType.Disjoint;
@@ -466,9 +466,9 @@ namespace TheMaths
                 {
                     int i1 = (i + 1) % 3, i2 = (i + 2) % 3;
                     int k1 = (k + 1) % 3, k2 = (k + 2) % 3;
-                    ExtentA = SizeA[i1] * AR[i2, k] + SizeA[i2] * AR[i1, k];
-                    ExtentB = SizeB[k1] * AR[i, k2] + SizeB[k2] * AR[i, k1];
-                    Separation = Math.Abs(vSepA[i2] * R[i1, k] - vSepA[i1] * R[i2, k]);
+                    ExtentA = SizeA.Index(i1) * AR.Index(i2, k) + SizeA.Index(i2) * AR.Index(i1, k);
+                    ExtentB = SizeB.Index(k1) * AR.Index(i, k2) + SizeB.Index(k2) * AR.Index(i, k1);
+                    Separation = Math.Abs(vSepA.Index(i2) * R.Index(i1, k) - vSepA.Index(i1) * R.Index(i2, k));
                     if (Separation > ExtentA + ExtentB)
                         return ContainmentType.Disjoint;
                 }
@@ -496,12 +496,12 @@ namespace TheMaths
             //http://www.3dkingdoms.com/weekly/bbox.cpp
             // Put line in box space
             Matrix invTrans;
-            Matrix.Invert(ref Transformation, out invTrans);
+            Matrix.Invert(Transformation, out invTrans);
 
             Vector3 LB1;
-            Vector3.TransformCoordinate(ref L1, ref invTrans, out LB1);
+            LB1 = Utilities.TransformCoordinate(L1, invTrans);
             Vector3 LB2;
-            Vector3.TransformCoordinate(ref L1, ref invTrans, out LB2);
+            LB2 = Utilities.TransformCoordinate(L1, invTrans);
 
             // Get line midpoint and extent
             var LMid = (LB1 + LB2) * 0.5f;
@@ -547,13 +547,13 @@ namespace TheMaths
             int i, k;
 
             Matrix R;                   // Rotation from B to A
-            Matrix.Invert(ref Transformation, out R);
+            Matrix.Invert(Transformation, out R);
             var AR = new Matrix();      // absolute values of R matrix, to use with box extents
 
             for (i = 0; i < 3; i++)
                 for (k = 0; k < 3; k++)
                 {
-                    AR[i, k] = Math.Abs(R[i, k]);
+                    AR.Index(i, k) = Math.Abs(R.Index(i, k));
                 }
 
 
@@ -565,9 +565,9 @@ namespace TheMaths
             // Test if any of A's basis vectors separate the box
             for (i = 0; i < 3; i++)
             {
-                ExtentA = SizeA[i];
-                ExtentB = Vector3.Dot(SizeB, new Vector3(AR[i, 0], AR[i, 1], AR[i, 2]));
-                Separation = Math.Abs(vSepA[i]);
+                ExtentA = SizeA.Index(i);
+                ExtentB = Vector3.Dot(SizeB, new Vector3(AR.Index(i, 0), AR.Index(i, 1), AR.Index(i, 2)));
+                Separation = Math.Abs(vSepA.Index(i));
 
                 if (Separation > ExtentA + ExtentB)
                     return ContainmentType.Disjoint;
@@ -576,9 +576,9 @@ namespace TheMaths
             // Test if any of B's basis vectors separate the box
             for (k = 0; k < 3; k++)
             {
-                ExtentA = Vector3.Dot(SizeA, new Vector3(AR[0, k], AR[1, k], AR[2, k]));
-                ExtentB = SizeB[k];
-                Separation = Math.Abs(Vector3.Dot(vSepA, new Vector3(R[0, k], R[1, k], R[2, k])));
+                ExtentA = Vector3.Dot(SizeA, new Vector3(AR.Index(0, k), AR.Index(1, k), AR.Index(2, k)));
+                ExtentB = SizeB.Index(k);
+                Separation = Math.Abs(Vector3.Dot(vSepA, new Vector3(R.Index(0, k), R.Index(1, k), R.Index(2, k))));
 
                 if (Separation > ExtentA + ExtentB)
                     return ContainmentType.Disjoint;
@@ -590,9 +590,9 @@ namespace TheMaths
                 {
                     int i1 = (i + 1) % 3, i2 = (i + 2) % 3;
                     int k1 = (k + 1) % 3, k2 = (k + 2) % 3;
-                    ExtentA = SizeA[i1] * AR[i2, k] + SizeA[i2] * AR[i1, k];
-                    ExtentB = SizeB[k1] * AR[i, k2] + SizeB[k2] * AR[i, k1];
-                    Separation = Math.Abs(vSepA[i2] * R[i1, k] - vSepA[i1] * R[i2, k]);
+                    ExtentA = SizeA.Index(i1) * AR.Index(i2, k) + SizeA.Index(i2) * AR.Index(i1, k);
+                    ExtentB = SizeB.Index(k1) * AR.Index(i, k2) + SizeB.Index(k2) * AR.Index(i, k1);
+                    Separation = Math.Abs(vSepA.Index(i2) * R.Index(i1, k) - vSepA.Index(i1) * R.Index(i2, k));
                     if (Separation > ExtentA + ExtentB)
                         return ContainmentType.Disjoint;
                 }
@@ -612,11 +612,11 @@ namespace TheMaths
         {
             // Put ray in box space
             Matrix invTrans;
-            Matrix.Invert(ref Transformation, out invTrans);
+            Matrix.Invert(Transformation, out invTrans);
 
             Ray bRay;
-            Vector3.TransformNormal(ref ray.Direction, ref invTrans, out bRay.Direction);
-            Vector3.TransformCoordinate(ref ray.Position, ref invTrans, out bRay.Position);
+            bRay.Direction = Vector3.TransformNormal(ray.Direction, invTrans);
+            bRay.Position = Utilities.TransformCoordinate(ray.Position, invTrans);
 
             //Perform a regular ray to BoundingBox check
             var bb = new BoundingBox(-Extents, Extents);
@@ -624,7 +624,7 @@ namespace TheMaths
 
             //Put the result intersection back to world
             if (intersects)
-                Vector3.TransformCoordinate(ref point, ref Transformation, out point);
+                point = Utilities.TransformCoordinate(point, Transformation);
 
             return intersects;
         }
@@ -647,12 +647,12 @@ namespace TheMaths
             var zv = new Vector3(0, 0, Extents.Z);
 
             var corners = new Vector3[8];
-            corners[0] = +xv + yv + zv;
-            corners[1] = +xv + yv - zv;
+            corners[0] = xv + yv + zv;
+            corners[1] = xv + yv - zv;
             corners[2] = -xv + yv - zv;
             corners[3] = -xv + yv + zv;
-            corners[4] = +xv - yv + zv;
-            corners[5] = +xv - yv - zv;
+            corners[4] = xv - yv + zv;
+            corners[5] = xv - yv - zv;
             corners[6] = -xv - yv - zv;
             corners[7] = -xv - yv + zv;
 
@@ -690,7 +690,7 @@ namespace TheMaths
                 int i, k;
                 for (i = 0; i < 3; i++)
                     for (k = 0; k < 3; k++)
-                        AtoB_Matrix[i, k] = Vector3.Dot(RotB[i], RotA[k]);
+                        AtoB_Matrix.Index(i, k) = Vector3.Dot(RotB[i], RotA[k]);
                 var v = B.Center - A.Center;
                 AtoB_Matrix.M41 = Vector3.Dot(v, RotA[0]);
                 AtoB_Matrix.M42 = Vector3.Dot(v, RotA[1]);
@@ -700,7 +700,7 @@ namespace TheMaths
             else
             {
                 Matrix AInvMat;
-                Matrix.Invert(ref A.Transformation, out AInvMat);
+                Matrix.Invert(A.Transformation, out AInvMat);
                 AtoB_Matrix = B.Transformation * AInvMat;
             }
 
@@ -724,7 +724,7 @@ namespace TheMaths
 
             //Get B corners in A Space
             var bCorners = B.GetLocalCorners();
-            Vector3.TransformCoordinate(bCorners, ref AtoB_Matrix, bCorners);
+            Utilities.TransformCoordinate(bCorners, ref AtoB_Matrix, bCorners);
 
             //Get A local Bounding Box
             var A_LocalBB = new BoundingBox(-A.Extents, A.Extents);
@@ -739,8 +739,8 @@ namespace TheMaths
             //Find the new Extents and Center, Transform Center back to world
             var newCenter = mergedBB.Minimum + (mergedBB.Maximum - mergedBB.Minimum) / 2f;
             A.Extents = mergedBB.Maximum - newCenter;
-            Vector3.TransformCoordinate(ref newCenter, ref A.Transformation, out newCenter);
-            A.Transformation.TranslationVector = newCenter;
+            newCenter = Utilities.TransformCoordinate(newCenter, A.Transformation);
+            A.Transformation.Translation = newCenter;
         }
 
         /// <summary>

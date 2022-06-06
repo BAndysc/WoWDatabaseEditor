@@ -474,7 +474,7 @@ namespace TheMaths
             rotationMatrix3x3.M32 = M32 / scale.Z;
             rotationMatrix3x3.M33 = M33 / scale.Z;
 
-            Quaternion.RotationMatrix(ref rotationMatrix3x3, out rotation);
+            Utilities.RotationMatrix(ref rotationMatrix3x3, out rotation);
             return true;
         }
 
@@ -514,7 +514,7 @@ namespace TheMaths
             rotationmatrix.M32 = M32 * inv_scale;
             rotationmatrix.M33 = M33 * inv_scale;
 
-            Quaternion.RotationMatrix(ref rotationmatrix, out rotation);
+            Utilities.RotationMatrix(ref rotationmatrix, out rotation);
             return true;
         }
 
@@ -1124,14 +1124,14 @@ namespace TheMaths
             //By separating the above algorithm into multiple lines, we actually increase accuracy.
             result = value;
 
-            result.Row1 = Vector3.Normalize(result.Row1);
+            result.Row1 = Vectors.Normalize(result.Row1);
 
             result.Row2 = result.Row2 - Vector3.Dot(result.Row1, result.Row2) * result.Row1;
-            result.Row2 = Vector3.Normalize(result.Row2);
+            result.Row2 = Vectors.Normalize(result.Row2);
 
             result.Row3 = result.Row3 - Vector3.Dot(result.Row1, result.Row3) * result.Row1;
             result.Row3 = result.Row3 - Vector3.Dot(result.Row2, result.Row3) * result.Row2;
-            result.Row3 = Vector3.Normalize(result.Row3);
+            result.Row3 = Vectors.Normalize(result.Row3);
         }
 
         /// <summary>
@@ -1413,9 +1413,9 @@ namespace TheMaths
             else
                 difference *= (float)(1.0 / Math.Sqrt(lengthSq));
 
-            Vector3.Cross(ref cameraUpVector, ref difference, out crossed);
-            crossed.Normalize();
-            Vector3.Cross(ref difference, ref crossed, out final);
+            crossed = Vector3.Cross(cameraUpVector, difference);
+            crossed = Vectors.Normalize(crossed);
+            final = Vector3.Cross(difference, crossed);
 
             result.M11 = crossed.X;
             result.M12 = crossed.Y;
@@ -1463,9 +1463,9 @@ namespace TheMaths
             else
                 difference *= (float)(1.0 / Math.Sqrt(lengthSq));
 
-            Vector3.Cross(ref cameraUpVector, ref difference, out crossed);
-            crossed.Normalize();
-            Vector3.Cross(ref difference, ref crossed, out final);
+            crossed = Vector3.Cross(cameraUpVector, difference);
+            crossed = Vectors.Normalize(crossed);
+            final = Vector3.Cross(difference, crossed);
 
             result.M11 = crossed.X;
             result.M12 = crossed.Y;
@@ -1503,9 +1503,11 @@ namespace TheMaths
         public static void LookAtLH(ref Vector3 eye, ref Vector3 target, ref Vector3 up, out Matrix3x3 result)
         {
             Vector3 xaxis, yaxis, zaxis;
-            Vector3.Subtract(ref target, ref eye, out zaxis); zaxis.Normalize();
-            Vector3.Cross(ref up, ref zaxis, out xaxis); xaxis.Normalize();
-            Vector3.Cross(ref zaxis, ref xaxis, out yaxis);
+            zaxis = target - eye;
+            zaxis = Vectors.Normalize(zaxis);
+            xaxis = Vector3.Cross(up, zaxis); 
+            xaxis = Vectors.Normalize(xaxis);
+            yaxis = Vector3.Cross(zaxis, xaxis);
 
             result = Matrix3x3.Identity;
             result.M11 = xaxis.X; result.M21 = xaxis.Y; result.M31 = xaxis.Z;
@@ -1537,9 +1539,11 @@ namespace TheMaths
         public static void LookAtRH(ref Vector3 eye, ref Vector3 target, ref Vector3 up, out Matrix3x3 result)
         {
             Vector3 xaxis, yaxis, zaxis;
-            Vector3.Subtract(ref eye, ref target, out zaxis); zaxis.Normalize();
-            Vector3.Cross(ref up, ref zaxis, out xaxis); xaxis.Normalize();
-            Vector3.Cross(ref zaxis, ref xaxis, out yaxis);
+            zaxis = eye - target;
+            zaxis = Vectors.Normalize(zaxis);
+            xaxis = Vector3.Cross(up, zaxis);
+            xaxis = Vectors.Normalize(xaxis);
+            yaxis = Vector3.Cross(zaxis, xaxis);
 
             result = Matrix3x3.Identity;
             result.M11 = xaxis.X; result.M21 = xaxis.Y; result.M31 = xaxis.Z;
@@ -1818,7 +1822,7 @@ namespace TheMaths
         public static void RotationYawPitchRoll(float yaw, float pitch, float roll, out Matrix3x3 result)
         {
             Quaternion quaternion = new Quaternion();
-            Quaternion.RotationYawPitchRoll(yaw, pitch, roll, out quaternion);
+            quaternion = Quaternion.CreateFromYawPitchRoll(yaw, pitch, roll);// RotationYawPitchRoll(yaw, pitch, roll, out quaternion);
             RotationQuaternion(ref quaternion, out result);
         }
 

@@ -168,7 +168,7 @@ namespace TheMaths
             //Reference: Page 126
 
             float dot;
-            Vector3.Dot(ref plane.Normal, ref point, out dot);
+            dot = Vector3.Dot(plane.Normal, point);
             float t = dot - plane.D;
 
             result = point - (t * plane.Normal);
@@ -187,7 +187,7 @@ namespace TheMaths
         //
         //     Vector3 temp;
         //     Vector3.Max(ref point, box.Minimum, out temp);
-        //     Vector3.Min(ref temp, ref box.Maximum, out result);
+        //     result = Vector3.Min(temp, box.Maximum);
         // }
 
         /// <summary>
@@ -203,8 +203,8 @@ namespace TheMaths
             //Reference: None
 
             //Get the unit direction from the sphere's center to the point.
-            Vector3.Subtract(ref point, ref sphere.Center, out result);
-            result.Normalize();
+            result = Vector3.Subtract(point, sphere.Center);
+            result = Vectors.Normalize(result);
 
             //Multiply the unit direction by the sphere's radius to get a vector
             //the length of the sphere.
@@ -232,8 +232,8 @@ namespace TheMaths
             //Reference: None
 
             //Get the unit direction from the first sphere's center to the second sphere's center.
-            Vector3.Subtract(ref sphere2.Center, ref sphere1.Center, out result);
-            result.Normalize();
+            result = Vector3.Subtract(sphere2.Center, sphere1.Center);
+            result = Vectors.Normalize(result);
 
             //Multiply the unit direction by the first sphere's radius to get a vector
             //the length of the first sphere.
@@ -255,7 +255,7 @@ namespace TheMaths
             //Reference: Page 127
 
             float dot;
-            Vector3.Dot(ref plane.Normal, ref point, out dot);
+            dot = Vector3.Dot(plane.Normal, point);
             return dot - plane.D;
         }
 
@@ -354,7 +354,7 @@ namespace TheMaths
             //Reference: None
 
             float distance;
-            Vector3.Distance(ref sphere.Center, ref point, out distance);
+            distance = Vector3.Distance(sphere.Center, point);
             distance -= sphere.Radius;
 
             return Math.Max(distance, 0f);
@@ -372,7 +372,7 @@ namespace TheMaths
             //Reference: None
 
             float distance;
-            Vector3.Distance(ref sphere1.Center, ref sphere2.Center, out distance);
+            distance = Vector3.Distance(sphere1.Center, sphere2.Center);
             distance -= sphere1.Radius + sphere2.Radius;
 
             return Math.Max(distance, 0f);
@@ -390,7 +390,7 @@ namespace TheMaths
             //Reference: None
 
             Vector3 m;
-            Vector3.Subtract(ref ray.Position, ref point, out m);
+            m = Vector3.Subtract(ray.Position, point);
 
             //Same thing as RayIntersectsSphere except that the radius of the sphere (point)
             //is the epsilon for zero.
@@ -433,7 +433,7 @@ namespace TheMaths
 
             Vector3 cross;
 
-            Vector3.Cross(ref ray1.Direction, ref ray2.Direction, out cross);
+            cross = Vector3.Cross(ray1.Direction, ray2.Direction);
             float denominator = cross.Length();
 
             //Lines are parallel.
@@ -520,7 +520,7 @@ namespace TheMaths
             //Reference: Page 175
 
             float direction;
-            Vector3.Dot(ref plane.Normal, ref ray.Direction, out direction);
+            direction = Vector3.Dot(plane.Normal, ray.Direction);
 
             if (MathUtil.IsZero(direction))
             {
@@ -529,7 +529,7 @@ namespace TheMaths
             }
 
             float position;
-            Vector3.Dot(ref plane.Normal, ref ray.Position, out position);
+            position = Vector3.Dot(plane.Normal, ray.Position);
             distance = (-plane.D - position) / direction;
 
             if (distance < 0f)
@@ -842,7 +842,7 @@ namespace TheMaths
             //Reference: Page 177
 
             Vector3 m;
-            Vector3.Subtract(ref ray.Position, ref sphere.Center, out m);
+            m = Vector3.Subtract(ray.Position, sphere.Center);
 
             float b = Vector3.Dot(m, ray.Direction);
             float c = Vector3.Dot(m, m) - (sphere.Radius * sphere.Radius);
@@ -899,7 +899,7 @@ namespace TheMaths
         public static PlaneIntersectionType PlaneIntersectsPoint(ref Plane plane, ref Vector3 point)
         {
             float distance;
-            Vector3.Dot(ref plane.Normal, ref point, out distance);
+            distance = Vector3.Dot(plane.Normal, point);
             distance += plane.D;
 
             if (distance > 0f)
@@ -920,12 +920,12 @@ namespace TheMaths
         public static bool PlaneIntersectsPlane(ref Plane plane1, ref Plane plane2)
         {
             Vector3 direction;
-            Vector3.Cross(ref plane1.Normal, ref plane2.Normal, out direction);
+            direction = Vector3.Cross(plane1.Normal, plane2.Normal);
 
             //If direction is the zero vector, the planes are parallel and possibly
             //coincident. It is not an intersection. The dot product will tell us.
             float denominator;
-            Vector3.Dot(ref direction, ref direction, out denominator);
+            denominator = Vector3.Dot(direction, direction);
 
             if (MathUtil.IsZero(denominator))
                 return false;
@@ -952,12 +952,12 @@ namespace TheMaths
             //Reference: Page 207
 
             Vector3 direction;
-            Vector3.Cross(ref plane1.Normal, ref plane2.Normal, out direction);
+            direction = Vector3.Cross(plane1.Normal, plane2.Normal);
 
             //If direction is the zero vector, the planes are parallel and possibly
             //coincident. It is not an intersection. The dot product will tell us.
             float denominator;
-            Vector3.Dot(ref direction, ref direction, out denominator);
+            denominator = Vector3.Dot(direction, direction);
 
             //We assume the planes are normalized, therefore the denominator
             //only serves as a parallel and coincident check. Otherwise we need
@@ -970,11 +970,11 @@ namespace TheMaths
 
             Vector3 point;
             Vector3 temp = plane1.D * plane2.Normal - plane2.D * plane1.Normal;
-            Vector3.Cross(ref temp, ref direction, out point);
+            point = Vector3.Cross(temp, direction);
 
             line.Position = point;
             line.Direction = direction;
-            line.Direction.Normalize();
+            line.Direction = Vectors.Normalize(line.Direction);
 
             return true;
         }
@@ -1027,7 +1027,7 @@ namespace TheMaths
             min.Z = (plane.Normal.Z >= 0.0f) ? box.Maximum.Z : box.Minimum.Z;
 
             float distance;
-            Vector3.Dot(ref plane.Normal, ref max, out distance);
+            distance = Vector3.Dot(plane.Normal, max);
 
             if (distance + plane.D > 0.0f)
                 return PlaneIntersectionType.Front;
@@ -1052,7 +1052,7 @@ namespace TheMaths
             //Reference: Page 160
 
             float distance;
-            Vector3.Dot(ref plane.Normal, ref sphere.Center, out distance);
+            distance = Vector3.Dot(plane.Normal, sphere.Center);
             distance += plane.D;
 
             if (distance > sphere.Radius)
@@ -1144,7 +1144,7 @@ namespace TheMaths
             Vector3 v = point - sphere.Center;
 
             float dot;
-            Vector3.Dot(ref v, ref v, out dot);
+            dot = Vector3.Dot(v, v);
 
             return dot <= sphere.Radius * sphere.Radius;
         }

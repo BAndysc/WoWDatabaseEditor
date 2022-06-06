@@ -1,5 +1,4 @@
-﻿using System;
-using OpenGLBindings;
+﻿using OpenGLBindings;
 using SixLabors.ImageSharp.PixelFormats;
 using TheAvaloniaOpenGL.Resources;
 using TheMaths;

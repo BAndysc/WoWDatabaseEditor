@@ -338,8 +338,8 @@ namespace TheMaths
 
             for (int i = 0; i < points.Length; ++i)
             {
-                Vector3.Min(ref min, ref points[i], out min);
-                Vector3.Max(ref max, ref points[i], out max);
+                min = Vector3.Min(min, points[i]);
+                max = Vector3.Max(max, points[i]);
             }
 
             result = new BoundingBox(min, max);
@@ -361,8 +361,8 @@ namespace TheMaths
 
             for (int i = 0; i < points.Length; ++i)
             {
-                Vector3.Min(ref min, ref points[i], out min);
-                Vector3.Max(ref max, ref points[i], out max);
+                min = Vector3.Min(min, points[i]);
+                max = Vector3.Max(max, points[i]);
             }
 
             return new BoundingBox(min, max);

@@ -282,7 +282,7 @@ namespace WDE.PacketViewer.Processing.Processors
                     {
                         var w = s.Waypoints[index];
                         thisPoint = new Vector2(w.X, w.Y);
-                        var thisForward = (thisPoint - prevPoint).Normalized;
+                        var thisForward = Vector2.Normalize(thisPoint - prevPoint);
                         var dotProduct = Vector2.Dot(prevForward, thisForward);
 
                         if (index != s.Waypoints.Count - 1 && // if this is the last point, then we want to check its angle

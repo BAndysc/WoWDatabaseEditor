@@ -127,7 +127,7 @@ namespace WDE.MapRenderer.Managers
         public float? HeightAtPosition(float x, float y, float? closestToZ)
         {
             var origin = new Vector3(x, y, closestToZ ?? 4000);
-            raycastSystem.RaycastAll(new Ray(origin.WithZ(4000), Vector3.Down), origin, outRaycast, Collisions.COLLISION_MASK_STATIC);
+            raycastSystem.RaycastAll(new Ray(origin.WithZ(4000), Vectors.Down), origin, outRaycast, Collisions.COLLISION_MASK_STATIC);
             if (outRaycast.Count > 0)
             {
                 float minDiff = float.MaxValue;
@@ -565,7 +565,7 @@ namespace WDE.MapRenderer.Managers
                 var t = new Transform();
                 t.Position = new Vector3(32 * Constants.BlockSize - m2.AbsolutePosition.Z, (32 * Constants.BlockSize - m2.AbsolutePosition.X), m2.AbsolutePosition.Y);
                 t.Scale = Vector3.One * m2.Scale;
-                t.Rotation = Quaternion.FromEuler(m2.Rotation.X, m2.Rotation.Y + 180,  m2.Rotation.Z);
+                t.Rotation = Utilities.FromEuler(m2.Rotation.X, m2.Rotation.Y + 180,  m2.Rotation.Z);
 
                 Entity entity;
                 NativeBuffer<Matrix>? bones = null;
@@ -623,7 +623,7 @@ namespace WDE.MapRenderer.Managers
                 
                 var wmoTransform = new Transform();
                 wmoTransform.Position = new Vector3((32 * Constants.BlockSize - wmoReference.AbsolutePosition.Z), (32 * Constants.BlockSize - wmoReference.AbsolutePosition.X), wmoReference.AbsolutePosition.Y);
-                wmoTransform.Rotation = Quaternion.FromEuler(wmoReference.Rotation.X,  wmoReference.Rotation.Y + 180, wmoReference.Rotation.Z);
+                wmoTransform.Rotation = Utilities.FromEuler(wmoReference.Rotation.X,  wmoReference.Rotation.Y + 180, wmoReference.Rotation.Z);
 
                 var tcs = new TaskCompletionSource<WmoManager.WmoInstance?>();
                 yield return wmoManager.LoadWorldMapObject(wmoReference.WmoPath, tcs);

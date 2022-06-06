@@ -12,6 +12,8 @@
       <PackageReference Include="OpenTK" Version="4.6.4" />
     </ItemGroup>
 
+    <Import Project="..\lib3d.props" />
+    
     <ItemGroup>
       <ProjectReference Include="..\..\WDE.AzerothCore\WDE.AzerothCore.csproj" />
       <ProjectReference Include="..\..\WDE.MapRenderer\WDE.MapRenderer.csproj" />

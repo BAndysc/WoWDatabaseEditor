@@ -27,8 +27,8 @@ namespace WDE.MapRenderer.Managers
             this.uiManager = uiManager;
 
             Position = new Vector3(285.396f, -4746.17f, 9.48428f + 20);
-            Rotation = Quaternion.LookRotation(
-                new Vector3(223.698f, -4745.11f, 10.1022f + 20) - Position, Vector3.Up);
+            Rotation = Utilities.LookRotation(
+                new Vector3(223.698f, -4745.11f, 10.1022f + 20) - Position, Vectors.Up);
             
             engineCamera.MainCamera.FOV = 75;
         }
@@ -49,18 +49,18 @@ namespace WDE.MapRenderer.Managers
                 yaw = Math.Clamp(yaw, 0, 179);
             }
             
-            Rotation = Quaternion.FromEuler(0, pitch, yaw);
-            var movement = inputManager.Keyboard.GetAxis(Vector3.Down, Key.W, Key.S) + 
-                           inputManager.Keyboard.GetAxis(Vector3.Backward, Key.A, Key.D) + 
-                           inputManager.Keyboard.GetAxis(Vector3.Left, Key.E, Key.Q);
-            movement.Normalize();
+            Rotation = Utilities.FromEuler(0, pitch, yaw);
+            var movement = inputManager.Keyboard.GetAxis(Vectors.Down, Key.W, Key.S) + 
+                           inputManager.Keyboard.GetAxis(Vectors.Backward, Key.A, Key.D) + 
+                           inputManager.Keyboard.GetAxis(Vectors.Left, Key.E, Key.Q);
+            movement = Vectors.Normalize(movement);
             float modifier = 0.4f;
             if (inputManager.Keyboard.IsDown(Key.LeftShift))
                 modifier = 15;
             if (inputManager.Keyboard.IsDown(Key.N))
                 modifier = 0.1f;
             float speed = 1 * (delta / 16.0f) * modifier;
-            Position += movement * Rotation * speed;
+            Position += movement.Multiply(Rotation) * speed;
 
             var camera = engineCamera.MainCamera;
             camera.Transform.Rotation = Rotation;

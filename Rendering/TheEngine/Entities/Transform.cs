@@ -1,6 +1,5 @@
 ﻿using Avalonia;
 using TheMaths;
-using Matrix = TheMaths.Matrix;
 
 namespace TheEngine.Entities
 {
@@ -39,7 +38,7 @@ namespace TheEngine.Entities
             }
         }
 
-        public Vector3 Forward => Vector3.Transform(Vector3.Forward, Rotation);
+        public Vector3 Forward => Vector3.Transform(Vectors.Forward, Rotation);
 
         public Transform()
         {
@@ -53,8 +52,8 @@ namespace TheEngine.Entities
 
         private void UpdateMatrix()
         {
-            LocalToWorldMatrix = Matrix.Transformation(Vector3.Zero, Quaternion.Identity, Scale, Vector3.Zero, Rotation, Position);
-            WorldToLocalMatrix = Matrix.Invert(LocalToWorldMatrix);
+            LocalToWorldMatrix = Utilities.Transformation(Vector3.Zero, Quaternion.Identity, Scale, Vector3.Zero, Rotation, Position);
+            Matrix.Invert(LocalToWorldMatrix, out WorldToLocalMatrix);
         }
     }
 }
