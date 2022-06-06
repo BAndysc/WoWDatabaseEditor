@@ -90,19 +90,56 @@ namespace WDE.PacketViewer.Processing.Processors
             
             return State[guid] = new IWaypointProcessor.UnitMovementState();
         }
+        
+        private void ProcessUpdateMovement(PacketBase basePacket, IWaypointProcessor.UnitMovementState state, MovementUpdate movement)
+        {
+            if (state.InCombat)
+                return;
+            
+            CheckIfNotRandom(state, movement.Mover, movement.SplineData.MoveData.Flags, movement.SplineData.MoveData.Jump);
 
+            if (movement.SplineData.MoveData.Points.Count == 0)
+                return;
+            
+            state.LastDestroyed = 0;
+            
+            state.Paths.Add(new IWaypointProcessor.Path(){FirstPacketNumber = basePacket.Number,
+                IsContinuationAfterPause = false,
+                PathStartTime = basePacket.Time.ToDateTime()
+            });
+            state.Paths[^1].IsFirstPathAfterSpawn = state.Paths.Count == 1 && state.JustSpawned;
+            state.LastSegment = null;
+
+            float distance = movement.SplineData.MoveData.Points[0].TotalDistance(movement.SplineData.MoveData.Points);
+
+            float? finalOrientation = movement.SplineData.MoveData.FacingCase == MovementSplineMoveData.FacingOneofCase.LookOrientation
+                ? movement.SplineData.MoveData.LookOrientation
+                : null;
+            state.Paths[^1].Segments.Add(new IWaypointProcessor.Segment(movement.MoveTime, distance, movement.SplineData.MoveData.Points[0], finalOrientation));
+            state.LastSegment = state.Paths[^1].Segments[^1];
+
+            if (movement.SplineData.MoveData.Points.Count >= 1)
+            {
+                state.Paths[^1].Segments[^1].Waypoints.AddRange(movement.SplineData.MoveData.Points);
+            }
+
+            if ((movement.SplineData.MoveData.Flags & UniversalSplineFlag.Parabolic) != 0 && movement.SplineData.MoveData.Jump != null)
+            {
+                state.Paths[^1].Segments[^1].JumpGravity = movement.SplineData.MoveData.Jump.Gravity;
+            }
+
+            state.LastMovement = basePacket.Time.ToDateTime();
+            state.LastMoveTime = movement.MoveTime;
+            state.LastMovementNumber = basePacket.Number;
+        }
+        
         protected override bool Process(PacketBase basePacket, PacketMonsterMove packet)
         {
             var state = Get(packet.Mover);
             if (state.InCombat)
                 return true;
 
-            if ((packet.Flags & UniversalSplineFlag.Parabolic) != 0  ||
-                (packet.Jump != null && packet.Jump.Gravity > 0) ||
-                (packet.Flags & UniversalSplineFlag.TransportEnter) != 0)
-            {
-                notRandom.Add(packet.Mover);
-            }
+            CheckIfNotRandom(state, packet.Mover, packet.Flags, packet.Jump);
             
             if (packet.PackedPoints.Count + packet.Points.Count == 0 || packet.Points.Count == 0)
                 return true;
@@ -215,13 +252,27 @@ namespace WDE.PacketViewer.Processing.Processors
             return true;
         }
 
+        private void CheckIfNotRandom(IWaypointProcessor.UnitMovementState state, UniversalGuid mover, UniversalSplineFlag flags, SplineJump? jump)
+        {
+            if ((flags & UniversalSplineFlag.Parabolic) != 0  ||
+                (jump != null && jump.Gravity > 0) ||
+                (flags & UniversalSplineFlag.TransportEnter) != 0)
+            {
+                notRandom.Add(mover);
+            }
+        }
+
         protected override bool Process(PacketBase basePacket, PacketUpdateObject packet)
         {
             foreach (var create in packet.Created)
             {
-                Get(create.Guid).JustSpawned = create.CreateType == CreateObjectType.Spawn;
+                var state = Get(create.Guid);
+                state.JustSpawned = create.CreateType == CreateObjectType.Spawn;
                 if (create.Values.TryGetInt("UNIT_FIELD_FLAGS", out var flags))
-                    Get(create.Guid).InCombat = (flags & (uint)GameDefines.UnitFlags.InCombat) == (uint)GameDefines.UnitFlags.InCombat;
+                    state.InCombat = (flags & (uint)GameDefines.UnitFlags.InCombat) == (uint)GameDefines.UnitFlags.InCombat;
+
+                if (create.Movement?.SplineData?.MoveData != null)
+                    ProcessUpdateMovement(basePacket, state, create.Movement);
             }
             
             foreach (var update in packet.Updated)

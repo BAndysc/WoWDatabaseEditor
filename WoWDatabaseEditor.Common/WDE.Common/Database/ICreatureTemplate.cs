@@ -51,11 +51,11 @@ namespace WDE.Common.Database
             Skinnable            = 0x04000000,
             Mount                = 0x08000000,
             Unk28                = 0x10000000,
-            Unk29                = 0x20000000,
+            PreventEmotesFromChatText = 0x20000000,
             Sheathe              = 0x40000000,
             Unk31                = 0x80000000,
             
-            ServerSideControlled = Rename | PetInCombat | InCombat,
+            ServerSideControlled = Rename | PetInCombat | InCombat | PreventEmotesFromChatText,
             AllowedDatabaseFlags = ImmuneToPc | ImmuneToNpc | NotSelectable | Pacified | Swimming,
         }
         
