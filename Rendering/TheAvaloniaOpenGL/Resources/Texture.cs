@@ -10,15 +10,16 @@ namespace TheAvaloniaOpenGL.Resources
         internal unsafe Texture(IDevice device, uint[]? pixels, int width, int height, TextureFormat textureFormat = TextureFormat.R8G8B8A8)
             : base(device, width, height, TextureTarget.Texture2D)
         {
+            ToInternalFormat(textureFormat, out var internalFormat, out var pixelFormat, out var pixelType);
             if (pixels == null)
             {
-                device.TexImage2D(TextureTarget.Texture2D, 0, ToInternalFormat(textureFormat), width, height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, new IntPtr(0));
+                device.TexImage2D(TextureTarget.Texture2D, 0, internalFormat, width, height, 0, pixelFormat, pixelType, new IntPtr(0));
             }
             else
             {
                 fixed (void* pData = pixels)
                 {
-                    device.TexImage2D(TextureTarget.Texture2D, 0, ToInternalFormat(textureFormat), width, height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, new IntPtr(pData));
+                    device.TexImage2D(TextureTarget.Texture2D, 0, internalFormat, width, height, 0, pixelFormat, pixelType, new IntPtr(pData));
                 }   
             }
             GenerateMipmaps();

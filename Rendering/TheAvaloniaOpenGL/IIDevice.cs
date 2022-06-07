@@ -51,6 +51,9 @@ namespace TheAvaloniaOpenGL
         void VertexAttribPointer(int index, int size, VertexAttribPointerType type, bool normalized, int stride, IntPtr pointer);
         void EnableVertexAttribArray(int index);
         void UseProgram(int program);
+        void ReadBuffer(ReadBufferMode buffer);
+        void ReadPixels<T>(int x, int y, int width, int height, PixelFormat format, PixelType type, Span<T> data)  where T : unmanaged;
+        void DrawBuffers(ReadOnlySpan<DrawBuffersEnum> buffers);
         void DrawArrays(PrimitiveType mode, int first, IntPtr count);
         void DrawElements(PrimitiveType mode, int count, DrawElementsType type, IntPtr indices);
         int GetUniformLocation(int program, string name);

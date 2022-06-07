@@ -7,12 +7,14 @@ out vec2 TexCoord2;
 out vec4 WorldPos;
 out vec4 SplatId;
 out vec3 Normal;
+flat out int instanceID;
 
 uniform samplerBuffer boneMatrices;
 
 void main()
 {
     VERTEX_SETUP_INSTANCING;
+    instanceID = gl_InstanceID;
 
     int boneIndices[4];
     boneIndices[0] = int(color2.x * 255);

@@ -5,7 +5,8 @@ namespace TheAvaloniaOpenGL.Resources
     public enum TextureFormat
     {
         R8G8B8A8,
-        R32f
+        R32f,
+        R32ui
     }
     
     public enum FilteringMode

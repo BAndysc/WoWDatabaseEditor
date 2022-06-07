@@ -12,14 +12,26 @@ namespace TheAvaloniaOpenGL.Resources
 
         internal readonly int Handle;
 
-        protected static PixelInternalFormat ToInternalFormat(TextureFormat textureFormat)
+        protected static void ToInternalFormat(TextureFormat textureFormat, out PixelInternalFormat internalFormat, out PixelFormat pixelFormat, out PixelType pixelType)
         {
+            
             switch (textureFormat)
             {
                 case TextureFormat.R8G8B8A8:
-                    return PixelInternalFormat.Rgba;
+                    internalFormat = PixelInternalFormat.Rgba;
+                    pixelFormat = PixelFormat.Rgba;
+                    pixelType = PixelType.UnsignedByte;
+                    break;
                 case TextureFormat.R32f:
-                    return PixelInternalFormat.R32f;
+                    internalFormat = PixelInternalFormat.R32f;
+                    pixelFormat = PixelFormat.Red;
+                    pixelType = PixelType.Float;
+                    break;
+                case TextureFormat.R32ui:
+                    internalFormat = PixelInternalFormat.R32ui;
+                    pixelFormat = PixelFormat.RedInteger;
+                    pixelType = PixelType.UnsignedInt;
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(textureFormat), textureFormat, null);
             }

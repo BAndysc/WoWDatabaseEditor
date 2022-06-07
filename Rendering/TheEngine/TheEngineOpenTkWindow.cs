@@ -188,6 +188,7 @@ public class TheEngineOpenTkWindow : GameWindow, IWindowHost
     protected override void OnUpdateFrame(FrameEventArgs args)
     {
         updateStopwatch.Restart();
+        engine.inputManager.PostUpdate();
         engine.inputManager.Update();
         UpdateKeyboard();
         UpdateMouse();
@@ -195,7 +196,6 @@ public class TheEngineOpenTkWindow : GameWindow, IWindowHost
         game?.Update((float)args.Time * 1000);
         engine.renderManager.UpdateTransforms();
             
-        engine.inputManager.PostUpdate();
         base.OnUpdateFrame(args);
         updateStopwatch.Stop();
         engine.statsManager.Counters.UpdateTime.Add(updateStopwatch.Elapsed.TotalMilliseconds);
@@ -217,7 +217,7 @@ public class TheEngineOpenTkWindow : GameWindow, IWindowHost
         if (!isRightDown && wasRightDown)
             engine.inputManager.mouse.MouseUp(isLeftDown ? Input.MouseButton.Left : Input.MouseButton.None);
         
-        engine.inputManager.mouse.PointerMoved(MouseState.Position.X, MouseState.Position.Y, WindowWidth, WindowHeight);
+        engine.inputManager.mouse.PointerMoved(MouseState.Position.X, MouseState.Position.Y, WindowWidth / DpiScaling, WindowHeight / DpiScaling);
         wasLeftDown = isLeftDown;
         wasRightDown = isRightDown;
     }
@@ -251,7 +251,7 @@ public class TheEngineOpenTkWindow : GameWindow, IWindowHost
         DpiScaling = scaleX;
         WindowWidth = e.Width * scaleX;
         WindowHeight = e.Height * scaleY;
-        base.OnResize(e);
+        base.OnResize(e);   
     }
 
     public float WindowWidth { get; private set; }

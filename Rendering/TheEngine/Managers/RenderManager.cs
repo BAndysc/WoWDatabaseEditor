@@ -13,18 +13,21 @@ using TheEngine.Interfaces;
 using TheEngine.Primitives;
 using TheEngine.Structures;
 using TheMaths;
+using MouseButton = TheEngine.Input.MouseButton;
 
 namespace TheEngine.Managers
 {
     public class RenderManager : IRenderManager, IDisposable
     {
         private readonly Engine engine;
+        private readonly bool flipY;
 
         private NativeBuffer<SceneBuffer> sceneBuffer;
         private NativeBuffer<ObjectBuffer> objectBuffer;
         //private NativeBuffer<PixelShaderSceneBuffer> pixelShaderSceneBuffer;
         private NativeBuffer<Matrix> instancesBuffer;
         private NativeBuffer<Matrix> instancesInverseBuffer;
+        private NativeBuffer<uint> instancesObjectIndicesBuffer;
         private MaterialInstanceRenderData instancingRenderData = new();
 
         private ObjectBuffer objectData;
@@ -32,6 +35,7 @@ namespace TheEngine.Managers
         //private PixelShaderSceneBuffer scenePixelData;
         private Matrix[] instancesArray;
         private Matrix[] inverseInstancesArray;
+        private uint[] instancesObjectInddicesArray;
 
         private ICameraManager cameraManager;
         
@@ -48,12 +52,41 @@ namespace TheEngine.Managers
 
         private int currentBackBufferWidth = -1;
         private int currentBackBufferHeight = -1;
+        private TextureHandle mainObjectBuffer;
         private TextureHandle[] backBuffers = new TextureHandle[2];
-        private int currentBackBufferIndex = 0;
-        private TextureHandle CurrentBackBuffer => backBuffers[currentBackBufferIndex];
-        private TextureHandle OtherBackBuffer => backBuffers[1 - currentBackBufferIndex];
-        private void SwapBackBuffers() => currentBackBufferIndex = (currentBackBufferIndex + 1) % 2;
-        
+        private int currentBackBufferIndex = -1;
+        private TextureHandle CurrentBackBuffer
+        {
+            get
+            {
+                if (currentBackBufferIndex == -1)
+                    return mainObjectBuffer;
+                return backBuffers[currentBackBufferIndex];
+            }
+        }
+
+        private TextureHandle OtherBackBuffer
+        {
+            get
+            {
+                if (currentBackBufferIndex == -1)
+                    return backBuffers[0];
+                return backBuffers[1 - currentBackBufferIndex];
+            }
+        }
+
+        private void SwapBackBuffers()
+        {
+            if (currentBackBufferIndex == -1)
+            {
+                currentBackBufferIndex = 0;
+            }
+            else
+            {
+                currentBackBufferIndex = (currentBackBufferIndex + 1) % 2;
+            }
+        }
+
         private IMesh planeMesh;
 
         private ShaderHandle blitShader;
@@ -87,6 +120,7 @@ namespace TheEngine.Managers
         internal RenderManager(Engine engine, bool flipY)
         {
             this.engine = engine;
+            this.flipY = flipY;
 
             cameraManager = engine.CameraManager;
 
@@ -139,6 +173,7 @@ namespace TheEngine.Managers
             sceneBuffer = engine.Device.CreateBuffer<SceneBuffer>(BufferTypeEnum.ConstVertex, 1);
             objectBuffer = engine.Device.CreateBuffer<ObjectBuffer>(BufferTypeEnum.ConstVertex, 1);
             //pixelShaderSceneBuffer = engine.Device.CreateBuffer<PixelShaderSceneBuffer>(BufferTypeEnum.ConstPixel, 1);
+            instancesObjectIndicesBuffer = engine.Device.CreateBuffer<uint>(BufferTypeEnum.StructuredBufferPixelOnly, 1, BufferInternalFormat.UInt);
             instancesBuffer = engine.Device.CreateBuffer<Matrix>(BufferTypeEnum.StructuredBufferVertexOnly, 1, BufferInternalFormat.Float4);
             instancesInverseBuffer = engine.Device.CreateBuffer<Matrix>(BufferTypeEnum.StructuredBufferVertexOnly, 1, BufferInternalFormat.Float4);
             engine.Device.device.CheckError("created buffers");
@@ -155,8 +190,9 @@ namespace TheEngine.Managers
             depthStencilNoZWrite = engine.Device.CreateDepthStencilState(false);
             engine.Device.device.CheckError("create depth stencil");
 
+            mainObjectBuffer = engine.textureManager.CreateRenderTexture((int)engine.WindowHost.WindowWidth, (int)engine.WindowHost.WindowHeight, 2);
             for (int i = 0; i < backBuffers.Length; ++i)
-                backBuffers[i] = engine.textureManager.CreateRenderTexture((int)engine.WindowHost.WindowWidth, (int)engine.WindowHost.WindowHeight);
+                backBuffers[i] = engine.textureManager.CreateRenderTexture((int)engine.WindowHost.WindowWidth, (int)engine.WindowHost.WindowHeight, 1);
             engine.Device.device.CheckError("create render tex");
 
             planeMesh = engine.MeshManager.CreateMesh(in ScreenPlane.Instance);
@@ -193,6 +229,7 @@ namespace TheEngine.Managers
             //outlineTexture.Dispose();
             engine.meshManager.DisposeMesh(lineMesh);
             engine.meshManager.DisposeMesh(planeMesh);
+            engine.textureManager.DisposeTexture(mainObjectBuffer);
             foreach (var t in backBuffers)
                 engine.textureManager.DisposeTexture(t);
 
@@ -201,6 +238,7 @@ namespace TheEngine.Managers
             defaultSampler.Dispose();
             instancesInverseBuffer.Dispose();
             instancesBuffer.Dispose();
+            instancesObjectIndicesBuffer.Dispose();
             //pixelShaderSceneBuffer.Dispose();
             objectBuffer.Dispose();
             sceneBuffer.Dispose();
@@ -298,6 +336,32 @@ namespace TheEngine.Managers
             cameraManager.MainCamera.Aspect = engine.WindowHost.Aspect;
         }
 
+        public void ScreenshotCurrentBuffer(string filename, int colorAttachment = 0)
+        {
+            var rt = engine.textureManager.GetTextureByHandle(mainObjectBuffer) as RenderTexture;
+            rt.ActivateSourceFrameBuffer(colorAttachment);
+            SixLabors.ImageSharp.PixelFormats.Rgba32[] pixels = new SixLabors.ImageSharp.PixelFormats.Rgba32[rt.Width * rt.Height];
+            engine.Device.device.ReadPixels(0, 0, rt.Width, rt.Height, PixelFormat.RedInteger, PixelType.UnsignedInt, pixels.AsSpan());
+            using SixLabors.ImageSharp.Image<SixLabors.ImageSharp.PixelFormats.Rgba32> image = SixLabors.ImageSharp.Image.LoadPixelData<SixLabors.ImageSharp.PixelFormats.Rgba32>(pixels, rt.Width, rt.Height);
+            SixLabors.ImageSharp.ImageExtensions.SaveAsPng(image, filename);
+        }
+
+        public Entity PickObject(Vector2 normalizedScreenPoint)
+        {
+            var rt = engine.textureManager.GetTextureByHandle(mainObjectBuffer) as RenderTexture;
+            rt.ActivateSourceFrameBuffer(1);
+            Span<uint> buf = stackalloc uint[1];
+            int x = (int)(normalizedScreenPoint.X * engine.WindowHost.WindowWidth * dynamicScale);
+            int y = (int)(normalizedScreenPoint.Y * engine.WindowHost.WindowHeight * dynamicScale);
+            engine.Device.device.ReadPixels(x, y, 1, 1, PixelFormat.RedInteger, PixelType.UnsignedInt, buf);
+            var index = buf[0];
+            if (index == 0)
+                return Entity.Empty;
+            if (index <= totalToDraw)
+                return renderersData[index - 1].Item3;
+            return Entity.Empty;
+        }
+        
         private bool inRenderingLoop = false;
         private bool inCoreRenderingLoop = false;
         private int currentFrameBuffer;
@@ -320,7 +384,7 @@ namespace TheEngine.Managers
             
             Stats = default;
             engine.Device.device.CheckError("Render begin");
-            
+
             engine.Device.RenderClearBuffer();
 
             if (currentBackBufferWidth != (int)engine.WindowHost.WindowWidth ||
@@ -328,10 +392,12 @@ namespace TheEngine.Managers
             {
                 currentBackBufferWidth = (int)engine.WindowHost.WindowWidth;
                 currentBackBufferHeight = (int)engine.WindowHost.WindowHeight;
+                engine.textureManager.DisposeTexture(mainObjectBuffer);
+                mainObjectBuffer = engine.textureManager.CreateRenderTexture(currentBackBufferWidth, currentBackBufferHeight, 2);
                 for (var index = 0; index < backBuffers.Length; index++)
                 {
                     engine.textureManager.DisposeTexture(backBuffers[index]);
-                    backBuffers[index] = engine.textureManager.CreateRenderTexture(currentBackBufferWidth, currentBackBufferHeight);
+                    backBuffers[index] = engine.textureManager.CreateRenderTexture(currentBackBufferWidth, currentBackBufferHeight, 1);
                 }
             }
 
@@ -350,7 +416,7 @@ namespace TheEngine.Managers
             }
 
             inCoreRenderingLoop = true;
-            currentBackBufferIndex = 0;
+            currentBackBufferIndex = -1;
             
             ActivateRenderTexture(CurrentBackBuffer, Color4.White);
 
@@ -376,7 +442,7 @@ namespace TheEngine.Managers
             if (inRenderingLoop)
             {
                 var tex = engine.textureManager.GetTextureByHandle(rt) as RenderTexture;
-                tex!.ActivateFrameBuffer(inCoreRenderingLoop && rt == CurrentBackBuffer && useDynamicScale ? dynamicScale : 1);
+                tex!.ActivateFrameBuffer(inCoreRenderingLoop && rt == mainObjectBuffer && useDynamicScale ? dynamicScale : 1);
                 if (color.HasValue)
                     tex!.Clear(color.Value.Red, color.Value.Green, color.Value.Blue, color.Value.Alpha);
             }
@@ -577,7 +643,7 @@ namespace TheEngine.Managers
         Stopwatch draw = new Stopwatch();
         private float viewDistanceModifier = 8;
 
-        private (LocalToWorld, MaterialInstanceRenderData?)[] localToWorlds = new (LocalToWorld, MaterialInstanceRenderData?)[10000];
+        private (LocalToWorld, MaterialInstanceRenderData?, Entity)[] renderersData = new (LocalToWorld, MaterialInstanceRenderData?, Entity)[10000];
         //private MaterialInstanceRenderData?[] materialInstanceData = new MaterialInstanceRenderData?[10000];
         private MeshRenderer[] renderers = new MeshRenderer[10000];
         private int opaque;
@@ -674,9 +740,9 @@ namespace TheEngine.Managers
             opaque = count.Values.Sum(i => i.opaque);
             transparent = count.Values.Sum(i => i.transparent);
             totalToDraw = opaque + transparent;
-            if (localToWorlds.Length < totalToDraw)
+            if (renderersData.Length < totalToDraw)
             {
-                localToWorlds = new (LocalToWorld, MaterialInstanceRenderData?)[totalToDraw];
+                renderersData = new (LocalToWorld, MaterialInstanceRenderData?, Entity)[totalToDraw];
                 renderers = new MeshRenderer[totalToDraw];
                 //materialInstanceData = new MaterialInstanceRenderData[totalToDraw];
             }
@@ -695,13 +761,13 @@ namespace TheEngine.Managers
                     {
                         renderers[opaqueIndex] = renderer;
                         //materialInstanceData[opaqueIndex] = materialData?[i];
-                        localToWorlds[opaqueIndex++] = (l2w[i], materialData?[i]);
+                        renderersData[opaqueIndex++] = (l2w[i], materialData?[i], itr[i]);
                     }
                     else
                     {
                         renderers[transparentIndex] = renderer;
                         //materialInstanceData[transparentIndex] = materialData?[i];
-                        localToWorlds[transparentIndex++] = (l2w[i], materialData?[i]);
+                        renderersData[transparentIndex++] = (l2w[i], materialData?[i], itr[i]);
                     }
                 }
             });
@@ -709,14 +775,14 @@ namespace TheEngine.Managers
             SortRenderersByMesh(0, opaque);
             SortRenderersByMesh(opaque + 1, totalToDraw);
 
-            Render(0, opaque);
+            Render(0, opaque, false);
         }
 
         private void SortRenderersByMesh(int start, int end)
         {
             if (end <= start)
                 return;
-            Array.Sort(renderers, localToWorlds, start, end - start, Comparer<MeshRenderer>.Create((a, b) =>
+            Array.Sort(renderers, renderersData, start, end - start, Comparer<MeshRenderer>.Create((a, b) =>
             {
                 if (a.MeshHandle == b.MeshHandle)
                 {
@@ -730,12 +796,12 @@ namespace TheEngine.Managers
 
         private void RenderTransparent()
         {
-            Render(opaque, totalToDraw);
+            Render(opaque, totalToDraw, true);
         }
 
         private bool enableInstancing = true;
 
-        private void Render(int start, int end)
+        private void Render(int start, int end, bool transparent)
         {
             sw.Restart();
             int savedByInstancing = 0;
@@ -750,20 +816,20 @@ namespace TheEngine.Managers
                 var toBatch = 0;
                 if (material.InstancedShader != null && // shader supports instancing
                     enableInstancing &&                 // instancing is enabled
-                    localToWorlds[i].Item2 == null)     // no material per instance data
+                    renderersData[i].Item2 == null)     // no material per instance data
                 {
                     int j = i + 1;
                     while (j < end && renderers[j].MeshHandle == mr.MeshHandle &&
                            renderers[j].SubMeshId == mr.SubMeshId &&
                            renderers[j].MaterialHandle == mr.MaterialHandle &&
-                           localToWorlds[j].Item2 == null)
+                           renderersData[j].Item2 == null)
                     {
                         toBatch++;
                         j++;
                     }   
                 }
 
-                if (toBatch <= 1)
+                if (toBatch <= 2)
                 {
                     if (currentShader != shader)
                     {
@@ -784,12 +850,13 @@ namespace TheEngine.Managers
                     }
                 
                     //materialtimer.Start();
-                    EnableMaterial(material, false, localToWorlds[i].Item2);
+                    EnableMaterial(material, false, renderersData[i].Item2);
                     //materialtimer.Stop();
                     
                     //buffertimer.Start();
-                    objectData.WorldMatrix = localToWorlds[i].Item1;
-                    objectData.InverseWorldMatrix = localToWorlds[i].Item1.Inverse;
+                    objectData.WorldMatrix = renderersData[i].Item1;
+                    objectData.InverseWorldMatrix = renderersData[i].Item1.Inverse;
+                    objectData.ObjectIndex = (uint)i + 1;
                     objectBuffer.UpdateBuffer(ref objectData);
                     //buffertimer.Stop();
 #if DEBUG
@@ -815,12 +882,14 @@ namespace TheEngine.Managers
                     {
                         instancesArray = new Matrix[toBatch + 1];
                         inverseInstancesArray = new Matrix[toBatch + 1];
+                        instancesObjectInddicesArray = new uint[toBatch + 1];
                     }
                     
                     for (int k = 0; k < toBatch + 1; ++k)
                     {
-                        instancesArray[k] = localToWorlds[i + k].Item1.Matrix;
-                        inverseInstancesArray[k] = localToWorlds[i + k].Item1.Inverse;
+                        instancesArray[k] = renderersData[i + k].Item1.Matrix;
+                        inverseInstancesArray[k] = renderersData[i + k].Item1.Inverse;
+                        instancesObjectInddicesArray[k] = (uint)(i + k);
                     }
 
                     //buffertimer.Start();
@@ -830,6 +899,7 @@ namespace TheEngine.Managers
                     //    engine.CreateBuffer<Matrix>(BufferTypeEnum.StructuredBufferVertexOnly, inerseWorldMatrices, BufferInternalFormat.Float4);
                     instancesBuffer.UpdateBuffer(instancesArray.AsSpan(0, toBatch + 1));
                     instancesInverseBuffer.UpdateBuffer(inverseInstancesArray.AsSpan(0, toBatch + 1));
+                    instancesObjectIndicesBuffer.UpdateBuffer(instancesObjectInddicesArray.AsSpan(0, toBatch + 1));
                     //buffertimer.Stop();
 
                     shader = material.InstancedShader!;
@@ -856,6 +926,8 @@ namespace TheEngine.Managers
                     instancingRenderData.Clear();
                     instancingRenderData.SetInstancedBuffer(material, "InstancingModels", instancesBuffer);
                     instancingRenderData.SetInstancedBuffer(material, "InstancingInverseModels", instancesInverseBuffer);
+                    if (material.HasInstanceUniform("ObjectIndices"))
+                        instancingRenderData.SetInstancedBuffer(material, "ObjectIndices", instancesObjectIndicesBuffer);
                     EnableMaterial(material, true, instancingRenderData);
                     //materialtimer.Stop();
                     

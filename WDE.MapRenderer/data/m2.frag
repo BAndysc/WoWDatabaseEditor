@@ -6,7 +6,9 @@ in vec2 TexCoord2;
 in vec4 WorldPos;
 in vec4 SplatId;
 in vec3 Normal;
-out vec4 FragColor;
+flat in int instanceID;
+layout (location = 0) out vec4 FragColor;
+layout (location = 1) out uint ObjectIndexOutputBuffer;
 
 uniform sampler2D texture1;
 uniform sampler2D texture2;
@@ -155,6 +157,8 @@ vec4 ShadeCModel(int pixelId, vec4 texture1, vec4 texture2)
 
 void main()
 {
+    PIXEL_SETUP_INSTANCING(instanceID);
+
     vec4 tex1 = texture(texture1, TexCoord.xy);
     vec4 tex2 = texture(texture2, TexCoord2.xy);
 
@@ -170,5 +174,6 @@ void main()
     FragColor = mix(FragColor, highglighted, highlight);
     
     FragColor = vec4(mix(FragColor.rgb, vec3(1, 0, 0), notSupported), color.a);
+    ObjectIndexOutputBuffer = objectIndex;
     //FragColor = vec4(Color.a, 0, 0, FragColor.a);
 }

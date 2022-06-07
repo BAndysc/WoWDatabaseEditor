@@ -8,19 +8,31 @@ namespace TheAvaloniaOpenGL.Resources
     internal class RenderTexture : IDisposable, ITexture
     {
         private Texture underlyingTexture;
+        private Texture[]? nextTextures;
 
         private int handle;
         private int depthHandle;
 
         private readonly IDevice device;
         
-        internal RenderTexture(IDevice device, int width, int height)
+        internal RenderTexture(IDevice device, int width, int height, int colorAttachments = 1)
         {
+            if (colorAttachments <= 0 || colorAttachments >= 5)
+                throw new ArgumentOutOfRangeException(nameof(colorAttachments));
             handle = device.GenFramebuffer();
             underlyingTexture = new Texture(device, (uint[])null, width, height);
             device.BindFramebuffer(FramebufferTarget.Framebuffer, handle);
-            device.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, TextureTarget.Texture2D,
-                underlyingTexture.Handle, 0);
+            device.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, TextureTarget.Texture2D, underlyingTexture.Handle, 0);
+            
+            if (colorAttachments > 1)
+            {
+                nextTextures = new Texture[colorAttachments - 1];
+                for (int i = 0; i < nextTextures.Length; i++)
+                {
+                    nextTextures[i] = new Texture(device, (uint[])null, width, height, TextureFormat.R32ui);
+                    device.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0 + i + 1, TextureTarget.Texture2D, nextTextures[i].Handle, 0);
+                }
+            }
             // create a renderbuffer object for depth and stencil attachment (we won't be sampling these)
 
             depthHandle = device.GenRenderbuffer();
@@ -44,11 +56,17 @@ namespace TheAvaloniaOpenGL.Resources
         public void SetFiltering(FilteringMode mode)
         {
             underlyingTexture.SetFiltering(mode);
+            if (nextTextures != null)
+                foreach (var t in nextTextures)
+                    t.SetFiltering(mode);
         }
 
         public void SetWrapping(WrapMode mode)
         {
             underlyingTexture.SetWrapping(mode);
+            if (nextTextures != null)
+                foreach (var t in nextTextures)
+                    t.SetWrapping(mode);
         }
 
         public void Clear(float r, float g, float b, float a)
@@ -62,11 +80,16 @@ namespace TheAvaloniaOpenGL.Resources
         {
             device.BindFramebuffer(FramebufferTarget.Framebuffer, handle);
             device.Viewport(0, 0, (int)Math.Max(1, Width * viewPortScale), (int)Math.Max(1, Height * viewPortScale));
+            Span<DrawBuffersEnum> buffers = stackalloc DrawBuffersEnum[nextTextures?.Length + 1 ?? 1];
+            for (int i = 0; i < buffers.Length; i++)
+                buffers[i] = DrawBuffersEnum.ColorAttachment0 + i;
+            device.DrawBuffers(buffers);
         }
         
-        public void ActivateSourceFrameBuffer()
+        public void ActivateSourceFrameBuffer(int attachment)
         {
             device.BindFramebuffer(FramebufferTarget.ReadFramebuffer, handle);
+            device.ReadBuffer(ReadBufferMode.ColorAttachment0 + attachment);
         }
         
         public void ActivateRenderFrameBuffer()
@@ -80,6 +103,22 @@ namespace TheAvaloniaOpenGL.Resources
             device.DeleteRenderbuffer(depthHandle);
             //TargetView.Dispose();
             underlyingTexture.Dispose();
+            if (nextTextures != null)
+            {
+                for (var index = 0; index < nextTextures.Length; index++)
+                {
+                    var texture = nextTextures[index];
+                    texture.Dispose();
+                }
+            }
+        }
+
+        public void ActivateAttachment(int colorAttachmentIndex, int slot)
+        {
+            if (colorAttachmentIndex == 0)
+                underlyingTexture.Activate(slot);
+            else
+                nextTextures[colorAttachmentIndex - 1].Activate(slot);
         }
     }
 }

@@ -146,6 +146,10 @@ namespace TheAvaloniaOpenGL.Resources
             
             PixelShader = device.CreateShader(ShaderType.FragmentShader);
             defines = new List<string>() { "PIXEL_SHADER" };
+            if (Instancing)
+            {
+                defines.Add("Instancing");
+            }
             var fragmentSource = ShaderSource.ParseShader(shaderData.Pixel.Path, true, defines.ToArray());
             result = device.CompileShaderAndGetError(PixelShader, fragmentSource);
             if (!string.IsNullOrEmpty(result))

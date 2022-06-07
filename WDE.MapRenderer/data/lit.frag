@@ -6,7 +6,8 @@ in vec4 WorldPos;
 flat in ivec4 SplatId;
 in vec4 Normal;
 flat in int ChunkId;
-out vec4 FragColor;
+layout (location = 0) out vec4 FragColor;
+layout (location = 1) out uint ObjectIndexOutputBuffer;
 
 uniform sampler2DArray texture1;
 uniform sampler2DArray holes;
@@ -102,4 +103,5 @@ void main()
     FragColor = mix(FragColor, FragColor + vec4(0.4, 0.4, 0.4, 0), clamp(isBorderOfChunk * showGrid, 0, 1));
     
     //FragColor = FragColor * 0.000001 + vec4(Normal.xyz / 2 + 0.5, 1);
+    ObjectIndexOutputBuffer = uint(0);
 }

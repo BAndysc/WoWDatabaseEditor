@@ -18,6 +18,7 @@ using InternalFormat = OpenGLBindings.InternalFormat;
 using PixelFormat = OpenGLBindings.PixelFormat;
 using PixelType = OpenGLBindings.PixelType;
 using PrimitiveType = OpenGLBindings.PrimitiveType;
+using ReadBufferMode = OpenGLBindings.ReadBufferMode;
 using RenderbufferTarget = OpenGLBindings.RenderbufferTarget;
 using ShaderType = OpenGLBindings.ShaderType;
 using TextureParameterName = OpenGLBindings.TextureParameterName;
@@ -499,6 +500,18 @@ namespace TheAvaloniaOpenGL
         [GlMinVersionEntryPoint("glDepthFunc", 2, 0)]
         public GlDepthFunc DepthFunc { get; }
         
+        public delegate void GlDrawBuffers(int n, IntPtr bufs);
+        [GlMinVersionEntryPoint("glDrawBuffers", 2, 0)]
+        public GlDrawBuffers DrawBuffersInternal { get; }
+        
+        public delegate void GlReadBuffer(ReadBufferMode mode);
+        [GlMinVersionEntryPoint("glReadBuffer", 2, 0)]
+        public GlReadBuffer ReadBuffer { get; }
+        
+        public delegate void GlReadPixels(int x, int y, int width, int height, PixelFormat format, PixelType type, IntPtr data);
+        [GlMinVersionEntryPoint("glReadPixels", 2, 0)]
+        public GlReadPixels ReadPixelsInternal { get; }
+
         public void CheckError(string what)
         {
             int err;
@@ -519,6 +532,18 @@ namespace TheAvaloniaOpenGL
             int[] temp = new int[1];
             Gl.GenTextures(1, temp);
             return temp[0];
+        }
+
+        public unsafe void DrawBuffers(ReadOnlySpan<DrawBuffersEnum> buffers)
+        {
+            fixed (DrawBuffersEnum* ptr = buffers)
+                DrawBuffersInternal(buffers.Length, (IntPtr)ptr);
+        }
+
+        public unsafe void ReadPixels<T>(int x, int y, int width, int height, PixelFormat format, PixelType type, Span<T> data) where T : unmanaged
+        {
+            fixed (void* ptr = data)
+                ReadPixelsInternal(x, y, width, height, format, type, (IntPtr)ptr); 
         }
     }
 }

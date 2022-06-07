@@ -123,9 +123,11 @@ layout (std140) uniform ObjectData
 #ifdef Instancing
 	mat4 _model;
 	mat4 _inverseModel;
+	uint _objectIndex;
 #else
 	mat4 model;
 	mat4 inverseModel;
+	uint objectIndex;
 #endif
 };
 
@@ -145,6 +147,30 @@ uniform samplerBuffer InstancingInverseModels;
 #endif
 
 #ifdef PIXEL_SHADER
+
+layout (std140) uniform ObjectData
+{
+#ifdef Instancing
+	mat4 _model;
+	mat4 _inverseModel;
+	uint _objectIndex;
+#else
+	mat4 model;
+	mat4 inverseModel;
+	uint objectIndex;
+#endif
+};
+
+#ifdef Instancing
+uniform usamplerBuffer ObjectIndices;
+#endif
+
+#ifdef Instancing
+#define PIXEL_SETUP_INSTANCING(T) uint objectIndex = uint(texelFetch(ObjectIndices, T).r); 
+#else
+#define PIXEL_SETUP_INSTANCING(T) ;
+#endif
+
 
 #define ddx(v) dFdx(v)
 #define ddy(v) dFdy(v)

@@ -12,6 +12,7 @@ using ClampColorTarget = OpenGLBindings.ClampColorTarget;
 using ClearBufferMask = OpenGLBindings.ClearBufferMask;
 using CullFaceMode = OpenGLBindings.CullFaceMode;
 using DepthFunction = OpenGLBindings.DepthFunction;
+using DrawBuffersEnum = OpenGLBindings.DrawBuffersEnum;
 using DrawElementsType = OpenGLBindings.DrawElementsType;
 using EnableCap = OpenGLBindings.EnableCap;
 using FramebufferAttachment = OpenGLBindings.FramebufferAttachment;
@@ -268,6 +269,14 @@ namespace TheAvaloniaOpenGL
             GL.UseProgram(program);
         }
 
+        public unsafe void DrawBuffers(ReadOnlySpan<DrawBuffersEnum> buffers)
+        {
+            fixed (DrawBuffersEnum* ptr = buffers)
+            {
+                GL.DrawBuffers(buffers.Length, (OpenTK.Graphics.OpenGL4.DrawBuffersEnum*)ptr);
+            }
+        }
+
         public void DrawArrays(PrimitiveType mode, int first, IntPtr count)
         {
             GL.DrawArrays((OpenTK.Graphics.OpenGL4.PrimitiveType)mode, first, count.ToInt32());
@@ -491,6 +500,17 @@ namespace TheAvaloniaOpenGL
         public void BlitFramebuffer(int srcX0, int srcY0, int srcX1, int srcY1, int dstX0, int dstY0, int dstX1, int dstY1, ClearBufferMask mask, OpenGLBindings.BlitFramebufferFilter filter)
         {
             GL.BlitFramebuffer(srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, (OpenTK.Graphics.OpenGL4.ClearBufferMask)mask, (BlitFramebufferFilter)filter);
+        }
+
+        public void ReadBuffer(OpenGLBindings.ReadBufferMode buffer)
+        {
+            GL.ReadBuffer((OpenTK.Graphics.OpenGL4.ReadBufferMode)buffer);
+        }
+        
+        public unsafe void ReadPixels<T>(int x, int y, int width, int height, OpenGLBindings.PixelFormat format, OpenGLBindings.PixelType type, Span<T> span) where T : unmanaged
+        {
+            fixed (void* ptr = span)
+                GL.ReadPixels(x, y, width, height, (OpenTK.Graphics.OpenGL4.PixelFormat)format, (OpenTK.Graphics.OpenGL4.PixelType)type, (IntPtr)ptr);
         }
     }
 }

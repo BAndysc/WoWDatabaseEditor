@@ -255,6 +255,26 @@ namespace TheAvaloniaOpenGL
             Report($"UseProgram({program})");
             device.UseProgram(program);
         }
+
+        public void ReadBuffer(ReadBufferMode buffer)
+        {
+            Report($"ReadBuffer({buffer})");
+            device.ReadBuffer(buffer);
+        }
+
+        public void ReadPixels<T>(int x, int y, int width, int height, PixelFormat format, PixelType type, Span<T> data) where T : unmanaged
+        {
+            Report($"ReadPixels({x}, {y}, {width}, {height}, {format}, {type}, span of {typeof(T)} of {data.Length} elements)");
+            device.ReadPixels(x, y, width, height, format, type, data);
+        }
+
+        public void DrawBuffers(ReadOnlySpan<DrawBuffersEnum> buffers)
+        {
+            var buf = string.Join(", ", buffers.ToArray());
+            Report($"DrawBuffers({buffers.Length}, {buf})");
+            device.DrawBuffers(buffers);
+        }
+
         public void DrawArrays(PrimitiveType mode, int first, IntPtr count)
         {
             Report($"DrawArrays({mode}, {first}, {count})");

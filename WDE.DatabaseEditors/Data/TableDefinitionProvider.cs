@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using WDE.Common.CoreVersion;
+using WDE.Common.Services.MessageBox;
+using WDE.Common.Utils;
 using WDE.DatabaseEditors.Data.Interfaces;
 using WDE.DatabaseEditors.Data.Structs;
 using WDE.Module.Attributes;
@@ -11,6 +14,7 @@ namespace WDE.DatabaseEditors.Data
     [AutoRegister]
     public class TableDefinitionProvider : ITableDefinitionProvider
     {
+        private readonly IMessageBoxService messageBoxService;
         private readonly List<DatabaseTableDefinitionJson> incompatibleDefinitionList = new();
         private readonly Dictionary<string, DatabaseTableDefinitionJson> incompatibleDefinitions = new();
         private readonly Dictionary<string, DatabaseTableDefinitionJson> definitions = new();
@@ -19,70 +23,97 @@ namespace WDE.DatabaseEditors.Data
 
         public TableDefinitionProvider(ITableDefinitionDeserializer serializationProvider,
             ITableDefinitionJsonProvider jsonProvider,
-            ICurrentCoreVersion currentCoreVersion)
+            ICurrentCoreVersion currentCoreVersion,
+            IMessageBoxService messageBoxService)
         {
+            this.messageBoxService = messageBoxService;
             Dictionary<string, List<DatabaseTableReferenceJson>> fileToExtraCompatibility = new();
             foreach (var source in jsonProvider.GetDefinitionReferences())
             {
-                var reference =
-                    serializationProvider.DeserializeTableDefinition<DatabaseTableReferenceJson>(source.content);
-                if (!fileToExtraCompatibility.ContainsKey(reference.File))
-                    fileToExtraCompatibility[reference.File] = new List<DatabaseTableReferenceJson>();
-                fileToExtraCompatibility[reference.File].Add(reference);
+                try
+                {
+                    var reference =
+                        serializationProvider.DeserializeTableDefinition<DatabaseTableReferenceJson>(source.content);
+                    if (!fileToExtraCompatibility.ContainsKey(reference.File))
+                        fileToExtraCompatibility[reference.File] = new List<DatabaseTableReferenceJson>();
+                    fileToExtraCompatibility[reference.File].Add(reference);
+                }
+                catch (Exception e)
+                {
+                    ShowLoadingError(source.file, e);
+                }
             }
             
             foreach (var source in jsonProvider.GetDefinitionSources())
             {
-                var definition =
-                    serializationProvider.DeserializeTableDefinition<DatabaseTableDefinitionJson>(source.content);
-
-                if (string.IsNullOrEmpty(definition.MultiSolutionName))
-                    definition.MultiSolutionName = definition.Name;
-
-                if (string.IsNullOrEmpty(definition.SingleSolutionName))
-                    definition.SingleSolutionName = definition.Name;
-
-                if (string.IsNullOrEmpty(definition.IconPath))
-                    definition.IconPath = "Icons/document_table.png";
-                
-                definition.TableColumns = new Dictionary<string, DatabaseColumnJson>();
-                foreach (var group in definition.Groups)
+                try
                 {
-                    foreach (var column in group.Fields)
+                    var definition =
+                        serializationProvider.DeserializeTableDefinition<DatabaseTableDefinitionJson>(source.content);
+
+                    if (string.IsNullOrEmpty(definition.MultiSolutionName))
+                        definition.MultiSolutionName = definition.Name;
+
+                    if (string.IsNullOrEmpty(definition.SingleSolutionName))
+                        definition.SingleSolutionName = definition.Name;
+
+                    if (string.IsNullOrEmpty(definition.IconPath))
+                        definition.IconPath = "Icons/document_table.png";
+
+                    definition.TableColumns = new Dictionary<string, DatabaseColumnJson>();
+                    foreach (var group in definition.Groups)
                     {
-                        definition.TableColumns[column.DbColumnName] = column;
+                        foreach (var column in group.Fields)
+                        {
+                            definition.TableColumns[column.DbColumnName] = column;
+                        }
                     }
-                }
 
-                definition.FileName = source.file;
-                
-                if (definition.ForeignTable != null)
-                {
-                    definition.ForeignTableByName = new Dictionary<string, DatabaseForeignTableJson>();
-                    foreach (var foreign in definition.ForeignTable)
-                    {
-                        definition.ForeignTableByName[foreign.TableName] = foreign;
-                    }
-                }
+                    definition.FileName = source.file;
 
-                if (definition.Compatibility.Contains(currentCoreVersion.Current.Tag) ||
-                    fileToExtraCompatibility.TryGetValue(source.file, out var reference) &&
-                    reference.Any(r => r.Compatibility == currentCoreVersion.Current.Tag))
-                {
-                    definitions[definition.Id] = definition;
-                    definitionsByTableName[definition.TableName] = definition;
                     if (definition.ForeignTable != null)
                     {
+                        definition.ForeignTableByName = new Dictionary<string, DatabaseForeignTableJson>();
                         foreach (var foreign in definition.ForeignTable)
-                            definitionsByForeignTableName[foreign.TableName] = definition;
+                        {
+                            definition.ForeignTableByName[foreign.TableName] = foreign;
+                        }
+                    }
+
+                    if (definition.Compatibility.Contains(currentCoreVersion.Current.Tag) ||
+                        fileToExtraCompatibility.TryGetValue(source.file, out var reference) &&
+                        reference.Any(r => r.Compatibility == currentCoreVersion.Current.Tag))
+                    {
+                        definitions[definition.Id] = definition;
+                        definitionsByTableName[definition.TableName] = definition;
+                        if (definition.ForeignTable != null)
+                        {
+                            foreach (var foreign in definition.ForeignTable)
+                                definitionsByForeignTableName[foreign.TableName] = definition;
+                        }
+                    }
+                    else
+                    {
+                        incompatibleDefinitions[definition.Id] = definition;
+                        incompatibleDefinitionList.Add(definition);
                     }
                 }
-                else
+                catch (Exception e)
                 {
-                    incompatibleDefinitions[definition.Id] = definition;
-                    incompatibleDefinitionList.Add(definition);
+                    ShowLoadingError(source.file, e);
                 }
             }
+        }
+
+        private void ShowLoadingError(string sourceFile, Exception e)
+        {
+            messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
+                    .SetTitle("Error")
+                    .SetMainInstruction("Cannot load table definition")
+                    .SetContent("Can't load table definition: " + sourceFile+".\n\n" + e.ToString())
+                    .WithOkButton(true)
+                    .Build())
+                .ListenErrors();
         }
 
         public IEnumerable<string>? CoreCompatibility(string definitionId)

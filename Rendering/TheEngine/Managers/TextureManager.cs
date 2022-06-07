@@ -176,9 +176,9 @@ namespace TheEngine.Managers
             return AddTexture(texture);
         }
         
-        public TextureHandle CreateRenderTexture(int width, int height)
+        public TextureHandle CreateRenderTexture(int width, int height, int colorAttachments = 1)
         {
-            var texture = engine.Device.CreateRenderTexture(width, height);
+            var texture = engine.Device.CreateRenderTexture(width, height, colorAttachments);
             return AddTexture(texture);
         }
 
@@ -202,7 +202,7 @@ namespace TheEngine.Managers
             var srcTex = GetTextureByHandle(src) as RenderTexture;
             var dstTex = GetTextureByHandle(dst) as RenderTexture;
             
-            srcTex!.ActivateSourceFrameBuffer();
+            srcTex!.ActivateSourceFrameBuffer(0);
             dstTex!.ActivateRenderFrameBuffer();
             engine.Device.device.BlitFramebuffer(srcX0, srcY0, srcX1, srcY1,  dstX0, dstY0,  dstX1,  dstY1, mask, filter);
         }
@@ -212,7 +212,7 @@ namespace TheEngine.Managers
             var srcTex = GetTextureByHandle(src) as RenderTexture;
             var dstTex = GetTextureByHandle(dst) as RenderTexture;
             
-            srcTex!.ActivateSourceFrameBuffer();
+            srcTex!.ActivateSourceFrameBuffer(0);
             dstTex!.ActivateRenderFrameBuffer();
             engine.Device.device.BlitFramebuffer(0, 0, srcTex.Width, srcTex.Height, 0, 0, dstTex.Width, dstTex.Height, ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Linear);
             engine.Device.device.BlitFramebuffer(0, 0, srcTex.Width, srcTex.Height, 0, 0, dstTex.Width, dstTex.Height, ClearBufferMask.DepthBufferBit, BlitFramebufferFilter.Nearest);

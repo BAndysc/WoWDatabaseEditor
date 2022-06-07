@@ -35,5 +35,6 @@ namespace TheEngine.Structures
     {
         public Matrix WorldMatrix;
         public Matrix InverseWorldMatrix;
+        public uint ObjectIndex;
     }
 }

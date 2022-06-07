@@ -3,7 +3,8 @@
 in vec2 TexCoord;
 in vec4 Normal;
 in vec3 WorldPos;
-out vec4 FragColor;
+layout (location = 0) out vec4 FragColor;
+layout (location = 1) out uint ObjectIndexOutputBuffer;
 
 uniform vec4 top;
 uniform vec4 middle;
@@ -74,4 +75,5 @@ void main()
     color = mix(color, cloudsColor1.rgb, cloudsDensity * isMidnight * pow(cloud, 3) * (smoothstep(0.52, 0.55, TexCoord.y))); // * (1 - smoothstep(0.75, 0.85, TexCoord.y)) 
     
     FragColor = vec4(color.rgb, 1);
+    ObjectIndexOutputBuffer = uint(0);
 }

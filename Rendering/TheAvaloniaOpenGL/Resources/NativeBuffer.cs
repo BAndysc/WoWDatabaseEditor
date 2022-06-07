@@ -20,7 +20,8 @@ namespace TheAvaloniaOpenGL.Resources
         None,
         Float4,
         Byte4,
-        Int4
+        Int4,
+        UInt
     }
 
     public interface INativeBuffer : IDisposable
@@ -74,6 +75,24 @@ namespace TheAvaloniaOpenGL.Resources
         private bool IsStructuredBuffer => BufferType == BufferTypeEnum.StructuredBuffer || BufferType == BufferTypeEnum.StructuredBufferPixelOnly || BufferType == BufferTypeEnum.StructuredBufferVertexOnly;
 
         public bool IsUsingBufferTexture => IsStructuredBuffer && !UseStorageBuffer;
+
+        private SizedInternalFormat ToInternalFormat(BufferInternalFormat format)
+        {
+            switch (format)
+            {
+                case BufferInternalFormat.Float4:
+                    return SizedInternalFormat.Rgba32f;
+                case BufferInternalFormat.Byte4:
+                    return SizedInternalFormat.Rgba8i;
+                case BufferInternalFormat.Int4:
+                    return SizedInternalFormat.Rgba32i;
+                case BufferInternalFormat.UInt:
+                    return SizedInternalFormat.R32ui;
+                case BufferInternalFormat.None:
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(format), format, null);
+            }
+        }
         
         private void CreateBuffer()
         {
@@ -85,7 +104,7 @@ namespace TheAvaloniaOpenGL.Resources
             {
                 TextureBufferHandle = device.GenTexture();
                 device.BindTexture(TextureTarget.TextureBuffer, TextureBufferHandle);
-                device.TexBuffer(TextureBufferTarget.TextureBuffer,  internalFormat == BufferInternalFormat.Float4 ? SizedInternalFormat.Rgba32f : (internalFormat== BufferInternalFormat.Byte4 ? SizedInternalFormat.Rgba8i : SizedInternalFormat.Rgba32i), BufferHandle);
+                device.TexBuffer(TextureBufferTarget.TextureBuffer,  ToInternalFormat(internalFormat), BufferHandle);
             }
         }
 

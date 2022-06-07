@@ -6,7 +6,8 @@ in vec2 TexCoord2;
 in vec4 WorldPos;
 in vec4 SplatId;
 in vec3 Normal;
-out vec4 FragColor;
+layout (location = 0) out vec4 FragColor;
+layout (location = 1) out uint ObjectIndexOutputBuffer;
 
 uniform sampler2D texture1;
 uniform sampler2D texture2;
@@ -75,6 +76,7 @@ void main()
     finalColor = mix(finalColor, diffuse, or(brightAtNight, unlit));
    
     FragColor = vec4(finalColor, 1);
+    ObjectIndexOutputBuffer = uint(0);
   
     //FragColor = vec4(mix(FragColor.rgb, vec3(1, 0, 0), notSupported), FragColor.a);
 }

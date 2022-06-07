@@ -129,6 +129,11 @@ namespace TheEngine.Entities
         //         structuredBuffers[index] = buffer;
         //     }
         // }
+
+        public bool HasInstanceUniform(string name)
+        {
+            return instancedShader != null && instancedShader.GetUniformLocation(name).HasValue;
+        }
         
         public int? GetInstancedUniformLocation(string name)
         {

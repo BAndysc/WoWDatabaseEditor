@@ -145,9 +145,9 @@ namespace TheAvaloniaOpenGL
         }
 
         // Safe multithread call
-        internal RenderTexture CreateRenderTexture(int width, int height)
+        internal RenderTexture CreateRenderTexture(int width, int height, int colorAttachments = 1)
         {
-            return new RenderTexture(device, width, height);
+            return new RenderTexture(device, width, height, colorAttachments);
         }
 
         // Safe multithread call

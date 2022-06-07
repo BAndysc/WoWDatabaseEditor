@@ -26,5 +26,10 @@ namespace TheEngine.ECS
         public static bool operator ==(Entity left, Entity right) => left.Equals(right);
 
         public static bool operator !=(Entity left, Entity right) => !left.Equals(right);
+
+        public override string ToString()
+        {
+            return $"Entity[{Id}, {Version}]";
+        }
     }
 }
