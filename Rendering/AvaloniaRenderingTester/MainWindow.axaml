@@ -1,0 +1,12 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:theEngine="clr-namespace:TheEngine;assembly=TheEngine"
+        xmlns:avaloniaRenderingTester="clr-namespace:AvaloniaRenderingTester"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="AvaloniaRenderingTester.MainWindow"
+        x:DataType="avaloniaRenderingTester:MainWindow"
+        Title="AvaloniaRenderingTester">
+    <theEngine:TheEnginePanel Game="{CompiledBinding Game}" />
+</Window>
