@@ -19,6 +19,7 @@ namespace WDE.PacketViewer.Processing.ProcessorProviders
         public string Name => "Story teller";
         public string Description => "Presents sniff as human readable story (only some packets)";
         public string Extension => "story";
+        public bool RequiresSplitUpdateObject => true;
         public Task<IPacketTextDumper> CreateDumper() =>
             Task.FromResult<IPacketTextDumper>(containerProvider.Resolve<StoryTellerDumper>((typeof(bool), false)));
     }
@@ -36,6 +37,7 @@ namespace WDE.PacketViewer.Processing.ProcessorProviders
         public string Name => "Story per guid";
         public string Description => "Presents sniff as human readable story (only some packets), grouped by each guid";
         public string Extension => "story";
+        public bool RequiresSplitUpdateObject => true;
         public Task<IPacketTextDumper> CreateDumper() =>
             Task.FromResult<IPacketTextDumper>(containerProvider.Resolve<StoryTellerDumper>((typeof(bool), true)));
     }

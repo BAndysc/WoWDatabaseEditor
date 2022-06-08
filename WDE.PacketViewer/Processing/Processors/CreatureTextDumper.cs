@@ -9,7 +9,7 @@ using WowPacketParser.Proto.Processing;
 
 namespace WDE.PacketViewer.Processing.Processors
 {
-    public class CreatureTextDumper : PacketProcessor<bool>, ITwoStepPacketBoolProcessor, IPacketTextDumper
+    public class CreatureTextDumper : PacketProcessor<bool>, ITwoStepPacketBoolProcessor, IPacketTextDumper, IPerFileStateProcessor
     {
         private class TextEntry : IEquatable<TextEntry>
         {
@@ -197,6 +197,11 @@ namespace WDE.PacketViewer.Processing.Processors
         public bool PreProcess(PacketHolder packet)
         {
             return chatEmoteSoundProcessor.Process(packet);
+        }
+
+        public void ClearAllState()
+        {
+            chatEmoteSoundProcessor.ClearAllState();
         }
     }
 }

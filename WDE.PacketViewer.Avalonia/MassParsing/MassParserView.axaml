@@ -1,0 +1,56 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:massParsing="clr-namespace:WDE.PacketViewer.MassParsing;assembly=WDE.PacketViewer"
+             xmlns:viewModels="clr-namespace:WDE.PacketViewer.ViewModels;assembly=WDE.PacketViewer"
+             Name="Root"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="massParsing:MassParserViewModel"
+             x:Class="WDE.PacketViewer.Avalonia.MassParsing.MassParserView">
+    <Panel>
+        <Grid ColumnDefinitions="*,5,*">
+            <DockPanel Grid.Column="0">
+                <ToolbarPanel DockPanel.Dock="Top">
+                    <Button Command="{CompiledBinding AddFileCommand}">Add file</Button>
+                    <Button Command="{CompiledBinding RemoveFileCommand}">Remove file</Button>
+                    <Button Command="{CompiledBinding AddFileRecursiveCommand}">Add recursive</Button>
+                </ToolbarPanel>
+                <ListBox Items="{CompiledBinding FileItems}" SelectedItems="{CompiledBinding SelectedFiles}" SelectionMode="Multiple">
+                    
+                </ListBox>
+            </DockPanel>
+            <GridSplitter Grid.Column="1" Classes="vertical" />
+            <DockPanel Grid.Column="2" Margin="10">
+                <TextBlock FontSize="18" DockPanel.Dock="Top">Choose a processor</TextBlock>
+                <ScrollViewer>
+                    <ItemsRepeater Margin="0,0,20,0" Items="{CompiledBinding Processors}">
+                        <ItemsRepeater.ItemTemplate>
+                            <DataTemplate DataType="viewModels:ProcessorViewModel">
+                                <DockPanel Margin="0,0,0,10">
+                                    <WdeImage Image="{CompiledBinding Image}" Width="24" Height="24" VerticalAlignment="Center" />
+                                    <Button Margin="10,0,0,0" Padding="2" Width="24" Height="24" DockPanel.Dock="Right" Command="{Binding #Root.DataContext.RunProcessor}" CommandParameter="{CompiledBinding .}"><WdeImage ImageUri="Icons/icon_right.png" /></Button>
+                                    <StackPanel Orientation="Vertical" Margin="3,0,0,0">
+                                        <TextBlock FontWeight="Bold" Text="{CompiledBinding Name}" />
+                                        <TextBlock TextWrapping="Wrap" Text="{CompiledBinding Description}" />
+                                        <TextBlock Opacity="0.7" Text="{CompiledBinding Format, StringFormat=Format: {0}}" />
+                                    </StackPanel>
+                                </DockPanel>
+                            </DataTemplate>
+                        </ItemsRepeater.ItemTemplate>
+                    </ItemsRepeater>
+                </ScrollViewer>
+            </DockPanel>
+        </Grid>
+        <Border Background="#20000000" IsVisible="{CompiledBinding LongTaskInProgress}">
+            <Border BoxShadow="0 10 50 0 #60000000" CornerRadius="4" HorizontalAlignment="Center" VerticalAlignment="Center" Background="{DynamicResource ContentBackground}" Padding="20">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Top" Margin="0,0,0,16" FontSize="16" Text="{CompiledBinding TaskName}" />
+                    <Button Margin="10,0,0,0" Padding="2" Command="{CompiledBinding InterruptCurrentTaskCommand}" DockPanel.Dock="Right"><WdeImage Width="24" Height="24" ImageUri="Icons/icon_delete.png"></WdeImage></Button>
+                    <TextBlock DockPanel.Dock="Top" Text="{CompiledBinding CurrentSubTask}" Opacity="0.5" MaxWidth="500" TextWrapping="WrapWithOverflow" />
+                    <ProgressBar HorizontalAlignment="Stretch" IsIndeterminate="True" />
+                </DockPanel>
+            </Border>
+        </Border>
+    </Panel>
+</UserControl>

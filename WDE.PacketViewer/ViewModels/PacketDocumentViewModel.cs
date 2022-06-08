@@ -843,7 +843,7 @@ namespace WDE.PacketViewer.ViewModels
             
             try
             {
-                var packets = await sniffLoader.LoadSniff(solutionItem.File, solutionItem.CustomVersion, currentActionToken.Token, this);
+                var packets = await sniffLoader.LoadSniff(solutionItem.File, solutionItem.CustomVersion, currentActionToken.Token, true, this);
                 if (!packetStore.Load((DumpFormatType)packets.DumpType))
                     await messageBoxService.SimpleDialog("Error", "Failed to load packet text output", "Failed to load _parsed.txt output file. Without this file, text output will be missing in the packets.");
                 

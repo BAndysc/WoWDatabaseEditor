@@ -23,6 +23,7 @@ namespace WDE.PacketViewer.Processing.ProcessorProviders
         public string Name => "Action - reaction";
         public string Description => "Debug";
         public string Extension => "story";
+        public bool RequiresSplitUpdateObject => true;
 
         public Task<IPacketTextDumper> CreateDumper()
         {

@@ -28,7 +28,7 @@ namespace WDE.PacketViewer.PacketParserIntegration
             this.viewerSettings = viewerSettings;
         }
         
-        public async Task<Packets> LoadSniff(string path, int? customVersion, CancellationToken token, IProgress<float> progress)
+        public async Task<Packets> LoadSniff(string path, int? customVersion, CancellationToken token, bool withText, IProgress<float> progress)
         {
             Packets packets = null!;
             var extension = Path.GetExtension(path);
@@ -52,21 +52,25 @@ namespace WDE.PacketViewer.PacketParserIntegration
                 if (IsFileInUse(parsedTextPath) || IsFileInUse(parsedPath))
                     throw new ParserException("Sniff output file already in use, probably in the middle of parsing, thus can't parse sniff. Are you parsing it in another window already?");    
 
-                var runParser = !File.Exists(parsedPath);
+                var runParser = !File.Exists(parsedPath) || (withText && !File.Exists(parsedTextPath));
                 
                 if (!runParser)
                 {
                     var versionType = await GetVersionAndDump(parsedPath);
                     runParser = !versionType.HasValue ||
                                      versionType.Value.Item1 != StructureVersion.ProtobufStructureVersion ||
+                                     (versionType.Value.Item2 == DumpFormatType.UniversalProto && withText) ||
                                      (versionType.Value.Item2 == DumpFormatType.UniversalProtoWithSeparateText && !File.Exists(parsedTextPath));
                 }
                 
                 if (runParser)
                 {
-                    await packetParserService.RunParser(path, viewerSettings.Settings.Parser, DumpFormatType.UniversalProtoWithSeparateText, customVersion, token, progress);
+                    await packetParserService.RunParser(path, viewerSettings.Settings.Parser, withText ? DumpFormatType.UniversalProtoWithSeparateText : DumpFormatType.UniversalProto, customVersion, token, progress);
                     if (token.IsCancellationRequested)
+                    {
                         File.Delete(parsedPath);
+                        File.Delete(parsedTextPath);
+                    }
                 }
                 path = parsedPath;
             }
@@ -76,6 +80,7 @@ namespace WDE.PacketViewer.PacketParserIntegration
                 var versionType = await GetVersionAndDump(path); 
                 bool runParser = !versionType.HasValue ||
                                  versionType.Value.Item1 != StructureVersion.ProtobufStructureVersion ||
+                                 (versionType.Value.Item2 == DumpFormatType.UniversalProto && withText) ||
                                  (versionType.Value.Item2 == DumpFormatType.UniversalProtoWithSeparateText && !File.Exists(parsedTextPath));
                 
                 if (runParser)

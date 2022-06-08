@@ -14,6 +14,7 @@ namespace WDE.PacketViewer.Processing.ProcessorProviders
         public string Description => "Prints average combat spell timings";
         public ImageUri? Image { get; } = new ImageUri("Icons/creature_spell.png");
         public string Extension => "txt";
+        public bool CanProcessMultipleFiles => true;
 
         public CombatCreatureSpellStatsProvider(Func<SpellStatsDumper> dumper)
         {

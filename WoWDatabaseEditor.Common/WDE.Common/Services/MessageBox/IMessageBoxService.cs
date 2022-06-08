@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace WDE.Common.Services.MessageBox
@@ -39,6 +40,30 @@ namespace WDE.Common.Services.MessageBox
                     .WithOkButton(true)
                     .Build());
             }
+        }
+        
+        public static Func<CancellationToken, Task> WrapError(this IMessageBoxService service, Func<CancellationToken, Task> task)
+        {
+            return async (token) =>
+            {
+                try
+                {
+                    await task(token);
+                }
+                catch (Exception e)
+                {
+                    var msg = e.Message;
+                    if (e.InnerException != null)
+                        msg += "\n\n --> " + e.InnerException.Message;
+
+                    await service.ShowDialog(new MessageBoxFactory<bool>()
+                        .SetTitle("Error")
+                        .SetMainInstruction("Error while executing the task")
+                        .SetContent(msg)
+                        .WithOkButton(true)
+                        .Build());
+                }
+            };
         }
     }
 }

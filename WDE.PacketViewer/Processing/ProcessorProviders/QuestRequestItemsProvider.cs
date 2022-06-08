@@ -20,6 +20,7 @@ public class QuestRequestItemsProvider : ITextPacketDumperProvider
     public string Name => "Quest request items";
     public string Description => "Generates a dump for quest_request_items (diff)";
     public string Extension => "sql";
+    public bool CanProcessMultipleFiles => true;
     public ImageUri? Image { get; } = new ImageUri("Icons/document_quest_big.png");
     public Task<IPacketTextDumper> CreateDumper() =>
         Task.FromResult<IPacketTextDumper>(creator());

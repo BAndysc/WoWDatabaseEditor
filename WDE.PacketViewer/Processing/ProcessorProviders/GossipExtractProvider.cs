@@ -20,6 +20,8 @@ namespace WDE.PacketViewer.Processing.ProcessorProviders
         public string Description => "Generates query for gossip_menu and gossip_menu_option tables";
         public string Extension => "sql";
         public ImageUri? Image => new ImageUri("Icons/gossip.png");
+        public bool CanProcessMultipleFiles => true;
+
         public Task<IPacketTextDumper> CreateDumper()
         {
             return Task.FromResult<IPacketTextDumper>(processor());

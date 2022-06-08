@@ -20,6 +20,7 @@ namespace WDE.PacketViewer.Processing.ProcessorProviders
         public string Name => "Spell and sound names";
         public string Description => "Generate all unique spell names as c++ like enum";
         public string Extension => "cpp";
+        public bool CanProcessMultipleFiles => true;
         public ImageUri? Image { get; } = new ImageUri("Icons/document_spell_big.png");
         public Task<IPacketTextDumper> CreateDumper() =>
             Task.FromResult<IPacketTextDumper>(new NameAsEnumDumper(processor()));

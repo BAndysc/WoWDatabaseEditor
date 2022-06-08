@@ -10,6 +10,8 @@ namespace WDE.PacketViewer.Processing.ProcessorProviders
         string Name { get; }
         string Description { get; }
         ImageUri? Image => null;
+        bool RequiresSplitUpdateObject => false;
+        bool CanProcessMultipleFiles => false;
     }
     
     [NonUniqueProvider]

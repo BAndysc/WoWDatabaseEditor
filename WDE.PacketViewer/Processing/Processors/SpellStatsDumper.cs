@@ -353,10 +353,5 @@ namespace WDE.PacketViewer.Processing.Processors
 
             return Task.FromResult(sb.ToString());
         }
-
-        public int GetMedian(int[] array)
-        {
-            return 2;
-        }
     }
 }

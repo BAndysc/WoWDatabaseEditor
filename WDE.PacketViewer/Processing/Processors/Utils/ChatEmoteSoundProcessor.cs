@@ -8,7 +8,7 @@ using WowPacketParser.Proto.Processing;
 namespace WDE.PacketViewer.Processing.Processors
 {
     [UniqueProvider]
-    public interface IChatEmoteSoundProcessor : IPacketProcessor<bool>
+    public interface IChatEmoteSoundProcessor : IPacketProcessor<bool>, IPerFileStateProcessor
     {
         /**
          * Returns an emote id if processor thinks the chat packet has associated emote packet
@@ -171,6 +171,15 @@ namespace WDE.PacketViewer.Processing.Processors
         public bool IsSoundForChat(PacketBase sound)
         {
             return soundPacketIdToChatPacketId.ContainsKey(sound.Number);
+        }
+
+        public void ClearAllState()
+        {
+            perGuidState.Clear();
+            emotePacketIdToChatPacketId.Clear();
+            soundPacketIdToChatPacketId.Clear();
+            chatPacketIdToEmote.Clear();
+            soundPacketIdToChatPacketId.Clear();
         }
     }
 }

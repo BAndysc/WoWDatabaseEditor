@@ -17,7 +17,12 @@ namespace WDE.PacketViewer.Processing
     {
         bool RequiresSplitUpdateObject => false;
         Task Process() => Task.CompletedTask;
-        IDocument Generate(PacketDocumentViewModel packetDocumentViewModel);
+        IDocument Generate(PacketDocumentViewModel? packetDocumentViewModel);
+    }
+
+    public interface IPerFileStateProcessor : IPacketProcessor<bool>
+    {
+        void ClearAllState();
     }
 
     public interface ITwoStepPacketBoolProcessor : ITwoStepPacketProcessor<bool>

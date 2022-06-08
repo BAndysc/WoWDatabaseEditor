@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
+        
     </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="PropertyChanged.SourceGenerator">
+            <Version>1.0.3</Version>
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
 </Project>
