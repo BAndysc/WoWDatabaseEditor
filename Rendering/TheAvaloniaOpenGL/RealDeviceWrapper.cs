@@ -400,5 +400,15 @@ namespace TheAvaloniaOpenGL
         {
             device.DepthFunc(func);
         }
+
+        public void Flush()
+        {
+            device.Flush();
+        }
+
+        public void Finish()
+        {
+            device.Finish();
+        }
     }
 }

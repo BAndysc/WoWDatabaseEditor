@@ -192,6 +192,8 @@ namespace TheEngine
                 game?.RenderGUI(delta);
                 engine.RenderGUI();
                 engine.renderManager.FinalizeRendering(fb);
+                engine.Device.device.Flush();
+                engine.Device.device.Finish();
                 renderStopwatch.Stop();
                 engine.statsManager.Counters.TotalRender.Add(renderStopwatch.Elapsed.Milliseconds);
                 

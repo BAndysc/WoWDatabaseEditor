@@ -512,6 +512,14 @@ namespace TheAvaloniaOpenGL
         [GlMinVersionEntryPoint("glReadPixels", 2, 0)]
         public GlReadPixels ReadPixelsInternal { get; }
 
+        public delegate void GlFinish();
+        [GlMinVersionEntryPoint("glFinish", 2, 0)]
+        public GlFinish Finish { get; }
+        
+        public delegate void GlFlush();
+        [GlMinVersionEntryPoint("glFlush", 2, 0)]
+        public GlFlush Flush { get; }
+
         public void CheckError(string what)
         {
             int err;

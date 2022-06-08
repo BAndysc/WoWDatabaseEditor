@@ -92,5 +92,7 @@ namespace TheAvaloniaOpenGL
         unsafe string GetActiveUniform(int unit, int index, int maxLength, out int length, out int size, out ActiveUniformType type);
         void DepthMask(bool on);
         void DepthFunction(DepthFunction func);
+        void Flush();
+        void Finish();
     }
 }
