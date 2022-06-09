@@ -1,34 +1,34 @@
-{
+﻿{
   "id": "gossip_menu_option",
   "compatibility": [
-    "TrinityWrath", "Azeroth"
+    "TrinityMaster"
   ],
   "name": "Gossip Menu Option",
   "single_solution_name": "{key} gossip menu options",
   "multi_solution_name": "Multiple gossip menu options",
   "description": "Gossip menu options are possible choices when a player talk to the npc",
   "table_name": "gossip_menu_option",
-  "table_index_name": "MenuID",
+  "table_index_name": "MenuId",
   "record_mode": "MultiRecord",
   "icon_path": "Icons/gossip.png",
   "reload_command": "reload gossip_menu_option",
   "picker": "GossipMenuParameter",
   "group_name": "Common scripting tables",
   "primary_key": [
-    "MenuID",
-    "OptionID"
+    "MenuId",
+    "OptionIndex"
   ],
-  "sort_by": ["MenuID", "OptionID"],
+  "sort_by": [ "MenuId", "OptionIndex" ],
   "commands": [
     {
       "command_id": "creatureTextToBroadcastId",
-      "parameters": ["OptionText", "OptionBroadcastTextID"]
+      "parameters": [ "OptionText", "OptionBroadcastTextID" ]
     }
   ],
   "conditions": {
     "source_type": 15,
-    "source_group": "MenuID",
-    "source_entry": "OptionID",
+    "source_group": "MenuId",
+    "source_entry": "OptionIndex",
     "targets": [
       {
         "id": 0,
@@ -46,14 +46,14 @@
       "fields": [
         {
           "name": "Menu ID",
-          "db_column_name": "MenuID",
+          "db_column_name": "MenuId",
           "value_type": "GossipMenuParameter",
           "preferred_width": 80,
           "read_only": true
         },
         {
           "name": "ID",
-          "db_column_name": "OptionID",
+          "db_column_name": "OptionIndex",
           "value_type": "uint",
           "autoincrement": true,
           "preferred_width": 50
@@ -73,7 +73,7 @@
         },
         {
           "name": "Broadcast Text",
-          "db_column_name": "OptionBroadcastTextID",
+          "db_column_name": "OptionBroadcastTextId",
           "value_type": "int"
         },
         {
@@ -89,45 +89,9 @@
           "value_type": "NpcFlagParameter"
         },
         {
-          "name": "Submenu id",
-          "db_column_name": "ActionMenuID",
-          "value_type": "GossipMenuParameter",
-          "zero_is_blank": true
-        },
-        {
           "is_condition": true,
           "name": "Conditions",
           "db_column_name": "conditions"
-        },
-        {
-          "name": "Action Poi ID",
-          "db_column_name": "ActionPoiID",
-          "value_type": "uint",
-          "zero_is_blank": true
-        },
-        {
-          "name": "Box Coded",
-          "db_column_name": "BoxCoded",
-          "value_type": "uint",
-          "zero_is_blank": true
-        },
-        {
-          "name": "Box Money",
-          "db_column_name": "BoxMoney",
-          "value_type": "MoneyParameter",
-          "zero_is_blank": true
-        },
-        {
-          "name": "Box Text",
-          "db_column_name": "BoxText",
-          "value_type": "string",
-          "can_be_null": true
-        },
-        {
-          "name": "Box Broadcast Text ID",
-          "db_column_name": "BoxBroadcastTextID",
-          "value_type": "int",
-          "zero_is_blank": true
         },
         {
           "name": "Verified Build",

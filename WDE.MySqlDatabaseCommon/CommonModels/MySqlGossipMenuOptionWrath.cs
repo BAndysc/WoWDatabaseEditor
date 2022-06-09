@@ -50,7 +50,59 @@ namespace WDE.MySqlDatabaseCommon.CommonModels
         [Column(Name = "VerifiedBuild")]
         public int VerifiedBuild { get; set; }
     }
-    
+
+    [Table(Name = "gossip_menu_option")]
+    public class MySqlGossipMenuOptionMaster : IGossipMenuOption
+    {
+        [PrimaryKey]
+        [Column(Name = "MenuId")]
+        public uint MenuId { get; set; }
+
+        [PrimaryKey]
+        [Column(Name = "OptionIndex")]
+        public uint OptionIndex { get; set; }
+
+        [Column(Name = "OptionIcon")]
+        public GossipOptionIcon Icon { get; set; }
+
+        [Column(Name = "OptionText")]
+        public string? Text { get; set; }
+
+        [Column(Name = "OptionBroadcastTextId")]
+        public int BroadcastTextId { get; set; }
+
+        [Column(Name = "OptionType")]
+        public GossipOption OptionType { get; set; }
+
+        [Column(Name = "OptionNpcFlag")]
+        public uint NpcFlag { get; set; }
+
+        public uint ActionMenuId => Action?.ActionMenuId ?? 0;
+        public uint ActionPoiId => Action?.ActionPoiId ?? 0;
+        public uint BoxCoded => Box?.BoxCoded ?? 0;
+        public uint BoxMoney => Box?.BoxMoney ?? 0;
+        public string? BoxText => Box?.BoxText;
+        public int BoxBroadcastTextId => Box?.BoxBroadcastTextId ?? 0;
+
+        [Column(Name = "VerifiedBuild")]
+        public int VerifiedBuild { get; set; }
+
+        public MySqlGossipMenuOptionAction? Action;
+        public MySqlGossipMenuOptionBox? Box;
+
+        public MySqlGossipMenuOptionMaster SetAction(MySqlGossipMenuOptionAction action)
+        {
+            Action = action;
+            return this;
+        }
+
+        public MySqlGossipMenuOptionMaster SetBox(MySqlGossipMenuOptionBox box)
+        {
+            Box = box;
+            return this;
+        }
+    }
+
     [Table(Name = "gossip_menu_option")]
     public class MySqlGossipMenuOptionCata : IGossipMenuOption
     {

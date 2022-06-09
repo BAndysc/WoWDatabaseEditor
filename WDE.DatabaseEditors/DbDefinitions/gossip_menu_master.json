@@ -17,7 +17,7 @@
     "MenuId",
     "TextId"
   ],
-  "sort_by": ["MenuId", "TextId"],
+  "sort_by": [ "MenuId", "TextId" ],
   "conditions": {
     "source_type": 14,
     "source_group": "MenuId",
