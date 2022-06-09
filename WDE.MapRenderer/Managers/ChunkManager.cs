@@ -211,6 +211,9 @@ namespace WDE.MapRenderer.Managers
 
         public IEnumerator LoadChunk(int y, int x, bool now)
         {
+            if (y < 0 || y >= 64 || x < 0 || x >= 64)
+                yield break;
+            
             if (!loadedChunks.Add((y, x)))
                 yield break;
             

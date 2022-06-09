@@ -58,6 +58,13 @@ public static class UpdateValueExtensions
         return 0;
     }
 
+    public static long? GetIntOrNull(this UpdateValues update, string field)
+    {
+        if (update.TryGetInt(field, out var v))
+            return v;
+        return null;
+    }
+
     public static bool TryGetGuid(this UpdateValues update, string field, out UniversalGuid value)
     {
         if (update.ValuesCase == UpdateValues.ValuesOneofCase.Legacy)

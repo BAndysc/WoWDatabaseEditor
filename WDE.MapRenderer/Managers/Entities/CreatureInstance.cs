@@ -161,11 +161,6 @@ public class CreatureInstance : WorldObjectInstance
         
         foreach (var material in instance.materials)
         {
-            var collider = entityManager.CreateEntity(archetypes.WorldObjectCollider);
-            collider.SetCollider(entityManager, instance.mesh, material.submesh, Collisions.COLLISION_MASK_CREATURE);
-            collider.SetCopyParentTransform(entityManager, objectEntity);
-            collider.SetDirtyPosition(entityManager);
-            
             var renderer = entityManager.CreateEntity(archetypes.WorldObjectMeshRendererArchetype);
             renderer.SetRenderer(entityManager, instance.mesh, material.submesh, material.material);
             renderer.SetCopyParentTransform(entityManager, objectEntity);
@@ -173,7 +168,6 @@ public class CreatureInstance : WorldObjectInstance
             entityManager.SetManagedComponent(renderer, materialInstanceRenderData);
             
             renderers.Add(renderer);
-            colliders.Add(collider);
         }
 
         textEntity = gameContext.UiManager.DrawPersistentWorldText("calibri", new Vector2(0.5f, 0.5f), creatureTemplate.Name, 0.25f, Matrix.Identity, 50);
