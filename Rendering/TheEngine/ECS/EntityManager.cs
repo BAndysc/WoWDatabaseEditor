@@ -1,6 +1,11 @@
+//#define DEBUG_ENTITY_CREATE_CALLSTACK
+
 using System.Runtime.CompilerServices;
 using System;
 using System.Collections.Generic;
+#if DEBUG_ENTITY_CREATE_CALLSTACK
+using System.Diagnostics;
+#endif
 
 namespace TheEngine.ECS
 {
@@ -16,11 +21,16 @@ namespace TheEngine.ECS
         private readonly List<Entity> freeEntities = new();
         private Entity[] entities = new Entity[1];
         private ulong[] entitiesArchetype = new ulong[1];
+        #if DEBUG_ENTITY_CREATE_CALLSTACK
+        private StackTrace?[] entitySource = new StackTrace?[1];
+        #endif
         private uint used;
         private readonly Dictionary<System.Type, int> typeToIndexMapping = new();
         private readonly Dictionary<System.Type, int> typeToManagedIndexMapping = new();
         private readonly Dictionary<ulong, Archetype> archetypes = new();
 
+        internal EntityDataManager DataManager => dataManager;
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void ResizeIfNeeded()
         {
@@ -28,6 +38,9 @@ namespace TheEngine.ECS
             {
                 Array.Resize(ref entities, entities.Length * 2 + 1);
                 Array.Resize(ref entitiesArchetype, entities.Length);
+#if DEBUG_ENTITY_CREATE_CALLSTACK
+                Array.Resize(ref entitySource, entities.Length);
+#endif
             }
         }
         
@@ -47,6 +60,9 @@ namespace TheEngine.ECS
             }
             entities[newEntity.Id] = newEntity;
             entitiesArchetype[newEntity.Id] = archetype.Hash;
+#if DEBUG_ENTITY_CREATE_CALLSTACK
+            entitySource[newEntity.Id] = new StackTrace(1, true);
+#endif
             dataManager.AddEntity(newEntity, archetype);
             return newEntity;
         }
@@ -99,6 +115,9 @@ namespace TheEngine.ECS
             dataManager.RemoveEntity(entity, archetypeHash);
             freeEntities.Add(entity);
             entities[entity.Id] = Entity.Empty;
+#if DEBUG_ENTITY_CREATE_CALLSTACK
+            entitySource[entity.Id] = null;
+#endif
             entitiesArchetype[entity.Id] = 0;
         }
 
@@ -147,7 +166,7 @@ namespace TheEngine.ECS
         {
             return (entitiesArchetype[entity.Id] & ManagedTypeData<T>().GlobalHash) != 0;
         }
-
+        
         public IEnumerable<IChunkDataIterator> ArchetypeIterator(Archetype archetype)
         {
             foreach (var a in dataManager.Archetypes)
@@ -182,6 +201,16 @@ namespace TheEngine.ECS
 
         public void Dispose()
         {
+#if DEBUG_ENTITY_CREATE_CALLSTACK
+            foreach (var trace in entitySource)
+            {
+                if (trace == null)
+                    continue;
+                Console.WriteLine("Entity not destroyed, created here: ");
+                Console.WriteLine(trace);
+            }
+            entitySource = null!;
+#endif
             freeEntities.Clear();
             entities = null!;
             entitiesArchetype = null!;
