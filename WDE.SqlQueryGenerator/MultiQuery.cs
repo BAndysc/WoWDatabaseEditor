@@ -7,7 +7,7 @@ namespace WDE.SqlQueryGenerator
 {
     internal class MultiQuery : IMultiQuery
     {
-        private List<IQuery> queries = new();
+        private List<IQuery?> queries = new();
         
         public MultiQuery()
         {
@@ -21,12 +21,17 @@ namespace WDE.SqlQueryGenerator
         public void Add(IQuery? query)
         {
             if (query != null)
-                queries.Add(query);
+            {
+                if (query is BlankQuery)
+                    queries.Add(null);
+                else
+                    queries.Add(query);
+            }
         }
 
         public IQuery Close()
         {
-            return new Query(new DummyMultiQuery(), string.Join(Environment.NewLine, queries.Select(q => q.QueryString).Where(q => !string.IsNullOrWhiteSpace(q))));
+            return new Query(new DummyMultiQuery(), string.Join(Environment.NewLine, queries.Select(q => (q?.QueryString ?? "", q == null)).Where(q => q.Item2 || !string.IsNullOrWhiteSpace(q.Item1)).Select(q => q.Item1)));
         }
     }
 

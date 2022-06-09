@@ -250,7 +250,7 @@ namespace WDE.SqlQueryGenerator
 
         public static IQuery BlankLine(this IMultiQuery query)
         {
-            return new Query(query, "");
+            return new BlankQuery(query);
         }
 
         public static IVariable Variable(this IMultiQuery query, string name)
@@ -263,7 +263,7 @@ namespace WDE.SqlQueryGenerator
             return new RawText(text);
         }
         
-        internal static string ToSql<T>(this T? o)
+        public static string ToSql<T>(this T? o)
         {
             if (o is null)
                 return "NULL";

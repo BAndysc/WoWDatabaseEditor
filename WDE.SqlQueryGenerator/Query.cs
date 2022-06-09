@@ -1,5 +1,16 @@
 namespace WDE.SqlQueryGenerator
 {
+    internal class BlankQuery : IQuery
+    {
+        public BlankQuery(IMultiQuery multiQuery)
+        {
+            multiQuery.Add(this);
+        }
+
+        public string QueryString => "";
+        public override string ToString() => QueryString;
+    }
+    
     internal class Query : IQuery
     {
         public Query( string query)

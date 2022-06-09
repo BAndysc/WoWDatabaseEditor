@@ -29,6 +29,7 @@ namespace WDE.Common.Services.MessageBox
             }
             catch (Exception e)
             {
+                Console.WriteLine(e);
                 var msg = e.Message;
                 if (e.InnerException != null)
                     msg += "\n\n --> " + e.InnerException.Message;
@@ -52,6 +53,7 @@ namespace WDE.Common.Services.MessageBox
                 }
                 catch (Exception e)
                 {
+                    Console.WriteLine(e);
                     var msg = e.Message;
                     if (e.InnerException != null)
                         msg += "\n\n --> " + e.InnerException.Message;
