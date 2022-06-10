@@ -19,6 +19,7 @@ namespace TheEngine.ECS
         T SetManagedComponent<T>(Entity entity, T value) where T : IManagedComponentData;
         IEnumerable<IChunkDataIterator> ArchetypeIterator(Archetype archetype);
         IComponentTypeData TypeData<T>() where T : unmanaged, IComponentData;
+        IComponentTypeData TypeData(Type t);
         IManagedComponentTypeData ManagedTypeData<T>() where T : class, IManagedComponentData;
         Archetype NewArchetype();
         bool Is(Entity entity, Archetype archetype);

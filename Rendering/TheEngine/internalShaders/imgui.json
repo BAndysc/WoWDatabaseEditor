@@ -1,0 +1,16 @@
+{
+  "Pixel": {
+    "Path": "internalShaders/imgui.frag"
+  },
+  "ZWrite": false,
+  "Vertex": {
+    "Path": "internalShaders/imgui.vert",
+    "Input": [
+      {"Type": "Float4"},
+      {"Type": "Float4"},
+      {"Type": "Float4"},
+      {"Type": "Float2"},
+      {"Type": "Float2"}
+    ]
+  }
+}

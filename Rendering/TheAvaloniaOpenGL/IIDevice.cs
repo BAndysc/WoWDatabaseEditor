@@ -55,11 +55,13 @@ namespace TheAvaloniaOpenGL
         void ReadPixels<T>(int x, int y, int width, int height, PixelFormat format, PixelType type, Span<T> data)  where T : unmanaged;
         void DrawBuffers(ReadOnlySpan<DrawBuffersEnum> buffers);
         void DrawArrays(PrimitiveType mode, int first, IntPtr count);
-        void DrawElements(PrimitiveType mode, int count, DrawElementsType type, IntPtr indices);
+        void DrawElements(PrimitiveType mode, int count, DrawElementsType type, IntPtr startIndexLocation);
+        void DrawElementsBaseVertex(PrimitiveType mode, int count, DrawElementsType type, IntPtr startIndexLocation, int startVertexLocationBytes);
         int GetUniformLocation(int program, string name);
         void Uniform1f(int location, float falue);
         void Uniform4f(int location, float a, float b, float c, float d);
         void Uniform3f(int loc, float a, float b, float c);
+        void UniformMatrix4f(int location, ref Matrix m, bool transpose);
         void TexImage2D(TextureTarget target, int level, PixelInternalFormat internalFormat, int width, int height, int border, PixelFormat format, PixelType type, IntPtr data);
         void CopyTexSubImage2D(TextureTarget target, int level, int xoffset, int yoffset, int x, int y, int width, int height);
         void TexParameteri(TextureTarget target, TextureParameterName name, int value);
@@ -92,6 +94,7 @@ namespace TheAvaloniaOpenGL
         unsafe string GetActiveUniform(int unit, int index, int maxLength, out int length, out int size, out ActiveUniformType type);
         void DepthMask(bool on);
         void DepthFunction(DepthFunction func);
+        void Scissor(int x, int y, int width, int height);
         void Flush();
         void Finish();
     }

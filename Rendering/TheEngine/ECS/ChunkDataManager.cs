@@ -222,5 +222,23 @@ namespace TheEngine.ECS
             }
             sparseReverseEntityMapping = null!;
         }
+
+        // for debugging only
+        internal unsafe object? UnsafeDebugGetComponent(Entity entity, IComponentTypeData type)
+        {
+            int i = 0;
+            for (int j = 0; j < componentsCount; ++j)
+            {
+                var c = Archetype.Components[j];
+                if (c.DataType == type.DataType)
+                {
+                    var index = sparseReverseEntityMapping[entity.Id];
+                    return Marshal.PtrToStructure(new IntPtr(componentData[i] + index * c.SizeBytes), type.DataType);
+                }
+                i++;
+            }
+
+            return null;
+        }
     }
 }

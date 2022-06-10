@@ -30,6 +30,8 @@ namespace TheEngine.ECS
         private readonly Dictionary<ulong, Archetype> archetypes = new();
 
         internal EntityDataManager DataManager => dataManager;
+        internal IEnumerable<Type> KnownTypes => typeToIndexMapping.Keys;
+        internal IEnumerable<Type> KnownManagedTypes => typeToManagedIndexMapping.Keys;
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void ResizeIfNeeded()
@@ -182,7 +184,16 @@ namespace TheEngine.ECS
                 index = typeToIndexMapping[typeof(T)] = typeToIndexMapping.Count;
             if (index >= 32)
                 throw new Exception("Currently there is limit of 32 different component datas. If you need more, change BitVector32 to BitVector64 or BitArray");
-            return new ComponentTypeData<T>(index);
+            return ComponentTypeData.Create<T>(index);
+        }
+        
+        public IComponentTypeData TypeData(System.Type t)
+        {
+            if (!typeToIndexMapping.TryGetValue(t, out var index))
+                index = typeToIndexMapping[t] = typeToIndexMapping.Count;
+            if (index >= 32)
+                throw new Exception("Currently there is limit of 32 different component datas. If you need more, change BitVector32 to BitVector64 or BitArray");
+            return new ComponentTypeData(t, index);
         }
 
         public IManagedComponentTypeData ManagedTypeData<T>() where T : class, IManagedComponentData
@@ -215,6 +226,16 @@ namespace TheEngine.ECS
             entities = null!;
             entitiesArchetype = null!;
             dataManager.Dispose();
+        }
+        
+        internal Archetype GetArchetypeByEntity(Entity entity)
+        {
+            return archetypes[entitiesArchetype[entity.Id]];
+        }
+        
+        internal ChunkDataManager GetEntityDataManagerByEntity(Entity entity)
+        {
+            return dataManager[entitiesArchetype[entity.Id]];
         }
     }
 }

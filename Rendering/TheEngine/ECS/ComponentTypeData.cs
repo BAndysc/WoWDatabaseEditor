@@ -1,15 +1,20 @@
 using System;
+using System.Runtime.InteropServices;
 
 namespace TheEngine.ECS
 {
-    public class ComponentTypeData<T> : IComponentTypeData<T> where T : unmanaged, IComponentData
+    public class ComponentTypeData : IComponentTypeData
     {
-
-        public unsafe ComponentTypeData(int index)
+        public ComponentTypeData(System.Type type, int index)
         {
             Index = index;
-            DataType = typeof(T);
-            SizeBytes = sizeof(T);
+            DataType = type;
+            SizeBytes = Marshal.SizeOf(type);
+        }
+
+        public static ComponentTypeData Create<T>(int index)
+        {
+            return new ComponentTypeData(typeof(T), index);
         }
 
         public int Index { get; }
@@ -18,7 +23,7 @@ namespace TheEngine.ECS
         public Type DataType { get; }
         public int SizeBytes { get; }
 
-        protected bool Equals(ComponentTypeData<T> other)
+        protected bool Equals(ComponentTypeData other)
         {
             return Index == other.Index && DataType == other.DataType;
         }
@@ -28,7 +33,7 @@ namespace TheEngine.ECS
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((ComponentTypeData<T>)obj);
+            return Equals((ComponentTypeData)obj);
         }
 
         public override int GetHashCode()
@@ -36,12 +41,12 @@ namespace TheEngine.ECS
             return HashCode.Combine(Index, DataType);
         }
 
-        public static bool operator ==(ComponentTypeData<T>? left, ComponentTypeData<T>? right)
+        public static bool operator ==(ComponentTypeData? left, ComponentTypeData? right)
         {
             return Equals(left, right);
         }
 
-        public static bool operator !=(ComponentTypeData<T>? left, ComponentTypeData<T>? right)
+        public static bool operator !=(ComponentTypeData? left, ComponentTypeData? right)
         {
             return !Equals(left, right);
         }

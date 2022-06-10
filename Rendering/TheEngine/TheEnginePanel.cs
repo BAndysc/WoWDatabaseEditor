@@ -45,12 +45,15 @@ namespace TheEngine
             engine.TotalTime += delta;
             framerate.Add(delta);
         }
-        
+
         public TheEnginePanel() : base(new OpenGlControlSettings
         {
             ContinuouslyRender = true,
             //DeInitializeOnVisualTreeDetachment = false,
-        }) { }
+        })
+        {
+            Focusable = true;
+        }
 
         static TheEnginePanel()
         {
@@ -66,16 +69,16 @@ namespace TheEngine
         protected override void OnKeyDown(KeyEventArgs e)
         {
             engine?.inputManager.keyboard.KeyDown(e.Key);
-            if (!Undo.Matches(e) && !Redo.Matches(e) && !IsModifierKey(e.Key))
-                e.Handled = true;
+            //if (!Undo.Matches(e) && !Redo.Matches(e) && !IsModifierKey(e.Key))
+            //    e.Handled = true;
             base.OnKeyDown(e);
         }
 
         protected override void OnKeyUp(KeyEventArgs e)
         {
             engine?.inputManager.keyboard.KeyUp(e.Key);
-            if (!Undo.Matches(e) && !Redo.Matches(e) && !IsModifierKey(e.Key))
-                e.Handled = true;
+            //if (!Undo.Matches(e) && !Redo.Matches(e) && !IsModifierKey(e.Key))
+            //    e.Handled = true;
             base.OnKeyUp(e);
         }
 
@@ -113,7 +116,7 @@ namespace TheEngine
 
         protected override void OnPointerWheelChanged(PointerWheelEventArgs e)
         {
-            engine?.inputManager.mouse.MouseWheel(e.Delta.Length > 0 ? (short)1 : (short)-1);
+            engine?.inputManager.mouse.MouseWheel(new Vector2((float)e.Delta.X, (float)e.Delta.Y));
             base.OnPointerWheelChanged(e);
         }
 
@@ -189,6 +192,7 @@ namespace TheEngine
                 engine.renderManager.RenderTransparent(fb);
                 game?.RenderTransparent(delta);
                 engine.renderManager.RenderPostProcess();
+                engine.BeforeRenderGUI(delta / 1000.0f);
                 game?.RenderGUI(delta);
                 engine.RenderGUI();
                 engine.renderManager.FinalizeRendering(fb);
@@ -249,7 +253,18 @@ namespace TheEngine
             if (IsModifierKey(e.Key))
                 engine?.inputManager.keyboard.KeyUp(e.Key);
         }
-        
+
+        protected override void OnTextInput(TextInputEventArgs e)
+        {
+            base.OnTextInput(e);
+            if (e.Text != null)
+            {
+                foreach (var letter in e.Text)
+                    engine?.inputManager.keyboard.OnTextInput(letter);
+                e.Handled = true;
+            }
+        }
+
         protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
         {
             //if (delayedDispose)

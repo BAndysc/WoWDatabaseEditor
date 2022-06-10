@@ -17,13 +17,13 @@ namespace TheEngine.Input
         private volatile bool leftJustUp;
         private volatile bool rightJustUp;
 
-        private volatile short mouseWheelDelta;
+        private Vector2 mouseWheelDelta;
 
         private Vector2 lastPosition;
         public Vector2 Position { get; private set; }
         public Vector2 Delta { get; private set; }
 
-        public short WheelDelta => mouseWheelDelta;
+        public Vector2 WheelDelta => mouseWheelDelta;
         public Vector2 NormalizedPosition { get; private set; }
         public Vector2 ScreenPoint
         {
@@ -43,10 +43,9 @@ namespace TheEngine.Input
         {
             Delta = lastPosition - Position;
             lastPosition = Position;
-            mouseWheelDelta = 0;
         }
 
-        internal void MouseWheel(short delta)
+        internal void MouseWheel(Vector2 delta)
         {
             mouseWheelDelta = delta;
         }
@@ -110,6 +109,7 @@ namespace TheEngine.Input
             rightJustDown = false;
             leftJustUp = false;
             rightJustUp = false;
+            mouseWheelDelta = Vector2.Zero;
         }
     }
 

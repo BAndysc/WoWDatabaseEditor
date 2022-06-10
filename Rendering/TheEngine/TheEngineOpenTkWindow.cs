@@ -8,6 +8,7 @@ using TheAvaloniaOpenGL;
 using TheEngine.Config;
 using TheEngine.Utils;
 using MouseButton = OpenTK.Windowing.GraphicsLibraryFramework.MouseButton;
+using TextInputEventArgs = OpenTK.Windowing.Common.TextInputEventArgs;
 
 namespace TheEngine;
 
@@ -51,6 +52,7 @@ public class TheEngineOpenTkWindow : GameWindow, IWindowHost
         engine.renderManager.RenderTransparent(0);
         game.RenderTransparent((float)args.Time * 1000);
         engine.renderManager.RenderPostProcess();
+        engine.BeforeRenderGUI((float)args.Time);
         game.RenderGUI((float)args.Time * 1000);
         engine.RenderGUI();
         engine.renderManager.FinalizeRendering(0);
@@ -217,13 +219,16 @@ public class TheEngineOpenTkWindow : GameWindow, IWindowHost
         if (!isRightDown && wasRightDown)
             engine.inputManager.mouse.MouseUp(isLeftDown ? Input.MouseButton.Left : Input.MouseButton.None);
         
+        engine.inputManager.mouse.MouseWheel(new Vector2(MouseState.ScrollDelta.X, MouseState.ScrollDelta.Y));
+        
         engine.inputManager.mouse.PointerMoved(MouseState.Position.X, MouseState.Position.Y, WindowWidth / DpiScaling, WindowHeight / DpiScaling);
         wasLeftDown = isLeftDown;
         wasRightDown = isRightDown;
     }
 
     private static Keys[] StaticCachedKeys = Enum.GetValues<Keys>();
-
+    private List<char> pressedKeys = new();
+    
     private void UpdateKeyboard()
     {
         var keys = KeyboardState.GetSnapshot();
@@ -242,7 +247,20 @@ public class TheEngineOpenTkWindow : GameWindow, IWindowHost
                     engine.inputManager.keyboard.KeyUp(avaKey);
             }
         }
+        
+        for (int i = 0; i < pressedKeys.Count; i++)
+        {
+            char c = pressedKeys[i];
+            engine.inputManager.keyboard.OnTextInput(c);
+        }
+        pressedKeys.Clear();
         previousState = keys;
+    }
+
+    protected override void OnTextInput(TextInputEventArgs e)
+    {
+        base.OnTextInput(e);
+        pressedKeys.Add((char)e.Unicode);
     }
 
     protected override void OnResize(ResizeEventArgs e)

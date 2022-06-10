@@ -7,6 +7,10 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <Target Name="CustomAfterBuild" AfterTargets="Build">
+        <Copy SourceFiles="$(OutputPath)\runtimes\osx-universal\native\libcimgui.dylib" DestinationFolder="$(OutputPath)\runtimes\osx\native\" ContinueOnError="false" />
+    </Target>
+    
     <ItemGroup>
       <PackageReference Include="JetBrains.Profiler.Api" Version="1.2.0-preview2" />
       <PackageReference Include="OpenTK" Version="4.6.4" />

@@ -89,7 +89,12 @@ namespace TheEngine
             fontManager = new FontManager(this);
             uiManager = new UIManager(this);
         }
-
+        
+        public void BeforeRenderGUI(float delta)
+        {
+            uiManager.BeforeRender(delta);
+        }
+        
         public void RenderGUI()
         {
             uiManager.Render();

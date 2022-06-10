@@ -111,6 +111,11 @@ namespace TheAvaloniaOpenGL
             return new Texture(device, pixels, width, height, generateMips);
         }
         
+        public unsafe Texture CreateTexture(int width, int height, Rgba32* pixels, bool generateMips)
+        {
+            return new Texture(device, pixels, width, height, generateMips);
+        }
+        
         public Texture CreateTexture(int width, int height, Vector4[] pixels)
         {
             return new Texture(device, pixels, width, height);
@@ -182,9 +187,12 @@ namespace TheAvaloniaOpenGL
         }
         
         // call only form render thread
-        public void DrawIndexed(int indexCount, int startIndexLocation, int baseVertexLocation)
+        public void DrawIndexed(int indexCount, int startIndexLocation, int baseVertexLocationBytes)
         {
-            device.DrawElements(PrimitiveType.Triangles, indexCount, DrawElementsType.UnsignedShort, new IntPtr(startIndexLocation * 2));
+            if (baseVertexLocationBytes == 0)
+                device.DrawElements(PrimitiveType.Triangles, indexCount, DrawElementsType.UnsignedShort, new IntPtr(startIndexLocation * 2));
+            else
+                device.DrawElementsBaseVertex(PrimitiveType.Triangles, indexCount, DrawElementsType.UnsignedShort, new IntPtr(startIndexLocation * 2), baseVertexLocationBytes);
             //device.ImmediateContext.DrawIndexed(indexCount, startIndexLocation, baseVertexLocation);
         }
 

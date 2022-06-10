@@ -170,6 +170,12 @@ namespace TheEngine.Managers
             return AddTexture(texture);
         }
         
+        public unsafe TextureHandle CreateTexture(Rgba32* pixels, int width, int height, bool generateMips)
+        {
+            var texture = engine.Device.CreateTexture(width, height, pixels, generateMips);
+            return AddTexture(texture);
+        }
+        
         public TextureHandle CreateTextureArray(Rgba32[][][] textures, int width, int height)
         {
             var texture = engine.Device.CreateTextureArray(width, height, textures);

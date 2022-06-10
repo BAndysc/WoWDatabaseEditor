@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ImGuiNET;
 using TheAvaloniaOpenGL.Resources;
 using TheEngine.Components;
 using TheEngine.Data;
@@ -8,6 +9,7 @@ using TheEngine.ECS;
 using TheEngine.Entities;
 using TheEngine.Handles;
 using TheEngine.Interfaces;
+using TheEngine.Utils;
 using TheMaths;
 
 namespace TheEngine.Managers
@@ -25,6 +27,7 @@ namespace TheEngine.Managers
         private readonly NativeBuffer<Vector4> glyphPositionsBuffer;
         private Vector4[] glyphUVs = new Vector4[1];
         private Vector4[] glyphPositions = new Vector4[1];
+        private ImGuiController imGuiController;
 
         private float Scaling => engine.WindowHost.DpiScaling;
 
@@ -84,17 +87,30 @@ namespace TheEngine.Managers
             
             worldMaterial.SetBuffer("glpyhUVs", glyphUVsBuffer);
             worldMaterial.SetBuffer("glyphPositions", glyphPositionsBuffer);
+
+            imGuiController = new ImGuiController(engine);
+            ei = new EntityInspector(engine);
         }
+
+        private EntityInspector ei;
 
         public void Dispose()
         {
             engine.MeshManager.DisposeMesh(quad);
             glyphUVsBuffer.Dispose();
             glyphPositionsBuffer.Dispose();
+            imGuiController.Dispose();
+        }
+
+        internal void BeforeRender(float delta)
+        {
+            imGuiController.BeforeRender(delta);
         }
 
         internal void Render()
         {
+            ei.Draw();
+            imGuiController.Render();
             var cameraPos = cameraManager.MainCamera.Transform.Position;
             persistentTextArchetype.ForEach<LocalToWorld, DisabledObjectBit, DrawTextData>((itr, start, end, matrices, disabledAccess, datas) =>
             {
@@ -108,6 +124,17 @@ namespace TheEngine.Managers
                         DrawWorldText(data.font, data.pivot, data.text, data.fontSize, matrix);
                 }
             });
+            
+            // using var ui = BeginImmediateDrawRel(0, 1, 0, 1);
+            // ui.BeginVerticalBox(new Vector4(0, 0, 0, 0.5f), 2);
+            // var em = engine.entityManager;
+            // foreach (var a in em.DataManager.Archetypes)
+            // {
+            //     if (a.Length == 0)
+            //         continue;
+            //     
+            //     ui.Text("calibri", a.Archetype.ToString() +": " + a.Length, 10, Vector4.One);
+            // }
         }
 
         public void DrawBox(float x, float y, float w, float h, Vector4 color)
@@ -446,15 +473,15 @@ namespace TheEngine.Managers
         
         public IImGui BeginImmediateDrawAbs(float x, float y)
         {
-            return new ImGui(this, new Vector2(x, y), false, Vector2.Zero);
+            return new TheImGui(this, new Vector2(x, y), false, Vector2.Zero);
         }
 
         public IImGui BeginImmediateDrawRel(float x, float y, float pivotX, float pivotY)
         {
-            return new ImGui(this, new Vector2(x, y), true, new Vector2(pivotX, pivotY));
+            return new TheImGui(this, new Vector2(x, y), true, new Vector2(pivotX, pivotY));
         }
 
-        internal class ImGui : IImGui
+        internal class TheImGui : IImGui
         {
             private readonly UIManager uiManager;
             private readonly Vector2 position;
@@ -463,7 +490,7 @@ namespace TheEngine.Managers
             private IDrawingCommand? root;
             private Stack<IChildContainer> parents = new();
 
-            public ImGui(UIManager uiManager, Vector2 position, bool relative, Vector2 pivot)
+            public TheImGui(UIManager uiManager, Vector2 position, bool relative, Vector2 pivot)
             {
                 this.uiManager = uiManager;
                 this.position = position;

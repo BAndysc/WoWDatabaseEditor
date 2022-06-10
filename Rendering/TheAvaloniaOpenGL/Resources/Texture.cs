@@ -56,6 +56,27 @@ namespace TheAvaloniaOpenGL.Resources
             UnbindTexture();
         }
         
+        internal unsafe Texture(IDevice device, Rgba32* pixels, int width, int height, bool generateMips)
+            :base(device, width, height, TextureTarget.Texture2D)
+        {
+            if (pixels == null)
+            {
+                device.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, new IntPtr(0));
+            }
+            else
+            {
+                device.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, new IntPtr(pixels));
+
+                if (!generateMips)
+                    device.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMaxLevel, 0);
+            }
+    
+            if (generateMips)
+                GenerateMipmaps();
+            SetFiltering(FilteringMode.Linear);
+            UnbindTexture();
+        }
+        
         internal unsafe Texture(IDevice device, float[]? pixels, int width, int height)
             :base (device, width, height, TextureTarget.Texture2D)
         {

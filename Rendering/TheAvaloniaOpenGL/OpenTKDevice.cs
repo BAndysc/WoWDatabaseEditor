@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using OpenTK.Graphics.OpenGL4;
 using ActiveUniformType = OpenGLBindings.ActiveUniformType;
 using BlendEquationMode = OpenGLBindings.BlendEquationMode;
@@ -282,11 +283,16 @@ namespace TheAvaloniaOpenGL
             GL.DrawArrays((OpenTK.Graphics.OpenGL4.PrimitiveType)mode, first, count.ToInt32());
         }
 
-        public void DrawElements(PrimitiveType mode, int count, DrawElementsType type, IntPtr indices)
+        public void DrawElements(PrimitiveType mode, int count, DrawElementsType type, IntPtr startIndexLocation)
         {
-            GL.DrawElements((OpenTK.Graphics.OpenGL4.PrimitiveType)mode, count, (OpenTK.Graphics.OpenGL4.DrawElementsType)type, indices);
+            GL.DrawElements((OpenTK.Graphics.OpenGL4.PrimitiveType)mode, count, (OpenTK.Graphics.OpenGL4.DrawElementsType)type, startIndexLocation);
         }
-
+        
+        public void DrawElementsBaseVertex(PrimitiveType mode, int count, DrawElementsType type, IntPtr startIndexLocation, int startVertexLocationBytes)
+        {
+            GL.DrawElementsBaseVertex((OpenTK.Graphics.OpenGL4.PrimitiveType)mode, count, (OpenTK.Graphics.OpenGL4.DrawElementsType)type, startIndexLocation, startVertexLocationBytes);
+        }
+        
         public int GetUniformLocation(int program, string name)
         {
             return GL.GetUniformLocation(program, name);
@@ -305,6 +311,11 @@ namespace TheAvaloniaOpenGL
         public void Uniform3f(int location, float a, float b, float c)
         {
             GL.Uniform3(location, a, b, c);
+        }
+
+        public unsafe void UniformMatrix4f(int location, ref Matrix4x4 m, bool transpose)
+        {
+            GL.UniformMatrix4(location, transpose, ref Unsafe.AsRef<OpenTK.Mathematics.Matrix4>(Unsafe.AsPointer(ref m)));
         }
 
         public void TexImage2D(TextureTarget target, int level, PixelInternalFormat internalFormat, int width, int height, int border,
@@ -495,6 +506,11 @@ namespace TheAvaloniaOpenGL
         public void DepthFunction(DepthFunction func)
         {
             GL.DepthFunc((OpenTK.Graphics.OpenGL4.DepthFunction)func);
+        }
+
+        public void Scissor(int x, int y, int width, int height)
+        {
+            GL.Scissor(x, y, width, height);
         }
 
         public void Flush()

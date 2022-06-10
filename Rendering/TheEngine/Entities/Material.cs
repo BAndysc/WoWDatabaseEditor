@@ -80,6 +80,7 @@ namespace TheEngine.Entities
         internal Dictionary<int, float> floatUniforms { get; } = new();
         internal Dictionary<int, Vector4> vector4Uniforms { get; } = new();
         internal Dictionary<int, Vector3> vector3Uniforms { get; } = new();
+        internal Dictionary<int, Matrix> matrixUniforms { get; } = new();
         
         internal Dictionary<int, TextureHandle> instancedTextureHandles { get; } = new();
         internal Dictionary<int, INativeBuffer> instancedStructuredBuffers { get; } = new();
@@ -87,6 +88,7 @@ namespace TheEngine.Entities
         internal Dictionary<int, float> instancedFloatUniforms { get; } = new();
         internal Dictionary<int, Vector4> instancedVector4Uniforms { get; } = new();
         internal Dictionary<int, Vector3> instancedVector3Uniforms { get; } = new();
+        internal Dictionary<int, Matrix> instancedMatrixUniforms { get; } = new();
         
         internal Material(Engine engine, ShaderHandle shaderHandle, ShaderHandle? instancedShaderHandle, MaterialHandle materialHandle)
         {
@@ -188,6 +190,11 @@ namespace TheEngine.Entities
             Set(vector4Uniforms, instancedVector4Uniforms, name, value);
         }
         
+        public void SetUniform(string name, Matrix value)
+        {
+            Set(matrixUniforms, instancedMatrixUniforms, name, value);
+        }
+        
         public void SetTexture(string name, TextureHandle texture)
         {
             Set(textureHandles, instancedTextureHandles, name, texture);
@@ -252,6 +259,11 @@ namespace TheEngine.Entities
                 {
                     instancedShader!.SetUniform(vector.Key, vector.Value.X, vector.Value.Y, vector.Value.Z);
                 }
+                
+                foreach (var vector in instancedMatrixUniforms)
+                {
+                    instancedShader!.SetUniform(vector.Key, vector.Value);
+                }
             }
             else
             {
@@ -289,6 +301,11 @@ namespace TheEngine.Entities
                 foreach (var vector in vector3Uniforms)
                 {
                     shader.SetUniform(vector.Key, vector.Value.X, vector.Value.Y, vector.Value.Z);
+                }
+                
+                foreach (var vector in matrixUniforms)
+                {
+                    shader.SetUniform(vector.Key, vector.Value);
                 }
             }
             

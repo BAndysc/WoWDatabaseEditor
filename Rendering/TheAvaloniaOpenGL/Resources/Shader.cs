@@ -297,6 +297,11 @@ namespace TheAvaloniaOpenGL.Resources
             }
         }
         
+        public void SetUniform(int loc, Matrix m)
+        {
+            device.UniformMatrix4f(loc, ref m, false);
+        }
+
         public void SetUniformInt(int loc, int val)
         {
             if (!uniformIntValues.TryGetValue(loc, out var curVal) || curVal != val)

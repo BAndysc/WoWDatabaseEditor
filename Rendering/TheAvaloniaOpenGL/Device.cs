@@ -385,6 +385,10 @@ namespace TheAvaloniaOpenGL
         public delegate void GlDrawElements(PrimitiveType mode, int count, DrawElementsType type, IntPtr indices);
         [GlEntryPoint("glDrawElements")]
         public GlDrawElements DrawElements { get; }
+        
+        public delegate void GlDrawElementsBaseVertex(PrimitiveType mode, int count, DrawElementsType type, IntPtr startIndexLocation, int startVertexPosBytes);
+        [GlEntryPoint("glDrawElementsBaseVertex")]
+        public GlDrawElementsBaseVertex DrawElementsBaseVertex { get; }
 
         public delegate int GlGetUniformLocation(int program, IntPtr name);
         [GlEntryPoint("glGetUniformLocation")]
@@ -499,6 +503,10 @@ namespace TheAvaloniaOpenGL
         public delegate void GlDepthFunc(DepthFunction func);
         [GlMinVersionEntryPoint("glDepthFunc", 2, 0)]
         public GlDepthFunc DepthFunc { get; }
+        
+        public delegate void GlScissor(int x, int y, int width, int height);
+        [GlMinVersionEntryPoint("glScissor", 2, 0)]
+        public GlScissor Scissor { get; }
         
         public delegate void GlDrawBuffers(int n, IntPtr bufs);
         [GlMinVersionEntryPoint("glDrawBuffers", 2, 0)]

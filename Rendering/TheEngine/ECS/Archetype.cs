@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Text;
 
 namespace TheEngine.ECS
 {
@@ -41,12 +42,17 @@ namespace TheEngine.ECS
 
         public Archetype WithComponentData<T>() where T : unmanaged, IComponentData
         {
+            return WithComponentData(typeof(T));
+        }
+        
+        internal Archetype WithComponentData(System.Type t)
+        {
             var n = new Archetype(EntityManager);
             n.managedComponents.AddRange(managedComponents);
             n.usedManagedComponents = usedManagedComponents;
 
             n.components.AddRange(components);
-            var typeData = EntityManager.TypeData<T>();
+            var typeData = EntityManager.TypeData(t);
             n.components.Add(typeData);
             n.usedComponents = usedComponents;
             n.usedComponents[(int)typeData.Hash] = true;
@@ -90,6 +96,16 @@ namespace TheEngine.ECS
         {
             return (usedComponents.Data & other.usedComponents.Data) == other.usedComponents.Data &&
                    (usedManagedComponents.Data & other.usedManagedComponents.Data) == other.usedManagedComponents.Data;
+        }
+
+        public override string ToString()
+        {
+            StringBuilder sb = new();
+            foreach (var comp in components)
+                sb.Append(comp.DataType.Name + " + ");
+            foreach (var comp in managedComponents)
+                sb.Append(comp.DataType.Name + " + ");
+            return sb.ToString();
         }
     }
 }

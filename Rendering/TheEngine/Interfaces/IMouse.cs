@@ -9,7 +9,7 @@ namespace TheEngine.Interfaces
         bool HasJustClicked(MouseButton button);
         bool HasJustReleased(MouseButton button);
         Vector2 Delta { get; }
-        short WheelDelta { get; }
+        Vector2 WheelDelta { get; }
         Vector2 NormalizedPosition { get; }
         Vector2 ScreenPoint { get; }
     }

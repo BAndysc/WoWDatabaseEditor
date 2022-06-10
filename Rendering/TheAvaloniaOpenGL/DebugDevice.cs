@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using OpenGLBindings;
 
 namespace TheAvaloniaOpenGL
@@ -280,12 +281,18 @@ namespace TheAvaloniaOpenGL
             Report($"DrawArrays({mode}, {first}, {count})");
             device.DrawArrays(mode, first, count);
         }
-        public void DrawElements(PrimitiveType mode, int count, DrawElementsType type, IntPtr indices)
+        public void DrawElements(PrimitiveType mode, int count, DrawElementsType type, IntPtr startIndexLocation)
         {
-            Report($"DrawElements({mode}, {count}, {type}, {indices})");
-            device.DrawElements(mode, count, type, indices);
+            Report($"DrawElements({mode}, {count}, {type}, {startIndexLocation})");
+            device.DrawElements(mode, count, type, startIndexLocation);
         }
-        
+
+        public void DrawElementsBaseVertex(PrimitiveType mode, int count, DrawElementsType type, IntPtr startIndexLocation, int startVertexLocationBytes)
+        {
+            Report($"DrawElementsBaseVertex({mode}, {count}, {type}, {startIndexLocation}, {startVertexLocationBytes})");
+            device.DrawElementsBaseVertex(mode, count, type, startIndexLocation, startVertexLocationBytes);
+        }
+
         public int GetUniformLocation(int program, string name)
         {
             var loc = device.GetUniformLocation(program, name);
@@ -493,6 +500,18 @@ namespace TheAvaloniaOpenGL
             device.DepthFunc(func);
         }
 
+        public void Scissor(int x, int y, int width, int height)
+        {
+            Report($"Scissor({x}, {y}, {width}, {height})");
+            device.Scissor(x, y, width, height);
+        }
+
+        public unsafe void UniformMatrix4f(int location, ref Matrix4x4 m, bool transpose)
+        {
+            Report($"Matrix4f({location}, {transpose}, {m})");
+            device.UniformMatrix4fv(location, 1, transpose, Unsafe.AsPointer(ref m));
+        }
+        
         public void Flush()
         {
             device.Flush();

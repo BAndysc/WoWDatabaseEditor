@@ -8,12 +8,11 @@
         <DefineConstants Condition="$(UseOpenGl) == 'true'">$(DefineConstants);USE_OPENTK</DefineConstants>
         <DefineConstants Condition="$([MSBuild]::IsOSPlatform('Windows'))">$(DefineConstants);USE_OPENTK</DefineConstants>
     </PropertyGroup>
-    
     <ItemGroup>
       <ProjectReference Include="..\TheAvaloniaOpenGL\TheAvaloniaOpenGL.csproj" />
       <ProjectReference Include="..\TheMaths\TheMaths.csproj" />
     </ItemGroup>
-    
+
     <ItemGroup>
       <Folder Include="GUI" />
     </ItemGroup>
@@ -46,6 +45,7 @@
     </ItemGroup>
     
     <ItemGroup>
+      <PackageReference Include="ImGui.NET" Version="1.87.3" />
       <PackageReference Include="OpenTK.Windowing.Desktop" Version="4.6.4" />
     </ItemGroup>
     
