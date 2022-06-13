@@ -53,13 +53,13 @@ namespace WDE.SqlQueryGenerator.Test
             var trans = Queries.BeginTransaction();
             trans.BlankLine();
             trans.BlankLine();
-            Assert.AreEqual("", trans.Close().QueryString);
+            Assert.AreEqual(Environment.NewLine + Environment.NewLine + Environment.NewLine, trans.Close().QueryString);
         }
         
         [Test]
         public void TestQueryToString()
         {
-            Assert.AreEqual("", Queries.BeginTransaction().BlankLine().ToString());
+            Assert.AreEqual(Environment.NewLine, Queries.BeginTransaction().BlankLine().ToString());
         }
     }
 }

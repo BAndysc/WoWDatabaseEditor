@@ -1,3 +1,5 @@
+using System;
+
 namespace WDE.SqlQueryGenerator
 {
     internal class BlankQuery : IQuery
@@ -7,7 +9,7 @@ namespace WDE.SqlQueryGenerator
             multiQuery.Add(this);
         }
 
-        public string QueryString => "";
+        public string QueryString => Environment.NewLine;
         public override string ToString() => QueryString;
     }
     
