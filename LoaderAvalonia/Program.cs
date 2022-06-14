@@ -1,5 +1,6 @@
 using WDE.AzerothCore;
 using WDE.CMaNGOS;
+using WDE.CMMySqlDatabase;
 using WDE.Common.Avalonia;
 using WDE.CommonViews.Avalonia;
 using WDE.Conditions;
@@ -67,6 +68,7 @@ namespace LoaderAvalonia
                 typeof(TrinityModule),
                 typeof(AzerothModule),
                 typeof(CMaNGOSModule),
+                typeof(CMMySqlDatabaseModule),
                 typeof(AnniversaryModule),
                 typeof(EventScriptsModule)
             };

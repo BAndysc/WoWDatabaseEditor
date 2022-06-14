@@ -26,6 +26,7 @@
         <ProjectReference Include="..\WDE.Solutions\WDE.Solutions.csproj" />
         <ProjectReference Include="..\WDE.SQLEditor\WDE.SQLEditor.csproj" />
         <ProjectReference Include="..\WDE.Updater\WDE.Updater.csproj" />
+        <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.CMMySqlDatabase\WDE.CMMySqlDatabase.csproj" />
         <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />
         <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.DbcStore\WDE.DbcStore.csproj" />
         <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.History\WDE.History.csproj" />
