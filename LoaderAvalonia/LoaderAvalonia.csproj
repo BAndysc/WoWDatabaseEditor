@@ -38,6 +38,7 @@
       <ProjectReference Include="..\WDE.PacketViewer\WDE.PacketViewer.csproj" />
       <ProjectReference Include="..\WDE.Spells\WDE.Spells.csproj" />
       <ProjectReference Include="..\WDE.WoWHeadConnector\WDE.WoWHeadConnector.csproj" />
+      <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.CMMySqlDatabase\WDE.CMMySqlDatabase.csproj" />
       <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />
       <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.DbcStore\WDE.DbcStore.csproj" />
       <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.History\WDE.History.csproj" />

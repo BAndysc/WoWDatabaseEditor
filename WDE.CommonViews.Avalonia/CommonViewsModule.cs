@@ -25,6 +25,7 @@ using WDE.Solutions.Explorer.ViewModels;
 using WDE.Solutions.Sessions;
 using WDE.SQLEditor.ViewModels;
 using WDE.TrinityMySqlDatabase.ViewModels;
+using WDE.CMMySqlDatabase.ViewModels;
 using WDE.Updater.ViewModels;
 
 namespace WDE.CommonViews.Avalonia
@@ -35,6 +36,7 @@ namespace WDE.CommonViews.Avalonia
         {
             // database
             viewLocator.Bind<DatabaseConfigViewModel, DatabaseConfigView>();
+            viewLocator.Bind<CMDatabaseConfigViewModel, DatabaseConfigView>();
             viewLocator.Bind<DebugQueryToolViewModel, DebugQueryToolView>();
             // solutions
             viewLocator.Bind<SolutionExplorerViewModel, SolutionExplorerView>();
