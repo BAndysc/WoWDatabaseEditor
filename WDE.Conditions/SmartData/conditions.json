@@ -920,6 +920,20 @@
 			}
 		],
 		"description": "{target} {negate:is|is not} at Scenario with Step {pram1}"
+	},
+
+	{
+		"id": 55,
+		"name": "CONDITION_SCENE_IN_PROGRESS",
+		"name_readable": "Has Scene In Progress",
+		"help": "Condition is met if target has a scene playing",
+		"parameters": [
+			{
+				"type": "Parameter",
+				"name": "SceneId"
+			}
+		],
+		"description": "{target} {negate:has|has not} Scene {pram1} in progress"
 	}
 
 ]

@@ -104,5 +104,11 @@
             "CONDITION_RELATION_TO",
             "CONDITION_REACTION_TO"
         ]
+    },
+    {
+        "name":"Scene",
+        "group_members":[
+            "CONDITION_SCENE_IN_PROGRESS"
+        ]
     }
 ]
