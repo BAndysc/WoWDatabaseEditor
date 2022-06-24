@@ -163,6 +163,7 @@ public class ImGuiController : IDisposable
         // config.EllipsisChar = ushort.MaxValue;
         // config.FontDataOwnedByAtlas = 1;
         io.Fonts.AddFontDefault();
+        //io.Fonts.AddFontFromFileTTF("Ruda-Bold.ttf", 15);
 
         io.BackendFlags |= ImGuiBackendFlags.RendererHasVtxOffset | ImGuiBackendFlags.HasSetMousePos;
         ImGui.StyleColorsDark();
@@ -194,7 +195,7 @@ public class ImGuiController : IDisposable
         ImGui.NewFrame();
     }
 
-    public void BeforeRender(float delta)
+    public void UpdateImGui(float delta)
     {
         ImGui.SetCurrentContext(imGuiContext);
         ImGuiIOPtr io = ImGui.GetIO();
@@ -207,6 +208,9 @@ public class ImGuiController : IDisposable
         io.MouseDown[1] = engine.inputManager.mouse.IsMouseDown(MouseButton.Right);
         io.MouseWheel = engine.inputManager.mouse.WheelDelta.Y;
         io.MouseWheelH = engine.inputManager.mouse.WheelDelta.X;
+
+        if (io.WantCaptureMouse)
+            engine.inputManager.mouse.PostUpdate();
         
         for (int i = 0; i < engine.inputManager.keyboard.justTextInputIndex; ++i)
         {

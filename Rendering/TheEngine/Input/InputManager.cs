@@ -17,9 +17,9 @@ namespace TheEngine.Input
             Keyboard = keyboard = new Keyboard();
         }
 
-        internal void Update()
+        internal void Update(float deltaMs)
         {
-            mouse.Update();
+            mouse.Update(deltaMs);
         }
 
         public void PostUpdate()

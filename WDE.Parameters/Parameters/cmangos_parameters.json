@@ -1,0 +1,11 @@
+{
+  "CmangosMovementTypeParameter": {
+    "values": {
+      "0": "idle",
+      "1": "random",
+      "2": "waypoints",
+      "3": "spline path",
+      "4": "linear waypoints"
+    }
+  }
+}

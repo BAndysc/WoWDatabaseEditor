@@ -205,6 +205,8 @@ namespace WDE.MapRenderer
 
         public void RenderGui(float delta)
         {
+            if (!gameProperties.RenderGui)
+                return;
             moduleManager.RenderGUI();
             notificationsCenter.RenderGUI(delta);
             screenSpaceSelector.Render();

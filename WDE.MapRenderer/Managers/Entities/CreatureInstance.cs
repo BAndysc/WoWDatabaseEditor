@@ -212,6 +212,17 @@ public class CreatureInstance : WorldObjectInstance
         }
     }
 
+    public IEnumerator SetVirtualItem(int slot, uint itemId)
+    {
+        if (itemId != 0 &&
+            gameContext.DbcManager.ItemStore.TryGetValue(itemId, out var item))
+        {
+            yield return SetVirtualItem(slot, item);
+        }
+
+        yield break;
+    }
+
     public IEnumerator SetVirtualItem(int slot, Item itemInfo)
     {
         var weaponModelCompletion = new TaskCompletionSource<MdxManager.MdxInstance?>();

@@ -12,6 +12,7 @@ namespace WDE.Common.Database
         string ScriptName { get; }
         public GameDefines.UnitFlags UnitFlags { get; }
         public GameDefines.NpcFlags NpcFlags { get; }
+        uint? EquipmentTemplateId { get; }
         
         int ModelsCount { get; }
         uint GetModel(int index);

@@ -426,5 +426,10 @@ namespace TheAvaloniaOpenGL
         {
             device.Finish();
         }
+
+        public void Debug(string msg)
+        {
+            
+        }
     }
 }

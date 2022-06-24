@@ -20,6 +20,13 @@ namespace WDE.TrinityMySqlDatabase.Models
         [Column(Name = "phaseMask")]
         public uint? PhaseMask { get; set; }
 
+        public int? PhaseId => null;
+        
+        public int? PhaseGroup => null;
+
+        [Column(Name = "equipment_id")]
+        public int EquipmentId { get; set; }
+        
         [Column(Name = "position_x")]
         public float X { get; set; }
 
@@ -51,6 +58,15 @@ namespace WDE.TrinityMySqlDatabase.Models
 
         public uint? PhaseMask => null;
 
+        [Column(Name = "PhaseId")]
+        public int? PhaseId { get; set; }
+        
+        [Column(Name = "PhaseGroup")]
+        public int? PhaseGroup { get; set; }
+
+        [Column(Name = "equipment_id")]
+        public int EquipmentId { get; set; }
+        
         [Column(Name = "position_x")]
         public float X { get; set; }
 

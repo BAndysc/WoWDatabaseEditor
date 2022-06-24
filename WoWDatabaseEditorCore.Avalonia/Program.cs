@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using AsyncAwaitBestPractices;
 using Avalonia;
 using Avalonia.Controls;
@@ -29,6 +30,7 @@ namespace WoWDatabaseEditorCore.Avalonia
                 return;
             System.Threading.Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
             SafeFireAndForgetExtensions.SetDefaultExceptionHandling(Console.WriteLine);
+            TaskScheduler.UnobservedTaskException += (sender, eventArgs) => Console.WriteLine(eventArgs.Exception);
             GlobalApplication.Arguments.Init(args);
             var app = BuildAvaloniaApp();
             try

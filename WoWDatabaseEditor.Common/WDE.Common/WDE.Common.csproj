@@ -19,6 +19,9 @@
     <PackageReference Include="CommonServiceLocator">
       <Version>2.0.5</Version>
     </PackageReference>
+    <PackageReference Include="DynamicData">
+      <Version>7.1.1</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="Newtonsoft.Json">
       <Version>13.0.1</Version>

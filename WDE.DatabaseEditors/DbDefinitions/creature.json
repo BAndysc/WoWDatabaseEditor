@@ -1,0 +1,158 @@
+{
+  "id": "creature",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Creature",
+  "description": "The table contains all creature spawns",
+  "table_name": "creature",
+  "table_index_name": "guid",
+  "record_mode": "SingleRow",
+  "group_name": "Spawns",
+  "icon_path": "Icons/document_creatures.png",
+  "primary_key": [
+    "guid"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Guid",
+          "db_column_name": "guid",
+          "value_type": "uint",
+          "read_only": true
+        },
+        {
+          "name": "Creature",
+          "db_column_name": "id",
+          "value_type": "CreatureParameter"
+        },
+        {
+          "name": "Map",
+          "db_column_name": "map",
+          "value_type": "MapParameter"
+        },
+        {
+          "name": "Zone",
+          "db_column_name": "zoneId",
+          "value_type": "ZoneAreaParameter"
+        },
+        {
+          "name": "Area",
+          "db_column_name": "areaId",
+          "value_type": "ZoneAreaParameter"
+        },
+        {
+          "name": "Spawn Mask",
+          "db_column_name": "spawnMask",
+          "value_type": "SpawnMaskParameter",
+          "default": 1
+        },
+        {
+          "name": "Phase Mask",
+          "db_column_name": "phaseMask",
+          "value_type": "PhaseMaskParameter",
+          "default": 1
+        },
+        {
+          "name": "Model",
+          "db_column_name": "modelid",
+          "value_type": "CreatureModelDataParameter"
+        },
+        {
+          "name": "Equipment Id",
+          "db_column_name": "equipment_id",
+          "value_type": "EquipmentCreatureGuidParameter"
+        },
+        {
+          "name": "Position X",
+          "db_column_name": "position_x",
+          "value_type": "float"
+        },
+        {
+          "name": "Position Y",
+          "db_column_name": "position_y",
+          "value_type": "float"
+        },
+        {
+          "name": "Position Z",
+          "db_column_name": "position_z",
+          "value_type": "float"
+        },
+        {
+          "name": "Orientation",
+          "db_column_name": "orientation",
+          "value_type": "float"
+        },
+        {
+          "name": "Spawn time secs",
+          "db_column_name": "spawntimesecs",
+          "value_type": "uint",
+          "default": 120
+        },
+        {
+          "name": "Wander Distance",
+          "db_column_name": "wander_distance",
+          "value_type": "float",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Current waypoint",
+          "db_column_name": "currentwaypoint",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Current health",
+          "db_column_name": "curhealth",
+          "value_type": "uint",
+          "default": 1,
+          "zero_is_blank": true
+        },
+        {
+          "name": "Current mana",
+          "db_column_name": "curmana",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Movement Type",
+          "db_column_name": "MovementType",
+          "value_type": "DatabaseMovementTypeParameter"
+        },
+        {
+          "name": "Npc flags",
+          "db_column_name": "npcflag",
+          "value_type": "NpcFlagParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Unit Flags",
+          "db_column_name": "unit_flags",
+          "value_type": "UnitFlagParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Dynamic flags",
+          "db_column_name": "dynamicflags",
+          "value_type": "DynamicFlagsParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Script Name",
+          "db_column_name": "ScriptName",
+          "value_type": "string",
+          "default": "",
+          "can_be_null": true
+        },
+        {
+          "name": "Verified Build",
+          "db_column_name": "VerifiedBuild",
+          "value_type": "int",
+          "can_be_null": true
+        }
+      ]
+    }
+  ]
+}

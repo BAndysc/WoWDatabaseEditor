@@ -1,0 +1,130 @@
+{
+  "id": "creature",
+  "compatibility": [
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Creature",
+  "description": "The table contains all creature spawns",
+  "table_name": "creature",
+  "table_index_name": "guid",
+  "record_mode": "SingleRow",
+  "group_name": "Spawns",
+  "icon_path": "Icons/document_creatures.png",
+  "primary_key": [
+    "guid"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Guid",
+          "db_column_name": "guid",
+          "value_type": "uint",
+          "read_only": true
+        },
+        {
+          "name": "Entry",
+          "db_column_name": "id",
+          "value_type": "CreatureParameter"
+        },
+        {
+          "name": "Map",
+          "db_column_name": "map",
+          "value_type": "MapParameter"
+        },
+        {
+          "name": "Spawn Mask",
+          "db_column_name": "spawnMask",
+          "value_type": "SpawnMaskParameter",
+          "default": 1
+        },
+        {
+          "name": "Phase Mask",
+          "db_column_name": "phaseMask",
+          "value_type": "PhaseMaskParameter",
+          "default": 1
+        },
+        {
+          "name": "Model",
+          "db_column_name": "modelid",
+          "value_type": "CreatureModelDataParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Equipment Id",
+          "db_column_name": "equipment_id",
+          "value_type": "TableReference(creature_equip_template#entry)Parameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Position X",
+          "db_column_name": "position_x",
+          "value_type": "float"
+        },
+        {
+          "name": "Position Y",
+          "db_column_name": "position_y",
+          "value_type": "float"
+        },
+        {
+          "name": "Position Z",
+          "db_column_name": "position_z",
+          "value_type": "float"
+        },
+        {
+          "name": "Orientation",
+          "db_column_name": "orientation",
+          "value_type": "float"
+        },
+        {
+          "name": "Spawn time secs min",
+          "db_column_name": "spawntimesecsmin",
+          "value_type": "uint",
+          "default": 120
+        },
+        {
+          "name": "Spawn time secs max",
+          "db_column_name": "spawntimesecsmax",
+          "value_type": "uint",
+          "default": 120
+        },
+        {
+          "name": "Spawn radius",
+          "db_column_name": "spawndist",
+          "value_type": "float",
+          "default": 5.0
+        },
+        {
+          "name": "Current waypoint",
+          "db_column_name": "currentwaypoint",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Current health",
+          "db_column_name": "curhealth",
+          "value_type": "uint",
+          "default": 1,
+          "zero_is_blank": true
+        },
+        {
+          "name": "Current mana",
+          "db_column_name": "curmana",
+          "value_type": "uint",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Is Dead",
+          "db_column_name": "DeathState",
+          "value_type": "BoolParameter"
+        },
+        {
+          "name": "Movement Type",
+          "db_column_name": "MovementType",
+          "value_type": "CmangosMovementTypeParameter"
+        }
+      ]
+    }
+  ]
+}

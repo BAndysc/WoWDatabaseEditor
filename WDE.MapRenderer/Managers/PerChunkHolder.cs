@@ -8,8 +8,8 @@ public class PerChunkHolder<T> where T : new()
 
     public T? this[(int x, int y) pair]
     {
-        get => array[pair.x, pair.y];
-        set => array[pair.x, pair.y] = value;
+        get => this[pair.x, pair.y];
+        set => this[pair.x, pair.y] = value;
     }
     
     public T? this[int x, int y]

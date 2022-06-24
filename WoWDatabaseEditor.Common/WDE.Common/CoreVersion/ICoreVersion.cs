@@ -18,6 +18,13 @@ namespace WDE.Common.CoreVersion
         bool SupportsSpecialCommands => false;
         bool SupportsReverseCommands => false;
         bool SupportsEventScripts => false;
+        PhasingType PhasingType { get; }
+    }
+
+    public enum PhasingType
+    {
+        PhaseMasks,
+        PhaseIds
     }
     
     public interface IGameVersionFeatures

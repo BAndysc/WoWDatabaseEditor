@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <OutputType>Library</OutputType>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <WarningsAsErrors>nullable</WarningsAsErrors>
+    </PropertyGroup>
+    <PropertyGroup>
+        <OutputPath>..\..\bin\$(Configuration)\</OutputPath>
+    </PropertyGroup>
+
+    <Import Project="..\..\Avalonia.props" />
+    <Import Project="..\..\Module.props" />
+    <Import Project="..\lib3d.props" />
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\WDE.MapRenderer\WDE.MapRenderer.csproj" />
+        <ProjectReference Include="..\..\WDE.MpqReader\WDE.MpqReader.csproj" />
+        <ProjectReference Include="..\..\WDE.MVVM\WDE.MVVM.csproj" />
+        <ProjectReference Include="..\..\WDE.Parameters\WDE.Parameters.csproj" />
+        <PackageReference Include="Avalonia" Version="0.10.8" />
+        <PackageReference Include="Nito.AsyncEx" Version="5.1.2" />
+        <ProjectReference Include="..\OpenGLBindings\OpenGLBindings.csproj" />
+        <ProjectReference Include="..\TheAvaloniaOpenGL\TheAvaloniaOpenGL.csproj" />
+        <ProjectReference Include="..\TheEngine\TheEngine.csproj" />
+        <ProjectReference Include="..\TheMaths\TheMaths.csproj" />
+    </ItemGroup>
+</Project>

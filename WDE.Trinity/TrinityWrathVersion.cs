@@ -16,6 +16,7 @@ namespace WDE.Trinity
         public IConditionFeatures ConditionFeatures => this;
         public IGameVersionFeatures GameVersionFeatures => this;
         public IDatabaseFeatures DatabaseFeatures => this;
+        public PhasingType PhasingType => PhasingType.PhaseMasks;
         
         public ISet<Type> UnsupportedTables { get; } = new HashSet<Type>{typeof(IAreaTriggerTemplate), typeof(IConversationTemplate), typeof(ISceneTemplate), typeof(IAreaTriggerCreateProperties)};
         public bool AlternativeTrinityDatabase => false;

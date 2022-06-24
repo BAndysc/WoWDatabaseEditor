@@ -338,6 +338,31 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public Task<ISceneTemplate?> GetSceneTemplateAsync(uint sceneId) => nonCachedDatabase.GetSceneTemplateAsync(sceneId);
 
         public Task<IList<ISceneTemplate>?> GetSceneTemplatesAsync() => nonCachedDatabase.GetSceneTemplatesAsync();
+        public Task<IList<ICreatureAddon>> GetCreatureAddons() => nonCachedDatabase.GetCreatureAddons();
+
+        public Task<IList<ICreatureTemplateAddon>> GetCreatureTemplateAddons() => nonCachedDatabase.GetCreatureTemplateAddons();
+
+        public Task<IList<ICreatureEquipmentTemplate>?> GetCreatureEquipmentTemplates() => nonCachedDatabase.GetCreatureEquipmentTemplates();
+
+        public Task<IList<IMangosCreatureEquipmentTemplate>?> GetMangosCreatureEquipmentTemplates() => nonCachedDatabase.GetMangosCreatureEquipmentTemplates();
+
+        public Task<IList<IGameEventCreature>> GetGameEventCreaturesAsync() => nonCachedDatabase.GetGameEventCreaturesAsync();
+
+        public Task<IList<IGameEventGameObject>> GetGameEventGameObjectsAsync() => nonCachedDatabase.GetGameEventGameObjectsAsync();
+
+        public Task<IList<IGameEventCreature>?> GetGameEventCreaturesByGuidAsync(uint guid) => nonCachedDatabase.GetGameEventCreaturesByGuidAsync(guid);
+
+        public Task<IList<IGameEventGameObject>?> GetGameEventGameObjectsByGuidAsync(uint guid) => nonCachedDatabase.GetGameEventGameObjectsByGuidAsync(guid);
+
+        public Task<IList<ICreatureEquipmentTemplate>?> GetCreatureEquipmentTemplates(uint entry) => nonCachedDatabase.GetCreatureEquipmentTemplates(entry);
+
+        public Task<IGameObject?> GetGameObjectByGuidAsync(uint guid) => nonCachedDatabase.GetGameObjectByGuidAsync(guid);
+
+        public Task<ICreature?> GetCreaturesByGuidAsync(uint guid) => nonCachedDatabase.GetCreaturesByGuidAsync(guid);
+
+        public Task<ICreatureAddon?> GetCreatureAddon(uint guid) => nonCachedDatabase.GetCreatureAddon(guid);
+
+        public Task<ICreatureTemplateAddon?> GetCreatureTemplateAddon(uint entry) => nonCachedDatabase.GetCreatureTemplateAddon(entry);
 
         public Task<List<IEventScriptLine>> GetEventScript(EventScriptType type, uint id) => nonCachedDatabase.GetEventScript(type, id);
 

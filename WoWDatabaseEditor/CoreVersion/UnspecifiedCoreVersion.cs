@@ -19,6 +19,7 @@ namespace WoWDatabaseEditorCore.CoreVersion
         public ISet<Type> UnsupportedTables => new HashSet<Type>();
         public ISet<SmartScriptType> SupportedTypes => new HashSet<SmartScriptType>();
         public bool AlternativeTrinityDatabase => false;
+        public PhasingType PhasingType => PhasingType.PhaseIds;
         
         public string TableName => "(null)";
         public string ConditionsFile => "SmartData/conditions.json";

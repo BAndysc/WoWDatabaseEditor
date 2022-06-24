@@ -19,6 +19,10 @@ namespace WDE.CMMySqlDatabase.Models
         [Column(Name = "phaseMask")]
         public uint? PhaseMask { get; set; }
 
+        public int? PhaseId => null;
+        
+        public int? PhaseGroup => null;
+
         [Column(Name = "position_x")]
         public float X { get; set; }
 

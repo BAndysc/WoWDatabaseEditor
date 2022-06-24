@@ -112,7 +112,7 @@ namespace WDE.CMMySqlDatabase.Models
         [Column("TrainerRace"                                 )] public byte    TrainerRace            { get; set; } // tinyint(3) unsigned
         [Column("TrainerTemplateId"                           )] public uint    TrainerTemplateId      { get; set; } // mediumint(8) unsigned
         [Column("VendorTemplateId"                            )] public uint    VendorTemplateId       { get; set; } // mediumint(8) unsigned
-        [Column("EquipmentTemplateId"                         )] public uint    EquipmentTemplateId    { get; set; } // mediumint(8) unsigned
+        [Column("EquipmentTemplateId"                         )] public uint?    EquipmentTemplateId    { get; set; } // mediumint(8) unsigned
         [Column("VehicleTemplateId"                           )] public uint    VehicleTemplateId      { get; set; } // mediumint(8) unsigned
         [Column("GossipMenuId"                                )] public uint    GossipMenuId           { get; set; } // mediumint(8) unsigned
         [Column("InteractionPauseTimer"                       )] public int     InteractionPauseTimer  { get; set; } // int(10)

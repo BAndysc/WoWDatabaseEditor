@@ -69,16 +69,16 @@ namespace TheEngine
         protected override void OnKeyDown(KeyEventArgs e)
         {
             engine?.inputManager.keyboard.KeyDown(e.Key);
-            //if (!Undo.Matches(e) && !Redo.Matches(e) && !IsModifierKey(e.Key))
-            //    e.Handled = true;
+            if (!Undo.Matches(e) && !Redo.Matches(e) && !IsModifierKey(e.Key))
+                e.Handled = true;
             base.OnKeyDown(e);
         }
 
         protected override void OnKeyUp(KeyEventArgs e)
         {
             engine?.inputManager.keyboard.KeyUp(e.Key);
-            //if (!Undo.Matches(e) && !Redo.Matches(e) && !IsModifierKey(e.Key))
-            //    e.Handled = true;
+            if (!Undo.Matches(e) && !Redo.Matches(e) && !IsModifierKey(e.Key))
+                e.Handled = true;
             base.OnKeyUp(e);
         }
 
@@ -125,12 +125,16 @@ namespace TheEngine
             try
             {
 #if USE_OPENTK
-            engine = new Engine(new OpenTKDevice(), new Configuration(), this, true);
+                IDevice device = new OpenTKDevice();
+#if DEBUG && DEBUG_OPENGL
+                device = new DebugDevice(device);
+#endif
+                engine = new Engine(device, new Configuration(), this, true);
 #else
                 IDevice device;
                 var real = new RealDevice(gl);
 #if DEBUG && DEBUG_OPENGL
-                device = new DebugDevice(real);
+                device = new DebugDevice(new RealDeviceWrapper(real));
 #else
                 device = new RealDeviceWrapper(real);
 #endif
@@ -170,10 +174,11 @@ namespace TheEngine
             {
                 engine.Device.device.CheckError("start OnOpenGlRender");
                 engine.Device.device.Begin();
-                engine.inputManager.Update();
-                engine.renderManager.BeginFrame();
 
                 var delta = (float)sw.Elapsed.TotalMilliseconds;
+                engine.inputManager.Update(delta);
+                engine.renderManager.BeginFrame();
+                engine.UpdateGui(delta / 1000.0f);
                 Tick(delta);
                 engine.statsManager.Counters.FrameTime.Add(delta);
                 sw.Restart();
@@ -192,7 +197,6 @@ namespace TheEngine
                 engine.renderManager.RenderTransparent(fb);
                 game?.RenderTransparent(delta);
                 engine.renderManager.RenderPostProcess();
-                engine.BeforeRenderGUI(delta / 1000.0f);
                 game?.RenderGUI(delta);
                 engine.RenderGUI();
                 engine.renderManager.FinalizeRendering(fb);

@@ -94,7 +94,7 @@ namespace TheEngine.Components
 
         public void Enable()
         {
-            enabled |= 1;
+            enabled |= 0b01;
         }
 
         public void Disable()
@@ -111,11 +111,11 @@ namespace TheEngine.Components
         {
             if (disabled)
             {
-                enabled |= 10;
+                enabled |= 0b10;
             }
             else
             {
-                enabled &= 0b01;
+                enabled &= 0b1;
             }
         }
 

@@ -12,5 +12,7 @@ namespace TheEngine.Interfaces
         Vector2 WheelDelta { get; }
         Vector2 NormalizedPosition { get; }
         Vector2 ScreenPoint { get; }
+        uint ClickCount { get; }
+        bool HasJustDoubleClicked { get; }
     }
 }

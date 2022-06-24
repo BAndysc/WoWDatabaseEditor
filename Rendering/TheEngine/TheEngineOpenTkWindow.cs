@@ -28,7 +28,11 @@ public class TheEngineOpenTkWindow : GameWindow, IWindowHost
 
     protected override void OnLoad()
     {
-        engine = new Engine(new OpenTKDevice(), new Configuration(), this, false);
+        IDevice device = new OpenTKDevice();
+#if DEBUG && DEBUG_OPENGL || true
+        device = new DebugDevice(device);
+#endif
+        engine = new Engine(device, new Configuration(), this, false);
         game.Initialize(engine);
         base.OnLoad();
     }
@@ -45,22 +49,29 @@ public class TheEngineOpenTkWindow : GameWindow, IWindowHost
         VSync = VSyncMode.Off;
         engine.statsManager.Counters.FrameTime.Add(args.Time * 1000);
         renderStopwatch.Restart();
+        engine.Device.device.Begin();
         engine.renderManager.BeginFrame();
         engine.renderManager.PrepareRendering(0);
         engine.renderManager.RenderOpaque(0);
+        engine.Device.device.Debug("  Rendering Game custom");
         game.Render((float)args.Time * 1000);
         engine.renderManager.RenderTransparent(0);
+        engine.Device.device.Debug("  Rendering Game custom translucent");
         game.RenderTransparent((float)args.Time * 1000);
         engine.renderManager.RenderPostProcess();
-        engine.BeforeRenderGUI((float)args.Time);
+        engine.Device.device.Debug("  Rendering Game custom GUI");
         game.RenderGUI((float)args.Time * 1000);
         engine.RenderGUI();
+        engine.Device.device.Debug("  Finalize rendering");
         engine.renderManager.FinalizeRendering(0);
         base.OnRenderFrame(args);
         renderStopwatch.Stop();
-        GL.Finish();
         engine.statsManager.Counters.TotalRender.Add(renderStopwatch.Elapsed.Milliseconds);
+        renderStopwatch.Restart();
+        GL.Finish();
         SwapBuffers();
+        renderStopwatch.Stop();
+        engine.statsManager.Counters.PresentTime.Add(renderStopwatch.Elapsed.Milliseconds);
     }
 
     private KeyboardState? previousState;
@@ -191,10 +202,21 @@ public class TheEngineOpenTkWindow : GameWindow, IWindowHost
     {
         updateStopwatch.Restart();
         engine.inputManager.PostUpdate();
-        engine.inputManager.Update();
+        engine.inputManager.Update((float)args.Time * 1000);
         UpdateKeyboard();
         UpdateMouse();
-
+        
+        if (engine.inputManager.Keyboard.JustPressed(Key.R))
+        {
+            if (engine.Device.device is DebugDevice debug)
+            {
+                var file = new FileInfo("render_debug.txt");
+                File.WriteAllLines(file.FullName, debug.commands);
+                Console.WriteLine("Log written to " + file.FullName);
+            }
+        }
+        
+        engine.UpdateGui((float)args.Time);
         game?.Update((float)args.Time * 1000);
         engine.renderManager.UpdateTransforms();
             

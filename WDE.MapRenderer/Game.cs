@@ -12,6 +12,7 @@ using WDE.Common.MPQ;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Utils;
 using WDE.MapRenderer.Managers;
+using WDE.Module;
 using WDE.Module.Attributes;
 
 namespace WDE.MapRenderer;
@@ -25,6 +26,7 @@ public class Game : IGame
     private readonly IMessageBoxService messageBoxService;
     private readonly IDatabaseClientFileOpener databaseClientFileOpener;
     private readonly IDatabaseProvider databaseProvider;
+    private readonly IScopedContainer scopedContainer;
     private GameManager? manager;
     public GameManager? Manager => manager; 
         
@@ -38,7 +40,8 @@ public class Game : IGame
         IGameProperties gameProperties,
         IMessageBoxService messageBoxService,
         IDatabaseClientFileOpener databaseClientFileOpener,
-        IDatabaseProvider databaseProvider)
+        IDatabaseProvider databaseProvider,
+        IScopedContainer scopedContainer)
     {
         this.mpqService = mpqService;
         this.gameView = gameView;
@@ -46,14 +49,14 @@ public class Game : IGame
         this.messageBoxService = messageBoxService;
         this.databaseClientFileOpener = databaseClientFileOpener;
         this.databaseProvider = databaseProvider;
+        this.scopedContainer = scopedContainer;
     }
         
     public bool Initialize(Engine engine)
     {
-        var unity = new UnityContainer();
-        unity.AddExtension(new Diagnostic());
-        var provider = new UnityContainerProvider(unity);
-        var registry = new UnityContainerRegistry(unity);
+        var unity = scopedContainer.CreateScope();
+        var provider = unity;
+        var registry = unity;
 
         registry.RegisterInstance(typeof(IGameProperties), gameProperties);
         registry.RegisterInstance(typeof(Engine), engine);

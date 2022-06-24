@@ -34,15 +34,31 @@ namespace TheEngine.Input
             }
         }
 
+        private float resetClickTimeCounter = 0;
+        
+        public uint ClickCount { get; private set; }
+
+        public bool HasJustDoubleClicked => ClickCount == 2;
+
         internal Mouse(Engine engine)
         {
             this.engine = engine;
         }
         
-        internal void Update()
+        internal void Update(float deltaMs)
         {
             Delta = lastPosition - Position;
             lastPosition = Position;
+            if (resetClickTimeCounter > 0)
+            {
+                if (resetClickTimeCounter <= deltaMs)
+                {
+                    ClickCount = 0;
+                    resetClickTimeCounter = 0;
+                }
+                else
+                    resetClickTimeCounter -= deltaMs;
+            }
         }
 
         internal void MouseWheel(Vector2 delta)
@@ -56,12 +72,16 @@ namespace TheEngine.Input
             {
                 leftDown = true;
                 leftJustDown = true;
+                ClickCount++;
+                resetClickTimeCounter = 500;
             }
 
             if ((button & MouseButton.Right) != 0)
             {
                 rightDown = true;
                 rightJustDown = true;
+                ClickCount++;
+                resetClickTimeCounter = 500;
             }
         }
 

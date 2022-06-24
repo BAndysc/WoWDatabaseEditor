@@ -396,6 +396,74 @@ namespace WDE.CMMySqlDatabase.Database
             return await model.SceneTemplates.ToListAsync<ISceneTemplate>();
         }
 
+        public async Task<IList<ICreatureAddon>> GetCreatureAddons()
+        {
+            await using var model = Database();
+            return await model.CreatureAddon.ToListAsync<ICreatureAddon>();
+        }
+
+        public async Task<IList<ICreatureTemplateAddon>> GetCreatureTemplateAddons()
+        {
+            await using var model = Database();
+            return await model.CreatureTemplateAddon.ToListAsync<ICreatureTemplateAddon>();
+        }
+
+        public async Task<IList<ICreatureEquipmentTemplate>?> GetCreatureEquipmentTemplates()
+        {
+            return null;
+        }
+
+        public async Task<IList<IGameEventCreature>> GetGameEventCreaturesAsync()
+        {
+            await using var model = Database();
+            return await model.GameEventCreature.ToListAsync<IGameEventCreature>();
+        }
+
+        public async Task<IList<IGameEventGameObject>> GetGameEventGameObjectsAsync()
+        {
+            await using var model = Database();
+            return await model.GameEventGameObject.ToListAsync<IGameEventGameObject>();
+        }
+
+        public async Task<IList<IGameEventCreature>?> GetGameEventCreaturesByGuidAsync(uint guid)
+        {
+            await using var model = Database();
+            return await model.GameEventCreature.Where(x => x.Guid == guid).ToListAsync<IGameEventCreature>();
+        }
+
+        public async Task<IList<IGameEventGameObject>?> GetGameEventGameObjectsByGuidAsync(uint guid)
+        {
+            await using var model = Database();
+            return await model.GameEventGameObject.Where(x => x.Guid == guid).ToListAsync<IGameEventGameObject>();
+        }
+
+        public async Task<IList<ICreatureEquipmentTemplate>?> GetCreatureEquipmentTemplates(uint entry)
+        {
+            return null;
+        }
+
+        public async Task<IList<IMangosCreatureEquipmentTemplate>?> GetMangosCreatureEquipmentTemplates()
+        {
+            await using var model = Database();
+            return await model.CreatureEquipmentTemplate.ToListAsync<IMangosCreatureEquipmentTemplate>();
+        }
+
+        public abstract Task<IGameObject?> GetGameObjectByGuidAsync(uint guid);
+
+        public abstract Task<ICreature?> GetCreaturesByGuidAsync(uint guid);
+
+        public async Task<ICreatureAddon?> GetCreatureAddon(uint guid)
+        {
+            await using var model = Database();
+            return await model.CreatureAddon.FirstOrDefaultAsync<ICreatureAddon>(x => x.Guid == guid);
+        }
+
+        public async Task<ICreatureTemplateAddon?> GetCreatureTemplateAddon(uint entry)
+        {
+            await using var model = Database();
+            return await model.CreatureTemplateAddon.FirstOrDefaultAsync<ICreatureTemplateAddon>(x => x.Entry == entry);
+        }
+
         public async Task<IList<IAuthRbacPermission>> GetRbacPermissionsAsync()
         {
             return new List<IAuthRbacPermission>();

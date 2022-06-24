@@ -7,21 +7,27 @@ namespace WDE.MapRenderer.Managers;
 [UniqueProvider]
 public interface IGameProperties
 {
-    bool OverrideLighting { get; }
-    bool DisableTimeFlow { get; }
-    int TimeSpeedMultiplier { get; }
-    bool ShowGrid { get; }
+    bool OverrideLighting { get; set; }
+    bool DisableTimeFlow { get; set;}
+    int TimeSpeedMultiplier { get; set; }
+    bool ShowGrid { get; set; }
     Time CurrentTime { get; set; }
-    float ViewDistanceModifier { get; }
-    bool ShowAreaTriggers { get; }
-    int TextureQuality { get; }
-    float DynamicResolution { get; }
+    float ViewDistanceModifier { get; set;}
+    bool ShowAreaTriggers { get; set; }
+    int TextureQuality { get; set; }
+    float DynamicResolution { get; set; }
+    bool RenderGui { get; set; }
 }
 
 [AutoRegister]
 [SingleInstance]
 public class GameProperties : IGameProperties
 {
+    public GameProperties()
+    {
+        
+    }
+    
     public bool OverrideLighting { get; set; }
     public bool DisableTimeFlow { get; set; }
     public int TimeSpeedMultiplier { get; set; }
@@ -31,4 +37,5 @@ public class GameProperties : IGameProperties
     public int TextureQuality { get; set; }
     public bool ShowAreaTriggers { get; set; }
     public float DynamicResolution { get; set; } = 1;
+    public bool RenderGui { get; set; } = true;
 }

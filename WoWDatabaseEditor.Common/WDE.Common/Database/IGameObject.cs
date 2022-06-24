@@ -7,6 +7,8 @@ namespace WDE.Common.Database
 
         public uint Map { get; }
         public uint? PhaseMask { get; }
+        int? PhaseId { get; }
+        int? PhaseGroup { get; }
         public float X { get; }
         public float Y { get; }
         public float Z { get; }

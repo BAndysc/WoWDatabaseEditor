@@ -97,5 +97,6 @@ namespace TheAvaloniaOpenGL
         void Scissor(int x, int y, int width, int height);
         void Flush();
         void Finish();
+        void Debug(string msg);
     }
 }

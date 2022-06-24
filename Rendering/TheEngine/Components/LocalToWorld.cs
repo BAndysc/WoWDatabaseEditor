@@ -15,6 +15,17 @@ namespace TheEngine.Components
         {
             entityManager.GetComponent<CopyParentTransform>(entity).Parent = parent;
         }
+
+        public static Entity GetRoot(this Entity entity, IEntityManager entityManager)
+        {
+            var copyTransformArchetype = entityManager.NewArchetype().WithComponentData<CopyParentTransform>();
+            while (entityManager.Is(entity, copyTransformArchetype))
+            {
+                entity = entityManager.GetComponent<CopyParentTransform>(entity).Parent;
+            }
+
+            return entity;
+        }
     }
 
     public struct LocalToWorld : IComponentData

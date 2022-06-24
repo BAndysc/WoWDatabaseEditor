@@ -90,13 +90,14 @@ namespace TheEngine
             uiManager = new UIManager(this);
         }
         
-        public void BeforeRenderGUI(float delta)
+        public void UpdateGui(float delta)
         {
-            uiManager.BeforeRender(delta);
+            uiManager.UpdateGui(delta);
         }
         
         public void RenderGUI()
         {
+            Device.device.Debug("  Rendering GUI");
             uiManager.Render();
         }
         

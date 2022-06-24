@@ -33,6 +33,7 @@ namespace WDE.MapRenderer.Managers
         public uint[,] areaIds = new uint[16,16];
         public Task? chunkLoading;
 
+        public Entity terrainEntity;
         public List<StaticRenderHandle> renderHandles = new();
         public List<Entity> entities = new();
         public List<NativeBuffer<Matrix>> animationBuffers = new();
@@ -108,6 +109,21 @@ namespace WDE.MapRenderer.Managers
                 renderGrid = value;
                 foreach (var chunk in chunks)
                     chunk.material?.SetUniformInt("showGrid", value ? 1 : 0);
+            }
+        }
+
+        private bool renderTerrain = true;
+        public bool RenderTerrain
+        {
+            get => renderTerrain;
+            set
+            {
+                if (renderTerrain == value)
+                    return;
+                renderTerrain = value;
+                foreach (var chunk in chunks)
+                    if (chunk.terrainEntity != Entity.Empty)
+                        chunk.terrainEntity.SetForceDisabledRendering(entityManager, !value);
             }
         }
 
@@ -509,6 +525,8 @@ namespace WDE.MapRenderer.Managers
                 new Vector3(chunkMesh.Bounds.Minimum.X, chunkMesh.Bounds.Minimum.Y, minHeight),
                 new Vector3(chunkMesh.Bounds.Maximum.X, chunkMesh.Bounds.Maximum.Y, maxHeight));
             entityManager.GetComponent<WorldMeshBounds>(terrainEntity) = RenderManager.LocalToWorld((MeshBounds)localBounds, new LocalToWorld() { Matrix = t.LocalToWorldMatrix });
+            terrainEntity.SetForceDisabledRendering(entityManager, !RenderTerrain);
+            chunk.terrainEntity = terrainEntity;
             chunk.entities.Add(terrainEntity);
             
             if (cancelationToken.IsCancellationRequested)
@@ -719,6 +737,7 @@ namespace WDE.MapRenderer.Managers
             yield return creatureManager.UnloadChunk(chunk.Creatures);
             yield return gameObjectManager.UnloadChunk(chunk.GameObjects);
             
+            chunk.terrainEntity = Entity.Empty;
             foreach (var obj in chunk.renderHandles)
                 renderManager.UnregisterStaticRenderer(obj);
             foreach (var entity in chunk.entities)

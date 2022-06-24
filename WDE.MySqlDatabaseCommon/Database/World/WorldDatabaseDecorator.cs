@@ -98,6 +98,31 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public ISceneTemplate? GetSceneTemplate(uint sceneId) => impl.GetSceneTemplate(sceneId);
         public Task<ISceneTemplate?> GetSceneTemplateAsync(uint sceneId) => impl.GetSceneTemplateAsync(sceneId);
         public Task<IList<ISceneTemplate>?> GetSceneTemplatesAsync() => impl.GetSceneTemplatesAsync();
+        public Task<IList<ICreatureAddon>> GetCreatureAddons() => impl.GetCreatureAddons();
+
+        public Task<IList<ICreatureTemplateAddon>> GetCreatureTemplateAddons() => impl.GetCreatureTemplateAddons();
+
+        public Task<IList<ICreatureEquipmentTemplate>?> GetCreatureEquipmentTemplates() => impl.GetCreatureEquipmentTemplates();
+
+        public Task<IList<IMangosCreatureEquipmentTemplate>?> GetMangosCreatureEquipmentTemplates() => impl.GetMangosCreatureEquipmentTemplates();
+        
+        public Task<IList<IGameEventCreature>> GetGameEventCreaturesAsync() => impl.GetGameEventCreaturesAsync();
+
+        public Task<IList<IGameEventGameObject>> GetGameEventGameObjectsAsync() => impl.GetGameEventGameObjectsAsync();
+
+        public Task<IList<IGameEventCreature>?> GetGameEventCreaturesByGuidAsync(uint guid) => impl.GetGameEventCreaturesByGuidAsync(guid);
+
+        public Task<IList<IGameEventGameObject>?> GetGameEventGameObjectsByGuidAsync(uint guid) => impl.GetGameEventGameObjectsByGuidAsync(guid);
+
+        public Task<IList<ICreatureEquipmentTemplate>?> GetCreatureEquipmentTemplates(uint entry) => impl.GetCreatureEquipmentTemplates(entry);
+
+        public Task<IGameObject?> GetGameObjectByGuidAsync(uint guid) => impl.GetGameObjectByGuidAsync(guid);
+
+        public Task<ICreature?> GetCreaturesByGuidAsync(uint guid) => impl.GetCreaturesByGuidAsync(guid);
+
+        public Task<ICreatureAddon?> GetCreatureAddon(uint guid) => impl.GetCreatureAddon(guid);
+
+        public Task<ICreatureTemplateAddon?> GetCreatureTemplateAddon(uint entry) => impl.GetCreatureTemplateAddon(entry);
 
         public Task<List<IEventScriptLine>> GetEventScript(EventScriptType type, uint id) => impl.GetEventScript(type, id);
     }

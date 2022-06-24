@@ -89,7 +89,21 @@ namespace WDE.Common.Database
         ISceneTemplate? GetSceneTemplate(uint sceneId);
         Task<ISceneTemplate?> GetSceneTemplateAsync(uint sceneId);
         Task<IList<ISceneTemplate>?> GetSceneTemplatesAsync();
-
+        
+        Task<IList<ICreatureAddon>> GetCreatureAddons();
+        Task<IList<ICreatureTemplateAddon>> GetCreatureTemplateAddons();
+        Task<IList<ICreatureEquipmentTemplate>?> GetCreatureEquipmentTemplates();
+        Task<IList<IMangosCreatureEquipmentTemplate>?> GetMangosCreatureEquipmentTemplates();
+        Task<IList<IGameEventCreature>> GetGameEventCreaturesAsync();
+        Task<IList<IGameEventGameObject>> GetGameEventGameObjectsAsync();
+        Task<IList<IGameEventCreature>?> GetGameEventCreaturesByGuidAsync(uint guid);
+        Task<IList<IGameEventGameObject>?> GetGameEventGameObjectsByGuidAsync(uint guid);
+        Task<IList<ICreatureEquipmentTemplate>?> GetCreatureEquipmentTemplates(uint entry);
+        Task<IGameObject?> GetGameObjectByGuidAsync(uint guid);
+        Task<ICreature?> GetCreaturesByGuidAsync(uint guid);
+        Task<ICreatureAddon?> GetCreatureAddon(uint guid);
+        Task<ICreatureTemplateAddon?> GetCreatureTemplateAddon(uint entry);
+        
         public enum SmartLinePropertyType
         {
             Event,

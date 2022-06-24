@@ -18,7 +18,7 @@ using IInputManager = TheEngine.Interfaces.IInputManager;
 
 namespace RenderingTester;
 
-public class StandaloneCustomGameModule : IGameModule, IPostProcess
+public class StandaloneCustomGameModule : IGameModule
 {
     private readonly IUIManager uiManager;
     private readonly CoroutineManager coroutineManager;
@@ -64,10 +64,6 @@ public class StandaloneCustomGameModule : IGameModule, IPostProcess
         this.mdxManager = mdxManager;
     }
 
-    private Material blurMaterial = null!;
-    private Material replacementMaterial = null!;
-    private Material outlineMaterial = null!;
-    
     public void Dispose()
     {
     }
@@ -75,28 +71,6 @@ public class StandaloneCustomGameModule : IGameModule, IPostProcess
     public void Initialize()
     {
         //gameContext.SetMap(571);
-        replacementMaterial = materialManager.CreateMaterial("data/unlit_flat_m2.json");
-        replacementMaterial.SetUniform("mesh_color", new Vector4(1, 0, 0, 1));
-
-        outlineMaterial = materialManager.CreateMaterial("data/outline.json");
-        outlineMaterial.BlendingEnabled = false;
-        outlineMaterial.SourceBlending = Blending.One;
-        outlineMaterial.DestinationBlending = Blending.Zero;
-        outlineMaterial.DepthTesting = DepthCompare.Always;
-        
-        blurMaterial = materialManager.CreateMaterial("data/blur.json");
-        blurMaterial.BlendingEnabled = true;
-        blurMaterial.SourceBlending = Blending.SrcAlpha;
-        blurMaterial.DestinationBlending = Blending.OneMinusSrcAlpha;
-        blurMaterial.DepthTesting = DepthCompare.Always;
-        blurMaterial.SetUniform("blurSize", 0.125f/4);
-        //blurMaterial.SetUniformInt("horizontalPass", 0);
-        //blurMaterial.SetUniform("sigma", 4);
-
-        RT = new ScreenRenderTexture(engine);
-        RT_downscaled = new ScreenRenderTexture(engine, 0.25f);
-        
-        renderManager.AddPostprocess(this);
     }
 
     private bool profiling = false;
@@ -116,15 +90,8 @@ public class StandaloneCustomGameModule : IGameModule, IPostProcess
         }
     }
 
-    private ScreenRenderTexture RT = null!;
-    private ScreenRenderTexture RT_downscaled = null!;
-    
     public void Render()
     {
-        RT.Update();
-        RT_downscaled.Update();
-        outlineMaterial.SetTexture("outlineTex", RT_downscaled);
-        outlineMaterial.SetTexture("outlineTexUnBlurred", RT);
     }
     
     public void RenderGUI()
@@ -156,11 +123,5 @@ public class StandaloneCustomGameModule : IGameModule, IPostProcess
         ui2.Text("calibri", $"Batches: " + (stats.NonInstancedDraws + stats.InstancedDraws), 12, Vector4.One);
         ui2.Text("calibri", $"Batches saved by instancing: " + stats.InstancedDrawSaved, 12, Vector4.One);
         ui2.Text("calibri", $"Tris: " + stats.TrianglesDrawn, 12, Vector4.One);
-    }
-
-    public void RenderPostprocess(IRenderManager context, TextureHandle currentImage)
-    {
-        outlineMaterial.SetTexture("_MainTex", currentImage);
-        context.RenderFullscreenPlane(outlineMaterial);
     }
 }

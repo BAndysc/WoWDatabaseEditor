@@ -102,15 +102,16 @@ namespace TheEngine.Managers
             imGuiController.Dispose();
         }
 
-        internal void BeforeRender(float delta)
+        internal void UpdateGui(float delta)
         {
-            imGuiController.BeforeRender(delta);
+            imGuiController.UpdateImGui(delta);
         }
 
         internal void Render()
         {
+#if DEBUG
             ei.Draw();
-            imGuiController.Render();
+#endif
             var cameraPos = cameraManager.MainCamera.Transform.Position;
             persistentTextArchetype.ForEach<LocalToWorld, DisabledObjectBit, DrawTextData>((itr, start, end, matrices, disabledAccess, datas) =>
             {
@@ -135,6 +136,8 @@ namespace TheEngine.Managers
             //     
             //     ui.Text("calibri", a.Archetype.ToString() +": " + a.Length, 10, Vector4.One);
             // }
+            
+            imGuiController.Render();
         }
 
         public void DrawBox(float x, float y, float w, float h, Vector4 color)

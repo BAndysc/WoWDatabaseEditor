@@ -1,0 +1,60 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:views="clr-namespace:WDE.MapSpawns.Views"
+             xmlns:viewModels="clr-namespace:WDE.MapSpawns.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:SpawnsToolViewModel"
+             x:Class="WDE.MapSpawns.Views.SpawnsToolView">
+    <DockPanel>
+        <ToolbarPanel DockPanel.Dock="Top">
+            <Button Content="Active events">
+                <Button.Flyout>
+                    <Flyout>
+                        <ScrollViewer MaxHeight="600">
+                            <ItemsRepeater Items="{CompiledBinding Events}">
+                                <ItemsRepeater.ItemTemplate>
+                                    <DataTemplate x:DataType="viewModels:GameEventViewModel">
+                                        <CheckBox Margin="0,3,0,3" IsChecked="{CompiledBinding Active}">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock MinWidth="23" FontFamily="Consolas,Menlo,Courier,Courier New" Opacity="0.7" Text="{CompiledBinding Entry}" />
+                                                <TextBlock Text="{CompiledBinding Name}" />
+                                            </StackPanel>
+                                        </CheckBox>
+                                    </DataTemplate>
+                                </ItemsRepeater.ItemTemplate>
+                            </ItemsRepeater>
+                        </ScrollViewer>
+                    </Flyout>
+                </Button.Flyout>
+            </Button>
+            <Button Content="Active phases">
+                <Button.Flyout>
+                    <Flyout>
+                        <ScrollViewer MaxHeight="600">
+                            <ItemsRepeater Items="{CompiledBinding AllPhases}">
+                                <ItemsRepeater.ItemTemplate>
+                                    <DataTemplate x:DataType="viewModels:GamePhaseViewModel">
+                                        <CheckBox Margin="0,3,0,3" IsChecked="{CompiledBinding Active}">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock MinWidth="23" FontFamily="Consolas,Menlo,Courier,Courier New" Opacity="0.7" Text="{CompiledBinding Entry}" />
+                                                <TextBlock Text="{CompiledBinding Name}" />
+                                            </StackPanel>
+                                        </CheckBox>
+                                    </DataTemplate>
+                                </ItemsRepeater.ItemTemplate>
+                            </ItemsRepeater>
+                        </ScrollViewer>
+                    </Flyout>
+                </Button.Flyout>
+            </Button>
+        </ToolbarPanel>
+        <TextBox DockPanel.Dock="Top" Watermark="Search" Text="{CompiledBinding SearchText}" />
+        <ScrollViewer>
+            <views:SpawnsFastTreeList SelectedSpawn2="{CompiledBinding SelectedSpawn, Mode=TwoWay}" Items2="{CompiledBinding SpawnItems}"
+                                      DoubleTapped="InputElement_OnDoubleTapped"
+            />
+        </ScrollViewer>
+    </DockPanel>
+</UserControl>

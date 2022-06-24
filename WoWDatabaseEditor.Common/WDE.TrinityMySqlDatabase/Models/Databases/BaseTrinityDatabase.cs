@@ -41,5 +41,10 @@ namespace WDE.TrinityMySqlDatabase.Models
         public ITable<MySqlSpellScriptLine> SpellScripts => GetTable<MySqlSpellScriptLine>();
         public ITable<MySqlAreaTriggerCreateProperties> AreaTriggerCreateProperties => GetTable<MySqlAreaTriggerCreateProperties>();
         public ITable<MySqlSceneTemplate> SceneTemplates => GetTable<MySqlSceneTemplate>();
+        public ITable<MySqlCreatureAddon> CreatureAddon => GetTable<MySqlCreatureAddon>();
+        public ITable<MySqlCreatureTemplateAddon> CreatureTemplateAddon => GetTable<MySqlCreatureTemplateAddon>();
+        public ITable<MySqlCreatureEquipmentTemplate> EquipmentTemplate => GetTable<MySqlCreatureEquipmentTemplate>();
+        public ITable<MySqlGameEventCreature> GameEventCreature => GetTable<MySqlGameEventCreature>();
+        public ITable<MySqlGameEventGameObject> GameEventGameObject => GetTable<MySqlGameEventGameObject>();
     }
 }

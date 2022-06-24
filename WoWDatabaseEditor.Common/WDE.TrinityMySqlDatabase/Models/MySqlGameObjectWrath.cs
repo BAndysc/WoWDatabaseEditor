@@ -16,6 +16,10 @@ namespace WDE.TrinityMySqlDatabase.Models
         [Column(Name = "map")]
         public uint Map { get; set; }
 
+        public int? PhaseId => null;
+        
+        public int? PhaseGroup => null;
+        
         [Column(Name = "phaseMask")]
         public uint? PhaseMask { get; set; }
 
@@ -72,6 +76,12 @@ namespace WDE.TrinityMySqlDatabase.Models
         public uint Map { get; set; }
 
         public uint? PhaseMask => null;
+        
+        [Column(Name = "PhaseId")]
+        public int? PhaseId { get; set; }
+        
+        [Column(Name = "PhaseGroup")]
+        public int? PhaseGroup { get; set; }
 
         [Column(Name = "position_x")]
         public float X { get; set; }

@@ -1,0 +1,111 @@
+{
+  "id": "gameobject",
+  "compatibility": [
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Gameobject",
+  "description": "The table contains all gameobject spawns",
+  "table_name": "gameobject",
+  "table_index_name": "guid",
+  "record_mode": "SingleRow",
+  "group_name": "Spawns",
+  "icon_path": "Icons/document_gameobjects.png",
+  "primary_key": [
+    "guid"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Guid",
+          "db_column_name": "guid",
+          "value_type": "uint",
+          "read_only": true
+        },
+        {
+          "name": "Entry",
+          "db_column_name": "id",
+          "value_type": "GameobjectParameter"
+        },
+        {
+          "name": "Map",
+          "db_column_name": "map",
+          "value_type": "MapParameter"
+        },
+        {
+          "name": "Spawn Mask",
+          "db_column_name": "spawnMask",
+          "value_type": "SpawnMaskParameter",
+          "default": 1
+        },
+        {
+          "name": "Phase Mask",
+          "db_column_name": "phaseMask",
+          "value_type": "PhaseMaskParameter",
+          "default": 1
+        },
+        {
+          "name": "Position X",
+          "db_column_name": "position_x",
+          "value_type": "float"
+        },
+        {
+          "name": "Position Y",
+          "db_column_name": "position_y",
+          "value_type": "float"
+        },
+        {
+          "name": "Position Z",
+          "db_column_name": "position_z",
+          "value_type": "float"
+        },
+        {
+          "name": "Orientation",
+          "db_column_name": "orientation",
+          "value_type": "float"
+        },
+        {
+          "name": "Rotation 0",
+          "db_column_name": "rotation0",
+          "value_type": "float"
+        },
+        {
+          "name": "Rotation 1",
+          "db_column_name": "rotation1",
+          "value_type": "float"
+        },
+        {
+          "name": "Rotation 2",
+          "db_column_name": "rotation2",
+          "value_type": "float"
+        },
+        {
+          "name": "Rotation 3",
+          "db_column_name": "rotation3",
+          "value_type": "float"
+        },
+        {
+          "name": "Spawn time secs min",
+          "db_column_name": "spawntimesecsmin",
+          "value_type": "int"
+        },
+        {
+          "name": "Spawn time secs max",
+          "db_column_name": "spawntimesecsmax",
+          "value_type": "int"
+        },
+        {
+          "name": "Anim progress",
+          "db_column_name": "animprogress",
+          "value_type": "uint"
+        },
+        {
+          "name": "State",
+          "db_column_name": "state",
+          "value_type": "GameobjectStateParameter"
+        }
+      ]
+    }
+  ]
+}

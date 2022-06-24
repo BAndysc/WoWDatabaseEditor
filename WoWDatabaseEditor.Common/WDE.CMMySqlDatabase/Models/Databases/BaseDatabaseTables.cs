@@ -29,5 +29,10 @@ namespace WDE.CMMySqlDatabase.Models
         public ITable<MySqlSpellScriptLine> SpellScripts => GetTable<MySqlSpellScriptLine>();
         public ITable<MySqlAreaTriggerCreateProperties> AreaTriggerCreateProperties => GetTable<MySqlAreaTriggerCreateProperties>();
         public ITable<MySqlSceneTemplate> SceneTemplates => GetTable<MySqlSceneTemplate>();
+        public ITable<CreatureAddon> CreatureAddon => GetTable<CreatureAddon>();
+        public ITable<CreatureTemplateAddon> CreatureTemplateAddon => GetTable<CreatureTemplateAddon>();
+        public ITable<GameEventCreature> GameEventCreature => GetTable<GameEventCreature>();
+        public ITable<GameEventGameObject> GameEventGameObject => GetTable<GameEventGameObject>();
+        public ITable<CreatureEquipmentTemplate> CreatureEquipmentTemplate => GetTable<CreatureEquipmentTemplate>();
     }
 }

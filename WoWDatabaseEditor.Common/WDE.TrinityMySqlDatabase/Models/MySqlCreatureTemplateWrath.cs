@@ -45,6 +45,8 @@ namespace WDE.TrinityMySqlDatabase.Models
         [Column(Name = "npcflag")]
         public GameDefines.NpcFlags NpcFlags { get; set; }
         
+        public uint? EquipmentTemplateId => null;
+        
         public int ModelsCount => 4;
         public uint GetModel(int index)
         {
@@ -92,7 +94,9 @@ namespace WDE.TrinityMySqlDatabase.Models
         
         [Column(Name = "npcflag")]
         public GameDefines.NpcFlags NpcFlags { get; set; }
-        
+
+        public uint? EquipmentTemplateId => null;
+
         public int ModelsCount => 0;
         public uint GetModel(int index)
         {

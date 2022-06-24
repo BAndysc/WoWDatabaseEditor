@@ -472,9 +472,9 @@ namespace TheEngine.Managers
 
         public void RenderFullscreenPlane(Material material)
         {
-            material.Shader.Activate();
+            SetShader(material.Shader);
             EnableMaterial(material, false, null);
-            planeMesh.Activate();
+            SetMesh((Mesh)planeMesh);
             engine.Device.DrawIndexed(engine.meshManager.GetMeshByHandle(planeMesh.Handle).IndexCount(0), 0, 0);
         }
         
@@ -515,6 +515,7 @@ namespace TheEngine.Managers
 
         internal void RenderPostProcess()
         {
+            engine.Device.device.Debug("  Rendering postprocesses");
             inCoreRenderingLoop = false;
             if (useDynamicScale)
             {
@@ -527,10 +528,12 @@ namespace TheEngine.Managers
             
             foreach (var post in postProcesses)
             {
+                engine.Device.device.Debug("  Rendering postprocess");
                 ActivateRenderTexture(OtherBackBuffer, Color4.White);
                 post.RenderPostprocess(this, CurrentBackBuffer);
                 SwapBackBuffers();
             }
+            engine.Device.device.Debug("  Finished rendering postprocesses");
         }
 
         private struct CachedComponentDataAccess<T> where T : unmanaged, IComponentData
@@ -803,6 +806,7 @@ namespace TheEngine.Managers
 
         private void Render(int start, int end, bool transparent)
         {
+            engine.Device.device.Debug(transparent ? "  Rendering translucent" : "  Rendering opaque");
             sw.Restart();
             int savedByInstancing = 0;
             for (int i = start; i < end; ++i)
@@ -831,23 +835,8 @@ namespace TheEngine.Managers
 
                 if (toBatch <= 2)
                 {
-                    if (currentShader != shader)
-                    {
-                        Stats.ShaderSwitches++;
-                        currentShader = shader;
-                        //shadertimer.Start();
-                        shader.Activate();
-                        //shadertimer.Stop();
-                    }
-
-                    if (currentMesh != mesh)
-                    {
-                        Stats.MeshSwitches++;
-                        currentMesh = mesh;
-                        //meshtimer.Start();
-                        mesh.Activate();
-                        //meshtimer.Stop();
-                    }
+                    SetShader(shader);
+                    SetMesh(mesh);
                 
                     //materialtimer.Start();
                     EnableMaterial(material, false, renderersData[i].Item2);
@@ -904,23 +893,9 @@ namespace TheEngine.Managers
 
                     shader = material.InstancedShader!;
                     
-                    if (currentShader != shader)
-                    {
-                        Stats.ShaderSwitches++;
-                        currentShader = shader;
-                        //shadertimer.Start();
-                        shader.Activate();
-                        //shadertimer.Stop();
-                    }
+                    SetShader(shader);
 
-                    if (currentMesh != mesh)
-                    {
-                        Stats.MeshSwitches++;
-                        currentMesh = mesh;
-                        //meshtimer.Start();
-                        mesh.Activate();
-                        //meshtimer.Stop();
-                    }
+                    SetMesh(mesh);
                 
                     //materialtimer.Start();
                     instancingRenderData.Clear();
@@ -949,6 +924,30 @@ namespace TheEngine.Managers
             Stats.InstancedDrawSaved += savedByInstancing;
         }
 
+        private void SetShader(Shader shader)
+        {
+            if (currentShader != shader)
+            {
+                Stats.ShaderSwitches++;
+                currentShader = shader;
+                //shadertimer.Start();
+                shader.Activate();
+                //shadertimer.Stop();
+            }
+        }
+
+        private void SetMesh(Mesh mesh)
+        {
+            if (currentMesh != mesh)
+            {
+                Stats.MeshSwitches++;
+                currentMesh = mesh;
+                //meshtimer.Start();
+                mesh.Activate();
+                //meshtimer.Stop();
+            }
+        }
+
         public void Render(MeshHandle meshHandle, MaterialHandle materialHandle, int submesh, Matrix localToWorld, Matrix? worldToLocal = null, MaterialInstanceRenderData? instanceData = null)
         {
             var mesh = engine.meshManager.GetMeshByHandle(meshHandle);
@@ -965,14 +964,9 @@ namespace TheEngine.Managers
             }
             
             Debug.Assert(inRenderingLoop);
-            if (currentShader != material.Shader)
-            {
-                currentShader = material.Shader;
-                currentShader.Activate();
-            }
+            SetShader(material.Shader);
             EnableMaterial(material, false, instanceData);
-            currentMesh = (Mesh)mesh;
-            mesh.Activate();
+            SetMesh((Mesh)mesh);
             objectData.WorldMatrix = localToWorld;
             objectData.InverseWorldMatrix = worldToLocal.Value;
             objectBuffer.UpdateBuffer(ref objectData);
@@ -985,15 +979,10 @@ namespace TheEngine.Managers
         {
             lineMesh.SetVertices(start, end);
             lineMesh.RebuildIndices();
-            if (currentShader != unlitMaterial.Shader)
-            {
-                currentShader = unlitMaterial.Shader;
-                currentShader.Activate();
-            }
+            SetShader(unlitMaterial.Shader);
             unlitMaterial.SetUniform("color", color);
             EnableMaterial(unlitMaterial, false);
-            currentMesh = (Mesh)lineMesh;
-            lineMesh.Activate();
+            SetMesh(lineMesh);
             objectData.WorldMatrix = Matrix.Identity;
             objectData.InverseWorldMatrix = Matrix.Identity;
             objectBuffer.UpdateBuffer(ref objectData);
@@ -1018,13 +1007,12 @@ namespace TheEngine.Managers
                 Matrix.Invert(localToWorld, out var worldToLocal_);
                 worldToLocal = worldToLocal_;
             }
-            material.Shader.Activate();
+            SetShader(material.Shader);
             EnableMaterial(material, false);
             objectData.WorldMatrix = localToWorld;
             objectData.InverseWorldMatrix = worldToLocal.Value;
             objectBuffer.UpdateBuffer(ref objectData);
-            
-            mesh.Activate();
+            SetMesh((Mesh)mesh);
             var start = mesh.IndexStart(submesh);
             var count = mesh.IndexCount(submesh);
             engine.Device.DrawIndexedInstanced(count, instancesCount, start, 0, 0);
@@ -1032,9 +1020,9 @@ namespace TheEngine.Managers
 
         public void RenderInstancedIndirect(IMesh mesh, Material material, int submesh, int instancesCount)
         {
-            material.Shader.Activate();
+            SetShader(material.Shader);
             EnableMaterial(material, false);
-            mesh.Activate();
+            SetMesh((Mesh)mesh);
             var start = mesh.IndexStart(submesh);
             var count = mesh.IndexCount(submesh);
             engine.Device.DrawIndexedInstanced(count, instancesCount, start, 0, 0);

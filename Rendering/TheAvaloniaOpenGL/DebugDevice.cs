@@ -7,11 +7,11 @@ namespace TheAvaloniaOpenGL
 {
     public class DebugDevice : IDevice
     {
-        private RealDevice device;
+        private IDevice device;
 
         public List<string> commands = new();
 
-        public DebugDevice(RealDevice device)
+        public DebugDevice(IDevice device)
         {
             this.device = device;
         }
@@ -491,13 +491,13 @@ namespace TheAvaloniaOpenGL
         public void DepthMask(bool @on)
         {
             Report($"DepthMask({@on})");
-            device.DepthMask(@on ? 1 : 0);
+            device.DepthMask(@on);
         }
 
         public void DepthFunction(DepthFunction func)
         {
             Report($"DepthFunc({func})");
-            device.DepthFunc(func);
+            device.DepthFunction(func);
         }
 
         public void Scissor(int x, int y, int width, int height)
@@ -509,7 +509,7 @@ namespace TheAvaloniaOpenGL
         public unsafe void UniformMatrix4f(int location, ref Matrix4x4 m, bool transpose)
         {
             Report($"Matrix4f({location}, {transpose}, {m})");
-            device.UniformMatrix4fv(location, 1, transpose, Unsafe.AsPointer(ref m));
+            device.UniformMatrix4f(location, ref m, transpose);
         }
         
         public void Flush()
@@ -520,6 +520,11 @@ namespace TheAvaloniaOpenGL
         public void Finish()
         {
             device.Finish();
+        }
+
+        public void Debug(string msg)
+        {
+            commands.Add(msg);
         }
     }
 }

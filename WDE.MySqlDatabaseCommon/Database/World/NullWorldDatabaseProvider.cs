@@ -138,5 +138,19 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public ISceneTemplate? GetSceneTemplate(uint sceneId) => null;
         public Task<ISceneTemplate?> GetSceneTemplateAsync(uint sceneId) => Task.FromResult<ISceneTemplate?>(null);
         public Task<IList<ISceneTemplate>?> GetSceneTemplatesAsync() => Task.FromResult<IList<ISceneTemplate>?>(null);
+        public async Task<IList<ICreatureAddon>> GetCreatureAddons() => new List<ICreatureAddon>();
+        public async Task<IList<ICreatureTemplateAddon>> GetCreatureTemplateAddons() => new List<ICreatureTemplateAddon>();
+        public async Task<IList<ICreatureEquipmentTemplate>?> GetCreatureEquipmentTemplates() => new List<ICreatureEquipmentTemplate>();
+        public async Task<IList<IMangosCreatureEquipmentTemplate>?> GetMangosCreatureEquipmentTemplates() => null;
+
+        public async Task<IList<IGameEventCreature>> GetGameEventCreaturesAsync() => new List<IGameEventCreature>();
+        public async Task<IList<IGameEventGameObject>> GetGameEventGameObjectsAsync() => new List<IGameEventGameObject>();
+        public async Task<IList<IGameEventCreature>?> GetGameEventCreaturesByGuidAsync(uint guid) => new List<IGameEventCreature>();
+        public async Task<IList<IGameEventGameObject>?> GetGameEventGameObjectsByGuidAsync(uint guid) => new List<IGameEventGameObject>();
+        public async Task<IList<ICreatureEquipmentTemplate>?> GetCreatureEquipmentTemplates(uint entry) => new List<ICreatureEquipmentTemplate>();
+        public async Task<IGameObject?> GetGameObjectByGuidAsync(uint guid) => null;
+        public async Task<ICreature?> GetCreaturesByGuidAsync(uint guid) => null;
+        public async Task<ICreatureAddon?> GetCreatureAddon(uint guid) => null;
+        public async Task<ICreatureTemplateAddon?> GetCreatureTemplateAddon(uint entry) => null;
     }
 }

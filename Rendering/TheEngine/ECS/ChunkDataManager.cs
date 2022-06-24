@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -224,18 +225,31 @@ namespace TheEngine.ECS
         }
 
         // for debugging only
+        internal object? DebugGetManagedComponent(Entity entity, IManagedComponentTypeData type)
+        {
+            for (int j = 0; j < managedComponentsCount; ++j)
+            {
+                var c = Archetype.ManagedComponents[j];
+                if (c.DataType == type.DataType)
+                {
+                    var index = sparseReverseEntityMapping[entity.Id];
+                    return managedComponentData[j][index];
+                }
+            }
+
+            return null;
+        }
+        
         internal unsafe object? UnsafeDebugGetComponent(Entity entity, IComponentTypeData type)
         {
-            int i = 0;
             for (int j = 0; j < componentsCount; ++j)
             {
                 var c = Archetype.Components[j];
                 if (c.DataType == type.DataType)
                 {
                     var index = sparseReverseEntityMapping[entity.Id];
-                    return Marshal.PtrToStructure(new IntPtr(componentData[i] + index * c.SizeBytes), type.DataType);
+                    return Marshal.PtrToStructure(new IntPtr(componentData[j] + index * c.SizeBytes), c.DataType);
                 }
-                i++;
             }
 
             return null;
