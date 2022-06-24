@@ -48,7 +48,9 @@ namespace WDE.Updater.Client
             if (response.StatusCode == HttpStatusCode.OK)
             {
                 string responseBody = await response.Content.ReadAsStringAsync();
-                return JsonConvert.DeserializeObject<CheckVersionResponse>(responseBody);
+                var result = JsonConvert.DeserializeObject<CheckVersionResponse>(responseBody);
+                if (result != null)
+                    return result;
             }
 
             throw new Exception("Update server returned " + response.StatusCode);

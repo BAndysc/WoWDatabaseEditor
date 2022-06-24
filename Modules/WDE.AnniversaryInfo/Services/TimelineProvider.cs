@@ -28,7 +28,7 @@ public class TimelineProvider : ITimelineProvider
         try
         {
             var response = await http.GetStringAsync(sourceUrl);
-            var items = JsonConvert.DeserializeObject<List<TimeLineItem>>(response)
+            var items = JsonConvert.DeserializeObject<List<TimeLineItem>>(response)!
                 .Where(item => !item.Skip)
                 .ToList();
             

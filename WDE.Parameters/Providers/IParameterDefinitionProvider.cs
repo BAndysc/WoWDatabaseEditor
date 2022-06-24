@@ -34,7 +34,7 @@ namespace WDE.Parameters.Providers
                 string data = File.ReadAllText(source);
                 try {
                     var parameters = JsonConvert.DeserializeObject<Dictionary<string, ParameterSpecModel>>(data);
-                    foreach (var keyPair in parameters)
+                    foreach (var keyPair in parameters!) // try-catch is null
                         allParameters[keyPair.Key] = keyPair.Value;
                 } 
                 catch (Exception e)

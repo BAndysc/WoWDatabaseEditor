@@ -32,6 +32,12 @@ public class ContextualParametersProvider : IContextualParametersProvider
         {
             var deserialized = JsonConvert.DeserializeObject<ContextualParameterJson>(json.content);
 
+            if (deserialized == null)
+            {
+                Console.WriteLine("Cannot deserialize " + json.file);
+                continue;
+            }
+            
             if (deserialized.SimpleSwitch != null)
             {
                 var required = deserialized.SimpleSwitch.Values.Values.ToList();

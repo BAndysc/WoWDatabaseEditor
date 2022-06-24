@@ -8,7 +8,7 @@ namespace WDE.SmartScriptEditor.Data
     [SingleInstance]
     public class SmartDataSerializationProvider : ISmartDataSerializationProvider
     {
-        public List<T> DeserializeSmartData<T>(string json) => JsonConvert.DeserializeObject<List<T>>(json);
+        public List<T> DeserializeSmartData<T>(string json) => JsonConvert.DeserializeObject<List<T>>(json)!;
 
         public string SerializeSmartData<T>(List<T> dataCollection)
         {

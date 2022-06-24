@@ -15,7 +15,7 @@ public class EventScriptDataProvider : IEventScriptDataProvider
 
     public EventScriptDataProvider(IEventScriptDataJsonProvider jsonProvider)
     {
-        data = JsonConvert.DeserializeObject<List<EventScriptRawData>>(jsonProvider.GetJson());
+        data = JsonConvert.DeserializeObject<List<EventScriptRawData>>(jsonProvider.GetJson())!;
         dataById = data.ToDictionary(x => x.Id, x => x);
     }
 

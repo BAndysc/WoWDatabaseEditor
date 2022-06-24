@@ -66,8 +66,9 @@ namespace WDE.PacketViewer.IntegrationTests
                 throw new Exception("Tests: error while deserializing test case file", e);
             }
             
-            foreach (var test in testCaseGroup)
-                await RunSingleTestCase(Path.GetDirectoryName(filePath)!, test);
+            if (testCaseGroup != null)
+                foreach (var test in testCaseGroup)
+                    await RunSingleTestCase(Path.GetDirectoryName(filePath)!, test);
         }
         
         public async Task RunSingleTestCase(string basePath, RelatedPacketsTestCaseGroup testCaseGroup)

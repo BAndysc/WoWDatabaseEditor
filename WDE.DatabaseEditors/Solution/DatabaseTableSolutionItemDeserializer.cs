@@ -51,7 +51,8 @@ namespace WDE.DatabaseEditors.Solution
                 else
                 {
                     var entries = JsonConvert.DeserializeObject<List<SolutionItemDatabaseEntity>>(projectItem.Comment);
-                    dbItem.Entries.AddRange(entries);
+                    if (entries != null)
+                        dbItem.Entries.AddRange(entries);
                 }
                 if (deletedEntries != null)
                     dbItem.DeletedEntries.AddRange(deletedEntries);
