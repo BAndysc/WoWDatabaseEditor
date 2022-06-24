@@ -16,7 +16,7 @@
         <ProjectReference Include="..\WDE.MVVM\WDE.MVVM.csproj" />
         <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />
         <PackageReference Include="Newtonsoft.Json">
-            <Version>12.0.3</Version>
+            <Version>13.0.1</Version>
         </PackageReference>
     </ItemGroup>
     <ItemGroup>
