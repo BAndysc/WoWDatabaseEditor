@@ -31,7 +31,7 @@ namespace WDE.SqlQueryGenerator
 
         public IQuery Close()
         {
-            return new Query(new DummyMultiQuery(), string.Join(Environment.NewLine, queries.Select(q => (q?.QueryString ?? "\n", q == null)).Where(q => q.Item2 || !string.IsNullOrWhiteSpace(q.Item1)).Select(q => q.Item1)));
+            return new Query(new DummyMultiQuery(), string.Join(Environment.NewLine, queries.Select(q => (q?.QueryString ?? Environment.NewLine, q == null)).Where(q => q.Item2 || !string.IsNullOrWhiteSpace(q.Item1)).Select(q => q.Item1)));
         }
     }
 
