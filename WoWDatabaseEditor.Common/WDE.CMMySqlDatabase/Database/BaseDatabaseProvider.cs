@@ -174,17 +174,12 @@ namespace WDE.CMMySqlDatabase.Database
         
         public async Task<IAreaTriggerScript?> GetAreaTriggerScript(int entry)
         {
-            await using var model = Database();
-            return await model.AreaTriggerScript.FirstOrDefaultAsync(script => script.Entry == entry);
+            return null;
         }
 
         public IEnumerable<IAreaTriggerTemplate> GetAreaTriggerTemplates()
         {
-            if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(IAreaTriggerTemplate)))
-                return new List<IAreaTriggerTemplate>();
-
-            using var model = Database();
-            return (from t in model.AreaTriggerTemplate orderby t.Id select t).ToList<IAreaTriggerTemplate>();
+            return new List<IAreaTriggerTemplate>();
         }
         
         public async Task<List<ICreatureClassLevelStat>> GetCreatureClassLevelStatsAsync()
@@ -209,11 +204,7 @@ namespace WDE.CMMySqlDatabase.Database
 
         public async Task<List<IAreaTriggerTemplate>> GetAreaTriggerTemplatesAsync()
         {
-            if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(IAreaTriggerTemplate)))
-                return new List<IAreaTriggerTemplate>();
-
-            await using var model = Database();
-            return await (from t in model.AreaTriggerTemplate orderby t.Id select t).ToListAsync<IAreaTriggerTemplate>();
+            return new List<IAreaTriggerTemplate>();
         }
         
         public IEnumerable<IGameObjectTemplate> GetGameObjectTemplates()
