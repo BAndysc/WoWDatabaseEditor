@@ -17,7 +17,6 @@ namespace WDE.CMMySqlDatabase.Models
         public ITable<QuestTemplateWoTLK> QuestTemplate => GetTable<QuestTemplateWoTLK>();
         public ITable<MySqlQuestRequestItem> QuestRequestItems => GetTable<MySqlQuestRequestItem>();
         public ITable<GameEventWoTLK> GameEvents => GetTable<GameEventWoTLK>();
-        public ITable<ConditionLineWoTLK> Conditions => GetTable<ConditionLineWoTLK>();
         public ITable<SpellScriptNameWoTLK> SpellScriptNames => GetTable<SpellScriptNameWoTLK>();
         public ITable<GossipMenuLineWoTLK> GossipMenus => GetTable<GossipMenuLineWoTLK>();
         public ITable<MySqlGossipMenuOptionWrath> GossipMenuOptions => GetTable<MySqlGossipMenuOptionWrath>();
