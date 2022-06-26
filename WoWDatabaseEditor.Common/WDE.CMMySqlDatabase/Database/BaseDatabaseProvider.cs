@@ -41,20 +41,12 @@ namespace WDE.CMMySqlDatabase.Database
         
         public async Task<List<ICreatureText>> GetCreatureTextsByEntryAsync(uint entry)
         {
-            await using var model = Database();
-            return await model.CreatureTexts.Where(t => t.CreatureId == entry)
-                .OrderBy(t => t.GroupId)
-                .ThenBy(t => t.Id)
-                .ToListAsync<ICreatureText>();
+            return new List<ICreatureText>();
         }
 
         public IReadOnlyList<ICreatureText>? GetCreatureTextsByEntry(uint entry)
         {
-            using var model = Database();
-            return model.CreatureTexts.Where(t => t.CreatureId == entry)
-                .OrderBy(t => t.GroupId)
-                .ThenBy(t => t.Id)
-                .ToList<ICreatureText>();
+            return null;
         }
         
         public async Task<IList<ISmartScriptLine>> GetLinesCallingSmartTimedActionList(int timedActionList)
