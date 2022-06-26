@@ -30,10 +30,6 @@ namespace WDE.CMaNGOS
         
         public ISet<SmartScriptType> SupportedTypes { get; } = new HashSet<SmartScriptType>
         {
-            SmartScriptType.Creature,
-            SmartScriptType.GameObject,
-            SmartScriptType.AreaTrigger,
-            SmartScriptType.TimedActionList,
         };
 
         public bool AlternativeTrinityDatabase => true;
