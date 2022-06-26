@@ -13,11 +13,9 @@ namespace WDE.CMMySqlDatabase.Models
         {
         }
 
-        public ITable<AreaTriggerScriptWoTLK> AreaTriggerScript => GetTable<AreaTriggerScriptWoTLK>();
         public ITable<GameObjectTemplateWoTLK> GameObjectTemplate => GetTable<GameObjectTemplateWoTLK>();
         public ITable<QuestTemplateWoTLK> QuestTemplate => GetTable<QuestTemplateWoTLK>();
         public ITable<MySqlQuestRequestItem> QuestRequestItems => GetTable<MySqlQuestRequestItem>();
-        public ITable<AreaTriggerTemplateWoTLK> AreaTriggerTemplate => GetTable<AreaTriggerTemplateWoTLK>();
         public ITable<GameEventWoTLK> GameEvents => GetTable<GameEventWoTLK>();
         public ITable<ConditionLineWoTLK> Conditions => GetTable<ConditionLineWoTLK>();
         public ITable<SpellScriptNameWoTLK> SpellScriptNames => GetTable<SpellScriptNameWoTLK>();
