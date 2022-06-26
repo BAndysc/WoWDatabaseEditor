@@ -267,57 +267,16 @@ namespace WDE.CMMySqlDatabase.Database
             IDatabaseProvider.ConditionKeyMask keyMask,
             IDatabaseProvider.ConditionKey? manualKey = null)
         {
-            using var writeLock = await DatabaseLock.WriteLock();
-            await using var model = Database();
-
-            var conditions = conditionLines?.ToList() ?? new List<IConditionLine>();
-            List<(int SourceType, int? SourceGroup, int? SourceEntry, int? SourceId)> keys = conditions.Select(c =>
-                    (c.SourceType, keyMask.HasFlagFast(IDatabaseProvider.ConditionKeyMask.SourceGroup) ? (int?) c.SourceGroup : null,
-                        keyMask.HasFlagFast(IDatabaseProvider.ConditionKeyMask.SourceEntry) ? (int?) c.SourceEntry : null,
-                        keyMask.HasFlagFast(IDatabaseProvider.ConditionKeyMask.SourceId) ? (int?) c.SourceId : null))
-                .Union(manualKey.HasValue
-                    ? new[]
-                    {
-                        (manualKey.Value.SourceType, manualKey.Value.SourceGroup, manualKey.Value.SourceEntry,
-                            manualKey.Value.SourceId)
-                    }
-                    : Array.Empty<(int, int?, int?, int?)>())
-                .Distinct()
-                .ToList();
-
-            await model.BeginTransactionAsync(IsolationLevel.ReadCommitted);
-
-            foreach (var key in keys)
-                await model.Conditions.Where(x => x.SourceType == key.SourceType &&
-                                                  (!key.SourceGroup.HasValue || x.SourceGroup == key.SourceGroup.Value) &&
-                                                  (!key.SourceEntry.HasValue || x.SourceEntry == key.SourceEntry.Value) &&
-                                                  (!key.SourceId.HasValue || x.SourceId == key.SourceId.Value))
-                    .DeleteAsync();
-
-            if (conditions.Count > 0)
-                await model.Conditions.BulkCopyAsync(conditions.Select(line => new ConditionLineWoTLK(line)));
-
-            await model.CommitTransactionAsync();
         }
 
         public IEnumerable<IConditionLine> GetConditionsFor(int sourceType, int sourceEntry, int sourceId)
         {
-            using var model = Database();
-
-            return model.Conditions.Where(line =>
-                    line.SourceType == sourceType && line.SourceEntry == sourceEntry && line.SourceId == sourceId)
-                .ToList();
+            return new List<IConditionLine>();
         }
 
         public async Task<IList<IConditionLine>> GetConditionsForAsync(IDatabaseProvider.ConditionKeyMask keyMask, IDatabaseProvider.ConditionKey key)
         {
-            await using var model = Database();
-
-            return await model.Conditions.Where(x => x.SourceType == key.SourceType &&
-                                                     (!keyMask.HasFlagFast(IDatabaseProvider.ConditionKeyMask.SourceGroup) || x.SourceGroup == (key.SourceGroup ?? 0)) &&
-                                                     (!keyMask.HasFlagFast(IDatabaseProvider.ConditionKeyMask.SourceEntry)  || x.SourceEntry == (key.SourceEntry ?? 0)) &&
-                                                     (!keyMask.HasFlagFast(IDatabaseProvider.ConditionKeyMask.SourceId)  || x.SourceId == (key.SourceId ?? 0)))
-                .ToListAsync<IConditionLine>();
+            return new List<IConditionLine>();
         }
 
         public async Task<IList<int>> GetSmartScriptEntriesByType(SmartScriptType scriptType)
