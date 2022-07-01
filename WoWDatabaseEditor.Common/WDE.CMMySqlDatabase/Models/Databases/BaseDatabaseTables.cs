@@ -15,14 +15,10 @@ namespace WDE.CMMySqlDatabase.Models
 
         public ITable<GameObjectTemplateWoTLK> GameObjectTemplate => GetTable<GameObjectTemplateWoTLK>();
         public ITable<QuestTemplateWoTLK> QuestTemplate => GetTable<QuestTemplateWoTLK>();
-        public ITable<MySqlQuestRequestItem> QuestRequestItems => GetTable<MySqlQuestRequestItem>();
         public ITable<GameEventWoTLK> GameEvents => GetTable<GameEventWoTLK>();
         public ITable<SpellScriptNameWoTLK> SpellScriptNames => GetTable<SpellScriptNameWoTLK>();
         public ITable<GossipMenuLineWoTLK> GossipMenus => GetTable<GossipMenuLineWoTLK>();
-        public ITable<MySqlGossipMenuOptionWrath> GossipMenuOptions => GetTable<MySqlGossipMenuOptionWrath>();
-        public ITable<MySqlGossipMenuOptionCata> SplitGossipMenuOptions => GetTable<MySqlGossipMenuOptionCata>();
-        public ITable<MySqlGossipMenuOptionAction> SplitGossipMenuOptionActions => GetTable<MySqlGossipMenuOptionAction>();
-        public ITable<MySqlGossipMenuOptionBox> SplitGossipMenuOptionBoxes => GetTable<MySqlGossipMenuOptionBox>();
+        public ITable<GossipMenuOption> GossipMenuOptions => GetTable<GossipMenuOption>();
         public ITable<NpcTextWoTLK> NpcTexts => GetTable<NpcTextWoTLK>();
         public ITable<CreatureClassLevelStatWoTLK> CreatureClassLevelStats => GetTable<CreatureClassLevelStatWoTLK>();
         public ITable<CoreCommandHelp> Commands => GetTable<CoreCommandHelp>();
