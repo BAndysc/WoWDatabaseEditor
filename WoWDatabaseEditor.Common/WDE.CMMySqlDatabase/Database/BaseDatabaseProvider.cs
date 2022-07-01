@@ -61,8 +61,7 @@ namespace WDE.CMMySqlDatabase.Database
 
         public async Task<IQuestRequestItem?> GetQuestRequestItem(uint entry)
         {
-            await using var model = Database();
-            return await model.QuestRequestItems.FirstOrDefaultAsync<IQuestRequestItem>(quest => quest.Entry == entry);
+            return null;
         }
 
         public IEnumerable<IGameEvent> GetGameEvents()

@@ -68,7 +68,7 @@ public class DatabaseProviderWoTLK : BaseDatabaseProvider<WoTLKDatabase>
     public override async Task<IBroadcastText?> GetBroadcastTextByIdAsync(uint id)
     {
         await using var model = Database();
-        return await (from t in model.BroadcastTexts where t.Id == id select t).FirstOrDefaultAsync();
+        return await (from t in model.BroadcastTexts where t._Id == id select t).FirstOrDefaultAsync();
     }
 
     public override ICreature? GetCreatureByGuid(uint guid)
