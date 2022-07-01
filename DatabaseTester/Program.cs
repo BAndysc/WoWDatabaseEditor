@@ -4,6 +4,7 @@ using Prism.Events;
 using Prism.Ioc;
 using Unity;
 using WDE.AzerothCore;
+using WDE.CMaNGOS;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;
 using WDE.Common.Managers;
@@ -166,6 +167,15 @@ public class Program
     public static int Main(string[] args)
     {
         FixCurrentDirectory();
+        
+        if (args.Length == 0)
+        {
+            Console.WriteLine("No arguments provided");
+            return -1;
+        }
+
+        if (args[^1] == "CMaNGOS-WoTLK")
+            return DatabaseTester.Program.Test<WDE.CMMySqlDatabase.WorldDatabaseProvider>(args, new CMaNGOSCoreVersion());
         return Test<WorldDatabaseProvider>(args, new AzerothCoreVersion(), new TrinityCataclysmVersion(), new TrinityMasterVersion(), new TrinityWrathVersion());
     }
 }

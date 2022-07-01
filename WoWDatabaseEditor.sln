@@ -205,6 +205,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WDE.CMaNGOS", "WDE.CMaNGOS\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WDE.CMMySqlDatabase", "WoWDatabaseEditor.Common\WDE.CMMySqlDatabase\WDE.CMMySqlDatabase.csproj", "{4C10CB30-7DEC-40D8-B3DB-9F59DCAEA3C5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatabaseTester", "DatabaseTester\DatabaseTester.csproj", "{AD02CF70-7EE5-4BD0-9FCE-DB56EB55AB17}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -567,6 +569,10 @@ Global
 		{4C10CB30-7DEC-40D8-B3DB-9F59DCAEA3C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4C10CB30-7DEC-40D8-B3DB-9F59DCAEA3C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4C10CB30-7DEC-40D8-B3DB-9F59DCAEA3C5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AD02CF70-7EE5-4BD0-9FCE-DB56EB55AB17}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD02CF70-7EE5-4BD0-9FCE-DB56EB55AB17}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD02CF70-7EE5-4BD0-9FCE-DB56EB55AB17}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD02CF70-7EE5-4BD0-9FCE-DB56EB55AB17}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -637,6 +643,7 @@ Global
 		{7431ED24-207C-44B0-871A-FFF037C92EAF} = {106EEB05-E9AB-453A-ADD0-96505F405D76}
 		{F116181B-D507-486F-8BA6-B48FDCF1923D} = {0DA53E9B-250E-4D88-A456-35436FEA60F5}
 		{4C10CB30-7DEC-40D8-B3DB-9F59DCAEA3C5} = {8A37024A-7A68-4BCB-B800-766D92E041EF}
+		{AD02CF70-7EE5-4BD0-9FCE-DB56EB55AB17} = {8A37024A-7A68-4BCB-B800-766D92E041EF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3E63D4A5-8159-4344-B556-1E1D8D63DA99}

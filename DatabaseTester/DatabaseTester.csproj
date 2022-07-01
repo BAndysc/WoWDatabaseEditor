@@ -13,8 +13,10 @@
     
     <ItemGroup>
       <ProjectReference Include="..\WDE.AzerothCore\WDE.AzerothCore.csproj" />
+      <ProjectReference Include="..\WDE.CMaNGOS\WDE.CMaNGOS.csproj" />
       <ProjectReference Include="..\WDE.DatabaseEditors\WDE.DatabaseEditors.csproj" />
       <ProjectReference Include="..\WDE.Trinity\WDE.Trinity.csproj" />
+      <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.CMMySqlDatabase\WDE.CMMySqlDatabase.csproj" />
       <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.TrinityMySqlDatabase\WDE.TrinityMySqlDatabase.csproj" />
     </ItemGroup>
 
