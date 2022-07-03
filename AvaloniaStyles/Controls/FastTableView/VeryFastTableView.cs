@@ -329,8 +329,7 @@ public partial class VeryFastTableView : Control, IKeyboardNavigationHandler
         return new Rect(widthRect.x, row * RowHeight + DrawingStartOffsetY, width, RowHeight);
     }
 
-    private ScrollViewer ScrollViewer => this.FindAncestorOfType<ScrollViewer>();
-
+    private ScrollViewer? ScrollViewer => this.FindAncestorOfType<ScrollViewer>();
 
     private bool IsRowVisible(int row, ScrollViewer? scroll = null)
     {
@@ -338,6 +337,8 @@ public partial class VeryFastTableView : Control, IKeyboardNavigationHandler
             return false;
         if (scroll == null)
             scroll = ScrollViewer;
+        if (scroll == null)
+            return false;
         var startIndex = Math.Max(0, (int)(scroll.Offset.Y / RowHeight) - 1);
         var endIndex = Math.Min(startIndex + scroll.Viewport.Height / RowHeight + 2, Rows.Count);
         return row >= startIndex && row < endIndex;

@@ -136,6 +136,8 @@ public partial class VeryFastTableView
             font = mainFontSansFamily;
 
         var scrollViewer = ScrollViewer;
+        if (scrollViewer == null)
+            return;
         double y = scrollViewer.Offset.Y;
         double height = RowHeight;
         double x = 0;
@@ -171,6 +173,8 @@ public partial class VeryFastTableView
 
     private bool IsPointHeader(Point p)
     {
+        if (ScrollViewer == null)
+            return false;
         return p.Y < RowHeight + ScrollViewer.Offset.Y;
     }
     

@@ -124,9 +124,11 @@ public partial class VeryFastTableView
 
     private void EnsureRowVisible(int row)
     {
+        if (ScrollViewer == null)
+            return;
         var top = row * RowHeight + DrawingStartOffsetY;
         var bottom = top + RowHeight;
-        if (top < ScrollViewer.Offset.Y + DrawingStartOffsetY * 2)
+        if (top < ScrollViewer!.Offset.Y + DrawingStartOffsetY * 2)
             ScrollViewer.Offset = ScrollViewer.Offset.WithY(top - DrawingStartOffsetY);
         else if (bottom > ScrollViewer.Offset.Y + ScrollViewer.Viewport.Height)
             ScrollViewer.Offset = ScrollViewer.Offset.WithY(bottom - ScrollViewer.Viewport.Height);
@@ -134,6 +136,8 @@ public partial class VeryFastTableView
 
     private void EnsureCellVisible(int cell)
     {
+        if (ScrollViewer == null)
+            return;
         var rect = GetColumnRect(cell);
         var left = rect.x;
         var right = left + rect.width;
