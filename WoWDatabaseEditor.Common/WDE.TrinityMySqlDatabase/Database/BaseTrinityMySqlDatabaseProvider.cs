@@ -598,17 +598,13 @@ namespace WDE.TrinityMySqlDatabase.Database
             return await model.SceneTemplates.ToListAsync<ISceneTemplate>();
         }
 
-        public async Task<IList<ICreatureAddon>> GetCreatureAddons()
-        {
-            await using var model = Database();
-            return await model.CreatureAddon.ToListAsync<ICreatureAddon>();
-        }
+        public abstract Task<IList<ICreatureAddon>> GetCreatureAddons();
 
-        public async Task<IList<ICreatureTemplateAddon>> GetCreatureTemplateAddons()
-        {
-            await using var model = Database();
-            return await model.CreatureTemplateAddon.ToListAsync<ICreatureTemplateAddon>();
-        }
+        public abstract Task<IList<ICreatureTemplateAddon>> GetCreatureTemplateAddons();
+
+        public abstract Task<ICreatureAddon?> GetCreatureAddon(uint guid);
+
+        public abstract Task<ICreatureTemplateAddon?> GetCreatureTemplateAddon(uint entry);
 
         public async Task<IList<ICreatureEquipmentTemplate>?> GetCreatureEquipmentTemplates()
         {
@@ -651,18 +647,6 @@ namespace WDE.TrinityMySqlDatabase.Database
         public abstract Task<IGameObject?> GetGameObjectByGuidAsync(uint guid);
 
         public abstract Task<ICreature?> GetCreaturesByGuidAsync(uint guid);
-
-        public async Task<ICreatureAddon?> GetCreatureAddon(uint guid)
-        {
-            await using var model = Database();
-            return await model.CreatureAddon.FirstOrDefaultAsync<ICreatureAddon>(x => x.Guid == guid);
-        }
-
-        public async Task<ICreatureTemplateAddon?> GetCreatureTemplateAddon(uint entry)
-        {
-            await using var model = Database();
-            return await model.CreatureTemplateAddon.FirstOrDefaultAsync<ICreatureTemplateAddon>(x => x.Entry == entry);
-        }
 
         public async Task<IList<IAuthRbacPermission>> GetRbacPermissionsAsync()
         {

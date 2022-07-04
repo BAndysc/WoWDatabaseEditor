@@ -13,4 +13,6 @@ public class AzerothDatabase : BaseTrinityDatabase
     public ITable<MySqlGameObjectWrath> GameObject => GetTable<MySqlGameObjectWrath>();
     public ITable<MySqlItemTemplate> ItemTemplate => GetTable<MySqlItemTemplate>();
     public ITable<MySqlCreatureModelInfo> CreatureModelInfo => GetTable<MySqlCreatureModelInfo>();
+    public ITable<MySqlCreatureAddonAC> CreatureAddon => GetTable<MySqlCreatureAddonAC>();
+    public ITable<MySqlCreatureTemplateAddonAC> CreatureTemplateAddon => GetTable<MySqlCreatureTemplateAddonAC>();
 }

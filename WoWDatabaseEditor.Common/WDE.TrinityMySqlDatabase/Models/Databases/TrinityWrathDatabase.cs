@@ -14,4 +14,6 @@ public class TrinityWrathDatabase : BaseTrinityDatabase
     public ITable<MySqlItemTemplate> ItemTemplate => GetTable<MySqlItemTemplate>();
     public ITable<MySqlSpawnGroupTemplate> SpawnGroupTemplate => GetTable<MySqlSpawnGroupTemplate>();
     public ITable<MySqlCreatureModelInfo> CreatureModelInfo => GetTable<MySqlCreatureModelInfo>();
+    public ITable<MySqlCreatureAddon> CreatureAddon => GetTable<MySqlCreatureAddon>();
+    public ITable<MySqlCreatureTemplateAddon> CreatureTemplateAddon => GetTable<MySqlCreatureTemplateAddon>();
 }

@@ -12,4 +12,6 @@ public class TrinityMasterDatabase : BaseTrinityDatabase
     public ITable<TrinityMasterMySqlServersideSpell> SpellDbc => GetTable<TrinityMasterMySqlServersideSpell>();
     public ITable<MySqlGameObjectCata> GameObject => GetTable<MySqlGameObjectCata>();
     public ITable<MySqlCreatureModelInfoShadowlands> CreatureModelInfo => GetTable<MySqlCreatureModelInfoShadowlands>();
+    public ITable<MySqlCreatureAddon> CreatureAddon => GetTable<MySqlCreatureAddon>();
+    public ITable<MySqlCreatureTemplateAddon> CreatureTemplateAddon => GetTable<MySqlCreatureTemplateAddon>();
 }

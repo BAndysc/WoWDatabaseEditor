@@ -7,7 +7,7 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
-    <Target Name="CustomAfterBuild" AfterTargets="Build">
+    <Target Condition="$([MSBuild]::IsOSPlatform('OSX'))" Name="CustomAfterBuild" AfterTargets="Build">
         <Copy SourceFiles="$(OutputPath)\runtimes\osx-universal\native\libcimgui.dylib" DestinationFolder="$(OutputPath)\runtimes\osx\native\" ContinueOnError="false" />
     </Target>
     
