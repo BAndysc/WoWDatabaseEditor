@@ -78,7 +78,11 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
 
         public Func<Task<object?>>? SpecialCommand => currentCoreVersion.Current.SupportsSpecialCommands ? Parameter.Parameter.SpecialCommand : null;
         
-        public bool IsHidden => Parameter.ForceHidden || !Parameter.IsUsed && (Parameter is not ParameterValueHolder<long> p || p.Value == 0);
+        private bool IsValueNonEmpty => Parameter is ParameterValueHolder<long> p && p.Value != 0 ||
+                                        Parameter is ParameterValueHolder<float> f && f.Value != 0 ||
+                                        Parameter is ParameterValueHolder<string> s && !string.IsNullOrEmpty(s.Value);
+        
+        public bool IsHidden => Parameter.ForceHidden || !(Parameter.IsUsed || IsValueNonEmpty);
 
         public bool UseModernPicker => HasItems && Parameter.Parameter.Items != null && Parameter is ParameterValueHolder<long> && Parameter.Parameter.Items!.Count < 1000;
 

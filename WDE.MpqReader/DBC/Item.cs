@@ -1,4 +1,5 @@
 using WDE.Common.DBC;
+using WDE.MpqReader.Structures;
 
 namespace WDE.MpqReader.DBC;
 
@@ -17,5 +18,13 @@ public class Item
         DisplayId = row.GetUInt(5);
         InventoryType = row.GetUInt(6);
         SheatheType = row.GetUInt(7);
+    }
+    public Item(IWdcIterator row)
+    {
+        Id = (uint)row.Id;
+        ClassId = row.GetByte("ClassID");
+        DisplayId = 0;
+        InventoryType = row.GetByte("InventoryType");
+        SheatheType = row.GetByte("SheatheType");
     }
 }

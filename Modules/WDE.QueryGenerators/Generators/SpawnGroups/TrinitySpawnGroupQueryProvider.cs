@@ -6,7 +6,7 @@ using WDE.SqlQueryGenerator;
 namespace WDE.QueryGenerators.Generators.SpawnGroups;
 
 [AutoRegister]
-[RejectsCore("CMaNGOS-WoTLK", "CMaNGOS-TBC", "CMaNGOS-Classic")]
+[RequiresCore("TrinityMaster", "TrinityCata", "TrinityWrath", "AzerothCore")]
 internal class TrinitySpawnGroupQueryProvider : IInsertQueryProvider<ISpawnGroupTemplate>, IDeleteQueryProvider<ISpawnGroupTemplate>
 {
     public IQuery Insert(ISpawnGroupTemplate template)

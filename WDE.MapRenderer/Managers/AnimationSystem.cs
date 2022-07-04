@@ -185,7 +185,7 @@ public class AnimationSystem
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool AnimationTickTime(float delta, M2AnimationComponentData animationData)
     {
-        if (animationData._currentAnimation == -1)
+        if (animationData._currentAnimation == -1 || animationData._length == 0)
             return false;
 
         if ((animationData.Flags & AnimationDataFlags.FallbackPlayBackwards) != 0)

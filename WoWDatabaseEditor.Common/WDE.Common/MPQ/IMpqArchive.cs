@@ -6,14 +6,17 @@ namespace WDE.Common.MPQ
 {
     public interface IMpqArchive : IDisposable
     {
-        IList<string> KnownFiles { get; }
-
-        int? ReadFile(byte[] buffer, string path);
+        int? ReadFile(byte[] buffer, int size, string path);
         int? GetFileSize(string path);
 
-        IMpqArchiveDetails Details { get; }
-        IMpqUserDataHeader UserDataHeader { get; }
-
         IMpqArchive Clone();
+        MpqLibrary Library { get; }
+    }
+
+    public enum MpqLibrary
+    {
+        Managed,
+        Stormlib,
+        Casclib
     }
 }

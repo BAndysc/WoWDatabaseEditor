@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using SixLabors.ImageSharp.PixelFormats;
 using TheMaths;
 using WDE.MpqReader.DBC;
@@ -17,21 +18,24 @@ namespace WDE.MpqReader.Structures
         public readonly ushort[] CollisionOnlyIndices;
         public readonly PooledArray<Vector3> Normals;
         public readonly List<PooledArray<Vector2>> UVs = new();
-        public readonly WorldMapObjectBatch[] Batches;
+        public readonly WorldMapObjectBatch[]? Batches;
         public readonly WorldMapObjectLiquid Liquid;
+        public readonly CAaBspNode[]? BspNodes;
+        public readonly ushort[]? BspIndices;
     
         public WorldMapObjectGroup(IBinaryReader reader, in WMOHeader wmoHeader)
         {
-            var firstChunkName = reader.ReadBytes(4);
-            Debug.Assert(firstChunkName[0] == 'R' && firstChunkName[1] == 'E' && firstChunkName[2] == 'V' && firstChunkName[3] == 'M');
+            var firstChunkName = reader.ReadUInt32();
+            Debug.Assert(firstChunkName == 0x4d564552);//'R' && firstChunkName[1] == 'E' && firstChunkName[2] == 'V' && firstChunkName[3] == 'M');
             reader.ReadInt32();
             reader.ReadInt32(); // version
 
-            var secondChunkName = reader.ReadBytes(4);
-            Debug.Assert(secondChunkName[0] == 'P' && secondChunkName[1] == 'G' && secondChunkName[2] == 'O' && secondChunkName[3] == 'M');
+            var secondChunkName = reader.ReadUInt32();
+            Debug.Assert(secondChunkName == 0x4d4f4750);// == 'P' && secondChunkName[1] == 'G' && secondChunkName[2] == 'O' && secondChunkName[3] == 'M');
             reader.ReadInt32();
             Header = new WorldMapObjectGroupHeader(reader);
-        
+
+            ushort[]? mobr = null;
             while (!reader.IsFinished())
             {
                 var chunkName = reader.ReadChunkName();
@@ -57,10 +61,26 @@ namespace WDE.MpqReader.Structures
                     VertexColors = ReadVertexColors(partialReader, size);
                 else if (chunkName == "MLIQ")
                     Liquid = new WorldMapObjectLiquid(reader, in wmoHeader, in Header);
+                else if (chunkName == "MORB")
+                    throw new Exception("MORB not supported");
+                else if (chunkName == "MOBN")
+                    BspNodes = ReadBspNodes(reader, size);
+                else if (chunkName == "MOBR")
+                    mobr = ReadBspIndices(reader, size);
 
                 CollisionOnlyIndices = BuildCollisionOnlyIndices(Polygons, Indices);
                 
                 reader.Offset = offset + size;
+            }
+
+            if (mobr != null && Indices != null)
+            {
+                BspIndices = new ushort[mobr.Length * 3];
+                for (var i = 0; i < mobr.Length; i++) {
+                    BspIndices[i*3 + 0] = Indices[3*mobr[i]+0];
+                    BspIndices[i*3 + 1] = Indices[3*mobr[i]+1];
+                    BspIndices[i*3 + 2] = Indices[3*mobr[i]+2];
+                }   
             }
         }
         
@@ -90,6 +110,22 @@ namespace WDE.MpqReader.Structures
             return collisionOnlyIndices;
         }
 
+        private static ushort[] ReadBspIndices(IBinaryReader reader, int size)
+        {
+            ushort[] indices = new ushort[size / Unsafe.SizeOf<ushort>()];
+            for (int i = 0; i < indices.Length; ++i)
+                indices[i] = reader.ReadUInt16();
+            return indices;
+        }
+
+        private static CAaBspNode[] ReadBspNodes(IBinaryReader reader, int size)
+        {
+            CAaBspNode[] nodes = new CAaBspNode[size / Unsafe.SizeOf<CAaBspNode>()];
+            for (int i = 0; i < nodes.Length; ++i)
+                nodes[i] = new CAaBspNode(reader);
+            return nodes;
+        }
+        
         private PooledArray<Color> ReadVertexColors(IBinaryReader reader, int size)
         {
             PooledArray<Color> colors = new PooledArray<Color>(size / 4);
@@ -204,6 +240,41 @@ namespace WDE.MpqReader.Structures
             materialId = reader.ReadByte();
         }
     }
+    
+    public enum CAaBspNodeFlags
+    {
+        Flag_XAxis = 0x0,
+        Flag_YAxis = 0x1,
+        Flag_ZAxis = 0x2,
+        Flag_AxisMask = 0x3,
+        Flag_Leaf = 0x4,
+        Flag_NoChild = 0xFFFF,
+    };
+    
+    public readonly struct CAaBspNode
+    {
+        public readonly CAaBspNodeFlags flags;
+        public readonly short negChild;      // index of bsp child node (right in this array)
+        public readonly short posChild;
+        public readonly ushort nFaces;       // num of triangle faces in MOBR
+        public readonly int faceStart;    // index of the first triangle index(in MOBR)
+        public readonly float planeDist;
+
+        public CAaBspNode(IBinaryReader reader)
+        {
+            flags = (CAaBspNodeFlags)reader.ReadUInt16();
+            negChild = reader.ReadInt16();
+            posChild = reader.ReadInt16();
+            nFaces = reader.ReadUInt16();
+            faceStart = reader.ReadInt32();
+            planeDist = reader.ReadFloat();
+        }
+    }
+
+    public enum WorldMapObjectBatchFlags
+    {
+        flag_use_material_id_large = 2,
+    }
 
     public readonly struct WorldMapObjectBatch
     {
@@ -213,8 +284,8 @@ namespace WDE.MpqReader.Structures
         public readonly ushort count; // number of MOVI indices used
         public readonly ushort minIndex; // index of the first vertex used in MOVT
         public readonly ushort maxIndex; // index of the last vertex used (batch includes this one)
-        public readonly byte flag_unknown_1;
-        public readonly byte material_id; // index in MOMT
+        public readonly WorldMapObjectBatchFlags flags;
+        public readonly ushort material_id; // index in MOMT
 
         public WorldMapObjectBatch(IBinaryReader reader)
         {
@@ -228,8 +299,10 @@ namespace WDE.MpqReader.Structures
             count = reader.ReadUInt16();
             minIndex = reader.ReadUInt16();
             maxIndex = reader.ReadUInt16();
-            flag_unknown_1 = reader.ReadByte();
+            flags = (WorldMapObjectBatchFlags)reader.ReadByte();
             material_id = reader.ReadByte();
+            if (flags.HasFlagFast(WorldMapObjectBatchFlags.flag_use_material_id_large))
+                material_id = (ushort)tz; // that's how wow encodes it, crazy, ain't it?
         }
     }
 

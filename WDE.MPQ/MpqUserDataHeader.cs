@@ -4,6 +4,14 @@ using WDE.Common.MPQ;
 
 namespace WDE.MPQ
 {
+    public interface IMpqUserDataHeader
+    {
+        int ArchiveOffset { get; }
+        byte[]? UserData { get; }
+        int UserDataReservedSize { get; }
+        int UserDataSize { get; }
+    }
+    
     class MpqUserDataHeader : IMpqUserDataHeader
     {
         public bool HasUserData { get; set; }

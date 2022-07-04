@@ -12,4 +12,13 @@ public class ItemStore : BaseDbcStore<uint, Item>
             store[o.Id] = o;
         }
     }
+    
+    public ItemStore(IEnumerable<IWdcIterator> rows)
+    {
+        foreach (var row in rows)
+        {
+            var o = new Item(row);
+            store[o.Id] = o;
+        }
+    }
 }

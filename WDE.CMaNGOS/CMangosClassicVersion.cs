@@ -20,6 +20,7 @@ public class CMangosClassicVersion : ICoreVersion, IDatabaseFeatures, ISmartScri
     public bool SupportsRbac => false;
     public bool SupportsConditionTargetVictim => false;
     public PhasingType PhasingType => PhasingType.NoPhasing;
+    public int Build => 5875;
 
     public ISet<Type> UnsupportedTables { get; } = new HashSet<Type>{typeof(IAreaTriggerTemplate),
         typeof(IConversationTemplate),

@@ -5,6 +5,7 @@ using SmartFormat;
 using WDE.Common.Parameters;
 using WDE.Parameters;
 using WDE.Parameters.Models;
+using WDE.SmartScriptEditor.Editor;
 
 namespace WDE.SmartScriptEditor.Models
 {
@@ -16,7 +17,7 @@ namespace WDE.SmartScriptEditor.Models
 
     public class SmartCondition : SmartBaseElement
     {
-        public static readonly int SmartConditionParametersCount = 3;
+        public static readonly ParametersCount SmartConditionParametersCount = new ParametersCount(3, 0, 0);
 
         private string comment = "";
         private bool isSelected;
@@ -24,7 +25,7 @@ namespace WDE.SmartScriptEditor.Models
         private ParameterValueHolder<long> inverted;
         private ParameterValueHolder<long> conditionTarget;
 
-        public SmartCondition(int id, bool supportsVictimTarget) : base(SmartConditionParametersCount, id, that => new ConstContextParameterValueHolder<long, SmartBaseElement>(Parameter.Instance, 0, that))
+        public SmartCondition(int id, bool supportsVictimTarget) : base(id, SmartConditionParametersCount, that => new ConstContextParameterValueHolder<long, SmartBaseElement>(Parameter.Instance, 0, that))
         {
             var conditionTargetParam = new Parameter();
             conditionTargetParam.Items = new Dictionary<long, SelectOption>() {[0] = new("Action invoker"), [1] = new("Object")};
@@ -122,7 +123,7 @@ namespace WDE.SmartScriptEditor.Models
             se.DescriptionRules = DescriptionRules;
             se.inverted.Value = inverted.Value;
             se.conditionTarget.Value = conditionTarget.Value;
-            for (var i = 0; i < SmartConditionParametersCount; ++i)
+            for (var i = 0; i < ParametersCount; ++i)
             {
                 se.GetParameter(i).Copy(GetParameter(i));
             }

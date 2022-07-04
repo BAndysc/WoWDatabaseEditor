@@ -15,7 +15,7 @@ public interface INodeViewModelBase
     public double Y { get; set; }
 }
 
-public abstract class NodeViewModelBase<T, K> : ViewModelBase, ITreeNode, INodeViewModelBase where T : NodeViewModelBase<T, K> where K : ConnectionViewModel<T, K>
+public abstract partial class NodeViewModelBase<T, K> : ViewModelBase, ITreeNode, INodeViewModelBase where T : NodeViewModelBase<T, K> where K : ConnectionViewModel<T, K>
 {
     private bool isDragging;
     private bool isSelected;
@@ -23,7 +23,6 @@ public abstract class NodeViewModelBase<T, K> : ViewModelBase, ITreeNode, INodeV
     private double x;
 
     private double y;
-    private uint entry;
 
     protected NodeViewModelBase()
     {
@@ -36,13 +35,21 @@ public abstract class NodeViewModelBase<T, K> : ViewModelBase, ITreeNode, INodeV
     public double X
     {
         get => x;
-        set => SetProperty(ref x, value);
+        set
+        {
+            if (value != 0)
+                SetProperty(ref x, value);
+        }
     }
 
     public double Y
     {
         get => y;
-        set => SetProperty(ref y, value);
+        set
+        {
+            if (value != 0) 
+                SetProperty(ref y, value);
+        }
     }
 
     public bool IsDragging
@@ -74,18 +81,12 @@ public abstract class NodeViewModelBase<T, K> : ViewModelBase, ITreeNode, INodeV
     public double PerfectX { get; set; }
     public double PerfectY { get; set; }
 
-    public uint Entry
-    {
-        get => entry;
-        set => SetProperty(ref entry, value);
-    }
-
     public int Level { get; set; }
 
     public abstract TreeNodeIterator ChildrenIterator { get; }
 
-    public double TreeWidth => 100;
-    public double TreeHeight => 100;
+    public virtual double TreeWidth => 100;
+    public virtual double TreeHeight => 100;
     public bool Collapsed => false;
 
     public event EventHandler? OutputChanged;

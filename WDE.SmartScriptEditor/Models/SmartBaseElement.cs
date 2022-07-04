@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using WDE.Common.Parameters;
 using WDE.Parameters.Models;
+using WDE.SmartScriptEditor.Editor;
 
 namespace WDE.SmartScriptEditor.Models
 {
@@ -17,6 +19,8 @@ namespace WDE.SmartScriptEditor.Models
 
         public virtual int LineId { get; set; }
         private readonly ParameterValueHolder<long>[] @params;
+        private readonly ParameterValueHolder<float>[]? floatParams;
+        private readonly ParameterValueHolder<string>[]? stringParams;
 
         private string? readableHint;
         public string? ReadableHint
@@ -45,17 +49,43 @@ namespace WDE.SmartScriptEditor.Models
         public IList<object> Context { get; }
         public List<DescriptionRule>? DescriptionRules { get; set; }
         public abstract string Readable { get; }
-        public int ParametersCount { get; }
+        public readonly int ParametersCount;
+        public readonly int FloatParametersCount;
+        public readonly int StringParametersCount;
         
-        protected SmartBaseElement(int parametersCount, int id, Func<SmartBaseElement, ParameterValueHolder<long>> paramCreator)
+        protected SmartBaseElement(int id, 
+            ParametersCount parametersCount,
+            Func<SmartBaseElement, ParameterValueHolder<long>> paramCreator)
         {
             Id = id;
-            ParametersCount = parametersCount;
-            @params = new ParameterValueHolder<long>[parametersCount];
-            for (int i = 0; i < parametersCount; ++i)
+            ParametersCount = parametersCount.IntCount;
+            @params = new ParameterValueHolder<long>[parametersCount.IntCount];
+            for (int i = 0; i < parametersCount.IntCount; ++i)
             {
                 @params[i] = paramCreator(this);
                 @params[i].PropertyChanged += (_, _) => CallOnChanged();
+            }
+
+            if (parametersCount.FloatCount > 0)
+            {
+                FloatParametersCount = parametersCount.FloatCount;
+                floatParams = new ParameterValueHolder<float>[parametersCount.FloatCount];
+                for (int i = 0; i < parametersCount.FloatCount; ++i)
+                {
+                    floatParams[i] = new ParameterValueHolder<float>(FloatParameter.Instance, 0);
+                    floatParams[i].PropertyChanged += (_, _) => CallOnChanged();
+                }
+            }
+            
+            if (parametersCount.StringCount > 0)
+            {
+                StringParametersCount = parametersCount.StringCount;
+                stringParams = new ParameterValueHolder<string>[parametersCount.StringCount];
+                for (int i = 0; i < parametersCount.StringCount; ++i)
+                {
+                    stringParams[i] = new ParameterValueHolder<string>(StringParameter.Instance, "");
+                    stringParams[i].PropertyChanged += (_, _) => CallOnChanged();
+                }
             }
 
             Context = @params.Select(p => (object)new ParameterWithContext(p, this)).ToList();
@@ -66,12 +96,34 @@ namespace WDE.SmartScriptEditor.Models
         {
             return @params[index];
         }
+        
+        public ParameterValueHolder<float> GetFloatParameter(int index)
+        {
+            return floatParams![index];
+        }
+        
+        public ParameterValueHolder<string> GetStringParameter(int index)
+        {
+            return stringParams![index];
+        }
 
         protected void CallOnChanged()
         {
             OnChanged(this, null!);
         }
+        
+        protected void CopyParameters(SmartBaseElement source)
+        {
+            for (var i = 0; i < ParametersCount; ++i)
+                GetParameter(i).Copy(source.GetParameter(i));
 
+            for (var i = 0; i < FloatParametersCount; ++i)
+                GetFloatParameter(i).Copy(source.GetFloatParameter(i));
+            
+            for (var i = 0; i < StringParametersCount; ++i)
+                GetStringParameter(i).Copy(source.GetStringParameter(i));
+        }
+        
         public IDisposable BulkEdit(string name)
         {
             return new BulkEditing(this, name);

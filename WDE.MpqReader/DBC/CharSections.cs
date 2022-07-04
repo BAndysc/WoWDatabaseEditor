@@ -1,4 +1,5 @@
 using WDE.Common.DBC;
+using WDE.MpqReader.Structures;
 
 namespace WDE.MpqReader.DBC;
 
@@ -8,9 +9,9 @@ public class CharSections
     public readonly int RaceID;
     public readonly int SexId;
     public readonly int BaseSection;
-    public readonly string TextureName1;
-    public readonly string TextureName2;
-    public readonly string TextureName3;
+    public readonly FileId TextureName1;
+    public readonly FileId TextureName2;
+    public readonly FileId TextureName3;
     public readonly int Flags;
     public readonly int VariationIndex;
     public readonly int ColorIndex;
@@ -27,6 +28,20 @@ public class CharSections
         Flags = dbcIterator.GetInt(7);
         VariationIndex = dbcIterator.GetInt(8);
         ColorIndex = dbcIterator.GetInt(9);
+    }
+
+    public CharSections(IWdcIterator dbcIterator)
+    {
+        Id = (uint)dbcIterator.Id;
+        RaceID = dbcIterator.GetByte("RaceID");
+        SexId = dbcIterator.GetByte("SexID");
+        BaseSection = dbcIterator.GetByte("BaseSection");
+        TextureName1 = dbcIterator.GetInt("MaterialResourcesID", 0);
+        TextureName2 = dbcIterator.GetInt("MaterialResourcesID", 1);
+        TextureName3 = dbcIterator.GetInt("MaterialResourcesID", 2);
+        Flags = dbcIterator.GetShort("Flags");
+        VariationIndex = dbcIterator.GetByte("VariationIndex");
+        ColorIndex = dbcIterator.GetByte("ColorIndex");
     }
 
     private CharSections()

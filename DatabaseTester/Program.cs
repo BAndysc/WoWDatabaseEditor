@@ -57,9 +57,9 @@ public class Program
     
     public static async Task<int> Test<T>(string[] args, params ICoreVersion[] cores) where T : class, IDatabaseProvider
     {
-        if (args.Length < 6)
+        if (args.Length < 7)
         {
-            Console.WriteLine("Usage: ./DatabaseTester [host] [port] [user] [password] [database] [core]");
+            Console.WriteLine("Usage: ./DatabaseTester [host] [port] [user] [password] [database] [hotfix database] [core]");
             Console.WriteLine("Cores: " + string.Join(", ", cores.Select(c => c.Tag)));
             return -1;
         }
@@ -71,11 +71,20 @@ public class Program
         var dbSettings = Substitute.For<IWorldDatabaseSettingsProvider>();
         dbSettings.Settings.ReturnsForAnyArgs(new DbAccess()
         {
+            Database = args[^3],
+            Host = args[^7],
+            Password = args[^4],
+            Port = int.Parse(args[^6]),
+            User = args[^5]
+        });
+        var hotfixDbSettings = Substitute.For<IHotfixDatabaseSettingsProvider>();
+        hotfixDbSettings.Settings.ReturnsForAnyArgs(new DbAccess()
+        {
             Database = args[^2],
-            Host = args[^6],
-            Password = args[^3],
-            Port = int.Parse(args[^5]),
-            User = args[^4]
+            Host = args[^7],
+            Password = args[^4],
+            Port = int.Parse(args[^6]),
+            User = args[^5]
         });
 
         var currentCoreVersion = Substitute.For<ICurrentCoreVersion>();
@@ -85,10 +94,12 @@ public class Program
         var connString = $"Server={dbSettings.Settings.Host};Port={dbSettings.Settings.Port ?? 3306};Database={dbSettings.Settings.Database};Uid={dbSettings.Settings.User};Pwd={dbSettings.Settings.Password};AllowUserVariables=True";
         databaseConn.ConnectionString.ReturnsForAnyArgs(connString);
         
+        
         var ioc = new UnityContainer().AddExtension(new Diagnostic());
         ioc.RegisterInstance<IContainerProvider>(new UnityContainerProvider(ioc));
         ioc.RegisterInstance<IMessageBoxService>(new ConsoleMessageBoxService());
         ioc.RegisterInstance<IWorldDatabaseSettingsProvider>(dbSettings);
+        ioc.RegisterInstance<IHotfixDatabaseSettingsProvider>(hotfixDbSettings);
         ioc.RegisterInstance<IAuthDatabaseSettingsProvider>(Substitute.For<IAuthDatabaseSettingsProvider>());
         ioc.RegisterInstance<ICurrentCoreVersion>(currentCoreVersion);
         ioc.RegisterInstance<ILoadingEventAggregator>(Substitute.For<ILoadingEventAggregator>());
@@ -130,6 +141,9 @@ public class Program
         var executor = ioc.Resolve<IMySqlExecutor>();
         foreach (var tableName in tester.Tables().Where(x => x != null))
         {
+            var result = await executor.ExecuteSelectSql($"SHOW TABLES LIKE '{tableName}'");
+            if (result.Count == 0)
+                continue;
             await executor.ExecuteSql($"ALTER TABLE `{tableName}` ROW_FORMAT = DEFAULT");
             await executor.ExecuteSql($"ALTER TABLE `{tableName}` ENGINE = InnoDB");
         }

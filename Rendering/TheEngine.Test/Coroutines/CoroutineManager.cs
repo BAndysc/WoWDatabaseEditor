@@ -227,9 +227,6 @@ namespace TheEngine.Test.Coroutines
             }
             
             Start(CoroutineA);
-            Assert.AreEqual(1, state);
-            Thread.Sleep(100);
-            cm.Step();
             Assert.AreEqual(2, state);
             Assert.AreEqual(0, cm.PendingCoroutines);
         }

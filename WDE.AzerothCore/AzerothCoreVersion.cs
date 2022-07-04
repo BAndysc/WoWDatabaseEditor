@@ -20,6 +20,7 @@ namespace WDE.AzerothCore
         public bool SupportsRbac => false;
         public bool SupportsConditionTargetVictim => true;
         public PhasingType PhasingType => PhasingType.PhaseMasks;
+        public int Build => 12340;
 
         public ISet<Type> UnsupportedTables { get; } = new HashSet<Type>{typeof(IAreaTriggerTemplate),
             typeof(IConversationTemplate),

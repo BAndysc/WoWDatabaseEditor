@@ -61,6 +61,7 @@ namespace WDE.DbcStore
         private readonly NullSpellService nullSpellService;
         private readonly CataSpellService cataSpellService;
         private readonly WrathSpellService wrathSpellService;
+        private readonly DatabaseClientFileOpener opener;
         private readonly IParameterFactory parameterFactory;
         private readonly ITaskRunner taskRunner;
         private readonly DBCD.DBCD dbcd;
@@ -74,6 +75,7 @@ namespace WDE.DbcStore
             NullSpellService nullSpellService,
             CataSpellService cataSpellService,
             WrathSpellService wrathSpellService,
+            DatabaseClientFileOpener opener,
             DBCD.DBCD dbcd)
         {
             this.parameterFactory = parameterFactory;
@@ -85,6 +87,7 @@ namespace WDE.DbcStore
             this.nullSpellService = nullSpellService;
             this.cataSpellService = cataSpellService;
             this.wrathSpellService = wrathSpellService;
+            this.opener = opener;
             this.dbcd = dbcd;
 
             spellServiceImpl = nullSpellService;
@@ -129,13 +132,13 @@ namespace WDE.DbcStore
                 !Directory.Exists(dbcSettingsProvider.GetSettings().Path))
             {
                 // we create a new fake task, that will not be started, but finalized so that (empty) parameters are registered
-                var fakeTask = new DbcLoadTask(parameterFactory, dbcSettingsProvider, this);
+                var fakeTask = new DbcLoadTask(parameterFactory, opener, dbcSettingsProvider, this);
                 fakeTask.FinishMainThread();
                 return;
             }
 
             IsConfigured = true;
-            taskRunner.ScheduleTask(new DbcLoadTask(parameterFactory, dbcSettingsProvider, this));
+            taskRunner.ScheduleTask(new DbcLoadTask(parameterFactory, opener, dbcSettingsProvider, this));
         }
 
         private class DbcLoadTask : IThreadedTask
@@ -197,11 +200,11 @@ namespace WDE.DbcStore
             public bool WaitForOtherTasks => false;
             private DatabaseClientFileOpener opener;
             
-            public DbcLoadTask(IParameterFactory parameterFactory, IDbcSettingsProvider settingsProvider, DbcStore store)
+            public DbcLoadTask(IParameterFactory parameterFactory, DatabaseClientFileOpener opener, IDbcSettingsProvider settingsProvider, DbcStore store)
             {
                 this.parameterFactory = parameterFactory;
                 this.store = store;
-                opener = new DatabaseClientFileOpener();
+                this.opener = opener;
                 dbcSettingsProvider = settingsProvider;
             }
 

@@ -114,7 +114,7 @@ namespace WDE.DatabaseEditors.Tools
             tableDefinition.Name = tableName.ToTitleCase();
             tableDefinition.TableName = tableName;
             tableDefinition.GroupName = "CATEGORY";
-            tableDefinition.RecordMode = primaryKeys.Count != 1 ? RecordMode.MultiRecord : RecordMode.SingleRow;
+            tableDefinition.RecordMode = RecordMode.SingleRow;//primaryKeys.Count != 1 ? RecordMode.MultiRecord : RecordMode.SingleRow;
             if (tableDefinition.RecordMode == RecordMode.SingleRow)
                 tableDefinition.SingleSolutionName = tableDefinition.MultiSolutionName = $"{tableName.ToTitleCase()} Table";
             else

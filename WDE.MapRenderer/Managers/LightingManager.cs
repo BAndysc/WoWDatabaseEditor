@@ -70,7 +70,7 @@ namespace WDE.MapRenderer.Managers
                     continue;
                 var pos = new Vector3(lightning.X, lightning.Y, lightning.Z);
                 var distance = (pos - position).Length();
-                if (distance < lightning.FalloffEnd)
+                //if (distance < lightning.FalloffEnd)
                 {
                     if (distance < bestDistance)
                     {

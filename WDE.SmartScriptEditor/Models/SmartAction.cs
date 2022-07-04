@@ -10,17 +10,17 @@ using WDE.Common.Database;
 using WDE.Common.Parameters;
 using WDE.Parameters.Models;
 using WDE.SmartScriptEditor.Data;
+using WDE.SmartScriptEditor.Editor;
 
 namespace WDE.SmartScriptEditor.Models
 {
     public class SmartAction : SmartBaseElement
     {
-        public static readonly int SmartActionParametersCount = 6;
-        
         private bool isSelected;
 
         private SmartEvent? parent;
 
+        private readonly IEditorFeatures features;
         private SmartSource source;
 
         private SmartTarget target;
@@ -29,12 +29,15 @@ namespace WDE.SmartScriptEditor.Models
 
         public event Action<SmartAction, IList<ICondition>?, IList<ICondition>?> OnConditionsChanged = delegate { };
         
-        public SmartAction(int id, SmartSource source, SmartTarget target) : 
-            base(SmartActionParametersCount, id, that => new SmartScriptParameterValueHolder(Parameter.Instance, 0, that))
+        public SmartAction(int id, IEditorFeatures features, SmartSource source, SmartTarget target) : 
+            base(id,
+                features.ActionParametersCount,
+                that => new SmartScriptParameterValueHolder(Parameter.Instance, 0, that))
         {
             if (source == null || target == null)
                 throw new ArgumentNullException("Source or target is null");
 
+            this.features = features;
             this.source = source;
             this.target = target;
             source.Parent = this;
@@ -170,12 +173,16 @@ namespace WDE.SmartScriptEditor.Models
                             pram4 = "[p=3]" + GetParameter(3) + "[/p]",
                             pram5 = "[p=4]" + GetParameter(4) + "[/p]",
                             pram6 = "[p=5]" + GetParameter(5) + "[/p]",
+                            pram7 = ParametersCount >= 7 ? "[p=6]" + GetParameter(6) + "[/p]" : "(invalid parameter)",
+                            fpram1 = FloatParametersCount >= 1 ? "[p]" + GetFloatParameter(0) + "[/p]" : "(invalid parameter)",
+                            fpram2 =  FloatParametersCount >= 2 ? "[p]" + GetFloatParameter(1) + "[/p]" : "(invalid parameter)",
                             pram1value = GetParameter(0).Value,
                             pram2value = GetParameter(1).Value,
                             pram3value = GetParameter(2).Value,
                             pram4value = GetParameter(3).Value,
                             pram5value = GetParameter(4).Value,
                             pram6value = GetParameter(5).Value,
+                            pram7value = ParametersCount >= 7 ? GetParameter(6).Value : 0,
                             target_x = target.X.ToString(CultureInfo.InvariantCulture),
                             target_y = target.Y.ToString(CultureInfo.InvariantCulture),
                             target_z = target.Z.ToString(CultureInfo.InvariantCulture),
@@ -212,14 +219,13 @@ namespace WDE.SmartScriptEditor.Models
 
         public SmartAction Copy()
         {
-            SmartAction se = new(Id, Source.Copy(), Target.Copy());
+            SmartAction se = new(Id, features, source.Copy(), Target.Copy());
             se.ReadableHint = ReadableHint;
             se.ActionFlags = ActionFlags;
             se.DescriptionRules = DescriptionRules;
             se.Conditions = Conditions?.ToList();
             se.LineId = LineId;
-            for (var i = 0; i < SmartActionParametersCount; ++i)
-                se.GetParameter(i).Copy(GetParameter(i));
+            se.CopyParameters(this);
             se.comment.Copy(comment);
             return se;
         }

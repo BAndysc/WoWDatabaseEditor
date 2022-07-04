@@ -9,24 +9,28 @@ using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Parsing;
 using WDE.Common.Parameters;
 using WDE.Parameters.Models;
+using WDE.SmartScriptEditor.Editor;
 
 namespace WDE.SmartScriptEditor.Models
 {
     public class SmartEvent : SmartBaseElement
     {
-        public static readonly int SmartEventParamsCount = 4;
-
+        private readonly IEditorFeatures features;
         private bool isSelected;
         private ParameterValueHolder<long> chance;
         private ParameterValueHolder<long> cooldownMax;
         private ParameterValueHolder<long> cooldownMin;
         private ParameterValueHolder<long> flags;
         private ParameterValueHolder<long> phases;
+        private ParameterValueHolder<long> timerId;
 
         public SmartScriptBase? Parent { get; set; }
 
-        public SmartEvent(int id) : base(SmartEventParamsCount, id, that => new ConstContextParameterValueHolder<long, SmartBaseElement>(Parameter.Instance, 0, that))
+        public SmartEvent(int id, IEditorFeatures features) : base(id, 
+            features.EventParametersCount,
+            that => new ConstContextParameterValueHolder<long, SmartBaseElement>(Parameter.Instance, 0, that))
         {
+            this.features = features;
             Actions = new ObservableCollection<SmartAction>();
             Conditions = new ObservableCollection<SmartCondition>();
 
@@ -50,10 +54,12 @@ namespace WDE.SmartScriptEditor.Models
             flags = new ParameterValueHolder<long>("Flags", SmartEventFlagParameter.Instance, 0);
             chance = new ParameterValueHolder<long>("Chance", Parameter.Instance, 0);
             phases = new ParameterValueHolder<long>("Phases", SmartEventPhaseParameter.Instance, 0);
+            timerId = new ParameterValueHolder<long>("Timer id", Parameter.Instance, 0);
             cooldownMin = new ParameterValueHolder<long>("Cooldown min", Parameter.Instance, 0);
             cooldownMax = new ParameterValueHolder<long>("Cooldown max", Parameter.Instance, 0);
 
             flags.PropertyChanged += (_, _) => CallOnChanged();
+            timerId.PropertyChanged += (_, _) => CallOnChanged();
             chance.PropertyChanged += (_, _) =>
             {
                 CallOnChanged();
@@ -83,6 +89,7 @@ namespace WDE.SmartScriptEditor.Models
         public ParameterValueHolder<long> Phases => phases;
         public ParameterValueHolder<long> Chance => chance;
         public ParameterValueHolder<long> Flags => flags;
+        public ParameterValueHolder<long> TimerId => timerId;
 
         public ObservableCollection<SmartAction> Actions { get; }
         public ObservableCollection<SmartCondition> Conditions { get; }
@@ -115,10 +122,15 @@ namespace WDE.SmartScriptEditor.Models
                             pram2 = "[p=1]" + GetParameter(1) + "[/p]",
                             pram3 = "[p=2]" + GetParameter(2) + "[/p]",
                             pram4 = "[p=3]" + GetParameter(3) + "[/p]",
+                            pram5 = ParametersCount >= 5 ? "[p=4]" + GetParameter(4) + "[/p]" : "",
+                            fpram1 = FloatParametersCount >= 1 ? "[p]" + GetFloatParameter(0) + "[/p]" : "",
+                            fpram2 = FloatParametersCount >= 2 ? "[p]" + GetFloatParameter(1) + "[/p]" : "",
+                            spram1 = StringParametersCount >= 1 ? "[p]" + GetStringParameter(0) + "[/p]" : "",
                             pram1value = GetParameter(0).Value,
                             pram2value = GetParameter(1).Value,
                             pram3value = GetParameter(2).Value,
-                            pram4value = GetParameter(3).Value
+                            pram4value = GetParameter(3).Value,
+                            pram5value = ParametersCount >= 5 ? GetParameter(4).Value : 0,
                         });
                     return output;
                 }
@@ -135,6 +147,8 @@ namespace WDE.SmartScriptEditor.Models
             }
         }
 
+        public IEditorFeatures EditorFeatures => features;
+
         public void AddAction(SmartAction smartAction)
         {
             Actions.Add(smartAction);
@@ -150,13 +164,28 @@ namespace WDE.SmartScriptEditor.Models
             if (Id != other.Id)
                 return false;
             
-            for (int i = 0; i < SmartEventParamsCount; ++i)
+            for (int i = 0; i < ParametersCount; ++i)
             {
                 if (GetParameter(i).Value != other.GetParameter(i).Value)
                     return false;
             }
+            
+            for (int i = 0; i < FloatParametersCount; ++i)
+            {
+                if (Math.Abs(GetFloatParameter(i).Value - other.GetFloatParameter(i).Value) > 0.00001f)
+                    return false;
+            }
+            
+            for (int i = 0; i < StringParametersCount; ++i)
+            {
+                if (GetStringParameter(i).Value != other.GetStringParameter(i).Value)
+                    return false;
+            }
 
             if (Flags.Value != other.Flags.Value)
+                return false;
+
+            if (TimerId.Value != other.TimerId.Value)
                 return false;
 
             if (Phases.Value != other.Phases.Value)
@@ -186,7 +215,7 @@ namespace WDE.SmartScriptEditor.Models
 
         public SmartEvent ShallowCopy()
         {
-            SmartEvent se = new(Id);
+            SmartEvent se = new(Id, features);
             se.ReadableHint = ReadableHint;
             se.DescriptionRules = DescriptionRules;
             se.Chance.Value = Chance.Value;
@@ -195,10 +224,8 @@ namespace WDE.SmartScriptEditor.Models
             se.Phases.Value = Phases.Value;
             se.CooldownMin.Value = CooldownMin.Value;
             se.CooldownMax.Value = CooldownMax.Value;
-            for (var i = 0; i < SmartEventParamsCount; ++i)
-            {
-                se.GetParameter(i).Copy(GetParameter(i));
-            }
+            se.TimerId.Value = TimerId.Value;
+            se.CopyParameters(this);
 
             return se;
         }

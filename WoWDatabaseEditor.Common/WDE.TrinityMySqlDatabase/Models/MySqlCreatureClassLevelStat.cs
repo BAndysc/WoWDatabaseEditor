@@ -24,16 +24,16 @@ namespace WDE.TrinityMySqlDatabase.Models
         public ushort BaseHp2 { get; set; }
         
         [Column(Name = "basemana")]
-        public ushort BaseMana { get; set; }
+        public int BaseMana { get; set; }
         
         [Column(Name = "basearmor")]
-        public ushort BaseArmor { get; set; }
+        public int BaseArmor { get; set; }
         
         [Column(Name = "attackpower")]
-        public ushort AttackPower { get; set; }
+        public int AttackPower { get; set; }
         
         [Column(Name = "rangedattackpower")]
-        public ushort RangedAttackPower { get; set; }
+        public int RangedAttackPower { get; set; }
         
         [Column(Name = "damage_base")]
         public float DamageBase { get; set; }

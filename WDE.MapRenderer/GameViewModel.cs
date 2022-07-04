@@ -308,7 +308,7 @@ Tris: " + stats.TrianglesDrawn;
                             .SetTitle("Missing settings")
                             .SetMainInstruction("Missing WoW folder configuration")
                             .SetContent(
-                                "In order to use the game view, you need to configure WoW 3.3.5 folder path in the settings -> Client Data Files")
+                                "In order to use the game view, you need to configure WoW 3.3.5 or 4.3.4 folder path in the settings -> Client Data Files")
                             .WithOkButton(true)
                             .Build()).ListenErrors();
                     }

@@ -11,11 +11,15 @@ namespace WDE.DbcStore.Spells.Wrath
         private Dictionary<uint, SpellCastTime> spellCastTimes = new();
         private SpellStructure[] spells;
         private Dictionary<uint, int> spellIndices = new();
+        private readonly DatabaseClientFileOpener opener;
+
+        public WrathSpellService(DatabaseClientFileOpener opener)
+        {
+            this.opener = opener;
+        }
         
         public void Load(string path)
         {
-            var opener = new DatabaseClientFileOpener();
-            
             foreach (var row in opener.Open(Path.Join(path, "SpellCastTimes.dbc")))
             {
                 var id = row.GetUInt(0);

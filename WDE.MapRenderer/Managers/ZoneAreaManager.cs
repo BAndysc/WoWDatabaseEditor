@@ -126,6 +126,13 @@ public class ZoneAreaManager
             var wdtBytesTask = gameFiles.ReadFile(fullName);
             yield return wdtBytesTask;
 
+            if (wdtBytesTask.IsFaulted)
+            {
+                Console.WriteLine("Couldn't load file: " + fullName);
+                progress.Done += 64 * 64;
+                continue;
+            }
+            
             using var wdtBytes = wdtBytesTask.Result;
 
             if (wdtBytes == null)

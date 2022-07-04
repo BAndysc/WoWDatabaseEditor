@@ -125,7 +125,7 @@ namespace TheAvaloniaOpenGL.Resources
         public unsafe void UpdateBuffer(Span<T> newData)
         {
             device.BindBuffer(GlBufferType, BufferHandle);
-            if (Length < newData.Length || true)
+            if (true || Length < newData.Length)
             {
                 fixed (void* pdata = newData)
                     device.BufferData(GlBufferType, new IntPtr(newData.Length * Utilities.SizeOf<T>()), new IntPtr(pdata), UsageHint);
@@ -141,7 +141,7 @@ namespace TheAvaloniaOpenGL.Resources
         public unsafe void UpdateBuffer(ref T newData)
         {
             device.BindBuffer(GlBufferType, BufferHandle);
-            if (Length < 1 || true)
+            if (true || Length < 1)
             {
                 fixed (void* pdata = &newData)
                     device.BufferData(GlBufferType, new IntPtr(Utilities.SizeOf<T>()), new IntPtr(pdata), UsageHint);

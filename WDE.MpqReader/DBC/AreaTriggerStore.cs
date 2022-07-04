@@ -1,12 +1,21 @@
 using System.Collections;
 using WDE.Common.DBC;
+using WDE.Common.MPQ;
 
 namespace WDE.MpqReader.DBC;
 
-public class AreaTriggerStore : IEnumerable<AreaTrigger>
+public class AreaTriggerStore : BaseDbcStore<int, AreaTrigger>
 {
-    private Dictionary<int, AreaTrigger> store = new();
-    public AreaTriggerStore(IEnumerable<IDbcIterator> rows)
+    public AreaTriggerStore(IEnumerable<IDbcIterator> rows, GameFilesVersion version)
+    {
+        foreach (var row in rows)
+        {
+            var o = new AreaTrigger(row, version);
+            store[o.Id] = o;
+        }
+    }
+    
+    public AreaTriggerStore(IEnumerable<IWdcIterator> rows, GameFilesVersion version)
     {
         foreach (var row in rows)
         {
@@ -14,9 +23,4 @@ public class AreaTriggerStore : IEnumerable<AreaTrigger>
             store[o.Id] = o;
         }
     }
-
-    public bool Contains(int id) => store.ContainsKey(id);
-    public AreaTrigger this[int id] => store[id];
-    public IEnumerator<AreaTrigger> GetEnumerator() => store.Values.GetEnumerator();
-    IEnumerator IEnumerable.GetEnumerator() => store.Values.GetEnumerator();
 }

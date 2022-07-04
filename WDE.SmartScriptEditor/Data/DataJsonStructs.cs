@@ -34,7 +34,33 @@ namespace WDE.SmartScriptEditor.Data
         [JsonProperty(PropertyName = "values")]
         public Dictionary<long, SelectOption> Values { get; set; }
     }
+    
+    [ExcludeFromCodeCoverage]
+    public struct SmartFloatParameterJsonData
+    {
+        [JsonProperty(PropertyName = "name")]
+        public string Name { get; set; }
 
+        [JsonProperty(PropertyName = "description")]
+        public string Description { get; set; }
+        
+        [JsonProperty(PropertyName = "defaultVal")]
+        public float DefaultVal { get; set; }
+    }
+    
+    [ExcludeFromCodeCoverage]
+    public struct SmartStringParameterJsonData
+    {
+        [JsonProperty(PropertyName = "name")]
+        public string Name { get; set; }
+
+        [JsonProperty(PropertyName = "description")]
+        public string Description { get; set; }
+        
+        [JsonProperty(PropertyName = "defaultVal")]
+        public string DefaultVal { get; set; }
+    }
+    
     [Flags]
     [JsonConverter(typeof(FlagJsonConverter))]
     public enum ActionFlags
@@ -93,6 +119,12 @@ namespace WDE.SmartScriptEditor.Data
 
         [JsonProperty(PropertyName = "parameters")]
         public IList<SmartParameterJsonData>? Parameters { get; set; }
+        
+        [JsonProperty(PropertyName = "fparameters")]
+        public IList<SmartFloatParameterJsonData>? FloatParameters { get; set; }
+        
+        [JsonProperty(PropertyName = "sparameters")]
+        public IList<SmartStringParameterJsonData>? StringParameters { get; set; }
 
         [JsonProperty(PropertyName = "description")]
         public string Description { get; set; }

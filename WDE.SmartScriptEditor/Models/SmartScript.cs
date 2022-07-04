@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using WDE.Common.Database;
 using WDE.Common.Services.MessageBox;
 using WDE.SmartScriptEditor.Data;
@@ -15,6 +16,8 @@ namespace WDE.SmartScriptEditor.Models
             SourceType = item.SmartType;
         }
 
+        public List<ISmartScriptLine> OriginalLines { get; } = new();
+        
         public readonly int EntryOrGuid;
         public override SmartScriptType SourceType { get; }
     }

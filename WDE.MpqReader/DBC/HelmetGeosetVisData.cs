@@ -24,6 +24,18 @@ public class HelmetGeosetVisData
         MiscFlags = dbcIterator.GetUInt(6);
         EyesFlags = dbcIterator.GetUInt(7);
     }
+    
+    public HelmetGeosetVisData(IWdcIterator dbcIterator)
+    {
+        Id = (uint)dbcIterator.Id;
+        HairFlags = (uint)dbcIterator.GetInt("HideGeoset", 0);
+        Facial1Flags = (uint)dbcIterator.GetInt("HideGeoset", 1);
+        Facial2Flags = (uint)dbcIterator.GetInt("HideGeoset", 2);
+        Facial3Flags = (uint)dbcIterator.GetInt("HideGeoset", 3);
+        EarsFlags = (uint)dbcIterator.GetInt("HideGeoset", 4);
+        MiscFlags = (uint)dbcIterator.GetInt("HideGeoset", 5);
+        EyesFlags = (uint)dbcIterator.GetInt("HideGeoset", 6);
+    }
 
     private HelmetGeosetVisData()
     {

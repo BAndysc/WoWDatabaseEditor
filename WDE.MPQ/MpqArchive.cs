@@ -10,8 +10,23 @@ using WDE.MPQ.Parsing;
 
 namespace WDE.MPQ
 {
+    public interface IMpqArchiveDetails
+    {
+        ArchiveHeader ArchiveHeader { get; }
+        IMpqHashTable HashTable { get; }
+        IList<BlockTableEntry> BlockTable { get; }
+
+        int SectorSize { get; }
+    }
+    public interface IMpqHashTable
+    {
+        HashTableEntry? FindEntry(ulong hashA, ulong hashB);
+    }
+
     public partial class MpqArchive : IMpqArchive, IMpqArchiveDetails
     {
+        public MpqLibrary Library => MpqLibrary.Managed;
+
         private readonly string path;
 
         public IMpqArchiveDetails Details => this;

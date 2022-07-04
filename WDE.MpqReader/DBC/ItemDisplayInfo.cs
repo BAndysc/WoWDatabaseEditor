@@ -1,14 +1,16 @@
 using WDE.Common.DBC;
+using WDE.Common.MPQ;
+using WDE.MpqReader.Structures;
 
 namespace WDE.MpqReader.DBC;
 
 public class ItemDisplayInfo
 {
     public readonly uint Id;
-    public readonly string LeftModel;
-    public readonly string RightModel;
-    public readonly string LeftModelTexture;
-    public readonly string RightModelTexture;
+    public readonly FileId LeftModel;
+    public readonly FileId RightModel;
+    public readonly FileId LeftModelTexture;
+    public readonly FileId RightModelTexture;
     public readonly string Icon1;
     public readonly string Icon2;
     public readonly int geosetGroup1;
@@ -27,11 +29,12 @@ public class ItemDisplayInfo
     public readonly string UpperLegTexture;
     public readonly string LowerLegTexture;
     public readonly string FootTexture;
+    public readonly string Texture9;
     public readonly int itemVisual;
     public readonly int particleColorID;
 
 
-    public ItemDisplayInfo(IDbcIterator dbcIterator)
+    public ItemDisplayInfo(IDbcIterator dbcIterator, GameFilesVersion version)
     {
         Id = dbcIterator.GetUInt(0);
         LeftModel = dbcIterator.GetString(1);
@@ -56,10 +59,28 @@ public class ItemDisplayInfo
         UpperLegTexture = dbcIterator.GetString(20);
         LowerLegTexture = dbcIterator.GetString(21);
         FootTexture = dbcIterator.GetString(22);
-        itemVisual = dbcIterator.GetInt(23);
-        particleColorID = dbcIterator.GetInt(24);
+        if (version == GameFilesVersion.Mop_5_4_8)
+        {
+            Texture9 = dbcIterator.GetString(23);
+            itemVisual = dbcIterator.GetInt(24);
+            particleColorID = dbcIterator.GetInt(25);
+        }
+        else
+        {
+            itemVisual = dbcIterator.GetInt(23);
+            particleColorID = dbcIterator.GetInt(24);
+        }
     }
-
+    
+    public ItemDisplayInfo(IWdcIterator dbcIterator, GameFilesVersion version)
+    {
+        Id = (uint)dbcIterator.Id;
+        LeftModel = dbcIterator.GetUInt("ModelResourcesID", 0);
+        RightModel = dbcIterator.GetUInt("ModelResourcesID", 1);
+        LeftModelTexture = dbcIterator.GetInt("ModelMaterialResourcesID", 0);
+        RightModelTexture = dbcIterator.GetInt("ModelMaterialResourcesID", 1);
+    }
+    
     private ItemDisplayInfo()
     {
         Id = 0;

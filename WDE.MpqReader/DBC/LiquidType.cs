@@ -4,7 +4,7 @@ namespace WDE.MpqReader.DBC;
 
 public class LiquidType
 {
-    public readonly uint Id;
+    public readonly int Id;
     public readonly string Name;
     public readonly float MaxDarkenDepth;
     public readonly uint MaterialId;
@@ -17,7 +17,7 @@ public class LiquidType
     
     public LiquidType(IDbcIterator row)
     {
-        Id = row.GetUInt(0);
+        Id = row.GetInt(0);
         Name = row.GetString(1);
         MaxDarkenDepth = row.GetFloat(6);
         MaterialId = row.GetUInt(14);
@@ -28,10 +28,33 @@ public class LiquidType
         Texture4 = row.GetString(19);
         Texture5 = row.GetString(20);
     }
+    
+    public LiquidType(IWdcIterator row)
+    {
+        Id = row.Id;
+        Name = row.GetString("Name");
+        MaxDarkenDepth = row.GetFloat("MaxDarkenDepth");
+        MaterialId = row.GetByte("MaterialID");
+        Texture0 = row.GetString("Texture", 0);
+        Texture1 = row.GetString("Texture", 1);
+        Texture2 = row.GetString("Texture", 2);
+        Texture3 = row.GetString("Texture", 3);
+        Texture4 = row.GetString("Texture", 4);
+        Texture5 = row.GetString("Texture", 5);
+    }
 }
 
-public class LiquidTypeStore : BaseDbcStore<uint, LiquidType>
+public class LiquidTypeStore : BaseDbcStore<int, LiquidType>
 {
+    public LiquidTypeStore(IEnumerable<IWdcIterator> rows)
+    {
+        foreach (var row in rows)
+        {
+            var o = new LiquidType(row);
+            store[o.Id] = o;
+        }
+    }
+    
     public LiquidTypeStore(IEnumerable<IDbcIterator> rows)
     {
         foreach (var row in rows)

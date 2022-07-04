@@ -9,6 +9,8 @@ namespace WDE.DbcStore.Spells.Cataclysm
 {
     public class CataSpellService : ISpellService
     {
+        private readonly DatabaseClientFileOpener opener;
+
         private class SpellCastTime
         {
             public uint Id;
@@ -83,11 +85,14 @@ namespace WDE.DbcStore.Spells.Cataclysm
         private Dictionary<uint, SpellCastTime> spellCastTimes = new();
         private Dictionary<uint, SpellCastingRequirements> requirements = new();
         private Dictionary<uint, SpellData> spells = new();
+
+        public CataSpellService(DatabaseClientFileOpener opener)
+        {
+            this.opener = opener;
+        }
         
         public void Load(string path)
         {
-            var opener = new DatabaseClientFileOpener();
-
             foreach (var row in opener.Open(Path.Join(path, "SpellCastingRequirements.dbc")))
             {
                 requirements[row.GetUInt(0)] = new SpellCastingRequirements()

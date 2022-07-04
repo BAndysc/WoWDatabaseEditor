@@ -4,7 +4,9 @@ namespace WDE.MPQ.ViewModels
     {
         Invalid,
         Wrath,
-        Cata
+        Mop,
+        Cata,
+        Legion
     }
     
     public interface IWoWFilesVerifier

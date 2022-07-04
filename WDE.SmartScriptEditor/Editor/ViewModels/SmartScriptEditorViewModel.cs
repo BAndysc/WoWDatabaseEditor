@@ -57,6 +57,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         private readonly ICurrentCoreVersion currentCoreVersion;
         private readonly ISmartScriptInspectorService inspectorService;
         private readonly IParameterPickerService parameterPickerService;
+        private readonly ISmartEditorExtension editorExtension;
         private readonly ISmartDataManager smartDataManager;
         private readonly IConditionDataManager conditionDataManager;
         private readonly ISmartFactory smartFactory;
@@ -111,7 +112,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             IConditionEditService conditionEditService,
             ICurrentCoreVersion currentCoreVersion,
             ISmartScriptInspectorService inspectorService,
-            IParameterPickerService parameterPickerService)
+            IParameterPickerService parameterPickerService,
+            ISmartEditorExtension editorExtension)
         {
             History = history;
             this.database = databaseProvider;
@@ -135,6 +137,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             this.currentCoreVersion = currentCoreVersion;
             this.inspectorService = inspectorService;
             this.parameterPickerService = parameterPickerService;
+            this.editorExtension = editorExtension;
             this.conditionDataManager = conditionDataManager;
             script = null!;
             this.item = null!;
@@ -573,7 +576,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     var selectedActions = Events.SelectMany(e => e.Actions).Where(e => e.IsSelected).ToList();
                     if (selectedActions.Count > 0)
                     {
-                        SmartEvent fakeEvent = new(-1) {ReadableHint = "", Parent = script};
+                        SmartEvent fakeEvent = new(-1, editorFeatures) {ReadableHint = "", Parent = script};
                         foreach (SmartAction a in selectedActions)
                             fakeEvent.AddAction(a.Copy());
 
@@ -587,7 +590,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     var selectedConditions = Events.SelectMany(e => e.Conditions).Where(e => e.IsSelected).ToList();
                     if (selectedConditions.Count > 0)
                     {
-                        SmartEvent fakeEvent = new(-1) {ReadableHint = "", Parent = script};
+                        SmartEvent fakeEvent = new(-1, editorFeatures) {ReadableHint = "", Parent = script};
                         foreach (SmartCondition c in selectedConditions)
                             fakeEvent.Conditions.Add(c.Copy());
 
@@ -1188,6 +1191,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
         private async Task AsyncLoad()
         {
+            await editorExtension.BeforeLoad(item);
             var lines = (await smartScriptDatabase.GetScriptFor(item.Entry, item.SmartType)).ToList();
             var conditions = smartScriptDatabase.GetConditionsForScript(item.Entry, item.SmartType).ToList();
             var targetSourceConditions = smartScriptDatabase.GetConditionsForSourceTarget(item.Entry, item.SmartType).ToList();
@@ -1196,6 +1200,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             History.AddHandler(new SaiHistoryHandler(script, smartFactory));
             TeachingTips.Start();
             problems.Value = inspectorService.GenerateInspections(script);
+            script.OriginalLines.AddRange(lines);
         }
         
         private async Task SaveAllToDb()
@@ -1440,14 +1445,24 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             for (var i = 0; i < obj.Source.ParametersCount; ++i)
                 parametersList.Add((obj.Source.GetParameter(i), "Source"));
 
+            if (obj.Source.Position != null)
+                for (var i = 0; i < 4; ++i)
+                    floatParametersList.Add((obj.Source.Position[i], "Source"));
+            
             for (var i = 0; i < obj.ParametersCount; ++i)
                 parametersList.Add((obj.GetParameter(i), "Action"));
+
+            for (var i = 0; i < obj.FloatParametersCount; ++i)
+                floatParametersList.Add((obj.GetFloatParameter(i), "Action"));
+
+            for (var i = 0; i < obj.StringParametersCount; ++i)
+                stringParametersList.Add((obj.GetStringParameter(i), "Action"));
 
             for (var i = 0; i < obj.Target.ParametersCount; ++i)
                 parametersList.Add((obj.Target.GetParameter(i), "Target"));
 
             for (var i = 0; i < 4; ++i)
-                floatParametersList.Add((obj.Target.Position[i], "Target"));
+                floatParametersList.Add((obj.Target.Position![i], "Target"));
 
             var actionDataObservable = obj.ToObservable(e => e.Id)
                 .Select(id => smartDataManager.GetRawData(SmartType.SmartAction, id));
@@ -1566,8 +1581,12 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                         if (obj.Id != originalAction.Id)
                             smartFactory.UpdateAction(originalAction, obj.Id);
                     
-                        for (var i = 0; i < originalAction.Target.Position.Length; ++i)
-                            originalAction.Target.Position[i].Value = obj.Target.Position[i].Value;
+                        if (originalAction.Source.Position != null)
+                            for (var i = 0; i < originalAction.Source.Position!.Length; ++i)
+                                originalAction.Source.Position[i].Value = obj.Source.Position![i].Value;
+                        
+                        for (var i = 0; i < originalAction.Target.Position!.Length; ++i)
+                            originalAction.Target.Position[i].Value = obj.Target.Position![i].Value;
 
                         for (var i = 0; i < originalAction.Target.ParametersCount; ++i)
                             originalAction.Target.GetParameter(i).Value = obj.Target.GetParameter(i).Value;
@@ -1577,6 +1596,12 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
                         for (var i = 0; i < originalAction.ParametersCount; ++i)
                             originalAction.GetParameter(i).Value = obj.GetParameter(i).Value;
+
+                        for (var i = 0; i < originalAction.FloatParametersCount; ++i)
+                            originalAction.GetFloatParameter(i).Value = obj.GetFloatParameter(i).Value;
+
+                        for (var i = 0; i < originalAction.StringParametersCount; ++i)
+                            originalAction.GetStringParameter(i).Value = obj.GetStringParameter(i).Value;
 
                         if (editorFeatures.SupportsTargetCondition)
                         {
@@ -1614,9 +1639,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             parametersList.Add((obj.ConditionTarget, "General"));
             
             for (var i = 0; i < obj.ParametersCount; ++i)
-            {                    
                 parametersList.Add((obj.GetParameter(i), "Condition"));
-            }
 
             actionList.Add(new EditableActionData("Condition", "General", async () =>
             {
@@ -1675,6 +1698,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 ev.Parent = originalEvent.Parent; // fake parent
             
             var actionList = new List<EditableActionData>();
+            var floatParametersList = new List<(ParameterValueHolder<float>, string)>();
+            var stringParametersList = new List<(ParameterValueHolder<string>, string)>();
             var parametersList = new List<(ParameterValueHolder<long>, string)>
             {
                 (ev.Chance, "General"),
@@ -1685,6 +1710,10 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             {
                 parametersList.Add((ev.CooldownMin, "General"));
                 parametersList.Add((ev.CooldownMax, "General"));
+            }
+            if (editorFeatures.SupportsEventTimerId)
+            {
+                parametersList.Add((ev.TimerId, "General"));
             }
 
             actionList.Add(new EditableActionData("Event", "General", async () =>
@@ -1699,14 +1728,20 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             for (var i = 0; i < ev.ParametersCount; ++i)
                 parametersList.Add((ev.GetParameter(i), "Event specific"));
 
+            for (var i = 0; i < ev.FloatParametersCount; ++i)
+                floatParametersList.Add((ev.GetFloatParameter(i), "Event specific"));
+
+            for (var i = 0; i < ev.StringParametersCount; ++i)
+                stringParametersList.Add((ev.GetStringParameter(i), "Event specific"));
+
             ParametersEditViewModel viewModel = new(itemFromListProvider, 
                 currentCoreVersion,
                 parameterPickerService,
                 ev,
                 !editOriginal,
                 parametersList,
-                null, 
-                null, 
+                floatParametersList, 
+                stringParametersList, 
                 actionList,
                 () =>
                     {
@@ -1720,8 +1755,16 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                             originalEvent.Phases.Value = ev.Phases.Value;
                             originalEvent.CooldownMax.Value = ev.CooldownMax.Value;
                             originalEvent.CooldownMin.Value = ev.CooldownMin.Value;
+                            originalEvent.TimerId.Value = ev.TimerId.Value;
+                            
                             for (var i = 0; i < originalEvent.ParametersCount; ++i)
                                 originalEvent.GetParameter(i).Value = ev.GetParameter(i).Value;
+                            
+                            for (var i = 0; i < originalEvent.FloatParametersCount; ++i)
+                                originalEvent.GetFloatParameter(i).Value = ev.GetFloatParameter(i).Value;
+                            
+                            for (var i = 0; i < originalEvent.StringParametersCount; ++i)
+                                originalEvent.GetStringParameter(i).Value = ev.GetStringParameter(i).Value;
                         }
                     },
                 "Event specific", context: ev);

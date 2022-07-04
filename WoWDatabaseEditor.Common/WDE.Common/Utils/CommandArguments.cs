@@ -51,6 +51,15 @@ namespace WDE.Common.Utils
             return uint.TryParse(word, out number);
         }
         
+        public bool TryGetInt(out int number)
+        {
+            number = 0;
+            if (!TryGetString(out var word))
+                return false;
+
+            return int.TryParse(word, out number);
+        }
+        
         public bool TryGetFloat(out float number)
         {
             number = 0;

@@ -141,7 +141,7 @@ namespace WDE.SmartScriptEditor.Exporter
             IList<SmartAction> actions = e.Actions.Count == 0
                 ? new List<SmartAction>
                 {
-                    new(-1, new SmartSource(-1) {ReadableHint = ""}, new SmartTarget(-1) {ReadableHint = ""})
+                    new(-1, e.EditorFeatures, new SmartSource(-1, e.EditorFeatures) {ReadableHint = ""}, new SmartTarget(-1, e.EditorFeatures) {ReadableHint = ""})
                     {
                         ReadableHint = "",
                         Parent = e
@@ -166,10 +166,15 @@ namespace WDE.SmartScriptEditor.Exporter
                     EventPhaseMask = (int) e.Phases.Value,
                     EventChance = (int) e.Chance.Value,
                     EventFlags = (int) e.Flags.Value,
+                    TimerId = (int)e.TimerId.Value,
                     EventParam1 = (int) e.GetParameter(0).Value,
                     EventParam2 = (int) e.GetParameter(1).Value,
                     EventParam3 = (int) e.GetParameter(2).Value,
                     EventParam4 = (int) e.GetParameter(3).Value,
+                    EventParam5 = (int) (e.ParametersCount >= 5 ? e.GetParameter(4).Value : 0),
+                    EventFloatParam1 = e.FloatParametersCount >= 1 ? e.GetFloatParameter(0).Value : 0,
+                    EventFloatParam2 = e.FloatParametersCount >= 2 ? e.GetFloatParameter(1).Value : 0,
+                    EventStringParam = e.StringParametersCount >= 1 ? e.GetStringParameter(0).Value : "",
                     EventCooldownMin = (int) e.CooldownMin.Value,
                     EventCooldownMax = (int) e.CooldownMax.Value,
                     ActionType = a.Id,
@@ -179,6 +184,9 @@ namespace WDE.SmartScriptEditor.Exporter
                     ActionParam4 = (int) a.GetParameter(3).Value,
                     ActionParam5 = (int) a.GetParameter(4).Value,
                     ActionParam6 = (int) a.GetParameter(5).Value,
+                    ActionParam7 = (int) (a.ParametersCount >= 7 ? a.GetParameter(6).Value : 0),
+                    ActionFloatParam1 = a.FloatParametersCount >= 1 ? a.GetFloatParameter(0).Value : 0,
+                    ActionFloatParam2 = a.FloatParametersCount >= 2 ? a.GetFloatParameter(1).Value : 0,
                     SourceType = a.Source.Id,
                     SourceParam1 = (int) a.Source.GetParameter(0).Value,
                     SourceParam2 = (int) a.Source.GetParameter(1).Value,

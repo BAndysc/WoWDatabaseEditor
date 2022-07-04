@@ -22,4 +22,15 @@ public class Emote
         Param = iterator.GetUInt(5);
         Sound = iterator.GetUInt(6);
     }
+
+    public Emote(IWdcIterator iterator)
+    {
+        Id = (uint)iterator.Id;
+        Name = iterator.GetString("EmoteSlashCommand");
+        AnimId = iterator.GetUShort("AnimID");
+        Flags = iterator.GetUInt("EmoteFlags");
+        Type = (EmoteType)iterator.GetByte("EmoteSpecProc");
+        Param = iterator.GetUInt("EmoteSpecProcParam");
+        Sound = iterator.GetUInt("EventSoundID");
+    }
 }

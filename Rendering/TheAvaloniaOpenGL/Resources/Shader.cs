@@ -9,10 +9,79 @@ using TheMaths;
 
 namespace TheAvaloniaOpenGL.Resources
 {
+    internal enum ShaderVariableType
+    {
+        Int,
+        Float,
+        Float2,
+        Float3,
+        Float4,
+        Sampler2D,
+        SamplerBuffer,
+        SamplerBufferArray,
+        IntSamplerBuffer,
+        UIntSamplerBuffer,
+        Matrix
+    }
+    
     internal class ShaderSource
     {
         private const string IncludeMacro = "#include ";
-        
+
+        public static IEnumerable<(ShaderVariableType type, string name)> ParseUniforms(string source)
+        {
+            int newLine;
+            int lastNewLine = 0;
+            do
+            {
+                newLine = source.IndexOf('\n', lastNewLine);
+                var end = newLine == -1 ? source.Length : newLine;
+                var line = source.AsSpan(lastNewLine, end - lastNewLine);
+                line = line.Trim();
+                if (line.StartsWith("uniform"))
+                {
+                    line = line.Slice(7).TrimStart();
+                    var spaceIndex = line.IndexOf(' ');
+                    if (spaceIndex != -1)
+                    {
+                        var variableType = line.Slice(0, spaceIndex);
+                        var variableName = line.Slice(spaceIndex + 1).TrimStart().TrimEnd(';');
+                        yield return (ParseType(variableType), variableName.ToString());
+                    }
+                }
+                lastNewLine = newLine + 1;
+            } while (newLine != -1);
+        }
+
+        private static ShaderVariableType ParseType(ReadOnlySpan<char> variableType)
+        {
+            if (variableType.Equals("int", StringComparison.InvariantCultureIgnoreCase))
+                return ShaderVariableType.Int;
+            if (variableType.Equals("bool", StringComparison.InvariantCultureIgnoreCase))
+                return ShaderVariableType.Int;
+            if (variableType.Equals("float", StringComparison.InvariantCultureIgnoreCase))
+                return ShaderVariableType.Float;
+            if (variableType.Equals("vec2", StringComparison.InvariantCultureIgnoreCase))
+                return ShaderVariableType.Float2;
+            if (variableType.Equals("vec3", StringComparison.InvariantCultureIgnoreCase))
+                return ShaderVariableType.Float3;
+            if (variableType.Equals("vec4", StringComparison.InvariantCultureIgnoreCase))
+                return ShaderVariableType.Float4;
+            if (variableType.Equals("mat4", StringComparison.InvariantCultureIgnoreCase))
+                return ShaderVariableType.Matrix;
+            if (variableType.Equals("sampler2D", StringComparison.InvariantCultureIgnoreCase))
+                return ShaderVariableType.Sampler2D;
+            if (variableType.Equals("samplerBuffer", StringComparison.InvariantCultureIgnoreCase))
+                return ShaderVariableType.SamplerBuffer;
+            if (variableType.Equals("sampler2DArray", StringComparison.InvariantCultureIgnoreCase))
+                return ShaderVariableType.SamplerBufferArray;
+            if (variableType.Equals("isamplerBuffer", StringComparison.InvariantCultureIgnoreCase))
+                return ShaderVariableType.IntSamplerBuffer;
+            if (variableType.Equals("usamplerBuffer", StringComparison.InvariantCultureIgnoreCase))
+                return ShaderVariableType.UIntSamplerBuffer;
+            throw new Exception("Unknown variable type " + variableType.ToString());
+        }
+
         public static string ParseShader(string file, bool mainFile, params string[] defines)
         {
             var source = File.ReadAllText(file);
@@ -81,6 +150,10 @@ namespace TheAvaloniaOpenGL.Resources
         private Dictionary<int, int> uniformIntValues = new();
         private Dictionary<string, int> uniformToLocation = new();
 
+        private HashSet<string> unusedUniforms;
+        private Dictionary<string, ShaderVariableType> uniformTypes;
+        private Dictionary<int, ShaderVariableType> uniformTypesByLocation;
+
         /*public class ShaderInclude : Include
         {
             private readonly string[] incPaths;
@@ -132,6 +205,7 @@ namespace TheAvaloniaOpenGL.Resources
             
             VertexShader = device.CreateShader(ShaderType.VertexShader);
             var vertexSource = ShaderSource.ParseShader(shaderData.Vertex.Path, true, defines.ToArray());
+            var vertexUniforms = ShaderSource.ParseUniforms(vertexSource);
             var result = device.CompileShaderAndGetError(VertexShader, vertexSource);
             if (!string.IsNullOrEmpty(result))
             {
@@ -152,6 +226,7 @@ namespace TheAvaloniaOpenGL.Resources
                 defines.Add("Instancing");
             }
             var fragmentSource = ShaderSource.ParseShader(shaderData.Pixel.Path, true, defines.ToArray());
+            var fragmentUniforms = ShaderSource.ParseUniforms(fragmentSource);
             result = device.CompileShaderAndGetError(PixelShader, fragmentSource);
             if (!string.IsNullOrEmpty(result))
             {
@@ -205,6 +280,13 @@ namespace TheAvaloniaOpenGL.Resources
                 uniformToLocation[uniformName] = location;
             }
             
+            var uniforms = vertexUniforms.Concat(fragmentUniforms).DistinctBy(x => x.name).ToList();
+            uniformTypes = uniforms
+                .Where(x => uniformToLocation.ContainsKey(x.name))
+                .ToDictionary(x => x.name, x => x.type);
+            uniformTypesByLocation = uniformTypes.ToDictionary(x => uniformToLocation[x.Key], x => x.Value);
+            unusedUniforms = uniforms.Select(x => x.name).Where(x => !uniformToLocation.ContainsKey(x)).ToHashSet();
+
             
             /*var shaderInclude = new ShaderInclude(includePaths);
 
@@ -262,6 +344,8 @@ namespace TheAvaloniaOpenGL.Resources
         {
             if (uniformToLocation.TryGetValue(name, out var loc))
                 return loc;
+            if (unusedUniforms.Contains(name))
+                return -1;
             return null;
         }
 
@@ -342,6 +426,9 @@ namespace TheAvaloniaOpenGL.Resources
                 uniformVectorValues[loc] = new Vector4(x, y, z, w);
             }
         }
+
+        internal IReadOnlyDictionary<string, ShaderVariableType> Uniforms => uniformTypes;
+        internal IReadOnlyDictionary<int, ShaderVariableType> UniformsByLocation => uniformTypesByLocation;
     }
     
     internal class ShaderData

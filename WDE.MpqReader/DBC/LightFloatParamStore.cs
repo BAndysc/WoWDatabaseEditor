@@ -2,9 +2,8 @@ using WDE.Common.DBC;
 
 namespace WDE.MpqReader.DBC;
 
-public class LightFloatParamStore
+public class LightFloatParamStore : BaseDbcStore<uint, LightFloatParam>
 {
-    private Dictionary<uint, LightFloatParam> store = new();
     public LightFloatParamStore(IEnumerable<IDbcIterator> rows)
     {
         foreach (var row in rows)
@@ -13,6 +12,9 @@ public class LightFloatParamStore
             store[o.Id] = o;
         }
     }
-        
-    public LightFloatParam this[uint id] => store[id];
+    
+    public LightFloatParamStore()
+    {
+
+    }
 }

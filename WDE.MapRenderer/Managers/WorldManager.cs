@@ -73,7 +73,7 @@ public class WorldManager : System.IDisposable
 
         ClearData();
         
-        CurrentWdt = new WDT(new MemoryBinaryReader(wdtBytes));
+        CurrentWdt = new WDT(new MemoryBinaryReader(wdtBytes), gameFiles.WoWVersion);
 
         Vector3 middlePosSum = Vector3.Zero;
         int chunks = 0;
@@ -109,7 +109,7 @@ public class WorldManager : System.IDisposable
         {
             if (CurrentWdt.WorldMapObject != null)
             {
-                cameraManager.Relocate(CurrentWdt.WorldMapObject.pos.WithZ(100));
+                cameraManager.Relocate(CurrentWdt.WorldMapObject.Value.pos.WithZ(100));
             }
         }
     }

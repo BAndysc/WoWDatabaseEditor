@@ -8,7 +8,7 @@
         
         <!-- This assumes DataContext of GraphNodeItem is always subclass of NodeViewModelBase, which is not as MVVM as it could be -->
         <Setter Property="X" Value="{Binding X, Mode=OneWay}" />
-        <Setter Property="Y" Value="{Binding Y, Mode=TwoWay}" />
+        <Setter Property="Y" Value="{Binding Y, Mode=OneWay}" />
         <Setter Property="IsDragging" Value="{Binding IsDragging, Mode=TwoWay}" />
         <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
         
@@ -75,6 +75,9 @@
                 <Border Background="{TemplateBinding Background}"
                         BorderBrush="{TemplateBinding BorderBrush}"
                         BorderThickness="{TemplateBinding BorderThickness}">
+                    <Border.Resources>
+                        <SolidColorBrush x:Key="ToolTipBackground" Color="#333333" />
+                    </Border.Resources>
                     <Border>
                         <Border.Background>
                             <VisualBrush TileMode="Tile" Stretch="None" AlignmentX="Left" AlignmentY="Top"

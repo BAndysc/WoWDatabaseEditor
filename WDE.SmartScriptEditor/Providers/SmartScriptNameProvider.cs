@@ -1,4 +1,5 @@
-﻿using WDE.Common.Database;
+﻿using System;
+using WDE.Common.Database;
 using WDE.Common.DBC;
 using WDE.Common.Solution;
 using WDE.SmartScriptEditor.Models;
@@ -45,6 +46,7 @@ namespace WDE.SmartScriptEditor.Providers
                     return database.GetQuestTemplate((uint)entryOrGuid)?.Name;
                 case SmartScriptType.Aura:
                 case SmartScriptType.Spell:
+                case SmartScriptType.StaticSpell:
                     if (spellStore.HasSpell((uint) entryOrGuid))
                         return spellStore.GetName((uint) entryOrGuid);
                     break;
@@ -94,6 +96,30 @@ namespace WDE.SmartScriptEditor.Providers
                         return "Area trigger entity " + entry;
                     case SmartScriptType.AreaTriggerEntityServerSide:
                         return "Serverside area trigger entity " + entry;
+                    case SmartScriptType.Event:
+                        return "Event " + entry;
+                    case SmartScriptType.Gossip:
+                        return "Gossip " + entry;
+                    case SmartScriptType.Transport:
+                        return "Transport " + entry;
+                    case SmartScriptType.Instance:
+                        return "Instance " + entry;
+                    case SmartScriptType.Scene:
+                        return "Scene " + entry;
+                    case SmartScriptType.Cinematic:
+                        return "Cinematic " + entry;
+                    case SmartScriptType.PlayerChoice:
+                        return "Player choice " + entry;
+                    case SmartScriptType.Template:
+                        return "Template " + entry;
+                    case SmartScriptType.StaticSpell:
+                        return "Static spell " + entry;
+                    case SmartScriptType.BattlePet:
+                        return "Battle pet " + entry;
+                    case SmartScriptType.Conversation:
+                        return "Conversation " + entry;
+                    default:
+                        throw new ArgumentOutOfRangeException();
                 }
             }
 

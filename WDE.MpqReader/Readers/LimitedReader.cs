@@ -19,11 +19,13 @@ namespace WDE.MpqReader.Readers
 
         private void AssertCanRead(int length)
         {
+            #if DEBUG
             if (length > SizeLeft)
                 throw new IndexOutOfRangeException($"Cannot read {length} bytes, only {SizeLeft} left to read");
+            #endif
         }
     
-        public byte[] ReadBytes(int length)
+        public ReadOnlyMemory<byte> ReadBytes(int length)
         {
             AssertCanRead(length);
             return reader.ReadBytes(length);

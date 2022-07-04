@@ -8,7 +8,8 @@ namespace WDE.CMMySqlDatabase.ViewModels
     public class CMDatabaseConfigViewModel : BaseDatabaseConfigViewModel
     {
         public CMDatabaseConfigViewModel(IWorldDatabaseSettingsProvider worldSettingsProvider,
-            IAuthDatabaseSettingsProvider authDatabaseSettingsProvider) : base(worldSettingsProvider, authDatabaseSettingsProvider)
+            IAuthDatabaseSettingsProvider authDatabaseSettingsProvider,
+            IHotfixDatabaseSettingsProvider hotfixDatabaseSettingsProvider) : base(worldSettingsProvider, authDatabaseSettingsProvider, hotfixDatabaseSettingsProvider)
         {
         }
 

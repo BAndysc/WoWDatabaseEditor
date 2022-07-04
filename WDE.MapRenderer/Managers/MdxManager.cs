@@ -7,6 +7,7 @@ using TheEngine.Entities;
 using TheEngine.Handles;
 using TheEngine.Interfaces;
 using TheMaths;
+using WDE.Common.MPQ;
 using WDE.MpqReader.DBC;
 using WDE.MpqReader.Readers;
 using WDE.MpqReader.Structures;
@@ -19,40 +20,92 @@ namespace WDE.MapRenderer.Managers
     enum ModelVertexShader
     {
         Diffuse_T1,
-        Diffuse_T2,
         Diffuse_Env,
         Diffuse_T1_T2,
         Diffuse_T1_Env,
-        Diffuse_Env_T2,
+        Diffuse_Env_T1,
         Diffuse_Env_Env,
+        Diffuse_T1_Env_T1,
+        Diffuse_T1_T1,
+        Diffuse_T1_T1_T1,
+        Diffuse_EdgeFade_T1,
+        Diffuse_T2,
+        Diffuse_T1_Env_T2,
+        Diffuse_EdgeFade_T1_T2,
+        Diffuse_EdgeFade_Env,
+        Diffuse_T1_T2_T1,
+        Diffuse_T1_T2_T3,
+        Color_T1_T2_T3,
+        BW_Diffuse_T1,
+        BW_Diffuse_T1_T2,
+        
+        Diffuse_T2_Wrath,
+        Diffuse_Env_T2_Wrath,
     };
     
     enum ModelPixelShader
     {
-        Opaque = 0,
-        Opaque_Opaque,
+        Opaque,
+        Mod,
         Opaque_Mod,
         Opaque_Mod2x,
         Opaque_Mod2xNA,
-        Opaque_Add,
-        Opaque_AddNA,
-        Opaque_AddAlpha,
-        Opaque_AddAlpha_Alpha,
-        Opaque_Mod2xNA_Alpha,
-        Mod,
-        Mod_Opaque,
+        Opaque_Opaque,
         Mod_Mod,
         Mod_Mod2x,
-        Mod_Mod2xNA,
         Mod_Add,
+        Mod_Mod2xNA,
         Mod_AddNA,
-        Mod2x,
-        Mod2x_Mod,
-        Mod2x_Mod2x,
-        Add,
-        Add_Mod,
-        Fade,
-        Decal
+        Mod_Opaque,
+        Opaque_Mod2xNA_Alpha,
+        Opaque_AddAlpha,
+        Opaque_AddAlpha_Alpha,
+        Opaque_Mod2xNA_Alpha_Add,
+        Mod_AddAlpha,
+        Mod_AddAlpha_Alpha,
+        Opaque_Alpha_Alpha,
+        Opaque_Mod2xNA_Alpha_3s,
+        Opaque_AddAlpha_Wgt,
+        Mod_Add_Alpha,
+        Opaque_ModNA_Alpha,
+        Mod_AddAlpha_Wgt,
+        Opaque_Mod_Add_Wgt,
+        Opaque_Mod2xNA_Alpha_UnshAlpha,
+        Mod_Dual_Crossfade,
+        Opaque_Mod2xNA_Alpha_Alpha,
+        Mod_Masked_Dual_Crossfade,
+        Opaque_Alpha,
+        Guild,
+        Guild_NoBorder,
+        Guild_Opaque,
+        Mod_Depth,
+        Illum,
+        Mod_Mod_Mod_Const,
+
+        Wrath_Opaque = 50,
+        Wrath_Opaque_Opaque,
+        Wrath_Opaque_Mod,
+        Wrath_Opaque_Mod2x,
+        Wrath_Opaque_Mod2xNA,
+        Wrath_Opaque_Add,
+        Wrath_Opaque_AddNA,
+        Wrath_Opaque_AddAlpha,
+        Wrath_Opaque_AddAlpha_Alpha,
+        Wrath_Opaque_Mod2xNA_Alpha,
+        Wrath_Mod,
+        Wrath_Mod_Opaque,
+        Wrath_Mod_Mod,
+        Wrath_Mod_Mod2x,
+        Wrath_Mod_Mod2xNA,
+        Wrath_Mod_Add,
+        Wrath_Mod_AddNA,
+        Wrath_Mod2x,
+        Wrath_Mod2x_Mod,
+        Wrath_Mod2x_Mod2x,
+        Wrath_Add,
+        Wrath_Add_Mod,
+        Wrath_Fade,
+        Wrath_Decal
     };
 
     
@@ -111,14 +164,14 @@ namespace WDE.MapRenderer.Managers
             }
         }
 
-        private Dictionary<string, (M2, M2Skin)?> m2s = new();
-        private Dictionary<string, Task<(M2, M2Skin)?>> m2sCurrentlyLoaded = new();
+        private Dictionary<FileId, (M2, M2Skin)?> m2s = new();
+        private Dictionary<FileId, Task<(M2, M2Skin)?>> m2sCurrentlyLoaded = new();
         
-        private Dictionary<string, (IMesh, M2, M2Skin)?> internalMeshes = new();
-        private Dictionary<string, Task<(IMesh, M2, M2Skin)?>> internalMeshesCurrentlyLoaded = new();
+        private Dictionary<FileId, (IMesh, M2, M2Skin)?> internalMeshes = new();
+        private Dictionary<FileId, Task<(IMesh, M2, M2Skin)?>> internalMeshesCurrentlyLoaded = new();
         
-        private Dictionary<string, MdxInstance?> meshes = new();
-        private Dictionary<string, Task<MdxInstance?>> meshesCurrentlyLoaded = new();
+        private Dictionary<FileId, MdxInstance?> meshes = new();
+        private Dictionary<FileId, Task<MdxInstance?>> meshesCurrentlyLoaded = new();
         private Dictionary<uint, MdxInstance?> creaturemeshes = new();
         private Dictionary<uint, Task<(MdxInstance?, WmoManager.WmoInstance?)?>> gameObjectMeshesCurrentlyLoaded = new();
         private Dictionary<uint, (MdxInstance?, WmoManager.WmoInstance?)?> gameObjectmeshes = new();
@@ -139,6 +192,7 @@ namespace WDE.MapRenderer.Managers
         private readonly HelmetGeosetVisDataStore helmetGeosetVisDataStore;
         private readonly CreatureModelDataStore creatureModelDataStore;
         private readonly GameObjectDisplayInfoStore gameObjectDisplayInfoStore;
+        private readonly TextureFileDataStore textureFileDataStore;
         private readonly ChrRacesStore racesStore;
         private readonly Engine engine;
         private readonly IGameContext gameContext;
@@ -161,6 +215,7 @@ namespace WDE.MapRenderer.Managers
             HelmetGeosetVisDataStore helmetGeosetVisDataStore,
             CreatureModelDataStore creatureModelDataStore,
             GameObjectDisplayInfoStore gameObjectDisplayInfoStore,
+            TextureFileDataStore textureFileDataStore,
             ChrRacesStore racesStore,
             Engine engine,
             IGameContext gameContext,
@@ -181,6 +236,7 @@ namespace WDE.MapRenderer.Managers
             this.helmetGeosetVisDataStore = helmetGeosetVisDataStore;
             this.creatureModelDataStore = creatureModelDataStore;
             this.gameObjectDisplayInfoStore = gameObjectDisplayInfoStore;
+            this.textureFileDataStore = textureFileDataStore;
             this.racesStore = racesStore;
             this.engine = engine;
             this.gameContext = gameContext;
@@ -533,7 +589,7 @@ namespace WDE.MapRenderer.Managers
                     {
                         var textureDefType = m2.textures[texId].type;
                         
-                        string? texFile = null;
+                        FileId? texFile = null;
                         
                         if (textureDefType == 0) // if texture is hardcoded
                             texFile = m2.textures[texId].filename.AsString();
@@ -549,7 +605,7 @@ namespace WDE.MapRenderer.Managers
                                 // This is for player characters... Creatures always come with a baked texture.
                                 // texFile = charSectionsStore.First(x => x.RaceID == displayinfoextra.Race
                                 // && x.BaseSection == 0 && x.ColorIndex == displayinfoextra.SkinColor).TextureName1;
-                                texFile = "textures\\BakedNpcTextures\\" + displayinfoextra.Texture;
+                                texFile = displayinfoextra.Texture.FileType == FileId.Type.FileName ? "textures\\BakedNpcTextures\\" + displayinfoextra.Texture.FileName : textureFileDataStore[(int)displayinfoextra.Texture.FileDataId].FileData;
                             }
 
                             // only seen for tauren female facial features
@@ -569,7 +625,7 @@ namespace WDE.MapRenderer.Managers
                                 {
                                     var capedisplayinfo = itemDisplayInfoStore.First(x => x.Id == displayinfoextra.Cape);
                                     texFile = "Item\\ObjectComponents\\Cape\\" + capedisplayinfo.LeftModelTexture + ".blp";
-                                    if (string.IsNullOrEmpty(texFile))
+                                    if (texFile == default)
                                         Console.WriteLine("Couldn't get Cape texture from displayextra : " + displayinfoextra);
                                 }
                                 else
@@ -620,8 +676,11 @@ namespace WDE.MapRenderer.Managers
                         {
                             if (creatureDisplayInfoStore.Contains(displayid))
                             {
-                                texFile = m2FilePath.Replace(m2FilePath.Split('\\').Last(), creatureDisplayInfoStore[displayid].TextureVariation1
-                                    + ".blp", StringComparison.InvariantCultureIgnoreCase); // replace m2 name by tetxure name
+                                if (creatureDisplayInfoStore[displayid].TextureVariation1.FileType == FileId.Type.FileId)
+                                    texFile = creatureDisplayInfoStore[displayid].TextureVariation1;
+                                else
+                                    texFile = m2FilePath.FileName.Replace(m2FilePath.FileName.Split('\\').Last(), creatureDisplayInfoStore[displayid].TextureVariation1.FileName
+                                        + ".blp", StringComparison.InvariantCultureIgnoreCase); // replace m2 name by tetxure name
                             }
                         }
 
@@ -629,8 +688,11 @@ namespace WDE.MapRenderer.Managers
                         {
                             if (creatureDisplayInfoStore.Contains(displayid))
                             {
-                                texFile = m2FilePath.Replace(m2FilePath.Split('\\').Last(), creatureDisplayInfoStore[displayid].TextureVariation2
-                                    + ".blp", StringComparison.InvariantCultureIgnoreCase); // replace m2 name by tetxure name
+                                if (creatureDisplayInfoStore[displayid].TextureVariation2.FileType == FileId.Type.FileId)
+                                    texFile = creatureDisplayInfoStore[displayid].TextureVariation2;
+                                else
+                                    texFile = m2FilePath.FileName.Replace(m2FilePath.FileName.Split('\\').Last(), creatureDisplayInfoStore[displayid].TextureVariation2.FileName
+                                        + ".blp", StringComparison.InvariantCultureIgnoreCase); // replace m2 name by tetxure name
                             }
                         }
 
@@ -638,8 +700,11 @@ namespace WDE.MapRenderer.Managers
                         {
                             if (creatureDisplayInfoStore.Contains(displayid))
                             {
-                                texFile = m2FilePath.Replace(m2FilePath.Split('\\').Last(), creatureDisplayInfoStore[displayid].TextureVariation3
-                                    + ".blp", StringComparison.InvariantCultureIgnoreCase); // replace m2 name by tetxure name
+                                if (creatureDisplayInfoStore[displayid].TextureVariation3.FileType == FileId.Type.FileId)
+                                    texFile = creatureDisplayInfoStore[displayid].TextureVariation3;
+                                else
+                                    texFile = m2FilePath.FileName.Replace(m2FilePath.FileName.Split('\\').Last(), creatureDisplayInfoStore[displayid].TextureVariation3.FileName
+                                        + ".blp", StringComparison.InvariantCultureIgnoreCase); // replace m2 name by tetxure name
                             }
                         }
 
@@ -652,13 +717,13 @@ namespace WDE.MapRenderer.Managers
                         // System.Diagnostics.Debug.WriteLine($"M2 texture path :  {texFile}");
                         // var texFile = textureDef.filename.AsString();
                         var tcs = new TaskCompletionSource<TextureHandle>();
-                        if (string.IsNullOrWhiteSpace(texFile))
+                        if (texFile == default)
                         {
                             Console.WriteLine("texture path is empty for display id : " + displayid + " dispextra : " + creatureDisplayInfoStore[displayid].ExtendedDisplayInfoID);
                             Console.WriteLine("texture type : " + textureDefType);
                             Console.WriteLine("skin section id : " + sectionSkinSectionId);
                         }
-                        yield return textureManager.GetTexture(texFile ?? "", tcs);
+                        yield return textureManager.GetTexture(texFile, tcs);
                         var resTex = tcs.Task.Result;
                         if (th.HasValue)
                             th2 = resTex;
@@ -726,9 +791,16 @@ namespace WDE.MapRenderer.Managers
 
             material.SetUniform("mesh_color", mesh_color);
             material.SetUniformInt("translucent", 0);
-            var shaderId = ResolveShaderID1(batch.shaderId, m2, in batch, (m2.global_flags & M2Flags.FLAG_USE_TEXTURE_COMBINER_COMBOS) != 0, (int)materialDef.blending_mode);
-            var shaders = ConvertShaderIDs(m2, in batch, shaderId);
-            material.SetUniformInt("pixel_shader", (int)shaders.Item2);
+            if (gameFiles.WoWVersion == GameFilesVersion.Wrath_3_3_5a)
+            {
+                var shaderId = ResolveShaderID1(batch.shaderId, m2, in batch, (m2.global_flags & M2Flags.FLAG_USE_TEXTURE_COMBINER_COMBOS) != 0, (int)materialDef.blending_mode);
+                var shaders = ConvertShaderIDs(m2, in batch, shaderId);
+                material.SetUniformInt("pixel_shader", (int)shaders.Item2);
+            }
+            else
+            {
+                material.SetUniformInt("pixel_shader", (int)GetNewPixelShaderID((short)batch.shaderId, batch.textureCount));
+            }
             //Console.WriteLine(path + " INDEX: " + j + " Pixel shader: " + M2GetPixelShaderID(batch.textureCount, batch.shader_id) + " tex count: " + batch.textureCount + " shader id: " + batch.shader_id + " blend: " + materialDef.blending_mode + " priority " + batch.priorityPlane + " start ");
 
             material.SetUniform("highlight", 0);
@@ -821,8 +893,8 @@ namespace WDE.MapRenderer.Managers
                 yield break;
             }
 
-            if ((string.IsNullOrEmpty(displayInfo.LeftModel) && !right) ||
-                (string.IsNullOrEmpty(displayInfo.RightModel) && right))
+            if ((displayInfo.LeftModel == default && !right) ||
+                (displayInfo.RightModel == default && right))
             {
                 itemMeshes[(displayid, right, raceGenderKey)] = null;
                 completion.SetResult(null);
@@ -831,45 +903,49 @@ namespace WDE.MapRenderer.Managers
                 yield break;
             }
 
-            // don't know what is the right way to determine the folder name
-            // that works for 3.3.5 tho
-            var folderPath = "ITEM\\OBJECTCOMPONENTS\\";
-            var model = (right ? displayInfo.RightModel : displayInfo.LeftModel).ToLower();
+            var model = (right ? displayInfo.RightModel : displayInfo.LeftModel);
             var texture = right ? displayInfo.RightModelTexture : displayInfo.LeftModelTexture;
 
-            if (model.StartsWith("arrow") || model.StartsWith("bullet"))
-                folderPath += "AMMO\\";
-            else if (model.StartsWith("helm"))
+            if (model.FileType == FileId.Type.FileName)
             {
-                folderPath += "HEAD\\";
-                if (racesStore.TryGetValue(race, out var raceInfo))
+                // don't know what is the right way to determine the folder name
+                // that works for 3.3.5 tho
+                var folderPath = "ITEM\\OBJECTCOMPONENTS\\";
+                var modelFileName = model.FileName.ToLower();
+                if (modelFileName.StartsWith("arrow") || modelFileName.StartsWith("bullet"))
+                    folderPath += "AMMO\\";
+                else if (modelFileName.StartsWith("helm"))
                 {
-                    model = Path.ChangeExtension(model, null) + "_" + raceInfo.ClientPrefix + (gender == 0 ? "M" : "F") + ".M2";
+                    folderPath += "HEAD\\";
+                    if (racesStore.TryGetValue(race, out var raceInfo))
+                    {
+                        model = Path.ChangeExtension(model.FileName, null) + "_" + raceInfo.ClientPrefix + (gender == 0 ? "M" : "F") + ".M2";
+                    }
+                    else
+                    {
+                        model = Path.ChangeExtension(model.FileName, null) + "_m.M2";
+                        Console.WriteLine("Trying to load a helm, without race!");
+                    }
                 }
+                else if (modelFileName.StartsWith("pouch"))
+                    folderPath += "Pouch\\";
+                else if (modelFileName.StartsWith("shield") || modelFileName.StartsWith("buckler"))
+                    folderPath += "Shield\\";
+                else if (modelFileName.StartsWith("lshoulder") || modelFileName.StartsWith("rshoulder"))
+                    folderPath += "Shoulder\\";
                 else
-                {
-                    model = Path.ChangeExtension(model, null) + "_m.M2";
-                    Console.WriteLine("Trying to load a helm, without race!");
-                }
+                    folderPath += "WEAPON\\";
+            
+                model= folderPath + model;
+                texture = folderPath + texture + ".blp";
             }
-            else if (model.StartsWith("pouch"))
-                folderPath += "Pouch\\";
-            else if (model.StartsWith("shield") || model.StartsWith("buckler"))
-                folderPath += "Shield\\";
-            else if (model.StartsWith("lshoulder") || model.StartsWith("rshoulder"))
-                folderPath += "Shoulder\\";
-            else
-                folderPath += "WEAPON\\";
-            
-            var m2FilePath = folderPath + model;
-            var texturePath = folderPath + texture + ".blp";
-            
+
             TaskCompletionSource<(IMesh, M2, M2Skin)?> m2File = new();
-            yield return InternalLoadM2Mesh(m2FilePath, m2File);
+            yield return InternalLoadM2Mesh(model, m2File);
 
             if (!m2File.Task.Result.HasValue)
             {
-                Console.WriteLine("Cannot find model " + m2FilePath);
+                Console.WriteLine("Cannot find model " + model);
                 itemMeshes[(displayid, right, raceGenderKey)] = null;
                 completion.SetResult(null);
                 itemMeshesCurrentlyLoaded.Remove((displayid, right, raceGenderKey));
@@ -889,7 +965,7 @@ namespace WDE.MapRenderer.Managers
                     batch.materialIndex >= m2.materials.Length ||
                     batch.skinSectionIndex >= skin.SubMeshes.Length)
                 {
-                    Console.WriteLine("Sth wrong with batch " + j + " in model " + m2FilePath);
+                    Console.WriteLine("Sth wrong with batch " + j + " in model " + model);
                     continue;
                 }
 
@@ -908,7 +984,7 @@ namespace WDE.MapRenderer.Managers
                             th2 = textureManager.EmptyTexture;
                         else
                             th = textureManager.EmptyTexture;
-                        Console.WriteLine("File " + m2FilePath + " batch " + j + " tex " + i + " out of range");
+                        Console.WriteLine("File " + model + " batch " + j + " tex " + i + " out of range");
                         continue;
                     }
                     var texId = m2.textureLookupTable[batch.textureLookupId + i];
@@ -922,14 +998,14 @@ namespace WDE.MapRenderer.Managers
                     else
                     {
                         var textureDefType = m2.textures[texId].type;
-                        string texFile = "";
+                        FileId texFile = default;
                         if (textureDefType == 0) // if tetx is hardcoded
                             texFile = m2.textures[texId].filename.AsString();
                         else
                         {
                             if (textureDefType != M2Texture.TextureType.TEX_COMPONENT_OBJECT_SKIN)
-                                Console.WriteLine("okay, so there is model " + m2FilePath + " which has texture type: " + textureDefType + ". What is it?");
-                            texFile = texturePath;
+                                Console.WriteLine("okay, so there is model " + model + " which has texture type: " + textureDefType + ". What is it?");
+                            texFile = texture;
                         }
                         
                         var tcs = new TaskCompletionSource<TextureHandle>();
@@ -947,7 +1023,7 @@ namespace WDE.MapRenderer.Managers
             
             if (j == 0)
             {
-                Console.WriteLine("Model " + m2FilePath + " has 0 materials");
+                Console.WriteLine("Model " + model + " has 0 materials");
                 itemMeshes[(displayid, right, raceGenderKey)] = null;
                 completion.SetResult(null);
                 itemMeshesCurrentlyLoaded.Remove((displayid, right, raceGenderKey));
@@ -995,7 +1071,8 @@ namespace WDE.MapRenderer.Managers
                 yield break;
             }
 
-            if (displayInfo.ModelName.EndsWith("wmo", StringComparison.InvariantCultureIgnoreCase))
+            if (displayInfo.ModelName.FileType == FileId.Type.FileName &&
+                displayInfo.ModelName.FileName.EndsWith("wmo", StringComparison.InvariantCultureIgnoreCase))
             {
                 var wmoInstance = new TaskCompletionSource<WmoManager.WmoInstance?>();
                 yield return wmoManager.LoadWorldMapObject(displayInfo.ModelName, wmoInstance);
@@ -1101,7 +1178,7 @@ namespace WDE.MapRenderer.Managers
             result.SetResult((mdx, null));
         }
         
-        public IEnumerator LoadM2Mesh(string path, TaskCompletionSource<MdxInstance?> result)
+        public IEnumerator LoadM2Mesh(FileId path, TaskCompletionSource<MdxInstance?> result)
         {
             if (meshes.ContainsKey(path))
             {
@@ -1214,7 +1291,7 @@ namespace WDE.MapRenderer.Managers
             result.SetResult(mdx);
         }
         
-        private IEnumerator InternalLoadM2Mesh(string path, TaskCompletionSource<(IMesh, M2, M2Skin)?> result)
+        private IEnumerator InternalLoadM2Mesh(FileId path, TaskCompletionSource<(IMesh, M2, M2Skin)?> result)
         {
             if (internalMeshes.ContainsKey(path))
             {
@@ -1259,7 +1336,7 @@ namespace WDE.MapRenderer.Managers
 
             yield return new WaitForTask(Task.Run(() =>
             {
-                var count = m2.vertices.Length;
+                var count = skin.Vertices.Length;
                 vertices = new Vector3[count];
                 normals = new Vector3[count];
                 uv1 = new Vector2[count];
@@ -1300,7 +1377,7 @@ namespace WDE.MapRenderer.Managers
             result.SetResult((mesh, m2, skin));
         }
         
-        public IEnumerator LoadM2File(string path, TaskCompletionSource<(M2, M2Skin)?> result)
+        public IEnumerator LoadM2File(FileId path, TaskCompletionSource<(M2, M2Skin)?> result)
         {          
             path = path.Replace("mdx", "M2", StringComparison.InvariantCultureIgnoreCase);
             path = path.Replace("mdl", "M2", StringComparison.InvariantCultureIgnoreCase); // apparently there are still some MDL models	
@@ -1321,16 +1398,50 @@ namespace WDE.MapRenderer.Managers
             var completion = new TaskCompletionSource<(M2, M2Skin)?>();
             m2sCurrentlyLoaded[path] = completion.Task;
 
-            var skinFilePath = path.Replace(".m2", "00.skin", StringComparison.InvariantCultureIgnoreCase);
             var file = gameFiles.ReadFile(path);
 
             yield return new WaitForTask(file);
-
+            
+            if (file.Result == null)
+            {
+                Console.WriteLine("Cannot find model " + path);
+                meshes[path] = null;
+                completion.SetResult(null);
+                meshesCurrentlyLoaded.Remove(path);
+                result.SetResult(null);
+                yield break;
+            }
+            
+            M2 m2 = null!;
+            
+            yield return new WaitForTask(Task.Run(() =>
+            {
+                m2 = M2.Read(new MemoryBinaryReader(file.Result), gameFiles.WoWVersion, path, p =>
+                {
+                    // TODO: can I use ReadFileSync? Can be problematic...
+                    var bytes = gameFiles.ReadFileSyncLocked(p, true);
+                    if (bytes == null)
+                        return null;
+                    return new MemoryBinaryReader(bytes);
+                });
+                file.Result.Dispose();
+            }));
+            
+            FileId skinFilePath;
+            if (path.FileType == FileId.Type.FileName)
+            {
+                skinFilePath = path.Replace(".m2", "00.skin", StringComparison.InvariantCultureIgnoreCase);
+            }
+            else
+            {
+                skinFilePath = m2.skinFileId;
+            }
+            
             var skinFile = gameFiles.ReadFile(skinFilePath);
             
             yield return new WaitForTask(skinFile);
             
-            if (file.Result == null || skinFile.Result == null)
+            if (skinFile.Result == null)
             {
                 Console.WriteLine("Cannot find model " + path);
                 meshes[path] = null;
@@ -1340,20 +1451,11 @@ namespace WDE.MapRenderer.Managers
                 yield break;
             }
 
-            M2 m2 = null!;
             M2Skin skin = new();
+            
             
             yield return new WaitForTask(Task.Run(() =>
             {
-                m2 = M2.Read(new MemoryBinaryReader(file.Result), path, p =>
-                {
-                    // TODO: can I use ReadFileSync? Can be problematic...
-                    var bytes = gameFiles.ReadFileSyncLocked(p, true);
-                    if (bytes == null)
-                        return null;
-                    return new MemoryBinaryReader(bytes);
-                });
-                file.Result.Dispose();
                 skin = new M2Skin(new MemoryBinaryReader(skinFile.Result));
                 skinFile.Result.Dispose();
             }));
@@ -1426,17 +1528,136 @@ namespace WDE.MapRenderer.Managers
 
             return shaderID;
         }
+
+        private static (ModelPixelShader, ModelVertexShader)[] M2ShaderTable = new[]
+        {
+            (ModelPixelShader.Opaque_Mod2xNA_Alpha, ModelVertexShader.Diffuse_T1_Env),
+            (ModelPixelShader.Opaque_AddAlpha, ModelVertexShader.Diffuse_T1_Env),
+            (ModelPixelShader.Opaque_AddAlpha_Alpha, ModelVertexShader.Diffuse_T1_Env),
+            (ModelPixelShader.Opaque_Mod2xNA_Alpha_Add, ModelVertexShader.Diffuse_T1_Env_T1),
+            (ModelPixelShader.Mod_AddAlpha, ModelVertexShader.Diffuse_T1_Env),
+            (ModelPixelShader.Opaque_AddAlpha, ModelVertexShader.Diffuse_T1_T1),
+            (ModelPixelShader.Mod_AddAlpha, ModelVertexShader.Diffuse_T1_T1),
+            (ModelPixelShader.Mod_AddAlpha_Alpha, ModelVertexShader.Diffuse_T1_Env),
+            (ModelPixelShader.Opaque_Alpha_Alpha, ModelVertexShader.Diffuse_T1_Env),
+            (ModelPixelShader.Opaque_Mod2xNA_Alpha_3s, ModelVertexShader.Diffuse_T1_Env_T1),
+            (ModelPixelShader.Opaque_AddAlpha_Wgt, ModelVertexShader.Diffuse_T1_T1),
+            (ModelPixelShader.Mod_Add_Alpha, ModelVertexShader.Diffuse_T1_Env),
+            (ModelPixelShader.Opaque_ModNA_Alpha, ModelVertexShader.Diffuse_T1_Env),
+            (ModelPixelShader.Mod_AddAlpha_Wgt, ModelVertexShader.Diffuse_T1_Env),
+            (ModelPixelShader.Mod_AddAlpha_Wgt, ModelVertexShader.Diffuse_T1_T1),
+            (ModelPixelShader.Opaque_AddAlpha_Wgt, ModelVertexShader.Diffuse_T1_T2),
+            (ModelPixelShader.Opaque_Mod_Add_Wgt, ModelVertexShader.Diffuse_T1_Env),
+            (ModelPixelShader.Opaque_Mod2xNA_Alpha_UnshAlpha, ModelVertexShader.Diffuse_T1_Env_T1),
+            (ModelPixelShader.Mod_Dual_Crossfade, ModelVertexShader.Diffuse_T1),
+            (ModelPixelShader.Mod_Depth, ModelVertexShader.Diffuse_EdgeFade_T1),
+            (ModelPixelShader.Opaque_Mod2xNA_Alpha_Alpha, ModelVertexShader.Diffuse_T1_Env_T2),
+            (ModelPixelShader.Mod_Mod, ModelVertexShader.Diffuse_EdgeFade_T1_T2),
+            (ModelPixelShader.Mod_Masked_Dual_Crossfade, ModelVertexShader.Diffuse_T1_T2),
+            (ModelPixelShader.Opaque_Alpha, ModelVertexShader.Diffuse_T1_T1),
+            (ModelPixelShader.Opaque_Mod2xNA_Alpha_UnshAlpha, ModelVertexShader.Diffuse_T1_Env_T2),
+            (ModelPixelShader.Mod_Depth, ModelVertexShader.Diffuse_EdgeFade_Env)
+        };
+        
+        private ModelPixelShader GetNewPixelShaderID(short shaderId, ushort textureCount)
+        {
+            ModelPixelShader result = ModelPixelShader.Opaque;
+
+		    if (shaderId < 0)
+		    {
+			    int shaderTableEntry = shaderId & 0x7FFF;
+
+                if (shaderTableEntry >= M2ShaderTable.Length)
+				    return ModelPixelShader.Opaque;
+
+			    result = M2ShaderTable[shaderTableEntry].Item1;
+		    }
+		    else if (textureCount == 1)
+		    {
+			    result = (shaderId & 0x70) != 0 ? ModelPixelShader.Mod : ModelPixelShader.Opaque;
+		    }
+		    else
+		    {
+			    if ((shaderId & 0x70) > 0)
+			    {
+				    switch (shaderId & 0x7)
+				    {
+				    case 3:
+				    {
+					    result = ModelPixelShader.Mod_Add;
+					    break;
+				    }
+				    case 4:
+				    {
+					    result = ModelPixelShader.Mod_Mod2x;
+					    break;
+				    }
+				    case 6:
+				    {
+					    result = ModelPixelShader.Mod_Mod2xNA;
+					    break;
+				    }
+				    case 7:
+				    {
+					    result = ModelPixelShader.Mod_AddNA;
+					    break;
+				    }
+
+				    default:
+				    {
+					    result = ModelPixelShader.Mod_Mod;
+					    break;
+				    }
+				    }
+			    }
+			    else
+			    {
+                    switch (shaderId & 0x7)
+				    {
+				    case 0:
+				    {
+					    result = ModelPixelShader.Opaque_Opaque;
+					    break;
+				    }
+				    case 3:
+				    case 7:
+				    {
+					    result = ModelPixelShader.Opaque_AddAlpha;
+					    break;
+				    }
+				    case 4:
+				    {
+					    result = ModelPixelShader.Opaque_Mod2x;
+					    break;
+				    }
+				    case 6:
+				    {
+					    result = ModelPixelShader.Opaque_Mod2xNA;
+					    break;
+				    }
+
+				    default:
+				    {
+					    result = ModelPixelShader.Opaque_Mod;
+					    break;
+				    }
+				    }
+			    }
+		    }
+
+		    return result;
+        }
         
         (ModelVertexShader, ModelPixelShader) ConvertShaderIDs(M2 m2, in M2Batch batch, ushort batchShaderId)
         {
             // If the shaderId is 0x8000 we don't need to map anything
             if (batchShaderId == 0x8000)
-                return (ModelVertexShader.Diffuse_T1, ModelPixelShader.Opaque);
+                return (ModelVertexShader.Diffuse_T1, ModelPixelShader.Wrath_Opaque);
 
             var shaderId = (ushort)(batchShaderId & 0x7FFF);
             ushort textureCount = batch.textureCount;
 
-            ModelPixelShader ps = ModelPixelShader.Mod;
+            ModelPixelShader ps = ModelPixelShader.Wrath_Mod;
             ModelVertexShader vs = ModelVertexShader.Diffuse_Env;
             
             if ((batchShaderId & 0x8000) != 0)
@@ -1444,17 +1665,17 @@ namespace WDE.MapRenderer.Managers
                 if (shaderId == 1)
                 {
                     vs = ModelVertexShader.Diffuse_T1_Env;
-                    ps = ModelPixelShader.Opaque_Mod2xNA_Alpha;
+                    ps = ModelPixelShader.Wrath_Opaque_Mod2xNA_Alpha;
                 }
                 else if (shaderId == 2)
                 {
                     vs = ModelVertexShader.Diffuse_T1_Env;
-                    ps = ModelPixelShader.Opaque_AddAlpha;
+                    ps = ModelPixelShader.Wrath_Opaque_AddAlpha;
                 }
                 else if (shaderId == 3)
                 {
                     vs = ModelVertexShader.Diffuse_T1_Env;
-                    ps = ModelPixelShader.Opaque_AddAlpha_Alpha;
+                    ps = ModelPixelShader.Wrath_Opaque_AddAlpha_Alpha;
                 }
                 else
                 {
@@ -1486,7 +1707,7 @@ namespace WDE.MapRenderer.Managers
                         }
                         else
                         {
-                            vs = ModelVertexShader.Diffuse_T2;
+                            vs = ModelVertexShader.Diffuse_T2_Wrath;
                         }
                     }
 
@@ -1494,7 +1715,7 @@ namespace WDE.MapRenderer.Managers
                     {
                         if (t1PixelMode == 0)
                         {
-                            ps = ModelPixelShader.Opaque;
+                            ps = ModelPixelShader.Wrath_Opaque;
                         }
                         /*else if (t1PixelMode == 1)
                         {
@@ -1502,23 +1723,23 @@ namespace WDE.MapRenderer.Managers
                         }*/
                         else if (t1PixelMode == 2)
                         {
-                            ps = ModelPixelShader.Decal;
+                            ps = ModelPixelShader.Wrath_Decal;
                         }
                         else if (t1PixelMode == 3)
                         {
-                            ps = ModelPixelShader.Add;
+                            ps = ModelPixelShader.Wrath_Add;
                         }
                         else if (t1PixelMode == 4)
                         {
-                            ps = ModelPixelShader.Mod2x;
+                            ps = ModelPixelShader.Wrath_Mod2x;
                         }
                         else if (t1PixelMode == 5)
                         {
-                            ps = ModelPixelShader.Fade;
+                            ps = ModelPixelShader.Wrath_Fade;
                         }
                         else
                         {
-                            ps = ModelPixelShader.Mod;
+                            ps = ModelPixelShader.Wrath_Mod;
                         }
                     }
                 }
@@ -1531,7 +1752,7 @@ namespace WDE.MapRenderer.Managers
                     {
                         if (t1EnvMapped && !t2EnvMapped)
                         {
-                            vs = ModelVertexShader.Diffuse_Env_T2;
+                            vs = ModelVertexShader.Diffuse_Env_T2_Wrath;
                         }
                         else if (!t1EnvMapped && t2EnvMapped)
                         {
@@ -1553,7 +1774,7 @@ namespace WDE.MapRenderer.Managers
                         {
                             if (t2PixelMode == 0)
                             {
-                                ps = ModelPixelShader.Opaque_Opaque;
+                                ps = ModelPixelShader.Wrath_Opaque_Opaque;
                             }
                             /*else if (t2PixelMode == 1)
                             {
@@ -1561,63 +1782,63 @@ namespace WDE.MapRenderer.Managers
                             }*/
                             else if (t2PixelMode == 3)
                             {
-                                ps = ModelPixelShader.Opaque_Add;
+                                ps = ModelPixelShader.Wrath_Opaque_Add;
                             }
                             else if (t2PixelMode == 4)
                             {
-                                ps = ModelPixelShader.Mod2x;
+                                ps = ModelPixelShader.Wrath_Mod2x;
                             }
                             else if (t2PixelMode == 6)
                             {
-                                ps = ModelPixelShader.Opaque_Mod2xNA;
+                                ps = ModelPixelShader.Wrath_Opaque_Mod2xNA;
                             }
                             else if (t2PixelMode == 7)
                             {
-                                ps = ModelPixelShader.Opaque_AddNA;
+                                ps = ModelPixelShader.Wrath_Opaque_AddNA;
                             }
                             else
                             {
-                                ps = ModelPixelShader.Opaque_Mod;
+                                ps = ModelPixelShader.Wrath_Opaque_Mod;
                             }
                         }
                         else if (t1PixelMode == 1)
                         {
                             if (t2PixelMode == 0)
                             {
-                                ps = ModelPixelShader.Mod_Opaque;
+                                ps = ModelPixelShader.Wrath_Mod_Opaque;
                             }
                             else if (t2PixelMode == 3)
                             {
-                                ps = ModelPixelShader.Mod_Add;
+                                ps = ModelPixelShader.Wrath_Mod_Add;
                             }
                             else if (t2PixelMode == 4)
                             {
-                                ps = ModelPixelShader.Mod_Mod2x;
+                                ps = ModelPixelShader.Wrath_Mod_Mod2x;
                             }
                             else if (t2PixelMode == 6)
                             {
-                                ps = ModelPixelShader.Mod_Mod2xNA;
+                                ps = ModelPixelShader.Wrath_Mod_Mod2xNA;
                             }
                             else if (t2PixelMode == 7)
                             {
-                                ps = ModelPixelShader.Mod_AddNA;
+                                ps = ModelPixelShader.Wrath_Mod_AddNA;
                             }
                             else
                             {
-                                ps = ModelPixelShader.Mod_Mod;
+                                ps = ModelPixelShader.Wrath_Mod_Mod;
                             }
                         }
                         else if (t1PixelMode == 3 && t2PixelMode == 1)
                         {
-                            ps = ModelPixelShader.Add_Mod;
+                            ps = ModelPixelShader.Wrath_Add_Mod;
                         }
                         else if (t1PixelMode == 4 && t2PixelMode == 1)
                         {
-                            ps = ModelPixelShader.Mod2x_Mod;
+                            ps = ModelPixelShader.Wrath_Mod2x_Mod;
                         }
                         else if (t1PixelMode == 4 && t2PixelMode == 4)
                         {
-                            ps = ModelPixelShader.Mod2x_Mod2x;
+                            ps = ModelPixelShader.Wrath_Mod2x_Mod2x;
                         }
                         else
                         {

@@ -20,6 +20,7 @@ namespace WDE.Common.CoreVersion
         bool SupportsReverseCommands => false;
         bool SupportsEventScripts => false;
         PhasingType PhasingType { get; }
+        int Build { get; }
     }
 
     public enum PhasingType

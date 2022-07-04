@@ -9,6 +9,7 @@ using WDE.Common.Providers;
 using WDE.Common.Services;
 using WDE.Conditions.Data;
 using WDE.Module.Attributes;
+using WDE.SmartScriptEditor.Editor;
 using WDE.SmartScriptEditor.Models;
 using WDE.SmartScriptEditor.Parameters;
 
@@ -19,11 +20,13 @@ namespace WDE.SmartScriptEditor.Data
     public class SmartFactory : ISmartFactory
     {
         private readonly IParameterFactory parameterFactory;
+        private readonly IEditorFeatures editorFeatures;
         private readonly ISmartDataManager smartDataManager;
         private readonly IConditionDataManager conditionDataManager;
         private readonly ICurrentCoreVersion currentCoreVersion;
 
         public SmartFactory(IParameterFactory parameterFactory, 
+            IEditorFeatures editorFeatures,
             ISmartDataManager smartDataManager, 
             IDatabaseProvider databaseProvider,
             IConditionDataManager conditionDataManager,
@@ -34,6 +37,7 @@ namespace WDE.SmartScriptEditor.Data
             IContainerProvider containerProvider)
         {
             this.parameterFactory = parameterFactory;
+            this.editorFeatures = editorFeatures;
             this.smartDataManager = smartDataManager;
             this.conditionDataManager = conditionDataManager;
             this.currentCoreVersion = currentCoreVersion;
@@ -73,7 +77,7 @@ namespace WDE.SmartScriptEditor.Data
             if (!smartDataManager.Contains(SmartType.SmartEvent, id))
                 throw new InvalidSmartEventException(id);
 
-            SmartEvent ev = new(id);
+            SmartEvent ev = new(id, editorFeatures);
             ev.Chance.Value = 100;
             SmartGenericJsonData raw = smartDataManager.GetRawData(SmartType.SmartEvent, id);
             SetParameterObjects(ev, raw);
@@ -98,11 +102,16 @@ namespace WDE.SmartScriptEditor.Data
             ev.Flags.Value = line.EventFlags;
             ev.CooldownMin.Value = line.EventCooldownMin;
             ev.CooldownMax.Value = line.EventCooldownMax;
+            ev.TimerId.Value = line.TimerId;
 
-            for (var i = 0; i < SmartEvent.SmartEventParamsCount; ++i)
-            {
+            for (var i = 0; i < ev.ParametersCount; ++i)
                 ev.GetParameter(i).Value = line.GetEventParam(i);
-            }
+            
+            for (var i = 0; i < ev.FloatParametersCount; ++i)
+                ev.GetFloatParameter(i).Value = line.GetEventFloatParam(i);
+            
+            for (var i = 0; i < ev.StringParametersCount; ++i)
+                ev.GetStringParameter(i).Value = line.GetEventStringParam(i) ?? "";
 
             return ev;
         }
@@ -148,7 +157,7 @@ namespace WDE.SmartScriptEditor.Data
             source ??= SourceFactory(0);
             target ??= TargetFactory(0);
 
-            SmartAction action = new(id, source, target);
+            SmartAction action = new(id, editorFeatures, source, target);
             var raw = smartDataManager.GetRawData(SmartType.SmartAction, id);
             action.ActionFlags = raw.Flags;
             action.CommentParameter.IsUsed = raw.CommentField != null;
@@ -159,11 +168,14 @@ namespace WDE.SmartScriptEditor.Data
             return action;
         }
 
-        private void UpdateTargetPositionVisibility(SmartTarget target)
+        private void UpdateTargetPositionVisibility(SmartSource sourceOrTarget)
         {
-            var actionData = smartDataManager.GetRawData(SmartType.SmartAction, target.Parent?.Id ?? SmartConstants.ActionNone);
-            var targetData = smartDataManager.GetRawData(SmartType.SmartTarget, target.Id);
-            foreach (var t in target.Position)
+            if (sourceOrTarget.Position == null)
+                return;
+            
+            var actionData = smartDataManager.GetRawData(SmartType.SmartAction, sourceOrTarget.Parent?.Id ?? SmartConstants.ActionNone);
+            var targetData = smartDataManager.GetRawData(SmartType.SmartTarget, sourceOrTarget.Id);
+            foreach (var t in sourceOrTarget.Position)
                 t.IsUsed = actionData.UsesTargetPosition | targetData.UsesTargetPosition;
         }
 
@@ -192,8 +204,11 @@ namespace WDE.SmartScriptEditor.Data
             
             SmartAction action = ActionFactory(line.ActionType, source, target);
 
-            for (var i = 0; i < SmartAction.SmartActionParametersCount; ++i)
+            for (var i = 0; i < action.ParametersCount; ++i)
                 action.GetParameter(i).Value = line.GetActionParam(i);
+            
+            for (var i = 0; i < action.FloatParametersCount; ++i)
+                action.GetFloatParameter(i).Value = line.GetActionFloatParam(i);
             
             if (raw.SourceStoreInAction)
             {
@@ -227,7 +242,7 @@ namespace WDE.SmartScriptEditor.Data
             if (data.ReplaceWithId.HasValue)
                 return TargetFactory(data.ReplaceWithId.Value);
             
-            SmartTarget target = new(id);
+            SmartTarget target = new(id, editorFeatures);
 
             SetParameterObjects(target, data);
 
@@ -269,10 +284,15 @@ namespace WDE.SmartScriptEditor.Data
             if (data.ReplaceWithId.HasValue)
                 return SourceFactory(data.ReplaceWithId.Value);
             
-            SmartSource source = new(id);
+            SmartSource source = new(id, editorFeatures);
 
             SetParameterObjects(source, data);
 
+            var sourceTypes = data.Types;
+
+            if (sourceTypes != null && sourceTypes.Contains("Position"))
+                source.IsPosition = true;
+            
             return source;
         }
         
@@ -290,6 +310,10 @@ namespace WDE.SmartScriptEditor.Data
             }
             
             SetParameterObjects(smartSource, raw, true);
+            
+            var sourceTypes = raw.Types;
+            smartSource.IsPosition = sourceTypes != null && sourceTypes.Contains("Position");
+            UpdateTargetPositionVisibility(smartSource);
         }
         
         public SmartTarget TargetFactory(ISmartScriptLine line)
@@ -303,7 +327,7 @@ namespace WDE.SmartScriptEditor.Data
 
             target.Condition.Value = (line.TargetConditionId);
 
-            for (var i = 0; i < SmartSource.SmartSourceParametersCount; ++i)
+            for (var i = 0; i < target.ParametersCount; ++i)
                 target.GetParameter(i).Value = line.GetTargetParam(i);
 
             return target;
@@ -313,9 +337,17 @@ namespace WDE.SmartScriptEditor.Data
         {
             SmartSource source = SourceFactory(line.SourceType);
 
+            if (editorFeatures.SourceHasPosition)
+            {
+                source.X = line.SourceX;
+                source.Y = line.SourceY;
+                source.Z = line.SourceZ;
+                source.O = line.SourceO;
+            }
+            
             source.Condition.Value = line.SourceConditionId;
 
-            for (var i = 0; i < SmartSource.SmartSourceParametersCount; ++i)
+            for (var i = 0; i < source.ParametersCount; ++i)
                 source.GetParameter(i).Value = line.GetSourceParam(i);
 
             return source;
@@ -341,30 +373,83 @@ namespace WDE.SmartScriptEditor.Data
                 element.GetParameter(i).IsUsed = false;
                 element.GetParameter(i).ForceHidden = true;
             }
+            
+            for (var i = 0; i < element.FloatParametersCount; ++i)
+            {
+                element.GetFloatParameter(i).Name = "Float parameter " + (i + 1) + " (unused)";
+                element.GetFloatParameter(i).IsUsed = false;
+                element.GetFloatParameter(i).ForceHidden = true;
+            }
+            
+            for (var i = 0; i < element.StringParametersCount; ++i)
+            {
+                element.GetStringParameter(i).Name = "String parameter " + (i + 1) + " (unused)";
+                element.GetStringParameter(i).IsUsed = false;
+                element.GetStringParameter(i).ForceHidden = true;
+            }
 
             if (data.Parameters == null)
             {
                 for (var i = 0; i < element.ParametersCount; ++i)
                     element.GetParameter(i).ForceHidden = false;
-                return;
             }
-
-            for (var i = 0; i < data.Parameters.Count; ++i)
+            else
             {
-                string key = data.Parameters[i].Type;
-                if (!parameterFactory.IsRegisteredLong(key))
-                    Console.WriteLine("Parameter type " + key + " is not registered");
+                for (var i = 0; i < data.Parameters.Count; ++i)
+                {
+                    string key = data.Parameters[i].Type;
+                    if (!parameterFactory.IsRegisteredLong(key))
+                        Console.WriteLine("Parameter type " + key + " is not registered");
                 
-                IParameter<long> parameter = parameterFactory.Factory(key);
-                element.GetParameter(i).Name = data.Parameters[i].Name;
-                if (!update)
-                    element.GetParameter(i).Value = data.Parameters[i].DefaultVal;
-                element.GetParameter(i).Parameter = parameter;
-                element.GetParameter(i).IsUsed = true;
+                    IParameter<long> parameter = parameterFactory.Factory(key);
+                    element.GetParameter(i).Name = data.Parameters[i].Name;
+                    if (!update)
+                        element.GetParameter(i).Value = data.Parameters[i].DefaultVal;
+                    element.GetParameter(i).Parameter = parameter;
+                    element.GetParameter(i).IsUsed = true;
+                }
+            
+                for (var i = 0; i < element.ParametersCount; ++i)
+                    element.GetParameter(i).ForceHidden = false;   
             }
             
-            for (var i = 0; i < element.ParametersCount; ++i)
-                element.GetParameter(i).ForceHidden = false;
+            if (data.FloatParameters == null)
+            {
+                for (var i = 0; i < element.FloatParametersCount; ++i)
+                    element.GetFloatParameter(i).ForceHidden = false;
+            }
+            else
+            {
+                for (var i = 0; i < data.FloatParameters.Count; ++i)
+                {
+                    element.GetFloatParameter(i).Name = data.FloatParameters[i].Name;
+                    if (!update)
+                        element.GetFloatParameter(i).Value = data.FloatParameters[i].DefaultVal;
+                    element.GetFloatParameter(i).IsUsed = true;
+                }
+            
+                for (var i = 0; i < element.FloatParametersCount; ++i)
+                    element.GetFloatParameter(i).ForceHidden = false;   
+            }
+            
+            if (data.StringParameters == null)
+            {
+                for (var i = 0; i < element.StringParametersCount; ++i)
+                    element.GetStringParameter(i).ForceHidden = false;
+            }
+            else
+            {
+                for (var i = 0; i < data.StringParameters.Count; ++i)
+                {
+                    element.GetStringParameter(i).Name = data.StringParameters[i].Name;
+                    if (!update)
+                        element.GetStringParameter(i).Value = data.StringParameters[i].DefaultVal;
+                    element.GetStringParameter(i).IsUsed = true;
+                }
+            
+                for (var i = 0; i < element.StringParametersCount; ++i)
+                    element.GetStringParameter(i).ForceHidden = false;   
+            }
         }
         
         private void SetParameterObjects(SmartBaseElement element, ConditionJsonData data)

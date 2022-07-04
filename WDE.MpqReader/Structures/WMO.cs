@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using TheMaths;
 using WDE.MpqReader.Readers;
+using Plane = TheMaths.Plane;
 
 namespace WDE.MpqReader.Structures
 {
@@ -23,8 +24,8 @@ namespace WDE.MpqReader.Structures
                     break;
             
                 partialReader.Offset = start;
-                var textureNameBytes =partialReader.ReadBytes(end - start);
-                var textureName = System.Text.Encoding.ASCII.GetString(textureNameBytes);
+                var textureNameBytes = partialReader.ReadBytes(end - start);
+                var textureName = System.Text.Encoding.ASCII.GetString(textureNameBytes.Span);
                 textures.Add(textureName);
                 if (withOffsets)
                     offsets![start - startOffset] = textureName;
@@ -45,11 +46,13 @@ namespace WDE.MpqReader.Structures
         public readonly string[] GroupNames;
         public readonly SmoDoodadDef[] DoodadsDefinition;
         public readonly WorldMapObjectMaterial[] Materials;
+        public readonly Vector3[] PortalVertices;
+        public readonly WmoPortal[] Portals;
 
         public WMO(IBinaryReader reader)
         {
-            Dictionary<int, string> offsets = null;
-            Dictionary<int, string> textureOffsets = null;
+            Dictionary<int, string> offsets = null!;
+            Dictionary<int, string> textureOffsets = null!;
 
             while (!reader.IsFinished())
             {
@@ -72,6 +75,10 @@ namespace WDE.MpqReader.Structures
                     GroupNames = ChunkedUtils.ReadZeroTerminatedStringArrays(partialReader, false, out _);
                 else if (chunkName == "MOMT")
                     Materials = ReadMaterials(partialReader, textureOffsets, size);
+                else if (chunkName == "MOPV")
+                    PortalVertices = ReadVertices(partialReader);
+                else if (chunkName == "MOPT")
+                    Portals = ReadPortals(partialReader);
             
                 reader.Offset = offset + size;
             }
@@ -82,6 +89,30 @@ namespace WDE.MpqReader.Structures
             return new WMO(reader);
         }
 
+        private WmoPortal[] ReadPortals(LimitedReader reader)
+        {
+            var portals = new WmoPortal[reader.Size / 20];
+            int i = 0;
+            while (!reader.IsFinished())
+            {
+                portals[i++] = new WmoPortal(reader);
+            }
+
+            return portals;
+        }
+
+        private static Vector3[] ReadVertices(IBinaryReader reader)
+        {
+            var vectors = new Vector3[reader.Size / (3 * 4)];
+            int i = 0;
+            while (!reader.IsFinished())
+            {
+                vectors[i++] = reader.ReadVector3();
+            }
+
+            return vectors;
+        }
+        
         private static WorldMapObjectMaterial[] ReadMaterials(IBinaryReader reader, Dictionary<int,string>? textureOffsets, int size)
         {
             var materials = new WorldMapObjectMaterial[size / 64];
@@ -105,6 +136,22 @@ namespace WDE.MpqReader.Structures
             }
             Debug.Assert(partialReader.IsFinished());
             return array;
+        }
+    }
+
+    public readonly struct WmoPortal
+    {
+        public readonly ushort startVetex;
+        public readonly ushort count;
+        public readonly Plane plane;
+
+        public WmoPortal(IBinaryReader reader)
+        {
+            startVetex = reader.ReadUInt16();
+            count = reader.ReadUInt16();
+            var planeNormal = reader.ReadVector3();
+            var planeDistance = reader.ReadFloat();
+            plane = new Plane(planeNormal, planeDistance);
         }
     }
 

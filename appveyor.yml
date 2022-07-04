@@ -8,6 +8,8 @@ environment:
     secure: IZcgg6msojQGCM0rLsUNTA==
   DEPLOY_KEY:
     secure: SXvCUsowLsFFH1P7e3IsqldBlcPD0gQ8qpsSM8s73VUImWk+NW0dbnLjbytCriqD6O3+FiBLKWkE/v0bNckEJkwFDU8y2ZuNjmB2NIyAQViPyi72/a3vRPM7ruJH+BY0
+  REPO_TOKEN:
+      secure: 0qeEEToZuwVcvYxnrAA5DeRQmdRMeYmrtmJKGUVFeTFteeMrw4z6pPUEE3wley1p
 services:
   - mysql
 install:
@@ -19,7 +21,7 @@ build_script:
     Rem Building WDE
     
     dotnet --list-sdks
-    
+  
     dotnet publish -c Release --self-contained false -f net6.0 -o bin/wowdatabaseeditor-avalonia-win/ LoaderAvalonia/LoaderAvalonia.csproj -r win8-x64 -p:PublishSingleFile=true -p:PublishTrimmed=false -p:DebugType=none
 
     dotnet publish -c Release --self-contained false -f net6.0 -o bin/wowdatabaseeditor-avalonia-mac/ LoaderAvalonia/LoaderAvalonia.csproj -r osx-x64
@@ -43,6 +45,26 @@ build_script:
     rename bin\wowdatabaseeditor-avalonia-linux\Updater _Updater
 
     rename bin\wowdatabaseeditor-avalonia-win\Updater.exe _Updater.exe
+       
+    git clone https://%REPO_TOKEN%@github.com/BAndysc/WoWDatabaseEditorExtras --recurse-submodules
+    
+    cd WoWDatabaseEditorExtras/WoWDatabaseEditor
+    
+    git checkout %APPVEYOR_REPO_COMMIT%
+    
+    cd ../
+    
+    mkdir modules
+    
+    dotnet publish WDE.Github/WDE.Github.csproj -o modules/ -c Release -f net6.0
+    
+    cp modules/WDE.Github.dll ../bin/wowdatabaseeditor-avalonia-win/WDE.Github.dll
+      
+    cp modules/WDE.Github.dll ../bin/wowdatabaseeditor-avalonia-mac/WDE.Github.dll
+      
+    cp modules/WDE.Github.dll ../bin/wowdatabaseeditor-avalonia-linux/WDE.Github.dll
+    
+    cd ../
 
     cd bin\wowdatabaseeditor-avalonia-win\
 
@@ -59,7 +81,15 @@ build_script:
     echo PLATFORM=MacOs >> bin/wowdatabaseeditor-avalonia-mac/app.ini
 
     echo PLATFORM=Linux >> bin/wowdatabaseeditor-avalonia-linux/app.ini
-
+      
+    curl -fsSL -o bin/wowdatabaseeditor-avalonia-win/storm.dll https://github.com/BAndysc/StormCascLibBinary/releases/download/windows/StormLib.dll
+      
+    curl -fsSL -o bin/wowdatabaseeditor-avalonia-win/casc.dll https://github.com/BAndysc/StormCascLibBinary/releases/download/windows/CascLib.dll
+      
+    curl -fsSL -o bin/wowdatabaseeditor-avalonia-linux/libstorm.so https://github.com/BAndysc/StormCascLibBinary/releases/download/linux/libstorm.so
+  
+    curl -fsSL -o bin/wowdatabaseeditor-avalonia-linux/libcasc.so https://github.com/BAndysc/StormCascLibBinary/releases/download/linux/libcasc.so
+  
     Rem Mac OS Bundle
 
     mkdir "WoW Database Editor.app"

@@ -17,6 +17,28 @@ public enum ConnectorAttachMode
     Right
 }
 
+public static class ConnectorAttachModeExtensions
+{
+    public static ConnectorAttachMode Opposite(this ConnectorAttachMode mode)
+    {
+        switch (mode)
+        {
+            case ConnectorAttachMode.Top:
+                return ConnectorAttachMode.Bottom;
+            case ConnectorAttachMode.Bottom:
+                return ConnectorAttachMode.Top;
+            case ConnectorAttachMode.Middle:
+                return ConnectorAttachMode.Middle;
+            case ConnectorAttachMode.Left:
+                return ConnectorAttachMode.Right;
+            case ConnectorAttachMode.Right:
+                return ConnectorAttachMode.Left;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(mode), mode, null);
+        }
+    }
+}
+
 public class ConnectorItem : TemplatedControl
 {
     private bool isDragging;

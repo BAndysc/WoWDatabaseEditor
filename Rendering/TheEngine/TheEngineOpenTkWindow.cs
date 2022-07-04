@@ -74,11 +74,12 @@ public class TheEngineOpenTkWindow : GameWindow, IWindowHost
         SwapBuffers();
         renderStopwatch.Stop();
         engine.statsManager.Counters.PresentTime.Add(renderStopwatch.Elapsed.Milliseconds);
-        if (measure)
+        if (stopMeasure)
         {
             MeasureProfiler.StopCollectingData();
             MeasureProfiler.SaveData();
             measure = false;
+            stopMeasure = false;
         }
     }
 
@@ -207,12 +208,17 @@ public class TheEngineOpenTkWindow : GameWindow, IWindowHost
     };
 
     private bool measure;
+    private bool stopMeasure;
     protected override void OnUpdateFrame(FrameEventArgs args)
     {
+        if (measure && engine.inputManager.keyboard.JustReleased(Key.H))
+            stopMeasure = true;
         if (engine.inputManager.keyboard.JustPressed(Key.H))
         {
             MeasureProfiler.StartCollectingData();
             measure = true;
+            if (!engine.inputManager.keyboard.IsDown(Key.LeftCtrl))
+                stopMeasure = true;
         }
         updateStopwatch.Restart();
         engine.inputManager.PostUpdate();

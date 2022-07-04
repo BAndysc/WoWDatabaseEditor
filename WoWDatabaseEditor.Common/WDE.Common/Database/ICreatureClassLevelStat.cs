@@ -4,10 +4,10 @@ namespace WDE.Common.Database
     {
         byte Level { get; }
         byte Class { get; }
-        ushort BaseMana { get; }
-        ushort BaseArmor { get; }
-        ushort AttackPower { get; }
-        ushort RangedAttackPower { get; }
+        int BaseMana { get; }
+        int BaseArmor { get; }
+        int AttackPower { get; }
+        int RangedAttackPower { get; }
 
         uint BaseHp(byte expansion);
         float Damage(byte expansion);

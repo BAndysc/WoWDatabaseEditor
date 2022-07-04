@@ -1,18 +1,25 @@
 using WDE.Common.DBC;
+using WDE.Common.MPQ;
 
 namespace WDE.MpqReader.DBC;
 
-public class LightParamStore
+public class LightParamStore : BaseDbcStore<uint, LightParam>
 {
-    private Dictionary<uint, LightParam> store = new();
-    public LightParamStore(IEnumerable<IDbcIterator> rows, LightIntParamStore lightIntParamStore, LightFloatParamStore floatParamStore)
+    public LightParamStore(GameFilesVersion wowVersion, IEnumerable<IDbcIterator> rows, LightIntParamStore lightIntParamStore, LightFloatParamStore floatParamStore, LightDataStore lightDataStore)
     {
         foreach (var row in rows)
         {
-            var o = new LightParam(row, lightIntParamStore, floatParamStore);
+            var o = new LightParam(wowVersion, row, lightIntParamStore, floatParamStore, lightDataStore);
             store[o.Id] = o;
         }
     }
-        
-    public LightParam this[uint id] => store[id];
+    
+    public LightParamStore(GameFilesVersion wowVersion, IEnumerable<IWdcIterator> rows, LightIntParamStore lightIntParamStore, LightFloatParamStore floatParamStore, LightDataStore lightDataStore)
+    {
+        foreach (var row in rows)
+        {
+            var o = new LightParam(wowVersion, row, lightDataStore);
+            store[o.Id] = o;
+        }
+    }
 }

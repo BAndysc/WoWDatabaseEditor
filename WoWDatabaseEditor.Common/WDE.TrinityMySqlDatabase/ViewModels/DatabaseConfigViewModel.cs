@@ -8,7 +8,8 @@ namespace WDE.TrinityMySqlDatabase.ViewModels
     public class DatabaseConfigViewModel : BaseDatabaseConfigViewModel
     {
         public DatabaseConfigViewModel(IWorldDatabaseSettingsProvider worldSettingsProvider,
-            IAuthDatabaseSettingsProvider authDatabaseSettingsProvider) : base(worldSettingsProvider, authDatabaseSettingsProvider)
+            IAuthDatabaseSettingsProvider authDatabaseSettingsProvider,
+            IHotfixDatabaseSettingsProvider hotfixDatabaseSettingsProvider) : base(worldSettingsProvider, authDatabaseSettingsProvider, hotfixDatabaseSettingsProvider)
         {
         }
 

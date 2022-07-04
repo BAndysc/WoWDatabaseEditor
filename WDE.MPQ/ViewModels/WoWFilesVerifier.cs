@@ -8,6 +8,8 @@ namespace WDE.MPQ.ViewModels
     internal class WoWFilesVerifier : IWoWFilesVerifier
     {
         private string[] wrathMpqs => new string[]{"common.MPQ", "common-2.MPQ", "expansion.MPQ", "lichking.MPQ"};
+        private string[] mopMpqs => new string[]
+            { "art.MPQ", "expansion1.MPQ", "expansion2.MPQ", "expansion3.MPQ", "expansion4.MPQ", "world.MPQ", "world2.MPQ" };
         private string[] cataMpqs => new string[]
             { "art.MPQ", "expansion1.MPQ", "expansion2.MPQ", "expansion3.MPQ", "world.MPQ", "world2.MPQ" };
         
@@ -29,8 +31,14 @@ namespace WDE.MPQ.ViewModels
             if (!dataPath.Exists)
                 return WoWFilesType.Invalid;
 
+            if (File.Exists(Path.Join(wowFolder, "Data", "config", "3b", "05", "3b0517b51edbe0b96f6ac5ea7eaaed38")))
+                return WoWFilesType.Legion;
+            
             if (ContainsAllFiles(wowFolder, wrathMpqs))
                 return WoWFilesType.Wrath;
+            
+            if (ContainsAllFiles(wowFolder, mopMpqs))
+                return WoWFilesType.Mop;
             
             if (ContainsAllFiles(wowFolder, cataMpqs))
                 return WoWFilesType.Cata;

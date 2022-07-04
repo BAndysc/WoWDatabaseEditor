@@ -21,18 +21,35 @@ namespace WDE.Common.Database
     
     public interface ICreatureText
     {
-        public uint CreatureId { get; }
-        public byte GroupId { get; }
-        public byte Id { get; }
-        public string? Text { get; }
-        public CreatureTextType Type { get; }
-        public byte Language { get; }
-        public float Probability { get; }
-        public uint Emote { get; }
-        public uint Duration { get; }
-        public uint Sound { get; }
-        public uint BroadcastTextId { get; }
-        public CreatureTextRange TextRange { get; }
-        public string? Comment { get; }
+        uint CreatureId { get; }
+        byte GroupId { get; }
+        byte Id { get; }
+        string? Text { get; }
+        CreatureTextType Type { get; }
+        byte Language { get; }
+        float Probability { get; }
+        uint Emote { get; }
+        uint Duration { get; }
+        uint Sound { get; }
+        uint BroadcastTextId { get; }
+        CreatureTextRange TextRange { get; }
+        string? Comment { get; }
+    }
+    
+    public class AbstractCreatureText : ICreatureText
+    {
+        public uint CreatureId { get; set; }
+        public byte GroupId { get; set; }
+        public byte Id { get; set; }
+        public string? Text { get; set; }
+        public CreatureTextType Type { get; set; }
+        public byte Language { get; set; }
+        public float Probability { get; set; }
+        public uint Emote { get; set; }
+        public uint Duration { get; set; }
+        public uint Sound { get; set; }
+        public uint BroadcastTextId { get; set; }
+        public CreatureTextRange TextRange { get; set; }
+        public string? Comment { get; set; }
     }
 }

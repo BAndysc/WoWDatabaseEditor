@@ -104,8 +104,17 @@ public class Game : IGame
         
         manager = (GameManager)provider.Resolve(typeof(GameManager));
         registry.RegisterInstance<IGameContext>(manager);
-            
-        bool success = manager.Initialize();
+
+        bool success;
+        try
+        {
+            success = manager.Initialize();
+        }
+        catch (Exception e)
+        {
+            messageBoxService.SimpleDialog("Error", "Couldn't initialize the 3D view", "Details: " + e.InnerException?.InnerException?.Message ?? e.Message + "\n\nPlease report to the developer.").ListenErrors();
+            success = false;
+        }
         if (!success)
         {
             manager.DisposeGame();

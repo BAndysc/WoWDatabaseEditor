@@ -99,6 +99,30 @@ namespace WDE.SmartScriptEditor.History
             script.BulkEditingFinished -= OnBulkEditingFinished;
         }
 
+        private void UnbindSmartBase(SmartBaseElement element)
+        {
+            for (var i = 0; i < element.ParametersCount; ++i)
+                element.GetParameter(i).OnValueChanged -= Parameter_OnValueChanged;
+            
+            for (var i = 0; i < element.FloatParametersCount; ++i)
+                element.GetFloatParameter(i).OnValueChanged -= ParameterFloat_OnValueChange;
+            
+            for (var i = 0; i < element.StringParametersCount; ++i)
+                element.GetStringParameter(i).OnValueChanged -= ParameterString_OnValueChanged;
+        }
+
+        private void BindSmartBase(SmartBaseElement element)
+        {
+            for (var i = 0; i < element.ParametersCount; ++i)
+                element.GetParameter(i).OnValueChanged += Parameter_OnValueChanged;
+            
+            for (var i = 0; i < element.FloatParametersCount; ++i)
+                element.GetFloatParameter(i).OnValueChanged += ParameterFloat_OnValueChange;
+            
+            for (var i = 0; i < element.StringParametersCount; ++i)
+                element.GetStringParameter(i).OnValueChanged += ParameterString_OnValueChanged;
+        }
+
         private void Events_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.Action == NotifyCollectionChangedAction.Add)
@@ -131,10 +155,10 @@ namespace WDE.SmartScriptEditor.History
             smartEvent.Phases.OnValueChanged -= Parameter_OnValueChanged;
             smartEvent.CooldownMin.OnValueChanged -= Parameter_OnValueChanged;
             smartEvent.CooldownMax.OnValueChanged -= Parameter_OnValueChanged;
+            smartEvent.TimerId.OnValueChanged -= Parameter_OnValueChanged;
             smartEvent.OnIdChanged -= SmartEventOnOnIdChanged;
 
-            for (var i = 0; i < SmartEvent.SmartEventParamsCount; ++i)
-                smartEvent.GetParameter(i).OnValueChanged -= Parameter_OnValueChanged;
+            UnbindSmartBase(smartEvent);
         }
 
         private void AddedAction(SmartAction smartAction, SmartEvent parent, int index)
@@ -154,17 +178,16 @@ namespace WDE.SmartScriptEditor.History
             smartAction.BulkEditingStarted += OnBulkEditingStarted;
             smartAction.BulkEditingFinished += OnBulkEditingFinished;
 
-            for (var i = 0; i < smartAction.ParametersCount; ++i)
-                smartAction.GetParameter(i).OnValueChanged += Parameter_OnValueChanged;
-
-            for (var i = 0; i < smartAction.Source.ParametersCount; ++i)
-                smartAction.Source.GetParameter(i).OnValueChanged += Parameter_OnValueChanged;
-
-            for (var i = 0; i < smartAction.Target.ParametersCount; ++i)
-                smartAction.Target.GetParameter(i).OnValueChanged += Parameter_OnValueChanged;
+            BindSmartBase(smartAction);
+            BindSmartBase(smartAction.Source);
+            BindSmartBase(smartAction.Target);
 
             for (var i = 0; i < 4; ++i)
-                smartAction.Target.Position[i].OnValueChanged += ParameterFloat_OnValueChange;
+                smartAction.Target.Position![i].OnValueChanged += ParameterFloat_OnValueChange;
+
+            if (smartAction.Source.Position != null)
+                for (var i = 0; i < 4; ++i)
+                    smartAction.Source.Position![i].OnValueChanged += ParameterFloat_OnValueChange;
 
             smartAction.CommentParameter.OnValueChanged += ParameterString_OnValueChanged;
             smartAction.OnIdChanged += SmartActionOnOnIdChanged;
@@ -184,19 +207,18 @@ namespace WDE.SmartScriptEditor.History
             smartAction.OnIdChanged -= SmartActionOnOnIdChanged;
             smartAction.BulkEditingStarted -= OnBulkEditingStarted;
             smartAction.BulkEditingFinished -= OnBulkEditingFinished;
-
-            for (var i = 0; i < smartAction.ParametersCount; ++i)
-                smartAction.GetParameter(i).OnValueChanged -= Parameter_OnValueChanged;
-
-            for (var i = 0; i < smartAction.Source.ParametersCount; ++i)
-                smartAction.Source.GetParameter(i).OnValueChanged -= Parameter_OnValueChanged;
-
-            for (var i = 0; i < smartAction.Target.ParametersCount; ++i)
-                smartAction.Target.GetParameter(i).OnValueChanged -= Parameter_OnValueChanged;
+            
+            UnbindSmartBase(smartAction);
+            UnbindSmartBase(smartAction.Source);
+            UnbindSmartBase(smartAction.Target);
 
             for (var i = 0; i < 4; ++i)
-                smartAction.Target.Position[i].OnValueChanged -= ParameterFloat_OnValueChange;
+                smartAction.Target.Position![i].OnValueChanged -= ParameterFloat_OnValueChange;
             
+            if (smartAction.Source.Position != null)
+                for (var i = 0; i < 4; ++i)
+                    smartAction.Source.Position![i].OnValueChanged -= ParameterFloat_OnValueChange;
+
             smartAction.CommentParameter.OnValueChanged -= ParameterString_OnValueChanged;
         }
         
@@ -217,9 +239,8 @@ namespace WDE.SmartScriptEditor.History
             smartCondition.OnIdChanged += SmartConditionOnOnIdChanged;
             smartCondition.BulkEditingStarted += OnBulkEditingStarted;
             smartCondition.BulkEditingFinished += OnBulkEditingFinished;
-
-            for (var i = 0; i < smartCondition.ParametersCount; ++i)
-                smartCondition.GetParameter(i).OnValueChanged += Parameter_OnValueChanged;
+            
+            BindSmartBase(smartCondition);
 
             smartCondition.Inverted.OnValueChanged += Parameter_OnValueChanged;
             smartCondition.ConditionTarget.OnValueChanged += Parameter_OnValueChanged;
@@ -230,8 +251,7 @@ namespace WDE.SmartScriptEditor.History
             smartCondition.BulkEditingStarted -= OnBulkEditingStarted;
             smartCondition.BulkEditingFinished -= OnBulkEditingFinished;
 
-            for (var i = 0; i < smartCondition.ParametersCount; ++i)
-                smartCondition.GetParameter(i).OnValueChanged -= Parameter_OnValueChanged;
+            UnbindSmartBase(smartCondition);
 
             smartCondition.Inverted.OnValueChanged -= Parameter_OnValueChanged;
             smartCondition.ConditionTarget.OnValueChanged -= Parameter_OnValueChanged;
@@ -260,9 +280,9 @@ namespace WDE.SmartScriptEditor.History
             smartEvent.Phases.OnValueChanged += Parameter_OnValueChanged;
             smartEvent.CooldownMin.OnValueChanged += Parameter_OnValueChanged;
             smartEvent.CooldownMax.OnValueChanged += Parameter_OnValueChanged;
+            smartEvent.TimerId.OnValueChanged += Parameter_OnValueChanged;
 
-            for (var i = 0; i < SmartEvent.SmartEventParamsCount; ++i)
-                smartEvent.GetParameter(i).OnValueChanged += Parameter_OnValueChanged;
+            BindSmartBase(smartEvent);
 
             smartEvent.Actions.CollectionChanged += Actions_CollectionChanged;
             smartEvent.Conditions.CollectionChanged += Conditions_CollectionChanged;

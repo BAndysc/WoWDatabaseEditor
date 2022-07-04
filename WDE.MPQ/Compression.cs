@@ -4,6 +4,8 @@ using System.Buffers;
 using System.IO;
 using System.IO.Compression;
 using ICSharpCode.SharpZipLib.BZip2;
+using ICSharpCode.SharpZipLib.Zip.Compression;
+using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
 
 namespace WDE.MPQ
 {
@@ -19,19 +21,16 @@ namespace WDE.MPQ
         
         public static int Deflate(byte[] input, int start, int length, byte[] output)
         {
-            // see http://george.chiramattel.com/blog/2007/09/deflatestream-block-length-does-not-match.html
-            // and possibly http://connect.microsoft.com/VisualStudio/feedback/details/97064/deflatestream-throws-exception-when-inflating-pdf-streams
-            // for more info on why we have to skip two extra bytes because of ZLIB
-            using var inputStream = new MemoryStream(input, 2 + start, length - 2);
-            using var deflate = new DeflateStream(inputStream, CompressionMode.Decompress);
+            using var inputStream = new NoAllocMemoryStream(input, start, length);
+            using var inflater = new InflaterInputStream(inputStream);
             using var outputStream = new MemoryStream(output, true);
             var buffer = ArrayPool<byte>.Shared.Rent(1024);
-            var read = deflate.Read(buffer, 0, 1024);
+            var read = inflater.Read(buffer, 0, 1024);
 
             while (read == buffer.Length)
             {
                 outputStream.Write(buffer, 0, read);
-                read = deflate.Read(buffer, 0, 1024);
+                read = inflater.Read(buffer, 0, 1024);
             }
 
             outputStream.Write(buffer, 0, read);
@@ -47,15 +46,22 @@ namespace WDE.MPQ
             return outputStream.ToArray();
         }
 
+        private static ThreadLocal<Inflater> inflaters = new(() => new Inflater());
+
         public static int DeflateTo(byte[] from, int start, int length, Span<byte> to)
         {
-            using var deflate = new DeflateStream(new NoAllocMemoryStream(from, 2 + start, length - 2), CompressionMode.Decompress);
+            using var memory = new NoAllocMemoryStream(from, start, length);
+            var inf = inflaters.Value!;
+            inf.Reset();
+            using var inflater = new InflaterInputStream(memory, inf, 1024);
             var buffer = ArrayPool<byte>.Shared.Rent(1024);
             int totalRead = 0;
             int offset = 0;
             while (true)
             {
-                var read = deflate.Read(buffer, 0, 1024);
+                var read = inflater.Read(buffer, 0, 1024);
+                if (read == 0)
+                    break;
                 buffer.AsSpan(0, read).CopyTo(to.Slice(offset));
                 offset += read;
                 totalRead += read;
@@ -87,6 +93,7 @@ namespace WDE.MPQ
                 var left = endPosition - position;
                 var toCopyLength = Math.Min(count, left); // never copy more than we have
                 Array.Copy(array, position, buffer, offset, toCopyLength);
+                position += toCopyLength;
                 return (int)toCopyLength;
             }
 

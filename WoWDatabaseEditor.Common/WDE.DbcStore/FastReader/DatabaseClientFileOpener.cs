@@ -9,6 +9,13 @@ namespace WDE.DbcStore.FastReader
     [AutoRegister]
     public class DatabaseClientFileOpener : IDatabaseClientFileOpener
     {
+        private readonly DBCD.DBCD dbcd;
+
+        public DatabaseClientFileOpener(DBCD.DBCD dbcd)
+        {
+            this.dbcd = dbcd;
+        }
+        
         public IDBC Open(byte[] data)
         {
             uint magic = BitConverter.ToUInt32(data);
@@ -39,6 +46,20 @@ namespace WDE.DbcStore.FastReader
                 return new FastWdc1Reader(path);
 
             throw new Exception("Unsupported version");
+        }
+
+        public IWDC OpenWdc(string table, byte[] data)
+        {
+            return new DbcdWrapper(dbcd.Load(new MemoryStream(data), table));
+        }
+
+        public IWDC OpenWdc(string path)
+        {
+            byte[] buffer = new byte[4];
+            using FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read);
+            var bytesRead = fs.Read(buffer, 0, 4);
+            fs.Close();
+            return OpenWdc(path, buffer);
         }
     }
 }
