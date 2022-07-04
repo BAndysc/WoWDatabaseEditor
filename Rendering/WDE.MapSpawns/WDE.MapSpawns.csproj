@@ -20,7 +20,6 @@
         <ProjectReference Include="..\..\WDE.MpqReader\WDE.MpqReader.csproj" />
         <ProjectReference Include="..\..\WDE.MVVM\WDE.MVVM.csproj" />
         <ProjectReference Include="..\..\WDE.Parameters\WDE.Parameters.csproj" />
-        <PackageReference Include="Avalonia" Version="0.10.8" />
         <PackageReference Include="Nito.AsyncEx" Version="5.1.2" />
         <ProjectReference Include="..\OpenGLBindings\OpenGLBindings.csproj" />
         <ProjectReference Include="..\TheAvaloniaOpenGL\TheAvaloniaOpenGL.csproj" />
