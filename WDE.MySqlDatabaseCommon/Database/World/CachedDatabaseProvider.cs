@@ -131,6 +131,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public Task TryConnect()
         {
+            nonCachedDatabase.GetCreatureTemplate(0); // if there is some connection problem, it should throw
             return taskRunner.ScheduleTask(new DatabaseCacheTask(this));
         }
 
