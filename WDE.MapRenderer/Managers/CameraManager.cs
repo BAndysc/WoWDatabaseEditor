@@ -71,7 +71,7 @@ namespace WDE.MapRenderer.Managers
         {
             using var ui = uiManager.BeginImmediateDrawRel(0, 1, 0, 1);
             ui.BeginVerticalBox(new Vector4(0, 0, 0, 0.5f), 3);
-            ui.Text("calibri", $"X: {Position.X:0.00} Y: {Position.Y:0.00} Z: {Position.Z:0.00}", 13, Vector4.One);
+            ui.Text("calibri", $"X: {Position.X:0.00} Y: {Position.Y:0.00} Z: {Position.Z:0.00}", 20, Vector4.One);
         }
     }
 }
