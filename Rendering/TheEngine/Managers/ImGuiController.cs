@@ -155,15 +155,11 @@ public class ImGuiController : IDisposable
         
         imGuiContext = ImGui.CreateContext();
         ImGui.SetCurrentContext(imGuiContext);
-        var io = ImGui.GetIO();
-        // ImFontConfig config = new();
-        // config.OversampleH = 3;
-        // config.OversampleV = 1;
-        // config.RasterizerMultiply = 1;
-        // config.EllipsisChar = ushort.MaxValue;
-        // config.FontDataOwnedByAtlas = 1;
-        io.Fonts.AddFontDefault();
-        //io.Fonts.AddFontFromFileTTF("Ruda-Bold.ttf", 15);
+        var io = ImGui.GetIO();        
+        var fonts = io.Fonts;
+
+        // default font
+        fonts.AddFontFromFileTTF("fonts/DroidSans.ttf", 15);
 
         io.BackendFlags |= ImGuiBackendFlags.RendererHasVtxOffset | ImGuiBackendFlags.HasSetMousePos;
         ImGui.StyleColorsDark();
@@ -187,10 +183,10 @@ public class ImGuiController : IDisposable
 
         shaderHandle = engine.shaderManager.LoadShader("internalShaders/imgui.json", false);
         material = engine.materialManager.CreateMaterial(shaderHandle, null);
-        
-        var fonts = ImGui.GetIO().Fonts;
-        io.Fonts.GetTexDataAsRGBA32(out IntPtr pixels, out int width, out int height, out int bytesPerPixel);
-        fontTexture = engine.textureManager.CreateTexture((Rgba32*)pixels, width, height,  true);
+        fonts.GetTexDataAsRGBA32(out IntPtr pixels, out int width, out int height, out int bytesPerPixel);
+
+        // do not generate mips for fonts
+        fontTexture = engine.textureManager.CreateTexture((Rgba32*)pixels, width, height,  false);
         fonts.SetTexID(new IntPtr(fontTexture.Handle));
         ImGui.NewFrame();
     }

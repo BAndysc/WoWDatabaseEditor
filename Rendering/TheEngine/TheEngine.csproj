@@ -38,6 +38,9 @@
       <None Update="fonts\calibri.png">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
+      <None Update="fonts\DroidSans.ttf">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
       <None Update="ECS\EntityExtensionsCodeGen.tt">
         <Generator>TextTemplatingFileGenerator</Generator>
         <LastGenOutput>EntityExtensionsCodeGen.cs</LastGenOutput>
