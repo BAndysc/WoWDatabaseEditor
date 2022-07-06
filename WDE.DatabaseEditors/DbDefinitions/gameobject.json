@@ -16,7 +16,7 @@
   ],
   "groups": [
     {
-      "group_name": "group",
+      "group_name": "General",
       "fields": [
         {
           "name": "Guid",
@@ -28,21 +28,6 @@
           "name": "Gameobject",
           "db_column_name": "id",
           "value_type": "GameobjectParameter"
-        },
-        {
-          "name": "Map",
-          "db_column_name": "map",
-          "value_type": "MapParameter"
-        },
-        {
-          "name": "Zone",
-          "db_column_name": "zoneId",
-          "value_type": "ZoneAreaParameter"
-        },
-        {
-          "name": "Area",
-          "db_column_name": "areaId",
-          "value_type": "ZoneAreaParameter"
         },
         {
           "name": "Spawn Mask",
@@ -124,6 +109,26 @@
           "value_type": "int",
           "can_be_null": true
         }
+      ]
+    },
+    {
+      "group_name": "Advanced",
+      "fields": [
+        {
+          "name": "Map",
+          "db_column_name": "map",
+          "value_type": "MapParameter"
+        },
+        {
+          "name": "Zone",
+          "db_column_name": "zoneId",
+          "value_type": "ZoneAreaParameter"
+        },
+        {
+          "name": "Area",
+          "db_column_name": "areaId",
+          "value_type": "ZoneAreaParameter"
+        }        
       ]
     }
   ]

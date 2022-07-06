@@ -13,14 +13,14 @@
                                           VerticalAlignment="Center"
                                           Grid.Column="2" Padding="0,3,3,3" 
                                           Margin="0,5,0,0">
-                            <ContentPresenter.Styles>
-                                <Style Selector="TextBlock">
-                                    <Setter Property="FontWeight" Value="Bold" />
-                                    <Setter Property="Foreground" Value="{DynamicResource GroupingHeaderColor}"/>
-                                </Style>
-                            </ContentPresenter.Styles>
                         </ContentPresenter>
                         <Rectangle Grid.Column="3" Fill="{DynamicResource GroupingHeaderColor}" Height="1" Margin="0,7,0,0"></Rectangle>
+                        <Grid.Styles>
+                            <Style Selector="TextBlock">
+                                <Setter Property="FontWeight" Value="Bold" />
+                                <Setter Property="Foreground" Value="{DynamicResource GroupingHeaderColor}"/>
+                            </Style>
+                        </Grid.Styles>
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>

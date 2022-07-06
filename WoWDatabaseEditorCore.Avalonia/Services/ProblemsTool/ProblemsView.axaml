@@ -36,7 +36,7 @@
                 <controls:GroupingHeader GroupName="{CompiledBinding Name}">
                     <controls:GroupingHeader.CustomContent>
                         <Border Padding="6,2,6,2" CornerRadius="3" Background="#30000000" Margin="0,0,3,0">
-                            <TextBlock Text="{CompiledBinding Count}" />
+                            <TextBlock Foreground="Black" Text="{CompiledBinding Count}" />
                         </Border>
                     </controls:GroupingHeader.CustomContent>
                 </controls:GroupingHeader>

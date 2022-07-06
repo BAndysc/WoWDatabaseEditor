@@ -20,11 +20,13 @@ namespace WDE.DatabaseEditors.Avalonia.Helpers
         {
             if (param is ViewModels.MultiRow.DatabaseCellViewModel { ActionCommand: { } } or 
                 ViewModels.SingleRow.SingleRecordDatabaseCellViewModel { ActionCommand: { } } or 
-                ViewModels.Template.DatabaseCellViewModel { ActionCommand: { } })
+                ViewModels.Template.DatabaseCellViewModel { ActionCommand: { } } or 
+                ViewModels.OneToOneForeignKey.SingleRecordDatabaseCellViewModel { ActionCommand: { } })
                 return CommandTemplate!.Build(param);
             if ((param is DatabaseCellViewModel vm && vm.ParameterValue is IParameterValue<long> holder && holder.Parameter is BoolParameter) ||
                 (param is ViewModels.MultiRow.DatabaseCellViewModel vm2 && vm2.ParameterValue is IParameterValue<long> holder2 && holder2.Parameter is BoolParameter) ||
-                (param is ViewModels.SingleRow.SingleRecordDatabaseCellViewModel vm3 && vm3.ParameterValue is IParameterValue<long> holder3 && holder3.Parameter is BoolParameter))
+                (param is ViewModels.SingleRow.SingleRecordDatabaseCellViewModel vm3 && vm3.ParameterValue is IParameterValue<long> holder3 && holder3.Parameter is BoolParameter) ||
+                (param is ViewModels.OneToOneForeignKey.SingleRecordDatabaseCellViewModel vm6 && vm6.ParameterValue is IParameterValue<long> holder4 && holder4.Parameter is BoolParameter))
                 return BoolTemplate!.Build(param);
             if (param is BaseDatabaseCellViewModel vm5 && vm5.UseFlagsPicker)
                 return FlagsTemplate!.Build(param);
@@ -35,7 +37,10 @@ namespace WDE.DatabaseEditors.Avalonia.Helpers
 
         public bool Match(object data)
         {
-            return data is DatabaseCellViewModel or ViewModels.MultiRow.DatabaseCellViewModel or ViewModels.SingleRow.SingleRecordDatabaseCellViewModel;
+            return data is DatabaseCellViewModel or
+                ViewModels.MultiRow.DatabaseCellViewModel or 
+                ViewModels.SingleRow.SingleRecordDatabaseCellViewModel or 
+                ViewModels.OneToOneForeignKey.SingleRecordDatabaseCellViewModel;
         }
     }
 }

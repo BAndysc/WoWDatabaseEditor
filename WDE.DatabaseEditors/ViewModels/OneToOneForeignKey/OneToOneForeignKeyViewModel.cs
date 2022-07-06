@@ -29,7 +29,6 @@ using WDE.DatabaseEditors.Models;
 using WDE.DatabaseEditors.QueryGenerators;
 using WDE.DatabaseEditors.Solution;
 using WDE.DatabaseEditors.Utils;
-using WDE.DatabaseEditors.ViewModels.SingleRow;
 using WDE.MVVM;
 using WDE.SqlQueryGenerator;
 
@@ -353,59 +352,66 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
         {
             row.ChangedCell -= OnRowChangedCell;
         }));
-        var columns = tableDefinition.Groups.SelectMany(g => g.Fields).ToList();
-
+        
         int columnIndex = 0;
-        foreach (var column in columns)
+        foreach (var group in tableDefinition.Groups)
         {
-            SingleRecordDatabaseCellViewModel cellViewModel;
+            var g = new DatabaseFieldsGroup(group.Name);
+            row.Groups.Add(g);
+            foreach (var column in group.Fields)
+            {
+                SingleRecordDatabaseCellViewModel cellViewModel;
 
-            if (tableDefinition.PrimaryKey.Contains(column.DbColumnName))
-                continue;
-            
-            if (column.IsConditionColumn)
-            {
-                throw new Exception("One to one conditions editing not supported (but it could be, but is there a need?)");
-            }
-            else if (column.IsMetaColumn)
-            {
-                var (cmd, name) = metaColumnsSupportService.GenerateCommand(column.Meta!, entity, key);
-                cellViewModel = new SingleRecordDatabaseCellViewModel(columnIndex, column.Name, cmd, row, entity, name);
-            }
-            else
-            {
-                var cell = entity.GetCell(column.DbColumnName);
-                if (cell == null)
-                    throw new Exception("this should never happen");
-
-                IParameterValue parameterValue = null!;
-                if (cell is DatabaseField<long> longParam)
+                if (tableDefinition.PrimaryKey.Contains(column.DbColumnName))
+                    continue;
+                
+                if (column.IsConditionColumn)
                 {
-                    IParameter<long> parameter = parameterFactory.Factory(column.ValueType);
-                    parameterValue = new ParameterValue<long, DatabaseEntity>(entity, longParam.Current, longParam.Original, parameter);
+                    throw new Exception("One to one conditions editing not supported (but it could be, but is there a need?)");
                 }
-                else if (cell is DatabaseField<string> stringParam)
+                else if (column.IsMetaColumn)
                 {
-                    if (column.AutogenerateComment != null)
+                    var (cmd, name) = metaColumnsSupportService.GenerateCommand(column.Meta!, entity, key);
+                    cellViewModel = new SingleRecordDatabaseCellViewModel(columnIndex, column.Name, cmd, row, entity, name);
+                }
+                else
+                {
+                    var cell = entity.GetCell(column.DbColumnName);
+                    if (cell == null)
+                        throw new Exception("this should never happen");
+
+                    IParameterValue parameterValue = null!;
+                    if (cell is DatabaseField<long> longParam)
                     {
-                        stringParam.Current.Value = stringParam.Current.Value.GetComment(column.CanBeNull);
-                        stringParam.Original.Value = stringParam.Original.Value.GetComment(column.CanBeNull);
+                        IParameter<long> parameter = parameterFactory.Factory(column.ValueType);
+                        parameterValue = new ParameterValue<long, DatabaseEntity>(entity, longParam.Current, longParam.Original, parameter);
+                    }
+                    else if (cell is DatabaseField<string> stringParam)
+                    {
+                        if (column.AutogenerateComment != null)
+                        {
+                            stringParam.Current.Value = stringParam.Current.Value.GetComment(column.CanBeNull);
+                            stringParam.Original.Value = stringParam.Original.Value.GetComment(column.CanBeNull);
+                        }
+
+                        parameterValue = new ParameterValue<string, DatabaseEntity>(entity, stringParam.Current, stringParam.Original, parameterFactory.FactoryString(column.ValueType));
+                    }
+                    else if (cell is DatabaseField<float> floatParameter)
+                    {
+                        parameterValue = new ParameterValue<float, DatabaseEntity>(entity, floatParameter.Current, floatParameter.Original, FloatParameter.Instance);
                     }
 
-                    parameterValue = new ParameterValue<string, DatabaseEntity>(entity, stringParam.Current, stringParam.Original, parameterFactory.FactoryString(column.ValueType));
-                }
-                else if (cell is DatabaseField<float> floatParameter)
-                {
-                    parameterValue = new ParameterValue<float, DatabaseEntity>(entity, floatParameter.Current, floatParameter.Original, FloatParameter.Instance);
+                    parameterValue.DefaultIsBlank = column.IsZeroBlank;
+                    cellViewModel = new SingleRecordDatabaseCellViewModel(columnIndex, column, row, entity, cell, parameterValue);
                 }
 
-                parameterValue.DefaultIsBlank = column.IsZeroBlank;
-                cellViewModel = new SingleRecordDatabaseCellViewModel(columnIndex, column, row, entity, cell, parameterValue);
-            }
-
-            row.Cells.Add(cellViewModel);
-            columnIndex++;
+                g.Cells.Add(cellViewModel);
+                columnIndex++;
+            }   
         }
+
+        if (row.Groups.Count == 1)
+            row.Groups[0].ShowHeader = false;
 
         return row;
     }
@@ -438,8 +444,8 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
         History.AddHandler(handler);
     }
     
-    public int DesiredWidth => 600;
-    public int DesiredHeight => 800;
+    public int DesiredWidth => 560;
+    public int DesiredHeight => 640;
     public string Title { get; }
     public ICommand Copy => new AlwaysDisabledCommand();
     public ICommand Cut => new AlwaysDisabledCommand();

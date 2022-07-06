@@ -28,16 +28,33 @@
                             KeyboardNavigation.TabNavigation="Continue"
                             MaximumColumnsCount="1" ColumnWidth="400" HorizontalSpacing="10" Spacing="5"></DynamicColumnsPanel>
                     </ItemsPanelTemplate>
-                    <DataTemplate x:Key="VerticalRowTemplate" x:DataType="singleRow:DatabaseEntityViewModel">
-                        <ItemsPresenter 
+                    <DataTemplate x:Key="VerticalRowTemplate" x:DataType="oneToOneForeignKey:DatabaseEntityViewModel">
+                        <ItemsPresenter
                             KeyboardNavigation.TabNavigation="Continue"
-                            Items="{CompiledBinding Cells, Mode=OneWay}"
+                            Items="{CompiledBinding Groups, Mode=OneWay}"
                             ItemsPanel="{StaticResource VerticalRowPanel}">
                             <ItemsPresenter.ItemTemplate>
-                                <DataTemplate x:DataType="singleRow:SingleRecordDatabaseCellViewModel">
-                                    <DockPanel LastChildFill="True">
-                                        <TextBlock Text="{CompiledBinding ColumnName, StringFormat={}{0}: }" Opacity="0.7" VerticalAlignment="Center" Width="100" FontWeight="Bold" />
-                                        <ContentPresenter Background="{DynamicResource ContentBackground}" BorderThickness="1" CornerRadius="4" BorderBrush="{DynamicResource TextControlBorderBrush}" Content="{Binding}" Margin="20,0,0,0" />
+                                <DataTemplate x:DataType="oneToOneForeignKey:DatabaseFieldsGroup">
+                                    <DockPanel>
+                                        <GroupingHeader IsVisible="{CompiledBinding ShowHeader}" DockPanel.Dock="Top">
+                                            <GroupingHeader.CustomContent>
+                                                <CheckBox IsChecked="{CompiledBinding IsExpanded}" Content="{CompiledBinding GroupName}" />
+                                            </GroupingHeader.CustomContent>
+                                        </GroupingHeader>
+                                        <ItemsPresenter 
+                                            IsVisible="{CompiledBinding IsExpanded}"
+                                            KeyboardNavigation.TabNavigation="Continue"
+                                            Items="{CompiledBinding Cells, Mode=OneWay}"
+                                            ItemsPanel="{StaticResource VerticalRowPanel}">
+                                            <ItemsPresenter.ItemTemplate>
+                                                <DataTemplate x:DataType="oneToOneForeignKey:SingleRecordDatabaseCellViewModel">
+                                                    <DockPanel LastChildFill="True">
+                                                        <TextBlock Text="{CompiledBinding ColumnName, StringFormat={}{0}: }" Opacity="0.7" VerticalAlignment="Center" Width="100" FontWeight="Bold" />
+                                                        <ContentPresenter Background="{DynamicResource ContentBackground}" BorderThickness="1" CornerRadius="4" BorderBrush="{DynamicResource TextControlBorderBrush}" Content="{Binding}" Margin="20,0,0,0" />
+                                                    </DockPanel>
+                                                </DataTemplate>
+                                            </ItemsPresenter.ItemTemplate>
+                                        </ItemsPresenter>
                                     </DockPanel>
                                 </DataTemplate>
                             </ItemsPresenter.ItemTemplate>
