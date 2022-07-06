@@ -34,6 +34,7 @@ namespace TheEngine.Input
             }
         }
 
+        private Vector2 lastClickPosition;
         private float resetClickTimeCounter = 0;
         
         public uint ClickCount { get; private set; }
@@ -72,16 +73,22 @@ namespace TheEngine.Input
             {
                 leftDown = true;
                 leftJustDown = true;
-                ClickCount++;
-                resetClickTimeCounter = 500;
             }
 
             if ((button & MouseButton.Right) != 0)
             {
                 rightDown = true;
                 rightJustDown = true;
+            }
+
+            if (leftJustDown || rightJustDown)
+            {
+                if ((lastClickPosition - ScreenPoint).LengthSquared() > 10 * 10)
+                    ClickCount = 0;
+                
                 ClickCount++;
                 resetClickTimeCounter = 500;
+                lastClickPosition = ScreenPoint;
             }
         }
 
