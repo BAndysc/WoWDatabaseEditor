@@ -169,7 +169,7 @@ namespace WDE.DatabaseEditors.ViewModels
                 var sql = queryGenerator
                     .GenerateQuery(new List<DatabaseKey>(){key}, null, new DatabaseTableData(tableDefinition, entities));
                 var splitItem = new DatabaseTableSolutionItem(tableDefinition.Id, tableDefinition.IgnoreEquality);
-                splitItem.Entries.Add(new SolutionItemDatabaseEntity(key, entities.Count > 0 && entities[0].ExistInDatabase, entities.Count > 0 ? GetOriginalFields(entities[0]) : null));
+                splitItem.Entries.Add(new SolutionItemDatabaseEntity(key, entities.Count > 0 && entities[0].ExistInDatabase, entities.Count > 0 && entities[0].ConditionsModified, entities.Count > 0 ? GetOriginalFields(entities[0]) : null));
                 split.Add((splitItem, sql));
             }
 

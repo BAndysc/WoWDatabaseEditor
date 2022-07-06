@@ -20,12 +20,15 @@ namespace WDE.DatabaseEditors.Models
         public Dictionary<string, IDatabaseField> Cells { get; }
 
         private IReadOnlyList<ICondition>? conditions;
+        
+        public bool ConditionsModified { get; set; }
 
         public IReadOnlyList<ICondition>? Conditions
         {
             get => conditions;
             set
             {
+                ConditionsModified = true;
                 var old = conditions;
                 conditions = value;
                 OnConditionsChanged?.Invoke(this, old, value);
@@ -73,7 +76,7 @@ namespace WDE.DatabaseEditors.Models
             ExistInDatabase = existInDatabase;
             this.key = key;
             Cells = cells;
-            Conditions = conditions;
+            this.conditions = conditions;
             foreach (var databaseField in Cells)
             {
                 databaseField.Value.OnChanged += action =>

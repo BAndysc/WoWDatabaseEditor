@@ -571,7 +571,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             var previousData = solutionItem.Entries.Where(e => Entities.All(entity => entity.GenerateKey(TableDefinition) != e.Key));
             
             solutionItem.Entries = Entities.Where(e => (!e.ExistInDatabase || EntityIsModified(e)) && !e.Phantom)
-                .Select(e => new SolutionItemDatabaseEntity(e.Key, e.ExistInDatabase, GetOriginalFields(e)))
+                .Select(e => new SolutionItemDatabaseEntity(e.Key, e.ExistInDatabase, e.ConditionsModified, GetOriginalFields(e)))
                 .Union(previousData)
                 .ToList();
             solutionItem.DeletedEntries = removedKeys.ToList();
@@ -580,7 +580,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
         private bool EntityIsModified(DatabaseEntity databaseEntity)
         {
             // todo: optimize?
-            return databaseEntity.Cells.Any(c => c.Value.IsModified);
+            return databaseEntity.ConditionsModified || databaseEntity.Cells.Any(c => c.Value.IsModified);
         }
 
         public override bool ForceRemoveEntity(DatabaseEntity entity)

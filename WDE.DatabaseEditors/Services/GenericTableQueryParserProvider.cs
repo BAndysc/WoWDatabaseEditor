@@ -126,7 +126,7 @@ public class GenericTableQueryParserProvider : IQueryParserProvider
                 if (key.Count != defi.GroupByKeys.Count)
                     continue;
                 var item = new DatabaseTableSolutionItem(defi.Id, defi.IgnoreEquality);
-                item.Entries.Add(new SolutionItemDatabaseEntity(key, false));
+                item.Entries.Add(new SolutionItemDatabaseEntity(key, false, false));
                 context.ProduceItem(item);
             }
         }
@@ -158,7 +158,7 @@ public class GenericTableQueryParserProvider : IQueryParserProvider
             {
                 var key = new DatabaseKey(keyIndices.Select(index => line[index]).Select(x => (long)x));
                 if (existing.Entries.All(x => x.Key != key))
-                    existing.Entries.Add(new SolutionItemDatabaseEntity(key, false));
+                    existing.Entries.Add(new SolutionItemDatabaseEntity(key, false, false));
                 if (byTableToDelete.TryGetValue(defi.Id, out var toDelete))
                     toDelete.Remove(key);
             }
@@ -171,7 +171,7 @@ public class GenericTableQueryParserProvider : IQueryParserProvider
                 if (line[keyIndices[0]] is not long lkey)
                     continue;
                 var item = new DatabaseTableSolutionItem(defi.Id, defi.IgnoreEquality);
-                item.Entries.Add(new SolutionItemDatabaseEntity(new DatabaseKey(lkey), false));
+                item.Entries.Add(new SolutionItemDatabaseEntity(new DatabaseKey(lkey), false, false));
                 context.ProduceItem(item);
             }
         }
@@ -220,7 +220,7 @@ public class GenericTableQueryParserProvider : IQueryParserProvider
                     var entry = existing.Entries.FirstOrDefault(e => e.Key == key);
                     if (entry == null)
                     {
-                        entry = new(key, true);
+                        entry = new(key, true, false);
                         existing.Entries.Add(entry);
                     }
                     originals = entry.OriginalValues ??= new();
@@ -228,7 +228,7 @@ public class GenericTableQueryParserProvider : IQueryParserProvider
                 else
                 {
                     var item = new DatabaseTableSolutionItem(defi.Id, defi.IgnoreEquality);
-                    item.Entries.Add(new SolutionItemDatabaseEntity(key, true));
+                    item.Entries.Add(new SolutionItemDatabaseEntity(key, true, false));
                     var savedItem = sessionService.Find(item);
                     if (savedItem != null)
                         item = (DatabaseTableSolutionItem)savedItem.Clone();

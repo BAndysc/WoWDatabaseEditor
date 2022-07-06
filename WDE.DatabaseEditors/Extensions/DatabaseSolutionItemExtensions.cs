@@ -18,6 +18,7 @@ namespace WDE.DatabaseEditors.Extensions
                     continue;
                 
                 entity.ExistInDatabase = solutionEntity.ExistsInDatabase;
+                entity.ConditionsModified = solutionEntity.ConditionsModified;
                 
                 if (solutionEntity.OriginalValues != null)
                     foreach (var original in solutionEntity.OriginalValues)

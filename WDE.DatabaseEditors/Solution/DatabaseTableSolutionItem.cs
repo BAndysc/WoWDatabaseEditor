@@ -11,9 +11,9 @@ namespace WDE.DatabaseEditors.Solution
 {
     public class DatabaseTableSolutionItem : ISolutionItem
     {
-        public DatabaseTableSolutionItem(DatabaseKey entry, bool existsInDatabase, string definitionId, bool ignoreEquality)
+        public DatabaseTableSolutionItem(DatabaseKey entry, bool existsInDatabase, bool conditionModified, string definitionId, bool ignoreEquality)
         {
-            Entries.Add(new SolutionItemDatabaseEntity(entry, existsInDatabase));
+            Entries.Add(new SolutionItemDatabaseEntity(entry, existsInDatabase, conditionModified));
             DefinitionId = definitionId;
             IgnoreEquality = ignoreEquality;
         }
@@ -99,15 +99,17 @@ namespace WDE.DatabaseEditors.Solution
     public class SolutionItemDatabaseEntity
     {
         [JsonConstructor]
-        public SolutionItemDatabaseEntity(DatabaseKey key, bool existsInDatabase, List<EntityOrigianlField>? originalValues = null)
+        public SolutionItemDatabaseEntity(DatabaseKey key, bool existsInDatabase, bool conditionsModified, List<EntityOrigianlField>? originalValues = null)
         {
             Key = key;
             ExistsInDatabase = existsInDatabase;
             OriginalValues = originalValues;
+            ConditionsModified = conditionsModified;
         }
 
         [JsonProperty("k")] public readonly DatabaseKey Key;
         [JsonProperty("e")] public readonly bool ExistsInDatabase;
+        [JsonProperty("c")] public readonly bool ConditionsModified;
 
         [JsonProperty("v")] public List<EntityOrigianlField>? OriginalValues { get; set; }
         // legacy names, now using one byte property names for space saving
@@ -117,6 +119,7 @@ namespace WDE.DatabaseEditors.Solution
         {
             Key = copy.Key;
             ExistsInDatabase = copy.ExistsInDatabase;
+            ConditionsModified = copy.ConditionsModified;
             OriginalValues = copy.OriginalValues?.Select(c => new EntityOrigianlField(c)).ToList();
         }
 

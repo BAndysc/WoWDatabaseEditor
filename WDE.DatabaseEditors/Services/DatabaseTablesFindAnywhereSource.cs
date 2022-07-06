@@ -156,7 +156,7 @@ public class DatabaseTablesFindAnywhereSource : IFindAnywhereSource
                                 key = new DatabaseKey(Convert.ToInt64(row[definition.TablePrimaryKeyColumnName].Item2));
                             else
                                 key = new DatabaseKey(Convert.ToInt64(row[definition.ForeignTableByName![tableName].ForeignKeys[0]].Item2));
-                            item = new DatabaseTableSolutionItem(key, true, definition.Id, definition.IgnoreEquality);
+                            item = new DatabaseTableSolutionItem(key, true, false, definition.Id, definition.IgnoreEquality);
                         }
                         
                         resultContext.AddResult(new FindAnywhereResult(

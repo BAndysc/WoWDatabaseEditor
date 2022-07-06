@@ -164,7 +164,7 @@ public class TableEditorPickerService : ITableEditorPickerService
             Debug.Assert(definition.RecordMode == RecordMode.MultiRecord);
             Debug.Assert(condition == null);
             Debug.Assert(defaultPartialKey.HasValue);
-            var solutionItem = new DatabaseTableSolutionItem(defaultPartialKey.Value, true, definition.Id, false);
+            var solutionItem = new DatabaseTableSolutionItem(defaultPartialKey.Value, true, false, definition.Id, false);
             openIsNoSaveMode = await CheckIfItemIsOpened(solutionItem, definition);
             var multiRow = containerProvider.Resolve<MultiRowDbTableEditorViewModel>((typeof(DatabaseTableSolutionItem), solutionItem));
             multiRow.AllowMultipleKeys = false;
