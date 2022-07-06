@@ -120,6 +120,7 @@ namespace WDE.MapRenderer
             private readonly CameraManager cameraManager;
             private readonly IStatsManager statsManager;
             private readonly ModuleManager moduleManager;
+            private readonly DbcManager dbcManager;
             private readonly TimeManager timeManager;
             private readonly IGameContext gameContext;
 
@@ -132,6 +133,7 @@ namespace WDE.MapRenderer
                 CameraManager cameraManager,
                 IStatsManager statsManager,
                 ModuleManager moduleManager,
+                DbcManager dbcManager,
                 TimeManager timeManager,
                 IGameContext gameContext)
             {
@@ -139,6 +141,7 @@ namespace WDE.MapRenderer
                 this.cameraManager = cameraManager;
                 this.statsManager = statsManager;
                 this.moduleManager = moduleManager;
+                this.dbcManager = dbcManager;
                 this.timeManager = timeManager;
                 this.gameContext = gameContext;
             }
@@ -169,6 +172,8 @@ namespace WDE.MapRenderer
             
             public void Initialize()
             {
+                vm.LoadMaps(dbcManager);
+                
                 registeredViewModels = moduleManager.ViewModels;
                 registeredViewModels.CollectionChanged += RegisteredViewModelsOnCollectionChanged;
                 
@@ -250,9 +255,7 @@ Tris: " + stats.TrianglesDrawn;
         }
         
         public GameViewModel(IMpqService mpqService,
-            IDbcStore dbcStore, 
             IMapDataProvider mapData, 
-            ITaskRunner taskRunner,
             IMessageBoxService messageBoxService,
             IGameView gameView,
             Func<Game> gameCreator,
@@ -278,17 +281,6 @@ Tris: " + stats.TrianglesDrawn;
 
             gameView.RegisterGameModule(container => container.Resolve<GameProxy>((typeof(GameViewModel), this)));
             
-            taskRunner.ScheduleTask("Loading maps", async () =>
-            {
-                maps = dbcStore.MapDirectoryStore
-                    .Select(pair =>
-                    {
-                        dbcStore.MapStore.TryGetValue(pair.Key, out var mapName);
-                        return new MapViewModel(pair.Value,  mapName, (uint)pair.Key);
-                    }).ToList();
-                RaisePropertyChanged(nameof(Maps));
-            });
-            
             ToggleMapVisibilityCommand = new DelegateCommand(() => IsMapVisible = !IsMapVisible);
             ToggleStatsVisibilityCommand = new DelegateCommand(() => DisplayStats = !DisplayStats);
             
@@ -313,6 +305,28 @@ Tris: " + stats.TrianglesDrawn;
                     }
                 }
             });
+        }
+
+        private void LoadMaps(DbcManager? dbcManager)
+        {
+            if (dbcManager == null)
+                return;
+            
+            maps = dbcManager.MapStore
+                .Where(map => map.MapType != MapType.Transport)
+                .Select(map => new MapViewModel(map.Directory, map.Name, (uint)map.Id))
+                .OrderBy(map => // sort by main continents first
+                {
+                    if (map.Id is 0 or 1)
+                        return map.Id;
+                    if (map.Id == 530) // outland
+                        return 2U;
+                    if (map.Id == 571) // northrend
+                        return 3U;
+                    return map.Id + 4;
+                })
+                .ToList();
+            RaisePropertyChanged(nameof(Maps));
         }
 
         private int state = 0;
