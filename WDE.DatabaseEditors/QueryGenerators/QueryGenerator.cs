@@ -293,7 +293,15 @@ namespace WDE.DatabaseEditors.QueryGenerators
                 return Queries.Empty();
             
             IMultiQuery query = Queries.BeginTransaction();
-            query.Add(BuildConditionsDeleteQuery(keys, tableData));
+
+            if (tableData.TableDefinition.RecordMode == RecordMode.SingleRow)
+            {
+                foreach (var deleteQuery in BuildConditionsDeleteQuerySingleRow(keys, tableData))
+                    query.Add(deleteQuery);
+            }
+            else
+                query.Add(BuildConditionsDeleteQuery(keys, tableData));
+
             List<IConditionLine> conditions = new();
             int sourceType = tableData.TableDefinition.Condition.SourceType;
 
@@ -327,6 +335,47 @@ namespace WDE.DatabaseEditors.QueryGenerators
             query.Add(conditionQueryGenerator.BuildInsertQuery(conditions));
 
             return query.Close();
+        }
+
+        private List<IQuery> BuildConditionsDeleteQuerySingleRow(IReadOnlyList<DatabaseKey> keys, IDatabaseTableData tableData)
+        {
+            List<IQuery> queries = new List<IQuery>();
+
+            if (tableData.TableDefinition.Condition == null)
+                return queries;
+
+            foreach (var entity in tableData.Entities)
+            {
+                if (entity.Conditions == null)
+                    continue;
+
+                int sourceGroup = 0;
+                int sourceEntry = 0;
+                int sourceId = 0;
+
+                if (tableData.TableDefinition.Condition.SourceEntryColumn != null &&
+                    entity.GetCell(tableData.TableDefinition.Condition.SourceEntryColumn) is DatabaseField<long>
+                        entryCell)
+                    sourceEntry = (int)entryCell.Current.Value;
+
+                if (tableData.TableDefinition.Condition.SourceGroupColumn != null &&
+                    entity.GetCell(tableData.TableDefinition.Condition.SourceGroupColumn) is DatabaseField<long>
+                        groupCell)
+                    sourceGroup = (int)groupCell.Current.Value;
+
+                if (tableData.TableDefinition.Condition.SourceIdColumn != null &&
+                    entity.GetCell(tableData.TableDefinition.Condition.SourceIdColumn) is DatabaseField<long>
+                        idCell)
+                    sourceId = (int)idCell.Current.Value;
+
+                queries.Add(conditionQueryGenerator.BuildDeleteQuery(new IDatabaseProvider.ConditionKey(
+                    tableData.TableDefinition.Condition.SourceType,
+                    sourceGroup != 0 ? sourceGroup : null,
+                    sourceEntry != 0 ? sourceEntry : null,
+                    sourceId != 0 ? sourceId : null)));
+            }
+
+            return queries;
         }
 
         private IQuery BuildConditionsDeleteQuery(IReadOnlyList<DatabaseKey> keys, IDatabaseTableData tableData)

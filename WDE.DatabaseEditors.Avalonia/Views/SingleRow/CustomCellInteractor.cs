@@ -32,8 +32,8 @@ public class CustomCellInteractor : CustomCellDrawerInteractorBase, ICustomCellI
 
         if (cell.ActionCommand != null)
         {
-            if (cell.ActionCommand.CanExecute(null))
-                cell.ActionCommand.Execute(null);
+            if (cell.ActionCommand.CanExecute(cell))
+                cell.ActionCommand.Execute(cell);
             return true;
         }
         
@@ -87,9 +87,9 @@ public class CustomCellInteractor : CustomCellDrawerInteractorBase, ICustomCellI
             }
         }
         
-        if (leftButton && cell.ActionCommand != null && cell.ActionCommand.CanExecute(null))
+        if (leftButton && cell.ActionCommand != null && cell.ActionCommand.CanExecute(cell))
         {
-            cell.ActionCommand.Execute(null);
+            cell.ActionCommand.Execute(cell);
             return true;
         }
         
