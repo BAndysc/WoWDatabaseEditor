@@ -7,7 +7,7 @@ namespace WDE.TrinityMySqlDatabase.Models
     [Table(Name = "quest_template")]
     public class MySqlQuestTemplate : IQuestTemplate
     {
-        private MySqlQuestTemplateAddon? addon;
+        private MySqlBaseQuestTemplateAddon? addon;
 
         [PrimaryKey]
         [Column(Name = "ID")]
@@ -32,7 +32,7 @@ namespace WDE.TrinityMySqlDatabase.Models
         [Column(Name = "RewardNextQuest")]
         public uint NextQuestInChain { get; set; }
 
-        public MySqlQuestTemplate SetAddon(MySqlQuestTemplateAddon? addon)
+        public MySqlQuestTemplate SetAddon(MySqlBaseQuestTemplateAddon? addon)
         {
             this.addon = addon;
             return this;
@@ -76,7 +76,7 @@ namespace WDE.TrinityMySqlDatabase.Models
     [Table(Name = "quest_template")]
     public class MySqlMasterQuestTemplate : IQuestTemplate
     {
-        private MySqlQuestTemplateAddon? addon;
+        private MySqlBaseQuestTemplateAddon? addon;
 
         [PrimaryKey]
         [Column(Name = "ID")]
@@ -118,7 +118,7 @@ namespace WDE.TrinityMySqlDatabase.Models
         [Column(Name = "RewardNextQuest")]
         public uint NextQuestInChain { get; set; }
 
-        public MySqlMasterQuestTemplate SetAddon(MySqlQuestTemplateAddon? addon)
+        public MySqlMasterQuestTemplate SetAddon(MySqlBaseQuestTemplateAddon? addon)
         {
             this.addon = addon;
             return this;

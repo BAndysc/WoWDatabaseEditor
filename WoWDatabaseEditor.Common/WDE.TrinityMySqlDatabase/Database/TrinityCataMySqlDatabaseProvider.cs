@@ -186,7 +186,7 @@ public class TrinityCataMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvider
         return await model.GameObject.Where(c => c.Map == map).ToListAsync<IGameObject>();
     }
     
-    protected virtual IQueryable<MySqlCataQuestTemplate> GetQuestsQuery(TrinityCataDatabase model)
+    private IQueryable<MySqlCataQuestTemplate> GetQuestsQuery(TrinityCataDatabase model)
     {
         return (from t in model.CataQuestTemplate
             join addon in model.CataQuestTemplateAddon on t.Entry equals addon.Entry into adn

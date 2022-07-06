@@ -168,7 +168,7 @@ public class TrinityMasterMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvid
         return await model.GameObject.Where(c => c.Map == map).ToListAsync<IGameObject>();
     }
     
-    protected IQueryable<MySqlMasterQuestTemplate> GetMasterQuestsQuery(BaseTrinityDatabase model)
+    private IQueryable<MySqlMasterQuestTemplate> GetQuestsQuery(TrinityMasterDatabase model)
     {
         return (from t in model.MasterQuestTemplate
             join addon in model.QuestTemplateAddon on t.Entry equals addon.Entry into adn
@@ -176,18 +176,25 @@ public class TrinityMasterMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvid
             orderby t.Entry
             select t.SetAddon(subaddon));
     }
-    
+        
     public override IEnumerable<IQuestTemplate> GetQuestTemplates()
     {
         using var model = Database();
 
-        return GetMasterQuestsQuery(model).ToList<IQuestTemplate>();
+        return GetQuestsQuery(model).ToList<IQuestTemplate>();
     }
 
     public override async Task<List<IQuestTemplate>> GetQuestTemplatesAsync()
     {
         await using var model = Database();
-        return await GetMasterQuestsQuery(model).ToListAsync<IQuestTemplate>();
+        return await GetQuestsQuery(model).ToListAsync<IQuestTemplate>();
+    }
+
+    public override IQuestTemplate? GetQuestTemplate(uint entry)
+    {
+        using var model = Database();
+        var addon = model.QuestTemplateAddon.FirstOrDefault(addon => addon.Entry == entry);
+        return model.MasterQuestTemplate.FirstOrDefault(q => q.Entry == entry)?.SetAddon(addon);
     }
     
     public override async Task<IList<ICreatureModelInfo>> GetCreatureModelInfoAsync()

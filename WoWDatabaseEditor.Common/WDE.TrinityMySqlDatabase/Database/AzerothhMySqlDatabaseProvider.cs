@@ -226,4 +226,33 @@ public class AzerothhMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvider<Az
         await using var model = Database();
         return await model.CreatureTemplateAddon.FirstOrDefaultAsync<ICreatureTemplateAddon>(x => x.Entry == entry);
     }
+
+    private IQueryable<MySqlQuestTemplate> GetQuestsQuery(AzerothDatabase model)
+    {
+        return (from t in model.QuestTemplate
+            join addon in model.QuestTemplateAddon on t.Entry equals addon.Entry into adn
+            from subaddon in adn.DefaultIfEmpty()
+            orderby t.Entry
+            select t.SetAddon(subaddon));
+    }
+        
+    public override IEnumerable<IQuestTemplate> GetQuestTemplates()
+    {
+        using var model = Database();
+
+        return GetQuestsQuery(model).ToList<IQuestTemplate>();
+    }
+
+    public override async Task<List<IQuestTemplate>> GetQuestTemplatesAsync()
+    {
+        await using var model = Database();
+        return await GetQuestsQuery(model).ToListAsync<IQuestTemplate>();
+    }
+
+    public override IQuestTemplate? GetQuestTemplate(uint entry)
+    {
+        using var model = Database();
+        var addon = model.QuestTemplateAddon.FirstOrDefault(addon => addon.Entry == entry);
+        return model.QuestTemplate.FirstOrDefault(q => q.Entry == entry)?.SetAddon(addon);
+    }
 }

@@ -14,4 +14,5 @@ public class TrinityMasterDatabase : BaseTrinityDatabase
     public ITable<MySqlCreatureModelInfoShadowlands> CreatureModelInfo => GetTable<MySqlCreatureModelInfoShadowlands>();
     public ITable<MySqlCreatureAddon> CreatureAddon => GetTable<MySqlCreatureAddon>();
     public ITable<MySqlCreatureTemplateAddon> CreatureTemplateAddon => GetTable<MySqlCreatureTemplateAddon>();
+    public ITable<MySqlWrathQuestTemplateAddon> QuestTemplateAddon => GetTable<MySqlWrathQuestTemplateAddon>();
 }

@@ -244,34 +244,11 @@ namespace WDE.TrinityMySqlDatabase.Database
 
         public abstract Task<IList<IGameObject>> GetGameObjectsAsync();
 
-        protected virtual IQueryable<MySqlQuestTemplate> GetQuestsQuery(BaseTrinityDatabase model)
-        {
-            return (from t in model.QuestTemplate
-                join addon in model.QuestTemplateAddon on t.Entry equals addon.Entry into adn
-                from subaddon in adn.DefaultIfEmpty()
-                orderby t.Entry
-                select t.SetAddon(subaddon));
-        }
-        
-        public virtual IEnumerable<IQuestTemplate> GetQuestTemplates()
-        {
-            using var model = Database();
+        public abstract IEnumerable<IQuestTemplate> GetQuestTemplates();
 
-            return GetQuestsQuery(model).ToList<IQuestTemplate>();
-        }
+        public abstract Task<List<IQuestTemplate>> GetQuestTemplatesAsync();
 
-        public virtual async Task<List<IQuestTemplate>> GetQuestTemplatesAsync()
-        {
-            await using var model = Database();
-            return await GetQuestsQuery(model).ToListAsync<IQuestTemplate>();
-        }
-
-        public virtual IQuestTemplate? GetQuestTemplate(uint entry)
-        {
-            using var model = Database();
-            MySqlQuestTemplateAddon? addon = model.QuestTemplateAddon.FirstOrDefault(addon => addon.Entry == entry);
-            return model.QuestTemplate.FirstOrDefault(q => q.Entry == entry)?.SetAddon(addon);
-        }
+        public abstract IQuestTemplate? GetQuestTemplate(uint entry);
 
         public IGameObjectTemplate? GetGameObjectTemplate(uint entry)
         {
@@ -330,9 +307,9 @@ namespace WDE.TrinityMySqlDatabase.Database
                     break;
                 }
                 case SmartScriptType.Quest:
-                    var addonExists = await model.QuestTemplateAddon.Where(p => p.Entry == (uint)entryOrGuid).AnyAsync();
+                    var addonExists = await model.QuestTemplateAddonWithScriptName.Where(p => p.Entry == (uint)entryOrGuid).AnyAsync();
                     if (!addonExists)
-                        await model.QuestTemplateAddon.InsertAsync(() => new MySqlQuestTemplateAddon()
+                        await model.QuestTemplateAddonWithScriptName.InsertAsync(() => new MySqlQuestTemplateAddonWithScriptName()
                             {Entry = (uint)entryOrGuid});
                     await model.QuestTemplateAddonWithScriptName
                         .Where(p => p.Entry == (uint) entryOrGuid)
