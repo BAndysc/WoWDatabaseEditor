@@ -59,7 +59,7 @@ namespace WDE.DatabaseEditors.Solution
             if (!arguments.TryGetUint(out var entry))
                 return Task.CompletedTask;
 
-            eventAggregator.GetEvent<EventRequestOpenItem>().Publish(new DatabaseTableSolutionItem(new DatabaseKey(entry), true, tableName, definition.IgnoreEquality));
+            eventAggregator.GetEvent<EventRequestOpenItem>().Publish(new DatabaseTableSolutionItem(new DatabaseKey(entry), true, false, tableName, definition.IgnoreEquality));
             return Task.CompletedTask;
         }
 

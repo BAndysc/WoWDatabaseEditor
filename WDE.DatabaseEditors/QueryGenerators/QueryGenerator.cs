@@ -493,6 +493,11 @@ namespace WDE.DatabaseEditors.QueryGenerators
 
                     update.Update();
                 }
+
+                if (entity.ConditionsModified)
+                {
+                    query.Add(BuildConditions(new []{entity.Key}, new DatabaseTableData(definition, new[]{entity})));
+                }
             }
             else
             {

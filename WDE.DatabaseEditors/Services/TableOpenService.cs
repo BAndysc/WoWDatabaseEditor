@@ -58,7 +58,7 @@ public class TableOpenService : ITableOpenService
     public async Task<ISolutionItem?> Create(DatabaseTableDefinitionJson definition, DatabaseKey key)
     {
         if (definition.RecordMode == RecordMode.MultiRecord)
-            return new DatabaseTableSolutionItem(key, false, definition.Id, definition.IgnoreEquality);
+            return new DatabaseTableSolutionItem(key, false, false, definition.Id, definition.IgnoreEquality);
         if (definition.RecordMode == RecordMode.SingleRow)
             return new DatabaseTableSolutionItem(definition.Id, definition.IgnoreEquality);
         else
@@ -81,7 +81,7 @@ public class TableOpenService : ITableOpenService
                         .WithNoButton(false).Build()))
                     return null;
             }
-            return new DatabaseTableSolutionItem(data.Entities[0].Key, data.Entities[0].ExistInDatabase, definition.Id, definition.IgnoreEquality);
+            return new DatabaseTableSolutionItem(data.Entities[0].Key, data.Entities[0].ExistInDatabase, data.Entities[0].ConditionsModified, definition.Id, definition.IgnoreEquality);
         }
     }
 

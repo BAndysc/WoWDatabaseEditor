@@ -135,7 +135,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
         protected override void UpdateSolutionItem()
         {
             solutionItem.Entries = Entities.Select(e =>
-                new SolutionItemDatabaseEntity(e.Key, e.ExistInDatabase, GetOriginalFields(e))).ToList();
+                new SolutionItemDatabaseEntity(e.Key, e.ExistInDatabase, e.ConditionsModified, GetOriginalFields(e))).ToList();
         }
 
         private async Task AddNewEntity()
@@ -276,7 +276,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
         {
             Dictionary<string, IObservable<bool>?> groupVisibility = new();
 
-            var pseudoItem = new DatabaseTableSolutionItem(entity.Key, entity.ExistInDatabase, tableDefinition.Id, tableDefinition.IgnoreEquality);
+            var pseudoItem = new DatabaseTableSolutionItem(entity.Key, entity.ExistInDatabase, entity.ConditionsModified, tableDefinition.Id, tableDefinition.IgnoreEquality);
             var savedItem = sessionService.Find(pseudoItem);
             if (savedItem is DatabaseTableSolutionItem savedTableItem)
                 savedTableItem.UpdateEntitiesWithOriginalValues(new List<DatabaseEntity>(){entity});

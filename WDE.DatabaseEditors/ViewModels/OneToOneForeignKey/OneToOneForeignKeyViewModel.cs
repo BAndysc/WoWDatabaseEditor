@@ -239,7 +239,7 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
             if (solutionTasksService.CanReloadRemotely)
             {
                 var pseudo = new DatabaseTableSolutionItem(tableDefinition.Id, tableDefinition.IgnoreEquality);
-                pseudo.Entries.Add(new SolutionItemDatabaseEntity(key, false));
+                pseudo.Entries.Add(new SolutionItemDatabaseEntity(key, false, false));
                 await solutionTasksService.ReloadSolutionRemotelyTask(pseudo);
             }
         }
@@ -270,9 +270,9 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
 
         if (PresentInDatabase)
         {
-            solutionItem.Entries = new []{new SolutionItemDatabaseEntity(key, Row!.Entity.ExistInDatabase, Row.Entity.GetOriginalFields())}
+            solutionItem.Entries = new []{new SolutionItemDatabaseEntity(key, Row!.Entity.ExistInDatabase, Row!.Entity.ConditionsModified, Row.Entity.GetOriginalFields())}
                 .Union(previousData)
-                .ToList();            
+                .ToList();
         } else if (wasPresentInDatabase && !presentInDatabase)
         {
             solutionItem.Entries = previousData.ToList();

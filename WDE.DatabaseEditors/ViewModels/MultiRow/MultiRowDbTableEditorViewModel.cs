@@ -332,7 +332,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         protected override void UpdateSolutionItem()
         {
             solutionItem.Entries = keys.Select(e =>
-                new SolutionItemDatabaseEntity(e, false)).ToList();
+                new SolutionItemDatabaseEntity(e, false, false)).ToList();
         }
 
         public async Task<bool> RemoveEntity(DatabaseEntity entity)
