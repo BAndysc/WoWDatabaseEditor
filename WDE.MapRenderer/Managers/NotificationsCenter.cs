@@ -1,4 +1,6 @@
+using ImGuiNET;
 using TheEngine.Interfaces;
+using TheEngine.Utils.ImGuiHelper;
 using TheMaths;
 
 namespace WDE.MapRenderer.Managers
@@ -8,14 +10,14 @@ namespace WDE.MapRenderer.Managers
         private readonly IUIManager uiManager;
         private float lastNotificationTime;
         private string? lastNotification;
+        private SimpleBox notificationBox;
 
         public const float Padding = 20;
 
-        public const string Font = "calibri";
-        
         public NotificationsCenter(IUIManager uiManager)
         {
             this.uiManager = uiManager;
+            this.notificationBox = new SimpleBox(BoxPlacement.ScreenCenter);
         }
 
         public void ShowMessage(string message, float time = 4000)
@@ -29,15 +31,17 @@ namespace WDE.MapRenderer.Managers
             if (lastNotification != null)
             {
                 float t = Math.Min(lastNotificationTime / 2500f, 1);
-                
-                using var ui = uiManager.BeginImmediateDrawRel(0.5f, 0.5f, 0.5f, 0.5f);
-                
-                ui.BeginVerticalBox(new Vector4(0, 0, 0, 0.5f).WithW(0.4f * t), Padding / 2);
-                ui.BeginVerticalBox(new Vector4(0, 0, 0, 0.7f).WithW(0.6f * t), Padding / 2);
-                ui.Text(Font, lastNotification, 18, Vector4.One.WithW(t));
-                ui.EndBox();
+
+                var io = ImGui.GetIO();
+
+                var bigBoldFont = io.Fonts.Fonts[2];
+                ImGui.PushFont(bigBoldFont);
+                notificationBox.Alpha = t * 0.8f;
+                notificationBox.Draw(lastNotification);
+                ImGui.PopFont();
 
                 lastNotificationTime -= delta;
+
                 if (lastNotificationTime < 0)
                 {
                     lastNotification = null;

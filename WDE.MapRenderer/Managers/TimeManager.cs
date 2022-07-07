@@ -1,4 +1,6 @@
+using ImGuiNET;
 using TheEngine.Interfaces;
+using TheEngine.Utils.ImGuiHelper;
 using TheMaths;
 using WDE.MpqReader.DBC;
 using WDE.MpqReader.Structures;
@@ -16,12 +18,15 @@ namespace WDE.MapRenderer.Managers
         
         public Time Time { get; private set; }
         public float MinuteFraction => minutes - Time.TotalMinutes;
-        
+
+        private SimpleBox timeNotificationBox;
+
         public TimeManager(IUIManager uiManager,
             IGameProperties gameProperties)
         {
             this.uiManager = uiManager;
             this.gameProperties = gameProperties;
+            this.timeNotificationBox = new SimpleBox(BoxPlacement.TopLeft);
         }
         
         private int TimeSpeedMultiplier
@@ -57,10 +62,7 @@ namespace WDE.MapRenderer.Managers
 
         public void RenderGUI()
         {
-            using var ui = uiManager.BeginImmediateDrawAbs(0, 0);
-            ui.BeginVerticalBox(new Vector4(0, 0, 0, 0.7f), 5);
-            ui.Text("calibri", $"{Time.Hour:00}:{Time.Minute:00}", 16, Vector4.One);
-            ui.EndBox();
+            timeNotificationBox.Draw($"{Time.Hour:00}:{Time.Minute:00}");
         }
     }
 }

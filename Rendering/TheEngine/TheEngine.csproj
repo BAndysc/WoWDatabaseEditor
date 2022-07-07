@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
@@ -39,6 +39,9 @@
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
       <None Update="fonts\DroidSans.ttf">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="fonts\DroidSans-Bold.ttf">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
       <None Update="ECS\EntityExtensionsCodeGen.tt">

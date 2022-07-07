@@ -1,5 +1,7 @@
+using ImGuiNET;
 using System.Collections;
 using TheEngine.Interfaces;
+using TheEngine.Utils.ImGuiHelper;
 using TheMaths;
 
 namespace WDE.MapRenderer.Managers;
@@ -39,6 +41,7 @@ public class LoadingManager : IDisposable
     private readonly WorldManager worldManager;
     private int? currentLoadedMap;
     private LoadingToken? loadingToken;
+    private SimpleBox loadingNotificationBox;
     
     public bool EssentialLoadingInProgress { get; private set; }
     
@@ -57,6 +60,8 @@ public class LoadingManager : IDisposable
         this.gameObjectManager = gameObjectManager;
         this.globalWorldMapObjectManager = globalWorldMapObjectManager;
         this.worldManager = worldManager;
+
+        this.loadingNotificationBox = new SimpleBox(BoxPlacement.BottomCenter);
     }
 
     public void Update(float delta)
@@ -111,12 +116,8 @@ public class LoadingManager : IDisposable
     {
         if (loadingToken != null)
         {
-            using var ui = uiManager.BeginImmediateDrawRel(0.5f, 1f, 0.5f, 1f);
-            ui.BeginVerticalBox(new Vector4(0, 0, 0, 0.5f), 2);
-            if (EssentialLoadingInProgress)
-                ui.Text( "calibri", "Loading essential things", 14, Vector4.One);
-            else
-                ui.Text( "calibri", "Loading less important things", 14, Vector4.One);
+            string message = EssentialLoadingInProgress ? "Loading essential things" : "Loading less important things";
+            loadingNotificationBox.Draw(message);
         }
     }
 }
