@@ -1,6 +1,8 @@
 using TheEngine.Coroutines;
 using System.Collections;
+using System.Windows.Input;
 using Avalonia.Input;
+using ImGuiNET;
 using JetBrains.Profiler.Api;
 using OpenTK.Platform.Windows;
 using TheAvaloniaOpenGL.Resources;
@@ -15,6 +17,7 @@ using TheMaths;
 using WDE.MapRenderer;
 using WDE.MapRenderer.Managers;
 using IInputManager = TheEngine.Interfaces.IInputManager;
+using MouseButton = TheEngine.Input.MouseButton;
 
 namespace RenderingTester;
 
@@ -31,6 +34,7 @@ public class StandaloneCustomGameModule : IGameModule
     private readonly IMaterialManager materialManager;
     private readonly ITextureManager textureManager;
     private readonly IMeshManager meshManager;
+    private readonly ModuleManager moduleManager;
     private readonly Archetypes archetypes;
     private readonly MdxManager mdxManager;
     public object? ViewModel => null;
@@ -46,6 +50,7 @@ public class StandaloneCustomGameModule : IGameModule
         IMaterialManager materialManager,
         ITextureManager textureManager,
         IMeshManager meshManager,
+        ModuleManager moduleManager,
         Archetypes archetypes,
         MdxManager mdxManager)
     {
@@ -60,6 +65,7 @@ public class StandaloneCustomGameModule : IGameModule
         this.materialManager = materialManager;
         this.textureManager = textureManager;
         this.meshManager = meshManager;
+        this.moduleManager = moduleManager;
         this.archetypes = archetypes;
         this.mdxManager = mdxManager;
     }
@@ -90,12 +96,58 @@ public class StandaloneCustomGameModule : IGameModule
         }
     }
 
-    public void Render()
+    public void Render(float delta)
     {
     }
     
+    public List<(string, ICommand, object?)>? GenerateContextMenu()
+    {
+        List<(string, ICommand, object?)>? allItems = null;
+        moduleManager.ForEach(mod =>
+        {
+            var items = mod.GenerateContextMenu();
+            if (items != null)
+            {
+                allItems ??= new List<(string, ICommand, object?)>();
+                allItems.AddRange(items);
+            }
+        });
+        return allItems == null || allItems.Count == 0 ? null : allItems;
+    }
+
+    private List<(string, ICommand, object?)>? currentMenu;
+    
     public void RenderGUI()
     {
+        if (inputManager.Mouse.HasJustClicked(MouseButton.Right))
+        {
+            currentMenu = GenerateContextMenu();
+            ImGui.OpenPopup("contextmenu");
+        }
+
+        if (currentMenu != null)
+        {
+            if (ImGui.BeginPopupContextItem("contextmenu"))
+            {
+                foreach (var option in currentMenu)
+                {
+                    if (option.Item1 == "-")
+                        ImGui.Text("----");
+                    else
+                    {
+                        if (ImGui.Selectable(option.Item1))
+                        {
+                            option.Item2.Execute(option.Item3);
+                            ImGui.CloseCurrentPopup();
+                        }   
+                    }
+                }
+                ImGui.EndPopup();
+            }
+            else
+                currentMenu = null;
+        }
+        
         var fps = 1000 / statsManager.Counters.FrameTime.Average;
         using var ui = uiManager.BeginImmediateDrawRel(1, 0, 1, 0);
         ui.BeginVerticalBox(new Vector4(0, 0, 0, 1), 2);

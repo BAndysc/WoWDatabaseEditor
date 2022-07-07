@@ -9,9 +9,9 @@ namespace TheEngine.ECS
     {
         private bool disposed;
         //private readonly byte[][] componentData;
-        private readonly unsafe byte*[] componentData;
-        private readonly object?[][] managedComponentData;
-        public readonly Archetype Archetype;
+        private unsafe byte*[] componentData;
+        private object?[][] managedComponentData;
+        public Archetype Archetype;
         private int capacity;
         private int used;
         private readonly int componentsCount;
@@ -28,6 +28,24 @@ namespace TheEngine.ECS
             //componentData = new byte[archetype.Components.Count][];
             componentData = new byte*[componentsCount];
             managedComponentData = new object?[managedComponentsCount][];
+        }
+
+        public unsafe void Dispose()
+        {
+            disposed = true;
+            Archetype = null!;
+            for (int i = 0; i < componentsCount; ++i)
+            {
+                Marshal.FreeHGlobal(new IntPtr(componentData[i]));
+                componentData[i] = null!;
+            }
+            for (int i = 0; i < managedComponentsCount; ++i)
+            {
+                managedComponentData[i] = null!;
+            }
+            componentData = null!;
+            managedComponentData = null!;
+            sparseReverseEntityMapping = null!;
         }
 
         ~ChunkDataManager()
@@ -211,17 +229,6 @@ namespace TheEngine.ECS
             }
             
             used--;
-        }
-
-        public unsafe void Dispose()
-        {
-            disposed = true;
-            for (int i = 0; i < componentsCount; ++i)
-            {
-                Marshal.FreeHGlobal(new IntPtr(componentData[i]));
-                componentData[i] = null!;
-            }
-            sparseReverseEntityMapping = null!;
         }
 
         // for debugging only

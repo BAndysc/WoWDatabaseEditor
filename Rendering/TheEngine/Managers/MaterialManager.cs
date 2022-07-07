@@ -34,7 +34,8 @@ namespace TheEngine.Managers
 
         public void Dispose()
         {
-            
+            materials.Clear();
+            materials = null!;
         }
 
         public Material GetMaterialByHandle(MaterialHandle handle)

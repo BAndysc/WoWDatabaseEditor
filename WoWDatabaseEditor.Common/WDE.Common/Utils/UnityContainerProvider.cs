@@ -2,9 +2,142 @@ using System;
 using System.Linq;
 using Prism.Ioc;
 using Unity;
+using Unity.Injection;
+using Unity.Lifetime;
 using Unity.Resolution;
 
 namespace WDE.Common.Utils;
+
+/// <summary>
+/// <para>
+/// Unity returns the same instance each time the Resolve(...) method is called or when the
+/// dependency mechanism injects the instance into other classes.
+/// </para>
+/// </summary>
+/// <remarks>
+/// <para>
+/// Per Container lifetime allows a registration of an existing or resolved object as
+/// a scoped singleton in the container it was created or registered. In other words
+/// this instance is unique within the container it war registered with. Child or parent
+/// containers could have their own instances registered for the same contract.
+/// </para>
+/// <para>
+/// When the <see cref="ContainerControlledLifetimeManager"/> is disposed,
+/// the instance is disposed with it.
+/// </para>
+/// </remarks>
+public class ContainerControlledLifetimeManager : SynchronizedLifetimeManager,
+                                                  IInstanceLifetimeManager,
+                                                  IFactoryLifetimeManager,
+                                                  ITypeLifetimeManager
+{
+    #region Fields
+
+    /// <summary>
+    /// An instance of the object this manager is associated with.
+    /// </summary>
+    /// <value>This field holds a strong reference to the associated object.</value>
+    protected object Value = NoValue;
+
+    #endregion
+
+
+    #region Constructor
+
+    public ContainerControlledLifetimeManager()
+    {
+        Set    = base.SetValue;
+        Get    = base.GetValue;
+        TryGet = base.TryGetValue;
+    }
+
+    #endregion
+
+
+    #region Scope
+
+    public object? Scope { get; internal set; }
+
+    #endregion
+
+
+    #region SynchronizedLifetimeManager
+
+    /// <inheritdoc/>
+    public override object GetValue(ILifetimeContainer? container = null)
+    {
+        return Get(container);
+    }
+
+    /// <inheritdoc/>
+    public override void SetValue(object newValue, ILifetimeContainer? container = null)
+    {
+        Set(newValue, container);
+        Set = (o, c) => throw new InvalidOperationException("ContainerControlledLifetimeManager can only be set once");
+        Get    = SynchronizedGetValue;
+        TryGet = SynchronizedGetValue;
+    }
+
+    /// <inheritdoc/>
+    protected override object SynchronizedGetValue(ILifetimeContainer? container = null) => Value;
+
+    /// <inheritdoc/>
+    protected override void SynchronizedSetValue(object newValue, ILifetimeContainer? container = null) => Value = newValue;
+
+    /// <inheritdoc/>
+    public override void RemoveValue(ILifetimeContainer? container = null) => Dispose();
+
+    #endregion
+
+
+    #region IFactoryLifetimeManager
+
+    /// <inheritdoc/>
+    protected override LifetimeManager OnCreateLifetimeManager()
+    {
+        return new ContainerControlledLifetimeManager
+        {
+            Scope = Scope
+        };
+    }
+
+    #endregion
+
+
+    #region IDisposable
+
+    /// <inheritdoc/>
+    protected override void Dispose(bool disposing)
+    {
+        try
+        {
+            if (NoValue == Value) return;
+            // in this app, I invoke dispose manually
+            // if (Value is IDisposable disposable)
+            // {
+            //     disposable.Dispose();
+            // }
+            Value = NoValue;
+        }
+        finally
+        {
+            base.Dispose(disposing);
+        }
+    }
+
+    #endregion
+
+
+    #region Overrides
+
+    /// <summary>
+    /// This method provides human readable representation of the lifetime
+    /// </summary>
+    /// <returns>Name of the lifetime</returns>
+    public override string ToString() => "Lifetime:PerContainer";
+
+    #endregion
+}
 
 public class UnityContainerRegistry : IContainerRegistry
 {
@@ -14,31 +147,34 @@ public class UnityContainerRegistry : IContainerRegistry
     {
         this.container = container;
     }
-    
     public IContainerRegistry RegisterInstance(Type type, object instance)
     {
-        container.RegisterInstance(type, instance);
+        container.RegisterInstance(type, null, instance, new ContainerControlledLifetimeManager());
+        //container.RegisterInstance(type, instance);
         return this;
     }
 
     public IContainerRegistry RegisterInstance(Type type, object instance, string name)
     {
-        container.RegisterInstance(type, instance);
+        container.RegisterInstance(type, name, instance, new ContainerControlledLifetimeManager());
+        //container.RegisterInstance(type, name, instance);
         return this;
     }
 
-    public IContainerRegistry RegisterSingleton(Type @from, Type to)
+    public IContainerRegistry RegisterSingleton(Type from, Type to)
     {
-        container.RegisterSingleton(@from, to);
+        container.RegisterType(from, to, null, new ContainerControlledLifetimeManager(), Array.Empty<InjectionMember>());
+        //container.RegisterSingleton(from, to);
         return this;
     }
 
-    public IContainerRegistry RegisterSingleton(Type @from, Type to, string name)
+    public IContainerRegistry RegisterSingleton(Type from, Type to, string name)
     {
-        container.RegisterSingleton(@from, to, name);
+        container.RegisterType(from, to, name, new ContainerControlledLifetimeManager(), Array.Empty<InjectionMember>());
+        //container.RegisterSingleton(from, to, name);
         return this;
     }
-
+    
     public IContainerRegistry Register(Type @from, Type to)
     {
         container.RegisterType(@from, to);

@@ -367,6 +367,5 @@ public class ImGuiController : IDisposable
         engine.textureManager.DisposeTexture(fontTexture);
         verticesBuffer.Dispose();
         indicesBuffer.Dispose();
-        engine.Dispose();
     }
 }

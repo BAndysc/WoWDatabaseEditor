@@ -34,6 +34,7 @@ public class Game : IGame
     public Task<bool> WaitForInitialized => waitForInitialized.Task;
     public event Action? OnInitialized;
     public event Action? OnFailedInitialize;
+    private IScopedContainer gameScope;
     
     public Game(IMpqService mpqService, 
         IGameView gameView,
@@ -50,13 +51,13 @@ public class Game : IGame
         this.databaseClientFileOpener = databaseClientFileOpener;
         this.databaseProvider = databaseProvider;
         this.scopedContainer = scopedContainer;
-    }
-        
+    } 
+
     public bool Initialize(Engine engine)
     {
-        var unity = scopedContainer.CreateScope();
-        var provider = unity;
-        var registry = unity;
+        gameScope = scopedContainer.CreateScope();
+        var provider = gameScope;
+        var registry = gameScope;
 
         registry.RegisterInstance(typeof(IGameProperties), gameProperties);
         registry.RegisterInstance(typeof(Engine), engine);
@@ -96,8 +97,6 @@ public class Game : IGame
         registry.RegisterSingleton<AreaTriggerManager>();
         registry.RegisterSingleton<RaycastSystem>();
         registry.RegisterSingleton<ModuleManager>();
-        registry.RegisterSingleton<CreatureManager>();
-        registry.RegisterSingleton<GameObjectManager>();
         registry.RegisterSingleton<CoroutineManager>();
         registry.RegisterSingleton<IGameFiles, GameFiles>();
         
@@ -152,6 +151,7 @@ public class Game : IGame
     public void DisposeGame()
     {
         manager?.DisposeGame();
+        gameScope.Dispose();
         OnAfterDisposed?.Invoke(this);
         waitForInitialized = new();
     }
