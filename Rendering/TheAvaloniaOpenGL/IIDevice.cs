@@ -8,7 +8,7 @@ namespace TheAvaloniaOpenGL
         void Begin();
         void DeleteVertexArrays(int count, int[] buffers);
         void BindVertexArray(int array);
-        unsafe   void GetIntegerv(GetPName n, int* rv);
+        int GetInteger(GetPName n);
         void GenVertexArrays(int n, int[] rv);
         void GenerateMipmap(TextureTarget target);
         void Uniform1I(int location, int lalue);
@@ -98,5 +98,16 @@ namespace TheAvaloniaOpenGL
         void Flush();
         void Finish();
         void Debug(string msg);
+    }
+
+    public static class DeviceExtensions
+    {
+        public static void Toggle(this IDevice device, EnableCap enableCap, bool on)
+        {
+            if (on)
+                device.Enable(enableCap);
+            else
+                device.Disable(enableCap);
+        }
     }
 }

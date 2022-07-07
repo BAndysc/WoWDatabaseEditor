@@ -100,11 +100,11 @@ namespace TheEngine.Managers
         private Material wireframe = null!;
         // end utils
 
-        private Mesh currentMesh = null;
+        private Mesh? currentMesh = null;
 
-        private Mesh lineMesh = null;
+        private Mesh? lineMesh = null;
         
-        private Shader currentShader = null;
+        private Shader? currentShader = null;
 
         private Archetype toCullArchetype;
         private Archetype entitiesSharingRenderingArchetype;
@@ -936,14 +936,14 @@ namespace TheEngine.Managers
             }
         }
 
-        private void SetMesh(Mesh mesh)
+        internal void SetMesh(Mesh? mesh)
         {
             if (currentMesh != mesh)
             {
                 Stats.MeshSwitches++;
                 currentMesh = mesh;
                 //meshtimer.Start();
-                mesh.Activate();
+                mesh?.Activate();
                 //meshtimer.Stop();
             }
         }

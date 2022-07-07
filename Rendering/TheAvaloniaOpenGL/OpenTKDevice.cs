@@ -53,6 +53,11 @@ namespace TheAvaloniaOpenGL
             GL.BindVertexArray(array);
         }
 
+        public int GetInteger(GetPName n)
+        {
+            return GL.GetInteger((OpenTK.Graphics.OpenGL4.GetPName)n);
+        }
+
         public unsafe void GetIntegerv(GetPName n, int* rv)
         {          
             GL.GetInteger((OpenTK.Graphics.OpenGL4.GetPName)n, rv);

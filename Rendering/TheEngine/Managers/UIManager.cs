@@ -560,6 +560,8 @@ namespace TheEngine.Managers
 
             public void Dispose()
             {
+                if (root == null)
+                    return;
                 var measure = root.Measure();
                 float posX = position.X;
                 float posY = position.Y;

@@ -26,6 +26,12 @@ namespace TheAvaloniaOpenGL
         {
             device.BindVertexArray(array);
         }
+
+        public int GetInteger(GetPName n)
+        {
+            return device.GetInteger(n);
+        }
+
         public unsafe void GetIntegerv(GetPName n, int* rv)
         {
             device.GetIntegerv(n, rv);

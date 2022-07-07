@@ -36,11 +36,14 @@ namespace TheAvaloniaOpenGL
             Report($"BindVertexArray({array})");
             device.BindVertexArray(array);
         }
-        public unsafe void GetIntegerv(GetPName n, int* rv)
+
+        public int GetInteger(GetPName n)
         {
-            device.GetIntegerv(n, rv);
-            Report($"GetIntegerv({n}) = {*rv}");
+            var i = device.GetInteger(n);
+            Report($"GetInteger({n}) = {i}");
+            return i;
         }
+
         public void GenVertexArrays(int n, int[] rv)
         {
             Report($"GenVertexArrays({n}, {string.Join(", ", rv)}");
