@@ -102,9 +102,9 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public Task<List<ICreatureTemplate>> GetCreatureTemplatesAsync() => Task.FromResult(new List<ICreatureTemplate>());
 
-        public Task<List<ICreature>> GetCreaturesAsync() => Task.FromResult(new List<ICreature>());
+        public Task<IList<ICreature>> GetCreaturesAsync() => Task.FromResult<IList<ICreature>>(new List<ICreature>());
 
-        public Task<List<IGameObject>> GetGameObjectsAsync() => Task.FromResult(new List<IGameObject>());
+        public Task<IList<IGameObject>> GetGameObjectsAsync() => Task.FromResult<IList<IGameObject>>(new List<IGameObject>());
 
         public Task<List<IConversationTemplate>> GetConversationTemplatesAsync() => Task.FromResult(new List<IConversationTemplate>());
         

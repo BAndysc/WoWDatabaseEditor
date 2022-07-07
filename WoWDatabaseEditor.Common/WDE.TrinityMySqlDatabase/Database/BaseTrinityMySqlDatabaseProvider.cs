@@ -101,7 +101,7 @@ namespace WDE.TrinityMySqlDatabase.Database
         }
 
         public abstract Task<List<ICreatureTemplate>> GetCreatureTemplatesAsync();
-        public abstract Task<List<ICreature>> GetCreaturesAsync();
+        public abstract Task<IList<ICreature>> GetCreaturesAsync();
 
         public async Task<List<IConversationTemplate>> GetConversationTemplatesAsync()
         {
@@ -242,7 +242,7 @@ namespace WDE.TrinityMySqlDatabase.Database
             return await (from t in model.GameObjectTemplate orderby t.Entry select t).ToListAsync<IGameObjectTemplate>();
         }
 
-        public abstract Task<List<IGameObject>> GetGameObjectsAsync();
+        public abstract Task<IList<IGameObject>> GetGameObjectsAsync();
 
         protected virtual IQueryable<MySqlQuestTemplate> GetQuestsQuery(BaseTrinityDatabase model)
         {

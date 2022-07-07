@@ -67,6 +67,8 @@ namespace WDE.Common.Database
         Task<IList<ICreature>> GetCreaturesByEntryAsync(uint entry);
         Task<IList<IGameObject>> GetGameObjectsByEntryAsync(uint entry);
         IEnumerable<ICreature> GetCreatures();
+        Task<IList<ICreature>> GetCreaturesAsync();
+        Task<IList<IGameObject>> GetGameObjectsAsync();
         Task<IList<ICreature>> GetCreaturesByMapAsync(uint map);
         Task<IList<IGameObject>> GetGameObjectsByMapAsync(uint map);
         IEnumerable<IGameObject> GetGameObjects();

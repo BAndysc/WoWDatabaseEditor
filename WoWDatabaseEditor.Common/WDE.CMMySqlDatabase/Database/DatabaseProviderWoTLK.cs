@@ -101,7 +101,7 @@ public class DatabaseProviderWoTLK : BaseDatabaseProvider<WoTLKDatabase>
         return await model.GameObject.Where(g => g.Entry == entry).ToListAsync<IGameObject>();
     }
 
-    public override async Task<List<ICreature>> GetCreaturesAsync()
+    public override async Task<IList<ICreature>> GetCreaturesAsync()
     {
         await using var model = Database();
         return await model.Creature.OrderBy(t => t.Entry).ToListAsync<ICreature>();
@@ -132,7 +132,7 @@ public class DatabaseProviderWoTLK : BaseDatabaseProvider<WoTLKDatabase>
         return await model.Creature.FirstOrDefaultAsync(e => e.Guid == guid);
     }
     
-    public override async Task<List<IGameObject>> GetGameObjectsAsync()
+    public override async Task<IList<IGameObject>> GetGameObjectsAsync()
     {
         await using var model = Database();
         return await model.GameObject.ToListAsync<IGameObject>();

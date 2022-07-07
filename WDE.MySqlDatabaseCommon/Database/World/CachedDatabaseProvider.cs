@@ -19,13 +19,9 @@ namespace WDE.MySqlDatabaseCommon.Database.World
     {
         private List<ICreatureTemplate>? creatureTemplateCache;
         private Dictionary<uint, ICreatureTemplate> creatureTemplateByEntry = new();
-
-        private List<ICreature>? creatureCache;
-       
+        
         private List<IGameObjectTemplate>? gameObjectTemplateCache;
         private Dictionary<uint, IGameObjectTemplate> gameObjectTemplateByEntry = new();
-
-        private List<IGameObject>? gameObjectCache;
 
         private List<IQuestTemplate>? questTemplateCache;
         private Dictionary<uint, IQuestTemplate> questTemplateByEntry = new();
@@ -115,20 +111,6 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             return typeof(ICreatureTemplate);
         }
 
-        private async Task<Type> RefreshCreature()
-        {
-            var templates = await nonCachedDatabase.GetCreaturesAsync().ConfigureAwait(false);
-            creatureCache = templates;
-            return typeof(ICreature);
-        }
-
-        private async Task<Type> RefreshGameObjects()
-        {
-            var templates = await nonCachedDatabase.GetGameObjectsAsync().ConfigureAwait(false);
-            gameObjectCache = templates;
-            return typeof(IGameObject);
-        }
-
         public Task TryConnect()
         {
             nonCachedDatabase.GetCreatureTemplate(0); // if there is some connection problem, it should throw
@@ -186,11 +168,12 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public IEnumerable<ICreature> GetCreatures()
         {
-            if (creatureCache != null)
-                return creatureCache;
-
             return nonCachedDatabase.GetCreatures();
         }
+
+        public Task<IList<ICreature>> GetCreaturesAsync() => ((IDatabaseProvider)nonCachedDatabase).GetCreaturesAsync();
+
+        public Task<IList<IGameObject>> GetGameObjectsAsync() => ((IDatabaseProvider)nonCachedDatabase).GetGameObjectsAsync();
 
         public Task<IList<ICreature>> GetCreaturesByMapAsync(uint map) => nonCachedDatabase.GetCreaturesByMapAsync(map);
         
@@ -198,9 +181,6 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public IEnumerable<IGameObject> GetGameObjects()
         {
-            if (gameObjectCache != null)
-                return gameObjectCache;
-
             return nonCachedDatabase.GetGameObjects();
         }
 

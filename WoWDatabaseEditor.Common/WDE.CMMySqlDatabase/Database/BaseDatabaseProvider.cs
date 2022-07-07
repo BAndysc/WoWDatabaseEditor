@@ -82,7 +82,7 @@ namespace WDE.CMMySqlDatabase.Database
         }
 
         public abstract Task<List<ICreatureTemplate>> GetCreatureTemplatesAsync();
-        public abstract Task<List<ICreature>> GetCreaturesAsync();
+        public abstract Task<IList<ICreature>> GetCreaturesAsync();
 
         public async Task<List<IConversationTemplate>> GetConversationTemplatesAsync()
         {
@@ -211,7 +211,7 @@ namespace WDE.CMMySqlDatabase.Database
             return await (o).ToListAsync<IGameObjectTemplate>();
         }
 
-        public abstract Task<List<IGameObject>> GetGameObjectsAsync();
+        public abstract Task<IList<IGameObject>> GetGameObjectsAsync();
 
         protected virtual IQueryable<QuestTemplateWoTLK> GetQuestsQuery(BaseDatabaseTables model)
         {
