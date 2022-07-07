@@ -162,6 +162,8 @@ public class ImGuiController : IDisposable
 
         // default font
         fonts.AddFontFromFileTTF("fonts/DroidSans.ttf", 15);
+        fonts.AddFontFromFileTTF("fonts/DroidSans-Bold.ttf", 15);
+        fonts.AddFontFromFileTTF("fonts/DroidSans-Bold.ttf", 25);
 
         io.BackendFlags |= ImGuiBackendFlags.RendererHasVtxOffset | ImGuiBackendFlags.HasSetMousePos;
         ImGui.StyleColorsDark();

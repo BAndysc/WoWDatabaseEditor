@@ -1,5 +1,7 @@
 using Avalonia.Input;
+using ImGuiNET;
 using TheEngine.Interfaces;
+using TheEngine.Utils.ImGuiHelper;
 using TheMaths;
 using WDE.MapRenderer.StaticData;
 using IInputManager = TheEngine.Interfaces.IInputManager;
@@ -14,7 +16,9 @@ namespace WDE.MapRenderer.Managers
         private readonly IUIManager uiManager;
         private float pitch;
         private float yaw = 26.9f + 90;
-        
+
+        private SimpleBox coordNotificationBox;
+
         public Vector3 Position { get; private set; }
         public Quaternion Rotation { get; private set; }
 
@@ -31,6 +35,7 @@ namespace WDE.MapRenderer.Managers
                 new Vector3(223.698f, -4745.11f, 10.1022f + 20) - Position, Vectors.Up);
             
             engineCamera.MainCamera.FOV = 75;
+            this.coordNotificationBox = new SimpleBox(BoxPlacement.BottomLeft);
         }
 
         public (int, int) CurrentChunk => Position.WoWPositionToChunk();
@@ -69,9 +74,7 @@ namespace WDE.MapRenderer.Managers
 
         public void RenderGUI()
         {
-            using var ui = uiManager.BeginImmediateDrawRel(0, 1, 0, 1);
-            ui.BeginVerticalBox(new Vector4(0, 0, 0, 0.5f), 3);
-            ui.Text("calibri", $"X: {Position.X:0.00} Y: {Position.Y:0.00} Z: {Position.Z:0.00}", 20, Vector4.One);
+            coordNotificationBox.Draw($"X: {Position.X:0.00} Y: {Position.Y:0.00} Z: {Position.Z:0.00}");
         }
     }
 }
