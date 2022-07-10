@@ -136,7 +136,6 @@ namespace TheAvaloniaOpenGL.Resources
                 fixed (void* pdata = newData)
                     device.BufferSubData(GlBufferType, IntPtr.Zero, new IntPtr(newData.Length * Utilities.SizeOf<T>()), new IntPtr(pdata));
             }
-            device.BindBuffer(GlBufferType, 0);
         }
         
         public unsafe void UpdateBuffer(ref T newData)
@@ -151,7 +150,6 @@ namespace TheAvaloniaOpenGL.Resources
             else
                 fixed (void* pdata = &newData)
                     device.BufferSubData(GlBufferType, IntPtr.Zero, new IntPtr(Utilities.SizeOf<T>()), new IntPtr(pdata));
-            device.BindBuffer(GlBufferType, 0);
         }
 
         private static BufferTarget BufferTypeToBindFlags(BufferTypeEnum bufferType)
