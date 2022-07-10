@@ -49,8 +49,6 @@ namespace WDE.MapRenderer.Managers
         WorldManager WorldManager { get; }
         LoadingManager LoadingManager { get; }
         ZoneAreaManager ZoneAreaManager { get; }
-        CreatureManager CreatureManager { get; }
-        GameObjectManager GameObjectManager { get; }
         AnimationSystem AnimationSystem { get; }
         IEntityManager EntityManager { get; }
         ITextureManager EngineTextureManager { get; }

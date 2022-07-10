@@ -40,8 +40,6 @@ namespace WDE.MapRenderer
         private WorldManager worldManager = null!;
         private LoadingManager loadingManager = null!;
         private ZoneAreaManager zoneAreaManager = null!;
-        private CreatureManager creatureManager = null!;
-        private GameObjectManager gameObjectManager = null!;
         private AnimationSystem animationSystem = null!;
 
         public CoroutineManager CoroutineManager => coroutineManager;
@@ -62,8 +60,6 @@ namespace WDE.MapRenderer
         public UpdateManager UpdateLoop => updateLoop;
         public WorldManager WorldManager => worldManager;
         public LoadingManager LoadingManager => loadingManager;
-        public CreatureManager CreatureManager => creatureManager;
-        public GameObjectManager GameObjectManager => gameObjectManager;
         public AnimationSystem AnimationSystem => animationSystem;
         public ZoneAreaManager ZoneAreaManager => zoneAreaManager;
         public Engine Engine { get; }
@@ -138,8 +134,6 @@ namespace WDE.MapRenderer
             areaTriggerManager = ResolveOrCreate<AreaTriggerManager>();
             raycastSystem = ResolveOrCreate<RaycastSystem>();
             moduleManager = ResolveOrCreate<ModuleManager>();
-            creatureManager = ResolveOrCreate<CreatureManager>();
-            gameObjectManager = ResolveOrCreate<GameObjectManager>();
             animationSystem = ResolveOrCreate<AnimationSystem>();
             
             IsInitialized = true;
