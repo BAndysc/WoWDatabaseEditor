@@ -29,7 +29,7 @@ public class TheEngineOpenTkWindow : GameWindow, IWindowHost
     protected override void OnLoad()
     {
         IDevice device = new OpenTKDevice();
-#if DEBUG && DEBUG_OPENGL || true
+#if DEBUG && DEBUG_OPENGL
         device = new DebugDevice(device);
 #endif
         engine = new Engine(device, new Configuration(), this, false);
