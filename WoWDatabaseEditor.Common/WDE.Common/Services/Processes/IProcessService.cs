@@ -10,6 +10,7 @@ namespace WDE.Common.Services.Processes
     {
         bool IsRunning { get; }
         void Kill();
+        event Action<int>? OnExit;
     }
 
     [UniqueProvider]

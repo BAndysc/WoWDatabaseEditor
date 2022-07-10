@@ -19,6 +19,13 @@ namespace WoWDatabaseEditorCore.Services.Processes
             public ProcessData(Process process)
             {
                 this.process = process;
+                process.EnableRaisingEvents = true;
+                process.Exited += ProcessOnExited;
+            }
+
+            private void ProcessOnExited(object? sender, EventArgs e)
+            {
+                OnExit?.Invoke(process.ExitCode);
             }
 
             public bool IsRunning => !process.HasExited;
@@ -30,6 +37,8 @@ namespace WoWDatabaseEditorCore.Services.Processes
                     process.Kill();
                 }
             }
+
+            public event Action<int>? OnExit;
         }
         
         public IProcess RunAndForget(string path, string arguments, string? workingDirectory, bool noWindow,

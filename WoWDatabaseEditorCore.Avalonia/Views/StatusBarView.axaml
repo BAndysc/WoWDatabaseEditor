@@ -25,6 +25,8 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
         
         <StackPanel Orientation="Horizontal">
@@ -88,7 +90,52 @@
                 </StackPanel>
             </Button>
         </Panel>
-        <Panel Grid.Column="2" VerticalAlignment="Stretch" Margin="0,0,10,0">
+        
+        <Panel Grid.Column="2" VerticalAlignment="Stretch" Margin="0,0,10,0" DataContext="{CompiledBinding ServerExecutableService}">
+            <Button BorderThickness="0" Foreground="White" Background="Transparent" Command="{CompiledBinding ToggleWorldServer}">
+                <WrapPanel>
+                    <WdeImage Width="13" Height="13" Margin="0,0,3,0" VerticalAlignment="Center">
+                        <Interaction.Behaviors>
+                            <DataTriggerBehavior Binding="{CompiledBinding IsWorldServerRunning}" ComparisonCondition="Equal" Value="True">
+                                <ChangePropertyAction TargetObject="{Binding #WdeImage}" 
+                                                      PropertyName="ImageUri"
+                                                      Value="Icons/icon_pause_mono.png" />
+                            </DataTriggerBehavior>
+                            <DataTriggerBehavior Binding="{CompiledBinding IsWorldServerRunning}" ComparisonCondition="NotEqual" Value="True">
+                                <ChangePropertyAction TargetObject="{Binding #WdeImage}" 
+                                                      PropertyName="ImageUri"
+                                                      Value="Icons/icon_play_mono.png" />
+                            </DataTriggerBehavior>
+                        </Interaction.Behaviors>
+                    </WdeImage>
+                    <TextBlock>World server</TextBlock>
+                </WrapPanel>
+            </Button>
+        </Panel>
+        
+        <Panel Grid.Column="3" VerticalAlignment="Stretch" Margin="0,0,10,0" DataContext="{CompiledBinding ServerExecutableService}">
+            <Button BorderThickness="0" Foreground="White" Background="Transparent" Command="{CompiledBinding ToggleAuthServer}">
+                <WrapPanel>
+                    <WdeImage Width="13" Height="13" Margin="0,0,3,0" VerticalAlignment="Center">
+                        <Interaction.Behaviors>
+                            <DataTriggerBehavior Binding="{CompiledBinding IsAuthServerRunning}" ComparisonCondition="Equal" Value="True">
+                                <ChangePropertyAction TargetObject="{Binding #WdeImage}" 
+                                                      PropertyName="ImageUri"
+                                                      Value="Icons/icon_pause_mono.png" />
+                            </DataTriggerBehavior>
+                            <DataTriggerBehavior Binding="{CompiledBinding IsAuthServerRunning}" ComparisonCondition="NotEqual" Value="True">
+                                <ChangePropertyAction TargetObject="{Binding #WdeImage}" 
+                                                      PropertyName="ImageUri"
+                                                      Value="Icons/icon_play_mono.png" />
+                            </DataTriggerBehavior>
+                        </Interaction.Behaviors>
+                    </WdeImage>
+                    <TextBlock>Auth server</TextBlock>
+                </WrapPanel>
+            </Button>
+        </Panel>
+        
+        <Panel Grid.Column="4" VerticalAlignment="Stretch" Margin="0,0,10,0">
             <Button BorderThickness="0" Foreground="White" Background="Transparent" Command="{CompiledBinding OpenProblemTool}">
                 <WrapPanel>
                     <Image Width="13" Height="13" Margin="0,0,3,0" VerticalAlignment="Center">
@@ -111,7 +158,7 @@
             </Button>
         </Panel>
         
-        <Panel Grid.Column="3" VerticalAlignment="Stretch" Margin="0">
+        <Panel Grid.Column="5" VerticalAlignment="Stretch" Margin="0">
             <Button BorderThickness="0" Foreground="White" Background="Transparent" Command="{CompiledBinding TasksViewModel.TogglePanelVisibility}">
                 <WrapPanel>
                     <TextBlock Text="{CompiledBinding TasksViewModel.PendingTasksCount, Mode=OneWay}" IsHitTestVisible="False" Foreground="{DynamicResource StatusBarForeground}" />

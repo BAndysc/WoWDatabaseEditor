@@ -1,0 +1,20 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:serverExecutable="clr-namespace:WoWDatabaseEditorCore.Services.ServerExecutable;assembly=WoWDatabaseEditorCore"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="serverExecutable:ServerExecutableConfigurationPanelViewModel"
+             x:Class="WoWDatabaseEditorCore.Avalonia.Services.ServerExecutable.ServerExecutableConfigurationPanelView">
+    <Grid RowDefinitions="Auto,5,Auto" ColumnDefinitions="Auto,5,*,5,Auto">
+        <TextBlock VerticalAlignment="Center">World server:</TextBlock>
+        <TextBox Text="{CompiledBinding WorldServerPath}"
+                 Grid.Row="0" Grid.Column="2" />
+        <Button Grid.Row="0" Grid.Column="4" Command="{CompiledBinding PickWorldPath}" Content="..." />
+
+        <TextBlock VerticalAlignment="Center" Grid.Row="2">Auth server:</TextBlock>
+        <TextBox Text="{CompiledBinding AuthServerPath}"
+                 Grid.Row="2" Grid.Column="2" />
+        <Button Grid.Row="2" Grid.Column="4" Command="{CompiledBinding PickAuthPath}" Content="..." />
+    </Grid>
+</UserControl>

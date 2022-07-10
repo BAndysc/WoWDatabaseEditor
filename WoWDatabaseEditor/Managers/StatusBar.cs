@@ -12,6 +12,7 @@ using WDE.Common.Utils;
 using WDE.Module.Attributes;
 using WDE.MVVM;
 using WoWDatabaseEditorCore.Services.ProblemsTool;
+using WoWDatabaseEditorCore.Services.ServerExecutable;
 using WoWDatabaseEditorCore.ViewModels;
 
 namespace WoWDatabaseEditorCore.Managers
@@ -23,20 +24,25 @@ namespace WoWDatabaseEditorCore.Managers
         private readonly TasksViewModel tasksViewModel;
         private readonly IMainThread mainThread;
         private readonly IPersonalGuidRangeService guidRangeService;
+        private readonly IServerExecutableService serverExecutableService;
         private readonly Lazy<IClipboardService> clipboardService;
         private readonly Lazy<IMessageBoxService> messageBoxService;
 
+        public IServerExecutableService ServerExecutableService => serverExecutableService;
+        
         public StatusBar(Lazy<IDocumentManager> documentManager,
             TasksViewModel tasksViewModel, 
             IEventAggregator eventAggregator,
             IMainThread mainThread,
             IPersonalGuidRangeService guidRangeService,
+            IServerExecutableService serverExecutableService,
             Lazy<IClipboardService> clipboardService,
             Lazy<IMessageBoxService> messageBoxService)
         {
             this.tasksViewModel = tasksViewModel;
             this.mainThread = mainThread;
             this.guidRangeService = guidRangeService;
+            this.serverExecutableService = serverExecutableService;
             this.clipboardService = clipboardService;
             this.messageBoxService = messageBoxService;
 
