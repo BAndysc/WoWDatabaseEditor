@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Reactive.Linq;
 using System.Windows.Input;
+using AsyncAwaitBestPractices.MVVM;
 using Avalonia;
 using Avalonia.Threading;
 using Prism.Commands;
@@ -10,10 +11,12 @@ using TheEngine.Interfaces;
 using TheMaths;
 using WDE.Common.DBC;
 using WDE.Common.Disposables;
+using WDE.Common.History;
 using WDE.Common.Managers;
 using WDE.Common.MPQ;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Tasks;
+using WDE.Common.Types;
 using WDE.Common.Utils;
 using WDE.Common.Windows;
 using WDE.MapRenderer.Managers;
@@ -51,7 +54,7 @@ namespace WDE.MapRenderer
     }
     
     [AutoRegister]
-    public partial class GameViewModel : ObservableBase, ITool, IMapContext<GameCameraViewModel>
+    public partial class GameViewModel : ObservableBase, IDocument, IMapContext<GameCameraViewModel>
     {
         private readonly Lazy<IDocumentManager> documentManager;
         private readonly GameViewSettings settings;
@@ -77,7 +80,7 @@ namespace WDE.MapRenderer
 
         private void OnFailedGameInitialize()
         {
-            Dispatcher.UIThread.Post(() => Visibility = false, DispatcherPriority.Background);
+            Dispatcher.UIThread.Post(() => CloseCommand?.Execute(null), DispatcherPriority.Background);
         }
 
         private MapViewModel? selectedMap;
@@ -286,7 +289,8 @@ Tris: " + stats.TrianglesDrawn;
             
             cameraViewModel = new GameCameraViewModel(this);
             Items.Add(cameraViewModel);
-            
+
+            Visibility = true;
             On(() => Visibility, @is =>
             {
                 if (@is && CurrentGame == null)
@@ -304,6 +308,18 @@ Tris: " + stats.TrianglesDrawn;
                             .Build()).ListenErrors();
                     }
                 }
+            });
+
+            CloseCommand = new AsyncCommand(async () =>
+            {
+                gameDisposedTask = new();
+                CanCloseTool();
+                await gameDisposedTask.Task;
+            });
+
+            Save = new AsyncAutoCommand(() =>
+            {
+                return Task.CompletedTask;
             });
         }
 
@@ -330,8 +346,9 @@ Tris: " + stats.TrianglesDrawn;
         }
 
         private int state = 0;
-        
-        public bool CanClose()
+        private TaskCompletionSource<bool>? gameDisposedTask;
+
+        public bool CanCloseTool()
         {
             if (state == 1)
             {
@@ -348,6 +365,7 @@ Tris: " + stats.TrianglesDrawn;
 
         private void CurrentGameOnOnAfterDisposed(Game game)
         {
+            gameDisposedTask?.SetResult(true);
             game.OnAfterDisposed -= CurrentGameOnOnAfterDisposed;
             mainThread.Delay(() =>
             {
@@ -473,7 +491,6 @@ Tris: " + stats.TrianglesDrawn;
         public ICommand ToggleMapVisibilityCommand { get; }
         public ICommand ToggleStatsVisibilityCommand { get; }
         
-
         public string UniqueId => "game_view";
 
         public bool Visibility
@@ -495,6 +512,15 @@ Tris: " + stats.TrianglesDrawn;
         }
 
         public string Title => "Game view";
+        public ImageUri? Icon { get; } = new ImageUri("Icons/icon_3d.png");
+        public ICommand Copy => AlwaysDisabledCommand.Command;
+        public ICommand Cut => AlwaysDisabledCommand.Command;
+        public ICommand Paste => AlwaysDisabledCommand.Command;
+        public ICommand Save { get; }
+        public IAsyncCommand? CloseCommand { get; set; }
+
+        public bool CanClose => true;
+
         public void Center(double x, double y)
         {
         }
@@ -533,6 +559,11 @@ Tris: " + stats.TrianglesDrawn;
         {
             RequestRender?.Invoke();
         }
+
+        public ICommand Undo => AlwaysDisabledCommand.Command;
+        public ICommand Redo => AlwaysDisabledCommand.Command;
+        public IHistoryManager? History { get; set; }
+        public bool IsModified { get; set; }
     }
     
     public class MapViewModel
