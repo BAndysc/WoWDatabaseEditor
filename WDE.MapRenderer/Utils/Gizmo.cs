@@ -66,6 +66,7 @@ namespace WDE.MapRenderer.Utils
             TranslateXY,
             TranslateY,
             TranslateXZ,
+            Snap,
             RotationX,
             RotationY,
             RotationZ,
@@ -185,6 +186,7 @@ namespace WDE.MapRenderer.Utils
         private GizmoMode dragging = GizmoMode.NoDragging;
 
         private TheMaths.Plane plane;
+        private bool snappingMode;
         private Vector3? axis;
         private readonly List<(T item, Quaternion original_rotation)> rotable = new();
         private readonly List<(T item, Vector3 original_position, Vector3 offset)> draggable = new();
@@ -253,6 +255,20 @@ namespace WDE.MapRenderer.Utils
             StartDragging(Gizmo.HitType.TranslateXY, ref ray, GizmoMode.KeyboardDrag);
         }
         
+        public void StartSnapDrag()
+        {
+            Ray ray = new Ray();
+            StartDragging(Gizmo.HitType.Snap, ref ray, GizmoMode.KeyboardDrag);
+        }
+        
+        public void Finish()
+        {
+            if (dragging is GizmoMode.KeyboardDrag or GizmoMode.MouseDrag)
+                FinishDrag();
+            else if (dragging == GizmoMode.Rotation)
+                FinishRotation();
+        }
+        
         public bool Update(float f)
         {
             var ray = cameraManager.MainCamera.NormalizedScreenPointToRay(inputManager.Mouse.NormalizedPosition);
@@ -287,17 +303,31 @@ namespace WDE.MapRenderer.Utils
 
             if (IsEnabled && dragging is GizmoMode.KeyboardDrag or GizmoMode.MouseDrag)
             {
-                if (plane.Intersects(ref ray, out Vector3 originalTouch))
+                if (snappingMode)
                 {
-                    foreach (var item in draggable)
+                    var hit = raycastSystem.RaycastMouse(0);
+                    if (hit.HasValue)
                     {
-                        var touch = originalTouch;
-                        if (axis.HasValue)
-                            touch = item.original_position + axis.Value * Vector3.Dot(touch - this.originalTouch, axis.Value);
-                        else
-                            touch += item.offset;
-                        Move(item.item, touch);   
+                        foreach (var item in draggable)
+                        {
+                            Move(item.item, hit.Value.Item2);
+                        }
                     }
+                }
+                else
+                {
+                    if (plane.Intersects(ref ray, out Vector3 originalTouch))
+                    {
+                        foreach (var item in draggable)
+                        {
+                            var touch = originalTouch;
+                            if (axis.HasValue)
+                                touch = item.original_position + axis.Value * Vector3.Dot(touch - this.originalTouch, axis.Value);
+                            else
+                                touch += item.offset;
+                            Move(item.item, touch);   
+                        }
+                    }   
                 }
             }
 
@@ -347,13 +377,17 @@ namespace WDE.MapRenderer.Utils
                 return false;
             }
             
-            if (dragging == GizmoMode.NoDragging && inputManager.Keyboard.JustPressed(Key.G))
+            if (dragging is not GizmoMode.KeyboardDrag or GizmoMode.MouseDrag && inputManager.Keyboard.JustPressed(Key.G))
             {
+                if (dragging == GizmoMode.Rotation)
+                    FinishRotation();
                 StartDragging(Gizmo.HitType.TranslateXY, ref ray, GizmoMode.KeyboardDrag);
             }
 
-            if (dragging == GizmoMode.NoDragging && CanRotate && inputManager.Keyboard.JustPressed(Key.R))
+            if (dragging != GizmoMode.Rotation && CanRotate && inputManager.Keyboard.JustPressed(Key.R))
             {
+                if (dragging != GizmoMode.NoDragging)
+                    FinishDrag();
                 StartRotation(Gizmo.HitType.RotationZ, ref ray, GizmoMode.Rotation);
             }
 
@@ -454,13 +488,19 @@ namespace WDE.MapRenderer.Utils
 
         private void StartDragging(Gizmo.HitType hitType, ref Ray ray, GizmoMode gizmoMode)
         {
-            GetDragAxisAndPlane(hitType, out var axis, out var plane);
-            if (plane.Intersects(ref ray, out Vector3 touchPoint))
-                StartDragging(touchPoint, axis, plane, gizmoMode);
+            if (hitType == Gizmo.HitType.Snap)
+                StartDragging(Vector3.Zero, null, plane, gizmoMode, true);
+            else
+            {
+                GetDragAxisAndPlane(hitType, out var axis, out var plane);
+                if (plane.Intersects(ref ray, out Vector3 touchPoint))
+                    StartDragging(touchPoint, axis, plane, gizmoMode, false);   
+            }
         }
         
-        private void StartDragging(Vector3 startTouchPoint, Vector3? axis, TheMaths.Plane plane, GizmoMode gizmoMode)
+        private void StartDragging(Vector3 startTouchPoint, Vector3? axis, TheMaths.Plane plane, GizmoMode gizmoMode, bool snapping)
         {
+            this.snappingMode = snapping;
             originalTouch = startTouchPoint;
             dragging = gizmoMode;
             this.axis = axis;
