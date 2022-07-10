@@ -16,6 +16,8 @@
         <BetterKeyBinding Gesture="Cmd+Z" CustomCommand="{CompiledBinding Undo}" />
         <BetterKeyBinding Gesture="Cmd+Y" CustomCommand="{CompiledBinding Redo}" />
         <BetterKeyBinding Gesture="Enter" CustomCommand="{CompiledBinding Accept}" />
+        <BetterKeyBinding Gesture="Ctrl+S" CustomCommand="{CompiledBinding ExecuteChangedCommand}" />
+        <BetterKeyBinding Gesture="Cmd+S" CustomCommand="{CompiledBinding ExecuteChangedCommand}" />
     </UserControl.KeyBindings>
     <UserControl.Resources>
         <ResourceDictionary>
