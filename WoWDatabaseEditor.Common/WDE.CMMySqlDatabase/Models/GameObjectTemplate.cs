@@ -7,7 +7,7 @@ namespace WDE.CMMySqlDatabase.Models
     public class GameObjectTemplateWoTLK : IGameObjectTemplate
     {
         [Column("entry"         , IsPrimaryKey = true )] public uint   Entry          { get; set; } // mediumint(8) unsigned
-        [Column("type"                                )] public byte   Type           { get; set; } // tinyint(3) unsigned
+        [Column("type"                                )] public byte   Type_           { get; set; } // tinyint(3) unsigned
         [Column("displayId"                           )] public uint   DisplayId      { get; set; } // mediumint(8) unsigned
         [Column("name"          , CanBeNull    = false)] public string Name           { get; set; } = null!; // varchar(100)
         [Column("IconName"      , CanBeNull    = false)] public string IconName       { get; set; } = null!; // varchar(100)
@@ -54,5 +54,6 @@ namespace WDE.CMMySqlDatabase.Models
 
         // not implemented in cmangos
         public string AIName { get; set; } = null!;
+        public GameobjectType Type => (GameobjectType)Type_;
     }
 }
