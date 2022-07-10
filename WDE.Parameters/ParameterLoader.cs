@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Prism.Events;
 using WDE.Common.Database;
 using WDE.Common.Events;
+using WDE.Common.Managers;
 using WDE.Common.Parameters;
 using WDE.Common.Providers;
 using WDE.Common.Services;
@@ -27,6 +28,7 @@ namespace WDE.Parameters
         private readonly IItemFromListProvider itemFromListProvider;
         private readonly IEventAggregator eventAggregator;
         private readonly ILoadingEventAggregator loadingEventAggregator;
+        private readonly Lazy<IWindowManager> windowManager;
         private readonly IQuickAccessRegisteredParameters quickAccessRegisteredParameters;
 
         private Dictionary<Type, List<IDatabaseObserver>> reloadable = new();
@@ -37,6 +39,7 @@ namespace WDE.Parameters
             IItemFromListProvider itemFromListProvider,
             IEventAggregator eventAggregator,
             ILoadingEventAggregator loadingEventAggregator,
+            Lazy<IWindowManager> windowManager,
             IQuickAccessRegisteredParameters quickAccessRegisteredParameters)
         {
             this.database = database;
@@ -45,6 +48,7 @@ namespace WDE.Parameters
             this.itemFromListProvider = itemFromListProvider;
             this.eventAggregator = eventAggregator;
             this.loadingEventAggregator = loadingEventAggregator;
+            this.windowManager = windowManager;
             this.quickAccessRegisteredParameters = quickAccessRegisteredParameters;
         }
 
@@ -107,9 +111,9 @@ namespace WDE.Parameters
             factory.Register("GameobjectBytes1Parameter", new GameObjectBytes1Parameter());
             factory.RegisterCombined("UnitBytes0Parameter", "RaceParameter",  "ClassParameter","GenderParameter", "PowerParameter", 
                 (race, @class, gender, power) => new UnitBytesParameter(race, @class, gender, power));
-            factory.RegisterCombined("UnitBytes1Parameter", "StandStateParameter", "AnimTierParameter", (standState, animTier) => new UnitBytes1Parameter(standState, animTier));
+            factory.RegisterCombined("UnitBytes1Parameter", "StandStateParameter", "AnimTierParameter", (standState, animTier) => new UnitBytes1Parameter(standState, animTier, windowManager));
             factory.RegisterCombined("UnitBytes2Parameter", "SheathStateParameter",  "UnitPVPStateFlagParameter","UnitBytesPetFlagParameter", "ShapeshiftFormParameter", 
-                (sheath, pvp, pet, shapeShift) => new UnitBytes2Parameter(sheath, pvp, pet, shapeShift));
+                (sheath, pvp, pet, shapeShift) => new UnitBytes2Parameter(sheath, pvp, pet, shapeShift, windowManager));
             
             eventAggregator.GetEvent<DatabaseCacheReloaded>().Subscribe(type =>
             {

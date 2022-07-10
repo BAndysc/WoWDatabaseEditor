@@ -46,5 +46,13 @@
         <DependentUpon>CustomQueryEditorView.axaml</DependentUpon>
         <SubType>Code</SubType>
       </Compile>
+      <Compile Update="Parameters\Views\UnitBytes1EditorView.axaml.cs">
+        <DependentUpon>UnitBytes1EditorView.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+      <Compile Update="Parameters\Views\UnitBytes2EditorView.axaml.cs">
+        <DependentUpon>UnitBytes2EditorView.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
     </ItemGroup>
 </Project>

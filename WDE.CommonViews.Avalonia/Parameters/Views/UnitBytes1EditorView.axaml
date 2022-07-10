@@ -1,0 +1,40 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:WDE.Parameters.ViewModels;assembly=WDE.Parameters"
+             xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:UnitBytes1EditorViewModel"
+             x:Class="WDE.Parameters.Views.UnitBytes1EditorView">
+    <Border Padding="5">
+        <Grid RowDefinitions="Auto,5,Auto,5,Auto,5,Auto,5,Auto,5,*,Auto" ColumnDefinitions="Auto,*">
+            <TextBox Grid.ColumnSpan="2" Watermark="Value" UseFloatingWatermark="True" Text="{CompiledBinding Bytes1}"></TextBox>
+            <TextBlock Grid.Row="2" VerticalAlignment="Center">Stand state:</TextBlock>
+            <CompletionComboBox Grid.Row="2" Grid.Column="1" 
+                                SelectedItem="{CompiledBinding StandState}" 
+                                controls:Extensions.EnumType="{x:Type viewModels:StandStates}" />
+        
+            <TextBlock Grid.Row="4" VerticalAlignment="Center">Pet talents:</TextBlock>
+            <TextBox Grid.Row="4" Grid.Column="1" Text="{CompiledBinding PetTalents}" />
+        
+            <TextBlock Grid.Row="6" VerticalAlignment="Center" Margin="0,0,10,0">Visibility state:</TextBlock>
+            <TextBox Grid.Row="6" Grid.Column="1" Text="{CompiledBinding  VisibilityState}" />
+        
+            <TextBlock Grid.Row="8" VerticalAlignment="Center">Anim tier:</TextBlock>
+            <CompletionComboBox Grid.Row="8" Grid.Column="1" 
+                                SelectedItem="{CompiledBinding AnimTier}" 
+                                controls:Extensions.EnumType="{x:Type viewModels:AnimTiers}" />
+            
+            <Grid Grid.Row="10" Grid.ColumnSpan="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="80" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="80" />
+                </Grid.ColumnDefinitions>
+                <Button Content="Cancel" Command="{CompiledBinding Cancel}"  />
+                <Button Command="{CompiledBinding Accept}" Grid.Column="2" Content="Accept" />
+            </Grid>
+        </Grid>
+    </Border>
+</UserControl>

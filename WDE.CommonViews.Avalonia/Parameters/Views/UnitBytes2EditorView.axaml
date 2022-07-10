@@ -1,0 +1,44 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:WDE.Parameters.ViewModels;assembly=WDE.Parameters"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
+             x:DataType="viewModels:UnitBytes2EditorViewModel"
+             x:Class="WDE.Parameters.Views.UnitBytes2EditorView">
+    <Border Padding="5">
+        <Grid RowDefinitions="Auto,5,Auto,5,Auto,5,Auto,5,Auto,5,*,Auto" ColumnDefinitions="Auto,*">
+            <TextBox Grid.ColumnSpan="2" Watermark="Value" UseFloatingWatermark="True" Text="{CompiledBinding Bytes2}"></TextBox>
+            <TextBlock Grid.Row="2" VerticalAlignment="Center">Sheath state:</TextBlock>
+            <CompletionComboBox Grid.Row="2" Grid.Column="1" 
+                                SelectedItem="{CompiledBinding SheathState}" 
+                                controls:Extensions.EnumType="{x:Type viewModels:SheathStates}" />
+        
+            <TextBlock Grid.Row="4" VerticalAlignment="Center">PvP flag:</TextBlock>
+            <FlagComboBox Grid.Row="4" Grid.Column="1" 
+                          SelectedValue="{CompiledBinding PvPFlag}" 
+                          Flags="{CompiledBinding PvPFlags}" />
+            
+            <TextBlock Grid.Row="6" VerticalAlignment="Center">Pet flag:</TextBlock>
+            <FlagComboBox Grid.Row="6" Grid.Column="1" 
+                          SelectedValue="{CompiledBinding PetFlag}" 
+                          Flags="{CompiledBinding PetFlags}" />
+            
+            <TextBlock Grid.Row="8" VerticalAlignment="Center" Margin="0,0,10,0">Shapeshift form:</TextBlock>
+            <CompletionComboBox Grid.Row="8" Grid.Column="1" 
+                                SelectedItem="{CompiledBinding ShapeshiftForm}" 
+                                Items="{CompiledBinding ShapeshiftForms}" />
+            
+            <Grid Grid.Row="10" Grid.ColumnSpan="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="80" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="80" />
+                </Grid.ColumnDefinitions>
+                <Button Content="Cancel" Command="{CompiledBinding Cancel}"  />
+                <Button Command="{CompiledBinding Accept}" Grid.Column="2" Content="Accept" />
+            </Grid>
+        </Grid>
+    </Border>
+</UserControl>
