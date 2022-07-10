@@ -69,16 +69,16 @@ namespace TheEngine
         protected override void OnKeyDown(KeyEventArgs e)
         {
             engine?.inputManager.keyboard.KeyDown(e.Key);
-            if (!Undo.Matches(e) && !Redo.Matches(e) && !IsModifierKey(e.Key))
-                e.Handled = true;
+            //if (!Undo.Matches(e) && !Redo.Matches(e) && !IsModifierKey(e.Key))
+            //    e.Handled = true;
             base.OnKeyDown(e);
         }
 
         protected override void OnKeyUp(KeyEventArgs e)
         {
             engine?.inputManager.keyboard.KeyUp(e.Key);
-            if (!Undo.Matches(e) && !Redo.Matches(e) && !IsModifierKey(e.Key))
-                e.Handled = true;
+            //if (!Undo.Matches(e) && !Redo.Matches(e) && !IsModifierKey(e.Key))
+            //    e.Handled = true;
             base.OnKeyUp(e);
         }
 

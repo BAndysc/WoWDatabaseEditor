@@ -25,8 +25,8 @@ namespace TheEngine.Input
         {
             if (key >= 0 && (int)key <= 255)
             {
-                if (downKeys[(int)key])
-                    return;
+                //if (downKeys[(int)key])
+                //    return;
                 downKeys[(int)key] = true;
             }
             
@@ -38,8 +38,8 @@ namespace TheEngine.Input
         {
             if (key >= 0 && (int)key <= 255)
             {
-                if (!downKeys[(int)key])
-                    return;
+                //if (!downKeys[(int)key])
+                //    return;
                 downKeys[(int)key] = false;
             }
             
