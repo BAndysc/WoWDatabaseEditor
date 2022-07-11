@@ -126,9 +126,9 @@ namespace TheAvaloniaOpenGL
             return new Texture(device, pixels, width, height);
         }
         
-        public Texture CreateTexture(int width, int height, uint[] pixels)
+        public Texture CreateTexture(int width, int height, uint[] pixels, TextureFormat format = TextureFormat.R8G8B8A8)
         {
-            return new Texture(device, pixels, width, height);
+            return new Texture(device, pixels, width, height, format);
         }
 
         // Safe multithread call

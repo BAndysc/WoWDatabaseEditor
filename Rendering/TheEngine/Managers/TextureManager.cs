@@ -188,6 +188,16 @@ namespace TheEngine.Managers
             return AddTexture(texture);
         }
 
+        public void ScreenshotRenderTexture(TextureHandle handle, string fileName, int colorAttachmentIndex = 0)
+        {
+            var rt = GetTextureByHandle(handle) as RenderTexture;
+            rt.ActivateSourceFrameBuffer(colorAttachmentIndex);
+            Rgba32[] pixels = new Rgba32[rt.Width * rt.Height];
+            engine.Device.device.ReadPixels(0, 0, rt.Width, rt.Height, PixelFormat.Rgba, PixelType.UnsignedByte, pixels.AsSpan());
+            using Image<Rgba32> image = Image.LoadPixelData(pixels, rt.Width, rt.Height);
+            image.SaveAsPng(fileName);
+        }
+
         internal ITexture? GetTextureByHandle(TextureHandle textureHandle)
         {
             return this[textureHandle];

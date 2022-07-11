@@ -338,12 +338,7 @@ namespace TheEngine.Managers
 
         public void ScreenshotCurrentBuffer(string filename, int colorAttachment = 0)
         {
-            var rt = engine.textureManager.GetTextureByHandle(mainObjectBuffer) as RenderTexture;
-            rt.ActivateSourceFrameBuffer(colorAttachment);
-            SixLabors.ImageSharp.PixelFormats.Rgba32[] pixels = new SixLabors.ImageSharp.PixelFormats.Rgba32[rt.Width * rt.Height];
-            engine.Device.device.ReadPixels(0, 0, rt.Width, rt.Height, PixelFormat.RedInteger, PixelType.UnsignedInt, pixels.AsSpan());
-            using SixLabors.ImageSharp.Image<SixLabors.ImageSharp.PixelFormats.Rgba32> image = SixLabors.ImageSharp.Image.LoadPixelData<SixLabors.ImageSharp.PixelFormats.Rgba32>(pixels, rt.Width, rt.Height);
-            SixLabors.ImageSharp.ImageExtensions.SaveAsPng(image, filename);
+            engine.textureManager.ScreenshotRenderTexture(mainObjectBuffer, filename, colorAttachment);
         }
 
         public Entity PickObject(Vector2 normalizedScreenPoint)
@@ -380,12 +375,11 @@ namespace TheEngine.Managers
 
             inRenderingLoop = true;
             engine.Device.device.CheckError("pre UpdateSceneBuffer");
-            UpdateSceneBuffer();
+            
+            ActivateScene(null);
             
             Stats = default;
             engine.Device.device.CheckError("Render begin");
-
-            engine.Device.RenderClearBuffer();
 
             if (currentBackBufferWidth != (int)engine.WindowHost.WindowWidth ||
                 currentBackBufferHeight != (int)engine.WindowHost.WindowHeight)
@@ -1038,23 +1032,31 @@ namespace TheEngine.Managers
             }
         }
 
-        private void UpdateSceneBuffer()
+        public void ActivateScene(in SceneData? scene)
         {
-            var camera = cameraManager.MainCamera;
+            var data = scene ?? new SceneData(engine.cameraManger.MainCamera, engine.lightManager.MainLight, engine.lightManager.SecondaryLight);
+            UpdateSceneBuffer(in data);
+            sceneBuffer.UpdateBuffer(ref sceneData);
+            sceneBuffer.Activate(Constants.SCENE_BUFFER_INDEX);
+        }
+
+        private void UpdateSceneBuffer(in SceneData data)
+        {
+            var camera = data.SceneCamera;
             var proj = camera.ProjectionMatrix;
             var vm = camera.Transform.WorldToLocalMatrix;
 
             sceneData.ViewMatrix = vm;
             sceneData.ProjectionMatrix = proj;
-            sceneData.LightPosition = engine.lightManager.MainLight.LightPosition;
-            sceneData.CameraPosition = new Vector4(engine.CameraManager.MainCamera.Transform.Position, 1);
-            sceneData.LightDirection = new Vector4(Vectors.Normalize((Vectors.Forward.Multiply(engine.lightManager.MainLight.LightRotation))), 0);
-            sceneData.LightColor = engine.lightManager.MainLight.LightColor.XYZ();
-            sceneData.LightIntensity = engine.lightManager.MainLight.LightIntensity; 
-            sceneData.SecondaryLightDirection = new Vector4(Vectors.Forward.Multiply(engine.lightManager.SecondaryLight.LightRotation), 0);
-            sceneData.SecondaryLightColor = engine.lightManager.SecondaryLight.LightColor.XYZ();
-            sceneData.SecondaryLightIntensity = engine.lightManager.SecondaryLight.LightIntensity;
-            sceneData.AmbientColor = engine.lightManager.MainLight.AmbientColor;
+            sceneData.LightPosition = data.MainLight.LightPosition;
+            sceneData.CameraPosition = new Vector4(camera.Transform.Position, 1);
+            sceneData.LightDirection = new Vector4(Vectors.Normalize((Vectors.Forward.Multiply(data.MainLight.LightRotation))), 0);
+            sceneData.LightColor = data.MainLight.LightColor.XYZ();
+            sceneData.LightIntensity = data.MainLight.LightIntensity; 
+            sceneData.SecondaryLightDirection = new Vector4(Vectors.Forward.Multiply(data.SecondaryLight.LightRotation), 0);
+            sceneData.SecondaryLightColor = data.SecondaryLight.LightColor.XYZ();
+            sceneData.SecondaryLightIntensity = data.SecondaryLight.LightIntensity;
+            sceneData.AmbientColor = data.MainLight.AmbientColor;
             sceneData.Time = (float)engine.TotalTime;
             sceneData.ScreenWidth = engine.WindowHost.WindowWidth;
             sceneData.ScreenHeight = engine.WindowHost.WindowHeight;

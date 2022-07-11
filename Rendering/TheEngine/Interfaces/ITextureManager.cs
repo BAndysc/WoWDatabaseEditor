@@ -16,6 +16,7 @@ namespace TheEngine.Interfaces
         TextureHandle CreateTexture(float[] pixels, int width, int height); 
         TextureHandle CreateTexture(Vector4[] pixels, int width, int height);
         TextureHandle CreateRenderTexture(int width, int height, int colorAttachments = 1);
+        void ScreenshotRenderTexture(TextureHandle rt, string fileName, int colorAttachmentIndex = 0);
         void BlitRenderTextures(TextureHandle src, TextureHandle dst);
         void DisposeTexture(TextureHandle handle);
         void SetFiltering(TextureHandle handle, FilteringMode mode);

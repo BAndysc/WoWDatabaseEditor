@@ -37,8 +37,8 @@ namespace TheAvaloniaOpenGL.Resources
 
             depthHandle = device.GenRenderbuffer();
             device.BindRenderbuffer(RenderbufferTarget.Renderbuffer, depthHandle);
-            device.RenderbufferStorage(RenderbufferTarget.Renderbuffer,  RenderbufferStorage.Depth24Stencil8, width, height);
-            device.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthStencilAttachment, RenderbufferTarget.Renderbuffer, depthHandle);
+            device.RenderbufferStorage(RenderbufferTarget.Renderbuffer,  RenderbufferStorage.DepthComponent, width, height);
+            device.FramebufferRenderbuffer(FramebufferTarget.Framebuffer, FramebufferAttachment.DepthAttachment, RenderbufferTarget.Renderbuffer, depthHandle);
 
             device.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
             this.device = device;
@@ -115,10 +115,14 @@ namespace TheAvaloniaOpenGL.Resources
 
         public void ActivateAttachment(int colorAttachmentIndex, int slot)
         {
+            GetTexture(colorAttachmentIndex).Activate(slot);
+        }
+
+        public Texture GetTexture(int colorAttachmentIndex)
+        {
             if (colorAttachmentIndex == 0)
-                underlyingTexture.Activate(slot);
-            else
-                nextTextures[colorAttachmentIndex - 1].Activate(slot);
+                return underlyingTexture;
+            return nextTextures[colorAttachmentIndex - 1];
         }
     }
 }
