@@ -152,5 +152,12 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public async Task<ICreature?> GetCreaturesByGuidAsync(uint guid) => null;
         public async Task<ICreatureAddon?> GetCreatureAddon(uint guid) => null;
         public async Task<ICreatureTemplateAddon?> GetCreatureTemplateAddon(uint entry) => null;
+        public async Task<IReadOnlyList<IWaypointData>?> GetWaypointData(uint pathId) => null;
+        public async Task<IReadOnlyList<ISmartScriptWaypoint>?> GetSmartScriptWaypoints(uint pathId) => null;
+        public async Task<IReadOnlyList<IScriptWaypoint>?> GetScriptWaypoints(uint pathId) => null;
+        public async Task<IReadOnlyList<IMangosWaypoint>?> GetMangosWaypoints(uint pathId) => null;
+        public async Task<IReadOnlyList<IMangosCreatureMovement>?> GetMangosCreatureMovement(uint guid) => null;
+        public async Task<IReadOnlyList<IMangosCreatureMovementTemplate>?> GetMangosCreatureMovementTemplate(uint entry, uint? pathId) => null;
+        public async Task<IMangosWaypointsPathName?> GetMangosPathName(uint pathId) => null;
     }
 }

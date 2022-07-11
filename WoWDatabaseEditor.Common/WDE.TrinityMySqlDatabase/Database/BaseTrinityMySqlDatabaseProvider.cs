@@ -582,6 +582,32 @@ namespace WDE.TrinityMySqlDatabase.Database
         public abstract Task<ICreatureAddon?> GetCreatureAddon(uint guid);
 
         public abstract Task<ICreatureTemplateAddon?> GetCreatureTemplateAddon(uint entry);
+        
+        public virtual async Task<IReadOnlyList<IWaypointData>?> GetWaypointData(uint pathId)
+        {
+            await using var model = Database();
+            return await model.WaypointData.Where(wp => wp.PathId == pathId).OrderBy(wp => wp.PointId).ToListAsync<IWaypointData>();
+        }
+
+        public virtual async Task<IReadOnlyList<ISmartScriptWaypoint>?> GetSmartScriptWaypoints(uint pathId)
+        {
+            await using var model = Database();
+            return await model.SmartScriptWaypoint.Where(wp => wp.PathId == pathId).OrderBy(wp => wp.PointId).ToListAsync<ISmartScriptWaypoint>();
+        }
+
+        public async Task<IReadOnlyList<IScriptWaypoint>?> GetScriptWaypoints(uint pathId)
+        {
+            await using var model = Database();
+            return await model.ScriptWaypoint.Where(wp => wp.PathId == pathId).OrderBy(wp => wp.PointId).ToListAsync<IScriptWaypoint>();
+        }
+
+        public async Task<IReadOnlyList<IMangosWaypoint>?> GetMangosWaypoints(uint pathId) => null;
+        
+        public async Task<IReadOnlyList<IMangosCreatureMovement>?> GetMangosCreatureMovement(uint guid) => null;
+
+        public async Task<IReadOnlyList<IMangosCreatureMovementTemplate>?> GetMangosCreatureMovementTemplate(uint entry, uint? pathId) => null;
+
+        public async Task<IMangosWaypointsPathName?> GetMangosPathName(uint pathId) => null;
 
         public async Task<IList<ICreatureEquipmentTemplate>?> GetCreatureEquipmentTemplates()
         {

@@ -34,5 +34,9 @@ namespace WDE.CMMySqlDatabase.Models
         public ITable<GameEventCreature> GameEventCreature => GetTable<GameEventCreature>();
         public ITable<GameEventGameObject> GameEventGameObject => GetTable<GameEventGameObject>();
         public ITable<CreatureEquipmentTemplate> CreatureEquipmentTemplate => GetTable<CreatureEquipmentTemplate>();
+        public ITable<MangosCreatureMovement> CreatureMovement => GetTable<MangosCreatureMovement>();
+        public ITable<MangosCreatureMovementTemplate> CreatureMovementTemplate => GetTable<MangosCreatureMovementTemplate>();
+        public ITable<MangosWaypoint> WaypointPath => GetTable<MangosWaypoint>();
+        public ITable<MangosWaypointPathName> WaypointPathName => GetTable<MangosWaypointPathName>();
     }
 }

@@ -43,5 +43,8 @@ namespace WDE.TrinityMySqlDatabase.Models
         public ITable<MySqlCreatureEquipmentTemplate> EquipmentTemplate => GetTable<MySqlCreatureEquipmentTemplate>();
         public ITable<MySqlGameEventCreature> GameEventCreature => GetTable<MySqlGameEventCreature>();
         public ITable<MySqlGameEventGameObject> GameEventGameObject => GetTable<MySqlGameEventGameObject>();
+        public ITable<WaypointData> WaypointData => GetTable<WaypointData>();
+        public ITable<ScriptWaypoint> ScriptWaypoint => GetTable<ScriptWaypoint>();
+        public ITable<SmartScriptWaypoint> SmartScriptWaypoint => GetTable<SmartScriptWaypoint>();
     }
 }

@@ -39,6 +39,12 @@ namespace WDE.TrinityMySqlDatabase.Models
         [Column(Name = "orientation")]
         public float O { get; set; }
 
+        [Column(Name = "MovementType")]
+        public MovementType MovementType { get; set; }
+        
+        [Column(Name = "wander_distance")]
+        public float WanderDistance { get; set; }
+        
         public uint SpawnKey => 0;
     }
     
@@ -77,6 +83,12 @@ namespace WDE.TrinityMySqlDatabase.Models
 
         [Column(Name = "orientation")]
         public float O { get; set; }
+
+        [Column(Name = "MovementType")]
+        public MovementType MovementType { get; set; }
+        
+        [Column(Name = "wander_distance")]
+        public float WanderDistance { get; set; }
 
         public uint SpawnKey => 0;
     }
@@ -117,6 +129,12 @@ namespace WDE.TrinityMySqlDatabase.Models
 
         [Column(Name = "orientation")]
         public float O { get; set; }
+
+        [Column(Name = "MovementType")]
+        public MovementType MovementType { get; set; }
+        
+        [Column(Name = "spawndist")]
+        public float WanderDistance { get; set; }
 
         public uint SpawnKey => 0;
     }

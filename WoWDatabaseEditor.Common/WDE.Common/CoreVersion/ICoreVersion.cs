@@ -40,11 +40,22 @@ namespace WDE.Common.CoreVersion
         string ConditionSourcesFile { get; }
     }
 
+    [Flags]
+    public enum WaypointTables
+    {
+        WaypointData = 0x1,  // waypoint_data
+        SmartScriptWaypoint = 0x2, // waypoints
+        ScriptWaypoint = 0x4, // script_waypoint
+        MangosWaypointPath = 0x8, // waypoint_path
+        MangosCreatureMovement = 0x16 // creature_movement(_template)
+    }
+    
     public interface IDatabaseFeatures
     {
         ISet<Type> UnsupportedTables { get; }
         bool AlternativeTrinityDatabase { get; }
         bool HasAiEntry => false;
+        WaypointTables SupportedWaypoints { get; }
     }
 
     public interface ISmartScriptFeatures

@@ -262,4 +262,16 @@ public class TrinityCataMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvider
         await using var model = Database();
         return await model.CreatureTemplateAddon.FirstOrDefaultAsync<ICreatureTemplateAddon>(x => x.Entry == entry);
     }
+    
+    public override async Task<IReadOnlyList<IWaypointData>?> GetWaypointData(uint pathId)
+    {
+        await using var model = Database();
+        return await model.WaypointDataCata.Where(wp => wp.PathId == pathId).OrderBy(wp => wp.PointId).ToListAsync<IWaypointData>();
+    }
+
+    public override async Task<IReadOnlyList<ISmartScriptWaypoint>?> GetSmartScriptWaypoints(uint pathId)
+    {
+        await using var model = Database();
+        return await model.SmartScriptWaypointCata.Where(wp => wp.PathId == pathId).OrderBy(wp => wp.PointId).ToListAsync<ISmartScriptWaypoint>();
+    }
 }

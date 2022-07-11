@@ -17,4 +17,6 @@ public class TrinityCataDatabase : BaseTrinityDatabase
     public ITable<MySqlCreatureModelInfo> CreatureModelInfo => GetTable<MySqlCreatureModelInfo>();
     public ITable<MySqlCreatureAddonCata> CreatureAddon => GetTable<MySqlCreatureAddonCata>();
     public ITable<MySqlCreatureTemplateAddonCata> CreatureTemplateAddon => GetTable<MySqlCreatureTemplateAddonCata>();
+    public ITable<WaypointDataCata> WaypointDataCata => GetTable<WaypointDataCata>();
+    public ITable<SmartScriptWaypointCata> SmartScriptWaypointCata => GetTable<SmartScriptWaypointCata>();
 }

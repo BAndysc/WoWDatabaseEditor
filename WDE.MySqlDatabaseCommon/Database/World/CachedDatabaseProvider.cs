@@ -344,6 +344,20 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public Task<ICreatureAddon?> GetCreatureAddon(uint guid) => nonCachedDatabase.GetCreatureAddon(guid);
 
         public Task<ICreatureTemplateAddon?> GetCreatureTemplateAddon(uint entry) => nonCachedDatabase.GetCreatureTemplateAddon(entry);
+       
+        public Task<IReadOnlyList<IWaypointData>?> GetWaypointData(uint pathId) => nonCachedDatabase.GetWaypointData(pathId);
+
+        public Task<IReadOnlyList<ISmartScriptWaypoint>?> GetSmartScriptWaypoints(uint pathId) => nonCachedDatabase.GetSmartScriptWaypoints(pathId);
+
+        public Task<IReadOnlyList<IScriptWaypoint>?> GetScriptWaypoints(uint pathId) => nonCachedDatabase.GetScriptWaypoints(pathId);
+
+        public Task<IReadOnlyList<IMangosWaypoint>?> GetMangosWaypoints(uint pathId) => nonCachedDatabase.GetMangosWaypoints(pathId);
+
+        public Task<IReadOnlyList<IMangosCreatureMovement>?> GetMangosCreatureMovement(uint guid) => nonCachedDatabase.GetMangosCreatureMovement(guid);
+        
+        public Task<IReadOnlyList<IMangosCreatureMovementTemplate>?> GetMangosCreatureMovementTemplate(uint entry, uint? pathId) => nonCachedDatabase.GetMangosCreatureMovementTemplate(entry, pathId);
+        
+        public Task<IMangosWaypointsPathName?> GetMangosPathName(uint pathId) => nonCachedDatabase.GetMangosPathName(pathId);
 
         public Task<List<IEventScriptLine>> GetEventScript(EventScriptType type, uint id) => nonCachedDatabase.GetEventScript(type, id);
 

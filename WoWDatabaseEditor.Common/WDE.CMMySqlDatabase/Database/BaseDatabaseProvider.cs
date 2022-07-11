@@ -464,6 +464,39 @@ namespace WDE.CMMySqlDatabase.Database
             return await model.CreatureTemplateAddon.FirstOrDefaultAsync<ICreatureTemplateAddon>(x => x.Entry == entry);
         }
 
+        public async Task<IReadOnlyList<IWaypointData>?> GetWaypointData(uint pathId) => null;
+
+        public async Task<IReadOnlyList<ISmartScriptWaypoint>?> GetSmartScriptWaypoints(uint pathId) => null;
+
+        public async Task<IReadOnlyList<IScriptWaypoint>?> GetScriptWaypoints(uint pathId) => null;
+
+        public async Task<IReadOnlyList<IMangosWaypoint>?> GetMangosWaypoints(uint pathId)
+        {
+            await using var model = Database();
+            return await model.WaypointPath.Where(x => x.PathId == pathId).OrderBy(x => x.PointId).ToListAsync<IMangosWaypoint>();
+        }
+
+        public async Task<IReadOnlyList<IMangosCreatureMovement>?> GetMangosCreatureMovement(uint guid)
+        {
+            await using var model = Database();
+            return await model.CreatureMovement.Where(x => x.Guid == guid).OrderBy(x => x.PointId).ToListAsync<IMangosCreatureMovement>();
+        }
+
+        public async Task<IReadOnlyList<IMangosCreatureMovementTemplate>?> GetMangosCreatureMovementTemplate(uint entry, uint? pathId)
+        {
+            await using var model = Database();
+            var predicate = PredicateBuilder.New<MangosCreatureMovementTemplate>(x => x.Entry == entry);
+            if (pathId.HasValue)
+                predicate = predicate.And(x => x.PathId == pathId);
+            return await model.CreatureMovementTemplate.Where(predicate).OrderBy(x => x.PointId).ToListAsync<IMangosCreatureMovementTemplate>();
+        }
+
+        public async Task<IMangosWaypointsPathName?> GetMangosPathName(uint pathId)
+        {
+            await using var model = Database();
+            return await model.WaypointPathName.FirstOrDefaultAsync(x => x.PathId == pathId);
+        }
+
         public async Task<IList<IAuthRbacPermission>> GetRbacPermissionsAsync()
         {
             return new List<IAuthRbacPermission>();

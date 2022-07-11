@@ -126,6 +126,20 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public Task<ICreatureTemplateAddon?> GetCreatureTemplateAddon(uint entry) => impl.GetCreatureTemplateAddon(entry);
 
+        public Task<IReadOnlyList<IWaypointData>?> GetWaypointData(uint pathId) => impl.GetWaypointData(pathId);
+
+        public Task<IReadOnlyList<ISmartScriptWaypoint>?> GetSmartScriptWaypoints(uint pathId) => impl.GetSmartScriptWaypoints(pathId);
+
+        public Task<IReadOnlyList<IScriptWaypoint>?> GetScriptWaypoints(uint pathId) => impl.GetScriptWaypoints(pathId);
+
+        public Task<IReadOnlyList<IMangosWaypoint>?> GetMangosWaypoints(uint pathId) => impl.GetMangosWaypoints(pathId);
+
+        public Task<IReadOnlyList<IMangosCreatureMovement>?> GetMangosCreatureMovement(uint guid) => impl.GetMangosCreatureMovement(guid);
+        
+        public Task<IReadOnlyList<IMangosCreatureMovementTemplate>?> GetMangosCreatureMovementTemplate(uint entry, uint? pathId) => impl.GetMangosCreatureMovementTemplate(entry, pathId);
+
+        public Task<IMangosWaypointsPathName?> GetMangosPathName(uint pathId) => impl.GetMangosPathName(pathId);
+
         public Task<List<IEventScriptLine>> GetEventScript(EventScriptType type, uint id) => impl.GetEventScript(type, id);
     }
 }

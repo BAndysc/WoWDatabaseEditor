@@ -105,7 +105,15 @@ namespace WDE.Common.Database
         Task<ICreature?> GetCreaturesByGuidAsync(uint guid);
         Task<ICreatureAddon?> GetCreatureAddon(uint guid);
         Task<ICreatureTemplateAddon?> GetCreatureTemplateAddon(uint entry);
-        
+
+        Task<IReadOnlyList<IWaypointData>?> GetWaypointData(uint pathId);
+        Task<IReadOnlyList<ISmartScriptWaypoint>?> GetSmartScriptWaypoints(uint pathId);
+        Task<IReadOnlyList<IScriptWaypoint>?> GetScriptWaypoints(uint pathId);
+        Task<IReadOnlyList<IMangosWaypoint>?> GetMangosWaypoints(uint pathId);
+        Task<IReadOnlyList<IMangosCreatureMovement>?> GetMangosCreatureMovement(uint guid);
+        Task<IReadOnlyList<IMangosCreatureMovementTemplate>?> GetMangosCreatureMovementTemplate(uint entry, uint? pathId);
+        Task<IMangosWaypointsPathName?> GetMangosPathName(uint pathId);
+            
         public enum SmartLinePropertyType
         {
             Event,
