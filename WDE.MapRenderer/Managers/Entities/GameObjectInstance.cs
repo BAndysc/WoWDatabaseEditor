@@ -14,7 +14,6 @@ public class GameObjectInstance : WorldObjectInstance
     private readonly IGameObjectTemplate gameObjectTemplate;
     private readonly uint gameObjectDisplayId;
     private List<INativeBuffer> bonesBuffers = new();
-    private M2AnimationComponentData masterAnimation = null!;
     private MaterialInstanceRenderData materialInstanceRenderData = null!;
 
     public GameObjectInstance(IGameContext gameContext,
@@ -35,8 +34,6 @@ public class GameObjectInstance : WorldObjectInstance
         }
     }
 
-    public M2? Model { get; private set; }
-
     public MaterialInstanceRenderData MaterialRenderData => materialInstanceRenderData;
 
     public Material BaseMaterial { get; private set; } = null!;
@@ -46,50 +43,72 @@ public class GameObjectInstance : WorldObjectInstance
         var entityManager = gameContext.EntityManager;
         var archetypes = gameContext.Archetypes;
         
-        var completion = new TaskCompletionSource<MdxManager.MdxInstance?>();
+        var completion = new TaskCompletionSource<(MdxManager.MdxInstance?, WmoManager.WmoInstance?)?>();
         yield return gameContext.MdxManager.LoadGameObjectModel(gameObjectDisplayId, completion);
+        
+        var m2Instance = completion.Task.Result?.Item1;
+        var wmoInstance = completion.Task.Result?.Item2;
 
-        var instance = completion.Task.Result;
-
-        if (instance == null || instance.materials.Length <= 0)
+        if ((m2Instance == null || m2Instance.materials.Length <= 0) && (wmoInstance == null || wmoInstance.meshes.Count == 0))
         {
             // lets find some better "placeholder" model
-            completion = new();
-            yield return gameContext.MdxManager.LoadM2Mesh("world\\arttest\\boxtest\\xyz.m2", completion);
-            instance = completion.Task.Result!;
+            var m2completion = new TaskCompletionSource<MdxManager.MdxInstance?>();
+            yield return gameContext.MdxManager.LoadM2Mesh("world\\arttest\\boxtest\\xyz.m2", m2completion);
+            m2Instance = m2completion.Task.Result!;
         }
 
-        Model = instance.model;
-
-        objectEntity = entityManager.CreateEntity(archetypes.WorldObjectArchetype);
-        objectEntity.SetTRS(entityManager, Vector3.Zero, Quaternion.Identity, instance.scale * gameObjectTemplate.Size * Vector3.One);
+        objectEntity = entityManager.CreateEntity(m2Instance == null ? archetypes.WorldObjectArchetype : archetypes.AnimatedWorldObjectArchetype);
+        objectEntity.SetTRS(entityManager, Vector3.Zero, Quaternion.Identity, (m2Instance?.scale ?? 1) * gameObjectTemplate.Size * Vector3.One);
         objectEntity.SetDirtyPosition(entityManager);
 
-        var boneMatricesBuffer = gameContext.Engine.CreateBuffer<Matrix>(BufferTypeEnum.StructuredBufferVertexOnly, 1, BufferInternalFormat.Float4);
-        bonesBuffers.Add(boneMatricesBuffer);
-        boneMatricesBuffer.UpdateBuffer(AnimationSystem.IdentityBones(instance.model.bones.Length).Span);
-
-        masterAnimation = new M2AnimationComponentData(instance.model)
-        {
-            SetNewAnimation = 0,
-            _buffer = boneMatricesBuffer
-        };
-        entityManager.SetManagedComponent(objectEntity, masterAnimation);
-
-        // optimization here, we can share the render data, because we know all the materials will be the same shader
         materialInstanceRenderData = new MaterialInstanceRenderData();
-        BaseMaterial = instance.materials[0].material;
-        materialInstanceRenderData.SetBuffer(BaseMaterial, "boneMatrices", boneMatricesBuffer);
-        
-        foreach (var material in instance.materials)
+        if (m2Instance != null)
         {
-            var renderer = entityManager.CreateEntity(archetypes.WorldObjectMeshRendererArchetype);
-            renderer.SetRenderer(entityManager, instance.mesh, material.submesh, material.material);
-            renderer.SetCopyParentTransform(entityManager, objectEntity);
-            renderer.SetDirtyPosition(entityManager);
-            entityManager.SetManagedComponent(renderer, materialInstanceRenderData);
+            var boneMatricesBuffer = gameContext.Engine.CreateBuffer<Matrix>(BufferTypeEnum.StructuredBufferVertexOnly, 1, BufferInternalFormat.Float4);
+            bonesBuffers.Add(boneMatricesBuffer);
+            boneMatricesBuffer.UpdateBuffer(AnimationSystem.IdentityBones(m2Instance.model.bones.Length).Span);
+
+            var masterAnimation = new M2AnimationComponentData(m2Instance.model)
+            {
+                SetNewAnimation = 0,
+                _buffer = boneMatricesBuffer
+            };
+            entityManager.SetManagedComponent(objectEntity, masterAnimation);
+
+            // optimization here, we can share the render data, because we know all the materials will be the same shader
+            BaseMaterial = m2Instance.materials[0].material;
+            materialInstanceRenderData.SetBuffer(BaseMaterial, "boneMatrices", boneMatricesBuffer);
+        
+            foreach (var material in m2Instance.materials)
+            {
+                var renderer = entityManager.CreateEntity(archetypes.WorldObjectMeshRendererArchetype);
+                renderer.SetRenderer(entityManager, m2Instance.mesh, material.submesh, material.material);
+                renderer.SetCopyParentTransform(entityManager, objectEntity);
+                renderer.SetDirtyPosition(entityManager);
+                entityManager.SetManagedComponent(renderer, materialInstanceRenderData);
             
-            renderers.Add(renderer);
+                renderers.Add(renderer);
+            }            
+        }
+        else if (wmoInstance != null)
+        {
+            foreach (var batch in wmoInstance.meshes)
+            {
+                for (var index = 0; index < batch.Item2.Length; index++)
+                {
+                    var material = batch.Item2[index];
+                    // optimization here, we can share the render data, because we know all the materials will be the same shader
+                    BaseMaterial = material;
+                    
+                    var renderer = entityManager.CreateEntity(archetypes.WorldObjectMeshRendererArchetype);
+                    renderer.SetRenderer(entityManager, batch.Item1, index, material);
+                    renderer.SetCopyParentTransform(entityManager, objectEntity);
+                    renderer.SetDirtyPosition(entityManager);
+                    entityManager.SetManagedComponent(renderer, materialInstanceRenderData);
+            
+                    renderers.Add(renderer);
+                }
+            }
         }
 
         textEntity = gameContext.UiManager.DrawPersistentWorldText("calibri", new Vector2(0.5f, 0.5f), gameObjectTemplate.Name, 0.25f, Matrix.Identity, 50);
@@ -104,7 +123,6 @@ public class GameObjectInstance : WorldObjectInstance
         {
             throw new Exception("Double dispose!");
         }
-        Model = null;
         
         var entityManager = gameContext.EntityManager;
         

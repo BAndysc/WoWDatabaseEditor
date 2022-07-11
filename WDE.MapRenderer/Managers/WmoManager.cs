@@ -166,6 +166,7 @@ namespace WDE.MapRenderer.Managers
             var mat = materialManager.CreateMaterial("data/wmo.json");
 
             mat.SetUniformInt("shader_id", (int)materialDef.shader);
+            mat.SetUniformInt("translucent", 0);
             //mat.SetUniform("notSupported", 0.0f);
             float alphaTest = 0.003921568f; // 1/255
 

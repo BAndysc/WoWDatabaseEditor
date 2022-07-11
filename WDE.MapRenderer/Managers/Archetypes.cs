@@ -47,6 +47,7 @@ public class Archetypes
     
     public Archetype WorldObjectCollider;
 
+    public Archetype AnimatedWorldObjectArchetype;
     public Archetype WorldObjectArchetype;
     public Archetype AttachmentsAnimationRootArchetype;
     public Archetype WorldObjectMeshRendererArchetype;
@@ -115,9 +116,11 @@ public class Archetypes
             .WithComponentData<RenderEnabledBit>()
             .WithComponentData<PerformCullingBit>()
             .WithComponentData<WorldMeshBounds>()
-            .WithManagedComponentData<M2AnimationComponentData>()
             .WithComponentData<LocalToWorld>();
 
+        AnimatedWorldObjectArchetype = WorldObjectArchetype
+            .WithManagedComponentData<M2AnimationComponentData>();
+        
         AttachmentsAnimationRootArchetype = entityManager.NewArchetype()
             .Includes(CullingArchetype)
             .Includes(DynamicObjectArchetype)

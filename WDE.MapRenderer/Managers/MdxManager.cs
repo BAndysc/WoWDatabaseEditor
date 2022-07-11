@@ -120,8 +120,8 @@ namespace WDE.MapRenderer.Managers
         private Dictionary<string, MdxInstance?> meshes = new();
         private Dictionary<string, Task<MdxInstance?>> meshesCurrentlyLoaded = new();
         private Dictionary<uint, MdxInstance?> creaturemeshes = new();
-        private Dictionary<uint, Task<MdxInstance?>> gameObjectMeshesCurrentlyLoaded = new();
-        private Dictionary<uint, MdxInstance?> gameObjectmeshes = new();
+        private Dictionary<uint, Task<(MdxInstance?, WmoManager.WmoInstance?)?>> gameObjectMeshesCurrentlyLoaded = new();
+        private Dictionary<uint, (MdxInstance?, WmoManager.WmoInstance?)?> gameObjectmeshes = new();
         private Dictionary<uint, Task<MdxInstance?>> creatureMeshesCurrentlyLoaded = new();
         private Dictionary<(uint displayId, bool right, ushort raceGender), MdxInstance?> itemMeshes = new();
         private Dictionary<(uint displayId, bool right, ushort raceGender), Task<MdxInstance?>> itemMeshesCurrentlyLoaded = new();
@@ -129,6 +129,7 @@ namespace WDE.MapRenderer.Managers
         private readonly IMeshManager meshManager;
         private readonly IMaterialManager materialManager;
         private readonly WoWTextureManager textureManager;
+        private readonly WmoManager wmoManager;
         private readonly CreatureDisplayInfoStore creatureDisplayInfoStore;
         private readonly CreatureDisplayInfoExtraStore creatureDisplayInfoExtraStore;
         private readonly ItemDisplayInfoStore itemDisplayInfoStore;
@@ -150,6 +151,7 @@ namespace WDE.MapRenderer.Managers
             IMeshManager meshManager, 
             IMaterialManager materialManager,
             WoWTextureManager textureManager,
+            WmoManager wmoManager,
             CreatureDisplayInfoStore creatureDisplayInfoStore,
             CreatureDisplayInfoExtraStore creatureDisplayInfoExtraStore,
             ItemDisplayInfoStore itemDisplayInfoStore,
@@ -169,6 +171,7 @@ namespace WDE.MapRenderer.Managers
             this.meshManager = meshManager;
             this.materialManager = materialManager;
             this.textureManager = textureManager;
+            this.wmoManager = wmoManager;
             this.creatureDisplayInfoStore = creatureDisplayInfoStore;
             this.creatureDisplayInfoExtraStore = creatureDisplayInfoExtraStore;
             this.itemDisplayInfoStore = itemDisplayInfoStore;
@@ -964,7 +967,7 @@ namespace WDE.MapRenderer.Managers
             result.SetResult(mdx);
         }
         
-        public IEnumerator LoadGameObjectModel(uint gameObjectDisplayId, TaskCompletionSource<MdxInstance?> result)
+        public IEnumerator LoadGameObjectModel(uint gameObjectDisplayId, TaskCompletionSource<(MdxInstance?, WmoManager.WmoInstance?)?> result)
         {
             if (gameObjectmeshes.ContainsKey(gameObjectDisplayId))
             {
@@ -979,7 +982,7 @@ namespace WDE.MapRenderer.Managers
                 yield break;
             }
 
-            var completion = new TaskCompletionSource<MdxInstance?>();
+            var completion = new TaskCompletionSource<(MdxInstance?, WmoManager.WmoInstance?)?>();
             gameObjectMeshesCurrentlyLoaded[gameObjectDisplayId] = completion.Task;
 
             if (!gameObjectDisplayInfoStore.TryGetValue(gameObjectDisplayId, out var displayInfo))
@@ -994,11 +997,12 @@ namespace WDE.MapRenderer.Managers
 
             if (displayInfo.ModelName.EndsWith("wmo", StringComparison.InvariantCultureIgnoreCase))
             {
-                Console.WriteLine("Gameobject display id " + gameObjectDisplayId + " is WMO, not M2. this is NOT YET supported!! path: " + displayInfo.ModelName);
-                gameObjectmeshes[gameObjectDisplayId] = null;
+                var wmoInstance = new TaskCompletionSource<WmoManager.WmoInstance?>();
+                yield return wmoManager.LoadWorldMapObject(displayInfo.ModelName, wmoInstance);
+                var res = gameObjectmeshes[gameObjectDisplayId] = (null, wmoInstance.Task.Result);
                 completion.SetResult(null);
                 gameObjectMeshesCurrentlyLoaded.Remove(gameObjectDisplayId);
-                result.SetResult(null);
+                result.SetResult(res);
                 yield break;
             }
 
@@ -1091,10 +1095,10 @@ namespace WDE.MapRenderer.Managers
                 materials = materials.AsSpan(0, j).ToArray(),
                 model = m2
             };
-            gameObjectmeshes.Add(gameObjectDisplayId, mdx);
+            gameObjectmeshes.Add(gameObjectDisplayId, (mdx, null));
             completion.SetResult(null);
             gameObjectMeshesCurrentlyLoaded.Remove(gameObjectDisplayId);
-            result.SetResult(mdx);
+            result.SetResult((mdx, null));
         }
         
         public IEnumerator LoadM2Mesh(string path, TaskCompletionSource<MdxInstance?> result)

@@ -140,7 +140,7 @@ public class CreatureInstance : WorldObjectInstance
 
         Model = instance.model;
 
-        objectEntity = entityManager.CreateEntity(archetypes.WorldObjectArchetype);
+        objectEntity = entityManager.CreateEntity(archetypes.AnimatedWorldObjectArchetype);
         objectEntity.SetTRS(entityManager, Vector3.Zero, Quaternion.Identity, instance.scale * creatureTemplate.Scale * Vector3.One);
         objectEntity.SetDirtyPosition(entityManager);
 

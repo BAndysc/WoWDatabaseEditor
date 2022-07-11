@@ -6,6 +6,7 @@ in vec2 TexCoord2;
 in vec4 WorldPos;
 in vec4 SplatId;
 in vec3 Normal;
+flat in int instanceID;
 layout (location = 0) out vec4 FragColor;
 layout (location = 1) out uint ObjectIndexOutputBuffer;
 
@@ -17,6 +18,7 @@ uniform int shader_id;
 uniform int unlit;
 uniform int brightAtNight;
 uniform int interior;
+uniform int translucent;
 
 /*uniform bool use_vertex_color;
 uniform bool unlit;
@@ -38,13 +40,19 @@ vec3 max3(vec3 a, vec3 b)
 }
 
 void main()
-{   
+{
+    PIXEL_SETUP_INSTANCING(instanceID);
+    
     vec4 tex = texture(texture1, TexCoord.xy);
     vec4 tex_2 = texture(texture2, TexCoord.xy);
 
     if (tex.a < alphaTest) 
         discard;
 
+    float makeTranslucent = mix(float(1), float(int((gl_FragCoord.x + gl_FragCoord.y)) % 2), float(translucent));
+    if (makeTranslucent < 0.5)
+        discard;
+    
     //FragColor = vec4(tex.rgb * (diffuse + ambient), mix(1, tex.a, (sign(alphaTest) + 1) / 2));
     
     vec3 diffuse;
@@ -76,7 +84,7 @@ void main()
     finalColor = mix(finalColor, diffuse, or(brightAtNight, unlit));
    
     FragColor = vec4(finalColor, 1);
-    ObjectIndexOutputBuffer = uint(0);
+    ObjectIndexOutputBuffer = objectIndex;
   
     //FragColor = vec4(mix(FragColor.rgb, vec3(1, 0, 0), notSupported), FragColor.a);
 }
