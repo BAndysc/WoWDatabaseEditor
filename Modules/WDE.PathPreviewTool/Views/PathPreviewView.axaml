@@ -14,8 +14,10 @@
     </UserControl.Styles>
     <Panel>
         <worldMap:WoWMapViewer MapViewModel="{CompiledBinding   }"
+                               TopLeftVirtual="{CompiledBinding TopLeft, Mode=OneWayToSource}"
+                               BottomRightVirtual="{CompiledBinding BottomRight, Mode=OneWayToSource}"
                                MapsPath="{CompiledBinding MapData.Path}"
-                               Map="{CompiledBinding SelectedMapPath}">
+                               Map="{CompiledBinding SelectedMap.Directory, FallbackValue=''}">
             <views:MiniMapPathRenderer Context2="{CompiledBinding .}"/>
         </worldMap:WoWMapViewer>
         <Border IsVisible="{CompiledBinding IsDownloadingMapData}" Width="300" Height="160" Padding="10" BorderThickness="1" BorderBrush="{DynamicResource ContentBorderBrush}" CornerRadius="4" Background="{DynamicResource ContentBackground}">

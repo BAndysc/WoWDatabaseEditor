@@ -13,7 +13,7 @@ public class PathPreviewWizardProvider : IWizardProvider
 {
     private readonly Func<PathPreviewViewModel> creator;
     public string Name => "Path preview tool";
-    public ImageUri Image { get; set; }
+    public ImageUri Image => new ImageUri("Icons/document_minimap_big.png");
     public bool IsCompatibleWithCore(ICoreVersion core) => true;
 
     public PathPreviewWizardProvider(Func<PathPreviewViewModel> creator)

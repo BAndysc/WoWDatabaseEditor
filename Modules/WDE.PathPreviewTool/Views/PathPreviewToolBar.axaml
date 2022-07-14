@@ -8,7 +8,17 @@
              IsEnabled="{CompiledBinding IsDownloadingMapData, Converter={x:Static BoolConverters.Not}}"
              x:Class="WDE.PathPreviewTool.Views.PathPreviewToolBar">
     <ToolbarPanel>
-        <ComboBox Items="{CompiledBinding MapData.Maps}" SelectedItem="{CompiledBinding SelectedMapPath}"></ComboBox>
-        <Button>Fetch paths</Button>
+        <ComboBox Items="{CompiledBinding MapData.Maps}" SelectedItem="{CompiledBinding SelectedMap}">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <DockPanel>
+                        <TextBlock Text="{CompiledBinding Id}" Width="50" FontWeight="Bold" />
+                        <TextBlock Text="{CompiledBinding Name}" />
+                    </DockPanel>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+        <CheckBox IsChecked="{CompiledBinding AutoFetch}">Auto refresh paths</CheckBox>
+        <ButtonImage Image="Icons/icon_down.png" Text="Fetch paths" Command="{CompiledBinding FetchPaths}" />
     </ToolbarPanel>
 </UserControl>

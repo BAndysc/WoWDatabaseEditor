@@ -7,10 +7,13 @@ using System.IO.Compression;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using Prism.Events;
+using WDE.Common.DBC;
 using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Tasks;
 using WDE.Module.Attributes;
+using WDE.WorldMap.ViewModels;
 
 namespace WDE.WorldMap.Services
 {
@@ -25,7 +28,8 @@ namespace WDE.WorldMap.Services
         private readonly IFileSystem fileSystem;
         private readonly Lazy<IMapDataDownloadService> mapDataDownloadService;
         private string? path;
-        private IEnumerable<string> maps = Enumerable.Empty<string>();
+        private IEnumerable<string> miniMaps = Enumerable.Empty<string>();
+        private IReadOnlyList<MapViewModel> maps = Array.Empty<MapViewModel>();
         public event PropertyChangedEventHandler? PropertyChanged;
 
         public string? Path
@@ -38,7 +42,7 @@ namespace WDE.WorldMap.Services
             }
         }
 
-        public IEnumerable<string> Maps
+        public IReadOnlyList<MapViewModel> Maps
         {
             get => maps;
             internal set
@@ -48,9 +52,21 @@ namespace WDE.WorldMap.Services
             }
         }
 
+        public IEnumerable<string> MiniMaps
+        {
+            get => miniMaps;
+            internal set
+            {
+                miniMaps = value;
+                OnPropertyChanged();
+            }
+        }
+
         public MapDataProvider(IUserSettings userSettings,
             IMessageBoxService messageBoxService,
             IFileSystem fileSystem,
+            IDbcStore dbcStore,
+            IEventAggregator eventAggregator,
             Lazy<IMapDataDownloadService> mapDataDownloadService)
         {
             this.userSettings = userSettings;
@@ -59,6 +75,13 @@ namespace WDE.WorldMap.Services
             this.mapDataDownloadService = mapDataDownloadService;
             Path = userSettings.Get<WorldMapSettings>().Path;
             UpdateMaps();
+            OnDbcLoaded(dbcStore);
+            eventAggregator.GetEvent<DbcLoadedEvent>().Subscribe(OnDbcLoaded);
+        }
+
+        private void OnDbcLoaded(IDbcStore dbcStore)
+        {
+            Maps = dbcStore.MapDirectoryStore.Select(pair => new MapViewModel((int)pair.Key, dbcStore.MapStore[(int)pair.Key], pair.Value)).ToList();
         }
 
         private void UpdateMaps()
@@ -66,7 +89,7 @@ namespace WDE.WorldMap.Services
             if (!VerifyPath(Path))
                 return;
 
-            Maps = Directory.GetDirectories(System.IO.Path.Join(Path, "x1")).Select(d => System.IO.Path.GetFileName(d)!)
+            MiniMaps = Directory.GetDirectories(System.IO.Path.Join(Path, "x1")).Select(d => System.IO.Path.GetFileName(d)!)
                 .ToList();
         }
 
@@ -145,7 +168,8 @@ namespace WDE.WorldMap.Services
     public interface IMapDataProvider : INotifyPropertyChanged
     {
         string? Path { get; }
-        IEnumerable<string> Maps { get; }
+        IReadOnlyList<MapViewModel> Maps { get; }
+        IEnumerable<string> MiniMaps { get; }
         Task LoadMaps(Progress<(long, long?)>? progress);
     }
 }
