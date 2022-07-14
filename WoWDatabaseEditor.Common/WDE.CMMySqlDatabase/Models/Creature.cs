@@ -27,6 +27,12 @@ namespace WDE.CMMySqlDatabase.Models
         [Column(Name = "equipment_id")]
         public int EquipmentId { get; set; }
 
+        [Column(Name = "MovementType")]
+        public MovementType MovementType { get; set; }
+        
+        [Column(Name = "spawndist")]
+        public float WanderDistance { get; set; }
+
         [Column(Name = "position_x")]
         public float X { get; set; }
 

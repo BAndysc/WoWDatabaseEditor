@@ -10,6 +10,8 @@ namespace WDE.Common.Database
         int? PhaseId { get; }
         int? PhaseGroup { get; }
         int EquipmentId { get; }
+        MovementType MovementType { get; }
+        float WanderDistance { get; }
         
         float X { get; }
         float Y { get; }
@@ -17,6 +19,15 @@ namespace WDE.Common.Database
         float O { get; }
         
         uint SpawnKey => 0;
+    }
+
+    public enum MovementType
+    {
+        Idle = 0,
+        Random = 1,
+        Waypoint = 2,
+        SplinePath = 3, // cmangos
+        LinearPath = 4 // cmangos
     }
 
     public interface IBaseCreatureAddon
