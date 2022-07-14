@@ -1,0 +1,28 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:WDE.PathPreviewTool.ViewModels"
+             xmlns:worldMap="clr-namespace:WDE.WorldMap;assembly=WDE.WorldMap"
+             xmlns:views="clr-namespace:WDE.PathPreviewTool.Views"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:PathPreviewViewModel"
+             IsEnabled="{CompiledBinding IsDownloadingMapData, Converter={x:Static BoolConverters.Not}}"
+             x:Class="WDE.PathPreviewTool.Views.PathPreviewView">
+    <UserControl.Styles>
+        <StyleInclude Source="avares://WDE.WorldMap/WoWMapViewer.axaml" />
+    </UserControl.Styles>
+    <Panel>
+        <worldMap:WoWMapViewer MapViewModel="{CompiledBinding   }"
+                               MapsPath="{CompiledBinding MapData.Path}"
+                               Map="{CompiledBinding SelectedMapPath}">
+            <views:MiniMapPathRenderer Context2="{CompiledBinding .}"/>
+        </worldMap:WoWMapViewer>
+        <Border IsVisible="{CompiledBinding IsDownloadingMapData}" Width="300" Height="160" Padding="10" BorderThickness="1" BorderBrush="{DynamicResource ContentBorderBrush}" CornerRadius="4" Background="{DynamicResource ContentBackground}">
+            <Grid RowDefinitions="*,Auto,5,Auto,*">
+                <TextBlock Grid.Row="1" FontSize="16">Map data downloading</TextBlock>
+                <ProgressBar Value="{CompiledBinding DownloadMapProgress}" Grid.Row="3"></ProgressBar>
+            </Grid>
+        </Border>
+    </Panel>
+</UserControl>

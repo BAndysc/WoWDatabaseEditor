@@ -20,6 +20,7 @@
     <ItemGroup>
       <ProjectReference Include="..\AvaloniaStyles\AvaloniaStyles.csproj" />
       <ProjectReference Include="..\Modules\WDE.EventScriptsEditor\WDE.EventScriptsEditor.csproj" />
+      <ProjectReference Include="..\Modules\WDE.PathPreviewTool\WDE.PathPreviewTool.csproj" />
       <ProjectReference Include="..\Rendering\WDE.MapSpawns\WDE.MapSpawns.csproj" />
       <ProjectReference Include="..\WDE.AzerothCore\WDE.AzerothCore.csproj" />
       <ProjectReference Include="..\WDE.CMaNGOS\WDE.CMaNGOS.csproj" />

@@ -31,6 +31,7 @@ using WDE.WoWHeadConnector;
 using WDE.AnniversaryInfo;
 using WDE.EventScriptsEditor;
 using WDE.MapSpawns;
+using WDE.PathPreviewTool;
 
 namespace LoaderAvalonia
 {
@@ -72,7 +73,8 @@ namespace LoaderAvalonia
                 typeof(CMMySqlDatabaseModule),
                 typeof(AnniversaryModule),
                 typeof(EventScriptsModule),
-                typeof(MapSpawnsModule)
+                typeof(MapSpawnsModule),
+                typeof(PathPreviewToolModule)
             };
             WoWDatabaseEditorCore.Avalonia.Program.PreloadedModules = modules;
             WoWDatabaseEditorCore.Avalonia.Program.Main(args);

@@ -211,6 +211,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Rendering", "Rendering", "{
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.MapSpawns", "Rendering\WDE.MapSpawns\WDE.MapSpawns.csproj", "{182B1741-C79E-4FAD-8D92-CFD19C823997}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.PathPreviewTool", "Modules\WDE.PathPreviewTool\WDE.PathPreviewTool.csproj", "{169A63F8-EC84-4973-A42C-8A4645097E40}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -581,6 +583,10 @@ Global
 		{182B1741-C79E-4FAD-8D92-CFD19C823997}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{182B1741-C79E-4FAD-8D92-CFD19C823997}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{182B1741-C79E-4FAD-8D92-CFD19C823997}.Release|Any CPU.Build.0 = Release|Any CPU
+		{169A63F8-EC84-4973-A42C-8A4645097E40}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{169A63F8-EC84-4973-A42C-8A4645097E40}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{169A63F8-EC84-4973-A42C-8A4645097E40}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{169A63F8-EC84-4973-A42C-8A4645097E40}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -661,6 +667,7 @@ Global
 		{CCD7E775-0ED3-498D-A958-CEB993F42BDE} = {46568AE8-448D-49BC-8E33-E549CCD8124F}
 		{B8A8B30B-93C1-4CCD-85D3-3178F3536AEB} = {46568AE8-448D-49BC-8E33-E549CCD8124F}
 		{182B1741-C79E-4FAD-8D92-CFD19C823997} = {46568AE8-448D-49BC-8E33-E549CCD8124F}
+		{169A63F8-EC84-4973-A42C-8A4645097E40} = {106EEB05-E9AB-453A-ADD0-96505F405D76}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3E63D4A5-8159-4344-B556-1E1D8D63DA99}
