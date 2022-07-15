@@ -8,7 +8,9 @@ using WDE.Common.Managers;
 using WDE.Common.Modules;
 using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
+using WDE.Common.Services.QueryParser.Models;
 using WDE.Common.Tasks;
+using WDE.Common.Utils;
 using WDE.MapRenderer;
 using WDE.MapRenderer.Managers;
 using WDE.MapSpawns;
@@ -16,6 +18,7 @@ using WDE.MapSpawns.Rendering;
 using WDE.Module;
 using WDE.MpqReader.DBC;
 using WDE.MpqReader.Structures;
+using WDE.SqlInterpreter;
 
 namespace RenderingTester;
 
@@ -213,8 +216,11 @@ public class ScopedContainer : BaseScopedContainer
     public override IScopedContainer CreateScope()
     {
         var childContainer = unity.CreateChildContainer();
+        var lt = new DefaultLifetime();
+        childContainer.AddExtension(lt);
+        lt.TypeDefaultLifetime = new ContainerControlledLifetimeManager();
         var extensions = new UnityContainerExtension(childContainer);
-        var scope = new ScopedContainer(extensions, childContainer);
+        var scope = new ScopedContainer(extensions, new UnityContainerRegistry(childContainer), childContainer);
         extensions.RegisterInstance<IScopedContainer>(scope);
         extensions.RegisterInstance<IContainerExtension>(scope);
         extensions.RegisterInstance<IContainerProvider>(scope);
@@ -222,14 +228,23 @@ public class ScopedContainer : BaseScopedContainer
         return scope;
     }
 
-    public ScopedContainer(IContainerExtension containerExtension, IUnityContainer impl) : base(containerExtension, impl)
+    public ScopedContainer(IContainerProvider provider, IContainerRegistry registry, IUnityContainer impl) : base(provider, registry, impl)
     {
     }
 }
 
+public class DummyQueryEvaluator : IQueryEvaluator
+{
+    public IEnumerable<InsertQuery> ExtractInserts(string query) => Enumerable.Empty<InsertQuery>();
+
+    public IEnumerable<UpdateQuery> ExtractUpdates(string query) => Enumerable.Empty<UpdateQuery>();
+
+    public IReadOnlyList<IBaseQuery> Extract(string query) => Array.Empty<IBaseQuery>();
+}
+
 public class DummyTableEditorPickerService : ITableEditorPickerService
 {
-    public async Task<long?> PickByColumn(string table, DatabaseKey? key, string column, long? initialValue, string? backupColumn = null)
+    public async Task<long?> PickByColumn(string table, DatabaseKey? key, string column, long? initialValue, string? backupColumn = null, string? customWhere = null)
     {
         Console.WriteLine("Objects editing not supported in standalone window");
         return null;

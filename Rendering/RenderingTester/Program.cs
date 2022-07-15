@@ -3,6 +3,7 @@ using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using Prism.Events;
 using Prism.Ioc;
+using Prism.Modularity;
 using RenderingTester;
 using TheEngine;
 using TheMaths;
@@ -24,8 +25,10 @@ using WDE.MapSpawns;
 using WDE.Module;
 using WDE.MPQ;
 using WDE.Parameters;
+using WDE.SqlInterpreter;
 using WDE.Trinity;
 using WDE.TrinityMySqlDatabase;
+using WoWDatabaseEditorCore;
 
 var nativeWindowSettings = new NativeWindowSettings()
 {
@@ -37,7 +40,7 @@ var nativeWindowSettings = new NativeWindowSettings()
 
 var container = new UnityContainer();
 container.AddExtension(new Diagnostic());
-var scopedContainer = new ScopedContainer(new UnityContainerExtension(container), container);
+var scopedContainer = new ScopedContainer(new UnityContainerExtension(container), new UnityContainerRegistry(container), container);
 var registry = new UnityContainerRegistry(container);
 var provider = new UnityContainerProvider(container);
 
@@ -51,19 +54,29 @@ registry.Register<IGameProperties, DummyGameProperties>();
 registry.Register<IMessageBoxService, DummyMessageBox>();
 registry.Register<IDatabaseClientFileOpener, DatabaseClientFileOpener>();
 registry.Register<ITableEditorPickerService, DummyTableEditorPickerService>();
+registry.Register<IQueryEvaluator, DummyQueryEvaluator>();
 var context = new SingleThreadSynchronizationContext(Thread.CurrentThread.ManagedThreadId);
 var mainThread = new MainThread(context);
 registry.RegisterInstance<IMainThread>(mainThread);
 registry.RegisterInstance<IEventAggregator>(new EventAggregator());
-new DbcStoreModule().RegisterTypes(registry);
-new MpqModule().RegisterTypes(registry);
-new WoWDatabaseEditorCore.MainModule().RegisterTypes(registry);
-new TrinityMySqlDatabaseModule().RegisterTypes(registry);
-new ParametersModule().RegisterTypes(registry);
-new TrinityModule().RegisterTypes(registry);
-new AzerothModule().RegisterTypes(registry);
-new MapSpawnsModule().RegisterTypes(registry);
 
+SetupModules(new DbcStoreModule(),
+    new MpqModule(),
+    new WoWDatabaseEditorCore.MainModule(),
+    new TrinityMySqlDatabaseModule(),
+    new ParametersModule(),
+    new TrinityModule(),
+    new AzerothModule(),
+    new MapSpawnsModule());
+
+void SetupModules(params ModuleBase[] modules)
+{
+    foreach (var module in modules)
+    {
+        module.InitializeCore("unspecified");
+        module.RegisterTypes(registry);
+    }
+}
 
 SynchronizationContext.SetSynchronizationContext(context);
 
