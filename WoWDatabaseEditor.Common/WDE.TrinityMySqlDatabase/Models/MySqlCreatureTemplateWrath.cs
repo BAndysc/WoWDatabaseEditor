@@ -31,10 +31,10 @@ namespace WDE.TrinityMySqlDatabase.Models
         public uint GossipMenuId { get; set; }
 
         [Column(Name = "minlevel")]
-        public byte MinLevel { get; set; }
+        public short MinLevel { get; set; }
         
         [Column(Name = "maxlevel")]
-        public byte MaxLevel { get; set; }
+        public short MaxLevel { get; set; }
 
         [Column(Name = "name")] 
         public string Name { get; set; } = "";
@@ -87,10 +87,10 @@ namespace WDE.TrinityMySqlDatabase.Models
         public uint GossipMenuId { get; set; }
 
         [Column(Name = "minlevel")]
-        public byte MinLevel { get; set; }
+        public short MinLevel { get; set; }
         
         [Column(Name = "maxlevel")]
-        public byte MaxLevel { get; set; }
+        public short MaxLevel { get; set; }
 
         [Column(Name = "name")] 
         public string Name { get; set; } = "";

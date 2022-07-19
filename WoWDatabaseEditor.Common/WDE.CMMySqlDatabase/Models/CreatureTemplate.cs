@@ -15,8 +15,8 @@ namespace WDE.CMMySqlDatabase.Models
         [Column("Name"                  , CanBeNull    = false)] public string  Name                   { get; set; } = null!; // char(100)
         [Column("SubName"                                     )] public string? SubName                { get; set; } // char(100)
         [Column("IconName"                                    )] public string? IconName               { get; set; } // char(100)
-        [Column("MinLevel"                                    )] public byte    MinLevel               { get; set; } // tinyint(3) unsigned
-        [Column("MaxLevel"                                    )] public byte    MaxLevel               { get; set; } // tinyint(3) unsigned
+        [Column("MinLevel"                                    )] public short   MinLevel               { get; set; } // tinyint(3) unsigned
+        [Column("MaxLevel"                                    )] public short   MaxLevel               { get; set; } // tinyint(3) unsigned
         [Column("DifficultyEntry1"                            )] public uint    DifficultyEntry1       { get; set; } // mediumint(8) unsigned
         [Column("DifficultyEntry2"                            )] public uint    DifficultyEntry2       { get; set; } // mediumint(8) unsigned
         [Column("DifficultyEntry3"                            )] public uint    DifficultyEntry3       { get; set; } // mediumint(8) unsigned

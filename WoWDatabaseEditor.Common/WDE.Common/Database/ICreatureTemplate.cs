@@ -7,8 +7,8 @@ namespace WDE.Common.Database
         uint Entry { get; }
         float Scale { get; }
         uint GossipMenuId { get; }
-        byte MinLevel { get; }
-        byte MaxLevel { get; }
+        short MinLevel { get; }
+        short MaxLevel { get; }
         string Name { get; }
         string AIName { get; }
         string ScriptName { get; }
