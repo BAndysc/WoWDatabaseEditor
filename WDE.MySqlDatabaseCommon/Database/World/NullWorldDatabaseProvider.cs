@@ -102,7 +102,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
        
         public Task<IList<ISmartScriptLine>> FindSmartScriptLinesBy(IEnumerable<(IDatabaseProvider.SmartLinePropertyType what, int whatValue, int parameterIndex, long valueToSearch)> conditions) => Task.FromResult<IList<ISmartScriptLine>>(new List<ISmartScriptLine>());
 
-        public Task<List<ICreatureTemplate>> GetCreatureTemplatesAsync() => Task.FromResult(new List<ICreatureTemplate>());
+        public Task<IReadOnlyList<ICreatureTemplate>> GetCreatureTemplatesAsync() => Task.FromResult<IReadOnlyList<ICreatureTemplate>>(new List<ICreatureTemplate>());
 
         public Task<IList<ICreature>> GetCreaturesAsync() => Task.FromResult<IList<ICreature>>(new List<ICreature>());
 

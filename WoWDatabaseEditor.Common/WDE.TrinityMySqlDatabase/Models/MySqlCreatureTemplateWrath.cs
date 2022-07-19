@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using LinqToDB.Mapping;
 using WDE.Common.Database;
 
@@ -109,10 +111,47 @@ namespace WDE.TrinityMySqlDatabase.Models
 
         public uint? EquipmentTemplateId => null;
 
-        public int ModelsCount => 0;
+        private IReadOnlyList<CreatureTemplateModel>? models;
+        
+        public int ModelsCount => models?.Count ?? 0;
+        
         public uint GetModel(int index)
         {
-            throw new Exception("Model out of range");
+            if (models == null)
+                return 0;
+            return models.FirstOrDefault(x => x.Index == index)?.CreatureDisplayId ?? 0;
         }
+
+        public ICreatureTemplate? WithModels(IReadOnlyList<CreatureTemplateModel> models)
+        {
+            this.models = models;
+            return this;
+        }
+    }
+
+    [Table(Name = "creature_template_model")]
+    public class CreatureTemplateModel
+    {
+        [PrimaryKey]
+        [Identity]
+        [Column(Name = "CreatureID")]
+        public uint CreatureId { get; set; }
+
+        [PrimaryKey]
+        [Identity]
+        [Column(Name = "Idx")]
+        public uint Index { get; set; }
+        
+        [Column(Name = "CreatureDisplayID")]
+        public uint CreatureDisplayId { get; set; }
+        
+        [Column(Name = "DisplayScale")]
+        public float DisplayScale { get; set; }
+        
+        [Column(Name = "Probability")]
+        public float Probability { get; set; }
+        
+        [Column(Name = "VerifiedBuild")]
+        public int VerifiedBuild { get; set; }
     }
 }

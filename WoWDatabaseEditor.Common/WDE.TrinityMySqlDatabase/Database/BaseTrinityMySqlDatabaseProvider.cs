@@ -100,7 +100,7 @@ namespace WDE.TrinityMySqlDatabase.Database
             return (from t in model.ConversationTemplate orderby t.Id select t).ToList<IConversationTemplate>();
         }
 
-        public abstract Task<List<ICreatureTemplate>> GetCreatureTemplatesAsync();
+        public abstract Task<IReadOnlyList<ICreatureTemplate>> GetCreatureTemplatesAsync();
         public abstract Task<IList<ICreature>> GetCreaturesAsync();
 
         public async Task<List<IConversationTemplate>> GetConversationTemplatesAsync()

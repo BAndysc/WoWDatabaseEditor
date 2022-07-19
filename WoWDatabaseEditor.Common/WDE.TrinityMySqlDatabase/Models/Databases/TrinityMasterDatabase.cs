@@ -6,6 +6,7 @@ namespace WDE.TrinityMySqlDatabase.Models;
 public class TrinityMasterDatabase : BaseTrinityDatabase
 {
     public ITable<MySqlCreatureTemplateMaster> CreatureTemplate => GetTable<MySqlCreatureTemplateMaster>();
+    public ITable<CreatureTemplateModel> CreatureTemplateModel => GetTable<CreatureTemplateModel>();
     public ITable<MySqlCreatureMaster> Creature => GetTable<MySqlCreatureMaster>();
     public ITable<MySqlBroadcastText> BroadcastTexts => GetTable<MySqlBroadcastText>();
     public ITable<TrinityString> Strings => GetTable<TrinityString>();

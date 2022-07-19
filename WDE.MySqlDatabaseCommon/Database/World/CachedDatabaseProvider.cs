@@ -17,7 +17,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 {
     public class CachedDatabaseProvider : IDatabaseProvider
     {
-        private List<ICreatureTemplate>? creatureTemplateCache;
+        private IReadOnlyList<ICreatureTemplate>? creatureTemplateCache;
         private Dictionary<uint, ICreatureTemplate> creatureTemplateByEntry = new();
         
         private List<IGameObjectTemplate>? gameObjectTemplateCache;

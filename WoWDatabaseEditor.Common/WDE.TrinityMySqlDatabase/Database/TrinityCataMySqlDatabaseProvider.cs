@@ -29,7 +29,7 @@ public class TrinityCataMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvider
         return model.CreatureTemplate.OrderBy(t => t.Entry).ToList<ICreatureTemplate>();
     }
     
-    public override async Task<List<ICreatureTemplate>> GetCreatureTemplatesAsync()
+    public override async Task<IReadOnlyList<ICreatureTemplate>> GetCreatureTemplatesAsync()
     {
         await using var model = Database();
         return await model.CreatureTemplate.OrderBy(t => t.Entry).ToListAsync<ICreatureTemplate>();

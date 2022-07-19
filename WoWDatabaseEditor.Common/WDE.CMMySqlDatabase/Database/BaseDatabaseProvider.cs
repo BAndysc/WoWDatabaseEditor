@@ -81,7 +81,7 @@ namespace WDE.CMMySqlDatabase.Database
             return new List<IConversationTemplate>();
         }
 
-        public abstract Task<List<ICreatureTemplate>> GetCreatureTemplatesAsync();
+        public abstract Task<IReadOnlyList<ICreatureTemplate>> GetCreatureTemplatesAsync();
         public abstract Task<IList<ICreature>> GetCreaturesAsync();
 
         public async Task<List<IConversationTemplate>> GetConversationTemplatesAsync()
