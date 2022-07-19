@@ -568,6 +568,7 @@ namespace WDE.DbcStore
                         Load("ItemSparse.db2", 0, 2, ItemStore);
                         Load("Languages.db2", 1, 0, LanguageStore);
                         Load("Map.db2", 0, 1, MapDirectoryStore);
+                        Load("Map.db2", 0, 2, MapStore);
                         Load("Faction.db2", 6, 4, FactionStore);
                         Load("FactionTemplate.db2", 0, 1, FactionTemplateStore);
                         // Load("Phase.db2", 1, 0, PhaseStore); // no names in legion :(
