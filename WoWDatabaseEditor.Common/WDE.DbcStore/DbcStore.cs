@@ -601,7 +601,8 @@ namespace WDE.DbcStore
                         Load("EmotesText.db2", "Name", TextEmoteStore);
                         Load("ItemSparse.db2", "Display_lang", ItemStore);
                         Load("Languages.db2", "Name_lang", LanguageStore);
-                        Load("Map.db2", "MapName_lang", MapDirectoryStore);
+                        Load("Map.db2", "Directory", MapDirectoryStore);
+                        Load("Map.db2", "MapName_lang", MapStore);
                         Load("Faction.db2", "Name_lang", FactionStore);
                         Load("FactionTemplate.db2", "Faction", FactionTemplateStore);
                         Load("SceneScriptPackage.db2", "Name", SceneStore);
