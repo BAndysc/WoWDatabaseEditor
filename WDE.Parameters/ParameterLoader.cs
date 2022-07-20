@@ -17,6 +17,7 @@ using WDE.Parameters.Models;
 using WDE.Parameters.Parameters;
 using WDE.Parameters.Providers;
 using WDE.Parameters.QuickAccess;
+using WDE.Parameters.ViewModels;
 
 namespace WDE.Parameters
 {
@@ -106,8 +107,8 @@ namespace WDE.Parameters
             factory.Register("PercentageParameter", new PercentageParameter());
             factory.Register("MoneyParameter", new MoneyParameter());
             factory.Register("MinuteIntervalParameter", new MinuteIntervalParameter());
-            factory.Register("UnixTimestampParameter", new UnixTimestampParameter(0));
-            factory.Register("UnixTimestampSince2000Parameter", new UnixTimestampParameter(946681200));
+            factory.Register("UnixTimestampParameter", new UnixTimestampParameter(0, windowManager));
+            factory.Register("UnixTimestampSince2000Parameter", new UnixTimestampParameter(946684800, windowManager));
             factory.Register("GameobjectBytes1Parameter", new GameObjectBytes1Parameter());
             factory.RegisterCombined("UnitBytes0Parameter", "RaceParameter",  "ClassParameter","GenderParameter", "PowerParameter", 
                 (race, @class, gender, power) => new UnitBytesParameter(race, @class, gender, power));
@@ -190,8 +191,8 @@ namespace WDE.Parameters
             for (int i = 0; i < parts.Length; i++)
             {
                 var part = parts[i];
-                if (!long.TryParse(part[..^1], out var num) &&
-                    !long.TryParse(part[..^4], out num))
+                if (!(part.Length > 1 && long.TryParse(part[..^1], out var num)) &&
+                    !(part.Length > 3 && long.TryParse(part[..^3], out num)))
                     return null;
                 if (part.EndsWith("y"))
                     minutes += num * 525600;
@@ -274,18 +275,37 @@ namespace WDE.Parameters
         }
     }
 
-    public class UnixTimestampParameter : Parameter
+    public class UnixTimestampParameter : Parameter, ICustomPickerParameter<long>
     {
         private readonly long startOffset;
+        private readonly Lazy<IWindowManager> windowManager;
 
-        public UnixTimestampParameter(long startOffset)
+        public UnixTimestampParameter(long startOffset, Lazy<IWindowManager> windowManager)
         {
             this.startOffset = startOffset;
+            this.windowManager = windowManager;
         }
+
+        public override bool HasItems => true;
+
+        private DateTimeOffset AsDateTime(long val) => DateTimeOffset.UnixEpoch.AddSeconds(startOffset + val);
         
         public override string ToString(long key)
         {
-            return DateTime.UnixEpoch.AddSeconds(startOffset + key).ToString("yyyy-MM-dd HH:mm:ss");
+            return AsDateTime(key).ToString("yyyy-MM-dd HH:mm:ss");
+        }
+
+        public async Task<(long, bool)> PickValue(long value)
+        {
+            var dialog = new UnixTimestampEditorViewModel();
+            dialog.DateTime = AsDateTime(value).UtcDateTime;
+            dialog.MinDate = dialog.MinDate.AddSeconds(startOffset);
+            dialog.MaxDate = dialog.MaxDate.AddSeconds(-startOffset);
+
+            if (!await windowManager.Value.ShowDialog(dialog))
+                return (0, false);
+
+            return (((DateTimeOffset)dialog.DateTime).ToUnixTimeSeconds() - startOffset, true);
         }
     }
 

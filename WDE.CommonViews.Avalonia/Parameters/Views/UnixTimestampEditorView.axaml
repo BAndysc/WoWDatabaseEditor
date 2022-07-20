@@ -1,0 +1,29 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:WDE.Parameters.ViewModels;assembly=WDE.Parameters"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:UnixTimestampEditorViewModel"
+             x:Class="WDE.CommonViews.Avalonia.Parameters.Views.UnixTimestampEditorView">
+    <Grid RowDefinitions="Auto,5,Auto,Auto,Auto,5,Auto,*,Auto" ColumnDefinitions="Auto,5,*">
+        <TextBlock FontWeight="Bold" Grid.Row="0" Grid.ColumnSpan="3">Unix timestamp:</TextBlock>
+        <TextBox Grid.Row="2" Grid.ColumnSpan="3" Text="{CompiledBinding UnixSeconds}"/>
+        <TextBlock Foreground="Red" Text="{CompiledBinding Error}" Grid.ColumnSpan="3" Grid.Row="3" Margin="0,4,0,0" />
+
+        <TextBlock FontWeight="Bold" Grid.Row="4" Grid.Column="0">Date:</TextBlock>
+        <TextBlock FontWeight="Bold" Grid.Row="4" Grid.Column="2">Time:</TextBlock>
+        <CalendarDatePicker Grid.Column="0" Grid.Row="6" SelectedDateFormat="Long" SelectedDate="{CompiledBinding DateTime, Mode=TwoWay}"/>
+        <TimePicker Grid.Column="2" Grid.Row="6" SelectedTime="{CompiledBinding Time}"/>
+        
+        <Grid Grid.Row="8" Grid.ColumnSpan="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="80" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="80" />
+            </Grid.ColumnDefinitions>
+            <Button Content="Cancel" Command="{CompiledBinding Cancel}"  />
+            <Button Command="{CompiledBinding Accept}" Grid.Column="2" Content="Accept" />
+        </Grid>
+    </Grid>
+</UserControl>
