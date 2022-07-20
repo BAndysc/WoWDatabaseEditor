@@ -5,25 +5,33 @@
              xmlns:components="clr-namespace:WDE.Common.Avalonia.Components;assembly=WDE.Common.Avalonia"
              xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
              xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia"
+             xmlns:template="clr-namespace:WDE.DatabaseEditors.ViewModels.Template;assembly=WDE.DatabaseEditors"
+             xmlns:viewModels="clr-namespace:WDE.DatabaseEditors.ViewModels;assembly=WDE.DatabaseEditors"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="template:TemplateDbTableEditorViewModel"
              IsEnabled="{Binding TaskInProgress, Converter={x:Static converters:InverseBoolConverter.Instance}}"
              x:Class="WDE.DatabaseEditors.Avalonia.Views.Template.TemplateDbTableEditorToolBar">
     <controls:ToolbarPanel>
-        <components:ButtonImage Command="{Binding AddNewCommand, Mode=OneTime}" Text="Add new" Image="Icons/icon_add.png" />
-        <ItemsPresenter Items="{Binding Commands}">
+        <components:ButtonImage Command="{CompiledBinding AddNewCommand, Mode=OneTime}" Text="Add new" Image="Icons/icon_add.png" />
+        <ItemsPresenter Items="{CompiledBinding Commands}">
             <ItemsPresenter.ItemsPanel>
                 <ItemsPanelTemplate>
                     <controls:ToolbarPanel />
                 </ItemsPanelTemplate>
             </ItemsPresenter.ItemsPanel>
             <ItemsPresenter.ItemTemplate>
-                <DataTemplate>
-                    <Button Command="{Binding Command}"
-                            ToolTip.Tip="{Binding Name}">
-                        <components:WdeImage Image="{Binding Icon}" />
+                <DataTemplate x:DataType="viewModels:TableCommandViewModel">
+                    <Button Command="{CompiledBinding Command}"
+                            ToolTip.Tip="{CompiledBinding Name}">
+                        <components:WdeImage Image="{CompiledBinding Icon}" />
                     </Button>
                 </DataTemplate>
             </ItemsPresenter.ItemTemplate>
         </ItemsPresenter>
+        <ToolbarSpacer />
+        <StackPanel DockPanel.Dock="Right" HorizontalAlignment="Right" Orientation="Horizontal">
+            <TextBlock VerticalAlignment="Center" Padding="0,0,15,0">Search: </TextBlock>
+            <TextBox MinHeight="24" Padding="0" Name="SearchTextBox" Width="200" HorizontalAlignment="Right" Text="{CompiledBinding SearchText, Mode=TwoWay}" />
+        </StackPanel>
     </controls:ToolbarPanel>
 </UserControl>
