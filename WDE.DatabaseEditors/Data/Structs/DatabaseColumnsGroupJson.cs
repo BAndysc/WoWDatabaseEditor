@@ -13,9 +13,6 @@ namespace WDE.DatabaseEditors.Data.Structs
         [JsonProperty(PropertyName = "show_if")]
         public ShowIfCondition? ShowIf { get; set; }
         
-        [JsonProperty(PropertyName = "group_sort_field")]
-        public string? GroupSortField { get; set; }
-
         [JsonProperty(PropertyName = "fields")]
         public IList<DatabaseColumnJson> Fields { get; set; } = null!;
 
