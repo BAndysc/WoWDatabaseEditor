@@ -122,11 +122,14 @@ namespace WDE.DbcStore
         {            
             parameterFactory.Register("RaceMaskParameter", new RaceMaskParameter(currentCoreVersion.Current.GameVersionFeatures.AllRaces), QuickAccessMode.Limited);
 
-            if (dbcSettingsProvider.GetSettings().SkipLoading)
+            if (dbcSettingsProvider.GetSettings().SkipLoading ||
+                !Directory.Exists(dbcSettingsProvider.GetSettings().Path))
+            {
+                // we create a new fake task, that will not be started, but finalized so that (empty) parameters are registered
+                var fakeTask = new DbcLoadTask(parameterFactory, dbcSettingsProvider, this);
+                fakeTask.FinishMainThread();
                 return;
-
-            if (!Directory.Exists(dbcSettingsProvider.GetSettings().Path))
-                return;
+            }
 
             IsConfigured = true;
             taskRunner.ScheduleTask(new DbcLoadTask(parameterFactory, dbcSettingsProvider, this));

@@ -33,6 +33,7 @@ namespace WoWDatabaseEditorCore.Services.LoadingEvents
                 pending.Publish(new T());
                 pendings.Remove(typeof(T));
             }
+            published.Add(typeof(T));
         }
     }
 }

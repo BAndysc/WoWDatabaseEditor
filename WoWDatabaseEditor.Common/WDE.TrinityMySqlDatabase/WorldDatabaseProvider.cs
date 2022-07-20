@@ -5,6 +5,7 @@ using WDE.Common.Database;
 using WDE.Common.Events;
 using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
+using WDE.Common.Tasks;
 using WDE.Module.Attributes;
 using WDE.MySqlDatabaseCommon.Database.World;
 using WDE.MySqlDatabaseCommon.Providers;
@@ -15,17 +16,23 @@ namespace WDE.TrinityMySqlDatabase
     [SingleInstance]
     public class WorldDatabaseProvider : WorldDatabaseDecorator
     {
+        private readonly ILoadingEventAggregator loadingEventAggregator;
+        private readonly IMainThread mainThread;
+
         public WorldDatabaseProvider(DatabaseResolver databaseResolver,
             NullWorldDatabaseProvider nullWorldDatabaseProvider,
             IWorldDatabaseSettingsProvider settingsProvider,
             IMessageBoxService messageBoxService,
             ILoadingEventAggregator loadingEventAggregator,
             IEventAggregator eventAggregator,
+            IMainThread mainThread,
             IContainerProvider containerProvider) : base(nullWorldDatabaseProvider)
         {
+            this.loadingEventAggregator = loadingEventAggregator;
+            this.mainThread = mainThread;
             if (settingsProvider.Settings.IsEmpty)
             {
-                eventAggregator.GetEvent<AllModulesLoaded>().Subscribe(loadingEventAggregator.Publish<DatabaseLoadedEvent>, true);
+                PublishLoadedEvent();
                 return;
             }
 
@@ -38,6 +45,7 @@ namespace WDE.TrinityMySqlDatabase
             catch (Exception e)
             {
                 impl = nullWorldDatabaseProvider;
+                PublishLoadedEvent();
                 messageBoxService.ShowDialog(new MessageBoxFactory<bool>().SetTitle("Database error")
                     .SetIcon(MessageBoxIcon.Error)
                     .SetMainInstruction("Couldn't connect to the database")
@@ -45,6 +53,11 @@ namespace WDE.TrinityMySqlDatabase
                     .WithOkButton(true)
                     .Build());
             }
+        }
+
+        private void PublishLoadedEvent()
+        {
+            mainThread.Dispatch(loadingEventAggregator.Publish<DatabaseLoadedEvent>);
         }
     }
 }
