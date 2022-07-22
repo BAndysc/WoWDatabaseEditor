@@ -20,11 +20,11 @@ build_script:
     
     dotnet --list-sdks
     
-    dotnet publish -c Release --self-contained false -f net6.0 -o bin/wowdatabaseeditor-avalonia-win/ LoaderAvalonia/LoaderAvalonia.csproj -r win8-x64 -p:PublishSingleFile=true -p:PublishTrimmed=false -p:DebugType=none
+    dotnet publish -c Debug --self-contained false -f net6.0 -o bin/wowdatabaseeditor-avalonia-win/ LoaderAvalonia/LoaderAvalonia.csproj -r win8-x64 -p:PublishSingleFile=true -p:PublishTrimmed=false -p:DebugType=none
 
-    dotnet publish -c Release --self-contained false -f net6.0 -o bin/wowdatabaseeditor-avalonia-mac/ LoaderAvalonia/LoaderAvalonia.csproj -r osx-x64
+    dotnet publish -c Debug --self-contained false -f net6.0 -o bin/wowdatabaseeditor-avalonia-mac/ LoaderAvalonia/LoaderAvalonia.csproj -r osx-x64
 
-    dotnet publish -c Release --self-contained false -f net6.0 -o bin/wowdatabaseeditor-avalonia-linux/ LoaderAvalonia/LoaderAvalonia.csproj -r linux-x64
+    dotnet publish -c Debug --self-contained false -f net6.0 -o bin/wowdatabaseeditor-avalonia-linux/ LoaderAvalonia/LoaderAvalonia.csproj -r linux-x64
       
     dotnet publish -c Release --self-contained false -f net6.0 -o bin/wowdatabaseeditor-avalonia-win/ Updater/Updater.csproj -r win8-x64 -p:PublishSingleFile=true -p:PublishTrimmed=false -p:DebugType=none
 
