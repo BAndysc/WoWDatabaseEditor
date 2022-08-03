@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -5,22 +6,28 @@ using System.Text;
 using System.Threading.Tasks;
 using DynamicData;
 using Prism.Mvvm;
+using PropertyChanged.SourceGenerator;
 using WDE.Common.Database;
 using WDE.Common.Types;
 using WDE.Common.Utils;
 using WDE.DatabaseEditors.Data.Interfaces;
 using WDE.DatabaseEditors.Data.Structs;
 using WDE.Module.Attributes;
+using WDE.MVVM;
+using WDE.MVVM.Observable;
 
 namespace WDE.DatabaseEditors.Tools
 {
     [AutoRegister]
-    public class CompatibilityCheckerViewModel : BindableBase
+    public partial class CompatibilityCheckerViewModel : BindableBase
     {
         private readonly IMySqlExecutor sqlExecutor;
+        private List<DatabaseTableDefinitionJson> allDefinitions = new();
         public ObservableCollection<DatabaseTableDefinitionJson> Definitions { get; } = new();
 
         public INativeTextDocument Raport { get; }
+
+        [Notify] private string searchText = "";
 
         private DatabaseTableDefinitionJson? selectedDefinition;
         public DatabaseTableDefinitionJson? SelectedDefinition
@@ -111,8 +118,25 @@ namespace WDE.DatabaseEditors.Tools
             INativeTextDocument document)
         {
             this.sqlExecutor = sqlExecutor;
-            Definitions.AddRange(definitionProvider.AllDefinitions);
+            allDefinitions.AddRange(definitionProvider.AllDefinitions);
             Raport = document;
+            this.ToObservable(o => o.SearchText)
+                .SubscribeAction(_ => DoSearch());
+        }
+
+        private void DoSearch()
+        {
+            Definitions.Clear();
+            if (string.IsNullOrWhiteSpace(searchText))
+                Definitions.AddRange(allDefinitions);
+            else
+            {
+                foreach (var def in allDefinitions)
+                {
+                    if (def.Name.Contains(searchText, StringComparison.InvariantCultureIgnoreCase))
+                        Definitions.Add(def);
+                }
+            }
         }
     }
 }

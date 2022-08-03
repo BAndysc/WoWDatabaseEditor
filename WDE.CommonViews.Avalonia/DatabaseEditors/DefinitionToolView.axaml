@@ -39,6 +39,7 @@
             <Grid ColumnDefinitions="200,10,*" DataContext="{CompiledBinding Compatibility}">
                 <DockPanel LastChildFill="True">
                     <TextBlock DockPanel.Dock="Top" FontWeight="Bold" Padding="4" TextWrapping="WrapWithOverflow">All provided table definitions:</TextBlock>
+                    <TextBox DockPanel.Dock="Top" Margin="5" Watermark="Search" Text="{CompiledBinding SearchText}" />
                     <ListBox Items="{CompiledBinding Definitions, Mode=OneTime}"
                              VirtualizationMode="None"
                              SelectedItem="{CompiledBinding SelectedDefinition, Mode=TwoWay}">
