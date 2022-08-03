@@ -22,7 +22,7 @@ namespace WDE.PacketViewer.Processing.ProcessorProviders
         public ImageUri? Image => new ImageUri("Icons/gossip.png");
         public bool CanProcessMultipleFiles => true;
 
-        public Task<IPacketTextDumper> CreateDumper()
+        public Task<IPacketTextDumper> CreateDumper(IParsingSettings settings)
         {
             return Task.FromResult<IPacketTextDumper>(processor());
         }

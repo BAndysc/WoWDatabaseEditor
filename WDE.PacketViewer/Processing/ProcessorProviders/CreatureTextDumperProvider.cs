@@ -21,8 +21,8 @@ namespace WDE.PacketViewer.Processing.ProcessorProviders
         public string Extension => "sql";
         public bool CanProcessMultipleFiles => true;
         public ImageUri? Image { get; } = new ImageUri("icons/chat_big.png");
-        public Task<IPacketTextDumper> CreateDumper() =>
-            Task.FromResult<IPacketTextDumper>(containerProvider.Resolve<CreatureTextDumper>((typeof(bool), false)));
+        public Task<IPacketTextDumper> CreateDumper(IParsingSettings settings) =>
+            Task.FromResult<IPacketTextDumper>(containerProvider.Resolve<CreatureTextDumper>((typeof(bool), false), (typeof(IParsingSettings), settings)));
     }
     
     [AutoRegister]
@@ -39,7 +39,7 @@ namespace WDE.PacketViewer.Processing.ProcessorProviders
         public string Extension => "sql";
         public bool CanProcessMultipleFiles => true;
         public ImageUri? Image { get; } = new ImageUri("icons/chat_diff_big.png");
-        public Task<IPacketTextDumper> CreateDumper() =>
-            Task.FromResult<IPacketTextDumper>(containerProvider.Resolve<CreatureTextDumper>((typeof(bool), true)));
+        public Task<IPacketTextDumper> CreateDumper(IParsingSettings settings) =>
+            Task.FromResult<IPacketTextDumper>(containerProvider.Resolve<CreatureTextDumper>((typeof(bool), true), (typeof(IParsingSettings), settings)));
     }
 }

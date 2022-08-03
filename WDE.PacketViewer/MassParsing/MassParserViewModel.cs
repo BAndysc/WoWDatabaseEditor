@@ -155,9 +155,9 @@ public partial class MassParserViewModel : ObservableBase, IDocument
                 IPerFileStateProcessor? perFileStateProcessor = null;
 
                 if (dumper.IsTextDumper)
-                    textProcessor = await dumper.CreateTextProcessor();
+                    textProcessor = await dumper.CreateTextProcessor(new ParsingSettingsViewModel());
                 else if (dumper.IsDocumentDumper)
-                    documentDumper = await dumper.CreateDocumentProcessor();
+                    documentDumper = await dumper.CreateDocumentProcessor(new ParsingSettingsViewModel());
 
                 if (textProcessor is ITwoStepPacketBoolProcessor twoStep_)
                     twoStep = twoStep_;
@@ -186,6 +186,8 @@ public partial class MassParserViewModel : ObservableBase, IDocument
                         {
                             twoStep.PreProcess(packet);
                         }
+
+                        await twoStep.PostProcessFirstStep();
                     }
                     
                     foreach (var packet in packets.Packets_)

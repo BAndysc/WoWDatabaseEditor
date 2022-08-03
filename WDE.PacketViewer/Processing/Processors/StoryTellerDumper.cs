@@ -218,7 +218,8 @@ namespace WDE.PacketViewer.Processing.Processors
         {
             var emote = chatProcessor.GetEmoteForChat(basePacket);
             var sound = chatProcessor.GetSoundForChat(basePacket);
-            AppendLine(basePacket,  packet.Sender, NiceGuid(packet.Sender) + " says: `" + packet.Text + "`"
+            var text = chatProcessor.GetTextForChar(basePacket);
+            AppendLine(basePacket,  packet.Sender, NiceGuid(packet.Sender) + " says: `" + text + "`"
                                    + (emote.HasValue ? " with emote " + GetStringFromDbc(dbcStore.EmoteStore, emote.Value) : "")
                                    + (sound.HasValue ? " with sound " + GetStringFromDbc(dbcStore.SoundStore, (int)sound.Value) : ""));
             return base.Process(basePacket, packet);

@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using WDE.Common.Database;
+using WDE.PacketViewer.Processing.Runners;
 using WDE.SqlQueryGenerator;
 using WowPacketParser.Proto;
 using WowPacketParser.Proto.Processing;
 
 namespace WDE.PacketViewer.Processing.Processors
 {
-    public class CreatureTextDumper : PacketProcessor<bool>, ITwoStepPacketBoolProcessor, IPacketTextDumper, IPerFileStateProcessor
+    public class CreatureTextDumper : CompoundProcessor<bool, IChatEmoteSoundProcessor>, IPacketTextDumper, IPerFileStateProcessor
     {
         private class TextEntry : IEquatable<TextEntry>
         {
@@ -40,6 +41,24 @@ namespace WDE.PacketViewer.Processing.Processors
                 Range = CreatureTextRange.Normal;
                 IsInSniffText = true;
                 IsInDatabaseText = false;
+            }
+            
+            public TextEntry(TextEntry other, string text)
+            {
+                Text = text;
+                GroupId = other.GroupId;
+                Id = other.Id;
+                Duration = other.Duration;
+                Type = other.Type;
+                Language = other.Language;
+                Emote = other.Emote;
+                Sound = other.Sound;
+                Probability = other.Probability;
+                Range = other.Range;
+                Comment = other.Comment;
+                BroadcastTextId = other.BroadcastTextId;
+                IsInSniffText = other.IsInSniffText;
+                IsInDatabaseText = other.IsInDatabaseText;
             }
 
             public TextEntry(ICreatureText text)
@@ -94,7 +113,7 @@ namespace WDE.PacketViewer.Processing.Processors
 
         public CreatureTextDumper(IChatEmoteSoundProcessor chatEmoteSoundProcessor, 
             IDatabaseProvider databaseProvider,
-            bool asDiff)
+            bool asDiff) : base (chatEmoteSoundProcessor)
         {
             this.chatEmoteSoundProcessor = chatEmoteSoundProcessor;
             this.databaseProvider = databaseProvider;
@@ -117,10 +136,11 @@ namespace WDE.PacketViewer.Processing.Processors
             
             var emote = chatEmoteSoundProcessor.GetEmoteForChat(basePacket);
             var sound = chatEmoteSoundProcessor.GetSoundForChat(basePacket);
+            var text = chatEmoteSoundProcessor.GetTextForChar(basePacket);
 
             var state = GetState(packet.Sender);
             
-            var entry = new TextEntry(packet.Text, (CreatureTextType)packet.Type, (uint)packet.Language, (uint)(emote ?? 0), sound ?? 0)
+            var entry = new TextEntry(text, (CreatureTextType)packet.Type, (uint)packet.Language, (uint)(emote ?? 0), sound ?? 0)
             {
                 GroupId = (byte)state.texts.Count,
                 Id = 0,
@@ -156,8 +176,9 @@ namespace WDE.PacketViewer.Processing.Processors
 
                 foreach (var sniffText in entry.Value.texts.Where(t => t.IsInSniffText && !t.IsInDatabaseText))
                 {
-                    sniffText.BroadcastTextId =
-                        (await databaseProvider.GetBroadcastTextByTextAsync(sniffText.Text))?.Id ?? 0;
+                    if (sniffText.BroadcastTextId == 0)
+                        sniffText.BroadcastTextId =
+                            (await databaseProvider.GetBroadcastTextByTextAsync(sniffText.Text))?.Id ?? 0;
                     sniffText.GroupId = (byte)(++maxId);
                 }
                 
@@ -192,11 +213,6 @@ namespace WDE.PacketViewer.Processing.Processors
             }
             
             return trans.Close().QueryString;
-        }
-
-        public bool PreProcess(PacketHolder packet)
-        {
-            return chatEmoteSoundProcessor.Process(packet);
         }
 
         public void ClearAllState()

@@ -20,8 +20,8 @@ namespace WDE.PacketViewer.Processing.ProcessorProviders
         public string Description => "Presents sniff as human readable story (only some packets)";
         public string Extension => "story";
         public bool RequiresSplitUpdateObject => true;
-        public Task<IPacketTextDumper> CreateDumper() =>
-            Task.FromResult<IPacketTextDumper>(containerProvider.Resolve<StoryTellerDumper>((typeof(bool), false)));
+        public Task<IPacketTextDumper> CreateDumper(IParsingSettings settings) =>
+            Task.FromResult<IPacketTextDumper>(containerProvider.Resolve<StoryTellerDumper>((typeof(bool), false), (typeof(IParsingSettings), settings)));
     }
     
     [AutoRegister]
@@ -38,7 +38,7 @@ namespace WDE.PacketViewer.Processing.ProcessorProviders
         public string Description => "Presents sniff as human readable story (only some packets), grouped by each guid";
         public string Extension => "story";
         public bool RequiresSplitUpdateObject => true;
-        public Task<IPacketTextDumper> CreateDumper() =>
-            Task.FromResult<IPacketTextDumper>(containerProvider.Resolve<StoryTellerDumper>((typeof(bool), true)));
+        public Task<IPacketTextDumper> CreateDumper(IParsingSettings settings) =>
+            Task.FromResult<IPacketTextDumper>(containerProvider.Resolve<StoryTellerDumper>((typeof(bool), true), (typeof(IParsingSettings), settings)));
     }
 }

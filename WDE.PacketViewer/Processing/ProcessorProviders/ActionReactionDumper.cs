@@ -25,7 +25,7 @@ namespace WDE.PacketViewer.Processing.ProcessorProviders
         public string Extension => "story";
         public bool RequiresSplitUpdateObject => true;
 
-        public Task<IPacketTextDumper> CreateDumper()
+        public Task<IPacketTextDumper> CreateDumper(IParsingSettings settings)
         {
             return Task.FromResult<IPacketTextDumper>(creator.CreateTextProcessor());
         }

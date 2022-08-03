@@ -41,8 +41,8 @@ namespace WDE.PacketViewer.ViewModels
         public string? Description => dumperProvider.Description;
         public string? Format => Extension == "txt" ? "text" : Extension;
         public ImageUri Image => dumperProvider.Image ?? new ImageUri("Icons/document_sniff.png");
-        public Task<IPacketTextDumper> CreateTextProcessor() => textProvider!.CreateDumper();
-        public Task<IPacketDocumentDumper> CreateDocumentProcessor() => documentProvider!.CreateDumper();
+        public Task<IPacketTextDumper> CreateTextProcessor(IParsingSettings settings) => textProvider!.CreateDumper(settings);
+        public Task<IPacketDocumentDumper> CreateDocumentProcessor(IParsingSettings settings) => documentProvider!.CreateDumper(settings);
         public bool IsTextDumper => textProvider != null;
         public bool IsDocumentDumper => documentProvider != null;
     }

@@ -22,7 +22,7 @@ namespace WDE.PacketViewer.Processing.ProcessorProviders
         public string Extension => "cpp";
         public bool CanProcessMultipleFiles => true;
         public ImageUri? Image { get; } = new ImageUri("Icons/document_spell_big.png");
-        public Task<IPacketTextDumper> CreateDumper() =>
+        public Task<IPacketTextDumper> CreateDumper(IParsingSettings settings) =>
             Task.FromResult<IPacketTextDumper>(new NameAsEnumDumper(processor()));
     }
 }

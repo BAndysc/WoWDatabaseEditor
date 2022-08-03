@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using WDE.Common.Database;
 using WDE.Module.Attributes;
 using WowPacketParser.Proto;
 using WowPacketParser.Proto.Processing;
@@ -34,11 +36,19 @@ namespace WDE.PacketViewer.Processing.Processors
          * Returns true if processor thinks this sound (play sound or play object sound) packet is sent with other chat packet
          */
         bool IsSoundForChat(PacketBase sound);
+
+        /**
+         * Returns text from the chat packet, translated if the processor support it
+         */
+        string GetTextForChar(PacketBase chat);
     }
     
     [AutoRegister]
-    public class ChatEmoteSoundProcessor : PacketProcessor<bool>, IChatEmoteSoundProcessor
+    public class ChatEmoteSoundProcessor : PacketProcessor<bool>, IChatEmoteSoundProcessor, INeedToPostProcess
     {
+        private readonly IDatabaseProvider databaseProvider;
+        private readonly IParsingSettings parsingSettings;
+
         private class State
         {
             public (PacketBase packet, PacketChat chat)? LastChat;
@@ -53,7 +63,16 @@ namespace WDE.PacketViewer.Processing.Processors
         
         private readonly Dictionary<int, int> chatPacketIdToEmote = new();
         private readonly Dictionary<int, uint> chatPacketIdToSound = new();
+        
+        private readonly Dictionary<int, PacketChat> numberToChat = new();
+        private Dictionary<int, string>? numberToTranslatedText;
 
+        public ChatEmoteSoundProcessor(IDatabaseProvider databaseProvider, IParsingSettings parsingSettings)
+        {
+            this.databaseProvider = databaseProvider;
+            this.parsingSettings = parsingSettings;
+        }
+        
         private State Get(UniversalGuid guid)
         {
             if (perGuidState.TryGetValue(guid, out var state))
@@ -89,6 +108,8 @@ namespace WDE.PacketViewer.Processing.Processors
                 chatPacketIdToSound[basePacket.Number] = state.LastSound!.Value.sound;
                 soundPacketIdToChatPacketId[state.LastSound!.Value.packet.Number] = basePacket.Number;
             }
+
+            numberToChat[basePacket.Number] = packet;
             return true;
         }
 
@@ -173,8 +194,49 @@ namespace WDE.PacketViewer.Processing.Processors
             return soundPacketIdToChatPacketId.ContainsKey(sound.Number);
         }
 
+        public async Task PostProcess()
+        {
+            if (!parsingSettings.TranslateChatToEnglish)
+                return;
+            
+            numberToTranslatedText = new();
+            
+            foreach (var pair in numberToChat)
+            {
+                var locale = await databaseProvider.GetBroadcastTextLocaleByTextAsync(pair.Value.Text);
+                if (locale == null)
+                    continue;
+
+                var broadcastText = await databaseProvider.GetBroadcastTextByIdAsync(locale.Id);
+
+                if (broadcastText == null)
+                    continue;
+
+                var text = pair.Value.Text == locale.Text ? broadcastText.Text : broadcastText.Text1;
+
+                if (text == null)
+                    continue;
+
+                numberToTranslatedText[pair.Key] = text;
+            }
+        }
+
+        public string GetTextForChar(PacketBase chat)
+        {
+            if (numberToTranslatedText != null &&
+                numberToTranslatedText.TryGetValue(chat.Number, out var englishText))
+                return englishText;
+            
+            if (numberToChat.TryGetValue(chat.Number, out var chatPacket))
+                return chatPacket.Text;
+
+            return "";
+        }
+
         public void ClearAllState()
         {
+            numberToTranslatedText?.Clear();
+            numberToChat.Clear();
             perGuidState.Clear();
             emotePacketIdToChatPacketId.Clear();
             soundPacketIdToChatPacketId.Clear();

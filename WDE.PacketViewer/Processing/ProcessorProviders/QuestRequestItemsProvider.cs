@@ -22,6 +22,6 @@ public class QuestRequestItemsProvider : ITextPacketDumperProvider
     public string Extension => "sql";
     public bool CanProcessMultipleFiles => true;
     public ImageUri? Image { get; } = new ImageUri("Icons/document_quest_big.png");
-    public Task<IPacketTextDumper> CreateDumper() =>
+    public Task<IPacketTextDumper> CreateDumper(IParsingSettings settings) =>
         Task.FromResult<IPacketTextDumper>(creator());
 }

@@ -6,6 +6,7 @@
              xmlns:components="clr-namespace:WDE.Common.Avalonia.Components;assembly=WDE.Common.Avalonia"
              xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia"
              xmlns:viewModels="clr-namespace:WDE.PacketViewer.ViewModels;assembly=WDE.PacketViewer"
+             xmlns:parsing="clr-namespace:WDE.PacketViewer.Processing;assembly=WDE.PacketViewer"
              x:DataType="viewModels:PacketDocumentViewModel"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              Name="Root"
@@ -38,6 +39,20 @@
             <components:WdeImage ImageUri="Icons/icon_filters_disable.png" />
         </ToggleButton>
         
+        <controls:DropDownButton DataContext="{CompiledBinding ParsingSettings}">
+            <controls:DropDownButton.Button>
+                <components:WdeImage ToolTip.Tip="Settings" ImageUri="Icons/icon_wrench.png" />
+            </controls:DropDownButton.Button>
+            <StackPanel>
+                <GroupingHeader>Dumpers general settings</GroupingHeader>
+                <TextBlock FontWeight="Bold">Chat:</TextBlock>
+                <CheckBox IsChecked="{CompiledBinding TranslateChatToEnglish}">Use broadcast_text_locale to translate CHAT texts to English</CheckBox>
+                <Border Height="20" />
+                <TextBlock FontWeight="Bold">Waypoint dump type:</TextBlock>
+                <controls:CompletionComboBox SelectedItem="{Binding WaypointsDumpType, Mode=TwoWay}" controls:Extensions.EnumType="{x:Type parsing:WaypointsDumpType}" />
+            </StackPanel>
+        </controls:DropDownButton>
+
         <Border Width="15" />
         
         <controls:DropDownButton>

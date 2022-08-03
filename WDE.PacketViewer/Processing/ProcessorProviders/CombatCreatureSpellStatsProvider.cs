@@ -21,7 +21,7 @@ namespace WDE.PacketViewer.Processing.ProcessorProviders
             this.dumper = dumper;
         }
         
-        public Task<IPacketTextDumper> CreateDumper()
+        public Task<IPacketTextDumper> CreateDumper(IParsingSettings settings)
         {
             return Task.FromResult<IPacketTextDumper>(dumper());
         }

@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using WowPacketParser.Proto;
 using WowPacketParser.Proto.Processing;
 
@@ -17,6 +18,12 @@ namespace WDE.PacketViewer.Processing.Runners
             r1.Process(packet);
             return true;
         }
+
+        public async Task PostProcessFirstStep()
+        {
+            if (r1 is INeedToPostProcess p1)
+                await p1.PostProcess();
+        }
     }
     
     public abstract class CompoundProcessor<T, R1, R2> : PacketProcessor<T>, ITwoStepPacketBoolProcessor where R1 : IPacketProcessor<T> where R2 : IPacketProcessor<T>
@@ -35,6 +42,14 @@ namespace WDE.PacketViewer.Processing.Runners
             r1.Process(packet);
             r2.Process(packet);
             return true;
+        }
+
+        public async Task PostProcessFirstStep()
+        {
+            if (r1 is INeedToPostProcess p1)
+                await p1.PostProcess();
+            if (r2 is INeedToPostProcess p2)
+                await p2.PostProcess();
         }
     }
     public abstract class CompoundProcessor<T, R1, R2, R3> : PacketProcessor<T>, ITwoStepPacketBoolProcessor where R1 : IPacketProcessor<T> 
@@ -58,6 +73,16 @@ namespace WDE.PacketViewer.Processing.Runners
             r2.Process(packet);
             r3.Process(packet);
             return true;
+        }
+
+        public async Task PostProcessFirstStep()
+        {
+            if (r1 is INeedToPostProcess p1)
+                await p1.PostProcess();
+            if (r2 is INeedToPostProcess p2)
+                await p2.PostProcess();
+            if (r3 is INeedToPostProcess p3)
+                await p3.PostProcess();
         }
     }
     
@@ -86,6 +111,18 @@ namespace WDE.PacketViewer.Processing.Runners
             r3.Process(packet);
             r4.Process(packet);
             return true;
+        }
+
+        public async Task PostProcessFirstStep()
+        {
+            if (r1 is INeedToPostProcess p1)
+                await p1.PostProcess();
+            if (r2 is INeedToPostProcess p2)
+                await p2.PostProcess();
+            if (r3 is INeedToPostProcess p3)
+                await p3.PostProcess();
+            if (r4 is INeedToPostProcess p4)
+                await p4.PostProcess();
         }
     }
     
@@ -118,6 +155,20 @@ namespace WDE.PacketViewer.Processing.Runners
             r4.Process(packet);
             r5.Process(packet);
             return true;
+        }
+
+        public async Task PostProcessFirstStep()
+        {
+            if (r1 is INeedToPostProcess p1)
+                await p1.PostProcess();
+            if (r2 is INeedToPostProcess p2)
+                await p2.PostProcess();
+            if (r3 is INeedToPostProcess p3)
+                await p3.PostProcess();
+            if (r4 is INeedToPostProcess p4)
+                await p4.PostProcess();
+            if (r5 is INeedToPostProcess p5)
+                await p5.PostProcess();
         }
     }
     
@@ -154,6 +205,22 @@ namespace WDE.PacketViewer.Processing.Runners
             r5.Process(packet);
             r6.Process(packet);
             return true;
+        }
+
+        public async Task PostProcessFirstStep()
+        {
+            if (r1 is INeedToPostProcess p1)
+                await p1.PostProcess();
+            if (r2 is INeedToPostProcess p2)
+                await p2.PostProcess();
+            if (r3 is INeedToPostProcess p3)
+                await p3.PostProcess();
+            if (r4 is INeedToPostProcess p4)
+                await p4.PostProcess();
+            if (r5 is INeedToPostProcess p5)
+                await p5.PostProcess();
+            if (r6 is INeedToPostProcess p6)
+                await p6.PostProcess();
         }
     }
 }

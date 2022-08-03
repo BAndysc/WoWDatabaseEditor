@@ -36,6 +36,7 @@ namespace WDE.PacketViewer.Processing
     public interface ITwoStepPacketProcessor<T>
     {
         T? PreProcess(PacketHolder packet);
+        Task PostProcessFirstStep() => Task.CompletedTask;
     }
 
     public interface IUnfilteredTwoStepPacketProcessor<T>
@@ -46,5 +47,10 @@ namespace WDE.PacketViewer.Processing
     public interface IUnfilteredPacketProcessor
     {
         void ProcessUnfiltered(PacketHolder unfiltered);
+    }
+
+    public interface INeedToPostProcess
+    {
+        Task PostProcess();
     }
 }

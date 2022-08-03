@@ -20,6 +20,6 @@ namespace WDE.PacketViewer.Processing.ProcessorProviders
         public string Description => "Prints when each quest was taken, completed and rewarded";
         public string Extension => "txt";
         public ImageUri? Image { get; } = new ImageUri("Icons/document_quest_template_big.png");
-        public Task<IPacketTextDumper> CreateDumper() => Task.FromResult<IPacketTextDumper>(creator());
+        public Task<IPacketTextDumper> CreateDumper(IParsingSettings settings) => Task.FromResult<IPacketTextDumper>(creator());
     }
 }

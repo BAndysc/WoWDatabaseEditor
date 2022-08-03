@@ -657,7 +657,7 @@ namespace WDE.PacketViewer.ViewModels
             foreach (var processor in processors)
             {
                 if (processor.IsTextDumper)
-                   textDumpers.Add((processor, await processor.CreateTextProcessor()));
+                   textDumpers.Add((processor, await processor.CreateTextProcessor(ParsingSettings)));
             }
 
             if (textDumpers.Any(d => d.dumper.RequiresSplitUpdateObject))
@@ -671,22 +671,23 @@ namespace WDE.PacketViewer.ViewModels
                 float processed = 0;
                 foreach (var pair in textDumpers)
                 {
-                    RunProcessor(cancellationToken, pair.dumper, new Progress<float>(i =>
+                    var task = RunProcessor(cancellationToken, pair.dumper, new Progress<float>(i =>
                     {
                         Report((processed + i) / totalProgress);
                     }));
+                    task.Wait(cancellationToken);
                     processed += 1;
 
                     Report(-1);
 
                     pair.dumper.Process().Wait(cancellationToken);
                     
-                    var task = pair.dumper.Generate();
-                    task.Wait(cancellationToken);
+                    var dumperTask = pair.dumper.Generate();
+                    dumperTask.Wait(cancellationToken);
                     
                     if (processors.Count > 1)
                         output.AppendLine(" -- " + pair.viewModel.Name);
-                    output.Append(task.Result);
+                    output.Append(dumperTask.Result);
 
                     if (processors.Count > 1)
                         output.AppendLine("\n\n");
@@ -703,7 +704,7 @@ namespace WDE.PacketViewer.ViewModels
             foreach (var processor in processors)
             {
                 if (processor.IsDocumentDumper)
-                    documentsDumpers.Add((processor, await processor.CreateDocumentProcessor()));
+                    documentsDumpers.Add((processor, await processor.CreateDocumentProcessor(ParsingSettings)));
             }
 
             if (documentsDumpers.Any(d => d.dumper.RequiresSplitUpdateObject))
@@ -716,10 +717,11 @@ namespace WDE.PacketViewer.ViewModels
                 float processed = 0;
                 foreach (var pair in documentsDumpers)
                 {
-                    RunProcessor(cancellationToken, pair.dumper, new Progress<float>(i =>
+                    var task = RunProcessor(cancellationToken, pair.dumper, new Progress<float>(i =>
                     {
                         Report((processed + i) / totalProgress);
                     }));
+                    task.Wait(cancellationToken);
                     processed += 1;
 
                     if (cancellationToken.IsCancellationRequested)
@@ -743,7 +745,7 @@ namespace WDE.PacketViewer.ViewModels
             return documents;
         }
 
-        private void RunProcessor(CancellationToken cancellationToken, IPacketProcessor<bool> dumper, IProgress<float> progress)
+        private async Task RunProcessor(CancellationToken cancellationToken, IPacketProcessor<bool> dumper, IProgress<float> progress)
         {
             var packetsCount = (long)FilteredPackets.Count;
             long processed = 0;
@@ -762,6 +764,8 @@ namespace WDE.PacketViewer.ViewModels
                         progress.Report(processed * 1.0f / packetsCount);
                     }
                 }
+
+                await preprocessor.PostProcessFirstStep();
             }
 
             // ReSharper disable once SuspiciousTypeConversion.Global
@@ -985,6 +989,8 @@ namespace WDE.PacketViewer.ViewModels
         }
 
         #region Properties
+        public ParsingSettingsViewModel ParsingSettings { get; } = new();
+        
         private string? mostRecentlySearchedItem;
         public string? MostRecentlySearchedItem
         {

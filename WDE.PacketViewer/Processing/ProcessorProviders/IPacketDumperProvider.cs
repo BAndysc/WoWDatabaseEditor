@@ -18,12 +18,12 @@ namespace WDE.PacketViewer.Processing.ProcessorProviders
     public interface ITextPacketDumperProvider : IPacketDumperProvider
     {
         string Extension { get; }
-        Task<IPacketTextDumper> CreateDumper();
+        Task<IPacketTextDumper> CreateDumper(IParsingSettings settings);
     }
     
     [NonUniqueProvider]
     public interface IDocumentPacketDumperProvider : IPacketDumperProvider
     {
-        Task<IPacketDocumentDumper> CreateDumper();
+        Task<IPacketDocumentDumper> CreateDumper(IParsingSettings settings);
     }
 }
