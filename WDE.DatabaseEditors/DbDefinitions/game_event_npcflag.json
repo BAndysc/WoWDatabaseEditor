@@ -1,7 +1,7 @@
 {
   "id": "game_event_npcflag",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityCata"
   ],
   "name": "Game Event Npcflag",
   "single_solution_name": "Game Event Npcflag",

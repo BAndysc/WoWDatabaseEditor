@@ -1,7 +1,7 @@
 {
   "id": "vehicle_accessory",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityCata"
   ],
   "name": "Vehicle Accessory",
   "single_solution_name": "{name} accessories",

@@ -1,7 +1,7 @@
 {
   "id": "creature_questitem",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityCata"
   ],
   "name": "Creature Quest Item",
   "single_solution_name": "Creature Quest Item",

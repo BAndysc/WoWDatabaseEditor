@@ -1,7 +1,7 @@
 {
   "id": "game_event_arena_seasons",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityCata"
   ],
   "name": "Game Event Arena Seasons",
   "single_solution_name": "Game Event Arena Seasons",

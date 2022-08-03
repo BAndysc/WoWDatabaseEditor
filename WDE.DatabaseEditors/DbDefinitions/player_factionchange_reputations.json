@@ -1,7 +1,7 @@
 {
   "id": "player_factionchange_reputations",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityCata"
   ],
   "name": "Player Faction Change Reputations",
   "single_solution_name": "Player Faction Change Reputations",

@@ -1,7 +1,7 @@
 {
   "id": "game_event_quest_condition",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityCata"
   ],
   "name": "Game Event Quest Condition",
   "description": "This table contains the mapping of a quest in a world event to the condition that it will fulfill. It also contains how much a given quest will add to a condition once that quest is completed by a player.",

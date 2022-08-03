@@ -1,7 +1,7 @@
 {
   "id": "instance_encounters",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityCata"
   ],
   "name": "Instance Encounters",
   "single_solution_name": "Instance Encounters",

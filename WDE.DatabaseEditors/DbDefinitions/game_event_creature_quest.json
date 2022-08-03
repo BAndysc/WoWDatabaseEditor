@@ -1,7 +1,7 @@
 {
   "id": "game_event_creature_quest",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityCata"
   ],
   "name": "Game Event Creature Quest",
   "single_solution_name": "Game Event Creature Quest",

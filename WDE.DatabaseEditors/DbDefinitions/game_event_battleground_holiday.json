@@ -1,7 +1,7 @@
 {
   "id": "game_event_battleground_holiday",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityCata"
   ],
   "name": "Game Event Battleground Holiday",
   "single_solution_name": "Game Event Battleground Holiday",

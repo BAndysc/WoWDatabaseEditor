@@ -1,7 +1,7 @@
 {
   "id": "holiday_dates",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityCata"
   ],
   "name": "Holiday Dates",
   "single_solution_name": "Holiday Dates",

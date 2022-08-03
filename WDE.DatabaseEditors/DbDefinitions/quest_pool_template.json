@@ -1,7 +1,7 @@
 {
   "id": "quest_pool_template",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityCata"
   ],
   "name": "Quest Pool Template",
   "single_solution_name": "Quest Pool Template Table",

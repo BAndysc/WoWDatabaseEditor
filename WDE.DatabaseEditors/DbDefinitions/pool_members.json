@@ -1,7 +1,7 @@
 {
   "id": "pool_members",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityCata"
   ],
   "name": "Pool Members",
   "single_solution_name": "Pool Members",

@@ -1,0 +1,83 @@
+{
+  "id": "waypoints",
+  "compatibility": [
+    "TrinityCata"
+  ],
+  "name": "Waypoints",
+  "single_solution_name": "Waypoints path {key}",
+  "multi_solution_name": "Waypoints (multiple paths)",
+  "description": "Waypoints that are used by Smart AI",
+  "table_name": "waypoints",
+  "table_index_name": "entry",
+  "record_mode": "MultiRecord",
+  "skip_quick_load": true,
+  "group_name": "Waypoints",
+  "icon_path": "Icons/document_waypoints2.png",
+  "reload_command": "reload waypoints",
+  "picker": "",
+  "primary_key": [
+    "entry",
+    "pointid"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Entry",
+          "db_column_name": "entry",
+          "value_type": "uint"
+        },
+        {
+          "name": "Point id",
+          "db_column_name": "pointid",
+          "value_type": "uint",
+          "preferred_width": 70.0
+        },
+        {
+          "name": "X",
+          "db_column_name": "position_x",
+          "value_type": "float"
+        },
+        {
+          "name": "Y",
+          "db_column_name": "position_y",
+          "value_type": "float"
+        },
+        {
+          "name": "Z",
+          "db_column_name": "position_z",
+          "value_type": "float"
+        },
+        {
+          "name": "Orientation",
+          "db_column_name": "orientation",
+          "value_type": "float",
+          "can_be_null": true
+        },
+        {
+          "name": "Delay",
+          "db_column_name": "delay",
+          "value_type": "uint"
+        },
+        {
+          "name": "Velocity",
+          "db_column_name": "velocity",
+          "value_type": "float"
+        },
+        {
+          "name": "Smooth Transition",
+          "db_column_name": "smoothTransition",
+          "value_type": "BoolParameter"
+        },
+        {
+          "name": "Point Comment",
+          "db_column_name": "point_comment",
+          "value_type": "string",
+          "can_be_null": true,
+          "preferred_width": 275.0
+        }
+      ]
+    }
+  ]
+}

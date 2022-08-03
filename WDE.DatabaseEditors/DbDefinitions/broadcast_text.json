@@ -1,7 +1,7 @@
 {
   "id": "broadcast_text",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityCata"
   ],
   "name": "Broadcast Text",
   "single_solution_name": "Broadcast Text",

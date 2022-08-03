@@ -1,7 +1,7 @@
 {
   "id": "creature_model_info",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityCata"
   ],
   "name": "Creature Model Info",
   "single_solution_name": "Creature Model Info",

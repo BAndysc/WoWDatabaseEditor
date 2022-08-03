@@ -1,7 +1,7 @@
 {
   "id": "game_event_prerequisite",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityCata"
   ],
   "name": "Game Event Prerequisite",
   "single_solution_name": "Game Event Prerequisite",

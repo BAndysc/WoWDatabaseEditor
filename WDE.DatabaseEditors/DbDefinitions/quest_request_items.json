@@ -1,7 +1,7 @@
 {
   "id": "quest_request_items",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityCata"
   ],
   "name": "Quest Request Items",
   "single_solution_name": "Quest Request Items Table",

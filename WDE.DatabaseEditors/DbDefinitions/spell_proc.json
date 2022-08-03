@@ -1,7 +1,7 @@
 {
   "id": "spell_proc",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityCata"
   ],
   "name": "Spell Proc",
   "single_solution_name": "Spell Proc Table",

@@ -1,7 +1,7 @@
 {
   "id": "achievement_criteria_data",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityCata"
   ],
   "name": "Achievement Criteria Data",
   "single_solution_name": "Achievement Criteria Data",

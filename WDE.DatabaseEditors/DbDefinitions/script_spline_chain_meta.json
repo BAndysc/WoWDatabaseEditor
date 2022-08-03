@@ -1,7 +1,7 @@
 {
   "id": "script_spline_chain_meta",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityCata"
   ],
   "name": "Script Spline Chain Meta",
   "single_solution_name": "Script Spline Chain Meta",

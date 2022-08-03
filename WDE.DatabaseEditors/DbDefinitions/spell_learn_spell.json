@@ -1,7 +1,7 @@
 {
   "id": "spell_learn_spell",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityCata"
   ],
   "name": "Spell Learn Spell",
   "single_solution_name": "Spell Learn Spell",

@@ -1,7 +1,7 @@
 {
   "id": "quest_poi",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityCata"
   ],
   "name": "Quest Poi",
   "single_solution_name": "Quest Poi",

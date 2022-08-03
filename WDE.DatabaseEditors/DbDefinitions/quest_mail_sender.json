@@ -1,7 +1,7 @@
 {
   "id": "quest_mail_sender",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityCata"
   ],
   "name": "Quest Mail Sender",
   "single_solution_name": "Quest Mail Sender Table",

@@ -1,7 +1,7 @@
 {
   "id": "page_text",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityCata"
   ],
   "name": "Page Text",
   "table_name": "page_text",

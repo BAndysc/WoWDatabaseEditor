@@ -1,7 +1,7 @@
 {
   "id": "battlemaster_entry",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityCata"
   ],
   "name": "Battlemaster Entry",
   "single_solution_name": "Battlemaster Entry",

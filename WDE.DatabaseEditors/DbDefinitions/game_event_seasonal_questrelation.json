@@ -1,7 +1,7 @@
 {
   "id": "game_event_seasonal_questrelation",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityCata"
   ],
   "name": "Game Event Seasonal Questrelation",
   "single_solution_name": "Game Event Seasonal Questrelation",

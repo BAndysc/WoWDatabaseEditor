@@ -1,7 +1,7 @@
 {
   "id": "spell_required",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityCata"
   ],
   "name": "Spell Required",
   "single_solution_name": "Spell Required table",

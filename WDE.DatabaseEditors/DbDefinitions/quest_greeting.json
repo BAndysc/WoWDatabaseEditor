@@ -1,7 +1,7 @@
 {
   "id": "quest_greeting",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityCata"
   ],
   "name": "Quest Greeting",
   "single_solution_name": "Quest Greeting",

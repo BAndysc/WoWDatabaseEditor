@@ -1,7 +1,7 @@
 {
   "id": "quest_pool_members",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityCata"
   ],
   "name": "Quest Pool Members",
   "single_solution_name": "Quest Pool Members Table",

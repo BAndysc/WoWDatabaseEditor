@@ -1,7 +1,7 @@
 {
   "id": "trainer_spell",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityCata"
   ],
   "name": "Trainer Spell",
   "single_solution_name": "Trainer Spell Table",

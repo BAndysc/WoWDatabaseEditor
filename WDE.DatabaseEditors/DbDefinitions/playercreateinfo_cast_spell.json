@@ -1,7 +1,7 @@
 {
   "id": "playercreateinfo_cast_spell",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityCata"
   ],
   "name": "Player createinfo Cast Spell",
   "single_solution_name": "Player createinfo Cast Spell",

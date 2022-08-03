@@ -1,7 +1,7 @@
 {
   "id": "spell_pet_auras",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityCata"
   ],
   "name": "Spell Pet Auras",
   "single_solution_name": "Spell Pet Auras table",

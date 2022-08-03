@@ -1,7 +1,7 @@
 {
   "id": "player_xp_for_level",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityCata"
   ],
   "name": "Player Xp For Level",
   "single_solution_name": "Player Xp For Level Table",

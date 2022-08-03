@@ -1,7 +1,7 @@
 {
   "id": "playercreateinfo_item",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityCata"
   ],
   "name": "Player createinfo Item",
   "single_solution_name": "Player createinfo Items",

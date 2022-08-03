@@ -1,7 +1,7 @@
 {
   "id": "game_event_model_equip",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityCata"
   ],
   "name": "Game Event Model Equip",
   "single_solution_name": "Game Event Model Equip",

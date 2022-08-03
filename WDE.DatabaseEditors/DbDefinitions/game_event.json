@@ -1,7 +1,7 @@
 {
   "id": "game_event",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityCata"
   ],
   "name": "Game Event",
   "single_solution_name": "Game Event",

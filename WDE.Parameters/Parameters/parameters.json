@@ -931,6 +931,13 @@
 			"offset": -1
 		}
 	},
+	"TypeFlags2Parameter": {
+		"isflag": true,
+		"name": "Type flags 2",
+		"values": {
+			"1": "unknown"
+		}
+	},
 	"TypeFlagsParameter": {
 		"name": "Type flags",
 		"isflag": true,

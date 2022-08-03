@@ -1,7 +1,7 @@
 {
   "id": "areatrigger_teleport",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityCata"
   ],
   "name": "Areatrigger Teleport",
   "single_solution_name": "Areatrigger Teleport",

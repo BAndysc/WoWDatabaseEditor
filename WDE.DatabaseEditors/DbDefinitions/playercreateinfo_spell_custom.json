@@ -1,7 +1,7 @@
 {
   "id": "playercreateinfo_spell_custom",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityCata"
   ],
   "name": "Player createinfo Spell Custom",
   "single_solution_name": "Player createinfo Spell Custom",

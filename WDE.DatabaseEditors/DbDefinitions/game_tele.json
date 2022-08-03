@@ -1,7 +1,7 @@
 {
   "id": "game_tele",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityCata"
   ],
   "name": "Game Tele",
   "single_solution_name": "Game Tele",

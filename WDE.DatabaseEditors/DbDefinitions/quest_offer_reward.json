@@ -1,7 +1,7 @@
 {
   "id": "quest_offer_reward",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityCata"
   ],
   "name": "Quest Offer Reward",
   "single_solution_name": "Quest Offer Reward Table",

@@ -1,7 +1,7 @@
 {
   "id": "spawn_group_template",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityCata"
   ],
   "name": "Spawn Group Template",
   "single_solution_name": "Spawn Group Template",

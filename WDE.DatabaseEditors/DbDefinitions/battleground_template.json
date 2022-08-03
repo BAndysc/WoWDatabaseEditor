@@ -1,7 +1,7 @@
 {
   "id": "battleground_template",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityCata"
   ],
   "name": "Battleground Template",
   "single_solution_name": "Battleground Template",

@@ -1,7 +1,7 @@
 {
   "id": "player_factionchange_quests",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityCata"
   ],
   "name": "Player Faction Change Quests",
   "single_solution_name": "Player Faction Change Quests",

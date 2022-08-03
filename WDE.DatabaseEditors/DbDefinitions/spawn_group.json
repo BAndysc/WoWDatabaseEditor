@@ -1,7 +1,7 @@
 {
   "id": "spawn_group",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityCata"
   ],
   "name": "Spawn Group",
   "single_solution_name": "Spawn Group",

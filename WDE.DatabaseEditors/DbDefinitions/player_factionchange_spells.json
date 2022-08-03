@@ -1,7 +1,7 @@
 {
   "id": "player_factionchange_spells",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityCata"
   ],
   "name": "Player Faction Change Spells",
   "single_solution_name": "Player Faction Change Spells",

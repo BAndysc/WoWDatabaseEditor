@@ -1,0 +1,656 @@
+﻿{
+  "id": "creature_template",
+  "compatibility": ["TrinityCata"],
+  "name": "Creature Template",
+  "description": "Edit existing creature templates",
+  "table_name": "creature_template",
+  "table_index_name": "entry",
+  "table_name_source_field": "name",
+  "single_solution_name": "Creature {name} template",
+  "multi_solution_name": "Multiple creatures template",
+  "reload_command": "reload creature_template",
+  "icon_path": "Icons/document_creature_template.png",
+  "picker": "CreatureParameter",
+  "group_name": "Templates",
+  "primary_key": [
+    "entry"
+  ],
+  "foreign_tables": [
+    {
+      "table_name": "creature_template_addon",
+      "foreign_key": ["entry"]
+    },
+    {
+      "table_name": "creature_template_movement",
+      "foreign_key": ["CreatureId"]
+    }
+  ],
+  "groups": [
+    {
+      "group_name": "Entries",
+      "fields": [
+        {
+          "name": "Entry",
+          "db_column_name": "entry",
+          "value_type": "uint",
+          "read_only": true
+        },
+        {
+          "name": "Name",
+          "db_column_name": "name",
+          "value_type": "string",
+          "read_only": true
+        },
+        {
+          "name": "Subname",
+          "db_column_name": "subname",
+          "value_type": "string",
+          "read_only": true,
+          "can_be_null": true
+        },
+        {
+          "name": "Female Name",
+          "db_column_name": "femaleName",
+          "value_type": "string",
+          "read_only": true
+        },
+        {
+          "name": "Difficulty 1",
+          "db_column_name": "difficulty_entry_1",
+          "value_type": "CreatureParameter"
+        },
+        {
+          "name": "Difficulty 2",
+          "db_column_name": "difficulty_entry_2",
+          "value_type": "CreatureParameter"
+        },
+        {
+          "name": "Difficulty 3",
+          "db_column_name": "difficulty_entry_3",
+          "value_type": "CreatureParameter"
+        },
+        {
+          "name": "Kill credit",
+          "db_column_name": "KillCredit1",
+          "value_type": "CreatureParameter"
+        },
+        {
+          "name": "Kill credit 2",
+          "db_column_name": "KillCredit2",
+          "value_type": "CreatureParameter"
+        }
+      ]
+    },
+    {
+      "group_name": "Gossip",
+      "fields": [
+        {
+          "name": "Icon name",
+          "db_column_name": "IconName",
+          "value_type": "IconNameParameter",
+          "can_be_null": true
+        },
+        {
+          "name": "Gossip menu ID",
+          "db_column_name": "gossip_menu_id",
+          "value_type": "GossipMenuParameter"
+        }
+      ]
+    },
+    {
+      "group_name": "General",
+      "fields": [
+        {
+          "name": "Faction",
+          "db_column_name": "faction",
+          "value_type": "FactionParameter"
+        },
+        {
+          "name": "Min level",
+          "db_column_name": "minlevel",
+          "value_type": "uint"
+        },
+        {
+          "name": "Max level",
+          "db_column_name": "maxlevel",
+          "value_type": "uint"
+        },
+        {
+          "name": "Expansion",
+          "db_column_name": "exp",
+          "value_type": "ExpansionParameter"
+        },
+        {
+          "name": "Expansion Unk",
+          "db_column_name": "exp_unk",
+          "value_type": "ExpansionParameter"
+        },
+        {
+          "name": "Rank",
+          "db_column_name": "rank",
+          "value_type": "NpcRankParameter"
+        },
+        {
+          "name": "Unit class",
+          "db_column_name": "unit_class",
+          "value_type": "UnitClassParameter"
+        },
+        {
+          "name": "Family",
+          "db_column_name": "family",
+          "value_type": "CreatureFamilyParameter"
+        },
+        {
+          "name": "Creature type",
+          "db_column_name": "type",
+          "value_type": "CreatureTypeParameter"
+        },
+        {
+          "name": "Racial leader",
+          "db_column_name": "RacialLeader",
+          "value_type": "BoolParameter"
+        }
+      ]
+    },
+    {
+      "group_name": "Flags",
+      "fields": [
+        {
+          "name": "NPC Flags",
+          "db_column_name": "npcflag",
+          "value_type": "NpcFlagParameter"
+        },
+        {
+          "name": "Unit Flags",
+          "db_column_name": "unit_flags",
+          "value_type": "UnitFlagParameter"
+        },
+        {
+          "name": "Unit Flags 2",
+          "db_column_name": "unit_flags2",
+          "value_type": "UnitFlags2Parameter"
+        },
+        {
+          "name": "Dynamic Flags",
+          "db_column_name": "dynamicflags",
+          "value_type": "DynamicFlagsParameter"
+        },
+        {
+          "name": "Type Flags",
+          "db_column_name": "type_flags",
+          "value_type": "TypeFlagsParameter"
+        },
+        {
+          "name": "Type Flags 2",
+          "db_column_name": "type_flags2",
+          "value_type": "TypeFlags2Parameter"
+        },
+        {
+          "name": "Extra Flags",
+          "db_column_name": "flags_extra",
+          "value_type": "ExtraFlagParameter"
+        }
+      ]
+    },
+    {
+      "group_name": "Addon",
+      "fields": [
+        {
+          "name": "Waypoint Path Id",
+          "db_column_name": "waypointPathId",
+          "value_type": "uint",
+          "foreign_table": "creature_template_addon"
+        },
+        {
+          "name": "Cyclic Spline Path Id",
+          "db_column_name": "cyclicSplinePathId",
+          "value_type": "uint",
+          "foreign_table": "creature_template_addon"
+        },
+        {
+          "name": "Mount",
+          "db_column_name": "mount",
+          "foreign_table": "creature_template_addon",
+          "value_type": "CreatureParameter"
+        },
+        {
+          "name": "Bytes 1",
+          "db_column_name": "bytes1",
+          "foreign_table": "creature_template_addon",
+          "value_type": "uint"
+        },
+        {
+          "name": "Bytes 2",
+          "db_column_name": "bytes2",
+          "foreign_table": "creature_template_addon",
+          "value_type": "uint"
+        },
+        {
+          "name": "Emote",
+          "db_column_name": "emote",
+          "foreign_table": "creature_template_addon",
+          "value_type": "EmoteParameter"
+        },
+        {
+          "name": "Visibility distance type",
+          "db_column_name": "visibilityDistanceType",
+          "foreign_table": "creature_template_addon",
+          "value_type": "uint",
+          "can_be_null": true
+        },
+        {
+          "name": "Ai Anim Kit",
+          "db_column_name": "aiAnimKit",
+          "value_type": "int",
+          "foreign_table": "creature_template_addon"
+        },
+        {
+          "name": "Movement Anim Kit",
+          "db_column_name": "movementAnimKit",
+          "value_type": "int",
+          "foreign_table": "creature_template_addon"
+        },
+        {
+          "name": "Melee Anim Kit",
+          "db_column_name": "meleeAnimKit",
+          "value_type": "int",
+          "foreign_table": "creature_template_addon"
+        },
+        {
+          "name": "Auras",
+          "db_column_name": "auras",
+          "foreign_table": "creature_template_addon",
+          "value_type": "MultiSpellParameter",
+          "can_be_null": true
+        }
+      ]
+    },    
+    {
+      "group_name": "Movement",
+      "fields": [
+        {
+          "name": "Vehicle ID",
+          "db_column_name": "VehicleId",
+          "value_type": "uint"
+        },
+        {
+          "name": "Walk speed",
+          "db_column_name": "speed_walk",
+          "value_type": "float"
+        },
+        {
+          "name": "Run speed",
+          "db_column_name": "speed_run",
+          "value_type": "float"
+        },
+        {
+          "name": "Movement type",
+          "db_column_name": "MovementType",
+          "value_type": "uint"
+        },
+        {
+          "name": "Hover height",
+          "db_column_name": "HoverHeight",
+          "value_type": "float"
+        },
+        {
+          "name": "Movement ID",
+          "db_column_name": "movementId",
+          "value_type": "uint"
+        },
+        {
+          "name": "Ground",
+          "db_column_name": "Ground",
+          "value_type": "MovementGroundStateParameter",
+          "foreign_table": "creature_template_movement",
+          "can_be_null": true
+        },
+        {
+          "name": "Swim",
+          "db_column_name": "Swim",
+          "value_type": "BoolParameter",
+          "foreign_table": "creature_template_movement",
+          "can_be_null": true
+        },
+        {
+          "name": "Flight",
+          "db_column_name": "Flight",
+          "value_type": "MovementFlightStateParameter",
+          "foreign_table": "creature_template_movement",
+          "can_be_null": true
+        },
+        {
+          "name": "Rooted",
+          "db_column_name": "Rooted",
+          "value_type": "BoolParameter",
+          "foreign_table": "creature_template_movement",
+          "can_be_null": true
+        },
+        {
+          "name": "Random",
+          "db_column_name": "Random",
+          "value_type": "MovementRandomMoveStateParameter",
+          "foreign_table": "creature_template_movement",
+          "can_be_null": true
+        },
+        {
+          "name": "Interaction Pause Timer",
+          "db_column_name": "InteractionPauseTimer",
+          "value_type": "uint",
+          "foreign_table": "creature_template_movement",
+          "can_be_null": true
+        }        
+      ]
+    },
+    {
+      "group_name": "Visual",
+      "fields": [
+        {
+          "name": "Model 1",
+          "db_column_name": "modelid1",
+          "value_type": "CreatureModelDataParameter"
+        },
+        {
+          "name": "Model 2",
+          "db_column_name": "modelid2",
+          "value_type": "CreatureModelDataParameter"
+        },
+        {
+          "name": "Model 3",
+          "db_column_name": "modelid3",
+          "value_type": "CreatureModelDataParameter"
+        },
+        {
+          "name": "Model 4",
+          "db_column_name": "modelid4",
+          "value_type": "CreatureModelDataParameter"
+        },
+        {
+          "name": "Model scale",
+          "db_column_name": "scale",
+          "value_type": "float"
+        }
+      ]
+    },
+    {
+      "group_name": "Combat",
+      "fields": [
+        {
+          "name": "Damage school",
+          "db_column_name": "dmgschool",
+          "value_type": "SpellSchoolParameter"
+        },
+        {
+          "name": "Melee attack time",
+          "db_column_name": "BaseAttackTime",
+          "value_type": "uint"
+        },
+        {
+          "name": "Ranged attack time",
+          "db_column_name": "RangeAttackTime",
+          "value_type": "uint"
+        },
+        {
+          "name": "BaseVariance",
+          "db_column_name": "BaseVariance",
+          "value_type": "float"
+        },
+        {
+          "name": "RangeVariance",
+          "db_column_name": "RangeVariance",
+          "value_type": "float"
+        },
+        {
+          "name": "Pet spell ID",
+          "db_column_name": "PetSpellDataId",
+          "value_type": "uint"
+        },
+        {
+          "name": "Health regen",
+          "db_column_name": "RegenHealth",
+          "value_type": "BoolParameter"
+        },
+        {
+          "name": "Health Modifier",
+          "db_column_name": "HealthModifier",
+          "value_type": "float"
+        },
+        {
+          "name": "Health Modifier Extra",
+          "db_column_name": "HealthModifierExtra",
+          "value_type": "float",
+          "default": 1.0
+        },
+        {
+          "name": "Mana Modifier",
+          "db_column_name": "ManaModifier",
+          "value_type": "float"
+        },
+        {
+          "name": "Mana Modifier Extra",
+          "db_column_name": "ManaModifierExtra",
+          "value_type": "float",
+          "default": 1.0
+        },
+        {
+          "name": "Armor mod",
+          "db_column_name": "ArmorModifier",
+          "value_type": "float"
+        },
+        {
+          "name": "Damage mod",
+          "db_column_name": "DamageModifier",
+          "value_type": "float"
+        },
+        {
+          "name": "Exp mod",
+          "db_column_name": "ExperienceModifier",
+          "value_type": "float"
+        },
+        {
+          "is_meta": true,
+          "name": "Effective health",
+          "meta": "expression:str(ceil(GetHP(this.minlevel, this.unit_class, this.exp) * this.HealthModifier)) + ' - ' + str(ceil(GetHP(this.maxlevel, this.unit_class, this.exp) * this.HealthModifier))",
+          "read_only": true
+        },
+        {
+          "is_meta": true,
+          "name": "Effective mana",
+          "meta": "expression:str(ceil(GetMana(this.minlevel, this.unit_class) * this.ManaModifier)) + ' - ' + str(ceil(GetMana(this.maxlevel, this.unit_class) * this.ManaModifier))",
+          "read_only": true
+        },
+        {
+          "is_meta": true,
+          "name": "Effective armor",
+          "meta": "expression:str(ceil(GetArmor(this.minlevel, this.unit_class) * this.ArmorModifier)) + ' - ' + str(ceil(GetArmor(this.maxlevel, this.unit_class) * this.ArmorModifier))",
+          "read_only": true
+        },
+        {
+          "is_meta": true,
+          "name": "Effective damage",
+          "meta": "expression:str(GetDamage(this.minlevel, this.unit_class, this.exp) * this.DamageModifier) + ' - ' + str(GetDamage(this.maxlevel, this.unit_class, this.exp) * this.DamageModifier * 3 / 2)",
+          "read_only": true
+        },
+        {
+          "is_meta": true,
+          "name": "AP bonus",
+          "meta": "expression:str(GetAPBonus(this.minlevel, this.unit_class)) + ' - ' + str(GetAPBonus(this.maxlevel, this.unit_class))",
+          "read_only": true
+        },
+        {
+          "is_meta": true,
+          "name": "Ranged AP bonus",
+          "meta": "expression:str(GetRangeAPBonus(this.minlevel, this.unit_class)) + ' - ' + str(GetRangeAPBonus(this.maxlevel, this.unit_class))",
+          "read_only": true
+        }
+      ]
+    },
+    {
+      "group_name": "Loot",
+      "fields": [
+        {
+          "name": "Loot ID",
+          "db_column_name": "lootid",
+          "value_type": "uint"
+        },
+        {
+          "name": "Skinning loot ID",
+          "db_column_name": "skinloot",
+          "value_type": "uint"
+        },
+        {
+          "name": "Pickpocket loot ID",
+          "db_column_name": "pickpocketloot",
+          "value_type": "uint"
+        },
+        {
+          "name": "Min gold",
+          "db_column_name": "mingold",
+          "value_type": "uint"
+        },
+        {
+          "name": "Max gold",
+          "db_column_name": "maxgold",
+          "value_type": "uint"
+        }
+      ]
+    },
+    {
+      "group_name": "Trainer",
+      "fields": [
+        {
+          "name": "Trainer Type",
+          "db_column_name": "trainer_type",
+          "value_type": "int"
+        },
+        {
+          "name": "Trainer Class",
+          "db_column_name": "trainer_class",
+          "value_type": "ClassParameter"
+        },
+        {
+          "name": "Trainer Race",
+          "db_column_name": "trainer_race",
+          "value_type": "RaceParameter"
+        }
+      ]
+    },
+    {
+      "group_name": "Immunities",
+      "fields": [
+        {
+          "name": "Mechanic immune mask",
+          "db_column_name": "mechanic_immune_mask",
+          "value_type": "SpellMechanicMaskParameter"
+        },
+        {
+          "name": "School immune mask",
+          "db_column_name": "spell_school_immune_mask",
+          "value_type": "SpellSchoolMaskParameter"
+        }
+      ]
+    },
+    {
+      "group_name": "Resistances",
+      "fields": [
+        {
+          "name": "Resistance (holy)",
+          "db_column_name": "resistance1",
+          "value_type": "int"
+        },
+        {
+          "name": "Resistance (fire)",
+          "db_column_name": "resistance2",
+          "value_type": "int"
+        },
+        {
+          "name": "Resistance (nature)",
+          "db_column_name": "resistance3",
+          "value_type": "int"
+        },
+        {
+          "name": "Resistance (frost)",
+          "db_column_name": "resistance4",
+          "value_type": "int"
+        },
+        {
+          "name": "Resistance (shadow)",
+          "db_column_name": "resistance5",
+          "value_type": "int"
+        },
+        {
+          "name": "Resistance (arcane)",
+          "db_column_name": "resistance6",
+          "value_type": "int"
+        }
+      ]
+    },
+    {
+      "group_name": "Spells",
+      "fields": [
+
+        {
+          "name": "Spell 1",
+          "db_column_name": "spell1",
+          "value_type": "SpellParameter"
+        },
+        {
+          "name": "Spell 2",
+          "db_column_name": "spell2",
+          "value_type": "SpellParameter"
+        },
+        {
+          "name": "Spell 3",
+          "db_column_name": "spell3",
+          "value_type": "SpellParameter"
+        },
+        {
+          "name": "Spell 4",
+          "db_column_name": "spell4",
+          "value_type": "SpellParameter"
+        },
+        {
+          "name": "Spell 5",
+          "db_column_name": "spell5",
+          "value_type": "SpellParameter"
+        },
+        {
+          "name": "Spell 6",
+          "db_column_name": "spell6",
+          "value_type": "SpellParameter"
+        },
+        {
+          "name": "Spell 7",
+          "db_column_name": "spell7",
+          "value_type": "SpellParameter"
+        },
+        {
+          "name": "Spell 8",
+          "db_column_name": "spell8",
+          "value_type": "SpellParameter"
+        }
+      ]
+    },
+    {
+      "group_name": "Scripts",
+      "fields": [
+        {
+          "name": "AI name",
+          "db_column_name": "AIName",
+          "value_type": "string"
+        },
+        {
+          "name": "Script name",
+          "db_column_name": "ScriptName",
+          "value_type": "string"
+        },
+        {
+          "name": "Verified build",
+          "db_column_name": "VerifiedBuild",
+          "value_type": "int",
+          "can_be_null": true
+        }
+      ]
+    }
+  ]
+}

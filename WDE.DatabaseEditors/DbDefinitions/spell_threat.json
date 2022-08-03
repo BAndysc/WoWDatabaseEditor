@@ -1,7 +1,7 @@
 {
   "id": "spell_threat",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityCata"
   ],
   "name": "Spell Threat",
   "single_solution_name": "Spell Threat Table",

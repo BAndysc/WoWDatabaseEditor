@@ -1,7 +1,7 @@
 {
   "id": "exploration_basexp",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityCata"
   ],
   "name": "Exploration Basexp",
   "description": "This table holds the base experience point information needed for when a player explores a new zone.",

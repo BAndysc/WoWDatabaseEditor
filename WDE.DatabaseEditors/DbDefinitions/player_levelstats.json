@@ -1,7 +1,7 @@
 {
   "id": "player_levelstats",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityCata"
   ],
   "name": "Player Level Stats",
   "single_solution_name": "Player Level Stats",

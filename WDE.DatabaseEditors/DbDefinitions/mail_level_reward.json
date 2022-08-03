@@ -1,7 +1,7 @@
 {
   "id": "mail_level_reward",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityCata"
   ],
   "name": "Mail Level Reward",
   "description": "On certain levels, you receive a mail with some text.",

@@ -1,7 +1,7 @@
 {
   "id": "linked_respawn",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityCata"
   ],
   "name": "Linked Respawn",
   "description": "This table links trash mobs to bosses so that if you kill the boss, the trash do not respawn before the instance is reset. Gameobjects can be linked too!",

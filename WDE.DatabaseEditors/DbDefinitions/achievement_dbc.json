@@ -1,7 +1,7 @@
 {
   "id": "achievement_dbc",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityCata"
   ],
   "name": "Achievement Dbc",
   "single_solution_name": "Achievement Dbc",

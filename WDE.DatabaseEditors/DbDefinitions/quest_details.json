@@ -1,7 +1,7 @@
 {
   "id": "quest_details",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityCata"
   ],
   "name": "Quest Details",
   "single_solution_name": "Quest Details Table",

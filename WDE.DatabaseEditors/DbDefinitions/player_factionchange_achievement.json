@@ -1,7 +1,7 @@
 {
   "id": "player_factionchange_achievement",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityCata"
   ],
   "name": "Player Faction Change Achievement",
   "single_solution_name": "Player Faction Change Achievement",

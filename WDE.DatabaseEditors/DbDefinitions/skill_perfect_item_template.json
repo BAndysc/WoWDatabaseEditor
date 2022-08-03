@@ -1,7 +1,7 @@
 {
   "id": "skill_perfect_item_template",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityCata"
   ],
   "name": "Skill Perfect Item Template",
   "single_solution_name": "Skill Perfect Item Template",

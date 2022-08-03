@@ -1,7 +1,7 @@
 {
   "id": "graveyard_zone",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityCata"
   ],
   "name": "Graveyard Zone",
   "single_solution_name": "Graveyard Zone",

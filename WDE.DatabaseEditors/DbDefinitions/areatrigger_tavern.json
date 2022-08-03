@@ -1,7 +1,7 @@
 {
   "id": "areatrigger_tavern",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityWrath", "TrinityCata"
   ],
   "name": "Areatrigger Tavern",
   "single_solution_name": "Areatrigger Tavern",

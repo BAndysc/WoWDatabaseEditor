@@ -1,7 +1,7 @@
 {
   "id": "phase_area",
   "compatibility": [
-    "TrinityMaster"
+    "TrinityMaster", "TrinityCata"
   ],
   "name": "Phase area",
   "description": "You can define what phase shoould be active in what areas",

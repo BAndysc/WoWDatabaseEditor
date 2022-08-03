@@ -1,7 +1,7 @@
 {
   "id": "disables",
   "compatibility": [
-    "TrinityWrath", "TrinityMaster"
+    "TrinityWrath", "TrinityMaster", "TrinityCata"
   ],
   "name": "Disables",
   "single_solution_name": "Disables",
