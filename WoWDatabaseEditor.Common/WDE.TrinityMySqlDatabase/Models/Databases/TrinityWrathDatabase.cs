@@ -17,4 +17,5 @@ public class TrinityWrathDatabase : BaseTrinityDatabase
     public ITable<MySqlCreatureAddon> CreatureAddon => GetTable<MySqlCreatureAddon>();
     public ITable<MySqlCreatureTemplateAddon> CreatureTemplateAddon => GetTable<MySqlCreatureTemplateAddon>();
     public ITable<MySqlWrathQuestTemplateAddon> QuestTemplateAddon => GetTable<MySqlWrathQuestTemplateAddon>();
+    public ITable<MySqlBroadcastTextLocale> BroadcastTextLocale => GetTable<MySqlBroadcastTextLocale>();
 }

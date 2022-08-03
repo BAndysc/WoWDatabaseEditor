@@ -142,4 +142,22 @@ namespace WDE.CMMySqlDatabase.Models
         }
 
     }
+    
+    [Table("broadcast_text_locale")]
+    public class BroadcastTextLocale : IBroadcastTextLocale
+    {
+        [PrimaryKey]
+        [Column(Name = "Id")]
+        public uint Id { get; set; }
+    
+        [PrimaryKey]
+        [Column(Name = "Locale")]
+        public string Locale { get; set; } = "";
+    
+        [Column(Name = "Text_lang")]
+        public string? Text { get; set; }
+    
+        [Column(Name = "Text1_lang")]
+        public string? Text1 { get; set; }
+    }
 }

@@ -70,7 +70,12 @@ public class AzerothhMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvider<Az
         await using var model = Database();
         return await (from t in model.BroadcastTexts where t.Id == id select t).FirstOrDefaultAsync();
     }
-
+    
+    public override async Task<IBroadcastTextLocale?> GetBroadcastTextLocaleByTextAsync(string text)
+    {
+        return null;
+    }
+    
     public override ICreature? GetCreatureByGuid(uint guid)
     {
         using var model = Database();

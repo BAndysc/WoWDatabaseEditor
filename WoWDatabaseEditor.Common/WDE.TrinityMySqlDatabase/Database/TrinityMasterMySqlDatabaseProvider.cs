@@ -66,6 +66,11 @@ public class TrinityMasterMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvid
         return null;
     }
 
+    public override async Task<IBroadcastTextLocale?> GetBroadcastTextLocaleByTextAsync(string text)
+    {
+        return null;
+    }
+
     public override ICreature? GetCreatureByGuid(uint guid)
     {
         using var model = Database();

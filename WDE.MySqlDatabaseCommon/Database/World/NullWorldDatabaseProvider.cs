@@ -71,6 +71,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         
         public Task<IBroadcastText?> GetBroadcastTextByIdAsync(uint id) => Task.FromResult<IBroadcastText?>(null);
         
+        public Task<IBroadcastTextLocale?> GetBroadcastTextLocaleByTextAsync(string text) => Task.FromResult<IBroadcastTextLocale?>(null);
+
         public Task<IBroadcastText?> GetBroadcastTextByTextAsync(string text) => Task.FromResult<IBroadcastText?>(null);
 
         public ICreature? GetCreatureByGuid(uint guid) => null;

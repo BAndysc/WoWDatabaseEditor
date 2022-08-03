@@ -16,6 +16,14 @@ namespace WDE.Common.Database
         uint EmotesId { get; }
         uint Flags { get; }
     }
+    
+    public interface IBroadcastTextLocale
+    {
+        uint Id { get; }
+        string Locale { get; }
+        string? Text { get; }
+        string? Text1 { get; }
+    }
 
     public class AbstractBroadcastText : IBroadcastText
     {

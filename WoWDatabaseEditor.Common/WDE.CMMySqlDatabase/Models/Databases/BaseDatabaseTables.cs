@@ -13,6 +13,7 @@ namespace WDE.CMMySqlDatabase.Models
         {
         }
 
+        public ITable<BroadcastTextLocale> BroadcastTextLocale => GetTable<BroadcastTextLocale>();
         public ITable<GameObjectTemplateWoTLK> GameObjectTemplate => GetTable<GameObjectTemplateWoTLK>();
         public ITable<QuestTemplateWoTLK> QuestTemplate => GetTable<QuestTemplateWoTLK>();
         public ITable<GameEventWoTLK> GameEvents => GetTable<GameEventWoTLK>();

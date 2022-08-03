@@ -281,6 +281,12 @@ namespace WDE.CMMySqlDatabase.Database
             return model.SpellScriptNames.Where(spell => spell.SpellId == spellId).ToList();
         }
 
+        public async Task<IBroadcastTextLocale?> GetBroadcastTextLocaleByTextAsync(string text)
+        {
+            await using var model = Database();
+            return await model.BroadcastTextLocale.FirstOrDefaultAsync(b => b.Text == text || b.Text1 == text);
+        }
+
         public abstract ICreature? GetCreatureByGuid(uint guid);
 
         public abstract IGameObject? GetGameObjectByGuid(uint guid);

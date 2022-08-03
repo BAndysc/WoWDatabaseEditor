@@ -84,6 +84,12 @@ public class TrinityCataMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvider
         return await (from t in model.BroadcastTexts where t.Id == id select t).FirstOrDefaultAsync();
     }
 
+    public override async Task<IBroadcastTextLocale?> GetBroadcastTextLocaleByTextAsync(string text)
+    {
+        await using var model = Database();
+        return await model.BroadcastTextLocale.FirstOrDefaultAsync(b => b.Text == text || b.Text1 == text);
+    }
+
     public override ICreature? GetCreatureByGuid(uint guid)
     {
         using var model = Database();

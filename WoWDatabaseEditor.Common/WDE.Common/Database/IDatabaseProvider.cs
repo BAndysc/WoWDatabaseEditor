@@ -60,6 +60,8 @@ namespace WDE.Common.Database
         Task<IBroadcastText?> GetBroadcastTextByTextAsync(string text);
         Task<IBroadcastText?> GetBroadcastTextByIdAsync(uint id);
 
+        Task<IBroadcastTextLocale?> GetBroadcastTextLocaleByTextAsync(string text);
+
         ICreature? GetCreatureByGuid(uint guid);
         IGameObject? GetGameObjectByGuid(uint guid);
         IEnumerable<ICreature> GetCreaturesByEntry(uint entry);

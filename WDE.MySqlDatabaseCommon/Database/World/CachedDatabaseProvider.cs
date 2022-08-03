@@ -301,6 +301,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         }
 
         public Task<IBroadcastText?> GetBroadcastTextByIdAsync(uint id) => nonCachedDatabase.GetBroadcastTextByIdAsync(id);
+        public Task<IBroadcastTextLocale?> GetBroadcastTextLocaleByTextAsync(string text) => nonCachedDatabase.GetBroadcastTextLocaleByTextAsync(text);
 
         public Task<List<IEventScriptLine>> FindEventScriptLinesBy(IReadOnlyList<(uint command, int dataIndex, long valueToSearch)> conditions) => nonCachedDatabase.FindEventScriptLinesBy(conditions);
         public Task<IList<ICreatureModelInfo>> GetCreatureModelInfoAsync() => nonCachedDatabase.GetCreatureModelInfoAsync();

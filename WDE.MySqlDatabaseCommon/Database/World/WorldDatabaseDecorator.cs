@@ -74,6 +74,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public IBroadcastText? GetBroadcastTextByText(string text) => impl.GetBroadcastTextByText(text);
         public Task<IBroadcastText?> GetBroadcastTextByTextAsync(string text) => impl.GetBroadcastTextByTextAsync(text);
         public Task<IBroadcastText?> GetBroadcastTextByIdAsync(uint id) => impl.GetBroadcastTextByIdAsync(id);
+        public Task<IBroadcastTextLocale?> GetBroadcastTextLocaleByTextAsync(string text) => impl.GetBroadcastTextLocaleByTextAsync(text);
 
         public ICreature? GetCreatureByGuid(uint guid) => impl.GetCreatureByGuid(guid);
         public IGameObject? GetGameObjectByGuid(uint guid) => impl.GetGameObjectByGuid(guid);

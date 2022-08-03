@@ -420,6 +420,8 @@ namespace WDE.TrinityMySqlDatabase.Database
             return model.SpellScriptNames.Where(spell => spell.SpellId == spellId).ToList();
         }
 
+        public abstract Task<IBroadcastTextLocale?> GetBroadcastTextLocaleByTextAsync(string text);
+
         public abstract ICreature? GetCreatureByGuid(uint guid);
 
         public abstract IGameObject? GetGameObjectByGuid(uint guid);
