@@ -86,8 +86,8 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
                     {
                         var tl = this.PointToClient(new PixelPoint(lastSize.LastX.Value, lastSize.LastY.Value));
                         var br = this.PointToClient(new PixelPoint(lastSize.LastX.Value + lastSize.LastWidth.Value, lastSize.LastY.Value + lastSize.LastHeight.Value));
-                        Width = br.X - tl.X;
-                        Height = br.Y - tl.Y;   
+                        Width = Math.Max(br.X - tl.X, 100);
+                        Height = Math.Max(br.Y - tl.Y, 100);   
                     }
                 }
             }
@@ -115,7 +115,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
             base.OnClosing(e);
             // we use screen coords for size so that size is custom app scaling independent 
             var screenTopLeftPoint = this.PointToScreen(new Point(Position.X, Position.Y));
-            var screenBottomRightPoint = this.PointToScreen(new Point(Position.X + Width, Position.Y + Height));
+            var screenBottomRightPoint = this.PointToScreen(new Point(Position.X + this.ClientSize.Width, Position.Y + this.ClientSize.Height));
             userSettings.Update(new WindowLastSize()
             {
                 WasMaximized = WindowState == WindowState.Maximized || WindowState == WindowState.FullScreen,
