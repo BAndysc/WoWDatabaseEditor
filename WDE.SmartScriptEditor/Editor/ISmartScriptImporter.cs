@@ -7,6 +7,6 @@ namespace WDE.SmartScriptEditor.Editor
 {
     public interface ISmartScriptImporter
     {
-        Task Import(SmartScript script, bool doNotTouchIfPossible, IList<ISmartScriptLine> lines, IList<IConditionLine> conditions, IList<IConditionLine> targetConditions);
+        Task Import(SmartScript script, bool doNotTouchIfPossible, IList<ISmartScriptLine> lines, IList<IConditionLine> conditions, IList<IConditionLine>? targetConditions);
     }
 }

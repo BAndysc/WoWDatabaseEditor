@@ -1250,6 +1250,8 @@
         "name_readable": "Waypoint path start",
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_SELF",
+        "target_types": ["Player"],
+        "do_not_propose_target": true,
         "usable_with_script_types": ["Creature", "TimedActionList"]
     },
     {
@@ -1697,7 +1699,7 @@
                 "description": "If > 0 contact distance + combatreach"
             }
         ],
-        "description": "{source}: Move to {targetid:choose(8):position {targetcoords}{pram2value:choose(0):| on transport}|{target} with offset {targetcoords}{pram4value:choose(0):| in {pram4} yd distance}} (point id {pram1}){pram3value:choose(0):| without pathfinding}",
+        "description": "{source}: Move to {targetid:choose(8):position {targetcoords}{pram2value:choose(0):| on transport}|{target}{hascoords: with offset {targetcoords}|}{pram4value:choose(0):| in {pram4} yd distance}}{pram1value:choose(0):| (point id {pram1})}{pram3value:choose(0):| without pathfinding}",
         "name_readable": "Move to position",
         "target_types": ["GameObject", "Player", "Creature", "Position"],
         "target_is_source": false,
@@ -3886,5 +3888,12 @@
         "target_is_source": false,
         "implicit_source": "SMART_TARGET_NONE",
         "usable_with_script_types": ["Creature"]
+    },
+    {
+        "id": 9994,
+        "name": "SMART_ACTION_META_REPEAT_CURRENT_ACTIONLIST",
+        "description": "    Repeat",
+        "name_readable": "Repeat current action list",
+        "implicit_source": "SMART_TARGET_SELF"
     }
 ]

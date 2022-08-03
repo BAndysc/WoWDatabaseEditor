@@ -51,7 +51,7 @@ namespace WDE.TrinitySmartScriptEditor.Providers
 
         private class EmptyMessageboxService : IMessageBoxService
         {
-            public Task<T?> ShowDialog<T>(IMessageBox<T> messageBox) => default;
+            public async Task<T?> ShowDialog<T>(IMessageBox<T> messageBox) => default;
         }
     }
 }

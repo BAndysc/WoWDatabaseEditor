@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;
@@ -47,7 +48,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
         public (ISmartScriptLine[], IConditionLine[]) ToDatabaseCompatibleSmartScript(SmartScript script)
         {
             if (script.Events.Count == 0)
-                return (new ISmartScriptLine[0], null);
+                return (new ISmartScriptLine[0], new IConditionLine[0]);
 
             var eventId = 0;
             var lines = new List<ISmartScriptLine>();
@@ -158,6 +159,10 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                     SmartEvent lastEvent = originalEvent;
                     
                     long accumulatedWaits = 0;
+                    int? firstInlineActionListId = null;
+                    int? firstInlineActionListUpdateType = null;
+                    bool? firstInlineActionListAllowOverride = null;
+                    int? currentInlineActionListId = null;
                     for (var index = 0; index < e.Actions.Count; ++index)
                     {
                         if (previousWasWait)
@@ -172,15 +177,17 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                         if (e.Actions[index].Id == SmartConstants.ActionBeginInlineActionList ||
                             e.Actions[index].Id == SmartConstants.ActionAfter)
                         {
-                            var timedActionListId = GetNextUnusedTimedActionList();
+                            firstInlineActionListId = currentInlineActionListId = GetNextUnusedTimedActionList();
                             SmartAction callTimedActionList = smartFactory.ActionFactory(SmartConstants.ActionCallTimedActionList,
                                 smartFactory.SourceFactory(SmartConstants.SourceSelf),
                                 smartFactory.TargetFactory(SmartConstants.TargetSelf));
-                            callTimedActionList.GetParameter(0).Value = timedActionListId;
+                            callTimedActionList.GetParameter(0).Value = currentInlineActionListId.Value;
                             if (e.Actions[index].Id == SmartConstants.ActionBeginInlineActionList)
                             {
-                                callTimedActionList.GetParameter(1).Value = e.Actions[index].GetParameter(0).Value;
-                                callTimedActionList.GetParameter(2).Value = e.Actions[index].GetParameter(1).Value;
+                                firstInlineActionListUpdateType = (int)e.Actions[index].GetParameter(0).Value;
+                                firstInlineActionListAllowOverride = e.Actions[index].GetParameter(1).Value != 0;
+                                callTimedActionList.GetParameter(1).Value = firstInlineActionListUpdateType.Value;
+                                callTimedActionList.GetParameter(2).Value = firstInlineActionListAllowOverride.Value ? 1 : 0;
                                 index++;
                             }
                             callTimedActionList.Comment = SmartConstants.CommentInlineActionList;
@@ -202,20 +209,35 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                                 }
                                 else if (e.Actions[index].Id == SmartConstants.ActionAfterMovement && index > 0)
                                 {
+                                    var previousActionType = e.Actions[index - 1].Id;
+                                    Debug.Assert(previousActionType is SmartConstants.ActionStartWaypointsPath or SmartConstants.ActionMovePoint);
                                     afterTimeMin = 0;
                                     afterTimeMax = 0;
-                                    var pathId = e.Actions[index - 1].GetParameter(1).Value;
-                                    timedActionListId = GetNextUnusedTimedActionList();
 
-                                    var eventFinishedMovement =
-                                        smartFactory.EventFactory(SmartConstants.EventWaypointsEnded);
+                                    SmartEvent eventFinishedMovement;
+                                    if (previousActionType == SmartConstants.ActionStartWaypointsPath)
+                                    {
+                                        var pathId = e.Actions[index - 1].GetParameter(1).Value;
+                                        eventFinishedMovement = smartFactory.EventFactory(SmartConstants.EventWaypointsEnded);
+                                        eventFinishedMovement.GetParameter(1).Value = pathId;
+                                    }
+                                    else if (previousActionType == SmartConstants.ActionMovePoint)
+                                    {
+                                        var pointId = e.Actions[index - 1].GetParameter(0).Value;
+                                        eventFinishedMovement = smartFactory.EventFactory(SmartConstants.EventMovementInform);
+                                        eventFinishedMovement.GetParameter(0).Value = SmartConstants.MovementTypePointMotionType;
+                                        eventFinishedMovement.GetParameter(1).Value = pointId;
+                                    }
+                                    else
+                                        throw new Exception("Invalid previosu action type");
+
                                     eventFinishedMovement.Parent = script;
-                                    eventFinishedMovement.GetParameter(1).Value = pathId;
                                     
+                                    currentInlineActionListId = GetNextUnusedTimedActionList();
                                     var callAnotherTimedActionList = smartFactory.ActionFactory(SmartConstants.ActionCallTimedActionList,
                                         smartFactory.SourceFactory(SmartConstants.SourceSelf),
                                         smartFactory.TargetFactory(SmartConstants.TargetSelf));
-                                    callAnotherTimedActionList.GetParameter(0).Value = timedActionListId;
+                                    callAnotherTimedActionList.GetParameter(0).Value = currentInlineActionListId.Value;
                                     callAnotherTimedActionList.Comment = SmartConstants.CommentInlineMovementActionList;
                                     
                                     eventFinishedMovement.AddAction(callAnotherTimedActionList);
@@ -228,12 +250,37 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                                     after.GetParameter(0).Value = afterTimeMin;
                                     after.GetParameter(1).Value = afterTimeMax;
                                     SmartAction actualAction = e.Actions[index].Copy();
+                                    
+                                    if (e.Actions[index].Id == SmartConstants.ActionRepeatTimedActionList)
+                                    {
+                                        actualAction = smartFactory.ActionFactory(SmartConstants.ActionCreateTimed, null, null);
+                                        actualAction.GetParameter(0).Value = nextTriggerId;
+                                        actualAction.GetParameter(1).Value = 500;
+                                        actualAction.GetParameter(2).Value = 500;
+                                        actualAction.Comment = SmartConstants.CommentInlineRepeatActionList;
+                                        
+                                        var eventTimedTriggerRepeat = smartFactory.EventFactory(SmartConstants.EventTriggerTimed);
+                                        eventTimedTriggerRepeat.Parent = script;
+                                        eventTimedTriggerRepeat.GetParameter(0).Value = nextTriggerId++;
+                                        additionalEvents.Add(eventTimedTriggerRepeat);
+                                        
+                                        SmartAction callTimedActionListAgain = smartFactory.ActionFactory(SmartConstants.ActionCallTimedActionList, smartFactory.SourceFactory(SmartConstants.SourceSelf), smartFactory.TargetFactory(SmartConstants.TargetSelf));
+                                        callTimedActionListAgain.GetParameter(0).Value = firstInlineActionListId.Value;
+                                        if (firstInlineActionListUpdateType.HasValue)
+                                            callTimedActionList.GetParameter(1).Value = firstInlineActionListUpdateType.Value;
+                                        if (firstInlineActionListAllowOverride.HasValue)
+                                            callTimedActionList.GetParameter(2).Value = firstInlineActionListAllowOverride.Value ? 1 : 0;
+
+                                        callTimedActionListAgain.Parent = eventTimedTriggerRepeat;
+                                        eventTimedTriggerRepeat.Actions.Add(callTimedActionListAgain);
+                                    }
+                                    
                                     AdjustCoreCompatibleAction(actualAction);
                         
-                                    after.Parent = new SmartScript(new SmartScriptSolutionItem(timedActionListId, SmartScriptType.TimedActionList), smartFactory, smartDataManager, messageBoxService);
+                                    after.Parent = new SmartScript(new SmartScriptSolutionItem(currentInlineActionListId.Value, SmartScriptType.TimedActionList), smartFactory, smartDataManager, messageBoxService);
                                     after.AddAction(actualAction);
                         
-                                    var serialized = after.ToSmartScriptLines(timedActionListId, SmartScriptType.TimedActionList, timedEventId++, false, 0);
+                                    var serialized = after.ToSmartScriptLines(currentInlineActionListId.Value, SmartScriptType.TimedActionList, timedEventId++, false, 0);
 
                                     if (serialized.Length != 1)
                                         throw new InvalidOperationException();
@@ -241,6 +288,9 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                                     lines.Add(serialized[0]);
                                     afterTimeMin = 0;
                                     afterTimeMax = 0;
+                                    
+                                    if (e.Actions[index].Id == SmartConstants.ActionRepeatTimedActionList)
+                                        FlushLines(null);
                                 }
                             }
                         }

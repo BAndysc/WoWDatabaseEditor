@@ -61,6 +61,7 @@ namespace WDE.SmartScriptEditor.Inspections
             eventInspections.Add(new IndentationInspection());
             eventInspections.Add(new BeginInlineActionListOnlyOnceInspection());
             eventInspections.Add(new MovementAwaitOnlyAfterMovement());
+            eventInspections.Add(new RepeatTimedActionListOnlyInBeginInlineTimedActionListInspection());
             
             actionInspections.Add(new ParameterRangeInspection());
             if (!currentCoreVersion.Current.SmartScriptFeatures.SupportsCreatingTimedEventsInsideTimedEvents)

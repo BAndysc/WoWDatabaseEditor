@@ -10,7 +10,7 @@ namespace WDE.SmartScriptEditor.Data
 
         SmartEvent EventFactory(ISmartScriptLine line);
 
-        SmartAction ActionFactory(int id, SmartSource source, SmartTarget target);
+        SmartAction ActionFactory(int id, SmartSource? source, SmartTarget? target);
 
         SmartAction ActionFactory(ISmartScriptLine line);
 

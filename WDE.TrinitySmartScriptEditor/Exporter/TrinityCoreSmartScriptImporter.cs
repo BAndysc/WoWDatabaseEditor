@@ -51,7 +51,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
             return false;
         }
 
-        public async Task Import(SmartScript script, bool doNotTouchIfPossible, IList<ISmartScriptLine> lines, IList<IConditionLine> conditions, IList<IConditionLine> targetConditions)
+        public async Task Import(SmartScript script, bool doNotTouchIfPossible, IList<ISmartScriptLine> lines, IList<IConditionLine> conditions, IList<IConditionLine>? targetConditions)
         {
             int? entry = null;
             SmartScriptType? source = null;
@@ -84,6 +84,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
             }
 
             SmartEvent? lastEvent = null;
+            List<int> onTimedEventToRemove = new(); // timed event ids that we want to remove, because they belong to REPEAT meta action
             foreach (var line in lines)
             {
                 if (TryParseGlobalVariable(script, line))
@@ -206,7 +207,16 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                             }
 
                             foreach (var a in e.Actions)
-                                currentEvent.AddAction(a);
+                            {
+                                if (a.Comment == SmartConstants.CommentInlineRepeatActionList)
+                                {
+                                    onTimedEventToRemove.Add((int)a.GetParameter(0).Value);
+                                    var actualAction = smartFactory.ActionFactory(SmartConstants.ActionRepeatTimedActionList, null, null);
+                                    currentEvent.AddAction(actualAction);
+                                }
+                                else
+                                    currentEvent.AddAction(a);
+                            }
                         }
                     }
                     else
@@ -276,16 +286,16 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                 if (e.Actions.Count > 0)
                 {
                     var a = e.Actions[^1];
-                    if (a.Id == SmartConstants.ActionStartWaypointsPath)
-                        startPathToActionParent[a.GetParameter(1).Value] = e;
+                    if (a.Id is SmartConstants.ActionStartWaypointsPath)
+                        startPathToActionParent[a.GetParameter(1).Value] = e; // path id
+                    else if (a.Id is SmartConstants.ActionMovePoint)
+                        startPathToActionParent[a.GetParameter(0).Value] = e; // point id
                 }
             }
             
             for (var index = script.Events.Count - 1; index >= 0; index--)
             {
                 var e = script.Events[index];
-                if (e.Id != SmartConstants.EventWaypointsEnded || e.GetParameter(0).Value != 0)
-                    continue;
                 
                 if (e.Actions.Count == 0 || e.Actions[0].Id != SmartConstants.ActionBeginInlineActionList)
                     continue;
@@ -293,12 +303,38 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                 if (!startPathToActionParent.TryGetValue(e.GetParameter(1).Value, out var startPathEvent))
                     continue;
                 
-                script.Events.Remove(e);
-                startPathEvent.AddAction(smartFactory.ActionFactory(SmartConstants.ActionAfterMovement, null, null));
-                for (int i = 1; i < e.Actions.Count; ++i)
-                    startPathEvent.AddAction(e.Actions[i]);
+                if ((e.Id == SmartConstants.EventWaypointsEnded && e.GetParameter(0).Value == 0) ||
+                    (e.Id == SmartConstants.EventMovementInform && 
+                     e.GetParameter(0).Value == SmartConstants.MovementTypePointMotionType &&
+                     e.GetParameter(1).Value != 0))
+                {
+                    script.Events.Remove(e);
+                    startPathEvent.AddAction(smartFactory.ActionFactory(SmartConstants.ActionAfterMovement, null, null));
+                    for (int i = 1; i < e.Actions.Count; ++i)
+                        startPathEvent.AddAction(e.Actions[i]);   
+                }
             }
 
+            if (onTimedEventToRemove.Count > 0)
+            {
+                for (var index = script.Events.Count - 1; index >= 0; index--)
+                {
+                    var e = script.Events[index];
+                    if (e.Id != SmartConstants.EventTriggerTimed)
+                        continue;
+                    
+                    if (e.Actions.Count != 1)
+                        continue;
+
+                    if (e.Actions[0].Id != SmartConstants.ActionCallTimedActionList)
+                        continue;
+
+                    if (!onTimedEventToRemove.Contains((int)e.GetParameter(0).Value))
+                        continue;
+                    
+                    script.Events.RemoveAt(index);
+                }
+            }
 
             if (doubleLinks.Count > 0)
             {

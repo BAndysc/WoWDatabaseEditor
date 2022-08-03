@@ -34,7 +34,8 @@ namespace WDE.SmartScriptEditor.Inspections
                             Line = a.LineId,
                             Message = "`After previous movement` action can only work within `begin inline actionlist` at the moment"
                         };
-                    if (prev.Id != SmartConstants.ActionStartWaypointsPath)
+                    if (prev.Id != SmartConstants.ActionStartWaypointsPath &&
+                        prev.Id != SmartConstants.ActionMovePoint)
                         return new InspectionResult()
                         {
                             Severity = DiagnosticSeverity.Error,
