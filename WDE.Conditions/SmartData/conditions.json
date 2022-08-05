@@ -225,26 +225,24 @@
 		"parameters": [
 			{
 				"type": "Parameter",
-				"name": "Data Type",
-				"description": "DEF"
+				"name": "Data Type"
 			},
 			{
 				"type": "Parameter",
 				"name": "Value",
-				"description": "If BOSS_STATE, avaliable values: NOT_STARTED = 0, IN_PROGRESS = 1, FAIL = 2, DONE = 3, SPECIAL = 4, TO_BE_DECIDED = 5"
+				"description": "If BOSS_STATE, available values: NOT_STARTED = 0, IN_PROGRESS = 1, FAIL = 2, DONE = 3, SPECIAL = 4, TO_BE_DECIDED = 5"
 			},
 			{
 				"type": "SwitchParameter",
 				"name": "Type",
 				"values": {
 					"0": {"name": "INSTANCE_INFO_DATA"},
-					"1": {"name": "INSTANCE_INFO_GUID_DATA"},
 					"2": {"name": "INSTANCE_INFO_BOSS_STATE"},
 					"3": {"name": "INSTANCE_INFO_DATA64"}
 				}
 			}
 		],
-		"description": "{negate:|NOT }{pram3value:choose(0|1|2|3):instance data {pram1} equals {pram2}|??????|boss {pram1} {pram2value:choose(0|1|2|3|4|5):has not started|is in progress|failed|special state|is to be decided?}|data64[{pram1}] = {pram2}}"
+		"description": "{negate:|NOT }{pram3value:choose(0|1|2|3):instance data {pram1} equals {pram2}|[not supported]|boss {pram1} {pram2value:choose(0|1|2|3|4|5):has not started|is in progress|failed|is done|special state|is to be decided}|data64[{pram1}] = {pram2}}"
 	},
 
 	{
