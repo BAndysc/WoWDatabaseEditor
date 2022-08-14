@@ -604,24 +604,24 @@ namespace WDE.PacketViewer.Processing.Processors
 
             if (continuedPhases.Count > 0)
                 sb.Append("Continued Phases:    " + continuedPhases[0]);
-            if ((continuedPhases.Count > 1 | addedPhases.Count > 0 | removedPhases.Count > 0) & continuedPhases.Count > 0)
+            if ((continuedPhases.Count > 1 || addedPhases.Count > 0 || removedPhases.Count > 0) && continuedPhases.Count > 0)
                 sb.AppendLine();
             for (int i = 1; i < continuedPhases.Count; ++i)
             {
                 sb.Append("                          " + continuedPhases[i]);
-                if (i < continuedPhases.Count - 1 | addedPhases.Count > 0 | removedPhases.Count > 0)
+                if (i < continuedPhases.Count - 1 || addedPhases.Count > 0 || removedPhases.Count > 0)
                     sb.AppendLine();
             }
-            if (addedPhases.Count > 0 & continuedPhases.Count > 0)
+            if (addedPhases.Count > 0 && continuedPhases.Count > 0)
                 sb.Append("     Added Phases:        " + addedPhases[0]);
-            if (addedPhases.Count > 0 & continuedPhases.Count == 0)
+            if (addedPhases.Count > 0 && continuedPhases.Count == 0)
                 sb.Append("Added Phases:        " + addedPhases[0]);
-            if ((addedPhases.Count > 1 | removedPhases.Count > 0) & addedPhases.Count > 0)
+            if ((addedPhases.Count > 1 || removedPhases.Count > 0) && addedPhases.Count > 0)
                 sb.AppendLine();
             for (int i = 1; i < addedPhases.Count; ++i)
             {
                 sb.Append("                          " + addedPhases[i]);
-                if (i < addedPhases.Count - 1 | removedPhases.Count > 0)
+                if (i < addedPhases.Count - 1 || removedPhases.Count > 0)
                     sb.AppendLine();
             }
 
