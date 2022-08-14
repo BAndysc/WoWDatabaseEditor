@@ -14,6 +14,7 @@ using WDE.PacketViewer.Processing.Processors.Utils;
 using WowPacketParser.Proto;
 using WDE.PacketViewer.Processing.Runners;
 using WDE.PacketViewer.Utils;
+using DynamicData;
 
 namespace WDE.PacketViewer.Processing.Processors
 {
@@ -61,6 +62,7 @@ namespace WDE.PacketViewer.Processing.Processors
         private readonly Dictionary<UniversalGuid, int> guids = new();
         private int currentShortGuid;
         private readonly Dictionary<uint, Dictionary<uint, string>> gossips = new();
+        private HashSet<uint> activePhases = new();
 
         public bool RequiresSplitUpdateObject => true;
         
@@ -567,17 +569,74 @@ namespace WDE.PacketViewer.Processing.Processors
         {
             StringBuilder sb = new StringBuilder();
             List<string> phases = new List<string>();
+            List<string> addedPhases = new List<string>();
+            List<string> removedPhases = new List<string>();
+            List<string> continuedPhases = new List<string>();
+
             foreach (uint phase in packet.Phases)
             {
                 phases.Add(GetStringFromDbc(dbcStore.PhaseStore, (int)phase));
+                bool wasadded = activePhases.Add(phase);
+                if (wasadded)
+                {
+                    addedPhases.Add(GetStringFromDbc(dbcStore.PhaseStore, (int)phase));
+                }
             }
 
-            if (phases.Count > 0)
-                sb.AppendLine("switch phase to: "+ phases[0]);
-            for (int i = 1; i < phases.Count; ++i)
+            foreach (uint phase in activePhases.ToList())
             {
-                sb.Append("                    " + phases[i]);
-                if (i < phases.Count - 1)
+                bool isRemoved = !packet.Phases.Contains(phase);
+                if (isRemoved)
+                {
+                    activePhases.Remove(phase);
+                    removedPhases.Add(GetStringFromDbc(dbcStore.PhaseStore, (int)phase));
+                }
+            }
+
+            foreach (uint phase in activePhases.ToList())
+            {
+                bool iscontinued = !addedPhases.Contains(GetStringFromDbc(dbcStore.PhaseStore, (int)phase));
+                if (iscontinued)
+                { 
+                    continuedPhases.Add(GetStringFromDbc(dbcStore.PhaseStore, (int)phase));
+                }
+            }
+
+            if (continuedPhases.Count > 0)
+                sb.Append("Continued Phases:    " + continuedPhases[0]);
+            if ((continuedPhases.Count > 1 || addedPhases.Count > 0 || removedPhases.Count > 0) && continuedPhases.Count > 0)
+                sb.AppendLine();
+            for (int i = 1; i < continuedPhases.Count; ++i)
+            {
+                sb.Append("                          " + continuedPhases[i]);
+                if (i < continuedPhases.Count - 1 || addedPhases.Count > 0 || removedPhases.Count > 0)
+                    sb.AppendLine();
+            }
+            if (addedPhases.Count > 0 && continuedPhases.Count > 0)
+                sb.Append("     Added Phases:        " + addedPhases[0]);
+            if (addedPhases.Count > 0 && continuedPhases.Count == 0)
+                sb.Append("Added Phases:        " + addedPhases[0]);
+            if ((addedPhases.Count > 1 || removedPhases.Count > 0) && addedPhases.Count > 0)
+                sb.AppendLine();
+            for (int i = 1; i < addedPhases.Count; ++i)
+            {
+                sb.Append("                          " + addedPhases[i]);
+                if (i < addedPhases.Count - 1 || removedPhases.Count > 0)
+                    sb.AppendLine();
+            }
+
+            if (removedPhases.Count > 0)
+            {
+                sb.AppendLine();
+                sb.Append("     Removed Phases:      " + removedPhases[0]);
+            }
+
+            if (removedPhases.Count > 1)
+                sb.AppendLine();
+            for (int i = 1; i < removedPhases.Count; ++i)
+            {
+                sb.Append("                          " + removedPhases[i]);
+                if (i < removedPhases.Count - 1)
                     sb.AppendLine();
             }
 
