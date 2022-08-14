@@ -39,13 +39,13 @@
           "name": "Name",
           "db_column_name": "name",
           "value_type": "string",
-          "read_only": true
+          "read_only": false
         },
         {
           "name": "Subname",
           "db_column_name": "subname",
           "value_type": "string",
-          "read_only": true,
+          "read_only": false,
           "can_be_null": true
         },
         {
