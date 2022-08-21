@@ -58,6 +58,14 @@
                             </DataTriggerBehavior>
                             <DataTriggerBehavior Binding="{Binding Severity}" ComparisonCondition="Equal">
                                 <DataTriggerBehavior.Value>
+                                    <managers:DiagnosticSeverity>Critical</managers:DiagnosticSeverity>
+                                </DataTriggerBehavior.Value>
+                                <ChangePropertyAction TargetObject="{Binding #Image}" 
+                                                      PropertyName="Source"
+                                                      Value="{StaticResource IconError}" />
+                            </DataTriggerBehavior>
+                            <DataTriggerBehavior Binding="{Binding Severity}" ComparisonCondition="Equal">
+                                <DataTriggerBehavior.Value>
                                     <managers:DiagnosticSeverity>Warning</managers:DiagnosticSeverity>
                                 </DataTriggerBehavior.Value>
                                 <ChangePropertyAction TargetObject="{Binding #Image}" 

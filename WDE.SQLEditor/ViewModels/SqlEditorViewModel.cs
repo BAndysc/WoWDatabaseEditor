@@ -7,6 +7,7 @@ using Prism.Mvvm;
 using WDE.Common.Database;
 using WDE.Common.History;
 using WDE.Common.Managers;
+using WDE.Common.Services.MessageBox;
 using WDE.Common.Solution;
 using WDE.Common.Tasks;
 using WDE.Common.Types;
@@ -56,9 +57,11 @@ namespace WDE.SQLEditor.ViewModels
         public SqlEditorViewModel(IMySqlExecutor mySqlExecutor, 
             IStatusBar statusBar,
             IDatabaseProvider databaseProvider, 
-            ITaskRunner taskRunner, 
+            ITaskRunner taskRunner,
+            IMessageBoxService messageBoxService,
             ISolutionItemSqlGeneratorRegistry sqlGeneratorsRegistry,
             INativeTextDocument sql,
+            IMainThread mainThread,
             MetaSolutionSQL item) : this(mySqlExecutor, statusBar, databaseProvider, taskRunner, sql)
         {
             IsLoading = true;
@@ -66,8 +69,24 @@ namespace WDE.SQLEditor.ViewModels
                 async () =>
                 {
                     StringBuilder sb = new();
-                    foreach (var subitem in item.ItemsToGenerate)
-                        sb.AppendLine((await sqlGeneratorsRegistry.GenerateSql(subitem)).QueryString);
+                    try
+                    {
+                        foreach (var subitem in item.ItemsToGenerate)
+                            sb.AppendLine((await sqlGeneratorsRegistry.GenerateSql(subitem)).QueryString);
+                    }
+                    catch (Exception e)
+                    {
+#pragma warning disable CS4014
+                        messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
+                            .SetTitle("Error while generating the SQL")
+                            .SetMainInstruction("Couldn't generate the sql")
+                            .SetContent(e.Message)
+                            .WithOkButton(true)
+                            .Build()).ListenErrors();
+#pragma warning restore CS4014
+                        mainThread.Delay(() => CloseCommand?.ExecuteAsync(), TimeSpan.FromMilliseconds(1));
+                        throw;
+                    }
                     string sql = sb.ToString();
                     
                     Code.FromString(sql);

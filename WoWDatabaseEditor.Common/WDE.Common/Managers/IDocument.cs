@@ -61,6 +61,7 @@ namespace WDE.Common.Managers
     
     public enum DiagnosticSeverity
     {
+        Critical,
         Error,
         Warning,
         Info

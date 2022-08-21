@@ -403,7 +403,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
         {
             if (Problems != null && Problems.TryGetValue(index, out var severity))
             { 
-                dc.DrawText(severity == DiagnosticSeverity.Error ? Brushes.Red : Brushes.Orange, new Point(0, yPos + 5 + 10), vvvvText);   
+                dc.DrawText(severity is DiagnosticSeverity.Error or DiagnosticSeverity.Critical ? Brushes.Red : Brushes.Orange, new Point(0, yPos + 5 + 10), vvvvText);   
             }
         }
 
