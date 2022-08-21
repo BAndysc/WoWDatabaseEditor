@@ -224,7 +224,7 @@ namespace WDE.Common.Avalonia.Controls
                     drawer.DrawUnderline(context, styleId, bounds);
                 }
 
-                if (bounds.Contains(currentPos))
+                if (bounds.Contains(currentPos) && contextId != -1)
                     newOverPartIndex = partIndex;
             });
 
@@ -248,7 +248,7 @@ namespace WDE.Common.Avalonia.Controls
             {
                 var styleId = parameter ? STYLE_PARAMETER : (source ? STYLE_SOURCE : STYLE_DEFAULT);
                 (wasWrapped, bounds) = drawer!.Measure(text, styleId, !wasWrapped, ref x, ref y, availableSize.Width);
-                if (bounds.Contains(currentPos))
+                if (bounds.Contains(currentPos) && contextId != -1)
                     overPartIndex = partIndex;
                 everWrapped |= wasWrapped;
             });
