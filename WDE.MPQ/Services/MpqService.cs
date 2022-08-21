@@ -27,7 +27,9 @@ namespace WDE.MPQ.Services
         {
             if (settings.Path == null)
                 return new EmptyMpqArchive();
-            var files = Directory.EnumerateFiles(Path.Join(settings.Path, "Data"), "*.mpq", SearchOption.AllDirectories).ToList();
+            var files = Directory.EnumerateFiles(Path.Join(settings.Path, "Data"), "*.mpq", new EnumerationOptions { RecurseSubdirectories = true, MatchType = MatchType.Win32, AttributesToSkip = 0, IgnoreInaccessible = true, MatchCasing = MatchCasing.CaseInsensitive})
+                .Where(x => !x.Contains("-update-"))
+                .ToList();
             files.Sort(MpqSortingFunc);
             List<IMpqArchive> archives = new();
             foreach (var file in files)
