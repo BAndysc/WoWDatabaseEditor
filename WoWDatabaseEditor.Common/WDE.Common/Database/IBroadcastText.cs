@@ -15,6 +15,8 @@ namespace WDE.Common.Database
         uint SoundEntriesId { get; }
         uint EmotesId { get; }
         uint Flags { get; }
+
+        int ChatTypeId => 0; // used in mangos, but helpful there
     }
     
     public interface IBroadcastTextLocale

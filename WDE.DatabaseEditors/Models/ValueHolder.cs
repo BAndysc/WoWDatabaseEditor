@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using WDE.Common.Annotations;
 using WDE.Common.Parameters;
+using WDE.Common.Utils;
 
 namespace WDE.DatabaseEditors.Models
 {
@@ -102,6 +104,7 @@ namespace WDE.DatabaseEditors.Models
         public string? ValueAsString => Value?.ToString();
         public void RaiseChanged()
         {
+            hasCachedStringValue = false;
             OnPropertyChanged(nameof(String));
             OnPropertyChanged(nameof(Value));
         }
@@ -120,6 +123,7 @@ namespace WDE.DatabaseEditors.Models
                     return;
                 
                 parameter = value;
+                hasCachedStringValue = false;
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(String));
             }
@@ -129,11 +133,13 @@ namespace WDE.DatabaseEditors.Models
         {
             this.context = context;
             this.value = value;
+            valueForAsyncCalculation = originalValue.Value!;
             this.originalValue = originalValue;
             this.parameter = parameter;
-            OriginalString = ToString(originalValue);
+            OriginalString = OriginalToString();
             value.PropertyChanged += (_, _) =>
             {
+                hasCachedStringValue = false;
                 OnPropertyChanged(nameof(String));
                 OnPropertyChanged(nameof(Value));
             };
@@ -156,20 +162,38 @@ namespace WDE.DatabaseEditors.Models
                 value.Value = originalValue.Value;
         }
 
-        private string ToString(ValueHolder<T> val)
+        private string OriginalToString()
         {
-            if (DefaultIsBlank && Comparer<T>.Default.Compare(val.Value, default) == 0)
+            if (DefaultIsBlank && Comparer<T>.Default.Compare(originalValue.Value, default) == 0)
                 return "";
-            if (val.IsNull)
+            if (originalValue.IsNull)
                 return "(null)";
             if (parameter is IContextualParameter<T, TContext> contextualParameter)
-                return contextualParameter.ToString(val.Value!, context);
-            return parameter.ToString(val.Value!);
+                return cachedStringValue = contextualParameter.ToString(originalValue.Value!, context);
+            return parameter.ToString(originalValue.Value!);
         }
         
         public override string ToString()
         {
-            return ToString(value);
+            if (DefaultIsBlank && Comparer<T>.Default.Compare(value.Value, default) == 0)
+                return "";
+            if (value.IsNull)
+                return "(null)";
+            
+            if (hasCachedStringValue)
+                return cachedStringValue;
+            
+            if (parameter is IAsyncContextualParameter<T, TContext> asyncContextualParameter)
+            {
+                if (!AsyncInProgress)
+                    CalculateStringAsync(value.Value!, context, asyncContextualParameter).ListenErrors();
+                return parameter.ToString(value.Value!);
+            }
+            
+            hasCachedStringValue = true;
+            if (parameter is IContextualParameter<T, TContext> contextualParameter)
+                return cachedStringValue = contextualParameter.ToString(value.Value!, context);
+            return cachedStringValue = parameter.ToString(value.Value!);
         }
         
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -177,6 +201,64 @@ namespace WDE.DatabaseEditors.Models
         private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+        
+        
+        /// Async
+        private CancellationTokenSource? currentToStringCancellationToken;
+        private string cachedStringValue = null!;
+        private bool hasCachedStringValue;
+        private T valueForAsyncCalculation;
+        public bool AsyncInProgress => currentToStringCancellationToken != null && (Comparer<T>.Default.Compare(valueForAsyncCalculation, Value) == 0);
+        private async System.Threading.Tasks.Task CalculateStringAsync(T v, IAsyncParameter<T> p)
+        {
+            currentToStringCancellationToken?.Cancel();
+            var token = new CancellationTokenSource();
+            valueForAsyncCalculation = v;
+            currentToStringCancellationToken = token;
+            try
+            {
+                var result = await p.ToStringAsync(v, currentToStringCancellationToken.Token);
+                if (token.IsCancellationRequested)
+                    return;
+
+                hasCachedStringValue = true;
+                cachedStringValue = result;
+            }
+            catch (Exception)
+            {
+                hasCachedStringValue = true;
+                cachedStringValue = ToString();
+            }
+
+            OnPropertyChanged(nameof(String));
+            
+            currentToStringCancellationToken = null;
+        }
+        
+        private async System.Threading.Tasks.Task CalculateStringAsync(T v, TContext context, IAsyncContextualParameter<T, TContext> p)
+        {
+            currentToStringCancellationToken?.Cancel();
+            var token = new CancellationTokenSource();
+            currentToStringCancellationToken = token;
+            valueForAsyncCalculation = v;
+            try
+            {
+                var result = await p.ToStringAsync(v, currentToStringCancellationToken.Token, context);
+                if (token.IsCancellationRequested)
+                    return;
+
+                hasCachedStringValue = true;
+                cachedStringValue = result;
+            }
+            catch (Exception)
+            {
+                hasCachedStringValue = true;
+                cachedStringValue = ToString();
+            }
+
+            OnPropertyChanged(nameof(String));
+            currentToStringCancellationToken = null;
         }
     }
 

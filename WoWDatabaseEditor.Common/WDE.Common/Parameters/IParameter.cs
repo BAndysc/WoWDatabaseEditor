@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace WDE.Common.Parameters
@@ -46,5 +47,15 @@ namespace WDE.Common.Parameters
     public interface ICustomPickerParameter<T> : IParameter<T> where T : notnull
     {
         Task<(T, bool)> PickValue(T value);
+    }
+    
+    public interface IAsyncParameter<T> : IParameter<T> where T : notnull
+    {
+        Task<string> ToStringAsync(T val, CancellationToken token);
+    }
+
+    public interface IAsyncContextualParameter<T, R> : IContextualParameter<T, R> where T : notnull
+    {
+        Task<string> ToStringAsync(T value, CancellationToken token, R context);
     }
 }

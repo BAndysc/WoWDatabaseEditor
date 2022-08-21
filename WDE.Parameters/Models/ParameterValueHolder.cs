@@ -1,8 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using WDE.Common.Annotations;
 using WDE.Common.Parameters;
+using WDE.Common.Utils;
 
 namespace WDE.Parameters.Models
 {
@@ -12,8 +15,11 @@ namespace WDE.Parameters.Models
 
     public class ParameterValueHolder<T> : IParameterValueHolder, INotifyPropertyChanged where T : notnull
     {
+        private CancellationTokenSource? currentToStringCancellationToken;
+        private string cachedStringValue = null!;
+        private bool hasCachedStringValue;
+        
         private T value;
-        [NotNull]
         public T Value
         {
             get => value;
@@ -24,6 +30,7 @@ namespace WDE.Parameters.Models
                 
                 var old = this.value;
                 this.value = value;
+                hasCachedStringValue = false;
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(String));
                 OnValueChanged?.Invoke(this, old, value);
@@ -84,17 +91,43 @@ namespace WDE.Parameters.Models
         public virtual Dictionary<T, SelectOption>? Items => Parameter.Items;
 
         public string String => ToString();
-
+        
         public override string ToString()
         {
-            return parameter.ToString(value);
+            if (hasCachedStringValue)
+                return cachedStringValue;
+            
+            if (parameter is IAsyncParameter<T> asyncParameter)
+            {
+                if (!AsyncInProgress) 
+                    CalculateStringAsync(value, asyncParameter).ListenErrors();
+                return parameter.ToString(value);
+            }
+            
+            hasCachedStringValue = true;
+            cachedStringValue = parameter.ToString(value);
+            return cachedStringValue;
         }
         
         public virtual string ToString<R>(R context)
         {
+            if (hasCachedStringValue)
+                return cachedStringValue;
+
+            if (parameter is IAsyncContextualParameter<T, R> asyncContextualParameter)
+            {
+                if (!AsyncInProgress)
+                    CalculateStringAsync(value, context, asyncContextualParameter).ListenErrors();
+                return parameter.ToString(value);
+            }
+
             if (parameter is IContextualParameter<T, R> contextualParameter)
-                return contextualParameter.ToString(value, context);
-            return parameter.ToString(value);
+            {
+                hasCachedStringValue = true;
+                return cachedStringValue = contextualParameter.ToString(value, context);
+            }
+            
+            return ToString();
         }
 
         public ParameterValueHolder(IParameter<T> parameter, T value)
@@ -102,6 +135,7 @@ namespace WDE.Parameters.Models
             IsUsed = false;
             name = "";
             this.value = value;
+            this.valueForAsyncCalculation = value;
             this.parameter = parameter;
         }
         
@@ -110,6 +144,7 @@ namespace WDE.Parameters.Models
             this.name = name;
             IsUsed = true;
             this.value = value;
+            this.valueForAsyncCalculation = value;
             this.parameter = parameter;
         }
 
@@ -123,6 +158,7 @@ namespace WDE.Parameters.Models
         
         public void ForceRefresh()
         {
+            hasCachedStringValue = false;
             OnPropertyChanged(nameof(String));
         }
         
@@ -134,6 +170,60 @@ namespace WDE.Parameters.Models
         private void OnPropertyChanged([CallerMemberName]  string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        /// Async
+        private T valueForAsyncCalculation;
+        public bool AsyncInProgress => currentToStringCancellationToken != null && (Comparer<T>.Default.Compare(valueForAsyncCalculation, Value) == 0);
+        private async System.Threading.Tasks.Task CalculateStringAsync(T v, IAsyncParameter<T> p)
+        {
+            currentToStringCancellationToken?.Cancel();
+            var token = new CancellationTokenSource();
+            valueForAsyncCalculation = v;
+            currentToStringCancellationToken = token;
+            try
+            {
+                var result = await p.ToStringAsync(v, currentToStringCancellationToken.Token);
+                if (token.IsCancellationRequested)
+                    return;
+
+                hasCachedStringValue = true;
+                cachedStringValue = result;
+            }
+            catch (Exception)
+            {
+                hasCachedStringValue = true;
+                cachedStringValue = ToString();
+            }
+
+            OnPropertyChanged(nameof(String));
+            
+            currentToStringCancellationToken = null;
+        }
+        
+        private async System.Threading.Tasks.Task CalculateStringAsync<R>(T v, R context, IAsyncContextualParameter<T, R> p)
+        {
+            currentToStringCancellationToken?.Cancel();
+            var token = new CancellationTokenSource();
+            currentToStringCancellationToken = token;
+            valueForAsyncCalculation = v;
+            try
+            {
+                var result = await p.ToStringAsync(v, currentToStringCancellationToken.Token, context);
+                if (token.IsCancellationRequested)
+                    return;
+
+                hasCachedStringValue = true;
+                cachedStringValue = result;
+            }
+            catch (Exception)
+            {
+                hasCachedStringValue = true;
+                cachedStringValue = ToString(context);
+            }
+
+            OnPropertyChanged(nameof(String));
+            currentToStringCancellationToken = null;
         }
     }
 
