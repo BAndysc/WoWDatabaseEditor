@@ -11,7 +11,7 @@ namespace WDE.Common.Services;
 [UniqueProvider]
 public interface ITableEditorPickerService
 {
-    Task<long?> PickByColumn(string table, DatabaseKey? key, string column, long? initialValue, string? backupColumn = null);
+    Task<long?> PickByColumn(string table, DatabaseKey? key, string column, long? initialValue, string? backupColumn = null, string? customWhere = null);
     Task ShowTable(string table, string? condition, DatabaseKey? defaultPartialKey = null);
     Task ShowForeignKey1To1(string table, DatabaseKey key);
 }

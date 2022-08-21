@@ -56,11 +56,14 @@ public class TableEditorPickerService : ITableEditorPickerService
         this.windowManager = windowManager;
     }
     
-    public async Task<long?> PickByColumn(string table, DatabaseKey? key, string column, long? initialValue, string? backupColumn = null)
+    public async Task<long?> PickByColumn(string table, DatabaseKey? key, string column, long? initialValue, string? backupColumn = null, string? customWhere = null)
     {
         var definition = definitionProvider.GetDefinition(table);
         if (definition == null)
             throw new UnsupportedTableException(table);
+
+        if (definition.RecordMode != RecordMode.SingleRow && customWhere != null)
+            throw new Exception("customWhere only works with SingleRow");
         
         if (definition.RecordMode != RecordMode.SingleRow && !key.HasValue)
             throw new Exception("Pick by column is not supported for multi-row tables without key");
@@ -102,16 +105,22 @@ public class TableEditorPickerService : ITableEditorPickerService
         {
             var singleRow = containerProvider.Resolve<SingleRowDbTableEditorViewModel>((typeof(DatabaseTableSolutionItem), solutionItem));
             tableViewModel = singleRow;
+            string? where = customWhere;
             if (key != null)
             {
-                singleRow.FilterViewModel.FilterText = $"`{definition.GroupByKeys[0]}` = {key.Value[0]}";
+                if (where == null)
+                    where = "";
+                else
+                    where = $"({where}) AND ";
+                where += $"`{definition.GroupByKeys[0]}` = {key.Value[0]}";
             }
             if (initialValue.HasValue)
             {
                 singleRow.TryFind(key.HasValue ? key.Value.WithAlso(initialValue.Value) : new DatabaseKey(initialValue.Value)).ListenErrors();
             }
-            if (key != null)
+            if (where != null)
             {
+                singleRow.FilterViewModel.FilterText = where;
                 singleRow.FilterViewModel.ApplyFilter.Execute(null);
             }
         }
