@@ -1,0 +1,220 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:extendedTextBlock="clr-namespace:WDE.Common.Avalonia.Controls;assembly=WDE.Common.Avalonia"
+        xmlns:views="clr-namespace:WDE.EventAiEditor.Avalonia.Editor.Views"
+        xmlns:controls="clr-namespace:WDE.EventAiEditor.Avalonia.Editor.UserControls"
+        xmlns:editing="clr-namespace:WDE.EventAiEditor.Avalonia.Editor.Views.Editing"
+        xmlns:styles="clr-namespace:AvaloniaStyles.Styles;assembly=AvaloniaStyles"
+        xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia"
+        xmlns:themes="clr-namespace:WDE.EventAiEditor.Avalonia.Themes"
+        xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
+        xmlns:controls1="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles">
+
+    <Styles.Resources>
+        <themes:IndentToMarginConverter x:Key="IndentToMarginConverter" LeftMultiplier="24" />
+        <converters:NullConverter x:Key="NullToBoolConverter" Inverted="True" />
+        <converters:EmptyStringToBoolConverter x:Key="EmptyStringToBoolConverter" WhenNullOrEmpty="False" />
+        <DrawingImage x:Key="BoxIcons.RegularWorld">
+            <GeometryDrawing  Brush="#30000000" Geometry="F1M189.055999755859,-557.611022949219C177.322998046875,-523.179016113281,170.667007446289,-486.356994628906,170.667007446289,-448L170.666000366211,-448.001007080078C170.666000366211,-274.263000488281,301.269012451172,-130.731994628906,469.3330078125,-109.611999511719L469.3330078125,-192.001007080078 341.3330078125,-320.001007080078 341.3330078125,-405.334014892578 189.055999755859,-557.611022949219z M640,-764.202026367188L640,-746.666015625C640,-699.56201171875,601.77099609375,-661.3330078125,554.6669921875,-661.3330078125L512,-661.3330078125 512,-618.666015625C512,-571.56201171875,473.77099609375,-533.3330078125,426.6669921875,-533.3330078125L426.6669921875,-405.3330078125 597.333984375,-405.3330078125C644.43798828125,-405.3330078125,682.6669921875,-367.10400390625,682.6669921875,-320L682.6669921875,-277.3330078125C711.97900390625,-277.3330078125,754.218994140625,-262.528015136719,782.080017089844,-240.085006713867L782.080017089844,-240.083999633789C826.580993652344,-297.726989746094 853.3330078125,-369.705993652344 853.3330078125,-447.998992919922 853.3330078125,-590.932983398438 764.927978515625,-713.471008300781 640,-764.202026367188z M512,-874.6669921875C747.263977050781,-874.6669921875 938.6669921875,-683.263977050781 938.6669921875,-448 938.6669921875,-212.735992431641 747.263977050781,-21.3330001831055 512,-21.3329925537109 276.735992431641,-21.3330001831055 85.3330001831055,-212.735992431641 85.3330001831055,-448 85.3330001831055,-683.263977050781 276.735992431641,-874.6669921875 512,-874.6669921875z"   />
+        </DrawingImage>
+    </Styles.Resources>
+    
+    <styles:StyleIncludeColorAware DarkSource="avares://WDE.EventAiEditor.Avalonia/Themes/ColorsDark.axaml"
+                                   LightSource="avares://WDE.EventAiEditor.Avalonia/Themes/ColorsLight.axaml"/>
+
+    <Style Selector="controls|EventAiActionView:action">
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border BorderThickness="1" Classes="action" 
+                        Background="Transparent"
+                        Padding="{Binding Indent, Converter={StaticResource IndentToMarginConverter}}">
+                    <extendedTextBlock:FormattedTextBlock
+                        ContextArray="{Binding Context}"
+                        IsSelected="{Binding IsSelected}"
+                        Padding="2"
+                        Text="{Binding Readable}" />
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    <Style Selector="controls|EventAiActionView:comment">
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border BorderThickness="1" Classes="comment">
+                    <TextBlock TextWrapping="Wrap"
+                               Padding="2"
+                               FontFamily="Consolas,Monaco"
+                               Text="{Binding Comment}" />
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    <Style Selector="controls|EventAiActionView:action Border">
+        <Setter Property="BorderBrush" Value="{DynamicResource EventAis.Action.Border}" />
+    </Style>
+    <Style Selector="controls|EventAiActionView:comment Border">
+        <Setter Property="BorderBrush" Value="{DynamicResource EventAis.Comment.Border}" />
+        <Setter Property="Background" Value="{DynamicResource EventAis.Comment.Background}" />
+    </Style>
+    <Style Selector="controls|EventAiActionView:action /template/ extendedTextBlock|FormattedTextBlock">
+        <Setter Property="Background" Value="{DynamicResource EventAis.Action.Background}" />
+    </Style>
+    <Style Selector="controls|EventAiActionView:action /template/ Border">
+    </Style>
+    <Style Selector="controls|EventAiActionView:action:selected /template/ Border">
+        <Setter Property="BorderBrush" Value="{DynamicResource EventAis.Action.Selected.Border}" />
+    </Style>
+    <Style Selector="controls|EventAiActionView:comment:selected /template/ Border">
+        <Setter Property="Background" Value="{DynamicResource EventAis.Comment.Selected.Background}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource EventAis.Comment.Selected.Border}" />
+    </Style>
+    <Style Selector="controls|EventAiActionView:action:selected /template/ extendedTextBlock|FormattedTextBlock">
+        <Setter Property="Background" Value="{DynamicResource EventAis.Action.Selected.Background}" />
+    </Style>
+    <Style Selector="controls|EventAiActionView:action /template/ extendedTextBlock|FormattedTextBlock:overlink">
+        <Setter Property="Cursor" Value="Hand" />
+    </Style>
+
+    
+    <Style Selector="controls|MiniEventIcon">
+        <Setter Property="Background" Value="#1976d2" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Panel Width="12" Height="12" Margin="2,0,0,0">
+                    <Ellipse Fill="{TemplateBinding Background}" IsVisible="{TemplateBinding IsNotEmoji}"></Ellipse>
+                    <TextBlock Foreground="{DynamicResource EventAis.Event.Flag.Foreground}" 
+                               Margin="0,1,0,0" 
+                               FontSize="9" 
+                               TextAlignment="Center" 
+                               VerticalAlignment="Center" Text="{TemplateBinding Text}"/>
+                </Panel>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+
+    <Style Selector="controls|EventAiEventFlagsView">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <ItemsPresenter Items="{TemplateBinding Flags}">
+                    <ItemsPresenter.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel MaxWidth="30" />
+                        </ItemsPanelTemplate>
+                    </ItemsPresenter.ItemsPanel>
+                    <ItemsPresenter.ItemTemplate>
+                        <controls:EventFlagPhaseDataSelector>
+                            <controls:EventFlagPhaseDataSelector.PhaseView>
+                                <controls:MiniEventIcon Background="{DynamicResource EventAis.Event.Phase.Background}" Text="{Binding Text}" ToolTip.Tip="{Binding ToolTip}" />
+                            </controls:EventFlagPhaseDataSelector.PhaseView>
+                            <controls:EventFlagPhaseDataSelector.FlagView>
+                                <controls:MiniEventIcon Background="{DynamicResource EventAis.Event.Flag.Background}" Text="{Binding Text}" ToolTip.Tip="{Binding ToolTip}" />
+                            </controls:EventFlagPhaseDataSelector.FlagView>
+                        </controls:EventFlagPhaseDataSelector>
+                    </ItemsPresenter.ItemTemplate>
+                </ItemsPresenter>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    
+    <Style Selector="controls|EventAiEventView">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <DockPanel LastChildFill="True">
+                    <Border BorderThickness="1" DockPanel.Dock="Top" Padding="5">
+                        <DockPanel LastChildFill="True">
+                            <controls:EventAiEventFlagsView DockPanel.Dock="Right"/>
+                            <Border VerticalAlignment="Center" CornerRadius="3" Background="{DynamicResource EventAis.Event.Chance.Background}" DockPanel.Dock="Right" IsVisible="{Binding ChanceString, Converter={StaticResource NullToBoolConverter}}">
+                                <TextBlock Padding="2,1" Foreground="White" FontWeight="Bold" FontSize="11" Text="{Binding ChanceString}"/>
+                            </Border>
+                            <extendedTextBlock:FormattedTextBlock
+                                ContextArray="{Binding Context}"
+                                IsSelected="{Binding IsSelected}"
+                                Text="{Binding Readable}" />
+                        </DockPanel>
+                    </Border>
+                    <Canvas Margin="20,0,0,0" />
+                </DockPanel>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    <Style Selector="controls|EventAiEventView /template/ Border">
+        <Setter Property="Background" Value="{DynamicResource EventAis.Event.Background}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource EventAis.Event.Border}" />
+    </Style>
+    <Style Selector="controls|EventAiEventView /template/ Canvas">
+        <Setter Property="Background" Value="{DynamicResource EventAis.Condition.Background}" />
+    </Style>
+    <Style Selector="controls|EventAiEventView:selected /template/ Border">
+        <Setter Property="BorderBrush" Value="{DynamicResource EventAis.Event.Selected.Border}" />
+        <Setter Property="Background" Value="{DynamicResource EventAis.Event.Selected.Background}" />
+    </Style>
+    <Style Selector="controls|EventAiEventView:selected /template/ Canvas">
+        <Setter Property="Background" Value="{DynamicResource EventAis.Event.Selected.Border}" />
+    </Style>
+
+    <Style Selector="controls|EventAiEventView /template/ extendedTextBlock|FormattedTextBlock:overlink">
+        <Setter Property="Cursor" Value="Hand" />
+    </Style>
+    
+    
+    
+    
+    <Style Selector="editing|ParameterEditorView">
+        <Setter Property="ClipToBounds" Value="False" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <DockPanel>
+                        <TextBlock Margin="4" Width="100" DockPanel.Dock="Left" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                   TextWrapping="Wrap" Text="{Binding Name, Mode=OneWay}" />
+                        <ContentPresenter Content="{Binding}">
+                            <ContentPresenter.DataTemplates>
+                                <views:ParameterDataTemplateSelector>
+                                    <views:ParameterDataTemplateSelector.Generic>
+                                        <DataTemplate>
+                                            <extendedTextBlock:ParameterValueHolderView
+                                                DataContext="{Binding Parameter}"
+                                                SpecialCopying="{Binding DataContext.SpecialCopying, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=editing:ParameterEditorView}, FallbackValue=False}" 
+                                                SpecialCommand="{Binding DataContext.SpecialCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=editing:ParameterEditorView}, FallbackValue=False}" 
+                                                PickCommand="{Binding DataContext.SelectItemAction, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=editing:ParameterEditorView}}" />
+                                        </DataTemplate>
+                                    </views:ParameterDataTemplateSelector.Generic>
+                                    <views:ParameterDataTemplateSelector.BoolParameter>
+                                        <DataTemplate>
+                                            <CheckBox Focusable="True" VerticalContentAlignment="Center" HorizontalAlignment="Stretch"
+                                                      DataContext="{Binding Parameter}"
+                                                      IsChecked="{Binding Value, Converter={x:Static converters:CommonConverters.LongToBoolConverter}}" />
+                                        </DataTemplate>
+                                    </views:ParameterDataTemplateSelector.BoolParameter>
+                                    <views:ParameterDataTemplateSelector.FlagParameter>
+                                        <DataTemplate>
+                                            <extendedTextBlock:FlagComboBox SelectedItem="{Binding Parameter.String}" SelectedValue="{Binding Parameter.Value}" Flags="{Binding Parameter.Items}" />
+                                        </DataTemplate>
+                                    </views:ParameterDataTemplateSelector.FlagParameter>
+                                    <views:ParameterDataTemplateSelector.ItemsParameter>
+                                        <DataTemplate>
+                                            <controls1:CompletionComboBox editing:ParameterEditorView.OnEnterPressed="true" SelectedItem="{Binding OptionValue}" Items="{Binding Items}" />
+                                        </DataTemplate>
+                                    </views:ParameterDataTemplateSelector.ItemsParameter>
+                                    <views:ParameterDataTemplateSelector.ButtonParameter>
+                                        <DataTemplate>
+                                            <Button Command="{Binding Command}" Content="{Binding ActionName}" />
+                                        </DataTemplate>
+                                    </views:ParameterDataTemplateSelector.ButtonParameter>
+                                </views:ParameterDataTemplateSelector>
+                            </ContentPresenter.DataTemplates>
+                        </ContentPresenter>
+
+                    </DockPanel>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style Selector="views|EventAiEditorView Button /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="CornerRadius" Value="0" />
+        <Setter Property="BoxShadow" Value="" />
+    </Style>
+</Styles>

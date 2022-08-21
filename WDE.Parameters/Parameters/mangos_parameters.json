@@ -1,0 +1,85 @@
+{
+  "EventAiTargetParameter": {
+    "values": {
+      "0": {"name": "self", "description": "Targets itself"},
+      "1": {"name": "hostile", "description": "Targets the current victim (usually the one with the most threat)"},
+      "2": {"name": "hostile second aggro", "description": "Targets the unit with the second most threat in the threat list"},
+      "3": {"name": "hostile last aggro", "description": "Targets the unit with the least threat in the threat list"},
+      "4": {"name": "hostile random", "description": "Targets a random unit from the threat list"},
+      "5": {"name": "hostile random not top", "description": "Targets a random unit from the threat list excluding the one with the most threat"},
+      "6": {"name": "action invoker", "description": "Targets the unit that caused the event; only for certain events only."},
+      "7": {"name": "action invoker's owner", "description": "Targets unit who is responsible for Event to occur (only works for EVENT_T_AGGRO, EVENT_T_KILL, EVENT_T_DEATH, EVENT_T_SPELLHIT, EVENT_T_OOC_LOS, EVENT_T_RECEIVE_EMOTE, EVENT_T_RECEIVE_AI_EVENT)"},
+      "8": {"name": "hostile random player", "description": "Targets Random Player on The Threat List"},
+      "9": {"name": "hostile random not top player", "description": "Targets Any Random Player Except Top Threat"},
+      "10": {"name": "event sender", "description": "Creature who sent a received AIEvent - only triggered by EVENT_T_RECEIVE_AI_EVENT"},
+      "11": {"name": "spawner", "description": "Owner of unit if exists"},
+      "12": {"name": "event specific", "description": "Filled by specific event (works for EVENT_T_FRIENDLY_HP, EVENT_T_FRIENDLY_IS_CC, EVENT_T_FRIENDLY_MISSING_BUFF)"},
+      "13": {"name": "player invoker", "description": "Player who initiated hostile contact with this npc"},
+      "14": {"name": "player tapped", "description": "Player who currently holds to score the kill credit from the npc"},
+      "15": {"name": "none", "description": "Default spell target - sets nullptr which should be most common spell fill"},
+      "16": {"name": "hostile random mana", "description": "Random target with mana"},
+      "17": {"name": "nearest aoe target", "description": "Checks for available near aoe targets by EffectRadiusIndex[0] for the spell used"},
+      "18": {"name": "hostile farthest away", "description": "Farthest away target, excluding melee range"}
+    }
+  },
+  "MangosChatTypeParameter": {
+    "values": {
+      "0": "Say",
+      "1": "Yell",
+      "2": "Text Emote",
+      "3": "Boss Emote",
+      "4": "Whisper",
+      "5": "Boss Whisper",
+      "6": "Zone Yell",
+      "7": "Zone Text Emote"
+    }
+  },
+  "MangosDbScriptRandomTemplateTypeParameter": {
+    "values": {
+      "0": "Text",
+      "1": "Relay Script"
+    }
+  },
+  "MangosSpellListFlagsParameter": {
+    "isflag": true,
+    "values": {
+      "1": "support action",
+      "2": "ranged action"
+    }
+  },
+  "MangosSpellListTargetParameter": {
+    "values": {
+      "0": "none",
+      "1": "current",
+      "2": "self",
+      "3": "dispellable friendly",
+      "4": "dispellable friendly no self",
+      "5": "friendly missing buff",
+      "6": "friendly missing buff no self",
+      "7": "current not alone"
+    }
+  },
+  "CreatureSpellTargetingTypeParameter": {
+    "values": {
+      "0": "hardcoded",
+      "1": "attack",
+      "2": "support"
+    }
+  },
+  "MangosAiEventTypeParameter": {
+    "values": {
+      "0": {"name": "just died", "description": "Sender = Killed Npc, Invoker = Killer"},
+      "1": {"name": "critical health", "description": "Sender = Hurt Npc, Invoker = DamageDealer - Expected to be sent by 10% health"},
+      "2": {"name": "lost health", "description": "Sender = Hurt Npc, Invoker = DamageDealer - Expected to be sent by 50% health"},
+      "3": {"name": "lost some health", "description": "Sender = Hurt Npc, Invoker = DamageDealer - Expected to be sent by 90% health"},
+      "4": {"name": "got full health", "description": "Sender = Healed Npc, Invoker = Healer"},
+      "5": {"name": "custom eventai a", "description": "Sender = Npc that throws custom event, Invoker = TARGET_T_ACTION_INVOKER (if exists)"},
+      "6": {"name": "custom eventai b", "description": "Sender = Npc that throws custom event, Invoker = TARGET_T_ACTION_INVOKER (if exists)"},
+      "7": {"name": "got cced", "description": "Sender = CCed Npc, Invoker = Caster that CCed"},
+      "8": {"name": "custom eventai c", "description": "Sender = Npc that throws custom event, Invoker = TARGET_T_ACTION_INVOKER (if exists)"},
+      "9": {"name": "custom eventai d", "description": "Sender = Npc that throws custom event, Invoker = TARGET_T_ACTION_INVOKER (if exists)"},
+      "10": {"name": "custom eventai e", "description": "Sender = Npc that throws custom event, Invoker = TARGET_T_ACTION_INVOKER (if exists)"},
+      "11": {"name": "custom eventai f", "description": "Sender = Npc that throws custom event, Invoker = TARGET_T_ACTION_INVOKER (if exists)"}
+    }
+  }
+}

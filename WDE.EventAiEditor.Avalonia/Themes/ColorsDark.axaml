@@ -1,0 +1,42 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Styles.Resources>
+        <SolidColorBrush x:Key="EventAis.Background" Color="#303030" />
+        
+        <SolidColorBrush x:Key="EventAis.Actions.Background" Color="#383838" />
+        <SolidColorBrush x:Key="EventAis.Action.Background" Color="#383838" />
+        <SolidColorBrush x:Key="EventAis.Action.Border" Color="#383838" />
+        <SolidColorBrush x:Key="EventAis.Action.Foreground" Color="#C7C7C7" />
+        <SolidColorBrush x:Key="EventAis.Action.Selected.Border" Color="#F5C61F" />
+        <SolidColorBrush x:Key="EventAis.Action.Selected.Background" Color="#FFF2BF" />
+        <SolidColorBrush x:Key="EventAis.Action.Selected.Foreground" Color="#3B3B3B" />
+        
+        <SolidColorBrush x:Key="EventAis.Parameter.Foreground" Color="#5EC3F8" />
+        <SolidColorBrush x:Key="EventAis.Source.Foreground" Color="#2FCA8B" /> <!-- #00B1CC -->
+        
+        <SolidColorBrush x:Key="EventAis.Comment.Background" Color="#1E501B" />
+        <SolidColorBrush x:Key="EventAis.Comment.Border" Color="#1E501B" />
+        <SolidColorBrush x:Key="EventAis.Comment.Foreground" Color="#B8B8B8" />
+        <SolidColorBrush x:Key="EventAis.Comment.Selected.Foreground" Color="#3B3B3B" />
+        <SolidColorBrush x:Key="EventAis.Comment.Selected.Border" Color="#F5C61F" />
+        <SolidColorBrush x:Key="EventAis.Comment.Selected.Background" Color="#FFF2BF" />
+        <SolidColorBrush x:Key="EventAis.Comment.Selected" Color="#565656" />
+        
+        <SolidColorBrush x:Key="EventAis.Event.Background" Color="#474747" />
+        <SolidColorBrush x:Key="EventAis.Event.Foreground" Color="#DBDBDB" />
+        <SolidColorBrush x:Key="EventAis.Event.Border" Color="#474747" />
+        <SolidColorBrush x:Key="EventAis.Event.Selected.Background" Color="#FFFFE0A9" />
+        <SolidColorBrush x:Key="EventAis.Event.Selected.Foreground" Color="#323232" />
+        <SolidColorBrush x:Key="EventAis.Event.Selected.Border" Color="#FFF5CC84" />
+    
+        <SolidColorBrush x:Key="EventAis.Event.Flag.Background" Color="#64b5f6" />
+        <SolidColorBrush x:Key="EventAis.Event.Phase.Background" Color="#81c784" />
+        <SolidColorBrush x:Key="EventAis.Event.Flag.Foreground" Color="#444444" />
+        
+        <SolidColorBrush x:Key="EventAis.Event.Chance.Background" Color="#AF27ae60" />
+        
+        <SolidColorBrush x:Key="EventAis.Condition.Background" Color="#404040" />
+        <SolidColorBrush x:Key="EventAis.Condition.Foreground" Color="#77FFFFFF" />
+        <SolidColorBrush x:Key="EventAis.Condition.Selected.Foreground" Color="#3B3B3B" />
+    </Styles.Resources>
+</Styles>

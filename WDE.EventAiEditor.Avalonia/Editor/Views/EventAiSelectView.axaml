@@ -1,0 +1,149 @@
+﻿<controls:DialogViewBase x:Class="WDE.EventAiEditor.Avalonia.Editor.Views.EventAiSelectView"
+                xmlns="https://github.com/avaloniaui"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:mvvm="http://prismlibrary.com/"
+                xmlns:controls="clr-namespace:WDE.Common.Avalonia.Controls;assembly=WDE.Common.Avalonia"
+                xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
+                xmlns:editor="clr-namespace:WDE.EventAiEditor.Avalonia.Editor"
+                Name="Root"
+                xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                xmlns:viewModels="clr-namespace:WDE.EventAiEditor.Editor.ViewModels;assembly=WDE.EventAiEditor"
+                x:DataType="viewModels:EventAiSelectViewModel"
+                mvvm:ViewModelLocator.AutoWireViewModel="False">
+    <UserControl.Resources>
+        <StreamGeometry x:Key="star_regular">M9.5,1l2.547,5.994l6.488,0.57l-4.913,4.275l1.462,6.347l-5.584,-3.352l-5.584,3.352l1.462,-6.347l-4.913,-4.275l6.488,-0.57l2.547,-5.994Z</StreamGeometry>
+        <DrawingImage x:Key="cogIcon">
+            <DrawingImage.Drawing>
+                <DrawingGroup>
+                    <DrawingGroup Opacity="1" Transform="0.875,0,0,0.875,1,1">
+                        <GeometryDrawing Brush="#FFB2B2B2" Geometry="F0 M16,16z M0,0z M9.846,0.216C8.632,-0.072,7.368,-0.072,6.154,0.216L6.154,2.194C5.825,2.298,5.506,2.43,5.2,2.589L3.801,1.19C2.739,1.845,1.845,2.739,1.19,3.801L2.589,5.2C2.43,5.506,2.298,5.825,2.194,6.154L0.216,6.154C-0.072,7.368,-0.072,8.632,0.216,9.846L2.194,9.846C2.298,10.175,2.43,10.494,2.589,10.8L1.19,12.199C1.845,13.261,2.739,14.155,3.801,14.81L5.2,13.411C5.506,13.57,5.825,13.702,6.154,13.806L6.154,15.784C7.368,16.072,8.632,16.072,9.846,15.784L9.846,13.806C10.175,13.702,10.494,13.57,10.8,13.411L12.199,14.81C13.261,14.155,14.155,13.261,14.81,12.199L13.411,10.8C13.57,10.494,13.702,10.175,13.806,9.846L15.784,9.846C16.072,8.632,16.072,7.368,15.784,6.154L13.806,6.154C13.702,5.825,13.57,5.506,13.411,5.2L14.81,3.801C14.155,2.739,13.261,1.845,12.199,1.19L10.8,2.589C10.494,2.43,10.175,2.298,9.846,2.194L9.846,0.216z M8,5.312C9.483,5.312 10.688,6.517 10.688,8 10.688,9.483 9.483,10.688 8,10.688 6.517,10.688 5.312,9.483 5.312,8 5.312,6.517 6.517,5.312 8,5.312z">
+                            <GeometryDrawing.Pen>
+                                <Pen Brush="#FF777777" Thickness="1.37" LineJoin="Round" />
+                            </GeometryDrawing.Pen>
+                        </GeometryDrawing>
+                    </DrawingGroup>
+                </DrawingGroup>
+            </DrawingImage.Drawing>
+        </DrawingImage>
+        <DrawingImage x:Key="timedIcon">
+            <DrawingImage.Drawing>
+                <DrawingGroup>
+                    <GeometryDrawing Brush="#FFA45DFF" Geometry="F0 M16,16z M0,0z M5,4L11,4 8,8 11,12 5,12 8,8 5,4z" />
+                    <GeometryDrawing Brush="#FF707070" Geometry="F0 M16,16z M0,0z M7.973,8.035C4.966,6.511,1.968,4.971,2,0L14,0C13.998,5.513 10.982,6.773 7.973,8.035 10.984,9.562 14.003,11.074 14,16L2,16C1.996,10.548,4.98,9.291,7.973,8.035z M7.933,9.136C6.458,9.754 5.009,10.403 4.066,11.764 3.515,12.56 3.152,13.598 3.038,15L12.949,15C12.58,11.581,10.278,10.325,7.933,9.136z M12.961,1L3.044,1C3.385,4.463 5.67,5.743 8.013,6.934 9.503,6.31 10.972,5.656 11.926,4.271 12.481,3.467 12.846,2.417 12.961,1z" />
+                    <GeometryDrawing Geometry="F0 M16,16z M0,0z M3,3L13,3">
+                        <GeometryDrawing.Pen>
+                            <Pen Brush="#FF707070" Thickness="0.8" LineJoin="Miter" />
+                        </GeometryDrawing.Pen>
+                    </GeometryDrawing>
+                </DrawingGroup>
+            </DrawingImage.Drawing>
+        </DrawingImage>
+    </UserControl.Resources>
+    
+    <Grid Margin="6">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+            <RowDefinition Height="30" />
+        </Grid.RowDefinitions>
+
+        <DockPanel Grid.Row="0" LastChildFill="True">
+            <controls:FixedTextBox DockPanel.Dock="Right"
+                                   Width="220"
+                                   AcceptsReturn="False"
+                                   Watermark="Search"
+                                   Text="{CompiledBinding SearchBox}"
+                                   KeyDown="InputElement_OnKeyDown"
+                                   HorizontalAlignment="Right"
+                                   VerticalContentAlignment="Center"
+                                   utils:FocusUtils.FocusFirst="True" />
+            <StackPanel Orientation="Vertical">
+                <TextBlock Text="{CompiledBinding SelectedItem.Help, FallbackValue='', TargetNullValue=''}" TextWrapping="WrapWithOverflow" />
+                <TextBlock Text="{CompiledBinding SelectedItem.EnumName, FallbackValue='', TargetNullValue=''}" TextWrapping="WrapWithOverflow" Opacity="0.5" />
+            </StackPanel>
+        </DockPanel>
+        
+        <ListBox Items="{CompiledBinding Items}"
+                 Grid.Row="1" Grid.ColumnSpan="2"  
+                 SelectedItem="{CompiledBinding SelectedItem}"
+                 Name="ListBox"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                 VirtualizationMode="Simple"
+                 Margin="0,6,0,6">
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <editor:FastGroupingWrapPanel ItemWidth="160" ItemHeight="24">
+                    </editor:FastGroupingWrapPanel>
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+            <ListBox.Styles>
+                <Style Selector="ListBoxItem" x:DataType="viewModels:EventOrActionItem">
+                    <Setter Property="(editor:FastGroupingWrapPanel.Group)" Value="{CompiledBinding Group}" />
+                    <Setter Property="IsVisible" Value="{CompiledBinding ShowItem}"></Setter>
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                    <Setter Property="ClipToBounds" Value="False" />
+                    <Setter Property="Padding" Value="7,5,2,7"></Setter>
+                    <Setter Property="ContextMenu">
+                        <ContextMenu>
+                            <MenuItem Header="Toggle favourite" CommandParameter="{CompiledBinding}" Command="{Binding #Root.DataContext.ToggleFavouriteCommand}" />
+                        </ContextMenu>
+                    </Setter>
+                </Style>
+                <Style Selector="ListBoxItem Path">
+                    <Setter Property="ClipToBounds" Value="False" />
+                    <Setter Property="MinWidth" Value="20" />
+                    <Setter Property="MinHeight" Value="20" />
+                </Style>
+            </ListBox.Styles>
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <DockPanel LastChildFill="True">
+                        <Image Margin="0,0,4,0" Width="16" Height="16" Stretch="Fill" Source="{StaticResource cogIcon}">
+                            <Interaction.Behaviors>
+                                <DataTriggerBehavior Binding="{CompiledBinding IsTimed}" Value="True">
+                                    <ChangePropertyAction PropertyName="Source" Value="{StaticResource timedIcon}" />
+                                </DataTriggerBehavior>
+                                <DataTriggerBehavior Binding="{CompiledBinding IsTimed}" Value="False">
+                                    <ChangePropertyAction PropertyName="Source" Value="{StaticResource cogIcon}" />
+                                </DataTriggerBehavior>
+                            </Interaction.Behaviors>
+                        </Image>
+                        <Path Data="{StaticResource star_regular}"
+                              DockPanel.Dock="Right"
+                              IsVisible="{CompiledBinding IsFavourite}"
+                              Fill="#FFB000"
+                              HorizontalAlignment="Center"
+                              VerticalAlignment="Center">
+                        </Path>
+                        <TextBlock Text="{CompiledBinding Name}" VerticalAlignment="Center">
+                            <Interaction.Behaviors>
+                                <DataTriggerBehavior Binding="{CompiledBinding Deprecated}" Value="True">
+                                    <ChangePropertyAction PropertyName="Foreground" Value="Gray" />
+                                </DataTriggerBehavior>
+                                <DataTriggerBehavior Binding="{CompiledBinding Deprecated}" Value="False">
+                                    <ChangePropertyAction PropertyName="Foreground" Value="{Binding #Root.Foreground}" />
+                                </DataTriggerBehavior>
+                            </Interaction.Behaviors>
+                        </TextBlock>
+                    </DockPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+            <Interaction.Behaviors>
+                <EventTriggerBehavior EventName="DoubleTapped">
+                    <InvokeCommandAction Command="{Binding #Root.DataContext.Accept}" />
+                </EventTriggerBehavior>
+            </Interaction.Behaviors>
+        </ListBox>
+        
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="80" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="80" />
+            </Grid.ColumnDefinitions>
+            <Button Content="Cancel" Command="{CompiledBinding Cancel}"  />
+            <TextBlock Grid.Column="1" FontSize="9" VerticalAlignment="Center" HorizontalAlignment="Center" Opacity="0.3">Right click on an item to mark as favourite.</TextBlock>
+            <Button Command="{CompiledBinding Accept}" Grid.Column="2" Content="Next" />
+        </Grid>
+    </Grid>
+</controls:DialogViewBase>

@@ -30,6 +30,8 @@
       <ProjectReference Include="..\WDE.Conditions\WDE.Conditions.csproj" />
       <ProjectReference Include="..\WDE.DatabaseEditors.Avalonia\WDE.DatabaseEditors.Avalonia.csproj" />
       <ProjectReference Include="..\WDE.DatabaseEditors\WDE.DatabaseEditors.csproj" />
+      <ProjectReference Include="..\WDE.EventAiEditor.Avalonia\WDE.EventAiEditor.Avalonia.csproj" />
+      <ProjectReference Include="..\WDE.MangosEventAiEditor\WDE.MangosEventAiEditor.csproj" />
       <ProjectReference Include="..\WDE.MVVM\WDE.MVVM.csproj" />
       <ProjectReference Include="..\WDE.Parameters\WDE.Parameters.csproj" />
       <ProjectReference Include="..\WDE.SourceCodeIntegrationEditor\WDE.SourceCodeIntegrationEditor.csproj" />

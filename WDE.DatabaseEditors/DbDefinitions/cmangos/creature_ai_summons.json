@@ -1,0 +1,61 @@
+{
+  "id": "creature_ai_summons",
+  "compatibility": [
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Creature Ai Summons",
+  "description": "Positions for summons in Event AI",
+  "table_name": "creature_ai_summons",
+  "table_index_name": "id",
+  "record_mode": "SingleRow",
+  "group_name": "Event AI",
+  "icon_path": "Icons/document_creature_summon_groups.png",
+  "reload_command": "reload creature_ai_summons",
+  "primary_key": [
+    "id"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Id",
+          "db_column_name": "id",
+          "value_type": "uint"
+        },
+        {
+          "name": "Position X",
+          "db_column_name": "position_x",
+          "value_type": "float"
+        },
+        {
+          "name": "Position Y",
+          "db_column_name": "position_y",
+          "value_type": "float"
+        },
+        {
+          "name": "Position Z",
+          "db_column_name": "position_z",
+          "value_type": "float"
+        },
+        {
+          "name": "Orientation",
+          "db_column_name": "orientation",
+          "value_type": "float"
+        },
+        {
+          "name": "Spawntimesecs",
+          "db_column_name": "spawntimesecs",
+          "value_type": "uint",
+          "default": 120
+        },
+        {
+          "name": "Comment",
+          "db_column_name": "comment",
+          "value_type": "string",
+          "default": ""
+        }
+      ]
+    }
+  ]
+}

@@ -54,6 +54,7 @@
         <StyleInclude Source="avares://AvaloniaGraph/Style.axaml" />
         <StyleInclude Source="avares://WDE.Common.Avalonia/Themes/Generic.axaml" />
         <StyleInclude Source="avares://WDE.SmartScriptEditor.Avalonia/Themes/Generic.axaml"/>
+        <StyleInclude Source="avares://WDE.EventAiEditor.Avalonia/Themes/Generic.axaml"/>
         <StyleInclude Source="avares://AvaloniaStyles/Controls/FastTableView/Style.axaml" />
         <StyleInclude Source="avares://Avalonia.Controls.TreeDataGrid/Themes/Fluent.axaml"/>
         <Style Selector="ListBox /template/ ItemsPresenter#PART_ItemsPresenter">

@@ -8,7 +8,7 @@ namespace WoWDatabaseEditorCore.CoreVersion
 {
     [AutoRegister]
     [SingleInstance]
-    public class UnspecifiedCoreVersion : ICoreVersion, IDatabaseFeatures, ISmartScriptFeatures, IConditionFeatures, IGameVersionFeatures
+    public class UnspecifiedCoreVersion : ICoreVersion, IDatabaseFeatures, ISmartScriptFeatures, IConditionFeatures, IGameVersionFeatures, IEventAiFeatures
     {
         public string Tag => "unspecified";
         public string FriendlyName => "Unspecified";
@@ -16,6 +16,7 @@ namespace WoWDatabaseEditorCore.CoreVersion
         public ISmartScriptFeatures SmartScriptFeatures => this;
         public IConditionFeatures ConditionFeatures => this;
         public IGameVersionFeatures GameVersionFeatures => this;
+        public IEventAiFeatures EventAiFeatures => this;
         public ISet<Type> UnsupportedTables => new HashSet<Type>();
         public ISet<SmartScriptType> SupportedTypes => new HashSet<SmartScriptType>();
         public bool AlternativeTrinityDatabase => false;

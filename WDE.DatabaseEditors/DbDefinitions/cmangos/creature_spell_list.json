@@ -1,0 +1,91 @@
+{
+  "id": "creature_spell_list",
+  "compatibility": [
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Creature Spell List",
+  "description": "Used to define spells per creature.",
+  "table_name": "creature_spell_list",
+  "table_index_name": "Id",
+  "record_mode": "SingleRow",
+  "group_name": "Combat",
+  "icon_path": "Icons/document_creature_spell.png",
+  "picker": "Parameter",
+  "primary_key": [
+    "Id",
+    "Position"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Id",
+          "db_column_name": "Id",
+          "value_type": "CreatureTemplateSpellListIdParameter"
+        },
+        {
+          "name": "Position",
+          "db_column_name": "Position",
+          "value_type": "int"
+        },
+        {
+          "name": "Spell",
+          "db_column_name": "SpellId",
+          "value_type": "SpellParameter"
+        },
+        {
+          "name": "Initial Min",
+          "db_column_name": "InitialMin",
+          "value_type": "int"
+        },
+        {
+          "name": "Initial Max",
+          "db_column_name": "InitialMax",
+          "value_type": "int"
+        },
+        {
+          "name": "Repeat Min",
+          "db_column_name": "RepeatMin",
+          "value_type": "int"
+        },
+        {
+          "name": "Repeat Max",
+          "db_column_name": "RepeatMax",
+          "value_type": "int"
+        },
+        {
+          "name": "Flags",
+          "db_column_name": "Flags",
+          "value_type": "MangosSpellListFlagsParameter"
+        },
+        {
+          "name": "Target",
+          "db_column_name": "TargetId",
+          "value_type": "TableReference(creature_spell_targeting#Id)Parameter"
+        },
+        {
+          "name": "Relay Script Id",
+          "db_column_name": "ScriptId",
+          "value_type": "int",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Availability",
+          "db_column_name": "Availability",
+          "value_type": "PercentageParameter"
+        },
+        {
+          "name": "Probability",
+          "db_column_name": "Probability",
+          "value_type": "int"
+        },
+        {
+          "name": "Comment",
+          "db_column_name": "Comments",
+          "value_type": "string"
+        }
+      ]
+    }
+  ]
+}

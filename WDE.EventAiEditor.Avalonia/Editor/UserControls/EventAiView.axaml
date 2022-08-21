@@ -1,0 +1,111 @@
+﻿<UserControl x:Class="WDE.EventAiEditor.Avalonia.Editor.UserControls.EventAiView"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:viewModels="clr-namespace:WDE.EventAiEditor.Editor.ViewModels"
+             xmlns:system="clr-namespace:System;assembly=System.Runtime"
+             xmlns:userControls="clr-namespace:WDE.EventAiEditor.Avalonia.Editor.UserControls"
+             xmlns:models="clr-namespace:WDE.EventAiEditor.Models;assembly=WDE.EventAiEditor"
+             xmlns:viewModels1="clr-namespace:WDE.EventAiEditor.Editor.ViewModels;assembly=WDE.EventAiEditor"
+             x:DataType="viewModels1:EventAiEditorViewModel"
+             mc:Ignorable="d" x:Name="Rooot"
+             d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <system:Boolean x:Key="FalseValue">False</system:Boolean>
+        <system:Boolean x:Key="TrueValue">True</system:Boolean>
+    </UserControl.Resources>
+    <UserControl.KeyBindings>
+        <KeyBinding Gesture="Back" Command="{CompiledBinding DeleteSelected}" />
+        <KeyBinding Gesture="Delete" Command="{CompiledBinding DeleteSelected}" />
+        <KeyBinding Gesture="Enter" Command="{CompiledBinding EditSelected}" />
+        <KeyBinding Gesture="Ctrl+A" Command="{CompiledBinding SelectAll}" />
+        <KeyBinding Gesture="Up" Command="{CompiledBinding SelectionUp}" CommandParameter="{StaticResource FalseValue}" />
+        <KeyBinding Gesture="Down" Command="{CompiledBinding SelectionDown}" CommandParameter="{StaticResource FalseValue}" />
+        <KeyBinding Gesture="Ctrl+Up" Command="{CompiledBinding SelectionUp}"
+                    CommandParameter="{StaticResource TrueValue}" />
+        <KeyBinding Gesture="Ctrl+Down" Command="{CompiledBinding SelectionDown}"
+                    CommandParameter="{StaticResource TrueValue}" />
+        <KeyBinding Gesture="Right" Command="{CompiledBinding SelectionRight}" />
+        <KeyBinding Gesture="Left" Command="{CompiledBinding SelectionLeft}" />
+    </UserControl.KeyBindings>
+    
+    <UserControl.Styles>
+        <Style Selector="Button.FlatButton">
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+            <Setter Property="VerticalContentAlignment" Value="Top" />
+        </Style>
+        <Style Selector="Button.FlatButton:pointerover /template/ ContentPresenter">
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="Background" Value="Transparent" />
+        </Style>
+        <Style Selector="Button.FlatButton:pressed /template/ ContentPresenter">
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="Background" Value="Transparent" />
+        </Style>
+    </UserControl.Styles>
+    <Grid Background="{DynamicResource EventAis.Background}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" MinHeight="30" />
+        </Grid.RowDefinitions>
+        <ItemsControl Focusable="False" Items="{CompiledBinding Together}" IsHitTestVisible="True" DockPanel.Dock="Top"
+                      Margin="7,0,7,0">
+            <ItemsControl.DataTemplates>
+                <DataTemplate DataType="{x:Type models:EventAiEvent}">
+                    <userControls:EventAiEventView
+                        Selected="{CompiledBinding IsSelected, Mode=TwoWay}"
+                        userControls:EventAiPanelLayout.Selected="{CompiledBinding IsSelected, Mode=TwoWay}"
+                        DirectEditParameter="{Binding DataContext.DirectEditParameter, ElementName=Rooot}"
+                        DeselectActionsOfDeselectedEventsRequest="{Binding DataContext.DeselectAllButEvents, ElementName=Rooot}"
+                        DeselectAllRequest="{Binding DataContext.DeselectAll, ElementName=Rooot}"
+                        IsSelected="{CompiledBinding IsSelected, Mode=TwoWay}"
+                        EditEventCommand="{Binding DataContext.EditEvent, ElementName=Rooot}"
+                        IsHitTestVisible="True"/>
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type models:EventAiAction}">
+                    <userControls:EventAiActionView
+                        Indent="{CompiledBinding Indent}"
+                        DirectEditParameter="{Binding DataContext.DirectEditParameter, ElementName=Rooot}"
+                        userControls:SelectableTemplatedControl.DeselectAllRequest="{Binding DataContext.DeselectAll, ElementName=Rooot}"
+                        DeselectAllButActionsRequest="{Binding DataContext.DeselectAllButActions, ElementName=Rooot}"
+                        EditActionCommand="{Binding DataContext.EditAction, ElementName=Rooot}"
+                        IsSelected="{CompiledBinding IsSelected, Mode=TwoWay}"
+                        userControls:EventAiPanelLayout.Selected="{CompiledBinding IsSelected, Mode=TwoWay}"
+                    />
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type viewModels1:NewActionViewModel}">
+                    <Button Classes="FlatButton"
+                            Content="Add action"
+                            Opacity="0.5"
+                            Command="{Binding DataContext.AddAction, ElementName=Rooot}"
+                            CommandParameter="{CompiledBinding}">
+                    </Button>
+                </DataTemplate>
+            </ItemsControl.DataTemplates>
+
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <userControls:EventAiPanelLayout Background="Transparent"
+                                                         Focusable="True"
+                                                  Script="{CompiledBinding Script}" 
+                                                  Problems="{CompiledBinding ProblematicLines}" 
+                                                  DropItems="{CompiledBinding OnDropItems}"
+                                                  DropActions="{CompiledBinding OnDropActions}"
+                                                  />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+        </ItemsControl>
+        <Button
+            Grid.Row="1" 
+            Classes="FlatButton"
+            Opacity="0.5"
+            Content="Add event"
+            Command="{CompiledBinding AddEvent}">
+        </Button>
+    </Grid>
+</UserControl>

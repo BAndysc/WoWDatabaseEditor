@@ -1,8 +1,6 @@
-﻿using System;
-using LinqToDB;
+﻿using LinqToDB;
 using LinqToDB.Data;
-using WDE.Common.CoreVersion;
-using WDE.Common.Database;
+using PropertyChanged.SourceGenerator;
 using WDE.MySqlDatabaseCommon.CommonModels;
 
 namespace WDE.CMMySqlDatabase.Models
@@ -39,5 +37,8 @@ namespace WDE.CMMySqlDatabase.Models
         public ITable<MangosCreatureMovementTemplate> CreatureMovementTemplate => GetTable<MangosCreatureMovementTemplate>();
         public ITable<MangosWaypoint> WaypointPath => GetTable<MangosWaypoint>();
         public ITable<MangosWaypointPathName> WaypointPathName => GetTable<MangosWaypointPathName>();
+        public ITable<EventAiLine> CreatureAiScripts => GetTable<EventAiLine>();
+        public ITable<DbScriptRandomTemplate> DbScriptRandomTemplates => GetTable<DbScriptRandomTemplate>();
+        public ITable<CreatureAiSummon> CreatureAiSummons => GetTable<CreatureAiSummon>();
     }
 }

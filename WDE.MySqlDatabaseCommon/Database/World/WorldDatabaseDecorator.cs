@@ -142,5 +142,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public Task<IMangosWaypointsPathName?> GetMangosPathName(uint pathId) => impl.GetMangosPathName(pathId);
 
         public Task<List<IEventScriptLine>> GetEventScript(EventScriptType type, uint id) => impl.GetEventScript(type, id);
+        
+        public Task<List<IEventAiLine>> GetEventAi(int id) => impl.GetEventAi(id);
     }
 }

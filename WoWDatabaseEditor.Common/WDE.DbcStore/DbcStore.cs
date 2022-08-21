@@ -106,6 +106,8 @@ namespace WDE.DbcStore
         public Dictionary<long, string> ClassStore { get; internal set;} = new();
         public Dictionary<long, string> RaceStore { get; internal set;} = new();
         public Dictionary<long, string> EmoteStore { get;internal set; } = new();
+        public Dictionary<long, string> EmoteOneShotStore { get;internal set; } = new();
+        public Dictionary<long, string> EmoteStateStore { get;internal set; } = new();
         public Dictionary<long, string> TextEmoteStore { get;internal set; } = new();
         public Dictionary<long, string> AchievementStore { get; internal set;} = new();
         public Dictionary<long, string> ItemStore { get; internal set;} = new();
@@ -315,6 +317,8 @@ namespace WDE.DbcStore
                 store.ClassStore = ClassStore;
                 store.RaceStore = RaceStore;
                 store.EmoteStore = EmoteStore;
+                store.EmoteOneShotStore = EmoteOneShotStore;
+                store.EmoteStateStore = EmoteStateStore;
                 store.TextEmoteStore = TextEmoteStore;
                 store.AchievementStore = AchievementStore;
                 store.ItemStore = ItemStore;
@@ -391,8 +395,6 @@ namespace WDE.DbcStore
             public void Run(ITaskProgress progress)
             {
                 this.progress = progress;
-                Database.LoadDefinitions();
-                Database.BuildNumber = (int) dbcSettingsProvider.GetSettings().DBCVersion;
 
                 switch (dbcSettingsProvider.GetSettings().DBCVersion)
                 {
@@ -559,6 +561,8 @@ namespace WDE.DbcStore
                     }
                     case DBCVersions.LEGION_26972:
                     {
+                        Database.LoadDefinitions();
+                        Database.BuildNumber = (int) dbcSettingsProvider.GetSettings().DBCVersion;
                         max = 18;
                         Load("AreaTrigger.db2", row => AreaTriggerStore.Add(row.GetInt(16), $"Area trigger"));
                         Load("spell.db2", 0, 1, SpellStore);

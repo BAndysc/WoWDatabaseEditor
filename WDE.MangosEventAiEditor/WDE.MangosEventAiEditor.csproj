@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <OutputType>Library</OutputType>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <Configurations>Debug;Release</Configurations>
+    <Platforms>AnyCPU</Platforms>
+    <Nullable>enable</Nullable>
+    <WarningsAsErrors>nullable</WarningsAsErrors>
+  </PropertyGroup>
+  <PropertyGroup>
+      <OutputPath>..\bin\$(Configuration)\</OutputPath>
+  </PropertyGroup>
+  <Import Project="..\Module.props" />
+  <ItemGroup>
+    <ProjectReference Include="..\WDE.Conditions\WDE.Conditions.csproj" />
+    <ProjectReference Include="..\WDE.MVVM\WDE.MVVM.csproj" />
+    <ProjectReference Include="..\WDE.Parameters\WDE.Parameters.csproj" />
+    <ProjectReference Include="..\WDE.EventAiEditor\WDE.EventAiEditor.csproj" />
+    <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="EventAiData\*.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="DynamicData">
+      <Version>7.2.1</Version>
+    </PackageReference>
+    <PackageReference Include="SmartFormat.NET">
+      <Version>2.5.3</Version>
+    </PackageReference>
+  </ItemGroup>
+</Project>

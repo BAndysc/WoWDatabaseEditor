@@ -1,0 +1,128 @@
+[
+    {
+        "name": "Talk; sounds",
+        "group_members": [
+            "ACTION_T_TEXT_NEW",
+            "ACTION_T_CHANCED_TEXT",
+            "ACTION_T_TEXT",
+            "ACTION_T_SOUND",
+            "ACTION_T_EMOTE",
+            "ACTION_T_RANDOM_SOUND",
+            "ACTION_T_RANDOM_EMOTE"
+        ]
+    },
+    {
+        "name": "Quest",
+        "group_members": [
+            "ACTION_T_QUEST_EVENT",
+            "ACTION_T_KILLED_MONSTER",
+            "ACTION_T_QUEST_CASTCREATUREGO",
+            "ACTION_T_QUEST_EVENT_ALL",
+            "ACTION_T_CASTCREATUREGO_ALL"
+        ]
+    },
+    {
+        "name": "Spells",
+        "group_members": [
+            "ACTION_T_CAST",
+            "ACTION_T_REMOVEAURASFROMSPELL",
+            "ACTION_T_INTERRUPT_SPELL",
+            "ACTION_T_SET_SPELL_SET"
+        ]
+    },
+    {
+        "name": "Movement",
+        "group_members": [
+            "ACTION_T_CHANGE_MOVEMENT",
+            "ACTION_T_SET_WALK",
+            "ACTION_T_SET_FACING",
+            "ACTION_T_SET_FOLLOW_MOVEMENT",
+            "ACTION_T_PAUSE_WAYPOINTS",
+            "ACTION_T_COMBAT_MOVEMENT",
+            "ACTION_T_RANGED_MOVEMENT"
+        ]
+    },
+    {
+        "name": "Unit",
+        "group_members": [
+            "ACTION_T_SET_FACTION",
+            "ACTION_T_FORCE_DESPAWN",
+            "ACTION_T_MORPH_TO_ENTRY_OR_MODEL",
+            "ACTION_T_MOUNT_TO_ENTRY_OR_MODEL",
+            "ACTION_T_SET_UNIT_FIELD",
+            "ACTION_T_SET_UNIT_FLAG",
+            "ACTION_T_REMOVE_UNIT_FLAG",
+            "ACTION_T_UPDATE_TEMPLATE",
+            "ACTION_T_SET_SHEATH",
+            "ACTION_T_SET_STAND_STATE",
+            "ACTION_T_SET_REACT_STATE"
+        ]
+    },
+    {
+        "name": "Summon",
+        "group_members": [
+            "ACTION_T_SPAWN",
+            "ACTION_T_SUMMON_ID"
+        ]
+    },
+    {
+        "name": "Threat",
+        "group_members": [
+            "ACTION_T_THREAT_SINGLE",
+            "ACTION_T_THREAT_ALL_PCT"
+        ]
+    },
+    {
+        "name": "Instance",
+        "group_members": [
+            "ACTION_T_SET_INST_DATA",
+            "ACTION_T_SET_INST_DATA64"
+        ]
+    },
+    {
+        "name": "Attack & death",
+        "group_members": [
+            "ACTION_T_ATTACK_START",
+            "ACTION_T_EVADE",
+            "ACTION_T_DIE",
+            "ACTION_T_CALL_FOR_HELP",
+            "ACTION_T_FLEE_FOR_ASSIST",
+            "ACTION_T_AUTO_ATTACK",
+            "ACTION_T_ZONE_COMBAT_PULSE",
+            "ACTION_T_SET_DEATH_PREVENTION"
+        ]
+    },
+    {
+        "name": "Phase",
+        "group_members": [
+            "ACTION_T_SET_PHASE",
+            "ACTION_T_INC_PHASE",
+            "ACTION_T_RANDOM_PHASE",
+            "ACTION_T_RANDOM_PHASE_RANGE"            
+        ]
+    },
+    {
+        "name": "Interact with other units",
+        "group_members": [
+            "ACTION_T_THROW_AI_EVENT",
+            "ACTION_T_SET_THROW_MASK",
+            "ACTION_T_START_RELAY_SCRIPT"
+        ]
+    },
+    {
+        "name": "Miscellaneous",
+        "group_members": [
+            "ACTION_T_DESPAWN_GUARDIANS",
+            "ACTION_T_SET_RANGED_MODE",
+            "ACTION_T_SET_IMMOBILIZED_STATE",
+            "ACTION_T_SET_DESPAWN_AGGREGATION",
+            "ACTION_T_SET_IMMUNITY_SET"
+        ]
+    },
+    {
+        "name": "Script",
+        "group_members": [
+            "ACTION_T_NONE"
+        ]
+    }
+]

@@ -1,0 +1,1 @@
+﻿Code in this folder is absolutely against any good WPF and MVVM practises, if you know how to write editor in a better way - any refactor (or rather - writing from the scratch) is welcome!

@@ -1,0 +1,1080 @@
+[
+    {
+        "id": 0,
+        "name": "ACTION_T_NONE",
+        "description": "Do nothing",
+        "name_readable": "Do nothing",
+        "implicit_source": "SELF"
+    },
+    {
+        "id": 1,
+        "name": "ACTION_T_TEXT",
+        "search_tags": "say text",
+        "parameters": [
+            {
+                "type": "BroadcastTextParameter",
+                "name": "Text Id 1"
+            },
+            {
+                "type": "BroadcastTextParameter",
+                "name": "Text Id 2"
+            },
+            {
+                "type": "BroadcastTextParameter",
+                "name": "Text Id 3"
+            }
+        ],
+        "description": "{source}: Say {pram2value:choose(0):|random }text {pram1}{pram2value:choose(0):|, {pram2}}{pram3value:choose(0):|, {pram3}}",
+        "name_readable": "Talk (old)",
+        "implicit_source": "SELF"
+    },
+    {
+        "id": 2,
+        "name": "ACTION_T_SET_FACTION",
+        "parameters": [
+            {
+                "type": "FactionParameter",
+                "name": "Faction"
+            },
+            {
+                "type": "FlagParameter",
+                "name": "Flags",
+                "values": {
+                    "1": {"name": "RESTORE_RESPAWN", "description": "Default faction will be restored at respawn"},
+                    "2": {"name": "RESTORE_COMBAT_STOP", "description": "at CombatStop() (happens at creature death, at evade or custom scripte among others)"},
+                    "4": {"name": "RESTORE_REACH_HOME", "description": "at reaching home in home movement (evade), if not already done at CombatStop()"},
+                    "8": {"name": "TOGGLE_NON_ATTACKABLE", "description": "Remove UNIT_FLAG_NON_ATTACKABLE(0x02) when faction is changed (reapply when temp-faction is removed)"},
+                    "16": {"name": "TOGGLE_IMMUNE_TO_PLAYER", "description": "Remove UNIT_FLAG_IMMUNE_TO_PLAYER(0x100) when faction is changed (reapply when temp-faction is removed)"},
+                    "32": {"name": "TOGGLE_IMMUNE_TO_NPC", "description": "Remove UNIT_FLAG_PASSIVE(0x200) when faction is changed (reapply when temp-faction is removed)"},
+                    "64": {"name": "TOGGLE_PACIFIED", "description": "Remove UNIT_FLAG_PACIFIED(0x20000) when faction is changed (reapply when temp-faction is removed)"},
+                    "128": {"name": "TOGGLE_NOT_SELECTABLE", "description": "Remove UNIT_FLAG_NOT_SELECTABLE(0x2000000) when faction is changed (reapply when temp-faction is removed)"}
+                }
+            }
+        ],
+        "description": "{source}: {pram1value:choose(0):Restore faction|Set faction to {pram1}{pram2value:choose(0):| with flags {pram2}}",
+        "name_readable": "Set faction",
+        "implicit_source": "SELF"
+    },
+    {
+        "id": 3,
+        "name": "ACTION_T_MORPH_TO_ENTRY_OR_MODEL",
+        "parameters": [
+            {
+                "type": "CreatureParameter",
+                "name": "Creature"
+            },
+            {
+                "type": "CreatureModelDataParameter",
+                "name": "Model id"
+            }
+        ],
+        "description": "{source}: {pram1value:choose(0):{pram2value:choose(0):Demorph|Morph to model {pram2}}|Morph to model from creature {pram1}}",
+        "name_readable": "Morph to entry or model",
+        "implicit_source": "SELF"
+    },
+    {
+        "id": 4,
+        "name": "ACTION_T_SOUND",
+        "parameters": [
+            {
+                "type": "SoundParameter",
+                "name": "Sound"
+            }
+        ],
+        "description": "{source}: Play sound {pram1}",
+        "name_readable": "Play sound",
+        "implicit_source": "SELF"
+    },
+    {
+        "id": 5,
+        "name": "ACTION_T_EMOTE",
+        "parameters": [
+            {
+                "type": "MangosEventAiEmoteParameter",
+                "name": "Emote"
+            }
+        ],
+        "description": "{source}: {pram1string}",
+        "name_readable": "Play emote",
+        "implicit_source": "SELF"
+    },
+    {
+        "id": 9,
+        "name": "ACTION_T_RANDOM_SOUND",
+        "parameters": [
+            {
+                "type": "SoundParameter",
+                "name": "Sound 1"
+            },
+            {
+                "type": "SoundParameter",
+                "name": "Sound 2"
+            },
+            {
+                "type": "SoundParameter",
+                "name": "Sound 3"
+            }
+        ],
+        "description": "{source}: Play random sound: {pram1}{pram2value:choose(0):|, {pram2}}{pram3value:choose(0):|, {pram3}}",
+        "name_readable": "Play random sound",
+        "implicit_source": "SELF"
+    },
+    {
+        "id": 10,
+        "name": "ACTION_T_RANDOM_EMOTE",
+        "parameters": [
+            {
+                "type": "EmoteParameter",
+                "name": "Emote 1"
+            },
+            {
+                "type": "EmoteParameter",
+                "name": "Emote 2"
+            },
+            {
+                "type": "EmoteParameter",
+                "name": "Emote 3"
+            }
+        ],
+        "description": "{source}: Play random emote {pram1}{pram2value:choose(0):|, {pram2}}{pram3value:choose(0):|, {pram3}}",
+        "name_readable": "Play random emote",
+        "implicit_source": "SELF"
+    },
+    {
+        "id": 11,
+        "name": "ACTION_T_CAST",
+        "parameters": [
+            {
+                "type": "SpellParameter",
+                "name": "Spell"
+            },
+            {
+                "type": "EventAiTargetParameter",
+                "name": "Target"
+            },
+            {
+                "type": "FlagParameter",
+                "name": "Flags",
+                "values": {
+                    "1": {"name": "INTERRUPT_PREVIOUS", "description": "Interrupts any previous spell casting."},
+                    "2": {"name": "TRIGGERED", "description": "Forces the cast to be instant and ignores any mana/reagents requirements."},
+                    "4": {"name": "FORCE_CAST", "description": "Forces spell to cast even if the target is possibly out of range or the creature is possibly out of mana"},
+                    "8": {"name": "NO_MELEE_IF_OOM", "description": "Prevents creature from entering melee if out of mana or out of range"},
+                    "16": {"name": "FORCE_TARGET_SELF", "description": "Forces the target to cast this spell on itself"},
+                    "32": {"name": "AURA_NOT_PRESENT", "description": "Only casts the spell on the target if the target does not have the aura from that spell on itself already."},
+                    "64": {"name": "IGNORE_UNSELECTABLE_TARGET", "description": "Can target UNIT_FLAG_NOT_SELECTABLE - Needed in some scripts"},
+                    "128": {"name": "SWITCH_CASTER_TARGET", "description": "Switches target and caster for spell cast"},
+                    "256": {"name": "MAIN_SPELL", "description": "Marks main spell for AI Type = Action 57 ACTION_T_SET_RANGED_MODE"},
+                    "512": {"name": "PLAYER_ONLY", "description": "Selects only player targets - substitution for EAI not having more params"},
+                    "1024": {"name": "DISTANCE_YOURSELF", "description": "If spell with this cast flag hits main aggro target, caster distances himself - EAI only"}
+                }
+            }
+        ],
+        "description": "{source}: Cast {pram1} on {pram2}{pram3value:choose(0):| with flags {pram3}}",
+        "name_readable": "Cast",
+        "target_types": ["Creature", "Player"],
+        "target_is_source": false,
+        "implicit_source": "SELF"
+    },
+    {
+        "id": 12,
+        "name": "ACTION_T_SPAWN",
+        "search_tags": "summon",
+        "parameters": [
+            {
+                "type": "CreatureParameter",
+                "name": "Creature"
+            },
+            {
+                "type": "EventAiTargetParameter",
+                "name": "Target"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Duration"
+            }
+        ],
+        "description": "{source}: Spawn creature {pram1}{pram2value:choose(15:| and attack {pram2}}{pram3value:choose(0):| (despawn after {pram3}s after evade)}",
+        "name_readable": "Spawn",
+        "implicit_source": "SELF"
+    },
+    {
+        "id": 13,
+        "name": "ACTION_T_THREAT_SINGLE",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Threat"
+            },
+            {
+                "type": "EventAiTargetParameter",
+                "name": "Target"
+            },
+            {
+                "type": "Parameter",
+                "name": "Is absolute value"
+            }
+        ],
+        "description": "{source}: Modify threat of {pram2} by {pram1}{pram3value:choose(0):%|}",
+        "description_rules": [
+            {
+                "description": "{source}: Remove {pram2} from the threatlist",
+                "condition": "action.param(1) == -101 && event.param(3) == 0"
+            }
+        ],
+        "name_readable": "Modify threat",
+        "implicit_source": "SELF"
+    },
+    {
+        "id": 14,
+        "name": "ACTION_T_THREAT_ALL_PCT",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Threat"
+            }
+        ],
+        "description": "{source}: Modify threat of all victims by {pram1}%",
+        "description_rules": [
+            {
+                "description": "{source}: Leave combat",
+                "condition": "action.param(1) == -101"
+            }
+        ],
+        "name_readable": "Modify threat all",
+        "implicit_source": "SELF"
+    },
+    {
+        "id": 15,
+        "name": "ACTION_T_QUEST_EVENT",
+        "parameters": [
+            {
+                "type": "QuestParameter",
+                "name": "Quest"
+            },
+            {
+                "type": "EventAiTargetParameter",
+                "name": "Target"
+            },
+            {
+                "type": "BoolParameter",
+                "name": "Reward group"
+            }
+        ],
+        "description": "{source}: Call AreaExploredOrEventHappens for{pram3value:choose(0):| the whole group of} {pram2} for quest {pram1}",
+        "name_readable": "Quest event",
+        "implicit_source": "SELF"
+    },
+    {
+        "id": 16,
+        "name": "ACTION_T_QUEST_CASTCREATUREGO",
+        "parameters": [
+            {
+                "type": "CreatureParameter",
+                "name": "Creature"
+            },
+            {
+                "type": "SpellParameter",
+                "name": "Spell"
+            },
+            {
+                "type": "EventAiTargetParameter",
+                "name": "Target"
+            }
+        ],
+        "description": "{source}: Send CastCreatureOrGo for a creature {pram1} with spell {pram2} for {pram3}",
+        "name_readable": "Send cast creature or go",
+        "implicit_source": "SELF"
+    },
+    {
+        "id": 17,
+        "name": "ACTION_T_SET_UNIT_FIELD",
+        "parameters": [
+            {
+                "type": "SwitchParameter",
+                "name": "Field",
+                "values": {
+                    "24": "health",
+                    "25": "mana",
+                    "56": "item slot 0",
+                    "57": "item slot 1",
+                    "58": "item slot 2",
+                    "65": "bounding radius",
+                    "66": "combat reach",
+                    "79": "dynamic flags",
+                    "82": "npc flags"
+                }
+            },
+            {
+                "type": "EventAiSetFieldValueParameter",
+                "name": "Value"
+            },
+            {
+                "type": "EventAiTargetParameter",
+                "name": "Target"
+            }
+        ],
+        "description": "[s=2]{pram3string}[/s]: Set field {pram1} to {pram2}",
+        "name_readable": "Set field",
+        "target_field": 3
+    },
+    {
+        "id": 18,
+        "name": "ACTION_T_SET_UNIT_FLAG",
+        "parameters": [
+            {
+                "type": "UnitFlagParameter",
+                "name": "Flags"
+            },
+            {
+                "type": "EventAiTargetParameter",
+                "name": "Target"
+            }
+        ],
+        "description": "[s=1]{pram2string}[/s]: Add unit flags {pram1}",
+        "name_readable": "Add unit flag",
+        "target_field": 2
+    },
+    {
+        "id": 19,
+        "name": "ACTION_T_REMOVE_UNIT_FLAG",
+        "parameters": [
+            {
+                "type": "UnitFlagParameter",
+                "name": "Flags"
+            },
+            {
+                "type": "EventAiTargetParameter",
+                "name": "Target"
+            }
+        ],
+        "description": "[s=1]{pram2string}[/s]: Remove unit flags {pram1}",
+        "name_readable": "Remove unit flag",
+        "target_field": 2
+    },
+    {
+        "id": 20,
+        "name": "ACTION_T_AUTO_ATTACK",
+        "parameters": [
+            {
+                "type": "BoolParameter",
+                "name": "Allow auto attack"
+            }
+        ],
+        "description": "{source}: {pram1value:choose(0):Disable melee attack|Enable melee attack}",
+        "name_readable": "Auto attack",
+        "implicit_source": "SELF"
+    },
+    {
+        "id": 21,
+        "name": "ACTION_T_COMBAT_MOVEMENT",
+        "parameters": [
+            {
+                "type": "BoolParameter",
+                "name": "Allow combat movement"
+            }
+        ],
+        "description": "{source}: {pram1value:choose(0):Disable chase combat movement|Enable chase combat movement}",
+        "name_readable": "Allow combat movement",
+        "implicit_source": "SELF"
+    },
+    {
+        "id": 22,
+        "name": "ACTION_T_SET_PHASE",
+        "parameters": [
+            {
+                "type": "EventAiPhaseParameter",
+                "name": "Phase"
+            }
+        ],
+        "description": "Set script phase to {pram1}",
+        "name_readable": "Set phase",
+        "implicit_source": "SELF"
+    },
+    {
+        "id": 23,
+        "name": "ACTION_T_INC_PHASE",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Value"
+            }
+        ],
+        "description": "Increment phase by {pram1}",
+        "description_rules": [
+            {
+                "description": "Decrement phase by {pram1}",
+                "condition": "action.param(1) > 0"
+            }
+        ],
+        "name_readable": "Increment/decrement phase",
+        "implicit_source": "SELF"
+    },
+    {
+        "id": 24,
+        "name": "ACTION_T_EVADE",
+        "parameters": [
+            {
+                "type": "BoolParameter",
+                "name": "Only drop combat"
+            }
+        ],
+        "description": "{source}: {pram1value:choose(0):Evade|Drop combat}",
+        "name_readable": "Evade",
+        "implicit_source": "SELF"
+    },
+    {
+        "id": 25,
+        "name": "ACTION_T_FLEE_FOR_ASSIST",
+        "description": "{source}: Flee for assist",
+        "name_readable": "Flee for assist",
+        "implicit_source": "SELF"
+    },
+    {
+        "id": 26,
+        "name": "ACTION_T_QUEST_EVENT_ALL",
+        "parameters": [
+            {
+                "type": "QuestParameter",
+                "name": "Quest"
+            },
+            {
+                "type": "BoolParameter",
+                "name": "Use threat list"
+            }
+        ],
+        "description": "{source}: Call {pram1} GroupEventHappens {pram2value:choose(0):to action invoker|to all players on the threatlist}",
+        "name_readable": "Quest event (all)",
+        "implicit_source": "SELF"
+    },
+    {
+        "id": 27,
+        "name": "ACTION_T_CASTCREATUREGO_ALL",
+        "parameters": [
+            {
+                "type": "QuestParameter",
+                "name": "Quest"
+            },
+            {
+                "type": "SpellParameter",
+                "name": "Spell"
+            }
+        ],
+        "description": "{source}: Call CastedCreatureOrGo for all players on the threat list with quest {pram1} and spell {pram2}",
+        "name_readable": "Casted creature or go (all)",
+        "implicit_source": "SELF"
+    },
+    {
+        "id": 28,
+        "name": "ACTION_T_REMOVEAURASFROMSPELL",
+        "parameters": [
+            {
+                "type": "EventAiTargetParameter",
+                "name": "Target"
+            },
+            {
+                "type": "SpellParameter",
+                "name": "Spell"
+            }
+        ],
+        "description": "[s=0]{pram1string}[/s]: Remove aura {pram2}",
+        "name_readable": "Remove aura",
+        "target_field": 1
+    },
+    {
+        "id": 29,
+        "name": "ACTION_T_RANGED_MOVEMENT",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Distance"
+            },
+            {
+                "type": "Parameter",
+                "name": "Angle"
+            }
+        ],
+        "description": "{source}: Set ranged combat movement to {pram1} yd range and {pram2} rad angle",
+        "name_readable": "Set ranged movement",
+        "description_rules": [
+            {
+                "description": "{source}: Set melee combat movement",
+                "condition": "action.param(1) == 0 && action.param(2) == 0"
+            }
+        ],
+        "implicit_source": "SELF"
+    },
+    {
+        "id": 30,
+        "name": "ACTION_T_RANDOM_PHASE",
+        "parameters": [
+            {
+                "type": "EventAiPhaseParameter",
+                "name": "Phase Id 1"
+            },
+            {
+                "type": "EventAiPhaseParameter",
+                "name": "Phase Id 2"
+            },
+            {
+                "type": "EventAiPhaseParameter",
+                "name": "Phase Id 3"
+            }
+        ],
+        "description": "Set random phase {pram1}, {pram2}, {pram3}",
+        "name_readable": "Set random phase",
+        "implicit_source": "SELF"
+    },
+    {
+        "id": 31,
+        "name": "ACTION_T_RANDOM_PHASE_RANGE",
+        "parameters": [
+            {
+                "type": "EventAiPhaseParameter",
+                "name": "Phase min"
+            },
+            {
+                "type": "EventAiPhaseParameter",
+                "name": "Phase max"
+            }
+        ],
+        "description": "Set random phase {pram1} - {pram2}",
+        "name_readable": "Set random phase (range)",
+        "implicit_source": "SELF"
+    },
+    {
+        "id": 32,
+        "name": "ACTION_T_SUMMON_ID",
+        "parameters": [
+            {
+                "type": "CreatureParameter",
+                "name": "Creature"
+            },
+            {
+                "type": "EventAiTargetParameter",
+                "name": "Target"
+            },
+            {
+                "type": "ActionSummonIdParameter",
+                "name": "Summon ID"
+            }
+        ],
+        "description": "{source}: Summon creature {pram1} at position {pram3string}{pram2value:choose(15):| and attack {pram2}}",
+        "name_readable": "Summon creature",
+        "implicit_source": "SELF"
+    },
+    {
+        "id": 33,
+        "name": "ACTION_T_KILLED_MONSTER",
+        "parameters": [
+            {
+                "type": "CreatureParameter",
+                "name": "Creature"
+            },
+            {
+                "type": "EventAiTargetParameter",
+                "name": "Target"
+            }
+        ],
+        "description": "[s=1]{pram2string}[/s]: Add {pram1} kill credit",
+        "name_readable": "Kill credit"
+    },
+    {
+        "id": 34,
+        "name": "ACTION_T_SET_INST_DATA",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Field"
+            },
+            {
+                "type": "Parameter",
+                "name": "Data"
+            }
+        ],
+        "description": "Set instance data field {pram1} to data {pram2}",
+        "name_readable": "Set instance data"
+    },
+    {
+        "id": 35,
+        "name": "ACTION_T_SET_INST_DATA64",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Field"
+            },
+            {
+                "type": "EventAiTargetParameter",
+                "name": "Target"
+            }
+        ],
+        "description": "Set instance guid data field {pram1} to guid {pram2}",
+        "name_readable": "Set instance guid data",
+        "implicit_source": "SELF"
+    },
+    {
+        "id": 36,
+        "name": "ACTION_T_UPDATE_TEMPLATE",
+        "parameters": [
+            {
+                "type": "CreatureParameter",
+                "name": "Creature"
+            },
+            {
+                "type": "SwitchParameter",
+                "name": "Team",
+                "values": {
+                    "0": "Alliance",
+                    "1": "Horde"
+                }
+            }
+        ],
+        "description": "{source}: Update template to {pram2} {pram1}",
+        "name_readable": "Update template",
+        "implicit_source": "SELF"
+    },
+    {
+        "id": 37,
+        "name": "ACTION_T_DIE",
+        "description": "{source}: Die",
+        "name_readable": "Die",
+        "implicit_source": "SELF"
+    },
+    {
+        "id": 38,
+        "name": "ACTION_T_ZONE_COMBAT_PULSE",
+        "description": "{source}: Set all players in instance in combat (must be in combat already)",
+        "name_readable": "Set players in combat",
+        "implicit_source": "SELF"
+    },
+    {
+        "id": 39,
+        "name": "ACTION_T_CALL_FOR_HELP",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Radius"
+            }
+        ],
+        "description": "{source}: Call for help in {pram1} yd range",
+        "name_readable": "Call for help",
+        "implicit_source": "SELF"
+    },
+    {
+        "id": 40,
+        "name": "ACTION_T_SET_SHEATH",
+        "parameters": [
+            {
+                "type": "SheathStateParameter",
+                "name": "State"
+            }
+        ],
+        "description": "{source}: Set sheath state to {pram1}",
+        "name_readable": "Set sheath state",
+        "implicit_source": "SELF"
+    },
+    {
+        "id": 41,
+        "name": "ACTION_T_FORCE_DESPAWN",
+        "parameters": [
+            {
+                "type": "FloatParameter",
+                "name": "Delay"
+            }
+        ],
+        "description": "{source}: Despawn{pram1value:choose(0):| in {pram1} seconds}",
+        "name_readable": "Despawn",
+        "implicit_source": "SELF"
+    },
+    {
+        "id": 42,
+        "name": "ACTION_T_SET_DEATH_PREVENTION",
+        "search_tags": "death prevention prevent",
+        "parameters": [
+            {
+                "type": "BoolParameter",
+                "name": "State"
+            }
+        ],
+        "description": "{source}: {pram1value:choose(0):Enable death|Disable death}",
+        "name_readable": "Set invincible",
+        "implicit_source": "SELF"
+    },
+    {
+        "id": 43,
+        "name": "ACTION_T_MOUNT_TO_ENTRY_OR_MODEL",
+        "search_tags": "unmount",
+        "parameters": [
+            {
+                "type": "CreatureParameter",
+                "name": "Creature"
+            },
+            {
+                "type": "CreatureModelDataParameter",
+                "name": "Model id"
+            }
+        ],
+        "description": "{source}: {pram1value:choose(0):{pram2value:choose(0):Unmount|Mount model {pram2}}|Mount creature {pram1}}",
+        "name_readable": "Mount to entry or model",
+        "implicit_source": "SELF"
+    },
+    {
+        "id": 44,
+        "name": "ACTION_T_CHANCED_TEXT",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Chance"
+            },
+            {
+                "type": "Parameter",
+                "name": "-TextId1"
+            },
+            {
+                "type": "Parameter",
+                "name": "-TextId2"
+            }
+        ],
+        "description": "{source}: Say {pram2}{pram3value:choose(0):| or{pram3}} with {pram1}% chance",
+        "name_readable": "Talk (chance)",
+        "deprecated": true,
+        "implicit_source": "SELF"
+    },
+    {
+        "id": 45,
+        "name": "ACTION_T_THROW_AI_EVENT",
+        "parameters": [
+            {
+                "type": "MangosAiEventTypeParameter",
+                "name": "Event type"
+            },
+            {
+                "type": "Parameter",
+                "name": "Radius"
+            },
+            {
+                "type": "EventAiTargetParameter",
+                "name": "Target"
+            }
+        ],
+        "description": "Send event {pram1} to all creatures in {pram2} yd with {pram3} invoker",
+        "name_readable": "Throw AI event",
+        "implicit_source": "SELF"
+    },
+    {
+        "id": 46,
+        "name": "ACTION_T_SET_THROW_MASK",
+        "parameters": [
+            {
+                "type": "FlagParameter",
+                "name": "Event type mask",
+                "values": {
+                    "1": {"name": "just died", "description": "Sent when npc dies"},
+                    "2": {"name": "critical health", "description": "Sent when damaged below 10% health"},
+                    "4": {"name": "lost health", "description": "Sent when damaged below 50% health"},
+                    "8": {"name": "lost some health", "description": "Sent when damaged below 90% health"},
+                    "16": {"name": "got full health", "description": "Sent when healed to full health"}
+                }
+            }
+        ],
+        "description": "Throw event {pram1} automatically to nearby creatures",
+        "name_readable": "Set throw event mask",
+        "implicit_source": "SELF"
+    },
+    {
+        "id": 47,
+        "name": "ACTION_T_SET_STAND_STATE",
+        "parameters": [
+            {
+                "type": "StandStateParameter",
+                "name": "Stand state"
+            }
+        ],
+        "description": "{source}: Set stand state to {pram1}",
+        "name_readable": "Set stand state",
+        "implicit_source": "SELF"
+    },
+    {
+        "id": 48,
+        "name": "ACTION_T_CHANGE_MOVEMENT",
+        "search_tags": "stay random waypoint path",
+        "parameters": [
+            {
+                "type": "SwitchParameter",
+                "name": "Movement Type",
+                "values": {
+                    "0": "Stay in place",
+                    "1": "Random move",
+                    "2": "Waypoint path"
+                }
+            },
+            {
+                "type": "Parameter",
+                "name": "Wander distance"
+            },
+            {
+                "type": "FlagParameter",
+                "name": "Flags",
+                "values": {
+                    "1": "as default movement generator",
+                    "2": "use waypoint_path"
+                }
+            }
+        ],
+        "description": "{source}: {pram1value:choose(0|1|2):Stay in place|Move random within {pram2} yd|Start path {pram2}|INVALID}{pram3value:choose(0):| ({pram2})}",
+        "name_readable": "Change movement",
+        "implicit_source": "SELF"
+    },
+    {
+        "id": 50,
+        "name": "ACTION_T_SET_REACT_STATE",
+        "parameters": [
+            {
+                "type": "ReactStateParameter",
+                "name": "ReactState"
+            }
+        ],
+        "description": "{source}: Set {pram1} react state",
+        "name_readable": "Set react state",
+        "implicit_source": "SELF"
+    },
+    {
+        "id": 51,
+        "name": "ACTION_T_PAUSE_WAYPOINTS",
+        "search_tags": "unpause",
+        "parameters": [
+            {
+                "type": "SwitchParameter",
+                "name": "Type",
+                "values": {
+                    "0": "Unpause",
+                    "1": "Pause"
+                }
+            }
+        ],
+        "description": "{source}: {pram1} waypoints",
+        "name_readable": "Pause waypoints",
+        "implicit_source": "SELF"
+    },
+    {
+        "id": 52,
+        "name": "ACTION_T_INTERRUPT_SPELL",
+        "parameters": [
+            {
+                "type": "SwitchParameter",
+                "name": "SpellType",
+                "values": {
+                    "0": "current melee",
+                    "1": "current generic",
+                    "2": "current autorepeated",
+                    "3": "current channeled"
+                }
+            }
+        ],
+        "description": "{source}: Interrupt {pram1} spell",
+        "name_readable": "Interrupt spell",
+        "implicit_source": "SELF"
+    },
+    {
+        "id": 53,
+        "name": "ACTION_T_START_RELAY_SCRIPT",
+        "parameters": [
+            {
+                "type": "StartRelayIdParameter",
+                "name": "Relay ID or Template"
+            },
+            {
+                "type": "EventAiTargetParameter",
+                "name": "Target"
+            }
+        ],
+        "description": "Start {pram1string}{pram2value:choose(15):| with target {pram2}}",
+        "name_readable": "Start relay script",
+        "implicit_source": "SELF"
+    },
+    {
+        "id": 54,
+        "name": "ACTION_T_TEXT_NEW",
+        "parameters": [
+            {
+                "type": "EventAiNewTextParameter",
+                "name": "TextId"
+            },
+            {
+                "type": "EventAiTargetParameter",
+                "name": "Target"
+            },
+            {
+                "type": "EventAiNewTextRandomTemplateParameter",
+                "name": "Template"
+            }
+        ],
+        "description": "{source}: {pram3value:choose(0):{pram1string}|{pram3string}}{pram2value:choose(0|15): | | to {pram2}}",
+        "name_readable": "Talk",
+        "implicit_source": "SELF"
+    },
+    {
+        "id": 55,
+        "name": "ACTION_T_ATTACK_START",
+        "parameters": [
+            {
+                "type": "EventAiTargetParameter",
+                "name": "Target"
+            }
+        ],
+        "description": "{source}: Attack {pram1}",
+        "name_readable": "Start attack",
+        "implicit_source": "SELF"
+    },
+    {
+        "id": 56,
+        "name": "ACTION_T_DESPAWN_GUARDIANS",
+        "parameters": [
+            {
+                "type": "CreatureParameter",
+                "name": "Guardian"
+            }
+        ],
+        "description": "{source}: Despawn {pram1value:choose(0):all guardians|guardians with entry {pram1}}",
+        "name_readable": "Despawn guardians",
+        "implicit_source": "SELF"
+    },
+    {
+        "id": 57,
+        "name": "ACTION_T_SET_RANGED_MODE",
+        "parameters": [
+            {
+                "type": "SwitchParameter",
+                "name": "Mode",
+                "values": {
+                    "0": {"name": "none", "description": "Basic melee mode and setting it also forcibly turns off ranged mode."},
+                    "1": {"name": "full caster", "description": "Creature will use spells and not melee, until going OOM, interrupted or silenced. When one of those conditions is valid, creature will come into melee mode and attack until enough mana for spells."},
+                    "2": {"name": "proximity", "description": "Creature will use spells and not melee until target comes within 8 yards, OOM, interrupted or silenced."},
+                    "3": {"name": "no melee mode", "description": "Creature will never melee. If OOM, interrupted or silenced, it will stand there and do nothing."}
+                }
+            },
+            {
+                "type": "Parameter",
+                "name": "Distance"
+            }
+        ],
+        "description": "{source}: Set ranged mode {pram1} with distance {pram2} yd",
+        "name_readable": "Set ranged move",
+        "implicit_source": "SELF"
+    },
+    {
+        "id": 58,
+        "name": "ACTION_T_SET_WALK",
+        "search_tags": "run",
+        "parameters": [
+            {
+                "type": "SwitchParameter",
+                "name": "Type",
+                "values": {
+                    "0": {"name": "run", "description": "sets running by default (default)"},
+                    "1": {"name": "walk", "description": "sets walking by default (default)"},
+                    "2": {"name": "run (in chase)", "description": "sets running during chasing (default)"},
+                    "3": {"name": "walk (in chase)", "description": "sets walking during chasing (default)"}
+                }
+            }
+        ],
+        "description": "{source}: Set {pram1}",
+        "name_readable": "Set walk",
+        "implicit_source": "SELF"
+    },
+    {
+        "id": 59,
+        "name": "ACTION_T_SET_FACING",
+        "search_tags": "orientation",
+        "parameters": [
+            {
+                "type": "EventAiTargetParameter",
+                "name": "Target"
+            },
+            {
+                "type": "BoolParameter",
+                "name": "Reset facing"
+            }
+        ],
+        "description": "{source}: {pram2value:choose(0):Look at {pram1}|Reset orientation}",
+        "name_readable": "Set facing",
+        "implicit_source": "SELF"
+    },
+    {
+        "id": 60,
+        "name": "ACTION_T_SET_SPELL_SET",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "SetId"
+            }
+        ],
+        "description": "{source}: Set spell set {pram1}",
+        "name_readable": "Set spell set",
+        "implicit_source": "SELF"
+    },
+    {
+        "id": 61,
+        "name": "ACTION_T_SET_IMMOBILIZED_STATE",
+        "parameters": [
+            {
+                "type": "BoolParameter",
+                "name": "Apply"
+            },
+            {
+                "type": "BoolParameter",
+                "name": "Remove on combat stop"
+            }
+        ],
+        "description": "{source}: {pram1value:choose(0):Disable immobilized|Set immobilized{pram2value:choose(0):| (unset on combat stop)}}",
+        "name_readable": "Set immobilized",
+        "implicit_source": "SELF"
+    },
+    {
+        "id": 62,
+        "name": "ACTION_T_SET_DESPAWN_AGGREGATION",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Mask"
+            },
+            {
+                "type": "Parameter",
+                "name": "Entry1"
+            },
+            {
+                "type": "Parameter",
+                "name": "Entry2"
+            }
+        ],
+        "description": "[TODO explain] Enable aggregation of guids for despawn on event (death, evade)",
+        "name_readable": "Set despawn aggregation",
+        "implicit_source": "SELF"
+    },
+    {
+        "id": 63,
+        "name": "ACTION_T_SET_IMMUNITY_SET",
+        "parameters": [
+            {
+                "type": "CreatureImmunitiesParameter",
+                "name": "Set id"
+            }
+        ],
+        "description": "{source}: Set immunity set {pram1}",
+        "name_readable": "Set immunity set",
+        "implicit_source": "SELF"
+    },
+    {
+        "id": 64,
+        "name": "ACTION_T_SET_FOLLOW_MOVEMENT",
+        "parameters": [
+            {
+                "type": "BoolParameter",
+                "name": "On/off"
+            }
+        ],
+        "description": "{source}: {pram1value:choose(0):Disable follow movement|Enable follow movement}",
+        "name_readable": "Set follow movement",
+        "implicit_source": "SELF"
+    }
+]

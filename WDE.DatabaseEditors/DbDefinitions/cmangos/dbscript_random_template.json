@@ -1,0 +1,57 @@
+{
+  "id": "dbscript_random_templates",
+  "compatibility": [
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Db script Random Templates",
+  "description": "Random templates used to define random texts or relay script IDs",
+  "table_name": "dbscript_random_templates",
+  "table_index_name": "id",
+  "record_mode": "SingleRow",
+  "group_name": "Database scripts",
+  "icon_path": "Icons/document_dice.png",
+  "primary_key": [
+    "id",
+    "type",
+    "target_id"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Id",
+          "db_column_name": "id",
+          "value_type": "uint",
+          "preferred_width": 40.0
+        },
+        {
+          "name": "Type",
+          "db_column_name": "type",
+          "value_type": "MangosDbScriptRandomTemplateTypeParameter",
+          "preferred_width": 55.0
+        },
+        {
+          "name": "Target Value",
+          "db_column_name": "target_id",
+          "value_type": "DbScriptRandomTemplateTargetValueParameter",
+          "preferred_width": 200.0
+        },
+        {
+          "name": "Chance",
+          "db_column_name": "chance",
+          "value_type": "PercentageParameter",
+          "preferred_width": 40.0,
+          "zero_is_blank": true
+        },
+        {
+          "name": "Comment",
+          "db_column_name": "comments",
+          "value_type": "string",
+          "default": "",
+          "can_be_null": true
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,944 @@
+[
+    {
+        "id": 0,
+        "name": "EVENT_T_TIMER_IN_COMBAT",
+        "search_tags": "timer ic",
+        "parameters": [
+            {
+                "type": "FloatParameter",
+                "name": "Initial Min"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Initial Max"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Repeat Min"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Repeat Max"
+            }
+        ],
+        "is_timed": true,
+        "description": "When in combat and timer at the beginning between {pram1} and {pram2} ms (and later repeats every {pram3} and {pram4} ms)",
+        "name_readable": "Every X seconds (in combat)",
+        "builtin_rules": [
+            "minmax(1, 2)",
+            "minmax(3, 4)"
+        ],
+        "description_rules": [
+            {
+                "description": "Once (IC)",
+                "condition": "event.param(1) == 0 && event.param(2) == 0 && event.param(3) == 0 && event.param(4) == 0"
+            },
+            {
+                "description": "Every {pram1} seconds (IC)",
+                "condition": "event.param(1) == event.param(2) && event.param(2) == event.param(3) && event.param(3) == event.param(4)"
+            },
+            {
+                "description": "Time = {pram1} seconds (IC)",
+                "condition": "event.param(3) == 0 && event.param(1) == event.param(2)"
+            },
+            {
+                "description": "Time between {pram1} - {pram2} seconds (IC)",
+                "condition": "event.param(3) == 0"
+            },
+            {
+                "description": "Every {pram1} - {pram2} seconds (IC)",
+                "condition": "event.param(1) == event.param(3) && event.param(2) == event.param(4)"
+            },
+            {
+                "description": "Every {pram3} seconds ({pram1}s initially) (IC)",
+                "condition": "event.param(1) == event.param(2) && event.param(3) == event.param(4)"
+            },
+            {
+                "description": "Every {pram3} - {pram4} seconds ({pram1} - {pram2}s initially) (IC)"
+            }
+        ]
+    },
+    {
+        "id": 1,
+        "name": "EVENT_T_TIMER_OOC",
+        "search_tags": "timer ooc",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "InitialMin"
+            },
+            {
+                "type": "Parameter",
+                "name": "InitialMax"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Cooldown min"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Cooldown max"
+            }
+        ],
+        "is_timed": true,
+        "description": "When out of combat and timer at the beginning between {pram1} and {pram2} ms (and later repeats every {pram3} and {pram4} ms)",
+        "name_readable": "Every X seconds (out of combat)",
+        "builtin_rules": [
+            "minmax(1, 2)",
+            "minmax(3, 4)"
+        ],
+        "description_rules": [
+            {
+                "description": "Once (OOC)",
+                "condition": "event.param(1) == 0 && event.param(2) == 0 && event.param(3) == 0 && event.param(4) == 0"
+            },
+            {
+                "description": "Every {pram1} seconds (OOC)",
+                "condition": "event.param(1) == event.param(2) && event.param(2) == event.param(3) && event.param(3) == event.param(4)"
+            },
+            {
+                "description": "Time = {pram1} seconds (OOC)",
+                "condition": "event.param(3) == 0 && event.param(1) == event.param(2)"
+            },
+            {
+                "description": "Time between {pram1} - {pram2} seconds (OOC)",
+                "condition": "event.param(3) == 0"
+            },
+            {
+                "description": "Every {pram1} - {pram2} seconds (OOC)",
+                "condition": "event.param(1) == event.param(3) && event.param(2) == event.param(4)"
+            },
+            {
+                "description": "Every {pram3} seconds ({pram1}s initially) (OOC)",
+                "condition": "event.param(1) == event.param(2) && event.param(3) == event.param(4)"
+            },
+            {
+                "description": "Every {pram3} - {pram4} seconds ({pram1} - {pram2}s initially) (OOC)"
+            }
+        ]
+    },
+    {
+        "id": 2,
+        "name": "EVENT_T_HP",
+        "parameters": [
+            {
+                "type": "PercentageParameter",
+                "name": "HP Max %"
+            },
+            {
+                "type": "PercentageParameter",
+                "name": "HP Min %"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Repeat Min"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Repeat Max"
+            }
+        ],
+        "is_timed": true,
+        "description": "When HP is between {pram2} and {pram1}",
+        "name_readable": "When HP between",
+        "builtin_rules": [
+            "maxmin(1, 2)",
+            "minmax(3, 4)"
+        ],
+        "description_rules": [
+            {
+                "description": "When HP is between {pram2} and {pram1} (once)",
+                "condition": "event.param(3) == 0 && event.param(4) == 0"
+            },
+            {
+                "description": "When HP is between {pram2} and {pram1} (repeat every {pram3}-{pram4} seconds)",
+                "condition": "event.param(4) > 0"
+            }
+        ]
+    },
+    {
+        "id": 3,
+        "name": "EVENT_T_MANA",
+        "parameters": [
+            {
+                "type": "PercentageParameter",
+                "name": "Mana Max %"
+            },
+            {
+                "type": "PercentageParameter",
+                "name": "Mana Min %"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Repeat Min"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Repeat Max"
+            }
+        ],
+        "is_timed": true,
+        "description": "When mana is between {pram2} and {pram1}%",
+        "name_readable": "When mana between",
+        "builtin_rules": [
+            "maxmin(1, 2)",
+            "minmax(3, 4)"
+        ],
+        "description_rules": [
+            {
+                "description": "When mana is between {pram2} and {pram1}% (once)",
+                "condition": "event.param(3) == 0 && event.param(4) == 0"
+            },
+            {
+                "description": "When mana is between {pram2} and {pram1}% (repeat every {pram3}-{pram4} seconds}})",
+                "condition": "event.param(4) > 0"
+            }
+        ]
+    },
+    {
+        "id": 4,
+        "name": "EVENT_T_AGGRO",
+        "description": "On aggro",
+        "name_readable": "On aggro"
+    },
+    {
+        "id": 5,
+        "name": "EVENT_T_KILL",
+        "parameters": [
+            {
+                "type": "FloatParameter",
+                "name": "Cooldown Min"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Cooldown Max"
+            },
+            {
+                "type": "BoolParameter",
+                "name": "Players only"
+            }
+        ],
+        "description": "On {pram3value:choose(0):creature or player|player} killed",
+        "name_readable": "On kill",
+        "builtin_rules": [
+            "minmax(1, 2)"
+        ],
+        "description_rules": [
+            {
+                "description": "On {pram3value:choose(0):creature or player|player} killed (cooldown {pram1}-{pram2} seconds)",
+                "condition": "event.param(2) > 0"
+            }
+        ]
+    },
+    {
+        "id": 6,
+        "name": "EVENT_T_DEATH",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Condition id"
+            }
+        ],
+        "description": "On death",
+        "name_readable": "On death"
+    },
+    {
+        "id": 7,
+        "name": "EVENT_T_EVADE",
+        "description": "On evade",
+        "name_readable": "On evade"
+    },
+    {
+        "id": 8,
+        "name": "EVENT_T_SPELLHIT",
+        "parameters": [
+            {
+                "type": "SpellParameter",
+                "name": "Spell"
+            },
+            {
+                "type": "SpellSchoolParameter",
+                "name": "School mask"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Cooldown min"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Cooldown max"
+            }
+        ],
+        "description": "On {pram1value:choose(0):{pram2value:choose(0):any spell|spell school {pram2}}|{pram2value:choose(0):{pram1} spell|INVALID}} hit{pram4value:choose(0):| (cooldown {pram3}-{pram4} seconds)}",
+        "name_readable": "On spell hit",
+        "builtin_rules": [
+            "minmax(3, 4)"
+        ]
+    },
+    {
+        "id": 9,
+        "name": "EVENT_T_RANGE",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Min distance"
+            },
+            {
+                "type": "Parameter",
+                "name": "Max distance"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Repeat min"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Repeat max"
+            }
+        ],
+        "is_timed": true,
+        "description": "When victim in {pram1value:choose(0):{pram2} yd|{pram1} - {pram2} yd} range{pram4value:choose(0):| (cooldown {pram3}-{pram4} seconds)}",
+        "name_readable": "Victim in range",
+        "builtin_rules": [
+            "minmax(1, 2)",
+            "minmax(3, 4)"
+        ]
+    },
+    {
+        "id": 10,
+        "name": "EVENT_T_OOC_LOS",
+        "parameters": [
+            {
+                "type": "SwitchParameter",
+                "name": "Hostile/Friendly",
+                "values": {
+                    "0": "only hostile",
+                    "1": "only friendly"
+                }
+            },
+            {
+                "type": "Parameter",
+                "name": "Max range"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Cooldown min"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Cooldown max"
+            },
+            {
+                "type": "BoolParameter",
+                "name": "Player only"
+            },
+            {
+                "type": "Parameter",
+                "name": "ConditionId"
+            }
+        ],
+        "is_timed": true,
+        "description": "When {pram1value:choose(0):hostile|friendly} {pram5value:choose(0):unit|player} in range {pram2} yd LOS{pram4value:choose(0):| (cooldown {pram3}-{pram4} seconds)}",
+        "name_readable": "Unit in LOS (OOC)",
+        "builtin_rules": [
+            "minmax(3, 4)"
+        ]
+    },
+    {
+        "id": 11,
+        "name": "EVENT_T_SPAWNED",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Condition"
+            },
+            {
+                "type": "Parameter",
+                "name": "Condition value"
+            }
+        ],
+        "description": "On spawned or respawned",
+        "name_readable": "On spawn/respawn"
+    },
+    {
+        "id": 12,
+        "name": "EVENT_T_TARGET_HP",
+        "parameters": [
+            {
+                "type": "PercentageParameter",
+                "name": "HP Max %"
+            },
+            {
+                "type": "PercentageParameter",
+                "name": "HP Min %"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Cooldown min"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Cooldown max"
+            }
+        ],
+        "is_timed": true,
+        "description": "When victim's HP between {pram2}-{pram1}%{pram4value:choose(0):| (cooldown {pram3}-{pram4} seconds)}",
+        "name_readable": "Target's HP",
+        "builtin_rules": [
+            "maxmin(1, 2)",
+            "minmax(3, 4)"
+        ]
+    },
+    {
+        "id": 13,
+        "name": "EVENT_T_TARGET_CASTING",
+        "parameters": [
+            {
+                "type": "FloatParameter",
+                "name": "Cooldown min"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Cooldown max"
+            }
+        ],
+        "is_timed": true,
+        "description": "When victim is casting a spell{pram2value:choose(0):| (cooldown {pram1}-{pram2} seconds)}",
+        "name_readable": "Target is casting",
+        "builtin_rules": [
+            "minmax(1, 2)"
+        ]
+    },
+    {
+        "id": 14,
+        "name": "EVENT_T_FRIENDLY_HP",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "HP deficit"
+            },
+            {
+                "type": "Parameter",
+                "name": "Radius"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Cooldown min"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Cooldown max"
+            },
+            {
+                "type": "BoolParameter",
+                "name": "Is percent"
+            }
+        ],
+        "is_timed": true,
+        "description": "When friendly unit within {pram2} yd has {pram5value:choose(0):{pram1}|{pram1}%} HP deficit{pram4value:choose(0):| (cooldown {pram3}-{pram4} seconds)}",
+        "name_readable": "Friendly's HP",
+        "builtin_rules": [
+            "minmax(3, 4)"
+        ]
+    },
+    {
+        "id": 15,
+        "name": "EVENT_T_FRIENDLY_IS_CC",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "DispelType"
+            },
+            {
+                "type": "Parameter",
+                "name": "Radius"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Cooldown min"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Cooldown max"
+            }
+        ],
+        "is_timed": true,
+        "description": "When friendly unit within {pram2} yd is CC{pram4value:choose(0):| (cooldown {pram3}-{pram4} seconds)}",
+        "name_readable": "Friendly is crowd controlled",
+        "builtin_rules": [
+            "minmax(3, 4)"
+        ]
+    },
+    {
+        "id": 16,
+        "name": "EVENT_T_FRIENDLY_MISSING_BUFF",
+        "parameters": [
+            {
+                "type": "SpellParameter",
+                "name": "Spell"
+            },
+            {
+                "type": "Parameter",
+                "name": "Radius"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Cooldown min"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Cooldown max"
+            },
+            {
+                "type": "BoolParameter",
+                "name": "In combat"
+            }
+        ],
+        "is_timed": true,
+        "description": "When friendly unit within {pram2} yd has aura {pram1} missing [{pram5value:choose(0):OOC|IC}]{pram4value:choose(0):| (cooldown {pram3}-{pram4} seconds)}",
+        "name_readable": "Friendly is missing buff",
+        "builtin_rules": [
+            "minmax(3, 4)"
+        ]
+    },
+    {
+        "id": 17,
+        "name": "EVENT_T_SUMMONED_UNIT",
+        "parameters": [
+            {
+                "type": "CreatureParameter",
+                "name": "Creature"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Cooldown min"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Cooldown max"
+            }
+        ],
+        "description": "On {pram1value:choose(0):any|{pram1}} creature summoned{pram3value:choose(0):| (cooldown {pram2}-{pram3} seconds)})",
+        "name_readable": "On summoned unit",
+        "builtin_rules": [
+            "minmax(2, 3)"
+        ]
+    },
+    {
+        "id": 18,
+        "name": "EVENT_T_TARGET_MANA",
+        "parameters": [
+            {
+                "type": "PercentageParameter",
+                "name": "Mana Max %"
+            },
+            {
+                "type": "PercentageParameter",
+                "name": "Mana Min %"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Cooldown min"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Cooldown max"
+            }
+        ],
+        "is_timed": true,
+        "description": "When victim's mana between {pram2}-{pram1}%{pram4value:choose(0):| (cooldown {pram3}-{pram4} seconds)}",
+        "name_readable": "Target's mana",
+        "builtin_rules": [
+            "maxmin(1, 2)",
+            "minmax(3, 4)"
+        ]
+    },
+    {
+        "id": 21,
+        "name": "EVENT_T_REACHED_HOME",
+        "description": "On home reached",
+        "name_readable": "On home reach"
+    },
+    {
+        "id": 22,
+        "name": "EVENT_T_RECEIVE_EMOTE",
+        "parameters": [
+            {
+                "type": "TextEmoteParameter",
+                "name": "Emote"
+            }
+        ],
+        "description": "On emote {pram1} received",
+        "name_readable": "On emote receive"
+    },
+    {
+        "id": 23,
+        "name": "EVENT_T_AURA",
+        "parameters": [
+            {
+                "type": "SpellParameter",
+                "name": "Spell"
+            },
+            {
+                "type": "Parameter",
+                "name": "Ammount in stack"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Cooldown min"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Cooldown max"
+            }
+        ],
+        "is_timed": true,
+        "description": "When have {pram1} aura{pram2value:choose(0|1): | | with at least {pram2} stacks}{pram4value:choose(0):| (cooldown {pram3}-{pram4} seconds)}",
+        "name_readable": "Has aura",
+        "builtin_rules": [
+            "minmax(3, 4)"
+        ]
+    },
+    {
+        "id": 24,
+        "name": "EVENT_T_TARGET_AURA",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "SpellID"
+            },
+            {
+                "type": "Parameter",
+                "name": "AmmountInStack"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Cooldown min"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Cooldown max"
+            }
+        ],
+        "is_timed": true,
+        "description": "When target has {pram1} aura{pram2value:choose(0|1): | | with at least {pram2} stacks}{pram4value:choose(0):| (cooldown {pram3}-{pram4} seconds)}",
+        "name_readable": "Target has aura",
+        "builtin_rules": [
+            "minmax(3, 4)"
+        ]
+    },
+    {
+        "id": 25,
+        "name": "EVENT_T_SUMMONED_JUST_DIED",
+        "parameters": [
+            {
+                "type": "CreatureParameter",
+                "name": "Creature"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Cooldown min"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Cooldown max"
+            }
+        ],
+        "description": "On summoned {pram1value:choose(0):any|{pram1}} creature died{pram3value:choose(0):| (cooldown {pram2}-{pram3} seconds)})",
+        "name_readable": "On summoned died",
+        "builtin_rules": [
+            "minmax(2, 3)"
+        ]
+    },
+    {
+        "id": 26,
+        "name": "EVENT_T_SUMMONED_JUST_DESPAWN",
+        "parameters": [
+            {
+                "type": "CreatureParameter",
+                "name": "Creature"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Cooldown min"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Cooldown max"
+            }
+        ],
+        "description": "On summoned {pram1value:choose(0):any|{pram1}} creature despawned{pram3value:choose(0):| (cooldown {pram2}-{pram3} seconds)})",
+        "name_readable": "On summoned despawned",
+        "builtin_rules": [
+            "minmax(2, 3)"
+        ]
+    },
+    {
+        "id": 27,
+        "name": "EVENT_T_MISSING_AURA",
+        "parameters": [
+            {
+                "type": "SpellParameter",
+                "name": "Spell"
+            },
+            {
+                "type": "Parameter",
+                "name": "Ammount in stack"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Cooldown min"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Cooldown max"
+            }
+        ],
+        "is_timed": true,
+        "description": "When {pram2value:choose(0|1):aura {pram1} is missing|aura {pram1} is missing|have less than {pram2} stacks of {pram1} aura}{pram4value:choose(0):| (cooldown {pram3}-{pram4} seconds)}",
+        "name_readable": "Missing aura",
+        "builtin_rules": [
+            "minmax(3, 4)"
+        ]
+    },
+    {
+        "id": 28,
+        "name": "EVENT_T_TARGET_MISSING_AURA",
+        "parameters": [
+            {
+                "type": "SpellParameter",
+                "name": "Spell"
+            },
+            {
+                "type": "Parameter",
+                "name": "Ammount in stack"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Cooldown min"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Cooldown max"
+            }
+        ],
+        "is_timed": true,
+        "description": "When target {pram2value:choose(0|1):'s aura {pram1} is missing|'s aura {pram1} is missing|has less than {pram2} stacks of {pram1} aura}{pram4value:choose(0):| (cooldown {pram3}-{pram4} seconds)}",
+        "name_readable": "Target missing aura",
+        "builtin_rules": [
+            "minmax(3, 4)"
+        ]
+    },
+    {
+        "id": 29,
+        "name": "EVENT_T_TIMER_GENERIC",
+        "search_tags": "timer generic",
+        "parameters": [
+            {
+                "type": "FloatParameter",
+                "name": "Initial Min"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Initial Max"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Repeat Min"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Repeat Max"
+            }
+        ],
+        "is_timed": true,
+        "description": "When timer at the beginning between {pram1} and {pram2} ms (and later repeats every {pram3} and {pram4} ms)",
+        "name_readable": "Every X seconds",
+        "builtin_rules": [
+            "minmax(1, 2)",
+            "minmax(3, 4)"
+        ],
+        "description_rules": [
+            {
+                "description": "Once",
+                "condition": "event.param(1) == 0 && event.param(2) == 0 && event.param(3) == 0 && event.param(4) == 0"
+            },
+            {
+                "description": "Every {pram1} seconds",
+                "condition": "event.param(1) == event.param(2) && event.param(2) == event.param(3) && event.param(3) == event.param(4)"
+            },
+            {
+                "description": "Time = {pram1} seconds",
+                "condition": "event.param(3) == 0 && event.param(1) == event.param(2)"
+            },
+            {
+                "description": "Time between {pram1} - {pram2} seconds",
+                "condition": "event.param(3) == 0"
+            },
+            {
+                "description": "Every {pram1} - {pram2} seconds",
+                "condition": "event.param(1) == event.param(3) && event.param(2) == event.param(4)"
+            },
+            {
+                "description": "Every {pram3} seconds ({pram1}s initially)",
+                "condition": "event.param(1) == event.param(2) && event.param(3) == event.param(4)"
+            },
+            {
+                "description": "Every {pram3} - {pram4} seconds ({pram1} - {pram2}s initially)"
+            }
+        ]
+    },
+    {
+        "id": 30,
+        "name": "EVENT_T_RECEIVE_AI_EVENT",
+        "parameters": [
+            {
+                "type": "MangosAiEventTypeParameter",
+                "name": "AI Event Type"
+            },
+            {
+                "type": "CreatureParameter",
+                "name": "Sender"
+            }
+        ],
+        "description": "On event {pram1}{pram2value:choose(0):| from creature {pram2}} received",
+        "name_readable": "On receive AI event"
+    },
+    {
+        "id": 31,
+        "name": "EVENT_T_ENERGY",
+        "parameters": [
+            {
+                "type": "PercentageParameter",
+                "name": "Energy max %"
+            },
+            {
+                "type": "PercentageParameter",
+                "name": "Energy min %"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Cooldown min"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Cooldown max"
+            }
+        ],
+        "is_timed": true,
+        "description": "When enery between {pram1value} and {pram2value}%{pram4value:choose(0):| (cooldown {pram3}-{pram4} seconds)}",
+        "name_readable": "Energy between",
+        "builtin_rules": [
+            "minmax(1, 2)",
+            "minmax(3, 4)"
+        ]
+    },
+    {
+        "id": 32,
+        "name": "EVENT_T_SELECT_ATTACKING_TARGET",
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Min range"
+            },
+            {
+                "type": "Parameter",
+                "name": "Max range"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Cooldown min"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Cooldown max"
+            }
+        ],
+        "is_timed": true,
+        "deprecated": true,
+        "description": "When have a target in threat table in {pram1}-{pram2} yd range{pram4value:choose(0):| (cooldown {pram3}-{pram4} seconds)}",
+        "name_readable": "Select attacking target",
+        "builtin_rules": [
+            "minmax(1, 2)",
+            "minmax(3, 4)"
+        ],
+        "rules": [
+            {
+                "rule": "false",
+                "level": "Warning",
+                "description": "Deprecated: use `TARGET_T_NEAREST_AOE_TARGET`"
+            }
+        ]
+    },
+    {
+        "id": 33,
+        "name": "EVENT_T_FACING_TARGET",
+        "parameters": [
+            {
+                "type": "SwitchParameter",
+                "name": "Back or front",
+                "values": {
+                    "0": "back",
+                    "1": "front"
+                }
+            },
+            {
+                "type": "Parameter",
+                "name": "(unused)"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Cooldown min"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Cooldown max"
+            }
+        ],
+        "is_timed": true,
+        "description": "When the npc is in {pram1} of the target{pram4value:choose(0):| (cooldown {pram3}-{pram4} seconds)}",
+        "name_readable": "Facing target",
+        "builtin_rules": [
+            "minmax(3, 4)"
+        ]
+    },
+    {
+        "id": 34,
+        "name": "EVENT_T_SPELLHIT_TARGET",
+        "parameters": [
+            {
+                "type": "SpellParameter",
+                "name": "Spell"
+            },
+            {
+                "type": "SpellSchoolParameter",
+                "name": "School mask"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Cooldown min"
+            },
+            {
+                "type": "FloatParameter",
+                "name": "Cooldown max"
+            }
+        ],
+        "description": "On {pram1value:choose(0):{pram2value:choose(0):any spell|spell school {pram2}}|{pram2value:choose(0):{pram1} spell|INVALID}} hit target{pram4value:choose(0):| (cooldown {pram3}-{pram4} seconds)}",
+        "name_readable": "On spell hit target",
+        "builtin_rules": [
+            "minmax(3, 4)"
+        ]
+    },
+    {
+        "id": 35,
+        "name": "EVENT_T_DEATH_PREVENTED",
+        "description": "On death prevented",
+        "name_readable": "On death prevented"
+    },
+    {
+        "id": 36,
+        "name": "EVENT_T_TARGET_NOT_REACHABLE",
+        "description": "On target unreachable",
+        "name_readable": "On target unreachable"
+    }
+]

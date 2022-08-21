@@ -12,7 +12,7 @@ namespace WDE.CMMySqlDatabase;
 public class DatabaseResolver
 {
     private readonly IAuthDatabaseProvider auth;
-    private readonly IAsyncDatabaseProvider world;
+    private readonly DatabaseProviderWoTLK world;
 
     public DatabaseResolver(ICurrentCoreVersion core,
         Lazy<DatabaseProviderWoTLK> cmWrath)
@@ -28,15 +28,14 @@ public class DatabaseResolver
             }
             default:
             {
-                var db= cmWrath.Value;
-                auth = db;
-                world = db;
-                return;
+                throw new ArgumentException("Unexpected core tag! " + core.Current.Tag);
             }
         }
     }
 
     public IAsyncDatabaseProvider ResolveWorld() => world;
+    
+    public IMangosDatabaseProvider ResolveMangosWorld() => world;
 
     public IAuthDatabaseProvider ResolveAuth() => auth;
 }

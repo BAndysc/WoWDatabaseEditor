@@ -1,0 +1,62 @@
+[
+    {
+        "name": "Timers",
+        "group_members": [
+            "EVENT_T_TIMER_IN_COMBAT",
+            "EVENT_T_TIMER_OOC",
+            "EVENT_T_TIMER_GENERIC"
+        ]
+    },
+    {
+        "name": "Self",
+        "group_members": [
+            "EVENT_T_AGGRO",
+            "EVENT_T_KILL",
+            "EVENT_T_DEATH",
+            "EVENT_T_EVADE",
+            "EVENT_T_SPAWNED",
+            "EVENT_T_REACHED_HOME",
+            "EVENT_T_RECEIVE_EMOTE",
+            "EVENT_T_OOC_LOS",
+            "EVENT_T_RECEIVE_AI_EVENT",
+            "EVENT_T_ENERGY",
+            "EVENT_T_DEATH_PREVENTED",
+            "EVENT_T_TARGET_NOT_REACHABLE"
+        ]
+    },
+    {
+        "name": "Spells",
+        "group_members": [
+            "EVENT_T_SPELLHIT",
+            "EVENT_T_SPELLHIT_TARGET"
+        ]
+    },
+    {
+        "name": "Summons",
+        "group_members": [
+            "EVENT_T_SUMMONED_UNIT",
+            "EVENT_T_SUMMONED_JUST_DIED",
+            "EVENT_T_SUMMONED_JUST_DESPAWN"
+        ]
+    },
+    {
+        "name": "Combat",
+        "group_members": [
+            "EVENT_T_HP",
+            "EVENT_T_MANA",
+            "EVENT_T_RANGE",
+            "EVENT_T_TARGET_HP",
+            "EVENT_T_TARGET_CASTING",
+            "EVENT_T_FRIENDLY_HP",
+            "EVENT_T_FRIENDLY_IS_CC",
+            "EVENT_T_FRIENDLY_MISSING_BUFF",
+            "EVENT_T_TARGET_MANA",
+            "EVENT_T_MISSING_AURA",
+            "EVENT_T_TARGET_MISSING_AURA",
+            "EVENT_T_SELECT_ATTACKING_TARGET",
+            "EVENT_T_FACING_TARGET",
+            "EVENT_T_AURA",
+            "EVENT_T_TARGET_AURA"
+        ]
+    }
+]

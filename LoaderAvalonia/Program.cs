@@ -29,7 +29,9 @@ using WDE.Updater;
 using WDE.WorldMap;
 using WDE.WoWHeadConnector;
 using WDE.AnniversaryInfo;
+using WDE.EventAiEditor.Avalonia;
 using WDE.EventScriptsEditor;
+using WDE.MangosEventAiEditor;
 using WDE.MapSpawns;
 using WDE.PathPreviewTool;
 
@@ -74,7 +76,9 @@ namespace LoaderAvalonia
                 typeof(AnniversaryModule),
                 typeof(EventScriptsModule),
                 typeof(MapSpawnsModule),
-                typeof(PathPreviewToolModule)
+                typeof(PathPreviewToolModule),
+                typeof(EventAiModule),
+                typeof(EventAiAvaloniaModule)
             };
             WoWDatabaseEditorCore.Avalonia.Program.PreloadedModules = modules;
             WoWDatabaseEditorCore.Avalonia.Program.Main(args);

@@ -8,13 +8,14 @@ namespace WDE.AzerothCore
 {
     [AutoRegister]
     [SingleInstance]
-    public class AzerothCoreVersion : ICoreVersion, IDatabaseFeatures, ISmartScriptFeatures, IConditionFeatures, IGameVersionFeatures
+    public class AzerothCoreVersion : ICoreVersion, IDatabaseFeatures, ISmartScriptFeatures, IConditionFeatures, IGameVersionFeatures, IEventAiFeatures
     {
         public string Tag => "Azeroth";
         public string FriendlyName => "AzerothCore Wrath of the Lich King";
         public ISmartScriptFeatures SmartScriptFeatures => this;
         public IConditionFeatures ConditionFeatures => this;
         public IGameVersionFeatures GameVersionFeatures => this;
+        public IEventAiFeatures EventAiFeatures => this;
         public IDatabaseFeatures DatabaseFeatures => this;
         public bool SupportsRbac => false;
         public bool SupportsConditionTargetVictim => true;

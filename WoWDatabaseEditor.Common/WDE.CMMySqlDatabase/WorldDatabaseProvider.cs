@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Prism.Events;
 using Prism.Ioc;
 using WDE.Common.Database;
@@ -14,11 +16,13 @@ namespace WDE.CMMySqlDatabase
 {
     [AutoRegister]
     [SingleInstance]
-    public class WorldDatabaseProvider : WorldDatabaseDecorator
+    public class WorldDatabaseProvider : WorldDatabaseDecorator, IMangosDatabaseProvider
     {
         private readonly ILoadingEventAggregator loadingEventAggregator;
         private readonly IMainThread mainThread;
 
+        private IMangosDatabaseProvider? mangosImpl = null;
+        
         public WorldDatabaseProvider(DatabaseResolver databaseResolver,
             NullWorldDatabaseProvider nullWorldDatabaseProvider,
             IWorldDatabaseSettingsProvider settingsProvider,
@@ -41,6 +45,7 @@ namespace WDE.CMMySqlDatabase
                 var cachedDatabase = containerProvider.Resolve<CachedDatabaseProvider>((typeof(IAsyncDatabaseProvider), databaseResolver.ResolveWorld()));
                 cachedDatabase.TryConnect();
                 impl = cachedDatabase;
+                mangosImpl = databaseResolver.ResolveMangosWorld();
             }
             catch (Exception e)
             {
@@ -58,6 +63,16 @@ namespace WDE.CMMySqlDatabase
         private void PublishLoadedEvent()
         {
             mainThread.Dispatch(loadingEventAggregator.Publish<DatabaseLoadedEvent>);
+        }
+
+        public Task<IList<IDbScriptRandomTemplate>?> GetScriptRandomTemplates(uint id, IMangosDatabaseProvider.RandomTemplateType type)
+        {
+            return mangosImpl?.GetScriptRandomTemplates(id, type) ?? Task.FromResult<IList<IDbScriptRandomTemplate>?>(null);
+        }
+
+        public Task<ICreatureAiSummon?> GetCreatureAiSummon(uint entry)
+        {
+            return mangosImpl?.GetCreatureAiSummon(entry) ?? Task.FromResult<ICreatureAiSummon?>(null);
         }
     }
 }

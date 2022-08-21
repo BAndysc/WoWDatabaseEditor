@@ -87,6 +87,8 @@ namespace WDE.Common.Database
         Task<List<IEventScriptLine>> GetEventScript(EventScriptType type, uint id) => Task.FromResult(new List<IEventScriptLine>());
         Task<List<IEventScriptLine>> FindEventScriptLinesBy(IReadOnlyList<(uint command, int dataIndex, long valueToSearch)> conditions) => Task.FromResult(new List<IEventScriptLine>());
 
+        Task<List<IEventAiLine>> GetEventAi(int id) => Task.FromResult(new List<IEventAiLine>());
+
         Task<IList<ICreatureModelInfo>> GetCreatureModelInfoAsync();
         ICreatureModelInfo? GetCreatureModelInfo(uint displayId);
 
@@ -148,6 +150,23 @@ namespace WDE.Common.Database
                 SourceEntry = sourceEntry;
                 SourceId = sourceId;
             }
+        }
+    }
+
+    [UniqueProvider]
+    public interface IMangosDatabaseProvider : IDatabaseProvider
+    {
+        Task<IList<IDbScriptRandomTemplate>?> GetScriptRandomTemplates(uint id, RandomTemplateType type)
+        {
+            return Task.FromResult<IList<IDbScriptRandomTemplate>?>(null);
+        }
+        
+        Task<ICreatureAiSummon?> GetCreatureAiSummon(uint entry);
+
+        public enum RandomTemplateType
+        {
+            Text = 0,
+            RelayScript = 1
         }
     }
     

@@ -8,7 +8,7 @@ namespace WDE.Trinity
 {
     [AutoRegister]
     [SingleInstance]
-    public class TrinityWrathVersion : ICoreVersion, IDatabaseFeatures, ISmartScriptFeatures, IConditionFeatures, IGameVersionFeatures
+    public class TrinityWrathVersion : ICoreVersion, IDatabaseFeatures, ISmartScriptFeatures, IConditionFeatures, IGameVersionFeatures, IEventAiFeatures
     {
         public string Tag => "TrinityWrath";
         public string FriendlyName => "TrinityCore Wrath of the Lich King";
@@ -16,6 +16,7 @@ namespace WDE.Trinity
         public IConditionFeatures ConditionFeatures => this;
         public IGameVersionFeatures GameVersionFeatures => this;
         public IDatabaseFeatures DatabaseFeatures => this;
+        public IEventAiFeatures EventAiFeatures => this;
         public PhasingType PhasingType => PhasingType.PhaseMasks;
         
         public ISet<Type> UnsupportedTables { get; } = new HashSet<Type>{typeof(IAreaTriggerTemplate), typeof(IConversationTemplate), typeof(ISceneTemplate), typeof(IAreaTriggerCreateProperties)};

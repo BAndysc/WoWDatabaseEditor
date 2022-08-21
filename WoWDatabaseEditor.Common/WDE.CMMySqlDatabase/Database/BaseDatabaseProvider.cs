@@ -18,7 +18,7 @@ using WDE.CMMySqlDatabase.Models;
 
 namespace WDE.CMMySqlDatabase.Database
 {
-    public abstract class BaseDatabaseProvider<T> : IAsyncDatabaseProvider, IAuthDatabaseProvider where T : BaseDatabaseTables, new()
+    public abstract class BaseDatabaseProvider<T> : IAsyncDatabaseProvider, IAuthDatabaseProvider, IMangosDatabaseProvider where T : BaseDatabaseTables, new()
     {
         public bool IsConnected => true;
         public abstract ICreatureTemplate? GetCreatureTemplate(uint entry);
@@ -502,6 +502,12 @@ namespace WDE.CMMySqlDatabase.Database
             await using var model = Database();
             return await model.WaypointPathName.FirstOrDefaultAsync(x => x.PathId == pathId);
         }
+        
+        public async Task<List<IEventAiLine>> GetEventAi(int entryOrGuid) 
+        {
+            await using var model = Database();
+            return await model.CreatureAiScripts.Where(x => x.CreatureIdOrGuid == entryOrGuid).OrderBy(x => x.Id).ToListAsync<IEventAiLine>();
+        }
 
         public async Task<IList<IAuthRbacPermission>> GetRbacPermissionsAsync()
         {
@@ -511,6 +517,18 @@ namespace WDE.CMMySqlDatabase.Database
         public async Task<IList<IAuthRbacLinkedPermission>> GetLinkedPermissionsAsync()
         {
             return new List<IAuthRbacLinkedPermission>();
+        }
+        
+        public async Task<IList<IDbScriptRandomTemplate>?> GetScriptRandomTemplates(uint id, IMangosDatabaseProvider.RandomTemplateType type)
+        {
+            await using var model = Database();
+            return await model.DbScriptRandomTemplates.Where(x => x.Id == id && x.Type == (int)type).ToListAsync<IDbScriptRandomTemplate>();
+        }
+
+        public async Task<ICreatureAiSummon?> GetCreatureAiSummon(uint entry)
+        {
+            await using var model = Database();
+            return await model.CreatureAiSummons.FirstOrDefaultAsync(x => x.Id == entry);
         }
 
         private bool Supports<R>()

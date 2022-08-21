@@ -14,6 +14,7 @@ namespace WDE.Common.CoreVersion
         ISmartScriptFeatures SmartScriptFeatures { get; }
         IConditionFeatures ConditionFeatures { get; }
         IGameVersionFeatures GameVersionFeatures { get; }
+        IEventAiFeatures EventAiFeatures { get; }
         bool SupportsRbac => true;
         bool SupportsSpecialCommands => false;
         bool SupportsReverseCommands => false;
@@ -56,6 +57,14 @@ namespace WDE.Common.CoreVersion
         bool AlternativeTrinityDatabase { get; }
         bool HasAiEntry => false;
         WaypointTables SupportedWaypoints { get; }
+    }
+
+    public interface IEventAiFeatures
+    {
+        string? ActionsPath => null;
+        string? EventsPath => null;
+        string? EventGroupPath => null;
+        string? ActionGroupPath => null;
     }
 
     public interface ISmartScriptFeatures

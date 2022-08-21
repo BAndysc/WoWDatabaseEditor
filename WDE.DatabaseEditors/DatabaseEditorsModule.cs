@@ -38,9 +38,12 @@ namespace WDE.DatabaseEditors
             this.containerProvider = containerProvider;
             containerProvider.Resolve<ILoadingEventAggregator>().OnEvent<EditorLoaded>().SubscribeOnce(_ =>
             {
+                var parameterPickerService = containerProvider.Resolve<IParameterPickerService>();
                 containerProvider.Resolve<IContextualParametersProvider>();
                 var factory = containerProvider.Resolve<IParameterFactory>();
                 factory.Register("BroadcastTextParameter", containerProvider.Resolve<BroadcastTextParameter>());
+                factory.RegisterDepending("CreatureTemplateSpellListIdParameter", "CreatureParameter", (a) => new CreatureTemplateSpellListIdParameter(a, parameterPickerService));
+                factory.RegisterDepending("DbScriptRandomTemplateTargetValueParameter", "BroadcastTextParameter", bcast => new DbScriptRandomTemplateTargetValueParameter(containerProvider.Resolve<IParameterPickerService>(), bcast));
                 factory.Register("LootReferenceParameter", containerProvider.Resolve<LootReferenceParameter>());
                 factory.Register("EquipmentCreatureGuidParameter", containerProvider.Resolve<EquipmentCreatureGuidParameter>());
                 factory.Register("CreatureGUIDParameter", factory.Factory("TableReference(creature#guid)Parameter"));

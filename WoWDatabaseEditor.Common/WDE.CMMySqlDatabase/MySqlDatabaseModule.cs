@@ -10,7 +10,7 @@ using WDE.MySqlDatabaseCommon.Tools;
 using WDE.CMMySqlDatabase.Database;
 
 
-[assembly: ModuleRequiresCore("CMaNGOS-WoTLK")] //<--- put the name you gave the "cmangos" core here
+[assembly: ModuleRequiresCore("CMaNGOS-WoTLK")]
 [assembly: ModuleBlocksOtherAttribute("WDE.TrinityMySqlDatabase")]
 
 namespace WDE.CMMySqlDatabase

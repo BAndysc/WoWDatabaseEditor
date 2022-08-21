@@ -1,0 +1,15 @@
+﻿<UserControl x:Class="WDE.EventAiEditor.Avalonia.Editor.Views.EventAiEditorView"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:userControls1="clr-namespace:WDE.EventAiEditor.Avalonia.Editor.UserControls"
+             x:DataType="viewModels:EventAiEditorViewModel"
+             xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
+             xmlns:viewModels="clr-namespace:WDE.EventAiEditor.Editor.ViewModels;assembly=WDE.EventAiEditor">
+    <Panel>
+        <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+            <userControls1:EventAiView Focusable="True" Name="EventAiView"/>
+        </ScrollViewer>
+        <controls:TeachingTip IsOpened="{CompiledBinding TeachingTips.MultipleActionsTipOpened}" VerticalAlignment="Bottom" Margin="20" Header="Multiple actions in one event">In the WoW Database Editor you can have many actions in a single event. You do not have to copy-paste events.</controls:TeachingTip>
+        <controls:TeachingTip IsOpened="{CompiledBinding TeachingTips.ControlToCopyOpened}" VerticalAlignment="Bottom" Margin="20" Header="Drag + control key to copy">You can hold control key while dragging event/action/condition to duplicate them.</controls:TeachingTip>
+    </Panel>
+</UserControl>

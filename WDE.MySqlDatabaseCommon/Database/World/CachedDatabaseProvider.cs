@@ -362,6 +362,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public Task<List<IEventScriptLine>> GetEventScript(EventScriptType type, uint id) => nonCachedDatabase.GetEventScript(type, id);
 
+        public Task<List<IEventAiLine>> GetEventAi(int id) => nonCachedDatabase.GetEventAi(id);
+
         public Task<IList<IDatabaseSpellDbc>> GetSpellDbcAsync()
         {
             if (databaseSpellDbcCache != null)

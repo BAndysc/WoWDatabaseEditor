@@ -8,13 +8,14 @@ namespace WDE.CMaNGOS
 {
     [AutoRegister]
     [SingleInstance]
-    public class CMaNGOSCoreVersion : ICoreVersion, IDatabaseFeatures, ISmartScriptFeatures, IConditionFeatures, IGameVersionFeatures
+    public class CMaNGOSCoreVersion : ICoreVersion, IDatabaseFeatures, ISmartScriptFeatures, IConditionFeatures, IGameVersionFeatures, IEventAiFeatures
     {
         public string Tag => "CMaNGOS-WoTLK";
         public string FriendlyName => "CMaNGOS Wrath of the Lich King";
         public ISmartScriptFeatures SmartScriptFeatures => this;
         public IConditionFeatures ConditionFeatures => this;
         public IGameVersionFeatures GameVersionFeatures => this;
+        public IEventAiFeatures EventAiFeatures => this;
         public IDatabaseFeatures DatabaseFeatures => this;
         public bool SupportsRbac => false;
         public bool SupportsConditionTargetVictim => false;
