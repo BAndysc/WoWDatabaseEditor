@@ -792,10 +792,18 @@
 			{
 				"type": "Parameter",
 				"name": "Objective ID"
-			}
+			},
+                        {
+                                "type": "Parameter",
+                                "name": "Unused"
+                        },
+                        {
+                                "type": "Parameter",
+                                "name": "Objective counter"
+                        }
 		],
 		"help": "Condition is met if target player has completed quest objective",
-		"description": "{target} {negate:has completed objective {pram1} (but hasn't rewarded quest yet)|hasn't completed objective {pram1} or has rewarded the quest}"
+		"description": "{target} {negate:has quest objective {pram1} == {pram3} (but hasn't rewarded quest yet)|hasn't quest objective {pram1} < {pram3} or has rewarded the quest}"
 	},
 	{
 		"id": 49,
