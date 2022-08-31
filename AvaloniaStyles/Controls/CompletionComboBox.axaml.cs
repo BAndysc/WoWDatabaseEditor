@@ -337,14 +337,8 @@ namespace AvaloniaStyles.Controls
                                     }
                                     else if (args.Key == Key.Tab)
                                     {
-                                        SelectionAdapter.HandleKeyDown(new KeyEventArgs
-                                        {
-                                            Device = args.Device,
-                                            Key = (args.KeyModifiers & KeyModifiers.Shift) != 0 ? Key.Up : Key.Down,
-                                            Route = args.Route,
-                                            RoutedEvent = args.RoutedEvent,
-                                            Source = args.Source
-                                        });
+                                        args.Key = (args.KeyModifiers & KeyModifiers.Shift) != 0 ? Key.Up : Key.Down;
+                                        SelectionAdapter.HandleKeyDown(args);
                                         args.Handled = true;
                                     }
                                     else if (args.Key == Key.Escape)

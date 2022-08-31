@@ -33,12 +33,10 @@ namespace WDE.Common.Avalonia.Controls
         {
             if (FocusManager.Instance.Current is TextBox tb)
             {
-                var ev = new KeyEventArgs()
-                {
-                    Key = Gesture.Key,
-                    KeyModifiers = Gesture.KeyModifiers,
-                    RoutedEvent = InputElement.KeyDownEvent
-                };
+                var ev = Activator.CreateInstance<KeyEventArgs>();
+                ev.Key = Gesture.Key;
+                ev.KeyModifiers = Gesture.KeyModifiers;
+                ev.RoutedEvent = InputElement.KeyDownEvent;
                 tb.RaiseEvent(ev);
                 if (!ev.Handled)
                     CustomCommand.Execute(parameter);
