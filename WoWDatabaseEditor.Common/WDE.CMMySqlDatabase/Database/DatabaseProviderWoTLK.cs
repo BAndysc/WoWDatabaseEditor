@@ -178,12 +178,6 @@ public class DatabaseProviderWoTLK : BaseDatabaseProvider<WoTLKDatabase>
         await using var model = Database();
         return await model.ItemTemplate.ToListAsync<IItem>();
     }
-        
-    public async Task<IList<ISpawnGroupTemplate>?> GetSpawnGroupTemplatesAsync()
-    {
-        await using var model = Database();
-        return await model.SpawnGroupTemplate.ToListAsync<ISpawnGroupTemplate>();
-    }
     
     public override async Task<IList<ICreatureModelInfo>> GetCreatureModelInfoAsync()
     {

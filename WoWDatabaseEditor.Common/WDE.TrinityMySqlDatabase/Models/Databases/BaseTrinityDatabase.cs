@@ -46,5 +46,7 @@ namespace WDE.TrinityMySqlDatabase.Models
         public ITable<WaypointData> WaypointData => GetTable<WaypointData>();
         public ITable<ScriptWaypoint> ScriptWaypoint => GetTable<ScriptWaypoint>();
         public ITable<SmartScriptWaypoint> SmartScriptWaypoint => GetTable<SmartScriptWaypoint>();
+        public ITable<MySqlSpawnGroupSpawn> SpawnGroupSpawns => GetTable<MySqlSpawnGroupSpawn>();
+        public ITable<MySqlSpawnGroupTemplate> SpawnGroupTemplate => GetTable<MySqlSpawnGroupTemplate>();
     }
 }

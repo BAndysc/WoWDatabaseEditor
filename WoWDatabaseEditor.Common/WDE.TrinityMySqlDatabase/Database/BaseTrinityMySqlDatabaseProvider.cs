@@ -671,6 +671,34 @@ namespace WDE.TrinityMySqlDatabase.Database
             return await model.RbacLinkedPermissions.ToListAsync<IAuthRbacLinkedPermission>();
         }
 
+        
+        public async Task<IList<ISpawnGroupTemplate>> GetSpawnGroupTemplatesAsync()
+        {
+            await using var model = Database();
+            return await model.SpawnGroupTemplate.ToListAsync<ISpawnGroupTemplate>();
+        }
+    
+        public async Task<IList<ISpawnGroupSpawn>> GetSpawnGroupSpawnsAsync()
+        {
+            await using var model = Database();
+            return await model.SpawnGroupSpawns.ToListAsync<ISpawnGroupSpawn>();
+        }
+    
+        public async Task<ISpawnGroupTemplate?> GetSpawnGroupTemplateByIdAsync(uint id)
+        {
+            await using var model = Database();
+            return await model.SpawnGroupTemplate.FirstOrDefaultAsync<ISpawnGroupTemplate>(x => x.Id == id);
+        }
+    
+        public async Task<ISpawnGroupSpawn?> GetSpawnGroupSpawnByGuidAsync(uint guid, SpawnGroupTemplateType type)
+        {
+            await using var model = Database();
+            return await model.SpawnGroupSpawns.FirstOrDefaultAsync<ISpawnGroupSpawn>(x => x.Guid == guid && x.Type == type);
+        }
+        
+        public async Task<ISpawnGroupFormation?> GetSpawnGroupFormation(uint id) => null;
+        public async Task<IList<ISpawnGroupFormation>?> GetSpawnGroupFormations() => null;
+        
         private bool Supports<R>()
         {
             return !currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(R));

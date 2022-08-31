@@ -1,0 +1,63 @@
+{
+  "id": "spawn_group_formation",
+  "compatibility": [
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Spawn Group Formation",
+  "single_solution_name": "Spawn Group Formation Table",
+  "multi_solution_name": "Spawn Group Formation Table",
+  "description": "Controls spawn group formations",
+  "table_name": "spawn_group_formation",
+  "table_index_name": "Id",
+  "record_mode": "SingleRow",
+  "group_name": "Spawn groups",
+  "skip_quick_load": true,
+  "icon_path": "Icons/document_spawngroup.png",
+  "reload_command": "reload spawn_group",
+  "primary_key": [
+    "Id"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Group id",
+          "db_column_name": "Id",
+          "value_type": "TableReference(spawn_group#Id)Parameter"
+        },
+        {
+          "name": "Formation Type",
+          "db_column_name": "FormationType",
+          "value_type": "CmangosFormationTypeParameter"
+        },
+        {
+          "name": "Formation Spread",
+          "db_column_name": "FormationSpread",
+          "value_type": "float"
+        },
+        {
+          "name": "Formation Options",
+          "db_column_name": "FormationOptions",
+          "value_type": "CmangosFormationOptionsParameter"
+        },
+        {
+          "name": "Path Id",
+          "db_column_name": "PathId",
+          "value_type": "int"
+        },
+        {
+          "name": "Movement Type",
+          "db_column_name": "MovementType",
+          "value_type": "CmangosFormationMovementTypeParameter"
+        },
+        {
+          "name": "Comment",
+          "db_column_name": "Comment",
+          "value_type": "string",
+          "can_be_null": true
+        }
+      ]
+    }
+  ]
+}

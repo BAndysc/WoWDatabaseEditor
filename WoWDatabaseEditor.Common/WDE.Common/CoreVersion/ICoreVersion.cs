@@ -57,6 +57,7 @@ namespace WDE.Common.CoreVersion
         bool AlternativeTrinityDatabase { get; }
         bool HasAiEntry => false;
         WaypointTables SupportedWaypoints { get; }
+        bool SpawnGroupTemplateHasType { get; }
     }
 
     public interface IEventAiFeatures

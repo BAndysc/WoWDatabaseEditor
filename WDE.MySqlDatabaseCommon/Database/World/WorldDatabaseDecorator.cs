@@ -28,8 +28,13 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public Task<IList<IItem>?> GetItemTemplatesAsync() => impl.GetItemTemplatesAsync();
         public Task<IList<ISmartScriptLine>> FindSmartScriptLinesBy(IEnumerable<(IDatabaseProvider.SmartLinePropertyType what, int whatValue, int parameterIndex, long valueToSearch)> conditions) => impl.FindSmartScriptLinesBy(conditions);
 
-        public Task<IList<ISpawnGroupTemplate>?> GetSpawnGroupTemplatesAsync() => impl.GetSpawnGroupTemplatesAsync();
-
+        public Task<IList<ISpawnGroupTemplate>> GetSpawnGroupTemplatesAsync() => impl.GetSpawnGroupTemplatesAsync();
+        public Task<IList<ISpawnGroupSpawn>> GetSpawnGroupSpawnsAsync() => impl.GetSpawnGroupSpawnsAsync();
+        public Task<ISpawnGroupTemplate?> GetSpawnGroupTemplateByIdAsync(uint id) => impl.GetSpawnGroupTemplateByIdAsync(id);
+        public Task<ISpawnGroupSpawn?> GetSpawnGroupSpawnByGuidAsync(uint guid, SpawnGroupTemplateType type) => impl.GetSpawnGroupSpawnByGuidAsync(guid, type);
+        public Task<ISpawnGroupFormation?> GetSpawnGroupFormation(uint id) => impl.GetSpawnGroupFormation(id);
+        public Task<IList<ISpawnGroupFormation>?> GetSpawnGroupFormations() => impl.GetSpawnGroupFormations();
+        
         public IEnumerable<IGameEvent> GetGameEvents() => impl.GetGameEvents();
         public IEnumerable<IConversationTemplate> GetConversationTemplates() => impl.GetConversationTemplates();
         public Task<List<IGossipMenuOption>> GetGossipMenuOptionsAsync(uint menuId) => impl.GetGossipMenuOptionsAsync(menuId);

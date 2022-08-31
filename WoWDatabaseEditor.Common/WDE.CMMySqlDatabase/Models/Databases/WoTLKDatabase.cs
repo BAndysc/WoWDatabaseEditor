@@ -11,7 +11,6 @@ public class WoTLKDatabase : BaseDatabaseTables
     public ITable<SpellDbcWoTLK> SpellDbc => GetTable<SpellDbcWoTLK>();
     public ITable<GameObjectWoTLK> GameObject => GetTable<GameObjectWoTLK>();
     public ITable<MySqlItemTemplate> ItemTemplate => GetTable<MySqlItemTemplate>();
-    public ITable<MySqlSpawnGroupTemplate> SpawnGroupTemplate => GetTable<MySqlSpawnGroupTemplate>();
     public ITable<CreatureModelInfoWoTLK> CreatureModelInfo => GetTable<CreatureModelInfoWoTLK>();
 
     public ITable<CmangosString> Strings => GetTable<CmangosString>();

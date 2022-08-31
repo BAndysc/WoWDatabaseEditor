@@ -535,5 +535,45 @@ namespace WDE.CMMySqlDatabase.Database
         {
             return !currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(R));
         }
+        
+        public async Task<IList<ISpawnGroupTemplate>> GetSpawnGroupTemplatesAsync()
+        {
+            await using var model = Database();
+            return await model.SpawnGroupTemplate.ToListAsync<ISpawnGroupTemplate>();
+        }
+    
+        public async Task<IList<ISpawnGroupSpawn>> GetSpawnGroupSpawnsAsync()
+        {
+            await using var model = Database();
+            return await model.SpawnGroupSpawns.ToListAsync<ISpawnGroupSpawn>();
+        }
+    
+        public async Task<ISpawnGroupTemplate?> GetSpawnGroupTemplateByIdAsync(uint id)
+        {
+            await using var model = Database();
+            return await model.SpawnGroupTemplate.FirstOrDefaultAsync<ISpawnGroupTemplate>(x => x.Id == id);
+        }
+
+        public async Task<ISpawnGroupFormation?> GetSpawnGroupFormation(uint id)
+        {
+            await using var model = Database();
+            return await model.SpawnGroupFormations.FirstOrDefaultAsync<ISpawnGroupFormation>(x => x.Id == id);
+        }
+
+        public async Task<IList<ISpawnGroupFormation>?> GetSpawnGroupFormations()
+        {
+            await using var model = Database();
+            return await model.SpawnGroupFormations.ToListAsync<ISpawnGroupFormation>();
+        }
+    
+        public async Task<ISpawnGroupSpawn?> GetSpawnGroupSpawnByGuidAsync(uint guid, SpawnGroupTemplateType type)
+        {
+            await using var model = Database();
+            return await model.SpawnGroupSpawns.InnerJoin(
+                model.SpawnGroupTemplate, 
+                (t1, t2) => t1.TemplateId == t2.Id && t2.Type == type,
+                (t1, t2) => t1)
+                .FirstOrDefaultAsync(t1 => t1.Guid == guid);
+        }
     }
 }

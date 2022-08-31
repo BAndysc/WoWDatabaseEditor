@@ -36,6 +36,7 @@ namespace WDE.CMaNGOS
 
         public bool AlternativeTrinityDatabase => true;
         public WaypointTables SupportedWaypoints => WaypointTables.MangosWaypointPath | WaypointTables.MangosCreatureMovement;
+        public bool SpawnGroupTemplateHasType => true;
         public string TableName => "smart_scripts";
 
         public string ConditionsFile => "SmartData/conditions.json";

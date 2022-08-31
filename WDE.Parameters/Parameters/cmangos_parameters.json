@@ -7,5 +7,40 @@
       "3": "spline path",
       "4": "linear waypoints"
     }
+  },
+  "CmangosFormationMovementTypeParameter": {
+    "values": {
+      "0": "idle",
+      "2": "waypoints",
+      "3": "spline path",
+      "4": "linear waypoints"
+    }
+  },
+  "CmangosSpawnGroupFlagParameter": {
+    "isflag": true,
+    "values":{
+      "1": "aggro together",
+      "2": "respawn together",
+      "4": "evade together",
+      "128": "despawn on condition failed"
+    }
+  },
+  "CmangosFormationTypeParameter": {
+    "values": {
+      "0": "random",
+      "1": "single file",
+      "2": "side by side",
+      "3": "like geese",
+      "4": "fanned out behind",
+      "5": "fanned out in front",
+      "6": "circle the leader"
+    }
+  },
+  "CmangosFormationOptionsParameter": {
+    "isflag": true,
+    "values": {
+      "1": "followers will not pathfind to location",
+      "2": "keep compact"
+    }
   }
 }

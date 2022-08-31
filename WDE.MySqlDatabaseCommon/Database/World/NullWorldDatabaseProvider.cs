@@ -161,5 +161,11 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public async Task<IReadOnlyList<IMangosCreatureMovement>?> GetMangosCreatureMovement(uint guid) => null;
         public async Task<IReadOnlyList<IMangosCreatureMovementTemplate>?> GetMangosCreatureMovementTemplate(uint entry, uint? pathId) => null;
         public async Task<IMangosWaypointsPathName?> GetMangosPathName(uint pathId) => null;
+        public Task<IList<ISpawnGroupTemplate>> GetSpawnGroupTemplatesAsync() => Task.FromResult<IList<ISpawnGroupTemplate>>(new List<ISpawnGroupTemplate>());
+        public Task<IList<ISpawnGroupSpawn>> GetSpawnGroupSpawnsAsync() => Task.FromResult<IList<ISpawnGroupSpawn>>(new List<ISpawnGroupSpawn>());
+        public Task<ISpawnGroupTemplate?> GetSpawnGroupTemplateByIdAsync(uint id) => Task.FromResult<ISpawnGroupTemplate?>(null);
+        public Task<ISpawnGroupSpawn?> GetSpawnGroupSpawnByGuidAsync(uint guid, SpawnGroupTemplateType type) => Task.FromResult<ISpawnGroupSpawn?>(null);
+        public async Task<ISpawnGroupFormation?> GetSpawnGroupFormation(uint id) => null;
+        public async Task<IList<ISpawnGroupFormation>?> GetSpawnGroupFormations() => null;
     }
 }

@@ -40,5 +40,8 @@ namespace WDE.CMMySqlDatabase.Models
         public ITable<EventAiLine> CreatureAiScripts => GetTable<EventAiLine>();
         public ITable<DbScriptRandomTemplate> DbScriptRandomTemplates => GetTable<DbScriptRandomTemplate>();
         public ITable<CreatureAiSummon> CreatureAiSummons => GetTable<CreatureAiSummon>();
+        public ITable<SpawnGroup> SpawnGroupTemplate => GetTable<SpawnGroup>();
+        public ITable<SpawnGroupSpawn> SpawnGroupSpawns => GetTable<SpawnGroupSpawn>();
+        public ITable<SpawnGroupFormation> SpawnGroupFormations => GetTable<SpawnGroupFormation>();
     }
 }

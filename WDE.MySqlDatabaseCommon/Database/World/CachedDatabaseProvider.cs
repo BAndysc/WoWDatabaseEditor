@@ -121,6 +121,9 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public ICreatureTemplate? GetCreatureTemplate(uint entry)
         {
+            if (entry == 0)
+                return null;
+
             if (creatureTemplateByEntry.TryGetValue(entry, out var template))
                 return template;
 
@@ -129,6 +132,9 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public IGameObjectTemplate? GetGameObjectTemplate(uint entry)
         {
+            if (entry == 0)
+                return null;
+            
             if (gameObjectTemplateByEntry.TryGetValue(entry, out var template))
                 return template;
 
@@ -227,8 +233,13 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public Task<IList<IItem>?> GetItemTemplatesAsync() => nonCachedDatabase.GetItemTemplatesAsync();
         public Task<IList<ISmartScriptLine>> FindSmartScriptLinesBy(IEnumerable<(IDatabaseProvider.SmartLinePropertyType what, int whatValue, int parameterIndex, long valueToSearch)> conditions) => nonCachedDatabase.FindSmartScriptLinesBy(conditions);
 
-        public Task<IList<ISpawnGroupTemplate>?> GetSpawnGroupTemplatesAsync() => nonCachedDatabase.GetSpawnGroupTemplatesAsync();
-
+        public Task<IList<ISpawnGroupTemplate>> GetSpawnGroupTemplatesAsync() => nonCachedDatabase.GetSpawnGroupTemplatesAsync();
+        public Task<IList<ISpawnGroupSpawn>> GetSpawnGroupSpawnsAsync() => nonCachedDatabase.GetSpawnGroupSpawnsAsync();
+        public Task<ISpawnGroupTemplate?> GetSpawnGroupTemplateByIdAsync(uint id) => nonCachedDatabase.GetSpawnGroupTemplateByIdAsync(id);
+        public Task<ISpawnGroupSpawn?> GetSpawnGroupSpawnByGuidAsync(uint guid, SpawnGroupTemplateType type) => nonCachedDatabase.GetSpawnGroupSpawnByGuidAsync(guid, type);
+        public Task<ISpawnGroupFormation?> GetSpawnGroupFormation(uint id) => nonCachedDatabase.GetSpawnGroupFormation(id);
+        public Task<IList<ISpawnGroupFormation>?> GetSpawnGroupFormations() => nonCachedDatabase.GetSpawnGroupFormations();
+        
         public IReadOnlyList<ICreatureText>? GetCreatureTextsByEntry(uint entry)
         {
             if (creatureTextsCache.TryGetValue(entry, out var texts))

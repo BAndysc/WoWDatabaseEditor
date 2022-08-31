@@ -1,0 +1,67 @@
+{
+  "id": "spawn_group",
+  "compatibility": [
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Spawn Group (template)",
+  "single_solution_name": "Spawn Group Table",
+  "multi_solution_name": "Spawn Group Table",
+  "description": "Spawn groups are used to logically group creature or gameobjects into groups.",
+  "table_name": "spawn_group",
+  "table_index_name": "Id",
+  "record_mode": "SingleRow",
+  "group_name": "Spawn groups",
+  "icon_path": "Icons/icon_spawngroup.png",
+  "reload_command": "reload spawn_group",
+  "primary_key": [
+    "Id"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Id",
+          "db_column_name": "Id",
+          "value_type": "int"
+        },
+        {
+          "name": "Name",
+          "db_column_name": "Name",
+          "value_type": "string"
+        },
+        {
+          "name": "Type",
+          "db_column_name": "Type",
+          "value_type": "SpawnObjectTypeParameter"
+        },
+        {
+          "name": "Max Count",
+          "db_column_name": "MaxCount",
+          "value_type": "int",
+          "zero_is_blank": true
+        },
+        {
+          "name": "World State",
+          "db_column_name": "WorldState",
+          "value_type": "int",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Flags",
+          "db_column_name": "Flags",
+          "value_type": "CmangosSpawnGroupFlagParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Formation",
+          "meta": "one2one:spawn_group_formation"
+        },
+        {
+          "name": "Members",
+          "meta": "table:spawn_group_spawn;`Id` = {Id}"
+        }
+      ]
+    }
+  ]
+}

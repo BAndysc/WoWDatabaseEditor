@@ -12,7 +12,13 @@ public class MySqlSpawnGroupTemplate : ISpawnGroupTemplate
 
     [Column(Name = "groupName")] 
     public string Name { get; set; } = "";
+
+    public SpawnGroupTemplateType Type => SpawnGroupTemplateType.Any;
     
     [Column(Name = "groupFlags")] 
-    public uint Flags { get; set; }
+    public uint GroupFlags { get; set; }
+    
+    public uint? TrinityFlags => GroupFlags;
+    
+    public uint? MangosFlags => null;
 }

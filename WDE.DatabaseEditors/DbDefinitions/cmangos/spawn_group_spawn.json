@@ -1,0 +1,50 @@
+{
+  "id": "spawn_group_spawn",
+  "compatibility": [
+    "CMaNGOS-WoTLK"
+  ],
+  "name": "Spawn Group (spawns)",
+  "single_solution_name": "Spawn Group Spawn Table",
+  "multi_solution_name": "Spawn Group Spawn Table",
+  "description": "Controls which spawn group do creature/gameobject spawns belong to.",
+  "table_name": "spawn_group_spawn",
+  "table_index_name": "Id",
+  "record_mode": "SingleRow",
+  "group_name": "Spawn groups",
+  "skip_quick_load": true,
+  "icon_path": "Icons/document_spawngroup.png",
+  "reload_command": "reload spawn_group",
+  "primary_key": [
+    "Id",
+    "Guid"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Group id",
+          "db_column_name": "Id",
+          "value_type": "TableReference(spawn_group#Id)Parameter"
+        },
+        {
+          "name": "Guid",
+          "db_column_name": "Guid",
+          "value_type": "int"
+        },
+        {
+          "name": "Slot Id",
+          "db_column_name": "SlotId",
+          "value_type": "int",
+          "default": -1
+        },
+        {
+          "name": "Chance",
+          "db_column_name": "Chance",
+          "value_type": "uint",
+          "zero_is_blank": true
+        }
+      ]
+    }
+  ]
+}
