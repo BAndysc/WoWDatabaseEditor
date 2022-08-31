@@ -5,13 +5,21 @@ using Prism.Ioc;
 using Prism.Modularity;
 using Unity;
 using Unity.Lifetime;
+using WDE.Common.CoreVersion;
 using WDE.Common.Windows;
 using WDE.Module.Attributes;
 
 namespace WDE.Module
 {
-    public abstract class ModuleBase : IModule
+    public interface IEditorModule : IModule
     {
+        void InitializeCore(string tag);
+    }
+    
+    public abstract class ModuleBase : IEditorModule
+    {
+        private string? coreTag;
+
         public ModuleBase()
         {
         }
@@ -52,8 +60,18 @@ namespace WDE.Module
 
         protected void RegisterType(Type register, IContainerRegistry unityContainer)
         {
+            if (string.IsNullOrEmpty(coreTag))
+                throw new Exception("Core must be set before registering the types!");
+            var requiresCore = register.GetCustomAttribute<RequiresCoreAttribute>();
+            var rejectsCore = register.GetCustomAttribute<RejectsCoreAttribute>();
             bool singleton = register.IsDefined(typeof(SingleInstanceAttribute), false);
 
+            if (requiresCore != null && !requiresCore.Tags.Contains(coreTag))
+                return;
+            
+            if (rejectsCore != null && rejectsCore.Tags.Contains(coreTag))
+                return;
+            
             if (singleton)
                 unityContainer.RegisterSingleton(register);
                     
@@ -75,6 +93,11 @@ namespace WDE.Module
 
         public virtual void FinalizeRegistration(IContainerRegistry container)
         {
+        }
+
+        public void InitializeCore(string coreTag)
+        {
+            this.coreTag = coreTag;
         }
     }
 }

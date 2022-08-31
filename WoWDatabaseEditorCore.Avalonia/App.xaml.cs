@@ -113,6 +113,7 @@ namespace WoWDatabaseEditorCore.Avalonia
             var fs = new FileSystem(vfs);
             var userSettings = new UserSettings(fs, new Lazy<IStatusBar>(new DummyStatusBar()));
             var currentCoreSettings = new CurrentCoreSettings(userSettings);
+            containerRegistry.RegisterInstance(typeof(ICurrentCoreSettings), currentCoreSettings);
             
             modulesManager = new ModulesManager(currentCoreSettings);
             var mainThread = new MainThread();
@@ -129,6 +130,7 @@ namespace WoWDatabaseEditorCore.Avalonia
         protected override void RegisterRequiredTypes(IContainerRegistry containerRegistry)
         {
             base.RegisterRequiredTypes(containerRegistry);
+            containerRegistry.RegisterSingleton<IModuleInitializer, CustomModuleInitializer>();
             containerRegistry.RegisterSingleton<IEventAggregator, EventAggregator>();
         }
 
