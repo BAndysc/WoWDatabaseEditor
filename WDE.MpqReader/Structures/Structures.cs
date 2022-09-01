@@ -1349,5 +1349,10 @@ namespace WDE.MpqReader.Structures
         {
             return array.AsSpan(start, length);
         }
+
+        public ReadOnlySpan<T> AsSpan()
+        {
+            return array.AsSpan();
+        }
     }
 }
