@@ -100,6 +100,7 @@ public class Game : IGame
         registry.RegisterSingleton<ModuleManager>();
         registry.RegisterSingleton<CoroutineManager>();
         registry.RegisterSingleton<IGameFiles, GameFiles>();
+        registry.RegisterSingleton<IChangesManager, ChangesManager>();
         
         manager = (GameManager)provider.Resolve(typeof(GameManager));
         registry.RegisterInstance<IGameContext>(manager);

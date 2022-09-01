@@ -131,6 +131,7 @@ namespace WDE.MapRenderer
             private IDisposable? activationSub;
 
             private ObservableCollection<object>? registeredViewModels;
+            private IDisposable? gameDisposable;
 
             public GameProxy(GameViewModel vm,
                 CameraManager cameraManager,
@@ -138,7 +139,8 @@ namespace WDE.MapRenderer
                 ModuleManager moduleManager,
                 DbcManager dbcManager,
                 TimeManager timeManager,
-                IGameContext gameContext)
+                IGameContext gameContext,
+                IChangesManager changesManager)
             {
                 this.vm = vm;
                 this.cameraManager = cameraManager;
@@ -147,6 +149,7 @@ namespace WDE.MapRenderer
                 this.dbcManager = dbcManager;
                 this.timeManager = timeManager;
                 this.gameContext = gameContext;
+                gameDisposable = changesManager.IsModified.SubscribeAction(@is => vm.IsModified = @is);
             }
             
             private void RegisteredViewModelsOnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -164,6 +167,8 @@ namespace WDE.MapRenderer
 
             public void Dispose()
             {
+                gameDisposable?.Dispose();
+                gameDisposable = null;
                 vm.ToolBars = new();
                 mapSub?.Dispose();
                 activationSub?.Dispose();
@@ -319,6 +324,11 @@ Tris: " + stats.TrianglesDrawn;
 
             Save = new AsyncAutoCommand(() =>
             {
+                if (currentGame != null)
+                {
+                    var changesManager = currentGame.Resolve<IChangesManager>();
+                    return changesManager?.Save() ?? Task.CompletedTask;
+                }
                 return Task.CompletedTask;
             });
         }

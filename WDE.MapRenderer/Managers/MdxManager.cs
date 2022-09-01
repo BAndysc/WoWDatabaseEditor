@@ -722,6 +722,7 @@ namespace WDE.MapRenderer.Managers
             Vector4 mesh_color = new Vector4(1.0f, 1.0f, 1.0f, trans);
 
             material.SetUniform("mesh_color", mesh_color);
+            material.SetUniformInt("translucent", 0);
             var shaderId = ResolveShaderID1(batch.shaderId, m2, in batch, (m2.global_flags & M2Flags.FLAG_USE_TEXTURE_COMBINER_COMBOS) != 0, (int)materialDef.blending_mode);
             var shaders = ConvertShaderIDs(m2, in batch, shaderId);
             material.SetUniformInt("pixel_shader", (int)shaders.Item2);

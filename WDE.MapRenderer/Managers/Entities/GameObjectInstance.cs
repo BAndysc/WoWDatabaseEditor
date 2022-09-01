@@ -2,6 +2,7 @@ using System.Collections;
 using TheAvaloniaOpenGL.Resources;
 using TheEngine.Components;
 using TheEngine.ECS;
+using TheEngine.Entities;
 using TheMaths;
 using WDE.Common.Database;
 using WDE.MpqReader.Structures;
@@ -14,6 +15,7 @@ public class GameObjectInstance : WorldObjectInstance
     private readonly uint gameObjectDisplayId;
     private List<INativeBuffer> bonesBuffers = new();
     private M2AnimationComponentData masterAnimation = null!;
+    private MaterialInstanceRenderData materialInstanceRenderData = null!;
 
     public GameObjectInstance(IGameContext gameContext,
         IGameObjectTemplate gameObjectTemplate,
@@ -35,6 +37,10 @@ public class GameObjectInstance : WorldObjectInstance
 
     public M2? Model { get; private set; }
 
+    public MaterialInstanceRenderData MaterialRenderData => materialInstanceRenderData;
+
+    public Material BaseMaterial { get; private set; } = null!;
+    
     public IEnumerator Load()
     {
         var entityManager = gameContext.EntityManager;
@@ -71,8 +77,9 @@ public class GameObjectInstance : WorldObjectInstance
         entityManager.SetManagedComponent(objectEntity, masterAnimation);
 
         // optimization here, we can share the render data, because we know all the materials will be the same shader
-        MaterialInstanceRenderData materialInstanceRenderData = new MaterialInstanceRenderData();
-        materialInstanceRenderData.SetBuffer(instance.materials[0].material, "boneMatrices", boneMatricesBuffer);
+        materialInstanceRenderData = new MaterialInstanceRenderData();
+        BaseMaterial = instance.materials[0].material;
+        materialInstanceRenderData.SetBuffer(BaseMaterial, "boneMatrices", boneMatricesBuffer);
         
         foreach (var material in instance.materials)
         {

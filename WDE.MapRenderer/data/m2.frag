@@ -17,6 +17,7 @@ uniform float notSupported;
 uniform float highlight;
 uniform int unlit;
 uniform int pixel_shader;
+uniform int translucent;
 uniform vec4 mesh_color;
 
 vec4 ShadeCModel(int pixelId, vec4 texture1, vec4 texture2)
@@ -165,6 +166,10 @@ void main()
     vec4 color = ShadeCModel(pixel_shader, tex1, tex2);
 
     if (color.a < alphaTest) 
+        discard;
+    
+    float makeTranslucent = mix(float(1), float(int((gl_FragCoord.x + gl_FragCoord.y)) % 2), float(translucent));
+    if (makeTranslucent < 0.5)
         discard;
     
     vec3 lighted = lighting(color.rgb, Normal.xyz);
