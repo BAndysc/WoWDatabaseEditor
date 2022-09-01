@@ -10,4 +10,5 @@ public abstract class BaseDbcStore<TKey, TVal> : IEnumerable<TVal> where TKey : 
     public TVal this[TKey id] => store[id];
     public IEnumerator<TVal> GetEnumerator() => store.Values.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => store.Values.GetEnumerator();
+    public int Count => store.Count;
 }

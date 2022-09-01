@@ -1,4 +1,6 @@
-﻿using System.Diagnostics;
+﻿using System.Collections;
+using System.Collections.Specialized;
+using System.Diagnostics;
 using TheMaths;
 using WDE.MpqReader.Readers;
 
@@ -82,6 +84,69 @@ namespace WDE.MpqReader.Structures
                 for (uint x = 0; x < 64; ++x)
                 {
                     chunks[y, x] = new WDTChunk(reader, x, y);
+                }
+            }
+            return chunks;
+        }
+    }
+
+    public struct BitVector64
+    {
+        private BitVector32 low;
+        private BitVector32 high;
+
+        public bool this[int index]
+        {
+            get
+            {
+                if (index <= 31)
+                    return low[(1<<index)];
+                return high[1 << (index - 32)];
+            }
+            set
+            {
+                if (index <= 31)
+                    low[(1<<index)] = value;
+                else
+                    high[1 << (index - 32)] = value;
+            }
+        }
+    }
+    
+    public class FastWDTChunks
+    {
+        public BitVector64[] Chunks { get; }
+
+        public FastWDTChunks(IBinaryReader reader)
+        {
+            while (!reader.IsFinished())
+            {
+                var chunkName = reader.ReadChunkName();
+                var size = reader.ReadInt32();
+
+                var offset = reader.Offset;
+
+                var partialReader = new LimitedReader(reader, size);
+
+                if (chunkName == "MAIN")
+                {
+                    Chunks = ReadWdtChunks(partialReader);
+                    break;
+                }
+                reader.Offset = offset + size;
+            }
+        }
+
+        private BitVector64[] ReadWdtChunks(IBinaryReader reader)
+        {
+            BitVector64[] chunks = new BitVector64[64];
+            for (uint y = 0; y < 64; ++y)
+            {
+                for (int x = 0; x < 64; ++x)
+                {
+                    var chunkFlags = reader.ReadUInt32();
+                    reader.ReadUInt32();
+                    chunks[y][x] = (chunkFlags & 1) == 1;
                 }
             }
             return chunks;

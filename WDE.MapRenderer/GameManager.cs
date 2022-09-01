@@ -39,6 +39,7 @@ namespace WDE.MapRenderer
         private UpdateManager updateLoop = null!;
         private WorldManager worldManager = null!;
         private LoadingManager loadingManager = null!;
+        private ZoneAreaManager zoneAreaManager = null!;
         private CreatureManager creatureManager = null!;
         private GameObjectManager gameObjectManager = null!;
         private AnimationSystem animationSystem = null!;
@@ -64,6 +65,7 @@ namespace WDE.MapRenderer
         public CreatureManager CreatureManager => creatureManager;
         public GameObjectManager GameObjectManager => gameObjectManager;
         public AnimationSystem AnimationSystem => animationSystem;
+        public ZoneAreaManager ZoneAreaManager => zoneAreaManager;
         public Engine Engine { get; }
         public IEntityManager EntityManager { get; }
         public ITextureManager EngineTextureManager { get; }
@@ -123,6 +125,7 @@ namespace WDE.MapRenderer
             timeManager = ResolveOrCreate<TimeManager>();
             screenSpaceSelector = ResolveOrCreate<ScreenSpaceSelector>();
             loadingManager = ResolveOrCreate<LoadingManager>();
+            zoneAreaManager = ResolveOrCreate<ZoneAreaManager>();
             textureManager = ResolveOrCreate<WoWTextureManager>();
             textureManager.SetQuality(gameProperties.TextureQuality);
             meshManager = ResolveOrCreate<WoWMeshManager>();
@@ -215,6 +218,7 @@ namespace WDE.MapRenderer
             loadingManager.RenderGUI();
             timeManager.RenderGUI();
             mdxManager.RenderGUI();
+            zoneAreaManager.RenderGUI();
         }
 
         public void SetMap(int mapId, Vector3? position = null)
@@ -225,6 +229,8 @@ namespace WDE.MapRenderer
                 worldManager?.SetNextTeleportPosition(position);
                 ChangedMap?.Invoke(mapId);
             }
+            else if (CurrentMap.Id == mapId && position.HasValue)
+                cameraManager.Relocate(position.Value);
         }
 
         public void DisposeGame()

@@ -60,7 +60,7 @@ namespace WoWDatabaseEditorCore.Services.FileSystemService
             return path.Open(FileMode.Create, FileAccess.Write);
         }
 
-        public FileSystemInfo ResolvePhysicalPath(string path)
+        public FileInfo ResolvePhysicalPath(string path)
         {
             return vfs.ResolvePath(path);
         }

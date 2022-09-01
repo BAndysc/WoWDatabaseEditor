@@ -38,6 +38,7 @@ public class LoadingManager : IDisposable
     private readonly CreatureManager creatureManager;
     private readonly GameObjectManager gameObjectManager;
     private readonly GlobalWorldMapObjectManager globalWorldMapObjectManager;
+    private readonly ZoneAreaManager zoneAreaManager;
     private readonly WorldManager worldManager;
     private int? currentLoadedMap;
     private LoadingToken? loadingToken;
@@ -51,6 +52,7 @@ public class LoadingManager : IDisposable
         CreatureManager creatureManager,
         GameObjectManager gameObjectManager,
         GlobalWorldMapObjectManager globalWorldMapObjectManager,
+        ZoneAreaManager zoneAreaManager,
         WorldManager worldManager)
     {
         this.gameContext = gameContext;
@@ -59,6 +61,7 @@ public class LoadingManager : IDisposable
         this.creatureManager = creatureManager;
         this.gameObjectManager = gameObjectManager;
         this.globalWorldMapObjectManager = globalWorldMapObjectManager;
+        this.zoneAreaManager = zoneAreaManager;
         this.worldManager = worldManager;
 
         this.loadingNotificationBox = new SimpleBox(BoxPlacement.BottomCenter);
@@ -89,6 +92,8 @@ public class LoadingManager : IDisposable
         
         yield return chunkManager.UnloadAllChunks();
 
+        yield return zoneAreaManager.Load();
+        
         yield return worldManager.LoadMap(newToken.CancellationToken);
 
         yield return creatureManager.LoadEssentialData(newToken.CancellationToken);

@@ -240,11 +240,13 @@ namespace WDE.MpqReader.Structures
 
     public struct FastAdtAreaTable
     {
-        public uint[,] AreaIds { get; } = new uint[16, 16];
+        public ushort[,] AreaIds { get; } = new ushort[16, 16];
+        public bool AllAreasAreSame { get; } = true; 
         public FastAdtAreaTable(IBinaryReader reader)
         {
             int y = 0;
             int x = 0;
+            ushort? prevArea = null;
             while (!reader.IsFinished())
             {
                 var chunkName = reader.ReadChunkName();
@@ -255,6 +257,9 @@ namespace WDE.MpqReader.Structures
                 if (chunkName == "MCNK")
                 {
                     AreaIds[y, x] = ReadChunkAreaId(reader);
+                    if (prevArea.HasValue && prevArea != AreaIds[y, x])
+                        AllAreasAreSame = false;
+                    prevArea = AreaIds[y, x];
 
                     x++;
                     if (x == 16)
@@ -268,10 +273,10 @@ namespace WDE.MpqReader.Structures
             }
         }
 
-        private uint ReadChunkAreaId(IBinaryReader reader)
+        private ushort ReadChunkAreaId(IBinaryReader reader)
         {
             reader.Offset += 0x34; // skip part of the header
-            return reader.ReadUInt32();
+            return (ushort)reader.ReadUInt32(); // ushort is enough even in 9.X
         }
     }
 

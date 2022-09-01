@@ -7,5 +7,11 @@ namespace WDE.Common.MPQ
     {
         bool IsConfigured();
         IMpqArchive Open();
+        GameFilesVersion? Version { get; }
+    }
+    
+    public enum GameFilesVersion
+    {
+        Wrath_3_3_5a = 335
     }
 }

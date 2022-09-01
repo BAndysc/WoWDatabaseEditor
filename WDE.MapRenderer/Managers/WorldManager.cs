@@ -13,8 +13,8 @@ public class WorldManager : System.IDisposable
     private readonly IGameContext gameContext;
     private readonly CameraManager cameraManager;
     private readonly NotificationsCenter notificationsCenter;
+    private readonly ZoneAreaManager zoneAreaManager;
     private readonly AreaTableStore areaTableStore;
-    private uint[,]?[,] areaTable = new uint[,]?[64,64];
     private bool[,] presentChunks = new bool[64, 64];
     private Vector3? teleportPosition;
     
@@ -22,12 +22,14 @@ public class WorldManager : System.IDisposable
         IGameContext gameContext,
         CameraManager cameraManager,
         NotificationsCenter notificationsCenter,
+        ZoneAreaManager zoneAreaManager,
         AreaTableStore areaTableStore)
     {
         this.gameFiles = gameFiles;
         this.gameContext = gameContext;
         this.cameraManager = cameraManager;
         this.notificationsCenter = notificationsCenter;
+        this.zoneAreaManager = zoneAreaManager;
         this.areaTableStore = areaTableStore;
     }
     
@@ -36,7 +38,7 @@ public class WorldManager : System.IDisposable
     private uint? prevAreaId;
     public void Update(float delta)
     {
-        var areaId = GetAreaId(cameraManager.Position);
+        var areaId = zoneAreaManager.GetAreaId((uint)gameContext.CurrentMap.Id, cameraManager.Position);
         if (areaId != prevAreaId)
         {
             prevAreaId = areaId;
@@ -51,46 +53,9 @@ public class WorldManager : System.IDisposable
         }
     }
 
-    public uint? GetAreaId(Vector3 wowPosition)
-    {
-        var chunk = wowPosition.WoWPositionToChunk();
-        if (chunk.Item1 < 0 || chunk.Item1 >= 64 || chunk.Item2 < 0 || chunk.Item2 >= 64)
-            return null;
-        
-        var areaIds = areaTable[chunk.Item1, chunk.Item2];
-        if (areaIds == null)
-            return null;
-        
-        var chunkPosition = chunk.ChunkToWoWPosition();
-        var relativePosition = chunkPosition - wowPosition;
-        var x = Math.Clamp((int)(relativePosition.X / Constants.ChunkSize), 0, 63);
-        var y = Math.Clamp((int)(relativePosition.Y / Constants.ChunkSize), 0, 63);
-        return areaIds[x, y];
-    }
-
     public IEnumerator LoadOptionals(CancellationToken cancel)
     {
-        for (int y = 0; y < 64; ++y)
-        {
-            for (int x = 0; x < 64; ++x)
-            {
-                if (cancel.IsCancellationRequested)
-                    yield break;
-            
-                if (presentChunks[y, x])
-                {
-                    var adtBytesTask = gameFiles.ReadFile(gameFiles.Adt(gameContext.CurrentMap.Directory, x, y));
-                    yield return adtBytesTask;
-                
-                    using var adtBytes = adtBytesTask.Result;
-                    if (adtBytes != null)
-                    {
-                        var adt = new FastAdtAreaTable(new MemoryBinaryReader(adtBytes));
-                        areaTable[y, x] = adt.AreaIds;
-                    }
-                }
-            }
-        }
+        yield break;
     }
     
     public IEnumerator LoadMap(CancellationToken cancel)
@@ -155,7 +120,6 @@ public class WorldManager : System.IDisposable
         {
             for (int x = 0; x < 64; ++x)
             {
-                areaTable[y, x] = null;
                 presentChunks[y, x] = false;
             }
         }

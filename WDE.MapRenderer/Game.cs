@@ -91,6 +91,7 @@ public class Game : IGame
         registry.RegisterSingleton<MdxManager>();
         registry.RegisterSingleton<WmoManager>();
         registry.RegisterSingleton<WorldManager>();
+        registry.RegisterSingleton<ZoneAreaManager>();
         registry.RegisterSingleton<ChunkManager>();
         registry.RegisterSingleton<CameraManager>();
         registry.RegisterSingleton<LightingManager>();
