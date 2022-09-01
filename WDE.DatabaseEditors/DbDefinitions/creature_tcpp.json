@@ -1,7 +1,7 @@
 {
   "id": "creature",
   "compatibility": [
-    "TrinityWrath"
+    "TrinityCata"
   ],
   "name": "Creature",
   "description": "The table contains all creature spawns",
@@ -41,6 +41,28 @@
           "default": 1
         },
         {
+          "name": "Phase Id",
+          "db_column_name": "PhaseId",
+          "value_type": "PhaseParameter",
+          "default": 169
+        },
+        {
+          "name": "Phase Group",
+          "db_column_name": "PhaseGroup",
+          "value_type": "PhaseGroupParameter"
+        },
+        {
+          "name": "Terrain Swap Map",
+          "db_column_name": "terrainSwapMap",
+          "value_type": "MapParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Phase Use Flags",
+          "db_column_name": "phaseUseFlags",
+          "value_type": "BoolParameter"
+        },
+        {
           "name": "Phase Mask",
           "db_column_name": "phaseMask",
           "value_type": "PhaseMaskParameter",
@@ -74,7 +96,7 @@
         },
         {
           "name": "Wander Distance",
-          "db_column_name": "wander_distance",
+          "db_column_name": "spawndist",
           "value_type": "float",
           "zero_is_blank": true
         },
@@ -103,7 +125,13 @@
       "fields": [
         {
           "name": "Path Id",
-          "db_column_name": "path_id",
+          "db_column_name": "waypointPathId",
+          "value_type": "uint",
+          "foreign_table": "creature_addon"
+        },
+        {
+          "name": "Cyclic spline path Id",
+          "db_column_name": "cyclicSplinePathId",
           "value_type": "uint",
           "foreign_table": "creature_addon"
         },
@@ -111,12 +139,6 @@
           "name": "Mount",
           "db_column_name": "mount",
           "value_type": "CreatureModelDataParameter",
-          "foreign_table": "creature_addon"
-        },
-        {
-          "name": "Mount Creature ID",
-          "db_column_name": "MountCreatureID",
-          "value_type": "CreatureParameter",
           "foreign_table": "creature_addon"
         },
         {
@@ -142,13 +164,32 @@
           "name": "Visibility Distance Type",
           "db_column_name": "visibilityDistanceType",
           "value_type": "VisibilityDistanceTypeParameter",
-          "foreign_table": "creature_addon"
+          "foreign_table": "creature_addon",
+          "can_be_null": true
         },
         {
           "name": "Auras",
           "db_column_name": "auras",
           "value_type": "MultiSpellParameter",
           "can_be_null": true,
+          "foreign_table": "creature_addon"
+        },
+        {
+          "name": "Ai Anim Kit",
+          "db_column_name": "aiAnimKit",
+          "value_type": "uint",
+          "foreign_table": "creature_addon"
+        },
+        {
+          "name": "Melee Anim Kit",
+          "db_column_name": "meleeAnimKit",
+          "value_type": "uint",
+          "foreign_table": "creature_addon"
+        },
+        {
+          "name": "Movement Anim Kit",
+          "db_column_name": "movementAnimKit",
+          "value_type": "uint",
           "foreign_table": "creature_addon"
         }
       ]

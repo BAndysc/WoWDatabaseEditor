@@ -1,0 +1,157 @@
+{
+  "id": "gameobject",
+  "compatibility": [
+    "TrinityCata"
+  ],
+  "name": "Gameobject",
+  "description": "The table contains all gameobject spawns",
+  "table_name": "gameobject",
+  "table_index_name": "guid",
+  "record_mode": "SingleRow",
+  "group_name": "Spawns",
+  "icon_path": "Icons/document_gameobjects.png",
+  "picker": "",
+  "primary_key": [
+    "guid"
+  ],
+  "groups": [
+    {
+      "group_name": "General",
+      "fields": [
+        {
+          "name": "Guid",
+          "db_column_name": "guid",
+          "value_type": "uint",
+          "read_only": true
+        },
+        {
+          "name": "Gameobject",
+          "db_column_name": "id",
+          "value_type": "GameobjectParameter"
+        },
+        {
+          "name": "Spawn Mask",
+          "db_column_name": "spawnMask",
+          "value_type": "SpawnMaskParameter",
+          "default": 1
+        },
+        {
+          "name": "Phase Id",
+          "db_column_name": "PhaseId",
+          "value_type": "PhaseParameter",
+          "default": 169
+        },
+        {
+          "name": "Phase Group",
+          "db_column_name": "PhaseGroup",
+          "value_type": "PhaseGroupParameter"
+        },
+        {
+          "name": "Terrain Swap Map",
+          "db_column_name": "terrainSwapMap",
+          "value_type": "MapParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Phase Use Flags",
+          "db_column_name": "phaseUseFlags",
+          "value_type": "BoolParameter"
+        },
+        {
+          "name": "Phase Mask",
+          "db_column_name": "phaseMask",
+          "value_type": "PhaseMaskParameter",
+          "default": 1
+        },
+        {
+          "name": "Position X",
+          "db_column_name": "position_x",
+          "value_type": "float"
+        },
+        {
+          "name": "Position Y",
+          "db_column_name": "position_y",
+          "value_type": "float"
+        },
+        {
+          "name": "Position Z",
+          "db_column_name": "position_z",
+          "value_type": "float"
+        },
+        {
+          "name": "Orientation",
+          "db_column_name": "orientation",
+          "value_type": "float"
+        },
+        {
+          "name": "Rotation 0",
+          "db_column_name": "rotation0",
+          "value_type": "float"
+        },
+        {
+          "name": "Rotation 1",
+          "db_column_name": "rotation1",
+          "value_type": "float"
+        },
+        {
+          "name": "Rotation 2",
+          "db_column_name": "rotation2",
+          "value_type": "float"
+        },
+        {
+          "name": "Rotation 3",
+          "db_column_name": "rotation3",
+          "value_type": "float"
+        },
+        {
+          "name": "Spawn time secs",
+          "db_column_name": "spawntimesecs",
+          "value_type": "int"
+        },
+        {
+          "name": "Anim progress",
+          "db_column_name": "animprogress",
+          "value_type": "uint"
+        },
+        {
+          "name": "State",
+          "db_column_name": "state",
+          "value_type": "GameobjectStateParameter"
+        },
+        {
+          "name": "Script Name",
+          "db_column_name": "ScriptName",
+          "value_type": "string",
+          "default": "",
+          "can_be_null": true
+        },
+        {
+          "name": "Verified Build",
+          "db_column_name": "VerifiedBuild",
+          "value_type": "int",
+          "can_be_null": true
+        }
+      ]
+    },
+    {
+      "group_name": "Advanced",
+      "fields": [
+        {
+          "name": "Map",
+          "db_column_name": "map",
+          "value_type": "MapParameter"
+        },
+        {
+          "name": "Zone",
+          "db_column_name": "zoneId",
+          "value_type": "ZoneAreaParameter"
+        },
+        {
+          "name": "Area",
+          "db_column_name": "areaId",
+          "value_type": "ZoneAreaParameter"
+        }        
+      ]
+    }
+  ]
+}
