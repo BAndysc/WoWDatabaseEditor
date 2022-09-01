@@ -263,6 +263,11 @@ namespace TheAvaloniaOpenGL.Resources
             return null;
         }
 
+        public string? GetUniformName(int location)
+        {
+            return uniformToLocation.FirstOrDefault(p => p.Value == location).Key;
+        }
+
         public void Validate()
         {
             device.ValidateProgram(ProgramHandle);
