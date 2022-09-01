@@ -40,6 +40,7 @@ namespace TheEngine.Input
         public uint ClickCount { get; private set; }
 
         public bool HasJustDoubleClicked => ClickCount == 2;
+        public Vector2 LastClickNormalizedPosition { get; private set; }
 
         internal Mouse(Engine engine)
         {
@@ -89,6 +90,7 @@ namespace TheEngine.Input
                 ClickCount++;
                 resetClickTimeCounter = 500;
                 lastClickPosition = ScreenPoint;
+                LastClickNormalizedPosition = NormalizedPosition;
             }
         }
 

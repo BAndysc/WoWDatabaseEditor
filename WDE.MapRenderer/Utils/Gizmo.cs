@@ -415,7 +415,8 @@ namespace WDE.MapRenderer.Utils
                     StartDragging(hitType, ref ray, GizmoMode.KeyboardDrag);
             }
 
-            if (inputManager.Mouse.HasJustClicked(MouseButton.Left) && !stopDrag)
+            if (inputManager.Mouse.IsMouseDown(MouseButton.Left) && !stopDrag &&
+                Vector2.Distance(inputManager.Mouse.LastClickNormalizedPosition, inputManager.Mouse.NormalizedPosition) > 0.01f)
             {
                 if (IsEnabled && dragging == GizmoMode.NoDragging)
                 {
