@@ -45,5 +45,6 @@ namespace WDE.CMaNGOS
         public CharacterRaces AllRaces => CharacterRaces.AllWrath;
         public CharacterClasses AllClasses => CharacterClasses.AllWrath;
         public bool SupportsEventScripts => false;
+        bool IEventAiFeatures.IsSupported => true;
     }
 }

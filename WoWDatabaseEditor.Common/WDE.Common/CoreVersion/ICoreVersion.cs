@@ -66,6 +66,7 @@ namespace WDE.Common.CoreVersion
         string? EventsPath => null;
         string? EventGroupPath => null;
         string? ActionGroupPath => null;
+        bool IsSupported => false;
     }
 
     public interface ISmartScriptFeatures
