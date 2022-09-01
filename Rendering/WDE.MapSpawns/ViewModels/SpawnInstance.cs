@@ -18,4 +18,7 @@ public abstract class SpawnInstance : IChildType, IManagedComponentData
     
     public bool IsSpawned => WorldObject != null;
     public abstract void Dispose();
+    public uint NestLevel { get; set; }
+    public bool IsVisible { get; set; }
+    public IParentType? Parent { get; set; }
 }
