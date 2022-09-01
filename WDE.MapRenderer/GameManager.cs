@@ -191,7 +191,7 @@ namespace WDE.MapRenderer
             meshManager.Render();
             renderManager.ViewDistanceModifier = gameProperties.ViewDistanceModifier;
             renderManager.SetDynamicResolutionScale(gameProperties.DynamicResolution);
-            moduleManager.Render();
+            moduleManager.Render(delta);
             lightingManager.Render();
         }
 

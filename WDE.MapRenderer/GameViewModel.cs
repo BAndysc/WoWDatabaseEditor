@@ -253,7 +253,7 @@ Tris: " + stats.TrianglesDrawn;
                 }, DispatcherPriority.Render);
             }
 
-            public void Render()
+            public void Render(float delta)
             {
             }
 

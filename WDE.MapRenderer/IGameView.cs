@@ -21,7 +21,7 @@ namespace WDE.MapRenderer
         object? ToolBar => null;
         void Initialize();
         void Update(float delta);
-        void Render() { }
+        void Render(float delta) { }
         void RenderTransparent() { }
         void RenderGUI() { }
         IEnumerator LoadChunk(int mapId, int chunkX, int chunkZ, CancellationToken cancellationToken)
