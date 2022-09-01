@@ -59,7 +59,7 @@ namespace WDE.Common.Avalonia.Components
             return img;
         }
 
-        private static Bitmap? LoadBitmap(ImageUri img)
+        public static Bitmap? LoadBitmap(ImageUri img)
         {
             string uri = img.Uri;
             if (SystemTheme.EffectiveThemeIsDark)
