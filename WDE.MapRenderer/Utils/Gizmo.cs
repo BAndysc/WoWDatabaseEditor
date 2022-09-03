@@ -185,6 +185,7 @@ namespace WDE.MapRenderer.Utils
         
         private GizmoMode dragging = GizmoMode.NoDragging;
 
+        private bool canFinishDragging;
         private TheMaths.Plane plane;
         private bool snappingMode;
         private Vector3? axis;
@@ -415,8 +416,7 @@ namespace WDE.MapRenderer.Utils
                     StartDragging(hitType, ref ray, GizmoMode.KeyboardDrag);
             }
 
-            if (inputManager.Mouse.IsMouseDown(MouseButton.Left) && !stopDrag &&
-                Vector2.Distance(inputManager.Mouse.LastClickNormalizedPosition, inputManager.Mouse.NormalizedPosition) > 0.01f)
+            if (inputManager.Mouse.HasJustClicked(MouseButton.Left) && !stopDrag)
             {
                 if (IsEnabled && dragging == GizmoMode.NoDragging)
                 {
@@ -425,6 +425,10 @@ namespace WDE.MapRenderer.Utils
                         StartDragging(result, ref ray, GizmoMode.MouseDrag);
                 }
             }
+
+            if (dragging == GizmoMode.MouseDrag && !canFinishDragging &&
+                Vector2.Distance(inputManager.Mouse.LastClickScreenPosition, inputManager.Mouse.ScreenPoint) > 3)
+                canFinishDragging = true;
 
             return IsDragging();
         }
@@ -437,7 +441,8 @@ namespace WDE.MapRenderer.Utils
         
         private void FinishDrag()
         {
-            FinishDragging(draggable.Select(x => x.item));
+            if (canFinishDragging)
+                FinishDragging(draggable.Select(x => x.item));
             draggable.Clear();
         }
 
@@ -487,9 +492,24 @@ namespace WDE.MapRenderer.Utils
             }
         }
 
+        private bool IsOnTheGround()
+        {
+            var toDrag = PointsToDrag();
+            if (toDrag == null || toDrag.Count == 0)
+                return false;
+
+            var position = GetPosition(toDrag[0]);
+            var hit = raycastSystem.Raycast(new Ray(position + Vectors.Up * 3, Vectors.Down), null);
+
+            if (!hit.HasValue)
+                return false;
+            
+            return Math.Abs(position.Z - hit.Value.Item2.Z) < 3f;
+        }
+
         private void StartDragging(Gizmo.HitType hitType, ref Ray ray, GizmoMode gizmoMode)
         {
-            if (hitType == Gizmo.HitType.Snap)
+            if (hitType == Gizmo.HitType.Snap || (IsOnTheGround() && hitType == Gizmo.HitType.TranslateXY))
                 StartDragging(Vector3.Zero, null, plane, gizmoMode, true);
             else
             {
@@ -504,6 +524,7 @@ namespace WDE.MapRenderer.Utils
             this.snappingMode = snapping;
             originalTouch = startTouchPoint;
             dragging = gizmoMode;
+            canFinishDragging = false;
             this.axis = axis;
             this.plane = plane;
             draggable.Clear();

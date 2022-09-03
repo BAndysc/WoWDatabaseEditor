@@ -33,6 +33,15 @@ namespace TheEngine.Input
                 return new Vector2(engine.WindowHost.WindowWidth * zeroOne.X, engine.WindowHost.WindowHeight * zeroOne.Y);
             }
         }
+        public Vector2 LastClickScreenPosition
+        {
+            get
+            {
+                var zeroOne = new Vector2(LastClickNormalizedPosition.X, 1 - LastClickNormalizedPosition.Y);
+                return new Vector2(engine.WindowHost.WindowWidth * zeroOne.X, engine.WindowHost.WindowHeight * zeroOne.Y);
+            }
+        }
+        
 
         private Vector2 lastClickPosition;
         private float resetClickTimeCounter = 0;

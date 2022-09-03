@@ -15,5 +15,6 @@ namespace TheEngine.Interfaces
         uint ClickCount { get; }
         bool HasJustDoubleClicked { get; }
         Vector2 LastClickNormalizedPosition { get; }
+        Vector2 LastClickScreenPosition { get; }
     }
 }
