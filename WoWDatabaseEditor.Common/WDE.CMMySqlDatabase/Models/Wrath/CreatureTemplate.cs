@@ -2,7 +2,7 @@
 using LinqToDB.Mapping;
 using WDE.Common.Database;
 
-namespace WDE.CMMySqlDatabase.Models
+namespace WDE.CMMySqlDatabase.Models.Wrath
 {
     /// <summary>
     /// Creature System

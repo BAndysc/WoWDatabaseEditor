@@ -5,12 +5,12 @@ PORT=$2
 HOST="$1"
 MYSQL_PATH="$5"
 
-URLs=( 'https://github.com/TrinityCore/TrinityCore' 'https://github.com/TrinityCore/TrinityCore' 'https://github.com/The-Cataclysm-Preservation-Project/TrinityCore' 'https://github.com/azerothcore/azerothcore-wotlk' 'https://github.com/cmangos/wotlk-db' )
-BRANCHEs=( 'master' '3.3.5' 'master' 'master' 'master' )
-UPDATEs=( 'master' '3.3.5' '4.3.4' '' '' )
-COREs=( 'TrinityMaster' 'TrinityWrath' 'TrinityCata' 'Azeroth' 'CMaNGOS-WoTLK' )
-TYPEs=( 'TC' 'TC' 'TC' 'TC' 'MANGOS' )
-SKIP=( false false false true false )
+URLs=( 'https://github.com/TrinityCore/TrinityCore' 'https://github.com/TrinityCore/TrinityCore' 'https://github.com/The-Cataclysm-Preservation-Project/TrinityCore' 'https://github.com/azerothcore/azerothcore-wotlk' 'https://github.com/cmangos/wotlk-db' 'https://github.com/cmangos/tbc-db' )
+BRANCHEs=( 'master' '3.3.5' 'master' 'master' 'master' 'master' )
+UPDATEs=( 'master' '3.3.5' '4.3.4' '' '' '' )
+COREs=( 'TrinityMaster' 'TrinityWrath' 'TrinityCata' 'Azeroth' 'CMaNGOS-WoTLK' 'CMaNGOS-TBC' )
+TYPEs=( 'TC' 'TC' 'TC' 'TC' 'MANGOS-335' 'MANGOS-243' )
+SKIP=( false false false true false false )
 
 for index in ${!URLs[*]}; do
 
@@ -31,7 +31,7 @@ for index in ${!URLs[*]}; do
     ;
     cd Repo
 
-    if [ "${TYPEs[$index]}" = "MANGOS" ]; then
+    if [ "${TYPEs[$index]}" = "MANGOS-335" ]; then
         rm -rf wotlk-world-db.zip
         rm -rf wotlkmangos.sql
         curl -L ${URLs[$index]}/releases/download/latest/wotlk-world-db.zip -o wotlk-world-db.zip
@@ -39,6 +39,14 @@ for index in ${!URLs[*]}; do
         rm -rf wotlk-world-db.zip
         "${MYSQL_PATH}" -u ${USER} -p${PASSWORD} temp_CI < wotlkmangos.sql
         rm -rf wotlkmangos.sql
+    elif [ "${TYPEs[$index]}" = "MANGOS-243" ]; then
+        rm -rf tbc-world-db.zip
+        rm -rf tbcmangos.sql
+        curl -L ${URLs[$index]}/releases/download/latest/tbc-world-db.zip -o tbc-world-db.zip
+        7z e tbc-world-db.zip
+        rm -rf tbc-world-db.zip
+        "${MYSQL_PATH}" -u ${USER} -p${PASSWORD} temp_CI < tbcmangos.sql
+        rm -rf tbcmangos.sql
     else
         git sparse-checkout set sql/base/dev
         git sparse-checkout add sql/updates/world/${UPDATEs[$index]}

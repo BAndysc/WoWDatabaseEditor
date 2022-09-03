@@ -1,7 +1,7 @@
 ﻿using LinqToDB.Mapping;
 using WDE.Common.Database;
 
-namespace WDE.CMMySqlDatabase.Models
+namespace WDE.CMMySqlDatabase.Models.Wrath
 {
     [Table(Name = "creature_template_classlevelstats")]
     public class CreatureClassLevelStatWoTLK : ICreatureClassLevelStat

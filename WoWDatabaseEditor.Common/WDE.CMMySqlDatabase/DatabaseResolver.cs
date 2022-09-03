@@ -12,10 +12,12 @@ namespace WDE.CMMySqlDatabase;
 public class DatabaseResolver
 {
     private readonly IAuthDatabaseProvider auth;
-    private readonly DatabaseProviderWoTLK world;
+    private readonly IAsyncDatabaseProvider world;
+    private readonly IMangosDatabaseProvider mangosWorld;
 
     public DatabaseResolver(ICurrentCoreVersion core,
-        Lazy<DatabaseProviderWoTLK> cmWrath)
+        Lazy<DatabaseProviderWoTLK> cmWrath,
+        Lazy<DatabaseProviderTBC> cmTbc)
     {
         switch (core.Current.Tag)
         {
@@ -24,6 +26,15 @@ public class DatabaseResolver
                 var db= cmWrath.Value;
                 auth = db;
                 world = db;
+                mangosWorld = db;
+                break;
+            }
+            case "CMaNGOS-TBC":
+            {
+                var db= cmTbc.Value;
+                auth = db;
+                world = db;
+                mangosWorld = db;
                 break;
             }
             default:
@@ -35,7 +46,7 @@ public class DatabaseResolver
 
     public IAsyncDatabaseProvider ResolveWorld() => world;
     
-    public IMangosDatabaseProvider ResolveMangosWorld() => world;
+    public IMangosDatabaseProvider ResolveMangosWorld() => mangosWorld;
 
     public IAuthDatabaseProvider ResolveAuth() => auth;
 }

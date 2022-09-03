@@ -24,6 +24,7 @@ namespace WDE.Common.CoreVersion
 
     public enum PhasingType
     {
+        NoPhasing,
         PhaseMasks,
         PhaseIds
     }

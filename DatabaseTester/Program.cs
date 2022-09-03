@@ -175,7 +175,9 @@ public class Program
         }
 
         if (args[^1] == "CMaNGOS-WoTLK")
-            return DatabaseTester.Program.Test<WDE.CMMySqlDatabase.WorldDatabaseProvider>(args, new CMaNGOSCoreVersion());
+            return DatabaseTester.Program.Test<WDE.CMMySqlDatabase.WorldDatabaseProvider>(args, new CMangosWrathVersion());
+        else if (args[^1] == "CMaNGOS-TBC")
+            return DatabaseTester.Program.Test<WDE.CMMySqlDatabase.WorldDatabaseProvider>(args, new CMangosTbcVersion());
         return Test<WorldDatabaseProvider>(args, new AzerothCoreVersion(), new TrinityCataclysmVersion(), new TrinityMasterVersion(), new TrinityWrathVersion());
     }
 }

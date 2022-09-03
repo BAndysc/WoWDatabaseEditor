@@ -162,7 +162,9 @@ namespace WDE.CMMySqlDatabase.Database
             await using var model = Database();
             return await (from t in model.NpcTexts orderby t.Id select t).ToListAsync<INpcText>();
         }
-        
+
+        public abstract Task<List<ICreatureClassLevelStat>> GetCreatureClassLevelStatsAsync();
+
         public async Task<IAreaTriggerScript?> GetAreaTriggerScript(int entry)
         {
             return null;
@@ -172,45 +174,19 @@ namespace WDE.CMMySqlDatabase.Database
         {
             return new List<IAreaTriggerTemplate>();
         }
-        
-        public async Task<List<ICreatureClassLevelStat>> GetCreatureClassLevelStatsAsync()
-        {
-            if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(ICreatureClassLevelStat)))
-                return new List<ICreatureClassLevelStat>();
 
-            await using var model = Database();
-            return await (from t in model.CreatureClassLevelStats select t).ToListAsync<ICreatureClassLevelStat>();
-        }
+        public abstract IEnumerable<ICreatureClassLevelStat> GetCreatureClassLevelStats();
 
         public abstract Task<List<IBroadcastText>> GetBroadcastTextsAsync();
-
-        public IEnumerable<ICreatureClassLevelStat> GetCreatureClassLevelStats()
-        {
-            if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(ICreatureClassLevelStat)))
-                return Enumerable.Empty<ICreatureClassLevelStat>();
-
-            using var model = Database();
-            return (from t in model.CreatureClassLevelStats select t).ToList<ICreatureClassLevelStat>();
-        }
 
         public async Task<List<IAreaTriggerTemplate>> GetAreaTriggerTemplatesAsync()
         {
             return new List<IAreaTriggerTemplate>();
         }
         
-        public IEnumerable<IGameObjectTemplate> GetGameObjectTemplates()
-        {
-            using var model = Database();
-            return (from t in model.GameObjectTemplate orderby t.Entry select t).ToList<IGameObjectTemplate>();
-        }
-        
-        public async Task<List<IGameObjectTemplate>> GetGameObjectTemplatesAsync()
-        {
-            await using var model = Database();
-            var o = from t in model.GameObjectTemplate orderby t.Entry select t;
-            return await (o).ToListAsync<IGameObjectTemplate>();
-        }
-
+        public abstract IEnumerable<IGameObjectTemplate> GetGameObjectTemplates();
+        public abstract Task<List<IGameObjectTemplate>> GetGameObjectTemplatesAsync();
+        public abstract IGameObjectTemplate? GetGameObjectTemplate(uint entry);
         public abstract Task<IList<IGameObject>> GetGameObjectsAsync();
 
         protected virtual IQueryable<QuestTemplateWoTLK> GetQuestsQuery(BaseDatabaseTables model)
@@ -239,13 +215,7 @@ namespace WDE.CMMySqlDatabase.Database
             using var model = Database();
             return model.QuestTemplate.FirstOrDefault(q => q.Entry == entry);
         }
-
-        public IGameObjectTemplate? GetGameObjectTemplate(uint entry)
-        {
-            using var model = Database();
-            return model.GameObjectTemplate.FirstOrDefault(g => g.Entry == entry);
-        }
-
+        
         public async Task InstallScriptFor(int entryOrGuid, SmartScriptType type, IList<ISmartScriptLine> script)
         {
         }
@@ -402,17 +372,8 @@ namespace WDE.CMMySqlDatabase.Database
             return await model.SceneTemplates.ToListAsync<ISceneTemplate>();
         }
 
-        public async Task<IList<ICreatureAddon>> GetCreatureAddons()
-        {
-            await using var model = Database();
-            return await model.CreatureAddon.ToListAsync<ICreatureAddon>();
-        }
-
-        public async Task<IList<ICreatureTemplateAddon>> GetCreatureTemplateAddons()
-        {
-            await using var model = Database();
-            return await model.CreatureTemplateAddon.ToListAsync<ICreatureTemplateAddon>();
-        }
+        public abstract Task<IList<ICreatureAddon>> GetCreatureAddons();
+        public abstract Task<IList<ICreatureTemplateAddon>> GetCreatureTemplateAddons();
 
         public async Task<IList<ICreatureEquipmentTemplate>?> GetCreatureEquipmentTemplates()
         {
@@ -457,18 +418,8 @@ namespace WDE.CMMySqlDatabase.Database
         public abstract Task<IGameObject?> GetGameObjectByGuidAsync(uint guid);
 
         public abstract Task<ICreature?> GetCreaturesByGuidAsync(uint guid);
-
-        public async Task<ICreatureAddon?> GetCreatureAddon(uint guid)
-        {
-            await using var model = Database();
-            return await model.CreatureAddon.FirstOrDefaultAsync<ICreatureAddon>(x => x.Guid == guid);
-        }
-
-        public async Task<ICreatureTemplateAddon?> GetCreatureTemplateAddon(uint entry)
-        {
-            await using var model = Database();
-            return await model.CreatureTemplateAddon.FirstOrDefaultAsync<ICreatureTemplateAddon>(x => x.Entry == entry);
-        }
+        public abstract Task<ICreatureAddon?> GetCreatureAddon(uint guid);
+        public abstract Task<ICreatureTemplateAddon?> GetCreatureTemplateAddon(uint entry);
 
         public async Task<IReadOnlyList<IWaypointData>?> GetWaypointData(uint pathId) => null;
 

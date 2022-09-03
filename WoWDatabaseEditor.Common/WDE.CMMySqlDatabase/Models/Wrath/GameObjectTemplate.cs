@@ -1,7 +1,7 @@
 ﻿using LinqToDB.Mapping;
 using WDE.Common.Database;
 
-namespace WDE.CMMySqlDatabase.Models
+namespace WDE.CMMySqlDatabase.Models.Wrath
 {
     [Table(Name = "gameobject_template")]
     public class GameObjectTemplateWoTLK : IGameObjectTemplate

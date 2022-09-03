@@ -9,7 +9,7 @@ using WDE.MangosEventAiEditor.Providers;
 using WDE.Module;
 using WDE.Module.Attributes;
 
-[assembly: ModuleRequiresCore("CMaNGOS-WoTLK")]
+[assembly: ModuleRequiresCore("CMaNGOS-WoTLK", "CMaNGOS-TBC")]
 
 namespace WDE.MangosEventAiEditor
 {

@@ -1,10 +1,10 @@
 using LinqToDB.Mapping;
 using WDE.Common.Database;
 
-namespace WDE.CMMySqlDatabase.Models
+namespace WDE.CMMySqlDatabase.Models.TBC
 {
     [Table(Name = "gameobject")]
-    public class GameObjectWoTLK : IGameObject
+    public class GameObjectTBC : IGameObject
     {
         [PrimaryKey]
         [Identity]
@@ -16,8 +16,7 @@ namespace WDE.CMMySqlDatabase.Models
         [Column(Name = "map")]
         public uint Map { get; set; }
 
-        [Column(Name = "phaseMask")]
-        public uint? PhaseMask { get; set; }
+        public uint? PhaseMask => null;
 
         public int? PhaseId => null;
         

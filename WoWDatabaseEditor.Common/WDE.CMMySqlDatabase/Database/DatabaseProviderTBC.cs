@@ -11,9 +11,9 @@ using WDE.CMMySqlDatabase.Models;
 
 namespace WDE.CMMySqlDatabase.Database;
 
-public class DatabaseProviderWoTLK : BaseDatabaseProvider<WoTLKDatabase>
+public class DatabaseProviderTBC : BaseDatabaseProvider<TBCDatabase>
 {
-    public DatabaseProviderWoTLK(IWorldDatabaseSettingsProvider settings, IAuthDatabaseSettingsProvider authSettings, DatabaseLogger databaseLogger, ICurrentCoreVersion currentCoreVersion) : base(settings, authSettings, databaseLogger, currentCoreVersion)
+    public DatabaseProviderTBC(IWorldDatabaseSettingsProvider settings, IAuthDatabaseSettingsProvider authSettings, DatabaseLogger databaseLogger, ICurrentCoreVersion currentCoreVersion) : base(settings, authSettings, databaseLogger, currentCoreVersion)
     {
     }
 
@@ -119,7 +119,7 @@ public class DatabaseProviderWoTLK : BaseDatabaseProvider<WoTLKDatabase>
         return await model.SpellDbc.ToListAsync<IDatabaseSpellDbc>();
     }
     
-    protected override async Task SetCreatureTemplateAI(WoTLKDatabase model, uint entry, string ainame, string scriptname)
+    protected override async Task SetCreatureTemplateAI(TBCDatabase model, uint entry, string ainame, string scriptname)
     {
         await model.CreatureTemplate.Where(p => p.Entry == entry)
             .Set(p => p.AIName, ainame)
@@ -127,7 +127,7 @@ public class DatabaseProviderWoTLK : BaseDatabaseProvider<WoTLKDatabase>
             .UpdateAsync();
     }
 
-    protected override async Task<ICreature?> GetCreatureByGuid(WoTLKDatabase model, uint guid)
+    protected override async Task<ICreature?> GetCreatureByGuid(TBCDatabase model, uint guid)
     {
         return await model.Creature.FirstOrDefaultAsync(e => e.Guid == guid);
     }
@@ -156,7 +156,7 @@ public class DatabaseProviderWoTLK : BaseDatabaseProvider<WoTLKDatabase>
         return model.GameObject.Where(g => g.Entry == entry).ToList();
     }
     
-    protected override Task<IGameObject?> GetGameObjectByGuidAsync(WoTLKDatabase model, uint guid)
+    protected override Task<IGameObject?> GetGameObjectByGuidAsync(TBCDatabase model, uint guid)
     {
         return model.GameObject.FirstOrDefaultAsync<IGameObject>(g => g.Guid == guid);
     }
