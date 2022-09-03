@@ -14,6 +14,7 @@ public class ModuleTests
         var module = new Module();
         IUnityContainer unity = new UnityContainer();
         var ext = new Prism.Unity.Ioc.UnityContainerExtension(unity);
+        module.InitializeCore("core");
         module.RegisterTypes(ext);
         var interfaceA = ext.Resolve<IInterfaceA>();
         var interfaceB = ext.Resolve<IInterfaceB>();
