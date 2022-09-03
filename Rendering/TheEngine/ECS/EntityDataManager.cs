@@ -41,8 +41,6 @@ namespace TheEngine.ECS
 
         public void Dispose()
         {
-            foreach (var chunk in archetypeToData.Values)
-                chunk.Dispose();
             foreach (var a in Archetypes)
                 a.Dispose();
             archetypeToData.Clear();

@@ -103,7 +103,8 @@ namespace TheEngine.Managers
             if (tex != emptyTextureImpl)
                 tex?.Dispose();
 #if DEBUG_CREATE_CALLSTACK
-            createCallStack.Remove(tex);
+            if (tex != null)
+               createCallStack.Remove(tex);
 #endif
             this[handle] = null;
         }

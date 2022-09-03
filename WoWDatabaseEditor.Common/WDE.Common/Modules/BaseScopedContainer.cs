@@ -7,40 +7,42 @@ namespace WDE.Common.Modules
 {
     public abstract class BaseScopedContainer : IScopedContainer
     {
+        private readonly IContainerProvider provider;
+        private readonly IContainerRegistry registry;
         protected IUnityContainer unity;
-        protected IContainerExtension inner;
 
-        public BaseScopedContainer(IContainerExtension containerExtension, IUnityContainer impl)
+        public BaseScopedContainer(IContainerProvider provider, IContainerRegistry registry, IUnityContainer impl)
         {
-            inner = containerExtension;
+            this.provider = provider;
+            this.registry = registry;
             unity = impl;
         }
         
-        public object Resolve(Type type) => inner.Resolve(type);
+        public object Resolve(Type type) => provider.Resolve(type);
 
-        public object Resolve(Type type, params (Type Type, object Instance)[] parameters) => inner.Resolve(type, parameters);
+        public object Resolve(Type type, params (Type Type, object Instance)[] parameters) => provider.Resolve(type, parameters);
 
-        public object Resolve(Type type, string name) => inner.Resolve(type, name);
+        public object Resolve(Type type, string name) => provider.Resolve(type, name);
 
-        public object Resolve(Type type, string name, params (Type Type, object Instance)[] parameters) => inner.Resolve(type, name, parameters);
+        public object Resolve(Type type, string name, params (Type Type, object Instance)[] parameters) => provider.Resolve(type, name, parameters);
 
-        public IContainerRegistry RegisterInstance(Type type, object instance) => inner.RegisterInstance(type, instance);
+        public IContainerRegistry RegisterInstance(Type type, object instance) => registry.RegisterInstance(type, instance);
 
-        public IContainerRegistry RegisterInstance(Type type, object instance, string name) => inner.RegisterInstance(type, instance, name);
+        public IContainerRegistry RegisterInstance(Type type, object instance, string name) => registry.RegisterInstance(type, instance, name);
 
-        public IContainerRegistry RegisterSingleton(Type @from, Type to) => inner.RegisterSingleton(@from, to);
+        public IContainerRegistry RegisterSingleton(Type @from, Type to) => registry.Register(@from, to);
 
-        public IContainerRegistry RegisterSingleton(Type @from, Type to, string name) => inner.RegisterSingleton(@from, to, name);
+        public IContainerRegistry RegisterSingleton(Type @from, Type to, string name) => registry.RegisterSingleton(@from, to, name);
 
-        public IContainerRegistry Register(Type @from, Type to) => inner.Register(@from, to);
+        public IContainerRegistry Register(Type @from, Type to) => registry.Register(@from, to);
 
-        public IContainerRegistry Register(Type @from, Type to, string name) => inner.Register(@from, to, name);
+        public IContainerRegistry Register(Type @from, Type to, string name) => registry.Register(@from, to, name);
 
-        public bool IsRegistered(Type type) => inner.IsRegistered(type);
+        public bool IsRegistered(Type type) => registry.IsRegistered(type);
 
-        public bool IsRegistered(Type type, string name) => inner.IsRegistered(type, name);
+        public bool IsRegistered(Type type, string name) => registry.IsRegistered(type, name);
 
-        public void FinalizeExtension() => inner.FinalizeExtension();
+        public void FinalizeExtension() {}
 
         public abstract IScopedContainer CreateScope();
 
