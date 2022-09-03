@@ -27,6 +27,9 @@ namespace WDE.CMMySqlDatabase.Models
         [Column(Name = "equipment_id")]
         public int EquipmentId { get; set; }
 
+        [Column(Name = "modelid")]
+        public uint Model { get; set; }
+
         [Column(Name = "MovementType")]
         public MovementType MovementType { get; set; }
         

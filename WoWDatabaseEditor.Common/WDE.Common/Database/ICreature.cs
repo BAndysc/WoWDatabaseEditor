@@ -10,6 +10,7 @@ namespace WDE.Common.Database
         int? PhaseId { get; }
         int? PhaseGroup { get; }
         int EquipmentId { get; }
+        uint Model { get; }
         MovementType MovementType { get; }
         float WanderDistance { get; }
         

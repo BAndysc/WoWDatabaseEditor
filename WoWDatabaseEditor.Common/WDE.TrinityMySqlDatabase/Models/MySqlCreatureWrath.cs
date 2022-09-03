@@ -24,6 +24,9 @@ namespace WDE.TrinityMySqlDatabase.Models
         
         public int? PhaseGroup => null;
 
+        [Column(Name = "modelid")]
+        public uint Model { get; set; }
+        
         [Column(Name = "equipment_id")]
         public int EquipmentId { get; set; }
         
@@ -69,6 +72,9 @@ namespace WDE.TrinityMySqlDatabase.Models
         
         public int? PhaseGroup => null;
 
+        [Column(Name = "modelid")]
+        public uint Model { get; set; }
+        
         [Column(Name = "equipment_id")]
         public int EquipmentId { get; set; }
         
@@ -115,6 +121,9 @@ namespace WDE.TrinityMySqlDatabase.Models
         [Column(Name = "PhaseGroup")]
         public int? PhaseGroup { get; set; }
 
+        [Column(Name = "modelid")]
+        public uint Model { get; set; }
+        
         [Column(Name = "equipment_id")]
         public int EquipmentId { get; set; }
         
@@ -161,6 +170,9 @@ namespace WDE.TrinityMySqlDatabase.Models
         [Column(Name = "PhaseGroup")]
         public int? PhaseGroup { get; set; }
 
+        [Column(Name = "modelid")]
+        public uint Model { get; set; }
+        
         [Column(Name = "equipment_id")]
         public int EquipmentId { get; set; }
         
