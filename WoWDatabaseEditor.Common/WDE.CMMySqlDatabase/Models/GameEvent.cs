@@ -27,7 +27,7 @@ namespace WDE.CMMySqlDatabase.Models
         /// This event starts only if defined LinkedTo event is started
         /// </summary>
         [Column("linkedTo")] public uint LinkedTo { get; set; } // mediumint(8) unsigned
-        [Column("EventGroup")] public uint EventGroup { get; set; } // mediumint(8) unsigned
+        //[Column("EventGroup")] public uint EventGroup { get; set; } // mediumint(8) unsigned
         /// <summary>
         /// Description of the event displayed in console
         /// </summary>

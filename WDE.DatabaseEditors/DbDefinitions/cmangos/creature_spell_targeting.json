@@ -1,7 +1,7 @@
 {
   "id": "creature_spell_targeting",
   "compatibility": [
-    "CMaNGOS-WoTLK"
+    "CMaNGOS-WoTLK", "CMaNGOS-TBC", "CMaNGOS-Classic"
   ],
   "name": "Creature Spell Targeting",
   "description": "Spell targeting data",

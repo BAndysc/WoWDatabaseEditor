@@ -178,6 +178,8 @@ public class Program
             return DatabaseTester.Program.Test<WDE.CMMySqlDatabase.WorldDatabaseProvider>(args, new CMangosWrathVersion());
         else if (args[^1] == "CMaNGOS-TBC")
             return DatabaseTester.Program.Test<WDE.CMMySqlDatabase.WorldDatabaseProvider>(args, new CMangosTbcVersion());
+        else if (args[^1] == "CMaNGOS-Classic")
+            return DatabaseTester.Program.Test<WDE.CMMySqlDatabase.WorldDatabaseProvider>(args, new CMangosClassicVersion());
         return Test<WorldDatabaseProvider>(args, new AzerothCoreVersion(), new TrinityCataclysmVersion(), new TrinityMasterVersion(), new TrinityWrathVersion());
     }
 }

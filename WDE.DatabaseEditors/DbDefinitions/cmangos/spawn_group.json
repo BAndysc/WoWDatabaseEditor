@@ -1,7 +1,7 @@
 {
   "id": "spawn_group",
   "compatibility": [
-    "CMaNGOS-WoTLK"
+    "CMaNGOS-WoTLK", "CMaNGOS-TBC", "CMaNGOS-Classic"
   ],
   "name": "Spawn Group (template)",
   "single_solution_name": "Spawn Group Table",

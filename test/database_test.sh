@@ -5,12 +5,13 @@ PORT=$2
 HOST="$1"
 MYSQL_PATH="$5"
 
-URLs=( 'https://github.com/TrinityCore/TrinityCore' 'https://github.com/TrinityCore/TrinityCore' 'https://github.com/The-Cataclysm-Preservation-Project/TrinityCore' 'https://github.com/azerothcore/azerothcore-wotlk' 'https://github.com/cmangos/wotlk-db' 'https://github.com/cmangos/tbc-db' )
-BRANCHEs=( 'master' '3.3.5' 'master' 'master' 'master' 'master' )
-UPDATEs=( 'master' '3.3.5' '4.3.4' '' '' '' )
-COREs=( 'TrinityMaster' 'TrinityWrath' 'TrinityCata' 'Azeroth' 'CMaNGOS-WoTLK' 'CMaNGOS-TBC' )
-TYPEs=( 'TC' 'TC' 'TC' 'TC' 'MANGOS-335' 'MANGOS-243' )
-SKIP=( false false false true false false )
+URLs=( 'https://github.com/TrinityCore/TrinityCore' 'https://github.com/TrinityCore/TrinityCore' 'https://github.com/The-Cataclysm-Preservation-Project/TrinityCore' 'https://github.com/azerothcore/azerothcore-wotlk' 'https://github.com/cmangos/wotlk-db' 'https://github.com/cmangos/tbc-db' 'https://github.com/cmangos/classic-db' )
+BRANCHEs=( 'master' '3.3.5' 'master' 'master' 'master' 'master' 'master' )
+UPDATEs=( 'master' '3.3.5' '4.3.4' '' '' '' '' )
+COREs=( 'TrinityMaster' 'TrinityWrath' 'TrinityCata' 'Azeroth' 'CMaNGOS-WoTLK' 'CMaNGOS-TBC' 'CMaNGOS-Classic' )
+MANGOSFILEs=( '' '' '' '' 'wotlk' 'tbc' 'classic' )
+TYPEs=( 'TC' 'TC' 'TC' 'TC' 'CMANGOS' 'CMANGOS' 'CMANGOS' )
+SKIP=( false false false true false false false )
 
 for index in ${!URLs[*]}; do
 
@@ -31,22 +32,14 @@ for index in ${!URLs[*]}; do
     ;
     cd Repo
 
-    if [ "${TYPEs[$index]}" = "MANGOS-335" ]; then
-        rm -rf wotlk-world-db.zip
-        rm -rf wotlkmangos.sql
-        curl -L ${URLs[$index]}/releases/download/latest/wotlk-world-db.zip -o wotlk-world-db.zip
-        7z e wotlk-world-db.zip
-        rm -rf wotlk-world-db.zip
-        "${MYSQL_PATH}" -u ${USER} -p${PASSWORD} temp_CI < wotlkmangos.sql
-        rm -rf wotlkmangos.sql
-    elif [ "${TYPEs[$index]}" = "MANGOS-243" ]; then
-        rm -rf tbc-world-db.zip
-        rm -rf tbcmangos.sql
-        curl -L ${URLs[$index]}/releases/download/latest/tbc-world-db.zip -o tbc-world-db.zip
-        7z e tbc-world-db.zip
-        rm -rf tbc-world-db.zip
-        "${MYSQL_PATH}" -u ${USER} -p${PASSWORD} temp_CI < tbcmangos.sql
-        rm -rf tbcmangos.sql
+    if [ "${TYPEs[$index]}" = "CMANGOS" ]; then
+        rm -rf ${MANGOSFILEs[$index]}-world-db.zip
+        rm -rf ${MANGOSFILEs[$index]}mangos.sql
+        curl -L ${URLs[$index]}/releases/download/latest/${MANGOSFILEs[$index]}-world-db.zip -o ${MANGOSFILEs[$index]}-world-db.zip
+        7z e ${MANGOSFILEs[$index]}-world-db.zip
+        rm -rf ${MANGOSFILEs[$index]}-world-db.zip
+        "${MYSQL_PATH}" -u ${USER} -p${PASSWORD} temp_CI < ${MANGOSFILEs[$index]}mangos.sql
+        rm -rf ${MANGOSFILEs[$index]}mangos.sql
     else
         git sparse-checkout set sql/base/dev
         git sparse-checkout add sql/updates/world/${UPDATEs[$index]}

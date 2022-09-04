@@ -1,7 +1,7 @@
 {
   "id": "creature_spell_list_entry",
   "compatibility": [
-    "CMaNGOS-WoTLK"
+    "CMaNGOS-WoTLK", "CMaNGOS-TBC", "CMaNGOS-Classic"
   ],
   "name": "Creature Spell List Entry",
   "description": "Holds basic chance of a ai to perform either a SPELL_LIST_FLAG_SUPPORT_ACTION or SPELL_LIST_FLAG_RANGED_ACTION.",

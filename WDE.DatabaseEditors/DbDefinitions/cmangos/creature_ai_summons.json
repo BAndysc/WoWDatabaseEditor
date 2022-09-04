@@ -1,7 +1,7 @@
 {
   "id": "creature_ai_summons",
   "compatibility": [
-    "CMaNGOS-WoTLK"
+    "CMaNGOS-WoTLK", "CMaNGOS-TBC", "CMaNGOS-Classic"
   ],
   "name": "Creature Ai Summons",
   "description": "Positions for summons in Event AI",

@@ -1,7 +1,7 @@
 {
   "id": "dbscript_random_templates",
   "compatibility": [
-    "CMaNGOS-WoTLK"
+    "CMaNGOS-WoTLK", "CMaNGOS-TBC", "CMaNGOS-Classic"
   ],
   "name": "Db script Random Templates",
   "description": "Random templates used to define random texts or relay script IDs",

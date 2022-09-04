@@ -22,6 +22,6 @@ namespace WDE.CMMySqlDatabase.Models
         [Column("SpeedRun"                                 )] public float SpeedRun           { get; set; } // float
         [Column("gender"                                   )] public uint  Gender             { get; set; } // tinyint(3) unsigned
         [Column("modelid_other_gender"                     )] public uint  ModelidOtherGender { get; set; } // mediumint(8) unsigned
-        [Column("modelid_alternative"                      )] public uint  ModelidAlternative { get; set; } // mediumint(8) unsigned
+        //[Column("modelid_alternative"                      )] public uint  ModelidAlternative { get; set; } // mediumint(8) unsigned
     }
 }

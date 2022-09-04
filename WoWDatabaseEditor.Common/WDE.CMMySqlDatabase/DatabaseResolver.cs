@@ -17,7 +17,8 @@ public class DatabaseResolver
 
     public DatabaseResolver(ICurrentCoreVersion core,
         Lazy<DatabaseProviderWoTLK> cmWrath,
-        Lazy<DatabaseProviderTBC> cmTbc)
+        Lazy<DatabaseProviderTBC> cmTbc,
+        Lazy<DatabaseProviderClassic> cmClassic)
     {
         switch (core.Current.Tag)
         {
@@ -32,6 +33,14 @@ public class DatabaseResolver
             case "CMaNGOS-TBC":
             {
                 var db= cmTbc.Value;
+                auth = db;
+                world = db;
+                mangosWorld = db;
+                break;
+            }
+            case "CMaNGOS-Classic":
+            {
+                var db= cmClassic.Value;
                 auth = db;
                 world = db;
                 mangosWorld = db;
