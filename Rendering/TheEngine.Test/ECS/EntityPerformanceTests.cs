@@ -108,7 +108,7 @@ namespace TheEngine.Test.ECS
             
             Assert.AreEqual(3, entityManager.GetComponent<Position>(new Entity(1000, 1)).position.X);
             Assert.AreEqual(3, oldSchool[1000].position.X);
-            Assert.IsTrue(entitySpeed < oldSchoolSpeed);
+            Assert.IsTrue(entitySpeed < oldSchoolSpeed * 1.2f);
             Console.WriteLine("ECS: " + entitySpeed);
             Console.WriteLine("OOP: " + oldSchoolSpeed);
         }

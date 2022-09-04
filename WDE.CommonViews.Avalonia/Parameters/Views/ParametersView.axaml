@@ -13,11 +13,17 @@
             <ColumnDefinition Width="5" />
             <ColumnDefinition Width="2*" />
         </Grid.ColumnDefinitions>
-        <ListBox BorderBrush="Transparent" Items="{CompiledBinding Parameters}" SelectedItem="{CompiledBinding Selected}" VirtualizationMode="None" />
+        <DockPanel>
+            <TextBox DockPanel.Dock="Top" Watermark="Search" Text="{CompiledBinding SearchText}" />
+            <ListBox BorderBrush="Transparent" Items="{CompiledBinding FilteredParameters}" SelectedItem="{CompiledBinding Selected}" VirtualizationMode="None" />
+        </DockPanel>
         <GridSplitter Classes="vertical" Grid.Column="1" Width="5" HorizontalAlignment="Stretch" />
         <Grid Grid.Column="2" IsEnabled="{CompiledBinding HasSelected}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="5" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="5" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition />
@@ -26,13 +32,13 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
-            <Label Content="{CompiledBinding Selected.Key}" Grid.ColumnSpan="2" />
-            <Label Content="Name" Grid.Row="1" />
-            <Label Content="Is flag" Grid.Row="2" />
-            <TextBox Text="{CompiledBinding Selected.Name}" Grid.Row="1" Grid.Column="1" />
-            <CheckBox IsChecked="{CompiledBinding Selected.IsFlag}" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Left"
+            <TextBlock Text="{CompiledBinding Selected.Key}" FontSize="20" FontWeight="Bold" Grid.ColumnSpan="2" />
+            <TextBlock Text="Name" Grid.Row="2" VerticalAlignment="Center" />
+            <TextBlock Text="Is flag" Grid.Row="4" VerticalAlignment="Center" />
+            <TextBox IsReadOnly="True" Text="{CompiledBinding Selected.Name}" Grid.Row="2" Grid.Column="1" />
+            <CheckBox IsChecked="{CompiledBinding Selected.IsFlag}" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Left"
                       VerticalAlignment="Top" IsHitTestVisible="False" />
-            <controls:GridView Items="{CompiledBinding Selected.Values}"  Grid.ColumnSpan="2" Grid.Row="3">
+            <controls:GridView Items="{CompiledBinding Selected.Values}"  Grid.ColumnSpan="2" Grid.Row="5">
                 <controls:GridView.Columns>
                     <controls:GridColumnDefinition Name="Key" PreferedWidth="70" Property="Key" />
                     <controls:GridColumnDefinition Name="Name" PreferedWidth="120" Property="Value.Name" />

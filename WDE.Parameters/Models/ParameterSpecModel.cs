@@ -6,15 +6,15 @@ using WDE.Common.Parameters;
 namespace WDE.Parameters.Models
 {
     [ExcludeFromCodeCoverage]
-    public struct ParameterSpecModel
+    public class ParameterSpecModel
     {
         [JsonProperty(PropertyName = "isflag")]
         public bool IsFlag { get; set; }
 
-        public string Key { get; set; }
+        public string Key { get; set; } = "";
 
         [JsonProperty(PropertyName = "name")]
-        public string Name { get; set; }
+        public string Name { get; set; } = "";
 
         [JsonProperty(PropertyName = "inmenu")]
         public bool InMenu { get; set; }
@@ -23,7 +23,7 @@ namespace WDE.Parameters.Models
         public QuickAccessMode QuickAccess { get; set; }
 
         [JsonProperty(PropertyName = "prefix")]
-        public string Prefix { get; set; }
+        public string Prefix { get; set; } = "";
 
         [JsonProperty(PropertyName = "values")]
         [JsonConverter(typeof(ParameterValuesJsonConverter))]
