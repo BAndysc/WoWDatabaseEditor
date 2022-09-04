@@ -32,6 +32,7 @@ namespace WDE.Parameters.ViewModels
         {
             foreach (string key in factory.GetKeys())
                 Parameters.Add(factory.GetDefinition(key));
+            Parameters.Sort((a, b) => String.Compare(a!.Name, b!.Name, StringComparison.Ordinal));
             if (Parameters.Count > 0)
                 Selected = Parameters[0];
             
@@ -56,7 +57,7 @@ namespace WDE.Parameters.ViewModels
             var indices = await Task.Run(() =>
             {
                 List<int> result = new();
-                var results = Process.ExtractSorted(text, Parameters.Select(x => x.Name), x => x.ToLowerInvariant(), null, 60);
+                var results = Process.ExtractAll(text, Parameters.Select(x => x.Name), x => x.ToLowerInvariant(), null, 75);
                 foreach (var r in results)
                     result.Add(r.Index);
                 return result;
