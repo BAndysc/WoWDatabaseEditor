@@ -25,16 +25,16 @@ namespace WDE.MPQ.Parsing
 
         [FieldOffset(0x0c)] public ushort FormatVersion;
 
-        [FieldOffset(0x0e)] public byte SectorSizeShift;
+        [FieldOffset(0x0e)] public byte SectorSizeShift; // wBlockSize
 
-        [FieldOffset(0x10)] public uint HashTableOffset;
+        [FieldOffset(0x10)] public uint HashTableOffset; // dwHashTablePos
 
-        [FieldOffset(0x14)] public uint BlockTableOffset;
+        [FieldOffset(0x14)] public uint BlockTableOffset; // dwBlockTablePos
 
-        [FieldOffset(0x18)] public uint HashTableEntryCount;
-
-        [FieldOffset(0x1c)] public uint BlockTableEntryCount;
-
+        [FieldOffset(0x18)] public uint HashTableEntryCount; // dwHashTableSize
+        
+        [FieldOffset(0x1c)] public uint BlockTableEntryCount; // dwBlockTableSize
+        // type 0 ends there
         [FieldOffset(0x20)] public ulong ExtendedBlockTableOffset;
 
         [FieldOffset(0x28)] public ushort HashTableOffsetHigh;
