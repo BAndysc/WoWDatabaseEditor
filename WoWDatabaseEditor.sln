@@ -220,6 +220,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.EventAiEditor.Avalonia"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.MangosEventAiEditor", "WDE.MangosEventAiEditor\WDE.MangosEventAiEditor.csproj", "{0878E86D-A238-492C-BEF0-A580DEC5C466}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.QueryGenerators", "Modules\WDE.QueryGenerators\WDE.QueryGenerators.csproj", "{8493EDDD-817B-452B-8791-E311370CCE20}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -606,6 +608,10 @@ Global
 		{0878E86D-A238-492C-BEF0-A580DEC5C466}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0878E86D-A238-492C-BEF0-A580DEC5C466}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0878E86D-A238-492C-BEF0-A580DEC5C466}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8493EDDD-817B-452B-8791-E311370CCE20}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8493EDDD-817B-452B-8791-E311370CCE20}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8493EDDD-817B-452B-8791-E311370CCE20}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8493EDDD-817B-452B-8791-E311370CCE20}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -690,6 +696,7 @@ Global
 		{987DE6EA-C357-45A0-BBF8-11590E76C494} = {106EEB05-E9AB-453A-ADD0-96505F405D76}
 		{48F03E3B-13D1-4E81-8F42-47CB458C09F7} = {106EEB05-E9AB-453A-ADD0-96505F405D76}
 		{0878E86D-A238-492C-BEF0-A580DEC5C466} = {106EEB05-E9AB-453A-ADD0-96505F405D76}
+		{8493EDDD-817B-452B-8791-E311370CCE20} = {4C553308-1140-42F2-B99C-90402248A983}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3E63D4A5-8159-4344-B556-1E1D8D63DA99}

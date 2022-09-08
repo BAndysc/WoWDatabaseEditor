@@ -1,3 +1,4 @@
+#!/bin/bash
 set -e
 USER="$3"
 PASSWORD="$4"

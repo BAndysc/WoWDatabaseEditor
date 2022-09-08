@@ -11,8 +11,8 @@ namespace WDE.Common.Database
     {
         bool IsConnected { get; }
         
-        Task ExecuteSql(IQuery query);
-        Task ExecuteSql(string query);
+        Task ExecuteSql(IQuery query, bool rollback = false);
+        Task ExecuteSql(string query, bool rollback = false);
         Task<IList<Dictionary<string, (Type, object)>>> ExecuteSelectSql(string query);
         Task<IList<string>> GetTables();
         Task<IList<MySqlDatabaseColumn>> GetTableColumns(string table);

@@ -148,12 +148,12 @@ namespace WDE.MySqlDatabaseCommon.Database
             return list;
         }
 
-        public Task ExecuteSql(IQuery query)
+        public Task ExecuteSql(IQuery query, bool rollback)
         {
-            return ExecuteSql(query.QueryString);
+            return ExecuteSql(query.QueryString, rollback);
         }
         
-        public async Task ExecuteSql(string query)
+        public async Task ExecuteSql(string query, bool rollback)
         {
             if (string.IsNullOrWhiteSpace(query) || !IsConnected)
                 return;
@@ -178,7 +178,10 @@ namespace WDE.MySqlDatabaseCommon.Database
             {
                 MySqlCommand cmd = new(query, conn, transaction);
                 await cmd.ExecuteNonQueryAsync();
-                await transaction.CommitAsync();
+                if (rollback)
+                    await transaction.RollbackAsync();
+                else
+                    await transaction.CommitAsync();
             }
             catch (MySqlConnector.MySqlException e)
             {

@@ -12,6 +12,7 @@
     </PropertyGroup>
     
     <ItemGroup>
+      <ProjectReference Include="..\Modules\WDE.QueryGenerators\WDE.QueryGenerators.csproj" />
       <ProjectReference Include="..\WDE.AzerothCore\WDE.AzerothCore.csproj" />
       <ProjectReference Include="..\WDE.CMaNGOS\WDE.CMaNGOS.csproj" />
       <ProjectReference Include="..\WDE.DatabaseEditors\WDE.DatabaseEditors.csproj" />

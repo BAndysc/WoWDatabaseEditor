@@ -20,6 +20,7 @@ using WDE.DatabaseEditors.Loaders;
 using WDE.MySqlDatabaseCommon.Database;
 using WDE.MySqlDatabaseCommon.Providers;
 using WDE.MySqlDatabaseCommon.Services;
+using WDE.QueryGenerators;
 using WDE.SqlInterpreter;
 using WDE.Trinity;
 using WDE.TrinityMySqlDatabase;
@@ -54,7 +55,7 @@ public class Program
         }
     }
     
-    public static int Test<T>(string[] args, params ICoreVersion[] cores) where T : class, IDatabaseProvider
+    public static async Task<int> Test<T>(string[] args, params ICoreVersion[] cores) where T : class, IDatabaseProvider
     {
         if (args.Length < 6)
         {
@@ -84,7 +85,7 @@ public class Program
         var connString = $"Server={dbSettings.Settings.Host};Port={dbSettings.Settings.Port ?? 3306};Database={dbSettings.Settings.Database};Uid={dbSettings.Settings.User};Pwd={dbSettings.Settings.Password};AllowUserVariables=True";
         databaseConn.ConnectionString.ReturnsForAnyArgs(connString);
         
-        var ioc = new UnityContainer();
+        var ioc = new UnityContainer().AddExtension(new Diagnostic());
         ioc.RegisterInstance<IContainerProvider>(new UnityContainerProvider(ioc));
         ioc.RegisterInstance<IMessageBoxService>(new ConsoleMessageBoxService());
         ioc.RegisterInstance<IWorldDatabaseSettingsProvider>(dbSettings);
@@ -113,13 +114,38 @@ public class Program
         var worldDb = ioc.Resolve<T>();
         ioc.RegisterInstance<IDatabaseProvider>(worldDb);
 
+        var module = new QueryGeneratorModule();
+        module.InitializeCore(core.Tag);
+        module.RegisterTypes(new UnityContainerRegistry(ioc));
+
         var allDefinitions = ioc.Resolve<ITableDefinitionProvider>().Definitions;
         var loader = ioc.Resolve<IDatabaseTableDataProvider>();
         foreach (var definition in allDefinitions)
         {
             Console.WriteLine("Table editor: " + definition.TableName);
-            var task = loader.Load(definition.Id, null, null, null, new[]{new DatabaseKey(definition.GroupByKeys.Select(x => 1L))});
-            task.Wait();
+            await loader.Load(definition.Id, null, null, null, new[]{new DatabaseKey(definition.GroupByKeys.Select(x => 1L))});
+        }
+
+        var tester = ioc.Resolve<QueryGeneratorTester>();
+        var executor = ioc.Resolve<IMySqlExecutor>();
+        foreach (var tableName in tester.Tables().Where(x => x != null))
+        {
+            await executor.ExecuteSql($"ALTER TABLE `{tableName}` ROW_FORMAT = DEFAULT");
+            await executor.ExecuteSql($"ALTER TABLE `{tableName}` ENGINE = InnoDB");
+        }
+
+        foreach (var query in tester.Generate().Where(x => x != null))
+        {
+            try
+            {
+                await executor.ExecuteSql(query!);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error: " + e.Message);
+                Console.WriteLine(query);
+                return -1;
+            }
         }
         
         var allMethods = typeof(T).GetMethods();
@@ -145,7 +171,7 @@ public class Program
             }
 
             if (ret is Task t)
-                t.Wait();
+                await t;
         }
 
         // methods with > 1 parameters
@@ -164,7 +190,7 @@ public class Program
             Directory.SetCurrentDirectory(exePath.Directory.FullName);
     }
     
-    public static int Main(string[] args)
+    public static async Task<int> Main(string[] args)
     {
         FixCurrentDirectory();
         
@@ -175,11 +201,11 @@ public class Program
         }
 
         if (args[^1] == "CMaNGOS-WoTLK")
-            return DatabaseTester.Program.Test<WDE.CMMySqlDatabase.WorldDatabaseProvider>(args, new CMangosWrathVersion());
+            return await DatabaseTester.Program.Test<WDE.CMMySqlDatabase.WorldDatabaseProvider>(args, new CMangosWrathVersion());
         else if (args[^1] == "CMaNGOS-TBC")
-            return DatabaseTester.Program.Test<WDE.CMMySqlDatabase.WorldDatabaseProvider>(args, new CMangosTbcVersion());
+            return await DatabaseTester.Program.Test<WDE.CMMySqlDatabase.WorldDatabaseProvider>(args, new CMangosTbcVersion());
         else if (args[^1] == "CMaNGOS-Classic")
-            return DatabaseTester.Program.Test<WDE.CMMySqlDatabase.WorldDatabaseProvider>(args, new CMangosClassicVersion());
-        return Test<WorldDatabaseProvider>(args, new AzerothCoreVersion(), new TrinityCataclysmVersion(), new TrinityMasterVersion(), new TrinityWrathVersion());
+            return await DatabaseTester.Program.Test<WDE.CMMySqlDatabase.WorldDatabaseProvider>(args, new CMangosClassicVersion());
+        return await Test<WorldDatabaseProvider>(args, new AzerothCoreVersion(), new TrinityCataclysmVersion(), new TrinityMasterVersion(), new TrinityWrathVersion());
     }
 }
