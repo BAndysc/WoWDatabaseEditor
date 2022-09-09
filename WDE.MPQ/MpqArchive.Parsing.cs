@@ -70,6 +70,10 @@ namespace WDE.MPQ
 
             if (ArchiveHeader.FormatVersion != 0 && ArchiveHeader.FormatVersion != 1 && ArchiveHeader.FormatVersion != 3)
                 throw new MpqParsingException("Invalid MPQ format. Must be '0', '1' or '3'.");
+
+            // Currently ExtendedBlockTableOffset is not used. Format 1+ only
+            if (ArchiveHeader.FormatVersion > 0 && ArchiveHeader.ExtendedBlockTableOffset > 0)
+                throw new MpqParsingException("MPQ uses extended table, this is currently not supported, report this to the developers.");
         }
 
         private IEnumerable<T> ReadTableEntries<T>(string name, uint tableOffset, uint numberOfEntries)
