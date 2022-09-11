@@ -20,6 +20,11 @@
             return binaryReader.ReadUInt32();
         }
 
+        public ulong ReadUInt64()
+        {
+            return binaryReader.ReadUInt64();
+        }
+
         public short ReadInt16()
         {
             return binaryReader.ReadInt16();

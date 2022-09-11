@@ -53,6 +53,12 @@ namespace WDE.MpqReader.Readers
             return reader.ReadUInt32();
         }
 
+        public ulong ReadUInt64()
+        {
+            AssertCanRead(8);
+            return reader.ReadUInt64();
+        }
+
         public float ReadFloat()
         {
             AssertCanRead(4);
