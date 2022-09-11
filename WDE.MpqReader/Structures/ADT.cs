@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
 using TheMaths;
 using WDE.MpqReader.Readers;
-using static WDE.MpqReader.Structures.MH2OLiquidInstance;
 
 namespace WDE.MpqReader.Structures
 {
