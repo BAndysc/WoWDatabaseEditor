@@ -44,6 +44,15 @@ namespace WDE.MpqReader.Readers
             return res;
         }
 
+        public ulong ReadUInt64()
+        {
+            // done by titi, no idea if this is correct
+            ulong res = (ulong)(bytes[currentPos] | (bytes[currentPos + 1] << 8) | (bytes[currentPos + 2] << 16) | (bytes[currentPos + 3] << 24)
+                            | (bytes[currentPos + 4] << 32) | (bytes[currentPos + 5] << 40) | (bytes[currentPos + 6] << 48) | (bytes[currentPos + 7] << 56));
+            currentPos += 8;
+            return res;
+        }
+
         public MemoryBinaryReader(byte[] bytes, int startPos, int maxLength)
         {
             this.bytes = bytes;

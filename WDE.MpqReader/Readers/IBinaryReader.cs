@@ -10,6 +10,7 @@
         float ReadFloat();
         bool IsFinished();
         byte ReadByte();
+        ulong ReadUInt64();
         int Offset { get; set; }
         int Size { get; }
     }
