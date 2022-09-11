@@ -346,8 +346,8 @@ namespace WDE.MpqReader.Structures
         public readonly byte Y_Offset { get; }
         public readonly byte Width { get; }
         public readonly byte Height { get; }
-        public readonly int OffsetExistsBitmap { get; }
-        public readonly int OffsetVertexData { get; }
+        private readonly int OffsetExistsBitmap { get; }
+        private readonly int OffsetVertexData { get; }
 
         // TODO : struct union ?
         public readonly LiquidVertexFormat0? Format0VertexList;
