@@ -1,8 +1,7 @@
 ﻿using System.Diagnostics;
-using System.Threading.Tasks;
 using TheMaths;
-using WDE.MpqReader.DBC;
 using WDE.MpqReader.Readers;
+using static WDE.MpqReader.Structures.MH2OLiquidInstance;
 
 namespace WDE.MpqReader.Structures
 {
@@ -304,6 +303,7 @@ namespace WDE.MpqReader.Structures
         // private int OffsetInstances { get; }
         // private uint LayerCount { get; }
         // private int OffsetAttributes { get; }
+        public bool IsActive { get; } = false;
         public MH2OLiquidInstance[]? LiquidInstances; // array size = layerCount
         public MH2OChunkAttributes[]? ChunkAttributes; // is it an array too ?
 
@@ -313,16 +313,25 @@ namespace WDE.MpqReader.Structures
             var LayerCount = reader.ReadUInt32();
             var OffsetAttributes = reader.ReadInt32();
 
-            if (OffsetInstances > 0)
+            if (LayerCount > 0)
             {
-                reader.Offset = OffsetInstances;
-                LiquidInstances = new MH2OLiquidInstance[LayerCount];
-            }
+                IsActive = true;
 
-            if (OffsetAttributes > 0)
-            {
-                reader.Offset = OffsetAttributes;
-                ChunkAttributes = new MH2OChunkAttributes[1]; // not 1 per layer ?
+                if (OffsetInstances > 0)
+                {
+                    reader.Offset = OffsetInstances;
+                    LiquidInstances = new MH2OLiquidInstance[LayerCount];
+                    for (int i = 0; i < LayerCount; i++)
+                        LiquidInstances[i] = new MH2OLiquidInstance(reader);
+                }
+
+                if (OffsetAttributes > 0)
+                {
+                    reader.Offset = OffsetAttributes;
+                    ChunkAttributes = new MH2OChunkAttributes[1]; // not 1 per layer ?
+                    for (int i = 0; i < LayerCount; i++)
+                        ChunkAttributes[i] = new MH2OChunkAttributes(reader);
+                }
             }
 
         }
@@ -342,10 +351,10 @@ namespace WDE.MpqReader.Structures
         public readonly int OffsetVertexData { get; }
 
         // TODO : struct union ?
-        public readonly LiquidVertexFormat0 Format0VertexList;
-        public readonly LiquidVertexFormat1 Format1VertexList;
-        public readonly LiquidVertexFormat2 Format2VertexList;
-        public readonly LiquidVertexFormat3 Format3VertexList;
+        public readonly LiquidVertexFormat0? Format0VertexList;
+        public readonly LiquidVertexFormat1? Format1VertexList;
+        public readonly LiquidVertexFormat2? Format2VertexList;
+        public readonly LiquidVertexFormat3? Format3VertexList;
 
         public readonly byte[]? RenderBitMap; // not all tiles in the instances need to be filled. always (width * height + 7) / 8 bytes. offset can be 0 for all-exist
 
@@ -524,6 +533,7 @@ namespace WDE.MpqReader.Structures
         public M2PlacementData[] M2Objects { get; }
         public SMChunkInfo[] ChunkInfo { get; } = new SMChunkInfo[16 * 16];
         public AdtChunk[] Chunks { get; } = new AdtChunk[16 * 16];
+        public bool HasLiquid { get; } = false;
         public MH2OLiquidChunk[] MH2OLiquidChunks { get; } = new MH2OLiquidChunk[16 * 16];
 
         public ADT(IBinaryReader reader, WdtFlags? wdtFlags)
@@ -564,14 +574,18 @@ namespace WDE.MpqReader.Structures
                     M2Objects = ReadM2PlacementData(partialReader, m2Ids);
                 else if (chunkName == "MH2O")
                 {
-                    MH2OLiquidChunks[chunkId++] = new MH2OLiquidChunk(partialReader);
+                    HasLiquid = true;
+                    for (int i = 0; i < 16 * 16; ++i)
+                    {
+                        MH2OLiquidChunks[i] = new MH2OLiquidChunk(partialReader);
+                        partialReader.Offset = 12 * i;
+                    }
+                    // MH2OLiquidChunks[LiquidChunkId++] = new MH2OLiquidChunk(partialReader);
                 }
-
                 else if (chunkName == "MCNK")
                 {
-                    chunkId = 0;
-                    Debug.Assert(ChunkInfo[chunkId].Offset == offset - 8);
-                    Debug.Assert(ChunkInfo[chunkId].Size == size + 8);
+                    // Debug.Assert(ChunkInfo[chunkId].Offset == offset - 8);
+                    // Debug.Assert(ChunkInfo[chunkId].Size == size + 8);
                     Chunks[chunkId++] = new AdtChunk(partialReader, wdtFlags);
                 }
             
