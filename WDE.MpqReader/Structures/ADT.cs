@@ -350,10 +350,10 @@ namespace WDE.MpqReader.Structures
         private readonly int OffsetVertexData { get; }
 
         // TODO : struct union ?
-        public readonly LiquidVertexFormat0? Format0VertexList;
-        public readonly LiquidVertexFormat1? Format1VertexList;
-        public readonly LiquidVertexFormat2? Format2VertexList;
-        public readonly LiquidVertexFormat3? Format3VertexList;
+        public readonly LiquidVertexFormat0 Format0VertexList;
+        public readonly LiquidVertexFormat1 Format1VertexList;
+        public readonly LiquidVertexFormat2 Format2VertexList;
+        public readonly LiquidVertexFormat3 Format3VertexList;
 
         public readonly byte[]? RenderBitMap; // not all tiles in the instances need to be filled. always (width * height + 7) / 8 bytes. offset can be 0 for all-exist
 
