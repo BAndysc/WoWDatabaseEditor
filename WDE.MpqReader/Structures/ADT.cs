@@ -1,6 +1,8 @@
 ﻿using System.Diagnostics;
 using TheMaths;
 using WDE.MpqReader.Readers;
+using System.Collections;
+using Newtonsoft.Json.Linq;
 
 namespace WDE.MpqReader.Structures
 {
@@ -321,7 +323,9 @@ namespace WDE.MpqReader.Structures
                     reader.Offset = OffsetInstances;
                     LiquidInstances = new MH2OLiquidInstance[LayerCount];
                     for (int i = 0; i < LayerCount; i++)
+                    {
                         LiquidInstances[i] = new MH2OLiquidInstance(reader);
+                    }
                 }
 
                 if (OffsetAttributes > 0)
@@ -348,8 +352,8 @@ namespace WDE.MpqReader.Structures
         public readonly byte Height { get; }
         private readonly int OffsetExistsBitmap { get; }
         private readonly int OffsetVertexData { get; }
-
-        public readonly byte[]? RenderBitMap; // not all tiles in the instances need to be filled. always (width * height + 7) / 8 bytes. offset can be 0 for all-exist
+        // public readonly byte[]? RenderBitMap; // not all tiles in the instances need to be filled. always (width * height + 7) / 8 bytes. offset can be 0 for all-exist
+        public readonly BitArray RenderBitArray;
 
         // public readonly float[] HeightMap = new float[9 * 9];
         public readonly Vector3[] Vertices = new Vector3[9 * 9];
@@ -369,17 +373,20 @@ namespace WDE.MpqReader.Structures
             OffsetExistsBitmap = reader.ReadInt32();
             OffsetVertexData = reader.ReadInt32();
 
-            if (OffsetExistsBitmap > 0) // TODO
+            var oldOffset = reader.Offset;
+
+            if (OffsetExistsBitmap > 0) 
             {
                 var bytecount = (Width * Height + 7) / 8;
-                reader.Offset = OffsetExistsBitmap;
 
-                RenderBitMap = new byte[bytecount];
-
+                reader.Offset = OffsetExistsBitmap; // TODO: apparently sometimes it is out of the limited reader's range
+                var RenderBitMap = new byte[bytecount];
                 for (int i = 0; i < bytecount; i++)
-                    RenderBitMap[i] = reader.ReadByte();
-            }
+                    RenderBitMap[i] = reader.ReadByte(); // old
 
+                RenderBitArray = new BitArray(RenderBitMap);
+
+            }
 
             if (LiquidVertexFormat > 3) // default to 0 if unknown format
                     LiquidVertexFormat = 0;
@@ -444,6 +451,8 @@ namespace WDE.MpqReader.Structures
             {
                 // No vertex data. debug message here
             }
+
+            reader.Offset = oldOffset; // reset offset position, required for additional layers.
 
         }
 

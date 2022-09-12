@@ -569,12 +569,15 @@ namespace WDE.MapRenderer.Managers
                                     // for (int tileX = LiquidInstance.X_Offset; tileX < LiquidInstance.Width; ++tileX) // X
                                     for (int tileX = LiquidInstance.X_Offset; tileX <= LiquidInstance.Width + LiquidInstance.X_Offset; ++tileX) // X
                                     {
+                                        bool renderState = true;
                                         // check if tile should be rendered
-                                        // if (LiquidInstance.RenderBitMap != null)
-                                        // {
-                                        //     // TODO
-                                        //     // var renderState = LiquidInstance.RenderBitMap[tileX + (tileY * LiquidInstance.Width)]; // maybe tileY + tileX * Height
-                                        // }
+                                        if (LiquidInstance.RenderBitArray != null)
+                                        {
+                                            renderState = LiquidInstance.RenderBitArray[tileX + tileY * LiquidInstance.Width];
+                                        }
+
+                                        if (renderState == false)
+                                            continue;
 
                                         var vertexindex = tileY * 9 + tileX;
 
