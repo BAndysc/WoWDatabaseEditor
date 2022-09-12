@@ -14,6 +14,7 @@ using TheMaths;
 using WDE.MapRenderer.Managers.Entities;
 using WDE.MapRenderer.StaticData;
 using WDE.MpqReader;
+using WDE.MpqReader.DBC;
 using WDE.MpqReader.Readers;
 using WDE.MpqReader.Structures;
 
@@ -542,12 +543,10 @@ namespace WDE.MapRenderer.Managers
                     for (int chunkX = 0; chunkX < Constants.ChunksInBlockX; ++chunkX)
                     {
                         if (!LiquidChunksEnumerator.MoveNext())
-                        {
                             throw new Exception("Unexpected end of liquid chunks");
-                        }
 
-                        var chunkposx = adtposx - ( (chunkY - 1) * Constants.ChunkSize);
-                        var chunkposy = adtposy - ( (chunkX - 1) * Constants.ChunkSize);
+                        var chunkposx = adtposx - ( (chunkX - 1 ) * Constants.ChunkSize);
+                        var chunkposy = adtposy - ( (chunkY - 1 ) * Constants.ChunkSize);
 
                         // TODO : Layers
                         // foreach (var layer in layers...)
@@ -558,23 +557,17 @@ namespace WDE.MapRenderer.Managers
                                 var tilecount = LiquidInstance.Width * LiquidInstance.Height;
                                 var vertcount = ( LiquidInstance.Width +1) * (LiquidInstance.Height + 1);
 
-                                Vector3[] vertices = new Vector3[vertcount];
+                                // Vector3[] vertices = new Vector3[vertcount];
                                 ushort[] indices = ArrayPool<ushort>.Shared.Rent(tilecount * 2 * 3); // 2 triangles per tile
                                 int k__ = 0;
 
-                                
-                                for (int vertid = 0; vertid < vertcount; ++vertid)
-                                {
-                                    if (LiquidInstance.LiquidVertexFormat == 2) // ocean. The liquid's height is always 0.0 regardless of the liquid_type or *_height_level!
-                                        vertices[vertid].Z = 0.0f;
-                                    else // default height to min height
-                                        vertices[vertid].Z = LiquidInstance.MinHeightLevel;
-                                }
-
                                 // iterate tiles
-                                for (int tileX = LiquidInstance.X_Offset; tileX < LiquidInstance.Width; ++tileX) // X
+
+                                //for (int tileY = LiquidInstance.Y_Offset; tileY < LiquidInstance.Height; ++tileY)
+                                for (int tileY = LiquidInstance.Y_Offset; tileY <= LiquidInstance.Height + LiquidInstance.Y_Offset; ++tileY)
                                 {
-                                    for (int tileY = LiquidInstance.Y_Offset; tileY < LiquidInstance.Height; ++tileY)
+                                    // for (int tileX = LiquidInstance.X_Offset; tileX < LiquidInstance.Width; ++tileX) // X
+                                    for (int tileX = LiquidInstance.X_Offset; tileX <= LiquidInstance.Width + LiquidInstance.X_Offset; ++tileX) // X
                                     {
                                         // check if tile should be rendered
                                         // if (LiquidInstance.RenderBitMap != null)
@@ -583,10 +576,14 @@ namespace WDE.MapRenderer.Managers
                                         //     // var renderState = LiquidInstance.RenderBitMap[tileX + (tileY * LiquidInstance.Width)]; // maybe tileY + tileX * Height
                                         // }
 
+                                        var vertexindex = tileY * 9 + tileX;
+
                                         // set indices
-                                        int tl = tileY * LiquidInstance.Width + tileX;
+                                        // int tl = tileY * LiquidInstance.Width + tileX;
+                                        int tl = tileY * 9 + tileX;
                                         int tr = tl + 1;
-                                        int bl = (tileY + 1) * LiquidInstance.Width + tileX;
+                                        //int bl = (tileY + 1) * LiquidInstance.Width + tileX;
+                                        int bl = (tileY + 1) * 9 + tileX;
                                         int br = bl + 1;
                                         // 1st triangle
                                         indices[k__++] = (ushort)tl;
@@ -597,58 +594,16 @@ namespace WDE.MapRenderer.Managers
                                         indices[k__++] = (ushort)br;
                                         indices[k__++] = (ushort)bl;
 
- 
+                                        // LiquidInstance.Vertices[vertexindex].X = chunkposx - (tileX * Constants.UnitSize);
+                                        // LiquidInstance.Vertices[vertexindex].Y = chunkposy - (tileY * Constants.UnitSize);
                                     }
                                 }
 
-                                // vertex data
-                                // for (int vertid = 0; vertid < vertcount; ++vertid)
-                                // {
-                                // 
-                                //     vertices[vertid].X = chunkposx - (tileX * ( Constants.ChunkSize / 8 ));
-                                //     vertices[vertid].Y = chunkposy - (tileY * (Constants.ChunkSize / 8));
-                                // 
-                                //     if (LiquidInstance.LiquidVertexFormat == 0)
-                                //         vertices[vertid].Z = LiquidInstance.Format0VertexList.Heightmap[vertid];
-                                //     // TODO : depth
-                                // 
-                                //     else if (LiquidInstance.LiquidVertexFormat == 1)
-                                //         vertices[vertid].Z = LiquidInstance.Format1VertexList.Heightmap[vertid];
-                                //         // TODO : uvmap
-                                // 
-                                //     // TODO : type 2 depthmap
-                                // 
-                                //     else if (LiquidInstance.LiquidVertexFormat == 3)
-                                //         vertices[vertid].Z = LiquidInstance.Format3VertexList.Heightmap[vertid];
-                                //         // TODO : depth
-                                //         // TODO : uvmap
-                                // }
-                                // vertex data
-                                for (int vertid = 0; vertid < vertcount; ++vertid)
-                                {
-                                    var tileX = vertid % 9;
-                                    var tileY = vertid / 9;
+                                // foreach (var vert in LiquidInstance.Vertices)
+                                //     if (vert.X == 0.0f || vert.Y == 0.0f)
+                                //         throw new Exception("vert coord x or y was 0");
 
-                                    vertices[vertid].X = chunkposx - (tileX * (Constants.ChunkSize / 8));
-                                    vertices[vertid].Y = chunkposy - (tileY * (Constants.ChunkSize / 8));
-
-                                    if (LiquidInstance.LiquidVertexFormat == 0)
-                                        vertices[vertid].Z = LiquidInstance.Format0VertexList.Heightmap[vertid];
-                                    // TODO : depth
-
-                                    else if (LiquidInstance.LiquidVertexFormat == 1)
-                                        vertices[vertid].Z = LiquidInstance.Format1VertexList.Heightmap[vertid];
-                                    // TODO : uvmap
-
-                                    // TODO : type 2 depthmap
-
-                                    else if (LiquidInstance.LiquidVertexFormat == 3)
-                                        vertices[vertid].Z = LiquidInstance.Format3VertexList.Heightmap[vertid];
-                                    // TODO : depth
-                                    // TODO : uvmap
-                                }
-
-                                IMesh waterMesh = meshManager.CreateMesh(vertices, indices);
+                                IMesh waterMesh = meshManager.CreateMesh(LiquidInstance.Vertices, indices);
 
                                 Material waterMaterial = materialManager.CreateMaterial("internalShaders/unlit.json");
                                 waterMaterial.ZWrite = false;
@@ -663,7 +618,9 @@ namespace WDE.MapRenderer.Managers
                                     .WithComponentData<LocalToWorld>()
                                     .WithComponentData<WorldMeshBounds>()
                                     .WithComponentData<MeshRenderer>());
-                                entityManager.GetComponent<LocalToWorld>(waterEntity).Matrix = Utilities.TRS(new Vector3(0, 0, 0), Quaternion.Identity, Vectors.One);
+                                entityManager.GetComponent<LocalToWorld>(waterEntity).Matrix = Utilities.TRS(new Vector3(chunkposx, chunkposy, 0), Quaternion.Identity, Vectors.One);
+                                // entityManager.GetComponent<LocalToWorld>(waterEntity).Matrix = Utilities.TRS(new Vector3(0, 0, 0), Quaternion.Identity, Vectors.One);
+
                                 entityManager.GetComponent<MeshRenderer>(waterEntity).SubMeshId = 0;
                                 entityManager.GetComponent<MeshRenderer>(waterEntity).MaterialHandle = waterMaterial.Handle;
                                 entityManager.GetComponent<MeshRenderer>(waterEntity).MeshHandle = waterMesh.Handle;
