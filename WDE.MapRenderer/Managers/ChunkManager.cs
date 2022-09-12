@@ -562,11 +562,14 @@ namespace WDE.MapRenderer.Managers
                                 ushort[] indices = ArrayPool<ushort>.Shared.Rent(tilecount * 2 * 3); // 2 triangles per tile
                                 int k__ = 0;
 
-                                if (LiquidInstance.LiquidVertexFormat == 2) // ocean. The liquid's height is always 0.0 regardless of the liquid_type or *_height_level!
-                                    for (int vertid = 0; vertid < vertcount; ++vertid)
-                                    {
+                                
+                                for (int vertid = 0; vertid < vertcount; ++vertid)
+                                {
+                                    if (LiquidInstance.LiquidVertexFormat == 2) // ocean. The liquid's height is always 0.0 regardless of the liquid_type or *_height_level!
                                         vertices[vertid].Z = 0.0f;
-                                    }
+                                    else // default height to min height
+                                        vertices[vertid].Z = LiquidInstance.MinHeightLevel;
+                                }
 
                                 // iterate tiles
                                 for (int tileX = LiquidInstance.X_Offset; tileX < LiquidInstance.Width; ++tileX) // X
