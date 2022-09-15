@@ -46,6 +46,7 @@ public class TheEngineOpenTkWindow : GameWindow, IWindowHost
 
     protected override void OnRenderFrame(FrameEventArgs args)
     {
+        engine.TotalTime += args.Time * 1000;
         VSync = VSyncMode.Off;
         engine.statsManager.Counters.FrameTime.Add(args.Time * 1000);
         renderStopwatch.Restart();

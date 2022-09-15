@@ -65,6 +65,8 @@ namespace WoWDatabaseEditorCore.ViewModels
         
         public string ProgramSubtitle { get; }
         
+        public object? QuickStartPanel { get; }
+        
         public QuickStartViewModel(ISolutionItemProvideService solutionItemProvideService, 
             IEnumerable<IWizardProvider> wizards,
             IEventAggregator eventAggregator,
@@ -84,7 +86,8 @@ namespace WoWDatabaseEditorCore.ViewModels
             IProgramNameService programNameService,
             IQuickLoadSettings quickLoadSettings,
             AboutViewModel aboutViewModel,
-            IAnniversarySummaryService anniversarySummaryService)
+            IAnniversarySummaryService anniversarySummaryService,
+            IEnumerable<IQuickStartPanel> quickStartPanels)
         {
             this.iconRegistry = iconRegistry;
             this.nameRegistry = nameRegistry;
@@ -95,6 +98,7 @@ namespace WoWDatabaseEditorCore.ViewModels
             Wizards.AddRange(wizards.Where(w => w.IsCompatibleWithCore(currentCoreVersion.Current)));
             HasWizards = Wizards.Count > 0;
             AboutViewModel = aboutViewModel;
+            QuickStartPanel = quickStartPanels.FirstOrDefault();
 
             var all = solutionItemProvideService.All.ToList();
             quickLoadSettings.Sort(all);

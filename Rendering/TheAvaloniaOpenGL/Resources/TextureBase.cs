@@ -32,6 +32,11 @@ namespace TheAvaloniaOpenGL.Resources
                     pixelFormat = PixelFormat.RedInteger;
                     pixelType = PixelType.UnsignedInt;
                     break;
+                case TextureFormat.DepthComponent:
+                    internalFormat = PixelInternalFormat.DepthComponent32f;
+                    pixelFormat = PixelFormat.DepthComponent;
+                    pixelType = PixelType.Float;
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(textureFormat), textureFormat, null);
             }

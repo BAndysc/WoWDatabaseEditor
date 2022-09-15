@@ -8,6 +8,7 @@
              xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
              xmlns:controls1="clr-namespace:Avalonia.Controls"
              xmlns:viewModels="clr-namespace:WoWDatabaseEditorCore.ViewModels;assembly=WoWDatabaseEditorCore"
+             xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
              mvvm:ViewModelLocator.AutoWireViewModel="False"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              Name="Root"
@@ -85,7 +86,7 @@
     <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Padding="20">
         <StackPanel>
             <Border BorderThickness="0,0,0,2" BorderBrush="#FF5FA2DA">
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
+                <DockPanel VerticalAlignment="Bottom" LastChildFill="False">
                     <Image Source="../Icon.png" Width="56" Height="56" />
                     <TextBlock VerticalAlignment="Bottom" FontSize="34" TextWrapping="WrapWithOverflow" Text="{CompiledBinding ProgramTitle}" />
                     <TextBlock VerticalAlignment="Bottom" FontSize="20" Opacity="0.7" Margin="10,0,0,0" TextWrapping="WrapWithOverflow" Text="{CompiledBinding ProgramSubtitle}" />
@@ -99,7 +100,9 @@
                             </EventTriggerBehavior>
                         </Interaction.Behaviors>
                     </WdeImage>
-                </StackPanel>
+                    
+                    <ContentControl DockPanel.Dock="Right" VerticalAlignment="Stretch" VerticalContentAlignment="Center" DataContext="{CompiledBinding QuickStartPanel}" utils:ViewBind.Model="{CompiledBinding}"></ContentControl>
+                </DockPanel>
             </Border>
             
             <Border Classes="infoBox" IsVisible="{CompiledBinding ShowGiveStarBox}">

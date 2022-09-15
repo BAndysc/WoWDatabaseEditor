@@ -52,6 +52,9 @@ namespace TheEngine.Managers
 
         private int currentBackBufferWidth = -1;
         private int currentBackBufferHeight = -1;
+        private TextureHandle opaqueTexture2D;
+        private TextureHandle depthTexture2D;
+        private TextureHandle opaqueRenderTexture;
         private TextureHandle mainObjectBuffer;
         private TextureHandle[] backBuffers = new TextureHandle[2];
         private int currentBackBufferIndex = -1;
@@ -117,6 +120,9 @@ namespace TheEngine.Managers
 
         private Archetype dynamicParentedEntitiesArchetype;
 
+        public TextureHandle DepthTexture => depthTexture2D;
+        public TextureHandle OpaqueTexture => opaqueTexture2D;
+        
         internal RenderManager(Engine engine, bool flipY)
         {
             this.engine = engine;
@@ -191,6 +197,7 @@ namespace TheEngine.Managers
             engine.Device.device.CheckError("create depth stencil");
 
             mainObjectBuffer = engine.textureManager.CreateRenderTexture((int)engine.WindowHost.WindowWidth, (int)engine.WindowHost.WindowHeight, 2);
+            opaqueRenderTexture = engine.textureManager.CreateRenderTextureWithColorAndDepth((int)engine.WindowHost.WindowWidth, (int)engine.WindowHost.WindowHeight, out opaqueTexture2D, out depthTexture2D);
             for (int i = 0; i < backBuffers.Length; ++i)
                 backBuffers[i] = engine.textureManager.CreateRenderTexture((int)engine.WindowHost.WindowWidth, (int)engine.WindowHost.WindowHeight, 1);
             engine.Device.device.CheckError("create render tex");
@@ -387,7 +394,11 @@ namespace TheEngine.Managers
                 currentBackBufferWidth = (int)engine.WindowHost.WindowWidth;
                 currentBackBufferHeight = (int)engine.WindowHost.WindowHeight;
                 engine.textureManager.DisposeTexture(mainObjectBuffer);
+                engine.textureManager.DisposeTexture(opaqueRenderTexture);
+                engine.textureManager.DisposeTexture(opaqueTexture2D);
+                engine.textureManager.DisposeTexture(depthTexture2D);
                 mainObjectBuffer = engine.textureManager.CreateRenderTexture(currentBackBufferWidth, currentBackBufferHeight, 2);
+                opaqueRenderTexture = engine.textureManager.CreateRenderTextureWithColorAndDepth((int)engine.WindowHost.WindowWidth, (int)engine.WindowHost.WindowHeight, out opaqueTexture2D, out depthTexture2D);
                 for (var index = 0; index < backBuffers.Length; index++)
                 {
                     engine.textureManager.DisposeTexture(backBuffers[index]);
@@ -793,6 +804,8 @@ namespace TheEngine.Managers
 
         private void RenderTransparent()
         {
+            engine.textureManager.BlitFramebuffers(mainObjectBuffer, opaqueRenderTexture, 0, 0, currentBackBufferWidth, currentBackBufferHeight, 0, 0, currentBackBufferWidth, currentBackBufferHeight, ClearBufferMask.DepthBufferBit | ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Nearest);
+            ActivateDefaultRenderTexture();
             Render(opaque, totalToDraw, true);
         }
 
@@ -1048,6 +1061,10 @@ namespace TheEngine.Managers
 
             sceneData.ViewMatrix = vm;
             sceneData.ProjectionMatrix = proj;
+            Matrix.Invert(vm, out var vmInv);
+            Matrix.Invert(proj, out var projInv);
+            sceneData.ViewMatrixInverse = vmInv;
+            sceneData.ProjectionMatrixInverse = projInv;
             sceneData.LightPosition = data.MainLight.LightPosition;
             sceneData.CameraPosition = new Vector4(camera.Transform.Position, 1);
             sceneData.LightDirection = new Vector4(Vectors.Normalize((Vectors.Forward.Multiply(data.MainLight.LightRotation))), 0);
@@ -1058,6 +1075,8 @@ namespace TheEngine.Managers
             sceneData.SecondaryLightIntensity = data.SecondaryLight.LightIntensity;
             sceneData.AmbientColor = data.MainLight.AmbientColor;
             sceneData.Time = (float)engine.TotalTime;
+            sceneData.ZNear = camera.NearClip;
+            sceneData.ZFar = camera.FarClip;
             sceneData.ScreenWidth = engine.WindowHost.WindowWidth;
             sceneData.ScreenHeight = engine.WindowHost.WindowHeight;
         }

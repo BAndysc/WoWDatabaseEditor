@@ -34,6 +34,8 @@ namespace TheEngine.Interfaces
         void SetDynamicResolutionScale(float scale);
         void DrawSphere(Vector3 center, float radius, Vector4 color);
         Entity PickObject(Vector2 normalizedScreenPosition);
+        TextureHandle DepthTexture { get; }
+        TextureHandle OpaqueTexture { get; }
     }
 
     public static class RenderManagerExtensions

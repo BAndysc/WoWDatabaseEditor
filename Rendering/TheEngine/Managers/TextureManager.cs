@@ -158,9 +158,9 @@ namespace TheEngine.Managers
             return AddTexture(texture);
         }
 
-        public TextureHandle CreateTexture(uint[] pixels, int width, int height)
+        public TextureHandle CreateTexture(uint[]? pixels, int width, int height, TextureFormat format = TextureFormat.R8G8B8A8)
         {
-            var texture = engine.Device.CreateTexture(width, height, pixels);
+            var texture = engine.Device.CreateTexture(width, height, pixels, format);
             return AddTexture(texture);
         }
         
@@ -184,10 +184,27 @@ namespace TheEngine.Managers
         
         public TextureHandle CreateRenderTexture(int width, int height, int colorAttachments = 1)
         {
+            width = Math.Max(1, width);
+            height = Math.Max(1, height);
             var texture = engine.Device.CreateRenderTexture(width, height, colorAttachments);
             return AddTexture(texture);
         }
-
+        
+        public TextureHandle CreateRenderTextureWithDepth(int width, int height, out TextureHandle depthTexture, int colorAttachments = 1)
+        {
+            depthTexture = CreateTexture(null, width, height, TextureFormat.DepthComponent);
+            var texture = engine.Device.CreateRenderTexture(width, height, colorAttachments, (Texture)GetTextureByHandle(depthTexture)!);
+            return AddTexture(texture);
+        }
+        
+        public TextureHandle CreateRenderTextureWithColorAndDepth(int width, int height, out TextureHandle colorTexture, out TextureHandle depthTexture)
+        {
+            depthTexture = CreateTexture(null, width, height, TextureFormat.DepthComponent);
+            colorTexture = CreateTexture(null, width, height, TextureFormat.R8G8B8A8);
+            var texture = engine.Device.CreateRenderTexture((Texture)GetTextureByHandle(colorTexture)!, (Texture)GetTextureByHandle(depthTexture)!);
+            return AddTexture(texture);
+        }
+        
         public void ScreenshotRenderTexture(TextureHandle handle, string fileName, int colorAttachmentIndex = 0)
         {
             var rt = GetTextureByHandle(handle) as RenderTexture;

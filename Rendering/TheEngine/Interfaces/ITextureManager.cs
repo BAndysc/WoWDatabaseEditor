@@ -12,7 +12,7 @@ namespace TheEngine.Interfaces
         //TextureHandle LoadTextureArray(params string[] path);
         TextureHandle CreateTextureArray(Rgba32[][][] pixels, int width, int height);
         TextureHandle CreateTexture(Rgba32[][] pixels, int width, int height, bool generateMips);
-        TextureHandle CreateTexture(uint[] pixels, int width, int height);
+        TextureHandle CreateTexture(uint[] pixels, int width, int height, TextureFormat format = TextureFormat.R8G8B8A8);
         TextureHandle CreateTexture(float[] pixels, int width, int height); 
         TextureHandle CreateTexture(Vector4[] pixels, int width, int height);
         TextureHandle CreateRenderTexture(int width, int height, int colorAttachments = 1);
