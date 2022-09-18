@@ -2,10 +2,11 @@ using JetBrains.Annotations;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using TheEngine;
+using WDE.Common.Services;
 
 namespace RenderingTester;
 
-public class GameStandaloneWindow : TheEngineOpenTkWindow
+public class GameStandaloneWindow : TheEngineOpenTkWindow, IClipboardService
 {
     private readonly MainThread mainThreadImpl;
     private readonly SingleThreadSynchronizationContext ctx;
@@ -22,5 +23,15 @@ public class GameStandaloneWindow : TheEngineOpenTkWindow
         base.OnUpdateFrame(args);
         ctx.ExecuteTasks();
         mainThreadImpl.Tick(TimeSpan.FromSeconds(args.Time));
+    }
+
+    public Task<string> GetText()
+    {
+        return Task.FromResult(ClipboardString);
+    }
+
+    public void SetText(string text)
+    {
+        ClipboardString = text;
     }
 }

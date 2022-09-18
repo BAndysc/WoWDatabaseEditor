@@ -1,9 +1,12 @@
 #define PI 3.14159265358979323846
+#define lerp mix
 
 layout (std140) uniform SceneData
 {
 	mat4 view;
 	mat4 projection;
+	mat4 viewInv;
+	mat4 projectionInv;
 	vec4 cameraPos;
 	vec4 lightDir;
 	vec3 lightColor;
@@ -19,8 +22,9 @@ layout (std140) uniform SceneData
 	float screenWidth;
 	float screenHeight;
 	float time;
-	vec3 padding2;
-	float padding3[2];
+	float zNear;
+	float zFar;
+	float padding3[3];
 };
 
 // Voronoi

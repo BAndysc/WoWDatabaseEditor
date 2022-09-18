@@ -4,6 +4,7 @@ using SixLabors.ImageSharp.PixelFormats;
 using TheAvaloniaOpenGL.Resources;
 using TheEngine;
 using TheEngine.Components;
+using TheEngine.Data;
 using TheEngine.ECS;
 using TheEngine.Entities;
 using TheEngine.Handles;
@@ -14,6 +15,7 @@ using TheMaths;
 using WDE.MapRenderer.Managers.Entities;
 using WDE.MapRenderer.StaticData;
 using WDE.MpqReader;
+using WDE.MpqReader.DBC;
 using WDE.MpqReader.Readers;
 using WDE.MpqReader.Structures;
 
@@ -36,6 +38,7 @@ namespace WDE.MapRenderer.Managers
         public Entity terrainEntity;
         public List<StaticRenderHandle> renderHandles = new();
         public List<Entity> entities = new();
+        public List<IMesh> meshes = new();
         public List<NativeBuffer<Matrix>> animationBuffers = new();
 
         public CreatureManager.CreatureChunkData Creatures = new();
@@ -528,7 +531,91 @@ namespace WDE.MapRenderer.Managers
             terrainEntity.SetForceDisabledRendering(entityManager, !RenderTerrain);
             chunk.terrainEntity = terrainEntity;
             chunk.entities.Add(terrainEntity);
-            
+
+            // water here
+            if (adt.HasLiquid)
+            {
+                float adtposx = t.Position.X;
+                float adtposy = t.Position.Y;
+
+                bool allWaterLayersHaveEqualSize = true;
+                float? waterHeight = null;
+
+                for (int chunkY = 0; chunkY < Constants.ChunksInBlockY; ++chunkY) // for each subchunk
+                {
+                    for (int chunkX = 0; chunkX < Constants.ChunksInBlockX; ++chunkX)
+                    {
+                        var liquidChunk = adt.MH2OLiquidChunks[chunkY * Constants.ChunksInBlockX + chunkX];
+                        if (liquidChunk.LayerCount != 1 ||
+                            !liquidChunk.LiquidInstances![0].IsSingleHeight ||
+                            (waterHeight.HasValue &&
+                            Math.Abs(liquidChunk.LiquidInstances[0].MinHeightLevel - waterHeight.Value) > float.Epsilon))
+                        {
+                            allWaterLayersHaveEqualSize = false;
+                            break;
+                        }
+
+                        waterHeight = liquidChunk.LiquidInstances[0].MinHeightLevel;
+                    }
+                }
+                
+                IMesh waterMesh;
+                Vector3 meshPosition = Vector3.Zero;
+                if (allWaterLayersHaveEqualSize)
+                {
+                    var merged = woWMeshManager.GenerateGiganticWaterMesh(waterHeight!.Value);
+                    waterMesh = meshManager.CreateMesh(merged.Item1, merged.Item2);
+                    meshPosition = new Vector3(adtposx, adtposy, 0);
+                }
+                else
+                {
+                    List<Vector3[]> verticesSet = new List<Vector3[]>();
+                    List<ushort[]> indicesSet = new List<ushort[]>();
+                    List<Vector3> offsets = new List<Vector3>();
+                    
+                    for (int chunkY = 0; chunkY < Constants.ChunksInBlockY; ++chunkY) // for each subchunk
+                    {
+                        for (int chunkX = 0; chunkX < Constants.ChunksInBlockX; ++chunkX)
+                        {
+                            var liquidChunk = adt.MH2OLiquidChunks[chunkY * Constants.ChunksInBlockX + chunkX];
+                            var chunkposx = adtposx - ( (chunkY) * Constants.ChunkSize);
+                            var chunkposy = adtposy - ( (chunkX) * Constants.ChunkSize);
+                        
+                            if (liquidChunk.LiquidInstances == null)
+                                continue;
+
+                            foreach (var liquidInstance in liquidChunk.LiquidInstances)
+                            {
+                                var (vertices, indices) = woWMeshManager.GenerateWaterMesh(liquidInstance);
+                                verticesSet.Add(vertices);
+                                indicesSet.Add(indices);
+                                offsets.Add(new Vector3(chunkposx, chunkposy, 0));
+                            }
+                        }
+                    }
+                    var merged = MeshBatcher.MergeMeshes(verticesSet, indicesSet, offsets);
+                    waterMesh = meshManager.CreateMesh(merged.Item1, merged.Item2);
+                }
+
+                var trsMatrix = Utilities.TRS(meshPosition, Quaternion.Identity, Vectors.One);
+                var waterEntity = entityManager.CreateEntity(archetypes.TerrainEntityArchetype);
+                entityManager.GetComponent<LocalToWorld>(waterEntity).Matrix = trsMatrix;
+                            
+                entityManager.GetComponent<MeshRenderer>(waterEntity).SubMeshId = 0;
+                entityManager.GetComponent<MeshRenderer>(waterEntity).MaterialHandle = woWMeshManager.WaterMaterial.Handle;
+                entityManager.GetComponent<MeshRenderer>(waterEntity).MeshHandle = waterMesh.Handle;
+                entityManager.GetComponent<MeshRenderer>(waterEntity).Opaque = false;
+                localBounds = waterMesh.Bounds;
+                localBounds = localBounds with { Size = localBounds.Size with { Z = 1 } };
+                entityManager.GetComponent<WorldMeshBounds>(waterEntity) = RenderManager.LocalToWorld((MeshBounds)localBounds, new LocalToWorld() { Matrix = trsMatrix });
+
+                chunk.entities.Add(waterEntity);
+                chunk.meshes.Add(waterMesh);
+            }
+
+
+            /////////////
+
             if (cancelationToken.IsCancellationRequested)
             {
                 tasksource.SetResult();
@@ -745,6 +832,9 @@ namespace WDE.MapRenderer.Managers
             foreach (var buffer in chunk.animationBuffers)
                 buffer.Dispose();
             
+            foreach (var obj in chunk.meshes)
+                meshManager.DisposeMesh(obj);
+                
             chunk.animationBuffers.Clear();
 
             chunk.Dispose(textureManager);

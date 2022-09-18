@@ -155,6 +155,10 @@ namespace Avalonia.OpenGL.Controls
                             OnOpenGlDeinit(_context.GlInterface, _fb);
                         }
                     }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("ERROR while deinitializing OpenGL: " + e);
+                    }
                     finally
                     {
                         DisposeContextIfNeeded();

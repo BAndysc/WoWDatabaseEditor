@@ -27,6 +27,7 @@ internal class NaiveThreadPool : System.IDisposable
         running = false;
         cts.Cancel();
         tasks.Dispose();
+        tasks = null!;
         resetEvent.Set();
         resetEvent.Dispose();
     }

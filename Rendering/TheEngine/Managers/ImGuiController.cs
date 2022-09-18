@@ -209,9 +209,6 @@ public class ImGuiController : IDisposable
         io.MouseWheel = engine.inputManager.mouse.WheelDelta.Y;
         io.MouseWheelH = engine.inputManager.mouse.WheelDelta.X;
 
-        if (io.WantCaptureMouse)
-            engine.inputManager.mouse.PostUpdate();
-        
         for (int i = 0; i < engine.inputManager.keyboard.justTextInputIndex; ++i)
         {
             var text = engine.inputManager.keyboard.justTextInput[i];
@@ -245,6 +242,15 @@ public class ImGuiController : IDisposable
         io.KeyShift = engine.inputManager.Keyboard.IsDown(Key.LeftShift);
         io.KeyAlt = engine.inputManager.Keyboard.IsDown(Key.LeftAlt);
         io.KeyCtrl = engine.inputManager.Keyboard.IsDown(Key.LeftCtrl);
+
+        if (io.WantCaptureMouse)
+            engine.inputManager.mouse.PostUpdate();
+
+        if (io.WantCaptureKeyboard)
+        {
+            engine.inputManager.keyboard.PostUpdate();
+            engine.inputManager.keyboard.ReleaseAllKeys();
+        }
 
         ImGui.NewFrame();
     }
@@ -367,6 +373,5 @@ public class ImGuiController : IDisposable
         engine.textureManager.DisposeTexture(fontTexture);
         verticesBuffer.Dispose();
         indicesBuffer.Dispose();
-        engine.Dispose();
     }
 }

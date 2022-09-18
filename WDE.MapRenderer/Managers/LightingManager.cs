@@ -57,6 +57,8 @@ namespace WDE.MapRenderer.Managers
             textureManager.DisposeTexture(noiseTexture);
         }
 
+        public Light? BestLight => bestLight;
+
         private Light? bestLight = null;
         public void Update(float delta)
         {

@@ -1,5 +1,6 @@
 ﻿using TheAvaloniaOpenGL.Resources;
 using TheEngine.Components;
+using TheEngine.Data;
 using TheEngine.ECS;
 using TheEngine.Entities;
 using TheEngine.Handles;
@@ -27,11 +28,14 @@ namespace TheEngine.Interfaces
         void RenderInstancedIndirect(IMesh mesh, Material material, int submesh, int count, Matrix localToWorld, Matrix? worldToLocal = null);
         void RenderInstancedIndirect(IMesh mesh, Material material, int submesh, int count);
         float ViewDistanceModifier { get; set; }
+        void ActivateScene(in SceneData? scene);
         void AddPostprocess(IPostProcess postProcess);
         void RemovePostprocess(IPostProcess postProcess);
         void SetDynamicResolutionScale(float scale);
         void DrawSphere(Vector3 center, float radius, Vector4 color);
         Entity PickObject(Vector2 normalizedScreenPosition);
+        TextureHandle DepthTexture { get; }
+        TextureHandle OpaqueTexture { get; }
     }
 
     public static class RenderManagerExtensions

@@ -1,15 +1,24 @@
 ﻿using System.Diagnostics;
 using System.Reactive.Disposables;
 using Prism.Ioc;
+using Unity;
+using Unity.Extension;
+using Unity.Resolution;
 using WDE.Common.Managers;
+using WDE.Common.Modules;
+using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
+using WDE.Common.Services.QueryParser.Models;
 using WDE.Common.Tasks;
+using WDE.Common.Utils;
 using WDE.MapRenderer;
 using WDE.MapRenderer.Managers;
 using WDE.MapSpawns;
 using WDE.MapSpawns.Rendering;
+using WDE.Module;
 using WDE.MpqReader.DBC;
 using WDE.MpqReader.Structures;
+using WDE.SqlInterpreter;
 
 namespace RenderingTester;
 
@@ -65,7 +74,13 @@ public class DummyMessageBox : IMessageBoxService
 
 public class MainThread : IMainThread
 {
+    private readonly SingleThreadSynchronizationContext context;
     private List<(TimeSpan delay, Action action)> delayed = new();
+
+    public MainThread(SingleThreadSynchronizationContext context)
+    {
+        this.context = context;
+    }
 
     public void Delay(Action action, TimeSpan delay)
     {
@@ -74,6 +89,7 @@ public class MainThread : IMainThread
 
     public void Dispatch(Action action)
     {
+        SynchronizationContext.SetSynchronizationContext(context);
         action();
     }
 
@@ -109,5 +125,140 @@ public class MainThread : IMainThread
                 delayed[i] = (newDelay, delayed[i].action);
             }
         }
+    }
+}
+
+public class UnityContainerExtension : IContainerExtension<IUnityContainer>
+{
+    public IUnityContainer Instance { get; }
+
+    public UnityContainerExtension() : this(new UnityContainer())
+    {
+    }
+
+    public UnityContainerExtension(IUnityContainer container) => Instance = container;
+
+    public void FinalizeExtension()
+    {
+    }
+
+    public IContainerRegistry RegisterInstance(Type type, object instance)
+    {
+        Instance.RegisterInstance(type, instance);
+        return this;
+    }
+
+    public IContainerRegistry RegisterInstance(Type type, object instance, string name)
+    {
+        Instance.RegisterInstance(type, name, instance);
+        return this;
+    }
+
+    public IContainerRegistry RegisterSingleton(Type from, Type to)
+    {
+        Instance.RegisterSingleton(from, to);
+        return this;
+    }
+
+    public IContainerRegistry RegisterSingleton(Type from, Type to, string name)
+    {
+        Instance.RegisterSingleton(from, to, name);
+        return this;
+    }
+
+    public IContainerRegistry Register(Type from, Type to)
+    {
+        Instance.RegisterType(from, to);
+        return this;
+    }
+
+    public IContainerRegistry Register(Type from, Type to, string name)
+    {
+        Instance.RegisterType(from, to, name);
+        return this;
+    }
+
+    public object Resolve(Type type)
+    {
+        return Instance.Resolve(type);
+    }
+
+    public object Resolve(Type type, string name)
+    {
+        return Instance.Resolve(type, name);
+    }
+
+    public object Resolve(Type type, params (Type Type, object Instance)[] parameters)
+    {
+        var overrides = parameters.Select(p => new DependencyOverride(p.Type, p.Instance)).ToArray();
+        return Instance.Resolve(type, overrides);
+    }
+
+    public object Resolve(Type type, string name, params (Type Type, object Instance)[] parameters)
+    {
+        var overrides = parameters.Select(p => new DependencyOverride(p.Type, p.Instance)).ToArray();
+        return Instance.Resolve(type, name, overrides);
+    }
+
+    public bool IsRegistered(Type type)
+    {
+        return Instance.IsRegistered(type);
+    }
+
+    public bool IsRegistered(Type type, string name)
+    {
+        return Instance.IsRegistered(type, name);
+    }
+}
+
+public class ScopedContainer : BaseScopedContainer
+{
+    public override IScopedContainer CreateScope()
+    {
+        var childContainer = unity.CreateChildContainer();
+        var lt = new DefaultLifetime();
+        childContainer.AddExtension(lt);
+        lt.TypeDefaultLifetime = new ContainerControlledLifetimeManager();
+        var extensions = new UnityContainerExtension(childContainer);
+        var scope = new ScopedContainer(extensions, new UnityContainerRegistry(childContainer), childContainer);
+        extensions.RegisterInstance<IScopedContainer>(scope);
+        extensions.RegisterInstance<IContainerExtension>(scope);
+        extensions.RegisterInstance<IContainerProvider>(scope);
+        extensions.RegisterInstance<IContainerRegistry>(scope);
+        return scope;
+    }
+
+    public ScopedContainer(IContainerProvider provider, IContainerRegistry registry, IUnityContainer impl) : base(provider, registry, impl)
+    {
+    }
+}
+
+public class DummyQueryEvaluator : IQueryEvaluator
+{
+    public IEnumerable<InsertQuery> ExtractInserts(string query) => Enumerable.Empty<InsertQuery>();
+
+    public IEnumerable<UpdateQuery> ExtractUpdates(string query) => Enumerable.Empty<UpdateQuery>();
+
+    public IReadOnlyList<IBaseQuery> Extract(string query) => Array.Empty<IBaseQuery>();
+}
+
+public class DummyTableEditorPickerService : ITableEditorPickerService
+{
+    public async Task<long?> PickByColumn(string table, DatabaseKey? key, string column, long? initialValue, string? backupColumn = null, string? customWhere = null)
+    {
+        Console.WriteLine("Objects editing not supported in standalone window");
+        return null;
+    }
+
+    public Task ShowTable(string table, string? condition, DatabaseKey? defaultPartialKey = null)
+    {
+        Console.WriteLine("Objects editing not supported in standalone window");
+        return Task.CompletedTask;
+    }
+
+    public Task ShowForeignKey1To1(string table, DatabaseKey key)
+    {
+        Console.WriteLine("Objects editing not supported in standalone window");
+        return Task.CompletedTask;
     }
 }

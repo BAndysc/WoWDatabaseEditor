@@ -99,7 +99,7 @@ namespace WoWDatabaseEditorCore.Avalonia
             unity = unity.AddExtension(new Diagnostic());
             #endif
             var container = new UnityContainerExtension(unity);
-            var mainScope = new ScopedContainer(container, unity);
+            var mainScope = new ScopedContainer(container, container, unity);
             container.RegisterInstance<IScopedContainer>(mainScope);
             ViewBind.ContainerProvider = container;
             DI.Container = unity;

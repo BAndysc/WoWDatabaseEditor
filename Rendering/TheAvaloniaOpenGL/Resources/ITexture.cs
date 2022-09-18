@@ -6,7 +6,8 @@ namespace TheAvaloniaOpenGL.Resources
     {
         R8G8B8A8,
         R32f,
-        R32ui
+        R32ui,
+        DepthComponent
     }
     
     public enum FilteringMode

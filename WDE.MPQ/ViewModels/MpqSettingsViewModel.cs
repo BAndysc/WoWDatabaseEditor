@@ -68,6 +68,6 @@ namespace WDE.MPQ.ViewModels
             "The editor can open Wrath of the Lich King files (MPQ) for extended features.";
         public bool IsModified { get; set; }
         public bool IsRestartRequired => true;
-        public ConfigurableGroup Group => ConfigurableGroup.Advanced;
+        public ConfigurableGroup Group => ConfigurableGroup.Basic;
     }
 }

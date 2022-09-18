@@ -29,7 +29,7 @@ public class TheEngineOpenTkWindow : GameWindow, IWindowHost
     protected override void OnLoad()
     {
         IDevice device = new OpenTKDevice();
-#if DEBUG && DEBUG_OPENGL || true
+#if DEBUG && DEBUG_OPENGL
         device = new DebugDevice(device);
 #endif
         engine = new Engine(device, new Configuration(), this, false);
@@ -46,6 +46,7 @@ public class TheEngineOpenTkWindow : GameWindow, IWindowHost
 
     protected override void OnRenderFrame(FrameEventArgs args)
     {
+        engine.TotalTime += args.Time * 1000;
         VSync = VSyncMode.Off;
         engine.statsManager.Counters.FrameTime.Add(args.Time * 1000);
         renderStopwatch.Restart();

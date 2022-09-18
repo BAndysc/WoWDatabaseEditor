@@ -81,8 +81,10 @@ namespace WDE.MpqReader.Readers
             get => reader.Offset - startOffset;
             set
             {
-                if (value < 0 || value > size)
-                    throw new IndexOutOfRangeException("Cannot set offset outside of desired range");
+                if (value < 0)
+                    throw new IndexOutOfRangeException("Cannot set offset smaller than desired range");
+                if (value > size)
+                    throw new IndexOutOfRangeException("Cannot set offset bigger than desired range");
                 reader.Offset = value + startOffset;
             }
         }

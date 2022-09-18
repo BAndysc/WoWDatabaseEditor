@@ -22,7 +22,8 @@ namespace TheAvaloniaOpenGL.Resources
                     device.TexImage2D(TextureTarget.Texture2D, 0, internalFormat, width, height, 0, pixelFormat, pixelType, new IntPtr(pData));
                 }   
             }
-            GenerateMipmaps();
+            //GenerateMipmaps();
+            device.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMaxLevel, 0);
             UnbindTexture();
         }
 

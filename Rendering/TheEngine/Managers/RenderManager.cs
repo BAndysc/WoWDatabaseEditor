@@ -52,6 +52,9 @@ namespace TheEngine.Managers
 
         private int currentBackBufferWidth = -1;
         private int currentBackBufferHeight = -1;
+        private TextureHandle opaqueTexture2D;
+        private TextureHandle depthTexture2D;
+        private TextureHandle opaqueRenderTexture;
         private TextureHandle mainObjectBuffer;
         private TextureHandle[] backBuffers = new TextureHandle[2];
         private int currentBackBufferIndex = -1;
@@ -117,6 +120,9 @@ namespace TheEngine.Managers
 
         private Archetype dynamicParentedEntitiesArchetype;
 
+        public TextureHandle DepthTexture => depthTexture2D;
+        public TextureHandle OpaqueTexture => opaqueTexture2D;
+        
         internal RenderManager(Engine engine, bool flipY)
         {
             this.engine = engine;
@@ -191,6 +197,7 @@ namespace TheEngine.Managers
             engine.Device.device.CheckError("create depth stencil");
 
             mainObjectBuffer = engine.textureManager.CreateRenderTexture((int)engine.WindowHost.WindowWidth, (int)engine.WindowHost.WindowHeight, 2);
+            opaqueRenderTexture = engine.textureManager.CreateRenderTextureWithColorAndDepth((int)engine.WindowHost.WindowWidth, (int)engine.WindowHost.WindowHeight, out opaqueTexture2D, out depthTexture2D);
             for (int i = 0; i < backBuffers.Length; ++i)
                 backBuffers[i] = engine.textureManager.CreateRenderTexture((int)engine.WindowHost.WindowWidth, (int)engine.WindowHost.WindowHeight, 1);
             engine.Device.device.CheckError("create render tex");
@@ -338,12 +345,7 @@ namespace TheEngine.Managers
 
         public void ScreenshotCurrentBuffer(string filename, int colorAttachment = 0)
         {
-            var rt = engine.textureManager.GetTextureByHandle(mainObjectBuffer) as RenderTexture;
-            rt.ActivateSourceFrameBuffer(colorAttachment);
-            SixLabors.ImageSharp.PixelFormats.Rgba32[] pixels = new SixLabors.ImageSharp.PixelFormats.Rgba32[rt.Width * rt.Height];
-            engine.Device.device.ReadPixels(0, 0, rt.Width, rt.Height, PixelFormat.RedInteger, PixelType.UnsignedInt, pixels.AsSpan());
-            using SixLabors.ImageSharp.Image<SixLabors.ImageSharp.PixelFormats.Rgba32> image = SixLabors.ImageSharp.Image.LoadPixelData<SixLabors.ImageSharp.PixelFormats.Rgba32>(pixels, rt.Width, rt.Height);
-            SixLabors.ImageSharp.ImageExtensions.SaveAsPng(image, filename);
+            engine.textureManager.ScreenshotRenderTexture(mainObjectBuffer, filename, colorAttachment);
         }
 
         public Entity PickObject(Vector2 normalizedScreenPoint)
@@ -380,12 +382,11 @@ namespace TheEngine.Managers
 
             inRenderingLoop = true;
             engine.Device.device.CheckError("pre UpdateSceneBuffer");
-            UpdateSceneBuffer();
+            
+            ActivateScene(null);
             
             Stats = default;
             engine.Device.device.CheckError("Render begin");
-
-            engine.Device.RenderClearBuffer();
 
             if (currentBackBufferWidth != (int)engine.WindowHost.WindowWidth ||
                 currentBackBufferHeight != (int)engine.WindowHost.WindowHeight)
@@ -393,7 +394,11 @@ namespace TheEngine.Managers
                 currentBackBufferWidth = (int)engine.WindowHost.WindowWidth;
                 currentBackBufferHeight = (int)engine.WindowHost.WindowHeight;
                 engine.textureManager.DisposeTexture(mainObjectBuffer);
+                engine.textureManager.DisposeTexture(opaqueRenderTexture);
+                engine.textureManager.DisposeTexture(opaqueTexture2D);
+                engine.textureManager.DisposeTexture(depthTexture2D);
                 mainObjectBuffer = engine.textureManager.CreateRenderTexture(currentBackBufferWidth, currentBackBufferHeight, 2);
+                opaqueRenderTexture = engine.textureManager.CreateRenderTextureWithColorAndDepth((int)engine.WindowHost.WindowWidth, (int)engine.WindowHost.WindowHeight, out opaqueTexture2D, out depthTexture2D);
                 for (var index = 0; index < backBuffers.Length; index++)
                 {
                     engine.textureManager.DisposeTexture(backBuffers[index]);
@@ -799,6 +804,8 @@ namespace TheEngine.Managers
 
         private void RenderTransparent()
         {
+            engine.textureManager.BlitFramebuffers(mainObjectBuffer, opaqueRenderTexture, 0, 0, currentBackBufferWidth, currentBackBufferHeight, 0, 0, currentBackBufferWidth, currentBackBufferHeight, ClearBufferMask.DepthBufferBit | ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Nearest);
+            ActivateDefaultRenderTexture();
             Render(opaque, totalToDraw, true);
         }
 
@@ -1038,24 +1045,38 @@ namespace TheEngine.Managers
             }
         }
 
-        private void UpdateSceneBuffer()
+        public void ActivateScene(in SceneData? scene)
         {
-            var camera = cameraManager.MainCamera;
+            var data = scene ?? new SceneData(engine.cameraManger.MainCamera, engine.lightManager.MainLight, engine.lightManager.SecondaryLight);
+            UpdateSceneBuffer(in data);
+            sceneBuffer.UpdateBuffer(ref sceneData);
+            sceneBuffer.Activate(Constants.SCENE_BUFFER_INDEX);
+        }
+
+        private void UpdateSceneBuffer(in SceneData data)
+        {
+            var camera = data.SceneCamera;
             var proj = camera.ProjectionMatrix;
             var vm = camera.Transform.WorldToLocalMatrix;
 
             sceneData.ViewMatrix = vm;
             sceneData.ProjectionMatrix = proj;
-            sceneData.LightPosition = engine.lightManager.MainLight.LightPosition;
-            sceneData.CameraPosition = new Vector4(engine.CameraManager.MainCamera.Transform.Position, 1);
-            sceneData.LightDirection = new Vector4(Vectors.Normalize((Vectors.Forward.Multiply(engine.lightManager.MainLight.LightRotation))), 0);
-            sceneData.LightColor = engine.lightManager.MainLight.LightColor.XYZ();
-            sceneData.LightIntensity = engine.lightManager.MainLight.LightIntensity; 
-            sceneData.SecondaryLightDirection = new Vector4(Vectors.Forward.Multiply(engine.lightManager.SecondaryLight.LightRotation), 0);
-            sceneData.SecondaryLightColor = engine.lightManager.SecondaryLight.LightColor.XYZ();
-            sceneData.SecondaryLightIntensity = engine.lightManager.SecondaryLight.LightIntensity;
-            sceneData.AmbientColor = engine.lightManager.MainLight.AmbientColor;
+            Matrix.Invert(vm, out var vmInv);
+            Matrix.Invert(proj, out var projInv);
+            sceneData.ViewMatrixInverse = vmInv;
+            sceneData.ProjectionMatrixInverse = projInv;
+            sceneData.LightPosition = data.MainLight.LightPosition;
+            sceneData.CameraPosition = new Vector4(camera.Transform.Position, 1);
+            sceneData.LightDirection = new Vector4(Vectors.Normalize((Vectors.Forward.Multiply(data.MainLight.LightRotation))), 0);
+            sceneData.LightColor = data.MainLight.LightColor.XYZ();
+            sceneData.LightIntensity = data.MainLight.LightIntensity; 
+            sceneData.SecondaryLightDirection = new Vector4(Vectors.Forward.Multiply(data.SecondaryLight.LightRotation), 0);
+            sceneData.SecondaryLightColor = data.SecondaryLight.LightColor.XYZ();
+            sceneData.SecondaryLightIntensity = data.SecondaryLight.LightIntensity;
+            sceneData.AmbientColor = data.MainLight.AmbientColor;
             sceneData.Time = (float)engine.TotalTime;
+            sceneData.ZNear = camera.NearClip;
+            sceneData.ZFar = camera.FarClip;
             sceneData.ScreenWidth = engine.WindowHost.WindowWidth;
             sceneData.ScreenHeight = engine.WindowHost.WindowHeight;
         }

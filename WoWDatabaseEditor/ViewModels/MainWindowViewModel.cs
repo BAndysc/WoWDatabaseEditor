@@ -74,11 +74,16 @@ namespace WoWDatabaseEditorCore.ViewModels
             {
                 var item = DocumentManager.ActiveSolutionItemDocument?.SolutionItem;
                 if (item == null)
+                {
+                    if (DocumentManager.ActiveDocument is { } doc)
+                        doc.Save.Execute(null);
                     return;
+                }
 
                 solutionTasksService.Save(DocumentManager.ActiveSolutionItemDocument!);
-            }, () => DocumentManager.ActiveSolutionItemDocument != null &&
-                     (solutionTasksService.CanSaveAndReloadRemotely || solutionTasksService.CanSaveToDatabase));
+            }, () => (DocumentManager.ActiveSolutionItemDocument != null &&
+                     (solutionTasksService.CanSaveAndReloadRemotely || solutionTasksService.CanSaveToDatabase)) ||
+                     (DocumentManager.ActiveDocument is {} doc && doc.Save.CanExecute(null)));
 
             CopyCurrentSqlCommand = new AsyncAutoCommand(async () =>
             {
@@ -125,7 +130,7 @@ namespace WoWDatabaseEditorCore.ViewModels
             //LoadDefault();
             
             Watch(DocumentManager, dm => dm.ActiveSolutionItemDocument, nameof(ShowExportButtons));
-            Watch(DocumentManager, dm => dm.ActiveSolutionItemDocument, nameof(ShowPlayButtons));
+            Watch(DocumentManager, dm => dm.ActiveDocument, nameof(ShowPlayButtons));
             Watch(tablesToolService, serv => serv.Visibility, nameof(ShowTablesList));
             
             eventAggregator.GetEvent<AllModulesLoaded>()
@@ -165,7 +170,7 @@ namespace WoWDatabaseEditorCore.ViewModels
         public DelegateCommand<IMenuDocumentItem> OpenDocument { get; }
 
         // this fallback to QuickStartViewModel is a hack, otherwise Avalonia for some reason will never show this button if it is not visible in the beginning
-        public bool ShowPlayButtons => DocumentManager.ActiveSolutionItemDocument?.ShowExportToolbarButtons ?? false;
+        public bool ShowPlayButtons => (DocumentManager.ActiveSolutionItemDocument?.ShowExportToolbarButtons ?? false) || (DocumentManager.ActiveDocument?.Save?.CanExecute(null) ?? false);
         
         public bool ShowExportButtons => DocumentManager.ActiveSolutionItemDocument?.ShowExportToolbarButtons ?? true;
         

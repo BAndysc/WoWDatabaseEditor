@@ -47,7 +47,7 @@
         <None Update="data\checker.png">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
-        <None Update="textures\noise_512.png">
+        <None Update="textures\*.png">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
     </ItemGroup>
