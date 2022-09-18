@@ -72,13 +72,13 @@ public class TrinityMasterMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvid
     public override async Task<List<IGossipMenuOption>> GetGossipMenuOptionsAsync(uint menuId)
     {
         await using var model = Database();
-        return await model.GossipMenuOptions.Where(option => option.MenuId == menuId).ToListAsync<IGossipMenuOption>();
+        return await model.GossipMenuOptionsMaster.Where(option => option.MenuId == menuId).ToListAsync<IGossipMenuOption>();
     }
     
     public override List<IGossipMenuOption> GetGossipMenuOptions(uint menuId)
     {
         using var model = Database();
-        return model.GossipMenuOptions.Where(option => option.MenuId == menuId).ToList<IGossipMenuOption>();
+        return model.GossipMenuOptionsMaster.Where(option => option.MenuId == menuId).ToList<IGossipMenuOption>();
     }
     
     public override async Task<List<IBroadcastText>> GetBroadcastTextsAsync()

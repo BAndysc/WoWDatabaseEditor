@@ -48,4 +48,5 @@ public class GossipMenuOption : IGossipMenuOption
     public int BoxBroadcastTextId { get; set; }
 
     public int VerifiedBuild => 0;
+    public bool HasOptionType => true;
 }

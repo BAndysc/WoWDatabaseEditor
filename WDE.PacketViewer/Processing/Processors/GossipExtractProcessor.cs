@@ -799,7 +799,7 @@ namespace WDE.PacketViewer.Processing.Processors
             if (sniff.LinkedMenuId != db.ActionMenuId)
                 return false;
 
-            if (sniff.OptionType != db.OptionType)
+            if (db.HasOptionType && sniff.OptionType != db.OptionType)
                 return false;
 
             if ((uint)sniff.NpcFlags != db.NpcFlag)

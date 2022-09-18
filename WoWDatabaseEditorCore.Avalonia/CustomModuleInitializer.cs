@@ -65,9 +65,8 @@ public class CustomModuleInitializer : IModuleInitializer
             if (moduleInstance != null)
             {
                 // Custom WDE
-                if (coreVersion.CurrentCore != null &&
-                    moduleInstance is IEditorModule editorModule)
-                    editorModule.InitializeCore(coreVersion.CurrentCore);
+                if (moduleInstance is IEditorModule editorModule)
+                    editorModule.InitializeCore(coreVersion.CurrentCore ?? "unspecified");
                 // End custom WDE
                 moduleInstance.RegisterTypes(_containerExtension);
                 moduleInstance.OnInitialized(_containerExtension);

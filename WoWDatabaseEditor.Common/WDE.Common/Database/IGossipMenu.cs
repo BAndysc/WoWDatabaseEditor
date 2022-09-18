@@ -74,5 +74,6 @@ namespace WDE.Common.Database
         string? BoxText { get; }
         int BoxBroadcastTextId { get; }
         int VerifiedBuild { get; }
+        bool HasOptionType { get; }
     }
 }

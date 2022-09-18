@@ -1,7 +1,7 @@
 {
   "id": "gossip_menu_option",
   "compatibility": [
-    "TrinityWrath", "Azeroth"
+    "TrinityMaster"
   ],
   "name": "Gossip Menu Option",
   "single_solution_name": "{key} gossip menu options",
@@ -60,8 +60,8 @@
         },
         {
           "name": "Icon",
-          "db_column_name": "OptionIcon",
-          "value_type": "GossipIconParameter",
+          "db_column_name": "OptionNpc",
+          "value_type": "GossipOptionNpcSlParameter",
           "preferred_width": 110
         },
         {
@@ -75,12 +75,6 @@
           "name": "Broadcast Text",
           "db_column_name": "OptionBroadcastTextID",
           "value_type": "int"
-        },
-        {
-          "name": "Type",
-          "db_column_name": "OptionType",
-          "default": 1,
-          "value_type": "GossipOptionTypeParameter"
         },
         {
           "name": "Npc Flag",

@@ -27,6 +27,7 @@ namespace WDE.TrinityMySqlDatabase.Models
         public ITable<MySqlSpellScriptName> SpellScriptNames => GetTable<MySqlSpellScriptName>();
         public ITable<MySqlGossipMenuLine> GossipMenus => GetTable<MySqlGossipMenuLine>();
         public ITable<MySqlGossipMenuOptionWrath> GossipMenuOptions => GetTable<MySqlGossipMenuOptionWrath>();
+        public ITable<MySqlGossipMenuOptionMaster> GossipMenuOptionsMaster => GetTable<MySqlGossipMenuOptionMaster>();
         public ITable<MySqlGossipMenuOptionCata> SplitGossipMenuOptions => GetTable<MySqlGossipMenuOptionCata>();
         public ITable<MySqlGossipMenuOptionAction> SplitGossipMenuOptionActions => GetTable<MySqlGossipMenuOptionAction>();
         public ITable<MySqlGossipMenuOptionBox> SplitGossipMenuOptionBoxes => GetTable<MySqlGossipMenuOptionBox>();
