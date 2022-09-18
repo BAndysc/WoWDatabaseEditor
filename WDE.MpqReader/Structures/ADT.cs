@@ -298,67 +298,83 @@ namespace WDE.MpqReader.Structures
             }
         }
     }
+    
+    // optimized bitset
+    public struct Bitset64
+    {
+        private ulong b0;
+        public bool this[int v] => (b0 & (1UL << v)) != 0;
+
+        public Bitset64(ulong val)
+        {
+            b0 = val;
+        }
+        
+        internal void SetByte(byte b, int index)
+        {
+            b0 &= ~(0b11111111UL << (index * 8));
+            b0 |= (ulong)(b) << (index * 8);
+        }
+        
+        public static Bitset64 Empty { get; } = new() { b0 = 0 };
+        public static Bitset64 Full { get; } = new() { b0 = 0xFFFFFFFFFFFFFFFFUL };
+    }
 
     public class MH2OLiquidChunk
     {
-        // private int OffsetInstances { get; }
-        // private uint LayerCount { get; }
-        // private int OffsetAttributes { get; }
-        public bool IsActive { get; } = false;
-        public MH2OLiquidInstance[]? LiquidInstances; // array size = layerCount
-        public MH2OChunkAttributes[]? ChunkAttributes; // is it an array too ?
+        public bool IsActive => LayerCount > 0;
+        public uint LayerCount { get; }
+        public MH2OLiquidInstance[]? LiquidInstances { get; }
+        public MH2OChunkAttributes[]? ChunkAttributes { get; }
 
         public MH2OLiquidChunk(IBinaryReader reader)
         {
-            var OffsetInstances = reader.ReadInt32();
-            var LayerCount = reader.ReadUInt32();
-            var OffsetAttributes = reader.ReadInt32();
+            var offsetInstances = reader.ReadInt32();
+            LayerCount = reader.ReadUInt32();
+            var offsetAttributes = reader.ReadInt32();
 
             if (LayerCount > 0)
             {
-                IsActive = true;
+                Debug.Assert(offsetInstances > 0);
 
-                if (OffsetInstances > 0)
-                {
-                    reader.Offset = OffsetInstances;
-                    LiquidInstances = new MH2OLiquidInstance[LayerCount];
-                    for (int i = 0; i < LayerCount; i++)
-                    {
-                        LiquidInstances[i] = new MH2OLiquidInstance(reader);
-                    }
-                }
+                reader.Offset = offsetInstances;
+                LiquidInstances = new MH2OLiquidInstance[LayerCount];
+                for (int i = 0; i < LayerCount; i++)
+                    LiquidInstances[i] = new MH2OLiquidInstance(reader);
 
-                if (OffsetAttributes > 0)
+                if (offsetAttributes > 0)
                 {
-                    reader.Offset = OffsetAttributes;
+                    reader.Offset = offsetAttributes;
                     ChunkAttributes = new MH2OChunkAttributes[LayerCount]; // not 1 per layer ?
                     for (int i = 0; i < LayerCount; i++)
                         ChunkAttributes[i] = new MH2OChunkAttributes(reader);
                 }
             }
-
         }
     }
 
     public readonly struct MH2OLiquidInstance
     {
-        public readonly ushort LiquidTypeId { get; } // LiquidType.dbc
-        public readonly ushort LiquidVertexFormat { get; } // LiquidVertexFormat if wrath, liquid_object_or_lvf if cata+
-        public readonly float MinHeightLevel { get; }
-        public readonly float MaxHeightLevel { get; }
-        public readonly byte X_Offset { get; }
-        public readonly byte Y_Offset { get; }
-        public readonly byte Width { get; }
-        public readonly byte Height { get; }
-        private readonly int OffsetExistsBitmap { get; }
-        private readonly int OffsetVertexData { get; }
-        // public readonly byte[]? RenderBitMap; // not all tiles in the instances need to be filled. always (width * height + 7) / 8 bytes. offset can be 0 for all-exist
-        public readonly BitArray RenderBitArray;
+        public readonly ushort LiquidTypeId; // LiquidType.dbc
+        public readonly ushort LiquidVertexFormat; // LiquidVertexFormat if wrath, liquid_object_or_lvf if cata+
+        public readonly float MinHeightLevel;
+        public readonly float MaxHeightLevel;
+        public readonly byte X_Offset;
+        public readonly byte Y_Offset;
+        public readonly byte Width;
+        public readonly byte Height;
+        private readonly int OffsetExistsBitmap;
+        private readonly int OffsetVertexData;
+        public readonly Bitset64 RenderBitArray;
 
-        // public readonly float[] HeightMap = new float[9 * 9];
-        public readonly Vector3[] Vertices = new Vector3[9 * 9];
-        public readonly float[] Depth = new float[9 * 9];
-        public readonly Vector2[] TexCoords = new Vector2[9 * 9];
+        public int X_Vertices => Width + 1;
+        public int Y_Vertices => Height + 1;
+        public bool IsSingleHeight => Math.Abs(MinHeightLevel - MaxHeightLevel) < float.Epsilon;
+
+        public readonly float[]? HeightMap; // = new float[9 * 9];
+        // not used yet
+        // public readonly float[] Depth = new float[9 * 9];
+        // public readonly Vector2[] TexCoords = new Vector2[9 * 9];
 
         public MH2OLiquidInstance(IBinaryReader reader)
         {
@@ -372,88 +388,59 @@ namespace WDE.MpqReader.Structures
             Height = reader.ReadByte();
             OffsetExistsBitmap = reader.ReadInt32();
             OffsetVertexData = reader.ReadInt32();
+            HeightMap = null;
 
             var oldOffset = reader.Offset;
 
+            RenderBitArray = Bitset64.Full;
             if (OffsetExistsBitmap > 0) 
             {
-                var bytecount = (Width * Height + 7) / 8;
-
-                reader.Offset = OffsetExistsBitmap; // TODO: apparently sometimes it is out of the limited reader's range
-                var RenderBitMap = new byte[bytecount];
-                for (int i = 0; i < bytecount; i++)
-                    RenderBitMap[i] = reader.ReadByte(); // old
-
-                RenderBitArray = new BitArray(RenderBitMap);
-
+                RenderBitArray = Bitset64.Empty;
+                
+                var bytesCount = (Width * Height + 7) / 8;
+                reader.Offset = OffsetExistsBitmap;
+                for (int i = 0; i < bytesCount; i++)
+                    RenderBitArray.SetByte(reader.ReadByte(), i);
             }
 
             if (LiquidVertexFormat > 3) // default to 0 if unknown format
-                    LiquidVertexFormat = 0;
+                LiquidVertexFormat = 0;
 
             if (OffsetVertexData == 0 && LiquidTypeId != 2) // if offset = 0 and liquidType ≠ 2, then let LVF = 2, i.e. some ocean shit
                 LiquidVertexFormat = 2;
 
-            // default values
-            for (int z = 0; z < 9; ++z)
-            {
-                for (int x = 0; x < 9; ++x)
-                {
-                    var v_index = z * 9 + x;
-                    TexCoords[v_index] = new Vector2(x / 4.0f, z / 4.0f);
-                    Depth[v_index] = 1.0f;
-
-                    if (LiquidVertexFormat == 2) // ocean. The liquid's height is always 0.0 regardless of the liquid_type or *_height_level!
-                        // HeightMap[v_index] = 0.0f;
-                        Vertices[v_index].Z = 0.0f;
-                    else
-                        // HeightMap[v_index] = MinHeightLevel;
-                        Vertices[v_index].Z = MinHeightLevel;
-
-                    Vertices[v_index].X = 4.166666f * x;
-                    Vertices[v_index].Y = 4.166666f * z;
-
-                }
-            }
-
             if (OffsetVertexData > 0)
             {
-                int entriescount = (Width + 1) * (Height + 1);
-
                 reader.Offset = OffsetVertexData;
 
-                if (LiquidVertexFormat == 0 || LiquidVertexFormat == 1 | LiquidVertexFormat == 3)
+                if (LiquidVertexFormat == 0 || LiquidVertexFormat == 1 || LiquidVertexFormat == 3)
                 {
-                    for (int z = Y_Offset; z <= Y_Offset + Height; ++z)
-                        for (int x = X_Offset; x <= X_Offset + Width; ++x)
-                            Vertices[z * 9 + x].Z = reader.ReadFloat();
+                    HeightMap = new float[X_Vertices * Y_Vertices];
+                    for (int y = 0; y < Y_Vertices; ++y)
+                        for (int x = 0; x < X_Vertices; ++x)
+                            HeightMap[y * X_Vertices + x] = reader.ReadFloat();
                 }
 
-                if (LiquidVertexFormat == 1 || LiquidVertexFormat == 3)
-                {
-                    for (int z = Y_Offset; z <= Y_Offset + Height; ++z)
-                        for (int x = X_Offset; x <= X_Offset + Width; ++x)
-                        {
-                            TexCoords[z * 9 + x].X = reader.ReadUInt16() / 255;
-                            TexCoords[z * 9 + x].Y = reader.ReadUInt16() / 255;
-                        }
-                }
-
-                if (LiquidVertexFormat == 0 || LiquidVertexFormat == 2 || LiquidVertexFormat == 3)
-                {
-                    for (int z = Y_Offset; z <= Y_Offset + Height; ++z)
-                        for (int x = X_Offset; x <= X_Offset + Width; ++x)
-                            Depth[z * 9 + x] = reader.ReadByte() / 255;
-                }
-
-            }
-            else
-            {
-                // No vertex data. debug message here
+                // not used yet
+                // if (LiquidVertexFormat == 1 || LiquidVertexFormat == 3)
+                // {
+                //     for (int z = 0; z < Y_Vertices; ++z)
+                //         for (int x = 0; x < X_Vertices; ++x)
+                //         {
+                //             TexCoords[z * X_Vertices + x].X = reader.ReadUInt16() / 255;
+                //             TexCoords[z * X_Vertices + x].Y = reader.ReadUInt16() / 255;
+                //         }
+                // }
+                //
+                // if (LiquidVertexFormat == 0 || LiquidVertexFormat == 2 || LiquidVertexFormat == 3)
+                // {
+                //     for (int z = 0; z < Y_Vertices; ++z)
+                //         for (int x = 0; x < X_Vertices; ++x)
+                //             Depth[z * X_Vertices + x] = reader.ReadByte() / 255;
+                // }
             }
 
-            reader.Offset = oldOffset; // reset offset position, required for additional layers.
-
+            reader.Offset = oldOffset;
         }
 
         public readonly struct UvMapEntry
@@ -467,27 +454,24 @@ namespace WDE.MpqReader.Structures
                 Y = reader.ReadUInt16();
             }
         }
-
     }
-
-
+    
     public readonly struct MH2OChunkAttributes
     {
-        // 8*8 bit masks.
-        public readonly ulong Fishable { get; }
-        public readonly ulong Deep { get; }
+        public readonly Bitset64 Fishable;
+        public readonly Bitset64 Deep;
 
         public MH2OChunkAttributes(IBinaryReader reader)
         {
-            Fishable = reader.ReadUInt64();
-            Deep = reader.ReadUInt64();
+            Fishable = new Bitset64(reader.ReadUInt64());
+            Deep = new Bitset64(reader.ReadUInt64());
         }
     }
 
-    public struct SMChunkInfo
+    public readonly struct SMChunkInfo
     {
-        public uint Offset { get; set; }
-        public uint Size { get; set; }
+        public readonly uint Offset;
+        public readonly uint Size;
 
         public SMChunkInfo(IBinaryReader reader)
         {
@@ -549,8 +533,8 @@ namespace WDE.MpqReader.Structures
                     HasLiquid = true;
                     for (int i = 0; i < 16 * 16; ++i)
                     {
-                        MH2OLiquidChunks[i] = new MH2OLiquidChunk(partialReader);
                         partialReader.Offset = 12 * i;
+                        MH2OLiquidChunks[i] = new MH2OLiquidChunk(partialReader);
                     }
                     // MH2OLiquidChunks[LiquidChunkId++] = new MH2OLiquidChunk(partialReader);
                 }

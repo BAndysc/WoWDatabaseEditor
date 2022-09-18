@@ -4,6 +4,7 @@ using SixLabors.ImageSharp.PixelFormats;
 using TheAvaloniaOpenGL.Resources;
 using TheEngine;
 using TheEngine.Components;
+using TheEngine.Data;
 using TheEngine.ECS;
 using TheEngine.Entities;
 using TheEngine.Handles;
@@ -37,6 +38,7 @@ namespace WDE.MapRenderer.Managers
         public Entity terrainEntity;
         public List<StaticRenderHandle> renderHandles = new();
         public List<Entity> entities = new();
+        public List<IMesh> meshes = new();
         public List<NativeBuffer<Matrix>> animationBuffers = new();
 
         public CreatureManager.CreatureChunkData Creatures = new();
@@ -530,111 +532,85 @@ namespace WDE.MapRenderer.Managers
             chunk.terrainEntity = terrainEntity;
             chunk.entities.Add(terrainEntity);
 
-            // water here ////////////////////////////////////////
+            // water here
             if (adt.HasLiquid)
             {
-                float adtposx = 17066 - ( Constants.BlockSize * chunk.X) ;
-                float adtposy = 17066 - (Constants.BlockSize * chunk.Z);
+                float adtposx = t.Position.X;
+                float adtposy = t.Position.Y;
 
+                bool allWaterLayersHaveEqualSize = true;
+                float? waterHeight = null;
 
-                using var LiquidChunksEnumerator = ((IEnumerable<MH2OLiquidChunk>)adt.MH2OLiquidChunks).GetEnumerator();
                 for (int chunkY = 0; chunkY < Constants.ChunksInBlockY; ++chunkY) // for each subchunk
                 {
                     for (int chunkX = 0; chunkX < Constants.ChunksInBlockX; ++chunkX)
                     {
-                        if (!LiquidChunksEnumerator.MoveNext())
-                            throw new Exception("Unexpected end of liquid chunks");
-
-                        var chunkposx = adtposx - ( (chunkX - 1 ) * Constants.ChunkSize);
-                        var chunkposy = adtposy - ( (chunkY - 1 ) * Constants.ChunkSize);
-
-                        // TODO : Layers
-                        // foreach (var layer in layers...)
-                        if (LiquidChunksEnumerator.Current.IsActive && LiquidChunksEnumerator.Current.LiquidInstances != null)
+                        var liquidChunk = adt.MH2OLiquidChunks[chunkY * Constants.ChunksInBlockX + chunkX];
+                        if (liquidChunk.LayerCount != 1 ||
+                            !liquidChunk.LiquidInstances![0].IsSingleHeight ||
+                            (waterHeight.HasValue &&
+                            Math.Abs(liquidChunk.LiquidInstances[0].MinHeightLevel - waterHeight.Value) > float.Epsilon))
                         {
-                            foreach (var LiquidInstance in LiquidChunksEnumerator.Current.LiquidInstances) // 1 mesh per layer or merge them ?
-                            {
-                                var tilecount = LiquidInstance.Width * LiquidInstance.Height;
-                                var vertcount = ( LiquidInstance.Width +1) * (LiquidInstance.Height + 1);
-
-                                // Vector3[] vertices = new Vector3[vertcount];
-                                ushort[] indices = ArrayPool<ushort>.Shared.Rent(tilecount * 2 * 3); // 2 triangles per tile
-                                int k__ = 0;
-
-                                // iterate tiles
-
-                                //for (int tileY = LiquidInstance.Y_Offset; tileY < LiquidInstance.Height; ++tileY)
-                                for (int tileY = LiquidInstance.Y_Offset; tileY <= LiquidInstance.Height + LiquidInstance.Y_Offset; ++tileY)
-                                {
-                                    // for (int tileX = LiquidInstance.X_Offset; tileX < LiquidInstance.Width; ++tileX) // X
-                                    for (int tileX = LiquidInstance.X_Offset; tileX <= LiquidInstance.Width + LiquidInstance.X_Offset; ++tileX) // X
-                                    {
-                                        bool renderState = true;
-                                        // check if tile should be rendered
-                                        if (LiquidInstance.RenderBitArray != null)
-                                        {
-                                            renderState = LiquidInstance.RenderBitArray[tileX + tileY * LiquidInstance.Width];
-                                        }
-
-                                        if (renderState == false)
-                                            continue;
-
-                                        var vertexindex = tileY * 9 + tileX;
-
-                                        // set indices
-                                        // int tl = tileY * LiquidInstance.Width + tileX;
-                                        int tl = tileY * 9 + tileX;
-                                        int tr = tl + 1;
-                                        //int bl = (tileY + 1) * LiquidInstance.Width + tileX;
-                                        int bl = (tileY + 1) * 9 + tileX;
-                                        int br = bl + 1;
-                                        // 1st triangle
-                                        indices[k__++] = (ushort)tl;
-                                        indices[k__++] = (ushort)tr;
-                                        indices[k__++] = (ushort)bl;
-                                        // 2nd triangle
-                                        indices[k__++] = (ushort)tr;
-                                        indices[k__++] = (ushort)br;
-                                        indices[k__++] = (ushort)bl;
-
-                                        // LiquidInstance.Vertices[vertexindex].X = chunkposx - (tileX * Constants.UnitSize);
-                                        // LiquidInstance.Vertices[vertexindex].Y = chunkposy - (tileY * Constants.UnitSize);
-                                    }
-                                }
-
-                                // foreach (var vert in LiquidInstance.Vertices)
-                                //     if (vert.X == 0.0f || vert.Y == 0.0f)
-                                //         throw new Exception("vert coord x or y was 0");
-
-                                IMesh waterMesh = meshManager.CreateMesh(LiquidInstance.Vertices, indices);
-
-                                Material waterMaterial = materialManager.CreateMaterial("internalShaders/unlit.json");
-                                waterMaterial.ZWrite = false;
-                                waterMaterial.SourceBlending = Blending.SrcAlpha;
-                                waterMaterial.DestinationBlending = Blending.OneMinusSrcAlpha;
-                                waterMaterial.BlendingEnabled = true;
-                                waterMaterial.SetUniform("color", new Vector4(0.28f, 1, 0.95f, 0.4f));
-
-
-                                var waterEntity = entityManager.CreateEntity(entityManager.NewArchetype()
-                                    .WithComponentData<RenderEnabledBit>()
-                                    .WithComponentData<LocalToWorld>()
-                                    .WithComponentData<WorldMeshBounds>()
-                                    .WithComponentData<MeshRenderer>());
-                                entityManager.GetComponent<LocalToWorld>(waterEntity).Matrix = Utilities.TRS(new Vector3(chunkposx, chunkposy, 0), Quaternion.Identity, Vectors.One);
-                                // entityManager.GetComponent<LocalToWorld>(waterEntity).Matrix = Utilities.TRS(new Vector3(0, 0, 0), Quaternion.Identity, Vectors.One);
-
-                                entityManager.GetComponent<MeshRenderer>(waterEntity).SubMeshId = 0;
-                                entityManager.GetComponent<MeshRenderer>(waterEntity).MaterialHandle = waterMaterial.Handle;
-                                entityManager.GetComponent<MeshRenderer>(waterEntity).MeshHandle = waterMesh.Handle;
-                                entityManager.GetComponent<MeshRenderer>(waterEntity).Opaque = false;
-                                entityManager.GetComponent<RenderEnabledBit>(waterEntity).Enable();
-                            }
-                            
+                            allWaterLayersHaveEqualSize = false;
+                            break;
                         }
-                        
-                    } 
+
+                        waterHeight = liquidChunk.LiquidInstances[0].MinHeightLevel;
+                    }
                 }
+                
+                IMesh waterMesh;
+                Vector3 meshPosition = Vector3.Zero;
+                if (allWaterLayersHaveEqualSize)
+                {
+                    var merged = woWMeshManager.GenerateGiganticWaterMesh(waterHeight!.Value);
+                    waterMesh = meshManager.CreateMesh(merged.Item1, merged.Item2);
+                    meshPosition = new Vector3(adtposx, adtposy, 0);
+                }
+                else
+                {
+                    List<Vector3[]> verticesSet = new List<Vector3[]>();
+                    List<ushort[]> indicesSet = new List<ushort[]>();
+                    List<Vector3> offsets = new List<Vector3>();
+                    
+                    for (int chunkY = 0; chunkY < Constants.ChunksInBlockY; ++chunkY) // for each subchunk
+                    {
+                        for (int chunkX = 0; chunkX < Constants.ChunksInBlockX; ++chunkX)
+                        {
+                            var liquidChunk = adt.MH2OLiquidChunks[chunkY * Constants.ChunksInBlockX + chunkX];
+                            var chunkposx = adtposx - ( (chunkY) * Constants.ChunkSize);
+                            var chunkposy = adtposy - ( (chunkX) * Constants.ChunkSize);
+                        
+                            if (liquidChunk.LiquidInstances == null)
+                                continue;
+
+                            foreach (var liquidInstance in liquidChunk.LiquidInstances)
+                            {
+                                var (vertices, indices) = woWMeshManager.GenerateWaterMesh(liquidInstance);
+                                verticesSet.Add(vertices);
+                                indicesSet.Add(indices);
+                                offsets.Add(new Vector3(chunkposx, chunkposy, 0));
+                            }
+                        }
+                    }
+                    var merged = MeshBatcher.MergeMeshes(verticesSet, indicesSet, offsets);
+                    waterMesh = meshManager.CreateMesh(merged.Item1, merged.Item2);
+                }
+
+                var trsMatrix = Utilities.TRS(meshPosition, Quaternion.Identity, Vectors.One);
+                var waterEntity = entityManager.CreateEntity(archetypes.TerrainEntityArchetype);
+                entityManager.GetComponent<LocalToWorld>(waterEntity).Matrix = trsMatrix;
+                            
+                entityManager.GetComponent<MeshRenderer>(waterEntity).SubMeshId = 0;
+                entityManager.GetComponent<MeshRenderer>(waterEntity).MaterialHandle = woWMeshManager.WaterMaterial.Handle;
+                entityManager.GetComponent<MeshRenderer>(waterEntity).MeshHandle = waterMesh.Handle;
+                entityManager.GetComponent<MeshRenderer>(waterEntity).Opaque = false;
+                localBounds = waterMesh.Bounds;
+                localBounds = localBounds with { Size = localBounds.Size with { Z = 1 } };
+                entityManager.GetComponent<WorldMeshBounds>(waterEntity) = RenderManager.LocalToWorld((MeshBounds)localBounds, new LocalToWorld() { Matrix = trsMatrix });
+
+                chunk.entities.Add(waterEntity);
+                chunk.meshes.Add(waterMesh);
             }
 
 
@@ -856,6 +832,9 @@ namespace WDE.MapRenderer.Managers
             foreach (var buffer in chunk.animationBuffers)
                 buffer.Dispose();
             
+            foreach (var obj in chunk.meshes)
+                meshManager.DisposeMesh(obj);
+                
             chunk.animationBuffers.Clear();
 
             chunk.Dispose(textureManager);
