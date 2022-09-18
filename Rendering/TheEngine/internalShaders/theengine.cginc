@@ -179,6 +179,21 @@ uniform usamplerBuffer ObjectIndices;
 #define ddx(v) dFdx(v)
 #define ddy(v) dFdy(v)
 
+float LinearEyeDepth(float d)
+{
+	return zNear * zFar / (zFar + d * (zNear - zFar));
+}
+
+float Linear01Depth(float d)
+{
+	return (LinearEyeDepth(d) - zNear) / (zFar - zNear);
+}
+
+vec3 NormalBlend(vec3 A, vec3 B)
+{
+	return normalize(vec3(A.rg + B.rg, A.b * B.b));
+}
+
 vec3 lighting(vec3 col, vec3 normal)
 {
 	float diff = max(dot(-normal, lightDir.xyz), 0.0);

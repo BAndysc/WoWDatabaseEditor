@@ -28,6 +28,7 @@ namespace WDE.MapRenderer.Managers
             chunkMesh = meshManager.CreateMesh(ChunkMesh.Create());
             
             WaterMaterial = materialManager.CreateMaterial("data/water.json");
+            WaterMaterial.Culling = CullingMode.Off;
             WaterMaterial.ZWrite = false;
             WaterMaterial.SourceBlending = Blending.SrcAlpha;
             WaterMaterial.DestinationBlending = Blending.OneMinusSrcAlpha;
@@ -47,8 +48,8 @@ namespace WDE.MapRenderer.Managers
                 var oceanDeep = light.NormalWeather.GetLightParameter(LightIntParamType.OceanDeep).GetColorAtTime(time);
                 //var riverShallow = light.NormalWeather.GetLightParameter(LightIntParamType.RiverShallow).GetColorAtTime(time);
                 //var riverDeep = light.NormalWeather.GetLightParameter(LightIntParamType.RiverDeep).GetColorAtTime(time);
-                WaterMaterial.SetUniform("deepColor", oceanDeep.ToRgbaVector() with {W=0.75f});
-                WaterMaterial.SetUniform("shallowColor", oceanShallow.ToRgbaVector() with {W=0.9f});
+                WaterMaterial.SetUniform("deepColor", oceanDeep.ToRgbaVector() with {W=0.55f});
+                WaterMaterial.SetUniform("shallowColor", oceanShallow.ToRgbaVector() with {W=0.85f});
             }
         }
         
