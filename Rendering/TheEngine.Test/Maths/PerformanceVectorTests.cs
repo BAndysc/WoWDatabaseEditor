@@ -7,7 +7,7 @@ namespace TheEngine.Test.Maths;
 
 public class PerformanceVectorTests
 {
-    [Test]
+    //[Test]
     public void TestPerformanceVector3()
     {
         Vector3[] vectors = new Vector3[10000000];
@@ -37,7 +37,7 @@ public class PerformanceVectorTests
     }
     
     
-    [Test]
+    //[Test]
     public void TestPerformanceMatrixInverse()
     {
         Matrix[] matrices = new Matrix[1000000];
