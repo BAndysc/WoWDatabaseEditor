@@ -61,6 +61,7 @@ namespace TheAvaloniaOpenGL.Resources
     public class Shader : IDisposable
     {
         private readonly IDevice device;
+        private readonly string shaderFile;
 
         internal int VertexShader { get; }
         internal int PixelShader { get; }
@@ -230,6 +231,7 @@ namespace TheAvaloniaOpenGL.Resources
             vertexShaderByteCode.Dispose();
             pixelShaderByteCode.Dispose();*/
             this.device = device;
+            this.shaderFile = shaderFile;
         }
 
         private static int TypeToSize(ShaderData.ShaderInputType type)
@@ -274,7 +276,7 @@ namespace TheAvaloniaOpenGL.Resources
             int ret = device.GetProgramParameter(ProgramHandle, GetProgramParameterName.ValidateStatus);
             if (ret == 0)
             {
-                var problem = device.GetProgramInfoLog(ProgramHandle);
+                var problem = "In shader: " + shaderFile + "\n\n" + device.GetProgramInfoLog(ProgramHandle);
                 Console.WriteLine(problem);
                 throw new Exception(problem);
             }
