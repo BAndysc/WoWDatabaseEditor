@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using SixLabors.ImageSharp.PixelFormats;
 using TheMaths;
+using WDE.MpqReader.DBC;
 using WDE.MpqReader.Readers;
 
 namespace WDE.MpqReader.Structures
@@ -17,6 +18,7 @@ namespace WDE.MpqReader.Structures
         public PooledArray<Vector3> Normals { get; init; }
         public List<PooledArray<Vector2>> UVs { get; init; } = new();
         public WorldMapObjectBatch[] Batches { get; init; }
+        public WorldMapObjectLiquid Liquid { get; init; }
     
         public WorldMapObjectGroup(IBinaryReader reader)
         {
@@ -53,6 +55,8 @@ namespace WDE.MpqReader.Structures
                     Batches = ReadBatches(partialReader, size);
                 else if (chunkName == "MOCV")
                     VertexColors = ReadVertexColors(partialReader, size);
+                else if (chunkName == "MLIQ")
+                    Liquid = new WorldMapObjectLiquid(reader, Header);
 
                 CollisionOnlyIndices = BuildCollisionOnlyIndices(Polygons, Indices);
                 
@@ -270,5 +274,163 @@ namespace WDE.MpqReader.Structures
             flags2 = reader.ReadUInt32();
             unk = reader.ReadUInt32();
         }
+    }
+
+    public struct WorldMapObjectLiquid
+    {
+        public int liquidVertsX;
+        public int liquidVertsY;
+        public int liquidTilesX;
+        public int liquidTilesY;
+        public Vector3 liquidCornerCoords;
+        public ushort liquidMateriallId;
+        public float[]? HeightMap;
+        public uint realLiquidType;
+        public LiquidVertex[]? liquidVertices;
+        public byte[]? tileFlags;
+
+        public List<Vector3> verticesCoords = new List<Vector3> ();
+
+
+        public WorldMapObjectLiquid(IBinaryReader reader, WorldMapObjectGroupHeader groupHeader)
+        {
+            liquidVertsX = reader.ReadInt32();
+            liquidVertsY = reader.ReadInt32();
+            liquidTilesX = reader.ReadInt32();
+            liquidTilesY = reader.ReadInt32();
+            liquidCornerCoords = reader.ReadVector3();
+            liquidMateriallId = reader.ReadUInt16();
+
+            // for (int i = 0; i < liquidVertsX * liquidVertsY; i++)
+            // {
+            //     LiquidVertex vertex = new LiquidVertex(reader);
+            // 
+            // }
+
+            liquidVertices = new LiquidVertex[liquidVertsX * liquidVertsY];
+
+            for (int y = 0; y < liquidVertsY; y++)
+            {
+                var y_pos = liquidCornerCoords.Y + y * 4.1666625f;
+                for (int x = 0; x < liquidVertsX; x++)
+                {
+                    var x_pos = liquidCornerCoords.X + x * 4.1666625f;
+                    LiquidVertex vertex = new LiquidVertex(reader);
+                    // vertex.xPos = x_pos;
+                    // vertex.yPos = y_pos;
+                    liquidVertices[x + (y * liquidVertsX)] = vertex;
+                    verticesCoords.Add(new Vector3(x_pos, y_pos, vertex.Height));
+                }
+            }
+
+            tileFlags = new byte[liquidTilesX * liquidTilesY];
+
+            for (int i = 0; i < (liquidTilesX * liquidTilesY); i++)
+            {
+                tileFlags[i] = reader.ReadByte();
+            }
+
+            // get liquid type
+            uint wmoLiquidType = 0;
+            if ((groupHeader.flags & 0x4) > 0)
+            {
+                wmoLiquidType = groupHeader.groupLiquid;
+            }
+            else // legacy liquid type
+            {
+                foreach (var tileFlag in tileFlags)
+                {
+                    if ((tileFlag & 15) != 15) // liquid type is in the first 4 bits. if 15 = don't render.
+                        wmoLiquidType = (uint)GetLegacyWaterType(tileFlag & 15);
+                }
+                
+            }
+            realLiquidType = FromWmoLiquidType(wmoLiquidType, groupHeader);
+
+        }
+
+        public struct LiquidVertex
+        {
+            public bool IsWater = true;
+            public float Height = 0.0f;
+            public float xPos;
+            public float yPos;
+
+            // water
+            public byte flow1 = 0;
+            public byte flow2 = 0;
+            public byte flow1Pct = 0;
+            public byte filler = 0;
+            // magma/slime
+            public short u;
+            public short v;
+
+            public LiquidVertex(IBinaryReader reader)
+            {
+                var pos = reader.Offset;
+                flow1 = reader.ReadByte();
+                flow2 = reader.ReadByte();
+                flow1Pct = reader.ReadByte();
+                filler = reader.ReadByte();
+
+                reader.Offset = pos;
+
+                u = reader.ReadInt16();
+                v = reader.ReadInt16();
+
+                Height = reader.ReadFloat();
+            }
+        }
+
+        private uint FromWmoLiquidType(uint basicLiquidType, WorldMapObjectGroupHeader groupHeader)
+        {
+            // Convert simplified WMO liquid type IDs to real LiquidType.dbc IDs
+            uint realLiquidType = 0;
+
+            if (basicLiquidType < 20)
+            {
+                if (basicLiquidType == 0 || basicLiquidType == 1)
+                    realLiquidType = (uint)((groupHeader.flags & 0x80000) > 0 ? 14 : 13);
+                else if (basicLiquidType == 1)
+                    realLiquidType = 14;
+                else if (basicLiquidType == 2)
+                    realLiquidType = 19;
+                else if (basicLiquidType == 3)
+                    realLiquidType = 20;
+                else if (basicLiquidType == 15)
+                    realLiquidType = 17;
+            }
+            else
+                realLiquidType = basicLiquidType + 1;
+
+            return realLiquidType;
+        }
+
+        private int GetLegacyWaterType(int LegacyliquidType)
+        {
+            // from blizzard's decompiled code...
+            int realLiquidType = LegacyliquidType += 1;
+
+            if ( (realLiquidType - 1) <= 0x13)
+            {
+                var newwater = (realLiquidType - 1) & 3;
+                if (newwater == 1)
+                    return 14;
+                if (newwater >= 1)
+                {
+                    if (newwater == 2)
+                        realLiquidType = 19;
+                    else if (newwater == 3)
+                        realLiquidType = 20;
+
+                    return realLiquidType;
+                }
+                realLiquidType = 13;
+
+            }
+
+            return realLiquidType;
+        }
+
     }
 }
