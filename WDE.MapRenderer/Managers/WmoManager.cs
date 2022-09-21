@@ -14,6 +14,7 @@ namespace WDE.MapRenderer.Managers
         private readonly IMeshManager meshManager;
         private readonly WoWTextureManager textureManager;
         private readonly IMaterialManager materialManager;
+        private readonly WoWMeshManager woWMeshManager;
 
         public class WmoInstance
         {
@@ -38,12 +39,14 @@ namespace WDE.MapRenderer.Managers
         public WmoManager(IGameFiles gameFiles,
             IMeshManager meshManager,
             WoWTextureManager textureManager,
-            IMaterialManager materialManager)
+            IMaterialManager materialManager,
+            WoWMeshManager woWMeshManager)
         {
             this.gameFiles = gameFiles;
             this.meshManager = meshManager;
             this.textureManager = textureManager;
             this.materialManager = materialManager;
+            this.woWMeshManager = woWMeshManager;
         }
 
         public IEnumerator LoadWorldMapObject(string path, TaskCompletionSource<WmoInstance?> result)
@@ -205,6 +208,47 @@ namespace WDE.MapRenderer.Managers
 
                 wmoMesh.RebuildIndices();
                 wmoInstance.meshes.Add((wmoMesh, materials));
+
+                if ((group.Header.flags & 0x1000) > 0) // has water
+                {
+                    var tilecount = group.Liquid.liquidTilesX * group.Liquid.liquidTilesY;
+                    var vertCount = (group.Liquid.liquidVertsY) * (group.Liquid.liquidVertsX);
+                    // vertices = new Vector3[vertCount];
+                    ushort[] LiquidIndices = new ushort[tilecount * 2 * 3];
+
+                    int index = 0;
+                    for (int tileY = 0; tileY < group.Liquid.liquidTilesY; ++tileY)
+                    {
+                        for (int tileX = 0; tileX < group.Liquid.liquidTilesX; ++tileX) // X
+                        {
+                            bool renderState = (group.Liquid.tileFlags[tileX + (tileY * group.Liquid.liquidTilesX)] & 15) > 0 ? false : true; //  mh2o.RenderBitArray[(tileY) * mh2o.Width + (tileX)];
+
+                            if (!renderState)
+                                continue;
+
+                            var vertexIndex = ((tileY)) * (group.Liquid.liquidTilesX + 1) + (tileX);
+                            int tl = vertexIndex;
+                            int tr = tl + 1;
+                            int bl = vertexIndex + (group.Liquid.liquidTilesX + 1); // +mhwo width is a new row
+                            int br = bl + 1;
+
+                            // 1st triangle
+                            LiquidIndices[index++] = (ushort)tl;
+                            LiquidIndices[index++] = (ushort)bl;
+                            LiquidIndices[index++] = (ushort)tr;
+                            // 2nd triangle
+                            LiquidIndices[index++] = (ushort)tr;
+                            LiquidIndices[index++] = (ushort)bl;
+                            LiquidIndices[index++] = (ushort)br;
+                        }
+                    }
+
+                    var waterMesh = meshManager.CreateMesh(group.Liquid.verticesCoords.ToArray(), LiquidIndices);
+                    Material[] liquidMaterials = new Material[1];
+                    liquidMaterials[0] = woWMeshManager.WaterMaterial;
+                    wmoInstance.meshes.Add((waterMesh, liquidMaterials));
+                }
+
                 group.Dispose();
             }
 
