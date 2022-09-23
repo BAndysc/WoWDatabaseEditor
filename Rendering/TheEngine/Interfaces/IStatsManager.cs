@@ -24,6 +24,7 @@ namespace TheEngine.Interfaces
         public RollingAverage FrameTime;
         public RollingAverage UpdateTime;
         public RollingAverage PresentTime;
+        public RollingAverage Sorting;
     }
     
     public interface IStatsManager

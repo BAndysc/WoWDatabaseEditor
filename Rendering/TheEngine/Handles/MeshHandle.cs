@@ -1,8 +1,8 @@
 ﻿namespace TheEngine.Handles
 {
-    public struct MeshHandle
+    public readonly struct MeshHandle
     {
-        internal int Handle { get; }
+        internal readonly int Handle;
 
         internal MeshHandle(int id)
         {

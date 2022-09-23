@@ -13,7 +13,7 @@
     
     <ItemGroup>
       <PackageReference Include="ImGui.NET" Version="1.87.3" />
-      <PackageReference Include="JetBrains.Profiler.Api" Version="1.2.0-preview2" />
+      <PackageReference Include="JetBrains.Profiler.Api" Version="1.2.0" />
       <PackageReference Include="OpenTK" Version="4.6.4" />
     </ItemGroup>
 
