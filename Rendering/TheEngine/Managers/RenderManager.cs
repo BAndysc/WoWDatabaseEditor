@@ -649,6 +649,7 @@ namespace TheEngine.Managers
         Stopwatch materialtimer = new Stopwatch();
         Stopwatch buffertimer = new Stopwatch();
         Stopwatch draw = new Stopwatch();
+        Stopwatch sorting = new Stopwatch();
         private float viewDistanceModifier = 8;
 
         private (LocalToWorld, MaterialInstanceRenderData?, Entity)[] renderersData = new (LocalToWorld, MaterialInstanceRenderData?, Entity)[10000];
@@ -780,8 +781,11 @@ namespace TheEngine.Managers
                 }
             });
 
+            sorting.Restart();
             SortRenderersByMesh(0, opaque);
             SortRenderersByMesh(opaque + 1, totalToDraw);
+            sorting.Stop();
+            engine.statsManager.Counters.Sorting.Add(sorting.Elapsed.TotalMilliseconds);
 
             Render(0, opaque, false);
         }

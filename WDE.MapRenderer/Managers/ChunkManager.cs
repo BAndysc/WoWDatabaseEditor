@@ -606,7 +606,7 @@ namespace WDE.MapRenderer.Managers
                 entityManager.GetComponent<MeshRenderer>(waterEntity).MeshHandle = waterMesh.Handle;
                 entityManager.GetComponent<MeshRenderer>(waterEntity).Opaque = false;
                 localBounds = waterMesh.Bounds;
-                localBounds = localBounds with { Size = localBounds.Size with { Z = 1 } };
+                localBounds = localBounds.WithSize(localBounds.Size with { Z = 1 });
                 entityManager.GetComponent<WorldMeshBounds>(waterEntity) = RenderManager.LocalToWorld((MeshBounds)localBounds, new LocalToWorld() { Matrix = trsMatrix });
 
                 chunk.entities.Add(waterEntity);

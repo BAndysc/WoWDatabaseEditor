@@ -59,23 +59,23 @@ namespace TheMaths
         /// <summary>
         /// The minimum point of the box.
         /// </summary>
-        public Vector3 Minimum => Center - Size / 2;
+        public readonly Vector3 Minimum;
 
         /// <summary>
         /// The maximum point of the box.
         /// </summary>
-        public Vector3 Maximum => Center + Size / 2;
+        public readonly Vector3 Maximum;
 
 
         /// <summary>
         /// Returns the size of the bounding box
         /// </summary>
-        public Vector3 Size;
+        public readonly Vector3 Size;
 
         /// <summary>
         /// Returns the size of the bounding box
         /// </summary>
-        public Vector3 Center;
+        public readonly Vector3 Center;
         
         /// <summary>
         /// Initializes a new instance of the <see cref="BoundingBox"/> struct.
@@ -86,6 +86,8 @@ namespace TheMaths
         {
             this.Center = (minimum + maximum) / 2;
             this.Size = maximum - minimum;
+            Minimum = minimum;
+            Maximum = maximum;
         }
 
         public static BoundingBox FromCenterSize(Vector3 center, Vector3 size)
@@ -552,6 +554,11 @@ namespace TheMaths
 
             var strongValue = (BoundingBox)value;
             return Equals(ref strongValue);
+        }
+
+        public BoundingBox WithSize(Vector3 size)
+        {
+            return FromCenterSize(Center, size);
         }
     }
 }

@@ -167,6 +167,7 @@ public class StandaloneCustomGameModule : IGameModule
         ui2.Text("calibri", $" - Render time: {counters.TotalRender.Average:0.00} ms", 12, Vector4.One);
         ui2.Text("calibri", $"   - Bounds: {counters.BoundsCalc.Average:0.00}ms", 12, Vector4.One);
         ui2.Text("calibri", $"   - Culling: {counters.Culling.Average:0.00}ms", 12, Vector4.One);
+        ui2.Text("calibri", $"   - Sorting: {counters.Sorting.Average:0.00}ms", 12, Vector4.One);
         ui2.Text("calibri", $"   - Drawing: {counters.Drawing.Average:0.00}ms", 12, Vector4.One);
         ui2.Text("calibri", $"   - Present time: {counters.PresentTime.Average:0.00} ms", 12, Vector4.One);
         ui2.Text("calibri", "Shaders: " + stats.ShaderSwitches, 12, Vector4.One);

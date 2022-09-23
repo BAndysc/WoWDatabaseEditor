@@ -494,21 +494,23 @@ namespace TheMaths
 
         private void GetBoxToPlanePVertexNVertex(ref BoundingBox box, ref Vector3 planeNormal, out Vector3 p, out Vector3 n)
         {
-            p = box.Minimum;
+            var min = box.Minimum;
+            var max = box.Maximum;
+            p = min;
             if (planeNormal.X >= 0)
-                p.X = box.Maximum.X;
+                p.X = max.X;
             if (planeNormal.Y >= 0)
-                p.Y = box.Maximum.Y;
+                p.Y = max.Y;
             if (planeNormal.Z >= 0)
-                p.Z = box.Maximum.Z;
+                p.Z = max.Z;
 
-            n = box.Maximum;
+            n = max;
             if (planeNormal.X >= 0)
-                n.X = box.Minimum.X;
+                n.X = min.X;
             if (planeNormal.Y >= 0)
-                n.Y = box.Minimum.Y;
+                n.Y = min.Y;
             if (planeNormal.Z >= 0)
-                n.Z = box.Minimum.Z;
+                n.Z = min.Z;
         }
 
         /// <summary>

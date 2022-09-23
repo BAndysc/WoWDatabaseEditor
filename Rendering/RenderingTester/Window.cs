@@ -57,7 +57,7 @@ public class DummyGameProperties : IGameProperties
     public Time CurrentTime { get; set; } = Time.FromMinutes(720);
     public float ViewDistanceModifier { get; set; } = 16;
     public bool ShowAreaTriggers { get; set; } = false;
-    public int TextureQuality { get; set; } = 0;
+    public int TextureQuality { get; set; } = 3;
     public float DynamicResolution { get; set; } = 1;
     public bool RenderGui { get; set; } = true;
 }

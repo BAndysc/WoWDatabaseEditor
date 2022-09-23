@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Avalonia.Input;
+using JetBrains.Profiler.Api;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
@@ -73,6 +74,12 @@ public class TheEngineOpenTkWindow : GameWindow, IWindowHost
         SwapBuffers();
         renderStopwatch.Stop();
         engine.statsManager.Counters.PresentTime.Add(renderStopwatch.Elapsed.Milliseconds);
+        if (measure)
+        {
+            MeasureProfiler.StopCollectingData();
+            MeasureProfiler.SaveData();
+            measure = false;
+        }
     }
 
     private KeyboardState? previousState;
@@ -199,8 +206,14 @@ public class TheEngineOpenTkWindow : GameWindow, IWindowHost
         { Keys.Menu, Key.DbeNoCodeInput },
     };
 
+    private bool measure;
     protected override void OnUpdateFrame(FrameEventArgs args)
     {
+        if (engine.inputManager.keyboard.JustPressed(Key.H))
+        {
+            MeasureProfiler.StartCollectingData();
+            measure = true;
+        }
         updateStopwatch.Restart();
         engine.inputManager.PostUpdate();
         engine.inputManager.Update((float)args.Time * 1000);
