@@ -584,9 +584,9 @@ namespace WDE.MapRenderer.Managers
                             if (liquidChunk.LiquidInstances == null)
                                 continue;
 
-                            foreach (var liquidInstance in liquidChunk.LiquidInstances)
+                            for (var index = 0; index < liquidChunk.LiquidInstances.Length; index++)
                             {
-                                var (vertices, indices) = woWMeshManager.GenerateWaterMesh(liquidInstance);
+                                var (vertices, indices) = woWMeshManager.GenerateWaterMesh(ref liquidChunk.LiquidInstances[index]);
                                 verticesSet.Add(vertices);
                                 indicesSet.Add(indices);
                                 offsets.Add(new Vector3(chunkposx, chunkposy, 0));

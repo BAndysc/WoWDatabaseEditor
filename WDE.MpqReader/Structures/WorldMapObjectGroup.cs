@@ -9,18 +9,18 @@ namespace WDE.MpqReader.Structures
 {
     public class WorldMapObjectGroup : System.IDisposable
     {
-        public WorldMapObjectGroupHeader Header { get; init; }
-        public PooledArray<WorldMapObjectPoly> Polygons { get; set; }
-        public PooledArray<ushort> Indices { get; init; }
-        public PooledArray<Vector3> Vertices { get; init; }
-        public PooledArray<Color>? VertexColors { get; init; }
-        public ushort[] CollisionOnlyIndices { get; init; }
-        public PooledArray<Vector3> Normals { get; init; }
-        public List<PooledArray<Vector2>> UVs { get; init; } = new();
-        public WorldMapObjectBatch[] Batches { get; init; }
-        public WorldMapObjectLiquid Liquid { get; init; }
+        public readonly WorldMapObjectGroupHeader Header;
+        public readonly PooledArray<WorldMapObjectPoly> Polygons;
+        public readonly PooledArray<ushort> Indices;
+        public readonly PooledArray<Vector3> Vertices;
+        public readonly PooledArray<Color>? VertexColors;
+        public readonly ushort[] CollisionOnlyIndices;
+        public readonly PooledArray<Vector3> Normals;
+        public readonly List<PooledArray<Vector2>> UVs = new();
+        public readonly WorldMapObjectBatch[] Batches;
+        public readonly WorldMapObjectLiquid Liquid;
     
-        public WorldMapObjectGroup(IBinaryReader reader)
+        public WorldMapObjectGroup(IBinaryReader reader, in WMOHeader wmoHeader)
         {
             var firstChunkName = reader.ReadBytes(4);
             Debug.Assert(firstChunkName[0] == 'R' && firstChunkName[1] == 'E' && firstChunkName[2] == 'V' && firstChunkName[3] == 'M');
@@ -56,7 +56,7 @@ namespace WDE.MpqReader.Structures
                 else if (chunkName == "MOCV")
                     VertexColors = ReadVertexColors(partialReader, size);
                 else if (chunkName == "MLIQ")
-                    Liquid = new WorldMapObjectLiquid(reader, Header);
+                    Liquid = new WorldMapObjectLiquid(reader, in wmoHeader, in Header);
 
                 CollisionOnlyIndices = BuildCollisionOnlyIndices(Polygons, Indices);
                 
@@ -178,7 +178,7 @@ namespace WDE.MpqReader.Structures
         }
     }
 
-    public struct WorldMapObjectPoly
+    public readonly struct WorldMapObjectPoly
     {
         [Flags]
         public enum Flags
@@ -193,8 +193,8 @@ namespace WDE.MpqReader.Structures
             /*0x80*/ F_COLLIDE_HIT = 0x80,
         }
 
-        public Flags flags;
-        public byte materialId;
+        public readonly Flags flags;
+        public readonly byte materialId;
 
         public bool IsCollisionOnly => materialId == 0xFF;
         
@@ -205,16 +205,16 @@ namespace WDE.MpqReader.Structures
         }
     }
 
-    public struct WorldMapObjectBatch
+    public readonly struct WorldMapObjectBatch
     {
-        public ushort bx, by, bz; // a bounding box for culling, see "unknown_box" below
-        public short tx, ty, tz;
-        public uint startIndex;                     // index of the first face index used in MOVI
-        public ushort count; // number of MOVI indices used
-        public ushort minIndex; // index of the first vertex used in MOVT
-        public ushort maxIndex; // index of the last vertex used (batch includes this one)
-        public byte flag_unknown_1;
-        public byte material_id; // index in MOMT
+        public readonly ushort bx, by, bz; // a bounding box for culling, see "unknown_box" below
+        public readonly short tx, ty, tz;
+        public readonly uint startIndex;                     // index of the first face index used in MOVI
+        public readonly ushort count; // number of MOVI indices used
+        public readonly ushort minIndex; // index of the first vertex used in MOVT
+        public readonly ushort maxIndex; // index of the last vertex used (batch includes this one)
+        public readonly byte flag_unknown_1;
+        public readonly byte material_id; // index in MOMT
 
         public WorldMapObjectBatch(IBinaryReader reader)
         {
@@ -233,34 +233,59 @@ namespace WDE.MpqReader.Structures
         }
     }
 
-    public struct WorldMapObjectGroupHeader
+    [Flags]
+    public enum WorldMapObjectGroupFlags
     {
-        public uint groupName;               // offset into MOGN
-        public uint descriptiveGroupName;    // offset into MOGN
-        public uint flags;                   // see below
-        public CAaBox boundingBox;              // as with flags, same as in corresponding MOGI entry
+        HasBSPTree = 0x1,
+        HasLightMapUnused = 0x2,
+        HasVertexColors = 0x4,
+        Exterior = 0x8,
+        ExteriorLit = 0x40,
+        Unreachable = 0x80,
+        ShowSkyInInterior = 0x100,
+        HasLights = 0x200,
+        HasDoodads = 0x800,
+        HasWater = 0x1000,
+        Interior = 0x2000,
+        QueryMountAllowed = 0x8000,
+        AlwaysDraw = 0x10000,
+        ShowSkybox = 0x40000,
+        IsNotWaterButOcean = 0x80000,
+        IsMountAllowed = 0x200000,
+        HasSeconMOCV = 0x1000000,
+        HasTwoMOTV = 0x2000000,
+        Antiportal = 0x4000000,
+        ExteriorCull = 0x20000000,
+        HasThreeMOTB = 0x40000000
+    }
 
-        public ushort portalStart;             // index into MOPR
-        public ushort portalCount;             // number of MOPR items used after portalStart
+    public readonly struct WorldMapObjectGroupHeader
+    {
+        public readonly uint groupName;               // offset into MOGN
+        public readonly uint descriptiveGroupName;    // offset into MOGN
+        public readonly WorldMapObjectGroupFlags flags;
+        public readonly CAaBox boundingBox;              // as with flags, same as in corresponding MOGI entry
 
-        public ushort transBatchCount;
-        public ushort intBatchCount;
-        public ushort extBatchCount;
-        public ushort padding_or_batch_type_d; // probably padding, but might be data?
+        public readonly ushort portalStart;             // index into MOPR
+        public readonly ushort portalCount;             // number of MOPR items used after portalStart
 
-        public Byte4Array fogIds;                // ids in MFOG
-        public uint groupLiquid;             // see below in the MLIQ chunk
+        public readonly ushort transBatchCount;
+        public readonly ushort intBatchCount;
+        public readonly ushort extBatchCount;
+        public readonly ushort padding_or_batch_type_d; // probably padding, but might be data?
 
-        public uint uniqueID;
+        public readonly Byte4Array fogIds;                // ids in MFOG
+        public readonly uint groupLiquid;             // see below in the MLIQ chunk
 
-        public uint flags2;
-        public uint unk;                     // UNUSED: 20740
+        public readonly uint uniqueID;
+        public readonly uint flags2;
+        public readonly uint unk;                     // UNUSED: 20740
 
         public WorldMapObjectGroupHeader(IBinaryReader reader)
         {
             groupName = reader.ReadUInt32();
             descriptiveGroupName = reader.ReadUInt32();
-            flags = reader.ReadUInt32();
+            flags = (WorldMapObjectGroupFlags)reader.ReadUInt32();
             boundingBox = CAaBox.Read(reader);
             portalStart = reader.ReadUInt16();
             portalCount = reader.ReadUInt16();
@@ -276,23 +301,20 @@ namespace WDE.MpqReader.Structures
         }
     }
 
-    public struct WorldMapObjectLiquid
+    public readonly struct WorldMapObjectLiquid
     {
-        public int liquidVertsX;
-        public int liquidVertsY;
-        public int liquidTilesX;
-        public int liquidTilesY;
-        public Vector3 liquidCornerCoords;
-        public ushort liquidMateriallId;
-        public float[]? HeightMap;
-        public uint realLiquidType;
-        public LiquidVertex[]? liquidVertices;
-        public byte[]? tileFlags;
+        public readonly int liquidVertsX;
+        public readonly int liquidVertsY;
+        public readonly int liquidTilesX;
+        public readonly int liquidTilesY;
+        public readonly Vector3 liquidCornerCoords;
+        public readonly ushort liquidMateriallId;
+        public readonly uint realLiquidType;
+        public readonly byte[]? tileFlags;
+        public readonly LiquidVertex[] vertices;
+        public readonly bool isOneHeight;
 
-        public List<Vector3> verticesCoords = new List<Vector3> ();
-
-
-        public WorldMapObjectLiquid(IBinaryReader reader, WorldMapObjectGroupHeader groupHeader)
+        public WorldMapObjectLiquid(IBinaryReader reader, in WMOHeader wmoHeader, in WorldMapObjectGroupHeader groupHeader)
         {
             liquidVertsX = reader.ReadInt32();
             liquidVertsY = reader.ReadInt32();
@@ -301,88 +323,69 @@ namespace WDE.MpqReader.Structures
             liquidCornerCoords = reader.ReadVector3();
             liquidMateriallId = reader.ReadUInt16();
 
-            // for (int i = 0; i < liquidVertsX * liquidVertsY; i++)
-            // {
-            //     LiquidVertex vertex = new LiquidVertex(reader);
-            // 
-            // }
-
-            liquidVertices = new LiquidVertex[liquidVertsX * liquidVertsY];
-
+            isOneHeight = true;
+            float? previousSize = null;
+            vertices = new LiquidVertex[liquidVertsX * liquidVertsY];
             for (int y = 0; y < liquidVertsY; y++)
             {
-                var y_pos = liquidCornerCoords.Y + y * 4.1666625f;
                 for (int x = 0; x < liquidVertsX; x++)
                 {
-                    var x_pos = liquidCornerCoords.X + x * 4.1666625f;
                     LiquidVertex vertex = new LiquidVertex(reader);
-                    // vertex.xPos = x_pos;
-                    // vertex.yPos = y_pos;
-                    liquidVertices[x + (y * liquidVertsX)] = vertex;
-                    verticesCoords.Add(new Vector3(x_pos, y_pos, vertex.Height));
+                    if (previousSize.HasValue && Math.Abs(previousSize.Value - vertex.Height) > 0.001f)
+                        isOneHeight = false;
+                    vertices[y * liquidVertsX + x] = vertex;
+                    
+                    previousSize = vertex.Height;
                 }
             }
-
+            
             tileFlags = new byte[liquidTilesX * liquidTilesY];
-
             for (int i = 0; i < (liquidTilesX * liquidTilesY); i++)
-            {
                 tileFlags[i] = reader.ReadByte();
-            }
 
             // get liquid type
             uint wmoLiquidType = 0;
-            if ((groupHeader.flags & 0x4) > 0)
+            if (wmoHeader.flags.HasFlagFast(WorldMapObjectFlags.FlagUseLiquidTypeDbcId))
             {
                 wmoLiquidType = groupHeader.groupLiquid;
             }
             else // legacy liquid type
             {
-                foreach (var tileFlag in tileFlags)
+                if (tileFlags.Length > 0)
                 {
-                    if ((tileFlag & 15) != 15) // liquid type is in the first 4 bits. if 15 = don't render.
-                        wmoLiquidType = (uint)GetLegacyWaterType(tileFlag & 15);
+                    if ((tileFlags[0] & 15) != 15) // liquid type is in the first 4 bits. if 15 = don't render.
+                    {
+                        wmoLiquidType = (uint)GetLegacyWaterType(tileFlags[0] & 15);
+                    }
                 }
-                
             }
-            realLiquidType = FromWmoLiquidType(wmoLiquidType, groupHeader);
-
+            realLiquidType = FromWmoLiquidType(wmoLiquidType, in groupHeader);
         }
 
-        public struct LiquidVertex
+        public readonly struct LiquidVertex
         {
-            public bool IsWater = true;
-            public float Height = 0.0f;
-            public float xPos;
-            public float yPos;
+            public readonly float Height;
 
             // water
-            public byte flow1 = 0;
-            public byte flow2 = 0;
-            public byte flow1Pct = 0;
-            public byte filler = 0;
+            public readonly byte flow1 = 0;
+            public readonly byte flow2 = 0;
+            public readonly byte flow1Pct = 0;
+            public readonly byte filler = 0;
             // magma/slime
-            public short u;
-            public short v;
+            public short u => (short)(flow1 | (flow2 << 8));
+            public short v => (short)(flow1Pct | (filler << 8));
 
             public LiquidVertex(IBinaryReader reader)
             {
-                var pos = reader.Offset;
                 flow1 = reader.ReadByte();
                 flow2 = reader.ReadByte();
                 flow1Pct = reader.ReadByte();
                 filler = reader.ReadByte();
-
-                reader.Offset = pos;
-
-                u = reader.ReadInt16();
-                v = reader.ReadInt16();
-
                 Height = reader.ReadFloat();
             }
         }
 
-        private uint FromWmoLiquidType(uint basicLiquidType, WorldMapObjectGroupHeader groupHeader)
+        private static uint FromWmoLiquidType(uint basicLiquidType, in WorldMapObjectGroupHeader groupHeader)
         {
             // Convert simplified WMO liquid type IDs to real LiquidType.dbc IDs
             uint realLiquidType = 0;
@@ -390,9 +393,7 @@ namespace WDE.MpqReader.Structures
             if (basicLiquidType < 20)
             {
                 if (basicLiquidType == 0 || basicLiquidType == 1)
-                    realLiquidType = (uint)((groupHeader.flags & 0x80000) > 0 ? 14 : 13);
-                else if (basicLiquidType == 1)
-                    realLiquidType = 14;
+                    realLiquidType = (uint)(groupHeader.flags.HasFlagFast(WorldMapObjectGroupFlags.IsNotWaterButOcean) ? 14 : 13);
                 else if (basicLiquidType == 2)
                     realLiquidType = 19;
                 else if (basicLiquidType == 3)
@@ -406,9 +407,8 @@ namespace WDE.MpqReader.Structures
             return realLiquidType;
         }
 
-        private int GetLegacyWaterType(int LegacyliquidType)
+        private static int GetLegacyWaterType(int LegacyliquidType)
         {
-            // from blizzard's decompiled code...
             int realLiquidType = LegacyliquidType += 1;
 
             if ( (realLiquidType - 1) <= 0x13)
@@ -431,6 +431,5 @@ namespace WDE.MpqReader.Structures
 
             return realLiquidType;
         }
-
     }
 }

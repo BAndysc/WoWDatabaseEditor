@@ -76,8 +76,55 @@ namespace WDE.MapRenderer.Managers
             };
             return (vertices, indices);
         }
+
+        public (Vector3[], ushort[]) GenerateWmoWaterMesh(in WorldMapObjectLiquid liquid)
+        {
+            var tilecount = liquid.liquidTilesX * liquid.liquidTilesY;
+            var vertCount = (liquid.liquidVertsY) * (liquid.liquidVertsX);
+            Vector3[] vertices = new Vector3[vertCount];
+            ushort[] liquidIndices = new ushort[tilecount * 2 * 3];
+            
+            for (int vertY = 0; vertY < liquid.liquidVertsY; ++vertY)
+            {
+                var y_pos = liquid.liquidCornerCoords.Y + vertY * Constants.UnitSize;
+                for (int vertX = 0; vertX < liquid.liquidVertsX; ++vertX)
+                {
+                    var x_pos = liquid.liquidCornerCoords.X + vertX * Constants.UnitSize;
+                    vertices[vertY * liquid.liquidVertsX + vertX] = new Vector3(x_pos, y_pos, liquid.vertices[vertY * liquid.liquidVertsX + vertX].Height);
+                }
+            }
+
+            int index = 0;
+            for (int tileY = 0; tileY < liquid.liquidTilesY; ++tileY)
+            {
+                for (int tileX = 0; tileX < liquid.liquidTilesX; ++tileX)
+                {
+                    bool renderState = (liquid.tileFlags[tileX + (tileY * liquid.liquidTilesX)] & 15) > 0 ? false : true; //  mh2o.RenderBitArray[(tileY) * mh2o.Width + (tileX)];
+
+                    if (!renderState)
+                        continue;
+
+                    var vertexIndex = tileY * liquid.liquidVertsX + (tileX);
+                    int tl = vertexIndex;
+                    int tr = tl + 1;
+                    int bl = vertexIndex + liquid.liquidVertsX; // +mhwo width is a new row
+                    int br = bl + 1;
+
+                    // 1st triangle
+                    liquidIndices[index++] = (ushort)tl;
+                    liquidIndices[index++] = (ushort)bl;
+                    liquidIndices[index++] = (ushort)tr;
+                    // 2nd triangle
+                    liquidIndices[index++] = (ushort)tr;
+                    liquidIndices[index++] = (ushort)bl;
+                    liquidIndices[index++] = (ushort)br;
+                }
+            }
+
+            return (vertices, liquidIndices);
+        }
         
-        public (Vector3[], ushort[]) GenerateWaterMesh(MH2OLiquidInstance mh2o)
+        public (Vector3[], ushort[]) GenerateWaterMesh(ref MH2OLiquidInstance mh2o)
         {
             Vector3[] vertices;
             ushort[] indices;

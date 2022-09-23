@@ -39,18 +39,15 @@ namespace WDE.MpqReader.Structures
 
     public class WMO
     {
-        public WMOHeader Header { get; private set; }
-        public string[] Textures { get; private set; }
-        public string[] ModelNames { get; private set; }
-        public string[] GroupNames { get; private set; }
-        public SmoDoodadDef[] DoodadsDefinition { get; private set; }
-        public WorldMapObjectMaterial[] Materials { get; private set; }
-    
-        private WMO(){}
+        public readonly WMOHeader Header;
+        public readonly string[] Textures;
+        public readonly string[] ModelNames;
+        public readonly string[] GroupNames;
+        public readonly SmoDoodadDef[] DoodadsDefinition;
+        public readonly WorldMapObjectMaterial[] Materials;
 
-        public static WMO Read(IBinaryReader reader)
+        public WMO(IBinaryReader reader)
         {
-            var wmo = new WMO();
             Dictionary<int, string> offsets = null;
             Dictionary<int, string> textureOffsets = null;
 
@@ -64,22 +61,25 @@ namespace WDE.MpqReader.Structures
                 var partialReader = new LimitedReader(reader, size);
 
                 if (chunkName == "MOHD")
-                    wmo.Header = WMOHeader.Read(partialReader);
+                    Header = WMOHeader.Read(partialReader);
                 else if (chunkName == "MOTX")
-                    wmo.Textures = ChunkedUtils.ReadZeroTerminatedStringArrays(partialReader, true, out textureOffsets);
+                    Textures = ChunkedUtils.ReadZeroTerminatedStringArrays(partialReader, true, out textureOffsets);
                 else if (chunkName == "MODD")
-                    wmo.DoodadsDefinition = ReadDoodads(partialReader, offsets, size);
+                    DoodadsDefinition = ReadDoodads(partialReader, offsets, size);
                 else if (chunkName == "MODN")
-                    wmo.ModelNames = ChunkedUtils.ReadZeroTerminatedStringArrays(partialReader, true, out offsets);
+                    ModelNames = ChunkedUtils.ReadZeroTerminatedStringArrays(partialReader, true, out offsets);
                 else if (chunkName == "MOGN")
-                    wmo.GroupNames = ChunkedUtils.ReadZeroTerminatedStringArrays(partialReader, false, out _);
+                    GroupNames = ChunkedUtils.ReadZeroTerminatedStringArrays(partialReader, false, out _);
                 else if (chunkName == "MOMT")
-                    wmo.Materials = ReadMaterials(partialReader, textureOffsets, size);
+                    Materials = ReadMaterials(partialReader, textureOffsets, size);
             
                 reader.Offset = offset + size;
             }
+        }
 
-            return wmo;
+        public static WMO Read(IBinaryReader reader)
+        {
+            return new WMO(reader);
         }
 
         private static WorldMapObjectMaterial[] ReadMaterials(IBinaryReader reader, Dictionary<int,string>? textureOffsets, int size)
@@ -137,7 +137,7 @@ namespace WDE.MpqReader.Structures
         GxBlend_BlendAdd
     }
 
-    public class WorldMapObjectMaterial
+    public readonly struct WorldMapObjectMaterial
     {
         [Flags]
         public enum Flags
@@ -152,19 +152,19 @@ namespace WDE.MpqReader.Structures
             clamp_t = 128
         }
     
-        public Flags flags { get; init; }
-        public uint shader { get; init; }                         // Index into CMapObj::s_wmoShaderMetaData. See below (shader types).
-        public GxBlendMode blendMode { get; init; }                      // Blending: see EGxBlend
-        public uint texture_1 { get; init; }                      // offset into MOTX; ≥ Battle (8.1.0.27826) No longer references MOTX but is a filedata id directly.
-        public CImVector sidnColor { get; init; }                    // emissive color; see below (emissive color)
-        public CImVector frameSidnColor { get; init; }               // sidn emissive color; set at runtime; gets sidn-manipulated emissive color; see below (emissive color)
-        public uint texture_2 { get; init; }                      // offset into MOTX
-        public CArgb diffColor { get; init; }
-        public uint ground_type { get; init; }                    // according to CMapObjDef::GetGroundType 
-        public uint texture_3 { get; init; }                      // offset into MOTX
-        public uint color_2 { get; init; }
-        public uint flags_2 { get; init; }
-        public uint[] runTimeData { get; init; }                 // This data is explicitly nulled upon loading. Contains textures or similar stuff.
+        public readonly Flags flags;
+        public readonly uint shader;                         // Index into CMapObj::s_wmoShaderMetaData. See below (shader types).
+        public readonly GxBlendMode blendMode;                      // Blending: see EGxBlend
+        public readonly uint texture_1;                      // offset into MOTX; ≥ Battle (8.1.0.27826) No longer references MOTX but is a filedata id directly.
+        public readonly CImVector sidnColor;                    // emissive color; see below (emissive color)
+        public readonly CImVector frameSidnColor;               // sidn emissive color; set at runtime; gets sidn-manipulated emissive color; see below (emissive color)
+        public readonly uint texture_2;                      // offset into MOTX
+        public readonly CArgb diffColor;
+        public readonly uint ground_type;                    // according to CMapObjDef::GetGroundType 
+        public readonly uint texture_3;                      // offset into MOTX
+        public readonly uint color_2;
+        public readonly uint flags_2;
+        //public readonly uint[] runTimeData { get; init; }                 // This data is explicitly nulled upon loading. Contains textures or similar stuff.
 
         public string? texture1Name { get; init; }
         public string? texture2Name { get; init; }
@@ -184,8 +184,11 @@ namespace WDE.MpqReader.Structures
             texture_3 = reader.ReadUInt32();
             color_2 = reader.ReadUInt32();
             flags_2 = reader.ReadUInt32();
-            runTimeData = new uint[] { reader.ReadUInt32(), reader.ReadUInt32(), reader.ReadUInt32(), reader.ReadUInt32() };
+            reader.Offset += 4 * 4;
+            //runTimeData = new uint[] { reader.ReadUInt32(), reader.ReadUInt32(), reader.ReadUInt32(), reader.ReadUInt32() };
 
+            texture2Name = null;
+            texture3Name = null;
             texture1Name = textures[(int)texture_1];
             if (textures.TryGetValue((int)texture_2, out var texname))
                 texture2Name = texname;
@@ -294,38 +297,38 @@ namespace WDE.MpqReader.Structures
         }
     }
 
-    public class WMOHeader
+    public readonly struct WMOHeader
     {
-        public uint nTextures { get; init; }    
-        public uint nGroups { get; init; }    
-        public uint nPortals { get; init; }   
-        public uint nLights { get; init; }                                        // Blizzard seems to add one to the MOLT entry count when there are MOLP chunks in the groups (and maybe for MOLS too?)ᵘ
-        public uint nDoodadNames { get; init; } 
-        public uint nDoodadDefs { get; init; }                                    // *
-        public uint nDoodadSets { get; init; }    
-        public uint ambColorRgba { get; init; }                                         // Color settings for base (ambient) color. See the flag at /*03Ch*/.   
-        public uint wmoID { get; init; }
-        public CAaBox bounding_box { get; init; }                                    // in the alpha, this bounding box was computed upon loading
-        public WorldMapObjectFlags flags { get; init; }
-    
-        private WMOHeader(){}
+        public readonly uint nTextures;    
+        public readonly uint nGroups;    
+        public readonly uint nPortals;   
+        public readonly uint nLights;                                        // Blizzard seems to add one to the MOLT entry count when there are MOLP chunks in the groups (and maybe for MOLS too?)ᵘ
+        public readonly uint nDoodadNames; 
+        public readonly uint nDoodadDefs;                                    // *
+        public readonly uint nDoodadSets;    
+        public readonly uint ambColorRgba;                                         // Color settings for base (ambient) color. See the flag at /*03Ch*/.   
+        public readonly uint wmoID;
+        public readonly CAaBox bounding_box;                                    // in the alpha, this bounding box was computed upon loading
+        public readonly WorldMapObjectFlags flags;
+
+        public WMOHeader(IBinaryReader reader)
+        {
+            nTextures = reader.ReadUInt32();
+            nGroups = reader.ReadUInt32();
+            nPortals = reader.ReadUInt32();
+            nLights = reader.ReadUInt32();
+            nDoodadNames = reader.ReadUInt32();
+            nDoodadDefs = reader.ReadUInt32();
+            nDoodadSets = reader.ReadUInt32();
+            ambColorRgba = reader.ReadUInt32();
+            wmoID = reader.ReadUInt32();
+            bounding_box = CAaBox.Read(reader);
+            flags = (WorldMapObjectFlags)reader.ReadUInt16();
+        }
 
         public static WMOHeader Read(IBinaryReader reader)
         {
-            return new WMOHeader()
-            {
-                nTextures = reader.ReadUInt32(),
-                nGroups = reader.ReadUInt32(),
-                nPortals = reader.ReadUInt32(),
-                nLights = reader.ReadUInt32(),
-                nDoodadNames = reader.ReadUInt32(),
-                nDoodadDefs = reader.ReadUInt32(),
-                nDoodadSets = reader.ReadUInt32(),
-                ambColorRgba = reader.ReadUInt32(),
-                wmoID = reader.ReadUInt32(),
-                bounding_box = CAaBox.Read(reader),
-                flags = (WorldMapObjectFlags)reader.ReadUInt16()
-            };
+            return new WMOHeader(reader);
         }
     }
 }

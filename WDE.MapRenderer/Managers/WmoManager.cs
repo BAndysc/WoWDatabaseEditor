@@ -91,7 +91,7 @@ namespace WDE.MapRenderer.Managers
                 if (bytesGroup.Result == null)
                     continue;
 
-                var group = new WorldMapObjectGroup(new MemoryBinaryReader(bytesGroup.Result));
+                var group = new WorldMapObjectGroup(new MemoryBinaryReader(bytesGroup.Result), in wmo.Header);
                 bytesGroup.Result.Dispose();
                 // bazaarfacade03 and cathy_facade01 - LODs for stormwind used by portal culling,
                 // but gives poor results without portal culling
@@ -118,87 +118,20 @@ namespace WDE.MapRenderer.Managers
                 foreach (var batch in group.Batches)
                 {
                     wmoMesh.SetSubmeshIndicesRange(j++, (int)batch.startIndex, batch.count);
-
-                    var materialDef = wmo.Materials[batch.material_id];
-                    var mat = materialManager.CreateMaterial("data/wmo.json");
-
-                    mat.SetUniformInt("shader_id", (int)materialDef.shader);
-                    //mat.SetUniform("notSupported", 0.0f);
-                    float alphaTest = 0.003921568f; // 1/255
+                    var mat = CreateMaterial(wmo, group, batch.material_id, out var tex1, out var tex2);
                     
-                    if (materialDef.blendMode == GxBlendMode.GxBlend_Opaque)
-                    {
-                        alphaTest = -1.0f;
-                        mat.BlendingEnabled = false;
-                    }
-                    else if (materialDef.blendMode == GxBlendMode.GxBlend_AlphaKey)
-                    {
-                        mat.BlendingEnabled = false;
-                        alphaTest = 0.878431372f; // 224/255
-                    }
-                    else if (materialDef.blendMode == GxBlendMode.GxBlend_Alpha)
-                    {
-                        mat.BlendingEnabled = true;
-                        mat.SourceBlending = Blending.SrcAlpha;
-                        mat.DestinationBlending = Blending.OneMinusSrcAlpha;
-                    }
-                    else if (materialDef.blendMode == GxBlendMode.GxBlend_Add)
-                    {
-                        mat.BlendingEnabled = true;
-                        mat.SourceBlending = Blending.SrcAlpha;
-                        mat.DestinationBlending = Blending.One;
-                    }
-                    else if (materialDef.blendMode == GxBlendMode.GxBlend_Mod)
-                    {
-                        mat.BlendingEnabled = true;
-                        mat.SourceBlending = Blending.DstColor;
-                        mat.DestinationBlending = Blending.Zero;
-                    }
-                    else if (materialDef.blendMode == GxBlendMode.GxBlend_Mod2x)
-                    {
-                        mat.BlendingEnabled = true;
-                        mat.SourceBlending = Blending.DstColor;
-                        mat.DestinationBlending = Blending.SrcColor;
-                    }
-                    else if (materialDef.blendMode == GxBlendMode.GxBlend_ModAdd)
-                    {
-                        mat.BlendingEnabled = true;
-                        mat.SourceBlending = Blending.DstColor;
-                        mat.DestinationBlending = Blending.One;
-                    }
-                    else
-                    {
-                        alphaTest = -1.0f;
-                        mat.BlendingEnabled = false;
-                        //mat.SetUniform("notSupported", 1);
-                    }
-
-                    mat.ZWrite = !mat.BlendingEnabled;
-                    mat.SetUniform("alphaTest", alphaTest);
-                    mat.SetUniformInt("unlit", materialDef.flags.HasFlagFast(WorldMapObjectMaterial.Flags.unlit) ? 1 : 0);
-                    mat.SetUniformInt("brightAtNight", materialDef.flags.HasFlagFast(WorldMapObjectMaterial.Flags.brightAtNight) ? 1 : 0);
-                    mat.SetUniformInt("interior", (group.Header.flags & 0x2000) == 0x2000 && group.VertexColors != null ? 1 : 0);
-
-                    if (materialDef.flags.HasFlagFast(WorldMapObjectMaterial.Flags.unculled))
-                        mat.Culling = CullingMode.Off;
-
-                    if (materialDef.texture1Name != null)
+                    if (tex1 != null)
                     {
                         var tcs = new TaskCompletionSource<TextureHandle>();
-                        yield return textureManager.GetTexture(materialDef.texture1Name, tcs);
+                        yield return textureManager.GetTexture(tex1, tcs);
                         mat.SetTexture("texture1", tcs.Task.Result);
                     }
-                    else
-                        mat.SetTexture("texture1", textureManager.EmptyTexture);
-                    
-                    if (materialDef.texture2Name != null)
+                    if (tex2 != null)
                     {
                         var tcs = new TaskCompletionSource<TextureHandle>();
-                        yield return textureManager.GetTexture(materialDef.texture2Name, tcs);
+                        yield return textureManager.GetTexture(tex2, tcs);
                         mat.SetTexture("texture2", tcs.Task.Result);
                     }
-                    else
-                        mat.SetTexture("texture2", textureManager.EmptyTexture);
 
                     materials[j - 1] = mat;
                 }
@@ -209,41 +142,10 @@ namespace WDE.MapRenderer.Managers
                 wmoMesh.RebuildIndices();
                 wmoInstance.meshes.Add((wmoMesh, materials));
 
-                if ((group.Header.flags & 0x1000) > 0) // has water
+                if (group.Header.flags.HasFlagFast(WorldMapObjectGroupFlags.HasWater))
                 {
-                    var tilecount = group.Liquid.liquidTilesX * group.Liquid.liquidTilesY;
-                    var vertCount = (group.Liquid.liquidVertsY) * (group.Liquid.liquidVertsX);
-                    // vertices = new Vector3[vertCount];
-                    ushort[] LiquidIndices = new ushort[tilecount * 2 * 3];
-
-                    int index = 0;
-                    for (int tileY = 0; tileY < group.Liquid.liquidTilesY; ++tileY)
-                    {
-                        for (int tileX = 0; tileX < group.Liquid.liquidTilesX; ++tileX) // X
-                        {
-                            bool renderState = (group.Liquid.tileFlags[tileX + (tileY * group.Liquid.liquidTilesX)] & 15) > 0 ? false : true; //  mh2o.RenderBitArray[(tileY) * mh2o.Width + (tileX)];
-
-                            if (!renderState)
-                                continue;
-
-                            var vertexIndex = ((tileY)) * (group.Liquid.liquidTilesX + 1) + (tileX);
-                            int tl = vertexIndex;
-                            int tr = tl + 1;
-                            int bl = vertexIndex + (group.Liquid.liquidTilesX + 1); // +mhwo width is a new row
-                            int br = bl + 1;
-
-                            // 1st triangle
-                            LiquidIndices[index++] = (ushort)tl;
-                            LiquidIndices[index++] = (ushort)bl;
-                            LiquidIndices[index++] = (ushort)tr;
-                            // 2nd triangle
-                            LiquidIndices[index++] = (ushort)tr;
-                            LiquidIndices[index++] = (ushort)bl;
-                            LiquidIndices[index++] = (ushort)br;
-                        }
-                    }
-
-                    var waterMesh = meshManager.CreateMesh(group.Liquid.verticesCoords.ToArray(), LiquidIndices);
+                    var (liquidVertices, liquidIndices) = woWMeshManager.GenerateWmoWaterMesh(in group.Liquid);
+                    var waterMesh = meshManager.CreateMesh(liquidVertices, liquidIndices);
                     Material[] liquidMaterials = new Material[1];
                     liquidMaterials[0] = woWMeshManager.WaterMaterial;
                     wmoInstance.meshes.Add((waterMesh, liquidMaterials));
@@ -256,6 +158,81 @@ namespace WDE.MapRenderer.Managers
             completion.SetResult(wmoInstance);
             meshesCurrentlyLoaded.Remove(path);
             result.SetResult(wmoInstance);
+        }
+
+        private Material CreateMaterial(WMO wmo, WorldMapObjectGroup group, int materialId, out string? tex1, out string? tex2)
+        {
+            ref readonly var materialDef = ref wmo.Materials[materialId];
+            var mat = materialManager.CreateMaterial("data/wmo.json");
+
+            mat.SetUniformInt("shader_id", (int)materialDef.shader);
+            //mat.SetUniform("notSupported", 0.0f);
+            float alphaTest = 0.003921568f; // 1/255
+
+            if (materialDef.blendMode == GxBlendMode.GxBlend_Opaque)
+            {
+                alphaTest = -1.0f;
+                mat.BlendingEnabled = false;
+            }
+            else if (materialDef.blendMode == GxBlendMode.GxBlend_AlphaKey)
+            {
+                mat.BlendingEnabled = false;
+                alphaTest = 0.878431372f; // 224/255
+            }
+            else if (materialDef.blendMode == GxBlendMode.GxBlend_Alpha)
+            {
+                mat.BlendingEnabled = true;
+                mat.SourceBlending = Blending.SrcAlpha;
+                mat.DestinationBlending = Blending.OneMinusSrcAlpha;
+            }
+            else if (materialDef.blendMode == GxBlendMode.GxBlend_Add)
+            {
+                mat.BlendingEnabled = true;
+                mat.SourceBlending = Blending.SrcAlpha;
+                mat.DestinationBlending = Blending.One;
+            }
+            else if (materialDef.blendMode == GxBlendMode.GxBlend_Mod)
+            {
+                mat.BlendingEnabled = true;
+                mat.SourceBlending = Blending.DstColor;
+                mat.DestinationBlending = Blending.Zero;
+            }
+            else if (materialDef.blendMode == GxBlendMode.GxBlend_Mod2x)
+            {
+                mat.BlendingEnabled = true;
+                mat.SourceBlending = Blending.DstColor;
+                mat.DestinationBlending = Blending.SrcColor;
+            }
+            else if (materialDef.blendMode == GxBlendMode.GxBlend_ModAdd)
+            {
+                mat.BlendingEnabled = true;
+                mat.SourceBlending = Blending.DstColor;
+                mat.DestinationBlending = Blending.One;
+            }
+            else
+            {
+                alphaTest = -1.0f;
+                mat.BlendingEnabled = false;
+                //mat.SetUniform("notSupported", 1);
+            }
+
+            mat.ZWrite = !mat.BlendingEnabled;
+            mat.SetUniform("alphaTest", alphaTest);
+            mat.SetUniformInt("unlit", materialDef.flags.HasFlagFast(WorldMapObjectMaterial.Flags.unlit) ? 1 : 0);
+            mat.SetUniformInt("brightAtNight",
+                materialDef.flags.HasFlagFast(WorldMapObjectMaterial.Flags.brightAtNight) ? 1 : 0);
+            mat.SetUniformInt("interior",
+                group.Header.flags.HasFlagFast(WorldMapObjectGroupFlags.Interior) && group.VertexColors != null ? 1 : 0);
+
+            if (materialDef.flags.HasFlagFast(WorldMapObjectMaterial.Flags.unculled))
+                mat.Culling = CullingMode.Off;
+
+            tex1 = materialDef.texture1Name;
+            tex2 = materialDef.texture2Name;
+            mat.SetTexture("texture1", textureManager.EmptyTexture);
+            mat.SetTexture("texture2", textureManager.EmptyTexture);
+            
+            return mat;
         }
 
         public void Dispose()
