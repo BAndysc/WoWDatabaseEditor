@@ -157,7 +157,7 @@ namespace WDE.MapRenderer.Managers
 
             // SmoDoodadDef[] smoDoodadDefs = new SmoDoodadDef[wmo.doodadSets[doodadset].count];
             // int idx = 0;
-            // for (var i = wmo.doodadSets[doodadset].startIndex; i < wmo.doodadSets[doodadset].count; i++)
+            // for (var i = wmo.doodadSets[doodadset].startIndex; i < ( wmo.doodadSets[doodadset].count + wmo.doodadSets[doodadset].startIndex ); i++)
             // {
             //     smoDoodadDefs[idx] = wmo.DoodadsDefinition[i];
             //     idx++;
