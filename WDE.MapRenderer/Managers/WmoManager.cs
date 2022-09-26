@@ -155,9 +155,12 @@ namespace WDE.MapRenderer.Managers
                 group.Dispose();
             }
 
-            // for (var i = wmo.doodadSets[wmoObject.DoodadSet].startIndex; i < wmo.doodadSets[wmoObject.DoodadSet].count; i++)
+            // SmoDoodadDef[] smoDoodadDefs = new SmoDoodadDef[wmo.doodadSets[doodadset].count];
+            // int idx = 0;
+            // for (var i = wmo.doodadSets[doodadset].startIndex; i < wmo.doodadSets[doodadset].count; i++)
             // {
-            // 
+            //     smoDoodadDefs[idx] = wmo.DoodadsDefinition[i];
+            //     idx++;
             // }
 
             meshes.Add(path, wmoInstance);
