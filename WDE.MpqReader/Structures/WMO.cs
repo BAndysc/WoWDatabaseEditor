@@ -1,12 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Runtime.CompilerServices;
 using TheMaths;
 using WDE.MpqReader.Readers;
-using static System.Formats.Asn1.AsnWriter;
-using static WDE.MpqReader.Structures.SmoDoodadDef;
 
 namespace WDE.MpqReader.Structures
 {
