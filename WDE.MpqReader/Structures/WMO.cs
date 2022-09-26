@@ -1,8 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Runtime.CompilerServices;
 using TheMaths;
 using WDE.MpqReader.Readers;
+using static System.Formats.Asn1.AsnWriter;
+using static WDE.MpqReader.Structures.SmoDoodadDef;
 
 namespace WDE.MpqReader.Structures
 {
@@ -43,6 +47,7 @@ namespace WDE.MpqReader.Structures
         public readonly string[] Textures;
         public readonly string[] ModelNames;
         public readonly string[] GroupNames;
+        public readonly SmoDoodadSet[] doodadSets;
         public readonly SmoDoodadDef[] DoodadsDefinition;
         public readonly WorldMapObjectMaterial[] Materials;
 
@@ -64,6 +69,8 @@ namespace WDE.MpqReader.Structures
                     Header = WMOHeader.Read(partialReader);
                 else if (chunkName == "MOTX")
                     Textures = ChunkedUtils.ReadZeroTerminatedStringArrays(partialReader, true, out textureOffsets);
+                else if (chunkName == "MODS")
+                    doodadSets = ReadDoodadSets(partialReader, Header);
                 else if (chunkName == "MODD")
                     DoodadsDefinition = ReadDoodads(partialReader, offsets, size);
                 else if (chunkName == "MODN")
@@ -93,6 +100,16 @@ namespace WDE.MpqReader.Structures
             }
 
             return materials;
+        }
+
+        private static SmoDoodadSet[] ReadDoodadSets(LimitedReader partialReader, WMOHeader Header)
+        {
+            SmoDoodadSet[] array = new SmoDoodadSet[Header.nDoodadSets];
+            for (int i = 0; i < Header.nDoodadSets; i++)
+            {
+                array[i] = new SmoDoodadSet(partialReader);
+            }
+            return array;
         }
 
         private static SmoDoodadDef[] ReadDoodads(LimitedReader partialReader, Dictionary<int, string> nameOffsets, int size)
@@ -268,6 +285,21 @@ namespace WDE.MpqReader.Structures
             a = reader.ReadByte();
         }
     };
+
+    public readonly struct SmoDoodadSet
+    {
+        public readonly string doodadSetName = "";
+        public readonly uint startIndex;
+        public readonly uint count;
+        public SmoDoodadSet(IBinaryReader reader)
+        {
+            var SetNameBytes = reader.ReadBytes(0x14);
+            doodadSetName = SetNameBytes.ToString();
+            startIndex = reader.ReadUInt32();
+            count = reader.ReadUInt32();
+            var unknown = reader.ReadUInt32();
+        }
+    }
 
     public readonly struct SmoDoodadDef
     {

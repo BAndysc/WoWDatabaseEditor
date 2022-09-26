@@ -12,6 +12,10 @@ namespace WDE.MpqReader.Structures
         public readonly Vector3 AbsolutePosition;
         public readonly Vector3 Rotation;
         public readonly CAaBox Bounds;
+        public readonly ushort Flags;
+        public readonly ushort DoodadSet;
+        public readonly ushort NameSet;
+        // public readonly ushort Scale; // Legion +
 
         public WorldMapObjectPlacementData(IBinaryReader reader, string[] names)
         {
@@ -20,7 +24,10 @@ namespace WDE.MpqReader.Structures
             AbsolutePosition = reader.ReadVector3();
             Rotation = reader.ReadVector3();
             Bounds = CAaBox.Read(reader);
-            reader.Offset += 8; // unused
+            Flags = reader.ReadUInt16();
+            DoodadSet = reader.ReadUInt16();
+            NameSet = reader.ReadUInt16();
+            ushort Scale = reader.ReadUInt16(); // unused
         }
     }
 

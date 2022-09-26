@@ -49,8 +49,11 @@ namespace WDE.MapRenderer.Managers
             this.woWMeshManager = woWMeshManager;
         }
 
-        public IEnumerator LoadWorldMapObject(string path, TaskCompletionSource<WmoInstance?> result)
+        public IEnumerator LoadWorldMapObject(WorldMapObjectPlacementData wmoObject, TaskCompletionSource<WmoInstance?> result)
         {
+
+            string path = wmoObject.WmoPath;
+
             if (meshes.ContainsKey(path))
             {
                 result.SetResult(meshes[path]);
@@ -152,6 +155,11 @@ namespace WDE.MapRenderer.Managers
                 }
 
                 group.Dispose();
+            }
+
+            for (var i = wmo.doodadSets[wmoObject.DoodadSet].startIndex; i < wmo.doodadSets[wmoObject.DoodadSet].count; i++)
+            {
+
             }
 
             meshes.Add(path, wmoInstance);
