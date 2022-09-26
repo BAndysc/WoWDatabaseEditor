@@ -157,10 +157,10 @@ namespace WDE.MapRenderer.Managers
                 group.Dispose();
             }
 
-            for (var i = wmo.doodadSets[wmoObject.DoodadSet].startIndex; i < wmo.doodadSets[wmoObject.DoodadSet].count; i++)
-            {
-
-            }
+            // for (var i = wmo.doodadSets[wmoObject.DoodadSet].startIndex; i < wmo.doodadSets[wmoObject.DoodadSet].count; i++)
+            // {
+            // 
+            // }
 
             meshes.Add(path, wmoInstance);
             completion.SetResult(wmoInstance);
