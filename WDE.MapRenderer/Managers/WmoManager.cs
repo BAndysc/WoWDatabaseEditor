@@ -49,10 +49,8 @@ namespace WDE.MapRenderer.Managers
             this.woWMeshManager = woWMeshManager;
         }
 
-        public IEnumerator LoadWorldMapObject(WorldMapObjectPlacementData wmoObject, TaskCompletionSource<WmoInstance?> result)
+        public IEnumerator LoadWorldMapObject(string path, TaskCompletionSource<WmoInstance?> result, int doodadset)
         {
-
-            string path = wmoObject.WmoPath;
 
             if (meshes.ContainsKey(path))
             {

@@ -40,10 +40,11 @@ public class GlobalWorldMapObjectManager
             yield break;
 
         var wmoPath = worldManager.CurrentWdt?.Mwmo;
-        
+        int doodadset = ((int)worldManager.CurrentWdt?.WorldMapObject.doodadSet);
+
         var tcs = new TaskCompletionSource<WmoManager.WmoInstance?>();
             
-        yield return wmoManager.LoadWorldMapObject(wmoPath!, tcs);
+        yield return wmoManager.LoadWorldMapObject(wmoPath!, tcs, doodadset);
         if (tcs.Task.Result == null)
             yield break;
 
