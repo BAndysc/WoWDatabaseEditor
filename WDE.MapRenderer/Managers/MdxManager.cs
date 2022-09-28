@@ -712,7 +712,7 @@ namespace WDE.MapRenderer.Managers
                     trans = m2.colors[batch.colorIndex].alpha.values[0][0].Value;
             }
 
-            if (batch.textureTransparencyLookupId != -1 && m2.textureWeights.Length < batch.textureTransparencyLookupId)
+            if (batch.textureTransparencyLookupId != -1 && m2.textureWeights.Length > batch.textureTransparencyLookupId)
             {
                 if (m2.textureWeights[batch.textureTransparencyLookupId].weight.values.Length > 0 &&
                     m2.textureWeights[batch.textureTransparencyLookupId].weight.values[0].Length > 0)

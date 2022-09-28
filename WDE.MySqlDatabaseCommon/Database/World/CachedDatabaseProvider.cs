@@ -71,6 +71,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
                     Refresh(RefreshNpcTexts);
                 else if (tableName == "creature_text")
                     Refresh(RefreshCreatureTexts);
+                else if (tableName == "quest_template" || tableName == "quest_template_addon")
+                    Refresh(RefreshQuestTemplates);
             }, true);
         }
 
@@ -96,6 +98,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             return typeof(ICreatureText);
         }
         
+
         private async Task<Type> RefreshGossipMenu()
         {
             gossipMenusCache = await nonCachedDatabase.GetGossipMenusAsync().ConfigureAwait(false);
@@ -111,6 +114,15 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             return typeof(ICreatureTemplate);
         }
 
+        private async Task<Type> RefreshQuestTemplates()
+        {
+            var templates = await nonCachedDatabase.GetQuestTemplatesAsync().ConfigureAwait(false);
+            Dictionary<uint, IQuestTemplate> tempDict = templates.ToDictionary(t => t.Entry);
+            questTemplateCache = templates;
+            questTemplateByEntry = tempDict;
+            return typeof(IQuestTemplate);
+        }
+        
         public Task TryConnect()
         {
             nonCachedDatabase.GetCreatureTemplate(0); // if there is some connection problem, it should throw
