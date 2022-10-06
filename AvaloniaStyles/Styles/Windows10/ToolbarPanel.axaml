@@ -94,4 +94,9 @@
                 <Setter Property="Padding" Value="12,0,5,0"/>
                 <Setter Property="Height" Value="24" />
         </Style>
+        <Style Selector="controls|ToolbarPanel > CompletionComboBox">
+                <Setter Property="Padding" Value="12,0,5,0"/>
+                <Setter Property="Height" Value="24" />
+                <Setter Property="MinHeight" Value="24" />
+        </Style>
 </Styles>

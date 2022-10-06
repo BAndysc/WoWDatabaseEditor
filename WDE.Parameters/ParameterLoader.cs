@@ -484,7 +484,7 @@ namespace WDE.Parameters
         {
             Items = new Dictionary<long, SelectOption>();
             foreach (IQuestTemplate item in database.GetQuestTemplates())
-                Items.Add(item.Entry, new SelectOption(item.Name));
+                Items.Add(item.Entry, new SelectOption(item.Name ?? "Quest " + item.Entry));
         }
     }
     

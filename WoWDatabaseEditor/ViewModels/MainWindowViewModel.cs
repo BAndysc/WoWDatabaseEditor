@@ -57,7 +57,8 @@ namespace WoWDatabaseEditorCore.ViewModels
             IProgramNameService programNameService,
             IMainThread mainThread,
             IQuickAccessViewModel quickAccessViewModel,
-            ITablesToolService tablesToolService)
+            ITablesToolService tablesToolService,
+            QuickGoToViewModel quickGoToViewModel)
         {
             DocumentManager = documentManager;
             StatusBar = statusBar;
@@ -116,6 +117,7 @@ namespace WoWDatabaseEditorCore.ViewModels
             TasksViewModel = tasksViewModel;
             RelatedSolutionItems = relatedSolutionItems;
             QuickAccessViewModel = quickAccessViewModel;
+            QuickGoToViewModel = quickGoToViewModel;
 
             MenuItemProviders = menuItemProvider.GetItems();
 
@@ -160,6 +162,7 @@ namespace WoWDatabaseEditorCore.ViewModels
         public TasksViewModel TasksViewModel { get; }
         public RelatedSolutionItems RelatedSolutionItems { get; }
         public IQuickAccessViewModel QuickAccessViewModel { get; }
+        public QuickGoToViewModel QuickGoToViewModel { get; }
 
         public List<IMainMenuItem> MenuItemProviders { get; }
 

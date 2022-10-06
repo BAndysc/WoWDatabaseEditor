@@ -52,6 +52,37 @@
                         </WdeImage>
                     </ToggleButton>
                     
+                    <controls:ToolbarPanel IsVisible="{CompiledBinding HasAnyType}" DataContext="{CompiledBinding QuickGoToViewModel}">
+                        <TextBlock Opacity="0.6" FontSize="9" VerticalAlignment="Center">Entry:</TextBlock>
+                        <CompletionComboBox AsyncPopulator="{CompiledBinding FindItemAsyncPopulator}" Width="150"
+                                            Items="{CompiledBinding Items}" SelectedItem="{CompiledBinding SelectedItem}">
+                            <CompletionComboBox.ButtonItemTemplate>
+                                <DataTemplate DataType="viewModels:QuickGoToItemViewModel">
+                                    <DockPanel>
+                                        <TextBlock Margin="0, 0, 10, 0" Opacity="0.75" Text="{CompiledBinding Key}"></TextBlock>
+                                        <TextBlock Text="{CompiledBinding Name}"></TextBlock>
+                                    </DockPanel>
+                                </DataTemplate>
+                            </CompletionComboBox.ButtonItemTemplate>
+                            <CompletionComboBox.ItemTemplate>
+                                <DataTemplate DataType="viewModels:QuickGoToItemViewModel">
+                                    <DockPanel Width="400">
+                                        <TextBlock Margin="0, 0, 10, 0" Opacity="0.75" Width="45" Text="{CompiledBinding Key}"></TextBlock>
+                                        <TextBlock Text="{CompiledBinding Name}"></TextBlock>
+                                    </DockPanel>
+                                </DataTemplate>
+                            </CompletionComboBox.ItemTemplate>
+                        </CompletionComboBox>
+                        <TextBlock Opacity="0.6" FontSize="9" VerticalAlignment="Center">Type:</TextBlock>
+                        <ComboBox Width="100" Items="{CompiledBinding Providers}" SelectedItem="{CompiledBinding SelectedProvider}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{CompiledBinding Name}"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </controls:ToolbarPanel>
+                    
                     <components:ButtonImage Image="Icons/icon_play.png" IsVisible="{CompiledBinding ShowPlayButtons}" Command="{CompiledBinding ExecuteChangedCommand}" />
                     <components:ButtonImage Command="{CompiledBinding GenerateCurrentSqlCommand}"
                                             IsVisible="{CompiledBinding ShowExportButtons}"

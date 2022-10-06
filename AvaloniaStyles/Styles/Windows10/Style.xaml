@@ -30,8 +30,8 @@
         <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/GroupingListBox.axaml" />
         <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/TeachingTip.axaml" />
         <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/TreeViewItem.axaml" />
-        <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/ToolbarPanel.axaml" />
         <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/CompletionComboBox.axaml" />
+        <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/ToolbarPanel.axaml" />
         <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/NativeMenuBar.xaml" />
         <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/WindowControlButtons.axaml" />
         <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/Window.xaml" />
