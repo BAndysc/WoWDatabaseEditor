@@ -35,7 +35,10 @@ namespace WDE.DbcStore.FastReader
             if (magic == FastDb2Reader.WDB2)
                 return new FastDb2Reader(path);
 
-            return new SlowWdcReaderWrapper(path);
+            if (magic == FastWdc1Reader.WDC1)
+                return new FastWdc1Reader(path);
+
+            throw new Exception("Unsupported version");
         }
     }
 }

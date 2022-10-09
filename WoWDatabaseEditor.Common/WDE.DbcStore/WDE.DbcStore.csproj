@@ -5,6 +5,7 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <Configurations>Debug;Release</Configurations>
     <Platforms>AnyCPU</Platforms>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup>
     <OutputPath>..\..\bin\$(Configuration)\</OutputPath>
@@ -13,17 +14,6 @@
     <ProjectReference Include="..\..\DBCD\DBCD\DBCD.csproj" />
     <ProjectReference Include="..\..\WDE.MVVM\WDE.MVVM.csproj" />
     <ProjectReference Include="..\WDE.Common\WDE.Common.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Definitions\Cata 4.3.4 %2815595%29.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Definitions\Legion 7.3.5 %2826972%29.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Definitions\WotLK 3.3.5 %2812340%29.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CommonServiceLocator">
@@ -50,5 +40,11 @@
     <PackageReference Include="Unity.RegistrationByConvention">
       <Version>5.11.1</Version>
     </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>WDE.DbcStore.Test</_Parameter1>
+    </AssemblyAttribute>
   </ItemGroup>
 </Project>
