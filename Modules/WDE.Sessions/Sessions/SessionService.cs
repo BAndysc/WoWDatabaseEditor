@@ -6,10 +6,8 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using WDE.Common;
-using WDE.Common.Database;
 using WDE.Common.Managers;
 using WDE.Common.Services;
 using WDE.Common.Sessions;
@@ -18,7 +16,7 @@ using WDE.Common.Utils;
 using WDE.Module.Attributes;
 using WDE.SqlQueryGenerator;
 
-namespace WDE.Solutions.Sessions
+namespace WDE.Sessions.Sessions
 {
     [AutoRegister]
     [SingleInstance]

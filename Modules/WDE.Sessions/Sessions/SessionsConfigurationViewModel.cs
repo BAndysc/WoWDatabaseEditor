@@ -3,11 +3,10 @@ using System.Windows.Input;
 using Prism.Commands;
 using WDE.Common;
 using WDE.Common.Sessions;
-using WDE.Common.Utils;
 using WDE.Module.Attributes;
 using WDE.MVVM;
 
-namespace WDE.Solutions.Sessions
+namespace WDE.Sessions.Sessions
 {
     [AutoRegister]
     public class SessionsConfigurationViewModel : ObservableBase, IConfigurable

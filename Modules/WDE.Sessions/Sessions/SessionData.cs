@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using WDE.Common.Services;
 
-namespace WDE.Solutions.Sessions
+namespace WDE.Sessions.Sessions
 {
     public struct SessionData : ISettings
     {

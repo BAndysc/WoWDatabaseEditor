@@ -301,9 +301,9 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public Task<IList<int>> GetSmartScriptEntriesByType(SmartScriptType scriptType) =>
             nonCachedDatabase.GetSmartScriptEntriesByType(scriptType);
         
-        public IEnumerable<ISmartScriptProjectItem> GetProjectItems() => nonCachedDatabase.GetProjectItems();
+        public IEnumerable<ISmartScriptProjectItem> GetLegacyProjectItems() => nonCachedDatabase.GetLegacyProjectItems();
         
-        public IEnumerable<ISmartScriptProject> GetProjects() => nonCachedDatabase.GetProjects();
+        public IEnumerable<ISmartScriptProject> GetLegacyProjects() => nonCachedDatabase.GetLegacyProjects();
 
         public IBroadcastText? GetBroadcastTextByText(string text)
         {

@@ -16,6 +16,7 @@ using WDE.PacketViewer;
 using WDE.PacketViewer.Avalonia;
 using WDE.Parameters;
 using WDE.RemoteSOAP;
+using WDE.Sessions;
 using WDE.SmartScriptEditor.Avalonia;
 using WDE.Solutions;
 using WDE.SourceCodeIntegrationEditor;
@@ -80,7 +81,8 @@ namespace LoaderAvalonia
                 typeof(PathPreviewToolModule),
                 typeof(EventAiModule),
                 typeof(EventAiAvaloniaModule),
-                typeof(QueryGeneratorModule)
+                typeof(QueryGeneratorModule),
+                typeof(SessionsModule)
             };
             WoWDatabaseEditorCore.Avalonia.Program.PreloadedModules = modules;
             WoWDatabaseEditorCore.Avalonia.Program.Main(args);

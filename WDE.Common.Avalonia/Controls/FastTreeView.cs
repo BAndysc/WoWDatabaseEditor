@@ -16,8 +16,10 @@ public abstract class FastTreeView<P, C> : Control where P : IParentType where C
     protected static SolidColorBrush SelectedRowBackground = new SolidColorBrush(Color.FromRgb(87, 124, 219));
     public static readonly StyledProperty<FlatTreeList<P, C>?> ItemsProperty = AvaloniaProperty.Register<FastTreeView<P, C>, FlatTreeList<P, C>?>(nameof(Items));
     public static readonly StyledProperty<bool> IsFilteredProperty = AvaloniaProperty.Register<FastTreeView<P, C>, bool>(nameof(IsFiltered));
+    public static readonly StyledProperty<bool> RequestRenderProperty = AvaloniaProperty.Register<FastTreeView<P, C>, bool>(nameof(RequestRender));
     public static readonly StyledProperty<INodeType?> SelectedNodeProperty = AvaloniaProperty.Register<FastTreeView<P, C>, INodeType?>(nameof(SelectedNode));
 
+    
     public const float RowHeight = 20;
     public const float Indent = 20;
 
@@ -39,6 +41,8 @@ public abstract class FastTreeView<P, C> : Control where P : IParentType where C
         ItemsProperty.Changed.AddClassHandler<FastTreeView<P, C>>((tree, args) => tree.ItemsChanged(args));
         AffectsRender<FastTreeView<P, C>>(IsFilteredProperty);
         AffectsMeasure<FastTreeView<P, C>>(IsFilteredProperty);
+        AffectsRender<FastTreeView<P, C>>(RequestRenderProperty);
+        AffectsMeasure<FastTreeView<P, C>>(RequestRenderProperty);
         FocusableProperty.OverrideDefaultValue<FastTreeView<P, C>>(true);
     }
 
@@ -318,6 +322,12 @@ public abstract class FastTreeView<P, C> : Control where P : IParentType where C
     {
         get => GetValue(IsFilteredProperty);
         set => SetValue(IsFilteredProperty, value);
+    }
+    
+    public bool RequestRender
+    {
+        get => GetValue(RequestRenderProperty);
+        set => SetValue(RequestRenderProperty, value);
     }
 
     public FlatTreeList<P, C>? Items

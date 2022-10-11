@@ -57,6 +57,7 @@
       <ProjectReference Include="..\WoWDatabaseEditor\WoWDatabaseEditorCore.csproj" />
       <ProjectReference Include="..\WDE.MapRenderer\WDE.MapRenderer.csproj" />
       <ProjectReference Include="..\Modules\WDE.AnniversaryInfo\WDE.AnniversaryInfo.csproj" />
+      <ProjectReference Include="..\Modules\WDE.Sessions\WDE.Sessions.csproj" />
     </ItemGroup>
 
 </Project>

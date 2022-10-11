@@ -15,9 +15,8 @@ using WDE.Common.Windows;
 using WDE.Module.Attributes;
 using WDE.MVVM;
 using WDE.MVVM.Observable;
-using WDE.Solutions.Explorer.ViewModels;
 
-namespace WDE.Solutions.Sessions
+namespace WDE.Sessions.Sessions
 {
     [AutoRegister]
     [SingleInstance]

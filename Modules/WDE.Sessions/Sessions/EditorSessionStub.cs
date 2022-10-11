@@ -1,7 +1,7 @@
 using System;
 using WDE.Common.Sessions;
 
-namespace WDE.Solutions.Sessions
+namespace WDE.Sessions.Sessions
 {
     internal class EditorSessionStub : IEditorSessionStub
     {

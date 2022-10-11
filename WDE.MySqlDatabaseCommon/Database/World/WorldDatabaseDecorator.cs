@@ -69,9 +69,9 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public IEnumerable<ISpellScriptName> GetSpellScriptNames(int spellId) => impl.GetSpellScriptNames(spellId);
 
-        public IEnumerable<ISmartScriptProjectItem> GetProjectItems() => impl.GetProjectItems();
+        public IEnumerable<ISmartScriptProjectItem> GetLegacyProjectItems() => impl.GetLegacyProjectItems();
         
-        public IEnumerable<ISmartScriptProject> GetProjects() => impl.GetProjects();
+        public IEnumerable<ISmartScriptProject> GetLegacyProjects() => impl.GetLegacyProjects();
 
         public Task<IList<int>> GetSmartScriptEntriesByType(SmartScriptType scriptType) =>
             impl.GetSmartScriptEntriesByType(scriptType);

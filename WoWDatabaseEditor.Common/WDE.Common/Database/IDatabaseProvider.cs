@@ -53,8 +53,8 @@ namespace WDE.Common.Database
 
         Task<IList<int>> GetSmartScriptEntriesByType(SmartScriptType scriptType);
 
-        IEnumerable<ISmartScriptProjectItem> GetProjectItems();
-        IEnumerable<ISmartScriptProject> GetProjects();
+        IEnumerable<ISmartScriptProjectItem> GetLegacyProjectItems();
+        IEnumerable<ISmartScriptProject> GetLegacyProjects();
 
         IBroadcastText? GetBroadcastTextByText(string text);
         Task<IBroadcastText?> GetBroadcastTextByTextAsync(string text);

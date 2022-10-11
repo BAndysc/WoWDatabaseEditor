@@ -15,7 +15,7 @@ using WDE.Module.Attributes;
 using WDE.MVVM;
 using WDE.MVVM.Observable;
 
-namespace WDE.Solutions.Sessions
+namespace WDE.Sessions.Sessions
 {
     [AutoRegister]
     [SingleInstance]

@@ -22,11 +22,11 @@ using WDE.MySqlDatabaseCommon.Tools;
 using WDE.Parameters.ViewModels;
 using WDE.RemoteSOAP.ViewModels;
 using WDE.Solutions.Explorer.ViewModels;
-using WDE.Solutions.Sessions;
 using WDE.SQLEditor.ViewModels;
 using WDE.TrinityMySqlDatabase.ViewModels;
 using WDE.CMMySqlDatabase.ViewModels;
 using WDE.Parameters.Views;
+using WDE.Sessions.Sessions;
 using WDE.Updater.ViewModels;
 
 namespace WDE.CommonViews.Avalonia

@@ -6,7 +6,7 @@ using System.Linq;
 using WDE.Common;
 using WDE.Common.Sessions;
 
-namespace WDE.Solutions.Sessions
+namespace WDE.Sessions.Sessions
 {
     internal class EditorSession : EditorSessionStub, IEditorSession
     {

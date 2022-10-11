@@ -8,7 +8,7 @@ using WDE.Common.Sessions;
 using WDE.Common.Solution;
 using WDE.Module.Attributes;
 
-namespace WDE.Solutions.Sessions
+namespace WDE.Sessions.Sessions
 {
     [AutoRegister]
     [SingleInstance]
