@@ -276,7 +276,7 @@ namespace WDE.SqlQueryGenerator
             if (o is bool b)
                 return b ? "1" : "0";
             if (o is DateTime dt)
-                return dt.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss");
+                return dt.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss").ToSqlEscapeString();
             if (o is SqlTimestamp ts)
                 return "FROM_UNIXTIME(" + ts.Value + ")";
             return o.ToString() ?? "[INVALID TYPE]";

@@ -30,7 +30,7 @@ namespace WDE.MySqlDatabaseCommon.CommonModels
         public uint NpcFlag { get; set; }
         
         [Column(Name = "ActionMenuID")]
-        public uint ActionMenuId { get; set; }
+        public int ActionMenuId { get; set; }
         
         [Column(Name = "ActionPoiID")]
         public uint ActionPoiId { get; set; }
@@ -79,7 +79,7 @@ namespace WDE.MySqlDatabaseCommon.CommonModels
         [Column(Name = "OptionNpcFlag")]
         public uint NpcFlag { get; set; }
 
-        public uint ActionMenuId => Action?.ActionMenuId ?? 0;
+        public int ActionMenuId => (int?)Action?.ActionMenuId ?? 0;
         public uint ActionPoiId => Action?.ActionPoiId ?? 0;
         public uint BoxCoded => Box?.BoxCoded ?? 0;
         public uint BoxMoney => Box?.BoxMoney ?? 0;
@@ -132,7 +132,7 @@ namespace WDE.MySqlDatabaseCommon.CommonModels
         public uint NpcFlag { get; set; }
         
         [Column(Name = "ActionMenuID")]
-        public uint ActionMenuId { get; set; }
+        public int ActionMenuId { get; set; }
         
         [Column(Name = "ActionPoiID")]
         public uint ActionPoiId { get; set; }

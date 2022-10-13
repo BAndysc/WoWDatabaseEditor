@@ -67,7 +67,7 @@ namespace WDE.Common.Database
         int BroadcastTextId { get; }
         GossipOption OptionType { get; }
         uint NpcFlag { get; }
-        uint ActionMenuId { get; }
+        int ActionMenuId { get; }
         uint ActionPoiId { get; }
         uint BoxCoded { get; }
         uint BoxMoney { get; }

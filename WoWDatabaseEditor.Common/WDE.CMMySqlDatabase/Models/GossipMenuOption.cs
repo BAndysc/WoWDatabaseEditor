@@ -30,7 +30,7 @@ public class GossipMenuOption : IGossipMenuOption
     public uint NpcFlag { get; set; }
         
     [Column(Name = "action_menu_id")]
-    public uint ActionMenuId { get; set; }
+    public int ActionMenuId { get; set; }
         
     [Column(Name = "action_poi_id")]
     public uint ActionPoiId { get; set; }

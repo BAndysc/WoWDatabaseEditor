@@ -152,7 +152,7 @@ namespace WoWDatabaseEditorCore.Providers
             ISolutionItem? item = await newItemService.GetNewSolutionItem();
             if (item != null)
             {
-                solutionManager.Items.Add(item);
+                solutionManager.Add(item);
                 if (item is not SolutionFolderItem)
                     eventAggregator.GetEvent<EventRequestOpenItem>().Publish(item);
             }
