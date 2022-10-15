@@ -1310,7 +1310,11 @@
 			},
 			"2": {
 				"name": "WOTLK"
-			}
+			},
+			"3": "CATA",
+			"4": "MOP",
+			"5": "WOD",
+			"6": "Legion"
 		}
 	},
 	"LootModeParameter": {

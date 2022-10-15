@@ -32,6 +32,7 @@ namespace WDE.SmartScriptEditor.Data
         public bool EnterToAccept { get; set; }
         
         [JsonProperty(PropertyName = "values")]
+        [JsonConverter(typeof(ParameterValuesJsonConverter))]
         public Dictionary<long, SelectOption> Values { get; set; }
     }
     

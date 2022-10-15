@@ -112,6 +112,7 @@ public class Game : IGame
         }
         catch (Exception e)
         {
+            Console.WriteLine(e);
             messageBoxService.SimpleDialog("Error", "Couldn't initialize the 3D view", "Details: " + e.InnerException?.InnerException?.Message ?? e.Message + "\n\nPlease report to the developer.").ListenErrors();
             success = false;
         }

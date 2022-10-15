@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using Newtonsoft.Json;
-using WDE.Common.Parameters;
 
-namespace WDE.Parameters.Models;
+namespace WDE.Common.Parameters;
 
 public class ParameterValuesJsonConverter : JsonConverter
 {
