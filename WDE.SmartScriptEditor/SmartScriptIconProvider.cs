@@ -18,7 +18,7 @@ namespace WDE.SmartScriptEditor
                 case SmartScriptType.AreaTrigger:
                     return new ImageUri("Icons/document_areatrigger.png");
                 case SmartScriptType.Event:
-                    return new ImageUri("Icons/document.png");
+                    return new ImageUri("Icons/document_event.png");
                 case SmartScriptType.Gossip:
                     return new ImageUri("Icons/document.png");
                 case SmartScriptType.Quest:
@@ -43,6 +43,16 @@ namespace WDE.SmartScriptEditor
                     return new ImageUri("Icons/document_cinematic.png");
                 case SmartScriptType.ActionList:
                     return new ImageUri("Icons/document_actionlist.png");
+                case SmartScriptType.PlayerChoice:
+                    return new ImageUri("Icons/document_player_choice.png");
+                case SmartScriptType.Template:
+                    return new ImageUri("Icons/document_template.png");
+                case SmartScriptType.StaticSpell:
+                    return new ImageUri("Icons/document_spell.png");
+                case SmartScriptType.BattlePet:
+                    return new ImageUri("Icons/document_battle_pet.png");
+                case SmartScriptType.Conversation:
+                    return new ImageUri("Icons/document_conversation.png");
                 default:
                     return new ImageUri("Icons/document.png");
             }

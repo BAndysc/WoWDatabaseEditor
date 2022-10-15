@@ -56,6 +56,13 @@ namespace WDE.SmartScriptEditor.Providers
                     if (entry.HasValue && dbcStore.SceneStore.ContainsKey((uint)entry))
                         return dbcStore.SceneStore[(uint)entry];
                     break;
+                case SmartScriptType.BattlePet:
+                    if (dbcStore.BattlePetSpeciesIdStore?.TryGetValue(entryOrGuid, out var creatureId) ?? false)
+                    {
+                        if (database.GetCreatureTemplate((uint)creatureId) is { } battleCreature)
+                            return battleCreature.Name;
+                    }
+                    break;
                 default:
                     return null;
             }
