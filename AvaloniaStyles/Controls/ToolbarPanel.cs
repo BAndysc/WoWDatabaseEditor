@@ -1,8 +1,10 @@
 using System;
+using System.Collections.Generic;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
 using Avalonia.Layout;
+using Avalonia.VisualTree;
 
 namespace AvaloniaStyles.Controls
 {
@@ -11,6 +13,8 @@ namespace AvaloniaStyles.Controls
         public static readonly StyledProperty<Panel?> OutOfBoundsPanelProperty = AvaloniaProperty.Register<ToolbarPanel, Panel?>(nameof(OutOfBoundsPanel));
         public static readonly StyledProperty<bool> IsOverflowProperty = AvaloniaProperty.Register<ToolbarPanel, bool>("IsOverflow");
 
+        private List<IControl> _overflowControls = new List<IControl>();
+        
         public Panel? OutOfBoundsPanel
         {
             get => (Panel?)GetValue(OutOfBoundsPanelProperty);
@@ -21,6 +25,47 @@ namespace AvaloniaStyles.Controls
         {
             get => (bool)GetValue(IsOverflowProperty);
             set => SetValue(IsOverflowProperty, value);
+        }
+
+        static ToolbarPanel()
+        {
+            OutOfBoundsPanelProperty.Changed.AddClassHandler<ToolbarPanel>((panel, e) => panel.OnChangedPanel(e));
+        }
+
+        private void OnChangedPanel(AvaloniaPropertyChangedEventArgs changed)
+        {
+            var newPanel = changed.NewValue as Panel;
+            if (newPanel == null)
+                return;
+            newPanel.AttachedToVisualTree += NewPanelOnAttachedToVisualTree;
+        }
+
+        private void NewPanelOnAttachedToVisualTree(object? sender, VisualTreeAttachmentEventArgs e)
+        {
+            foreach (var child in _overflowControls)
+                OutOfBoundsPanel!.Children.Add(child);
+            _overflowControls.Clear();
+        }
+
+        protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+        {
+            base.OnDetachedFromVisualTree(e);
+            if (OutOfBoundsPanel is { } panel)
+            {
+                for (var index = panel.Children.Count - 1; index >= 0; index--)
+                {
+                    var child = panel.Children[0];
+                    panel.Children.RemoveAt(0);
+                    Children.Add(child);
+                }
+            }
+
+            if (_overflowControls.Count > 0)
+            {
+                foreach (var control in _overflowControls)
+                    Children.Add(control);
+                _overflowControls.Clear();
+            }
         }
         
         protected override Size MeasureOverride(Size availableSize)
@@ -128,7 +173,10 @@ namespace AvaloniaStyles.Controls
                     {
                         var c = children[^1];
                         Children.RemoveAt(Children.Count - 1);
-                        panel.Children.Insert(0, c);
+                        if (((IVisual)panel).IsAttachedToVisualTree)
+                            panel.Children.Insert(0, c);
+                        else
+                            _overflowControls.Insert(0, c);
                     }
 
                     IsOverflow = true;
@@ -141,17 +189,29 @@ namespace AvaloniaStyles.Controls
             {
                 if (leftSpace > 0)
                 {
-                    if (OutOfBoundsPanel.Children.Count > 0)
+                    IControl? child = null;
+                    if (_overflowControls.Count > 0)
                     {
-                        var child = OutOfBoundsPanel.Children[0];
+                        child = _overflowControls[0];
+                    }
+                    else if (OutOfBoundsPanel.Children.Count > 0)
+                    {
+                        child = OutOfBoundsPanel.Children[0];
+                    }
+
+                    if (child != null)
+                    {
                         if (leftSpace > child.Bounds.Width + spacing)
                         {
-                            OutOfBoundsPanel.Children.RemoveAt(0);
+                            if (_overflowControls.Count > 0)
+                                _overflowControls.RemoveAt(0);
+                            else
+                                OutOfBoundsPanel.Children.RemoveAt(0);
                             Children.Add(child);
                         }
                     }
                 }
-                IsOverflow = OutOfBoundsPanel.Children.Count > 0;
+                IsOverflow = OutOfBoundsPanel.Children.Count > 0 || _overflowControls.Count > 0;
             }
 
             return finalSize;

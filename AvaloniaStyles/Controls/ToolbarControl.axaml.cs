@@ -33,16 +33,6 @@ public class ToolbarControl : TemplatedControl, IPanel
             childrenHost.Children.Add(child);
     }
 
-    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
-    {
-        base.OnAttachedToVisualTree(e);
-    }
-
-    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
-    {
-        base.OnDetachedFromVisualTree(e);
-    }
-
     private void ChildrenChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         switch (e.Action)
