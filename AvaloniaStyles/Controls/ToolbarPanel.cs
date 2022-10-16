@@ -8,6 +8,21 @@ namespace AvaloniaStyles.Controls
 {
     public class ToolbarPanel : Panel
     {
+        public static readonly StyledProperty<Panel?> OutOfBoundsPanelProperty = AvaloniaProperty.Register<ToolbarPanel, Panel?>(nameof(OutOfBoundsPanel));
+        public static readonly StyledProperty<bool> IsOverflowProperty = AvaloniaProperty.Register<ToolbarPanel, bool>("IsOverflow");
+
+        public Panel? OutOfBoundsPanel
+        {
+            get => (Panel?)GetValue(OutOfBoundsPanelProperty);
+            set => SetValue(OutOfBoundsPanelProperty, value);
+        }
+        
+        public bool IsOverflow
+        {
+            get => (bool)GetValue(IsOverflowProperty);
+            set => SetValue(IsOverflowProperty, value);
+        }
+        
         protected override Size MeasureOverride(Size availableSize)
         {
             var spacing = 4;
@@ -35,6 +50,11 @@ namespace AvaloniaStyles.Controls
                 child.Measure(availableSize.WithWidth(double.PositiveInfinity));
                 desiredWidth += child.DesiredSize.Width + spacing;
                 desiredHeight = Math.Max(desiredHeight, child.DesiredSize.Height);
+            }
+            if (OutOfBoundsPanel != null)
+            {
+                OutOfBoundsPanel.Measure(availableSize.WithWidth(double.PositiveInfinity));
+                desiredWidth += OutOfBoundsPanel.DesiredSize.Width + spacing;
             }
 
             return new Size(any ? desiredWidth - spacing : 0, desiredHeight);
@@ -99,8 +119,39 @@ namespace AvaloniaStyles.Controls
                     rcChild = rcChild.WithWidth(previousChildSize);
                     previousChildSize += spacing;
                 }
+                if (rcChild.Right > finalSize.Width)
+                    rcChild = rcChild.WithWidth(Math.Max(0, finalSize.Width - rcChild.X));
 
+                if (rcChild.Right > finalSize.Width && OutOfBoundsPanel is { } panel)
+                {
+                    for (var j = i; j < count; ++j)
+                    {
+                        var c = children[^1];
+                        Children.RemoveAt(Children.Count - 1);
+                        panel.Children.Insert(0, c);
+                    }
+
+                    IsOverflow = true;
+                    return finalSize;
+                }
                 ArrangeChild(child, rcChild, finalSize);
+            }
+
+            if (OutOfBoundsPanel != null)
+            {
+                if (leftSpace > 0)
+                {
+                    if (OutOfBoundsPanel.Children.Count > 0)
+                    {
+                        var child = OutOfBoundsPanel.Children[0];
+                        if (leftSpace > child.Bounds.Width + spacing)
+                        {
+                            OutOfBoundsPanel.Children.RemoveAt(0);
+                            Children.Add(child);
+                        }
+                    }
+                }
+                IsOverflow = OutOfBoundsPanel.Children.Count > 0;
             }
 
             return finalSize;

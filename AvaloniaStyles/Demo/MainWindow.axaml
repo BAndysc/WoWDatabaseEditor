@@ -76,6 +76,26 @@
     
     <ScrollViewer Margin="10" Background="{DynamicResource MainColorBackground}">
         <StackPanel Spacing="10" Orientation="Vertical">
+            
+            <Border BorderThickness="1" BorderBrush="Black">
+                <Grid ColumnDefinitions="100,5,20">
+                    <ToolbarControl>
+                        <Button>A</Button>
+                        <Button>B</Button>
+                        <Button>C</Button>
+                        <Button>D</Button>
+                        <Button>E</Button>
+                        <Button>F</Button>
+                        <Button>G</Button>
+                        <Button>H</Button>
+                        <Button>I</Button>
+                        <Button>K</Button>
+                    </ToolbarControl>
+                    <GridSplitter Grid.Column="1" />
+                    <Border Grid.Column="2" />
+                </Grid>
+            </Border>
+            
             <controls:CompletionComboBox SelectedItem="{Binding EnumValue, Mode=TwoWay}" controls:Extensions.EnumType="{x:Type demo:ExampleEnum}" />
             <Button>Button</Button>
             <Button IsEnabled="False">Disabled button</Button>
