@@ -33,12 +33,13 @@ public class AnniversarySummaryService : IAnniversarySummaryService
 
     public void TryOpenDefaultSummary()
     {
-        if (!data.SummaryAutoShown)
-        {
-            data.SummaryAutoShown = true;
-            userSettings.Update(data);
-            OpenSummary();
-        }
+        // disabled
+        // if (!data.SummaryAutoShown)
+        // {
+        //     data.SummaryAutoShown = true;
+        //     userSettings.Update(data);
+        //     OpenSummary();
+        // }
     }
 
     public bool ShowAnniversaryBox { get; set; }

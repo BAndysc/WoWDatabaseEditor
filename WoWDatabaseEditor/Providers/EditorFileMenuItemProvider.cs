@@ -48,8 +48,15 @@ namespace WoWDatabaseEditorCore.Providers
             DocumentManager = documentManager;
             this.settings = settings;
             SubItems = new List<IMenuItem>();
-            SubItems.Add(new ModuleMenuItem("_Add item to project", new AsyncAutoCommand(AddNewItemWindow), new("Control+N")));
-            SubItems.Add(new ModuleMenuItem("_New / Open (without project)", new AsyncAutoCommand(OpenNewItemWindow), new("Control+O")));
+            if (solutionManager.CanContainAnyItem)
+            {
+                SubItems.Add(new ModuleMenuItem("_Add item to project", new AsyncAutoCommand(AddNewItemWindow), new("Control+N")));
+                SubItems.Add(new ModuleMenuItem("_New / Open (without project)", new AsyncAutoCommand(OpenNewItemWindow), new("Control+O")));
+            }
+            else
+            {
+                SubItems.Add(new ModuleMenuItem("_New / Open", new AsyncAutoCommand(OpenNewItemWindow), new("Control+O")));
+            }
             
             SubItems.Add(new ModuleMenuItem("_Save to database", 
                 new DelegateCommand(

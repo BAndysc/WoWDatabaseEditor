@@ -10,6 +10,10 @@ namespace WDE.Common
     public interface ISolutionManager
     {
         IReadOnlyObservableList<ISolutionItem> Items { get; }
+        /**
+         * returns true if this SolutionManager can contain any ISolutionItem
+         */
+        bool CanContainAnyItem { get; }
         void Initialize();
         void Refresh(ISolutionItem item);
         void RefreshAll();

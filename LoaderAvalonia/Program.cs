@@ -35,6 +35,7 @@ using WDE.EventScriptsEditor;
 using WDE.MangosEventAiEditor;
 using WDE.MapSpawns;
 using WDE.PathPreviewTool;
+using WDE.FirstTimeWizard;
 using WDE.QueryGenerators;
 
 namespace LoaderAvalonia
@@ -82,7 +83,8 @@ namespace LoaderAvalonia
                 typeof(EventAiModule),
                 typeof(EventAiAvaloniaModule),
                 typeof(QueryGeneratorModule),
-                typeof(SessionsModule)
+                typeof(SessionsModule),
+                typeof(FirstTimeWizardModule)
             };
             WoWDatabaseEditorCore.Avalonia.Program.PreloadedModules = modules;
             WoWDatabaseEditorCore.Avalonia.Program.Main(args);

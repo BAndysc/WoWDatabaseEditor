@@ -224,6 +224,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.MangosEventAiEditor", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.QueryGenerators", "Modules\WDE.QueryGenerators\WDE.QueryGenerators.csproj", "{8493EDDD-817B-452B-8791-E311370CCE20}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.FirstTimeWizard", "Modules\WDE.FirstTimeWizard\WDE.FirstTimeWizard.csproj", "{DEFE898D-4221-4D67-89CF-E2D2671EF2A9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -618,6 +620,10 @@ Global
 		{C3F7C88F-458A-49A4-B239-2695C16513B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C3F7C88F-458A-49A4-B239-2695C16513B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C3F7C88F-458A-49A4-B239-2695C16513B8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DEFE898D-4221-4D67-89CF-E2D2671EF2A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DEFE898D-4221-4D67-89CF-E2D2671EF2A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DEFE898D-4221-4D67-89CF-E2D2671EF2A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DEFE898D-4221-4D67-89CF-E2D2671EF2A9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -704,6 +710,7 @@ Global
 		{0878E86D-A238-492C-BEF0-A580DEC5C466} = {106EEB05-E9AB-453A-ADD0-96505F405D76}
 		{8493EDDD-817B-452B-8791-E311370CCE20} = {4C553308-1140-42F2-B99C-90402248A983}
 		{C3F7C88F-458A-49A4-B239-2695C16513B8} = {4C553308-1140-42F2-B99C-90402248A983}
+		{DEFE898D-4221-4D67-89CF-E2D2671EF2A9} = {2616E90A-DE5D-41B4-A95F-352A62521D86}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3E63D4A5-8159-4344-B556-1E1D8D63DA99}

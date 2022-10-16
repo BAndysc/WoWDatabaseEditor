@@ -28,6 +28,7 @@ namespace WDE.Common.DBC
         Dictionary<long, string> CharTitleStore { get; }
         Dictionary<long, string> MapDirectoryStore { get; }
         Dictionary<long, string> SceneStore { get; }
+        Dictionary<long, long> BattlePetSpeciesIdStore { get; }
     }
     
     public class DbcLoadedEvent : PubSubEvent<IDbcStore>

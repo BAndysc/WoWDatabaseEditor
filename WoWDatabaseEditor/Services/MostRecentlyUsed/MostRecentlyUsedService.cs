@@ -57,8 +57,9 @@ namespace WoWDatabaseEditorCore.Services.MostRecentlyUsed
             {
                 return serializer.Serialize(item, true);
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Console.WriteLine(e);
                 return null;
             }
         }

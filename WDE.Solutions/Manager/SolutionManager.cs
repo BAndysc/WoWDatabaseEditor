@@ -54,6 +54,7 @@ namespace WDE.Solutions.Manager
 
         private ObservableList<ISolutionItem> items;
         public IReadOnlyObservableList<ISolutionItem> Items => items;
+        public bool CanContainAnyItem => true;
 
         public void RefreshAll()
         {

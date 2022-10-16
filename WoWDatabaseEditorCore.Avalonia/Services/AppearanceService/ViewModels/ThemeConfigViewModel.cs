@@ -15,7 +15,7 @@ using WoWDatabaseEditorCore.Avalonia.Views;
 namespace WoWDatabaseEditorCore.Avalonia.Services.AppearanceService.ViewModels
 {
     [AutoRegister]
-    public class ThemeConfigViewModel : BindableBase, IConfigurable
+    public class ThemeConfigViewModel : BindableBase, IFirstTimeWizardConfigurable
     {
         private Theme name;
         private List<Theme> themes;

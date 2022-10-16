@@ -7,7 +7,7 @@ using WDE.MySqlDatabaseCommon.Providers;
 
 namespace WDE.MySqlDatabaseCommon.ViewModels
 {
-    public abstract class BaseDatabaseConfigViewModel : ObservableBase, IConfigurable
+    public abstract class BaseDatabaseConfigViewModel : ObservableBase, IFirstTimeWizardConfigurable
     {
         public BaseDatabaseConfigViewModel(IWorldDatabaseSettingsProvider worldSettingsProvider,
             IAuthDatabaseSettingsProvider authDatabaseSettingsProvider,

@@ -123,7 +123,8 @@ namespace WDE.DbcStore
         public Dictionary<long, string> MapDirectoryStore { get; internal set;} = new();
         public Dictionary<long, string> QuestSortStore { get; internal set;} = new();
         public Dictionary<long, string> SceneStore { get; internal set; } = new();
-        
+        public Dictionary<long, long> BattlePetSpeciesIdStore { get; internal set; } = new();
+
         internal void Load()
         {            
             parameterFactory.Register("RaceMaskParameter", new RaceMaskParameter(currentCoreVersion.Current.GameVersionFeatures.AllRaces), QuickAccessMode.Limited);
@@ -195,6 +196,7 @@ namespace WDE.DbcStore
             public Dictionary<long, string> ItemDbcStore { get; internal set;} = new(); // item.dbc, not item-sparse.dbc
             
             public Dictionary<long, string> SceneStore { get; internal set;} = new();
+            public Dictionary<long, long> BattlePetSpeciesIdStore { get; internal set; } = new();
 
             public string Name => "DBC Loading";
             public bool WaitForOtherTasks => false;
@@ -335,6 +337,7 @@ namespace WDE.DbcStore
                 store.MapDirectoryStore = MapDirectoryStore;
                 store.QuestSortStore = QuestSortStore;
                 store.SceneStore = SceneStore;
+                store.BattlePetSpeciesIdStore = BattlePetSpeciesIdStore;
                 store.CurrencyTypeStore = CurrencyTypeStore;
                 
                 parameterFactory.Register("AchievementParameter", new DbcParameter(AchievementStore), QuickAccessMode.Full);
@@ -653,7 +656,7 @@ namespace WDE.DbcStore
                     }
                     case DBCVersions.LEGION_26972:
                     {
-                        max = 39;
+                        max = 42;
                         Load("CriteriaTree.db2", 0, 1, AchievementCriteriaStore);
                         Load("AreaTrigger.db2", row => AreaTriggerStore.Add(row.GetInt(14), $"Area trigger"));
                         Load("AreaTable.db2", 0, 2, AreaStore);
@@ -704,7 +707,19 @@ namespace WDE.DbcStore
                         Load("achievement.db2", row =>  AchievementStore.Add(row.GetInt(12), row.GetString(0)));
                         Load("spell.db2", row => SpellStore.Add(row.Key, row.GetString(1)));
                         Load("chrClasses.db2", 19, 1, ClassStore);
-                        Load("Emotes.db2", 0, 2, EmoteStore);
+                        
+                        Load("Emotes.db2", row =>
+                        {
+                            var id = row.Key;
+                            var name = row.GetString(2);
+                            var proc = row.GetInt(6);
+                            if (proc == 0)
+                                EmoteOneShotStore.Add(id, name);
+                            else if (proc == 2)
+                                EmoteStateStore.Add(id, name);
+                            EmoteStore.Add(id, name);
+                        });
+                        
                         Load("EmotesText.db2", 0, 1, TextEmoteStore);
                         Load("HolidayNames.db2", 0, 1, HolidayNamesStore);
                         Load("Holidays.db2", row =>
@@ -742,6 +757,8 @@ namespace WDE.DbcStore
                         Load("SpellItemEnchantment.db2", 0, 1, SpellItemEnchantmentStore);
                         Load("TaxiNodes.db2",  0, 1, TaxiNodeStore);
                         Load("TaxiPath.db2",  row => TaxiPathsStore.Add(row.GetInt(2), (row.GetUShort(0), row.GetUShort(1))));
+                        Load("SceneScriptPackage.db2", 0, 1, SceneStore);
+                        Load("BattlePetSpecies.db2", 8, 2, BattlePetSpeciesIdStore);
                         break;
                     }
                     case DBCVersions.SHADOWLANDS_41079:

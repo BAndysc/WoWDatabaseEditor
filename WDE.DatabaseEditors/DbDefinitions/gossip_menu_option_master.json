@@ -77,12 +77,6 @@
           "value_type": "int"
         },
         {
-          "name": "Npc Flag",
-          "db_column_name": "OptionNpcFlag",
-          "default": 1,
-          "value_type": "NpcFlagParameter"
-        },
-        {
           "name": "Submenu id",
           "db_column_name": "ActionMenuID",
           "value_type": "GossipMenuParameter",

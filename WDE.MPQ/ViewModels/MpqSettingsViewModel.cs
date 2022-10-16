@@ -10,7 +10,7 @@ using WDE.Module.Attributes;
 namespace WDE.MPQ.ViewModels
 {
     [AutoRegister]
-    public class MpqSettingsViewModel : BindableBase, IConfigurable
+    public class MpqSettingsViewModel : BindableBase, IFirstTimeWizardConfigurable
     {
         private string? woWPath;
         private MpqOpenType mpqOpenType;
