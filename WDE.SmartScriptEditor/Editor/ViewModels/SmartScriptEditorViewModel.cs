@@ -932,6 +932,19 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     e.IsSelected = true;
             });
 
+            RemoveAllCommands = new DelegateCommand(() =>
+            {
+                using var _ = script.BulkEdit("Remove all comments");
+                foreach (SmartEvent e in Events)
+                {
+                    for (int i = e.Actions.Count - 1; i >= 0; --i)
+                    {
+                        if (e.Actions[i].Id == SmartConstants.ActionComment)
+                            e.Actions.RemoveAt(i);
+                    }
+                }
+            });
+
             History.PropertyChanged += (sender, args) =>
             {
                 UndoCommand.RaiseCanExecuteChanged();
@@ -996,6 +1009,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         public DelegateCommand DeselectAllButConditions { get; set; }
         public DelegateCommand DeselectAllButActions { get; set; }
         public DelegateCommand DeselectAllButEvents { get; set; }
+        public DelegateCommand RemoveAllCommands { get; }
 
         public AsyncAutoCommand<GlobalVariable> EditGlobalVariable { get; }
         public DelegateCommand<object> DirectEditParameter { get; }
@@ -1245,7 +1259,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
             SmartTarget? target = null;
 
-            if (!actionData.TargetIsSource && !actionData.DoNotProposeTarget && (actionData.TargetTypes?.Count ?? 0) > 0)
+            if (!actionData.TargetIsSource && !actionData.DoNotProposeTarget && actionData.TargetTypes != SmartSourceTargetType.None)
             {
                 var targetPick = await ShowTargetPicker(e, actionData);
 
@@ -1327,7 +1341,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     return (eventSupportsActionInvoker || !data.IsInvoker) &&
                            (data.UsableWithScriptTypes == null ||
                             data.UsableWithScriptTypes.Contains(script.SourceType)) &&
-                           (actionData.TargetTypes == null || (data.Types != null && actionData.TargetTypes.Intersect(data.Types).Any()));
+                           (actionData.TargetTypes == SmartSourceTargetType.None || (data.Types(script.SourceType) != SmartSourceTargetType.None && (actionData.TargetTypes & data.Types(script.SourceType)) != 0));
                 }, BuildStoredObjectsList());
         }
 
@@ -1381,19 +1395,20 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             }
             else
             {
-                IList<string>? possibleSourcesOfAction = actionData.TargetIsSource ? actionData.TargetTypes : actionData.Sources;
-                var possibleSourcesOfSource = sourceData.Types;
+                SmartSourceTargetType possibleSourcesOfAction = actionData.TargetIsSource ? actionData.TargetTypes : actionData.Sources;
+                var possibleSourcesOfSource = sourceData.Types(script.SourceType);
 
-                if (possibleSourcesOfAction == null || possibleSourcesOfSource == null)
-                    return false;
-
-                if (sourceData.Id == SmartConstants.SourceSelf && script.SourceType == SmartScriptType.Creature)
-                    return possibleSourcesOfAction.Contains("Creature");
+                if ((sourceData.Id == SmartConstants.SourceSelf || sourceData.Id == SmartConstants.SourceNone)
+                    && possibleSourcesOfSource == SmartSourceTargetType.None)
+                    return true;
                 
-                if (sourceData.Id == SmartConstants.SourceSelf && script.SourceType == SmartScriptType.GameObject)
-                    return possibleSourcesOfAction.Contains("GameObject");
+                if (sourceData.Id == SmartConstants.SourceSelf && script.SourceType == SmartScriptType.Creature)
+                    return possibleSourcesOfAction.HasFlagFast(SmartSourceTargetType.Creature);
 
-                return possibleSourcesOfAction.Intersect(possibleSourcesOfSource).Any();
+                if (sourceData.Id == SmartConstants.SourceSelf && script.SourceType == SmartScriptType.GameObject)
+                    return possibleSourcesOfAction.HasFlagFast(SmartSourceTargetType.GameObject);
+
+                return (possibleSourcesOfAction & possibleSourcesOfSource) != 0;
             }
         }
         
@@ -1468,7 +1483,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 .Select(id => smartDataManager.GetRawData(SmartType.SmartAction, id));
             var canPickConditions =
                 actionDataObservable.Select(ad => !ad.Flags.HasFlagFast(ActionFlags.ConditionInParameter1));
-            var canPickTarget = actionDataObservable.Select(actionData => !actionData.TargetIsSource && (actionData.TargetTypes?.Count ?? 0) > 0);
+            var canPickTarget = actionDataObservable.Select(actionData => !actionData.TargetIsSource && actionData.TargetTypes != SmartSourceTargetType.None);
 
             actionList.Add(new EditableActionData("Conditions", "Action", async () =>
             {
@@ -1497,7 +1512,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                             .SetTitle("Incorrect source for chosen action")
                             .SetMainInstruction($"The source you have chosen ({sourceData.NameReadable}) is not supported with action {actionData.NameReadable}");
                         if (string.IsNullOrEmpty(actionData.ImplicitSource))
-                            dialog.SetContent($"Selected source can be one of: {string.Join(", ", sourceData.Types ?? Enumerable.Empty<string>())}. However, current action requires one of: {string.Join(", ", actionData.TargetTypes  ?? Enumerable.Empty<string>())}");
+                            dialog.SetContent($"Selected source can be one of: {sourceData.RawTypes}. However, current action requires one of: {actionData.TargetTypes}");
                         else
                             dialog.SetContent($"In TrinityCore some actions do not support some sources, this is one of the case. Following action will ignore chosen source and will use source: {actionData.ImplicitSource}");
                         await messageBoxService.ShowDialog(dialog.SetIcon(MessageBoxIcon.Information).Build());

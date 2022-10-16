@@ -135,7 +135,8 @@ namespace WDE.SmartScriptEditor.Exporter
             SmartScriptType scriptSourceType,
             int id,
             bool autoLinks = false,
-            int? linkTo = null)
+            int? linkTo = null,
+            bool shortComments = false)
         {
             var lines = new List<ISmartScriptLine>();
             IList<SmartAction> actions = e.Actions.Count == 0
@@ -201,7 +202,7 @@ namespace WDE.SmartScriptEditor.Exporter
                     TargetY = a.Target.Y,
                     TargetZ = a.Target.Z,
                     TargetO = a.Target.O,
-                    Comment = e.Readable.RemoveTags().Trim() + " - " + a.Readable.RemoveTags().Trim() +
+                    Comment = shortComments ? a.Comment : e.Readable.RemoveTags().Trim() + " - " + a.Readable.RemoveTags().Trim() +
                               (string.IsNullOrEmpty(a.Comment) ? "" : " // " + a.Comment)
                 };
                 if (autoLinks && index > 0)

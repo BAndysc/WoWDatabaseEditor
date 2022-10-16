@@ -34,7 +34,8 @@ namespace WDE.SmartScriptEditor.Data
             IItemFromListProvider itemFromListProvider,
             ICurrentCoreVersion currentCoreVersion,
             IQuestEntryProviderService questEntryProviderService,
-            IContainerProvider containerProvider)
+            IContainerProvider containerProvider,
+            IParameterPickerService pickerService)
         {
             this.parameterFactory = parameterFactory;
             this.editorFeatures = editorFeatures;
@@ -52,6 +53,7 @@ namespace WDE.SmartScriptEditor.Data
                 parameterFactory.Register("QuestEnderParameter", new QuestStarterEnderParameter(databaseProvider, tableEditorPickerService, questEntryProviderService, false));
                 parameterFactory.Register("CreatureSpawnKeyParameter", new CreatureSpawnKeyParameter(databaseProvider));
                 parameterFactory.Register("GameobjectSpawnKeyParameter", new GameObjectSpawnKeyParameter(databaseProvider));
+                parameterFactory.RegisterCombined("NpcFlagsSmartTypeBasedParameter", "NpcFlagParameter", "NpcFlag2Parameter", (npc1, npc2) => new NpcFlagsSmartTypeBasedParameter(npc1, npc2, pickerService));
                 var storedTarget = parameterFactory.Register("StoredTargetParameter", containerProvider.Resolve<VariableContextualParameter>(
                     (typeof(GlobalVariableType), GlobalVariableType.StoredTarget), (typeof(string), "storedTarget")));
                 parameterFactory.Register("DataVariableParameter", containerProvider.Resolve<VariableContextualParameter>(
@@ -246,9 +248,9 @@ namespace WDE.SmartScriptEditor.Data
 
             SetParameterObjects(target, data);
 
-            var targetTypes = data.Types;
+            var targetTypes = data.RawTypes;
 
-            if (targetTypes != null && targetTypes.Contains("Position"))
+            if (targetTypes.HasFlagFast(SmartSourceTargetType.Position))
                 target.IsPosition = true;
 
             return target;
@@ -267,8 +269,8 @@ namespace WDE.SmartScriptEditor.Data
                 return;
             }
             
-            var targetTypes = raw.Types;
-            smartTarget.IsPosition = targetTypes != null && targetTypes.Contains("Position");
+            var targetTypes = raw.RawTypes;
+            smartTarget.IsPosition = targetTypes.HasFlagFast(SmartSourceTargetType.Position);
             
             SetParameterObjects(smartTarget, raw, true);
             UpdateTargetPositionVisibility(smartTarget);
@@ -288,9 +290,9 @@ namespace WDE.SmartScriptEditor.Data
 
             SetParameterObjects(source, data);
 
-            var sourceTypes = data.Types;
+            var sourceTypes = data.RawTypes;
 
-            if (sourceTypes != null && sourceTypes.Contains("Position"))
+            if (sourceTypes.HasFlagFast(SmartSourceTargetType.Position))
                 source.IsPosition = true;
             
             return source;
@@ -311,8 +313,8 @@ namespace WDE.SmartScriptEditor.Data
             
             SetParameterObjects(smartSource, raw, true);
             
-            var sourceTypes = raw.Types;
-            smartSource.IsPosition = sourceTypes != null && sourceTypes.Contains("Position");
+            var sourceTypes = raw.RawTypes;
+            smartSource.IsPosition = sourceTypes.HasFlagFast(SmartSourceTargetType.Position);
             UpdateTargetPositionVisibility(smartSource);
         }
         
