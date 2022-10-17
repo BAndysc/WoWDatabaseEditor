@@ -21,28 +21,12 @@ namespace WDE.SmartScriptEditor.Models
         
         private ParameterValueHolder<long> condition;
 
-        public readonly ParameterValueHolder<float>[]? Position;
-
-        public SmartSource(int id, IEditorFeatures features, bool? withPosition = null) : base(id,
+        public SmartSource(int id, IEditorFeatures features) : base(id,
             features.TargetParametersCount,
             that => new SmartScriptParameterValueHolder(Parameter.Instance, 0, that))
         {
             this.features = features;
             condition = new ParameterValueHolder<long>("Condition ID", Parameter.Instance, 0);
-
-            if (withPosition.HasValue && withPosition.Value ||
-                (!withPosition.HasValue && features.SourceHasPosition))
-            {
-                Position = new ParameterValueHolder<float>[4];
-
-                Position[0] = new ParameterValueHolder<float>("Target X", FloatParameter.Instance, 0);
-                Position[1] = new ParameterValueHolder<float>("Target Y", FloatParameter.Instance, 0);
-                Position[2] = new ParameterValueHolder<float>("Target Z", FloatParameter.Instance, 0);
-                Position[3] = new ParameterValueHolder<float>("Target O", FloatParameter.Instance, 0);
-
-                for (var i = 0; i < 4; ++i)
-                    Position[i].PropertyChanged += (_, _) => CallOnChanged();   
-            }
         }
 
         public bool IsPosition { get; set; }
@@ -61,26 +45,26 @@ namespace WDE.SmartScriptEditor.Models
         
         public float X
         {
-            get => Position![0].Value;
-            set => Position![0].Value = value;
+            get => GetFloatParameter(0).Value;
+            set => GetFloatParameter(0).Value = value;
         }
 
         public float Y
         {
-            get => Position![1].Value;
-            set => Position![1].Value = value;
+            get => GetFloatParameter(1).Value;
+            set => GetFloatParameter(1).Value = value;
         }
 
         public float Z
         {
-            get => Position![2].Value;
-            set => Position![2].Value = value;
+            get => GetFloatParameter(2).Value;
+            set => GetFloatParameter(2).Value = value;
         }
 
         public float O
         {
-            get => Position![3].Value;
-            set => Position![3].Value = value;
+            get => GetFloatParameter(3).Value;
+            set => GetFloatParameter(3).Value = value;
         }
 
         private IList<ICondition>? conditions;
@@ -121,6 +105,10 @@ namespace WDE.SmartScriptEditor.Models
                             y = Y.ToString(CultureInfo.InvariantCulture),
                             z = Z.ToString(CultureInfo.InvariantCulture),
                             o = O.ToString(CultureInfo.InvariantCulture),
+                            fparam1 = X.ToString(CultureInfo.InvariantCulture),
+                            fparam2 = Y.ToString(CultureInfo.InvariantCulture),
+                            fparam3 = Z.ToString(CultureInfo.InvariantCulture),
+                            fparam4 = O.ToString(CultureInfo.InvariantCulture),
                             invoker = GetInvokerNameWithContext()
                         });
                     if ((Conditions?.Count ?? 0) == 0)
@@ -173,12 +161,9 @@ namespace WDE.SmartScriptEditor.Models
 
         private bool HasPosition()
         {
-            if (Position == null)
-                return false;
-            
-            for (var i = 0; i < 4; ++i)
+            for (var i = 0; i < FloatParametersCount; ++i)
             {
-                if (Position[i].Value != 0)
+                if (GetFloatParameter(i).Value != 0)
                     return true;
             }
 
@@ -195,19 +180,13 @@ namespace WDE.SmartScriptEditor.Models
         
         public SmartSource Copy()
         {
-            SmartSource se = new(Id, features, Position != null)
+            SmartSource se = new(Id, features)
             {
                 ReadableHint = ReadableHint, 
                 DescriptionRules = DescriptionRules,
                 IsPosition = IsPosition
             };
             se.CopyParameters(this);
-
-            if (Position != null)
-            {
-                for (var i = 0; i < Position.Length; ++i)
-                    se.Position![i].Copy(Position[i]);
-            }
 
             se.Conditions = Conditions?.ToList();
             return se;

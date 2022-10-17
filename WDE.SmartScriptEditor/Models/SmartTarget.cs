@@ -12,7 +12,7 @@ namespace WDE.SmartScriptEditor.Models
 {
     public class SmartTarget : SmartSource
     {
-        public SmartTarget(int id, IEditorFeatures features) : base(id, features, true)
+        public SmartTarget(int id, IEditorFeatures features) : base(id, features)
         {
         }
 
@@ -26,9 +26,6 @@ namespace WDE.SmartScriptEditor.Models
             };
             
             se.CopyParameters(this);
-            
-            for (var i = 0; i < Position!.Length; ++i)
-                se.Position![i].Copy(Position[i]);
             
             se.Conditions = Conditions?.ToList();
             

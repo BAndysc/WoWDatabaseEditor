@@ -182,13 +182,6 @@ namespace WDE.SmartScriptEditor.History
             BindSmartBase(smartAction.Source);
             BindSmartBase(smartAction.Target);
 
-            for (var i = 0; i < 4; ++i)
-                smartAction.Target.Position![i].OnValueChanged += ParameterFloat_OnValueChange;
-
-            if (smartAction.Source.Position != null)
-                for (var i = 0; i < 4; ++i)
-                    smartAction.Source.Position![i].OnValueChanged += ParameterFloat_OnValueChange;
-
             smartAction.CommentParameter.OnValueChanged += ParameterString_OnValueChanged;
             smartAction.OnIdChanged += SmartActionOnOnIdChanged;
             smartAction.Source.OnIdChanged += SmartSourceOnOnIdChanged;
@@ -211,13 +204,6 @@ namespace WDE.SmartScriptEditor.History
             UnbindSmartBase(smartAction);
             UnbindSmartBase(smartAction.Source);
             UnbindSmartBase(smartAction.Target);
-
-            for (var i = 0; i < 4; ++i)
-                smartAction.Target.Position![i].OnValueChanged -= ParameterFloat_OnValueChange;
-            
-            if (smartAction.Source.Position != null)
-                for (var i = 0; i < 4; ++i)
-                    smartAction.Source.Position![i].OnValueChanged -= ParameterFloat_OnValueChange;
 
             smartAction.CommentParameter.OnValueChanged -= ParameterString_OnValueChanged;
         }

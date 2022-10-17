@@ -170,15 +170,22 @@ namespace WDE.SmartScriptEditor.Data
             return action;
         }
 
+        private static readonly string[] Coords = new[] { "X", "Y", "Z", "O" }; 
+
         private void UpdateTargetPositionVisibility(SmartSource sourceOrTarget)
         {
-            if (sourceOrTarget.Position == null)
-                return;
-            
             var actionData = smartDataManager.GetRawData(SmartType.SmartAction, sourceOrTarget.Parent?.Id ?? SmartConstants.ActionNone);
             var targetData = smartDataManager.GetRawData(SmartType.SmartTarget, sourceOrTarget.Id);
-            foreach (var t in sourceOrTarget.Position)
-                t.IsUsed = actionData.UsesTargetPosition | targetData.UsesTargetPosition;
+            for (int i = 0; i < sourceOrTarget.FloatParametersCount; ++i)
+            {
+                var parameter = sourceOrTarget.GetFloatParameter(i);
+                var isCustomParameter = targetData.FloatParameters != null && targetData.FloatParameters.Count > i;
+                parameter.IsUsed = actionData.UsesTargetPosition || 
+                                   targetData.UsesTargetPosition || 
+                                   isCustomParameter;
+                if (parameter.IsUsed && !isCustomParameter)
+                    parameter.Name = Coords[i];
+            }
         }
 
         public void UpdateAction(SmartAction smartAction, int id)

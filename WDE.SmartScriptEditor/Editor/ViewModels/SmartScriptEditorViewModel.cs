@@ -1460,9 +1460,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             for (var i = 0; i < obj.Source.ParametersCount; ++i)
                 parametersList.Add((obj.Source.GetParameter(i), "Source"));
 
-            if (obj.Source.Position != null)
-                for (var i = 0; i < 4; ++i)
-                    floatParametersList.Add((obj.Source.Position[i], "Source"));
+            for (var i = 0; i < obj.Source.FloatParametersCount; ++i)
+                floatParametersList.Add((obj.Source.GetFloatParameter(i), "Source"));
             
             for (var i = 0; i < obj.ParametersCount; ++i)
                 parametersList.Add((obj.GetParameter(i), "Action"));
@@ -1476,8 +1475,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             for (var i = 0; i < obj.Target.ParametersCount; ++i)
                 parametersList.Add((obj.Target.GetParameter(i), "Target"));
 
-            for (var i = 0; i < 4; ++i)
-                floatParametersList.Add((obj.Target.Position![i], "Target"));
+            for (var i = 0; i < obj.Target.FloatParametersCount; ++i)
+                floatParametersList.Add((obj.Target.GetFloatParameter(i), "Target"));
 
             var actionDataObservable = obj.ToObservable(e => e.Id)
                 .Select(id => smartDataManager.GetRawData(SmartType.SmartAction, id));
@@ -1596,12 +1595,11 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                         if (obj.Id != originalAction.Id)
                             smartFactory.UpdateAction(originalAction, obj.Id);
                     
-                        if (originalAction.Source.Position != null)
-                            for (var i = 0; i < originalAction.Source.Position!.Length; ++i)
-                                originalAction.Source.Position[i].Value = obj.Source.Position![i].Value;
+                        for (var i = 0; i < originalAction.Source.FloatParametersCount; ++i)
+                            originalAction.Source.GetFloatParameter(i).Value = obj.Source.GetFloatParameter(i).Value;
                         
-                        for (var i = 0; i < originalAction.Target.Position!.Length; ++i)
-                            originalAction.Target.Position[i].Value = obj.Target.Position![i].Value;
+                        for (var i = 0; i < originalAction.Target.FloatParametersCount; ++i)
+                            originalAction.Target.GetFloatParameter(i).Value = obj.Target.GetFloatParameter(i).Value;
 
                         for (var i = 0; i < originalAction.Target.ParametersCount; ++i)
                             originalAction.Target.GetParameter(i).Value = obj.Target.GetParameter(i).Value;
