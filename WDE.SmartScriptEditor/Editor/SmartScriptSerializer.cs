@@ -16,7 +16,7 @@ namespace WDE.SmartScriptEditor.Exporter
         private static readonly string SerializedStringFormat =
             "({entryorguid}, {source_type}, {id}, {linkto}, {event_id}, {phasemask}, {chance}, {flags}, {event_param1}, {event_param2}, {event_param3}, {event_param4}, {action_id}, {action_param1}, {action_param2}, {action_param3}, {action_param4}, {action_param5}, {action_param6}, {source_id}, {source_param1}, {source_param2}, {source_param3}, {target_id}, {target_param1}, {target_param2}, {target_param3}, {x}, {y}, {z}, {o}, \"{comment}\")";
 
-        public static bool TryToISmartScriptLine(this string str, out ISmartScriptLine line)
+        public static bool TryToISmartScriptLine(this string str, out AbstractSmartScriptLine line)
         {
             line = new AbstractSmartScriptLine();
 
@@ -130,7 +130,7 @@ namespace WDE.SmartScriptEditor.Exporter
             };
         }
 
-        public static ISmartScriptLine[] ToSmartScriptLines(this SmartEvent e,
+        public static AbstractSmartScriptLine[] ToSmartScriptLines(this SmartEvent e,
             int scriptEntryOrGuid,
             SmartScriptType scriptSourceType,
             int id,
@@ -138,7 +138,7 @@ namespace WDE.SmartScriptEditor.Exporter
             int? linkTo = null,
             bool shortComments = false)
         {
-            var lines = new List<ISmartScriptLine>();
+            var lines = new List<AbstractSmartScriptLine>();
             IList<SmartAction> actions = e.Actions.Count == 0
                 ? new List<SmartAction>
                 {
@@ -228,13 +228,13 @@ namespace WDE.SmartScriptEditor.Exporter
             return lines.ToArray();
         }
         
-        public static IConditionLine[] ToConditionLines(this SmartEvent e,
+        public static AbstractConditionLine[] ToConditionLines(this SmartEvent e,
             int conditionSourceType,
             int scriptEntryOrGuid,
             SmartScriptType scriptSourceType,
             int id)
         {
-            var lines = new List<IConditionLine>();
+            var lines = new List<AbstractConditionLine>();
             var elseGroup = 0;
 
             for (var index = 0; index < e.Conditions.Count; index++)

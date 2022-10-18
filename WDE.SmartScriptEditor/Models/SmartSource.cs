@@ -105,10 +105,10 @@ namespace WDE.SmartScriptEditor.Models
                             y = Y.ToString(CultureInfo.InvariantCulture),
                             z = Z.ToString(CultureInfo.InvariantCulture),
                             o = O.ToString(CultureInfo.InvariantCulture),
-                            fparam1 = X.ToString(CultureInfo.InvariantCulture),
-                            fparam2 = Y.ToString(CultureInfo.InvariantCulture),
-                            fparam3 = Z.ToString(CultureInfo.InvariantCulture),
-                            fparam4 = O.ToString(CultureInfo.InvariantCulture),
+                            fpram1 = X.ToString(CultureInfo.InvariantCulture),
+                            fpram2 = Y.ToString(CultureInfo.InvariantCulture),
+                            fpram3 = Z.ToString(CultureInfo.InvariantCulture),
+                            fpram4 = O.ToString(CultureInfo.InvariantCulture),
                             invoker = GetInvokerNameWithContext()
                         });
                     if ((Conditions?.Count ?? 0) == 0)

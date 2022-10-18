@@ -23,24 +23,12 @@ namespace WDE.TrinitySmartScriptEditor.Editor
         {
             return Task.FromResult(databaseProvider.GetScriptFor(entryOrGuid, type));
         }
-
-        public Task InstallScriptFor(int entryOrGuid, SmartScriptType type, IList<ISmartScriptLine> script)
-        {
-            return databaseProvider.InstallScriptFor(entryOrGuid, type, script);
-        }
-
+        
         public IEnumerable<IConditionLine> GetConditionsForScript(int entryOrGuid, SmartScriptType type)
         {
             return databaseProvider.GetConditionsFor(SmartConstants.ConditionSourceSmartScript, entryOrGuid, (int)type);
         }
         
-        public async Task InstallConditionsForScript(IEnumerable<IConditionLine> conditions, int entryOrGuid, SmartScriptType type)
-        {
-            await databaseProvider.InstallConditions(conditions, 
-                IDatabaseProvider.ConditionKeyMask.SourceEntry | IDatabaseProvider.ConditionKeyMask.SourceId,
-                new IDatabaseProvider.ConditionKey(SmartConstants.ConditionSourceSmartScript, null, entryOrGuid, (int)type));
-        }
-
         public Task<IList<ISmartScriptLine>> FindSmartScriptLinesBy(IEnumerable<(IDatabaseProvider.SmartLinePropertyType what, int whatValue, int parameterIndex, long valueToSearch)> conditions)
         {
             return databaseProvider.FindSmartScriptLinesBy(conditions);

@@ -216,10 +216,6 @@ namespace WDE.CMMySqlDatabase.Database
             return model.QuestTemplate.FirstOrDefault(q => q.Entry == entry);
         }
         
-        public async Task InstallScriptFor(int entryOrGuid, SmartScriptType type, IList<ISmartScriptLine> script)
-        {
-        }
-
         protected abstract Task<ICreature?> GetCreatureByGuid(T model, uint guid);
         protected abstract Task<IGameObject?> GetGameObjectByGuidAsync(T model, uint guid);
         protected abstract Task SetCreatureTemplateAI(T model, uint entry, string ainame, string scriptname);

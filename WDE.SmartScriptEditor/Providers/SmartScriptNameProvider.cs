@@ -19,7 +19,7 @@ namespace WDE.SmartScriptEditor.Providers
             this.dbcStore = dbcStore;
         }
 
-        private string? TryGetName(int entryOrGuid, SmartScriptType type)
+        protected virtual string? TryGetName(int entryOrGuid, SmartScriptType type)
         {
             uint? entry = 0;
             switch (type)

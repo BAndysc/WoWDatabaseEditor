@@ -28,7 +28,7 @@ namespace WDE.SmartScriptEditor.Models
 
         public SmartEvent(int id, IEditorFeatures features) : base(id, 
             features.EventParametersCount,
-            that => new ConstContextParameterValueHolder<long, SmartBaseElement>(Parameter.Instance, 0, that))
+            that => new SmartScriptParameterValueHolder(Parameter.Instance, 0, that))
         {
             this.features = features;
             Actions = new ObservableCollection<SmartAction>();

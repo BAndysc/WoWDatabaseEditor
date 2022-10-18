@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;
+using Newtonsoft.Json;
 using Prism.Commands;
 using Prism.Events;
 using WDE.Common;
@@ -57,6 +58,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         private readonly ICurrentCoreVersion currentCoreVersion;
         private readonly ISmartScriptInspectorService inspectorService;
         private readonly IParameterPickerService parameterPickerService;
+        private readonly IMySqlExecutor mySqlExecutor;
         private readonly ISmartEditorExtension editorExtension;
         private readonly ISmartDataManager smartDataManager;
         private readonly IConditionDataManager conditionDataManager;
@@ -84,6 +86,12 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         {
             get => script;
             set => SetProperty(ref script, value);
+        }
+
+        private class ClipboardEvents
+        {
+            public List<AbstractSmartScriptLine> Lines { get; set; } = new();
+            public List<AbstractConditionLine> Conditions { get; set; } = new();
         }
         
         public SmartScriptEditorViewModel(ISmartScriptSolutionItem item,
@@ -113,6 +121,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             ICurrentCoreVersion currentCoreVersion,
             ISmartScriptInspectorService inspectorService,
             IParameterPickerService parameterPickerService,
+            IMySqlExecutor mySqlExecutor,
             ISmartEditorExtension editorExtension)
         {
             History = history;
@@ -137,6 +146,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             this.currentCoreVersion = currentCoreVersion;
             this.inspectorService = inspectorService;
             this.parameterPickerService = parameterPickerService;
+            this.mySqlExecutor = mySqlExecutor;
             this.editorExtension = editorExtension;
             this.conditionDataManager = conditionDataManager;
             script = null!;
@@ -559,17 +569,18 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 var selectedEvents = Events.Where(e => e.IsSelected).ToList();
                 if (selectedEvents.Count > 0)
                 {
-                    string eventLines = string.Join("\n",
-                        selectedEvents.SelectMany((e, index) => e.ToSmartScriptLines(script!.EntryOrGuid, script.SourceType, index))
-                            .Select(s => s.SerializeToString()));
-                    string conditionLines = string.Join("\n",
-                        selectedEvents.SelectMany((e, index) => e.ToConditionLines(SmartConstants.ConditionSourceSmartScript, script!.EntryOrGuid, script.SourceType, index))
-                            .Select(s => s.ToSqlString())); 
-                    
-                    if (string.IsNullOrEmpty(conditionLines))
-                        clipboard.SetText(eventLines);
-                    else
-                        clipboard.SetText($"conditions:\n{conditionLines}\nevents:\n{eventLines}");
+                    var eventLines = selectedEvents
+                        .SelectMany((e, index) => e.ToSmartScriptLines(script!.EntryOrGuid, script.SourceType, index))
+                        .ToList();
+
+                    var conditionLines = selectedEvents
+                        .SelectMany((e, index) => e.ToConditionLines(SmartConstants.ConditionSourceSmartScript, script!.EntryOrGuid, script.SourceType, index))
+                        .ToList();
+
+                    var clibpoardEvents = new ClipboardEvents() { Lines = eventLines, Conditions = conditionLines };
+
+                    string serialized = JsonConvert.SerializeObject(clibpoardEvents);
+                    clipboard.SetText(serialized);
                 }
                 else if (AnyActionSelected)
                 {
@@ -580,9 +591,11 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                         foreach (SmartAction a in selectedActions)
                             fakeEvent.AddAction(a.Copy());
 
-                        string lines = string.Join("\n",
-                            fakeEvent.ToSmartScriptLines(script!.EntryOrGuid, script.SourceType, 0).Select(s => s.SerializeToString()));
-                        clipboard.SetText(lines);
+                        var lines = fakeEvent
+                            .ToSmartScriptLines(script!.EntryOrGuid, script.SourceType, 0);
+
+                        var serialized = JsonConvert.SerializeObject(new ClipboardEvents() { Lines = lines.ToList() });
+                        clipboard.SetText(serialized);
                     }
                 }
                 else if (AnyConditionSelected)
@@ -594,9 +607,10 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                         foreach (SmartCondition c in selectedConditions)
                             fakeEvent.Conditions.Add(c.Copy());
 
-                        string lines = string.Join("\n",
-                            fakeEvent.ToConditionLines(SmartConstants.ConditionSourceSmartScript, script!.EntryOrGuid, script.SourceType, 0).Select(s => s.ToSqlString()));
-                        clipboard.SetText("conditions:\n" + lines);
+                        var lines = fakeEvent
+                            .ToConditionLines(SmartConstants.ConditionSourceSmartScript, script!.EntryOrGuid, script.SourceType, 0);
+                        var serialized = JsonConvert.SerializeObject(new ClipboardEvents(){ Conditions = lines.ToList() });
+                        clipboard.SetText(serialized);
                     }
                 }
             });
@@ -610,49 +624,23 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 if (string.IsNullOrEmpty(await clipboard.GetText()))
                     return;
                 
-                var content = await clipboard.GetText() ?? "";
-                List<IConditionLine>? conditions = null;
-                
-                if (content.StartsWith("conditions:"))
+                var contentString = await clipboard.GetText() ?? "{}";
+                ClipboardEvents? content;
+                try
                 {
-                    int eventsIndex = content.IndexOf("events:");
-                    string conditionsString;
-                    if (eventsIndex >= 0)
-                    {
-                        var eventsString = content.Substring(eventsIndex + 8).Trim();
-                        conditionsString = content.Substring(12, eventsIndex - 12);
-                        content = eventsString;
-                    }
-                    else 
-                    {
-                        conditionsString = content.Substring(12);
-                        content = "";
-                    }
-                    
-                    conditions = conditionsString.Split('\n')
-                        .Select(line =>
-                        {
-                            if (line.TryToConditionLine(out IConditionLine s))
-                                return s;
-                            return null!;
-                        })
-                        .Where(l => l != null)
-                        .ToList<IConditionLine>();
+                    content = JsonConvert.DeserializeObject<ClipboardEvents>(contentString);
                 }
-                
-                var lines = content.Split('\n')!
-                    .Select(line =>
-                    {
-                        if (line.TryToISmartScriptLine(out ISmartScriptLine s))
-                            return s;
-                        return null!;
-                    })
-                    .Where(l => l != null)
-                    .ToList<ISmartScriptLine>();
-                
-                if (lines.Count > 0)
+                catch (Exception)
                 {
-                    if (lines[0].EventType == -1) // actions
+                    return;
+                }
+
+                if (content == null)
+                    return;
+                
+                if (content.Lines.Count > 0)
+                {
+                    if (content.Lines[0].EventType == -1) // actions
                     {
                         int? eventIndex = null;
                         int? actionIndex = null;
@@ -690,7 +678,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                                 actionIndex = 0;
 
                             DeselectAll.Execute();
-                            foreach (var smartLine in lines)
+                            foreach (var smartLine in content.Lines)
                             {
                                 var smartAction = script.SafeActionFactory(smartLine);
                                 if (smartAction == null)
@@ -725,12 +713,12 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                             if (!index.HasValue)
                                 index = Events.Count;
                             
-                            foreach (var e in script.InsertFromClipboard(index.Value, lines, conditions))
+                            foreach (var e in script.InsertFromClipboard(index.Value, content.Lines, content.Conditions))
                                 e.IsSelected = true;
                         }
                     }
                 }
-                else if (conditions != null && conditions.Count > 0)
+                else if (content.Conditions != null && content.Conditions.Count > 0)
                 {
                     if (AnyConditionSelected)
                     {
@@ -769,7 +757,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                                 conditionIndex = 0;
 
                             DeselectAll.Execute();
-                            foreach (var smartCondition in conditions.Select(c => script.SafeConditionFactory(c)))
+                            foreach (var smartCondition in content.Conditions.Select(c => script.SafeConditionFactory(c)))
                             {
                                 if (smartCondition != null)
                                 {
@@ -786,7 +774,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                         {
                             var smartEvent = SelectedItem;
                             DeselectAll.Execute();
-                            foreach (var smartCondition in conditions.Select(c => script!.SafeConditionFactory(c)))
+                            foreach (var smartCondition in content.Conditions.Select(c => script!.SafeConditionFactory(c)))
                             {
                                 if (smartCondition != null)
                                 {
@@ -1221,13 +1209,10 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         {
             statusbar.PublishNotification(new PlainNotification(NotificationType.Info, "Saving to database"));
 
-            var (lines, conditions) = smartScriptExporter.ToDatabaseCompatibleSmartScript(script);
-            
-            await smartScriptDatabase.InstallScriptFor(item.Entry, item.SmartType, lines);
+            var query = smartScriptExporter.GenerateSql(item, script);
 
-            await smartScriptDatabase.InstallConditionsForScript(conditions,
-                item.Entry, item.SmartType);
-            
+            await mySqlExecutor.ExecuteSql(query);
+
             statusbar.PublishNotification(new PlainNotification(NotificationType.Success, "Saved to database"));
             
             History.MarkAsSaved();

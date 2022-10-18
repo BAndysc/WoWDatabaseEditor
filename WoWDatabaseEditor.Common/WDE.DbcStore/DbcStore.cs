@@ -19,6 +19,7 @@ using WDE.DbcStore.Spells;
 using WDE.DbcStore.Spells.Cataclysm;
 using WDE.DbcStore.Spells.Wrath;
 using WDE.Module.Attributes;
+using WDE.MVVM.Observable;
 
 namespace WDE.DbcStore
 {
@@ -382,6 +383,7 @@ namespace WDE.DbcStore
                 parameterFactory.Register("AchievementCriteriaParameter", new DbcParameter(AchievementCriteriaStore));
                 parameterFactory.Register("ItemVisualParameter", new DbcParameter(ItemDbcStore));
                 parameterFactory.Register("SceneScriptPackage", new DbcParameter(SceneStore));
+                parameterFactory.RegisterDepending("BattlePetSpeciesParameter", "CreatureParameter", (creature) => new BattlePetSpeciesParameter(store, parameterFactory, creature));
 
                 switch (dbcSettingsProvider.GetSettings().DBCVersion)
                 {
@@ -1005,6 +1007,40 @@ namespace WDE.DbcStore
         }
 
         public bool AllowUnknownItems => true;
+    }
+    
+    public class BattlePetSpeciesParameter : ParameterNumbered
+    {
+        private readonly DbcStore dbcStore;
+        private readonly IParameterFactory parameterFactory;
+        private readonly IParameter<long> creatures;
+
+        public BattlePetSpeciesParameter(DbcStore dbcStore, IParameterFactory parameterFactory, IParameter<long> creatures)
+        {
+            this.dbcStore = dbcStore;
+            this.parameterFactory = parameterFactory;
+            this.creatures = creatures;
+            Items = new Dictionary<long, SelectOption>();
+            Refresh();
+
+            parameterFactory.OnRegister().SubscribeAction(p =>
+            {
+                if (p == creatures)
+                    Refresh();
+            });
+        }
+
+        private void Refresh()
+        {
+            Items!.Clear();
+            foreach (var (key, value) in dbcStore.BattlePetSpeciesIdStore)
+            {
+                if (creatures.Items != null && creatures.Items.TryGetValue(value, out var petName))
+                    Items!.Add(key, new SelectOption(petName.Name + " (" + value + ")"));
+                else
+                    Items!.Add(key, new SelectOption("Creature " + value));
+            }
+        }
     }
 
     public class LanguageParameter : DbcParameter

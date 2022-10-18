@@ -53,9 +53,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public IEnumerable<ISmartScriptLine> GetScriptFor(int entryOrGuid, SmartScriptType type) =>
             impl.GetScriptFor(entryOrGuid, type);
-        public Task InstallScriptFor(int entryOrGuid, SmartScriptType type, IList<ISmartScriptLine> script) =>
-            impl.InstallScriptFor(entryOrGuid, type, script);
-
+        
         public Task InstallConditions(IEnumerable<IConditionLine> conditions,
             IDatabaseProvider.ConditionKeyMask keyMask,
             IDatabaseProvider.ConditionKey? manualKey = null) =>

@@ -4,101 +4,101 @@ namespace WDE.Common.Database
 {
     public interface ISmartScriptLine
     {
-        int EntryOrGuid { get; set; }
+        int EntryOrGuid { get; }
 
-        int ScriptSourceType { get; set; }
+        int ScriptSourceType { get; }
 
-        int Id { get; set; }
+        int Id { get; }
 
-        int Link { get; set; }
+        int Link { get; }
         
-        int LineId { get; set; }
+        int LineId { get; }
 
-        int EventType { get; set; }
+        int EventType { get; }
 
-        int EventPhaseMask { get; set; }
+        int EventPhaseMask { get; }
 
-        int EventChance { get; set; }
+        int EventChance { get; }
 
-        int TimerId { get; set; }
+        int TimerId { get; }
         
-        int EventFlags { get; set; }
+        int EventFlags { get; }
 
-        long EventParam1 { get; set; }
+        long EventParam1 { get; }
 
-        long EventParam2 { get; set; }
+        long EventParam2 { get; }
 
-        long EventParam3 { get; set; }
+        long EventParam3 { get; }
 
-        long EventParam4 { get; set; }
+        long EventParam4 { get; }
 
-        long EventParam5 { get; set; }
+        long EventParam5 { get; }
         
-        float EventFloatParam1 { get; set; }
+        float EventFloatParam1 { get; }
         
-        float EventFloatParam2 { get; set; }
+        float EventFloatParam2 { get; }
 
-        string? EventStringParam { get; set; }
+        string? EventStringParam { get; }
 
-        int EventCooldownMin { get; set; }
+        int EventCooldownMin { get; }
 
-        int EventCooldownMax { get; set; }
+        int EventCooldownMax { get; }
 
         int ActionType { get; set; }
 
-        long ActionParam1 { get; set; }
+        long ActionParam1 { get; }
 
-        long ActionParam2 { get; set; }
+        long ActionParam2 { get; }
 
-        long ActionParam3 { get; set; }
+        long ActionParam3 { get; }
 
-        long ActionParam4 { get; set; }
+        long ActionParam4 { get; }
 
-        long ActionParam5 { get; set; }
+        long ActionParam5 { get; }
 
-        long ActionParam6 { get; set; }
+        long ActionParam6 { get; }
         
-        long ActionParam7 { get; set; }
+        long ActionParam7 { get; }
         
-        float ActionFloatParam1 { get; set; }
+        float ActionFloatParam1 { get; }
         
-        float ActionFloatParam2 { get; set; }
+        float ActionFloatParam2 { get; }
 
-        int SourceType { get; set; }
+        int SourceType { get; }
 
-        long SourceParam1 { get; set; }
+        long SourceParam1 { get; }
 
-        long SourceParam2 { get; set; }
+        long SourceParam2 { get; }
 
-        long SourceParam3 { get; set; }
+        long SourceParam3 { get; }
 
-        int SourceConditionId { get; set; }
+        int SourceConditionId { get; }
 
-        float SourceX { get; set; }
+        float SourceX { get; }
 
-        float SourceY { get; set; }
+        float SourceY { get; }
 
-        float SourceZ { get; set; }
+        float SourceZ { get; }
 
-        float SourceO { get; set; }
+        float SourceO { get; }
 
-        int TargetType { get; set; }
+        int TargetType { get; }
 
-        long TargetParam1 { get; set; }
+        long TargetParam1 { get; }
 
-        long TargetParam2 { get; set; }
+        long TargetParam2 { get; }
 
-        long TargetParam3 { get; set; }
+        long TargetParam3 { get; }
 
-        int TargetConditionId { get; set; }
+        int TargetConditionId { get; }
 
-        float TargetX { get; set; }
+        float TargetX { get; }
 
-        float TargetY { get; set; }
+        float TargetY { get; }
 
-        float TargetZ { get; set; }
+        float TargetZ { get; }
 
-        float TargetO { get; set; }
+        float TargetO { get; }
 
         string Comment { get; set; }
     }
