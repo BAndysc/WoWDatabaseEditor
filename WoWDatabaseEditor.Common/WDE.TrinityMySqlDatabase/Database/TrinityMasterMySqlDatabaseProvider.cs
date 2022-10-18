@@ -285,4 +285,22 @@ public class TrinityMasterMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvid
         await using var model = Database();
         return await model.CreatureTemplateAddon.FirstOrDefaultAsync<ICreatureTemplateAddon>(x => x.Entry == entry);
     }
+
+    public override async Task<IList<IPlayerChoice>?> GetPlayerChoicesAsync()
+    {
+        await using var model = Database();
+        return await model.PlayerChoice.ToListAsync<IPlayerChoice>();
+    }
+
+    public override async Task<IList<IPlayerChoiceResponse>?> GetPlayerChoiceResponsesAsync()
+    {
+        await using var model = Database();
+        return await model.PlayerChoiceResponse.ToListAsync<IPlayerChoiceResponse>();
+    }
+
+    public override async Task<IList<IPlayerChoiceResponse>?> GetPlayerChoiceResponsesAsync(int choiceId)
+    {
+        await using var model = Database();
+        return await model.PlayerChoiceResponse.Where(x => x.ChoiceId == choiceId).ToListAsync<IPlayerChoiceResponse>();
+    }
 }

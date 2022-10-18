@@ -53,6 +53,10 @@ namespace WDE.Common.Database
 
         Task<IList<int>> GetSmartScriptEntriesByType(SmartScriptType scriptType);
 
+        Task<IList<IPlayerChoice>?> GetPlayerChoicesAsync();
+        Task<IList<IPlayerChoiceResponse>?> GetPlayerChoiceResponsesAsync();
+        Task<IList<IPlayerChoiceResponse>?> GetPlayerChoiceResponsesAsync(int choiceId);
+
         IEnumerable<ISmartScriptProjectItem> GetLegacyProjectItems();
         IEnumerable<ISmartScriptProject> GetLegacyProjects();
 

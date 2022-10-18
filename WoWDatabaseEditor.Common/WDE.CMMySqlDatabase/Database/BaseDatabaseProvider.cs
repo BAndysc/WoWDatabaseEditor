@@ -244,7 +244,13 @@ namespace WDE.CMMySqlDatabase.Database
         {
             return new List<int>();
         }
-        
+
+        public async Task<IList<IPlayerChoice>?> GetPlayerChoicesAsync() => null;
+
+        public async Task<IList<IPlayerChoiceResponse>?> GetPlayerChoiceResponsesAsync() => null;
+
+        public async Task<IList<IPlayerChoiceResponse>?> GetPlayerChoiceResponsesAsync(int choiceId) => null;
+
         public IEnumerable<ISpellScriptName> GetSpellScriptNames(int spellId)
         {
             using var model = Database();

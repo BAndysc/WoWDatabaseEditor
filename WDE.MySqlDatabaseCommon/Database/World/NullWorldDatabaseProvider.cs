@@ -59,6 +59,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public Task<IList<IConditionLine>> GetConditionsForAsync(IDatabaseProvider.ConditionKeyMask keyMask, IDatabaseProvider.ConditionKey manualKey) => Task.FromResult<IList<IConditionLine>>(System.Array.Empty<IConditionLine>());
         
         public IEnumerable<ISpellScriptName> GetSpellScriptNames(int spellId) => Enumerable.Empty<ISpellScriptName>();
+
+        public async Task<IList<IPlayerChoiceResponse>?> GetPlayerChoiceResponsesAsync(int choiceId) => null;
         
         public IEnumerable<ISmartScriptProjectItem> GetLegacyProjectItems() => Enumerable.Empty<ISmartScriptProjectItem>();
         
@@ -66,7 +68,11 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public Task<IList<int>> GetSmartScriptEntriesByType(SmartScriptType scriptType) =>
             Task.FromResult<IList<int>>(new List<int>());
-        
+
+        public async Task<IList<IPlayerChoice>?> GetPlayerChoicesAsync() => null;
+
+        public async Task<IList<IPlayerChoiceResponse>?> GetPlayerChoiceResponsesAsync() => null;
+
         public IBroadcastText? GetBroadcastTextByText(string text) => null;
         
         public Task<IBroadcastText?> GetBroadcastTextByIdAsync(uint id) => Task.FromResult<IBroadcastText?>(null);

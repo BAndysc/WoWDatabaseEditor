@@ -300,7 +300,13 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public Task<IList<int>> GetSmartScriptEntriesByType(SmartScriptType scriptType) =>
             nonCachedDatabase.GetSmartScriptEntriesByType(scriptType);
-        
+
+        public async Task<IList<IPlayerChoice>?> GetPlayerChoicesAsync() => await nonCachedDatabase.GetPlayerChoicesAsync();
+
+        public async Task<IList<IPlayerChoiceResponse>?> GetPlayerChoiceResponsesAsync() => await nonCachedDatabase.GetPlayerChoiceResponsesAsync();
+
+        public async Task<IList<IPlayerChoiceResponse>?> GetPlayerChoiceResponsesAsync(int choiceId) => await nonCachedDatabase.GetPlayerChoiceResponsesAsync(choiceId);
+
         public IEnumerable<ISmartScriptProjectItem> GetLegacyProjectItems() => nonCachedDatabase.GetLegacyProjectItems();
         
         public IEnumerable<ISmartScriptProject> GetLegacyProjects() => nonCachedDatabase.GetLegacyProjects();

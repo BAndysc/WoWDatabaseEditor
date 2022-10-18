@@ -256,92 +256,6 @@ namespace WDE.TrinityMySqlDatabase.Database
             return model.GameObjectTemplate.FirstOrDefault(g => g.Entry == entry);
         }
 
-        public async Task InstallScriptFor(int entryOrGuid, SmartScriptType type, IList<ISmartScriptLine> script)
-        {
-            using var writeLock = await DatabaseLock.WriteLock();
-            await using var model = Database();
-
-            await model.BeginTransactionAsync(IsolationLevel.ReadCommitted);
-            
-            foreach (var pair in script.Select(l => (l.ScriptSourceType, l.EntryOrGuid))
-                .Concat(new (int ScriptSourceType, int EntryOrGuid)[]{((int)type, entryOrGuid)})
-                .Distinct())
-                await model.SmartScript.Where(x => x.EntryOrGuid == pair.EntryOrGuid && x.ScriptSourceType == pair.ScriptSourceType).DeleteAsync();
-
-            switch (type)
-            {
-                case SmartScriptType.Creature:
-                {
-                    uint entry = 0;
-                    if (entryOrGuid < 0)
-                    {
-                        var template = await GetCreatureByGuid(model, (uint)-entryOrGuid);
-                        if (template == null)
-                            throw new Exception(
-                                $"Trying to install creature script for guid {-entryOrGuid}, but this guid doesn't exist in creature table, so entry cannot be determined.");
-                        entry = template.Entry;
-                    }
-                    else
-                        entry = (uint)entryOrGuid;
-
-                    await SetCreatureTemplateAI(model, entry, currentCoreVersion.Current.SmartScriptFeatures.CreatureSmartAiName, "");
-                    break;
-                }
-                case SmartScriptType.GameObject:
-                {
-                    uint entry = 0;
-                    if (entryOrGuid < 0)
-                    {
-                        var template = await GetGameObjectByGuidAsync(model, (uint)-entryOrGuid);
-                        if (template == null)
-                            throw new Exception(
-                                $"Trying to install gameobject script for guid {-entryOrGuid}, but this guid doesn't exist in gameobject table, so entry cannot be determined.");
-                        entry = template.Entry;
-                    }
-                    else
-                        entry = (uint)entryOrGuid;
-                    await model.GameObjectTemplate.Where(p => p.Entry == entry)
-                        .Set(p => p.AIName, currentCoreVersion.Current.SmartScriptFeatures.GameObjectSmartAiName)
-                        .Set(p => p.ScriptName, "")
-                        .UpdateAsync();
-                    break;
-                }
-                case SmartScriptType.Quest:
-                    var addonExists = await model.QuestTemplateAddonWithScriptName.Where(p => p.Entry == (uint)entryOrGuid).AnyAsync();
-                    if (!addonExists)
-                        await model.QuestTemplateAddonWithScriptName.InsertAsync(() => new MySqlQuestTemplateAddonWithScriptName()
-                            {Entry = (uint)entryOrGuid});
-                    await model.QuestTemplateAddonWithScriptName
-                        .Where(p => p.Entry == (uint) entryOrGuid)
-                        .Set(p => p.ScriptName, "SmartQuest")
-                        .UpdateAsync();
-                    break;
-                case SmartScriptType.AreaTrigger:
-                    await model.AreaTriggerScript.Where(p => p.Entry == entryOrGuid).DeleteAsync();
-                    await model.AreaTriggerScript.InsertAsync(() => new MySqlAreaTriggerScript(){Entry = entryOrGuid, ScriptName = "SmartTrigger"});
-                    break;
-                case SmartScriptType.AreaTriggerEntity:
-                    await model.AreaTriggerCreateProperties.Where(p => p.Id == (uint)entryOrGuid)
-                        .Set(p => p.ScriptName, "SmartAreaTriggerAI")
-                        .UpdateAsync();
-                    break;
-                case SmartScriptType.AreaTriggerEntityServerSide:
-                    await model.AreaTriggerCreateProperties.Where(p => p.Id == (uint)entryOrGuid)
-                        .Set(p => p.ScriptName, "SmartAreaTriggerAI")
-                        .UpdateAsync();
-                    break;
-                case SmartScriptType.Scene:
-                    await model.SceneTemplates.Where(p => p.SceneId == (uint)entryOrGuid)
-                        .Set(p => p.ScriptName, "SmartScene")
-                        .UpdateAsync();
-                    break;
-            }
-            
-            await model.SmartScript.BulkCopyAsync(script.Select(l => new MySqlSmartScriptLine(l)));
-
-            await model.CommitTransactionAsync();
-        }
-
         protected abstract Task<ICreature?> GetCreatureByGuid(T model, uint guid);
         protected abstract Task<IGameObject?> GetGameObjectByGuidAsync(T model, uint guid);
         protected abstract Task SetCreatureTemplateAI(T model, uint entry, string ainame, string scriptname);
@@ -413,7 +327,13 @@ namespace WDE.TrinityMySqlDatabase.Database
                 .Select(t => t.Key)
                 .ToListAsync();
         }
-        
+
+        public virtual async Task<IList<IPlayerChoice>?> GetPlayerChoicesAsync() => null;
+
+        public virtual async Task<IList<IPlayerChoiceResponse>?> GetPlayerChoiceResponsesAsync() => null;
+
+        public virtual async Task<IList<IPlayerChoiceResponse>?> GetPlayerChoiceResponsesAsync(int choiceId) => null;
+
         public IEnumerable<ISpellScriptName> GetSpellScriptNames(int spellId)
         {
             using var model = Database();

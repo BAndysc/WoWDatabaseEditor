@@ -69,13 +69,19 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public IEnumerable<ISpellScriptName> GetSpellScriptNames(int spellId) => impl.GetSpellScriptNames(spellId);
 
+        public async Task<IList<IPlayerChoiceResponse>?> GetPlayerChoiceResponsesAsync(int choiceId) => await impl.GetPlayerChoiceResponsesAsync(choiceId);
+
         public IEnumerable<ISmartScriptProjectItem> GetLegacyProjectItems() => impl.GetLegacyProjectItems();
         
         public IEnumerable<ISmartScriptProject> GetLegacyProjects() => impl.GetLegacyProjects();
 
         public Task<IList<int>> GetSmartScriptEntriesByType(SmartScriptType scriptType) =>
             impl.GetSmartScriptEntriesByType(scriptType);
-        
+
+        public async Task<IList<IPlayerChoice>?> GetPlayerChoicesAsync() => await impl.GetPlayerChoicesAsync();
+
+        public async Task<IList<IPlayerChoiceResponse>?> GetPlayerChoiceResponsesAsync() => await impl.GetPlayerChoiceResponsesAsync();
+
         public IBroadcastText? GetBroadcastTextByText(string text) => impl.GetBroadcastTextByText(text);
         public Task<IBroadcastText?> GetBroadcastTextByTextAsync(string text) => impl.GetBroadcastTextByTextAsync(text);
         public Task<IBroadcastText?> GetBroadcastTextByIdAsync(uint id) => impl.GetBroadcastTextByIdAsync(id);
