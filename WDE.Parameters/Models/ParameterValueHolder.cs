@@ -37,6 +37,8 @@ namespace WDE.Parameters.Models
             }
         }
 
+        public void RefreshStringText() => hasCachedStringValue = false;
+
         private IParameter<T> parameter;
         public IParameter<T> Parameter
         {
@@ -118,6 +120,8 @@ namespace WDE.Parameters.Models
             {
                 if (!AsyncInProgress)
                     CalculateStringAsync(value, context, asyncContextualParameter).ListenErrors();
+                if (hasCachedStringValue)
+                    return cachedStringValue;
                 return parameter.ToString(value);
             }
 

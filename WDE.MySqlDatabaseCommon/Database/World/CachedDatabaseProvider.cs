@@ -271,6 +271,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             return nonCachedDatabase.GetScriptFor(entryOrGuid, type);
         }
 
+        public async Task<IList<ISmartScriptLine>> GetScriptForAsync(int entryOrGuid, SmartScriptType type) => await nonCachedDatabase.GetScriptForAsync(entryOrGuid, type);
+
         public async Task InstallConditions(IEnumerable<IConditionLine> conditions,
             IDatabaseProvider.ConditionKeyMask keyMask,
             IDatabaseProvider.ConditionKey? manualKey = null)

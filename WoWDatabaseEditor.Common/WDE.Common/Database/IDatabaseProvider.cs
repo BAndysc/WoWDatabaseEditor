@@ -41,6 +41,7 @@ namespace WDE.Common.Database
         
         Task<IList<ISmartScriptLine>> GetLinesCallingSmartTimedActionList(int timedActionList);
         IEnumerable<ISmartScriptLine> GetScriptFor(int entryOrGuid, SmartScriptType type);
+        Task<IList<ISmartScriptLine>> GetScriptForAsync(int entryOrGuid, SmartScriptType type);
 
         Task InstallConditions(IEnumerable<IConditionLine> conditions, ConditionKeyMask keyMask, ConditionKey? manualKey = null);
 

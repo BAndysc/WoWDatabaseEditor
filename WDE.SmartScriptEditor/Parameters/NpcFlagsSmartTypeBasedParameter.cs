@@ -5,7 +5,7 @@ using WDE.SmartScriptEditor.Models;
 
 namespace WDE.SmartScriptEditor.Parameters;
 
-public class NpcFlagsSmartTypeBasedParameter : IContextualParameter<long, SmartBaseElement>, ICustomPickerContextualParameter<long>
+public class NpcFlagsSmartTypeBasedParameter : IContextualParameter<long, SmartBaseElement>, ICustomPickerContextualParameter<long>, IAffectsOtherParametersParameter
 {
     private readonly IParameter<long> npcFlag1;
     private readonly IParameter<long> npcFlag2;
@@ -46,5 +46,10 @@ public class NpcFlagsSmartTypeBasedParameter : IContextualParameter<long, SmartB
         var type = GetTypeForContext(context);
         var parameter = type == 0 ? npcFlag1 : npcFlag2;
         return parameter.ToString(value);
+    }
+
+    public IEnumerable<int> AffectedParameters()
+    {
+        yield return 0;
     }
 }

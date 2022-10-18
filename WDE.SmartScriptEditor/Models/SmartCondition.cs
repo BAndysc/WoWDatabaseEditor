@@ -36,10 +36,10 @@ namespace WDE.SmartScriptEditor.Models
             conditionTarget = new ParameterValueHolder<long>("Condition target", conditionTargetParam, 0);
             inverted.PropertyChanged += ((sender, value) =>
             {
-                CallOnChanged();
+                CallOnChanged(sender);
                 OnPropertyChanged(nameof(IsInverted));
             });
-            conditionTarget.PropertyChanged += ((sender, value) => CallOnChanged());
+            conditionTarget.PropertyChanged += ((sender, value) => CallOnChanged(sender));
             Context.Add(conditionTarget);
         }
 
@@ -108,11 +108,6 @@ namespace WDE.SmartScriptEditor.Models
         {
             if (e.PropertyName == nameof(SmartEvent.IsSelected))
                 OnPropertyChanged(nameof(IsSelected));
-        }
-
-        private void SourceOnOnChanged(object? sender, EventArgs e)
-        {
-            CallOnChanged();
         }
 
         public SmartCondition Copy()

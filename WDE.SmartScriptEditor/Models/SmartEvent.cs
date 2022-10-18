@@ -58,16 +58,16 @@ namespace WDE.SmartScriptEditor.Models
             cooldownMin = new ParameterValueHolder<long>("Cooldown min", Parameter.Instance, 0);
             cooldownMax = new ParameterValueHolder<long>("Cooldown max", Parameter.Instance, 0);
 
-            flags.PropertyChanged += (_, _) => CallOnChanged();
-            timerId.PropertyChanged += (_, _) => CallOnChanged();
-            chance.PropertyChanged += (_, _) =>
+            flags.PropertyChanged += (sender, _) => CallOnChanged(sender);
+            timerId.PropertyChanged += (sender, _) => CallOnChanged(sender);
+            chance.PropertyChanged += (sender, _) =>
             {
-                CallOnChanged();
+                CallOnChanged(sender);
                 OnPropertyChanged(nameof(ChanceString));
             };
-            phases.PropertyChanged += (_, _) => CallOnChanged();
-            cooldownMin.PropertyChanged += (_, _) => CallOnChanged();
-            cooldownMax.PropertyChanged += (_, _) => CallOnChanged();
+            phases.PropertyChanged += (sender, _) => CallOnChanged(sender);
+            cooldownMin.PropertyChanged += (sender, _) => CallOnChanged(sender);
+            cooldownMax.PropertyChanged += (sender, _) => CallOnChanged(sender);
         }
 
         public bool IsSelected

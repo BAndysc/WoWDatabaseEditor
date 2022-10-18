@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using Unity.Injection;
 using WDE.Common.Parameters;
 using WDE.Parameters.Models;
 using WDE.SmartScriptEditor.Editor;
+using WDE.SmartScriptEditor.Parameters;
 
 namespace WDE.SmartScriptEditor.Models
 {
@@ -29,7 +31,7 @@ namespace WDE.SmartScriptEditor.Models
             set
             {
                 readableHint = value;
-                CallOnChanged();
+                CallOnChanged(null);
             }
         }
         
@@ -63,7 +65,7 @@ namespace WDE.SmartScriptEditor.Models
             for (int i = 0; i < parametersCount.IntCount; ++i)
             {
                 @params[i] = paramCreator(this);
-                @params[i].PropertyChanged += (_, _) => CallOnChanged();
+                @params[i].PropertyChanged += (p, _) => CallOnChanged(p);
             }
 
             if (parametersCount.FloatCount > 0)
@@ -73,7 +75,7 @@ namespace WDE.SmartScriptEditor.Models
                 for (int i = 0; i < parametersCount.FloatCount; ++i)
                 {
                     floatParams[i] = new ParameterValueHolder<float>(FloatParameter.Instance, 0);
-                    floatParams[i].PropertyChanged += (_, _) => CallOnChanged();
+                    floatParams[i].PropertyChanged += (p, _) => CallOnChanged(p);
                 }
             }
             
@@ -84,7 +86,7 @@ namespace WDE.SmartScriptEditor.Models
                 for (int i = 0; i < parametersCount.StringCount; ++i)
                 {
                     stringParams[i] = new ParameterValueHolder<string>(StringParameter.Instance, "");
-                    stringParams[i].PropertyChanged += (_, _) => CallOnChanged();
+                    stringParams[i].PropertyChanged += (sender, _) => CallOnChanged(sender);
                 }
             }
 
@@ -107,9 +109,17 @@ namespace WDE.SmartScriptEditor.Models
             return stringParams![index];
         }
 
-        protected void CallOnChanged()
+        protected void CallOnChanged(object? sender)
         {
             OnChanged(this, null!);
+            if (sender is ParameterValueHolder<long> paramHolder)
+            {
+                if (paramHolder.Parameter is IAffectsOtherParametersParameter affectsOther)
+                {
+                    foreach (var index in affectsOther.AffectedParameters())
+                        @params[index].RefreshStringText();
+                }
+            }
         }
         
         protected void CopyParameters(SmartBaseElement source)

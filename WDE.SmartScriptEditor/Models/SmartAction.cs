@@ -45,9 +45,9 @@ namespace WDE.SmartScriptEditor.Models
             source.OnChanged += SourceOnOnChanged;
             target.OnChanged += SourceOnOnChanged;
             comment = new ParameterValueHolder<string>("Comment", StringParameter.Instance, "");
-            comment.PropertyChanged += (_, _) =>
+            comment.PropertyChanged += (sender, _) =>
             {
-                CallOnChanged();
+                CallOnChanged(sender);
                 OnPropertyChanged(nameof(Comment));
             };
             
@@ -214,7 +214,7 @@ namespace WDE.SmartScriptEditor.Models
 
         private void SourceOnOnChanged(object? sender, EventArgs e)
         {
-            CallOnChanged();
+            CallOnChanged(sender);
         }
 
         public SmartAction Copy()

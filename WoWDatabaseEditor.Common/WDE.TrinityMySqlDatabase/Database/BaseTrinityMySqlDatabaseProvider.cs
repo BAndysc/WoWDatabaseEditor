@@ -211,6 +211,12 @@ namespace WDE.TrinityMySqlDatabase.Database
         }
 
         public abstract Task<List<IBroadcastText>> GetBroadcastTextsAsync();
+        
+        public async Task<IList<ISmartScriptLine>> GetScriptForAsync(int entryOrGuid, SmartScriptType type)
+        {
+            await using var model = Database();
+            return await model.SmartScript.Where(line => line.EntryOrGuid == entryOrGuid && line.ScriptSourceType == (int) type).ToListAsync<ISmartScriptLine>();
+        }
 
         public IEnumerable<ICreatureClassLevelStat> GetCreatureClassLevelStats()
         {

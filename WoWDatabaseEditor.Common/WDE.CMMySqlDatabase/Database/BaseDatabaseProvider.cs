@@ -178,6 +178,8 @@ namespace WDE.CMMySqlDatabase.Database
         public abstract IEnumerable<ICreatureClassLevelStat> GetCreatureClassLevelStats();
 
         public abstract Task<List<IBroadcastText>> GetBroadcastTextsAsync();
+        
+        public async Task<IList<ISmartScriptLine>> GetScriptForAsync(int entryOrGuid, SmartScriptType type) => new List<ISmartScriptLine>();
 
         public async Task<List<IAreaTriggerTemplate>> GetAreaTriggerTemplatesAsync()
         {
