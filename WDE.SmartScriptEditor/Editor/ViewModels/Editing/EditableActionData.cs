@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
 {
     public readonly struct EditableActionData
     {
-        public EditableActionData(string name, string @group, Action command, IObservable<string> buttonName, IObservable<bool>? isHidden = null)
+        public EditableActionData(string name, string @group, Func<Task> command, IObservable<string> buttonName, IObservable<bool>? isHidden = null)
         {
             Name = name;
             Group = @group;
@@ -15,7 +16,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
 
         public string Name { get; }
         public string Group { get; }
-        public Action Command { get; }
+        public Func<Task> Command { get; }
         public IObservable<string> ButtonName { get; }
         public IObservable<bool>? IsHidden { get; }
     }

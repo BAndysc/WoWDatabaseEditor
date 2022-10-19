@@ -30,6 +30,7 @@
         public const int ActionAfter = 9996;
         public const int ActionAfterMovement = 9995;
         public const int ActionRepeatTimedActionList = 9994;
+        public const int ActionLink = 9993;
         public const string CommentInlineActionList = "-inline";
         public const string CommentInlineMovementActionList = "-inline_wp";
         public const string CommentInlineRepeatActionList = "-inline_repeat";

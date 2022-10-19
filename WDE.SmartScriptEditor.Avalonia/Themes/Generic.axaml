@@ -215,6 +215,7 @@
     
     <Style Selector="editing|ParameterEditorView">
         <Setter Property="ClipToBounds" Value="False" />
+        <Setter Property="HoldsMultipleValues" Value="{Binding HoldsMultipleValues}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate>
@@ -263,6 +264,14 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+    </Style>
+    
+    <Style Selector="editing|ParameterEditorView.multiplevalues CompletionComboBox">
+        <Setter Property="BorderBrush" Value="Red" />
+    </Style>
+    
+    <Style Selector="editing|ParameterEditorView.multiplevalues TextBox">
+        <Setter Property="BorderBrush" Value="Red" />
     </Style>
 
     <Style Selector="views|SmartScriptEditorView Button /template/ ContentPresenter#PART_ContentPresenter">

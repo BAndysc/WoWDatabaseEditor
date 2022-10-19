@@ -1,5 +1,6 @@
 ﻿using System.Windows.Input;
 using Prism.Commands;
+using WDE.Common.Utils;
 using WDE.MVVM;
 
 namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
@@ -10,7 +11,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
         {
             Group = data.Group;
             Name = data.Name;
-            Command = new DelegateCommand(data.Command);
+            Command = new AsyncAutoCommand(data.Command);
             Link(data.ButtonName, () => ActionName);
             
             if (data.IsHidden == null)

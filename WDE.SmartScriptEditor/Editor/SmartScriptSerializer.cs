@@ -112,7 +112,7 @@ namespace WDE.SmartScriptEditor.Exporter
             return Smart.Format(SerializedStringFormat, data);
         }
 
-        public static ISmartScriptLine ToMetaSmartScriptLine(this GlobalVariable gv, 
+        public static AbstractSmartScriptLine ToMetaSmartScriptLine(this GlobalVariable gv, 
             int scriptEntryOrGuid,
             SmartScriptType scriptSourceType,
             int id)

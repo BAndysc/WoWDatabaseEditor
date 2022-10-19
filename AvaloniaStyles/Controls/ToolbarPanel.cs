@@ -96,6 +96,12 @@ namespace AvaloniaStyles.Controls
                 desiredWidth += child.DesiredSize.Width + spacing;
                 desiredHeight = Math.Max(desiredHeight, child.DesiredSize.Height);
             }
+
+            foreach (var child in _overflowControls)
+            {
+                desiredWidth += child.DesiredSize.Width + spacing;
+            }
+            
             if (OutOfBoundsPanel != null)
             {
                 OutOfBoundsPanel.Measure(availableSize.WithWidth(double.PositiveInfinity));

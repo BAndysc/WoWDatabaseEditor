@@ -27,7 +27,7 @@ namespace WDE.SmartScriptEditor.Models
 
         private ParameterValueHolder<string> comment;
 
-        public event Action<SmartAction, IList<ICondition>?, IList<ICondition>?> OnConditionsChanged = delegate { };
+        // public event Action<SmartAction, IList<ICondition>?, IList<ICondition>?> OnConditionsChanged = delegate { };
         
         public SmartAction(int id, IEditorFeatures features, SmartSource source, SmartTarget target) : 
             base(id,
@@ -83,7 +83,7 @@ namespace WDE.SmartScriptEditor.Models
 
         public SmartSource Source => source;
 
-        private string conditionReadable = "true";
+        /*private string conditionReadable = "true";
 
         private IList<ICondition>? conditions;
         public IList<ICondition>? Conditions
@@ -104,7 +104,7 @@ namespace WDE.SmartScriptEditor.Models
                 }
                 InvalidateReadable();
             }
-        }
+        }*/
         
         public bool IsSelected
         {
@@ -165,8 +165,8 @@ namespace WDE.SmartScriptEditor.Models
                             targetid = Target.Id,
                             sourceid = Source.Id,
                             pram2_m1 = "[p=1]" + (GetParameter(1).Value - 1) + "[/p]",
-                            condition1 = conditionReadable,
-                            hascondition = (conditions?.Count ?? 0) > 0,
+                            //condition1 = conditionReadable,
+                            //hascondition = (conditions?.Count ?? 0) > 0,
                             pram1 = "[p=0]" + GetParameter(0) + "[/p]",
                             pram2 = "[p=1]" + GetParameter(1) + "[/p]",
                             pram3 = "[p=2]" + GetParameter(2) + "[/p]",
@@ -223,7 +223,7 @@ namespace WDE.SmartScriptEditor.Models
             se.ReadableHint = ReadableHint;
             se.ActionFlags = ActionFlags;
             se.DescriptionRules = DescriptionRules;
-            se.Conditions = Conditions?.ToList();
+            //se.Conditions = Conditions?.ToList();
             se.LineId = LineId;
             se.CopyParameters(this);
             se.comment.Copy(comment);

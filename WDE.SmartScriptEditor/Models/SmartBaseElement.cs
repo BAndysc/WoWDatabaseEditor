@@ -112,7 +112,7 @@ namespace WDE.SmartScriptEditor.Models
         protected void CallOnChanged(object? sender)
         {
             OnChanged(this, null!);
-            if (sender is ParameterValueHolder<long> paramHolder)
+            if (sender is IParameterValueHolder<long> paramHolder)
             {
                 if (paramHolder.Parameter is IAffectsOtherParametersParameter affectsOther)
                 {
