@@ -168,15 +168,8 @@ namespace TheEngine.ECS
         {
             return (entitiesArchetype[entity.Id] & ManagedTypeData<T>().GlobalHash) != 0;
         }
-        
-        public IEnumerable<IChunkDataIterator> ArchetypeIterator(Archetype archetype)
-        {
-            foreach (var a in dataManager.Archetypes)
-            {
-                if (a.Archetype.Contains(archetype))
-                    yield return a;
-            }
-        }
+
+        public ChunkDataIterator ArchetypeIterator(Archetype archetype) => new ChunkDataIterator(this, archetype);
 
         public IComponentTypeData TypeData<T>() where T : unmanaged, IComponentData
         {
@@ -238,4 +231,31 @@ namespace TheEngine.ECS
             return dataManager[entitiesArchetype[entity.Id]];
         }
     }
+    
+    
+    public struct ChunkDataIterator
+    {
+        private readonly Archetype archetype;
+        private EntityDataManager.ArchetypeIterator iterator;
+
+        internal ChunkDataIterator(EntityManager manager, Archetype archetype)
+        {
+            this.archetype = archetype;
+            iterator = manager.DataManager.Archetypes;
+        }
+
+        public bool MoveNext()
+        {
+            while (iterator.MoveNext())
+            {
+                if (iterator.Current.Archetype.Contains(archetype))
+                    return true;
+            }
+
+            return false;
+        }
+            
+        public IChunkDataIterator Current => iterator.Current;
+    }
+
 }

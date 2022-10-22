@@ -10,8 +10,9 @@ public static partial class EntityExtensions
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.ManagedDataAccess<N0>()
                     );
@@ -23,8 +24,9 @@ itr.ManagedDataAccess<N0>()
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.ManagedDataAccess<N0>()
 ));
@@ -37,8 +39,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.ManagedDataAccess<N0>(), itr.OptionalManagedDataAccess<N1>()
                     );
@@ -51,8 +54,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.ManagedDataAccess<N0>(), itr.OptionalManagedDataAccess<N1>()
 ));
@@ -65,8 +69,9 @@ where T0 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T0>()
                     );
@@ -79,8 +84,9 @@ where T0 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T0>()
 ));
@@ -94,8 +100,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T0>(), itr.OptionalManagedDataAccess<N1>()
                     );
@@ -109,8 +116,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T0>(), itr.OptionalManagedDataAccess<N1>()
 ));
@@ -124,8 +132,9 @@ where T1 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T0>(), itr.OptionalDataAccess<T1>()
                     );
@@ -139,8 +148,9 @@ where T1 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T0>(), itr.OptionalDataAccess<T1>()
 ));
@@ -155,8 +165,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T0>(), itr.OptionalDataAccess<T1>(), itr.OptionalManagedDataAccess<N1>()
                     );
@@ -171,8 +182,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T0>(), itr.OptionalDataAccess<T1>(), itr.OptionalManagedDataAccess<N1>()
 ));
@@ -187,8 +199,9 @@ where T2 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T0>(), itr.OptionalDataAccess<T1>(), itr.OptionalDataAccess<T2>()
                     );
@@ -203,8 +216,9 @@ where T2 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T0>(), itr.OptionalDataAccess<T1>(), itr.OptionalDataAccess<T2>()
 ));
@@ -220,8 +234,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T0>(), itr.OptionalDataAccess<T1>(), itr.OptionalDataAccess<T2>(), itr.OptionalManagedDataAccess<N1>()
                     );
@@ -237,8 +252,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T0>(), itr.OptionalDataAccess<T1>(), itr.OptionalDataAccess<T2>(), itr.OptionalManagedDataAccess<N1>()
 ));
@@ -251,8 +267,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>()
                     );
@@ -265,8 +282,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>()
 ));
@@ -280,8 +298,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalManagedDataAccess<N2>()
                     );
@@ -295,8 +314,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalManagedDataAccess<N2>()
 ));
@@ -310,8 +330,9 @@ where T0 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T0>()
                     );
@@ -325,8 +346,9 @@ where T0 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T0>()
 ));
@@ -341,8 +363,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T0>(), itr.OptionalManagedDataAccess<N2>()
                     );
@@ -357,8 +380,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T0>(), itr.OptionalManagedDataAccess<N2>()
 ));
@@ -373,8 +397,9 @@ where T1 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T0>(), itr.OptionalDataAccess<T1>()
                     );
@@ -389,8 +414,9 @@ where T1 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T0>(), itr.OptionalDataAccess<T1>()
 ));
@@ -406,8 +432,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T0>(), itr.OptionalDataAccess<T1>(), itr.OptionalManagedDataAccess<N2>()
                     );
@@ -423,8 +450,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T0>(), itr.OptionalDataAccess<T1>(), itr.OptionalManagedDataAccess<N2>()
 ));
@@ -440,8 +468,9 @@ where T2 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T0>(), itr.OptionalDataAccess<T1>(), itr.OptionalDataAccess<T2>()
                     );
@@ -457,8 +486,9 @@ where T2 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T0>(), itr.OptionalDataAccess<T1>(), itr.OptionalDataAccess<T2>()
 ));
@@ -475,8 +505,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T0>(), itr.OptionalDataAccess<T1>(), itr.OptionalDataAccess<T2>(), itr.OptionalManagedDataAccess<N2>()
                     );
@@ -493,8 +524,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T0>(), itr.OptionalDataAccess<T1>(), itr.OptionalDataAccess<T2>(), itr.OptionalManagedDataAccess<N2>()
 ));
@@ -508,8 +540,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>()
                     );
@@ -523,8 +556,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>()
 ));
@@ -539,8 +573,9 @@ where N3 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalManagedDataAccess<N3>()
                     );
@@ -555,8 +590,9 @@ where N3 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalManagedDataAccess<N3>()
 ));
@@ -571,8 +607,9 @@ where T0 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T0>()
                     );
@@ -587,8 +624,9 @@ where T0 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T0>()
 ));
@@ -604,8 +642,9 @@ where N3 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T0>(), itr.OptionalManagedDataAccess<N3>()
                     );
@@ -621,8 +660,9 @@ where N3 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T0>(), itr.OptionalManagedDataAccess<N3>()
 ));
@@ -638,8 +678,9 @@ where T1 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T0>(), itr.OptionalDataAccess<T1>()
                     );
@@ -655,8 +696,9 @@ where T1 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T0>(), itr.OptionalDataAccess<T1>()
 ));
@@ -673,8 +715,9 @@ where N3 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T0>(), itr.OptionalDataAccess<T1>(), itr.OptionalManagedDataAccess<N3>()
                     );
@@ -691,8 +734,9 @@ where N3 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T0>(), itr.OptionalDataAccess<T1>(), itr.OptionalManagedDataAccess<N3>()
 ));
@@ -709,8 +753,9 @@ where T2 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T0>(), itr.OptionalDataAccess<T1>(), itr.OptionalDataAccess<T2>()
                     );
@@ -727,8 +772,9 @@ where T2 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T0>(), itr.OptionalDataAccess<T1>(), itr.OptionalDataAccess<T2>()
 ));
@@ -746,8 +792,9 @@ where N3 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T0>(), itr.OptionalDataAccess<T1>(), itr.OptionalDataAccess<T2>(), itr.OptionalManagedDataAccess<N3>()
                     );
@@ -765,8 +812,9 @@ where N3 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T0>(), itr.OptionalDataAccess<T1>(), itr.OptionalDataAccess<T2>(), itr.OptionalManagedDataAccess<N3>()
 ));
@@ -778,8 +826,9 @@ itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>()
                     );
@@ -791,8 +840,9 @@ itr.DataAccess<T0>()
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>()
 ));
@@ -805,8 +855,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.OptionalManagedDataAccess<N0>()
                     );
@@ -819,8 +870,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.OptionalManagedDataAccess<N0>()
 ));
@@ -833,8 +885,9 @@ where T1 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.OptionalDataAccess<T1>()
                     );
@@ -847,8 +900,9 @@ where T1 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.OptionalDataAccess<T1>()
 ));
@@ -862,8 +916,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.OptionalDataAccess<T1>(), itr.OptionalManagedDataAccess<N0>()
                     );
@@ -877,8 +932,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.OptionalDataAccess<T1>(), itr.OptionalManagedDataAccess<N0>()
 ));
@@ -892,8 +948,9 @@ where T2 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.OptionalDataAccess<T1>(), itr.OptionalDataAccess<T2>()
                     );
@@ -907,8 +964,9 @@ where T2 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.OptionalDataAccess<T1>(), itr.OptionalDataAccess<T2>()
 ));
@@ -923,8 +981,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.OptionalDataAccess<T1>(), itr.OptionalDataAccess<T2>(), itr.OptionalManagedDataAccess<N0>()
                     );
@@ -939,8 +998,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.OptionalDataAccess<T1>(), itr.OptionalDataAccess<T2>(), itr.OptionalManagedDataAccess<N0>()
 ));
@@ -955,8 +1015,9 @@ where T3 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.OptionalDataAccess<T1>(), itr.OptionalDataAccess<T2>(), itr.OptionalDataAccess<T3>()
                     );
@@ -971,8 +1032,9 @@ where T3 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.OptionalDataAccess<T1>(), itr.OptionalDataAccess<T2>(), itr.OptionalDataAccess<T3>()
 ));
@@ -988,8 +1050,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.OptionalDataAccess<T1>(), itr.OptionalDataAccess<T2>(), itr.OptionalDataAccess<T3>(), itr.OptionalManagedDataAccess<N0>()
                     );
@@ -1005,8 +1068,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.OptionalDataAccess<T1>(), itr.OptionalDataAccess<T2>(), itr.OptionalDataAccess<T3>(), itr.OptionalManagedDataAccess<N0>()
 ));
@@ -1019,8 +1083,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.ManagedDataAccess<N0>()
                     );
@@ -1033,8 +1098,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.ManagedDataAccess<N0>()
 ));
@@ -1048,8 +1114,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.ManagedDataAccess<N0>(), itr.OptionalManagedDataAccess<N1>()
                     );
@@ -1063,8 +1130,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.ManagedDataAccess<N0>(), itr.OptionalManagedDataAccess<N1>()
 ));
@@ -1078,8 +1146,9 @@ where T1 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T1>()
                     );
@@ -1093,8 +1162,9 @@ where T1 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T1>()
 ));
@@ -1109,8 +1179,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T1>(), itr.OptionalManagedDataAccess<N1>()
                     );
@@ -1125,8 +1196,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T1>(), itr.OptionalManagedDataAccess<N1>()
 ));
@@ -1141,8 +1213,9 @@ where T2 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T1>(), itr.OptionalDataAccess<T2>()
                     );
@@ -1157,8 +1230,9 @@ where T2 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T1>(), itr.OptionalDataAccess<T2>()
 ));
@@ -1174,8 +1248,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T1>(), itr.OptionalDataAccess<T2>(), itr.OptionalManagedDataAccess<N1>()
                     );
@@ -1191,8 +1266,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T1>(), itr.OptionalDataAccess<T2>(), itr.OptionalManagedDataAccess<N1>()
 ));
@@ -1208,8 +1284,9 @@ where T3 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T1>(), itr.OptionalDataAccess<T2>(), itr.OptionalDataAccess<T3>()
                     );
@@ -1225,8 +1302,9 @@ where T3 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T1>(), itr.OptionalDataAccess<T2>(), itr.OptionalDataAccess<T3>()
 ));
@@ -1243,8 +1321,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T1>(), itr.OptionalDataAccess<T2>(), itr.OptionalDataAccess<T3>(), itr.OptionalManagedDataAccess<N1>()
                     );
@@ -1261,8 +1340,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T1>(), itr.OptionalDataAccess<T2>(), itr.OptionalDataAccess<T3>(), itr.OptionalManagedDataAccess<N1>()
 ));
@@ -1276,8 +1356,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>()
                     );
@@ -1291,8 +1372,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>()
 ));
@@ -1307,8 +1389,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalManagedDataAccess<N2>()
                     );
@@ -1323,8 +1406,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalManagedDataAccess<N2>()
 ));
@@ -1339,8 +1423,9 @@ where T1 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T1>()
                     );
@@ -1355,8 +1440,9 @@ where T1 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T1>()
 ));
@@ -1372,8 +1458,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T1>(), itr.OptionalManagedDataAccess<N2>()
                     );
@@ -1389,8 +1476,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T1>(), itr.OptionalManagedDataAccess<N2>()
 ));
@@ -1406,8 +1494,9 @@ where T2 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T1>(), itr.OptionalDataAccess<T2>()
                     );
@@ -1423,8 +1512,9 @@ where T2 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T1>(), itr.OptionalDataAccess<T2>()
 ));
@@ -1441,8 +1531,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T1>(), itr.OptionalDataAccess<T2>(), itr.OptionalManagedDataAccess<N2>()
                     );
@@ -1459,8 +1550,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T1>(), itr.OptionalDataAccess<T2>(), itr.OptionalManagedDataAccess<N2>()
 ));
@@ -1477,8 +1569,9 @@ where T3 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T1>(), itr.OptionalDataAccess<T2>(), itr.OptionalDataAccess<T3>()
                     );
@@ -1495,8 +1588,9 @@ where T3 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T1>(), itr.OptionalDataAccess<T2>(), itr.OptionalDataAccess<T3>()
 ));
@@ -1514,8 +1608,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T1>(), itr.OptionalDataAccess<T2>(), itr.OptionalDataAccess<T3>(), itr.OptionalManagedDataAccess<N2>()
                     );
@@ -1533,8 +1628,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T1>(), itr.OptionalDataAccess<T2>(), itr.OptionalDataAccess<T3>(), itr.OptionalManagedDataAccess<N2>()
 ));
@@ -1549,8 +1645,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>()
                     );
@@ -1565,8 +1662,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>()
 ));
@@ -1582,8 +1680,9 @@ where N3 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalManagedDataAccess<N3>()
                     );
@@ -1599,8 +1698,9 @@ where N3 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalManagedDataAccess<N3>()
 ));
@@ -1616,8 +1716,9 @@ where T1 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T1>()
                     );
@@ -1633,8 +1734,9 @@ where T1 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T1>()
 ));
@@ -1651,8 +1753,9 @@ where N3 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T1>(), itr.OptionalManagedDataAccess<N3>()
                     );
@@ -1669,8 +1772,9 @@ where N3 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T1>(), itr.OptionalManagedDataAccess<N3>()
 ));
@@ -1687,8 +1791,9 @@ where T2 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T1>(), itr.OptionalDataAccess<T2>()
                     );
@@ -1705,8 +1810,9 @@ where T2 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T1>(), itr.OptionalDataAccess<T2>()
 ));
@@ -1724,8 +1830,9 @@ where N3 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T1>(), itr.OptionalDataAccess<T2>(), itr.OptionalManagedDataAccess<N3>()
                     );
@@ -1743,8 +1850,9 @@ where N3 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T1>(), itr.OptionalDataAccess<T2>(), itr.OptionalManagedDataAccess<N3>()
 ));
@@ -1762,8 +1870,9 @@ where T3 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T1>(), itr.OptionalDataAccess<T2>(), itr.OptionalDataAccess<T3>()
                     );
@@ -1781,8 +1890,9 @@ where T3 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T1>(), itr.OptionalDataAccess<T2>(), itr.OptionalDataAccess<T3>()
 ));
@@ -1801,8 +1911,9 @@ where N3 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T1>(), itr.OptionalDataAccess<T2>(), itr.OptionalDataAccess<T3>(), itr.OptionalManagedDataAccess<N3>()
                     );
@@ -1821,8 +1932,9 @@ where N3 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T1>(), itr.OptionalDataAccess<T2>(), itr.OptionalDataAccess<T3>(), itr.OptionalManagedDataAccess<N3>()
 ));
@@ -1835,8 +1947,9 @@ where T1 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>()
                     );
@@ -1849,8 +1962,9 @@ where T1 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>()
 ));
@@ -1864,8 +1978,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.OptionalManagedDataAccess<N0>()
                     );
@@ -1879,8 +1994,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.OptionalManagedDataAccess<N0>()
 ));
@@ -1894,8 +2010,9 @@ where T2 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.OptionalDataAccess<T2>()
                     );
@@ -1909,8 +2026,9 @@ where T2 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.OptionalDataAccess<T2>()
 ));
@@ -1925,8 +2043,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.OptionalDataAccess<T2>(), itr.OptionalManagedDataAccess<N0>()
                     );
@@ -1941,8 +2060,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.OptionalDataAccess<T2>(), itr.OptionalManagedDataAccess<N0>()
 ));
@@ -1957,8 +2077,9 @@ where T3 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.OptionalDataAccess<T2>(), itr.OptionalDataAccess<T3>()
                     );
@@ -1973,8 +2094,9 @@ where T3 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.OptionalDataAccess<T2>(), itr.OptionalDataAccess<T3>()
 ));
@@ -1990,8 +2112,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.OptionalDataAccess<T2>(), itr.OptionalDataAccess<T3>(), itr.OptionalManagedDataAccess<N0>()
                     );
@@ -2007,8 +2130,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.OptionalDataAccess<T2>(), itr.OptionalDataAccess<T3>(), itr.OptionalManagedDataAccess<N0>()
 ));
@@ -2024,8 +2148,9 @@ where T4 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.OptionalDataAccess<T2>(), itr.OptionalDataAccess<T3>(), itr.OptionalDataAccess<T4>()
                     );
@@ -2041,8 +2166,9 @@ where T4 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.OptionalDataAccess<T2>(), itr.OptionalDataAccess<T3>(), itr.OptionalDataAccess<T4>()
 ));
@@ -2059,8 +2185,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.OptionalDataAccess<T2>(), itr.OptionalDataAccess<T3>(), itr.OptionalDataAccess<T4>(), itr.OptionalManagedDataAccess<N0>()
                     );
@@ -2077,8 +2204,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.OptionalDataAccess<T2>(), itr.OptionalDataAccess<T3>(), itr.OptionalDataAccess<T4>(), itr.OptionalManagedDataAccess<N0>()
 ));
@@ -2092,8 +2220,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.ManagedDataAccess<N0>()
                     );
@@ -2107,8 +2236,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.ManagedDataAccess<N0>()
 ));
@@ -2123,8 +2253,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.ManagedDataAccess<N0>(), itr.OptionalManagedDataAccess<N1>()
                     );
@@ -2139,8 +2270,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.ManagedDataAccess<N0>(), itr.OptionalManagedDataAccess<N1>()
 ));
@@ -2155,8 +2287,9 @@ where T2 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T2>()
                     );
@@ -2171,8 +2304,9 @@ where T2 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T2>()
 ));
@@ -2188,8 +2322,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T2>(), itr.OptionalManagedDataAccess<N1>()
                     );
@@ -2205,8 +2340,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T2>(), itr.OptionalManagedDataAccess<N1>()
 ));
@@ -2222,8 +2358,9 @@ where T3 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T2>(), itr.OptionalDataAccess<T3>()
                     );
@@ -2239,8 +2376,9 @@ where T3 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T2>(), itr.OptionalDataAccess<T3>()
 ));
@@ -2257,8 +2395,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T2>(), itr.OptionalDataAccess<T3>(), itr.OptionalManagedDataAccess<N1>()
                     );
@@ -2275,8 +2414,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T2>(), itr.OptionalDataAccess<T3>(), itr.OptionalManagedDataAccess<N1>()
 ));
@@ -2293,8 +2433,9 @@ where T4 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T2>(), itr.OptionalDataAccess<T3>(), itr.OptionalDataAccess<T4>()
                     );
@@ -2311,8 +2452,9 @@ where T4 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T2>(), itr.OptionalDataAccess<T3>(), itr.OptionalDataAccess<T4>()
 ));
@@ -2330,8 +2472,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T2>(), itr.OptionalDataAccess<T3>(), itr.OptionalDataAccess<T4>(), itr.OptionalManagedDataAccess<N1>()
                     );
@@ -2349,8 +2492,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T2>(), itr.OptionalDataAccess<T3>(), itr.OptionalDataAccess<T4>(), itr.OptionalManagedDataAccess<N1>()
 ));
@@ -2365,8 +2509,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>()
                     );
@@ -2381,8 +2526,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>()
 ));
@@ -2398,8 +2544,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalManagedDataAccess<N2>()
                     );
@@ -2415,8 +2562,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalManagedDataAccess<N2>()
 ));
@@ -2432,8 +2580,9 @@ where T2 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T2>()
                     );
@@ -2449,8 +2598,9 @@ where T2 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T2>()
 ));
@@ -2467,8 +2617,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T2>(), itr.OptionalManagedDataAccess<N2>()
                     );
@@ -2485,8 +2636,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T2>(), itr.OptionalManagedDataAccess<N2>()
 ));
@@ -2503,8 +2655,9 @@ where T3 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T2>(), itr.OptionalDataAccess<T3>()
                     );
@@ -2521,8 +2674,9 @@ where T3 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T2>(), itr.OptionalDataAccess<T3>()
 ));
@@ -2540,8 +2694,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T2>(), itr.OptionalDataAccess<T3>(), itr.OptionalManagedDataAccess<N2>()
                     );
@@ -2559,8 +2714,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T2>(), itr.OptionalDataAccess<T3>(), itr.OptionalManagedDataAccess<N2>()
 ));
@@ -2578,8 +2734,9 @@ where T4 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T2>(), itr.OptionalDataAccess<T3>(), itr.OptionalDataAccess<T4>()
                     );
@@ -2597,8 +2754,9 @@ where T4 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T2>(), itr.OptionalDataAccess<T3>(), itr.OptionalDataAccess<T4>()
 ));
@@ -2617,8 +2775,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T2>(), itr.OptionalDataAccess<T3>(), itr.OptionalDataAccess<T4>(), itr.OptionalManagedDataAccess<N2>()
                     );
@@ -2637,8 +2796,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T2>(), itr.OptionalDataAccess<T3>(), itr.OptionalDataAccess<T4>(), itr.OptionalManagedDataAccess<N2>()
 ));
@@ -2654,8 +2814,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>()
                     );
@@ -2671,8 +2832,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>()
 ));
@@ -2689,8 +2851,9 @@ where N3 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalManagedDataAccess<N3>()
                     );
@@ -2707,8 +2870,9 @@ where N3 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalManagedDataAccess<N3>()
 ));
@@ -2725,8 +2889,9 @@ where T2 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T2>()
                     );
@@ -2743,8 +2908,9 @@ where T2 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T2>()
 ));
@@ -2762,8 +2928,9 @@ where N3 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T2>(), itr.OptionalManagedDataAccess<N3>()
                     );
@@ -2781,8 +2948,9 @@ where N3 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T2>(), itr.OptionalManagedDataAccess<N3>()
 ));
@@ -2800,8 +2968,9 @@ where T3 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T2>(), itr.OptionalDataAccess<T3>()
                     );
@@ -2819,8 +2988,9 @@ where T3 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T2>(), itr.OptionalDataAccess<T3>()
 ));
@@ -2839,8 +3009,9 @@ where N3 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T2>(), itr.OptionalDataAccess<T3>(), itr.OptionalManagedDataAccess<N3>()
                     );
@@ -2859,8 +3030,9 @@ where N3 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T2>(), itr.OptionalDataAccess<T3>(), itr.OptionalManagedDataAccess<N3>()
 ));
@@ -2879,8 +3051,9 @@ where T4 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T2>(), itr.OptionalDataAccess<T3>(), itr.OptionalDataAccess<T4>()
                     );
@@ -2899,8 +3072,9 @@ where T4 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T2>(), itr.OptionalDataAccess<T3>(), itr.OptionalDataAccess<T4>()
 ));
@@ -2920,8 +3094,9 @@ where N3 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T2>(), itr.OptionalDataAccess<T3>(), itr.OptionalDataAccess<T4>(), itr.OptionalManagedDataAccess<N3>()
                     );
@@ -2941,8 +3116,9 @@ where N3 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T2>(), itr.OptionalDataAccess<T3>(), itr.OptionalDataAccess<T4>(), itr.OptionalManagedDataAccess<N3>()
 ));
@@ -2956,8 +3132,9 @@ where T2 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>()
                     );
@@ -2971,8 +3148,9 @@ where T2 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>()
 ));
@@ -2987,8 +3165,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.OptionalManagedDataAccess<N0>()
                     );
@@ -3003,8 +3182,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.OptionalManagedDataAccess<N0>()
 ));
@@ -3019,8 +3199,9 @@ where T3 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.OptionalDataAccess<T3>()
                     );
@@ -3035,8 +3216,9 @@ where T3 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.OptionalDataAccess<T3>()
 ));
@@ -3052,8 +3234,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.OptionalDataAccess<T3>(), itr.OptionalManagedDataAccess<N0>()
                     );
@@ -3069,8 +3252,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.OptionalDataAccess<T3>(), itr.OptionalManagedDataAccess<N0>()
 ));
@@ -3086,8 +3270,9 @@ where T4 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.OptionalDataAccess<T3>(), itr.OptionalDataAccess<T4>()
                     );
@@ -3103,8 +3288,9 @@ where T4 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.OptionalDataAccess<T3>(), itr.OptionalDataAccess<T4>()
 ));
@@ -3121,8 +3307,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.OptionalDataAccess<T3>(), itr.OptionalDataAccess<T4>(), itr.OptionalManagedDataAccess<N0>()
                     );
@@ -3139,8 +3326,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.OptionalDataAccess<T3>(), itr.OptionalDataAccess<T4>(), itr.OptionalManagedDataAccess<N0>()
 ));
@@ -3157,8 +3345,9 @@ where T5 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.OptionalDataAccess<T3>(), itr.OptionalDataAccess<T4>(), itr.OptionalDataAccess<T5>()
                     );
@@ -3175,8 +3364,9 @@ where T5 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.OptionalDataAccess<T3>(), itr.OptionalDataAccess<T4>(), itr.OptionalDataAccess<T5>()
 ));
@@ -3194,8 +3384,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.OptionalDataAccess<T3>(), itr.OptionalDataAccess<T4>(), itr.OptionalDataAccess<T5>(), itr.OptionalManagedDataAccess<N0>()
                     );
@@ -3213,8 +3404,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.OptionalDataAccess<T3>(), itr.OptionalDataAccess<T4>(), itr.OptionalDataAccess<T5>(), itr.OptionalManagedDataAccess<N0>()
 ));
@@ -3229,8 +3421,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.ManagedDataAccess<N0>()
                     );
@@ -3245,8 +3438,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.ManagedDataAccess<N0>()
 ));
@@ -3262,8 +3456,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.ManagedDataAccess<N0>(), itr.OptionalManagedDataAccess<N1>()
                     );
@@ -3279,8 +3474,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.ManagedDataAccess<N0>(), itr.OptionalManagedDataAccess<N1>()
 ));
@@ -3296,8 +3492,9 @@ where T3 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T3>()
                     );
@@ -3313,8 +3510,9 @@ where T3 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T3>()
 ));
@@ -3331,8 +3529,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T3>(), itr.OptionalManagedDataAccess<N1>()
                     );
@@ -3349,8 +3548,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T3>(), itr.OptionalManagedDataAccess<N1>()
 ));
@@ -3367,8 +3567,9 @@ where T4 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T3>(), itr.OptionalDataAccess<T4>()
                     );
@@ -3385,8 +3586,9 @@ where T4 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T3>(), itr.OptionalDataAccess<T4>()
 ));
@@ -3404,8 +3606,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T3>(), itr.OptionalDataAccess<T4>(), itr.OptionalManagedDataAccess<N1>()
                     );
@@ -3423,8 +3626,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T3>(), itr.OptionalDataAccess<T4>(), itr.OptionalManagedDataAccess<N1>()
 ));
@@ -3442,8 +3646,9 @@ where T5 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T3>(), itr.OptionalDataAccess<T4>(), itr.OptionalDataAccess<T5>()
                     );
@@ -3461,8 +3666,9 @@ where T5 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T3>(), itr.OptionalDataAccess<T4>(), itr.OptionalDataAccess<T5>()
 ));
@@ -3481,8 +3687,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T3>(), itr.OptionalDataAccess<T4>(), itr.OptionalDataAccess<T5>(), itr.OptionalManagedDataAccess<N1>()
                     );
@@ -3501,8 +3708,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T3>(), itr.OptionalDataAccess<T4>(), itr.OptionalDataAccess<T5>(), itr.OptionalManagedDataAccess<N1>()
 ));
@@ -3518,8 +3726,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>()
                     );
@@ -3535,8 +3744,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>()
 ));
@@ -3553,8 +3763,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalManagedDataAccess<N2>()
                     );
@@ -3571,8 +3782,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalManagedDataAccess<N2>()
 ));
@@ -3589,8 +3801,9 @@ where T3 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T3>()
                     );
@@ -3607,8 +3820,9 @@ where T3 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T3>()
 ));
@@ -3626,8 +3840,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T3>(), itr.OptionalManagedDataAccess<N2>()
                     );
@@ -3645,8 +3860,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T3>(), itr.OptionalManagedDataAccess<N2>()
 ));
@@ -3664,8 +3880,9 @@ where T4 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T3>(), itr.OptionalDataAccess<T4>()
                     );
@@ -3683,8 +3900,9 @@ where T4 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T3>(), itr.OptionalDataAccess<T4>()
 ));
@@ -3703,8 +3921,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T3>(), itr.OptionalDataAccess<T4>(), itr.OptionalManagedDataAccess<N2>()
                     );
@@ -3723,8 +3942,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T3>(), itr.OptionalDataAccess<T4>(), itr.OptionalManagedDataAccess<N2>()
 ));
@@ -3743,8 +3963,9 @@ where T5 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T3>(), itr.OptionalDataAccess<T4>(), itr.OptionalDataAccess<T5>()
                     );
@@ -3763,8 +3984,9 @@ where T5 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T3>(), itr.OptionalDataAccess<T4>(), itr.OptionalDataAccess<T5>()
 ));
@@ -3784,8 +4006,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T3>(), itr.OptionalDataAccess<T4>(), itr.OptionalDataAccess<T5>(), itr.OptionalManagedDataAccess<N2>()
                     );
@@ -3805,8 +4028,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T3>(), itr.OptionalDataAccess<T4>(), itr.OptionalDataAccess<T5>(), itr.OptionalManagedDataAccess<N2>()
 ));
@@ -3823,8 +4047,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>()
                     );
@@ -3841,8 +4066,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>()
 ));
@@ -3860,8 +4086,9 @@ where N3 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalManagedDataAccess<N3>()
                     );
@@ -3879,8 +4106,9 @@ where N3 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalManagedDataAccess<N3>()
 ));
@@ -3898,8 +4126,9 @@ where T3 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T3>()
                     );
@@ -3917,8 +4146,9 @@ where T3 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T3>()
 ));
@@ -3937,8 +4167,9 @@ where N3 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T3>(), itr.OptionalManagedDataAccess<N3>()
                     );
@@ -3957,8 +4188,9 @@ where N3 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T3>(), itr.OptionalManagedDataAccess<N3>()
 ));
@@ -3977,8 +4209,9 @@ where T4 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T3>(), itr.OptionalDataAccess<T4>()
                     );
@@ -3997,8 +4230,9 @@ where T4 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T3>(), itr.OptionalDataAccess<T4>()
 ));
@@ -4018,8 +4252,9 @@ where N3 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T3>(), itr.OptionalDataAccess<T4>(), itr.OptionalManagedDataAccess<N3>()
                     );
@@ -4039,8 +4274,9 @@ where N3 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T3>(), itr.OptionalDataAccess<T4>(), itr.OptionalManagedDataAccess<N3>()
 ));
@@ -4060,8 +4296,9 @@ where T5 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T3>(), itr.OptionalDataAccess<T4>(), itr.OptionalDataAccess<T5>()
                     );
@@ -4081,8 +4318,9 @@ where T5 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T3>(), itr.OptionalDataAccess<T4>(), itr.OptionalDataAccess<T5>()
 ));
@@ -4103,8 +4341,9 @@ where N3 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T3>(), itr.OptionalDataAccess<T4>(), itr.OptionalDataAccess<T5>(), itr.OptionalManagedDataAccess<N3>()
                     );
@@ -4125,8 +4364,9 @@ where N3 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T3>(), itr.OptionalDataAccess<T4>(), itr.OptionalDataAccess<T5>(), itr.OptionalManagedDataAccess<N3>()
 ));
@@ -4141,8 +4381,9 @@ where T3 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>()
                     );
@@ -4157,8 +4398,9 @@ where T3 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>()
 ));
@@ -4174,8 +4416,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.OptionalManagedDataAccess<N0>()
                     );
@@ -4191,8 +4434,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.OptionalManagedDataAccess<N0>()
 ));
@@ -4208,8 +4452,9 @@ where T4 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.OptionalDataAccess<T4>()
                     );
@@ -4225,8 +4470,9 @@ where T4 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.OptionalDataAccess<T4>()
 ));
@@ -4243,8 +4489,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.OptionalDataAccess<T4>(), itr.OptionalManagedDataAccess<N0>()
                     );
@@ -4261,8 +4508,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.OptionalDataAccess<T4>(), itr.OptionalManagedDataAccess<N0>()
 ));
@@ -4279,8 +4527,9 @@ where T5 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.OptionalDataAccess<T4>(), itr.OptionalDataAccess<T5>()
                     );
@@ -4297,8 +4546,9 @@ where T5 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.OptionalDataAccess<T4>(), itr.OptionalDataAccess<T5>()
 ));
@@ -4316,8 +4566,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.OptionalDataAccess<T4>(), itr.OptionalDataAccess<T5>(), itr.OptionalManagedDataAccess<N0>()
                     );
@@ -4335,8 +4586,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.OptionalDataAccess<T4>(), itr.OptionalDataAccess<T5>(), itr.OptionalManagedDataAccess<N0>()
 ));
@@ -4354,8 +4606,9 @@ where T6 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.OptionalDataAccess<T4>(), itr.OptionalDataAccess<T5>(), itr.OptionalDataAccess<T6>()
                     );
@@ -4373,8 +4626,9 @@ where T6 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.OptionalDataAccess<T4>(), itr.OptionalDataAccess<T5>(), itr.OptionalDataAccess<T6>()
 ));
@@ -4393,8 +4647,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.OptionalDataAccess<T4>(), itr.OptionalDataAccess<T5>(), itr.OptionalDataAccess<T6>(), itr.OptionalManagedDataAccess<N0>()
                     );
@@ -4413,8 +4668,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.OptionalDataAccess<T4>(), itr.OptionalDataAccess<T5>(), itr.OptionalDataAccess<T6>(), itr.OptionalManagedDataAccess<N0>()
 ));
@@ -4430,8 +4686,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.ManagedDataAccess<N0>()
                     );
@@ -4447,8 +4704,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.ManagedDataAccess<N0>()
 ));
@@ -4465,8 +4723,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.ManagedDataAccess<N0>(), itr.OptionalManagedDataAccess<N1>()
                     );
@@ -4483,8 +4742,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.ManagedDataAccess<N0>(), itr.OptionalManagedDataAccess<N1>()
 ));
@@ -4501,8 +4761,9 @@ where T4 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T4>()
                     );
@@ -4519,8 +4780,9 @@ where T4 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T4>()
 ));
@@ -4538,8 +4800,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T4>(), itr.OptionalManagedDataAccess<N1>()
                     );
@@ -4557,8 +4820,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T4>(), itr.OptionalManagedDataAccess<N1>()
 ));
@@ -4576,8 +4840,9 @@ where T5 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T4>(), itr.OptionalDataAccess<T5>()
                     );
@@ -4595,8 +4860,9 @@ where T5 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T4>(), itr.OptionalDataAccess<T5>()
 ));
@@ -4615,8 +4881,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T4>(), itr.OptionalDataAccess<T5>(), itr.OptionalManagedDataAccess<N1>()
                     );
@@ -4635,8 +4902,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T4>(), itr.OptionalDataAccess<T5>(), itr.OptionalManagedDataAccess<N1>()
 ));
@@ -4655,8 +4923,9 @@ where T6 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T4>(), itr.OptionalDataAccess<T5>(), itr.OptionalDataAccess<T6>()
                     );
@@ -4675,8 +4944,9 @@ where T6 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T4>(), itr.OptionalDataAccess<T5>(), itr.OptionalDataAccess<T6>()
 ));
@@ -4696,8 +4966,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T4>(), itr.OptionalDataAccess<T5>(), itr.OptionalDataAccess<T6>(), itr.OptionalManagedDataAccess<N1>()
                     );
@@ -4717,8 +4988,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T4>(), itr.OptionalDataAccess<T5>(), itr.OptionalDataAccess<T6>(), itr.OptionalManagedDataAccess<N1>()
 ));
@@ -4735,8 +5007,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>()
                     );
@@ -4753,8 +5026,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>()
 ));
@@ -4772,8 +5046,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalManagedDataAccess<N2>()
                     );
@@ -4791,8 +5066,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalManagedDataAccess<N2>()
 ));
@@ -4810,8 +5086,9 @@ where T4 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T4>()
                     );
@@ -4829,8 +5106,9 @@ where T4 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T4>()
 ));
@@ -4849,8 +5127,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T4>(), itr.OptionalManagedDataAccess<N2>()
                     );
@@ -4869,8 +5148,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T4>(), itr.OptionalManagedDataAccess<N2>()
 ));
@@ -4889,8 +5169,9 @@ where T5 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T4>(), itr.OptionalDataAccess<T5>()
                     );
@@ -4909,8 +5190,9 @@ where T5 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T4>(), itr.OptionalDataAccess<T5>()
 ));
@@ -4930,8 +5212,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T4>(), itr.OptionalDataAccess<T5>(), itr.OptionalManagedDataAccess<N2>()
                     );
@@ -4951,8 +5234,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T4>(), itr.OptionalDataAccess<T5>(), itr.OptionalManagedDataAccess<N2>()
 ));
@@ -4972,8 +5256,9 @@ where T6 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T4>(), itr.OptionalDataAccess<T5>(), itr.OptionalDataAccess<T6>()
                     );
@@ -4993,8 +5278,9 @@ where T6 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T4>(), itr.OptionalDataAccess<T5>(), itr.OptionalDataAccess<T6>()
 ));
@@ -5015,8 +5301,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T4>(), itr.OptionalDataAccess<T5>(), itr.OptionalDataAccess<T6>(), itr.OptionalManagedDataAccess<N2>()
                     );
@@ -5037,8 +5324,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T4>(), itr.OptionalDataAccess<T5>(), itr.OptionalDataAccess<T6>(), itr.OptionalManagedDataAccess<N2>()
 ));
@@ -5056,8 +5344,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>()
                     );
@@ -5075,8 +5364,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>()
 ));
@@ -5095,8 +5385,9 @@ where N3 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalManagedDataAccess<N3>()
                     );
@@ -5115,8 +5406,9 @@ where N3 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalManagedDataAccess<N3>()
 ));
@@ -5135,8 +5427,9 @@ where T4 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T4>()
                     );
@@ -5155,8 +5448,9 @@ where T4 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T4>()
 ));
@@ -5176,8 +5470,9 @@ where N3 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T4>(), itr.OptionalManagedDataAccess<N3>()
                     );
@@ -5197,8 +5492,9 @@ where N3 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T4>(), itr.OptionalManagedDataAccess<N3>()
 ));
@@ -5218,8 +5514,9 @@ where T5 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T4>(), itr.OptionalDataAccess<T5>()
                     );
@@ -5239,8 +5536,9 @@ where T5 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T4>(), itr.OptionalDataAccess<T5>()
 ));
@@ -5261,8 +5559,9 @@ where N3 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T4>(), itr.OptionalDataAccess<T5>(), itr.OptionalManagedDataAccess<N3>()
                     );
@@ -5283,8 +5582,9 @@ where N3 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T4>(), itr.OptionalDataAccess<T5>(), itr.OptionalManagedDataAccess<N3>()
 ));
@@ -5305,8 +5605,9 @@ where T6 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T4>(), itr.OptionalDataAccess<T5>(), itr.OptionalDataAccess<T6>()
                     );
@@ -5327,8 +5628,9 @@ where T6 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T4>(), itr.OptionalDataAccess<T5>(), itr.OptionalDataAccess<T6>()
 ));
@@ -5350,8 +5652,9 @@ where N3 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T4>(), itr.OptionalDataAccess<T5>(), itr.OptionalDataAccess<T6>(), itr.OptionalManagedDataAccess<N3>()
                     );
@@ -5373,8 +5676,9 @@ where N3 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T4>(), itr.OptionalDataAccess<T5>(), itr.OptionalDataAccess<T6>(), itr.OptionalManagedDataAccess<N3>()
 ));
@@ -5390,8 +5694,9 @@ where T4 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>()
                     );
@@ -5407,8 +5712,9 @@ where T4 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>()
 ));
@@ -5425,8 +5731,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.OptionalManagedDataAccess<N0>()
                     );
@@ -5443,8 +5750,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.OptionalManagedDataAccess<N0>()
 ));
@@ -5461,8 +5769,9 @@ where T5 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.OptionalDataAccess<T5>()
                     );
@@ -5479,8 +5788,9 @@ where T5 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.OptionalDataAccess<T5>()
 ));
@@ -5498,8 +5808,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.OptionalDataAccess<T5>(), itr.OptionalManagedDataAccess<N0>()
                     );
@@ -5517,8 +5828,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.OptionalDataAccess<T5>(), itr.OptionalManagedDataAccess<N0>()
 ));
@@ -5536,8 +5848,9 @@ where T6 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.OptionalDataAccess<T5>(), itr.OptionalDataAccess<T6>()
                     );
@@ -5555,8 +5868,9 @@ where T6 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.OptionalDataAccess<T5>(), itr.OptionalDataAccess<T6>()
 ));
@@ -5575,8 +5889,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.OptionalDataAccess<T5>(), itr.OptionalDataAccess<T6>(), itr.OptionalManagedDataAccess<N0>()
                     );
@@ -5595,8 +5910,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.OptionalDataAccess<T5>(), itr.OptionalDataAccess<T6>(), itr.OptionalManagedDataAccess<N0>()
 ));
@@ -5615,8 +5931,9 @@ where T7 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.OptionalDataAccess<T5>(), itr.OptionalDataAccess<T6>(), itr.OptionalDataAccess<T7>()
                     );
@@ -5635,8 +5952,9 @@ where T7 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.OptionalDataAccess<T5>(), itr.OptionalDataAccess<T6>(), itr.OptionalDataAccess<T7>()
 ));
@@ -5656,8 +5974,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.OptionalDataAccess<T5>(), itr.OptionalDataAccess<T6>(), itr.OptionalDataAccess<T7>(), itr.OptionalManagedDataAccess<N0>()
                     );
@@ -5677,8 +5996,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.OptionalDataAccess<T5>(), itr.OptionalDataAccess<T6>(), itr.OptionalDataAccess<T7>(), itr.OptionalManagedDataAccess<N0>()
 ));
@@ -5695,8 +6015,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.ManagedDataAccess<N0>()
                     );
@@ -5713,8 +6034,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.ManagedDataAccess<N0>()
 ));
@@ -5732,8 +6054,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.ManagedDataAccess<N0>(), itr.OptionalManagedDataAccess<N1>()
                     );
@@ -5751,8 +6074,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.ManagedDataAccess<N0>(), itr.OptionalManagedDataAccess<N1>()
 ));
@@ -5770,8 +6094,9 @@ where T5 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T5>()
                     );
@@ -5789,8 +6114,9 @@ where T5 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T5>()
 ));
@@ -5809,8 +6135,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T5>(), itr.OptionalManagedDataAccess<N1>()
                     );
@@ -5829,8 +6156,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T5>(), itr.OptionalManagedDataAccess<N1>()
 ));
@@ -5849,8 +6177,9 @@ where T6 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T5>(), itr.OptionalDataAccess<T6>()
                     );
@@ -5869,8 +6198,9 @@ where T6 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T5>(), itr.OptionalDataAccess<T6>()
 ));
@@ -5890,8 +6220,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T5>(), itr.OptionalDataAccess<T6>(), itr.OptionalManagedDataAccess<N1>()
                     );
@@ -5911,8 +6242,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T5>(), itr.OptionalDataAccess<T6>(), itr.OptionalManagedDataAccess<N1>()
 ));
@@ -5932,8 +6264,9 @@ where T7 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T5>(), itr.OptionalDataAccess<T6>(), itr.OptionalDataAccess<T7>()
                     );
@@ -5953,8 +6286,9 @@ where T7 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T5>(), itr.OptionalDataAccess<T6>(), itr.OptionalDataAccess<T7>()
 ));
@@ -5975,8 +6309,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T5>(), itr.OptionalDataAccess<T6>(), itr.OptionalDataAccess<T7>(), itr.OptionalManagedDataAccess<N1>()
                     );
@@ -5997,8 +6332,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T5>(), itr.OptionalDataAccess<T6>(), itr.OptionalDataAccess<T7>(), itr.OptionalManagedDataAccess<N1>()
 ));
@@ -6016,8 +6352,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>()
                     );
@@ -6035,8 +6372,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>()
 ));
@@ -6055,8 +6393,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalManagedDataAccess<N2>()
                     );
@@ -6075,8 +6414,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalManagedDataAccess<N2>()
 ));
@@ -6095,8 +6435,9 @@ where T5 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T5>()
                     );
@@ -6115,8 +6456,9 @@ where T5 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T5>()
 ));
@@ -6136,8 +6478,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T5>(), itr.OptionalManagedDataAccess<N2>()
                     );
@@ -6157,8 +6500,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T5>(), itr.OptionalManagedDataAccess<N2>()
 ));
@@ -6178,8 +6522,9 @@ where T6 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T5>(), itr.OptionalDataAccess<T6>()
                     );
@@ -6199,8 +6544,9 @@ where T6 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T5>(), itr.OptionalDataAccess<T6>()
 ));
@@ -6221,8 +6567,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T5>(), itr.OptionalDataAccess<T6>(), itr.OptionalManagedDataAccess<N2>()
                     );
@@ -6243,8 +6590,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T5>(), itr.OptionalDataAccess<T6>(), itr.OptionalManagedDataAccess<N2>()
 ));
@@ -6265,8 +6613,9 @@ where T7 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T5>(), itr.OptionalDataAccess<T6>(), itr.OptionalDataAccess<T7>()
                     );
@@ -6287,8 +6636,9 @@ where T7 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T5>(), itr.OptionalDataAccess<T6>(), itr.OptionalDataAccess<T7>()
 ));
@@ -6310,8 +6660,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T5>(), itr.OptionalDataAccess<T6>(), itr.OptionalDataAccess<T7>(), itr.OptionalManagedDataAccess<N2>()
                     );
@@ -6333,8 +6684,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T5>(), itr.OptionalDataAccess<T6>(), itr.OptionalDataAccess<T7>(), itr.OptionalManagedDataAccess<N2>()
 ));
@@ -6353,8 +6705,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>()
                     );
@@ -6373,8 +6726,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>()
 ));
@@ -6394,8 +6748,9 @@ where N3 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalManagedDataAccess<N3>()
                     );
@@ -6415,8 +6770,9 @@ where N3 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalManagedDataAccess<N3>()
 ));
@@ -6436,8 +6792,9 @@ where T5 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T5>()
                     );
@@ -6457,8 +6814,9 @@ where T5 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T5>()
 ));
@@ -6479,8 +6837,9 @@ where N3 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T5>(), itr.OptionalManagedDataAccess<N3>()
                     );
@@ -6501,8 +6860,9 @@ where N3 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T5>(), itr.OptionalManagedDataAccess<N3>()
 ));
@@ -6523,8 +6883,9 @@ where T6 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T5>(), itr.OptionalDataAccess<T6>()
                     );
@@ -6545,8 +6906,9 @@ where T6 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T5>(), itr.OptionalDataAccess<T6>()
 ));
@@ -6568,8 +6930,9 @@ where N3 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T5>(), itr.OptionalDataAccess<T6>(), itr.OptionalManagedDataAccess<N3>()
                     );
@@ -6591,8 +6954,9 @@ where N3 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T5>(), itr.OptionalDataAccess<T6>(), itr.OptionalManagedDataAccess<N3>()
 ));
@@ -6614,8 +6978,9 @@ where T7 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T5>(), itr.OptionalDataAccess<T6>(), itr.OptionalDataAccess<T7>()
                     );
@@ -6637,8 +7002,9 @@ where T7 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T5>(), itr.OptionalDataAccess<T6>(), itr.OptionalDataAccess<T7>()
 ));
@@ -6661,8 +7027,9 @@ where N3 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T5>(), itr.OptionalDataAccess<T6>(), itr.OptionalDataAccess<T7>(), itr.OptionalManagedDataAccess<N3>()
                     );
@@ -6685,8 +7052,9 @@ where N3 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T5>(), itr.OptionalDataAccess<T6>(), itr.OptionalDataAccess<T7>(), itr.OptionalManagedDataAccess<N3>()
 ));
@@ -6703,8 +7071,9 @@ where T5 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>()
                     );
@@ -6721,8 +7090,9 @@ where T5 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>()
 ));
@@ -6740,8 +7110,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.OptionalManagedDataAccess<N0>()
                     );
@@ -6759,8 +7130,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.OptionalManagedDataAccess<N0>()
 ));
@@ -6778,8 +7150,9 @@ where T6 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.OptionalDataAccess<T6>()
                     );
@@ -6797,8 +7170,9 @@ where T6 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.OptionalDataAccess<T6>()
 ));
@@ -6817,8 +7191,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.OptionalDataAccess<T6>(), itr.OptionalManagedDataAccess<N0>()
                     );
@@ -6837,8 +7212,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.OptionalDataAccess<T6>(), itr.OptionalManagedDataAccess<N0>()
 ));
@@ -6857,8 +7233,9 @@ where T7 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.OptionalDataAccess<T6>(), itr.OptionalDataAccess<T7>()
                     );
@@ -6877,8 +7254,9 @@ where T7 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.OptionalDataAccess<T6>(), itr.OptionalDataAccess<T7>()
 ));
@@ -6898,8 +7276,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.OptionalDataAccess<T6>(), itr.OptionalDataAccess<T7>(), itr.OptionalManagedDataAccess<N0>()
                     );
@@ -6919,8 +7298,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.OptionalDataAccess<T6>(), itr.OptionalDataAccess<T7>(), itr.OptionalManagedDataAccess<N0>()
 ));
@@ -6940,8 +7320,9 @@ where T8 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.OptionalDataAccess<T6>(), itr.OptionalDataAccess<T7>(), itr.OptionalDataAccess<T8>()
                     );
@@ -6961,8 +7342,9 @@ where T8 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.OptionalDataAccess<T6>(), itr.OptionalDataAccess<T7>(), itr.OptionalDataAccess<T8>()
 ));
@@ -6983,8 +7365,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.OptionalDataAccess<T6>(), itr.OptionalDataAccess<T7>(), itr.OptionalDataAccess<T8>(), itr.OptionalManagedDataAccess<N0>()
                     );
@@ -7005,8 +7388,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.OptionalDataAccess<T6>(), itr.OptionalDataAccess<T7>(), itr.OptionalDataAccess<T8>(), itr.OptionalManagedDataAccess<N0>()
 ));
@@ -7024,8 +7408,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.ManagedDataAccess<N0>()
                     );
@@ -7043,8 +7428,9 @@ where N0 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.ManagedDataAccess<N0>()
 ));
@@ -7063,8 +7449,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.ManagedDataAccess<N0>(), itr.OptionalManagedDataAccess<N1>()
                     );
@@ -7083,8 +7470,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.ManagedDataAccess<N0>(), itr.OptionalManagedDataAccess<N1>()
 ));
@@ -7103,8 +7491,9 @@ where T6 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T6>()
                     );
@@ -7123,8 +7512,9 @@ where T6 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T6>()
 ));
@@ -7144,8 +7534,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T6>(), itr.OptionalManagedDataAccess<N1>()
                     );
@@ -7165,8 +7556,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T6>(), itr.OptionalManagedDataAccess<N1>()
 ));
@@ -7186,8 +7578,9 @@ where T7 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T6>(), itr.OptionalDataAccess<T7>()
                     );
@@ -7207,8 +7600,9 @@ where T7 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T6>(), itr.OptionalDataAccess<T7>()
 ));
@@ -7229,8 +7623,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T6>(), itr.OptionalDataAccess<T7>(), itr.OptionalManagedDataAccess<N1>()
                     );
@@ -7251,8 +7646,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T6>(), itr.OptionalDataAccess<T7>(), itr.OptionalManagedDataAccess<N1>()
 ));
@@ -7273,8 +7669,9 @@ where T8 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T6>(), itr.OptionalDataAccess<T7>(), itr.OptionalDataAccess<T8>()
                     );
@@ -7295,8 +7692,9 @@ where T8 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T6>(), itr.OptionalDataAccess<T7>(), itr.OptionalDataAccess<T8>()
 ));
@@ -7318,8 +7716,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T6>(), itr.OptionalDataAccess<T7>(), itr.OptionalDataAccess<T8>(), itr.OptionalManagedDataAccess<N1>()
                     );
@@ -7341,8 +7740,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.ManagedDataAccess<N0>(), itr.OptionalDataAccess<T6>(), itr.OptionalDataAccess<T7>(), itr.OptionalDataAccess<T8>(), itr.OptionalManagedDataAccess<N1>()
 ));
@@ -7361,8 +7761,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>()
                     );
@@ -7381,8 +7782,9 @@ where N1 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>()
 ));
@@ -7402,8 +7804,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalManagedDataAccess<N2>()
                     );
@@ -7423,8 +7826,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalManagedDataAccess<N2>()
 ));
@@ -7444,8 +7848,9 @@ where T6 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T6>()
                     );
@@ -7465,8 +7870,9 @@ where T6 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T6>()
 ));
@@ -7487,8 +7893,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T6>(), itr.OptionalManagedDataAccess<N2>()
                     );
@@ -7509,8 +7916,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T6>(), itr.OptionalManagedDataAccess<N2>()
 ));
@@ -7531,8 +7939,9 @@ where T7 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T6>(), itr.OptionalDataAccess<T7>()
                     );
@@ -7553,8 +7962,9 @@ where T7 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T6>(), itr.OptionalDataAccess<T7>()
 ));
@@ -7576,8 +7986,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T6>(), itr.OptionalDataAccess<T7>(), itr.OptionalManagedDataAccess<N2>()
                     );
@@ -7599,8 +8010,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T6>(), itr.OptionalDataAccess<T7>(), itr.OptionalManagedDataAccess<N2>()
 ));
@@ -7622,8 +8034,9 @@ where T8 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T6>(), itr.OptionalDataAccess<T7>(), itr.OptionalDataAccess<T8>()
                     );
@@ -7645,8 +8058,9 @@ where T8 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T6>(), itr.OptionalDataAccess<T7>(), itr.OptionalDataAccess<T8>()
 ));
@@ -7669,8 +8083,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T6>(), itr.OptionalDataAccess<T7>(), itr.OptionalDataAccess<T8>(), itr.OptionalManagedDataAccess<N2>()
                     );
@@ -7693,8 +8108,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.OptionalDataAccess<T6>(), itr.OptionalDataAccess<T7>(), itr.OptionalDataAccess<T8>(), itr.OptionalManagedDataAccess<N2>()
 ));
@@ -7714,8 +8130,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>()
                     );
@@ -7735,8 +8152,9 @@ where N2 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>()
 ));
@@ -7757,8 +8175,9 @@ where N3 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalManagedDataAccess<N3>()
                     );
@@ -7779,8 +8198,9 @@ where N3 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalManagedDataAccess<N3>()
 ));
@@ -7801,8 +8221,9 @@ where T6 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T6>()
                     );
@@ -7823,8 +8244,9 @@ where T6 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T6>()
 ));
@@ -7846,8 +8268,9 @@ where N3 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T6>(), itr.OptionalManagedDataAccess<N3>()
                     );
@@ -7869,8 +8292,9 @@ where N3 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T6>(), itr.OptionalManagedDataAccess<N3>()
 ));
@@ -7892,8 +8316,9 @@ where T7 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T6>(), itr.OptionalDataAccess<T7>()
                     );
@@ -7915,8 +8340,9 @@ where T7 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T6>(), itr.OptionalDataAccess<T7>()
 ));
@@ -7939,8 +8365,9 @@ where N3 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T6>(), itr.OptionalDataAccess<T7>(), itr.OptionalManagedDataAccess<N3>()
                     );
@@ -7963,8 +8390,9 @@ where N3 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T6>(), itr.OptionalDataAccess<T7>(), itr.OptionalManagedDataAccess<N3>()
 ));
@@ -7987,8 +8415,9 @@ where T8 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T6>(), itr.OptionalDataAccess<T7>(), itr.OptionalDataAccess<T8>()
                     );
@@ -8011,8 +8440,9 @@ where T8 : unmanaged, IComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T6>(), itr.OptionalDataAccess<T7>(), itr.OptionalDataAccess<T8>()
 ));
@@ -8036,8 +8466,9 @@ where N3 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     process(itr, 0, itr.Length, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T6>(), itr.OptionalDataAccess<T7>(), itr.OptionalDataAccess<T8>(), itr.OptionalManagedDataAccess<N3>()
                     );
@@ -8061,8 +8492,9 @@ where N3 : IManagedComponentData
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
                     RunThreads(0, itr.Length, (s, e) => process(itr, s, e, 
 itr.DataAccess<T0>(), itr.DataAccess<T1>(), itr.DataAccess<T2>(), itr.DataAccess<T3>(), itr.DataAccess<T4>(), itr.DataAccess<T5>(), itr.ManagedDataAccess<N0>(), itr.ManagedDataAccess<N1>(), itr.ManagedDataAccess<N2>(), itr.OptionalDataAccess<T6>(), itr.OptionalDataAccess<T7>(), itr.OptionalDataAccess<T8>(), itr.OptionalManagedDataAccess<N3>()
 ));
