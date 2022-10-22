@@ -15,6 +15,14 @@ internal readonly struct ArraySlice<T>
         this.length = length;
     }
 
-    public ReadOnlySpan<T> Span => new ReadOnlySpan<T>(array, offset, length);
+    public ReadOnlySpan<T> Span => length <= 0 ? ReadOnlySpan<T>.Empty : new ReadOnlySpan<T>(array, offset, length);
+    
     public int Start => offset;
+    
+    public int Length => length;
+
+    public ArraySlice<T> Skip(int count)
+    {
+        return new ArraySlice<T>(array, offset + count, length - count);
+    }
 }

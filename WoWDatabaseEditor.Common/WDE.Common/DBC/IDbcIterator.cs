@@ -4,12 +4,15 @@ namespace WDE.Common.DBC
     {
         uint Key { get; }
         public int GetInt(int field);
+        public int GetInt(int field, int arrayIndex);
         public uint GetUInt(int field);
-        public uint GetUInt(int field, int index);
-        public ushort GetUShort(int field, int index);
+        public uint GetUInt(int field, int arrayIndex);
         public ushort GetUShort(int field);
+        public ushort GetUShort(int field, int arrayIndex);
         public string GetString(int field);
+        public string GetString(int field, int arrayIndex);
         public float GetFloat(int field);
+        public float GetFloat(int field, int arrayIndex);
     }
 
     public interface IWdcIterator

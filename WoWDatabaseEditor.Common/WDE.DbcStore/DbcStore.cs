@@ -151,8 +151,8 @@ namespace WDE.DbcStore
             private readonly IDbcSettingsProvider dbcSettingsProvider;
             private readonly IParameterFactory parameterFactory;
             private readonly DbcStore store;
-            private readonly DBDProvider dbdProvider;
-            private readonly DBCProvider dbcProvider;
+            private readonly DBDProvider dbdProvider = null!;
+            private readonly DBCProvider dbcProvider = null!;
 
             private Dictionary<long, string> AreaTriggerStore { get; } = new();
             private Dictionary<long, long> FactionTemplateStore { get; } = new();
@@ -290,7 +290,7 @@ namespace WDE.DbcStore
                         if (item[fieldName] == null)
                             return;
 
-                        dictionary.Add(item.ID, item[fieldName].ToString());
+                        dictionary.Add(item.ID, item[fieldName].ToString()!);
                     }
                 }
             }
@@ -416,7 +416,7 @@ namespace WDE.DbcStore
 
             private int max = 0;
             private int now = 0;
-            private ITaskProgress progress;
+            private ITaskProgress progress = null!;
             
             public void Run(ITaskProgress progress)
             {
@@ -970,7 +970,7 @@ namespace WDE.DbcStore
         private ISpellService spellServiceImpl;
         public bool Exists(uint spellId) => spellServiceImpl.Exists(spellId);
 
-        public T GetAttributes<T>(uint spellId) where T : Enum => spellServiceImpl.GetAttributes<T>(spellId);
+        public T GetAttributes<T>(uint spellId) where T : unmanaged, Enum => spellServiceImpl.GetAttributes<T>(spellId);
         public uint? GetSkillLine(uint spellId) => spellServiceImpl.GetSkillLine(spellId);
         public uint? GetSpellFocus(uint spellId) => spellServiceImpl.GetSpellFocus(spellId);
         public TimeSpan? GetSpellCastingTime(uint spellId) => spellServiceImpl.GetSpellCastingTime(spellId);
@@ -1015,7 +1015,7 @@ namespace WDE.DbcStore
         
         private string GetFileName(string s)
         {
-            int indexOf = s.LastIndexOf('\\');
+            int indexOf = Math.Max(s.LastIndexOf('\\'), s.LastIndexOf('/'));
             return indexOf == -1 ? s : s.Substring(indexOf + 1);
         }
     }
@@ -1075,7 +1075,7 @@ namespace WDE.DbcStore
     {
         public LanguageParameter(Dictionary<long, string> storage) : base(storage)
         {
-            Items.Add(0, new SelectOption("Universal"));
+            Items!.Add(0, new SelectOption("Universal"));
         }
     }
 
@@ -1084,7 +1084,7 @@ namespace WDE.DbcStore
         public ZoneOrQuestSortParameter(Dictionary<long, string> zones, Dictionary<long, string> questSorts) : base(zones)
         {
             foreach (var pair in questSorts)
-                Items.Add(-pair.Key, new SelectOption(pair.Value));
+                Items!.Add(-pair.Key, new SelectOption(pair.Value));
         }
     }
 
@@ -1096,7 +1096,7 @@ namespace WDE.DbcStore
             {
                 var from = taxiNodes.TryGetValue(path.Value.Item1, out var fromName) ? fromName : "unknown";
                 var to = taxiNodes.TryGetValue(path.Value.Item2, out var toName) ? toName : "unknown";
-                Items.Add(path.Key, new SelectOption($"{from} -> {to}"));
+                Items!.Add(path.Key, new SelectOption($"{from} -> {to}"));
             }
         }
     }

@@ -102,6 +102,10 @@ public partial class FastWdc1Reader
         }
 
         public int GetInt(int field) => (int)GetULong(field);
+        public int GetInt(int field, int arrayIndex)
+        {
+            throw new NotImplementedException();
+        }
 
         public uint GetUInt(int field) => (uint)GetULong(field);
 
@@ -117,6 +121,11 @@ public partial class FastWdc1Reader
 
         public ushort GetUShort(int field) => (ushort)GetULong(field);
 
+        public string GetString(int field, int arrayIndex)
+        {
+            throw new NotImplementedException();
+        }
+
         public unsafe float GetFloat(int field)
         {
             if (parent.header.Flags.HasFlagFast(Wdc1Header.HeaderFlags.IndexMap))
@@ -126,6 +135,11 @@ public partial class FastWdc1Reader
             var bitOffset = GetFieldBitOffset(field);
             fixed (byte* ptr = GetRowMemory())
                 return *(float*)(ptr + bitOffset / 8);
+        }
+
+        public float GetFloat(int field, int arrayIndex)
+        {
+            throw new NotImplementedException();
         }
 
         public string GetString(int field)

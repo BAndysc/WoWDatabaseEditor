@@ -11,6 +11,7 @@ public partial class FastWdc1Reader
         private readonly FastWdc1Reader parent;
         private int offset;
         private int index;
+        private uint? overrideKey;
 
         public RegularIterator(FastWdc1Reader parent)
         {
@@ -21,6 +22,7 @@ public partial class FastWdc1Reader
         {
             this.index = index;
             this.offset = (int)offset;
+            overrideKey = null;
         }
 
         private ReadOnlySpan<byte> GetRowMemory()
@@ -28,7 +30,7 @@ public partial class FastWdc1Reader
             return parent.data.Span.Slice(offset, (int)parent.header.RecordSize);
         }
 
-        private ReadOnlySpan<byte> GetFieldMemory(int fieldId)
+        private ReadOnlySpan<byte> GetFieldMemory(int fieldId, int arrayIndex = 0)
         {
             if (parent.header.Flags.HasFlagFast(Wdc1Header.HeaderFlags.IndexMap))
             {
@@ -37,17 +39,23 @@ public partial class FastWdc1Reader
 
                 fieldId--;
             }
-
-            return parent.data.Span.Slice(offset + parent.header.Fields[fieldId].Position, parent.header.Fields[fieldId].SizeInBytes);
+            var offsetBits = parent.fieldStorageInfo[fieldId].FieldOffsetBits;
+            var sizeTotalBits = parent.fieldStorageInfo[fieldId].FieldSizeBits;
+            var elementSize = (parent.header.Fields[fieldId].SizeInBytes * 8);
+            var elementsCount = sizeTotalBits / elementSize;
+            
+            return parent.data.Span.Slice(offset + offsetBits / 8 + arrayIndex * (elementSize / 8), elementSize / 8);
         }
 
         public uint Key
         {
             get
             {
+                if (overrideKey.HasValue)
+                    return overrideKey.Value;
                 if (parent.header.Flags.HasFlagFast(Wdc1Header.HeaderFlags.IndexMap))
                     return parent.ids.Span.Slice(index * 4, 4).ReadUInt();
-                throw new Exception("This WDC1 doesn't have a key");
+                return GetUInt(parent.header.IdIndex);
             }
         }
 
@@ -74,15 +82,31 @@ public partial class FastWdc1Reader
 
             if (field == parent.fieldStorageInfo.Length && parent.relationship != null)
                 return parent.relationship.Entries[index].ForeignId;
-            if (parent.fieldStorageInfo[field].StorageType is FieldCompression.FieldCompressionCommonData
-                or FieldCompression.FieldCompressionBitpackedIndexedArray)
-                throw new Exception("not implemented");
+
+            if (parent.fieldStorageInfo[field].StorageType == FieldCompression.FieldCompressionCommonData)
+            {
+                var id = GetInt(parent.header.IdIndex);
+                CommonDataElementView commonView = new(parent.palletOrCommon![field].Span);
+                while (commonView.IsValid && commonView.RecordId < id)
+                {
+                    parent.ForwardCommonData(field);
+                    commonView = new(parent.palletOrCommon[field].Span);
+                }
+                
+                if (commonView.IsValid && commonView.RecordId == id)
+                    return commonView.Value;
+                return parent.fieldStorageInfo[field].DefaultValue;
+            }
+            
+            if (parent.fieldStorageInfo[field].StorageType == FieldCompression.FieldCompressionBitpackedIndexedArray)
+                throw new Exception("Cannot read bitpacked indexed array as ulong");
+            
             var value = ReadBits(GetRowMemory(), parent.fieldStorageInfo[field].FieldOffsetBits,
                 parent.fieldStorageInfo[field].FieldSizeBits);
 
             if (parent.fieldStorageInfo[field].StorageType == FieldCompression.FieldCompressionBitpackedIndexed)
             {
-                fixed (byte* ptr = parent.pallet.Span.Slice((int)value * 4, 4))
+                fixed (byte* ptr = parent.palletOrCommon![field].Span.Slice((int)value * 4, 4))
                     return *(uint*)ptr;
             }
 
@@ -90,22 +114,43 @@ public partial class FastWdc1Reader
         }
 
 
-        private ulong GetULong(int field, int index)
+        private unsafe ulong GetULong(int field, int index)
         {
             if (parent.header.Flags.HasFlagFast(Wdc1Header.HeaderFlags.IndexMap))
                 field--;
             if (field == parent.fieldStorageInfo.Length && parent.relationship != null)
                 return parent.relationship.Entries[index].ForeignId;
-            if (parent.fieldStorageInfo[field].StorageType >= FieldCompression.FieldCompressionCommonData)
+            if (parent.fieldStorageInfo[field].StorageType is FieldCompression.FieldCompressionCommonData)
                 throw new Exception("not implemented");
             var offsetBits = parent.fieldStorageInfo[field].FieldOffsetBits;
             var sizeTotalBits = parent.fieldStorageInfo[field].FieldSizeBits;
             var elementSize = (parent.header.Fields[field].SizeInBytes * 8);
-            var elementsCount = sizeTotalBits / elementSize;
-            return ReadBits(GetRowMemory(), offsetBits + index * elementSize, elementSize);
+            var originalIndex = index;
+            if (parent.fieldStorageInfo[field].StorageType == FieldCompression.FieldCompressionBitpackedIndexedArray)
+            {
+                index = 0;
+                elementSize = sizeTotalBits;
+            }
+            var value = ReadBits(GetRowMemory(), offsetBits + index * elementSize, elementSize);
+            
+            if (parent.fieldStorageInfo[field].StorageType == FieldCompression.FieldCompressionBitpackedIndexed)
+            {
+                fixed (byte* ptr = parent.palletOrCommon![field].Span.Slice((int)value * 4, 4))
+                    return *(uint*)ptr;
+            }
+
+            if (parent.fieldStorageInfo[field].StorageType == FieldCompression.FieldCompressionBitpackedIndexedArray)
+            {
+                fixed (byte* ptr = parent.palletOrCommon![field].Span.Slice((int)value * 4 * (int)parent.fieldStorageInfo[field].ArrayCount + originalIndex * 4, 4))
+                    return *(uint*)ptr;
+            }
+
+            return value;
         }
 
         public int GetInt(int field) => (int)GetULong(field);
+        
+        public int GetInt(int field, int arrayIndex) => (int)GetULong(field, arrayIndex);
 
         public uint GetUInt(int field) => (uint)GetULong(field);
 
@@ -115,9 +160,26 @@ public partial class FastWdc1Reader
 
         public ushort GetUShort(int field) => (ushort)GetULong(field);
 
+        public string GetString(int field, int arrayIndex)
+        {
+            var strings = parent.strings.Span;
+            var start = GetInt(field, arrayIndex);
+            var zeroByteIndex = start;
+            while (strings[zeroByteIndex++] != 0) ;
+            return zeroByteIndex <= start
+                ? ""
+                : Encoding.UTF8.GetString(strings.Slice(start, zeroByteIndex - start - 1));
+        }
+
         public unsafe float GetFloat(int field)
         {
             fixed (byte* ptr = GetFieldMemory(field))
+                return *(float*)ptr;
+        }
+
+        public unsafe float GetFloat(int field, int arrayIndex)
+        {
+            fixed (byte* ptr = GetFieldMemory(field, arrayIndex))
                 return *(float*)ptr;
         }
 
@@ -130,6 +192,11 @@ public partial class FastWdc1Reader
             return zeroByteIndex <= start
                 ? ""
                 : Encoding.UTF8.GetString(strings.Slice(start, zeroByteIndex - start - 1));
+        }
+
+        public void OverrideKey(uint overrideKey)
+        {
+            this.overrideKey = overrideKey;
         }
     }
 }

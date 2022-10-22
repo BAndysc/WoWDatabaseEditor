@@ -33,11 +33,7 @@ public class DbcdWrapper : IWDC
     
     private class Iterator : IWdcIterator
     {
-        private DBCDRow row;
-
-        public Iterator()
-        {
-        }
+        private DBCDRow row = null!;
 
         internal void SetRow(DBCDRow row)
         {

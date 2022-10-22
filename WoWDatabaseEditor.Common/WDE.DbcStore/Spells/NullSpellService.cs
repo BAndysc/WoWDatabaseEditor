@@ -7,7 +7,7 @@ namespace WDE.DbcStore.Spells
     {
         public bool Exists(uint spellId) => true;
 
-        public T GetAttributes<T>(uint spellId) where T : Enum => default;
+        public T GetAttributes<T>(uint spellId) where T : unmanaged, Enum => default;
 
         public uint? GetSkillLine(uint spellId) => null;
 

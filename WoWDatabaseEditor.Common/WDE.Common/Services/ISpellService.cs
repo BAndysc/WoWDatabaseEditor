@@ -853,7 +853,7 @@ namespace WDE.Common.Services
     public interface ISpellService
     {
         bool Exists(uint spellId);
-        T GetAttributes<T>(uint spellId) where T : Enum;
+        T GetAttributes<T>(uint spellId) where T : unmanaged, Enum;
         uint? GetSkillLine(uint spellId);
         uint? GetSpellFocus(uint spellId);
         TimeSpan? GetSpellCastingTime(uint spellId);

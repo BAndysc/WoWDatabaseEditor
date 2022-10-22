@@ -15,7 +15,8 @@ public partial class FastWdc1Reader : IDBC
     private ArraySlice<byte> strings;
     private ArraySlice<byte> offsets;
     private ArraySlice<byte> ids;
-    private ArraySlice<byte> pallet;
+    private ArraySlice<byte> copy;
+    private ArraySlice<byte>[]? palletOrCommon;
     
     private RelationshipMapping? relationship;
 
@@ -81,6 +82,7 @@ public partial class FastWdc1Reader : IDBC
         public uint BitpackingSizeBits; // not useful for most purposes
         public uint Flags; // known values - 0x01: sign-extend (signed)
         public uint DefaultValue => BitpackingOffsetBits;
+        public uint ArrayCount => Flags; //  for FieldCompressionBitpackedIndexedArray
 
         public FieldStorageInfo(BinaryReader reader)
         {
@@ -107,10 +109,18 @@ public partial class FastWdc1Reader : IDBC
 
     private class RelationshipMapping
     {
-        public uint NumEntries;
-        public uint MinId;
-        public uint MaxId;
-        public RelationshipEntry[] Entries;
+        public readonly uint NumEntries;
+        public readonly uint MinId;
+        public readonly uint MaxId;
+        public readonly RelationshipEntry[] Entries;
+
+        public RelationshipMapping(uint numEntries, uint minId, uint maxId, RelationshipEntry[] entries)
+        {
+            NumEntries = numEntries;
+            MinId = minId;
+            MaxId = maxId;
+            Entries = entries;
+        }
     }
 
     public FastWdc1Reader(byte[] bytes)
@@ -139,30 +149,54 @@ public partial class FastWdc1Reader : IDBC
         ids = new ArraySlice<byte>(bytes, (int)reader.BaseStream.Position, (int)header.IdListSize);
         reader.BaseStream.Position += header.IdListSize;
 
-        if (header.CopyTableSize > 0)
-        {
-            // skip
-            reader.BaseStream.Position += header.CopyTableSize;
-        }
-
+        copy = new ArraySlice<byte>(bytes, (int)reader.BaseStream.Position, (int)header.CopyTableSize);
+        reader.BaseStream.Position += header.CopyTableSize;
+        
         fieldStorageInfo = new FieldStorageInfo[header.FieldStorageInfoSize / FieldStorageInfo.SizeOf];
         for (var i = 0; i < fieldStorageInfo.Length; i++)
         {
             fieldStorageInfo[i] = new FieldStorageInfo(reader);
         }
 
-        pallet = new ArraySlice<byte>(bytes, (int)reader.BaseStream.Position, (int)header.PalletDataSize);
+        var palletStart = reader.BaseStream.Position;
+        for (int i = 0; i < fieldStorageInfo.Length; ++i)
+        {
+            if (fieldStorageInfo[i].AdditionalDataSize == 0)
+                continue;
+            
+            if (fieldStorageInfo[i].StorageType is FieldCompression.FieldCompressionBitpackedIndexedArray or FieldCompression.FieldCompressionBitpackedIndexed)
+            {
+                palletOrCommon ??= new ArraySlice<byte>[fieldStorageInfo.Length];
+                palletOrCommon[i] = new ArraySlice<byte>(bytes, (int)reader.BaseStream.Position, (int)fieldStorageInfo[i].AdditionalDataSize);
+                reader.BaseStream.Position += fieldStorageInfo[i].AdditionalDataSize;   
+            }
+        }
         
-        reader.BaseStream.Position += header.PalletDataSize;
-        reader.BaseStream.Position += header.CommonDataSize;
+        if (palletStart + header.PalletDataSize != reader.BaseStream.Position)
+            throw new Exception("pallet data size mismatch");
+
+        var commonStart = reader.BaseStream.Position;
+        for (int i = 0; i < fieldStorageInfo.Length; ++i)
+        {
+            if (fieldStorageInfo[i].AdditionalDataSize == 0)
+                continue;
+            
+            if (fieldStorageInfo[i].StorageType is FieldCompression.FieldCompressionCommonData)
+            {
+                palletOrCommon ??= new ArraySlice<byte>[fieldStorageInfo.Length];
+                palletOrCommon[i] = new ArraySlice<byte>(bytes, (int)reader.BaseStream.Position, (int)fieldStorageInfo[i].AdditionalDataSize);
+                reader.BaseStream.Position += fieldStorageInfo[i].AdditionalDataSize;   
+            }
+        }
+        if (commonStart + header.CommonDataSize != reader.BaseStream.Position)
+            throw new Exception("common data size mismatch");
 
         if (header.RelationshipDataSize > 0)
         {
-            relationship = new RelationshipMapping();
-            relationship.NumEntries = reader.ReadUInt32();
-            relationship.MinId = reader.ReadUInt32();
-            relationship.MaxId = reader.ReadUInt32();
-            relationship.Entries = new RelationshipEntry[relationship.NumEntries];
+            var numEntries = reader.ReadUInt32();
+            var minId = reader.ReadUInt32();
+            var maxId = reader.ReadUInt32();
+            relationship = new RelationshipMapping(numEntries, minId, maxId, new RelationshipEntry[numEntries]);
             for (int i = 0; i < relationship.NumEntries; ++i)
             {
                 relationship.Entries[i] = new RelationshipEntry()
@@ -174,6 +208,8 @@ public partial class FastWdc1Reader : IDBC
                     throw new Exception("non linear relationship indices");
             }
         }
+
+        RecordCount = header.RecordCount + (uint)copy.Length / 8;
     }
 
     public FastWdc1Reader(string path) : this(File.ReadAllBytes(path))
@@ -184,6 +220,9 @@ public partial class FastWdc1Reader : IDBC
     {
         if (header.Flags.HasFlagFast(Wdc1Header.HeaderFlags.OffsetMap))
         {
+            if (copy.Length > 0)
+                throw new Exception("Copy not implemented with offset");
+            
             VariableIterator iterator = new VariableIterator(this);
             for (int i = 0; i < header.RecordCount; ++i)
             {
@@ -194,9 +233,59 @@ public partial class FastWdc1Reader : IDBC
                 yield return iterator;
             }
         }
+        else if (header.Flags.HasFlagFast(Wdc1Header.HeaderFlags.IndexMap) && header.CopyTableSize > 0)
+        {
+            // I have to construct a list, because it is not sorted.
+            List<(uint recordId, uint originalRecordId)> copyMapping = new();
+            while (copy.Length > 0)
+            {
+                var view = new CopyDataElementView(copy.Span);
+                copyMapping.Add((view.RecordId, view.OldRecordId));
+                ForwardCopyData();
+            }
+            copyMapping.Sort();
+
+            RegularIterator iterator = new RegularIterator(this);
+            Dictionary<uint, int> recordIdToIndex = new();
+
+            int copyMappingIndex = 0;
+            for (int i = 0; i < header.RecordCount; ++i)
+            {
+                iterator.SetOffsetIndex(i, i * header.RecordSize);
+                var recordId = iterator.Key;
+                recordIdToIndex[recordId] = i;
+                
+                while (copyMappingIndex < copyMapping.Count && copyMapping[copyMappingIndex].recordId < recordId)
+                {
+                    var oldIndex = recordIdToIndex[copyMapping[copyMappingIndex].originalRecordId];
+                    RegularIterator copyShadow = new RegularIterator(this);
+                    copyShadow.SetOffsetIndex(oldIndex, oldIndex * header.RecordSize);
+                    copyShadow.OverrideKey(copyMapping[copyMappingIndex].recordId);
+                    yield return copyShadow;
+
+                    copyMappingIndex++;
+                }
+                yield return iterator;
+            }
+
+            while (copyMappingIndex < copyMapping.Count)
+            {
+                var oldIndex = recordIdToIndex[copyMapping[copyMappingIndex].originalRecordId];
+                RegularIterator copyShadow = new RegularIterator(this);
+                copyShadow.SetOffsetIndex(oldIndex, oldIndex * header.RecordSize);
+                copyShadow.OverrideKey(copyMapping[copyMappingIndex].recordId);
+                yield return copyShadow;
+                copyMappingIndex++;
+            }
+        }
         else
         {
+            
+            if (copy.Length > 0)
+                throw new Exception("Copy not implemented without indexmap");
+
             RegularIterator iterator = new RegularIterator(this);
+            
             for (int i = 0; i < RecordCount; ++i)
             {
                 iterator.SetOffsetIndex(i, i * header.RecordSize);
@@ -207,5 +296,15 @@ public partial class FastWdc1Reader : IDBC
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-    public uint RecordCount => header.RecordCount;
+    public uint RecordCount { get; }
+
+    private void ForwardCommonData(int field)
+    {
+        palletOrCommon![field] = palletOrCommon[field].Skip(8);
+    }
+
+    private void ForwardCopyData()
+    {
+        copy = copy.Skip(8);
+    }
 }

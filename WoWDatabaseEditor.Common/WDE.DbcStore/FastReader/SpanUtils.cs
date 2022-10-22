@@ -2,6 +2,7 @@ using System;
 
 namespace WDE.DbcStore.FastReader;
 
+// these functions are 2-3 times faster than BitConverter, really
 internal static class SpanUtils
 {
     public static unsafe int ReadInt(this ReadOnlySpan<byte> span)

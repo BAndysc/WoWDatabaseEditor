@@ -9,7 +9,7 @@ namespace WDE.DbcStore.Spells.Wrath
     public class WrathSpellService : ISpellService
     {
         private Dictionary<uint, SpellCastTime> spellCastTimes = new();
-        private SpellStructure[] spells;
+        private SpellStructure[] spells = null!;
         private Dictionary<uint, int> spellIndices = new();
         private readonly DatabaseClientFileOpener opener;
 
@@ -227,7 +227,7 @@ namespace WDE.DbcStore.Spells.Wrath
             return spellIndices.ContainsKey(spellId);
         }
 
-        public T GetAttributes<T>(uint spellId) where T : Enum
+        public T GetAttributes<T>(uint spellId) where T : unmanaged, Enum
         {
             if (spellIndices.TryGetValue(spellId, out var spellIndex))
                 return default;
@@ -279,7 +279,7 @@ namespace WDE.DbcStore.Spells.Wrath
         public TimeSpan? GetSpellCastingTime(uint spellId)
         {
             if (spellIndices.TryGetValue(spellId, out var spellIndex))
-                return spells[spellIndex].CastingTime == null ? null : TimeSpan.FromMilliseconds(Math.Max(spells[spellIndex].CastingTime.BaseTimeMs, spells[spellIndex].CastingTime.MinimumMs));
+                return spells[spellIndex].CastingTime == null ? null : TimeSpan.FromMilliseconds(Math.Max(spells[spellIndex].CastingTime!.BaseTimeMs, spells[spellIndex].CastingTime!.MinimumMs));
             return null;
         }
 
