@@ -72,7 +72,7 @@ namespace WDE.TrinityMySqlDatabase.Database
             using var model = Database();
             return model.SmartScript.Where(line => line.EntryOrGuid == entryOrGuid && line.ScriptSourceType == (int) type).ToList();
         }
-
+        
         public async Task<IQuestRequestItem?> GetQuestRequestItem(uint entry)
         {
             await using var model = Database();
@@ -251,7 +251,11 @@ namespace WDE.TrinityMySqlDatabase.Database
         public abstract Task<IList<IGameObject>> GetGameObjectsAsync();
 
         public abstract IEnumerable<IQuestTemplate> GetQuestTemplates();
+        
+        public virtual async Task<IList<IQuestObjective>> GetQuestObjectives(uint questId) => new List<IQuestObjective>();
 
+        public virtual async Task<IQuestObjective?> GetQuestObjective(uint questId, int storageIndex) => null;
+        
         public abstract Task<List<IQuestTemplate>> GetQuestTemplatesAsync();
 
         public abstract IQuestTemplate? GetQuestTemplate(uint entry);

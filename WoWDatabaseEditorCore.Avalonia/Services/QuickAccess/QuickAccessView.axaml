@@ -5,19 +5,23 @@
              xmlns:quickAccess="clr-namespace:WoWDatabaseEditorCore.Services.QuickAccess;assembly=WoWDatabaseEditorCore"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              ClipToBounds="False"
+             CornerRadius="{DynamicResource ControlCornerRadius}"
              x:DataType="quickAccess:QuickAccessViewModel"
              x:Class="WoWDatabaseEditorCore.Avalonia.Services.QuickAccess.QuickAccessView">
     <Border Background="White" BorderBrush="{DynamicResource ContentBorderBrush}" BorderThickness="1"
             Width="500"
+            CornerRadius="{DynamicResource ControlCornerRadius}"
             BoxShadow="0 0 60 15 #60000000">
         <DockPanel>
             <TextBox Text="{CompiledBinding SearchText, Mode=TwoWay}" HorizontalAlignment="Stretch" VerticalAlignment="Center"
                      BorderThickness="0,0,0,1"
+                     CornerRadius="{DynamicResource ControlCornerRadius}"
                      DockPanel.Dock="Top"
                      x:Name="SearchBox"
             ></TextBox>
             <ListBox Background="{DynamicResource SlightlyHighlightedBackground}" MaxHeight="350" BorderThickness="0" 
                      x:Name="ResultsList"
+                     CornerRadius="{DynamicResource ControlCornerRadius}"
                      Items="{CompiledBinding Items}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>

@@ -303,4 +303,16 @@ public class TrinityMasterMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvid
         await using var model = Database();
         return await model.PlayerChoiceResponse.Where(x => x.ChoiceId == choiceId).ToListAsync<IPlayerChoiceResponse>();
     }
+
+    public override async Task<IList<IQuestObjective>> GetQuestObjectives(uint questId)
+    {
+        await using var model = Database();
+        return await model.QuestObjective.Where(x => x.QuestId == questId).ToListAsync<IQuestObjective>();
+    }
+
+    public override async Task<IQuestObjective?> GetQuestObjective(uint questId, int storageIndex)
+    {
+        await using var model = Database();
+        return await model.QuestObjective.FirstOrDefaultAsync(x => x.QuestId == questId && x.StorageIndex == storageIndex);
+    }
 }

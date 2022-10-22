@@ -24,6 +24,8 @@ namespace WDE.Common.Database
 
         IQuestTemplate? GetQuestTemplate(uint entry);
         IEnumerable<IQuestTemplate> GetQuestTemplates();
+        Task<IList<IQuestObjective>> GetQuestObjectives(uint questId);
+        Task<IQuestObjective?> GetQuestObjective(uint questId, int storageIndex);
         Task<IQuestRequestItem?> GetQuestRequestItem(uint entry);
 
         IEnumerable<IGameEvent> GetGameEvents();

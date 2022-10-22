@@ -14,6 +14,7 @@ namespace WDE.SmartScriptEditor.Models
     {
         public SmartTarget(int id, IEditorFeatures features) : base(id, features)
         {
+            isSource = false;
         }
 
         public new SmartTarget Copy()

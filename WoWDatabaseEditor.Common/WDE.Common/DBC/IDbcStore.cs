@@ -28,6 +28,9 @@ namespace WDE.Common.DBC
         Dictionary<long, string> CharTitleStore { get; }
         Dictionary<long, string> MapDirectoryStore { get; }
         Dictionary<long, string> SceneStore { get; }
+        Dictionary<long, string> ScenarioStore { get; }
+        Dictionary<long, Dictionary<long, long>> ScenarioToStepStore { get; }
+        Dictionary<long, string> ScenarioStepStore { get; }
         Dictionary<long, long> BattlePetSpeciesIdStore { get; }
     }
     

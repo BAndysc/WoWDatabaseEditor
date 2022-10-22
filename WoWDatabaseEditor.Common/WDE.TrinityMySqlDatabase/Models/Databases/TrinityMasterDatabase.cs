@@ -18,4 +18,5 @@ public class TrinityMasterDatabase : BaseTrinityDatabase
     public ITable<MySqlWrathQuestTemplateAddon> QuestTemplateAddon => GetTable<MySqlWrathQuestTemplateAddon>();
     public ITable<MySqlPlayerChoice> PlayerChoice => GetTable<MySqlPlayerChoice>();
     public ITable<MySqlPlayerChoiceResponse> PlayerChoiceResponse => GetTable<MySqlPlayerChoiceResponse>();
+    public ITable<MySqlQuestObjective> QuestObjective => GetTable<MySqlQuestObjective>();
 }

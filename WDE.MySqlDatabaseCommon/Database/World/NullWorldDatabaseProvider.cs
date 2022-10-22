@@ -23,6 +23,10 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public IEnumerable<IQuestTemplate> GetQuestTemplates() => Enumerable.Empty<IQuestTemplate>();
         
+        public async Task<IList<IQuestObjective>> GetQuestObjectives(uint questId) => new List<IQuestObjective>();
+
+        public async Task<IQuestObjective?> GetQuestObjective(uint questId, int storageIndex) => null;
+
         public Task<IQuestRequestItem?> GetQuestRequestItem(uint entry) => Task.FromResult<IQuestRequestItem?>(null);
 
         public IEnumerable<IAreaTriggerTemplate> GetAreaTriggerTemplates() => Enumerable.Empty<IAreaTriggerTemplate>();

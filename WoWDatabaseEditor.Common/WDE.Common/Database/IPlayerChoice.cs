@@ -11,6 +11,5 @@ public interface IPlayerChoiceResponse
     int ResponseId { get; }
     int ChoiceId { get; }
     string Header { get; }
-    string SubHeader { get; }
     string Answer { get; }
 }

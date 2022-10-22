@@ -21,6 +21,8 @@ namespace WDE.SmartScriptEditor.Models
         
         private ParameterValueHolder<long> condition;
 
+        protected bool isSource = true;
+
         public SmartSource(int id, IEditorFeatures features) : base(id,
             features.TargetParametersCount,
             that => new SmartScriptParameterValueHolder(Parameter.Instance, 0, that))
@@ -109,7 +111,10 @@ namespace WDE.SmartScriptEditor.Models
                             fpram2 = Y.ToString(CultureInfo.InvariantCulture),
                             fpram3 = Z.ToString(CultureInfo.InvariantCulture),
                             fpram4 = O.ToString(CultureInfo.InvariantCulture),
-                            invoker = GetInvokerNameWithContext()
+                            invoker = GetInvokerNameWithContext(),
+                            isSource = isSource,
+                            isTarget = !isSource,
+                            
                         });
                     if ((Conditions?.Count ?? 0) == 0)
                         return output;

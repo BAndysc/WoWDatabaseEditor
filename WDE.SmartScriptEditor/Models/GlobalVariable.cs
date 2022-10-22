@@ -149,6 +149,7 @@ namespace WDE.SmartScriptEditor.Models
         Function,
         StoredPoint,
         DatabasePoint,
-        Actor
+        Actor,
+        Repeated
     }
 }

@@ -53,6 +53,8 @@ namespace WDE.SmartScriptEditor.Data
                 parameterFactory.Register("QuestEnderParameter", new QuestStarterEnderParameter(databaseProvider, tableEditorPickerService, questEntryProviderService, false));
                 parameterFactory.Register("CreatureSpawnKeyParameter", new CreatureSpawnKeyParameter(databaseProvider));
                 parameterFactory.Register("GameobjectSpawnKeyParameter", new GameObjectSpawnKeyParameter(databaseProvider));
+                parameterFactory.Register("SmartScenarioStepParameter", containerProvider.Resolve<SmartScenarioStepParameter>());
+                parameterFactory.Register("SmartQuestObjectiveParameter", containerProvider.Resolve<SmartQuestObjectiveParameter>());
                 parameterFactory.RegisterCombined("NpcFlagsSmartTypeBasedParameter", "NpcFlagParameter", "NpcFlag2Parameter", (npc1, npc2) => new NpcFlagsSmartTypeBasedParameter(npc1, npc2, pickerService));
                 var storedTarget = parameterFactory.Register("StoredTargetParameter", containerProvider.Resolve<VariableContextualParameter>(
                     (typeof(GlobalVariableType), GlobalVariableType.StoredTarget), (typeof(string), "storedTarget")));
@@ -68,6 +70,8 @@ namespace WDE.SmartScriptEditor.Data
                     (typeof(GlobalVariableType), GlobalVariableType.StoredPoint), (typeof(string), "storedPoint")));
                 parameterFactory.Register("DatabasePointParameter", containerProvider.Resolve<VariableContextualParameter>(
                     (typeof(GlobalVariableType), GlobalVariableType.DatabasePoint), (typeof(string), "databasePoint")));
+                parameterFactory.Register("RepatedParameter", containerProvider.Resolve<VariableContextualParameter>(
+                    (typeof(GlobalVariableType), GlobalVariableType.Repeated), (typeof(string), "repeated")));
                 var actor = parameterFactory.Register("ActorParameter", containerProvider.Resolve<VariableContextualParameter>(
                     (typeof(GlobalVariableType), GlobalVariableType.Actor), (typeof(string), "actor")));
                 parameterFactory.Register("StoredTargetOrActorParameter", new StoredTargetOrActorParameter(storedTarget, actor));

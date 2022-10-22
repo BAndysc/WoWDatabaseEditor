@@ -124,6 +124,9 @@ namespace WDE.DbcStore
         public Dictionary<long, string> MapDirectoryStore { get; internal set;} = new();
         public Dictionary<long, string> QuestSortStore { get; internal set;} = new();
         public Dictionary<long, string> SceneStore { get; internal set; } = new();
+        public Dictionary<long, string> ScenarioStore { get; internal set;} = new();
+        public Dictionary<long, string> ScenarioStepStore { get; internal set;} = new();
+        public Dictionary<long, Dictionary<long, long>> ScenarioToStepStore { get; internal set; } = new();
         public Dictionary<long, long> BattlePetSpeciesIdStore { get; internal set; } = new();
 
         internal void Load()
@@ -195,8 +198,11 @@ namespace WDE.DbcStore
             public Dictionary<long, string> BattlegroundStore { get; internal set;} = new();
             public Dictionary<long, string> AchievementCriteriaStore { get; internal set;} = new();
             public Dictionary<long, string> ItemDbcStore { get; internal set;} = new(); // item.dbc, not item-sparse.dbc
-            
             public Dictionary<long, string> SceneStore { get; internal set;} = new();
+            public Dictionary<long, string> ScenarioStore { get; internal set;} = new();
+            public Dictionary<long, string> ScenarioStepStore { get; internal set;} = new();
+            public Dictionary<long, string> BattlePetAbilityStore { get; internal set;} = new();
+            public Dictionary<long, Dictionary<long, long>> ScenarioToStepStore { get; internal set; } = new();
             public Dictionary<long, long> BattlePetSpeciesIdStore { get; internal set; } = new();
 
             public string Name => "DBC Loading";
@@ -338,6 +344,9 @@ namespace WDE.DbcStore
                 store.MapDirectoryStore = MapDirectoryStore;
                 store.QuestSortStore = QuestSortStore;
                 store.SceneStore = SceneStore;
+                store.ScenarioStore = ScenarioStore;
+                store.ScenarioStepStore = ScenarioStepStore;
+                store.ScenarioToStepStore = ScenarioToStepStore;
                 store.BattlePetSpeciesIdStore = BattlePetSpeciesIdStore;
                 store.CurrencyTypeStore = CurrencyTypeStore;
                 
@@ -370,6 +379,7 @@ namespace WDE.DbcStore
                 parameterFactory.Register("AreaTriggerParameter", new DbcParameter(AreaTriggerStore));
                 parameterFactory.Register("ZoneOrQuestSortParameter", new ZoneOrQuestSortParameter(AreaStore, QuestSortStore));
                 parameterFactory.Register("TaxiPathParameter", new TaxiPathParameter(TaxiPathsStore, TaxiNodeStore));
+                parameterFactory.Register("TaxiNodeParameter", new DbcParameter(TaxiNodeStore));
                 parameterFactory.Register("SpellItemEnchantmentParameter", new DbcParameter(SpellItemEnchantmentStore));
                 parameterFactory.Register("AreaGroupParameter", new DbcParameter(AreaGroupStore));
                 parameterFactory.Register("ItemDisplayInfoParameter", new DbcParameter(ItemDisplayInfoStore));
@@ -382,7 +392,11 @@ namespace WDE.DbcStore
                 parameterFactory.Register("BattlegroundParameter", new DbcParameter(BattlegroundStore));
                 parameterFactory.Register("AchievementCriteriaParameter", new DbcParameter(AchievementCriteriaStore));
                 parameterFactory.Register("ItemVisualParameter", new DbcParameter(ItemDbcStore));
-                parameterFactory.Register("SceneScriptPackage", new DbcParameter(SceneStore));
+                parameterFactory.Register("SceneScriptParameter", new DbcParameter(SceneStore));
+                parameterFactory.Register("ScenarioParameter", new DbcParameter(ScenarioStore));
+                parameterFactory.Register("ScenarioStepParameter", new DbcParameter(ScenarioStepStore));
+                parameterFactory.Register("BattlePetAbilityParameter", new DbcParameter(BattlePetAbilityStore));
+                
                 parameterFactory.RegisterDepending("BattlePetSpeciesParameter", "CreatureParameter", (creature) => new BattlePetSpeciesParameter(store, parameterFactory, creature));
 
                 switch (dbcSettingsProvider.GetSettings().DBCVersion)
@@ -761,6 +775,20 @@ namespace WDE.DbcStore
                         Load("TaxiPath.db2",  row => TaxiPathsStore.Add(row.GetInt(2), (row.GetUShort(0), row.GetUShort(1))));
                         Load("SceneScriptPackage.db2", 0, 1, SceneStore);
                         Load("BattlePetSpecies.db2", 8, 2, BattlePetSpeciesIdStore);
+                        Load("BattlePetAbility.db2", 0, 1, BattlePetAbilityStore);
+                        Load("Scenario.db2", 0, 1, ScenarioStore);
+                        Load("ScenarioStep.db2", row =>
+                        {
+                            var stepId = row.Key;
+                            var description = row.GetString(0);
+                            var name = row.GetString(1);
+                            var scenarioId = row.GetUInt(3);
+                            var stepIndex = row.GetUInt(6);
+                            ScenarioStepStore[stepId] = name;
+                            if (!ScenarioToStepStore.TryGetValue(scenarioId, out var scenarioSteps))
+                                scenarioSteps = ScenarioToStepStore[scenarioId] = new();
+                            scenarioSteps[stepIndex] = stepId;
+                        });
                         break;
                     }
                     case DBCVersions.SHADOWLANDS_41079:

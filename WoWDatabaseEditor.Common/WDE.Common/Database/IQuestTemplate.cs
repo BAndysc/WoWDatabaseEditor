@@ -14,4 +14,14 @@
         int BreadcrumbForQuestId { get; }
         uint NextQuestInChain { get; }
     }
+
+    public interface IQuestObjective
+    {
+        uint ObjectiveId { get; }
+        uint QuestId { get; }
+        int StorageIndex { get; }
+        int ObjectId { get; }
+        int Amount { get; }
+        string? Description { get; }
+    }
 }

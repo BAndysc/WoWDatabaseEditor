@@ -104,6 +104,7 @@ namespace WDE.Parameters
             factory.Register("GossipMenuParameter", AddDatabaseParameter(new GossipMenuParameter(database)));
             factory.Register("NpcTextParameter", AddDatabaseParameter(new NpcTextParameter(database)));
             factory.Register("PlayerChoiceParameter", AddAsyncDatabaseParameter(new PlayerChoiceParameter(database)));
+            factory.Register("PlayerChoiceResponseParameter", AddAsyncDatabaseParameter(new PlayerChoiceResponseParameter(database)));
             factory.Register("ConversationTemplateParameter", new ConversationTemplateParameter(database));
             factory.Register("BoolParameter", new BoolParameter());
             factory.Register("FlagParameter", new FlagParameter());
@@ -635,6 +636,25 @@ namespace WDE.Parameters
             if (choices != null)
                 foreach (var item in choices)
                     Items.Add(item.ChoiceId, new SelectOption(item.Question));
+        }
+    }
+
+    public class PlayerChoiceResponseParameter : LateAsyncLoadParameter
+    {
+        private readonly IDatabaseProvider database;
+
+        public PlayerChoiceResponseParameter(IDatabaseProvider database)
+        {
+            this.database = database;
+        }
+        
+        public override async Task LateLoad()
+        {
+            Items = new Dictionary<long, SelectOption>();
+            var choices = await database.GetPlayerChoiceResponsesAsync();
+            if (choices != null)
+                foreach (var item in choices)
+                    Items.Add(item.ChoiceId, new SelectOption(item.Answer));
         }
     }
 }

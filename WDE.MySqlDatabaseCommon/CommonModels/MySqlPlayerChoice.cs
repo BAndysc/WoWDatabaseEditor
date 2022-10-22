@@ -27,9 +27,6 @@ public class MySqlPlayerChoiceResponse : IPlayerChoiceResponse
     [Column(Name = "Header")]
     public string Header { get; set; } = "";
     
-    [Column(Name = "SubHeader")]
-    public string SubHeader { get; set; } = "";
-
     [Column(Name = "Answer")]
     public string Answer { get; set; } = "";
 }
