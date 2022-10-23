@@ -59,6 +59,7 @@
       <ProjectReference Include="..\Modules\WDE.AnniversaryInfo\WDE.AnniversaryInfo.csproj" />
       <ProjectReference Include="..\Modules\WDE.Sessions\WDE.Sessions.csproj" />
       <ProjectReference Include="..\Modules\WDE.FirstTimeWizard\WDE.FirstTimeWizard.csproj" />
+      <ProjectReference Include="..\Modules\WDE.Profiles\WDE.Profiles.csproj" />
     </ItemGroup>
 
 </Project>

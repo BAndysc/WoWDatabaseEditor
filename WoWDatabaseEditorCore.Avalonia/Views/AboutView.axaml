@@ -11,7 +11,7 @@
         <DockPanel Margin="20" LastChildFill="True">
             <TextBlock DockPanel.Dock="Bottom" IsVisible="{CompiledBinding VersionKnown}" Text="{CompiledBinding ReleaseData}" TextWrapping="WrapWithOverflow" />
             <StackPanel>
-                <Border BorderThickness="0,0,0,2" BorderBrush="#FF5FA2DA">
+                <Border BorderThickness="0,0,0,2" BorderBrush="{DynamicResource AccentColorMedium}">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom">
                         <Image Source="../Icon.png" Width="56" Height="56" />
                         <TextBlock VerticalAlignment="Bottom" FontSize="34" TextWrapping="WrapWithOverflow">WoW Database Editor 2022.1</TextBlock>

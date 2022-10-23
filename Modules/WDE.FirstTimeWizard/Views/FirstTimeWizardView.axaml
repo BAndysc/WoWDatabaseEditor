@@ -9,11 +9,12 @@
              x:Class="WDE.FirstTimeWizard.Views.FirstTimeWizardView">
     
     <DockPanel>
-        <Border Padding="15" Background="{DynamicResource ContentBackground}" DockPanel.Dock="Top" BorderThickness="0,0,0,2" BorderBrush="#FF5FA2DA">
+        <Border Padding="15" Background="{DynamicResource ContentBackground}" DockPanel.Dock="Top" BorderThickness="0,0,0,2" BorderBrush="{DynamicResource AccentColorMedium}">
             <DockPanel VerticalAlignment="Bottom" LastChildFill="False">
                 <TextBlock DockPanel.Dock="Top" VerticalAlignment="Bottom" FontSize="34" TextWrapping="WrapWithOverflow" Text="WoW Database Editor" />
-                <Border Height="15" />
+                <Border DockPanel.Dock="Top" Height="15" />
                 <TextBlock DockPanel.Dock="Top" TextWrapping="WrapWithOverflow" FontSize="16">Welcome to the WoW Database Editor! This guide will help you configure the editor.</TextBlock>
+                <Border DockPanel.Dock="Top" Height="15" />
             </DockPanel>
         </Border>
         

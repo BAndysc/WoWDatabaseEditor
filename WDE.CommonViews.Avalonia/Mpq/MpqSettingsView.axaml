@@ -7,18 +7,19 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="viewModels:MpqSettingsViewModel"
              x:Class="WDE.CommonViews.Avalonia.Mpq.MpqSettingsView">
-    
-    <StackPanel Orientation="Vertical">
-        <controls:SettingsHeader Text="Client files" />
-        <TextBlock Opacity="0.7">Please select a folder with Wrath's wow.exe in it.</TextBlock>
-        <DockPanel LastChildFill="True">
-            <TextBlock VerticalAlignment="Center" Margin="0,0,10,0">WoW Path:</TextBlock>
-            <Button DockPanel.Dock="Right" Command="{CompiledBinding PickFolder}">...</Button>
-            <TextBox Text="{CompiledBinding WoWPath}" IsReadOnly="True" />
-        </DockPanel>
-        <DockPanel Margin="0,5,0,0">
-            <TextBlock VerticalAlignment="Center" Margin="0,0,5,0">Archive open mode: </TextBlock>
-            <ComboBox Items="{CompiledBinding MpqOpenTypes}" SelectedItem="{CompiledBinding MpqOpenType}" />
-        </DockPanel>
-    </StackPanel>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Orientation="Vertical">
+            <controls:SettingsHeader Text="Client files" />
+            <TextBlock Opacity="0.7">Please select a folder with Wrath's wow.exe in it.</TextBlock>
+            <DockPanel LastChildFill="True">
+                <TextBlock VerticalAlignment="Center" Margin="0,0,10,0">WoW Path:</TextBlock>
+                <Button DockPanel.Dock="Right" Command="{CompiledBinding PickFolder}">...</Button>
+                <TextBox Text="{CompiledBinding WoWPath}" IsReadOnly="True" />
+            </DockPanel>
+            <DockPanel Margin="0,5,0,0">
+                <TextBlock VerticalAlignment="Center" Margin="0,0,5,0">Archive open mode: </TextBlock>
+                <ComboBox Items="{CompiledBinding MpqOpenTypes}" SelectedItem="{CompiledBinding MpqOpenType}" />
+            </DockPanel>
+        </StackPanel>
+    </ScrollViewer>
 </UserControl>

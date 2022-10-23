@@ -16,7 +16,7 @@ namespace WoWDatabaseEditorCore.Services.ServerExecutable;
 public partial class ServerExecutableService : ObservableBase, IServerExecutableService
 {
     private readonly IProcessService processService;
-    private readonly IMessageBoxService messageBoxService;
+    private readonly Lazy<IMessageBoxService> messageBoxService;
     private readonly IServerExecutableConfiguration configuration;
     private readonly Lazy<IStatusBar> statusBar;
     [Notify] private bool isWorldServerRunning;
@@ -28,7 +28,7 @@ public partial class ServerExecutableService : ObservableBase, IServerExecutable
     private IProcess? authProcess;
     
     public ServerExecutableService(IProcessService processService,
-        IMessageBoxService messageBoxService,
+        Lazy<IMessageBoxService> messageBoxService,
         IServerExecutableConfiguration configuration,
         Lazy<IStatusBar> statusBar)
     {
@@ -89,7 +89,7 @@ public partial class ServerExecutableService : ObservableBase, IServerExecutable
 
     private Task ShowConfigureDialog()
     {
-        return messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
+        return messageBoxService.Value.ShowDialog(new MessageBoxFactory<bool>()
             .SetTitle("Configuration error")
             .SetMainInstruction("Setup server path first")
             .SetContent("In order to use quick executable start, configure the server paths in the settings")

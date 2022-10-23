@@ -24,9 +24,9 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.AppearanceService.Providers
             return Settings;
         }
 
-        public void UpdateSettings(Theme theme, double? customScaling)
+        public void UpdateSettings(Theme theme, double? customScaling, double hue, double saturation, double lightness)
         {
-            userSettings.Update(new ThemeSettings(theme.Name, customScaling.HasValue, customScaling ?? 1));
+            userSettings.Update(new ThemeSettings(theme.Name, customScaling.HasValue, customScaling ?? 1, hue, saturation, lightness));
         }
     }
 }

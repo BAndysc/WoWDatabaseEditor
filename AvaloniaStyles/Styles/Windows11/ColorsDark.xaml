@@ -5,12 +5,17 @@
         <SolidColorBrush x:Key="TabControlBorder" Color="Transparent" />
         <SolidColorBrush x:Key="TabControlBorderSelected" Color="#333333" />
         <SolidColorBrush x:Key="TabItemHeaderBackgroundUnselected" Color="Transparent" />
+         <!-- 2B2D30-->
+        <AccentSolidColorBrush Hue="{DynamicResource AccentHue}" Color="#2B2D30" x:Key="TitleBarBackground" />
+        <AccentSolidColorBrush Hue="{DynamicResource AccentHue}" Color="#2B2D30" x:Key="WindowContentBackground" />
+        <AccentSolidColorBrush Hue="{DynamicResource AccentHue}" Color="#2B2D30" x:Key="MainWindowContentBackground" />
         
-        <SolidColorBrush Color="#202020" x:Key="TitleBarBackground" />
-        <SolidColorBrush Color="#202020" x:Key="WindowContentBackground" />
-        <SolidColorBrush Color="#202020" x:Key="MainWindowContentBackground" />
+        <AccentSolidColorBrush Hue="{DynamicResource AccentHue}" Color="#5fa2da" x:Key="AccentColorMedium" />
         
-        <SolidColorBrush Color="#2D2D2D" x:Key="ContentBackground" />
+        <SolidColorBrush Color="Black" x:Key="OuterWindowBorderColor" />
+        <SolidColorBrush Color="#78797B" x:Key="InnerWindowBorderColor" />
+        
+        <SolidColorBrush Color="#1E1F22" x:Key="ContentBackground" />
         
         <Thickness x:Key="ButtonBorderThemeThickness">1</Thickness>
         
@@ -44,14 +49,27 @@
         <SolidColorBrush Color="#1F1F20" x:Key="TextControlBackgroundFocused" />
         
         <!-- combobox -->
-        <SolidColorBrush x:Key="ComboBoxBackground" Color="#2D2D2D" />
+        <SolidColorBrush x:Key="ComboBoxBackground" Color="#212121" />
         <SolidColorBrush x:Key="ComboBoxBackgroundPointerOver" Color="#323232" />
         <SolidColorBrush x:Key="ComboBoxBackgroundPressed" Color="#272726" />
         <SolidColorBrush x:Key="ComboBoxBackgroundDisabled" Color="#3F3F3D" />
-        <SolidColorBrush x:Key="ComboBoxBackgroundUnfocused" Color="#2D2D2D" />
+        <SolidColorBrush x:Key="ComboBoxBackgroundUnfocused" Color="#212121" />
         <SolidColorBrush x:Key="ComboBoxBorderBrush" Color="#353535" />
         <SolidColorBrush x:Key="ComboBoxBorderBrushPointerOver" Color="#353535" />
         <SolidColorBrush x:Key="ComboBoxBorderBrushPressed" Color="#353535" />
         <SolidColorBrush x:Key="ComboBoxBorderBrushDisabled" Color="#454545" />
+        
+        
+        <!-- listbox -->
+        <Color x:Key="SystemListLowColor">#19FFFFFF</Color>
+        <Color x:Key="SystemListMediumColor">#33FFFFFF</Color>
+        <AccentSolidColorBrush Hue="{DynamicResource AccentHue}" x:Key="SystemControlHighlightListAccentHighBrush" BaseColor="{DynamicResource SystemAccentColor}" Opacity="0.9" />
+        <AccentSolidColorBrush Hue="{DynamicResource AccentHue}" x:Key="SystemControlHighlightListAccentMediumBrush" BaseColor="{DynamicResource SystemAccentColor}" Opacity="0.6" />
+        <AccentSolidColorBrush Hue="{DynamicResource AccentHue}" x:Key="SystemControlHighlightListAccentLowBrush" BaseColor="{DynamicResource SystemAccentColor}" Opacity="0.8" />
+        <!--<AccentSolidColorBrush Hue="{DynamicResource AccentHue}" x:Key="SystemControlHighlightListMediumBrush" BaseColor="{StaticResource SystemListMediumColor}" />
+        <AccentSolidColorBrush Hue="{DynamicResource AccentHue}" x:Key="SystemControlHighlightListLowBrush" BaseColor="{StaticResource SystemListLowColor}" />-->
+
+        <!-- dock -->
+        <AccentSolidColorBrush Hue="{DynamicResource AccentHue}" BaseColor="{DynamicResource SystemAccentColor}" x:Key="DockThemeAccentBrush" />
     </Styles.Resources>
 </Styles>

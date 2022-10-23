@@ -1,11 +1,22 @@
 using System;
+using Avalonia;
 using AvaloniaStyles;
+using AvaloniaStyles.Utils;
 
 namespace WoWDatabaseEditorCore.Avalonia.Services.AppearanceService
 {
     public class AvaloniaThemeStyle : SystemTheme
     {
+        public static double BaseHue = 0.7f;
         internal static SystemThemeOptions Theme = SystemThemeOptions.LightWindows11;
+
+        internal static HslDiff AccentHue
+        {
+            set
+            {
+                Application.Current.Resources["AccentHue"] = value;
+            }
+        }
 
         internal static bool UseDock
         {

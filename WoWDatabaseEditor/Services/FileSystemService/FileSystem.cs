@@ -1,8 +1,10 @@
 using System;
 using System.IO;
+using WDE.Common.Profiles;
 using WDE.Common.Services;
 using WDE.Common.Tasks;
 using WDE.Module.Attributes;
+using WDE.Profiles.Services;
 
 namespace WoWDatabaseEditorCore.Services.FileSystemService
 {
@@ -17,18 +19,10 @@ namespace WoWDatabaseEditorCore.Services.FileSystemService
         {
             this.vfs = vfs;
             var localDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            vfs.MountDirectory("~", Path.Join(localDataPath, APPLICATION_FOLDER, TryGetProfile()));
+            vfs.MountDirectory("~", Path.Join(localDataPath, APPLICATION_FOLDER, ProfileService.ReadDefaultProfileKey()));
+            vfs.MountDirectory("/common", Path.Join(localDataPath, APPLICATION_FOLDER, "common"));
         }
 
-        private string TryGetProfile()
-        {
-            if (GlobalApplication.Arguments.IsArgumentSet("profile") &&
-                GlobalApplication.Arguments.GetValue("profile") != null)
-                return GlobalApplication.Arguments.GetValue("profile")!;
-            if (File.Exists("profile"))
-                return File.ReadAllText("profile");
-            return "default";
-        }
 
         public bool Exists(string virtualPath)
         {

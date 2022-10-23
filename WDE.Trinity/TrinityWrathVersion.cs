@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;
+using WDE.Common.Types;
 using WDE.Module.Attributes;
 
 namespace WDE.Trinity
@@ -12,6 +13,7 @@ namespace WDE.Trinity
     {
         public string Tag => "TrinityWrath";
         public string FriendlyName => "TrinityCore Wrath of the Lich King";
+        public ImageUri Icon { get; } = new ImageUri("Icons/core_tc.png");
         public ISmartScriptFeatures SmartScriptFeatures => this;
         public IConditionFeatures ConditionFeatures => this;
         public IGameVersionFeatures GameVersionFeatures => this;

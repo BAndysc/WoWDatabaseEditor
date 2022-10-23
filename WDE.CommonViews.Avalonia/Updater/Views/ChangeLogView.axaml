@@ -15,7 +15,7 @@
         <converters:DataTimeToStringConverter Format="m" x:Key="TimeConverter"/>
     </UserControl.Resources>
     <DockPanel LastChildFill="True">
-        <Border BorderThickness="0,0,0,2" BorderBrush="#FF5FA2DA" DockPanel.Dock="Top">
+        <Border BorderThickness="0,0,0,2" BorderBrush="{DynamicResource AccentColorMedium}" DockPanel.Dock="Top">
             <TextBlock VerticalAlignment="Bottom" 
                        FontSize="34"
                        FontFamily="Segoe UI Light" 
@@ -35,7 +35,7 @@
                                 <ItemsPresenter.ItemTemplate>
                                     <DataTemplate x:DataType="system:String">
                                         <DockPanel LastChildFill="True">
-                                            <Ellipse Width="4" Height="4" VerticalAlignment="Top" Margin="0,4,8,0" Fill="#FF5FA2DA" DockPanel.Dock="Left" />
+                                            <Ellipse Width="4" Height="4" VerticalAlignment="Top" Margin="0,4,8,0" Fill="{DynamicResource AccentColorMedium}" DockPanel.Dock="Left" />
                                             <TextBlock Margin="0,0,0,5" FontSize="14" Text="{CompiledBinding .}" TextWrapping="WrapWithOverflow"></TextBlock>
                                         </DockPanel>
                                     </DataTemplate>

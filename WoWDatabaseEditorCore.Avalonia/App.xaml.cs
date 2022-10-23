@@ -41,7 +41,6 @@ namespace WoWDatabaseEditorCore.Avalonia
     public class App : PrismApplication
     {
         private IModulesManager? modulesManager;
-        private SplashScreenView? splash;
 
         public App()
         {
@@ -257,29 +256,46 @@ namespace WoWDatabaseEditorCore.Avalonia
 
         public static Window? MainApp;
 
+        private Window? splashScreenWindow;
+
+        private IGlobalServiceRoot? globalServiceRoot;
+
+        public override void OnFrameworkInitializationCompleted()
+        {
+            splashScreenWindow = new SplashScreenWindow();
+            splashScreenWindow.Show();
+
+            DispatcherTimer.RunOnce(() =>
+            {
+                base.Initialize();
+                if (AvaloniaThemeStyle.UseDock)
+                {
+                    ((IContainerRegistry)Container).RegisterSingleton<MainWindowWithDocking>();
+                    MainApp = Container.Resolve<MainWindowWithDocking>();
+                }
+                else
+                {
+                    ((IContainerRegistry)Container).RegisterSingleton<MainWindow>();
+                    MainApp = Container.Resolve<MainWindow>();
+                }
+
+                MainApp.DataContext = Container.Resolve<MainWindowViewModel>();
+                this.InitializeShell(MainApp);
+
+                globalServiceRoot = Container.Resolve<IGlobalServiceRoot>();
+
+                IEventAggregator? eventAggregator = Container.Resolve<IEventAggregator>();
+                eventAggregator.GetEvent<AllModulesLoaded>().Publish();
+                Container.Resolve<ILoadingEventAggregator>().Publish<EditorLoaded>();
+                MainApp.ShowActivated = true;
+                MainApp.Show();
+                splashScreenWindow.Close();
+            }, TimeSpan.FromMilliseconds(160));
+        }
+
         public override void Initialize()
         {
-            base.Initialize();
             AvaloniaXamlLoader.Load(this);
-            
-            
-            if (AvaloniaThemeStyle.UseDock)
-            {
-                ((IContainerRegistry)Container).RegisterSingleton<MainWindowWithDocking>();
-                MainApp = Container.Resolve<MainWindowWithDocking>();
-            }
-            else
-            {
-                ((IContainerRegistry)Container).RegisterSingleton<MainWindow>();
-                MainApp = Container.Resolve<MainWindow>();
-            }
-            MainApp.DataContext = Container.Resolve<MainWindowViewModel>();
-            this.InitializeShell(MainApp);
-
-            
-            IEventAggregator? eventAggregator = Container.Resolve<IEventAggregator>();
-            eventAggregator.GetEvent<AllModulesLoaded>().Publish();
-            Container.Resolve<ILoadingEventAggregator>().Publish<EditorLoaded>();
         }
 
         private class Conflict

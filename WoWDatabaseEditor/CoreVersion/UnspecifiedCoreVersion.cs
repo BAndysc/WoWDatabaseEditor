@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;
+using WDE.Common.Types;
 using WDE.Module.Attributes;
 
 namespace WoWDatabaseEditorCore.CoreVersion
@@ -12,6 +13,7 @@ namespace WoWDatabaseEditorCore.CoreVersion
     {
         public string Tag => "unspecified";
         public string FriendlyName => "Unspecified";
+        public ImageUri Icon { get; } = new ImageUri("Icons/core_unknown.png");
         public IDatabaseFeatures DatabaseFeatures => this;
         public ISmartScriptFeatures SmartScriptFeatures => this;
         public IConditionFeatures ConditionFeatures => this;

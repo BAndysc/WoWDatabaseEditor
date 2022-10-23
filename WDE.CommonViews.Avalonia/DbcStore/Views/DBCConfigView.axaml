@@ -8,44 +8,46 @@
              mvvm:ViewModelLocator.AutoWireViewModel="False"
              x:DataType="viewModels:DBCConfigViewModel"
              mc:Ignorable="d">
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="Auto" />
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
-        <SettingsHeader Grid.ColumnSpan="3" Grid.Row="0" Text="DBC settings" />
-        
-        <TextBlock Text="Path to DBC/DB2s" Grid.Row="1" VerticalAlignment="Center" />
-        <TextBox Margin="5" Grid.Column="1" Grid.Row="1"
-                 Text="{CompiledBinding Path, Mode=TwoWay}" Padding="5" Name="Path" />
-        <Button Grid.Column="2" Grid.Row="1" Padding="5" VerticalAlignment="Center" Command="{CompiledBinding PickFolder}">...</Button>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <SettingsHeader Grid.ColumnSpan="3" Grid.Row="0" Text="DBC settings" />
+            
+            <TextBlock Text="Path to DBC/DB2s" Grid.Row="1" VerticalAlignment="Center" />
+            <TextBox Margin="5" Grid.Column="1" Grid.Row="1"
+                     Text="{CompiledBinding Path, Mode=TwoWay}" Padding="5" Name="Path" />
+            <Button Grid.Column="2" Grid.Row="1" Padding="5" VerticalAlignment="Center" Command="{CompiledBinding PickFolder}">...</Button>
 
-        <TextBlock Text="DBC/DB2 Version" VerticalAlignment="Center" Grid.Row="2" />
-        <ComboBox Name="dbcVersion" Grid.Row="2" Grid.Column="1" Margin="5" Padding="5"
-                  VerticalAlignment="Center" HorizontalAlignment="Stretch"
-                  Items="{CompiledBinding DBCVersions}"
-                  SelectedItem="{CompiledBinding DBCVersion}" />
-      
-        <TextBlock Text="DBC Locale" VerticalAlignment="Center" Grid.Row="3" />
-        <ComboBox Name="dbcLocale" Grid.Row="3" Grid.Column="1" Margin="5" Padding="5"
-                  VerticalAlignment="Center" HorizontalAlignment="Stretch"
-                  Items="{CompiledBinding DBCLocales}"
-                  IsEnabled="{CompiledBinding CanPickLocale}"
-                  SelectedItem="{CompiledBinding DBCLocale}" />
+            <TextBlock Text="DBC/DB2 Version" VerticalAlignment="Center" Grid.Row="2" />
+            <ComboBox Name="dbcVersion" Grid.Row="2" Grid.Column="1" Margin="5" Padding="5"
+                      VerticalAlignment="Center" HorizontalAlignment="Stretch"
+                      Items="{CompiledBinding DBCVersions}"
+                      SelectedItem="{CompiledBinding DBCVersion}" />
+          
+            <TextBlock Text="DBC Locale" VerticalAlignment="Center" Grid.Row="3" />
+            <ComboBox Name="dbcLocale" Grid.Row="3" Grid.Column="1" Margin="5" Padding="5"
+                      VerticalAlignment="Center" HorizontalAlignment="Stretch"
+                      Items="{CompiledBinding DBCLocales}"
+                      IsEnabled="{CompiledBinding CanPickLocale}"
+                      SelectedItem="{CompiledBinding DBCLocale}" />
 
-        
-        <SettingsHeader Grid.ColumnSpan="3" Grid.Row="4" Text="Advanced" />
-        <TextBlock Text="Skip loading dbc" VerticalAlignment="Center" Grid.Row="5" />
-        <CheckBox Grid.Column="1" IsChecked="{CompiledBinding SkipLoading}" Padding="0" Margin="0" Grid.Row="5"
-                  HorizontalAlignment="Center" VerticalAlignment="Center" />
-    </Grid>
+            
+            <SettingsHeader Grid.ColumnSpan="3" Grid.Row="4" Text="Advanced" />
+            <TextBlock Text="Skip loading dbc" VerticalAlignment="Center" Grid.Row="5" />
+            <CheckBox Grid.Column="1" IsChecked="{CompiledBinding SkipLoading}" Padding="0" Margin="0" Grid.Row="5"
+                      HorizontalAlignment="Center" VerticalAlignment="Center" />
+        </Grid>
+    </ScrollViewer>
 </UserControl>

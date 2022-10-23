@@ -12,6 +12,7 @@ namespace AvaloniaStyles.Controls
     {
         public static readonly StyledProperty<Panel?> OutOfBoundsPanelProperty = AvaloniaProperty.Register<ToolbarPanel, Panel?>(nameof(OutOfBoundsPanel));
         public static readonly StyledProperty<bool> IsOverflowProperty = AvaloniaProperty.Register<ToolbarPanel, bool>("IsOverflow");
+        public static readonly StyledProperty<double> SpacingProperty = AvaloniaProperty.Register<ToolbarPanel, double>("Spacing", 4);
 
         private List<IControl> _overflowControls = new List<IControl>();
         
@@ -26,10 +27,18 @@ namespace AvaloniaStyles.Controls
             get => (bool)GetValue(IsOverflowProperty);
             set => SetValue(IsOverflowProperty, value);
         }
+        
+        public double Spacing
+        {
+            get => GetValue(SpacingProperty);
+            set => SetValue(SpacingProperty, value);
+        }
 
         static ToolbarPanel()
         {
             OutOfBoundsPanelProperty.Changed.AddClassHandler<ToolbarPanel>((panel, e) => panel.OnChangedPanel(e));
+            AffectsMeasure<ToolbarPanel>(SpacingProperty);
+            AffectsArrange<ToolbarPanel>(SpacingProperty);
         }
 
         private void OnChangedPanel(AvaloniaPropertyChangedEventArgs changed)
@@ -70,7 +79,7 @@ namespace AvaloniaStyles.Controls
         
         protected override Size MeasureOverride(Size availableSize)
         {
-            var spacing = 4;
+            var spacing = Spacing;
             double desiredWidth = 0;
             double desiredHeight = 0;
             var children = Children;
@@ -116,7 +125,7 @@ namespace AvaloniaStyles.Controls
             var children = Children;
             Rect rcChild = new Rect(finalSize);
             double previousChildSize = 0.0;
-            var spacing = 4;
+            var spacing = Spacing;
 
             int spacerCount = 0;
             double totalDesiredWidth = 0;

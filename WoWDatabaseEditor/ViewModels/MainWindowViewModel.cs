@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using Prism.Commands;
 using Prism.Events;
 using WDE.Common.Events;
@@ -21,6 +22,8 @@ using WDE.MVVM.Observable;
 using WoWDatabaseEditor.Providers;
 using WoWDatabaseEditorCore.Managers;
 using WoWDatabaseEditorCore.Services;
+using WoWDatabaseEditorCore.Services.FindAnywhere;
+using WoWDatabaseEditorCore.Services.Profiles;
 using WoWDatabaseEditorCore.Services.QuickAccess;
 
 namespace WoWDatabaseEditorCore.ViewModels
@@ -35,6 +38,7 @@ namespace WoWDatabaseEditorCore.ViewModels
         private readonly Func<TextDocumentViewModel> textDocumentCreator;
         private readonly ISolutionTasksService solutionTasksService;
         private readonly ITablesToolService tablesToolService;
+        private readonly IGlobalServiceRoot globalServiceRoot;
 
         private readonly Dictionary<string, ITool> toolById = new();
 
@@ -57,8 +61,13 @@ namespace WoWDatabaseEditorCore.ViewModels
             IProgramNameService programNameService,
             IMainThread mainThread,
             IQuickAccessViewModel quickAccessViewModel,
+            IWindowManager windowManager,
             ITablesToolService tablesToolService,
-            QuickGoToViewModel quickGoToViewModel)
+            Lazy<IGameViewService> gameViewService,
+            QuickGoToViewModel quickGoToViewModel,
+            ProfilesViewModel profilesViewModel,
+            IGlobalServiceRoot globalServiceRoot,
+            Func<IFindAnywhereDialogViewModel> findAnywhereCreator)
         {
             DocumentManager = documentManager;
             StatusBar = statusBar;
@@ -68,6 +77,7 @@ namespace WoWDatabaseEditorCore.ViewModels
             this.textDocumentCreator = textDocumentCreator;
             this.solutionTasksService = solutionTasksService;
             this.tablesToolService = tablesToolService;
+            this.globalServiceRoot = globalServiceRoot;
             Title = programNameService.Title;
             Subtitle = programNameService.Subtitle;
             OpenDocument = new DelegateCommand<IMenuDocumentItem>(ShowDocument);
@@ -105,6 +115,16 @@ namespace WoWDatabaseEditorCore.ViewModels
                 if (DocumentManager.ActiveDocument is ISolutionItemDocument {SolutionItem: { }} sid)
                     solutionSqlService.OpenDocumentWithSqlFor(sid.SolutionItem);
             }, () => DocumentManager.ActiveDocument != null && DocumentManager.ActiveDocument is ISolutionItemDocument);
+
+            FindAnywhereCommand = new AsyncAutoCommand(async () =>
+            {
+                await windowManager.ShowDialog(findAnywhereCreator());
+            });
+
+            Open3DCommand = new DelegateCommand(() =>
+            {
+                gameViewService.Value.Open();
+            });
             
             DocumentManager.ToObservable(dm => dm.ActiveDocument)
                 .SubscribeAction(_ =>
@@ -118,6 +138,7 @@ namespace WoWDatabaseEditorCore.ViewModels
             RelatedSolutionItems = relatedSolutionItems;
             QuickAccessViewModel = quickAccessViewModel;
             QuickGoToViewModel = quickGoToViewModel;
+            ProfilesViewModel = profilesViewModel;
 
             MenuItemProviders = menuItemProvider.GetItems();
 
@@ -163,6 +184,7 @@ namespace WoWDatabaseEditorCore.ViewModels
         public RelatedSolutionItems RelatedSolutionItems { get; }
         public IQuickAccessViewModel QuickAccessViewModel { get; }
         public QuickGoToViewModel QuickGoToViewModel { get; }
+        public ProfilesViewModel ProfilesViewModel { get; }
 
         public List<IMainMenuItem> MenuItemProviders { get; }
 
@@ -183,6 +205,10 @@ namespace WoWDatabaseEditorCore.ViewModels
         
         public DelegateCommand GenerateCurrentSqlCommand { get; }
 
+        public ICommand FindAnywhereCommand { get; }
+        
+        public ICommand Open3DCommand { get; }
+        
         public bool ShowTablesList
         {
             get => tablesToolService.Visibility;
@@ -328,5 +354,10 @@ namespace WoWDatabaseEditorCore.ViewModels
 
         public event Action CloseRequest = delegate{};
         public event Action ForceCloseRequest = delegate{};
+
+        public void NotifyWillClose()
+        {
+            globalServiceRoot.Dispose();
+        }
     }
 }

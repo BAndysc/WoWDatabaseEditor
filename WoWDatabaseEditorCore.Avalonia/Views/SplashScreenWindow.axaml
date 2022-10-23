@@ -1,0 +1,34 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="WoWDatabaseEditorCore.Avalonia.Views.SplashScreenWindow"
+        Width="500"
+        Height="330"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaChromeHints="NoChrome"
+        ExtendClientAreaTitleBarHeightHint="0"
+        Background="#2577BA"
+        CanResize="False"
+        WindowStartupLocation="CenterScreen"
+        ShowInTaskbar="True"
+        ShowActivated="True"
+        Title="TestWindow">
+    <Panel>
+        
+        <Grid ColumnDefinitions="2*,3*">
+            <Border BoxShadow=" 10 1 40 1 #40000000"  Background="#103B5E">
+                <Image Source="../Icon.png" Width="200" Height="200" VerticalAlignment="Center" HorizontalAlignment="Center" />
+            </Border>
+            <Border Background="#23000000" Grid.Column="1">
+                <StackPanel Margin="20,0,0,0" Orientation="Vertical" VerticalAlignment="Center">
+                    <TextBlock FontSize="18" Foreground="White" Opacity="0.7">loading...</TextBlock>
+                    <TextBlock FontSize="45" Foreground="White">WoW</TextBlock>
+                    <TextBlock FontSize="45" FontWeight="Light" Foreground="White">Database</TextBlock>
+                    <TextBlock FontSize="45" FontWeight="Light" Foreground="White">Editor</TextBlock>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Panel>
+</Window>

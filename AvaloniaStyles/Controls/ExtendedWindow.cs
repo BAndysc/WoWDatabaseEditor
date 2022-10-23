@@ -140,7 +140,11 @@ namespace AvaloniaStyles.Controls
             if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                 PseudoClasses.Add(":macos");
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
                 PseudoClasses.Add(":windows");
+                if (Environment.OSVersion.Version.Build >= 22000)
+                    PseudoClasses.Add(":win11");
+            }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
                 PseudoClasses.Add(":linux");
             SystemTheme.CustomScalingUpdated += SystemThemeOnCustomScalingUpdated;

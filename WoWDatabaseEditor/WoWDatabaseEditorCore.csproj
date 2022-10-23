@@ -11,6 +11,7 @@
     <OutputPath>..\bin\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Modules\WDE.Profiles\WDE.Profiles.csproj" />
     <ProjectReference Include="..\WDE.MVVM\WDE.MVVM.csproj" />
     <ProjectReference Include="..\WDE.Solutions\WDE.Solutions.csproj" />
     <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />

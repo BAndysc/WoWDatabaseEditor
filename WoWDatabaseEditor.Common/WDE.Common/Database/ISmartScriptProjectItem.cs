@@ -20,5 +20,18 @@ namespace WDE.Common.Database
         public int? Value2 { get; set; }
         public string? StringValue { get; set; }
         public string? Comment { get; set; }
+
+        public AbstractSmartScriptProjectItem() {}
+        
+        public AbstractSmartScriptProjectItem(ISmartScriptProjectItem item)
+        {
+            Id = item.Id;
+            ProjectId = item.ProjectId;
+            Type = item.Type;
+            Value = item.Value;
+            Value2 = item.Value2;
+            StringValue = item.StringValue;
+            Comment = item.Comment;
+        }
     }
 }

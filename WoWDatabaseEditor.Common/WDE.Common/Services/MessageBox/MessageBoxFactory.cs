@@ -4,6 +4,11 @@ using WDE.Common.Utils;
 
 namespace WDE.Common.Services.MessageBox
 {
+    public struct EscapeToClose
+    {
+        public static EscapeToClose style;
+    }
+    
     public class MessageBoxFactory<T>
     {
         private string windowTitle = "";
@@ -68,10 +73,10 @@ namespace WDE.Common.Services.MessageBox
         {
             return WithButton("Yes", returnValue, true, false);
         }
-        
-        public MessageBoxFactory<T> WithNoButton(T returnValue)
+
+        public MessageBoxFactory<T> WithNoButton(T returnValue, EscapeToClose? escapeToCancel = null)
         {
-            return WithButton("No", returnValue, false, false);
+            return WithButton("No", returnValue, false, escapeToCancel.HasValue);
         }
         
         public MessageBoxFactory<T> WithCancelButton(T returnValue)

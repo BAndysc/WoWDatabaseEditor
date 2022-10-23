@@ -23,7 +23,7 @@ public class AnniversarySummaryService : IAnniversarySummaryService
         this.timelineViewModelFactory = timelineViewModelFactory;
         this.userSettings = userSettings;
         data = userSettings.Get<Data>();
-        ShowAnniversaryBox = !data.HideSummaryBox;
+        ShowAnniversaryBox = false;
     }
     
     public void OpenSummary()

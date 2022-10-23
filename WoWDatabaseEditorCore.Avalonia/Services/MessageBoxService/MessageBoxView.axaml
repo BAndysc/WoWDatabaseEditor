@@ -32,7 +32,7 @@
         </ItemsPresenter.ItemTemplate>
         <ItemsPresenter.ItemsPanel>
             <ItemsPanelTemplate>
-                <StackPanel KeyboardNavigation.TabNavigation="Continue" />
+                <StretchStackPanel KeyboardNavigation.TabNavigation="Continue" />
             </ItemsPanelTemplate>
         </ItemsPresenter.ItemsPanel>
     </ItemsPresenter>

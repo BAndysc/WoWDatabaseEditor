@@ -13,16 +13,16 @@ public partial class VeryFastTableView : Control, IKeyboardNavigationHandler
     private static double ColumnSpacing = 10;
     private static double RowHeight = 28;
     private static double DrawingStartOffsetY = RowHeight;
-    private static SolidColorBrush OddRowBackground = new SolidColorBrush(Colors.White);
-    private static SolidColorBrush SelectedRowBackground = new SolidColorBrush(Color.FromRgb(87, 124, 219));
-    private static SolidColorBrush EvenRowBackground = new SolidColorBrush(Color.FromRgb(240, 240, 240));
-    private static SolidColorBrush HeaderBackground = new SolidColorBrush(Colors.White);
+    private static ISolidColorBrush OddRowBackground = new SolidColorBrush(Colors.White);
+    private static ISolidColorBrush SelectedRowBackground = new SolidColorBrush(Color.FromRgb(87, 124, 219));
+    private static ISolidColorBrush EvenRowBackground = new SolidColorBrush(Color.FromRgb(240, 240, 240));
+    private static ISolidColorBrush HeaderBackground = new SolidColorBrush(Colors.White);
     private static IPen HeaderBorderBackground = new Pen(new SolidColorBrush(Color.FromRgb(220, 220, 220)), 1);
     private static IPen BorderPen = new Pen(new SolidColorBrush(Colors.Black), 1);
     private static IPen FocusPen = new Pen(new SolidColorBrush(Colors.Black), 2);
     private static IPen FocusOuterPen = new Pen(new SolidColorBrush(Colors.White), 3);
-    private static SolidColorBrush TextBrush = new SolidColorBrush(Color.FromRgb(41, 41, 41));
-    private static SolidColorBrush FocusTextBrush = OddRowBackground;
+    private static ISolidColorBrush TextBrush = new SolidColorBrush(Color.FromRgb(41, 41, 41));
+    private static ISolidColorBrush FocusTextBrush = OddRowBackground;
 
     public int ColumnsCount => Columns?.Count ?? 0;
 

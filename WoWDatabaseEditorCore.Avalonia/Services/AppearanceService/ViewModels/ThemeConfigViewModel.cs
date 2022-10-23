@@ -1,21 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Input;
+using Avalonia;
+using Avalonia.Media;
+using Avalonia.Threading;
+using AvaloniaStyles;
+using AvaloniaStyles.Controls;
+using AvaloniaStyles.Utils;
 using Prism.Commands;
 using Prism.Mvvm;
+using PropertyChanged.SourceGenerator;
+using SixLabors.ImageSharp.ColorSpaces;
 using WDE.Common;
 using WDE.Common.Managers;
 using WDE.Common.Tasks;
 using WDE.Module.Attributes;
+using WDE.MVVM;
+using WDE.MVVM.Observable;
 using WoWDatabaseEditorCore.Avalonia.Services.AppearanceService.Providers;
 using WoWDatabaseEditorCore.Avalonia.Views;
 
 namespace WoWDatabaseEditorCore.Avalonia.Services.AppearanceService.ViewModels
 {
     [AutoRegister]
-    public class ThemeConfigViewModel : BindableBase, IFirstTimeWizardConfigurable
+    public partial class ThemeConfigViewModel : ObservableBase, IFirstTimeWizardConfigurable
     {
         private Theme name;
         private List<Theme> themes;
@@ -35,11 +46,29 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.AppearanceService.ViewModels
             {
                 themeManager.SetTheme(ThemeName);
                 themeManager.UpdateCustomScaling(useCustomScaling ? ScalingValue : null);
-                settings.UpdateSettings(ThemeName, UseCustomScaling ? Math.Clamp(ScalingValue, 0.5, 4) : null);
+                settings.UpdateSettings(ThemeName, UseCustomScaling ? Math.Clamp(ScalingValue, 0.5, 4) : null, color.H - AvaloniaThemeStyle.BaseHue, color.S * 2 - 1, lightness * 2 -1);
                 IsModified = false;
             });
+
+            lightness = (currentSettings.Lightness + 1)/2;
+            color = new HslColor(currentSettings.Hue+AvaloniaThemeStyle.BaseHue, (currentSettings.Saturation + 1)/2, currentSettings.Lightness);
+
+            this.ToObservable(() => Color)
+                .Skip(1)
+                .SubscribeAction(x =>
+                {
+                    AvaloniaThemeStyle.AccentHue = new HslDiff(color.H, color.S, lightness);
+                    IsModified = true;
+                });
+            this.ToObservable(() => Lightness)
+                .Skip(1)
+                .SubscribeAction(x =>
+                {
+                    AvaloniaThemeStyle.AccentHue = new HslDiff(color.H, color.S, lightness);
+                    IsModified = true;
+                });
         }
-        
+
         public Theme CurrentThemeName { get; }
 
         public Theme ThemeName
@@ -53,7 +82,10 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.AppearanceService.ViewModels
         }
 
         public bool AllowCustomScaling { get; }
-        
+
+        [Notify] private HslColor color;
+        [Notify] private double lightness = 0.5;
+
         public List<Theme> Themes
         {
             get => themes;

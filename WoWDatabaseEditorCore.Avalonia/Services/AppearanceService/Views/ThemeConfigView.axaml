@@ -7,22 +7,32 @@
              xmlns:viewModels="clr-namespace:WoWDatabaseEditorCore.Avalonia.Services.AppearanceService.ViewModels"
              x:DataType="viewModels:ThemeConfigViewModel"
              prism:ViewModelLocator.AutoWireViewModel="False">
-    <StackPanel>
-        <controls:SettingsHeader Text="Themes" />
-        <TextBlock VerticalAlignment="Center"  Text="{CompiledBinding CurrentThemeName, StringFormat=Current: {0}}" />
-        <TextBlock VerticalAlignment="Center"  Text="All:" />
-        <ComboBox Margin="30,0,0,0" VerticalAlignment="Top" Items="{CompiledBinding Themes}"
-                  SelectedItem="{CompiledBinding ThemeName, Mode=TwoWay}" />
-        
-        <controls:SettingsHeader Text="Scaling" />
-        <TextBlock VerticalAlignment="Center"  Text="{CompiledBinding RecommendedScalingPercentage, StringFormat=Recommended scaling: {0}%}" />
-        <TextBlock VerticalAlignment="Center"  Text="Custom scaling [EXPERIMENTAL]:" />
-        <CheckBox IsEnabled="{CompiledBinding AllowCustomScaling}" Margin="30,0,0,0" IsChecked="{CompiledBinding UseCustomScaling}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
-            <Grid ColumnDefinitions="Auto,*" IsEnabled="{CompiledBinding UseCustomScaling}">
-                <TextBlock Width="90" VerticalAlignment="Center" Text="{CompiledBinding ScalingValuePercentage, StringFormat={}{0}%}"></TextBlock>
-                <Slider Grid.Column="1" HorizontalAlignment="Stretch" Name="ScalingSlider" Minimum="0.5" Maximum="4" Value="{CompiledBinding ScalingValue, Mode=TwoWay}" SmallChange="0.1" LargeChange="0.5" />
-            </Grid>
-        </CheckBox>
-        <TextBlock IsVisible="{CompiledBinding AllowCustomScaling, Converter={x:Static BoolConverters.Not}}">Info: Custom scaling is available only on Windows</TextBlock>
-    </StackPanel>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel>
+            <controls:SettingsHeader Text="Themes" />
+            <TextBlock VerticalAlignment="Center"  Text="{CompiledBinding CurrentThemeName, StringFormat=Current: {0}}" />
+            <TextBlock VerticalAlignment="Center"  Text="All:" />
+            <ComboBox Margin="30,0,0,0" VerticalAlignment="Top" Items="{CompiledBinding Themes}"
+                      SelectedItem="{CompiledBinding ThemeName, Mode=TwoWay}" />
+            
+            <controls:SettingsHeader Text="Accent color" />
+            <DockPanel>
+                <Slider DockPanel.Dock="Right" Orientation="Vertical" VerticalAlignment="Stretch" Value="{CompiledBinding Lightness}" Name="Lightness" Minimum="0" Maximum="1" />
+                <ColorPicker Lightness="{CompiledBinding Lightness}" SelectedColor="{CompiledBinding Color, Mode=TwoWay}" MaxWidth="500" Height="300" />
+            </DockPanel>
+
+            <TextBlock Opacity="0.7">Info: Custom accent color is available only in Windows 11 Theme.</TextBlock>
+            
+            <controls:SettingsHeader Text="Scaling" />
+            <TextBlock VerticalAlignment="Center"  Text="{CompiledBinding RecommendedScalingPercentage, StringFormat=Recommended scaling: {0}%}" />
+            <TextBlock VerticalAlignment="Center"  Text="Custom scaling [EXPERIMENTAL]:" />
+            <CheckBox IsEnabled="{CompiledBinding AllowCustomScaling}" Margin="30,0,0,0" IsChecked="{CompiledBinding UseCustomScaling}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+                <Grid ColumnDefinitions="Auto,*" IsEnabled="{CompiledBinding UseCustomScaling}">
+                    <TextBlock Width="90" VerticalAlignment="Center" Text="{CompiledBinding ScalingValuePercentage, StringFormat={}{0}%}"></TextBlock>
+                    <Slider Grid.Column="1" HorizontalAlignment="Stretch" Name="ScalingSlider" Minimum="0.5" Maximum="4" Value="{CompiledBinding ScalingValue, Mode=TwoWay}" SmallChange="0.1" LargeChange="0.5" />
+                </Grid>
+            </CheckBox>
+            <TextBlock Opacity="0.7" IsVisible="{CompiledBinding AllowCustomScaling, Converter={x:Static BoolConverters.Not}}">Info: Custom scaling is available only on Windows</TextBlock>
+        </StackPanel>
+    </ScrollViewer>
 </UserControl>

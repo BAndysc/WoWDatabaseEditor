@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;
+using WDE.Common.Types;
 using WDE.Module.Attributes;
 
 namespace WDE.AzerothCore
@@ -12,6 +13,7 @@ namespace WDE.AzerothCore
     {
         public string Tag => "Azeroth";
         public string FriendlyName => "AzerothCore Wrath of the Lich King";
+        public ImageUri Icon { get; } = new ImageUri("Icons/core_ac.png");
         public ISmartScriptFeatures SmartScriptFeatures => this;
         public IConditionFeatures ConditionFeatures => this;
         public IGameVersionFeatures GameVersionFeatures => this;

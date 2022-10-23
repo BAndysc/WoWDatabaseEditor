@@ -41,7 +41,7 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
             currentFilter = AutoDispose(new ReactiveProperty<Func<CheckableSelectOption<T>, bool>>(_ => true,
                 Compare.CreateEqualityComparer<Func<CheckableSelectOption<T>, bool>>((_, _) => false, _ => 0)));
             AutoDispose(this.items.Connect()
-                .Filter(currentFilter)
+                .Filter(currentFilter, ListFilterPolicy.ClearAndReplace)
                 .Sort(comparer)
                 .Bind(out outFilteredList)
                 .Subscribe());

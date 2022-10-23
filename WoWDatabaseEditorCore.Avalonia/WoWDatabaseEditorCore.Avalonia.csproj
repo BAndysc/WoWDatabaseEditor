@@ -21,6 +21,11 @@
     </ItemGroup>
     <Import Project="..\Avalonia.props" />
     <ItemGroup>
+        <PackageReference Include="PropertyChanged.SourceGenerator">
+            <Version>1.0.3</Version>
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
         <PackageReference Include="Avalonia.Controls.TreeDataGrid" Version="0.10.10" />
         <PackageReference Include="Avalonia.Diagnostics" Version="$(AvaloniaVersion)" />
         <PackageReference Include="Avalonia.Controls.DataGrid" Version="$(AvaloniaVersion)" />

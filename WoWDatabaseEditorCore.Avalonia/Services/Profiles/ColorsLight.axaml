@@ -1,0 +1,14 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Design.PreviewWith>
+        <Border Padding="20">
+            <!-- Add Controls for Previewer Here -->
+        </Border>
+    </Design.PreviewWith>
+
+    <Styles.Resources>
+        <SolidColorBrush Color="#40FFFFFF" x:Key="CoreButtonBackground" />
+        <SolidColorBrush Color="#60FFFFFF" x:Key="CoreButtonPointerOverBackground" />
+        <SolidColorBrush Color="#20FFFFFF" x:Key="CoreButtonPressedBackground" />
+    </Styles.Resources>
+</Styles>

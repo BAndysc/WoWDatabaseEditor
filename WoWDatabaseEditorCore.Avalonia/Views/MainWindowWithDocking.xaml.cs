@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
+using AvaloniaStyles;
 using AvaloniaStyles.Controls;
 using Dock.Avalonia.Controls;
 using Newtonsoft.Json;
@@ -50,6 +51,14 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
             InitializeComponent();
             this.AttachDevTools();
             mainWindowHolder.Window = this;
+            if (SystemTheme.EffectiveTheme is SystemThemeOptions.LightWindows11 or SystemThemeOptions.DarkWindows11)
+            {
+                this.Classes.Add("win11");
+            }
+            else
+            {
+                this.Classes.Add("win10");
+            }
             PersistentDockDataTemplate.DocumentManager = documentManager;
         }
 
@@ -126,10 +135,15 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
             });
             fileSystem.WriteAllText(DockSettingsFile,
                 JsonConvert.SerializeObject(avaloniaDockAdapter.SerializeDock(), Formatting.Indented));
-            if (!realClosing && DataContext is MainWindowViewModel closeAwareViewModel)
+            if (DataContext is MainWindowViewModel closeAwareViewModel)
             {
-                TryClose(closeAwareViewModel).ListenErrors();
-                e.Cancel = true;
+                if (!realClosing)
+                {
+                    TryClose(closeAwareViewModel).ListenErrors();
+                    e.Cancel = true;
+                }
+                else
+                    closeAwareViewModel.NotifyWillClose();
             }
         }
 

@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
@@ -39,6 +40,13 @@ namespace AvaloniaStyles.Controls
         public BaseMessageBoxWindow()
         {
             this.AttachDevTools();
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                PseudoClasses.Add(":macos");
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                PseudoClasses.Add(":windows");
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                PseudoClasses.Add(":linux");
+
         }
         
         Type IStyleable.StyleKey => typeof(BaseMessageBoxWindow);

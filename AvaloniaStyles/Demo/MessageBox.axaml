@@ -17,10 +17,9 @@
                 BorderBrush="#70FFFFFF"
                 ClipToBounds="False" />
     </controls:BaseMessageBoxWindow.Image>
-    <StackPanel>
+    <StretchStackPanel>
         <Button Click="Button_OnClick">Save</Button>
         <Button Click="Button_OnClick">Don't save</Button>
-        <MenuItem Header="-" />
         <Button Click="Button_OnClick">Cancel</Button>
-    </StackPanel>
+    </StretchStackPanel>
 </controls:BaseMessageBoxWindow>
