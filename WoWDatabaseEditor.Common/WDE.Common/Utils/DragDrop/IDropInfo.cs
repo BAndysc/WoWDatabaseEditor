@@ -17,6 +17,11 @@ namespace WDE.Common.Utils.DragDrop
         void Drop(IDropInfo dropInfo);
     }
 
+    public interface IDragSource
+    {
+        bool CanDrag(object data);
+    }
+
     public enum DragDropEffects
     {
         /// <summary>
@@ -57,6 +62,7 @@ namespace WDE.Common.Utils.DragDrop
         object Data { get; }
         object? TargetItem { get; }
         int InsertIndex { get; }
+        bool IsCopy { get; }
         DropTargetAdorners DropTargetAdorner { get; set; }
         DragDropEffects Effects { get; set; }
         RelativeInsertPosition InsertPosition { get; set; }

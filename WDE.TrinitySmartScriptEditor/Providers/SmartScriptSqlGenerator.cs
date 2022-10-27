@@ -42,7 +42,7 @@ namespace WDE.TrinitySmartScriptEditor.Providers
 
         public async Task<IQuery> GenerateSql(SmartScriptSolutionItem item)
         {
-            SmartScript script = new(item, smartFactory.Value, smartDataManager.Value, new EmptyMessageboxService());
+            SmartScript script = new(item, smartFactory.Value, smartDataManager.Value, new EmptyMessageboxService(), importer.Value);
             var lines = (await database.Value.GetScriptFor(item.Entry, item.SmartType)).ToList();
             var conditions = database.Value.GetConditionsForScript(item.Entry, item.SmartType).ToList();
             await importer.Value.Import(script, true, lines, conditions, null);

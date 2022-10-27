@@ -84,6 +84,9 @@ namespace WDE.Conditions.Data
         [JsonProperty(PropertyName = "description")]
         public string Description { get; set; } = "Missing description";
         
+        [JsonProperty(PropertyName = "negdescription")]
+        public string? NegativeDescription { get; set; }
+        
         [JsonProperty(PropertyName = "help")]
         public string? Help { get; set; }
 

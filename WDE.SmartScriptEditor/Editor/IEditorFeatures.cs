@@ -8,6 +8,7 @@ namespace WDE.SmartScriptEditor.Editor
         bool SupportsTargetCondition { get; }
         bool SupportsEventTimerId { get; }
         bool SourceHasPosition { get; }
+        ParametersCount ConditionParametersCount { get; }
         ParametersCount EventParametersCount { get; }
         ParametersCount ActionParametersCount { get; }
         ParametersCount TargetParametersCount { get; }

@@ -28,6 +28,10 @@ namespace WDE.TrinityMySqlDatabase.Models
         [PrimaryKey]
         public int ElseGroup { get; set; }
 
+        public int ConditionIndex { get; set; }
+
+        public int ConditionParent { get; set; }
+
         [Column(Name = "ConditionTypeOrReference")]
         [PrimaryKey]
         public int ConditionType { get; set; }
@@ -38,15 +42,17 @@ namespace WDE.TrinityMySqlDatabase.Models
 
         [Column(Name = "ConditionValue1")]
         [PrimaryKey]
-        public int ConditionValue1 { get; set; }
+        public long ConditionValue1 { get; set; }
 
         [Column(Name = "ConditionValue2")]
         [PrimaryKey]
-        public int ConditionValue2 { get; set; }
+        public long ConditionValue2 { get; set; }
 
         [Column(Name = "ConditionValue3")]
         [PrimaryKey]
-        public int ConditionValue3 { get; set; }
+        public long ConditionValue3 { get; set; }
+        
+        public long ConditionValue4 { get; set; }
 
         [Column(Name = "NegativeCondition")]
         [PrimaryKey]
@@ -69,6 +75,7 @@ namespace WDE.TrinityMySqlDatabase.Models
             ConditionValue1 = otherLine.ConditionValue1;
             ConditionValue2 = otherLine.ConditionValue2;
             ConditionValue3 = otherLine.ConditionValue3;
+            ConditionValue4 = otherLine.ConditionValue4;
             NegativeCondition = otherLine.NegativeCondition;
             Comment = otherLine.Comment;
         }

@@ -9,6 +9,7 @@ using WDE.Common.Solution;
 using WDE.Module.Attributes;
 using WDE.SmartScriptEditor;
 using WDE.SmartScriptEditor.Data;
+using WDE.SmartScriptEditor.Editor;
 using WDE.SmartScriptEditor.Editor.UserControls;
 using WDE.SmartScriptEditor.Exporter;
 using WDE.SmartScriptEditor.Models;
@@ -26,6 +27,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
         private readonly ISolutionItemNameRegistry nameRegistry;
         private readonly IDatabaseProvider databaseProvider;
         private readonly IMessageBoxService messageBoxService;
+        private readonly ISmartScriptImporter importer;
         private readonly IConditionQueryGenerator conditionQueryGenerator;
 
         public TrinityCoreSmartScriptExporter(ISmartFactory smartFactory,
@@ -34,6 +36,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
             ISolutionItemNameRegistry nameRegistry,
             IDatabaseProvider databaseProvider,
             IMessageBoxService messageBoxService,
+            ISmartScriptImporter importer,
             IConditionQueryGenerator conditionQueryGenerator)
         {
             this.smartFactory = smartFactory;
@@ -42,6 +45,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
             this.nameRegistry = nameRegistry;
             this.databaseProvider = databaseProvider;
             this.messageBoxService = messageBoxService;
+            this.importer = importer;
             this.conditionQueryGenerator = conditionQueryGenerator;
         }
         
@@ -277,7 +281,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                                     
                                     AdjustCoreCompatibleAction(actualAction);
                         
-                                    after.Parent = new SmartScript(new SmartScriptSolutionItem(currentInlineActionListId.Value, SmartScriptType.TimedActionList), smartFactory, smartDataManager, messageBoxService);
+                                    after.Parent = new SmartScript(new SmartScriptSolutionItem(currentInlineActionListId.Value, SmartScriptType.TimedActionList), smartFactory, smartDataManager, messageBoxService, importer);
                                     after.AddAction(actualAction);
                         
                                     var serialized = after.ToSmartScriptLines(currentInlineActionListId.Value, SmartScriptType.TimedActionList, timedEventId++, false, 0);

@@ -127,7 +127,7 @@ namespace WDE.SmartScriptEditor.Data
             if (!conditionDataManager.HasConditionData(id))
                 throw new NullReferenceException("No data for condition id " + id);
 
-            SmartCondition ev = new(id, currentCoreVersion.Current.SmartScriptFeatures.SupportsConditionTargetVictim);
+            SmartCondition ev = new(id, currentCoreVersion.Current.SmartScriptFeatures.SupportsConditionTargetVictim, editorFeatures);
             var raw = conditionDataManager.GetConditionData(id);
             SetParameterObjects(ev, raw);
 
@@ -144,13 +144,12 @@ namespace WDE.SmartScriptEditor.Data
 
         public SmartCondition ConditionFactory(IConditionLine line)
         {
-            SmartCondition condition = ConditionFactory(line.ConditionType);
+            SmartCondition condition = ConditionFactory(line.ConditionIndex == 0 ? line.ConditionType : -line.ConditionType);
 
             condition.Inverted.Value = line.NegativeCondition;
             condition.ConditionTarget.Value = line.ConditionTarget;
-            condition.GetParameter(0).Value = line.ConditionValue1;
-            condition.GetParameter(1).Value = line.ConditionValue2;
-            condition.GetParameter(2).Value = line.ConditionValue3;
+            for (int i = 0; i < condition.ParametersCount; ++i)
+                condition.GetParameter(i).Value = line.GetConditionValue(i);
 
             return condition;
         }
@@ -465,10 +464,11 @@ namespace WDE.SmartScriptEditor.Data
             }
         }
         
-        private void SetParameterObjects(SmartBaseElement element, ConditionJsonData data)
+        private void SetParameterObjects(SmartCondition element, ConditionJsonData data)
         {
             element.Id = data.Id;
             element.ReadableHint = data.Description;
+            element.NegativeReadableHint = data.NegativeDescription;
 
             for (var i = 0; i < element.ParametersCount; ++i)
                 element.GetParameter(i).IsUsed = false;

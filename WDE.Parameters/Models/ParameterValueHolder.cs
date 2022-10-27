@@ -56,7 +56,8 @@ namespace WDE.Parameters.Models
             {
                 if (parameter == value)
                     return;
-                
+
+                hasCachedStringValue = false;
                 parameter = value;
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(String));

@@ -15,6 +15,7 @@ namespace WDE.Conditions.ViewModels
         public static int ParametersCount => 3;
         private ParameterValueHolder<long>[] parameters = new ParameterValueHolder<long>[ParametersCount];
         private string? readableHint;
+        private string? negativeReadableHint;
         private int conditionId;
 
         public int ConditionId => conditionId;
@@ -51,6 +52,8 @@ namespace WDE.Conditions.ViewModels
                 string? readable = readableHint;
                 if (readable == null)
                     return "";
+                if (negativeReadableHint != null && Invert.Value != 0)
+                    readable = negativeReadableHint;
                 return Smart.Format(readable, new
                 {
                     target = "[s]" + ConditionTarget + "[/s]",
@@ -70,6 +73,7 @@ namespace WDE.Conditions.ViewModels
             var old = conditionId;
             conditionId = data.Id;
             readableHint = data.Description;
+            negativeReadableHint = data.NegativeDescription;
             RaisePropertyChanged(nameof(Readable));
             ConditionChanged?.Invoke(this, old, conditionId);
         }

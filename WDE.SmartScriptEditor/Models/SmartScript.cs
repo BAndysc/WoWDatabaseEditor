@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using WDE.Common.Database;
 using WDE.Common.Services.MessageBox;
 using WDE.SmartScriptEditor.Data;
+using WDE.SmartScriptEditor.Editor;
 
 namespace WDE.SmartScriptEditor.Models
 {
@@ -10,7 +11,8 @@ namespace WDE.SmartScriptEditor.Models
         public SmartScript(ISmartScriptSolutionItem item,
             ISmartFactory smartFactory,
             ISmartDataManager smartDataManager,
-            IMessageBoxService messageBoxService) : base (smartFactory, smartDataManager, messageBoxService)
+            IMessageBoxService messageBoxService,
+            ISmartScriptImporter importer) : base (smartFactory, smartDataManager, messageBoxService, importer)
         {
             EntryOrGuid = (int) item.Entry;
             SourceType = item.SmartType;

@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using WDE.Common.Database;
 using WDE.Common.Services.MessageBox;
 using WDE.MVVM.Observable;
 using WDE.SmartScriptEditor.Data;
+using WDE.SmartScriptEditor.Editor;
 using WDE.SmartScriptEditor.Models.Helpers;
 
 namespace WDE.SmartScriptEditor.Models
@@ -15,6 +17,7 @@ namespace WDE.SmartScriptEditor.Models
         protected readonly ISmartFactory smartFactory;
         protected readonly ISmartDataManager smartDataManager;
         protected readonly IMessageBoxService messageBoxService;
+        private readonly ISmartScriptImporter importer;
 
         public readonly ObservableCollection<SmartEvent> Events;
         
@@ -49,11 +52,13 @@ namespace WDE.SmartScriptEditor.Models
             
         public SmartScriptBase(ISmartFactory smartFactory,
             ISmartDataManager smartDataManager,
-            IMessageBoxService messageBoxService)
+            IMessageBoxService messageBoxService,
+            ISmartScriptImporter importer)
         {
             this.smartFactory = smartFactory;
             this.smartDataManager = smartDataManager;
             this.messageBoxService = messageBoxService;
+            this.importer = importer;
             Events = new ObservableCollection<SmartEvent>();
             selectionHelper = new SmartSelectionHelper(this);
             selectionHelper.ScriptSelectedChanged += CallScriptSelectedChanged;
@@ -128,7 +133,7 @@ namespace WDE.SmartScriptEditor.Models
             List<SmartEvent> newEvents = new();
             SmartEvent? currentEvent = null;
             var prevIndex = 0;
-            var conds = ParseConditions(conditions);
+            var conds = importer.ImportConditions(this, conditions?.ToList() ?? new List<IConditionLine>());
 
             foreach (ISmartScriptLine line in lines)
             {
@@ -160,40 +165,6 @@ namespace WDE.SmartScriptEditor.Models
                 }
             }
             return newEvents;
-        }
-
-        public Dictionary<int, List<SmartCondition>> ParseConditions(IEnumerable<IConditionLine>? conditions)
-        {
-            Dictionary<int, List<SmartCondition>> conds = new();
-            if (conditions != null)
-            {
-                Dictionary<int, int> prevElseGroupPerLine = new();
-                foreach (IConditionLine line in conditions)
-                {
-                    SmartCondition? condition = SafeConditionFactory(line);
-
-                    if (condition == null)
-                        continue;
-
-                    if (!conds.ContainsKey(line.SourceGroup - 1))
-                        conds[line.SourceGroup - 1] = new List<SmartCondition>();
-
-                    if (!prevElseGroupPerLine.TryGetValue(line.SourceGroup - 1, out var prevElseGroup))
-                        prevElseGroup = prevElseGroupPerLine[line.SourceGroup - 1] = 0;
-                    
-                    if (prevElseGroup != line.ElseGroup && conds[line.SourceGroup - 1].Count > 0)
-                    {
-                        var or = SafeConditionFactory(-1);
-                        if (or != null)
-                            conds[line.SourceGroup - 1].Add(or);
-                        prevElseGroupPerLine[line.SourceGroup - 1] = line.ElseGroup;
-                    }
-
-                    conds[line.SourceGroup - 1].Add(condition);
-                }
-            }
-
-            return conds;
         }
 
         public void SafeUpdateSource(SmartSource source, int targetId)

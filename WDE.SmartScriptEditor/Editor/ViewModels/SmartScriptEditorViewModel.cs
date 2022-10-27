@@ -1063,7 +1063,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 itemNameRegistry.GetName(newItem) :
                 itemNameRegistry.GetName(newItem) + $" ({newItem.Entry})";
             
-            Script = new SmartScript(this.item, smartFactory, smartDataManager, messageBoxService);
+            Script = new SmartScript(this.item, smartFactory, smartDataManager, messageBoxService, smartScriptImporter);
 
             bool updateInspections = false;
             new Thread(() =>
@@ -1538,11 +1538,15 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
         private Task<bool> EditSelectedActionsCommand()
         {
-            return EditActionCommand(Events.SelectMany(e => e.Actions).Where(a => a.IsSelected).ToList());
+            var actions = Events.SelectMany(e => e.Actions).Where(a => a.IsSelected).ToList();
+            if (actions.Count == 0)
+                return Task.FromResult(false);
+            return EditActionCommand(actions);
         }
         
         private ParametersEditViewModel ConditionEditViewModel(IReadOnlyList<SmartCondition> originalConditions, bool editOriginal = false)
         {
+            Debug.Assert(originalConditions.Count > 0);
             IReadOnlyList<SmartCondition> conditionsToEdit = editOriginal? originalConditions : originalConditions.Select(c => c.Copy()).ToList();
             if (!editOriginal)
                 conditionsToEdit.Each(c => c.Parent = originalConditions[0].Parent); // fake parent
@@ -1600,7 +1604,10 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         
         private Task<bool> EditSelectedConditionsCommand()
         {
-            return EditConditionCommand(Events.SelectMany(e => e.Conditions).Where(a => a.IsSelected).ToList());
+            var conditions = Events.SelectMany(e => e.Conditions).Where(a => a.IsSelected).ToList();
+            if (conditions.Count == 0)
+                return Task.FromResult(false);
+            return EditConditionCommand(conditions);
         }
 
         private void EditSelectedEventsCommand()
