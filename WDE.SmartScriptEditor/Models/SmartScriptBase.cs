@@ -173,8 +173,9 @@ namespace WDE.SmartScriptEditor.Models
             {
                 smartFactory.UpdateSource(source, targetId);
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Console.WriteLine(e);
                 messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
                     .SetIcon(MessageBoxIcon.Error)
                     .SetTitle("Unknown source")
@@ -189,8 +190,9 @@ namespace WDE.SmartScriptEditor.Models
             {
                 return smartFactory.ActionFactory(actionId, source, target);
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Console.WriteLine(e);
                 messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
                     .SetIcon(MessageBoxIcon.Warning)
                     .SetTitle("Unknown action")
@@ -209,10 +211,11 @@ namespace WDE.SmartScriptEditor.Models
             }
             catch (Exception e)
             {
+                Console.WriteLine(e);
                 messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
                     .SetIcon(MessageBoxIcon.Warning)
                     .SetTitle("Unknown action")
-                    .SetMainInstruction("Skipping action: " + e.Message)
+                    .SetMainInstruction($"Skipping action {line.ActionType} (or source {line.SourceType} or target {line.TargetType}): " + e.Message)
                     .Build());
             }
 
@@ -225,8 +228,9 @@ namespace WDE.SmartScriptEditor.Models
             {
                 return smartFactory.ConditionFactory(line);
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Console.WriteLine(e);
                 messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
                     .SetIcon(MessageBoxIcon.Warning)
                     .SetTitle("Unknown condition")
@@ -243,8 +247,9 @@ namespace WDE.SmartScriptEditor.Models
             {
                 return smartFactory.ConditionFactory(id);
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Console.WriteLine(e);
                 messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
                     .SetIcon(MessageBoxIcon.Warning)
                     .SetTitle("Unknown condition")
@@ -261,8 +266,9 @@ namespace WDE.SmartScriptEditor.Models
             {
                 return smartFactory.EventFactory(line);
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Console.WriteLine(e);
                 messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
                     .SetIcon(MessageBoxIcon.Warning)
                     .SetTitle("Unknown event")
