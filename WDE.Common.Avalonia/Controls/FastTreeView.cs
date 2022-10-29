@@ -6,6 +6,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.VisualTree;
+using WDE.Common.Avalonia.Utils;
 using WDE.Common.Utils;
 
 namespace WDE.Common.Avalonia.Controls;
@@ -22,22 +23,11 @@ public abstract class FastTreeView<P, C> : Control where P : IParentType where C
     
     public const float RowHeight = 20;
     public const float Indent = 20;
-
-    private static bool GetResource<T>(string key, T defaultVal, out T outT)
-    {
-        outT = defaultVal;
-        if (Application.Current.Styles.TryGetResource(key, out var res) && res is T t)
-        {
-            outT = t;
-            return true;
-        }
-        return false;
-    }
     
     static FastTreeView()
     {
-        GetResource("FastTableView.SelectedRowBackground", HoverRowBackground, out HoverRowBackground);
-        GetResource("FastTableView.HoverRowBackground", HoverRowBackground, out HoverRowBackground);
+        ResourcesUtils.Get("FastTableView.SelectedRowBackground", HoverRowBackground, out HoverRowBackground);
+        ResourcesUtils.Get("FastTableView.HoverRowBackground", HoverRowBackground, out HoverRowBackground);
         ItemsProperty.Changed.AddClassHandler<FastTreeView<P, C>>((tree, args) => tree.ItemsChanged(args));
         AffectsRender<FastTreeView<P, C>>(IsFilteredProperty);
         AffectsMeasure<FastTreeView<P, C>>(IsFilteredProperty);

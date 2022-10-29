@@ -568,10 +568,10 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                         .ToList();
 
                     var conditionLines = selectedEvents
-                        .SelectMany((e, index) => e.ToConditionLines(SmartConstants.ConditionSourceSmartScript, script.EntryOrGuid, script.SourceType, index))
+                        .SelectMany((e, index) => this.smartScriptExporter.ToDatabaseCompatibleConditions(script, e, index))
                         .ToList();
 
-                    var clibpoardEvents = new ClipboardEvents() { Lines = eventLines, Conditions = conditionLines };
+                    var clibpoardEvents = new ClipboardEvents() { Lines = eventLines, Conditions = conditionLines.Select(l => new AbstractConditionLine(l)).ToList() };
 
                     string serialized = JsonConvert.SerializeObject(clibpoardEvents);
                     clipboard.SetText(serialized);
@@ -601,9 +601,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                         foreach (SmartCondition c in selectedConditions)
                             fakeEvent.Conditions.Add(c.Copy());
 
-                        var lines = fakeEvent
-                            .ToConditionLines(SmartConstants.ConditionSourceSmartScript, script.EntryOrGuid, script.SourceType, 0);
-                        var serialized = JsonConvert.SerializeObject(new ClipboardEvents(){ Conditions = lines.ToList() });
+                        var lines = smartScriptExporter.ToDatabaseCompatibleConditions(script, fakeEvent, 0);
+                        var serialized = JsonConvert.SerializeObject(new ClipboardEvents(){ Conditions = lines.Select(l => new AbstractConditionLine(l)).ToList() });
                         clipboard.SetText(serialized);
                     }
                 }
@@ -1231,18 +1230,38 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             if (e == null)
                 return;
 
-            int? conditionId = await ShowConditionPicker();
-            
-            if (!conditionId.HasValue)
-                return;
+            if (editorFeatures.UseExternalConditionsEditor)
+            {
+                var conditions = smartScriptExporter.ToDatabaseCompatibleConditions(script, e);
+                var result = await conditionEditService.EditConditions(SmartConstants.ConditionSourceSmartScript, conditions);
+                if (result == null)
+                    return;
 
-            var conditionData = conditionDataManager.GetConditionData(conditionId.Value);
-
-            SmartCondition ev = smartFactory.ConditionFactory(conditionId.Value);
-            ev.Parent = e;
+                var parsed =  smartScriptImporter.ImportConditions(script,
+                    result.Select(l => new AbstractConditionLine(0, 0, 0, 0, l)).ToList());
+                using var _ = script.BulkEdit("Edit conditions");
+                e.Conditions.RemoveAll();
+                if (parsed.TryGetValue(0, out var flatList))
+                {
+                    foreach (var cond in flatList)
+                        e.Conditions.Add(cond);
+                }
+            }
+            else
+            {
+                int? conditionId = await ShowConditionPicker();
             
-            if ((conditionData.Parameters?.Count ?? 0) == 0 || await EditConditionCommand(new []{ev}))
-                e.Conditions.Add(ev);
+                if (!conditionId.HasValue)
+                    return;
+
+                var conditionData = conditionDataManager.GetConditionData(conditionId.Value);
+
+                SmartCondition ev = smartFactory.ConditionFactory(conditionId.Value);
+                ev.Parent = e;
+            
+                if ((conditionData.Parameters?.Count ?? 0) == 0 || await EditConditionCommand(new []{ev}))
+                    e.Conditions.Add(ev);   
+            }
         }
 
         private async Task<int?> ShowConditionPicker()
@@ -1411,6 +1430,9 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             var firstTargetParameter = editableGroup.Parameters[^actionsToEdit[0].Target.ParametersCount];
             
             editableGroup.Add("Comment", actionsToEdit, originalActions, a => a.CommentParameter);
+
+            bool modifiedSourceConditions = false;
+            bool modifiedTargetConditions = false;
             
             if (!isComment)
             {
@@ -1476,21 +1498,38 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 
                 if (editorFeatures.SupportsTargetCondition)
                 {
-                    // var sourceConditions = new ReactiveProperty<string>($"Conditions ({obj.Source.Conditions?.Count ?? 0})");
-                    // actionList.Add(new EditableActionData("Conditions", "Source", async () =>
-                    // {
-                    //     var newConditions = await conditionEditService.EditConditions(29, obj.Source.Conditions);
-                    //     obj.Source.Conditions = newConditions?.ToList();
-                    //     sourceConditions.Value = $"Conditions ({obj.Source.Conditions?.Count ?? 0})";
-                    // }, sourceConditions));
-                    //
-                    // var targetConditions = new ReactiveProperty<string>($"Conditions ({obj.Target.Conditions?.Count ?? 0})");
-                    // actionList.Add(new EditableActionData("Conditions", "Target", async () =>
-                    // {
-                    //     var newConditions = await conditionEditService.EditConditions(29, obj.Target.Conditions);
-                    //     obj.Target.Conditions = newConditions?.ToList();
-                    //     targetConditions.Value = $"Conditions ({obj.Target.Conditions?.Count ?? 0})";
-                    // }, targetConditions, canPickTarget.Not()));   
+                    var anyHasSourceConditions = actionsToEdit.Any(a => a.Source.Conditions != null && a.Source.Conditions.Count > 0);
+                    var anyHasTargetConditions = actionsToEdit.Any(a => a.Target.Conditions != null && a.Target.Conditions.Count > 0);
+                    var editingMultipleSourceConditions = anyHasSourceConditions && actionsToEdit.Count > 1;
+                    var editingMultipleTargetConditions = anyHasTargetConditions && actionsToEdit.Count > 1;
+
+                    var sourceConditions = new ReactiveProperty<string>(editingMultipleSourceConditions ? "Conditions (warning: multiple actions)" : $"Conditions ({actionsToEdit[0].Source.Conditions?.Count ?? 0})");
+                    editableGroup.Add(new EditableActionData("Conditions", "Source", async () =>
+                    {
+                        var newConditions = await conditionEditService.EditConditions(30, actionsToEdit[0].Source.Conditions);
+                        if (newConditions != null)
+                        {
+                            var conditions = newConditions.ToList();
+                            modifiedSourceConditions = true;
+                            foreach (var action in actionsToEdit)
+                                action.Source.Conditions = conditions.ToList();
+                            sourceConditions.Value = $"Conditions ({actionsToEdit[0].Source.Conditions?.Count ?? 0})";
+                        }
+                    }, sourceConditions));
+                    
+                    var targetConditions = new ReactiveProperty<string>(editingMultipleTargetConditions ? "Conditions (warning: multiple actions)" : $"Conditions ({actionsToEdit[0].Target.Conditions?.Count ?? 0})");
+                    editableGroup.Add(new EditableActionData("Conditions", "Target", async () =>
+                    {
+                        var newConditions = await conditionEditService.EditConditions(30, actionsToEdit[0].Target.Conditions);
+                        if (newConditions != null)
+                        {
+                            var conditions = newConditions.ToList();
+                            modifiedTargetConditions = true;
+                            foreach (var action in actionsToEdit)
+                                action.Target.Conditions = conditions.ToList();
+                            targetConditions.Value = $"Conditions ({actionsToEdit[0].Target.Conditions?.Count ?? 0})";
+                        }
+                    }, targetConditions, canPickTarget.Not()));
                 }
             }
 
@@ -1513,12 +1552,20 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                         sourceType.ApplyToOriginals();
                         targetType.ApplyToOriginals();
                         editableGroup.Apply();
-
-                        // if (editorFeatures.SupportsTargetCondition)
-                        // {
-                        //     actions.Source.Conditions = obj.Source.Conditions;
-                        //     actions.Target.Conditions = obj.Target.Conditions;
-                        // }
+                        
+                        if (!editOriginal && editorFeatures.SupportsTargetCondition)
+                        {
+                            if (modifiedSourceConditions)
+                            {
+                                foreach (var action in originalActions)
+                                    action.Source.Conditions = actionsToEdit[0].Source.Conditions?.ToList();
+                            }
+                            if (modifiedTargetConditions)
+                            {
+                                foreach (var action in originalActions)
+                                    action.Target.Conditions = actionsToEdit[0].Target.Conditions?.ToList();
+                            }
+                        }
                     }
                 }, focusFirstGroup: "Action", context: actionsToEdit[0]); 
             viewModel.AutoDispose(actionType);
@@ -1633,7 +1680,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         
         private ParametersEditViewModel EventEditViewModel(IReadOnlyList<SmartEvent> originalEvents, bool editOriginal = false)
         {
-            IReadOnlyList<SmartEvent> eventsToEdit = editOriginal ? originalEvents : originalEvents.Select(e => e.ShallowCopy()).ToList();
+            IReadOnlyList<SmartEvent> eventsToEdit = editOriginal ? originalEvents : originalEvents.Select(e => e.CopyWithConditions()).ToList();
             if (!editOriginal)
                 eventsToEdit.Each(e => e.Parent = originalEvents[0].Parent);
 
@@ -1665,6 +1712,30 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 editableGroup.Add("General", eventsToEdit, originalEvents, e => e.TimerId);
             }
 
+            bool modifiedConditions = false;
+            var anyHasConditions = eventsToEdit.Any(e => e.Conditions.Count > 0);
+            var editingMultipleConditions = anyHasConditions && eventsToEdit.Count > 1;
+
+            var sourceConditions = new ReactiveProperty<string>(editingMultipleConditions ? "Conditions (warning: multiple events)" : $"Conditions ({eventsToEdit[0].Conditions?.Count ?? 0})");
+            editableGroup.Add(new EditableActionData("Conditions", "General", async () =>
+            {
+                var oldConditions = smartScriptExporter.ToDatabaseCompatibleConditions(script, eventsToEdit[0]);
+                var newConditions = await conditionEditService.EditConditions(22, oldConditions);
+                if (newConditions != null)
+                {
+                    var conditions = newConditions.ToList();
+                    var smartConditions = smartScriptImporter.ImportConditions(script, conditions);
+                    modifiedConditions = true;
+                    foreach (var @event in eventsToEdit)
+                    {
+                        @event.Conditions.RemoveAll();
+                        foreach (var c in smartConditions)
+                            @event.Conditions.Add(c.Copy());
+                    }
+                    sourceConditions.Value = $"Conditions ({eventsToEdit[0].Conditions?.Count ?? 0})";
+                }
+            }, sourceConditions));
+
             editableGroup.Add(new EditableActionData("Event", "General", async () =>
             {
                 int? newEventIndex = await ShowEventPicker();
@@ -1688,6 +1759,15 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     {
                         eventType.ApplyToOriginals();
                         editableGroup.Apply();
+                        if (!editOriginal && modifiedConditions)
+                        {
+                            foreach (var e in originalEvents)
+                            {
+                                e.Conditions.RemoveAll();
+                                foreach (var c in eventsToEdit[0].Conditions)
+                                    e.Conditions.Add(c.Copy());
+                            }
+                        }
                     }
                 },
                 "Event specific", context: eventsToEdit[0]);

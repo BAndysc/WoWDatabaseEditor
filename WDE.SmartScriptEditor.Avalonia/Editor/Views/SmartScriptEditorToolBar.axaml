@@ -7,6 +7,6 @@
              x:DataType="viewModels:SmartScriptEditorViewModel"
              x:Class="WDE.SmartScriptEditor.Avalonia.Editor.Views.SmartScriptEditorToolBar">
     <ToolbarPanel>
-        <Button Command="{CompiledBinding RemoveAllCommands}">Remove all comments</Button>
+        <ButtonImage Image="Icons/icon_remove_comment.png" Command="{CompiledBinding RemoveAllCommands}" ToolTip.Tip="Remove all comments" />
     </ToolbarPanel>
 </UserControl>

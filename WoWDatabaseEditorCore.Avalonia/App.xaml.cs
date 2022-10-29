@@ -28,6 +28,7 @@ using WDE.Module;
 using WDE.Module.Attributes;
 using WoWDatabaseEditorCore.Avalonia.Managers;
 using WoWDatabaseEditorCore.Avalonia.Services.AppearanceService;
+using WoWDatabaseEditorCore.Avalonia.Services.AppearanceService.Providers;
 using WoWDatabaseEditorCore.Avalonia.Views;
 using WoWDatabaseEditorCore.CoreVersion;
 using WoWDatabaseEditorCore.Services.FileSystemService;
@@ -247,7 +248,6 @@ namespace WoWDatabaseEditorCore.Avalonia
 
             Container.Resolve<IDebugConsole>();
             
-            var themeManager = Container.Resolve<IThemeManager>();
             ViewBind.AppViewLocator = Container.Resolve<IViewLocator>();
 
             IMessageBoxService messageBoxService = Container.Resolve<IMessageBoxService>();
@@ -295,6 +295,8 @@ namespace WoWDatabaseEditorCore.Avalonia
 
         public override void Initialize()
         {
+            // we have to initialize theme manager as soon as possible in order to correctly apply the style
+            var themeManager = new ThemeManager(new ThemeSettingsProvider(new UserSettings(new FileSystem(new VirtualFileSystem()), new Lazy<IStatusBar>(new DummyStatusBar()))));
             AvaloniaXamlLoader.Load(this);
         }
 

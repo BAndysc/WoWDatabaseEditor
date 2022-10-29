@@ -611,7 +611,7 @@ namespace WDE.Common.Avalonia.DnD
 
         private static bool IsCopyKey(DragEventArgs e)
         {
-            return true || e.KeyModifiers.HasFlag(platformCopyKeyModifier);
+            return e.KeyModifiers.HasFlag(platformCopyKeyModifier);
         }
     }
     

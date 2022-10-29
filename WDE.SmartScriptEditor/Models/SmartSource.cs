@@ -15,7 +15,7 @@ namespace WDE.SmartScriptEditor.Models
     public class SmartSource : SmartBaseElement
     {
         protected readonly IEditorFeatures features;
-        public event Action<SmartSource, IList<ICondition>?, IList<ICondition>?> OnConditionsChanged = delegate { };
+        public event Action<SmartSource, IReadOnlyList<ICondition>?, IReadOnlyList<ICondition>?> OnConditionsChanged = delegate { };
         
         protected SmartAction? parent;
         
@@ -69,8 +69,8 @@ namespace WDE.SmartScriptEditor.Models
             set => GetFloatParameter(3).Value = value;
         }
 
-        private IList<ICondition>? conditions;
-        public IList<ICondition>? Conditions
+        private IReadOnlyList<ICondition>? conditions;
+        public IReadOnlyList<ICondition>? Conditions
         {
             get => conditions;
             set

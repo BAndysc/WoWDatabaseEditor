@@ -1,6 +1,7 @@
 using System;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Templates;
 using Prism.Ioc;
 using WDE.Common.Windows;
@@ -47,6 +48,7 @@ namespace WDE.Common.Avalonia.Utils
             if (view != null && targetLocation != null)
             {
                 Type? type = targetLocation.GetType();
+                //targetLocation.SetValue(ContentControl.ContentProperty, view);
                 type.GetProperty("Content")?.SetValue(targetLocation, view);
             }
         }

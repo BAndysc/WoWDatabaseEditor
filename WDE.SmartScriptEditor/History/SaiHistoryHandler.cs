@@ -295,7 +295,7 @@ namespace WDE.SmartScriptEditor.History
             PushAction(new SmartIdChangedAction<SmartCondition>((SmartCondition)condition, old, @new, (a, id) => smartFactory.UpdateCondition(a, id)));
         }   
         
-        private void SmartSourceOnConditionsChanged(SmartSource source, IList<ICondition>? old, IList<ICondition>? nnew)
+        private void SmartSourceOnConditionsChanged(SmartSource source, IReadOnlyList<ICondition>? old, IReadOnlyList<ICondition>? nnew)
         {
             PushAction(new SourceTargetConditionsChanged(source, old, nnew));
         }
@@ -533,11 +533,11 @@ namespace WDE.SmartScriptEditor.History
     public class SourceTargetConditionsChanged : IHistoryAction
     {
         private readonly SmartSource source;
-        private readonly IList<ICondition>? old;
-        private readonly IList<ICondition>? newConds;
+        private readonly IReadOnlyList<ICondition>? old;
+        private readonly IReadOnlyList<ICondition>? newConds;
         private readonly string readable;
 
-        public SourceTargetConditionsChanged(SmartSource source, IList<ICondition>? old, IList<ICondition>? newConds)
+        public SourceTargetConditionsChanged(SmartSource source, IReadOnlyList<ICondition>? old, IReadOnlyList<ICondition>? newConds)
         {
             this.source = source;
             this.old = old;

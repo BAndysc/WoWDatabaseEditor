@@ -222,7 +222,7 @@ namespace WDE.SmartScriptEditor.Models
             return null;
         }
         
-        public SmartCondition? SafeConditionFactory(IConditionLine line)
+        public SmartCondition? SafeConditionFactory(ICondition line)
         {
             try
             {

@@ -9,9 +9,9 @@
         
         <utils:HslDiff x:Key="AccentHue" H="0" S="1" L="0.5" />
         <!-- ccd4de-->
-        <AccentSolidColorBrush Hue="{DynamicResource AccentHue}" Color="#a8bcd5" x:Key="TitleBarBackground" />
-        <AccentSolidColorBrush Hue="{DynamicResource AccentHue}" Color="#a8bcd5" x:Key="WindowContentBackground" />
-        <AccentSolidColorBrush Hue="{DynamicResource AccentHue}" Color="#a8bcd5" x:Key="MainWindowContentBackground" /> <!-- dark: #293955-->
+        <AccentSolidColorBrush Hue="{DynamicResource AccentHue}" Color="#b0c0cf" x:Key="TitleBarBackground" />
+        <AccentSolidColorBrush Hue="{DynamicResource AccentHue}" Color="#b0c0cf" x:Key="WindowContentBackground" />
+        <AccentSolidColorBrush Hue="{DynamicResource AccentHue}" Color="#b0c0cf" x:Key="MainWindowContentBackground" /> <!-- dark: #293955-->
         
         <AccentSolidColorBrush Hue="{DynamicResource AccentHue}" Color="#007ACC" x:Key="StatusBarBackground" />
 

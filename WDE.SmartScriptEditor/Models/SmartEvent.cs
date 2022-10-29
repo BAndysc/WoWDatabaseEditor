@@ -213,6 +213,16 @@ namespace WDE.SmartScriptEditor.Models
             return shallow;
         }
 
+        public SmartEvent CopyWithConditions()
+        {
+            var shallow = ShallowCopy();
+
+            foreach (var condition in Conditions)
+                shallow.Conditions.Add(condition.Copy());
+            
+            return shallow;
+        }
+
         public SmartEvent ShallowCopy()
         {
             SmartEvent se = new(Id, features);

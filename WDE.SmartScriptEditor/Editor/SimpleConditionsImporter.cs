@@ -41,5 +41,30 @@ public class SimpleConditionsImporter : ISimpleConditionsImporter
         }
 
         return conds;
-    }   
+    }
+
+    public List<SmartCondition> ImportConditions(SmartScriptBase script, IReadOnlyList<ICondition> conditions)
+    {
+        List<SmartCondition> conds = new();
+        int prevElseGroup = 0;
+        foreach (ICondition line in conditions)
+        {
+            SmartCondition? condition = script.SafeConditionFactory(line);
+
+            if (condition == null)
+                continue;
+            
+            if (prevElseGroup != line.ElseGroup && conds.Count > 0)
+            {
+                var or = script.SafeConditionFactory(-1);
+                if (or != null)
+                    conds.Add(or);
+                prevElseGroup = line.ElseGroup;
+            }
+
+            conds.Add(condition);
+        }
+
+        return conds;
+    }
 }

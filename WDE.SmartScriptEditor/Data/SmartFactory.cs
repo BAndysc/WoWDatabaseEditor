@@ -142,7 +142,7 @@ namespace WDE.SmartScriptEditor.Data
             SetParameterObjects(smartCondition, conditionDataManager.GetConditionData(id));
         }
 
-        public SmartCondition ConditionFactory(IConditionLine line)
+        public SmartCondition ConditionFactory(ICondition line)
         {
             SmartCondition condition = ConditionFactory(line.ConditionIndex == 0 ? line.ConditionType : -line.ConditionType);
 

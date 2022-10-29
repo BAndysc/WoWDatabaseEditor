@@ -142,6 +142,7 @@ namespace WDE.SmartScriptEditor.Models
             se.DescriptionRules = DescriptionRules;
             se.inverted.Value = inverted.Value;
             se.conditionTarget.Value = conditionTarget.Value;
+            se.Indent = Indent;
             for (var i = 0; i < ParametersCount; ++i)
             {
                 se.GetParameter(i).Copy(GetParameter(i));

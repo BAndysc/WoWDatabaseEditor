@@ -1,13 +1,10 @@
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using WDE.Common.Database;
 using WDE.Common.Services.MessageBox;
 using WDE.Module.Attributes;
-using WDE.Parameters.Models;
 using WDE.SmartScriptEditor;
 using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Editor;
@@ -55,6 +52,11 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
         }
 
         public Dictionary<int, List<SmartCondition>> ImportConditions(SmartScriptBase script, IReadOnlyList<IConditionLine> lines)
+        {
+            return simpleConditionsImporter.ImportConditions(script, lines);
+        }
+
+        public List<SmartCondition> ImportConditions(SmartScriptBase script, IReadOnlyList<ICondition> lines)
         {
             return simpleConditionsImporter.ImportConditions(script, lines);
         }
