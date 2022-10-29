@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using WDE.Common.CoreVersion;
+using WDE.Common.Parameters;
 using WDE.Module.Attributes;
 using WDE.SmartScriptEditor.Editor;
 
@@ -17,5 +20,15 @@ namespace WDE.TrinitySmartScriptEditor.Editor
         public ParametersCount EventParametersCount { get; } = new ParametersCount(4, 0, 0);
         public ParametersCount ActionParametersCount { get; } = new ParametersCount(6, 0, 0);
         public ParametersCount TargetParametersCount { get; } = new ParametersCount(3, 4, 0);
+        public IParameter<long> ConditionTargetParameter { get; }
+
+        public TrinityEditorFeatures(ICurrentCoreVersion coreVersion)
+        {
+            var conditionTargetParam = new Parameter();
+            conditionTargetParam.Items = new Dictionary<long, SelectOption>() {[0] = new("Action invoker"), [1] = new("Object")};
+            if (coreVersion.Current.SmartScriptFeatures.SupportsConditionTargetVictim)
+                conditionTargetParam.Items.Add(2, new SelectOption("Victim"));
+            ConditionTargetParameter = conditionTargetParam;
+        }
     }
 }

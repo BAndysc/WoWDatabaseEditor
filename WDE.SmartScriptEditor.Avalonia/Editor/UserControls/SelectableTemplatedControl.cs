@@ -43,6 +43,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
         private ulong lastPressedTimestamp = 0;
         private int lastClickCount = 0;
         private bool lastPressedWithControlOn = false;
+        private bool lastPressedWithShiftOn = false;
         private Point pressPosition;
         protected override void OnPointerPressed(PointerPressedEventArgs e)
         {
@@ -51,6 +52,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
             lastPressedTimestamp = e.Timestamp;
             lastClickCount = e.ClickCount;
             lastPressedWithControlOn = IsMultiSelect(e.KeyModifiers);
+            lastPressedWithShiftOn = e.KeyModifiers.HasFlagFast(KeyModifiers.Shift);
             pressPosition = e.GetPosition(this);
 
             if (e.ClickCount == 1)

@@ -314,6 +314,11 @@ namespace WoWDatabaseEditorCore.Avalonia
     }
     public class MainThread : IMainThread
     {
+        public MainThread()
+        {
+            Profiler.SetupMainThread(this);
+        }
+        
         public void Delay(Action action, TimeSpan delay)
         {
             DispatcherTimer.RunOnce(action, delay);

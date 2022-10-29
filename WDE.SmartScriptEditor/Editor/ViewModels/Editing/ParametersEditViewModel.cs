@@ -41,7 +41,10 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
                 Readable = "(multiple)";
             
             foreach (EditableActionData act in editableGroup.Actions)
-                allParameters.Add(new EditableParameterActionViewModel(act));
+                if (act.Value != null)
+                    allParameters.Add(new NumberedEditableParameterActionViewModel(act));
+                else
+                    allParameters.Add(new EditableParameterActionViewModel(act));
 
             bool first = focusFirst;
             foreach (var parameter in editableGroup.Parameters)

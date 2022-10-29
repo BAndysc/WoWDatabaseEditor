@@ -14,6 +14,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.Views
         public DataTemplate? FlagParameter { get; set; }
         public DataTemplate? BoolParameter { get; set; }
         public DataTemplate? ButtonParameter { get; set; }
+        public DataTemplate? NumberedButtonParameter { get; set; }
         
         public IControl Build(object item)
         {
@@ -26,7 +27,9 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.Views
                 if (intParam.UseModernPicker && ItemsParameter != null)
                     return ItemsParameter.Build(item);
             }
-            else if (item is EditableParameterActionViewModel aevm && ButtonParameter != null)
+            else if (item is NumberedEditableParameterActionViewModel && NumberedButtonParameter != null)
+                return NumberedButtonParameter.Build(item);
+            else if (item is EditableParameterActionViewModel && ButtonParameter != null)
                 return ButtonParameter.Build(item);
             return Generic?.Build(item) ?? new Panel();
         }

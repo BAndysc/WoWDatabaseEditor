@@ -29,6 +29,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
         private readonly IDatabaseProvider databaseProvider;
         private readonly IMessageBoxService messageBoxService;
         private readonly ISmartScriptImporter importer;
+        private readonly IEditorFeatures editorFeatures;
         private readonly IConditionQueryGenerator conditionQueryGenerator;
 
         public TrinityCoreSmartScriptExporter(ISmartFactory smartFactory,
@@ -38,6 +39,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
             IDatabaseProvider databaseProvider,
             IMessageBoxService messageBoxService,
             ISmartScriptImporter importer,
+            IEditorFeatures editorFeatures,
             IConditionQueryGenerator conditionQueryGenerator)
         {
             this.smartFactory = smartFactory;
@@ -47,6 +49,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
             this.databaseProvider = databaseProvider;
             this.messageBoxService = messageBoxService;
             this.importer = importer;
+            this.editorFeatures = editorFeatures;
             this.conditionQueryGenerator = conditionQueryGenerator;
         }
 
@@ -319,7 +322,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                                     
                                     AdjustCoreCompatibleAction(actualAction);
                         
-                                    after.Parent = new SmartScript(new SmartScriptSolutionItem(currentInlineActionListId.Value, SmartScriptType.TimedActionList), smartFactory, smartDataManager, messageBoxService, importer);
+                                    after.Parent = new SmartScript(new SmartScriptSolutionItem(currentInlineActionListId.Value, SmartScriptType.TimedActionList), smartFactory, smartDataManager, messageBoxService, editorFeatures, importer);
                                     after.AddAction(actualAction);
                         
                                     var serialized = after.ToSmartScriptLines(currentInlineActionListId.Value, SmartScriptType.TimedActionList, timedEventId++, false, 0);

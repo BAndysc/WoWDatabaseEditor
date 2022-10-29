@@ -35,23 +35,21 @@ namespace WDE.SmartScriptEditor.Models
             }
         }
         
-        public SmartCondition(int id, bool supportsVictimTarget, IEditorFeatures features) : base(id, features.ConditionParametersCount, that => new ConstContextParameterValueHolder<long, SmartBaseElement>(Parameter.Instance, 0, that))
+        public SmartCondition(int id, IEditorFeatures features) : base(id, features.ConditionParametersCount, that => new ConstContextParameterValueHolder<long, SmartBaseElement>(Parameter.Instance, 0, that))
         {
             this.features = features;
-            var conditionTargetParam = new Parameter();
-            conditionTargetParam.Items = new Dictionary<long, SelectOption>() {[0] = new("Action invoker"), [1] = new("Object")};
-            if (supportsVictimTarget)
-                conditionTargetParam.Items.Add(2, new SelectOption("Victim"));
 
             inverted = new ParameterValueHolder<long>("Inverted", BoolParameter.Instance, 0);
-            conditionTarget = new ParameterValueHolder<long>("Condition target", conditionTargetParam, 0);
+            conditionTarget = new ParameterValueHolder<long>("Condition target", features.ConditionTargetParameter, 0);
             inverted.PropertyChanged += ((sender, value) =>
             {
                 CallOnChanged(sender);
                 OnPropertyChanged(nameof(IsInverted));
             });
             conditionTarget.PropertyChanged += ((sender, value) => CallOnChanged(sender));
-            Context.Add(conditionTarget);
+            while (Context.Count < 9)
+                Context.Add(null);
+            Context.Add(new ParameterWithContext(conditionTarget, this));
         }
         
         public int Indent { get; set; }
@@ -108,7 +106,7 @@ namespace WDE.SmartScriptEditor.Models
                 bool isNegative = inverted.Value != 0;
                 return Smart.Format(readable, new
                 {
-                    target = "[p=3]" + conditionTarget + "[/p]",
+                    target = "[p=9]" + conditionTarget + "[/p]",
                     pram1 = "[p=0]" + GetParameter(0) + "[/p]",
                     pram2 = "[p=1]" + GetParameter(1) + "[/p]",
                     pram3 = "[p=2]" + GetParameter(2) + "[/p]",
@@ -135,7 +133,7 @@ namespace WDE.SmartScriptEditor.Models
 
         public SmartCondition Copy()
         {
-            SmartCondition se = new(Id, conditionTarget.Parameter.Items?.Count >= 3, features);
+            SmartCondition se = new(Id, features);
             se.Comment = Comment;
             se.ReadableHint = ReadableHint;
             se.NegativeReadableHint = NegativeReadableHint;

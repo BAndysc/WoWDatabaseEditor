@@ -48,7 +48,7 @@ namespace WDE.SmartScriptEditor.Models
             }
         }
         
-        public IList<object> Context { get; }
+        public IList<object?> Context { get; }
         public List<DescriptionRule>? DescriptionRules { get; set; }
         public abstract string Readable { get; }
         public readonly int ParametersCount;
@@ -90,7 +90,7 @@ namespace WDE.SmartScriptEditor.Models
                 }
             }
 
-            Context = @params.Select(p => (object)new ParameterWithContext(p, this)).ToList();
+            Context = @params.Select(p => (object?)new ParameterWithContext(p, this)).ToList();
             OnChanged += (sender, args) => OnPropertyChanged(nameof(Readable));
         }
 

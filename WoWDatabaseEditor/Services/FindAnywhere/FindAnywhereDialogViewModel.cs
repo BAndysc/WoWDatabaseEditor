@@ -20,7 +20,7 @@ public partial class FindAnywhereDialogViewModel : ObservableBase, IFindAnywhere
 {
     private readonly IDatabaseProvider databaseProvider;
     public int DesiredWidth => 400;
-    public int DesiredHeight => 220;
+    public int DesiredHeight => 320;
     public string Title => "Find anywhere";
     public bool Resizeable => true;
     public ICommand Accept { get; set; }

@@ -135,6 +135,20 @@
 			"10": {"name": "zg ticket"}
 		}	
 	},
+	"DispelTypeMaskParameter": {
+		"values": {
+			"2": {"name": "magic"},
+			"4": {"name": "curse"},
+			"8": {"name": "disease"},
+			"16": {"name": "poison"},
+			"32": {"name": "stealth"},
+			"64": {"name": "invisibility"},
+			"128": {"name": "all"},
+			"256": {"name": "spe npc only"},
+			"512": {"name": "enrage"},
+			"1024": {"name": "zg ticket"}
+		}
+	},
 	"MechanicsParameter": {
 		"values": {
 			"0": {"name": "None"},
@@ -849,5 +863,11 @@
 			"502": {"name": "MOD_VERSATILITY_DAMAGE_DONE_BENEFIT"},
 			"503": {"name": "MOD_VERSATILITY_HEALING_DONE_BENEFIT"}
 		}
-	},	
+	},
+	"AuraPositivityParameter": {
+		"values": {
+			"0": "Only negative",
+			"1": "Only positive"
+		}
+	}
 }

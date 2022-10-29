@@ -12,6 +12,10 @@ namespace WDE.Parameters.Models
     public interface IParameterValueHolder : INotifyPropertyChanged
     {
         bool HoldsMultipleValues { get; }
+        bool IsUsed { get;}
+        bool ForceHidden { get; }
+        string Name { get; }
+        string String { get; }
     }
     
     public interface IParameterValueHolder<T> : IParameterValueHolder where T : notnull
@@ -19,7 +23,7 @@ namespace WDE.Parameters.Models
         IParameter<T> Parameter { get; }
         T Value { get; set; }
     }
-    
+
     public class ParameterValueHolder<T> : IParameterValueHolder<T>, INotifyPropertyChanged where T : notnull
     {
         private CancellationTokenSource? currentToStringCancellationToken;

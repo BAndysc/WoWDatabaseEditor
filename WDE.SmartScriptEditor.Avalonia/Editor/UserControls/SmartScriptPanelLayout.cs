@@ -275,9 +275,6 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
 
         protected override void OnPointerReleased(PointerReleasedEventArgs e)
         {
-            var systemWideControlModifier = AvaloniaLocator.Current
-                .GetService<PlatformHotkeyConfiguration>()?.CommandModifiers ?? KeyModifiers.Control;
-            
             base.OnPointerReleased(e);
             UpdateIsCopying(e.KeyModifiers);
             StopDragging();
@@ -476,7 +473,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
                     {
                         if (AnyEventSelected())
                             draggingEvents = true;
-                        else
+                        else if (CanDragConditions())
                             draggingConditions = true;
                     }
                     else
@@ -539,6 +536,11 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
             }
 
             InvalidateArrange();
+        }
+
+        private bool CanDragConditions()
+        {
+            return Script.EditorFeatures.CanReorderConditions;
         }
 
         protected override void OnPointerLeave(PointerEventArgs e)

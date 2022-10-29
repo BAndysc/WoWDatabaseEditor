@@ -1062,7 +1062,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 itemNameRegistry.GetName(newItem) :
                 itemNameRegistry.GetName(newItem) + $" ({newItem.Entry})";
             
-            Script = new SmartScript(this.item, smartFactory, smartDataManager, messageBoxService, smartScriptImporter);
+            Script = new SmartScript(this.item, smartFactory, smartDataManager, messageBoxService, editorFeatures, smartScriptImporter);
 
             bool updateInspections = false;
             new Thread(() =>
@@ -1468,7 +1468,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     sourceType.Value = newId;
                     if (newSourceIndex.Value.Item2)
                         firstSourceParameter.parameter.Value = newSourceIndex.Value.Item1;
-                }, sourceDataObservable.Select(a => a?.NameReadable ?? "---")));
+                }, sourceDataObservable.Select(a => a?.NameReadable ?? "---"), null, sourceType));
 
                 editableGroup.Add(new EditableActionData("Type", "Action", async () =>
                 {
@@ -1477,7 +1477,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                         return;
 
                     actionType.Value = newActionIndex.Value;
-                }, actionDataObservable.Select(a => a?.NameReadable ?? "---")));
+                }, actionDataObservable.Select(a => a?.NameReadable ?? "---"), null, actionType));
             
                 var canPickTarget = actionDataObservable.Select(actionData => !actionData.HasValue || actionData.Value.TargetTypes != SmartSourceTargetType.None);
 
@@ -1494,7 +1494,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     targetType.Value = newId;
                     if (newTargetIndex.Value.Item2)   
                         firstTargetParameter.parameter.Value = newTargetIndex.Value.Item1;
-                }, targetDataObservable.Select(t => t?.NameReadable ?? "---"), canPickTarget.Not()));
+                }, targetDataObservable.Select(t => t?.NameReadable ?? "---"), canPickTarget.Not(), targetType));
                 
                 if (editorFeatures.SupportsTargetCondition)
                 {
@@ -1619,7 +1619,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     return;
 
                 conditionType.Value = newConditionId.Value;
-            }, conditionType.ToObservable(e => e.Value).Select(id => conditionType.HoldsMultipleValues ? "---" : conditionDataManager.GetConditionData(id).NameReadable)));
+            }, conditionType.ToObservable(e => e.Value).Select(id => conditionType.HoldsMultipleValues ? "---" : conditionDataManager.GetConditionData(id).NameReadable),
+                null, conditionType));
             
             ParametersEditViewModel viewModel = new(itemFromListProvider, 
                 currentCoreVersion,
@@ -1635,7 +1636,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                         editableGroup.Apply();
                     }
                 },
-                "Condition");
+                "Condition", conditionsToEdit[0]);
             viewModel.AutoDispose(conditionType);
             
             return viewModel;
@@ -1743,7 +1744,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     return;
 
                 eventType.Value = newEventIndex.Value;
-            }, eventType.ToObservable(e => e.Value).Select(id => eventType.HoldsMultipleValues ? "--" : smartDataManager.GetRawData(SmartType.SmartEvent, id).NameReadable)));
+            }, eventType.ToObservable(e => e.Value).Select(id => eventType.HoldsMultipleValues ? "--" : smartDataManager.GetRawData(SmartType.SmartEvent, id).NameReadable),
+                null, eventType));
             
             editableGroup.Add("Event specific", eventsToEdit, originalEvents);
 

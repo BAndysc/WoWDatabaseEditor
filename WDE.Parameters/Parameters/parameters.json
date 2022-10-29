@@ -2857,5 +2857,13 @@
 			"4": "Whisper",
 			"5": "Boss whisper"
 		}
+	},
+	"GameobjectLootStateParameter": {
+		"values": {
+			"0": {"name": "GO_NOT_READY"},
+			"1": {"name": "GO_READY"},
+			"2": {"name": "GO_ACTIVATED"},
+			"3": {"name": "GO_JUST_DEACTIVATED"}
+		}
 	}
 }

@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using PropertyChanged.SourceGenerator;
 using WDE.Common.Annotations;
+using WDE.Common.Parameters;
 
 namespace WDE.Parameters.Models;
 
@@ -13,7 +14,7 @@ public interface IBulkEditSource
     IDisposable BulkEdit(string name);
 }
 
-public partial class MultiPropertyValueHolder<T, R> : IDisposable where T : notnull where R : INotifyPropertyChanged
+public partial class MultiPropertyValueHolder<T, R> : IParameterValueHolder<T>, IDisposable where T : notnull where R : INotifyPropertyChanged
 {
     private bool wasTouched;
     private readonly T defaultValue;
@@ -75,8 +76,10 @@ public partial class MultiPropertyValueHolder<T, R> : IDisposable where T : notn
         else
             this.value = defaultValue;
         OnPropertyChanged(nameof(Value));
-
+        
         HoldsMultipleValues = !isSameValue;
+        
+        OnPropertyChanged(nameof(String));
     }
 
     [Notify] private bool holdsMultipleValues;
@@ -93,6 +96,7 @@ public partial class MultiPropertyValueHolder<T, R> : IDisposable where T : notn
     }
     
     private T value;
+
     public T Value
     {
         get => value;
@@ -156,4 +160,13 @@ public partial class MultiPropertyValueHolder<T, R> : IDisposable where T : notn
             v.PropertyChanged -= OnSourceChanged;
         }
     }
+
+    public bool IsUsed => true;
+    public bool ForceHidden => false;
+    public string Name => "";
+    public string String => holdsMultipleValues ? "-" : Value.ToString() ?? "-";
+
+    public IParameter<T> Parameter => typeof(T) == typeof(int) ? 
+        (IParameter<T>)IntParameter.Instance :
+        throw new NotImplementedException();
 }

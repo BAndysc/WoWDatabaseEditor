@@ -127,7 +127,7 @@ namespace WDE.SmartScriptEditor.Data
             if (!conditionDataManager.HasConditionData(id))
                 throw new NullReferenceException("No data for condition id " + id);
 
-            SmartCondition ev = new(id, currentCoreVersion.Current.SmartScriptFeatures.SupportsConditionTargetVictim, editorFeatures);
+            SmartCondition ev = new(id, editorFeatures);
             var raw = conditionDataManager.GetConditionData(id);
             SetParameterObjects(ev, raw);
 

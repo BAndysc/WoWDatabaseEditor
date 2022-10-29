@@ -21,18 +21,21 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
         private readonly ISmartDataManager smartDataManager;
         private readonly IMessageBoxService messageBoxService;
         private readonly IDatabaseProvider databaseProvider;
+        private readonly IEditorFeatures editorFeatures;
         private readonly ISimpleConditionsImporter simpleConditionsImporter;
 
         public TrinityCoreSmartScriptImporter(ISmartFactory smartFactory,
             ISmartDataManager smartDataManager,
             IMessageBoxService messageBoxService,
             IDatabaseProvider databaseProvider,
+            IEditorFeatures editorFeatures,
             ISimpleConditionsImporter simpleConditionsImporter)
         {
             this.smartFactory = smartFactory;
             this.smartDataManager = smartDataManager;
             this.messageBoxService = messageBoxService;
             this.databaseProvider = databaseProvider;
+            this.editorFeatures = editorFeatures;
             this.simpleConditionsImporter = simpleConditionsImporter;
         }
         
@@ -200,7 +203,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                         var pseudoScript = new SmartScript(
                             new SmartScriptSolutionItem((int)action.GetParameter(0).Value,
                                 SmartScriptType.TimedActionList),
-                            smartFactory, smartDataManager, messageBoxService, this);
+                            smartFactory, smartDataManager, messageBoxService, editorFeatures, this);
                         await Import(pseudoScript, doNotTouchIfPossible, timedScript.ToList(), new List<IConditionLine>(),
                             new List<IConditionLine>());
                         currentEvent.AddAction(beginInlineAction);

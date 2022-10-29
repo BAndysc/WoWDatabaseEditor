@@ -89,4 +89,29 @@
     <Style Selector="Button:disabled ContentPresenter#PART_ContentPresenter, RepeatButton:disabled ContentPresenter#PART_ContentPresenter, ToggleButton:disabled ContentPresenter#PART_ContentPresenter">
       <Setter Property="Opacity" Value="0.5" />
     </Style>
+    
+    <!-- primary -->
+    
+    <Style Selector="Button.primary">
+      <Setter Property="Background" Value="{DynamicResource PrimaryButtonBackground}" />
+      <Setter Property="Foreground" Value="{DynamicResource PrimaryButtonForeground}" />
+    </Style>
+    
+    <Style Selector="Button.primary:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource PrimaryButtonBackgroundPointerOver}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource PrimaryButtonBorderBrushPointerOver}" />
+      <Setter Property="TextBlock.Foreground" Value="{DynamicResource PrimaryButtonForeground}" />
+    </Style>
+    
+    <Style Selector="Button.primary:pressed  /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource PrimaryButtonBackgroundPressed}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource PrimaryButtonBorderBrushPressed}" />
+      <Setter Property="TextBlock.Foreground" Value="{DynamicResource PrimaryButtonForeground}" />
+    </Style>
+    
+    <Style Selector="Button.primary:disabled /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource PrimaryButtonBackgroundPressed}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource PrimaryButtonBorderBrushPressed}" />
+      <Setter Property="TextBlock.Foreground" Value="{DynamicResource PrimaryButtonForeground}" />
+    </Style>
 </Styles>

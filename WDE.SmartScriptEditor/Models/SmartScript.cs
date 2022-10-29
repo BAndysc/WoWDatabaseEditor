@@ -8,12 +8,16 @@ namespace WDE.SmartScriptEditor.Models
 {
     public class SmartScript : SmartScriptBase
     {
+        public IEditorFeatures EditorFeatures { get; }
+
         public SmartScript(ISmartScriptSolutionItem item,
             ISmartFactory smartFactory,
             ISmartDataManager smartDataManager,
             IMessageBoxService messageBoxService,
+            IEditorFeatures editorFeatures,
             ISmartScriptImporter importer) : base (smartFactory, smartDataManager, messageBoxService, importer)
         {
+            EditorFeatures = editorFeatures;
             EntryOrGuid = (int) item.Entry;
             SourceType = item.SmartType;
         }

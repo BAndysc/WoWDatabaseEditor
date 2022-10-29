@@ -15,14 +15,14 @@ public partial class MultiParameterValueHolder<T> : IParameterValueHolder<T>, Sy
     private bool hasCachedStringValue;
     private readonly IParameter<T> defaultParameter;
     private readonly T defaultValue;
-    private readonly IReadOnlyList<ParameterValueHolder<T>> values;
-    private readonly IReadOnlyList<ParameterValueHolder<T>> originals;
+    private readonly IReadOnlyList<IParameterValueHolder<T>> values;
+    private readonly IReadOnlyList<IParameterValueHolder<T>> originals;
     private readonly IBulkEditSource? bulkEditSource;
 
     public MultiParameterValueHolder(IParameter<T> defaultParameter, 
         T defaultValue, 
-        IReadOnlyList<ParameterValueHolder<T>> values,
-        IReadOnlyList<ParameterValueHolder<T>> originals,
+        IReadOnlyList<IParameterValueHolder<T>> values,
+        IReadOnlyList<IParameterValueHolder<T>> originals,
         IBulkEditSource? bulkEditSource)
     {
         this.defaultParameter = defaultParameter;

@@ -204,6 +204,7 @@ namespace WDE.DbcStore
             public Dictionary<long, string> BattlePetAbilityStore { get; internal set;} = new();
             public Dictionary<long, Dictionary<long, long>> ScenarioToStepStore { get; internal set; } = new();
             public Dictionary<long, long> BattlePetSpeciesIdStore { get; internal set; } = new();
+            public Dictionary<long, string> CharSpecializationStore { get; internal set;} = new();
 
             public string Name => "DBC Loading";
             public bool WaitForOtherTasks => false;
@@ -396,6 +397,7 @@ namespace WDE.DbcStore
                 parameterFactory.Register("ScenarioParameter", new DbcParameter(ScenarioStore));
                 parameterFactory.Register("ScenarioStepParameter", new DbcParameter(ScenarioStepStore));
                 parameterFactory.Register("BattlePetAbilityParameter", new DbcParameter(BattlePetAbilityStore));
+                parameterFactory.Register("CharSpecializationParameter", new DbcParameter(CharSpecializationStore));
                 
                 parameterFactory.RegisterDepending("BattlePetSpeciesParameter", "CreatureParameter", (creature) => new BattlePetSpeciesParameter(store, parameterFactory, creature));
 
@@ -788,6 +790,16 @@ namespace WDE.DbcStore
                             if (!ScenarioToStepStore.TryGetValue(scenarioId, out var scenarioSteps))
                                 scenarioSteps = ScenarioToStepStore[scenarioId] = new();
                             scenarioSteps[stepIndex] = stepId;
+                        });
+                        Load("ChrSpecialization.db2", row =>
+                        {
+                            var specId = row.Key;
+                            var name = row.GetString(0);
+                            var classId = row.GetUInt(4);
+                            if (ClassStore.TryGetValue(classId, out var className))
+                                CharSpecializationStore.Add(specId, $"{className} - {name}");
+                            else
+                                CharSpecializationStore.Add(specId, $"{name}");
                         });
                         break;
                     }

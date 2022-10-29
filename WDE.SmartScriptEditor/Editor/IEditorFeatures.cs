@@ -1,3 +1,5 @@
+using WDE.Common.Parameters;
+
 namespace WDE.SmartScriptEditor.Editor
 {
     public interface IEditorFeatures
@@ -9,10 +11,12 @@ namespace WDE.SmartScriptEditor.Editor
         bool SupportsEventTimerId { get; }
         bool SourceHasPosition { get; }
         bool UseExternalConditionsEditor => false;
+        bool CanReorderConditions => true;
         ParametersCount ConditionParametersCount { get; }
         ParametersCount EventParametersCount { get; }
         ParametersCount ActionParametersCount { get; }
         ParametersCount TargetParametersCount { get; }
+        IParameter<long> ConditionTargetParameter { get; }
     }
 
     public readonly struct ParametersCount

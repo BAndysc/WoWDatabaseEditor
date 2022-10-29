@@ -19,6 +19,18 @@ namespace WDE.Common.Parameters
         public static Parameter Instance { get; } = new Parameter();
     }
     
+    public class IntParameter : GenericBaseParameter<int>
+    {
+        public override string ToString(int key)
+        {
+            if (Items != null && Items.TryGetValue(key, out var option))
+                return option.Name;
+            return key.ToString();
+        }
+
+        public static IntParameter Instance { get; } = new IntParameter();
+    }
+    
     public class ParameterNumbered : GenericBaseParameter<long>
     {
         public override string ToString(long key, ToStringOptions options)
