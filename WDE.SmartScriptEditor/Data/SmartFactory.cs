@@ -289,7 +289,13 @@ namespace WDE.SmartScriptEditor.Data
         public SmartSource SourceFactory(int id)
         {
             if (!smartDataManager.Contains(SmartType.SmartSource, id))
-                throw new InvalidSmartSourceException(id);
+            {
+                // target only target used as a source. Allow it anyway
+                if (smartDataManager.Contains(SmartType.SmartTarget, id))
+                    return TargetFactory(id);
+                else
+                    throw new InvalidSmartSourceException(id);
+            }
 
             var data = smartDataManager.GetRawData(SmartType.SmartSource, id);
 

@@ -112,6 +112,7 @@ namespace WDE.SmartScriptEditor.Models
                             fpram3 = Z.ToString(CultureInfo.InvariantCulture),
                             fpram4 = O.ToString(CultureInfo.InvariantCulture),
                             invoker = GetInvokerNameWithContext(),
+                            isSourcePosition = parent?.Source?.IsPosition,
                             isSource = isSource,
                             isTarget = !isSource,
                             
