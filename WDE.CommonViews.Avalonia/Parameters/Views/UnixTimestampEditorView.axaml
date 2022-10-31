@@ -16,14 +16,8 @@
         <CalendarDatePicker Grid.Column="0" Grid.Row="6" SelectedDateFormat="Long" SelectedDate="{CompiledBinding DateTime, Mode=TwoWay}"/>
         <TimePicker Grid.Column="2" Grid.Row="6" SelectedTime="{CompiledBinding Time}"/>
         
-        <Grid Grid.Row="8" Grid.ColumnSpan="3">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="80" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="80" />
-            </Grid.ColumnDefinitions>
-            <Button Content="Cancel" Command="{CompiledBinding Cancel}"  />
-            <Button Command="{CompiledBinding Accept}" Grid.Column="2" Content="Accept" />
-        </Grid>
+        <OkCancelButtons Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="3"
+                         AcceptCommand="{CompiledBinding Accept}"
+                         CancelCommand="{CompiledBinding Cancel}" />
     </Grid>
 </UserControl>

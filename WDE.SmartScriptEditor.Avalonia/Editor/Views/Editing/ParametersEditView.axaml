@@ -40,14 +40,9 @@
                 </ItemsPresenter.ItemTemplate>
             </ItemsPresenter>
         </ScrollViewer>
-        <Grid Grid.Row="2" IsVisible="{CompiledBinding ShowCloseButtons}">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="80" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="80" />
-            </Grid.ColumnDefinitions>
-            <Button Command="{CompiledBinding Cancel}"  Content="Cancel" />
-            <Button Command="{CompiledBinding Accept}" Grid.Column="2" Content="Ok" />
-        </Grid>
+        
+        <OkCancelButtons Grid.Row="2" IsVisible="{CompiledBinding ShowCloseButtons}"
+                         AcceptCommand="{CompiledBinding Accept}"
+                         CancelCommand="{CompiledBinding Cancel}" />
     </Grid>
 </UserControl>

@@ -14,6 +14,19 @@ namespace WDE.Common.Utils
             }, TaskContinuationOptions.OnlyOnFaulted);
         }
         
+        public static async Task WrapSafe(this Task t, Action onBefore, Action onFinally)
+        {
+            onBefore();
+            try
+            {
+                await t;
+            }
+            finally
+            {
+                onFinally();
+            }
+        }
+        
         public static void IgnoreResult(this Task t)
         {
             t.ContinueWith(e =>

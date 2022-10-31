@@ -12,6 +12,7 @@ using WDE.Common.Parameters;
 using WDE.Common.Services;
 using WDE.Common.Tasks;
 using WDE.Common.Utils;
+using WDE.QueryGenerators.Base;
 
 namespace WDE.MySqlDatabaseCommon.Database.World
 {
@@ -51,6 +52,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public CachedDatabaseProvider(IAsyncDatabaseProvider nonCachedDatabase,
             ITaskRunner taskRunner, IStatusBar statusBar, IEventAggregator eventAggregator,
             ILoadingEventAggregator loadingEventAggregator,
+            IQueryGenerator<ICreatureText> creatureTextInsertProvider,
             IParameterFactory parameterFactory)
         {
             this.nonCachedDatabase = nonCachedDatabase;
@@ -69,7 +71,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
                     Refresh(RefreshGossipMenu);
                 else if (tableName == "npc_text")
                     Refresh(RefreshNpcTexts);
-                else if (tableName == "creature_text")
+                else if (tableName == creatureTextInsertProvider.TableName)
                     Refresh(RefreshCreatureTexts);
                 else if (tableName == "quest_template" || tableName == "quest_template_addon")
                     Refresh(RefreshQuestTemplates);

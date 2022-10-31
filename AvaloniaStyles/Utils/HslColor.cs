@@ -62,7 +62,7 @@ public readonly struct HslColor
             var slower = Math.Sqrt(intensity01);
             l = slower * Math.Pow(L, 1 / intensity01);
         }
-        return new HslColor(scaler.H, Math.Clamp(S * scaler.S, 0, 1), l);
+        return new HslColor(scaler.H, Math.Clamp(S * (scaler.S * 2), 0, 1), l);
     }
     
     public HslColor WithHue(double hue)

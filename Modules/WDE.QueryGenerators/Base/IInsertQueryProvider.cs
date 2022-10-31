@@ -8,4 +8,5 @@ public interface IInsertQueryProvider<T>
 {
     IQuery Insert(T t);
     string TableName { get; }
+    int Priority => 0;
 }

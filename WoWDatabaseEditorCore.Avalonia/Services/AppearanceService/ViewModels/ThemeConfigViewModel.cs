@@ -46,12 +46,12 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.AppearanceService.ViewModels
             {
                 themeManager.SetTheme(ThemeName);
                 themeManager.UpdateCustomScaling(useCustomScaling ? ScalingValue : null);
-                settings.UpdateSettings(ThemeName, UseCustomScaling ? Math.Clamp(ScalingValue, 0.5, 4) : null, color.H - AvaloniaThemeStyle.BaseHue, color.S * 2 - 1, lightness * 2 -1);
+                settings.UpdateSettings(ThemeName, UseCustomScaling ? Math.Clamp(ScalingValue, 0.5, 4) : null, color.H - AvaloniaThemeStyle.BaseHue, color.S, lightness);
                 IsModified = false;
             });
 
-            lightness = (currentSettings.Lightness + 1)/2;
-            color = new HslColor(currentSettings.Hue+AvaloniaThemeStyle.BaseHue, (currentSettings.Saturation + 1)/2, currentSettings.Lightness);
+            lightness = currentSettings.Lightness;
+            color = new HslColor(currentSettings.Hue+AvaloniaThemeStyle.BaseHue, currentSettings.Saturation, currentSettings.Lightness);
 
             this.ToObservable(() => Color)
                 .Skip(1)

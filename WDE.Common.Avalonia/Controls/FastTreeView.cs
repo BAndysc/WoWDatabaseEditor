@@ -109,10 +109,12 @@ public abstract class FastTreeView<P, C> : Control where P : IParentType where C
             if (currentPoint.Position.X <= Indent * parent.NestLevel || e.ClickCount == 2)
                 parent.IsExpanded = !parent.IsExpanded;
             SelectedNode = parent;
+            InvalidateVisual();
         }
         else if (obj is C child)
         {
             SelectedNode = child;
+            InvalidateVisual();
         }
     }
 
@@ -179,6 +181,7 @@ public abstract class FastTreeView<P, C> : Control where P : IParentType where C
 
             e.Handled = true;
         }
+        InvalidateVisual();
     }
 
     private int GetNextIndex(FlatTreeList<P, C> items, int currentIndex, int direction)

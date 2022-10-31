@@ -48,7 +48,7 @@ namespace WDE.SmartScriptEditor.Data
                 parameterFactory.Register("EventScriptParameter", new Parameter());
                 parameterFactory.Register("TimedActionListParameter", new Parameter());
                 parameterFactory.Register("GossipMenuOptionParameter", new GossipMenuOptionParameter(databaseProvider, tableEditorPickerService, itemFromListProvider));
-                parameterFactory.Register("CreatureTextParameter", new CreatureTextParameter(databaseProvider, tableEditorPickerService, itemFromListProvider));
+                parameterFactory.Register("CreatureTextParameter", new CreatureTextParameter(databaseProvider, tableEditorPickerService, itemFromListProvider, "creature_text", "GroupId"));
                 parameterFactory.Register("QuestStarterParameter", new QuestStarterEnderParameter(databaseProvider, tableEditorPickerService, questEntryProviderService, true));
                 parameterFactory.Register("QuestEnderParameter", new QuestStarterEnderParameter(databaseProvider, tableEditorPickerService, questEntryProviderService, false));
                 parameterFactory.Register("CreatureSpawnKeyParameter", new CreatureSpawnKeyParameter(databaseProvider));

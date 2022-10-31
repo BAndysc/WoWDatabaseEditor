@@ -3,10 +3,26 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:viewModels="clr-namespace:WDE.SmartScriptEditor.Editor.ViewModels;assembly=WDE.SmartScriptEditor"
+             xmlns:editor="clr-namespace:WDE.SmartScriptEditor.Editor;assembly=WDE.SmartScriptEditor"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="viewModels:SmartScriptEditorViewModel"
+             Name="Root"
              x:Class="WDE.SmartScriptEditor.Avalonia.Editor.Views.SmartScriptEditorToolBar">
     <ToolbarPanel>
         <ButtonImage Image="Icons/icon_remove_comment.png" Command="{CompiledBinding RemoveAllCommands}" ToolTip.Tip="Remove all comments" />
+        <ItemsPresenter Items="{CompiledBinding ExtensionCommands}">
+            <ItemsPresenter.ItemTemplate>
+                <DataTemplate x:DataType="editor:SmartExtensionCommand">
+                    <Button Command="{CompiledBinding  Command}" CommandParameter="{Binding #Root.DataContext}" ToolTip.Tip="{CompiledBinding Name}">
+                        <WdeImage Image="{CompiledBinding Icon}" />
+                    </Button>
+                </DataTemplate>
+            </ItemsPresenter.ItemTemplate>
+            <ItemsPresenter.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ToolbarPanel />
+                </ItemsPanelTemplate>
+            </ItemsPresenter.ItemsPanel>
+        </ItemsPresenter>
     </ToolbarPanel>
 </UserControl>

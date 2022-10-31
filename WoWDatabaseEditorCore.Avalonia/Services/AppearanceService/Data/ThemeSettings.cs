@@ -10,11 +10,11 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.AppearanceService.Data
 
         public double CustomScaling { get; }
         
-        public double Hue { get; }
+        public double Hue { get; } /* 0 --- 1 */
         
-        public double Saturation { get; }
+        public double Saturation { get; } /* -1 --- 1 */
         
-        public double Lightness { get; }
+        public double Lightness { get; } /* -1 --- 1 */
 
         public ThemeSettings(string name, bool useCustomScaling, double customScaling, double hue, double saturation, double lightness)
         {

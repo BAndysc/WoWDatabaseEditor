@@ -79,7 +79,7 @@ namespace WDE.Common.Utils
         }
     }
     
-    public class AsyncAutoCommand<T> : ICommand
+    public class AsyncAutoCommand<T> : ICommand, IAsyncCommand<T>
     {
         private bool isBusy;
 
@@ -130,6 +130,11 @@ namespace WDE.Common.Utils
         public void Execute(object? parameter)
         {
             ((ICommand) command).Execute(parameter);
+        }
+
+        public Task ExecuteAsync(T parameter)
+        {
+            return command.ExecuteAsync(parameter);
         }
 
         public void RaiseCanExecuteChanged()
@@ -199,6 +204,60 @@ namespace WDE.Common.Utils
         }
     }
     
+    internal class AsyncCommandExceptionWrap<T, R> : ICommand, IAsyncCommand<R> where T : Exception
+    {
+        private readonly IAsyncCommand<R> parent;
+        private readonly Action<T>? onError;
+        private readonly Func<T, Task>? onErrorTask;
+
+        public AsyncCommandExceptionWrap(IAsyncCommand<R> parent, Action<T> onError)
+        {
+            this.parent = parent;
+            this.onError = onError;
+        }
+        
+        public AsyncCommandExceptionWrap(IAsyncCommand<R> parent, Func<T, Task> onError)
+        {
+            this.parent = parent;
+            this.onErrorTask = onError;
+        }
+        
+        public bool CanExecute(object? parameter)
+        {
+            return parent.CanExecute(parameter);
+        }
+
+        public void Execute(object? parameter)
+        {
+            ExecuteAsync((R)parameter!).ListenErrors();
+        }
+
+        public async Task ExecuteAsync(R parameter)
+        {
+            try
+            {
+                await parent.ExecuteAsync(parameter);
+            }
+            catch (T e)
+            {
+                onError?.Invoke(e);
+                if (onErrorTask != null)
+                    await onErrorTask(e);
+            }
+        }
+
+        public void RaiseCanExecuteChanged()
+        {
+            parent.RaiseCanExecuteChanged();
+        }
+
+        public event EventHandler? CanExecuteChanged
+        {
+            add => parent.CanExecuteChanged += value;
+            remove => parent.CanExecuteChanged -= value;
+        }
+    }
+    
     public static class CommandExtensions
     {
         public static IAsyncCommand WrapException<T>(this IAsyncCommand cmd, Action<T> onError) where T : Exception
@@ -210,6 +269,16 @@ namespace WDE.Common.Utils
         {
             return new AsyncCommandExceptionWrap<T>(cmd, async (e) =>
             {
+                Console.WriteLine(e);
+                await messageBoxService.SimpleDialog("Error", header ?? "Error occured while executing the command", e.Message);
+            });
+        }
+        
+        public static IAsyncCommand<R> WrapMessageBox<T, R>(this IAsyncCommand<R> cmd, IMessageBoxService messageBoxService, string? header = null) where T : Exception
+        {
+            return new AsyncCommandExceptionWrap<T, R>(cmd, async (e) =>
+            {
+                Console.WriteLine(e);
                 await messageBoxService.SimpleDialog("Error", header ?? "Error occured while executing the command", e.Message);
             });
         }

@@ -105,7 +105,7 @@
         <Style Selector="multiRow|SelectablePanel">
             <Setter Property="Background" Value="{DynamicResource TreeViewItem.Content.Background.NormalAlternate}" />
         </Style>
-        <Style Selector="multiRow|SelectablePanel.odd">
+        <Style Selector="multiRow|SelectablePanel:nth-child(2n)">
             <Setter Property="Background" Value="{DynamicResource TreeViewItem.Content.Background.Normal}" />
         </Style>
         <Style Selector="multiRow|SelectablePanel:selected">
@@ -216,14 +216,14 @@
                                         <Button Command="{Binding ElementName=rootWindow, Path=DataContext.AddRowCommand, Mode=OneTime}" CommandParameter="{CompiledBinding ., Mode=OneTime}">+</Button>
                                     </controls1:GroupingHeader.CustomContent>
                                 </controls1:GroupingHeader>
-                                <controls:AlternatingItemsControl multiRow:SelectablePanel.SelectedItem="{Binding #rootWindow.DataContext.SelectedRow, Mode=TwoWay}" 
-                                                                  multiRow:SelectablePanel.ObserveItems="True"
-                                                                  Items="{CompiledBinding ., Mode=OneTime}" 
-                                                                  ClipToBounds="False"
-                                                                  MinHeight="20" 
-                                                                  utils:FocusUtils.FocusFirst="True"
-                                                                  ItemTemplate="{StaticResource RowTemplate}" />
-                            </StackPanel>
+                                <ItemsControl multiRow:SelectablePanel.SelectedItem="{Binding #rootWindow.DataContext.SelectedRow, Mode=TwoWay}" 
+                                              multiRow:SelectablePanel.ObserveItems="True"
+                                              Items="{CompiledBinding ., Mode=OneTime}" 
+                                              ClipToBounds="False"
+                                              MinHeight="20" 
+                                              utils:FocusUtils.FocusFirst="True"
+                                              ItemTemplate="{StaticResource RowTemplate}" />
+                                </StackPanel>
                         </DataTemplate>
                     </ItemsPresenter.ItemTemplate>
                 </ItemsPresenter>

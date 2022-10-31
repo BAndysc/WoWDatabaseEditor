@@ -193,6 +193,7 @@ namespace WDE.SmartScriptEditor.Models
             };
             se.CopyParameters(this);
 
+            se.Condition.Value = Condition.Value;
             se.Conditions = Conditions?.ToList();
             return se;
         }

@@ -22,16 +22,11 @@
         
         <Border DockPanel.Dock="Top" Height="15" />
         
-        <Grid Margin="0,5" DockPanel.Dock="Bottom">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="120" />
-                <ColumnDefinition Width="5" />
-                <ColumnDefinition Width="120" />
-            </Grid.ColumnDefinitions>
-            <Button Command="{CompiledBinding Accept}" Grid.Column="1" Content="Save profile" />
-            <Button Content="Cancel" Grid.Column="3" Command="{CompiledBinding Cancel}"  />
-        </Grid>
+        
+        <OkCancelButtons DockPanel.Dock="Bottom" Margin="0,5"
+                         AcceptCommand="{CompiledBinding Accept}"
+                         AcceptText="Save profile"
+                         CancelCommand="{CompiledBinding Cancel}" />
         
         <Grid ColumnDefinitions="Auto,10,*" RowDefinitions="Auto,10,Auto,10,Auto,Auto,10,Auto">
             <TextBlock VerticalAlignment="Center" Grid.Row="0" Grid.Column="0">Profile name:</TextBlock>

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using Prism.Commands;
 using Prism.Events;
+using ReactiveUI;
 using WDE.Common.Events;
 using WDE.Common.Managers;
 using WDE.Common.Services.MessageBox;
@@ -294,7 +295,7 @@ namespace WoWDatabaseEditorCore.ViewModels
                             if (await before.ShallSavePreventClosing())
                                 return false;
                         }
-                        editor.Save.Execute(null);
+                        //editor.Save.Execute(null);
                         if (editor is ISolutionItemDocument solutionItemDocument)
                             await solutionTasksService.Save(solutionItemDocument);
                         else
@@ -331,10 +332,40 @@ namespace WoWDatabaseEditorCore.ViewModels
                     }
                 }
             }
-
+            
             while (DocumentManager.OpenedDocuments.Count > 0)
                 DocumentManager.OpenedDocuments.RemoveAt(DocumentManager.OpenedDocuments.Count - 1);
+            
+            var modifiedTools = DocumentManager.AllTools
+                .Select(t => t as ISavableTool)
+                .Where(t => t != null)
+                .Cast<ISavableTool>()
+                .Where(t => t.IsModified)
+                .ToList();
 
+            foreach (var tool in modifiedTools)
+            {
+                var message = new MessageBoxFactory<MessageBoxButtonType>().SetTitle("Tool is modified")
+                    .SetMainInstruction("Do you want to save the changes of " + tool.Title + "?")
+                    .SetContent("Your changes will be lost if you don't save them.")
+                    .SetIcon(MessageBoxIcon.Warning)
+                    .WithYesButton(MessageBoxButtonType.Yes)
+                    .WithNoButton(MessageBoxButtonType.No)
+                    .WithCancelButton(MessageBoxButtonType.Cancel);
+
+                MessageBoxButtonType result = await messageBoxService.ShowDialog(message.Build());
+                if (result == MessageBoxButtonType.Cancel)
+                    return false;
+
+                if (result == MessageBoxButtonType.Yes)
+                {
+                    tool.Save.Execute(null);
+                }
+                else if (result == MessageBoxButtonType.No)
+                {
+                }
+            }
+            
             return true;
         }
 

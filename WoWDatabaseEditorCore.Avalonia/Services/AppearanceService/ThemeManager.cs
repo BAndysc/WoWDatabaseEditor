@@ -34,7 +34,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.AppearanceService
             SetTheme(theme);
             if (Enum.TryParse<SystemThemeOptions>(theme.Name, out var t))
                 AvaloniaThemeStyle.Theme = t;
-            AvaloniaThemeStyle.AccentHue = new HslDiff(settings.Hue+AvaloniaThemeStyle.BaseHue, (settings.Saturation+1)/2, (settings.Lightness+1)/2);
+            AvaloniaThemeStyle.AccentHue = new HslDiff(settings.Hue+AvaloniaThemeStyle.BaseHue, settings.Saturation, settings.Lightness);
             
             SystemTheme.CustomScalingValue = settings.UseCustomScaling ? Math.Clamp(settings.CustomScaling, 0.5, 4) : null;
         }

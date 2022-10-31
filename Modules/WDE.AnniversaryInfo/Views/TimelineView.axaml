@@ -11,20 +11,20 @@
         <Style Selector="Border.Content">
             <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
         </Style>
-        <Style Selector="Grid:not(.odd) Border.Content">
+        <Style Selector="ContentPresenter Border.Content">
             <Setter Property="(Grid.Column)" Value="1" />
             <Setter Property="Padding" Value="35,20,20,20" />
             <Setter Property="CornerRadius" Value="0,8,8,0" />
         </Style>
-        <Style Selector="Grid.odd Border.Content">
+        <Style Selector="ContentPresenter Rectangle">
+            <Setter Property="(Grid.Column)" Value="0" />
+        </Style>
+        <Style Selector="ContentPresenter:nth-child(2n) Border.Content">
             <Setter Property="(Grid.Column)" Value="0" />
             <Setter Property="Padding" Value="20,20,35,20" />
             <Setter Property="CornerRadius" Value="8,0,0,8" />
         </Style>
-        <Style Selector="Grid:not(.odd) Rectangle">
-            <Setter Property="(Grid.Column)" Value="0" />
-        </Style>
-        <Style Selector="Grid.odd Rectangle">
+        <Style Selector="ContentPresenter:nth-child(2n) Rectangle">
             <Setter Property="(Grid.Column)" Value="2" />
         </Style>
         <Style Selector="TextBlock">
@@ -42,7 +42,7 @@
     <Panel>
         <ScrollViewer HorizontalScrollBarVisibility="Disabled" Background="#474e5d">
             <DockPanel LastChildFill="True">
-                <AlternatingItemsControl Items="{CompiledBinding Cards}" Padding="0,20,0,20">
+                <ItemsControl Items="{CompiledBinding Cards}" Padding="0,20,0,20">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <DockPanel MaxWidth="1200" LastChildFill="False" />
@@ -102,7 +102,7 @@
                             </Grid>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
-                </AlternatingItemsControl>
+                </ItemsControl>
             </DockPanel>
         </ScrollViewer>
         <Border x:Name="Border" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="#A0000000" Padding="25"

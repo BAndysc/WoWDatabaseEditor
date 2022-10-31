@@ -143,7 +143,7 @@
             </Grid.ColumnDefinitions>
             <Button Content="Cancel" Command="{CompiledBinding Cancel}"  />
             <TextBlock Grid.Column="1" FontSize="9" VerticalAlignment="Center" HorizontalAlignment="Center" Opacity="0.3">Right click on an item to mark as favourite.</TextBlock>
-            <Button Command="{CompiledBinding Accept}" Grid.Column="2" Content="Next" />
+            <Button Classes="primary" Command="{CompiledBinding Accept}" Grid.Column="2" Content="Next" />
         </Grid>
     </Grid>
 </controls:DialogViewBase>

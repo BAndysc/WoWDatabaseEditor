@@ -15,14 +15,19 @@ public class CreatureTextParameter : IContextualParameter<long, SmartBaseElement
     private readonly IDatabaseProvider databaseProvider;
     private readonly ITableEditorPickerService tableEditorPickerService;
     private readonly IItemFromListProvider itemFromListProvider;
+    private readonly string tableName;
+    private readonly string columnName;
 
     public CreatureTextParameter(IDatabaseProvider databaseProvider,
         ITableEditorPickerService tableEditorPickerService,
-        IItemFromListProvider itemFromListProvider)
+        IItemFromListProvider itemFromListProvider,
+        string tableName, string columnName)
     {
         this.databaseProvider = databaseProvider;
         this.tableEditorPickerService = tableEditorPickerService;
         this.itemFromListProvider = itemFromListProvider;
+        this.tableName = tableName;
+        this.columnName = columnName;
     }
 
     public bool AllowUnknownItems => true;
@@ -86,7 +91,7 @@ public class CreatureTextParameter : IContextualParameter<long, SmartBaseElement
         {
             try
             {
-                var id = await tableEditorPickerService.PickByColumn("creature_text", new DatabaseKey(entry ?? 0), "GroupId",
+                var id = await tableEditorPickerService.PickByColumn(tableName, new DatabaseKey(entry ?? 0), columnName,
                     (uint)value);
                 if (id.HasValue)
                     return (id.Value, true);

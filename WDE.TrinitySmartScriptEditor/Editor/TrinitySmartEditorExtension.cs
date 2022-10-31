@@ -8,8 +8,4 @@ namespace WDE.TrinitySmartScriptEditor.Editor;
 [AutoRegister]
 public class TrinitySmartEditorExtension : ISmartEditorExtension
 {
-    public Task BeforeLoad(ISmartScriptSolutionItem item)
-    {
-        return Task.CompletedTask;
-    }
 }

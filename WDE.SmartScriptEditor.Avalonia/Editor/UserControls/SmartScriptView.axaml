@@ -20,14 +20,19 @@
         <KeyBinding Gesture="Delete" Command="{CompiledBinding DeleteSelected}" />
         <KeyBinding Gesture="Enter" Command="{CompiledBinding EditSelected}" />
         <KeyBinding Gesture="Ctrl+A" Command="{CompiledBinding SelectAll}" />
-        <KeyBinding Gesture="Up" Command="{CompiledBinding SelectionUp}" CommandParameter="{StaticResource FalseValue}" />
-        <KeyBinding Gesture="Down" Command="{CompiledBinding SelectionDown}" CommandParameter="{StaticResource FalseValue}" />
         <KeyBinding Gesture="Ctrl+Up" Command="{CompiledBinding SelectionUp}"
                     CommandParameter="{StaticResource TrueValue}" />
         <KeyBinding Gesture="Ctrl+Down" Command="{CompiledBinding SelectionDown}"
                     CommandParameter="{StaticResource TrueValue}" />
+        <KeyBinding Gesture="Shift+Up" Command="{CompiledBinding SelectionUp}"
+                    CommandParameter="{StaticResource TrueValue}" />
+        <KeyBinding Gesture="Shift+Down" Command="{CompiledBinding SelectionDown}"
+                    CommandParameter="{StaticResource TrueValue}" />
         <KeyBinding Gesture="Right" Command="{CompiledBinding SelectionRight}" />
         <KeyBinding Gesture="Left" Command="{CompiledBinding SelectionLeft}" />
+        <KeyBinding Gesture="Up" Command="{CompiledBinding SelectionUp}" CommandParameter="{StaticResource FalseValue}" />
+        <KeyBinding Gesture="Down" Command="{CompiledBinding SelectionDown}" CommandParameter="{StaticResource FalseValue}" />
+
     </UserControl.KeyBindings>
     
     <UserControl.Styles>

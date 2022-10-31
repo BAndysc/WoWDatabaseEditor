@@ -89,7 +89,10 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         {
             public List<AbstractSmartScriptLine> Lines { get; set; } = new();
             public List<AbstractConditionLine> Conditions { get; set; } = new();
+            public List<AbstractConditionLine> TargetConditions { get; set; } = new();
         }
+        
+        public IList<SmartExtensionCommand> ExtensionCommands { get; }
         
         public SmartScriptEditorViewModel(ISmartScriptSolutionItem item,
             IHistoryManager history,
@@ -149,6 +152,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             TeachingTips = null!;
             title = "";
             Icon = iconRegistry.GetIcon(item);
+
+            ExtensionCommands = editorExtension?.Commands?.ToList() ?? new List<SmartExtensionCommand>();
             
             CloseCommand = new AsyncCommand(async () =>
             {
@@ -563,6 +568,24 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 var selectedEvents = Events.Where(e => e.IsSelected).ToList();
                 if (selectedEvents.Count > 0)
                 {
+                    int targetIndex = 1;
+                    var targetConditions = selectedEvents
+                        .SelectMany(e => e.Actions)
+                        .SelectMany(a => new[] { a.Source, a.Target })
+                        .SelectMany(x =>
+                        {
+                            if (x.Conditions != null && x.Conditions.Count > 0)
+                            {
+                                x.Condition.Value = targetIndex++;
+                                return x.Conditions!.Select(c => new AbstractConditionLine(0, targetIndex - 1, 0, 0, c));
+                            }
+                            else
+                            {
+                                x.Condition.Value = 0;
+                                return Array.Empty<AbstractConditionLine>();
+                            }
+                        }).ToList();
+                    
                     var eventLines = selectedEvents
                         .SelectMany((e, index) => e.ToSmartScriptLines(script.EntryOrGuid, script.SourceType, index))
                         .ToList();
@@ -571,16 +594,36 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                         .SelectMany((e, index) => this.smartScriptExporter.ToDatabaseCompatibleConditions(script, e, index))
                         .ToList();
 
-                    var clibpoardEvents = new ClipboardEvents() { Lines = eventLines, Conditions = conditionLines.Select(l => new AbstractConditionLine(l)).ToList() };
+                    var clibpoardEvents = new ClipboardEvents() { Lines = eventLines, 
+                        Conditions = conditionLines.Select(l => new AbstractConditionLine(l)).ToList(),
+                        TargetConditions = targetConditions
+                    };
 
                     string serialized = JsonConvert.SerializeObject(clibpoardEvents);
                     clipboard.SetText(serialized);
                 }
                 else if (AnyActionSelected)
                 {
+                    int targetIndex = 1;
                     var selectedActions = Events.SelectMany(e => e.Actions).Where(e => e.IsSelected).ToList();
                     if (selectedActions.Count > 0)
                     {
+                        var targetConditions = selectedActions
+                            .SelectMany(a => new[] { a.Source, a.Target })
+                            .SelectMany(x =>
+                            {
+                                if (x.Conditions != null && x.Conditions.Count > 0)
+                                {
+                                    x.Condition.Value = targetIndex++;
+                                    return x.Conditions!.Select(c => new AbstractConditionLine(0, targetIndex - 1, 0, 0, c));
+                                }
+                                else
+                                {
+                                    x.Condition.Value = 0;
+                                    return Array.Empty<AbstractConditionLine>();
+                                }
+                            }).ToList();
+                        
                         SmartEvent fakeEvent = new(-1, editorFeatures) {ReadableHint = "", Parent = script};
                         foreach (SmartAction a in selectedActions)
                             fakeEvent.AddAction(a.Copy());
@@ -588,7 +631,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                         var lines = fakeEvent
                             .ToSmartScriptLines(script.EntryOrGuid, script.SourceType, 0);
 
-                        var serialized = JsonConvert.SerializeObject(new ClipboardEvents() { Lines = lines.ToList() });
+                        var serialized = JsonConvert.SerializeObject(new ClipboardEvents() { Lines = lines.ToList(), TargetConditions = targetConditions});
                         clipboard.SetText(serialized);
                     }
                 }
@@ -635,6 +678,13 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 {
                     if (content.Lines[0].EventType == -1) // actions
                     {
+                        Dictionary<int, List<ICondition>>? targetConditions = null;
+                        if (content.TargetConditions.Count > 0)
+                        {
+                            targetConditions = content.TargetConditions.GroupBy(c => c.SourceGroup)
+                                .ToDictionary(x => x.Key, x => x.ToList<ICondition>());
+                        }
+                        
                         int? eventIndex = null;
                         int? actionIndex = null;
                         using (script.BulkEdit("Paste actions"))
@@ -682,6 +732,16 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                                 Events[eventIndex.Value].Actions.Insert(actionIndex!.Value, smartAction);
                                 smartAction.IsSelected = true;
                                 actionIndex++;
+
+                                if (smartLine.SourceConditionId > 0 &&
+                                    targetConditions != null &&
+                                    targetConditions.TryGetValue(smartLine.SourceConditionId, out var sourceConditions))
+                                    smartAction.Source.Conditions = sourceConditions;
+                                
+                                if (smartLine.TargetConditionId > 0 &&
+                                    targetConditions != null &&
+                                    targetConditions.TryGetValue(smartLine.TargetConditionId, out var sourceConditionsTarget))
+                                    smartAction.Target.Conditions = sourceConditionsTarget;
                             }
                         }
                     }
@@ -706,7 +766,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                             if (!index.HasValue)
                                 index = Events.Count;
                             
-                            foreach (var e in script.InsertFromClipboard(index.Value, content.Lines, content.Conditions))
+                            foreach (var e in script.InsertFromClipboard(index.Value, content.Lines, content.Conditions, content.TargetConditions))
                                 e.IsSelected = true;
                         }
                     }
@@ -799,16 +859,20 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                         }
                         else
                         {
-                            DeselectAll.Execute();
+                            if (addToSelection)
+                                DeselectAllButGlobalVariables.Execute();
+                            else
+                                DeselectAll.Execute();
                             script.GlobalVariables[selectedGlobalVariableIndex].IsSelected = true;
                         }
                     }
                 }
                 else if (AnyEventSelected)
                 {
-                    int selectedEventIndex = Math.Clamp(FirstSelectedIndex + diff, 0, Events.Count - 1);
+                    int selectedEventIndex = Math.Clamp(diff < 0 ? FirstSelectedIndex + diff : LastSelectedIndex + diff, 0, Events.Count - 1);
                     if (addToSelection)
                     {
+                        Profiler.ProfileOneFrame();
                         Events[selectedEventIndex].IsSelected = true;
                     }
                     else
@@ -827,8 +891,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 }
                 else if (AnyActionSelected)
                 {
-                    int nextActionIndex = FirstSelectedActionIndex.actionIndex + diff;
-                    int nextEventIndex = FirstSelectedActionIndex.eventIndex;
+                    int nextActionIndex = diff < 0 ? FirstSelectedActionIndex.actionIndex + diff : LastSelectedActionIndex.actionIndex + diff;
+                    int nextEventIndex = diff < 0 ? FirstSelectedActionIndex.eventIndex : LastSelectedActionIndex.eventIndex;
                     while (nextActionIndex == -1 || nextActionIndex >= Events[nextEventIndex].Actions.Count)
                     {
                         nextEventIndex += diff;
@@ -844,14 +908,18 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
                     if (nextActionIndex != -1 && nextEventIndex >= 0 && nextEventIndex < Events.Count)
                     {
-                        DeselectAll.Execute();
+                        if (!addToSelection)
+                            DeselectAll.Execute();
+                        else
+                            DeselectAllButActions.Execute();
                         Events[nextEventIndex].Actions[nextActionIndex].IsSelected = true;
                     }
                 }
                 else if (AnyConditionSelected)
-                {
-                    int nextConditionIndex = FirstSelectedConditionIndex.conditionIndex + diff;
-                    int nextEventIndex = FirstSelectedConditionIndex.eventIndex;
+                {            
+                    int nextConditionIndex = diff < 0 ? FirstSelectedConditionIndex.conditionIndex + diff : LastSelectedConditionIndex.conditionIndex + diff;
+                    int nextEventIndex = diff < 0 ? FirstSelectedConditionIndex.eventIndex : LastSelectedConditionIndex.eventIndex;
+                    
                     while (nextConditionIndex == -1 || nextConditionIndex >= Events[nextEventIndex].Conditions.Count)
                     {
                         nextEventIndex += diff;
@@ -867,7 +935,10 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
                     if (nextConditionIndex != -1 && nextEventIndex >= 0 && nextEventIndex < Events.Count)
                     {
-                        DeselectAll.Execute();
+                        if (!addToSelection)
+                            DeselectAll.Execute();
+                        else
+                            DeselectAllButConditions.Execute();
                         Events[nextEventIndex].Conditions[nextConditionIndex].IsSelected = true;
                     }
                 }
@@ -922,6 +993,12 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                             e.Actions.RemoveAt(i);
                     }
                 }
+            });
+
+            DismissNotification = new DelegateCommand<SmartExtensionNotification>(notification =>
+            {
+                Notifications.Remove(notification);
+                notification.Dispose();
             });
 
             History.PropertyChanged += (_, _) =>
@@ -1020,11 +1097,20 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         private int FirstSelectedIndex =>
             Events.Select((e, index) => (e.IsSelected, index)).Where(p => p.IsSelected).Select(p => p.index).FirstOrDefault();
 
+        private int LastSelectedIndex =>
+            Events.Select((e, index) => (e.IsSelected, index)).Where(p => p.IsSelected).Select(p => p.index).LastOrDefault();
+
         private (int eventIndex, int actionIndex) FirstSelectedActionIndex =>
             Events.SelectMany((e, eventIndex) => e.Actions.Select((a, actionIndex) => (a.IsSelected, eventIndex, actionIndex)))
                 .Where(p => p.IsSelected)
                 .Select(p => (p.eventIndex, p.actionIndex))
                 .FirstOrDefault();
+
+        private (int eventIndex, int actionIndex) LastSelectedActionIndex =>
+            Events.SelectMany((e, eventIndex) => e.Actions.Select((a, actionIndex) => (a.IsSelected, eventIndex, actionIndex)))
+                .Where(p => p.IsSelected)
+                .Select(p => (p.eventIndex, p.actionIndex))
+                .LastOrDefault();
 
         private (int eventIndex, int conditionIndex) FirstSelectedConditionIndex =>
             Events.SelectMany((e, eventIndex) => e.Conditions.Select((a, conditionIndex) => (a.IsSelected, eventIndex, conditionIndex)))
@@ -1032,6 +1118,12 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 .Select(p => (p.eventIndex, p.conditionIndex))
                 .FirstOrDefault();
                 
+        private (int eventIndex, int conditionIndex) LastSelectedConditionIndex =>
+            Events.SelectMany((e, eventIndex) => e.Conditions.Select((a, conditionIndex) => (a.IsSelected, eventIndex, conditionIndex)))
+                .Where(p => p.IsSelected)
+                .Select(p => (p.eventIndex, p.conditionIndex))
+                .LastOrDefault();
+
         public bool CanClose { get; } = true;
         public IHistoryManager History { get; }
 
@@ -1141,7 +1233,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
         private async Task AsyncLoad()
         {
-            await editorExtension.BeforeLoad(item);
+            await editorExtension.BeforeLoad(this, item);
             var lines = (await smartScriptDatabase.GetScriptFor(item.Entry, item.SmartType)).ToList();
             var conditions = smartScriptDatabase.GetConditionsForScript(item.Entry, item.SmartType).ToList();
             var targetSourceConditions = smartScriptDatabase.GetConditionsForSourceTarget(item.Entry, item.SmartType).ToList();
@@ -1795,6 +1887,28 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         {
             get => problematicLines;
             set => SetProperty(ref problematicLines, value);
+        }
+
+        public ObservableCollection<SmartExtensionNotification> Notifications { get; } = new();
+
+        public DelegateCommand<SmartExtensionNotification> DismissNotification { get; }
+
+        public void AddNotification(SmartExtensionNotification notification)
+        {
+            Notifications.Add(notification.WrapCommand(cmd => new DelegateCommand(() =>
+            {
+                cmd.Execute(null);
+                DismissNotification.Execute(notification);
+            })));
+            notification.AutoDispose(notification
+                .ToObservable(o => o.IsOpened)
+                .SubscribeAction(isOpened =>
+                {
+                    if (isOpened)
+                        return;
+
+                    DismissNotification.Execute(notification);
+                }));
         }
     }
 }

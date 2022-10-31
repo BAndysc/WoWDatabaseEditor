@@ -217,11 +217,20 @@ namespace AvaloniaStyles.Controls
                 {
                     DispatcherTimer.RunOnce(() =>
                     {
+                        if (box.SearchTextBox == null) // before template applied
+                            return;
+                        
+                        box.SearchTextBox.Text = "";
                         FocusManager.Instance.Focus(box.SearchTextBox, NavigationMethod.Pointer);
                         box.SearchTextBox.SelectionEnd = box.SearchTextBox.SelectionStart = box.SearchTextBox.Text.Length;
-                    }, TimeSpan.FromMilliseconds(1));
-                    box.SearchTextBox.Text = "";
+                    }, TimeSpan.FromMilliseconds(16));
+
                     box.TextUpdated("");
+                    
+                    if (box.SearchTextBox == null) // before template applied
+                        return;
+                    
+                    box.SearchTextBox.Text = "";
                 }
             });
         }

@@ -7,4 +7,5 @@ namespace WDE.QueryGenerators.Base;
 public interface IUpdateQueryProvider<T>
 {
     IQuery Update(T t);
+    int Priority => 0;
 }

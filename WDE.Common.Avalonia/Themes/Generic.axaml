@@ -115,8 +115,8 @@
         <Setter Property="Template">
             <ControlTemplate>
                 <StackPanel Spacing="15" Orientation="Horizontal" HorizontalAlignment="Right">
-                    <Button Classes="primary" MinWidth="90" MinHeight="30" Command="{TemplateBinding AcceptCommand}" Content="{TemplateBinding AcceptText}"></Button>
-                    <Button MinWidth="90" MinHeight="30" Command="{TemplateBinding CancelCommand}">Cancel</Button>
+                    <Button IsDefault="True" Classes="primary" MinWidth="90" MinHeight="30" Command="{TemplateBinding AcceptCommand}" Content="{TemplateBinding AcceptText}"></Button>
+                    <Button IsCancel="True" MinWidth="90" MinHeight="30" Command="{TemplateBinding CancelCommand}">Cancel</Button>
                 </StackPanel>
             </ControlTemplate>
         </Setter>

@@ -12,14 +12,11 @@ internal class QueryGenerator<R> : IQueryGenerator<R>
         IEnumerable<IDeleteQueryProvider<R>> deleteProviders,
         IEnumerable<IUpdateQueryProvider<R>> updateProviders)
     {
-        foreach (var p in insertProviders)
-            insertProvider = p;
+        insertProvider = insertProviders.MaxBy(p => p.Priority);
         
-        foreach (var p in deleteProviders)
-            deleteProvider = p;
+        deleteProvider = deleteProviders.MaxBy(p => p.Priority);
 
-        foreach (var p in updateProviders)
-            updateProvider = p;
+        updateProvider = updateProviders.MaxBy(p => p.Priority);
 
         if (insertProvider == null && deleteProvider == null && updateProvider == null)
             Console.WriteLine("Couldn't find a provider for " + typeof(R));

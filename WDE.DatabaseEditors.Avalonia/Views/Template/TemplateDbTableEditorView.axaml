@@ -105,37 +105,49 @@
                                        LightSource="avares://WDE.DatabaseEditors.Avalonia/Views/ColorsLight.axaml"/>
         <StyleInclude Source="avares://WDE.DatabaseEditors.Avalonia/Controls/FastCellView.axaml" />
         <StyleInclude Source="avares://WDE.DatabaseEditors.Avalonia/Controls/FastBoolCellView.axaml" />
-        <Style Selector="DockPanel.alternating">
+        <Style Selector="ContentPresenter DockPanel.alternating">
             <Setter Property="Background" Value="{DynamicResource TreeViewItem.Content.Background.NormalAlternate}" />
         </Style>
-        <Style Selector="DockPanel.alternating.odd">
+        <Style Selector="ContentPresenter:nth-child(2n) DockPanel.alternating">
             <Setter Property="Background" Value="{DynamicResource TreeViewItem.Content.Background.Normal}" />
         </Style>
     </UserControl.Styles>
     <Panel>
-        <ScrollViewer>
-            <ItemsPresenter Focusable="False" Items="{CompiledBinding FilteredRows, Mode=OneTime}" Margin="0, 0, 0, 20">
-                <ItemsPresenter.ItemTemplate>
-                    <DataTemplate x:DataType="viewModels:DatabaseRowsGroupViewModel">
-                        <StackPanel Orientation="Vertical" Margin="0, 10, 0, 0">
-                            <Border Height="20" Background="{DynamicResource TreeViewItem.Header.Background.Special}">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Padding="10,0,0,0" 
-                                               Text="{CompiledBinding GroupName, Mode=OneTime}" 
-                                               Foreground="{DynamicResource TreeViewItem.Header.Foreground.Special}" 
-                                               Width="150"
-                                               VerticalAlignment="Center"/>
-                                    <ItemsControl ItemTemplate="{StaticResource RowHeaderTemplate}" Items="{Binding DataContext.Header, ElementName=rootWindow, Mode=OneTime}" ItemsPanel="{StaticResource HorizontalStackPanelTemplate}">
-                                    </ItemsControl>
-                                </StackPanel>
-                            </Border>
-                            <controls1:AlternatingItemsControl ItemTemplate="{StaticResource RowTemplate}" Focusable="False" Items="{CompiledBinding ., Mode=OneTime}">
-                            </controls1:AlternatingItemsControl>
-                        </StackPanel>
-                    </DataTemplate>
-                </ItemsPresenter.ItemTemplate>
-            </ItemsPresenter>
-        </ScrollViewer>
+        <TabControl Padding="0" Items="{CompiledBinding FilteredRows, Mode=OneTime}" SelectedItem="{CompiledBinding SelectedGroup}">
+            <TabControl.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{CompiledBinding GroupName}" />
+                </DataTemplate>
+            </TabControl.ItemTemplate>
+            <TabControl.ContentTemplate>
+                <DataTemplate x:DataType="viewModels:DatabaseRowsGroupViewModel">
+                    <StackPanel Orientation="Vertical" Margin="0, 10, 0, 0">
+                        <Border Height="20" Background="{DynamicResource TreeViewItem.Header.Background.Special}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Padding="10,0,0,0" 
+                                           Text="{CompiledBinding GroupName}" 
+                                           Foreground="{DynamicResource TreeViewItem.Header.Foreground.Special}" 
+                                           Width="150"
+                                           VerticalAlignment="Center"/>
+                                <ItemsControl ItemTemplate="{StaticResource RowHeaderTemplate}" Items="{Binding DataContext.Header, ElementName=rootWindow}" ItemsPanel="{StaticResource HorizontalStackPanelTemplate}">
+                                </ItemsControl>
+                            </StackPanel>
+                        </Border>
+                        <ItemsControl ItemTemplate="{StaticResource RowTemplate}" Focusable="False" Items="{CompiledBinding .}">
+                        </ItemsControl>
+                    </StackPanel>
+                </DataTemplate>
+            </TabControl.ContentTemplate>
+        </TabControl>
+        
+        <!-- <ScrollViewer> -->
+        <!--      -->
+        <!--     ~1~ <ItemsPresenter Focusable="False" Items="{CompiledBinding FilteredRows, Mode=OneTime}" Margin="0, 0, 0, 20"> @1@ -->
+        <!--     ~1~     <ItemsPresenter.ItemTemplate> @1@ -->
+        <!--     ~1~          @1@ -->
+        <!--     ~1~     </ItemsPresenter.ItemTemplate> @1@ -->
+        <!--     ~1~ </ItemsPresenter> @1@ -->
+        <!-- </ScrollViewer> -->
         
         <controls2:TeachingTip IsOpened="{CompiledBinding YouCanRevertTipOpened}" 
                                VerticalAlignment="Bottom" Margin="20" 

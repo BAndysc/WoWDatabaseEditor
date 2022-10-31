@@ -7,4 +7,5 @@ namespace WDE.QueryGenerators.Base;
 public interface IDeleteQueryProvider<T>
 {
     IQuery Delete(T t);
+    int Priority => 0;
 }

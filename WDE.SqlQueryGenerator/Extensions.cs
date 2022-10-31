@@ -174,7 +174,7 @@ namespace WDE.SqlQueryGenerator
 
         public static IWhere WhereIn<T>(this ITable table, string columnName, IEnumerable<T> values)
         {
-            var str = string.Join(", ", values);
+            var str = string.Join(", ", values.Select(v => v.ToSql()));
             return new Where(table, $"`{columnName}` IN ({str})");
         }
 
@@ -273,12 +273,35 @@ namespace WDE.SqlQueryGenerator
                 return f.ToString(CultureInfo.InvariantCulture);
             if (o is double d)
                 return d.ToString(CultureInfo.InvariantCulture);
+            if (o is int i)
+                return i.ToString();
+            if (o is uint ui)
+                return ui.ToString();
+            if (o is long l)
+                return l.ToString();
+            if (o is ulong ul)
+                return ul.ToString();
+            if (o is short sh)
+                return sh.ToString();
+            if (o is ushort ush)
+                return ush.ToString();
+            if (o is byte bt)
+                return bt.ToString();
+            if (o is sbyte sbt)
+                return sbt.ToString();
             if (o is bool b)
                 return b ? "1" : "0";
             if (o is DateTime dt)
                 return dt.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss").ToSqlEscapeString();
             if (o is SqlTimestamp ts)
                 return "FROM_UNIXTIME(" + ts.Value + ")";
+            if (o is Guid g)
+                return g.ToString().ToSqlEscapeString();
+            if (o.GetType().IsEnum)
+                return ((long)(object)o).ToString();
+            if (o is RawText raw)
+                return raw.ToString();
+            throw new Exception($"Invalid type in ToSql: {o.GetType()}");
             return o.ToString() ?? "[INVALID TYPE]";
         }
 

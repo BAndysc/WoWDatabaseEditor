@@ -46,14 +46,8 @@
             <TextBox Grid.Row="8" Grid.Column="1" Text="{CompiledBinding Comment, Mode=TwoWay}"></TextBox>
         </Grid>
     
-        <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="80" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="80" />
-            </Grid.ColumnDefinitions>
-            <Button Content="Cancel" Command="{CompiledBinding Cancel}"  />
-            <Button Command="{CompiledBinding Accept}" Grid.Column="2" Content="Accept" />
-        </Grid>
+        <OkCancelButtons Grid.Row="1"
+                         AcceptCommand="{CompiledBinding Accept}"
+                         CancelCommand="{CompiledBinding Cancel}" />
     </Grid>
 </controls:DialogViewBase>

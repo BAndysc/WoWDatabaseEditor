@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Linq;
 using WDE.Common.Database;
 using WDE.Common.Services.MessageBox;
+using WDE.Common.Utils;
 using WDE.MVVM.Observable;
 using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Editor;
@@ -128,12 +129,21 @@ namespace WDE.SmartScriptEditor.Models
             ScriptSelectedChanged?.Invoke();
         }
         
-        public List<SmartEvent> InsertFromClipboard(int index, IEnumerable<ISmartScriptLine> lines, IEnumerable<IConditionLine>? conditions)
+        public void Clear()
+        {
+            Events.RemoveAll();
+        }
+        
+        public List<SmartEvent> InsertFromClipboard(int index, IEnumerable<ISmartScriptLine> lines, IEnumerable<IConditionLine>? conditions, IEnumerable<IConditionLine>? targetConditionLines)
         {
             List<SmartEvent> newEvents = new();
             SmartEvent? currentEvent = null;
             var prevIndex = 0;
             var conds = importer.ImportConditions(this, conditions?.ToList() ?? new List<IConditionLine>());
+
+            Dictionary<int, List<ICondition>>? targetConditions = null;
+            if (targetConditionLines != null)
+                targetConditions = targetConditionLines.GroupBy(x => x.SourceGroup).ToDictionary(x => x.Key, x => x.ToList<ICondition>());
 
             foreach (ISmartScriptLine line in lines)
             {
@@ -160,6 +170,17 @@ namespace WDE.SmartScriptEditor.Models
                         action.Comment = line.Comment.Contains(" // ")
                             ? line.Comment.Substring(line.Comment.IndexOf(" // ") + 4).Trim()
                             : "";
+                        
+                        if (targetConditions != null &&
+                            line.SourceConditionId > 0 &&
+                            targetConditions.TryGetValue(line.SourceConditionId, out var srcConditions))
+                            action.Source.Conditions = srcConditions;
+                        
+                        if (targetConditions != null &&
+                            line.TargetConditionId > 0 &&
+                            targetConditions.TryGetValue(line.TargetConditionId, out var targtConditions))
+                            action.Target.Conditions = targtConditions;
+                        
                         currentEvent.AddAction(action);
                     }
                 }

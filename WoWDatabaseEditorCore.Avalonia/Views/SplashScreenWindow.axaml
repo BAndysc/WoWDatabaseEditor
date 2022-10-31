@@ -21,13 +21,32 @@
             <Border BoxShadow=" 10 1 40 1 #40000000"  Background="#103B5E">
                 <Image Source="../Icon.png" Width="200" Height="200" VerticalAlignment="Center" HorizontalAlignment="Center" />
             </Border>
-            <Border Background="#23000000" Grid.Column="1">
-                <StackPanel Margin="20,0,0,0" Orientation="Vertical" VerticalAlignment="Center">
-                    <TextBlock FontSize="18" Foreground="White" Opacity="0.7">loading...</TextBlock>
-                    <TextBlock FontSize="45" Foreground="White">WoW</TextBlock>
-                    <TextBlock FontSize="45" FontWeight="Light" Foreground="White">Database</TextBlock>
-                    <TextBlock FontSize="45" FontWeight="Light" Foreground="White">Editor</TextBlock>
-                </StackPanel>
+            <Border Background="#1991ED" Grid.Column="1" ClipToBounds="True">
+                <Panel>
+                    <StackPanel Margin="20,-25,0,0" Orientation="Vertical" VerticalAlignment="Center">
+                        <TextBlock FontSize="18" Foreground="White" Opacity="0.7">loading...</TextBlock>
+                        <TextBlock FontSize="45" Foreground="White">WoW</TextBlock>
+                        <TextBlock FontSize="45" FontWeight="Light" Foreground="White">Database</TextBlock>
+                        <TextBlock FontSize="45" FontWeight="Light" Foreground="White">Editor</TextBlock>
+                    </StackPanel>
+                    <Border RenderTransformOrigin="0.5 0.5" 
+                            RenderTransform="rotate(16deg)" 
+                            VerticalAlignment="Bottom" 
+                            Height="110"
+                            Width="500"
+                            Background="#4FAEFF"
+                            BoxShadow="inset 0 0 60 20 #ff0272d2">
+                    </Border>
+                    <Border RenderTransformOrigin="0.5 1" 
+                            RenderTransform="rotate(16deg)" 
+                            VerticalAlignment="Top" 
+                            Height="110"
+                            Width="500"
+                            Background="#4FAEFF"
+                            Margin="0,-140,0,0"
+                            BoxShadow="inset 0 0 60 20 #ff0272d2">
+                    </Border>
+                </Panel>
             </Border>
         </Grid>
     </Panel>
