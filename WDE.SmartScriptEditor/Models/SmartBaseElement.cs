@@ -117,7 +117,8 @@ namespace WDE.SmartScriptEditor.Models
                 if (paramHolder.Parameter is IAffectsOtherParametersParameter affectsOther)
                 {
                     foreach (var index in affectsOther.AffectedParameters())
-                        @params[index].RefreshStringText();
+                        if (index < @params.Length)
+                            @params[index].RefreshStringText();
                 }
             }
         }
