@@ -1,9 +1,10 @@
 using System.Collections.Generic;
 using WDE.Common.Parameters;
+using WDE.Conditions.Shared;
 
 namespace WDE.Conditions.ViewModels
 {
-    public class ConditionObjectEntryParameter : IContextualParameter<long, ConditionViewModel>
+    public class ConditionObjectEntryParameter : IContextualParameter<long, IConditionViewModel>
     {
         private readonly IParameterFactory parameterFactory;
         public string? Prefix => null;
@@ -21,7 +22,7 @@ namespace WDE.Conditions.ViewModels
 
         public Dictionary<long, SelectOption>? Items { get; }
 
-        public Dictionary<long, SelectOption>? ItemsForContext(ConditionViewModel context)
+        public Dictionary<long, SelectOption>? ItemsForContext(IConditionViewModel context)
         {
             LazyLoad();
             
@@ -46,7 +47,7 @@ namespace WDE.Conditions.ViewModels
         private IParameter<long>? creatureParameter;
         private IParameter<long>? gameobjectParameter;
 
-        public string ToString(long value, ConditionViewModel context)
+        public string ToString(long value, IConditionViewModel context)
         {
             LazyLoad();
             

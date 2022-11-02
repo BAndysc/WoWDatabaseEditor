@@ -12,7 +12,10 @@ public class MySqlQuestObjective : IQuestObjective
     
     [Column(Name = "QuestID")]
     public uint QuestId { get; set; }
-    
+
+    [Column(Name = "Type")]
+    public QuestObjectiveType Type { get; set; }
+
     [Column(Name = "StorageIndex")]
     public int StorageIndex { get; set; }
     

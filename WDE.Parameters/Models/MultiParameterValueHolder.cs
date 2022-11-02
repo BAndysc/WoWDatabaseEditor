@@ -207,7 +207,7 @@ public partial class MultiParameterValueHolder<T> : IParameterValueHolder<T>, Sy
         if (HoldsMultipleValues)
             cachedStringValue = "---";
         else
-            cachedStringValue = parameter.ToString(value);
+            cachedStringValue = values[0].String;// parameter.ToString(value);
     
         return cachedStringValue;
     }

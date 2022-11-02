@@ -5,12 +5,13 @@ using WDE.Common.Database;
 using WDE.Common.Parameters;
 using WDE.Common.Utils;
 using WDE.Conditions.Data;
+using WDE.Conditions.Shared;
 using WDE.Parameters;
 using WDE.Parameters.Models;
 
 namespace WDE.Conditions.ViewModels
 {
-    public class ConditionViewModel : BindableBase
+    public class ConditionViewModel : BindableBase, IConditionViewModel
     {
         public static int ParametersCount => 3;
         private ParameterValueHolder<long>[] parameters = new ParameterValueHolder<long>[ParametersCount];
@@ -31,7 +32,7 @@ namespace WDE.Conditions.ViewModels
         public ConditionViewModel(IParameter<long> targets)
         {
             for (int i = 0; i < ParametersCount; ++i)
-                parameters[i] = new ConstContextParameterValueHolder<long, ConditionViewModel>(Parameter.Instance, 0, this);
+                parameters[i] = new ConstContextParameterValueHolder<long, IConditionViewModel>(Parameter.Instance, 0, this);
             ConditionTarget = new ParameterValueHolder<long>("Target", targets, 0);
             ConditionTarget.IsUsed = targets.HasItems && targets.Items!.Count > 1;
 

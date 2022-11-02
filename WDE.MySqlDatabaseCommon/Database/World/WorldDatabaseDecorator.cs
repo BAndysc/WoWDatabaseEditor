@@ -26,6 +26,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public IEnumerable<IQuestTemplate> GetQuestTemplates() => impl.GetQuestTemplates();
         public async Task<IList<IQuestObjective>> GetQuestObjectives(uint questId) => await impl.GetQuestObjectives(questId);
         public async Task<IQuestObjective?> GetQuestObjective(uint questId, int storageIndex) => await impl.GetQuestObjective(questId, storageIndex);
+        public async Task<IQuestObjective?> GetQuestObjectiveById(uint objectiveId) => await impl.GetQuestObjectiveById(objectiveId);
 
         public Task<IQuestRequestItem?> GetQuestRequestItem(uint entry) => impl.GetQuestRequestItem(entry);
         public Task<IList<IItem>?> GetItemTemplatesAsync() => impl.GetItemTemplatesAsync();

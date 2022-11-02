@@ -205,6 +205,9 @@ namespace WDE.DbcStore
             public Dictionary<long, Dictionary<long, long>> ScenarioToStepStore { get; internal set; } = new();
             public Dictionary<long, long> BattlePetSpeciesIdStore { get; internal set; } = new();
             public Dictionary<long, string> CharSpecializationStore { get; internal set;} = new();
+            public Dictionary<long, string> GarrisonClassSpecStore { get; internal set; } = new();
+            public Dictionary<long, string> GarrisonBuildingStore { get; internal set; } = new();
+            public Dictionary<long, string> GarrisonTalentStore { get; internal set; } = new();
 
             public string Name => "DBC Loading";
             public bool WaitForOtherTasks => false;
@@ -398,6 +401,9 @@ namespace WDE.DbcStore
                 parameterFactory.Register("ScenarioStepParameter", new DbcParameter(ScenarioStepStore));
                 parameterFactory.Register("BattlePetAbilityParameter", new DbcParameter(BattlePetAbilityStore));
                 parameterFactory.Register("CharSpecializationParameter", new DbcParameter(CharSpecializationStore));
+                parameterFactory.Register("GarrisonClassSpecParameter", new DbcParameter(GarrisonClassSpecStore));
+                parameterFactory.Register("GarrisonBuildingParameter", new DbcParameter(GarrisonBuildingStore));
+                parameterFactory.Register("GarrisonTalentParameter", new DbcParameter(GarrisonTalentStore));
                 
                 parameterFactory.RegisterDepending("BattlePetSpeciesParameter", "CreatureParameter", (creature) => new BattlePetSpeciesParameter(store, parameterFactory, creature));
 
@@ -779,6 +785,18 @@ namespace WDE.DbcStore
                         Load("BattlePetSpecies.db2", 8, 2, BattlePetSpeciesIdStore);
                         Load("BattlePetAbility.db2", 0, 1, BattlePetAbilityStore);
                         Load("Scenario.db2", 0, 1, ScenarioStore);
+                        Load("GarrClassSpec.db2", 7, 0, GarrisonClassSpecStore);
+                        Load("GarrTalent.db2", 7, 0, GarrisonTalentStore);
+                        Load("GarrBuilding.db2", row =>
+                        {
+                            var id = row.Key;
+                            var allyName = row.GetString(1);
+                            var hordeName = row.GetString(2);
+                            if (allyName == hordeName)
+                                GarrisonBuildingStore[id] = allyName;
+                            else
+                                GarrisonBuildingStore[id] = $"{allyName} / {hordeName}";
+                        });
                         Load("ScenarioStep.db2", row =>
                         {
                             var stepId = row.Key;

@@ -216,6 +216,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public async Task<IQuestObjective?> GetQuestObjective(uint questId, int storageIndex) => await nonCachedDatabase.GetQuestObjective(questId, storageIndex);
 
+        public async Task<IQuestObjective?> GetQuestObjectiveById(uint objectiveId) => await nonCachedDatabase.GetQuestObjectiveById(objectiveId);
+
         public Task<IQuestRequestItem?> GetQuestRequestItem(uint entry) => nonCachedDatabase.GetQuestRequestItem(entry);
 
         public IEnumerable<ICreatureClassLevelStat> GetCreatureClassLevelStats() =>

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using Unity.Injection;
 using WDE.Common.Parameters;
+using WDE.Conditions.Shared;
 using WDE.Parameters.Models;
 using WDE.SmartScriptEditor.Editor;
 using WDE.SmartScriptEditor.Parameters;
@@ -119,6 +120,14 @@ namespace WDE.SmartScriptEditor.Models
                     foreach (var index in affectsOther.AffectedParameters())
                         if (index < @params.Length)
                             @params[index].RefreshStringText();
+                }
+
+                foreach (var p in @params)
+                {
+                    if (p.Parameter is IAffectedByOtherParametersParameter affectedByOther)
+                        foreach (var index in affectedByOther.AffectedByParameters())
+                            if (@params[index] == paramHolder)
+                                p.RefreshStringText();
                 }
             }
         }

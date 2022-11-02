@@ -54,7 +54,8 @@ namespace WDE.SmartScriptEditor.Data
                 parameterFactory.Register("CreatureSpawnKeyParameter", new CreatureSpawnKeyParameter(databaseProvider));
                 parameterFactory.Register("GameobjectSpawnKeyParameter", new GameObjectSpawnKeyParameter(databaseProvider));
                 parameterFactory.Register("SmartScenarioStepParameter", containerProvider.Resolve<SmartScenarioStepParameter>());
-                parameterFactory.Register("SmartQuestObjectiveParameter", containerProvider.Resolve<SmartQuestObjectiveParameter>());
+                parameterFactory.Register("SmartQuestObjectiveStorageIndexParameter", containerProvider.Resolve<SmartQuestObjectiveParameter>((typeof(bool), true)));
+                parameterFactory.Register("SmartQuestObjectiveParameter", containerProvider.Resolve<SmartQuestObjectiveParameter>((typeof(bool), false)));
                 parameterFactory.RegisterCombined("NpcFlagsSmartTypeBasedParameter", "NpcFlagParameter", "NpcFlag2Parameter", (npc1, npc2) => new NpcFlagsSmartTypeBasedParameter(npc1, npc2, pickerService));
                 var storedTarget = parameterFactory.Register("StoredTargetParameter", containerProvider.Resolve<VariableContextualParameter>(
                     (typeof(GlobalVariableType), GlobalVariableType.StoredTarget), (typeof(string), "storedTarget")));

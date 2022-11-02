@@ -104,7 +104,7 @@ namespace WDE.SmartScriptEditor.Models
                 if (negativeReadableHint != null && inverted.Value != 0)
                     readable = negativeReadableHint;
                 bool isNegative = inverted.Value != 0;
-                return Smart.Format(readable, new
+                var result = Smart.Format(readable, new
                 {
                     target = "[p=9]" + conditionTarget + "[/p]",
                     pram1 = "[p=0]" + GetParameter(0) + "[/p]",
@@ -122,6 +122,7 @@ namespace WDE.SmartScriptEditor.Models
                     
                     negate = inverted.Value == 0
                 });
+                return result;
             }
         }
 

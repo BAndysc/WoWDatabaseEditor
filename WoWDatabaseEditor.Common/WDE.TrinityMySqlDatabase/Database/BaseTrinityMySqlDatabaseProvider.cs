@@ -256,6 +256,8 @@ namespace WDE.TrinityMySqlDatabase.Database
 
         public virtual async Task<IQuestObjective?> GetQuestObjective(uint questId, int storageIndex) => null;
         
+        public virtual async Task<IQuestObjective?> GetQuestObjectiveById(uint objectiveId) => null;
+        
         public abstract Task<List<IQuestTemplate>> GetQuestTemplatesAsync();
 
         public abstract IQuestTemplate? GetQuestTemplate(uint entry);

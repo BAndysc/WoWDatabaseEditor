@@ -62,6 +62,8 @@ namespace WDE.CMMySqlDatabase.Database
         public async Task<IList<IQuestObjective>> GetQuestObjectives(uint questId) => new List<IQuestObjective>();
 
         public async Task<IQuestObjective?> GetQuestObjective(uint questId, int storageIndex) => null;
+        
+        public async Task<IQuestObjective?> GetQuestObjectiveById(uint objectiveId) => null;
 
         public async Task<IQuestRequestItem?> GetQuestRequestItem(uint entry)
         {

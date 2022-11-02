@@ -315,4 +315,10 @@ public class TrinityMasterMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvid
         await using var model = Database();
         return await model.QuestObjective.FirstOrDefaultAsync(x => x.QuestId == questId && x.StorageIndex == storageIndex);
     }
+    
+    public override async Task<IQuestObjective?> GetQuestObjectiveById(uint objectiveId)
+    {
+        await using var model = Database();
+        return await model.QuestObjective.FirstOrDefaultAsync(x => x.ObjectiveId == objectiveId);
+    }
 }

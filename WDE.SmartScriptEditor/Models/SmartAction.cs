@@ -50,7 +50,8 @@ namespace WDE.SmartScriptEditor.Models
                 CallOnChanged(sender);
                 OnPropertyChanged(nameof(Comment));
             };
-            
+            while (Context.Count < 8)
+                Context.Add(null);
             Context.Add(new MetaSmartSourceTargetEdit(this, true));
             Context.Add(new MetaSmartSourceTargetEdit(this, false));
         }
@@ -157,8 +158,8 @@ namespace WDE.SmartScriptEditor.Models
                     string output = Smart.Format(readable,
                         new
                         {
-                            target = "[s=7]" + Target.Readable + "[/s]",
-                            source = "[s=6]" + Source.Readable + "[/s]",
+                            target = "[s=9]" + Target.Readable + "[/s]",
+                            source = "[s=8]" + Source.Readable + "[/s]",
                             targetcoords = "[p]" + Target.GetCoords() + "[/p]",
                             hascoords = Target.X != 0 || Target.Y != 0 || Target.Z != 0 || Target.O != 0,
                             target_position = "[s=6]" + Target.GetPosition() + "[/s]",

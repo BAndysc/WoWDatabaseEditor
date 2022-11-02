@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using WDE.Common.Parameters;
+using WDE.Conditions.Shared;
 using WDE.SmartScriptEditor.Models;
 
 namespace WDE.SmartScriptEditor.Parameters;

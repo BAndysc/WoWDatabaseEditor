@@ -30,8 +30,10 @@ namespace WDE.Common.Parameters
     public struct ToStringOptions
     {
         public bool WithNumber;
+        
+        public static ToStringOptions WithoutNumber => new ToStringOptions(){WithNumber = false};
     }
-
+    
     public interface IContextualParameter<T, R> : IParameter<T> where T : notnull
     {
         string ToString(T value, R context);
