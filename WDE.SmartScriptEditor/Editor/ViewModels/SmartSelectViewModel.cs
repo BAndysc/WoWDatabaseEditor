@@ -32,6 +32,9 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             }
             
             var lower = text?.ToLower();
+            int? searchId = null;
+            if (int.TryParse(text, out var textInt))
+                searchId = textInt;
             
             // filtering on a separate thread, so that UI doesn't lag
             await Task.Run(() =>
@@ -39,16 +42,18 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 visibleCount = 0;
                 foreach (var item in AllItems)
                 {
-                    if (string.IsNullOrEmpty(lower))
+                    if (searchId.HasValue && searchId.Value == item.Id)
+                        item.Score = 101;
+                    else if (string.IsNullOrEmpty(lower))
                     {
                         item.Score = 100;
                     }
-                    else if (item.Name.ToLower() == lower)
+                    else if (item.Name.Equals(lower, StringComparison.InvariantCultureIgnoreCase))
                     {
                         item.Score = 101;
                     } else
                     {
-                        int indexOf = item.SearchName.IndexOf(lower, StringComparison.Ordinal);
+                        int indexOf = item.SearchName.IndexOf(lower, StringComparison.InvariantCultureIgnoreCase);
                         bool contains = indexOf != -1;
                         bool isFullWorld = false;
                         if (contains)

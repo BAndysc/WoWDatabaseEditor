@@ -518,7 +518,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                         }
                     }
                 }
-                else if (AnyConditionSelected)
+                else if (AnyConditionSelected && !editorFeatures.UseExternalConditionsEditor) // with external editor, you may not delete conditions in sai directly
                 {
                     using (script.BulkEdit("Delete conditions"))
                     {

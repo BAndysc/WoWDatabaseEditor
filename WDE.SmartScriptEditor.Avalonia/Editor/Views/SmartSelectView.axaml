@@ -72,7 +72,7 @@
                  Margin="0,6,0,6">
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <editor:FastGroupingWrapPanel ItemWidth="160" ItemHeight="24">
+                    <editor:FastGroupingWrapPanel ItemWidth="200" ItemHeight="24">
                     </editor:FastGroupingWrapPanel>
                 </ItemsPanelTemplate>
             </ListBox.ItemsPanel>
@@ -115,6 +115,7 @@
                               HorizontalAlignment="Center"
                               VerticalAlignment="Center">
                         </Path>
+                        <TextBlock Text="{CompiledBinding Id}" VerticalAlignment="Center" DockPanel.Dock="Left" Width="22" TextAlignment="Right" Margin="0,0,2,0" Opacity="0.4" />
                         <TextBlock Text="{CompiledBinding Name}" VerticalAlignment="Center">
                             <Interaction.Behaviors>
                                 <DataTriggerBehavior Binding="{CompiledBinding Deprecated}" Value="True">
