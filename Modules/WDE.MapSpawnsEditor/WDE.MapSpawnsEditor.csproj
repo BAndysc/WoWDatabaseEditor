@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <OutputType>Library</OutputType>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <WarningsAsErrors>nullable</WarningsAsErrors>
+    </PropertyGroup>
+    <PropertyGroup>
+        <OutputPath>..\WoWDatabaseEditor\bin\$(Configuration)\</OutputPath>
+    </PropertyGroup>
+
+    <Import Project="..\..\Avalonia.props" />
+    <Import Project="..\..\Module.props" />
+    <Import Project="..\..\Rendering\lib3d.props" />
+
+    <ItemGroup>
+        <ProjectReference Include="..\WDE.QueryGenerators\WDE.QueryGenerators.csproj" />
+        <ProjectReference Include="..\..\WDE.DatabaseEditors\WDE.DatabaseEditors.csproj" />
+        <ProjectReference Include="..\..\WDE.MangosEventAiEditor\WDE.MangosEventAiEditor.csproj" />
+        <ProjectReference Include="..\..\WDE.MapRenderer\WDE.MapRenderer.csproj" />
+        <ProjectReference Include="..\..\WDE.MpqReader\WDE.MpqReader.csproj" />
+        <ProjectReference Include="..\..\WDE.MVVM\WDE.MVVM.csproj" />
+        <ProjectReference Include="..\..\WDE.Parameters\WDE.Parameters.csproj" />
+        <PackageReference Include="Nito.AsyncEx" Version="5.1.2" />
+        <ProjectReference Include="..\..\WDE.TrinitySmartScriptEditor\WDE.TrinitySmartScriptEditor.csproj" />
+        <ProjectReference Include="..\..\Rendering\OpenGLBindings\OpenGLBindings.csproj" />
+        <ProjectReference Include="..\..\Rendering\TheAvaloniaOpenGL\TheAvaloniaOpenGL.csproj" />
+        <ProjectReference Include="..\..\Rendering\TheEngine\TheEngine.csproj" />
+        <ProjectReference Include="..\..\Rendering\TheMaths\TheMaths.csproj" />
+    </ItemGroup>
+</Project>

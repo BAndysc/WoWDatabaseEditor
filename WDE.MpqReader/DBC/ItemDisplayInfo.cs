@@ -72,13 +72,26 @@ public class ItemDisplayInfo
         }
     }
     
-    public ItemDisplayInfo(IWdcIterator dbcIterator, GameFilesVersion version)
+    public ItemDisplayInfo(IWdcIterator dbcIterator, GameFilesVersion version, ModelFileDataStore modelFileDataStore, TextureFileDataStore textureFileDataStore)
     {
         Id = (uint)dbcIterator.Id;
-        LeftModel = dbcIterator.GetUInt("ModelResourcesID", 0);
-        RightModel = dbcIterator.GetUInt("ModelResourcesID", 1);
-        LeftModelTexture = dbcIterator.GetInt("ModelMaterialResourcesID", 0);
-        RightModelTexture = dbcIterator.GetInt("ModelMaterialResourcesID", 1);
+        
+        var leftModelId = dbcIterator.GetUInt("ModelResourcesID", 0);
+        var rightModelId = dbcIterator.GetUInt("ModelResourcesID", 1);
+        var leftModelTextureId = dbcIterator.GetInt("ModelMaterialResourcesID", 0);
+        var rightModelTextureId = dbcIterator.GetInt("ModelMaterialResourcesID", 1);
+
+        if (leftModelId > 0 && modelFileDataStore.TryGetValue((int)leftModelId, out var modelData))
+            LeftModel = modelData.FileData;
+        
+        if (rightModelId > 0 && modelFileDataStore.TryGetValue((int)rightModelId, out modelData))
+            RightModel = modelData.FileData;
+        
+        if (leftModelTextureId > 0 && textureFileDataStore.TryGetValue(leftModelTextureId, out var textureFileData))
+            LeftModelTexture = textureFileData.FileData;
+        
+        if (rightModelTextureId > 0 && textureFileDataStore.TryGetValue(rightModelTextureId, out textureFileData))
+            RightModelTexture = textureFileData.FileData;
     }
     
     private ItemDisplayInfo()

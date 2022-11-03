@@ -1856,7 +1856,8 @@ namespace WDE.MapRenderer.Managers
             identityBonesBuffer.Dispose();
             
             foreach (var mesh in internalMeshes.Values)
-                meshManager.DisposeMesh(mesh.Value.Item1);
+                if (mesh.HasValue)
+                    meshManager.DisposeMesh(mesh.Value.Item1);
         }
     }
 }

@@ -5,7 +5,7 @@ namespace WDE.MpqReader.DBC;
 
 public class CharSectionsStore : BaseDbcStore<uint, CharSections>
 {
-    public CharSectionsStore(IEnumerable<IDbcIterator> rows)
+    public CharSectionsStore(IEnumerable<IDbcIterator> rows, TextureFileDataStore textureFileDataStore)
     {
         foreach (var row in rows)
         {
@@ -14,11 +14,11 @@ public class CharSectionsStore : BaseDbcStore<uint, CharSections>
         }
     }
     
-    public CharSectionsStore(IEnumerable<IWdcIterator> rows)
+    public CharSectionsStore(IEnumerable<IWdcIterator> rows, TextureFileDataStore textureFileDataStore)
     {
         foreach (var row in rows)
         {
-            var o = new CharSections(row);
+            var o = new CharSections(row, textureFileDataStore);
             store[o.Id] = o;
         }
     }

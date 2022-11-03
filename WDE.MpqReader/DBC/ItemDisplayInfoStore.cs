@@ -6,7 +6,7 @@ namespace WDE.MpqReader.DBC;
 
 public class ItemDisplayInfoStore : BaseDbcStore<uint, ItemDisplayInfo>
 {
-    public ItemDisplayInfoStore(IEnumerable<IDbcIterator> rows, GameFilesVersion version)
+    public ItemDisplayInfoStore(IEnumerable<IDbcIterator> rows, GameFilesVersion version, ModelFileDataStore modelFileDataStore, TextureFileDataStore textureFileDataStore)
     {
         foreach (var row in rows)
         {
@@ -15,11 +15,11 @@ public class ItemDisplayInfoStore : BaseDbcStore<uint, ItemDisplayInfo>
         }
     }
     
-    public ItemDisplayInfoStore(IEnumerable<IWdcIterator> rows, GameFilesVersion version)
+    public ItemDisplayInfoStore(IEnumerable<IWdcIterator> rows, GameFilesVersion version, ModelFileDataStore modelFileDataStore, TextureFileDataStore textureFileDataStore)
     {
         foreach (var row in rows)
         {
-            var o = new ItemDisplayInfo(row, version);
+            var o = new ItemDisplayInfo(row, version, modelFileDataStore, textureFileDataStore);
             store[o.Id] = o;
         }
     }

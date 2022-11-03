@@ -25,7 +25,7 @@ public class QuickGoToViewModel : ObservableBase
         IEventAggregator eventAggregator)
     {
         Items = new ObservableCollection<QuickGoToItemViewModel>();
-        Providers = new ObservableCollection<IQuickGoToProvider>(providers);
+        Providers = new ObservableCollection<IQuickGoToProvider>(providers.OrderBy(p => p.Order));
         
         FindItemAsyncPopulator = (s, token) =>
         {
@@ -65,9 +65,9 @@ public class QuickGoToViewModel : ObservableBase
             {
                 parameter = parameterFactory.Factory(selectedProvider.ParameterKey);
                 
+                Items.Clear();
                 if (parameter.Items != null)
                 {
-                    Items.Clear();
                     Items.AddRange(parameter.Items.Select(x => new QuickGoToItemViewModel(x.Key, x.Value.Name)));
                 }
             }

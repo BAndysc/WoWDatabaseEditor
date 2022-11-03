@@ -524,7 +524,7 @@ namespace WDE.MapRenderer.Utils
             this.snappingMode = snapping;
             originalTouch = startTouchPoint;
             dragging = gizmoMode;
-            canFinishDragging = false;
+            canFinishDragging = gizmoMode == GizmoMode.MouseDrag ? false : true;
             this.axis = axis;
             this.plane = plane;
             draggable.Clear();

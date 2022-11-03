@@ -27,11 +27,37 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
         private readonly IUserSettings userSettings;
         private AvaloniaDockAdapter avaloniaDockAdapter;
 
+        public static readonly AttachedProperty<bool> OnEnterPressedProperty = 
+            AvaloniaProperty.RegisterAttached<CompletionComboBox, bool>("OnEnterPressed", typeof(MainWindowWithDocking));
+
         public MainWindowWithDocking()
         {
             fileSystem = null!;
             userSettings = null!;
             avaloniaDockAdapter = null!;
+        }
+        
+        public static bool GetOnEnterPressed(IAvaloniaObject obj)
+        {
+            return obj.GetValue(OnEnterPressedProperty);
+        }
+
+        public static void SetOnEnterPressed(IAvaloniaObject obj, bool value)
+        {
+            obj.SetValue(OnEnterPressedProperty, value);
+        }
+
+        static MainWindowWithDocking()
+        {
+            OnEnterPressedProperty.Changed.AddClassHandler<CompletionComboBox>((box, args) =>
+            {
+                box.OnEnterPressed += (sender, pressedArgs) =>
+                {
+                    var box = (CompletionComboBox)sender!;
+                    if (pressedArgs.SelectedItem == null && long.TryParse(pressedArgs.SearchText, out var l))
+                        box.SelectedItem = new QuickGoToItemViewModel(l, "(unknown)");
+                };
+            });
         }
         
         public MainWindowWithDocking(IMainWindowHolder mainWindowHolder, 

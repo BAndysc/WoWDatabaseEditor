@@ -115,6 +115,7 @@
                     <controls:ToolbarPanel IsVisible="{CompiledBinding HasAnyType}" DataContext="{CompiledBinding QuickGoToViewModel}">
                         <TextBlock Opacity="0.6" FontSize="9" VerticalAlignment="Center">Entry:</TextBlock>
                         <CompletionComboBox AsyncPopulator="{CompiledBinding FindItemAsyncPopulator}" Width="150"
+                                            views:MainWindowWithDocking.OnEnterPressed="true"
                                             Items="{CompiledBinding Items}" SelectedItem="{CompiledBinding SelectedItem}">
                             <CompletionComboBox.ButtonItemTemplate>
                                 <DataTemplate DataType="viewModels:QuickGoToItemViewModel">

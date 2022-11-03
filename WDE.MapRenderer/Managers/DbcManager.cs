@@ -16,6 +16,7 @@ namespace WDE.MapRenderer.Managers
         public CreatureDisplayInfoExtraStore CreatureDisplayInfoExtraStore { get; }
         public EmoteStore EmoteStore { get; }
         public AnimationDataStore AnimationDataStore { get; }
+        public ItemAppearanceStore ItemAppearanceStore { get; }
         public ItemStore ItemStore { get; }
         public ItemDisplayInfoStore ItemDisplayInfoStore { get; }
         public CreatureModelDataStore CreatureModelDataStore { get; }
@@ -32,6 +33,7 @@ namespace WDE.MapRenderer.Managers
         public LightParamStore LightParamStore { get; }
         public LightStore LightStore { get; }
         public TextureFileDataStore TextureFileDataStore { get; }
+        public ModelFileDataStore ModelFileDataStore { get; }
         public LiquidTypeStore LiquidTypeStore { get; }
         public LiquidObjectStore LiquidObjectStore { get; }
         public LiquidMaterialStore LiquidMaterialStore { get; }
@@ -72,10 +74,11 @@ namespace WDE.MapRenderer.Managers
             EmoteStore = new((dynamic)OpenDbc("Emotes"));
             AnimationDataStore = new((dynamic)OpenDbc("AnimationData"), gameFiles.WoWVersion);
             GameObjectDisplayInfoStore = new((dynamic)OpenDbc("GameObjectDisplayInfo"));
-            ItemStore = new((dynamic)OpenDbc("Item"));
-            ItemDisplayInfoStore = new((dynamic)OpenDbc("ItemDisplayInfo"), gameFiles.WoWVersion);
+            if (gameFiles.WoWVersion == GameFilesVersion.Legion_7_3_5)
+                ItemAppearanceStore = new((dynamic)OpenDbc("ItemAppearance"));
+            else
+                ItemAppearanceStore = new();
             HelmetGeosetVisDataStore = new((dynamic)OpenDbc("HelmetGeosetVisData"));
-            CharSectionsStore = new((dynamic)OpenDbc("CharSections"));
             ChrRacesStore = new((dynamic)OpenDbc("ChrRaces"));
             CharacterFacialHairStylesStore = new((dynamic)OpenDbc("CharacterFacialHairStyles"), gameFiles.WoWVersion);
             CharHairGeosetsStore = new((dynamic)OpenDbc("CharHairGeosets"), gameFiles.WoWVersion);
@@ -88,6 +91,7 @@ namespace WDE.MapRenderer.Managers
                 LightFloatParamStore = new ((dynamic)OpenDbc("LightFloatBand"));
                 LightDataStore = new();
                 TextureFileDataStore = new();
+                ModelFileDataStore = new();
                 LiquidObjectStore = new();
             }
             else if (gameFiles.WoWVersion == GameFilesVersion.Cataclysm_4_3_4)
@@ -96,6 +100,7 @@ namespace WDE.MapRenderer.Managers
                 LightFloatParamStore = new ((dynamic)OpenDbc("LightFloatBand"));
                 LightDataStore = new();
                 TextureFileDataStore = new();
+                ModelFileDataStore = new();
                 LiquidObjectStore = new((dynamic)OpenDbc("LiquidObject"));
             }
             else if (gameFiles.WoWVersion == GameFilesVersion.Mop_5_4_8)
@@ -104,6 +109,7 @@ namespace WDE.MapRenderer.Managers
                 LightFloatParamStore = new ();
                 LightDataStore = new((dynamic)OpenDbc("LightData"));      
                 TextureFileDataStore = new();
+                ModelFileDataStore = new();
                 LiquidObjectStore = new((dynamic)OpenDbc("LiquidObject"));
             }
             else
@@ -112,8 +118,12 @@ namespace WDE.MapRenderer.Managers
                 LightFloatParamStore = new ();
                 LightDataStore = new((dynamic)OpenDbc("LightData"));
                 TextureFileDataStore = new((dynamic)OpenDbc("TextureFileData"));
+                ModelFileDataStore = new((dynamic)OpenDbc("ModelFileData"));
                 LiquidObjectStore = new((dynamic)OpenDbc("LiquidObject"));
             }
+            ItemStore = new((dynamic)OpenDbc("Item"), ItemAppearanceStore);
+            CharSectionsStore = new((dynamic)OpenDbc("CharSections"), TextureFileDataStore);
+            ItemDisplayInfoStore = new((dynamic)OpenDbc("ItemDisplayInfo"), gameFiles.WoWVersion, ModelFileDataStore, TextureFileDataStore);
             LightParamStore = new (gameFiles.WoWVersion, (dynamic)OpenDbc("LightParams"), LightIntParamStore, LightFloatParamStore, LightDataStore);
             LightStore = new ((dynamic)OpenDbc("Light"), LightParamStore);
         }

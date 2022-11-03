@@ -195,9 +195,15 @@ namespace WDE.MpqReader.Structures
                 
                 if (global_flags.HasFlagFast(M2Flags.CHUNKED_ANIM_FILES_2))
                 {
-                    Debug.Assert(contentReader.ReadChunkName() == "AFM2");
-                    var size = contentReader.ReadInt32();
-                    return new LimitedReader(contentReader, size);
+                    while (!contentReader.IsFinished())
+                    {
+                        var chunkName = contentReader.ReadChunkName();
+                        var size = contentReader.ReadInt32();
+                        if (chunkName == "2MFA")
+                            return new LimitedReader(contentReader, size);
+                        contentReader.Offset += size;
+                    }
+                    Debug.Assert(false, "Couldn't find chunk AFM2 in anim file");
                 }
                 return contentReader;
             };
