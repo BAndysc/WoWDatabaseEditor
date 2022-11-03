@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -126,7 +127,8 @@ namespace WDE.DatabaseEditors.Data.Structs
         public int SourceType { get; set; }
         
         [JsonProperty(PropertyName = "source_group")]
-        public string? SourceGroupColumn { get; set; }
+        [JsonConverter(typeof(DatabaseConditionColumnConverter))]
+        public DatabaseConditionColumn? SourceGroupColumn { get; set; }
         
         [JsonProperty(PropertyName = "source_entry")]
         public string? SourceEntryColumn { get; set; }
@@ -139,6 +141,20 @@ namespace WDE.DatabaseEditors.Data.Structs
         
         [JsonProperty(PropertyName = "targets")]
         public IList<DatabaseConditionTargetJson>? Targets { get; set; }
+    }
+
+    public sealed class DatabaseConditionColumn
+    {
+        public string Name { get; set; } = "";
+        
+        public bool IsAbs { get; set; }
+
+        public int Calculate(int val)
+        {
+            if (IsAbs)
+                return Math.Abs(val);
+            return val;
+        }
     }
 
     public class DatabaseConditionTargetJson

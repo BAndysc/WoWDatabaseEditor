@@ -11,6 +11,8 @@ using WDE.DatabaseEditors.Extensions;
 using WDE.DatabaseEditors.Models;
 using WDE.DatabaseEditors.ViewModels.SingleRow;
 using WDE.Module.Attributes;
+using WDE.QueryGenerators.Base;
+using WDE.QueryGenerators.Models;
 using WDE.SqlQueryGenerator;
 
 namespace WDE.DatabaseEditors.QueryGenerators
@@ -21,14 +23,17 @@ namespace WDE.DatabaseEditors.QueryGenerators
     {
         private readonly ICreatureStatCalculatorService calculatorService;
         private readonly IParameterFactory parameterFactory;
+        private readonly IQueryGenerator<ConditionDeleteModel> conditionDeleteGenerator;
         private readonly IConditionQueryGenerator conditionQueryGenerator;
 
         public QueryGenerator(ICreatureStatCalculatorService calculatorService,
             IParameterFactory parameterFactory,
+            IQueryGenerator<ConditionDeleteModel> conditionDeleteGenerator,
             IConditionQueryGenerator conditionQueryGenerator)
         {
             this.calculatorService = calculatorService;
             this.parameterFactory = parameterFactory;
+            this.conditionDeleteGenerator = conditionDeleteGenerator;
             this.conditionQueryGenerator = conditionQueryGenerator;
         }
         
@@ -320,9 +325,9 @@ namespace WDE.DatabaseEditors.QueryGenerators
                     sourceEntry = (int) entryCell.Current.Value;
 
                 if (tableData.TableDefinition.Condition.SourceGroupColumn != null &&
-                    entity.GetCell(tableData.TableDefinition.Condition.SourceGroupColumn) is DatabaseField<long>
+                    entity.GetCell(tableData.TableDefinition.Condition.SourceGroupColumn.Name) is DatabaseField<long>
                         groupCell)
-                    sourceGroup = (int) groupCell.Current.Value;
+                    sourceGroup = tableData.TableDefinition.Condition.SourceGroupColumn.Calculate((int)groupCell.Current.Value);
 
                 if (tableData.TableDefinition.Condition.SourceIdColumn != null &&
                     entity.GetCell(tableData.TableDefinition.Condition.SourceIdColumn) is DatabaseField<long>
@@ -359,9 +364,9 @@ namespace WDE.DatabaseEditors.QueryGenerators
                     sourceEntry = (int)entryCell.Current.Value;
 
                 if (tableData.TableDefinition.Condition.SourceGroupColumn != null &&
-                    entity.GetCell(tableData.TableDefinition.Condition.SourceGroupColumn) is DatabaseField<long>
+                    entity.GetCell(tableData.TableDefinition.Condition.SourceGroupColumn.Name) is DatabaseField<long>
                         groupCell)
-                    sourceGroup = (int)groupCell.Current.Value;
+                    sourceGroup = tableData.TableDefinition.Condition.SourceGroupColumn.Calculate((int)groupCell.Current.Value);
 
                 if (tableData.TableDefinition.Condition.SourceIdColumn != null &&
                     entity.GetCell(tableData.TableDefinition.Condition.SourceIdColumn) is DatabaseField<long>
@@ -380,17 +385,23 @@ namespace WDE.DatabaseEditors.QueryGenerators
 
         private IQuery BuildConditionsDeleteQuery(IReadOnlyList<DatabaseKey> keys, IDatabaseTableData tableData)
         {
-            if (tableData.TableDefinition.Condition == null)
+            if (tableData.TableDefinition.Condition == null || keys.Count == 0)
                 return Queries.Empty();
 
+            Debug.Assert(keys[0].Count == 1);
+            
             string? columnKey = null;
 
+            bool doAbs = false;
             if (tableData.TableDefinition.Condition.SourceEntryColumn ==
                 tableData.TableDefinition.TablePrimaryKeyColumnName)
                 columnKey = "SourceEntry";
-            else if (tableData.TableDefinition.Condition.SourceGroupColumn ==
+            else if (tableData.TableDefinition.Condition.SourceGroupColumn?.Name ==
                      tableData.TableDefinition.TablePrimaryKeyColumnName)
+            {
                 columnKey = "SourceGroup";
+                doAbs = tableData.TableDefinition.Condition.SourceGroupColumn?.IsAbs ?? false;
+            }
             else if (tableData.TableDefinition.Condition.SourceIdColumn ==
                      tableData.TableDefinition.TablePrimaryKeyColumnName)
                 columnKey = "SourceId";
@@ -398,10 +409,21 @@ namespace WDE.DatabaseEditors.QueryGenerators
             if (columnKey == null)
                 throw new Exception("No condition source group/entry/id is table primary key. Unable to generate SQL.");
 
-            return Queries.Table("conditions")
-                .Where(r => r.Column<int>("SourceTypeOrReferenceId") == tableData.TableDefinition.Condition.SourceType)
-                .WhereIn(columnKey, keys.Distinct())
-                .Delete();
+            var distinctKeys = keys.Select(k => k[0]).Distinct();
+            if (doAbs)
+                distinctKeys = distinctKeys.Select(Math.Abs);
+
+            ConditionDeleteModel model = default;
+            if (columnKey == "SourceEntry")
+                model = ConditionDeleteModel.ByEntry(tableData.TableDefinition.Condition.SourceType, distinctKeys.ToList());
+            else if (columnKey == "SourceGroup")
+                model = ConditionDeleteModel.ByGroup(tableData.TableDefinition.Condition.SourceType, distinctKeys.ToList());
+            else if (columnKey == "SourceId")
+                model = ConditionDeleteModel.ById(tableData.TableDefinition.Condition.SourceType,
+                    distinctKeys.ToList());
+            else
+                throw new Exception("Invalid condition delete");
+            return conditionDeleteGenerator.Delete(model)!;
         }
 
         public IQuery GenerateUpdateFieldQuery(DatabaseTableDefinitionJson table, DatabaseEntity entity,
