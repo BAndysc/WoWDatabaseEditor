@@ -1,0 +1,44 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:genericSettings="clr-namespace:WoWDatabaseEditorCore.Services.GenericSettings;assembly=WoWDatabaseEditorCore"
+             xmlns:settings="clr-namespace:WDE.Common.Settings;assembly=WDE.Common"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="genericSettings:GeneralSettingsViewModel"
+             x:Class="WoWDatabaseEditorCore.Avalonia.Services.GenericSettings.GeneralSettingsView">
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+        <ItemsPresenter Items="{CompiledBinding Groups}">
+            <ItemsPresenter.ItemTemplate>
+                <DataTemplate DataType="genericSettings:GeneralSettingsGroupViewModel">
+                    <DockPanel>
+                        <SettingsHeader DockPanel.Dock="Top" Margin="0,10" Text="{CompiledBinding Name}" />
+                        <ItemsPresenter Items="{CompiledBinding Settings}">
+                            <ItemsPresenter.DataTemplates>
+                                <DataTemplate DataType="settings:IBoolGenericSetting">
+                                    <StackPanel>
+                                        <CheckBox IsChecked="{CompiledBinding Value}" Content="{CompiledBinding Name}" />
+                                        <TextBlock TextWrapping="WrapWithOverflow" Text="{CompiledBinding Help}" Opacity="0.5" Margin="20,0,0,0" />
+                                    </StackPanel>
+                                </DataTemplate>
+                                <DataTemplate DataType="settings:IListOptionGenericSetting">
+                                    <DockPanel>
+                                        <TextBlock MaxWidth="200" TextWrapping="WrapWithOverflow" Text="{CompiledBinding Name, StringFormat={}{0}:}" VerticalAlignment="Center" />
+                                        <TextBlock TextWrapping="WrapWithOverflow" DockPanel.Dock="Bottom" Text="{CompiledBinding Help}" Opacity="0.5" Margin="20,0,0,0" />
+                                        <ComboBox Margin="10,0,0,0" Items="{CompiledBinding Options}" SelectedItem="{CompiledBinding SelectedOption}"></ComboBox>
+                                    </DockPanel>
+                                </DataTemplate>
+                                
+                            </ItemsPresenter.DataTemplates>
+                            <ItemsPresenter.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Spacing="10" />
+                                </ItemsPanelTemplate>
+                            </ItemsPresenter.ItemsPanel>
+                        </ItemsPresenter>
+                    </DockPanel>
+                </DataTemplate>
+            </ItemsPresenter.ItemTemplate>
+        </ItemsPresenter>
+    </ScrollViewer>
+</UserControl>

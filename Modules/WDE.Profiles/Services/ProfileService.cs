@@ -9,6 +9,7 @@ using WDE.Common;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;
 using WDE.Common.Profiles;
+using WDE.Common.Services.MessageBox;
 using WDE.Common.Services.Processes;
 using WDE.Common.Solution;
 using WDE.Common.Tasks;
@@ -31,6 +32,7 @@ public class ProfileService : IProfileService
     private readonly IProcessService processService;
     private readonly IProjectItemSerializer serializer;
     private readonly ISolutionItemSerializerRegistry serializerRegistry;
+    private readonly IMessageBoxService messageBoxService;
     private readonly List<ICoreVersion> coreVersions;
     private readonly Dictionary<string, ICoreVersion> coreVersionsByKey;
     private string currentProfileKey;
@@ -42,6 +44,7 @@ public class ProfileService : IProfileService
         IProcessService processService,
         IProjectItemSerializer serializer,
         ISolutionItemSerializerRegistry serializerRegistry,
+        IMessageBoxService messageBoxService,
         IEnumerable<ICoreVersion> coreVersions)
     {
         this.fileSystem = fileSystem;
@@ -49,6 +52,7 @@ public class ProfileService : IProfileService
         this.processService = processService;
         this.serializer = serializer;
         this.serializerRegistry = serializerRegistry;
+        this.messageBoxService = messageBoxService;
         this.coreVersions = coreVersions.ToList();
         coreVersionsByKey = this.coreVersions.ToDictionary(x => x.Tag, x => x);
         
@@ -345,6 +349,10 @@ public class ProfileService : IProfileService
                 return true;
             }
         }
+        
+        await messageBoxService.SimpleDialog("No profile found",
+            "No profile with " + coreTag + " core version found",
+            "Create a new profile with this core version tag, in order to start this editor directly.");
 
         return false;
     }
