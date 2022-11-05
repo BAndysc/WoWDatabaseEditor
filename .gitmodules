@@ -6,7 +6,8 @@
 	url = https://github.com/BAndysc/AvaloniaEdit
 [submodule "WoWPacketParser"]
 	path = WoWPacketParser
-	url = https://github.com/BAndysc/WoWPacketParser
+	url = https://github.com/mdX7/WowPacketParser.git
+	branch = uf_fix
 [submodule "Prism.Avalonia"]
 	path = Prism.Avalonia
 	url = https://github.com/BAndysc/Prism.Avalonia
