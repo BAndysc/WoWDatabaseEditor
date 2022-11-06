@@ -25,6 +25,9 @@ namespace WDE.Parameters.Models
         [JsonProperty(PropertyName = "prefix")]
         public string Prefix { get; set; } = "";
 
+        [JsonProperty(PropertyName = "tags")]
+        public IList<string>? Tags { get; set; }
+        
         [JsonProperty(PropertyName = "values")]
         [JsonConverter(typeof(ParameterValuesJsonConverter))]
         public Dictionary<long, SelectOption>? Values { get; set; }

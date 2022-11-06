@@ -125,6 +125,8 @@ namespace WDE.SmartScriptEditor.Models
                             pram5 = ParametersCount >= 5 ? "[p=4]" + GetParameter(4) + "[/p]" : "",
                             fpram1 = FloatParametersCount >= 1 ? "[p]" + GetFloatParameter(0) + "[/p]" : "",
                             fpram2 = FloatParametersCount >= 2 ? "[p]" + GetFloatParameter(1) + "[/p]" : "",
+                            fpram1value = FloatParametersCount >= 1 ? GetFloatParameter(0).Value : 0.0f,
+                            fpram2value =  FloatParametersCount >= 2 ? GetFloatParameter(1).Value : 0.0f,
                             spram1 = StringParametersCount >= 1 ? "[p]" + GetStringParameter(0) + "[/p]" : "",
                             pram1value = GetParameter(0).Value,
                             pram2value = GetParameter(1).Value,

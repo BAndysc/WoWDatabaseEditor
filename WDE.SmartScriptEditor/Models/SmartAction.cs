@@ -177,6 +177,8 @@ namespace WDE.SmartScriptEditor.Models
                             pram7 = ParametersCount >= 7 ? "[p=6]" + GetParameter(6) + "[/p]" : "(invalid parameter)",
                             fpram1 = FloatParametersCount >= 1 ? "[p]" + GetFloatParameter(0) + "[/p]" : "(invalid parameter)",
                             fpram2 =  FloatParametersCount >= 2 ? "[p]" + GetFloatParameter(1) + "[/p]" : "(invalid parameter)",
+                            fpram1value = FloatParametersCount >= 1 ? GetFloatParameter(0).Value : 0.0f,
+                            fpram2value =  FloatParametersCount >= 2 ? GetFloatParameter(1).Value : 0.0f,
                             pram1value = GetParameter(0).Value,
                             pram2value = GetParameter(1).Value,
                             pram3value = GetParameter(2).Value,
