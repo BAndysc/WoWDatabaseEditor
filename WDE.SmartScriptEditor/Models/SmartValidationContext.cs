@@ -1,3 +1,4 @@
+using System.Numerics;
 using WDE.Common.Database;
 using WDE.SmartScriptEditor.Validation;
 
@@ -28,5 +29,13 @@ namespace WDE.SmartScriptEditor.Models
         public long GetActionSourceParameter(int index) => action?.Source.GetParameter(index).Value ?? 0;
         public long GetActionTargetParameter(int index) => action?.Target.GetParameter(index).Value ?? 0;
         public long GetTargetType() => action?.Target.Id ?? 0;
+        public Vector4 GetTargetPosition()
+        {
+            if (action?.Target is { } target)
+            {
+                return new Vector4(target.X, target.Y, target.Z, target.O);
+            }
+            return Vector4.Zero;
+        }
     }
 }

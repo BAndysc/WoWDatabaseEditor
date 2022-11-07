@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Numerics;
 using NUnit.Framework;
 using WDE.Common.Database;
 using WDE.SmartScriptEditor.Validation;
@@ -136,6 +137,11 @@ namespace WDE.SmartScriptEditor.Test.Validation.Antlr
             public long GetTargetType()
             {
                 return 1;
+            }
+
+            public Vector4 GetTargetPosition()
+            {
+                return Vector4.Zero;
             }
         }
     }

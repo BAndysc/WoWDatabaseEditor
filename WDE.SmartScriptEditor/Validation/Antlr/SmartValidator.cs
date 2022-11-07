@@ -46,7 +46,7 @@ namespace WDE.SmartScriptEditor.Validation.Antlr
         {
             return WrapWithTryCatch(parser =>
             {
-                BoolExpressionVisitor visitor = new(new IntExpressionVisitor(context));
+                BoolExpressionVisitor visitor = new(context, new IntExpressionVisitor(context));
                 boolContextCached ??= parser.exprBool();
                 return visitor.Visit(boolContextCached);
             });

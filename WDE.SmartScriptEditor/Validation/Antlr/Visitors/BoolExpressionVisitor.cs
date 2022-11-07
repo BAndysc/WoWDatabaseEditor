@@ -1,4 +1,5 @@
-﻿using Antlr4.Runtime.Tree;
+﻿using System;
+using Antlr4.Runtime.Tree;
 
 namespace WDE.SmartScriptEditor.Validation.Antlr.Visitors
 {
@@ -6,8 +7,11 @@ namespace WDE.SmartScriptEditor.Validation.Antlr.Visitors
     {
         private readonly IntExpressionVisitor intVisitor;
 
-        public BoolExpressionVisitor(IntExpressionVisitor intExpressionVisitor)
+        private readonly ISmartValidationContext smartContext;
+
+        public BoolExpressionVisitor(ISmartValidationContext context, IntExpressionVisitor intExpressionVisitor)
         {
+            smartContext = context;
             intVisitor = intExpressionVisitor;
         }
             
@@ -79,6 +83,12 @@ namespace WDE.SmartScriptEditor.Validation.Antlr.Visitors
         public override bool VisitBLessEquals(SmartScriptValidationParser.BLessEqualsContext context)
         {
             return intVisitor.Visit(context.exprInt()[0]) <= intVisitor.Visit(context.exprInt()[1]);
+        }
+
+        public override bool VisitBTargetPosEmpty(SmartScriptValidationParser.BTargetPosEmptyContext context)
+        {
+            var pos = smartContext.GetTargetPosition();
+            return Math.Abs(pos.X) < float.Epsilon && Math.Abs(pos.Y) < float.Epsilon && Math.Abs(pos.Z) < float.Epsilon;
         }
 
         public override bool VisitChildren(IRuleNode node)
