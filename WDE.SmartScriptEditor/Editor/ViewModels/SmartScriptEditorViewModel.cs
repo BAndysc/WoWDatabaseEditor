@@ -435,10 +435,9 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     statusbar.PublishNotification(new PlainNotification(NotificationType.Error,
                         "Error while saving script to the database: " + e.Message));
                 });*/
-            SaveCommand = new DelegateCommand(() =>
+            SaveCommand = new AsyncAutoCommand(() =>
             {
-                
-                taskRunner.ScheduleTask("Save script to database", SaveAllToDb);
+                return taskRunner.ScheduleTask("Save script to database", SaveAllToDb);
             });
 
             DeleteAction = new DelegateCommand<SmartAction>(DeleteActionCommand);
@@ -1072,7 +1071,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         public AsyncCommand CutCommand { get; set; }
         public AsyncCommand PasteCommand { get; set; }
         public event Action? OnPaste;
-        public DelegateCommand SaveCommand { get; set; }
+        public AsyncAutoCommand SaveCommand { get; set; }
         public DelegateCommand DeleteSelected { get; set; }
         public DelegateCommand EditSelected { get; set; }
 
