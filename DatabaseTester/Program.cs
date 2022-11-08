@@ -122,6 +122,9 @@ public class Program
         ioc.RegisterSingleton<ITableDefinitionJsonProvider, TableDefinitionJsonProvider>();
         ioc.RegisterSingleton<ITableDefinitionProvider, TableDefinitionProvider>();
 
+        var queryGeneratorModule = new QueryGeneratorModule();
+        queryGeneratorModule.RegisterTypes(new UnityContainerRegistry(ioc));
+
         var worldDb = ioc.Resolve<T>();
         ioc.RegisterInstance<IDatabaseProvider>(worldDb);
 
