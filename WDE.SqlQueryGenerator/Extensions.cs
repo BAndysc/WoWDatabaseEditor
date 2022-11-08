@@ -17,7 +17,14 @@ namespace WDE.SqlQueryGenerator
             Value = value;
         }
     }
-    
+
+    public enum QueryInsertMode
+    {
+        Insert,
+        InsertIgnore,
+        Replace
+    }
+
     public static class Extensions
     {
         public static IQuery InsertIgnore(this ITable table, Dictionary<string, object?> obj)
@@ -32,15 +39,25 @@ namespace WDE.SqlQueryGenerator
         
         public static IQuery Insert(this ITable table, Dictionary<string, object?> obj, bool insertIgnore = false)
         {
-            return table.BulkInsert(new[] { obj }, insertIgnore);
+            return table.BulkInsert(new[] { obj }, QueryInsertMode.InsertIgnore);
         }
         
         public static IQuery Insert(this ITable table, object obj, bool insertIgnore = false)
         {
-            return table.BulkInsert(new[] { obj }, insertIgnore);
+            return table.BulkInsert(new[] { obj }, QueryInsertMode.InsertIgnore);
         }
         
-        public static IQuery BulkInsert(this ITable table, ICollection<Dictionary<string, object?>> objects, bool insertIgnore = false)
+        public static IQuery Replace(this ITable table, Dictionary<string, object?> obj)
+        {
+            return table.BulkInsert(new[] { obj }, QueryInsertMode.Replace);
+        }
+        
+        public static IQuery Replace(this ITable table, object obj)
+        {
+            return table.BulkInsert(new[] { obj }, QueryInsertMode.Replace);
+        }
+
+        public static IQuery BulkInsert(this ITable table, ICollection<Dictionary<string, object?>> objects, QueryInsertMode mode = QueryInsertMode.Insert)
         {
             bool first = true;
             IList<string> properties = null!;
@@ -52,8 +69,8 @@ namespace WDE.SqlQueryGenerator
                 {
                     properties = o.Keys.ToList();
                     var cols = string.Join(", ", properties.Select(c => $"`{c}`"));
-                    var ignore = insertIgnore ? " IGNORE" : "";
-                    sb.Append($"INSERT{ignore} INTO `{table.TableName}` ({cols}) VALUES");
+                    var insert = mode == QueryInsertMode.Insert ? "INSERT" : (mode == QueryInsertMode.InsertIgnore ? "INSERT IGNORE" : "REPLACE");
+                    sb.Append($"{insert} INTO `{table.TableName}` ({cols}) VALUES");
                     if (objects.Count > 1 || properties.Count > 1)
                         sb.AppendLine();
                     else
@@ -72,8 +89,13 @@ namespace WDE.SqlQueryGenerator
             sb.Append(';');
             return new Query(table, sb.ToString());
         }
+
+        public static IQuery BulkReplace(this ITable table, IEnumerable<object> objects)
+        {
+            return BulkInsert(table, objects, QueryInsertMode.Replace);
+        }
         
-        public static IQuery BulkInsert(this ITable table, IEnumerable<object> objects, bool insertIgnore = false)
+        public static IQuery BulkInsert(this ITable table, IEnumerable<object> objects, QueryInsertMode mode = QueryInsertMode.Insert)
         {
             bool first = true;
             PropertyInfo[] properties = null!;
@@ -92,8 +114,8 @@ namespace WDE.SqlQueryGenerator
                         .Where(prop => prop != commentProperty && prop != ignoredProperty)
                         .ToArray();
                     var cols = string.Join(", ", properties.Select(c => $"`{c.Name}`"));
-                    var ignore = insertIgnore ? " IGNORE" : "";
-                    sb.AppendLine($"INSERT{ignore} INTO `{table.TableName}` ({cols}) VALUES");
+                    var insert = mode == QueryInsertMode.Insert ? "INSERT" : (mode == QueryInsertMode.InsertIgnore ? "INSERT IGNORE" : "REPLACE");
+                    sb.AppendLine($"{insert} INTO `{table.TableName}` ({cols}) VALUES");
                     first = false;
                 }
 
