@@ -123,14 +123,11 @@ public class Program
         ioc.RegisterSingleton<ITableDefinitionProvider, TableDefinitionProvider>();
 
         var queryGeneratorModule = new QueryGeneratorModule();
+        queryGeneratorModule.InitializeCore(core.Tag);
         queryGeneratorModule.RegisterTypes(new UnityContainerRegistry(ioc));
 
         var worldDb = ioc.Resolve<T>();
         ioc.RegisterInstance<IDatabaseProvider>(worldDb);
-
-        var module = new QueryGeneratorModule();
-        module.InitializeCore(core.Tag);
-        module.RegisterTypes(new UnityContainerRegistry(ioc));
 
         var allDefinitions = ioc.Resolve<ITableDefinitionProvider>().Definitions;
         var loader = ioc.Resolve<IDatabaseTableDataProvider>();

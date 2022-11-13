@@ -39,12 +39,12 @@ namespace WDE.SqlQueryGenerator
         
         public static IQuery Insert(this ITable table, Dictionary<string, object?> obj, bool insertIgnore = false)
         {
-            return table.BulkInsert(new[] { obj }, QueryInsertMode.InsertIgnore);
+            return table.BulkInsert(new[] { obj }, insertIgnore ? QueryInsertMode.InsertIgnore : QueryInsertMode.Insert);
         }
         
         public static IQuery Insert(this ITable table, object obj, bool insertIgnore = false)
         {
-            return table.BulkInsert(new[] { obj }, QueryInsertMode.InsertIgnore);
+            return table.BulkInsert(new[] { obj }, insertIgnore ? QueryInsertMode.InsertIgnore : QueryInsertMode.Insert);
         }
         
         public static IQuery Replace(this ITable table, Dictionary<string, object?> obj)

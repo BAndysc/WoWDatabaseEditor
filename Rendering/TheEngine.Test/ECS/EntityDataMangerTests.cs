@@ -141,16 +141,17 @@ namespace TheEngine.Test.ECS
             entityManager.GetComponent<ComponentB>(entities[2]).x = 0;
 
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
-                var accessComponentA = itr.DataAccess<ComponentA>();
-                var accessComponentB = itr.DataAccess<ComponentB>();
-                for (int i = 0; i < itr.Length; ++i)
+                var current = iterator.Current;
+                var accessComponentA = current.DataAccess<ComponentA>();
+                var accessComponentB = current.DataAccess<ComponentB>();
+                for (int i = 0; i < current.Length; ++i)
                 {
-                    Assert.AreEqual(entities[i], itr[i]);
+                    Assert.AreEqual(entities[i], current[i]);
                     Assert.AreEqual(i, accessComponentA[i].a);
                     Assert.AreEqual(2 - i, accessComponentB[i].x);
-                }   
+                }      
             }
         }
 
@@ -236,8 +237,6 @@ namespace TheEngine.Test.ECS
                 totalCount += end - start;
             });
             Assert.AreEqual(1, totalCount);
-            
-            var archetypes = entityManager.ArchetypeIterator(archetypeOnlyB).ToList();
         }
     }
 }

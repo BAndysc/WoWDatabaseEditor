@@ -137,7 +137,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor
                 if (visual is ILayoutable layoutable && visual is IControl control 
                                                      && layoutable.IsVisible)
                 {
-                    var group = GetGroup(control);
+                    var group = GetGroup(control) ?? "(default)";
                     if (!elementsInGroup.ContainsKey(group))
                         elementsInGroup[group] = new List<IControl>() { control };
                     else

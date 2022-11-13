@@ -128,7 +128,6 @@ namespace WDE.MySqlDatabaseCommon.CommonModels
 
         public GossipOption OptionType => GossipOption.None;
 
-        [Column(Name = "OptionNpcFlag")]
         public uint NpcFlag { get; set; }
         
         [Column(Name = "ActionMenuID")]
