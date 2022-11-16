@@ -208,7 +208,8 @@ namespace WDE.DbcStore
             public Dictionary<long, string> GarrisonClassSpecStore { get; internal set; } = new();
             public Dictionary<long, string> GarrisonBuildingStore { get; internal set; } = new();
             public Dictionary<long, string> GarrisonTalentStore { get; internal set; } = new();
-
+            public Dictionary<long, string> DifficultyStore { get; internal set; } = new();
+            
             public string Name => "DBC Loading";
             public bool WaitForOtherTasks => false;
             private DatabaseClientFileOpener opener;
@@ -404,6 +405,7 @@ namespace WDE.DbcStore
                 parameterFactory.Register("GarrisonClassSpecParameter", new DbcParameter(GarrisonClassSpecStore));
                 parameterFactory.Register("GarrisonBuildingParameter", new DbcParameter(GarrisonBuildingStore));
                 parameterFactory.Register("GarrisonTalentParameter", new DbcParameter(GarrisonTalentStore));
+                parameterFactory.Register("DifficultyParameter", new DbcParameter(DifficultyStore));
                 
                 parameterFactory.RegisterDepending("BattlePetSpeciesParameter", "CreatureParameter", (creature) => new BattlePetSpeciesParameter(store, parameterFactory, creature));
 
@@ -615,6 +617,7 @@ namespace WDE.DbcStore
                         Load("AreaTable.dbc", 0, 13, AreaStore);
                         Load("ChrClasses.dbc", 0, 3, ClassStore);
                         Load("ChrRaces.dbc", 0, 14, RaceStore);
+                        Load("Difficulty.dbc", 0, 11, DifficultyStore);
                         Load("Emotes.dbc", row =>
                         {
                             var proc = row.GetUInt(4);
@@ -688,6 +691,7 @@ namespace WDE.DbcStore
                         Load("BattlemasterList.db2", 0, 1, BattlegroundStore);
                         Load("CurrencyTypes.db2", 0, 1, CurrencyTypeStore);
                         Load("DungeonEncounter.db2", 6, 0, DungeonEncounterStore);
+                        Load("Difficulty.db2", 0, 1, DifficultyStore);
                         Load("ItemSparse.db2", 0, 2, ItemStore);
                         Load("ItemExtendedCost.db2", row =>
                         {

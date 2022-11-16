@@ -15,7 +15,7 @@ namespace WDE.DatabaseEditors.CustomCommands
         ImageUri Icon { get; }
         string Name { get; }
         string CommandId { get; }
-        Task Process(DatabaseCommandDefinitionJson definition, IDatabaseTableData tableData, IAddRowKey addRow);
+        Task Process(DatabaseCommandDefinitionJson definition, IDatabaseTableData tableData, ITableContext tableContext);
     }
     
     [NonUniqueProvider]
@@ -24,6 +24,6 @@ namespace WDE.DatabaseEditors.CustomCommands
         ImageUri Icon { get; }
         string Name { get; }
         string CommandId { get; }
-        Task Process(DatabaseCommandDefinitionJson definition, IDatabaseTableData tableData, ICollection<DatabaseKey> keys, IAddRowKey addRow);
+        Task Process(DatabaseCommandDefinitionJson definition, IDatabaseTableData tableData, ICollection<DatabaseKey> keys, ITableContext tableContext);
     }
 }

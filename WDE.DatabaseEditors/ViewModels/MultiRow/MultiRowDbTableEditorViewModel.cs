@@ -64,6 +64,8 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         }
 
         public override DatabaseEntity? FocusedEntity => SelectedRow?.Entity;
+        
+        public override DatabaseKey? SelectedTableKey => FocusedEntity?.ForceGenerateKey(tableDefinition);
 
         private MultiRowSplitMode splitMode;
         public bool SplitView => splitMode != MultiRowSplitMode.None;
