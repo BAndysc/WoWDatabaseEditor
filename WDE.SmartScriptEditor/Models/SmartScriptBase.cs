@@ -131,6 +131,7 @@ namespace WDE.SmartScriptEditor.Models
         
         public void Clear()
         {
+            GlobalVariables.RemoveAll();
             Events.RemoveAll();
         }
         
