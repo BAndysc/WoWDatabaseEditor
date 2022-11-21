@@ -20,6 +20,7 @@ using WDE.Common.Tasks;
 using WDE.Module.Attributes;
 using WDE.MVVM;
 using WDE.MVVM.Observable;
+using WoWDatabaseEditorCore.Avalonia.Services.AppearanceService.Data;
 using WoWDatabaseEditorCore.Avalonia.Services.AppearanceService.Providers;
 using WoWDatabaseEditorCore.Avalonia.Views;
 
@@ -31,9 +32,11 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.AppearanceService.ViewModels
         private Theme name;
         private List<Theme> themes;
 
+        private ThemeSettings currentSettings;
+
         public ThemeConfigViewModel(IThemeSettingsProvider settings, IThemeManager themeManager, IMainWindowHolder mainWindowHolder)
         {
-            var currentSettings = settings.GetSettings();
+            currentSettings = settings.GetSettings();
             name = CurrentThemeName = themeManager.CurrentTheme;
             themes = themeManager.Themes.ToList();
             useCustomScaling = currentSettings.UseCustomScaling;
@@ -47,7 +50,9 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.AppearanceService.ViewModels
                 themeManager.SetTheme(ThemeName);
                 themeManager.UpdateCustomScaling(useCustomScaling ? ScalingValue : null);
                 settings.UpdateSettings(ThemeName, UseCustomScaling ? Math.Clamp(ScalingValue, 0.5, 4) : null, color.H - AvaloniaThemeStyle.BaseHue, color.S, lightness);
-                IsModified = false;
+                currentSettings = settings.GetSettings();
+                CurrentThemeName = ThemeName;
+                RaisePropertyChanged(nameof(IsModified));
             });
 
             lightness = currentSettings.Lightness;
@@ -58,33 +63,32 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.AppearanceService.ViewModels
                 .SubscribeAction(x =>
                 {
                     AvaloniaThemeStyle.AccentHue = new HslDiff(color.H, color.S, lightness);
-                    IsModified = true;
                 });
+            
             this.ToObservable(() => Lightness)
                 .Skip(1)
                 .SubscribeAction(x =>
                 {
                     AvaloniaThemeStyle.AccentHue = new HslDiff(color.H, color.S, lightness);
-                    IsModified = true;
                 });
         }
 
-        public Theme CurrentThemeName { get; }
+        public Theme CurrentThemeName { get; private set; }
 
         public Theme ThemeName
         {
             get => name;
             set
             {
-                IsModified = true;
                 SetProperty(ref name, value);
+                RaisePropertyChanged(nameof(IsModified));
             }
         }
 
         public bool AllowCustomScaling { get; }
 
-        [Notify] private HslColor color;
-        [Notify] private double lightness = 0.5;
+        [AlsoNotify(nameof(IsModified))] [Notify] private HslColor color;
+        [AlsoNotify(nameof(IsModified))] [Notify] private double lightness = 0.5;
 
         public List<Theme> Themes
         {
@@ -101,8 +105,8 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.AppearanceService.ViewModels
             get => useCustomScaling;
             set
             {
-                IsModified = true;
                 SetProperty(ref useCustomScaling, value);
+                RaisePropertyChanged(nameof(IsModified));
             }
         }
 
@@ -111,8 +115,8 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.AppearanceService.ViewModels
             get => scalingValue;
             set
             {
-                IsModified = true;
-                SetProperty(ref scalingValue, value); 
+                SetProperty(ref scalingValue, value);
+                RaisePropertyChanged(nameof(IsModified));
                 RaisePropertyChanged(nameof(ScalingValuePercentage));
             }
         }
@@ -123,14 +127,14 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.AppearanceService.ViewModels
         public bool IsRestartRequired => true;
         public ConfigurableGroup Group => ConfigurableGroup.Basic;
 
-        private bool isModified;
         private double scalingValue;
         private bool useCustomScaling;
 
-        public bool IsModified
-        {
-            get => isModified;
-            private set => SetProperty(ref isModified, value);
-        }
+        public bool IsModified =>
+            currentSettings.UseCustomScaling != useCustomScaling ||
+            CurrentThemeName.Name != ThemeName.Name ||
+            Math.Abs(currentSettings.Hue - (color.H - AvaloniaThemeStyle.BaseHue)) > 0.0001f ||
+            Math.Abs(currentSettings.Saturation - color.S) > 0.0001f ||
+            Math.Abs(currentSettings.Lightness - lightness) > 0.0001f;
     }
 }

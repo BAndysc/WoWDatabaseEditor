@@ -15,6 +15,8 @@ public class ListOptionGenericSetting : IListOptionGenericSetting
         get => selectedOption;
         set
         {
+            if (Equals(selectedOption, value))
+                return;
             selectedOption = value;
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SelectedOption)));
         }

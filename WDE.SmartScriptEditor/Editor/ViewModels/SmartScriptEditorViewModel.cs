@@ -245,7 +245,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                             Events[i].IsSelected = false;
                             if (args.Move)
                             {
-                                if (i <= destIndex)
+                                if (i < destIndex)
                                     d--;
                                 script.Events.RemoveAt(i);
                             }

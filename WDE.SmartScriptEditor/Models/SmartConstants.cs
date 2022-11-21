@@ -39,5 +39,6 @@
         public const int ConditionSourceSmartScript = 22;
         public const int ConditionOr = -1;
         public const int MovementTypePointMotionType = 8;
+        public const int EventFlagNotRepeatable = 1;
     }
 }

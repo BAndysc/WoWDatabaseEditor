@@ -19,6 +19,18 @@ namespace WDE.Common.Parameters
         public static Parameter Instance { get; } = new Parameter();
     }
     
+    public class UnusedParameter : GenericBaseParameter<long>
+    {
+        public override string ToString(long key)
+        {
+            if (Items != null && Items.TryGetValue(key, out var option))
+                return option.Name + " (unused)";
+            return key.ToString() + " (unused)";
+        }
+
+        public static UnusedParameter Instance { get; } = new UnusedParameter();
+    }
+
     public class IntParameter : GenericBaseParameter<int>
     {
         public override string ToString(int key)

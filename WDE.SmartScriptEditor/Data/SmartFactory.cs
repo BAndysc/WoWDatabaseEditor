@@ -425,7 +425,7 @@ namespace WDE.SmartScriptEditor.Data
                     if (!update)
                         element.GetParameter(i).Value = data.Parameters[i].DefaultVal;
                     element.GetParameter(i).Parameter = parameter;
-                    element.GetParameter(i).IsUsed = true;
+                    element.GetParameter(i).IsUsed = parameter != UnusedParameter.Instance;
                 }
             
                 for (var i = 0; i < element.ParametersCount; ++i)

@@ -92,6 +92,7 @@ namespace WDE.Parameters
             }
 
             factory.Register("InvalidParameter", new InvalidParameter<long>());
+            factory.Register("UnusedParameter", new UnusedParameter());
             factory.Register("FloatParameter", new FloatIntParameter(1000));
             factory.Register("DecifloatParameter", new FloatIntParameter(100));
             factory.Register("GameEventParameter", AddDatabaseParameter(new GameEventParameter(database)), QuickAccessMode.Limited);

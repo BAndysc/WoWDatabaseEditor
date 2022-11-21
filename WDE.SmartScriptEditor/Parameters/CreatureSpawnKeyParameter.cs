@@ -18,6 +18,8 @@ namespace WDE.SmartScriptEditor.Parameters
         
         public bool HasItems => true;
         
+        public bool AllowUnknownItems => true;
+        
         public string ToString(long value) => value.ToString();
 
         public Dictionary<long, SelectOption>? Items => null;

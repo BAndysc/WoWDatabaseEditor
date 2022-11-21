@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -51,7 +52,7 @@ namespace WDE.SmartScriptEditor.Models
                 }
             };
 
-            flags = new ParameterValueHolder<long>("Flags", SmartEventFlagParameter.Instance, 0);
+            flags = new ParameterValueHolder<long>("Flags", features.EventFlagsParameter, 0);
             chance = new ParameterValueHolder<long>("Chance", Parameter.Instance, 0);
             phases = new ParameterValueHolder<long>("Phases", SmartEventPhaseParameter.Instance, 0);
             timerId = new ParameterValueHolder<long>("Timer id", Parameter.Instance, 0);
@@ -262,34 +263,6 @@ namespace WDE.SmartScriptEditor.Models
         Event = EventValues | Actions
     }
     
-    public enum SmartEventFlag
-    {
-        [Description(
-            "The event will be fired only once until next Reset() call. If you do not want to run it again even after Reset, add flag DontReset")]
-        NotRepeatable = 1,
-
-        [Description("The event will only be fired in normal dungeon/10 man normal raid")]
-        Difficulty0 = 2,
-
-        [Description("The event will only be fired in heroic dungeon/25 man normal raid")]
-        Difficulty1 = 4,
-
-        [Description("The event will only be fired in epic dungeon/10 man heroic raid")]
-        Difficulty2 = 8,
-
-        [Description("The event will only be fired in 25 man heroic raid")]
-        Difficulty3 = 16,
-
-        [Description("The event will only be fired if TrinityCore is compiled with DEBUG flag")]
-        DebugOnly = 128,
-
-        [Description("If you set this flag, NotRepeatable will not reset after Reset() call")]
-        DontReset = 256,
-
-        [Description("Event will be fired even if NPC is charmed")]
-        WhileCharmed = 512
-    }
-
     public enum SmartEventPhases
     {
         Always = 0,
@@ -313,38 +286,17 @@ namespace WDE.SmartScriptEditor.Models
 
         public SmartEventFlagParameter()
         {
-            Items = Enum
-                .GetValues<SmartEventFlag>()
-                .ToDictionary(f => (long) f, f => new SelectOption(f.ToString(), f.GetDescription()));
-        }
-    }
-
-    public static class EnumExtensions
-    {
-        public static string? GetDescription<T>(this T e) where T : IConvertible
-        {
-            if (e is Enum)
+            Items = new Dictionary<long, SelectOption>()
             {
-                Type type = e.GetType();
-                Array values = System.Enum.GetValues(type);
-
-                foreach (int val in values)
-                {
-                    if (val == e.ToInt32(CultureInfo.InvariantCulture))
-                    {
-                        var memInfo = type.GetMember(type.GetEnumName(val)!);
-                        var descriptionAttribute = memInfo[0]
-                            .GetCustomAttributes(typeof(DescriptionAttribute), false)
-                            .FirstOrDefault() as DescriptionAttribute;
-
-                        if (descriptionAttribute != null)
-                        {
-                            return descriptionAttribute.Description;
-                        }
-                    }
-                }
-            }
-            return null; // could also return string.Empty
+                [1] = new SelectOption("Not repeatable", "The event will be fired only once until next Reset() call. If you do not want to run it again even after Reset, add flag DontReset"),
+                [2] = new SelectOption("Difficulty 0", "The event will only be fired in normal dungeon/10 man normal raid"),
+                [4] = new SelectOption("Difficulty 1", "The event will only be fired in heroic dungeon/25 man normal raid"),
+                [8] = new SelectOption("Difficulty 2", "The event will only be fired in epic dungeon/10 man heroic raid"),
+                [16] = new SelectOption("Difficulty 3", "The event will only be fired in 25 man heroic raid"),
+                [128] = new SelectOption("Debug only", "The event will only be fired if TrinityCore is compiled with DEBUG flag"),
+                [256] = new SelectOption("Don't reset", "If you set this flag, NotRepeatable will not reset after Reset() call"),
+                [512] = new SelectOption("While charmed", "Event will be fired even if NPC is charmed"),
+            };
         }
     }
 

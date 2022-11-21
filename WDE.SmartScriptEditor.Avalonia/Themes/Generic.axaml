@@ -139,7 +139,13 @@
                                 <controls:MiniEventIcon Background="{DynamicResource SmartScripts.Event.Phase.Background}" Text="{Binding Text}" ToolTip.Tip="{Binding ToolTip}" />
                             </controls:SmartEventFlagPhaseDataSelector.PhaseView>
                             <controls:SmartEventFlagPhaseDataSelector.FlagView>
-                                <controls:MiniEventIcon Background="{DynamicResource SmartScripts.Event.Flag.Background}" Text="{Binding Text}" ToolTip.Tip="{Binding ToolTip}" />
+                                <TextBlock Foreground="{DynamicResource SmartScripts.Event.Flag.Background}" 
+                                           Margin="2,0,0,0" 
+                                           FontSize="10" 
+                                           Width="12" Height="12"
+                                           TextAlignment="Center" 
+                                           ToolTip.Tip="{Binding ToolTip}"
+                                           VerticalAlignment="Center" Text="{Binding Text}"/>
                             </controls:SmartEventFlagPhaseDataSelector.FlagView>
                         </controls:SmartEventFlagPhaseDataSelector>
                     </ItemsPresenter.ItemTemplate>

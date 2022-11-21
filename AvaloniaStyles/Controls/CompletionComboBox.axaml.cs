@@ -441,7 +441,7 @@ namespace AvaloniaStyles.Controls
             try
             {
                 IEnumerable<object> result = await asyncPopulator.Invoke(searchText, cancellationToken);
-                var resultList = result is IList ? result : result.ToList();
+                var resultList = result is IList ? result : result?.ToList();
 
                 if (cancellationToken.IsCancellationRequested)
                     return;
@@ -451,7 +451,8 @@ namespace AvaloniaStyles.Controls
                     if (!cancellationToken.IsCancellationRequested)
                     {
                         view.Clear();
-                        view.InsertRange(0, resultList);
+                        if (resultList != null)
+                            view.InsertRange(0, resultList);
                     }
                 });
             }
