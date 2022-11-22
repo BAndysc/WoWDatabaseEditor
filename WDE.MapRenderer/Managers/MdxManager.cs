@@ -1426,6 +1426,16 @@ namespace WDE.MapRenderer.Managers
                 });
                 file.Result.Dispose();
             }));
+
+            if (m2 == null)
+            {
+                Console.WriteLine("Cannot load model " + path);
+                meshes[path] = null;
+                completion.SetResult(null);
+                meshesCurrentlyLoaded.Remove(path);
+                result.SetResult(null);
+                yield break;
+            }
             
             FileId skinFilePath;
             if (path.FileType == FileId.Type.FileName)

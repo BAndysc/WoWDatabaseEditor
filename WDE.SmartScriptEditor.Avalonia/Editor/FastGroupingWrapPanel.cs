@@ -3,13 +3,11 @@ using System.Collections.Generic;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
-using Avalonia.Layout;
 using Avalonia.Media;
-using Avalonia.Media.Immutable;
-using Avalonia.Utilities;
 using Avalonia.VisualTree;
 using WDE.Common.Avalonia.Utils;
-using WDE.SmartScriptEditor.Avalonia.Editor.Views;
+using WDE.MVVM;
+using WDE.MVVM.Observable;
 using static System.Math;
 
 namespace WDE.SmartScriptEditor.Avalonia.Editor
@@ -25,6 +23,12 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor
 
         public static readonly AttachedProperty<string> GroupProperty =
             AvaloniaProperty.RegisterAttached<FastGroupingWrapPanel, IControl, string>("Group");
+        
+        public static readonly AttachedProperty<bool> ActiveProperty =
+            AvaloniaProperty.RegisterAttached<FastGroupingWrapPanel, IControl, bool>("Active");
+        
+        private ScrollViewer? ScrollViewer => this.FindAncestorOfType<ScrollViewer>();
+        private IDisposable? scrollDisposable;
 
         static FastGroupingWrapPanel()
         {
@@ -32,7 +36,26 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor
             AffectsParentMeasure<FastGroupingWrapPanel>(GroupProperty);
             AffectsParentMeasure<FastGroupingWrapPanel>(IsVisibleProperty);
         }
-        
+
+        protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+        {
+            base.OnAttachedToVisualTree(e);
+            var scrollViewer = ScrollViewer;
+            scrollDisposable = scrollViewer!.ToObservable(x => x.Offset)
+                .SubscribeAction(_ =>
+                {
+                    InvalidateMeasure();
+                    InvalidateArrange();
+                });
+        }
+
+        protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+        {
+            base.OnDetachedFromVisualTree(e);
+            scrollDisposable?.Dispose();
+            scrollDisposable = null;
+        }
+
         public static string GetGroup(IControl control)
         {
             return control.GetValue(GroupProperty);
@@ -41,6 +64,16 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor
         public static void SetGroup(IControl control, string value)
         {
             control.SetValue(GroupProperty, value);
+        }
+        
+        public static bool GetActive(IControl control)
+        {
+            return control.GetValue(ActiveProperty);
+        }
+        
+        public static void SetActive(IControl control, bool value)
+        {
+            control.SetValue(ActiveProperty, value);
         }
         
         public double ItemWidth
@@ -134,8 +167,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor
             {
                 IVisual visual = visualChildren[i];
 
-                if (visual is ILayoutable layoutable && visual is IControl control 
-                                                     && layoutable.IsVisible)
+                if (visual is IControl control && GetActive(control))
                 {
                     var group = GetGroup(control) ?? "(default)";
                     if (!elementsInGroup.ContainsKey(group))
@@ -163,6 +195,8 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor
 
         protected override Size ArrangeOverride(Size finalSize)
         {
+            var scrollViewer = ScrollViewer!;
+            var viewPortRect = new Rect(scrollViewer.Offset.X, scrollViewer.Offset.Y, scrollViewer.Viewport.Width, scrollViewer.Viewport.Height);
             var arrangeRect = new Rect(finalSize);
 
             var visualChildren = VisualChildren;
@@ -171,25 +205,37 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor
             var itemsPerRow = Max(1, (int)Floor(finalSize.Width / itemWidth));
             
             MeasureOverride(finalSize);
-            
+
             for (var i = 0; i < visualCount; i++)
             {
-                IVisual visual = visualChildren[i];
+                IControl? control = visualChildren[i] as IControl;
+                if (control == null)
+                    continue;
 
-                if (visual is ILayoutable layoutable && visual is IControl control && layoutable.IsVisible)
+                if (GetActive(control))
                 {
                     var group = GetGroup(control);
                     if (groupStartHeight.TryGetValue(group, out var startPos))
                     {
                         double x = startPos.Item2;
                         double y = startPos.Item3;
-                        layoutable.Arrange(new Rect(x, y, itemWidth, itemHeight));
+                        var rect = new Rect(x, y, itemWidth, itemHeight);
+                        if (rect.Intersects(viewPortRect))
+                        {
+                            control.IsVisible = true;
+                            control.Arrange(rect);
+                        }
+                        else
+                            control.IsVisible = false;
+
                         if (startPos.Item4 + 1 == itemsPerRow)
                             groupStartHeight[group] = (startPos.Item1, 0, y + itemHeight, 0);
                         else
                             groupStartHeight[group] = (startPos.Item1, x + itemWidth, y, startPos.Item4 + 1);
                     }
                 }
+                else
+                    control.IsVisible = false;
             }
             InvalidateVisual();
             return finalSize;

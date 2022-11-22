@@ -87,7 +87,10 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             }
             
             var filtered = AllItems.OrderByDescending(f => string.IsNullOrEmpty(lower) ? -f.Order : f.Score).ToList();
-            Items.OverrideWith(filtered);
+            {
+                using var _ = Items.SuspendNotifications();
+                Items.OverrideWith(filtered);
+            }
             
             SelectFirstVisible();
             currentToken = null;
@@ -104,7 +107,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         {
             this.favourites = favourites;
             Title = title;
-            MakeItems(type, predicate, customItems, smartDataManager, conditionDataManager);
+            MakeItems(type, predicate, customItems, smartDataManager, conditionDataManager).ListenErrors();
 
             AutoDispose(this.WhenValueChanged(t => t.SearchBox)!
                 .SubscribeAction(text =>
@@ -117,9 +120,6 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     var token = new CancellationTokenSource();
                     FilterAndSort(text, token, token.Token).ListenErrors();
                 }));
-
-            if (Items.Count > 0)
-                SelectFirstVisible();
 
             Cancel = new DelegateCommand(() => CloseCancel?.Invoke());
             _accept = new DelegateCommand(() =>
@@ -180,12 +180,13 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             }
         }
         
-        private void MakeItems(SmartType type, 
+        private async Task MakeItems(SmartType type, 
             Func<SmartGenericJsonData, bool> predicate, 
             List<(int id, string name)>? customItems,
             ISmartDataManager smartDataManager, 
             IConditionDataManager conditionDataManager)
         {
+            await Task.Delay(1); // add small delay for UI to render
             int order = 0;
             foreach (var smartDataGroup in smartDataManager.GetGroupsData(type))
             {
@@ -211,6 +212,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
                         AllItems.Add(i);
                         Items.Add(i);
+                        if (order % 50 == 0)
+                            await Task.Delay(1); // add small delay for UI to render
                     }
                 }
             }
@@ -261,6 +264,9 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     }
                 }   
             }
+            
+            if (Items.Count > 0 && SelectedItem == null)
+                SelectFirstVisible();
         }
 
         public DelegateCommand<SmartItem> ToggleFavouriteCommand { get; }

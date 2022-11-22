@@ -8,8 +8,11 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:viewModels="clr-namespace:WDE.SmartScriptEditor.Editor.ViewModels.Editing;assembly=WDE.SmartScriptEditor"
              x:DataType="viewModels:ParametersEditViewModel"
+             Focusable="True"
+             utils:FocusUtils.FocusFirst="True"
+             utils:FocusUtils.FocusFirstMethod="Pointer"
+             utils:KeyGestureBind.Bindings="{CompiledBinding KeyBindings}"
              mvvm:ViewModelLocator.AutoWireViewModel="False">
-    
     <Grid Margin="6">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />

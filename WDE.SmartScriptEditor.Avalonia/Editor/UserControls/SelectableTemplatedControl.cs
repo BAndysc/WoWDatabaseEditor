@@ -88,7 +88,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
             {
                 if (e.Source is FormattedTextBlock tb && tb.OverContext != null)
                 {
-                    OnDirectEdit(tb.OverContext);
+                    OnDirectEdit(e.KeyModifiers.HasFlagFast(MultiselectGesture), tb.OverContext);
                     e.Handled = true;
                 }
                 else
@@ -114,7 +114,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
         }
         
         protected virtual void OnEdit() {}
-        protected virtual void OnDirectEdit(object context) {}
+        protected virtual void OnDirectEdit(bool controlPressed, object context) {}
         
         static SelectableTemplatedControl()
         {

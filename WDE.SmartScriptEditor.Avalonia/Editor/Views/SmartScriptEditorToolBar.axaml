@@ -9,7 +9,7 @@
              Name="Root"
              x:Class="WDE.SmartScriptEditor.Avalonia.Editor.Views.SmartScriptEditorToolBar">
     <ToolbarPanel>
-        <ButtonImage Image="Icons/icon_remove_comment.png" Command="{CompiledBinding RemoveAllCommands}" ToolTip.Tip="Remove all comments" />
+        <ButtonImage Image="Icons/icon_remove_comment.png" Command="{CompiledBinding RemoveAllComments}" ToolTip.Tip="Remove all comments" />
         <ItemsPresenter Items="{CompiledBinding ExtensionCommands}">
             <ItemsPresenter.ItemTemplate>
                 <DataTemplate x:DataType="editor:SmartExtensionCommand">

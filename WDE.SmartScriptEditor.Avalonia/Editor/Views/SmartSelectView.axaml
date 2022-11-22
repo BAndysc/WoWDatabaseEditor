@@ -79,7 +79,7 @@
             <ListBox.Styles>
                 <Style Selector="ListBoxItem" x:DataType="viewModels:SmartItem">
                     <Setter Property="(editor:FastGroupingWrapPanel.Group)" Value="{CompiledBinding Group}" />
-                    <Setter Property="IsVisible" Value="{CompiledBinding ShowItem}"></Setter>
+                    <Setter Property="(editor:FastGroupingWrapPanel.Active)" Value="{CompiledBinding ShowItem}"></Setter>
                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                     <Setter Property="ClipToBounds" Value="False" />
                     <Setter Property="Padding" Value="7,5,2,7"></Setter>
@@ -95,6 +95,11 @@
                     <Setter Property="MinHeight" Value="20" />
                 </Style>
             </ListBox.Styles>
+            <Interaction.Behaviors>
+                <EventTriggerBehavior EventName="DoubleTapped">
+                    <InvokeCommandAction Command="{Binding #Root.DataContext.Accept}" />
+                </EventTriggerBehavior>
+            </Interaction.Behaviors>
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <DockPanel LastChildFill="True">
@@ -129,11 +134,6 @@
                     </DockPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>
-            <Interaction.Behaviors>
-                <EventTriggerBehavior EventName="DoubleTapped">
-                    <InvokeCommandAction Command="{Binding #Root.DataContext.Accept}" />
-                </EventTriggerBehavior>
-            </Interaction.Behaviors>
         </ListBox>
         
         <Grid Grid.Row="2">

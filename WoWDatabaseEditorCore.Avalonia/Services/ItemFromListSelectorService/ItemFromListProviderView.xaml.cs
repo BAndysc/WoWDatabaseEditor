@@ -41,7 +41,10 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.ItemFromListSelectorService
                 var checkBox = selected.FindDescendantOfType<CheckBox>();
 
                 if (checkBox != null)
+                {
                     checkBox.IsChecked = !checkBox.IsChecked;
+                    e.Handled = true;
+                }
             }
         }
 

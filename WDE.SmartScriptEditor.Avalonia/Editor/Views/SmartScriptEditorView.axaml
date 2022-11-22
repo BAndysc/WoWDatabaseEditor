@@ -14,6 +14,16 @@
             <userControls1:SmartScriptView Focusable="True" Name="SmartScriptView"/>
         </ScrollViewer>
         
+        <Slider Minimum="0.5" Maximum="1"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Bottom" 
+                Width="100"
+                Height="45"
+                Margin="0,0,10,0"
+                Opacity="0.6"
+                Orientation="Horizontal" 
+                Value="{CompiledBinding Scale}" />
+        
         <ItemsPresenter Items="{CompiledBinding Notifications}">
             <ItemsPresenter.ItemTemplate>
                 <DataTemplate x:DataType="editor:SmartExtensionNotification">

@@ -105,8 +105,9 @@ public class SmartEditableGroup : System.IDisposable
             parameter.Dispose();
     }
 
-    public void Add(EditableActionData action)
+    public EditableActionData Add(EditableActionData action)
     {
         actions.Add(action);
+        return action;
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using DynamicData;
 using DynamicData.Binding;
@@ -12,6 +13,7 @@ using WDE.Common.Parameters;
 using WDE.MVVM.Observable;
 using WDE.MVVM;
 using WDE.Common.Providers;
+using WDE.Common.Utils;
 using WDE.Parameters.Models;
 using WDE.SmartScriptEditor.Models;
 
@@ -21,6 +23,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
     {
         private readonly IParameterPickerService parameterPickerService;
 
+        public List<CommandKeyBinding> KeyBindings { get; } = new List<CommandKeyBinding>();
+        
         public ParametersEditViewModel(IItemFromListProvider itemFromListProvider,
             ICurrentCoreVersion currentCoreVersion,
             IParameterPickerService parameterPickerService,
@@ -39,12 +43,14 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
                 Link(element, e => e.Readable, () => Readable);
             else
                 Readable = "(multiple)";
-            
+
             foreach (EditableActionData act in editableGroup.Actions)
+            {
                 if (act.Value != null)
                     allParameters.Add(new NumberedEditableParameterActionViewModel(act));
                 else
                     allParameters.Add(new EditableParameterActionViewModel(act));
+            }
 
             bool first = focusFirst;
             foreach (var parameter in editableGroup.Parameters)
@@ -107,7 +113,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
         public ReadOnlyObservableCollection<Grouping<string, IEditableParameterViewModel>> FilteredParameters { get; }
         public string Readable { get; private set; } = "";
         public bool ShowCloseButtons { get; set; } = true;
-
+        
         public ICommand Accept { get; }
         public ICommand Cancel { get; }
         public int DesiredWidth => 545;
