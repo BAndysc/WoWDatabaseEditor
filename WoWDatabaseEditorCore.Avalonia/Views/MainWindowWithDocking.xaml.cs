@@ -54,8 +54,18 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
                 box.OnEnterPressed += (sender, pressedArgs) =>
                 {
                     var box = (CompletionComboBox)sender!;
-                    if (pressedArgs.SelectedItem == null && long.TryParse(pressedArgs.SearchText, out var l))
+                    if (pressedArgs.SelectedItem == null && box.SelectedItem != null && string.IsNullOrEmpty(pressedArgs.SearchText))
+                    {
+                        var oldItem = box.SelectedItem;
+                        box.SelectedItem = null;
+                        box.SelectedItem = oldItem; // reselect the same item on subsequent enter press
+                        pressedArgs.Handled = true;
+                    }
+                    else if (pressedArgs.SelectedItem == null && long.TryParse(pressedArgs.SearchText, out var l))
+                    {
                         box.SelectedItem = new QuickGoToItemViewModel(l, "(unknown)");
+                        pressedArgs.Handled = true;
+                    }
                 };
             });
         }
