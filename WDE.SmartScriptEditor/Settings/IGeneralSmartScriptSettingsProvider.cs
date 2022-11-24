@@ -7,5 +7,6 @@ public interface IGeneralSmartScriptSettingsProvider
 {
     SmartScriptViewType ViewType { get; set; }
     AddingElementBehaviour AddingBehaviour { get; set; }
+    float DefaultScale { get; set; }
     void Apply();
 }

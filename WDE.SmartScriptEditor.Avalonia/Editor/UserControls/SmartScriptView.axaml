@@ -74,6 +74,8 @@
                         <MenuItem IsVisible="{CompiledBinding AnySelected}" Command="{CompiledBinding NewEventAboveCommand}" Header="New event above" />
                         <MenuItem Command="{CompiledBinding NewEventBelowCommand}" Header="New event below" />
                         <Separator />
+                        <MenuItem Command="{CompiledBinding EditConditionsCommand}" Header="Edit conditions" />
+                        <Separator />
                         <MenuItem Command="{CompiledBinding Copy}" Header="Copy" />
                         <MenuItem Command="{CompiledBinding Cut}" Header="Cut" />
                         <MenuItem Command="{CompiledBinding Paste}" Header="Paste" />

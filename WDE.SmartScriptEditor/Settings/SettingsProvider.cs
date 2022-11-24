@@ -13,11 +13,13 @@ public class SettingsProvider : IGeneralSettingsGroup
     
     private ListOptionGenericSetting viewType;
     private ListOptionGenericSetting addingBehaviour;
+    private FloatSliderGenericSetting defaultScale;
 
     public void Save()
     {
         smartSettingsProvider.AddingBehaviour = (AddingElementBehaviour)addingBehaviour.SelectedOption;
         smartSettingsProvider.ViewType = (SmartScriptViewType)viewType.SelectedOption;
+        smartSettingsProvider.DefaultScale = defaultScale.Value;
         smartSettingsProvider.Apply();
     }
 
@@ -38,11 +40,17 @@ public class SettingsProvider : IGeneralSettingsGroup
                 AddingElementBehaviour.Wizard, AddingElementBehaviour.DirectlyOpenDialog, AddingElementBehaviour.JustAdd
             },
             smartSettingsProvider.AddingBehaviour, null);
+
+        defaultScale = new FloatSliderGenericSetting("Default scaling",
+            smartSettingsProvider.DefaultScale,
+            0.5f,
+            1f);
         
         Settings = new List<IGenericSetting>()
         {
             viewType,
-            addingBehaviour
+            addingBehaviour,
+            defaultScale
         };
     }
 }

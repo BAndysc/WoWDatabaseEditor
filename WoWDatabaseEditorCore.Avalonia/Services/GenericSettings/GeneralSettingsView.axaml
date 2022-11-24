@@ -28,7 +28,17 @@
                                         <ComboBox Margin="10,0,0,0" Items="{CompiledBinding Options}" SelectedItem="{CompiledBinding SelectedOption}"></ComboBox>
                                     </DockPanel>
                                 </DataTemplate>
-                                
+                                <DataTemplate DataType="settings:IFloatSliderGenericSetting">
+                                    <DockPanel>
+                                        <TextBlock MaxWidth="200" TextWrapping="WrapWithOverflow" Text="{CompiledBinding Name, StringFormat={}{0}:}" VerticalAlignment="Center" />
+                                        <TextBlock TextWrapping="WrapWithOverflow" DockPanel.Dock="Bottom" Text="{CompiledBinding Help}" Opacity="0.5" Margin="20,0,0,0" />
+                                        <TextBox VerticalAlignment="Center" DockPanel.Dock="Right" Text="{CompiledBinding Value}" />
+                                        <Slider Margin="10,0,0,0" 
+                                                Minimum="{CompiledBinding Min}"
+                                                Maximum="{CompiledBinding Max}"
+                                                Value="{CompiledBinding Value}" />
+                                    </DockPanel>
+                                </DataTemplate>
                             </ItemsPresenter.DataTemplates>
                             <ItemsPresenter.ItemsPanel>
                                 <ItemsPanelTemplate>

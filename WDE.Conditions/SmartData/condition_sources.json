@@ -462,6 +462,19 @@
     }
   },
   {
+    "id": 22,
+    "name": "CONDITION_SOURCE_TYPE_SMART_EVENT",
+    "description": "SMART_EVENT",
+    "targets": {
+      "0": {
+        "description":"Invoker"
+      },
+      "1": {
+        "description":"Self"
+      }
+    }
+  },
+  {
     "id": 23,
     "name": "CONDITION_SOURCE_TYPE_NPC_VENDOR",
     "description": "Show item {entry} from vendor {group}",

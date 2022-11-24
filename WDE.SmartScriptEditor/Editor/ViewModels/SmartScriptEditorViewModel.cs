@@ -83,6 +83,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         }
         
         [Notify] private float scale = 1.0f;
+        
+        public ICommand SaveDefaultScaleCommand { get; }
 
         public SmartScript Script
         {
@@ -159,6 +161,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             TeachingTips = null!;
             title = "";
             Icon = iconRegistry.GetIcon(item);
+            scale = preferences.DefaultScale;
 
             ExtensionCommands = editorExtension?.Commands?.ToList() ?? new List<SmartExtensionCommand>();
             
@@ -1040,10 +1043,19 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             NewEventAboveCommand = new AsyncCommand(() => NewEvent(false));
             NewEventBelowCommand = new AsyncCommand(() => NewEvent(true));
 
+            EditConditionsCommand = new AsyncCommand(() => ExternalConditionEdit(Events.Where(e => e.IsSelected).ToList()),
+                _ => AnyEventSelected);
+            
             DismissNotification = new DelegateCommand<SmartExtensionNotification>(notification =>
             {
                 Notifications.Remove(notification);
                 notification.Dispose();
+            });
+
+            SaveDefaultScaleCommand = new DelegateCommand(() =>
+            {
+                preferences.DefaultScale = scale;
+                preferences.Apply();
             });
 
             History.PropertyChanged += (_, _) =>
@@ -1106,8 +1118,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         public DelegateCommand<SmartAction> DeleteAction { get; set; }
 
         public AsyncAutoCommand EditAction { get; set; }
-        public AsyncAutoCommand EditCondition { get; 
-        }
+        public AsyncAutoCommand EditCondition { get; }
         public AsyncAutoCommand AddEvent { get; set; }
         public AsyncAutoCommand DefineGlobalVariable { get; set; }
 
@@ -1126,6 +1137,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         public AsyncCommand NewActionBelowCommand { get; set; }
         public AsyncCommand NewEventAboveCommand { get; set; }
         public AsyncCommand NewEventBelowCommand { get; set; }
+        public AsyncCommand EditConditionsCommand { get; set; }
 
         public DelegateCommand<bool?> SelectionUp { get; set; }
         public DelegateCommand<bool?> SelectionDown { get; set; }
@@ -1259,6 +1271,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         private void EventChildrenSelectionChanged()
         {
             RaisePropertyChanged(nameof(AnySelected));
+            EditConditionsCommand.RaiseCanExecuteChanged();
             if (!smartEditorViewModel.IsOpened)
                 return;
                 
@@ -1411,6 +1424,30 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             return null;
         }
 
+        private async Task ExternalConditionEdit(List<SmartEvent> events)
+        {
+            if (events.Count == 0)
+                return;
+            
+            var conditions = smartScriptExporter.ToDatabaseCompatibleConditions(script, events[0]);
+            var result = await conditionEditService.EditConditions(SmartConstants.ConditionSourceSmartScript, conditions);
+            if (result == null)
+                return;
+
+            var parsed =  smartScriptImporter.ImportConditions(script, result.Select(l => new AbstractConditionLine(0, 0, 0, 0, l)).ToList());
+            using var _ = script.BulkEdit("Edit conditions");
+
+            foreach (var e in events)
+            {
+                e.Conditions.RemoveAll();
+                if (parsed.TryGetValue(0, out var flatList))
+                {
+                    foreach (var cond in flatList)
+                        e.Conditions.Add(cond.Copy());
+                }
+            }
+        }
+        
         private async Task AddConditionCommand(NewConditionViewModel obj)
         {
             SmartEvent? e = obj.Event;
@@ -1419,20 +1456,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
             if (editorFeatures.UseExternalConditionsEditor)
             {
-                var conditions = smartScriptExporter.ToDatabaseCompatibleConditions(script, e);
-                var result = await conditionEditService.EditConditions(SmartConstants.ConditionSourceSmartScript, conditions);
-                if (result == null)
-                    return;
-
-                var parsed =  smartScriptImporter.ImportConditions(script,
-                    result.Select(l => new AbstractConditionLine(0, 0, 0, 0, l)).ToList());
-                using var _ = script.BulkEdit("Edit conditions");
-                e.Conditions.RemoveAll();
-                if (parsed.TryGetValue(0, out var flatList))
-                {
-                    foreach (var cond in flatList)
-                        e.Conditions.Add(cond);
-                }
+                await ExternalConditionEdit(new List<SmartEvent>(){e});
             }
             else
             {

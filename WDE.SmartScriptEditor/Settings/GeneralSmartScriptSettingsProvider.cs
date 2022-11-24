@@ -1,3 +1,6 @@
+using System;
+using System.ComponentModel;
+using Newtonsoft.Json;
 using WDE.Common.Services;
 using WDE.Module.Attributes;
 
@@ -11,6 +14,10 @@ public class GeneralSmartScriptSettingsProvider : IGeneralSmartScriptSettingsPro
     {
         public SmartScriptViewType ViewType;
         public AddingElementBehaviour AddingBehaviour;
+        
+        [DefaultValue(1)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
+        public float DefaultScale;
     }
 
     private Data currentData;
@@ -38,6 +45,12 @@ public class GeneralSmartScriptSettingsProvider : IGeneralSmartScriptSettingsPro
     {
         get => currentData.AddingBehaviour;
         set => currentData.AddingBehaviour = value;
+    }
+
+    public float DefaultScale
+    {
+        get => Math.Clamp(currentData.DefaultScale, 0.5f, 2f);
+        set => currentData.DefaultScale = Math.Clamp(value, 0.5f, 2f);
     }
 
     public void Apply()
