@@ -16,9 +16,9 @@ public class InverseRenderTransformPanel : Panel
     
     protected override Size MeasureOverride(Size availableSize)
     {
-        var size = base.MeasureOverride(availableSize);
         if (RenderTransform == null)
-            return size;
-        return new Size(size.Width * RenderTransform.Value.M11, size.Height * RenderTransform.Value.M22);
+            return base.MeasureOverride(availableSize);
+        var size = base.MeasureOverride(new Size(availableSize.Width / RenderTransform.Value.M11, availableSize.Height));
+        return new Size(size.Width , size.Height * RenderTransform.Value.M22); // * RenderTransform.Value.M11
     }
 }
