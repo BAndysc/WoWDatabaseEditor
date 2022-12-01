@@ -1078,8 +1078,6 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 ProblematicLines = lines;
             }));
 
-            AutoDispose(new ActionDisposable(() => disposed = true));
-            
             SetSolutionItem(item);
         }
 
@@ -1207,8 +1205,6 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         public ICommand Paste => PasteCommand;
         public ICommand Save => SaveCommand;
         public IAsyncCommand? CloseCommand { get; set; }
-
-        private bool disposed;
         
         private void SetSolutionItem(ISmartScriptSolutionItem newItem)
         {
@@ -1221,21 +1217,17 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             Script = new SmartScript(this.item, smartFactory, smartDataManager, messageBoxService, editorFeatures, smartScriptImporter);
 
             bool updateInspections = false;
-            new Thread(() =>
+            AutoDispose(mainThread.StartTimer(() =>
             {
-                while (!disposed)
+                if (updateInspections)
                 {
-                    if (updateInspections)
-                    {
-                        mainThread.Dispatch(() =>
-                        {
-                            problems.Value = inspectorService.GenerateInspections(script);
-                        });
-                        updateInspections = false;
-                    }
-                    Thread.Sleep(1200);
+                    problems.Value = inspectorService.GenerateInspections(script);
+                    updateInspections = false;
                 }
-            }).Start();
+
+                return true;
+            }, TimeSpan.FromMilliseconds(1200)));
+            
             script.EventChanged += (_, _, _) =>
             {
                 updateInspections = true;

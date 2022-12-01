@@ -95,7 +95,7 @@ namespace WDE.SmartScriptEditor.Models
         public ObservableCollection<SmartAction> Actions { get; }
         public ObservableCollection<SmartCondition> Conditions { get; }
 
-        public override string Readable
+        protected override string ReadableImpl
         {
             get
             {

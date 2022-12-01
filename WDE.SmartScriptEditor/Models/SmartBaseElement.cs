@@ -51,7 +51,22 @@ namespace WDE.SmartScriptEditor.Models
         
         public IList<object?> Context { get; }
         public List<DescriptionRule>? DescriptionRules { get; set; }
-        public abstract string Readable { get; }
+        private bool readableDirty = true;
+        private string readableCache = null!;
+        protected abstract string ReadableImpl { get; }
+        public string Readable
+        {
+            get
+            {
+                if (readableDirty)
+                {
+                    readableCache = ReadableImpl;
+                    readableDirty = false;
+                }
+                return readableCache;
+            }
+        }
+        
         public readonly int ParametersCount;
         public readonly int FloatParametersCount;
         public readonly int StringParametersCount;
@@ -92,7 +107,7 @@ namespace WDE.SmartScriptEditor.Models
             }
 
             Context = @params.Select(p => (object?)new ParameterWithContext(p, this)).ToList();
-            OnChanged += (sender, args) => OnPropertyChanged(nameof(Readable));
+            OnChanged += (_, _) => InvalidateReadable();
         }
 
         public ParameterValueHolder<long> GetParameter(int index)
@@ -151,6 +166,7 @@ namespace WDE.SmartScriptEditor.Models
 
         public virtual void InvalidateReadable()
         {
+            readableDirty = true;
             OnPropertyChanged(nameof(Readable));
         }
 

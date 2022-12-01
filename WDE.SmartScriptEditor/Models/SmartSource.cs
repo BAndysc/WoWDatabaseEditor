@@ -88,7 +88,7 @@ namespace WDE.SmartScriptEditor.Models
 
         public ParameterValueHolder<long> Condition => condition;
 
-        public override string Readable
+        protected override string ReadableImpl
         {
             get
             {

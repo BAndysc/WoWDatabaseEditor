@@ -134,7 +134,7 @@ namespace WDE.SmartScriptEditor.Models
 
         public SmartTarget Target => target;
 
-        public override string Readable
+        protected override string ReadableImpl
         {
             get
             {

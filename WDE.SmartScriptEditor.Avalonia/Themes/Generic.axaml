@@ -7,9 +7,9 @@
         xmlns:styles="clr-namespace:AvaloniaStyles.Styles;assembly=AvaloniaStyles"
         xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia"
         xmlns:themes="clr-namespace:WDE.SmartScriptEditor.Avalonia.Themes"
-        xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
         xmlns:controls1="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
-        xmlns:editing1="clr-namespace:WDE.SmartScriptEditor.Editor.ViewModels.Editing;assembly=WDE.SmartScriptEditor">
+        xmlns:editing1="clr-namespace:WDE.SmartScriptEditor.Editor.ViewModels.Editing;assembly=WDE.SmartScriptEditor"
+        xmlns:models="clr-namespace:WDE.SmartScriptEditor.Models;assembly=WDE.SmartScriptEditor">
 
     <Styles.Resources>
         <themes:IndentToMarginConverter x:Key="IndentToMarginConverter" LeftMultiplier="24" />
@@ -27,15 +27,15 @@
     <Style Selector="controls|SmartActionView:action">
         <Setter Property="HorizontalAlignment" Value="Stretch" />
         <Setter Property="Template">
-            <ControlTemplate>
+            <ControlTemplate x:DataType="models:SmartAction">
                 <Border BorderThickness="1" Classes="action" 
                         Background="Transparent"
-                        Padding="{Binding Indent, Converter={StaticResource IndentToMarginConverter}}">
+                        Padding="{CompiledBinding Indent, Converter={StaticResource IndentToMarginConverter}}">
                     <extendedTextBlock:FormattedTextBlock
-                        ContextArray="{Binding Context}"
-                        IsSelected="{Binding IsSelected}"
+                        ContextArray="{CompiledBinding Context}"
+                        IsSelected="{CompiledBinding IsSelected}"
                         Padding="2"
-                        Text="{Binding Readable}" />
+                        Text="{CompiledBinding Readable}" />
                 </Border>
             </ControlTemplate>
         </Setter>
@@ -43,12 +43,12 @@
     <Style Selector="controls|SmartActionView:comment">
         <Setter Property="HorizontalAlignment" Value="Stretch" />
         <Setter Property="Template">
-            <ControlTemplate>
+            <ControlTemplate x:DataType="models:SmartAction">
                 <Border BorderThickness="1" Classes="comment">
                     <TextBlock TextWrapping="Wrap"
                                Padding="2"
                                FontFamily="Consolas,Monaco"
-                               Text="{Binding Comment}" />
+                               Text="{CompiledBinding Comment}" />
                 </Border>
             </ControlTemplate>
         </Setter>
@@ -82,12 +82,12 @@
     <Style Selector="controls|SmartConditionView">
         <Setter Property="HorizontalAlignment" Value="Stretch" />
         <Setter Property="Template">
-            <ControlTemplate>
-                <Border BorderThickness="1" Margin="{Binding Indent, Converter={StaticResource NumberToMarginConverter}}">
+            <ControlTemplate x:DataType="models:SmartCondition">
+                <Border BorderThickness="1" Margin="{CompiledBinding Indent, Converter={StaticResource NumberToMarginConverter}}">
                     <extendedTextBlock:FormattedTextBlock Padding="2"
-                                                          ContextArray="{Binding Context}"
-                                                          IsSelected="{Binding IsSelected}"
-                                                          Text="{Binding Readable}" />
+                                                          ContextArray="{CompiledBinding Context}"
+                                                          IsSelected="{CompiledBinding IsSelected}"
+                                                          Text="{CompiledBinding Readable}" />
                 </Border>
             </ControlTemplate>
         </Setter>
@@ -156,18 +156,18 @@
     
     <Style Selector="controls|SmartEventView">
         <Setter Property="Template">
-            <ControlTemplate>
+            <ControlTemplate x:DataType="models:SmartEvent">
                 <DockPanel LastChildFill="True">
                     <Border BorderThickness="1" DockPanel.Dock="Top" Padding="5">
                         <DockPanel LastChildFill="True">
                             <controls:SmartEventFlagsView DockPanel.Dock="Right"/>
-                            <Border VerticalAlignment="Center" CornerRadius="3" Background="{DynamicResource SmartScripts.Event.Chance.Background}" DockPanel.Dock="Right" IsVisible="{Binding ChanceString, Converter={StaticResource NullToBoolConverter}}">
-                                <TextBlock Padding="2,1" Foreground="White" FontWeight="Bold" FontSize="11" Text="{Binding ChanceString}"/>
+                            <Border VerticalAlignment="Center" CornerRadius="3" Background="{DynamicResource SmartScripts.Event.Chance.Background}" DockPanel.Dock="Right" IsVisible="{CompiledBinding ChanceString, Converter={StaticResource NullToBoolConverter}}">
+                                <TextBlock Padding="2,1" Foreground="White" FontWeight="Bold" FontSize="11" Text="{CompiledBinding ChanceString}"/>
                             </Border>
                             <extendedTextBlock:FormattedTextBlock
-                                ContextArray="{Binding Context}"
-                                IsSelected="{Binding IsSelected}"
-                                Text="{Binding Readable}" />
+                                ContextArray="{CompiledBinding Context}"
+                                IsSelected="{CompiledBinding IsSelected}"
+                                Text="{CompiledBinding Readable}" />
                         </DockPanel>
                     </Border>
                     <Canvas Margin="20,0,0,0" />
