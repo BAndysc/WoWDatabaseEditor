@@ -105,7 +105,7 @@ namespace WDE.PacketViewer.Processing.Processors
             {
                 Index = option.OptionIndex;
                 Text = option.Text;
-                Icon = (GossipOptionIcon)option.OptionIcon;
+                Icon = (GossipOptionIcon)option.OptionNpc;
                 OptionType = GossipOption.Gossip;
                 NpcFlags = GameDefines.NpcFlags.Gossip;
                 BoxCoded = option.BoxCoded;
@@ -222,7 +222,7 @@ namespace WDE.PacketViewer.Processing.Processors
                     menu.AddOption(gossipMenuOption);
                 }
                 
-                if (gossipMenuOption.Text != option.Text || (int)gossipMenuOption.Icon != option.OptionIcon)
+                if (gossipMenuOption.Text != option.Text || (int)gossipMenuOption.Icon != option.OptionNpc)
                     throw new Exception($"Same menu id, same option index different options :( menuId: {menu.MenuId} option index: {option.OptionIndex}");
             }
             

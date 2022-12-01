@@ -3251,15 +3251,12 @@
             {
                 "type": "ConversationTemplateParameter",
                 "name": "Conversation template id"
-            },
-            {
-                "type": "Parameter",
-                "name": "Base object dynamic actor index"
             }
         ],
-        "description": "Start conversation {pram1}{pram2value:choose(0):| with base object dynamic actor index: {pram2_m1}}",
+        "description": "{source}: Start conversation {pram1}",
         "name_readable": "Start conversation",
-        "implicit_source": "SMART_TARGET_NONE"
+        "target_types": ["Player"],
+        "target_is_source": true
     },
     {
         "id": 144,
