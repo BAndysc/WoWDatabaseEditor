@@ -40,7 +40,7 @@ namespace AvaloniaRenderingTester
             registry.Register<IGameProperties, DummyGameProperties>();
             registry.Register<IMessageBoxService, DummyMessageBox>();
             registry.Register<IDatabaseClientFileOpener, DatabaseClientFileOpener>();
-            var mainThread = new MainThread();
+            var mainThread = new MainThread(null!);
             registry.RegisterInstance<IMainThread>(mainThread);
             registry.RegisterInstance<IEventAggregator>(new EventAggregator());
             new MpqModule().RegisterTypes(registry);

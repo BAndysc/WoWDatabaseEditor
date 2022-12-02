@@ -141,7 +141,10 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             if (creatureTemplateByEntry.TryGetValue(entry, out var template))
                 return template;
 
-            return nonCachedDatabase.GetCreatureTemplate(entry);
+            template = nonCachedDatabase.GetCreatureTemplate(entry);
+            if (template != null)
+                creatureTemplateByEntry[entry] = template;
+            return template;
         }
 
         public IGameObjectTemplate? GetGameObjectTemplate(uint entry)
@@ -152,7 +155,10 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             if (gameObjectTemplateByEntry.TryGetValue(entry, out var template))
                 return template;
 
-            return nonCachedDatabase.GetGameObjectTemplate(entry);
+            template = nonCachedDatabase.GetGameObjectTemplate(entry);
+            if (template != null)
+                gameObjectTemplateByEntry[entry] = template;
+            return template;
         }
 
         public IQuestTemplate? GetQuestTemplate(uint entry)

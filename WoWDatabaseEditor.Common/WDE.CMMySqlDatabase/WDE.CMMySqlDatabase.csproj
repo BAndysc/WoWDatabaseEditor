@@ -22,7 +22,7 @@
     <PackageReference Include="CommonServiceLocator">
       <Version>2.0.5</Version>
     </PackageReference>
-    <PackageReference Include="Google.Protobuf" Version="3.17.3" />
+    <PackageReference Include="Google.Protobuf" Version="3.21.9" />
     <PackageReference Include="linq2db">
       <Version>3.3.0</Version>
     </PackageReference>
