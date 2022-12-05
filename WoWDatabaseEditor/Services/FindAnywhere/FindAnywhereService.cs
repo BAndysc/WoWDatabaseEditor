@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.VisualBasic.CompilerServices;
 using WDE.Common.Managers;
 using WDE.Common.Services.FindAnywhere;
 using WDE.Common.Utils;
@@ -18,6 +17,7 @@ public class FindAnywhereService : IFindAnywhereService
     private readonly Func<IFindAnywhereResultsViewModel> resultsCreator;
     private readonly Lazy<IDocumentManager> documentManager;
     private readonly IList<IFindAnywhereSource> sources;
+    private readonly LRUCache<(string, long), ToListFindAnywhereResultContext> cache = new(30);
 
     public FindAnywhereService(Func<IFindAnywhereResultsViewModel> resultsCreator,
         Lazy<IDocumentManager> documentManager,
@@ -39,13 +39,39 @@ public class FindAnywhereService : IFindAnywhereService
 
     public async Task Find(IFindAnywhereResultContext resultContext, IReadOnlyList<string> parameterName, IReadOnlyList<long> parameterValue, CancellationToken cancellationToken)
     {
-        foreach (var source in sources)
+        // cacheable version
+        if (parameterName.Count == 1 && parameterValue.Count == 1)
         {
-            if (cancellationToken.IsCancellationRequested)
-                return;
+            if (cache.TryGetValue((parameterName[0], parameterValue[0]), out var results) && results is {})
+            {
+                foreach (var result in results.Results)
+                    resultContext.AddResult(result);
+            }
+            else
+            {
+                var listResults = new ToListFindAnywhereResultContext();
+                var multiplexResults = new MultiplexFindAnywhereResultContext(listResults, resultContext);
+                foreach (var source in sources)
+                {
+                    if (cancellationToken.IsCancellationRequested)
+                        return;
             
-            foreach (var val in parameterValue)
-                await source.Find(resultContext, parameterName, val, cancellationToken);
+                    foreach (var val in parameterValue)
+                        await source.Find(multiplexResults, parameterName, val, cancellationToken);
+                }
+                cache[(parameterName[0], parameterValue[0])] = listResults;
+            }
+        }
+        else
+        {
+            foreach (var source in sources)
+            {
+                if (cancellationToken.IsCancellationRequested)
+                    return;
+            
+                foreach (var val in parameterValue)
+                    await source.Find(resultContext, parameterName, val, cancellationToken);
+            }   
         }
     }
 }

@@ -37,15 +37,20 @@ public abstract class SmartScriptBaseFindAnywhereSource : IFindAnywhereSource
     public async Task Find(IFindAnywhereResultContext resultContext, IReadOnlyList<string> parameterNames, long parameterValue,
         CancellationToken cancellationToken)
     {
+        HashSet<(int, int)> added = new();
         var results = await databaseProvider.FindSmartScriptLinesBy(PrepareCondition(parameterNames, parameterValue));
         foreach (var result in results)
         {
+            if (!added.Add((result.ScriptSourceType, result.EntryOrGuid)))
+                continue;
+            
             var item = GenerateSolutionItem(result);
             var name = nameRegistry.GetName(item);
             var icon = iconRegistry.GetIcon(item);
             resultContext.AddResult(new FindAnywhereResult(
                 icon,
-                name + " (" + result.EntryOrGuid + ")",
+                result.EntryOrGuid,
+                name,
                 result.Comment,
                 item));
         }

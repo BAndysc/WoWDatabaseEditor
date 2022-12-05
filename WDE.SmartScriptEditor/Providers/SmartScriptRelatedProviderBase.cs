@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using WDE.Common.Database;
 using WDE.Common.Solution;
@@ -13,19 +14,39 @@ namespace WDE.SmartScriptEditor.Providers
         {
             this.databaseProvider = databaseProvider;
         }
+
+        private RelatedSolutionItem.RelatedType SmartScriptToRelatedType(SmartScriptType type)
+        {
+            switch (type)
+            {
+                case SmartScriptType.Creature:
+                    return RelatedSolutionItem.RelatedType.CreatureEntry;
+                case SmartScriptType.GameObject:
+                    return RelatedSolutionItem.RelatedType.GameobjectEntry;
+                case SmartScriptType.Template:
+                    return RelatedSolutionItem.RelatedType.Template;
+                case SmartScriptType.TimedActionList:
+                    return RelatedSolutionItem.RelatedType.TimedActionList;
+                case SmartScriptType.Quest:
+                    return RelatedSolutionItem.RelatedType.QuestEntry;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), $"{type} is not expected to be invoked here");
+            }
+        }
         
         public Task<RelatedSolutionItem?> GetRelated(T item)
         {
             if (item.SmartType != SmartScriptType.Creature &&
-                item.SmartType != SmartScriptType.GameObject)
+                item.SmartType != SmartScriptType.GameObject &&
+                item.SmartType != SmartScriptType.Template &&
+                item.SmartType != SmartScriptType.TimedActionList &&
+                item.SmartType != SmartScriptType.Quest)
                 return Task.FromResult<RelatedSolutionItem?>(null);
 
             if (item.Entry >= 0)
             {
                 return Task.FromResult<RelatedSolutionItem?>(
-                    new RelatedSolutionItem(item.SmartType == SmartScriptType.Creature ? 
-                        RelatedSolutionItem.RelatedType.CreatureEntry : 
-                        RelatedSolutionItem.RelatedType.GameobjectEntry, item.Entry));
+                    new RelatedSolutionItem(SmartScriptToRelatedType(item.SmartType), item.Entry));
             }
 
             if (item.SmartType == SmartScriptType.Creature)

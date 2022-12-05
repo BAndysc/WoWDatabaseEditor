@@ -53,7 +53,8 @@ public class SpellFindAnywhereSource : IFindAnywhereSource
             mainThread.Dispatch(() =>
             {
                 resultContext.AddResult(new FindAnywhereResult(icon,
-                    name + " (" + spell + ")",
+                    spell,
+                    name,
                     description,
                     null,
                     command));

@@ -47,7 +47,7 @@ namespace WDE.Common.Parameters
     {
         public override string ToString(long key, ToStringOptions options)
         {
-            if (options.WithNumber)
+            if (options.withNumber)
                 return ToString(key);
 
             if (Items != null && Items.TryGetValue(key, out var option))

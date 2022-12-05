@@ -122,7 +122,7 @@ namespace WDE.DatabaseEditors.Expressions.Antlr
             
             var cell = entity?.GetCell(name);
             if (cell is DatabaseField<long> lField)
-                return parameterFactory.Factory(column.ValueType).ToString(lField.Current.Value, new ToStringOptions(){WithNumber = false});
+                return parameterFactory.Factory(column.ValueType).ToString(lField.Current.Value, new ToStringOptions(){withNumber = false});
             
             if (cell is DatabaseField<float> fField)
                 return fField.Current.ToString();
@@ -132,7 +132,7 @@ namespace WDE.DatabaseEditors.Expressions.Antlr
                 var sParam = parameterFactory.FactoryString(column.ValueType);
                 if (sParam is IContextualParameter<string, DatabaseEntity> sContext)
                     return sContext.ToString(sField.Current.Value ?? "", entity!);
-                return sParam.ToString(sField.Current.Value ?? "", new ToStringOptions(){WithNumber = false});
+                return sParam.ToString(sField.Current.Value ?? "", new ToStringOptions(){withNumber = false});
             }
             
             return "";

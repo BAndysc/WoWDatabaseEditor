@@ -33,7 +33,11 @@
         <ItemsPresenter Items="{CompiledBinding Notifications}">
             <ItemsPresenter.ItemTemplate>
                 <DataTemplate x:DataType="editor:SmartExtensionNotification">
-                    <controls:TeachingTip IsDontWorryHintVisible="False" IsOpened="{CompiledBinding IsOpened}" Header="{CompiledBinding Header}">
+                    <controls:TeachingTip 
+                        HorizontalAlignment="Right"
+                        IsDontWorryHintVisible="False" 
+                        IsOpened="{CompiledBinding IsOpened}" 
+                        Header="{CompiledBinding Header}">
                         <StackPanel Orientation="Vertical" Spacing="10">
                             <TextBlock TextWrapping="WrapWithOverflow" Text="{CompiledBinding Content}"></TextBlock>
                             <Button Classes="primary" HorizontalAlignment="Right" Command="{CompiledBinding Action}" CommandParameter="{CompiledBinding}" Content="{CompiledBinding ActionName}" />

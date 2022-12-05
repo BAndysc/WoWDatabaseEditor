@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using WDE.Module.Attributes;
 
@@ -14,8 +15,33 @@ namespace WDE.Common.Solution
         Task<RelatedSolutionItem?> GetRelated(T item);
     }
     
-    public readonly struct RelatedSolutionItem
+    public readonly struct RelatedSolutionItem : IEquatable<RelatedSolutionItem>
     {
+        public bool Equals(RelatedSolutionItem other)
+        {
+            return Entry == other.Entry && Type == other.Type;
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is RelatedSolutionItem other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Entry, (int)Type);
+        }
+
+        public static bool operator ==(RelatedSolutionItem left, RelatedSolutionItem right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(RelatedSolutionItem left, RelatedSolutionItem right)
+        {
+            return !left.Equals(right);
+        }
+
         public long Entry { get; }
         public RelatedType Type { get; }
 
@@ -30,7 +56,9 @@ namespace WDE.Common.Solution
             CreatureEntry,
             GameobjectEntry,
             GossipMenu,
-            QuestEntry
+            QuestEntry,
+            Template,
+            TimedActionList
         }
     }
     

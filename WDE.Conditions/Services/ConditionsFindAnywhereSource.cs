@@ -113,6 +113,7 @@ public class ConditionsFindAnywhereSource : IFindAnywhereSource
         foreach (var row in result)
         {
             resultContext.AddResult(new FindAnywhereResult(new ImageUri("Icons/document_conditions.png"),
+                null,
                 "Condition " + row["Comment"].Item2,
                  string.Join(", ", row.Select(pair => pair.Key + ": " + pair.Value.Item2)),
                 null,

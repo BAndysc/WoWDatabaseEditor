@@ -21,8 +21,8 @@ public abstract class FastTreeView<P, C> : Control where P : IParentType where C
     public static readonly StyledProperty<INodeType?> SelectedNodeProperty = AvaloniaProperty.Register<FastTreeView<P, C>, INodeType?>(nameof(SelectedNode));
 
     
-    public const float RowHeight = 20;
-    public const float Indent = 20;
+    public const float RowHeight = 24;
+    public const float Indent = 24;
     
     static FastTreeView()
     {
@@ -221,6 +221,18 @@ public abstract class FastTreeView<P, C> : Control where P : IParentType where C
 
         var scrollViewer = this.FindAncestorOfType<ScrollViewer>();
 
+        if (scrollViewer == null)
+        {
+            context.DrawText(Brushes.Red, default, 
+                new FormattedText("FastTreeView must be wrapped in ScrollViewer!", 
+                    Typeface.Default, 
+                    14,
+                    TextAlignment.Left,
+                    TextWrapping.Wrap, 
+                    Bounds.Size));
+            return;
+        }
+        
         // determine the first and last visible row
         var startOffset = scrollViewer.Offset.Y;
         var endOffset = startOffset + scrollViewer.Viewport.Height;

@@ -17,6 +17,7 @@ using WDE.Common.Database;
 using WDE.Common.Disposables;
 using WDE.Common.History;
 using WDE.Common.Managers;
+using WDE.Common.Outliner;
 using WDE.Common.Parameters;
 using WDE.Common.Providers;
 using WDE.Common.Services;
@@ -36,12 +37,13 @@ using WDE.SmartScriptEditor.Exporter;
 using WDE.SmartScriptEditor.Models;
 using WDE.SmartScriptEditor.History;
 using WDE.SmartScriptEditor.Inspections;
+using WDE.SmartScriptEditor.Services;
 using WDE.SmartScriptEditor.Settings;
 using WDE.SqlQueryGenerator;
 
 namespace WDE.SmartScriptEditor.Editor.ViewModels
 {
-    public partial class SmartScriptEditorViewModel : ObservableBase, ISolutionItemDocument, IProblemSourceDocument
+    public partial class SmartScriptEditorViewModel : ObservableBase, ISolutionItemDocument, IProblemSourceDocument, IOutlinerSourceDocument
     {
         private readonly ISmartScriptDatabaseProvider smartScriptDatabase;
         private readonly IItemFromListProvider itemFromListProvider;
@@ -67,6 +69,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         private readonly IStatusBar statusbar;
         private readonly IWindowManager windowManager;
         private readonly IMessageBoxService messageBoxService;
+        private readonly IOutlinerService outlinerService;
 
         private ISmartScriptSolutionItem item;
         private SmartScript script;
@@ -129,7 +132,9 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             IParameterPickerService parameterPickerService,
             IMySqlExecutor mySqlExecutor,
             ISmartEditorExtension editorExtension,
-            IGeneralSmartScriptSettingsProvider preferences)
+            IGeneralSmartScriptSettingsProvider preferences,
+            IOutlinerService outlinerService,
+            ISmartScriptOutlinerModel outlinerData)
         {
             History = history;
             this.smartScriptDatabase = smartScriptDatabase;
@@ -156,6 +161,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             this.editorExtension = editorExtension;
             this.preferences = preferences;
             this.conditionDataManager = conditionDataManager;
+            this.outlinerService = outlinerService;
+            this.outlinerData = outlinerData;
             script = null!;
             this.item = null!;
             TeachingTips = null!;
@@ -1221,6 +1228,9 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             {
                 if (updateInspections)
                 {
+                    outlinerService.Process(outlinerData, script);
+                    outlinerModel.Publish(outlinerData);
+                    
                     problems.Value = inspectorService.GenerateInspections(script);
                     updateInspections = false;
                 }
@@ -2029,10 +2039,16 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         }
 
         public ISolutionItem SolutionItem => item;
+
+        private ISmartScriptOutlinerModel outlinerData;
+        private ValuePublisher<IOutlinerModel> outlinerModel = new ValuePublisher<IOutlinerModel>();
+        public IObservable<IOutlinerModel> OutlinerModel => outlinerModel;
+
         public IObservable<IReadOnlyList<IInspectionResult>> Problems => problems;
         private ReactiveProperty<IReadOnlyList<IInspectionResult>> problems = new(new List<IInspectionResult>());
 
         private Dictionary<int, DiagnosticSeverity>? problematicLines = new();
+
         public Dictionary<int, DiagnosticSeverity>? ProblematicLines
         {
             get => problematicLines;

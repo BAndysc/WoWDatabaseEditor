@@ -46,6 +46,7 @@ public abstract class EventAiBaseFindAnywhereSource : IFindAnywhereSource
             var icon = iconRegistry.GetIcon(item);
             resultContext.AddResult(new FindAnywhereResult(
                 icon,
+                result.Id,
                 name + " (" + result.CreatureIdOrGuid + ")",
                 result.Comment,
                 item));

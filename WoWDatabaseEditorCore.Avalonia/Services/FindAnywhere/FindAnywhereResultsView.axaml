@@ -28,7 +28,10 @@
                             <Border Padding="10,5,10,5" Name="Border">
                                 <DockPanel>
                                     <WdeImage Margin="0,0,10,0" Image="{CompiledBinding Icon}" DockPanel.Dock="Left" Width="32" />
-                                    <TextBlock Margin="0,0,0,5" DockPanel.Dock="Top" FontWeight="Bold" Text="{CompiledBinding Title}" />
+                                    <StackPanel Margin="0,0,0,5" DockPanel.Dock="Top" Orientation="Horizontal">
+                                        <TextBlock FontWeight="Bold" Text="{CompiledBinding Entry, FallbackValue=''}" IsVisible="{CompiledBinding Entry, Converter={x:Static NullConverter.IsNotNull}}" Margin="0, 0, 10, 0" FontFamily="Consolas,Menlo,Courier,Courier New" />
+                                        <TextBlock FontWeight="Bold" Text="{CompiledBinding Title}" />
+                                    </StackPanel>
                                     <TextBlock Text="{CompiledBinding Description}" />
                                 </DockPanel>
                                 <Interaction.Behaviors>

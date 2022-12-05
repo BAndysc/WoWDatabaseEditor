@@ -33,6 +33,8 @@ namespace WDE.SmartScriptEditor.Data
         IEnumerable<SmartGenericJsonData> GetAllData(SmartType type);
         
         void Reload(SmartType smartType);
+
+        int MaxId(SmartType type);
     }
 
     [AutoRegister]
@@ -44,6 +46,8 @@ namespace WDE.SmartScriptEditor.Data
         private readonly ISmartDataProvider provider;
         private readonly IEditorFeatures editorFeatures;
         private readonly IParameterFactory parameterFactory;
+
+        private int maxIdEvent, maxIdAction, maxIdTarget;
 
         public SmartDataManager(ISmartDataProvider provider, 
             IEditorFeatures editorFeatures,
@@ -142,7 +146,15 @@ namespace WDE.SmartScriptEditor.Data
         private void Load(SmartType type, IEnumerable<SmartGenericJsonData> data)
         {
             foreach (SmartGenericJsonData d in data)
+            {
                 Add(type, d);
+                if (type == SmartType.SmartEvent)
+                    maxIdEvent = Math.Max(maxIdEvent, d.Id);
+                else if (type == SmartType.SmartAction)
+                    maxIdAction = Math.Max(maxIdAction, d.Id);
+                else if (type == SmartType.SmartTarget)
+                    maxIdTarget = Math.Max(maxIdTarget, d.Id);
+            }
         }
 
         private void ActualAdd(SmartType type, SmartGenericJsonData data)
@@ -191,6 +203,22 @@ namespace WDE.SmartScriptEditor.Data
                     Load(smartType, provider.GetTargets());
                     break;
             }
+        }
+
+        public int MaxId(SmartType type)
+        {
+            switch (type)
+            {
+                case SmartType.SmartEvent:
+                    return maxIdEvent;
+                case SmartType.SmartAction:
+                    return maxIdAction;
+                case SmartType.SmartTarget:
+                case SmartType.SmartSource:
+                    return maxIdTarget;
+            }
+
+            return 0;
         }
     }
 
