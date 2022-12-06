@@ -49,8 +49,9 @@ namespace WDE.MapRenderer.Managers
             this.woWMeshManager = woWMeshManager;
         }
 
-        public IEnumerator LoadWorldMapObject(string path, TaskCompletionSource<WmoInstance?> result)
+        public IEnumerator LoadWorldMapObject(string path, TaskCompletionSource<WmoInstance?> result, int doodadset)
         {
+
             if (meshes.ContainsKey(path))
             {
                 result.SetResult(meshes[path]);
@@ -153,6 +154,14 @@ namespace WDE.MapRenderer.Managers
 
                 group.Dispose();
             }
+
+            // SmoDoodadDef[] smoDoodadDefs = new SmoDoodadDef[wmo.doodadSets[doodadset].count];
+            // int idx = 0;
+            // for (var i = wmo.doodadSets[doodadset].startIndex; i < ( wmo.doodadSets[doodadset].count + wmo.doodadSets[doodadset].startIndex ); i++)
+            // {
+            //     smoDoodadDefs[idx] = wmo.DoodadsDefinition[i];
+            //     idx++;
+            // }
 
             meshes.Add(path, wmoInstance);
             completion.SetResult(wmoInstance);

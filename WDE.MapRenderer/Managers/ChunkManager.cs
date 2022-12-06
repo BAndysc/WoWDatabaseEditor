@@ -734,7 +734,7 @@ namespace WDE.MapRenderer.Managers
                 wmoTransform.Rotation = Utilities.FromEuler(wmoReference.Rotation.X,  wmoReference.Rotation.Y + 180, wmoReference.Rotation.Z);
 
                 var tcs = new TaskCompletionSource<WmoManager.WmoInstance?>();
-                yield return wmoManager.LoadWorldMapObject(wmoReference.WmoPath, tcs);
+                yield return wmoManager.LoadWorldMapObject(wmoReference.WmoPath, tcs, wmoReference.DoodadSet);
                 if (tcs.Task.Result == null)
                     continue;
 
