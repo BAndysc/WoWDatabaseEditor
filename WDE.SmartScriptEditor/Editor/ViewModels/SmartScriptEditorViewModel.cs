@@ -1335,7 +1335,9 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             }
             else
             {
-                action = smartFactory.ActionFactory(SmartConstants.ActionNone, smartFactory.SourceFactory(SmartConstants.SourceSelf), smartFactory.TargetFactory(SmartConstants.TargetSelf));
+                var source = smartFactory.SourceFactory(SmartConstants.SourceSelf);
+                var target = smartFactory.TargetFactory(SmartConstants.TargetNone);
+                action = smartFactory.ActionFactory(SmartConstants.ActionNone, source, target);
 
                 if (preferences.AddingBehaviour == AddingElementBehaviour.JustAdd)
                 {
@@ -1394,7 +1396,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     target.GetParameter(0).Value = targetPick.Value.Item1;
             }
             else 
-                target = smartFactory.TargetFactory(SmartConstants.TargetSelf);
+                target = smartFactory.TargetFactory(SmartConstants.TargetNone);
             
             SmartSource source = smartFactory.SourceFactory(sourceId);
             if (sourcePick.Value.Item2)
