@@ -12,6 +12,7 @@
         xmlns:models="clr-namespace:WDE.SmartScriptEditor.Models;assembly=WDE.SmartScriptEditor">
 
     <Styles.Resources>
+        <!-- this is later also used in SmartScriptPanelLayout measurement, for performance reasons-->
         <themes:IndentToMarginConverter x:Key="IndentToMarginConverter" LeftMultiplier="24" />
         <converters:NullConverter x:Key="NullToBoolConverter" Inverted="True" />
         <converters:EmptyStringToBoolConverter x:Key="EmptyStringToBoolConverter" WhenNullOrEmpty="False" />
@@ -28,7 +29,7 @@
         <Setter Property="HorizontalAlignment" Value="Stretch" />
         <Setter Property="Template">
             <ControlTemplate x:DataType="models:SmartAction">
-                <Border BorderThickness="1" Classes="action" 
+                <Border BorderThickness="0,1,1,1" Classes="action" 
                         Background="Transparent"
                         Padding="{CompiledBinding Indent, Converter={StaticResource IndentToMarginConverter}}">
                     <extendedTextBlock:FormattedTextBlock
@@ -44,7 +45,7 @@
         <Setter Property="HorizontalAlignment" Value="Stretch" />
         <Setter Property="Template">
             <ControlTemplate x:DataType="models:SmartAction">
-                <Border BorderThickness="1" Classes="comment">
+                <Border BorderThickness="0,1,1,1" Classes="comment">
                     <TextBlock TextWrapping="Wrap"
                                Padding="2"
                                FontFamily="Consolas,Monaco"
@@ -59,6 +60,7 @@
     <Style Selector="controls|SmartActionView:comment Border">
         <Setter Property="BorderBrush" Value="{DynamicResource SmartScripts.Comment.Border}" />
         <Setter Property="Background" Value="{DynamicResource SmartScripts.Comment.Background}" />
+        <Setter Property="TextBlock.Foreground" Value="{DynamicResource SmartScripts.Comment.Foreground}" />
     </Style>
     <Style Selector="controls|SmartActionView:action /template/ extendedTextBlock|FormattedTextBlock">
         <Setter Property="Background" Value="{DynamicResource SmartScripts.Action.Background}" />
@@ -71,6 +73,7 @@
     <Style Selector="controls|SmartActionView:comment:selected /template/ Border">
         <Setter Property="Background" Value="{DynamicResource SmartScripts.Comment.Selected.Background}" />
         <Setter Property="BorderBrush" Value="{DynamicResource SmartScripts.Comment.Selected.Border}" />
+        <Setter Property="TextBlock.Foreground" Value="{DynamicResource SmartScripts.Comment.Selected.Foreground}" />
     </Style>
     <Style Selector="controls|SmartActionView:action:selected /template/ extendedTextBlock|FormattedTextBlock">
         <Setter Property="Background" Value="{DynamicResource SmartScripts.Action.Selected.Background}" />
@@ -113,7 +116,7 @@
         <Setter Property="Template">
             <ControlTemplate>
                 <Panel Width="12" Height="12" Margin="2,0,0,0">
-                    <Ellipse Fill="{TemplateBinding Background}"></Ellipse>
+                    <Ellipse Fill="{TemplateBinding Background}" ToolTip.Tip=""></Ellipse>
                     <TextBlock Foreground="{DynamicResource SmartScripts.Event.Flag.Foreground}" 
                                Margin="0,1,0,0" 
                                FontSize="9" 
@@ -123,44 +126,37 @@
             </ControlTemplate>
         </Setter>
     </Style>
-
-    <Style Selector="controls|SmartEventFlagsView">
+    
+    <Style Selector="controls|SmartGroupView">
         <Setter Property="Template">
             <ControlTemplate>
-                <ItemsPresenter Items="{TemplateBinding Flags}">
-                    <ItemsPresenter.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <WrapPanel MaxWidth="30" />
-                        </ItemsPanelTemplate>
-                    </ItemsPresenter.ItemsPanel>
-                    <ItemsPresenter.ItemTemplate>
-                        <controls:SmartEventFlagPhaseDataSelector>
-                            <controls:SmartEventFlagPhaseDataSelector.PhaseView>
-                                <controls:MiniEventIcon Background="{DynamicResource SmartScripts.Event.Phase.Background}" Text="{Binding Text}" ToolTip.Tip="{Binding ToolTip}" />
-                            </controls:SmartEventFlagPhaseDataSelector.PhaseView>
-                            <controls:SmartEventFlagPhaseDataSelector.FlagView>
-                                <TextBlock Foreground="{DynamicResource SmartScripts.Event.Flag.Background}" 
-                                           Margin="2,0,0,0" 
-                                           FontSize="10" 
-                                           Width="12" Height="12"
-                                           TextAlignment="Center" 
-                                           ToolTip.Tip="{Binding ToolTip}"
-                                           VerticalAlignment="Center" Text="{Binding Text}"/>
-                            </controls:SmartEventFlagPhaseDataSelector.FlagView>
-                        </controls:SmartEventFlagPhaseDataSelector>
-                    </ItemsPresenter.ItemTemplate>
-                </ItemsPresenter>
+                <Border Name="PART_Border" BorderThickness="1" CornerRadius="4" Padding="6">
+                    <DockPanel>
+                        <CheckBox DockPanel.Dock="Left" IsChecked="{TemplateBinding IsExpanded, Mode=TwoWay}" />
+                        <TextBlock FontWeight="Bold" FontSize="14" Text="{TemplateBinding Header}" DockPanel.Dock="Top" TextWrapping="WrapWithOverflow" />
+                        <TextBlock Opacity="0.8" Text="{TemplateBinding Description}" TextWrapping="WrapWithOverflow" />
+                    </DockPanel>
+                </Border>
             </ControlTemplate>
         </Setter>
+    </Style>
+    <Style Selector="controls|SmartGroupView /template/ Border#PART_Border">
+        <Setter Property="Background" Value="{DynamicResource SmartScripts.Group.Background}" />
+        <Setter Property="TextBlock.Foreground" Value="{DynamicResource SmartScripts.Group.Foreground}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SmartScripts.Group.Border}" />
+    </Style>
+    <Style Selector="controls|SmartGroupView:selected /template/ Border#PART_Border">
+        <Setter Property="BorderBrush" Value="{DynamicResource SmartScripts.Group.Selected.Border}" />
+        <Setter Property="Background" Value="{DynamicResource SmartScripts.Group.Selected.Background}" />
     </Style>
     
     <Style Selector="controls|SmartEventView">
         <Setter Property="Template">
             <ControlTemplate x:DataType="models:SmartEvent">
                 <DockPanel LastChildFill="True">
-                    <Border BorderThickness="1" DockPanel.Dock="Top" Padding="5">
+                    <Border Name="Main" BorderThickness="1" CornerRadius="4,0,0,4" DockPanel.Dock="Top" Padding="5">
                         <DockPanel LastChildFill="True">
-                            <controls:SmartEventFlagsView DockPanel.Dock="Right"/>
+                            <controls:SmartEventFlagsView TextBlock.Foreground="{DynamicResource SmartScripts.Event.Flag.Background}" DockPanel.Dock="Right"/>
                             <Border VerticalAlignment="Center" CornerRadius="3" Background="{DynamicResource SmartScripts.Event.Chance.Background}" DockPanel.Dock="Right" IsVisible="{CompiledBinding ChanceString, Converter={StaticResource NullToBoolConverter}}">
                                 <TextBlock Padding="2,1" Foreground="White" FontWeight="Bold" FontSize="11" Text="{CompiledBinding ChanceString}"/>
                             </Border>
@@ -170,23 +166,23 @@
                                 Text="{CompiledBinding Readable}" />
                         </DockPanel>
                     </Border>
-                    <Canvas Margin="20,0,0,0" />
+                    <Border Name="Filler" CornerRadius="0,0,4,4" Margin="20,0,0,0" />
                 </DockPanel>
             </ControlTemplate>
         </Setter>
     </Style>
-    <Style Selector="controls|SmartEventView /template/ Border">
+    <Style Selector="controls|SmartEventView /template/ Border#Main">
         <Setter Property="Background" Value="{DynamicResource SmartScripts.Event.Background}" />
         <Setter Property="BorderBrush" Value="{DynamicResource SmartScripts.Event.Border}" />
     </Style>
-    <Style Selector="controls|SmartEventView /template/ Canvas">
+    <Style Selector="controls|SmartEventView /template/ Border#Filler">
         <Setter Property="Background" Value="{DynamicResource SmartScripts.Condition.Background}" />
     </Style>
-    <Style Selector="controls|SmartEventView:selected /template/ Border">
+    <Style Selector="controls|SmartEventView:selected /template/ Border#Main">
         <Setter Property="BorderBrush" Value="{DynamicResource SmartScripts.Event.Selected.Border}" />
         <Setter Property="Background" Value="{DynamicResource SmartScripts.Event.Selected.Background}" />
     </Style>
-    <Style Selector="controls|SmartEventView:selected /template/ Canvas">
+    <Style Selector="controls|SmartEventView:selected /template/ Border#Filler">
         <Setter Property="Background" Value="{DynamicResource SmartScripts.Event.Selected.Border}" />
     </Style>
 
@@ -198,7 +194,7 @@
     <Style Selector="controls|GlobalVariableView">
         <Setter Property="Template">
             <ControlTemplate>
-                <Border BorderThickness="1" DockPanel.Dock="Top" Padding="5">
+                <Border Name="PART_Var" BorderThickness="1" DockPanel.Dock="Top" Padding="5">
                     <DockPanel LastChildFill="True">
                         <Image MinWidth="15" Source="{StaticResource BoxIcons.RegularWorld}" Width="15" Height="15" Margin="0,0,5,0"/>
                         <TextBlock TextWrapping="Wrap" IsVisible="{Binding Comment, Converter={StaticResource EmptyStringToBoolConverter}}" DockPanel.Dock="Right" Opacity="0.8" FontStyle="Italic" MaxWidth="300" MinWidth="60" Text="{Binding Comment, Mode=OneWay}" />
@@ -208,16 +204,23 @@
             </ControlTemplate>
         </Setter>
     </Style>
-    <Style Selector="controls|GlobalVariableView Border">
+    <Style Selector="controls|GlobalVariableView.first Border#PART_Var">
+        <Setter Property="CornerRadius" Value="6,6,0,0" />
+    </Style>
+    <Style Selector="controls|GlobalVariableView.last Border#PART_Var">
+        <Setter Property="CornerRadius" Value="0, 0, 6,6" />
+    </Style>
+    <Style Selector="controls|GlobalVariableView.first.last Border#PART_Var">
+        <Setter Property="CornerRadius" Value="6,6,6,6" />
+    </Style>
+    <Style Selector="controls|GlobalVariableView Border#PART_Var">
         <Setter Property="BorderBrush" Value="{DynamicResource SmartScripts.Comment.Border}" />
         <Setter Property="Background" Value="{DynamicResource SmartScripts.Comment.Background}" />
     </Style>
-    <Style Selector="controls|GlobalVariableView:selected /template/ Border">
+    <Style Selector="controls|GlobalVariableView:selected /template/ Border#PART_Var">
         <Setter Property="Background" Value="{DynamicResource SmartScripts.Comment.Selected.Background}" />
         <Setter Property="BorderBrush" Value="{DynamicResource SmartScripts.Comment.Selected.Border}" />
-    </Style>
-    <Style Selector="controls|GlobalVariableView:selected /template/ TextBlock">
-        <Setter Property="Foreground" Value="{DynamicResource SmartScripts.Comment.Selected.Foreground}" />
+        <Setter Property="TextBlock.Foreground" Value="{DynamicResource SmartScripts.Comment.Selected.Foreground}" />
     </Style>
     
     

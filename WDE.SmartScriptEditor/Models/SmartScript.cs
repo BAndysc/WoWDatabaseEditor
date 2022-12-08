@@ -15,7 +15,7 @@ namespace WDE.SmartScriptEditor.Models
             ISmartDataManager smartDataManager,
             IMessageBoxService messageBoxService,
             IEditorFeatures editorFeatures,
-            ISmartScriptImporter importer) : base (smartFactory, smartDataManager, messageBoxService, importer)
+            ISmartScriptImporter importer) : base (smartFactory, editorFeatures, smartDataManager, messageBoxService, importer)
         {
             EditorFeatures = editorFeatures;
             EntryOrGuid = (int) item.Entry;

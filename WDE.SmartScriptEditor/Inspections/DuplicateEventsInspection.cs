@@ -20,7 +20,10 @@ namespace WDE.SmartScriptEditor.Inspections
             {
                 var current = script.Events[index];
 
-                if (current.Chance.Value == 100 && current.Conditions.Count == 0 && previous.Conditions.Count == 0 && previous.Equals(current))
+                if (current.Chance.Value == 100 && 
+                    current.Conditions.Count == 0 && 
+                    previous.Conditions.Count == 0 && 
+                    previous.Equals(current))
                 {
                     yield return new InspectionResult()
                     {

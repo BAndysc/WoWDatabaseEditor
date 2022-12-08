@@ -42,6 +42,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
 
         private ulong lastPressedTimestamp = 0;
         private int lastClickCount = 0;
+        private bool wasAlreadySelectedOnLastPressed;
         private bool lastPressedWithControlOn = false;
         private bool lastPressedWithShiftOn = false;
         private Point pressPosition;
@@ -51,14 +52,17 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
 
             lastPressedTimestamp = e.Timestamp;
             lastClickCount = e.ClickCount;
+            wasAlreadySelectedOnLastPressed = isSelected;
             lastPressedWithControlOn = IsMultiSelect(e.KeyModifiers);
             lastPressedWithShiftOn = e.KeyModifiers.HasFlagFast(KeyModifiers.Shift);
             pressPosition = e.GetPosition(this);
 
             if (e.ClickCount == 1)
             {
-                if (e.Source is FormattedTextBlock tb && tb.OverContext != null)
-                    return;
+                // in the past pressing on a link text wasn't selecting the item
+                // but this yield problems with dragging, when the drag is initialized by clicking on a link
+                //if (e.Source is FormattedTextBlock tb && tb.OverContext != null)
+                //    return;
 
                 if (IsSelected)
                 {
@@ -84,6 +88,10 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
         protected override void OnPointerReleased(PointerReleasedEventArgs e)
         {
             base.OnPointerReleased(e);
+            var releasePosition = e.GetPosition(this);
+            var vector = pressPosition - releasePosition;
+            var dist = Math.Sqrt(vector.X * vector.X + vector.Y * vector.Y);
+            var hasDragged = dist >= 5;
             if (lastClickCount == 1 && (e.Timestamp - lastPressedTimestamp) <= 1000)
             {
                 if (e.Source is FormattedTextBlock tb && tb.OverContext != null)
@@ -95,14 +103,18 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
                 {
                     if (lastPressedWithControlOn)
                     {
-                        var vector = pressPosition - e.GetPosition(this);
-                        var dist = Math.Sqrt(vector.X * vector.X + vector.Y * vector.Y);
-                        if (dist < 5)
+                        if (!hasDragged)
                         {
                             DeselectOthers();
                             IsSelected = !IsSelected;
                             e.Handled = true;   
                         }
+                    }
+                    else if (wasAlreadySelectedOnLastPressed && !hasDragged)
+                    {
+                        DeselectAllRequest?.Execute(null);
+                        IsSelected = true;
+                        e.Handled = true;
                     }
                 }
             }

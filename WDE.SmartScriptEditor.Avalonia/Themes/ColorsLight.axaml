@@ -35,5 +35,12 @@
 
         <SolidColorBrush x:Key="SmartScripts.Condition.Background" Color="#BFCCE0" />
         <SolidColorBrush x:Key="SmartScripts.Condition.Foreground" Color="#77000000" />
+        
+        <SolidColorBrush x:Key="SmartScripts.Group.Background" Color="#DDE7F4" />
+        <SolidColorBrush x:Key="SmartScripts.Group.Foreground" Color="#282828" />
+        <SolidColorBrush x:Key="SmartScripts.Group.Border" Color="#BACCE4" />
+        <SolidColorBrush x:Key="SmartScripts.Group.Selected.Background" Color="#F9DB7B" />
+        <SolidColorBrush x:Key="SmartScripts.Group.Selected.Foreground" Color="#282828" />
+        <SolidColorBrush x:Key="SmartScripts.Group.Selected.Border" Color="#EEC84A" />
     </Styles.Resources>
 </Styles>

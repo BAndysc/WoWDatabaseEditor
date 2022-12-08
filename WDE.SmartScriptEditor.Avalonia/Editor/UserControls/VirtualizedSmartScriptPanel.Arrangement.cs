@@ -1,0 +1,191 @@
+using System;
+using System.Collections.Generic;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Media;
+using WDE.SmartScriptEditor.Avalonia.Extensions;
+using WDE.SmartScriptEditor.Editor.ViewModels;
+using WDE.SmartScriptEditor.Models;
+
+namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls;
+
+public partial class VirtualizedSmartScriptPanel
+{
+    private RecyclableViewList eventViews;
+    private RecyclableViewList actionViews;
+    private RecyclableViewList commentsViews;
+    private RecyclableViewList conditionViews;
+    private RecyclableViewList variableViews;
+    private RecyclableViewList groupViews;
+    private RecyclableViewList newActionViews;
+    private RecyclableViewList newConditionViews;
+    
+    private void ArrangeCondition(in SizingContext context, SmartCondition condition, bool inGroup, double y, out double conditionHeight)
+    {
+        conditionHeight = condition.CachedHeight ?? 0;
+        var conditionRect = (inGroup ? context.grupedConditionRect : context.conditionRect).WithVertical(y, conditionHeight);
+        condition.Position = conditionRect.ToPositionSize();
+        
+        if (context.visibleRect.Intersects(conditionRect))
+        {
+            var view = conditionViews.GetNext(condition);
+            view.Measure(new Size(conditionRect.Width, float.PositiveInfinity));
+            view.Arrange(conditionRect);
+        }
+    }
+    
+    private void ArrangeAction(in SizingContext context, SmartAction action, double y, out double actionHeight)
+    {
+        actionHeight = action.CachedHeight ?? 0;
+        var actionRect = context.actionRect.WithVertical(y, actionHeight);
+        action.Position = actionRect.ToPositionSize();
+        
+        if (context.visibleRect.Intersects(actionRect))
+        {
+            IControl view;
+            if (action.Id == SmartConstants.ActionComment)
+            {
+                view = commentsViews.GetNext(action);
+            }
+            else
+            {
+                view = actionViews.GetNext(action);
+            }
+            view.Measure(new Size(actionRect.Width, float.PositiveInfinity));
+            view.Arrange(actionRect);
+        }
+    }
+    
+    private void ArrangeEvent(in SizingContext context, SmartEvent e, bool inGroup, double startY, out double totalHeight)
+    {
+        double y = startY;
+        double actionsHeight = compactView ? 0 : AddActionHeight;
+        double conditionsHeight = compactView ? 0 : AddConditionHeight;
+        
+        foreach (var action in e.Actions)
+        {
+            if (action.Id == SmartConstants.ActionComment && HideComments)
+                continue;
+            ArrangeAction(in context, action, y, out var actionHeight);
+            y += actionHeight + ActionSpacing;
+            actionsHeight += actionHeight + ActionSpacing;
+        }
+
+        if (!compactView && !AnyDragging && mouseY >= e.Position.Y && mouseY <= e.Position.Bottom)
+        {
+            var newActionView = newActionViews.GetNext(new NewActionViewModel(){Event = e});
+            newActionView.Arrange(context.actionRect.WithVertical(y, AddActionHeight));
+        }
+
+        y = startY + (e.CachedHeight ?? 0);
+        foreach (var condition in e.Conditions)
+        {
+            ArrangeCondition(in context, condition, inGroup, y, out var conditionHeight);
+            y += conditionHeight + ConditionSpacing;
+            conditionsHeight += conditionHeight + ConditionSpacing;
+        }
+        if (!compactView && !AnyDragging && mouseY >= e.Position.Y && mouseY <= e.Position.Bottom)
+        {
+            var newConditionView = newConditionViews.GetNext(new NewConditionViewModel(){Event = e});
+            newConditionView.Arrange(context.conditionRect.WithVertical(y, AddConditionHeight));
+        }
+
+        totalHeight = Math.Max((e.CachedHeight ?? 0) + conditionsHeight, actionsHeight);
+        var eventRect = (inGroup ? context.groupedEventRect : context.eventRect).WithVertical(startY, totalHeight);
+        e.Position = eventRect.ToPositionSize();
+        e.EventPosition = eventRect.WithHeight(e.CachedHeight ?? 0).Deflate(2).ToPositionSize();
+        
+        if (context.visibleRect.Intersects(eventRect))
+        {
+            var eventView = eventViews.GetNext(e);
+            eventView.Measure(new Size(eventRect.Width, float.PositiveInfinity));
+            eventView.Arrange(eventRect);
+        }
+    }
+
+    private void ArrangeVariable(in SizingContext context, GlobalVariable variable, bool first, bool last, double y, out double height)
+    {
+        height = variable.CachedHeight ?? 0;
+        var rect = context.variableRect.WithVertical(y, height);
+        variable.Position = rect.ToPositionSize();
+        if (context.visibleRect.Intersects(rect))
+        {
+            var groupView = variableViews.GetNext(variable);
+            groupView.Classes.Set("first", first);
+            groupView.Classes.Set("last", last);
+            groupView.Measure(new Size(context.variableRect.Width, float.PositiveInfinity));
+            groupView.Arrange(rect);
+        }
+    }
+
+    private void ArrangeGroup(in SizingContext context, SmartGroup group, double y, out double height)
+    {
+        height = group.CachedHeight ?? 0;
+        var rect = context.groupRect.WithVertical(y, height);
+        group.Position = rect.ToPositionSize();
+        if (context.visibleRect.Intersects(rect))
+        {
+            var groupView = groupViews.GetNext(group);
+            groupView.Measure(new Size(context.groupRect.Width, float.PositiveInfinity));
+            groupView.Arrange(rect);
+        }
+    }
+    
+    protected override Size ArrangeOverride(Size finalSize)
+    {
+        if (script == null)
+            return Size.Empty;
+        
+        var context = new SizingContext(finalSize.Width, Padding, EventPaddingLeft, VisibleRect);
+        
+        double y = PaddingTop;
+        variableViews.Reset(VariableItemTemplate);
+        eventViews.Reset(EventItemTemplate);
+        actionViews.Reset(ActionItemTemplate);
+        commentsViews.Reset(ActionItemTemplate);
+        conditionViews.Reset(ConditionItemTemplate);
+        groupViews.Reset(GroupItemTemplate);
+        newActionViews.Reset(NewActionItemTemplate);
+        newConditionViews.Reset(NewConditionItemTemplate);
+
+        for (var i = 0; i < script.GlobalVariables.Count; i++)
+        {
+            var variable = script.GlobalVariables[i];
+            ArrangeVariable(in context, variable, i == 0, i == script.GlobalVariables.Count - 1, y, out var variableHeight);
+            y += variableHeight + VariableSpacing;
+        }
+
+        if (script.GlobalVariables.Count > 0)
+            y += EventSpacing;
+        
+        foreach (var tuple in ScriptIterator)
+        {
+            switch (tuple)
+            {
+                case (var group, null, _, _, _):
+                    ArrangeGroup(in context, group!, y, out var groupHeight);
+                    y += groupHeight + EventSpacing;
+                    break;
+                case (null, var e, var inGroup, var groupExpanded, var eventIndex):
+                    if (!groupExpanded)
+                        continue;
+                    
+                    ArrangeEvent(in context, e, inGroup, y, out var eventHeight);
+                    y += eventHeight + EventSpacing;
+                    break;
+            }
+        }
+        
+        conditionViews.Finish();
+        actionViews.Finish();
+        commentsViews.Finish();
+        eventViews.Finish();
+        groupViews.Finish();
+        newActionViews.Finish();
+        newConditionViews.Finish();
+        variableViews.Finish();
+
+        UpdateOverElement();
+        return finalSize;
+    }
+}

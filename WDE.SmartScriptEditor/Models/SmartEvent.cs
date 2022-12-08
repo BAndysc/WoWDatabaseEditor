@@ -11,6 +11,7 @@ using SmartFormat.Core.Parsing;
 using WDE.Common.Parameters;
 using WDE.Parameters.Models;
 using WDE.SmartScriptEditor.Editor;
+using WDE.SmartScriptEditor.Models.Helpers;
 
 namespace WDE.SmartScriptEditor.Models
 {
@@ -26,6 +27,23 @@ namespace WDE.SmartScriptEditor.Models
         private ParameterValueHolder<long> timerId;
 
         public SmartScriptBase? Parent { get; set; }
+        public PositionSize EventPosition { get; set; }
+        //public GroupId Group { get; set; }
+
+        public bool IsBeginGroup => Id == SmartConstants.EventGroupBegin;
+        public bool IsEndGroup => Id == SmartConstants.EventGroupEnd;
+        public bool IsGroup => IsBeginGroup || IsEndGroup;
+        public bool IsEvent => !IsGroup;
+
+        public static SmartEvent NewBeginGroup() => new(SmartConstants.EventGroupBegin, SmartGroupFakeEditorFeatures.Instance)
+        {
+            ReadableHint = SmartConstants.BeginGroupText + "{spram1value}{spram2value:" + SmartConstants.BeginGroupSeparator + "{spram2value}|}"
+        };
+        
+        public static SmartEvent NewEndGroup() => new(SmartConstants.EventGroupEnd, SmartGroupFakeEditorFeatures.Instance)
+        {
+            ReadableHint = SmartConstants.EndGroupText
+        };
 
         public SmartEvent(int id, IEditorFeatures features) : base(id, 
             features.EventParametersCount,
@@ -71,9 +89,29 @@ namespace WDE.SmartScriptEditor.Models
             cooldownMax.PropertyChanged += (sender, _) => CallOnChanged(sender);
         }
 
+        private SmartEvent? group;
+        public SmartGroup? Group
+        {
+            get => group == null ? null : new SmartGroup(group);
+            set
+            {
+                if (group != null)
+                    group.PropertyChanged -= GroupPropertyChanged;
+                group = value?.InnerEvent;
+                if (group != null)
+                    group.PropertyChanged += GroupPropertyChanged;
+            }
+        }
+
+        private void GroupPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(IsSelected))
+                OnPropertyChanged(nameof(IsSelected));
+        }
+
         public bool IsSelected
         {
-            get => isSelected;
+            get => isSelected || IsEvent && (group?.IsSelected ?? false);
             set
             {
                 if (value == isSelected)
@@ -119,21 +157,24 @@ namespace WDE.SmartScriptEditor.Models
                     string output = Smart.Format(readable,
                         new
                         {
-                            pram1 = "[p=0]" + GetParameter(0) + "[/p]",
-                            pram2 = "[p=1]" + GetParameter(1) + "[/p]",
-                            pram3 = "[p=2]" + GetParameter(2) + "[/p]",
-                            pram4 = "[p=3]" + GetParameter(3) + "[/p]",
-                            pram5 = ParametersCount >= 5 ? "[p=4]" + GetParameter(4) + "[/p]" : "",
-                            fpram1 = FloatParametersCount >= 1 ? "[p]" + GetFloatParameter(0) + "[/p]" : "",
-                            fpram2 = FloatParametersCount >= 2 ? "[p]" + GetFloatParameter(1) + "[/p]" : "",
-                            fpram1value = FloatParametersCount >= 1 ? GetFloatParameter(0).Value : 0.0f,
-                            fpram2value =  FloatParametersCount >= 2 ? GetFloatParameter(1).Value : 0.0f,
-                            spram1 = StringParametersCount >= 1 ? "[p]" + GetStringParameter(0) + "[/p]" : "",
-                            pram1value = GetParameter(0).Value,
-                            pram2value = GetParameter(1).Value,
-                            pram3value = GetParameter(2).Value,
-                            pram4value = GetParameter(3).Value,
-                            pram5value = ParametersCount >= 5 ? GetParameter(4).Value : 0,
+                            pram1 = "[p=0]" + this.GetTextOrDefault(0) + "[/p]",
+                            pram2 = "[p=1]" + this.GetTextOrDefault(1) + "[/p]",
+                            pram3 = "[p=2]" + this.GetTextOrDefault(2) + "[/p]",
+                            pram4 = "[p=3]" + this.GetTextOrDefault(3) + "[/p]",
+                            pram5 = "[p=4]" + this.GetTextOrDefault(4) + "[/p]",
+                            fpram1 = "[p]" + this.GetFloatTextOrDefault(0) + "[/p]",
+                            fpram2 = "[p]" + this.GetFloatTextOrDefault(1) + "[/p]",
+                            fpram1value = this.GetFloatValueOrDefault(0),
+                            fpram2value = this.GetFloatValueOrDefault(1),
+                            spram1 = "[p]" + this.GetStringValueOrDefault(0) + "[/p]",
+                            spram2 = "[p]" + this.GetStringValueOrDefault(1) + "[/p]",
+                            spram1value = this.GetStringValueOrDefault(0),
+                            spram2value = this.GetStringValueOrDefault(1),
+                            pram1value = this.GetValueOrDefault(0),
+                            pram2value = this.GetValueOrDefault(1),
+                            pram3value = this.GetValueOrDefault(2),
+                            pram4value = this.GetValueOrDefault(3),
+                            pram5value = this.GetValueOrDefault(4),
                         });
                     return output;
                 }
@@ -151,6 +192,7 @@ namespace WDE.SmartScriptEditor.Models
         }
 
         public IEditorFeatures EditorFeatures => features;
+        //public bool HasGroup => Group != GroupId.Null;
 
         public void AddAction(SmartAction smartAction)
         {
@@ -260,7 +302,8 @@ namespace WDE.SmartScriptEditor.Models
         ActionsValues = 2,
         Actions = 4,
         Script = 8,
-        Event = EventValues | Actions
+        Conditions = 16,
+        Event = EventValues | Actions | Conditions
     }
     
     public enum SmartEventPhases

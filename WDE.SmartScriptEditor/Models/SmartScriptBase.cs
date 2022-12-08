@@ -6,9 +6,11 @@ using System.Linq;
 using WDE.Common.Database;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Utils;
+using WDE.MVVM;
 using WDE.MVVM.Observable;
 using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Editor;
+using WDE.SmartScriptEditor.Exporter;
 using WDE.SmartScriptEditor.Models.Helpers;
 
 namespace WDE.SmartScriptEditor.Models
@@ -16,6 +18,7 @@ namespace WDE.SmartScriptEditor.Models
     public abstract class SmartScriptBase
     {
         protected readonly ISmartFactory smartFactory;
+        private readonly IEditorFeatures editorFeatures;
         protected readonly ISmartDataManager smartDataManager;
         protected readonly IMessageBoxService messageBoxService;
         private readonly ISmartScriptImporter importer;
@@ -27,13 +30,14 @@ namespace WDE.SmartScriptEditor.Models
         public abstract SmartScriptType SourceType { get; }
         public event Action? ScriptSelectedChanged;
         public event Action<SmartEvent?, SmartAction?, EventChangedMask>? EventChanged;
+        public event Action? InvalidateVisual;
         
         public ObservableCollection<object> AllSmartObjectsFlat { get; } 
         
         public ObservableCollection<SmartAction> AllActions { get; }
 
         public ObservableCollection<GlobalVariable> GlobalVariables { get; } = new();
-        
+
         ~SmartScriptBase()
         {
             selectionHelper.Dispose();
@@ -50,13 +54,15 @@ namespace WDE.SmartScriptEditor.Models
         
         public SmartGenericJsonData? TryGetTargetData(SmartTarget t) =>
             smartDataManager.Contains(SmartType.SmartTarget, t.Id) ? smartDataManager.GetRawData(SmartType.SmartTarget, t.Id) : null;
-            
+        
         public SmartScriptBase(ISmartFactory smartFactory,
+            IEditorFeatures editorFeatures,
             ISmartDataManager smartDataManager,
             IMessageBoxService messageBoxService,
             ISmartScriptImporter importer)
         {
             this.smartFactory = smartFactory;
+            this.editorFeatures = editorFeatures;
             this.smartDataManager = smartDataManager;
             this.messageBoxService = messageBoxService;
             this.importer = importer;
@@ -75,7 +81,29 @@ namespace WDE.SmartScriptEditor.Models
                 .Subscribe((e) =>
                 {
                     if (e.Type == CollectionEventType.Add)
+                    {
                         e.Item.Parent = this;
+                        if (e.Item.IsEvent)
+                        {
+                            if (TryGetEventGroup(e.Index, out var group, out _))
+                                e.Item.Group = group;
+                            else
+                                e.Item.Group = null;
+                        }
+                        else if (e.Item.IsGroup)
+                        {
+                            RegroupAllEvents();
+                        }
+                    }
+                    else if (e.Type == CollectionEventType.Remove)
+                    {
+                        e.Item.Parent = null;
+                        e.Item.Group = null; 
+                        if (e.Item.IsGroup)
+                        {
+                            RegroupAllEvents();
+                        }
+                    }
                 });
 
             GlobalVariables.ToStream(true).Subscribe(e =>
@@ -85,13 +113,29 @@ namespace WDE.SmartScriptEditor.Models
                     e.Item.PropertyChanged += GlobalVariableChanged;
                 else
                     e.Item.PropertyChanged -= GlobalVariableChanged;
+                InvalidateVisual?.Invoke();
             });
+        }
+
+        private void RegroupAllEvents()
+        {
+            SmartGroup? lastGroup = null;
+            foreach (var e in Events)
+            {
+                if (e.IsEvent)
+                    e.Group = lastGroup;
+                else if (e.IsBeginGroup)
+                    lastGroup = new SmartGroup(e);
+                else if (e.IsEndGroup)
+                    lastGroup = null;
+            }
         }
 
         private void GlobalVariableChanged(object? sender, PropertyChangedEventArgs? _)
         {
             foreach (var e in Events)
                 e.InvalidateReadable();
+            InvalidateVisual?.Invoke();
         }
 
         private void RenumerateEvents()
@@ -127,6 +171,7 @@ namespace WDE.SmartScriptEditor.Models
         private void CallScriptSelectedChanged()
         {
             ScriptSelectedChanged?.Invoke();
+            InvalidateVisual?.Invoke();
         }
         
         public void Clear()
@@ -134,7 +179,102 @@ namespace WDE.SmartScriptEditor.Models
             GlobalVariables.RemoveAll();
             Events.RemoveAll();
         }
+
+        public bool TryGetEventGroup(SmartEvent e, out SmartGroup group, out SmartEvent endGroup)
+        {
+            group = null!;
+            endGroup = null!;
+            var indexOfEvent = Events.IndexOf(e);
+            if (indexOfEvent == -1)
+                return false;
+
+            return TryGetEventGroup(indexOfEvent, out group, out endGroup);
+        }
         
+        public bool TryGetEventGroup(int indexOfEvent, out SmartGroup group, out SmartEvent endGroup)
+        {
+            group = null!;
+            endGroup = null!;
+            if (indexOfEvent >= Events.Count)
+                return false;
+            
+            while (indexOfEvent >= 0)
+            {
+                if (Events[indexOfEvent].IsEndGroup)
+                    return false;
+                if (Events[indexOfEvent].IsBeginGroup)
+                {
+                    group = new SmartGroup(Events[indexOfEvent]);
+                    while (++indexOfEvent < Events.Count)
+                    {
+                        if (Events[indexOfEvent].IsEndGroup)
+                        {
+                            endGroup = Events[indexOfEvent];
+                            return true;
+                        }
+                        else if (Events[indexOfEvent].IsBeginGroup)
+                        {
+                            Console.WriteLine("[ERROR IN DATA] Nested groups are not allowed!");
+                            return false;
+                        }
+                    }
+                    Console.WriteLine("[ERROR IN DATA] Begin group without an end!");
+                    return false;
+                }
+                indexOfEvent--;
+            }
+
+            return false;
+        }
+
+        public bool TryGetEvent(int index, out SmartEvent e)
+        {
+            if (index >= 0 && index < Events.Count)
+            {
+                e = Events[index];
+                return true;
+            }
+
+            e = null!;
+            return false;
+        }
+
+        public SmartEvent? FindMatchingBackwards(int startSearch, Func<SmartEvent, bool> predicate)
+        {
+            for (int i = startSearch; i >= 0; --i)
+                if (predicate(Events[i]))
+                    return Events[i];
+            return null;
+        }
+
+        public SmartGroup InsertGroupBegin(int index, string header, string? description)
+        {   
+            var previousGroup = FindMatchingBackwards(index - 1, e => e.IsGroup);
+            if (previousGroup != null && previousGroup.IsBeginGroup)
+            {
+                // close unclosed group
+                InsertGroupEnd(index++);
+            }
+            
+            var groupBegin = SmartEvent.NewBeginGroup();
+            var groupBeginView = new SmartGroup(groupBegin);
+            groupBeginView.Header = header;
+            groupBeginView.Description = description;
+            Events.Insert(index, groupBegin);
+            return groupBeginView;
+        }
+
+        public bool InsertGroupEnd(int index)
+        {
+            var previousGroup = FindMatchingBackwards(index - 1, e => e.IsGroup);
+            if (previousGroup == null || previousGroup.IsEndGroup)
+                return false;
+            
+            var groupEnd = SmartEvent.NewEndGroup();
+            Events.Insert(index, groupEnd);
+            return true;
+        }
+
         public List<SmartEvent> InsertFromClipboard(int index, IEnumerable<ISmartScriptLine> lines, IEnumerable<IConditionLine>? conditions, IEnumerable<IConditionLine>? targetConditionLines)
         {
             List<SmartEvent> newEvents = new();
@@ -148,6 +288,25 @@ namespace WDE.SmartScriptEditor.Models
 
             foreach (ISmartScriptLine line in lines)
             {
+                if (line.EventType == SmartConstants.EventGroupBegin &&
+                    line.Comment.TryParseBeginGroupComment(out var header, out var description))
+                {
+                    if (TryGetEventGroup(index, out var group, out var endGroup))
+                    {
+                        InsertGroupEnd(index++);
+                        Events.Remove(endGroup);
+                    }
+                    InsertGroupBegin(index++, header, description);
+                    continue;
+                }
+                
+                if (line.EventType == SmartConstants.EventGroupEnd &&
+                    line.Comment.TryParseEndGroupComment())
+                {
+                    InsertGroupEnd(index++);
+                    continue;
+                }
+                
                 if (currentEvent == null || prevIndex != line.Id)
                 {
                     prevIndex = line.Id;

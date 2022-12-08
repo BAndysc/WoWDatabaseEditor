@@ -192,6 +192,9 @@ public class OutlinerService : IOutlinerService
     {
         for (int i = 0; i < element.ParametersCount; ++i)
         {
+            if (element.Id < 0)
+                continue;
+            
             var type = types[element.Id, i];
             if (type == null)
                 continue;

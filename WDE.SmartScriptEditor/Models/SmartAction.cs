@@ -11,6 +11,7 @@ using WDE.Common.Parameters;
 using WDE.Parameters.Models;
 using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Editor;
+using WDE.SmartScriptEditor.Models.Helpers;
 
 namespace WDE.SmartScriptEditor.Models
 {
@@ -165,27 +166,27 @@ namespace WDE.SmartScriptEditor.Models
                             target_position = "[s=6]" + Target.GetPosition() + "[/s]",
                             targetid = Target.Id,
                             sourceid = Source.Id,
-                            pram2_m1 = "[p=1]" + (GetParameter(1).Value - 1) + "[/p]",
+                            pram2_m1 = "[p=1]" + (this.GetValueOrDefault(1) - 1) + "[/p]",
                             //condition1 = conditionReadable,
                             //hascondition = (conditions?.Count ?? 0) > 0,
-                            pram1 = "[p=0]" + GetParameter(0) + "[/p]",
-                            pram2 = "[p=1]" + GetParameter(1) + "[/p]",
-                            pram3 = "[p=2]" + GetParameter(2) + "[/p]",
-                            pram4 = "[p=3]" + GetParameter(3) + "[/p]",
-                            pram5 = "[p=4]" + GetParameter(4) + "[/p]",
-                            pram6 = "[p=5]" + GetParameter(5) + "[/p]",
-                            pram7 = ParametersCount >= 7 ? "[p=6]" + GetParameter(6) + "[/p]" : "(invalid parameter)",
-                            fpram1 = FloatParametersCount >= 1 ? "[p]" + GetFloatParameter(0) + "[/p]" : "(invalid parameter)",
-                            fpram2 =  FloatParametersCount >= 2 ? "[p]" + GetFloatParameter(1) + "[/p]" : "(invalid parameter)",
-                            fpram1value = FloatParametersCount >= 1 ? GetFloatParameter(0).Value : 0.0f,
-                            fpram2value =  FloatParametersCount >= 2 ? GetFloatParameter(1).Value : 0.0f,
-                            pram1value = GetParameter(0).Value,
-                            pram2value = GetParameter(1).Value,
-                            pram3value = GetParameter(2).Value,
-                            pram4value = GetParameter(3).Value,
-                            pram5value = GetParameter(4).Value,
-                            pram6value = GetParameter(5).Value,
-                            pram7value = ParametersCount >= 7 ? GetParameter(6).Value : 0,
+                            pram1 = "[p=0]" + this.GetTextOrDefault(0) + "[/p]",
+                            pram2 = "[p=1]" + this.GetTextOrDefault(1) + "[/p]",
+                            pram3 = "[p=2]" + this.GetTextOrDefault(2) + "[/p]",
+                            pram4 = "[p=3]" + this.GetTextOrDefault(3) + "[/p]",
+                            pram5 = "[p=4]" + this.GetTextOrDefault(4) + "[/p]",
+                            pram6 = "[p=5]" + this.GetTextOrDefault(5) + "[/p]",
+                            pram7 = "[p=6]" + this.GetTextOrDefault(6) + "[/p]",
+                            fpram1 = "[p]" + this.GetFloatTextOrDefault(0) + "[/p]",
+                            fpram2 =  "[p]" + this.GetFloatTextOrDefault(1) + "[/p]",
+                            fpram1value = this.GetFloatValueOrDefault(0),
+                            fpram2value =  this.GetFloatValueOrDefault(1),
+                            pram1value = this.GetValueOrDefault(0),
+                            pram2value = this.GetValueOrDefault(1),
+                            pram3value = this.GetValueOrDefault(2),
+                            pram4value = this.GetValueOrDefault(3),
+                            pram5value = this.GetValueOrDefault(4),
+                            pram6value = this.GetValueOrDefault(5),
+                            pram7value = this.GetValueOrDefault(6),
                             target_x = target.X.ToString(CultureInfo.InvariantCulture),
                             target_y = target.Y.ToString(CultureInfo.InvariantCulture),
                             target_z = target.Z.ToString(CultureInfo.InvariantCulture),
@@ -210,8 +211,6 @@ namespace WDE.SmartScriptEditor.Models
         private void ParentPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == nameof(SmartEvent.IsSelected))
-                //if (!_parent.IsSelected)
-                //    IsSelected = false;
                 OnPropertyChanged(nameof(IsSelected));
         }
 

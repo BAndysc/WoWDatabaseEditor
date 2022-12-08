@@ -9,6 +9,7 @@ using WDE.Common.Database;
 using WDE.Common.Parameters;
 using WDE.Parameters.Models;
 using WDE.SmartScriptEditor.Editor;
+using WDE.SmartScriptEditor.Models.Helpers;
 
 namespace WDE.SmartScriptEditor.Models
 {
@@ -47,25 +48,25 @@ namespace WDE.SmartScriptEditor.Models
         
         public float X
         {
-            get => GetFloatParameter(0).Value;
+            get => this.GetFloatValueOrDefault(0);
             set => GetFloatParameter(0).Value = value;
         }
 
         public float Y
         {
-            get => GetFloatParameter(1).Value;
+            get => this.GetFloatValueOrDefault(1);
             set => GetFloatParameter(1).Value = value;
         }
 
         public float Z
         {
-            get => GetFloatParameter(2).Value;
+            get => this.GetFloatValueOrDefault(2);
             set => GetFloatParameter(2).Value = value;
         }
 
         public float O
         {
-            get => GetFloatParameter(3).Value;
+            get => this.GetFloatValueOrDefault(3);
             set => GetFloatParameter(3).Value = value;
         }
 
@@ -97,12 +98,12 @@ namespace WDE.SmartScriptEditor.Models
                     string output = Smart.Format(ReadableHint,
                         new
                         {
-                            pram1 = GetParameter(0),
-                            pram2 = GetParameter(1),
-                            pram3 = GetParameter(2),
-                            pram1value = GetParameter(0).Value,
-                            pram2value = GetParameter(1).Value,
-                            pram3value = GetParameter(2).Value,
+                            pram1 = this.GetTextOrDefault(0) ?? "",
+                            pram2 = this.GetTextOrDefault(1) ?? "",
+                            pram3 = this.GetTextOrDefault(2) ?? "",
+                            pram1value = this.GetValueOrDefault(0),
+                            pram2value = this.GetValueOrDefault(1),
+                            pram3value = this.GetValueOrDefault(2),
                             x = X.ToString(CultureInfo.InvariantCulture),
                             y = Y.ToString(CultureInfo.InvariantCulture),
                             z = Z.ToString(CultureInfo.InvariantCulture),

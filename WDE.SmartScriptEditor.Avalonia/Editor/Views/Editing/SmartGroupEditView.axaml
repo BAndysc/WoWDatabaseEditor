@@ -1,0 +1,19 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:editing="clr-namespace:WDE.SmartScriptEditor.Editor.ViewModels.Editing;assembly=WDE.SmartScriptEditor"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="editing:SmartGroupEditViewModel"
+             Padding="8"
+             x:Class="WDE.SmartScriptEditor.Avalonia.Editor.Views.Editing.SmartGroupEditView">
+    <StackPanel Spacing="8">
+        <TextBlock FontSize="16" FontWeight="Bold">Group edit</TextBlock>
+        <TextBox Name="GroupName" UseFloatingWatermark="True" Watermark="Group name" Text="{CompiledBinding Header}" />
+        <Grid ColumnDefinitions="Auto,10,*">
+            <TextBlock VerticalAlignment="Center">Description:</TextBlock>
+            <TextBox AcceptsReturn="True" Grid.Column="2" Text="{CompiledBinding Description}" />
+        </Grid>
+        <OkCancelButtons CancelCommand="{CompiledBinding Cancel}" AcceptCommand="{CompiledBinding Accept}" HorizontalAlignment="Right" />
+    </StackPanel>
+</UserControl>

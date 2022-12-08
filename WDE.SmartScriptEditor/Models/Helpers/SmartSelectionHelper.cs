@@ -100,11 +100,21 @@ namespace WDE.SmartScriptEditor.Models.Helpers
         
         private void ConditionReceived(CollectionEvent<SmartCondition> collectionEvent)
         {
+            EventChanged?.Invoke(collectionEvent.Item.Parent, null, EventChangedMask.Conditions);
             if (collectionEvent.Type == CollectionEventType.Add)
             {
                 AllSmartObjectsFlat.Add(collectionEvent.Item);
                 conditionToDisposables.Add(collectionEvent.Item,
-                    collectionEvent.Item.ToObservable(e => e.IsSelected).Subscribe(SelectionChanged));
+                    new CompositeDisposable(
+                        collectionEvent.Item.ToObservable(e => e.IsSelected).Subscribe(SelectionChanged),
+                        Observable.FromEventPattern<EventHandler, EventArgs>(
+                            h => collectionEvent.Item.OnChanged += h,
+                            h => collectionEvent.Item.OnChanged -= h).Subscribe(handler =>
+                        {
+                            SmartCondition? e = (SmartCondition?) handler.Sender;
+                            EventChanged?.Invoke(e?.Parent, null, EventChangedMask.Conditions);
+                        })
+                    ));
             }
             else if (collectionEvent.Type == CollectionEventType.Remove)
             {

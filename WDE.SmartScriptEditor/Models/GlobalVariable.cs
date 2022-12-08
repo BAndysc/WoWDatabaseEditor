@@ -138,6 +138,12 @@ namespace WDE.SmartScriptEditor.Models
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+        
+    
+        // while it breaks a single responsibility principle, it makes the code work way faster by caching it here
+        // without using any additional Dictionaries, so for sake of performance, let's keep it this way
+        public double? CachedHeight { get; set; }
+        public PositionSize Position { get; set; }
     }
 
     public enum GlobalVariableType

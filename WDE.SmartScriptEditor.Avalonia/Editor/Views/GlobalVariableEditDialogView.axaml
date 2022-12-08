@@ -10,6 +10,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
+            <RowDefinition Height="10" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
@@ -46,7 +47,7 @@
             <TextBox Grid.Row="8" Grid.Column="1" Text="{CompiledBinding Comment, Mode=TwoWay}"></TextBox>
         </Grid>
     
-        <OkCancelButtons Grid.Row="1"
+        <OkCancelButtons Grid.Row="2"
                          AcceptCommand="{CompiledBinding Accept}"
                          CancelCommand="{CompiledBinding Cancel}" />
     </Grid>

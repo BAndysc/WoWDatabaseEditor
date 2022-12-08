@@ -9,7 +9,9 @@
              Name="Root"
              x:Class="WDE.SmartScriptEditor.Avalonia.Editor.Views.SmartScriptEditorToolBar">
     <ToolbarPanel>
-        <ButtonImage Image="Icons/icon_remove_comment.png" Command="{CompiledBinding RemoveAllComments}" ToolTip.Tip="Remove all comments" />
+        <ToggleButton IsChecked="{CompiledBinding HideComments}" ToolTip.Tip="Hide comments (doesn't remove)" >
+            <WdeImage ImageUri="Icons/icon_remove_comment.png"></WdeImage>
+        </ToggleButton>
         <ItemsPresenter Items="{CompiledBinding ExtensionCommands}">
             <ItemsPresenter.ItemTemplate>
                 <DataTemplate x:DataType="editor:SmartExtensionCommand">
@@ -24,5 +26,7 @@
                 </ItemsPanelTemplate>
             </ItemsPresenter.ItemsPanel>
         </ItemsPresenter>
+        <ToolbarSpacer />
+        <TextBox Name="SearchTextBox" MinHeight="24" Watermark="Search in script" Text="{CompiledBinding SearchText}" />
     </ToolbarPanel>
 </UserControl>

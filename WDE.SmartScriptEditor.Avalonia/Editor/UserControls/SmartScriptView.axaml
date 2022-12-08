@@ -59,118 +59,136 @@
         RenderTransformOrigin="0, 0"
         RenderTransform="{CompiledBinding Scale, Converter={StaticResource FloatToScaleTransformConverter}}"
         >
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" MinHeight="30" />
-            </Grid.RowDefinitions>
-            <ItemsControl Focusable="False" Items="{CompiledBinding Together}" IsHitTestVisible="True" DockPanel.Dock="Top"
-                          Margin="7,0,7,0">
-                <ItemsControl.ContextMenu>
-                    <ContextMenu>
-                        <MenuItem Command="{CompiledBinding NewActionAboveCommand}" IsVisible="{CompiledBinding AnySelected}" Header="New action above" />
-                        <MenuItem Command="{CompiledBinding NewActionBelowCommand}" IsVisible="{CompiledBinding AnySelected}" Header="New action below" />
-                        <Separator IsVisible="{CompiledBinding AnySelected}" />
-                        <MenuItem IsVisible="{CompiledBinding AnySelected}" Command="{CompiledBinding NewEventAboveCommand}" Header="New event above" />
-                        <MenuItem Command="{CompiledBinding NewEventBelowCommand}" Header="New event below" />
-                        <Separator />
-                        <MenuItem Command="{CompiledBinding EditConditionsCommand}" Header="Edit conditions" />
-                        <Separator />
-                        <MenuItem Command="{CompiledBinding Copy}" Header="Copy" />
-                        <MenuItem Command="{CompiledBinding Cut}" Header="Cut" />
-                        <MenuItem Command="{CompiledBinding Paste}" Header="Paste" />
-                        <Separator />
-                        <MenuItem Command="{CompiledBinding DeleteSelected}" Header="Delete" />
-                    </ContextMenu>
-                </ItemsControl.ContextMenu>
-                <ItemsControl.DataTemplates>
-                    <DataTemplate DataType="{x:Type models:SmartEvent}">
-                        <userControls:SmartEventView
-                            Selected="{CompiledBinding IsSelected, Mode=TwoWay}"
-                            userControls:SmartScriptPanelLayout.Selected="{CompiledBinding IsSelected, Mode=TwoWay}"
-                            DirectEditParameter="{Binding DataContext.DirectEditParameter, ElementName=Rooot}"
-                            DeselectActionsOfDeselectedEventsRequest="{Binding DataContext.DeselectAllButEvents, ElementName=Rooot}"
-                            DeselectAllRequest="{Binding DataContext.DeselectAll, ElementName=Rooot}"
-                            IsSelected="{CompiledBinding IsSelected, Mode=TwoWay}"
-                            EditEventCommand="{Binding DataContext.EditEvent, ElementName=Rooot}"
-                            IsHitTestVisible="True"/>
-                    </DataTemplate>
-                    <DataTemplate DataType="{x:Type models:SmartAction}">
-                        <userControls:SmartActionView
-                            Indent="{CompiledBinding Indent}"
-                            DirectEditParameter="{Binding DataContext.DirectEditParameter, ElementName=Rooot}"
-                            DirectOpenParameter="{Binding DataContext.DirectOpenParameter, ElementName=Rooot}"
-                            userControls:SelectableTemplatedControl.DeselectAllRequest="{Binding DataContext.DeselectAll, ElementName=Rooot}"
-                            DeselectAllButActionsRequest="{Binding DataContext.DeselectAllButActions, ElementName=Rooot}"
-                            EditActionCommand="{Binding DataContext.EditAction, ElementName=Rooot}"
-                            IsSelected="{CompiledBinding IsSelected, Mode=TwoWay}"
-                            userControls:SmartScriptPanelLayout.Selected="{CompiledBinding IsSelected, Mode=TwoWay}"
-                        />
-                    </DataTemplate>
-                    <DataTemplate DataType="{x:Type models:SmartCondition}">
-                        <userControls:SmartConditionView
-                            DirectEditParameter="{Binding DataContext.DirectEditParameter, ElementName=Rooot}"
-                            DeselectAllRequest="{Binding DataContext.DeselectAll, ElementName=Rooot}"
-                            DeselectAllButConditionsRequest="{Binding DataContext.DeselectAllButConditions, ElementName=Rooot}"
-                            EditConditionCommand="{Binding DataContext.EditCondition, ElementName=Rooot}"
-                            userControls:SmartScriptPanelLayout.Selected="{CompiledBinding IsSelected, Mode=TwoWay}"
-                            IsSelected="{CompiledBinding IsSelected, Mode=TwoWay}"
-                            />
-                    </DataTemplate>
-                    <DataTemplate DataType="{x:Type models:GlobalVariable}">
-                        <userControls:GlobalVariableView
-                            DeselectAllRequest="{Binding DataContext.DeselectAll, ElementName=Rooot}"
-                            EditGlobalVariableCommand="{Binding DataContext.EditGlobalVariable, ElementName=Rooot}"
-                            DeselectAllButGlobalVariablesRequest="{Binding DataContext.DeselectAllButGlobalVariables, ElementName=Rooot}"
-                            userControls:SmartScriptPanelLayout.Selected="{CompiledBinding IsSelected, Mode=TwoWay}"
-                            IsSelected="{CompiledBinding IsSelected, Mode=TwoWay}"
-                        />
-                    </DataTemplate>
-                    <DataTemplate DataType="{x:Type viewModels1:NewActionViewModel}">
-                        <Button Classes="FlatButton"
-                                Content="Add action"
-                                Opacity="0.5"
-                                Command="{Binding DataContext.AddAction, ElementName=Rooot}"
-                                CommandParameter="{CompiledBinding}">
-                        </Button>
-                    </DataTemplate>
-                
-                    <DataTemplate DataType="{x:Type viewModels1:NewConditionViewModel}">
-                        <Button Classes="FlatButton"
-                            Content="Add condition"
-                            Opacity="0.5"
-                            Command="{Binding DataContext.AddCondition, ElementName=Rooot}"
-                            CommandParameter="{CompiledBinding}">
-                        </Button>
-                    </DataTemplate>
-                </ItemsControl.DataTemplates>
-
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <userControls:SmartScriptPanelLayout Background="Transparent"
-                                                             Focusable="True"
-                                                      Script="{CompiledBinding Script}" 
-                                                      Problems="{CompiledBinding ProblematicLines}" 
+        <Panel>
+            <DockPanel>
+                <userControls:VirtualizedSmartScriptPanel Background="Transparent"
+                                                      Focusable="True"
+                                                      DropGroups="{CompiledBinding OnDropGroups}"
                                                       DropItems="{CompiledBinding OnDropItems}"
                                                       DropActions="{CompiledBinding OnDropActions}"
                                                       DropConditions="{CompiledBinding OnDropConditions}"
-                                                      />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-            </ItemsControl>
-            <Button
-                Grid.Row="1" 
-                Classes="FlatButton"
-                Opacity="0.5"
-                Content="Add event"
-                Command="{CompiledBinding AddEvent}">
-                <Button.ContextMenu>
-                    <ContextMenu>
-                        <MenuItem Header="Define global variable" 
-                                  Command="{CompiledBinding DefineGlobalVariable}" />
+                                                      Script="{CompiledBinding Script}" 
+                                                      Problems="{CompiledBinding ProblematicLines}" 
+                                                      HideComments="{CompiledBinding HideComments}"
+                                                      DockPanel.Dock="Top">
+                    <userControls:VirtualizedSmartScriptPanel.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Command="{CompiledBinding NewActionAboveCommand}" IsVisible="{CompiledBinding AnySelected}" Header="New action above" />
+                            <MenuItem Command="{CompiledBinding NewActionBelowCommand}" IsVisible="{CompiledBinding AnySelected}" Header="New action below" />
+                            <Separator IsVisible="{CompiledBinding AnySelected}" />
+                            <MenuItem IsVisible="{CompiledBinding AnySelected}" Command="{CompiledBinding NewEventAboveCommand}" Header="New event above" />
+                            <MenuItem Command="{CompiledBinding NewEventBelowCommand}" Header="New event below" />
+                            <Separator />
+                            <MenuItem IsVisible="{CompiledBinding AnySelected}" Command="{CompiledBinding NewGroupAboveCommand}" Header="New group above" />
+                            <MenuItem Command="{CompiledBinding NewGroupBelowCommand}" Header="New group below" />
+                            <Separator />
+                            <MenuItem Command="{CompiledBinding EditConditionsCommand}" Header="Edit conditions" />
+                            <MenuItem Command="{CompiledBinding DefineGlobalVariable}" Header="Define a global variable" />
+                            <Separator />
+                            <MenuItem Command="{CompiledBinding Copy}" Header="Copy" />
+                            <MenuItem Command="{CompiledBinding Cut}" Header="Cut" />
+                            <MenuItem Command="{CompiledBinding Paste}" Header="Paste" />
+                            <Separator />
+                            <MenuItem Command="{CompiledBinding DeleteSelected}" Header="Delete" />
                         </ContextMenu>
-                </Button.ContextMenu>
-            </Button>
-        </Grid>
+                    </userControls:VirtualizedSmartScriptPanel.ContextMenu>
+                    <userControls:VirtualizedSmartScriptPanel.EventItemTemplate>
+                        <DataTemplate DataType="{x:Type models:SmartEvent}">
+                            <userControls:SmartEventView
+                                Selected="{CompiledBinding IsSelected, Mode=TwoWay}"
+                                userControls:SmartScriptPanelLayout.Selected="{CompiledBinding IsSelected, Mode=TwoWay}"
+                                DirectEditParameter="{Binding DataContext.DirectEditParameter, ElementName=Rooot}"
+                                DeselectActionsOfDeselectedEventsRequest="{Binding DataContext.DeselectAllButEvents, ElementName=Rooot}"
+                                DeselectAllRequest="{Binding DataContext.DeselectAll, ElementName=Rooot}"
+                                IsSelected="{CompiledBinding IsSelected, Mode=TwoWay}"
+                                EditEventCommand="{Binding DataContext.EditEvent, ElementName=Rooot}"
+                                IsHitTestVisible="True"/>
+                        </DataTemplate>
+                    </userControls:VirtualizedSmartScriptPanel.EventItemTemplate>
+                    <userControls:VirtualizedSmartScriptPanel.ActionItemTemplate>
+                        <DataTemplate DataType="{x:Type models:SmartAction}">
+                            <userControls:SmartActionView
+                                Indent="{CompiledBinding Indent}"
+                                DirectEditParameter="{Binding DataContext.DirectEditParameter, ElementName=Rooot}"
+                                DirectOpenParameter="{Binding DataContext.DirectOpenParameter, ElementName=Rooot}"
+                                userControls:SelectableTemplatedControl.DeselectAllRequest="{Binding DataContext.DeselectAll, ElementName=Rooot}"
+                                DeselectAllButActionsRequest="{Binding DataContext.DeselectAllButActions, ElementName=Rooot}"
+                                EditActionCommand="{Binding DataContext.EditAction, ElementName=Rooot}"
+                                IsSelected="{CompiledBinding IsSelected, Mode=TwoWay}"
+                                userControls:SmartScriptPanelLayout.Selected="{CompiledBinding IsSelected, Mode=TwoWay}"
+                            />
+                        </DataTemplate>
+                    </userControls:VirtualizedSmartScriptPanel.ActionItemTemplate>
+                    <userControls:VirtualizedSmartScriptPanel.ConditionItemTemplate>
+                        <DataTemplate DataType="{x:Type models:SmartCondition}">
+                            <userControls:SmartConditionView
+                                DirectEditParameter="{Binding DataContext.DirectEditParameter, ElementName=Rooot}"
+                                DeselectAllRequest="{Binding DataContext.DeselectAll, ElementName=Rooot}"
+                                DeselectAllButConditionsRequest="{Binding DataContext.DeselectAllButConditions, ElementName=Rooot}"
+                                EditConditionCommand="{Binding DataContext.EditCondition, ElementName=Rooot}"
+                                userControls:SmartScriptPanelLayout.Selected="{CompiledBinding IsSelected, Mode=TwoWay}"
+                                IsSelected="{CompiledBinding IsSelected, Mode=TwoWay}"
+                                />
+                        </DataTemplate>
+                    </userControls:VirtualizedSmartScriptPanel.ConditionItemTemplate>
+                    <userControls:VirtualizedSmartScriptPanel.GroupItemTemplate>
+                        <DataTemplate x:DataType="models:SmartGroup">
+                            <userControls:SmartGroupView IsExpanded="{CompiledBinding IsExpanded, Mode=TwoWay}" 
+                                                         Header="{CompiledBinding Header}" 
+                                                         IsSelected="{CompiledBinding IsSelected, Mode=TwoWay}"
+                                                         DeselectAllButGroupsRequest="{Binding DataContext.DeselectAllButGroups, ElementName=Rooot}"
+                                                         DeselectAllRequest="{Binding DataContext.DeselectAll, ElementName=Rooot}"
+                                                         Description="{CompiledBinding Description}">
+                            </userControls:SmartGroupView>
+                        </DataTemplate>
+                    </userControls:VirtualizedSmartScriptPanel.GroupItemTemplate>
+                    <userControls:VirtualizedSmartScriptPanel.VariableItemTemplate>
+                        <DataTemplate DataType="{x:Type models:GlobalVariable}">
+                            <userControls:GlobalVariableView
+                                DeselectAllRequest="{Binding DataContext.DeselectAll, ElementName=Rooot}"
+                                DeselectAllButGlobalVariablesRequest="{Binding DataContext.DeselectAllButGlobalVariables, ElementName=Rooot}"
+                                userControls:SmartScriptPanelLayout.Selected="{CompiledBinding IsSelected, Mode=TwoWay}"
+                                IsSelected="{CompiledBinding IsSelected, Mode=TwoWay}"
+                                Script="{Binding DataContext.Script, ElementName=Rooot}"
+                            />
+                        </DataTemplate>
+                    </userControls:VirtualizedSmartScriptPanel.VariableItemTemplate>
+                    <userControls:VirtualizedSmartScriptPanel.NewActionItemTemplate>
+                        <DataTemplate DataType="{x:Type viewModels1:NewActionViewModel}">
+                            <Button Classes="FlatButton"
+                                    Content="Add action"
+                                    Opacity="0.5"
+                                    Command="{Binding DataContext.AddAction, ElementName=Rooot}"
+                                    CommandParameter="{CompiledBinding}">
+                            </Button>
+                        </DataTemplate>
+                    </userControls:VirtualizedSmartScriptPanel.NewActionItemTemplate>
+                    <userControls:VirtualizedSmartScriptPanel.NewConditionItemTemplate>
+                        <DataTemplate DataType="{x:Type viewModels1:NewConditionViewModel}">
+                            <Button Classes="FlatButton"
+                                    Content="Add condition"
+                                    Opacity="0.5"
+                                    Command="{Binding DataContext.AddCondition, ElementName=Rooot}"
+                                    CommandParameter="{CompiledBinding}">
+                            </Button>
+                        </DataTemplate>
+                    </userControls:VirtualizedSmartScriptPanel.NewConditionItemTemplate>
+                </userControls:VirtualizedSmartScriptPanel>
+                <Button
+                    Grid.Row="1" 
+                    Classes="FlatButton"
+                    Opacity="0.5"
+                    Content="Add event"
+                    Command="{CompiledBinding AddEvent}">
+                    <Button.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Define global variable" 
+                                      Command="{CompiledBinding DefineGlobalVariable}" />
+                            </ContextMenu>
+                    </Button.ContextMenu>
+                </Button>
+            </DockPanel>
+            <userControls:SmartScriptOverlay FindText="{CompiledBinding SearchText}" Script="{CompiledBinding Script}" />
+        </Panel>
     </userControls:InverseRenderTransformPanel>
 </UserControl>

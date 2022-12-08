@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using WDE.Common.Database;
 using WDE.Common.Utils;
 using WDE.SmartScriptEditor.Models;
+using WDE.SmartScriptEditor.Models.Helpers;
 
 namespace WDE.SmartScriptEditor.Exporter
 {
@@ -23,6 +25,37 @@ namespace WDE.SmartScriptEditor.Exporter
                 ActionType = SmartConstants.ActionNone,
                 Comment = string.IsNullOrEmpty(gv.Comment) ? $"#define {gv.VariableType} {gv.Key}{entry} {gv.Name}" : $"#define {gv.VariableType} {gv.Key} {gv.Name} -- {gv.Comment}"
             };
+        }
+
+        public static bool TryParseEndGroupComment(this string comment)
+        {
+            return comment.StartsWith(SmartConstants.EndGroupText);
+        }
+        
+        public static bool TryParseBeginGroupComment(this string comment, out string header, out string? description)
+        {
+            description = null;
+            header = "";
+            
+            if (!comment.StartsWith(SmartConstants.BeginGroupText))
+                return false;
+
+            var stringView = comment.AsSpan(SmartConstants.BeginGroupText.Length);
+            if (comment.EndsWith(" - "))
+                stringView  = stringView.Slice(0, stringView.Length - 3);
+
+            var indexOfSeparator = stringView.IndexOf(SmartConstants.BeginGroupSeparator, StringComparison.Ordinal);
+            var headerName = indexOfSeparator == -1
+                ? stringView
+                : stringView.Slice(0, indexOfSeparator);
+            ReadOnlySpan<char> descriptionName = indexOfSeparator == -1
+                ? null
+                : stringView.Slice(indexOfSeparator + SmartConstants.BeginGroupSeparator.Length);
+
+            header = headerName.ToString();
+            if (!descriptionName.IsEmpty)
+                description = descriptionName.ToString();
+            return true;
         }
 
         public static AbstractSmartScriptLine[] ToSmartScriptLines(this SmartEvent e,
@@ -63,44 +96,44 @@ namespace WDE.SmartScriptEditor.Exporter
                     EventChance = (int) e.Chance.Value,
                     EventFlags = (int) e.Flags.Value,
                     TimerId = (int)e.TimerId.Value,
-                    EventParam1 = (int) e.GetParameter(0).Value,
-                    EventParam2 = (int) e.GetParameter(1).Value,
-                    EventParam3 = (int) e.GetParameter(2).Value,
-                    EventParam4 = (int) e.GetParameter(3).Value,
-                    EventParam5 = (int) (e.ParametersCount >= 5 ? e.GetParameter(4).Value : 0),
-                    EventFloatParam1 = e.FloatParametersCount >= 1 ? e.GetFloatParameter(0).Value : 0,
-                    EventFloatParam2 = e.FloatParametersCount >= 2 ? e.GetFloatParameter(1).Value : 0,
-                    EventStringParam = e.StringParametersCount >= 1 ? e.GetStringParameter(0).Value : "",
+                    EventParam1 = (int) e.GetValueOrDefault(0),
+                    EventParam2 = (int) e.GetValueOrDefault(1),
+                    EventParam3 = (int) e.GetValueOrDefault(2),
+                    EventParam4 = (int) e.GetValueOrDefault(3),
+                    EventParam5 = (int) e.GetValueOrDefault(4),
+                    EventFloatParam1 = e.GetFloatValueOrDefault(0),
+                    EventFloatParam2 = e.GetFloatValueOrDefault(1),
+                    EventStringParam = e.GetStringValueOrDefault(0) ?? "",
                     EventCooldownMin = (int) e.CooldownMin.Value,
                     EventCooldownMax = (int) e.CooldownMax.Value,
                     ActionType = a.Id,
-                    ActionParam1 = (int) a.GetParameter(0).Value,
-                    ActionParam2 = (int) a.GetParameter(1).Value,
-                    ActionParam3 = (int) a.GetParameter(2).Value,
-                    ActionParam4 = (int) a.GetParameter(3).Value,
-                    ActionParam5 = (int) a.GetParameter(4).Value,
-                    ActionParam6 = (int) a.GetParameter(5).Value,
-                    ActionParam7 = (int) (a.ParametersCount >= 7 ? a.GetParameter(6).Value : 0),
-                    ActionFloatParam1 = a.FloatParametersCount >= 1 ? a.GetFloatParameter(0).Value : 0,
-                    ActionFloatParam2 = a.FloatParametersCount >= 2 ? a.GetFloatParameter(1).Value : 0,
+                    ActionParam1 = (int) a.GetValueOrDefault(0),
+                    ActionParam2 = (int) a.GetValueOrDefault(1),
+                    ActionParam3 = (int) a.GetValueOrDefault(2),
+                    ActionParam4 = (int) a.GetValueOrDefault(3),
+                    ActionParam5 = (int) a.GetValueOrDefault(4),
+                    ActionParam6 = (int) a.GetValueOrDefault(5),
+                    ActionParam7 = (int) a.GetValueOrDefault(7),
+                    ActionFloatParam1 = a.GetFloatValueOrDefault(0),
+                    ActionFloatParam2 = a.GetFloatValueOrDefault(1),
                     SourceType = a.Source.Id,
-                    SourceParam1 = (int) a.Source.GetParameter(0).Value,
-                    SourceParam2 = (int) a.Source.GetParameter(1).Value,
-                    SourceParam3 = (int) a.Source.GetParameter(2).Value,
-                    SourceX = a.Source.FloatParametersCount >= 1 ? a.Source.X : 0,
-                    SourceY = a.Source.FloatParametersCount >= 2 ? a.Source.Y : 0,
-                    SourceZ = a.Source.FloatParametersCount >= 3 ? a.Source.Z : 0,
-                    SourceO = a.Source.FloatParametersCount >= 4 ? a.Source.O : 0,
+                    SourceParam1 = (int) a.Source.GetValueOrDefault(0),
+                    SourceParam2 = (int) a.Source.GetValueOrDefault(1),
+                    SourceParam3 = (int) a.Source.GetValueOrDefault(2),
+                    SourceX = a.Source.GetFloatValueOrDefault(0),
+                    SourceY = a.Source.GetFloatValueOrDefault(1),
+                    SourceZ = a.Source.GetFloatValueOrDefault(2),
+                    SourceO = a.Source.GetFloatValueOrDefault(3),
                     SourceConditionId = (int)a.Source.Condition.Value,
                     TargetType = a.Target.Id,
-                    TargetParam1 = (int) a.Target.GetParameter(0).Value,
-                    TargetParam2 = (int) a.Target.GetParameter(1).Value,
-                    TargetParam3 = (int) a.Target.GetParameter(2).Value,
+                    TargetParam1 = (int) a.Target.GetValueOrDefault(0),
+                    TargetParam2 = (int) a.Target.GetValueOrDefault(1),
+                    TargetParam3 = (int) a.Target.GetValueOrDefault(2),
                     TargetConditionId = (int)a.Target.Condition.Value,
-                    TargetX = a.Target.X,
-                    TargetY = a.Target.Y,
-                    TargetZ = a.Target.Z,
-                    TargetO = a.Target.O,
+                    TargetX = a.Target.GetFloatValueOrDefault(0),
+                    TargetY = a.Target.GetFloatValueOrDefault(1),
+                    TargetZ = a.Target.GetFloatValueOrDefault(2),
+                    TargetO = a.Target.GetFloatValueOrDefault(3),
                     Comment = shortComments ? a.Comment : e.Readable.RemoveTags().Trim() + " - " + a.Readable.RemoveTags().Trim() +
                               (string.IsNullOrEmpty(a.Comment) ? "" : " // " + a.Comment)
                 };

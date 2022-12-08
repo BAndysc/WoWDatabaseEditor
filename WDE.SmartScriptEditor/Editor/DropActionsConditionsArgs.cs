@@ -1,4 +1,6 @@
-﻿namespace WDE.SmartScriptEditor.Editor.UserControls
+﻿using WDE.SmartScriptEditor.Models;
+
+namespace WDE.SmartScriptEditor.Editor.UserControls
 {
     public class DropActionsConditionsArgs
     {

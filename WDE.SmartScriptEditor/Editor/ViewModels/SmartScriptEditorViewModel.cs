@@ -84,8 +84,12 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             get => isLoading;
             internal set => SetProperty(ref isLoading, value);
         }
+
+        [Notify] private string? searchText;
         
         [Notify] private float scale = 1.0f;
+
+        [Notify] private bool hideComments = false;
         
         public ICommand SaveDefaultScaleCommand { get; }
 
@@ -178,6 +182,22 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     smartEditorViewModel.ShowEditor(null, null);
             });
             EditEvent = new DelegateCommand(EditSelectedEventsCommand);
+            DeselectAllButGroups = new DelegateCommand(() =>
+            {
+                foreach (var gv in script.GlobalVariables)
+                    gv.IsSelected = false;
+                foreach (SmartEvent e in Events)
+                {
+                    if (e.IsEvent)
+                    {
+                        foreach (var a in e.Actions)
+                            a.IsSelected = false;
+                        foreach (var c in e.Conditions)
+                            c.IsSelected = false;
+                        e.IsSelected = false;
+                    }
+                }
+            });
             DeselectAllButEvents = new DelegateCommand(() =>
             {
                 foreach (var gv in script.GlobalVariables)
@@ -191,12 +211,16 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                         foreach (var c in e.Conditions)
                             c.IsSelected = false;
                     }
+
+                    if (e.IsGroup)
+                        e.IsSelected = false;
                 }
             });
             DeselectAll = new DelegateCommand(() =>
             {
                 foreach (var gv in script.GlobalVariables)
                     gv.IsSelected = false;
+                
                 foreach (SmartEvent e in Events)
                 {
                     foreach (var a in e.Actions)
@@ -280,6 +304,30 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     }
                 }
             });
+            OnDropGroups = new DelegateCommand<DropActionsConditionsArgs>(args =>
+            {
+                if (args == null)
+                    return;
+
+                bool inGroup = false;
+                foreach (var e in Events)
+                {
+                    if (e.IsBeginGroup && e.IsSelected)
+                    {
+                        inGroup = true;
+                    }
+
+                    if (inGroup && e.IsEndGroup)
+                    {
+                        e.IsSelected = true;
+                        inGroup = false;
+                    }
+
+                    if (inGroup && e.IsEvent)
+                        e.IsSelected = true;
+                }
+                OnDropItems.Execute(args);
+            });
             OnDropActions = new DelegateCommand<DropActionsConditionsArgs>(data =>
             {
                 using (script.BulkEdit(data.Move ? "Reorder actions" : "Copy actions"))
@@ -359,21 +407,6 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 }
             });
 
-            EditGlobalVariable = new AsyncAutoCommand<GlobalVariable>(async variable =>
-            {
-                var vm = new GlobalVariableEditDialogViewModel(variable);
-                if (await windowManager.ShowDialog(vm))
-                {
-                    using (script.BulkEdit("Edit global variable"))
-                    {
-                        variable.Key = vm.Key;
-                        variable.VariableType = vm.VariableType;
-                        variable.Name = vm.Name;
-                        variable.Comment = vm.Comment;
-                        variable.Entry = vm.Entry;
-                    }
-                }
-            });
             EditAction = new AsyncAutoCommand(EditSelectedActionsCommand);
             EditCondition = new AsyncAutoCommand(EditSelectedConditionsCommand);
             AddEvent = new AsyncAutoCommand(() => AddEventCommand(null));
@@ -863,6 +896,52 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 OnPaste?.Invoke();
             });
 
+            int GetNextVisibleEvent(int start, int direction)
+            {
+                var index = start + direction;
+                while (index >= 0 && index < script!.Events.Count)
+                {
+                    if (Events[index].IsEvent && (!script.TryGetEventGroup(index, out var group, out _) || group.IsExpanded))
+                        return index;
+                    index += direction;
+                }
+
+                return start;
+            }
+
+            SmartGroup? GetNextGroup(int start, int direction)
+            {
+                var index = start + direction;
+                if (direction > 0)
+                {
+                    while (script!.TryGetEvent(index, out var e))
+                    {
+                        if (e.IsBeginGroup)
+                            return new SmartGroup(e);
+                        index += direction;
+                    }
+
+                    return null;
+                }
+                else
+                {
+                    if (script!.TryGetEventGroup(index, out var group, out _))
+                    {
+                        while (script!.TryGetEvent(index, out var e) && !e.IsBeginGroup)
+                            index += direction; // find begin of this group
+                        index += direction;
+                    }
+
+                    while (script!.TryGetEvent(index, out var e))
+                    {
+                        if (e.IsBeginGroup)
+                            return new SmartGroup(e);
+                        index += direction;
+                    }
+                    return null;
+                }
+            }
+            
             void SelectionUpDown(bool addToSelection, int diff)
             {
                 if (AnyGlobalVariableSelected)
@@ -889,12 +968,20 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                         }
                     }
                 }
+                else if (AnyGroupSelected)
+                {
+                    SmartGroup? nextGroup = diff < 0 ? GetNextGroup(FirstSelectedIndex, -1) : GetNextGroup(LastSelectedIndex, 1);
+                    if (nextGroup != null)
+                    {
+                        DeselectAll.Execute();
+                        nextGroup.IsSelected = true;
+                    }
+                }
                 else if (AnyEventSelected)
                 {
-                    int selectedEventIndex = Math.Clamp(diff < 0 ? FirstSelectedIndex + diff : LastSelectedIndex + diff, 0, Events.Count - 1);
+                    int selectedEventIndex = diff < 0 ? GetNextVisibleEvent(FirstSelectedIndex, -1) : GetNextVisibleEvent(LastSelectedIndex, 1);
                     if (addToSelection)
                     {
-                        Profiler.ProfileOneFrame();
                         Events[selectedEventIndex].IsSelected = true;
                     }
                     else
@@ -915,9 +1002,9 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 {
                     int nextActionIndex = diff < 0 ? FirstSelectedActionIndex.actionIndex + diff : LastSelectedActionIndex.actionIndex + diff;
                     int nextEventIndex = diff < 0 ? FirstSelectedActionIndex.eventIndex : LastSelectedActionIndex.eventIndex;
-                    while (nextActionIndex == -1 || nextActionIndex >= Events[nextEventIndex].Actions.Count)
+                    while (nextActionIndex == -1 || nextActionIndex >= Events[nextEventIndex].Actions.Count || (hideComments && Events[nextEventIndex].Actions[nextActionIndex].Id == SmartConstants.ActionComment))
                     {
-                        nextEventIndex += diff;
+                        nextEventIndex = GetNextVisibleEvent(nextEventIndex, diff);
                         if (nextEventIndex >= 0 && nextEventIndex < Events.Count)
                         {
                             nextActionIndex = diff > 0
@@ -944,7 +1031,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     
                     while (nextConditionIndex == -1 || nextConditionIndex >= Events[nextEventIndex].Conditions.Count)
                     {
-                        nextEventIndex += diff;
+                        nextEventIndex = GetNextVisibleEvent(nextEventIndex, diff);
                         if (nextEventIndex >= 0 && nextEventIndex < Events.Count)
                         {
                             nextConditionIndex = diff > 0
@@ -980,6 +1067,15 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     DeselectAll.Execute();
                     Events[actionEventIndex.eventIndex].IsSelected = true;
                 }
+                else if (!AnyGroupSelected && AnyEventSelected)
+                {
+                    var eventIndex = FirstSelectedIndex;
+                    if (script.TryGetEventGroup(Events[eventIndex], out var group, out _))
+                    {
+                        DeselectAll.Execute();
+                        group.IsSelected = true;
+                    }
+                }
                 else if (!AnyEventSelected && !AnyActionSelected)
                     SelectionUpDown(false, -1);
             });
@@ -987,7 +1083,14 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             {
                 if (!AnyEventSelected)
                     SelectionUpDown(false, -1);
-                if (AnyEventSelected)
+                else if (AnyGroupSelected)
+                {
+                    var eventIndex = FirstSelectedIndex;
+                    DeselectAll.Execute();
+                    if (script.TryGetEvent(eventIndex + 1, out var e))
+                        e.IsSelected = true;
+                }
+                else if (AnyEventSelected)
                 {
                     int eventIndex = FirstSelectedIndex;
                     if (Events[eventIndex].Actions.Count > 0)
@@ -1045,10 +1148,30 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 await AddEventCommand(index);
             }
 
+            async Task NewGroup(bool below)
+            {
+                var index = below ? LastSelectedIndex : FirstSelectedIndex;
+                if (index == -1)
+                    index = Events.Count - 1;
+
+                if (below)
+                    index++;
+
+                var fakeGroup = new SmartGroup(SmartEvent.NewBeginGroup());
+                if (await windowManager.ShowDialog(new SmartGroupEditViewModel(fakeGroup)))
+                {
+                    using var _ = script.BulkEdit("Insert group");
+                    var group = script.InsertGroupBegin(index, fakeGroup.Header, fakeGroup.Description);
+                    script.InsertGroupEnd(index + 1);
+                }
+            }
+
             NewActionAboveCommand = new AsyncCommand(() => NewAction(false));
             NewActionBelowCommand = new AsyncCommand(() => NewAction(true));
             NewEventAboveCommand = new AsyncCommand(() => NewEvent(false));
             NewEventBelowCommand = new AsyncCommand(() => NewEvent(true));
+            NewGroupAboveCommand = new AsyncCommand(() => NewGroup(false));
+            NewGroupBelowCommand = new AsyncCommand(() => NewGroup(true));
 
             EditConditionsCommand = new AsyncCommand(() => ExternalConditionEdit(Events.Where(e => e.IsSelected).ToList()),
                 _ => AnyEventSelected);
@@ -1097,8 +1220,6 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
         public ObservableCollection<SmartEvent> Events => script.Events;
 
-        public ObservableCollection<object> Together { get; } = new();
-
         public SmartEvent? SelectedItem => Events.FirstOrDefault(ev => ev.IsSelected);
 
         public DelegateCommand EditEvent { get; set; }
@@ -1108,15 +1229,16 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         public DelegateCommand DeselectAllButConditions { get; set; }
         public DelegateCommand DeselectAllButActions { get; set; }
         public DelegateCommand DeselectAllButEvents { get; set; }
+        public DelegateCommand DeselectAllButGroups { get; set; }
         public DelegateCommand RemoveAllComments { get; }
-
-        public AsyncAutoCommand<GlobalVariable> EditGlobalVariable { get; }
+        
         public AsyncAutoCommand<object> DirectEditParameter { get; }
         public AsyncAutoCommand<object> DirectOpenParameter { get; }
         public DelegateCommand<DropActionsConditionsArgs> OnDropConditions { get; set; }
         public DelegateCommand<DropActionsConditionsArgs> OnDropActions { get; set; }
         public DelegateCommand<DropActionsConditionsArgs> OnDropItems { get; set; }
-
+        public DelegateCommand<DropActionsConditionsArgs> OnDropGroups { get; set; }
+        
         public AsyncAutoCommand<NewActionViewModel> AddAction { get; set; }
         public AsyncAutoCommand<NewConditionViewModel> AddCondition { get; set; }
 
@@ -1142,6 +1264,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         public AsyncCommand NewActionBelowCommand { get; set; }
         public AsyncCommand NewEventAboveCommand { get; set; }
         public AsyncCommand NewEventBelowCommand { get; set; }
+        public AsyncCommand NewGroupAboveCommand { get; set; }
+        public AsyncCommand NewGroupBelowCommand { get; set; }
         public AsyncCommand EditConditionsCommand { get; set; }
 
         public DelegateCommand<bool?> SelectionUp { get; set; }
@@ -1150,10 +1274,11 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         public DelegateCommand SelectionLeft { get; set; }
         public DelegateCommand SelectAll { get; set; }
 
-        public bool AnySelected => AnyEventSelected || AnyActionSelected;
+        public bool AnySelected => AnyGroupSelected || AnyEventSelected || AnyActionSelected;
         private bool AnyGlobalVariableSelected => script.GlobalVariables.Any(e => e.IsSelected);
         private bool MultipleGlobalVariablesSelected => script.GlobalVariables.Count(e => e.IsSelected) >= 2;
-        public bool AnyEventSelected => Events.Any(e => e.IsSelected);
+        public bool AnyEventSelected => Events.Any(e => e.IsEvent && e.IsSelected);
+        public bool AnyGroupSelected => Events.Any(e => e.IsBeginGroup && e.IsSelected);
         private bool MultipleEventsSelected => Events.Count(e => e.IsSelected) >= 2;
         private bool MultipleActionsSelected => Events.SelectMany(e => e.Actions).Count(a => a.IsSelected) >= 2;
         public bool AnyActionSelected => Events.SelectMany(e => e.Actions).Any(a => a.IsSelected);
@@ -1245,25 +1370,6 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             
             TeachingTips = AutoDispose(new SmartTeachingTips(teachingTipService, this, Script));
             Script.ScriptSelectedChanged += EventChildrenSelectionChanged;
-            
-            Together.Add(new NewActionViewModel());
-            Together.Add(new NewConditionViewModel());
-
-            AutoDispose(script.GlobalVariables.ToStream(false).Subscribe(e =>
-            {
-                if (e.Type == CollectionEventType.Add)
-                    Together.Insert(Together.Count - 1, e.Item);
-                else
-                    Together.Remove(e.Item);
-            }));
-            
-            AutoDispose(script.AllSmartObjectsFlat.ToStream(false).Subscribe((e) =>
-            {
-                if (e.Type == CollectionEventType.Add)
-                    Together.Insert(Together.Count - 1, e.Item);
-                else
-                    Together.Remove(e.Item);
-            }));
             
             taskRunner.ScheduleTask($"Loading script {Title}", AsyncLoad);
         }
@@ -1382,7 +1488,6 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
             int sourceId = sourcePick.Value.Item2 ? SmartConstants.SourceStoredObject : sourcePick.Value.Item1;
             
-            Profiler.ProfileOneFrame();
             int? actionId = await ShowActionPicker(e, sourceId);
 
             if (!actionId.HasValue)
@@ -1621,9 +1726,13 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     await EditEventCommand(new[] { ev }))
                 {
                     if (!insertIndex.HasValue || insertIndex < 0 || insertIndex > script.Events.Count)
+                    {
                         script.Events.Add(ev);
+                    }
                     else
+                    {
                         script.Events.Insert(insertIndex.Value, ev);
+                    }
                     ev.IsSelected = true;
                 }
             }
