@@ -89,6 +89,10 @@
         <SolidColorBrush x:Key="TabItemHeaderBackgroundUnselected" Color="#202021" />
         <SolidColorBrush x:Key="TabItemHeaderBackgroundDisabled" Color="#343436" />
         
+        <!-- setting item -->
+        <SolidColorBrush x:Key="SettingItemBackground" Color="#333333" />
+        <SolidColorBrush x:Key="SettingItemBorder" Color="#494949" />
+        
         <!-- -->
         <AccentSolidColorBrush Hue="{DynamicResource AccentHue}" x:Key="GroupingHeaderColor" Color="#2AA0C4" />
         

@@ -10,16 +10,16 @@
              mc:Ignorable="d"
              x:DataType="viewModels:CoreVersionConfigViewModel"
              d:DesignHeight="300" d:DesignWidth="300">
-    <Grid RowDefinitions="Auto" ColumnDefinitions="Auto,*">
-        <TextBlock Grid.Row="0" VerticalAlignment="Center" Margin="5">Core version</TextBlock>
-        <ComboBox Grid.Row="0" Grid.Column="1" 
-                  Items="{CompiledBinding CoreVersions}" 
-                  SelectedItem="{CompiledBinding SelectedVersion, Mode=TwoWay}">
-            <ComboBox.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{CompiledBinding FriendlyName}" />
-                </DataTemplate>
-            </ComboBox.ItemTemplate>
-        </ComboBox>
-    </Grid>
+    <StackPanel Margin="0,1,0,0">
+        <SettingItem Header="Core version" Help="Depending on the core version, particular features will be enabled/disabled.">
+            <ComboBox Items="{CompiledBinding CoreVersions}" 
+                      SelectedItem="{CompiledBinding SelectedVersion, Mode=TwoWay}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{CompiledBinding FriendlyName}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>        
+        </SettingItem>
+    </StackPanel>
 </UserControl>

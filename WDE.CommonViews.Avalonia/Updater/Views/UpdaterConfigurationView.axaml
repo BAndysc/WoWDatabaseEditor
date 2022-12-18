@@ -4,42 +4,47 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia"
              xmlns:mvvm="http://prismlibrary.com/"
+             xmlns:viewModels="clr-namespace:WDE.Updater.ViewModels;assembly=WDE.Updater"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              mvvm:ViewModelLocator.AutoWireViewModel="False"
+             x:DataType="viewModels:UpdaterConfigurationViewModel"
              x:Class="WDE.CommonViews.Avalonia.Updater.Views.UpdaterConfigurationView">
     <UserControl.Resources>
         <converters:DataTimeToStringConverter x:Key="DateConverter" Format="f" />
         <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
     </UserControl.Resources>
     <ScrollViewer>
-        <Grid RowDefinitions="Auto,10,Auto,10,Auto,10,Auto,30,Auto,Auto,Auto" ColumnDefinitions="Auto,10,*">
-            <TextBlock Text="Current version"
-                       Grid.Row="0" />
-            <TextBlock Text="{Binding CurrentVersion}"
-                       Grid.Row="0" Grid.Column="2"/>
-            <TextBlock Text="Last checked updates"
-                       Grid.Row="2"/>
-            <TextBlock Text="{Binding LastCheckForUpdates, Converter={StaticResource DateConverter}}"
-                       Grid.Row="2" Grid.Column="2"/>
-            <Button Command="{Binding CheckForUpdatesCommand}"
-                    Grid.Column="2"
-                    Grid.Row="4">Check for updates</Button>
-            <Button Command="{Binding ShowChangelog}"
-                    Grid.Column="2"
-                    Grid.Row="6">Show changelog</Button>
-        
-            <TextBlock Text="Disable auto updates" VerticalAlignment="Center"
-                       Grid.Row="8"/>
-            <CheckBox IsChecked="{Binding DisableAutoUpdates}" 
-                      Grid.Row="8" Grid.Column="2"/>
-                  
-            <TextBlock Text="Enable silent updates" VerticalAlignment="Center"
-                       Grid.Row="9"/>
-            <CheckBox IsChecked="{Binding EnableSilentUpdates}" 
-                      IsEnabled="{Binding DisableAutoUpdates, Converter={StaticResource InverseBoolConverter}}"
-                      Grid.Row="9" Grid.Column="2"/>
-            <TextBlock Text="With 'silent updates' enabled, updates are downloaded and installed automatically."
-                       Grid.Row="10" Grid.Column="2"/>
-        </Grid>
+        <StackPanel>
+            <SettingsHeader Text="Auto updates" />
+            <StackPanel>
+                <SettingItem Header="Current version">
+                    <TextBlock Text="{CompiledBinding CurrentVersion}" FontWeight="Bold"/>
+                </SettingItem>
+                
+                <SettingItem Header="Last checked updates">
+                    <DockPanel>
+                        <TextBlock Text="{CompiledBinding LastCheckForUpdates, Converter={StaticResource DateConverter}}"
+                                   DockPanel.Dock="Top"
+                                   FontWeight="Bold" />
+                        <Button Command="{CompiledBinding CheckForUpdatesCommand}">Check for updates</Button>
+                    </DockPanel>
+                </SettingItem>
+                
+                <SettingItem Header="Changelog">
+                    <Button Command="{CompiledBinding ShowChangelog}">Show</Button>
+                </SettingItem>
+                
+                <SettingItem Header="Disable auto updates" Help="By default the editor checks for new updates automatically (but asks before downloading)">
+                    <ToggleSwitch IsChecked="{CompiledBinding DisableAutoUpdates}" 
+                                  OnContent="" OffContent="" />
+                </SettingItem>
+                
+                <SettingItem Header="Enable silent updates" Help="With 'silent updates' enabled, updates are downloaded and installed automatically, without asking.">
+                    <ToggleSwitch IsChecked="{CompiledBinding EnableSilentUpdates}" 
+                              IsEnabled="{CompiledBinding DisableAutoUpdates, Converter={StaticResource InverseBoolConverter}}"
+                              OnContent="" OffContent=""/>
+                </SettingItem>
+            </StackPanel>
+        </StackPanel>
     </ScrollViewer>
 </UserControl>

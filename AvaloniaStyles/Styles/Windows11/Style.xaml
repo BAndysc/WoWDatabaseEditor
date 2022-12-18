@@ -16,6 +16,7 @@
         <StyleInclude Source="avares://AvaloniaStyles/Controls/WizardPanel.axaml" />
         <StyleInclude Source="avares://AvaloniaStyles/Controls/DropDownButton.axaml" />
         <StyleInclude Source="avares://AvaloniaStyles/Controls/ToolbarControl.axaml" />
+        <StyleInclude Source="avares://AvaloniaStyles/Controls/SettingItem.axaml" />
         
         <!--<StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/TabStrip.xaml" />-->
         <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/GridSplitter.axaml" />
@@ -43,5 +44,6 @@
         <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/Window.xaml" />
         <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows11/Window.axaml" />
         <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/StatusBar.xaml" />
+        <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/SettingItem.axaml" />
         <StyleInclude Source="avares://Dock.Avalonia/Themes/DockFluentTheme.axaml"/>
 </Styles>

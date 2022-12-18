@@ -10,16 +10,17 @@
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Orientation="Vertical">
             <controls:SettingsHeader Text="Client files" />
-            <TextBlock Opacity="0.7">Please select a folder with Wrath's wow.exe in it.</TextBlock>
-            <DockPanel LastChildFill="True">
-                <TextBlock VerticalAlignment="Center" Margin="0,0,10,0">WoW Path:</TextBlock>
-                <Button DockPanel.Dock="Right" Command="{CompiledBinding PickFolder}">...</Button>
-                <TextBox Text="{CompiledBinding WoWPath}" IsReadOnly="True" />
-            </DockPanel>
-            <DockPanel Margin="0,5,0,0">
-                <TextBlock VerticalAlignment="Center" Margin="0,0,5,0">Archive open mode: </TextBlock>
-                <ComboBox Items="{CompiledBinding MpqOpenTypes}" SelectedItem="{CompiledBinding MpqOpenType}" />
-            </DockPanel>
+            <StackPanel>
+                <SettingItem Header="WoW Path" Help="Please select a folder with Wrath's wow.exe in it.">
+                    <DockPanel LastChildFill="True">
+                        <Button DockPanel.Dock="Right" Command="{CompiledBinding PickFolder}">...</Button>
+                        <TextBox Text="{CompiledBinding WoWPath}" IsReadOnly="True" />
+                    </DockPanel>
+                </SettingItem>
+                <SettingItem Header="Archive open mode" Help="Stormlib has better compatibility, but might be slower. Doesn't matter if you select > MoP client.">
+                    <ComboBox Items="{CompiledBinding MpqOpenTypes}" SelectedItem="{CompiledBinding MpqOpenType}" />
+                </SettingItem>
+            </StackPanel>
         </StackPanel>
     </ScrollViewer>
 </UserControl>

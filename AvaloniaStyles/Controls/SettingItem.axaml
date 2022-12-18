@@ -1,0 +1,65 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:AvaloniaStyles.Controls">
+    <Design.PreviewWith>
+        <controls:SettingItem />
+    </Design.PreviewWith>
+
+    <Style Selector="StackPanel > ContentPresenter:nth-child(1) > controls|SettingItem">
+        <Setter Property="CornerRadius" Value="6,6,0,0" />
+    </Style>
+    <Style Selector="StackPanel > ContentPresenter:nth-last-child(1) > controls|SettingItem">
+        <Setter Property="CornerRadius" Value="0,0,6,6" />
+    </Style>
+    <Style Selector="StackPanel > ContentPresenter:nth-child(1):nth-last-child(1) > controls|SettingItem">
+        <Setter Property="CornerRadius" Value="6,6,6,6" />
+    </Style>
+    
+    <Style Selector="StackPanel > controls|SettingItem:nth-child(1)">
+        <Setter Property="CornerRadius" Value="6,6,0,0" />
+    </Style>
+    <Style Selector="StackPanel > controls|SettingItem:nth-last-child(1)">
+        <Setter Property="CornerRadius" Value="0,0,6,6" />
+    </Style>
+    <Style Selector="StackPanel > controls|SettingItem:nth-child(1):nth-last-child(1)">
+        <Setter Property="CornerRadius" Value="6,6,6,6" />
+    </Style>
+    
+    <Style Selector="controls|SettingItem > TextBox">
+        <Setter Property="MinWidth" Value="350" />
+    </Style>
+    <Style Selector="controls|SettingItem > ToggleSwitch">
+        <Setter Property="OnContent" Value="" />
+        <Setter Property="OffContent" Value="" />
+    </Style>
+    <Style Selector="controls|SettingItem">
+        <Setter Property="Margin" Value="0,0,0,-1" /> <!-- trick for border overlap -->
+        <Setter Property="MinHeight" Value="46"></Setter>
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border CornerRadius="{TemplateBinding CornerRadius}" BorderThickness="1" BorderBrush="{TemplateBinding BorderBrush}" Background="{TemplateBinding Background}">
+                    <Grid VerticalAlignment="Center" RowDefinitions="Auto,Auto" Margin="6">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" MinWidth="50" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Row="1" Grid.ColumnSpan="3" TextWrapping="WrapWithOverflow" 
+                                   Text="{TemplateBinding Help}"
+                                   Margin="0,6,0,0" IsVisible="{TemplateBinding Help, Converter={x:Static ObjectConverters.IsNotNull}}"
+                                   Opacity="0.5" />
+                        <ContentPresenter Grid.Column="2"
+                                          HorizontalContentAlignment="Right"
+                                          Content="{TemplateBinding Content}" />
+                        <TextBlock Text="{TemplateBinding Header}" 
+                                   VerticalAlignment="Center"
+                                   TextWrapping="WrapWithOverflow" />
+                    </Grid>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    <Style Selector="ContentPresenter:nth-last-child(1) controls|SettingItem">
+        <Setter Property="Margin" Value="0" />
+    </Style>
+</Styles>

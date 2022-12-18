@@ -85,6 +85,10 @@
         <SolidColorBrush x:Key="ComboBoxBorderBrushPressed" Color="#0F000000" />
         <SolidColorBrush x:Key="ComboBoxBorderBrushDisabled" Color="#0F000000" />
         
+        <!-- setting item -->
+        <SolidColorBrush x:Key="SettingItemBackground" Color="#F0F0F0" />
+        <SolidColorBrush x:Key="SettingItemBorder" Color="#DDDDDD" />
+        
         <!-- dock -->
         <!--<AccentSolidColorBrush Hue="{DynamicResource AccentHue}" BaseColor="{DynamicResource SystemAccentColor}" x:Key="DockThemeAccentBrush" />-->
     </Styles.Resources>

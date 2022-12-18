@@ -9,8 +9,6 @@
              x:Class="WDE.CommonViews.Avalonia.Sessions.SessionsConfigurationView">
     <ScrollViewer>
         <StackPanel>
-            <controls:SettingsHeader Text="Configuration" />
-            <CheckBox IsThreeState="True" IsChecked="{CompiledBinding DeleteOnSave}">After saving, always delete the session?</CheckBox>
             <controls:SettingsHeader Text="Recently deleted sessions" />
             <Button Command="{CompiledBinding RestoreSelectedSession}">Restore</Button>
             <ListBox Items="{CompiledBinding DeletedSessions}" 

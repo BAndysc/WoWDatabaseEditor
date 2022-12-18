@@ -15,7 +15,7 @@
         <SolidColorBrush Color="Black" x:Key="OuterWindowBorderColor" />
         <SolidColorBrush Color="#78797B" x:Key="InnerWindowBorderColor" />
         
-        <SolidColorBrush Color="#1E1F22" x:Key="ContentBackground" />
+        <SolidColorBrush Color="#2B2D31" x:Key="ContentBackground" />
         
         <Thickness x:Key="ButtonBorderThemeThickness">1</Thickness>
         
@@ -77,6 +77,10 @@
         <!--<AccentSolidColorBrush Hue="{DynamicResource AccentHue}" x:Key="SystemControlHighlightListMediumBrush" BaseColor="{StaticResource SystemListMediumColor}" />
         <AccentSolidColorBrush Hue="{DynamicResource AccentHue}" x:Key="SystemControlHighlightListLowBrush" BaseColor="{StaticResource SystemListLowColor}" />-->
 
+        <!-- setting item -->
+        <SolidColorBrush x:Key="SettingItemBackground" Color="#333333" />
+        <SolidColorBrush x:Key="SettingItemBorder" Color="#494949" />
+        
         <!-- dock -->
         <AccentSolidColorBrush Hue="{DynamicResource AccentHue}" BaseColor="{DynamicResource SystemAccentColor}" x:Key="DockThemeAccentBrush" />
     </Styles.Resources>

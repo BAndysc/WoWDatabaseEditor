@@ -25,47 +25,47 @@
     <ScrollViewer HorizontalScrollBarVisibility="Disabled">
         <StackPanel>
             <controls:SettingsHeader Text="Defaults" />
-            <StackPanel Orientation="Vertical" Margin="15,0,0,0">
-                <CheckBox IsChecked="{CompiledBinding AlwaysSplitUpdates, Mode=TwoWay}">Always split UPDATE_OBJECT</CheckBox>
-                <TextBlock TextWrapping="WrapWithOverflow" Opacity="0.7" Margin="20,0,0,0">If you want to filter individual updates, you have to split UPDATE_OBJECT packets. This option can be also manually triggered for each sniff, however you may enable it globally be default. Note: it DOES increase memory usage.</TextBlock>
-
-                <CheckBox Margin="0,10,0,0" IsChecked="{CompiledBinding AlwaysHidePlayerMovePackets, Mode=TwoWay}">Always hide player move packets</CheckBox>
-                <TextBlock TextWrapping="WrapWithOverflow" Opacity="0.7" Margin="20,0,0,0">If you enable this, CMSG_MOVE* and SMSG_MOVE* opcodes will be hidden. They usually doesn't contain useful information anyway.</TextBlock>
-
-                <CheckBox Margin="0,10,0,0" IsChecked="{CompiledBinding WrapLines, Mode=TwoWay}">Wrap lines</CheckBox>
-                <DockPanel LastChildFill="True">
-                    <TextBlock Classes="Label">Default filter</TextBlock>
-                    <views:FilterTextEditor Document="{CompiledBinding DefaultFilterText, Converter={StaticResource DocumentConverter}}" />
-                </DockPanel>
-                <TextBlock TextWrapping="WrapWithOverflow" Opacity="0.7" Margin="20,0,0,0">If you use some filter often, you may want to set it as a default filter.</TextBlock>
+            <StackPanel Orientation="Vertical">
+                <SettingItem Header="Always split UPDATE_OBJECT" Help="If you want to filter individual updates, you have to split UPDATE_OBJECT packets. This option can be also manually triggered for each sniff, however you may enable it globally be default. Note: it DOES increase memory usage.">
+                    <ToggleSwitch IsChecked="{CompiledBinding AlwaysSplitUpdates, Mode=TwoWay}"></ToggleSwitch>
+                </SettingItem>
+                
+                <SettingItem Header="Always hide player move packets" Help="If you enable this, CMSG_MOVE* and SMSG_MOVE* opcodes will be hidden. They usually doesn't contain useful information anyway.">
+                    <ToggleSwitch IsChecked="{CompiledBinding AlwaysHidePlayerMovePackets, Mode=TwoWay}"></ToggleSwitch>
+                </SettingItem>
+                
+                <SettingItem Header="Wrap lines">
+                    <ToggleSwitch IsChecked="{CompiledBinding WrapLines, Mode=TwoWay}"></ToggleSwitch>
+                </SettingItem>
+                
+                <SettingItem Header="Default filter" Help="If you use some filter often, you may want to set it as a default filter.">
+                    <views:FilterTextEditor HorizontalAlignment="Stretch" MinWidth="200" Document="{CompiledBinding DefaultFilterText, Converter={StaticResource DocumentConverter}}" />
+                </SettingItem>
             </StackPanel>
             
-            
             <controls:SettingsHeader Text="WoW Packet Parser settings" />
-            <ItemsControl Items="{CompiledBinding ParserSettings}" Margin="15,0,0,0">
+            <ItemsControl Items="{CompiledBinding ParserSettings}">
                 <ItemsControl.DataTemplates>
                     <DataTemplate DataType="viewModels:ParserBoolSettingViewModel">
-                        <StackPanel>
-                            <CheckBox IsChecked="{CompiledBinding Value, Mode=TwoWay}" Content="{CompiledBinding Name}" />
-                            <TextBlock TextWrapping="WrapWithOverflow" Opacity="0.7" Margin="20,0,0,0" Text="{CompiledBinding Help}" IsVisible="{CompiledBinding Help, Converter={StaticResource NullConverter}}"/>
-                        </StackPanel>
+                        <SettingItem Header="{CompiledBinding Name}" Help="{CompiledBinding Help}">
+                            <ToggleSwitch IsChecked="{CompiledBinding Value, Mode=TwoWay}" />
+                        </SettingItem>
                     </DataTemplate>
                     <DataTemplate DataType="viewModels:ParserStringSettingViewModel">
-                        <StackPanel Margin="0,0,0,12">
-                            <DockPanel LastChildFill="True">
-                                <TextBlock Text="{CompiledBinding Name}"
-                                           Classes="Label" />
-                                <TextBox Text="{CompiledBinding Value, Mode=TwoWay}" />
-                            </DockPanel>
-                            <TextBlock TextWrapping="WrapWithOverflow" Opacity="0.7" Margin="20,0,0,0" Text="{CompiledBinding Help}" IsVisible="{CompiledBinding Help, Converter={StaticResource NullConverter}}"/>
-                        </StackPanel>
+                        <SettingItem Header="{CompiledBinding Name}" Help="{CompiledBinding Help}">
+                            <TextBox Text="{CompiledBinding Value, Mode=TwoWay}" />
+                        </SettingItem>
                     </DataTemplate>
                 </ItemsControl.DataTemplates>
             </ItemsControl>
             
             <StackPanel IsVisible="{CompiledBinding IsDebugBuild, Mode=OneTime}">
                 <controls:SettingsHeader Text="[Development] Integration test" />
-                <CheckBox Name="ShowIntegrationTest">This is only for development purposes</CheckBox>
+                <StackPanel>
+                    <SettingItem Header="This is only for development purposes">
+                        <ToggleSwitch Name="ShowIntegrationTest" />
+                    </SettingItem>
+                </StackPanel>
                 <DockPanel IsVisible="{CompiledBinding #ShowIntegrationTest.IsChecked}">
                     <Button DockPanel.Dock="Right" Command="{CompiledBinding RunTestsCommand}">Run tests</Button>
                     <TextBox IsReadOnly="True" Text="{CompiledBinding DefaultTestCasePath}" />

@@ -157,8 +157,8 @@ public class ColorPicker : Control
     private async Task AsyncRedraw(CancellationToken token, int version)
     {
         currentCalculateVersion = version;
-        int width = (int)Bounds.Width;
-        int height = (int)Bounds.Height;
+        int width = Math.Max(1, (int)Bounds.Width);
+        int height = Math.Max(1, (int)Bounds.Height);
         byte[] array = ArrayPool<byte>.Shared.Rent(width * height * 4);
         await ColorPickerUtils.CreateComponentBitmapAsync(token, array, width, height, HueOffset, Lightness);
         if (currentVersion < version && !token.IsCancellationRequested)
