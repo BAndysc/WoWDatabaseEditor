@@ -125,9 +125,14 @@ namespace WDE.SmartScriptEditor.Models
                 if (e.IsEvent)
                     e.Group = lastGroup;
                 else if (e.IsBeginGroup)
+                {
                     lastGroup = new SmartGroup(e);
+                }
                 else if (e.IsEndGroup)
+                {
+                    e.Group = lastGroup;
                     lastGroup = null;
+                }
             }
         }
 
@@ -214,11 +219,9 @@ namespace WDE.SmartScriptEditor.Models
                         }
                         else if (Events[indexOfEvent].IsBeginGroup)
                         {
-                            Console.WriteLine("[ERROR IN DATA] Nested groups are not allowed!");
                             return false;
                         }
                     }
-                    Console.WriteLine("[ERROR IN DATA] Begin group without an end!");
                     return false;
                 }
                 indexOfEvent--;
@@ -253,7 +256,8 @@ namespace WDE.SmartScriptEditor.Models
             if (previousGroup != null && previousGroup.IsBeginGroup)
             {
                 // close unclosed group
-                InsertGroupEnd(index++);
+                if (InsertGroupEnd(index))
+                    index++;
             }
             
             var groupBegin = SmartEvent.NewBeginGroup();
@@ -286,6 +290,7 @@ namespace WDE.SmartScriptEditor.Models
             if (targetConditionLines != null)
                 targetConditions = targetConditionLines.GroupBy(x => x.SourceGroup).ToDictionary(x => x.Key, x => x.ToList<ICondition>());
 
+            bool hasOpenedGroup = false;
             foreach (ISmartScriptLine line in lines)
             {
                 if (line.EventType == SmartConstants.EventGroupBegin &&
@@ -293,17 +298,22 @@ namespace WDE.SmartScriptEditor.Models
                 {
                     if (TryGetEventGroup(index, out var group, out var endGroup))
                     {
-                        InsertGroupEnd(index++);
+                        if (InsertGroupEnd(index))
+                            index++;
                         Events.Remove(endGroup);
                     }
-                    InsertGroupBegin(index++, header, description);
+                    group = InsertGroupBegin(index++, header, description);
+                    newEvents.Add(group.InnerEvent);
+                    hasOpenedGroup = true;
                     continue;
                 }
                 
                 if (line.EventType == SmartConstants.EventGroupEnd &&
                     line.Comment.TryParseEndGroupComment())
                 {
-                    InsertGroupEnd(index++);
+                    if (InsertGroupEnd(index))
+                        index++;
+                    hasOpenedGroup = false;
                     continue;
                 }
                 
@@ -344,6 +354,11 @@ namespace WDE.SmartScriptEditor.Models
                         currentEvent.AddAction(action);
                     }
                 }
+            }
+
+            if (hasOpenedGroup)
+            {
+                InsertGroupEnd(index++);
             }
             return newEvents;
         }

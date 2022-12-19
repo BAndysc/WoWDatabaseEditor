@@ -34,7 +34,9 @@ public abstract class SmartScriptBaseFindAnywhereSource : IFindAnywhereSource
 
     public int Order => -1;
     
-    public async Task Find(IFindAnywhereResultContext resultContext, IReadOnlyList<string> parameterNames, long parameterValue,
+    public FindAnywhereSourceType SourceType => FindAnywhereSourceType.SmartScripts;
+
+    public async Task Find(IFindAnywhereResultContext resultContext, FindAnywhereSourceType searchType, IReadOnlyList<string> parameterNames, long parameterValue,
         CancellationToken cancellationToken)
     {
         HashSet<(int, int)> added = new();

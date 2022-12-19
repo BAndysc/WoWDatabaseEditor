@@ -31,9 +31,15 @@ internal class QuickCommands : IQuickCommands
             viewModel.Value.OpenSearch(o.ToString());
         });
 
+        CloseSearchCommand = new DelegateCommand<object>(o =>
+        {
+            viewModel.Value.CloseSearch();
+        });
+
         NoCommand = new DelegateCommand(() => { });
     }
     
+    public ICommand CloseSearchCommand { get; set; }
     public ICommand CopyCommand { get; set; }
     public ICommand SetSearchCommand { get; set; }
     public ICommand NoCommand { get; set; }

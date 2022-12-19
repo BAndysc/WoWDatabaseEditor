@@ -30,8 +30,10 @@ public class ConditionsFindAnywhereSource : IFindAnywhereSource
         this.mySqlExecutor = mySqlExecutor;
         this.messageBoxService = messageBoxService;
     }
-    
-    public async Task Find(IFindAnywhereResultContext resultContext, IReadOnlyList<string> parameterNames, long parameterValue, CancellationToken cancellationToken)
+
+    public FindAnywhereSourceType SourceType => FindAnywhereSourceType.Conditions;
+
+    public async Task Find(IFindAnywhereResultContext resultContext, FindAnywhereSourceType searchType, IReadOnlyList<string> parameterNames, long parameterValue, CancellationToken cancellationToken)
     {
         var command = new DelegateCommand(() =>
         {

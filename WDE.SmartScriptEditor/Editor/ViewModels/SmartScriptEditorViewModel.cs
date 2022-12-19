@@ -90,6 +90,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         [Notify] private float scale = 1.0f;
 
         [Notify] private bool hideComments = false;
+
+        [Notify] private bool hideConditions = false;
         
         public ICommand SaveDefaultScaleCommand { get; }
 
@@ -549,9 +551,15 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 {
                     using (script.BulkEdit("Delete actions"))
                     {
-                        (int eventIndex, int actionIndex)? nextSelect = FirstSelectedActionIndex;
+                        (int nextEventIndex, int nextActionIndex)? nextSelect = GetNextVisibleAction(FirstSelectedActionIndex.eventIndex, FirstSelectedActionIndex.actionIndex, 1);
+                        if (nextSelect.Value.nextEventIndex == FirstSelectedActionIndex.eventIndex && nextSelect.Value.nextActionIndex == FirstSelectedActionIndex.actionIndex)
+                            nextSelect = GetNextVisibleAction(FirstSelectedActionIndex.eventIndex, FirstSelectedActionIndex.actionIndex, -1);
                         if (MultipleActionsSelected)
                             nextSelect = null;
+
+                        SmartAction? nextActionToSelect = null;
+                        if (nextSelect.HasValue && (nextSelect.Value.nextEventIndex != FirstSelectedActionIndex.eventIndex || nextSelect.Value.nextActionIndex != FirstSelectedActionIndex.actionIndex))
+                            nextActionToSelect = Events[nextSelect.Value.nextEventIndex].Actions[nextSelect.Value.nextActionIndex];
 
                         for (var i = 0; i < Events.Count; ++i)
                         {
@@ -563,14 +571,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                             }
                         }
 
-                        if (nextSelect.HasValue)
-                        {
-                            if (nextSelect.Value.actionIndex < Events[nextSelect.Value.eventIndex].Actions.Count)
-                                Events[nextSelect.Value.eventIndex].Actions[nextSelect.Value.actionIndex].IsSelected = true;
-                            else if (Events[nextSelect.Value.eventIndex].Actions.Count > 0 && 
-                                     nextSelect.Value.actionIndex == Events[nextSelect.Value.eventIndex].Actions.Count)
-                                Events[nextSelect.Value.eventIndex].Actions[nextSelect.Value.actionIndex - 1].IsSelected = true;
-                        }
+                        if (nextActionToSelect != null)
+                            nextActionToSelect.IsSelected = true;
                     }
                 }
                 else if (AnyConditionSelected && !editorFeatures.UseExternalConditionsEditor) // with external editor, you may not delete conditions in sai directly
@@ -908,6 +910,32 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
                 return start;
             }
+            
+            (int eventIndex, int actionIndex) GetNextVisibleAction(int startEvent, int startAction, int direction)
+            {
+                var eventIndex = startEvent;
+                var actionIndex = startAction + direction;
+                while (eventIndex >= 0 && eventIndex < script!.Events.Count)
+                {
+                    if (actionIndex < 0 || actionIndex >= Events[eventIndex].Actions.Count)
+                    {
+                        var nextEventIndex = GetNextVisibleEvent(eventIndex, direction);
+                        if (nextEventIndex == eventIndex)
+                            return (startEvent, startAction);
+                        eventIndex = nextEventIndex;
+                        actionIndex = direction > 0 ? 0 : Events[eventIndex].Actions.Count - 1;
+                    }
+                    else if (hideComments && Events[eventIndex].Actions[actionIndex].Id == SmartConstants.ActionComment)
+                    {
+                        actionIndex += direction;
+                    }
+                    else
+                    {
+                        return (eventIndex, actionIndex);
+                    }
+                }
+                return (-1, -1);
+            }
 
             SmartGroup? GetNextGroup(int start, int direction)
             {
@@ -1000,22 +1028,12 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 }
                 else if (AnyActionSelected)
                 {
-                    int nextActionIndex = diff < 0 ? FirstSelectedActionIndex.actionIndex + diff : LastSelectedActionIndex.actionIndex + diff;
-                    int nextEventIndex = diff < 0 ? FirstSelectedActionIndex.eventIndex : LastSelectedActionIndex.eventIndex;
-                    while (nextActionIndex == -1 || nextActionIndex >= Events[nextEventIndex].Actions.Count || (hideComments && Events[nextEventIndex].Actions[nextActionIndex].Id == SmartConstants.ActionComment))
-                    {
-                        nextEventIndex = GetNextVisibleEvent(nextEventIndex, diff);
-                        if (nextEventIndex >= 0 && nextEventIndex < Events.Count)
-                        {
-                            nextActionIndex = diff > 0
-                                ? Events[nextEventIndex].Actions.Count > 0 ? 0 : -1
-                                : Events[nextEventIndex].Actions.Count - 1;
-                        }
-                        else
-                            break;
-                    }
-
-                    if (nextActionIndex != -1 && nextEventIndex >= 0 && nextEventIndex < Events.Count)
+                    (int nextEventIndex, int nextActionIndex) = GetNextVisibleAction(
+                        diff < 0 ? FirstSelectedActionIndex.eventIndex : LastSelectedActionIndex.eventIndex,
+                        diff < 0 ? FirstSelectedActionIndex.actionIndex : LastSelectedActionIndex.actionIndex,
+                        diff);
+                    
+                    if (nextActionIndex != -1 && nextEventIndex != -1)
                     {
                         if (!addToSelection)
                             DeselectAll.Execute();
@@ -1510,8 +1528,11 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 if (targetPick.Value.Item2)
                     target.GetParameter(0).Value = targetPick.Value.Item1;
             }
-            else 
-                target = smartFactory.TargetFactory(SmartConstants.TargetNone);
+            else
+            {
+                var usesTarget = actionData.TargetTypes != SmartSourceTargetType.None && actionData.DoNotProposeTarget;
+                target = smartFactory.TargetFactory(usesTarget ? SmartConstants.TargetSelf : SmartConstants.TargetNone);
+            }
             
             SmartSource source = smartFactory.SourceFactory(sourceId);
             if (sourcePick.Value.Item2)

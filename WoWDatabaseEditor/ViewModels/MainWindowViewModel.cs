@@ -11,6 +11,7 @@ using WDE.Common.Managers;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Windows;
 using WDE.Common.Menu;
+using WDE.Common.Providers;
 using WDE.Common.QuickAccess;
 using WDE.Common.Services;
 using WDE.Common.Sessions;
@@ -38,6 +39,8 @@ namespace WoWDatabaseEditorCore.ViewModels
         private readonly Func<QuickStartViewModel> quickStartCreator;
         private readonly Func<TextDocumentViewModel> textDocumentCreator;
         private readonly ISolutionTasksService solutionTasksService;
+        private readonly IProgramNameService programNameService;
+        private readonly List<IProgramNameAddon> programNameAddons;
         private readonly ITablesToolService tablesToolService;
         private readonly IGlobalServiceRoot globalServiceRoot;
 
@@ -60,6 +63,7 @@ namespace WoWDatabaseEditorCore.ViewModels
             ITaskRunner taskRunner,
             IEventAggregator eventAggregator,
             IProgramNameService programNameService,
+            IEnumerable<IProgramNameAddon> nameAddons,
             IMainThread mainThread,
             IQuickAccessViewModel quickAccessViewModel,
             IWindowManager windowManager,
@@ -77,10 +81,15 @@ namespace WoWDatabaseEditorCore.ViewModels
             this.quickStartCreator = quickStartCreator;
             this.textDocumentCreator = textDocumentCreator;
             this.solutionTasksService = solutionTasksService;
+            this.programNameService = programNameService;
             this.tablesToolService = tablesToolService;
             this.globalServiceRoot = globalServiceRoot;
-            Title = programNameService.Title;
+            this.programNameAddons = nameAddons.ToList();
+            Title = "";
             Subtitle = programNameService.Subtitle;
+            foreach (var titleAddon in programNameAddons)
+                titleAddon.ToObservable(x => x.Addon).SubscribeAction(_ => UpdateTitle());
+            UpdateTitle();
             OpenDocument = new DelegateCommand<IMenuDocumentItem>(ShowDocument);
             ExecuteChangedCommand = new DelegateCommand(() =>
             {
@@ -178,6 +187,18 @@ namespace WoWDatabaseEditorCore.ViewModels
                 .Build());
         }
 
+        private void UpdateTitle()
+        {
+            if (programNameAddons.Count == 0)
+                Title = programNameService.Title;
+            else
+            {
+                var name = string.Join(" ", programNameAddons.Select(a => a.Addon));
+                Title = programNameService.Title + " " + name;
+            }
+            RaisePropertyChanged(nameof(Title));
+        }
+
         public IStatusBar StatusBar { get; }
         public IDocumentManager DocumentManager { get; }
 
@@ -189,7 +210,7 @@ namespace WoWDatabaseEditorCore.ViewModels
 
         public List<IMainMenuItem> MenuItemProviders { get; }
 
-        public string Title { get; }
+        public string Title { get; private set; }
         
         public string Subtitle { get; }
 

@@ -25,6 +25,7 @@ using WDE.Solutions.Explorer.ViewModels;
 using WDE.SQLEditor.ViewModels;
 using WDE.TrinityMySqlDatabase.ViewModels;
 using WDE.CMMySqlDatabase.ViewModels;
+using WDE.Parameters.QuickAccess;
 using WDE.Parameters.Views;
 using WDE.Sessions.Sessions;
 using WDE.Updater.ViewModels;
@@ -44,6 +45,7 @@ namespace WDE.CommonViews.Avalonia
             viewLocator.Bind<SessionToolViewModel, SessionToolView>();
             viewLocator.Bind<SessionsConfigurationViewModel, SessionsConfigurationView>();
             // parameters
+            viewLocator.Bind<ParameterSearchConfiguration, SearchConfigurationView>();
             viewLocator.Bind<ParametersViewModel, ParametersView>();
             viewLocator.Bind<StringPickerViewModel, StringPickerView>();
             viewLocator.Bind<UnitBytes1EditorViewModel, UnitBytes1EditorView>();

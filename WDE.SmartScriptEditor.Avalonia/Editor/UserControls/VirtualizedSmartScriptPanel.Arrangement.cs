@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Templates;
 using Avalonia.Media;
 using WDE.SmartScriptEditor.Avalonia.Extensions;
 using WDE.SmartScriptEditor.Editor.ViewModels;
@@ -19,6 +20,7 @@ public partial class VirtualizedSmartScriptPanel
     private RecyclableViewList groupViews;
     private RecyclableViewList newActionViews;
     private RecyclableViewList newConditionViews;
+    private RecyclableViewList textBlockViews;
     
     private void ArrangeCondition(in SizingContext context, SmartCondition condition, bool inGroup, double y, out double conditionHeight)
     {
@@ -59,8 +61,9 @@ public partial class VirtualizedSmartScriptPanel
     private void ArrangeEvent(in SizingContext context, SmartEvent e, bool inGroup, double startY, out double totalHeight)
     {
         double y = startY;
-        double actionsHeight = compactView ? 0 : AddActionHeight;
-        double conditionsHeight = compactView ? 0 : AddConditionHeight;
+        bool useCompactView = compactView && e != script!.Events[^1];
+        double actionsHeight = useCompactView ? 0 : AddActionHeight;
+        double conditionsHeight = useCompactView ? 0 : AddConditionHeight;
         
         foreach (var action in e.Actions)
         {
@@ -71,23 +74,39 @@ public partial class VirtualizedSmartScriptPanel
             actionsHeight += actionHeight + ActionSpacing;
         }
 
-        if (!compactView && !AnyDragging && mouseY >= e.Position.Y && mouseY <= e.Position.Bottom)
+        if ((!useCompactView || actionsHeight + AddActionHeight < e.Position.Height) && !AnyDragging && mouseY >= e.Position.Y && mouseY <= e.Position.Bottom)
         {
             var newActionView = newActionViews.GetNext(new NewActionViewModel(){Event = e});
             newActionView.Arrange(context.actionRect.WithVertical(y, AddActionHeight));
         }
 
         y = startY + (e.CachedHeight ?? 0);
-        foreach (var condition in e.Conditions)
+        if (!hideConditions)
         {
-            ArrangeCondition(in context, condition, inGroup, y, out var conditionHeight);
-            y += conditionHeight + ConditionSpacing;
-            conditionsHeight += conditionHeight + ConditionSpacing;
+            foreach (var condition in e.Conditions)
+            {
+                ArrangeCondition(in context, condition, inGroup, y, out var conditionHeight);
+                y += conditionHeight + ConditionSpacing;
+                conditionsHeight += conditionHeight + ConditionSpacing;
+            }   
         }
-        if (!compactView && !AnyDragging && mouseY >= e.Position.Y && mouseY <= e.Position.Bottom)
+        else
+        {
+            if (e.Conditions.Count > 0)
+            {
+                var text = (TextBlock)textBlockViews.GetNext(e.Conditions);
+                text.Text = e.Conditions.Count == 1 ? "1 condition" : $"{e.Conditions.Count} conditions";
+                text.Padding = new Thickness(10,2,10,2);
+                text.Opacity = 0.6f;
+                text.Arrange((inGroup ? context.grupedConditionRect : context.conditionRect).WithVertical(y, AddConditionHeight));
+                y += AddConditionHeight;
+                conditionsHeight += AddConditionHeight;
+            }
+        }
+        if ((!useCompactView || e.CachedHeight!.Value + conditionsHeight + AddConditionHeight < e.Position.Height) && !AnyDragging && mouseY >= e.Position.Y && mouseY <= e.Position.Bottom)
         {
             var newConditionView = newConditionViews.GetNext(new NewConditionViewModel(){Event = e});
-            newConditionView.Arrange(context.conditionRect.WithVertical(y, AddConditionHeight));
+            newConditionView.Arrange((inGroup ? context.grupedConditionRect : context.conditionRect).WithVertical(y, AddConditionHeight));
         }
 
         totalHeight = Math.Max((e.CachedHeight ?? 0) + conditionsHeight, actionsHeight);
@@ -147,6 +166,7 @@ public partial class VirtualizedSmartScriptPanel
         groupViews.Reset(GroupItemTemplate);
         newActionViews.Reset(NewActionItemTemplate);
         newConditionViews.Reset(NewConditionItemTemplate);
+        textBlockViews.Reset(new FuncDataTemplate(typeof(object), (_, _) => new TextBlock(), true));
 
         for (var i = 0; i < script.GlobalVariables.Count; i++)
         {
@@ -184,6 +204,7 @@ public partial class VirtualizedSmartScriptPanel
         newActionViews.Finish();
         newConditionViews.Finish();
         variableViews.Finish();
+        textBlockViews.Finish();
 
         UpdateOverElement();
         return finalSize;

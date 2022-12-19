@@ -97,7 +97,7 @@ namespace WDE.SqlQueryGenerator
         
         public static IQuery BulkInsert(this ITable table, IEnumerable<object> objects, QueryInsertMode mode = QueryInsertMode.Insert)
         {
-            bool first = true;
+            int i = 0;
             PropertyInfo[] properties = null!;
             var sb = new StringBuilder();
             var lines = new List<(string row, bool ignored, string? comment)>();
@@ -105,7 +105,7 @@ namespace WDE.SqlQueryGenerator
             PropertyInfo? ignoredProperty = null;
             foreach (var o in objects)
             {
-                if (first)
+                if (i == 0)
                 {
                     var type = o.GetType();
                     commentProperty = type.GetProperty("__comment", BindingFlags.Instance | BindingFlags.Public);
@@ -115,17 +115,22 @@ namespace WDE.SqlQueryGenerator
                         .ToArray();
                     var cols = string.Join(", ", properties.Select(c => $"`{c.Name}`"));
                     var insert = mode == QueryInsertMode.Insert ? "INSERT" : (mode == QueryInsertMode.InsertIgnore ? "INSERT IGNORE" : "REPLACE");
-                    sb.AppendLine($"{insert} INTO `{table.TableName}` ({cols}) VALUES");
-                    first = false;
+                    sb.Append($"{insert} INTO `{table.TableName}` ({cols}) VALUES ");
+                }
+                else if (i == 1)
+                {
+                    sb.AppendLine();
                 }
 
                 var comment = (string?)commentProperty?.GetValue(o) ?? null;
                 var ignored = (bool)((bool?)ignoredProperty?.GetValue(o) ?? false);
                 var row = string.Join(", ", properties.Select(p => p.GetValue(o).ToSql()));
                 lines.Add((row, ignored, comment));
+                
+                i++;
             }
 
-            if (first)
+            if (i == 0)
                 return new Query(table, "");
 
 

@@ -12,6 +12,9 @@
         <ToggleButton IsChecked="{CompiledBinding HideComments}" ToolTip.Tip="Hide comments (doesn't remove)" >
             <WdeImage ImageUri="Icons/icon_remove_comment.png"></WdeImage>
         </ToggleButton>
+        <ToggleButton IsChecked="{CompiledBinding HideConditions}" ToolTip.Tip="Hide conditions (doesn't remove)" >
+            Hide conditions
+        </ToggleButton>
         <ItemsPresenter Items="{CompiledBinding ExtensionCommands}">
             <ItemsPresenter.ItemTemplate>
                 <DataTemplate x:DataType="editor:SmartExtensionCommand">
@@ -27,6 +30,6 @@
             </ItemsPresenter.ItemsPanel>
         </ItemsPresenter>
         <ToolbarSpacer />
-        <TextBox Name="SearchTextBox" MinHeight="24" Watermark="Search in script" Text="{CompiledBinding SearchText}" />
+        <TextBox Name="SearchTextBox" Padding="8,0" MinHeight="22" Watermark="Search in script" Text="{CompiledBinding SearchText}" />
     </ToolbarPanel>
 </UserControl>

@@ -82,6 +82,14 @@ public partial class VirtualizedSmartScriptPanel : Panel
         get => hideComments;
         set => SetAndRaise(HideCommentsProperty, ref hideComments, value);
     }
+    
+    private bool hideConditions;
+    public static readonly DirectProperty<VirtualizedSmartScriptPanel, bool> HideConditionsProperty = AvaloniaProperty.RegisterDirect<VirtualizedSmartScriptPanel, bool>("HideConditions", o => o.HideConditions, (o, v) => o.HideConditions = v);
+    public bool HideConditions
+    {
+        get => hideConditions;
+        set => SetAndRaise(HideConditionsProperty, ref hideConditions, value);
+    }
 
     private readonly bool compactView;
     private const double PaddingLeft = 5;
@@ -115,6 +123,7 @@ public partial class VirtualizedSmartScriptPanel : Panel
     static VirtualizedSmartScriptPanel()
     {
         HideCommentsProperty.Changed.AddClassHandler<VirtualizedSmartScriptPanel>((panel, _) => panel.InvalidateScript());
+        HideConditionsProperty.Changed.AddClassHandler<VirtualizedSmartScriptPanel>((panel, _) => panel.InvalidateScript());
         ScriptProperty.Changed.AddClassHandler<VirtualizedSmartScriptPanel>((panel, e) =>
         {
             if (e.OldValue is SmartScript oldScript)
@@ -153,6 +162,7 @@ public partial class VirtualizedSmartScriptPanel : Panel
         groupViews = new(childrenContainer);
         newActionViews = new(childrenContainer);
         newConditionViews = new(childrenContainer);
+        textBlockViews = new(childrenContainer);
     }
 
     private void EventChanged(SmartEvent? arg1, SmartAction? arg2, EventChangedMask arg3)

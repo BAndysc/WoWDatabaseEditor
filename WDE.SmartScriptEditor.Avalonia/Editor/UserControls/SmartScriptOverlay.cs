@@ -25,7 +25,15 @@ public class SmartScriptOverlay : Control
         get => (string?)GetValue(FindTextProperty);
         set => SetValue(FindTextProperty, value);
     }
-
+    
+    private bool hideConditions;
+    public static readonly DirectProperty<SmartScriptOverlay, bool> HideConditionsProperty = AvaloniaProperty.RegisterDirect<SmartScriptOverlay, bool>("HideConditions", o => o.HideConditions, (o, v) => o.HideConditions = v);
+    public bool HideConditions
+    {
+        get => hideConditions;
+        set => SetAndRaise(HideConditionsProperty, ref hideConditions, value);
+    }
+    
     private ScrollViewer ScrollView => this.FindAncestorOfType<ScrollViewer>();
     private InverseRenderTransformPanel? Panel => this.FindAncestorOfType<InverseRenderTransformPanel>();
 
@@ -53,6 +61,7 @@ public class SmartScriptOverlay : Control
     {  
         IsHitTestVisibleProperty.OverrideDefaultValue<SmartScriptOverlay>(false);
         AffectsRender<SmartScriptOverlay>(FindTextProperty);
+        AffectsRender<SmartScriptOverlay>(HideConditionsProperty);
         ScriptProperty.Changed.AddClassHandler<SmartScriptOverlay>((panel, e) =>
         {
             if (e.OldValue is SmartScript oldScript)
@@ -134,19 +143,22 @@ public class SmartScriptOverlay : Control
                         }
                     }
                 }
-            
-                foreach (var condition in e.Conditions)
+
+                if (!hideConditions)
                 {
-                    var actionRect = condition.Position.ToRect();
-                    if (scrollRect.Intersects(actionRect))
+                    foreach (var condition in e.Conditions)
                     {
-                        if (condition.Readable.Contains(FindText, StringComparison.InvariantCultureIgnoreCase))
+                        var actionRect = condition.Position.ToRect();
+                        if (scrollRect.Intersects(actionRect))
                         {
-                            group.Children!.Add( new RectangleGeometry(actionRect));
-                            any = true;
+                            if (condition.Readable.Contains(FindText, StringComparison.InvariantCultureIgnoreCase))
+                            {
+                                group.Children!.Add( new RectangleGeometry(actionRect));
+                                any = true;
+                            }
                         }
-                    }
-                }   
+                    }   
+                }
             }
         }
 

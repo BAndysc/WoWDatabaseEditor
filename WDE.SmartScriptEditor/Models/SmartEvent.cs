@@ -111,7 +111,7 @@ namespace WDE.SmartScriptEditor.Models
 
         public bool IsSelected
         {
-            get => isSelected || IsEvent && (group?.IsSelected ?? false);
+            get => isSelected || (IsEvent || IsEndGroup) && (group?.IsSelected ?? false);
             set
             {
                 if (value == isSelected)
@@ -242,6 +242,9 @@ namespace WDE.SmartScriptEditor.Models
             if (CooldownMax.Value != other.CooldownMax.Value)
                 return false;
 
+            if (group != other.group)
+                return false;
+            
             return Chance.Value == other.Chance.Value;
         }
 

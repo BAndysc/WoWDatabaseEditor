@@ -38,26 +38,13 @@ public class TrinityCataMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvider
     public override async Task<List<IGossipMenuOption>> GetGossipMenuOptionsAsync(uint menuId)
     {
         await using var model = Database();
-        var query = GetGossipOptionsQuery(model);
-        return await query.ToListAsync<IGossipMenuOption>();
+        return await model.GossipMenuOptions.Where(option => option.MenuId == menuId).ToListAsync<IGossipMenuOption>();
     }
-
+    
     public override List<IGossipMenuOption> GetGossipMenuOptions(uint menuId)
     {
         using var model = Database();
-        var query = GetGossipOptionsQuery(model);
-        return query.ToList<IGossipMenuOption>();
-    }
-    private static IQueryable<MySqlGossipMenuOptionCata> GetGossipOptionsQuery(TrinityCataDatabase model)
-    {
-        IQueryable<MySqlGossipMenuOptionCata> query = (from t in model.SplitGossipMenuOptions
-            join actions in model.SplitGossipMenuOptionActions on t.MenuId equals actions.MenuId into adn
-            from subaddon in adn.DefaultIfEmpty()
-            join boxes in model.SplitGossipMenuOptionBoxes on t.MenuId equals boxes.MenuId into box
-            from subaddon2 in box.DefaultIfEmpty()
-            orderby t.MenuId
-            select t.SetAction(subaddon).SetBox(subaddon2));
-        return query;
+        return model.GossipMenuOptions.Where(option => option.MenuId == menuId).ToList<IGossipMenuOption>();
     }
 
     public override async Task<List<IBroadcastText>> GetBroadcastTextsAsync()

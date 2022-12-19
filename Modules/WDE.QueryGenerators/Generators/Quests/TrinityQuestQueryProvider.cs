@@ -18,7 +18,7 @@ public class TrinityQuestQueryProvider : IUpdateQueryProvider<QuestChainDiff>
     public TrinityQuestQueryProvider(IDatabaseProvider databaseProvider, ICurrentCoreVersion currentCoreVersion)
     {
         this.databaseProvider = databaseProvider;
-        hasBreadcrumb = currentCoreVersion.Current.Tag == "AzerothCore";
+        hasBreadcrumb = currentCoreVersion.Current.Tag != "AzerothCore";
     }
     
     public IQuery Update(QuestChainDiff q)
@@ -31,6 +31,10 @@ public class TrinityQuestQueryProvider : IUpdateQueryProvider<QuestChainDiff>
 
         var trans = Queries.BeginTransaction();
 
+        var template = databaseProvider.GetQuestTemplate(q.Id);
+        if (template != null)
+            trans.Comment(template.Name);
+        
         trans.Table(TableName)
             .InsertIgnore(new { ID = q.Id });
         
@@ -47,9 +51,6 @@ public class TrinityQuestQueryProvider : IUpdateQueryProvider<QuestChainDiff>
         if (hasBreadcrumb && q.BreadcrumbQuestId.HasValue)
             update = update.Set("BreadcrumbForQuestId", q.BreadcrumbQuestId.Value);
         
-        var template = databaseProvider.GetQuestTemplate(q.Id);
-        if (template != null)
-            trans.Comment(template.Name);
         update.Update();
 
         return trans.Close();

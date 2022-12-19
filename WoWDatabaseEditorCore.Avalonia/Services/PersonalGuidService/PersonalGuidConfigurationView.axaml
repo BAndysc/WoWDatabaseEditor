@@ -19,7 +19,7 @@
                 <SettingItem Header="Current creature guid">
                     <DockPanel>
                         <Button DockPanel.Dock="Right" Command="{CompiledBinding ResetCreatureCounter}">Reset</Button>
-                        <TextBlock FontWeight="Bold" Text="{CompiledBinding CurrentCreatureGuid, Mode=TwoWay}"></TextBlock>
+                        <TextBlock VerticalAlignment="Center" FontWeight="Bold" Text="{CompiledBinding CurrentCreatureGuid, Mode=TwoWay}"></TextBlock>
                     </DockPanel>
                 </SettingItem>
                 <SettingItem Header="Creature guids count">
@@ -38,7 +38,7 @@
                 <SettingItem Header="Current gameobject guid">
                     <DockPanel>
                         <Button DockPanel.Dock="Right" Command="{CompiledBinding ResetGameObjectCounter}">Reset</Button>
-                        <TextBlock FontWeight="Bold" Text="{CompiledBinding CurrentGameObjectGuid, Mode=TwoWay}"></TextBlock>
+                        <TextBlock VerticalAlignment="Center" FontWeight="Bold" Text="{CompiledBinding CurrentGameObjectGuid, Mode=TwoWay}"></TextBlock>
                     </DockPanel>
                 </SettingItem>
                 <SettingItem Header="gameobject guids count">

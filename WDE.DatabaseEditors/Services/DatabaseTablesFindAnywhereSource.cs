@@ -48,14 +48,24 @@ public class DatabaseTablesFindAnywhereSource : IFindAnywhereSource
         this.eventAggregator = eventAggregator;
         this.parameterFactory = parameterFactory;
     }
-    
-    public async Task Find(IFindAnywhereResultContext resultContext, IReadOnlyList<string> parameterNames, long parameterValue, CancellationToken cancellationToken)
+
+    public FindAnywhereSourceType SourceType => FindAnywhereSourceType.Tables | FindAnywhereSourceType.Spawns;
+
+    public async Task Find(IFindAnywhereResultContext resultContext, FindAnywhereSourceType searchType, IReadOnlyList<string> parameterNames, long parameterValue, CancellationToken cancellationToken)
     {
         foreach (var definition in definitionProvider.Definitions)
         {
             if (definition.IsOnlyConditionsTable)
                 continue;
 
+            if (!searchType.HasFlagFast(FindAnywhereSourceType.Spawns) &&
+                definition.TableName is "creature" or "gameobject")
+                continue;
+
+            if (!searchType.HasFlagFast(FindAnywhereSourceType.Tables) &&
+                definition.TableName is not "creature" and not "gameobject")
+                continue;
+            
             HashSet<DatabaseKey> added = new();
             foreach (var tableGroup in definition.Groups.SelectMany(group => group.Fields.Select(column => (group, column))).GroupBy(c => c.column.ForeignTable ?? definition.TableName))
             {

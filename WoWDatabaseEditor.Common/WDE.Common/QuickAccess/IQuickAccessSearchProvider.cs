@@ -25,5 +25,6 @@ public interface IQuickCommands
     ICommand CopyCommand { get; }
     ICommand SetSearchCommand { get; }
     ICommand NoCommand { get; }
+    ICommand CloseSearchCommand { get; }
     QuickAccessItem AndMoreItem { get; }
 }

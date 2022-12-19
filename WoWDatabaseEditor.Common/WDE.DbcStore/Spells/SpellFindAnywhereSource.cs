@@ -23,6 +23,8 @@ public class SpellFindAnywhereSource : IFindAnywhereSource
     private readonly Lazy<IMainThread> mainThreadLazy;
 
     public int Order => int.MaxValue;
+    
+    public FindAnywhereSourceType SourceType => FindAnywhereSourceType.Dbc;
 
     public SpellFindAnywhereSource(Lazy<ISpellService> spellService,
         Lazy<ISpellStore> spellStore,
@@ -35,7 +37,7 @@ public class SpellFindAnywhereSource : IFindAnywhereSource
         this.mainThreadLazy = mainThreadLazy;
     }
     
-    public async Task Find(IFindAnywhereResultContext resultContext, IReadOnlyList<string> parameterNames, long parameterValue, CancellationToken cancellationToken)
+    public async Task Find(IFindAnywhereResultContext resultContext, FindAnywhereSourceType searchType, IReadOnlyList<string> parameterNames, long parameterValue, CancellationToken cancellationToken)
     {
         var command = new AsyncAutoCommand(() => messageBoxService.Value.ShowDialog(new MessageBoxFactory<bool>()
             .SetTitle("DBC entry")

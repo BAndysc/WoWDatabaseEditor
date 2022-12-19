@@ -77,7 +77,7 @@ public partial class FindAnywhereResultsViewModel : ObservableBase, IFindAnywher
             SearchSummaryText = parameter[0].Replace("Parameter", "") + " = " + values[0];
         else
             SearchSummaryText = parameter[0].Replace("Parameter", "") + " IN (" + string.Join(", ", values) + ")";
-        await findAnywhereService.Find(this, parameter, values, cancellationTokenSource.Token);
+        await findAnywhereService.Find(this, FindAnywhereSourceType.All, parameter, values, cancellationTokenSource.Token);
         SearchingInProgress = false;
         if (Results.Count == 0)
             NoResultsFound = true;

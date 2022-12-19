@@ -12,7 +12,10 @@ public class GeneralSmartScriptSettingsProvider : IGeneralSmartScriptSettingsPro
 {
     public struct Data : ISettings
     {
+        [DefaultValue(SmartScriptViewType.Compact)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
         public SmartScriptViewType ViewType;
+
         public AddingElementBehaviour AddingBehaviour;
         
         [DefaultValue(1)]

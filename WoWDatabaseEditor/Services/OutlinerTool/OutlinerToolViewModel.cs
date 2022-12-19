@@ -1,8 +1,6 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -10,11 +8,9 @@ using Prism.Commands;
 using Prism.Events;
 using PropertyChanged.SourceGenerator;
 using WDE.Common;
-using WDE.Common.Database;
 using WDE.Common.Events;
 using WDE.Common.Managers;
 using WDE.Common.Outliner;
-using WDE.Common.Parameters;
 using WDE.Common.Services.FindAnywhere;
 using WDE.Common.Solution;
 using WDE.Common.Types;
@@ -34,6 +30,7 @@ public partial class OutlinerToolViewModel : ObservableBase, ITool
     private readonly Lazy<IDocumentManager> documentManager;
     private readonly Lazy<ISolutionItemRelatedRegistry> relatedRegistry;
     private readonly Lazy<IFindAnywhereService> findAnywhereService;
+    private readonly IOutlinerSettingsService settings;
     private readonly IEventAggregator eventAggregator;
     private ObservableCollection<OutlinerGroupViewModel> groups = new();
     public ObservableCollection<OutlinerGroupViewModel> Groups => groups;
@@ -50,11 +47,13 @@ public partial class OutlinerToolViewModel : ObservableBase, ITool
     public OutlinerToolViewModel(Lazy<IDocumentManager> documentManager,
         Lazy<ISolutionItemRelatedRegistry> relatedRegistry,
         Lazy<IFindAnywhereService> findAnywhereService,
+        IOutlinerSettingsService settings,
         IEventAggregator eventAggregator)
     {
         this.documentManager = documentManager;
         this.relatedRegistry = relatedRegistry;
         this.findAnywhereService = findAnywhereService;
+        this.settings = settings;
         this.eventAggregator = eventAggregator;
         groupsByType[RelatedSolutionItem.RelatedType.CreatureEntry] = new OutlinerGroupViewModel("Creatures");
         groupsByType[RelatedSolutionItem.RelatedType.GameobjectEntry] = new OutlinerGroupViewModel("Game Objects");
@@ -68,31 +67,49 @@ public partial class OutlinerToolViewModel : ObservableBase, ITool
 
         flatItems = new FlatTreeList<OutlinerGroupViewModel, OutlinerItemViewModel>(groups);
 
+        foreach (var val in Enum.GetValues<FindAnywhereSourceType>())
+        {
+            if (val != FindAnywhereSourceType.None && val != FindAnywhereSourceType.All)
+                Sources.Add(new OutlinerSourceViewModel(val, settings));
+        }
+        
+        On(() => Visibility, @is =>
+        {
+            if (@is)
+                AnalyseDocument(documentManager.Value.ActiveDocument);
+        });
+        
         AutoDispose(eventAggregator.GetEvent<AllModulesLoaded>().Subscribe(Bind, true));
+    }
+
+    private void AnalyseDocument(IDocument? document)
+    {
+        currentSubscription?.Dispose();
+        currentSubscription = null;
+        ClearGroups();
+        ClearReferences();
+
+        if (document is ISolutionItemDocument solutionDocument)
+        {
+            if (document is IOutlinerSourceDocument outlinerSource)
+                currentSubscription = outlinerSource.OutlinerModel.SubscribeAction(Update);
+
+            if (currentCancellationTokenSource != null)
+            {
+                currentCancellationTokenSource.Cancel();
+                currentCancellationTokenSource = null;
+            }
+                
+            RefreshReferencedBy(solutionDocument).ListenErrors();
+        }
     }
     
     private void Bind()
     {
         documentManager.Value.ToObservable(d => d.ActiveDocument).SubscribeAction(active =>
         {
-            currentSubscription?.Dispose();
-            currentSubscription = null;
-            ClearGroups();
-            ClearReferences();
-
-            if (active is ISolutionItemDocument document)
-            {
-                if (document is IOutlinerSourceDocument outlinerSource)
-                    currentSubscription = outlinerSource.OutlinerModel.SubscribeAction(Update);
-
-                if (currentCancellationTokenSource != null)
-                {
-                    currentCancellationTokenSource.Cancel();
-                    currentCancellationTokenSource = null;
-                }
-                
-                RefreshReferencedBy(document).ListenErrors();
-            }
+            if (visibility)
+                AnalyseDocument(active);
         });
     }
 
@@ -119,7 +136,7 @@ public partial class OutlinerToolViewModel : ObservableBase, ITool
         var token = new CancellationTokenSource();
         currentCancellationTokenSource = token;
         referencedBy.IsRefreshing = true;
-        await findAnywhereService.Value.Find(new FindRelatedContext(this, token), new[] { type }, new[] { related.Value.Entry }, token.Token);
+        await findAnywhereService.Value.Find(new FindRelatedContext(this, token), ~settings.SkipSources, new[] { type }, new[] { related.Value.Entry }, token.Token);
         if (token == currentCancellationTokenSource)
             currentCancellationTokenSource = null;
         referencedBy.IsRefreshing = false;
@@ -210,81 +227,6 @@ public partial class OutlinerToolViewModel : ObservableBase, ITool
         else
             eventAggregator.GetEvent<EventRequestOpenItem>().Publish(viewModel.SolutionItem!);
     }
-}
 
-public partial class OutlinerGroupViewModel : IParentType
-{
-    [Notify] private bool isExpanded = true;
-    private string name;
-    public string Name { get; private set; }
-
-    private bool isRefreshing;
-    public bool IsRefreshing
-    {
-        get => isRefreshing;
-        set
-        {
-            if (isRefreshing == value)
-                return;
-            isRefreshing = value;
-            if (value)
-                Name = name + " (refreshing...)";
-            else
-                Name = name;
-        }
-    }
-    
-    public ObservableCollection<OutlinerItemViewModel> Items { get; } = new();
-
-    public OutlinerGroupViewModel(string name)
-    {
-        this.name = name;
-        Name = name;
-        Items.CollectionChanged += ItemsOnCollectionChanged;
-    }
-
-    private void ItemsOnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
-    {
-        ChildrenChanged?.Invoke(this, e);
-    }
-
-    public void Clear()
-    {
-        Items.RemoveAll();
-    }
-
-    public void Add(OutlinerItemViewModel item)
-    {
-        Items.Add(item);
-    }
-
-    public uint NestLevel { get; set; }
-    public bool IsVisible { get; set; } = true;
-    public IParentType? Parent { get; set; }
-    public IReadOnlyList<IParentType> NestedParents => Array.Empty<IParentType>();
-    public IReadOnlyList<IChildType> Children => Items;
-
-    public event NotifyCollectionChangedEventHandler? ChildrenChanged;
-    public event NotifyCollectionChangedEventHandler? NestedParentsChanged;
-}
-
-public partial class OutlinerItemViewModel : IChildType
-{
-    public OutlinerItemViewModel(ISolutionItem? solutionItem, long? entry, string? name, ImageUri icon, ICommand? customCommand)
-    {
-        Name = name;
-        Icon = icon;
-        Entry = entry?.ToString();
-        CustomCommand = customCommand;
-        SolutionItem = solutionItem;
-    }
-
-    public ISolutionItem? SolutionItem { get; }
-    public string? Name { get; }
-    public ImageUri Icon { get; }
-    public string? Entry { get; }
-    public ICommand? CustomCommand { get; }
-    public uint NestLevel { get; set; }
-    public bool IsVisible { get; set; } = true;
-    public IParentType? Parent { get; set; }
+    public ObservableCollection<OutlinerSourceViewModel> Sources { get; } = new();
 }

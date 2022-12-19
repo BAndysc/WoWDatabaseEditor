@@ -65,7 +65,9 @@ public partial class VirtualizedSmartScriptPanel
             e.CachedHeight = size.Height;    
         }
 
-        double actionsHeight = compactView ? 0 : AddActionHeight;
+        bool useCompactView = compactView && e != script!.Events[^1];
+        
+        double actionsHeight = useCompactView ? 0 : AddActionHeight;
         foreach (var action in e.Actions)
         {
             if (action.Id == SmartConstants.ActionComment && HideComments)
@@ -75,12 +77,20 @@ public partial class VirtualizedSmartScriptPanel
             actionsHeight += action.CachedHeight.Value + ActionSpacing;
         }
 
-        double conditionsHeight = compactView ? 0 : AddConditionHeight;
-        foreach (var condition in e.Conditions)
+        double conditionsHeight = useCompactView ? 0 : AddConditionHeight;
+        if (hideConditions)
         {
-            if (!condition.CachedHeight.HasValue)
-                condition.CachedHeight = MeasureCondition(condition, (inGroup ? context.grupedConditionRect : context.conditionRect).Width).Height;
-            conditionsHeight += condition.CachedHeight.Value + ConditionSpacing;
+            if (e.Conditions.Count > 0)
+                conditionsHeight += AddConditionHeight;
+        }
+        else
+        {
+            foreach (var condition in e.Conditions)
+            {
+                if (!condition.CachedHeight.HasValue)
+                    condition.CachedHeight = MeasureCondition(condition, (inGroup ? context.grupedConditionRect : context.conditionRect).Width).Height;
+                conditionsHeight += condition.CachedHeight.Value + ConditionSpacing;
+            }   
         }
 
         totalHeight = Math.Max(actionsHeight, e.CachedHeight.Value + conditionsHeight);

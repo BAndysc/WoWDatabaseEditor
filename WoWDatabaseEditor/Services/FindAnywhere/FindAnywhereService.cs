@@ -17,7 +17,7 @@ public class FindAnywhereService : IFindAnywhereService
     private readonly Func<IFindAnywhereResultsViewModel> resultsCreator;
     private readonly Lazy<IDocumentManager> documentManager;
     private readonly IList<IFindAnywhereSource> sources;
-    private readonly LRUCache<(string, long), ToListFindAnywhereResultContext> cache = new(30);
+    private readonly LRUCache<(string, long, FindAnywhereSourceType), ToListFindAnywhereResultContext> cache = new(30);
 
     public FindAnywhereService(Func<IFindAnywhereResultsViewModel> resultsCreator,
         Lazy<IDocumentManager> documentManager,
@@ -37,12 +37,12 @@ public class FindAnywhereService : IFindAnywhereService
         documentManager.Value.OpenDocument(results);
     }
 
-    public async Task Find(IFindAnywhereResultContext resultContext, IReadOnlyList<string> parameterName, IReadOnlyList<long> parameterValue, CancellationToken cancellationToken)
+    public async Task Find(IFindAnywhereResultContext resultContext, FindAnywhereSourceType sourceTypes, IReadOnlyList<string> parameterName, IReadOnlyList<long> parameterValue, CancellationToken cancellationToken)
     {
         // cacheable version
         if (parameterName.Count == 1 && parameterValue.Count == 1)
         {
-            if (cache.TryGetValue((parameterName[0], parameterValue[0]), out var results) && results is {})
+            if (cache.TryGetValue((parameterName[0], parameterValue[0], sourceTypes), out var results) && results is {})
             {
                 foreach (var result in results.Results)
                     resultContext.AddResult(result);
@@ -56,10 +56,13 @@ public class FindAnywhereService : IFindAnywhereService
                     if (cancellationToken.IsCancellationRequested)
                         return;
             
+                    if ((source.SourceType & sourceTypes) == 0)
+                        continue;
+                    
                     foreach (var val in parameterValue)
-                        await source.Find(multiplexResults, parameterName, val, cancellationToken);
+                        await source.Find(multiplexResults, sourceTypes, parameterName, val, cancellationToken);
                 }
-                cache[(parameterName[0], parameterValue[0])] = listResults;
+                cache[(parameterName[0], parameterValue[0], sourceTypes)] = listResults;
             }
         }
         else
@@ -68,9 +71,12 @@ public class FindAnywhereService : IFindAnywhereService
             {
                 if (cancellationToken.IsCancellationRequested)
                     return;
+
+                if ((source.SourceType & sourceTypes) == 0)
+                    continue;
             
                 foreach (var val in parameterValue)
-                    await source.Find(resultContext, parameterName, val, cancellationToken);
+                    await source.Find(resultContext, sourceTypes, parameterName, val, cancellationToken);
             }   
         }
     }

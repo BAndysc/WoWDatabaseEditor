@@ -70,6 +70,7 @@
                                                       Script="{CompiledBinding Script}" 
                                                       Problems="{CompiledBinding ProblematicLines}" 
                                                       HideComments="{CompiledBinding HideComments}"
+                                                      HideConditions="{CompiledBinding HideConditions}"
                                                       DockPanel.Dock="Top">
                     <userControls:VirtualizedSmartScriptPanel.ContextMenu>
                         <ContextMenu>
@@ -188,7 +189,10 @@
                     </Button.ContextMenu>
                 </Button>
             </DockPanel>
-            <userControls:SmartScriptOverlay FindText="{CompiledBinding SearchText}" Script="{CompiledBinding Script}" />
+            <userControls:SmartScriptOverlay 
+                HideConditions="{CompiledBinding HideConditions}"
+                FindText="{CompiledBinding SearchText}"
+                Script="{CompiledBinding Script}" />
         </Panel>
     </userControls:InverseRenderTransformPanel>
 </UserControl>

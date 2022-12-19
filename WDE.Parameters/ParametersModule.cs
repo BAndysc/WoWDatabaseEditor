@@ -7,6 +7,7 @@ using WDE.Module.Attributes;
 
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 [assembly: InternalsVisibleTo("WDE.Parameters.Test")]
+[assembly: InternalsVisibleTo("WDE.CommonViews.Avalonia")]
 namespace WDE.Parameters
 {
     [AutoRegister]
