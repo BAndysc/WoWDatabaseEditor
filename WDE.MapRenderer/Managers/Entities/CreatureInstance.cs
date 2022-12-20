@@ -2,6 +2,7 @@ using System.Collections;
 using TheAvaloniaOpenGL.Resources;
 using TheEngine.Components;
 using TheEngine.ECS;
+using TheEngine.Entities;
 using TheMaths;
 using WDE.Common.Database;
 using WDE.MapRenderer.Utils;
@@ -16,6 +17,7 @@ public class CreatureInstance : WorldObjectInstance
     public readonly uint CreatureDisplayId;
     private List<INativeBuffer> bonesBuffers = new();
     private M2AnimationComponentData masterAnimation = null!;
+    private MaterialInstanceRenderData materialInstanceRenderData = null!;
 
     public CreatureInstance(IGameContext gameContext,
         ICreatureTemplate creatureTemplate,
@@ -68,6 +70,10 @@ public class CreatureInstance : WorldObjectInstance
     }
 
     public M2? Model { get; private set; }
+
+    public MaterialInstanceRenderData MaterialRenderData => materialInstanceRenderData;
+    
+    public Material BaseMaterial { get; private set; } = null!;
 
     public MdxManager.MdxInstance Mount
     {
@@ -134,7 +140,7 @@ public class CreatureInstance : WorldObjectInstance
 
         Model = instance.model;
 
-        objectEntity = entityManager.CreateEntity(archetypes.WorldObjectArchetype);
+        objectEntity = entityManager.CreateEntity(archetypes.AnimatedWorldObjectArchetype);
         objectEntity.SetTRS(entityManager, Vector3.Zero, Quaternion.Identity, instance.scale * creatureTemplate.Scale * Vector3.One);
         objectEntity.SetDirtyPosition(entityManager);
 
@@ -150,8 +156,9 @@ public class CreatureInstance : WorldObjectInstance
         entityManager.SetManagedComponent(objectEntity, masterAnimation);
 
         // optimization here, we can share the render data, because we know all the materials will be the same shader
-        MaterialInstanceRenderData materialInstanceRenderData = new MaterialInstanceRenderData();
-        materialInstanceRenderData.SetBuffer(instance.materials[0].material, "boneMatrices", boneMatricesBuffer);
+        materialInstanceRenderData = new MaterialInstanceRenderData();
+        BaseMaterial = instance.materials[0].material;
+        materialInstanceRenderData.SetBuffer(BaseMaterial, "boneMatrices", boneMatricesBuffer);
 
         if (instance.attachments != null)
         {
@@ -268,5 +275,13 @@ public class CreatureInstance : WorldObjectInstance
         
         entityManager.DestroyEntity(objectEntity);
         objectEntity = Entity.Empty;
+    }
+
+    public IEnumerator LoadMount(uint mountDisplayId)
+    {
+        TaskCompletionSource<MdxManager.MdxInstance?> mountModelTask = new();
+        yield return gameContext.MdxManager.LoadCreatureModel(mountDisplayId, mountModelTask);
+        if (mountModelTask.Task.Result is { } mountModel)
+            Mount = mountModel;
     }
 }

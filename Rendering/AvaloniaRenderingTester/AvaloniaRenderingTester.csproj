@@ -12,7 +12,7 @@
     </Target>
     
     <ItemGroup>
-        <PackageReference Include="JetBrains.Profiler.Api" Version="1.2.0-preview2" />
+        <PackageReference Include="JetBrains.Profiler.Api" Version="1.2.0" />
     </ItemGroup>
 
     <Import Project="..\lib3d.props" />

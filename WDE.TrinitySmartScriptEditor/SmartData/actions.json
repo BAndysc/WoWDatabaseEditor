@@ -3892,5 +3892,18 @@
         "description": "    Repeat",
         "name_readable": "Repeat current action list",
         "implicit_source": "SMART_TARGET_SELF"
+    },
+    {
+        "id": 9993,
+        "name": "SMART_ACTION_META_LINK",
+        "description": "    Link to event {pram1}",
+        "name_readable": "Link to event",
+        "parameters": [
+            {
+                "name": "Link id",
+                "type": "Parameter"
+            }
+        ],
+        "implicit_source": "SMART_TARGET_NONE"
     }
 ]

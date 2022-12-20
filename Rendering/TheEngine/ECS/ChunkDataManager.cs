@@ -72,8 +72,10 @@ namespace TheEngine.ECS
         public ManagedComponentDataAccess<T>? OptionalManagedDataAccess<T>() where T : IManagedComponentData
         {
             int i = 0;
-            foreach (var c in Archetype.ManagedComponents)
+            // for to prevent allocations
+            for (var index = 0; index < Archetype.ManagedComponents.Count; index++)
             {
+                var c = Archetype.ManagedComponents[index];
                 if (c.DataType == typeof(T))
                     return new ManagedComponentDataAccess<T>(managedComponentData[i], sparseReverseEntityMapping);
                 i++;

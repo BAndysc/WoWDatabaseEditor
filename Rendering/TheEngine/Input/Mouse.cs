@@ -33,12 +33,23 @@ namespace TheEngine.Input
                 return new Vector2(engine.WindowHost.WindowWidth * zeroOne.X, engine.WindowHost.WindowHeight * zeroOne.Y);
             }
         }
+        public Vector2 LastClickScreenPosition
+        {
+            get
+            {
+                var zeroOne = new Vector2(LastClickNormalizedPosition.X, 1 - LastClickNormalizedPosition.Y);
+                return new Vector2(engine.WindowHost.WindowWidth * zeroOne.X, engine.WindowHost.WindowHeight * zeroOne.Y);
+            }
+        }
+        
 
+        private Vector2 lastClickPosition;
         private float resetClickTimeCounter = 0;
         
         public uint ClickCount { get; private set; }
 
         public bool HasJustDoubleClicked => ClickCount == 2;
+        public Vector2 LastClickNormalizedPosition { get; private set; }
 
         internal Mouse(Engine engine)
         {
@@ -72,16 +83,23 @@ namespace TheEngine.Input
             {
                 leftDown = true;
                 leftJustDown = true;
-                ClickCount++;
-                resetClickTimeCounter = 500;
             }
 
             if ((button & MouseButton.Right) != 0)
             {
                 rightDown = true;
                 rightJustDown = true;
+            }
+
+            if (leftJustDown || rightJustDown)
+            {
+                if ((lastClickPosition - ScreenPoint).LengthSquared() > 10 * 10)
+                    ClickCount = 0;
+                
                 ClickCount++;
                 resetClickTimeCounter = 500;
+                lastClickPosition = ScreenPoint;
+                LastClickNormalizedPosition = NormalizedPosition;
             }
         }
 

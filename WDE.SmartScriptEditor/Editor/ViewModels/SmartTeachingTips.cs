@@ -1,6 +1,10 @@
+using System;
 using System.Collections.Specialized;
+using System.Reactive.Linq;
 using Prism.Mvvm;
 using WDE.Common.Services;
+using WDE.MVVM;
+using WDE.MVVM.Observable;
 using WDE.SmartScriptEditor.Models;
 
 namespace WDE.SmartScriptEditor.Editor.ViewModels
@@ -11,6 +15,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         private const string TipMultipleActions = "SmartScriptEditor.MultipleActions";
         private const string TipYouCanNameStoredTargets = "SmartScriptEditor.YouCanNameStoredTargets";
         private const string TipControlToCopy = "SmartScriptEditor.ControlToCopy";
+        private const string TipSaveDefaultScale = "SmartScriptEditor.SaveDefaultScale";
         private readonly ITeachingTipService teachingTipService;
         private readonly SmartScriptEditorViewModel vm;
         private readonly SmartScript script;
@@ -19,6 +24,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         public bool WaitActionTipOpened { get; set; }
         public bool YouCanNameStoredTargetsTipOpened { get; set; }
         public bool ControlToCopyOpened { get; set; }
+        public bool SaveDefaultScaleOpened { get; set; }
         
         public SmartTeachingTips(ITeachingTipService teachingTipService, SmartScriptEditorViewModel vm, SmartScript script)
         {
@@ -122,9 +128,13 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
             return true;
         }
-
+        
+        private IDisposable? defaultScaleDisposable;
+        
         public void Dispose()
         {
+            defaultScaleDisposable?.Dispose();
+            defaultScaleDisposable = null;
             vm.OnPaste -= OnPaste;
             script.AllActions.CollectionChanged -= AllActionsOnCollectionChanged;
         }
@@ -136,6 +146,22 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             {
                 vm.OnPaste += OnPaste;
                 script.AllActions.CollectionChanged += AllActionsOnCollectionChanged;
+            }
+
+            if (!teachingTipService.IsTipShown(TipSaveDefaultScale))
+            {
+                defaultScaleDisposable = vm.ToObservable(x => x.Scale)
+                    .Skip(1)
+                    .SubscribeOnce(_ => ShowSaveScale());
+            }
+        }
+
+        private void ShowSaveScale()
+        {
+            if (teachingTipService.ShowTip(TipSaveDefaultScale))
+            {
+                SaveDefaultScaleOpened = true;
+                RaisePropertyChanged(nameof(SaveDefaultScaleOpened));   
             }
         }
 

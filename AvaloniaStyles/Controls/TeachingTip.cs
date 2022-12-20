@@ -26,6 +26,8 @@ namespace AvaloniaStyles.Controls
         public static readonly DirectProperty<TeachingTip, bool> IsOpenedProperty = 
             AvaloniaProperty.RegisterDirect<TeachingTip, bool>("IsOpened", o => o.IsOpened, (o, v) => o.IsOpened = v, defaultBindingMode: BindingMode.TwoWay);
 
+        public static readonly StyledProperty<bool> IsDontWorryHintVisibleProperty = AvaloniaProperty.Register<TeachingTip, bool>("IsDontWorryHintVisible", true);
+
         public string Header
         {
             get => GetValue(HeaderProperty);
@@ -43,6 +45,12 @@ namespace AvaloniaStyles.Controls
         }
         
         public ICommand CloseCommand { get; }
+
+        public bool IsDontWorryHintVisible
+        {
+            get => (bool)GetValue(IsDontWorryHintVisibleProperty);
+            set => SetValue(IsDontWorryHintVisibleProperty, value);
+        }
 
         public TeachingTip()
         {

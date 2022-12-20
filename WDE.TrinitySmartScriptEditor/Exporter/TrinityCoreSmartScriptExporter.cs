@@ -6,9 +6,11 @@ using WDE.Common.CoreVersion;
 using WDE.Common.Database;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Solution;
+using WDE.Common.Utils;
 using WDE.Module.Attributes;
 using WDE.SmartScriptEditor;
 using WDE.SmartScriptEditor.Data;
+using WDE.SmartScriptEditor.Editor;
 using WDE.SmartScriptEditor.Editor.UserControls;
 using WDE.SmartScriptEditor.Exporter;
 using WDE.SmartScriptEditor.Models;
@@ -26,6 +28,8 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
         private readonly ISolutionItemNameRegistry nameRegistry;
         private readonly IDatabaseProvider databaseProvider;
         private readonly IMessageBoxService messageBoxService;
+        private readonly ISmartScriptImporter importer;
+        private readonly IEditorFeatures editorFeatures;
         private readonly IConditionQueryGenerator conditionQueryGenerator;
 
         public TrinityCoreSmartScriptExporter(ISmartFactory smartFactory,
@@ -34,6 +38,8 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
             ISolutionItemNameRegistry nameRegistry,
             IDatabaseProvider databaseProvider,
             IMessageBoxService messageBoxService,
+            ISmartScriptImporter importer,
+            IEditorFeatures editorFeatures,
             IConditionQueryGenerator conditionQueryGenerator)
         {
             this.smartFactory = smartFactory;
@@ -42,9 +48,48 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
             this.nameRegistry = nameRegistry;
             this.databaseProvider = databaseProvider;
             this.messageBoxService = messageBoxService;
+            this.importer = importer;
+            this.editorFeatures = editorFeatures;
             this.conditionQueryGenerator = conditionQueryGenerator;
         }
-        
+
+        public IReadOnlyList<ICondition> ToDatabaseCompatibleConditions(SmartScript script, SmartEvent @event)
+        {
+            return ToDatabaseCompatibleConditions(script, @event, 0);
+        }
+
+        public IReadOnlyList<IConditionLine> ToDatabaseCompatibleConditions(SmartScript script, SmartEvent e, int id)
+        {
+            var lines = new List<AbstractConditionLine>();
+            var elseGroup = 0;
+
+            for (var index = 0; index < e.Conditions.Count; index++)
+            {
+                SmartCondition c = e.Conditions[index];
+                if (c.Id == SmartConstants.ConditionOr)
+                {
+                    elseGroup++;
+                    continue;
+                }
+                lines.Add(new AbstractConditionLine()
+                {
+                    SourceType = SmartConstants.ConditionSourceSmartScript,
+                    SourceGroup = id + 1,
+                    SourceEntry = script.EntryOrGuid,
+                    SourceId = (int)script.SourceType,
+                    ElseGroup = elseGroup,
+                    ConditionType = c.Id,
+                    ConditionTarget = (byte)c.ConditionTarget.Value,
+                    ConditionValue1 = (int)c.GetParameter(0).Value,
+                    ConditionValue2 = (int)c.GetParameter(1).Value,
+                    ConditionValue3 = (int)c.GetParameter(2).Value,
+                    NegativeCondition = (int)c.Inverted.Value,
+                    Comment = c.Readable.RemoveTags()
+                });
+            }
+            return lines.ToArray();
+        }
+
         public (ISmartScriptLine[], IConditionLine[]) ToDatabaseCompatibleSmartScript(SmartScript script)
         {
             if (script.Events.Count == 0)
@@ -131,7 +176,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                 {
                     if (eventForConditions != null)
                     {
-                        var serializedConditions = eventForConditions.ToConditionLines(SmartConstants.ConditionSourceSmartScript, script.EntryOrGuid, script.SourceType, eventId);
+                        var serializedConditions = ToDatabaseCompatibleConditions(script, eventForConditions, eventId);
                         if (serializedConditions != null)
                             conditions.AddRange(serializedConditions);
                     }
@@ -277,7 +322,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                                     
                                     AdjustCoreCompatibleAction(actualAction);
                         
-                                    after.Parent = new SmartScript(new SmartScriptSolutionItem(currentInlineActionListId.Value, SmartScriptType.TimedActionList), smartFactory, smartDataManager, messageBoxService);
+                                    after.Parent = new SmartScript(new SmartScriptSolutionItem(currentInlineActionListId.Value, SmartScriptType.TimedActionList), smartFactory, smartDataManager, messageBoxService, editorFeatures, importer);
                                     after.AddAction(actualAction);
                         
                                     var serialized = after.ToSmartScriptLines(currentInlineActionListId.Value, SmartScriptType.TimedActionList, timedEventId++, false, 0);

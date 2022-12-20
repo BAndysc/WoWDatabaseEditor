@@ -58,4 +58,16 @@ public abstract class LightParam<T>
         for (int j = 0; j < Count; j++)
             Values[j] = reader(dbcIterator, i++);
     }
+
+    protected LightParam()
+    {
+        Count = 0;
+    }
+    
+    protected LightParam(T[] values, Time[] times)
+    {
+        Count = (uint)values.Length;
+        Values = values;
+        Times = times;
+    }
 }

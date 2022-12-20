@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using AsyncAwaitBestPractices.MVVM;
 using WDE.Module.Attributes;
 
 namespace WDE.Common.Windows
@@ -13,6 +14,13 @@ namespace WDE.Common.Windows
         bool OpenOnStart { get; }
         bool IsSelected { get; set; }
         bool CanClose() => true;
+    }
+
+    [NonUniqueProvider]
+    public interface ISavableTool : ITool
+    {
+        bool IsModified { get; }
+        IAsyncCommand Save { get; }
     }
 
     public interface IFocusableTool : ITool

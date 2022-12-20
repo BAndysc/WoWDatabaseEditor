@@ -12,21 +12,29 @@ namespace WDE.MapRenderer.Managers
     {
         private readonly ITextureManager textureManager;
         private readonly IGameFiles gameFiles;
-        private Dictionary<string, TextureHandle> texts = new();
+        private readonly IGameContext gameContext;
+        private Dictionary<FileId, TextureHandle> texts = new();
 
         public TextureHandle EmptyTexture { get; }
         
-        public WoWTextureManager(ITextureManager textureManager, IGameFiles gameFiles)
+        public WoWTextureManager(ITextureManager textureManager, IGameFiles gameFiles, IGameContext gameContext)
         {
             this.textureManager = textureManager;
             this.gameFiles = gameFiles;
+            this.gameContext = gameContext;
             EmptyTexture = textureManager.CreateTexture(
                     new[] { new Rgba32[] { new(255, 0, 0, 255) } }, 1, 1, false);
         }
 
-        public IEnumerator GetTexture(string texturePath, TaskCompletionSource<TextureHandle> result)
+        public IEnumerator GetTexture(FileId? texturePath, TaskCompletionSource<TextureHandle> result)
         {
-            if (texts.TryGetValue(texturePath, out var t))
+            if (!texturePath.HasValue)
+            {
+                result.SetResult(EmptyTexture);
+                yield break;
+            }
+            
+            if (texts.TryGetValue(texturePath.Value, out var t))
             {
                 result.SetResult(t);
                 yield break;
@@ -34,25 +42,32 @@ namespace WDE.MapRenderer.Managers
 
             var dummy = textureManager.CreateDummyHandle();
 
-            texts[texturePath] = dummy;
+            texts[texturePath.Value] = dummy;
+            
+            gameContext.StartCoroutine(InternalLoadTexture(dummy, texturePath.Value));
+            
+            result.SetResult(dummy);
+        }
 
+        private IEnumerator InternalLoadTexture(TextureHandle handle, FileId texturePath)
+        {
             var bytes = gameFiles.ReadFile(texturePath);
             yield return bytes;
             if (bytes.Result == null)
-            {
-                result.SetResult(textureManager.CreateTexture(null, 1, 1, true));
                 yield break;
-            }
 
-            var blp = new BLP(bytes.Result.AsArray(), 0, bytes.Result.Length, maxSize);
+            BLP blp = null!;
+            yield return Task.Run(() =>
+            {
+                blp = new BLP(bytes.Result.AsArray(), 0, bytes.Result.Length, maxSize);
+            });
             bytes.Result.Dispose();
         
-            Debug.Assert(texts[texturePath] == dummy);
+            Debug.Assert(texts[texturePath] == handle);
             var generateMips = blp.Header.Mips == BLP.MipmapLevelAndFlagType.MipsNone;
             var actualHandle = textureManager.CreateTexture(blp.Data, (int)blp.RealWidth, (int)blp.RealHeight, generateMips);
             textureManager.SetFiltering(texts[texturePath], FilteringMode.Linear);
-            textureManager.ReplaceHandles(dummy, actualHandle);
-            result.SetResult(dummy);
+            textureManager.ReplaceHandles(handle, actualHandle);
         }
 
         public void Dispose()

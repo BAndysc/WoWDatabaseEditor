@@ -6,11 +6,15 @@ using System.Windows.Input;
 using FuzzySharp;
 using FuzzySharp.PreProcess;
 using Prism.Commands;
+using Prism.Events;
+using WDE.Common;
+using WDE.Common.Events;
 using WDE.Common.Managers;
 using WDE.Common.Parameters;
 using WDE.Common.QuickAccess;
 using WDE.Common.Services;
 using WDE.Common.Types;
+using WDE.Common.Utils;
 using WDE.Module.Attributes;
 using WDE.Parameters.Models;
 
@@ -56,15 +60,32 @@ public class ParametersSearch : IQuickAccessSearchProvider
 {
     private readonly IParameterFactory parameterFactory;
     private readonly IQuickAccessRegisteredParameters parameters;
+    private readonly IParametersSearchSettings settings;
     private readonly IQuickCommands quickCommands;
 
-    internal ParametersSearch(IParameterFactory parameterFactory, 
+    private AsyncAutoCommand<(INumberSolutionItemProvider, long)?> openItemCommand;
+
+    internal ParametersSearch(IEventAggregator eventAggregator,
+        IParameterFactory parameterFactory, 
         IQuickAccessRegisteredParameters parameters,
+        IParametersSearchSettings settings,
         IQuickCommands quickCommands)
     {
         this.parameterFactory = parameterFactory;
         this.parameters = parameters;
+        this.settings = settings;
         this.quickCommands = quickCommands;
+
+        openItemCommand = new AsyncAutoCommand<(INumberSolutionItemProvider, long)?>(async tuple =>
+        {
+            var (provider, entry) = tuple!.Value;
+            var solutionItem = await provider.CreateSolutionItem(entry);
+            if (solutionItem != null)
+            {       
+                eventAggregator.GetEvent<EventRequestOpenItem>().Publish(solutionItem);
+            }
+            quickCommands.CloseSearchCommand.Execute(null);
+        });
     }
     
     public async Task Provide(string text, Action<QuickAccessItem> produce, CancellationToken cancellationToken)
@@ -103,7 +124,16 @@ public class ParametersSearch : IQuickAccessSearchProvider
                 
                 if (nameMatches || itemScore > 70)
                 {
-                    var quickItem = new QuickAccessItem(new ImageUri("Icons/icon_copy.png"), fullName,  item.Key.ToString(), model.name, quickCommands.CopyCommand, item.Key, (byte)itemScore);
+                    var provider = settings.GetProviderForParameter(model.key);
+                    QuickAccessItem quickItem;
+                    if (provider != null)
+                    {
+                        quickItem = new QuickAccessItem(provider.GetImage(), fullName,  item.Key.ToString(), provider.GetName(), openItemCommand, (provider, item.Key), (byte)itemScore);
+                    }
+                    else
+                    {
+                        quickItem = new QuickAccessItem(new ImageUri("Icons/icon_copy.png"), fullName,  item.Key.ToString(), model.name, quickCommands.CopyCommand, item.Key, (byte)itemScore);
+                    }
                     results.Add((-Math.Max(nameScore, itemScore), item.Key, quickItem));
                     total++;
 

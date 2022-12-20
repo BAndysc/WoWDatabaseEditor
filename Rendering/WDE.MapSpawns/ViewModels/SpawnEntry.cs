@@ -34,12 +34,18 @@ public partial class SpawnEntry : IParentType
     public override string ToString() => Name;
 
     public event PropertyChangedEventHandler? PropertyChanged;
-    public event NotifyCollectionChangedEventHandler? CollectionChanged
+    public event NotifyCollectionChangedEventHandler? ChildrenChanged
     {
         add => Spawns.CollectionChanged += value;
         remove => Spawns.CollectionChanged -= value;
     }
-    
+
+    public event NotifyCollectionChangedEventHandler? NestedParentsChanged;
+
+    public IReadOnlyList<IParentType> NestedParents { get; } = new List<IParentType>();
     public IReadOnlyList<IChildType> Children => Spawns;
     public ObservableCollection<SpawnInstance> Spawns { get; } = new();
+    public uint NestLevel { get; set; }
+    public bool IsVisible { get; set; }
+    public IParentType? Parent { get; set; }
 }

@@ -12,6 +12,7 @@ using WDE.Common.Parameters;
 using WDE.Common.Services;
 using WDE.Common.Tasks;
 using WDE.Common.Utils;
+using WDE.QueryGenerators.Base;
 
 namespace WDE.MySqlDatabaseCommon.Database.World
 {
@@ -51,6 +52,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public CachedDatabaseProvider(IAsyncDatabaseProvider nonCachedDatabase,
             ITaskRunner taskRunner, IStatusBar statusBar, IEventAggregator eventAggregator,
             ILoadingEventAggregator loadingEventAggregator,
+            IQueryGenerator<ICreatureText> creatureTextInsertProvider,
             IParameterFactory parameterFactory)
         {
             this.nonCachedDatabase = nonCachedDatabase;
@@ -69,8 +71,10 @@ namespace WDE.MySqlDatabaseCommon.Database.World
                     Refresh(RefreshGossipMenu);
                 else if (tableName == "npc_text")
                     Refresh(RefreshNpcTexts);
-                else if (tableName == "creature_text")
+                else if (tableName == creatureTextInsertProvider.TableName)
                     Refresh(RefreshCreatureTexts);
+                else if (tableName == "quest_template" || tableName == "quest_template_addon")
+                    Refresh(RefreshQuestTemplates);
             }, true);
         }
 
@@ -96,6 +100,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             return typeof(ICreatureText);
         }
         
+
         private async Task<Type> RefreshGossipMenu()
         {
             gossipMenusCache = await nonCachedDatabase.GetGossipMenusAsync().ConfigureAwait(false);
@@ -111,6 +116,15 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             return typeof(ICreatureTemplate);
         }
 
+        private async Task<Type> RefreshQuestTemplates()
+        {
+            var templates = await nonCachedDatabase.GetQuestTemplatesAsync().ConfigureAwait(false);
+            Dictionary<uint, IQuestTemplate> tempDict = templates.ToDictionary(t => t.Entry);
+            questTemplateCache = templates;
+            questTemplateByEntry = tempDict;
+            return typeof(IQuestTemplate);
+        }
+        
         public Task TryConnect()
         {
             nonCachedDatabase.GetCreatureTemplate(0); // if there is some connection problem, it should throw
@@ -127,7 +141,10 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             if (creatureTemplateByEntry.TryGetValue(entry, out var template))
                 return template;
 
-            return nonCachedDatabase.GetCreatureTemplate(entry);
+            template = nonCachedDatabase.GetCreatureTemplate(entry);
+            if (template != null)
+                creatureTemplateByEntry[entry] = template;
+            return template;
         }
 
         public IGameObjectTemplate? GetGameObjectTemplate(uint entry)
@@ -138,7 +155,10 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             if (gameObjectTemplateByEntry.TryGetValue(entry, out var template))
                 return template;
 
-            return nonCachedDatabase.GetGameObjectTemplate(entry);
+            template = nonCachedDatabase.GetGameObjectTemplate(entry);
+            if (template != null)
+                gameObjectTemplateByEntry[entry] = template;
+            return template;
         }
 
         public IQuestTemplate? GetQuestTemplate(uint entry)
@@ -197,6 +217,12 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
             return nonCachedDatabase.GetQuestTemplates();
         }
+
+        public async Task<IList<IQuestObjective>> GetQuestObjectives(uint questId) => await nonCachedDatabase.GetQuestObjectives(questId);
+
+        public async Task<IQuestObjective?> GetQuestObjective(uint questId, int storageIndex) => await nonCachedDatabase.GetQuestObjective(questId, storageIndex);
+
+        public async Task<IQuestObjective?> GetQuestObjectiveById(uint objectiveId) => await nonCachedDatabase.GetQuestObjectiveById(objectiveId);
 
         public Task<IQuestRequestItem?> GetQuestRequestItem(uint entry) => nonCachedDatabase.GetQuestRequestItem(entry);
 
@@ -259,10 +285,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             return nonCachedDatabase.GetScriptFor(entryOrGuid, type);
         }
 
-        public async Task InstallScriptFor(int entryOrGuid, SmartScriptType type, IList<ISmartScriptLine> script)
-        {
-            await nonCachedDatabase.InstallScriptFor(entryOrGuid, type, script);
-        }
+        public async Task<IList<ISmartScriptLine>> GetScriptForAsync(int entryOrGuid, SmartScriptType type) => await nonCachedDatabase.GetScriptForAsync(entryOrGuid, type);
 
         public async Task InstallConditions(IEnumerable<IConditionLine> conditions,
             IDatabaseProvider.ConditionKeyMask keyMask,
@@ -288,10 +311,16 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public Task<IList<int>> GetSmartScriptEntriesByType(SmartScriptType scriptType) =>
             nonCachedDatabase.GetSmartScriptEntriesByType(scriptType);
+
+        public async Task<IList<IPlayerChoice>?> GetPlayerChoicesAsync() => await nonCachedDatabase.GetPlayerChoicesAsync();
+
+        public async Task<IList<IPlayerChoiceResponse>?> GetPlayerChoiceResponsesAsync() => await nonCachedDatabase.GetPlayerChoiceResponsesAsync();
+
+        public async Task<IList<IPlayerChoiceResponse>?> GetPlayerChoiceResponsesAsync(int choiceId) => await nonCachedDatabase.GetPlayerChoiceResponsesAsync(choiceId);
+
+        public IEnumerable<ISmartScriptProjectItem> GetLegacyProjectItems() => nonCachedDatabase.GetLegacyProjectItems();
         
-        public IEnumerable<ISmartScriptProjectItem> GetProjectItems() => nonCachedDatabase.GetProjectItems();
-        
-        public IEnumerable<ISmartScriptProject> GetProjects() => nonCachedDatabase.GetProjects();
+        public IEnumerable<ISmartScriptProject> GetLegacyProjects() => nonCachedDatabase.GetLegacyProjects();
 
         public IBroadcastText? GetBroadcastTextByText(string text)
         {

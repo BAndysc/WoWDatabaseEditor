@@ -30,8 +30,10 @@ public class ConditionsFindAnywhereSource : IFindAnywhereSource
         this.mySqlExecutor = mySqlExecutor;
         this.messageBoxService = messageBoxService;
     }
-    
-    public async Task Find(IFindAnywhereResultContext resultContext, IReadOnlyList<string> parameterNames, long parameterValue, CancellationToken cancellationToken)
+
+    public FindAnywhereSourceType SourceType => FindAnywhereSourceType.Conditions;
+
+    public async Task Find(IFindAnywhereResultContext resultContext, FindAnywhereSourceType searchType, IReadOnlyList<string> parameterNames, long parameterValue, CancellationToken cancellationToken)
     {
         var command = new DelegateCommand(() =>
         {
@@ -113,6 +115,7 @@ public class ConditionsFindAnywhereSource : IFindAnywhereSource
         foreach (var row in result)
         {
             resultContext.AddResult(new FindAnywhereResult(new ImageUri("Icons/document_conditions.png"),
+                null,
                 "Condition " + row["Comment"].Item2,
                  string.Join(", ", row.Select(pair => pair.Key + ": " + pair.Value.Item2)),
                 null,

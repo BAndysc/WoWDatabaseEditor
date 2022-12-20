@@ -24,6 +24,10 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public IQuestTemplate? GetQuestTemplate(uint entry) => impl.GetQuestTemplate(entry);
         public IEnumerable<IAreaTriggerTemplate> GetAreaTriggerTemplates() => impl.GetAreaTriggerTemplates();
         public IEnumerable<IQuestTemplate> GetQuestTemplates() => impl.GetQuestTemplates();
+        public async Task<IList<IQuestObjective>> GetQuestObjectives(uint questId) => await impl.GetQuestObjectives(questId);
+        public async Task<IQuestObjective?> GetQuestObjective(uint questId, int storageIndex) => await impl.GetQuestObjective(questId, storageIndex);
+        public async Task<IQuestObjective?> GetQuestObjectiveById(uint objectiveId) => await impl.GetQuestObjectiveById(objectiveId);
+
         public Task<IQuestRequestItem?> GetQuestRequestItem(uint entry) => impl.GetQuestRequestItem(entry);
         public Task<IList<IItem>?> GetItemTemplatesAsync() => impl.GetItemTemplatesAsync();
         public Task<IList<ISmartScriptLine>> FindSmartScriptLinesBy(IEnumerable<(IDatabaseProvider.SmartLinePropertyType what, int whatValue, int parameterIndex, long valueToSearch)> conditions) => impl.FindSmartScriptLinesBy(conditions);
@@ -53,8 +57,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public IEnumerable<ISmartScriptLine> GetScriptFor(int entryOrGuid, SmartScriptType type) =>
             impl.GetScriptFor(entryOrGuid, type);
-        public Task InstallScriptFor(int entryOrGuid, SmartScriptType type, IList<ISmartScriptLine> script) =>
-            impl.InstallScriptFor(entryOrGuid, type, script);
+
+        public async Task<IList<ISmartScriptLine>> GetScriptForAsync(int entryOrGuid, SmartScriptType type) => await impl.GetScriptForAsync(entryOrGuid, type);
 
         public Task InstallConditions(IEnumerable<IConditionLine> conditions,
             IDatabaseProvider.ConditionKeyMask keyMask,
@@ -69,13 +73,19 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public IEnumerable<ISpellScriptName> GetSpellScriptNames(int spellId) => impl.GetSpellScriptNames(spellId);
 
-        public IEnumerable<ISmartScriptProjectItem> GetProjectItems() => impl.GetProjectItems();
+        public async Task<IList<IPlayerChoiceResponse>?> GetPlayerChoiceResponsesAsync(int choiceId) => await impl.GetPlayerChoiceResponsesAsync(choiceId);
+
+        public IEnumerable<ISmartScriptProjectItem> GetLegacyProjectItems() => impl.GetLegacyProjectItems();
         
-        public IEnumerable<ISmartScriptProject> GetProjects() => impl.GetProjects();
+        public IEnumerable<ISmartScriptProject> GetLegacyProjects() => impl.GetLegacyProjects();
 
         public Task<IList<int>> GetSmartScriptEntriesByType(SmartScriptType scriptType) =>
             impl.GetSmartScriptEntriesByType(scriptType);
-        
+
+        public async Task<IList<IPlayerChoice>?> GetPlayerChoicesAsync() => await impl.GetPlayerChoicesAsync();
+
+        public async Task<IList<IPlayerChoiceResponse>?> GetPlayerChoiceResponsesAsync() => await impl.GetPlayerChoiceResponsesAsync();
+
         public IBroadcastText? GetBroadcastTextByText(string text) => impl.GetBroadcastTextByText(text);
         public Task<IBroadcastText?> GetBroadcastTextByTextAsync(string text) => impl.GetBroadcastTextByTextAsync(text);
         public Task<IBroadcastText?> GetBroadcastTextByIdAsync(uint id) => impl.GetBroadcastTextByIdAsync(id);

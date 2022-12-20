@@ -49,17 +49,24 @@ namespace WDE.Common.Avalonia.Components
 
         private static ImageUri OnSourceChanged(IAvaloniaObject d, ImageUri img)
         {
-            if (!cache.TryGetValue(img, out var bitmap))
-            {
-                bitmap = cache[img] = LoadBitmap(img);
-            }
+            var bitmap = LoadBitmap(img);
             if (bitmap != null)
                 d.SetValue(SourceProperty, bitmap);
 
             return img;
         }
 
-        private static Bitmap? LoadBitmap(ImageUri img)
+        public static Bitmap? LoadBitmap(ImageUri img)
+        {
+            if (!cache.TryGetValue(img, out var bitmap))
+            {
+                bitmap = cache[img] = LoadBitmapImpl(img);
+            }
+
+            return bitmap;
+        }
+        
+        private static Bitmap? LoadBitmapImpl(ImageUri img)
         {
             string uri = img.Uri;
             if (SystemTheme.EffectiveThemeIsDark)

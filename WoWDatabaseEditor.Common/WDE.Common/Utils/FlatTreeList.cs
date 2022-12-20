@@ -7,39 +7,70 @@ using DynamicData.Binding;
 
 namespace WDE.Common.Utils;
 
-public class FlatTreeList<P, C> : IDisposable, IEnumerable, IEnumerable<object>, IList, INotifyCollectionChanged where P : IParentType where C : IChildType
+public class FlatTreeList<P, C> : IDisposable, IEnumerable, IEnumerable<INodeType>, IList<INodeType>, IReadOnlyList<INodeType>, INotifyCollectionChanged where P : IParentType where C : IChildType
 {
-    private ObservableCollectionExtended<object> innerList = new();
+    private ObservableCollectionExtended<INodeType> innerList = new();
     private List<P> parents = new();
-    
-    public FlatTreeList(IReadOnlyList<P> parents)
+    private IReadOnlyList<P> roots;
+
+    public FlatTreeList(IReadOnlyList<P> roots)
     {
-        InstallParents(parents);
-        if (parents is INotifyCollectionChanged incc)
+        this.roots = roots;
+        InstallParents(roots, 1);
+        if (roots is INotifyCollectionChanged incc)
             incc.CollectionChanged += OnParentCollectionChanged;
     }
 
-    private void InstallParents(IReadOnlyList<P> parents)
+    private void InstallParents(IReadOnlyList<P> parents, uint level)
     {
         foreach (var parent in parents)
         {
-            InstallParent(parent); 
+            InstallParent(parent, null, level); 
         }
     }
 
-    private void InstallParent(P parent)
+    private void UninstallParent(P parent, int index)
     {
-        innerList.Add(parent);
         if (parent.IsExpanded)
         {
+            foreach (var nested in parent.NestedParents)
+            {
+                UninstallParent((P)nested, index);
+            }
             foreach (var child in parent.Children)
             {
-                innerList.Add(child);
+                innerList.RemoveAt(index);
+            }
+        }
+        parent.PropertyChanged -= OnParentPropChanged;
+        parent.ChildrenChanged -= OnChildrenChanged;
+        innerList.RemoveAt(index);
+        parents.Remove(parent);
+    }
+
+    private int InstallParent(P parent, int? index = null, uint level = 0)
+    {
+        parent.NestLevel = level;
+        int addedElements = 1;
+        innerList.Insert(index ?? innerList.Count, parent);
+        if (parent.IsExpanded)
+        {
+            foreach (var nestedParent in parent.NestedParents)
+            {
+                addedElements += InstallParent((P)nestedParent, index + addedElements, level + 1);
+            }
+            foreach (var child in parent.Children)
+            {
+                child.NestLevel = level + 1;
+                innerList.Insert(index + addedElements ?? innerList.Count, child);
+                addedElements++;
             }
         }
         this.parents.Add(parent);
         parent.PropertyChanged += OnParentPropChanged;
-        parent.CollectionChanged += OnParentInternalCollectionChanged;
+        parent.ChildrenChanged += OnChildrenChanged;
+        parent.NestedParentsChanged += OnNestedParentsChanged;
+        return addedElements;
     }
 
     private void OnParentCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -49,19 +80,20 @@ public class FlatTreeList<P, C> : IDisposable, IEnumerable, IEnumerable<object>,
             foreach (var parent in parents)
             {
                 parent.PropertyChanged -= OnParentPropChanged;
-                parent.CollectionChanged -= OnParentInternalCollectionChanged;
+                parent.ChildrenChanged -= OnChildrenChanged;
+                parent.NestedParentsChanged -= OnNestedParentsChanged;
             }
             parents.Clear();
             innerList.Clear();
-            InstallParents((sender as IReadOnlyList<P>)!);
+            InstallParents((sender as IReadOnlyList<P>)!, 1);
         }
         else if (e.Action == NotifyCollectionChangedAction.Add)
         {
             if (e.NewItems is IReadOnlyList<P> pList)
-                InstallParents(pList);
+                InstallParents(pList, 1);
             else
                 foreach (P p in e.NewItems!)
-                    InstallParent(p);
+                    InstallParent(p, null, 1);
         }
         else if (e.Action == NotifyCollectionChangedAction.Remove)
         {
@@ -84,11 +116,22 @@ public class FlatTreeList<P, C> : IDisposable, IEnumerable, IEnumerable<object>,
         {
             int i = 0;
 
+            if (parent.NestedParents.Count > 0)
+            {
+                var bulk = innerList.SuspendNotifications();
+                foreach (var nestedParent in parent.NestedParents)
+                {
+                    i += InstallParent((P)nestedParent, startIndex + i + 1, parent.NestLevel + 1);
+                }
+                bulk.Dispose();
+                //CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, (IList)parent.Children, startIndex + 1));                
+            }
             if (parent.Children.Count > 0)
             {
                 var bulk = innerList.SuspendNotifications();
                 foreach (var child in parent.Children)
                 {
+                    child.NestLevel = parent.NestLevel + 1;
                     innerList.Insert(startIndex + ++i, child);
                 }
                 bulk.Dispose();
@@ -97,9 +140,13 @@ public class FlatTreeList<P, C> : IDisposable, IEnumerable, IEnumerable<object>,
         }
         else
         {
-            if (parent.Children.Count > 0)
+            if (parent.Children.Count + parent.NestedParents.Count > 0)
             {
                 var bulk = innerList.SuspendNotifications();
+                foreach (var nestedParent in parent.NestedParents)
+                {
+                    UninstallParent((P)nestedParent, startIndex + 1);
+                }
                 foreach (var child in parent.Children)
                 {
                     innerList.RemoveAt(startIndex + 1);
@@ -115,12 +162,27 @@ public class FlatTreeList<P, C> : IDisposable, IEnumerable, IEnumerable<object>,
         foreach (var p in parents)
         {
             p.PropertyChanged -= OnParentPropChanged;
-            p.CollectionChanged -= OnParentInternalCollectionChanged;
+            p.ChildrenChanged -= OnChildrenChanged;
+            p.NestedParentsChanged -= OnNestedParentsChanged;
         }
         parents.Clear();
     }
 
-    private void OnParentInternalCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    private int CountVisibleItems(IParentType parent)
+    {
+        int count = 1;
+        if (parent.IsExpanded)
+        {
+            foreach (var nested in parent.NestedParents)
+                count += CountVisibleItems(nested);
+
+            count += parent.Children.Count;
+        }
+
+        return count;
+    }
+
+    private void OnNestedParentsChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         P parent = (P)sender!;
         if (!parent.IsExpanded)
@@ -129,51 +191,81 @@ public class FlatTreeList<P, C> : IDisposable, IEnumerable, IEnumerable<object>,
         var startIndex = innerList.IndexOf(parent);
         int i = 0;
 
-        if (parent.Children.Count > 0)
+        var bulk = innerList.SuspendNotifications();
+        if (e.Action == NotifyCollectionChangedAction.Remove)
         {
-            var bulk = innerList.SuspendNotifications();
-            if (e.Action == NotifyCollectionChangedAction.Remove)
-            {
-                foreach (C child in e.OldItems!)
-                {
-                    innerList.RemoveAt(startIndex + 1 + e.OldStartingIndex + i);
-                    i++;
-                }
-            }
-            else if (e.Action == NotifyCollectionChangedAction.Add)
-            {
-                foreach (C child in e.NewItems!)
-                {
-                    innerList.Insert(startIndex + 1 + e.NewStartingIndex + i, child);
-                    i++;
-                }
-            }
-            else
-                throw new Exception("not supported thing");
-
-            bulk.Dispose();
-            //CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, (IList)parent.Children, startIndex + 1));                
+            foreach (P nestedParent in e.OldItems!)
+                UninstallParent(nestedParent, startIndex + 1);
         }
-    }
+        else if (e.Action == NotifyCollectionChangedAction.Add)
+        {
+            foreach (P nestedParent in e.NewItems!)
+                i += InstallParent(nestedParent, i + startIndex + 1, parent.NestLevel + 1);
+        }
+        else
+            throw new Exception("not supported thing");
 
-    public IEnumerator<C> GetChildrenEnumerator()
+        bulk.Dispose();
+        //CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, (IList)parent.Children, startIndex + 1));                
+        }
+
+    private void OnChildrenChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
-        foreach (var parent in parents)
+        P parent = (P)sender!;
+        if (!parent.IsExpanded)
+            return;
+
+        var startIndex = innerList.IndexOf(parent);
+        int i = 0;
+
+        foreach (var nested in parent.NestedParents)
+            i += CountVisibleItems(nested);
+        
+        var bulk = innerList.SuspendNotifications();
+        if (e.Action == NotifyCollectionChangedAction.Remove)
         {
-            foreach (var child in parent.Children)
+            foreach (C child in e.OldItems!)
             {
-                yield return (C)child;
+                innerList.RemoveAt(startIndex + 1 + e.OldStartingIndex + i);
+                i++;
             }
         }
-    }
+        else if (e.Action == NotifyCollectionChangedAction.Add)
+        {
+            foreach (C child in e.NewItems!)
+            {
+                child.NestLevel = parent.NestLevel + 1;
+                innerList.Insert(startIndex + 1 + e.NewStartingIndex + i, child);
+                i++;
+            }
+        }
+        else
+            throw new Exception("not supported thing");
 
+        bulk.Dispose();
+        //CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, (IList)parent.Children, startIndex + 1));                
+    }
+    
+    private IEnumerable<C> GetChildren(P parent)
+    {
+        foreach (var nested in parent.NestedParents)
+        {
+            foreach (var c in GetChildren((P)nested))
+                yield return (C)c;
+        }
+        foreach (var child in parent.Children)
+        {
+            yield return (C)child;
+        }
+    }
+    
     public IEnumerable<C> GetChildren()
     {
-        foreach (var parent in parents)
+        foreach (var parent in roots)
         {
-            foreach (var child in parent.Children)
+            foreach (var child in GetChildren(parent))
             {
-                yield return (C)child;
+                yield return child;
             }
         }
     }
@@ -183,7 +275,12 @@ public class FlatTreeList<P, C> : IDisposable, IEnumerable, IEnumerable<object>,
         return parents.GetEnumerator();
     }
     
-    IEnumerator<object> IEnumerable<object>.GetEnumerator()
+    public IEnumerable<P> GetRoots()
+    {
+        return roots;
+    }
+    
+    IEnumerator<INodeType> IEnumerable<INodeType>.GetEnumerator()
     {
         return innerList.GetEnumerator();
     }
@@ -210,10 +307,10 @@ public class FlatTreeList<P, C> : IDisposable, IEnumerable, IEnumerable<object>,
 
     public object SyncRoot => ((ICollection)innerList).SyncRoot;
 
-    public int Add(object? value)
+    public void Add(INodeType? value)
     {
         throw new Exception("not supported!");
-        return ((IList)innerList).Add(value);
+        //return ((IList)innerList).Add(value);
     }
 
     public void Clear()
@@ -222,17 +319,22 @@ public class FlatTreeList<P, C> : IDisposable, IEnumerable, IEnumerable<object>,
         innerList.Clear();
     }
 
-    public bool Contains(object? value) => ((IList)innerList).Contains(value);
+    public bool Contains(INodeType? value) => ((IList)innerList).Contains(value);
+    
+    public void CopyTo(INodeType[] array, int arrayIndex)
+    {
+        throw new Exception("not supported!");
+    }
 
-    public int IndexOf(object? value) => ((IList)innerList).IndexOf(value);
+    public int IndexOf(INodeType? value) => ((IList)innerList).IndexOf(value);
 
-    public void Insert(int index, object? value)
+    public void Insert(int index, INodeType? value)
     {
         throw new Exception("not supported!");
         ((IList)innerList).Insert(index, value);
     }
 
-    public void Remove(object? value)
+    public bool Remove(INodeType? value)
     {
         throw new Exception("not supported!");
         ((IList)innerList).Remove(value);
@@ -248,20 +350,29 @@ public class FlatTreeList<P, C> : IDisposable, IEnumerable, IEnumerable<object>,
 
     public bool IsReadOnly => true;
 
-    public object? this[int index]
+    public INodeType this[int index]
     {
-        get => ((IList)innerList)[index];
+        get => innerList[index];
         set => throw new Exception("not supported!");
     }
 }
 
-public interface IChildType
+public interface INodeType
 {
-    
+    public uint NestLevel { get; set; }
+    public bool IsVisible { get; set; } // used internally for fast filtering
+    public IParentType? Parent { get; set; }
 }
 
-public interface IParentType : INotifyPropertyChanged, INotifyCollectionChanged
+public interface IChildType : INodeType
+{
+}
+
+public interface IParentType : INodeType, INotifyPropertyChanged
 {
     public bool IsExpanded { get; set; }
+    public IReadOnlyList<IParentType> NestedParents { get; }
     public IReadOnlyList<IChildType> Children { get; }
+    event NotifyCollectionChangedEventHandler? ChildrenChanged;
+    event NotifyCollectionChangedEventHandler? NestedParentsChanged;
 }

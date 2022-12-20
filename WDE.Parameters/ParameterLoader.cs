@@ -12,6 +12,7 @@ using WDE.Common.Managers;
 using WDE.Common.Parameters;
 using WDE.Common.Providers;
 using WDE.Common.Services;
+using WDE.Common.Utils;
 using WDE.MVVM.Observable;
 using WDE.Parameters.Models;
 using WDE.Parameters.Parameters;
@@ -33,6 +34,7 @@ namespace WDE.Parameters
         private readonly IQuickAccessRegisteredParameters quickAccessRegisteredParameters;
 
         private Dictionary<Type, List<IDatabaseObserver>> reloadable = new();
+        private List<LateAsyncLoadParameter> asyncDatabaseParameters = new();
         private List<LateLoadParameter> databaseParameters = new();
         internal ParameterLoader(IDatabaseProvider database, 
             IParameterDefinitionProvider parameterDefinitionProvider,
@@ -90,6 +92,7 @@ namespace WDE.Parameters
             }
 
             factory.Register("InvalidParameter", new InvalidParameter<long>());
+            factory.Register("UnusedParameter", new UnusedParameter());
             factory.Register("FloatParameter", new FloatIntParameter(1000));
             factory.Register("DecifloatParameter", new FloatIntParameter(100));
             factory.Register("GameEventParameter", AddDatabaseParameter(new GameEventParameter(database)), QuickAccessMode.Limited);
@@ -101,6 +104,8 @@ namespace WDE.Parameters
             factory.Register("GameobjectParameter", AddDatabaseParameter(new GameobjectParameter(database, serverIntegration, itemFromListProvider)), QuickAccessMode.Limited);
             factory.Register("GossipMenuParameter", AddDatabaseParameter(new GossipMenuParameter(database)));
             factory.Register("NpcTextParameter", AddDatabaseParameter(new NpcTextParameter(database)));
+            factory.Register("PlayerChoiceParameter", AddAsyncDatabaseParameter(new PlayerChoiceParameter(database)));
+            factory.Register("PlayerChoiceResponseParameter", AddAsyncDatabaseParameter(new PlayerChoiceResponseParameter(database)));
             factory.Register("ConversationTemplateParameter", new ConversationTemplateParameter(database));
             factory.Register("BoolParameter", new BoolParameter());
             factory.Register("FlagParameter", new FlagParameter());
@@ -123,15 +128,23 @@ namespace WDE.Parameters
                 foreach (var parameter in list)
                     parameter.Reload();
             }, ThreadOption.UIThread, true);
-            
-            loadingEventAggregator.OnEvent<DatabaseLoadedEvent>().SubscribeAction(_ =>
+
+            async Task OnDatabaseLoad()
             {
                 foreach (var p in databaseParameters)
                 {
                     p.LateLoad();
                     factory.Updated(p);
                 }
-            });
+
+                foreach (var p in asyncDatabaseParameters)
+                {
+                    await p.LateLoad();
+                    factory.Updated(p);
+                }
+            }
+
+            loadingEventAggregator.OnEvent<DatabaseLoadedEvent>().SubscribeAction(_ => OnDatabaseLoad().ListenErrors());
         }
     
         private T AddDatabaseParameter<T>(T t) where T : LateLoadParameter
@@ -143,6 +156,18 @@ namespace WDE.Parameters
                 list.Add(databaseObserver);
             }
             databaseParameters.Add(t);
+            return t;
+        }
+        
+        private T AddAsyncDatabaseParameter<T>(T t) where T : LateAsyncLoadParameter
+        {
+            if (t is IDatabaseObserver databaseObserver)
+            {
+                if (!reloadable.TryGetValue(databaseObserver.ObservedType, out var list))
+                    list = reloadable[databaseObserver.ObservedType] = new();
+                list.Add(databaseObserver);
+            }
+            asyncDatabaseParameters.Add(t);
             return t;
         }
     }
@@ -323,6 +348,11 @@ namespace WDE.Parameters
     {
         public abstract void LateLoad();
     }
+    
+    public abstract class LateAsyncLoadParameter : ParameterNumbered
+    {
+        public abstract Task LateLoad();
+    }
 
     public abstract class LazyLoadParameter : ParameterNumbered
     {
@@ -484,7 +514,7 @@ namespace WDE.Parameters
         {
             Items = new Dictionary<long, SelectOption>();
             foreach (IQuestTemplate item in database.GetQuestTemplates())
-                Items.Add(item.Entry, new SelectOption(item.Name));
+                Items.Add(item.Entry, new SelectOption(item.Name ?? "Quest " + item.Entry));
         }
     }
     
@@ -590,5 +620,42 @@ namespace WDE.Parameters
             }
         }
     }
-    
+
+    public class PlayerChoiceParameter : LateAsyncLoadParameter
+    {
+        private readonly IDatabaseProvider database;
+
+        public PlayerChoiceParameter(IDatabaseProvider database)
+        {
+            this.database = database;
+        }
+        
+        public override async Task LateLoad()
+        {
+            Items = new Dictionary<long, SelectOption>();
+            var choices = await database.GetPlayerChoicesAsync();
+            if (choices != null)
+                foreach (var item in choices)
+                    Items.Add(item.ChoiceId, new SelectOption(item.Question));
+        }
+    }
+
+    public class PlayerChoiceResponseParameter : LateAsyncLoadParameter
+    {
+        private readonly IDatabaseProvider database;
+
+        public PlayerChoiceResponseParameter(IDatabaseProvider database)
+        {
+            this.database = database;
+        }
+        
+        public override async Task LateLoad()
+        {
+            Items = new Dictionary<long, SelectOption>();
+            var choices = await database.GetPlayerChoiceResponsesAsync();
+            if (choices != null)
+                foreach (var item in choices)
+                    Items.Add(item.ResponseId, new SelectOption(item.Answer));
+        }
+    }
 }

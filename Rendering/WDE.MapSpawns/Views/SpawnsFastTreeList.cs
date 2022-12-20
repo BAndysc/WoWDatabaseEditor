@@ -14,7 +14,7 @@ public class SpawnsFastTreeList : FastTreeView<SpawnEntry, SpawnInstance>
     #region Avalonia workaround
     // apparently control inheritance in Avalonia, when controls are in different projects doesn't work
     public static readonly StyledProperty<FlatTreeList<SpawnEntry, SpawnInstance>?> Items2Property = FastTreeView<SpawnEntry, SpawnInstance>.ItemsProperty.AddOwner<SpawnsFastTreeList>();
-    public static readonly StyledProperty<SpawnInstance?> SelectedSpawn2Property = FastTreeView<SpawnEntry, SpawnInstance>.SelectedSpawnProperty.AddOwner<SpawnsFastTreeList>();
+    public static readonly StyledProperty<INodeType?> SelectedSpawn2Property = FastTreeView<SpawnEntry, SpawnInstance>.SelectedNodeProperty.AddOwner<SpawnsFastTreeList>();
 
     public FlatTreeList<SpawnEntry, SpawnInstance>? Items2
     {
@@ -22,7 +22,7 @@ public class SpawnsFastTreeList : FastTreeView<SpawnEntry, SpawnInstance>
         set => SetValue(Items2Property, value);
     }
 
-    public SpawnInstance? SelectedSpawn2
+    public INodeType? SelectedSpawn2
     {
         get => GetValue(SelectedSpawn2Property);
         set => SetValue(SelectedSpawn2Property, value);
@@ -31,25 +31,27 @@ public class SpawnsFastTreeList : FastTreeView<SpawnEntry, SpawnInstance>
     
     static SpawnsFastTreeList()
     {
-        SelectedSpawnProperty.Changed.AddClassHandler<SpawnsFastTreeList>((tree, args) =>
+        SelectedSpawn2Property.Changed.AddClassHandler<SpawnsFastTreeList>((tree, args) =>
         {
             Dispatcher.UIThread.Post(() =>
             {
-                var newSelection = (SpawnInstance?)args.NewValue;
-                var index = tree.Items!.IndexOf(newSelection);
-                if (index == -1 && newSelection != null)
-                    index = tree.Items!.IndexIfObject(x => x is SpawnEntry group && group.Entry == newSelection.Entry);
-                if (index != -1)
+                if (args.NewValue is SpawnInstance newSelection)
                 {
-                    float y = index * RowHeight;
-                    if (tree.ScrollViewer != null)
+                    var index = tree.Items!.IndexOf(newSelection);
+                    if (index == -1)
+                        index = tree.Items!.IndexIf(x => x is SpawnEntry group && group.Entry == newSelection.Entry);
+                    if (index != -1)
                     {
-                        if (tree.ScrollViewer.Offset.Y > y || tree.ScrollViewer.Offset.Y + tree.ScrollViewer.Viewport.Height < y)
-                            tree.ScrollViewer.Offset = tree.ScrollViewer.Offset.WithY(y);   
+                        float y = index * RowHeight;
+                        if (tree.ScrollViewer != null)
+                        {
+                            if (tree.ScrollViewer.Offset.Y > y || tree.ScrollViewer.Offset.Y + tree.ScrollViewer.Viewport.Height < y)
+                                tree.ScrollViewer.Offset = tree.ScrollViewer.Offset.WithY(y);   
+                        }
                     }
-                }
                 
-                tree.InvalidateVisual();
+                    tree.InvalidateVisual();   
+                }
             }, DispatcherPriority.Render);
         });
     }
@@ -67,7 +69,7 @@ public class SpawnsFastTreeList : FastTreeView<SpawnEntry, SpawnInstance>
             ft.Text = row?.ToString() ?? "(null)";
 
             var isHover = mouseOverRow == row;
-            var isSelected = SelectedSpawn == row;
+            var isSelected = SelectedSpawn2 == row;
         
             if (isHover || isSelected)
                 context.DrawRectangle(isHover ? HoverRowBackground : SelectedRowBackground, null, rect);

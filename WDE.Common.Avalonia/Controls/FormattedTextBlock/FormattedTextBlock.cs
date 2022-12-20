@@ -11,7 +11,7 @@ namespace WDE.Common.Avalonia.Controls
 {
     public class FormattedTextBlock : Control
     {
-        private static FormattedTextDrawer? drawer = null;
+        private static FormattedTextDrawer drawer = null!;
         private static int STYLE_DEFAULT = 0;
         private static int STYLE_PARAMETER = 1;
         private static int STYLE_SOURCE = 2;
@@ -25,42 +25,48 @@ namespace WDE.Common.Avalonia.Controls
             AffectsMeasure<FormattedTextBlock>(TextProperty);
         }
 
-        public FormattedTextBlock()
+        private static void EnsureDrawerInitialized()
         {
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+            if (drawer != null)
+                return;
+            
             // this is a hack optimization
             // this probably will be removed
             // when avalonia has support for "RUN"
-            if (drawer == null)
+            drawer = new FormattedTextDrawer();
+            if (!Application.Current.Styles.TryGetResource("MainFontSans", out var mainFontSans)
+                || mainFontSans is not FontFamily mainFontSansFamily)
+                return;
+            
+            if (Application.Current.Styles.TryGetResource("SmartScripts.Event.Foreground", out var eventColor)
+                && eventColor is IBrush eventBrush)
             {
-                drawer = new FormattedTextDrawer();
-                if (!Application.Current.Styles.TryGetResource("MainFontSans", out var mainFontSans)
-                    || mainFontSans is not FontFamily mainFontSansFamily)
-                    return;
-                
-                if (Application.Current.Styles.TryGetResource("SmartScripts.Event.Foreground", out var eventColor)
-                    && eventColor is IBrush eventBrush)
-                {
-                    drawer.AddStyle(STYLE_DEFAULT, new Typeface(mainFontSansFamily), 12, eventBrush, 0);
-                }
-                
-                if (Application.Current.Styles.TryGetResource("SmartScripts.Event.Selected.Foreground", out var eventSelectedColor)
-                    && eventSelectedColor is IBrush eventSelectedBrush)
-                {
-                    drawer.AddStyle(STYLE_DEFAULT_SELECTED, new Typeface(mainFontSansFamily), 12, eventSelectedBrush, 0);
-                }
-                
-                if (Application.Current.Styles.TryGetResource("SmartScripts.Parameter.Foreground", out var parameterColor)
-                    && parameterColor is IBrush parameterBrush)
-                {
-                    drawer.AddStyle(STYLE_PARAMETER, new Typeface("Consolas,Menlo,Courier,Courier New", FontStyle.Normal, FontWeight.Bold), 12, parameterBrush, 1);
-                }
-                
-                if (Application.Current.Styles.TryGetResource("SmartScripts.Source.Foreground", out var sourceColor)
-                    && sourceColor is IBrush sourceBrush)
-                {
-                    drawer.AddStyle(STYLE_SOURCE, new Typeface("Consolas,Menlo,Courier,Courier New", FontStyle.Normal, FontWeight.Bold), 12, sourceBrush, 1);
-                }
+                drawer.AddStyle(STYLE_DEFAULT, new Typeface(mainFontSansFamily), 12, eventBrush, 0);
             }
+            
+            if (Application.Current.Styles.TryGetResource("SmartScripts.Event.Selected.Foreground", out var eventSelectedColor)
+                && eventSelectedColor is IBrush eventSelectedBrush)
+            {
+                drawer.AddStyle(STYLE_DEFAULT_SELECTED, new Typeface(mainFontSansFamily), 12, eventSelectedBrush, 0);
+            }
+            
+            if (Application.Current.Styles.TryGetResource("SmartScripts.Parameter.Foreground", out var parameterColor)
+                && parameterColor is IBrush parameterBrush)
+            {
+                drawer.AddStyle(STYLE_PARAMETER, new Typeface("Consolas,Menlo,Courier,Courier New", FontStyle.Normal, FontWeight.Bold), 12, parameterBrush, 1);
+            }
+            
+            if (Application.Current.Styles.TryGetResource("SmartScripts.Source.Foreground", out var sourceColor)
+                && sourceColor is IBrush sourceBrush)
+            {
+                drawer.AddStyle(STYLE_SOURCE, new Typeface("Consolas,Menlo,Courier,Courier New", FontStyle.Normal, FontWeight.Bold), 12, sourceBrush, 1);
+            }
+        }
+
+        public FormattedTextBlock()
+        {
+            EnsureDrawerInitialized();
         }
         
         private int overPartIndex = -1;
@@ -88,7 +94,7 @@ namespace WDE.Common.Avalonia.Controls
             Slash
         }
 
-        private void ParseText(string text, Action<string, int, bool, bool, int> action)
+        private static void ParseText(string? text, Action<string, int, bool, bool, int> action)
         {
             if (text == null)
                 return;
@@ -238,21 +244,32 @@ namespace WDE.Common.Avalonia.Controls
             wasOverLink = overLink;
         }
 
-        protected override Size MeasureOverride(Size availableSize)
+        public static Size MeasureText(float maxWidth, string text, Point testPoint, out int? overPartIndex)
         {
+            EnsureDrawerInitialized();
             Rect bounds;
             bool wasWrapped = true;
             bool everWrapped = false;
             double x = 0, y = 0;
-            ParseText(Text, (text, partIndex, source, parameter, contextId) =>
+            int? hoverPartIndex = null;
+            ParseText(text, (t, partIndex, source, parameter, contextId) =>
             {
                 var styleId = parameter ? STYLE_PARAMETER : (source ? STYLE_SOURCE : STYLE_DEFAULT);
-                (wasWrapped, bounds) = drawer!.Measure(text, styleId, !wasWrapped, ref x, ref y, availableSize.Width);
-                if (bounds.Contains(currentPos) && contextId != -1)
-                    overPartIndex = partIndex;
+                (wasWrapped, bounds) = drawer.Measure(t, styleId, !wasWrapped, ref x, ref y, maxWidth);
+                if (bounds.Contains(testPoint) && contextId != -1)
+                    hoverPartIndex = partIndex;
                 everWrapped |= wasWrapped;
             });
-            var size = new Size(everWrapped ? availableSize.Width : x, y + drawer!.LineHeight);
+            overPartIndex = hoverPartIndex;
+            var size = new Size(everWrapped ? maxWidth : x, y + drawer.LineHeight);
+            return size;
+        }
+
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            var size = MeasureText((float)availableSize.Width, Text, currentPos, out var hoverPartIndex);
+            if (hoverPartIndex.HasValue)
+                overPartIndex = hoverPartIndex.Value;
             return size.Inflate(Padding);
         }
 

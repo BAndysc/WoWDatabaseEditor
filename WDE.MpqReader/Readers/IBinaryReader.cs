@@ -2,7 +2,7 @@
 {
     public interface IBinaryReader
     {
-        byte[] ReadBytes(int length);
+        ReadOnlyMemory<byte> ReadBytes(int length);
         short ReadInt16();
         int ReadInt32();
         ushort ReadUInt16();

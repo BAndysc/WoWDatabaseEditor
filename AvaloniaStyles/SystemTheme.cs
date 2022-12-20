@@ -34,7 +34,7 @@ namespace AvaloniaStyles
             }
         }
 
-        internal static SystemThemeOptions EffectiveTheme { get; private set; }
+        public static SystemThemeOptions EffectiveTheme { get; private set; }
         public static bool EffectiveThemeIsDark { get; private set; }
         
         public SystemTheme(IServiceProvider serviceProvider) : base(serviceProvider)
@@ -51,9 +51,9 @@ namespace AvaloniaStyles
                 return theme;
 
             var os = Environment.OSVersion.Version;
-            if (OperatingSystem.IsWindows() && os.Major == 10)
-                return SystemThemeOptions.LightWindows10;
-
+            // 11 style even for win 10, why not :)
+            // if (OperatingSystem.IsWindows() && os.Major == 10)
+            //     return SystemThemeOptions.LightWindows10;
             return SystemThemeOptions.LightWindows11;
         }
         

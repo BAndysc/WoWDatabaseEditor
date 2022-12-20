@@ -72,14 +72,14 @@
                  Margin="0,6,0,6">
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <editor:FastGroupingWrapPanel ItemWidth="160" ItemHeight="24">
+                    <editor:FastGroupingWrapPanel ItemWidth="200" ItemHeight="24">
                     </editor:FastGroupingWrapPanel>
                 </ItemsPanelTemplate>
             </ListBox.ItemsPanel>
             <ListBox.Styles>
                 <Style Selector="ListBoxItem" x:DataType="viewModels:SmartItem">
                     <Setter Property="(editor:FastGroupingWrapPanel.Group)" Value="{CompiledBinding Group}" />
-                    <Setter Property="IsVisible" Value="{CompiledBinding ShowItem}"></Setter>
+                    <Setter Property="(editor:FastGroupingWrapPanel.Active)" Value="{CompiledBinding ShowItem}"></Setter>
                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                     <Setter Property="ClipToBounds" Value="False" />
                     <Setter Property="Padding" Value="7,5,2,7"></Setter>
@@ -95,6 +95,11 @@
                     <Setter Property="MinHeight" Value="20" />
                 </Style>
             </ListBox.Styles>
+            <Interaction.Behaviors>
+                <EventTriggerBehavior EventName="DoubleTapped">
+                    <InvokeCommandAction Command="{Binding #Root.DataContext.Accept}" />
+                </EventTriggerBehavior>
+            </Interaction.Behaviors>
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <DockPanel LastChildFill="True">
@@ -115,6 +120,7 @@
                               HorizontalAlignment="Center"
                               VerticalAlignment="Center">
                         </Path>
+                        <TextBlock Text="{CompiledBinding Id}" VerticalAlignment="Center" DockPanel.Dock="Left" Width="22" TextAlignment="Right" Margin="0,0,2,0" Opacity="0.4" />
                         <TextBlock Text="{CompiledBinding Name}" VerticalAlignment="Center">
                             <Interaction.Behaviors>
                                 <DataTriggerBehavior Binding="{CompiledBinding Deprecated}" Value="True">
@@ -128,11 +134,6 @@
                     </DockPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>
-            <Interaction.Behaviors>
-                <EventTriggerBehavior EventName="DoubleTapped">
-                    <InvokeCommandAction Command="{Binding #Root.DataContext.Accept}" />
-                </EventTriggerBehavior>
-            </Interaction.Behaviors>
         </ListBox>
         
         <Grid Grid.Row="2">
@@ -143,7 +144,7 @@
             </Grid.ColumnDefinitions>
             <Button Content="Cancel" Command="{CompiledBinding Cancel}"  />
             <TextBlock Grid.Column="1" FontSize="9" VerticalAlignment="Center" HorizontalAlignment="Center" Opacity="0.3">Right click on an item to mark as favourite.</TextBlock>
-            <Button Command="{CompiledBinding Accept}" Grid.Column="2" Content="Next" />
+            <Button Classes="primary" Command="{CompiledBinding Accept}" Grid.Column="2" Content="Next" />
         </Grid>
     </Grid>
 </controls:DialogViewBase>

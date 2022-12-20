@@ -13,4 +13,13 @@ public class ChrRacesStore : BaseDbcStore<uint, ChrRaces>
             store[o.Id] = o;
         }
     }
+    
+    public ChrRacesStore(IEnumerable<IWdcIterator> rows)
+    {
+        foreach (var row in rows)
+        {
+            var o = new ChrRaces(row);
+            store[o.Id] = o;
+        }
+    }
 }

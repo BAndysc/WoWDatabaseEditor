@@ -124,7 +124,7 @@ namespace WDE.MPQ
         }
 
         // todos: support more decompression algorithms?
-        public int? ReadFile(byte[] buffer, string path)
+        public int? ReadFile(byte[] buffer, int size, string path)
         {
             if (path == null) throw new ArgumentNullException("path");
 
@@ -246,6 +246,7 @@ namespace WDE.MPQ
                 left -= decompressedLength;
             }
 
+            Debug.Assert(left == 0);
             return (int)blockEntry.FileSize;
         }
 
@@ -256,7 +257,7 @@ namespace WDE.MPQ
                 return new List<string>();
 
             var listfile = new byte[listfileSize.Value];
-            ReadFile(listfile, "(listfile)");
+            ReadFile(listfile, -1, "(listfile)");
             
             var contents = Encoding.UTF8.GetString(listfile);
             var entries = contents.Split(new[] {';', '\r', '\n'}, StringSplitOptions.RemoveEmptyEntries);

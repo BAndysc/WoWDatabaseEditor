@@ -1,12 +1,21 @@
 using System.Collections;
 using WDE.Common.DBC;
+using WDE.Common.MPQ;
 
 namespace WDE.MpqReader.DBC;
 
-public class CharHairGeosetsStore : IEnumerable<CharHairGeosets>
+public class CharHairGeosetsStore : BaseDbcStore<uint, CharHairGeosets>
 {
-    private Dictionary<uint, CharHairGeosets> store = new();
-    public CharHairGeosetsStore(IEnumerable<IDbcIterator> rows)
+    public CharHairGeosetsStore(IEnumerable<IDbcIterator> rows, GameFilesVersion version)
+    {
+        foreach (var row in rows)
+        {
+            var o = new CharHairGeosets(row, version);
+            store[o.Id] = o;
+        }
+    }
+
+    public CharHairGeosetsStore(IEnumerable<IWdcIterator> rows, GameFilesVersion version)
     {
         foreach (var row in rows)
         {
@@ -14,9 +23,4 @@ public class CharHairGeosetsStore : IEnumerable<CharHairGeosets>
             store[o.Id] = o;
         }
     }
-
-    public bool Contains(uint id) => store.ContainsKey(id);
-    public CharHairGeosets this[uint id] => store[id];
-    public IEnumerator<CharHairGeosets> GetEnumerator() => store.Values.GetEnumerator();
-    IEnumerator IEnumerable.GetEnumerator() => store.Values.GetEnumerator();
 }

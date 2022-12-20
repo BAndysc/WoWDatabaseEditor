@@ -64,68 +64,85 @@ namespace TheEngine.Coroutines
         private bool CoroutineStep(CoroutineState state)
         {
             bool hasContinuation = false;
-            try
+            while (true)
             {
-                hasContinuation = state.Coroutine.MoveNext();
-            }
-            catch (Exception e)
-            {
-                if (state.Parent != null && !state.Parent.IgnoreNestedExceptions)
+                try
                 {
-                    state.Parent.NestedException = e;
-                    state.Parent = null; // <-- so that it doesn't get activated
+                    hasContinuation = state.Coroutine.MoveNext();
                 }
-                Console.WriteLine("Exception while running a continuation: ");
-                Console.WriteLine(e);
-            }
-            if (hasContinuation)
-            {
-                var cur = state.Coroutine.Current;
-                if (cur == null)
+                catch (Exception e)
                 {
+                    if (state.Parent != null && !state.Parent.IgnoreNestedExceptions)
+                    {
+                        state.Parent.NestedException = e;
+                        state.Parent = null; // <-- so that it doesn't get activated
+                    }
+                    Console.WriteLine("Exception while running a continuation: ");
+                    Console.WriteLine(e);
+                }
+                if (hasContinuation)
+                {
+                    var cur = state.Coroutine.Current;
+                    if (cur == null)
+                    {
+                        return true;
+                    }
+                    else if (cur is ContinueOnExceptionEnumerator continueOnException)
+                    {
+                        state.Active = false;
+                        state.IgnoreNestedExceptions = true;
+                        if (!StartNested(continueOnException.Enumerator, state) && state.NestedException == null)
+                        {
+                            state.Active = true;
+                            continue; // return CoroutineStep(state);
+                        }
+                    }
+                    else if (cur is IEnumerator nested)
+                    {
+                        state.Active = false;
+                        if (!StartNested(nested, state) && state.NestedException == null)
+                        {
+                            state.Active = true;
+                            continue; // return CoroutineStep(state);
+                        }
+                    }
+                    else if (cur is WaitForTask || cur is Task)
+                    {
+                        state.Active = false;
+                        Task task = cur is WaitForTask w ? w.Task : (Task)cur;
+                        state.WaitingForTask = task;
+                        if (task.IsCompleted)
+                        {
+                            if (task.Exception != null)
+                                Console.WriteLine(task.Exception);
+                            state.Active = true;
+                            state.WaitingForTask = null;
+                        }
+                        else
+                        {
+                            task.ContinueWith(t =>
+                            {
+                                if (t.Exception != null)
+                                    Console.WriteLine(t.Exception);
+                                state.Active = true;
+                                state.WaitingForTask = null;
+                            });
+                        }
+
+                        if (state.Active)
+                            continue; //return CoroutineStep(state);
+                        
+                    } else
+                        throw new Exception("You can only yield null (For the next frame) or WaitForTask or another IEnumerator");
+
                     return true;
                 }
-                else if (cur is ContinueOnExceptionEnumerator continueOnException)
+                else
                 {
-                    state.Active = false;
-                    state.IgnoreNestedExceptions = true;
-                    if (!StartNested(continueOnException.Enumerator, state) && state.NestedException == null)
-                    {
-                        state.Active = true;
-                        return CoroutineStep(state);
-                    }
+                    if (state.Parent != null)
+                        state.Parent.Active = true;
+                    return false;
                 }
-                else if (cur is IEnumerator nested)
-                {
-                    state.Active = false;
-                    if (!StartNested(nested, state) && state.NestedException == null)
-                    {
-                        state.Active = true;
-                        return CoroutineStep(state);
-                    }
-                }
-                else if (cur is WaitForTask || cur is Task)
-                {
-                    state.Active = false;
-                    Task task = cur is WaitForTask w ? w.Task : (Task)cur;
-                    state.WaitingForTask = task;
-                    task.ContinueWith(t =>
-                    {
-                        if (t.Exception != null)
-                            Console.WriteLine(t.Exception);
-                        state.Active = true;
-                        state.WaitingForTask = null;
-                    });
-                } else
-                    throw new Exception("You can only yield null (For the next frame) or WaitForTask or another IEnumerator");
-
-                return true;
-            }
-            else
-            {
-                if (state.Parent != null)
-                    state.Parent.Active = true;
-                return false;
             }
         }
 

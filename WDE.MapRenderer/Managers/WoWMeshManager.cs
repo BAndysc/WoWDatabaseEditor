@@ -12,6 +12,9 @@ namespace WDE.MapRenderer.Managers
         private readonly IRenderManager renderManager;
         private readonly LightingManager lightingManager;
         private readonly TimeManager timeManager;
+        private readonly LiquidObjectStore liquidObjectStore;
+        private readonly LiquidTypeStore liquidTypeStore;
+        private readonly LiquidMaterialStore liquidMaterialStore;
         private IMesh chunkMesh;
 
         public WoWMeshManager(IMeshManager meshManager,
@@ -19,12 +22,18 @@ namespace WDE.MapRenderer.Managers
             ITextureManager textureManager, 
             IMaterialManager materialManager,
             LightingManager lightingManager,
-            TimeManager timeManager)
+            TimeManager timeManager,
+            LiquidObjectStore liquidObjectStore,
+            LiquidTypeStore liquidTypeStore,
+            LiquidMaterialStore liquidMaterialStore)
         {
             this.meshManager = meshManager;
             this.renderManager = renderManager;
             this.lightingManager = lightingManager;
             this.timeManager = timeManager;
+            this.liquidObjectStore = liquidObjectStore;
+            this.liquidTypeStore = liquidTypeStore;
+            this.liquidMaterialStore = liquidMaterialStore;
             chunkMesh = meshManager.CreateMesh(ChunkMesh.Create());
             
             WaterMaterial = materialManager.CreateMaterial("data/water.json");
@@ -126,10 +135,13 @@ namespace WDE.MapRenderer.Managers
         
         public (Vector3[], ushort[]) GenerateWaterMesh(ref MH2OLiquidInstance mh2o)
         {
-            Vector3[] vertices;
-            ushort[] indices;
+            Vector3[] vertices = Array.Empty<Vector3>();
+            ushort[] indices = Array.Empty<ushort>();
+
+            var format = mh2o.LiquidVertexFormat;
+
             // optimized path
-            if (mh2o.LiquidVertexFormat == 2 || mh2o.IsSingleHeight)
+            if (format == 2 || mh2o.IsSingleHeight || mh2o.HeightMap == null)
             {
                 var offset = new Vector3(-mh2o.Y_Offset * Constants.UnitSize, -mh2o.X_Offset * Constants.UnitSize, mh2o.MinHeightLevel);
                 vertices = new Vector3[4]

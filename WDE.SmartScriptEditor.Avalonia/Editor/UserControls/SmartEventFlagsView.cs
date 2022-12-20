@@ -3,34 +3,228 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using Avalonia;
-using Avalonia.Collections;
 using Avalonia.Controls;
-using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Templates;
 using Avalonia.LogicalTree;
 using Avalonia.Markup.Xaml.Templates;
+using Avalonia.Media;
+using Avalonia.Media.TextFormatting;
 using Avalonia.Metadata;
+using WDE.Common.Avalonia.Utils;
+using WDE.Common.Parameters;
 using WDE.MVVM;
 using WDE.MVVM.Observable;
+using WDE.SmartScriptEditor.Editor;
 using WDE.SmartScriptEditor.Models;
 
 namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
 {
-    public class SmartEventFlagsView : TemplatedControl
+    public class SmartEventFlagMapping
     {
-        private IDisposable? flagsDisposable;
-        private AvaloniaList<IconViewModel> flags = new();
-        public static readonly DirectProperty<SmartEventFlagsView, AvaloniaList<IconViewModel>> FlagsProperty = AvaloniaProperty.RegisterDirect<SmartEventFlagsView, AvaloniaList<IconViewModel>>("Flags", o => o.Flags, (o, v) => o.Flags = v);
-
-        public AvaloniaList<IconViewModel> Flags
+        public long NonRepeatable { get; }
+        public long DebugOnly { get; }
+        public long WhileCharmed { get; }
+        public long DontReset { get; }
+        public long Difficulty0 { get; }
+        public long Difficulty1 { get; }
+        public long Difficulty2 { get; }
+        public long Difficulty3 { get; }
+        public long DifficultyLfr { get; }
+        public long DifficultyFlex { get; }
+        public long Template { get; }
+        public long ConditionFailedTime { get; }
+        public long ConditionFailedOnce { get; }
+        public long UpdateTimer { get; }
+        
+        public bool HasValues { get; }
+        
+        public SmartEventFlagMapping(IEditorFeatures editorFeatures)
         {
-            get => flags;
-            set => SetAndRaise(FlagsProperty, ref flags, value);
+            var param = editorFeatures.EventFlagsParameter;
+            if (param.Items == null)
+                return;
+
+            HasValues = true;
+            NonRepeatable = GetValue(param.Items.FirstOrDefault(x => x.Value.Name == "Not repeatable"));
+            DebugOnly = GetValue(param.Items.FirstOrDefault(x => x.Value.Name == "Debug only"));
+            WhileCharmed = GetValue(param.Items.FirstOrDefault(x => x.Value.Name == "While charmed"));
+            DontReset = GetValue(param.Items.FirstOrDefault(x => x.Value.Name == "Don't reset"));
+            Difficulty0 = GetValue(param.Items.FirstOrDefault(x => x.Value.Name == "Difficulty 0"));
+            Difficulty1 = GetValue(param.Items.FirstOrDefault(x => x.Value.Name == "Difficulty 1"));
+            Difficulty2 = GetValue(param.Items.FirstOrDefault(x => x.Value.Name == "Difficulty 2"));
+            Difficulty3 = GetValue(param.Items.FirstOrDefault(x => x.Value.Name == "Difficulty 3"));
+            DifficultyLfr = GetValue(param.Items.FirstOrDefault(x => x.Value.Name == "LFR difficulty"));
+            DifficultyFlex = GetValue(param.Items.FirstOrDefault(x => x.Value.Name == "Flex difficulty"));
+            Template = GetValue(param.Items.FirstOrDefault(x => x.Value.Name.Contains("template")));
+            ConditionFailedTime = GetValue(param.Items.FirstOrDefault(x => x.Value.Name.Contains("condition")&& x.Value.Name.Contains("time")));
+            ConditionFailedOnce = GetValue(param.Items.FirstOrDefault(x => x.Value.Name.Contains("Condition")&& x.Value.Name.Contains("once")));
+            UpdateTimer = GetValue(param.Items.FirstOrDefault(x => x.Value.Name.Contains("timer")));
+        }
+
+        private long GetValue(KeyValuePair<long,SelectOption> pair)
+        {
+            if (pair.Key == 0)
+                return -1;
+            return pair.Key;
+        }
+    }
+    
+    public class SmartEventFlagsView : Control
+    {
+        public const double BoxSize = FontSize + Padding * 2;
+        public const double FontSize = 9;
+        public const double Padding = 2;
+        public const double Spacing = 2;
+        public const int ItemsInRow = 2;
+        public const double TotalWidth = BoxSize * ItemsInRow + Spacing * (ItemsInRow - 1);
+        
+        private IDisposable? flagsDisposable;
+        private SmartEventFlagMapping flagsMapping;
+        private IBrush? foreground;
+
+        public SmartEventFlagsView()
+        {
+            flagsMapping = ViewBind.ResolveViewModel<SmartEventFlagMapping>();
+            if (Application.Current.Styles.TryGetResource("SmartScripts.Event.Flag.Foreground", out var eventFlagForegroundColor)
+                && eventFlagForegroundColor is IBrush eventFlagForegroundBrush)
+            {
+                foreground = eventFlagForegroundBrush;
+            }
+        }
+
+        protected override void OnDataContextChanged(EventArgs e)
+        {
+            base.OnDataContextChanged(e);
+            InvalidateMeasure();
+            flagsDisposable?.Dispose();
+            BindToDataContext();
         }
 
         protected override void OnAttachedToLogicalTree(LogicalTreeAttachmentEventArgs e)
         {
             base.OnAttachedToLogicalTree(e);
+            if (flagsDisposable == null)
+                BindToDataContext();
+        }
+
+        private struct RenderContext
+        {
+            public double x, y;
+        }
+        
+        private void RenderIcon(DrawingContext context, ref RenderContext data, string symbol)
+        {
+            if (char.IsAscii(symbol[0]))
+                context.DrawRectangle(new SolidColorBrush(Color.Parse("#1976d2")), null, new Rect(data.x, data.y, BoxSize, BoxSize), BoxSize / 2, BoxSize / 2);
+            
+            var tl = new TextLayout(symbol, new Typeface(GetValue(TextBlock.FontFamilyProperty)), FontSize, foreground, TextAlignment.Center, maxWidth: BoxSize);
+            tl.Draw(context, new Point(data.x, data.y));
+            
+            data.x -= BoxSize + Spacing;
+            if (data.x < 0)
+            {
+                data.x = TotalWidth - BoxSize;
+                data.y += BoxSize + Spacing;
+            }
+        }
+        
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            var icons = GetIconsCount();
+            int rows = (int)Math.Ceiling(icons / 2f);
+            return new Size(TotalWidth,  rows * BoxSize + (rows - 1) * Spacing);
+        }
+
+        private int GetIconsCount()
+        {
+            if (DataContext is not SmartEvent e)
+                return 0;
+
+            var eventFlagsNum = e.Flags.Value;
+            var eventPhasesNum = e.Phases.Value;
+
+            if (eventFlagsNum == 0 && eventPhasesNum == 0)
+                return 0;
+
+            int count = 0;
+            
+            if (eventFlagsNum > 0 && e.Flags.Parameter.HasItems)
+            {
+                foreach (var item in e.Flags.Parameter.Items!)
+                {
+                    if (item.Key == 0)
+                        continue;
+
+                    if ((eventFlagsNum & item.Key) > 0)
+                        count++;
+                }
+            }
+
+            if (eventPhasesNum > 0 && e.Phases.Parameter.HasItems)
+            {
+                int totalPhases = e.Phases.Parameter.Items!
+                    .Count(item => (eventPhasesNum & item.Key) > 0);
+
+                if (totalPhases > 3)
+                    count++;
+                else
+                    count += totalPhases;
+            }
+
+            return count;
+        }
+        
+        public override void Render(DrawingContext context)
+        {
+            base.Render(context);
+            if (DataContext is SmartEvent e)
+            {
+                RenderContext data = new();
+                data.x = TotalWidth - BoxSize;
+                
+                var eventFlagsNum = e.Flags.Value;
+                var eventPhasesNum = e.Phases.Value;
+
+                if (eventFlagsNum > 0 && e.Flags.Parameter.HasItems)
+                {
+                    foreach (var item in e.Flags.Parameter.Items!)
+                    {
+                        if (item.Key == 0)
+                            continue;
+
+                        if ((eventFlagsNum & item.Key) > 0)
+                        {
+                            RenderIcon(context, ref data, FlagToIconTextSymbol(item.Key));
+                        }
+                    }
+                }
+                    
+                if (eventPhasesNum > 0 && e.Phases.Parameter.HasItems)
+                {
+                    int totalPhases = e.Phases.Parameter.Items!
+                        .Count(item => (eventPhasesNum & item.Key) > 0);
+
+                    var currentPhases = e.Phases.Parameter.Items!
+                        .Where(item => item.Key != 0 && (eventPhasesNum & item.Key) > 0)
+                        .Select(item => PhaseMaskToPhase((int) item.Key));
+                        
+                    if (totalPhases > 3)
+                    {
+                        RenderIcon(context, ref data, "...");
+                    }
+                    else
+                    {
+                        foreach (var phase in currentPhases)
+                        {
+                            RenderIcon(context, ref data, phase.ToString());
+                        }
+                    }
+                }
+            }
+        }
+
+        private void BindToDataContext()
+        {
             if (DataContext is SmartEvent se)
             {
                 var flagsObservable = se.Flags.ToObservable(t => t.Value);
@@ -38,63 +232,83 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
                 var combined = flagsObservable.CombineLatest(phasesObservable, (flags, phases) => (flags, phases));
                 flagsDisposable = combined.SubscribeAction(tuple =>
                 {
-                    flags.Clear();
-                    var (eventFlagsNum, eventPhasesNum) = tuple;
-
-                    if (eventFlagsNum > 0 && se.Flags.Parameter.HasItems)
-                    {
-                        foreach (var item in se.Flags.Parameter.Items!)
-                        {
-                            if (item.Key == 0)
-                                continue;
-                            
-                            if ((eventFlagsNum & item.Key) > 0)
-                                flags.Add(new IconViewModel(FlagToIconTextSymbol(item.Key), item.Value.Name, item.Value.Description));
-                        }
-                    }
-                    
-                    if (eventPhasesNum > 0 && se.Phases.Parameter.HasItems)
-                    {
-                        int totalPhases = se.Phases.Parameter.Items!
-                            .Count(item => (eventPhasesNum & item.Key) > 0);
-
-                        var currentPhases = se.Phases.Parameter.Items!
-                            .Where(item => item.Key != 0 && (eventPhasesNum & item.Key) > 0)
-                            .Select(item => PhaseMaskToPhase((int) item.Key));
-                        
-                        if (totalPhases > 3)
-                        {
-                            flags.Add(new IconViewModel(currentPhases));
-                        }
-                        else
-                        {
-                            foreach (var phase in currentPhases)
-                                flags.Add(new IconViewModel(phase));
-                        }
-                    }
+                    var tip = GenerateToolTip();
+                    SetValue(ToolTip.TipProperty, tip);
+                    InvalidateMeasure();
+                    InvalidateVisual();
                 });
             }
         }
 
-        private static string FlagToIconTextSymbol(long flag)
+        private static List<string> tempList = new();
+        private string? GenerateToolTip()
         {
-            SmartEventFlag f = (SmartEventFlag) flag;
-            if (f == SmartEventFlag.NotRepeatable)
-                return "I";
-            if (f == SmartEventFlag.DebugOnly)
-                return "d";
-            if (f == SmartEventFlag.WhileCharmed)
+            if (DataContext is not SmartEvent e)
+                return null;
+            if (e.Flags.Value == 0 && e.Phases.Value == 0)
+                return null;
+            
+            tempList.Clear();
+            var eventFlagsNum = e.Flags.Value;
+            var eventPhasesNum = e.Phases.Value;
+
+            if (eventFlagsNum > 0 && e.Flags.Parameter.HasItems)
+            {
+                foreach (var item in e.Flags.Parameter.Items!)
+                {
+                    if (item.Key == 0)
+                        continue;
+
+                    if ((eventFlagsNum & item.Key) > 0)
+                        tempList.Add(" • " + FlagToIconTextSymbol(item.Key) + " - flag " + item.Value.Name);
+                }
+            }
+                    
+            if (eventPhasesNum > 0 && e.Phases.Parameter.HasItems)
+            {
+                var currentPhases = e.Phases.Parameter.Items!
+                    .Where(item => item.Key != 0 && (eventPhasesNum & item.Key) > 0)
+                    .Select(item => PhaseMaskToPhase((int) item.Key));
+                       
+                foreach (var phase in currentPhases)
+                {
+                    tempList.Add(" • Phase " + phase);
+                }
+            }
+
+            return string.Join("\n", tempList);
+        }
+
+        private string FlagToIconTextSymbol(long flag)
+        {
+            if (flag == flagsMapping.NonRepeatable)
+                return "🔁";
+            if (flag == flagsMapping.DebugOnly)
+                return "🐛";
+            if (flag == flagsMapping.WhileCharmed)
                 return "c";
-            if (f == SmartEventFlag.DontReset)
+            if (flag == flagsMapping.DontReset)
                 return "r";
-            if (f == SmartEventFlag.Difficulty0)
+            if (flag == flagsMapping.Difficulty0)
                 return "A";
-            if (f == SmartEventFlag.Difficulty1)
+            if (flag == flagsMapping.Difficulty1)
                 return "B";
-            if (f == SmartEventFlag.Difficulty2)
+            if (flag == flagsMapping.Difficulty2)
                 return "C";
-            if (f == SmartEventFlag.Difficulty3)
+            if (flag == flagsMapping.Difficulty3)
                 return "D";
+            if (flag == flagsMapping.DifficultyLfr)
+                return "E";
+            if (flag == flagsMapping.DifficultyFlex)
+                return "f";
+            if (flag == flagsMapping.Template)
+                return "🎫";
+            if (flag == flagsMapping.ConditionFailedOnce)
+                return "💢";
+            if (flag == flagsMapping.ConditionFailedTime)
+                return "💥";
+            if (flag == flagsMapping.UpdateTimer)
+                return "⏱️";
             return "?";
         }
 

@@ -8,6 +8,7 @@ using Avalonia.Media;
 using Avalonia.Media.Immutable;
 using Avalonia.Utilities;
 using Avalonia.VisualTree;
+using WDE.Common.Avalonia.Utils;
 using WDE.EventAiEditor.Avalonia.Editor.Views;
 using static System.Math;
 
@@ -15,6 +16,8 @@ namespace WDE.EventAiEditor.Avalonia.Editor
 {
     public class FastGroupingWrapPanel : Panel, INavigableContainer
     {
+        protected static ISolidColorBrush HeaderForeground = new ImmutableSolidColorBrush(new Color(0xFF, 0x22, 0x6E, 0x8B));
+        
         private double itemWidth;
         public static readonly DirectProperty<FastGroupingWrapPanel, double> ItemWidthProperty = AvaloniaProperty.RegisterDirect<FastGroupingWrapPanel, double>("ItemWidth", o => o.ItemWidth, (o, v) => o.ItemWidth = v);
         private double itemHeight;
@@ -25,6 +28,7 @@ namespace WDE.EventAiEditor.Avalonia.Editor
 
         static FastGroupingWrapPanel()
         {
+            ResourcesUtils.Get("GroupingHeaderColor", HeaderForeground, out HeaderForeground);
             AffectsParentMeasure<FastGroupingWrapPanel>(GroupProperty);
             AffectsParentMeasure<FastGroupingWrapPanel>(IsVisibleProperty);
         }
@@ -54,7 +58,7 @@ namespace WDE.EventAiEditor.Avalonia.Editor
         public override void Render(DrawingContext context)
         {
             base.Render(context);
-            var brush = new ImmutableSolidColorBrush(new Color(0xFF, 0x22, 0x6E, 0x8B));
+            var brush = HeaderForeground;
             var pen = new ImmutablePen(brush, 1);
             foreach (var group in groupStartHeight)
             {

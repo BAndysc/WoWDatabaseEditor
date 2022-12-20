@@ -8,7 +8,7 @@
     <Style Selector="controls|SettingsHeader">
         <Setter Property="Template">
             <ControlTemplate>
-                <DockPanel LastChildFill="True" Margin="0,10,0,0">
+                <DockPanel LastChildFill="True" Margin="0,10,0,10">
                     <TextBlock FontWeight="Bold" Name="Text" Text="{TemplateBinding Text}" />
                     <Border Height="1" Background="{Binding #Text.Foreground}" Margin="10,0" Opacity="0.3" VerticalAlignment="Center" HorizontalAlignment="Stretch" />
                 </DockPanel>

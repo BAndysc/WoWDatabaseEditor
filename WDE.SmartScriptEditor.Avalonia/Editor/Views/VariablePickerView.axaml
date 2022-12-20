@@ -57,14 +57,9 @@
                 </GridColumnDefinition>
             </GridView.Columns>
         </GridView>
-        <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="80" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="80" />
-            </Grid.ColumnDefinitions>
-            <Button Content="Cancel" Command="{CompiledBinding Cancel}"  />
-            <Button Command="{CompiledBinding Accept}" Grid.Column="2" Content="Pick" />
-        </Grid>
+        
+        <OkCancelButtons Grid.Row="1" AcceptText="Pick"
+                         AcceptCommand="{CompiledBinding Accept}"
+                         CancelCommand="{CompiledBinding Cancel}" />
     </Grid>
 </UserControl>

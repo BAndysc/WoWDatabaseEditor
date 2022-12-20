@@ -1,7 +1,9 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Styles.Resources>
-        <SolidColorBrush x:Key="TreeViewItem.Header.Background.Special" Color="#2D619E"/>
+        <Color x:Key="TreeViewItem.Header.Background.SpecialColor">#2D619E</Color>
+        <AccentSolidColorBrush x:Key="TreeViewItem.Header.Background.Special" Hue="{DynamicResource AccentHue}" BaseColor="{StaticResource TreeViewItem.Header.Background.SpecialColor}" />
+        
         <SolidColorBrush x:Key="TreeViewItem.Header.Foreground.Special" Color="#F2F2F2" />
         <SolidColorBrush x:Key="TreeViewItem.Content.Background.Modified" Color="#023e7d" Opacity=".5"/>
         <SolidColorBrush x:Key="TreeViewItem.Content.Background.Normal" Color="#FF252526"/>

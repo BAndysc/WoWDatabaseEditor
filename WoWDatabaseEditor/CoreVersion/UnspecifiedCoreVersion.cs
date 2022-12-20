@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;
+using WDE.Common.Types;
 using WDE.Module.Attributes;
 
 namespace WoWDatabaseEditorCore.CoreVersion
@@ -12,6 +13,7 @@ namespace WoWDatabaseEditorCore.CoreVersion
     {
         public string Tag => "unspecified";
         public string FriendlyName => "Unspecified";
+        public ImageUri Icon { get; } = new ImageUri("Icons/core_unknown.png");
         public IDatabaseFeatures DatabaseFeatures => this;
         public ISmartScriptFeatures SmartScriptFeatures => this;
         public IConditionFeatures ConditionFeatures => this;
@@ -23,7 +25,8 @@ namespace WoWDatabaseEditorCore.CoreVersion
         public bool AlternativeTrinityDatabase => false;
         public WaypointTables SupportedWaypoints => 0;
         public PhasingType PhasingType => PhasingType.PhaseIds;
-        
+        public int Build => 0;
+
         public string TableName => "(null)";
         public string ConditionsFile => "SmartData/conditions.json";
         public string ConditionGroupsFile => "SmartData/conditions_groups.json";

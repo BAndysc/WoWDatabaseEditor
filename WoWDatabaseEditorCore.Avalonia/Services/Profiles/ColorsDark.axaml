@@ -1,0 +1,8 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Styles.Resources>
+        <SolidColorBrush Color="#20FFFFFF" x:Key="CoreButtonBackground" />
+        <SolidColorBrush Color="#30FFFFFF" x:Key="CoreButtonPointerOverBackground" />
+        <SolidColorBrush Color="#10000000" x:Key="CoreButtonPressedBackground" />
+    </Styles.Resources>
+</Styles>

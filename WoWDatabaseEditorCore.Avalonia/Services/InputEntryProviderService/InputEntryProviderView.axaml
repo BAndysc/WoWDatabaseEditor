@@ -22,9 +22,10 @@
         <TextBlock Margin="0,0,0,10" DockPanel.Dock="Top" Text="{Binding Title}" FontSize="16" FontWeight="Bold" TextWrapping="WrapWithOverflow" />
         <TextBlock Margin="0,0,0,10" DockPanel.Dock="Top" Text="{Binding Description}" TextWrapping="WrapWithOverflow" />
         <TextBox utils:FocusUtils.FocusFirst="True" Margin="0,0,0,10" Text="{Binding Entry}" HorizontalAlignment="Stretch" AcceptsReturn="False" DockPanel.Dock="Top" AcceptsTab="False" />
-        <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom" Spacing="10" HorizontalAlignment="Right">
-            <Button IsDefault="True" Content="Ok" Command="{Binding Save}" MinWidth="80" />
-            <Button IsCancel="True" Content="Cancel" Command="{Binding Cancel}" MinWidth="80" />
-        </StackPanel>
+        
+        
+        <OkCancelButtons DockPanel.Dock="Bottom"
+                         AcceptCommand="{Binding Save}"
+                         CancelCommand="{Binding Cancel}" />
     </DockPanel>
 </UserControl>

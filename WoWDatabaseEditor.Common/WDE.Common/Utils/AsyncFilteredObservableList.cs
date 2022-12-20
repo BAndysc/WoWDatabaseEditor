@@ -165,9 +165,9 @@ public class AsyncFilteredObservableList<T> : INotifyCollectionChanged, IReadOnl
 
     void IList.Clear() => throw new NotSupportedException();
 
-    public bool Contains(object? value) => throw new NotSupportedException();
+    public bool Contains(object? value) => ((IList)collection).Contains(value);
 
-    public int IndexOf(object? value) => throw new NotSupportedException();
+    public int IndexOf(object? value) => ((IList)collection).IndexOf(value);
 
     public void Insert(int index, object? value) => throw new NotSupportedException();
 
@@ -197,7 +197,7 @@ public class AsyncFilteredObservableList<T> : INotifyCollectionChanged, IReadOnl
 
     bool ICollection<T>.IsReadOnly => true;
 
-    public int IndexOf(T item) => throw new NotSupportedException();
+    public int IndexOf(T item) => collection.IndexOf(item);
 
     public void Insert(int index, T item) => throw new NotSupportedException();
 

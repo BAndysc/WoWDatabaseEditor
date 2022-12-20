@@ -76,6 +76,7 @@ namespace WDE.SQLEditor.ViewModels
                     }
                     catch (Exception e)
                     {
+                        Console.WriteLine(e);
 #pragma warning disable CS4014
                         messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
                             .SetTitle("Error while generating the SQL")

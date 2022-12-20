@@ -23,7 +23,7 @@ public class AnniversarySummaryService : IAnniversarySummaryService
         this.timelineViewModelFactory = timelineViewModelFactory;
         this.userSettings = userSettings;
         data = userSettings.Get<Data>();
-        ShowAnniversaryBox = !data.HideSummaryBox;
+        ShowAnniversaryBox = false;
     }
     
     public void OpenSummary()
@@ -33,12 +33,13 @@ public class AnniversarySummaryService : IAnniversarySummaryService
 
     public void TryOpenDefaultSummary()
     {
-        if (!data.SummaryAutoShown)
-        {
-            data.SummaryAutoShown = true;
-            userSettings.Update(data);
-            OpenSummary();
-        }
+        // disabled
+        // if (!data.SummaryAutoShown)
+        // {
+        //     data.SummaryAutoShown = true;
+        //     userSettings.Update(data);
+        //     OpenSummary();
+        // }
     }
 
     public bool ShowAnniversaryBox { get; set; }

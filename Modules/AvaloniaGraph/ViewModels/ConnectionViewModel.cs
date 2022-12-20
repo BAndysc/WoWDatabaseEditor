@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Specialized;
 using Avalonia;
 using AvaloniaGraph.Controls;
 using AvaloniaGraph.GraphLayout;
@@ -47,6 +48,7 @@ public class ConnectionViewModel<T, K> : ViewModelBase, IConnectionViewModel whe
             {
                 from.PositionChanged -= OnFromPositionChanged;
                 from.Connections.Remove((this as K)!);
+                from.Connections.CollectionChanged -= OnFromConnectionsChanged;
             }
 
             from = value;
@@ -55,6 +57,7 @@ public class ConnectionViewModel<T, K> : ViewModelBase, IConnectionViewModel whe
             {
                 from.PositionChanged += OnFromPositionChanged;
                 from.Connections.Add((this as K)!);
+                from.Connections.CollectionChanged += OnFromConnectionsChanged;
                 FromPosition = from.Position;
                 // why?
                 //To = to;
@@ -65,6 +68,14 @@ public class ConnectionViewModel<T, K> : ViewModelBase, IConnectionViewModel whe
         }
     }
 
+    protected virtual void OnFromConnectionsChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+    }
+
+    protected virtual void OnToConnectionsChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+    }
+    
     public InputConnectorViewModel<T, K>? To
     {
         get => to;
@@ -74,6 +85,7 @@ public class ConnectionViewModel<T, K> : ViewModelBase, IConnectionViewModel whe
             {
                 to.PositionChanged -= OnToPositionChanged;
                 to.Connections.Remove((this as K)!);
+                to.Connections.CollectionChanged -= OnToConnectionsChanged;
             }
 
             to = value;
@@ -82,6 +94,7 @@ public class ConnectionViewModel<T, K> : ViewModelBase, IConnectionViewModel whe
             {
                 to.PositionChanged += OnToPositionChanged;
                 to.Connections.Add((this as K)!);
+                to.Connections.CollectionChanged += OnToConnectionsChanged;
                 ToPosition = to.Position;
             }
 
@@ -90,9 +103,9 @@ public class ConnectionViewModel<T, K> : ViewModelBase, IConnectionViewModel whe
         }
     }
     
-    public ConnectorAttachMode StartAttachMode => From?.AttachMode ?? ConnectorAttachMode.Middle;
+    public ConnectorAttachMode StartAttachMode => From?.AttachMode ?? (To?.AttachMode.Opposite() ?? ConnectorAttachMode.Middle);
     
-    public ConnectorAttachMode EndAttachMode => To?.AttachMode ?? ConnectorAttachMode.Middle;
+    public ConnectorAttachMode EndAttachMode => To?.AttachMode ?? (From?.AttachMode.Opposite() ?? ConnectorAttachMode.Middle);
 
     public Point TopLeftPosition => new(Math.Min(fromPosition.X, toPosition.X), Math.Min(fromPosition.Y, toPosition.Y));
 
@@ -130,11 +143,8 @@ public class ConnectionViewModel<T, K> : ViewModelBase, IConnectionViewModel whe
 
     public void Detach()
     {
-        if (From != null)
-            From.Connections.Remove((this as K)!);
-
-        if (To != null)
-            To.Connections.Remove((this as K)!);
+        From = null;
+        To = null;
     }
 
     private void OnFromPositionChanged(object? sender, EventArgs e)

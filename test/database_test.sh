@@ -1,3 +1,4 @@
+#!/bin/bash
 set -e
 USER="$3"
 PASSWORD="$4"
@@ -69,7 +70,7 @@ for index in ${!URLs[*]}; do
 
     cd ../
 
-    dotnet run --project ../DatabaseTester/DatabaseTester.csproj $HOST $PORT $USER $PASSWORD temp_CI ${COREs[$index]}
+    dotnet run --project ../DatabaseTester/DatabaseTester.csproj $HOST $PORT $USER $PASSWORD temp_CI x ${COREs[$index]}
 
     "${MYSQL_PATH}" -u ${USER} -p${PASSWORD} -e 'DROP DATABASE temp_CI'
 

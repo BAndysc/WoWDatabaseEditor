@@ -6,15 +6,22 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="serverExecutable:ServerExecutableConfigurationPanelViewModel"
              x:Class="WoWDatabaseEditorCore.Avalonia.Services.ServerExecutable.ServerExecutableConfigurationPanelView">
-    <Grid RowDefinitions="Auto,5,Auto" ColumnDefinitions="Auto,5,*,5,Auto">
-        <TextBlock VerticalAlignment="Center">World server:</TextBlock>
-        <TextBox Text="{CompiledBinding WorldServerPath}"
-                 Grid.Row="0" Grid.Column="2" />
-        <Button Grid.Row="0" Grid.Column="4" Command="{CompiledBinding PickWorldPath}" Content="..." />
-
-        <TextBlock VerticalAlignment="Center" Grid.Row="2">Auth server:</TextBlock>
-        <TextBox Text="{CompiledBinding AuthServerPath}"
-                 Grid.Row="2" Grid.Column="2" />
-        <Button Grid.Row="2" Grid.Column="4" Command="{CompiledBinding PickAuthPath}" Content="..." />
-    </Grid>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel>
+            <SettingItem Header="World server path">
+                <DockPanel>
+                    <Button DockPanel.Dock="Right" Command="{CompiledBinding PickWorldPath}" Content="..." />
+                    <TextBox Text="{CompiledBinding WorldServerPath}"
+                             MinWidth="250" />
+                </DockPanel>
+            </SettingItem>
+            <SettingItem Header="Auth server path">
+                <DockPanel>
+                    <Button DockPanel.Dock="Right" Command="{CompiledBinding PickAuthPath}" Content="..." />
+                    <TextBox Text="{CompiledBinding AuthServerPath}"
+                             MinWidth="250" />
+                </DockPanel>
+            </SettingItem>
+        </StackPanel>
+    </ScrollViewer>
 </UserControl>

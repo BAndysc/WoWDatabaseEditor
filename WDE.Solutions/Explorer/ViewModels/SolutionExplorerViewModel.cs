@@ -223,7 +223,7 @@ namespace WDE.Solutions.Explorer.ViewModels
         private void DeleteSolutionItem(SolutionItemViewModel item)
         {
             if (item.Parent == null)
-                this.solutionManager.Items.Remove(item.Item);
+                this.solutionManager.Remove(item.Item);
             else
                 item.Parent.Item.Items?.Remove(item.Item);
             
@@ -253,7 +253,7 @@ namespace WDE.Solutions.Explorer.ViewModels
             if (existing == null)
             {
                 if (selected == null)
-                    solutionManager.Items.Add(item);
+                    solutionManager.Add(item);
                 else if (selected.Item.Items != null && selected.Item.IsContainer)
                     selected.Item.Items.Add(item);
                 else if (selected.Parent != null)
@@ -299,7 +299,7 @@ namespace WDE.Solutions.Explorer.ViewModels
                 dropInfo.Effects = DragDropEffects.Move;
             }
         }
-
+        
         public void Drop(IDropInfo dropInfo)
         {
             SolutionItemViewModel? sourceItem = dropInfo.Data as SolutionItemViewModel;
@@ -309,7 +309,7 @@ namespace WDE.Solutions.Explorer.ViewModels
                 return;
 
             var prevPosition = 0;
-            var sourceList = sourceItem.Parent == null ? solutionManager.Items : sourceItem.Parent.Item.Items;
+            var sourceList = sourceItem.Parent == null ? (ObservableCollection<ISolutionItem>)solutionManager.Items : sourceItem.Parent.Item.Items;
             if (sourceList == null)
                 return;
             
@@ -317,7 +317,7 @@ namespace WDE.Solutions.Explorer.ViewModels
                 ? targetItem
                 : targetItem?.Parent;
             
-            var destList = destListOwner?.Item?.Items ?? solutionManager.Items;
+            var destList = destListOwner?.Item?.Items ?? (ObservableCollection<ISolutionItem>)solutionManager.Items;
 
             while (destListOwner != null)
             {

@@ -99,10 +99,10 @@ namespace WDE.MapRenderer.Managers
             modules.Clear();
         }
 
-        public void Render()
+        public void Render(float delta)
         {
             foreach (var module in modules)
-                module.Item2.Render();
+                module.Item2.Render(delta);
         }
 
         public void RenderGUI()

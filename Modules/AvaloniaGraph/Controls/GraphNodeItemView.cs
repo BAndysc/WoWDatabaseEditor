@@ -91,7 +91,8 @@ public class GraphNodeItemView : ListBoxItem
         startX = X;
         startY = Y;
 
-        isLeftMouseButtonDown = true;
+        if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+            isLeftMouseButtonDown = true;
 
         e.Handled = true;
 

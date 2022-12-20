@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;
+using WDE.Common.Types;
 using WDE.Module.Attributes;
 
 namespace WDE.Trinity
@@ -12,13 +13,15 @@ namespace WDE.Trinity
     {
         public string Tag => "TrinityWrath";
         public string FriendlyName => "TrinityCore Wrath of the Lich King";
+        public ImageUri Icon { get; } = new ImageUri("Icons/core_tc.png");
         public ISmartScriptFeatures SmartScriptFeatures => this;
         public IConditionFeatures ConditionFeatures => this;
         public IGameVersionFeatures GameVersionFeatures => this;
         public IDatabaseFeatures DatabaseFeatures => this;
         public IEventAiFeatures EventAiFeatures => this;
         public PhasingType PhasingType => PhasingType.PhaseMasks;
-        
+        public int Build => 12340;
+
         public ISet<Type> UnsupportedTables { get; } = new HashSet<Type>{typeof(IAreaTriggerTemplate), typeof(IConversationTemplate), typeof(ISceneTemplate), typeof(IAreaTriggerCreateProperties)};
         public bool AlternativeTrinityDatabase => false;
         public WaypointTables SupportedWaypoints => WaypointTables.WaypointData | WaypointTables.SmartScriptWaypoint | WaypointTables.ScriptWaypoint;

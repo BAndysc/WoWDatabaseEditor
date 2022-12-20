@@ -1,0 +1,66 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:views="clr-namespace:WDE.MapSpawnsEditor.Views"
+             xmlns:viewModels="clr-namespace:WDE.MapSpawnsEditor.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:SpawnsToolViewModel"
+             x:Class="WDE.MapSpawnsEditor.Views.SpawnsToolView">
+    <DockPanel>
+        <ToolbarPanel DockPanel.Dock="Top">
+            <Button Content="Active events">
+                <Button.Flyout>
+                    <Flyout>
+                        <ScrollViewer MaxHeight="600">
+                            <ItemsRepeater Items="{CompiledBinding Events}">
+                                <ItemsRepeater.ItemTemplate>
+                                    <DataTemplate x:DataType="viewModels:GameEventViewModel">
+                                        <CheckBox Margin="0,3,0,3" IsChecked="{CompiledBinding Active}">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock MinWidth="23" FontFamily="Consolas,Menlo,Courier,Courier New" Opacity="0.7" Text="{CompiledBinding Entry}" />
+                                                <TextBlock Text="{CompiledBinding Name}" />
+                                            </StackPanel>
+                                        </CheckBox>
+                                    </DataTemplate>
+                                </ItemsRepeater.ItemTemplate>
+                            </ItemsRepeater>
+                        </ScrollViewer>
+                    </Flyout>
+                </Button.Flyout>
+            </Button>
+            <Button Content="Active phases">
+                <Button.Flyout>
+                    <Flyout>
+                        <ScrollViewer MaxHeight="600">
+                            <ItemsRepeater Items="{CompiledBinding AllPhases}">
+                                <ItemsRepeater.ItemTemplate>
+                                    <DataTemplate x:DataType="viewModels:GamePhaseViewModel">
+                                        <CheckBox Margin="0,3,0,3" IsChecked="{CompiledBinding Active}">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock MinWidth="23" FontFamily="Consolas,Menlo,Courier,Courier New" Opacity="0.7" Text="{CompiledBinding Entry}" />
+                                                <TextBlock Text="{CompiledBinding Name}" />
+                                            </StackPanel>
+                                        </CheckBox>
+                                    </DataTemplate>
+                                </ItemsRepeater.ItemTemplate>
+                            </ItemsRepeater>
+                        </ScrollViewer>
+                    </Flyout>
+                </Button.Flyout>
+            </Button>
+        </ToolbarPanel>
+        <TextBox DockPanel.Dock="Top" Watermark="Search" Text="{CompiledBinding SearchText}" />
+        <ScrollViewer>
+            <views:SpawnsFastTreeList Name="SpawnsList" SelectedNode2="{CompiledBinding SelectedNode, Mode=TwoWay}" Items2="{CompiledBinding SpawnItems}"
+                                      IsFiltered2="{CompiledBinding SearchText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" 
+                                      DoubleTapped="InputElement_OnDoubleTapped" KeyDown="SpawnsList_OnKeyDown">
+                <views:SpawnsFastTreeList.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Spawn" Command="{CompiledBinding AddSpawn}" CommandParameter="{CompiledBinding SelectedNode}" />
+                    </ContextMenu>
+                </views:SpawnsFastTreeList.ContextMenu>
+            </views:SpawnsFastTreeList>
+        </ScrollViewer>
+    </DockPanel>
+</UserControl>

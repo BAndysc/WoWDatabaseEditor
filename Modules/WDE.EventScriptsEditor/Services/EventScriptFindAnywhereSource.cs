@@ -29,8 +29,10 @@ public class EventScriptFindAnywhereSource : IFindAnywhereSource
         this.dataProvider = dataProvider;
         this.viewModelFactory = viewModelFactory;
     }
-    
-    public async Task Find(IFindAnywhereResultContext resultContext, IReadOnlyList<string> parameterNames, long parameterValue, CancellationToken cancellationToken)
+
+    public FindAnywhereSourceType SourceType => FindAnywhereSourceType.EventAi;
+
+    public async Task Find(IFindAnywhereResultContext resultContext, FindAnywhereSourceType searchType, IReadOnlyList<string> parameterNames, long parameterValue, CancellationToken cancellationToken)
     {
         EventScriptType? lookForType = null;
         if (parameterNames.IndexOf("EventScriptParameter") != -1)
@@ -47,6 +49,7 @@ public class EventScriptFindAnywhereSource : IFindAnywhereSource
                 var vm = viewModelFactory.Factory(result[0]);
                 resultContext.AddResult(new FindAnywhereResult(
                     new ImageUri("Icons/document_event_script_big.png"),
+                    null,
                     lookForType.Value + " Script",
                     vm.Text,
                     item
@@ -61,6 +64,7 @@ public class EventScriptFindAnywhereSource : IFindAnywhereSource
             var vm = viewModelFactory.Factory(f);
             resultContext.AddResult(new FindAnywhereResult(
                 new ImageUri("Icons/document_event_script_big.png"),
+                null,
                 f.Type + " Script",
                 vm.Text,
                 item

@@ -1,0 +1,58 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:idc="clr-namespace:Dock.Avalonia.Controls;assembly=Dock.Avalonia">
+        <Styles.Resources>
+                <AccentSolidColorBrush Hue="{DynamicResource AccentHue}" BaseColor="#4D6082" x:Key="ToolChromeControl.Grip" />
+                <AccentSolidColorBrush Hue="{DynamicResource AccentHue}" BaseColor="#515F7F" x:Key="DocumentControl.PART_TabStripItem" />
+                <AccentSolidColorBrush Hue="{DynamicResource AccentHue}" BaseColor="#5F7096" x:Key="DocumentControl.PART_TabStrip.pointerover.not.selected" />
+        </Styles.Resources>
+        <Style Selector="idc|ToolChromeControl">
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+        <Style Selector="idc|ToolChromeControl /template/ Grid#PART_Grip">
+                <Setter Property="Background" Value="{StaticResource ToolChromeControl.Grip}"/>
+        </Style>
+        <Style Selector="idc|ToolChromeControl /template/ TextBlock#PART_Title">
+                <Setter Property="Foreground" Value="{DynamicResource DockThemeForegroundBrush}" />
+        </Style>
+        <Style Selector="idc|DocumentControl /template/ Border#PART_Border ContentControl#PART_ContentPresenter">
+                <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
+        </Style>
+        <Style Selector="idc|DocumentControl TabStripItem">
+                <Setter Property="Background" Value="{DynamicResource TitleBarBackground}" />
+        </Style>
+        <Style Selector="idc|DocumentControl /template/ TabStrip#PART_TabStrip TabStripItem:pointerover:not(:selected)">
+                <Setter Property="Background" Value="{StaticResource DocumentControl.PART_TabStrip.pointerover.not.selected}"/>
+                <Setter Property="Foreground" Value="White" />
+        </Style>
+        <Style Selector="idc|DocumentControl:not(:active) /template/ TabStrip#PART_TabStrip TabStripItem:pointerover">
+                <Setter Property="Background" Value="{StaticResource DocumentControl.PART_TabStrip.pointerover.not.selected}"/>
+                <Setter Property="Foreground" Value="White" />
+        </Style>
+        <Style Selector="idc|ToolControl TabStrip#PART_TabStrip TabStripItem">
+                <Setter Property="Foreground" Value="White" />
+                <Setter Property="Background" Value="{StaticResource DocumentControl.PART_TabStripItem}" />
+        </Style>
+        <Style Selector="idc|ToolControl TabStrip#PART_TabStrip TabStripItem:pointerover">
+                <Setter Property="Foreground" Value="White" />
+                <Setter Property="Background" Value="{StaticResource DocumentControl.PART_TabStrip.pointerover.not.selected}" />
+        </Style>
+        <Style Selector="idc|ToolControl /template/ TabStrip#PART_TabStrip TabStripItem:selected">
+                <Setter Property="Foreground" Value="{DynamicResource DockApplicationAccentForegroundBrush}" />
+                <Setter Property="Background" Value="{DynamicResource ContentBackground}" />
+        </Style>
+        <Style Selector="idc|DocumentControl /template/ Border#PART_Border">
+                <Setter Property="BorderThickness" Value="1,0,1,1"/>
+        </Style>
+        <Style Selector="idc|DocumentControl /template/ Grid#PART_Grid">
+                <Setter Property="Background" Value="{StaticResource DocumentControl.PART_TabStripItem}"/>
+        </Style>
+        <Style Selector="idc|DocumentControl:not(:active) /template/ TabStrip#PART_TabStrip TabStripItem:selected">
+                <Setter Property="Background" Value="{StaticResource DocumentControl.PART_TabStripItem}" />
+        </Style>
+        
+        <Style Selector="DocumentControl /template/ TabStrip#PART_TabStrip TabStripItem">
+                <Setter Property="Foreground" Value="#333333" />
+        </Style>
+</Styles>

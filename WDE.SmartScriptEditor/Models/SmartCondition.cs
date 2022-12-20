@@ -5,6 +5,7 @@ using SmartFormat;
 using WDE.Common.Parameters;
 using WDE.Parameters;
 using WDE.Parameters.Models;
+using WDE.SmartScriptEditor.Editor;
 
 namespace WDE.SmartScriptEditor.Models
 {
@@ -16,31 +17,42 @@ namespace WDE.SmartScriptEditor.Models
 
     public class SmartCondition : SmartBaseElement
     {
-        public static readonly int SmartConditionParametersCount = 3;
-
+        private readonly IEditorFeatures features;
         private string comment = "";
         private bool isSelected;
         private SmartEvent? parent;
         private ParameterValueHolder<long> inverted;
         private ParameterValueHolder<long> conditionTarget;
 
-        public SmartCondition(int id, bool supportsVictimTarget) : base(SmartConditionParametersCount, id, that => new ConstContextParameterValueHolder<long, SmartBaseElement>(Parameter.Instance, 0, that))
+        private string? negativeReadableHint;
+        public string? NegativeReadableHint
         {
-            var conditionTargetParam = new Parameter();
-            conditionTargetParam.Items = new Dictionary<long, SelectOption>() {[0] = new("Action invoker"), [1] = new("Object")};
-            if (supportsVictimTarget)
-                conditionTargetParam.Items.Add(2, new SelectOption("Victim"));
+            get => negativeReadableHint;
+            set
+            {
+                negativeReadableHint = value;
+                CallOnChanged(null);
+            }
+        }
+        
+        public SmartCondition(int id, IEditorFeatures features) : base(id, features.ConditionParametersCount, that => new ConstContextParameterValueHolder<long, SmartBaseElement>(Parameter.Instance, 0, that))
+        {
+            this.features = features;
 
             inverted = new ParameterValueHolder<long>("Inverted", BoolParameter.Instance, 0);
-            conditionTarget = new ParameterValueHolder<long>("Condition target", conditionTargetParam, 0);
+            conditionTarget = new ParameterValueHolder<long>("Condition target", features.ConditionTargetParameter, 0);
             inverted.PropertyChanged += ((sender, value) =>
             {
-                CallOnChanged();
+                CallOnChanged(sender);
                 OnPropertyChanged(nameof(IsInverted));
             });
-            conditionTarget.PropertyChanged += ((sender, value) => CallOnChanged());
-            Context.Add(conditionTarget);
+            conditionTarget.PropertyChanged += ((sender, value) => CallOnChanged(sender));
+            while (Context.Count < 9)
+                Context.Add(null);
+            Context.Add(new ParameterWithContext(conditionTarget, this));
         }
+        
+        public int Indent { get; set; }
 
         public SmartEvent? Parent
         {
@@ -83,23 +95,34 @@ namespace WDE.SmartScriptEditor.Models
             }
         }
 
-        public override string Readable
+        protected override string ReadableImpl
         {
             get {
                 string? readable = ReadableHint;
                 if (readable == null)
                     return "";
-                return Smart.Format(readable, new
+                if (negativeReadableHint != null && inverted.Value != 0)
+                    readable = negativeReadableHint;
+                bool isNegative = inverted.Value != 0;
+                var result = Smart.Format(readable, new
                 {
-                    target = "[p=3]" + conditionTarget + "[/p]",
+                    target = "[p=9]" + conditionTarget + "[/p]",
                     pram1 = "[p=0]" + GetParameter(0) + "[/p]",
                     pram2 = "[p=1]" + GetParameter(1) + "[/p]",
                     pram3 = "[p=2]" + GetParameter(2) + "[/p]",
+                    pram4 = ParametersCount >= 4 ? "[p=3]" + GetParameter(3) + "[/p]" : "",
                     pram1value = GetParameter(0).Value,
                     pram2value = GetParameter(1).Value,
                     pram3value = GetParameter(2).Value,
+                    pram4value = ParametersCount >= 4 ? GetParameter(3).Value : 0,
+                    pram1comp = (isNegative, GetParameter(0).Value),
+                    pram2comp = (isNegative, GetParameter(1).Value),
+                    pram3comp = (isNegative, GetParameter(2).Value),
+                    pram4comp = (isNegative, ParametersCount >= 4 ? GetParameter(3).Value : 0),
+                    
                     negate = inverted.Value == 0
                 });
+                return result;
             }
         }
 
@@ -109,20 +132,17 @@ namespace WDE.SmartScriptEditor.Models
                 OnPropertyChanged(nameof(IsSelected));
         }
 
-        private void SourceOnOnChanged(object? sender, EventArgs e)
-        {
-            CallOnChanged();
-        }
-
         public SmartCondition Copy()
         {
-            SmartCondition se = new(Id, conditionTarget.Parameter.Items?.Count >= 3);
+            SmartCondition se = new(Id, features);
             se.Comment = Comment;
             se.ReadableHint = ReadableHint;
+            se.NegativeReadableHint = NegativeReadableHint;
             se.DescriptionRules = DescriptionRules;
             se.inverted.Value = inverted.Value;
             se.conditionTarget.Value = conditionTarget.Value;
-            for (var i = 0; i < SmartConditionParametersCount; ++i)
+            se.Indent = Indent;
+            for (var i = 0; i < ParametersCount; ++i)
             {
                 se.GetParameter(i).Copy(GetParameter(i));
             }

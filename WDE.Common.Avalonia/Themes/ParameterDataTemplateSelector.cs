@@ -13,7 +13,7 @@ namespace WDE.Common.Avalonia.Themes
         
         public IControl Build(object item)
         {
-            if (item is ParameterValueHolder<long> intParam && intParam.Parameter is BoolParameter boolParameter && BoolParameter != null)
+            if (item is IParameterValueHolder<long> intParam && intParam.Parameter is BoolParameter boolParameter && BoolParameter != null)
                 return BoolParameter.Build(item);
             return Generic?.Build(item) ?? new Panel();
         }

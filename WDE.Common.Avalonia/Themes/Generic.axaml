@@ -26,7 +26,7 @@
                                                 CommandParameter="{Binding }"
                                                 Margin="3,0,0,0"
                                                 Focusable="False"
-                                                IsVisible="{Binding HasItems}" />
+                                                IsVisible="{Binding HasItems, FallbackValue=False}" />
                                         <controls:ParameterTextBox VerticalContentAlignment="Center"
                                                                    Focusable="True"
                                                                    Name="TextBox"
@@ -53,7 +53,7 @@
                                             </controls:ParameterTextBox.InnerLeftContent>
                                             <controls:ParameterTextBox.InnerRightContent>
                                                 <Button 
-                                                    IsVisible="{Binding SpecialCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=controls:ParameterValueHolderView}, Converter={StaticResource NullConverter}}"
+                                                    IsVisible="{Binding SpecialCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=controls:ParameterValueHolderView}, Converter={StaticResource NullConverter}, FallbackValue=False}"
                                                     Background="Transparent"
                                                     BorderBrush="Transparent"
                                                     Command="{Binding PickSpecial, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=controls:ParameterValueHolderView}}">
@@ -105,6 +105,19 @@
                 <Panel Background="Transparent" Name="PART_Panel">
                     <TextBlock HorizontalAlignment="Stretch" VerticalAlignment="Center" TextAlignment="Left" Text="{TemplateBinding Text}"></TextBlock>
                 </Panel>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    
+    
+    <Style Selector="controls|OkCancelButtons">
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <StackPanel Spacing="15" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button IsDefault="True" Classes="primary" MinWidth="90" MinHeight="30" Command="{TemplateBinding AcceptCommand}" Content="{TemplateBinding AcceptText}"></Button>
+                    <Button IsCancel="True" MinWidth="90" MinHeight="30" Command="{TemplateBinding CancelCommand}">Cancel</Button>
+                </StackPanel>
             </ControlTemplate>
         </Setter>
     </Style>

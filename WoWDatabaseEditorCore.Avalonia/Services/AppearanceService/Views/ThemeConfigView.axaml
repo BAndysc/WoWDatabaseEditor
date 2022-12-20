@@ -7,22 +7,39 @@
              xmlns:viewModels="clr-namespace:WoWDatabaseEditorCore.Avalonia.Services.AppearanceService.ViewModels"
              x:DataType="viewModels:ThemeConfigViewModel"
              prism:ViewModelLocator.AutoWireViewModel="False">
-    <StackPanel>
-        <controls:SettingsHeader Text="Themes" />
-        <TextBlock VerticalAlignment="Center"  Text="{CompiledBinding CurrentThemeName, StringFormat=Current: {0}}" />
-        <TextBlock VerticalAlignment="Center"  Text="All:" />
-        <ComboBox Margin="30,0,0,0" VerticalAlignment="Top" Items="{CompiledBinding Themes}"
-                  SelectedItem="{CompiledBinding ThemeName, Mode=TwoWay}" />
-        
-        <controls:SettingsHeader Text="Scaling" />
-        <TextBlock VerticalAlignment="Center"  Text="{CompiledBinding RecommendedScalingPercentage, StringFormat=Recommended scaling: {0}%}" />
-        <TextBlock VerticalAlignment="Center"  Text="Custom scaling [EXPERIMENTAL]:" />
-        <CheckBox IsEnabled="{CompiledBinding AllowCustomScaling}" Margin="30,0,0,0" IsChecked="{CompiledBinding UseCustomScaling}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
-            <Grid ColumnDefinitions="Auto,*" IsEnabled="{CompiledBinding UseCustomScaling}">
-                <TextBlock Width="90" VerticalAlignment="Center" Text="{CompiledBinding ScalingValuePercentage, StringFormat={}{0}%}"></TextBlock>
-                <Slider Grid.Column="1" HorizontalAlignment="Stretch" Name="ScalingSlider" Minimum="0.5" Maximum="4" Value="{CompiledBinding ScalingValue, Mode=TwoWay}" SmallChange="0.1" LargeChange="0.5" />
-            </Grid>
-        </CheckBox>
-        <TextBlock IsVisible="{CompiledBinding AllowCustomScaling, Converter={x:Static BoolConverters.Not}}">Info: Custom scaling is available only on Windows</TextBlock>
-    </StackPanel>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel>
+            <controls:SettingsHeader Text="Themes" />
+            <StackPanel>
+                <SettingItem Header="Current theme">
+                    <TextBlock FontWeight="Bold" Text="{CompiledBinding CurrentThemeName}" />
+                </SettingItem>
+                <SettingItem Header="Theme">
+                    <ComboBox Margin="30,0,0,0" VerticalAlignment="Top" Items="{CompiledBinding Themes}"
+                              SelectedItem="{CompiledBinding ThemeName, Mode=TwoWay}" />
+                </SettingItem>
+                <SettingItem Header="Accent color" Help="Info: Custom accent color is available only in Windows 11 Theme.">
+                    <DockPanel>
+                        <Slider DockPanel.Dock="Right" Orientation="Vertical" VerticalAlignment="Stretch" Value="{CompiledBinding Lightness}" Name="Lightness" Minimum="0" Maximum="1" />
+                        <ColorPicker Lightness="{CompiledBinding Lightness}" SelectedColor="{CompiledBinding Color, Mode=TwoWay}" Width="200" Height="120" />
+                    </DockPanel>
+                </SettingItem>
+            </StackPanel>
+            
+            <controls:SettingsHeader Text="Scaling" />
+            <StackPanel>
+                <SettingItem Header="Recommended scaling">
+                    <TextBlock VerticalAlignment="Center"  Text="{CompiledBinding RecommendedScalingPercentage, StringFormat={}{0}%}" FontWeight="Bold" />
+                </SettingItem>
+                <SettingItem Header="Custom scaling" Help="Info: Custom scaling is available only on Windows">
+                    <DockPanel IsEnabled="{CompiledBinding AllowCustomScaling}">
+                        <ToggleSwitch IsChecked="{CompiledBinding UseCustomScaling}" DockPanel.Dock="Right" />
+                        <TextBlock DockPanel.Dock="Left" Width="90" VerticalAlignment="Center" Text="{CompiledBinding ScalingValuePercentage, StringFormat={}{0}%}"></TextBlock>
+                        <Slider MinWidth="100" HorizontalAlignment="Stretch" Name="ScalingSlider" Minimum="0.5" Maximum="4" Value="{CompiledBinding ScalingValue, Mode=TwoWay}" SmallChange="0.1" LargeChange="0.5" />
+                    </DockPanel>
+                </SettingItem>
+            </StackPanel>
+
+        </StackPanel>
+    </ScrollViewer>
 </UserControl>

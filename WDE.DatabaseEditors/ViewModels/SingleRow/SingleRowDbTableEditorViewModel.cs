@@ -71,6 +71,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
         public ObservableCollection<DatabaseEntityViewModel> Rows { get; } = new();
 
         private bool showOnlyModified;
+        public override DatabaseKey? SelectedTableKey => FocusedEntity?.GenerateKey(tableDefinition);
         [AlsoNotify(nameof(FocusedEntity))] [AlsoNotify(nameof(FocusedRow))] [Notify] private int focusedRowIndex;
         [AlsoNotify(nameof(FocusedCell))] [Notify] private int focusedCellIndex = -1;
         public override DatabaseEntity? FocusedEntity => FocusedRow?.Entity;

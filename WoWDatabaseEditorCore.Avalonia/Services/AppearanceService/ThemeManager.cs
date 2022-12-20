@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using AvaloniaStyles;
+using AvaloniaStyles.Utils;
 using WDE.Common.Factories.Http;
 using WDE.Common.Managers;
 using WDE.Module.Attributes;
@@ -33,6 +34,8 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.AppearanceService
             SetTheme(theme);
             if (Enum.TryParse<SystemThemeOptions>(theme.Name, out var t))
                 AvaloniaThemeStyle.Theme = t;
+            AvaloniaThemeStyle.AccentHue = new HslDiff(settings.Hue+AvaloniaThemeStyle.BaseHue, settings.Saturation, settings.Lightness);
+            
             SystemTheme.CustomScalingValue = settings.UseCustomScaling ? Math.Clamp(settings.CustomScaling, 0.5, 4) : null;
         }
 

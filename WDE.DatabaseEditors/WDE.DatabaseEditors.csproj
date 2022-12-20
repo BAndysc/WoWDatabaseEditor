@@ -17,6 +17,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\AvaloniaStyles\AvaloniaStyles.csproj" />
+      <ProjectReference Include="..\Modules\WDE.QueryGenerators\WDE.QueryGenerators.csproj" />
       <ProjectReference Include="..\WDE.Common.Avalonia\WDE.Common.Avalonia.csproj" />
       <ProjectReference Include="..\WDE.MVVM\WDE.MVVM.csproj" />
       <ProjectReference Include="..\WDE.Parameters\WDE.Parameters.csproj" />

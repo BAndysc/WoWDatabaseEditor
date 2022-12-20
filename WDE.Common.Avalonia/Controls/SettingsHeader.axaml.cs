@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Metadata;
 
 namespace WDE.Common.Avalonia.Controls
 {
@@ -9,6 +10,7 @@ namespace WDE.Common.Avalonia.Controls
         private string? text;
         public static readonly DirectProperty<SettingsHeader, string?> TextProperty = AvaloniaProperty.RegisterDirect<SettingsHeader, string?>("Text", o => o.Text, (o, v) => o.Text = v);
 
+        [Content]
         public string? Text
         {
             get => text;

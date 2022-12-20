@@ -9,6 +9,8 @@ namespace WDE.DbcStore.Spells.Cataclysm
 {
     public class CataSpellService : ISpellService
     {
+        private readonly DatabaseClientFileOpener opener;
+
         private class SpellCastTime
         {
             public uint Id;
@@ -37,9 +39,9 @@ namespace WDE.DbcStore.Spells.Cataclysm
             public uint EffectRadiusIndexA { get; init; }
             public uint EffectRadiusIndexB { get; init; }
             public float EffectRealPointsPerLevel { get; init; }
-            public uint[] EffectSpellClassMask { get; init; }
+            public uint[] EffectSpellClassMask { get; init; } = Array.Empty<uint>();
             public uint EffectTriggerSpell { get; init; }
-            public uint[] ImplicitTarget { get; init; }
+            public uint[] ImplicitTarget { get; init; } = Array.Empty<uint>();
             public uint SpellId { get; init; }
             public uint EffectIndex { get; init; }
             public uint EffectAttributes { get; init; }
@@ -73,8 +75,8 @@ namespace WDE.DbcStore.Spells.Cataclysm
             public SpellEffect[]? SpellEffects { get; set; }
             public uint SpellCastingRequirementsId { get; init; }
             public SpellCastingRequirements? SpellCastingRequirements { get; init; }
-            
-            public string Name { get; init; }
+
+            public string Name { get; init; } = null!;
             public string? Description { get; init; }
             public uint? SkillLine { get; set; }
             public SpellCastTime? CastTime { get; set; }
@@ -83,11 +85,14 @@ namespace WDE.DbcStore.Spells.Cataclysm
         private Dictionary<uint, SpellCastTime> spellCastTimes = new();
         private Dictionary<uint, SpellCastingRequirements> requirements = new();
         private Dictionary<uint, SpellData> spells = new();
+
+        public CataSpellService(DatabaseClientFileOpener opener)
+        {
+            this.opener = opener;
+        }
         
         public void Load(string path)
         {
-            var opener = new DatabaseClientFileOpener();
-
             foreach (var row in opener.Open(Path.Join(path, "SpellCastingRequirements.dbc")))
             {
                 requirements[row.GetUInt(0)] = new SpellCastingRequirements()
@@ -219,7 +224,7 @@ namespace WDE.DbcStore.Spells.Cataclysm
 
         public bool Exists(uint spellId) => spells.ContainsKey(spellId);
 
-        public T GetAttributes<T>(uint spellId) where T : Enum
+        public T GetAttributes<T>(uint spellId) where T : unmanaged, Enum
         {
             if (!spells.TryGetValue(spellId, out var spell))
                 return default;

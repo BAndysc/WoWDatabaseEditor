@@ -32,9 +32,36 @@ namespace WDE.SmartScriptEditor.Data
         public bool EnterToAccept { get; set; }
         
         [JsonProperty(PropertyName = "values")]
+        [JsonConverter(typeof(ParameterValuesJsonConverter))]
         public Dictionary<long, SelectOption> Values { get; set; }
     }
+    
+    [ExcludeFromCodeCoverage]
+    public struct SmartFloatParameterJsonData
+    {
+        [JsonProperty(PropertyName = "name")]
+        public string Name { get; set; }
 
+        [JsonProperty(PropertyName = "description")]
+        public string Description { get; set; }
+        
+        [JsonProperty(PropertyName = "defaultVal")]
+        public float DefaultVal { get; set; }
+    }
+    
+    [ExcludeFromCodeCoverage]
+    public struct SmartStringParameterJsonData
+    {
+        [JsonProperty(PropertyName = "name")]
+        public string Name { get; set; }
+
+        [JsonProperty(PropertyName = "description")]
+        public string Description { get; set; }
+        
+        [JsonProperty(PropertyName = "defaultVal")]
+        public string DefaultVal { get; set; }
+    }
+    
     [Flags]
     [JsonConverter(typeof(FlagJsonConverter))]
     public enum ActionFlags
@@ -49,6 +76,29 @@ namespace WDE.SmartScriptEditor.Data
         WaitAction = 64,
         NeedsAwait = 128,
         MustBeLast = 256
+    }
+    
+    [Flags]
+    [JsonConverter(typeof(FlagJsonConverter))]
+    public enum SmartSourceTargetType
+    {
+        None = 0,
+        Creature = 1,
+        GameObject = 2,
+        Player = 4,
+        AreaTrigger = 8,
+        Dummy = 16,
+        Conversation = 32,
+        BattlePet = 64,
+        DynObj = 128,
+        Position = 256,
+        Aura = 512,
+        Spell = 1024,
+        
+        Self = 0x800000,
+        
+        Unit = Creature | Player,
+        WorldObject = Unit | GameObject | AreaTrigger | Dummy | Conversation | BattlePet | DynObj
     }
 
     [ExcludeFromCodeCoverage]
@@ -93,18 +143,24 @@ namespace WDE.SmartScriptEditor.Data
 
         [JsonProperty(PropertyName = "parameters")]
         public IList<SmartParameterJsonData>? Parameters { get; set; }
+        
+        [JsonProperty(PropertyName = "fparameters")]
+        public IList<SmartFloatParameterJsonData>? FloatParameters { get; set; }
+        
+        [JsonProperty(PropertyName = "sparameters")]
+        public IList<SmartStringParameterJsonData>? StringParameters { get; set; }
 
         [JsonProperty(PropertyName = "description")]
         public string Description { get; set; }
 
         [JsonProperty(PropertyName = "types")]
-        public IList<string>? Types { get; set; }
-
+        public SmartSourceTargetType RawTypes { get; set; }
+        
         [JsonProperty(PropertyName = "is_only_target")]
         public bool IsOnlyTarget { get; set; }
 
         [JsonProperty(PropertyName = "sources")]
-        public IList<string>? Sources { get; set; }
+        public SmartSourceTargetType Sources { get; set; }
 
         [JsonProperty(PropertyName = "incompatible")]
         public IList<int>? Incompatible { get; set; }
@@ -116,7 +172,7 @@ namespace WDE.SmartScriptEditor.Data
         public bool DoNotProposeTarget { get; set; }
 
         [JsonProperty(PropertyName = "target_types")]
-        public IList<string>? TargetTypes { get; set; }
+        public SmartSourceTargetType TargetTypes { get; set; }
 
         [JsonProperty(PropertyName = "implicit_source")]
         public string? ImplicitSource { get; set; }
@@ -172,6 +228,46 @@ namespace WDE.SmartScriptEditor.Data
         public bool HasParameters()
         {
             return Parameters != null && Parameters.Count > 0;
+        }
+        
+        public SmartSourceTargetType Types(SmartScriptType scriptType)
+        {
+            var hasSelf = RawTypes.HasFlag(SmartSourceTargetType.Self);
+            if (!hasSelf)
+                return RawTypes;
+            var types = RawTypes;
+            switch (scriptType)
+            {
+                case SmartScriptType.Creature:
+                    types |= SmartSourceTargetType.Creature;
+                    break;
+                case SmartScriptType.GameObject:
+                    types |= SmartSourceTargetType.GameObject;
+                    break;
+                case SmartScriptType.Quest:
+                    types |= SmartSourceTargetType.Player;
+                    break;
+                case SmartScriptType.Spell:
+                    types |= SmartSourceTargetType.Unit;
+                    break;
+                case SmartScriptType.TimedActionList:
+                    types |= SmartSourceTargetType.Creature | SmartSourceTargetType.GameObject;
+                    break;
+                case SmartScriptType.AreaTriggerEntityServerSide:
+                    types |= SmartSourceTargetType.AreaTrigger;
+                    break;
+                case SmartScriptType.StaticSpell:
+                    types |= SmartSourceTargetType.Unit;
+                    break;
+                case SmartScriptType.BattlePet:
+                    types |= SmartSourceTargetType.BattlePet;
+                    break;
+                case SmartScriptType.Conversation:
+                    types |= SmartSourceTargetType.Player;
+                    break;
+            }
+
+            return types;
         }
     }
 

@@ -21,6 +21,11 @@
     </ItemGroup>
     <Import Project="..\Avalonia.props" />
     <ItemGroup>
+        <PackageReference Include="PropertyChanged.SourceGenerator">
+            <Version>1.0.3</Version>
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
         <PackageReference Include="Avalonia.Controls.TreeDataGrid" Version="0.10.10" />
         <PackageReference Include="Avalonia.Diagnostics" Version="$(AvaloniaVersion)" />
         <PackageReference Include="Avalonia.Controls.DataGrid" Version="$(AvaloniaVersion)" />
@@ -35,6 +40,8 @@
         <ProjectReference Include="..\Prism.Avalonia\src\Prism.Unity.Avalonia\Prism.Unity.Avalonia.csproj" />
         <ProjectReference Include="..\Rendering\TheEngine\TheEngine.csproj" />
         <ProjectReference Include="..\WDE.Common.Avalonia\WDE.Common.Avalonia.csproj" />
+        <ProjectReference Include="..\WDE.EventAiEditor.Avalonia\WDE.EventAiEditor.Avalonia.csproj" />
+        <ProjectReference Include="..\WDE.SmartScriptEditor.Avalonia\WDE.SmartScriptEditor.Avalonia.csproj" />
         <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />
         <ProjectReference Include="..\WoWDatabaseEditor\WoWDatabaseEditorCore.csproj" />
         <ProjectReference Include="..\Dock\src\Dock.Model\Dock.Model.csproj" />

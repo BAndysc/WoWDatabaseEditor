@@ -19,7 +19,7 @@ namespace WDE.Solutions.Manager
         public SolutionManager(IUserSettings userSettings, IParameterFactory parameterFactory)
         {
             this.userSettings = userSettings;
-            Items = new ObservableCollection<ISolutionItem>();
+            items = new ObservableList<ISolutionItem>();
 
             Initialize();
 
@@ -31,7 +31,30 @@ namespace WDE.Solutions.Manager
         }
 
         public event System.Action<ISolutionItem?>? RefreshRequest;
-        public ObservableCollection<ISolutionItem> Items { get; }
+        
+        public void Add(ISolutionItem item)
+        {
+            items.Add(item);
+        }
+
+        public void Insert(int index, ISolutionItem item)
+        {
+            items.Insert(index, item);
+        }
+
+        public void Remove(ISolutionItem item)
+        {
+            items.Remove(item);
+        }
+
+        public void RemoveAt(int index)
+        {
+            items.RemoveAt(index);
+        }
+
+        private ObservableList<ISolutionItem> items;
+        public IReadOnlyObservableList<ISolutionItem> Items => items;
+        public bool CanContainAnyItem => true;
 
         public void RefreshAll()
         {
@@ -54,10 +77,10 @@ namespace WDE.Solutions.Manager
             foreach (var item in data.Items)
             {
                 InitItem(item);
-                Items.Add(item);
+                items.Add(item);
             }
 
-            RemoveDuplicates(Items, new HashSet<ISolutionItem>());
+            RemoveDuplicates(items, new HashSet<ISolutionItem>());
         }
 
         private void RemoveDuplicates(ObservableCollection<ISolutionItem> items, HashSet<ISolutionItem> added)
@@ -101,7 +124,7 @@ namespace WDE.Solutions.Manager
 
         private void Save()
         {
-            userSettings.Update<Data>(new Data(Items));
+            userSettings.Update<Data>(new Data(items));
         }
 
         private void InitItem(ISolutionItem item)

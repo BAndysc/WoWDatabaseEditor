@@ -1,8 +1,8 @@
 ﻿using System.Diagnostics;
 using TheMaths;
+using WDE.Common.MPQ;
+using WDE.MpqReader.DBC;
 using WDE.MpqReader.Readers;
-using System.Collections;
-using Newtonsoft.Json.Linq;
 
 namespace WDE.MpqReader.Structures
 {
@@ -23,23 +23,38 @@ namespace WDE.MpqReader.Structures
             reader.Offset += 8; // unused
         }
     }
-
+    
+    public enum MDDFFlags {
+        mddf_biodome = 1,                     // this sets internal flags to | 0x800 (WDOODADDEF.var0xC).
+        mddf_shrubbery = 2,                   // the actual meaning of these is unknown to me. maybe biodome is for really big M2s. 6.0.1.18179 seems 
+        // not to check  for this flag
+        mddf_unk_4 = 0x4,                     // Legion+ᵘ
+        mddf_unk_8 = 0x8,                     // Legion+ᵘ
+        mddf_liquidKnown = 0x20, // Legion+ᵘ
+        mddf_entry_is_filedata_id = 0x40,     // Legion+ᵘ nameId is a file data id to directly load
+        mddf_unk_100 = 0x100,                 // Legion+ᵘ
+    }
+    
     public readonly struct M2PlacementData
     {
-        public readonly string M2Path;
+        public readonly FileId M2Path;
         public readonly Vector3 AbsolutePosition;
         public readonly Vector3 Rotation;
         public readonly float Scale;
-        public readonly ushort Flags;
+        public readonly MDDFFlags Flags;
 
         public M2PlacementData(IBinaryReader reader, string[] names)
         {
-            M2Path = names[reader.ReadInt32()];
+            var entry = reader.ReadUInt32();
             var uniqueId = reader.ReadInt32();
             AbsolutePosition = reader.ReadVector3();
             Rotation = reader.ReadVector3();
             Scale = reader.ReadUInt16() / 1024.0f;
-            Flags = reader.ReadUInt16();
+            Flags = (MDDFFlags)reader.ReadUInt16();
+            if (Flags.HasFlagFast(MDDFFlags.mddf_entry_is_filedata_id))
+                M2Path = entry;
+            else
+                M2Path = names[entry];
         }
     }
 
@@ -62,26 +77,56 @@ namespace WDE.MpqReader.Structures
         }
     }
 
+    public enum AdtFlags
+    {
+        has_mcsh = 1,
+        impass = 2,
+        lq_river = 4,
+        lq_ocean  = 8,
+        lq_magma  = 16,
+        lq_slime  = 32,
+        has_mccv  = 64,
+        unknown_0x80 = 128,
+        do_not_fix_alpha_map = 32768,                    // "fix" alpha maps in MCAL and MCSH (4 bit alpha maps are 63*63 instead of 64*64).
+        // If this flag is not set, the MCAL format *has* to be unfixed4444, otherwise UnpackAlphaShadowBits will assert.
+        high_res_holes = 65536,                          // Since ~5.3 WoW uses full 64-bit to store holes for each tile if this flag is set.
+    }
+    
     public class AdtChunk
     {
+        private readonly WdtFlags? wdtFlags;
         public Vector3 BasePosition { get; }
         public float[] Heights { get; } = new float[9 * 9 + 8 * 8];
         public Vector3[] Normals { get; } = new Vector3[9 * 9 + 8 * 8];
         public bool[,]? Holes { get; } = null;
-        public byte[,,] SplatMap { get; }
-        public ShadowMap? ShadowMap { get; } = null;
+        public byte[,,]? SplatMap { get; private set; }
+        public ShadowMap? ShadowMap { get; private set; } = null;
         public ADTSplat[] Splats { get; } = new ADTSplat[4];
         public uint AreaId { get; }
     
-        public AdtChunk(IBinaryReader reader, WdtFlags? wdtFlags)
+        private readonly int chunkFlags;
+        private int nLayers;
+        
+        public AdtChunk(IBinaryReader reader, WdtFlags? wdtFlags, GameFilesVersion gameFilesVersion)
         {
-            var chunkFlags = reader.ReadInt32();
+            this.wdtFlags = wdtFlags;
+            chunkFlags = reader.ReadInt32();
             var ix = reader.ReadInt32();
             var iy = reader.ReadInt32();
-            var nLayers = reader.ReadInt32();
+            nLayers = reader.ReadInt32();
             var nDoodadRefs = reader.ReadInt32();
-            var offsMCVT = reader.ReadInt32();
-            var offsMCNR = reader.ReadInt32();
+            var offsMCVT = 0;
+            var offsMCNR = 0;
+            ulong holesHighRes = 0;
+            if (gameFilesVersion <= GameFilesVersion.Cataclysm_4_3_4)
+            {
+                offsMCVT = reader.ReadInt32();
+                offsMCNR = reader.ReadInt32();                
+            }
+            else
+            {
+                holesHighRes = reader.ReadUInt64();
+            }
             var offsMCLY = reader.ReadInt32();
             var offsMCRF = reader.ReadInt32();
             var offsMCAL = reader.ReadInt32();
@@ -91,29 +136,66 @@ namespace WDE.MpqReader.Structures
             AreaId = reader.ReadUInt32();
             var nMapObjRefs = reader.ReadInt32();
             var holesLowRes = reader.ReadUInt16();
-        
-            reader.ReadBytes(42); // rest of the header
+
+            reader.Offset += 42; // skip rest of the header
             BasePosition = reader.ReadVector3();
-            reader.ReadBytes(12); // rest of header
-
-            reader.Offset = offsMCVT;
-            for (int i = 0; i < 9 * 9 + 8 * 8; ++i)
-                Heights[i] = reader.ReadFloat();
-
-            reader.Offset = offsMCNR;
-            for (int i = 0; i < 9 * 9 + 8 * 8; ++i)
+            reader.Offset += 12; // skip rest of the header
+            
+            if (gameFilesVersion > GameFilesVersion.Cataclysm_4_3_4)
             {
-                var x = (sbyte)reader.ReadByte();
-                var y = (sbyte)reader.ReadByte();
-                var z = (sbyte)reader.ReadByte();
-                Normals[i] = new Vector3(x / 127.0f, y / 127.0f, z / 127.0f);
+                while (!reader.IsFinished())
+                {
+                    var chunkName = reader.ReadChunkName();
+                    var size = reader.ReadInt32();
+
+                    var offset = reader.Offset;
+
+                    if (chunkName == "MCVT")
+                    {
+                        var partialReader = new LimitedReader(reader, size);
+                        for (int i = 0; i < 9 * 9 + 8 * 8; ++i)
+                            Heights[i] = partialReader.ReadFloat();   
+                    }
+                    else if (chunkName == "MCNR")
+                    {
+                        var partialReader = new LimitedReader(reader, size);
+                        for (int i = 0; i < 9 * 9 + 8 * 8; ++i)
+                        {
+                            var x = (sbyte)partialReader.ReadByte();
+                            var y = (sbyte)partialReader.ReadByte();
+                            var z = (sbyte)partialReader.ReadByte();
+                            Normals[i] = new Vector3(x / 127.0f, y / 127.0f, z / 127.0f);
+                        }
+                    }
+
+                    reader.Offset = offset + size;
+                }
+            }
+            
+            if (offsMCVT > 0)
+            {
+                reader.Offset = offsMCVT;
+                for (int i = 0; i < 9 * 9 + 8 * 8; ++i)
+                    Heights[i] = reader.ReadFloat();   
             }
 
-            reader.Offset = offsMCLY;
-            int splatId = 0;
-            while (splatId < nLayers)
+            if (offsMCNR > 0)
             {
-                Splats[splatId++] = new ADTSplat(reader);
+                reader.Offset = offsMCNR;
+                for (int i = 0; i < 9 * 9 + 8 * 8; ++i)
+                {
+                    var x = (sbyte)reader.ReadByte();
+                    var y = (sbyte)reader.ReadByte();
+                    var z = (sbyte)reader.ReadByte();
+                    Normals[i] = new Vector3(x / 127.0f, y / 127.0f, z / 127.0f);
+                }
+            }
+
+            if (offsMCLY > 0)
+            {
+                reader.Offset = offsMCLY - 4;
+                int sizeMcly = reader.ReadInt32();
+                LoadMCLY(new LimitedReader(reader, sizeMcly));   
             }
         
             if (holesLowRes != 0)
@@ -139,112 +221,189 @@ namespace WDE.MpqReader.Structures
 
             if (offsMCAL > 0)
             {
-                SplatMap = new byte[64, 64, nLayers];
-                int k = 0;
-                for (int i = 0; i < nLayers; ++i)
-                {
-                    if (!Splats[i].UseAlphamap)
-                        continue;
-
-                    reader.Offset = offsMCAL + (int)Splats[i].Offset;
-                    uint length = i < nLayers - 1 ? Splats[i + 1].Offset - Splats[i].Offset : (uint)sizeMCAL - Splats[i].Offset;
-
-                    if (Splats[i].UseAlphamapCompression)
-                    {
-                        int offO = 0;
-
-                        while (offO < 4096)
-                        {
-                            // fill or copy mode
-                            byte b = reader.ReadByte();
-                        
-                            bool fill = (b & 0x80) > 0;
-                            int n = b & 0x7F;
-                            if (n == 0)
-                                break;
-                            
-                            b = reader.ReadByte();
-                        
-                            for (int kk = 0; kk < n && offO < 4096; kk++)
-                            {
-                                SplatMap[offO % 64, offO / 64, k] = b;
-                                offO++;
-                                if (!fill)
-                                {
-                                    if (kk < n - 1)
-                                        b = reader.ReadByte();
-                                }
-                            }
-                        }
-                    }
-                    else if ((wdtFlags & WdtFlags.AdtHasBigAlpha) != 0) // 4096 uncompressed mode  if 0x4 or 0x80 set
-                    {
-                        for (int y = 0; y < 64; ++y)
-                        {
-                            for (int x = 0; x < 64; ++x)
-                            {
-                                SplatMap[x, y, k] = reader.ReadByte();
-                            }
-                        }
-                    }
-                    else //if (length != 4096) // if 2048 uncompressed mode
-                    {
-                        for (int y = 0; y < 64; ++y)
-                        {
-                            for (int x = 0; x < 64; x += 2)
-                            {
-                                var val = reader.ReadByte();
-                                SplatMap[x, y, k] = (byte)((val & 0xF) * 0x10);
-                                SplatMap[x + 1, y, k] = (byte)(((val >> 4) & 0xF) * 0x10);
-                            }
-                        }
-
-                        if ((chunkFlags & 0x8000) == 0) // Do not fix alpha map flag
-                        {
-                            for (int j = 0; j < 64; ++j)
-                            {
-                                SplatMap[j, 63, k] = SplatMap[j, 62, k];
-                                SplatMap[63, j, k] = SplatMap[62, j, k];
-                            }
-                            SplatMap[63, 63, k] = SplatMap[62, 62, k];
-                        }
-                    }
-
-                    ++k;
-                }
+                LoadMCAL(reader, offsMCAL, sizeMCAL);
             }
 
             if (offsMCSH > 0 && sizeMCSH > 0)
             {
-                ShadowMap = new ShadowMap();
                 reader.Offset = offsMCSH;
-                for (int y = 0; y < 64; ++y)
+                LoadMCSH(new LimitedReader(reader, sizeMCSH));
+            }
+        }
+
+        private void LoadMCSH(IBinaryReader reader)
+        {
+            ShadowMap = new ShadowMap();
+            for (int y = 0; y < 64; ++y)
+            {
+                for (int x = 0; x < 64; x += 8)
                 {
-                    for (int x = 0; x < 64; x += 8)
-                    {
-                        var b = reader.ReadByte();
-                        ShadowMap[x + 0, y] = (b & 0b00000001) != 0;
-                        ShadowMap[x + 1, y] = (b & 0b00000010) != 0;
-                        ShadowMap[x + 2, y] = (b & 0b00000100) != 0;
-                        ShadowMap[x + 3, y] = (b & 0b00001000) != 0;
-                        ShadowMap[x + 4, y] = (b & 0b00010000) != 0;
-                        ShadowMap[x + 5, y] = (b & 0b00100000) != 0;
-                        ShadowMap[x + 6, y] = (b & 0b01000000) != 0;
-                        ShadowMap[x + 7, y] = (b & 0b10000000) != 0;
-                    }
+                    var b = reader.ReadByte();
+                    ShadowMap[x + 0, y] = (b & 0b00000001) != 0;
+                    ShadowMap[x + 1, y] = (b & 0b00000010) != 0;
+                    ShadowMap[x + 2, y] = (b & 0b00000100) != 0;
+                    ShadowMap[x + 3, y] = (b & 0b00001000) != 0;
+                    ShadowMap[x + 4, y] = (b & 0b00010000) != 0;
+                    ShadowMap[x + 5, y] = (b & 0b00100000) != 0;
+                    ShadowMap[x + 6, y] = (b & 0b01000000) != 0;
+                    ShadowMap[x + 7, y] = (b & 0b10000000) != 0;
                 }
             }
+        }
+        
+        private void LoadMCLY(IBinaryReader reader)
+        {
+            int splatId = 0;
+            while (!reader.IsFinished())
+            {
+                Splats[splatId++] = new ADTSplat(reader);
+            }
+            nLayers = splatId;
+        }
+        
+        private void LoadMCAL(IBinaryReader reader, int offsMCAL, int sizeMCAL)
+        {
+            SplatMap = new byte[64, 64, nLayers];
+            int k = 0;
+            for (int i = 0; i < nLayers; ++i)
+            {
+                if (!Splats[i].UseAlphamap)
+                    continue;
 
+                reader.Offset = offsMCAL + (int)Splats[i].Offset;
+                uint length = i < nLayers - 1 ? Splats[i + 1].Offset - Splats[i].Offset : (uint)sizeMCAL - Splats[i].Offset;
+
+                if (Splats[i].UseAlphamapCompression)
+                {
+                    int offO = 0;
+
+                    while (offO < 4096)
+                    {
+                        // fill or copy mode
+                        byte b = reader.ReadByte();
+                    
+                        bool fill = (b & 0x80) > 0;
+                        int n = b & 0x7F;
+                        if (n == 0)
+                            break;
+                        
+                        b = reader.ReadByte();
+                    
+                        for (int kk = 0; kk < n && offO < 4096; kk++)
+                        {
+                            SplatMap[offO % 64, offO / 64, k] = b;
+                            offO++;
+                            if (!fill)
+                            {
+                                if (kk < n - 1)
+                                    b = reader.ReadByte();
+                            }
+                        }
+                    }
+                }
+                else if ((wdtFlags & WdtFlags.AdtHasBigAlpha) != 0) // 4096 uncompressed mode  if 0x4 or 0x80 set
+                {
+                    for (int y = 0; y < 64; ++y)
+                    {
+                        for (int x = 0; x < 64; ++x)
+                        {
+                            SplatMap[x, y, k] = reader.ReadByte();
+                        }
+                    }
+                }
+                else //if (length != 4096) // if 2048 uncompressed mode
+                {
+                    for (int y = 0; y < 64; ++y)
+                    {
+                        for (int x = 0; x < 64; x += 2)
+                        {
+                            var val = reader.ReadByte();
+                            SplatMap[x, y, k] = (byte)((val & 0xF) * 0x10);
+                            SplatMap[x + 1, y, k] = (byte)(((val >> 4) & 0xF) * 0x10);
+                        }
+                    }
+
+                    if ((chunkFlags & 0x8000) == 0) // Do not fix alpha map flag
+                    {
+                        for (int j = 0; j < 64; ++j)
+                        {
+                            SplatMap[j, 63, k] = SplatMap[j, 62, k];
+                            SplatMap[63, j, k] = SplatMap[62, j, k];
+                        }
+                        SplatMap[63, 63, k] = SplatMap[62, 62, k];
+                    }
+                }
+
+                ++k;
+            }
+        }
+
+        public void LoadObjPart(IBinaryReader reader)
+        {
+            while (!reader.IsFinished())
+            {
+                var chunkName = reader.ReadChunkName();
+                var size = reader.ReadInt32();
+
+                var offset = reader.Offset;
+
+                var partialReader = new LimitedReader(reader, size);
+
+                if (chunkName == "MCSH")
+                {
+                    LoadMCSH(partialReader);
+                }
+                else if (chunkName == "MCAL")
+                {
+                    LoadMCAL(partialReader, 0, partialReader.Size);
+                }
+                else if (chunkName == "MCLY")
+                {
+                    LoadMCLY(partialReader);
+                }
+                
+                reader.Offset = offset + size;
+            }
+        }
+        
+        public void LoadTexPart(IBinaryReader reader)
+        {
+            while (!reader.IsFinished())
+            {
+                var chunkName = reader.ReadChunkName();
+                var size = reader.ReadInt32();
+
+                var offset = reader.Offset;
+
+                var partialReader = new LimitedReader(reader, size);
+
+                if (chunkName == "MCSH")
+                {
+                    LoadMCSH(partialReader);
+                }
+                else if (chunkName == "MCAL")
+                {
+                    LoadMCAL(partialReader, 0, partialReader.Size);
+                }
+                else if (chunkName == "MCLY")
+                {
+                    LoadMCLY(partialReader);
+                }
+                
+                reader.Offset = offset + size;
+            }
         }
     }
 
     public struct FastAdtAreaTable
     {
-        public uint[,] AreaIds { get; } = new uint[16, 16];
+        public ushort[,] AreaIds { get; } = new ushort[16, 16];
+        public bool AllAreasAreSame { get; } = true; 
         public FastAdtAreaTable(IBinaryReader reader)
         {
             int y = 0;
             int x = 0;
+            ushort? prevArea = null;
             while (!reader.IsFinished())
             {
                 var chunkName = reader.ReadChunkName();
@@ -255,6 +414,9 @@ namespace WDE.MpqReader.Structures
                 if (chunkName == "MCNK")
                 {
                     AreaIds[y, x] = ReadChunkAreaId(reader);
+                    if (prevArea.HasValue && prevArea != AreaIds[y, x])
+                        AllAreasAreSame = false;
+                    prevArea = AreaIds[y, x];
 
                     x++;
                     if (x == 16)
@@ -268,10 +430,10 @@ namespace WDE.MpqReader.Structures
             }
         }
 
-        private uint ReadChunkAreaId(IBinaryReader reader)
+        private ushort ReadChunkAreaId(IBinaryReader reader)
         {
             reader.Offset += 0x34; // skip part of the header
-            return reader.ReadUInt32();
+            return (ushort)reader.ReadUInt32(); // ushort is enough even in 9.X
         }
     }
 
@@ -298,7 +460,7 @@ namespace WDE.MpqReader.Structures
             }
         }
     }
-    
+
     // optimized bitset
     public struct Bitset64
     {
@@ -327,7 +489,7 @@ namespace WDE.MpqReader.Structures
         public MH2OLiquidInstance[]? LiquidInstances { get; }
         public MH2OChunkAttributes[]? ChunkAttributes { get; }
 
-        public MH2OLiquidChunk(IBinaryReader reader)
+        public MH2OLiquidChunk(IBinaryReader reader, LiquidObjectStore liquidObjectStore, LiquidTypeStore liquidTypeStore, LiquidMaterialStore liquidMaterialStore)
         {
             var offsetInstances = reader.ReadInt32();
             LayerCount = reader.ReadUInt32();
@@ -340,7 +502,7 @@ namespace WDE.MpqReader.Structures
                 reader.Offset = offsetInstances;
                 LiquidInstances = new MH2OLiquidInstance[LayerCount];
                 for (int i = 0; i < LayerCount; i++)
-                    LiquidInstances[i] = new MH2OLiquidInstance(reader);
+                    LiquidInstances[i] = new MH2OLiquidInstance(reader, liquidObjectStore, liquidTypeStore, liquidMaterialStore);
 
                 if (offsetAttributes > 0)
                 {
@@ -376,7 +538,7 @@ namespace WDE.MpqReader.Structures
         // public readonly float[] Depth = new float[9 * 9];
         // public readonly Vector2[] TexCoords = new Vector2[9 * 9];
 
-        public MH2OLiquidInstance(IBinaryReader reader)
+        public MH2OLiquidInstance(IBinaryReader reader, LiquidObjectStore liquidObjectStore, LiquidTypeStore liquidTypeStore, LiquidMaterialStore liquidMaterialStore)
         {
             LiquidTypeId = reader.ReadUInt16();
             LiquidVertexFormat = reader.ReadUInt16();
@@ -390,6 +552,28 @@ namespace WDE.MpqReader.Structures
             OffsetVertexData = reader.ReadInt32();
             HeightMap = null;
 
+            if (LiquidVertexFormat > 42)
+            {
+                if (!liquidObjectStore.TryGetValue(LiquidVertexFormat, out var liquidObject))
+                {
+                    throw new Exception("Unknown water format: " + LiquidVertexFormat);
+                }
+
+                if (!liquidTypeStore.TryGetValue(liquidObject.LiquidTypeId, out var liquidType))
+                {
+                    throw new Exception("Unknown liquid type id: " + liquidObject.LiquidTypeId);
+                }
+
+                if (!liquidMaterialStore.TryGetValue((int)liquidType.MaterialId, out var liquidMaterial))
+                {
+                    throw new Exception("Unknown liquid material id: " + liquidType.MaterialId);
+                }
+
+                LiquidVertexFormat = (ushort)liquidMaterial.LVF;
+            }
+            else if (LiquidVertexFormat == 42)
+                LiquidVertexFormat = 2;
+
             var oldOffset = reader.Offset;
 
             RenderBitArray = Bitset64.Full;
@@ -402,9 +586,6 @@ namespace WDE.MpqReader.Structures
                 for (int i = 0; i < bytesCount; i++)
                     RenderBitArray.SetByte(reader.ReadByte(), i);
             }
-
-            if (LiquidVertexFormat > 3) // default to 0 if unknown format
-                LiquidVertexFormat = 0;
 
             if (OffsetVertexData == 0 && LiquidTypeId != 2) // if offset = 0 and liquidType ≠ 2, then let LVF = 2, i.e. some ocean shit
                 LiquidVertexFormat = 2;
@@ -466,12 +647,12 @@ namespace WDE.MpqReader.Structures
             Fishable = new Bitset64(reader.ReadUInt64());
             Deep = new Bitset64(reader.ReadUInt64());
         }
-    }
+    }    
 
-    public readonly struct SMChunkInfo
+    public struct SMChunkInfo
     {
-        public readonly uint Offset;
-        public readonly uint Size;
+        public uint Offset { get; set; }
+        public uint Size { get; set; }
 
         public SMChunkInfo(IBinaryReader reader)
         {
@@ -492,7 +673,8 @@ namespace WDE.MpqReader.Structures
         public bool HasLiquid { get; } = false;
         public MH2OLiquidChunk[] MH2OLiquidChunks { get; } = new MH2OLiquidChunk[16 * 16];
 
-        public ADT(IBinaryReader reader, WdtFlags? wdtFlags)
+        public ADT(GameFilesVersion version, IBinaryReader reader, IBinaryReader? readerTex, IBinaryReader? readerObj, IBinaryReader? readerLod, WdtFlags? wdtFlags,
+            LiquidObjectStore liquidObjectStore, LiquidTypeStore liquidTypeStore, LiquidMaterialStore liquidMaterialStore)
         {
             string[]? worldMapObjectsIds = null;
             string[]? m2Ids = null;
@@ -534,18 +716,125 @@ namespace WDE.MpqReader.Structures
                     for (int i = 0; i < 16 * 16; ++i)
                     {
                         partialReader.Offset = 12 * i;
-                        MH2OLiquidChunks[i] = new MH2OLiquidChunk(partialReader);
+                        MH2OLiquidChunks[i] = new MH2OLiquidChunk(partialReader, liquidObjectStore, liquidTypeStore, liquidMaterialStore);
                     }
                     // MH2OLiquidChunks[LiquidChunkId++] = new MH2OLiquidChunk(partialReader);
                 }
                 else if (chunkName == "MCNK")
                 {
-                    // Debug.Assert(ChunkInfo[chunkId].Offset == offset - 8);
-                    // Debug.Assert(ChunkInfo[chunkId].Size == size + 8);
-                    Chunks[chunkId++] = new AdtChunk(partialReader, wdtFlags);
+                    if (version == GameFilesVersion.Wrath_3_3_5a)
+                    {
+                        Debug.Assert(ChunkInfo[chunkId].Offset == offset - 8);
+                        Debug.Assert(ChunkInfo[chunkId].Size == size + 8);
+                    }
+                    Chunks[chunkId++] = new AdtChunk(partialReader, wdtFlags, version);
                 }
             
                 reader.Offset = offset + size;
+            }
+
+            if (readerLod != null)
+            {
+                while (!readerLod.IsFinished())
+                {
+                    var chunkName = readerLod.ReadChunkName();
+                    var size = readerLod.ReadInt32();
+
+                    var offset = readerLod.Offset;
+                    var partialReader = new LimitedReader(readerLod, size);
+
+                    if (chunkName == "MLVH")
+                    {
+                        float[] heights = new float[129 * 129 + 128 * 128];
+                        for (int i = 0; i < 129 * 129 + 128 * 128; ++i)
+                            heights[i] = partialReader.ReadFloat();
+
+                        for (int chunkY = 0; chunkY < 16; ++chunkY)
+                        {
+                            for (int chunkX = 0; chunkX < 16; ++chunkX)
+                            {
+                                chunkId = chunkY * 16 + chunkX;
+                                float baseHeight = Chunks[chunkId].BasePosition.Z;
+                                for (int i = 0; i < 9; ++i)
+                                {
+                                    int globalY = chunkY * 8 + i;
+                                    for (int j = 0; j < 9; ++j)
+                                    {
+                                        int globalX = chunkX * 8 + j;
+
+                                        int globalIndex = globalY * 129 + globalX;
+                                        Chunks[chunkId].Heights[i * (9 + 8) + j] = heights[globalIndex] - baseHeight;
+                                    }
+                                }
+                                
+                                // inside
+                                for (int i = 0; i < 8; ++i)
+                                {
+                                    int globalY = chunkY * 8 + i;
+                                    for (int j = 0; j < 8; ++j)
+                                    {
+                                        int globalX = chunkX * 8 + j;
+
+                                        int globalIndex = 129 * 129 + globalY * 128 + globalX;
+                                        Chunks[chunkId].Heights[9 + i * (9 + 8) + j] = heights[globalIndex] - baseHeight;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                    readerLod.Offset = offset + size;
+                }
+            }
+            
+            if (readerTex != null)
+            {
+                chunkId = 0;
+                while (!readerTex.IsFinished())
+                {
+                    var chunkName = readerTex.ReadChunkName();
+                    var size = readerTex.ReadInt32();
+
+                    var offset = readerTex.Offset;
+
+                    var partialReader = new LimitedReader(readerTex, size);
+
+                    if (chunkName == "MTEX")
+                        Textures = ChunkedUtils.ReadZeroTerminatedStringArrays(partialReader, false, out _);
+                    else if (chunkName == "MCNK")
+                        Chunks[chunkId++].LoadTexPart(partialReader);
+            
+                    readerTex.Offset = offset + size;
+                }
+            }
+
+            if (readerObj != null)
+            {
+                chunkId = 0;
+                while (!readerObj.IsFinished())
+                {
+                    var chunkName = readerObj.ReadChunkName();
+                    var size = readerObj.ReadInt32();
+
+                    var offset = readerObj.Offset;
+
+                    var partialReader = new LimitedReader(readerObj, size);
+
+                    if (chunkName == "MWMO")
+                        ChunkedUtils.ReadZeroTerminatedStringArrays(partialReader, true, out wmosNameOffsets);
+                    else if (chunkName == "MWID")
+                        worldMapObjectsIds = ReadNameOffsets(partialReader, wmosNameOffsets);
+                    else if (chunkName == "MODF")
+                        WorldMapObjects = ReadWorldMapObjectPlacementData(partialReader, worldMapObjectsIds);
+                    else if (chunkName == "MMDX")
+                        ChunkedUtils.ReadZeroTerminatedStringArrays(partialReader, true, out m2NameOffsets);
+                    else if (chunkName == "MMID")
+                        m2Ids = ReadNameOffsets(partialReader, m2NameOffsets);
+                    else if (chunkName == "MDDF")
+                        M2Objects = ReadM2PlacementData(partialReader, m2Ids);
+            
+                    readerObj.Offset = offset + size;
+                }
             }
         }
 

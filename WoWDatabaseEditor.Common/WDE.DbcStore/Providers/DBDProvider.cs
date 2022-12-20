@@ -24,9 +24,9 @@ namespace WDE.DbcStore.Providers
             this.client.BaseAddress = BaseURI;
         }
 
-        public Stream StreamForTableName(string tableName, string build = null)
+        public Stream? StreamForTableName(string tableName, string? build = null)
         {
-            string dbdName = Path.GetFileName(tableName).Replace(".db2", ".dbd");
+            string dbdName = Path.ChangeExtension(Path.GetFileName(tableName), ".dbd");
 
             if (!fileSystem.Exists($"{CachePath}/{dbdName}") || (DateTime.Now - fileSystem.GetLastWriteTime($"{CachePath}/{dbdName}")).TotalHours > 24)
             {

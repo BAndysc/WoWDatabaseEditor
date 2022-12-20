@@ -7,10 +7,11 @@ using WDE.MySqlDatabaseCommon.Providers;
 
 namespace WDE.MySqlDatabaseCommon.ViewModels
 {
-    public abstract class BaseDatabaseConfigViewModel : ObservableBase, IConfigurable
+    public abstract class BaseDatabaseConfigViewModel : ObservableBase, IFirstTimeWizardConfigurable
     {
         public BaseDatabaseConfigViewModel(IWorldDatabaseSettingsProvider worldSettingsProvider,
-            IAuthDatabaseSettingsProvider authDatabaseSettingsProvider)
+            IAuthDatabaseSettingsProvider authDatabaseSettingsProvider,
+            IHotfixDatabaseSettingsProvider hotfixDatabaseSettingsProvider)
         {
             var dbSettings = worldSettingsProvider.Settings;
             WorldDatabase.Database = dbSettings.Database;
@@ -28,6 +29,14 @@ namespace WDE.MySqlDatabaseCommon.ViewModels
             AuthDatabase.Host = authDbSettings.Host;
             AuthDatabase.IsModified = false;
             
+            var hotfixDbSettings = hotfixDatabaseSettingsProvider.Settings;
+            HotfixDatabase.Database = hotfixDbSettings.Database;
+            HotfixDatabase.Port = (hotfixDbSettings.Port ?? 3306).ToString();
+            HotfixDatabase.User = hotfixDbSettings.User;
+            HotfixDatabase.Password = hotfixDbSettings.Password;
+            HotfixDatabase.Host = hotfixDbSettings.Host;
+            HotfixDatabase.IsModified = false;
+            
             
             Save = new DelegateCommand(() =>
             {
@@ -42,10 +51,17 @@ namespace WDE.MySqlDatabaseCommon.ViewModels
                     worldSettingsProvider.Settings = WorldDatabase;
                     WorldDatabase.IsModified = false;
                 }
+                
+                if (HotfixDatabase.IsModified)
+                {
+                    hotfixDatabaseSettingsProvider.Settings = HotfixDatabase;
+                    HotfixDatabase.IsModified = false;
+                }
             });
             
             Watch(WorldDatabase, s => s.IsModified, nameof(IsModified));
             Watch(AuthDatabase, s => s.IsModified, nameof(IsModified));
+            Watch(HotfixDatabase, s => s.IsModified, nameof(IsModified));
         }
 
         public ICommand Save { get; }
@@ -53,7 +69,8 @@ namespace WDE.MySqlDatabaseCommon.ViewModels
         public abstract string? ShortDescription { get; }
         public SettingsViewModel WorldDatabase { get; } = new SettingsViewModel();
         public SettingsViewModel AuthDatabase { get; } = new SettingsViewModel();
-        public bool IsModified => WorldDatabase.IsModified || AuthDatabase.IsModified;
+        public SettingsViewModel HotfixDatabase { get; } = new SettingsViewModel();
+        public bool IsModified => WorldDatabase.IsModified || AuthDatabase.IsModified || HotfixDatabase.IsModified;
         public bool IsRestartRequired => true;
         public ConfigurableGroup Group => ConfigurableGroup.Basic;
     }

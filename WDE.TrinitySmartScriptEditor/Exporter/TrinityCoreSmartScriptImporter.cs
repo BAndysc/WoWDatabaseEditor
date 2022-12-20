@@ -1,13 +1,10 @@
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using WDE.Common.Database;
 using WDE.Common.Services.MessageBox;
 using WDE.Module.Attributes;
-using WDE.Parameters.Models;
 using WDE.SmartScriptEditor;
 using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Editor;
@@ -24,16 +21,22 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
         private readonly ISmartDataManager smartDataManager;
         private readonly IMessageBoxService messageBoxService;
         private readonly IDatabaseProvider databaseProvider;
+        private readonly IEditorFeatures editorFeatures;
+        private readonly ISimpleConditionsImporter simpleConditionsImporter;
 
         public TrinityCoreSmartScriptImporter(ISmartFactory smartFactory,
             ISmartDataManager smartDataManager,
             IMessageBoxService messageBoxService,
-            IDatabaseProvider databaseProvider)
+            IDatabaseProvider databaseProvider,
+            IEditorFeatures editorFeatures,
+            ISimpleConditionsImporter simpleConditionsImporter)
         {
             this.smartFactory = smartFactory;
             this.smartDataManager = smartDataManager;
             this.messageBoxService = messageBoxService;
             this.databaseProvider = databaseProvider;
+            this.editorFeatures = editorFeatures;
+            this.simpleConditionsImporter = simpleConditionsImporter;
         }
         
         private bool TryParseGlobalVariable(SmartScript script, ISmartScriptLine line)
@@ -51,13 +54,23 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
             return false;
         }
 
-        public async Task Import(SmartScript script, bool doNotTouchIfPossible, IList<ISmartScriptLine> lines, IList<IConditionLine> conditions, IList<IConditionLine>? targetConditions)
+        public Dictionary<int, List<SmartCondition>> ImportConditions(SmartScriptBase script, IReadOnlyList<IConditionLine> lines)
+        {
+            return simpleConditionsImporter.ImportConditions(script, lines);
+        }
+
+        public List<SmartCondition> ImportConditions(SmartScriptBase script, IReadOnlyList<ICondition> lines)
+        {
+            return simpleConditionsImporter.ImportConditions(script, lines);
+        }
+
+        public async Task Import(SmartScript script, bool doNotTouchIfPossible, IReadOnlyList<ISmartScriptLine> lines, IReadOnlyList<IConditionLine> conditions, IReadOnlyList<IConditionLine>? targetConditions)
         {
             int? entry = null;
             SmartScriptType? source = null;
             bool? shouldMergeUserLastAnswer = doNotTouchIfPossible ? false : null;
 
-            var conds = script.ParseConditions(conditions);
+            var conds = ImportConditions(script, conditions);
             SortedDictionary<long, SmartEvent> startPathToActionParent = new();
             SortedDictionary<long, SmartEvent> triggerIdToActionParent = new();
             SortedDictionary<long, SmartEvent> triggerIdToEvent = new();
@@ -190,7 +203,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                         var pseudoScript = new SmartScript(
                             new SmartScriptSolutionItem((int)action.GetParameter(0).Value,
                                 SmartScriptType.TimedActionList),
-                            smartFactory, smartDataManager, messageBoxService);
+                            smartFactory, smartDataManager, messageBoxService, editorFeatures, this);
                         await Import(pseudoScript, doNotTouchIfPossible, timedScript.ToList(), new List<IConditionLine>(),
                             new List<IConditionLine>());
                         currentEvent.AddAction(beginInlineAction);

@@ -17,7 +17,7 @@ namespace TheEngine.ECS
         ref T GetComponent<T>(Entity entity) where T : unmanaged, IComponentData;
         T GetManagedComponent<T>(Entity entity) where T : IManagedComponentData;
         T SetManagedComponent<T>(Entity entity, T value) where T : IManagedComponentData;
-        IEnumerable<IChunkDataIterator> ArchetypeIterator(Archetype archetype);
+        ChunkDataIterator ArchetypeIterator(Archetype archetype);
         IComponentTypeData TypeData<T>() where T : unmanaged, IComponentData;
         IComponentTypeData TypeData(Type t);
         IManagedComponentTypeData ManagedTypeData<T>() where T : class, IManagedComponentData;

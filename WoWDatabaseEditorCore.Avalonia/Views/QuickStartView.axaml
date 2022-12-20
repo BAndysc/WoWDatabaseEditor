@@ -29,7 +29,7 @@
             </Setter>
         </Style>
         <Style Selector="Button.LinkALike TextBlock">
-            <Setter Property="Foreground" Value="#FF5FA2DA" />
+            <Setter Property="Foreground" Value="{DynamicResource AccentColorMedium}" />
         </Style>
         <Style Selector="Button.LinkALike:pointerover TextBlock">
             <Setter Property="TextDecorations" Value="Underline" />
@@ -85,7 +85,7 @@
     </UserControl.Styles>
     <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Padding="20">
         <StackPanel>
-            <Border BorderThickness="0,0,0,2" BorderBrush="#FF5FA2DA">
+            <Border BorderThickness="0,0,0,2" BorderBrush="{DynamicResource AccentColorMedium}">
                 <DockPanel VerticalAlignment="Bottom" LastChildFill="False">
                     <Image Source="../Icon.png" Width="56" Height="56" />
                     <TextBlock VerticalAlignment="Bottom" FontSize="34" TextWrapping="WrapWithOverflow" Text="{CompiledBinding ProgramTitle}" />

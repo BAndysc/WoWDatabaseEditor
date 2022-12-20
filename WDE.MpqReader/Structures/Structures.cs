@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;
 using TheMaths;
+using WDE.Common.MPQ;
 using WDE.MpqReader.Readers;
 
 namespace WDE.MpqReader.Structures
@@ -15,7 +16,11 @@ namespace WDE.MpqReader.Structures
         FLAG_TILT_X = 1,
         FLAG_TILT_Y = 2,
         UNK0 = 4,
-        FLAG_USE_TEXTURE_COMBINER_COMBOS = 8
+        FLAG_USE_TEXTURE_COMBINER_COMBOS = 8,
+        LOAD_PHYS_DATA = 32,
+        TEXTURE_TRANSFORMS_USE_BONE_SEQUENCES = 2048,
+        CHUNKED_ANIM_FILES = 0x2000,
+        CHUNKED_ANIM_FILES_2 = 0x200000
     }
 
     public class M2
@@ -35,7 +40,7 @@ namespace WDE.MpqReader.Structures
 /*0x048*/  public readonly M2Array<M2Color> colors;                             // Color and alpha animations definitions.
 /*0x050*/  public readonly M2Array<M2Texture> textures;
 /*0x058*/  public readonly M2Array<M2TextureWeight> textureWeights;            // Transparency of textures.
-/*0x060*/  //public readonly M2Array<M2TextureTransform> texture_transforms;
+/*0x060*/  public readonly M2Array<M2TextureTransform> texture_transforms;
 /*0x068*/  public readonly M2Array<ushort> textureIndicesById;                // (alt. name: replacable_texture_lookup)
 /*0x070*/  public readonly M2Array<M2Material> materials;                       // Blending modes / render flags.
 /*0x078*/  // public readonly M2Array<ushort> boneCombos;                        // (alt. name: bone_lookup_table)
@@ -59,6 +64,7 @@ namespace WDE.MpqReader.Structures
 /*0x120*/  //public readonly M2Array<M2Ribbon> ribbon_emitters;                     // Things swirling around. See the CoT-entrance for light-trails.
         ///*0x128*/  M2Array<M2Particleⁱ> particle_emitters { get; init; }
            public M2Array<ushort>? textureCombinerCombos { get; init; }
+        public readonly FileId skinFileId;
 
         public int? GetAnimationIndexByAnimationId(int anim_id)
         {
@@ -93,9 +99,68 @@ namespace WDE.MpqReader.Structures
             // unreachable
         }
 
-        private M2(IBinaryReader reader, string path, Func<string, IBinaryReader?> opener)
+        private M2(IBinaryReader reader, GameFilesVersion wowVersion, FileId path, Func<FileId, IBinaryReader?> opener)
         {
+            Dictionary<(ushort, ushort), uint>? animSubAnimToFileId = null;
+            FileId[]? boneFileIds = null;
+            FileId? skelFileId = null;
             magic = reader.ReadUInt32();
+            if (magic != 0x3032444D)
+            {
+                int md21Offset = 0;
+                int md21Size = 0;
+                reader.Offset -= 4;
+                while (!reader.IsFinished())
+                {
+                    var chunkName = reader.ReadChunkNameReversed();
+                    var size = reader.ReadInt32();
+                    
+                    var offset = reader.Offset;
+                    if (chunkName == "MD21")
+                    {
+                        md21Offset = offset;
+                        md21Size = size;
+                    }
+                    else if (chunkName == "SFID")
+                    {
+                        skinFileId = reader.ReadUInt32();
+                    }
+                    else if (chunkName == "SKID")
+                    {
+                        skelFileId = reader.ReadUInt32();
+                        throw new Exception("Skel files not supported");
+                    }
+                    else if (chunkName == "BFID")
+                    {
+                        boneFileIds = new FileId[size/4];
+                        int i = 0;
+                        var partialReader = new LimitedReader(reader, size);
+                        while (!partialReader.IsFinished())
+                        {
+                            var fileId = partialReader.ReadUInt32();
+                            boneFileIds[i++] = fileId;
+                        }
+                    }
+                    else if (chunkName == "AFID")
+                    {
+                        animSubAnimToFileId = new();
+                        var partialReader = new LimitedReader(reader, size);
+                        while (!partialReader.IsFinished())
+                        {
+                            var animId = partialReader.ReadUInt16();
+                            var subAnimId = partialReader.ReadUInt16();
+                            var fileId = partialReader.ReadUInt32();
+                            if (fileId != 0)
+                                animSubAnimToFileId[(animId, subAnimId)] = fileId;
+                        }
+                    }
+                    reader.Offset = offset + size;
+                }
+
+                reader.Offset = md21Offset;
+                reader = new LimitedReader(reader, md21Size);
+                reader.Offset += 4;
+            }
             version = reader.ReadUInt32();
             reader.SkipM2Array(); // name = reader.ReadArray(r => (char)r.ReadByte());
             global_flags = (M2Flags)reader.ReadUInt32();
@@ -112,9 +177,34 @@ namespace WDE.MpqReader.Structures
             {
                 var animId = sequences[idx].id;
                 var animVariation = sequences[idx].variationIndex;
-                var animPath = Path.ChangeExtension(path, null);
-                animPath = animPath + animId.ToString().PadLeft(4, '0') + "-" + animVariation.ToString().PadLeft(2, '0') +".anim";
+                FileId animPath;
+                if (path.FileType == FileId.Type.FileName)
+                {
+                    animPath = Path.ChangeExtension(path.FileName, null);
+                    animPath = animPath + animId.ToString().PadLeft(4, '0') + "-" + animVariation.ToString().PadLeft(2, '0') +".anim";
+                }
+                else
+                {
+                    if (!animSubAnimToFileId!.TryGetValue((animId, animVariation), out var fileId))
+                        return null;
+                    animPath = fileId;
+                }
                 var contentReader = opener(animPath);
+                if (contentReader == null)
+                    return null;
+                
+                if (global_flags.HasFlagFast(M2Flags.CHUNKED_ANIM_FILES_2))
+                {
+                    while (!contentReader.IsFinished())
+                    {
+                        var chunkName = contentReader.ReadChunkName();
+                        var size = contentReader.ReadInt32();
+                        if (chunkName == "2MFA")
+                            return new LimitedReader(contentReader, size);
+                        contentReader.Offset += size;
+                    }
+                    Debug.Assert(false, "Couldn't find chunk AFM2 in anim file");
+                }
                 return contentReader;
             };
             bones = new M2CompBoneArray(reader, in sequences, openAnimFile);
@@ -124,7 +214,7 @@ namespace WDE.MpqReader.Structures
             colors = reader.ReadArray(r => new M2Color(r));
             textures = reader.ReadArray(M2Texture.Read);
             textureWeights = reader.ReadArray(M2TextureWeight.Read);
-            reader.SkipM2Array(); // texture_transforms = reader.ReadArray(M2TextureTransform.Read);
+            texture_transforms = reader.ReadArray(M2TextureTransform.Read);
             textureIndicesById = reader.ReadArrayUInt16();
             materials = reader.ReadArray(M2Material.Read);
             reader.SkipM2Array(); //boneCombos = reader.ReadArrayUInt16();
@@ -150,9 +240,9 @@ namespace WDE.MpqReader.Structures
             textureCombinerCombos = (global_flags & M2Flags.FLAG_USE_TEXTURE_COMBINER_COMBOS) != 0 ? reader.ReadArrayUInt16() : null;
         }
 
-        public static M2 Read(IBinaryReader reader, string path, Func<string, IBinaryReader?> opener)
+        public static M2 Read(IBinaryReader reader, GameFilesVersion version, FileId path, Func<FileId, IBinaryReader?> opener)
         {
-            return new M2(reader, path, opener);
+            return new M2(reader, version, path, opener);
         }
     }
 
@@ -366,15 +456,15 @@ namespace WDE.MpqReader.Structures
 
     public readonly struct M2TextureTransform
     {
-        public readonly M2Track<Vector3> translation;
-        public readonly M2Track<Quaternion> rotation;    // rotation center is texture center (0.5, 0.5)
-        public readonly M2Track<Vector3> scaling;
+        public readonly MutableM2Track<Vector3> translation;
+        public readonly MutableM2Track<Quaternion> rotation;    // rotation center is texture center (0.5, 0.5)
+        public readonly MutableM2Track<Vector3> scaling;
 
         public M2TextureTransform(IBinaryReader reader)
         {
-            translation = M2Track<Vector3>.Read(reader, r => r.ReadVector3());
-            rotation = M2Track<Quaternion>.Read(reader, r => r.ReadQuaternion());
-            scaling = M2Track<Vector3>.Read(reader, r => r.ReadVector3());
+            translation = MutableM2Track<Vector3>.Read(reader, r => r.ReadVector3());
+            rotation = MutableM2Track<Quaternion>.Read(reader, r => r.ReadQuaternion());
+            scaling = MutableM2Track<Vector3>.Read(reader, r => r.ReadVector3());
         }
         
         public static M2TextureTransform Read(IBinaryReader reader)
@@ -637,24 +727,26 @@ namespace WDE.MpqReader.Structures
         public Vector3 target_position_base { get; init; }
         public M2Track<M2SplineKey<float>> roll { get; init; } // The camera can have some roll-effect. Its 0 to 2*Pi. 
         // only in #if ≥ Cata
-        //    M2Track<M2SplineKey<float>> FoV; //Diagonal FOV in radians. See below for conversion.
+        M2Track<M2SplineKey<float>> FoV; //Diagonal FOV in radians. See below for conversion.
     
         private M2Camera() {}
 
-        public static M2Camera Read(IBinaryReader reader)
+        public M2Camera(IBinaryReader reader, GameFilesVersion version)
         {
-            return new M2Camera()
+            type = reader.ReadUInt32();
+            if (version <= GameFilesVersion.Wrath_3_3_5a)
+                fov = reader.ReadFloat();
+            far_clip = reader.ReadFloat();
+            near_clip = reader.ReadFloat();
+            positions = M2Track<M2SplineKey<Vector3>>.ReadSplineKey(reader, r => r.ReadVector3());
+            position_base = reader.ReadVector3();
+            target_position = M2Track<M2SplineKey<Vector3>>.ReadSplineKey(reader, r => r.ReadVector3());
+            target_position_base = reader.ReadVector3();
+            roll = M2Track<M2SplineKey<float>>.ReadSplineKey(reader, r => r.ReadFloat());
+            if (version >= GameFilesVersion.Cataclysm_4_3_4)
             {
-                type = reader.ReadUInt32(),
-                fov = reader.ReadFloat(),
-                far_clip = reader.ReadFloat(),
-                near_clip = reader.ReadFloat(),
-                positions = M2Track<M2SplineKey<Vector3>>.ReadSplineKey(reader, r => r.ReadVector3()),
-                position_base = reader.ReadVector3(),
-                target_position = M2Track<M2SplineKey<Vector3>>.ReadSplineKey(reader, r => r.ReadVector3()),
-                target_position_base = reader.ReadVector3(),
-                roll = M2Track<M2SplineKey<float>>.ReadSplineKey(reader, r => r.ReadFloat()),
-            };
+                FoV = M2Track<M2SplineKey<float>>.ReadSplineKey(reader, r => r.ReadFloat());
+            }
         }
     }
 
@@ -849,6 +941,8 @@ namespace WDE.MpqReader.Structures
         public M2Skin(IBinaryReader reader)
         {
             var magic = reader.ReadInt32();
+            if (magic != 0x4E494B53)
+                throw new Exception($"Invalid M2 skin magic ({magic})");
             Vertices = reader.ReadArrayUInt16();
             Indices = reader.ReadArrayUInt16();
             BoneIndices = reader.ReadArray(r => new Uint8x4(r.ReadByte(), r.ReadByte(), r.ReadByte(), r.ReadByte()));
@@ -892,7 +986,7 @@ namespace WDE.MpqReader.Structures
         public readonly ushort textureLookupId;          // Index into Texture lookup table
         public readonly ushort textureUnitLookupId;     // Index into the texture unit lookup table.
         public readonly short textureTransparencyLookupId;         // Index into transparency lookup table.
-        public readonly ushort textureUVAnimationLookupId;          // Index into uvanimation lookup table. 
+        public readonly short textureUVAnimationLookupId;          // Index into uvanimation lookup table. 
 
         public M2Batch(IBinaryReader binaryReader)
         {
@@ -908,7 +1002,7 @@ namespace WDE.MpqReader.Structures
             textureLookupId = binaryReader.ReadUInt16();
             textureUnitLookupId = binaryReader.ReadUInt16();
             textureTransparencyLookupId = binaryReader.ReadInt16();
-            textureUVAnimationLookupId = binaryReader.ReadUInt16();
+            textureUVAnimationLookupId = binaryReader.ReadInt16();
         }
     }
 
@@ -982,6 +1076,16 @@ namespace WDE.MpqReader.Structures
             array[0] = (char)reader.ReadByte();
             return new string(array);
         }
+        
+        public static string ReadChunkNameReversed(this IBinaryReader reader)
+        {
+            Span<char> array = stackalloc char[4];
+            array[0] = (char)reader.ReadByte();
+            array[1] = (char)reader.ReadByte();
+            array[2] = (char)reader.ReadByte();
+            array[3] = (char)reader.ReadByte();
+            return new string(array);
+        }
     
         public static string ReadCString(this IBinaryReader reader)
         {
@@ -1034,6 +1138,10 @@ namespace WDE.MpqReader.Structures
         public static M2Array<T> ReadArrayDataFromSeparateReader<T>(this IBinaryReader binaryReader, IBinaryReader contentReader, System.Func<int, IBinaryReader, T> read)
         {
             var size = binaryReader.ReadInt32();
+            if (size > 0x100000)
+            {
+                Console.WriteLine("wtf");
+            }
             var offset = binaryReader.ReadInt32();
             var currentOffset = binaryReader.Offset;
 
@@ -1169,6 +1277,21 @@ namespace WDE.MpqReader.Structures
                 else
                     return new MutableM2Array<T>(r.ReadInt32(), r.ReadInt32(), null);
             });
+            return new MutableM2Track<T>()
+            {
+                interpolation_type = interpolation_type,
+                global_sequence = global_sequence,
+                timestamps = timestamps,
+                values = values
+            };
+        }
+        
+        public static MutableM2Track<T> Read(IBinaryReader reader, Func<IBinaryReader, T> read)
+        {
+            var interpolation_type = reader.ReadUInt16();
+            var global_sequence = reader.ReadUInt16();
+            var timestamps = reader.ReadMutableArray(x => x.ReadMutableArray(x2 => x2.ReadUInt32()));
+            var values = reader.ReadMutableArray(x => x.ReadMutableArray(read));
             return new MutableM2Track<T>()
             {
                 interpolation_type = interpolation_type,
@@ -1348,6 +1471,11 @@ namespace WDE.MpqReader.Structures
         public ReadOnlySpan<T> AsSpan(int start, int length)
         {
             return array.AsSpan(start, length);
+        }
+
+        public ReadOnlySpan<T> AsSpan()
+        {
+            return array.AsSpan();
         }
     }
 }

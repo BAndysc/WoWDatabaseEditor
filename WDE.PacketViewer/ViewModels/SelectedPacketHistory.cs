@@ -1,5 +1,4 @@
 using System;
-using System.Reactive.Linq;
 using WDE.Common.History;
 using WDE.MVVM;
 using WDE.MVVM.Observable;

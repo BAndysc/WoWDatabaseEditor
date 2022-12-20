@@ -22,6 +22,8 @@ namespace WDE.MapRenderer.Managers
         public Vector3 Position { get; private set; }
         public Quaternion Rotation { get; private set; }
 
+        private float currentSpeed = 0;
+
         public CameraManager(ICameraManager engineCamera,
             IInputManager inputManager,
             IUIManager uiManager)
@@ -58,6 +60,12 @@ namespace WDE.MapRenderer.Managers
             var movement = inputManager.Keyboard.GetAxis(Vectors.Down, Key.W, Key.S) + 
                            inputManager.Keyboard.GetAxis(Vectors.Backward, Key.A, Key.D) + 
                            inputManager.Keyboard.GetAxis(Vectors.Left, Key.E, Key.Q);
+
+            if (movement.LengthSquared() == 0)
+                currentSpeed = Math.Max(0, currentSpeed - delta * 0.01f);
+            else if (currentSpeed < 1)
+                currentSpeed = Math.Min(1, currentSpeed + delta * 0.001f * 0.5f);
+            
             movement = Vectors.Normalize(movement);
             float modifier = 0.4f;
             if (inputManager.Keyboard.IsDown(Key.LeftShift))
@@ -65,7 +73,7 @@ namespace WDE.MapRenderer.Managers
             if (inputManager.Keyboard.IsDown(Key.N))
                 modifier = 0.1f;
             float speed = 1 * (delta / 16.0f) * modifier;
-            Position += movement.Multiply(Rotation) * speed;
+            Position += movement.Multiply(Rotation) * speed * currentSpeed;
 
             var camera = engineCamera.MainCamera;
             camera.Transform.Rotation = Rotation;

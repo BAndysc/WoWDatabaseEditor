@@ -2,12 +2,12 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Styles.Resources>
         <SolidColorBrush x:Key="FastTableView.OddRowBackground" Color="#202020" />
-        <SolidColorBrush x:Key="FastTableView.SelectedRowBackground" Color="#2C4C70" />
+        <AccentSolidColorBrush Hue="{DynamicResource AccentHue}" x:Key="FastTableView.SelectedRowBackground" BaseColor="#2C4C70" />
         <SolidColorBrush x:Key="FastTableView.EvenRowBackground" Color="#2A2A2A" />
         <SolidColorBrush x:Key="FastTableView.HeaderBackground" Color="#101010" />
         <SolidColorBrush x:Key="FastTableView.TextBrush" Color="#D2D2D2" />
         <SolidColorBrush x:Key="FastTableView.FocusTextBrush" Color="#D2D2D2" />
-        <SolidColorBrush x:Key="FastTableView.HoverRowBackground" Color="#577CDB" />
+        <AccentSolidColorBrush Hue="{DynamicResource AccentHue}" x:Key="FastTableView.HoverRowBackground" Color="#577CDB" />
         <Pen Thickness="1" x:Key="FastTableView.HeaderBorderBackground" Brush="#343434" />
         <Pen Thickness="1" x:Key="FastTableView.BorderPen" Brush="White" />
         <Pen Thickness="2" x:Key="FastTableView.FocusPen" Brush="White" />

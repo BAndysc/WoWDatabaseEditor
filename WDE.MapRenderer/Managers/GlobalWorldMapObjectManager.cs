@@ -37,13 +37,13 @@ public class GlobalWorldMapObjectManager
     public IEnumerator Load()
     {
         if (worldManager.CurrentWdt?.WorldMapObject is not { } wmo) 
-            yield break;
-
-        var wmoPath = worldManager.CurrentWdt?.Mwmo;
+            yield break; 
+        
+        FileId wmoPath = wmo.fileId ?? worldManager.CurrentWdt?.Mwmo!;
         
         var tcs = new TaskCompletionSource<WmoManager.WmoInstance?>();
             
-        yield return wmoManager.LoadWorldMapObject(wmoPath!, tcs);
+        yield return wmoManager.LoadWorldMapObject(wmoPath, tcs);
         if (tcs.Task.Result == null)
             yield break;
 

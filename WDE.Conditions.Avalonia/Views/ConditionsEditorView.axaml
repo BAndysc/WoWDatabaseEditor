@@ -82,16 +82,8 @@
             </StackPanel>
         </Border>
         
-        <Border Padding="10" Grid.Row="4">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="150" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="150" />
-                </Grid.ColumnDefinitions>
-                <Button Command="{CompiledBinding Cancel}">Cancel</Button>
-                <Button Grid.Column="2" Command="{CompiledBinding Accept}">Ok</Button>
-            </Grid>
-        </Border>
+        <OkCancelButtons Grid.Row="4" Margin="10" 
+                         AcceptCommand="{CompiledBinding Accept}"
+                         CancelCommand="{CompiledBinding Cancel}" />
     </Grid>
 </controls:DialogViewBase>

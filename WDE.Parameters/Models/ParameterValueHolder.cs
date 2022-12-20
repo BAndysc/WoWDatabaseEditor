@@ -9,11 +9,22 @@ using WDE.Common.Utils;
 
 namespace WDE.Parameters.Models
 {
-    public interface IParameterValueHolder
+    public interface IParameterValueHolder : INotifyPropertyChanged
     {
+        bool HoldsMultipleValues { get; }
+        bool IsUsed { get;}
+        bool ForceHidden { get; }
+        string Name { get; }
+        string String { get; }
+    }
+    
+    public interface IParameterValueHolder<T> : IParameterValueHolder where T : notnull
+    {
+        IParameter<T> Parameter { get; }
+        T Value { get; set; }
     }
 
-    public class ParameterValueHolder<T> : IParameterValueHolder, INotifyPropertyChanged where T : notnull
+    public class ParameterValueHolder<T> : IParameterValueHolder<T>, INotifyPropertyChanged where T : notnull
     {
         private CancellationTokenSource? currentToStringCancellationToken;
         private string cachedStringValue = null!;
@@ -37,6 +48,10 @@ namespace WDE.Parameters.Models
             }
         }
 
+        public bool HoldsMultipleValues => false;
+
+        public void RefreshStringText() => hasCachedStringValue = false;
+
         private IParameter<T> parameter;
         public IParameter<T> Parameter
         {
@@ -45,7 +60,8 @@ namespace WDE.Parameters.Models
             {
                 if (parameter == value)
                     return;
-                
+
+                hasCachedStringValue = false;
                 parameter = value;
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(String));
@@ -118,6 +134,8 @@ namespace WDE.Parameters.Models
             {
                 if (!AsyncInProgress)
                     CalculateStringAsync(value, context, asyncContextualParameter).ListenErrors();
+                if (hasCachedStringValue)
+                    return cachedStringValue;
                 return parameter.ToString(value);
             }
 

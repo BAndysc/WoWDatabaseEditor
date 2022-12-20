@@ -15,7 +15,7 @@ using WDE.MVVM.Observable;
 
 namespace WDE.MapSpawns.ViewModels;
 
-[AutoRegister]
+//[AutoRegister]
 public partial class SpawnsToolViewModel : ObservableBase, ITool
 {
     private readonly ISpawnSelectionService spawnSelectionService;

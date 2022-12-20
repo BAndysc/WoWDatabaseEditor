@@ -23,6 +23,12 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public IEnumerable<IQuestTemplate> GetQuestTemplates() => Enumerable.Empty<IQuestTemplate>();
         
+        public async Task<IList<IQuestObjective>> GetQuestObjectives(uint questId) => new List<IQuestObjective>();
+
+        public async Task<IQuestObjective?> GetQuestObjective(uint questId, int storageIndex) => null;
+
+        public async Task<IQuestObjective?> GetQuestObjectiveById(uint objectiveId) => null;
+        
         public Task<IQuestRequestItem?> GetQuestRequestItem(uint entry) => Task.FromResult<IQuestRequestItem?>(null);
 
         public IEnumerable<IAreaTriggerTemplate> GetAreaTriggerTemplates() => Enumerable.Empty<IAreaTriggerTemplate>();
@@ -50,8 +56,6 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public IEnumerable<ISmartScriptLine> GetScriptFor(int entryOrGuid, SmartScriptType type) => Enumerable.Empty<ISmartScriptLine>();
 
-        public Task InstallScriptFor(int entryOrGuid, SmartScriptType type, IList<ISmartScriptLine> script) => Task.FromResult(false);
-
         public Task InstallConditions(IEnumerable<IConditionLine> conditions, IDatabaseProvider.ConditionKeyMask keyMask, IDatabaseProvider.ConditionKey? manualKey = null) => Task.FromResult(false);
 
         public IEnumerable<IConditionLine> GetConditionsFor(int sourceType, int sourceEntry, int sourceId) => Enumerable.Empty<IConditionLine>();
@@ -59,14 +63,20 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public Task<IList<IConditionLine>> GetConditionsForAsync(IDatabaseProvider.ConditionKeyMask keyMask, IDatabaseProvider.ConditionKey manualKey) => Task.FromResult<IList<IConditionLine>>(System.Array.Empty<IConditionLine>());
         
         public IEnumerable<ISpellScriptName> GetSpellScriptNames(int spellId) => Enumerable.Empty<ISpellScriptName>();
+
+        public async Task<IList<IPlayerChoiceResponse>?> GetPlayerChoiceResponsesAsync(int choiceId) => null;
         
-        public IEnumerable<ISmartScriptProjectItem> GetProjectItems() => Enumerable.Empty<ISmartScriptProjectItem>();
+        public IEnumerable<ISmartScriptProjectItem> GetLegacyProjectItems() => Enumerable.Empty<ISmartScriptProjectItem>();
         
-        public IEnumerable<ISmartScriptProject> GetProjects() => Enumerable.Empty<ISmartScriptProject>();
+        public IEnumerable<ISmartScriptProject> GetLegacyProjects() => Enumerable.Empty<ISmartScriptProject>();
 
         public Task<IList<int>> GetSmartScriptEntriesByType(SmartScriptType scriptType) =>
             Task.FromResult<IList<int>>(new List<int>());
-        
+
+        public async Task<IList<IPlayerChoice>?> GetPlayerChoicesAsync() => null;
+
+        public async Task<IList<IPlayerChoiceResponse>?> GetPlayerChoiceResponsesAsync() => null;
+
         public IBroadcastText? GetBroadcastTextByText(string text) => null;
         
         public Task<IBroadcastText?> GetBroadcastTextByIdAsync(uint id) => Task.FromResult<IBroadcastText?>(null);
@@ -125,6 +135,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public Task<List<ICreatureClassLevelStat>> GetCreatureClassLevelStatsAsync() => Task.FromResult(new List<ICreatureClassLevelStat>());
 
         public Task<List<IBroadcastText>> GetBroadcastTextsAsync() => Task.FromResult(new List<IBroadcastText>());
+
+        public async Task<IList<ISmartScriptLine>> GetScriptForAsync(int entryOrGuid, SmartScriptType type) => new List<ISmartScriptLine>();
 
         public Task<List<IEventScriptLine>> GetEventScript(EventScriptType type, uint id) => Task.FromResult(new List<IEventScriptLine>());
         public Task<IList<ICreatureModelInfo>> GetCreatureModelInfoAsync()

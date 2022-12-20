@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using WDE.Common.Database;
+using WDE.Common.Types;
 using WDE.Module.Attributes;
 
 namespace WDE.Common.CoreVersion
@@ -10,6 +11,7 @@ namespace WDE.Common.CoreVersion
     {
         string Tag { get; }
         string FriendlyName { get; }
+        ImageUri Icon { get; }
         IDatabaseFeatures DatabaseFeatures { get; }
         ISmartScriptFeatures SmartScriptFeatures { get; }
         IConditionFeatures ConditionFeatures { get; }
@@ -20,6 +22,7 @@ namespace WDE.Common.CoreVersion
         bool SupportsReverseCommands => false;
         bool SupportsEventScripts => false;
         PhasingType PhasingType { get; }
+        int Build { get; }
     }
 
     public enum PhasingType

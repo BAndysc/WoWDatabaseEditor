@@ -24,6 +24,9 @@ namespace WDE.Common.Database
 
         IQuestTemplate? GetQuestTemplate(uint entry);
         IEnumerable<IQuestTemplate> GetQuestTemplates();
+        Task<IList<IQuestObjective>> GetQuestObjectives(uint questId);
+        Task<IQuestObjective?> GetQuestObjective(uint questId, int storageIndex);
+        Task<IQuestObjective?> GetQuestObjectiveById(uint objectiveId);
         Task<IQuestRequestItem?> GetQuestRequestItem(uint entry);
 
         IEnumerable<IGameEvent> GetGameEvents();
@@ -41,8 +44,8 @@ namespace WDE.Common.Database
         
         Task<IList<ISmartScriptLine>> GetLinesCallingSmartTimedActionList(int timedActionList);
         IEnumerable<ISmartScriptLine> GetScriptFor(int entryOrGuid, SmartScriptType type);
+        Task<IList<ISmartScriptLine>> GetScriptForAsync(int entryOrGuid, SmartScriptType type);
 
-        Task InstallScriptFor(int entryOrGuid, SmartScriptType type, IList<ISmartScriptLine> script);
         Task InstallConditions(IEnumerable<IConditionLine> conditions, ConditionKeyMask keyMask, ConditionKey? manualKey = null);
 
         IEnumerable<IConditionLine> GetConditionsFor(int sourceType, int sourceEntry, int sourceId);
@@ -53,8 +56,12 @@ namespace WDE.Common.Database
 
         Task<IList<int>> GetSmartScriptEntriesByType(SmartScriptType scriptType);
 
-        IEnumerable<ISmartScriptProjectItem> GetProjectItems();
-        IEnumerable<ISmartScriptProject> GetProjects();
+        Task<IList<IPlayerChoice>?> GetPlayerChoicesAsync();
+        Task<IList<IPlayerChoiceResponse>?> GetPlayerChoiceResponsesAsync();
+        Task<IList<IPlayerChoiceResponse>?> GetPlayerChoiceResponsesAsync(int choiceId);
+
+        IEnumerable<ISmartScriptProjectItem> GetLegacyProjectItems();
+        IEnumerable<ISmartScriptProject> GetLegacyProjects();
 
         IBroadcastText? GetBroadcastTextByText(string text);
         Task<IBroadcastText?> GetBroadcastTextByTextAsync(string text);

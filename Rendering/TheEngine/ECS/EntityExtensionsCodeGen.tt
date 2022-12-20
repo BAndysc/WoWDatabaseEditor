@@ -57,8 +57,9 @@ public static partial class EntityExtensions
         {
             var entityManager = archetype.EntityManager;
             var iterator = entityManager.ArchetypeIterator(archetype);
-            foreach (var itr in iterator)
+            while (iterator.MoveNext())
             {
+                var itr = iterator.Current;
 <#
                         if (parallel)
                         {

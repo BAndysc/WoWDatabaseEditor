@@ -1,0 +1,35 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:WDE.SmartScriptEditor.Editor.ViewModels;assembly=WDE.SmartScriptEditor"
+             xmlns:editor="clr-namespace:WDE.SmartScriptEditor.Editor;assembly=WDE.SmartScriptEditor"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:SmartScriptEditorViewModel"
+             Name="Root"
+             x:Class="WDE.SmartScriptEditor.Avalonia.Editor.Views.SmartScriptEditorToolBar">
+    <ToolbarPanel>
+        <ToggleButton IsChecked="{CompiledBinding HideComments}" ToolTip.Tip="Hide comments (doesn't remove)" >
+            <WdeImage ImageUri="Icons/icon_remove_comment.png"></WdeImage>
+        </ToggleButton>
+        <ToggleButton IsChecked="{CompiledBinding HideConditions}" ToolTip.Tip="Hide conditions (doesn't remove)" >
+            Hide conditions
+        </ToggleButton>
+        <ItemsPresenter Items="{CompiledBinding ExtensionCommands}">
+            <ItemsPresenter.ItemTemplate>
+                <DataTemplate x:DataType="editor:SmartExtensionCommand">
+                    <Button Command="{CompiledBinding  Command}" CommandParameter="{Binding #Root.DataContext}" ToolTip.Tip="{CompiledBinding Name}">
+                        <WdeImage Image="{CompiledBinding Icon}" />
+                    </Button>
+                </DataTemplate>
+            </ItemsPresenter.ItemTemplate>
+            <ItemsPresenter.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ToolbarPanel />
+                </ItemsPanelTemplate>
+            </ItemsPresenter.ItemsPanel>
+        </ItemsPresenter>
+        <ToolbarSpacer />
+        <TextBox Name="SearchTextBox" Padding="8,0" MinHeight="22" Watermark="Search in script" Text="{CompiledBinding SearchText}" />
+    </ToolbarPanel>
+</UserControl>

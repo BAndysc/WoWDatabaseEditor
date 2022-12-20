@@ -80,16 +80,16 @@ namespace WDE.MVVM
         protected void Link<T>(IObservable<T> observable, Expression<Func<T>> getSetter)
         {
             if (!(getSetter.Body is MemberExpression me))
-                throw new Exception();
+                throw new Exception("getSetter must be a single getter p => p.PropertyMember");
             
             if ((me.Member.MemberType & MemberTypes.Property) == 0)
-                throw new Exception();
+                throw new Exception("getSetter must be a single property getter p => p.PropertyMember");
 
             var propertyName = me.Member.Name;
             var property = GetType().GetProperty(propertyName);
             
             if (property == null || !property.CanWrite)
-                throw new Exception();
+                throw new Exception($"Property {propertyName} not found or not writeable");
 
             var setter = property.GetSetMethod(true);
             
@@ -99,6 +99,7 @@ namespace WDE.MVVM
                     RaisePropertyChanged(propertyName);
                 }));
         }
+
         /// <summary>
         /// Subscribes into given observable, each time observable produces a value,
         /// OnPropertyChanged is fired for given property in getter

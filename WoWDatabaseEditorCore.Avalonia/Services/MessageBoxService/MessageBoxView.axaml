@@ -23,16 +23,17 @@
     </controls:BaseMessageBoxWindow.KeyBindings>
     <ItemsPresenter KeyboardNavigation.TabNavigation="Continue" Items="{Binding Buttons}" Name="ButtonsList">
         <ItemsPresenter.ItemTemplate>
-            <DataTemplate>
-                <Button Content="{Binding Name}" 
+            <DataTemplate x:DataType="messageBoxService:MessageBoxButtonViewModel">
+                <Button Content="{CompiledBinding Name}" 
+                        Classes.primary="{CompiledBinding IsDefault}"
                         utils:FocusUtils.FocusFirst="{Binding IsDefault}"
-                        IsDefault="{Binding IsDefault}" 
-                        Command="{Binding Command}" />
+                        IsDefault="{CompiledBinding IsDefault}" 
+                        Command="{CompiledBinding Command}" />
             </DataTemplate>
         </ItemsPresenter.ItemTemplate>
         <ItemsPresenter.ItemsPanel>
             <ItemsPanelTemplate>
-                <StackPanel KeyboardNavigation.TabNavigation="Continue" />
+                <StretchStackPanel KeyboardNavigation.TabNavigation="Continue" />
             </ItemsPanelTemplate>
         </ItemsPresenter.ItemsPanel>
     </ItemsPresenter>

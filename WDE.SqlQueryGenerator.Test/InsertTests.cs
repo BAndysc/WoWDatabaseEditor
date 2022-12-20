@@ -12,7 +12,7 @@ namespace WDE.SqlQueryGenerator.Test
             var query = Queries
                 .Table("a")
                 .Insert(new { b = 1 });
-            Assert.AreEqual($"INSERT INTO `a` (`b`) VALUES{Environment.NewLine}(1);", query.QueryString);
+            Assert.AreEqual($"INSERT INTO `a` (`b`) VALUES (1);", query.QueryString);
         }
         
         [Test]
@@ -21,7 +21,7 @@ namespace WDE.SqlQueryGenerator.Test
             var query = Queries
                 .Table("a")
                 .BulkInsert(new []{new { b = 1 }, new { b = 2 }});
-            Assert.AreEqual($"INSERT INTO `a` (`b`) VALUES{Environment.NewLine}(1),{Environment.NewLine}(2);", query.QueryString);
+            Assert.AreEqual($"INSERT INTO `a` (`b`) VALUES {Environment.NewLine}(1),{Environment.NewLine}(2);", query.QueryString);
         }
         
         [Test]
@@ -48,7 +48,7 @@ namespace WDE.SqlQueryGenerator.Test
             var query = Queries
                 .Table("a")
                 .InsertIgnore(new { b = 1 });
-            Assert.AreEqual($"INSERT IGNORE INTO `a` (`b`) VALUES{Environment.NewLine}(1);", query.QueryString);
+            Assert.AreEqual($"INSERT IGNORE INTO `a` (`b`) VALUES (1);", query.QueryString);
         }
         
         [Test]

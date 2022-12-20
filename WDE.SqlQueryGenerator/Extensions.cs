@@ -17,7 +17,14 @@ namespace WDE.SqlQueryGenerator
             Value = value;
         }
     }
-    
+
+    public enum QueryInsertMode
+    {
+        Insert,
+        InsertIgnore,
+        Replace
+    }
+
     public static class Extensions
     {
         public static IQuery InsertIgnore(this ITable table, Dictionary<string, object?> obj)
@@ -32,15 +39,25 @@ namespace WDE.SqlQueryGenerator
         
         public static IQuery Insert(this ITable table, Dictionary<string, object?> obj, bool insertIgnore = false)
         {
-            return table.BulkInsert(new[] { obj }, insertIgnore);
+            return table.BulkInsert(new[] { obj }, insertIgnore ? QueryInsertMode.InsertIgnore : QueryInsertMode.Insert);
         }
         
         public static IQuery Insert(this ITable table, object obj, bool insertIgnore = false)
         {
-            return table.BulkInsert(new[] { obj }, insertIgnore);
+            return table.BulkInsert(new[] { obj }, insertIgnore ? QueryInsertMode.InsertIgnore : QueryInsertMode.Insert);
         }
         
-        public static IQuery BulkInsert(this ITable table, ICollection<Dictionary<string, object?>> objects, bool insertIgnore = false)
+        public static IQuery Replace(this ITable table, Dictionary<string, object?> obj)
+        {
+            return table.BulkInsert(new[] { obj }, QueryInsertMode.Replace);
+        }
+        
+        public static IQuery Replace(this ITable table, object obj)
+        {
+            return table.BulkInsert(new[] { obj }, QueryInsertMode.Replace);
+        }
+
+        public static IQuery BulkInsert(this ITable table, ICollection<Dictionary<string, object?>> objects, QueryInsertMode mode = QueryInsertMode.Insert)
         {
             bool first = true;
             IList<string> properties = null!;
@@ -52,8 +69,8 @@ namespace WDE.SqlQueryGenerator
                 {
                     properties = o.Keys.ToList();
                     var cols = string.Join(", ", properties.Select(c => $"`{c}`"));
-                    var ignore = insertIgnore ? " IGNORE" : "";
-                    sb.Append($"INSERT{ignore} INTO `{table.TableName}` ({cols}) VALUES");
+                    var insert = mode == QueryInsertMode.Insert ? "INSERT" : (mode == QueryInsertMode.InsertIgnore ? "INSERT IGNORE" : "REPLACE");
+                    sb.Append($"{insert} INTO `{table.TableName}` ({cols}) VALUES");
                     if (objects.Count > 1 || properties.Count > 1)
                         sb.AppendLine();
                     else
@@ -72,10 +89,15 @@ namespace WDE.SqlQueryGenerator
             sb.Append(';');
             return new Query(table, sb.ToString());
         }
-        
-        public static IQuery BulkInsert(this ITable table, IEnumerable<object> objects, bool insertIgnore = false)
+
+        public static IQuery BulkReplace(this ITable table, IEnumerable<object> objects)
         {
-            bool first = true;
+            return BulkInsert(table, objects, QueryInsertMode.Replace);
+        }
+        
+        public static IQuery BulkInsert(this ITable table, IEnumerable<object> objects, QueryInsertMode mode = QueryInsertMode.Insert)
+        {
+            int i = 0;
             PropertyInfo[] properties = null!;
             var sb = new StringBuilder();
             var lines = new List<(string row, bool ignored, string? comment)>();
@@ -83,7 +105,7 @@ namespace WDE.SqlQueryGenerator
             PropertyInfo? ignoredProperty = null;
             foreach (var o in objects)
             {
-                if (first)
+                if (i == 0)
                 {
                     var type = o.GetType();
                     commentProperty = type.GetProperty("__comment", BindingFlags.Instance | BindingFlags.Public);
@@ -92,18 +114,23 @@ namespace WDE.SqlQueryGenerator
                         .Where(prop => prop != commentProperty && prop != ignoredProperty)
                         .ToArray();
                     var cols = string.Join(", ", properties.Select(c => $"`{c.Name}`"));
-                    var ignore = insertIgnore ? " IGNORE" : "";
-                    sb.AppendLine($"INSERT{ignore} INTO `{table.TableName}` ({cols}) VALUES");
-                    first = false;
+                    var insert = mode == QueryInsertMode.Insert ? "INSERT" : (mode == QueryInsertMode.InsertIgnore ? "INSERT IGNORE" : "REPLACE");
+                    sb.Append($"{insert} INTO `{table.TableName}` ({cols}) VALUES ");
+                }
+                else if (i == 1)
+                {
+                    sb.AppendLine();
                 }
 
                 var comment = (string?)commentProperty?.GetValue(o) ?? null;
                 var ignored = (bool)((bool?)ignoredProperty?.GetValue(o) ?? false);
                 var row = string.Join(", ", properties.Select(p => p.GetValue(o).ToSql()));
                 lines.Add((row, ignored, comment));
+                
+                i++;
             }
 
-            if (first)
+            if (i == 0)
                 return new Query(table, "");
 
 
@@ -174,7 +201,7 @@ namespace WDE.SqlQueryGenerator
 
         public static IWhere WhereIn<T>(this ITable table, string columnName, IEnumerable<T> values)
         {
-            var str = string.Join(", ", values);
+            var str = string.Join(", ", values.Select(v => v.ToSql()));
             return new Where(table, $"`{columnName}` IN ({str})");
         }
 
@@ -273,12 +300,37 @@ namespace WDE.SqlQueryGenerator
                 return f.ToString(CultureInfo.InvariantCulture);
             if (o is double d)
                 return d.ToString(CultureInfo.InvariantCulture);
+            if (o is int i)
+                return i.ToString();
+            if (o is uint ui)
+                return ui.ToString();
+            if (o is long l)
+                return l.ToString();
+            if (o is ulong ul)
+                return ul.ToString();
+            if (o is short sh)
+                return sh.ToString();
+            if (o is ushort ush)
+                return ush.ToString();
+            if (o is byte bt)
+                return bt.ToString();
+            if (o is sbyte sbt)
+                return sbt.ToString();
             if (o is bool b)
                 return b ? "1" : "0";
             if (o is DateTime dt)
-                return dt.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss");
+                return dt.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss").ToSqlEscapeString();
             if (o is SqlTimestamp ts)
                 return "FROM_UNIXTIME(" + ts.Value + ")";
+            if (o is Guid g)
+                return g.ToString().ToSqlEscapeString();
+            if (o.GetType().IsEnum)
+                return ((long)(object)o).ToString();
+            if (o is RawText raw)
+                return raw.ToString();
+            if (o is Variable var)
+                return var.ToString();
+            throw new Exception($"Invalid type in ToSql: {o.GetType()}");
             return o.ToString() ?? "[INVALID TYPE]";
         }
 

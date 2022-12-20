@@ -1,0 +1,34 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:quickAccess="clr-namespace:WDE.Parameters.QuickAccess;assembly=WDE.Parameters"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="quickAccess:ParameterSearchConfiguration"
+             x:Class="WDE.CommonViews.Avalonia.Parameters.SearchConfigurationView">
+    <ScrollViewer>
+       <StackPanel>
+           <SettingsHeader Text="Default quick access actions" />
+           <ItemsControl Items="{CompiledBinding Parameters}">
+               <ItemsControl.ItemTemplate>
+                   <DataTemplate>
+                       <SettingItem Header="{CompiledBinding ParameterName}">
+                           <ComboBox Items="{CompiledBinding Actions}" SelectedItem="{CompiledBinding Action}">
+                               <ComboBox.ItemTemplate>
+                                   <DataTemplate>
+                                       <TextBlock Text="{CompiledBinding Name}" />
+                                   </DataTemplate>
+                               </ComboBox.ItemTemplate>
+                           </ComboBox>
+                       </SettingItem>
+                   </DataTemplate>
+               </ItemsControl.ItemTemplate>
+               <ItemsControl.ItemsPanel>
+                   <ItemsPanelTemplate>
+                       <StackPanel />
+                   </ItemsPanelTemplate>
+               </ItemsControl.ItemsPanel>
+           </ItemsControl>
+       </StackPanel>
+    </ScrollViewer>
+</UserControl>

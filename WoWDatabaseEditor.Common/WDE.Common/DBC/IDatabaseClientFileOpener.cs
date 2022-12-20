@@ -8,5 +8,7 @@ namespace WDE.Common.DBC
     {
         IDBC Open(byte[] data);
         IDBC Open(string path);
+        IWDC OpenWdc(string table, byte[] data);
+        IWDC OpenWdc(string path);
     }
 }

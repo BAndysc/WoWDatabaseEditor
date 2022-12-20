@@ -20,7 +20,7 @@ public partial class ServerExecutableConfigurationPanelViewModel : ObservableBas
     public string Name => "World server executable";
     public string? ShortDescription => "You can configure your world and auth server paths for easy start/stop button access in the statusbar";
     public bool IsRestartRequired => false;
-    public ConfigurableGroup Group => ConfigurableGroup.Advanced;
+    public ConfigurableGroup Group => ConfigurableGroup.Basic;
 
     public bool IsModified => worldServerPath != configuration.WorldServerPath || authServerPath != configuration.AuthServerPath;
     [Notify] [AlsoNotify(nameof(IsModified))] private string? worldServerPath;

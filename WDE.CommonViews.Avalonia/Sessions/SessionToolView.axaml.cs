@@ -1,8 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Input;
-using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using WDE.Solutions.Sessions;
+using WDE.Sessions.Sessions;
 
 namespace WDE.CommonViews.Avalonia.Sessions
 {

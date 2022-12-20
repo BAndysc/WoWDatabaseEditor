@@ -2,13 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using Prism.Commands;
 using Prism.Events;
+using ReactiveUI;
 using WDE.Common.Events;
 using WDE.Common.Managers;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Windows;
 using WDE.Common.Menu;
+using WDE.Common.Providers;
 using WDE.Common.QuickAccess;
 using WDE.Common.Services;
 using WDE.Common.Sessions;
@@ -21,6 +24,8 @@ using WDE.MVVM.Observable;
 using WoWDatabaseEditor.Providers;
 using WoWDatabaseEditorCore.Managers;
 using WoWDatabaseEditorCore.Services;
+using WoWDatabaseEditorCore.Services.FindAnywhere;
+using WoWDatabaseEditorCore.Services.Profiles;
 using WoWDatabaseEditorCore.Services.QuickAccess;
 
 namespace WoWDatabaseEditorCore.ViewModels
@@ -34,7 +39,10 @@ namespace WoWDatabaseEditorCore.ViewModels
         private readonly Func<QuickStartViewModel> quickStartCreator;
         private readonly Func<TextDocumentViewModel> textDocumentCreator;
         private readonly ISolutionTasksService solutionTasksService;
+        private readonly IProgramNameService programNameService;
+        private readonly List<IProgramNameAddon> programNameAddons;
         private readonly ITablesToolService tablesToolService;
+        private readonly IGlobalServiceRoot globalServiceRoot;
 
         private readonly Dictionary<string, ITool> toolById = new();
 
@@ -55,9 +63,16 @@ namespace WoWDatabaseEditorCore.ViewModels
             ITaskRunner taskRunner,
             IEventAggregator eventAggregator,
             IProgramNameService programNameService,
+            IEnumerable<IProgramNameAddon> nameAddons,
             IMainThread mainThread,
             IQuickAccessViewModel quickAccessViewModel,
-            ITablesToolService tablesToolService)
+            IWindowManager windowManager,
+            ITablesToolService tablesToolService,
+            Lazy<IGameViewService> gameViewService,
+            QuickGoToViewModel quickGoToViewModel,
+            ProfilesViewModel profilesViewModel,
+            IGlobalServiceRoot globalServiceRoot,
+            Func<IFindAnywhereDialogViewModel> findAnywhereCreator)
         {
             DocumentManager = documentManager;
             StatusBar = statusBar;
@@ -66,9 +81,15 @@ namespace WoWDatabaseEditorCore.ViewModels
             this.quickStartCreator = quickStartCreator;
             this.textDocumentCreator = textDocumentCreator;
             this.solutionTasksService = solutionTasksService;
+            this.programNameService = programNameService;
             this.tablesToolService = tablesToolService;
-            Title = programNameService.Title;
+            this.globalServiceRoot = globalServiceRoot;
+            this.programNameAddons = nameAddons.ToList();
+            Title = "";
             Subtitle = programNameService.Subtitle;
+            foreach (var titleAddon in programNameAddons)
+                titleAddon.ToObservable(x => x.Addon).SubscribeAction(_ => UpdateTitle());
+            UpdateTitle();
             OpenDocument = new DelegateCommand<IMenuDocumentItem>(ShowDocument);
             ExecuteChangedCommand = new DelegateCommand(() =>
             {
@@ -104,6 +125,16 @@ namespace WoWDatabaseEditorCore.ViewModels
                 if (DocumentManager.ActiveDocument is ISolutionItemDocument {SolutionItem: { }} sid)
                     solutionSqlService.OpenDocumentWithSqlFor(sid.SolutionItem);
             }, () => DocumentManager.ActiveDocument != null && DocumentManager.ActiveDocument is ISolutionItemDocument);
+
+            FindAnywhereCommand = new AsyncAutoCommand(async () =>
+            {
+                await windowManager.ShowDialog(findAnywhereCreator());
+            });
+
+            Open3DCommand = new DelegateCommand(() =>
+            {
+                gameViewService.Value.Open();
+            });
             
             DocumentManager.ToObservable(dm => dm.ActiveDocument)
                 .SubscribeAction(_ =>
@@ -116,6 +147,8 @@ namespace WoWDatabaseEditorCore.ViewModels
             TasksViewModel = tasksViewModel;
             RelatedSolutionItems = relatedSolutionItems;
             QuickAccessViewModel = quickAccessViewModel;
+            QuickGoToViewModel = quickGoToViewModel;
+            ProfilesViewModel = profilesViewModel;
 
             MenuItemProviders = menuItemProvider.GetItems();
 
@@ -154,16 +187,30 @@ namespace WoWDatabaseEditorCore.ViewModels
                 .Build());
         }
 
+        private void UpdateTitle()
+        {
+            if (programNameAddons.Count == 0)
+                Title = programNameService.Title;
+            else
+            {
+                var name = string.Join(" ", programNameAddons.Select(a => a.Addon));
+                Title = programNameService.Title + " " + name;
+            }
+            RaisePropertyChanged(nameof(Title));
+        }
+
         public IStatusBar StatusBar { get; }
         public IDocumentManager DocumentManager { get; }
 
         public TasksViewModel TasksViewModel { get; }
         public RelatedSolutionItems RelatedSolutionItems { get; }
         public IQuickAccessViewModel QuickAccessViewModel { get; }
+        public QuickGoToViewModel QuickGoToViewModel { get; }
+        public ProfilesViewModel ProfilesViewModel { get; }
 
         public List<IMainMenuItem> MenuItemProviders { get; }
 
-        public string Title { get; }
+        public string Title { get; private set; }
         
         public string Subtitle { get; }
 
@@ -180,6 +227,10 @@ namespace WoWDatabaseEditorCore.ViewModels
         
         public DelegateCommand GenerateCurrentSqlCommand { get; }
 
+        public ICommand FindAnywhereCommand { get; }
+        
+        public ICommand Open3DCommand { get; }
+        
         public bool ShowTablesList
         {
             get => tablesToolService.Visibility;
@@ -265,7 +316,7 @@ namespace WoWDatabaseEditorCore.ViewModels
                             if (await before.ShallSavePreventClosing())
                                 return false;
                         }
-                        editor.Save.Execute(null);
+                        //editor.Save.Execute(null);
                         if (editor is ISolutionItemDocument solutionItemDocument)
                             await solutionTasksService.Save(solutionItemDocument);
                         else
@@ -302,10 +353,40 @@ namespace WoWDatabaseEditorCore.ViewModels
                     }
                 }
             }
-
+            
             while (DocumentManager.OpenedDocuments.Count > 0)
                 DocumentManager.OpenedDocuments.RemoveAt(DocumentManager.OpenedDocuments.Count - 1);
+            
+            var modifiedTools = DocumentManager.AllTools
+                .Select(t => t as ISavableTool)
+                .Where(t => t != null)
+                .Cast<ISavableTool>()
+                .Where(t => t.IsModified)
+                .ToList();
 
+            foreach (var tool in modifiedTools)
+            {
+                var message = new MessageBoxFactory<MessageBoxButtonType>().SetTitle("Tool is modified")
+                    .SetMainInstruction("Do you want to save the changes of " + tool.Title + "?")
+                    .SetContent("Your changes will be lost if you don't save them.")
+                    .SetIcon(MessageBoxIcon.Warning)
+                    .WithYesButton(MessageBoxButtonType.Yes)
+                    .WithNoButton(MessageBoxButtonType.No)
+                    .WithCancelButton(MessageBoxButtonType.Cancel);
+
+                MessageBoxButtonType result = await messageBoxService.ShowDialog(message.Build());
+                if (result == MessageBoxButtonType.Cancel)
+                    return false;
+
+                if (result == MessageBoxButtonType.Yes)
+                {
+                    tool.Save.Execute(null);
+                }
+                else if (result == MessageBoxButtonType.No)
+                {
+                }
+            }
+            
             return true;
         }
 
@@ -325,5 +406,10 @@ namespace WoWDatabaseEditorCore.ViewModels
 
         public event Action CloseRequest = delegate{};
         public event Action ForceCloseRequest = delegate{};
+
+        public void NotifyWillClose()
+        {
+            globalServiceRoot.Dispose();
+        }
     }
 }

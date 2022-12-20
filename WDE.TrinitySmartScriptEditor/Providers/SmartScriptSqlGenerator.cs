@@ -23,6 +23,7 @@ namespace WDE.TrinitySmartScriptEditor.Providers
         private readonly Lazy<ISmartFactory> smartFactory;
         private readonly Lazy<ISmartDataManager> smartDataManager;
         private readonly Lazy<ISmartScriptExporter> exporter;
+        private readonly Lazy<IEditorFeatures> editorFeatures;
         private readonly Lazy<ISmartScriptImporter> importer;
 
         public SmartScriptSqlGenerator(IEventAggregator eventAggregator,
@@ -30,6 +31,7 @@ namespace WDE.TrinitySmartScriptEditor.Providers
             Lazy<ISmartFactory> smartFactory,
             Lazy<ISmartDataManager> smartDataManager,
             Lazy<ISmartScriptExporter> exporter,
+            Lazy<IEditorFeatures> editorFeatures,
             Lazy<ISmartScriptImporter> importer)
         {
             this.eventAggregator = eventAggregator;
@@ -37,12 +39,13 @@ namespace WDE.TrinitySmartScriptEditor.Providers
             this.smartFactory = smartFactory;
             this.smartDataManager = smartDataManager;
             this.exporter = exporter;
+            this.editorFeatures = editorFeatures;
             this.importer = importer;
         }
 
         public async Task<IQuery> GenerateSql(SmartScriptSolutionItem item)
         {
-            SmartScript script = new(item, smartFactory.Value, smartDataManager.Value, new EmptyMessageboxService());
+            SmartScript script = new(item, smartFactory.Value, smartDataManager.Value, new EmptyMessageboxService(), editorFeatures.Value, importer.Value);
             var lines = (await database.Value.GetScriptFor(item.Entry, item.SmartType)).ToList();
             var conditions = database.Value.GetConditionsForScript(item.Entry, item.SmartType).ToList();
             await importer.Value.Import(script, true, lines, conditions, null);

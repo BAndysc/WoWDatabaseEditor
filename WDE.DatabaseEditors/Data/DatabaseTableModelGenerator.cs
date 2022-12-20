@@ -149,6 +149,10 @@ namespace WDE.DatabaseEditors.Data
                         conditions = ((IList<IConditionLine>)column.Value.value);
                         continue;
                     }
+                    else if (column.Value.type == typeof(DateTime))
+                    {
+                        valueHolder = new ValueHolder<long>(((DateTimeOffset)(DateTime)column.Value.value).ToUnixTimeSeconds(), column.Value.value is DBNull);
+                    }
                     else
                     {
                         throw new NotImplementedException("Unknown column type " + column.Value.type);

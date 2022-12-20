@@ -11,7 +11,7 @@
         <Setter Property="Foreground" Value="{DynamicResource TextControlForeground}" />
         <Setter Property="Background" Value="{DynamicResource TextControlBackground}" />
         <Setter Property="BorderBrush" Value="{DynamicResource TextControlBorderBrush}" />
-        <Setter Property="BorderThickness" Value="{DynamicResource TextControlBorderThemeThickness}" />    
+        <Setter Property="BorderThickness" Value="1, 1, 1, 1" />    
         <!--        <Setter Property="CornerRadius" Value="{DynamicResource ControlCornerRadius}" />-->
         <Setter Property="FontSize" Value="{DynamicResource ControlContentThemeFontSize}" />
         <Setter Property="MinHeight" Value="{DynamicResource TextControlThemeMinHeight}" />

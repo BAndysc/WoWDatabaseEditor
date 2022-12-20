@@ -12,7 +12,7 @@ using WDE.RemoteSOAP.Services.Soap;
 namespace WDE.RemoteSOAP.ViewModels
 {
     [AutoRegister]
-    public class SoapConfigViewModel : BindableBase, IConfigurable
+    public class SoapConfigViewModel : BindableBase, IFirstTimeWizardConfigurable
     {
         private readonly IConnectionSettingsProvider settings;
         private string? host;

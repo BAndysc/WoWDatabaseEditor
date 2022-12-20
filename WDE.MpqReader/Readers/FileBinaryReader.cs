@@ -5,7 +5,7 @@
         private readonly FileStream fileStream;
         private readonly BinaryReader binaryReader;
 
-        public byte[] ReadBytes(int length)
+        public ReadOnlyMemory<byte> ReadBytes(int length)
         {
             return binaryReader.ReadBytes(length);
         }

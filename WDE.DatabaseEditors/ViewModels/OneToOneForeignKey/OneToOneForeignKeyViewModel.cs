@@ -125,19 +125,20 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
         {
             CloseCancel?.Invoke();
         });
-        Save = noSaveMode ? AlwaysDisabledCommand.Command : new AsyncAutoCommand(SaveData);
         ExecuteChangedCommand = noSaveMode ? new AsyncAutoCommand(() => Task.CompletedTask, () => false) : new AsyncAutoCommand(async () =>
         {
             await SaveData();
             eventAggregator.GetEvent<DatabaseTableChanged>().Publish(tableDefinition.TableName);
-            if (!sessionService.IsOpened || sessionService.IsPaused)
-                return;
+            if (sessionService.IsOpened && !sessionService.IsPaused)
+            {
+                UpdateSolutionItemWithEverything();
+                await taskRunner.ScheduleTask("Update session", async () => await sessionService.UpdateQuery(this));
+            }
 
-            UpdateSolutionItemWithEverything();
-            await taskRunner.ScheduleTask("Update session", async () => await sessionService.UpdateQuery(this));
             History.MarkAsSaved();
             forceUpdateCells.Clear();
         });
+        Save = ExecuteChangedCommand;
         CopyCurrentSqlCommand = new AsyncAutoCommand(async () =>
         {
             await taskRunner.ScheduleTask("Generating SQL",

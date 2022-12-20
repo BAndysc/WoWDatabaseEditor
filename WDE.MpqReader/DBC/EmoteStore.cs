@@ -12,4 +12,13 @@ public class EmoteStore : BaseDbcStore<uint, Emote>
             store[o.Id] = o;
         }
     }
+    
+    public EmoteStore(IEnumerable<IWdcIterator> rows)
+    {
+        foreach (var row in rows)
+        {
+            var o = new Emote(row);
+            store[o.Id] = o;
+        }
+    }
 }

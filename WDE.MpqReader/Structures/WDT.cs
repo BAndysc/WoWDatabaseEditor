@@ -1,5 +1,8 @@
-﻿using System.Diagnostics;
+﻿using System.Collections;
+using System.Collections.Specialized;
+using System.Diagnostics;
 using TheMaths;
+using WDE.Common.MPQ;
 using WDE.MpqReader.Readers;
 
 namespace WDE.MpqReader.Structures
@@ -48,7 +51,7 @@ namespace WDE.MpqReader.Structures
         public string? Mwmo { get; }
         public MODF? WorldMapObject { get; }
 
-        public WDT(IBinaryReader reader)
+        public WDT(IBinaryReader reader, GameFilesVersion version)
         {
             Dictionary<int, string>? mwmosNameOffsets = null;
             while (!reader.IsFinished())
@@ -69,7 +72,7 @@ namespace WDE.MpqReader.Structures
                 else if (chunkName == "MWMO")
                     Mwmo = ChunkedUtils.ReadZeroTerminatedStringArrays(partialReader, true, out mwmosNameOffsets).FirstOrDefault();
                 else if (chunkName == "MODF")
-                    WorldMapObject = MODF.Read(partialReader);
+                    WorldMapObject = MODF.Read(partialReader, version);
                 reader.Offset = offset + size;
             }
         }
@@ -82,6 +85,69 @@ namespace WDE.MpqReader.Structures
                 for (uint x = 0; x < 64; ++x)
                 {
                     chunks[y, x] = new WDTChunk(reader, x, y);
+                }
+            }
+            return chunks;
+        }
+    }
+
+    public struct BitVector64
+    {
+        private BitVector32 low;
+        private BitVector32 high;
+
+        public bool this[int index]
+        {
+            get
+            {
+                if (index <= 31)
+                    return low[(1<<index)];
+                return high[1 << (index - 32)];
+            }
+            set
+            {
+                if (index <= 31)
+                    low[(1<<index)] = value;
+                else
+                    high[1 << (index - 32)] = value;
+            }
+        }
+    }
+    
+    public class FastWDTChunks
+    {
+        public BitVector64[] Chunks { get; }
+
+        public FastWDTChunks(IBinaryReader reader)
+        {
+            while (!reader.IsFinished())
+            {
+                var chunkName = reader.ReadChunkName();
+                var size = reader.ReadInt32();
+
+                var offset = reader.Offset;
+
+                var partialReader = new LimitedReader(reader, size);
+
+                if (chunkName == "MAIN")
+                {
+                    Chunks = ReadWdtChunks(partialReader);
+                    break;
+                }
+                reader.Offset = offset + size;
+            }
+        }
+
+        private BitVector64[] ReadWdtChunks(IBinaryReader reader)
+        {
+            BitVector64[] chunks = new BitVector64[64];
+            for (uint y = 0; y < 64; ++y)
+            {
+                for (int x = 0; x < 64; ++x)
+                {
+                    var chunkFlags = reader.ReadUInt32();
+                    reader.ReadUInt32();
+                    chunks[y][x] = (chunkFlags & 1) == 1;
                 }
             }
             return chunks;
@@ -107,34 +173,51 @@ namespace WDE.MpqReader.Structures
             };
         }
     }
+    
+    public enum MODFFlags {
+        modf_destroyable = 0x1,         // set for destroyable buildings like the tower in DeathknightStart. This makes it a server-controllable game object.
+        modf_use_lod = 0x2,             // WoD(?)+: also load _LOD1.WMO for use dependent on distance
+        modf_unk_has_scale = 0x4,       // Legion+: if this flag is set then use scale = scale / 1024, otherwise scale is 1.0
+        modf_entry_is_filedata_id = 0x8, // Legion+: nameId is a file data id to directly load //SMMapObjDef::FLAG_FILEDATAID
+        modf_use_sets_from_mwds = 0x80  // Shadowlands+: if set, doodad set indexes of which to load should be taken from MWDS chunk
+    };
 
-    public class MODF
+    public readonly struct MODF
     {
-        public uint uniqueId { get; init; }
-        public Vector3 pos { get; init; }
-        public Vector3 rot { get; init; }
-        public CAaBox extents { get; init; }
-        public uint flags { get; init; } // TODO
-        public uint doodadSet { get; init; }
-        public uint nameSet { get; init; }
-        public uint pad { get; init; }
+        public readonly FileId? fileId;
+        public readonly uint uniqueId;
+        public readonly Vector3 pos;
+        public readonly Vector3 rot;
+        public readonly CAaBox extents;
+        public readonly MODFFlags flags; // TODO
+        public readonly uint doodadSet;
+        public readonly uint nameSet;
+        public readonly float scale;
 
-        private MODF() { }
-
-        public static MODF Read(IBinaryReader reader)
+        public MODF(IBinaryReader reader, GameFilesVersion version)
         {
-            reader.ReadUInt32();
-            return new MODF()
-            {
-                uniqueId = reader.ReadUInt32(),
-                pos = reader.ReadVector3(),
-                rot = reader.ReadVector3(),
-                extents = CAaBox.Read(reader),
-                flags = reader.ReadUInt16(),
-                doodadSet = reader.ReadUInt16(),
-                nameSet = reader.ReadUInt16(),
-                pad = reader.ReadUInt16()
-            };
+            var entryOrFileId = reader.ReadUInt32();
+            uniqueId = reader.ReadUInt32();
+            pos = reader.ReadVector3();
+            rot = reader.ReadVector3();
+            extents = CAaBox.Read(reader);
+            flags = (MODFFlags)reader.ReadUInt16();
+            doodadSet = reader.ReadUInt16();
+            nameSet = reader.ReadUInt16();
+            scale = reader.ReadUInt16();
+            if (version < GameFilesVersion.Legion_7_3_5 || !flags.HasFlagFast(MODFFlags.modf_unk_has_scale))
+                scale = 1;
+            else
+                scale /= 1024;
+
+            fileId = default;
+            if (flags.HasFlagFast(MODFFlags.modf_entry_is_filedata_id))
+                fileId = entryOrFileId;
+        }
+
+        public static MODF Read(IBinaryReader reader, GameFilesVersion version)
+        {
+            return new MODF(reader, version);
         }
     }
 }

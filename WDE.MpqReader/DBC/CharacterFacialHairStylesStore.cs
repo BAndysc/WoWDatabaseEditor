@@ -1,25 +1,32 @@
 using System.Collections;
 using WDE.Common.DBC;
+using WDE.Common.MPQ;
 
 namespace WDE.MpqReader.DBC;
 
-public class CharacterFacialHairStylesStore : IEnumerable<CharacterFacialHairStyles>
+public class CharacterFacialHairStylesStore : BaseDbcStore<uint, CharacterFacialHairStyles>
 {
-    private Dictionary<uint, CharacterFacialHairStyles> store = new();
-    public CharacterFacialHairStylesStore(IEnumerable<IDbcIterator> rows)
+    public CharacterFacialHairStylesStore(IEnumerable<IDbcIterator> rows, GameFilesVersion version)
     {
         uint idx = 1;
         foreach (var row in rows)
         {
-            var o = new CharacterFacialHairStyles(row);
+            var o = new CharacterFacialHairStyles(row, version);
             store[idx] = o;
 
             idx++;
         }
     }
+    
+    public CharacterFacialHairStylesStore(IEnumerable<IWdcIterator> rows, GameFilesVersion version)
+    {
+        uint idx = 1;
+        foreach (var row in rows)
+        {
+            var o = new CharacterFacialHairStyles(row, version);
+            store[idx] = o;
 
-    // public bool Contains(uint id) => store.ContainsKey(id);
-    // public CharacterFacialHairStyles this[uint id] => store[id];
-    public IEnumerator<CharacterFacialHairStyles> GetEnumerator() => store.Values.GetEnumerator();
-    IEnumerator IEnumerable.GetEnumerator() => store.Values.GetEnumerator();
+            idx++;
+        }
+    }
 }

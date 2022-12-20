@@ -16,6 +16,7 @@ using WDE.PacketViewer;
 using WDE.PacketViewer.Avalonia;
 using WDE.Parameters;
 using WDE.RemoteSOAP;
+using WDE.Sessions;
 using WDE.SmartScriptEditor.Avalonia;
 using WDE.Solutions;
 using WDE.SourceCodeIntegrationEditor;
@@ -34,6 +35,9 @@ using WDE.EventScriptsEditor;
 using WDE.MangosEventAiEditor;
 using WDE.MapSpawns;
 using WDE.PathPreviewTool;
+using WDE.FirstTimeWizard;
+using WDE.QueryGenerators;
+using WDE.Profiles;
 
 namespace LoaderAvalonia
 {
@@ -78,7 +82,11 @@ namespace LoaderAvalonia
                 typeof(MapSpawnsModule),
                 typeof(PathPreviewToolModule),
                 typeof(EventAiModule),
-                typeof(EventAiAvaloniaModule)
+                typeof(EventAiAvaloniaModule),
+                typeof(QueryGeneratorModule),
+                typeof(SessionsModule),
+                typeof(FirstTimeWizardModule),
+                typeof(ProfilesModule)
             };
             WoWDatabaseEditorCore.Avalonia.Program.PreloadedModules = modules;
             WoWDatabaseEditorCore.Avalonia.Program.Main(args);

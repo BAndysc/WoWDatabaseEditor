@@ -40,10 +40,7 @@ namespace WDE.MapRenderer.Managers
         public List<Entity> entities = new();
         public List<IMesh> meshes = new();
         public List<NativeBuffer<Matrix>> animationBuffers = new();
-
-        public CreatureManager.CreatureChunkData Creatures = new();
-        public GameObjectManager.GameObjectChunkData GameObjects = new();
-
+        
         public ChunkInstance(int x, int z)
         {
             X = x;
@@ -91,10 +88,9 @@ namespace WDE.MapRenderer.Managers
         private readonly Lazy<LoadingManager> loadingManager;
         private readonly ModuleManager moduleManager;
         private readonly RaycastSystem raycastSystem;
+        private readonly DbcManager dbcManager;
         private readonly Engine engine;
         private readonly IGameContext gameContext;
-        private readonly CreatureManager creatureManager;
-        private readonly GameObjectManager gameObjectManager;
         private readonly Archetypes archetypes;
         private HashSet<(int, int)> loadedChunks = new();
         private List<ChunkInstance> chunks = new();
@@ -197,12 +193,11 @@ namespace WDE.MapRenderer.Managers
             WmoManager wmoManager,
             WorldManager worldManager,
             IGameContext gameContext,
-            CreatureManager creatureManager,
-            GameObjectManager gameObjectManager,
             Archetypes archetypes,
             Lazy<LoadingManager> loadingManager,
             ModuleManager moduleManager,
             RaycastSystem raycastSystem,
+            DbcManager dbcManager,
             Engine engine)
         {
             this.entityManager = entityManager;
@@ -219,12 +214,11 @@ namespace WDE.MapRenderer.Managers
             this.wmoManager = wmoManager;
             this.worldManager = worldManager;
             this.gameContext = gameContext;
-            this.creatureManager = creatureManager;
-            this.gameObjectManager = gameObjectManager;
             this.archetypes = archetypes;
             this.loadingManager = loadingManager;
             this.moduleManager = moduleManager;
             this.raycastSystem = raycastSystem;
+            this.dbcManager = dbcManager;
             this.engine = engine;
         }
 
@@ -246,8 +240,17 @@ namespace WDE.MapRenderer.Managers
             var WDTflag = worldManager.CurrentWdt?.Header.flags;
 
             var fullName = gameFiles.Adt(gameContext.CurrentMap.Directory, x, y);
+            var fullNameTex0 = gameFiles.AdtTex0(gameContext.CurrentMap.Directory, x, y);
+            var fullNameObj0 = gameFiles.AdtObj0(gameContext.CurrentMap.Directory, x, y);
+            var fullNameLod = gameFiles.AdtLod0(gameContext.CurrentMap.Directory, x, y);
             var file = gameFiles.ReadFile(fullName);
+            var fileTex0 = gameFiles.ReadFile(fullNameTex0, true);
+            var fileObj0 = gameFiles.ReadFile(fullNameObj0, true);
+            var fileLod = gameFiles.ReadFile(fullNameLod, true);
             yield return file;
+            yield return fileTex0;
+            yield return fileObj0;
+            yield return fileLod;
             if (file.Result == null)
             {
                 tasksource.SetResult();
@@ -274,7 +277,11 @@ namespace WDE.MapRenderer.Managers
 
                 try
                 {
-                    adt = new ADT(new MemoryBinaryReader(file.Result), WDTflag);
+                    adt = new ADT( gameFiles.WoWVersion, new MemoryBinaryReader(file.Result), 
+                        fileTex0.Result == null ? null : new MemoryBinaryReader(fileTex0.Result),
+                        fileObj0.Result == null ? null : new MemoryBinaryReader(fileObj0.Result),
+                        fileLod.Result == null ? null : new MemoryBinaryReader(fileLod.Result), WDTflag,
+                        dbcManager.LiquidObjectStore, dbcManager.LiquidTypeStore, dbcManager.LiquidMaterialStore);
                 }
                 catch (Exception e)
                 {
@@ -285,6 +292,8 @@ namespace WDE.MapRenderer.Managers
                 }
             });
             file.Result.Dispose();
+            fileTex0.Result?.Dispose();
+            fileObj0.Result?.Dispose();
 
             if (adt == null)
                 yield break;
@@ -403,7 +412,7 @@ namespace WDE.MapRenderer.Managers
                 
                     int _i = 0;
                     var sm = chunksEnumerator2.Current.SplatMap;
-                    var len = sm.GetLength(2);
+                    var len = sm?.GetLength(2) ?? 0;
                     for (int _x = 0; _x < 64; ++_x)
                     {
                         for (int _y = 0; _y < 64; ++_y)
@@ -646,10 +655,6 @@ namespace WDE.MapRenderer.Managers
             yield return LoadWorldMapObjects(adt, chunk, cancellationToken);
 
             yield return LoadM2(adt, chunk, cancellationToken);
-            
-            //yield return creatureManager.LoadCreatures(chunk.Creatures, chunk.X, chunk.Z, cancellationToken);
-
-            //yield return gameObjectManager.LoadGameObjects(chunk.GameObjects, chunk.X, chunk.Z, cancellationToken);
         }
 
         private IEnumerator LoadM2(ADT adt, ChunkInstance chunk, CancellationToken cancellationToken)
@@ -820,9 +825,6 @@ namespace WDE.MapRenderer.Managers
             }
             
             yield return moduleManager.ForEach(UnloadModuleChunk);
-
-            yield return creatureManager.UnloadChunk(chunk.Creatures);
-            yield return gameObjectManager.UnloadChunk(chunk.GameObjects);
             
             chunk.terrainEntity = Entity.Empty;
             foreach (var obj in chunk.renderHandles)

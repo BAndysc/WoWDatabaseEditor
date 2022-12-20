@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;
+using WDE.Common.Types;
 using WDE.Module.Attributes;
 
 namespace WDE.Trinity
@@ -12,6 +13,7 @@ namespace WDE.Trinity
     {
         public string Tag => "TrinityCata";
         public string FriendlyName => "The Cataclysm Preservation Project";
+        public ImageUri Icon { get; } = new ImageUri("Icons/core_tc.png");
 
         public IDatabaseFeatures DatabaseFeatures => this;
         public ISmartScriptFeatures SmartScriptFeatures => this;
@@ -19,6 +21,7 @@ namespace WDE.Trinity
         public IGameVersionFeatures GameVersionFeatures => this;
         public IEventAiFeatures EventAiFeatures => this;
         public PhasingType PhasingType => PhasingType.PhaseIds;
+        public int Build => 15595;
 
         public ISet<Type> UnsupportedTables { get; } = new HashSet<Type>{typeof(IAreaTriggerTemplate), typeof(IConversationTemplate), typeof(ICreatureClassLevelStat), typeof(ISceneTemplate), typeof(IAreaTriggerCreateProperties)};
         public bool AlternativeTrinityDatabase => false;

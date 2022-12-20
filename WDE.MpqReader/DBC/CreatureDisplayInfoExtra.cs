@@ -1,4 +1,5 @@
 using WDE.Common.DBC;
+using WDE.MpqReader.Structures;
 
 namespace WDE.MpqReader.DBC;
 
@@ -24,7 +25,7 @@ public class CreatureDisplayInfoExtra
     public readonly uint Tabard;
     public readonly uint Cape;
     public readonly int Flags;
-    public readonly string Texture;
+    public readonly FileId Texture;
 
 
     public CreatureDisplayInfoExtra(IDbcIterator dbcIterator)
@@ -53,6 +54,32 @@ public class CreatureDisplayInfoExtra
         Texture = dbcIterator.GetString(20);
     }
 
+    public CreatureDisplayInfoExtra(IWdcIterator dbcIterator)
+    {
+        Id = (uint)dbcIterator.Id;
+        Race = (uint)dbcIterator.GetSByte("DisplayRaceID");
+        // CreatureType = dbcIterator.GetInt(2);
+        Gender = (uint)dbcIterator.GetSByte("DisplaySexID");
+        SkinColor = dbcIterator.GetByte("SkinID");
+        FaceType = dbcIterator.GetByte("FaceID");
+        HairStyle = dbcIterator.GetByte("HairStyleID");
+        HairColor = dbcIterator.GetByte("HairColorID");
+        BeardStyle = dbcIterator.GetByte("FacialHairID");
+        Helm = 0;
+        Shoulder = 0;
+        Shirt = 0;
+        Cuirass = 0;
+        Belt = 0;
+        Legs = 0;
+        Boots = 0;
+        Wrist = 0;
+        Gloves = 0;
+        Tabard = 0;
+        Cape = 0;
+        Flags = 0;
+        Texture = dbcIterator.GetInt("BakeMaterialResourcesID");
+    }
+    
     private CreatureDisplayInfoExtra()
     {
         Id = 0;

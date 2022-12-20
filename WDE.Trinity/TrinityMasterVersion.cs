@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;
+using WDE.Common.Types;
 using WDE.Module.Attributes;
 
 namespace WDE.Trinity
@@ -12,12 +13,14 @@ namespace WDE.Trinity
     {
         public string Tag => "TrinityMaster";
         public string FriendlyName => "TrinityCore Shadowlands";
+        public ImageUri Icon { get; } = new ImageUri("Icons/core_tc.png");
         public ISmartScriptFeatures SmartScriptFeatures => this;
         public IConditionFeatures ConditionFeatures => this;
         public IGameVersionFeatures GameVersionFeatures => this;
         public IDatabaseFeatures DatabaseFeatures => this;
         public IEventAiFeatures EventAiFeatures => this;
         public PhasingType PhasingType => PhasingType.PhaseIds;
+        public int Build => 45745;
 
         public ISet<Type> UnsupportedTables { get; } = new HashSet<Type>() {typeof(INpcText), typeof(ICreatureClassLevelStat), typeof(IBroadcastText)};
         public bool AlternativeTrinityDatabase => false;

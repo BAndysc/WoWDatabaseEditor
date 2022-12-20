@@ -33,8 +33,8 @@ namespace WDE.MapRenderer.Managers
             }
         }
 
-        private Dictionary<string, WmoInstance?> meshes = new();
-        private Dictionary<string, Task> meshesCurrentlyLoaded = new();
+        private Dictionary<FileId, WmoInstance?> meshes = new();
+        private Dictionary<FileId, Task> meshesCurrentlyLoaded = new();
 
         public WmoManager(IGameFiles gameFiles,
             IMeshManager meshManager,
@@ -49,7 +49,7 @@ namespace WDE.MapRenderer.Managers
             this.woWMeshManager = woWMeshManager;
         }
 
-        public IEnumerator LoadWorldMapObject(string path, TaskCompletionSource<WmoInstance?> result)
+        public IEnumerator LoadWorldMapObject(FileId path, TaskCompletionSource<WmoInstance?> result)
         {
             if (meshes.ContainsKey(path))
             {
@@ -104,14 +104,18 @@ namespace WDE.MapRenderer.Managers
 
             foreach (var group in groups)
             {
+                if (group.Batches == null)
+                    continue;
+                
                 ushort[] indices = new ushort[group.Indices.Length + group.CollisionOnlyIndices.Length];
                 Array.Copy(group.Indices.AsArray(), indices, group.Indices.Length);
                 Array.Copy(group.CollisionOnlyIndices, 0, indices, group.Indices.Length, group.CollisionOnlyIndices.Length);
-                var wmoMeshData = new MeshData(group.Vertices.AsArray(), group.Normals.AsArray(), group.UVs[0].AsArray(),
+                var wmoMeshData = new MeshData(group.Vertices.AsArray(), group.Normals.AsArray(), group.UVs.Count >= 1 ? group.UVs[0].AsArray() : null,
                     indices, group.Vertices.Length, group.Indices.Length,
                     group.UVs.Count >= 2 ? group.UVs[1].AsArray() : null, group.VertexColors?.AsArray());
                 
                 var wmoMesh = meshManager.CreateMesh(wmoMeshData);
+                
                 wmoMesh.SetSubmeshCount(group.Batches.Length + 1); // + 1 for collision only submesh
                 int j = 0;
                 Material[] materials = new Material[group.Batches.Length];
@@ -166,6 +170,7 @@ namespace WDE.MapRenderer.Managers
             var mat = materialManager.CreateMaterial("data/wmo.json");
 
             mat.SetUniformInt("shader_id", (int)materialDef.shader);
+            mat.SetUniformInt("translucent", 0);
             //mat.SetUniform("notSupported", 0.0f);
             float alphaTest = 0.003921568f; // 1/255
 

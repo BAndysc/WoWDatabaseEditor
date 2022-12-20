@@ -11,6 +11,7 @@
     <OutputPath>..\bin\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Modules\WDE.Profiles\WDE.Profiles.csproj" />
     <ProjectReference Include="..\WDE.MVVM\WDE.MVVM.csproj" />
     <ProjectReference Include="..\WDE.Solutions\WDE.Solutions.csproj" />
     <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />
@@ -27,6 +28,9 @@
       <Version>1.0.3</Version>
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="System.Reactive">
+      <Version>5.0.0</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>

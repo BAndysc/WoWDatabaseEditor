@@ -1,18 +1,26 @@
-﻿namespace WDE.Common.Database
+﻿using System;
+
+namespace WDE.Common.Database
 {
     public interface ICondition
     {
         int ElseGroup { get; set; }
+        
+        int ConditionIndex { get; set; }
+        
+        int ConditionParent { get; set; }
 
         int ConditionType { get; set; }
 
         byte ConditionTarget { get; set; }
 
-        int ConditionValue1 { get; set; }
+        long ConditionValue1 { get; set; }
 
-        int ConditionValue2 { get; set; }
+        long ConditionValue2 { get; set; }
 
-        int ConditionValue3 { get; set; }
+        long ConditionValue3 { get; set; }
+
+        long ConditionValue4 { get; set; }
 
         int NegativeCondition { get; set; }
 
@@ -29,6 +37,22 @@
 
         int SourceId { get; set; }
     }
+
+    public static class ConditionLineExtensions
+    {
+        public static long GetConditionValue(this ICondition line, int i)
+        {
+            switch (i)
+            {
+                case 0: return line.ConditionValue1;
+                case 1: return line.ConditionValue2;
+                case 2: return line.ConditionValue3;
+                case 3: return line.ConditionValue4;
+            }
+
+            throw new ArgumentOutOfRangeException();
+        }
+    }
     
     public class AbstractConditionLine : IConditionLine
     {
@@ -41,6 +65,8 @@
             SourceEntry = line.SourceEntry;
             SourceId = line.SourceId;
             ElseGroup = line.ElseGroup;
+            ConditionIndex = line.ConditionIndex;
+            ConditionParent = line.ConditionParent;
             ConditionType = line.ConditionType;
             ConditionTarget = line.ConditionTarget;
             ConditionValue1 = line.ConditionValue1;
@@ -57,6 +83,8 @@
             SourceEntry = sourceEntry;
             SourceId = sourceId;
             ElseGroup = condition.ElseGroup;
+            ConditionIndex = condition.ConditionIndex;
+            ConditionParent = condition.ConditionParent;
             ConditionType = condition.ConditionType;
             ConditionTarget = condition.ConditionTarget;
             ConditionValue1 = condition.ConditionValue1;
@@ -76,15 +104,21 @@
 
         public int ElseGroup { get; set; }
 
+        public int ConditionIndex { get; set; }
+        
+        public int ConditionParent { get; set; }
+
         public int ConditionType { get; set; }
 
         public byte ConditionTarget { get; set; }
 
-        public int ConditionValue1 { get; set; }
+        public long ConditionValue1 { get; set; }
 
-        public int ConditionValue2 { get; set; }
+        public long ConditionValue2 { get; set; }
 
-        public int ConditionValue3 { get; set; }
+        public long ConditionValue3 { get; set; }
+        
+        public long ConditionValue4 { get; set; }
 
         public int NegativeCondition { get; set; }
 
@@ -98,26 +132,35 @@
         public AbstractCondition(ICondition line)
         {
             ElseGroup = line.ElseGroup;
+            ConditionIndex = line.ConditionIndex;
+            ConditionParent = line.ConditionParent;
             ConditionType = line.ConditionType;
             ConditionTarget = line.ConditionTarget;
             ConditionValue1 = line.ConditionValue1;
             ConditionValue2 = line.ConditionValue2;
             ConditionValue3 = line.ConditionValue3;
+            ConditionValue4 = line.ConditionValue4;
             NegativeCondition = line.NegativeCondition;
             Comment = line.Comment;
         }
         
         public int ElseGroup { get; set; }
+        
+        public int ConditionIndex { get; set; }
+        
+        public int ConditionParent { get; set; }
 
         public int ConditionType { get; set; }
 
         public byte ConditionTarget { get; set; }
 
-        public int ConditionValue1 { get; set; }
+        public long ConditionValue1 { get; set; }
 
-        public int ConditionValue2 { get; set; }
+        public long ConditionValue2 { get; set; }
 
-        public int ConditionValue3 { get; set; }
+        public long ConditionValue3 { get; set; }
+        
+        public long ConditionValue4 { get; set; }
 
         public int NegativeCondition { get; set; }
 

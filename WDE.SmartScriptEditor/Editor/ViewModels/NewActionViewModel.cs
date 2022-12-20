@@ -18,6 +18,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 OnPropertyChanged();
             }
         }
+        
+        public int? InsertIndex { get; set; }
 
         public event PropertyChangedEventHandler? PropertyChanged;
 

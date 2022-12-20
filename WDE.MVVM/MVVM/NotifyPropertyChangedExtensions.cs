@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Linq.Expressions;
+using System.Windows.Input;
 using WDE.MVVM.Observable;
 
 namespace WDE.MVVM
@@ -17,6 +18,11 @@ namespace WDE.MVVM
             return new NotifyPropertyToObservable<T, R>(obj, getter);
         }
         
+        public static IObservable<Unit> ToObservable(this ICommand obj)
+        {
+            return new NotifyCommandCanExecuteObservable(obj);
+        }
+
         public static IObservable<T> ToObservable<T, R>(this R obj, Expression<Func<T>> getter) where R : INotifyPropertyChanged
         {
             return new NotifyPropertyToObservable<T, R>(obj, getter);

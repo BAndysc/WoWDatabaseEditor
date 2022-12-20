@@ -52,9 +52,9 @@ public class EntityInspector
 
             var itr = em.ArchetypeIterator(a);
             int total = 0;
-            foreach (var i in itr)
+            while (itr.MoveNext())
             {
-                total += i.Length;
+                total += itr.Current.Length;
             }
             
             ImGui.Text("Found " + total + " total entities matching query");
@@ -62,8 +62,8 @@ public class EntityInspector
             ImGuiListClipper clipper = new ImGuiListClipper();
             ImGuiNative.ImGuiListClipper_Begin(&clipper, total, ImGui.GetTextLineHeightWithSpacing());
             ImGuiNative.ImGuiListClipper_Step(&clipper);
-            
-            using var enumer = em.ArchetypeIterator(a).GetEnumerator();
+
+            var enumer = em.ArchetypeIterator(a);
             enumer.MoveNext();
             var chunkItr = enumer.Current;
             

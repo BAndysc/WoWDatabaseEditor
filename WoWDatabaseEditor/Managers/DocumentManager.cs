@@ -78,8 +78,11 @@ namespace WoWDatabaseEditorCore.Managers
                 } else if (ActiveUndoRedo == activeDocument && activeDocument != null)
                     ActiveUndoRedo = null;
                 activeSolutionItemDocument = value as ISolutionItemDocument;
-                SetProperty(ref activeDocument, value);
-                RaisePropertyChanged(nameof(ActiveSolutionItemDocument));
+                if (activeDocument != value)
+                {
+                    SetProperty(ref activeDocument, value);
+                    RaisePropertyChanged(nameof(ActiveSolutionItemDocument));
+                }
                 SelectedTool = null;
                 eventAggregator.GetEvent<EventActiveDocumentChanged>().Publish(value);
             }

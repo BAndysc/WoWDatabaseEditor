@@ -328,6 +328,7 @@ public class ImGuiController : IDisposable
         // Render command lists
         int vtxOffset = 0;
         int idxOffset = 0;
+        TextureHandle? prevHandle = null;
         for (int n = 0; n < drawData.CmdListsCount; n++)
         {
             ImDrawListPtr cmdList = drawData.CmdListsRange[n];
@@ -342,8 +343,13 @@ public class ImGuiController : IDisposable
                 {
                     if (pcmd.TextureId != IntPtr.Zero)
                     {
-                        var handle = new TextureHandle(pcmd.TextureId.ToInt32());
-                        material.SetTexture("FontTexture", handle);
+                        var handle = TextureHandle.FromIntPtr(pcmd.TextureId);
+                        if (prevHandle != handle)
+                        {
+                            material.SetTexture("FontTexture", handle);
+                            material.ActivateUniforms(false);
+                            prevHandle = handle;
+                        }
                     }
                     Vector2 clipMin = new(pcmd.ClipRect.X, pcmd.ClipRect.Y);
                     Vector2 clipMax = new(pcmd.ClipRect.Z, pcmd.ClipRect.W);

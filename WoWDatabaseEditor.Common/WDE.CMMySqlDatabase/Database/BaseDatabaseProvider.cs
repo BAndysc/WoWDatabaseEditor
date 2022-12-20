@@ -59,6 +59,12 @@ namespace WDE.CMMySqlDatabase.Database
             return new List<ISmartScriptLine>();
         }
 
+        public async Task<IList<IQuestObjective>> GetQuestObjectives(uint questId) => new List<IQuestObjective>();
+
+        public async Task<IQuestObjective?> GetQuestObjective(uint questId, int storageIndex) => null;
+        
+        public async Task<IQuestObjective?> GetQuestObjectiveById(uint objectiveId) => null;
+
         public async Task<IQuestRequestItem?> GetQuestRequestItem(uint entry)
         {
             return null;
@@ -178,6 +184,8 @@ namespace WDE.CMMySqlDatabase.Database
         public abstract IEnumerable<ICreatureClassLevelStat> GetCreatureClassLevelStats();
 
         public abstract Task<List<IBroadcastText>> GetBroadcastTextsAsync();
+        
+        public async Task<IList<ISmartScriptLine>> GetScriptForAsync(int entryOrGuid, SmartScriptType type) => new List<ISmartScriptLine>();
 
         public async Task<List<IAreaTriggerTemplate>> GetAreaTriggerTemplatesAsync()
         {
@@ -216,10 +224,6 @@ namespace WDE.CMMySqlDatabase.Database
             return model.QuestTemplate.FirstOrDefault(q => q.Entry == entry);
         }
         
-        public async Task InstallScriptFor(int entryOrGuid, SmartScriptType type, IList<ISmartScriptLine> script)
-        {
-        }
-
         protected abstract Task<ICreature?> GetCreatureByGuid(T model, uint guid);
         protected abstract Task<IGameObject?> GetGameObjectByGuidAsync(T model, uint guid);
         protected abstract Task SetCreatureTemplateAI(T model, uint entry, string ainame, string scriptname);
@@ -244,7 +248,13 @@ namespace WDE.CMMySqlDatabase.Database
         {
             return new List<int>();
         }
-        
+
+        public async Task<IList<IPlayerChoice>?> GetPlayerChoicesAsync() => null;
+
+        public async Task<IList<IPlayerChoiceResponse>?> GetPlayerChoiceResponsesAsync() => null;
+
+        public async Task<IList<IPlayerChoiceResponse>?> GetPlayerChoiceResponsesAsync(int choiceId) => null;
+
         public IEnumerable<ISpellScriptName> GetSpellScriptNames(int spellId)
         {
             using var model = Database();
@@ -291,8 +301,8 @@ namespace WDE.CMMySqlDatabase.Database
             return await model.PointsOfInterest.OrderBy(t => t.Id).ToListAsync<IPointOfInterest>();
         }
 
-        public IEnumerable<ISmartScriptProjectItem> GetProjectItems() => Enumerable.Empty<ISmartScriptProjectItem>();
-        public IEnumerable<ISmartScriptProject> GetProjects() => Enumerable.Empty<ISmartScriptProject>();
+        public IEnumerable<ISmartScriptProjectItem> GetLegacyProjectItems() => Enumerable.Empty<ISmartScriptProjectItem>();
+        public IEnumerable<ISmartScriptProject> GetLegacyProjects() => Enumerable.Empty<ISmartScriptProject>();
         public abstract IBroadcastText? GetBroadcastTextByText(string text);
         public abstract Task<IBroadcastText?> GetBroadcastTextByTextAsync(string text);
         public abstract Task<IBroadcastText?> GetBroadcastTextByIdAsync(uint id);

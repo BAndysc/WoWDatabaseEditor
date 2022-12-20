@@ -18,7 +18,7 @@ namespace WDE.SmartScriptEditor.Inspections
 
         public InspectionResult? Inspect(SmartEvent e)
         {
-            if (e.GetParameter(pram).Value != 0 || (e.Flags.Value & (int)SmartEventFlag.NotRepeatable) != 0)
+            if (e.GetParameter(pram).Value != 0 || (e.Flags.Value & SmartConstants.EventFlagNotRepeatable) != 0)
                 return null;
             return new InspectionResult()
             {

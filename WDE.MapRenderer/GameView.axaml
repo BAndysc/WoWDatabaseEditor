@@ -12,8 +12,8 @@
         <StyleInclude Source="avares://WDE.WorldMap/WoWMapViewer.axaml" />
     </UserControl.Styles>
     <UserControl.KeyBindings>
-        <KeyBinding Gesture="M" Command="{CompiledBinding ToggleMapVisibilityCommand}" />
-        <KeyBinding Gesture="B" Command="{CompiledBinding ToggleStatsVisibilityCommand}" />
+        <!--<KeyBinding Gesture="M" Command="{CompiledBinding ToggleMapVisibilityCommand}" />
+        <KeyBinding Gesture="B" Command="{CompiledBinding ToggleStatsVisibilityCommand}" />-->
     </UserControl.KeyBindings>
     <DockPanel LastChildFill="True">
         <Panel>

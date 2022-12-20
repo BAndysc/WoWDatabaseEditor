@@ -9,7 +9,7 @@ using WDE.MVVM;
 namespace WoWDatabaseEditorCore.CoreVersion.ViewModels
 {
     [AutoRegister]
-    public class CoreVersionConfigViewModel : ObservableBase, IConfigurable
+    public class CoreVersionConfigViewModel : ObservableBase, ICoreVersionConfigurable
     {
         private readonly ICurrentCoreVersion currentCoreVersion;
         public ObservableCollection<ICoreVersion> CoreVersions { get; }

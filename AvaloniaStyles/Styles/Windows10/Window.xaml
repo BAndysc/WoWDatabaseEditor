@@ -35,6 +35,7 @@
                                         <Image Source="{TemplateBinding ManagedIcon}" DockPanel.Dock="Left" Width="24"/>
                                         <NativeMenuBar DockPanel.Dock="Left" />
                                         <controls1:WindowControlButtons DockPanel.Dock="Right"/>
+                                        <ContentPresenter DockPanel.Dock="Right" Content="{Binding ToolBar.TopContent, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
                                         <StackPanel ClipToBounds="True" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                                             <TextBlock 
                                                 IsHitTestVisible="False" 

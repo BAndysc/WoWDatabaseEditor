@@ -48,16 +48,28 @@ public class DatabaseTablesFindAnywhereSource : IFindAnywhereSource
         this.eventAggregator = eventAggregator;
         this.parameterFactory = parameterFactory;
     }
-    
-    public async Task Find(IFindAnywhereResultContext resultContext, IReadOnlyList<string> parameterNames, long parameterValue, CancellationToken cancellationToken)
+
+    public FindAnywhereSourceType SourceType => FindAnywhereSourceType.Tables | FindAnywhereSourceType.Spawns;
+
+    public async Task Find(IFindAnywhereResultContext resultContext, FindAnywhereSourceType searchType, IReadOnlyList<string> parameterNames, long parameterValue, CancellationToken cancellationToken)
     {
         foreach (var definition in definitionProvider.Definitions)
         {
             if (definition.IsOnlyConditionsTable)
                 continue;
+
+            if (!searchType.HasFlagFast(FindAnywhereSourceType.Spawns) &&
+                definition.TableName is "creature" or "gameobject")
+                continue;
+
+            if (!searchType.HasFlagFast(FindAnywhereSourceType.Tables) &&
+                definition.TableName is not "creature" and not "gameobject")
+                continue;
             
+            HashSet<DatabaseKey> added = new();
             foreach (var tableGroup in definition.Groups.SelectMany(group => group.Fields.Select(column => (group, column))).GroupBy(c => c.column.ForeignTable ?? definition.TableName))
             {
+                added.Clear();
                 var tableName = tableGroup.Key;
                 var table = Queries.Table(tableName);
                 var where = table.ToWhere();
@@ -112,9 +124,10 @@ public class DatabaseTablesFindAnywhereSource : IFindAnywhereSource
                         ISolutionItem? item = null;
                         ICommand? commad = null;
 
+                        DatabaseKey key;
                         if (definition.RecordMode == RecordMode.SingleRow)
                         {
-                            var key = new DatabaseKey(definition.PrimaryKey.Select(k => Convert.ToInt64(row[k].Item2)));
+                            key = new DatabaseKey(definition.PrimaryKey.Select(k => Convert.ToInt64(row[k].Item2)));
                             commad = new DelegateCommand(() =>
                             {
                                 var solutionItem = new DatabaseTableSolutionItem(definition.Id, definition.IgnoreEquality);
@@ -151,16 +164,19 @@ public class DatabaseTablesFindAnywhereSource : IFindAnywhereSource
                         }
                         else
                         {
-                            DatabaseKey key;
                             if (tableName == definition.TableName)
                                 key = new DatabaseKey(Convert.ToInt64(row[definition.TablePrimaryKeyColumnName].Item2));
                             else
                                 key = new DatabaseKey(Convert.ToInt64(row[definition.ForeignTableByName![tableName].ForeignKeys[0]].Item2));
+
+                            if (!added.Add(key))
+                                continue;
                             item = new DatabaseTableSolutionItem(key, true, false, definition.Id, definition.IgnoreEquality);
                         }
                         
                         resultContext.AddResult(new FindAnywhereResult(
                             new ImageUri(definition.IconPath!),
+                            key[0],
                             tableName,
                             string.Join(", ", row.Select(pair => pair.Key + ": " + pair.Value.Item2)),
                             item,

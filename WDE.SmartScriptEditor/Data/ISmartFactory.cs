@@ -20,7 +20,7 @@ namespace WDE.SmartScriptEditor.Data
         
         SmartCondition ConditionFactory(int id);
         
-        SmartCondition ConditionFactory(IConditionLine id);
+        SmartCondition ConditionFactory(ICondition id);
         
         void UpdateEvent(SmartEvent smartEvent, int id);
 

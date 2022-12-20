@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
              xmlns:components="clr-namespace:WDE.Common.Avalonia.Components;assembly=WDE.Common.Avalonia"
-             xmlns:sessions="clr-namespace:WDE.Solutions.Sessions;assembly=WDE.Solutions"
+             xmlns:sessions="clr-namespace:WDE.Sessions.Sessions;assembly=WDE.Sessions"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="sessions:SessionToolViewModel"
              x:Class="WDE.CommonViews.Avalonia.Sessions.SessionToolView">

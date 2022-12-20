@@ -1,0 +1,100 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:profiles="clr-namespace:WoWDatabaseEditorCore.Services.Profiles;assembly=WoWDatabaseEditorCore"
+             xmlns:behaviours="clr-namespace:AvaloniaStyles.Behaviours;assembly=AvaloniaStyles"
+             xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
+             xmlns:styles="clr-namespace:AvaloniaStyles.Styles;assembly=AvaloniaStyles"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="profiles:ProfilesViewModel"
+             x:Class="WoWDatabaseEditorCore.Avalonia.Services.Profiles.ProfilesControl">
+    
+    <UserControl.Styles>
+        <styles:StyleIncludeColorAware DarkSource="avares://WoWDatabaseEditorCore.Avalonia.GUI/Services/Profiles/ColorsDark.axaml"
+                                       LightSource="avares://WoWDatabaseEditorCore.Avalonia.GUI/Services/Profiles/ColorsLight.axaml"/>
+        <Style Selector="Border.FakeButton">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
+            <Setter Property="Cursor" Value="Hand" />
+        </Style>
+        <Style Selector="Border.FakeButton:pointerover">
+            <Setter Property="Background" Value="#10ffffff" />
+        </Style>
+        <Style Selector="Border.FakeButton:pressed">
+            <Setter Property="Background" Value="#40000000" />
+        </Style>
+    </UserControl.Styles>
+    
+    <UserControl.Resources>
+        <BoolToDoubleConverter x:Key="RunningConverter" WhenFalse="1" WhenTrue="0" />
+        <DataTemplate x:Key="ProfileTemplate" DataType="profiles:ProfileViewModel">
+            <DockPanel>
+                <ButtonImage Image="Icons/icon_edit_mono.png" Margin="10,0,0,0" Padding="2" Width="20" Height="20"
+                             VerticalAlignment="Center"
+                             DockPanel.Dock="Right" 
+                             IsVisible="{CompiledBinding CanEdit}" 
+                             Command="{CompiledBinding EditCommand}" 
+                             CommandParameter="{CompiledBinding}" />
+                <ButtonImage Image="Icons/icon_delete_mono.png" Margin="10,0,0,0" Padding="2"  Width="20" Height="20"
+                             VerticalAlignment="Center"
+                             DockPanel.Dock="Right" 
+                             IsVisible="{CompiledBinding CanDelete}" 
+                             Command="{CompiledBinding DeleteCommand}" 
+                             CommandParameter="{CompiledBinding}" />
+                <Border Classes="FakeButton" Name="Border" Padding="10,0">
+                    <DockPanel Margin="0,4,0,4">
+                        <WdeImage DockPanel.Dock="Left" Image="{CompiledBinding Icon}" Width="24" Height="24" />
+                        <TextBlock Margin="10,0,0,0" VerticalAlignment="Center" Text="{CompiledBinding Header}"></TextBlock>
+                    </DockPanel>
+                    <Interaction.Behaviors>
+                        <EventTriggerBehavior EventName="PointerReleased" SourceObject="{Binding #Border}">
+                            <InvokeCommandAction Command="{CompiledBinding Command}" CommandParameter="{CompiledBinding }" />
+                            <utils:CloseFlyoutAction />
+                        </EventTriggerBehavior>
+                        <utils:PressedClassBehaviour />
+                    </Interaction.Behaviors>
+                </Border>
+            </DockPanel>
+        </DataTemplate>
+    </UserControl.Resources>
+    
+    <Border  Name="CurrentEmu" Cursor="Hand" CornerRadius="4" Height="30" Padding="16,0" VerticalAlignment="Center">
+        <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+            <WdeImage Height="20" Image="{CompiledBinding CurrentProfileIcon}" />
+            <TextBlock Margin="10,0,0,0" VerticalAlignment="Center" FontSize="16" FontWeight="Light" Text="{CompiledBinding CurrentProfileName}" />
+        </StackPanel>
+        <Border.ContextFlyout>
+            <Flyout Placement="BottomEdgeAlignedLeft" IsOpen="{CompiledBinding IsOpen, Mode=OneWayToSource}">
+                <Panel>
+                    <StackPanel Opacity="{CompiledBinding Refreshing, Converter={StaticResource RunningConverter}}">
+                        <SettingsHeader Margin="0">Running</SettingsHeader>
+                        <ItemsRepeater ItemTemplate="{StaticResource ProfileTemplate}" Items="{CompiledBinding RunningProfiles}" />
+                    
+                        <SettingsHeader Margin="0,20,0,0">Open new instance</SettingsHeader>
+                        <ItemsRepeater ItemTemplate="{StaticResource ProfileTemplate}" Items="{CompiledBinding Profiles}" />
+                        
+                        <SettingsHeader Margin="0,20,0,5">Create new</SettingsHeader>
+                        <Button Command="{CompiledBinding CreateNewProfileCommand}">Create a profile</Button>
+                    </StackPanel>
+                    <TextBlock IsVisible="{CompiledBinding Refreshing}" VerticalAlignment="Center" HorizontalAlignment="Center">Refreshing...</TextBlock>
+                </Panel>
+            </Flyout>
+        </Border.ContextFlyout>
+        <Border.Styles>
+            <Style Selector="Border#CurrentEmu">
+                <Setter Property="Background" Value="{DynamicResource CoreButtonBackground}"/>
+            </Style>
+            <Style Selector="Border#CurrentEmu:pointerover">
+                <Setter Property="Background" Value="{DynamicResource CoreButtonPointerOverBackground}"/>
+            </Style>
+            <Style Selector="Border#CurrentEmu:pressed">
+                <Setter Property="Background" Value="{DynamicResource CoreButtonPressedBackground}"/>
+            </Style>
+        </Border.Styles>
+        <Interaction.Behaviors>
+            <behaviours:OpenContextMenuOnLeftMouseButtonBehavior />
+            <utils:PressedClassBehaviour />
+        </Interaction.Behaviors>
+    </Border>
+</UserControl>

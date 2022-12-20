@@ -27,6 +27,7 @@ namespace WDE.SmartScriptEditor.Inspections
                     e.GetParameter(i).HasItems)
                 {
                     if (e.GetParameter(i).Parameter is FlagParameter fp &&
+                        e.GetParameter(i).Value > 0 &&
                         ContainsAllFlags(fp, e.GetParameter(i).Value) != 0)
                     {
                         var unknownFlag = ContainsAllFlags(fp, e.GetParameter(i).Value);
@@ -38,7 +39,7 @@ namespace WDE.SmartScriptEditor.Inspections
                         }; 
                     }
                     
-                    if (e.GetParameter(i).Value != 0 &&
+                    if (e.GetParameter(i).Value > 0 &&
                         e.GetParameter(i).Parameter is not FlagParameter &&
                         !e.GetParameter(i).Parameter.AllowUnknownItems &&
                         !(e.GetParameter(i).Items?.ContainsKey(e.GetParameter(i).Value) ?? false))

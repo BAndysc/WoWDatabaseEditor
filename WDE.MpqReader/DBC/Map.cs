@@ -1,4 +1,5 @@
 using WDE.Common.DBC;
+using WDE.Common.MPQ;
 
 namespace WDE.MpqReader.DBC;
 
@@ -16,12 +17,33 @@ public class Map
     public readonly string Name;
     public readonly MapType MapType;
 
-    public Map(IDbcIterator dbcIterator)
+    public Map(IDbcIterator dbcIterator, GameFilesVersion version)
     {
         Id = dbcIterator.GetInt(0);
         Directory = dbcIterator.GetString(1);
-        Name = dbcIterator.GetString(5);
-        MapType = IsWrathTransportMap(Id) ? MapType.Transport : MapType.Unknown1;
+        if (version == GameFilesVersion.Mop_5_4_8)
+        {
+            MapType = (MapType)dbcIterator.GetUInt(4);
+            Name = dbcIterator.GetString(5);
+        }
+        else if (version == GameFilesVersion.Cataclysm_4_3_4)
+        {
+            MapType = (MapType)dbcIterator.GetUInt(4);
+            Name = dbcIterator.GetString(6);
+        }
+        else
+        {
+            Name = dbcIterator.GetString(5);
+            MapType = IsWrathTransportMap(Id) ? MapType.Transport : MapType.Unknown1;
+        }
+    }
+
+    public Map(IWdcIterator dbcIterator, GameFilesVersion version)
+    {
+        Id = dbcIterator.Id;
+        Directory = dbcIterator.GetString("Directory");
+        MapType = (MapType)dbcIterator.GetByte("MapType");
+        Name = dbcIterator.GetString("MapName_lang");
     }
 
     private static bool IsWrathTransportMap(int mapId)

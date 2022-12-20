@@ -1,4 +1,5 @@
 using WDE.Common.DBC;
+using WDE.Common.MPQ;
 
 namespace WDE.MpqReader.DBC;
 
@@ -14,17 +15,31 @@ public class CharacterFacialHairStyles
     public readonly int Geoset4;
     public readonly int Geoset5;
 
-    public CharacterFacialHairStyles(IDbcIterator dbcIterator)
+    public CharacterFacialHairStyles(IDbcIterator dbcIterator, GameFilesVersion version)
     {
         // Id = 0;
-        RaceID = dbcIterator.GetInt(0);
-        SexId = dbcIterator.GetInt(1);
-        VariationId = dbcIterator.GetInt(2);
-        Geoset1 = dbcIterator.GetInt(3);
-        Geoset2 = dbcIterator.GetInt(4);
-        Geoset3 = dbcIterator.GetInt(5);
-        Geoset4 = dbcIterator.GetInt(6);
-        Geoset5 = dbcIterator.GetInt(7);
+        int i = version == GameFilesVersion.Cataclysm_4_3_4 ? 1 : 0;
+        RaceID = dbcIterator.GetInt(i++);
+        SexId = dbcIterator.GetInt(i++);
+        VariationId = dbcIterator.GetInt(i++);
+        Geoset1 = dbcIterator.GetInt(i++);
+        Geoset2 = dbcIterator.GetInt(i++);
+        Geoset3 = dbcIterator.GetInt(i++);
+        Geoset4 = dbcIterator.GetInt(i++);
+        Geoset5 = dbcIterator.GetInt(i++);
+    }
+    
+    public CharacterFacialHairStyles(IWdcIterator dbcIterator, GameFilesVersion version)
+    {
+        // Id = 0;
+        RaceID = dbcIterator.GetByte("RaceID");
+        SexId = dbcIterator.GetByte("SexID");
+        VariationId = dbcIterator.GetByte("VariationID");
+        Geoset1 = dbcIterator.GetInt("Geoset", 0);
+        Geoset2 = dbcIterator.GetInt("Geoset", 1);
+        Geoset3 = dbcIterator.GetInt("Geoset", 2);
+        Geoset4 = dbcIterator.GetInt("Geoset", 3);
+        Geoset5 = dbcIterator.GetInt("Geoset", 4);
     }
 
     private CharacterFacialHairStyles()

@@ -6,5 +6,12 @@ namespace WDE.MPQ.ViewModels
     public interface IMpqSettings
     {
         public string? Path { get; set; }
+        public MpqOpenType OpenType { get; set; }
+    }
+
+    public enum MpqOpenType
+    {
+        WowDatabaseEditor = 0,
+        Stormlib = 1
     }
 }

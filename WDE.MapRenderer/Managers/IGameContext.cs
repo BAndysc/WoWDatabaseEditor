@@ -5,6 +5,7 @@ using TheEngine.ECS;
 using TheEngine.Interfaces;
 using TheEngine.PhysicsSystem;
 using TheMaths;
+using WDE.Common.MPQ;
 using WDE.MpqReader;
 using WDE.MpqReader.DBC;
 using WDE.MpqReader.Structures;
@@ -13,13 +14,17 @@ namespace WDE.MapRenderer.Managers
 {
     public interface IGameFiles
     {
-        Task<PooledArray<byte>?> ReadFile(string fileName);
-        PooledArray<byte>? ReadFileSyncPool(string fileName);
-        byte[]? ReadFileSync(string fileName);
-        byte[]? ReadFileSyncLocked(string fileName, bool silent = false);
+        Task<PooledArray<byte>?> ReadFile(FileId fileId, bool silent = false);
+        PooledArray<byte>? ReadFileSyncPool(FileId fileId);
+        byte[]? ReadFileSync(FileId fileId);
+        byte[]? ReadFileSyncLocked(FileId fileId, bool silent = false);
         string Adt(string mapName, int x, int y);
+        string AdtTex0(string mapName, int x, int y);
+        string AdtObj0(string mapName, int x, int y);
+        string AdtLod0(string mapName, int x, int y);
         string Wdt(string mapName);
         bool Initialize();
+        GameFilesVersion WoWVersion { get; }
     }
     
     public interface IGameContext
@@ -48,8 +53,7 @@ namespace WDE.MapRenderer.Managers
         UpdateManager UpdateLoop { get; }
         WorldManager WorldManager { get; }
         LoadingManager LoadingManager { get; }
-        CreatureManager CreatureManager { get; }
-        GameObjectManager GameObjectManager { get; }
+        ZoneAreaManager ZoneAreaManager { get; }
         AnimationSystem AnimationSystem { get; }
         IEntityManager EntityManager { get; }
         ITextureManager EngineTextureManager { get; }

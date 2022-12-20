@@ -7,6 +7,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Generators;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
+using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
 using Avalonia.Media;
@@ -24,6 +25,7 @@ namespace WDE.Common.Avalonia.DnD
         public static readonly AttachedProperty<bool> IsDropTargetProperty = AvaloniaProperty.RegisterAttached<IAvaloniaObject, bool>("IsDropTarget", typeof(DragAndDrop));
         public static readonly AttachedProperty<bool> IsDragSourceProperty = AvaloniaProperty.RegisterAttached<IAvaloniaObject, bool>("IsDragSource", typeof(DragAndDrop));
         public static readonly AttachedProperty<IDropTarget?> DropHandlerProperty = AvaloniaProperty.RegisterAttached<IAvaloniaObject, IDropTarget?>("DropHandler", typeof(DragAndDrop));
+        public static readonly AttachedProperty<IDragSource?> DragHandlerProperty = AvaloniaProperty.RegisterAttached<IAvaloniaObject, IDragSource?>("DragHandler", typeof(DragAndDrop));
 
         public static bool GetIsDropTarget(IAvaloniaObject obj)
         {
@@ -54,12 +56,27 @@ namespace WDE.Common.Avalonia.DnD
         {
             obj.SetValue(DropHandlerProperty, value);
         }
+
+        public static IDragSource? GetDragHandler(IAvaloniaObject obj)
+        {
+            return (IDragSource?) obj.GetValue(DragHandlerProperty);
+        }
+
+        public static void SetDragHandler(IAvaloniaObject obj, IDragSource? value)
+        {
+            obj.SetValue(DragHandlerProperty, value);
+        }
         
         private static Point m_cursorStartPos;
         private static AdornerHelper adorner;
 
+        private static IDropInfo? dropInfo;
+        
+        private static readonly KeyModifiers platformCopyKeyModifier;
+
         static DragAndDrop()
         {
+            platformCopyKeyModifier = AvaloniaLocator.Current.GetService<PlatformHotkeyConfiguration>().CommandModifiers;
             adorner = new AdornerHelper();
             IsDropTargetProperty.Changed.Subscribe(args =>
             {
@@ -114,7 +131,7 @@ namespace WDE.Common.Avalonia.DnD
         {
             if (sender is not TreeView treeView)
                 return;
-            
+
             Point currentCursorPos = e.GetPosition(null);
             Vector cursorVector = m_cursorStartPos - currentCursorPos;
 
@@ -124,6 +141,10 @@ namespace WDE.Common.Avalonia.DnD
             
             TreeViewItem? targetItem = FindVisualParent<TreeViewItem>((IVisual?)e.Source);
             if (targetItem == null || targetItem.DataContext == null) 
+                return;
+            
+            var dragHandler = GetDragHandler(treeView);
+            if (dragHandler != null && !dragHandler.CanDrag(treeView.SelectedItem))
                 return;
             
             dragging = true;
@@ -221,6 +242,7 @@ namespace WDE.Common.Avalonia.DnD
             public DropTargetAdorners DropTargetAdorner { get; set; }
             public Common.Utils.DragDrop.DragDropEffects Effects { get; set; }
             public RelativeInsertPosition InsertPosition { get; set; }
+            public bool IsCopy { get; set; }
         }
 
         private static void OnListDragOver(object? sender, DragEventArgs e)
@@ -259,7 +281,8 @@ namespace WDE.Common.Avalonia.DnD
             {
                 InsertIndex = indexOfDrop,
                 InsertPosition = insertPosition,
-                TargetItem = listBox.Items
+                TargetItem = listBox.Items,
+                IsCopy = IsCopyKey(e)
             };
             dropHandler.DragOver(dropInfo);
 
@@ -277,7 +300,7 @@ namespace WDE.Common.Avalonia.DnD
             
             adorner.Adorner?.Update(listBox, dropInfo);
         }
-        
+
         private static void OnListDrop(object? sender, DragEventArgs e)
         {
             var listBox = sender as ListBox;
@@ -305,10 +328,14 @@ namespace WDE.Common.Avalonia.DnD
             else
                 indexOfDrop = listBox.ItemCount;
             
-            dropHandler.Drop(new DropInfo(dragInfo.Value.draggedElement[0]!)
+            WrapTryCatch(() =>
             {
-                InsertIndex = indexOfDrop,
-                TargetItem = listBox.Items
+                dropHandler.Drop(new DropInfo(dragInfo.Value.draggedElement[0]!)
+                {
+                    InsertIndex = indexOfDrop,
+                    TargetItem = listBox.Items,
+                    IsCopy = IsCopyKey(e)
+                });                
             });
         }
         
@@ -352,7 +379,8 @@ namespace WDE.Common.Avalonia.DnD
             {
                 InsertIndex = indexOfDrop,
                 InsertPosition = insertPosition,
-                TargetItem = listBox.Items
+                TargetItem = listBox.Items,
+                IsCopy = IsCopyKey(e)
             };
             dropHandler.DragOver(dropInfo);
 
@@ -397,14 +425,19 @@ namespace WDE.Common.Avalonia.DnD
             }
             else
                 indexOfDrop = listBox.ListBoxImpl!.ItemCount;
-            
-            dropHandler.Drop(new DropInfo(listBox.ListBoxImpl?.SelectionMode == SelectionMode.Multiple ? dragInfo.Value.draggedElement : dragInfo.Value.draggedElement[0]!)
+
+            WrapTryCatch(() =>
             {
-                InsertIndex = indexOfDrop,
-                TargetItem = listBox.Items
+                dropHandler.Drop(new DropInfo(listBox.ListBoxImpl?.SelectionMode == SelectionMode.Multiple
+                    ? dragInfo.Value.draggedElement
+                    : dragInfo.Value.draggedElement[0]!)
+                {
+                    InsertIndex = indexOfDrop,
+                    TargetItem = listBox.Items,
+                    IsCopy = IsCopyKey(e)
+                });
             });
         }
-        
         
         
         
@@ -469,7 +502,8 @@ namespace WDE.Common.Avalonia.DnD
             {
                 InsertIndex = indexOfDrop,
                 InsertPosition = insertPosition,
-                TargetItem = ((IControl?)dropElement)?.DataContext
+                TargetItem = ((IControl?)dropElement)?.DataContext,
+                IsCopy = IsCopyKey(e)
             };
             dropHandler.DragOver(dropInfo);
 
@@ -492,8 +526,6 @@ namespace WDE.Common.Avalonia.DnD
             adorner.Adorner?.Update(treeView, treeItemContainerGenerator, dropInfo);
         }
 
-        private static IDropInfo? dropInfo;
-        
         private static void OnTreeViewDrop(object? sender, DragEventArgs e)
         {
             var treeView = sender as TreeView;
@@ -513,9 +545,9 @@ namespace WDE.Common.Avalonia.DnD
             
             var scrollViewer = treeView.FindDescendantOfType<ScrollViewer>();
             var previousOffset = scrollViewer?.Offset;
-            
-            if (dropInfo != null)
-                dropHandler.Drop(dropInfo);
+
+            if (dropInfo != null && dropInfo.Effects != Common.Utils.DragDrop.DragDropEffects.None)
+                WrapTryCatch(() => dropHandler.Drop(dropInfo));
             dropInfo = null;
             
             Dispatcher.UIThread.Post(() =>
@@ -523,6 +555,18 @@ namespace WDE.Common.Avalonia.DnD
                 if (previousOffset.HasValue)
                     scrollViewer!.Offset = previousOffset.Value;
             }, DispatcherPriority.Render);
+        }
+
+        private static void WrapTryCatch(Action x)
+        {
+            try
+            {
+                x();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
         }
 
 
@@ -563,6 +607,11 @@ namespace WDE.Common.Avalonia.DnD
 
                 child = parentObject;
             }
+        }
+
+        private static bool IsCopyKey(DragEventArgs e)
+        {
+            return e.KeyModifiers.HasFlag(platformCopyKeyModifier);
         }
     }
     

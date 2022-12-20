@@ -1,7 +1,7 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:controls="clr-namespace:AvaloniaStyles.Controls">
     <Style Selector="controls|StatusBar">
-        <Setter Property="Height" Value="20" />
+        <Setter Property="Height" Value="26" />
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="Background" Value="{DynamicResource StatusBarBackground}"/> 
         <Setter Property="Template">

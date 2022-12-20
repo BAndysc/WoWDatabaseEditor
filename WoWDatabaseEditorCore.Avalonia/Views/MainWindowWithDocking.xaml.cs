@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
+using AvaloniaStyles;
 using AvaloniaStyles.Controls;
 using Dock.Avalonia.Controls;
 using Newtonsoft.Json;
@@ -26,11 +27,47 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
         private readonly IUserSettings userSettings;
         private AvaloniaDockAdapter avaloniaDockAdapter;
 
+        public static readonly AttachedProperty<bool> OnEnterPressedProperty = 
+            AvaloniaProperty.RegisterAttached<CompletionComboBox, bool>("OnEnterPressed", typeof(MainWindowWithDocking));
+
         public MainWindowWithDocking()
         {
             fileSystem = null!;
             userSettings = null!;
             avaloniaDockAdapter = null!;
+        }
+        
+        public static bool GetOnEnterPressed(IAvaloniaObject obj)
+        {
+            return obj.GetValue(OnEnterPressedProperty);
+        }
+
+        public static void SetOnEnterPressed(IAvaloniaObject obj, bool value)
+        {
+            obj.SetValue(OnEnterPressedProperty, value);
+        }
+
+        static MainWindowWithDocking()
+        {
+            OnEnterPressedProperty.Changed.AddClassHandler<CompletionComboBox>((box, args) =>
+            {
+                box.OnEnterPressed += (sender, pressedArgs) =>
+                {
+                    var box = (CompletionComboBox)sender!;
+                    if (pressedArgs.SelectedItem == null && box.SelectedItem != null && string.IsNullOrEmpty(pressedArgs.SearchText))
+                    {
+                        var oldItem = box.SelectedItem;
+                        box.SelectedItem = null;
+                        box.SelectedItem = oldItem; // reselect the same item on subsequent enter press
+                        pressedArgs.Handled = true;
+                    }
+                    else if (pressedArgs.SelectedItem == null && long.TryParse(pressedArgs.SearchText, out var l))
+                    {
+                        box.SelectedItem = new QuickGoToItemViewModel(l, "(unknown)");
+                        pressedArgs.Handled = true;
+                    }
+                };
+            });
         }
         
         public MainWindowWithDocking(IMainWindowHolder mainWindowHolder, 
@@ -50,6 +87,14 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
             InitializeComponent();
             this.AttachDevTools();
             mainWindowHolder.Window = this;
+            if (SystemTheme.EffectiveTheme is SystemThemeOptions.LightWindows11 or SystemThemeOptions.DarkWindows11)
+            {
+                this.Classes.Add("win11");
+            }
+            else
+            {
+                this.Classes.Add("win10");
+            }
             PersistentDockDataTemplate.DocumentManager = documentManager;
         }
 
@@ -126,10 +171,15 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
             });
             fileSystem.WriteAllText(DockSettingsFile,
                 JsonConvert.SerializeObject(avaloniaDockAdapter.SerializeDock(), Formatting.Indented));
-            if (!realClosing && DataContext is MainWindowViewModel closeAwareViewModel)
+            if (DataContext is MainWindowViewModel closeAwareViewModel)
             {
-                TryClose(closeAwareViewModel).ListenErrors();
-                e.Cancel = true;
+                if (!realClosing)
+                {
+                    TryClose(closeAwareViewModel).ListenErrors();
+                    e.Cancel = true;
+                }
+                else
+                    closeAwareViewModel.NotifyWillClose();
             }
         }
 

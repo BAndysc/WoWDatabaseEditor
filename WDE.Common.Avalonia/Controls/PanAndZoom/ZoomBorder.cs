@@ -107,6 +107,12 @@ namespace WDE.WorldMap.PanAndZoom
             AvaloniaProperty.Register<ZoomBorder, bool>(nameof(EnableConstrains), true, false, BindingMode.TwoWay);
 
         /// <summary>
+        /// Identifies the <seealso cref="EnableZoomConstrains"/> avalonia property.
+        /// </summary>
+        public static StyledProperty<bool> EnableZoomConstrainsProperty =
+            AvaloniaProperty.Register<ZoomBorder, bool>(nameof(EnableZoomConstrains), false, false, BindingMode.TwoWay);
+
+        /// <summary>
         /// Identifies the <seealso cref="MinZoomX"/> avalonia property.
         /// </summary>
         public static StyledProperty<double> MinZoomXProperty =
@@ -285,7 +291,16 @@ namespace WDE.WorldMap.PanAndZoom
             get => GetValue(EnableConstrainsProperty);
             set => SetValue(EnableConstrainsProperty, value);
         }
-
+        
+        /// <summary>
+        /// Gets or sets flag indicating whether zoom ratio constrains are applied. Mutually exclusive with <seealso cref="EnableConstrains"/>.
+        /// </summary>
+        public bool EnableZoomConstrains
+        {
+            get => GetValue(EnableZoomConstrainsProperty);
+            set => SetValue(EnableZoomConstrainsProperty, value);
+        }
+        
         /// <summary>
         /// Gets or sets minimum zoom ratio for x axis.
         /// </summary>
@@ -754,7 +769,22 @@ namespace WDE.WorldMap.PanAndZoom
         /// <param name="invalidateScroll">The flag indicating whether to invalidate scroll.</param>
         public void ZoomTo(double ratio, double x, double y, bool invalidateScroll)
         {
-            _matrix = MatrixHelper.ScaleAtPrepend(_matrix, ratio, ratio, x, y);
+            double ratioX = ratio;
+            double ratioY = ratio;
+            if (EnableZoomConstrains)
+            {
+                if (ratio > 1)
+                {
+                    ratioX = Math.Min(ratio, MaxZoomX / _zoomX);
+                    ratioY = Math.Min(ratio, MaxZoomY / _zoomY);
+                }
+                else
+                {
+                    ratioX = Math.Max(ratio, MinZoomX / _zoomX);
+                    ratioY = Math.Max(ratio, MinZoomY / _zoomY);
+                }
+            }
+            _matrix = MatrixHelper.ScaleAtPrepend(_matrix, ratioX, ratioY, x, y);
             Invalidate(invalidateScroll);
         }
 

@@ -13,4 +13,13 @@ public class GameObjectDisplayInfoStore : BaseDbcStore<uint, GameObjectDisplayIn
             store[o.Id] = o;
         }
     }
+    
+    public GameObjectDisplayInfoStore(IEnumerable<IWdcIterator> rows)
+    {
+        foreach (var row in rows)
+        {
+            var o = new GameObjectDisplayInfo(row);
+            store[o.Id] = o;
+        }
+    }
 }

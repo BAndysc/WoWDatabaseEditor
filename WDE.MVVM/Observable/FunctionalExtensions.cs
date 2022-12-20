@@ -16,6 +16,11 @@ namespace WDE.MVVM.Observable
             return new SelectObservable<T, R>(observable, converter);
         }
 
+        public static IObservable<T> Where<T>(this IObservable<T> observable, Func<T, bool> converter)
+        {
+            return new WhereObservable<T>(observable, converter);
+        }
+
         public static IObservable<bool> Not(this IObservable<bool> observable)
         {
             return observable.Select(t => !t);

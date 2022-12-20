@@ -5,16 +5,18 @@ using WDE.Common.Database;
 using WDE.Common.Parameters;
 using WDE.Common.Utils;
 using WDE.Conditions.Data;
+using WDE.Conditions.Shared;
 using WDE.Parameters;
 using WDE.Parameters.Models;
 
 namespace WDE.Conditions.ViewModels
 {
-    public class ConditionViewModel : BindableBase
+    public class ConditionViewModel : BindableBase, IConditionViewModel
     {
         public static int ParametersCount => 3;
         private ParameterValueHolder<long>[] parameters = new ParameterValueHolder<long>[ParametersCount];
         private string? readableHint;
+        private string? negativeReadableHint;
         private int conditionId;
 
         public int ConditionId => conditionId;
@@ -30,7 +32,7 @@ namespace WDE.Conditions.ViewModels
         public ConditionViewModel(IParameter<long> targets)
         {
             for (int i = 0; i < ParametersCount; ++i)
-                parameters[i] = new ConstContextParameterValueHolder<long, ConditionViewModel>(Parameter.Instance, 0, this);
+                parameters[i] = new ConstContextParameterValueHolder<long, IConditionViewModel>(Parameter.Instance, 0, this);
             ConditionTarget = new ParameterValueHolder<long>("Target", targets, 0);
             ConditionTarget.IsUsed = targets.HasItems && targets.Items!.Count > 1;
 
@@ -51,6 +53,8 @@ namespace WDE.Conditions.ViewModels
                 string? readable = readableHint;
                 if (readable == null)
                     return "";
+                if (negativeReadableHint != null && Invert.Value != 0)
+                    readable = negativeReadableHint;
                 return Smart.Format(readable, new
                 {
                     target = "[s]" + ConditionTarget + "[/s]",
@@ -70,6 +74,7 @@ namespace WDE.Conditions.ViewModels
             var old = conditionId;
             conditionId = data.Id;
             readableHint = data.Description;
+            negativeReadableHint = data.NegativeDescription;
             RaisePropertyChanged(nameof(Readable));
             ConditionChanged?.Invoke(this, old, conditionId);
         }

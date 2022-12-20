@@ -13,6 +13,27 @@ namespace WDE.Common.Utils
                 Console.WriteLine(e.Exception);
             }, TaskContinuationOptions.OnlyOnFaulted);
         }
+        
+        public static async Task WrapSafe(this Task t, Action onBefore, Action onFinally)
+        {
+            onBefore();
+            try
+            {
+                await t;
+            }
+            finally
+            {
+                onFinally();
+            }
+        }
+        
+        public static void IgnoreResult(this Task t)
+        {
+            t.ContinueWith(e =>
+            {
+                var x = e.Exception;
+            }, TaskContinuationOptions.OnlyOnFaulted);
+        }
 
         public static Progress<(long, long?)> ToProgress(this ITaskProgress taskProgress)
         {

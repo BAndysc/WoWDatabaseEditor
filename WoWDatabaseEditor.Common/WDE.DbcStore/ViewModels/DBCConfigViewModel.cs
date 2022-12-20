@@ -13,7 +13,7 @@ using WDE.MVVM;
 namespace WDE.DbcStore.ViewModels
 {
     [AutoRegister]
-    public class DBCConfigViewModel : ObservableBase, IConfigurable
+    public class DBCConfigViewModel : ObservableBase, IFirstTimeWizardConfigurable
     {
         private DBCVersions dbcVersion;
         private string path;

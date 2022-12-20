@@ -1,0 +1,29 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:WDE.MapSpawnsEditor.Tools.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:SpawnGroupPickerViewModel"
+             IsEnabled="{CompiledBinding IsDialogEnabled}"
+             x:Class="WDE.MapSpawnsEditor.Tools.Views.SpawnGroupPickerView">
+    <DockPanel>
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom" Spacing="10" HorizontalAlignment="Right">
+            <Button IsCancel="True" Content="Cancel" Command="{CompiledBinding Cancel}" MinWidth="80" />
+            <Button IsDefault="True" Content="Ok" Command="{CompiledBinding Accept}" MinWidth="80" />
+        </StackPanel>
+        <Grid ColumnDefinitions="Auto,10,*" RowDefinitions="Auto,10,Auto,10,Auto,10,Auto">
+            <TextBlock Grid.ColumnSpan="3" FontSize="18">Create a new spawn group</TextBlock>
+            <TextBlock VerticalAlignment="Center" Grid.Row="2" Grid.Column="0">Id:</TextBlock>
+            <TextBox Text="{CompiledBinding Id}" Grid.Row="2" Grid.Column="2" />
+        
+            <TextBlock VerticalAlignment="Center" Grid.Row="4" Grid.Column="0">Name:</TextBlock>
+            <TextBox Text="{CompiledBinding Name}" Grid.Row="4" Grid.Column="2" />
+            
+            <TextBlock VerticalAlignment="Center" Grid.Row="6" Grid.Column="0" IsVisible="{CompiledBinding HasSpawnGroupType}">Group type:</TextBlock>
+            <ComboBox Grid.Row="6" Grid.Column="2" IsVisible="{CompiledBinding HasSpawnGroupType}"
+                      Items="{CompiledBinding SpawnGroupTypes}" 
+                      SelectedItem="{CompiledBinding GroupType}" />
+        </Grid>
+    </DockPanel>
+</UserControl>

@@ -150,14 +150,8 @@
                 </Expander>
             </StackPanel>
         </ScrollViewer>
-        <Grid Grid.Row="2">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="80" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="80" />
-            </Grid.ColumnDefinitions>
-            <Button Command="{CompiledBinding Cancel}"  Content="Cancel" />
-            <Button Command="{CompiledBinding Accept}" Grid.Column="2" Content="Ok" />
-        </Grid>
+        <OkCancelButtons Grid.Row="2" Grid.Column="0" 
+                         AcceptCommand="{CompiledBinding Accept}"
+                         CancelCommand="{CompiledBinding Cancel}" />
     </Grid>
 </controls1:DialogViewBase>

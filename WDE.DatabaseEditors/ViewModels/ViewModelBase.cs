@@ -36,7 +36,7 @@ using WDE.SqlQueryGenerator;
 
 namespace WDE.DatabaseEditors.ViewModels
 {
-    public abstract class ViewModelBase : ObservableBase, ISolutionItemDocument, ISplitSolutionItemQueryGenerator, IAddRowKey
+    public abstract class ViewModelBase : ObservableBase, ISolutionItemDocument, ISplitSolutionItemQueryGenerator, ITableContext
     {
         protected readonly ISolutionItemNameRegistry solutionItemName;
         protected readonly ISolutionManager solutionManager;
@@ -252,7 +252,7 @@ namespace WDE.DatabaseEditors.ViewModels
                 {
                     Commands.Add(new TableCommandViewModel(cmd, new AsyncAutoCommand( () =>
                     {
-                        return messageBoxService.WrapError(() => 
+                        return messageBoxService.WrapError(() =>
                             WrapBulkEdit(
                             () => WrapBlockingTask(
                                 () => cmd.Process(command, new DatabaseTableData(tableDefinition, Entities), this)
@@ -353,5 +353,6 @@ namespace WDE.DatabaseEditors.ViewModels
         public ISolutionItem SolutionItem => solutionItem;
         public virtual DatabaseEntity? FocusedEntity { get; }
         public abstract DatabaseEntity AddRow(DatabaseKey key);
+        public abstract DatabaseKey? SelectedTableKey { get; }
     }
 }

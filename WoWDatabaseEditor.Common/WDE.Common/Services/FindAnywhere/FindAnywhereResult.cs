@@ -5,8 +5,9 @@ namespace WDE.Common.Services.FindAnywhere;
 
 public class FindAnywhereResult : IFindAnywhereResult
 {
-    public FindAnywhereResult(ImageUri icon, string title, string description, ISolutionItem? solutionItem = null, ICommand? command = null)
+    public FindAnywhereResult(ImageUri icon, long? entry, string title, string description, ISolutionItem? solutionItem = null, ICommand? command = null)
     {
+        Entry = entry;
         Icon = icon;
         Title = title;
         Description = description;
@@ -15,6 +16,7 @@ public class FindAnywhereResult : IFindAnywhereResult
     }
 
     public ImageUri Icon { get; }
+    public long? Entry { get; set; }
     public string Title { get; }
     public string Description { get; }
     public ISolutionItem? SolutionItem { get; }

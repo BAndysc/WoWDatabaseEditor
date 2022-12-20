@@ -35,7 +35,9 @@ public abstract class EventAiBaseFindAnywhereSource : IFindAnywhereSource
 
     public int Order => -1;
     
-    public async Task Find(IFindAnywhereResultContext resultContext, IReadOnlyList<string> parameterNames, long parameterValue,
+    public FindAnywhereSourceType SourceType => FindAnywhereSourceType.EventAi;
+
+    public async Task Find(IFindAnywhereResultContext resultContext, FindAnywhereSourceType searchType, IReadOnlyList<string> parameterNames, long parameterValue,
         CancellationToken cancellationToken)
     {
         var results = await databaseProvider.FindEventAiLinesBy(PrepareCondition(parameterNames, parameterValue));
@@ -46,6 +48,7 @@ public abstract class EventAiBaseFindAnywhereSource : IFindAnywhereSource
             var icon = iconRegistry.GetIcon(item);
             resultContext.AddResult(new FindAnywhereResult(
                 icon,
+                result.Id,
                 name + " (" + result.CreatureIdOrGuid + ")",
                 result.Comment,
                 item));

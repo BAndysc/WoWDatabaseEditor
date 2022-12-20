@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using SmartFormat;
 using SmartFormat.Core.Formatting;
@@ -7,23 +8,31 @@ using SmartFormat.Core.Parsing;
 using WDE.Common.Database;
 using WDE.Common.Parameters;
 using WDE.Parameters.Models;
+using WDE.SmartScriptEditor.Editor;
+using WDE.SmartScriptEditor.Models.Helpers;
 
 namespace WDE.SmartScriptEditor.Models
 {
     public class SmartSource : SmartBaseElement
     {
-        public static readonly int SmartSourceParametersCount = 3;
-
-        public event Action<SmartSource, IList<ICondition>?, IList<ICondition>?> OnConditionsChanged = delegate { };
+        protected readonly IEditorFeatures features;
+        public event Action<SmartSource, IReadOnlyList<ICondition>?, IReadOnlyList<ICondition>?> OnConditionsChanged = delegate { };
         
         protected SmartAction? parent;
         
         private ParameterValueHolder<long> condition;
 
-        public SmartSource(int id) : base(SmartSourceParametersCount, id, that => new SmartScriptParameterValueHolder(Parameter.Instance, 0, that))
+        protected bool isSource = true;
+
+        public SmartSource(int id, IEditorFeatures features) : base(id,
+            features.TargetParametersCount,
+            that => new SmartScriptParameterValueHolder(Parameter.Instance, 0, that))
         {
+            this.features = features;
             condition = new ParameterValueHolder<long>("Condition ID", Parameter.Instance, 0);
         }
+
+        public bool IsPosition { get; set; }
 
         public SmartAction? Parent
         {
@@ -36,9 +45,33 @@ namespace WDE.SmartScriptEditor.Models
             get => parent?.LineId ?? -1;
             set { }
         }
+        
+        public float X
+        {
+            get => this.GetFloatValueOrDefault(0);
+            set => GetFloatParameter(0).Value = value;
+        }
 
-        private IList<ICondition>? conditions;
-        public IList<ICondition>? Conditions
+        public float Y
+        {
+            get => this.GetFloatValueOrDefault(1);
+            set => GetFloatParameter(1).Value = value;
+        }
+
+        public float Z
+        {
+            get => this.GetFloatValueOrDefault(2);
+            set => GetFloatParameter(2).Value = value;
+        }
+
+        public float O
+        {
+            get => this.GetFloatValueOrDefault(3);
+            set => GetFloatParameter(3).Value = value;
+        }
+
+        private IReadOnlyList<ICondition>? conditions;
+        public IReadOnlyList<ICondition>? Conditions
         {
             get => conditions;
             set
@@ -56,7 +89,7 @@ namespace WDE.SmartScriptEditor.Models
 
         public ParameterValueHolder<long> Condition => condition;
 
-        public override string Readable
+        protected override string ReadableImpl
         {
             get
             {
@@ -65,17 +98,29 @@ namespace WDE.SmartScriptEditor.Models
                     string output = Smart.Format(ReadableHint,
                         new
                         {
-                            pram1 = GetParameter(0),
-                            pram2 = GetParameter(1),
-                            pram3 = GetParameter(2),
-                            pram1value = GetParameter(0).Value,
-                            pram2value = GetParameter(1).Value,
-                            pram3value = GetParameter(2).Value,
-                            x = 0.ToString(),
-                            y = 0.ToString(),
-                            z = 0.ToString(),
-                            o = 0.ToString(),
-                            invoker = GetInvokerNameWithContext()
+                            pram1 = this.GetTextOrDefault(0) ?? "",
+                            pram2 = this.GetTextOrDefault(1) ?? "",
+                            pram3 = this.GetTextOrDefault(2) ?? "",
+                            pram1value = this.GetValueOrDefault(0),
+                            pram2value = this.GetValueOrDefault(1),
+                            pram3value = this.GetValueOrDefault(2),
+                            x = X.ToString(CultureInfo.InvariantCulture),
+                            y = Y.ToString(CultureInfo.InvariantCulture),
+                            z = Z.ToString(CultureInfo.InvariantCulture),
+                            o = O.ToString(CultureInfo.InvariantCulture),
+                            fpram1 = X.ToString(CultureInfo.InvariantCulture),
+                            fpram2 = Y.ToString(CultureInfo.InvariantCulture),
+                            fpram3 = Z.ToString(CultureInfo.InvariantCulture),
+                            fpram4 = O.ToString(CultureInfo.InvariantCulture),
+                            fpram1value = X,
+                            fpram2value = Y,
+                            fpram3value = Z,
+                            fpram4value = O,
+                            invoker = GetInvokerNameWithContext(),
+                            isSourcePosition = parent?.Source?.IsPosition,
+                            isSource = isSource,
+                            isTarget = !isSource,
+                            
                         });
                     if ((Conditions?.Count ?? 0) == 0)
                         return output;
@@ -114,15 +159,47 @@ namespace WDE.SmartScriptEditor.Models
             }
 
         }
-
-        public SmartSource Copy()
+        
+        public string GetCoordsXyz()
         {
-            SmartSource se = new(Id) {ReadableHint = ReadableHint, DescriptionRules = DescriptionRules};
-            for (var i = 0; i < SmartSourceParametersCount; ++i)
+            return $"({X.ToString(CultureInfo.InvariantCulture)}, {Y.ToString(CultureInfo.InvariantCulture)}, {Z.ToString(CultureInfo.InvariantCulture)})";
+        }
+        
+        public string GetCoords()
+        {
+            return $"({X.ToString(CultureInfo.InvariantCulture)}, {Y.ToString(CultureInfo.InvariantCulture)}, {Z.ToString(CultureInfo.InvariantCulture)}, {O.ToString(CultureInfo.InvariantCulture)})";
+        }
+
+        private bool HasPosition()
+        {
+            for (var i = 0; i < FloatParametersCount; ++i)
             {
-                se.GetParameter(i).Copy(GetParameter(i));
+                if (GetFloatParameter(i).Value != 0)
+                    return true;
             }
 
+            return false;
+        }
+
+        public string GetPosition()
+        {
+            string output = Readable;
+            return output.Contains("position") || IsPosition
+                ? output
+                : "position of " + output + (HasPosition() ? " moved by offset " + GetCoordsXyz() : "");
+        }
+        
+        public SmartSource Copy()
+        {
+            SmartSource se = new(Id, features)
+            {
+                ReadableHint = ReadableHint, 
+                DescriptionRules = DescriptionRules,
+                IsPosition = IsPosition
+            };
+            se.CopyParameters(this);
+
+            se.Condition.Value = Condition.Value;
             se.Conditions = Conditions?.ToList();
             return se;
         }

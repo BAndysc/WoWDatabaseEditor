@@ -16,6 +16,17 @@ namespace WDE.Common
         
         void ConfigurableOpened() { }
     }
+    
+    [NonUniqueProvider]
+    public interface IFirstTimeWizardConfigurable : IConfigurable
+    {
+    }
+
+    [UniqueProvider]
+    public interface ICoreVersionConfigurable : IConfigurable
+    {
+        
+    }
 
     public enum ConfigurableGroup
     {

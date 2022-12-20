@@ -182,11 +182,18 @@ namespace WDE.DatabaseEditors.Models
             
             if (hasCachedStringValue)
                 return cachedStringValue;
-            
+
             if (parameter is IAsyncContextualParameter<T, TContext> asyncContextualParameter)
             {
                 if (!AsyncInProgress)
                     CalculateStringAsync(value.Value!, context, asyncContextualParameter).ListenErrors();
+                return parameter.ToString(value.Value!);
+            }
+            
+            if (parameter is IAsyncParameter<T> asyncParameter)
+            {
+                if (!AsyncInProgress)
+                    CalculateStringAsync(value.Value!, asyncParameter).ListenErrors();
                 return parameter.ToString(value.Value!);
             }
             

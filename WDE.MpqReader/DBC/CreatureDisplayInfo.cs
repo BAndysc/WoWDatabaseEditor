@@ -1,4 +1,6 @@
 ﻿using WDE.Common.DBC;
+using WDE.Common.MPQ;
+using WDE.MpqReader.Structures;
 
 namespace WDE.MpqReader.DBC
 {
@@ -10,17 +12,17 @@ namespace WDE.MpqReader.DBC
         public readonly uint ExtendedDisplayInfoID;
         public readonly float CreatureModelScale;
         public readonly float CreatureModelAlpha;
-        public readonly string TextureVariation1;
-        public readonly string TextureVariation2;
-        public readonly string TextureVariation3;
-        public readonly string PortraitTextureName;
+        public readonly FileId TextureVariation1;
+        public readonly FileId TextureVariation2;
+        public readonly FileId TextureVariation3;
+        public readonly FileId PortraitTextureName;
         public readonly int BloodID;
         public readonly int NPCSoundID;
         public readonly int ParticleColorID;
         public readonly int CreatureGeosetData;
         public readonly int ObjectEffectPackageID;
 
-        public CreatureDisplayInfo(IDbcIterator dbcIterator)
+        public CreatureDisplayInfo(IDbcIterator dbcIterator, GameFilesVersion version)
         {
             Id = dbcIterator.GetUInt(0);
             ModelId = dbcIterator.GetInt(1);
@@ -32,12 +34,34 @@ namespace WDE.MpqReader.DBC
             TextureVariation2 = dbcIterator.GetString(7);
             TextureVariation3 = dbcIterator.GetString(8);
             PortraitTextureName = dbcIterator.GetString(9);
-            BloodID = dbcIterator.GetInt(10);
-            NPCSoundID = dbcIterator.GetInt(11);
-            ParticleColorID = dbcIterator.GetInt(12);
-            CreatureGeosetData = dbcIterator.GetInt(13);
-            ObjectEffectPackageID = dbcIterator.GetInt(14);
+            int i = 10;
+            if (version == GameFilesVersion.Cataclysm_4_3_4)
+                i++; // SizeClass
+            BloodID = dbcIterator.GetInt(i++);
+            NPCSoundID = dbcIterator.GetInt(i++);
+            ParticleColorID = dbcIterator.GetInt(i++);
+            CreatureGeosetData = dbcIterator.GetInt(i++);
+            ObjectEffectPackageID = dbcIterator.GetInt(i++);
+        }
+        
+        public CreatureDisplayInfo(IWdcIterator dbcIterator, GameFilesVersion version)
+        {
+            Id = (uint)dbcIterator.Id;
 
+            ModelId = dbcIterator.GetUShort("ModelID");
+            SoundId = dbcIterator.GetUShort("NPCSoundID");
+            ExtendedDisplayInfoID = (uint)dbcIterator.GetInt("ExtendedDisplayInfoID");
+            CreatureModelScale = dbcIterator.GetFloat("CreatureModelScale");
+            CreatureModelAlpha = dbcIterator.GetByte("CreatureModelAlpha") / 255.0f;
+            TextureVariation1 = dbcIterator.GetInt("TextureVariationFileDataID", 0);
+            TextureVariation2 = dbcIterator.GetInt("TextureVariationFileDataID", 1);
+            TextureVariation3 = dbcIterator.GetInt("TextureVariationFileDataID", 2);
+            PortraitTextureName = dbcIterator.GetInt("PortraitTextureFileDataID");
+            BloodID = dbcIterator.GetByte("BloodID");
+            NPCSoundID = dbcIterator.GetUShort("NPCSoundID");
+            ParticleColorID = dbcIterator.GetUShort("ParticleColorID");
+            CreatureGeosetData = dbcIterator.GetInt("CreatureGeosetData");
+            ObjectEffectPackageID = dbcIterator.GetUShort("ObjectEffectPackageID");
         }
 
         private CreatureDisplayInfo()

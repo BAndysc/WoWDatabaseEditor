@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Threading;
@@ -10,6 +11,8 @@ using Prism.Commands;
 using WDE.Common.Avalonia.Utils;
 using WDE.Common.Parameters;
 using WDE.Common.Utils;
+using WDE.MVVM;
+using WDE.MVVM.Observable;
 using WDE.Parameters.Models;
 
 namespace WDE.Common.Avalonia.Controls
@@ -64,7 +67,7 @@ namespace WDE.Common.Avalonia.Controls
             var pickerService = ViewBind.ResolveViewModel<IParameterPickerService>();
             PickCommand = new AsyncAutoCommand(async () =>
             {
-                if (DataContext is ParameterValueHolder<long> context)
+                if (DataContext is IParameterValueHolder<long> context)
                 {
                     var result = await pickerService.PickParameter(context.Parameter, context.Value);
                     if (result.ok)

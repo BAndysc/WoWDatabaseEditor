@@ -91,6 +91,7 @@ public class Game : IGame
         registry.RegisterSingleton<MdxManager>();
         registry.RegisterSingleton<WmoManager>();
         registry.RegisterSingleton<WorldManager>();
+        registry.RegisterSingleton<ZoneAreaManager>();
         registry.RegisterSingleton<ChunkManager>();
         registry.RegisterSingleton<CameraManager>();
         registry.RegisterSingleton<LightingManager>();
@@ -99,11 +100,22 @@ public class Game : IGame
         registry.RegisterSingleton<ModuleManager>();
         registry.RegisterSingleton<CoroutineManager>();
         registry.RegisterSingleton<IGameFiles, GameFiles>();
+        registry.RegisterSingleton<IChangesManager, ChangesManager>();
         
         manager = (GameManager)provider.Resolve(typeof(GameManager));
         registry.RegisterInstance<IGameContext>(manager);
-            
-        bool success = manager.Initialize();
+
+        bool success;
+        try
+        {
+            success = manager.Initialize();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            messageBoxService.SimpleDialog("Error", "Couldn't initialize the 3D view", "Details: " + e.InnerException?.InnerException?.Message ?? e.Message + "\n\nPlease report to the developer.").ListenErrors();
+            success = false;
+        }
         if (!success)
         {
             manager.DisposeGame();

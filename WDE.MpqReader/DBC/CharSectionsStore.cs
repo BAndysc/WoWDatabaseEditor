@@ -3,10 +3,9 @@ using WDE.Common.DBC;
 
 namespace WDE.MpqReader.DBC;
 
-public class CharSectionsStore : IEnumerable<CharSections>
+public class CharSectionsStore : BaseDbcStore<uint, CharSections>
 {
-    private Dictionary<uint, CharSections> store = new();
-    public CharSectionsStore(IEnumerable<IDbcIterator> rows)
+    public CharSectionsStore(IEnumerable<IDbcIterator> rows, TextureFileDataStore textureFileDataStore)
     {
         foreach (var row in rows)
         {
@@ -14,9 +13,13 @@ public class CharSectionsStore : IEnumerable<CharSections>
             store[o.Id] = o;
         }
     }
-
-    public bool Contains(uint id) => store.ContainsKey(id);
-    public CharSections this[uint id] => store[id];
-    public IEnumerator<CharSections> GetEnumerator() => store.Values.GetEnumerator();
-    IEnumerator IEnumerable.GetEnumerator() => store.Values.GetEnumerator();
+    
+    public CharSectionsStore(IEnumerable<IWdcIterator> rows, TextureFileDataStore textureFileDataStore)
+    {
+        foreach (var row in rows)
+        {
+            var o = new CharSections(row, textureFileDataStore);
+            store[o.Id] = o;
+        }
+    }
 }

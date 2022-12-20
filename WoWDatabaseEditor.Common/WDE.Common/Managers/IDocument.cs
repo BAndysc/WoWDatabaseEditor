@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;
 using WDE.Common.History;
+using WDE.Common.Outliner;
 using WDE.Common.Types;
 using WDE.SqlQueryGenerator;
 
@@ -52,6 +53,11 @@ namespace WDE.Common.Managers
         IObservable<IReadOnlyList<IInspectionResult>> Problems { get; }
     }
 
+    public interface IOutlinerSourceDocument : IDocument
+    {
+        IObservable<IOutlinerModel> OutlinerModel { get; }
+    }
+    
     public interface IInspectionResult
     {
         public string Message { get; }

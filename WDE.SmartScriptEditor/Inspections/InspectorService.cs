@@ -98,6 +98,8 @@ namespace WDE.SmartScriptEditor.Inspections
 
         private IEnumerable<IInspectionResult> GenerateInspectionsForEvent(SmartEvent ev)
         {
+            if (ev.IsGroup)
+                yield break;
             foreach (var i in eventInspections)
             {
                 var result = i.Inspect(ev);

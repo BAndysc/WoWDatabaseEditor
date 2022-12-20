@@ -91,7 +91,7 @@ namespace WDE.PacketViewer.Processing.Processors
             public GossipOptionIcon Icon { get; }
             public GossipOption OptionType { get; }
             public GameDefines.NpcFlags NpcFlags { get; }
-            public uint LinkedMenuId { get; set; }
+            public int LinkedMenuId { get; set; }
             public bool IsFromSniff { get; }
             public bool BoxCoded { get; }
             public string? BoxText { get; }
@@ -200,7 +200,7 @@ namespace WDE.PacketViewer.Processing.Processors
             {
                 if (currentGossipMenu.TryGetOption(lastChosenOption.Value.optionIndex, out var chosenOption))
                 {
-                    chosenOption.LinkedMenuId = packet.MenuId;
+                    chosenOption.LinkedMenuId = (int)packet.MenuId;
                 }
                 else
                 {

@@ -20,6 +20,7 @@ namespace WDE.Common.Parameters
         bool IsRegisteredString(string type);
         T Register<T>(string key, T parameter, QuickAccessMode quickAccessMode = QuickAccessMode.None) where T : IParameter<long>;
         void Register(string key, IParameter<string> parameter);
+        void Updated(IParameter parameter);
 
         void RegisterDepending(string name, string dependsOn, Func<IParameter<long>, IParameter<long>> creator, QuickAccessMode quickAccessMode = QuickAccessMode.None);
         void RegisterDepending(string name, string dependsOn, Func<IParameter<long>, IParameter<string>> creator);

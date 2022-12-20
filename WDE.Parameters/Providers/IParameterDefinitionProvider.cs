@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
+using WDE.Common.CoreVersion;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Utils;
 using WDE.Module.Attributes;
@@ -16,18 +17,30 @@ namespace WDE.Parameters.Providers
     {
         public IReadOnlyDictionary<string, ParameterSpecModel> Parameters { get; }
 
-        public ParameterDefinitionProvider(IMessageBoxService service)
+        private int GetOrder(string fileName)
+        {
+            switch (Path.GetFileNameWithoutExtension(fileName))
+            {
+                case "parameters":
+                    return 0;
+                case "spell_parameters":
+                    return 1;
+                case "spell_parameters2":
+                    return 2;
+            }
+
+            return 3;
+        }
+        
+        public ParameterDefinitionProvider(IMessageBoxService service, ICurrentCoreVersion currentCoreVersion)
         {
             var allParameters = new Dictionary<string, ParameterSpecModel>();
 
             var files = Directory
                 .GetFiles("Parameters/", "*.json", SearchOption.AllDirectories)
-                .OrderBy(t => t, Compare.CreateComparer<string>((a, b) =>
-                {
-                    if (Path.GetFileName(a) == "parameters.json")
-                        return -1;
-                    return 1;
-                })).ToList();
+                .OrderBy(GetOrder).ToList();
+
+            var currentCore = currentCoreVersion.Current;
             
             foreach (var source in files)
             {
@@ -35,7 +48,12 @@ namespace WDE.Parameters.Providers
                 try {
                     var parameters = JsonConvert.DeserializeObject<Dictionary<string, ParameterSpecModel>>(data);
                     foreach (var keyPair in parameters!) // try-catch is null
-                        allParameters[keyPair.Key] = keyPair.Value;
+                    {
+                        if (keyPair.Value.Tags == null || keyPair.Value.Tags.Contains(currentCore.Tag))
+                        {
+                            allParameters[keyPair.Key] = keyPair.Value;
+                        }
+                    }
                 } 
                 catch (Exception e)
                 {

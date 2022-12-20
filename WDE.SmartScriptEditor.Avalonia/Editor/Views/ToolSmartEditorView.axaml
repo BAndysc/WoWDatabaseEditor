@@ -8,6 +8,7 @@
           xmlns:components="clr-namespace:WDE.Common.Avalonia.Components;assembly=WDE.Common.Avalonia"
           xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
           xmlns:viewModels="clr-namespace:WDE.SmartScriptEditor.Editor.ViewModels;assembly=WDE.SmartScriptEditor"
+          xmlns:editing="clr-namespace:WDE.SmartScriptEditor.Avalonia.Editor.Views.Editing"
           mvvm:ViewModelLocator.AutoWireViewModel="False"
           mc:Ignorable="d"
           x:DataType="viewModels:ToolSmartEditorViewModel"
@@ -43,5 +44,5 @@
         </controls:MonochromaticIcon>
     </components:ToolView.Icon>
     
-    <ContentPresenter DataContext="{CompiledBinding EditorViewModel}" utils:ViewBind.Model="{CompiledBinding}" />
+    <editing:ParametersEditView DataContext="{CompiledBinding EditorViewModel}" />
 </components:ToolView>

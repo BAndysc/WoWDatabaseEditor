@@ -57,7 +57,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 variableTypes.Add(e);
         }
         
-        public GlobalVariableEditDialogViewModel(GlobalVariable toEdit)
+        public GlobalVariableEditDialogViewModel(GlobalVariable toEdit, SmartScriptBase? script = null)
         {
             this.toEdit = toEdit;
             key = toEdit.Key;
@@ -69,6 +69,12 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             Accept = new DelegateCommand(() =>
             {
                 CloseOk?.Invoke();
+                using var _ = script?.BulkEdit("Edit global variable");
+                toEdit.Key = Key;
+                toEdit.VariableType = variableType;
+                toEdit.Name = Name;
+                toEdit.Comment = Comment;
+                toEdit.Entry = Entry;
             });
             Cancel = new DelegateCommand(() => CloseCancel?.Invoke());
         }

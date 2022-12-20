@@ -2,15 +2,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:sessions="clr-namespace:WDE.Solutions.Sessions;assembly=WDE.Solutions"
+             xmlns:sessions="clr-namespace:WDE.Sessions.Sessions;assembly=WDE.Sessions"
              xmlns:controls="clr-namespace:WDE.Common.Avalonia.Controls;assembly=WDE.Common.Avalonia"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="sessions:SessionsConfigurationViewModel"
              x:Class="WDE.CommonViews.Avalonia.Sessions.SessionsConfigurationView">
     <ScrollViewer>
         <StackPanel>
-            <controls:SettingsHeader Text="Configuration" />
-            <CheckBox IsThreeState="True" IsChecked="{CompiledBinding DeleteOnSave}">After saving, always delete the session?</CheckBox>
             <controls:SettingsHeader Text="Recently deleted sessions" />
             <Button Command="{CompiledBinding RestoreSelectedSession}">Restore</Button>
             <ListBox Items="{CompiledBinding DeletedSessions}" 

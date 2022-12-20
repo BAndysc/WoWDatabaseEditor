@@ -14,7 +14,8 @@ namespace WDE.MapRenderer.Utils;
 public class HighlightPostProcess : IPostProcess, System.IDisposable
 {
     private readonly Engine engine;
-    private Material replacementMaterial = null!;
+    private Material replacementMaterialM2 = null!;
+    private Material replacementMaterialWmo = null!;
     private Material outlineMaterial = null!;
 
     private ScreenRenderTexture RT;
@@ -33,8 +34,10 @@ public class HighlightPostProcess : IPostProcess, System.IDisposable
         RT = new ScreenRenderTexture(engine);
         RT_downscaled = new ScreenRenderTexture(engine, 0.25f);
         
-        replacementMaterial = engine.MaterialManager.CreateMaterial("data/unlit_flat_m2.json");
-        replacementMaterial.SetUniform("mesh_color", new Vector4(1, 0, 0, 1));
+        replacementMaterialM2 = engine.MaterialManager.CreateMaterial("data/unlit_flat_m2.json");
+        replacementMaterialM2.SetUniform("mesh_color", new Vector4(1, 0, 0, 1));
+        replacementMaterialWmo = engine.MaterialManager.CreateMaterial("data/unlit_flat_wmo.json");
+        replacementMaterialWmo.SetUniform("mesh_color", new Vector4(1, 0, 0, 1));
     }
 
     public void Render(IReadOnlyList<Entity>? renderers)
@@ -53,11 +56,22 @@ public class HighlightPostProcess : IPostProcess, System.IDisposable
                 var instanceData = entityManager.GetManagedComponent<MaterialInstanceRenderData>(entity);
 
                 var oldMaterial = engine.MaterialManager.GetMaterialByHandle(renderer.MaterialHandle);
-                replacementMaterial.Culling = oldMaterial.Culling;
-                replacementMaterial.SetUniform("alphaTest", oldMaterial.GetUniformFloat("alphaTest"));
-                replacementMaterial.SetTexture("texture1", oldMaterial.GetTexture("texture1"));
-                replacementMaterial.SetBuffer("boneMatrices", instanceData.GetBuffer("boneMatrices")!);
-                engine.RenderManager.Render(renderer.MeshHandle, replacementMaterial.Handle, renderer.SubMeshId, localToWorld.Matrix, localToWorld.Inverse);
+                var bones = instanceData.GetBuffer("boneMatrices");
+                Material material;
+                if (bones != null)
+                {
+                    material = replacementMaterialM2;
+                    replacementMaterialM2.SetBuffer("boneMatrices", bones);
+                }
+                else
+                {
+                    material = replacementMaterialWmo;
+                }
+                material.Culling = oldMaterial.Culling;
+                material.SetUniform("alphaTest", oldMaterial.GetUniformFloat("alphaTest"));
+                material.SetTexture("texture1", oldMaterial.GetTexture("texture1"));
+                    
+                engine.RenderManager.Render(renderer.MeshHandle, material.Handle, renderer.SubMeshId, localToWorld.Matrix, localToWorld.Inverse);
             }
         }
         

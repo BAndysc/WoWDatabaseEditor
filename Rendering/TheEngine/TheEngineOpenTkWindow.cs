@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using Avalonia.Input;
 using JetBrains.Profiler.Api;
 using OpenTK.Graphics.OpenGL4;
@@ -19,11 +20,13 @@ public class TheEngineOpenTkWindow : GameWindow, IWindowHost
     private Engine engine = null!;
     private Stopwatch updateStopwatch = new();
     private Stopwatch renderStopwatch = new Stopwatch();
+    private bool isMacOS;
 
     public TheEngineOpenTkWindow(GameWindowSettings gameWindowSettings,
         NativeWindowSettings nativeWindowSettings,
         IGame game) : base(gameWindowSettings, nativeWindowSettings)
     {
+        isMacOS = RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
         this.game = game;
     }
 
@@ -74,11 +77,12 @@ public class TheEngineOpenTkWindow : GameWindow, IWindowHost
         SwapBuffers();
         renderStopwatch.Stop();
         engine.statsManager.Counters.PresentTime.Add(renderStopwatch.Elapsed.Milliseconds);
-        if (measure)
+        if (stopMeasure)
         {
             MeasureProfiler.StopCollectingData();
             MeasureProfiler.SaveData();
             measure = false;
+            stopMeasure = false;
         }
     }
 
@@ -207,12 +211,17 @@ public class TheEngineOpenTkWindow : GameWindow, IWindowHost
     };
 
     private bool measure;
+    private bool stopMeasure;
     protected override void OnUpdateFrame(FrameEventArgs args)
     {
+        if (measure && engine.inputManager.keyboard.JustReleased(Key.H))
+            stopMeasure = true;
         if (engine.inputManager.keyboard.JustPressed(Key.H))
         {
             MeasureProfiler.StartCollectingData();
             measure = true;
+            if (!engine.inputManager.keyboard.IsDown(Key.LeftCtrl))
+                stopMeasure = true;
         }
         updateStopwatch.Restart();
         engine.inputManager.PostUpdate();
@@ -256,8 +265,12 @@ public class TheEngineOpenTkWindow : GameWindow, IWindowHost
             engine.inputManager.mouse.MouseUp(isLeftDown ? Input.MouseButton.Left : Input.MouseButton.None);
         
         engine.inputManager.mouse.MouseWheel(new Vector2(MouseState.ScrollDelta.X, MouseState.ScrollDelta.Y));
-        
-        engine.inputManager.mouse.PointerMoved(MouseState.Position.X, MouseState.Position.Y, WindowWidth / DpiScaling, WindowHeight / DpiScaling);
+
+        if (isMacOS)
+            engine.inputManager.mouse.PointerMoved(MouseState.Position.X, MouseState.Position.Y, WindowWidth / DpiScaling, WindowHeight / DpiScaling);
+        else
+            engine.inputManager.mouse.PointerMoved(MouseState.Position.X, MouseState.Position.Y, WindowWidth, WindowHeight);
+
         wasLeftDown = isLeftDown;
         wasRightDown = isRightDown;
     }
@@ -303,8 +316,19 @@ public class TheEngineOpenTkWindow : GameWindow, IWindowHost
     {
         TryGetCurrentMonitorScale(out var scaleX, out var scaleY);
         DpiScaling = scaleX;
-        WindowWidth = e.Width * scaleX;
-        WindowHeight = e.Height * scaleY;
+        // for some reason, Windows gives different measurements than macOS
+        // macOS provides "scaled" values, while Windows provides "unscaled" values
+        // i.e. for x2 scaling and 3000x1500 window, macOS gives 1500x750, while Windows gives 3000x1500
+        if (isMacOS)
+        {
+            WindowWidth = e.Width * scaleX;
+            WindowHeight = e.Height * scaleY;
+        }
+        else
+        {
+            WindowWidth = e.Width;
+            WindowHeight = e.Height;
+        }
         base.OnResize(e);   
     }
 

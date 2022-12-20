@@ -16,7 +16,6 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
-using AvaloniaStyles.Utils;
 using FuzzySharp;
 using WDE.MVVM.Utils;
 
@@ -218,11 +217,20 @@ namespace AvaloniaStyles.Controls
                 {
                     DispatcherTimer.RunOnce(() =>
                     {
+                        if (box.SearchTextBox == null) // before template applied
+                            return;
+                        
+                        box.SearchTextBox.Text = "";
                         FocusManager.Instance.Focus(box.SearchTextBox, NavigationMethod.Pointer);
                         box.SearchTextBox.SelectionEnd = box.SearchTextBox.SelectionStart = box.SearchTextBox.Text.Length;
-                    }, TimeSpan.FromMilliseconds(1));
-                    box.SearchTextBox.Text = "";
+                    }, TimeSpan.FromMilliseconds(16));
+
                     box.TextUpdated("");
+                    
+                    if (box.SearchTextBox == null) // before template applied
+                        return;
+                    
+                    box.SearchTextBox.Text = "";
                 }
             });
         }
@@ -433,7 +441,7 @@ namespace AvaloniaStyles.Controls
             try
             {
                 IEnumerable<object> result = await asyncPopulator.Invoke(searchText, cancellationToken);
-                var resultList = result.ToList();
+                var resultList = result is IList ? result : result?.ToList();
 
                 if (cancellationToken.IsCancellationRequested)
                     return;
@@ -442,7 +450,9 @@ namespace AvaloniaStyles.Controls
                 {
                     if (!cancellationToken.IsCancellationRequested)
                     {
-                        view.OverrideWith(resultList);
+                        view.Clear();
+                        if (resultList != null)
+                            view.InsertRange(0, resultList);
                     }
                 });
             }

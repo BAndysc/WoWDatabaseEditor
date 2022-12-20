@@ -14,11 +14,11 @@ public interface ITreeNodeIterator
 
 public struct TreeNodeIterator : ITreeNodeIterator
 {
-    private readonly IList connections;
+    private readonly IReadOnlyList<IConnectionViewModel> connections;
     private int i = 0;
     private int count = 0;
 
-    public TreeNodeIterator(IList connections)
+    public TreeNodeIterator(IReadOnlyList<IConnectionViewModel> connections)
     {
         this.connections = connections;
         this.count = connections.Count;
@@ -45,6 +45,5 @@ public interface ITreeNode
     bool Collapsed { get; }
     double PerfectX { get; set; }
     double PerfectY { get; set; }
-    uint Entry { get; set; }
     int Level { get; set; }
 }

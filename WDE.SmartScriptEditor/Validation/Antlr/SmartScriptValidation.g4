@@ -9,6 +9,7 @@ options {
 
 exprBool
     : '!' exprBool                          # BNegate
+    | 'target' '.' 'emptyPosition'          # BTargetPosEmpty
     | exprInt '<' exprInt                   # BLessThan
     | exprInt '<=' exprInt                  # BLessEquals
     | exprInt '>' exprInt                   # BGreaterThan

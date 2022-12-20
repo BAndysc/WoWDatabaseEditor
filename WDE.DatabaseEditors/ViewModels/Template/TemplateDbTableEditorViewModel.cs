@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using DynamicData;
 using Prism.Commands;
 using Prism.Events;
+using PropertyChanged.SourceGenerator;
 using WDE.Common;
 using WDE.Common.Database;
 using WDE.Common.History;
@@ -36,7 +37,7 @@ using WDE.SqlQueryGenerator;
 
 namespace WDE.DatabaseEditors.ViewModels.Template
 {
-    public class TemplateDbTableEditorViewModel : ViewModelBase
+    public partial class TemplateDbTableEditorViewModel : ViewModelBase
     {
         private const string TipYouCanRevertId = "TableEditor.YouCanRevert";
     
@@ -54,6 +55,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
         private readonly IDatabaseTableDataProvider tableDataProvider;
         
         public ObservableCollection<string> Header { get; } = new();
+        [Notify] private DatabaseRowsGroupViewModel? selectedGroup;
         public ReadOnlyObservableCollection<DatabaseRowsGroupViewModel> FilteredRows { get; }
         public IObservable<Func<DatabaseRowViewModel, bool>> CurrentFilter { get; }
         public SourceList<DatabaseRowViewModel> Rows { get; } = new();
@@ -64,6 +66,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
         public DelegateCommand<DatabaseCellViewModel?> SetNullCommand { get; }
         public AsyncAutoCommand<DatabaseCellViewModel> OpenParameterWindow { get; }
         private readonly Dictionary<string, ReactiveProperty<bool>> groupVisibilityByName = new();
+        public override DatabaseKey? SelectedTableKey => null;
 
         public AsyncAutoCommand AddNewCommand { get; }
 

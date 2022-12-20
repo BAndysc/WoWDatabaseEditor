@@ -51,15 +51,11 @@
                 <TextBlock VerticalAlignment="Center">Name:</TextBlock>
                 <TextBox Text="{CompiledBinding CustomName, Mode=TwoWay}" Margin="10,0,0,0" />
             </DockPanel>
-            <Grid Grid.Row="3">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="80" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="80" />
-                </Grid.ColumnDefinitions>
-                <Button Content="Cancel" Command="{CompiledBinding Cancel}" HorizontalAlignment="Stretch" />
-                <Button Grid.Column="2" Content="OK" Command="{CompiledBinding Accept}" HorizontalAlignment="Stretch"/>
-            </Grid>
+            
+            <OkCancelButtons Grid.Row="3" 
+                             AcceptCommand="{CompiledBinding Accept}"
+                             AcceptText="Ok"
+                             CancelCommand="{CompiledBinding Cancel}" />
         </Grid>
     </Grid>
 </UserControl>

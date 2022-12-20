@@ -10,10 +10,13 @@ using Avalonia.Input;
 using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using Avalonia.Media;
+using Avalonia.VisualTree;
+using WDE.Common.Avalonia.Utils;
 using WDE.Common.Managers;
 using WDE.SmartScriptEditor.Editor.UserControls;
 using WDE.SmartScriptEditor.Editor.ViewModels;
 using WDE.SmartScriptEditor.Models;
+using WDE.SmartScriptEditor.Settings;
 
 namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
 {
@@ -51,7 +54,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
 
         private static double PaddingLeft = 20;
         
-        private double EventWidth(double totalWidth) => Math.Min(Math.Max(totalWidth - 50, PaddingLeft + 10), 250);
+        private double EventWidth(double totalWidth) => Math.Min(Math.Max(totalWidth - 50, PaddingLeft + 10), 300);
         
         private double ConditionWidth(double totalWidth) => Math.Max(EventWidth(totalWidth) - 22 - PaddingLeft, 0);
 
@@ -59,6 +62,14 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
         {
             AffectsRender<SmartScriptPanelLayout>(ProblemsProperty);
             PointerPressedEvent.AddClassHandler<SmartScriptPanelLayout>(PointerPressedHandled, RoutingStrategies.Tunnel, true);
+        }
+        
+        private bool CompactView { get; }
+
+        public SmartScriptPanelLayout()
+        {
+            var smartScriptSettings = ViewBind.ResolveViewModel<IGeneralSmartScriptSettingsProvider>();
+            CompactView = smartScriptSettings.ViewType == SmartScriptViewType.Compact;
         }
 
         private static void PointerPressedHandled(SmartScriptPanelLayout panel, PointerPressedEventArgs e)
@@ -220,13 +231,17 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
             {
                 eventPresenter.Measure(new Size(eventWidth - PaddingLeft, availableSize.Height));
 
-                float actionsHeight = 26;
-                float conditionsHeight = 26;
-
+                float actionsHeight = CompactView ? 0 : 26;
+                float conditionsHeight = CompactView ? 0 : 26;
+                
                 if (!presenterToEvent.ContainsKey(eventPresenter))
                     continue;
 
                 SmartEvent @event = presenterToEvent[eventPresenter];
+
+                if (@event == Script.Events[^1]) // last event
+                    actionsHeight = 26; // always show Add Action for the last event
+                
                 foreach (SmartAction action in @event.Actions)
                 {
                     if (!actionToPresenter.TryGetValue(action, out var actionPresenter))
@@ -248,7 +263,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
 
                 totalDesiredHeight += Math.Max(actionsHeight, (float) eventPresenter.DesiredSize.Height + conditionsHeight) + EventSpacing;
             }
-
+            
             return new Size(availableSize.Width, Math.Max(0, totalDesiredHeight));
         }
 
@@ -275,9 +290,6 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
 
         protected override void OnPointerReleased(PointerReleasedEventArgs e)
         {
-            var systemWideControlModifier = AvaloniaLocator.Current
-                .GetService<PlatformHotkeyConfiguration>()?.CommandModifiers ?? KeyModifiers.Control;
-            
             base.OnPointerReleased(e);
             UpdateIsCopying(e.KeyModifiers);
             StopDragging();
@@ -476,7 +488,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
                     {
                         if (AnyEventSelected())
                             draggingEvents = true;
-                        else
+                        else if (CanDragConditions())
                             draggingConditions = true;
                     }
                     else
@@ -538,7 +550,32 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
                 InvalidateVisual();
             }
 
+            // scroll when dragging on edges
+            if (draggingActions || draggingConditions || draggingEvents)
+            {
+                if (ScrollViewer is { } scrollViewer && Panel is { } panel)
+                {
+                    var scale = panel.RenderTransform?.Value.M11 ?? 1;
+                    var relativeMouse = mouseY * scale - scrollViewer.Offset.Y;
+                    var offset = 0;
+                    if (relativeMouse < 15)
+                        offset = -1;
+                    else if (relativeMouse > scrollViewer.Viewport.Height - 15)
+                        offset = 1;
+
+                    if (offset != 0)
+                    {
+                        scrollViewer.Offset = new Vector(scrollViewer.Offset.X, scrollViewer.Offset.Y + offset * 10);
+                    }
+                }
+            }
+
             InvalidateArrange();
+        }
+
+        private bool CanDragConditions()
+        {
+            return Script.EditorFeatures.CanReorderConditions;
         }
 
         protected override void OnPointerLeave(PointerEventArgs e)
@@ -562,6 +599,9 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
 
             return new Size(finalSize.Width, totalHeight);
         }
+        
+        private ScrollViewer? ScrollViewer => this.FindAncestorOfType<ScrollViewer>();
+        private InverseRenderTransformPanel? Panel => this.FindAncestorOfType<InverseRenderTransformPanel>();
         
         protected override Size ArrangeOverride(Size finalSize)
         {
@@ -617,6 +657,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
                     continue;
 
                 var height = (float)eventPresenter.DesiredSize.Height;
+                
                 if (!draggingEvents || isCopying || !GetSelected(eventPresenter.Child))
                 {
                     float actionHeight = ArrangeActions(eventIndex, 0, finalSize, eventPresenter, y, height);
@@ -635,16 +676,21 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
                             if (addConditionViewModel != null)
                                 addConditionViewModel.Event = smartEvent;                            
                         }
-                            
-                        addActionPresenter?.Arrange(new Rect(EventWidth(finalSize.Width),
-                            y + actionHeight - 26,
-                            Math.Max(finalSize.Width - EventWidth(finalSize.Width), 0),
-                            24));
-                            
-                        addConditionPresenter?.Arrange(new Rect(PaddingLeft + 25,
-                            y + eventsConditionsHeight - 26,
-                            ConditionWidth(finalSize.Width),
-                            24));
+
+                        if (!CompactView || actionHeight + 24 < height || ev == Script.Events[^1])
+                        {
+                            addActionPresenter?.Arrange(new Rect(EventWidth(finalSize.Width),
+                                y + actionHeight - (CompactView && ev != Script.Events[^1] ? 0 : 26),
+                                Math.Max(finalSize.Width - EventWidth(finalSize.Width), 0),
+                                24));
+                        }
+                        if (!CompactView || eventsConditionsHeight + 24  < height)
+                        {
+                            addConditionPresenter?.Arrange(new Rect(PaddingLeft + 25,
+                                y + eventsConditionsHeight - (CompactView ? 0 : 26),
+                                ConditionWidth(finalSize.Width),
+                                24));   
+                        }
                     }
 
                     y += height + EventSpacing;
@@ -684,7 +730,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
             float y,
             float eventHeight)
         {
-            float totalHeight = 26;
+            float totalHeight = CompactView && eventIndex != Script.Events.Count - 1 ? 0 : 26;
             if (!presenterToEvent.TryGetValue(eveentPresenter, out SmartEvent? @event))
                 return totalHeight;
 
@@ -703,7 +749,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
                 actionIndex++;
             }
 
-            float rest = Math.Max(26, eventHeight - (totalHeight - 26));
+            float rest = Math.Max(CompactView && eventIndex != Script.Events.Count - 1 ? 0 : 26, eventHeight - (totalHeight - 26));
 
             actionHeights.Add((y + (rest + ActionSpacing) / 2, rest, actionIndex, eventIndex));
 
@@ -712,9 +758,10 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
 
         private float MeasureActions(ContentPresenter eventPresenter)
         {
-            float totalHeight = 26;
             if (!presenterToEvent.TryGetValue(eventPresenter, out SmartEvent? @event))
-                return totalHeight;
+                return 0;
+            
+            float totalHeight = CompactView && @event != Script.Events[^1] ? 0 : 26;
 
             foreach (SmartAction action in @event.Actions)
             {
@@ -730,7 +777,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
         
         private float MeasureConditions(ContentPresenter eventPresenter)
         {
-            float totalHeight = 26;
+            float totalHeight = CompactView ? 0 : 26;
             if (!presenterToEvent.TryGetValue(eventPresenter, out SmartEvent? @event))
                 return totalHeight;
 
@@ -753,7 +800,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
             float y,
             float eventHeight)
         {
-            float totalHeight = 26;
+            float totalHeight = CompactView ? 0 : 26;
             if (!presenterToEvent.TryGetValue(eveentPresenter, out SmartEvent? @event))
                 return totalHeight;
 
@@ -805,7 +852,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
         public static readonly AvaloniaProperty ProblemsProperty =
             AvaloniaProperty.Register<SmartScriptPanelLayout, Dictionary<int, DiagnosticSeverity>?>(nameof(Problems));
 
-        public float EventSpacing => 10;
+        public float EventSpacing => CompactView ? 2 : 10;
 
         public float ConditionSpacing => 2;
         public float ActionSpacing => 2;

@@ -7,14 +7,58 @@
              xmlns:userControls1="clr-namespace:WDE.SmartScriptEditor.Avalonia.Editor.UserControls"
              x:DataType="viewModels:SmartScriptEditorViewModel"
              xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
-             xmlns:viewModels="clr-namespace:WDE.SmartScriptEditor.Editor.ViewModels;assembly=WDE.SmartScriptEditor">
+             xmlns:viewModels="clr-namespace:WDE.SmartScriptEditor.Editor.ViewModels;assembly=WDE.SmartScriptEditor"
+             xmlns:editor="clr-namespace:WDE.SmartScriptEditor.Editor;assembly=WDE.SmartScriptEditor">
     <Panel>
         <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
             <userControls1:SmartScriptView Focusable="True" Name="SmartScriptView"/>
         </ScrollViewer>
-        <controls:TeachingTip IsOpened="{CompiledBinding TeachingTips.WaitActionTipOpened}" VerticalAlignment="Bottom" Margin="20" Header="Have you checked WAIT action yet?">WoW Database Editor has special "wait" action that can be used instead of timed action lists. Check it out!</controls:TeachingTip>
+        
+        <Slider Minimum="0.5" Maximum="1"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Bottom" 
+                Width="100"
+                Height="45"
+                Margin="0,0,10,0"
+                Opacity="0.6"
+                Orientation="Horizontal" 
+                Value="{CompiledBinding Scale}">
+            <Slider.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Set as the default scale" Command="{CompiledBinding SaveDefaultScaleCommand}" />
+                </ContextMenu>
+            </Slider.ContextMenu>
+        </Slider>
+        
+        <ItemsPresenter Items="{CompiledBinding Notifications}">
+            <ItemsPresenter.ItemTemplate>
+                <DataTemplate x:DataType="editor:SmartExtensionNotification">
+                    <controls:TeachingTip 
+                        HorizontalAlignment="Right"
+                        IsDontWorryHintVisible="False" 
+                        IsOpened="{CompiledBinding IsOpened}" 
+                        Header="{CompiledBinding Header}">
+                        <StackPanel Orientation="Vertical" Spacing="10">
+                            <TextBlock TextWrapping="WrapWithOverflow" Text="{CompiledBinding Content}"></TextBlock>
+                            <Button Classes="primary" HorizontalAlignment="Right" Command="{CompiledBinding Action}" CommandParameter="{CompiledBinding}" Content="{CompiledBinding ActionName}" />
+                        </StackPanel>
+                    </controls:TeachingTip>
+                </DataTemplate>
+            </ItemsPresenter.ItemTemplate>
+            <ItemsPresenter.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Vertical" Spacing="10" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="10" />
+                </ItemsPanelTemplate>
+            </ItemsPresenter.ItemsPanel>
+        </ItemsPresenter>
+        
         <controls:TeachingTip IsOpened="{CompiledBinding TeachingTips.MultipleActionsTipOpened}" VerticalAlignment="Bottom" Margin="20" Header="Multiple actions in one event">In the WoW Database Editor you can have many actions in a single event. You do not have to copy-paste events.</controls:TeachingTip>
         <controls:TeachingTip IsOpened="{CompiledBinding TeachingTips.YouCanNameStoredTargetsTipOpened}" VerticalAlignment="Bottom" Margin="20" Header="Stored object source/target name">You can name stored object variables to make writing script easier. To add named stored object, use right click on 'Add Event'.</controls:TeachingTip>
         <controls:TeachingTip IsOpened="{CompiledBinding TeachingTips.ControlToCopyOpened}" VerticalAlignment="Bottom" Margin="20" Header="Drag + control key to copy">You can hold control key while dragging event/action/condition to duplicate them.</controls:TeachingTip>
+        <controls:TeachingTip IsOpened="{CompiledBinding TeachingTips.SaveDefaultScaleOpened}" VerticalAlignment="Bottom" Margin="20" Header="Right mouse button to save">You can save the default script scale using the context menu of the slider.</controls:TeachingTip>
+        
+        <Border Background="{DynamicResource ContentBackground}" Opacity="0.8" IsVisible="{CompiledBinding IsLoading}">
+            <TextBlock VerticalAlignment="Center" TextAlignment="Center" HorizontalAlignment="Center" FontSize="16">Loading script...</TextBlock>
+        </Border>
     </Panel>
 </UserControl>

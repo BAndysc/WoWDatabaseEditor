@@ -1,5 +1,6 @@
 using System.Buffers;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using TheAvaloniaOpenGL.Resources;
 using TheEngine.Components;
 using TheEngine.ECS;
@@ -49,7 +50,7 @@ public class AnimationSystem
         this.animationDataStore = animationDataStore;
     }
     
-    private Vector3 GetFirstOrDefaultVector3(int IDX, MutableM2Track<Vector3> track, Vector3 def, float t)
+    private static Vector3 GetFirstOrDefaultVector3(int IDX, MutableM2Track<Vector3> track, Vector3 def, float t)
     {
         if (track.Length <= IDX)
             return def;
@@ -75,7 +76,7 @@ public class AnimationSystem
         return Vector3.Lerp(prev, nextValue, pct);
     }
 
-    private int FirstIndexGreaterThan(in MutableM2Array<uint> array, uint target)
+    private static int FirstIndexGreaterThan(in MutableM2Array<uint> array, uint target)
     {
         if (target >= array[array.Length - 1])
             return array.Length - 1;
@@ -93,7 +94,7 @@ public class AnimationSystem
         return st > array.Length - 1 ? array.Length - 1 : st; // or return end + 1
     }
     
-    private Quaternion GetFirstOrDefaultQuaternion(int IDX, MutableM2Track<M2CompQuat> track, Quaternion def, float t)
+    private static Quaternion GetFirstOrDefaultQuaternion(int IDX, MutableM2Track<M2CompQuat> track, Quaternion def, float t)
     {
         if (track.Length <= IDX)
             return def;
@@ -119,7 +120,7 @@ public class AnimationSystem
         return Quaternion.Slerp(prev.Value, nextValue.Value, pct);
     }
 
-    private Matrix GetBoneMatrixWithoutParent(M2 m2, int boneIndex, float t, int IDX)
+    private static Matrix GetBoneMatrixWithoutParent(M2 m2, int boneIndex, float t, int IDX)
     {
         Matrix boneMatrix;
         ref readonly var boneData = ref m2.bones[boneIndex];
@@ -150,7 +151,7 @@ public class AnimationSystem
         return boneMatrix;
     }
     
-    private Matrix GetBoneMatrix(M2 m2, Matrix[] calculatedBones, int boneIndex, float t, int IDX)
+    private static Matrix GetBoneMatrix(M2 m2, Matrix[] calculatedBones, int boneIndex, float t, int IDX)
     {
         Matrix boneMatrix = GetBoneMatrixWithoutParent(m2, boneIndex, t, IDX);
         ref readonly var boneData = ref m2.bones[boneIndex];
@@ -170,7 +171,7 @@ public class AnimationSystem
     }
     
     // slower, but not additional array required
-    private Matrix GetBoneMatrixRecursive(M2 m2, int boneIndex, float t, int IDX)
+    private static Matrix GetBoneMatrixRecursive(M2 m2, int boneIndex, float t, int IDX)
     {
         Matrix boneMatrix = GetBoneMatrixWithoutParent(m2, boneIndex, t, IDX);
         ref readonly var boneData = ref m2.bones[boneIndex];
@@ -181,6 +182,129 @@ public class AnimationSystem
         return boneMatrix;
     }
     
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static bool AnimationTickTime(float delta, M2AnimationComponentData animationData)
+    {
+        if (animationData._currentAnimation == -1 || animationData._length == 0)
+            return false;
+
+        if ((animationData.Flags & AnimationDataFlags.FallbackPlayBackwards) != 0)
+            animationData._time -= delta;
+        else
+            animationData._time += delta;
+
+        if ((animationData.Flags & AnimationDataFlags.FallbackHoldsLastFrame) != 0)
+        {
+            if (animationData._time > animationData._length)
+                animationData._time = animationData._length;
+            else if (animationData._time < 0)
+                animationData._time = 0;
+        }
+        else
+        {
+            while (animationData._time > animationData._length)
+                animationData._time -= animationData._length;
+            if (animationData._time < 0)
+                animationData._time = animationData._length;
+        }
+
+        return true;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static bool UpdateAnimationData(M2AnimationComponentData animationData)
+    {
+        if (animationData._currentAnimation != animationData.SetNewAnimation)
+        {
+            int? lookup = animationData.Model.GetAnimationIndexByAnimationId(animationData.SetNewAnimation);
+            if (!lookup.HasValue)
+            {
+                animationData._currentAnimation = -1;
+            }
+            else
+            {
+
+                var internalIndex = lookup.Value;
+                do
+                {
+                    bool isAlias = animationData.Model.sequences[internalIndex].flags.HasFlagFast(M2SequenceFlags.IsAlias);
+                    if (!isAlias || animationData.Model.sequences[internalIndex].aliasNext == internalIndex)
+                        break;
+                    internalIndex = animationData.Model.sequences[internalIndex].aliasNext;
+                } while (true);
+                
+                animationData._animInternalIndex = internalIndex;
+                animationData._length = animationData.Model.sequences[internalIndex].duration;
+                animationData._currentAnimation = animationData.SetNewAnimation;
+                animationData._time = 0;
+                
+                animationData.Model.bones.LoadAnimation(animationData._animInternalIndex);
+                return true;
+            }
+        }
+
+        return false;
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static void AnimationCalculateBones(int bonesLength, M2AnimationComponentData animationData, Matrix4x4[] localBones)
+    {
+        for (int j = 0; j < bonesLength; ++j)
+        {
+            var boneMatrix = GetBoneMatrix(animationData.Model, localBones, j, animationData._time,
+                animationData._animInternalIndex);
+            localBones[j] = boneMatrix;
+        }
+
+        if (animationData.AttachmentType.HasValue)
+        {
+            var attachedTo = animationData.AttachedTo;
+            var attachmentType = animationData.AttachmentType.Value;
+            while (attachedTo != null)
+            {
+                int attachedToBone = -1;
+                Vector3 offset = Vector3.Zero;
+                for (var index = 0; index < attachedTo.Model.attachments.Length; index++)
+                {
+                    ref readonly var attachment = ref attachedTo.Model.attachments[index];
+                    if (attachment.id == attachmentType)
+                    {
+                        attachedToBone = attachment.bone;
+                        offset = attachment.position;
+                        break;
+                    }
+                }
+
+                if (attachedToBone != -1)
+                {
+                    var parentMatrix = GetBoneMatrixRecursive(attachedTo.Model, attachedToBone, attachedTo._time,
+                        attachedTo._animInternalIndex);
+                    for (int j = 0; j < bonesLength; ++j)
+                        localBones[j] *= Matrix.CreateTranslation(offset) * parentMatrix;
+                }
+
+                attachmentType = attachedTo.AttachmentType ?? M2AttachmentType.ItemVisual0;
+                attachedTo = attachedTo.AttachedTo;
+            }
+        }
+    }
+
+    public static bool ManualAnimationStep(float delta, M2AnimationComponentData animationData)
+    {
+        UpdateAnimationData(animationData);
+        if (!AnimationTickTime(delta, animationData)) 
+            return false;
+        
+        var bonesLength = animationData.Model.bones.Length;
+        var localBones = ArrayPool<Matrix>.Shared.Rent(bonesLength);
+        
+        AnimationCalculateBones(bonesLength, animationData, localBones);
+        animationData._buffer.UpdateBuffer(localBones.AsSpan(0, bonesLength));
+        ArrayPool<Matrix>.Shared.Return(localBones);
+        
+        return true;
+    }
+
     public void Update(float delta)
     {
         sw.Restart();
@@ -199,110 +323,29 @@ public class AnimationSystem
                 sum++;
                 var animationData = animationAccess[i];
 
-                if (animationData._currentAnimation != animationData.SetNewAnimation)
+                if (UpdateAnimationData(animationData))
                 {
-                    int? lookup = animationData.Model.GetAnimationIndexByAnimationId(animationData.SetNewAnimation);
-                    if (!lookup.HasValue)
-                    {
-                        animationData._currentAnimation = -1;
-                    }
-                    else
-                    {
+                    var bounds = animationData.Model.sequences[animationData._animInternalIndex].bounds;
+                    var bb = new BoundingBox(bounds.extent.min, bounds.extent.max);
+                    
+                    if (meshBoundsAccess.HasValue)
+                        meshBoundsAccess.Value[i].box = bb;
 
-                        var internalIndex = lookup.Value;
-                        do
-                        {
-                            bool isAlias = animationData.Model.sequences[internalIndex].flags.HasFlagFast(M2SequenceFlags.IsAlias);
-                            if (!isAlias || animationData.Model.sequences[internalIndex].aliasNext == internalIndex)
-                                break;
-                            internalIndex = animationData.Model.sequences[internalIndex].aliasNext;
-                        } while (true);
-                        
-                        animationData._animInternalIndex = internalIndex;
-                        animationData._length = animationData.Model.sequences[internalIndex].duration;
-                        animationData._currentAnimation = animationData.SetNewAnimation;
-                        animationData._time = 0;
-                        
-                        animationData.Model.bones.LoadAnimation(animationData._animInternalIndex);
-
-                        var bounds = animationData.Model.sequences[internalIndex].bounds;
-                        var bb = new BoundingBox(bounds.extent.min, bounds.extent.max);
-                        if (meshBoundsAccess.HasValue)
-                        {
-                            meshBoundsAccess.Value[i].box = bb;
-                        }
-                        if (worldMeshBounds.HasValue)
-                        {
-                            worldMeshBounds.Value[i].box = RenderManager.LocalToWorld((MeshBounds)bb, in localToWorldAccess[i]);
-                        }
-                        if (dirtPositionAccess.HasValue)
-                            dirtPositionAccess.Value[i].Enable();
-                    }
+                    if (worldMeshBounds.HasValue)
+                        worldMeshBounds.Value[i].box = RenderManager.LocalToWorld((MeshBounds)bb, in localToWorldAccess[i]);
+                
+                    if (dirtPositionAccess.HasValue)
+                        dirtPositionAccess.Value[i].Enable();
                 }
 
-                if (animationData._currentAnimation == -1)
+                if (!AnimationTickTime(delta, animationData)) 
                     continue;
-
-                if ((animationData.Flags & AnimationDataFlags.FallbackPlayBackwards) != 0)
-                    animationData._time -= delta;
-                else    
-                    animationData._time += delta;
-
-                if ((animationData.Flags & AnimationDataFlags.FallbackHoldsLastFrame) != 0)
-                {
-                    if (animationData._time > animationData._length)
-                        animationData._time = animationData._length;
-                    else if (animationData._time < 0)
-                        animationData._time = 0;
-                }
-                else
-                {
-                    while (animationData._time > animationData._length)
-                        animationData._time -= animationData._length;
-                    if (animationData._time < 0)
-                        animationData._time = animationData._length;
-                }
 
                 var bonesLength = animationData.Model.bones.Length;
                 var localBones = ArrayPool<Matrix>.Shared.Rent(bonesLength);
 
-                for (int j = 0; j < bonesLength; ++j)
-                {
-                    var boneMatrix = GetBoneMatrix(animationData.Model, localBones, j, animationData._time, animationData._animInternalIndex);
-                    localBones[j] = boneMatrix;
-                }
-                
-                if (animationData.AttachmentType.HasValue)
-                {
-                    var attachedTo = animationData.AttachedTo;
-                    var attachmentType = animationData.AttachmentType.Value;
-                    while (attachedTo != null)
-                    {
-                        int attachedToBone = -1;
-                        Vector3 offset = Vector3.Zero;
-                        for (var index = 0; index < attachedTo.Model.attachments.Length; index++)
-                        {
-                            ref readonly var attachment = ref attachedTo.Model.attachments[index];
-                            if (attachment.id == attachmentType)
-                            {
-                                attachedToBone = attachment.bone;
-                                offset = attachment.position;
-                                break;
-                            }
-                        }
+                AnimationCalculateBones(bonesLength, animationData, localBones);
 
-                        if (attachedToBone != -1)
-                        {
-                            var parentMatrix = GetBoneMatrixRecursive(attachedTo.Model, attachedToBone, attachedTo._time, attachedTo._animInternalIndex);
-                            for (int j = 0; j < bonesLength; ++j)
-                                localBones[j] *= Matrix.CreateTranslation(offset) * parentMatrix;
-                        }
-
-                        attachmentType = attachedTo.AttachmentType ?? M2AttachmentType.ItemVisual0;
-                        attachedTo = attachedTo.AttachedTo;
-                    }
-                }
-                
                 updates.Value!.Add((animationData._buffer, bonesLength, localBones));
                 //animationData._buffer.UpdateBuffer(localBones.AsSpan(0, bonesLength));
             }

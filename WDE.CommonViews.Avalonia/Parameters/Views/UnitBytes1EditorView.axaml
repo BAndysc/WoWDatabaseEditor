@@ -26,15 +26,9 @@
                                 SelectedItem="{CompiledBinding AnimTier}" 
                                 controls:Extensions.EnumType="{x:Type viewModels:AnimTiers}" />
             
-            <Grid Grid.Row="10" Grid.ColumnSpan="2">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="80" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="80" />
-                </Grid.ColumnDefinitions>
-                <Button Content="Cancel" Command="{CompiledBinding Cancel}"  />
-                <Button Command="{CompiledBinding Accept}" Grid.Column="2" Content="Accept" />
-            </Grid>
+            <OkCancelButtons Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="2"
+                             AcceptCommand="{CompiledBinding Accept}"
+                             CancelCommand="{CompiledBinding Cancel}" />
         </Grid>
     </Border>
 </UserControl>

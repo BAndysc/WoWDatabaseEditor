@@ -79,8 +79,13 @@ namespace WDE.Conditions.ViewModels
                 if (SelectedCondition != null)
                     index = Conditions.IndexOf(SelectedCondition) + 1;
                 index = Math.Clamp(index, 0, Conditions.Count);
+
+                var item = conditionsFactory.Create(conditionSourceType, 0) ??
+                           conditionsFactory.CreateOr(conditionSourceType);
                 
-                Conditions.Insert(index, conditionsFactory.Create(conditionSourceType, 0) ?? conditionsFactory.CreateOr(conditionSourceType));
+                if (item == null)
+                    throw new Exception();
+                Conditions.Insert(index, item);
             });
             RemoveItemCommand = new DelegateCommand(() =>
             {

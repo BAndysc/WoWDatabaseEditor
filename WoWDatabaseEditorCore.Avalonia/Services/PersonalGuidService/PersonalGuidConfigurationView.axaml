@@ -7,44 +7,47 @@
              x:DataType="personalGuidService:PersonalGuidConfigurationViewModel"
              x:Class="WoWDatabaseEditorCore.Avalonia.Services.PersonalGuidService.PersonalGuidConfigurationView">
     <ScrollViewer HorizontalScrollBarVisibility="Disabled">
-        <StackPanel Spacing="5">
-            <CheckBox IsChecked="{CompiledBinding IsEnabled}" Content="Enable service" />
-            <Grid IsEnabled="{CompiledBinding IsEnabled}"
-                  RowDefinitions="Auto,5,Auto,5,Auto,5,Auto,35,Auto,5,Auto,5,Auto,5,Auto"
-                  ColumnDefinitions="Auto,5,3*,Auto">
-
-                <TextBlock Grid.Row="0">Start creature guid:</TextBlock>
-                <TextBox Grid.ColumnSpan="2" Grid.Column="2" Grid.Row="0" Text="{CompiledBinding StartCreatureGuid, Mode=TwoWay}"></TextBox>
-                
-                <TextBlock Grid.Row="2">Current creature guid:</TextBlock>
-                <TextBox Grid.Column="2" Grid.Row="2" IsEnabled="False"  Text="{CompiledBinding CurrentCreatureGuid, Mode=TwoWay}"></TextBox>
-                <Button Grid.Column="3" Grid.Row="2" Command="{CompiledBinding ResetCreatureCounter}">Reset</Button>
-                
-                <TextBlock Grid.Row="4">Creature guids count:</TextBlock>
-                <TextBox Grid.ColumnSpan="2" Grid.Column="2" Grid.Row="4" Text="{CompiledBinding CreatureGuidCount, Mode=TwoWay}"></TextBox>
-                
-                <TextBlock Grid.Row="6">Last creature guid:</TextBlock>
-                <TextBox Grid.ColumnSpan="2" Grid.Column="2" Grid.Row="6" IsEnabled="False" Text="{CompiledBinding LastCreatureGuid, Mode=TwoWay}"></TextBox>
-               
-                <TextBlock Grid.Row="8">Start gameobject guid:</TextBlock>
-                <TextBox Grid.ColumnSpan="2" Grid.Column="2" Grid.Row="8" Text="{CompiledBinding StartGameObjectGuid, Mode=TwoWay}"></TextBox>
-                
-                <TextBlock Grid.Row="10">Current gameobject guid:</TextBlock>
-                <TextBox Grid.Column="2" Grid.Row="10" IsEnabled="False"  Text="{CompiledBinding CurrentGameObjectGuid, Mode=TwoWay}"></TextBox>
-                <Button Grid.Column="3" Grid.Row="10" Command="{CompiledBinding ResetGameObjectCounter}">Reset</Button>
-
-                <TextBlock Grid.Row="12">Creature guids count:</TextBlock>
-                <TextBox Grid.ColumnSpan="2" Grid.Column="2" Grid.Row="12" Text="{CompiledBinding GameObjectGuidCount, Mode=TwoWay}"></TextBox>
-
-                <TextBlock Grid.Row="14">Last gameobject guid:</TextBlock>
-                <TextBox Grid.ColumnSpan="2" Grid.Column="2" Grid.Row="14" IsEnabled="False" Text="{CompiledBinding LastGameObjectGuid, Mode=TwoWay}"></TextBox>
-                <Grid.Styles>
-                    <Style Selector="TextBlock">
-                        <Setter Property="VerticalAlignment" Value="Center" />
-                    </Style>
-                </Grid.Styles>
-            </Grid>
-
+        <StackPanel>
+            <SettingItem Header="Enable service">
+                <ToggleSwitch IsChecked="{CompiledBinding IsEnabled}" />
+            </SettingItem>
+            <SettingsHeader Text="Creatures" />
+            <StackPanel IsEnabled="{CompiledBinding IsEnabled}">
+                <SettingItem Header="Start creature guid">
+                    <TextBox Text="{CompiledBinding StartCreatureGuid, Mode=TwoWay}"></TextBox>
+                </SettingItem>
+                <SettingItem Header="Current creature guid">
+                    <DockPanel>
+                        <Button DockPanel.Dock="Right" Command="{CompiledBinding ResetCreatureCounter}">Reset</Button>
+                        <TextBlock VerticalAlignment="Center" FontWeight="Bold" Text="{CompiledBinding CurrentCreatureGuid, Mode=TwoWay}"></TextBlock>
+                    </DockPanel>
+                </SettingItem>
+                <SettingItem Header="Creature guids count">
+                    <TextBox Text="{CompiledBinding CreatureGuidCount, Mode=TwoWay}"></TextBox>
+                </SettingItem>
+                <SettingItem Header="Last creature guid">
+                    <TextBlock FontWeight="Bold" Text="{CompiledBinding LastCreatureGuid, Mode=TwoWay}"></TextBlock>
+                </SettingItem>
+            </StackPanel>
+            
+            <SettingsHeader Text="Gameobjects" />
+            <StackPanel IsEnabled="{CompiledBinding IsEnabled}">
+                <SettingItem Header="Start gameobject guid">
+                    <TextBox Text="{CompiledBinding StartGameObjectGuid, Mode=TwoWay}"></TextBox>
+                </SettingItem>
+                <SettingItem Header="Current gameobject guid">
+                    <DockPanel>
+                        <Button DockPanel.Dock="Right" Command="{CompiledBinding ResetGameObjectCounter}">Reset</Button>
+                        <TextBlock VerticalAlignment="Center" FontWeight="Bold" Text="{CompiledBinding CurrentGameObjectGuid, Mode=TwoWay}"></TextBlock>
+                    </DockPanel>
+                </SettingItem>
+                <SettingItem Header="gameobject guids count">
+                    <TextBox Text="{CompiledBinding GameObjectGuidCount, Mode=TwoWay}"></TextBox>
+                </SettingItem>
+                <SettingItem Header="Last gameobject guid">
+                    <TextBlock FontWeight="Bold" Text="{CompiledBinding LastGameObjectGuid, Mode=TwoWay}"></TextBlock>
+                </SettingItem>
+            </StackPanel>
         </StackPanel>
     </ScrollViewer>
 </UserControl>

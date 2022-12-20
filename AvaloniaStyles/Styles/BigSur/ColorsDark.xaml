@@ -49,7 +49,7 @@
         <!-- title bar -->
         <SolidColorBrush x:Key="TitleBarSeparatorBrush" Color="Black" />
         <SolidColorBrush x:Key="TitleBarHighlight" Color="#4B4B4B" /> <!-- glow simulation on the top of titlebar -->
-        <SolidColorBrush x:Key="TitleBarBackground" Color="#363636" />
+        <SolidColorBrush x:Key="TitleBarBackgroundTitleBarBackground" Color="#363636" />
         
         <!-- textbox -->
         <SolidColorBrush x:Key="TextBoxForeground" Color="White" />

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;
+using WDE.Common.Types;
 using WDE.Module.Attributes;
 
 namespace WDE.CMaNGOS;
@@ -12,6 +13,7 @@ public class CMangosTbcVersion : ICoreVersion, IDatabaseFeatures, ISmartScriptFe
 {
     public string Tag => "CMaNGOS-TBC";
     public string FriendlyName => "CMaNGOS The Burning Crusade";
+    public ImageUri Icon { get; } = new ImageUri("Icons/core_cmangos.png");
     public ISmartScriptFeatures SmartScriptFeatures => this;
     public IConditionFeatures ConditionFeatures => this;
     public IGameVersionFeatures GameVersionFeatures => this;
@@ -20,6 +22,7 @@ public class CMangosTbcVersion : ICoreVersion, IDatabaseFeatures, ISmartScriptFe
     public bool SupportsRbac => false;
     public bool SupportsConditionTargetVictim => false;
     public PhasingType PhasingType => PhasingType.NoPhasing;
+    public int Build => 8606;
 
     public ISet<Type> UnsupportedTables { get; } = new HashSet<Type>{typeof(IAreaTriggerTemplate),
         typeof(IConversationTemplate),

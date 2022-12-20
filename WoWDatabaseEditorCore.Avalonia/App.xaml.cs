@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
 using System.Threading.Tasks;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
@@ -28,6 +29,7 @@ using WDE.Module;
 using WDE.Module.Attributes;
 using WoWDatabaseEditorCore.Avalonia.Managers;
 using WoWDatabaseEditorCore.Avalonia.Services.AppearanceService;
+using WoWDatabaseEditorCore.Avalonia.Services.AppearanceService.Providers;
 using WoWDatabaseEditorCore.Avalonia.Views;
 using WoWDatabaseEditorCore.CoreVersion;
 using WoWDatabaseEditorCore.Services.FileSystemService;
@@ -41,7 +43,6 @@ namespace WoWDatabaseEditorCore.Avalonia
     public class App : PrismApplication
     {
         private IModulesManager? modulesManager;
-        private SplashScreenView? splash;
 
         public App()
         {
@@ -248,7 +249,6 @@ namespace WoWDatabaseEditorCore.Avalonia
 
             Container.Resolve<IDebugConsole>();
             
-            var themeManager = Container.Resolve<IThemeManager>();
             ViewBind.AppViewLocator = Container.Resolve<IViewLocator>();
 
             IMessageBoxService messageBoxService = Container.Resolve<IMessageBoxService>();
@@ -257,29 +257,48 @@ namespace WoWDatabaseEditorCore.Avalonia
 
         public static Window? MainApp;
 
+        private Window? splashScreenWindow;
+
+        private IGlobalServiceRoot? globalServiceRoot;
+
+        public override void OnFrameworkInitializationCompleted()
+        {
+            splashScreenWindow = new SplashScreenWindow();
+            splashScreenWindow.Show();
+
+            DispatcherTimer.RunOnce(() =>
+            {
+                base.Initialize();
+                if (AvaloniaThemeStyle.UseDock)
+                {
+                    ((IContainerRegistry)Container).RegisterSingleton<MainWindowWithDocking>();
+                    MainApp = Container.Resolve<MainWindowWithDocking>();
+                }
+                else
+                {
+                    ((IContainerRegistry)Container).RegisterSingleton<MainWindow>();
+                    MainApp = Container.Resolve<MainWindow>();
+                }
+
+                MainApp.DataContext = Container.Resolve<MainWindowViewModel>();
+                this.InitializeShell(MainApp);
+
+                globalServiceRoot = Container.Resolve<IGlobalServiceRoot>();
+
+                IEventAggregator? eventAggregator = Container.Resolve<IEventAggregator>();
+                eventAggregator.GetEvent<AllModulesLoaded>().Publish();
+                Container.Resolve<ILoadingEventAggregator>().Publish<EditorLoaded>();
+                MainApp.ShowActivated = true;
+                MainApp.Show();
+                splashScreenWindow.Close();
+            }, TimeSpan.FromMilliseconds(160));
+        }
+
         public override void Initialize()
         {
-            base.Initialize();
+            // we have to initialize theme manager as soon as possible in order to correctly apply the style
+            var themeManager = new ThemeManager(new ThemeSettingsProvider(new UserSettings(new FileSystem(new VirtualFileSystem()), new Lazy<IStatusBar>(new DummyStatusBar()))));
             AvaloniaXamlLoader.Load(this);
-            
-            
-            if (AvaloniaThemeStyle.UseDock)
-            {
-                ((IContainerRegistry)Container).RegisterSingleton<MainWindowWithDocking>();
-                MainApp = Container.Resolve<MainWindowWithDocking>();
-            }
-            else
-            {
-                ((IContainerRegistry)Container).RegisterSingleton<MainWindow>();
-                MainApp = Container.Resolve<MainWindow>();
-            }
-            MainApp.DataContext = Container.Resolve<MainWindowViewModel>();
-            this.InitializeShell(MainApp);
-
-            
-            IEventAggregator? eventAggregator = Container.Resolve<IEventAggregator>();
-            eventAggregator.GetEvent<AllModulesLoaded>().Publish();
-            Container.Resolve<ILoadingEventAggregator>().Publish<EditorLoaded>();
         }
 
         private class Conflict
@@ -296,6 +315,11 @@ namespace WoWDatabaseEditorCore.Avalonia
     }
     public class MainThread : IMainThread
     {
+        public MainThread()
+        {
+            Profiler.SetupMainThread(this);
+        }
+        
         public void Delay(Action action, TimeSpan delay)
         {
             DispatcherTimer.RunOnce(action, delay);

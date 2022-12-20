@@ -200,9 +200,9 @@ namespace WDE.DatabaseEditors.Loaders
                             int? sourceGroup = null, sourceEntry = null, sourceId = null;
 
                             if (definition.Condition.SourceGroupColumn != null &&
-                                row.TryGetValue(definition.Condition.SourceGroupColumn, out var groupData) &&
+                                row.TryGetValue(definition.Condition.SourceGroupColumn.Name, out var groupData) &&
                                 int.TryParse(groupData.Item2.ToString(), out var groupInt))
-                                sourceGroup = groupInt;
+                                sourceGroup = definition.Condition.SourceGroupColumn.Calculate(groupInt);
 
                             if (definition.Condition.SourceEntryColumn != null &&
                                 row.TryGetValue(definition.Condition.SourceEntryColumn, out var entryData) &&
@@ -265,10 +265,10 @@ namespace WDE.DatabaseEditors.Loaders
                         Debug.Assert(key.Count == 1, "todo?");
                         int? sourceGroup = null, sourceEntry = null, sourceId = null;
                         if (definition.Condition.SourceGroupColumn != null &&
-                            definition.TablePrimaryKeyColumnName == definition.Condition.SourceGroupColumn)
+                            definition.TablePrimaryKeyColumnName == definition.Condition.SourceGroupColumn.Name)
                         {
                             keyMask = IDatabaseProvider.ConditionKeyMask.SourceGroup;
-                            sourceGroup = (int)key[0];
+                            sourceGroup = definition.Condition.SourceGroupColumn.Calculate((int)key[0]);
                         }
 
                         if (definition.Condition.SourceEntryColumn != null &&
@@ -303,7 +303,7 @@ namespace WDE.DatabaseEditors.Loaders
                                     if (column.IsConditionColumn)
                                         continue;
                                     if (definition.Condition.SourceGroupColumn != null &&
-                                        column.DbColumnName == definition.Condition.SourceGroupColumn)
+                                        column.DbColumnName == definition.Condition.SourceGroupColumn.Name)
                                         row.Add(column.DbColumnName, (typeof(int), distinct.SourceGroup));
 
                                     if (definition.Condition.SourceEntryColumn != null &&
@@ -335,9 +335,9 @@ namespace WDE.DatabaseEditors.Loaders
                                 int? sourceGroup = null, sourceEntry = null, sourceId = null;
 
                                 if (definition.Condition.SourceGroupColumn != null &&
-                                    row.TryGetValue(definition.Condition.SourceGroupColumn, out var groupData) &&
+                                    row.TryGetValue(definition.Condition.SourceGroupColumn.Name, out var groupData) &&
                                     int.TryParse(groupData.Item2.ToString(), out var groupInt))
-                                    sourceGroup = groupInt;
+                                    sourceGroup = definition.Condition.SourceGroupColumn.Calculate(groupInt);
 
                                 if (definition.Condition.SourceEntryColumn != null &&
                                     row.TryGetValue(definition.Condition.SourceEntryColumn, out var entryData) &&

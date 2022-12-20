@@ -15,8 +15,14 @@
         Scene = 10,
         AreaTriggerEntity = 11,
         AreaTriggerEntityServerSide = 12,
-        Aura = 13, // do not exists on TC
-        Cinematic = 14, // do not exists on TC
+        // do not exists in TC
+        Aura = 13,
+        Cinematic = 14,
+        PlayerChoice = 15,
+        Template,
+        StaticSpell,
+        BattlePet,
+        Conversation,
         END,
         
         ActionList,  // can be any id, do not delete

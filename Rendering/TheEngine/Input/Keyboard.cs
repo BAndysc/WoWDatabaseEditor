@@ -60,6 +60,14 @@ namespace TheEngine.Input
             return false;
         }
         
+        public bool JustReleased(Key key)
+        {
+            for (int i = 0; i < justReleasedKeysIndex; ++i)
+                if (justReleasedKeys[i] == key)
+                    return true;
+            return false;
+        }
+        
         public Vector3 GetAxis(Vector3 axis, Key positive, Key negative)
         {
             return axis * (IsDown(positive) ? 1 : 0) + axis * (IsDown(negative) ? -1 : 0);

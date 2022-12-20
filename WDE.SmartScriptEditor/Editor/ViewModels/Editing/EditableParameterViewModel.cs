@@ -22,7 +22,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
         private readonly IParameterPickerService parameterPickerService;
         private readonly object? context;
 
-        public EditableParameterViewModel(ParameterValueHolder<T> parameter, 
+        public EditableParameterViewModel(MultiParameterValueHolder<T> parameter, 
             string group, 
             IItemFromListProvider itemFromListProvider,
             ICurrentCoreVersion currentCoreVersion,
@@ -50,10 +50,13 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
             Watch(parameter, p => p.Parameter, nameof(SpecialCommand));
             Watch(parameter, p => p.Name, nameof(Name));
             Watch(parameter, p => p.Value, nameof(OptionValue));
+            Watch(parameter, p => p.HoldsMultipleValues, nameof(HoldsMultipleValues));
         }
 
-        public ParameterValueHolder<T> Parameter { get; set; }
+        public MultiParameterValueHolder<T> Parameter { get; set; }
 
+        public bool HoldsMultipleValues => Parameter.HoldsMultipleValues;
+        
         public string Group { get; }
         
         public bool SpecialCopying { get; }
@@ -66,7 +69,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
         {
             get
             {
-                if (Parameter is not ParameterValueHolder<long> p)
+                if (Parameter is not MultiParameterValueHolder<long> p)
                     return null;
                 return HasItems
                     ? p.Items!.Select(pair => (object)new ParameterOption(pair.Key, pair.Value.Name)).ToList()
@@ -78,15 +81,19 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
 
         public Func<Task<object?>>? SpecialCommand => currentCoreVersion.Current.SupportsSpecialCommands ? Parameter.Parameter.SpecialCommand : null;
         
-        public bool IsHidden => Parameter.ForceHidden || !Parameter.IsUsed && (Parameter is not ParameterValueHolder<long> p || p.Value == 0);
+        private bool IsValueNonEmpty => Parameter is MultiParameterValueHolder<long> p && p.Value != 0 ||
+                                        Parameter is MultiParameterValueHolder<float> f && f.Value != 0 ||
+                                        Parameter is MultiParameterValueHolder<string> s && !string.IsNullOrEmpty(s.Value);
+        
+        public bool IsHidden => Parameter.ForceHidden || !(Parameter.IsUsed || IsValueNonEmpty);
 
-        public bool UseModernPicker => HasItems && Parameter.Parameter.Items != null && Parameter is ParameterValueHolder<long> && Parameter.Parameter.Items!.Count < 1000;
+        public bool UseModernPicker => HasItems && Parameter.Parameter.Items != null && Parameter is MultiParameterValueHolder<long> && Parameter.Parameter.Items!.Count < 1000;
 
         public ParameterOption? OptionValue
         {
             get
             {
-                if (Parameter is ParameterValueHolder<long> p)
+                if (Parameter is MultiParameterValueHolder<long> p)
                 {
                     if (p.Items != null && p.Items.TryGetValue(p.Value, out var option))
                         return new ParameterOption(p.Value, option.Name);
@@ -108,13 +115,13 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
         {
             get
             {
-                if (Parameter is ParameterValueHolder<long> p)
+                if (Parameter is MultiParameterValueHolder<long> p)
                     return p.Value == 1;
                 return false;
             }
             set
             {
-                if (Parameter is ParameterValueHolder<long> p)
+                if (Parameter is MultiParameterValueHolder<long> p)
                     p.Value = value ? 1 : 0;
                 RaisePropertyChanged();
             }
@@ -122,7 +129,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
         
         private async Task SelectItem()
         {
-            if (Parameter is ParameterValueHolder<long> p)
+            if (Parameter is MultiParameterValueHolder<long> p)
             {
                 (long? val, bool ok) = await parameterPickerService.PickParameter(p.Parameter, p.Value, context);
                 if (ok)
@@ -132,7 +139,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
                         p.ForceRefresh();
                 }
             }
-            else if (Parameter is ParameterValueHolder<string> s)
+            else if (Parameter is MultiParameterValueHolder<string> s)
             {
                 (string? val, bool ok) = await parameterPickerService.PickParameter(s.Parameter, s.Value, context);
                 if (ok)

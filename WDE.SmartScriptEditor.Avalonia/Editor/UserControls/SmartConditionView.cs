@@ -43,7 +43,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
             EditConditionCommand?.Execute(DataContext);
         }
 
-        protected override void OnDirectEdit(object context)
+        protected override void OnDirectEdit(bool controlPressed, object context)
         {
             DirectEditParameter?.Execute(context);
         }

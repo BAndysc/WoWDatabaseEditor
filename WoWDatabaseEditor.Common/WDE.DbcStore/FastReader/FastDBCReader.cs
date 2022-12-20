@@ -63,12 +63,26 @@ namespace WDE.DbcStore.FastReader
             {
                 this.offset = offset;
             }
+
+            public uint Key => throw new Exception("DBC does not have a key");
             
             public int GetInt(int field) => BitConverter.ToInt32(parent.bytes, offset + field * 4);
+            
+            public int GetInt(int field, int arrayIndex) => throw new Exception("DBC doesn't have arrays");
 
             public uint GetUInt(int field) => BitConverter.ToUInt32(parent.bytes, offset + field * 4);
+            
+            public uint GetUInt(int field, int index) => throw new Exception("DBC doesn't have arrays");
+            
+            public ushort GetUShort(int field, int index) => throw new Exception("DBC doesn't have arrays");
+
+            public ushort GetUShort(int field) => (ushort)GetUInt(field);
+
+            public string GetString(int field, int arrayIndex) => throw new Exception("DBC doesn't have arrays");
 
             public float GetFloat(int field) => BitConverter.ToSingle(parent.bytes, offset + field * 4);
+            
+            public float GetFloat(int field, int arrayIndex) => throw new Exception("DBC doesn't have arrays");
 
             public string GetString(int field)
             {

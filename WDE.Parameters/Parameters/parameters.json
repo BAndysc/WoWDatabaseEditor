@@ -1310,7 +1310,11 @@
 			},
 			"2": {
 				"name": "WOTLK"
-			}
+			},
+			"3": "CATA",
+			"4": "MOP",
+			"5": "WOD",
+			"6": "Legion"
 		}
 	},
 	"LootModeParameter": {
@@ -2852,6 +2856,14 @@
 			"3": "Boss emote",
 			"4": "Whisper",
 			"5": "Boss whisper"
+		}
+	},
+	"GameobjectLootStateParameter": {
+		"values": {
+			"0": {"name": "GO_NOT_READY"},
+			"1": {"name": "GO_READY"},
+			"2": {"name": "GO_ACTIVATED"},
+			"3": {"name": "GO_JUST_DEACTIVATED"}
 		}
 	}
 }

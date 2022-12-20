@@ -1,0 +1,66 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:profiles="clr-namespace:WoWDatabaseEditorCore.Services.Profiles;assembly=WoWDatabaseEditorCore"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="profiles:ProfileCreateViewModel"
+             x:Class="WoWDatabaseEditorCore.Avalonia.Services.Profiles.ProfileCreateView">
+    <UserControl.Resources>
+        <HueToBrushConverter Lightness="0.5" Saturation="1" x:Key="HueToBrush" />
+    </UserControl.Resources>
+    <DockPanel>
+        <Border Padding="15" Background="{DynamicResource ContentBackground}" DockPanel.Dock="Top" BorderThickness="0,0,0,2" BorderBrush="{DynamicResource AccentColorMedium}">
+            <DockPanel VerticalAlignment="Bottom" LastChildFill="False">
+                <TextBlock DockPanel.Dock="Top" FontSize="20" TextWrapping="WrapWithOverflow" Margin="0,10" 
+                           IsVisible="{CompiledBinding NoCreate}">Edit profile</TextBlock>
+                <TextBlock DockPanel.Dock="Top" FontSize="20" TextWrapping="WrapWithOverflow" Margin="0,10" 
+                           IsVisible="{CompiledBinding NoCreate, Converter={x:Static BoolConverters.Not}}">Create profile</TextBlock>
+                <TextBlock DockPanel.Dock="Top" TextWrapping="WrapWithOverflow" Margin="0,10">Using profiles, you can have multiple simultaneous configurations.</TextBlock>
+            </DockPanel>
+        </Border>
+        
+        <Border DockPanel.Dock="Top" Height="15" />
+        
+        
+        <OkCancelButtons DockPanel.Dock="Bottom" Margin="0,5"
+                         AcceptCommand="{CompiledBinding Accept}"
+                         AcceptText="Save profile"
+                         CancelCommand="{CompiledBinding Cancel}" />
+        
+        <Grid ColumnDefinitions="Auto,10,*" RowDefinitions="Auto,10,Auto,10,Auto,Auto,10,Auto">
+            <TextBlock VerticalAlignment="Center" Grid.Row="0" Grid.Column="0">Profile name:</TextBlock>
+            <TextBox Text="{CompiledBinding ProfileName}" Grid.Row="0" Grid.Column="2"/>
+            
+            <TextBlock IsVisible="{CompiledBinding NoCreate, Converter={x:Static BoolConverters.Not}}" VerticalAlignment="Center" Grid.Row="2" Grid.Column="0">Core version:</TextBlock>
+            <ComboBox Items="{CompiledBinding CoreVersions}" 
+                      IsVisible="{CompiledBinding NoCreate, Converter={x:Static BoolConverters.Not}}"
+                      HorizontalAlignment="Stretch"
+                      SelectedItem="{CompiledBinding SelectedCoreVersion}" Grid.Row="2" Grid.Column="2">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <DockPanel>
+                            <WdeImage DockPanel.Dock="Left" Image="{CompiledBinding Icon}" Width="24" Height="24" />
+                            <TextBlock VerticalAlignment="Center" Margin="10,0,0,0" Text="{CompiledBinding FriendlyName}" />
+                        </DockPanel>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            
+            <TextBlock VerticalAlignment="Center" Grid.Row="4" Grid.Column="0"
+                       IsVisible="{CompiledBinding NoCreate, Converter={x:Static BoolConverters.Not}}"
+                       >Accent color:</TextBlock>
+            <DockPanel Grid.Row="4" Grid.Column="2" 
+                       IsVisible="{CompiledBinding NoCreate, Converter={x:Static BoolConverters.Not}}"
+                       >
+                <Border Margin="15,0,0,0" DockPanel.Dock="Right" Width="32" Height="32" BorderThickness="2" BorderBrush="{DynamicResource TextControlBorderBrush}" Background="{CompiledBinding RebasedHue, Converter={StaticResource HueToBrush}}" CornerRadius="{DynamicResource ControlCornerRadius}" />
+                <Slider Value="{CompiledBinding Hue}" Minimum="0" Maximum="1" />
+            </DockPanel>
+            <TextBlock IsVisible="{CompiledBinding NoCreate, Converter={x:Static BoolConverters.Not}}"
+                       Opacity="0.5" Grid.Row="5" Grid.Column="2">(different accent colors can help you distinguish the editor windows)</TextBlock>
+            
+            <TextBlock VerticalAlignment="Center" Grid.Row="7" Grid.Column="0">Make default:</TextBlock>
+            <CheckBox Grid.Row="7" Grid.Column="2" IsChecked="{CompiledBinding MakeDefault}" />
+        </Grid>
+    </DockPanel>
+</UserControl>

@@ -1,0 +1,33 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:outlinerTool="clr-namespace:WoWDatabaseEditorCore.Services.OutlinerTool;assembly=WoWDatabaseEditorCore"
+             xmlns:outlinerViews="clr-namespace:WoWDatabaseEditorCore.Avalonia.Services.OutlinerTool"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="outlinerTool:OutlinerToolViewModel"
+             x:Class="WoWDatabaseEditorCore.Avalonia.Services.OutlinerTool.OutlinerToolView">
+    <ScrollViewer>
+        <outlinerViews:OutlinerFastTreeView 
+            IsFiltered="True"
+            Name="TreeView"
+            DoubleTapped="InputElement_OnDoubleTapped"
+            Items2="{CompiledBinding FlatItems}"
+        >
+            <outlinerViews:OutlinerFastTreeView.ContextMenu>
+                <ContextMenu Items="{CompiledBinding Sources}">
+                    <ContextMenu.Styles>
+                        <Style Selector="MenuItem">
+                            <Setter Property="Header" Value="{Binding Name}" />
+                            <Setter Property="Icon">
+                                <Template>
+                                    <CheckBox IsChecked="{Binding Include}" />
+                                </Template>
+                            </Setter>
+                        </Style>
+                    </ContextMenu.Styles>
+                </ContextMenu>
+            </outlinerViews:OutlinerFastTreeView.ContextMenu>
+        </outlinerViews:OutlinerFastTreeView>
+    </ScrollViewer>
+</UserControl>
