@@ -20,7 +20,8 @@ namespace WDE.TrinitySmartScriptEditor
         public override void RegisterTypes(IContainerRegistry containerRegistry)
         {
             base.RegisterTypes(containerRegistry);
-            AutoRegisterByConvention(typeof(SmartFactory).Assembly, moduleScope);
+            AutoRegisterByConvention(typeof(SmartFactory).Assembly, containerRegistry);
+            AutoRegisterByConvention(typeof(SmartScriptModule).Assembly, containerRegistry);
             
             var t = new ToolSmartEditorViewModel();
             containerRegistry.RegisterInstance(typeof(ITool), t);
