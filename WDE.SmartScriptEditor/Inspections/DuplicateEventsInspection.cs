@@ -23,7 +23,9 @@ namespace WDE.SmartScriptEditor.Inspections
                 if (current.Chance.Value == 100 && 
                     current.Conditions.Count == 0 && 
                     previous.Conditions.Count == 0 && 
-                    previous.Equals(current))
+                    previous.Equals(current) &&
+                    (previous.Actions.Count == 0 ||
+                     previous.Actions[^1].Source.Id <= SmartConstants.SourceSelf)) // if source != none or self, then it's not a duplicate
                 {
                     yield return new InspectionResult()
                     {

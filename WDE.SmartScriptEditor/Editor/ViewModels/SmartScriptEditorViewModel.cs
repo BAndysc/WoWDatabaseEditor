@@ -109,7 +109,10 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         }
         
         public IList<SmartExtensionCommand> ExtensionCommands { get; }
-        
+
+        [Notify] private HighlightViewModel selectedHighlighter; 
+        public IReadOnlyList<HighlightViewModel> Highlighters => highlighter.Highlighters;
+
         public SmartScriptEditorViewModel(ISmartScriptSolutionItem item,
             IHistoryManager history,
             ISmartScriptDatabaseProvider smartScriptDatabase,
@@ -140,7 +143,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             ISmartEditorExtension editorExtension,
             IGeneralSmartScriptSettingsProvider preferences,
             IOutlinerService outlinerService,
-            ISmartScriptOutlinerModel outlinerData)
+            ISmartScriptOutlinerModel outlinerData,
+            ISmartHighlighter highlighter)
         {
             History = history;
             this.smartScriptDatabase = smartScriptDatabase;
@@ -169,12 +173,24 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             this.conditionDataManager = conditionDataManager;
             this.outlinerService = outlinerService;
             this.outlinerData = outlinerData;
+            this.highlighter = highlighter;
+            selectedHighlighter = highlighter.Highlighters[0];
             script = null!;
             this.item = null!;
             TeachingTips = null!;
             title = "";
             Icon = iconRegistry.GetIcon(item);
             scale = preferences.DefaultScale;
+            
+            On(() => SelectedHighlighter, v =>
+            {
+                if (script == null)
+                    return;
+                foreach (var e in Events)
+                {
+                    RecolorEvent(e);
+                }
+            });
 
             ExtensionCommands = editorExtension?.Commands?.ToList() ?? new List<SmartExtensionCommand>();
             
@@ -524,27 +540,63 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                         }
                     }
                 }
-                if (AnyEventSelected)
+                else if (AnyGroupSelected)
+                {
+                    using (script.BulkEdit("Delete groups"))
+                    {
+                        bool inGroup = false;
+                        List<SmartEvent> innerEvents = new();
+                        for (int i = 0; i < Events.Count;)
+                        {
+                            var e = Events[i];
+                            if (e.IsBeginGroup && e.IsSelected)
+                            {
+                                inGroup = true;
+                                Events.RemoveAt(i);
+                            }
+                            else if (e.IsEndGroup && inGroup)
+                            {
+                                inGroup = false;
+                                Events.RemoveAt(i);
+                            }
+                            else if (e.IsBeginGroup && !e.IsSelected && inGroup)
+                            {
+                                inGroup = false;
+                                i++;
+                            }
+                            else if (inGroup)
+                            {
+                                innerEvents.Add(e);
+                                i++;
+                            }
+                            else
+                                i++;
+                        }
+
+                        DeselectAll.Execute();
+                        innerEvents.ForEach(e => e.IsSelected = true);
+                    }
+                }
+                else if (AnyEventSelected)
                 {
                     using (script.BulkEdit("Delete events"))
                     {
-                        int? nextSelect = FirstSelectedIndex;
+                        int? nextSelect = GetNextVisibleEvent(FirstSelectedEventIndex, 1);
                         if (MultipleEventsSelected)
                             nextSelect = null;
-
+                        SmartEvent? eventToSelect = null;
+                        if (nextSelect.HasValue && nextSelect != -1)
+                            eventToSelect = Events[nextSelect.Value];
+                        
                         for (int i = Events.Count - 1; i >= 0; --i)
                         {
                             if (Events[i].IsSelected)
                                 Events.RemoveAt(i);
                         }
 
-                        if (nextSelect.HasValue)
-                        {
-                            if (nextSelect.Value < Events.Count)
-                                Events[nextSelect.Value].IsSelected = true;
-                            else if (nextSelect.Value - 1 >= 0 && nextSelect.Value - 1 < Events.Count)
-                                Events[nextSelect.Value - 1].IsSelected = true;
-                        }
+                        DeselectAll.Execute();
+                        if (eventToSelect != null)
+                            eventToSelect.IsSelected = true;
                     }
                 }
                 else if (AnyActionSelected)
@@ -998,7 +1050,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 }
                 else if (AnyGroupSelected)
                 {
-                    SmartGroup? nextGroup = diff < 0 ? GetNextGroup(FirstSelectedIndex, -1) : GetNextGroup(LastSelectedIndex, 1);
+                    SmartGroup? nextGroup = diff < 0 ? GetNextGroup(FirstSelectedGroupIndex, -1) : GetNextGroup(LastSelectedGroupIndex, 1);
                     if (nextGroup != null)
                     {
                         DeselectAll.Execute();
@@ -1007,14 +1059,14 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 }
                 else if (AnyEventSelected)
                 {
-                    int selectedEventIndex = diff < 0 ? GetNextVisibleEvent(FirstSelectedIndex, -1) : GetNextVisibleEvent(LastSelectedIndex, 1);
+                    int selectedEventIndex = diff < 0 ? GetNextVisibleEvent(FirstSelectedEventIndex, -1) : GetNextVisibleEvent(LastSelectedEventIndex, 1);
                     if (addToSelection)
                     {
                         Events[selectedEventIndex].IsSelected = true;
                     }
                     else
                     {
-                        if (FirstSelectedIndex + diff == -1 && script.GlobalVariables.Count > 0)
+                        if (FirstSelectedEventIndex + diff == -1 && script.GlobalVariables.Count > 0)
                         {
                             DeselectAll.Execute();
                             script.GlobalVariables[^1].IsSelected = true;
@@ -1087,7 +1139,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 }
                 else if (!AnyGroupSelected && AnyEventSelected)
                 {
-                    var eventIndex = FirstSelectedIndex;
+                    var eventIndex = FirstSelectedEventIndex;
                     if (script.TryGetEventGroup(Events[eventIndex], out var group, out _))
                     {
                         DeselectAll.Execute();
@@ -1103,14 +1155,14 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     SelectionUpDown(false, -1);
                 else if (AnyGroupSelected)
                 {
-                    var eventIndex = FirstSelectedIndex;
+                    var eventIndex = FirstSelectedEventIndex;
                     DeselectAll.Execute();
-                    if (script.TryGetEvent(eventIndex + 1, out var e))
+                    if (script.TryGetEvent(eventIndex, out var e))
                         e.IsSelected = true;
                 }
                 else if (AnyEventSelected)
                 {
-                    int eventIndex = FirstSelectedIndex;
+                    int eventIndex = FirstSelectedEventIndex;
                     if (Events[eventIndex].Actions.Count > 0)
                     {
                         DeselectAll.Execute();
@@ -1143,7 +1195,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 var index = below ? LastSelectedActionIndex : FirstSelectedActionIndex;
                 if (index.actionIndex == -1 || index.eventIndex == -1)
                 {
-                    index = (below ? LastSelectedIndex : FirstSelectedIndex, 0);
+                    index = (below ? LastSelectedEventIndex : FirstSelectedEventIndex, 0);
                     if (index.eventIndex == -1)
                         return;
                 }
@@ -1156,7 +1208,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             
             async Task NewEvent(bool below)
             {
-                var index = below ? LastSelectedIndex : FirstSelectedIndex;
+                var index = below ? LastSelectedEventIndex : FirstSelectedEventIndex;
                 if (index == -1)
                     index = Events.Count - 1;
 
@@ -1168,7 +1220,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
             async Task NewGroup(bool below)
             {
-                var index = below ? LastSelectedIndex : FirstSelectedIndex;
+                var index = below ? LastSelectedEventIndex : FirstSelectedEventIndex;
                 if (index == -1)
                     index = Events.Count - 1;
 
@@ -1179,11 +1231,59 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 if (await windowManager.ShowDialog(new SmartGroupEditViewModel(fakeGroup)))
                 {
                     using var _ = script.BulkEdit("Insert group");
-                    var group = script.InsertGroupBegin(index, fakeGroup.Header, fakeGroup.Description);
+                    var group = script.InsertGroupBegin(ref index, fakeGroup.Header, fakeGroup.Description);
                     script.InsertGroupEnd(index + 1);
                 }
             }
 
+            long GetNextLinkId()
+            {
+                long max = 1;
+                foreach (SmartEvent e in Events)
+                {
+                    if (e.Id == SmartConstants.EventLink)
+                        max = Math.Max(max, e.GetParameter(0).Value + 1);
+                    foreach (SmartAction a in e.Actions)
+                    {
+                        if (a.Id == SmartConstants.ActionLink)
+                        {
+                            max = Math.Max(max, a.GetParameter(0).Value + 1);
+                        }
+                    }
+                }
+                return max;
+            }
+
+            AddLinkCommand = new DelegateCommand(() =>
+            {
+                using (script.BulkEdit("Insert a link"))
+                {
+                    int eventIndex;
+                    int actionIndex;
+                    if (AnyEventSelected)
+                    {
+                        eventIndex = FirstSelectedEventIndex;
+                        actionIndex = Events[eventIndex].Actions.Count - 1;
+                    }
+                    else if (AnyActionSelected)
+                        (eventIndex, actionIndex) = FirstSelectedActionIndex;
+                    else 
+                        return;
+                    
+                    var @event = smartFactory.EventFactory(SmartConstants.EventLink);
+                    var action = smartFactory.ActionFactory(SmartConstants.ActionLink, null, null);
+                    @event.GetParameter(0).Value = action.GetParameter(0).Value = GetNextLinkId();
+                    Events[eventIndex].Actions.Insert(actionIndex + 1, action);
+                    Events.Insert(eventIndex + 1, @event);
+                    for (int i = Events[eventIndex].Actions.Count - 1; i > actionIndex + 1; --i)
+                    {
+                        var a = Events[eventIndex].Actions[i];
+                        Events[eventIndex].Actions.RemoveAt(Events[eventIndex].Actions.Count - 1);
+                        @event.Actions.Insert(0, a);
+                    }
+                }
+            }, () => AnyActionSelected || AnyEventSelected).ObservesProperty(() => AnyActionSelected).ObservesProperty(() => AnyEventSelected);
+            
             NewActionAboveCommand = new AsyncCommand(() => NewAction(false));
             NewActionBelowCommand = new AsyncCommand(() => NewAction(true));
             NewEventAboveCommand = new AsyncCommand(() => NewEvent(false));
@@ -1285,6 +1385,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         public AsyncCommand NewGroupAboveCommand { get; set; }
         public AsyncCommand NewGroupBelowCommand { get; set; }
         public AsyncCommand EditConditionsCommand { get; set; }
+        public DelegateCommand AddLinkCommand { get; set; }
 
         public DelegateCommand<bool?> SelectionUp { get; set; }
         public DelegateCommand<bool?> SelectionDown { get; set; }
@@ -1297,7 +1398,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         private bool MultipleGlobalVariablesSelected => script.GlobalVariables.Count(e => e.IsSelected) >= 2;
         public bool AnyEventSelected => Events.Any(e => e.IsEvent && e.IsSelected);
         public bool AnyGroupSelected => Events.Any(e => e.IsBeginGroup && e.IsSelected);
-        private bool MultipleEventsSelected => Events.Count(e => e.IsSelected) >= 2;
+        private bool MultipleGroupsSelected => Events.Count(e => e.IsSelected && e.IsBeginGroup) >= 2;
+        private bool MultipleEventsSelected => Events.Count(e => e.IsSelected && e.IsEvent) >= 2;
         private bool MultipleActionsSelected => Events.SelectMany(e => e.Actions).Count(a => a.IsSelected) >= 2;
         public bool AnyActionSelected => Events.SelectMany(e => e.Actions).Any(a => a.IsSelected);
         private bool MultipleConditionsSelected => Events.SelectMany(e => e.Conditions).Count(a => a.IsSelected) >= 2;
@@ -1306,11 +1408,17 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         private int FirstSelectedGlobalVariableIndex =>
             script.GlobalVariables.Select((e, index) => (e.IsSelected, index)).Where(p => p.IsSelected).Select(p => p.index).FirstOrDefault();
 
-        private int FirstSelectedIndex =>
-            Events.Select((e, index) => (e.IsSelected, index)).Where(p => p.IsSelected).Select(p => p.index).FirstOrDefault(-1);
+        private int FirstSelectedEventIndex =>
+            Events.Select((e, index) => (e.IsSelected && e.IsEvent, index)).Where(p => p.Item1).Select(p => p.index).FirstOrDefault(-1);
 
-        private int LastSelectedIndex =>
-            Events.Select((e, index) => (e.IsSelected, index)).Where(p => p.IsSelected).Select(p => p.index).LastOrDefault(-1);
+        private int LastSelectedEventIndex =>
+            Events.Select((e, index) => (e.IsSelected && e.IsEvent, index)).Where(p => p.Item1).Select(p => p.index).LastOrDefault(-1);
+
+        private int FirstSelectedGroupIndex =>
+            Events.Select((e, index) => (e.IsSelected && e.IsBeginGroup, index)).Where(p => p.Item1).Select(p => p.index).FirstOrDefault(-1);
+
+        private int LastSelectedGroupIndex =>
+            Events.Select((e, index) => (e.IsSelected && e.IsBeginGroup, index)).Where(p => p.Item1).Select(p => p.index).LastOrDefault(-1);
 
         private (int eventIndex, int actionIndex) FirstSelectedActionIndex =>
             Events.SelectMany((e, eventIndex) => e.Actions.Select((a, actionIndex) => (a.IsSelected, eventIndex, actionIndex)))
@@ -1381,9 +1489,11 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 return true;
             }, TimeSpan.FromMilliseconds(1200)));
             
-            script.EventChanged += (_, _, _) =>
+            script.EventChanged += (e, a, _) =>
             {
                 updateInspections = true;
+                if (e != null || a?.Parent != null)
+                    RecolorEvent((e ?? a?.Parent)!);
             };
             
             TeachingTips = AutoDispose(new SmartTeachingTips(teachingTipService, this, Script));
@@ -1397,6 +1507,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         private void EventChildrenSelectionChanged()
         {
             RaisePropertyChanged(nameof(AnySelected));
+            RaisePropertyChanged(nameof(AnyActionSelected));
+            RaisePropertyChanged(nameof(AnyEventSelected));
             EditConditionsCommand.RaiseCanExecuteChanged();
             if (!smartEditorViewModel.IsOpened)
                 return;
@@ -1406,7 +1518,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             
             if (AnyEventSelected)
             {
-                currentlyPreviewedViewModel = EventEditViewModel(Events.Where(e => e.IsSelected).ToList(), true);
+                currentlyPreviewedViewModel = EventEditViewModel(Events.Where(e => e.IsSelected && e.IsEvent).ToList(), true);
             }
             else if (AnyConditionSelected)
             {
@@ -2171,6 +2283,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         public ISolutionItem SolutionItem => item;
 
         private ISmartScriptOutlinerModel outlinerData;
+        private readonly ISmartHighlighter highlighter;
         private ValuePublisher<IOutlinerModel> outlinerModel = new ValuePublisher<IOutlinerModel>();
         public IObservable<IOutlinerModel> OutlinerModel => outlinerModel;
 
@@ -2205,6 +2318,35 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
                     DismissNotification.Execute(notification);
                 }));
+        }
+        
+        private void RecolorEvent(SmartEvent e)
+        {
+            highlighter.SetHighlightParameter(selectedHighlighter.Parameter);
+            e.ColorId = (0, 0);
+            if (highlighter.Highlight(e, out var eventParameterIndex))
+            {
+                var value = e.GetParameter(eventParameterIndex).Value;
+                e.ColorId = (selectedHighlighter.HighlightIndex, value);
+            }
+            foreach (var a in e.Actions)
+            {
+                a.ColorId = (0, 0);
+                if (highlighter.Highlight(a, out var actionParameterIndex))
+                {
+                    var value = a.GetParameter(actionParameterIndex).Value;
+                    a.ColorId = (selectedHighlighter.HighlightIndex, value);
+                }
+            }
+            foreach (var c in e.Conditions)
+            {
+                c.ColorId = (0, 0);
+                if (highlighter.Highlight(c, out var conditionParameterIndex))
+                {
+                    var value = c.GetParameter(conditionParameterIndex).Value;
+                    c.ColorId = (selectedHighlighter.HighlightIndex, value);
+                }
+            }
         }
     }
 }

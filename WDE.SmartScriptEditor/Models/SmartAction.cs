@@ -6,7 +6,6 @@ using System.Linq;
 using SmartFormat;
 using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Parsing;
-using WDE.Common.Database;
 using WDE.Common.Parameters;
 using WDE.Parameters.Models;
 using WDE.SmartScriptEditor.Data;
@@ -15,7 +14,7 @@ using WDE.SmartScriptEditor.Models.Helpers;
 
 namespace WDE.SmartScriptEditor.Models
 {
-    public class SmartAction : SmartBaseElement
+    public class SmartAction : VisualSmartBaseElement
     {
         private bool isSelected;
 

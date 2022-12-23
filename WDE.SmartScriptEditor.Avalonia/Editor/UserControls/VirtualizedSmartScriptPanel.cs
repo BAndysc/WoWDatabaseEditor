@@ -116,7 +116,7 @@ public partial class VirtualizedSmartScriptPanel : Panel
     private static HorizRect EventWidth(double totalWidth)
     {
         var x = PaddingLeft + EventPaddingLeft;
-        var right = Math.Min(Math.Max(totalWidth - 50, PaddingLeft + EventPaddingLeft + 10), 300);
+        var right = Math.Min(Math.Max(totalWidth - 50, PaddingLeft + EventPaddingLeft + 10), 350);
         return new HorizRect(x, right - x);
     }
 

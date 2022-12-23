@@ -22,6 +22,17 @@ using WDE.MVVM.Observable;
 
 namespace WoWDatabaseEditorCore.Services.OutlinerTool;
 
+[SingleInstance]
+[AutoRegister]
+public partial class OutlinerToolService : ObservableBase, IOutlinerToolService
+{
+    [Notify] private IOutlinerItemViewModel? selectedItem;
+
+    public OutlinerToolService()
+    {
+        
+    }
+}
 
 [AutoRegister]
 [SingleInstance]
@@ -31,6 +42,7 @@ public partial class OutlinerToolViewModel : ObservableBase, ITool
     private readonly Lazy<ISolutionItemRelatedRegistry> relatedRegistry;
     private readonly Lazy<IFindAnywhereService> findAnywhereService;
     private readonly IOutlinerSettingsService settings;
+    private readonly OutlinerToolService outlinerService;
     private readonly IEventAggregator eventAggregator;
     private ObservableCollection<OutlinerGroupViewModel> groups = new();
     public ObservableCollection<OutlinerGroupViewModel> Groups => groups;
@@ -44,16 +56,31 @@ public partial class OutlinerToolViewModel : ObservableBase, ITool
     private System.IDisposable? currentSubscription;
     private CancellationTokenSource? currentCancellationTokenSource;
     
+    private INodeType? selectedNode;
+    public INodeType? SelectedNode
+    {
+        get => selectedNode;
+        set
+        {
+            SetProperty(ref selectedNode, value);
+            outlinerService.SelectedItem = value as IOutlinerItemViewModel;
+        }
+    }
+    
+    public ObservableCollection<OutlinerSourceViewModel> Sources { get; } = new();
+
     public OutlinerToolViewModel(Lazy<IDocumentManager> documentManager,
         Lazy<ISolutionItemRelatedRegistry> relatedRegistry,
         Lazy<IFindAnywhereService> findAnywhereService,
         IOutlinerSettingsService settings,
+        OutlinerToolService outlinerService,
         IEventAggregator eventAggregator)
     {
         this.documentManager = documentManager;
         this.relatedRegistry = relatedRegistry;
         this.findAnywhereService = findAnywhereService;
         this.settings = settings;
+        this.outlinerService = outlinerService;
         this.eventAggregator = eventAggregator;
         groupsByType[RelatedSolutionItem.RelatedType.CreatureEntry] = new OutlinerGroupViewModel("Creatures");
         groupsByType[RelatedSolutionItem.RelatedType.GameobjectEntry] = new OutlinerGroupViewModel("Game Objects");
@@ -71,6 +98,11 @@ public partial class OutlinerToolViewModel : ObservableBase, ITool
         {
             if (val != FindAnywhereSourceType.None && val != FindAnywhereSourceType.All)
                 Sources.Add(new OutlinerSourceViewModel(val, settings));
+        }
+
+        foreach (var source in Sources)
+        {
+            source.PropertyChanged += (_, _) => AnalyseDocument(documentManager.Value.ActiveDocument);
         }
         
         On(() => Visibility, @is =>
@@ -227,6 +259,4 @@ public partial class OutlinerToolViewModel : ObservableBase, ITool
         else
             eventAggregator.GetEvent<EventRequestOpenItem>().Publish(viewModel.SolutionItem!);
     }
-
-    public ObservableCollection<OutlinerSourceViewModel> Sources { get; } = new();
 }

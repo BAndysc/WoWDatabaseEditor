@@ -13,21 +13,25 @@
             Name="TreeView"
             DoubleTapped="InputElement_OnDoubleTapped"
             Items2="{CompiledBinding FlatItems}"
+            SelectedNode2="{CompiledBinding SelectedNode}"
         >
-            <outlinerViews:OutlinerFastTreeView.ContextMenu>
-                <ContextMenu Items="{CompiledBinding Sources}">
-                    <ContextMenu.Styles>
-                        <Style Selector="MenuItem">
-                            <Setter Property="Header" Value="{Binding Name}" />
-                            <Setter Property="Icon">
-                                <Template>
-                                    <CheckBox IsChecked="{Binding Include}" />
-                                </Template>
-                            </Setter>
-                        </Style>
-                    </ContextMenu.Styles>
-                </ContextMenu>
-            </outlinerViews:OutlinerFastTreeView.ContextMenu>
+            <outlinerViews:OutlinerFastTreeView.ContextFlyout>
+                <Flyout>
+                    <StackPanel>
+                        <SettingsHeader>Select where to search:</SettingsHeader>
+                        <ItemsControl Items="{CompiledBinding Sources}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <CheckBox HorizontalAlignment="Stretch" 
+                                              Padding="4,8"
+                                              IsChecked="{CompiledBinding Include}" 
+                                              Content="{CompiledBinding Name}" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Flyout>
+            </outlinerViews:OutlinerFastTreeView.ContextFlyout>
         </outlinerViews:OutlinerFastTreeView>
     </ScrollViewer>
 </UserControl>

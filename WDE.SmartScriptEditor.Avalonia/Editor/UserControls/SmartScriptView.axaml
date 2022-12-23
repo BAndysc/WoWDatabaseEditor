@@ -8,6 +8,7 @@
              xmlns:userControls="clr-namespace:WDE.SmartScriptEditor.Avalonia.Editor.UserControls"
              xmlns:models="clr-namespace:WDE.SmartScriptEditor.Models;assembly=WDE.SmartScriptEditor"
              xmlns:viewModels1="clr-namespace:WDE.SmartScriptEditor.Editor.ViewModels;assembly=WDE.SmartScriptEditor"
+             xmlns:views="clr-namespace:WDE.SmartScriptEditor.Avalonia.Editor.Views"
              x:DataType="viewModels1:SmartScriptEditorViewModel"
              mc:Ignorable="d" x:Name="Rooot"
              Background="{DynamicResource SmartScripts.Background}"
@@ -16,6 +17,7 @@
         <system:Boolean x:Key="FalseValue">False</system:Boolean>
         <system:Boolean x:Key="TrueValue">True</system:Boolean>
         <FloatToScaleTransformConverter x:Key="FloatToScaleTransformConverter" />
+        <views:ColorIdToNiceColorConverter x:Key="ColorIdToNiceColorConverter" />
     </UserControl.Resources>
     <UserControl.KeyBindings>
         <KeyBinding Gesture="Back" Command="{CompiledBinding DeleteSelected}" />
@@ -61,41 +63,43 @@
         >
         <Panel>
             <DockPanel>
+                <DockPanel.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Command="{CompiledBinding NewActionAboveCommand}" IsVisible="{CompiledBinding AnySelected}" Header="New action above" />
+                        <MenuItem Command="{CompiledBinding NewActionBelowCommand}" IsVisible="{CompiledBinding AnySelected}" Header="New action below" />
+                        <Separator IsVisible="{CompiledBinding AnySelected}" />
+                        <MenuItem IsVisible="{CompiledBinding AnySelected}" Command="{CompiledBinding NewEventAboveCommand}" Header="New event above" />
+                        <MenuItem Command="{CompiledBinding NewEventBelowCommand}" Header="New event below" />
+                        <Separator />
+                        <MenuItem IsVisible="{CompiledBinding AnySelected}" Command="{CompiledBinding NewGroupAboveCommand}" Header="New group above" />
+                        <MenuItem Command="{CompiledBinding NewGroupBelowCommand}" Header="New group below" />
+                        <Separator />
+                        <MenuItem Command="{CompiledBinding AddLinkCommand}" IsVisible="{CompiledBinding AnySelected}"  Header="Add link" />
+                        <MenuItem Command="{CompiledBinding EditConditionsCommand}" Header="Edit conditions" />
+                        <MenuItem Command="{CompiledBinding DefineGlobalVariable}" Header="Define a global variable" />
+                        <Separator />
+                        <MenuItem Command="{CompiledBinding Copy}" Header="Copy" />
+                        <MenuItem Command="{CompiledBinding Cut}" Header="Cut" />
+                        <MenuItem Command="{CompiledBinding Paste}" Header="Paste" />
+                        <Separator />
+                        <MenuItem Command="{CompiledBinding DeleteSelected}" Header="Delete" />
+                    </ContextMenu>
+                </DockPanel.ContextMenu>
                 <userControls:VirtualizedSmartScriptPanel Background="Transparent"
-                                                      Focusable="True"
-                                                      DropGroups="{CompiledBinding OnDropGroups}"
-                                                      DropItems="{CompiledBinding OnDropItems}"
-                                                      DropActions="{CompiledBinding OnDropActions}"
-                                                      DropConditions="{CompiledBinding OnDropConditions}"
-                                                      Script="{CompiledBinding Script}" 
-                                                      Problems="{CompiledBinding ProblematicLines}" 
-                                                      HideComments="{CompiledBinding HideComments}"
-                                                      HideConditions="{CompiledBinding HideConditions}"
-                                                      DockPanel.Dock="Top">
-                    <userControls:VirtualizedSmartScriptPanel.ContextMenu>
-                        <ContextMenu>
-                            <MenuItem Command="{CompiledBinding NewActionAboveCommand}" IsVisible="{CompiledBinding AnySelected}" Header="New action above" />
-                            <MenuItem Command="{CompiledBinding NewActionBelowCommand}" IsVisible="{CompiledBinding AnySelected}" Header="New action below" />
-                            <Separator IsVisible="{CompiledBinding AnySelected}" />
-                            <MenuItem IsVisible="{CompiledBinding AnySelected}" Command="{CompiledBinding NewEventAboveCommand}" Header="New event above" />
-                            <MenuItem Command="{CompiledBinding NewEventBelowCommand}" Header="New event below" />
-                            <Separator />
-                            <MenuItem IsVisible="{CompiledBinding AnySelected}" Command="{CompiledBinding NewGroupAboveCommand}" Header="New group above" />
-                            <MenuItem Command="{CompiledBinding NewGroupBelowCommand}" Header="New group below" />
-                            <Separator />
-                            <MenuItem Command="{CompiledBinding EditConditionsCommand}" Header="Edit conditions" />
-                            <MenuItem Command="{CompiledBinding DefineGlobalVariable}" Header="Define a global variable" />
-                            <Separator />
-                            <MenuItem Command="{CompiledBinding Copy}" Header="Copy" />
-                            <MenuItem Command="{CompiledBinding Cut}" Header="Cut" />
-                            <MenuItem Command="{CompiledBinding Paste}" Header="Paste" />
-                            <Separator />
-                            <MenuItem Command="{CompiledBinding DeleteSelected}" Header="Delete" />
-                        </ContextMenu>
-                    </userControls:VirtualizedSmartScriptPanel.ContextMenu>
+                                                          Focusable="True"
+                                                          DropGroups="{CompiledBinding OnDropGroups}"
+                                                          DropItems="{CompiledBinding OnDropItems}"
+                                                          DropActions="{CompiledBinding OnDropActions}"
+                                                          DropConditions="{CompiledBinding OnDropConditions}"
+                                                          Script="{CompiledBinding Script}" 
+                                                          Problems="{CompiledBinding ProblematicLines}" 
+                                                          HideComments="{CompiledBinding HideComments}"
+                                                          HideConditions="{CompiledBinding HideConditions}"
+                                                          DockPanel.Dock="Top">
                     <userControls:VirtualizedSmartScriptPanel.EventItemTemplate>
                         <DataTemplate DataType="{x:Type models:SmartEvent}">
                             <userControls:SmartEventView
+                                SpecialBackground="{CompiledBinding ColorId, Converter={StaticResource ColorIdToNiceColorConverter}}"
                                 Selected="{CompiledBinding IsSelected, Mode=TwoWay}"
                                 userControls:SmartScriptPanelLayout.Selected="{CompiledBinding IsSelected, Mode=TwoWay}"
                                 DirectEditParameter="{Binding DataContext.DirectEditParameter, ElementName=Rooot}"
@@ -109,6 +113,7 @@
                     <userControls:VirtualizedSmartScriptPanel.ActionItemTemplate>
                         <DataTemplate DataType="{x:Type models:SmartAction}">
                             <userControls:SmartActionView
+                                SpecialBackground="{CompiledBinding ColorId, Converter={StaticResource ColorIdToNiceColorConverter}}"
                                 Indent="{CompiledBinding Indent}"
                                 DirectEditParameter="{Binding DataContext.DirectEditParameter, ElementName=Rooot}"
                                 DirectOpenParameter="{Binding DataContext.DirectOpenParameter, ElementName=Rooot}"
@@ -123,6 +128,7 @@
                     <userControls:VirtualizedSmartScriptPanel.ConditionItemTemplate>
                         <DataTemplate DataType="{x:Type models:SmartCondition}">
                             <userControls:SmartConditionView
+                                SpecialBackground="{CompiledBinding ColorId, Converter={StaticResource ColorIdToNiceColorConverter}}"
                                 DirectEditParameter="{Binding DataContext.DirectEditParameter, ElementName=Rooot}"
                                 DeselectAllRequest="{Binding DataContext.DeselectAll, ElementName=Rooot}"
                                 DeselectAllButConditionsRequest="{Binding DataContext.DeselectAllButConditions, ElementName=Rooot}"
@@ -181,12 +187,6 @@
                     Opacity="0.5"
                     Content="Add event"
                     Command="{CompiledBinding AddEvent}">
-                    <Button.ContextMenu>
-                        <ContextMenu>
-                            <MenuItem Header="Define global variable" 
-                                      Command="{CompiledBinding DefineGlobalVariable}" />
-                            </ContextMenu>
-                    </Button.ContextMenu>
                 </Button>
             </DockPanel>
             <userControls:SmartScriptOverlay 

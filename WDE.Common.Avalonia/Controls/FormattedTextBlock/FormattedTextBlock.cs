@@ -204,9 +204,6 @@ namespace WDE.Common.Avalonia.Controls
                 context.FillRectangle(Background, new Rect(Bounds.Size));
             }
 
-            Stopwatch sw = new();
-            Stopwatch sw2 = new();
-            sw.Start();
             int newOverPartIndex = -1;
             double x = Padding.Left;
             double y = Padding.Top;
@@ -219,10 +216,8 @@ namespace WDE.Common.Avalonia.Controls
                 var styleId = parameter ? STYLE_PARAMETER : (source ? STYLE_SOURCE : (IsSelected ? STYLE_DEFAULT_SELECTED : STYLE_DEFAULT));
    
                 Rect bounds;
-                sw2.Start();
-                (wasWrapped, bounds) = drawer!.Draw(context, text, styleId, !wasWrapped, ref x, ref y, Padding.Left, Bounds.Width + 5);
-                sw2.Stop();
-
+                (wasWrapped, bounds) = drawer!.Draw(context, text, styleId, !wasWrapped, ref x, ref y, Padding.Left, Bounds.Width - Padding.Right);
+                
                 if (overPartIndex == partIndex && (source || parameter) && IsPointerOver)
                 {
                     overLink = true;
@@ -267,7 +262,7 @@ namespace WDE.Common.Avalonia.Controls
 
         protected override Size MeasureOverride(Size availableSize)
         {
-            var size = MeasureText((float)availableSize.Width, Text, currentPos, out var hoverPartIndex);
+            var size = MeasureText((float)(availableSize.Width - Padding.Left - Padding.Right), Text, currentPos, out var hoverPartIndex);
             if (hoverPartIndex.HasValue)
                 overPartIndex = hoverPartIndex.Value;
             return size.Inflate(Padding);

@@ -148,6 +148,9 @@ namespace WDE.SmartScriptEditor.Models
             int index = 1;
             foreach (var e in Events)
             {
+                if (e.IsGroup)
+                    continue;
+                
                 e.LineId = index;
                 if (e.Actions.Count == 0)
                 {
@@ -250,7 +253,7 @@ namespace WDE.SmartScriptEditor.Models
             return null;
         }
 
-        public SmartGroup InsertGroupBegin(int index, string header, string? description)
+        public SmartGroup InsertGroupBegin(ref int index, string header, string? description)
         {   
             var previousGroup = FindMatchingBackwards(index - 1, e => e.IsGroup);
             if (previousGroup != null && previousGroup.IsBeginGroup)
@@ -302,7 +305,8 @@ namespace WDE.SmartScriptEditor.Models
                             index++;
                         Events.Remove(endGroup);
                     }
-                    group = InsertGroupBegin(index++, header, description);
+                    group = InsertGroupBegin(ref index, header, description);
+                    index++;
                     newEvents.Add(group.InnerEvent);
                     hasOpenedGroup = true;
                     continue;

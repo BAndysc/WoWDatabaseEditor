@@ -96,7 +96,7 @@
         },
         {
           "name": "Wander Distance",
-          "db_column_name": "spawndist",
+          "db_column_name": "wander_distance",
           "value_type": "float",
           "zero_is_blank": true
         },

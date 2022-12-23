@@ -142,7 +142,7 @@ namespace WDE.TrinityMySqlDatabase.Models
         [Column(Name = "MovementType")]
         public MovementType MovementType { get; set; }
         
-        [Column(Name = "spawndist")]
+        [Column(Name = "wander_distance")]
         public float WanderDistance { get; set; }
 
         public uint SpawnKey => 0;

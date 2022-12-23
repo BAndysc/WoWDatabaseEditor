@@ -99,6 +99,7 @@ public partial class VirtualizedSmartScriptPanel
                 text.Padding = new Thickness(10,2,10,2);
                 text.Opacity = 0.6f;
                 text.Arrange((inGroup ? context.grupedConditionRect : context.conditionRect).WithVertical(y, AddConditionHeight));
+                text.IsHitTestVisible = false;
                 y += AddConditionHeight;
                 conditionsHeight += AddConditionHeight;
             }

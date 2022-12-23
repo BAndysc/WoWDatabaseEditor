@@ -1,11 +1,12 @@
 using System.Windows.Input;
 using WDE.Common;
+using WDE.Common.Outliner;
 using WDE.Common.Types;
 using WDE.Common.Utils;
 
 namespace WoWDatabaseEditorCore.Services.OutlinerTool;
 
-public partial class OutlinerItemViewModel : IChildType
+public partial class OutlinerItemViewModel : IChildType, IOutlinerItemViewModel
 {
     public OutlinerItemViewModel(ISolutionItem? solutionItem, long? entry, string? name, ImageUri icon, ICommand? customCommand)
     {

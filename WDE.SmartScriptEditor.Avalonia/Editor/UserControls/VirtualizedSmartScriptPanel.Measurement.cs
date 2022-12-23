@@ -12,8 +12,8 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls;
 
 public partial class VirtualizedSmartScriptPanel
 {
-    public const double AddActionHeight = 26;
-    public const double AddConditionHeight = 26;
+    public const double AddActionHeight = 25;
+    public const double AddConditionHeight = 25;
     
     private MeasureUtil measureEvent;
     private MeasureUtil measureCondition;

@@ -118,7 +118,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
                 context.DrawRectangle(new SolidColorBrush(Color.Parse("#1976d2")), null, new Rect(data.x, data.y, BoxSize, BoxSize), BoxSize / 2, BoxSize / 2);
             
             var tl = new TextLayout(symbol, new Typeface(GetValue(TextBlock.FontFamilyProperty)), FontSize, foreground, TextAlignment.Center, maxWidth: BoxSize);
-            tl.Draw(context, new Point(data.x, data.y));
+            tl.Draw(context, new Point(data.x, data.y + 1));
             
             data.x -= BoxSize + Spacing;
             if (data.x < 0)
@@ -131,6 +131,10 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
         protected override Size MeasureOverride(Size availableSize)
         {
             var icons = GetIconsCount();
+            if (icons == 0)
+                return new Size(0, 0);
+            else if (icons == 1)
+                return new Size(BoxSize, BoxSize);
             int rows = (int)Math.Ceiling(icons / 2f);
             return new Size(TotalWidth,  rows * BoxSize + (rows - 1) * Spacing);
         }
@@ -181,6 +185,8 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
             {
                 RenderContext data = new();
                 data.x = TotalWidth - BoxSize;
+                if (GetIconsCount() == 1)
+                    data.x = 0;
                 
                 var eventFlagsNum = e.Flags.Value;
                 var eventPhasesNum = e.Phases.Value;

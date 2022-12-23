@@ -25,11 +25,6 @@ namespace WDE.SmartScriptEditor.Models
         private readonly ParameterValueHolder<float>[]? floatParams;
         private readonly ParameterValueHolder<string>[]? stringParams;
 
-        // while it breaks a single responsibility principle, it makes the code work way faster by caching it here
-        // without using any additional Dictionaries, so for sake of performance, let's keep it this way
-        public double? CachedHeight { get; set; }
-        public PositionSize Position { get; set; }
-        
         private string? readableHint = "";
         public string? ReadableHint
         {
@@ -130,9 +125,8 @@ namespace WDE.SmartScriptEditor.Models
             return stringParams![index];
         }
 
-        protected void CallOnChanged(object? sender)
+        protected virtual void CallOnChanged(object? sender)
         {
-            CachedHeight = null;
             OnChanged(this, null!);
             if (sender is IParameterValueHolder<long> paramHolder)
             {

@@ -30,12 +30,12 @@
         <Setter Property="Template">
             <ControlTemplate x:DataType="models:SmartAction">
                 <Border BorderThickness="0,1,1,1" Classes="action" 
-                        Background="Transparent"
                         Padding="{CompiledBinding Indent, Converter={StaticResource IndentToMarginConverter}}">
                     <extendedTextBlock:FormattedTextBlock
                         ContextArray="{CompiledBinding Context}"
                         IsSelected="{CompiledBinding IsSelected}"
                         Padding="2"
+                        Background="{TemplateBinding SpecialBackground}"
                         Text="{CompiledBinding Readable}" />
                 </Border>
             </ControlTemplate>
@@ -62,10 +62,8 @@
         <Setter Property="Background" Value="{DynamicResource SmartScripts.Comment.Background}" />
         <Setter Property="TextBlock.Foreground" Value="{DynamicResource SmartScripts.Comment.Foreground}" />
     </Style>
-    <Style Selector="controls|SmartActionView:action /template/ extendedTextBlock|FormattedTextBlock">
-        <Setter Property="Background" Value="{DynamicResource SmartScripts.Action.Background}" />
-    </Style>
     <Style Selector="controls|SmartActionView:action /template/ Border">
+        <Setter Property="Background" Value="{DynamicResource SmartScripts.Action.Background}" />
     </Style>
     <Style Selector="controls|SmartActionView:action:selected /template/ Border">
         <Setter Property="BorderBrush" Value="{DynamicResource SmartScripts.Action.Selected.Border}" />
@@ -88,6 +86,7 @@
             <ControlTemplate x:DataType="models:SmartCondition">
                 <Border BorderThickness="1" Margin="{CompiledBinding Indent, Converter={StaticResource NumberToMarginConverter}}">
                     <extendedTextBlock:FormattedTextBlock Padding="2"
+                                                          Background="{TemplateBinding SpecialBackground}"
                                                           ContextArray="{CompiledBinding Context}"
                                                           IsSelected="{CompiledBinding IsSelected}"
                                                           Text="{CompiledBinding Readable}" />
@@ -97,8 +96,6 @@
     </Style>
     <Style Selector="controls|SmartConditionView /template/ Border">
         <Setter Property="BorderBrush" Value="{DynamicResource SmartScripts.Action.Border}" />
-    </Style>
-    <Style Selector="controls|SmartConditionView /template/ extendedTextBlock|FormattedTextBlock">
         <Setter Property="Background" Value="{DynamicResource SmartScripts.Action.Background}" />
     </Style>
     <Style Selector="controls|SmartConditionView:selected /template/ Border">
@@ -154,17 +151,19 @@
         <Setter Property="Template">
             <ControlTemplate x:DataType="models:SmartEvent">
                 <DockPanel LastChildFill="True">
-                    <Border Name="Main" BorderThickness="1" CornerRadius="4,0,0,4" DockPanel.Dock="Top" Padding="5">
-                        <DockPanel LastChildFill="True">
-                            <controls:SmartEventFlagsView TextBlock.Foreground="{DynamicResource SmartScripts.Event.Flag.Background}" DockPanel.Dock="Right"/>
-                            <Border VerticalAlignment="Center" CornerRadius="3" Background="{DynamicResource SmartScripts.Event.Chance.Background}" DockPanel.Dock="Right" IsVisible="{CompiledBinding ChanceString, Converter={StaticResource NullToBoolConverter}}">
-                                <TextBlock Padding="2,1" Foreground="White" FontWeight="Bold" FontSize="11" Text="{CompiledBinding ChanceString}"/>
-                            </Border>
-                            <extendedTextBlock:FormattedTextBlock
-                                ContextArray="{CompiledBinding Context}"
-                                IsSelected="{CompiledBinding IsSelected}"
-                                Text="{CompiledBinding Readable}" />
-                        </DockPanel>
+                    <Border Name="Main" BorderThickness="1" CornerRadius="4,0,0,4" DockPanel.Dock="Top">
+                        <Border Padding="5" Background="{TemplateBinding SpecialBackground}" Name="Inner">
+                            <DockPanel LastChildFill="True">
+                                <controls:SmartEventFlagsView TextBlock.Foreground="{DynamicResource SmartScripts.Event.Flag.Background}" DockPanel.Dock="Right"/>
+                                <Border VerticalAlignment="Center" CornerRadius="3" Background="{DynamicResource SmartScripts.Event.Chance.Background}" DockPanel.Dock="Right" IsVisible="{CompiledBinding ChanceString, Converter={StaticResource NullToBoolConverter}}">
+                                    <TextBlock Padding="2,1" Foreground="White" FontWeight="Bold" FontSize="11" Text="{CompiledBinding ChanceString}"/>
+                                </Border>
+                                <extendedTextBlock:FormattedTextBlock
+                                    ContextArray="{CompiledBinding Context}"
+                                    IsSelected="{CompiledBinding IsSelected}"
+                                    Text="{CompiledBinding Readable}" />
+                            </DockPanel>
+                        </Border>
                     </Border>
                     <Border Name="Filler" CornerRadius="0,0,4,4" Margin="20,0,0,0" />
                 </DockPanel>
@@ -180,6 +179,8 @@
     </Style>
     <Style Selector="controls|SmartEventView:selected /template/ Border#Main">
         <Setter Property="BorderBrush" Value="{DynamicResource SmartScripts.Event.Selected.Border}" />
+    </Style>
+    <Style Selector="controls|SmartEventView:selected /template/ Border#Inner">
         <Setter Property="Background" Value="{DynamicResource SmartScripts.Event.Selected.Background}" />
     </Style>
     <Style Selector="controls|SmartEventView:selected /template/ Border#Filler">

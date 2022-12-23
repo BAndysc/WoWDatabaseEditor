@@ -15,7 +15,7 @@ using WDE.SmartScriptEditor.Models.Helpers;
 
 namespace WDE.SmartScriptEditor.Models
 {
-    public class SmartEvent : SmartBaseElement
+    public class SmartEvent : VisualSmartBaseElement
     {
         private readonly IEditorFeatures features;
         private bool isSelected;
@@ -28,13 +28,12 @@ namespace WDE.SmartScriptEditor.Models
 
         public SmartScriptBase? Parent { get; set; }
         public PositionSize EventPosition { get; set; }
-        //public GroupId Group { get; set; }
-
+       
         public bool IsBeginGroup => Id == SmartConstants.EventGroupBegin;
         public bool IsEndGroup => Id == SmartConstants.EventGroupEnd;
         public bool IsGroup => IsBeginGroup || IsEndGroup;
         public bool IsEvent => !IsGroup;
-
+        
         public static SmartEvent NewBeginGroup() => new(SmartConstants.EventGroupBegin, SmartGroupFakeEditorFeatures.Instance)
         {
             ReadableHint = SmartConstants.BeginGroupText + "{spram1value}{spram2value:" + SmartConstants.BeginGroupSeparator + "{spram2value}|}"

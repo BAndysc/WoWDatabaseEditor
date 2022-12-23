@@ -13,7 +13,7 @@ public class OutlinerFastTreeView : FastTreeView<OutlinerGroupViewModel, Outline
 {
     //Avalonia BUG workaround
     public static readonly StyledProperty<FlatTreeList<OutlinerGroupViewModel, OutlinerItemViewModel>?> Items2Property = FastTreeView<OutlinerGroupViewModel, OutlinerItemViewModel>.ItemsProperty.AddOwner<OutlinerFastTreeView>();
-    public static readonly StyledProperty<INodeType?> SelectedSpawn2Property = FastTreeView<OutlinerGroupViewModel, OutlinerItemViewModel>.SelectedNodeProperty.AddOwner<OutlinerFastTreeView>();
+    public static readonly StyledProperty<INodeType?> SelectedNode2Property = FastTreeView<OutlinerGroupViewModel, OutlinerItemViewModel>.SelectedNodeProperty.AddOwner<OutlinerFastTreeView>();
     
     public FlatTreeList<OutlinerGroupViewModel, OutlinerItemViewModel>? Items2
     {
@@ -21,12 +21,12 @@ public class OutlinerFastTreeView : FastTreeView<OutlinerGroupViewModel, Outline
         set => SetValue(Items2Property, value);
     }
 
-    public INodeType? SelectedSpawn2
+    public INodeType? SelectedNode2
     {
-        get => GetValue(SelectedSpawn2Property);
-        set => SetValue(SelectedSpawn2Property, value);
+        get => GetValue(SelectedNode2Property);
+        set => SetValue(SelectedNode2Property, value);
     }
-
+    
     protected override void DrawRow(Typeface typeface, Pen pen, IBrush foreground, DrawingContext context, object? row, Rect rect)
     {
         var ft = new FormattedText
@@ -37,7 +37,7 @@ public class OutlinerFastTreeView : FastTreeView<OutlinerGroupViewModel, Outline
         };
 
         var isHover = mouseOverRow == row;
-        var isSelected = SelectedSpawn2 == row;
+        var isSelected = SelectedNode2 == row;
         
         if (isHover || isSelected)
             context.DrawRectangle(isHover ? HoverRowBackground : SelectedRowBackground, null, rect);

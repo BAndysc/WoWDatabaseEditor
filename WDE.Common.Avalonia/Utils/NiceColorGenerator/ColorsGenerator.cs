@@ -1,6 +1,7 @@
 using System;
 using Avalonia.Media;
 using AvaloniaStyles;
+using AvaloniaStyles.Utils;
 
 namespace WDE.Common.Avalonia.Utils.NiceColorGenerator
 {
@@ -13,7 +14,7 @@ namespace WDE.Common.Avalonia.Utils.NiceColorGenerator
         private double baseSaturation;
         private double? customLuminance;
         private double BaseLuminance => customLuminance ?? (SystemTheme.EffectiveThemeIsDark ? 0.16 : 0.84);
-        private double LuminanceChange => SystemTheme.EffectiveThemeIsDark ? 0.1 : -0.1;
+        private double LuminanceChange => SystemTheme.EffectiveThemeIsDark ? 0.05 : -0.05;
 
         public void Reset()
         {
@@ -31,13 +32,13 @@ namespace WDE.Common.Avalonia.Utils.NiceColorGenerator
 
         public Color GetNext()
         {
-            Color c = Utils.HSL2RGB(hue, satu, lumo);
-            if (hue < 0.95)
-                hue = Math.Min(1, hue + 0.1);
+            Color c = new HslColor(hue, satu, lumo).ToRgba();
+            if (hue < 0.92)
+                hue = Math.Min(1, hue + 0.08);
             else
             {
                 hue = 0;
-                if (LuminanceChange < 0 && lumo >= 0.5 || LuminanceChange > 0 && lumo <= 0.5)
+                if (LuminanceChange < 0 && lumo >= 0.65 || LuminanceChange > 0 && lumo <= 0.35)
                 {
                     lumo += LuminanceChange;
                 }

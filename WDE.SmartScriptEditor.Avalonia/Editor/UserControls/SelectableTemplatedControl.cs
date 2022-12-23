@@ -5,6 +5,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Input.Platform;
+using Avalonia.Media;
 using WDE.Common.Avalonia.Controls;
 
 namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
@@ -14,6 +15,14 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
         public static KeyModifiers MultiselectGesture { get; } = AvaloniaLocator.Current
             .GetService<PlatformHotkeyConfiguration>()?.CommandModifiers ?? KeyModifiers.Control;
         
+        public static readonly StyledProperty<IBrush> SpecialBackgroundProperty = AvaloniaProperty.Register<SelectableTemplatedControl, IBrush>(nameof(SpecialBackground));
+
+        public IBrush SpecialBackground
+        {
+            get => (IBrush)GetValue(SpecialBackgroundProperty);
+            set => SetValue(SpecialBackgroundProperty, value);
+        }
+
         public static readonly AvaloniaProperty DeselectAllRequestProperty =
             AvaloniaProperty.Register<SelectableTemplatedControl, ICommand>(nameof(DeselectAllRequest));
 

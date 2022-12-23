@@ -15,7 +15,7 @@ namespace WDE.SmartScriptEditor.Models
         Object = 1,
     }
 
-    public class SmartCondition : SmartBaseElement
+    public class SmartCondition : VisualSmartBaseElement
     {
         private readonly IEditorFeatures features;
         private string comment = "";

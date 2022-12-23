@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Data;
 using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.VisualTree;
@@ -18,7 +19,7 @@ public abstract class FastTreeView<P, C> : Control where P : IParentType where C
     public static readonly StyledProperty<FlatTreeList<P, C>?> ItemsProperty = AvaloniaProperty.Register<FastTreeView<P, C>, FlatTreeList<P, C>?>(nameof(Items));
     public static readonly StyledProperty<bool> IsFilteredProperty = AvaloniaProperty.Register<FastTreeView<P, C>, bool>(nameof(IsFiltered));
     public static readonly StyledProperty<bool> RequestRenderProperty = AvaloniaProperty.Register<FastTreeView<P, C>, bool>(nameof(RequestRender));
-    public static readonly StyledProperty<INodeType?> SelectedNodeProperty = AvaloniaProperty.Register<FastTreeView<P, C>, INodeType?>(nameof(SelectedNode));
+    public static readonly StyledProperty<INodeType?> SelectedNodeProperty = AvaloniaProperty.Register<FastTreeView<P, C>, INodeType?>(nameof(SelectedNode), defaultBindingMode: BindingMode.TwoWay);
 
     
     public const float RowHeight = 24;

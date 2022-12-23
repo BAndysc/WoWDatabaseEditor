@@ -113,7 +113,7 @@ namespace WDE.SmartScriptEditor.Exporter
                     ActionParam4 = (int) a.GetValueOrDefault(3),
                     ActionParam5 = (int) a.GetValueOrDefault(4),
                     ActionParam6 = (int) a.GetValueOrDefault(5),
-                    ActionParam7 = (int) a.GetValueOrDefault(7),
+                    ActionParam7 = (int) a.GetValueOrDefault(6),
                     ActionFloatParam1 = a.GetFloatValueOrDefault(0),
                     ActionFloatParam2 = a.GetFloatValueOrDefault(1),
                     SourceType = a.Source.Id,
