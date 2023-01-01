@@ -1,5 +1,6 @@
 using System;
 using System.Text.RegularExpressions;
+using WDE.Common.Database;
 using WDE.SmartScriptEditor.Models;
 
 namespace WDE.SmartScriptEditor.Utils;

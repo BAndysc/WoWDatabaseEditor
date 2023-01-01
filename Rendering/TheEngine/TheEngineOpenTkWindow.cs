@@ -252,8 +252,9 @@ public class TheEngineOpenTkWindow : GameWindow, IWindowHost
     private bool wasRightDown = false;
     private void UpdateMouse()
     {
-        var isLeftDown = MouseState.IsButtonDown(MouseButton.Left);
-        var isRightDown = MouseState.IsButtonDown(MouseButton.Right);
+        mouseState = MouseState;
+        var isLeftDown = mouseState.IsButtonDown(MouseButton.Left);
+        var isRightDown = mouseState.IsButtonDown(MouseButton.Right);
         if (isLeftDown && !wasLeftDown)
             engine.inputManager.mouse.MouseDown(Input.MouseButton.Left);
         if (!isLeftDown && wasLeftDown)
@@ -264,12 +265,12 @@ public class TheEngineOpenTkWindow : GameWindow, IWindowHost
         if (!isRightDown && wasRightDown)
             engine.inputManager.mouse.MouseUp(isLeftDown ? Input.MouseButton.Left : Input.MouseButton.None);
         
-        engine.inputManager.mouse.MouseWheel(new Vector2(MouseState.ScrollDelta.X, MouseState.ScrollDelta.Y));
+        engine.inputManager.mouse.MouseWheel(new Vector2(mouseState.ScrollDelta.X, mouseState.ScrollDelta.Y));
 
         if (isMacOS)
-            engine.inputManager.mouse.PointerMoved(MouseState.Position.X, MouseState.Position.Y, WindowWidth / DpiScaling, WindowHeight / DpiScaling);
+            engine.inputManager.mouse.PointerMoved(mouseState.Position.X, mouseState.Position.Y, WindowWidth / DpiScaling, WindowHeight / DpiScaling);
         else
-            engine.inputManager.mouse.PointerMoved(MouseState.Position.X, MouseState.Position.Y, WindowWidth, WindowHeight);
+            engine.inputManager.mouse.PointerMoved(mouseState.Position.X, mouseState.Position.Y, WindowWidth, WindowHeight);
 
         wasLeftDown = isLeftDown;
         wasRightDown = isRightDown;
@@ -277,7 +278,8 @@ public class TheEngineOpenTkWindow : GameWindow, IWindowHost
 
     private static Keys[] StaticCachedKeys = Enum.GetValues<Keys>();
     private List<char> pressedKeys = new();
-    
+    private MouseState mouseState;
+
     private void UpdateKeyboard()
     {
         var keys = KeyboardState.GetSnapshot();
