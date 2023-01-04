@@ -31,7 +31,16 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
 
         private void OnLoaded()
         {
-            mainWindowHolder.RootWindow.Activated += WindowOnActivated;
+            try
+            {
+                if (mainWindowHolder.RootWindow != null)
+                    mainWindowHolder.RootWindow.Activated += WindowOnActivated;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
 
         private void WindowOnActivated(object? sender, EventArgs e)

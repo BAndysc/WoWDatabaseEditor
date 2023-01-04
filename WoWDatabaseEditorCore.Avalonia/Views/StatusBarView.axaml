@@ -152,7 +152,7 @@
                             </DataTriggerBehavior>
                         </Interaction.Behaviors>
                     </Image>
-                    <TextBlock Text="{CompiledBinding TotalProblems, Mode=OneWay}" IsHitTestVisible="False" Foreground="{DynamicResource StatusBarForeground}" />
+                    <TextBlock Text="{CompiledBinding TotalProblems, Mode=OneWay}" IsHitTestVisible="False" />
                     <TextBlock Text=" problems found"></TextBlock>
                 </WrapPanel>
             </Button>
@@ -161,7 +161,7 @@
         <Panel Grid.Column="5" VerticalAlignment="Stretch" Margin="0">
             <Button BorderThickness="0" Foreground="White" Background="Transparent" Command="{CompiledBinding TasksViewModel.TogglePanelVisibility}">
                 <WrapPanel>
-                    <TextBlock Text="{CompiledBinding TasksViewModel.PendingTasksCount, Mode=OneWay}" IsHitTestVisible="False" Foreground="{DynamicResource StatusBarForeground}" />
+                    <TextBlock Text="{CompiledBinding TasksViewModel.PendingTasksCount, Mode=OneWay}" IsHitTestVisible="False" />
                     <TextBlock Text=" tasks running in background"></TextBlock>
                 </WrapPanel>
             </Button>

@@ -15,13 +15,13 @@
                     <TextBlock FontWeight="Bold" Text="{CompiledBinding CurrentThemeName}" />
                 </SettingItem>
                 <SettingItem Header="Theme">
-                    <ComboBox Margin="30,0,0,0" VerticalAlignment="Top" Items="{CompiledBinding Themes}"
+                    <ComboBox Margin="30,0,0,0" VerticalAlignment="Top" ItemsSource="{CompiledBinding Themes}"
                               SelectedItem="{CompiledBinding ThemeName, Mode=TwoWay}" />
                 </SettingItem>
                 <SettingItem Header="Accent color" Help="Info: Custom accent color is available only in Windows 11 Theme.">
                     <DockPanel>
                         <Slider DockPanel.Dock="Right" Orientation="Vertical" VerticalAlignment="Stretch" Value="{CompiledBinding Lightness}" Name="Lightness" Minimum="0" Maximum="1" />
-                        <ColorPicker Lightness="{CompiledBinding Lightness}" SelectedColor="{CompiledBinding Color, Mode=TwoWay}" Width="200" Height="120" />
+                        <WdeColorPicker Lightness="{CompiledBinding Lightness}" SelectedColor="{CompiledBinding Color, Mode=TwoWay}" Width="200" Height="120" />
                     </DockPanel>
                 </SettingItem>
             </StackPanel>

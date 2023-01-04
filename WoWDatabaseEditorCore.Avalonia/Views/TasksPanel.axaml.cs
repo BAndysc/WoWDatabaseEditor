@@ -3,7 +3,7 @@ using Avalonia.Markup.Xaml;
 
 namespace WoWDatabaseEditorCore.Avalonia.Views
 {
-    public class TasksPanel : UserControl
+    public partial class TasksPanel : UserControl
     {
         public TasksPanel()
         {

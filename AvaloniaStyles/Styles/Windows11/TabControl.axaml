@@ -3,7 +3,7 @@
     <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/TabControl.axaml" />
     <Style Selector="TabItem:selected">
         <Setter Property="BorderBrush" Value="{DynamicResource TabControlBorderSelected}" />
-        <Setter Property="TextBlock.FontWeight" Value="Bold" />
+        <Setter Property="TextElement.FontWeight" Value="Bold" />
         <Setter Property="Margin" Value="-1,0,0,0"></Setter>
     </Style>
 </Styles>

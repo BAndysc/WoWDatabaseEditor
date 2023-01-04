@@ -34,7 +34,7 @@ public class SmartScriptOverlay : Control
         set => SetAndRaise(HideConditionsProperty, ref hideConditions, value);
     }
     
-    private ScrollViewer ScrollView => this.FindAncestorOfType<ScrollViewer>();
+    private ScrollViewer ScrollView => this.FindAncestorOfType<ScrollViewer>()!;
     private InverseRenderTransformPanel? Panel => this.FindAncestorOfType<InverseRenderTransformPanel>();
 
     private Rect VisibleRect

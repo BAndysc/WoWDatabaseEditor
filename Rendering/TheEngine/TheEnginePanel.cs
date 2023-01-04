@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Data;
@@ -9,27 +11,25 @@ using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using Avalonia.OpenGL;
 using Avalonia.OpenGL.Controls;
+using Avalonia.Rendering;
+using Avalonia.Rendering.Composition;
 using Avalonia.Threading;
 using TheAvaloniaOpenGL;
 using TheEngine.Config;
 using MouseButton = TheEngine.Input.MouseButton;
 using TheEngine.Utils;
 using TheMaths;
+using Point = Avalonia.Point;
 
+[assembly: InternalsVisibleTo("RenderingTester")]
 namespace TheEngine
 {
 #if USE_OPENTK
     public class TheEnginePanel : OpenTKGlControl2, IWindowHost, IDisposable
 #else
-    public class TheEnginePanel : OpenGlBase, IWindowHost, IDisposable
+    public class TheEnginePanel : OpenGlBase2, IWindowHost, IDisposable, ICustomHitTest
 #endif
     {
-        public static KeyGesture Undo { get; } = AvaloniaLocator.Current
-            .GetService<PlatformHotkeyConfiguration>()?.Undo.FirstOrDefault() ?? new KeyGesture(Key.Z, KeyModifiers.Control);
-
-        public static KeyGesture Redo { get; } = AvaloniaLocator.Current
-            .GetService<PlatformHotkeyConfiguration>()?.Redo.FirstOrDefault() ?? new KeyGesture(Key.Y, KeyModifiers.Control);
-        
         protected Engine? engine;
         private Stopwatch sw = new Stopwatch();
         private Stopwatch renderStopwatch = new Stopwatch();
@@ -46,14 +46,23 @@ namespace TheEngine
             framerate.Add(delta);
         }
 
-        public TheEnginePanel() : base(
-            /*new OpenGlControlSettings
-        {
-            ContinuouslyRender = true,
-            //DeInitializeOnVisualTreeDetachment = false,
-        }*/)
+        public TheEnginePanel() : base()
         {
             Focusable = true;
+            DispatcherTimer.Run(() =>
+            {
+                var _compo = typeof(OpenGlControlBase).GetField("_compositor", BindingFlags.Instance | BindingFlags.NonPublic);
+                if (_compo == null)
+                    return true;
+                var compositor = _compo.GetValue(this) as Compositor;
+                compositor.RequestCompositionUpdate(() =>
+                {
+                    var updatemethod =
+                        typeof(OpenGlControlBase).GetMethod("Update", BindingFlags.Instance | BindingFlags.NonPublic);
+                    updatemethod.Invoke(this, null);
+                });
+                return true;
+            }, TimeSpan.FromMilliseconds(12));
         }
 
         static TheEnginePanel()
@@ -121,7 +130,7 @@ namespace TheEngine
             base.OnPointerWheelChanged(e);
         }
 
-        protected override void OnOpenGlInit(GlInterface gl, int fb)
+        protected override void OnOpenGlInit(GlInterface gl)
         {
             try
             {
@@ -130,7 +139,7 @@ namespace TheEngine
 #if DEBUG && DEBUG_OPENGL
                 device = new DebugDevice(device);
 #endif
-                engine = new Engine(device, new Configuration(), this, true);
+                engine = new Engine(device, new Configuration(), this, false);
 #else
                 IDevice device;
                 var real = new RealDevice(gl);
@@ -139,7 +148,7 @@ namespace TheEngine
 #else
                 device = new RealDeviceWrapper(real);
 #endif
-                engine = new Engine(device, new Configuration(), this, true);
+                engine = new Engine(device, new Configuration(), this, false);
 #endif
             }
             catch (Exception e)
@@ -149,19 +158,37 @@ namespace TheEngine
             }
         }
 
-        protected override void OnOpenGlDeinit(GlInterface gl, int fb)
+        protected override void OnOpenGlDeinit(GlInterface gl)
         {
             game?.DisposeGame();
             engine.Dispose();
             engine = null!;
-            base.OnOpenGlDeinit(gl, fb);
+            base.OnOpenGlDeinit(gl);
+        }
+
+        private PixelSize GetPixelSize(IRenderRoot visualRoot)
+        {
+            var scaling = visualRoot.RenderScaling;
+            return new PixelSize(Math.Max(1, (int)(Bounds.Width * scaling)),
+                Math.Max(1, (int)(Bounds.Height * scaling)));
+        }
+        
+        public (float, float) PixelSize
+        {
+            get
+            {
+                var pixelSize = GetPixelSize(VisualRoot);
+                return (pixelSize.Width, pixelSize.Height);
+            }
         }
 
         protected override void OnOpenGlRender(GlInterface gl, int fb)
         {
+            //Dispatcher.UIThread.Post(RequestNextFrameRendering, DispatcherPriority.Render);
             if (delayedDispose)
             {
-                DoCleanup();
+                Console.WriteLine("Can't do DoCleanup as before, 3D should be fixed");
+                //DoCleanup();
                 delayedDispose = false;
                 return;
             }
@@ -170,7 +197,7 @@ namespace TheEngine
                 return;
             
             engine.statsManager.PixelSize = new Vector2(PixelSize.Item1, PixelSize.Item2);
-            engine.statsManager.Counters.PresentTime.Add(PresentTime);
+            engine.statsManager.Counters.PresentTime.Add(default); // @todo PresentTime
             try
             {
                 engine.Device.device.CheckError("start OnOpenGlRender");
@@ -183,7 +210,7 @@ namespace TheEngine
                 Tick(delta);
                 engine.statsManager.Counters.FrameTime.Add(delta);
                 sw.Restart();
-                Dispatcher.UIThread.Post(() => RaisePropertyChanged(FrameRateProperty, Optional<float>.Empty, FrameRate), DispatcherPriority.Render);
+                Dispatcher.UIThread.Post(() => RaisePropertyChanged(FrameRateProperty, 0, FrameRate), DispatcherPriority.Render);
 
                 updateStopwatch.Restart();
                 Update(delta);
@@ -241,8 +268,8 @@ namespace TheEngine
         {
             base.OnAttachedToVisualTree(e);
             sw.Restart();
-            globalKeyDownDisposable = ((IControl)e.Root).AddDisposableHandler(KeyDownEvent, GlobalKeyDown, RoutingStrategies.Tunnel);
-            globalKeyUpDisposable = ((IControl)e.Root).AddDisposableHandler(KeyUpEvent, GlobalKeyUp, RoutingStrategies.Tunnel);
+            globalKeyDownDisposable = ((Control)e.Root).AddDisposableHandler(KeyDownEvent, GlobalKeyDown, RoutingStrategies.Tunnel);
+            globalKeyUpDisposable = ((Control)e.Root).AddDisposableHandler(KeyUpEvent, GlobalKeyUp, RoutingStrategies.Tunnel);
         }
 
         private bool IsModifierKey(Key key) => key is Key.LeftShift or Key.LeftCtrl or Key.LeftAlt or Key.LWin;
@@ -310,7 +337,7 @@ namespace TheEngine
         
         public float WindowWidth => PixelSize.Item1;
         public float WindowHeight => PixelSize.Item2;
-        public float DpiScaling => 1;
+        public float DpiScaling => (float)VisualRoot.RenderScaling;
 
         public IGame? Game
         {
@@ -326,7 +353,13 @@ namespace TheEngine
 
         public void Dispose()
         {
-            DoCleanup();
+            Console.WriteLine("Can't do DoClanup as before");
+            //DoCleanup();
+        }
+
+        public bool HitTest(Point point)
+        {
+            return true;
         }
     }
 }

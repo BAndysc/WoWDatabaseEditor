@@ -188,7 +188,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         {
             await Task.Delay(1); // add small delay for UI to render
             int order = 0;
-            foreach (var smartDataGroup in smartDataManager.GetGroupsData(type))
+            foreach (var smartDataGroup in await smartDataManager.GetGroupsData(type))
             {
                 foreach (var member in smartDataGroup.Members)
                 {

@@ -11,7 +11,7 @@ using WoWDatabaseEditorCore.Services.QuickAccess;
 
 namespace WoWDatabaseEditorCore.Avalonia.Services.QuickAccess;
 
-public class QuickAccessView : UserControl
+public partial class QuickAccessView : UserControl
 {
     private TextBox searchBox = null!;
     private ListBox resultsList = null!;
@@ -26,14 +26,14 @@ public class QuickAccessView : UserControl
     private void InitializeComponent()
     {
         AvaloniaXamlLoader.Load(this);
-        searchBox = this.FindControl<TextBox>("SearchBox");
-        resultsList = this.FindControl<ListBox>("ResultsList");
+        searchBox = this.GetControl<TextBox>("SearchBox");
+        resultsList = this.GetControl<ListBox>("ResultsList");
         adapter = new SelectingItemsControlSelectionAdapter(resultsList);
         adapter.Commit += ResultCommit;
         searchBox.GotFocus += (_, _) =>
         {
             if (searchBoxMoveToEnd)
-                searchBox.SelectionEnd = searchBox.SelectionStart = searchBox.Text.Length;
+                searchBox.SelectionEnd = searchBox.SelectionStart = searchBox.Text?.Length ?? 0;
             else
                searchBox.SelectAll();
         };
@@ -72,7 +72,7 @@ public class QuickAccessView : UserControl
                 vm.Commit(item);
                 searchBoxMoveToEnd = true;
                 searchBox.Focus();
-                searchBox.SelectionEnd = searchBox.SelectionStart = searchBox.Text.Length;
+                searchBox.SelectionEnd = searchBox.SelectionStart = searchBox.Text?.Length ?? 0;
                 searchBoxMoveToEnd = false;   
             }
         }

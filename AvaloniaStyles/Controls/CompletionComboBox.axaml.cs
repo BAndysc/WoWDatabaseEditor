@@ -204,7 +204,14 @@ namespace AvaloniaStyles.Controls
                 IsDropDownOpen = true;
                 DispatcherTimer.RunOnce(() =>
                 {
-                    SearchTextBox.RaiseEvent(new TextInputEventArgs
+                    TextInputEventArgs args = new TextInputEventArgs();
+                    args.Handled = false;
+                    args.Text = e.Text;
+                    args.Route = e.Route;
+                    args.RoutedEvent = e.RoutedEvent;
+                    args.Source = SearchTextBox;
+                    SearchTextBox.RaiseEvent(args);
+                    /*SearchTextBox.RaiseEvent(new TextInputEventArgs
                     {
                         Device = e.Device,
                         Handled = false,
@@ -212,7 +219,7 @@ namespace AvaloniaStyles.Controls
                         Route = e.Route,
                         RoutedEvent = e.RoutedEvent,
                         Source = SearchTextBox
-                    });
+                    });*/
                 }, TimeSpan.FromMilliseconds(1));
                 e.Handled = true;
             }
@@ -246,7 +253,7 @@ namespace AvaloniaStyles.Controls
                             return;
                         
                         //box.SearchText = "";
-                        FocusManager.Instance!.Focus(box.SearchTextBox, NavigationMethod.Pointer);
+                        box.SearchTextBox.Focus(NavigationMethod.Pointer);
                         box.SearchTextBox.SelectionEnd = box.SearchTextBox.SelectionStart = box.SearchText.Length;
                     }, TimeSpan.FromMilliseconds(16));
 
@@ -262,12 +269,12 @@ namespace AvaloniaStyles.Controls
         
         protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
         {
-            SearchTextBox = e.NameScope.Find<TextBox>("PART_SearchTextBox");
+            SearchTextBox = e.NameScope.Find<TextBox>("PART_SearchTextBox")  ?? throw new NullReferenceException("Couldn't find PART_SearchTextBox");
             SearchTextBox.AddHandler(KeyDownEvent, SearchTextBoxOnKeyDown, RoutingStrategies.Tunnel);
             
-            ToggleButton = e.NameScope.Find<ToggleButton>("PART_Button");
+            ToggleButton = e.NameScope.Find<ToggleButton>("PART_Button")  ?? throw new NullReferenceException("Couldn't find PART_Button");
             
-            ListBox = e.NameScope.Find<ListBox>("PART_SelectingItemsControl");
+            ListBox = e.NameScope.Find<ListBox>("PART_SelectingItemsControl") ?? throw new NullReferenceException("Couldn't find PART_SelectingItemsControl");
             ListBox.PointerReleased += OnSelectorPointerReleased;
             if (ListBox != null)
             {
@@ -294,11 +301,11 @@ namespace AvaloniaStyles.Controls
                 return;
             if (watermark == null)
                 return;
-            foreach (var binding in AvaloniaLocator.Current.GetRequiredService<PlatformHotkeyConfiguration>().Copy)
+            foreach (var binding in TopLevel.GetTopLevel(this)!.PlatformSettings!.HotkeyConfiguration!.Copy)
             {
                 if (binding.Matches(e))
                 {
-                    AvaloniaLocator.Current.GetRequiredService<IClipboard>().SetTextAsync(watermark);
+                    TopLevel.GetTopLevel(this)?.Clipboard?.SetTextAsync(watermark);
                     e.Handled = true;
                 }
             }
@@ -306,7 +313,7 @@ namespace AvaloniaStyles.Controls
 
         private void OnSelectorPointerReleased(object? sender, PointerReleasedEventArgs e)
         {
-            if (e.Source is IControl control && control.FindAncestorOfType<CheckBox>() != null)
+            if (e.Source is Control control && control.FindAncestorOfType<CheckBox>() != null)
                 return;
             
             Commit(adapter?.SelectedItem);
@@ -318,7 +325,7 @@ namespace AvaloniaStyles.Controls
             Dispatcher.UIThread.Post(() =>
             {
                 // Call the central updated text method as a user-initiated action
-                TextUpdated(textBox.Text);
+                TextUpdated(textBox.Text ?? "");
             });
         }
         
@@ -340,14 +347,14 @@ namespace AvaloniaStyles.Controls
             {
                 if (adapter != null)
                 {
-                    adapter.Items = null;
+                    adapter.ItemsSource = null;
                 }
 
                 adapter = value;
 
                 if (adapter != null)
                 {
-                    adapter.Items = view;
+                    adapter.ItemsSource = view;
                 }
             }
         }
@@ -379,7 +386,7 @@ namespace AvaloniaStyles.Controls
 
                                     if (args.Key == Key.Enter)
                                     {
-                                        var enterArgs = new EnterPressedArgs(textBox.Text,
+                                        var enterArgs = new EnterPressedArgs(textBox.Text ?? "",
                                             SelectionAdapter.SelectedItem);
                                         OnEnterPressed?.Invoke(this, enterArgs);
                                         if (!enterArgs.Handled)
@@ -389,8 +396,15 @@ namespace AvaloniaStyles.Controls
                                     }
                                     else if (args.Key == Key.Tab)
                                     {
-                                        args.Key = (args.KeyModifiers & KeyModifiers.Shift) != 0 ? Key.Up : Key.Down;
-                                        SelectionAdapter.HandleKeyDown(args);
+                                        var newArgs = new KeyEventArgs()
+                                        {
+                                            Key = (args.KeyModifiers & KeyModifiers.Shift) != 0 ? Key.Up : Key.Down,
+                                            Route = args.Route,
+                                            RoutedEvent = args.RoutedEvent,
+                                            KeyModifiers = args.KeyModifiers,
+                                            Source = args.Source,
+                                        };
+                                        SelectionAdapter.HandleKeyDown(newArgs);
                                         args.Handled = true;
                                     }
                                     else if (args.Key == Key.Escape)
@@ -422,7 +436,7 @@ namespace AvaloniaStyles.Controls
                                 // don't ever let textbox lost focus
                                 if (IsDropDownOpen)
                                 {
-                                    Dispatcher.UIThread.Post(() => FocusManager.Instance!.Focus(textBox));
+                                    Dispatcher.UIThread.Post(() => textBox.Focus());
                                 }
                             }));
                 }
@@ -440,7 +454,7 @@ namespace AvaloniaStyles.Controls
         private void Close()
         {
             IsDropDownOpen = false;
-            FocusManager.Instance!.Focus(ToggleButton, NavigationMethod.Tab);
+            ToggleButton.Focus(NavigationMethod.Tab);
             Closed?.Invoke();
         }
         

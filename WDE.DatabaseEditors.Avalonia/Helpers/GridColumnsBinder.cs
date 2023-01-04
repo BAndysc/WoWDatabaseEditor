@@ -9,26 +9,26 @@ namespace WDE.DatabaseEditors.Avalonia.Helpers
 {
     public class GridColumnsBinder
     {
-        public static readonly AttachedProperty<ObservableCollection<DatabaseColumnHeaderViewModel>> ColumnsProperty = AvaloniaProperty.RegisterAttached<IAvaloniaObject, ObservableCollection<DatabaseColumnHeaderViewModel>>("Columns", typeof(GridColumnsBinder));
+        public static readonly AttachedProperty<ObservableCollection<DatabaseColumnHeaderViewModel>> ColumnsProperty = AvaloniaProperty.RegisterAttached<AvaloniaObject, ObservableCollection<DatabaseColumnHeaderViewModel>>("Columns", typeof(GridColumnsBinder));
 
-        public static ObservableCollection<DatabaseColumnHeaderViewModel> GetColumns(IAvaloniaObject obj)
+        public static ObservableCollection<DatabaseColumnHeaderViewModel> GetColumns(AvaloniaObject obj)
         {
-            return obj.GetValue(ColumnsProperty);
+            return (ObservableCollection<DatabaseColumnHeaderViewModel>?)obj.GetValue(ColumnsProperty) ?? new ObservableCollection<DatabaseColumnHeaderViewModel>();
         }
 
-        public static void SetColumns(IAvaloniaObject obj, ObservableCollection<DatabaseColumnHeaderViewModel> value)
+        public static void SetColumns(AvaloniaObject obj, ObservableCollection<DatabaseColumnHeaderViewModel> value)
         {
             obj.SetValue(ColumnsProperty, value);
         }
 
-        public static readonly AttachedProperty<ObservableCollection<DatabaseColumnHeaderViewModel>> ColumnsWithHeaderProperty = AvaloniaProperty.RegisterAttached<IAvaloniaObject, ObservableCollection<DatabaseColumnHeaderViewModel>>("ColumnsWithHeader", typeof(GridColumnsBinder));
+        public static readonly AttachedProperty<ObservableCollection<DatabaseColumnHeaderViewModel>> ColumnsWithHeaderProperty = AvaloniaProperty.RegisterAttached<AvaloniaObject, ObservableCollection<DatabaseColumnHeaderViewModel>>("ColumnsWithHeader", typeof(GridColumnsBinder));
 
-        public static ObservableCollection<DatabaseColumnHeaderViewModel> GetColumnsWithHeader(IAvaloniaObject obj)
+        public static ObservableCollection<DatabaseColumnHeaderViewModel> GetColumnsWithHeader(AvaloniaObject obj)
         {
-            return obj.GetValue(ColumnsWithHeaderProperty);
+            return (ObservableCollection<DatabaseColumnHeaderViewModel>?)obj.GetValue(ColumnsWithHeaderProperty) ?? new ObservableCollection<DatabaseColumnHeaderViewModel>();
         }
 
-        public static void SetColumnsWithHeader(IAvaloniaObject obj, ObservableCollection<DatabaseColumnHeaderViewModel> value)
+        public static void SetColumnsWithHeader(AvaloniaObject obj, ObservableCollection<DatabaseColumnHeaderViewModel> value)
         {
             obj.SetValue(ColumnsWithHeaderProperty, value);
         }

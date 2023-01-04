@@ -9,6 +9,7 @@
 
     <ItemGroup>
         <PackageReference Include="JetBrains.Profiler.Api" Version="1.2.0" />
+        <PackageReference Include="Avalonia.Desktop" Version="$(AvaloniaVersion)"/>
     </ItemGroup>
 
     <Import Project="..\lib3d.props" />

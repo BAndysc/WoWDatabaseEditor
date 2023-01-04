@@ -4,7 +4,7 @@ using Avalonia.Markup.Xaml;
 
 namespace WDE.FirstTimeWizard.Views;
 
-public class FirstTimeWizardView : UserControl
+public partial class FirstTimeWizardView : UserControl
 {
     public FirstTimeWizardView()
     {

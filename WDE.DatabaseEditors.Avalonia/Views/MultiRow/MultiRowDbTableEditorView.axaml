@@ -65,24 +65,24 @@
         </ItemsPanelTemplate>
         <DataTemplate x:Key="RowTemplate" x:DataType="vm:DatabaseEntityViewModel">
             <multiRow:SelectablePanel>
-                <ItemsPresenter 
+                <ItemsControl 
                     KeyboardNavigation.TabNavigation="Continue"
-                    Items="{CompiledBinding Cells, Mode=OneTime}" 
+                    ItemsSource="{CompiledBinding Cells, Mode=OneTime}" 
                     ItemsPanel="{StaticResource HorizontalRowPanel}">
-                    <ItemsPresenter.Styles>
+                    <ItemsControl.Styles>
                         <Style Selector="Grid > ContentPresenter" x:DataType="vm:DatabaseCellViewModel">
                             <Setter Property="(Grid.Column)" Value="{CompiledBinding ColumnIndex}" />
                         </Style>
-                    </ItemsPresenter.Styles>
-                </ItemsPresenter>
+                    </ItemsControl.Styles>
+                </ItemsControl>
             </multiRow:SelectablePanel>
         </DataTemplate>
         <DataTemplate x:Key="VerticalRowTemplate" DataType="vm:DatabaseEntityViewModel">
-            <ItemsPresenter 
+            <ItemsControl 
                 KeyboardNavigation.TabNavigation="Continue"
-                Items="{CompiledBinding Cells, Mode=OneWay}"
+                ItemsSource="{CompiledBinding Cells, Mode=OneWay}"
                 ItemsPanel="{StaticResource VerticalRowPanel}">
-                <ItemsPresenter.ItemTemplate>
+                <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="vm:DatabaseCellViewModel">
                         <DockPanel LastChildFill="True">
                             <TextBlock Text="{CompiledBinding ColumnName, StringFormat={}{0}: }" Opacity="0.7" VerticalAlignment="Center" Width="100" FontWeight="Bold" />
@@ -90,8 +90,8 @@
                         </DockPanel>
 
                     </DataTemplate>
-                </ItemsPresenter.ItemTemplate>
-            </ItemsPresenter>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
         </DataTemplate>
     </UserControl.Resources>
     <UserControl.Styles>
@@ -205,11 +205,11 @@
         
         <Grid utils:GridUtils.DynamicRows="{CompiledBinding SplitVertical, Converter={StaticResource RowsConverter}}"
           utils:GridUtils.DynamicColumns="{CompiledBinding SplitHorizontal, Converter={StaticResource ColumnsConverter}}">
-            <ScrollViewer Padding="0,0,15,15" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible" AllowAutoHide="False">
+            <ScrollViewer BringIntoViewOnFocusChange="False" Padding="0,0,15,15" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible" AllowAutoHide="False">
                 <fastTableView:VeryFastTableView
                     InteractiveHeader="True"
                     ValueUpdateRequest="VeryFastTableView_OnValueUpdateRequest"
-                    TextBlock.FontFamily="Consolas,Menlo,Courier,Courier New"
+                    TextElement.FontFamily="Consolas,Menlo,Courier,Courier New"
                     SelectedCellIndex="{CompiledBinding FocusedCellIndex}"
                     SelectedRowIndex="{CompiledBinding FocusedRowIndex}"
                     MultiSelection="{CompiledBinding MultiSelection}"

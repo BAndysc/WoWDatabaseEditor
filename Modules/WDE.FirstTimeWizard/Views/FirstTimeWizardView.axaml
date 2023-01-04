@@ -36,8 +36,8 @@
             </DockPanel>
             <Panel IsVisible="{CompiledBinding HasCoreVersion}">
                 <Grid ColumnDefinitions="200,5,*">
-                    <ListBox Items="{CompiledBinding Configurables}"
-                             VirtualizationMode="None"
+                    <ListBox ItemsSource="{CompiledBinding Configurables}"
+                            
                              SelectedItem="{CompiledBinding SelectedConfigurable}">
                         <ListBox.ItemTemplate>
                             <DataTemplate>

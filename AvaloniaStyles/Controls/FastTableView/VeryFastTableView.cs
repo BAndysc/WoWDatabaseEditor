@@ -4,13 +4,15 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
+using Avalonia.Styling;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using WDE.Common.Utils;
+using WDE.MVVM.Observable;
 
 namespace AvaloniaStyles.Controls.FastTableView;
 
-public partial class VeryFastTableView : Panel, IKeyboardNavigationHandler, IFastTableContext
+public partial class VeryFastTableView : Panel, IFastTableContext
 {
     private static double ColumnSpacing = 10;
     private static double RowHeight = 28;
@@ -36,7 +38,7 @@ public partial class VeryFastTableView : Panel, IKeyboardNavigationHandler, IFas
     private static bool GetResource<T>(string key, T defaultVal, out T outT)
     {
         outT = defaultVal;
-        if (Application.Current!.Styles.TryGetResource(key, out var res) && res is T t)
+        if (Application.Current!.Styles.TryGetResource(key, SystemTheme.EffectiveThemeIsDark ? ThemeVariant.Dark : ThemeVariant.Light, out var res) && res is T t)
         {
             outT = t;
             return true;
@@ -88,10 +90,10 @@ public partial class VeryFastTableView : Panel, IKeyboardNavigationHandler, IFas
         {
             view.EnsureCellVisible((int)e.NewValue!);
         });
-        AffectsRender<VeryFastTableView>(SelectedRowIndexProperty);
-        AffectsRender<VeryFastTableView>(SelectedCellIndexProperty);
-        AffectsRender<VeryFastTableView>(RowFilterProperty);
-        AffectsRender<VeryFastTableView>(RowFilterParameterProperty);
+        AffectsRender(SelectedRowIndexProperty);
+        AffectsRender(SelectedCellIndexProperty);
+        AffectsRender(RowFilterProperty);
+        AffectsRender(RowFilterParameterProperty);
         AffectsRender(IsGroupingEnabledProperty);
         AffectsMeasure<VeryFastTableView>(RowFilterProperty);
         AffectsMeasure<VeryFastTableView>(RowFilterParameterProperty);
@@ -104,9 +106,27 @@ public partial class VeryFastTableView : Panel, IKeyboardNavigationHandler, IFas
 
         RowFilterParameterProperty.Changed.AddClassHandler<VeryFastTableView>((table, e) => table.RemoveInvisibleFromSelection());
     }
-    
+
+    private static void AffectsRender(AvaloniaProperty property)
+    {
+        property.Changed.AddClassHandler<VeryFastTableView>((t, e) =>
+        {
+            t.InvalidateVisual();
+        });
+    }
+
+    VeryFastTableViewRenderer renderer;
+
+    public new void InvalidateVisual()
+    {
+        renderer.InvalidateVisual();
+    }
+
     public VeryFastTableView()
     {
+        renderer = new VeryFastTableViewRenderer();
+        Children.Add(renderer);
+        renderer.RenderOverride = Render;
         var openAndErase = new DelegateCommand(() =>
         {
             if (IsSelectedCellValid)
@@ -132,6 +152,23 @@ public partial class VeryFastTableView : Panel, IKeyboardNavigationHandler, IFas
             Command = openAndErase
         });
         headerViews = new RecyclableViewList(this);
+    }
+
+    private ScrollViewer? boundScrollViewer;
+    
+    public override void ApplyTemplate()
+    {
+        base.ApplyTemplate();
+        if (boundScrollViewer != null)
+            boundScrollViewer.ScrollChanged -= ScrollViewerOnScrollChanged;
+        if (ScrollViewer != null)
+            ScrollViewer.ScrollChanged += ScrollViewerOnScrollChanged;
+        boundScrollViewer = ScrollViewer;
+    }
+
+    private void ScrollViewerOnScrollChanged(object? sender, ScrollChangedEventArgs e)
+    {
+        InvalidateVisual();
     }
 
     private void RemoveInvisibleFromSelection()
@@ -177,6 +214,10 @@ public partial class VeryFastTableView : Panel, IKeyboardNavigationHandler, IFas
         {
             InvalidateMeasure();
             InvalidateArrange();
+            ScrollViewer!.GetObservable(Avalonia.Controls.ScrollViewer.OffsetProperty).SubscribeAction(x =>
+            {
+                Console.WriteLine(x);
+            });
         });
     }
 
@@ -241,12 +282,12 @@ public partial class VeryFastTableView : Panel, IKeyboardNavigationHandler, IFas
         }
     }
 
-    protected override void OnPointerLeave(PointerEventArgs e)
+    protected override void OnPointerExited(PointerEventArgs e)
     {
         Cursor = Cursor.Default;
         lastMouseLocation = new Point(-1, -1);
         InvalidateVisual();
-        base.OnPointerLeave(e);
+        base.OnPointerExited(e);
     }
 
     protected override void OnPointerMoved(PointerEventArgs e)

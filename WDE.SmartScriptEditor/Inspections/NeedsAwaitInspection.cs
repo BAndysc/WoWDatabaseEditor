@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using WDE.Common.Managers;
+using WDE.MVVM.Observable;
 using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Models;
 
@@ -13,7 +15,15 @@ public class NeedsAwaitInspection : IEventInspection
             
     public NeedsAwaitInspection(ISmartDataManager smartDataManager)
     {
-        foreach (var a in smartDataManager.GetAllData(SmartType.SmartAction))
+        smartDataManager.GetAllData(SmartType.SmartAction).SubscribeAction(Load);
+    }
+
+    private void Load(IReadOnlyList<SmartGenericJsonData> list)
+    {
+        waitAction = -1;
+        awaitAction = -1;
+        needsAwait = -1;
+        foreach (var a in list)
         {
             if (a.Flags.HasFlagFast(ActionFlags.Await))
             {
@@ -35,7 +45,7 @@ public class NeedsAwaitInspection : IEventInspection
             }
         }
     }
-        
+
     public InspectionResult? Inspect(SmartEvent e)
     {
         bool awaitRequired = false;

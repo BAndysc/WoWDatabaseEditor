@@ -18,7 +18,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="DynamicData">
-      <Version>7.2.1</Version>
+      <Version>7.9.5</Version>
     </PackageReference>
     <PackageReference Include="SmartFormat.NET">
       <Version>2.7.3</Version>
@@ -40,5 +40,11 @@
     <None Update="Icons\**\*.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Icons\icon_tables.png" />
+    <None Remove="Icons\icon_tables@2x.png" />
+    <None Remove="Icons\icon_tables_white.png" />
+    <None Remove="Icons\icon_tables_white@2x.png" />
   </ItemGroup>
 </Project>

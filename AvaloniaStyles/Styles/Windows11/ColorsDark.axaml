@@ -1,0 +1,87 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/ColorsDark.axaml" />
+    <Styles.Resources>
+        <SolidColorBrush x:Key="TabControlBorder" Color="Transparent" />
+        <SolidColorBrush x:Key="TabControlBorderSelected" Color="#333333" />
+        <SolidColorBrush x:Key="TabItemHeaderBackgroundUnselected" Color="Transparent" />
+         <!-- 2B2D30-->
+        <SolidColorBrush Color="#2B2D30" x:Key="TitleBarBackground"  Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush Color="#2B2D30" x:Key="WindowContentBackground"  Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush Color="#2B2D30" x:Key="MainWindowContentBackground"  Accent.Hue="{DynamicResource AccentHue}" />
+        
+        <SolidColorBrush Color="#5fa2da" x:Key="AccentColorMedium"  Accent.Hue="{DynamicResource AccentHue}" />
+        
+        <SolidColorBrush Color="Black" x:Key="OuterWindowBorderColor" />
+        <SolidColorBrush Color="#78797B" x:Key="InnerWindowBorderColor" />
+        
+        <SolidColorBrush Color="#2B2D31" x:Key="ContentBackground" />
+        
+        <Thickness x:Key="ButtonBorderThemeThickness">1</Thickness>
+        
+        <Color x:Key="ControlStrokeColorDefault">#12FFFFFF</Color>
+        <Color x:Key="ControlStrokeColorSecondary">#18FFFFFF</Color>
+        <!-- button -->
+        <CornerRadius x:Key="ControlCornerRadius">4</CornerRadius>
+        <CornerRadius x:Key="ControlCornerTopRadius">4,4,0,0</CornerRadius>
+        
+        <SolidColorBrush x:Key="ButtonBackground" Color="#0FFFFFFF" />
+        <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="#15FFFFFF" />
+        <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="#08FFFFFF" />
+        <SolidColorBrush x:Key="ButtonBackgroundDisabled" Color="#0BFFFFFF" />
+        
+        <SolidColorBrush x:Key="ButtonForeground" Color="#d4d4d4" />
+        <LinearGradientBrush x:Key="ControlElevationBorderBrush" StartPoint="0,0" EndPoint="0,3">
+            <LinearGradientBrush.GradientStops>
+                <GradientStop Offset="0.33" Color="{StaticResource ControlStrokeColorSecondary}" />
+                <GradientStop Offset="1" Color="{StaticResource ControlStrokeColorDefault}" />
+            </LinearGradientBrush.GradientStops>
+        </LinearGradientBrush>
+        
+        
+        <SolidColorBrush x:Key="PrimaryButtonBackground" Color="#118aed"  Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush x:Key="PrimaryButtonBackgroundPointerOver" Color="#1494FF"  Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush x:Key="PrimaryButtonBorderBrushPointerOver" Color="#1494FF"  Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush x:Key="PrimaryButtonBackgroundPressed" Color="#0F74C7"  Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush x:Key="PrimaryButtonBorderBrushPressed" Color="#0F74C7"  Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush x:Key="PrimaryButtonForeground" Color="White"  Accent.Hue="{DynamicResource AccentHue}" />
+        
+        <!-- textbox -->
+        <Thickness x:Key="TextControlBorderThemeThickness">0,0,0,1</Thickness>
+        <Thickness x:Key="TextControlBorderThemeThicknessFocused">0,0,0,2</Thickness>
+        <SolidColorBrush x:Key="TextControlBorderBrush" Color="#303030" />
+        <SolidColorBrush x:Key="TextControlBorderBrushBottom" Color="#9A9A9A" />
+        <SolidColorBrush x:Key="TextControlBorderBrushFocused" Color="#6EBFF9" />
+        <StaticResource ResourceKey="ContentBackground" x:Key="TextControlBackground" />
+        <SolidColorBrush Color="#313231" x:Key="TextControlBackgroundPointerOver" />
+        <SolidColorBrush Color="#1F1F20" x:Key="TextControlBackgroundFocused" />
+        
+        <!-- combobox -->
+        <SolidColorBrush x:Key="ComboBoxBackground" Color="#212121" />
+        <SolidColorBrush x:Key="ComboBoxBackgroundPointerOver" Color="#323232" />
+        <SolidColorBrush x:Key="ComboBoxBackgroundPressed" Color="#272726" />
+        <SolidColorBrush x:Key="ComboBoxBackgroundDisabled" Color="#3F3F3D" />
+        <SolidColorBrush x:Key="ComboBoxBackgroundUnfocused" Color="#212121" />
+        <SolidColorBrush x:Key="ComboBoxBorderBrush" Color="#353535" />
+        <SolidColorBrush x:Key="ComboBoxBorderBrushPointerOver" Color="#353535" />
+        <SolidColorBrush x:Key="ComboBoxBorderBrushPressed" Color="#353535" />
+        <SolidColorBrush x:Key="ComboBoxBorderBrushDisabled" Color="#454545" />
+        
+        
+        <!-- listbox -->
+        <Color x:Key="SystemListLowColor">#19FFFFFF</Color>
+        <Color x:Key="SystemListMediumColor">#33FFFFFF</Color>
+        <SolidColorBrush x:Key="SystemControlHighlightListAccentHighBrush" Accent.BaseColor="{DynamicResource SystemAccentColor}" Opacity="0.9"  Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush x:Key="SystemControlHighlightListAccentMediumBrush" Accent.BaseColor="{DynamicResource SystemAccentColor}" Opacity="0.6"  Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush x:Key="SystemControlHighlightListAccentLowBrush" Accent.BaseColor="{DynamicResource SystemAccentColor}" Opacity="0.8"  Accent.Hue="{DynamicResource AccentHue}" />
+        <!--<SolidColorBrush x:Key="SystemControlHighlightListMediumBrush" BaseColor="{StaticResource SystemListMediumColor}"  Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush x:Key="SystemControlHighlightListLowBrush" BaseColor="{StaticResource SystemListLowColor}"  Accent.Hue="{DynamicResource AccentHue}" />-->
+
+        <!-- setting item -->
+        <SolidColorBrush x:Key="SettingItemBackground" Color="#333333" />
+        <SolidColorBrush x:Key="SettingItemBorder" Color="#494949" />
+        
+        <!-- dock -->
+        <SolidColorBrush Accent.BaseColor="{DynamicResource SystemAccentColor}" x:Key="DockThemeAccentBrush"  Accent.Hue="{DynamicResource AccentHue}" />
+    </Styles.Resources>
+</Styles>

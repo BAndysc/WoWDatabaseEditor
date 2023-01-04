@@ -106,7 +106,7 @@
                             <userControls:SmartEventView
                                 SpecialBackground="{CompiledBinding ColorId, Converter={StaticResource ColorIdToNiceColorConverter}}"
                                 Selected="{CompiledBinding IsSelected, Mode=TwoWay}"
-                                userControls:SmartScriptPanelLayout.Selected="{CompiledBinding IsSelected, Mode=TwoWay}"
+                                userControls:VirtualizedSmartScriptPanel.Selected="{CompiledBinding IsSelected, Mode=TwoWay}"
                                 DirectEditParameter="{Binding DataContext.DirectEditParameter, ElementName=Rooot}"
                                 DirectOpenParameter="{Binding DataContext.DirectOpenParameter, ElementName=Rooot}"
                                 DeselectActionsOfDeselectedEventsRequest="{Binding DataContext.DeselectAllButEvents, ElementName=Rooot}"
@@ -127,7 +127,7 @@
                                 DeselectAllButActionsRequest="{Binding DataContext.DeselectAllButActions, ElementName=Rooot}"
                                 EditActionCommand="{Binding DataContext.EditAction, ElementName=Rooot}"
                                 IsSelected="{CompiledBinding IsSelected, Mode=TwoWay}"
-                                userControls:SmartScriptPanelLayout.Selected="{CompiledBinding IsSelected, Mode=TwoWay}"
+                                userControls:VirtualizedSmartScriptPanel.Selected="{CompiledBinding IsSelected, Mode=TwoWay}"
                             />
                         </DataTemplate>
                     </userControls:VirtualizedSmartScriptPanel.ActionItemTemplate>
@@ -139,7 +139,7 @@
                                 DeselectAllRequest="{Binding DataContext.DeselectAll, ElementName=Rooot}"
                                 DeselectAllButConditionsRequest="{Binding DataContext.DeselectAllButConditions, ElementName=Rooot}"
                                 EditConditionCommand="{Binding DataContext.EditCondition, ElementName=Rooot}"
-                                userControls:SmartScriptPanelLayout.Selected="{CompiledBinding IsSelected, Mode=TwoWay}"
+                                userControls:VirtualizedSmartScriptPanel.Selected="{CompiledBinding IsSelected, Mode=TwoWay}"
                                 IsSelected="{CompiledBinding IsSelected, Mode=TwoWay}"
                                 />
                         </DataTemplate>
@@ -161,7 +161,7 @@
                             <userControls:GlobalVariableView
                                 DeselectAllRequest="{Binding DataContext.DeselectAll, ElementName=Rooot}"
                                 DeselectAllButGlobalVariablesRequest="{Binding DataContext.DeselectAllButGlobalVariables, ElementName=Rooot}"
-                                userControls:SmartScriptPanelLayout.Selected="{CompiledBinding IsSelected, Mode=TwoWay}"
+                                userControls:VirtualizedSmartScriptPanel.Selected="{CompiledBinding IsSelected, Mode=TwoWay}"
                                 IsSelected="{CompiledBinding IsSelected, Mode=TwoWay}"
                                 Script="{Binding DataContext.Script, ElementName=Rooot}"
                             />

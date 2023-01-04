@@ -9,7 +9,7 @@ public class RecyclableViewList
 {
     private readonly Panel owner;
     private readonly bool behind;
-    private List<IControl> controls = new();
+    private List<Control> controls = new();
     private int counter = 0;
     private IDataTemplate? template;
 
@@ -25,12 +25,12 @@ public class RecyclableViewList
         counter = 0;
     }
 
-    public IControl GetNext(object context)
+    public Control GetNext(object context)
     {
-        IControl control;
+        Control control;
         if (counter >= controls.Count)
         {
-            control = template!.Build(null!);
+            control = template!.Build(null!)!;
             controls.Add(control);
             control.DataContext = context;
             if (behind)

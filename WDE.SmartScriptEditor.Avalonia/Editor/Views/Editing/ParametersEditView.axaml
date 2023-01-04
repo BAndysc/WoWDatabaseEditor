@@ -25,25 +25,25 @@
             Text="{CompiledBinding Readable}"
             Margin="0,0,0,10" />
         <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Grid.Row="1">
-            <ItemsPresenter Margin="0,0,20,0" Focusable="False" KeyboardNavigation.TabNavigation="Continue" Items="{CompiledBinding FilteredParameters}" x:Name="Parameters">
-                <ItemsPresenter.ItemTemplate>
+            <ItemsControl Margin="0,0,20,0" Focusable="False" KeyboardNavigation.TabNavigation="Continue" ItemsSource="{CompiledBinding FilteredParameters}" x:Name="Parameters">
+                <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <StackPanel>
                             <TextBlock Text="{Binding Key}" FontWeight="Thin" FontSize="17" />
-                            <ItemsPresenter KeyboardNavigation.TabNavigation="Continue" Items="{Binding}" Margin="10,0,0,16">
-                                <ItemsPresenter.ItemTemplate>
+                            <ItemsControl KeyboardNavigation.TabNavigation="Continue" ItemsSource="{Binding}" Margin="10,0,0,16">
+                                <ItemsControl.ItemTemplate>
                                     <DataTemplate x:DataType="viewModels:IEditableParameterViewModel">
                                         <editing:ParameterEditorView utils:FocusUtils.FocusFirst="{CompiledBinding FocusFirst}"
                                                                      SpecialCopying="{Binding SpecialCopying}"
                                                                      Tag="{Binding #Root.DataContext.EntryOrGuid}"
                                                                      Margin="0,0,0,5" />
                                     </DataTemplate>
-                                </ItemsPresenter.ItemTemplate>
-                            </ItemsPresenter>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
                         </StackPanel>
                     </DataTemplate>
-                </ItemsPresenter.ItemTemplate>
-            </ItemsPresenter>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
         </ScrollViewer>
         
         <OkCancelButtons Grid.Row="2" IsVisible="{CompiledBinding ShowCloseButtons}"

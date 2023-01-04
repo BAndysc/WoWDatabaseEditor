@@ -9,11 +9,7 @@ public class ConnectionsContainer : ListBox, IStyleable
 {
     Type IStyleable.StyleKey => typeof(ListBox);
 
-    protected override IItemContainerGenerator CreateItemContainerGenerator()
-    {
-        return new ItemContainerGenerator<ConnectionItem>(
-            this,
-            ContentControl.ContentProperty,
-            ContentControl.ContentTemplateProperty);
-    }
+    // Avalonia 11
+    // //
+    // protected override Control CreateContainerForItemOverride() => new ConnectionItem();
 }

@@ -3,7 +3,7 @@ using Avalonia.Markup.Xaml;
 
 namespace WDE.CommonViews.Avalonia.RemoteSOAP.Views
 {
-    public class SoapConfigView : UserControl
+    public partial class SoapConfigView : UserControl
     {
         public SoapConfigView()
         {

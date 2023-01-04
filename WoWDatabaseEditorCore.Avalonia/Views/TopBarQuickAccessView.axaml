@@ -8,7 +8,7 @@
              x:DataType="viewModels:TopBarQuickAccessViewModel"
              x:Name="Root"
              x:Class="WoWDatabaseEditorCore.Avalonia.Views.TopBarQuickAccessView">
-    <ItemsControl Items="{CompiledBinding Editors}">
+    <ItemsControl ItemsSource="{CompiledBinding Editors}">
         <ItemsControl.ItemsPanel>
             <ItemsPanelTemplate>
                 <ToolbarPanel />

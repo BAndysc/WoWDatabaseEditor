@@ -18,7 +18,7 @@ namespace WDE.EventAiEditor.Avalonia.Editor.UserControls
             set
             {
                 SetAndRaise(TextProperty, ref text, value);
-                RaisePropertyChanged(IsNotEmojiProperty, Optional<bool>.Empty, IsNotEmoji);
+                RaisePropertyChanged(IsNotEmojiProperty, false, IsNotEmoji);
             }
         }
     }

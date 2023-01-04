@@ -157,14 +157,14 @@ namespace WDE.EventAiEditor.Avalonia.Editor.UserControls
         [TemplateContent]
         public object? FlagView { get; set; }
         
-        public IControl Build(object param)
+        public Control? Build(object? param)
         {
             if (param is EventAiEventFlagsView.IconViewModel {IsPhaseFlag: true})
-                return TemplateContent.Load(PhaseView).Control;
-            return TemplateContent.Load(FlagView).Control;
+                return TemplateContent.Load(PhaseView)?.Result;
+            return TemplateContent.Load(FlagView)?.Result;
         }
 
-        public bool Match(object data)
+        public bool Match(object? data)
         {
             return true;
         }

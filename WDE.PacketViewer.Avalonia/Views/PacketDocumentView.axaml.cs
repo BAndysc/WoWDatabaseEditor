@@ -4,6 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using AvaloniaEdit;
 using AvaloniaEdit.CodeCompletion;
@@ -14,7 +15,7 @@ using WDE.PacketViewer.ViewModels;
 
 namespace WDE.PacketViewer.Avalonia.Views
 {
-    public class PacketDocumentView : UserControl
+    public partial class PacketDocumentView : UserControl
     {
         public PacketDocumentView()
         {
@@ -26,7 +27,7 @@ namespace WDE.PacketViewer.Avalonia.Views
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);
-            editor = this.FindControl<TextEditor>("TextEditor");
+            editor = this.GetControl<TextEditor>("TextEditor");
             editor.TextArea.TextEntered += TextAreaOnTextEntered;
 
             editor.Options.AllowScrollBelowDocument = false;
@@ -140,7 +141,7 @@ namespace WDE.PacketViewer.Avalonia.Views
                 Description = description;
             }
 
-            public IBitmap? Image => null;
+            public IImage? Image => null;
 
             public string Text { get; }
 

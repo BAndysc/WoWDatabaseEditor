@@ -1,6 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
+using WDE.Common.Services;
 using WDE.DatabaseEditors.Data.Interfaces;
 using WDE.Module.Attributes;
 
@@ -9,14 +12,37 @@ namespace WDE.DatabaseEditors.Data
     [AutoRegister]
     public class TableDefinitionJsonProvider : ITableDefinitionJsonProvider
     {
-        public IEnumerable<(string file, string content)> GetDefinitionSources()
+        private readonly IRuntimeDataService dataService;
+
+        public TableDefinitionJsonProvider(IRuntimeDataService dataService)
         {
-            return Directory.GetFiles("DbDefinitions/", "*.json", SearchOption.AllDirectories).Select(f => (f, File.ReadAllText(f)));
+            this.dataService = dataService;
         }
         
-        public IEnumerable<(string file, string content)> GetDefinitionReferences()
+        public async Task<IEnumerable<(string file, string content)>> GetDefinitionSources()
         {
-            return Directory.GetFiles("DbDefinitions/", "*.ref", SearchOption.AllDirectories).Select(f => (f, File.ReadAllText(f)));
+            var files = await dataService.GetAllFiles("DbDefinitions/", "*.json");
+            List<(string file, string content)> results = new List<(string file, string content)>();
+            foreach (var f in files)
+            {
+                var content = await dataService.ReadAllText(f);
+                results.Add((f, content));
+            }
+
+            return results;
+        }
+        
+        public async Task<IEnumerable<(string file, string content)>> GetDefinitionReferences()
+        {
+            var files = await dataService.GetAllFiles("DbDefinitions/", "*.ref");
+            List<(string file, string content)> results = new List<(string file, string content)>();
+            foreach (var f in files)
+            {
+                var content = await dataService.ReadAllText(f);
+                results.Add((f, content));
+            }
+
+            return results;
         }
     }
 }

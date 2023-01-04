@@ -4,6 +4,7 @@ using Avalonia.Data.Converters;
 using Avalonia.Media;
 using AvaloniaStyles.Controls;
 using AvaloniaStyles.Utils;
+using HslColor = AvaloniaStyles.Utils.HslColor;
 
 namespace WDE.Common.Avalonia.Converters;
 

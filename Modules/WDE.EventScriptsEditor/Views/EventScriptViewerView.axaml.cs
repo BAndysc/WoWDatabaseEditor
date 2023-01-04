@@ -4,7 +4,7 @@ using Avalonia.Markup.Xaml;
 
 namespace WDE.EventScriptsEditor.Views;
 
-public class EventScriptViewerView : UserControl
+public partial class EventScriptViewerView : UserControl
 {
     public EventScriptViewerView()
     {

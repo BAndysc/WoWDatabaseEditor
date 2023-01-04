@@ -113,12 +113,6 @@ public partial class VeryFastTableView
         return MoveCursorDown();
     }
 
-
-    public void SetOwner(IInputRoot owner)
-    {
-        
-    }
-
     public void Move(IInputElement element, NavigationDirection direction, KeyModifiers keyModifiers = KeyModifiers.None)
     {
         switch (direction)

@@ -1,8 +1,10 @@
+using System.Globalization;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Media.TextFormatting;
+using Avalonia.Threading;
 using AvaloniaStyles.Controls.FastTableView;
 using WDE.Common.Avalonia;
 using WDE.Common.Avalonia.Services;
@@ -66,7 +68,7 @@ public class CustomCellDrawer : CustomCellDrawerInteractorBase, ICustomCellDrawe
         if (row.Duplicate)
         {
             var pen = DuplicateRowPen;
-            context.FillRectangle(pen.Brush, rect.Deflate(1).WithWidth(5));
+            context.FillRectangle(pen.Brush ?? Brushes.Black, rect.Deflate(1).WithWidth(5));
             context.DrawLine(pen, rect.TopLeft,rect.TopRight);
             context.DrawLine(pen, rect.BottomLeft, rect.BottomRight);
         }
@@ -93,19 +95,17 @@ public class CustomCellDrawer : CustomCellDrawerInteractorBase, ICustomCellDrawe
         var state = context.PushClip(rect);
         if (char.IsAscii(text[0]))
         {
-            var ft = new FormattedText
+            var ft = new FormattedText(text, CultureInfo.InvariantCulture, FlowDirection.LeftToRight, Typeface.Default, 12, ButtonTextPen.Brush)
             {
-                Text = text,
-                Constraint = new Size(rect.Width, rect.Height),
-                Typeface = Typeface.Default,
-                FontSize = 12
+                MaxTextHeight = rect.Height,
+                MaxTextWidth = rect.Width
             };
-            context.DrawText(ButtonTextPen.Brush, new Point(rect.Center.X - ft.Bounds.Width / 2, rect.Center.Y - ft.Bounds.Height / 2), ft);
+            context.DrawText(ft, new Point(rect.Center.X - ft.Width / 2, rect.Center.Y - ft.Height / 2));
         }
         else
         {
             var tl = new TextLayout(text, Typeface.Default, 12, ButtonTextPen.Brush, TextAlignment.Center, maxWidth: rect.Width, maxHeight:rect.Height);
-            tl.Draw(context, new Point(rect.Left, rect.Center.Y - tl.Size.Height / 2));
+            tl.Draw(context, new Point(rect.Left, rect.Center.Y - tl.Height / 2));
         }
         state.Dispose();
     }
@@ -146,7 +146,7 @@ public class CustomCellDrawer : CustomCellDrawerInteractorBase, ICustomCellDrawe
                 async Task UpdateIcon(uint spell)
                 {
                     await spellIconService.GetIcon(spell);
-                    table.InvalidateVisual();
+                    Dispatcher.UIThread.Post(table.InvalidateVisual);
                 }
                 UpdateIcon(spellId).ListenErrors();
             }
@@ -170,15 +170,13 @@ public class CustomCellDrawer : CustomCellDrawerInteractorBase, ICustomCellDrawe
             if (broadcastTextId != null && cell.TableField is DatabaseField<string> textField && string.IsNullOrWhiteSpace(textField.Current.Value))
             {
                 rect = rect.Deflate(new Thickness(10, 0, 0, 0));
-                var ft = new FormattedText
-                {
-                    Text = cell.ToString(),
-                    Constraint = new Size(rect.Width, rect.Height),
-                    Typeface = Typeface.Default,
-                    FontSize = 12
-                };
                 var textColor = new SolidColorBrush(TextBrush.Color, 0.4f);
-                context.DrawText(textColor, new Point(rect.X, rect.Center.Y - ft.Bounds.Height / 2), ft);
+                var ft = new FormattedText(cell.ToString() ?? "", CultureInfo.InvariantCulture, FlowDirection.LeftToRight, Typeface.Default, 12, textColor)
+                {
+                    MaxTextHeight = rect.Height,
+                    MaxTextWidth = rect.Width
+                };
+                context.DrawText(ft, new Point(rect.X, rect.Center.Y - ft.Height / 2));
                 return true;
             }
         }

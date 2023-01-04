@@ -44,7 +44,7 @@
             </StackPanel>
             
             <controls:SettingsHeader Text="WoW Packet Parser settings" />
-            <ItemsControl Items="{CompiledBinding ParserSettings}">
+            <ItemsControl ItemsSource="{CompiledBinding ParserSettings}">
                 <ItemsControl.DataTemplates>
                     <DataTemplate DataType="viewModels:ParserBoolSettingViewModel">
                         <SettingItem Header="{CompiledBinding Name}" Help="{CompiledBinding Help}">

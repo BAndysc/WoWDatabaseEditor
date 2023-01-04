@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Linq;
 using Avalonia;
 using Avalonia.Collections;
@@ -9,6 +10,7 @@ using Avalonia.Data;
 using Avalonia.Input;
 using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
+using Avalonia.Utilities;
 using Avalonia.VisualTree;
 using DynamicData;
 using WDE.Common.Collections;
@@ -103,6 +105,8 @@ public class VirtualizedGridView : TemplatedControl
 
     private VirtualizedGridViewItemPresenter? children;
     private Grid? header;
+    private ScrollViewer? headerScroll;
+    private ScrollViewer? contentScroll;
 
     public VirtualizedGridViewItemPresenter? ItemPresenter => children;
     
@@ -115,7 +119,7 @@ public class VirtualizedGridView : TemplatedControl
         if (e.Key is Key.Up or Key.Down)
         {
             var rangeModifier = e.KeyModifiers.HasFlagFast(KeyModifiers.Shift);
-            var toggleModifier = e.KeyModifiers.HasFlagFast(AvaloniaLocator.Current.GetRequiredService<PlatformHotkeyConfiguration>().CommandModifiers);
+            var toggleModifier = e.KeyModifiers.HasFlagFast(RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? KeyModifiers.Meta : KeyModifiers.Control);
 
             int index;
             if (e.Key == Key.Up)
@@ -138,7 +142,7 @@ public class VirtualizedGridView : TemplatedControl
 
     protected ListBoxItem? GetContainerFromEventSource(object? eventSource)
     {
-        for (var current = eventSource as IVisual; current != null; current = current.GetVisualParent())
+        for (var current = eventSource as Visual; current != null; current = current.GetVisualParent())
         {
             if (current is ListBoxItem lbi)
             {
@@ -164,11 +168,21 @@ public class VirtualizedGridView : TemplatedControl
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
-        header = e.NameScope.Find<Grid>("PART_header");
-        children = e.NameScope.Find<VirtualizedGridViewItemPresenter>("PART_Children");
+        if (headerScroll is not null)
+            headerScroll.ScrollChanged -= OnHeaderScroll;
+        if (contentScroll is not null)
+            contentScroll.ScrollChanged -= OnContentScroll;
+        
+        header = e.NameScope.Get<Grid>("PART_header");
+        children = e.NameScope.Get<VirtualizedGridViewItemPresenter>("PART_Children");
+        headerScroll = e.NameScope.Get<ScrollViewer>("PART_HeaderScroll");
+        contentScroll = e.NameScope.Get<ScrollViewer>("PART_ContentScroll");
 
         header.ColumnDefinitions.Clear();
         header.Children.Clear();
+
+        headerScroll.ScrollChanged += OnHeaderScroll;
+        contentScroll.ScrollChanged += OnContentScroll;
         
         VirtualizedGridViewItemPresenter.SetupGridColumns(columns, header, true, useCheckBoxes);
 
@@ -201,6 +215,18 @@ public class VirtualizedGridView : TemplatedControl
         
         foreach (var column in Columns)
             AddHeaderCell(column.Name);
+    }
+
+    private void OnContentScroll(object? sender, ScrollChangedEventArgs e)
+    {
+        if (contentScroll is not null && headerScroll is not null && !MathUtilities.IsZero(e.OffsetDelta.X))
+            headerScroll.Offset = headerScroll.Offset.WithX(contentScroll.Offset.X);
+    }
+
+    private void OnHeaderScroll(object? sender, ScrollChangedEventArgs e)
+    {
+        if (contentScroll is not null && headerScroll is not null && !MathUtilities.IsZero(e.OffsetDelta.X))
+            contentScroll.Offset = contentScroll.Offset.WithX(headerScroll.Offset.X);
     }
 
     private void ColumnsSizeChanged()
@@ -283,7 +309,7 @@ public class VirtualizedGridView : TemplatedControl
                     e.Source,
                     true,
                     e.KeyModifiers.HasFlagFast(KeyModifiers.Shift),
-                    e.KeyModifiers.HasFlagFast(AvaloniaLocator.Current.GetRequiredService<PlatformHotkeyConfiguration>().CommandModifiers),
+                    e.KeyModifiers.HasFlagFast(RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? KeyModifiers.Meta : KeyModifiers.Control),
                     point.Properties.IsRightButtonPressed);
             }
         }

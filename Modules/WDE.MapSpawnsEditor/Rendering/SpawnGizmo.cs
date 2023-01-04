@@ -1,4 +1,3 @@
-using JetBrains.Annotations;
 using TheEngine.Interfaces;
 using TheEngine.PhysicsSystem;
 using TheMaths;

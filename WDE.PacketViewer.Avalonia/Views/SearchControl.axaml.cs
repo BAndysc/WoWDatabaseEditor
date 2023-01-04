@@ -55,8 +55,8 @@ namespace WDE.PacketViewer.Avalonia.Views
         protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
         {
             base.OnApplyTemplate(e);
-            searchBox = e.NameScope.Find<TextBox>("SearchText");
-            FocusManager.Instance!.Focus(searchBox);
+            searchBox = e.NameScope.Get<TextBox>("SearchText");
+            searchBox.Focus();
         }
 
         protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
@@ -69,7 +69,7 @@ namespace WDE.PacketViewer.Avalonia.Views
                 {
                     DispatcherTimer.RunOnce(() =>
                     {
-                        FocusManager.Instance!.Focus(searchBox);
+                        searchBox.Focus();
                     }, TimeSpan.FromMilliseconds(1));
                 }
             });

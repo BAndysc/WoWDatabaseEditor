@@ -68,10 +68,10 @@
         </Style>
     </ExtendedWindow.Styles>
     
-    <ManagedMenu.Menu>
+    <NativeMenu.Menu>
         <NativeMenu utils:MenuBind.MenuItems="{CompiledBinding MenuItemProviders}">
         </NativeMenu>
-    </ManagedMenu.Menu>
+    </NativeMenu.Menu>
     
     <controls:ExtendedWindow.ToolBar>
         <controls:ToolBar>
@@ -141,7 +141,7 @@
                             </CompletionComboBox.ItemTemplate>
                         </CompletionComboBox>
                         <TextBlock Opacity="0.6" FontSize="9" VerticalAlignment="Center">Type:</TextBlock>
-                        <ComboBox Width="100" Items="{CompiledBinding Providers}" SelectedItem="{CompiledBinding SelectedProvider}">
+                        <ComboBox Width="100" ItemsSource="{CompiledBinding Providers}" SelectedItem="{CompiledBinding SelectedProvider}">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{CompiledBinding Name}"/>
@@ -168,21 +168,21 @@
             </controls:ToolBar.MiddleContent>
             <controls:ToolBar.RightContent>
                 <ToolbarPanel>
-                    <ItemsPresenter Items="{CompiledBinding RelatedSolutionItems.List}">
-                        <ItemsPresenter.ItemTemplate>
+                    <ItemsControl ItemsSource="{CompiledBinding RelatedSolutionItems.List}">
+                        <ItemsControl.ItemTemplate>
                             <DataTemplate DataType="viewModels:RelatedSolutionItemViewModel">
                                 <Button Command="{CompiledBinding CreateCommand}"
                                         ToolTip.Tip="{CompiledBinding Name}">
                                     <components:WdeImage Image="{CompiledBinding Icon}" />
                                 </Button>
                             </DataTemplate>
-                        </ItemsPresenter.ItemTemplate>
-                        <ItemsPresenter.ItemsPanel>
+                        </ItemsControl.ItemTemplate>
+                        <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <controls:ToolbarPanel />
                             </ItemsPanelTemplate>
-                        </ItemsPresenter.ItemsPanel>
-                    </ItemsPresenter>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
                     
                     <Button ToolTip.Tip="Open game view" Classes="HideWin10" Command="{CompiledBinding Open3DCommand}" BorderThickness="1" Margin="20,0,0,0" Width="34" Height="34">
                         <Path VerticalAlignment="Center" Width="16" Fill="{Binding $parent[Button].Foreground}" Data="{StaticResource Open3DIcon}" />

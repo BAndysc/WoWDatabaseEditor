@@ -63,19 +63,19 @@
                             MaximumColumnsCount="{Binding #rootWindow.DataContext.SplitHorizontal, Converter={StaticResource BoolToInt1Max}}" ColumnWidth="400" HorizontalSpacing="10" Spacing="5"></controls:DynamicColumnsPanel>
                     </ItemsPanelTemplate>
                     <DataTemplate x:Key="VerticalRowTemplate" x:DataType="singleRow:DatabaseEntityViewModel">
-                        <ItemsPresenter 
+                        <ItemsControl 
                             KeyboardNavigation.TabNavigation="Continue"
-                            Items="{CompiledBinding Cells, Mode=OneWay}"
+                            ItemsSource="{CompiledBinding Cells, Mode=OneWay}"
                             ItemsPanel="{StaticResource VerticalRowPanel}">
-                            <ItemsPresenter.ItemTemplate>
+                            <ItemsControl.ItemTemplate>
                                 <DataTemplate x:DataType="singleRow:SingleRecordDatabaseCellViewModel">
                                     <DockPanel LastChildFill="True">
                                         <TextBlock Text="{CompiledBinding ColumnName, StringFormat={}{0}: }" Opacity="0.7" VerticalAlignment="Center" Width="100" FontWeight="Bold" />
                                         <ContentPresenter Background="{DynamicResource ContentBackground}" BorderThickness="1" CornerRadius="4" BorderBrush="{DynamicResource TextControlBorderBrush}" Content="{Binding}" Margin="20,0,0,0" />
                                     </DockPanel>
                                 </DataTemplate>
-                            </ItemsPresenter.ItemTemplate>
-                        </ItemsPresenter>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
                     </DataTemplate>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
@@ -114,7 +114,7 @@
                             <Button.Flyout>
                                 <Flyout>
                                     <ScrollViewer MaxHeight="500">
-                                        <ItemsControl Items="{CompiledBinding Columns}">
+                                        <ItemsControl ItemsSource="{CompiledBinding Columns}">
                                             <ItemsControl.ItemsPanel>
                                                 <ItemsPanelTemplate>
                                                     <StackPanel Spacing="3" />
@@ -158,9 +158,9 @@
                         <TextBlock TextAlignment="Center" HorizontalAlignment="Stretch" VerticalAlignment="Center" Opacity="0.7" Text="{CompiledBinding RowsSummaryText}" />              
                     </DockPanel>
                 </Border>
-                <ScrollViewer Padding="0,0,15,15" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible" AllowAutoHide="False">
+                <ScrollViewer BringIntoViewOnFocusChange="False" Padding="0,0,15,15" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible" AllowAutoHide="False">
                     <fastTableView:VeryFastTableView
-                        TextBlock.FontFamily="Consolas,Menlo,Courier,Courier New"
+                        TextElement.FontFamily="Consolas,Menlo,Courier,Courier New"
                         SelectedRowIndex="{CompiledBinding FocusedRowIndex}"
                         SelectedCellIndex="{CompiledBinding FocusedCellIndex}"
                         HiddenColumns="{CompiledBinding HiddenColumns}"

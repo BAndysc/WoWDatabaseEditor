@@ -4,7 +4,6 @@
                          xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
                          xmlns:controls="clr-namespace:WDE.Common.Avalonia.Controls;assembly=WDE.Common.Avalonia"
                          xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-                         d:DataContext="{d:DesignInstance itemFromListSelectorService:LongItemFromListProviderViewModel, IsDesignTimeCreatable=False}"
                          xmlns:controls1="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
                          xmlns:itemFromListSelectorService="clr-namespace:WoWDatabaseEditorCore.Services.ItemFromListSelectorService;assembly=WoWDatabaseEditorCore">
     <Grid Margin="6">

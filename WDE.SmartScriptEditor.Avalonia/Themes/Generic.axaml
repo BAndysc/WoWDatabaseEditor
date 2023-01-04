@@ -307,6 +307,6 @@
 
     <Style Selector="views|SmartScriptEditorView Button /template/ ContentPresenter#PART_ContentPresenter">
         <Setter Property="CornerRadius" Value="0" />
-        <Setter Property="BoxShadow" Value="" />
+        <Setter Property="BoxShadow" Value="none" />
     </Style>
 </Styles>

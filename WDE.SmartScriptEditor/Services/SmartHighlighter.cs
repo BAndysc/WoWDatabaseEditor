@@ -1,5 +1,8 @@
+using System;
 using System.Collections.Generic;
+using System.Reactive.Linq;
 using WDE.Conditions.Data;
+using WDE.MVVM.Observable;
 using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Editor.ViewModels;
 using WDE.SmartScriptEditor.Models;
@@ -26,68 +29,88 @@ public abstract class SmartHighlighter : ISmartHighlighter
     {
         this.smartDataManager = smartDataManager;
         this.conditionDataManager = conditionDataManager;
+
+        smartDataManager.GetAllData(SmartType.SmartEvent)
+            .CombineLatest(smartDataManager.GetAllData(SmartType.SmartAction))
+            .SubscribeAction(tuple => Load(tuple.First, tuple.Second));
+    }
+
+    private void Load(IReadOnlyList<SmartGenericJsonData> events, IReadOnlyList<SmartGenericJsonData> actions)
+    {
+        highlightEventByParameter.Clear();
+        highlightActionByParameter.Clear();
+        highlightConditionsByParameter.Clear();
+        highlighters.Clear();
+        
+        void SetupHighlight(string header, string parameter)
+        {
+            Dictionary<int, int> highlightEvents = new();
+            Dictionary<int, int> highlightActions = new();
+            Dictionary<int, int> highlightConditions = new();
+            
+            foreach (var data in events)
+            {
+                if (data.Parameters == null)
+                    continue;
+    
+                int index = 0;
+                foreach (var p in data.Parameters)
+                {
+                    if (p.Type == parameter)
+                        highlightEvents.Add(data.Id, index);
+                    index++;
+                }
+            }
+            
+            foreach (var data in actions)
+            {
+                if (data.Parameters == null)
+                    continue;
+    
+                int index = 0;
+                foreach (var p in data.Parameters)
+                {
+                    if (p.Type == parameter)
+                    {
+                        // in fact, more than one parameter can have the same type
+                        // but let's ignore it now and just pick the first matching one
+                        highlightActions.Add(data.Id, index);
+                        break;
+                    }
+                    index++;
+                }
+            }
+    
+            foreach (var data in conditionDataManager.AllConditionData)
+            {
+                if (data.Parameters == null)
+                    continue;
+                
+                int index = 0;
+                foreach (var p in data.Parameters)
+                {
+                    if (p.Type == parameter)
+                        highlightConditions.Add(data.Id, index);
+                    index++;
+                }
+            }
+    
+            highlightEventByParameter[parameter] = highlightEvents;
+            highlightActionByParameter[parameter] = highlightActions;
+            highlightConditionsByParameter[parameter] = highlightConditions;
+            highlighters.Add(new(header, parameter, highlighters.Count));
+        }
+        
         highlighters.Add(new("None", "", 0));
         SetupHighlight("Timed events", "TimedEventParameter");
         SetupHighlight("Links", "LinkParameter");
         SetupHighlight("Spells", "SpellParameter");
+        DoSetup(SetupHighlight);
     }
-    
-    protected void SetupHighlight(string header, string parameter)
+
+    protected virtual void DoSetup(Action<string, string> setupHighlight)
     {
-        Dictionary<int, int> highlightEvents = new();
-        Dictionary<int, int> highlightActions = new();
-        Dictionary<int, int> highlightConditions = new();
-        foreach (var data in smartDataManager.GetAllData(SmartType.SmartEvent))
-        {
-            if (data.Parameters == null)
-                continue;
-
-            int index = 0;
-            foreach (var p in data.Parameters)
-            {
-                if (p.Type == parameter)
-                    highlightEvents.Add(data.Id, index);
-                index++;
-            }
-        }
         
-        foreach (var data in smartDataManager.GetAllData(SmartType.SmartAction))
-        {
-            if (data.Parameters == null)
-                continue;
-
-            int index = 0;
-            foreach (var p in data.Parameters)
-            {
-                if (p.Type == parameter)
-                {
-                    // in fact, more than one parameter can have the same type
-                    // but let's ignore it now and just pick the first matching one
-                    highlightActions.Add(data.Id, index);
-                    break;
-                }
-                index++;
-            }
-        }
-
-        foreach (var data in conditionDataManager.AllConditionData)
-        {
-            if (data.Parameters == null)
-                continue;
-            
-            int index = 0;
-            foreach (var p in data.Parameters)
-            {
-                if (p.Type == parameter)
-                    highlightConditions.Add(data.Id, index);
-                index++;
-            }
-        }
-
-        highlightEventByParameter[parameter] = highlightEvents;
-        highlightActionByParameter[parameter] = highlightActions;
-        highlightConditionsByParameter[parameter] = highlightConditions;
-        highlighters.Add(new(header, parameter, highlighters.Count));
     }
 
     public void SetHighlightParameter(string parameter)

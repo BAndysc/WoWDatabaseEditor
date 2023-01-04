@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Runtime.CompilerServices;
 using Avalonia;
 using Avalonia.Collections;
@@ -193,7 +194,7 @@ namespace WDE.Common.Avalonia.Controls
                     {
                         if (disposable != null)
                             throw new Exception();
-                        disposable = completionBox.GetObservable(SelectedValueProperty).SubscribeAction(_ =>
+                        disposable = completionBox.GetObservable(SelectedValueProperty).Skip(1).SubscribeAction(_ =>
                         {
                             OnPropertyChanged(nameof(IsChecked));
                         });

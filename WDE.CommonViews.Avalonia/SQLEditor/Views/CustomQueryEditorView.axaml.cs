@@ -9,7 +9,7 @@ namespace WDE.CommonViews.Avalonia.SQLEditor.Views
     /// <summary>
     ///     Interaction logic for SqlEditorView
     /// </summary>
-    public class CustomQueryEditorView : UserControl
+    public partial class CustomQueryEditorView : UserControl
     {
         public ICommand Undo { get; }
         public ICommand Redo { get; }

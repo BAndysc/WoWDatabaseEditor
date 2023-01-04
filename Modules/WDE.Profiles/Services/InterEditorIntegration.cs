@@ -56,7 +56,10 @@ public class InterEditorIntegration : IGlobalService, IDisposable
 
         loadingEventAggregator.OnEvent<EditorLoaded>().SubscribeAction(_ =>
         {
-            interEditorCommunication.Open();
+            if (OperatingSystem.IsWindows() ||
+                OperatingSystem.IsLinux() || 
+                OperatingSystem.IsMacOS())
+                interEditorCommunication.Open();
         });
     }
 

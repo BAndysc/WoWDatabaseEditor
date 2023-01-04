@@ -66,8 +66,8 @@ namespace WDE.EventAiEditor.Avalonia.Editor.UserControls
             DeselectActionsOfDeselectedEventsRequest?.Execute(null);
         }
 
-        public static readonly AvaloniaProperty SelectedProperty = AvaloniaProperty.RegisterAttached<EventAiEventView, IControl, bool>("Selected");
-        public static bool GetSelected(IControl control) => (bool?)control.GetValue(SelectedProperty) ?? false;
-        public static void SetSelected(IControl control, bool value) => control.SetValue(SelectedProperty, value);
+        public static readonly AvaloniaProperty SelectedProperty = AvaloniaProperty.RegisterAttached<EventAiEventView, Control, bool>("Selected");
+        public static bool GetSelected(Control control) => (bool?)control.GetValue(SelectedProperty) ?? false;
+        public static void SetSelected(Control control, bool value) => control.SetValue(SelectedProperty, value);
     }
 }

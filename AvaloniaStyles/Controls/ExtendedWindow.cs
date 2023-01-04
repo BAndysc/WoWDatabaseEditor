@@ -24,8 +24,8 @@ namespace AvaloniaStyles.Controls
         public static readonly StyledProperty<ToolBar> ToolBarProperty =
             AvaloniaProperty.Register<ExtendedWindow, ToolBar>(nameof(ToolBar));
 
-        public static readonly StyledProperty<IControl?> SideBarProperty =
-            AvaloniaProperty.Register<ExtendedWindow, IControl?>(nameof(SideBar));
+        public static readonly StyledProperty<Control?> SideBarProperty =
+            AvaloniaProperty.Register<ExtendedWindow, Control?>(nameof(SideBar));
         
         public static readonly StyledProperty<StatusBar> StatusBarProperty =
             AvaloniaProperty.Register<ExtendedWindow, StatusBar>(nameof(StatusBar));
@@ -33,8 +33,8 @@ namespace AvaloniaStyles.Controls
         public static readonly StyledProperty<TabStrip> TabStripProperty =
             AvaloniaProperty.Register<ExtendedWindow, TabStrip>(nameof(TabStrip));
         
-        public static readonly StyledProperty<IControl> OverlayProperty =
-            AvaloniaProperty.Register<ExtendedWindow, IControl>(nameof(Overlay));
+        public static readonly StyledProperty<Control> OverlayProperty =
+            AvaloniaProperty.Register<ExtendedWindow, Control>(nameof(Overlay));
         
         public static readonly StyledProperty<string> SubTitleProperty =
                 AvaloniaProperty.Register<ExtendedWindow, string>(nameof(SubTitle));
@@ -57,7 +57,7 @@ namespace AvaloniaStyles.Controls
             set => SetValue(ToolBarProperty, value);
         }
         
-        public IControl? SideBar
+        public Control? SideBar
         {
             get => GetValue(SideBarProperty);
             set => SetValue(SideBarProperty, value);
@@ -69,7 +69,7 @@ namespace AvaloniaStyles.Controls
             set => SetValue(StatusBarProperty, value);
         }
         
-        public IControl Overlay
+        public Control Overlay
         {
             get => GetValue(OverlayProperty);
             set => SetValue(OverlayProperty, value);
@@ -162,6 +162,8 @@ namespace AvaloniaStyles.Controls
                 scaling = SystemTheme.CustomScalingValue.Value;
             
             var impl = window.PlatformImpl;
+            if (impl == null)
+                return;
             var f = impl.GetType().GetField("_scaling", BindingFlags.Instance | BindingFlags.NonPublic);
             if (f != null)
             {
@@ -171,7 +173,8 @@ namespace AvaloniaStyles.Controls
                     var oldWidth = window.Width * curVal;
                     var oldHeight = window.Height * curVal;
                     f.SetValue(impl, scaling);
-                    impl.ScalingChanged(scaling);
+                    Action<double>? scalingChanged = (Action<double>?)impl.GetType().GetProperty("ScalingChanged", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)?.GetValue(impl);
+                    scalingChanged?.Invoke(scaling);
                     DispatcherTimer.RunOnce(() =>
                     {
                         window.Width = oldWidth / scaling;

@@ -6,7 +6,7 @@ namespace AvaloniaGraph.Controls;
 public class ConnectionDragCompletedEventArgs : ConnectionDragEventArgs
 {
     public ConnectionDragCompletedEventArgs(RoutedEvent routedEvent,
-        IInteractive? source,
+        Interactive? source,
         GraphNodeItemView? elementItem,
         object connection,
         ConnectorItem sourceConnectorItem,

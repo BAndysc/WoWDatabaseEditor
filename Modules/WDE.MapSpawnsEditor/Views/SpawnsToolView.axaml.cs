@@ -13,7 +13,7 @@ using WDE.MVVM.Observable;
 
 namespace WDE.MapSpawnsEditor.Views;
 
-public class SpawnsToolView : UserControl
+public partial class SpawnsToolView : UserControl
 {
     private SpawnsFastTreeList spawns = null!;
     private System.IDisposable? disposable;
@@ -26,7 +26,7 @@ public class SpawnsToolView : UserControl
     private void InitializeComponent()
     {
         AvaloniaXamlLoader.Load(this);
-        spawns = this.FindControl<SpawnsFastTreeList>("SpawnsList");
+        spawns = this.GetControl<SpawnsFastTreeList>("SpawnsList");
     }
 
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
@@ -43,12 +43,12 @@ public class SpawnsToolView : UserControl
 
     private void OnFocusRequest()
     {
-        var root = this.GetVisualRoot();
-        var panel = root.FindDescendantOfType<TheEnginePanel>();
+        var root = this.GetVisualRoot() as TopLevel;
+        var panel = root?.FindDescendantOfType<TheEnginePanel>();
         
         Dispatcher.UIThread.Post(() =>
         {
-            FocusManager.Instance!.Focus(panel, NavigationMethod.Tab);
+            panel!.Focus(NavigationMethod.Tab);
         }, DispatcherPriority.Render);
     }
 
@@ -60,7 +60,7 @@ public class SpawnsToolView : UserControl
         disposable = null;
     }
 
-    private void InputElement_OnDoubleTapped(object? sender, RoutedEventArgs e)
+    private void InputElement_OnDoubleTapped(object? sender, TappedEventArgs e)
     {
         if (DataContext is SpawnsToolViewModel vm && vm.SelectedNode is SpawnInstance selectedSpawn)
         {

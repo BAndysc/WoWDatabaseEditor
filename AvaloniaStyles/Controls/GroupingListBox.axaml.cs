@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Linq;
 using Avalonia;
 using Avalonia.Collections;
 using Avalonia.Controls;
@@ -8,6 +9,7 @@ using Avalonia.Controls.Templates;
 using Avalonia.Data;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.LogicalTree;
 using Avalonia.Metadata;
 using Avalonia.Styling;
 using Avalonia.VisualTree;
@@ -31,27 +33,27 @@ namespace AvaloniaStyles.Controls
             set => SetAndRaise(GroupNameProperty, ref groupName, value);
         }
         
-        public static readonly DirectProperty<GroupingHeader, IControl?> CustomContentProperty =
-            AvaloniaProperty.RegisterDirect<GroupingHeader, IControl?>(
+        public static readonly DirectProperty<GroupingHeader, Control?> CustomContentProperty =
+            AvaloniaProperty.RegisterDirect<GroupingHeader, Control?>(
                 nameof(CustomContent),
                 o => o.CustomContent,
                 (o, v) => o.CustomContent = v);
 
-        private IControl? customContent;
-        public IControl? CustomContent
+        private Control? customContent;
+        public Control? CustomContent
         {
             get => customContent;
             set => SetAndRaise(CustomContentProperty, ref customContent, value);
         }
         
-        public static readonly DirectProperty<GroupingHeader, IControl?> CustomRightContentProperty =
-            AvaloniaProperty.RegisterDirect<GroupingHeader, IControl?>(
+        public static readonly DirectProperty<GroupingHeader, Control?> CustomRightContentProperty =
+            AvaloniaProperty.RegisterDirect<GroupingHeader, Control?>(
                 nameof(CustomRightContent),
                 o => o.CustomRightContent,
                 (o, v) => o.CustomRightContent = v);
 
-        private IControl? customRightContent;
-        public IControl? CustomRightContent
+        private Control? customRightContent;
+        public Control? CustomRightContent
         {
             get => customRightContent;
             set => SetAndRaise(CustomRightContentProperty, ref customRightContent, value);
@@ -92,16 +94,16 @@ namespace AvaloniaStyles.Controls
             set => SetAndRaise(ItemsProperty, ref items, value);
         }
         
-        private static readonly FuncTemplate<IPanel> DefaultPanel =
-            new FuncTemplate<IPanel>(() => new StackPanel());
+        private static readonly FuncTemplate<Panel> DefaultPanel =
+            new FuncTemplate<Panel>(() => new StackPanel());
         
-        public static readonly StyledProperty<ITemplate<IPanel>> ItemsPanelProperty =
-            AvaloniaProperty.Register<GroupingListBox, ITemplate<IPanel>>(nameof(ItemsPanel), DefaultPanel);
+        public static readonly StyledProperty<ITemplate<Panel>> ItemsPanelProperty =
+            AvaloniaProperty.Register<GroupingListBox, ITemplate<Panel>>(nameof(ItemsPanel), DefaultPanel);
 
         public static readonly StyledProperty<IDataTemplate> ItemTemplateProperty =
             AvaloniaProperty.Register<GroupingListBox, IDataTemplate>(nameof(ItemTemplate));
         
-        public ITemplate<IPanel> ItemsPanel
+        public ITemplate<Panel> ItemsPanel
         {
             get => GetValue(ItemsPanelProperty);
             set => SetValue(ItemsPanelProperty, value);
@@ -140,7 +142,8 @@ namespace AvaloniaStyles.Controls
                 return;
 
             var container = parentItems.ItemContainerGenerator.ContainerFromIndex(index);
-            scroll.Offset = new Vector(0, container.Bounds.Y);
+            if (container != null)
+                scroll.Offset = new Vector(0, container.Bounds.Y);
         }
 
         protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
@@ -166,7 +169,7 @@ namespace AvaloniaStyles.Controls
                 return;
             
             listBox.SelectedIndex = innerIndex;
-            (listBox.ItemContainerGenerator.ContainerFromIndex(listBox.SelectedIndex)).Focus();
+            (listBox.ItemContainerGenerator.ContainerFromIndex(listBox.SelectedIndex))?.Focus();
         }
 
         #region KEYBOARD_NAVIGATION
@@ -193,14 +196,17 @@ namespace AvaloniaStyles.Controls
             {
                 e.Handled = true;
                 var dir = e.Key == Key.Up ? -1 : 1;
-                int itemsInRow = (int)(that.Bounds.Width / ((that.ItemContainerGenerator.ContainerFromIndex(0)).Bounds.Width));
+                var element = that.ItemContainerGenerator.ContainerFromIndex(0);
+                if (element == null)
+                    return;
+                int itemsInRow = (int)(that.Bounds.Width / (element.Bounds.Width));
                 MoveUpDown(that, parent, itemsInRow, dir);
             }   
         }
 
         private ListBox? GetNextParent(ItemsControl parent, ListBox current, int dir)
         {
-            var currentParentIndex = ((IList)parent.Items).IndexOf(current.DataContext);
+            var currentParentIndex = ((IList?)parent.Items)?.IndexOf(current.DataContext) ?? -1;
             var nextParentIndex = currentParentIndex + dir;
             if (nextParentIndex < 0 || nextParentIndex > parent.ItemCount - 1)
                 return null;
@@ -210,9 +216,12 @@ namespace AvaloniaStyles.Controls
         private ListBox? GetListBoxFromItemsControl(ItemsControl parent, int index)
         {
             var x = parent.ItemContainerGenerator.ContainerFromIndex(index);
-            if (x == null || x.LogicalChildren.Count == 0 || x.LogicalChildren[0].LogicalChildren.Count < 2)
+            if (x == null)
                 return null;
-            return (ListBox) x.LogicalChildren[0].LogicalChildren[1];
+            var logicalChildren = x.GetLogicalChildren().ToList();
+            if (x == null || logicalChildren.Count == 0 || logicalChildren[0].LogicalChildren.Count < 2)
+                return null;
+            return (ListBox) logicalChildren[0].LogicalChildren[1];
         }
         
         private void MoveNextPrev(ListBox listBox, ItemsControl parent, int dir)
@@ -280,17 +289,17 @@ namespace AvaloniaStyles.Controls
         private void SelectIndex(ListBox listbox, int index)
         {
             listbox.SelectedIndex = index;
-            (listbox.ItemContainerGenerator.ContainerFromIndex(listbox.SelectedIndex)).Focus();
+            listbox.ItemContainerGenerator.ContainerFromIndex(listbox.SelectedIndex)?.Focus();
         }
         
-        public static T? FindParent<T>(IVisual? obj) where T : Control
+        public static T? FindParent<T>(Visual? obj) where T : Control
         {
-            obj = obj?.VisualParent;
+            obj = obj?.GetVisualParent();
             while (obj != null)
             {
                 if (obj is T parent)
                     return parent;
-                obj = obj.VisualParent;
+                obj = obj.GetVisualParent();
             }
 
             return null;
@@ -338,7 +347,7 @@ namespace AvaloniaStyles.Controls
                 inEvent = true;
                 {
                     o.CustomSelectedItem = arg.NewValue;
-                    GroupingListBox parent = o.FindAncestorOfType<GroupingListBox>();
+                    GroupingListBox? parent = o.FindAncestorOfType<GroupingListBox>();
                     if (parent != null)
                         parent.SelectedItem = arg.NewValue;
                     o.RaisePropertyChanged(CustomSelectedItemProperty, arg.OldValue, arg.NewValue);
@@ -348,6 +357,6 @@ namespace AvaloniaStyles.Controls
             });
         }
 
-        private bool IsAttached() => ((IVisual) this).IsAttachedToVisualTree;
+        private bool IsAttached() => ((Visual) this).GetVisualRoot() != null;
     }
 }

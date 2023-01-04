@@ -31,11 +31,11 @@
                             MaximumColumnsCount="1" ColumnWidth="400" HorizontalSpacing="10" Spacing="5"></DynamicColumnsPanel>
                     </ItemsPanelTemplate>
                     <DataTemplate x:Key="VerticalRowTemplate" x:DataType="oneToOneForeignKey:DatabaseEntityViewModel">
-                        <ItemsPresenter
+                        <ItemsControl
                             KeyboardNavigation.TabNavigation="Continue"
-                            Items="{CompiledBinding Groups, Mode=OneWay}"
+                            ItemsSource="{CompiledBinding Groups, Mode=OneWay}"
                             ItemsPanel="{StaticResource VerticalRowPanel}">
-                            <ItemsPresenter.ItemTemplate>
+                            <ItemsControl.ItemTemplate>
                                 <DataTemplate x:DataType="oneToOneForeignKey:DatabaseFieldsGroup">
                                     <DockPanel>
                                         <GroupingHeader IsVisible="{CompiledBinding ShowHeader}" DockPanel.Dock="Top">
@@ -43,24 +43,24 @@
                                                 <CheckBox IsChecked="{CompiledBinding IsExpanded}" Content="{CompiledBinding GroupName}" />
                                             </GroupingHeader.CustomContent>
                                         </GroupingHeader>
-                                        <ItemsPresenter 
+                                        <ItemsControl 
                                             IsVisible="{CompiledBinding IsExpanded}"
                                             KeyboardNavigation.TabNavigation="Continue"
-                                            Items="{CompiledBinding Cells, Mode=OneWay}"
+                                            ItemsSource="{CompiledBinding Cells, Mode=OneWay}"
                                             ItemsPanel="{StaticResource VerticalRowPanel}">
-                                            <ItemsPresenter.ItemTemplate>
+                                            <ItemsControl.ItemTemplate>
                                                 <DataTemplate x:DataType="oneToOneForeignKey:SingleRecordDatabaseCellViewModel">
                                                     <DockPanel LastChildFill="True">
                                                         <TextBlock Text="{CompiledBinding ColumnName, StringFormat={}{0}: }" Opacity="0.7" VerticalAlignment="Center" Width="100" FontWeight="Bold" />
                                                         <ContentPresenter Background="{DynamicResource ContentBackground}" BorderThickness="1" CornerRadius="4" BorderBrush="{DynamicResource TextControlBorderBrush}" Content="{Binding}" Margin="20,0,0,0" />
                                                     </DockPanel>
                                                 </DataTemplate>
-                                            </ItemsPresenter.ItemTemplate>
-                                        </ItemsPresenter>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
                                     </DockPanel>
                                 </DataTemplate>
-                            </ItemsPresenter.ItemTemplate>
-                        </ItemsPresenter>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
                     </DataTemplate>
                 </ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>

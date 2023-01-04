@@ -14,6 +14,16 @@ namespace WDE.Common.Types
 
         public static ImageUri Empty { get; } = new ImageUri("Icons/empty.png");
 
+        public static bool operator ==(ImageUri left, ImageUri right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(ImageUri left, ImageUri right)
+        {
+            return !left.Equals(right);
+        }
+
         public bool Equals(ImageUri other)
         {
             return Uri == other.Uri;

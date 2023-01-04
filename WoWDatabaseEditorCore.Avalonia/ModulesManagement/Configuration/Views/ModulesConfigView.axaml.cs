@@ -6,7 +6,7 @@ namespace WoWDatabaseEditorCore.Avalonia.ModulesManagement.Configuration.Views
     /// <summary>
     ///     Interaction logic for ModulesConfigView.xaml
     /// </summary>
-    public class ModulesConfigView : UserControl
+    public partial class ModulesConfigView : UserControl
     {
         public ModulesConfigView()
         {

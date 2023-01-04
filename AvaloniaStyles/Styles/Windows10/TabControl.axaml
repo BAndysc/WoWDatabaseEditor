@@ -20,9 +20,7 @@
                 VerticalAlignment="{TemplateBinding VerticalAlignment}">
           <DockPanel>
             <ItemsPresenter Name="PART_ItemsPresenter"
-                            Items="{TemplateBinding Items}"
                             ItemsPanel="{TemplateBinding ItemsPanel}"
-                            ItemTemplate="{TemplateBinding ItemTemplate}"
                             Margin="0,0,0,-1"
                             ZIndex="1"
                             DockPanel.Dock="{TemplateBinding TabStripPlacement}"/>
@@ -76,9 +74,9 @@
                               Content="{TemplateBinding Header}"
                               HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                               VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                              TextBlock.FontFamily="{TemplateBinding FontFamily}"
-                              TextBlock.FontSize="{TemplateBinding FontSize}"
-                              TextBlock.FontWeight="{TemplateBinding FontWeight}" />
+                              TextElement.FontFamily="{TemplateBinding FontFamily}"
+                              TextElement.FontSize="{TemplateBinding FontSize}"
+                              TextElement.FontWeight="{TemplateBinding FontWeight}" />
           </Border>
           <Border Name="PART_BottomBorder" Height="1" Background="{DynamicResource TabItemHeaderBackgroundSelected}" VerticalAlignment="Bottom" HorizontalAlignment="Stretch"/>
         </Panel>
@@ -148,5 +146,10 @@
   </Style>
   <Style Selector="TabItem[TabStripPlacement=Right]">
     <Setter Property="HorizontalContentAlignment" Value="Right" />
+  </Style>
+  
+  
+  <Style Selector="TabControl[TabStripPlacement=Top] /template/ ItemsPresenter#PART_ItemsPresenter">
+    <Setter Property="Margin" Value="0,0,0,-1" /> <!-- was {DynamicResource TabControlTopPlacementItemMargin} -->
   </Style>
 </Styles>

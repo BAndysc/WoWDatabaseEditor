@@ -25,8 +25,8 @@
                                       Content="{Binding}"
                                       DockPanel.Dock="Top"
                                       Padding="10"
-                                      TextBlock.FontSize="28"
-                                      TextBlock.FontWeight="Light"
+                                      TextElement.FontSize="28"
+                                      TextElement.FontWeight="Light"
                                       />
                     <Border></Border>
                     <DockPanel Margin="10" DockPanel.Dock="Bottom" LastChildFill="True">

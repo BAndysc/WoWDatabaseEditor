@@ -28,7 +28,12 @@ namespace WDE.DatabaseEditors
                 return settings;
             };
         }
-        
+
+        public override void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+            base.RegisterTypes(containerRegistry);
+        }
+
         public override void OnInitialized(IContainerProvider containerProvider)
         {
             this.containerProvider = containerProvider;

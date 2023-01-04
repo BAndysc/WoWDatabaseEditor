@@ -2,10 +2,10 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="using:AvaloniaStyles.Controls">
     <Design.PreviewWith>
-        <controls:DropDownButton />
+        <controls:WdeDropDownButton />
     </Design.PreviewWith>
 
-    <Style Selector="controls|DropDownButton">
+    <Style Selector="controls|WdeDropDownButton">
         <Setter Property="Template">
             <ControlTemplate>
                 <Grid>

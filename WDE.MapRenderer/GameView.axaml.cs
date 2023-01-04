@@ -8,7 +8,7 @@ using WDE.WorldMap.Extensions;
 
 namespace WDE.MapRenderer
 {
-    public class GameView : UserControl
+    public partial class GameView : UserControl
     {
         private TheEnginePanel enginePanel;
         
@@ -57,7 +57,7 @@ namespace WDE.MapRenderer
                     e.Handled = true;
                 else if (enginePanel.ContextMenu != null)
                 {
-                    enginePanel.ContextMenu.Items = items.Select(i =>
+                    enginePanel.ContextMenu.ItemsSource = items.Select(i =>
                     {
                         if (i.Item1 == "-")
                             return (object)new Separator();

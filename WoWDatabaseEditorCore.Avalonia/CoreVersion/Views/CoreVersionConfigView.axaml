@@ -12,7 +12,7 @@
              d:DesignHeight="300" d:DesignWidth="300">
     <StackPanel Margin="0,1,0,0">
         <SettingItem Header="Core version" Help="Depending on the core version, particular features will be enabled/disabled.">
-            <ComboBox Items="{CompiledBinding CoreVersions}" 
+            <ComboBox ItemsSource="{CompiledBinding CoreVersions}" 
                       SelectedItem="{CompiledBinding SelectedVersion, Mode=TwoWay}">
                 <ComboBox.ItemTemplate>
                     <DataTemplate>

@@ -38,7 +38,7 @@ namespace WDE.Updater.Test.Services
             platformService = Substitute.For<IAutoUpdatePlatformService>();
             updateVerifier = Substitute.For<IUpdateVerifier>();
             clientFactory
-                .Create(Arg.Any<Uri>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<Platforms>())
+                .Create(Arg.Any<Uri>(), Arg.Any<string>(), Arg.Any<string?>(), Arg.Any<UpdatePlatforms>())
                 .Returns(updateClient);
         }
         

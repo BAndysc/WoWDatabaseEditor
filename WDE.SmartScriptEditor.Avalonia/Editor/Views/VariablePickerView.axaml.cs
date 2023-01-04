@@ -4,7 +4,7 @@ using Avalonia.Markup.Xaml;
 
 namespace WDE.SmartScriptEditor.Avalonia.Editor.Views;
 
-public class VariablePickerView : UserControl
+public partial class VariablePickerView : UserControl
 {
     public VariablePickerView()
     {

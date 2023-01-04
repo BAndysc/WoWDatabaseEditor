@@ -18,7 +18,7 @@
                     </DockPanel>
                 </SettingItem>
                 <SettingItem Header="Archive open mode" Help="Stormlib has better compatibility, but might be slower. Doesn't matter if you select > MoP client.">
-                    <ComboBox Items="{CompiledBinding MpqOpenTypes}" SelectedItem="{CompiledBinding MpqOpenType}" />
+                    <ComboBox ItemsSource="{CompiledBinding MpqOpenTypes}" SelectedItem="{CompiledBinding MpqOpenType}" />
                 </SettingItem>
             </StackPanel>
         </StackPanel>

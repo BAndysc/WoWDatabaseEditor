@@ -4,6 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using WDE.WorldMap.Extensions;
 using WDE.WorldMap.Models;
 
@@ -82,7 +83,7 @@ namespace WDE.WorldMap
                 var parent = e.Parent;
 
                 while (parent != null && parent is not WoWMapViewer)
-                    parent = parent.VisualParent;
+                    parent = parent.GetVisualParent();
 
                 if (parent is WoWMapViewer map)
                 {
@@ -251,9 +252,9 @@ namespace WDE.WorldMap
             StopDrag(e.GetPosition(this));
         }
 
-        protected override void OnPointerLeave(PointerEventArgs e)
+        protected override void OnPointerExited(PointerEventArgs e)
         {
-            base.OnPointerLeave(e);
+            base.OnPointerExited(e);
             StopDrag(null);
         }
 

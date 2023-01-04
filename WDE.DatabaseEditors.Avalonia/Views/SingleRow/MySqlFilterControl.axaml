@@ -10,8 +10,8 @@
         <KeyBinding Gesture="Enter" Command="{CompiledBinding ApplyFilter}" />
     </UserControl.KeyBindings>
     <DockPanel Margin="4">
-        <ComboBox Margin="0,0,4,0" SelectedItem="{CompiledBinding SelectedColumn}" Items="{CompiledBinding Columns}" />
-        <ComboBox Margin="0,0,4,0" IsVisible="{CompiledBinding ShowOperatorChoice}" SelectedItem="{CompiledBinding SelectedOperator}" Items="{CompiledBinding Operators}" />
+        <ComboBox Margin="0,0,4,0" SelectedItem="{CompiledBinding SelectedColumn}" ItemsSource="{CompiledBinding Columns}" />
+        <ComboBox Margin="0,0,4,0" IsVisible="{CompiledBinding ShowOperatorChoice}" SelectedItem="{CompiledBinding SelectedOperator}" ItemsSource="{CompiledBinding Operators}" />
         <Button DockPanel.Dock="Right" Content="..." Command="{CompiledBinding PickParameterCommand}" />
         <TextBox IsEnabled="{CompiledBinding ShowFilterText}" Margin="0,0,4,0" Text="{CompiledBinding FilterText}" />
     </DockPanel>

@@ -69,10 +69,10 @@
                 <Panel>
                     <StackPanel Opacity="{CompiledBinding Refreshing, Converter={StaticResource RunningConverter}}">
                         <SettingsHeader Margin="0">Running</SettingsHeader>
-                        <ItemsRepeater ItemTemplate="{StaticResource ProfileTemplate}" Items="{CompiledBinding RunningProfiles}" />
+                        <ItemsRepeater ItemTemplate="{StaticResource ProfileTemplate}" ItemsSource="{CompiledBinding RunningProfiles}" />
                     
                         <SettingsHeader Margin="0,20,0,0">Open new instance</SettingsHeader>
-                        <ItemsRepeater ItemTemplate="{StaticResource ProfileTemplate}" Items="{CompiledBinding Profiles}" />
+                        <ItemsRepeater ItemTemplate="{StaticResource ProfileTemplate}" ItemsSource="{CompiledBinding Profiles}" />
                         
                         <SettingsHeader Margin="0,20,0,5">Create new</SettingsHeader>
                         <Button Command="{CompiledBinding CreateNewProfileCommand}">Create a profile</Button>

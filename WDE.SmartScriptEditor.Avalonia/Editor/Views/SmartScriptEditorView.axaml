@@ -36,8 +36,8 @@
             </Slider.ContextMenu>
         </Slider>
         
-        <ItemsPresenter Items="{CompiledBinding Notifications}">
-            <ItemsPresenter.ItemTemplate>
+        <ItemsControl ItemsSource="{CompiledBinding Notifications}">
+            <ItemsControl.ItemTemplate>
                 <DataTemplate x:DataType="editor:SmartExtensionNotification">
                     <controls:TeachingTip 
                         HorizontalAlignment="Right"
@@ -50,13 +50,13 @@
                         </StackPanel>
                     </controls:TeachingTip>
                 </DataTemplate>
-            </ItemsPresenter.ItemTemplate>
-            <ItemsPresenter.ItemsPanel>
+            </ItemsControl.ItemTemplate>
+            <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <StackPanel Orientation="Vertical" Spacing="10" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="10" />
                 </ItemsPanelTemplate>
-            </ItemsPresenter.ItemsPanel>
-        </ItemsPresenter>
+            </ItemsControl.ItemsPanel>
+        </ItemsControl>
         
         <controls:TeachingTip IsOpened="{CompiledBinding TeachingTips.MultipleActionsTipOpened}" VerticalAlignment="Bottom" Margin="20" Header="Multiple actions in one event">In the WoW Database Editor you can have many actions in a single event. You do not have to copy-paste events.</controls:TeachingTip>
         <controls:TeachingTip IsOpened="{CompiledBinding TeachingTips.YouCanNameStoredTargetsTipOpened}" VerticalAlignment="Bottom" Margin="20" Header="Stored object source/target name">You can name stored object variables to make writing script easier. To add named stored object, use right click on 'Add Event'.</controls:TeachingTip>

@@ -21,7 +21,7 @@ public class ToggleAllCheckBox : CheckBox, IStyleable
     public ICommand? AltCommand
     {
         get => _altCommand;
-        set => SetAndRaise(CommandProperty, ref _altCommand, value);
+        set => SetAndRaise(AltCommandProperty, ref _altCommand, value);
     }
     
     public Type StyleKey => typeof(CheckBox);

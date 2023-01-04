@@ -1,8 +1,10 @@
+using System.Globalization;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Media.TextFormatting;
+using Avalonia.Threading;
 using AvaloniaStyles.Controls.FastTableView;
 using WDE.Common.Avalonia;
 using WDE.Common.Avalonia.Services;
@@ -61,7 +63,7 @@ public class CustomCellDrawer : CustomCellDrawerInteractorBase, ICustomCellDrawe
         if (!row.Entity.ExistInDatabase)
         {
             var pen = row.IsPhantomEntity ? PhantomRowPen : ModifiedCellPen;
-            context.FillRectangle(pen.Brush, rect.WithWidth(5));
+            context.FillRectangle(pen.Brush ?? Brushes.Black, rect.WithWidth(5));
             context.DrawLine(pen, rect.TopLeft,rect.TopRight);
             context.DrawLine(pen, rect.BottomLeft, rect.BottomRight);
         }
@@ -88,19 +90,17 @@ public class CustomCellDrawer : CustomCellDrawerInteractorBase, ICustomCellDrawe
         var state = context.PushClip(rect);
         if (char.IsAscii(text[0]))
         {
-            var ft = new FormattedText
+            var ft = new FormattedText(text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, Typeface.Default, 12, ButtonTextPen.Brush)
             {
-                Text = text,
-                Constraint = new Size(rect.Width, rect.Height),
-                Typeface = Typeface.Default,
-                FontSize = 12
+                MaxTextWidth = rect.Width,
+                MaxTextHeight = rect.Height,
             };
-            context.DrawText(ButtonTextPen.Brush, new Point(rect.Center.X - ft.Bounds.Width / 2, rect.Center.Y - ft.Bounds.Height / 2), ft);
+            context.DrawText(ft, new Point(rect.Center.X - ft.Width / 2, rect.Center.Y - ft.Height / 2));
         }
         else
         {
             var tl = new TextLayout(text, Typeface.Default, 12, ButtonTextPen.Brush, TextAlignment.Center, maxWidth: rect.Width, maxHeight:rect.Height);
-            tl.Draw(context, new Point(rect.Left, rect.Center.Y - tl.Size.Height / 2));
+            tl.Draw(context, new Point(rect.Left, rect.Center.Y - tl.Height / 2));
         }
         state.Dispose();
     }
@@ -147,7 +147,7 @@ public class CustomCellDrawer : CustomCellDrawerInteractorBase, ICustomCellDrawe
                 async Task UpdateIcon(uint spell)
                 {
                     await spellIconService.GetIcon(spell);
-                    table.InvalidateVisual();
+                    Dispatcher.UIThread.Post(table.InvalidateVisual);
                 }
                 UpdateIcon(spellId).ListenErrors();
             }

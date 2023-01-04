@@ -5,15 +5,15 @@ using Avalonia.Metadata;
 
 namespace AvaloniaStyles.Controls
 {
-    public class DropDownButton : TemplatedControl
+    public class WdeDropDownButton : TemplatedControl
     {
         private object? button;
-        public static readonly DirectProperty<DropDownButton, object?> ButtonProperty = AvaloniaProperty.RegisterDirect<DropDownButton, object?>("Button", o => o.Button, (o, v) => o.Button = v);
+        public static readonly DirectProperty<WdeDropDownButton, object?> ButtonProperty = AvaloniaProperty.RegisterDirect<WdeDropDownButton, object?>("Button", o => o.Button, (o, v) => o.Button = v);
         private bool isDropDownOpened;
-        public static readonly DirectProperty<DropDownButton, bool> IsDropDownOpenedProperty = AvaloniaProperty.RegisterDirect<DropDownButton, bool>("IsDropDownOpened", o => o.IsDropDownOpened, (o, v) => o.IsDropDownOpened = v);
+        public static readonly DirectProperty<WdeDropDownButton, bool> IsDropDownOpenedProperty = AvaloniaProperty.RegisterDirect<WdeDropDownButton, bool>("IsDropDownOpened", o => o.IsDropDownOpened, (o, v) => o.IsDropDownOpened = v);
 
         public static readonly StyledProperty<Control?> ChildProperty =
-            AvaloniaProperty.Register<DropDownButton, Control?>(nameof(Child));
+            AvaloniaProperty.Register<WdeDropDownButton, Control?>(nameof(Child));
         
         public object? Button
         {

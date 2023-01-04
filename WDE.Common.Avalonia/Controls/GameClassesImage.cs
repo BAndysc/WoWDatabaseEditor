@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media.Imaging;
@@ -13,6 +14,8 @@ public class GameClassesImage : BaseGameEnumImage
 {
     public static readonly StyledProperty<CharacterClasses> GameClassesProperty = AvaloniaProperty.Register<GameClassesImage, CharacterClasses>(nameof(GameClasses));
 
+    private static Task? cacheInProgress;
+    
     private static List<int> enumValues = new()
     {
         (int)CharacterClasses.Warrior,
@@ -95,4 +98,9 @@ public class GameClassesImage : BaseGameEnumImage
     protected override List<int> EnumValues => enumValues;
     protected override List<ImageUri> Images => images;
     protected override List<Bitmap?> CachedBitmaps => cachedBitmaps;
+    protected override Task? CacheInProgress
+    {
+        get => cacheInProgress;
+        set => cacheInProgress = value;
+    }
 }

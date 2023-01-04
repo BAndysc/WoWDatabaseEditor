@@ -28,10 +28,10 @@ namespace AvaloniaStyles.Controls
             set => SetValue(HeaderProperty, value);
         }
         
-        public static readonly StyledProperty<IControl> ImageProperty =
-            AvaloniaProperty.Register<BaseMessageBoxWindow, IControl>(nameof(Image));
+        public static readonly StyledProperty<Control> ImageProperty =
+            AvaloniaProperty.Register<BaseMessageBoxWindow, Control>(nameof(Image));
         
-        public IControl Image
+        public Control Image
         {
             get => GetValue(ImageProperty);
             set => SetValue(ImageProperty, value);
@@ -39,7 +39,6 @@ namespace AvaloniaStyles.Controls
         
         public BaseMessageBoxWindow()
         {
-            this.AttachDevTools();
             if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                 PseudoClasses.Add(":macos");
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))

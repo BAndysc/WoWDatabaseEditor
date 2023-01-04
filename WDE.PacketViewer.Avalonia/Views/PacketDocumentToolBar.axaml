@@ -39,10 +39,10 @@
             <components:WdeImage ImageUri="Icons/icon_filters_disable.png" />
         </ToggleButton>
         
-        <controls:DropDownButton DataContext="{CompiledBinding ParsingSettings}">
-            <controls:DropDownButton.Button>
+        <WdeDropDownButton DataContext="{CompiledBinding ParsingSettings}">
+            <WdeDropDownButton.Button>
                 <components:WdeImage ToolTip.Tip="Settings" ImageUri="Icons/icon_wrench.png" />
-            </controls:DropDownButton.Button>
+            </WdeDropDownButton.Button>
             <StackPanel>
                 <GroupingHeader>Dumpers general settings</GroupingHeader>
                 <TextBlock FontWeight="Bold">Chat:</TextBlock>
@@ -51,20 +51,20 @@
                 <TextBlock FontWeight="Bold">Waypoint dump type:</TextBlock>
                 <controls:CompletionComboBox SelectedItem="{Binding WaypointsDumpType, Mode=TwoWay}" controls:Extensions.EnumType="{x:Type parsing:WaypointsDumpType}" />
             </StackPanel>
-        </controls:DropDownButton>
+        </WdeDropDownButton>
 
         <Border Width="15" />
         
-        <controls:DropDownButton>
-            <controls:DropDownButton.Button>
+        <WdeDropDownButton>
+            <WdeDropDownButton.Button>
                 <StackPanel Orientation="Horizontal">
                     <components:WdeImage ImageUri="Icons/icon_cog_reload.png" />
                     <TextBlock>Dump</TextBlock>
                 </StackPanel>
-            </controls:DropDownButton.Button>
+            </WdeDropDownButton.Button>
             <StackPanel Orientation="Vertical">
-                <ItemsPresenter Items="{CompiledBinding Processors}">
-                    <ItemsPresenter.ItemTemplate>
+                <ItemsControl ItemsSource="{CompiledBinding Processors}">
+                    <ItemsControl.ItemTemplate>
                         <DataTemplate x:DataType="viewModels:ProcessorViewModel">
                             <CheckBox IsChecked="{CompiledBinding IsChecked}" Margin="0,0,0,12" HorizontalAlignment="Stretch">
                                 <DockPanel>
@@ -77,20 +77,20 @@
                                 </DockPanel>
                             </CheckBox>
                         </DataTemplate>
-                    </ItemsPresenter.ItemTemplate>
-                </ItemsPresenter>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
                 <Button ClickMode="Press" Command="{CompiledBinding RunProcessors}" Content="Execute">
                     <Interaction.Behaviors>
                         <controls:DismissPopupBehaviour/>
                     </Interaction.Behaviors>
                 </Button>
             </StackPanel>
-        </controls:DropDownButton>
+        </WdeDropDownButton>
         
         <Border Width="15" />
         
-        <ItemsPresenter Items="{CompiledBinding Processors}">
-            <ItemsPresenter.ItemTemplate>
+        <ItemsControl ItemsSource="{CompiledBinding Processors}">
+            <ItemsControl.ItemTemplate>
                 <DataTemplate x:DataType="viewModels:ProcessorViewModel">
                     <Button Command="{Binding #Root.DataContext.QuickRunProcessor}"
                             CommandParameter="{CompiledBinding .}"
@@ -98,13 +98,13 @@
                         <components:WdeImage Image="{CompiledBinding Image}" />
                     </Button>
                 </DataTemplate>
-            </ItemsPresenter.ItemTemplate>
-            <ItemsPresenter.ItemsPanel>
+            </ItemsControl.ItemTemplate>
+            <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <controls:ToolbarPanel />
                 </ItemsPanelTemplate>
-            </ItemsPresenter.ItemsPanel>
-        </ItemsPresenter>
+            </ItemsControl.ItemsPanel>
+        </ItemsControl>
         
         <controls:ToolbarSpacer />
 

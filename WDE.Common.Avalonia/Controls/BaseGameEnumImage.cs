@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
+using Avalonia.Threading;
 using WDE.Common.Avalonia.Components;
 using WDE.Common.Types;
+using WDE.Common.Utils;
 
 namespace WDE.Common.Avalonia.Controls;
 
@@ -33,6 +36,8 @@ public abstract class BaseGameEnumImage : Control
     
     protected abstract List<Bitmap?> CachedBitmaps { get; }
     
+    protected abstract Task? CacheInProgress { get; set; }
+    
     protected override Size MeasureOverride(Size availableSize)
     {
         int icons = 0;
@@ -52,17 +57,61 @@ public abstract class BaseGameEnumImage : Control
         return new Size(icons * allHeight + Math.Max(0, icons - 1) * Spacing, allHeight);
     }
 
-    protected static void CacheBitmaps(List<Bitmap?> cache, List<ImageUri> images)
+    private bool instanceWaitingForCache = false;
+    
+    protected bool CacheBitmaps(List<Bitmap?> cache, List<ImageUri> images)
     {
-        if (cache.Count == images.Count)
-            return;
-        
-        cache.Clear();
-        foreach (var imageUri in images)
+        if (instanceWaitingForCache)
+            return false;
+
+        if (CacheInProgress != null)
         {
-            cache.Add(WdeImage.LoadBitmap(imageUri));
+            instanceWaitingForCache = true;
+            async Task InvalidateOnLoad()
+            {
+                await CacheInProgress!;
+                instanceWaitingForCache = false;
+                Dispatcher.UIThread.Post(InvalidateVisual);
+            }
+            InvalidateOnLoad().ListenErrors();
+            return false;
         }
+
+        
+        if (cache.Count == images.Count)
+            return true;
+        
+        var taskCompletionSource = new TaskCompletionSource();
+        CacheInProgress = taskCompletionSource.Task;
+        async Task CacheBitmapsAsync()
+        {
+            cache.Clear();
+            foreach (var imageUri in images)
+            {
+                Bitmap? img = null;
+                try
+                {
+                    img = await WdeImage.LoadBitmapAsync(imageUri);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+                cache.Add(img);
+            }
+
+            await AdditionalCacheTaskAsync();
+
+            CacheInProgress = null;
+            Dispatcher.UIThread.Post(InvalidateVisual);
+            taskCompletionSource.SetResult();
+        }
+
+        CacheBitmapsAsync().ListenErrors();
+        return false;
     }
+    
+    protected virtual async Task AdditionalCacheTaskAsync() { }
     
     public override void Render(DrawingContext context)
     {
@@ -73,8 +122,9 @@ public abstract class BaseGameEnumImage : Control
         var x = 0d;
         var size = Math.Min(Bounds.Width, Bounds.Height);
         var spacing = Spacing;
-        CacheBitmaps(CachedBitmaps, Images);
-        
+        if (!CacheBitmaps(CachedBitmaps, Images))
+            return;
+      
         for (var index = 0; index < Images.Count; index++)
         {
             var icon = EnumValues[index];

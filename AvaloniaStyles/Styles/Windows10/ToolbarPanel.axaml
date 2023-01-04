@@ -41,7 +41,8 @@
                 <Setter Property="Background" Value="Transparent" />
         </Style>
         
-        <!-- toolbarpanel -> contentpresenter -> button -->
+        
+        <!-- toolbarpanel > contentpresenter -> button -->
         
         <Style Selector="controls|ToolbarPanel > ContentPresenter > :is(Button)">
                 <Setter Property="HorizontalAlignment" Value="Left" />
@@ -69,29 +70,57 @@
                 <Setter Property="Background" Value="Transparent" />
         </Style>
         
-        <!-- drop down -->
-        <Style Selector="controls|ToolbarPanel > controls|DropDownButton ToggleButton">
+        <!-- toolbarpanel -> ItemsControl > contentpresenter -> button for nested toolbar panels -->
+        
+        <Style Selector="controls|ToolbarPanel > ItemsControl > ContentPresenter > :is(Button)">
                 <Setter Property="HorizontalAlignment" Value="Left" />
                 <Setter Property="Padding" Value="0" />
                 <Setter Property="Background" Value="Transparent" />
                 <Setter Property="BorderThickness" Value="0" />
                 <Setter Property="Height" Value="24" />
         </Style>
-        <Style Selector="controls|ToolbarPanel > controls|DropDownButton ToggleButton ContentPresenter">
-                <Setter Property="Height" Value="24" />
+        <Style Selector="controls|ToolbarPanel > ItemsControl > ContentPresenter > :is(Button) /template/ ContentPresenter">
+                <Setter Property="MinHeight" Value="24" />
+                <Setter Property="VerticalAlignment" Value="Center" />
         </Style>
-        <Style Selector="controls|ToolbarPanel > controls|DropDownButton ToggleButton :is(Image)">
+        <Style Selector="controls|ToolbarPanel > ItemsControl > ContentPresenter > :is(Button) :is(Image)">
                 <Setter Property="Height" Value="24"/>
                 <Setter Property="Width" Value="24" />
         </Style>
-        <Style Selector="controls|ToolbarPanel > controls|DropDownButton ToggleButton TextBlock">
+        <Style Selector="controls|ToolbarPanel > ItemsControl > ContentPresenter > :is(Button) TextBlock">
                 <Setter Property="VerticalAlignment" Value="Center"/>
                 <Setter Property="Margin" Value="2" />
         </Style>
-        <Style Selector="controls|ToolbarPanel > controls|DropDownButton ToggleButton:disabled">
+        <Style Selector="controls|ToolbarPanel > ItemsControl > ContentPresenter > :is(Button):disabled">
                 <Setter Property="Opacity" Value="0.2" />
         </Style>
-        <Style Selector="controls|ToolbarPanel > controls|DropDownButton ToggleButton:disabled /template/ ContentPresenter#PART_ContentPresenter">
+        <Style Selector="controls|ToolbarPanel > ItemsControl > ContentPresenter > :is(Button):disabled /template/ ContentPresenter#PART_ContentPresenter">
+                <Setter Property="Background" Value="Transparent" />
+        </Style>
+        
+        <!-- drop down -->
+        <Style Selector="controls|ToolbarPanel > controls|WdeDropDownButton ToggleButton">
+                <Setter Property="HorizontalAlignment" Value="Left" />
+                <Setter Property="Padding" Value="0" />
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="Height" Value="24" />
+        </Style>
+        <Style Selector="controls|ToolbarPanel > controls|WdeDropDownButton ToggleButton ContentPresenter">
+                <Setter Property="Height" Value="24" />
+        </Style>
+        <Style Selector="controls|ToolbarPanel > controls|WdeDropDownButton ToggleButton :is(Image)">
+                <Setter Property="Height" Value="24"/>
+                <Setter Property="Width" Value="24" />
+        </Style>
+        <Style Selector="controls|ToolbarPanel > controls|WdeDropDownButton ToggleButton TextBlock">
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="Margin" Value="2" />
+        </Style>
+        <Style Selector="controls|ToolbarPanel > controls|WdeDropDownButton ToggleButton:disabled">
+                <Setter Property="Opacity" Value="0.2" />
+        </Style>
+        <Style Selector="controls|ToolbarPanel > controls|WdeDropDownButton ToggleButton:disabled /template/ ContentPresenter#PART_ContentPresenter">
                 <Setter Property="Background" Value="Transparent" />
         </Style>
         

@@ -53,7 +53,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" MinHeight="30" />
         </Grid.RowDefinitions>
-        <ItemsControl Focusable="False" Items="{CompiledBinding Together}" IsHitTestVisible="True" DockPanel.Dock="Top"
+        <ItemsControl Focusable="False" ItemsSource="{CompiledBinding Together}" IsHitTestVisible="True" DockPanel.Dock="Top"
                       Margin="7,0,7,0">
             <ItemsControl.DataTemplates>
                 <DataTemplate DataType="{x:Type models:EventAiEvent}">

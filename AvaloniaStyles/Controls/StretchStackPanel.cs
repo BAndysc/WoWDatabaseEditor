@@ -22,7 +22,7 @@ public class StretchStackPanel : Panel
         int index = 0;
         for (int count = children.Count; index < count; ++index)
         {
-            IControl control = children[index];
+            Control control = children[index];
             if (control == null)
                 continue;
             
@@ -37,7 +37,7 @@ public class StretchStackPanel : Panel
         index = 0;
         for (int count = children.Count; index < count; ++index)
         {
-            IControl control = children[index];
+            Control control = children[index];
             if (control == null)
                 continue;
             
@@ -65,7 +65,7 @@ public class StretchStackPanel : Panel
         int index = 0;
         for (int count = children.Count; index < count; ++index)
         {
-            IControl control = children[index];
+            Control control = children[index];
             if (control != null)
             {
                 bool isVisible = control.IsVisible;

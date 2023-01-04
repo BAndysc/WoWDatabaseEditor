@@ -1,19 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
 using WDE.Common;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;
-using WDE.Common.Parameters;
-using WDE.Common.Providers;
 using WDE.Common.Services;
-using WDE.Common.Services.MessageBox;
 using WDE.Common.Solution;
 using WDE.Common.Types;
 using WDE.DatabaseEditors.Data.Interfaces;
 using WDE.DatabaseEditors.Data.Structs;
-using WDE.DatabaseEditors.Loaders;
-using WDE.DatabaseEditors.Models;
 using WDE.DatabaseEditors.Services;
 using WDE.Module.Attributes;
 

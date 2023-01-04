@@ -8,7 +8,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.Views
     /// <summary>
     ///     Interaction logic for SmartScriptEditorView
     /// </summary>
-    public class SmartScriptEditorView : UserControl
+    public partial class SmartScriptEditorView : UserControl
     {
         public SmartScriptEditorView()
         {

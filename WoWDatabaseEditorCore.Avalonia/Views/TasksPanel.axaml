@@ -17,7 +17,7 @@
         <DockPanel LastChildFill="True" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <Label DockPanel.Dock="Top">Running tasks</Label>
             <ScrollViewer VerticalScrollBarVisibility="Auto">
-                <ItemsControl Items="{Binding Tasks}">
+                <ItemsControl ItemsSource="{Binding Tasks}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <Button BorderThickness="0" Command="{Binding ForgetTaskCommand}" HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch">

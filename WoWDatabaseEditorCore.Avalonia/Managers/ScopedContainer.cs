@@ -1,4 +1,3 @@
-using JetBrains.Annotations;
 using Prism.Ioc;
 using Prism.Unity.Ioc;
 using Unity;
@@ -17,7 +16,7 @@ public class ScopedContainer : BaseScopedContainer
         childContainer.AddExtension(lt);
         lt.TypeDefaultLifetime = new ContainerControlledLifetimeManager();
         var extensions = new UnityContainerExtension(childContainer);
-        var scope = new ScopedContainer(extensions, new UnityContainerRegistry(childContainer), childContainer);
+        var scope = new ScopedContainer(extensions, new UnityContainerRegistry(childContainer, extensions), childContainer);
         extensions.RegisterInstance<IScopedContainer>(scope);
         extensions.RegisterInstance<IContainerExtension>(scope);
         extensions.RegisterInstance<IContainerProvider>(scope);

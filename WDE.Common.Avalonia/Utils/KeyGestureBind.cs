@@ -34,7 +34,7 @@ public static class KeyGestureBind
         });
     }
     
-    public static IList<CommandKeyBinding> GetBindings(UserControl control) => (IList<CommandKeyBinding>)control.GetValue(BindingsProperty)!;
+    public static IList<CommandKeyBinding> GetBindings(UserControl control) => (IList<CommandKeyBinding>?)control.GetValue(BindingsProperty)??new List<CommandKeyBinding>();
     public static void SetBindings(UserControl control, object value) => control.SetValue(BindingsProperty, value);
 
 }

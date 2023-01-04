@@ -10,7 +10,7 @@ using WDE.Common.Managers;
 
 namespace WDE.SmartScriptEditor.Avalonia.Editor.Views.Editing;
 
-public class SmartGroupEditView : UserControl
+public partial class SmartGroupEditView : UserControl
 {
     public SmartGroupEditView()
     {
@@ -27,7 +27,7 @@ public class SmartGroupEditView : UserControl
         base.OnAttachedToVisualTree(e);
         DispatcherTimer.RunOnce(() =>
         {
-            var edit = this.FindControl<TextBox>("GroupName");
+            var edit = this.GetControl<TextBox>("GroupName");
             edit.SelectAll();
             edit.Focus();
         }, TimeSpan.FromMilliseconds(1));

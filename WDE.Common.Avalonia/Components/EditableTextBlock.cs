@@ -32,7 +32,7 @@ public class EditableTextBlock : TemplatedControl
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        panel = e.NameScope.Find<Panel>("PART_Panel");
+        panel = e.NameScope.Find<Panel>("PART_Panel") ?? throw new NullReferenceException("PART_Panel not found");
     }
 
     protected override void OnPointerPressed(PointerPressedEventArgs e)
@@ -73,7 +73,7 @@ public class EditableTextBlock : TemplatedControl
         adornerLayer.Children.Add(textBox);
         AdornerLayer.SetAdornedElement(textBox, this);
 
-        DispatcherTimer.RunOnce(textBox.Focus, TimeSpan.FromMilliseconds(1));
+        DispatcherTimer.RunOnce(() => textBox.Focus(), TimeSpan.FromMilliseconds(1));
         textBox.SelectAll();
 
         if (this.GetVisualRoot() is TopLevel toplevel)
@@ -117,7 +117,7 @@ public class EditableTextBlock : TemplatedControl
         clickDisposable = null;
         
         if (save)
-            Text = textBox.Text;
+            Text = textBox.Text ?? "";
         textBox = null;
     }
 }

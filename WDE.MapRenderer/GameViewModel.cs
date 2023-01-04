@@ -543,7 +543,7 @@ Tris: " + stats.TrianglesDrawn;
 
         private GameCameraViewModel cameraViewModel;
         private bool visibility;
-        private bool displayStats;
+        private bool displayStats = true;
         private bool isSelected;
         public ObservableCollection<GameCameraViewModel> Items { get; } = new();
         public IEnumerable<GameCameraViewModel> VisibleItems => Items;

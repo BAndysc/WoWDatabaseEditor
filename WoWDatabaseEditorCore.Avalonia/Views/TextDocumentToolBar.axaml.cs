@@ -3,7 +3,7 @@ using Avalonia.Markup.Xaml;
 
 namespace WoWDatabaseEditorCore.Avalonia.Views
 {
-    public class TextDocumentToolBar : UserControl
+    public partial class TextDocumentToolBar : UserControl
     {
         public TextDocumentToolBar()
         {

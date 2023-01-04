@@ -24,65 +24,35 @@
                         BorderBrush="{TemplateBinding BorderBrush}"
                         BorderThickness="{TemplateBinding BorderThickness}"
                         CornerRadius="{TemplateBinding CornerRadius}">
+                    <DockPanel LastChildFill="True" Grid.IsSharedSizeScope="True">
+                        <ScrollViewer HorizontalScrollBarVisibility="Hidden"
+                                      VerticalScrollBarVisibility="Disabled"
+                                      Name="PART_HeaderScroll"
+                                      DockPanel.Dock="Top">
+                            <GridViewHeader>
+                                <Grid Name="PART_header">
+                                </Grid>
+                            </GridViewHeader>
+                        </ScrollViewer>
                     
-                    <Grid ColumnDefinitions="*,Auto" RowDefinitions="*,Auto">
-                        <AlternativeScrollViewer 
-                                                          Grid.RowSpan="2" Grid.ColumnSpan="2"
-                                                          Name="HScroll"
-                                                          ShouldHandleWheelEvent="True"
-                                                          AllowAutoHide="{TemplateBinding (ScrollViewer.AllowAutoHide)}"
-                                                          HorizontalScrollBarVisibility="Auto" 
-                                                          VerticalScrollBarVisibility="Disabled">
-                            <DockPanel LastChildFill="True" Grid.IsSharedSizeScope="True">
-                                <GridViewHeader DockPanel.Dock="Top">
-                                    <Grid Name="PART_header">
-                                    </Grid>
-                                </GridViewHeader>
-                            
-                                <Border Padding="{TemplateBinding Padding}">
-                                    <AlternativeScrollViewer Name="VScroll"
-                                                             HorizontalScrollBarVisibility="Disabled"
-                                                             VerticalScrollBarVisibility="Auto"
-                                                             AllowAutoHide="{TemplateBinding (ScrollViewer.AllowAutoHide)}">
-                                        <VirtualizedGridViewItemPresenter Items="{TemplateBinding Items}" 
-                                                                          HorizontalAlignment="Left"
-                                                                          MaxWidth="10000"
-                                                                          ItemHeight="{TemplateBinding ItemHeight}"
-                                                                          FocusedIndex="{TemplateBinding FocusedIndex}"
-                                                                          Selection="{TemplateBinding Selection}"
-                                                                          CheckedIndices="{TemplateBinding CheckedIndices}"
-                                                                          UseCheckBoxes="{TemplateBinding UseCheckBoxes}"
-                                                                          Columns="{TemplateBinding Columns}"
-                                                                          Name="PART_Children">
-                                        </VirtualizedGridViewItemPresenter>
-                                    </AlternativeScrollViewer>
-                                </Border>
-                            </DockPanel>
-                        </AlternativeScrollViewer>
-                        <ScrollBar Name="PART_HorizontalScrollBar"
-                                   Orientation="Horizontal"
-                                   AllowAutoHide="{Binding #HScroll.AllowAutoHide}"
-                                   LargeChange="{Binding #HScroll.LargeChange.Width}"
-                                   SmallChange="{Binding #HScroll.SmallChange.Width}"
-                                   Maximum="{Binding #HScroll.HorizontalScrollBarMaximum}"
-                                   Value="{Binding #HScroll.HorizontalScrollBarValue, Mode=TwoWay}"
-                                   ViewportSize="{Binding #HScroll.HorizontalScrollBarViewportSize}"
-                                   Visibility="{Binding #HScroll.HorizontalScrollBarVisibility}"
-                                   Grid.Row="1"
-                                   Focusable="False" />
-                        <!-- how to do it better way? -->
-                        <ScrollBar Name="PART_VerticalScrollBar"
-                                   Orientation="Vertical"
-                                   AllowAutoHide="{Binding $parent[VirtualizedGridView].VisualChildren[0].VisualChildren[0].VisualChildren[0].VisualChildren[0].VisualChildren[0].VisualChildren[1].VisualChildren[0].AllowAutoHide}"
-                                   LargeChange="{Binding $parent[VirtualizedGridView].VisualChildren[0].VisualChildren[0].VisualChildren[0].VisualChildren[0].VisualChildren[0].VisualChildren[1].VisualChildren[0].LargeChange.Width}"
-                                   SmallChange="{Binding $parent[VirtualizedGridView].VisualChildren[0].VisualChildren[0].VisualChildren[0].VisualChildren[0].VisualChildren[0].VisualChildren[1].VisualChildren[0].SmallChange.Width}"
-                                   ViewportSize="{Binding $parent[VirtualizedGridView].VisualChildren[0].VisualChildren[0].VisualChildren[0].VisualChildren[0].VisualChildren[0].VisualChildren[1].VisualChildren[0].VerticalScrollBarViewportSize}"
-                                   Visibility="{Binding $parent[VirtualizedGridView].VisualChildren[0].VisualChildren[0].VisualChildren[0].VisualChildren[0].VisualChildren[0].VisualChildren[1].VisualChildren[0].VerticalScrollBarVisibility}"
-                                   Maximum="{Binding  $parent[VirtualizedGridView].VisualChildren[0].VisualChildren[0].VisualChildren[0].VisualChildren[0].VisualChildren[0].VisualChildren[1].VisualChildren[0].VerticalScrollBarMaximum}"
-                                   Value="{Binding $parent[VirtualizedGridView].VisualChildren[0].VisualChildren[0].VisualChildren[0].VisualChildren[0].VisualChildren[0].VisualChildren[1].VisualChildren[0].VerticalScrollBarValue, Mode=TwoWay}"
-                                   Grid.Column="1"
-                                   Focusable="False" />
-                    </Grid>
+                        <Border Padding="{TemplateBinding Padding}">
+                            <ScrollViewer Name="PART_ContentScroll"
+                                          HorizontalScrollBarVisibility="Visible"
+                                          VerticalScrollBarVisibility="Visible">
+                                <VirtualizedGridViewItemPresenter Items="{TemplateBinding Items}" 
+                                                                  HorizontalAlignment="Left"
+                                                                  MaxWidth="10000"
+                                                                  ItemHeight="{TemplateBinding ItemHeight}"
+                                                                  FocusedIndex="{TemplateBinding FocusedIndex}"
+                                                                  Selection="{TemplateBinding Selection}"
+                                                                  CheckedIndices="{TemplateBinding CheckedIndices}"
+                                                                  UseCheckBoxes="{TemplateBinding UseCheckBoxes}"
+                                                                  Columns="{TemplateBinding Columns}"
+                                                                  Name="PART_Children">
+                                </VirtualizedGridViewItemPresenter>
+                            </ScrollViewer>
+                        </Border>
+                    </DockPanel>
                 </Border>
             </ControlTemplate>
         </Setter>

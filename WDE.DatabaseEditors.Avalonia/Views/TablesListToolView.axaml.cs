@@ -13,9 +13,8 @@ using WDE.DatabaseEditors.ViewModels;
 
 namespace WDE.DatabaseEditors.Avalonia.Views;
 
-public class TablesListToolView : UserControl
+public partial class TablesListToolView : UserControl
 {
-    private ListBox TablesListBox = null!;
     private ISelectionAdapter SelectionAdapter = null!;
     
     public TablesListToolView()
@@ -23,15 +22,9 @@ public class TablesListToolView : UserControl
         InitializeComponent();
     }
 
-    private void InitializeComponent()
-    {
-        AvaloniaXamlLoader.Load(this);
-    }
-
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
-        TablesListBox = this.FindControl<ListBox>("TablesListBox");
         SelectionAdapter = new SelectingItemsControlSelectionAdapter(TablesListBox);
         DispatcherTimer.RunOnce(() =>
         {
@@ -41,20 +34,9 @@ public class TablesListToolView : UserControl
         }, TimeSpan.FromMilliseconds(1));
     }
 
-    private void InputElement_OnDoubleTapped(object? sender, RoutedEventArgs e)
-    {
-        if (sender is ListBox itemsBox && e.Source is IVisual visual)
-        {
-            if (visual.SelfOrVisualAncestor<ListBoxItem>() is { } item)
-            {
-                (DataContext as TablesListToolViewModel)!.OpenTable((item.DataContext as TableItemViewModel)!);
-            }
-        }
-    }
-
     private void InputElement_OnPointerReleased(object? sender, PointerReleasedEventArgs e)
     {
-        if (sender is ListBox itemsBox && e.Source is IVisual visual)
+        if (sender is ListBox itemsBox && e.Source is Visual visual)
         {
             if (visual.SelfOrVisualAncestor<ListBoxItem>() is { } item)
             {
@@ -67,7 +49,7 @@ public class TablesListToolView : UserControl
     {
         if (e.Key == Key.Enter)
         {
-            if (sender is ListBox itemsBox && e.Source is IVisual visual)
+            if (sender is ListBox itemsBox && e.Source is Visual visual)
             {
                 if (visual.SelfOrVisualAncestor<ListBoxItem>() is { } item)
                 {
@@ -89,4 +71,16 @@ public class TablesListToolView : UserControl
             e.Handled = true;
         }
     }
+
+    private void InputElement_OnDoubleTapped(object? sender, TappedEventArgs e)
+    {
+        if (sender is ListBox itemsBox && e.Source is Visual visual)
+        {
+            if (visual.SelfOrVisualAncestor<ListBoxItem>() is { } item)
+            {
+                (DataContext as TablesListToolViewModel)!.OpenTable((item.DataContext as TableItemViewModel)!);
+            }
+        }
+    }
+
 }

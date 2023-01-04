@@ -13,7 +13,7 @@
                 <Button.Flyout>
                     <Flyout>
                         <ScrollViewer MaxHeight="600">
-                            <ItemsRepeater Items="{CompiledBinding Events}">
+                            <ItemsRepeater ItemsSource="{CompiledBinding Events}">
                                 <ItemsRepeater.ItemTemplate>
                                     <DataTemplate x:DataType="viewModels:GameEventViewModel">
                                         <CheckBox Margin="0,3,0,3" IsChecked="{CompiledBinding Active}">
@@ -33,7 +33,7 @@
                 <Button.Flyout>
                     <Flyout>
                         <ScrollViewer MaxHeight="600">
-                            <ItemsRepeater Items="{CompiledBinding AllPhases}">
+                            <ItemsRepeater ItemsSource="{CompiledBinding AllPhases}">
                                 <ItemsRepeater.ItemTemplate>
                                     <DataTemplate x:DataType="viewModels:GamePhaseViewModel">
                                         <CheckBox Margin="0,3,0,3" IsChecked="{CompiledBinding Active}">
@@ -53,7 +53,6 @@
         <TextBox DockPanel.Dock="Top" Watermark="Search" Text="{CompiledBinding SearchText}" />
         <ScrollViewer>
             <views:SpawnsFastTreeList SelectedSpawn2="{CompiledBinding SelectedSpawn, Mode=TwoWay}" Items2="{CompiledBinding SpawnItems}"
-                                      DoubleTapped="InputElement_OnDoubleTapped"
             />
         </ScrollViewer>
     </DockPanel>

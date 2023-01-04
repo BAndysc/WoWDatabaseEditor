@@ -11,10 +11,10 @@ using Avalonia.VisualTree;
 
 namespace AvaloniaStyles.Controls;
 
-public class ToolbarControl : TemplatedControl, IPanel
+public class ToolbarControl : TemplatedControl
 {
     public ToolbarControl() => this.Children.CollectionChanged += new NotifyCollectionChangedEventHandler(this.ChildrenChanged);
-
+    
     public static readonly StyledProperty<bool> IsOverflowProperty = AvaloniaProperty.Register<ToolbarControl, bool>(nameof(IsOverflow));
     
     public bool IsOverflow
@@ -24,15 +24,20 @@ public class ToolbarControl : TemplatedControl, IPanel
     }
     
     private Panel? childrenHost;
-
+    
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
         childrenHost = e.NameScope.Find<Panel>("PART_ChildrenHost");
+        if (childrenHost == null)
+            throw new NullReferenceException("Couldn't find PART_ChildrenHost in ToolbarControl Template");
         foreach (var child in Children)
+        {
             childrenHost.Children.Add(child);
+            child.ApplyStyling();
+        }
     }
-
+    
     private void ChildrenChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         switch (e.Action)
@@ -57,8 +62,8 @@ public class ToolbarControl : TemplatedControl, IPanel
                 for (int index1 = 0; index1 < e.OldItems!.Count; ++index1)
                 {
                     int index2 = index1 + e.OldStartingIndex;
-                    IControl? newItem = (IControl?) e.NewItems![index1];
-                    if (childrenHost != null)
+                    Control? newItem = (Control?) e.NewItems![index1];
+                    if (childrenHost != null && newItem != null)
                         childrenHost.Children[index2] = newItem;
                 }
                 break;
@@ -72,7 +77,7 @@ public class ToolbarControl : TemplatedControl, IPanel
                 throw new NotSupportedException();
         }
     }
-
+    
     [Content]
     public Avalonia.Controls.Controls Children { get; } = new Avalonia.Controls.Controls();
 }

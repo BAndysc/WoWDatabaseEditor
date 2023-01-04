@@ -38,12 +38,12 @@ public class TwoColumnsPanel : Panel
         VerticalAlignmentProperty.OverrideDefaultValue<TwoColumnsPanel>(VerticalAlignment.Top);
     }
 
-    private IEnumerable<(IControl left, IControl? right)> GetChildren()
+    private IEnumerable<(Control left, Control? right)> GetChildren()
     {
         for (var index = 0; index < Children.Count; index++)
         {
-            IControl left;
-            IControl? right = null;
+            Control left;
+            Control? right = null;
             left = Children[index];
 
             if (left.IsSet(ColumnSpanProperty))

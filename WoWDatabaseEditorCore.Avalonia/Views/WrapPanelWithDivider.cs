@@ -38,11 +38,11 @@ namespace Avalonia.Controls
             AvaloniaProperty.Register<WrapPanelWithDivider, double>(nameof(ItemHeight), double.NaN);
 
         public static readonly StyledProperty<bool> ForceNewLineProperty = 
-            AvaloniaProperty.RegisterAttached<IControl, WrapPanelWithDivider, bool>("ForceNewLine", defaultValue: false);
+            AvaloniaProperty.RegisterAttached<Control, WrapPanelWithDivider, bool>("ForceNewLine", defaultValue: false);
 
-        public static void SetForceNewLine(IControl item, bool value) => item.SetValue(ForceNewLineProperty, value);
+        public static void SetForceNewLine(Control item, bool value) => item.SetValue(ForceNewLineProperty, value);
 
-        public static bool GetForceNewLine(IControl item) => item.GetValue(ForceNewLineProperty);
+        public static bool GetForceNewLine(Control item) => (bool?)item.GetValue(ForceNewLineProperty) ?? false;
 
         /// <summary>
         /// Initializes static members of the <see cref="WrapPanelWithDivider"/> class.
@@ -86,12 +86,12 @@ namespace Avalonia.Controls
         /// <param name="from">The control from which movement begins.</param>
         /// <param name="wrap">Whether to wrap around when the first or last item is reached.</param>
         /// <returns>The control.</returns>
-        IInputElement INavigableContainer.GetControl(NavigationDirection direction, IInputElement from, bool wrap)
+        IInputElement INavigableContainer.GetControl(NavigationDirection direction, IInputElement? from, bool wrap)
         {
             var orientation = Orientation;
             var children = Children;
             bool horiz = orientation == Orientation.Horizontal;
-            int index = Children.IndexOf((IControl)from);
+            int index = from == null ? -1 : Children.IndexOf((Control)from);
 
             switch (direction)
             {

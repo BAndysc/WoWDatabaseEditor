@@ -7,6 +7,7 @@ using System.Runtime.Loader;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 using Prism.Events;
@@ -20,6 +21,7 @@ using WDE.Common.Avalonia;
 using WDE.Common.Avalonia.Utils;
 using WDE.Common.Events;
 using WDE.Common.Managers;
+using WDE.Common.Modules;
 using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Tasks;
@@ -239,10 +241,18 @@ namespace WoWDatabaseEditorCore.Avalonia
             return new ConfigurationModuleCatalog();
         }
 
-        protected override void OnInitialized()
+        private Window? splashScreenWindow;
+
+        private IGlobalServiceRoot? globalServiceRoot;
+        
+        protected async Task OnInitializedAsync()
         {
             this.InitializeModules();
 
+            var asyncInitializers = Container.Resolve<IEnumerable<IGlobalAsyncInitializer>>();
+            foreach (var init in asyncInitializers)
+                await init.Initialize();
+            
             var loadedModules = Container.Resolve<IEnumerable<ModuleBase>>();
             foreach (var module in loadedModules)
                 module.FinalizeRegistration((IContainerRegistry)Container);
@@ -254,51 +264,90 @@ namespace WoWDatabaseEditorCore.Avalonia
             IMessageBoxService messageBoxService = Container.Resolve<IMessageBoxService>();
             ViewBind.AppViewLocator = Container.Resolve<IViewLocator>();
         }
+        
+        private bool forceSingleView = false;
 
-        public static Window? MainApp;
-
-        private Window? splashScreenWindow;
-
-        private IGlobalServiceRoot? globalServiceRoot;
-
-        public override void OnFrameworkInitializationCompleted()
+        private async Task OnFrameworkInitializationCompletedAsync()
         {
-            splashScreenWindow = new SplashScreenWindow();
-            splashScreenWindow.Show();
-
-            DispatcherTimer.RunOnce(() =>
+            if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime)
             {
-                base.Initialize();
-                if (AvaloniaThemeStyle.UseDock)
+                 splashScreenWindow = new SplashScreenWindow();
+                 splashScreenWindow.Show();
+            }
+
+            await Task.Delay(1);
+            
+            base.Initialize();
+
+            await OnInitializedAsync();
+            
+            var dataContext = Container.Resolve<MainWindowViewModel>();
+            
+            if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime)
+            {
+                if (forceSingleView)
                 {
-                    ((IContainerRegistry)Container).RegisterSingleton<MainWindowWithDocking>();
-                    MainApp = Container.Resolve<MainWindowWithDocking>();
+                    var mainApp = Container.Resolve<MainWebView>();
+
+                    mainApp.DataContext = dataContext;
+                    this.InitializeShell(mainApp);
+                    
+                    globalServiceRoot = Container.Resolve<IGlobalServiceRoot>();
+
+                    IEventAggregator? eventAggregator = Container.Resolve<IEventAggregator>();
+                    eventAggregator.GetEvent<AllModulesLoaded>().Publish();
+                    Container.Resolve<ILoadingEventAggregator>().Publish<EditorLoaded>();
+
+                    var window = Container.Resolve<Window1>();
+                    window.Content = mainApp;
+                    window.Show();
                 }
                 else
                 {
-                    ((IContainerRegistry)Container).RegisterSingleton<MainWindow>();
-                    MainApp = Container.Resolve<MainWindow>();
+                    var mainApp = Container.Resolve<MainWindowWithDocking>();
+                
+                    mainApp.DataContext = dataContext;
+                    this.InitializeShell(mainApp);
+                
+                    globalServiceRoot = Container.Resolve<IGlobalServiceRoot>();
+                
+                    IEventAggregator? eventAggregator = Container.Resolve<IEventAggregator>();
+                    eventAggregator.GetEvent<AllModulesLoaded>().Publish();
+                    Container.Resolve<ILoadingEventAggregator>().Publish<EditorLoaded>();
+                    mainApp.ShowActivated = true;
+                    mainApp.Show();
                 }
+                splashScreenWindow?.Close();
+            }
+            else if (ApplicationLifetime is ISingleViewApplicationLifetime singleView)
+            {
+                var mainApp = Container.Resolve<MainWebView>();
 
-                MainApp.DataContext = Container.Resolve<MainWindowViewModel>();
-                this.InitializeShell(MainApp);
+                mainApp.DataContext = dataContext;
+                this.InitializeShell(mainApp);
 
                 globalServiceRoot = Container.Resolve<IGlobalServiceRoot>();
 
                 IEventAggregator? eventAggregator = Container.Resolve<IEventAggregator>();
                 eventAggregator.GetEvent<AllModulesLoaded>().Publish();
                 Container.Resolve<ILoadingEventAggregator>().Publish<EditorLoaded>();
-                MainApp.ShowActivated = true;
-                MainApp.Show();
-                splashScreenWindow.Close();
-            }, TimeSpan.FromMilliseconds(160));
+
+                singleView.MainView = mainApp;
+            }
+        }
+        
+        public override void OnFrameworkInitializationCompleted()
+        {
+            OnFrameworkInitializationCompletedAsync().ListenErrors();
         }
 
         public override void Initialize()
         {
             // we have to initialize theme manager as soon as possible in order to correctly apply the style
             var themeManager = new ThemeManager(new ThemeSettingsProvider(new UserSettings(new FileSystem(new VirtualFileSystem()), new Lazy<IStatusBar>(new DummyStatusBar()))));
-            AvaloniaXamlLoader.Load(this);
+            var color = Application.Current!.Resources["AccentHue"];
+            AvaloniaXamlLoader.Load(this); // with Avalonia 11 this place loses the color
+            Application.Current!.Resources["AccentHue"] = color;
         }
 
         private class Conflict

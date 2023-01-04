@@ -45,7 +45,7 @@ public partial class VirtualizedSmartScriptPanel
         
         if (context.visibleRect.Intersects(actionRect))
         {
-            IControl view;
+            Control view;
             if (action.Id == SmartConstants.ActionComment)
             {
                 view = commentsViews.GetNext(action);
@@ -155,7 +155,7 @@ public partial class VirtualizedSmartScriptPanel
     protected override Size ArrangeOverride(Size finalSize)
     {
         if (script == null)
-            return Size.Empty;
+            return default;
         
         var context = new SizingContext(finalSize.Width, Padding, EventPaddingLeft, VisibleRect);
         

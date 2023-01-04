@@ -18,12 +18,12 @@
             </SettingItem>
             <SettingItem Header="DBC version">
                 <ComboBox Name="dbcVersion"
-                          Items="{CompiledBinding DBCVersions}"
+                          ItemsSource="{CompiledBinding DBCVersions}"
                           SelectedItem="{CompiledBinding DBCVersion}" />
             </SettingItem>
             <SettingItem Header="DBC locale">
                 <ComboBox Name="dbcLocale" 
-                          Items="{CompiledBinding DBCLocales}"
+                          ItemsSource="{CompiledBinding DBCLocales}"
                           IsEnabled="{CompiledBinding CanPickLocale}"
                           SelectedItem="{CompiledBinding DBCLocale}" />
             </SettingItem>
