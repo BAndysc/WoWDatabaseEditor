@@ -13,13 +13,17 @@ public class SettingsProvider : IGeneralSettingsGroup
     
     private ListOptionGenericSetting viewType;
     private ListOptionGenericSetting addingBehaviour;
+    private ListOptionGenericSetting actionEditViewOrder;
+    private BoolGenericSetting insertActionOnEventInsert;
     private FloatSliderGenericSetting defaultScale;
-
+    
     public void Save()
     {
         smartSettingsProvider.AddingBehaviour = (AddingElementBehaviour)addingBehaviour.SelectedOption;
         smartSettingsProvider.ViewType = (SmartScriptViewType)viewType.SelectedOption;
+        smartSettingsProvider.ActionEditViewOrder = (ActionEditViewOrder)actionEditViewOrder.SelectedOption;
         smartSettingsProvider.DefaultScale = defaultScale.Value;
+        smartSettingsProvider.InsertActionOnEventInsert = insertActionOnEventInsert.Value;
         smartSettingsProvider.Apply();
     }
 
@@ -41,6 +45,16 @@ public class SettingsProvider : IGeneralSettingsGroup
             },
             smartSettingsProvider.AddingBehaviour, null);
 
+        actionEditViewOrder = new ListOptionGenericSetting("Action edit view order",
+            new object[]
+            {
+                ActionEditViewOrder.SourceActionTarget, ActionEditViewOrder.ActionSourceTarget
+            },
+            smartSettingsProvider.ActionEditViewOrder, null);
+
+        insertActionOnEventInsert = new BoolGenericSetting("Insert a new action on event insert",
+            smartSettingsProvider.InsertActionOnEventInsert, null);
+        
         defaultScale = new FloatSliderGenericSetting("Default scaling",
             smartSettingsProvider.DefaultScale,
             0.5f,
@@ -50,6 +64,8 @@ public class SettingsProvider : IGeneralSettingsGroup
         {
             viewType,
             addingBehaviour,
+            actionEditViewOrder,
+            insertActionOnEventInsert,
             defaultScale
         };
     }

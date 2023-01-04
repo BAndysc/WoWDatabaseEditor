@@ -7,6 +7,8 @@ public interface IGeneralSmartScriptSettingsProvider
 {
     SmartScriptViewType ViewType { get; set; }
     AddingElementBehaviour AddingBehaviour { get; set; }
+    ActionEditViewOrder ActionEditViewOrder { get; set; }
+    bool InsertActionOnEventInsert { get; set; }
     float DefaultScale { get; set; }
     void Apply();
 }

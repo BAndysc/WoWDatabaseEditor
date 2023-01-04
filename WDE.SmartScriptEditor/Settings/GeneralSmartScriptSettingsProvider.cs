@@ -17,6 +17,10 @@ public class GeneralSmartScriptSettingsProvider : IGeneralSmartScriptSettingsPro
         public SmartScriptViewType ViewType;
 
         public AddingElementBehaviour AddingBehaviour;
+
+        public ActionEditViewOrder ActionEditViewOrder;
+
+        public bool InsertActionOnEventInsert;
         
         [DefaultValue(1)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
@@ -56,6 +60,18 @@ public class GeneralSmartScriptSettingsProvider : IGeneralSmartScriptSettingsPro
         set => currentData.DefaultScale = Math.Clamp(value, 0.5f, 2f);
     }
 
+    public ActionEditViewOrder ActionEditViewOrder
+    {
+        get => currentData.ActionEditViewOrder;
+        set => currentData.ActionEditViewOrder = value;
+    }
+    
+    public bool InsertActionOnEventInsert
+    {
+        get => currentData.InsertActionOnEventInsert;
+        set => currentData.InsertActionOnEventInsert = value;
+    }
+    
     public void Apply()
     {
         Save();

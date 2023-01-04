@@ -1584,7 +1584,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 var source = smartFactory.SourceFactory(SmartConstants.SourceSelf);
                 var target = smartFactory.TargetFactory(SmartConstants.TargetNone);
                 action = smartFactory.ActionFactory(SmartConstants.ActionNone, source, target);
-
+                action.Parent = e; // <-- set the parent already, so that the edit window has the correct parent
                 if (preferences.AddingBehaviour == AddingElementBehaviour.JustAdd)
                 {
                     // empty
@@ -1867,6 +1867,11 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                         script.Events.Insert(insertIndex.Value, ev);
                     }
                     ev.IsSelected = true;
+
+                    if (preferences.InsertActionOnEventInsert)
+                    {
+                        await NewActionAboveCommand.ExecuteAsync();
+                    }
                 }
             }
         }
@@ -1915,51 +1920,60 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 var actionDataObservable = actionType.ToObservable(e => e.Value).Select(id => actionType.HoldsMultipleValues ? (SmartGenericJsonData?)null : smartDataManager.GetRawData(SmartType.SmartAction, id));
                 var sourceDataObservable = sourceType.ToObservable(e => e.Value).Select(id => sourceType.HoldsMultipleValues ? (SmartGenericJsonData?)null : smartDataManager.GetRawData(SmartType.SmartSource, id));
                 var targetDataObservable = targetType.ToObservable(e => e.Value).Select(id => targetType.HoldsMultipleValues ? (SmartGenericJsonData?)null : smartDataManager.GetRawData(SmartType.SmartTarget, id));
-                
-                selectSourceTypeCommand = editableGroup.Add(new EditableActionData("Type", "Source", async () =>
+
+                var selectSource = new EditableActionData("Type", "Source", async () =>
                 {
                     var newSourceIndex = await ShowSourcePicker(actionsToEdit[0].Parent);
                     if (!newSourceIndex.HasValue)
                         return;
-                    
+
                     var newId = newSourceIndex.Value.Item2
                         ? SmartConstants.SourceStoredObject
                         : newSourceIndex.Value.Item1;
-                    
+
                     var newSourceData = smartDataManager.GetRawData(SmartType.SmartTarget, newId);
-                    var actionData = actionType.HoldsMultipleValues ? (SmartGenericJsonData?)null : smartDataManager.GetRawData(SmartType.SmartAction, actionType.Value);
+                    var actionData = actionType.HoldsMultipleValues
+                        ? (SmartGenericJsonData?)null
+                        : smartDataManager.GetRawData(SmartType.SmartAction, actionType.Value);
                     if (actionData.HasValue && !IsSourceCompatibleWithAction(newSourceData, actionData.Value))
                     {
                         var sourceData = smartDataManager.GetRawData(SmartType.SmartSource, newId);
                         var dialog = new MessageBoxFactory<bool>()
                             .SetTitle("Incorrect source for chosen action")
-                            .SetMainInstruction($"The source you have chosen ({sourceData.NameReadable}) is not supported with action {actionData.Value.NameReadable}");
+                            .SetMainInstruction(
+                                $"The source you have chosen ({sourceData.NameReadable}) is not supported with action {actionData.Value.NameReadable}");
                         if (string.IsNullOrEmpty(actionData.Value.ImplicitSource))
-                            dialog.SetContent($"Selected source can be one of: {sourceData.RawTypes}. However, current action requires one of: {actionData.Value.TargetTypes}");
+                            dialog.SetContent(
+                                $"Selected source can be one of: {sourceData.RawTypes}. However, current action requires one of: {actionData.Value.TargetTypes}");
                         else
-                            dialog.SetContent($"In TrinityCore some actions do not support some sources, this is one of the case. Following action will ignore chosen source and will use source: {actionData.Value.ImplicitSource}");
+                            dialog.SetContent(
+                                $"In TrinityCore some actions do not support some sources, this is one of the case. Following action will ignore chosen source and will use source: {actionData.Value.ImplicitSource}");
                         await messageBoxService.ShowDialog(dialog.SetIcon(MessageBoxIcon.Information).Build());
                     }
 
                     sourceType.Value = newId;
                     if (newSourceIndex.Value.Item2)
                         firstSourceParameter.parameter.Value = newSourceIndex.Value.Item1;
-                }, sourceDataObservable.Select(a => a?.NameReadable ?? "---"), null, sourceType)).Command;
+                }, sourceDataObservable.Select(a => a?.NameReadable ?? "---"), null, sourceType);
 
-                selectActionTypeCommand = editableGroup.Add(new EditableActionData("Type", "Action", async () =>
+                var selectAction = new EditableActionData("Type", "Action", async () =>
                 {
-                    int? newActionIndex = await ShowActionPicker(actionsToEdit[0].Parent, sourceType.HoldsMultipleValues ? null : sourceType.Value, false);
+                    int? newActionIndex = await ShowActionPicker(actionsToEdit[0].Parent,
+                        sourceType.HoldsMultipleValues ? null : sourceType.Value, false);
                     if (!newActionIndex.HasValue)
                         return;
 
                     actionType.Value = newActionIndex.Value;
-                }, actionDataObservable.Select(a => a?.NameReadable ?? "---"), null, actionType)).Command;
-            
+                }, actionDataObservable.Select(a => a?.NameReadable ?? "---"), null, actionType);
+                
                 var canPickTarget = actionDataObservable.Select(actionData => !actionData.HasValue || actionData.Value.TargetTypes != SmartSourceTargetType.None);
 
-                selectTargetTypeCommand = editableGroup.Add(new EditableActionData("Type", "Target", async () =>
+                var selectTarget = new EditableActionData("Type", "Target", async () =>
                 {
-                    var newTargetIndex = await ShowTargetPicker(actionsToEdit[0].Parent, actionType.HoldsMultipleValues ? null : smartDataManager.GetRawData(SmartType.SmartAction, actionType.Value));
+                    var newTargetIndex = await ShowTargetPicker(actionsToEdit[0].Parent,
+                        actionType.HoldsMultipleValues
+                            ? null
+                            : smartDataManager.GetRawData(SmartType.SmartAction, actionType.Value));
                     if (!newTargetIndex.HasValue)
                         return;
 
@@ -1968,10 +1982,26 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                         : newTargetIndex.Value.Item1;
 
                     targetType.Value = newId;
-                    if (newTargetIndex.Value.Item2)   
+                    if (newTargetIndex.Value.Item2)
                         firstTargetParameter.parameter.Value = newTargetIndex.Value.Item1;
-                }, targetDataObservable.Select(t => t?.NameReadable ?? "---"), canPickTarget.Not(), targetType)).Command;
+                }, targetDataObservable.Select(t => t?.NameReadable ?? "---"), canPickTarget.Not(), targetType);
+
+                selectSourceTypeCommand = selectSource.Command;
+                selectActionTypeCommand = selectAction.Command;
+                selectTargetTypeCommand = selectTarget.Command;
                 
+                if (preferences.ActionEditViewOrder == ActionEditViewOrder.SourceActionTarget)
+                {
+                    editableGroup.Add(selectSource);
+                    editableGroup.Add(selectAction);
+                }
+                else
+                {
+                    editableGroup.Add(selectAction);
+                    editableGroup.Add(selectSource);
+                }
+                editableGroup.Add(selectTarget);
+                    
                 if (editorFeatures.SupportsTargetCondition)
                 {
                     var anyHasSourceConditions = actionsToEdit.Any(a => a.Source.Conditions != null && a.Source.Conditions.Count > 0);
