@@ -14,6 +14,7 @@ using MySqlConnector;
 using Prism.Commands;
 using PropertyChanged.SourceGenerator;
 using WDE.Common.Avalonia.Components;
+using WDE.Common.Tasks;
 using WDE.Common.Types;
 using WDE.Common.Utils;
 using WDE.MVVM;
@@ -463,7 +464,12 @@ internal class TableController : BaseVirtualizedTableController
 
     static TableController()
     {
-        keyBitmap = WdeImage.LoadBitmap(new ImageUri("Icons/icon_key_mono.png"));
+        if (GlobalApplication.Backend == GlobalApplication.AppBackend.UnitTests)
+            return;
+        keyBitmap = WdeImage.LoadBitmapNowOrAsync(new ImageUri("Icons/icon_key_mono.png"), bitmap =>
+        {
+            keyBitmap = bitmap;
+        });
     }
     
     public override bool PointerDown(int rowIndex, int cellIndex, Rect cellRect, Point pressPoint, bool leftPressed, bool rightPressed, int clickCount)

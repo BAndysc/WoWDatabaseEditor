@@ -25,7 +25,7 @@ public class TextDocumentService : ITextDocumentService
     private readonly Func<TextDocumentViewModel> creator;
     private readonly IWindowManager windowManager;
     private readonly IMessageBoxService messageBoxService;
-    private readonly IStatusBar statusBar;
+    private readonly Lazy<IStatusBar> statusBar;
     private readonly ISessionService sessionService;
     private readonly IDatabaseProvider databaseProvider;
     private readonly ITaskRunner taskRunner;
@@ -34,7 +34,7 @@ public class TextDocumentService : ITextDocumentService
 
     public TextDocumentService(Func<TextDocumentViewModel> creator, IWindowManager windowManager,
         IMessageBoxService messageBoxService,
-        IStatusBar statusBar,
+        Lazy<IStatusBar> statusBar,
         ISessionService sessionService,
         IDatabaseProvider databaseProvider,
         ITaskRunner taskRunner,
@@ -91,15 +91,15 @@ public class TextDocumentService : ITextDocumentService
         
     private async Task WrapStatusbar(Func<Task> action)
     {
-        statusBar.PublishNotification(new PlainNotification(NotificationType.Info, "Executing query"));
+        statusBar.Value.PublishNotification(new PlainNotification(NotificationType.Info, "Executing query"));
         try
         {
             await action();
-            statusBar.PublishNotification(new PlainNotification(NotificationType.Success, "Query executed"));
+            statusBar.Value.PublishNotification(new PlainNotification(NotificationType.Success, "Query executed"));
         }
         catch (Exception e)
         {
-            statusBar.PublishNotification(new PlainNotification(NotificationType.Error, "Failure during query execution: " + e.Message));
+            statusBar.Value.PublishNotification(new PlainNotification(NotificationType.Error, "Failure during query execution: " + e.Message));
             Console.WriteLine(e);
         }
     }

@@ -16,7 +16,7 @@
     >
     <StackPanel>
       <TextBlock Text="{CompiledBinding Title}" FontWeight="Bold" TextAlignment="Center" />
-      <popups:PopupContextMenu Items="{CompiledBinding MenuItems}"
+      <popups:PopupContextMenu ItemsSource="{CompiledBinding MenuItems}"
                              BorderThickness="0"
                              Padding="0"
                              Margin="0">

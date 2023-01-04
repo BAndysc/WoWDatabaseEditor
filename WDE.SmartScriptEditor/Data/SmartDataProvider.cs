@@ -1,37 +1,57 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using WDE.Common.CoreVersion;
+using WDE.Common.Modules;
+using WDE.Common.Utils;
 using WDE.Module.Attributes;
 
 namespace WDE.SmartScriptEditor.Data
 {
     [AutoRegister]
     [SingleInstance]
-    public class SmartDataProvider : ISmartDataProvider
+    public class SmartDataProviderAsync : ISmartDataProviderAsync, IGlobalAsyncInitializer
     {
-        private readonly List<SmartGenericJsonData> actions;
-        private readonly List<SmartGenericJsonData> events;
-        private readonly List<SmartGenericJsonData> targets;
-        private readonly List<SmartGroupsJsonData> eventsGroups;
-        private readonly List<SmartGroupsJsonData> actionsGroups;
-        private readonly List<SmartGroupsJsonData> targetsGroups;
+        private List<SmartGenericJsonData>? actions;
+        private List<SmartGenericJsonData>? events;
+        private List<SmartGenericJsonData>? targets;
+        private List<SmartGroupsJsonData>? eventsGroups;
+        private List<SmartGroupsJsonData>? actionsGroups;
+        private List<SmartGroupsJsonData>? targetsGroups;
 
+        private readonly ISmartRawDataProviderAsync smartRawDataProvider;
         private readonly ICurrentCoreVersion coreVersion;
 
-        public SmartDataProvider(ISmartRawDataProvider smartRawDataProvider,
+        public SmartDataProviderAsync(ISmartRawDataProviderAsync smartRawDataProvider,
             ICurrentCoreVersion coreVersion)
         {
+            this.smartRawDataProvider = smartRawDataProvider;
             this.coreVersion = coreVersion;
+        }
 
-            actions = smartRawDataProvider.GetActions().Where(IsSmartValidForCore).ToList();
-            events = smartRawDataProvider.GetEvents().Where(IsSmartValidForCore).ToList();
-            targets = smartRawDataProvider.GetTargets().Where(IsSmartValidForCore).ToList();
+        private bool isLoaded;
+
+        public async Task Initialize()
+        {
+            await LoadAsync();
+        }
+
+        private async Task LoadAsync()
+        {
+            if (isLoaded)
+                return;
+
+            isLoaded = true;
+            actions = (await smartRawDataProvider.GetActions()).Where(IsSmartValidForCore).ToList();
+            events = (await smartRawDataProvider.GetEvents()).Where(IsSmartValidForCore).ToList();
+            targets = (await smartRawDataProvider.GetTargets()).Where(IsSmartValidForCore).ToList();
 
             var actionKeys = actions.Select(g => g.Name).ToHashSet();
             var eventKeys = events.Select(g => g.Name).ToHashSet();
             var targetKeys = targets.Select(g => g.Name).ToHashSet();
 
-            eventsGroups = smartRawDataProvider.GetEventsGroups().Select(group =>
+            eventsGroups = (await smartRawDataProvider.GetEventsGroups()).Select(group =>
                     new SmartGroupsJsonData()
                     {
                         Name = group.Name,
@@ -39,7 +59,7 @@ namespace WDE.SmartScriptEditor.Data
                     })
                 .ToList();
             
-            actionsGroups = smartRawDataProvider.GetActionsGroups().Select(group =>
+            actionsGroups = (await smartRawDataProvider.GetActionsGroups()).Select(group =>
                     new SmartGroupsJsonData()
                     {
                         Name = group.Name,
@@ -47,8 +67,8 @@ namespace WDE.SmartScriptEditor.Data
                     })
                 .ToList();
             
-            targetsGroups = smartRawDataProvider.GetTargetsGroups().Select(group =>
-                new SmartGroupsJsonData()
+            targetsGroups = (await smartRawDataProvider.GetTargetsGroups()).Select(group =>
+                    new SmartGroupsJsonData()
                     {
                         Name = group.Name,
                         Members = group.Members.Where(name => targetKeys.Contains(name)).ToList()
@@ -60,12 +80,47 @@ namespace WDE.SmartScriptEditor.Data
         {
             return data.Tags == null || data.Tags.Contains(coreVersion.Current.Tag) || (coreVersion.Current.SmartScriptFeatures.ForceLoadTag != null && data.Tags.Contains(coreVersion.Current.SmartScriptFeatures.ForceLoadTag));
         }
-        
-        public IEnumerable<SmartGenericJsonData> GetActions() => actions;
-        public IEnumerable<SmartGenericJsonData> GetEvents() => events;
-        public IEnumerable<SmartGenericJsonData> GetTargets() => targets;
-        public IEnumerable<SmartGroupsJsonData> GetEventsGroups() => eventsGroups;
-        public IEnumerable<SmartGroupsJsonData> GetActionsGroups() => actionsGroups;
-        public IEnumerable<SmartGroupsJsonData> GetTargetsGroups() => targetsGroups;
+
+        public async Task<IReadOnlyList<SmartGenericJsonData>> GetEvents()
+        {
+            if (events == null)
+                await LoadAsync();
+            return events!;
+        }
+
+        public async Task<IReadOnlyList<SmartGenericJsonData>> GetActions()
+        {
+            if (actions == null)
+                await LoadAsync();
+            return actions!;
+        }
+
+        public async Task<IReadOnlyList<SmartGenericJsonData>> GetTargets()
+        {
+            if (targets == null)
+                await LoadAsync();
+            return targets!;
+        }
+
+        public async Task<IReadOnlyList<SmartGroupsJsonData>> GetEventsGroups()
+        {
+            if (eventsGroups == null)
+                await LoadAsync();
+            return eventsGroups!;
+        }
+
+        public async Task<IReadOnlyList<SmartGroupsJsonData>> GetActionsGroups()
+        {
+            if (actionsGroups == null)
+                await LoadAsync();
+            return actionsGroups!;
+        }
+
+        public async Task<IReadOnlyList<SmartGroupsJsonData>> GetTargetsGroups()
+        {
+            if (targetsGroups == null)
+                await LoadAsync();
+            return targetsGroups!;
+        }
     }
 }

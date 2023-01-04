@@ -297,7 +297,7 @@ namespace WDE.DatabaseEditors.Loaders
                             sourceId = (int)key[0];
                         }
                         
-                        IList<IConditionLine>? conditionList = await databaseProvider.GetConditionsForAsync(keyMask,
+                        IReadOnlyList<IConditionLine>? conditionList = await databaseProvider.GetConditionsForAsync(keyMask,
                             new IDatabaseProvider.ConditionKey(definition.Condition.SourceType, sourceGroup,
                                 sourceEntry, sourceId));
                         if (conditionList != null && conditionList.Count > 0)

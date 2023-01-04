@@ -1,7 +1,9 @@
 using System;
 using System.Runtime.InteropServices;
+using Avalonia;
 using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Metadata;
+using Avalonia.Styling;
 
 [assembly: XmlnsDefinition("https://github.com/avaloniaui", "AvaloniaStyles.Controls")]
 
@@ -56,7 +58,7 @@ namespace AvaloniaStyles
             // 11 style even for win 10, why not :)
             // if (OperatingSystem.IsWindows() && os.Major == 10)
             //     return SystemThemeOptions.LightWindows10;
-            return SystemThemeOptions.LightWindows11;
+            return SystemThemeOptions.LightWindows10;
         }
         
         private SystemThemeOptions mode;
@@ -73,6 +75,10 @@ namespace AvaloniaStyles
                                        // || EffectiveTheme == SystemThemeOptions.MacOsCatalinaDark ||
                                        // EffectiveTheme == SystemThemeOptions.MacOsBigSurDark;
 
+               Application.Current!.RequestedThemeVariant = EffectiveThemeIsDark
+                   ? ThemeVariant.Dark
+                   : ThemeVariant.Light;
+                                       
                 switch (EffectiveTheme)
                 {
                     // case SystemThemeOptions.MacOsCatalinaLight:
@@ -88,19 +94,21 @@ namespace AvaloniaStyles
                     //     Source = new Uri("avares://AvaloniaStyles/Styles/MacOsBigSurDark.xaml", UriKind.Absolute);
                     //     break;
                     case SystemThemeOptions.DarkWindows10:
-                        Source = new Uri("avares://AvaloniaStyles/Styles/Windows10Dark.xaml", UriKind.Absolute);
+                        Source = new Uri("avares://AvaloniaStyles/Styles/Windows10Dark.axaml", UriKind.Absolute);
                         break;
                     case SystemThemeOptions.LightWindows10:
-                        Source = new Uri("avares://AvaloniaStyles/Styles/Windows10Light.xaml", UriKind.Absolute);
+                        Source = new Uri("avares://AvaloniaStyles/Styles/Windows10Light.axaml", UriKind.Absolute);
                         break;
                     case SystemThemeOptions.DarkWindows11:
-                        Source = new Uri("avares://AvaloniaStyles/Styles/Windows11Dark.xaml", UriKind.Absolute);
+                        Source = new Uri("avares://AvaloniaStyles/Styles/Windows11Dark.axaml", UriKind.Absolute);
                         break;
                     case SystemThemeOptions.LightWindows11:
-                        Source = new Uri("avares://AvaloniaStyles/Styles/Windows11Light.xaml", UriKind.Absolute);
+                        Source = new Uri("avares://AvaloniaStyles/Styles/Windows11Light.axaml", UriKind.Absolute);
                         break;
                 }
             }
         }
+
+        public static ThemeVariant EffectiveThemeVariant => EffectiveThemeIsDark ? ThemeVariant.Dark : ThemeVariant.Light;
     }
 }

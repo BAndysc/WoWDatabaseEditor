@@ -1,7 +1,9 @@
 using System;
+using System.Globalization;
 using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Documents;
 using Avalonia.Media;
 using AvaloniaStyles.Controls.FastTableView;
 using WDE.Common.Utils;
@@ -20,7 +22,7 @@ public partial class VirtualizedVeryFastTableView
         {
             var scrollViewer = ScrollViewer;
             if (scrollViewer == null)
-                return Rect.Empty;
+                return default;
             return new Rect(scrollViewer.Offset.X, scrollViewer.Offset.Y + DrawingStartOffsetY, scrollViewer.Viewport.Width, scrollViewer.Viewport.Height - DrawingStartOffsetY);
         }
     }
@@ -29,24 +31,17 @@ public partial class VirtualizedVeryFastTableView
 
     public override void Render(DrawingContext context)
     {
-        base.Render(context);
         try
         {
             if (lastException != null)
             {
-                context.DrawText(Brushes.Red, new Point(0, 0), new FormattedText
+                context.DrawText(new FormattedText("Fatal error", CultureInfo.InvariantCulture, FlowDirection.LeftToRight, Typeface.Default, 16, Brushes.Red)
+                { }, new Point(0, 0));            
+                context.DrawText(new FormattedText(lastException.ToString(), CultureInfo.InvariantCulture, FlowDirection.LeftToRight, Typeface.Default, 12, Brushes.Red)
                 {
-                    Text = "Fatal error",
-                    Typeface = Typeface.Default,
-                    FontSize = 16
-                });            
-                context.DrawText(Brushes.Red, new Point(0, 24), new FormattedText
-                {
-                    Text = lastException.ToString(),
-                    Typeface = Typeface.Default,
-                    FontSize = 12,
-                    Constraint = Bounds.Size
-                });
+                    MaxTextHeight = Bounds.Height,
+                    MaxTextWidth = Bounds.Width
+                }, new Point(0, 24));
             }
             else
                RenderImpl(context);
@@ -58,45 +53,21 @@ public partial class VirtualizedVeryFastTableView
         }
     }
 
-    // note: this won't be required in Avalonia 11 which has proper support for Unicode 12 
-    private void GetFonts(out FontFamily defaultFont, out FontFamily unicodeFallback)
-    {
-        defaultFont = TextBlock.GetFontFamily(this);
-        this.GetResource("UniFont", new FontFamily("Unifont"), out unicodeFallback);
-    }
-    private void GetTypefaces(out Typeface defaultFont, out Typeface unicodeFallback)
-    {
-        GetFonts(out var defaultFontFamily, out var unicodeFallbackFamily);
-        defaultFont = new Typeface(defaultFontFamily);
-        unicodeFallback = new Typeface(unicodeFallbackFamily);
-    }
-    private bool UseFallbackUnicodeFont(ReadOnlySpan<char> str)
-    {
-        var len = str.Length;
-        for (int i = 0; i < len; ++i)
-        {
-            if (str[i] >= 0x3FF)
-                return true;
-        }
-
-        return false;
-    }
-
     public void AutoFitColumnsWidth()
     {
         if (Columns is not { } columns)
             return;
         
         var controller = Controller;
-        GetFonts(out var defaultFont, out _);
+        var defaultFont = TextElement.GetFontFamily(this);
         var defaultTypeface = new Typeface(defaultFont);
         var boldTypeface = new Typeface(defaultFont,default, FontWeight.Bold);
         Span<double> columnWidths = stackalloc double[columns.Count];
         var (firstVisibleIndex, lastVisibleIndex) = GetFirstAndLastVisibleRows();
         for (int i = 0; i < columns.Count; i++)
         {
-            var ft = new FormattedText(columns[i].Header, boldTypeface, 12, TextAlignment.Left, TextWrapping.NoWrap, new Size(100000, 10000));
-            columnWidths[i] = ft.Bounds.Width + ColumnSpacing * 2 + 20; // this +20 is only for SqlEditor which displays a key icon for primary key columns.
+            var ft = new FormattedText(columns[i].Header, CultureInfo.InvariantCulture, FlowDirection.LeftToRight, boldTypeface, 12, Brushes.Black);
+            columnWidths[i] = ft.Width + ColumnSpacing * 2 + 20; // this +20 is only for SqlEditor which displays a key icon for primary key columns.
                                                                         // If this control is reused for another editor, then it might be changed, but still pls keep
                                                                         // the space in case of SqlEditor.
         }
@@ -106,8 +77,8 @@ public partial class VirtualizedVeryFastTableView
             for (int cellIndex = 0; cellIndex < columnWidths.Length; ++cellIndex)
             {
                 var cellText = controller.GetCellText(rowIndex, cellIndex);
-                var ft = new FormattedText(cellText, defaultTypeface, 12, TextAlignment.Left, TextWrapping.NoWrap, new Size(100000, 10000));
-                columnWidths[cellIndex] = Math.Max(columnWidths[cellIndex], ft.Bounds.Width + ColumnSpacing * 2);
+                var ft = new FormattedText(cellText ?? "", CultureInfo.InvariantCulture, FlowDirection.LeftToRight, defaultTypeface, 12, Brushes.Black);
+                columnWidths[cellIndex] = Math.Max(columnWidths[cellIndex], ft.Width + ColumnSpacing * 2);
             }
         }
 
@@ -132,8 +103,8 @@ public partial class VirtualizedVeryFastTableView
     
     private void RenderImpl(DrawingContext context)
     {
-        GetTypefaces(out var font, out var unicodeFallback);
-        
+        var font = new Typeface(TextElement.GetFontFamily(this));
+
         var actualWidth = Bounds.Width;
 
         var viewPort = DataViewport;
@@ -207,22 +178,18 @@ public partial class VirtualizedVeryFastTableView
                                         text = text.Substring(0, indexOfEndOfLine);
 
                                     rect = rect.WithWidth(rect.Width - ColumnSpacing);
-                                    var ft = new FormattedText
+                                    var ft = new FormattedText(text, CultureInfo.InvariantCulture, FlowDirection.LeftToRight, font, 12, textColor)
                                     {
-                                        Text = text,
-                                        Constraint = new Size(rect.Width, RowHeight),
-                                        Typeface = UseFallbackUnicodeFont(text) ? unicodeFallback : font,
-                                        FontSize = 12
+                                        MaxTextHeight = RowHeight,
+                                        MaxTextWidth = float.MaxValue // rect.Width // we don't want text wrapping so pass float.MaxValue
                                     };
+                                    
                                     if (Math.Abs(rectWidth - rect.Width) > 0.01)
                                     {
                                         state.Dispose();
                                         state = context.PushClip(rect);
                                     }
-
-                                    context.DrawText(textColor,
-                                        new Point(rect.X + ColumnSpacing, y + RowHeight / 2 - ft.Bounds.Height / 2),
-                                        ft);
+                                    context.DrawText(ft, new Point(rect.X + ColumnSpacing, rect.Center.Y - ft.Height / 2));
                                 }
                             }
                         }
@@ -257,7 +224,7 @@ public partial class VirtualizedVeryFastTableView
         var controller = Controller;
         
         FontFamily font = FontFamily.Default;
-        if (Application.Current!.Styles.TryGetResource("MainFontSans", out var mainFontSans) && mainFontSans is FontFamily mainFontSansFamily)
+        if (Application.Current!.Styles.TryGetResource("MainFontSans", SystemTheme.EffectiveThemeVariant, out var mainFontSans) && mainFontSans is FontFamily mainFontSansFamily)
             font = mainFontSansFamily;
 
         var scrollViewer = ScrollViewer;
@@ -281,12 +248,10 @@ public partial class VirtualizedVeryFastTableView
                 continue;
             
             var column = Columns[i];
-            var ft = new FormattedText
+            var ft = new FormattedText(column.Header, CultureInfo.InvariantCulture, FlowDirection.LeftToRight, new Typeface(font, FontStyle.Normal, FontWeight.Bold), 12, BorderPen.Brush)
             {
-                Text = column.Header,
-                Constraint = new Size(column.Width, RowHeight),
-                Typeface = new Typeface(font, FontStyle.Normal, FontWeight.Bold),
-                FontSize = 12
+                MaxTextHeight = RowHeight,
+                MaxTextWidth = float.MaxValue // column.Width // we don't want text wrapping so pass float.MaxValue
             };
             
             bool isMouseOverColumn = isMouseOverHeader && lastMouseLocation.X >= x && lastMouseLocation.X < x + column.Width;
@@ -296,7 +261,7 @@ public partial class VirtualizedVeryFastTableView
             var cellRect = new Rect(x + ColumnSpacing, y, Math.Max(0, column.Width - ColumnSpacing * 2), RowHeight);
             controller.DrawHeader(i, context, this, ref cellRect);
             var state = context.PushClip(cellRect);
-            context.DrawText(BorderPen.Brush, new Point(cellRect.X, cellRect.Center.Y - ft.Bounds.Height / 2), ft);
+            context.DrawText(ft, new Point(cellRect.X, cellRect.Center.Y - ft.Height / 2));
             state.Dispose();
             
             x += column.Width;

@@ -2,6 +2,7 @@ using System;
 using Avalonia.Media;
 using AvaloniaStyles;
 using AvaloniaStyles.Utils;
+using HslColor = AvaloniaStyles.Utils.HslColor;
 
 namespace WDE.Common.Avalonia.Utils.NiceColorGenerator
 {

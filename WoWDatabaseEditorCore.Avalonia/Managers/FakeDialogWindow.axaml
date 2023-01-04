@@ -1,0 +1,28 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
+             xmlns:managers="clr-namespace:WDE.Common.Managers;assembly=WDE.Common"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             Name="This"
+             x:DataType="managers:IWindowViewModel"
+             x:Class="WoWDatabaseEditorCore.Avalonia.Managers.FakeDialogWindow">
+  <Border Background="{DynamicResource WindowContentBackground}"
+          BorderBrush="Gray"
+          BoxShadow="0 0 30 5 #50000000"
+          Margin="30"
+          ClipToBounds="False"
+          BorderThickness="1">
+    <DockPanel>
+      <DockPanel DockPanel.Dock="Top" Height="24" LastChildFill="True" Background="{DynamicResource TitleBarBackground}">
+        <WdeImage Image="{CompiledBinding Icon}" Width="16" Height="16" VerticalAlignment="Center" />
+        <Button DockPanel.Dock="Right" Width="24" Height="24" Content="X" />
+
+        <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Text="{CompiledBinding Title}" />
+      </DockPanel>
+      <ContentControl DockPanel.Dock="Top" DataContext="{CompiledBinding #This.DataContext}" Content="{CompiledBinding}" ContentTemplate="{x:Static utils:ToolbarDataTemplate.Template}" />
+      <ContentControl DataContext="{CompiledBinding #This.DataContext}" Content="{CompiledBinding}" ContentTemplate="{x:Static utils:ViewDataTemplate.Template}" />
+    </DockPanel>
+  </Border>
+</UserControl>

@@ -7,6 +7,7 @@ using WDE.Common.Parameters;
 using WDE.Common.Providers;
 using WDE.Common.Services;
 using WDE.Common.Utils;
+using WDE.MVVM.Observable;
 using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Models;
 
@@ -21,7 +22,7 @@ public class CreatureTextParameter : IContextualParameter<long, SmartBaseElement
     private readonly string columnName;
 
     private Dictionary<int, int> targetIdToCreatureEntryParameter = new();
-    private Dictionary<int, int> actionIdToTalkTarget;
+    private Dictionary<int, int> actionIdToTalkTarget = new();
 
     public CreatureTextParameter(ISmartDataManager smartDataManager,
         IDatabaseProvider databaseProvider,
@@ -35,12 +36,21 @@ public class CreatureTextParameter : IContextualParameter<long, SmartBaseElement
         this.tableName = tableName;
         this.columnName = columnName;
 
-        actionIdToTalkTarget = smartDataManager.GetAllData(SmartType.SmartAction)
+        smartDataManager.GetAllData(SmartType.SmartAction).SubscribeAction(LoadActions);
+        smartDataManager.GetAllData(SmartType.SmartTarget).SubscribeAction(Load);
+    }
+
+    private void LoadActions(IReadOnlyList<SmartGenericJsonData> actions)
+    {
+        actionIdToTalkTarget = actions
             .Where(x => x.Parameters != null && x.Parameters.Any(p => p.Name == "UseTalkTarget"))
             .Select(x => (x.Id, x.Parameters!.IndexIf(p => p.Name == "UseTalkTarget")))
             .ToDictionary(x => x.Id, x => x.Item2);
+    }
 
-        foreach (var data in smartDataManager.GetAllData(SmartType.SmartTarget))
+    private void Load(IReadOnlyList<SmartGenericJsonData> targets)
+    {
+        foreach (var data in targets)
         {
             if (data.Parameters == null)
                 continue;
@@ -68,9 +78,9 @@ public class CreatureTextParameter : IContextualParameter<long, SmartBaseElement
         return null;
     }
 
-    private uint? GetEntry(SmartBaseElement? element)
+    private async ValueTask<uint?> GetEntry(SmartBaseElement? element)
     {
-        uint? GetCreatureEntryFromScript(SmartScript smartScript)
+        async ValueTask<uint?> GetCreatureEntryFromScript(SmartScript smartScript)
         {
             if (smartScript.Entry.HasValue)
             {
@@ -88,7 +98,7 @@ public class CreatureTextParameter : IContextualParameter<long, SmartBaseElement
                 return (uint)smartScript.EntryOrGuid;
             }
 
-            return databaseProvider.GetCreatureByGuid(0, (uint)(-smartScript.EntryOrGuid))?.Entry;
+            return (await databaseProvider.GetCreatureByGuidAsync(0, (uint)(-smartScript.EntryOrGuid)))?.Entry;
         }
 
         var script = GetScript(element);
@@ -96,7 +106,7 @@ public class CreatureTextParameter : IContextualParameter<long, SmartBaseElement
             return null;
         if (element is SmartEvent)
         {
-            return GetCreatureEntryFromScript(smartScript);
+            return await GetCreatureEntryFromScript(smartScript);
         }
         if (element is SmartAction action)
         {
@@ -105,12 +115,12 @@ public class CreatureTextParameter : IContextualParameter<long, SmartBaseElement
                 action.Source.Id == SmartConstants.SourceNone ||
                 action.Source.Id == SmartConstants.SourceSelf))
             {
-                return GetCreatureEntryFromScript(smartScript);
+                return await GetCreatureEntryFromScript(smartScript);
             }
             else if (targetIdToCreatureEntryParameter.TryGetValue(action.Source.Id, out var creatureEntryParameterIndex))
                 return (uint)action.Source.GetParameter(creatureEntryParameterIndex).Value;
             else if (action.Source.Id == 10) // creature guid
-                return databaseProvider.GetCreatureByGuid(0, (uint)action.Source.GetParameter(0).Value)?.Entry;
+                return (await databaseProvider.GetCreatureByGuidAsync(0, (uint)action.Source.GetParameter(0).Value))?.Entry;
             else if (action.Source.Id == 12 || action.Source.Id == 58) // stored target / actor
             {
                 var val = action.Source.GetParameter(0).Value;
@@ -124,7 +134,7 @@ public class CreatureTextParameter : IContextualParameter<long, SmartBaseElement
 
     public async Task<(long, bool)> PickValue(long value, object context)
     {
-        var entry = GetEntry(context as SmartBaseElement);
+        var entry = await GetEntry(context as SmartBaseElement);
         if (!entry.HasValue)
         {
             return await FallbackPicker(value);
@@ -161,12 +171,12 @@ public class CreatureTextParameter : IContextualParameter<long, SmartBaseElement
     
     public async Task<string> ToStringAsync(long value, CancellationToken token, SmartBaseElement context)
     {
-        var entry = GetEntry(context);
+        var entry = await GetEntry(context);
         if (entry == null)
             return value.ToString();
         
-        var texts = databaseProvider.GetCreatureTextsByEntry(entry.Value);
-        if (texts == null || texts.Count == 0)
+        var texts = await databaseProvider.GetCreatureTextsByEntryAsync(entry.Value);
+        if (texts.Count == 0)
             return value.ToString();
         
         var firstOrDefault = texts.FirstOrDefault(x => x.GroupId == value);

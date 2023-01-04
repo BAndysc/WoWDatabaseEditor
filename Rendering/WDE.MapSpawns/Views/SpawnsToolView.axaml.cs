@@ -6,7 +6,7 @@ using Avalonia.Markup.Xaml;
 
 namespace WDE.MapSpawns.Views;
 
-public class SpawnsToolView : UserControl
+public partial class SpawnsToolView : UserControl
 {
     public SpawnsToolView()
     {
@@ -16,9 +16,5 @@ public class SpawnsToolView : UserControl
     private void InitializeComponent()
     {
         AvaloniaXamlLoader.Load(this);
-    }
-
-    private void InputElement_OnDoubleTapped(object? sender, RoutedEventArgs e)
-    {
     }
 }

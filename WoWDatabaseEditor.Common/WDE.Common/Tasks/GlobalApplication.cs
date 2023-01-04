@@ -9,7 +9,8 @@ namespace WDE.Common.Tasks
         public enum AppBackend
         {
             Uninitialized,
-            Avalonia
+            Avalonia,
+            UnitTests
         }
 
         public static IMainThread? mainThread;
@@ -31,12 +32,14 @@ namespace WDE.Common.Tasks
 
         public static bool IsRunning { get; set; } = true;
         public static bool Supports3D { get; set; } = true;
+        public static bool SingleView { get; set; } = false;
 
-        public static void InitializeApplication(IMainThread thread, AppBackend backend)
+        public static void InitializeApplication(IMainThread thread, AppBackend backend, bool singleView = false)
         {
             Debug.Assert(mainThread == null);
             mainThread = thread;
             Backend = backend;
+            SingleView = singleView;
         }
 
         public static void Deinitialize()

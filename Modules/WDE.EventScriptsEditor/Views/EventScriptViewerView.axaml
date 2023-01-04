@@ -20,7 +20,7 @@
             <TextBlock>WoW Database Editor can only view the script in the read only mode.</TextBlock>
         </Border>
         <ScrollViewer Padding="10">
-            <ItemsRepeater Items="{CompiledBinding Lines}">
+            <ItemsRepeater ItemsSource="{CompiledBinding Lines}">
                 <ItemsRepeater.Layout>
                     <StackLayout Spacing="15" />
                 </ItemsRepeater.Layout>

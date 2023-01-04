@@ -21,7 +21,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.MessageBoxService
         public MessageBoxViewModel(IMessageBox<T> model)
         {
             Model = model;
-            CancelButtonCommand = YesButtonCommand = NoButtonCommand = new DelegateCommand(() => { });
+            CancelButtonCommand = YesButtonCommand = NoButtonCommand = new DelegateCommand(() => { }, () => false);
             foreach (var btn in model.Buttons)
             {
                 var vm = new MessageBoxButtonViewModel(btn.Name, btn == model.DefaultButton, new DelegateCommand(() =>

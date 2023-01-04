@@ -4,7 +4,7 @@ using Avalonia.Markup.Xaml;
 
 namespace WDE.DatabaseEditors.Avalonia.Views.OneToOneForeignKey;
 
-public class OneToOneForeignKeyView : UserControl
+public partial class OneToOneForeignKeyView : UserControl
 {
     public OneToOneForeignKeyView()
     {

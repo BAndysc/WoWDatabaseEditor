@@ -120,15 +120,15 @@ namespace WDE.Parameters
             factory.Register("DecifloatParameter", new FloatIntParameter(100));
             factory.Register("OneTenthParameter", new FloatIntParameter(10));
             factory.Register("MillisecondsParameter", new MillisecondsParameter());
-            factory.Register("GameEventParameter", AddDatabaseParameter(new GameEventParameter(database)), QuickAccessMode.Limited);
-            factory.Register("CreatureParameter", AddDatabaseParameter(new CreatureParameter(database, creaturePicker, serverIntegration)), QuickAccessMode.Limited);
-            factory.Register("Creature(creature_text)Parameter", AddDatabaseParameter(new CreatureParameter(database, creaturePicker, serverIntegration, "creature_text")), QuickAccessMode.Limited);
-            factory.Register("Creature(smart_ai_text)Parameter", AddDatabaseParameter(new CreatureParameter(database, creaturePicker, serverIntegration, "smart_ai_text")), QuickAccessMode.Limited);
-            factory.Register("CreatureGameobjectNameParameter", AddDatabaseParameter(new CreatureGameobjectNameParameter(database)));
-            factory.Register("CreatureGameobjectParameter", AddDatabaseParameter(new CreatureGameobjectParameter(database)));
-            factory.Register("QuestParameter", AddDatabaseParameter(new QuestParameter(database, questEntryProviderService)), QuickAccessMode.Limited);
-            factory.Register("PrevQuestParameter", AddDatabaseParameter(new PrevQuestParameter(database)));
-            factory.Register("GameobjectParameter", AddDatabaseParameter(new GameobjectParameter(database, serverIntegration, itemFromListProvider)), QuickAccessMode.Limited);
+            factory.Register("GameEventParameter", AddAsyncDatabaseParameter(new GameEventParameter(database)), QuickAccessMode.Limited);
+            factory.Register("CreatureParameter", AddAsyncDatabaseParameter(new CreatureParameter(database, creaturePicker, serverIntegration)), QuickAccessMode.Limited);
+            factory.Register("Creature(creature_text)Parameter", AddAsyncDatabaseParameter(new CreatureParameter(database, creaturePicker, serverIntegration, "creature_text")), QuickAccessMode.Limited);
+            factory.Register("Creature(smart_ai_text)Parameter", AddAsyncDatabaseParameter(new CreatureParameter(database, creaturePicker, serverIntegration, "smart_ai_text")), QuickAccessMode.Limited);
+            factory.Register("CreatureGameobjectNameParameter", AddAsyncDatabaseParameter(new CreatureGameobjectNameParameter(database)));
+            factory.Register("CreatureGameobjectParameter", AddAsyncDatabaseParameter(new CreatureGameobjectParameter(database)));
+            factory.Register("QuestParameter", AddAsyncDatabaseParameter(new QuestParameter(database, questEntryProviderService)), QuickAccessMode.Limited);
+            factory.Register("PrevQuestParameter", AddAsyncDatabaseParameter(new PrevQuestParameter(database)));
+            factory.Register("GameobjectParameter", AddAsyncDatabaseParameter(new GameobjectParameter(database, serverIntegration, itemFromListProvider)), QuickAccessMode.Limited);
             factory.Register("GossipMenuParameter", AddAsyncDatabaseParameter(new GossipMenuParameter(database)));
             factory.Register("NpcTextParameter", AddAsyncDatabaseParameter(new NpcTextParameter(database)));
             factory.Register("PlayerChoiceParameter", AddAsyncDatabaseParameter(new PlayerChoiceParameter(database)));
@@ -484,7 +484,7 @@ namespace WDE.Parameters
         void Reload();
     }
     
-    public class CreatureParameter : LateLoadParameter, ICustomPickerParameter<long>
+    public class CreatureParameter : LateAsyncLoadParameter, ICustomPickerParameter<long>
     {
         private readonly IDatabaseProvider database;
         private readonly ICreatureEntryOrGuidProviderService picker;
@@ -521,14 +521,14 @@ namespace WDE.Parameters
             };
         }
 
-        public override void LateLoad()
+        public override async Task LateLoad()
         {
-            foreach (ICreatureTemplate item in database.GetCreatureTemplates())
+            foreach (ICreatureTemplate item in await database.GetCreatureTemplatesAsync())
                 Items!.Add(item.Entry, new SelectOption(item.Name));
         }
     }
 
-    public class CreatureGameobjectNameParameter : LateLoadParameter
+    public class CreatureGameobjectNameParameter : LateAsyncLoadParameter
     {
         private readonly IDatabaseProvider database;
 
@@ -537,17 +537,17 @@ namespace WDE.Parameters
             this.database = database;
         }
 
-        public override void LateLoad()
+        public override async Task LateLoad()
         {
             Items = new Dictionary<long, SelectOption>();
-            foreach (IGameObjectTemplate item in database.GetGameObjectTemplates())
+            foreach (IGameObjectTemplate item in await database.GetGameObjectTemplatesAsync())
                 Items[item.Entry] = new SelectOption(item.Name);
-            foreach (ICreatureTemplate item in database.GetCreatureTemplates())
+            foreach (ICreatureTemplate item in await database.GetCreatureTemplatesAsync())
                 Items[item.Entry] = new SelectOption(item.Name);
         }
     }
     
-    public class CreatureGameobjectParameter : LateLoadParameter
+    public class CreatureGameobjectParameter : LateAsyncLoadParameter
     {
         private readonly IDatabaseProvider database;
 
@@ -556,12 +556,12 @@ namespace WDE.Parameters
             this.database = database;
         }
 
-        public override void LateLoad()
+        public override async Task LateLoad()
         {
             Items = new Dictionary<long, SelectOption>();
-            foreach (ICreatureTemplate item in database.GetCreatureTemplates())
+            foreach (ICreatureTemplate item in await database.GetCreatureTemplatesAsync())
                 Items.Add(item.Entry, new SelectOption(item.Name));
-            foreach (IGameObjectTemplate item in database.GetGameObjectTemplates())
+            foreach (IGameObjectTemplate item in await database.GetGameObjectTemplatesAsync())
                 Items.Add(-item.Entry, new SelectOption(item.Name));
         }
     }
@@ -606,7 +606,7 @@ namespace WDE.Parameters
         public override async Task LateLoad()
         {
             Items = new Dictionary<long, SelectOption>();
-            foreach (IGossipMenu item in database.GetGossipMenus())
+            foreach (IGossipMenu item in await database.GetGossipMenusAsync())
             {
                 var text = item.Text
                     .Select(t => t.Text0_0 ?? t.Text0_1 ?? "")
@@ -656,7 +656,7 @@ namespace WDE.Parameters
         public override async Task LateLoad()
         {
             Items = new Dictionary<long, SelectOption>();
-            foreach (INpcText item in database.GetNpcTexts())
+            foreach (INpcText item in await database.GetNpcTextsAsync())
             {
                 var text = string.IsNullOrEmpty(item.Text0_0) ? item.Text0_1 : item.Text0_0;
                 if (string.IsNullOrEmpty(text) && item.BroadcastTextId > 0)
@@ -674,7 +674,7 @@ namespace WDE.Parameters
         public void Reload() => LateLoad().ListenErrors();
     }
     
-    public class QuestParameter : LateLoadParameter, ICustomPickerParameter<long>
+    public class QuestParameter : LateAsyncLoadParameter, ICustomPickerParameter<long>
     {
         private readonly IDatabaseProvider database;
         private readonly IQuestEntryProviderService questEntryProvider;
@@ -685,10 +685,10 @@ namespace WDE.Parameters
             this.questEntryProvider = questEntryProvider;
         }
 
-        public override void LateLoad()
+        public override async Task LateLoad()
         {
             Items = new Dictionary<long, SelectOption>();
-            foreach (IQuestTemplate item in database.GetQuestTemplates())
+            foreach (IQuestTemplate item in await database.GetQuestTemplatesAsync())
                 Items[item.Entry] = new SelectOption(item.Name ?? "Quest " + item.Entry);
         }
 
@@ -699,7 +699,7 @@ namespace WDE.Parameters
         }
     }
     
-    public class PrevQuestParameter : LateLoadParameter
+    public class PrevQuestParameter : LateAsyncLoadParameter
     {
         private readonly IDatabaseProvider database;
 
@@ -708,10 +708,10 @@ namespace WDE.Parameters
             this.database = database;
         }
 
-        public override void LateLoad()
+        public override async Task LateLoad()
         {
             Items = new Dictionary<long, SelectOption>();
-            foreach (IQuestTemplate item in database.GetQuestTemplates())
+            foreach (IQuestTemplate item in await database.GetQuestTemplatesAsync())
             {
                 Items[-item.Entry] = new SelectOption(item.Name, "quest must be active");
                 Items[item.Entry] = new SelectOption(item.Name, "quest must be completed");
@@ -719,7 +719,7 @@ namespace WDE.Parameters
         }
     }
 
-    public class GameEventParameter : LateLoadParameter
+    public class GameEventParameter : LateAsyncLoadParameter
     {
         private readonly IDatabaseProvider database;
 
@@ -728,15 +728,15 @@ namespace WDE.Parameters
             this.database = database;
         }
 
-        public override void LateLoad()
+        public override async Task LateLoad()
         {
             Items = new Dictionary<long, SelectOption>();
-            foreach (IGameEvent item in database.GetGameEvents())
+            foreach (IGameEvent item in await database.GetGameEventsAsync())
                 Items.Add(item.Entry, new SelectOption(item.Description ?? "(null)"));
         }
     }
 
-    public class GameobjectParameter : LateLoadParameter
+    public class GameobjectParameter : LateAsyncLoadParameter
     {
         private readonly IDatabaseProvider database;
         
@@ -772,10 +772,10 @@ namespace WDE.Parameters
             };
         }
 
-        public override void LateLoad()
+        public override async Task LateLoad()
         {
             Items = new Dictionary<long, SelectOption>();
-            foreach (IGameObjectTemplate item in database.GetGameObjectTemplates())
+            foreach (IGameObjectTemplate item in await database.GetGameObjectTemplatesAsync())
                 Items.Add(item.Entry, new SelectOption(item.Name));
         }
     }
@@ -965,7 +965,7 @@ namespace WDE.Parameters
         // todo: it should fire only if conversationLineStore is loaded
         public override async Task LateLoad()
         {
-            var conversationTemplates = databaseProvider.GetConversationTemplates();
+            var conversationTemplates = await databaseProvider.GetConversationTemplatesAsync();
             var actorTemplates = (await databaseProvider.GetConversationActorTemplates())
                 .GroupBy(x => x.Id)
                 .ToDictionary(x => x.Key, x => x.ToList());

@@ -45,7 +45,7 @@ public class CustomCellDrawer : BaseCustomCellDrawer, ICustomCellDrawer
         if (row.IsDuplicate)
         {
             var pen = DuplicateRowPen;
-            context.FillRectangle(pen.Brush, rect.Deflate(1).WithWidth(5));
+            context.FillRectangle(pen.Brush ?? Brushes.Black, rect.Deflate(1).WithWidth(5));
             context.DrawLine(pen, rect.TopLeft,rect.TopRight);
             context.DrawLine(pen, rect.BottomLeft, rect.BottomRight);
         }

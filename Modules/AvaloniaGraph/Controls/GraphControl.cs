@@ -29,16 +29,16 @@ public class GraphControl : TemplatedControl
 
     public IList SelectedElements => nodesContainer?.SelectedItems ?? new List<object>();
 
-    public IEnumerable ElementsView => nodesContainer?.Items ?? Enumerable.Empty<object>();
+    public IEnumerable ElementsView => nodesContainer?.ItemsSource ?? Array.Empty<object>();
     
     public event EventHandler<SelectionChangedEventArgs>? SelectionChanged;
 
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
-        nodesContainer = (NodesContainer)e.NameScope.Find("PART_ElementItemsControl");
+        nodesContainer = e.NameScope.Get<NodesContainer>("PART_ElementItemsControl");
         nodesContainer.SelectionChanged += OnNodesContainerSelectChanged;
 
-        connectionsContainer = (ConnectionsContainer)e.NameScope.Find("PART_ConnectionItemsControl");
+        connectionsContainer = e.NameScope.Get<ConnectionsContainer>("PART_ConnectionItemsControl");
         connectionsContainer.SelectionChanged += OnConnectionsContainerSelectChanged;
 
         base.OnApplyTemplate(e);
@@ -55,20 +55,20 @@ public class GraphControl : TemplatedControl
         //if (e.AddedItems.Count > 0)
         //    connectionItemsControl.SelectedItem = null;
         if (SelectionChanged != null)
-            SelectionChanged(this, new SelectionChangedEventArgs(e.RoutedEvent, e.RemovedItems, e.AddedItems));
+            SelectionChanged(this, new SelectionChangedEventArgs(e.RoutedEvent!, e.RemovedItems, e.AddedItems));
     }
 
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
-        nodesContainer!.SelectedItems.Clear();
-        connectionsContainer!.SelectedItems.Clear();
+        nodesContainer!.SelectedItems!.Clear();
+        connectionsContainer!.SelectedItems!.Clear();
         base.OnPointerPressed(e);
     }
 
     public int GetMaxZIndex()
     {
-        return nodesContainer!.ItemContainerGenerator.Containers
-            .Select(elementItem => ((GraphNodeItemView)elementItem.ContainerControl).ZIndex)
+        return nodesContainer!.ItemsView.Select(x => nodesContainer.ContainerFromItem(x!))
+            .Select(elementItem => ((GraphNodeItemView)elementItem!.Parent!).ZIndex)
             .Concat(new[] { 0 })
             .Max();
     }

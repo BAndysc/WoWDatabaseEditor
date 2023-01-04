@@ -8,6 +8,7 @@ using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using Avalonia.LogicalTree;
 using Avalonia.VisualTree;
+using WDE.Common.Avalonia;
 using WDE.Common.Avalonia.Utils;
 using WDE.Common.Utils;
 using WDE.MVVM.Observable;
@@ -58,7 +59,7 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
                 }
                 else if (!that.IsFocused)
                 {
-                    FocusManager.Instance!.Focus(that, NavigationMethod.Tab);
+                    that.Focus(NavigationMethod.Tab);
                     e.Handled = true;
                 }
             }, RoutingStrategies.Tunnel);
@@ -70,8 +71,9 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
         {
             if (isReadOnly)
                 return;
-            
-            var text = await ((IClipboard)AvaloniaLocator.Current.GetService(typeof(IClipboard))!).GetTextAsync();
+
+            var clipboard = TopLevel.GetTopLevel(this)?.Clipboard;
+            var text = clipboard == null ? null : await clipboard.GetTextAsync();
 
             if (string.IsNullOrEmpty(text))
                 return;
@@ -81,18 +83,18 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
 
         protected abstract void PasteImpl(string text);
 
-        public abstract void DoCopy(IClipboard clipboard);
+        public abstract void DoCopy();
 
         protected override void OnKeyDown(KeyEventArgs e)
         {
             HandleMoveLeftRightUpBottom(e, true);
             base.OnKeyDown(e);
-            if (CopyGesture?.Matches(e) ?? false)
+            if (KeyGestures.Copy?.Matches(e) ?? false)
             {
-                DoCopy((IClipboard)AvaloniaLocator.Current.GetService(typeof(IClipboard))!);
+                DoCopy();
                 e.Handled = true;
             }
-            else if (PasteGesture?.Matches(e) ?? false)
+            else if (KeyGestures.Paste?.Matches(e) ?? false)
             {
                 DoPaste().ListenErrors();
                 e.Handled = true;
@@ -123,7 +125,7 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
             opened = false;
             editingControl = null;
             
-            FocusManager.Instance!.Focus(this, NavigationMethod.Tab);
+            Focus(NavigationMethod.Tab);
         }
 
         protected abstract void EndEditingInternal(bool commit);
@@ -179,11 +181,5 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
 
             return true;
         }
-        
-        public static KeyGesture? CopyGesture { get; } = AvaloniaLocator.Current
-            .GetService<PlatformHotkeyConfiguration>()?.Copy.FirstOrDefault();
-
-        public static KeyGesture? PasteGesture { get; } = AvaloniaLocator.Current
-            .GetService<PlatformHotkeyConfiguration>()?.Paste.FirstOrDefault();
     }
 }

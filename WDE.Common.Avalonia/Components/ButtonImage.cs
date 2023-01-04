@@ -1,8 +1,11 @@
 using System;
 using Avalonia;
+using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
+using Avalonia.Data;
 using Avalonia.Layout;
+using Avalonia.Markup.Xaml.MarkupExtensions;
 using Avalonia.Styling;
 using WDE.Common.Types;
 
@@ -52,14 +55,17 @@ namespace WDE.Common.Avalonia.Components
             {
                 btn.ContentTemplate = new FuncDataTemplate(_ => true, (_, _) =>
                 {
-                    var sp = new StackPanel() { Orientation = Orientation.Horizontal };
-                    var imageControl = new WdeImage() { Classes = new Classes("ButtonIcon") };
+                    var sp = new StackPanel(){ Orientation = Orientation.Horizontal };
+                    var imageControl = new WdeImage();
+                    imageControl[!IsVisibleProperty] = new DynamicResourceExtension("DisplayButtonImageIcon");
                     if (imageUri.HasValue)
                         imageControl.Image = imageUri.Value;
                     else
                         imageControl.ImageUri = imageString;
+                    var textBlock = new TextBlock(){Text = text, VerticalAlignment = VerticalAlignment.Center};
+                    textBlock[!IsVisibleProperty] = new DynamicResourceExtension("DisplayButtonImageText");
                     sp.Children.Add(imageControl);
-                    sp.Children.Add(new TextBlock(){Text = text, VerticalAlignment = VerticalAlignment.Center, Classes = new Classes("ButtonText")});
+                    sp.Children.Add(textBlock);
                     return sp;
                 });
             }

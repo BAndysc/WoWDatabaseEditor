@@ -8,7 +8,7 @@ using WDE.Module.Attributes;
 namespace WoWDatabaseEditorCore.Services.UserSettingsService
 {
     [SingleInstance]
-    [AutoRegister]
+    [AutoRegister(Platforms.NonBrowser)]
     public class UserSettings : IUserSettings
     {
         private readonly IFileSystem fileSystem;

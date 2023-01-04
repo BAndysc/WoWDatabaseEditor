@@ -1,0 +1,55 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:AvaloniaStyles.Controls"
+        xmlns:converters="clr-namespace:AvaloniaStyles.Converters"
+        xmlns:behaviours="clr-namespace:AvaloniaStyles.Behaviours">
+  <Design.PreviewWith>
+    <controls:HamburgerMenuButton />
+  </Design.PreviewWith>
+
+  <Styles.Resources>
+    <converters:IListCountToBoolConverter x:Key="ListCountToBoolConverter" />
+  </Styles.Resources>
+
+  <Style Selector="controls|HamburgerMenuButton">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Button Width="34" Height="34"
+                IsVisible="{Binding $parent[TopLevel].(NativeMenu.Menu).Items, FallbackValue=False, Converter={StaticResource ListCountToBoolConverter}}">
+          <Button.Content>
+            <Path Fill="{Binding $parent[Button].Foreground}">
+              <Path.Data>
+                <GeometryGroup>
+                  <RectangleGeometry Rect="1 3 14 2" />
+                  <RectangleGeometry Rect="1 7 14 2" />
+                  <RectangleGeometry Rect="1 11 14 2" />
+                </GeometryGroup>
+              </Path.Data>
+            </Path>
+          </Button.Content>
+          <!-- <Interaction.Behaviors> -->
+          <!--   <behaviours:OpenContextMenuOnClickBehavior /> -->
+          <!-- </Interaction.Behaviors> -->
+          <Button.Flyout>
+            <MenuFlyout Placement="BottomEdgeAlignedLeft"
+              ItemsSource="{Binding $parent[TopLevel].(NativeMenu.Menu).Items, FallbackValue={x:Null}}">
+            </MenuFlyout>
+          </Button.Flyout>
+          <Button.Styles>
+            <Style Selector="MenuItem">
+              <Setter Property="(converters:NativeMenuItemHelper.IsChecked)" Value="{Binding IsChecked}"></Setter>
+              <Setter Property="(converters:NativeMenuItemHelper.ToggleType)" Value="{Binding ToggleType}"></Setter>
+              <Setter Property="Header" Value="{Binding Header}" />
+              <Setter Property="InputGesture" Value="{Binding Gesture}" />
+              <Setter Property="HotKey" Value="{Binding Gesture}" />
+              <Setter Property="ItemsSource" Value="{Binding Menu.Items}" />
+              <Setter Property="Command" Value="{Binding Command}" />
+              <Setter Property="CommandParameter" Value="{Binding CommandParameter}" />
+              <Setter Property="(NativeMenuBar.EnableMenuItemClickForwarding)" Value="True" />
+            </Style>
+          </Button.Styles>
+        </Button>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+</Styles>

@@ -44,7 +44,7 @@ namespace WDE.MangosEventAiEditor.Providers
             EventAiScript script = new(item, eventAiFactory.Value, eventAiDataManager.Value, new EmptyMessageboxService());
             var lines = (await database.Value.GetScriptFor(item.EntryOrGuid)).ToList();
             await importer.Value.Import(script, true, lines);
-            return exporter.Value.GenerateSql(item, script);
+            return await exporter.Value.GenerateSql(item, script);
         }
 
         private class EmptyMessageboxService : IMessageBoxService

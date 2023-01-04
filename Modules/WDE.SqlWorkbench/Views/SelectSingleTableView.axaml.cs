@@ -1,6 +1,7 @@
 using System;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
@@ -87,7 +88,7 @@ public partial class SelectSingleTableView : UserControl
         }
     }
 
-    private void InputElement_OnDoubleTapped(object? sender, RoutedEventArgs e)
+    private void InputElement_OnDoubleTapped(object? sender, TappedEventArgs e)
     {
         if (DataContext is SelectSingleTableViewModel vm)
         {

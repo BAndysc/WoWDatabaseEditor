@@ -3,7 +3,7 @@ using Avalonia.Markup.Xaml;
 
 namespace WoWDatabaseEditorCore.Avalonia.Views
 {
-    public class QuickStartView : UserControl
+    public partial class QuickStartView : UserControl
     {
         public QuickStartView()
         {

@@ -4,7 +4,7 @@ using Avalonia.Markup.Xaml;
 
 namespace WDE.Parameters.Views;
 
-public class UnitBytes2EditorView : UserControl
+public partial class UnitBytes2EditorView : UserControl
 {
     public UnitBytes2EditorView()
     {

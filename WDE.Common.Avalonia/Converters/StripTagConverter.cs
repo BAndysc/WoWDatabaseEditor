@@ -7,6 +7,8 @@ namespace WDE.Common.Avalonia.Converters
 {
     public class StripTagConverter : IValueConverter
     {
+        public static StripTagConverter Instance { get; } = new();
+
         public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
             if (value is string s)

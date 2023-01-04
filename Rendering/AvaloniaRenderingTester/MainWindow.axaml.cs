@@ -12,6 +12,7 @@ using RenderingTester;
 using TheEngine;
 using Unity;
 using WDE.AzerothCore;
+using WDE.Common.Avalonia.Utils;
 using WDE.Common.Database.Counters;
 using WDE.Common.DBC;
 using WDE.Common.Managers;
@@ -145,7 +146,7 @@ namespace AvaloniaRenderingTester
         {
         }
 
-        private IClipboard clipboard => Application.Current.Clipboard;
+        private IClipboard clipboard => Application.Current?.GetTopLevel().Clipboard;
         
         public Task<string> GetText()
         {
@@ -158,3 +159,4 @@ namespace AvaloniaRenderingTester
         }
     }
 }
+

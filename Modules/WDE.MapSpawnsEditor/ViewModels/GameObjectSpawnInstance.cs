@@ -21,7 +21,7 @@ public class GameObjectSpawnInstance : SpawnInstance
     public sealed override string Header { get; protected set; } = "";
     public override WorldObjectInstance? WorldObject => GameObject;
     public GameObjectInstance? GameObject { get; set; }
-    public IList<IGameEventGameObject>? GameEvents { get; set; }
+    public IReadOnlyList<IGameEventGameObject>? GameEvents { get; set; }
 
     public GameObjectSpawnInstance(IGameObject data, IGameObjectTemplate gameObjectTemplate, ISpawnGroupTemplate? spawnGroup)
     {

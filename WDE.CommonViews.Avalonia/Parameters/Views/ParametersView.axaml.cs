@@ -6,7 +6,7 @@ namespace WDE.CommonViews.Avalonia.Parameters.Views
     /// <summary>
     ///     Interaction logic for ParametersView
     /// </summary>
-    public class ParametersView : UserControl
+    public partial class ParametersView : UserControl
     {
         public ParametersView()
         {

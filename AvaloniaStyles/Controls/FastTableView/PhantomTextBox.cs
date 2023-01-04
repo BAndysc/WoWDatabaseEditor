@@ -102,7 +102,7 @@ public abstract class PhantomControlBase<T> where T : Control
         focusDisposable = null;
         
         if (parent is IInputElement inputElement)
-            FocusManager.Instance!.Focus(inputElement);
+            inputElement.Focus();
         element = null;
         parent = null;
         IsOpened = false;
@@ -122,7 +122,7 @@ public class PhantomTextBox : PhantomControlBase<TextBox>
     private Action<string, ActionAfterSave>? currentOnApply = null;
     private ActionAfterSave actionAfterSave;
 
-    public void Spawn(Visual parent, Rect position, string text, bool selectAll, Action<string, ActionAfterSave> onApply, FontFamily? customFont = null)
+    public void Spawn(Visual parent, Rect position, string text, bool selectAll, Action<string, ActionAfterSave> onApply)
     {
         Despawn(false);
 
@@ -135,7 +135,7 @@ public class PhantomTextBox : PhantomControlBase<TextBox>
         textBox.Padding = new Thickness(5 + 3, -2, 0, 0);
         textBox.Margin = new Thickness(0,  0, 0, 0);
         textBox.Text = text;
-        textBox.FontFamily = customFont ?? new FontFamily("Consolas,Menlo,Courier,Courier New");
+        textBox.FontFamily = new FontFamily("Consolas,Menlo,Courier,Courier New");
         textBox.KeyBindings.Add(new KeyBinding()
         {
             Gesture = new KeyGesture(Key.Enter),
@@ -181,8 +181,8 @@ public class PhantomTextBox : PhantomControlBase<TextBox>
             return;
 
         textBox.LostFocus += ElementLostFocus;
-
-        DispatcherTimer.RunOnce(textBox.Focus, TimeSpan.FromMilliseconds(1));
+        
+        DispatcherTimer.RunOnce(() => textBox.Focus(), TimeSpan.FromMilliseconds(1));
         if (selectAll)
             textBox.SelectAll();
         else
@@ -203,7 +203,7 @@ public class PhantomTextBox : PhantomControlBase<TextBox>
 
     protected override void Save(TextBox element)
     {
-        currentOnApply?.Invoke(element.Text, actionAfterSave);
+        currentOnApply?.Invoke(element.Text ?? "", actionAfterSave);
     }
 }
 
@@ -240,7 +240,7 @@ public abstract class BasePhantomCompletionComboBox : PhantomControlBase<Complet
         flagsComboBox.IsLightDismissEnabled = false; // we are handling it ourselves, without doing .Handled = true so that as soon as user press outside of popup, the click is treated as actual click
         flagsComboBox.Closed += CompletionComboBoxOnClosed;
         
-        if (!AttachAsAdorner(parent, position, flagsComboBox))
+        if (!AttachAsAdorner(parent, position, flagsComboBox, true))
             return;
 
         DispatcherTimer.RunOnce(() =>

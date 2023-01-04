@@ -118,7 +118,7 @@ namespace WDE.SourceCodeIntegrationEditor.ViewModels
                 child.Parent = parent;
             }
 
-            Dictionary<string, string?> existing = databaseProvider.GetCommands().ToDictionary(d => d.Name, d => d.Help);
+            Dictionary<string, string?> existing = (await databaseProvider.GetCommands()).ToDictionary(d => d.Name, d => d.Help);
 
             Commands.Clear();
             CommandsNoRbac.Clear();

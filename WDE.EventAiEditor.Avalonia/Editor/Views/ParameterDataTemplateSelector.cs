@@ -15,7 +15,7 @@ namespace WDE.EventAiEditor.Avalonia.Editor.Views
         public DataTemplate? BoolParameter { get; set; }
         public DataTemplate? ButtonParameter { get; set; }
         
-        public IControl Build(object item)
+        public Control? Build(object? item)
         {
             if (item is EditableParameterViewModel<long> intParam)
             {
@@ -31,7 +31,7 @@ namespace WDE.EventAiEditor.Avalonia.Editor.Views
             return Generic?.Build(item) ?? new Panel();
         }
 
-        public bool Match(object data)
+        public bool Match(object? data)
         {
             return data is EditableParameterViewModel || data is EditableParameterActionViewModel;
         }

@@ -64,6 +64,6 @@ public class BreakpointContextMenu : ContextMenu, IStyleable
     public override void Close()
     {
         base.Close();
-        this.FindAncestorOfType<BreakpointMenuView>().Close();
+        this.FindAncestorOfType<BreakpointMenuView>()?.Close();
     }
 }

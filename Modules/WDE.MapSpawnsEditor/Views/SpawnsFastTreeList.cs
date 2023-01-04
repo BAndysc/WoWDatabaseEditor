@@ -1,3 +1,4 @@
+using System.Globalization;
 using Avalonia;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
@@ -71,14 +72,18 @@ public class SpawnsFastTreeList : FastTreeView<SpawnGroup, SpawnInstance>
     
     static SpawnsFastTreeList()
     {
-        zoneAreaIcon = WdeImage.LoadBitmap(new ImageUri("Icons/icon_folder_2.png"));
-        zoneAreaIconOpened = WdeImage.LoadBitmap(new ImageUri("Icons/icon_folder_2_opened.png"));
-        mapIcon = WdeImage.LoadBitmap(new ImageUri("Icons/icon_world.png"));
-        creatureIcon = WdeImage.LoadBitmap(new ImageUri("Icons/document_creature_template.png"));
-        gobjectIcon = WdeImage.LoadBitmap(new ImageUri("Icons/document_gameobject_template.png"));
-        creaturesIcon = WdeImage.LoadBitmap(new ImageUri("Icons/document_creatures.png"));
-        gobjectsIcon = WdeImage.LoadBitmap(new ImageUri("Icons/document_gameobjects.png"));
-        spawnGroupIcon = WdeImage.LoadBitmap(new ImageUri("Icons/icon_spawngroup.png"));
+        async Task LoadIconsAsync()
+        {
+            zoneAreaIcon = await WdeImage.LoadBitmapAsync(new ImageUri("Icons/icon_folder_2.png"));
+            zoneAreaIconOpened = await WdeImage.LoadBitmapAsync(new ImageUri("Icons/icon_folder_2_opened.png"));
+            mapIcon = await WdeImage.LoadBitmapAsync(new ImageUri("Icons/icon_world.png"));
+            creatureIcon = await WdeImage.LoadBitmapAsync(new ImageUri("Icons/document_creature_template.png"));
+            gobjectIcon = await WdeImage.LoadBitmapAsync(new ImageUri("Icons/document_gameobject_template.png"));
+            creaturesIcon = await WdeImage.LoadBitmapAsync(new ImageUri("Icons/document_creatures.png"));
+            gobjectsIcon = await WdeImage.LoadBitmapAsync(new ImageUri("Icons/document_gameobjects.png"));
+            spawnGroupIcon = await WdeImage.LoadBitmapAsync(new ImageUri("Icons/icon_spawngroup.png"));
+        }
+        LoadIconsAsync().ListenErrors();
         SelectedNode2Property.Changed.AddClassHandler<SpawnsFastTreeList>((tree, args) =>
         {
             Dispatcher.UIThread.Post(() =>
@@ -121,15 +126,13 @@ public class SpawnsFastTreeList : FastTreeView<SpawnGroup, SpawnInstance>
     protected override void DrawRow(Typeface typeface, Pen pen, IBrush foreground, DrawingContext context, object? row, Rect rect)
     {
         {
-            var ft = new FormattedText
+            var ft = new FormattedText(row?.ToString() ?? "(null)", CultureInfo.CurrentCulture,
+                FlowDirection.LeftToRight, typeface, 12, foreground)
             {
-                Constraint = new Size(float.PositiveInfinity, RowHeight),
-                Typeface = typeface,
-                FontSize = 12
+                MaxTextWidth = float.MaxValue,
+                MaxTextHeight = RowHeight
             };
-
-            ft.Text = row?.ToString() ?? "(null)";
-
+            
             var isHover = mouseOverRow == row;
             var isSelected = SelectedNode == row;
         
@@ -138,7 +141,7 @@ public class SpawnsFastTreeList : FastTreeView<SpawnGroup, SpawnInstance>
 
             var nestLevel = (row is SpawnGroup a1 ? a1.NestLevel : ((SpawnInstance)row!).NestLevel);
             var iconRect = new Rect(Indent * nestLevel, rect.Center.Y - 16 / 2, 16, 16);
-            var textOrigin = new Point(Indent * nestLevel + 18, rect.Y + rect.Height / 2 - ft.Bounds.Height / 2);
+            var textOrigin = new Point(Indent * nestLevel + 18, rect.Y + rect.Height / 2 - ft.Height / 2);
             
             if (row is SpawnGroup group)
             {
@@ -166,15 +169,17 @@ public class SpawnsFastTreeList : FastTreeView<SpawnGroup, SpawnInstance>
                         icon = gobjectsIcon;
                         break;
                 }
-                context.DrawImage(icon, iconRect);
-                context.DrawText(foreground, textOrigin, ft);
+                if (icon != null)
+                    context.DrawImage(icon, iconRect);
+                context.DrawText(ft, textOrigin);
                 DrawToggleMark(rect.WithWidth(RowHeight).WithX(Indent * (group.NestLevel - 1)), context, pen, group.IsExpanded);
             }
             else if (row is SpawnInstance spawn)
             {
-                context.DrawImage(spawn is CreatureSpawnInstance ? creatureIcon : gobjectIcon, iconRect);
+                if (creatureIcon != null && gobjectIcon != null)
+                    context.DrawImage(spawn is CreatureSpawnInstance ? creatureIcon : gobjectIcon, iconRect);
 
-                context.DrawText(foreground, textOrigin, ft);
+                context.DrawText(ft, textOrigin);
                 double x = rect.Width - 2;
                 if (spawn.IsSpawned)
                     context.DrawRectangle(foreground, null, new Rect(x - 6, rect.Center.Y - 3, 6, 6), 3, 3);

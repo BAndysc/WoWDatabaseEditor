@@ -1,36 +1,13 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:controls="clr-namespace:AvaloniaStyles.Controls">
+        xmlns:controls="clr-namespace:AvaloniaStyles.Controls"
+        xmlns:converters="clr-namespace:AvaloniaStyles.Converters">
     <Design.PreviewWith>
         <controls:GridView />
     </Design.PreviewWith>
     
-    <Style Selector="controls|AlternativeScrollViewer">
-        <Setter Property="Template">
-            <ControlTemplate>
-                <controls:AlternativeScrollContentPresenter Name="PART_ContentPresenter"
-                                                            Background="{TemplateBinding Background}"
-                                                            CanHorizontallyScroll="{TemplateBinding CanHorizontallyScroll}"
-                                                            CanVerticallyScroll="{TemplateBinding CanVerticallyScroll}"
-                                                            ShouldHandleWheelEvent="{TemplateBinding ShouldHandleWheelEvent}"
-                                                            Content="{TemplateBinding Content}"
-                                                            Extent="{TemplateBinding Extent, Mode=TwoWay}"
-                                                            Margin="{TemplateBinding Padding}"
-                                                            Offset="{TemplateBinding Offset, Mode=TwoWay}"
-                                                            CornerRadius="{TemplateBinding CornerRadius}"
-                                                            Viewport="{TemplateBinding Viewport, Mode=TwoWay}">
-                    <ScrollContentPresenter.GestureRecognizers>
-                        <ScrollGestureRecognizer
-                            CanHorizontallyScroll="{TemplateBinding CanHorizontallyScroll}"
-                            CanVerticallyScroll="{TemplateBinding CanVerticallyScroll}" />
-                    </ScrollContentPresenter.GestureRecognizers>
-                </controls:AlternativeScrollContentPresenter>
-            </ControlTemplate>
-        </Setter>
-    </Style>
-    
     <Style Selector="controls|GridViewListBox">
-        <Setter Property="TextBlock.Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}" />
         <Setter Property="Background" Value="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}" />
         <Setter Property="BorderBrush" Value="{DynamicResource SystemControlForegroundBaseHighBrush}" />
         <Setter Property="BorderThickness" Value="{DynamicResource ListBoxBorderThemeThickness}" />
@@ -39,19 +16,11 @@
         <Setter Property="FontSize" Value="{DynamicResource ControlContentThemeFontSize}" />    
         <Setter Property="Template">
             <ControlTemplate>
-                <controls:AlternativeScrollViewer Name="PART_ScrollViewer"
-                                                  CornerRadius="{TemplateBinding CornerRadius}"
-                                                  Background="{TemplateBinding Background}"
-                                                  HorizontalScrollBarVisibility="{TemplateBinding (ScrollViewer.HorizontalScrollBarVisibility)}"
-                                                  VerticalScrollBarVisibility="{TemplateBinding (ScrollViewer.VerticalScrollBarVisibility)}"
-                                                  AllowAutoHide="{TemplateBinding (ScrollViewer.AllowAutoHide)}">
+                <Border Background="{TemplateBinding Background}">
                     <ItemsPresenter Name="PART_ItemsPresenter"
-                                    Items="{TemplateBinding Items}"
                                     ItemsPanel="{TemplateBinding ItemsPanel}"
-                                    ItemTemplate="{TemplateBinding ItemTemplate}"
-                                    Margin="{TemplateBinding Padding}"
-                                    VirtualizationMode="{TemplateBinding VirtualizationMode}"/>
-                </controls:AlternativeScrollViewer>
+                                    Margin="{TemplateBinding Padding}"/>
+                </Border>
             </ControlTemplate>
         </Setter>
     </Style>
@@ -64,56 +33,32 @@
                 <Border BorderThickness="{TemplateBinding BorderThickness}" 
                         CornerRadius="{TemplateBinding CornerRadius}"
                         BorderBrush="{TemplateBinding BorderBrush}">
-                    <Grid  ColumnDefinitions="*,Auto" RowDefinitions="*,Auto">
-                        <controls:AlternativeScrollViewer 
-                                                          Grid.RowSpan="2" Grid.ColumnSpan="2"
-                                                          Name="HScroll"
-                                                          ShouldHandleWheelEvent="True"
-                                                          HorizontalScrollBarVisibility="Auto" 
-                                                          VerticalScrollBarVisibility="Disabled">
-                            <DockPanel LastChildFill="True" Grid.IsSharedSizeScope="True">
-                                <controls:GridViewHeader DockPanel.Dock="Top">
-                                    <Grid Name="PART_header">
-                                    </Grid>
-                                </controls:GridViewHeader>
-                            
-                                <!-- AutoScrollToSelectedItem=false on purpose, because of some weird Avalonia bug -->
-                                <controls:GridViewListBox Items="{TemplateBinding Items}" 
-                                                          Selection="{TemplateBinding Selection, Mode=OneWay}"
-                                                          ItemTemplate="{TemplateBinding ItemTemplate}"
-                                                          SelectionMode="{TemplateBinding SelectionMode}"
-                                                          BorderThickness="0"
-                                                          Name="PART_listbox"
-                                                          AutoScrollToSelectedItem="False"
-                                                          ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
-                                                          ScrollViewer.VerticalScrollBarVisibility="Auto">
-                                </controls:GridViewListBox>
-                            </DockPanel>
-                        </controls:AlternativeScrollViewer>
-                        <ScrollBar Name="PART_HorizontalScrollBar"
-                                   Orientation="Horizontal"
-                                   AllowAutoHide="{Binding #HScroll.AllowAutoHide}"
-                                   LargeChange="{Binding #HScroll.LargeChange.Width}"
-                                   SmallChange="{Binding #HScroll.SmallChange.Width}"
-                                   Maximum="{Binding #HScroll.HorizontalScrollBarMaximum}"
-                                   Value="{Binding #HScroll.HorizontalScrollBarValue, Mode=TwoWay}"
-                                   ViewportSize="{Binding #HScroll.HorizontalScrollBarViewportSize}"
-                                   Visibility="{Binding #HScroll.HorizontalScrollBarVisibility}"
-                                   Grid.Row="1"
-                                   Focusable="False" />
-                        <!-- how to do it better way? -->
-                        <ScrollBar Name="PART_VerticalScrollBar"
-                                   Orientation="Vertical"
-                                   AllowAutoHide="{Binding $parent[controls:GridView].VisualChildren[0].VisualChildren[0].VisualChildren[0].VisualChildren[0].VisualChildren[0].VisualChildren[1].VisualChildren[0].AllowAutoHide}"
-                                   LargeChange="{Binding $parent[controls:GridView].VisualChildren[0].VisualChildren[0].VisualChildren[0].VisualChildren[0].VisualChildren[0].VisualChildren[1].VisualChildren[0].LargeChange.Width}"
-                                   SmallChange="{Binding $parent[controls:GridView].VisualChildren[0].VisualChildren[0].VisualChildren[0].VisualChildren[0].VisualChildren[0].VisualChildren[1].VisualChildren[0].SmallChange.Width}"
-                                   ViewportSize="{Binding $parent[controls:GridView].VisualChildren[0].VisualChildren[0].VisualChildren[0].VisualChildren[0].VisualChildren[0].VisualChildren[1].VisualChildren[0].VerticalScrollBarViewportSize}"
-                                   Visibility="{Binding $parent[controls:GridView].VisualChildren[0].VisualChildren[0].VisualChildren[0].VisualChildren[0].VisualChildren[0].VisualChildren[1].VisualChildren[0].VerticalScrollBarVisibility}"
-                                   Maximum="{Binding  $parent[controls:GridView].VisualChildren[0].VisualChildren[0].VisualChildren[0].VisualChildren[0].VisualChildren[0].VisualChildren[1].VisualChildren[0].VerticalScrollBarMaximum}"
-                                   Value="{Binding $parent[controls:GridView].VisualChildren[0].VisualChildren[0].VisualChildren[0].VisualChildren[0].VisualChildren[0].VisualChildren[1].VisualChildren[0].VerticalScrollBarValue, Mode=TwoWay}"
-                                   Grid.Column="1"
-                                   Focusable="False" />
-                    </Grid>
+                    <DockPanel LastChildFill="True" Grid.IsSharedSizeScope="True">
+                        <ScrollViewer HorizontalScrollBarVisibility="Hidden" 
+                                      VerticalScrollBarVisibility="Disabled"
+                                      Name="PART_HeaderScroll"
+                                      DockPanel.Dock="Top">
+                            <controls:GridViewHeader>
+                                <Grid Name="PART_header">
+                                </Grid>
+                            </controls:GridViewHeader>
+                        </ScrollViewer>
+
+                        <ScrollViewer HorizontalScrollBarVisibility="Visible"
+                                      VerticalScrollBarVisibility="Visible"
+                                      Name="PART_ContentScroll">
+                            <controls:GridViewListBox ItemsSource="{TemplateBinding Items}"
+                                                      Selection="{TemplateBinding Selection, Mode=OneWay}"
+                                                      ItemTemplate="{TemplateBinding ItemTemplate}"
+                                                      SelectionMode="{TemplateBinding SelectionMode}"
+                                                      BorderThickness="0"
+                                                      Name="PART_listbox"
+                                                      AutoScrollToSelectedItem="{TemplateBinding AutoScrollToSelectedItem}"
+                                                      ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
+                                                      ScrollViewer.VerticalScrollBarVisibility="Auto">
+                            </controls:GridViewListBox>
+                        </ScrollViewer>
+                    </DockPanel>
                 </Border>
             </ControlTemplate>
         </Setter>

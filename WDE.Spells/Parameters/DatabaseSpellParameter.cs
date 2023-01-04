@@ -6,7 +6,7 @@ namespace WDE.Spells.Parameters
 {
     internal class DatabaseSpellParameter : ParameterNumbered
     {
-        public DatabaseSpellParameter(IList<IDatabaseSpellDbc>? items)
+        public DatabaseSpellParameter(IReadOnlyList<IDatabaseSpellDbc>? items)
         {
             if (items == null)
                 return;

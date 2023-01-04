@@ -7,6 +7,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using Avalonia.Data;
 using Avalonia.Data.Converters;
+using Avalonia.ReactiveUI;
 using Avalonia.Threading;
 using Prism.Commands;
 using PropertyChanged.SourceGenerator;

@@ -5,6 +5,7 @@ using Avalonia.Media;
 using System;
 using System.ComponentModel;
 using System.Globalization;
+using Avalonia.Controls.Documents;
 
 namespace AvaloniaStyles.Controls;
 
@@ -18,7 +19,7 @@ public class FAIconElement : Control
     /// Defines the <see cref="Foreground"/> property
     /// </summary>
     public static readonly AttachedProperty<IBrush> ForegroundProperty =
-        TextBlock.ForegroundProperty.AddOwner<FAIconElement>();
+        TextElement.ForegroundProperty.AddOwner<FAIconElement>();
 
     /// <summary>
     /// Gets or sets a brush that describes the foreground color.
@@ -29,7 +30,7 @@ public class FAIconElement : Control
         set => SetValue(ForegroundProperty, value);
     }
 
-    protected override void OnPropertyChanged<T>(AvaloniaPropertyChangedEventArgs<T> change)
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);
 

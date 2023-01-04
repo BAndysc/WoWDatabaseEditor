@@ -21,17 +21,16 @@ public class ToggleAllCheckBox : CheckBox, IStyleable
     public ICommand? AltCommand
     {
         get => _altCommand;
-        set => SetAndRaise(CommandProperty, ref _altCommand, value);
+        set => SetAndRaise(AltCommandProperty, ref _altCommand, value);
     }
-    
-    public Type StyleKey => typeof(CheckBox);
+
+    protected override Type StyleKeyOverride => typeof(CheckBox);
 
     protected override void OnPointerReleased(PointerReleasedEventArgs e)
     {
-        if (IsPressed && e.InitialPressMouseButton == MouseButton.Left &&
+        if (e.InitialPressMouseButton == MouseButton.Left &&
             e.KeyModifiers != KeyModifiers.None)
         {
-            SetValue(IsPressedProperty, false);
             e.Handled = true;
             OnClickAlternative();
         }

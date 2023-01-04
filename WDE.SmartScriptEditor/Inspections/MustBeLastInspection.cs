@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using WDE.Common.Managers;
 using WDE.Common.Utils;
+using WDE.MVVM.Observable;
 using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Models;
 
@@ -12,7 +14,13 @@ public class MustBeLastInspection : IEventInspection
             
     public MustBeLastInspection(ISmartDataManager smartDataManager)
     {
-        foreach (var a in smartDataManager.GetAllData(SmartType.SmartAction))
+        smartDataManager.GetAllData(SmartType.SmartAction).SubscribeAction(Load);
+    }
+
+    private void Load(IReadOnlyList<SmartGenericJsonData> list)
+    {
+        action = -1;
+        foreach (var a in list)
         {
             if (a.Flags.HasFlagFast(ActionFlags.MustBeLast))
             {
@@ -22,7 +30,7 @@ public class MustBeLastInspection : IEventInspection
             }
         }
     }
-        
+
     public InspectionResult? Inspect(SmartEvent e)
     {
         // -1, because we skip the last action

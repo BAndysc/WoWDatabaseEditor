@@ -28,7 +28,7 @@
                        VerticalAlignment="Center"
                        Margin="0,0,10,0" Text="{TemplateBinding DisplayName}"/>
 
-            <ContentControl Content="{TemplateBinding ToolBarContent}" />
+            <ContentControl ClipToBounds="{TemplateBinding ClipToBounds}" Content="{TemplateBinding ToolBarContent}" />
 
             <ContentControl Content="{TemplateBinding RightContent}" DockPanel.Dock="Right"></ContentControl>
           </DockPanel>
@@ -36,5 +36,8 @@
         </StackPanel>
       </ControlTemplate>
     </Setter>
+  </Style>
+  <Style Selector="controls|EditorHeader ToolbarPanel">
+    <Setter Property="Background" Value="Transparent" />
   </Style>
 </Styles>

@@ -1,4 +1,3 @@
-using JetBrains.Annotations;
 using Prism.Ioc;
 using Prism.Unity.Ioc;
 using Unity;

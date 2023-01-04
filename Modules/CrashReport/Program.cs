@@ -34,6 +34,6 @@ class Program
     public static AppBuilder BuildAvaloniaApp()
         => AppBuilder.Configure<App>()
             .UsePlatformDetect()
-            //.WithInterFont() // ava11
+            .WithInterFont() 
             .LogToTrace();
 }

@@ -7,7 +7,6 @@
              xmlns:models="clr-namespace:WDE.Updater.Models;assembly=WDE.Updater"
              xmlns:system="clr-namespace:System;assembly=System.Runtime"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             d:DataContext="{d:DesignInstance viewModels:ChangeLogViewModel}"
              Padding="15"
              x:DataType="viewModels:ChangeLogViewModel"
              x:Class="WDE.CommonViews.Avalonia.Updater.Views.ChangeLogView">
@@ -23,28 +22,28 @@
                        Text="{CompiledBinding Title}"/>
         </Border>
         <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-            <ItemsPresenter Items="{CompiledBinding Changes}">
-                <ItemsPresenter.ItemTemplate>
+            <ItemsControl ItemsSource="{CompiledBinding Changes}">
+                <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="models:ChangeLogEntry">
                         <StackPanel Margin="0,10,0,0">
                             <DockPanel>
                                 <TextBlock Text="{CompiledBinding Title}" FontSize="17"/>
                                 <TextBlock TextAlignment="Right" Text="{CompiledBinding Date, Converter={StaticResource TimeConverter}}" FontSize="14" DockPanel.Dock="Right"/>
                             </DockPanel>
-                            <ItemsPresenter Items="{CompiledBinding Changes}" Margin="10,0,0,0">
-                                <ItemsPresenter.ItemTemplate>
+                            <ItemsControl ItemsSource="{CompiledBinding Changes}" Margin="10,0,0,0">
+                                <ItemsControl.ItemTemplate>
                                     <DataTemplate x:DataType="system:String">
                                         <DockPanel LastChildFill="True">
                                             <Ellipse Width="4" Height="4" VerticalAlignment="Top" Margin="0,4,8,0" Fill="{DynamicResource AccentColorMedium}" DockPanel.Dock="Left" />
                                             <TextBlock Margin="0,0,0,5" FontSize="14" Text="{CompiledBinding .}" TextWrapping="WrapWithOverflow"></TextBlock>
                                         </DockPanel>
                                     </DataTemplate>
-                                </ItemsPresenter.ItemTemplate>
-                            </ItemsPresenter>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
                         </StackPanel>
                     </DataTemplate>
-                </ItemsPresenter.ItemTemplate>
-            </ItemsPresenter>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
         </ScrollViewer>
     </DockPanel>
 </UserControl>

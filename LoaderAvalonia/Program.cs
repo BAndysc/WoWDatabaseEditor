@@ -1,3 +1,4 @@
+using BaseDesktopLoader;
 using WDE.AzerothCore;
 using WDE.CMaNGOS;
 using WDE.CMMySqlDatabase;
@@ -39,7 +40,6 @@ using WDE.MapSpawns;
 using WDE.PathPreviewTool;
 using WDE.FirstTimeWizard;
 using WDE.LootEditor;
-using WDE.LootEditor.Models;
 using WDE.QueryGenerators;
 using WDE.Profiles;
 using WDE.SqlWorkbench;
@@ -97,8 +97,7 @@ namespace LoaderAvalonia
                 typeof(SqlWorkbenchModule),
                 typeof(DebuggerModule)
             };
-            WoWDatabaseEditorCore.Avalonia.Program.PreloadedModules = modules;
-            WoWDatabaseEditorCore.Avalonia.Program.Main(args);
+            BaseProgramLoader.Main(modules, args);
         }
     }
 }

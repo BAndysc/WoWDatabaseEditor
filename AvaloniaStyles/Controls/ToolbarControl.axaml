@@ -1,69 +1,98 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="using:AvaloniaStyles.Controls">
-    <Design.PreviewWith>
-        <controls:ToolbarControl />
-    </Design.PreviewWith>
+
+    <Styles.Resources>
+        <ControlTheme x:Key="{x:Type controls:ToolbarItemsControl}" TargetType="controls:ToolbarItemsControl">
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{TemplateBinding CornerRadius}"
+                            Padding="{TemplateBinding Padding}">
+                        <DockPanel>
+                            <!-- ToolbarPanel here so that the button get proper style -->
+                            <ToolbarPanel ClipToBounds="{TemplateBinding ClipToBounds}" DockPanel.Dock="Right">
+                                <Button ToolTip.Tip="Expand toolbar" IsVisible="{TemplateBinding IsOverflow}">
+                                    <Button.Content>
+                                        <Path Width="20" Height="20" Data="M3,10L8.782,10L3.282,4.5L5.5,4.5L11,10L5.5,15.5L3.282,15.5L8.782,10L3,10Z M9,10L14.782,10L9.282,4.5L11.5,4.5L17,10L11.5,15.5L9.282,15.5L14.782,10L9,10Z"
+                                              Fill="{DynamicResource SystemControlForegroundBaseHighBrush}"
+                                              StrokeThickness="0"
+                                              Opacity="0.7" />
+                                    </Button.Content>
+                                    <Button.Flyout>
+                                        <Flyout>
+                                            <controls:ToolbarPanel WrapOnOverflow="True" Name="OverflowPanel" />
+                                        </Flyout>
+                                    </Button.Flyout>
+                                </Button>
+                            </ToolbarPanel>
+                            <ItemsPresenter Name="PART_ItemsPresenter">
+                                <ItemsPresenter.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <controls:ToolbarPanel ClipToBounds="{TemplateBinding ClipToBounds}" IsOverflow="{Binding IsOverflow, RelativeSource={RelativeSource TemplatedParent}, Mode=OneWayToSource}" OutOfBoundsPanel="{Binding #OverflowPanel}" />
+                                    </ItemsPanelTemplate>
+                                </ItemsPresenter.ItemsPanel>
+                            </ItemsPresenter>
+                        </DockPanel>
+
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+        </ControlTheme>
+
+
+        <ControlTheme x:Key="{x:Type controls:ToolbarControl}" TargetType="controls:ToolbarControl">
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{TemplateBinding CornerRadius}"
+                            Padding="{TemplateBinding Padding}">
+                        <DockPanel>
+                            <!-- ToolbarPanel here so that the button get proper style -->
+                            <ToolbarPanel DockPanel.Dock="Right">
+                                <Button ToolTip.Tip="Expand toolbar" IsVisible="{TemplateBinding IsOverflow}">
+                                    <Button.Content>
+                                        <Path Width="20" Height="20" Data="M3,10L8.782,10L3.282,4.5L5.5,4.5L11,10L5.5,15.5L3.282,15.5L8.782,10L3,10Z M9,10L14.782,10L9.282,4.5L11.5,4.5L17,10L11.5,15.5L9.282,15.5L14.782,10L9,10Z"
+                                              Fill="{DynamicResource SystemControlForegroundBaseHighBrush}"
+                                              StrokeThickness="0"
+                                              Opacity="0.7" />
+                                    </Button.Content>
+                                    <Button.Flyout>
+                                        <Flyout>
+                                            <controls:ToolbarPanel WrapOnOverflow="True" Name="OverflowPanel" />
+                                        </Flyout>
+                                    </Button.Flyout>
+                                </Button>
+                            </ToolbarPanel>
+                            <controls:ToolbarPanel x:Name="PART_Panel" ClipToBounds="True" IsOverflow="{Binding IsOverflow, RelativeSource={RelativeSource TemplatedParent}, Mode=OneWayToSource}" OutOfBoundsPanel="{Binding #OverflowPanel}" />
+                        </DockPanel>
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+        </ControlTheme>
+    </Styles.Resources>
+
+    <Style Selector="controls|ToolbarItemsControl FlyoutPresenter">
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="MinWidth" Value="0" />
+        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+        <Setter Property="Background" Value="{DynamicResource TitleBarBackground}" />
+    </Style>
+    <Style Selector="ToolbarItemsControl > ContentPresenter">
+        <Setter Property="HorizontalAlignment" Value="Left" />
+    </Style>
 
     <Style Selector="controls|ToolbarControl FlyoutPresenter">
         <Setter Property="Padding" Value="0" />
         <Setter Property="MinWidth" Value="0" />
         <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
-    </Style>
-    <Style Selector="ToolbarItemsControl">
-        <Setter Property="ItemsPanel">
-            <ItemsPanelTemplate>
-                <ToolbarControl />
-            </ItemsPanelTemplate>
-        </Setter>
-        <Setter Property="Template">
-            <ControlTemplate>
-                <Border Background="{TemplateBinding Background}"
-                        BorderBrush="{TemplateBinding BorderBrush}"
-                        BorderThickness="{TemplateBinding BorderThickness}"
-                        CornerRadius="{TemplateBinding CornerRadius}"
-                        Padding="{TemplateBinding Padding}">
-                    <ItemsPresenter Name="PART_ItemsPresenter"
-                                    Items="{TemplateBinding Items}"
-                                    ItemsPanel="{TemplateBinding ItemsPanel}"
-                                    ItemTemplate="{TemplateBinding ItemTemplate}"/>
-                </Border>
-            </ControlTemplate>
-        </Setter>
-    </Style>
-    <Style Selector="ToolbarItemsControl > ContentPresenter">
-        <Setter Property="HorizontalAlignment" Value="Left" />
-    </Style>
-    <Style Selector="controls|ToolbarControl">
-        <Setter Property="Template">
-            <ControlTemplate>
-                <DockPanel>
-                    <ToolbarPanel DockPanel.Dock="Right">
-                        <Button ToolTip.Tip="Expand toolbar" IsVisible="{TemplateBinding IsOverflow}">
-                            <Button.Content>
-                                <Path Width="20" Height="20" Data="M3,10L8.782,10L3.282,4.5L5.5,4.5L11,10L5.5,15.5L3.282,15.5L8.782,10L3,10Z M9,10L14.782,10L9.282,4.5L11.5,4.5L17,10L11.5,15.5L9.282,15.5L14.782,10L9,10Z"
-                                      Fill="{DynamicResource SystemControlForegroundBaseHighBrush}"
-                                      StrokeThickness="0" 
-                                      Opacity="0.7" />
-                            </Button.Content>
-                            <Button.Flyout>
-                                <Flyout>
-                                    <ToolbarPanel WrapOnOverflow="True" Name="OverflowPanel">
-                                    
-                                    </ToolbarPanel>
-                                </Flyout>
-                            </Button.Flyout>
-                        </Button>
-                    </ToolbarPanel>
-                    <controls:ToolbarPanel ClipToBounds="True" OutOfBoundsPanel="{Binding #OverflowPanel}" IsOverflow="{TemplateBinding IsOverflow, Mode=OneWayToSource}" Name="PART_ChildrenHost">
-                        
-                    </controls:ToolbarPanel>
-                </DockPanel>
-            </ControlTemplate>
-        </Setter>
-    </Style>
-    
-    <Style Selector="controls|ToolbarControl FlyoutPresenter">
         <Setter Property="Background" Value="{DynamicResource TitleBarBackground}" />
+    </Style>
+    <Style Selector="ToolbarControl > ContentPresenter">
+        <Setter Property="HorizontalAlignment" Value="Left" />
     </Style>
 </Styles>

@@ -22,35 +22,41 @@ build_script:
     
     dotnet --list-sdks
 
-    dotnet publish -c Release --self-contained false -f net7.0 -o bin/wowdatabaseeditor-avalonia-win/ LoaderAvalonia/LoaderAvalonia.csproj -r win8-x64 -p:PublishSingleFile=true -p:PublishTrimmed=false -p:DebugType=none
+    dotnet publish -c Release --self-contained false -f net8.0 -o bin/wowdatabaseeditor-avalonia-win/ LoaderAvalonia/LoaderAvalonia.csproj -r win-x64 -p:PublishSingleFile=true -p:PublishTrimmed=false -p:DebugType=none
       
-    dotnet publish -c Release --self-contained false -f net7.0 -o bin/wowdatabaseeditor-avalonia-mac/ LoaderAvalonia/LoaderAvalonia.csproj -r osx-x64
+    dotnet publish -c Release --self-contained false -f net8.0 -o bin/wowdatabaseeditor-avalonia-mac/ LoaderAvalonia/LoaderAvalonia.csproj -r osx-x64
       
-    dotnet publish -c Release --self-contained false -f net7.0 -o bin/wowdatabaseeditor-avalonia-linux/ LoaderAvalonia/LoaderAvalonia.csproj -r linux-x64 -p:PublishSingleFile=true -p:PublishTrimmed=false -p:DebugType=none
+    dotnet publish -c Release --self-contained false -f net8.0 -o bin/wowdatabaseeditor-avalonia-linux/ LoaderAvalonia/LoaderAvalonia.csproj -r linux-x64 -p:PublishSingleFile=true -p:PublishTrimmed=false -p:DebugType=none
       
-    dotnet publish -c Release --self-contained false -f net7.0 -o bin/wowdatabaseeditor-avalonia-win/ Modules/CrashReport/CrashReport.csproj -r win8-x64 -p:PublishSingleFile=true -p:PublishTrimmed=false -p:DebugType=none
+    dotnet publish -c Release --self-contained false -f net8.0 -o bin/wowdatabaseeditor-avalonia-win/ Modules/CrashReport/CrashReport.csproj -r win-x64 -p:PublishSingleFile=true -p:PublishTrimmed=false -p:DebugType=none
      
-    dotnet publish -c Release --self-contained false -f net7.0 -o bin/wowdatabaseeditor-avalonia-mac/ Modules/CrashReport/CrashReport.csproj -r osx-x64
+    dotnet publish -c Release --self-contained false -f net8.0 -o bin/wowdatabaseeditor-avalonia-mac/ Modules/CrashReport/CrashReport.csproj -r osx-x64
    
-    dotnet publish -c Release --self-contained false -f net7.0 -o bin/wowdatabaseeditor-avalonia-linux/ Modules/CrashReport/CrashReport.csproj -r linux-x64 -p:PublishSingleFile=true -p:PublishTrimmed=false -p:DebugType=none
+    dotnet publish -c Release --self-contained false -f net8.0 -o bin/wowdatabaseeditor-avalonia-linux/ Modules/CrashReport/CrashReport.csproj -r linux-x64 -p:PublishSingleFile=true -p:PublishTrimmed=false -p:DebugType=none
       
-    dotnet publish -c Release --self-contained false -f net7.0 -o bin/wowdatabaseeditor-avalonia-win/ Updater/Updater.csproj -r win8-x64 -p:PublishSingleFile=true -p:PublishTrimmed=false -p:DebugType=none
+    dotnet publish -c Release --self-contained false -f net8.0 -o bin/wowdatabaseeditor-avalonia-win/ Updater/Updater.csproj -r win-x64 -p:PublishSingleFile=true -p:PublishTrimmed=false -p:DebugType=none
 
-    dotnet publish -c Release --self-contained false -f net7.0 -o bin/wowdatabaseeditor-avalonia-mac/ Updater/Updater.csproj -r osx-x64
+    dotnet publish -c Release --self-contained false -f net8.0 -o bin/wowdatabaseeditor-avalonia-mac/ Updater/Updater.csproj -r osx-x64
 
-    dotnet publish -c Release --self-contained false -f net7.0 -o bin/wowdatabaseeditor-avalonia-linux/ Updater/Updater.csproj -r linux-x64 -p:PublishSingleFile=true -p:PublishTrimmed=false -p:DebugType=none
+    dotnet publish -c Release --self-contained false -f net8.0 -o bin/wowdatabaseeditor-avalonia-linux/ Updater/Updater.csproj -r linux-x64 -p:PublishSingleFile=true -p:PublishTrimmed=false -p:DebugType=none
     
-    dotnet publish -c Release --self-contained false -f net7.0 -o bin/wowdatabaseeditor-avalonia-win/parser WoWPacketParserLoader -r win8-x64
+    dotnet publish -c Release --self-contained false -f net8.0 -o bin/wowdatabaseeditor-avalonia-win/parser WoWPacketParserLoader -r win-x64
       
-    dotnet publish -c Release --self-contained false -f net7.0 -o bin/wowdatabaseeditor-avalonia-mac/parser WoWPacketParserLoader -r osx-x64
+    dotnet publish -c Release --self-contained false -f net8.0 -o bin/wowdatabaseeditor-avalonia-mac/parser WoWPacketParserLoader -r osx-x64
       
-    dotnet publish -c Release --self-contained false -f net7.0 -o bin/wowdatabaseeditor-avalonia-linux/parser WoWPacketParserLoader -r linux-x64
+    dotnet publish -c Release --self-contained false -f net8.0 -o bin/wowdatabaseeditor-avalonia-linux/parser WoWPacketParserLoader -r linux-x64
     
     rename bin\wowdatabaseeditor-avalonia-mac\Updater _Updater
     
     rename bin\wowdatabaseeditor-avalonia-linux\Updater _Updater
 
     rename bin\wowdatabaseeditor-avalonia-win\Updater.exe _Updater.exe
+      
+    rename bin\wowdatabaseeditor-avalonia-mac\WoWDatabaseEditor WoWDatabaseEditorCore.Avalonia
+
+    rename bin\wowdatabaseeditor-avalonia-linux\WoWDatabaseEditor WoWDatabaseEditorCore.Avalonia
+
+    rename bin\wowdatabaseeditor-avalonia-win\WoWDatabaseEditor.exe WoWDatabaseEditorCore.Avalonia.exe
        
     git clone https://%REPO_TOKEN%@github.com/BAndysc/WoWDatabaseEditorExtras --recurse-submodules
     
@@ -62,7 +68,7 @@ build_script:
     
     mkdir modules
     
-    dotnet publish WDE.Github/WDE.Github.csproj -o modules/ -c Release -f net7.0
+    dotnet publish WDE.Github/WDE.Github.csproj -o modules/ -c Release -f net8.0
     
     cp modules/WDE.Github.dll ../bin/wowdatabaseeditor-avalonia-win/WDE.Github.dll
       

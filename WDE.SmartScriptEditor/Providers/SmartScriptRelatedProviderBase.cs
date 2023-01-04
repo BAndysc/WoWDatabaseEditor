@@ -37,7 +37,7 @@ namespace WDE.SmartScriptEditor.Providers
             }
         }
         
-        public Task<RelatedSolutionItem?> GetRelated(T item)
+        public async Task<RelatedSolutionItem?> GetRelated(T item)
         {
             if (item.SmartType != SmartScriptType.Creature &&
                 item.SmartType != SmartScriptType.GameObject &&
@@ -46,32 +46,30 @@ namespace WDE.SmartScriptEditor.Providers
                 item.SmartType != SmartScriptType.Quest &&
                 item.SmartType != SmartScriptType.Spell &&
                 item.SmartType != SmartScriptType.StaticSpell)
-                return Task.FromResult<RelatedSolutionItem?>(null);
+                return null;
 
             if (item.Entry.HasValue)
             {
-                return Task.FromResult<RelatedSolutionItem?>(
-                    new RelatedSolutionItem(SmartScriptToRelatedType(item.SmartType), item.Entry.Value));
+                return new RelatedSolutionItem(SmartScriptToRelatedType(item.SmartType), item.Entry.Value);
             }
 
             if (item.EntryOrGuid >= 0)
             {
-                return Task.FromResult<RelatedSolutionItem?>(
-                    new RelatedSolutionItem(SmartScriptToRelatedType(item.SmartType), item.EntryOrGuid));
+                return new RelatedSolutionItem(SmartScriptToRelatedType(item.SmartType), item.EntryOrGuid);
             }
 
             if (item.SmartType == SmartScriptType.Creature)
             {
-                var creature = databaseProvider.GetCreatureByGuid(0, (uint)(-item.EntryOrGuid));
+                var creature = await databaseProvider.GetCreatureByGuidAsync(0, (uint)(-item.EntryOrGuid));
                 if (creature == null)
-                    return Task.FromResult<RelatedSolutionItem?>(null);
-                return Task.FromResult<RelatedSolutionItem?>(new RelatedSolutionItem(RelatedSolutionItem.RelatedType.CreatureEntry, creature.Entry));
+                    return null;
+                return new RelatedSolutionItem(RelatedSolutionItem.RelatedType.CreatureEntry, creature.Entry);
             }
             
-            var gameobject = databaseProvider.GetGameObjectByGuid(0, (uint)(-item.EntryOrGuid));
+            var gameobject = await databaseProvider.GetGameObjectByGuidAsync(0, (uint)(-item.EntryOrGuid));
             if (gameobject == null)
-                return Task.FromResult<RelatedSolutionItem?>(null);
-            return Task.FromResult<RelatedSolutionItem?>(new RelatedSolutionItem(RelatedSolutionItem.RelatedType.GameobjectEntry, gameobject.Entry));
+                return null;
+            return new RelatedSolutionItem(RelatedSolutionItem.RelatedType.GameobjectEntry, gameobject.Entry);
         }
     }
 }

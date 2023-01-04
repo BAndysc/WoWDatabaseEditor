@@ -1,12 +1,13 @@
 using System;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
+using Avalonia.Markup.Xaml.Templates;
 
 namespace CrashReport;
 
 public class AvaloniaViewLocator : IDataTemplate
 {
-    public IControl Build(object? param)
+    public Control? Build(object? param)
     {
         if (param == null)
             return new TextBlock(){Text = "Null model"};
@@ -25,6 +26,6 @@ public class AvaloniaViewLocator : IDataTemplate
 
     public bool Match(object? data)
     {
-        return data is not IControl && data != null && data is not string;
+        return data is not Control && data != null && data is not string;
     }
 }

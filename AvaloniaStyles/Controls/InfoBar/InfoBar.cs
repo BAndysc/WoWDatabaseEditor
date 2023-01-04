@@ -39,7 +39,7 @@ public partial class InfoBar : ContentControl
         UpdateForeground();
     }
 
-    protected override void OnPropertyChanged<T>(AvaloniaPropertyChangedEventArgs<T> change)
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);
         if (change.Property == IsOpenProperty)
@@ -77,7 +77,7 @@ public partial class InfoBar : ContentControl
         }
     }
 
-    protected override bool RegisterContentPresenter(IContentPresenter presenter)
+    protected override bool RegisterContentPresenter(ContentPresenter presenter)
     {
         if (presenter.Name == "ContentPresenter")
             return true;

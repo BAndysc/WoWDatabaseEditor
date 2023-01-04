@@ -3,6 +3,7 @@ using System.ComponentModel;
 using Avalonia;
 using Avalonia.Collections;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Layout;
 using Avalonia.Markup.Xaml;
 using Avalonia.VisualTree;
@@ -14,7 +15,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
     /// <summary>
     ///     Interaction logic for ModulesConfigView.xaml
     /// </summary>
-    public class DialogWindow : ExtendedWindow
+    public partial class DialogWindow : ExtendedWindow
     {
         private bool reallyCloseNow = false;
         
@@ -24,11 +25,6 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
             this.AttachDevTools();
         }
         
-        private void InitializeComponent()
-        {
-            AvaloniaXamlLoader.Load(this);
-        }
-
         protected override void OnOpened(EventArgs e)
         {
             base.OnOpened(e);
@@ -99,7 +95,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
             Close(false);
         }
 
-        protected override void OnClosing(CancelEventArgs e)
+        protected override void OnClosing(WindowClosingEventArgs e)
         {
             base.OnClosing(e);
             if (reallyCloseNow)
@@ -111,74 +107,23 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
                 closable.OnClose();
             }
         }
-        
-        
-        // AVALONIA FIX
-        
-        protected virtual Size MeasureOverrideInternal(Size availableSize)
+
+        protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
         {
-            double num1 = 0.0;
-            double num2 = 0.0;
-            IAvaloniaList<IVisual> visualChildren = this.VisualChildren;
-            int count = visualChildren.Count;
-            for (int index = 0; index < count; ++index)
+            base.OnApplyTemplate(e);
+            var visualLayerManager = this.FindDescendantOfType<VisualLayerManager>();
+
+            // this ia bug in Avalonia 11
+            // if you add a TextBox to adorner layer and it will be focused and no textbox has been ever focused
+            // then visualLayerManager.TextSelectorLayer property will be accessed from within VisualLayerManager
+            // Measure (or Arrange) causing Collection was modified; enumeration operation may not execute.
+            // until this is fixed, we workaround that by fetching this property here, so that a getter invoked in
+            // Measure will not create a layer
+            // https://github.com/AvaloniaUI/Avalonia/issues/14483
+            if (visualLayerManager != null)
             {
-                if (visualChildren[index] is ILayoutable layoutable)
-                {
-                    layoutable.Measure(availableSize);
-                    num1 = Math.Max(num1, layoutable.DesiredSize.Width);
-                    num2 = Math.Max(num2, layoutable.DesiredSize.Height);
-                }
+                var layer = visualLayerManager.TextSelectorLayer;
             }
-            return new Size(num1, num2);
-        }
-        
-        // this is a workaround to broken SizeToContent with MaxWidth
-        // this is copied base.MeasureOverride with added Math.Min MaxWidth constraint
-        protected override Size MeasureOverride(Size availableSize)
-        {
-            var sizeToContent = SizeToContent;
-            var clientSize = ClientSize;
-            var constraint = clientSize;
-            var maxAutoSize = PlatformImpl?.MaxAutoSizeHint ?? Size.Infinity;
-
-            if (sizeToContent.HasAllFlags(SizeToContent.Width))
-            {
-                constraint = constraint.WithWidth(Math.Min(maxAutoSize.Width, MaxWidth));
-            }
-
-            if (sizeToContent.HasAllFlags(SizeToContent.Height))
-            {
-                constraint = constraint.WithHeight(maxAutoSize.Height);
-            }
-
-            var result = MeasureOverrideInternal(constraint);
-
-            if (!sizeToContent.HasAllFlags(SizeToContent.Width))
-            {
-                if (!double.IsInfinity(availableSize.Width))
-                {
-                    result = result.WithWidth(availableSize.Width);
-                }
-                else
-                {
-                    result = result.WithWidth(clientSize.Width);
-                }
-            }
-
-            if (!sizeToContent.HasAllFlags(SizeToContent.Height))
-            {
-                if (!double.IsInfinity(availableSize.Height))
-                {
-                    result = result.WithHeight(availableSize.Height);
-                }
-                else
-                {
-                    result = result.WithHeight(clientSize.Height);
-                }
-            }
-
-            return result;
         }
     }
 }

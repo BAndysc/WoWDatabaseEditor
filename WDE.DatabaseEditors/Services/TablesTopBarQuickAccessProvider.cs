@@ -24,7 +24,10 @@ public class TablesTopBarQuickAccessProvider : ITopBarQuickAccessProvider
         {
             var definition = definitionProvider.GetDefinition(table);
             if (definition == null)
+            {
+                continue;
                 throw new Exception("Table " + table + " not found while constructing top bar quick access items");
+            }
 
             var icon = new ImageUri(definition.IconPath ?? "Icons/document.png");
              

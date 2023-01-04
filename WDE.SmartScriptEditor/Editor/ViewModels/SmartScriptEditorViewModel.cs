@@ -1541,9 +1541,9 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             }
         }
 
-        public Task<IQuery> GenerateQuery()
+        public async Task<IQuery> GenerateQuery()
         {
-            return Task.FromResult(smartScriptExporter.GenerateSql(item, script));
+            return await smartScriptExporter.GenerateSql(item, script);
         }
 
         public string Name => itemNameRegistry.GetName(item);
@@ -1763,8 +1763,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         {
             await editorExtension.BeforeLoad(this, item);
             var lines = (await smartScriptDatabase.GetScriptFor(item.Entry ?? 0, item.EntryOrGuid, item.SmartType)).ToList();
-            var conditions = smartScriptDatabase.GetConditionsForScript(item.Entry, item.EntryOrGuid, item.SmartType).ToList();
-            var targetSourceConditions = smartScriptDatabase.GetConditionsForSourceTarget(item.Entry, item.EntryOrGuid, item.SmartType).ToList();
+            var conditions = (await smartScriptDatabase.GetConditionsForScript(item.Entry, item.EntryOrGuid, item.SmartType)).ToList();
+            var targetSourceConditions = (await smartScriptDatabase.GetConditionsForSourceTarget(item.Entry, item.EntryOrGuid, item.SmartType)).ToList();
 
             if (!scriptRestored && sessionToRestore == null)
                 await smartScriptImporter.Import(script, false, lines, conditions, targetSourceConditions);
@@ -1791,7 +1791,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         {
             statusbar.PublishNotification(new PlainNotification(NotificationType.Info, "Saving to database"));
 
-            var query = smartScriptExporter.GenerateSql(item, script);
+            var query = await smartScriptExporter.GenerateSql(item, script);
 
             await mySqlExecutor.ExecuteSql(query);
 
@@ -2150,7 +2150,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             {
                 cachedPossibleTargets = SmartSourceTargetType.None;
                 possibleTargetIds = new HashSet<int>();
-                foreach (var target in smartDataManager.GetAllData(SmartType.SmartTarget))
+                foreach (var target in smartDataManager.GetAllData(SmartType.SmartTarget).Value)
                 {
                     if (target.UsableWithScriptTypes != null && !target.UsableWithScriptTypes.Value.HasFlagFast(script.SourceType.ToMask()))
                         continue;

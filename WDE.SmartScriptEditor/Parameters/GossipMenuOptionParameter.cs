@@ -57,7 +57,7 @@ public class GossipMenuOptionParameter : IAsyncContextualParameter<long, SmartBa
 
         uint? entry = 0;
         if (script.EntryOrGuid < 0)
-            entry = (databaseProvider.GetCreatureByGuid(0, (uint)(-script.EntryOrGuid)))?.Entry;
+            entry = (await databaseProvider.GetCreatureByGuidAsync(0, (uint)(-script.EntryOrGuid)))?.Entry;
         else if (script.Entry.HasValue)
             entry = script.Entry.Value;
         else
@@ -126,7 +126,7 @@ public class GossipMenuOptionParameter : IAsyncContextualParameter<long, SmartBa
     {
         return "...loading (" + (value) + ")";
     }
-    
+
     public string ToString(long value)
     {
         return value.ToString();

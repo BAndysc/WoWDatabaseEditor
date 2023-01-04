@@ -36,8 +36,7 @@
           <Button Command="{CompiledBinding SelectAllTablesCommand}">All</Button>
           <Button Command="{CompiledBinding SelectNoTableCommand}">None</Button>
         </ToolbarPanel>
-        <ListBox Name="TablesListBox" Items="{CompiledBinding Tables}" 
-                 VirtualizationMode="None"
+        <ListBox Name="TablesListBox" ItemsSource="{CompiledBinding Tables}" 
                  SelectionMode="Multiple" 
                  KeyDown="TableItemKeyPressed">
           <ListBox.ItemTemplate>
@@ -76,7 +75,7 @@
         <TextBlock Text="{CompiledBinding EstimatedSize, StringFormat={}{0:0.00} MB}" />
         
         <TextBlock Text="Options:" VerticalAlignment="Top" />
-        <ItemsControl Items="{CompiledBinding BoolOptions}" KeyboardNavigation.TabNavigation="Continue">
+        <ItemsControl ItemsSource="{CompiledBinding BoolOptions}" KeyboardNavigation.TabNavigation="Continue">
           <ItemsControl.ItemTemplate>
             <DataTemplate>
               <CheckBox Margin="0,0,0,4" IsChecked="{CompiledBinding IsChecked}" ToolTip.Tip="{CompiledBinding Description}">

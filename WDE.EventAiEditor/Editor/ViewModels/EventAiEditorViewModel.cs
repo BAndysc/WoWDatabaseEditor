@@ -587,7 +587,7 @@ namespace WDE.EventAiEditor.Editor.ViewModels
                 .ToList();
             if (critical.Count > 0)
                 throw new Exception("Critical errors found:   " + string.Join("\n   ", critical.Select(c => c.Message)));
-            return Task.FromResult(EventAiExporter.GenerateSql(item, script));
+            return EventAiExporter.GenerateSql(item, script);
         }
 
         public string Name => itemNameRegistry.GetName(item);

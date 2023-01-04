@@ -436,7 +436,7 @@ namespace TheEngine.Managers
             engine.Device.device.BlendEquation(BlendEquationMode.FuncAdd);
         }
 
-        private bool useDynamicScale = false;
+        private bool useDynamicScale = true;
         private float dynamicScale = 1;
         private float? pendingDynamicScale;
         private int DynamicWidth => useDynamicScale ? Math.Max(1, (int)(currentBackBufferWidth * dynamicScale)) : currentBackBufferWidth;

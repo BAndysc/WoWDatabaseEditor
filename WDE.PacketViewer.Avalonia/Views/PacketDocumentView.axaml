@@ -72,12 +72,11 @@
                                     <ScrollViewer
                                         HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}"
                                         VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}">
-                                        <ItemsPresenter Name="PART_ItemsPresenter"
-                                                        Items="{TemplateBinding Items}"
-                                                        Margin="{DynamicResource ComboBoxDropdownContentMargin}"
-                                                        ItemsPanel="{TemplateBinding ItemsPanel}"
-                                                        ItemTemplate="{TemplateBinding ItemTemplate}"
-                                                        VirtualizationMode="{TemplateBinding VirtualizationMode}" />
+                                        <ItemsControl Name="PART_ItemsPresenter"
+                                                      ItemsSource="{TemplateBinding ItemsSource}"
+                                                      Margin="{DynamicResource ComboBoxDropdownContentMargin}"
+                                                      ItemsPanel="{TemplateBinding ItemsPanel}"
+                                                      ItemTemplate="{TemplateBinding ItemTemplate}" />
                                     </ScrollViewer>
                                 </Border>
                             </Popup>
@@ -110,7 +109,7 @@
                     <DockPanel LastChildFill="True" DockPanel.Dock="Top" Margin="0,5,0,0">
                         <ComboBox Classes="ComboDropDown" Margin="0,0,5,0" VerticalAlignment="Stretch"
                                   Width="32"
-                                  DockPanel.Dock="Left" Items="{CompiledBinding MostRecentlySearched}"
+                                  DockPanel.Dock="Left" ItemsSource="{CompiledBinding MostRecentlySearched}"
                                   SelectedItem="{CompiledBinding MostRecentlySearchedItem}" />
                         <Button DockPanel.Dock="Right" Command="{CompiledBinding OpenFilterDialogCommand}">
                             <components:WdeImage ImageUri="Icons/icon_filter.png" Width="24" Height="24" />
@@ -218,7 +217,7 @@
                         <TabItem Header="Reason predictions" IsEnabled="{CompiledBinding ReasonPanelVisibility}">
                             <DockPanel>
                                 <controls:GroupingHeader GroupName="What are the possible reasons for sending the packet" DockPanel.Dock="Top" />
-                                <ListBox Items="{CompiledBinding Predictions}"
+                                <ListBox ItemsSource="{CompiledBinding Predictions}"
                                          Name="ActionReasonsView">
                                     <ListBox.Styles>
                                         <Style Selector="ListBoxItem">
@@ -248,7 +247,7 @@
                         <TabItem Header="Possible actions" IsEnabled="{CompiledBinding ReasonPanelVisibility}">
                             <DockPanel>
                                 <controls:GroupingHeader GroupName="What other packets may have been sent because of this packet" DockPanel.Dock="Top" />
-                                <ListBox Items="{CompiledBinding PossibleActions}"
+                                <ListBox ItemsSource="{CompiledBinding PossibleActions}"
                                          Name="PossibleActionsView">
                                     <ListBox.Styles>
                                         <Style Selector="ListBoxItem">
@@ -284,7 +283,7 @@
                                             <Setter Property="TextWrapping" Value="WrapWithOverflow" />
                                         </Style>
                                     </ScrollViewer.Styles>
-                                    <ItemsControl Items="{CompiledBinding DetectedActions}">
+                                    <ItemsControl ItemsSource="{CompiledBinding DetectedActions}">
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
                                                 <StackPanel Orientation="Vertical" Margin="0,0,0,10">
@@ -295,14 +294,14 @@
                                                     <TextBlock IsVisible="{CompiledBinding Location, Converter={x:Static converters:CommonConverters.InversedNullToBoolConverter}}"
                                                                Text="{CompiledBinding Location, StringFormat=Position of action: {0}}" Opacity="0.6" />
                                                     <TextBlock Text="Additional actors:" IsVisible="{CompiledBinding AdditionalActors, Converter={x:Static converters:CommonConverters.InversedNullToBoolConverter}}" />
-                                                    <ItemsPresenter IsVisible="{CompiledBinding AdditionalActors, Converter={x:Static converters:CommonConverters.InversedNullToBoolConverter}}"
-                                                                    Items="{CompiledBinding AdditionalActors}">
-                                                        <ItemsPresenter.ItemsPanel>
+                                                    <ItemsControl IsVisible="{CompiledBinding AdditionalActors, Converter={x:Static converters:CommonConverters.InversedNullToBoolConverter}}"
+                                                                  ItemsSource="{CompiledBinding AdditionalActors}">
+                                                        <ItemsControl.ItemsPanel>
                                                             <ItemsPanelTemplate>
                                                                 <StackPanel Margin="10,0,0,0 "/>
                                                             </ItemsPanelTemplate>
-                                                        </ItemsPresenter.ItemsPanel>
-                                                    </ItemsPresenter>
+                                                        </ItemsControl.ItemsPanel>
+                                                    </ItemsControl>
                                                 </StackPanel>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
@@ -319,7 +318,7 @@
                                             <Setter Property="TextWrapping" Value="WrapWithOverflow" />
                                         </Style>
                                     </ScrollViewer.Styles>
-                                    <ItemsControl Items="{CompiledBinding DetectedEvents}">
+                                    <ItemsControl ItemsSource="{CompiledBinding DetectedEvents}">
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
                                                 <StackPanel Orientation="Vertical" Margin="0,0,0,10">
@@ -330,14 +329,14 @@
                                                     <TextBlock IsVisible="{CompiledBinding Location, Converter={x:Static converters:CommonConverters.InversedNullToBoolConverter}}"
                                                                Text="{CompiledBinding Location, StringFormat=Position of event: {0}}" Opacity="0.6" />
                                                     <TextBlock Text="Additional actors:" IsVisible="{CompiledBinding AdditionalActors, Converter={x:Static converters:CommonConverters.InversedNullToBoolConverter}}" />
-                                                    <ItemsPresenter IsVisible="{CompiledBinding AdditionalActors, Converter={x:Static converters:CommonConverters.InversedNullToBoolConverter}}"
-                                                                    Items="{CompiledBinding AdditionalActors}">
-                                                        <ItemsPresenter.ItemsPanel>
+                                                    <ItemsControl IsVisible="{CompiledBinding AdditionalActors, Converter={x:Static converters:CommonConverters.InversedNullToBoolConverter}}"
+                                                                  ItemsSource="{CompiledBinding AdditionalActors}">
+                                                        <ItemsControl.ItemsPanel>
                                                             <ItemsPanelTemplate>
                                                                 <StackPanel Margin="10,0,0,0 "/>
                                                             </ItemsPanelTemplate>
-                                                        </ItemsPresenter.ItemsPanel>
-                                                    </ItemsPresenter>
+                                                        </ItemsControl.ItemsPanel>
+                                                    </ItemsControl>
                                                 </StackPanel>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>

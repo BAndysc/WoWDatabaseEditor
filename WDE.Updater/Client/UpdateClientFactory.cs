@@ -15,7 +15,7 @@ namespace WDE.Updater.Client
             this.httpClientFactory = httpClientFactory;
         }
         
-        public IUpdateClient Create(Uri updateServerUrl, string marketplace, string? key, Platforms platform)
+        public IUpdateClient Create(Uri updateServerUrl, string marketplace, string? key, UpdatePlatforms platform)
         {
             var httpClient = httpClientFactory.Factory();
             return new UpdateClient(updateServerUrl, marketplace, key, platform, httpClient);

@@ -381,8 +381,13 @@ namespace WDE.PacketViewer.Processing.Processors
                 }));
             }
 
-            var npcTextsToInsert =
-                npcTexts.Where(npcText => databaseProvider.GetNpcText(npcText.entry) == null).ToList();
+            List<(uint entry, List<(uint broadcastText, float probability)>)> npcTextsToInsert = new();
+            foreach (var npcText in npcTexts)
+            {
+                var model = await databaseProvider.GetNpcText(npcText.entry);
+                if (model == null)
+                    npcTextsToInsert.Add(npcText);
+            }
             if (npcTextsToInsert.Count > 0)
             {
                 multiQuery.Comment("");

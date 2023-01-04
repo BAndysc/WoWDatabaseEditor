@@ -35,12 +35,12 @@ namespace WDE.EventAiEditor.Avalonia.Editor.Views.Editing
             set => SetAndRaise(SpecialCopyingProperty, ref specialCopying, value);
         }
 
-        public static bool GetOnEnterPressed(IAvaloniaObject obj)
+        public static bool GetOnEnterPressed(AvaloniaObject obj)
         {
-            return obj.GetValue(OnEnterPressedProperty);
+            return (bool?)obj.GetValue(OnEnterPressedProperty) ?? false;
         }
 
-        public static void SetOnEnterPressed(IAvaloniaObject obj, bool value)
+        public static void SetOnEnterPressed(AvaloniaObject obj, bool value)
         {
             obj.SetValue(OnEnterPressedProperty, value);
         }

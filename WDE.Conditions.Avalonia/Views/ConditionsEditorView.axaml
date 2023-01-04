@@ -29,7 +29,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="60" />
         </Grid.RowDefinitions>
-        <ListBox Grid.Row="1" VirtualizationMode="None" dnD:DragAndDrop.IsDropTarget="True" dnD:DragAndDrop.DropHandler="{CompiledBinding }" dnD:DragAndDrop.IsDragSource="True" Items="{CompiledBinding Conditions, Mode=OneTime}" SelectedItem="{CompiledBinding SelectedCondition}">
+        <ListBox Grid.Row="1" dnD:DragAndDrop.IsDropTarget="True" dnD:DragAndDrop.DropHandler="{CompiledBinding }" dnD:DragAndDrop.IsDragSource="True" ItemsSource="{CompiledBinding Conditions, Mode=OneTime}" SelectedItem="{CompiledBinding SelectedCondition}">
             <ListBox.KeyBindings>
                 <KeyBinding Command="{CompiledBinding RemoveItemCommand}" Gesture="Delete" />
                 <KeyBinding Command="{CompiledBinding RemoveItemCommand}" Gesture="Back" />

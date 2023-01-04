@@ -3,7 +3,7 @@ using Avalonia.Markup.Xaml;
 
 namespace WoWDatabaseEditorCore.Avalonia.Views
 {
-    public class DebugConsoleView : UserControl
+    public partial class DebugConsoleView : UserControl
     {
         public DebugConsoleView()
         {

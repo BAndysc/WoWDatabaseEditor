@@ -19,7 +19,7 @@ namespace WoWDatabaseEditorCore.CoreVersion
         {
             this.settings = settings;
             AllVersions = coreVersions.ToList();
-            Current = AllVersions.First(c => c.GetType() == typeof(UnspecifiedCoreVersion));
+            Current = AllVersions.First(c => c is UnspecifiedCoreVersion);
             
             var savedVersion = settings.CurrentCore;
             

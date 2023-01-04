@@ -15,7 +15,7 @@
         </Grid.ColumnDefinitions>
         <DockPanel>
             <TextBox DockPanel.Dock="Top" Watermark="Search" Text="{CompiledBinding SearchText}" />
-            <ListBox BorderBrush="Transparent" Items="{CompiledBinding FilteredParameters}" SelectedItem="{CompiledBinding Selected}" VirtualizationMode="None" />
+            <ListBox BorderBrush="Transparent" ItemsSource="{CompiledBinding FilteredParameters}" SelectedItem="{CompiledBinding Selected}" />
         </DockPanel>
         <GridSplitter Classes="vertical" Grid.Column="1" Width="5" HorizontalAlignment="Stretch" />
         <Grid Grid.Column="2" IsEnabled="{CompiledBinding HasSelected}">

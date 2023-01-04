@@ -32,7 +32,7 @@ namespace WDE.SmartScriptEditor.Providers
             {
                 case SmartScriptType.Creature:
                     if (entryOrGuid < 0)
-                        entry = database.GetCreatureByGuid(0, (uint)-entryOrGuid)?.Entry;
+                        entry = database.GetCachedCreatureByGuid(0, (uint)-entryOrGuid)?.Entry;
                     else if (scriptEntry.HasValue)
                         entry = scriptEntry.Value;
                     else
@@ -43,7 +43,7 @@ namespace WDE.SmartScriptEditor.Providers
                     break;
                 case SmartScriptType.GameObject:
                     if (entryOrGuid < 0)
-                        entry = database.GetGameObjectByGuid(0, (uint)-entryOrGuid)?.Entry;
+                        entry = database.GetCachedGameObjectByGuid(0, (uint)-entryOrGuid)?.Entry;
                     else if (scriptEntry.HasValue)
                         entry = scriptEntry.Value;
                     else
@@ -61,7 +61,7 @@ namespace WDE.SmartScriptEditor.Providers
                         return spellStore.GetName((uint) entryOrGuid);
                     break;
                 case SmartScriptType.Scene:
-                    entry = database.GetSceneTemplate((uint)entryOrGuid)?.ScriptPackageId;
+                    entry = database.GetCachedSceneTemplate((uint)entryOrGuid)?.ScriptPackageId;
 
                     if (entry.HasValue && dbcStore.SceneStore.ContainsKey((uint)entry))
                         return dbcStore.SceneStore[(uint)entry];

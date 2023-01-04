@@ -8,6 +8,7 @@ using Avalonia.Data;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml.Styling;
+using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using AvaloniaEdit;
 using AvaloniaEdit.CodeCompletion;
@@ -52,7 +53,7 @@ public class CodeCompletionTextEditor : TemplatedControl
         set => SetValue(CodeCompletionRootKeyProperty, value);
     }
 
-    protected override void OnPropertyChanged<T>(AvaloniaPropertyChangedEventArgs<T> change)
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);
         if (change.Property == TextProperty)
@@ -70,8 +71,8 @@ public class CodeCompletionTextEditor : TemplatedControl
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        textEditor = e.NameScope.Find<TextEditor>("PART_Editor");
-        placeholder = e.NameScope.Find<TextBlock>("PART_Placeholder");
+        textEditor = e.NameScope.Get<TextEditor>("PART_Editor");
+        placeholder = e.NameScope.Get<TextBlock>("PART_Placeholder");
 
         textEditor.Document.UpdateFinished += DocumentUpdateFinished;
         textEditor.TextArea.TextEntered += TextAreaOnTextEntered;
@@ -99,8 +100,7 @@ public class CodeCompletionTextEditor : TemplatedControl
     private void FocusLost(object? sender, RoutedEventArgs e)
     {
         inUpdateTextProperty = true;
-        //@todo Ava11 change to SetCurrentValue
-        SetValue(TextProperty, textEditor!.Text);
+        SetCurrentValue(TextProperty, textEditor!.Text);
         inUpdateTextProperty = false;
     }
 
@@ -138,7 +138,7 @@ public class CodeCompletionTextEditor : TemplatedControl
 
 public class BreakpointLogCompletionViewModel : ICompletionData
 {
-    public IBitmap Image => null!;
+    public IImage Image => null!;
     public string Text { get; set; } = "";
     public string Type { get; set; } = "";
     public object Content => "";

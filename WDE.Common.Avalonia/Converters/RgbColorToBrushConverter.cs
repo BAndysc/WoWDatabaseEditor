@@ -16,7 +16,7 @@ public class RgbColorToBrushConverter : IValueConverter
             return new SolidColorBrush(Color.FromArgb(255, rgbColor.R, rgbColor.G, rgbColor.B));
         if (value is Color color)
             return new SolidColorBrush(color);
-        return Brushes.Black;
+        return null;
     }
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)

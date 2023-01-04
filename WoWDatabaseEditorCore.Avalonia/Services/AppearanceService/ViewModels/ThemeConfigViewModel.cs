@@ -23,6 +23,7 @@ using WDE.MVVM.Observable;
 using WoWDatabaseEditorCore.Avalonia.Services.AppearanceService.Data;
 using WoWDatabaseEditorCore.Avalonia.Services.AppearanceService.Providers;
 using WoWDatabaseEditorCore.Avalonia.Views;
+using HslColor = AvaloniaStyles.Utils.HslColor;
 
 namespace WoWDatabaseEditorCore.Avalonia.Services.AppearanceService.ViewModels
 {

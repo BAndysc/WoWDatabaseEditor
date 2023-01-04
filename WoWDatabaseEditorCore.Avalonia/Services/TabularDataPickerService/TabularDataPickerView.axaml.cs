@@ -9,6 +9,7 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 using AvaloniaStyles.Controls;
 using Prism.Commands;
+using WDE.Common.Avalonia;
 
 namespace WoWDatabaseEditorCore.Avalonia.Services.TabularDataPickerService;
 
@@ -26,9 +27,9 @@ public partial class TabularDataPickerView : UserControl
         {
             Command = new DelegateCommand(() =>
             {
-                this.FindControl<TextBox>("SearchBox").Focus();
+                this.GetControl<TextBox>("SearchBox").Focus();
             }),
-            Gesture = new KeyGesture(Key.F, AvaloniaLocator.Current.GetRequiredService<PlatformHotkeyConfiguration>().CommandModifiers)
+            Gesture = new KeyGesture(Key.F, KeyGestures.CommandModifier)
         });
     }
 
@@ -37,9 +38,7 @@ public partial class TabularDataPickerView : UserControl
     {
         if (e.Key == Key.Down)
         {
-            VirtualizedGridView gridView = this.FindControl<VirtualizedGridView>("GridView");
-            if (gridView == null)
-                return;
+            VirtualizedGridView gridView = this.GetControl<VirtualizedGridView>("GridView");
 
             if (gridView.FocusedIndex == null || gridView.FocusedIndex == -1)
             {

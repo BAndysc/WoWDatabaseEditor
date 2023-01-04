@@ -53,7 +53,7 @@ internal class SqlWorkbenchViewModelTests
         windowManager = Substitute.For<IWindowManager>();
         connectionsManager = Substitute.For<IConnectionsManager>();
         confirmationService = Substitute.For<IQueryConfirmationService>();
-        GlobalApplication.InitializeApplication(mainThread, GlobalApplication.AppBackend.Avalonia);
+        GlobalApplication.InitializeApplication(mainThread, GlobalApplication.AppBackend.UnitTests);
 
         synchronizationContext = new ManualSynchronizationContext();
         SynchronizationContext.SetSynchronizationContext(synchronizationContext);

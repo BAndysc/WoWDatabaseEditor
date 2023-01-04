@@ -130,7 +130,7 @@ namespace AvaloniaStyles.Controls
                     for (var i = 0; i < e.OldItems!.Count; ++i)
                     {
                         var index = i + e.OldStartingIndex;
-                        var child = (IControl)e.NewItems![i]!;
+                        var child = (Control)e.NewItems![i]!;
 
                         partPanelContainer!.Children[index] = child;
                         //LogicalChildren[index] = child;
@@ -142,7 +142,7 @@ namespace AvaloniaStyles.Controls
                     throw new NotSupportedException();
             }
             
-            RaisePropertyChanged(StepsCountProperty, Optional<uint>.Empty, (uint)Children.Count);
+            RaisePropertyChanged(StepsCountProperty, (uint)0, (uint)Children.Count);
             InvalidateMeasure();
             UpdateVisibility();
         }
@@ -158,11 +158,11 @@ namespace AvaloniaStyles.Controls
 
         private Panel? partPanelContainer;
 
-        public static readonly AttachedProperty<string> StepTitleProperty = AvaloniaProperty.RegisterAttached<IAvaloniaObject, string>("StepTitle", typeof(WizardPanel));
+        public static readonly AttachedProperty<string> StepTitleProperty = AvaloniaProperty.RegisterAttached<AvaloniaObject, string>("StepTitle", typeof(WizardPanel));
 
-        public static string? GetStepTitle(IAvaloniaObject obj) => obj.GetValue(StepTitleProperty);
+        public static string? GetStepTitle(AvaloniaObject obj) => (string?)obj?.GetValue(StepTitleProperty) ?? "(null)";
 
-        public static void SetStepTitle(IAvaloniaObject obj, string value)
+        public static void SetStepTitle(AvaloniaObject obj, string value)
         {
             obj.SetValue(StepTitleProperty, value);
         }

@@ -58,6 +58,8 @@ public class CustomModuleInitializer : IModuleInitializer
         if (moduleInfo == null)
             throw new ArgumentNullException(nameof(moduleInfo));
 
+        Console.WriteLine("Loading module: " + moduleInfo.ModuleName);
+
         IModule? moduleInstance = null;
         try
         {

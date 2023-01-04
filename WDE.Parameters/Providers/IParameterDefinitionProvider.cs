@@ -35,10 +35,20 @@ namespace WDE.Parameters.Providers
         public ParameterDefinitionProvider(IMessageBoxService service, ICurrentCoreVersion currentCoreVersion)
         {
             var allParameters = new Dictionary<string, ParameterSpecModel>();
-
-            var files = Directory
-                .GetFiles("Parameters/", "*.json", SearchOption.AllDirectories)
-                .OrderBy(GetOrder).ToList();
+            
+            List<string> files;
+            if (OperatingSystem.IsBrowser())
+            {
+                files = new();//
+                Console.WriteLine("Parameters not supported in browser yet.");
+                //throw new PlatformNotSupportedException("Parameters not supported in browser yet.");
+            }
+            else
+            {
+                files = Directory
+                    .GetFiles("Parameters/", "*.json", SearchOption.AllDirectories)
+                    .OrderBy(GetOrder).ToList();   
+            }
 
             var currentCore = currentCoreVersion.Current;
             

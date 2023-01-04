@@ -4,7 +4,7 @@ using Avalonia.Markup.Xaml;
 
 namespace WDE.MapSpawnsEditor.Tools.Views;
 
-public class SpawnGroupPickerView : UserControl
+public partial class SpawnGroupPickerView : UserControl
 {
     public SpawnGroupPickerView()
     {

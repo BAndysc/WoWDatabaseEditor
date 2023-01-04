@@ -1,4 +1,5 @@
 using System;
+using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using AvaloniaEdit.CodeCompletion;
 using AvaloniaEdit.Document;
@@ -16,7 +17,7 @@ public class EditorCompletionData : ICompletionData
         ImageUri = icon;
     }
 
-    public IBitmap? Image => null;
+    public IImage? Image => null;
 
     public string Text { get; }
 

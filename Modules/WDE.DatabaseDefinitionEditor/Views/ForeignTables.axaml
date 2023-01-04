@@ -16,7 +16,7 @@
         <ButtonImage ToolTip.Tip="Delete selected foreign table reference" Image="Icons/icon_delete.png" Command="{CompiledBinding DeleteSelectedForeignTable}" IsEnabled="{CompiledBinding SelectedForeignTable, Converter={x:Static NullConverter.IsNotNull}}" />
       </ToolbarPanel>
             
-      <ListBox dnD:DragAndDrop.IsDropTarget="True" dnD:DragAndDrop.DropHandler="{CompiledBinding }" dnD:DragAndDrop.IsDragSource="True" Items="{CompiledBinding ForeignTables}" SelectedItem="{CompiledBinding SelectedForeignTable}">
+      <ListBox dnD:DragAndDrop.IsDropTarget="True" dnD:DragAndDrop.DropHandler="{CompiledBinding }" dnD:DragAndDrop.IsDragSource="True" ItemsSource="{CompiledBinding ForeignTables}" SelectedItem="{CompiledBinding SelectedForeignTable}">
         <ListBox.KeyBindings>
           <KeyBinding Gesture="Delete" Command="{CompiledBinding DeleteSelectedForeignTable}" />
           <KeyBinding Gesture="Back" Command="{CompiledBinding DeleteSelectedForeignTable}" />
@@ -51,7 +51,7 @@
             <ButtonImage ToolTip.Tip="Delete selected foreign key column" Image="Icons/icon_delete.png" Command="{CompiledBinding DeleteSelectedForeignKey}" IsEnabled="{CompiledBinding SelectedForeignKey, Converter={x:Static NullConverter.IsNotNull}}" />
           </ToolbarPanel>
             
-          <ListBox dnD:DragAndDrop.IsDropTarget="True" dnD:DragAndDrop.DropHandler="{CompiledBinding }" dnD:DragAndDrop.IsDragSource="True" Items="{CompiledBinding ForeignKeys}" SelectedItem="{CompiledBinding SelectedForeignKey}">
+          <ListBox dnD:DragAndDrop.IsDropTarget="True" dnD:DragAndDrop.DropHandler="{CompiledBinding }" dnD:DragAndDrop.IsDragSource="True" ItemsSource="{CompiledBinding ForeignKeys}" SelectedItem="{CompiledBinding SelectedForeignKey}">
             <ListBox.KeyBindings>
               <KeyBinding Gesture="Delete" Command="{CompiledBinding DeleteSelectedForeignKey}" />
               <KeyBinding Gesture="Back" Command="{CompiledBinding DeleteSelectedForeignKey}" />

@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
+using System.Threading.Tasks;
 using WDE.Common.Database;
+using WDE.Common.Modules;
 using WDE.Common.Parameters;
 using WDE.Module.Attributes;
+using WDE.MVVM.Observable;
 using WDE.SmartScriptEditor.Editor;
 
 namespace WDE.SmartScriptEditor.Data
@@ -31,12 +34,10 @@ namespace WDE.SmartScriptEditor.Data
 
         SmartGenericJsonData GetDataByName(SmartType type, string name);
 
-        IEnumerable<SmartGroupsJsonData> GetGroupsData(SmartType type);
+        Task<IReadOnlyList<SmartGroupsJsonData>> GetGroupsData(SmartType type);
 
-        IEnumerable<SmartGenericJsonData> GetAllData(SmartType type);
+        ReactiveProperty<IReadOnlyList<SmartGenericJsonData>> GetAllData(SmartType type);
         
-        void Reload(SmartType smartType);
-
         int MaxId(SmartType type);
 
         SmartGenericJsonData? GetDefaultEvent(SmartScriptType type);
@@ -44,45 +45,40 @@ namespace WDE.SmartScriptEditor.Data
 
     [AutoRegister]
     [SingleInstance]
-    public class SmartDataManager : ISmartDataManager
+    public class SmartDataManager : ISmartDataManager, IGlobalAsyncInitializer
     {
-        private readonly Dictionary<SmartType, Dictionary<int, SmartGenericJsonData>> smartIdData = new()
-        {
-            [SmartType.SmartAction] = new Dictionary<int, SmartGenericJsonData>(),
-            [SmartType.SmartEvent] = new Dictionary<int, SmartGenericJsonData>(),
-            [SmartType.SmartTarget] = new Dictionary<int, SmartGenericJsonData>(),
-            [SmartType.SmartSource] = new Dictionary<int, SmartGenericJsonData>(),
-        };
-
-        private readonly Dictionary<SmartType, Dictionary<string, SmartGenericJsonData>> smartNameData = new()
-        {
-            [SmartType.SmartAction] = new Dictionary<string, SmartGenericJsonData>(),
-            [SmartType.SmartEvent] = new Dictionary<string, SmartGenericJsonData>(),
-            [SmartType.SmartTarget] = new Dictionary<string, SmartGenericJsonData>(),
-            [SmartType.SmartSource] = new Dictionary<string, SmartGenericJsonData>(),
-        };
+        private readonly Dictionary<SmartType, Dictionary<int, SmartGenericJsonData>> smartIdData = new();
+        private readonly Dictionary<SmartType, Dictionary<string, SmartGenericJsonData>> smartNameData = new();
+        private readonly Dictionary<SmartType, ReactiveProperty<IReadOnlyList<SmartGenericJsonData>>> allData = new();
         private readonly Dictionary<(SmartType, SmartScriptType), int> defaults = new();
-        private readonly ISmartDataProvider provider;
+        private readonly ISmartDataProviderAsync provider;
         private readonly IEditorFeatures editorFeatures;
         private readonly IParameterFactory parameterFactory;
 
         private int maxIdEvent, maxIdAction, maxIdTarget;
 
-        public SmartDataManager(ISmartDataProvider provider, 
+        public SmartDataManager(ISmartDataProviderAsync provider, 
             IEditorFeatures editorFeatures,
             IParameterFactory parameterFactory)
         {
-            Load(SmartType.SmartEvent, provider.GetEvents());
-            Load(SmartType.SmartAction, provider.GetActions());
-            Load(SmartType.SmartTarget, provider.GetTargets());
             this.provider = provider;
             this.editorFeatures = editorFeatures;
             this.parameterFactory = parameterFactory;
+            
+            allData[SmartType.SmartAction] = new ReactiveProperty<IReadOnlyList<SmartGenericJsonData>>(new List<SmartGenericJsonData>());
+            allData[SmartType.SmartEvent] = new ReactiveProperty<IReadOnlyList<SmartGenericJsonData>>(new List<SmartGenericJsonData>());
+            allData[SmartType.SmartTarget] = allData[SmartType.SmartSource] = new ReactiveProperty<IReadOnlyList<SmartGenericJsonData>>(new List<SmartGenericJsonData>());
+        }
 
+        public async Task Initialize()
+        {
+            Load(SmartType.SmartEvent, await provider.GetEvents());
+            Load(SmartType.SmartAction, await provider.GetActions());
+            Load(SmartType.SmartTarget, await provider.GetTargets());
             foreach (var (key, value) in smartIdData)
                 RegisterDynamicParameters(key, value.Values);
         }
-        
+
         private void RegisterDynamicParameters(SmartType type, ICollection<SmartGenericJsonData> datas)
         {
             foreach (var data in datas)
@@ -162,31 +158,33 @@ namespace WDE.SmartScriptEditor.Data
             return smartNameData[type][name];
         }
 
-        public IEnumerable<SmartGroupsJsonData> GetGroupsData(SmartType type)
+        public async Task<IReadOnlyList<SmartGroupsJsonData>> GetGroupsData(SmartType type)
         {
             switch(type)
             {
                 case SmartType.SmartEvent:
-                    return provider.GetEventsGroups();
+                    return await provider.GetEventsGroups();
                 case SmartType.SmartAction:
-                    return provider.GetActionsGroups();
+                    return await provider.GetActionsGroups();
                 case SmartType.SmartTarget:
                 case SmartType.SmartSource:
-                    return provider.GetTargetsGroups();
+                    return await provider.GetTargetsGroups();
                 default:
                     return new List<SmartGroupsJsonData>();
             }
         }
 
-        public IEnumerable<SmartGenericJsonData> GetAllData(SmartType type)
+        public ReactiveProperty<IReadOnlyList<SmartGenericJsonData>> GetAllData(SmartType type)
         {
-            return smartIdData[type].Values;
+            return allData[type];
         }
 
         private void Load(SmartType type, IEnumerable<SmartGenericJsonData> data)
         {
+            List<SmartGenericJsonData> list = new List<SmartGenericJsonData>();
             foreach (SmartGenericJsonData d in data)
             {
+                list.Add(d);
                 Add(type, d);
                 if (type == SmartType.SmartEvent)
                     maxIdEvent = Math.Max(maxIdEvent, d.Id);
@@ -195,6 +193,7 @@ namespace WDE.SmartScriptEditor.Data
                 else if (type == SmartType.SmartTarget)
                     maxIdTarget = Math.Max(maxIdTarget, d.Id);
             }
+            allData[type].Value = list;
         }
 
         private void ActualAdd(SmartType type, SmartGenericJsonData data)
@@ -225,32 +224,32 @@ namespace WDE.SmartScriptEditor.Data
         {
             if (type == SmartType.SmartSource)
                 ActualAdd(SmartType.SmartTarget, data);
-            else if (type == SmartType.SmartTarget)
+            else if (type == SmartType.SmartTarget && !data.IsOnlyTarget)
                 ActualAdd(SmartType.SmartSource, data);
 
             ActualAdd(type, data);
         }
 
-        public void Reload(SmartType smartType)
-        {
-            smartIdData.Remove(smartType);
-            smartNameData.Remove(smartType);
-            switch (smartType)
-            {
-                case SmartType.SmartEvent:
-                    Load(smartType, provider.GetEvents());
-                    break;
-                case SmartType.SmartAction:
-                    Load(smartType, provider.GetActions());
-                    break;
-                case SmartType.SmartTarget:
-                case SmartType.SmartSource:
-                    smartIdData.Remove(SmartType.SmartSource);
-                    smartNameData.Remove(SmartType.SmartSource);
-                    Load(smartType, provider.GetTargets());
-                    break;
-            }
-        }
+        //public void Reload(SmartType smartType)
+        // {
+        //     smartIdData.Remove(smartType);
+        //     smartNameData.Remove(smartType);
+        //     switch (smartType)
+        //     {
+        //         case SmartType.SmartEvent:
+        //             Load(smartType, provider.GetEvents());
+        //             break;
+        //         case SmartType.SmartAction:
+        //             Load(smartType, provider.GetActions());
+        //             break;
+        //         case SmartType.SmartTarget:
+        //         case SmartType.SmartSource:
+        //             smartIdData.Remove(SmartType.SmartSource);
+        //             smartNameData.Remove(SmartType.SmartSource);
+        //             Load(smartType, provider.GetTargets());
+        //             break;
+        //     }
+        // }
 
         public int MaxId(SmartType type)
         {

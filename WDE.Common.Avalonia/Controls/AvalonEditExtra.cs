@@ -12,27 +12,27 @@ namespace WDE.Common.Avalonia.Controls
 {
     public class AvalonEditExtra
     {
-        public static readonly AttachedProperty<string> SyntaxProperty = AvaloniaProperty.RegisterAttached<IAvaloniaObject, string>("Syntax", typeof(AvalonEditExtra));
+        public static readonly AttachedProperty<string> SyntaxProperty = AvaloniaProperty.RegisterAttached<AvaloniaObject, string>("Syntax", typeof(AvalonEditExtra));
 
-        public static string GetSyntax(IAvaloniaObject obj)
+        public static string GetSyntax(AvaloniaObject obj)
         {
-            return obj.GetValue(SyntaxProperty);
+            return (string?)obj.GetValue(SyntaxProperty) ?? "";
         }
 
-        public static void SetSyntax(IAvaloniaObject obj, string value)
+        public static void SetSyntax(AvaloniaObject obj, string value)
         {
             obj.SetValue(SyntaxProperty, value);
         }
         
         
-        public static readonly AttachedProperty<string> SyntaxExtensionProperty = AvaloniaProperty.RegisterAttached<IAvaloniaObject, string>("SyntaxExtension", typeof(AvalonEditExtra));
+        public static readonly AttachedProperty<string> SyntaxExtensionProperty = AvaloniaProperty.RegisterAttached<AvaloniaObject, string>("SyntaxExtension", typeof(AvalonEditExtra));
 
-        public static string GetSyntaxExtension(IAvaloniaObject obj)
+        public static string GetSyntaxExtension(AvaloniaObject obj)
         {
-            return obj.GetValue(SyntaxExtensionProperty);
+            return (string?)obj.GetValue(SyntaxExtensionProperty) ?? "";
         }
 
-        public static void SetSyntaxExtension(IAvaloniaObject obj, string value)
+        public static void SetSyntaxExtension(AvaloniaObject obj, string value)
         {
             obj.SetValue(SyntaxExtensionProperty, value);
         }

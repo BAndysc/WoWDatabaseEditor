@@ -1,13 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <RestoreAdditionalProjectSources>
-            https://nuget-feed-all.avaloniaui.net/v3/index.json
-        </RestoreAdditionalProjectSources>
     </PropertyGroup>
 
     <ItemGroup>
@@ -16,11 +13,11 @@
     </ItemGroup>
 
     <Import Project="..\lib3d.props" />
-    
+
     <ItemGroup>
       <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
       <PackageReference Include="SixLabors.ImageSharp" Version="1.0.4" />
-      <PackageReference Include="Avalonia" Version="0.10.999-cibuild0044575-beta" />
+      <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
     </ItemGroup>
 
 </Project>

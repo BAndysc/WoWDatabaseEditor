@@ -6,8 +6,6 @@ using WDE.MVVM.Observable;
 
 namespace WoWDatabaseEditorCore.Services.LoadingEvents
 {
-    [AutoRegister]
-    [SingleInstance]
     public class LoadingEventAggregator : ILoadingEventAggregator
     {
         private HashSet<Type> published = new();

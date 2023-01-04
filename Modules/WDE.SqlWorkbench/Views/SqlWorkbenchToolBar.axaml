@@ -40,7 +40,7 @@
     
     <Border Width="20" />
 
-    <ComboBox Items="{CompiledBinding Limits}" SelectedItem="{CompiledBinding Limit}">
+    <ComboBox ItemsSource="{CompiledBinding Limits}" SelectedItem="{CompiledBinding Limit}">
       <ComboBox.ItemTemplate>
         <DataTemplate>
           <TextBlock Text="{CompiledBinding ., StringFormat=Limit to {0} rows}" />

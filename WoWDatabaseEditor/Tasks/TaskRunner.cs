@@ -41,7 +41,7 @@ namespace WoWDatabaseEditorCore.Tasks
 
         private void AssertMainThread()
         {
-            Debug.Assert(SynchronizationContext.Current != null);
+            //Debug.Assert(SynchronizationContext.Current != null);
         }
 
         private void ScheduleNow(TaskCompletionSource taskCompletionSource, ITask task, ITaskProgress progress)
@@ -189,7 +189,7 @@ namespace WoWDatabaseEditorCore.Tasks
 
             protected void InvokeUpdatedEvent()
             {
-                Debug.Assert(SynchronizationContext.Current != null);
+                //Debug.Assert(SynchronizationContext.Current != null);
                 Updated?.Invoke(this);
             }
         }

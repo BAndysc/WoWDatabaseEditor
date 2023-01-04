@@ -49,7 +49,7 @@ public class AzerothhMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvider<Az
         return Array.Empty<ICreatureTemplateDifficulty>();
     }
 
-    public override async Task<List<IGossipMenuOption>> GetGossipMenuOptionsAsync(uint menuId)
+    public override async Task<IReadOnlyList<IGossipMenuOption>> GetGossipMenuOptionsAsync(uint menuId)
     {
         await using var model = Database();
         return await model.GossipMenuOptions.Where(option => option.MenuId == menuId).ToListAsync<IGossipMenuOption>();
@@ -61,7 +61,7 @@ public class AzerothhMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvider<Az
         return model.GossipMenuOptions.Where(option => option.MenuId == menuId).ToList<IGossipMenuOption>();
     }
 
-    public override async Task<List<IBroadcastText>> GetBroadcastTextsAsync()
+    public override async Task<IReadOnlyList<IBroadcastText>> GetBroadcastTextsAsync()
     {
         await using var model = Database();
         return await (from t in model.BroadcastTexts orderby t.Id select t).ToListAsync<IBroadcastText>();
@@ -90,10 +90,10 @@ public class AzerothhMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvider<Az
         return null;
     }
     
-    public override ICreature? GetCreatureByGuid(uint entry, uint guid)
+    public override async Task<ICreature?> GetCreatureByGuidAsync(uint entry, uint guid)
     {
-        using var model = Database();
-        return model.Creature.FirstOrDefault(c => c.Guid == guid);
+        await using var model = Database();
+        return await model.Creature.FirstOrDefaultAsync(c => c.Guid == guid);
     }
 
     public override IEnumerable<ICreature> GetCreaturesByEntry(uint entry)
@@ -108,19 +108,19 @@ public class AzerothhMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvider<Az
         return model.Creature.OrderBy(t => t.Entry).ToList<ICreature>();
     }
 
-    public override async Task<IList<ICreature>> GetCreaturesByEntryAsync(uint entry)
+    public override async Task<IReadOnlyList<ICreature>> GetCreaturesByEntryAsync(uint entry)
     {
         await using var model = Database();
         return await model.Creature.Where(g => g.Entry == entry).ToListAsync<ICreature>();
     }
 
-    public override async Task<IList<IGameObject>> GetGameObjectsByEntryAsync(uint entry)
+    public override async Task<IReadOnlyList<IGameObject>> GetGameObjectsByEntryAsync(uint entry)
     {
         await using var model = Database();
         return await model.GameObject.Where(g => g.Entry == entry).ToListAsync<IGameObject>();
     }
     
-    public override async Task<IList<ICreature>> GetCreaturesAsync()
+    public override async Task<IReadOnlyList<ICreature>> GetCreaturesAsync()
     {
         await using var model = Database();
         return await model.Creature.OrderBy(t => t.Entry).ToListAsync<ICreature>();
@@ -140,13 +140,13 @@ public class AzerothhMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvider<Az
         return await model.GameObject.Where(c => array.Contains(c.Guid)).ToListAsync<IGameObject>();
     }
 
-    public override async Task<IList<ITrinityString>> GetStringsAsync()
+    public override async Task<IReadOnlyList<ITrinityString>> GetStringsAsync()
     {
         await using var model = Database();
         return await model.Strings.ToListAsync<ITrinityString>();
     }
 
-    public override async Task<IList<IDatabaseSpellDbc>> GetSpellDbcAsync()
+    public override async Task<IReadOnlyList<IDatabaseSpellDbc>> GetSpellDbcAsync()
     {
         await using var model = Database();
         return await model.SpellDbc.ToListAsync<IDatabaseSpellDbc>();
@@ -160,12 +160,12 @@ public class AzerothhMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvider<Az
             .UpdateAsync();
     }
 
-    protected override async Task<ICreature?> GetCreatureByGuid(AzerothDatabase model, uint guid)
+    protected override async Task<ICreature?> GetCreatureByGuidAsync(AzerothDatabase model, uint guid)
     {
         return await model.Creature.FirstOrDefaultAsync(e => e.Guid == guid);
     }
     
-    public override async Task<IList<IGameObject>> GetGameObjectsAsync()
+    public override async Task<IReadOnlyList<IGameObject>> GetGameObjectsAsync()
     {
         await using var model = Database();
         return await model.GameObject.ToListAsync<IGameObject>();
@@ -175,12 +175,6 @@ public class AzerothhMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvider<Az
     {
         using var model = Database();
         return model.GameObject.ToList<IGameObject>();
-    }
-    
-    public override IGameObject? GetGameObjectByGuid(uint entry, uint guid)
-    {
-        using var model = Database();
-        return model.GameObject.FirstOrDefault(g => g.Guid == guid);
     }
 
     public override IEnumerable<IGameObject> GetGameObjectsByEntry(uint entry)
@@ -194,31 +188,31 @@ public class AzerothhMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvider<Az
         return model.GameObject.FirstOrDefaultAsync<IGameObject>(g => g.Guid == guid);
     }
     
-    public override async Task<IList<ICreature>> GetCreaturesByMapAsync(uint map)
+    public override async Task<IReadOnlyList<ICreature>> GetCreaturesByMapAsync(uint map)
     {
         await using var model = Database();
         return await model.Creature.Where(c => c.Map == map).ToListAsync<ICreature>();
     }
 
-    public override async Task<IList<IGameObject>> GetGameObjectsByMapAsync(uint map)
+    public override async Task<IReadOnlyList<IGameObject>> GetGameObjectsByMapAsync(uint map)
     {
         await using var model = Database();
         return await model.GameObject.Where(c => c.Map == map).ToListAsync<IGameObject>();
     }
 
-    public override async Task<IList<IItem>?> GetItemTemplatesAsync()
+    public override async Task<IReadOnlyList<IItem>?> GetItemTemplatesAsync()
     {
         await using var model = Database();
         return await model.ItemTemplate.ToListAsync<IItem>();
     }
     
-    public override async Task<IList<ICreatureModelInfo>> GetCreatureModelInfoAsync()
+    public override async Task<IReadOnlyList<ICreatureModelInfo>> GetCreatureModelInfoAsync()
     {
         await using var model = Database();
         return await model.CreatureModelInfo.ToListAsync<ICreatureModelInfo>();
     }
 
-    public override ICreatureModelInfo? GetCreatureModelInfo(uint displayId)
+    public override async Task<ICreatureModelInfo?> GetCreatureModelInfo(uint displayId)
     {
         using var model = Database();
         return model.CreatureModelInfo.FirstOrDefault(x => x.DisplayId == displayId);
@@ -236,13 +230,13 @@ public class AzerothhMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvider<Az
         return await model.Creature.FirstOrDefaultAsync(x => x.Guid == guid);
     }
     
-    public override async Task<IList<ICreatureAddon>> GetCreatureAddons()
+    public override async Task<IReadOnlyList<ICreatureAddon>> GetCreatureAddons()
     {
         await using var model = Database();
         return await model.CreatureAddon.ToListAsync<ICreatureAddon>();
     }
 
-    public override async Task<IList<ICreatureTemplateAddon>> GetCreatureTemplateAddons()
+    public override async Task<IReadOnlyList<ICreatureTemplateAddon>> GetCreatureTemplateAddons()
     {
         await using var model = Database();
         return await model.CreatureTemplateAddon.ToListAsync<ICreatureTemplateAddon>();
@@ -276,7 +270,7 @@ public class AzerothhMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvider<Az
         return GetQuestsQuery(model).ToList<IQuestTemplate>();
     }
 
-    public override async Task<List<IQuestTemplate>> GetQuestTemplatesAsync()
+    public override async Task<IReadOnlyList<IQuestTemplate>> GetQuestTemplatesAsync()
     {
         await using var model = Database();
         return await GetQuestsQuery(model).ToListAsync<IQuestTemplate>();
@@ -289,7 +283,7 @@ public class AzerothhMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvider<Az
         return model.QuestTemplate.FirstOrDefault(q => q.Entry == entry)?.SetAddon(addon);
     }
     
-    public override async Task<List<IEventScriptLine>> GetEventScript(EventScriptType type, uint id)
+    public override async Task<IReadOnlyList<IEventScriptLine>> GetEventScript(EventScriptType type, uint id)
     {
         await using var model = Database();
         switch (type)
@@ -310,7 +304,7 @@ public class AzerothhMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvider<Az
         }
     }
     
-    public override async Task<List<IEventScriptLine>> FindEventScriptLinesBy(IReadOnlyList<(uint command, int dataIndex, long valueToSearch)> conditions)
+    public override async Task<IReadOnlyList<IEventScriptLine>> FindEventScriptLinesBy(IReadOnlyList<(uint command, int dataIndex, long valueToSearch)> conditions)
     {
         await using var model = Database();
         var events = await model.EventScripts.Where(GenerateWhereConditionsForEventScript<MySqlEventScriptNoCommentLine>(conditions)).ToListAsync<IEventScriptLine>();
@@ -325,13 +319,13 @@ public class AzerothhMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvider<Az
         return model.SmartScript.Where(line => line.EntryOrGuid == entryOrGuid && line.ScriptSourceType == (int) type).ToList();
     }
     
-    public override async Task<IList<ISmartScriptLine>> GetScriptForAsync(uint entry, int entryOrGuid, SmartScriptType type)
+    public override async Task<IReadOnlyList<ISmartScriptLine>> GetScriptForAsync(uint entry, int entryOrGuid, SmartScriptType type)
     {
         await using var model = Database();
         return await model.SmartScript.Where(line => line.EntryOrGuid == entryOrGuid && line.ScriptSourceType == (int) type).ToListAsync<ISmartScriptLine>();
     }
 
-    public override async Task<IList<ISmartScriptLine>> FindSmartScriptLinesBy(IEnumerable<(IDatabaseProvider.SmartLinePropertyType what, int whatValue, int parameterIndex, long valueToSearch)> conditions)
+    public override async Task<IReadOnlyList<ISmartScriptLine>> FindSmartScriptLinesBy(IEnumerable<(IDatabaseProvider.SmartLinePropertyType what, int whatValue, int parameterIndex, long valueToSearch)> conditions)
     {
         await using var model = Database();
         var predicate = PredicateBuilder.New<AzerothMySqlSmartScriptLine>();

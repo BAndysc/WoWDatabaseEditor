@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using LinqKit;
@@ -9,8 +8,6 @@ using LinqToDB.Data;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;
 using WDE.Common.DBC;
-using WDE.MySqlDatabaseCommon.CommonModels;
-using WDE.MySqlDatabaseCommon.Database;
 using WDE.MySqlDatabaseCommon.Database.World;
 using WDE.MySqlDatabaseCommon.Providers;
 using WDE.MySqlDatabaseCommon.Services;
@@ -40,7 +37,7 @@ namespace WDE.TrinityMySqlDatabase.Database
 
         protected T Database() => new();
         
-        public async Task<List<ICreatureText>> GetCreatureTextsByEntryAsync(uint entry)
+        public async Task<IReadOnlyList<ICreatureText>> GetCreatureTextsByEntryAsync(uint entry)
         {
             await using var model = Database();
             return await model.CreatureTexts.Where(t => t.CreatureId == entry)
@@ -58,7 +55,7 @@ namespace WDE.TrinityMySqlDatabase.Database
                 .ToList<ICreatureText>();
         }
         
-        public async Task<IList<ISmartScriptLine>> GetLinesCallingSmartTimedActionList(int timedActionList)
+        public async Task<IReadOnlyList<ISmartScriptLine>> GetLinesCallingSmartTimedActionList(int timedActionList)
         {
             await using var model = Database();
             return await model.BaseSmartScript.Where(line =>
@@ -81,9 +78,9 @@ namespace WDE.TrinityMySqlDatabase.Database
 
         public abstract IEnumerable<ISmartScriptLine> GetScriptFor(uint entry, int entryOrGuid, SmartScriptType type);
 
-        public abstract Task<IList<ISmartScriptLine>> GetScriptForAsync(uint entry, int entryOrGuid, SmartScriptType type);
+        public abstract Task<IReadOnlyList<ISmartScriptLine>> GetScriptForAsync(uint entry, int entryOrGuid, SmartScriptType type);
 
-        public abstract Task<IList<ISmartScriptLine>> FindSmartScriptLinesBy(IEnumerable<(IDatabaseProvider.SmartLinePropertyType what, int whatValue, int parameterIndex, long valueToSearch)> conditions);
+        public abstract Task<IReadOnlyList<ISmartScriptLine>> FindSmartScriptLinesBy(IEnumerable<(IDatabaseProvider.SmartLinePropertyType what, int whatValue, int parameterIndex, long valueToSearch)> conditions);
         
         public async Task<IQuestRequestItem?> GetQuestRequestItem(uint entry)
         {
@@ -97,7 +94,7 @@ namespace WDE.TrinityMySqlDatabase.Database
             return (from t in model.GameEvents orderby t.Entry select t).ToList<IGameEvent>();
         }
         
-        public async Task<List<IGameEvent>> GetGameEventsAsync()
+        public async Task<IReadOnlyList<IGameEvent>> GetGameEventsAsync()
         {
             await using var model = Database();
             return await (from t in model.GameEvents orderby t.Entry select t).ToListAsync<IGameEvent>();
@@ -105,7 +102,7 @@ namespace WDE.TrinityMySqlDatabase.Database
         
         public IEnumerable<IConversationTemplate> GetConversationTemplates()
         {
-            if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(IConversationTemplate)))
+            if (!Supports<IConversationTemplate>())
                 return new List<IConversationTemplate>();
             
             using var model = Database();
@@ -114,11 +111,11 @@ namespace WDE.TrinityMySqlDatabase.Database
 
         public abstract void ConnectOrThrow();
         public abstract Task<IReadOnlyList<ICreatureTemplate>> GetCreatureTemplatesAsync();
-        public abstract Task<IList<ICreature>> GetCreaturesAsync();
+        public abstract Task<IReadOnlyList<ICreature>> GetCreaturesAsync();
 
-        public async Task<List<IConversationTemplate>> GetConversationTemplatesAsync()
+        public async Task<IReadOnlyList<IConversationTemplate>> GetConversationTemplatesAsync()
         {
-            if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(IConversationTemplate)))
+            if (!Supports<IConversationTemplate>())
                 return new List<IConversationTemplate>();
             
             await using var model = Database();
@@ -130,7 +127,7 @@ namespace WDE.TrinityMySqlDatabase.Database
             using var model = Database();
 
             List<MySqlGossipMenuLine> gossips;
-            if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(INpcText)))
+            if (!Supports<INpcText>())
             {
                 gossips = model.GossipMenus.ToList();
             }
@@ -147,12 +144,12 @@ namespace WDE.TrinityMySqlDatabase.Database
                 .ToList<IGossipMenu>();
         }
         
-        public async Task<List<IGossipMenu>> GetGossipMenusAsync()
+        public async Task<IReadOnlyList<IGossipMenu>> GetGossipMenusAsync()
         {
             await using var model = Database();
 
             List<MySqlGossipMenuLine> gossips;
-            if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(INpcText)))
+            if (!Supports<INpcText>())
             {
                 gossips = await model.GossipMenus.ToListAsync();
             }
@@ -174,7 +171,7 @@ namespace WDE.TrinityMySqlDatabase.Database
             await using var model = Database();
 
             List<MySqlGossipMenuLine> gossips;
-            if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(INpcText)))
+            if (!Supports<INpcText>())
             {
                 gossips = await model.GossipMenus.Where(g => g.MenuId == menuId).ToListAsync();
             }
@@ -193,30 +190,30 @@ namespace WDE.TrinityMySqlDatabase.Database
             return new MySqlGossipMenu(menuId, gossips.Where(t => t.Text != null).Select(t => t.Text!).ToList());
         }
 
-        public abstract Task<List<IGossipMenuOption>> GetGossipMenuOptionsAsync(uint menuId);
+        public abstract Task<IReadOnlyList<IGossipMenuOption>> GetGossipMenuOptionsAsync(uint menuId);
         public abstract List<IGossipMenuOption> GetGossipMenuOptions(uint menuId);
 
-        public INpcText? GetNpcText(uint entry)
+        public async Task<INpcText?> GetNpcText(uint entry)
         {
-            if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(INpcText)))
+            if (!Supports<INpcText>())
                 return null;
-            
-            using var model = Database();
-            return model.NpcTexts.FirstOrDefault(text => text.Id == entry);
+
+            await using var model = Database();
+            return await model.NpcTexts.FirstOrDefaultAsync(text => text.Id == entry);
         }
 
         public IEnumerable<INpcText> GetNpcTexts()
         {
-            if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(INpcText)))
+            if (!Supports<INpcText>())
                 return new List<INpcText>();
             
             using var model = Database();
             return (from t in model.NpcTexts orderby t.Id select t).ToList<INpcText>();
         }
 
-        public async Task<List<INpcText>> GetNpcTextsAsync()
+        public async Task<IReadOnlyList<INpcText>> GetNpcTextsAsync()
         {
-            if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(INpcText)))
+            if (!Supports<INpcText>())
                 return new List<INpcText>();
             
             await using var model = Database();
@@ -236,36 +233,36 @@ namespace WDE.TrinityMySqlDatabase.Database
 
         public IEnumerable<IAreaTriggerTemplate> GetAreaTriggerTemplates()
         {
-            if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(IAreaTriggerTemplate)))
+            if (!Supports<IAreaTriggerTemplate>())
                 return new List<IAreaTriggerTemplate>();
 
             using var model = Database();
             return (from t in model.AreaTriggerTemplate orderby t.Id select t).ToList<IAreaTriggerTemplate>();
         }
         
-        public async Task<List<ICreatureClassLevelStat>> GetCreatureClassLevelStatsAsync()
+        public async Task<IReadOnlyList<ICreatureClassLevelStat>> GetCreatureClassLevelStatsAsync()
         {
-            if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(ICreatureClassLevelStat)))
+            if (!Supports<ICreatureClassLevelStat>())
                 return new List<ICreatureClassLevelStat>();
 
             await using var model = Database();
             return await (from t in model.CreatureClassLevelStats select t).ToListAsync<ICreatureClassLevelStat>();
         }
 
-        public abstract Task<List<IBroadcastText>> GetBroadcastTextsAsync();
+        public abstract Task<IReadOnlyList<IBroadcastText>> GetBroadcastTextsAsync();
         
         public IEnumerable<ICreatureClassLevelStat> GetCreatureClassLevelStats()
         {
-            if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(ICreatureClassLevelStat)))
+            if (!Supports<ICreatureClassLevelStat>())
                 return Enumerable.Empty<ICreatureClassLevelStat>();
 
             using var model = Database();
             return (from t in model.CreatureClassLevelStats select t).ToList<ICreatureClassLevelStat>();
         }
 
-        public async Task<IList<IAreaTriggerTemplate>> GetAreaTriggerTemplatesAsync()
+        public async Task<IReadOnlyList<IAreaTriggerTemplate>> GetAreaTriggerTemplatesAsync()
         {
-            if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(IAreaTriggerTemplate)))
+            if (!Supports<IAreaTriggerTemplate>())
                 return new List<IAreaTriggerTemplate>();
 
             await using var model = Database();
@@ -278,13 +275,13 @@ namespace WDE.TrinityMySqlDatabase.Database
             return (from t in model.GameObjectTemplate orderby t.Entry select t).ToList<IGameObjectTemplate>();
         }
         
-        public async Task<List<IGameObjectTemplate>> GetGameObjectTemplatesAsync()
+        public async Task<IReadOnlyList<IGameObjectTemplate>> GetGameObjectTemplatesAsync()
         {
             await using var model = Database();
             return await (from t in model.GameObjectTemplate orderby t.Entry select t).ToListAsync<IGameObjectTemplate>();
         }
 
-        public abstract Task<IList<IGameObject>> GetGameObjectsAsync();
+        public abstract Task<IReadOnlyList<IGameObject>> GetGameObjectsAsync();
         public abstract Task<IReadOnlyList<ICreature>> GetCreaturesAsync(IEnumerable<SpawnKey> guids);
         public abstract Task<IReadOnlyList<IGameObject>> GetGameObjectsAsync(IEnumerable<SpawnKey> guids);
 
@@ -296,7 +293,7 @@ namespace WDE.TrinityMySqlDatabase.Database
         
         public virtual async Task<IQuestObjective?> GetQuestObjectiveById(uint objectiveId) => null;
         
-        public abstract Task<List<IQuestTemplate>> GetQuestTemplatesAsync();
+        public abstract Task<IReadOnlyList<IQuestTemplate>> GetQuestTemplatesAsync();
 
         public abstract Task<IQuestTemplate?> GetQuestTemplate(uint entry);
 
@@ -306,20 +303,20 @@ namespace WDE.TrinityMySqlDatabase.Database
             return model.GameObjectTemplate.FirstOrDefault(g => g.Entry == entry);
         }
 
-        protected abstract Task<ICreature?> GetCreatureByGuid(T model, uint guid);
+        protected abstract Task<ICreature?> GetCreatureByGuidAsync(T model, uint guid);
         protected abstract Task<IGameObject?> GetGameObjectByGuidAsync(T model, uint guid);
         protected abstract Task SetCreatureTemplateAI(T model, uint entry, string ainame, string scriptname);
 
-        public virtual IEnumerable<IConditionLine> GetConditionsFor(int sourceType, int sourceEntry, int sourceId)
+        public virtual async Task<IReadOnlyList<IConditionLine>> GetConditionsForAsync(int sourceType, int sourceEntry, int sourceId)
         {
-            using var model = Database();
+            await using var model = Database();
 
-            return model.Conditions.Where(line =>
+            return await model.Conditions.Where(line =>
                     line.SourceType == sourceType && line.SourceEntry == sourceEntry && line.SourceId == sourceId)
-                .ToList();
+                .ToListAsync<IConditionLine>();
         }
 
-        public virtual async Task<IList<IConditionLine>> GetConditionsForAsync(IDatabaseProvider.ConditionKeyMask keyMask, IDatabaseProvider.ConditionKey key)
+        public virtual async Task<IReadOnlyList<IConditionLine>> GetConditionsForAsync(IDatabaseProvider.ConditionKeyMask keyMask, IDatabaseProvider.ConditionKey key)
         {
             await using var model = Database();
 
@@ -330,7 +327,7 @@ namespace WDE.TrinityMySqlDatabase.Database
                 .ToListAsync<IConditionLine>();
         }
 
-        public virtual async Task<IList<IConditionLine>> GetConditionsForAsync(IDatabaseProvider.ConditionKeyMask keyMask, ICollection<IDatabaseProvider.ConditionKey> manualKeys)
+        public virtual async Task<IReadOnlyList<IConditionLine>> GetConditionsForAsync(IDatabaseProvider.ConditionKeyMask keyMask, ICollection<IDatabaseProvider.ConditionKey> manualKeys)
         {
             if (manualKeys.Count == 0)
                 return new List<IConditionLine>();
@@ -347,46 +344,46 @@ namespace WDE.TrinityMySqlDatabase.Database
             return await model.Conditions.Where(predicate).ToListAsync<IConditionLine>();
         }
         
-        public virtual async Task<IList<IPlayerChoice>?> GetPlayerChoicesAsync() => null;
+        public virtual async Task<IReadOnlyList<IPlayerChoice>?> GetPlayerChoicesAsync() => null;
 
-        public virtual async Task<IList<IPlayerChoiceResponse>?> GetPlayerChoiceResponsesAsync() => null;
+        public virtual async Task<IReadOnlyList<IPlayerChoiceResponse>?> GetPlayerChoiceResponsesAsync() => null;
 
-        public virtual async Task<IList<IPlayerChoiceResponse>?> GetPlayerChoiceResponsesAsync(int choiceId) => null;
+        public virtual async Task<IReadOnlyList<IPlayerChoiceResponse>?> GetPlayerChoiceResponsesAsync(int choiceId) => null;
 
-        public IEnumerable<ISpellScriptName> GetSpellScriptNames(int spellId)
+        public async Task<IReadOnlyList<ISpellScriptName>> GetSpellScriptNames(int spellId)
         {
-            using var model = Database();
-            return model.SpellScriptNames.Where(spell => spell.SpellId == spellId).ToList();
+            await using var model = Database();
+            return await model.SpellScriptNames.Where(spell => spell.SpellId == spellId).ToListAsync();
         }
 
         public abstract Task<IBroadcastTextLocale?> GetBroadcastTextLocaleByTextAsync(string text);
 
-        public abstract ICreature? GetCreatureByGuid(uint entry, uint guid);
+        public abstract Task<ICreature?> GetCreatureByGuidAsync(uint entry, uint guid);
 
-        public abstract IGameObject? GetGameObjectByGuid(uint entry, uint guid);
+        public abstract Task<IGameObject?> GetGameObjectByGuidAsync(uint entry, uint guid);
 
         public abstract IEnumerable<IGameObject> GetGameObjectsByEntry(uint entry);
-        public abstract Task<IList<ICreature>> GetCreaturesByEntryAsync(uint entry);
-        public abstract Task<IList<IGameObject>> GetGameObjectsByEntryAsync(uint entry);
+        public abstract Task<IReadOnlyList<ICreature>> GetCreaturesByEntryAsync(uint entry);
+        public abstract Task<IReadOnlyList<IGameObject>> GetGameObjectsByEntryAsync(uint entry);
 
         public abstract IEnumerable<ICreature> GetCreaturesByEntry(uint entry);
 
 
         public abstract IReadOnlyList<ICreature> GetCreatures();
-        public abstract Task<IList<ICreature>> GetCreaturesByMapAsync(uint map);
-        public abstract Task<IList<IGameObject>> GetGameObjectsByMapAsync(uint map);
+        public abstract Task<IReadOnlyList<ICreature>> GetCreaturesByMapAsync(uint map);
+        public abstract Task<IReadOnlyList<IGameObject>> GetGameObjectsByMapAsync(uint map);
         public abstract IEnumerable<IGameObject> GetGameObjects();
 
-        public IEnumerable<ICoreCommandHelp> GetCommands()
+        public async Task<IReadOnlyList<ICoreCommandHelp>> GetCommands()
         {
             using var model = Database();
             return model.Commands.ToList();
         }
 
-        public abstract Task<IList<ITrinityString>> GetStringsAsync();
-        public abstract Task<IList<IDatabaseSpellDbc>> GetSpellDbcAsync();
+        public abstract Task<IReadOnlyList<ITrinityString>> GetStringsAsync();
+        public abstract Task<IReadOnlyList<IDatabaseSpellDbc>> GetSpellDbcAsync();
 
-        public async Task<List<IPointOfInterest>> GetPointsOfInterestsAsync()
+        public async Task<IReadOnlyList<IPointOfInterest>> GetPointsOfInterestsAsync()
         {
             if (!Supports<IPointOfInterest>())
                 return new List<IPointOfInterest>();
@@ -401,7 +398,7 @@ namespace WDE.TrinityMySqlDatabase.Database
         public abstract Task<IBroadcastText?> GetBroadcastTextByTextAsync(string text);
         public abstract Task<IBroadcastText?> GetBroadcastTextByIdAsync(uint id);
 
-        public virtual Task<IList<IItem>?> GetItemTemplatesAsync() => Task.FromResult<IList<IItem>?>(null);
+        public virtual Task<IReadOnlyList<IItem>?> GetItemTemplatesAsync() => Task.FromResult<IReadOnlyList<IItem>?>(null);
 
         protected ExpressionStarter<T> GenerateWhereConditionsForEventScript<T>(IEnumerable<(uint command, int dataIndex, long valueToSearch)> conditions) where T : IEventScriptLine
         {
@@ -418,13 +415,13 @@ namespace WDE.TrinityMySqlDatabase.Database
             return predicate;
         }
 
-        public abstract Task<List<IEventScriptLine>> FindEventScriptLinesBy(IReadOnlyList<(uint command, int dataIndex, long valueToSearch)> conditions);
+        public abstract Task<IReadOnlyList<IEventScriptLine>> FindEventScriptLinesBy(IReadOnlyList<(uint command, int dataIndex, long valueToSearch)> conditions);
 
-        public abstract Task<IList<ICreatureModelInfo>> GetCreatureModelInfoAsync();
+        public abstract Task<IReadOnlyList<ICreatureModelInfo>> GetCreatureModelInfoAsync();
 
-        public abstract ICreatureModelInfo? GetCreatureModelInfo(uint displayId);
+        public abstract Task<ICreatureModelInfo?> GetCreatureModelInfo(uint displayId);
 
-        public abstract Task<List<IEventScriptLine>> GetEventScript(EventScriptType type, uint id);
+        public abstract Task<IReadOnlyList<IEventScriptLine>> GetEventScript(EventScriptType type, uint id);
 
         public ISceneTemplate? GetSceneTemplate(uint sceneId)
         {
@@ -442,7 +439,7 @@ namespace WDE.TrinityMySqlDatabase.Database
             return await model.SceneTemplates.FirstOrDefaultAsync(x => x.SceneId == sceneId);
         }
 
-        public async Task<IList<ISceneTemplate>?> GetSceneTemplatesAsync()
+        public async Task<IReadOnlyList<ISceneTemplate>?> GetSceneTemplatesAsync()
         {
             if (!Supports<ISceneTemplate>())
                 return null; 
@@ -452,7 +449,7 @@ namespace WDE.TrinityMySqlDatabase.Database
 
         public virtual async Task<IPhaseName?> GetPhaseNameAsync(uint phaseId) => null;
 
-        public virtual async Task<IList<IPhaseName>?> GetPhaseNamesAsync() => null;
+        public virtual async Task<IReadOnlyList<IPhaseName>?> GetPhaseNamesAsync() => null;
         
         public async Task<IReadOnlyList<INpcSpellClickSpell>> GetNpcSpellClickSpells(uint creatureId)
         {
@@ -461,9 +458,9 @@ namespace WDE.TrinityMySqlDatabase.Database
 
         public virtual IList<IPhaseName>? GetPhaseNames() => null;
         
-        public abstract Task<IList<ICreatureAddon>> GetCreatureAddons();
+        public abstract Task<IReadOnlyList<ICreatureAddon>> GetCreatureAddons();
 
-        public abstract Task<IList<ICreatureTemplateAddon>> GetCreatureTemplateAddons();
+        public abstract Task<IReadOnlyList<ICreatureTemplateAddon>> GetCreatureTemplateAddons();
 
         public abstract Task<ICreatureAddon?> GetCreatureAddon(uint entry, uint guid);
 
@@ -491,45 +488,43 @@ namespace WDE.TrinityMySqlDatabase.Database
 
         public async Task<IMangosWaypointsPathName?> GetMangosPathName(uint pathId) => null;
 
-        public async Task<IList<ICreatureEquipmentTemplate>?> GetCreatureEquipmentTemplates()
+        public async Task<IReadOnlyList<ICreatureEquipmentTemplate>?> GetCreatureEquipmentTemplates()
         {
             await using var model = Database();
             return await model.EquipmentTemplate.ToListAsync<ICreatureEquipmentTemplate>();
         }
 
-        public async Task<IList<IGameEventCreature>> GetGameEventCreaturesAsync()
+        public async Task<IReadOnlyList<IGameEventCreature>> GetGameEventCreaturesAsync()
         {
             await using var model = Database();
             return await model.GameEventCreature.ToListAsync<IGameEventCreature>();
         }
 
-        public async Task<IList<IGameEventGameObject>> GetGameEventGameObjectsAsync()
+        public async Task<IReadOnlyList<IGameEventGameObject>> GetGameEventGameObjectsAsync()
         {
             await using var model = Database();
             return await model.GameEventGameObject.ToListAsync<IGameEventGameObject>();
         }
 
-        public async Task<IList<IGameEventCreature>?> GetGameEventCreaturesByGuidAsync(uint entry, uint guid)
+        public async Task<IReadOnlyList<IGameEventCreature>?> GetGameEventCreaturesByGuidAsync(uint entry, uint guid)
         {
             await using var model = Database();
             return await model.GameEventCreature.Where(x => x.Guid == guid).ToListAsync<IGameEventCreature>();
         }
 
-        public async Task<IList<IGameEventGameObject>?> GetGameEventGameObjectsByGuidAsync(uint entry, uint guid)
+        public async Task<IReadOnlyList<IGameEventGameObject>?> GetGameEventGameObjectsByGuidAsync(uint entry, uint guid)
         {
             await using var model = Database();
             return await model.GameEventGameObject.Where(x => x.Guid == guid).ToListAsync<IGameEventGameObject>();
         }
 
-        public async Task<IList<ICreatureEquipmentTemplate>?> GetCreatureEquipmentTemplates(uint entry)
+        public async Task<IReadOnlyList<ICreatureEquipmentTemplate>?> GetCreatureEquipmentTemplates(uint entry)
         {
             await using var model = Database();
             return await model.EquipmentTemplate.Where(x => x.Entry == entry).ToListAsync<ICreatureEquipmentTemplate>();
         }
 
-        public async Task<IList<IMangosCreatureEquipmentTemplate>?> GetMangosCreatureEquipmentTemplates() => null;
-
-        public abstract Task<IGameObject?> GetGameObjectByGuidAsync(uint entry, uint guid);
+        public async Task<IReadOnlyList<IMangosCreatureEquipmentTemplate>?> GetMangosCreatureEquipmentTemplates() => null;
 
         public abstract Task<ICreature?> GetCreaturesByGuidAsync(uint entry, uint guid);
 
@@ -552,7 +547,7 @@ namespace WDE.TrinityMySqlDatabase.Database
         }
 
         
-        public async Task<IList<ISpawnGroupTemplate>> GetSpawnGroupTemplatesAsync()
+        public async Task<IReadOnlyList<ISpawnGroupTemplate>> GetSpawnGroupTemplatesAsync()
         {
             if (!Supports<ISpawnGroupTemplate>())
                 return new List<ISpawnGroupTemplate>();
@@ -560,7 +555,7 @@ namespace WDE.TrinityMySqlDatabase.Database
             return await model.SpawnGroupTemplate.ToListAsync<ISpawnGroupTemplate>();
         }
     
-        public async Task<IList<ISpawnGroupSpawn>> GetSpawnGroupSpawnsAsync()
+        public async Task<IReadOnlyList<ISpawnGroupSpawn>> GetSpawnGroupSpawnsAsync()
         {
             if (!Supports<ISpawnGroupSpawn>())
                 return new List<ISpawnGroupSpawn>();
@@ -585,7 +580,7 @@ namespace WDE.TrinityMySqlDatabase.Database
         }
         
         public async Task<ISpawnGroupFormation?> GetSpawnGroupFormation(uint id) => null;
-        public async Task<IList<ISpawnGroupFormation>?> GetSpawnGroupFormations() => null;
+        public async Task<IReadOnlyList<ISpawnGroupFormation>?> GetSpawnGroupFormations() => null;
         
         public virtual async Task<IReadOnlyList<ILootEntry>> GetLoot(LootSourceType type)
         {

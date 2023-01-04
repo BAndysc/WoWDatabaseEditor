@@ -17,10 +17,10 @@ public class LostFocusUpdateBindingBehavior : Behavior<TextBox>
         });
     }
     
-    public static readonly StyledProperty<string> TextProperty = AvaloniaProperty.Register<LostFocusUpdateBindingBehavior, string>(
+    public static readonly StyledProperty<string?> TextProperty = AvaloniaProperty.Register<LostFocusUpdateBindingBehavior, string?>(
         nameof(Text), defaultBindingMode: BindingMode.TwoWay);
 
-    public string Text
+    public string? Text
     {
         get => GetValue(TextProperty);
         set => SetValue(TextProperty, value);
@@ -64,10 +64,10 @@ public class NumericUpDownLostFocusUpdateBindingBehavior : Behavior<NumericUpDow
         });
     }
     
-    public static readonly StyledProperty<double> ValueProperty = AvaloniaProperty.Register<NumericUpDownLostFocusUpdateBindingBehavior, double>(
+    public static readonly StyledProperty<decimal?> ValueProperty = AvaloniaProperty.Register<NumericUpDownLostFocusUpdateBindingBehavior, decimal?>(
         nameof(Value), defaultBindingMode: BindingMode.TwoWay);
 
-    public double Value
+    public decimal? Value
     {
         get => GetValue(ValueProperty);
         set => SetValue(ValueProperty, value);

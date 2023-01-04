@@ -1,0 +1,79 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
+             xmlns:demo="clr-namespace:AvaloniaStyles.Demo"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="AvaloniaStyles.Demo.MainView">
+    <ScrollViewer Margin="10" Background="{DynamicResource MainColorBackground}">
+        <StackPanel Spacing="10" Orientation="Vertical" Background="Transparent">
+            
+            <Border BorderThickness="1" BorderBrush="Black">
+                <Grid ColumnDefinitions="100,5,20">
+                    <ToolbarControl>
+                        <Button>A</Button>
+                        <Button>B</Button>
+                        <Button>C</Button>
+                        <Button>D</Button>
+                        <Button>E</Button>
+                        <Button>F</Button>
+                        <Button>G</Button>
+                        <Button>H</Button>
+                        <Button>I</Button>
+                        <Button>K</Button>
+                    </ToolbarControl>
+                    <GridSplitter Grid.Column="1" />
+                    <Border Grid.Column="2" />
+                </Grid>
+            </Border>
+            
+            <CompletionComboBox SelectedItem="{Binding EnumValue, Mode=TwoWay}" controls:Extensions.EnumType="{x:Type demo:ExampleEnum}" />
+            <Button>Button</Button>
+            <Button IsEnabled="False">Disabled button</Button>
+            <CheckBox>Checkbox</CheckBox>
+            <CheckBox IsChecked="True">Checked</CheckBox>
+            <CheckBox IsChecked="{x:Null}">Indetermine</CheckBox>
+            <RadioButton>Radio</RadioButton>
+            <RadioButton IsChecked="True">Checked radio</RadioButton>
+            <TextBox Watermark="Textbox" />
+            <ComboBox ItemsSource="{Binding Themes}" SelectedItem="{Binding CurrentTheme, Mode=TwoWay}" />
+            <TabControl>
+                <TabItem Header="Main">
+                    <Button>Tab a</Button>
+                </TabItem>
+                <TabItem Header="Edit">
+                    <TextBlock>Tab b</TextBlock>
+                </TabItem>
+                <TabItem Header="More">
+                    <TextBox Text="Tab c" />
+                </TabItem>
+            </TabControl>
+            <ListBox>
+                <ListBoxItem>A</ListBoxItem>
+                <ListBoxItem>B</ListBoxItem>
+                <ListBoxItem>C</ListBoxItem>
+                <ListBoxItem>D</ListBoxItem>
+            </ListBox>
+            <GridView Items="{Binding Items}">
+                <GridView.Columns>
+                    <GridColumnDefinition Name="Bool" Property="Bool" Checkable="True" />
+                    <GridColumnDefinition Name="Name" Property="Name" />
+                    <GridColumnDefinition Name="Number" Property="Number" />
+                </GridView.Columns>
+            </GridView>
+            <GridView Items="{Binding Items}">
+                <GridView.Columns>
+                    <GridColumnDefinition Name="Name" Property="Name" />
+                    <GridColumnDefinition Name="Number" Property="Number" />
+                </GridView.Columns>
+            </GridView>
+            <DataGrid AutoGenerateColumns="True" 
+                      CanUserResizeColumns="True"
+                      SelectionMode="Extended"
+                      ItemsSource="{Binding Items}">
+            </DataGrid>
+            <Button Click="ShowDemoDialog">Show Modal Dialog</Button>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

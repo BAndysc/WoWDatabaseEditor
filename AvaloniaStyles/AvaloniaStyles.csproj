@@ -1,19 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <OutputType>WinExe</OutputType>
-        <TargetFramework>net7.0</TargetFramework>
-        <RuntimeIdentifiers>win8-x64;osx-x64;linux-x64;osx-arm64;win-x64</RuntimeIdentifiers>
+        <OutputType>Library</OutputType>
+        <TargetFramework>net8.0</TargetFramework>
         <Configurations>Debug;Release</Configurations>
         <Platforms>AnyCPU</Platforms>
         <Nullable>enable</Nullable>
         <WarningsAsErrors>nullable</WarningsAsErrors>
     </PropertyGroup>
     <PropertyGroup>
-        <SelfContained>false</SelfContained>
-        <PublishSingleFile>true</PublishSingleFile>
-        <OutputPath>..\bin\$(Configuration)\</OutputPath>
+        <SelfContained>true</SelfContained>
     </PropertyGroup>
+
     <Import Project="..\Module.props" />    
     
     <Import Project="..\Avalonia.props" />
@@ -26,6 +24,9 @@
       <AvaloniaResource Include="Styles\Assets\Lato\*.ttf" />
       <None Remove="Fonts\Symbols.ttf" />
       <AvaloniaResource Include="Fonts\Symbols.ttf" />
+      <AvaloniaResource Remove="Styles\BigSur\**" />
+      <AvaloniaResource Remove="Styles\Catalina\**" />
+      <AvaloniaResource Remove="Styles\MacOs\**" />
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\AvaloniaEdit\src\AvaloniaEdit\AvaloniaEdit.csproj" />

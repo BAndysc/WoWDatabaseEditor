@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <OutputType>WinExe</OutputType>
-        <TargetFramework>net7.0</TargetFramework>
+        <OutputType>Library</OutputType>
+        <TargetFramework>net8.0</TargetFramework>
         <Configurations>Debug;Release</Configurations>
         <Platforms>AnyCPU</Platforms>
         <ApplicationIcon>Icon.ico</ApplicationIcon>
@@ -15,7 +15,6 @@
         <OutputPath>..\bin\$(Configuration)\</OutputPath>
     </PropertyGroup>
     <ItemGroup>
-        <AvaloniaResource Include="Fonts\Unifont.otf" />
         <AvaloniaResource Include="Icon.png" />
         <AvaloniaResource Include="IconSmall.png" />
         <None Remove="logo.png" />
@@ -28,17 +27,18 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Avalonia.Controls.TreeDataGrid" Version="0.10.10" />
         <PackageReference Include="Avalonia.Diagnostics" Version="$(AvaloniaVersion)" />
         <PackageReference Include="Avalonia.Controls.DataGrid" Version="$(AvaloniaVersion)" />
         <PackageReference Include="Prism.Core" Version="7.2.0.1422" />
-        <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="2.88.0-preview.127" />
+<!--        <PackageReference Include="SkiaSharp" Version="3.0.0-preview.1.8" />-->
+<!--        <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="3.0.0-preview.1.8" />-->
         <PackageReference Include="SmartFormat.NET" Version="2.7.3" />
         <PackageReference Include="OpenTK.Graphics" Version="4.7.5" />
         <PackageReference Include="OpenTK.Core" Version="4.7.5" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\AvaloniaStyles\AvaloniaStyles.csproj" />
+        <ProjectReference Include="..\Dock\src\Dock.Model.Mvvm\Dock.Model.Mvvm.csproj" />
         <ProjectReference Include="..\Modules\AvaloniaGraph\AvaloniaGraph.csproj" />
         <ProjectReference Include="..\Prism.Avalonia\src\Prism.Unity.Avalonia\Prism.Unity.Avalonia.csproj" />
         <ProjectReference Include="..\Rendering\TheEngine\TheEngine.csproj" />
@@ -48,9 +48,8 @@
         <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />
         <ProjectReference Include="..\WoWDatabaseEditor\WoWDatabaseEditorCore.csproj" />
         <ProjectReference Include="..\Dock\src\Dock.Model\Dock.Model.csproj" />
-        <ProjectReference Include="..\Dock\src\Dock.Model.ReactiveUI\Dock.Model.ReactiveUI.csproj" />
         <ProjectReference Include="..\Dock\src\Dock.Avalonia\Dock.Avalonia.csproj" />
-        <ProjectReference Include="..\Dock\src\Dock.ProportionalStackPanel\Dock.ProportionalStackPanel.csproj" />
+<!--        <ProjectReference Include="..\Dock\src\Dock.ProportionalStackPanel\Dock.ProportionalStackPanel.csproj" />-->
     </ItemGroup>
     <ItemGroup>
       <Resource Include="Icon.ico" />

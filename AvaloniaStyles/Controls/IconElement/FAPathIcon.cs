@@ -18,7 +18,7 @@ public partial class FAPathIcon : FAIconElement
         ClipToBoundsProperty.OverrideDefaultValue<FAPathIcon>(true);
     }
 
-    protected override void OnPropertyChanged<T>(AvaloniaPropertyChangedEventArgs<T> change)
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);
 

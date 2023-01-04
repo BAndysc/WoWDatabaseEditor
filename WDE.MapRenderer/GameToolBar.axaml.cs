@@ -3,7 +3,7 @@ using Avalonia.Markup.Xaml;
 
 namespace WDE.MapRenderer
 {
-    public class GameToolBar : UserControl
+    public partial class GameToolBar : UserControl
     {
         public GameToolBar()
         {

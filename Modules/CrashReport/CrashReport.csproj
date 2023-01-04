@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <OutputType>WinExe</OutputType>
-        <TargetFramework>net7.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
         <WarningsAsErrors>nullable</WarningsAsErrors>
         <ApplicationIcon>Icon.ico</ApplicationIcon>
@@ -17,6 +17,7 @@
     <Import Project="..\..\Avalonia.props" />
     <ItemGroup>
         <PackageReference Include="Avalonia.Diagnostics" Version="$(AvaloniaVersion)" />
+        <PackageReference Include="Avalonia.Desktop" Version="$(AvaloniaVersion)" />
     </ItemGroup>
     <ItemGroup>
       <AvaloniaResource Include="Icon.png" />

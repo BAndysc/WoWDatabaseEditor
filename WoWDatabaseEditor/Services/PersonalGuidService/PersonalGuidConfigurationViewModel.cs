@@ -12,7 +12,7 @@ using WDE.MVVM.Observable;
 
 namespace WoWDatabaseEditorCore.Services.PersonalGuidService;
 
-[AutoRegister]
+[AutoRegister(Platforms.Desktop)]
 public partial class PersonalGuidConfigurationViewModel : ObservableBase, IConfigurable
 {
     private readonly IPersonalGuidRangeSettingsService service;

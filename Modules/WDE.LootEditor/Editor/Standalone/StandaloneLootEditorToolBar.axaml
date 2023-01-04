@@ -15,39 +15,39 @@
   <ToolbarPanel>
 
     <ButtonImage Image="Icons/icon_save.png" ToolTip.Tip="Save conditions" Command="{CompiledBinding SaveCommand}" />
-        
+
     <ButtonImage Image="Icons/icon_to_sql.png" ToolTip.Tip="Generate query" Command="{CompiledBinding GenerateQueryCommand}" />
-    
+
     <TextBlock Text="Type:" VerticalAlignment="Center" Opacity="0.5" />
-    <CompletionComboBox 
+    <CompletionComboBox
       IsEnabled="{CompiledBinding CanChangeLootType}"
-      SelectedItem="{CompiledBinding LootType, Mode=TwoWay}" 
+      SelectedItem="{CompiledBinding LootType, Mode=TwoWay}"
       controls:Extensions.EnumType="{x:Type database:LootSourceType}" />
-    
+
     <Border Width="20" />
-    
+
     <TextBlock Text="Difficulty:" VerticalAlignment="Center" Opacity="0.5" />
-    <CompletionComboBox SelectedItem="{CompiledBinding Difficulty, Mode=TwoWay}" 
+    <CompletionComboBox SelectedItem="{CompiledBinding Difficulty, Mode=TwoWay}"
                         Items="{CompiledBinding Difficulties}"
                         IsEnabled="{CompiledBinding CanChooseDifficulty}" />
-    
+
     <Border Width="20" />
 
     <TextBlock Text="Entry:" VerticalAlignment="Center" Opacity="0.5" />
     <TextBox Classes="noErrors" IsEnabled="{CompiledBinding CanChangeEntry}" Text="{CompiledBinding SolutionEntry}" />
     <ButtonImage Image="Icons/icon_picker_color.png" ToolTip.Tip="Pick entry" IsEnabled="{CompiledBinding CanChangeEntry}" Command="{CompiledBinding PickEntryCommand}" />
-    
-    <ButtonImage IsVisible="{CompiledBinding IsPerEntityLootEditingMode}" 
+
+    <ButtonImage IsVisible="{CompiledBinding IsPerEntityLootEditingMode}"
                  Image="Icons/icon_restore.png" ToolTip.Tip="Load" Command="{CompiledBinding LoadLootCommand}" />
-    
-    <ButtonImage IsVisible="{CompiledBinding IsPerDatabaseTableLootEditingMode}" 
-                 Image="Icons/icon_down.png" Text="{CompiledBinding LootType, StringFormat=Load {0} loot}" ToolTip.Tip="Load loot id from the selected entity" 
+
+    <ButtonImage IsVisible="{CompiledBinding IsPerDatabaseTableLootEditingMode}"
+                 Image="Icons/icon_down.png" Text="{CompiledBinding LootType, StringFormat=Load {0} loot}" ToolTip.Tip="Load loot id from the selected entity"
                  Command="{CompiledBinding LoadLootCommand}" />
 
-    <ContentPresenter DataContext="{CompiledBinding ViewModel}" 
-                      Content="{CompiledBinding .}"
-                      IsEnabled="{CompiledBinding ., Converter={x:Static NullConverter.IsNotNull}}" 
-                      ContentTemplate="{x:Static utils:ToolbarDataTemplate.Template}"
+    <ContentControl DataContext="{CompiledBinding ViewModel}"
+                    Content="{CompiledBinding .}"
+                    IsEnabled="{CompiledBinding ., Converter={x:Static NullConverter.IsNotNull}}"
+                    ContentTemplate="{x:Static utils:ToolbarDataTemplate.Template}"
     />
   </ToolbarPanel>
 </UserControl>

@@ -164,7 +164,7 @@ public class EditableItemsTextBlock : TemplatedControl
         AdornerLayer.SetAdornedElement(textBox, this);
         adornerLayer.Children.Add(textBox);
 
-        DispatcherTimer.RunOnce(textBox.Focus, TimeSpan.FromMilliseconds(1));
+        DispatcherTimer.RunOnce(() => textBox.Focus(), TimeSpan.FromMilliseconds(1));
         if (overrideText == null)
             textBox.SelectAll();
         else
@@ -263,7 +263,7 @@ public class EditableItemsTextBlock : TemplatedControl
 
         if (save)
         {
-            OnNewItemRequest?.Invoke(this, new NewItemRequestArgs(textBox.Text));
+            OnNewItemRequest?.Invoke(this, new NewItemRequestArgs(textBox.Text ?? ""));
         }
         textBox = null;
     }

@@ -1,4 +1,5 @@
-﻿using WDE.Common.Managers;
+﻿using System.ComponentModel;
+using WDE.Common.Managers;
 using WDE.Module.Attributes;
 using WDE.MVVM;
 
@@ -20,5 +21,13 @@ namespace WoWDatabaseEditorCore.Managers
         {
             CurrentNotification = notification;
         }
+    }
+    
+    [FallbackAutoRegister]
+    internal class NullConnectionsStatusBarItem : IConnectionsStatusBarItem
+    {
+        public int OpenedConnections => 0;
+        public bool IsPanelVisible { get; set; }
+        public event PropertyChangedEventHandler? PropertyChanged;
     }
 }

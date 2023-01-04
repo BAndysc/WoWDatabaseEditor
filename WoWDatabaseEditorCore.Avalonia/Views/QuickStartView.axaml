@@ -101,12 +101,13 @@
                     <!--     </Interaction.Behaviors> -->
                     <!-- </WdeImage> -->
                     
-                    <ContentControl DockPanel.Dock="Right" VerticalAlignment="Stretch" VerticalContentAlignment="Center" Content="{CompiledBinding QuickStartPanel}" />
+                    <ContentControl DockPanel.Dock="Right" VerticalAlignment="Stretch" VerticalContentAlignment="Center" 
+                                    Content="{CompiledBinding QuickStartPanel}" />
                 </DockPanel>
             </Border>
             
             <Border Classes="infoBox" IsVisible="{CompiledBinding ShowGiveStarBox}">
-                <StackPanel Orientation="Vertical" TextBlock.FontSize="13">
+                <StackPanel Orientation="Vertical" TextElement.FontSize="13">
                     <TextBlock FontWeight="Bold" TextWrapping="WrapWithOverflow">It looks like you are using Wow Database Editor for quite some time already.</TextBlock>
                     <TextBlock TextWrapping="WrapWithOverflow">How about you leave a star on github for this project? It costs you nothing, but gives authors of this app power for further development 💪! To leave a star, you need an account on github, the 'star' button can be found in the top right corner.</TextBlock>
                     <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
@@ -120,7 +121,7 @@
             <!--     <DockPanel> -->
             <!--         <WdeImage VerticalAlignment="Center" ImageUri="Icons/document_party_big.png" Width="32" Height="32" /> -->
             <!--         <Button DockPanel.Dock="Right" Command="{CompiledBinding CloseAnniversaryBox}">Dismiss</Button> -->
-            <!--         <StackPanel Orientation="Vertical" TextBlock.FontSize="13"> -->
+            <!--         <StackPanel Orientation="Vertical" TextElement.FontSize="13"> -->
             <!--             <TextBlock FontWeight="Bold" TextWrapping="WrapWithOverflow">Year 2021 is over!</TextBlock> -->
             <!--             <TextBlock Cursor="Hand" TextWrapping="WrapWithOverflow" x:Name="Text" -->
             <!--                        Text="Click here to see the history of the editor (including old screenshots 🤩)"> -->
@@ -143,7 +144,7 @@
                 
                 <StackPanel Margin="30,0,0,0">
                     <TextBlock FontSize="24" Opacity="0.75" Margin="0,15,0,10">Quick load</TextBlock>
-                    <ItemsControl Margin="20,0,0,0" Items="{CompiledBinding FlatItemPrototypes, Mode=OneTime}">
+                    <ItemsControl Margin="20,0,0,0" ItemsSource="{CompiledBinding FlatItemPrototypes, Mode=OneTime}">
                         <ItemsControl.Styles>
                             <Style Selector="ItemsControl > ContentPresenter">
                                 <Setter Property="(controls1:WrapPanelWithDivider.ForceNewLine)" Value="{Binding ForceNewLine}" />
@@ -173,7 +174,7 @@
                     </ItemsControl>
                     
                     <TextBlock FontSize="24" Opacity="0.75" Margin="0,15,0,10" IsVisible="{CompiledBinding HasWizards}">Quick wizards</TextBlock>
-                    <ItemsControl Margin="20,0,0,0" Items="{CompiledBinding Wizards, Mode=OneTime}">
+                    <ItemsControl Margin="20,0,0,0" ItemsSource="{CompiledBinding Wizards, Mode=OneTime}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <WrapPanel></WrapPanel>
@@ -193,7 +194,7 @@
                 <StackPanel Grid.Column="1" Margin="30,0,0,0">
                     <TextBlock FontSize="24" Opacity="0.75" Margin="0,15,0,10">Recent</TextBlock>
                     
-                    <ItemsControl Margin="20,0,0,0" Items="{CompiledBinding MostRecentlyUsedItems}">
+                    <ItemsControl Margin="20,0,0,0" ItemsSource="{CompiledBinding MostRecentlyUsedItems}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <StackPanel></StackPanel>
@@ -219,7 +220,7 @@
                         <TextBlock FontSize="24" Opacity="0.75" Margin="0,15,0,0">Settings overview</TextBlock>
                         <TextBlock Margin="0,10,0,0" TextWrapping="WrapWithOverflow">In order to enable all features, you have to configure the editor first.</TextBlock>
                         <TextBlock Margin="0,10,0,0" TextWrapping="WrapWithOverflow" IsVisible="{CompiledBinding AllConfigured}">Congratulations! You have everything configured properly!</TextBlock>
-                        <ItemsControl Items="{CompiledBinding ConfigurationChecks, Mode=OneTime}">
+                        <ItemsControl ItemsSource="{CompiledBinding ConfigurationChecks, Mode=OneTime}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <DockPanel LastChildFill="True" Margin="0,10,0,0">

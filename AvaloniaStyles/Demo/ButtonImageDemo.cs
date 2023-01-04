@@ -49,7 +49,9 @@ public class ButtonImageDemo : Button, IStyleable
         if (hasImage && text != null)
         {
             var sp = new StackPanel() { Orientation = Orientation.Horizontal };
-            sp.Children.Add(new TextBlock(){Text = text, VerticalAlignment = VerticalAlignment.Center, Classes = new Classes("ButtonText")});
+            var tb = new TextBlock() { Text = text, VerticalAlignment = VerticalAlignment.Center };
+            tb.Classes.Add("ButtonText");
+            sp.Children.Add(tb);
             btn.Content = sp;
         }
         else if (hasImage)

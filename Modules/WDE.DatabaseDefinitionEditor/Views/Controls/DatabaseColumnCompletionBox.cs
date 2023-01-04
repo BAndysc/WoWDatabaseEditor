@@ -16,12 +16,10 @@ using WDE.MVVM.Observable;
 
 namespace WDE.DatabaseDefinitionEditor.Views.Controls;
 
-public class DatabaseColumnCompletionBox : CompletionComboBox, IStyleable
+public class DatabaseColumnCompletionBox : CompletionComboBox
 {
-    Type IStyleable.StyleKey => typeof(CompletionComboBox);
-
     public static readonly StyledProperty<string?> TableNameProperty = AvaloniaProperty.Register<DatabaseColumnCompletionBox, string?>(nameof(TableName));
-    //protected override Type StyleKeyOverride => typeof(CompletionComboBox); // avalonia 11
+    protected override Type StyleKeyOverride => typeof(CompletionComboBox);
 
     public string? TableName
     {

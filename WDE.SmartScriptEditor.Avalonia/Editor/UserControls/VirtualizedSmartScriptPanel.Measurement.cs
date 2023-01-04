@@ -3,6 +3,7 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
+using Avalonia.Media;
 using JetBrains.Profiler.Api;
 using WDE.Common.Avalonia.Controls;
 using WDE.Common.Utils;
@@ -100,7 +101,7 @@ public partial class VirtualizedSmartScriptPanel
     protected override Size MeasureOverride(Size availableSize)
     {
         if (script == null)
-            return Size.Empty;
+            return default;
         
         SizingContext context = new SizingContext(availableSize.Width, Padding, EventPaddingLeft, VisibleRect);
         
@@ -146,7 +147,7 @@ public partial class VirtualizedSmartScriptPanel
     {
         private readonly Panel panel;
         private bool oddMeasurement = false;
-        private IControl? control;
+        private Control? control;
         
         public MeasureUtil(Panel panel)
         {
@@ -157,7 +158,8 @@ public partial class VirtualizedSmartScriptPanel
         {
             if (control == null)
             {
-                control = templateGetter().Build(null!);
+                control = templateGetter().Build(null!)!;
+                control.DataContext = dataContext;
                 panel.Children.Add(control);
                 control.ClipToBounds = true;
                 control.Arrange(new Rect(-1, -1, 1, 1));

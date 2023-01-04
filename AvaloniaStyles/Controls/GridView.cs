@@ -13,9 +13,11 @@ using Avalonia.Controls.Templates;
 using Avalonia.Data;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.LogicalTree;
 using Avalonia.Metadata;
 using Avalonia.Styling;
 using Avalonia.Threading;
+using Avalonia.Utilities;
 using Avalonia.VisualTree;
 using WDE.MVVM;
 using WDE.MVVM.Observable;
@@ -25,12 +27,14 @@ namespace AvaloniaStyles.Controls
 {
     public class GridViewListBox : ListBox
     {
-        protected override IItemContainerGenerator CreateItemContainerGenerator()
+        protected override Control CreateContainerForItemOverride(object? item, int index, object? recycleKey)
         {
-            return new ItemContainerGenerator<GridViewItem>(
-                this, 
-                ContentControl.ContentProperty,
-                ContentControl.ContentTemplateProperty);
+            return new GridViewItem();
+        }
+
+        protected override bool NeedsContainerOverride(object? item, int index, out object? recycleKey)
+        {
+            return NeedsContainer<GridViewItem>(item, out recycleKey);
         }
     }
 
@@ -143,18 +147,34 @@ namespace AvaloniaStyles.Controls
 
         public ListBox? ListBoxImpl => listBox;
         
+        private ScrollViewer? headerScroll;
+        private ScrollViewer? contentScroll;
+        
         protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
         {
+            if (headerScroll is { })
+                headerScroll.ScrollChanged -= OnHeaderScrollChanged;
+            if (contentScroll is { })
+                contentScroll.ScrollChanged -= OnContentScrollChanged;
+            
             base.OnApplyTemplate(e);
-            header = e.NameScope.Find<Grid>("PART_header");
-            listBox = e.NameScope.Find<ListBox>("PART_listbox");
-                
+            header = e.NameScope.Get<Grid>("PART_header");
+            listBox = e.NameScope.Get<ListBox>("PART_listbox");
+            headerScroll = e.NameScope.Get<ScrollViewer>("PART_HeaderScroll");
+            contentScroll = e.NameScope.Get<ScrollViewer>("PART_ContentScroll");
+            
+            headerScroll.ScrollChanged += OnHeaderScrollChanged;
+            contentScroll.ScrollChanged += OnContentScrollChanged;
+
+            contentScroll.GetObservable(ScrollViewer.OffsetProperty)
+                .SubscribeAction(@is =>
+                {
+                    Console.WriteLine(@is);
+                });
+            
             header.ColumnDefinitions.Clear();
             header.Children.Clear();
             SetupGridColumns(header, true);
-            
-            // additional column in header makes it easier to resize
-            header.ColumnDefinitions.Add(new ColumnDefinition(20, GridUnitType.Pixel));
             
             int i = 0;
             foreach (var column in Columns)
@@ -174,17 +194,18 @@ namespace AvaloniaStyles.Controls
             }
 
             BindFixMultiSelect();
-            
-            void ExecuteScrollWhenLayoutUpdated(object? sender, EventArgs e)
-            {
-                LayoutUpdated -= ExecuteScrollWhenLayoutUpdated;
-                Dispatcher.UIThread.Post(AutoScrollToSelectedItemIfNecessary);
-            }
+        }
 
-            if (AutoScrollToSelectedItem)
-            {
-                LayoutUpdated += ExecuteScrollWhenLayoutUpdated;
-            }
+        private void OnContentScrollChanged(object? sender, ScrollChangedEventArgs e)
+        {
+            if (contentScroll is not null && headerScroll is not null && !MathUtilities.IsZero(e.OffsetDelta.X))
+                headerScroll.Offset = headerScroll.Offset.WithX(contentScroll.Offset.X);
+        }
+
+        private void OnHeaderScrollChanged(object? sender, ScrollChangedEventArgs e)
+        {
+            if (contentScroll is not null && headerScroll is not null && !MathUtilities.IsZero(e.OffsetDelta.X))
+                contentScroll.Offset = contentScroll.Offset.WithX(headerScroll.Offset.X);
         }
 
         private void BindFixMultiSelect()
@@ -207,7 +228,7 @@ namespace AvaloniaStyles.Controls
                     if (listBox.Selection.Count <= 0) 
                         return;
 
-                    if (e.Source is not IVisual source)
+                    if (e.Source is not Visual source)
                         return;
                     
                     var point = e.GetCurrentPoint(source);
@@ -215,13 +236,13 @@ namespace AvaloniaStyles.Controls
                     if (!point.Properties.IsLeftButtonPressed && !point.Properties.IsRightButtonPressed) 
                         return;
                     
-                    var containerIndex = GetContainerIndexFromEventSource(listBox, e.Source);
+                    var containerIndex = GetContainerIndexFromEventSource(listBox, e.Source as Interactive);
 
                     if (!containerIndex.HasValue)
                         return;
                                 
-                    var range = e.KeyModifiers.HasAllFlags(KeyModifiers.Shift);
-                    var toggle = e.KeyModifiers.HasAllFlags(KeyModifiers.Control);
+                    var range = e.KeyModifiers.HasFlagFast(KeyModifiers.Shift);
+                    var toggle = e.KeyModifiers.HasFlagFast(KeyModifiers.Control);
                     var isSelected = listBox.Selection.SelectedIndexes.Contains(containerIndex.Value);
 
                     if (isSelected || toggle || range)
@@ -233,7 +254,7 @@ namespace AvaloniaStyles.Controls
                     if (listBox.Selection.Count <= 0) 
                         return;
                     
-                    if (e.Source is not IVisual source) 
+                    if (e.Source is not Visual source) 
                         return;
 
                     var point = e.GetCurrentPoint(source);
@@ -241,7 +262,7 @@ namespace AvaloniaStyles.Controls
                     if (point.Properties.PointerUpdateKind == PointerUpdateKind.LeftButtonReleased || 
                         point.Properties.PointerUpdateKind == PointerUpdateKind.RightButtonReleased)
                     {
-                        var containerIndex = GetContainerIndexFromEventSource(listBox, e.Source);
+                        var containerIndex = GetContainerIndexFromEventSource(listBox, e.Source as Interactive);
 
                         if (containerIndex.HasValue)
                         {
@@ -253,8 +274,8 @@ namespace AvaloniaStyles.Controls
                                 .Invoke(listBox, new object[]
                                 {
                                     containerIndex.Value, true,
-                                    e.KeyModifiers.HasAllFlags(KeyModifiers.Shift),
-                                    e.KeyModifiers.HasAllFlags(KeyModifiers.Control),
+                                    e.KeyModifiers.HasFlagFast(KeyModifiers.Shift),
+                                    e.KeyModifiers.HasFlagFast(KeyModifiers.Control),
                                     point.Properties.PointerUpdateKind == PointerUpdateKind.RightButtonReleased
                                 });
                             e.Handled = true;
@@ -269,7 +290,6 @@ namespace AvaloniaStyles.Controls
         protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
         {
             base.OnAttachedToVisualTree(e);
-            AutoScrollToSelectedItemIfNecessary();
             BindFixMultiSelect();
         }
 
@@ -280,11 +300,11 @@ namespace AvaloniaStyles.Controls
             handlersDisposable = null;
         }
 
-        protected static int? GetContainerIndexFromEventSource(ListBox listBox, IInteractive? eventSource)
+        protected static int? GetContainerIndexFromEventSource(ListBox listBox, Interactive? eventSource)
         {
-            for (var current = eventSource as IVisual; current != null; current = current.VisualParent)
+            for (var current = eventSource as Visual; current != null; current = current.GetVisualParent())
             {
-                if (current is IControl control && control.LogicalParent == listBox)
+                if (current is Control control && ReferenceEquals(control.GetLogicalParent(), listBox))
                 {
                     int? index = listBox.ItemContainerGenerator?.IndexFromContainer(control);
                     return index == -1 ? null : index;
@@ -314,40 +334,14 @@ namespace AvaloniaStyles.Controls
                 grid.ColumnDefinitions.Add(c);
                 grid.ColumnDefinitions.Add(new ColumnDefinition(SplitterWidth, GridUnitType.Pixel));
             }
-        }
 
-        private void AutoScrollToSelectedItemIfNecessary()
-        {
-            if (listBox == null)
-                return;
-
-            if (!AutoScrollToSelectedItem)
-                return;
-
-            if (SelectedItem == null)
-                return;
-
-            var index = listBox.SelectedIndex;
-
-            var visible = listBox.GetVisualDescendants().Count(t => t is ListBoxItem);
-                    
-            var scroll = listBox.FindDescendantOfType<ScrollViewer>();
-                    
-            if (index < scroll.Offset.Y || index > scroll.Offset.Y + visible)
-                scroll.Offset = new Vector(scroll.Offset.X, Math.Max(0, index - visible / 2));
+            // additional column in header makes it easier to resize
+            grid.ColumnDefinitions.Add(new ColumnDefinition(20, GridUnitType.Pixel));
         }
 
         static GridView()
         {
             ColumnsProperty.Changed.AddClassHandler<GridView>(OnColumnsModified);
-
-            SelectedItemProperty.Changed.AddClassHandler<GridView>((view, args) =>
-            {
-                if (!view.AutoScrollToSelectedItem)
-                    return;
-                
-                Dispatcher.UIThread.Post(view.AutoScrollToSelectedItemIfNecessary);
-            });
 
             SelectionProperty.Changed.AddClassHandler<GridView>((view, args) =>
             {
@@ -404,10 +398,10 @@ namespace AvaloniaStyles.Controls
                 int i = 0;
                 foreach (var column in Columns)
                 {
-                    IControl control;
+                    Control control;
                     if (column.DataTemplate is { } dt)
                     {
-                        control = dt.Build(column);
+                        control = dt.Build(column) ?? new TextBlock(){Text = "Couldn't instantiate column"};
                     } 
                     else if (column.Checkable)
                     {

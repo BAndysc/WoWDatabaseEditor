@@ -45,7 +45,7 @@
                            MaxWidth="700"
                            MaxHeight="600"
                            PlacementConstraintAdjustment="SlideY,SlideX"
-                           PlacementMode="Bottom"
+                           Placement="Bottom"
                            PlacementGravity="Bottom"
                            PlacementTarget="PART_Button">
                         <Border Name="PART_SuggestionsContainer"

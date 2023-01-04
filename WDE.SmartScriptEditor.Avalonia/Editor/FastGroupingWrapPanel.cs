@@ -1,10 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Documents;
 using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.VisualTree;
+using AvaloniaStyles.Controls;
 using WDE.Common.Avalonia.Utils;
 using WDE.MVVM;
 using WDE.MVVM.Observable;
@@ -12,7 +15,8 @@ using static System.Math;
 
 namespace WDE.SmartScriptEditor.Avalonia.Editor
 {
-    public class FastGroupingWrapPanel : Panel, INavigableContainer
+    // this is one big hack and should be refactored completely, grounds up
+    public class FastGroupingWrapPanel : RenderedPanel, INavigableContainer
     {
         protected static ISolidColorBrush HeaderForeground = new SolidColorBrush(new Color(0xFF, 0x22, 0x6E, 0x8B));
 
@@ -22,10 +26,10 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor
         public static readonly DirectProperty<FastGroupingWrapPanel, double> ItemHeightProperty = AvaloniaProperty.RegisterDirect<FastGroupingWrapPanel, double>("ItemHeight", o => o.ItemHeight, (o, v) => o.ItemHeight = v);
 
         public static readonly AttachedProperty<string> GroupProperty =
-            AvaloniaProperty.RegisterAttached<FastGroupingWrapPanel, IControl, string>("Group");
+            AvaloniaProperty.RegisterAttached<FastGroupingWrapPanel, Control, string>("Group");
         
         public static readonly AttachedProperty<bool> ActiveProperty =
-            AvaloniaProperty.RegisterAttached<FastGroupingWrapPanel, IControl, bool>("Active");
+            AvaloniaProperty.RegisterAttached<FastGroupingWrapPanel, Control, bool>("Active");
         
         private ScrollViewer? ScrollViewer => this.FindAncestorOfType<ScrollViewer>();
         private IDisposable? scrollDisposable;
@@ -56,22 +60,22 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor
             scrollDisposable = null;
         }
 
-        public static string GetGroup(IControl control)
+        public static string GetGroup(Control control)
         {
-            return control.GetValue(GroupProperty);
+            return (string?)control.GetValue(GroupProperty) ?? "(null)";
         }
         
-        public static void SetGroup(IControl control, string value)
+        public static void SetGroup(Control control, string value)
         {
             control.SetValue(GroupProperty, value);
         }
         
-        public static bool GetActive(IControl control)
+        public static bool GetActive(Control control)
         {
-            return control.GetValue(ActiveProperty);
+            return (bool?)control.GetValue(ActiveProperty) ?? false;
         }
         
-        public static void SetActive(IControl control, bool value)
+        public static void SetActive(Control control, bool value)
         {
             control.SetValue(ActiveProperty, value);
         }
@@ -87,10 +91,9 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor
             get => itemHeight;
             set => SetAndRaise(ItemHeightProperty, ref itemHeight, value);
         }
-
+        
         public override void Render(DrawingContext context)
         {
-            base.Render(context);
             var brush = HeaderForeground;
             var pen = new Pen(brush, 1);
             foreach (var group in groupStartHeight)
@@ -98,13 +101,11 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor
                 if (group.Value.height < float.Epsilon)
                     continue;
                 var lineY = group.Value.Item1 + 15;
-                var ft = new FormattedText();
-                ft.FontSize = 12;
-                ft.Text = group.Key;
-                ft.Typeface = new Typeface(TextBlock.GetFontFamily(this), FontStyle.Normal, FontWeight.Bold);
+                var ft = new FormattedText(group.Key, CultureInfo.CurrentCulture,  FlowDirection.LeftToRight, 
+                    new Typeface(TextElement.GetFontFamily(this), FontStyle.Normal, FontWeight.Bold), 12, brush);
                 context.DrawLine(pen, new Point(0, lineY), new Point(15, lineY));
-                context.DrawText(brush, new Point(20, group.Value.Item1 + 16 - ft.Bounds.Height / 2), ft);
-                context.DrawLine(pen, new Point(20 + ft.Bounds.Width + 5, lineY), new Point(this.Bounds.Width, lineY));
+                context.DrawText(ft, new Point(20, group.Value.Item1 + 16 - ft.Height / 2));
+                context.DrawLine(pen, new Point(20 + ft.Width + 5, lineY), new Point(this.Bounds.Width, lineY));
             }
         }
 
@@ -115,7 +116,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor
 
             var itemsPerRow = (int)Max(1, Floor(this.Bounds.Width / itemWidth));
             if (grid.GetLength(0) < itemsPerRow || grid.GetLength(1) < VisualChildren.Count)
-                grid = new IControl[(int)itemsPerRow, VisualChildren.Count];
+                grid = new Control[(int)itemsPerRow, VisualChildren.Count];
             else
             {
                 for (int i = 0; i < grid.GetLength(0); ++i)
@@ -147,9 +148,9 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor
             gridDirty = false;
         }
         
-        Dictionary<string, List<IControl>> elementsInGroup = new();
+        Dictionary<string, List<Control>> elementsInGroup = new();
         Dictionary<string, (double y, double x, double height, int count)> groupStartHeight = new();
-        private IControl?[,] grid = new IControl[0, 0];
+        private Control?[,] grid = new Control[0, 0];
         private bool gridDirty = true;
         protected override Size MeasureOverride(Size availableSize)
         {
@@ -157,21 +158,30 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor
             double height = 0;
             gridDirty = true;
 
+            EnsureRenderer();
+
             var visualChildren = VisualChildren;
             var visualCount = visualChildren.Count;
-
+            
             elementsInGroup.Clear();
             groupStartHeight.Clear();
-            elementsInGroup["Favourites"] = new List<IControl>() { };
+            elementsInGroup["Favourites"] = new List<Control>() { };
+            Control? renderer = null;
             for (var i = 0; i < visualCount; i++)
             {
-                IVisual visual = visualChildren[i];
+                Visual visual = visualChildren[i];
 
-                if (visual is IControl control && GetActive(control))
+                if (IsRenderer(visual))
+                {
+                    renderer = (Control)visual;
+                    continue;
+                }
+
+                if (visual is Control control && GetActive(control))
                 {
                     var group = GetGroup(control) ?? "(default)";
                     if (!elementsInGroup.ContainsKey(group))
-                        elementsInGroup[group] = new List<IControl>() { control };
+                        elementsInGroup[group] = new List<Control>() { control };
                     else
                         elementsInGroup[group].Add(control);
                 }
@@ -190,7 +200,11 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor
                     groupStartHeight[group.Key] = (0, 0, 0, 0);
             }
             
-            return new Size(Min(availableSize.Width, visualCount * itemWidth), height);
+            var desiredSize = new Size(Min(availableSize.Width, visualCount * itemWidth), height);
+
+            renderer?.Measure(desiredSize);
+
+            return desiredSize;
         }
 
         protected override Size ArrangeOverride(Size finalSize)
@@ -206,12 +220,21 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor
             var itemsPerRow = Max(1, (int)Floor(finalSize.Width / itemWidth));
             
             MeasureOverride(finalSize);
+            
+            if (visualCount == 0)
+                return default;
 
             for (var i = 0; i < visualCount; i++)
             {
-                IControl? control = visualChildren[i] as IControl;
+                Control? control = visualChildren[i] as Control;
                 if (control == null)
                     continue;
+
+                if (IsRenderer(control))
+                {
+                    control.Arrange(new Rect(0, 0, scrollViewer.Extent.Width, scrollViewer.Extent.Width));
+                    continue;
+                }
 
                 if (GetActive(control))
                 {
@@ -226,8 +249,6 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor
                             control.IsVisible = true;
                             control.Arrange(rect);
                         }
-                        else
-                            control.IsVisible = false;
 
                         if (startPos.Item4 + 1 == itemsPerRow)
                             groupStartHeight[group] = (startPos.Item1, 0, y + itemHeight, 0);
@@ -242,7 +263,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor
             return finalSize;
         }
 
-        private (int, int)? Find(IInputElement element)
+        private (int, int)? Find(IInputElement? element)
         {
             BuildGrid();
             for (int i = 0; i < grid.GetLength(0); ++i)
@@ -259,9 +280,9 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor
             return null;
         }
         
-        public IInputElement GetControl(NavigationDirection direction, IInputElement @from, bool wrap)
+        public IInputElement? GetControl(NavigationDirection direction, IInputElement? @from, bool wrap)
         {
-            IControl control = (IControl)@from;
+            Control? control = (Control?)@from;
             var index = Find(from);
             if (index == null)
                 return from;

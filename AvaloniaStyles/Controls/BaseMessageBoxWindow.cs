@@ -30,10 +30,10 @@ namespace AvaloniaStyles.Controls
             set => SetValue(HeaderProperty, value);
         }
         
-        public static readonly StyledProperty<IControl> ImageProperty =
-            AvaloniaProperty.Register<BaseMessageBoxWindow, IControl>(nameof(Image));
+        public static readonly StyledProperty<Control> ImageProperty =
+            AvaloniaProperty.Register<BaseMessageBoxWindow, Control>(nameof(Image));
         
-        public IControl Image
+        public Control Image
         {
             get => GetValue(ImageProperty);
             set => SetValue(ImageProperty, value);
@@ -41,7 +41,6 @@ namespace AvaloniaStyles.Controls
         
         public BaseMessageBoxWindow()
         {
-            this.AttachDevTools();
             if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                 PseudoClasses.Add(":macos");
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -49,7 +48,8 @@ namespace AvaloniaStyles.Controls
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
                 PseudoClasses.Add(":linux");
 
-            Win32.SetDarkMode(PlatformImpl.Handle.Handle, SystemTheme.EffectiveThemeIsDark);
+            if (TryGetPlatformHandle() is { } handle)
+               Win32.SetDarkMode(handle.Handle, SystemTheme.EffectiveThemeIsDark);
         }
         
         Type IStyleable.StyleKey => typeof(BaseMessageBoxWindow);
@@ -59,7 +59,8 @@ namespace AvaloniaStyles.Controls
             base.OnApplyTemplate(e);
             ExtendClientAreaChromeHints = ExtendClientAreaChromeHints.NoChrome;
             if (Background is ISolidColorBrush brush)
-                Win32.SetTitleBarColor(PlatformImpl.Handle.Handle, brush.Color);
+                if (TryGetPlatformHandle() is { } handle)
+                    Win32.SetTitleBarColor(handle.Handle, brush.Color);
         }
     }
 }

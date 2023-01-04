@@ -12,6 +12,6 @@ public class PopupContextMenu : ContextMenu, IStyleable
     public override void Close()
     {
         base.Close();
-        this.FindAncestorOfType<PopupMenu>().Close();
+        this.FindAncestorOfType<PopupMenu>()?.Close();
     }
 }

@@ -4,7 +4,7 @@ using Avalonia.Markup.Xaml;
 
 namespace WDE.MapSpawnsEditor.Views;
 
-public class SpawnsQueriesToolView : UserControl
+public partial class SpawnsQueriesToolView : UserControl
 {
     public SpawnsQueriesToolView()
     {

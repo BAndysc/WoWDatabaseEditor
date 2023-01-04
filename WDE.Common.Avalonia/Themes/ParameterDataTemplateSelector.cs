@@ -11,14 +11,14 @@ namespace WDE.Common.Avalonia.Themes
         public DataTemplate? Generic { get; set; }
         public DataTemplate? BoolParameter { get; set; }
         
-        public IControl Build(object item)
+        public Control? Build(object? item)
         {
             if (item is IParameterValueHolder<long> intParam && intParam.Parameter is BoolParameter boolParameter && BoolParameter != null)
                 return BoolParameter.Build(item);
             return Generic?.Build(item) ?? new Panel();
         }
 
-        public bool Match(object data)
+        public bool Match(object? data)
         {
             return data is IParameterValueHolder;
         }

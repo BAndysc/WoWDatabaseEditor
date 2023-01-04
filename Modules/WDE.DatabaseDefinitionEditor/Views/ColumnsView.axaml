@@ -23,7 +23,7 @@
                       <Flyout>
                           <DockPanel>
                               <TextBlock DockPanel.Dock="Top">Foreign tables:</TextBlock>
-                              <ItemsControl Items="{CompiledBinding ForeignTables}">
+                              <ItemsControl ItemsSource="{CompiledBinding ForeignTables}">
                                   <ItemsControl.ItemsPanel>
                                       <ItemsPanelTemplate>
                                           <StackPanel Spacing="5" />
@@ -51,7 +51,7 @@
                     Background="{DynamicResource ThemeBackgroundBrush}"
                     BorderThickness="{DynamicResource ThemeBorderThickness}"
                     BorderBrush="{DynamicResource ThemeBorderMidBrush}"
-                    Items="{CompiledBinding Groups}"
+                    ItemsSource="{CompiledBinding Groups}"
                     SelectedItem="{CompiledBinding SelectedColumnOrGroup}">
               <TreeView.DataTemplates>
                   <TreeDataTemplate DataType="definitionEditor:ColumnViewModel" x:DataType="definitionEditor:ColumnViewModel">

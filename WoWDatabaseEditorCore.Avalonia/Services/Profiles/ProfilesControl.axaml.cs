@@ -4,7 +4,7 @@ using Avalonia.Markup.Xaml;
 
 namespace WoWDatabaseEditorCore.Avalonia.Services.Profiles;
 
-public class ProfilesControl : UserControl
+public partial class ProfilesControl : UserControl
 {
     public ProfilesControl()
     {

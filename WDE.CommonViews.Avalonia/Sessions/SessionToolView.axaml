@@ -14,7 +14,7 @@
         </Style>
     </UserControl.Styles>
     <DockPanel>
-       <controls:ToolbarPanel DockPanel.Dock="Top">
+       <controls:ToolbarControl DockPanel.Dock="Top">
            <components:ButtonImage Command="{CompiledBinding NewSessionCommand, Mode=OneTime}" Image="Icons/icon_new.png" ToolTip.Tip="New session" />
            <components:ButtonImage Command="{CompiledBinding SaveCurrentCurrent, Mode=OneTime}" Image="Icons/icon_save.png" ToolTip.Tip="Save session" />
            <components:ButtonImage Command="{CompiledBinding PreviewCurrentCommand}" Image="Icons/icon_to_sql.png" ToolTip.Tip="Preview current total SQL" />
@@ -22,17 +22,17 @@
            <controls:ToolbarSpacer />
            <components:ButtonImage Command="{CompiledBinding DeleteSelectedItem}" Image="Icons/icon_delete.png" ToolTip.Tip="Remove item" />
            <components:ButtonImage ToolTip.Tip="Open sessions help website" Command="{CompiledBinding OpenHelpCommand}" Image="Icons/icon_help.png" />
-       </controls:ToolbarPanel>
+       </controls:ToolbarControl>
        <ComboBox DockPanel.Dock="Top" HorizontalAlignment="Stretch" 
                  IsVisible="{CompiledBinding HasAnySessions}"
-                 Items="{CompiledBinding Sessions}" SelectedItem="{CompiledBinding SelectedSession, Mode=TwoWay}">
+                 ItemsSource="{CompiledBinding Sessions}" SelectedItem="{CompiledBinding SelectedSession, Mode=TwoWay}">
            <ComboBox.ItemTemplate>
                <DataTemplate>
                    <TextBlock Text="{CompiledBinding Name}" />
                </DataTemplate>
            </ComboBox.ItemTemplate>
        </ComboBox>
-       <ListBox Items="{CompiledBinding CurrentSolutionItems}"
+       <ListBox ItemsSource="{CompiledBinding CurrentSolutionItems}"
                 BorderThickness="0" 
                 SelectedItem="{CompiledBinding SelectedItem, Mode=TwoWay}"
                 DoubleTapped="Tv_OnDoubleTapped">

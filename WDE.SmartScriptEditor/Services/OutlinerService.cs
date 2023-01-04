@@ -120,14 +120,20 @@ public class OutlinerService : IOutlinerService
         eventInspectors = new SmartScriptType?[dataManager.MaxId(SmartType.SmartEvent)+1, editorFeatures.EventParametersCount.IntCount];
         actionInspectors = new SmartScriptType?[dataManager.MaxId(SmartType.SmartAction)+1, editorFeatures.ActionParametersCount.IntCount];
         targetInspectors = new SmartScriptType?[dataManager.MaxId(SmartType.SmartTarget)+1, editorFeatures.TargetParametersCount.IntCount];
-        
-        ProcessData(SmartType.SmartEvent, eventInspectors);
-        ProcessData(SmartType.SmartAction, actionInspectors);
-        ProcessData(SmartType.SmartTarget, targetInspectors);
 
-        void ProcessData(SmartType type, SmartScriptType?[,] dest)
+        dataManager.GetAllData(SmartType.SmartEvent)
+            .SubscribeAction(x => ProcessData(x, eventInspectors));
+        
+        dataManager.GetAllData(SmartType.SmartAction)
+            .SubscribeAction(x => ProcessData(x, actionInspectors));
+        
+        dataManager.GetAllData(SmartType.SmartTarget)
+            .SubscribeAction(x => ProcessData(x, targetInspectors));
+        
+        void ProcessData(IReadOnlyList<SmartGenericJsonData> list, SmartScriptType?[,] dest)
         {
-            foreach (var data in dataManager.GetAllData(type))
+            Array.Clear(dest);
+            foreach (var data in list)
             {
                 if (data.Parameters == null)
                     continue;

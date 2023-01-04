@@ -9,7 +9,7 @@ using WDE.Updater.Services;
 
 namespace WDE.Updater.ViewModels
 {
-    [AutoRegister]
+    [AutoRegister(Platforms.Desktop)]
     public class UpdaterConfigurationViewModel : ObservableBase, IConfigurable
     {
         private readonly IUpdaterSettingsProvider settings;

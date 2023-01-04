@@ -6,7 +6,7 @@ namespace WDE.CommonViews.Avalonia.TrinityMySqlDatabase.Views
     /// <summary>
     ///     Interaction logic for DatabaseConfigView
     /// </summary>
-    public class DatabaseConfigView : UserControl
+    public partial class DatabaseConfigView : UserControl
     {
         public DatabaseConfigView()
         {

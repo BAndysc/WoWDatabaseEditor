@@ -3,7 +3,7 @@ using Avalonia.Markup.Xaml;
 
 namespace WDE.SourceCodeIntegrationEditor.Views
 {
-    public class TrinityStringsView : UserControl
+    public partial class TrinityStringsView : UserControl
     {
         public TrinityStringsView()
         {

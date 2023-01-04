@@ -4,7 +4,7 @@ using WDE.MySqlDatabaseCommon.ViewModels;
 
 namespace WDE.CMMySqlDatabase.ViewModels
 {
-    [AutoRegister]
+    [AutoRegister(Platforms.Desktop)]
     public class CMDatabaseConfigViewModel : BaseDatabaseConfigViewModel
     {
         public CMDatabaseConfigViewModel(IWorldDatabaseSettingsProvider worldSettingsProvider,

@@ -47,7 +47,7 @@ public class SymbolIcon : FAIconElement
         set => SetValue(FontSizeProperty, value);
     }
 
-    protected override void OnPropertyChanged<T>(AvaloniaPropertyChangedEventArgs<T> change)
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);
         if (change.Property == TextBlock.FontSizeProperty ||
@@ -77,7 +77,7 @@ public class SymbolIcon : FAIconElement
         if (_textLayout == null)
             GenerateText();
 
-        return _textLayout?.Size ?? default;
+        return new Size(_textLayout.Width, _textLayout.Height);
     }
 
     public override void Render(DrawingContext context)
@@ -88,10 +88,9 @@ public class SymbolIcon : FAIconElement
         var dstRect = new Rect(Bounds.Size);
         using (context.PushClip(dstRect))
         {
-            var pt = new Point(dstRect.Center.X - _textLayout.Size.Width / 2,
-                dstRect.Center.Y - _textLayout.Size.Height / 2);
-            using var _ = context.PushPostTransform(Matrix.CreateTranslation(pt));
-            _textLayout.Draw(context); // , pt todo Avalonia 11
+            var pt = new Point(dstRect.Center.X - _textLayout.Width / 2,
+                dstRect.Center.Y - _textLayout.Height / 2);
+            _textLayout.Draw(context, pt);
         }
     }
 

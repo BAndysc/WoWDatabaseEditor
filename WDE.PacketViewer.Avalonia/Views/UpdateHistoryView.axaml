@@ -38,7 +38,7 @@
             </CompletionComboBox>
         </DockPanel>
         <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-            <ItemsControl FontSize="11" Items="{CompiledBinding CurrentValues}">
+            <ItemsControl FontSize="11" ItemsSource="{CompiledBinding CurrentValues}">
                 <ItemsControl.Styles>
                     <Style Selector="ItemsControl > ContentPresenter:nth-child(2n)">
                         <Setter Property="Background" Value="#107F7F7F" />

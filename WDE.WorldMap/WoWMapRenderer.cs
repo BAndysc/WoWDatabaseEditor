@@ -5,7 +5,6 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
-using Avalonia.Visuals.Media.Imaging;
 
 namespace WDE.WorldMap
 {
@@ -86,7 +85,7 @@ namespace WDE.WorldMap
                 interpo = BitmapInterpolationMode.MediumQuality;
             
             foreach (var tile in tiles[i]!)
-                context.DrawImage(tile.bitmap, new Rect(tile.bitmap.Size), new Rect(tile.x, tile.y, tile.size, tile.size), interpo);
+                context.DrawImage(tile.bitmap, new Rect(tile.bitmap.Size), new Rect(tile.x, tile.y, tile.size, tile.size));
         }
 
         private bool loaded;

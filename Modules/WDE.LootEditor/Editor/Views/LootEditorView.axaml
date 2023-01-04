@@ -26,7 +26,7 @@
                                              x:Name="VeryFastTableView"
                                              ColumnPressed="VeryFastTableView_OnColumnPressed"
                                              RowFilterParameter="{CompiledBinding SearchText}"
-                                             TextBlock.FontFamily="Consolas,Menlo,Courier,Courier New">
+                                             TextElement.FontFamily="Consolas,Menlo,Courier,Courier New">
                 <fastTableView:VeryFastTableView.RowFilter>
                     <views:RowFilterPredicate />
                 </fastTableView:VeryFastTableView.RowFilter>
@@ -58,7 +58,7 @@
                                 />
                             </GroupingHeader.CustomContent>
                             <GroupingHeader.CustomCenterContent>
-                                <ItemsControl Items="{CompiledBinding #Root.((viewModels:LootEditorViewModel)DataContext).Buttons}">
+                                <ItemsControl ItemsSource="{CompiledBinding #Root.((viewModels:LootEditorViewModel)DataContext).Buttons}">
                                     <ItemsControl.ContextMenu>
                                         <FixedContextMenu>
                                             <MenuItem Header="Edit buttons" Command="{CompiledBinding #Root.((viewModels:LootEditorViewModel)DataContext).OpenLootConfigurationCommand}"/>

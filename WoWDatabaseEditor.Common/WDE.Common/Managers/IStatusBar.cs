@@ -48,12 +48,4 @@ namespace WDE.Common.Managers
         int OpenedConnections { get; }
         bool IsPanelVisible { get; set; }
     }
-    
-    [FallbackAutoRegister]
-    internal class NullConnectionsStatusBarItem : IConnectionsStatusBarItem
-    {
-        public int OpenedConnections => 0;
-        public bool IsPanelVisible { get; set; }
-        public event PropertyChangedEventHandler? PropertyChanged;
-    }
 }

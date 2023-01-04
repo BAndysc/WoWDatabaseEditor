@@ -4,7 +4,7 @@ using Avalonia.Markup.Xaml;
 
 namespace WoWDatabaseEditorCore.Avalonia.Services.ServerExecutable;
 
-public class ServerExecutableConfigurationPanelView : UserControl
+public partial class ServerExecutableConfigurationPanelView : UserControl
 {
     public ServerExecutableConfigurationPanelView()
     {

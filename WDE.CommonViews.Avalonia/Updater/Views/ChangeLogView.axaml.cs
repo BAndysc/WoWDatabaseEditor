@@ -3,7 +3,7 @@ using Avalonia.Markup.Xaml;
 
 namespace WDE.CommonViews.Avalonia.Updater.Views
 {
-    public class ChangeLogView : UserControl
+    public partial class ChangeLogView : UserControl
     {
         public ChangeLogView()
         {

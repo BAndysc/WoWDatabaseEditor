@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Threading.Tasks;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;
 using WDE.Common.Solution;
@@ -34,13 +35,13 @@ namespace WDE.MangosEventAiEditor.Exporter
             this.nameProvider = nameProvider;
         }
 
-        public IQuery GetSql()
+        public async Task<IQuery> GetSql()
         {
             var query = Queries.BeginTransaction(DataDatabaseType.World);
             query.Comment(nameProvider.GetName(item));
             var serializedScript = scriptExporter.ToDatabaseCompatibleEventAi(script);
             BuildDelete(query, item.EntryOrGuid, serializedScript);
-            BuildUpdate(query);
+            await BuildUpdate(query);
             BuildInsert(query, serializedScript);
             return query.Close();
         }
@@ -87,13 +88,13 @@ namespace WDE.MangosEventAiEditor.Exporter
             };
         }
 
-        private void BuildUpdate(IMultiQuery query)
+        private async Task BuildUpdate(IMultiQuery query)
         {
             uint? entry;
             if (script.EntryOrGuid >= 0)
                 entry = (uint)script.EntryOrGuid;
             else
-                entry = databaseProvider.GetCreatureByGuid(0, (uint)-script.EntryOrGuid)?.Entry;
+                entry = (await databaseProvider.GetCreatureByGuidAsync(0, (uint)-script.EntryOrGuid))?.Entry;
 
             if (entry.HasValue)
             {

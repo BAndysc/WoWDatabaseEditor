@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using WDE.Common.Database;
 
 namespace WDE.MySqlDatabaseCommon.Services
@@ -16,6 +17,7 @@ namespace WDE.MySqlDatabaseCommon.Services
         
         public uint GetHealthFor(byte level, byte unitClass, byte expansion)
         {
+            // @todo make it async
             EnsureBuildStats();
 
             if (!stats.TryGetValue(MakeKey(level, unitClass), out var stat))
@@ -26,6 +28,7 @@ namespace WDE.MySqlDatabaseCommon.Services
 
         public int GetAttackPowerBonusFor(byte level, byte unitClass)
         {
+            // @todo make it async
             EnsureBuildStats();
 
             if (!stats.TryGetValue(MakeKey(level, unitClass), out var stat))
@@ -36,6 +39,7 @@ namespace WDE.MySqlDatabaseCommon.Services
 
         public int GetRangedAttackPowerBonusFor(byte level, byte unitClass)
         {
+            // @todo make it async
             EnsureBuildStats();
 
             if (!stats.TryGetValue(MakeKey(level, unitClass), out var stat))
@@ -46,6 +50,7 @@ namespace WDE.MySqlDatabaseCommon.Services
         
         public int GetManaFor(byte level, byte unitClass)
         {
+            // @todo make it async
             EnsureBuildStats();
 
             if (!stats.TryGetValue(MakeKey(level, unitClass), out var stat))
@@ -56,6 +61,7 @@ namespace WDE.MySqlDatabaseCommon.Services
 
         public int GetArmorFor(byte level, byte unitClass)
         {
+            // @todo make it async
             EnsureBuildStats();
 
             if (!stats.TryGetValue(MakeKey(level, unitClass), out var stat))
@@ -66,6 +72,7 @@ namespace WDE.MySqlDatabaseCommon.Services
 
         public float GetDamageFor(byte level, byte unitClass, byte expansion)
         {
+            // @todo make it async
             EnsureBuildStats();
 
             if (!stats.TryGetValue(MakeKey(level, unitClass), out var stat))
@@ -74,18 +81,18 @@ namespace WDE.MySqlDatabaseCommon.Services
             return stat.Damage(expansion);
         }
         
-        private void EnsureBuildStats()
+        private async ValueTask EnsureBuildStats()
         {
             if (built) 
                 return;
             
             built = true;
-            CacheStats();
+            await CacheStats();
         }
 
-        private void CacheStats()
+        private async Task CacheStats()
         {
-            foreach (var stat in databaseProvider.GetCreatureClassLevelStats())
+            foreach (var stat in await databaseProvider.GetCreatureClassLevelStatsAsync())
             {
                 stats[MakeKey(stat)] = stat;
             }

@@ -76,7 +76,7 @@ namespace WDE.DbcStore
 
         internal class SpawnGroupTemplateParameter : ParameterNumbered
         {
-            public SpawnGroupTemplateParameter(IList<ISpawnGroupTemplate>? items)
+            public SpawnGroupTemplateParameter(IReadOnlyList<ISpawnGroupTemplate>? items)
             {
                 if (items == null)
                     return;
@@ -88,7 +88,7 @@ namespace WDE.DbcStore
 
         internal class DatabaseItemParameter : ParameterNumbered
         {
-            public DatabaseItemParameter(IList<IItem>? items)
+            public DatabaseItemParameter(IReadOnlyList<IItem>? items)
             {
                 if (items == null)
                     return;

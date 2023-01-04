@@ -14,7 +14,7 @@ using AvaloniaStyles.Controls;
 
 namespace WoWDatabaseEditorCore.Avalonia.Services.MessageBoxService
 {
-    public class MessageBoxView : BaseMessageBoxWindow
+    public partial class MessageBoxView : BaseMessageBoxWindow
     {
         public MessageBoxView()
         {
@@ -26,11 +26,11 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.MessageBoxService
         {
             double num1 = 0.0;
             double num2 = 0.0;
-            IAvaloniaList<IVisual> visualChildren = this.VisualChildren;
+            IAvaloniaList<Visual> visualChildren = this.VisualChildren;
             int count = visualChildren.Count;
             for (int index = 0; index < count; ++index)
             {
-                if (visualChildren[index] is ILayoutable layoutable)
+                if (visualChildren[index] is Layoutable layoutable)
                 {
                     layoutable.Measure(availableSize);
                     num1 = Math.Max(num1, layoutable.DesiredSize.Width);
@@ -39,60 +39,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.MessageBoxService
             }
             return new Size(num1, num2);
         }
-        
-        // this is a workaround to broken SizeToContent with MaxWidth
-        // this is copied base.MeasureOverride with added Math.Min MaxWidth constraint
-        protected override Size MeasureOverride(Size availableSize)
-        {
-            var sizeToContent = SizeToContent;
-            var clientSize = ClientSize;
-            var constraint = clientSize;
-            var maxAutoSize = PlatformImpl?.MaxAutoSizeHint ?? Size.Infinity;
 
-            if (sizeToContent.HasAllFlags(SizeToContent.Width))
-            {
-                constraint = constraint.WithWidth(Math.Min(maxAutoSize.Width, MaxWidth));
-            }
-
-            if (sizeToContent.HasAllFlags(SizeToContent.Height))
-            {
-                constraint = constraint.WithHeight(maxAutoSize.Height);
-            }
-
-            var result = MeasureOverrideInternal(constraint);
-
-            if (!sizeToContent.HasAllFlags(SizeToContent.Width))
-            {
-                if (!double.IsInfinity(availableSize.Width))
-                {
-                    result = result.WithWidth(availableSize.Width);
-                }
-                else
-                {
-                    result = result.WithWidth(clientSize.Width);
-                }
-            }
-
-            if (!sizeToContent.HasAllFlags(SizeToContent.Height))
-            {
-                if (!double.IsInfinity(availableSize.Height))
-                {
-                    result = result.WithHeight(availableSize.Height);
-                }
-                else
-                {
-                    result = result.WithHeight(clientSize.Height);
-                }
-            }
-
-            return result;
-        }
-
-        private void InitializeComponent()
-        {
-            AvaloniaXamlLoader.Load(this);
-        }
-        
         protected override void OnDataContextChanged(EventArgs e)
         {
             base.OnDataContextChanged(e);
@@ -102,7 +49,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.MessageBoxService
             }
         }
 
-        protected override void OnClosing(CancelEventArgs e)
+        protected override void OnClosing(WindowClosingEventArgs e)
         {
             if (!realClosing)
             {

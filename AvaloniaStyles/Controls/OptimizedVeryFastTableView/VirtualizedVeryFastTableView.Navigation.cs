@@ -81,14 +81,8 @@ public partial class VirtualizedVeryFastTableView
         SelectedCellIndex = 0;
         return MoveCursorDown();
     }
-
-
-    public void SetOwner(IInputRoot owner)
-    {
-        
-    }
-
-    public void Move(IInputElement element, NavigationDirection direction, KeyModifiers keyModifiers = KeyModifiers.None)
+    
+    public (bool handled, IInputElement? next) GetNext(IInputElement element, NavigationDirection direction)
     {
         switch (direction)
         {
@@ -129,6 +123,7 @@ public partial class VirtualizedVeryFastTableView
         }
         MultiSelection.Clear();
         MultiSelection.Add(SelectedRowIndex);
+        return (false, null);
     }
 
     private void EnsureRowVisible(int rowIndex)
