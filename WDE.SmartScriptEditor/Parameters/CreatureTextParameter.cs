@@ -7,6 +7,7 @@ using WDE.Common.Parameters;
 using WDE.Common.Providers;
 using WDE.Common.Services;
 using WDE.Common.Utils;
+using WDE.MVVM.Observable;
 using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Models;
 
@@ -34,7 +35,12 @@ public class CreatureTextParameter : IContextualParameter<long, SmartBaseElement
         this.tableName = tableName;
         this.columnName = columnName;
 
-        foreach (var data in smartDataManager.GetAllData(SmartType.SmartTarget))
+        smartDataManager.GetAllData(SmartType.SmartTarget).SubscribeAction(Load);
+    }
+
+    private void Load(IReadOnlyList<SmartGenericJsonData> targets)
+    {
+        foreach (var data in targets)
         {
             if (data.Parameters == null)
                 continue;

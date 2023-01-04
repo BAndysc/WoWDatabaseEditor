@@ -46,7 +46,7 @@ public class SmartGroupView : SelectableTemplatedControl
         view.DataContext = vm;
         view.MinWidth = vm.DesiredWidth;
         flyout.Content = view;
-        flyout.Placement = FlyoutPlacementMode.BottomEdgeAlignedLeft;
+        flyout.Placement = PlacementMode.BottomEdgeAlignedLeft;
         flyout.ShowAt(this);
     }
 

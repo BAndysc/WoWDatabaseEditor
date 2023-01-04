@@ -17,6 +17,7 @@
     <Import Project="..\..\Avalonia.props" />
     <ItemGroup>
         <PackageReference Include="Avalonia.Diagnostics" Version="$(AvaloniaVersion)" />
+        <PackageReference Include="Avalonia.Desktop" Version="$(AvaloniaVersion)" />
     </ItemGroup>
     <ItemGroup>
       <AvaloniaResource Include="Icon.png" />

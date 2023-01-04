@@ -11,7 +11,7 @@ public class RecyclableViewList
 {
     private readonly Panel owner;
     private readonly bool behind;
-    private List<IControl> controls = new();
+    private List<Control> controls = new();
     private int counter = 0;
     private IDataTemplate? template;
 
@@ -27,14 +27,14 @@ public class RecyclableViewList
         counter = 0;
     }
 
-    public bool TryGetNext(object context, out IControl control)
+    public bool TryGetNext(object context, out Control control)
     {
         control = null!;
         if (template == null)
             return false;
         if (counter >= controls.Count)
         {
-            control = template!.Build(null!);
+            control = template!.Build(null!)!;
             controls.Add(control);
             control.DataContext = context;
             if (behind)
@@ -71,7 +71,7 @@ public class RecyclableViewList
         return true;
     }
     
-    public IControl GetNext(object context)
+    public Control GetNext(object context)
     {
         if (!TryGetNext(context, out var control))
             throw new Exception("Template is null!");

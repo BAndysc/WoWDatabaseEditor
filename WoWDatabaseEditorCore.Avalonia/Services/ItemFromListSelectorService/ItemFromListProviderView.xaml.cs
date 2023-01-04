@@ -8,6 +8,7 @@ using Avalonia.Threading;
 using Avalonia.VisualTree;
 using AvaloniaStyles.Controls;
 using Prism.Commands;
+using WDE.Common.Avalonia;
 using WDE.Common.Avalonia.Controls;
 using WoWDatabaseEditorCore.Services.ItemFromListSelectorService;
 
@@ -30,9 +31,9 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.ItemFromListSelectorService
             {
                 Command = new DelegateCommand(() =>
                 {
-                    this.FindControl<TextBox>("SearchBox").Focus();
+                    this.GetControl<TextBox>("SearchBox").Focus();
                 }),
-                Gesture = new KeyGesture(Key.F, AvaloniaLocator.Current.GetRequiredService<PlatformHotkeyConfiguration>().CommandModifiers)
+                Gesture = new KeyGesture(Key.F, KeyGestures.CommandModifier)
             });
         }
         
@@ -41,8 +42,8 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.ItemFromListSelectorService
         {
             if (e.Key == Key.Down)
             {
-                GridView gridView = this.FindControl<GridView>("GridView");
-                if (gridView == null || gridView.ListBoxImpl == null)
+                GridView gridView = this.GetControl<GridView>("GridView");
+                if (gridView.ListBoxImpl == null)
                     return;
 
                 if (gridView.ListBoxImpl.SelectedItem == null)

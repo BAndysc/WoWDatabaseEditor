@@ -21,7 +21,7 @@ public class OnReleaseListBox : ListBox, IStyleable
     protected override void OnPointerReleased(Avalonia.Input.PointerReleasedEventArgs e)
     {
         base.OnPointerReleased(e);
-        if (e.Source is IVisual source)
+        if (e.Source is Visual source)
         {
             var point = e.GetCurrentPoint(source);
 
@@ -30,8 +30,8 @@ public class OnReleaseListBox : ListBox, IStyleable
                 e.Handled = UpdateSelectionFromEventSource(
                     e.Source,
                     true,
-                    e.KeyModifiers.HasAllFlags(KeyModifiers.Shift),
-                    e.KeyModifiers.HasAllFlags(KeyModifiers.Control),
+                    e.KeyModifiers.HasFlagFast(KeyModifiers.Shift),
+                    e.KeyModifiers.HasFlagFast(KeyModifiers.Control),
                     point.Properties.IsRightButtonPressed);
             }
         }

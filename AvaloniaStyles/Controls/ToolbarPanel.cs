@@ -14,7 +14,7 @@ namespace AvaloniaStyles.Controls
         public static readonly StyledProperty<bool> IsOverflowProperty = AvaloniaProperty.Register<ToolbarPanel, bool>("IsOverflow");
         public static readonly StyledProperty<double> SpacingProperty = AvaloniaProperty.Register<ToolbarPanel, double>("Spacing", 4);
 
-        private List<IControl> _overflowControls = new List<IControl>();
+        private List<Control> _overflowControls = new List<Control>();
         
         public Panel? OutOfBoundsPanel
         {
@@ -52,7 +52,10 @@ namespace AvaloniaStyles.Controls
         private void NewPanelOnAttachedToVisualTree(object? sender, VisualTreeAttachmentEventArgs e)
         {
             foreach (var child in _overflowControls)
+            {
                 OutOfBoundsPanel!.Children.Add(child);
+                child.ApplyStyling();
+            }
             _overflowControls.Clear();
         }
 
@@ -188,7 +191,7 @@ namespace AvaloniaStyles.Controls
                     {
                         var c = children[^1];
                         Children.RemoveAt(Children.Count - 1);
-                        if (((IVisual)panel).IsAttachedToVisualTree)
+                        if (panel!.GetVisualRoot() != null)
                             panel.Children.Insert(0, c);
                         else
                             _overflowControls.Insert(0, c);
@@ -204,7 +207,7 @@ namespace AvaloniaStyles.Controls
             {
                 if (leftSpace > 0)
                 {
-                    IControl? child = null;
+                    Control? child = null;
                     if (_overflowControls.Count > 0)
                     {
                         child = _overflowControls[0];
@@ -233,7 +236,7 @@ namespace AvaloniaStyles.Controls
         }
 
         internal virtual void ArrangeChild(
-            IControl child,
+            Control child,
             Rect rect,
             Size panelSize)
         {

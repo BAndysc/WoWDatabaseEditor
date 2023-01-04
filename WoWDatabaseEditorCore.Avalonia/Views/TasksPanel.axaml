@@ -17,7 +17,7 @@
         <DockPanel LastChildFill="True" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <Label DockPanel.Dock="Top">Running tasks</Label>
             <ScrollViewer VerticalScrollBarVisibility="Auto">
-                <ItemsControl Items="{Binding Tasks}">
+                <ItemsControl ItemsSource="{Binding Tasks}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <Button BorderThickness="0" Command="{Binding ForgetTaskCommand}" HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch">
@@ -71,7 +71,7 @@
                                     </Style>
                                     <Style Selector="Button:disabled /template/ ContentPresenter#PART_ContentPresenter">
                                         <Setter Property="Background" Value="Transparent" />
-                                        <Setter Property="TextBlock.Foreground" Value="Black" />
+                                        <Setter Property="TextElement.Foreground" Value="Black" />
                                     </Style>
                                 </Button.Styles>
                             </Button>

@@ -105,7 +105,7 @@ namespace WoWDatabaseEditorCore.ViewModels
 
             private void OnProgressUpdate(ITaskProgress progress)
             {
-                Debug.Assert(SynchronizationContext.Current != null);
+                //Debug.Assert(SynchronizationContext.Current != null);
                 MaxValue = progress.MaxProgress;
                 Progress = progress.CurrentProgress;
                 CurrentTask = progress.CurrentTask;

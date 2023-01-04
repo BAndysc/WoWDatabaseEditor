@@ -21,7 +21,7 @@ namespace WDE.Updater.Test.Data
             Assert.AreEqual(new Uri("http://localhost"), provider.UpdateServerUrl);
             Assert.AreEqual("abc", provider.UpdateKey);
             Assert.AreEqual("def", provider.Marketplace);
-            Assert.AreEqual(Platforms.Linux, provider.Platform);
+            Assert.AreEqual(UpdatePlatforms.Linux, provider.Platform);
         }
 
         [Test]
@@ -83,23 +83,23 @@ namespace WDE.Updater.Test.Data
         {
             Setup("http://localhost", "abc", "def", "Linux");
             var provider = new UpdateServerDataProvider(config);
-            Assert.AreEqual(Platforms.Linux, provider.Platform);
+            Assert.AreEqual(UpdatePlatforms.Linux, provider.Platform);
             
             Setup("http://localhost", "abc", "def", "Windows");
             provider = new UpdateServerDataProvider(config);
-            Assert.AreEqual(Platforms.Windows, provider.Platform);
+            Assert.AreEqual(UpdatePlatforms.Windows, provider.Platform);
             
             Setup("http://localhost", "abc", "def", "MacOs");
             provider = new UpdateServerDataProvider(config);
-            Assert.AreEqual(Platforms.MacOs, provider.Platform);
+            Assert.AreEqual(UpdatePlatforms.MacOs, provider.Platform);
             
             Setup("http://localhost", "abc", "def", "MacOsArm");
             provider = new UpdateServerDataProvider(config);
-            Assert.AreEqual(Platforms.MacOsArm, provider.Platform);
+            Assert.AreEqual(UpdatePlatforms.MacOsArm, provider.Platform);
 
             Setup("http://localhost", "abc", "def", "WindowsWpf");
             provider = new UpdateServerDataProvider(config);
-            Assert.AreEqual(Platforms.WindowsWpf, provider.Platform);
+            Assert.AreEqual(UpdatePlatforms.WindowsWpf, provider.Platform);
         }
         
         private void Setup(string? server, string? key, string? marketplace, string? platform)

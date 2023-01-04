@@ -94,8 +94,8 @@
                         </Border.Background>
                         <Grid>
                             <controls:NodesContainer x:Name="PART_ElementItemsControl"
-                                                          Items="{TemplateBinding ElementsSource}"
-                                                          VirtualizationMode="None"
+                                                          ItemsSource="{TemplateBinding ElementsSource}"
+                                                         
                                                           ItemTemplate="{TemplateBinding ElementItemTemplate}">
                                 <ListBox.ItemsPanel>
                                     <ItemsPanelTemplate>
@@ -106,12 +106,11 @@
                                     <Style Selector="ListBox">
                                         <Setter Property="Template">
                                             <ControlTemplate>
-                                                <ItemsPresenter Name="PART_ItemsPresenter"
-                                                                Items="{TemplateBinding Items}"
+                                                <ItemsControl Name="PART_ItemsPresenter"
+                                                                ItemsSource="{TemplateBinding ItemsSource}"
                                                                 ItemsPanel="{TemplateBinding ItemsPanel}"
                                                                 ItemTemplate="{TemplateBinding ItemTemplate}"
-                                                                Margin="{TemplateBinding Padding}"
-                                                                VirtualizationMode="{TemplateBinding VirtualizationMode}" />
+                                                                Margin="{TemplateBinding Padding}" />
                                             </ControlTemplate>
                                         </Setter>
                                     </Style>
@@ -119,9 +118,9 @@
                             </controls:NodesContainer>
 
                             <controls:ConnectionsContainer x:Name="PART_ConnectionItemsControl"
-                                                             Items="{TemplateBinding ConnectionsSource}"
+                                                             ItemsSource="{TemplateBinding ConnectionsSource}"
                                                              SelectedItems="{TemplateBinding SelectedConnections}"
-                                                             VirtualizationMode="None"
+                                                            
                                                              ItemTemplate="{TemplateBinding ConnectionItemTemplate}">
                                 <ListBox.ItemsPanel>
                                     <ItemsPanelTemplate>
@@ -132,12 +131,11 @@
                                     <Style Selector="ListBox">
                                         <Setter Property="Template">
                                             <ControlTemplate>
-                                                <ItemsPresenter Name="PART_ItemsPresenter"
-                                                                Items="{TemplateBinding Items}"
-                                                                ItemsPanel="{TemplateBinding ItemsPanel}"
-                                                                ItemTemplate="{TemplateBinding ItemTemplate}"
-                                                                Margin="{TemplateBinding Padding}"
-                                                                VirtualizationMode="{TemplateBinding VirtualizationMode}" />
+                                                <ItemsControl Name="PART_ItemsPresenter"
+                                                              ItemsSource="{TemplateBinding ItemsSource}"
+                                                              ItemsPanel="{TemplateBinding ItemsPanel}"
+                                                              ItemTemplate="{TemplateBinding ItemTemplate}"
+                                                              Margin="{TemplateBinding Padding}" />
                                             </ControlTemplate>
                                         </Setter>
                                     </Style>

@@ -1,6 +1,5 @@
 using System;
 using Avalonia.Markup.Xaml.Styling;
-using JetBrains.Annotations;
 
 namespace AvaloniaStyles.Styles
 {
@@ -28,11 +27,11 @@ namespace AvaloniaStyles.Styles
             }
         }
         
-        public StyleIncludeColorAware([NotNull] Uri baseUri) : base(baseUri)
+        public StyleIncludeColorAware(Uri baseUri) : base(baseUri)
         {
         }
 
-        public StyleIncludeColorAware([NotNull] IServiceProvider serviceProvider) : base(serviceProvider)
+        public StyleIncludeColorAware(IServiceProvider serviceProvider) : base(serviceProvider)
         {
         }
     }

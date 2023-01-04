@@ -6,7 +6,7 @@ using WDE.DatabaseEditors.ViewModels.SingleRow;
 
 namespace WDE.DatabaseEditors.Avalonia.Views.SingleRow
 {
-    public class SingleRowDbTableEditorView : UserControl
+    public partial class SingleRowDbTableEditorView : UserControl
     {
         public SingleRowDbTableEditorView()
         {

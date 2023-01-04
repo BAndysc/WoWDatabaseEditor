@@ -11,6 +11,7 @@ using Avalonia.Input.Platform;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using JetBrains.Profiler.Api;
+using WDE.Common.Avalonia;
 using WDE.Common.Avalonia.Utils;
 using WDE.Common.Managers;
 using WDE.Common.Utils;
@@ -33,9 +34,9 @@ public partial class VirtualizedSmartScriptPanel : Panel
     public static readonly StyledProperty<IDataTemplate> NewActionItemTemplateProperty = AvaloniaProperty.Register<VirtualizedSmartScriptPanel, IDataTemplate>(nameof(NewActionItemTemplate));
     public static readonly StyledProperty<IDataTemplate> NewConditionItemTemplateProperty = AvaloniaProperty.Register<VirtualizedSmartScriptPanel, IDataTemplate>(nameof(NewConditionItemTemplate));
 
-    public static readonly AvaloniaProperty SelectedProperty = AvaloniaProperty.RegisterAttached<VirtualizedSmartScriptPanel, IControl, bool>("Selected");
-    public static bool GetSelected(IControl control) => (bool?)control.GetValue(SelectedProperty) ?? false;
-    public static void SetSelected(IControl control, bool value) => control.SetValue(SelectedProperty, value);
+    public static readonly AvaloniaProperty SelectedProperty = AvaloniaProperty.RegisterAttached<VirtualizedSmartScriptPanel, Control, bool>("Selected");
+    public static bool GetSelected(Control control) => (bool?)control.GetValue(SelectedProperty) ?? false;
+    public static void SetSelected(Control control, bool value) => control.SetValue(SelectedProperty, value);
 
     public static readonly AvaloniaProperty DropItemsProperty = AvaloniaProperty.Register<VirtualizedSmartScriptPanel, ICommand>(nameof(DropItems));
 
@@ -231,7 +232,7 @@ public partial class VirtualizedSmartScriptPanel : Panel
         set => SetValue(NewConditionItemTemplateProperty, value);
     }
 
-    private ScrollViewer ScrollView => this.FindAncestorOfType<ScrollViewer>();
+    private ScrollViewer ScrollView => this.FindAncestorOfType<ScrollViewer>()!;
     private InverseRenderTransformPanel? Panel => this.FindAncestorOfType<InverseRenderTransformPanel>();
 
     private Rect VisibleRect
@@ -309,8 +310,7 @@ public partial class VirtualizedSmartScriptPanel : Panel
     
     private void UpdateIsCopying(KeyModifiers key)
     {
-        var systemWideControlModifier = AvaloniaLocator.Current
-            .GetService<PlatformHotkeyConfiguration>()?.CommandModifiers ?? KeyModifiers.Control;
+        var systemWideControlModifier = KeyGestures.CommandModifier;
         isCopying = key.HasFlagFast(systemWideControlModifier);
     }
 
@@ -720,9 +720,9 @@ public partial class VirtualizedSmartScriptPanel : Panel
         return script != null && script.EditorFeatures.CanReorderConditions;
     }
 
-    protected override void OnPointerLeave(PointerEventArgs e)
+    protected override void OnPointerExited(PointerEventArgs e)
     {
-        base.OnPointerLeave(e);
+        base.OnPointerExited(e);
         mouseStartPositionValid = false;
     }
 

@@ -63,7 +63,7 @@
     <Style Selector="controls|SmartActionView:comment Border">
         <Setter Property="BorderBrush" Value="{DynamicResource SmartScripts.Comment.Border}" />
         <Setter Property="Background" Value="{DynamicResource SmartScripts.Comment.Background}" />
-        <Setter Property="TextBlock.Foreground" Value="{DynamicResource SmartScripts.Comment.Foreground}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource SmartScripts.Comment.Foreground}" />
     </Style>
     <Style Selector="controls|SmartActionView:action /template/ Border">
         <Setter Property="Background" Value="{DynamicResource SmartScripts.Action.Background}" />
@@ -74,7 +74,7 @@
     <Style Selector="controls|SmartActionView:comment:selected /template/ Border">
         <Setter Property="Background" Value="{DynamicResource SmartScripts.Comment.Selected.Background}" />
         <Setter Property="BorderBrush" Value="{DynamicResource SmartScripts.Comment.Selected.Border}" />
-        <Setter Property="TextBlock.Foreground" Value="{DynamicResource SmartScripts.Comment.Selected.Foreground}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource SmartScripts.Comment.Selected.Foreground}" />
     </Style>
     <Style Selector="controls|SmartActionView:action:selected /template/ extendedTextBlock|FormattedTextBlock">
         <Setter Property="Background" Value="{DynamicResource SmartScripts.Action.Selected.Background}" />
@@ -144,7 +144,7 @@
     </Style>
     <Style Selector="controls|SmartGroupView /template/ Border#PART_Border">
         <Setter Property="Background" Value="{DynamicResource SmartScripts.Group.Background}" />
-        <Setter Property="TextBlock.Foreground" Value="{DynamicResource SmartScripts.Group.Foreground}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource SmartScripts.Group.Foreground}" />
         <Setter Property="BorderBrush" Value="{DynamicResource SmartScripts.Group.Border}" />
     </Style>
     <Style Selector="controls|SmartGroupView:selected /template/ Border#PART_Border">
@@ -159,7 +159,7 @@
                     <Border Name="Main" BorderThickness="1" CornerRadius="4,0,0,4" DockPanel.Dock="Top">
                         <Border Padding="5" Background="{TemplateBinding SpecialBackground}" Name="Inner">
                             <DockPanel LastChildFill="True">
-                                <controls:SmartEventFlagsView Margin="2,0,0,0" TextBlock.Foreground="{DynamicResource SmartScripts.Event.Flag.Background}" DockPanel.Dock="Right"/>
+                                <controls:SmartEventFlagsView Margin="2,0,0,0" TextElement.Foreground="{DynamicResource SmartScripts.Event.Flag.Background}" DockPanel.Dock="Right"/>
                                 <Border ToolTip.Tip="Event chance" Margin="2,0,0,0" VerticalAlignment="Center" CornerRadius="3" Background="{DynamicResource SmartScripts.Event.Chance.Background}" DockPanel.Dock="Right" IsVisible="{CompiledBinding ChanceString, Converter={StaticResource NullToBoolConverter}}">
                                     <TextBlock Padding="2,1" Foreground="White" FontWeight="Bold" FontSize="11" Text="{CompiledBinding ChanceString}"/>
                                 </Border>
@@ -229,7 +229,7 @@
     <Style Selector="controls|GlobalVariableView:selected /template/ Border#PART_Var">
         <Setter Property="Background" Value="{DynamicResource SmartScripts.Comment.Selected.Background}" />
         <Setter Property="BorderBrush" Value="{DynamicResource SmartScripts.Comment.Selected.Border}" />
-        <Setter Property="TextBlock.Foreground" Value="{DynamicResource SmartScripts.Comment.Selected.Foreground}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource SmartScripts.Comment.Selected.Foreground}" />
     </Style>
     
     
@@ -307,6 +307,6 @@
 
     <Style Selector="views|SmartScriptEditorView Button /template/ ContentPresenter#PART_ContentPresenter">
         <Setter Property="CornerRadius" Value="0" />
-        <Setter Property="BoxShadow" Value="" />
+        <Setter Property="BoxShadow" Value="none" />
     </Style>
 </Styles>

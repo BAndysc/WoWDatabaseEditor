@@ -42,18 +42,18 @@
     <!--<Style Selector="controls|CompletionComboBox ToggleButton:checked /template/ ContentPresenter#PART_ContentPresenter">
         <Setter Property="Background" Value="{DynamicResource ToggleButtonBackgroundChecked}" />
         <Setter Property="BorderBrush" Value="{DynamicResource ToggleButtonBorderBrushChecked}" />
-        <Setter Property="TextBlock.Foreground" Value="{DynamicResource ToggleButtonForegroundChecked}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource ToggleButtonForegroundChecked}" />
     </Style>-->
 
     <Style Selector="controls|CompletionComboBox ToggleButton:checked:pointerover /template/ ContentPresenter#PART_ContentPresenter">
         <Setter Property="Background" Value="{DynamicResource ToggleButtonBackgroundCheckedPointerOver}" />
         <Setter Property="BorderBrush" Value="{DynamicResource ToggleButtonBorderBrushCheckedPointerOver}" />
-        <Setter Property="TextBlock.Foreground" Value="{DynamicResource ToggleButtonForegroundCheckedPointerOver}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource ToggleButtonForegroundCheckedPointerOver}" />
     </Style>
 
     <Style Selector="controls|CompletionComboBox ToggleButton:checked:pressed /template/ ContentPresenter#PART_ContentPresenter">
         <Setter Property="Background" Value="{DynamicResource ToggleButtonBackgroundCheckedPressed}" />
         <Setter Property="BorderBrush" Value="{DynamicResource ToggleButtonBorderBrushCheckedPressed}" />
-        <Setter Property="TextBlock.Foreground" Value="{DynamicResource ToggleButtonForegroundCheckedPressed}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource ToggleButtonForegroundCheckedPressed}" />
     </Style>
 </Styles>

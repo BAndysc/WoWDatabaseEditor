@@ -1,3 +1,4 @@
+using System.Globalization;
 using Avalonia;
 using Avalonia.Media;
 using Avalonia.Media.TextFormatting;
@@ -56,16 +57,14 @@ public abstract class BaseVirtualizedTableController : IVirtualizedTableControll
 
     protected void DrawText(DrawingContext context, Rect rect, string text, Color? color = null, float opacity = 0.4f, TextAlignment alignment = TextAlignment.Left)
     {
-        var ft = new FormattedText
+        var textColor = new SolidColorBrush(color ?? TextBrush.Color, opacity);
+        var ft = new FormattedText(text, CultureInfo.InvariantCulture, FlowDirection.LeftToRight, new Typeface(MonoFont), 12, textColor)
         {
-            Text = text,
-            Constraint = new Size(rect.Width, rect.Height),
-            Typeface = new Typeface(MonoFont),//Typeface.Default,
-            FontSize = 12,
+            MaxTextHeight = rect.Height,
+            MaxTextWidth = rect.Width,
             TextAlignment = alignment
         };
-        var textColor = new SolidColorBrush(color ?? TextBrush.Color, opacity);
-        context.DrawText(textColor, new Point(rect.X, rect.Center.Y - ft.Bounds.Height / 2), ft);
+        context.DrawText(ft, new Point(rect.X, rect.Center.Y - ft.Height / 2));
     }
 
     protected void DrawButton(DrawingContext context, Rect rect, string text, int margin, bool enabled = true)
@@ -82,30 +81,18 @@ public abstract class BaseVirtualizedTableController : IVirtualizedTableControll
         var state = context.PushClip(rect);
         if (char.IsAscii(text[0]))
         {
-            var ft = new FormattedText
+            var ft = new FormattedText(text, CultureInfo.InvariantCulture, FlowDirection.LeftToRight, Typeface.Default, 12, ButtonTextPen.Brush)
             {
-                Text = text,
-                Constraint = new Size(rect.Width, rect.Height),
-                Typeface = Typeface.Default,
-                FontSize = 12
+                MaxTextHeight = rect.Height,
+                MaxTextWidth = rect.Width
             };
-            context.DrawText(ButtonTextPen.Brush, new Point(rect.Center.X - ft.Bounds.Width / 2, rect.Center.Y - ft.Bounds.Height / 2), ft);
+            context.DrawText(ft, new Point(rect.Center.X - ft.Width / 2, rect.Center.Y - ft.Height / 2));
         }
         else
         {
             var tl = new TextLayout(text, Typeface.Default, 12, ButtonTextPen.Brush, TextAlignment.Center, maxWidth: rect.Width, maxHeight:rect.Height);
-            Draw(tl, context, new Point(rect.Left, rect.Center.Y - tl.Size.Height / 2));
+            tl.Draw(context, new Point(rect.Left, rect.Center.Y - tl.Height / 2));
         }
         state.Dispose();
-    }
-    
-    
-    
-    /* not required in avalonia 11, just call layout.Draw(context, p) */
-    private static void Draw(TextLayout layout, DrawingContext context, Point p)
-    {
-        double offset = layout.MaxWidth / 2 - layout.Size.Width / 2;
-        using var _ = context.PushPostTransform(Matrix.CreateTranslation(p.X + offset, p.Y));
-        layout.Draw(context);
     }
 }

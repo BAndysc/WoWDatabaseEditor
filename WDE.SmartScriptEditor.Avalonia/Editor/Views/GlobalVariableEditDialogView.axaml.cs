@@ -10,7 +10,7 @@ using WDE.Common.Managers;
 
 namespace WDE.SmartScriptEditor.Avalonia.Editor.Views
 {
-    public class GlobalVariableEditDialogView : DialogViewBase
+    public partial class GlobalVariableEditDialogView : DialogViewBase
     {
         public GlobalVariableEditDialogView()
         {

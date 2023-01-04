@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
@@ -26,10 +27,39 @@ public class VirtualizedSmartScriptPanelRenderOverlay : Control
     }
 }
 
+
+public class FormattedTextNumberCache
+{
+    private FormattedText[] cache = new FormattedText[0];
+
+    public FormattedTextNumberCache()
+    {
+                
+    }
+
+    public FormattedText Get(int index)
+    {
+        if (cache.Length <= index)
+            EnsureCache(index + 1);
+        return cache[index];
+    }
+
+    private void EnsureCache(int size)
+    {
+        int old = cache.Length;
+        size = Math.Max(size, cache.Length * 2 + 1);
+        Array.Resize(ref cache, size);
+        for (int i = old; i < size; ++i)
+        {
+            cache[i] = new FormattedText($"{i}", CultureInfo.CurrentCulture, FlowDirection.LeftToRight, Typeface.Default, 10, Brushes.DarkGray);
+        }
+    }
+}
+
 public partial class VirtualizedSmartScriptPanel
 {
     private static FormattedText? vvvvText;
-    private static SmartScriptPanelLayout.FormattedTextNumberCache NumberCache = new();
+    private static FormattedTextNumberCache NumberCache = new();
     public void RenderOverlay(DrawingContext context)
     {
         base.Render(context);
@@ -70,10 +100,7 @@ public partial class VirtualizedSmartScriptPanel
         
         if (vvvvText == null)
         {
-            vvvvText = new FormattedText();
-            vvvvText.FontSize = 7;
-            vvvvText.Text = "vvvv";
-            vvvvText.Typeface = Typeface.Default;
+            vvvvText = new FormattedText("vvvv", CultureInfo.CurrentCulture, FlowDirection.LeftToRight, Typeface.Default, 7, null);
         }
         
         var visibleRect = VisibleRect;
@@ -121,7 +148,7 @@ public partial class VirtualizedSmartScriptPanel
                         if (a.DestinationEventId is { } eventId)
                         {
                             var ft = NumberCache.Get(eventId);
-                            context.DrawText(Brushes.DarkGray, new Point(PaddingLeft + x, yPos + 5), ft);
+                            context.DrawText(ft, new Point(PaddingLeft + x, yPos + 5));
                         }
                         DrawProblems(context, a.VirtualLineId, new Point(x, yPos));
                     }
@@ -134,7 +161,8 @@ public partial class VirtualizedSmartScriptPanel
     {
         if (Problems != null && Problems.TryGetValue(index, out var severity))
         { 
-            dc.DrawText(severity is DiagnosticSeverity.Error or DiagnosticSeverity.Critical ? Brushes.Red : Brushes.Orange, new Point(PaddingLeft + pos.X, pos.Y + 5 + 10), vvvvText);   
+            vvvvText!.SetForegroundBrush(severity is DiagnosticSeverity.Error or DiagnosticSeverity.Critical ? Brushes.Red : Brushes.Orange);
+            dc.DrawText(vvvvText, new Point(PaddingLeft + pos.X, pos.Y + 5 + 10));   
         }
     }
 

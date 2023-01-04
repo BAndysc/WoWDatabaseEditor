@@ -40,7 +40,7 @@
     <Style Selector="Button.accent:disabled /template/ ContentPresenter#PART_ContentPresenter">
       <Setter Property="Background" Value="{DynamicResource AccentButtonBackgroundDisabled}" />
       <Setter Property="BorderBrush" Value="{DynamicResource AccentButtonBorderBrushDisabled}" />
-      <Setter Property="TextBlock.Foreground" Value="{DynamicResource AccentButtonForegroundDisabled}" />
+      <Setter Property="TextElement.Foreground" Value="{DynamicResource AccentButtonForegroundDisabled}" />
     </Style>
     
     <Style Selector="Button /template/ ContentPresenter#PART_ContentPresenter">

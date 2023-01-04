@@ -31,7 +31,7 @@
                                        MultiSelection="{CompiledBinding MultiSelection}"
                                        SelectedRowIndex="{CompiledBinding FocusedRowIndex}"
                                        DoubleTapped="VeryFastTableView_OnDoubleTapped"
-                                       TextBlock.FontFamily="{DynamicResource MonoFont}"
+                                       TextElement.FontFamily="{DynamicResource MonoFont}"
                                        Columns="{CompiledBinding Columns}">
         <fastTableView:VeryFastTableView.GroupHeaderTemplate>
           <DataTemplate x:DataType="viewModels:LootGroupViewModel">

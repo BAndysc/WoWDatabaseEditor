@@ -16,20 +16,14 @@ namespace AvaloniaStyles
         {
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
                 desktop.MainWindow = new MainWindow();
+            else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
+            {
+                singleViewPlatform.MainView = new MainView
+                {
+                    DataContext = new DemoDataContext()
+                };
+            }
             base.OnFrameworkInitializationCompleted();
         }
-
-        static void Main(string[] args) 
-            => BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
-
-        // App configuration, used by the entry point and previewer
-        static AppBuilder BuildAvaloniaApp()
-            => AppBuilder.Configure<App>()
-                .With(new Win32PlatformOptions
-                {
-                    OverlayPopups = true,
-                })
-                .UsePlatformDetect()
-                .LogToTrace();
     }
 }

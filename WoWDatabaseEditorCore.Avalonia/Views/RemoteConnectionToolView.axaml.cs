@@ -9,8 +9,6 @@ namespace WoWDatabaseEditorCore.Avalonia.Views;
 
 public partial class RemoteConnectionToolView : UserControl
 {
-    private TextEditor? MyAvalonEdit;
-        
     public RemoteConnectionToolView()
     {
         InitializeComponent();

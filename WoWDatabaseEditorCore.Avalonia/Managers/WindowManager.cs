@@ -8,6 +8,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
+using Avalonia.LogicalTree;
 using Avalonia.Media;
 using Avalonia.VisualTree;
 using WDE.Common.Avalonia.Components;
@@ -74,6 +75,23 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
                 }
             }
 
+            public (int x, int y) Size
+            {
+                get
+                {
+                    if (window.TryGetTarget(out var target))
+                    {
+                        // we use screen coords for size so that size is custom app scaling independent 
+                        var screenTopLeftPoint = target.PointToScreen(new Point(target.Position.X, target.Position.Y));
+                        var screenBottomRightPoint = target.PointToScreen(new Point(target.Position.X + target.ClientSize.Width, target.Position.Y + target.ClientSize.Height));
+                        var width = screenBottomRightPoint.X - screenTopLeftPoint.X;
+                        var height = screenBottomRightPoint.Y - screenTopLeftPoint.Y;
+                        return (width, height);
+                    }
+                    return (100, 100);
+                }
+            }
+
             public (int x, int y) LogicalSize
             {
                 get
@@ -81,23 +99,6 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
                     if (window.TryGetTarget(out var target))
                     {
                         return ((int)target.Width, (int)target.Height);
-                    }
-                    return (100, 100);
-                }
-            }
-            
-            public (int x, int y) Size
-            {
-                get
-                {
-                    if (window.TryGetTarget(out var target))
-                    {
-                        // we use screen coords for size so that size is custom app scaling independent
-                        var screenTopLeftPoint = target.PointToScreen(new Point(target.Position.X, target.Position.Y));
-                        var screenBottomRightPoint = target.PointToScreen(new Point(target.Position.X + target.ClientSize.Width, target.Position.Y + target.ClientSize.Height));
-                        var width = screenBottomRightPoint.X - screenTopLeftPoint.X;
-                        var height = screenBottomRightPoint.Y - screenTopLeftPoint.Y;
-                        return (width, height);
                     }
                     return (100, 100);
                 }
@@ -191,6 +192,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
                     var tcs = new TaskCompletionSource<bool>();
                     var popup = new Popup();
                     popup.IsLightDismissEnabled = true;
+                    popup.WindowManagerAddShadowHint = true;
                     bool closed = false;
                     popup.Height = viewModel.DesiredHeight;
                     popup.Width = viewModel.DesiredWidth;
@@ -218,13 +220,23 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
                             tcs.SetResult(false);
                         }
                     });
-                    if (FocusManager.Instance!.Current is Control c)
-                    {
-                        popup.PlacementTarget = c;
-                    }
-                    ((DockPanel)mainWindowHolder.RootWindow.GetVisualRoot().VisualChildren[0].VisualChildren[0].VisualChildren[0]).Children.Add(popup);
-                    popup.PlacementMode = PlacementMode.Pointer;
+                    // if (FocusManager.Instance?.Current is Control c)
+                    // {
+                    //     popup.PlacementTarget = c;
+                    // }
+                    Control? visualRoot;
+
+                    if (Application.Current!.ApplicationLifetime is ISingleViewApplicationLifetime viewApp)
+                        visualRoot = viewApp.MainView;
+                    else
+                        visualRoot = mainWindowHolder.RootWindow.GetLogicalChildren().FirstOrDefault() as MainWebView;
+                    
+                    var panel = visualRoot!.GetControl<Panel>("PART_Overlay");
+                    panel.Children.Add(popup);
+                    popup.PlacementMode = PlacementMode.Center;
                     popup.IsOpen = true;
+
+                    
                     window = null;
                     return tcs.Task;
                 }

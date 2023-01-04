@@ -4,7 +4,7 @@ using Avalonia.Markup.Xaml;
 
 namespace WoWDatabaseEditorCore.Avalonia.Services.QuickLoadService;
 
-public class QuickLoadSettingsView : UserControl
+public partial class QuickLoadSettingsView : UserControl
 {
     public QuickLoadSettingsView()
     {

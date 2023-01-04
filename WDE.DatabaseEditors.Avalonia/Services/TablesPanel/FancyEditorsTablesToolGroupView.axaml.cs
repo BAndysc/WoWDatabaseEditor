@@ -19,18 +19,11 @@ public partial class FancyEditorsTablesToolGroupView : UserControl
         InitializeComponent();
     }
     
-    private ListBox TablesListBox = null!;
     private ISelectionAdapter SelectionAdapter = null!;
-
-    private void InitializeComponent()
-    {
-        AvaloniaXamlLoader.Load(this);
-    }
 
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
-        TablesListBox = this.FindControl<ListBox>("TablesListBox");
         SelectionAdapter = new SelectingItemsControlSelectionAdapter(TablesListBox);
         DispatcherTimer.RunOnce(() =>
         {
@@ -40,9 +33,9 @@ public partial class FancyEditorsTablesToolGroupView : UserControl
         }, TimeSpan.FromMilliseconds(1));
     }
 
-    private void InputElement_OnDoubleTapped(object? sender, RoutedEventArgs e)
+    private void InputElement_OnDoubleTapped(object? sender, TappedEventArgs e)
     {
-        if (sender is ListBox itemsBox && e.Source is IVisual visual)
+        if (sender is ListBox itemsBox && e.Source is Visual visual)
         {
             if (visual.SelfOrVisualAncestor<ListBoxItem>() is { } item)
             {
@@ -53,7 +46,7 @@ public partial class FancyEditorsTablesToolGroupView : UserControl
 
     private void InputElement_OnPointerReleased(object? sender, PointerReleasedEventArgs e)
     {
-        if (sender is ListBox itemsBox && e.Source is IVisual visual)
+        if (sender is ListBox itemsBox && e.Source is Visual visual)
         {
             if (visual.SelfOrVisualAncestor<ListBoxItem>() is { } item)
             {
@@ -66,7 +59,7 @@ public partial class FancyEditorsTablesToolGroupView : UserControl
     {
         if (e.Key == Key.Enter)
         {
-            if (sender is ListBox itemsBox && e.Source is IVisual visual)
+            if (sender is ListBox itemsBox && e.Source is Visual visual)
             {
                 if (visual.SelfOrVisualAncestor<ListBoxItem>() is { } item)
                 {

@@ -25,14 +25,14 @@
        </controls:ToolbarPanel>
        <ComboBox DockPanel.Dock="Top" HorizontalAlignment="Stretch" 
                  IsVisible="{CompiledBinding HasAnySessions}"
-                 Items="{CompiledBinding Sessions}" SelectedItem="{CompiledBinding SelectedSession, Mode=TwoWay}">
+                 ItemsSource="{CompiledBinding Sessions}" SelectedItem="{CompiledBinding SelectedSession, Mode=TwoWay}">
            <ComboBox.ItemTemplate>
                <DataTemplate>
                    <TextBlock Text="{CompiledBinding Name}" />
                </DataTemplate>
            </ComboBox.ItemTemplate>
        </ComboBox>
-       <ListBox Items="{CompiledBinding CurrentSolutionItems}"
+       <ListBox ItemsSource="{CompiledBinding CurrentSolutionItems}"
                 BorderThickness="0" 
                 SelectedItem="{CompiledBinding SelectedItem, Mode=TwoWay}"
                 DoubleTapped="Tv_OnDoubleTapped">

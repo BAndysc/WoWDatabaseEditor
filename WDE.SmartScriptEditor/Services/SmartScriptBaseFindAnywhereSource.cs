@@ -80,7 +80,7 @@ public abstract class SmartScriptBaseFindAnywhereSource : IFindAnywhereSource
     
     private IEnumerable<(IDatabaseProvider.SmartLinePropertyType what, int whatValue, int parameterIndex, long valueToSearch)> PrepareConditionForType(IReadOnlyList<string> parameterNames, long parameterValue, SmartType type, IDatabaseProvider.SmartLinePropertyType dbType)
     {
-        foreach (var data in smartDataManager.GetAllData(type))
+        foreach (var data in smartDataManager.GetAllData(type).Value)
         {
             if (data.Parameters == null)
                 continue;

@@ -1,7 +1,9 @@
 using System;
+using System.Globalization;
 using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Documents;
 using Avalonia.Media;
 using AvaloniaStyles.Controls.FastTableView;
 using WDE.Common.Utils;
@@ -20,48 +22,49 @@ public partial class VirtualizedVeryFastTableView
         {
             var scrollViewer = ScrollViewer;
             if (scrollViewer == null)
-                return Rect.Empty;
+                return default;
             return new Rect(scrollViewer.Offset.X, scrollViewer.Offset.Y + DrawingStartOffsetY, scrollViewer.Viewport.Width, scrollViewer.Viewport.Height - DrawingStartOffsetY);
         }
     }
 
     private Exception? lastException;
     
-    public override void Render(DrawingContext context)
-    {
-        base.Render(context);
-        try
-        {
-            if (lastException != null)
-            {
-                context.DrawText(Brushes.Red, new Point(0, 0), new FormattedText
-                {
-                    Text = "Fatal error",
-                    Typeface = Typeface.Default,
-                    FontSize = 16
-                });            
-                context.DrawText(Brushes.Red, new Point(0, 24), new FormattedText
-                {
-                    Text = lastException.ToString(),
-                    Typeface = Typeface.Default,
-                    FontSize = 12,
-                    Constraint = Bounds.Size
-                });
-            }
-            else
-               RenderImpl(context);
-        }
-        catch (Exception e)
-        {
-            lastException = e;
-            Console.WriteLine(e);
-        }
-    }
+    // todo Ava11
+    // public override void Render(DrawingContext context)
+    // {
+    //     base.Render(context);
+    //     try
+    //     {
+    //         if (lastException != null)
+    //         {
+    //             context.DrawText(Brushes.Red, new Point(0, 0), new FormattedText
+    //             {
+    //                 Text = "Fatal error",
+    //                 Typeface = Typeface.Default,
+    //                 FontSize = 16
+    //             });            
+    //             context.DrawText(Brushes.Red, new Point(0, 24), new FormattedText
+    //             {
+    //                 Text = lastException.ToString(),
+    //                 Typeface = Typeface.Default,
+    //                 FontSize = 12,
+    //                 Constraint = Bounds.Size
+    //             });
+    //         }
+    //         else
+    //            RenderImpl(context);
+    //     }
+    //     catch (Exception e)
+    //     {
+    //         lastException = e;
+    //         Console.WriteLine(e);
+    //     }
+    // }
 
     private void RenderImpl(DrawingContext context)
     {
 
-        var font = new Typeface(TextBlock.GetFontFamily(this));
+        var font = new Typeface(TextElement.GetFontFamily(this));
         
         var actualWidth = Bounds.Width;
 
@@ -139,22 +142,18 @@ public partial class VirtualizedVeryFastTableView
                                         text = text.Substring(0, indexOfEndOfLine);
 
                                     rect = rect.WithWidth(rect.Width - ColumnSpacing);
-                                    var ft = new FormattedText
+                                    var ft = new FormattedText(text, CultureInfo.InvariantCulture, FlowDirection.LeftToRight, font, 12, textColor)
                                     {
-                                        Text = text,
-                                        Constraint = new Size(rect.Width, RowHeight),
-                                        Typeface = font,
-                                        FontSize = 12
+                                        MaxTextHeight = RowHeight,
+                                        MaxTextWidth = rect.Width
                                     };
+                                    
                                     if (Math.Abs(rectWidth - rect.Width) > 0.01)
                                     {
                                         state.Dispose();
                                         state = context.PushClip(rect);
                                     }
-
-                                    context.DrawText(textColor,
-                                        new Point(rect.X + ColumnSpacing, y + RowHeight / 2 - ft.Bounds.Height / 2),
-                                        ft);
+                                    context.DrawText(ft, new Point(rect.Center.X + ColumnSpacing, rect.Center.Y - ft.Height / 2));
                                 }
                             }
                         }
@@ -189,7 +188,8 @@ public partial class VirtualizedVeryFastTableView
         var controller = Controller;
         
         FontFamily font = FontFamily.Default;
-        if (Application.Current!.Styles.TryGetResource("MainFontSans", out var mainFontSans) && mainFontSans is FontFamily mainFontSansFamily)
+        //todo avalonia11: default theme?
+        if (Application.Current!.Styles.TryGetResource("MainFontSans", default, out var mainFontSans) && mainFontSans is FontFamily mainFontSansFamily)
             font = mainFontSansFamily;
 
         var scrollViewer = ScrollViewer;
@@ -213,12 +213,10 @@ public partial class VirtualizedVeryFastTableView
                 continue;
             
             var column = Columns[i];
-            var ft = new FormattedText
+            var ft = new FormattedText(column.Header, CultureInfo.InvariantCulture, FlowDirection.LeftToRight, new Typeface(font, FontStyle.Normal, FontWeight.Bold), 12, BorderPen.Brush)
             {
-                Text = column.Header,
-                Constraint = new Size(column.Width, RowHeight),
-                Typeface = new Typeface(font, FontStyle.Normal, FontWeight.Bold),
-                FontSize = 12
+                MaxTextHeight = RowHeight,
+                MaxTextWidth = column.Width
             };
             
             bool isMouseOverColumn = isMouseOverHeader && lastMouseLocation.X >= x && lastMouseLocation.X < x + column.Width;
@@ -228,7 +226,7 @@ public partial class VirtualizedVeryFastTableView
             var cellRect = new Rect(x + ColumnSpacing, y, Math.Max(0, column.Width - ColumnSpacing * 2), RowHeight);
             controller.DrawHeader(i, context, this, ref cellRect);
             var state = context.PushClip(cellRect);
-            context.DrawText(BorderPen.Brush, new Point(cellRect.X, cellRect.Center.Y - ft.Bounds.Height / 2), ft);
+            context.DrawText(ft, new Point(cellRect.X, cellRect.Center.Y - ft.Height / 2));
             state.Dispose();
             
             x += column.Width;

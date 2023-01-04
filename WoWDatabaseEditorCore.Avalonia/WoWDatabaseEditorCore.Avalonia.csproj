@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <OutputType>WinExe</OutputType>
+        <OutputType>Library</OutputType>
         <TargetFramework>net7.0</TargetFramework>
         <Configurations>Debug;Release</Configurations>
         <Platforms>AnyCPU</Platforms>
@@ -25,7 +25,7 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Avalonia.Controls.TreeDataGrid" Version="0.10.10" />
+        <PackageReference Include="Avalonia.Controls.TreeDataGrid" Version="11.0.0" />
         <PackageReference Include="Avalonia.Diagnostics" Version="$(AvaloniaVersion)" />
         <PackageReference Include="Avalonia.Controls.DataGrid" Version="$(AvaloniaVersion)" />
         <PackageReference Include="Prism.Core" Version="7.2.0.1422" />
@@ -36,7 +36,9 @@
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\AvaloniaStyles\AvaloniaStyles.csproj" />
+        <ProjectReference Include="..\Dock\src\Dock.Model.Mvvm\Dock.Model.Mvvm.csproj" />
         <ProjectReference Include="..\Modules\AvaloniaGraph\AvaloniaGraph.csproj" />
+        <ProjectReference Include="..\Modules\WDE.DatabaseDefinitionEditor\WDE.DatabaseDefinitionEditor.csproj" />
         <ProjectReference Include="..\Prism.Avalonia\src\Prism.Unity.Avalonia\Prism.Unity.Avalonia.csproj" />
         <ProjectReference Include="..\Rendering\TheEngine\TheEngine.csproj" />
         <ProjectReference Include="..\WDE.Common.Avalonia\WDE.Common.Avalonia.csproj" />
@@ -45,9 +47,8 @@
         <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />
         <ProjectReference Include="..\WoWDatabaseEditor\WoWDatabaseEditorCore.csproj" />
         <ProjectReference Include="..\Dock\src\Dock.Model\Dock.Model.csproj" />
-        <ProjectReference Include="..\Dock\src\Dock.Model.ReactiveUI\Dock.Model.ReactiveUI.csproj" />
         <ProjectReference Include="..\Dock\src\Dock.Avalonia\Dock.Avalonia.csproj" />
-        <ProjectReference Include="..\Dock\src\Dock.ProportionalStackPanel\Dock.ProportionalStackPanel.csproj" />
+<!--        <ProjectReference Include="..\Dock\src\Dock.ProportionalStackPanel\Dock.ProportionalStackPanel.csproj" />-->
     </ItemGroup>
     <ItemGroup>
       <Resource Include="Icon.ico" />

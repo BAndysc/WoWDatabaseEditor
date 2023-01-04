@@ -8,6 +8,7 @@ using WDE.Common.Services;
 using WDE.Common.Types;
 using WDE.Common.Utils;
 using WDE.Module.Attributes;
+using WDE.MVVM.Observable;
 using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Editor;
 using WDE.SmartScriptEditor.Editor.ViewModels;
@@ -62,7 +63,14 @@ public class DynamicContextMenuService : IDynamicContextMenuService
         this.spellService = spellService;
         this.editorFeatures = editorFeatures;
         this.preferences = preferences;
-        foreach (var actionData in dataManager.GetAllData(SmartType.SmartAction))
+        dataManager.GetAllData(SmartType.SmartAction)
+            .SubscribeAction(Load);
+    }
+
+    private void Load(IReadOnlyList<SmartGenericJsonData> actions)
+    {
+        perActionMenus.Clear();
+        foreach (var actionData in actions)
         {
             if (actionData.ContextMenu == null)
                 continue;

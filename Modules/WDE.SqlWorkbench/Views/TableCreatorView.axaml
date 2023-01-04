@@ -24,8 +24,8 @@
         
         <TextBlock Text="Charset/Collation:" />
         <Grid ColumnDefinitions="*,5,*">
-          <ComboBox HorizontalAlignment="Stretch" Grid.Column="0" Items="{CompiledBinding Charsets}" SelectedItem="{CompiledBinding SelectedCharset}" />
-          <ComboBox HorizontalAlignment="Stretch" Grid.Column="2" Items="{CompiledBinding SelectedCharset.Collations}" SelectedItem="{CompiledBinding SelectedCollation}" />
+          <ComboBox HorizontalAlignment="Stretch" Grid.Column="0" ItemsSource="{CompiledBinding Charsets}" SelectedItem="{CompiledBinding SelectedCharset}" />
+          <ComboBox HorizontalAlignment="Stretch" Grid.Column="2" ItemsSource="{CompiledBinding SelectedCharset.Collations}" SelectedItem="{CompiledBinding SelectedCollation}" />
         </Grid>
         
         <TextBlock Text="Comment: "/>
@@ -158,14 +158,14 @@
               <GridColumnDefinition Name="Kind" Property="" PreferedWidth="130">
                 <GridColumnDefinition.DataTemplate>
                   <DataTemplate x:DataType="viewModels:IndexViewModel">
-                    <ComboBox SelectedItem="{CompiledBinding Kind}" Items="{x:Static viewModels:IndexViewModel.Kinds}" />
+                    <ComboBox SelectedItem="{CompiledBinding Kind}" ItemsSource="{x:Static viewModels:IndexViewModel.Kinds}" />
                   </DataTemplate>
                 </GridColumnDefinition.DataTemplate>
               </GridColumnDefinition>
               <GridColumnDefinition Name="Type" Property="" PreferedWidth="130">
                 <GridColumnDefinition.DataTemplate>
                   <DataTemplate x:DataType="viewModels:IndexViewModel">
-                    <ComboBox IsEnabled="{CompiledBinding CanPickType}" SelectedItem="{CompiledBinding Type}" Items="{x:Static viewModels:IndexViewModel.Types}" />
+                    <ComboBox IsEnabled="{CompiledBinding CanPickType}" SelectedItem="{CompiledBinding Type}" ItemsSource="{x:Static viewModels:IndexViewModel.Types}" />
                   </DataTemplate>
                 </GridColumnDefinition.DataTemplate>
               </GridColumnDefinition>

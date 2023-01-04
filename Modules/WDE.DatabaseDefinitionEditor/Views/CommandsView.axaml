@@ -14,7 +14,7 @@
         <ButtonImage ToolTip.Tip="Delete the selected command" Image="Icons/icon_delete.png" Command="{CompiledBinding DeleteSelectedCommand}" IsEnabled="{CompiledBinding SelectedCommand, Converter={x:Static NullConverter.IsNotNull}}" />
       </ToolbarPanel>
             
-      <ListBox Items="{CompiledBinding Commands}" SelectedItem="{CompiledBinding SelectedCommand}">
+      <ListBox ItemsSource="{CompiledBinding Commands}" SelectedItem="{CompiledBinding SelectedCommand}">
         <ListBox.KeyBindings>
           <KeyBinding Gesture="Delete" Command="{CompiledBinding DeleteSelectedCommand}" />
           <KeyBinding Gesture="Back" Command="{CompiledBinding DeleteSelectedCommand}" />

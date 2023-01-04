@@ -2,10 +2,10 @@
 <Project>
     <PropertyGroup>
         <RestoreAdditionalProjectSources>
-            https://nuget-feed-all.avaloniaui.net/v3/index.json
+            https://nuget-feed-all.avaloniaui.net/v3/index.json;https://www.myget.org/F/xamlbehaviors-nightly/api/v3/index.json
         </RestoreAdditionalProjectSources>
         <NoWarn>CS0067,CS3021,CS1998,CA1416,CS1591</NoWarn>
-        <AvaloniaVersion>0.10.22</AvaloniaVersion>
+        <AvaloniaVersion>11.0.6</AvaloniaVersion>
         <LangVersion>preview</LangVersion>
     </PropertyGroup>
     <PropertyGroup>

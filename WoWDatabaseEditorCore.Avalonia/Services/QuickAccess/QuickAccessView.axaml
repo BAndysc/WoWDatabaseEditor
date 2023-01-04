@@ -22,7 +22,7 @@
             <ListBox Background="{DynamicResource SlightlyHighlightedBackground}" MaxHeight="350" BorderThickness="0" 
                      x:Name="ResultsList"
                      CornerRadius="{DynamicResource ControlCornerRadius}"
-                     Items="{CompiledBinding Items}">
+                     ItemsSource="{CompiledBinding Items}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <DockPanel LastChildFill="True">

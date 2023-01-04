@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -12,6 +13,7 @@ public class ContextualParametersJsonProvider : IContextualParametersJsonProvide
 {
     public IEnumerable<(string file, string content)> GetParameters()
     {
+        return Enumerable.Empty<(string, string)>();
         return Directory.GetFiles("DatabaseContextualParameters/", "*.json").Select(f => (f, File.ReadAllText(f)));
     }
 }

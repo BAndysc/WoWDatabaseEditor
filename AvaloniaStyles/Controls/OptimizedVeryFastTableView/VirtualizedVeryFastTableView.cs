@@ -13,7 +13,7 @@ using WDE.MVVM.Observable;
 
 namespace AvaloniaStyles.Controls.OptimizedVeryFastTableView;
 
-public partial class VirtualizedVeryFastTableView : Panel, IKeyboardNavigationHandler
+public partial class VirtualizedVeryFastTableView : Panel, ICustomKeyboardNavigation
 {
     protected static double ColumnSpacing = 10;
     protected static double RowHeight = 28;
@@ -39,7 +39,8 @@ public partial class VirtualizedVeryFastTableView : Panel, IKeyboardNavigationHa
     private static bool GetResource<T>(string key, T defaultVal, out T outT)
     {
         outT = defaultVal;
-        if (Application.Current!.Styles.TryGetResource(key, out var res) && res is T t)
+        // todo: ava11 theme?
+        if (Application.Current!.Styles.TryGetResource(key, default, out var res) && res is T t)
         {
             outT = t;
             return true;
@@ -192,13 +193,13 @@ public partial class VirtualizedVeryFastTableView : Panel, IKeyboardNavigationHa
             e.Handled = true;
         }
     }
-
-    protected override void OnPointerLeave(PointerEventArgs e)
+    
+    protected override void OnPointerExited(PointerEventArgs e)
     {
         Cursor = Cursor.Default;
         lastMouseLocation = new Point(-1, -1);
         InvalidateVisual();
-        base.OnPointerLeave(e);
+        base.OnPointerExited(e);
     }
 
     protected override void OnPointerMoved(PointerEventArgs e)
@@ -409,13 +410,13 @@ public partial class VirtualizedVeryFastTableView : Panel, IKeyboardNavigationHa
                     switch (action)
                     {
                         case PhantomTextBox.ActionAfterSave.MoveUp:
-                            Move(this, NavigationDirection.Up);
+                            GetNext(this, NavigationDirection.Up);
                             break;
                         case PhantomTextBox.ActionAfterSave.MoveDown:
-                            Move(this, NavigationDirection.Down);
+                            GetNext(this, NavigationDirection.Down);
                             break;
                         case PhantomTextBox.ActionAfterSave.MoveNext:
-                            Move(this, NavigationDirection.Next);
+                            GetNext(this, NavigationDirection.Next);
                             break;
                         default:
                             throw new ArgumentOutOfRangeException(nameof(action), action, null);
@@ -496,20 +497,24 @@ public partial class VirtualizedVeryFastTableView : Panel, IKeyboardNavigationHa
 
         public bool CanExecute(object? parameter)
         {
-            if (FocusManager.Instance!.Current is TextBox tb)
-                return true;
+            // @fixme avalonia 11
+            //if (FocusManager.Instance!.Current is TextBox tb)
+            //    return true;
             return CustomCommand.CanExecute(parameter);
         }
 
         public void Execute(object? parameter)
         {
-            if (FocusManager.Instance!.Current is TextBox tb)
+            // @fixme avalonia 11
+            if (false)//FocusManager.Instance!.Current is TextBox tb)
             {
-                var ev = Activator.CreateInstance<KeyEventArgs>();
-                ev.Key = Gesture.Key;
-                ev.KeyModifiers = Gesture.KeyModifiers;
-                ev.RoutedEvent = InputElement.KeyDownEvent;
-                tb.RaiseEvent(ev);
+                var ev = new KeyEventArgs()
+                {
+                    Key = Gesture.Key,
+                    KeyModifiers = Gesture.KeyModifiers,
+                    RoutedEvent = InputElement.KeyDownEvent,
+                };
+                //tb.RaiseEvent(ev);
                 if (!ev.Handled && CanExecute(parameter))
                     CustomCommand.Execute(parameter);
             }

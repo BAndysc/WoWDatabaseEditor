@@ -51,7 +51,7 @@
         </SettingItem>
         
         <SettingItem Header="Default connection" Help="The default connection that will be open when you use the 'New SQL document' button">
-          <ComboBox Items="{CompiledBinding Connections}" SelectedItem="{CompiledBinding DefaultConnection}">
+          <ComboBox ItemsSource="{CompiledBinding Connections}" SelectedItem="{CompiledBinding DefaultConnection}">
             <ComboBox.ItemTemplate>
               <DataTemplate>
                 <DockPanel>
@@ -75,7 +75,7 @@
             dnD:DragAndDrop.IsDropTarget="True"
             dnD:DragAndDrop.DropHandler="{CompiledBinding .}" 
             dnD:DragAndDrop.IsDragSource="True"
-            Items="{CompiledBinding Connections}" SelectedItem="{CompiledBinding SelectedConnection}">
+            ItemsSource="{CompiledBinding Connections}" SelectedItem="{CompiledBinding SelectedConnection}">
             <ListBox.ItemTemplate>
               <DataTemplate>
                 <DockPanel>
@@ -106,7 +106,7 @@
                     <Flyout>
                       <DockPanel>
                         <Slider DockPanel.Dock="Right" Orientation="Vertical" VerticalAlignment="Stretch" Value="{Binding #ColorPicker.Lightness}" Name="Lightness" Minimum="0.1" Maximum="0.9" />
-                        <ColorPicker Name="ColorPicker" SelectedColor="{CompiledBinding HslColor, Mode=TwoWay}" Width="200" Height="200" />
+                        <WdeColorPicker Name="ColorPicker" SelectedColor="{CompiledBinding HslColor, Mode=TwoWay}" Width="200" Height="200" />
                       </DockPanel>
                     </Flyout>
                   </Button.Flyout>
@@ -143,7 +143,7 @@
             </SettingItem>
             
             <SettingItem Header="Safety Mode" Help="The editor can ask you before execution of any query (any withing the raw SQL editor, not in the other table editors!!), useful if you edit a production database.">
-              <ComboBox SelectedItem="{CompiledBinding SafeMode}" Items="{x:Static settings:ConnectionConfigViewModel.SafeModes}">
+              <ComboBox SelectedItem="{CompiledBinding SafeMode}" ItemsSource="{x:Static settings:ConnectionConfigViewModel.SafeModes}">
                 <ComboBox.ItemTemplate>
                   <DataTemplate x:DataType="connection:QueryExecutionSafety">
                     <DockPanel>

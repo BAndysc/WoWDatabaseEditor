@@ -1,6 +1,5 @@
 using System;
 using System.ComponentModel;
-using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
@@ -44,12 +43,12 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
             avaloniaDockAdapter = null!;
         }
         
-        public static bool GetOnEnterPressed(IAvaloniaObject obj)
+        public static bool GetOnEnterPressed(AvaloniaObject obj)
         {
-            return obj.GetValue(OnEnterPressedProperty);
+            return (bool?)obj.GetValue(OnEnterPressedProperty) ?? false;
         }
 
-        public static void SetOnEnterPressed(IAvaloniaObject obj, bool value)
+        public static void SetOnEnterPressed(AvaloniaObject obj, bool value)
         {
             obj.SetValue(OnEnterPressedProperty, value);
         }
@@ -119,7 +118,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
             AvaloniaXamlLoader.Load(this);
             AddHandler(KeyUpEvent, OnKeyUpTunneled, RoutingStrategies.Tunnel);
             
-            DockControl dock = this.FindControl<DockControl>("DockControl");
+            DockControl dock = this.GetControl<DockControl>("DockControl");
             
             SerializedDock? serializedDock = null;
             if (fileSystem.Exists(DockSettingsFile))
@@ -186,7 +185,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
                                 }
                             }
                         },
-                        Placement = FlyoutPlacementMode.BottomEdgeAlignedLeft,
+                        Placement = PlacementMode.BottomEdgeAlignedLeft,
                     };
                     flyout.ShowAt(btn);
                 }, TimeSpan.FromSeconds(1));   
@@ -200,7 +199,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
             if (e.KeyModifiers.HasFlagFast(KeyModifiers.Control) &&
                 e.Key == Key.Tab)
             {
-                var documentControl = FocusManager.Instance!.Current?.FindAncestorOfType<DocumentControl>() ?? this.FindDescendantOfType<DocumentControl>();
+                var documentControl = (TopLevel.GetTopLevel(this)?.FocusManager?.GetFocusedElement() as Visual)?.FindAncestorOfType<DocumentControl>() ?? this.FindDescendantOfType<DocumentControl>();
                 if (documentControl?.DataContext is not FocusAwareDocumentDock documentDock)
                     return;
                     
@@ -241,7 +240,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
 
         private bool realClosing = false;
         
-        protected override void OnClosing(CancelEventArgs e)
+        protected override void OnClosing(WindowClosingEventArgs e)
         {
             base.OnClosing(e);
             // we use screen coords for size so that size is custom app scaling independent 

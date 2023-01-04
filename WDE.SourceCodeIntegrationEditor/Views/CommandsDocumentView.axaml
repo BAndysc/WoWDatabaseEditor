@@ -36,9 +36,9 @@
             <ScrollViewer controls:WizardPanel.StepTitle="Choose commands to generate sql for">
                 <StackPanel>
                     <controls:GroupingHeader GroupName="Commands with no RBAC defined in database" />
-                    <ItemsControl Padding="10,0" Items="{CompiledBinding CommandsNoRbac}" />
+                    <ItemsControl Padding="10,0" ItemsSource="{CompiledBinding CommandsNoRbac}" />
                     <controls:GroupingHeader GroupName="Commands with RBAC, but not defined in commands table" />
-                    <ItemsControl Padding="10,0" Items="{CompiledBinding Commands}" />
+                    <ItemsControl Padding="10,0" ItemsSource="{CompiledBinding Commands}" />
                 </StackPanel>
                 <ScrollViewer.DataTemplates>
                     <DataTemplate DataType="{x:Type viewModels:CommandViewModel}">
@@ -53,7 +53,7 @@
             </ScrollViewer>
             
             <ScrollViewer controls:WizardPanel.StepTitle="Specify commands settings">
-                <ItemsControl Items="{CompiledBinding ChosenCommands}">
+                <ItemsControl ItemsSource="{CompiledBinding ChosenCommands}">
                     <ItemsControl.Styles>
                         <Style Selector="ItemsControl:empty">
                             <Setter Property="Template">
@@ -79,7 +79,7 @@
                                 <ComboBox Margin="0,2" 
                                           IsEnabled="{CompiledBinding IsRbacDefined, Converter={StaticResource InverseBoolConverter}}"
                                           Grid.Row="2" Grid.Column="1" 
-                                          Items="{Binding #Root.DataContext.PossibleParentPermissions}" 
+                                          ItemsSource="{Binding #Root.DataContext.PossibleParentPermissions}" 
                                           SelectedItem="{CompiledBinding PermissionViewModel.Parent, Mode=TwoWay}">
                                     <ComboBox.ItemTemplate>
                                         <DataTemplate>

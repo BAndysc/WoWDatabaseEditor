@@ -68,10 +68,10 @@
         </Style>
     </ExtendedWindow.Styles>
     
-    <ManagedMenu.Menu>
+    <NativeMenu.Menu>
         <NativeMenu utils:MenuBind.MenuItems="{CompiledBinding MenuItemProviders}">
         </NativeMenu>
-    </ManagedMenu.Menu>
+    </NativeMenu.Menu>
     
     <controls:ExtendedWindow.ToolBar>
         <controls:ToolBar>
@@ -142,7 +142,7 @@
                             </CompletionComboBox.ItemTemplate>
                         </CompletionComboBox>
                         <TextBlock Opacity="0.6" FontSize="9" VerticalAlignment="Center">Type:</TextBlock>
-                        <ComboBox Items="{CompiledBinding Providers}" SelectedItem="{CompiledBinding SelectedProvider}">
+                        <ComboBox ItemsSource="{CompiledBinding Providers}" SelectedItem="{CompiledBinding SelectedProvider}">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{CompiledBinding Name}"/>
@@ -169,21 +169,21 @@
             </controls:ToolBar.MiddleContent>
             <controls:ToolBar.RightContent>
                 <ToolbarPanel>
-                    <ItemsPresenter Items="{CompiledBinding RelatedSolutionItems.List}">
-                        <ItemsPresenter.ItemTemplate>
+                    <ItemsControl ItemsSource="{CompiledBinding RelatedSolutionItems.List}">
+                        <ItemsControl.ItemTemplate>
                             <DataTemplate DataType="viewModels:RelatedSolutionItemViewModel">
                                 <Button Command="{CompiledBinding CreateCommand}"
                                         ToolTip.Tip="{CompiledBinding Name}">
                                     <components:WdeImage Image="{CompiledBinding Icon}" />
                                 </Button>
                             </DataTemplate>
-                        </ItemsPresenter.ItemTemplate>
-                        <ItemsPresenter.ItemsPanel>
+                        </ItemsControl.ItemTemplate>
+                        <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <controls:ToolbarPanel />
                             </ItemsPanelTemplate>
-                        </ItemsPresenter.ItemsPanel>
-                    </ItemsPresenter>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
                     
                     <Button x:Name="OpenSQLDocument" ToolTip.Tip="New SQL document" Command="{CompiledBinding OpenSqlDocumentCommand}" BorderThickness="1" Margin="20,0,0,0" Width="34" Height="34">
                         <Path Stretch="UniformToFill" Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="{Binding $parent[Button].Foreground}" StrokeThickness="1" Data="{StaticResource ToSqlIcon}" />

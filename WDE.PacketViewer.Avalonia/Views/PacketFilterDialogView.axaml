@@ -73,7 +73,7 @@
                     
                             <ListBox Grid.Row="1" Grid.Column="0"
                                      SelectionMode="Multiple"
-                                     Items="{CompiledBinding  ExcludedGuids}">
+                                     ItemsSource="{CompiledBinding  ExcludedGuids}">
                                 <ListBox.KeyBindings>
                                     <KeyBinding Gesture="Back" Command="{CompiledBinding DeleteExcludedGuid}" CommandParameter="{Binding $self.SelectedItem}" />
                                     <KeyBinding Gesture="Delete" Command="{CompiledBinding DeleteExcludedGuid}" CommandParameter="{Binding $self.SelectedItem}" />
@@ -102,7 +102,7 @@
                     
                             <ListBox Grid.Row="1" Grid.Column="2"
                                      SelectionMode="Multiple"
-                                     Items="{CompiledBinding IncludedGuids}">
+                                     ItemsSource="{CompiledBinding IncludedGuids}">
                                 <ListBox.KeyBindings>
                                     <KeyBinding Gesture="Back" Command="{CompiledBinding DeleteIncludedGuid}" CommandParameter="{Binding $self.SelectedItem}" />
                                     <KeyBinding Gesture="Delete" Command="{CompiledBinding DeleteIncludedGuid}" CommandParameter="{Binding $self.SelectedItem}" />

@@ -6,7 +6,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.ConfigurationService.Views
     /// <summary>
     ///     Interaction logic for ConfigurationWindow.xaml
     /// </summary>
-    public class ConfigurationPanelView : UserControl
+    public partial class ConfigurationPanelView : UserControl
     {
         public ConfigurationPanelView()
         {

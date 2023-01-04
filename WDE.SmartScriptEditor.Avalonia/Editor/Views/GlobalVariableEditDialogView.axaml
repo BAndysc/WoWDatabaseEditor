@@ -31,7 +31,7 @@
             </Grid.RowDefinitions>
         
             <TextBlock VerticalAlignment="Center" Grid.Row="0" Grid.Column="0">Variable type:</TextBlock>
-            <ComboBox HorizontalAlignment="Stretch" Grid.Row="0" Grid.Column="1" Items="{CompiledBinding VariableTypes, Mode=OneTime}" SelectedItem="{CompiledBinding VariableType, Mode=TwoWay}">
+            <ComboBox HorizontalAlignment="Stretch" Grid.Row="0" Grid.Column="1" ItemsSource="{CompiledBinding VariableTypes, Mode=OneTime}" SelectedItem="{CompiledBinding VariableType, Mode=TwoWay}">
             </ComboBox>
         
             <TextBlock VerticalAlignment="Center" Grid.Row="2" Grid.Column="0">Number:</TextBlock>

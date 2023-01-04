@@ -14,7 +14,7 @@ using TheAvaloniaOpenGL.Windows;
 
 namespace TheAvaloniaOpenGL;
 
-public class NativeOpenGlControlBase : NativeControlHost, ICustomSimpleHitTest
+public class NativeOpenGlControlBase : NativeControlHost
 {
     private IRenderingWindow? window;
     private IRenderingOpenGlContext? context;

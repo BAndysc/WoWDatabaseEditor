@@ -18,20 +18,20 @@
                             <Button.Content>
                                 <Path Width="20" Height="20" Data="M3,10L8.782,10L3.282,4.5L5.5,4.5L11,10L5.5,15.5L3.282,15.5L8.782,10L3,10Z M9,10L14.782,10L9.282,4.5L11.5,4.5L17,10L11.5,15.5L9.282,15.5L14.782,10L9,10Z"
                                       Fill="{DynamicResource SystemControlForegroundBaseHighBrush}"
-                                      StrokeThickness="0" 
+                                      StrokeThickness="0"
                                       Opacity="0.7" />
                             </Button.Content>
                             <Button.Flyout>
                                 <Flyout>
                                     <ToolbarPanel Name="OverflowPanel">
-                                    
+    
                                     </ToolbarPanel>
                                 </Flyout>
                             </Button.Flyout>
                         </Button>
                     </ToolbarPanel>
                     <controls:ToolbarPanel OutOfBoundsPanel="{Binding #OverflowPanel}" IsOverflow="{TemplateBinding IsOverflow, Mode=OneWayToSource}" Name="PART_ChildrenHost">
-                        
+    
                     </controls:ToolbarPanel>
                 </DockPanel>
             </ControlTemplate>

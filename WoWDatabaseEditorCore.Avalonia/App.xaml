@@ -5,17 +5,20 @@
              xmlns:controls="clr-namespace:Dock.Avalonia.Controls;assembly=Dock.Avalonia"
              xmlns:controls1="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
              xmlns:components="clr-namespace:WDE.Common.Avalonia.Components;assembly=WDE.Common.Avalonia"
-             xmlns:proportionalStackPanel="clr-namespace:Dock.ProportionalStackPanel;assembly=Dock.ProportionalStackPanel"
              xmlns:avalonia="clr-namespace:WoWDatabaseEditorCore.Avalonia"
              x:Class="WoWDatabaseEditorCore.Avalonia.App"
+             RequestedThemeVariant="Light"
              Name="WoW Database Editor">
-    <Application.DataTemplates>
+     <Application.DataTemplates>
         <avalonia:AvaloniaViewLocator />
     </Application.DataTemplates>
-
     <Application.Resources>
-        <FontFamily x:Key="MonoFont">Consolas,Menlo,Courier,Courier New</FontFamily>
-        <DrawingImage x:Key="StatusBarIconNotice">
+    
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>                
+                <ResourceDictionary>
+                    <FontFamily x:Key="MonoFont">Consolas,Menlo,Courier,Courier New</FontFamily>
+                    <DrawingImage x:Key="StatusBarIconNotice">
         <DrawingImage.Drawing>
             <DrawingGroup >
                 <DrawingGroup.Transform>
@@ -53,30 +56,35 @@
             </DrawingGroup>
         </DrawingImage.Drawing>
     </DrawingImage>
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Application.Resources>
     <Application.Styles>
         <appearanceService:AvaloniaThemeStyle />
-        <StyleInclude Source="avares://AvaloniaEdit/AvaloniaEdit.xaml" />
+        <StyleInclude Source="avares://AvaloniaEdit/Themes/Fluent/AvaloniaEdit.xaml" />
         <StyleInclude Source="avares://AvaloniaGraph/Style.axaml" />
         <StyleInclude Source="avares://WDE.Common.Avalonia/Themes/Generic.axaml" />
         <StyleInclude Source="avares://WDE.SmartScriptEditor.Avalonia/Themes/Generic.axaml"/>
         <StyleInclude Source="avares://WDE.EventAiEditor.Avalonia/Themes/Generic.axaml"/>
         <StyleInclude Source="avares://AvaloniaStyles/Controls/FastTableView/Style.axaml" />
+        <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
         <StyleInclude Source="avares://Avalonia.Controls.TreeDataGrid/Themes/Fluent.axaml"/>
         <StyleInclude Source="avares://WDE.DatabaseDefinitionEditor/Themes/Generic.axaml" />
-        <Style Selector="ListBox /template/ ItemsPresenter#PART_ItemsPresenter">
-            <Setter Property="(KeyboardNavigation.TabNavigation)" Value="Continue" />
-        </Style>
-        <Style Selector="controls|DockableControl > ItemsControl > Border > ItemsPresenter#PART_ItemsPresenter">
-            <Setter Property="(KeyboardNavigation.TabNavigation)" Value="Continue" />
-        </Style>
-        <Style Selector="proportionalStackPanel|ProportionalStackPanel">
-            <Setter Property="(KeyboardNavigation.TabNavigation)" Value="Continue" />
-        </Style>
-        <Style Selector="controls1|ToolbarPanel > ItemsPresenter components|WdeImage">
-            <Setter Property="Height" Value="20" />
-        </Style>
-        
+        <!-- <StyleInclude Source="avares://Avalonia.Controls.TreeDataGrid/Themes/Fluent.axaml"/> -->
+        <!-- <Style Selector="ListBox /template/ ItemsPresenter#PART_ItemsPresenter"> -->
+        <!--     <Setter Property="(KeyboardNavigation.TabNavigation)" Value="Continue" /> -->
+        <!-- </Style> -->
+        <!-- <Style Selector="controls|DockableControl > ItemsControl > Border > ItemsPresenter#PART_ItemsPresenter"> -->
+        <!--     <Setter Property="(KeyboardNavigation.TabNavigation)" Value="Continue" /> -->
+        <!-- </Style> -->
+        <!-- <Style Selector="controls|ProportionalStackPanel"> -->
+        <!--     <Setter Property="(KeyboardNavigation.TabNavigation)" Value="Continue" /> -->
+        <!-- </Style> -->
+        <!-- <Style Selector="controls1|ToolbarPanel > ItemsPresenter components|WdeImage"> -->
+        <!--     <Setter Property="Height" Value="20" /> -->
+        <!-- </Style> -->
+
         
         <Style Selector="TextBox.noErrors DataValidationErrors">
             <!-- I don't want to display data validation errors here -->

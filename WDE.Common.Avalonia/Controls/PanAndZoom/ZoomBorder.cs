@@ -208,7 +208,7 @@ namespace WDE.WorldMap.PanAndZoom
 
         internal static void Log(string message) => Debug.WriteLine(message);
 
-        private IControl? _element;
+        private Control? _element;
         private Point _pan;
         private Point _previous;
         private Matrix _matrix;
@@ -493,7 +493,7 @@ namespace WDE.WorldMap.PanAndZoom
             Moved(e);
         }
 
-        private void ChildChanged(IControl? element)
+        private void ChildChanged(Control? element)
         {
             if (element != null && element != _element && _element != null)
             {
@@ -506,7 +506,7 @@ namespace WDE.WorldMap.PanAndZoom
             }
         }
 
-        private void AttachElement(IControl? element)
+        private void AttachElement(Control? element)
         {
             if (element == null)
             {
@@ -1111,7 +1111,7 @@ namespace WDE.WorldMap.PanAndZoom
 
         bool ILogicalScrollable.IsLogicalScrollEnabled => true;
 
-        event EventHandler ILogicalScrollable.ScrollInvalidated
+        event EventHandler? ILogicalScrollable.ScrollInvalidated
         {
             add => _scrollInvalidated += value;
             remove => _scrollInvalidated -= value;
@@ -1121,12 +1121,12 @@ namespace WDE.WorldMap.PanAndZoom
 
         Size ILogicalScrollable.PageScrollSize => new Size(10, 10);
 
-        bool ILogicalScrollable.BringIntoView(IControl target, Rect targetRect)
+        bool ILogicalScrollable.BringIntoView(Control target, Rect targetRect)
         {
             return false;
         }
 
-        IControl? ILogicalScrollable.GetControlInDirection(NavigationDirection direction, IControl from)
+        Control? ILogicalScrollable.GetControlInDirection(NavigationDirection direction, Control? from)
         {
             return null;
         }

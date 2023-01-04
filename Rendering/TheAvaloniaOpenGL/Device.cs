@@ -19,6 +19,7 @@ using PrimitiveType = OpenGLBindings.PrimitiveType;
 using ReadBufferMode = OpenGLBindings.ReadBufferMode;
 using RenderbufferTarget = OpenGLBindings.RenderbufferTarget;
 using ShaderType = OpenGLBindings.ShaderType;
+using SizedInternalFormat = OpenGLBindings.SizedInternalFormat;
 using TextureParameterName = OpenGLBindings.TextureParameterName;
 using TextureTarget = OpenGLBindings.TextureTarget;
 using TextureUnit = OpenGLBindings.TextureUnit;
@@ -32,69 +33,127 @@ using VertexAttribPointerType = OpenGLBindings.VertexAttribPointerType;
 
 namespace TheAvaloniaOpenGL
 {
-    public class RealDevice : GlInterfaceBase<GlInterface.GlContextInfo>
+    public unsafe class RealDevice
     {
         private GlInterface Gl { get; }
         private int maxTextureImageUnits;
         
-        public RealDevice(GlInterface gl) : base(gl.GetProcAddress, gl.ContextInfo)
+        public RealDevice(GlInterface gl)
         {
             Gl = gl;
             maxTextureImageUnits = GetInteger(GetPName.MaxTextureImageUnits);
             Console.WriteLine("Max texture units: " + maxTextureImageUnits);
+            GlGenerateMipmap = (delegate* unmanaged[Stdcall]<int, void>)gl.GetProcAddress("glGenerateMipmap");
+            addr_Uniform1I = (delegate* unmanaged[Stdcall]<int, int, void>)Gl.GetProcAddress("glUniform1i");
+            addr_GenSamplers = (delegate* unmanaged[Stdcall]<int, int*, void>)Gl.GetProcAddress("glGenSamplers");
+            addr_BindSampler = (delegate* unmanaged[Stdcall]<int, int, void>)Gl.GetProcAddress("glBindSampler");
+            addr_GetUniformBlockIndex = (delegate* unmanaged[Stdcall]<int, IntPtr, int>)Gl.GetProcAddress("glGetUniformBlockIndex");
+            addr_UniformBlockBinding = (delegate* unmanaged[Stdcall]<int, int, int, void>)Gl.GetProcAddress("glUniformBlockBinding");
+            addr_BindBufferBase = (delegate* unmanaged[Stdcall]<BufferRangeTarget, int, int, void>)Gl.GetProcAddress("glBindBufferBase");
+            addr_GlCullFace = (delegate* unmanaged[Stdcall]<CullFaceMode, void>)Gl.GetProcAddress("glCullFace");
+            addr_GlDisable = (delegate* unmanaged[Stdcall]<EnableCap, void>)Gl.GetProcAddress("glDisable");
+            addr_GlEnable = (delegate* unmanaged[Stdcall]<EnableCap, void>)Gl.GetProcAddress("glEnable");
+            addr_BindBuffer = (delegate* unmanaged[Stdcall]<BufferTarget, int, void>)Gl.GetProcAddress("glBindBuffer");
+            addr_BufferData = (delegate* unmanaged[Stdcall]<BufferTarget, IntPtr, IntPtr, BufferUsageHint, void>)Gl.GetProcAddress("glBufferData");
+            addr_BufferSubData = (delegate* unmanaged[Stdcall]<BufferTarget, IntPtr, IntPtr, IntPtr, void>)Gl.GetProcAddress("glBufferSubData");
+            addr_GlActiveTexture = (delegate* unmanaged[Stdcall]<TextureUnit, void>)Gl.GetProcAddress("glActiveTexture");
+            addr_BindTexture = (delegate* unmanaged[Stdcall]<TextureTarget, int, void>)Gl.GetProcAddress("glBindTexture");
+            addr_BindFramebuffer = (delegate* unmanaged[Stdcall]<FramebufferTarget, int, void>)Gl.GetProcAddress("glBindFramebuffer");
+            addr_BindRenderbuffer = (delegate* unmanaged[Stdcall]<RenderbufferTarget, int, void>)Gl.GetProcAddress("glBindRenderbuffer");
+            addr_GlClearStencil = (delegate* unmanaged[Stdcall]<int, void>)Gl.GetProcAddress("glClearStencil");
+            addr_ClearColor = (delegate* unmanaged[Stdcall]<float, float, float, float, void>)Gl.GetProcAddress("glClearColor");
+            addr_GlClear = (delegate* unmanaged[Stdcall]<ClearBufferMask, void>)Gl.GetProcAddress("glClear");
+            addr_Viewport = (delegate* unmanaged[Stdcall]<int, int, int, int, void>)Gl.GetProcAddress("glViewport");
+            addr_DrawElementsInstanced = (delegate* unmanaged[Stdcall]<PrimitiveType, int, DrawElementsType, IntPtr, int, void>)Gl.GetProcAddress("glDrawElementsInstanced");
+            addr_ClampColor = (delegate* unmanaged[Stdcall]<ClampColorTarget, ClampColorMode, void>)Gl.GetProcAddress("glClampColor");
+            addr_TexBuffer = (delegate* unmanaged[Stdcall]<TextureBufferTarget, SizedInternalFormat, int, void>)Gl.GetProcAddress("glTexBuffer");
+            addr_GlValidateProgram = (delegate* unmanaged[Stdcall]<int, void>)Gl.GetProcAddress("glValidateProgram");
+            addr_GetAttribLocation = (delegate* unmanaged[Stdcall]<int, IntPtr, int>)Gl.GetProcAddress("glGetAttribLocation");
+            addr_GlEnableVertexAttribArray = (delegate* unmanaged[Stdcall]<int, void>)Gl.GetProcAddress("glEnableVertexAttribArray");
+            addr_GlUseProgram = (delegate* unmanaged[Stdcall]<int, void>)Gl.GetProcAddress("glUseProgram");
+            addr_GlDepthMask = (delegate* unmanaged[Stdcall]<int, void>)Gl.GetProcAddress("glDepthMask");
+            addr_DrawArrays = (delegate* unmanaged[Stdcall]<PrimitiveType, int, IntPtr, void>)Gl.GetProcAddress("glDrawArrays");
+            addr_DrawElements = (delegate* unmanaged[Stdcall]<PrimitiveType, int, DrawElementsType, IntPtr, void>)Gl.GetProcAddress("glDrawElements");
+            addr_DrawElementsBaseVertex = (delegate* unmanaged[Stdcall]<PrimitiveType, int, DrawElementsType, IntPtr, int, void>)Gl.GetProcAddress("glDrawElementsBaseVertex");
+            addr_GetUniformLocation = (delegate* unmanaged[Stdcall]<int, IntPtr, int>)Gl.GetProcAddress("glGetUniformLocation");
+            addr_Uniform1f = (delegate* unmanaged[Stdcall]<int, float, void>)Gl.GetProcAddress("glUniform1f");
+            addr_Uniform4f = (delegate* unmanaged[Stdcall]<int, float, float, float, float, void>)Gl.GetProcAddress("glUniform4f");
+            addr_Uniform3f = (delegate* unmanaged[Stdcall]<int, float, float, float, void>)Gl.GetProcAddress("glUniform3f");
+            addr_TexParameteri = (delegate* unmanaged[Stdcall]<TextureTarget, TextureParameterName, int, void>)Gl.GetProcAddress("glTexParameteri");
+            addr_GlDeleteProgram = (delegate* unmanaged[Stdcall]<int, void>)Gl.GetProcAddress("glDeleteProgram");
+            addr_AttachShader = (delegate* unmanaged[Stdcall]<int, int, void>)Gl.GetProcAddress("glAttachShader");
+            addr_GlLinkProgram = (delegate* unmanaged[Stdcall]<int, void>)Gl.GetProcAddress("glLinkProgram");
+            addr_GlCreateShader = (delegate* unmanaged[Stdcall]<ShaderType, int>)Gl.GetProcAddress("glCreateShader");
+            addr_BlendFunc = (delegate* unmanaged[Stdcall]<BlendingFactorSrc, BlendingFactorDest, void>)Gl.GetProcAddress("glBlendFunc");
+            addr_BlendFuncSeparate = (delegate* unmanaged[Stdcall]<BlendingFactorSrc, BlendingFactorDest, BlendingFactorSrc, BlendingFactorDest, void>)Gl.GetProcAddress("glBlendFuncSeparate");
+            addr_GlBlendEquation = (delegate* unmanaged[Stdcall]<BlendEquationMode, void>)Gl.GetProcAddress("glBlendEquation");
+            addr_BlitFramebuffer = (delegate* unmanaged[Stdcall]<int, int, int, int, int, int, int, int, ClearBufferMask, BlitFramebufferFilter, void>)Gl.GetProcAddress("glBlitFramebuffer");
+            addr_GlDepthFunc = (delegate* unmanaged[Stdcall]<DepthFunction, void>)Gl.GetProcAddress("glDepthFunc");
+            addr_Scissor = (delegate* unmanaged[Stdcall]<int, int, int, int, void>)Gl.GetProcAddress("glScissor");
+            addr_DrawBuffers = (delegate* unmanaged[Stdcall]<int, IntPtr, void>)Gl.GetProcAddress("glDrawBuffers");
+            addr_GlReadBuffer = (delegate* unmanaged[Stdcall]<ReadBufferMode, void>)Gl.GetProcAddress("glReadBuffer");
+            addr_ReadPixels = (delegate* unmanaged[Stdcall]<int, int, int, int, PixelFormat, PixelType, IntPtr, void>)Gl.GetProcAddress("glReadPixels");
+            addr_GetProgramiv = (delegate* unmanaged[Stdcall]<int, GetProgramParameterName, int*, void>)Gl.GetProcAddress("glGetProgramiv");
+            addr_GetActiveUniform = (delegate* unmanaged[Stdcall]<int, int, int, out int, out int, out ActiveUniformType, void*, void>)Gl.GetProcAddress("glGetActiveUniform");
+            addr_TexImage3D = (delegate* unmanaged[Stdcall]<TextureTarget, int, InternalFormat, int, int, int, int, PixelFormat, PixelType, IntPtr, void>)Gl.GetProcAddress("glTexImage3D");
+            addr_TexImage2D = (delegate* unmanaged[Stdcall]<TextureTarget, int, int, int, int, int, PixelFormat, PixelType, IntPtr, void>)Gl.GetProcAddress("glTexSubImage2D");
+            addr_UniformMatrix4fv = (delegate* unmanaged[Stdcall]<int, int, int, float*, void>)Gl.GetProcAddress("glUniformMatrix4fv");
         }
-            
-        public delegate void GlDeleteVertexArrays(int count, int[] buffers);
-        [GlMinVersionEntryPoint("glDeleteVertexArrays", 3,0)]
-        [GlExtensionEntryPoint("glDeleteVertexArraysOES", "GL_OES_vertex_array_object")]
-        public GlDeleteVertexArrays DeleteVertexArrays { get; }
-            
-        public delegate void GlBindVertexArray(int array);
-        [GlMinVersionEntryPoint("glBindVertexArray", 3,0)]
-        [GlExtensionEntryPoint("glBindVertexArrayOES", "GL_OES_vertex_array_object")]
-        public GlBindVertexArray BindVertexArray { get; }
-        
-        
-        public unsafe delegate void GlGetIntegerv(GetPName n, int* rv);
-        [GlMinVersionEntryPoint("glGetIntegerv",2,0)]
-        public GlGetIntegerv GetIntegerv { get; }
 
-        public unsafe int GetInteger(GetPName name)
+        public void DeleteVertexArrays(int count, int[] args)
+        {
+            fixed (int* ptr = args)
+                Gl.DeleteVertexArrays(count, ptr);
+        }
+
+        public void BindVertexArray(int array)
+        {
+            Gl.BindVertexArray(array);
+        }
+        
+        public int GetInteger(GetPName name)
         {
             int i;
-            GetIntegerv(name, &i);
+            Gl.GetIntegerv((int)name, out i);
             return i;
         }
         
-        public delegate void GlGenVertexArrays(int n, int[] rv);
-        [GlMinVersionEntryPoint("glGenVertexArrays",3,0)]
-        [GlExtensionEntryPoint("glGenVertexArraysOES", "GL_OES_vertex_array_object")]
-        public GlGenVertexArrays GenVertexArrays { get; }
-            
-        
-        public delegate void GlGenerateMipmap(TextureTarget target);
-        [GlMinVersionEntryPoint("glGenerateMipmap", 3,0)]
-        public GlGenerateMipmap GenerateMipmap { get; }
-        
-        
-        public delegate void GlUniform1I(int location, int lalue);
-        [GlMinVersionEntryPoint("glUniform1i", 2, 0)]
-        public GlUniform1I Uniform1I { get; }
-        
-        public unsafe delegate void GlGetProgramiv(int program, GetProgramParameterName pname, int* prams);
-        [GlMinVersionEntryPoint("glGetProgramiv", 2, 0)]
-        public GlGetProgramiv GetProgramiv { get; }
+        public void GenVertexArrays(int n, int[] rv)
+        {
+            fixed (int* ptr = rv)
+                Gl.GenVertexArrays(n, ptr);
+        }
 
-        public unsafe int GetProgramParameter(int program, GetProgramParameterName pname)
+
+        public void GenerateMipmap(TextureTarget target)
+        {
+            GlGenerateMipmap((int)target);
+        }
+        delegate* unmanaged[Stdcall]<int, void> GlGenerateMipmap;
+
+        delegate* unmanaged[Stdcall]<int, int, void> addr_Uniform1I;
+        public void Uniform1I(int location, int lalue) => addr_Uniform1I(location, lalue);
+
+        delegate* unmanaged[Stdcall]<int, GetProgramParameterName, int*, void> addr_GetProgramiv;
+        public void GetProgramiv(int program, GetProgramParameterName pname, int* prams)
+        {
+            addr_GetProgramiv(program, pname, prams);            
+        }
+        
+        public int GetProgramParameter(int program, GetProgramParameterName pname)
         {
             int x;
             GetProgramiv(program, pname, &x);
             return x;
         }
         
-        public delegate void GlGenSamplers(int len, int[] rv);
-        [GlMinVersionEntryPoint("glGenSamplers", 3, 3)]
-        public GlGenSamplers GenSamplers { get; }
+        delegate* unmanaged[Stdcall]<int, int*, void> addr_GenSamplers;
+        public void GenSamplers(int len, int[] rv)
+        {
+            fixed(int* ptr = rv)
+                addr_GenSamplers(len, ptr);
+        }
+
         public int GenSampler()
         {
             int[] rv = new int[1];
@@ -102,23 +161,27 @@ namespace TheAvaloniaOpenGL
             return rv[0];
         }
         
-        public delegate void GlBindSampler(int unit, int sampler);
-        [GlMinVersionEntryPoint("glBindSampler", 3, 3)]
-        public GlBindSampler BindSampler { get; }
+        delegate* unmanaged[Stdcall]<int, int, void> addr_BindSampler;
+        public void BindSampler(int unit, int sampler)
+        {
+            addr_BindSampler(unit, sampler);
+        }
         
-        public unsafe delegate void GlGetActiveUniform(int unit, int index, int bufSize, out int length, out int size, out ActiveUniformType type, void* name);
-        [GlMinVersionEntryPoint("glGetActiveUniform", 3, 3)]
-        public GlGetActiveUniform GetActiveUniform_ { get; }
-
-        public unsafe string GetActiveUniform(int unit, int index, int maxLength, out int length, out int size, out ActiveUniformType type)
+        delegate* unmanaged[Stdcall]<int, int, int, out int, out int, out ActiveUniformType, void*, void> addr_GetActiveUniform;
+        public void GetActiveUniform(int unit, int index, int bufSize, out int length, out int size, out ActiveUniformType type, void* name)
+        {
+            addr_GetActiveUniform(unit, index, bufSize, out length, out size, out type, name);
+        }
+        
+        public string GetActiveUniform(int unit, int index, int maxLength, out int length, out int size, out ActiveUniformType type)
         {
             byte[] bytes = new byte[maxLength];
             fixed (byte* infoLog = bytes)
-                GetActiveUniform_(unit, index, maxLength, out length,  out size, out type, (void*) infoLog);
+                GetActiveUniform(unit, index, maxLength, out length,  out size, out type, (void*) infoLog);
             return Encoding.UTF8.GetString(bytes, 0, length);
         }
         
-        public unsafe string GetProgramInfoLog(int program, int maxLength = 2048)
+        public string GetProgramInfoLog(int program, int maxLength = 2048)
         {
             byte[] bytes = new byte[maxLength];
             int length;
@@ -127,54 +190,78 @@ namespace TheAvaloniaOpenGL
             return Encoding.UTF8.GetString(bytes, 0, length);
         }
         
-        public delegate int GlGetUniformBlockIndex(int program, IntPtr uniformBlockName);
-        [GlMinVersionEntryPoint("glGetUniformBlockIndex", 3, 1)]
-        public GlGetUniformBlockIndex GetUniformBlockIndex_ { get; }
+        delegate* unmanaged[Stdcall]<int, IntPtr, int> addr_GetUniformBlockIndex;
+        public int GetUniformBlockIndex_(int program, IntPtr uniformBlockName)
+        {
+            return addr_GetUniformBlockIndex(program, uniformBlockName);
+        }
 
         public int GetUniformBlockIndex(int program, string uniformBlockName)
         {
-            using Utf8Buffer utf8Buffer = new Utf8Buffer(uniformBlockName);
-            return GetUniformBlockIndex_(program, utf8Buffer.DangerousGetHandle());
+            var bytes = Encoding.UTF8.GetByteCount(uniformBlockName);
+            Span<byte> buffer = stackalloc byte[bytes + 1];
+            Encoding.UTF8.GetBytes(uniformBlockName, buffer);
+            
+            fixed (byte* ptr = buffer)
+                return GetUniformBlockIndex_(program, new IntPtr(ptr));
         }
         
-        public delegate void GlUniformBlockBinding(int program, int uniformBlockIndex, int uniformBlockBinding);
-        [GlMinVersionEntryPoint("glUniformBlockBinding", 3, 1)]
-        public GlUniformBlockBinding UniformBlockBinding { get; }
+        delegate* unmanaged[Stdcall]<int, int, int, void> addr_UniformBlockBinding;
+        public void UniformBlockBinding(int program, int uniformBlockIndex, int uniformBlockBinding)
+        {
+            addr_UniformBlockBinding(program, uniformBlockIndex, uniformBlockBinding);
+        }
 
-        public delegate void GlBindBufferBase(BufferRangeTarget target, int index, int buffer);
-        [GlMinVersionEntryPoint("glBindBufferBase", 3, 0)]
-        public GlBindBufferBase BindBufferBase { get; }
+        delegate* unmanaged[Stdcall]<BufferRangeTarget, int, int, void> addr_BindBufferBase;
+        public void BindBufferBase(BufferRangeTarget target, int index, int buffer)
+        {
+            addr_BindBufferBase(target, index, buffer);
+        }
         
-        public delegate void GlCullFace(CullFaceMode mode);
-        [GlMinVersionEntryPoint("glCullFace", 2, 0)]
-        public GlCullFace CullFace { get; }
+        delegate* unmanaged[Stdcall]<CullFaceMode, void> addr_GlCullFace;
+        public void CullFace(CullFaceMode mode)
+        {
+            addr_GlCullFace(mode);
+        }
         
-        public delegate void GlDisable(EnableCap mode);
-        [GlMinVersionEntryPoint("glDisable", 2, 0)]
-        public GlDisable Disable { get; }
+        delegate* unmanaged[Stdcall]<EnableCap, void> addr_GlDisable;
+        public void Disable(EnableCap mode)
+        {
+            addr_GlDisable(mode);
+        }
         
-        public delegate void GlEnable(EnableCap mode);
-        [GlMinVersionEntryPoint("glEnable", 2, 0)]
-        public GlEnable Enable { get; }
+        delegate* unmanaged[Stdcall]<EnableCap, void> addr_GlEnable;
+        public void Enable(EnableCap mode)
+        {
+            addr_GlEnable(mode);
+        }
 
         public int GenBuffer() => Gl.GenBuffer();
         
-        public delegate void GlBindBuffer(BufferTarget target, int buffer);
-        [GlEntryPoint("glBindBuffer")]
-        public GlBindBuffer BindBuffer { get; }
+        delegate* unmanaged[Stdcall]<BufferTarget, int, void> addr_BindBuffer;
+        public void BindBuffer(BufferTarget target, int buffer)
+        {
+            addr_BindBuffer(target, buffer);
+        }
         
-        public delegate void GlBufferData(BufferTarget target, IntPtr size, IntPtr data, BufferUsageHint usage);
-        [GlEntryPoint("glBufferData")]
-        public GlBufferData BufferData { get; }
+        delegate* unmanaged[Stdcall]<BufferTarget, IntPtr, IntPtr, BufferUsageHint, void> addr_BufferData;
+        public void BufferData(BufferTarget target, IntPtr size, IntPtr data, BufferUsageHint usage)
+        { 
+            addr_BufferData(target, size, data, usage);
+        }
         
-        public delegate void GlBufferSubData(BufferTarget target, IntPtr offset, IntPtr size, IntPtr data);
-        [GlEntryPoint("glBufferSubData")]
-        public GlBufferSubData BufferSubData { get; }
+        delegate* unmanaged[Stdcall]<BufferTarget, IntPtr, IntPtr, IntPtr, void> addr_BufferSubData;
+        public void BufferSubData(BufferTarget target, IntPtr offset, IntPtr size, IntPtr data)
+        {
+            addr_BufferSubData(target, offset, size, data);
+        }
         
         
-        public delegate void GlActiveTexture(TextureUnit texture);
-        [GlEntryPoint("glActiveTexture")]
-        public GlActiveTexture ActiveTexture { get; }
+        delegate* unmanaged[Stdcall]<TextureUnit, void> addr_GlActiveTexture;
+        public void ActiveTexture(TextureUnit texture)
+        {
+            addr_GlActiveTexture(texture);
+        }
 
         private int currentTextureSlot = -1;
         
@@ -198,107 +285,132 @@ namespace TheAvaloniaOpenGL
             currentTextureSlot = (int)slot;
         }
 
-        public delegate void GlBindTexture(TextureTarget target, int fb);
-        [GlEntryPoint("glBindTexture")]
-        public GlBindTexture BindTexture { get; }
+        delegate* unmanaged[Stdcall]<TextureTarget, int, void> addr_BindTexture;
+        public void BindTexture(TextureTarget target, int fb)
+        {
+            addr_BindTexture(target, fb);
+        }
 
-        public unsafe delegate void GlDeleteTextures(int count, int* textures);
-        [GlEntryPoint("glDeleteTextures")]
-        public GlDeleteTextures DeleteTextures { get; }
-        
-        public unsafe void DeleteTexture(int name) => DeleteTextures(1, &name);
+        public void DeleteTextures(int count, int* textures)
+        {
+            Gl.DeleteTextures(count, textures);
+        }
+            
+        public void DeleteTexture(int name) => DeleteTextures(1, &name);
 
-        public unsafe delegate void GlDeleteBuffers(int count, int* buffers);
-        [GlEntryPoint("glDeleteBuffers")]
-        public GlDeleteBuffers DeleteBuffers { get; }
+        public void DeleteBuffers(int count, int* buffers)
+        {
+            Gl.DeleteBuffers(count, buffers);
+        }
         
-        public unsafe void DeleteBuffer(int name) => DeleteBuffers(1, &name);
+        public void DeleteBuffer(int name) => DeleteBuffers(1, &name);
         
-        public unsafe delegate void GlGenFramebuffers(int count, int* res);
-        [GlEntryPoint("glGenFramebuffers")]
-        public GlGenFramebuffers GenFramebuffers { get; }
+        public void GenFramebuffers(int count, int* res)
+        {
+            Gl.GenFramebuffers(count, res);
+        }
 
-        public unsafe int GenFramebuffer()
+        public int GenFramebuffer()
         {
             int x;
             GenFramebuffers(1, &x);
             return x;
         }
-        
-        public unsafe delegate void GlDeleteFramebuffers(int count, int* framebuffers);
-        [GlEntryPoint("glDeleteFramebuffers")]
-        public GlDeleteFramebuffers DeleteFramebuffers { get; }
 
-        public unsafe void DeleteFramebuffer(int name) => DeleteFramebuffers(1, &name);
-        
-        public delegate void GlBindFramebuffer(FramebufferTarget target, int fb);
-        [GlEntryPoint("glBindFramebuffer")]
-        public GlBindFramebuffer BindFramebuffer { get; }
-        
-        public unsafe delegate void GlGenRenderbuffers(int count, int* res);
-        [GlEntryPoint("glGenRenderbuffers")]
-        public GlGenRenderbuffers GenRenderbuffers { get; }
+        public void DeleteFramebuffers(int count, int* framebuffers)
+        {
+            Gl.DeleteFramebuffers(count, framebuffers);
+        }
 
-        public unsafe int GenRenderbuffer()
+        public void DeleteFramebuffer(int name) => DeleteFramebuffers(1, &name);
+        
+        delegate* unmanaged[Stdcall]<FramebufferTarget, int, void> addr_BindFramebuffer;
+        public void BindFramebuffer(FramebufferTarget target, int fb)
+        {
+            addr_BindFramebuffer(target, fb);
+        }
+
+        public void GenRenderbuffers(int count, int* res)
+        {
+            Gl.GenRenderbuffers(count, res);
+        }
+
+        public int GenRenderbuffer()
         {
             int x;
             GenRenderbuffers(1, &x);
             return x;
         }
-        
-        public unsafe delegate void GlDeleteRenderbuffers(int count, int* renderbuffers);
-        [GlEntryPoint("glDeleteRenderbuffers")]
-        public GlDeleteTextures DeleteRenderbuffers { get; }
 
-        public unsafe void DeleteRenderbuffer(int name) => DeleteRenderbuffers(1, &name);
+        public void DeleteRenderbuffers(int count, int* renderbuffers)
+        {
+            Gl.DeleteRenderbuffers(count, renderbuffers);
+        }
 
-        public delegate void GlBindRenderbuffer(RenderbufferTarget target, int fb);
-        [GlEntryPoint("glBindRenderbuffer")]
-        public GlBindRenderbuffer BindRenderbuffer { get; }
-        
-        public delegate void GlFramebufferTexture2D(
+        public void DeleteRenderbuffer(int name) => DeleteRenderbuffers(1, &name);
+
+        delegate* unmanaged[Stdcall]<RenderbufferTarget, int, void> addr_BindRenderbuffer;
+        public void BindRenderbuffer(RenderbufferTarget target, int fb)
+        {
+            addr_BindRenderbuffer(target, fb);
+        }
+
+        public void FramebufferTexture2D(
             FramebufferTarget target,
             FramebufferAttachment attachment,
             TextureTarget texTarget,
             int texture,
-            int level);
-        [GlEntryPoint("glFramebufferTexture2D")]
-        public GlFramebufferTexture2D FramebufferTexture2D { get; }
+            int level)
+        {
+            Gl.FramebufferTexture2D((int)target, (int)attachment, (int)texTarget, texture, level);    
+        }
         
-        public delegate void GlRenderbufferStorage(
+        public void RenderbufferStorage(
             RenderbufferTarget target,
             RenderbufferStorage internalFormat,
             int width,
-            int height);
-        [GlEntryPoint("glRenderbufferStorage")]
-        public GlRenderbufferStorage RenderbufferStorage { get; }
+            int height)
+        {
+            Gl.RenderbufferStorage((int)target, (int)internalFormat, width, height);
+        }
         
-        public delegate void GlFramebufferRenderbuffer(
+        public void FramebufferRenderbuffer(
             FramebufferTarget target,
             FramebufferAttachment attachment,
             RenderbufferTarget renderbufferTarget,
-            int renderbuffer);
-        [GlEntryPoint("glFramebufferRenderbuffer")]
-        public GlFramebufferRenderbuffer FramebufferRenderbuffer { get; }
+            int renderbuffer)
+        {
+            Gl.FramebufferRenderbuffer((int)target, (int)attachment, (int)renderbufferTarget, renderbuffer);
+        }
         
         
-        public delegate void GlClearStencil(int buffer);
-        [GlEntryPoint("glClearStencil")]
-        public GlClearStencil ClearStencil { get; }
+        delegate* unmanaged[Stdcall]<int, void> addr_GlClearStencil;
+        public void ClearStencil(int buffer)
+        {
+             addr_GlClearStencil(buffer);
+        }
 
-        public delegate void GlClearColor(float r, float g, float b, float a);
-        [GlEntryPoint("glClearColor")]
-        public GlClearColor ClearColor { get; }
+        delegate* unmanaged[Stdcall]<float, float, float, float, void> addr_ClearColor;
+        public void ClearColor(float r, float g, float b, float a)
+        {
+            addr_ClearColor(r, g, b, a);
+        }
 
-        public delegate void GlClear(ClearBufferMask bits);
-        [GlEntryPoint("glClear")]
-        public GlClear Clear { get; }
+        delegate* unmanaged[Stdcall]<ClearBufferMask, void> addr_GlClear;
+        public void Clear(ClearBufferMask bits)
+        {
+            addr_GlClear(bits);
+        }
 
-        public delegate void GlViewport(int x, int y, int width, int height);
-        [GlEntryPoint("glViewport")]
-        public GlViewport Viewport { get; }
+        delegate* unmanaged[Stdcall]<int, int, int, int, void> addr_Viewport;
+        public void Viewport(int x, int y, int width, int height)
+        {
+             addr_Viewport(x, y, width, height);
+        }
         
-        public delegate void GlTexImage3D(
+        delegate* unmanaged[Stdcall]<TextureTarget, int, InternalFormat, int, int, int, int, PixelFormat, PixelType, IntPtr, void> addr_TexImage3D;
+
+        public void TexImage3D(
             TextureTarget target,
             int level,
             InternalFormat internalFormat,
@@ -308,12 +420,14 @@ namespace TheAvaloniaOpenGL
             int border,
             PixelFormat format,
             PixelType type,
-            IntPtr data);
-        [GlMinVersionEntryPoint("glTexImage3D", 2, 0)]
-        public GlTexImage3D TexImage3D { get; }
+            IntPtr data)
+        {
+            addr_TexImage3D(target, level, internalFormat, width, height, depth, border, format, type, data);
+        }
         
         
-        public delegate void GlTexSubImage2D(
+        delegate* unmanaged[Stdcall]<TextureTarget, int, int, int, int, int, PixelFormat, PixelType, IntPtr, void> addr_TexImage2D;
+        public void TexSubImage2D(
             TextureTarget target,
             int level,
             int xoffset,
@@ -322,99 +436,142 @@ namespace TheAvaloniaOpenGL
             int height,
             PixelFormat format,
             PixelType type,
-            IntPtr data);
-        [GlMinVersionEntryPoint("glTexSubImage2D", 2, 0)]
-        public GlTexSubImage2D TexSubImage2D { get; }
+            IntPtr data)
+        {
+            addr_TexImage2D(target, level, xoffset, yoffset, width, height, format, type, data);
+        }
+
+        delegate* unmanaged[Stdcall]<PrimitiveType, int, DrawElementsType, IntPtr, int, void> addr_DrawElementsInstanced;
+        public void DrawElementsInstanced(PrimitiveType mode, int count, DrawElementsType type, IntPtr indices, int instancesCount)
+        {
+            addr_DrawElementsInstanced(mode, count, type, indices, instancesCount);
+        }
         
+        delegate* unmanaged[Stdcall]<ClampColorTarget, ClampColorMode, void> addr_ClampColor;
+        public void ClampColor(ClampColorTarget target, ClampColorMode clamp)
+        {
+            addr_ClampColor(target, clamp);
+        }
         
-        public delegate void GlDrawElementsInstanced(PrimitiveType mode, int count, DrawElementsType type, IntPtr indices, int instancesCount);
-        [GlMinVersionEntryPoint("glDrawElementsInstanced", 3, 1)]
-        public GlDrawElementsInstanced DrawElementsInstanced { get; }
+        delegate* unmanaged[Stdcall]<TextureBufferTarget, SizedInternalFormat, int, void> addr_TexBuffer;
+        public void TexBuffer(TextureBufferTarget target, SizedInternalFormat internalformat, int buffer)
+        {
+            addr_TexBuffer(target, internalformat, buffer);
+        }
         
-        public delegate void GlClampColor(ClampColorTarget target, ClampColorMode clamp);
-        [GlMinVersionEntryPoint("glClampColor", 3, 0)]
-        public GlClampColor ClampColor { get; }
+        delegate* unmanaged[Stdcall]<int, void> addr_GlValidateProgram;
+        public void ValidateProgram(int program)
+        {
+            addr_GlValidateProgram(program);
+        }
         
-        public delegate void GlTexBuffer(TextureBufferTarget target, SizedInternalFormat internalformat, int buffer);
-        [GlMinVersionEntryPoint("glTexBuffer", 3, 1)]
-        public GlTexBuffer TexBuffer { get; }
-        
-        public delegate void GlValidateProgram(int program);
-        [GlMinVersionEntryPoint("glValidateProgram", 2, 0)]
-        public GlValidateProgram ValidateProgram { get; }
-        
-        public delegate int GlGetAttribLocation(int program, IntPtr name);
-        [GlEntryPoint("glGetAttribLocation")]
-        public GlGetAttribLocation GetAttribLocation_ { get; }
+        delegate* unmanaged[Stdcall]<int, IntPtr, int> addr_GetAttribLocation;
+        public int GetAttribLocation(int program, IntPtr name)
+        {
+            return addr_GetAttribLocation(program, name);
+        }
 
         public int GetAttribLocation(int program, string name)
         {
-            using Utf8Buffer utf8Buffer = new Utf8Buffer(name);
-            return GetAttribLocation_(program, utf8Buffer.DangerousGetHandle());
+            var bytes = Encoding.UTF8.GetByteCount(name);
+            Span<byte> buffer = stackalloc byte[bytes + 1];
+            Encoding.UTF8.GetBytes(name, buffer);
+            
+            fixed (byte* ptr = buffer)
+                return GetAttribLocation(program, new IntPtr(ptr));
         }
 
-        public delegate void GlVertexAttribPointer(
+        public void VertexAttribPointer(
             int index,
             int size,
             VertexAttribPointerType type,
             bool normalized,
             int stride,
-            IntPtr pointer);
-        [GlEntryPoint("glVertexAttribPointer")]
-        public GlVertexAttribPointer VertexAttribPointer { get; }
-
-        public delegate void GlEnableVertexAttribArray(int index);
-        [GlEntryPoint("glEnableVertexAttribArray")]
-        public GlEnableVertexAttribArray EnableVertexAttribArray { get; }
-
-        public delegate void GlUseProgram(int program);
-        [GlEntryPoint("glUseProgram")]
-        public GlUseProgram UseProgram { get; }
-        
-
-        public delegate void GlDepthMask(int on);
-        [GlEntryPoint("glDepthMask")]
-        public GlDepthMask DepthMask { get; }
-        
-        public delegate void GlDrawArrays(PrimitiveType mode, int first, IntPtr count);
-        [GlEntryPoint("glDrawArrays")]
-        public GlDrawArrays DrawArrays { get; }
-        
-        public delegate void GlDrawElements(PrimitiveType mode, int count, DrawElementsType type, IntPtr indices);
-        [GlEntryPoint("glDrawElements")]
-        public GlDrawElements DrawElements { get; }
-        
-        public delegate void GlDrawElementsBaseVertex(PrimitiveType mode, int count, DrawElementsType type, IntPtr startIndexLocation, int startVertexPosBytes);
-        [GlEntryPoint("glDrawElementsBaseVertex")]
-        public GlDrawElementsBaseVertex DrawElementsBaseVertex { get; }
-
-        public delegate int GlGetUniformLocation(int program, IntPtr name);
-        [GlEntryPoint("glGetUniformLocation")]
-        public GlGetUniformLocation GetUniformLocation_ { get; }
-
-        public int GetUniformLocation(int program, string name)
+            IntPtr pointer)
         {
-            using (Utf8Buffer utf8Buffer = new Utf8Buffer(name))
-                return this.GetUniformLocation_(program, utf8Buffer.DangerousGetHandle());
+            Gl.VertexAttribPointer(index, size, (int)type, normalized ? 1 : 0, stride, pointer);
         }
 
-        public delegate void GlUniform1f(int location, float falue);
-        [GlEntryPoint("glUniform1f")]
-        public GlUniform1f Uniform1f { get; }
+        delegate* unmanaged[Stdcall]<int, void> addr_GlEnableVertexAttribArray;
+        public void EnableVertexAttribArray(int index)
+        {
+            addr_GlEnableVertexAttribArray(index);
+        }
+
+        delegate* unmanaged[Stdcall]<int, void> addr_GlUseProgram;
+        public void UseProgram(int program)
+        {
+            addr_GlUseProgram(program);
+        }
         
-        public delegate void GlUniform4f(int location, float a, float b, float c, float d);
-        [GlEntryPoint("glUniform4f")]
-        public GlUniform4f Uniform4f { get; }
+
+        delegate* unmanaged[Stdcall]<int, void> addr_GlDepthMask;
+        public void DepthMask(int on)
+        {
+            addr_GlDepthMask(on);
+        } 
+        
+        delegate* unmanaged[Stdcall]<PrimitiveType, int, IntPtr, void> addr_DrawArrays;
+        public void DrawArrays(PrimitiveType mode, int first, IntPtr count)
+        {
+            addr_DrawArrays(mode, first, count);
+        }
+        
+        delegate* unmanaged[Stdcall]<PrimitiveType, int, DrawElementsType, IntPtr, void> addr_DrawElements;
+        public void DrawElements(PrimitiveType mode, int count, DrawElementsType type, IntPtr indices)
+        {
+            addr_DrawElements(mode, count, type, indices);
+        }
+        
+        delegate* unmanaged[Stdcall]<PrimitiveType, int, DrawElementsType, IntPtr, int, void> addr_DrawElementsBaseVertex;
+        public void DrawElementsBaseVertex(PrimitiveType mode, int count, DrawElementsType type, IntPtr startIndexLocation, int startVertexPosBytes)
+        {
+            addr_DrawElementsBaseVertex(mode, count, type, startIndexLocation, startVertexPosBytes);
+        }
+
+        delegate* unmanaged[Stdcall]<int, int, int, float*, void> addr_UniformMatrix4fv;
+        public void UniformMatrix4fv(int location, int count, bool transpose, float* ptr)
+        {
+            addr_UniformMatrix4fv(location, count, transpose ? 1 : 0, ptr);
+        }
+
+        
+        delegate* unmanaged[Stdcall]<int, IntPtr, int> addr_GetUniformLocation;
+        public int GetUniformLocation(int program, IntPtr name)
+        {
+            return addr_GetUniformLocation(program, name);
+        }
+        
+        public int GetUniformLocation(int program, string name)
+        {
+            var bytes = Encoding.UTF8.GetByteCount(name);
+            Span<byte> buffer = stackalloc byte[bytes + 1];
+            Encoding.UTF8.GetBytes(name, buffer);
+            
+            fixed (byte* ptr = buffer)
+                return GetUniformLocation(program, new IntPtr(ptr));
+        }
+
+        delegate* unmanaged[Stdcall]<int, float, void> addr_Uniform1f;
+        public void Uniform1f(int location, float falue)
+        {
+            addr_Uniform1f(location, falue);
+        }
+        
+        delegate* unmanaged[Stdcall]<int, float, float, float, float, void> addr_Uniform4f;
+        public void Uniform4f(int location, float a, float b, float c, float d)
+        {
+            addr_Uniform4f(location, a, b, c, d);
+        }
 
 
-        public delegate void GlUniform3f(int location, float a, float b, float c);
-        [GlEntryPoint("glUniform3f")]
-        public GlUniform3f Uniform3f { get; }
-        
-        [GlEntryPoint("glUniformMatrix4fv")]
-        public GlInterface.GlUniformMatrix4fv UniformMatrix4fv { get; }
-        
-        public delegate void GlTexImage2D(
+        delegate* unmanaged[Stdcall]<int, float, float, float, void> addr_Uniform3f;
+        public void Uniform3f(int location, float a, float b, float c)
+        {
+            addr_Uniform3f(location, a, b, c);
+        }
+
+        public void TexImage2D(
             TextureTarget target,
             int level,
             PixelInternalFormat internalFormat,
@@ -423,11 +580,12 @@ namespace TheAvaloniaOpenGL
             int border,
             PixelFormat format,
             PixelType type,
-            IntPtr data);
-        [GlEntryPoint("glTexImage2D")]
-        public GlTexImage2D TexImage2D { get; }
+            IntPtr data)
+        {
+            Gl.TexImage2D((int)target, level, (int)internalFormat, width, height, border, (int)format, (int)type, data);
+        }
 
-        public delegate void GlCopyTexSubImage2D(
+        public void CopyTexSubImage2D(
             TextureTarget target,
             int level,
             int xoffset,
@@ -435,42 +593,54 @@ namespace TheAvaloniaOpenGL
             int x,
             int y,
             int width,
-            int height);
-        [GlEntryPoint("glCopyTexSubImage2D")]
-        public GlCopyTexSubImage2D CopyTexSubImage2D { get; }
+            int height)
+        {
+            Gl.CopyTexSubImage2D((int)target, level, xoffset, yoffset, x, y, width, height);
+        }
 
-        public delegate void GlTexParameteri(TextureTarget target, TextureParameterName name, int value);
-        [GlEntryPoint("glTexParameteri")]
-        public GlTexParameteri TexParameteri { get; }
+        delegate* unmanaged[Stdcall]<TextureTarget, TextureParameterName, int, void> addr_TexParameteri;
+        public void TexParameteri(TextureTarget target, TextureParameterName name, int value)
+        {
+            addr_TexParameteri(target, name, value);
+        }
 
         public void TexParameter(TextureTarget target, TextureParameterName name, int value) =>
             TexParameteri(target, name, value);
-        
-        
-        public unsafe delegate void GlGetProgramInfoLog(
+
+        public delegate void GlGetProgramInfoLog(
             int program,
             int maxLength,
             out int len,
             void* infoLog);
-        public delegate int GlCreateProgram();
-        [GlEntryPoint("glCreateProgram")]
-        public GlCreateProgram CreateProgram { get; }
+
+        public int CreateProgram()
+        {
+            return Gl.CreateProgram();
+        }
         
-        public delegate void GlDeleteProgram(int program);
-        [GlEntryPoint("glDeleteProgram")]
-        public GlDeleteProgram DeleteProgram { get; }
+        delegate* unmanaged[Stdcall]<int, void> addr_GlDeleteProgram;
+        public void DeleteProgram(int program)
+        {
+            addr_GlDeleteProgram(program);
+        }
 
-        public delegate void GlAttachShader(int program, int shader);
-        [GlEntryPoint("glAttachShader")]
-        public GlAttachShader AttachShader { get; }
+        delegate* unmanaged[Stdcall]<int, int, void> addr_AttachShader;
+        public void AttachShader(int program, int shader)
+        {
+            addr_AttachShader(program, shader);
+        }
 
-        public delegate void GlLinkProgram(int program);
-        [GlEntryPoint("glLinkProgram")]
-        public GlLinkProgram LinkProgram { get; }
+        delegate* unmanaged[Stdcall]<int, void> addr_GlLinkProgram;
+        public void LinkProgram(int program)
+        {
+            addr_GlLinkProgram(program);
+        }
 
-        public delegate int GlCreateShader(ShaderType shaderType);
-        [GlEntryPoint("glCreateShader")]
-        public GlCreateShader CreateShader { get; }
+        delegate* unmanaged[Stdcall]<ShaderType, int> addr_GlCreateShader;
+        public int CreateShader(ShaderType shaderType)
+        {
+            return addr_GlCreateShader(shaderType);
+        }
         
         public string CompileShaderAndGetError(int shader, string source)
         {
@@ -482,49 +652,69 @@ namespace TheAvaloniaOpenGL
             return Gl.LinkProgramAndGetError(program);
         }
         
-        public delegate void GlBlendFunc(BlendingFactorSrc src, BlendingFactorDest dst);
-        [GlMinVersionEntryPoint("glBlendFunc", 2, 0)]
-        public GlBlendFunc BlendFunc { get; }
+        delegate* unmanaged[Stdcall]<BlendingFactorSrc, BlendingFactorDest, void> addr_BlendFunc;
+        public void BlendFunc(BlendingFactorSrc src, BlendingFactorDest dst)
+        {
+            addr_BlendFunc(src, dst);
+        }
         
-        public delegate void GlBlendFuncSeparate(BlendingFactorSrc srcRGB, BlendingFactorDest dstRGB, BlendingFactorSrc srcAlpha, BlendingFactorDest dstAlpha);
-        [GlMinVersionEntryPoint("glBlendFuncSeparate", 2, 0)]
-        public GlBlendFuncSeparate BlendFuncSeparate { get; }
+        delegate* unmanaged[Stdcall]<BlendingFactorSrc, BlendingFactorDest, BlendingFactorSrc, BlendingFactorDest, void> addr_BlendFuncSeparate;
+        public void BlendFuncSeparate(BlendingFactorSrc srcRGB, BlendingFactorDest dstRGB, BlendingFactorSrc srcAlpha, BlendingFactorDest dstAlpha)
+        {
+            addr_BlendFuncSeparate(srcRGB, dstRGB, srcAlpha, dstAlpha);
+        }
 
-        public delegate void GlBlendEquation(BlendEquationMode mode);
-        [GlMinVersionEntryPoint("glBlendEquation", 2, 0)]
-        public GlBlendEquation BlendEquation { get; }
+        delegate* unmanaged[Stdcall]<BlendEquationMode, void> addr_GlBlendEquation;
+        public void BlendEquation(BlendEquationMode mode)
+        {
+            addr_GlBlendEquation(mode);
+        }
 
-        public delegate void GlBlitFramebuffer(int srcX0, int srcY0, int srcX1, int srcY1, int dstX0, int dstY0, int dstX1, int dstY1, ClearBufferMask mask, BlitFramebufferFilter filter);
-        [GlMinVersionEntryPoint("glBlitFramebuffer", 3, 0)]
-        public GlBlitFramebuffer BlitFramebuffer { get; }
+        delegate* unmanaged[Stdcall]<int, int, int, int, int, int, int, int, ClearBufferMask, BlitFramebufferFilter, void> addr_BlitFramebuffer;
+        public void BlitFramebuffer(int srcX0, int srcY0, int srcX1, int srcY1, int dstX0, int dstY0, int dstX1, int dstY1, ClearBufferMask mask, BlitFramebufferFilter filter)
+        {
+            addr_BlitFramebuffer(srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, mask, filter);
+        }
         
-        public delegate void GlDepthFunc(DepthFunction func);
-        [GlMinVersionEntryPoint("glDepthFunc", 2, 0)]
-        public GlDepthFunc DepthFunc { get; }
+        delegate* unmanaged[Stdcall]<DepthFunction, void> addr_GlDepthFunc;
+        public void DepthFunc(DepthFunction func)
+        {
+            addr_GlDepthFunc(func);
+        }
         
-        public delegate void GlScissor(int x, int y, int width, int height);
-        [GlMinVersionEntryPoint("glScissor", 2, 0)]
-        public GlScissor Scissor { get; }
+        delegate* unmanaged[Stdcall]<int, int, int, int, void> addr_Scissor;
+        public void Scissor(int x, int y, int width, int height)
+        {
+            addr_Scissor(x, y, width, height);
+        }
         
-        public delegate void GlDrawBuffers(int n, IntPtr bufs);
-        [GlMinVersionEntryPoint("glDrawBuffers", 2, 0)]
-        public GlDrawBuffers DrawBuffersInternal { get; }
+        delegate* unmanaged[Stdcall]<int, IntPtr, void> addr_DrawBuffers;
+        public void DrawBuffers(int n, IntPtr bufs)
+        {
+            addr_DrawBuffers(n, bufs);
+        }
         
-        public delegate void GlReadBuffer(ReadBufferMode mode);
-        [GlMinVersionEntryPoint("glReadBuffer", 2, 0)]
-        public GlReadBuffer ReadBuffer { get; }
+        delegate* unmanaged[Stdcall]<ReadBufferMode, void> addr_GlReadBuffer;
+        public void ReadBuffer(ReadBufferMode mode)
+        {
+            addr_GlReadBuffer(mode);
+        }
         
-        public delegate void GlReadPixels(int x, int y, int width, int height, PixelFormat format, PixelType type, IntPtr data);
-        [GlMinVersionEntryPoint("glReadPixels", 2, 0)]
-        public GlReadPixels ReadPixelsInternal { get; }
+        delegate* unmanaged[Stdcall]<int, int, int, int, PixelFormat, PixelType, IntPtr, void> addr_ReadPixels;
+        public void ReadPixels(int x, int y, int width, int height, PixelFormat format, PixelType type, IntPtr data)
+        {
+            addr_ReadPixels(x, y, width, height, format, type, data);
+        }
 
-        public delegate void GlFinish();
-        [GlMinVersionEntryPoint("glFinish", 2, 0)]
-        public GlFinish Finish { get; }
-        
-        public delegate void GlFlush();
-        [GlMinVersionEntryPoint("glFlush", 2, 0)]
-        public GlFlush Flush { get; }
+        public void Finish()
+        {
+            Gl.Finish();
+        }
+
+        public void Flush()
+        {
+            Gl.Flush();
+        }
 
         public void CheckError(string what)
         {
@@ -543,21 +733,19 @@ namespace TheAvaloniaOpenGL
 
         public int GenTexture()
         {
-            int[] temp = new int[1];
-            Gl.GenTextures(1, temp);
-            return temp[0];
+            return Gl.GenTexture();
         }
 
-        public unsafe void DrawBuffers(ReadOnlySpan<DrawBuffersEnum> buffers)
+        public void DrawBuffers(ReadOnlySpan<DrawBuffersEnum> buffers)
         {
             fixed (DrawBuffersEnum* ptr = buffers)
-                DrawBuffersInternal(buffers.Length, (IntPtr)ptr);
+                DrawBuffers(buffers.Length, (IntPtr)ptr);
         }
 
-        public unsafe void ReadPixels<T>(int x, int y, int width, int height, PixelFormat format, PixelType type, Span<T> data) where T : unmanaged
+        public void ReadPixels<T>(int x, int y, int width, int height, PixelFormat format, PixelType type, Span<T> data) where T : unmanaged
         {
             fixed (void* ptr = data)
-                ReadPixelsInternal(x, y, width, height, format, type, (IntPtr)ptr); 
+                ReadPixels(x, y, width, height, format, type, (IntPtr)ptr); 
         }
     }
 }

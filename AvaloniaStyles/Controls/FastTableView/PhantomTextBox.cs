@@ -42,11 +42,14 @@ public abstract class PhantomControlBase<T> where T : Control
         AdornerLayer.SetIsClipEnabled(element, false);
         this.element = element;
         
+        // avalonia 11 bug? https://github.com/AvaloniaUI/Avalonia/issues/9845
+        var transformed = parent.TranslatePoint(position.Position, (parent.GetVisualRoot() as Visual)!)!.Value;
+                    
         element.Width = position.Width;
         element.Height = position.Height;
         element.HorizontalAlignment = HorizontalAlignment.Left;
         element.VerticalAlignment = VerticalAlignment.Top;
-        element.Margin = new Thickness(position.X, position.Y, 0, 0);
+        element.Margin = new Thickness(transformed.X, transformed.Y, 0, 0);
         
         if (parent.GetVisualRoot() is TopLevel toplevel)
         {
@@ -86,9 +89,9 @@ public abstract class PhantomControlBase<T> where T : Control
 
         clickDisposable?.Dispose();
         clickDisposable = null;
-        
+
         if (parent is IInputElement inputElement)
-            FocusManager.Instance!.Focus(inputElement);
+            inputElement.Focus();
         element = null;
         parent = null;
         IsOpened = false;
@@ -162,7 +165,7 @@ public class PhantomTextBox : PhantomControlBase<TextBox>
         if (!AttachAsAdorner(parent, position, textBox))
             return;
 
-        DispatcherTimer.RunOnce(textBox.Focus, TimeSpan.FromMilliseconds(1));
+        DispatcherTimer.RunOnce(() => textBox.Focus(), TimeSpan.FromMilliseconds(1));
         if (selectAll)
             textBox.SelectAll();
         else
@@ -183,7 +186,7 @@ public class PhantomTextBox : PhantomControlBase<TextBox>
 
     protected override void Save(TextBox element)
     {
-        currentOnApply?.Invoke(element.Text, actionAfterSave);
+        currentOnApply?.Invoke(element.Text ?? "", actionAfterSave);
     }
 }
 

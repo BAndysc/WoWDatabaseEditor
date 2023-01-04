@@ -1,3 +1,4 @@
+using System.Globalization;
 using Avalonia;
 using Avalonia.Media;
 using Avalonia.Threading;
@@ -59,14 +60,12 @@ public class SpawnsFastTreeList : FastTreeView<SpawnEntry, SpawnInstance>
     protected override void DrawRow(Typeface typeface, Pen pen, IBrush foreground, DrawingContext context, object? row, Rect rect)
     {
         {
-            var ft = new FormattedText
+            var ft = new FormattedText(row?.ToString() ?? "(null)",
+                CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, 12, foreground)
             {
-                Constraint = new Size(float.PositiveInfinity, RowHeight),
-                Typeface = typeface,
-                FontSize = 12
+                MaxTextWidth = float.PositiveInfinity,
+                MaxTextHeight = RowHeight
             };
-
-            ft.Text = row?.ToString() ?? "(null)";
 
             var isHover = mouseOverRow == row;
             var isSelected = SelectedSpawn2 == row;
@@ -76,12 +75,12 @@ public class SpawnsFastTreeList : FastTreeView<SpawnEntry, SpawnInstance>
 
             if (row is SpawnEntry group)
             {
-                context.DrawText(foreground, new Point(Indent, rect.Y + rect.Height / 2 - ft.Bounds.Height / 2), ft);
+                context.DrawText(ft, new Point(Indent, rect.Y + rect.Height / 2 - ft.Height / 2));
                 DrawToggleMark(rect.WithWidth(RowHeight), context, pen, group.IsExpanded);
             }
             else if (row is SpawnInstance spawn)
             {
-                context.DrawText(foreground, new Point(Indent * 2, rect.Y + rect.Height / 2 - ft.Bounds.Height / 2), ft);
+                context.DrawText(ft, new Point(Indent * 2, rect.Y + rect.Height / 2 - ft.Height / 2));
                 double x = rect.Width - 2;
                 if (spawn.IsSpawned)
                     context.DrawRectangle(foreground, null, new Rect(x - 6, rect.Center.Y - 3, 6, 6), 3, 3);

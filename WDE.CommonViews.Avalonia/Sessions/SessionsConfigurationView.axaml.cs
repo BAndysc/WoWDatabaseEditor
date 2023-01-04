@@ -4,7 +4,7 @@ using Avalonia.Markup.Xaml;
 
 namespace WDE.CommonViews.Avalonia.Sessions
 {
-    public class SessionsConfigurationView : UserControl
+    public partial class SessionsConfigurationView : UserControl
     {
         public SessionsConfigurationView()
         {

@@ -38,7 +38,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
             var control = sender as Control;
             var contextMenu = control?.ContextMenu;
             
-            if (contextMenu == null || dataContext == null)
+            if (contextMenu == null || dataContext == null || control == null)
                 return;
 
             var topLevel = control.GetVisualRoot() as TopLevel;
@@ -46,7 +46,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
 
             var dynamicMenuItems = dataContext.GetDynamicContextMenuForSelected();
             
-            var items = contextMenu.Items as AvaloniaList<object>;
+            var items = contextMenu.ItemsSource as AvaloniaList<object>;
             if (items == null)
                 return;
 
@@ -83,7 +83,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
                 {
                     AddMenuItem("Copy parameter value", new DelegateCommand(() =>
                     {
-                        AvaloniaLocator.Current.GetRequiredService<IClipboard>().SetTextAsync(context.Parameter.Value.ToString()).ListenErrors();
+                        TopLevel.GetTopLevel(this)?.Clipboard?.SetTextAsync(context.Parameter.Value.ToString()).ListenErrors();
                     }));
                     anythingAdded = true;
                 }
@@ -95,7 +95,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
                         AddMenuItem("Copy coords", new DelegateCommand(() =>
                         {
                             var coords = $"{sourceOrTarget.X} {sourceOrTarget.Y} {sourceOrTarget.Z} {sourceOrTarget.O}";
-                            AvaloniaLocator.Current.GetRequiredService<IClipboard>().SetTextAsync(coords).ListenErrors();
+                            TopLevel.GetTopLevel(this)?.Clipboard?.SetTextAsync(coords).ListenErrors();
                         }));
                         anythingAdded = true;   
                     }
@@ -112,7 +112,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
             if (anythingAdded)
             {
                 AddSeparator();
-                contextMenu.MenuClosed += MenuClosed;   
+                contextMenu.Closed += MenuClosed;   
             }
         }
 
@@ -122,14 +122,14 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
             if (contextMenu == null)
                 return;
 
-            var items = contextMenu.Items as AvaloniaList<object>;
+            var items = contextMenu.ItemsSource as AvaloniaList<object>;
             if (items == null)
                 return;
 
             for (int i = 0; i < temporaryMenuItems.Count; ++i)
                 items.Remove(temporaryMenuItems[i]);
             temporaryMenuItems.Clear();
-            contextMenu.MenuClosed -= MenuClosed;
+            contextMenu.Closed -= MenuClosed;
         }
     }
 }

@@ -134,7 +134,7 @@
     
     <GridSplitter Classes="horizontal" Grid.Row="1" />
     
-    <TabControl Grid.Row="2" IsVisible="{CompiledBinding HasAnyResults}" Items="{CompiledBinding Results}" SelectedItem="{CompiledBinding SelectedResult}">
+    <TabControl Grid.Row="2" IsVisible="{CompiledBinding HasAnyResults}" ItemsSource="{CompiledBinding Results}" SelectedItem="{CompiledBinding SelectedResult}">
       <TabControl.Styles>
         <Style Selector="TabItem">
           <Setter Property="ContextMenu">

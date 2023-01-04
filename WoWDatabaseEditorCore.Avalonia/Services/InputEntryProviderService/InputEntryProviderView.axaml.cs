@@ -3,7 +3,7 @@ using Avalonia.Markup.Xaml;
 
 namespace WoWDatabaseEditorCore.Avalonia.Services.InputEntryProviderService
 {
-    public class InputEntryProviderView : UserControl
+    public partial class InputEntryProviderView : UserControl
     {
         public InputEntryProviderView()
         {

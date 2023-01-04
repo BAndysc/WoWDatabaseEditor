@@ -98,7 +98,7 @@ namespace WDE.SqlWorkbench.Services.TextMarkers
         {
             foreach (var view in textViews)
             {
-                view.Redraw(segment, DispatcherPriority.Normal);
+                view.Redraw(segment.Offset, DispatcherPriority.Normal);
             }
 
             if (RedrawRequested != null)
@@ -132,15 +132,15 @@ namespace WDE.SqlWorkbench.Services.TextMarkers
                         {
                             if (foregroundBrush != null)
                             {
-                                element.TextRunProperties.ForegroundBrush = foregroundBrush;
+                                element.TextRunProperties.SetForegroundBrush(foregroundBrush);
                             }
 
                             Typeface tf = element.TextRunProperties.Typeface;
-                            element.TextRunProperties.Typeface = (new Typeface(
+                            element.TextRunProperties.SetTypeface((new Typeface(
                                 tf.FontFamily,
                                 marker.FontStyle ?? tf.Style,
                                 marker.FontWeight ?? tf.Weight
-                            ));
+                            )));
                         }
                     );
                 }   

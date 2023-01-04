@@ -62,7 +62,7 @@ namespace WDE.Common.Avalonia.Controls
                 {
                     nextTextBox.Text = Text;
                     nextTextBox.Focus();
-                    nextTextBox.SelectionStart = nextTextBox.SelectionEnd = nextTextBox.Text.Length;
+                    nextTextBox.SelectionStart = nextTextBox.SelectionEnd = (nextTextBox.Text?.Length ?? 0);
                     e.Handled = true;
                 }
             }
@@ -72,9 +72,11 @@ namespace WDE.Common.Avalonia.Controls
 
         protected override void OnTextInput(TextInputEventArgs e)
         {
-            if (justHandledS &&
-                (e.Text?.Equals("s", StringComparison.OrdinalIgnoreCase) ?? false))
+            if ((e.Text?.Equals("s", StringComparison.OrdinalIgnoreCase) ?? false) && float.TryParse(Text, out var textAsFloat) &&
+                SelectionStart == Text.Length)
             {
+                Text = ((long)(textAsFloat * 1000)).ToString();
+                SelectionStart = SelectionEnd = Text.Length;
                 e.Handled = true;
             }
             else
@@ -83,7 +85,8 @@ namespace WDE.Common.Avalonia.Controls
 
         private async void PasteAsync()
         {
-            var text = await ((IClipboard)AvaloniaLocator.Current.GetService(typeof(IClipboard))!).GetTextAsync();
+            var clipboard = TopLevel.GetTopLevel(this)?.Clipboard;
+            var text = clipboard == null ? null : await clipboard.GetTextAsync();
 
             if (text is null) 
                 return;
@@ -107,7 +110,7 @@ namespace WDE.Common.Avalonia.Controls
                 Paste();
         }
 
-        private static T? FindNext<T>(IVisual? start) where T : class, IVisual 
+        private static T? FindNext<T>(Visual? start) where T : Visual
         {
             if (start == null)
                 return null;
@@ -117,15 +120,16 @@ namespace WDE.Common.Avalonia.Controls
                 return null;
 
             int startChildrenIndex = 0;
-            while (startChildrenIndex < parent.VisualChildren.Count &&
-                   parent.VisualChildren[startChildrenIndex] != start)
+            var visualChildren = parent.GetVisualChildren().ToList();
+            while (startChildrenIndex < visualChildren.Count &&
+                   !ReferenceEquals(visualChildren[startChildrenIndex], start))
                 startChildrenIndex++;
             
             startChildrenIndex++;
             
-            for (int i = startChildrenIndex; i < parent.VisualChildren.Count; ++i)
+            for (int i = startChildrenIndex; i < visualChildren.Count; ++i)
             {
-                var find = parent.VisualChildren[i].FindDescendantOfType<T>(true);
+                var find = visualChildren[i].FindDescendantOfType<T>(true);
                 if (find != null)
                     return find;
             }
@@ -133,7 +137,7 @@ namespace WDE.Common.Avalonia.Controls
             return FindNext<T>(parent);
         }
         
-        private static T? FindPrev<T>(IVisual? start) where T : class, IVisual 
+        private static T? FindPrev<T>(Visual? start) where T : Visual 
         {
             if (start == null)
                 return null;
@@ -142,16 +146,17 @@ namespace WDE.Common.Avalonia.Controls
             if (parent == null)
                 return null;
 
-            int startChildrenIndex = parent.VisualChildren.Count - 1;
+            var visualChildren = parent.GetVisualChildren().ToList();
+            int startChildrenIndex = visualChildren.Count - 1;
             while (startChildrenIndex >= 0 &&
-                   parent.VisualChildren[startChildrenIndex] != start)
+                   !ReferenceEquals(visualChildren[startChildrenIndex], start))
                 startChildrenIndex--;
             
             startChildrenIndex--;
             
             for (int i = startChildrenIndex; i >= 0 ; --i)
             {
-                var find = parent.VisualChildren[i].FindDescendantOfType<T>(true);
+                var find = visualChildren[i].FindDescendantOfType<T>(true);
                 if (find != null)
                     return find;
             }

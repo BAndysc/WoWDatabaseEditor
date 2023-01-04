@@ -4,7 +4,7 @@ using Avalonia.Markup.Xaml;
 
 namespace WoWDatabaseEditorCore.Avalonia.Services.FindAnywhere;
 
-public class FindAnywhereDialogView : UserControl
+public partial class FindAnywhereDialogView : UserControl
 {
     public FindAnywhereDialogView()
     {

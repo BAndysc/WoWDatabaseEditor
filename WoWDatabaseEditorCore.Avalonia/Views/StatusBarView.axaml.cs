@@ -10,7 +10,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
     /// <summary>
     ///     Interaction logic for AboutView
     /// </summary>
-    public class StatusBarView : UserControl
+    public partial class StatusBarView : UserControl
     {
         public StatusBarView()
         {

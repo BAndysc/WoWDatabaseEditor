@@ -33,7 +33,7 @@
         <ButtonImage Image="Icons/icon_delete.png" Command="{CompiledBinding DeleteSelectedParameterCommand}" IsEnabled="{CompiledBinding SelectedParameter, Converter={x:Static NullConverter.IsNotNull}}" />
       </ToolbarPanel>
             
-      <ListBox dnD:DragAndDrop.IsDropTarget="True" dnD:DragAndDrop.DropHandler="{CompiledBinding }" dnD:DragAndDrop.IsDragSource="True" Items="{CompiledBinding Parameters}" SelectedItem="{CompiledBinding SelectedParameter}">
+      <ListBox dnD:DragAndDrop.IsDropTarget="True" dnD:DragAndDrop.DropHandler="{CompiledBinding }" dnD:DragAndDrop.IsDragSource="True" ItemsSource="{CompiledBinding Parameters}" SelectedItem="{CompiledBinding SelectedParameter}">
         <ListBox.KeyBindings>
           <KeyBinding Gesture="Delete" Command="{CompiledBinding DeleteSelectedParameterCommand}" />
           <KeyBinding Gesture="Back" Command="{CompiledBinding DeleteSelectedParameterCommand}" />

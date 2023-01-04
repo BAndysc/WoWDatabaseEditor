@@ -9,9 +9,9 @@
 
     <Styles.Resources>
         <converters:ChromeToBoolConverter x:Key="ChromeToBoolConverter" NoChrome="True" AlwaysChrome="False" MacChromeOnly="True" />
-        <AccentSolidColorBrush Hue="{DynamicResource AccentHue}" Color="#4168CF" x:Key="TopBarButtonBackground" />
-        <LightSolidColorBrush Light="0.1" Base="{DynamicResource TopBarButtonBackground}" x:Key="TopBarButtonHoverBackground" />
-        <LightSolidColorBrush Light="-0.1" Base="{DynamicResource TopBarButtonBackground}" x:Key="TopBarButtonPressedBackground" />
+        <SolidColorBrush Color="#4168CF" x:Key="TopBarButtonBackground"  Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush Color="#4077DD" x:Key="TopBarButtonHoverBackground"  Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush Color="#4069C6" x:Key="TopBarButtonPressedBackground"  Accent.Hue="{DynamicResource AccentHue}" />
     </Styles.Resources>
     
     <Style Selector="ExtendedTitleBar">
@@ -39,9 +39,18 @@
         <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}"/>
         <Setter Property="Template">
             <ControlTemplate>
+                <Panel>
+                    <Border Name="PART_TransparencyFallback" IsHitTestVisible="False" />
+                    <Border Background="{TemplateBinding Background}" IsHitTestVisible="False" />
+                    <Panel Background="Transparent" Margin="{TemplateBinding WindowDecorationMargin}" />
+                    <VisualLayerManager>
+                        <VisualLayerManager.ChromeOverlayLayer>
+                            <TitleBar />
+                        </VisualLayerManager.ChromeOverlayLayer>
+
+                        
                 <Border BorderThickness="0" BorderBrush="{DynamicResource OuterWindowBorderColor}" Name="PART_windowBorder">
                     <Border ClipToBounds="True" BorderThickness="0" BorderBrush="{DynamicResource InnerWindowBorderColor}" Name="PART_windowBorder_inner">
-                        <VisualLayerManager>
                             <DockPanel LastChildFill="True" Margin="{TemplateBinding OffScreenMargin}">
                                 <Panel DockPanel.Dock="Top">
                                     <Border Background="{DynamicResource TitleBarBackground}" IsHitTestVisible="False" Name="PART_titlebarBorder"/>
@@ -84,14 +93,17 @@
                                 
                                 <Border Padding="4" Name="PART_content">
                                     <Panel>
-                                        <ContentPresenter Content="{TemplateBinding Content}" />
+                                        <ContentPresenter Name="PART_ContentPresenter" 
+                                                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                                                          Content="{TemplateBinding Content}" />
                                         <ContentPresenter Content="{TemplateBinding Overlay}" />
                                     </Panel>
                                 </Border>
                             </DockPanel>
-                        </VisualLayerManager>
+                        </Border>
                     </Border>
-                </Border>
+                        </VisualLayerManager>
+                    </Panel>
             </ControlTemplate>
         </Setter>
     </Style>

@@ -72,7 +72,7 @@
     <Style Selector="Button.accent:disabled /template/ ContentPresenter#PART_ContentPresenter">
       <Setter Property="Background" Value="{DynamicResource AccentButtonBackgroundDisabled}" />
       <Setter Property="BorderBrush" Value="{DynamicResource AccentButtonBorderBrushDisabled}" />
-      <Setter Property="TextBlock.Foreground" Value="{DynamicResource AccentButtonForegroundDisabled}" />
+      <Setter Property="TextElement.Foreground" Value="{DynamicResource AccentButtonForegroundDisabled}" />
     </Style>
     
     <Style Selector="Button /template/ ContentPresenter#PART_ContentPresenter">
@@ -100,18 +100,18 @@
     <Style Selector="Button.primary:pointerover /template/ ContentPresenter#PART_ContentPresenter">
       <Setter Property="Background" Value="{DynamicResource PrimaryButtonBackgroundPointerOver}" />
       <Setter Property="BorderBrush" Value="{DynamicResource PrimaryButtonBorderBrushPointerOver}" />
-      <Setter Property="TextBlock.Foreground" Value="{DynamicResource PrimaryButtonForeground}" />
+      <Setter Property="TextElement.Foreground" Value="{DynamicResource PrimaryButtonForeground}" />
     </Style>
     
     <Style Selector="Button.primary:pressed  /template/ ContentPresenter#PART_ContentPresenter">
       <Setter Property="Background" Value="{DynamicResource PrimaryButtonBackgroundPressed}" />
       <Setter Property="BorderBrush" Value="{DynamicResource PrimaryButtonBorderBrushPressed}" />
-      <Setter Property="TextBlock.Foreground" Value="{DynamicResource PrimaryButtonForeground}" />
+      <Setter Property="TextElement.Foreground" Value="{DynamicResource PrimaryButtonForeground}" />
     </Style>
     
     <Style Selector="Button.primary:disabled /template/ ContentPresenter#PART_ContentPresenter">
       <Setter Property="Background" Value="{DynamicResource PrimaryButtonBackgroundPressed}" />
       <Setter Property="BorderBrush" Value="{DynamicResource PrimaryButtonBorderBrushPressed}" />
-      <Setter Property="TextBlock.Foreground" Value="{DynamicResource PrimaryButtonForeground}" />
+      <Setter Property="TextElement.Foreground" Value="{DynamicResource PrimaryButtonForeground}" />
     </Style>
 </Styles>

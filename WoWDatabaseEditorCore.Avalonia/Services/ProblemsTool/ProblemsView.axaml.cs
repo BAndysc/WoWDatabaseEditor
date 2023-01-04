@@ -6,7 +6,7 @@ using WoWDatabaseEditorCore.Services.ProblemsTool;
 
 namespace WoWDatabaseEditorCore.Avalonia.Services.ProblemsTool
 {
-    public class ProblemsView : UserControl
+    public partial class ProblemsView : UserControl
     {
         public ProblemsView()
         {

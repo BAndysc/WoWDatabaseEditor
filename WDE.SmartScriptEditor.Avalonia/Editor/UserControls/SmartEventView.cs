@@ -3,7 +3,6 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using WDE.Common.Avalonia.Controls;
-using WDE.Common.Utils;
 
 namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
 {
@@ -54,9 +53,9 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
             set => SetAndRaise(DirectEditParameterProperty, ref directEditParameter, value);
         }
 
-        public ICommand DirectOpenParameter
+        public ICommand? DirectOpenParameter
         {
-            get => (ICommand?) GetValue(DirectOpenParameterProperty) ?? AlwaysDisabledCommand.Command;
+            get => (ICommand?) GetValue(DirectOpenParameterProperty);
             set => SetValue(DirectOpenParameterProperty, value);
         }
 
@@ -77,5 +76,9 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
         {
             DeselectActionsOfDeselectedEventsRequest?.Execute(null);
         }
+
+        public static readonly AvaloniaProperty SelectedProperty = AvaloniaProperty.RegisterAttached<SmartEventView, Control, bool>("Selected");
+        public static bool GetSelected(Control control) => (bool?)control.GetValue(SelectedProperty) ?? false;
+        public static void SetSelected(Control control, bool value) => control.SetValue(SelectedProperty, value);
     }
 }

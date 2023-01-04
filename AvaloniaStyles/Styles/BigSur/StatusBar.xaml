@@ -21,7 +21,7 @@
     
     <Style Selector="controls|StatusBar Button /template/ ContentPresenter#PART_ContentPresenter">
         <Setter Property="CornerRadius" Value="0" />
-        <Setter Property="BoxShadow" Value="" />
+        <Setter Property="BoxShadow" Value="none" />
     </Style>
     <Style Selector="controls|StatusBar Button">
         <Setter Property="BorderThickness" Value="0" />

@@ -41,7 +41,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Extensions
                 if (!window.IsActive)
                 {
                     int val = 1;
-                    DwmSetWindowAttribute(window.PlatformImpl.Handle.Handle,
+                    DwmSetWindowAttribute(window.TryGetPlatformHandle()!.Handle,
                         DWMWINDOWATTRIBUTE.TransitionsForceDisabled,
                         ref val,
                         sizeof(int));
@@ -50,7 +50,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Extensions
                     window.WindowState = WindowState.Normal;
                     
                     val = 0;
-                    DwmSetWindowAttribute(window.PlatformImpl.Handle.Handle,
+                    DwmSetWindowAttribute(window.TryGetPlatformHandle()!.Handle,
                         DWMWINDOWATTRIBUTE.TransitionsForceDisabled,
                         ref val,
                         sizeof(int));

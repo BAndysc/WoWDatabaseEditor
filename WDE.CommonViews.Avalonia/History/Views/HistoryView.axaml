@@ -39,7 +39,7 @@
         </controls:MonochromaticIcon>
     </components:ToolView.Icon>
     
-    <ListBox Items="{CompiledBinding Items}" BorderThickness="0" Background="Transparent">
+    <ListBox ItemsSource="{CompiledBinding Items}" BorderThickness="0" Background="Transparent">
         <ListBox.ItemTemplate>
             <DataTemplate>
                 <WrapPanel>

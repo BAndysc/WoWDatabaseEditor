@@ -60,7 +60,7 @@ public partial class SqlWorkbenchView : UserControl
     private void InitializeComponent()
     {
         AvaloniaXamlLoader.Load(this);
-        editor = this.FindControl<TextEditor>("TextEditor");
+        editor = this.GetControl<TextEditor>("TextEditor");
         editor.TextArea.Caret.PositionChanged += CaretPositionChanged;
         var commandBindings = editor.TextArea.DefaultInputHandler.Editing.CommandBindings;
         var deleteLineBinding = commandBindings.FirstOrDefault(b => b.Command.Gesture == new KeyGesture(Key.D, KeyModifiers.Control));
@@ -229,7 +229,7 @@ public partial class SqlWorkbenchView : UserControl
                 md.Markdown = text;
                 
                 var flyout = FlyoutBase.GetAttachedFlyout(editor);
-                flyout?.ShowAt(editor, true);
+                flyout?.ShowAt(editor);//, true); // todo: avalonia11 ava11
             }
         }
     }

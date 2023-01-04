@@ -1,5 +1,5 @@
 ﻿using System;
-using Dock.Model.ReactiveUI.Controls;
+using Dock.Model.Mvvm.Controls;
 using WDE.Common.Managers;
 using WDE.Common.Windows;
 using ITool = WDE.Common.Windows.ITool;
@@ -19,7 +19,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
             Title = tool.Title;
             ViewModel = tool;
             CanFloat = false;
-            CanPin = false;
+            CanPin = true;
             CanClose = true;
         }
 

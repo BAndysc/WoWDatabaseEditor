@@ -12,7 +12,7 @@ namespace WDE.Common.Avalonia.Components
 {
     public class MultiViewModelContentPresenter : TemplatedControl
     {
-        private Dictionary<object, IControl> viewModelsToViews = new();
+        private Dictionary<object, Control> viewModelsToViews = new();
         
         public static readonly DirectProperty<MultiViewModelContentPresenter, IEnumerable> ViewModelsProperty =
             AvaloniaProperty.RegisterDirect<MultiViewModelContentPresenter, IEnumerable>(nameof(ViewModels), o => o.ViewModels, (o, v) => o.ViewModels = v);
@@ -24,10 +24,10 @@ namespace WDE.Common.Avalonia.Components
             set => SetAndRaise(ViewModelsProperty, ref items, value);
         }
         
-        public static readonly DirectProperty<MultiViewModelContentPresenter, IControl?> SelectedViewProperty =
-            AvaloniaProperty.RegisterDirect<MultiViewModelContentPresenter, IControl?>(nameof(SelectedView), o => o.SelectedView);
-        private IControl? selectedView;
-        public IControl? SelectedView
+        public static readonly DirectProperty<MultiViewModelContentPresenter, Control?> SelectedViewProperty =
+            AvaloniaProperty.RegisterDirect<MultiViewModelContentPresenter, Control?>(nameof(SelectedView), o => o.SelectedView);
+        private Control? selectedView;
+        public Control? SelectedView
         {
             get => selectedView;
             private set => SetAndRaise(SelectedViewProperty, ref selectedView, value);
@@ -82,11 +82,11 @@ namespace WDE.Common.Avalonia.Components
             {
                 if (ViewBind.TryResolve(newViewModel, out var view))
                 {
-                    if (view is not IControl controlView)
+                    if (view is not Control controlView)
                         continue;
                     viewModelsToViews[newViewModel] = controlView;
                     if (selectedViewModel == newViewModel)
-                        SelectedView = view as IControl;
+                        SelectedView = view as Control;
                     if (view is ILogical logical)
                         LogicalChildren.Add(logical);
                 }

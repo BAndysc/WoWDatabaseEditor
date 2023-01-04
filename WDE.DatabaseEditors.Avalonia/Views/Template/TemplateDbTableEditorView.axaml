@@ -1,7 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             d:DataContext="{d:DesignInstance viewModels:TemplateDbTableEditorViewModel}"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:controls="clr-namespace:WDE.DatabaseEditors.Avalonia.Controls"
              xmlns:controls1="clr-namespace:WDE.Common.Avalonia.Controls;assembly=WDE.Common.Avalonia"
@@ -83,8 +82,8 @@
         <DataTemplate x:Key="RowTemplate" x:DataType="viewModels:DatabaseRowViewModel">
             <DockPanel Classes="alternating" Height="24">
                 <TextBlock ToolTip.Tip="{CompiledBinding Help, Mode=OneTime}" Text="{CompiledBinding Name, Mode=OneTime}" Width="180" VerticalAlignment="Center" Padding="10,0,10,0" />
-                <ItemsPresenter Items="{CompiledBinding Cells}" ItemTemplate="{StaticResource FieldValueTemplateSelector}" ItemsPanel="{StaticResource HorizontalStackPanelTemplate}">
-                </ItemsPresenter>
+                <ItemsControl ItemsSource="{CompiledBinding Cells}" ItemTemplate="{StaticResource FieldValueTemplateSelector}" ItemsPanel="{StaticResource HorizontalStackPanelTemplate}">
+                </ItemsControl>
             </DockPanel>
         </DataTemplate>
     </UserControl.Resources>
@@ -116,7 +115,7 @@
         </Style>
     </UserControl.Styles>
     <Panel>
-        <TabControl Padding="0" Items="{CompiledBinding FilteredRows, Mode=OneTime}" SelectedItem="{CompiledBinding SelectedGroup}">
+        <TabControl Padding="0" ItemsSource="{CompiledBinding FilteredRows, Mode=OneTime}" SelectedItem="{CompiledBinding SelectedGroup}">
             <TabControl.ItemTemplate>
                 <DataTemplate>
                     <TextBlock Text="{CompiledBinding GroupName}" />
@@ -133,11 +132,11 @@
                                                Foreground="{DynamicResource TreeViewItem.Header.Foreground.Special}" 
                                                Width="180"
                                                VerticalAlignment="Center"/>
-                                    <ItemsControl ItemTemplate="{StaticResource RowHeaderTemplate}" Items="{Binding DataContext.Header, ElementName=rootWindow}" ItemsPanel="{StaticResource HorizontalStackPanelTemplate}">
+                                    <ItemsControl ItemTemplate="{StaticResource RowHeaderTemplate}" ItemsSource="{Binding DataContext.Header, ElementName=rootWindow}" ItemsPanel="{StaticResource HorizontalStackPanelTemplate}">
                                     </ItemsControl>
                                 </StackPanel>
                             </Border>
-                            <ItemsControl ItemTemplate="{StaticResource RowTemplate}" Focusable="False" Items="{CompiledBinding .}">
+                            <ItemsControl ItemTemplate="{StaticResource RowTemplate}" Focusable="False" ItemsSource="{CompiledBinding .}">
                             </ItemsControl>
                         </StackPanel>
                     </ScrollViewer>
@@ -147,11 +146,11 @@
         
         <!-- <ScrollViewer> -->
         <!--      -->
-        <!--     ~1~ <ItemsPresenter Focusable="False" Items="{CompiledBinding FilteredRows, Mode=OneTime}" Margin="0, 0, 0, 20"> @1@ -->
-        <!--     ~1~     <ItemsPresenter.ItemTemplate> @1@ -->
+        <!--     ~1~ <ItemsControl Focusable="False" ItemsSource="{CompiledBinding FilteredRows, Mode=OneTime}" Margin="0, 0, 0, 20"> @1@ -->
+        <!--     ~1~     <ItemsControl.ItemTemplate> @1@ -->
         <!--     ~1~          @1@ -->
-        <!--     ~1~     </ItemsPresenter.ItemTemplate> @1@ -->
-        <!--     ~1~ </ItemsPresenter> @1@ -->
+        <!--     ~1~     </ItemsControl.ItemTemplate> @1@ -->
+        <!--     ~1~ </ItemsControl> @1@ -->
         <!-- </ScrollViewer> -->
         
         <controls2:TeachingTip IsOpened="{CompiledBinding YouCanRevertTipOpened}" 

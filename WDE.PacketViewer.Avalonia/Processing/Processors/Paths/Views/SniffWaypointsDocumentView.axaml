@@ -18,7 +18,7 @@
       
       <DockPanel>
         <GroupingHeader DockPanel.Dock="Top" GroupName="Units" />
-        <TreeView Items="{CompiledBinding Creatures}"
+        <TreeView ItemsSource="{CompiledBinding Creatures}"
                   SelectedItem="{CompiledBinding SelectedObject}"
         >
           <TreeView.DataTemplates>

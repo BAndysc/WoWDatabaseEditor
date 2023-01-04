@@ -37,14 +37,14 @@ namespace WDE.Common.Avalonia.Utils
     public class ToolbarDataTemplate : IDataTemplate
     {
         public static IDataTemplate Template { get; } = new ToolbarDataTemplate();
-        public IControl Build(object param)
+        public Control Build(object? param)
         {
             if (ViewBind.AppViewLocator != null && param != null &&
                 ViewBind.AppViewLocator.TryResolveToolBar(param.GetType(), out var toolbarType))
             {
                 try
                 {
-                    return (IControl)Activator.CreateInstance(toolbarType)!;
+                    return (Control)Activator.CreateInstance(toolbarType)!;
                 }
                 catch (Exception e)
                 {
@@ -55,16 +55,16 @@ namespace WDE.Common.Avalonia.Utils
             return new Control();
         }
 
-        public bool Match(object data)
+        public bool Match(object? data)
         {
-            return data is not IControl && data is not string;
+            return data is not Control && data is not string;
         }
     }
     
     public class ViewDataTemplate : IDataTemplate
     {
         public static IDataTemplate Template { get; } = new ViewDataTemplate();
-        public IControl Build(object param)
+        public Control Build(object? param)
         {
             string? fail = null;
             if (ViewBind.AppViewLocator != null && param != null &&
@@ -72,7 +72,7 @@ namespace WDE.Common.Avalonia.Utils
             {
                 try
                 {
-                    return (IControl)Activator.CreateInstance(viewType)!;
+                    return (Control)Activator.CreateInstance(viewType)!;
                 }
                 catch (Exception e)
                 {
@@ -87,9 +87,9 @@ namespace WDE.Common.Avalonia.Utils
             };
         }
 
-        public bool Match(object data)
+        public bool Match(object? data)
         {
-            return data is not IControl && data is not string;
+            return data is not Control && data is not string;
         }
     }
 }

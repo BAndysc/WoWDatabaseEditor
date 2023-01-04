@@ -13,7 +13,7 @@
              x:DataType="definitionEditor:DefinitionViewModel">
     <TwoColumnsPanel>
         <TextBlock ToolTip.Tip="Whether you edit world or hotfix database">Database:</TextBlock>
-        <ComboBox Items="{x:Static tools:DefinitionEditorStatic.DataDatabaseTypes}" SelectedItem="{CompiledBinding DataDatabaseType}" />
+        <ComboBox ItemsSource="{x:Static tools:DefinitionEditorStatic.DataDatabaseTypes}" SelectedItem="{CompiledBinding DataDatabaseType}" />
         
         <TextBlock ToolTip.Tip="Table name in the database">Table name:</TextBlock>
         <controls:DatabaseTableCompletionBox Database="{CompiledBinding DataDatabaseType}" TableName="{CompiledBinding TableName}" /> 
@@ -40,7 +40,7 @@
         <TextBlock xml:space="preserve" ToolTip.Tip="The display mode of this editor. Template is a vertical view and can be used for tables with single column primary key, i.e. creature_template.
 
 MultiRecord and SingleRow can be used for tables with multi (or single) column primary key. However with MultiRecord you still have to specify Table Primary Key Column, which will be used for grouping items. In SingleRow there is no grouping. You always see the whole table.">Table record mode:</TextBlock>
-        <ComboBox Items="{x:Static tools:DefinitionEditorStatic.RecordModes}" SelectedItem="{CompiledBinding RecordMode}" />
+        <ComboBox ItemsSource="{x:Static tools:DefinitionEditorStatic.RecordModes}" SelectedItem="{CompiledBinding RecordMode}" />
 
         <TextBlock ToolTip.Tip="Friendly name used i.e. in menus">Friendly name:</TextBlock>
         <TextBox Text="{CompiledBinding Name}" />
@@ -66,7 +66,7 @@ MultiRecord and SingleRow can be used for tables with multi (or single) column p
                                               IsVisible="{CompiledBinding IsSingleRow, Converter={x:Static BoolConverters.Not}}" />
 
         <TextBlock ToolTip.Tip="Condition only mode is a special mode for tables, where there is a certain condition source type and no matching table. I.e. spell implicit target (13) condition source, doesn't relate to any table. It is just a condition. Due to lack of a generic condition editor, the workaround in the editor is to create a special editor for such nonexisting table `spell_implicit_target`." IsVisible="{CompiledBinding IsMultiRecord}">Is only conditions table:</TextBlock>
-        <ComboBox IsVisible="{CompiledBinding IsMultiRecord}" Items="{x:Static tools:DefinitionEditorStatic.OnlyConditionModes}" SelectedItem="{CompiledBinding IsOnlyConditionsTable}" />
+        <ComboBox IsVisible="{CompiledBinding IsMultiRecord}" ItemsSource="{x:Static tools:DefinitionEditorStatic.OnlyConditionModes}" SelectedItem="{CompiledBinding IsOnlyConditionsTable}" />
 
         <TextBlock>Flags:</TextBlock>
         <StackPanel Spacing="5">
@@ -103,7 +103,7 @@ MultiRecord and SingleRow can be used for tables with multi (or single) column p
                 <ButtonImage Image="Icons/icon_delete.png" Command="{CompiledBinding DeleteSelectedSortBy}" IsEnabled="{CompiledBinding SelectedSortBy, Converter={x:Static NullConverter.IsNotNull}}" />
             </ToolbarPanel>
             
-            <ListBox dnD:DragAndDrop.IsDropTarget="True" dnD:DragAndDrop.DropHandler="{CompiledBinding }" dnD:DragAndDrop.IsDragSource="True" Items="{CompiledBinding SortBy}" SelectedItem="{CompiledBinding SelectedSortBy}">
+            <ListBox dnD:DragAndDrop.IsDropTarget="True" dnD:DragAndDrop.DropHandler="{CompiledBinding }" dnD:DragAndDrop.IsDragSource="True" ItemsSource="{CompiledBinding SortBy}" SelectedItem="{CompiledBinding SelectedSortBy}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <TextBlock Text="{CompiledBinding ColumnName}" />
@@ -156,7 +156,7 @@ I.e. user looks for sound = 1423 and it finds row in the creature_text table wit
                     <ButtonImage Image="Icons/icon_delete.png" Command="{CompiledBinding DeleteSelectedPrimaryKey}" IsEnabled="{CompiledBinding SelectedCustomPrimaryKey, Converter={x:Static NullConverter.IsNotNull}}" />
                 </ToolbarPanel>
             
-                <ListBox dnD:DragAndDrop.IsDropTarget="True" dnD:DragAndDrop.DropHandler="{CompiledBinding }" dnD:DragAndDrop.IsDragSource="True" Items="{CompiledBinding CustomPrimaryKey}" SelectedItem="{CompiledBinding SelectedCustomPrimaryKey}">
+                <ListBox dnD:DragAndDrop.IsDropTarget="True" dnD:DragAndDrop.DropHandler="{CompiledBinding }" dnD:DragAndDrop.IsDragSource="True" ItemsSource="{CompiledBinding CustomPrimaryKey}" SelectedItem="{CompiledBinding SelectedCustomPrimaryKey}">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <TextBlock Text="{CompiledBinding ColumnName}" />
@@ -183,7 +183,7 @@ I.e. user looks for sound = 1423 and it finds row in the creature_text table wit
         <TextBlock ToolTip.Tip="When not null, upon row insertion or duplication, the editor will set the first column of the primary key to the next value of creature/gameobject guid, depending on this setting.
 
 This is only used for `creature` and `gameobject` tables editor." IsVisible="{CompiledBinding IsSingleRow}">Auto key value:</TextBlock>
-        <ComboBox Items="{x:Static tools:DefinitionEditorStatic.GuidTypes}" 
+        <ComboBox ItemsSource="{x:Static tools:DefinitionEditorStatic.GuidTypes}" 
                   IsVisible="{CompiledBinding IsSingleRow}"
                   SelectedItem="{CompiledBinding AutoKeyValue}" />
         <TwoColumnsPanel.Styles>

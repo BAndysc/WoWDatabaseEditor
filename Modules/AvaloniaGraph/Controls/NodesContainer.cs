@@ -9,11 +9,9 @@ public class NodesContainer : ListBox, IStyleable
 {
     Type IStyleable.StyleKey => typeof(ListBox);
 
-    protected override IItemContainerGenerator CreateItemContainerGenerator()
-    {
-        return new ItemContainerGenerator<GraphNodeItemView>(
-            this,
-            ContentControl.ContentProperty,
-            ContentControl.ContentTemplateProperty);
-    }
+    // Avalonia 11
+    // protected override Control CreateContainerForItemOverride()
+    // {
+    //     return new GraphNodeItemView();
+    // }
 }

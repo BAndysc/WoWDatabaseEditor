@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Input;
 using Avalonia.Input.Platform;
@@ -7,21 +8,33 @@ namespace WDE.Common.Avalonia
 {
     public static class KeyGestures
     {
-        public static KeyGesture Cut { get; } = AvaloniaLocator.Current
-            .GetService<PlatformHotkeyConfiguration>()?.Cut.FirstOrDefault() ?? new KeyGesture(Key.X, KeyModifiers.Control);
-
-        public static KeyGesture Copy { get; } = AvaloniaLocator.Current
-            .GetService<PlatformHotkeyConfiguration>()?.Copy.FirstOrDefault() ?? new KeyGesture(Key.C, KeyModifiers.Control);
-
-        public static KeyGesture Paste { get; } = AvaloniaLocator.Current
-            .GetService<PlatformHotkeyConfiguration>()?.Paste.FirstOrDefault() ?? new KeyGesture(Key.V, KeyModifiers.Control);
+        public static KeyModifiers CommandModifier { get; }
         
-        public static KeyGesture Undo { get; } = AvaloniaLocator.Current
-            .GetService<PlatformHotkeyConfiguration>()?.Undo.FirstOrDefault() ?? new KeyGesture(Key.Z, KeyModifiers.Control);
+        static KeyGestures()
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                CommandModifier = KeyModifiers.Meta;
+            else
+                CommandModifier = KeyModifiers.Control;
 
-        public static KeyGesture Redo { get; } = AvaloniaLocator.Current
-            .GetService<PlatformHotkeyConfiguration>()?.Redo.FirstOrDefault() ?? new KeyGesture(Key.Y, KeyModifiers.Control);
+            Cut = new KeyGesture(Key.X, CommandModifier);
+            Copy = new KeyGesture(Key.C, CommandModifier);
+            Paste = new KeyGesture(Key.V, CommandModifier);
+            Undo = new KeyGesture(Key.Z, CommandModifier);
+            Redo = new KeyGesture(Key.Y, CommandModifier);
+            Save = new KeyGesture(Key.S, CommandModifier);
+        }
         
-        public static KeyGesture Save { get; } = new KeyGesture(Key.S, AvaloniaLocator.Current.GetService<PlatformHotkeyConfiguration>()?.CommandModifiers ?? KeyModifiers.Control);
+        public static KeyGesture Cut { get; }
+
+        public static KeyGesture Copy { get; }
+
+        public static KeyGesture Paste { get; }
+        
+        public static KeyGesture Undo { get; }
+
+        public static KeyGesture Redo { get; }
+        
+        public static KeyGesture Save { get; }
     }
 }

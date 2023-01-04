@@ -17,7 +17,7 @@
     <Grid ColumnDefinitions="200,10,*">
         <DockPanel LastChildFill="True">
             <TextBlock DockPanel.Dock="Top" FontWeight="Bold" Padding="4" TextWrapping="WrapWithOverflow">Definitions:</TextBlock>
-            <ComboBox DockPanel.Dock="Top" Items="{CompiledBinding DefinitionSources}"
+            <ComboBox DockPanel.Dock="Top" ItemsSource="{CompiledBinding DefinitionSources}"
                       Margin="5"
                       HorizontalAlignment="Stretch"
                       SelectedItem="{CompiledBinding SelectedDefinitionSource}">
@@ -34,7 +34,7 @@
                         <Flyout>
                             <StackPanel Spacing="5">
                                 <TextBlock>Pick a table to import:</TextBlock>
-                                <ComboBox HorizontalAlignment="Stretch" SelectedItem="{CompiledBinding ImportTableDatabaseType}" Items="{x:Static tools:DefinitionEditorStatic.DataDatabaseTypes}" />
+                                <ComboBox HorizontalAlignment="Stretch" SelectedItem="{CompiledBinding ImportTableDatabaseType}" ItemsSource="{x:Static tools:DefinitionEditorStatic.DataDatabaseTypes}" />
                                 <controls:DatabaseTableCompletionBox
                                     Database="{CompiledBinding ImportTableDatabaseType}"
                                     TableName="{CompiledBinding ImportTableName}"/>
@@ -45,7 +45,7 @@
                 </ButtonImage>
                 <ButtonImage ToolTip.Tip="Create an empty table" Image="Icons/icon_new.png" Command="{CompiledBinding CreateEmptyTableCommand}" />
             </ToolbarPanel>
-            <controls:OnReleaseListBox Items="{CompiledBinding Definitions}"
+            <controls:OnReleaseListBox ItemsSource="{CompiledBinding Definitions}"
                               Margin="5,0,5,5"
                               SelectedItem="{CompiledBinding SelectedDefinition, Mode=TwoWay}">
                 <controls:OnReleaseListBox.ItemsPanel>

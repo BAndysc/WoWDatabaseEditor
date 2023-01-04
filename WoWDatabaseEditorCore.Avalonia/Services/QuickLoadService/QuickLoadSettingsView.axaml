@@ -16,8 +16,8 @@
             <Button Command="{CompiledBinding SetVisibleNone}">None visible</Button>
         </ToolbarPanel>
         <TextBlock Opacity="0.8" DockPanel.Dock="Top">Drag and drop items to reorder them. Use the checkbox to hide them from the quick start panel.</TextBlock>
-        <ListBox Items="{CompiledBinding QuickLoadItems}"
-                 VirtualizationMode="None"
+        <ListBox ItemsSource="{CompiledBinding QuickLoadItems}"
+                
                  SelectedItem="{CompiledBinding SelectedItem, Mode=TwoWay}"
                  dnD:DragAndDrop.IsDropTarget="True" 
                  dnD:DragAndDrop.DropHandler="{CompiledBinding }" 

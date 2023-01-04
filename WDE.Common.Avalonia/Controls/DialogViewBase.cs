@@ -2,7 +2,7 @@ using Avalonia.Controls;
 
 namespace WDE.Common.Avalonia.Controls
 {
-    public class DialogViewBase : UserControl
+    public partial class DialogViewBase : UserControl
     {
     }
 }

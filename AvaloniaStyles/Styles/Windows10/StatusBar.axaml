@@ -1,0 +1,44 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:controls="clr-namespace:AvaloniaStyles.Controls">
+    <Style Selector="controls|StatusBar">
+        <Setter Property="Height" Value="26" />
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Background" Value="{DynamicResource StatusBarBackground}"/> 
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Panel>
+                    <Border BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            Background="{TemplateBinding Background}">
+                        <ContentPresenter Content="{TemplateBinding Content}" Padding="7.5,2"/>
+                    </Border>
+                </Panel>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    
+    <Style Selector="controls|StatusBar Button">
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="TextElement.Foreground" Value="White" />
+    </Style>
+    <Style Selector="controls|StatusBar Button /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="Transparent" />
+    </Style>
+    <Style Selector="controls|StatusBar Button /template/ Border#BorderElement">
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+    <Style Selector="controls|StatusBar Button:disabled /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Opacity" Value="1" />
+        <Setter Property="TextElement.Foreground" Value="White" />
+    </Style>
+    <Style Selector="controls|StatusBar Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="#20000000" />
+        <Setter Property="TextElement.Foreground" Value="White" />
+    </Style>
+    <Style Selector="controls|StatusBar Button:pressed /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="#40000000" />
+        <Setter Property="TextElement.Foreground" Value="White" />
+    </Style>
+</Styles>

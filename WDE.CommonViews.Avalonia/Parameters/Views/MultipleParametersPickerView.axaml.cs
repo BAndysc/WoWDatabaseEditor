@@ -61,6 +61,6 @@ public partial class MultipleParametersPickerView : UserControl
             return;
 
         var editableTextBlock = selectedBox.FindDescendantOfType<EditableTextBlock>();
-        editableTextBlock.BeginEditing(e.Text);
+        editableTextBlock?.BeginEditing(e.Text);
     }
 }

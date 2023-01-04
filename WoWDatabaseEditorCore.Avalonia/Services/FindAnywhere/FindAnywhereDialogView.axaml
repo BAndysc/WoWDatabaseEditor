@@ -24,7 +24,7 @@
         <Grid Margin="10" RowDefinitions="Auto,10,Auto" ColumnDefinitions="Auto,10,*,Auto">
             <TextBlock VerticalAlignment="Center">Type:</TextBlock>
             
-            <ComboBox Items="{CompiledBinding Sources}"
+            <ComboBox ItemsSource="{CompiledBinding Sources}"
                       HorizontalAlignment="Stretch"
                       SelectedItem="{CompiledBinding SelectedSource}"
                       Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="0" />

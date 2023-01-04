@@ -11,7 +11,7 @@
   <Border Margin="10" Background="{DynamicResource ContentBackground}" BorderThickness="1" BorderBrush="{DynamicResource ContentBorderBrush}">
     <Panel>
       <ScrollViewer>
-        <ItemsRepeater Items="{CompiledBinding Items}" IsEnabled="{CompiledBinding !IsLoading}">
+        <ItemsRepeater ItemsSource="{CompiledBinding Items}" IsEnabled="{CompiledBinding !IsLoading}">
           <ItemsRepeater.ItemTemplate>
             <DataTemplate x:DataType="crossReferences:CrossReferenceViewModel">
               <Button BorderThickness="0" 

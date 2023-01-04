@@ -8,13 +8,13 @@
              x:DataType="genericSettings:GeneralSettingsViewModel"
              x:Class="WoWDatabaseEditorCore.Avalonia.Services.GenericSettings.GeneralSettingsView">
     <ScrollViewer HorizontalScrollBarVisibility="Disabled" Grid.IsSharedSizeScope="True">
-        <ItemsPresenter Items="{CompiledBinding Groups}">
-            <ItemsPresenter.ItemTemplate>
+        <ItemsControl ItemsSource="{CompiledBinding Groups}">
+            <ItemsControl.ItemTemplate>
                 <DataTemplate DataType="genericSettings:GeneralSettingsGroupViewModel">
                     <DockPanel>
                         <SettingsHeader DockPanel.Dock="Top" Margin="0,10" Text="{CompiledBinding Name}" />
-                        <ItemsPresenter Items="{CompiledBinding Settings}">
-                            <ItemsPresenter.DataTemplates>
+                        <ItemsControl ItemsSource="{CompiledBinding Settings}">
+                            <ItemsControl.DataTemplates>
                                 <DataTemplate DataType="settings:IBoolGenericSetting">
                                     <SettingItem Help="{CompiledBinding Help}" Header="{CompiledBinding Name}">
                                         <ToggleSwitch OnContent="" OffContent="" IsChecked="{CompiledBinding Value}"></ToggleSwitch>
@@ -22,7 +22,7 @@
                                  </DataTemplate>
                                 <DataTemplate DataType="settings:IListOptionGenericSetting">
                                     <SettingItem Help="{CompiledBinding Help}" Header="{CompiledBinding Name}">
-                                        <ComboBox Margin="10,0,0,0" Items="{CompiledBinding Options}" SelectedItem="{CompiledBinding SelectedOption}"></ComboBox>
+                                        <ComboBox Margin="10,0,0,0" ItemsSource="{CompiledBinding Options}" SelectedItem="{CompiledBinding SelectedOption}"></ComboBox>
                                     </SettingItem>
                                 </DataTemplate>
                                 <DataTemplate DataType="settings:IFloatSliderGenericSetting">
@@ -37,16 +37,16 @@
                                        </Grid>
                                     </SettingItem>
                                 </DataTemplate>
-                            </ItemsPresenter.DataTemplates>
-                            <ItemsPresenter.ItemsPanel>
+                            </ItemsControl.DataTemplates>
+                            <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <StackPanel Spacing="0" />
                                 </ItemsPanelTemplate>
-                            </ItemsPresenter.ItemsPanel>
-                        </ItemsPresenter>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
                     </DockPanel>
                 </DataTemplate>
-            </ItemsPresenter.ItemTemplate>
-        </ItemsPresenter>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
     </ScrollViewer>
 </UserControl>

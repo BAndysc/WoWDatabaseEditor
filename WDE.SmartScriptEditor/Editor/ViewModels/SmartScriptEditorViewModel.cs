@@ -2092,7 +2092,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             {
                 cachedPossibleTargets = SmartSourceTargetType.None;
                 possibleTargetIds = new HashSet<int>();
-                foreach (var target in smartDataManager.GetAllData(SmartType.SmartTarget))
+                foreach (var target in smartDataManager.GetAllData(SmartType.SmartTarget).Value)
                 {
                     if (target.UsableWithScriptTypes != null && !target.UsableWithScriptTypes.Value.HasFlagFast(script.SourceType.ToMask()))
                         continue;

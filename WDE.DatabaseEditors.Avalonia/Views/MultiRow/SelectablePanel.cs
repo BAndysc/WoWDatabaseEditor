@@ -11,8 +11,8 @@ namespace WDE.DatabaseEditors.Avalonia.Views.MultiRow
     public class SelectablePanel : Panel
     {
         public static readonly StyledProperty<bool> IsSelectedProperty = AvaloniaProperty.Register<SelectablePanel, bool>(nameof(IsSelected));
-        public static readonly AttachedProperty<object?> SelectedItemProperty = AvaloniaProperty.RegisterAttached<IAvaloniaObject, object?>("SelectedItem", typeof(SelectablePanel));
-        public static readonly AttachedProperty<bool> ObserveItemsProperty = AvaloniaProperty.RegisterAttached<IAvaloniaObject, bool>("ObserveItems", typeof(SelectablePanel));
+        public static readonly AttachedProperty<object?> SelectedItemProperty = AvaloniaProperty.RegisterAttached<AvaloniaObject, object?>("SelectedItem", typeof(SelectablePanel));
+        public static readonly AttachedProperty<bool> ObserveItemsProperty = AvaloniaProperty.RegisterAttached<AvaloniaObject, bool>("ObserveItems", typeof(SelectablePanel));
 
         static SelectablePanel()
         {
@@ -29,19 +29,21 @@ namespace WDE.DatabaseEditors.Avalonia.Views.MultiRow
 
         private static void ObserveItemsChanged(ItemsControl arg1, AvaloniaPropertyChangedEventArgs arg2)
         {
-            arg1.ItemContainerGenerator.Materialized += ItemContainerGeneratorOnMaterialized;
+            // @todo avalonia11
+            //arg1.ItemContainerGenerator.Materialized += ItemContainerGeneratorOnMaterialized;
         }
 
-        private static void ItemContainerGeneratorOnMaterialized(object? sender, ItemContainerEventArgs e)
-        {
-            var icg = sender as ItemContainerGenerator;
-            if (icg == null)
-                return;
-            var ic = icg.Owner as ItemsControl;
-            if (ic == null)
-                return;
-            UpdateSelected(ic, GetSelectedItem(ic));
-        }
+        // @todo avalonia11
+        // private static void ItemContainerGeneratorOnMaterialized(object? sender, ItemContainerEventArgs e)
+        // {
+        //     var icg = sender as ItemContainerGenerator;
+        //     if (icg == null)
+        //         return;
+        //     var ic = icg.Owner as ItemsControl;
+        //     if (ic == null)
+        //         return;
+        //     UpdateSelected(ic, GetSelectedItem(ic));
+        // }
 
         private static void UpdateSelected(ItemsControl arg1, object? newValue)
         {
@@ -67,7 +69,8 @@ namespace WDE.DatabaseEditors.Avalonia.Views.MultiRow
         public void Select()
         {
             var parent = this.FindAncestorOfType<ItemsControl>();
-            SetSelectedItem(parent, DataContext);
+            if (parent != null)
+                SetSelectedItem(parent, DataContext);
         }
 
         private static void HandlePointerPressed(SelectablePanel panel, PointerPressedEventArgs args)
@@ -75,22 +78,22 @@ namespace WDE.DatabaseEditors.Avalonia.Views.MultiRow
             panel.Select();
         }
 
-        public static object? GetSelectedItem(IAvaloniaObject obj)
+        public static object? GetSelectedItem(AvaloniaObject obj)
         {
             return (object?)obj.GetValue(SelectedItemProperty);
         }
 
-        public static void SetSelectedItem(IAvaloniaObject obj, object? value)
+        public static void SetSelectedItem(AvaloniaObject obj, object? value)
         {
             obj.SetValue(SelectedItemProperty, value);
         }
 
-        public static bool GetObserveItems(IAvaloniaObject obj)
+        public static bool GetObserveItems(AvaloniaObject obj)
         {
-            return (bool)obj.GetValue(ObserveItemsProperty);
+            return (bool?)obj.GetValue(ObserveItemsProperty) ?? false;
         }
 
-        public static void SetObserveItems(IAvaloniaObject obj, bool value)
+        public static void SetObserveItems(AvaloniaObject obj, bool value)
         {
             obj.SetValue(ObserveItemsProperty, value);
         }

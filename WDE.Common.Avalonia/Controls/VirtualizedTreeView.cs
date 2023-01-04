@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Globalization;
 using System.Linq;
+using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Documents;
 using Avalonia.Controls.Generators;
 using Avalonia.Controls.Templates;
 using Avalonia.Data;
@@ -76,24 +79,34 @@ public class VirtualizedTreeView : Panel
         if (e.Handled)
             return;
         
-        if (e.Source is IVisual source)
+        if (e.Source is Visual source)
         {
             var point = e.GetCurrentPoint(source);
 
             if (point.Properties.IsLeftButtonPressed || point.Properties.IsRightButtonPressed)
             {
                 e.Handled = UpdateSelectionFromEventSource(
-                    e.Source as IControl,
+                    e.Source as Control,
                     true,
-                    e.KeyModifiers.HasAllFlags(KeyModifiers.Shift),
-                    e.KeyModifiers.HasAllFlags(AvaloniaLocator.Current.GetRequiredService<PlatformHotkeyConfiguration>().CommandModifiers),
+                    e.KeyModifiers.HasFlagFast(KeyModifiers.Shift),
+                    e.KeyModifiers.HasFlagFast(GetPlatformCommandKey()),
                     point.Properties.IsRightButtonPressed,
                     e.ClickCount);
             }
         }
     }
     
-    protected bool UpdateSelectionFromEventSource(IControl? eventSource,
+    private static KeyModifiers GetPlatformCommandKey()
+    {            
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            return KeyModifiers.Meta;
+        }
+
+        return KeyModifiers.Control;
+    }
+
+    protected bool UpdateSelectionFromEventSource(Control? eventSource,
         bool select = true,
         bool rangeModifier = false,
         bool toggleModifier = false,
@@ -301,8 +314,8 @@ public class VirtualizedTreeView : Panel
         var startIndex = Math.Max(0, (int)(scrollViewer.Offset.Y / RowHeight) - 1);
         var endIndex = Math.Min(startIndex + scrollViewer.Viewport.Height / RowHeight + 2, Items.Count);
         
-        var font = new Typeface(TextBlock.GetFontFamily(this));
-        var foreground = TextBlock.GetForeground(this);
+        var font = new Typeface(TextElement.GetFontFamily(this));
+        var foreground = TextElement.GetForeground(this);
         var pen = new Pen(foreground, 2);
 
         var hasFilter = IsFiltered;
@@ -383,8 +396,9 @@ public class VirtualizedTreeView : Panel
         visualTreeSubscription = null;
         base.OnDetachedFromVisualTree(e);
     }
-
-    public override void Render(DrawingContext context)
+    
+    // @fixme avalonia 11
+    public void Render(DrawingContext context)
     {
         base.Render(context);
         
@@ -393,13 +407,19 @@ public class VirtualizedTreeView : Panel
         
         if (ScrollViewer is not { } scrollViewer)
         {
-            context.DrawText(Brushes.Red, default, 
+            context.DrawText(
                 new FormattedText("VirtualizedTreeView must be wrapped in ScrollViewer!", 
+                    CultureInfo.InvariantCulture,
+                    FlowDirection.LeftToRight,
                     Typeface.Default, 
                     14,
-                    TextAlignment.Left,
-                    TextWrapping.Wrap, 
-                    Bounds.Size));
+                    Brushes.Red)
+                {
+                    TextAlignment = TextAlignment.Left,
+                    MaxTextWidth = Bounds.Width,
+                    MaxTextHeight = Bounds.Height,
+                    // TextWrapping.Wrap
+                }, default);
             return;
         }
         

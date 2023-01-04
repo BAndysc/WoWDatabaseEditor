@@ -15,23 +15,23 @@
         <ToggleButton IsChecked="{CompiledBinding HideConditions}" ToolTip.Tip="Hide conditions (doesn't remove)" >
             Hide conditions
         </ToggleButton>
-        <ItemsPresenter Items="{CompiledBinding ExtensionCommands}">
-            <ItemsPresenter.ItemTemplate>
+        <ItemsControl ItemsSource="{CompiledBinding ExtensionCommands}">
+            <ItemsControl.ItemTemplate>
                 <DataTemplate x:DataType="editor:SmartExtensionCommand">
                     <Button Command="{CompiledBinding  Command}" CommandParameter="{Binding #Root.DataContext}" ToolTip.Tip="{CompiledBinding Name}">
                         <WdeImage Image="{CompiledBinding Icon}" />
                     </Button>
                 </DataTemplate>
-            </ItemsPresenter.ItemTemplate>
-            <ItemsPresenter.ItemsPanel>
+            </ItemsControl.ItemTemplate>
+            <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <ToolbarPanel />
                 </ItemsPanelTemplate>
-            </ItemsPresenter.ItemsPanel>
-        </ItemsPresenter>
+            </ItemsControl.ItemsPanel>
+        </ItemsControl>
         <ToolbarSpacer />
         <TextBlock FontSize="9" Opacity="0.5" VerticalAlignment="Center" Margin="0,0,5,0">Highlight:</TextBlock>
-        <ComboBox Items="{CompiledBinding Highlighters}" SelectedItem="{CompiledBinding SelectedHighlighter}">
+        <ComboBox ItemsSource="{CompiledBinding Highlighters}" SelectedItem="{CompiledBinding SelectedHighlighter}">
             <ComboBox.ItemTemplate>
                 <DataTemplate x:DataType="viewModels:HighlightViewModel">
                     <TextBlock Text="{CompiledBinding Header}" />

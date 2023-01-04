@@ -1,3 +1,4 @@
+using System;
 using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls;
@@ -133,7 +134,7 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
             setNullMenuItem = new MenuItem() {Header = "Set to null"};
             deleteMenuItem = new MenuItem() {Header = "Delete entity from the editor"};
             duplicateMenuItem = new MenuItem() {Header = "Duplicate row"};
-            contextMenu.Items = new Control[]
+            contextMenu.ItemsSource = new Control[]
             {
                 revertMenuItem,
                 setNullMenuItem,
@@ -141,7 +142,7 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
                 duplicateMenuItem,
                 deleteMenuItem
             };
-            contextMenu.MenuClosed += (sender, args) =>
+            contextMenu.Closed += (sender, args) =>
             {
                 revertMenuItem.CommandParameter = null!;
                 setNullMenuItem.CommandParameter = null!;
@@ -189,64 +190,66 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
         
         protected void HandleMoveLeftRightUpBottom(KeyEventArgs args, bool leftRight)
         {
-            if (MoveLeft(args.Key, args.KeyModifiers, leftRight) || MoveRight(args.Key, args.KeyModifiers, leftRight))
-            {
-                var wrapper = (this.GetVisualParent().GetVisualParent().GetVisualParent() as ContentPresenter) ?? this.GetVisualParent() as ContentPresenter;
-
-                var itemsPresenter = wrapper?.FindAncestorOfType<ItemsPresenter>();
-                if (itemsPresenter == null)
-                    return;
-
-                var index = itemsPresenter.ItemContainerGenerator.IndexFromContainer(wrapper);
-
-                if (MoveLeft(args.Key, args.KeyModifiers, leftRight))
-                    index--;
-                else
-                    index++;
-
-                var next = itemsPresenter.ItemContainerGenerator.ContainerFromIndex(index)?.FindDescendantOfType<FastCellViewBase>();
-                
-                if (next != null)
-                {
-                    EndEditing();
-                    FocusManager.Instance!.Focus(next, NavigationMethod.Tab);
-                    args.Handled = true;
-                }
-            }
+            throw new Exception("AVALONIA 11 todo");
+            // if (MoveLeft(args.Key, args.KeyModifiers, leftRight) || MoveRight(args.Key, args.KeyModifiers, leftRight))
+            // {
+            //     var wrapper = (this.GetVisualParent()?.GetVisualParent()?.GetVisualParent() as ContentPresenter) ?? this.GetVisualParent() as ContentPresenter;
+            //
+            //     var itemsPresenter = wrapper?.FindAncestorOfType<ItemsControl>();
+            //     if (itemsPresenter == null)
+            //         return;
+            //
+            //     var index = itemsPresenter.ItemContainerGenerator.IndexFromContainer(wrapper);
+            //
+            //     if (MoveLeft(args.Key, args.KeyModifiers, leftRight))
+            //         index--;
+            //     else
+            //         index++;
+            //
+            //     var next = itemsPresenter.ItemContainerGenerator.ContainerFromIndex(index)?.FindDescendantOfType<FastCellViewBase>();
+            //     
+            //     if (next != null)
+            //     {
+            //         EndEditing();
+            //         next.Focus(NavigationMethod.Tab);
+            //         args.Handled = true;
+            //     }
+            // }
 
             if (MoveUp(args.Key, args.KeyModifiers) || MoveDown(args.Key, args.KeyModifiers))
             {
-                var wrapper = this.GetVisualParent() as IControl;
-                var itemsPresenter = wrapper?.VisualParent?.VisualParent as ItemsPresenter;
-                var row = itemsPresenter?.GetVisualParent()?.VisualParent as IControl;
-                var rows = row?.VisualParent?.VisualParent as ItemsPresenter;
+                throw new Exception("AVALONIA 11 todo");
+                var wrapper = this.GetVisualParent() as Control;
+                var itemsPresenter = wrapper?.GetVisualParent()?.GetVisualParent() as ItemsPresenter;
+                var row = itemsPresenter?.GetVisualParent()?.GetVisualParent() as Control;
+                var rows = row?.GetVisualParent()?.GetVisualParent() as ItemsPresenter;
                 if (wrapper == null || itemsPresenter == null || row == null || rows == null)
                     return;
                 
-                var innerIndex = itemsPresenter.ItemContainerGenerator.IndexFromContainer(wrapper);
-                var rowIndex = rows.ItemContainerGenerator.IndexFromContainer(row);
-
-                if (MoveDown(args.Key, args.KeyModifiers))
-                    rowIndex++;
-                else
-                    rowIndex--;
-
-                var newRow = rows.ItemContainerGenerator.ContainerFromIndex(rowIndex)
-                    ?.VisualChildren[0]?.VisualChildren[0] as ItemsPresenter;
-                newRow ??= rows.ItemContainerGenerator.ContainerFromIndex(rowIndex)
-                    ?.VisualChildren[0]?.VisualChildren[1] as ItemsPresenter;
-                
-                if (newRow == null)
-                    return;
-
-                var newCell = newRow.ItemContainerGenerator.ContainerFromIndex(innerIndex)?.VisualChildren[0] as FastCellViewBase;
-
-                if (newCell == null)
-                    return;
-                
-                this.EndEditing();
-                FocusManager.Instance!.Focus(newCell, NavigationMethod.Tab);
-                args.Handled = true;
+                // var innerIndex = itemsPresenter.ItemContainerGenerator.IndexFromContainer(wrapper);
+                // var rowIndex = rows.ItemContainerGenerator.IndexFromContainer(row);
+                //
+                // if (MoveDown(args.Key, args.KeyModifiers))
+                //     rowIndex++;
+                // else
+                //     rowIndex--;
+                //
+                // var newRow = rows.ItemContainerGenerator.ContainerFromIndex(rowIndex)
+                //     ?.VisualChildren[0]?.VisualChildren[0] as ItemsPresenter;
+                // newRow ??= rows.ItemContainerGenerator.ContainerFromIndex(rowIndex)
+                //     ?.VisualChildren[0]?.VisualChildren[1] as ItemsPresenter;
+                //
+                // if (newRow == null)
+                //     return;
+                //
+                // var newCell = newRow.ItemContainerGenerator.ContainerFromIndex(innerIndex)?.VisualChildren[0] as FastCellViewBase;
+                //
+                // if (newCell == null)
+                //     return;
+                //
+                // this.EndEditing();
+                // newCell.Focus(NavigationMethod.Tab);
+                // args.Handled = true;
             }
         }
 

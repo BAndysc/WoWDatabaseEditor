@@ -13,7 +13,7 @@
   <DockPanel LastChildFill="True" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
     <Label DockPanel.Dock="Top">Opened connections</Label>
     <ScrollViewer VerticalScrollBarVisibility="Auto">
-      <ItemsControl Items="{CompiledBinding OpenedConnectionsList}">
+      <ItemsControl ItemsSource="{CompiledBinding OpenedConnectionsList}">
         <ItemsControl.ItemTemplate>
           <DataTemplate x:DataType="connection:IConnection">
             <Button BorderThickness="0" HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch">
@@ -41,7 +41,7 @@
                 </Style>
                 <Style Selector="Button:disabled /template/ ContentPresenter#PART_ContentPresenter">
                   <Setter Property="Background" Value="Transparent" />
-                  <Setter Property="TextBlock.Foreground" Value="Black" />
+                  <Setter Property="TextElement.Foreground" Value="Black" />
                 </Style>
               </Button.Styles>
             </Button>

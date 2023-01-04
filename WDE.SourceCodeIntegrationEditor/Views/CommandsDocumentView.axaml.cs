@@ -3,7 +3,7 @@ using Avalonia.Markup.Xaml;
 
 namespace WDE.SourceCodeIntegrationEditor.Views
 {
-    public class CommandsDocumentView : UserControl
+    public partial class CommandsDocumentView : UserControl
     {
         public CommandsDocumentView()
         {
