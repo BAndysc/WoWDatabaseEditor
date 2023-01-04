@@ -79,7 +79,10 @@ public class ConnectorItem : TemplatedControl
             centerPoint = new Point(0, Bounds.Height / 2);
         else if (attachMode == ConnectorAttachMode.Right)
             centerPoint = new Point(Bounds.Width, Bounds.Height / 2);
-        Position = this.TranslatePoint(centerPoint, ParentCanvas) ?? centerPoint;
+        if (ParentCanvas == null)
+            SetCurrentValue(PositionProperty, centerPoint);
+        else
+            SetCurrentValue(PositionProperty, this.TranslatePoint(centerPoint, ParentCanvas) ?? centerPoint);
     }
 
     #region Dependency properties

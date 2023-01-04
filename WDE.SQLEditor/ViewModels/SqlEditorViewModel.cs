@@ -6,6 +6,7 @@ using AsyncAwaitBestPractices.MVVM;
 using Prism.Commands;
 using Prism.Mvvm;
 using PropertyChanged.SourceGenerator;
+using WDE.Common;
 using WDE.Common.Database;
 using WDE.Common.History;
 using WDE.Common.Managers;
@@ -38,7 +39,7 @@ namespace WDE.SQLEditor.ViewModels
             ITaskRunner taskRunner, 
             INativeTextDocument sql)
         {
-            Code = sql;
+            code = sql;
             ExecuteSql = new AsyncAutoCommand(() =>
             {
                 return taskRunner.ScheduleTask("Executing query",
@@ -58,7 +59,7 @@ namespace WDE.SQLEditor.ViewModels
                         catch (Exception e)
                         {
                             statusBar.PublishNotification(new PlainNotification(NotificationType.Error, $"Failure during {database} query execution"));
-                            Console.WriteLine(e);
+                            LOG.LogError(e, message: "Error during query execution");
                         }
                     });
             }, () => databaseProvider.IsConnected);
@@ -90,7 +91,7 @@ namespace WDE.SQLEditor.ViewModels
                         {
                             var q = await sqlGeneratorsRegistry.GenerateSql(subitem);
                             if (previousType.HasValue && q.Database != previousType)
-                                messageBoxService.SimpleDialog("WARNING!!", "Warning!", "Somehow some queries in this SQL refers to World database and some refers to Hotfix. Be cautious before applying.");
+                                messageBoxService.SimpleDialog("WARNING!!", "Warning!", "Somehow some queries in this SQL refers to World database and some refers to Hotfix. Be cautious before applying.").ListenErrors();
                             previousType = q.Database;
                             sb.AppendLine(q.QueryString);
                         }
@@ -99,7 +100,7 @@ namespace WDE.SQLEditor.ViewModels
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine(e);
+                        LOG.LogError(e);
 #pragma warning disable CS4014
                         messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
                             .SetTitle("Error while generating the SQL")
@@ -143,17 +144,17 @@ namespace WDE.SQLEditor.ViewModels
         public bool Resizeable => true;
         public ICommand Accept { get; }
         public ICommand Cancel { get; }
-        public event Action CloseCancel;
-        public event Action CloseOk;
+        public event Action? CloseCancel;
+        public event Action? CloseOk;
         public ICommand Undo { get; } = AlwaysDisabledCommand.Command;
         public ICommand Redo { get; } = AlwaysDisabledCommand.Command;
         public ICommand Copy { get; } = AlwaysDisabledCommand.Command;
         public ICommand Cut { get; } = AlwaysDisabledCommand.Command;
         public ICommand Paste { get; } = AlwaysDisabledCommand.Command;
         public IAsyncCommand Save { get; }
-        public IAsyncCommand CloseCommand { get; set; } = null;
+        public IAsyncCommand? CloseCommand { get; set; } = null;
         public bool CanClose { get; } = true;
         public bool IsModified { get; } = false;
-        public IHistoryManager History { get; } = null;
+        public IHistoryManager? History { get; } = null;
     }
 }

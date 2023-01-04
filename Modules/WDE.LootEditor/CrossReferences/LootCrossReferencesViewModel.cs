@@ -55,7 +55,7 @@ public partial class LootCrossReferencesViewModel : ObservableBase, IDialog
         });
         OpenCrossReferenceCommand = new AsyncCommand<CrossReferenceViewModel>(async xRef =>
         {
-            await lootService.EditLoot(xRef.Type, xRef.Entry, xRef.DifficultyId);
+            await lootService.EditLoot(xRef!.Type, xRef.Entry, xRef.DifficultyId);
         });
         isLoading = true;
         Load().ListenErrors();

@@ -35,7 +35,7 @@ public class QuestEntryProviderService : IQuestEntryProviderService
         this.parameterFactory = parameterFactory;
     }
 
-    private ITabularDataArgs<IQuestTemplate> BuildTable(uint? questId, out int index)
+    private async Task<(ITabularDataArgs<IQuestTemplate>, int index)> BuildTable(uint? questId)
     {
         var questSortParameter = parameterFactory.Factory("ZoneOrQuestSortParameter");
         var questSortConverter = new FuncValueConverter<int, string>(id =>
@@ -47,9 +47,9 @@ public class QuestEntryProviderService : IQuestEntryProviderService
             return id.ToString();
         });
         
-        var templates = database.GetQuestTemplates();
-        index = questId.HasValue ? templates.IndexIf(t => t.Entry == questId) : -1;
-        return new TabularDataBuilder<IQuestTemplate>()
+        var templates = await database.GetQuestTemplatesAsync();
+        var index = questId.HasValue ? templates.IndexIf(t => t.Entry == questId) : -1;
+        var table = new TabularDataBuilder<IQuestTemplate>()
             .SetTitle("Pick a quest")
             .SetData(templates.AsIndexedCollection())
             .SetColumns(new TabularDataColumn(nameof(IQuestTemplate.Entry), "Entry", 60),
@@ -121,18 +121,19 @@ public class QuestEntryProviderService : IQuestEntryProviderService
                 };
             })
             .Build();
+        return (table, index);
     }
 
     public async Task<uint?> GetEntryFromService(uint? questId = null)
     {
-        var table = BuildTable(questId, out var index);
+        var (table, index) = await BuildTable(questId);
         var result = await tabularDataPicker.PickRow(table, index, questId.HasValue && questId > 0 ? questId.ToString() : null);
         return result?.Entry;
     }
 
     public async Task<IReadOnlyCollection<uint>> GetEntriesFromService()
     {
-        var table = BuildTable(null, out _);
+        var (table, index) = await BuildTable(null);
         var templates = await tabularDataPicker.PickRows(table);
         return templates == null ? Array.Empty<uint>() : templates.Select(t => t.Entry).ToList();
     }

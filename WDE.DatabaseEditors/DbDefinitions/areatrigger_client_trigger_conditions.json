@@ -1,0 +1,47 @@
+{
+  "id": "areatrigger_client_trigger_conditions",
+  "compatibility": [
+    "TrinityWrath", "TrinityMaster"
+  ],
+  "name": "Client Areatrigger Trigger Conditions",
+  "single_solution_name": "{name} areatrigger client trigger conditions",
+  "multi_solution_name": "Multiple areatrigger client trigger conditions",
+  "table_name": "areatrigger_client_trigger_conditions",
+  "table_index_name": "areatrigger_id",
+  "record_mode": "MultiRecord",
+  "icon_path": "Icons/document_areatrigger.png",
+  "group_name": "Common scripting tables",
+  "picker": "AreaTriggerParameter",
+  "only_conditions": "IgnoreTableCompletely",
+  "primary_key": [
+    "areatrigger_id"
+  ],
+  "conditions": {
+    "source_type": 30,
+    "source_entry": "areatrigger_id",
+    "targets": [
+      {
+        "id": 0,
+        "name": "player"
+      }
+    ]
+  },
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Areatrigger Id",
+          "db_column_name": "areatrigger_id",
+          "value_type": "AreaTriggerParameter",
+          "read_only": true
+        },
+        {
+          "is_condition": true,
+          "name": "Conditions",
+          "db_column_name": "conditions"
+        }
+      ]
+    }
+  ]
+}

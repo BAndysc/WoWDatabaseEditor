@@ -4,7 +4,7 @@ using Avalonia.Markup.Xaml;
 
 namespace WDE.DatabaseEditors.Avalonia.Views;
 
-public class RowPickerToolBar : UserControl
+public partial class RowPickerToolBar : UserControl
 {
     public RowPickerToolBar()
     {

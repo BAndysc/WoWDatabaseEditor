@@ -11,7 +11,7 @@ public class BezierLine : Shape //, ICustomHitTest
         AvaloniaProperty.Register<BezierLine, Point>(nameof(StartPoint));
 
     public static readonly StyledProperty<Point> EndPointProperty =
-        AvaloniaProperty.Register<BezierLine, Point>(nameof(StartPoint));
+        AvaloniaProperty.Register<BezierLine, Point>(nameof(EndPoint));
 
     static BezierLine()
     {
@@ -74,20 +74,18 @@ public class BezierLine : Shape //, ICustomHitTest
 
     protected override Geometry? CreateDefiningGeometry()
     {
+        var figure = new PathFigure
+        {
+            IsFilled = false,
+            StartPoint = Relative
+                ? StartPoint - new Point(Math.Min(StartPoint.X, EndPoint.X), Math.Min(StartPoint.Y, EndPoint.Y))
+                : StartPoint,
+            Segments = GetSegments(),
+            IsClosed = false
+        };
         return new PathGeometry
         {
-            Figures =
-            {
-                new PathFigure
-                {
-                    IsFilled = false,
-                    StartPoint = Relative
-                        ? StartPoint - new Point(Math.Min(StartPoint.X, EndPoint.X), Math.Min(StartPoint.Y, EndPoint.Y))
-                        : StartPoint,
-                    Segments = GetSegments(),
-                    IsClosed = false
-                }
-            }
+            Figures = new PathFigures(){figure}
         };
     }
 

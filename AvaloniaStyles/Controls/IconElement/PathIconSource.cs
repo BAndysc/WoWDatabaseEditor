@@ -17,7 +17,7 @@ public class PathIconSource : IconSource
     /// <summary>
     /// Defines the <see cref="Data"/> property
     /// </summary>
-    public static StyledProperty<Geometry> DataProperty =
+    public static readonly StyledProperty<Geometry> DataProperty =
         FAPathIcon.DataProperty.AddOwner<PathIconSource>();
 
     /// <summary>
@@ -34,7 +34,7 @@ public class PathIconSource : IconSource
     /// Defines the <see cref="Stretch"/> property.
     /// </summary>
     public static readonly StyledProperty<Stretch> StretchProperty =
-        FAPathIcon.StretchProperty.AddOwner<FAPathIcon>();
+        FAPathIcon.StretchProperty.AddOwner<PathIconSource>();
 
     /// <summary>
     /// Gets or sets a <see cref="Stretch"/> enumeration value that describes how the shape fills its allocated space.
@@ -49,7 +49,7 @@ public class PathIconSource : IconSource
     /// Defines the <see cref="StretchDirection"/> property.
     /// </summary>
     public static readonly StyledProperty<StretchDirection> StretchDirectionProperty =
-        FAPathIcon.StretchDirectionProperty.AddOwner<Avalonia.Controls.PathIcon>();
+        FAPathIcon.StretchDirectionProperty.AddOwner<PathIconSource>();
 
     /// <summary>
     /// Gets or sets a value controlling in what direction contents will be stretched.

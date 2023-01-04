@@ -9,8 +9,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;
+using Avalonia.Threading;
 using DynamicData;
 using DynamicData.Binding;
+using Microsoft.Extensions.Logging;
 using Prism.Commands;
 using WDE.Common;
 using WDE.Common.Database;
@@ -114,11 +116,14 @@ namespace WDE.PacketViewer.ViewModels
                     return;
 
                 inApplyFilterCommand = true;
-                MostRecentlySearchedItem = FilterText.ToString();
+                mostRecentlySearchedItem = FilterText.ToString();
+                RaisePropertyChanged(nameof(MostRecentlySearchedItem));
                 inApplyFilterCommand = false;
-                
+
                 if (!string.IsNullOrEmpty(FilterText.ToString()))
+                {
                     mostRecentlySearchedService.Add(FilterText.ToString());
+                }
 
                 if (currentActionToken != filteringToken)
                     throw new Exception("Invalid concurrent access!");
@@ -150,7 +155,7 @@ namespace WDE.PacketViewer.ViewModels
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e);
+                    LOG.LogError(e, "Error during saving file");
                     await this.messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
                         .SetTitle("Fatal error")
                         .SetMainInstruction("Fatal error during saving file")
@@ -203,7 +208,7 @@ namespace WDE.PacketViewer.ViewModels
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e);
+                    LOG.LogError(e, "Error during quick run processor");
                     await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
                         .SetIcon(MessageBoxIcon.Error)
                         .SetTitle("Fatal error")
@@ -236,7 +241,7 @@ namespace WDE.PacketViewer.ViewModels
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e);
+                    LOG.LogError(e, "Error during run processors");
                     await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
                         .SetIcon(MessageBoxIcon.Error)
                         .SetTitle("Fatal error")
@@ -618,12 +623,12 @@ namespace WDE.PacketViewer.ViewModels
             }
             catch (AggregateException e)
             {
-                Console.WriteLine(e.InnerExceptions[0]);
+                LOG.LogError(e.InnerExceptions[0], "Error during running processors");
                 throw e.InnerExceptions[0];
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                LOG.LogError(e, "Error during running processors");
                 throw;
             }
 
@@ -637,7 +642,7 @@ namespace WDE.PacketViewer.ViewModels
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                LOG.LogError(e, "Error during running processors");
                 throw;
             }
             
@@ -897,7 +902,7 @@ namespace WDE.PacketViewer.ViewModels
             }
             catch (Exception e)
             {
-                Console.WriteLine(e.ToString());
+                LOG.LogError(e, "Error during loading sniff");
             }
 
             FilteringProgress = -1;
@@ -912,7 +917,7 @@ namespace WDE.PacketViewer.ViewModels
         {
             if (currentActionToken != null)
             {
-                Console.WriteLine("Invalid concurrent task access!");
+                LOG.LogError("Invalid concurrent task access!");
                 throw new Exception("Invalid concurrent task access!");
             }
         }
@@ -1028,7 +1033,9 @@ namespace WDE.PacketViewer.ViewModels
                 if (value != null)
                 {
                     FilterText.FromString(value);
-                    ApplyFilterCommand.ExecuteAsync();   
+                    // without this there was an exception in Avalonia 11 when changing the most recently searched
+                    // from the list
+                    Dispatcher.UIThread.Post(() => ApplyFilterCommand.ExecuteAsync());
                 }
             }
         }

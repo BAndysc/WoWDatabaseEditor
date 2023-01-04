@@ -5,6 +5,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using AvaloniaEdit;
 using AvaloniaEdit.Editing;
+using WDE.Common.Avalonia.Utils;
 
 namespace WDE.Common.Avalonia.Controls
 {
@@ -13,7 +14,7 @@ namespace WDE.Common.Avalonia.Controls
      */
     public class BetterKeyBinding : KeyBinding, ICommand
     {
-        public static readonly StyledProperty<ICommand> CustomCommandProperty = AvaloniaProperty.Register<KeyBinding, ICommand>(nameof (CustomCommand));
+        public static readonly StyledProperty<ICommand> CustomCommandProperty = AvaloniaProperty.Register<BetterKeyBinding, ICommand>(nameof (CustomCommand));
 
         public ICommand CustomCommand
         {
@@ -28,22 +29,29 @@ namespace WDE.Common.Avalonia.Controls
 
         public bool CanExecute(object? parameter)
         {
-            if (FocusManager.Instance!.Current is TextBox tb)
-                return true;
+            var focusManager = Application.Current?.GetTopLevel()?.FocusManager;
+            var currentAsTextBox = focusManager?.GetFocusedElement() as TextBox;
+            var currentAsTextEditor = focusManager?.GetFocusedElement() as TextEditor;
+            var currentAsTextArea = focusManager?.GetFocusedElement() as TextArea;
+            if (currentAsTextBox != null || currentAsTextEditor != null || currentAsTextArea != null)
+                 return true;
             return CustomCommand.CanExecute(parameter);
         }
 
         public void Execute(object? parameter)
         {
-            var currentAsTextBox = FocusManager.Instance!.Current as TextBox;
-            var currentAsTextEditor = FocusManager.Instance!.Current as TextEditor;
-            var currentAsTextArea = FocusManager.Instance!.Current as TextArea;
+            var focusManager = Application.Current?.GetTopLevel()?.FocusManager;
+            var currentAsTextBox = focusManager?.GetFocusedElement() as TextBox;
+            var currentAsTextEditor = focusManager?.GetFocusedElement() as TextEditor;
+            var currentAsTextArea = focusManager?.GetFocusedElement() as TextArea;
             if (currentAsTextBox != null || currentAsTextEditor != null || currentAsTextArea != null)
             {
-                var ev = Activator.CreateInstance<KeyEventArgs>();
-                ev.Key = Gesture.Key;
-                ev.KeyModifiers = Gesture.KeyModifiers;
-                ev.RoutedEvent = InputElement.KeyDownEvent;
+                var ev = new KeyEventArgs()
+                {
+                    Key = Gesture.Key,
+                    KeyModifiers = Gesture.KeyModifiers,
+                    RoutedEvent = InputElement.KeyDownEvent
+                };
                 ((Control?)currentAsTextBox ?? (Control?)currentAsTextEditor ?? currentAsTextArea)!.RaiseEvent(ev);
                 if (!ev.Handled && CanExecute(parameter))
                     CustomCommand.Execute(parameter);

@@ -2,24 +2,30 @@
 
     <PropertyGroup>
         <OutputType>WinExe</OutputType>
-        <TargetFramework>net7.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <Configurations>Debug;Release</Configurations>
         <Platforms>AnyCPU</Platforms>
         <ApplicationIcon>../WoWDatabaseEditorCore.Avalonia/Icon.ico</ApplicationIcon>
-        <AssemblyName>WoWDatabaseEditorCore.Avalonia</AssemblyName>
+        <AssemblyName>WoWDatabaseEditor</AssemblyName>
         <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
     </PropertyGroup>
     <PropertyGroup>
         <OutputPath>..\bin\$(Configuration)\</OutputPath>
     </PropertyGroup>
-    <Import Project="..\Module.props" />    
+    <Import Project="..\Module.props" />
+    <Import Project="..\Avalonia.props" />
 
+    <ItemGroup>
+        <PackageReference Include="Avalonia.Desktop" Version="$(AvaloniaVersion)" />
+    </ItemGroup>
+    
     <PropertyGroup>
         <ApplicationManifest>app.manifest</ApplicationManifest>
     </PropertyGroup>
     
     <ItemGroup>
       <ProjectReference Include="..\AvaloniaStyles\AvaloniaStyles.csproj" />
+      <ProjectReference Include="..\BaseDesktopLoader\BaseDesktopLoader.csproj" />
       <ProjectReference Include="..\Modules\WDE.DatabaseDefinitionEditor\WDE.DatabaseDefinitionEditor.csproj" />
       <ProjectReference Include="..\Modules\WDE.Debugger\WDE.Debugger.csproj" />
       <ProjectReference Include="..\Modules\WDE.EventScriptsEditor\WDE.EventScriptsEditor.csproj" />

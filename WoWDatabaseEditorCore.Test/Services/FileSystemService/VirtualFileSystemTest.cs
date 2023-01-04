@@ -7,7 +7,7 @@ namespace WoWDatabaseEditorCore.Test.Services.FileSystemService
 {
     public class VirtualFileSystemTest
     {
-        private IVirtualFileSystem vfs;
+        private IVirtualFileSystem vfs = null!;
         
         [SetUp]
         public void Init()

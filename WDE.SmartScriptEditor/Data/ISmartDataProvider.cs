@@ -4,34 +4,34 @@ using System.Threading.Tasks;
 
 namespace WDE.SmartScriptEditor.Data
 {
-    public interface ISmartDataJsonProvider
+    public interface ISmartDataJsonProviderAsync
     {
-        string GetEventsJson();
-        string GetActionsJson();
-        string GetTargetsJson();
-        string GetEventsGroupsJson();
-        string GetActionsGroupsJson();
-        string GetTargetsGroupsJson();
+        Task<string> GetEventsJson();
+        Task<string> GetActionsJson();
+        Task<string> GetTargetsJson();
+        Task<string> GetEventsGroupsJson();
+        Task<string> GetActionsGroupsJson();
+        Task<string> GetTargetsGroupsJson();
     }
-    
-    public interface ISmartRawDataProvider
+
+    public interface ISmartRawDataProviderAsync
     {
-        IEnumerable<SmartGenericJsonData> GetEvents();
-        IEnumerable<SmartGenericJsonData> GetActions();
-        IEnumerable<SmartGenericJsonData> GetTargets();
-        IEnumerable<SmartGroupsJsonData> GetEventsGroups();
-        IEnumerable<SmartGroupsJsonData> GetActionsGroups();
-        IEnumerable<SmartGroupsJsonData> GetTargetsGroups();
+        Task<IReadOnlyList<SmartGenericJsonData>> GetEvents();
+        Task<IReadOnlyList<SmartGenericJsonData>> GetActions();
+        Task<IReadOnlyList<SmartGenericJsonData>> GetTargets();
+        Task<IReadOnlyList<SmartGroupsJsonData>> GetEventsGroups();
+        Task<IReadOnlyList<SmartGroupsJsonData>> GetActionsGroups();
+        Task<IReadOnlyList<SmartGroupsJsonData>> GetTargetsGroups();
     }
-    
-    public interface ISmartDataProvider
+ 
+    public interface ISmartDataProviderAsync
     {
-        IEnumerable<SmartGenericJsonData> GetEvents();
-        IEnumerable<SmartGenericJsonData> GetActions();
-        IEnumerable<SmartGenericJsonData> GetTargets();
-        IEnumerable<SmartGroupsJsonData> GetEventsGroups();
-        IEnumerable<SmartGroupsJsonData> GetActionsGroups();
-        IEnumerable<SmartGroupsJsonData> GetTargetsGroups();
+        Task<IReadOnlyList<SmartGenericJsonData>> GetEvents();
+        Task<IReadOnlyList<SmartGenericJsonData>> GetActions();
+        Task<IReadOnlyList<SmartGenericJsonData>> GetTargets();
+        Task<IReadOnlyList<SmartGroupsJsonData>> GetEventsGroups();
+        Task<IReadOnlyList<SmartGroupsJsonData>> GetActionsGroups();
+        Task<IReadOnlyList<SmartGroupsJsonData>> GetTargetsGroups();
     }
 
     public interface ISmartTypeListProvider

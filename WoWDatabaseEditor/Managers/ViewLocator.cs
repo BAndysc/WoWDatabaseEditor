@@ -6,8 +6,8 @@ using WDE.Module.Attributes;
 
 namespace WoWDatabaseEditorCore.Managers
 {
-    [SingleInstance]
-    [AutoRegister]
+    //[SingleInstance]
+    //[AutoRegister]
     public class ViewLocator : IViewLocator
     {
         private Dictionary<Type, Type?> staticBinding = new();

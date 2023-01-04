@@ -11,25 +11,25 @@ namespace WDE.WorldMap
     public class WoWMapViewer : ContentControl
     {
         private double zoom;
-        public static readonly DirectProperty<WoWMapViewer, double> ZoomProperty = AvaloniaProperty.RegisterDirect<WoWMapViewer, double>("Zoom", o => o.Zoom, (o, v) => o.Zoom = v);
+        public static readonly DirectProperty<WoWMapViewer, double> ZoomProperty = AvaloniaProperty.RegisterDirect<WoWMapViewer, double>(nameof(Zoom), o => o.Zoom, (o, v) => o.Zoom = v);
         
         private string? map;
-        public static readonly DirectProperty<WoWMapViewer, string?> MapProperty = AvaloniaProperty.RegisterDirect<WoWMapViewer, string?>("Map", o => o.Map, (o, v) => o.Map = v);
+        public static readonly DirectProperty<WoWMapViewer, string?> MapProperty = AvaloniaProperty.RegisterDirect<WoWMapViewer, string?>(nameof(Map), o => o.Map, (o, v) => o.Map = v);
         
         private string? mapsPath;
-        public static readonly DirectProperty<WoWMapViewer, string?> MapsPathProperty = AvaloniaProperty.RegisterDirect<WoWMapViewer, string?>("MapsPath", o => o.MapsPath, (o, v) => o.MapsPath = v);
+        public static readonly DirectProperty<WoWMapViewer, string?> MapsPathProperty = AvaloniaProperty.RegisterDirect<WoWMapViewer, string?>(nameof(MapsPath), o => o.MapsPath, (o, v) => o.MapsPath = v);
         
         private IMapContext? mapViewModel;
-        public static readonly DirectProperty<WoWMapViewer, IMapContext?> MapViewModelProperty = AvaloniaProperty.RegisterDirect<WoWMapViewer, IMapContext?>("Context", o => o.MapViewModel, (o, v) => o.MapViewModel = v);
+        public static readonly DirectProperty<WoWMapViewer, IMapContext?> MapViewModelProperty = AvaloniaProperty.RegisterDirect<WoWMapViewer, IMapContext?>(nameof(MapViewModel), o => o.MapViewModel, (o, v) => o.MapViewModel = v);
         
         private bool renderBackground = true;
-        public static readonly DirectProperty<WoWMapViewer, bool> RenderBackgroundProperty = AvaloniaProperty.RegisterDirect<WoWMapViewer, bool>("RenderBackground", o => o.RenderBackground, (o, v) => o.RenderBackground = v);
+        public static readonly DirectProperty<WoWMapViewer, bool> RenderBackgroundProperty = AvaloniaProperty.RegisterDirect<WoWMapViewer, bool>(nameof(RenderBackground), o => o.RenderBackground, (o, v) => o.RenderBackground = v);
         
         private Point topLeftVirtual;
-        public static readonly DirectProperty<WoWMapViewer, Point> TopLeftVirtualProperty = AvaloniaProperty.RegisterDirect<WoWMapViewer, Point>("TopLeftVirtual", o => o.TopLeftVirtual, (o, v) => o.TopLeftVirtual = v);
+        public static readonly DirectProperty<WoWMapViewer, Point> TopLeftVirtualProperty = AvaloniaProperty.RegisterDirect<WoWMapViewer, Point>(nameof(TopLeftVirtual), o => o.TopLeftVirtual, (o, v) => o.TopLeftVirtual = v);
         
         private Point bottomRightVirtual;
-        public static readonly DirectProperty<WoWMapViewer, Point> BottomRightVirtualProperty = AvaloniaProperty.RegisterDirect<WoWMapViewer, Point>("BottomRightVirtual", o => o.BottomRightVirtual, (o, v) => o.BottomRightVirtual = v);
+        public static readonly DirectProperty<WoWMapViewer, Point> BottomRightVirtualProperty = AvaloniaProperty.RegisterDirect<WoWMapViewer, Point>(nameof(BottomRightVirtual), o => o.BottomRightVirtual, (o, v) => o.BottomRightVirtual = v);
 
         private ExtendedZoomBorder? zoomBorder;
         

@@ -4,7 +4,7 @@ using Avalonia.Markup.Xaml;
 
 namespace WDE.PacketViewer.Avalonia.MassParsing;
 
-public class MassParserView : UserControl
+public partial class MassParserView : UserControl
 {
     public MassParserView()
     {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using WDE.Common;
 using WDE.Common.Database;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Utils;
@@ -462,7 +463,7 @@ namespace WDE.SmartScriptEditor.Models
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                LOG.LogWarning(e);
                 messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
                     .SetIcon(MessageBoxIcon.Error)
                     .SetTitle("Unknown source")
@@ -479,7 +480,7 @@ namespace WDE.SmartScriptEditor.Models
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                LOG.LogWarning(e);
                 messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
                     .SetIcon(MessageBoxIcon.Warning)
                     .SetTitle("Unknown action")
@@ -498,7 +499,7 @@ namespace WDE.SmartScriptEditor.Models
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                LOG.LogWarning(e);
                 messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
                     .SetIcon(MessageBoxIcon.Warning)
                     .SetTitle("Unknown action")
@@ -517,7 +518,7 @@ namespace WDE.SmartScriptEditor.Models
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                LOG.LogWarning(e);
                 messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
                     .SetIcon(MessageBoxIcon.Warning)
                     .SetTitle("Unknown condition")
@@ -536,7 +537,7 @@ namespace WDE.SmartScriptEditor.Models
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                LOG.LogWarning(e);
                 messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
                     .SetIcon(MessageBoxIcon.Warning)
                     .SetTitle("Unknown condition")
@@ -555,7 +556,7 @@ namespace WDE.SmartScriptEditor.Models
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                LOG.LogWarning(e);
                 messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
                     .SetIcon(MessageBoxIcon.Warning)
                     .SetTitle("Unknown event")

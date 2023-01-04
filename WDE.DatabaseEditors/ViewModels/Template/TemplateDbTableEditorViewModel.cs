@@ -42,14 +42,8 @@ namespace WDE.DatabaseEditors.ViewModels.Template
     {
         private const string TipYouCanRevertId = "TableEditor.YouCanRevert";
     
-        private readonly IItemFromListProvider itemFromListProvider;
-        private readonly IMessageBoxService messageBoxService;
-        private readonly IParameterFactory parameterFactory;
-        private readonly IDatabaseQueryExecutor mySqlExecutor;
-        private readonly IQueryGenerator queryGenerator;
         private readonly ITeachingTipService teachingTipService;
         private readonly ICreatureStatCalculatorService creatureStatCalculatorService;
-        private readonly ISessionService sessionService;
         private readonly IConditionEditService conditionEditService;
         private readonly ITableEditorPickerService tableEditorPickerService;
         private readonly IMetaColumnsSupportService metaColumnsSupportService;
@@ -99,15 +93,9 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             tableDefinitionProvider, itemFromListProvider, iconRegistry, sessionService,
             commandService, parameterPickerService, statusBar, mySqlExecutor)
         {
-            this.itemFromListProvider = itemFromListProvider;
             this.tableDataProvider = tableDataProvider;
-            this.messageBoxService = messageBoxService;
-            this.parameterFactory = parameterFactory;
-            this.mySqlExecutor = mySqlExecutor;
-            this.queryGenerator = queryGenerator;
             this.teachingTipService = teachingTipService;
             this.creatureStatCalculatorService = creatureStatCalculatorService;
-            this.sessionService = sessionService;
             this.conditionEditService = conditionEditService;
             this.tableEditorPickerService = tableEditorPickerService;
             this.metaColumnsSupportService = metaColumnsSupportService;

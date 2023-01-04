@@ -647,11 +647,10 @@ namespace WDE.Debugger.Test.Services
             });
 
             bool exceptionSynchronizationAttempted = false;
-            source3.Synchronizer.Synchronize(exceptionDebugPointId).Returns(async _ =>
+            source3.Synchronizer.Synchronize(exceptionDebugPointId).Returns<Task<SynchronizationResult>>(async _ =>
             {
                 exceptionSynchronizationAttempted = true;
                 throw new Exception("Synchronization failed.");
-                return SynchronizationResult.Ok;
             });
 
             // Act

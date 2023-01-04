@@ -90,7 +90,7 @@ namespace WDE.Sessions.Sessions
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                LOG.LogError(e, "Error while opening session");
             }
         }
         

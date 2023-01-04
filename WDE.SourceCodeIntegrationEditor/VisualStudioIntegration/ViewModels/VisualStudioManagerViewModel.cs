@@ -11,6 +11,7 @@ using Avalonia.VisualTree;
 using EnvDTE;
 using Prism.Events;
 using Prism.Ioc;
+using WDE.Common;
 using WDE.Common.Debugging;
 using WDE.Common.Managers;
 using WDE.Common.Services;
@@ -96,7 +97,7 @@ internal class VisualStudioManagerViewModel : IVisualStudioManagerViewModel
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                LOG.LogError(e);
             }
         }
     }

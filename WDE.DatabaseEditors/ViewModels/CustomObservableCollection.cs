@@ -29,7 +29,7 @@ public class CustomObservableCollection<T> : ObservableCollectionExtended<T>
     /// <summary>
     /// fast ordering, without firing notifications
     /// </summary>
-    /// <param name="columnIndex"></param>
+    /// <param name="indices"></param>
     public virtual void OrderByIndices(List<int> indices)
     {
         var sorted = indices.Select(i => this[i]).ToList();

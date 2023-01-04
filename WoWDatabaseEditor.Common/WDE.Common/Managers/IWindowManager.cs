@@ -46,6 +46,7 @@ namespace WDE.Common.Managers
         /// <summary>
         /// opens Windows Explorer or mac Finder with selected file
         /// </summary>
+        /// <param name="windowManager"></param>
         /// <param name="path">file to select</param>
         public static void RevealFile(this IWindowManager windowManager, string path)
         {

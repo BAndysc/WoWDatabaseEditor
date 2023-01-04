@@ -14,7 +14,7 @@ using WDE.Common.Utils;
 
 namespace WDE.SqlWorkbench.Services.TablesPanel;
 
-public class ConnectionListToolView : UserControl
+public partial class ConnectionListToolView : UserControl
 {
     private VirtualizedTreeView TablesTreeView = null!;
     public ICommand FocusTextBoxCommand { get; }
@@ -42,9 +42,9 @@ public class ConnectionListToolView : UserControl
         }, TimeSpan.FromMilliseconds(1));
     }
 
-    private void InputElement_OnDoubleTapped(object? sender, RoutedEventArgs e)
+    private void InputElement_OnDoubleTapped(object? sender, TappedEventArgs e)
     {
-        if (sender is VirtualizedTreeView itemsBox && e.Source is IVisual visual)
+        if (sender is VirtualizedTreeView itemsBox && e.Source is Visual visual)
         {
             if (visual.SelfOrVisualAncestor<VirtualizedTreeViewItem>() is { } item)
             {

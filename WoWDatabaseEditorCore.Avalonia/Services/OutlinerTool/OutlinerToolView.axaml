@@ -30,7 +30,7 @@
                 <Flyout>
                     <StackPanel>
                         <SettingsHeader>Select where to search:</SettingsHeader>
-                        <ItemsControl Items="{CompiledBinding Sources}">
+                        <ItemsControl ItemsSource="{CompiledBinding Sources}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <CheckBox HorizontalAlignment="Stretch"

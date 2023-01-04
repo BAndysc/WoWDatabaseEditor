@@ -8,7 +8,7 @@ using WDE.SmartScriptEditor.Models;
 
 namespace WDE.SmartScriptEditor.Parameters;
 
-public class SmartScenarioStepParameter : IContextualParameter<long, SmartBaseElement>, ICustomPickerContextualParameter<long>
+public class SmartScenarioStepParameter : BaseContextualParameter<long, SmartBaseElement>, ICustomPickerContextualParameter<long>
 {
     private readonly IDbcStore dbcStore;
     private readonly IItemFromListProvider itemFromListProvider;
@@ -68,14 +68,14 @@ public class SmartScenarioStepParameter : IContextualParameter<long, SmartBaseEl
         return (0, false);
     }
 
-    public string? Prefix => null;
-    public bool HasItems => true;
+    public override string? Prefix => null;
+    public override bool HasItems => true;
     
-    public string ToString(long value) => "Step " + value;
+    public override string ToString(long value) => "Step " + value;
     
-    public Dictionary<long, SelectOption>? Items => null;
+    public override Dictionary<long, SelectOption>? Items => null;
 
-    public string ToString(long value, SmartBaseElement context)
+    public override string ToString(long value, SmartBaseElement context)
     {
         var scenarioId = GetScenarioIdFromContext(context);
         if (!scenarioId.HasValue || scenarioId.Value == 0)

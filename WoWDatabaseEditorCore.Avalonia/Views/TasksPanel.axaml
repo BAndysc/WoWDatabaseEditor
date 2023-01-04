@@ -10,28 +10,28 @@
              d:DesignHeight="300" d:DesignWidth="300">
     <Border BorderThickness="1"
             Background="{DynamicResource ContentBackground}"
-            BorderBrush="Gray" 
+            BorderBrush="Gray"
             CornerRadius="{DynamicResource ControlCornerRadius}"
             Width="300" Height="350" BoxShadow="0 0 30 5 #50000000">
     <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
         <DockPanel LastChildFill="True" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <Label DockPanel.Dock="Top">Running tasks</Label>
             <ScrollViewer VerticalScrollBarVisibility="Auto">
-                <ItemsControl Items="{Binding Tasks}">
+                <ItemsControl ItemsSource="{Binding Tasks}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <Button BorderThickness="0" Command="{Binding ForgetTaskCommand}" HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch">
                                 <DockPanel LastChildFill="True">
-                                    <ContentPresenter Margin="4,0,8,0">
-                                        <ContentPresenter.Content>
+                                    <ContentControl Margin="4,0,8,0">
+                                        <ContentControl.Content>
                                             <utils1:LoadingSpinner></utils1:LoadingSpinner>
-                                        </ContentPresenter.Content>
+                                        </ContentControl.Content>
                                         <Interaction.Behaviors>
                                             <DataTriggerBehavior Binding="{Binding State}" ComparisonCondition="Equal">
                                                 <DataTriggerBehavior.Value>
                                                     <tasks:TaskState>FinishedSuccess</tasks:TaskState>
                                                 </DataTriggerBehavior.Value>
-                                                <ChangePropertyAction TargetObject="{Binding #ContentPresenter}" PropertyName="Content">
+                                                <ChangePropertyAction TargetObject="{Binding #ContentControl}" PropertyName="Content">
                                                     <ChangePropertyAction.Value>
                                                         <Image Width="24" Height="24" DockPanel.Dock="Left" Stretch="Fill" Source="{StaticResource StatusBarIconSuccess}">
                                                         </Image>
@@ -42,19 +42,19 @@
                                                 <DataTriggerBehavior.Value>
                                                     <tasks:TaskState>FinishedFailed</tasks:TaskState>
                                                 </DataTriggerBehavior.Value>
-                                                <ChangePropertyAction TargetObject="{Binding #ContentPresenter}" PropertyName="ContentPresenter.Content" Value="{StaticResource StatusBarIconError}"/>
+                                                <ChangePropertyAction TargetObject="{Binding #ContentControl}" PropertyName="ContentPresenter.Content" Value="{StaticResource StatusBarIconError}"/>
                                             </DataTriggerBehavior>-->
                                         </Interaction.Behaviors>
-                                    </ContentPresenter>
-                                    
+                                    </ContentControl>
+
                                     <StackPanel HorizontalAlignment="Stretch" Margin="0,0,5,0">
                                         <Label Content="{Binding TaskName}" FontWeight="Bold"></Label>
                                         <ProgressBar Value="{Binding Percent}"></ProgressBar>
-                                        
+
                                         <Label Content="{Binding CurrentTask, TargetNullValue={}}"></Label>
                                     </StackPanel>
                                 </DockPanel>
-                                
+
                                 <Button.Styles>
                                     <Style Selector="Button">
                                         <Setter Property="Opacity" Value="0.5" />
@@ -71,7 +71,7 @@
                                     </Style>
                                     <Style Selector="Button:disabled /template/ ContentPresenter#PART_ContentPresenter">
                                         <Setter Property="Background" Value="Transparent" />
-                                        <Setter Property="TextBlock.Foreground" Value="Black" />
+                                        <Setter Property="TextElement.Foreground" Value="Black" />
                                     </Style>
                                 </Button.Styles>
                             </Button>

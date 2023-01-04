@@ -1,3 +1,8 @@
+using Avalonia;
+using Avalonia.ReactiveUI;
+using BaseDesktopLoader;
+using Projektanker.Icons.Avalonia;
+using Projektanker.Icons.Avalonia.MaterialDesign;
 using WDE.AzerothCore;
 using WDE.CMaNGOS;
 using WDE.CMMySqlDatabase;
@@ -39,10 +44,10 @@ using WDE.MapSpawns;
 using WDE.PathPreviewTool;
 using WDE.FirstTimeWizard;
 using WDE.LootEditor;
-using WDE.LootEditor.Models;
 using WDE.QueryGenerators;
 using WDE.Profiles;
 using WDE.SqlWorkbench;
+using WoWDatabaseEditorCore.Avalonia;
 
 namespace LoaderAvalonia
 {
@@ -97,8 +102,18 @@ namespace LoaderAvalonia
                 typeof(SqlWorkbenchModule),
                 typeof(DebuggerModule)
             };
-            WoWDatabaseEditorCore.Avalonia.Program.PreloadedModules = modules;
-            WoWDatabaseEditorCore.Avalonia.Program.Main(args);
+            BaseProgramLoader.Main(modules, args);
+        }
+
+        // Avalonia configuration, don't remove; only used by visual designer.
+        public static AppBuilder BuildAvaloniaApp()
+        {
+            var configuration = AppBuilder.Configure<App>()
+                .UsePlatformDetect()
+                .UseReactiveUI()
+                .LogToTrace();
+
+            return configuration;
         }
     }
 }

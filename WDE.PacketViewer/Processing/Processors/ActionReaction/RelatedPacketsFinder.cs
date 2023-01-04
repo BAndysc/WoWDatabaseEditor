@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using WDE.Common;
 using WDE.Common.Services.MessageBox;
 using WDE.Module.Attributes;
 using WDE.PacketViewer.Services;
@@ -105,7 +106,7 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
             foreach (var f in packets)
                 idToPacket[f.Id] = f;
 
-            Console.WriteLine("First event in chain: " + happenReason!.Value.Description + " (" + happenReason.Value.PacketNumber + ")");
+            LOG.LogInformation("First event in chain: {@description} (@number)",  happenReason!.Value.Description, happenReason.Value.PacketNumber);
             Queue<int> reasons = new Queue<int>();
             HashSet<int> usedReasons = new();
             List<int> relatedPacketsWithoutActors = new();
@@ -142,8 +143,7 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                     {
                         if (relatedActors.Add(actionHappened.Value.MainActor))
                         {
-                            Console.WriteLine("Taking " + actionHappened.Value.MainActor.ToWowParserString() +
-                                              " from packet " + action.packetId + " linked by " + reason);
+                            LOG.LogInformation("Taking {@actor} from packet {@packet} linked by {@reason}", actionHappened.Value.MainActor.ToWowParserString(), action.packetId, reason);
                         }
                     }
 
@@ -158,9 +158,8 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
                         {
                             if (relatedActors.Add(r))
                             {
-                                Console.WriteLine(
-                                    "Taking " + r.ToWowParserString() +
-                                    " form packet " + action.packetId + "(extra) linked by " + reason);
+                                LOG.LogInformation(
+                                    "Taking {@actor} from packet {@packet} (extra) linked by {@reason}", r.ToWowParserString(), action.packetId, reason);
                             }
                         }
                     }

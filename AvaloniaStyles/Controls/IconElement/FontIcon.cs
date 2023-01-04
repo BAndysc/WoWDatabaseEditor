@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Documents;
 using Avalonia.Media;
 using Avalonia.Media.TextFormatting;
 using Avalonia.Threading;
@@ -14,20 +15,20 @@ namespace AvaloniaStyles.Controls;
 /// </summary>
 public partial class FontIcon : FAIconElement
 {
-    protected override void OnPropertyChanged<T>(AvaloniaPropertyChangedEventArgs<T> change)
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);
 
-        if (change.Property == TextBlock.FontSizeProperty ||
-            change.Property == TextBlock.FontFamilyProperty ||
-            change.Property == TextBlock.FontWeightProperty ||
-            change.Property == TextBlock.FontStyleProperty ||
+        if (change.Property == TextElement.FontSizeProperty ||
+            change.Property == TextElement.FontFamilyProperty ||
+            change.Property == TextElement.FontWeightProperty ||
+            change.Property == TextElement.FontStyleProperty ||
             change.Property == GlyphProperty)
         {
             _textLayout = null;
             InvalidateMeasure();
         }
-        else if (change.Property == TextBlock.ForegroundProperty)
+        else if (change.Property == TextElement.ForegroundProperty)
         {
             _textLayout = null;
             // FAIconElement calls InvalidateVisual
@@ -41,7 +42,7 @@ public partial class FontIcon : FAIconElement
             GenerateText();
         }
 
-        return _textLayout.Size;
+        return new Size(_textLayout.Width, _textLayout.Height);
     }
 
     public override void Render(DrawingContext context)
@@ -52,10 +53,9 @@ public partial class FontIcon : FAIconElement
         var dstRect = new Rect(Bounds.Size);
         using (context.PushClip(dstRect))
         {
-            var pt = new Point(dstRect.Center.X - _textLayout.Size.Width / 2,
-                               dstRect.Center.Y - _textLayout.Size.Height / 2);
-            using var _ = context.PushPreTransform(Matrix.CreateTranslation(pt));
-            _textLayout.Draw(context); // , pt todo Avalonia 11
+            var pt = new Point(dstRect.Center.X - _textLayout.Width / 2,
+                dstRect.Center.Y - _textLayout.Height / 2);
+            _textLayout.Draw(context, pt);
         }
     }
 

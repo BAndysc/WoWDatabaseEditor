@@ -3,8 +3,8 @@
     <Setter Property="BorderBrush" Value="{DynamicResource ThemeBorderMidBrush}"/>
     <Setter Property="BorderThickness" Value="0"/>
     <Setter Property="Padding" Value="4"/>
-    <Setter Property="TextBlock.FontSize" Value="{DynamicResource FontSizeNormal}" />
-    <Setter Property="TextBlock.FontWeight" Value="Normal" />
+    <Setter Property="TextElement.FontSize" Value="{DynamicResource FontSizeNormal}" />
+    <Setter Property="TextElement.FontWeight" Value="Normal" />
     <Setter Property="WindowManagerAddShadowHint" Value="True" />
     <Setter Property="Template">
         <ControlTemplate>

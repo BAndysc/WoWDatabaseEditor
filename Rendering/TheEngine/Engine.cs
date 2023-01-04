@@ -56,10 +56,6 @@ namespace TheEngine
         
         internal UIManager uiManager { get; }
         public IUIManager Ui => uiManager;
-        
-        private Thread renderThread;
-        
-        private volatile bool isDisposing;
 
         public double TotalTime;
 
@@ -106,7 +102,6 @@ namespace TheEngine
         
         public void Dispose()
         {
-            isDisposing = true;
             uiManager.Dispose();
             fontManager.Dispose();
             lightManager.Dispose();

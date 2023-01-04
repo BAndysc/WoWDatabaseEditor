@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using DynamicData.Binding;
+using Microsoft.Extensions.Logging;
 using Prism.Commands;
 using WDE.Common.Managers;
 using WDE.Common.Utils;
@@ -102,7 +103,7 @@ namespace WDE.EventAiEditor.Editor.ViewModels
                 {
                     if (currentToken != null)
                     {
-                        Console.WriteLine("Searching in progress, canceling");
+                        LOG.LogInformation("Searching in progress, canceling");
                     }
                     currentToken?.Cancel();
                     var token = new CancellationTokenSource();

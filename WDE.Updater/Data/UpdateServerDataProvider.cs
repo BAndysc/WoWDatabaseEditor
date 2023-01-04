@@ -16,16 +16,16 @@ namespace WDE.Updater.Data
             var updateKey = configuration.GetString("UPDATE_KEY");
             var marketplace = configuration.GetString("MARKETPLACE");
             var platformString = configuration.GetString("PLATFORM");
-            Platforms? platform = null;
+            UpdatePlatforms? platform = null;
             
-            if (platformString != null && Enum.TryParse(platformString, true, out Platforms p))
+            if (platformString != null && Enum.TryParse(platformString, true, out UpdatePlatforms p))
                 platform = p;
 
             HasUpdateServerData = updateServer != null && marketplace != null && platform != null;
             UpdateServerUrl = SafeCreateUrl(updateServer, new Uri("http://localhost"));
             Marketplace = marketplace ?? "";
             UpdateKey = updateKey;
-            Platform = platform ?? Platforms.Windows;
+            Platform = platform ?? UpdatePlatforms.Windows;
         }
 
         private Uri SafeCreateUrl(string? uri, Uri fallback)
@@ -45,7 +45,7 @@ namespace WDE.Updater.Data
         
         public Uri UpdateServerUrl { get; }
         public string Marketplace { get; }
-        public Platforms Platform { get; }
+        public UpdatePlatforms Platform { get; }
         public string? UpdateKey { get; }
         public bool HasUpdateServerData { get; }
         public string Part => $"marketplace: {Marketplace}, platform: {Platform.ToString()}";

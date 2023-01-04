@@ -9,12 +9,13 @@ namespace WDE.Conditions.Data
     [AutoRegister]
     public class ConditionDataProvider : IConditionDataProvider
     {
-        private List<ConditionJsonData> conditions;
-        private List<ConditionSourcesJsonData> conditionSources;
-        private List<ConditionGroupsJsonData> conditionGroups;
+        private List<ConditionJsonData>? conditions;
+        private List<ConditionSourcesJsonData>? conditionSources;
+        private List<ConditionGroupsJsonData>? conditionGroups;
 
         private readonly IConditionDataJsonProvider provider;
         private readonly IConditionDataSerializationProvider serializationProvider;
+        private readonly ICurrentCoreVersion currentCoreVersion;
 
         public ConditionDataProvider(IConditionDataJsonProvider provider, 
             IConditionDataSerializationProvider serializationProvider,
@@ -22,19 +23,38 @@ namespace WDE.Conditions.Data
         {
             this.provider = provider;
             this.serializationProvider = serializationProvider;
-
-            var currentTag = currentCoreVersion.Current.Tag;
-
-            conditions = serializationProvider
-                .DeserializeConditionData<ConditionJsonData>(provider.GetConditionsJson())
-                .Where(c => c.Tags == null || c.Tags.Contains(currentTag))
-                .ToList();
-            conditionSources = serializationProvider.DeserializeConditionData<ConditionSourcesJsonData>(provider.GetConditionSourcesJson());
-            conditionGroups = serializationProvider.DeserializeConditionData<ConditionGroupsJsonData>(provider.GetConditionGroupsJson());
+            this.currentCoreVersion = currentCoreVersion;
         }
 
-        public IEnumerable<ConditionJsonData> GetConditions() => conditions;
-        public IEnumerable<ConditionSourcesJsonData> GetConditionSources() => conditionSources;
-        public IEnumerable<ConditionGroupsJsonData> GetConditionGroups() => conditionGroups;
+        public async Task<IReadOnlyList<ConditionJsonData>> GetConditions()
+        {
+            if (conditions == null)
+            {
+                var currentTag = currentCoreVersion.Current.Tag;
+                conditions = serializationProvider
+                    .DeserializeConditionData<ConditionJsonData>(await provider.GetConditionsJson())
+                    .Where(c => c.Tags == null || c.Tags.Contains(currentTag))
+                    .ToList();
+            }
+            return conditions;
+        }
+
+        public async Task<IReadOnlyList<ConditionSourcesJsonData>> GetConditionSources()
+        {
+            if (conditionSources == null)
+            {
+                conditionSources = serializationProvider.DeserializeConditionData<ConditionSourcesJsonData>(await provider.GetConditionSourcesJson());
+            }
+            return conditionSources;
+        }
+
+        public async Task<IReadOnlyList<ConditionGroupsJsonData>> GetConditionGroups()
+        {
+            if (conditionGroups == null)
+            {
+                conditionGroups = serializationProvider.DeserializeConditionData<ConditionGroupsJsonData>(await provider.GetConditionGroupsJson());
+            }
+            return conditionGroups;
+        }
     }
 }

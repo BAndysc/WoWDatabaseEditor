@@ -9,7 +9,7 @@ using WDE.DatabaseEditors.ViewModels.MultiRow;
 
 namespace WDE.DatabaseEditors.Avalonia.Views.MultiRow
 {
-    public class MultiRowDbTableEditorView : UserControl
+    public partial class MultiRowDbTableEditorView : UserControl
     {
         public MultiRowDbTableEditorView()
         {
@@ -45,7 +45,7 @@ namespace WDE.DatabaseEditors.Avalonia.Views.MultiRow
                 return;
 
             var contextMenu = tableView.ContextMenu!;
-            var items = contextMenu.Items as AvaloniaList<object>;
+            var items = contextMenu.ItemsSource as AvaloniaList<object>;
             if (items == null)
                 return;
 
@@ -64,7 +64,7 @@ namespace WDE.DatabaseEditors.Avalonia.Views.MultiRow
         {
             VeryFastTableView tableView = (VeryFastTableView)sender!;
             var contextMenu = tableView.ContextMenu!;
-            var items = contextMenu.Items as AvaloniaList<object>;
+            var items = contextMenu.ItemsSource as AvaloniaList<object>;
             if (items == null)
                 return;
             for (int i = 0; i < customContextMenus; ++i)

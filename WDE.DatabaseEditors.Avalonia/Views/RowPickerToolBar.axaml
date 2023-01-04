@@ -11,12 +11,12 @@
         <ButtonImage Image="Icons/icon_play.png"
                      Command="{CompiledBinding ExecuteChangedCommand}" />
         <ButtonImage Command="{CompiledBinding GenerateCurrentSqlCommand}"
-                                Text="To SQL" 
+                                Text="To SQL"
                                 Image="Icons/icon_to_sql.png" />
         <ButtonImage Command="{CompiledBinding CopyCurrentSqlCommand}"
-                                ToolTip.Tip="Copy SQL" 
+                                ToolTip.Tip="Copy SQL"
                                 Image="Icons/icon_copy_sql.png" />
-        <ContentPresenter HorizontalAlignment="Left" DataContext="{CompiledBinding MainViewModel}" Content="{Binding}" ContentTemplate="{x:Static utils:ToolbarDataTemplate.Template}" />
+        <ContentControl HorizontalAlignment="Left" DataContext="{CompiledBinding MainViewModel}" Content="{Binding}" ContentTemplate="{x:Static utils:ToolbarDataTemplate.Template}" />
         <ToolbarSpacer />
         <ButtonImage Command="{CompiledBinding PickSelected}"
                      ToolTip.Tip="Pick"

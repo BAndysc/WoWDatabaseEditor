@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using DynamicData.Binding;
+using Microsoft.Extensions.Logging;
 using Prism.Commands;
 using WDE.Common.Managers;
 using WDE.Common.Utils;
@@ -133,7 +134,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         {
             if (currentToken != null)
             {
-                Console.WriteLine("Searching in progress, canceling");
+                LOG.LogWarning("Searching in progress, canceling");
             }
 
             currentToken?.Cancel();
@@ -191,7 +192,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         {
             await Task.Delay(1); // add small delay for UI to render
             int order = 0;
-            foreach (var smartDataGroup in smartDataManager.GetGroupsData(type))
+            foreach (var smartDataGroup in await smartDataManager.GetGroupsData(type))
             {
                 foreach (var member in smartDataGroup.Members)
                 {

@@ -6,17 +6,17 @@ using WDE.SmartScriptEditor.Models;
 
 namespace WDE.SmartScriptEditor.Parameters;
 
-public class NpcFlagsSmartTypeBasedParameter : IContextualParameter<long, SmartBaseElement>, ICustomPickerContextualParameter<long>, IAffectsOtherParametersParameter
+public class NpcFlagsSmartTypeBasedParameter : BaseContextualParameter<long, SmartBaseElement>, ICustomPickerContextualParameter<long>, IAffectsOtherParametersParameter
 {
     private readonly IParameter<long> npcFlag1;
     private readonly IParameter<long> npcFlag2;
     private readonly IParameterPickerService parameterPickerService;
 
-    public string? Prefix => null;
-    public bool HasItems => true;
+    public override string? Prefix => null;
+    public override bool HasItems => true;
     public bool AllowUnknownItems => true;
-    public string ToString(long value) => value.ToString();
-    public Dictionary<long, SelectOption>? Items => null;
+    public override string ToString(long value) => value.ToString();
+    public override Dictionary<long, SelectOption>? Items => null;
     
     public NpcFlagsSmartTypeBasedParameter(IParameter<long> npcFlag1, IParameter<long> npcFlag2,
         IParameterPickerService parameterPickerService)
@@ -43,7 +43,7 @@ public class NpcFlagsSmartTypeBasedParameter : IContextualParameter<long, SmartB
         return await parameterPickerService.PickParameter(parameter, value);
     }
 
-    public string ToString(long value, SmartBaseElement context)
+    public override string ToString(long value, SmartBaseElement context)
     {
         var type = GetTypeForContext(context);
         var parameter = type == 0 ? npcFlag1 : npcFlag2;

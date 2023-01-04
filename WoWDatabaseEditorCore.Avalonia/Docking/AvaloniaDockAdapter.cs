@@ -58,9 +58,10 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
         
         public IRootDock? Initialize(SerializedDock? serializedDock)
         {
+            IReadOnlyList<IDockable>? dockablesToPin = null;
             if (serializedDock != null)
             {
-                rootLayout = dockSerializer.Deserialize(serializedDock);
+                rootLayout = dockSerializer.Deserialize(serializedDock, out dockablesToPin);
                 if ((rootLayout?.VisibleDockables?.Count ?? 0) == 0)
                     rootLayout = null;
             }
@@ -72,6 +73,12 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
             }
             
             factory.InitLayout(rootLayout);
+
+            if (dockablesToPin != null)
+            {
+                foreach (var x in dockablesToPin)
+                    factory.PinDockable(x);
+            }
 
             currentLayout = rootLayout!.VisibleDockables![0] as IDock;
 
@@ -116,16 +123,22 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
                         else
                             factory.AddTool(currentLayout!, dockable, tool.PreferedPosition);
                         factory.SetActiveDockable(dockable);
-                    } else if (isVisible && tools.ContainsKey(tool))
+                    } else if (isVisible && tools.TryGetValue(tool, out var visibleTool))
                     {
-                        factory.SetActiveDockable(tools[tool]);
+                        factory.SetActiveDockable(visibleTool);
                     }
                     else if (!isVisible)
                     {
                         if (tools.TryGetValue(tool, out var dockable))
                         {
                             if (!dockable.IsClosed)
+                            {
+                                if (factory.IsDockablePinned(dockable, factory.FindRoot(dockable, _ => true)!))
+                                {
+                                    factory.PinDockable(dockable);
+                                }
                                 factory.CloseDockable(dockable);
+                            }
                             tools.Remove(tool);
                         }
                     }

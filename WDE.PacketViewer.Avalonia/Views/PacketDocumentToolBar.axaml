@@ -40,67 +40,67 @@
             <components:WdeImage ImageUri="Icons/icon_filters_disable.png" />
         </ToggleButton>
         
-        <controls:DropDownButton DataContext="{CompiledBinding ParsingSettings}">
-            <controls:DropDownButton.Button>
-                <components:WdeImage ToolTip.Tip="Settings" ImageUri="Icons/icon_wrench.png" />
-            </controls:DropDownButton.Button>
-            <StackPanel>
-                <GroupingHeader>Dumpers general settings</GroupingHeader>
-                <TextBlock FontWeight="Bold">Chat:</TextBlock>
-                <CheckBox IsChecked="{CompiledBinding TranslateChatToEnglish}">Use broadcast_text_locale to translate CHAT texts to English</CheckBox>
-                <Border Height="20" />
-                <TextBlock FontWeight="Bold">Query generation:</TextBlock>
-                <CheckBox IsChecked="{CompiledBinding PreferOneLineSql}">Prefer one-line SQLs</CheckBox>
-                <Border Height="20" />
-                <TextBlock FontWeight="Bold">Waypoint dump type:</TextBlock>
-                <controls:CompletionComboBox SelectedItem="{CompiledBinding WaypointsExporter, Mode=TwoWay}" Items="{CompiledBinding Exporters}">
-                    <controls:CompletionComboBox.ItemTemplate>
-                        <DataTemplate x:DataType="paths:ISniffWaypointsExporter">
-                            <TextBlock Text="{CompiledBinding Name}" />
-                        </DataTemplate>
-                    </controls:CompletionComboBox.ItemTemplate>
-                </controls:CompletionComboBox>
-            </StackPanel>
-        </controls:DropDownButton>
+        <DropDownButton DataContext="{CompiledBinding ParsingSettings}">
+            <components:WdeImage ToolTip.Tip="Settings" ImageUri="Icons/icon_wrench.png" />
+            <DropDownButton.Flyout>
+                <Flyout>
+                    <StackPanel>
+                        <GroupingHeader>Dumpers general settings</GroupingHeader>
+                        <TextBlock FontWeight="Bold">Chat:</TextBlock>
+                        <CheckBox IsChecked="{CompiledBinding TranslateChatToEnglish}">Use broadcast_text_locale to translate CHAT texts to English</CheckBox>
+                        <Border Height="20" />
+                        <TextBlock FontWeight="Bold">Query generation:</TextBlock>
+                        <CheckBox IsChecked="{CompiledBinding PreferOneLineSql}">Prefer one-line SQLs</CheckBox>
+                        <Border Height="20" />
+                        <TextBlock FontWeight="Bold">Waypoint dump type:</TextBlock>
+                        <controls:CompletionComboBox SelectedItem="{CompiledBinding WaypointsExporter, Mode=TwoWay}" Items="{CompiledBinding Exporters}">
+                            <controls:CompletionComboBox.ItemTemplate>
+                                <DataTemplate x:DataType="paths:ISniffWaypointsExporter">
+                                    <TextBlock Text="{CompiledBinding Name}" />
+                                </DataTemplate>
+                            </controls:CompletionComboBox.ItemTemplate>
+                        </controls:CompletionComboBox>
+                    </StackPanel>
+                </Flyout>
+            </DropDownButton.Flyout>
+        </DropDownButton>
 
         <Border Width="15" />
         
-        <controls:DropDownButton>
-            <controls:DropDownButton.Button>
-                <StackPanel Orientation="Horizontal">
-                    <components:WdeImage ImageUri="Icons/icon_cog_reload.png" />
-                    <TextBlock>Dump</TextBlock>
-                </StackPanel>
-            </controls:DropDownButton.Button>
-            <StackPanel Orientation="Vertical">
-                <ItemsPresenter Items="{CompiledBinding Processors}">
-                    <ItemsPresenter.ItemTemplate>
-                        <DataTemplate x:DataType="viewModels:ProcessorViewModel">
-                            <CheckBox IsChecked="{CompiledBinding IsChecked}" Margin="0,0,0,12" HorizontalAlignment="Stretch">
-                                <DockPanel>
-                                    <components:WdeImage Image="{CompiledBinding Image}" Width="24" Height="24" VerticalAlignment="Center" />
-                                    <StackPanel Orientation="Vertical" Margin="3,0,0,0">
-                                        <TextBlock FontWeight="Bold" Text="{CompiledBinding Name}" />
-                                        <TextBlock Text="{CompiledBinding Description}" />
-                                        <TextBlock Opacity="0.7" Text="{CompiledBinding Format, StringFormat=Format: {0}}" />
-                                    </StackPanel>
-                                </DockPanel>
-                            </CheckBox>
-                        </DataTemplate>
-                    </ItemsPresenter.ItemTemplate>
-                </ItemsPresenter>
-                <Button ClickMode="Press" Command="{CompiledBinding RunProcessors}" Content="Execute">
-                    <Interaction.Behaviors>
-                        <controls:DismissPopupBehaviour/>
-                    </Interaction.Behaviors>
-                </Button>
+        <DropDownButton>
+            <StackPanel Orientation="Horizontal">
+                <components:WdeImage ImageUri="Icons/icon_cog_reload.png" />
+                <TextBlock>Dump</TextBlock>
             </StackPanel>
-        </controls:DropDownButton>
+            <DropDownButton.Flyout>
+                <Flyout FlyoutPresenterClasses="no-horiz-scroll">
+                    <StackPanel Orientation="Vertical">
+                        <ItemsControl ItemsSource="{CompiledBinding Processors}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="viewModels:ProcessorViewModel">
+                                    <CheckBox IsChecked="{CompiledBinding IsChecked}" Margin="0,0,0,12" HorizontalAlignment="Stretch">
+                                        <DockPanel>
+                                            <components:WdeImage Image="{CompiledBinding Image}" Width="24" Height="24" VerticalAlignment="Center" />
+                                            <StackPanel Orientation="Vertical" Margin="3,0,0,0">
+                                                <TextBlock FontWeight="Bold" Text="{CompiledBinding Name}" />
+                                                <TextBlock Text="{CompiledBinding Description}" />
+                                                <TextBlock Opacity="0.7" Text="{CompiledBinding Format, StringFormat=Format: {0}}" />
+                                            </StackPanel>
+                                        </DockPanel>
+                                    </CheckBox>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <Button ClickMode="Press" Command="{CompiledBinding RunProcessors}" Content="Execute" />
+                    </StackPanel>
+                </Flyout>
+            </DropDownButton.Flyout>
+        </DropDownButton>
         
         <Border Width="15" />
         
-        <ItemsPresenter Items="{CompiledBinding Processors}">
-            <ItemsPresenter.ItemTemplate>
+        <ItemsControl ItemsSource="{CompiledBinding Processors}">
+            <ItemsControl.ItemTemplate>
                 <DataTemplate x:DataType="viewModels:ProcessorViewModel">
                     <Button Command="{Binding #Root.DataContext.QuickRunProcessor}"
                             CommandParameter="{CompiledBinding .}"
@@ -108,13 +108,13 @@
                         <components:WdeImage Image="{CompiledBinding Image}" />
                     </Button>
                 </DataTemplate>
-            </ItemsPresenter.ItemTemplate>
-            <ItemsPresenter.ItemsPanel>
+            </ItemsControl.ItemTemplate>
+            <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <controls:ToolbarPanel />
                 </ItemsPanelTemplate>
-            </ItemsPresenter.ItemsPanel>
-        </ItemsPresenter>
+            </ItemsControl.ItemsPanel>
+        </ItemsControl>
         
         <controls:ToolbarSpacer />
 

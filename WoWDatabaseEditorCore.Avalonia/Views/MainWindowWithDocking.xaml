@@ -26,6 +26,7 @@
           SubTitle="{CompiledBinding Subtitle}"
           Classes="MainWindow"
           x:DataType="viewModels:MainWindowViewModel"
+          utils:MenuBind.MenuItems="{CompiledBinding MenuItemProviders}"
           utils:MenuBind.MenuItemsGestures="{CompiledBinding MenuItemProviders}"
           Title="{CompiledBinding Title}">
 
@@ -60,7 +61,7 @@
             <PathGeometry>M15,3L6.36,0.802L1,3L1,13L9,15L10,14.999L15,13L15,3ZM2,4.221L2,12.19L9,13.95L9,5.981L2,4.221ZM10,5.997L10,13.915L14,12.239L14,4.321L10,5.997ZM2.78,3.386L9.198,5L9.791,5L13.2,3.572L6.41,1.865L2.78,3.386Z</PathGeometry>
         </GeometryGroup>
     </controls:ExtendedWindow.Resources>
-    
+
     <ExtendedWindow.Styles>
         <Style Selector="ExtendedWindow.win10 :is(Control).HideWin10">
             <Setter Property="IsVisible" Value="False" />
@@ -68,19 +69,8 @@
         <Style Selector="ExtendedWindow.win11 :is(Control).HideWin11">
             <Setter Property="IsVisible" Value="False" />
         </Style>
-        <Style Selector="ExtendedWindow.ToolbarStyleIcon TextBlock.ButtonText">
-            <Setter Property="IsVisible" Value="False" />
-        </Style>
-        <Style Selector="ExtendedWindow.ToolbarStyleText WdeImage.ButtonIcon">
-            <Setter Property="IsVisible" Value="False" />
-        </Style>
     </ExtendedWindow.Styles>
-    
-    <ManagedMenu.Menu>
-        <NativeMenu utils:MenuBind.MenuItems="{CompiledBinding MenuItemProviders}">
-        </NativeMenu>
-    </ManagedMenu.Menu>
-    
+
     <controls:ExtendedWindow.ToolBar>
         <controls:ToolBar>
             <controls:ToolBar.TopLeftContent>
@@ -104,9 +94,9 @@
                             <Path Stretch="UniformToFill" Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="White" Data="{StaticResource CopyIcon}"/>
                         </Button>
                     </controls:ToolbarPanel>
-                    
+
                     <Border Width="30"  DockPanel.Dock="Left"/>
-                    
+
                     <profiles1:ProfilesControl DataContext="{CompiledBinding ProfilesViewModel}" DockPanel.Dock="Left"/>
                 </DockPanel>
             </controls:ToolBar.TopContent>
@@ -124,7 +114,7 @@
                             </WdeImage.Styles>
                         </WdeImage>
                     </ToggleButton>
-                    
+
                     <controls:ToolbarPanel IsVisible="{CompiledBinding HasAnyType}" DataContext="{CompiledBinding QuickGoToViewModel}">
                         <TextBlock Opacity="0.6" FontSize="9" VerticalAlignment="Center">Entry:</TextBlock>
                         <CompletionComboBox AsyncPopulator="{CompiledBinding FindItemAsyncPopulator}" Width="150"
@@ -149,7 +139,7 @@
                             </CompletionComboBox.ItemTemplate>
                         </CompletionComboBox>
                         <TextBlock Opacity="0.6" FontSize="9" VerticalAlignment="Center">Type:</TextBlock>
-                        <ComboBox Items="{CompiledBinding Providers}" SelectedItem="{CompiledBinding SelectedProvider}">
+                        <ComboBox ItemsSource="{CompiledBinding Providers}" SelectedItem="{CompiledBinding SelectedProvider}">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{CompiledBinding Name}"/>
@@ -157,26 +147,26 @@
                             </ComboBox.ItemTemplate>
                         </ComboBox>
                     </controls:ToolbarPanel>
-                    
+
                     <controls:ToolbarPanel Classes="HideWin11">
                         <components:ButtonImage Image="Icons/icon_play.png" IsVisible="{CompiledBinding ShowPlayButtons}" Command="{CompiledBinding ExecuteChangedCommand}" />
                         <components:ButtonImage Command="{CompiledBinding GenerateCurrentSqlCommand}"
                                                 IsVisible="{CompiledBinding ShowExportButtons}"
-                                                Text="To SQL" 
+                                                Text="To SQL"
                                                 Image="Icons/icon_to_sql.png" />
                         <components:ButtonImage Command="{CompiledBinding CopyCurrentSqlCommand}"
                                                 IsVisible="{CompiledBinding ShowExportButtons}"
-                                                ToolTip.Tip="Copy SQL" 
+                                                ToolTip.Tip="Copy SQL"
                                                 Image="Icons/icon_copy_sql.png" />
                     </controls:ToolbarPanel>
-                </ToolbarPanel>                    
+                </ToolbarPanel>
             </controls:ToolBar.LeftContent>
             <controls:ToolBar.MiddleContent>
-                <ContentPresenter DataContext="{CompiledBinding DocumentManager.ActiveDocument}" Content="{CompiledBinding}" ContentTemplate="{x:Static utils:ToolbarDataTemplate.Template}" />
+                <ContentControl DataContext="{CompiledBinding DocumentManager.ActiveDocument}" Content="{CompiledBinding}" ContentTemplate="{x:Static utils:ToolbarDataTemplate.Template}" />
             </controls:ToolBar.MiddleContent>
             <controls:ToolBar.RightContent>
                 <ToolbarPanel>
-                    <ToolbarItemsControl IsVisible="{CompiledBinding ShowRelatedItems}" Items="{CompiledBinding RelatedSolutionItems.List}">
+                    <ToolbarItemsControl IsVisible="{CompiledBinding ShowRelatedItems}" ItemsSource="{CompiledBinding RelatedSolutionItems.List}">
                         <ToolbarItemsControl.ItemTemplate>
                             <DataTemplate DataType="viewModels:RelatedSolutionItemViewModel">
                                 <ButtonImage Command="{CompiledBinding CreateCommand}"
@@ -195,11 +185,11 @@
                     <Button x:Name="OpenSQLDocument" ToolTip.Tip="New SQL document" Command="{CompiledBinding OpenSqlDocumentCommand}" BorderThickness="1" Margin="5,0,0,0" Width="34" Height="34">
                         <Path Stretch="UniformToFill" Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="{Binding $parent[Button].Foreground}" StrokeThickness="1" Data="{StaticResource ToSqlIcon}" />
                     </Button>
-                    
+
                     <Button ToolTip.Tip="Open game view" Classes="HideWin10" Command="{CompiledBinding Open3DCommand}" BorderThickness="1" Margin="5,0,0,0" Width="34" Height="34">
                         <Path VerticalAlignment="Center" Width="16" Fill="{Binding $parent[Button].Foreground}" Data="{StaticResource Open3DIcon}" />
                     </Button>
-                    
+
                     <Button ToolTip.Tip="Find anywhere" Classes="HideWin10" Command="{CompiledBinding FindAnywhereCommand}" BorderThickness="1" Margin="5,0,0,0" Width="34" Height="34">
                         <Path VerticalAlignment="Center" Width="16" Fill="{Binding $parent[Button].Foreground}" Data="{StaticResource FindAnywhereIcon}" />
                     </Button>
@@ -207,13 +197,13 @@
             </controls:ToolBar.RightContent>
         </controls:ToolBar>
     </controls:ExtendedWindow.ToolBar>
-    
+
     <controls:ExtendedWindow.StatusBar>
         <controls:StatusBar>
             <views:StatusBarView DockPanel.Dock="Bottom" Height="30" DataContext="{CompiledBinding StatusBar}" />
         </controls:StatusBar>
     </controls:ExtendedWindow.StatusBar>
-    
+
     <controls:ExtendedWindow.Overlay>
         <Panel>
             <ContentControl Content="{CompiledBinding VisualStudioManagerViewModel}"
@@ -229,7 +219,7 @@
                               IsVisible="{CompiledBinding IsPanelVisible, Mode=OneWay}" />
             <Border BorderThickness="1"
                     Background="{DynamicResource ContentBackground}"
-                    BorderBrush="Gray" 
+                    BorderBrush="Gray"
                     HorizontalAlignment="Right"
                     VerticalAlignment="Bottom"
                     Margin="0,0,155,0"
@@ -241,11 +231,11 @@
                                 ContentTemplate="{x:Static utils:ViewDataTemplate.Template}"
                                 ClipToBounds="False" />
             </Border>
-            <Panel Name="Panel" 
+            <Panel Name="Panel"
                    DataContext="{CompiledBinding QuickAccessViewModel, Mode=OneWay}"
                    IsVisible="{CompiledBinding IsOpened, Mode=OneWay}"
                    Background="Transparent">
-                <quickAccess:QuickAccessView 
+                <quickAccess:QuickAccessView
                     HorizontalAlignment="Center"
                     IsVisible="{CompiledBinding IsOpened, Mode=OneWay}"
                     Margin="0,200,0,0"
@@ -272,12 +262,12 @@
                             <TextBlock Text="{CompiledBinding Title}" Padding="2">
                                 <Interaction.Behaviors>
                                     <DataTriggerBehavior Binding="{CompiledBinding ViewModel.IsModified}" ComparisonCondition="Equal" Value="False">
-                                        <ChangePropertyAction TargetObject="{Binding #TextBlock}" 
+                                        <ChangePropertyAction TargetObject="{Binding #TextBlock}"
                                                               PropertyName="FontWeight"
                                                               Value="Normal" />
                                     </DataTriggerBehavior>
                                     <DataTriggerBehavior Binding="{CompiledBinding ViewModel.IsModified}" ComparisonCondition="Equal" Value="True">
-                                        <ChangePropertyAction TargetObject="{Binding #TextBlock}" 
+                                        <ChangePropertyAction TargetObject="{Binding #TextBlock}"
                                                               PropertyName="FontWeight"
                                                               Value="Bold" />
                                     </DataTriggerBehavior>

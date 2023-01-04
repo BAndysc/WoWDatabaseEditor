@@ -1,7 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using WDE.Common;
 using WDE.Common.CoreVersion;
+using WDE.Common.Services;
 using WDE.Module.Attributes;
 
 namespace WDE.Conditions.Data
@@ -10,21 +12,24 @@ namespace WDE.Conditions.Data
     public class ConditionDataJsonProvider : IConditionDataJsonProvider
     {
         private readonly ICurrentCoreVersion currentCoreVersion;
+        private readonly IRuntimeDataService dataService;
 
-        public ConditionDataJsonProvider(ICurrentCoreVersion currentCoreVersion)
+        public ConditionDataJsonProvider(ICurrentCoreVersion currentCoreVersion,
+            IRuntimeDataService dataService)
         {
             this.currentCoreVersion = currentCoreVersion;
+            this.dataService = dataService;
         }
         
-        public string GetConditionsJson() => ReadFileOrEmptyArray(currentCoreVersion.Current.ConditionFeatures.ConditionsFile);
-        public string GetConditionSourcesJson() => ReadFileOrEmptyArray(currentCoreVersion.Current.ConditionFeatures.ConditionSourcesFile);
-        public string GetConditionGroupsJson() => ReadFileOrEmptyArray(currentCoreVersion.Current.ConditionFeatures.ConditionGroupsFile);
+        public Task<string> GetConditionsJson() => ReadFileOrEmptyArray(currentCoreVersion.Current.ConditionFeatures.ConditionsFile);
+        public Task<string> GetConditionSourcesJson() => ReadFileOrEmptyArray(currentCoreVersion.Current.ConditionFeatures.ConditionSourcesFile);
+        public Task<string> GetConditionGroupsJson() => ReadFileOrEmptyArray(currentCoreVersion.Current.ConditionFeatures.ConditionGroupsFile);
        
-        private string ReadFileOrEmptyArray(string path)
+        private async Task<string> ReadFileOrEmptyArray(string path)
         {
-            if (File.Exists(path))  
-                return File.ReadAllText(path);
-            Console.WriteLine("File not found: " + path + ". Fallback to an empty list.");
+            if (await dataService.Exists(path))
+                return await dataService.ReadAllText(path);
+            LOG.LogError("File not found: " + path + ". Fallback to an empty list.");
             return "[]";
         }
     }

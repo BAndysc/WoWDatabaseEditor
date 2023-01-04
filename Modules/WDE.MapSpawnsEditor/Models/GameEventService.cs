@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Reactive.Linq;
 using WDE.Common.Database;
+using WDE.Common.Modules;
 using WDE.MapSpawnsEditor.ViewModels;
 using WDE.Module.Attributes;
 using WDE.MVVM;
@@ -19,8 +20,9 @@ public interface IGameEventService
 
 [AutoRegister]
 [SingleInstance]
-public class GameEventService : IGameEventService
+public class GameEventService : IGameEventService, IGlobalAsyncInitializer
 {
+    private readonly IDatabaseProvider databaseProvider;
     public ObservableCollection<GameEventViewModel> GameEvents { get; private set; } = new();
     public ObservableCollection<GameEventViewModel> ActiveEvents { get; private set; } = new();
     public IObservable<IReadOnlyList<GameEventViewModel>> ActiveEventsObservable { get; set; }
@@ -35,31 +37,26 @@ public class GameEventService : IGameEventService
 
     public GameEventService(IDatabaseProvider databaseProvider)
     {
-        // todo: replace with async
-        try
-        {
-            var gameEvents = databaseProvider.GetGameEvents();
-            GameEvents.AddRange(gameEvents.Select(ge => new GameEventViewModel(ge)));
+        this.databaseProvider = databaseProvider;
+        ActiveEventsObservable = FunctionalExtensions.Select(ActiveEvents.ToCountChangedObservable(), _ => ActiveEvents);
 
-            foreach (var e in GameEvents)
-            {
-                e.ToObservable(x => x.Active)
-                    .Skip(1)
-                    .SubscribeAction(@is =>
-                    {
-                        if (@is)
-                            ActiveEvents.Add(e);
-                        else
-                            ActiveEvents.Remove(e);
-                    });
-            }
-        }
-        catch (Exception e)
+        foreach (var e in GameEvents)
         {
-            Console.WriteLine(e);
+            e.ToObservable(x => x.Active)
+                .Skip(1)
+                .SubscribeAction(@is =>
+                {
+                    if (@is)
+                        ActiveEvents.Add(e);
+                    else
+                        ActiveEvents.Remove(e);
+                });
         }
+    }
 
-        ActiveEventsObservable =
-            FunctionalExtensions.Select(ActiveEvents.ToCountChangedObservable(), _ => ActiveEvents);
+    public async Task Initialize()
+    {
+        var gameEvents = await databaseProvider.GetGameEventsAsync();
+        GameEvents.AddRange(gameEvents.Select(ge => new GameEventViewModel(ge)));
     }
 }

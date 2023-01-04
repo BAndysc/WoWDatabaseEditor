@@ -8,14 +8,14 @@ using WoWDatabaseEditorCore.Services.OutlinerTool;
 
 namespace WoWDatabaseEditorCore.Avalonia.Services.OutlinerTool;
 
-public class OutlinerToolView : UserControl
+public partial class OutlinerToolView : UserControl
 {
     private VirtualizedTreeView treeView;
     
     public OutlinerToolView()
     {
         InitializeComponent();
-        treeView = this.FindControl<VirtualizedTreeView>("TreeView");
+        treeView = this.GetControl<VirtualizedTreeView>("TreeView");
     }
 
     private void InitializeComponent()
@@ -23,7 +23,7 @@ public class OutlinerToolView : UserControl
         AvaloniaXamlLoader.Load(this);
     }
 
-    private void InputElement_OnDoubleTapped(object? sender, RoutedEventArgs e)
+    private void InputElement_OnDoubleTapped(object? sender, TappedEventArgs e)
     {
         if (treeView.SelectedNode is OutlinerItemViewModel vm && DataContext is OutlinerToolViewModel dataContext)
         {

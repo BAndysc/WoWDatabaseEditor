@@ -24,7 +24,7 @@ public class CreatureSpawnInstance : SpawnInstance
     public CreatureInstance? Creature { get; set; }
     public float Orientation => data.O;
     public uint CreatureDisplayId => data.Model;
-    public IList<IGameEventCreature>? GameEvents { get; set; }
+    public IReadOnlyList<IGameEventCreature>? GameEvents { get; set; }
     public IBaseCreatureAddon? Addon { get; set; }
     public IBaseEquipmentTemplate? Equipment { get; set; }
 

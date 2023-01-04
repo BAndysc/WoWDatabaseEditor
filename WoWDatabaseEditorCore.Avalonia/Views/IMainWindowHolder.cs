@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
+using WDE.Common;
 using WDE.Module.Attributes;
 
 namespace WoWDatabaseEditorCore.Avalonia.Views
@@ -51,7 +52,13 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
             var top = FindTopWindow();
             if (top != null && top.WindowState == WindowState.Minimized)
                 top.WindowState = WindowState.Normal;
-            window.Show(top);
+            if (top != null)
+                window.Show(top);
+            else
+            {
+                LOG.LogWarning("Trying to show a window without any active window! Are you closing the editor already?");
+                window.Show();
+            }
         }
     }
 }

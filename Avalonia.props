@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <AvaloniaVersion>11.1.999-cibuild0045870-beta</AvaloniaVersion>
+    </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
+        <PackageReference Include="Avalonia.Skia" Version="$(AvaloniaVersion)" />
+        <PackageReference Include="Avalonia.Controls.ItemsRepeater" Version="$(AvaloniaVersion)" />
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="$(AvaloniaVersion)"/>
         <PackageReference Include="Avalonia.ReactiveUI" Version="$(AvaloniaVersion)" />
-        <PackageReference Include="Avalonia.Desktop" Version="$(AvaloniaVersion)" />
-        <PackageReference Include="Avalonia.Xaml.Behaviors" Version="0.10.10" />
-        <PackageReference Include="Projektanker.Icons.Avalonia" Version="5.13.0" />
-        <PackageReference Include="Projektanker.Icons.Avalonia.MaterialDesign" Version="5.13.0" />
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="$(AvaloniaVersion)" />
+        <PackageReference Include="Avalonia.Xaml.Behaviors" Version="11.0.10" />
+        <PackageReference Include="Projektanker.Icons.Avalonia" Version="9.1.1" />
+        <PackageReference Include="Projektanker.Icons.Avalonia.MaterialDesign" Version="9.1.1" />
         <ProjectReference Include="$(MSBuildThisFileDirectory)\Prism.Avalonia\src\Prism.Avalonia\Prism.Avalonia.csproj" />
     </ItemGroup>
     <ItemGroup>

@@ -14,7 +14,6 @@ namespace WDE.SqlWorkbench.Services;
 [UniqueProvider]
 internal interface IExtendedSqlEditorService : ISqlEditorService
 {
-    void NewDocument();
     void NewDocument(IConnection connection);
     void NewDocumentWithTableInfo(IConnection connection, string schema, string tableName);
     void NewDocumentWithTableSelect(IConnection connection, string schema, string tableName);

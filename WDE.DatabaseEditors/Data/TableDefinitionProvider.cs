@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
+using WDE.Common;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;
+using WDE.Common.Modules;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Utils;
 using WDE.DatabaseEditors.Data.Interfaces;
@@ -14,8 +17,11 @@ namespace WDE.DatabaseEditors.Data
 {
     [SingleInstance]
     [AutoRegister]
-    public class TableDefinitionProvider : ITableDefinitionProvider
+    public class TableDefinitionProvider : ITableDefinitionProvider, IGlobalAsyncInitializer
     {
+        private readonly ITableDefinitionDeserializer serializationProvider;
+        private readonly Lazy<ITableDefinitionJsonProvider> jsonProvider;
+        private readonly ICurrentCoreVersion currentCoreVersion;
         private readonly IMessageBoxService messageBoxService;
         private readonly List<DatabaseTableDefinitionJson> incompatibleDefinitionList = new();
         private readonly Dictionary<DatabaseTable, DatabaseTableDefinitionJson> incompatibleDefinitions = new();
@@ -24,13 +30,20 @@ namespace WDE.DatabaseEditors.Data
         private readonly Dictionary<DatabaseTable, DatabaseTableDefinitionJson> definitionsByForeignTableName = new();
 
         public TableDefinitionProvider(ITableDefinitionDeserializer serializationProvider,
-            ITableDefinitionJsonProvider jsonProvider,
+            Lazy<ITableDefinitionJsonProvider> jsonProvider,
             ICurrentCoreVersion currentCoreVersion,
             IMessageBoxService messageBoxService)
         {
+            this.serializationProvider = serializationProvider;
+            this.jsonProvider = jsonProvider;
+            this.currentCoreVersion = currentCoreVersion;
             this.messageBoxService = messageBoxService;
+        }
+
+        public async Task Initialize()
+        {
             Dictionary<string, List<DatabaseTableReferenceJson>> fileToExtraCompatibility = new();
-            foreach (var source in jsonProvider.GetDefinitionReferences())
+            foreach (var source in await jsonProvider.Value.GetDefinitionReferences())
             {
                 try
                 {
@@ -46,7 +59,7 @@ namespace WDE.DatabaseEditors.Data
                 }
             }
             
-            foreach (var source in jsonProvider.GetDefinitionSources())
+            foreach (var source in await jsonProvider.Value.GetDefinitionSources())
             {
                 try
                 {
@@ -105,11 +118,12 @@ namespace WDE.DatabaseEditors.Data
                 {
                     ShowLoadingError(source.file, e);
                 }
-            }
+            }    
         }
-
+        
         private void ShowLoadingError(string sourceFile, Exception e)
         {
+            LOG.LogError(e);
             messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
                     .SetTitle("Error")
                     .SetMainInstruction("Cannot load table definition")

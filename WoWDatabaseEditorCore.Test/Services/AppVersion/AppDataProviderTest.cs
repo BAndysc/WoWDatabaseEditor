@@ -7,7 +7,7 @@ namespace WoWDatabaseEditorCore.Test.Services.AppVersion
 {
     public class AppDataProviderTest
     {
-        private IFileSystem fileSystem;
+        private IFileSystem fileSystem = null!;
         
         [SetUp]
         public void Init()

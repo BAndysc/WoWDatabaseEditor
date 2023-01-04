@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -34,7 +35,10 @@ namespace WDE.Common.Services.MessageBox
                 .Build());
         }
     
-        public static async Task WrapError(this IMessageBoxService service, Func<Task> task)
+        public static async Task WrapError(this IMessageBoxService service, Func<Task> task,
+            [CallerMemberName] string? caller = null,
+            [CallerFilePath] string? callerFile = null,
+            [CallerLineNumber] int? callerLineNumber = null)
         {
             try
             {
@@ -46,7 +50,7 @@ namespace WDE.Common.Services.MessageBox
                 if (ex is AggregateException ae && ae.InnerExceptions.Count == 1)
                     ex = ae.InnerExceptions[0];
                 
-                Console.WriteLine(ex);
+                LOG.LogError(ex, "Error in {0} at {1}:{2}", caller, callerFile, callerLineNumber);
                 var msg = ex.Message;
                 if (ex.InnerException != null)
                     msg += "\n\n --> " + ex.InnerException.Message;
@@ -60,7 +64,10 @@ namespace WDE.Common.Services.MessageBox
             }
         }
         
-        public static Func<CancellationToken, Task> WrapError(this IMessageBoxService service, Func<CancellationToken, Task> task)
+        public static Func<CancellationToken, Task> WrapError(this IMessageBoxService service, Func<CancellationToken, Task> task,
+            [CallerMemberName] string? caller = null,
+            [CallerFilePath] string? callerFile = null,
+            [CallerLineNumber] int? callerLineNumber = null)
         {
             return async (token) =>
             {
@@ -70,7 +77,7 @@ namespace WDE.Common.Services.MessageBox
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e);
+                    LOG.LogError(e, "Error in {0} at {1}:{2}", caller, callerFile, callerLineNumber);
                     var msg = e.Message;
                     if (e.InnerException != null)
                         msg += "\n\n --> " + e.InnerException.Message;

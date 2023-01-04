@@ -39,10 +39,10 @@ public partial class VeryFastTableView
         if (TableSpan is { } span && span.IsMerged(SelectedRowIndex.GroupIndex, SelectedRowIndex.RowIndex, next.Value, out var firstRow, out var firstColumn))
         {
             next = firstColumn;
-            SelectedRowIndex = new VerticalCursor(SelectedRowIndex.GroupIndex, firstRow);
+            SetCurrentValue(SelectedRowIndexProperty, new VerticalCursor(SelectedRowIndex.GroupIndex, firstRow));
         }
 
-        SelectedCellIndex = next.Value;
+        SetCurrentValue(SelectedCellIndexProperty, next.Value);
         return true;
     }
 
@@ -55,10 +55,10 @@ public partial class VeryFastTableView
         if (TableSpan is { } span && span.IsMerged(SelectedRowIndex.GroupIndex, SelectedRowIndex.RowIndex, prev.Value, out var firstRow, out var firstColumn))
         {
             prev = firstColumn;
-            SelectedRowIndex = new VerticalCursor(SelectedRowIndex.GroupIndex, firstRow);
+            SetCurrentValue(SelectedRowIndexProperty, new VerticalCursor(SelectedRowIndex.GroupIndex, firstRow));
         }
 
-        SelectedCellIndex = prev.Value;
+        SetCurrentValue(SelectedCellIndexProperty, prev.Value);
         return true;
     }
 
@@ -118,7 +118,7 @@ public partial class VeryFastTableView
                     {
                         if (IsFilteredRowVisible(items[group], items[group].Rows[row], rowFilter, rowFilterParameter))
                         {
-                            SelectedRowIndex = new VerticalCursor(group, row);
+                            SetCurrentValue(SelectedRowIndexProperty, new VerticalCursor(group, row));
                             return true;
                         }
                     }
@@ -148,7 +148,7 @@ public partial class VeryFastTableView
         if (MoveCursorLeft())
             return true;
         
-        SelectedCellIndex = ColumnsCount - 1;
+        SetCurrentValue(SelectedCellIndexProperty, ColumnsCount - 1);
         return MoveCursorUp();
     }
 
@@ -156,14 +156,8 @@ public partial class VeryFastTableView
     {
         if (MoveCursorRight())
             return true;
-        SelectedCellIndex = 0;
+        SetCurrentValue(SelectedCellIndexProperty, 0);
         return MoveCursorDown();
-    }
-
-
-    public void SetOwner(IInputRoot owner)
-    {
-        
     }
 
     public void Move(IInputElement element, NavigationDirection direction, KeyModifiers keyModifiers = KeyModifiers.None)
@@ -177,12 +171,12 @@ public partial class VeryFastTableView
                 MoveCursorPrevious();
                 break;
             case NavigationDirection.First:
-                SelectedRowIndex = new VerticalCursor(0, 0);
-                SelectedCellIndex = 0;
+                SetCurrentValue(SelectedRowIndexProperty, new VerticalCursor(0, 0));
+                SetCurrentValue(SelectedCellIndexProperty, 0);
                 break;
             case NavigationDirection.Last:
-                SelectedRowIndex = new VerticalCursor(Items?.Count ?? 0 - 1, Items?[^1]?.Rows?.Count ?? 0 - 1);
-                SelectedCellIndex = ColumnsCount - 1;
+                SetCurrentValue(SelectedRowIndexProperty, new VerticalCursor(Items?.Count ?? 0 - 1, Items?[^1]?.Rows?.Count ?? 0 - 1));
+                SetCurrentValue(SelectedCellIndexProperty, ColumnsCount - 1);
                 break;
             case NavigationDirection.Left:
                 MoveCursorLeft();

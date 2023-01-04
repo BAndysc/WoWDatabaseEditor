@@ -1,3 +1,4 @@
+using WDE.Common;
 using WDE.Common.Database;
 using WDE.SqlQueryGenerator;
 
@@ -20,7 +21,7 @@ internal class QueryGenerator<R> : IQueryGenerator<R>
         updateProvider = updateProviders.MaxBy(p => p.Priority);
 
         if (insertProvider == null && deleteProvider == null && updateProvider == null)
-            Console.WriteLine("Couldn't find a provider for " + typeof(R));
+            LOG.LogError("Couldn't find a provider for " + typeof(R));
     }
 
     public IQuery? TryInsert(R element) => insertProvider?.Insert(element);

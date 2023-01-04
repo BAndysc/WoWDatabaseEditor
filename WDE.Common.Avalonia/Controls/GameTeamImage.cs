@@ -1,15 +1,18 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
+using Avalonia.Threading;
 using WDE.Common.Avalonia.Components;
 using WDE.Common.Avalonia.Utils;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;
 using WDE.Common.Types;
+using WDE.Common.Utils;
 
 namespace WDE.Common.Avalonia.Controls;
 
@@ -44,6 +47,8 @@ public class GameTeamImage : Control
         set => SetValue(IgnoreIfBothProperty, value);
     }
 
+    private bool instanceWaitingForCache; // per control check so that only one call path waits for the task below
+    private static Task? cacheInProgress; // task to load images, one per whole application
     private static Bitmap? allyImage, hordeImage;
     private static CharacterRaces cachedAllyRaces, cachedHordeRaces, cachedAllSupportedRaces;
 
@@ -56,6 +61,42 @@ public class GameTeamImage : Control
         ClipToBoundsProperty.OverrideDefaultValue<GameTeamImage>(true);
     }
 
+    private bool CacheBitmap()
+    {
+        if (instanceWaitingForCache)
+            return false;
+
+        if (cacheInProgress != null)
+        {
+            instanceWaitingForCache = true;
+            async Task InvalidateOnLoad()
+            {
+                await cacheInProgress!;
+                instanceWaitingForCache = false;
+                Dispatcher.UIThread.Post(InvalidateVisual);
+            }
+            InvalidateOnLoad().ListenErrors();
+            return false;
+        }
+
+        if (allyImage != null)
+            return true;
+
+        var taskCompletionSource = new TaskCompletionSource();
+        cacheInProgress = taskCompletionSource.Task;
+        async Task CacheBitmapAsync()
+        {
+            allyImage = await WdeImage.LoadBitmapAsync(new ImageUri("Icons/icon_alliance.png"));
+            hordeImage = await WdeImage.LoadBitmapAsync(new ImageUri("Icons/icon_horde.png"));
+            Dispatcher.UIThread.Post(InvalidateVisual);
+            taskCompletionSource.SetResult();
+            cacheInProgress = null;
+        }
+
+        CacheBitmapAsync().ListenErrors();
+        return false;
+    }
+
     private void CheckTeams(out bool isHorde, out bool isAlly)
     {
         if (allyImage == null)
@@ -64,8 +105,6 @@ public class GameTeamImage : Control
             cachedAllSupportedRaces = coreVersion.GameVersionFeatures.AllRaces;
             cachedAllyRaces = cachedAllSupportedRaces & CharacterRaces.AllAlliance;
             cachedHordeRaces = cachedAllSupportedRaces & CharacterRaces.AllHorde;
-            allyImage = WdeImage.LoadBitmap(new ImageUri("Icons/icon_alliance.png"));
-            hordeImage = WdeImage.LoadBitmap(new ImageUri("Icons/icon_horde.png"));
         }
 
         var races = Races;
@@ -107,6 +146,8 @@ public class GameTeamImage : Control
 
     public override void Render(DrawingContext context)
     {
+        if (!CacheBitmap())
+            return;
         CheckTeams(out var isHorde, out var isAlly);
         var size = Math.Min(Bounds.Width, Bounds.Height);
         double x = 0;
@@ -114,14 +155,16 @@ public class GameTeamImage : Control
         {
             var rect = new Rect(x, 0, size, size);
             x += size + Spacing;
-            context.DrawImage(allyImage, rect);
+            if (allyImage != null)
+                context.DrawImage(allyImage, rect);
         }
 
         if (isHorde)
         {
             var rect = new Rect(x, 0, size, size);
             x += size + Spacing;
-            context.DrawImage(hordeImage, rect);
+            if (hordeImage != null)
+                context.DrawImage(hordeImage, rect);
         }
     }
 }

@@ -18,7 +18,6 @@ using WDE.SqlWorkbench.ViewModels;
 
 namespace WDE.SqlWorkbench.Test.IntegrationTests;
 
-[SuppressMessage("Assertion", "NUnit2005:Consider using Assert.That(actual, Is.EqualTo(expected)) instead of Assert.AreEqual(expected, actual)")]
 internal class SqlWorkbenchViewModelTests
 {
     protected ActionsOutputViewModel actionsOutputService = null!;
@@ -53,7 +52,7 @@ internal class SqlWorkbenchViewModelTests
         windowManager = Substitute.For<IWindowManager>();
         connectionsManager = Substitute.For<IConnectionsManager>();
         confirmationService = Substitute.For<IQueryConfirmationService>();
-        GlobalApplication.InitializeApplication(mainThread, GlobalApplication.AppBackend.Avalonia);
+        GlobalApplication.InitializeApplication(mainThread, GlobalApplication.AppBackend.UnitTests);
 
         synchronizationContext = new ManualSynchronizationContext();
         SynchronizationContext.SetSynchronizationContext(synchronizationContext);
@@ -68,6 +67,7 @@ internal class SqlWorkbenchViewModelTests
     [TearDown]
     public void TearDown()
     {
+        actionsOutputService.Dispose();
         GlobalApplication.Deinitialize();
     }
 
@@ -97,7 +97,7 @@ internal class SqlWorkbenchViewModelTests
     public async Task TestNoConnection()
     {
         using var vm = CreateViewModel(default);
-        userQuestionsService.Received().ConnectionsErrorAsync(Arg.Any<MySqlException>());
+        await userQuestionsService.Received().ConnectionsErrorAsync(Arg.Any<MySqlException>());
     }
     
     [Test]
@@ -125,7 +125,7 @@ internal class SqlWorkbenchViewModelTests
         Assert.AreEqual("tab", results.GetShortValue(0, 1));
         
         results.UpdateSelectedCells("abc");
-        userQuestionsService.Received().InformCantEditNonSelectAsync();
+        await userQuestionsService.Received().InformCantEditNonSelectAsync();
         
         CollectionAssert.AreEqual(new []
         {
@@ -162,7 +162,7 @@ internal class SqlWorkbenchViewModelTests
         results.SelectedCellIndex = 1;
         results.Selection.Add(0);
         results.UpdateSelectedCells("newText");
-        userQuestionsService.Received().NoFullPrimaryKeyAsync();
+        await userQuestionsService.Received().NoFullPrimaryKeyAsync();
         Assert.AreEqual("text", results.GetShortValue(0, 1));
         
         CollectionAssert.AreEqual(new []
@@ -205,7 +205,7 @@ internal class SqlWorkbenchViewModelTests
         Assert.IsTrue(results.IsModified);
         Assert.IsTrue(vm.IsModified);
 
-        confirmationService.QueryConfirmationAsync(default, default).ReturnsForAnyArgs(Task.FromResult(QueryConfirmationResult.AlreadyExecuted));
+        confirmationService.QueryConfirmationAsync(default!, default!).ReturnsForAnyArgs(Task.FromResult(QueryConfirmationResult.AlreadyExecuted));
         userQuestionsService.ConfirmExecuteQueryAsync("START TRANSACTION").Returns(true);
         userQuestionsService.ConfirmExecuteQueryAsync("COMMIT").Returns(true);
         userQuestionsService.ConfirmExecuteQueryAsync("UPDATE `tab` SET `a` = 3 WHERE `a` = 5").Returns(true);
@@ -213,9 +213,9 @@ internal class SqlWorkbenchViewModelTests
         await results.ApplyChangesCommand.ExecuteAsync();
         Assert.IsTrue(actionsOutputService.Actions[2].IsSuccess);
         
-        userQuestionsService.Received().ConfirmExecuteQueryAsync("START TRANSACTION");
-        userQuestionsService.Received().ConfirmExecuteQueryAsync("COMMIT");
-        userQuestionsService.Received().ConfirmExecuteQueryAsync("UPDATE `tab` SET `a` = 3 WHERE `a` = 5");
+        await userQuestionsService.Received().ConfirmExecuteQueryAsync("START TRANSACTION");
+        await userQuestionsService.Received().ConfirmExecuteQueryAsync("COMMIT");
+        await userQuestionsService.Received().ConfirmExecuteQueryAsync("UPDATE `tab` SET `a` = 3 WHERE `a` = 5");
         
         CollectionAssert.AreEqual(new []
         {
@@ -266,15 +266,15 @@ internal class SqlWorkbenchViewModelTests
         Assert.IsTrue(results.IsModified);
         Assert.IsTrue(vm.IsModified);
         
-        confirmationService.QueryConfirmationAsync(default, default).ReturnsForAnyArgs(Task.FromResult(QueryConfirmationResult.AlreadyExecuted));
-        userQuestionsService.ConfirmExecuteQueryAsync(default).ReturnsForAnyArgs(true);
+        confirmationService.QueryConfirmationAsync(default!, default!).ReturnsForAnyArgs(Task.FromResult(QueryConfirmationResult.AlreadyExecuted));
+        userQuestionsService.ConfirmExecuteQueryAsync(default!).ReturnsForAnyArgs(true);
         Assert.IsTrue(results.ApplyChangesCommand.CanExecute(null));
         await results.ApplyChangesCommand.ExecuteAsync();
         Assert.IsTrue(actionsOutputService.Actions[2].IsSuccess);
         
-        userQuestionsService.Received().ConfirmExecuteQueryAsync("START TRANSACTION");
-        userQuestionsService.Received().ConfirmExecuteQueryAsync("COMMIT");
-        userQuestionsService.Received().ConfirmExecuteQueryAsync("INSERT INTO `tab` (`b`, `a`) VALUES\n(NULL, NULL),\n('txt', 3)");
+        await userQuestionsService.Received().ConfirmExecuteQueryAsync("START TRANSACTION");
+        await userQuestionsService.Received().ConfirmExecuteQueryAsync("COMMIT");
+        await userQuestionsService.Received().ConfirmExecuteQueryAsync("INSERT INTO `tab` (`b`, `a`) VALUES\n(NULL, NULL),\n('txt', 3)");
         
         CollectionAssert.AreEqual(new []
         {
@@ -331,9 +331,9 @@ internal class SqlWorkbenchViewModelTests
         await results.ApplyChangesCommand.ExecuteAsync();
         Assert.IsTrue(actionsOutputService.Actions[2].IsSuccess);
         
-        userQuestionsService.Received().ConfirmExecuteQueryAsync("START TRANSACTION");
-        userQuestionsService.Received().ConfirmExecuteQueryAsync("COMMIT");
-        userQuestionsService.Received().ConfirmExecuteQueryAsync("INSERT INTO `tab` (`b`, `a`) VALUES\n('abc', 2)");
+        await userQuestionsService.Received().ConfirmExecuteQueryAsync("START TRANSACTION");
+        await userQuestionsService.Received().ConfirmExecuteQueryAsync("COMMIT");
+        await userQuestionsService.Received().ConfirmExecuteQueryAsync("INSERT INTO `tab` (`b`, `a`) VALUES\n('abc', 2)");
         
         CollectionAssert.AreEqual(new []
         {
@@ -657,7 +657,7 @@ internal class SqlWorkbenchViewModelTests
         results.CopySelectedCommand.Execute(null);
         
         clipboard.Received().SetText("\"a\t\n\\\"bb\\\"c\"\t1\nefg\t3");
-        clipboard.GetText().ReturnsForAnyArgs(Task.FromResult("\"a\t\n\\\"bb\"c\"\t1\nefg\t3"));
+        clipboard.GetText().ReturnsForAnyArgs(Task.FromResult<string?>("\"a\t\n\\\"bb\"c\"\t1\nefg\t3"));
         await results.PasteSelectedCommand.ExecuteAsync();
         
         Assert.AreEqual(5, results.Count);
@@ -836,7 +836,7 @@ internal class SqlWorkbenchViewModelTests
         results.SelectedRowIndex = 0;
         
         Assert.IsTrue(results.CellEditor is StringCellEditorViewModel);
-        ((StringCellEditorViewModel)results.CellEditor)!.Document.Text = "def";
+        ((StringCellEditorViewModel)results.CellEditor!)!.Document.Text = "def";
         results.CellEditor.ApplyChangesCommand.Execute(null);
 
         Assert.AreEqual("def", results.GetShortValue(0, 1));
@@ -935,7 +935,7 @@ internal class SqlWorkbenchViewModelTests
         results.SelectedRowIndex = 0;
         
         Assert.IsTrue(results.CellEditor is StringCellEditorViewModel);
-        Assert.AreEqual("varchar(255)", results.CellEditor.Type);
+        Assert.AreEqual("varchar(255)", results.CellEditor!.Type);
     }
     
     [Test]

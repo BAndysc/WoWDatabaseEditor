@@ -8,6 +8,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Templates;
 using Avalonia.Data;
+using Avalonia.ReactiveUI;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using WDE.Common.Collections;
@@ -64,10 +65,10 @@ public class VirtualizedGridViewItemPresenter : Panel
             
             foreach (var column in Columns)
             {
-                IControl control;
+                Control control;
                 if (column.DataTemplate is { } dt)
                 {
-                    control = dt.Build(column);
+                    control = dt.Build(column) ?? new TextBlock(){Text = "Error: data template for column returned null control"};
                 } 
                 else if (column.Checkable)
                 {
@@ -181,7 +182,8 @@ public class VirtualizedGridViewItemPresenter : Panel
         get => items;
         set => SetAndRaise(ItemsProperty, ref items, value);
     }
-    
+
+    #pragma warning disable AVP1030
     public int? FocusedIndex
     {
         get
@@ -193,6 +195,7 @@ public class VirtualizedGridViewItemPresenter : Panel
         }
         set => SetValue(FocusedIndexProperty, value);
     }
+    #pragma warning restore AVP1030
 
     public IMultiIndexContainer Selection
     {

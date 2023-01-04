@@ -26,6 +26,8 @@ public partial class LootPickerView : UserControl
         {
             e.Handled = true;
             var veryFastTableView = this.FindControl<VeryFastTableView>("VeryFastTableView");
+            if (veryFastTableView== null)
+                return;
             veryFastTableView.Focus();
             if (!veryFastTableView.IsSelectedRowValid)
             {
@@ -39,7 +41,7 @@ public partial class LootPickerView : UserControl
         }
     }
 
-    private void VeryFastTableView_OnDoubleTapped(object? sender, RoutedEventArgs e)
+    private void VeryFastTableView_OnDoubleTapped(object? sender, TappedEventArgs e)
     {
         if (DataContext is LootPickerViewModel vm)
         {

@@ -44,6 +44,8 @@ namespace WDE.MapRenderer
             });
         }
 
+        public bool IsSupported => true;
+
         public async Task<Game> Open()
         {
             if (!GlobalApplication.Supports3D)

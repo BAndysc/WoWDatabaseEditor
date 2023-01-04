@@ -159,4 +159,16 @@ public readonly struct PublicMySqlDecimal : IComparable<PublicMySqlDecimal>
     public static bool operator >=(PublicMySqlDecimal left, PublicMySqlDecimal right) => left.CompareTo(right) >= 0;
     public static bool operator ==(PublicMySqlDecimal left, PublicMySqlDecimal right) => left.CompareTo(right) == 0;
     public static bool operator !=(PublicMySqlDecimal left, PublicMySqlDecimal right) => left.CompareTo(right) != 0;
+
+    public override int GetHashCode()
+    {
+        return 0;
+    }
+
+    public override bool Equals(object? obj)
+    {
+        if (obj is PublicMySqlDecimal other)
+            return other == this;
+        return false;
+    }
 }

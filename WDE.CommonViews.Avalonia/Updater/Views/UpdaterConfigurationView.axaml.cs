@@ -3,7 +3,7 @@ using Avalonia.Markup.Xaml;
 
 namespace WDE.CommonViews.Avalonia.Updater.Views
 {
-    public class UpdaterConfigurationView : UserControl
+    public partial class UpdaterConfigurationView : UserControl
     {
         public UpdaterConfigurationView()
         {

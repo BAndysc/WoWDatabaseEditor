@@ -1,8 +1,10 @@
+using System.Globalization;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Media.TextFormatting;
+using Avalonia.Threading;
 using AvaloniaStyles.Controls.FastTableView;
 using WDE.Common.Avalonia;
 using WDE.Common.Avalonia.Services;
@@ -45,7 +47,7 @@ public class CustomCellDrawer : BaseCustomCellDrawer, ICustomCellDrawer
         if (!row.Entity.ExistInDatabase)
         {
             var pen = row.IsPhantomEntity ? PhantomRowPen : ModifiedCellPen;
-            context.FillRectangle(pen.Brush, rect.WithWidth(5));
+            context.FillRectangle(pen.Brush ?? Brushes.Black, rect.WithWidth(5));
             context.DrawLine(pen, rect.TopLeft,rect.TopRight);
             context.DrawLine(pen, rect.BottomLeft, rect.BottomRight);
         }
@@ -87,7 +89,7 @@ public class CustomCellDrawer : BaseCustomCellDrawer, ICustomCellDrawer
                 async Task FetchAsync()
                 {
                     await itemIconService.GetIcon((int)longField.Current.Value);
-                    table.InvalidateVisual();
+                    Dispatcher.UIThread.Post(table.InvalidateVisual);
                 }
                 FetchAsync().ListenErrors();
             }
@@ -101,7 +103,7 @@ public class CustomCellDrawer : BaseCustomCellDrawer, ICustomCellDrawer
                 async Task UpdateIcon(uint spell)
                 {
                     await spellIconService.GetIcon(spell);
-                    table.InvalidateVisual();
+                    Dispatcher.UIThread.Post(table.InvalidateVisual);
                 }
                 UpdateIcon(spellId).ListenErrors();
             }

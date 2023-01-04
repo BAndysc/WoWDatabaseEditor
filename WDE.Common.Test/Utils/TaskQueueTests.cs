@@ -75,20 +75,24 @@ public class TaskQueueTests
             Enumerable.Range(0, numberOfTasks).Select(x => new TaskCompletionSource()).ToArray();
 
         List<int> taskResultOutput = new List<int>();
-        
+
+        List<Task> scheduledTasks = new List<Task>();
+
         for (int i = 0; i < numberOfTasks; i++)
         {
             int taskId = i;
-            queue.Schedule(async _ =>
+            scheduledTasks.Add(queue.Schedule(async _ =>
             {
                 taskResultOutput.Add(taskId);
                 await tasks[taskId].Task;
-            });
+            }));
         }
 
         // finish the tasks in reverse order
         for (int i = numberOfTasks - 1; i >= 0; i--)
             tasks[i].SetResult();
+
+        await Task.WhenAll(scheduledTasks.ToArray());
 
         // but they should run in order
         CollectionAssert.AreEqual(new int[]{0, 1, 2, 3, 4}, taskResultOutput);

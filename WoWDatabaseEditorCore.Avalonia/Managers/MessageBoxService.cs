@@ -1,12 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Controls.Primitives;
+using Avalonia.LogicalTree;
+using Avalonia.Media;
 using Prism.Events;
+using WDE.Common;
 using WDE.Common.Events;
 using WDE.Common.Services.MessageBox;
+using WDE.Common.Tasks;
 using WDE.Common.Utils;
 using WDE.Module.Attributes;
+using WDE.MVVM.Observable;
+using WoWDatabaseEditorCore.Avalonia.Controls;
 using WoWDatabaseEditorCore.Avalonia.Services.MessageBoxService;
 using WoWDatabaseEditorCore.Avalonia.Views;
 
@@ -31,7 +43,16 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
 
         private void OnLoaded()
         {
-            mainWindowHolder.RootWindow.Activated += WindowOnActivated;
+            try
+            {
+                if (mainWindowHolder.RootWindow != null)
+                    mainWindowHolder.RootWindow.Activated += WindowOnActivated;
+            }
+            catch (Exception e)
+            {
+                LOG.LogError(e);
+                throw;
+            }
         }
 
         private void WindowOnActivated(object? sender, EventArgs e)
@@ -51,10 +72,35 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
         {
             Debug.Assert(!dialogOpened);
             dialogOpened = true;
-            MessageBoxView view = new MessageBoxView();
             var viewModel = new MessageBoxViewModel<T>(messageBox);
-            view.DataContext = viewModel;
-            await mainWindowHolder.ShowDialog<bool>(view);
+            if (GlobalApplication.SingleView)
+            {
+                var view = new MessageBoxControlView() { DataContext = viewModel };
+                viewModel.Close += () =>
+                {
+                };
+                Control? visualRoot;
+
+                if (Application.Current!.ApplicationLifetime is ISingleViewApplicationLifetime viewApp)
+                    visualRoot = viewApp.MainView;
+                else
+                    visualRoot = mainWindowHolder.RootWindow.GetLogicalChildren().FirstOrDefault() as MainWebView;
+
+                var panel = visualRoot!.GetControl<PseudoWindowsPanel>("PART_WindowsContainer");
+
+                await panel.ShowDialog(new FakeWindow()
+                {
+                    Content = view,
+                    DataContext = viewModel
+                });
+            }
+            else
+            {
+                MessageBoxView view = new MessageBoxView();
+                view.DataContext = viewModel;
+                await mainWindowHolder.ShowDialog<bool>(view);
+            }
+
             dialogOpened = false;
 
             if (pending.Count > 0)
@@ -63,7 +109,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
                 pending.RemoveAt(0);
                 first().ListenErrors(); // no await! this is another dialog
             }
-            
+
             return viewModel.SelectedOption;
         }
         

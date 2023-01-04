@@ -1,11 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-<!--        <WarningsAsErrors>nullable</WarningsAsErrors>-->
+        <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+        <NoWarn>$(NoWarn),CS8618,CS8603,CS8629,CS8602,CS8604,CS0219,CS8600,CS0414</NoWarn>
+<!--        <WarningsAsErrors>$(WarningsAsErrors),nullable</WarningsAsErrors>-->
     </PropertyGroup>
     <Import Project="..\Avalonia.props" />
     <PropertyGroup>

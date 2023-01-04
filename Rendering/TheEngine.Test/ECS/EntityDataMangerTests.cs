@@ -25,16 +25,16 @@ namespace TheEngine.Test.ECS
 
         private class ManagedData : IManagedComponentData
         {
-            public string str;
+            public string? str;
         }
         
         private IEntityManager entityManager = null!;
-        private Archetype archetype;
-        private Archetype archetypeOnlyA;
-        private Archetype archetypeOnlyB;
-        private Archetype archetypeOnlyC;
-        private Archetype archetypeOnlyManaged;
-        private Archetype archetypeAAndManaged;
+        private Archetype archetype = null!;
+        private Archetype archetypeOnlyA = null!;
+        private Archetype archetypeOnlyB = null!;
+        private Archetype archetypeOnlyC = null!;
+        private Archetype archetypeOnlyManaged = null!;
+        private Archetype archetypeAAndManaged = null!;
         
         [SetUp]
         public void Setup()

@@ -3,6 +3,7 @@ using System.Linq;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
+using WDE.Common;
 using WDE.Module.Attributes;
 using WDE.SqlWorkbench.Antlr;
 using WDE.SqlWorkbench.Models;
@@ -243,7 +244,7 @@ internal class QueryUtility : IQueryUtility
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            LOG.LogError(e);
             return false;
         }
     }

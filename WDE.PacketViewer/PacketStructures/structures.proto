@@ -1,6 +1,5 @@
 syntax = "proto3";
 package wpp;
-import "google/protobuf/timestamp.proto";
 option csharp_namespace = "WoWPacketParser.Proto2";
 
 message FakeMessageSoThatCompilationWorks {

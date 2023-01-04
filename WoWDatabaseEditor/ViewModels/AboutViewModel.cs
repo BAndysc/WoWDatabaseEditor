@@ -30,7 +30,7 @@ namespace WoWDatabaseEditorCore.ViewModels
         public AboutViewModel(IApplicationVersion applicationVersion,
             IDatabaseProvider databaseProvider, 
             IDbcStore dbcStore,
-            IConfigureService settings,
+            Lazy<IConfigureService> settings,
             ICurrentCoreVersion coreVersion,
             IRemoteConnectorService remoteConnectorService,
             ISourceCodePathService sourceCodePathService)
@@ -62,7 +62,7 @@ namespace WoWDatabaseEditorCore.ViewModels
 
             AllConfigured = ConfigurationChecks.All(s => s.Fulfilled);
 
-            OpenSettingsCommand = new DelegateCommand(settings.ShowSettings);
+            OpenSettingsCommand = new DelegateCommand(() => settings.Value.ShowSettings());
         }
 
         public ICommand OpenSettingsCommand { get; }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Globalization;
 using System.Linq;
 using System.Windows.Input;
 using Avalonia;
@@ -10,6 +11,8 @@ using Avalonia.Input;
 using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using Avalonia.Media;
+using AvaloniaStyles.Controls;
+using WDE.Common.Avalonia;
 using WDE.Common.Managers;
 using WDE.Common.Utils;
 using WDE.EventAiEditor.Editor.UserControls;
@@ -18,7 +21,7 @@ using WDE.EventAiEditor.Models;
 
 namespace WDE.EventAiEditor.Avalonia.Editor.UserControls
 {
-    internal class EventAiPanelLayout : Panel
+    internal class EventAiPanelLayout : RenderedPanel
     {
         private readonly List<(float y, float height, int actionIndex, int eventIndex)> actionHeights = new();
         private readonly List<(float y, float height, int conditionIndex, int eventIndex)> conditionHeights = new();
@@ -56,10 +59,14 @@ namespace WDE.EventAiEditor.Avalonia.Editor.UserControls
         {
             panel.mouseStartPosition = e.GetPosition(panel);
         }
-        
-        protected override void LogicalChildrenCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+
+        public EventAiPanelLayout()
         {
-            base.LogicalChildrenCollectionChanged(sender, e);
+            Children.CollectionChanged += ChildrenCollectionChanged;
+        }
+
+        protected void ChildrenCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
                 foreach (var o in e.NewItems!)
@@ -140,10 +147,10 @@ namespace WDE.EventAiEditor.Avalonia.Editor.UserControls
 
         private IEnumerable<ContentPresenter> Events()
         {
-            foreach (ContentPresenter child in Children)
+            foreach (var child in Children)
             {
-                if (child.Content is EventAiEvent)
-                    yield return child;
+                if (child is ContentPresenter { Content: EventAiEvent } cp)
+                    yield return cp;
             }
         }
         
@@ -187,24 +194,24 @@ namespace WDE.EventAiEditor.Avalonia.Editor.UserControls
             if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed &&
                 e.ClickCount == 1)
             {
-                foreach (ContentPresenter @event in Children)
-                    if (@event.Child != null)
-                        SetSelected(@event.Child, false);
+                foreach (var @event in Children)
+                {
+                    if (@event is not ContentPresenter cp)
+                        continue;
+                    if (cp.Child != null)
+                        SetSelected(cp.Child, false);
+                }
             }            
         }
 
         private void UpdateIsCopying(KeyModifiers key)
         {
-            var systemWideControlModifier = AvaloniaLocator.Current
-                .GetService<PlatformHotkeyConfiguration>()?.CommandModifiers ?? KeyModifiers.Control;
+            var systemWideControlModifier = KeyGestures.CommandModifier;
             isCopying = key.HasFlagFast(systemWideControlModifier);
         }
 
         protected override void OnPointerReleased(PointerReleasedEventArgs e)
         {
-            var systemWideControlModifier = AvaloniaLocator.Current
-                .GetService<PlatformHotkeyConfiguration>()?.CommandModifiers ?? KeyModifiers.Control;
-            
             base.OnPointerReleased(e);
             UpdateIsCopying(e.KeyModifiers);
             StopDragging();
@@ -248,9 +255,9 @@ namespace WDE.EventAiEditor.Avalonia.Editor.UserControls
 
         private static FormattedText? vvvvText;
         private static FormattedTextNumberCache NumberCache = new();
+
         public override void Render(DrawingContext dc)
         {
-            base.Render(dc);
             if (AnythingSelected())
             {
                 if (draggingActions)
@@ -265,19 +272,16 @@ namespace WDE.EventAiEditor.Avalonia.Editor.UserControls
                     {
                         float x = 1;
                         float y = OverIndexEvent.y - OverIndexEvent.height / 2 - 1;
-                        dc.DrawLine(new Pen(Brushes.Gray, 1), new Point(x, y), new Point(x + EventWidth(Bounds.Width), y));   
+                        dc.DrawLine(new Pen(Brushes.Gray, 1), new Point(x, y), new Point(x + EventWidth(Bounds.Width), y));
                     }
                 }
             }
 
             if (vvvvText == null)
             {
-                vvvvText = new FormattedText();
-                vvvvText.FontSize = 7;
-                vvvvText.Text = "vvvv";
-                vvvvText.Typeface = Typeface.Default;
+                vvvvText = new FormattedText("vvv", CultureInfo.CurrentCulture,FlowDirection.LeftToRight,Typeface.Default, 7, null);
             }
-            
+
             int index = 1;
             double yPos = 0;
             foreach (var e in Script.Events)
@@ -289,7 +293,7 @@ namespace WDE.EventAiEditor.Avalonia.Editor.UserControls
                     yPos = eventPresenter.Bounds.Y;
 
                     var ft = NumberCache.Get(index);
-                    dc.DrawText(Brushes.DarkGray, new Point(0, yPos + 5), ft);
+                    dc.DrawText(ft, new Point(0, yPos + 5)); // Brushes.DarkGray;
                     DrawProblems(dc, index, yPos);
                     index++;
                 }
@@ -299,11 +303,11 @@ namespace WDE.EventAiEditor.Avalonia.Editor.UserControls
                     {
                         if (!actionToPresenter.TryGetValue(a, out var actionPresenter))
                             continue;
-                        
+
                         yPos = actionPresenter.Bounds.Y;
 
                         var ft = NumberCache.Get(index);
-                        dc.DrawText(Brushes.DarkGray, new Point(0, yPos + 5), ft);
+                        dc.DrawText(ft, new Point(0, yPos + 5)); // Brushes.DarkGray;
                         DrawProblems(dc, index, yPos);
                         index++;
                     }
@@ -315,7 +319,8 @@ namespace WDE.EventAiEditor.Avalonia.Editor.UserControls
         {
             if (Problems != null && Problems.TryGetValue(index, out var severity))
             { 
-                dc.DrawText(severity is DiagnosticSeverity.Error or DiagnosticSeverity.Critical ? Brushes.Red : Brushes.Orange, new Point(0, yPos + 5 + 10), vvvvText);   
+                vvvvText!.SetForegroundBrush(severity is DiagnosticSeverity.Error or DiagnosticSeverity.Critical ? Brushes.Red : Brushes.Orange);
+                dc.DrawText(vvvvText, new Point(0, yPos + 5 + 10));   
             }
         }
 
@@ -342,10 +347,7 @@ namespace WDE.EventAiEditor.Avalonia.Editor.UserControls
                 Array.Resize(ref cache, size);
                 for (int i = old; i < size; ++i)
                 {
-                    cache[i] = new FormattedText();
-                    cache[i].Text = $"{i}";
-                    cache[i].FontSize = 10;
-                    cache[i].Typeface = Typeface.Default;
+                    cache[i] = new FormattedText($"{i}", CultureInfo.CurrentCulture, FlowDirection.LeftToRight, Typeface.Default, 10, Brushes.DarkGray);
                 }
             }
         }
@@ -439,9 +441,9 @@ namespace WDE.EventAiEditor.Avalonia.Editor.UserControls
             InvalidateArrange();
         }
 
-        protected override void OnPointerLeave(PointerEventArgs e)
+        protected override void OnPointerExited(PointerEventArgs e)
         {
-            base.OnPointerLeave(e);
+            base.OnPointerExited(e);
             mouseStartPositionValid = false;
         }
 
@@ -470,7 +472,7 @@ namespace WDE.EventAiEditor.Avalonia.Editor.UserControls
                 eventHeights.Add((y + (lastHeight + EventSpacing) / 2, lastHeight + EventSpacing, eventIndex - 1));
                 y += lastHeight + EventSpacing;
 
-                if (!draggingEvents || isCopying || !GetSelected(eventPresenter.Child))
+                if (!draggingEvents || isCopying || eventPresenter.Child == null || !GetSelected(eventPresenter.Child))
                     continue;
                 selectedHeight += lastHeight + EventSpacing;
             }
@@ -495,7 +497,7 @@ namespace WDE.EventAiEditor.Avalonia.Editor.UserControls
                     continue;
 
                 var height = (float)eventPresenter.DesiredSize.Height;
-                if (!draggingEvents || isCopying || !GetSelected(eventPresenter.Child))
+                if (!draggingEvents || isCopying || eventPresenter.Child == null || !GetSelected(eventPresenter.Child))
                 {
                     float actionHeight = ArrangeActions(eventIndex, 0, finalSize, eventPresenter, y, height);
                     height = Math.Max(height, actionHeight);
@@ -532,7 +534,7 @@ namespace WDE.EventAiEditor.Avalonia.Editor.UserControls
                 if (!eventToPresenter.TryGetValue(ev, out var eventPresenter))
                     continue;
                 var height = (float) eventPresenter.DesiredSize.Height;
-                if (draggingEvents && !isCopying && GetSelected(eventPresenter.Child))
+                if (draggingEvents && !isCopying && eventPresenter.Child != null && GetSelected(eventPresenter.Child))
                 {
                     height = Math.Max(height, ArrangeActions(eventIndex, 20, finalSize, eventPresenter, start, height));
                     eventPresenter.Arrange(new Rect(20 + PaddingLeft, start, EventWidth(finalSize.Width) - PaddingLeft, height));
@@ -594,18 +596,17 @@ namespace WDE.EventAiEditor.Avalonia.Editor.UserControls
 
             return totalHeight;
         }
-        
-        // protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
-        // {
-        //     base.OnRenderSizeChanged(sizeInfo);
-        //     InvalidateMeasure();
-        //     InvalidateArrange();
-        // }
-        //
+
+        protected override void OnSizeChanged(SizeChangedEventArgs e)
+        {
+            base.OnSizeChanged(e);
+            InvalidateMeasure();
+            InvalidateArrange();
+        }
 
         public EventAiScript Script
         {
-            get => (EventAiScript) GetValue(ScriptProperty)!;
+            get => (EventAiScript?) GetValue(ScriptProperty) ?? throw new NullReferenceException();
             set => SetValue(ScriptProperty, value);
         }
 
@@ -624,9 +625,9 @@ namespace WDE.EventAiEditor.Avalonia.Editor.UserControls
 
         public float ActionSpacing => 2;
 
-        public static readonly AvaloniaProperty SelectedProperty = AvaloniaProperty.RegisterAttached<EventAiPanelLayout, IControl, bool>("Selected");
-        public static bool GetSelected(IControl control) => (bool?)control.GetValue(SelectedProperty) ?? false;
-        public static void SetSelected(IControl control, bool value) => control.SetValue(SelectedProperty, value);
+        public static readonly AvaloniaProperty SelectedProperty = AvaloniaProperty.RegisterAttached<EventAiPanelLayout, Control, bool>("Selected");
+        public static bool GetSelected(Control control) => (bool?)control.GetValue(SelectedProperty) ?? false;
+        public static void SetSelected(Control control, bool value) => control.SetValue(SelectedProperty, value);
 
         public static readonly AvaloniaProperty DropItemsProperty = AvaloniaProperty.Register<EventAiPanelLayout, ICommand>(nameof(DropItems));
 

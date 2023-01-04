@@ -7,7 +7,7 @@ using WDE.DatabaseEditors.Models;
 
 namespace WDE.DatabaseEditors.Parameters;
 
-public class DbScriptRandomTemplateTargetValueParameter : IAsyncContextualParameter<long, DatabaseEntity>, ICustomPickerContextualParameter<long>
+public class DbScriptRandomTemplateTargetValueParameter : BaseAsyncContextualParameter<long, DatabaseEntity>, ICustomPickerContextualParameter<long>
 {
     private readonly IParameterPickerService pickerService;
     private readonly IAsyncParameter<long>? broadcastTextsParameter;
@@ -40,12 +40,12 @@ public class DbScriptRandomTemplateTargetValueParameter : IAsyncContextualParame
         return pickerService.PickParameter(parameter, value);
     }
     
-    public string ToString(long value, DatabaseEntity context)
+    public override string ToString(long value, DatabaseEntity context)
     {
         return value.ToString();
     }
 
-    public Task<string> ToStringAsync(long value, CancellationToken token, DatabaseEntity entity)
+    public override Task<string> ToStringAsync(long value, CancellationToken token, DatabaseEntity entity)
     {
         var cell = entity.GetTypedValueOrThrow<long>("type");
         if (cell == (int)IMangosDatabaseProvider.RandomTemplateType.Text && broadcastTextsParameter != null)
@@ -53,9 +53,9 @@ public class DbScriptRandomTemplateTargetValueParameter : IAsyncContextualParame
         return Task.FromResult(value.ToString());
     }
 
-    public string? Prefix => null;
-    public bool HasItems => true;
+    public override string? Prefix => null;
+    public override bool HasItems => true;
     public bool AllowUnknownItems => true;
-    public string ToString(long value) => value.ToString();
-    public Dictionary<long, SelectOption>? Items => null;
+    public override string ToString(long value) => value.ToString();
+    public override Dictionary<long, SelectOption>? Items => null;
 }

@@ -9,7 +9,7 @@ namespace AvaloniaGraph.Controls;
 public class ConnectionItem : ListBoxItem
 {
     public static readonly StyledProperty<Point> TopLeftPositionProperty =
-        AvaloniaProperty.Register<GraphNodeItemView, Point>(nameof(TopLeftPosition),
+        AvaloniaProperty.Register<ConnectionItem, Point>(nameof(TopLeftPosition),
             defaultBindingMode: BindingMode.TwoWay);
 
     private GraphControl? ParentGraphControl => this.FindAncestorOfType<GraphControl>();

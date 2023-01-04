@@ -8,12 +8,17 @@
     
     <!-- change fluent style to windows classic -->
     
-    <Style Selector="Button, RepeatButton, ToggleButton">
+    <Style Selector="Button, RepeatButton, ToggleButton, DropDownButton">
+      <Setter Property="VerticalContentAlignment" Value="Center" />
       <Setter Property="RenderTransform" Value="none" />
       <Setter Property="Transitions">
         <Transitions>
         </Transitions>
       </Setter>
+    </Style>
+
+    <Style Selector="Button:pressed, RepeatButton:pressed, ToggleButton:pressed, DropDownButton:pressed">
+      <Setter Property="RenderTransform" Value="none" />
     </Style>
     
     <!--<Style Selector="Button /template/ ContentPresenter#PART_ContentPresenter">
@@ -33,14 +38,14 @@
       </Setter>
     </Style>-->
 
-    <Style Selector="Button:pressed, RepeatButton:pressed, ToggleButton:pressed">
+    <Style Selector="Button:pressed, RepeatButton:pressed, ToggleButton:pressed, DropDownButton:pressed">
       <Setter Property="RenderTransform" Value="none" />
     </Style>
 
     <Style Selector="Button.accent:disabled /template/ ContentPresenter#PART_ContentPresenter">
       <Setter Property="Background" Value="{DynamicResource AccentButtonBackgroundDisabled}" />
       <Setter Property="BorderBrush" Value="{DynamicResource AccentButtonBorderBrushDisabled}" />
-      <Setter Property="TextBlock.Foreground" Value="{DynamicResource AccentButtonForegroundDisabled}" />
+      <Setter Property="TextElement.Foreground" Value="{DynamicResource AccentButtonForegroundDisabled}" />
     </Style>
     
     <Style Selector="Button /template/ ContentPresenter#PART_ContentPresenter">

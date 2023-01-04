@@ -7,7 +7,7 @@ using WDE.SmartScriptEditor.Models;
 
 namespace WDE.SmartScriptEditor.Parameters
 {
-    public class StoredTargetOrActorParameter : IContextualParameter<long, SmartBaseElement>, ICustomPickerContextualParameter<long>
+    public class StoredTargetOrActorParameter : BaseContextualParameter<long, SmartBaseElement>, ICustomPickerContextualParameter<long>
     {
         private readonly VariableContextualParameter storedTarget;
         private readonly VariableContextualParameter actor;
@@ -38,7 +38,7 @@ namespace WDE.SmartScriptEditor.Parameters
                 : actor.PickValue(value, context);
         }
         
-        public string ToString(long value, SmartBaseElement context)
+        public override string ToString(long value, SmartBaseElement context)
         {
             return GetScript(context) is SmartScript
                 ? storedTarget.ToString(value, context)
@@ -46,13 +46,13 @@ namespace WDE.SmartScriptEditor.Parameters
         }
 
         public bool AllowUnknownItems => true;
-        public string? Prefix => null;
-        public bool HasItems => true;
-        public string ToString(long value) => value.ToString();
-        public Dictionary<long, SelectOption>? Items => null;
+        public override string? Prefix => null;
+        public override bool HasItems => true;
+        public override string ToString(long value) => value.ToString();
+        public override Dictionary<long, SelectOption>? Items => null;
     }
     
-    public class VariableContextualParameter : IContextualParameter<long, SmartBaseElement>, ICustomPickerContextualParameter<long>
+    public class VariableContextualParameter : BaseContextualParameter<long, SmartBaseElement>, ICustomPickerContextualParameter<long>
     {
         private readonly GlobalVariableType type;
         private readonly string name;
@@ -88,7 +88,7 @@ namespace WDE.SmartScriptEditor.Parameters
             return (result ?? 0, result.HasValue);
         }
 
-        public string? Prefix => null;
+        public override string? Prefix => null;
 
         private static SmartScriptBase? GetScript(SmartBaseElement? element)
         {
@@ -139,14 +139,14 @@ namespace WDE.SmartScriptEditor.Parameters
             return $"{name}\\[{value}\\]";
         }
 
-        public string ToString(long value, SmartBaseElement context)
+        public override string ToString(long value, SmartBaseElement context)
         {
             return ToString(value, context, name, type);
         }
 
-        public bool HasItems => true;
+        public override bool HasItems => true;
 
-        public string ToString(long value) => value.ToString();
-        public Dictionary<long, SelectOption>? Items => null;
+        public override string ToString(long value) => value.ToString();
+        public override Dictionary<long, SelectOption>? Items => null;
     }
 }

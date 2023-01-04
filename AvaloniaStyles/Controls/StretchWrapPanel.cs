@@ -35,9 +35,9 @@ namespace AvaloniaStyles.Controls
 
             for (var i = 0; i < visualCount; i++)
             {
-                IVisual visual = visualChildren[i];
+                Visual visual = visualChildren[i];
 
-                if (visual is not ILayoutable layoutable)
+                if (visual is not Layoutable layoutable)
                     continue;
                 
                 layoutable.Measure(availableSize.WithWidth(Math.Max(availableSize.Width, 100)));
@@ -87,9 +87,9 @@ namespace AvaloniaStyles.Controls
             
             for (var i = 0; i < visualCount; i++)
             {
-                IVisual visual = visualChildren[i];
+                Visual visual = visualChildren[i];
 
-                if (visual is ILayoutable layoutable)
+                if (visual is Layoutable layoutable)
                 {
                     StyledElement? styledElement = layoutable as StyledElement;
                     if (styledElement == null)

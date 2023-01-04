@@ -14,7 +14,6 @@ namespace TheAvaloniaOpenGL.Resources
             var data = ArrayPool<Rgba32>.Shared.Rent(width * height * texturesCount);
             for (int i = 0; i < mipsCount; ++i)
             {
-                int ptr = 0;
                 for (int j = 0; j < texturesCount; ++j)
                 {
                     var jThTexiThMip = pixels[j][i];

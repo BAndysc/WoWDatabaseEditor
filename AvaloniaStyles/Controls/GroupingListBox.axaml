@@ -35,16 +35,14 @@
                         BorderBrush="{TemplateBinding BorderBrush}"
                         BorderThickness="{TemplateBinding BorderThickness}">
                     <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Name="PART_ScrollViewer">
-                        <ItemsControl Items="{TemplateBinding Items}" Name="PART_ParentItems">
+                        <ItemsControl ItemsSource="{TemplateBinding Items}" Name="PART_ParentItems">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <StackPanel>
                                         <ContentPresenter ContentTemplate="{Binding RelativeSource={RelativeSource AncestorType=controls:GroupingListBox}, Path=HeaderTemplate}" Content="{Binding}" />
-                                        <controls:GroupingListBoxInner Items="{Binding}"
-                                                  VirtualizationMode="None" 
-                                                  CustomSelectedItem="{Binding RelativeSource={RelativeSource AncestorType=controls:GroupingListBox}, Path=SelectedItem}"
-                                                  ItemTemplate="{Binding RelativeSource={RelativeSource AncestorType=controls:GroupingListBox}, Path=ItemTemplate}"
-                                                  ItemsPanel="{Binding RelativeSource={RelativeSource AncestorType=controls:GroupingListBox}, Path=ItemsPanel}">
+                                        <controls:GroupingListBoxInner ItemsSource="{Binding}"
+                                                                       CustomSelectedItem="{Binding RelativeSource={RelativeSource AncestorType=controls:GroupingListBox}, Path=SelectedItem}"
+                                                                       ItemTemplate="{Binding RelativeSource={RelativeSource AncestorType=controls:GroupingListBox}, Path=ItemTemplate}">
                                         </controls:GroupingListBoxInner>
                                     </StackPanel>
                                 </DataTemplate>
@@ -61,11 +59,8 @@
             <Setter.Value>
                 <ControlTemplate>
                     <ItemsPresenter Name="PART_ItemsPresenter"
-                                    Items="{TemplateBinding Items}"
                                     ItemsPanel="{TemplateBinding ItemsPanel}"
-                                    ItemTemplate="{TemplateBinding ItemTemplate}"
-                                    Margin="{TemplateBinding Padding}"
-                                    VirtualizationMode="{TemplateBinding VirtualizationMode}"/>
+                                    Margin="{TemplateBinding Padding}"/>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

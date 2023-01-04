@@ -47,8 +47,11 @@ public readonly struct HslColor
         return new Color((byte)(opacity * 255), (byte)result.X, (byte)result.Y, (byte)result.Z);
     }
 
-    public HslColor Scale(HslDiff scaler)
+    public HslColor Scale(HslDiff? scaler)
     {
+        if (scaler == null)
+            return this;
+        
         double l = L;
         if (scaler.L > 0.5)
         {

@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Globalization;
 using System.Linq;
+using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Documents;
 using Avalonia.Controls.Generators;
 using Avalonia.Controls.Templates;
 using Avalonia.Data;
@@ -21,7 +24,7 @@ using WDE.MVVM.Utils;
 
 namespace WDE.Common.Avalonia.Controls;
 
-public class VirtualizedTreeView : Panel
+public class VirtualizedTreeView : RenderedPanel
 {
     public static readonly StyledProperty<IReadOnlyList<INodeType>?> ItemsProperty = AvaloniaProperty.Register<VirtualizedTreeView, IReadOnlyList<INodeType>?>(nameof(Items));
     public static readonly StyledProperty<bool> IsFilteredProperty = AvaloniaProperty.Register<VirtualizedTreeView, bool>(nameof(IsFiltered));
@@ -76,24 +79,34 @@ public class VirtualizedTreeView : Panel
         if (e.Handled)
             return;
         
-        if (e.Source is IVisual source)
+        if (e.Source is Visual source)
         {
             var point = e.GetCurrentPoint(source);
 
             if (point.Properties.IsLeftButtonPressed || point.Properties.IsRightButtonPressed)
             {
                 e.Handled = UpdateSelectionFromEventSource(
-                    e.Source as IControl,
+                    e.Source as Control,
                     true,
-                    e.KeyModifiers.HasAllFlags(KeyModifiers.Shift),
-                    e.KeyModifiers.HasAllFlags(AvaloniaLocator.Current.GetRequiredService<PlatformHotkeyConfiguration>().CommandModifiers),
+                    e.KeyModifiers.HasFlagFast(KeyModifiers.Shift),
+                    e.KeyModifiers.HasFlagFast(GetPlatformCommandKey()),
                     point.Properties.IsRightButtonPressed,
                     e.ClickCount);
             }
         }
     }
     
-    protected bool UpdateSelectionFromEventSource(IControl? eventSource,
+    private static KeyModifiers GetPlatformCommandKey()
+    {            
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            return KeyModifiers.Meta;
+        }
+
+        return KeyModifiers.Control;
+    }
+
+    protected bool UpdateSelectionFromEventSource(Control? eventSource,
         bool select = true,
         bool rangeModifier = false,
         bool toggleModifier = false,
@@ -107,12 +120,12 @@ public class VirtualizedTreeView : Panel
             // and it clashed with this code
             //if (clickCount == 2)
             //    parent.IsExpanded = !parent.IsExpanded;
-            SelectedNode = parent;
+            SetCurrentValue(SelectedNodeProperty, parent);
             InvalidateArrange();
         }
         else if (obj is INodeType child)
         {
-            SelectedNode = child;
+            SetCurrentValue(SelectedNodeProperty, child);
             InvalidateArrange();
         }
 
@@ -126,12 +139,12 @@ public class VirtualizedTreeView : Panel
         {
             if (e.Key == Key.Down)
             {
-                SelectedNode = Items?.FirstOrDefault(x => x.IsVisible);
+                SetCurrentValue(SelectedNodeProperty, Items?.FirstOrDefault(x => x.IsVisible));
                 e.Handled = true;
             }
             else if (e.Key == Key.Up)
             {
-                SelectedNode = Items?.LastOrDefault(x => x.IsVisible);
+                SetCurrentValue(SelectedNodeProperty, Items?.LastOrDefault(x => x.IsVisible));
                 e.Handled = true;
             }
             return;
@@ -167,7 +180,7 @@ public class VirtualizedTreeView : Panel
             if (parentToCollapse != null && parentToCollapse.IsExpanded)
             {
                 parentToCollapse.IsExpanded = false;
-                SelectedNode = parentToCollapse;
+                SetCurrentValue(SelectedNodeProperty, parentToCollapse);
                 e.Handled = true;
             }
             else
@@ -187,7 +200,7 @@ public class VirtualizedTreeView : Panel
             var currentIndex = items.IndexOf(SelectedNode);
             int nextIndex = GetNextIndex(items, currentIndex, moveDownUp);
             if (nextIndex != -1)
-                SelectedNode = items[nextIndex];
+                SetCurrentValue(SelectedNodeProperty, items[nextIndex]);
 
             e.Handled = true;
         }
@@ -300,9 +313,11 @@ public class VirtualizedTreeView : Panel
         var endOffset = startOffset + scrollViewer.Viewport.Height;
         var startIndex = Math.Max(0, (int)(scrollViewer.Offset.Y / RowHeight) - 1);
         var endIndex = Math.Min(startIndex + scrollViewer.Viewport.Height / RowHeight + 2, Items.Count);
-        
-        var font = new Typeface(TextBlock.GetFontFamily(this));
-        var foreground = TextBlock.GetForeground(this);
+
+        Renderer.Arrange(new Rect(scrollViewer.Extent));
+
+        var font = new Typeface(TextElement.GetFontFamily(this));
+        var foreground = TextElement.GetForeground(this);
         var pen = new Pen(foreground, 2);
 
         var hasFilter = IsFiltered;
@@ -341,6 +356,7 @@ public class VirtualizedTreeView : Panel
                         (_, _) => new TextBlock() { Text = "No template! Define <DataTemplates>" })
                 };
 
+                element.Measure(rowRect.Size);
                 element.Arrange(rowRect);
                 element.IsSelected = isSelected;
             }
@@ -387,20 +403,24 @@ public class VirtualizedTreeView : Panel
 
     public override void Render(DrawingContext context)
     {
-        base.Render(context);
-
         if (Items == null)
             return;
 
         if (ScrollViewer is not { } scrollViewer)
         {
-            context.DrawText(Brushes.Red, default,
+            context.DrawText(
                 new FormattedText("VirtualizedTreeView must be wrapped in ScrollViewer!",
+                    CultureInfo.InvariantCulture,
+                    FlowDirection.LeftToRight,
                     Typeface.Default,
                     14,
-                    TextAlignment.Left,
-                    TextWrapping.Wrap,
-                    Bounds.Size));
+                    Brushes.Red)
+                {
+                    TextAlignment = TextAlignment.Left,
+                    MaxTextWidth = Bounds.Width,
+                    MaxTextHeight = Bounds.Height,
+                    // TextWrapping.Wrap
+                }, default);
             return;
         }
 

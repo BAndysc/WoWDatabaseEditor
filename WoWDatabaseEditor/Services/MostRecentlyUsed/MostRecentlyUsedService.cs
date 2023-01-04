@@ -59,7 +59,7 @@ namespace WoWDatabaseEditorCore.Services.MostRecentlyUsed
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                LOG.LogError(e);
                 return null;
             }
         }

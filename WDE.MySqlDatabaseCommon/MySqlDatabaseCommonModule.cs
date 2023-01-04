@@ -6,10 +6,18 @@ namespace WDE.MySqlDatabaseCommon
 {
     public class MySqlDatabaseCommonModule : ModuleBase
     {
+        private IContainerProvider? provider;
+
         public override void OnInitialized(IContainerProvider containerProvider)
         {
             base.OnInitialized(containerProvider);
-            containerProvider.Resolve<DatabaseFileLogService>();
+            provider = containerProvider;
+        }
+
+        public override void FinalizeRegistration(IContainerRegistry container)
+        {
+            base.FinalizeRegistration(container);
+            provider?.Resolve<DatabaseFileLogService>();
         }
     }
 }

@@ -10,9 +10,9 @@ using Avalonia.VisualTree;
 
 namespace WDE.DatabaseDefinitionEditor.Views.Controls;
 
-public class TextBoxWithNoInput : TextBox, IStyleable
+public class TextBoxWithNoInput : TextBox
 {
-    Type IStyleable.StyleKey => typeof(TextBox);
+    protected override Type StyleKeyOverride => typeof(TextBox);
     
     protected override void OnTextInput(TextInputEventArgs e)
     {
@@ -85,7 +85,7 @@ public class KeyBindingBox : TemplatedControl
         else if (e.Key == Key.LeftAlt || e.Key == Key.RightAlt)
             modifier &= ~KeyModifiers.Alt;
         
-        KeyGesture = new KeyGesture(e.Key, modifier);
+        SetCurrentValue(KeyGestureProperty, new KeyGesture(e.Key, modifier));
         e.Handled = true;
     }
 }

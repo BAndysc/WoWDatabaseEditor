@@ -16,7 +16,7 @@ public class NullableTextBox : TemplatedControl
     public static readonly StyledProperty<string?> WatermarkProperty =
         AvaloniaProperty.Register<NullableTextBox, string?>(nameof(Watermark));
     
-    public static readonly StyledProperty<bool> IsNotNullProperty = AvaloniaProperty.Register<NullableTextBox, bool>("IsNull");
+    public static readonly StyledProperty<bool> IsNotNullProperty = AvaloniaProperty.Register<NullableTextBox, bool>(nameof(IsNotNull));
 
     static NullableTextBox()
     {
@@ -34,12 +34,12 @@ public class NullableTextBox : TemplatedControl
         inEvent = true;
         if (IsNotNull && Text == null)
         {
-            Text = lastNonNullText;
+            SetCurrentValue(TextProperty, lastNonNullText);
         }
         else if (!IsNotNull)
         {
             lastNonNullText = Text ?? "";
-            Text = null;
+            SetCurrentValue(TextProperty, null);
         }
         inEvent = false;
     }
@@ -50,7 +50,7 @@ public class NullableTextBox : TemplatedControl
             return;
         
         inEvent = true;
-        IsNotNull = Text != null;
+        SetCurrentValue(IsNotNullProperty, Text != null);
         inEvent = false;
     }
 

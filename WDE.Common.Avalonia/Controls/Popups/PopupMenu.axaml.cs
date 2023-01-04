@@ -39,7 +39,7 @@ public partial class PopupMenu : UserControl
             popup = new Popup()
             {
                 PlacementTarget = control,
-                PlacementMode = PlacementMode.Pointer,
+                Placement = PlacementMode.Pointer,
                 IsLightDismissEnabled = true,
                 OverlayDismissEventPassThrough = true,
                 Child = this

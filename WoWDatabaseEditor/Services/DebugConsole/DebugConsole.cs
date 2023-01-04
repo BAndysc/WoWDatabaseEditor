@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Text;
+using WDE.Common;
 using WDE.Module.Attributes;
 
 namespace WoWDatabaseEditorCore.Services.DebugConsole
@@ -51,8 +52,7 @@ namespace WoWDatabaseEditorCore.Services.DebugConsole
             }
             catch (System.Exception e)
             {
-                System.Console.WriteLine("Cannot open Redirect.txt for writing");
-                System.Console.WriteLine(e.Message);
+                LOG.LogError(e, message: "Cannot open Redirect.txt for writing");
             }
         }
 

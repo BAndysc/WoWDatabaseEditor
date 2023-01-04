@@ -1,24 +1,35 @@
-<controls:ExtendedWindow xmlns="https://github.com/avaloniaui"
-          xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-          xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-          xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-          xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
-          xmlns:demo="clr-namespace:AvaloniaStyles.Demo"
-          mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-          SizeToContent="Manual"
-          x:DataType="demo:MainWindow"
-          x:Class="AvaloniaStyles.Demo.MainWindow"
-          Title="Demo">
+<ExtendedWindow xmlns="https://github.com/avaloniaui"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
+                xmlns:demo="clr-namespace:AvaloniaStyles.Demo"
+                mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+                SizeToContent="Manual"
+                RequestedThemeVariant="Light"
+                x:Class="AvaloniaStyles.Demo.MainWindow"
+                x:DataType="demo:DemoDataContext"
+                Title="Demo">
+    <NativeMenu.Menu>
+        <NativeMenu>
+            <NativeMenuItem Header="File">
+                <NativeMenu>
+                    <NativeMenuItem Header="New" />
+                    <NativeMenuItem Header="Open" />
+                    <NativeMenuItem Header="Save" />
+                </NativeMenu>
+            </NativeMenuItem>
+            <NativeMenuItem Header="Edit">
+                <NativeMenu>
+                    <NativeMenuItem Header="Copy" />
+                    <NativeMenuItem Header="Paste" />
+                    <NativeMenuItem Header="Cut" />
+                </NativeMenu>
+            </NativeMenuItem>
+        </NativeMenu>
+    </NativeMenu.Menu>
+    
     <controls:ExtendedWindow.SideBar>
-        <controls:ToolsTabControl Items="{Binding DocumentManager.AllTools}" Name="Tools">
-            <controls:ToolsTabControl.ItemTemplate>
-                <DataTemplate>
-                    <ContentPresenter 
-                        Content="{Binding Path=(controls:ToolsTabControl.AttachedView).Icon, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=TabItem}}"
-                        Width="16" Height="16" />
-                </DataTemplate>
-            </controls:ToolsTabControl.ItemTemplate>
-        </controls:ToolsTabControl>
     </controls:ExtendedWindow.SideBar>
     
     <controls:ExtendedWindow.ToolBar>
@@ -31,20 +42,31 @@
             </controls:ToolBar.LeftContent>
             <controls:ToolBar.RightContent>
                 <ToolbarPanel>
-                    
-                    <ToolbarItemsControl Items="{CompiledBinding Items}">
+                    <ToolbarItemsControl ItemsSource="{CompiledBinding Items}">
                         <ToolbarItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <demo:ButtonImageDemo Text="{CompiledBinding Name}"></demo:ButtonImageDemo>
                             </DataTemplate>
                         </ToolbarItemsControl.ItemTemplate>
                     </ToolbarItemsControl>
+                    <Button>
+                        <Border Background="Transparent"
+                                Width="12"
+                                Height="12"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center">
+                            <Path Fill="{Binding $parent[Button].Foreground}"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center"
+                                  Data="M 0 0 L 6 3.5 L 0 7 Z"/>
+                        </Border>
+                    </Button>
+                    <Button>SQL</Button>
                 </ToolbarPanel>
             </controls:ToolBar.RightContent>
             <controls:ToolBar.MiddleContent>
                 <ToolbarPanel>
                     <Button>Search</Button>
-
                 </ToolbarPanel>
             </controls:ToolBar.MiddleContent>
         </controls:ToolBar>
@@ -59,7 +81,7 @@
     <controls:ExtendedWindow.TabStrip>
         <TabStrip DockPanel.Dock="Top" 
                   SelectedItem="{Binding ActiveTab}"
-                  Items="{Binding Tabs}">
+                  ItemsSource="{Binding Tabs}">
             <TabStrip.ItemTemplate>
                 <DataTemplate>
                     <DockPanel LastChildFill="True">
@@ -71,91 +93,6 @@
         </TabStrip>
     </controls:ExtendedWindow.TabStrip>
     
-    <ScrollViewer Margin="10" Background="{DynamicResource MainColorBackground}">
-        <StackPanel Spacing="10" Orientation="Vertical">
-            
-            <Border BorderThickness="1" BorderBrush="Black">
-                <Grid ColumnDefinitions="100,5,20">
-                    <ToolbarControl>
-                        <demo:ButtonImageDemo Text="A" />
-                        <demo:ButtonImageDemo Text="B" />
-                        <demo:ButtonImageDemo Text="C" />
-                        <demo:ButtonImageDemo Text="D" />
-                        <demo:ButtonImageDemo Text="E" />
-                        <demo:ButtonImageDemo Text="F" />
-                        <demo:ButtonImageDemo Text="G" />
-                        <demo:ButtonImageDemo Text="H" />
-                        <demo:ButtonImageDemo Text="I" />
-                        <demo:ButtonImageDemo Text="K" />
-                    </ToolbarControl>
-                    <GridSplitter Grid.Column="1" />
-                    <Border Grid.Column="2" />
-                </Grid>
-            </Border>
-            
-            <ToolbarItemsControl Items="abcdefgjijkklmo">
-                <ToolbarItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <demo:ButtonImageDemo Text="{Binding .}"></demo:ButtonImageDemo>
-                    </DataTemplate>
-                </ToolbarItemsControl.ItemTemplate>
-            </ToolbarItemsControl>
-            
-            <ToolbarItemsControl Items="abcdefgjijkklmo">
-                <ToolbarItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Button Content="{Binding .}"></Button>
-                    </DataTemplate>
-                </ToolbarItemsControl.ItemTemplate>
-            </ToolbarItemsControl>
-            
-            <controls:CompletionComboBox SelectedItem="{Binding EnumValue, Mode=TwoWay}" controls:Extensions.EnumType="{x:Type demo:ExampleEnum}" />
-            <Button>Button</Button>
-            <Button IsEnabled="False">Disabled button</Button>
-            <CheckBox>Checkbox</CheckBox>
-            <CheckBox IsChecked="True">Checked</CheckBox>
-            <CheckBox IsChecked="{x:Null}">Indetermine</CheckBox>
-            <RadioButton>Radio</RadioButton>
-            <RadioButton IsChecked="True">Checked radio</RadioButton>
-            <TextBox Watermark="Textbox" />
-            <ComboBox Items="{Binding Themes}" SelectedItem="{Binding CurrentTheme, Mode=TwoWay}" />
-            <TabControl>
-                <TabItem Header="Main">
-                    <Button>Tab a</Button>
-                </TabItem>
-                <TabItem Header="Edit">
-                    <TextBlock>Tab b</TextBlock>
-                </TabItem>
-                <TabItem Header="More">
-                    <TextBox Text="Tab c" />
-                </TabItem>
-            </TabControl>
-            <ListBox>
-                <ListBoxItem>A</ListBoxItem>
-                <ListBoxItem>B</ListBoxItem>
-                <ListBoxItem>C</ListBoxItem>
-                <ListBoxItem>D</ListBoxItem>
-            </ListBox>
-            <controls:GridView Items="{Binding Items}">
-                <controls:GridView.Columns>
-                    <controls:GridColumnDefinition Name="Bool" Property="Bool" Checkable="True" />
-                    <controls:GridColumnDefinition Name="Name" Property="Name" />
-                    <controls:GridColumnDefinition Name="Number" Property="Number" />
-                </controls:GridView.Columns>
-            </controls:GridView>
-            <controls:GridView Items="{Binding Items}">
-                <controls:GridView.Columns>
-                    <controls:GridColumnDefinition Name="Name" Property="Name" />
-                    <controls:GridColumnDefinition Name="Number" Property="Number" />
-                </controls:GridView.Columns>
-            </controls:GridView>
-            <DataGrid AutoGenerateColumns="True" 
-                      CanUserResizeColumns="True"
-                      SelectionMode="Extended"
-                      Items="{Binding Items}">
-            </DataGrid>
-            <Button Click="ShowDemoDialog">Show Modal Dialog</Button>
-        </StackPanel>
-    </ScrollViewer>
+    <demo:MainView />
     
-</controls:ExtendedWindow>
+</ExtendedWindow>

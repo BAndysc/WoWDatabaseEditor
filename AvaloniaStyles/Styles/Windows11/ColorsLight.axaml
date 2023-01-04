@@ -1,0 +1,95 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:sys="clr-namespace:System;assembly=netstandard"
+        xmlns:styles="clr-namespace:AvaloniaStyles.Styles"
+        xmlns:utils="clr-namespace:AvaloniaStyles.Utils">
+    <StyleInclude Source="avares://AvaloniaStyles/Styles/Windows10/ColorsLight.axaml" />
+    <Styles.Resources>
+        <SolidColorBrush Color="#FDFCFC" x:Key="ContentBackground" />
+        
+        <utils:HslDiff x:Key="AccentHue" H="0" S="1" L="0.5" />
+        <!-- ccd4de-->
+        <SolidColorBrush Color="#b0c0cf" x:Key="TitleBarBackground"  Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush Color="#b0c0cf" x:Key="WindowContentBackground"  Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush Color="#b0c0cf" x:Key="MainWindowContentBackground"  Accent.Hue="{DynamicResource AccentHue}" /> <!-- dark: #293955-->
+        
+        <SolidColorBrush Color="#007ACC" x:Key="StatusBarBackground"  Accent.Hue="{DynamicResource AccentHue}" />
+
+        <SolidColorBrush Color="#5fa2da" x:Key="AccentColorMedium"  Accent.Hue="{DynamicResource AccentHue}" />
+        
+        <SolidColorBrush Color="#7F7F7F" x:Key="OuterWindowBorderColor" />
+        <SolidColorBrush Color="White" x:Key="InnerWindowBorderColor" />
+        
+        <Thickness x:Key="ButtonBorderThemeThickness">1</Thickness>
+        <SolidColorBrush x:Key="TabControlBorder" Color="Transparent" />
+        <SolidColorBrush x:Key="TabControlBorderSelected" Color="#0F000000" />
+        <SolidColorBrush x:Key="TabItemHeaderBackgroundUnselected" Color="Transparent" />
+        
+        <Color x:Key="ControlStrokeColorDefault">#0F000000</Color>
+        <Color x:Key="ControlStrokeColorSecondary">#29000000</Color>
+        <!-- button -->
+        <CornerRadius x:Key="ControlCornerRadius">4</CornerRadius>
+        <CornerRadius x:Key="ControlCornerTopRadius">4,4,0,0</CornerRadius>
+        
+        <!--
+        <SolidColorBrush x:Key="SystemControlHighlightAltBaseHighBrush">White</SolidColorBrush>
+        <SolidColorBrush x:Key="SystemControlHighlightListAccentMediumBrush">#0984e3</SolidColorBrush>
+        <SolidColorBrush x:Key="SystemControlHighlightListAccentLowBrush">#086FBF</SolidColorBrush>
+        <SolidColorBrush x:Key="SystemControlHighlightListLowBrush">#74b9ff</SolidColorBrush>-->
+        
+        <SolidColorBrush x:Key="ButtonBackground" Color="#FCFCFC"  Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush x:Key="ButtonForeground" Color="#1B1B1B"  Accent.Hue="{DynamicResource AccentHue}" />
+        <LinearGradientBrush x:Key="ControlElevationBorderBrush" StartPoint="0,0" EndPoint="0,3">
+            <LinearGradientBrush.GradientStops>
+                <GradientStop Offset="0.33" Color="{StaticResource ControlStrokeColorSecondary}" />
+                <GradientStop Offset="1" Color="{StaticResource ControlStrokeColorDefault}" />
+            </LinearGradientBrush.GradientStops>
+        </LinearGradientBrush>
+        <StaticResource x:Key="ButtonBorderBrush" ResourceKey="ControlElevationBorderBrush" />
+        
+        <SolidColorBrush x:Key="PrimaryButtonBackground" Color="#118aed"  Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush x:Key="PrimaryButtonBackgroundPointerOver" Color="#1494FF"  Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush x:Key="PrimaryButtonBorderBrushPointerOver" Color="#1494FF"  Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush x:Key="PrimaryButtonBackgroundPressed" Color="#0F74C7"  Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush x:Key="PrimaryButtonBorderBrushPressed" Color="#0F74C7"  Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush x:Key="PrimaryButtonForeground" Color="White"  Accent.Hue="{DynamicResource AccentHue}" />
+        
+        <!-- textbox -->
+        <Thickness x:Key="TextControlBorderThemeThickness">0,0,0,1</Thickness>
+        <Thickness x:Key="TextControlBorderThemeThicknessFocused">0,0,0,2</Thickness>
+        <SolidColorBrush x:Key="TextControlBorderBrush" Color="#E5E5E4" />
+        <SolidColorBrush x:Key="TextControlBorderBrushBottom" Color="#868586" />
+        <SolidColorBrush x:Key="TextControlBorderBrushFocused" Color="#2B66BA" />
+        <StaticResource ResourceKey="ContentBackground" x:Key="TextControlBackground" />
+        <SolidColorBrush Color="#F7F6F6" x:Key="TextControlBackgroundPointerOver" />
+        <SolidColorBrush Color="White" x:Key="TextControlBackgroundFocused" />
+        
+        <!-- listbox -->
+        
+        <Color x:Key="SystemListLowColor">#19000000</Color>
+        <Color x:Key="SystemListMediumColor">#33000000</Color>
+        <SolidColorBrush x:Key="SystemControlHighlightListAccentHighBrush" Accent.BaseColor="{DynamicResource SystemAccentColor}" Opacity="0.7"  Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush x:Key="SystemControlHighlightListAccentMediumBrush" Accent.BaseColor="{DynamicResource SystemAccentColor}" Opacity="0.6"  Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush x:Key="SystemControlHighlightListAccentLowBrush" Accent.BaseColor="{DynamicResource SystemAccentColor}" Opacity="0.4"  Accent.Hue="{DynamicResource AccentHue}" />
+        <!--<SolidColorBrush x:Key="SystemControlHighlightListMediumBrush" BaseColor="{StaticResource SystemListMediumColor}"  Accent.Hue="{DynamicResource AccentHue}" />
+        <SolidColorBrush x:Key="SystemControlHighlightListLowBrush" BaseColor="{StaticResource SystemListLowColor}"  Accent.Hue="{DynamicResource AccentHue}" />-->
+
+        <!-- combobox -->
+        <SolidColorBrush x:Key="ComboBoxBackground" Color="#B3FFFFFF" />
+        <SolidColorBrush x:Key="ComboBoxBackgroundPointerOver" Color="#80F9F9F9" />
+        <SolidColorBrush x:Key="ComboBoxBackgroundPressed" Color="#4DF9F9F9" />
+        <SolidColorBrush x:Key="ComboBoxBackgroundDisabled" Color="#4DF9F9F9" />
+        <SolidColorBrush x:Key="ComboBoxBackgroundUnfocused" Color="#B3FFFFFF" />
+        <SolidColorBrush x:Key="ComboBoxBorderBrush" Color="#0F000000" />
+        <SolidColorBrush x:Key="ComboBoxBorderBrushPointerOver" Color="#0F000000" />
+        <SolidColorBrush x:Key="ComboBoxBorderBrushPressed" Color="#0F000000" />
+        <SolidColorBrush x:Key="ComboBoxBorderBrushDisabled" Color="#0F000000" />
+        
+        <!-- setting item -->
+        <SolidColorBrush x:Key="SettingItemBackground" Color="#F0F0F0" />
+        <SolidColorBrush x:Key="SettingItemBorder" Color="#DDDDDD" />
+        
+        <!-- dock -->
+        <!--<SolidColorBrush BaseColor="{DynamicResource SystemAccentColor}" x:Key="DockThemeAccentBrush"  Accent.Hue="{DynamicResource AccentHue}" />-->
+    </Styles.Resources>
+</Styles>

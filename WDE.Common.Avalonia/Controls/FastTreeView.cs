@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Globalization;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Documents;
 using Avalonia.Data;
 using Avalonia.Input;
 using Avalonia.Media;
+using Avalonia.Threading;
 using Avalonia.VisualTree;
 using WDE.Common.Avalonia.Utils;
 using WDE.Common.Utils;
@@ -16,11 +19,12 @@ public abstract class FastTreeView<P, C> : Control where P : IParentType where C
 {
     protected static SolidColorBrush HoverRowBackground = new SolidColorBrush(Color.FromRgb(87, 124, 219));
     protected static SolidColorBrush SelectedRowBackground = new SolidColorBrush(Color.FromRgb(87, 124, 219));
+    #pragma warning disable AVP1002
     public static readonly StyledProperty<FlatTreeList<P, C>?> ItemsProperty = AvaloniaProperty.Register<FastTreeView<P, C>, FlatTreeList<P, C>?>(nameof(Items));
     public static readonly StyledProperty<bool> IsFilteredProperty = AvaloniaProperty.Register<FastTreeView<P, C>, bool>(nameof(IsFiltered));
     public static readonly StyledProperty<bool> RequestRenderProperty = AvaloniaProperty.Register<FastTreeView<P, C>, bool>(nameof(RequestRender));
     public static readonly StyledProperty<INodeType?> SelectedNodeProperty = AvaloniaProperty.Register<FastTreeView<P, C>, INodeType?>(nameof(SelectedNode), defaultBindingMode: BindingMode.TwoWay);
-
+    #pragma warning restore AVP1002
     
     public const float RowHeight = 24;
     public const float Indent = 24;
@@ -56,9 +60,12 @@ public abstract class FastTreeView<P, C> : Control where P : IParentType where C
 
     private void OldOnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
-        InvalidateMeasure();
-        InvalidateArrange();
-        InvalidateVisual();
+        Dispatcher.UIThread.Post(() =>
+        {
+            InvalidateMeasure();
+            InvalidateArrange();
+            InvalidateVisual(); 
+        });
     }
 
     protected object? mouseOverRow;
@@ -114,12 +121,12 @@ public abstract class FastTreeView<P, C> : Control where P : IParentType where C
         {
             if (currentPoint.Position.X <= Indent * parent.NestLevel || e.ClickCount == 2)
                 parent.IsExpanded = !parent.IsExpanded;
-            SelectedNode = parent;
+            SetCurrentValue(SelectedNodeProperty, parent);
             InvalidateVisual();
         }
         else if (obj is C child)
         {
-            SelectedNode = child;
+            SetCurrentValue(SelectedNodeProperty, child);
             InvalidateVisual();
         }
     }
@@ -183,7 +190,7 @@ public abstract class FastTreeView<P, C> : Control where P : IParentType where C
             var currentIndex = items.IndexOf(SelectedNode);
             int nextIndex = GetNextIndex(items, currentIndex, moveDownUp);
             if (nextIndex != -1)
-                SelectedNode = items[nextIndex];
+                SetCurrentValue(SelectedNodeProperty, items[nextIndex]);
 
             e.Handled = true;
         }
@@ -210,9 +217,9 @@ public abstract class FastTreeView<P, C> : Control where P : IParentType where C
         MouseOverRow = GetRowAtPosition(point.Y);
     }
 
-    protected override void OnPointerLeave(PointerEventArgs e)
+    protected override void OnPointerExited(PointerEventArgs e)
     {
-        base.OnPointerLeave(e);
+        base.OnPointerExited(e);
         MouseOverRow = null;
     }
 
@@ -291,13 +298,16 @@ public abstract class FastTreeView<P, C> : Control where P : IParentType where C
         
         if (ScrollViewer is not { } scrollViewer)
         {
-            context.DrawText(Brushes.Red, default, 
-                new FormattedText("FastTreeView must be wrapped in ScrollViewer!", 
-                    Typeface.Default, 
-                    14,
-                    TextAlignment.Left,
-                    TextWrapping.Wrap, 
-                    Bounds.Size));
+            var ft = new FormattedText("FastTreeView must be wrapped in ScrollViewer!",
+                CultureInfo.CurrentCulture,
+                FlowDirection.LeftToRight,
+                Typeface.Default,
+                14,
+                Brushes.Red)
+            {
+                MaxTextWidth = Bounds.Width
+            };
+            context.DrawText(ft, default);
             return;
         }
         
@@ -310,8 +320,8 @@ public abstract class FastTreeView<P, C> : Control where P : IParentType where C
         context.FillRectangle(Brushes.Transparent, new Rect(scrollViewer.Offset.X, scrollViewer.Offset.Y, scrollViewer.Viewport.Width, scrollViewer.Viewport.Height));
         
         var items = Items;
-        var font = new Typeface(TextBlock.GetFontFamily(this));
-        var foreground = TextBlock.GetForeground(this);
+        var font = new Typeface(TextElement.GetFontFamily(this));
+        var foreground = TextElement.GetForeground(this);
         var pen = new Pen(foreground, 2);
 
         var hasFilter = IsFiltered;
@@ -332,7 +342,7 @@ public abstract class FastTreeView<P, C> : Control where P : IParentType where C
             {
                 var rowRect = new Rect(0, y, actualWidth, RowHeight);
 
-                DrawRow(font, pen, foreground, context, row, rowRect);
+                DrawRow(font, pen, foreground ?? Brushes.Red, context, row, rowRect);
             }
             
             y += RowHeight;

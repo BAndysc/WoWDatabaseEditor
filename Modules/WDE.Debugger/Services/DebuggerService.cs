@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Prism.Events;
+using WDE.Common;
 using WDE.Common.Debugging;
 using WDE.Common.Services;
 using WDE.Common.Utils;
@@ -158,7 +159,7 @@ internal class DebuggerService : IDebuggerService
         {
             if (!sourcesByKey.TryGetValue(snapshot.SourceName, out var source))
             {
-                Console.WriteLine("Couldn't deserialize debug point with key: " + snapshot.SourceName);
+                LOG.LogWarning("Couldn't deserialize debug point with key: " + snapshot.SourceName);
                 return;
             }
 
@@ -193,13 +194,13 @@ internal class DebuggerService : IDebuggerService
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine("Couldn't load a snapshot: " + e);
+                    LOG.LogError(e, message: "Couldn't load a snapshot");
                 }
             }
         }
         catch (Exception e)
         {
-            Console.WriteLine("Couldn't load snapshots: " + e);
+            LOG.LogError(e, message: "Couldn't load snapshots");
         }
     }
 
@@ -256,7 +257,7 @@ internal class DebuggerService : IDebuggerService
             else
                 throw new ArgumentOutOfRangeException(nameof(result));
         }
-        catch (OperationCanceledException e)
+        catch (OperationCanceledException)
         {
             debug.State = BreakpointState.Pending;
         }
@@ -669,11 +670,11 @@ internal class DebuggerService : IDebuggerService
                     await debug.Source.Synchronizer.Delete(id);
                     debug.State = BreakpointState.Synced;
                 }
-                catch (OperationCanceledException e)
+                catch (OperationCanceledException)
                 {
                     debug.State = BreakpointState.Pending;
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     debug.State = BreakpointState.SynchronizationError;
                     throw;
@@ -692,12 +693,12 @@ internal class DebuggerService : IDebuggerService
                     await debug.Source.Synchronizer.Delete(id);
                 RemoveDebugPointInternal(id);
             }
-            catch (DebuggingFeaturesDisabledException e)
+            catch (DebuggingFeaturesDisabledException)
             {
                 RemoveDebugPointInternal(id);
                 throw;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 debug.State = BreakpointState.SynchronizationError;
                 CallDebugPointChangedInternal(id);

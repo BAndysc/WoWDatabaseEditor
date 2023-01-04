@@ -21,11 +21,12 @@ namespace WDE.MPQ.ViewModels
             var folder = new DirectoryInfo(wowFolder);
             var wowFile = new FileInfo(Path.Join(wowFolder, "wow.exe"));
             var dataPath = new DirectoryInfo(Path.Join(wowFolder, "Data"));
+            var macAppPath = new DirectoryInfo(Path.Join(wowFolder, "World of Warcraft.app"));
 
             if (!folder.Exists)
                 return WoWFilesType.Invalid;
 
-            if (!wowFile.Exists)
+            if (!wowFile.Exists && !macAppPath.Exists)
                 return WoWFilesType.Invalid;
             
             if (!dataPath.Exists)

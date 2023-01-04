@@ -1,0 +1,23 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Design.PreviewWith>
+    <Border Padding="20">
+      <!-- Add Controls for Previewer Here -->
+    </Border>
+  </Design.PreviewWith>
+
+  <Style Selector="ToolControl /template/ Border#PART_Border">
+    <Setter Property="BorderThickness" Value="1 0 1 1" />
+  </Style>
+  <Style Selector="ToolControl /template/ ToolTabStrip#PART_TabStrip ToolTabStripItem:selected">
+    <Setter Property="Margin" Value="0,-1,0,0"></Setter>
+  </Style>
+
+  <!-- idk what that was for, it looks ugly -->
+  <Style Selector="ToolTabStrip /template/ Border#PART_BorderFill">
+    <Setter Property="BorderThickness" Value="0" />
+  </Style>
+  <Style Selector="ToolTabStripItem">
+    <Setter Property="BorderThickness" Value="0" />
+  </Style>
+</Styles>

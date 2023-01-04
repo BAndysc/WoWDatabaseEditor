@@ -47,7 +47,7 @@
     </components:ToolView.Styles>
     
     <TreeView x:Name="tv" Margin="0" 
-              Items="{CompiledBinding Root}" 
+              ItemsSource="{CompiledBinding Root}" 
               SelectionMode="Multiple"
               SelectedItem="{CompiledBinding SelectedItem, Mode=TwoWay}"
               SelectedItems="{CompiledBinding SelectedItems, Mode=TwoWay}"
@@ -62,11 +62,11 @@
                           Command="{Binding #tv.DataContext.AddItem, Mode=OneTime}" />
                 <MenuItem Header="Quick add"
                           Classes="Parent"
-                          Items="{Binding #tv.DataContext.AddItems}">
+                          ItemsSource="{Binding #tv.DataContext.AddItems}">
                     <MenuItem.Styles>
                         <Style Selector="MenuItem.Parent > MenuItem" x:DataType="viewModels:AddItemCategoryMenuViewModel">
                             <Setter Property="Header" Value="{CompiledBinding Name}"/>
-                            <Setter Property="Items" Value="{CompiledBinding Items}"/>
+                            <Setter Property="ItemsSource" Value="{CompiledBinding Items}"/>
                         </Style>
                         <Style Selector="MenuItem.Parent > MenuItem > MenuItem" x:DataType="viewModels:SolutionItemMenuViewModel">
                             <Setter Property="Header" Value="{CompiledBinding Name}"/>
@@ -102,7 +102,7 @@
             </Style>
         </TreeView.Styles>
         <TreeView.DataTemplates>
-            <TreeDataTemplate ItemsSource="{CompiledBinding Children}">
+            <TreeDataTemplate DataType="viewModels:SolutionItemViewModel" ItemsSource="{CompiledBinding Children}">
                 <DockPanel Classes="TreeViewItemRow" LastChildFill="True" Height="26" Background="Transparent">
                     <components:WdeImage Width="14" Height="14" Stretch="Fill" Margin="0,0,6,0" Image="{CompiledBinding Icon}" />
                     <TextBlock Padding="2" VerticalAlignment="Center" Text="{CompiledBinding ExtraId}"
@@ -120,7 +120,7 @@
                             Command="{Binding #tv.DataContext.ExportToServerItem, Mode=OneTime}"
                             CommandParameter="{CompiledBinding .}"
                             Margin="0,0,6,0">
-                        <components:WdeImage ImageUri="Resources/icon_reload.png" Width="16" Height="16" />
+                        <components:WdeImage ImageUri="Icons/icon_reload.png" Width="16" Height="16" />
                     </Button>
                     <TextBlock Margin="0,0,0,0" Padding="0,0,0,0" VerticalAlignment="Center"
                                Text="{CompiledBinding Name}" TextTrimming="CharacterEllipsis" />

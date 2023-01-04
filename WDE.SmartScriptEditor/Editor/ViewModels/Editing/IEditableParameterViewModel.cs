@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using WDE.Common.Parameters;
 
 namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
 {
@@ -9,5 +10,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
         string Name { get; }
         bool FocusFirst { get; set; }
         bool IsFirstParameter { get; set; }
+        bool HoldsMultipleValues { get; }
+        IParameter? GenericParameter { get; }
+        object? Context { get; }
     }
 }

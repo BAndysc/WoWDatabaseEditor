@@ -7,9 +7,9 @@ using WDE.Common.Avalonia.Controls;
 
 namespace WDE.PacketViewer.Avalonia.Views
 {
-    public class FilterTextEditor : TextEditor, IStyleable
+    public class FilterTextEditor : TextEditor
     {
-        Type IStyleable.StyleKey => typeof(TextEditor);
+        protected override Type StyleKeyOverride => typeof(TextEditor);
 
         public FilterTextEditor()
         {

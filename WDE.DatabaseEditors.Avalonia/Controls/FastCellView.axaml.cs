@@ -30,8 +30,8 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
         {
             base.OnApplyTemplate(e);
 
-            partPanel = e.NameScope.Find<Panel>("PART_Panel");
-            partText = e.NameScope.Find<TextBlock>("PART_text");
+            partPanel = e.NameScope.Get<Panel>("PART_Panel");
+            partText = e.NameScope.Get<TextBlock>("PART_text");
             
             if (!isReadOnly)
                 partText.Cursor = new Cursor(StandardCursorType.Ibeam);
@@ -94,19 +94,19 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
             {
                 if (DataContext is ViewModels.SingleRow.SingleRecordDatabaseCellViewModel singleRecordViewModel)
                 {
-                    singleRecordViewModel.UpdateFromString(textBox.Text);
+                    singleRecordViewModel.UpdateFromString(textBox.Text ?? "");
                 }
                 else if (DataContext is ViewModels.OneToOneForeignKey.SingleRecordDatabaseCellViewModel oneToOneRecordViewModel)
                 {
-                    oneToOneRecordViewModel.UpdateFromString(textBox.Text);
+                    oneToOneRecordViewModel.UpdateFromString(textBox.Text ?? "");
                 }
                 else if (DataContext is ViewModels.MultiRow.DatabaseCellViewModel multiRowViewModel)
                 {
-                    multiRowViewModel.UpdateFromString(textBox.Text);
+                    multiRowViewModel.UpdateFromString(textBox.Text ?? "");
                 }
                 else if (DataContext is ViewModels.Template.DatabaseCellViewModel templateViewModel)
                 {
-                    templateViewModel.UpdateFromString(textBox.Text);
+                    templateViewModel.UpdateFromString(textBox.Text ?? "");
                 }
                 else if (Value is long)
                 {
@@ -119,7 +119,7 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
                         Value = value;
                 }
                 else
-                    Value = textBox.Text;
+                    Value = textBox.Text ?? "";
             }
 
             textBox = null;
@@ -137,15 +137,13 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
                 {
                     if (textBox == null)
                         return;
-                    textBox.RaiseEvent(new TextInputEventArgs
-                    {
-                        Device = e.Device,
-                        Handled = false,
-                        Text = e.Text,
-                        Route = e.Route,
-                        RoutedEvent = e.RoutedEvent,
-                        Source = textBox
-                    });
+                    var args = new TextInputEventArgs();
+                    args.Handled = false;
+                    args.Text = e.Text;
+                    args.Route = e.Route;
+                    args.RoutedEvent = e.RoutedEvent;
+                    args.Source = textBox;
+                    textBox.RaiseEvent(args);
                 }, TimeSpan.FromMilliseconds(1));
             }
         }
@@ -158,9 +156,9 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
             Value = text;
         }
 
-        public override void DoCopy(IClipboard clipboard)
+        public override void DoCopy()
         {
-            clipboard.SetTextAsync(Value.ToString()!);
+            TopLevel.GetTopLevel(this)?.Clipboard?.SetTextAsync(Value.ToString()!);
         }
     }
 }

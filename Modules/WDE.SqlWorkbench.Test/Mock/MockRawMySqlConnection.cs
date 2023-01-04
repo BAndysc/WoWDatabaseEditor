@@ -273,8 +273,7 @@ internal class MockSqlConnector : IMySqlConnector
             private readonly IQuerySafetyService querySafetyService;
             private readonly string? currentDatabase;
             private readonly QueryExecutionSafety queryExecutionSafety;
-            private bool isInTransaction = false;
-            
+
             public MockConnection(MockSqlConnector mockSqlConnector,
                 MockMemoryServer server,
                 IQuerySafetyService querySafetyService,
@@ -452,17 +451,14 @@ internal class MockSqlConnector : IMySqlConnector
                 }
                 else if (beginTransactionMatch.Success)
                 {
-                    isInTransaction = true;
                     return SelectResult.NonQuery(0);
                 }
                 else if (commitTransactionMatch.Success)
                 {
-                    isInTransaction = false;
                     return SelectResult.NonQuery(0);
                 }
                 else if (rollbackTransactionMatch.Success)
                 {
-                    isInTransaction = false;
                     return SelectResult.NonQuery(0);
                 }
                 

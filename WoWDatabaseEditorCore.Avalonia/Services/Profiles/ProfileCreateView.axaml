@@ -33,7 +33,7 @@
             <TextBox Text="{CompiledBinding ProfileName}" Grid.Row="0" Grid.Column="2"/>
             
             <TextBlock IsVisible="{CompiledBinding NoCreate, Converter={x:Static BoolConverters.Not}}" VerticalAlignment="Center" Grid.Row="2" Grid.Column="0">Core version:</TextBlock>
-            <ComboBox Items="{CompiledBinding CoreVersions}" 
+            <ComboBox ItemsSource="{CompiledBinding CoreVersions}" 
                       IsVisible="{CompiledBinding NoCreate, Converter={x:Static BoolConverters.Not}}"
                       HorizontalAlignment="Stretch"
                       SelectedItem="{CompiledBinding SelectedCoreVersion}" Grid.Row="2" Grid.Column="2">

@@ -197,8 +197,6 @@ namespace WDE.DbcStore
             private readonly IParameterFactory parameterFactory;
             private readonly ITabularDataPicker dataPicker;
             private readonly DbcStore store;
-            private readonly DBDProvider dbdProvider = null!;
-            private readonly DBCProvider dbcProvider = null!;
             
             public string Name => "DBC Loading";
             public bool WaitForOtherTasks => false;

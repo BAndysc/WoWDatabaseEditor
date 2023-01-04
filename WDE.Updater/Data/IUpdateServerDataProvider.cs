@@ -7,7 +7,7 @@ namespace WDE.Updater.Data
     {
         Uri UpdateServerUrl { get; }
         string Marketplace { get; }
-        Platforms Platform { get; }
+        UpdatePlatforms Platform { get; }
         string? UpdateKey { get; }
         bool HasUpdateServerData { get; }
     }

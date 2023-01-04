@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using WDE.Common.Managers;
+using WDE.MVVM.Observable;
 using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Models;
 
@@ -13,7 +14,14 @@ namespace WDE.SmartScriptEditor.Inspections
             
         public WaitInCombatEventInspection(ISmartDataManager smartDataManager)
         {
-            foreach (var a in smartDataManager.GetAllData(SmartType.SmartAction))
+            smartDataManager.GetAllData(SmartType.SmartAction).SubscribeAction(Load);
+        }
+
+        private void Load(IReadOnlyList<SmartGenericJsonData> list)
+        {
+            waitActionId = -1;
+            disableResetAi = -1;
+            foreach (var a in list)
             {
                 if (a.Flags.HasFlagFast(ActionFlags.WaitAction))
                     waitActionId = a.Id;
@@ -21,7 +29,7 @@ namespace WDE.SmartScriptEditor.Inspections
                     disableResetAi = a.Id;
             }
         }
-        
+
         public IEnumerable<InspectionResult> Inspect(SmartScriptBase script)
         {
             var anyDisableReset = script.AllActions.Any(a => a.Id == disableResetAi);

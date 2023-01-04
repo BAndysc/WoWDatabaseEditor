@@ -6,7 +6,7 @@ using WDE.Common.Avalonia.Controls;
 
 namespace WDE.DatabaseEditors.Avalonia.Controls
 {
-    public class ParameterTextBox : FixedTextBox, IStyleable
+    public class ParameterTextBox : FixedTextBox
     {
         private DateTime lastFocusTime;
         
@@ -25,6 +25,6 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
             base.OnPointerPressed(e);
         }
 
-        Type IStyleable.StyleKey => typeof(TextBox);
+        protected override Type StyleKeyOverride => typeof(TextBox);
     }
 }

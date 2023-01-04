@@ -7,7 +7,7 @@ namespace WDE.MVVM.Test.MVVM
     [ExcludeFromCodeCoverage]
     internal sealed class TestObjectNotifyPropertyChanged : INotifyPropertyChanged
     {
-        public readonly int Field;
+        public readonly int Field = 0;
         private int number;
         private float floatNumber;
         private string? stringValue;

@@ -45,8 +45,8 @@
                            MaxWidth="700"
                            MaxHeight="600"
                            PlacementConstraintAdjustment="SlideY,SlideX"
-                           PlacementMode="Bottom"
-                           PlacementGravity="Bottom"
+                           Placement="BottomEdgeAlignedLeft"
+                           PlacementGravity="BottomLeft"
                            PlacementTarget="PART_Button">
                         <Border Name="PART_SuggestionsContainer"
                                 Padding="{DynamicResource AutoCompleteListMargin}"

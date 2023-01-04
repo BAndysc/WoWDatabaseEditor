@@ -138,10 +138,14 @@ namespace TheEngine.Managers
             }
 
             using Image<Rgba32> image = Image.Load<Rgba32>(path);
-            if (!image.TryGetSinglePixelSpan(out var span))
-                throw new Exception("Cannot load texture " + path);
-                
-            var textureHandle = CreateTexture(new Rgba32[][]{span.ToArray()}, image.Width, image.Height, true);
+            Rgba32[] array = new Rgba32[image.Width * image.Height];
+            image.ProcessPixelRows(x =>
+            {
+                for (int i = 0; i < x.Height; ++i)
+                    x.GetRowSpan(i).CopyTo(array.AsSpan(i * x.Width));
+            });
+
+            var textureHandle = CreateTexture(new Rgba32[][]{array}, image.Width, image.Height, true);
             texturesByPath.Add(path, textureHandle);
             byPathReferencesCount.Add(textureHandle, 1);
             return textureHandle;
@@ -212,7 +216,7 @@ namespace TheEngine.Managers
             rt.ActivateSourceFrameBuffer(colorAttachmentIndex);
             Rgba32[] pixels = new Rgba32[rt.Width * rt.Height];
             engine.Device.device.ReadPixels(0, 0, rt.Width, rt.Height, PixelFormat.Rgba, PixelType.UnsignedByte, pixels.AsSpan());
-            using Image<Rgba32> image = Image.LoadPixelData(pixels, rt.Width, rt.Height);
+            using Image<Rgba32> image = Image.LoadPixelData<Rgba32>(pixels, rt.Width, rt.Height);
             image.SaveAsPng(fileName);
         }
 

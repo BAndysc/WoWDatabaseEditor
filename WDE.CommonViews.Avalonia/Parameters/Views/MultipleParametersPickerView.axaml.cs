@@ -55,12 +55,12 @@ public partial class MultipleParametersPickerView : UserControl
         if (grid.ListBoxImpl == null)
             return;
 
-        var selectedBox = grid.ListBoxImpl.ItemContainerGenerator.ContainerFromIndex(grid.ListBoxImpl.SelectedIndex);
+        var selectedBox = grid.ListBoxImpl.ContainerFromIndex(grid.ListBoxImpl.SelectedIndex);
 
         if (selectedBox == null)
             return;
 
         var editableTextBlock = selectedBox.FindDescendantOfType<EditableTextBlock>();
-        editableTextBlock.BeginEditing(e.Text);
+        editableTextBlock?.BeginEditing(e.Text);
     }
 }

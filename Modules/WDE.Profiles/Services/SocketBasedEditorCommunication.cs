@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using WDE.Common;
 using WDE.Common.Database;
 using WDE.Common.Profiles;
 using WDE.Common.Utils;
@@ -75,8 +76,7 @@ public class SocketBasedEditorCommunication : IInterEditorCommunication
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e);
-                    Console.WriteLine("Profile system crashed, restarting");
+                    LOG.LogError(e, message: "Profile system crashed, restarting");
                 }
             }
         }
@@ -98,7 +98,7 @@ public class SocketBasedEditorCommunication : IInterEditorCommunication
             {
                 receive = await listener.ReceiveAsync(token);
             }
-            catch (OperationCanceledException e)
+            catch (OperationCanceledException)
             {
                 return;
             }
@@ -133,7 +133,7 @@ public class SocketBasedEditorCommunication : IInterEditorCommunication
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            LOG.LogError(e);
         }
     }
 
@@ -147,7 +147,7 @@ public class SocketBasedEditorCommunication : IInterEditorCommunication
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            LOG.LogError(e);
         }
     }
 
@@ -214,7 +214,7 @@ public class SocketBasedEditorCommunication : IInterEditorCommunication
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            LOG.LogError(e);
         }
     }
     
@@ -244,7 +244,7 @@ public class SocketBasedEditorCommunication : IInterEditorCommunication
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            LOG.LogError(e);
             return null;
         }
     }

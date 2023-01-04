@@ -66,9 +66,9 @@ namespace WDE.Common.Avalonia.Controls
         /// <param name="from">The control from which movement begins.</param>
         /// <param name="wrap">Whether to wrap around when the first or last item is reached.</param>
         /// <returns>The control.</returns>
-        IInputElement INavigableContainer.GetControl(NavigationDirection direction, IInputElement from, bool wrap)
+        IInputElement INavigableContainer.GetControl(NavigationDirection direction, IInputElement? from, bool wrap)
         {
-            var result = GetControlInDirection(direction, from as IControl);
+            var result = GetControlInDirection(direction, from as Control);
 
             if (result == null && wrap)
             {
@@ -96,7 +96,7 @@ namespace WDE.Common.Avalonia.Controls
         /// <param name="direction">The movement direction.</param>
         /// <param name="from">The control from which movement begins.</param>
         /// <returns>The control.</returns>
-        protected virtual IInputElement? GetControlInDirection(NavigationDirection direction, IControl? from)
+        protected virtual IInputElement? GetControlInDirection(NavigationDirection direction, Control? from)
         {
             int index = from != null ? Children.IndexOf(from) : -1;
 
@@ -156,7 +156,7 @@ namespace WDE.Common.Avalonia.Controls
             return (size.Width - Math.Max(count - 1, 0) * HorizontalSpacing) / count;
         }
 
-        public IEnumerable<IControl> VisibleChildren()
+        public IEnumerable<Control> VisibleChildren()
         {
             for (int i = 0, count = Children.Count; i < count; ++i)
             {
@@ -287,7 +287,7 @@ namespace WDE.Common.Avalonia.Controls
         }
 
         internal virtual void ArrangeChild(
-            IControl child,
+            Control child,
             Rect rect,
             Size panelSize)
         {

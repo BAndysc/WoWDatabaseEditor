@@ -100,15 +100,15 @@ internal class ConnectionListToolViewModelTests
     }
 
     [Test]
-    public void Test_InvalidConnection()
+    public async Task Test_InvalidConnection()
     {
         mockServer.Kill();
         using var vm = CreateConnectedViewModel();
-        userQuestionsService.ReceivedWithAnyArgs().ConnectionsErrorAsync(default);
+        await userQuestionsService.ReceivedWithAnyArgs().ConnectionsErrorAsync(default!);
     }
 
     [Test]
-    public void Test_IsExpanded()
+    public async Task Test_IsExpanded()
     {
         using var vm = CreateConnectedViewModel();
         Assert.AreEqual(1, vm.FlatItems.Count);
@@ -122,7 +122,7 @@ internal class ConnectionListToolViewModelTests
         Assert.AreEqual("Views", visible[1].Name);
         CollectionAssert.AreEquivalent(new[] {"TABLES", "ROUTINES", "ENGINES", "COLLATIONS", "SCHEMATA", "COLUMNS"}, visible.Skip(2).Select(x => x.Name));
         
-        userQuestionsService.DidNotReceiveWithAnyArgs().ConnectionsErrorAsync(default);
+        await userQuestionsService.DidNotReceiveWithAnyArgs().ConnectionsErrorAsync(default!);
         
         CollectionAssert.AreEqual(new string[]
         {
@@ -133,7 +133,7 @@ internal class ConnectionListToolViewModelTests
     }
 
     [Test]
-    public void Test_Delete_OnlyOpensDialog()
+    public async Task Test_Delete_OnlyOpensDialog()
     {
         var db = mockServer.CreateDatabase("world");
         var table = db.CreateTable("table", TableType.Table, new ColumnInfo("a", "int", false, false, false, null, null, null));
@@ -157,7 +157,7 @@ internal class ConnectionListToolViewModelTests
         queryDialogService.Received().ShowQueryDialog("DROP TABLE `world`.`table`;");
         queryDialogService.Received().ShowQueryDialog("TRUNCATE TABLE `world`.`table`;");
         
-        userQuestionsService.DidNotReceiveWithAnyArgs().ConnectionsErrorAsync(default);
+        await userQuestionsService.DidNotReceiveWithAnyArgs().ConnectionsErrorAsync(default!);
         
         CollectionAssert.AreEqual(new string[]
         {

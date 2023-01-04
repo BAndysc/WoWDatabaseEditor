@@ -6,7 +6,7 @@ namespace WDE.SourceCodeIntegrationEditor.VisualStudioIntegration.Views;
 
 public class BalloonPopup : ContentControl
 {
-    public static readonly StyledProperty<bool> ShowTailProperty = AvaloniaProperty.Register<BalloonPopup, bool>("ShowTail");
+    public static readonly StyledProperty<bool> ShowTailProperty = AvaloniaProperty.Register<BalloonPopup, bool>(nameof(ShowTail));
 
     public bool ShowTail
     {
@@ -14,13 +14,13 @@ public class BalloonPopup : ContentControl
         set => SetValue(ShowTailProperty, value);
     }
 
-    protected override void OnPropertyChanged<T>(AvaloniaPropertyChangedEventArgs<T> change)
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);
 
         if (change.Property == ShowTailProperty)
         {
-            PseudoClasses.Set(":showtail", change.NewValue.GetValueOrDefault<bool>());
+            PseudoClasses.Set(":showtail", ShowTail);
         }
     }
 }

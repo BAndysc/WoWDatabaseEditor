@@ -12,7 +12,7 @@ using WDE.SmartScriptEditor.Models;
 
 namespace WDE.SmartScriptEditor.Parameters;
 
-public class GossipMenuOptionParameter : IAsyncContextualParameter<long, SmartBaseElement>, ICustomPickerContextualParameter<long>,
+public class GossipMenuOptionParameter : BaseAsyncContextualParameter<long, SmartBaseElement>, ICustomPickerContextualParameter<long>,
     IAffectedByOtherParametersParameter
 {
     private readonly ICachedDatabaseProvider databaseProvider;
@@ -57,7 +57,7 @@ public class GossipMenuOptionParameter : IAsyncContextualParameter<long, SmartBa
 
         uint? entry = 0;
         if (script.EntryOrGuid < 0)
-            entry = (databaseProvider.GetCreatureByGuid(0, (uint)(-script.EntryOrGuid)))?.Entry;
+            entry = (await databaseProvider.GetCreatureByGuidAsync(0, (uint)(-script.EntryOrGuid)))?.Entry;
         else if (script.Entry.HasValue)
             entry = script.Entry.Value;
         else
@@ -100,12 +100,12 @@ public class GossipMenuOptionParameter : IAsyncContextualParameter<long, SmartBa
         return (0, false);
     }
 
-    public string? Prefix => null;
-    public bool HasItems => true;
+    public override string? Prefix => null;
+    public override bool HasItems => true;
 
-    public Dictionary<long, SelectOption>? Items { get; set; }
+    public override Dictionary<long, SelectOption>? Items => null;
 
-    public async Task<string> ToStringAsync(long value, CancellationToken token, SmartBaseElement context)
+    public override async Task<string> ToStringAsync(long value, CancellationToken token, SmartBaseElement context)
     {
         var entry = await GetMenuEntry(context);
         if (entry == null)
@@ -122,12 +122,12 @@ public class GossipMenuOptionParameter : IAsyncContextualParameter<long, SmartBa
         return text == null ? value.ToString() : $"{text.TrimToLength(25)} ({value})";
     }
 
-    public string ToString(long value, SmartBaseElement context)
+    public override string ToString(long value, SmartBaseElement context)
     {
         return "...loading (" + (value) + ")";
     }
-    
-    public string ToString(long value)
+
+    public override string ToString(long value)
     {
         return value.ToString();
     }

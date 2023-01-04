@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using WDE.Module.Attributes;
 
 namespace WDE.DatabaseEditors.Data.Interfaces
@@ -6,8 +7,7 @@ namespace WDE.DatabaseEditors.Data.Interfaces
     [UniqueProvider]
     public interface ITableDefinitionJsonProvider
     {
-        IEnumerable<(string file, string content)> GetDefinitionSources();
-        
-        IEnumerable<(string file, string content)> GetDefinitionReferences();
+        Task<IEnumerable<(string file, string content)>> GetDefinitionSources();
+        Task<IEnumerable<(string file, string content)>> GetDefinitionReferences();
     }
 }

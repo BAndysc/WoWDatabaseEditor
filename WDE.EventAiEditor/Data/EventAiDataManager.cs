@@ -185,9 +185,5 @@ namespace WDE.EventAiEditor.Data
         public EventAiDataWithSuchIdExists(string message, Exception innerException) : base(message, innerException)
         {
         }
-
-        protected EventAiDataWithSuchIdExists(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
-        }
     }
 }

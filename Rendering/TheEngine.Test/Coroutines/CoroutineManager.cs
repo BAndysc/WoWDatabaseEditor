@@ -9,7 +9,7 @@ namespace TheEngine.Test.Coroutines
 {
     public class CoroutineManagerTest
     {
-        private CoroutineManager cm;
+        private CoroutineManager cm = null!;
         
         [SetUp]
         public void Setup()

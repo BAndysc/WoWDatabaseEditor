@@ -6,7 +6,7 @@ namespace WDE.EventAiEditor.Avalonia.Editor.Views
     /// <summary>
     ///     Interaction logic for EventAiEditorView
     /// </summary>
-    public class EventAiEditorView : UserControl
+    public partial class EventAiEditorView : UserControl
     {
         public EventAiEditorView()
         {

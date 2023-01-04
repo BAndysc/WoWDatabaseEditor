@@ -12,6 +12,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking.Serialization
         public bool Horizontal { get; set; }
         public double Proportion { get; set; }
         public bool IsCollapsable { get; set; }
+        public bool IsPinned { get; set; }
         public List<SerializedDock> Children { get; set; } = new();
     }
 

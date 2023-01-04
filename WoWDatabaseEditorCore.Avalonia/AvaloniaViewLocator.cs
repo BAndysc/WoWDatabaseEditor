@@ -7,7 +7,7 @@ namespace WoWDatabaseEditorCore.Avalonia;
 
 public class AvaloniaViewLocator : IDataTemplate
 {
-    public IControl Build(object? param)
+    public Control Build(object? param)
     {
         if (param == null)
             return new TextBlock(){Text = "Null model"};

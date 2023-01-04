@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Prism.Ioc;
+using WDE.Common;
 using WDE.Common.Database;
 using WDE.Common.Managers;
 using WDE.Common.Services;
@@ -170,7 +171,7 @@ public class TableEditorPickerService : ITableEditorPickerService
                 if (col is DatabaseField<long> longColumn2)
                     return longColumn2.Current.Value;
             }
-            Console.WriteLine($"Couldn't find column {column} or {backupColumn} in {tableViewModel.TableDefinition.Name}");
+            LOG.LogWarning($"Couldn't find column {column} or {backupColumn} in {tableViewModel.TableDefinition.Name}");
         }
         return null;
     }

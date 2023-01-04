@@ -53,8 +53,8 @@ namespace WDE.SmartScriptEditor.Data
                 parameterFactory.Register("CreatureTextParameter", new CreatureTextParameter(smartDataManager, databaseProvider, tableEditorPickerService, itemFromListProvider, DatabaseTable.WorldTable("creature_text"), "GroupId"));
                 parameterFactory.Register("QuestStarterParameter", new QuestStarterEnderParameter(databaseProvider, tableEditorPickerService, questEntryProviderService, "queststarter"));
                 parameterFactory.Register("QuestEnderParameter", new QuestStarterEnderParameter(databaseProvider, tableEditorPickerService, questEntryProviderService, "questender"));
-                parameterFactory.Register("CreatureSpawnKeyParameter", new CreatureSpawnKeyParameter(databaseProvider));
-                parameterFactory.Register("GameobjectSpawnKeyParameter", new GameObjectSpawnKeyParameter(databaseProvider));
+                parameterFactory.Register("CreatureSpawnKeyParameter", new CreatureSpawnKeyParameter(databaseProvider, itemFromListProvider));
+                parameterFactory.Register("GameobjectSpawnKeyParameter", new GameObjectSpawnKeyParameter(databaseProvider, itemFromListProvider));
                 parameterFactory.Register("SmartScenarioStepParameter", containerProvider.Resolve<SmartScenarioStepParameter>());
                 parameterFactory.Register("SmartQuestObjectiveStorageIndexParameter", containerProvider.Resolve<SmartQuestObjectiveParameter>((typeof(bool), true)));
                 parameterFactory.Register("SmartQuestObjectiveParameter", containerProvider.Resolve<SmartQuestObjectiveParameter>((typeof(bool), false)));
@@ -426,7 +426,7 @@ namespace WDE.SmartScriptEditor.Data
                 {
                     string key = data.Parameters[i].Type;
                     if (!parameterFactory.IsRegisteredLong(key))
-                        Console.WriteLine("Parameter type " + key + " is not registered");
+                        LOG.LogWarning("Parameter type " + key + " is not registered");
                 
                     IParameter<long> parameter = parameterFactory.Factory(key);
                     element.GetParameter(i).Name = data.Parameters[i].Name;
@@ -497,7 +497,7 @@ namespace WDE.SmartScriptEditor.Data
                 {
                     string key = data.Parameters[i].Type;
                     if (!parameterFactory.IsRegisteredLong(key))
-                        Console.WriteLine("Parameter type " + key + " is not registered");
+                        LOG.LogWarning("Parameter type " + key + " is not registered");
                     IParameter<long> parameter = parameterFactory.Factory(key);
 
                     element.GetParameter(i).Name = data.Parameters[i].Name;
@@ -512,7 +512,7 @@ namespace WDE.SmartScriptEditor.Data
                 {
                     string? key = data.StringParameters[i].Type;
                     if (key != null && !parameterFactory.IsRegisteredString(key))
-                        Console.WriteLine("Parameter type " + key + " is not registered");
+                        LOG.LogWarning("Parameter type " + key + " is not registered");
                     IParameter<string> parameter = parameterFactory.FactoryString(key);
 
                     element.GetStringParameter(i).Name = data.StringParameters[i].Name;

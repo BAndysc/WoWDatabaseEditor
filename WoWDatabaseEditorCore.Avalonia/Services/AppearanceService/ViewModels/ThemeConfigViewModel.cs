@@ -23,6 +23,7 @@ using WDE.MVVM.Observable;
 using WoWDatabaseEditorCore.Avalonia.Services.AppearanceService.Data;
 using WoWDatabaseEditorCore.Avalonia.Services.AppearanceService.Providers;
 using WoWDatabaseEditorCore.Avalonia.Views;
+using HslColor = AvaloniaStyles.Utils.HslColor;
 
 namespace WoWDatabaseEditorCore.Avalonia.Services.AppearanceService.ViewModels
 {
@@ -42,7 +43,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.AppearanceService.ViewModels
             useCustomScaling = currentSettings.UseCustomScaling;
             scalingValue = Math.Clamp(currentSettings.CustomScaling, 0.5, 4);
             RecommendedScalingPercentage =
-                (int)(((mainWindowHolder.RootWindow?.Screens?.Primary ?? mainWindowHolder.RootWindow?.Screens?.All?.FirstOrDefault())?.PixelDensity ?? 1) * 100);
+                (int)(((mainWindowHolder.RootWindow?.Screens?.Primary ?? mainWindowHolder.RootWindow?.Screens?.All?.FirstOrDefault())?.Scaling ?? 1) * 100);
             AllowCustomScaling = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             
             Save = new DelegateCommand(() =>
@@ -132,6 +133,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.AppearanceService.ViewModels
 
         public bool IsModified =>
             currentSettings.UseCustomScaling != useCustomScaling ||
+            Math.Abs(currentSettings.CustomScaling - scalingValue) > 0.001f ||
             CurrentThemeName.Name != ThemeName.Name ||
             Math.Abs(currentSettings.Hue - (color.H - AvaloniaThemeStyle.BaseHue)) > 0.0001f ||
             Math.Abs(currentSettings.Saturation - color.S) > 0.0001f ||

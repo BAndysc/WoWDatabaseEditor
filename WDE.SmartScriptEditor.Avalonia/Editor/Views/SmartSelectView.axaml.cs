@@ -18,7 +18,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.Views
         public SmartSelectView()
         {
             InitializeComponent();
-            var searchTextBox = this.FindControl<TextBox>("SearchTextBox");
+            var searchTextBox = this.GetControl<TextBox>("SearchTextBox");
             searchTextBox.AddHandler(KeyDownEvent, InputElement_OnKeyDown, RoutingStrategies.Tunnel);
         }
         
@@ -31,7 +31,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.Views
         private void InputElement_OnKeyDown(object? sender, KeyEventArgs e)
         {
             var textBox = (TextBox)sender!;
-            if (!(e.Key == Key.Down || e.Key == Key.Right && textBox.SelectionStart == textBox.Text.Length))
+            if (!(e.Key == Key.Down || e.Key == Key.Right && textBox.SelectionStart == textBox.Text?.Length))
                 return;
 
             if (DataContext is SmartSelectViewModel vm)
@@ -43,7 +43,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.Views
                     var index = listBox.SelectedIndex;
                     if (index < 0 || index >= listBox.ItemCount)
                         index = 0;
-                    FocusManager.Instance!.Focus(listBox.ItemContainerGenerator.ContainerFromIndex(index), NavigationMethod.Tab);
+                    listBox.ContainerFromIndex(index)!.Focus(NavigationMethod.Tab);
                 }
                 e.Handled = true;
             }

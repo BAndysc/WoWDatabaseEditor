@@ -9,6 +9,7 @@ using WDE.Common.Menu;
 using WDE.Common.Services;
 using WDE.Module.Attributes;
 using WoWDatabaseEditorCore.Managers;
+using WoWDatabaseEditorCore.Services.LogService.ViewModels;
 using WoWDatabaseEditorCore.ViewModels;
 
 namespace WoWDatabaseEditorCore.Providers
@@ -17,7 +18,7 @@ namespace WoWDatabaseEditorCore.Providers
     public class HelpMenuItemProvider : IMainMenuItem, INotifyPropertyChanged
     {
         private readonly Func<AboutViewModel> aboutViewModelCreator;
-        private readonly Func<DebugConsoleViewModel> debugConsole;
+        private readonly Func<LogViewerControlViewModel> debugConsole;
         private readonly ITextDocumentService textDocumentService;
         public IDocumentManager DocumentManager { get; }
         
@@ -27,7 +28,7 @@ namespace WoWDatabaseEditorCore.Providers
 
         public HelpMenuItemProvider(IDocumentManager documentManager, IConfigureService settings,
             Func<AboutViewModel> aboutViewModelCreator, 
-            Func<DebugConsoleViewModel> debugConsole,
+            Func<LogViewerControlViewModel> debugConsole,
             ITextDocumentService textDocumentService,
             IReportBugService reportBugService)
         {

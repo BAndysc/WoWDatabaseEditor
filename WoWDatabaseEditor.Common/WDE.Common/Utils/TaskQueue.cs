@@ -97,7 +97,7 @@ public partial class TaskQueue : INotifyPropertyChanged
             {
                 await currentTask;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 // Todo: I think this can be safely ignored, because someone else already awaits this task, don't they?
             }
@@ -122,7 +122,7 @@ public partial class TaskQueue : INotifyPropertyChanged
         {
             await currentTask;
         }
-        catch (Exception e)
+        catch (Exception)
         {
             // Todo: I think this can be safely ignored, because someone else already awaits the currentTask, don't they?
         }
@@ -187,9 +187,9 @@ public partial class TaskQueue : INotifyPropertyChanged
                 }
             }
         }
-        catch (InvalidThreadAccessException e)
+        catch (InvalidThreadAccessException)
         {
-            Console.WriteLine("CONCURRENCY EXCEPTION! The last task has run the continuation on another thread! This is not how async await should work. This is a critical error, please report to the devs.");
+            LOG.LogCritical("CONCURRENCY EXCEPTION! The last task has run the continuation on another thread! This is not how async await should work. This is a critical error, please report to the devs.");
         }
         finally
         {

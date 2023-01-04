@@ -6,16 +6,11 @@ namespace WDE.CommonViews.Avalonia.History.Views
     /// <summary>
     ///     Interaction logic for HistoryView.xaml
     /// </summary>
-    public class HistoryView : ToolView
+    public partial class HistoryView : ToolView
     {
         public HistoryView()
         {
             InitializeComponent();
-        }
-        
-        private void InitializeComponent()
-        {
-            AvaloniaXamlLoader.Load(this);
         }
     }
 }

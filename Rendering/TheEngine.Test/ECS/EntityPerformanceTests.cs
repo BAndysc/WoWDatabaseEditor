@@ -19,8 +19,8 @@ namespace TheEngine.Test.ECS
             public Vector3 velocity;
         }
 
-        private IEntityManager entityManager;
-        private Archetype archetype;
+        private IEntityManager entityManager = null!;
+        private Archetype archetype = null!;
         private int count = 10_000_000;
 
         private class OldSchoolObject

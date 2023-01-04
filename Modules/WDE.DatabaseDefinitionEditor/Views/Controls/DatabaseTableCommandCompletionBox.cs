@@ -13,9 +13,9 @@ using WDE.DatabaseEditors.CustomCommands;
 
 namespace WDE.DatabaseDefinitionEditor.Views.Controls;
 
-public class DatabaseTableCommandCompletionBox : CompletionComboBox, IStyleable
+public class DatabaseTableCommandCompletionBox : CompletionComboBox
 {
-    Type IStyleable.StyleKey => typeof(CompletionComboBox);
+    protected override Type StyleKeyOverride => typeof(CompletionComboBox);
 
     public string CommandId
     {

@@ -43,7 +43,7 @@ public class QuestStarterEnderParameter : IParameter<long>, ICustomPickerContext
         return null;
     }
 
-    private uint? GetEntry(SmartBaseElement? element)
+    private async ValueTask<uint?> GetEntry(SmartBaseElement? element)
     {
         var script = GetScript(element);
         if (script == null)
@@ -51,9 +51,9 @@ public class QuestStarterEnderParameter : IParameter<long>, ICustomPickerContext
         if (script.EntryOrGuid < 0)
         {
             if (script.SourceType == SmartScriptType.GameObject)
-                return databaseProvider.GetGameObjectByGuid(0, (uint)(-script.EntryOrGuid))?.Entry;
+                return (await databaseProvider.GetGameObjectByGuidAsync(0, (uint)(-script.EntryOrGuid)))?.Entry;
             else
-                return databaseProvider.GetCreatureByGuid(0, (uint)(-script.EntryOrGuid))?.Entry;
+                return (await databaseProvider.GetCreatureByGuidAsync(0, (uint)(-script.EntryOrGuid)))?.Entry;
         }
 
         uint value = 0;
@@ -70,7 +70,7 @@ public class QuestStarterEnderParameter : IParameter<long>, ICustomPickerContext
 
     public async Task<(long, bool)> PickValue(long value, object context)
     {
-        var entry = GetEntry(context as SmartBaseElement);
+        var entry = await GetEntry(context as SmartBaseElement);
         if (!entry.HasValue)
         {
             return await FallbackPicker();

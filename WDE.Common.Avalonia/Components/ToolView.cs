@@ -4,10 +4,10 @@ using AvaloniaStyles.Controls;
 
 namespace WDE.Common.Avalonia.Components
 {
-    public class ToolView : UserControl
+    public partial class ToolView : UserControl
     {
         public static readonly StyledProperty<MonochromaticIcon> IconProperty =
-            AvaloniaProperty.Register<ToolView, MonochromaticIcon>(nameof(Icon));
+            AvaloniaProperty.RegisterAttached<ToolView, MonochromaticIcon>(nameof(Icon), typeof(ToolView));
         
         public MonochromaticIcon Icon
         {

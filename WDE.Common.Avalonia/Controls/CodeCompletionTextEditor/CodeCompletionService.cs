@@ -2,16 +2,21 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using AvaloniaEdit.Document;
 using Newtonsoft.Json;
+using WDE.Common.Modules;
+using WDE.Common.Services;
 using WDE.Module.Attributes;
 
 namespace WDE.Common.Avalonia.Controls.CodeCompletionTextEditor;
 
 [AutoRegister]
 [SingleInstance]
-public class CodeCompletionService : ICodeCompletionService
+public class CodeCompletionService : ICodeCompletionService, IGlobalAsyncInitializer
 {
+    private readonly IRuntimeDataService runtimeDataService;
+
     public class TraceSchema
     {
         [JsonProperty("name")]
@@ -23,31 +28,33 @@ public class CodeCompletionService : ICodeCompletionService
 
     private Dictionary<string, TraceSchema> schemata = new();
 
-    public CodeCompletionService()
+    public CodeCompletionService(IRuntimeDataService runtimeDataService)
     {
-        if (Directory.Exists("CodeCompletionData"))
+        this.runtimeDataService = runtimeDataService;
+    }
+
+    public async Task Initialize()
+    {
+        var files = await runtimeDataService.GetAllFiles("CodeCompletionData", "*.json");
+        foreach (var file in files)
         {
-            var files = Directory.GetFiles("CodeCompletionData", "*.json");
-            foreach (var file in files)
+            try
             {
-                try
+                var schema = await runtimeDataService.ReadAllText(file);
+                var deserialized = JsonConvert.DeserializeObject<TraceSchema[]>(schema);
+                if (deserialized != null)
                 {
-                    var schema = File.ReadAllText(file);
-                    var deserialized = JsonConvert.DeserializeObject<TraceSchema[]>(schema);
-                    if (deserialized != null)
+                    foreach (var traceSchema in deserialized)
                     {
-                        foreach (var traceSchema in deserialized)
-                        {
-                            if (schemata.ContainsKey(traceSchema.Name))
-                                Console.WriteLine("Duplicate schema name: " + traceSchema.Name + ". Ignoring the old one.");
-                            schemata[traceSchema.Name] = traceSchema;
-                        }
+                        if (schemata.ContainsKey(traceSchema.Name))
+                            LOG.LogWarning(LOG.NonCriticalInvalidStateEventId, "Duplicate schema name: " + traceSchema.Name + ". Ignoring the old one.");
+                        schemata[traceSchema.Name] = traceSchema;
                     }
                 }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
+            }
+            catch (Exception e)
+            {
+                LOG.LogError(e);
             }
         }
     }

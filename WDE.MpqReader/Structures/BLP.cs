@@ -160,10 +160,15 @@ namespace WDE.MpqReader.Structures
                 height /= 2;
             }
             using Image<Rgba32> img = new Image<Rgba32>(width, height);
-            for (int y = 0; y < height; ++y)
             {
-                var span = img.GetPixelRowSpan(y);
-                blp.Data[mipLevel].AsSpan(y * width, width).CopyTo(span);
+                img.ProcessPixelRows(x =>
+                {
+                    for (int y = 0; y < x.Height; ++y)
+                    {
+                        var span = x.GetRowSpan(y);
+                        blp.Data[mipLevel].AsSpan(y * width, width).CopyTo(span);
+                    }
+                });
             }
             img.SaveAsPng(path);
         }

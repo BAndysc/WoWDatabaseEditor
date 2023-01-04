@@ -18,7 +18,7 @@ public class SmartSelectViewModelTests
     {
         private List<(SendOrPostCallback d, object state)> queue = new();
     
-        public override void Post(SendOrPostCallback d, object? state) => queue.Add((d, state));
+        public override void Post(SendOrPostCallback d, object state) => queue.Add((d, state));
 
         public void ExecuteAll()
         {

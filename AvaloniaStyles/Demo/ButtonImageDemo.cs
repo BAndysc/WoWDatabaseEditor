@@ -7,14 +7,14 @@ using WDE.Common.Types;
 
 namespace AvaloniaStyles.Demo;
 
-public class ButtonImageDemo : Button, IStyleable
+public class ButtonImageDemo : Button
 {
     private object? image;
     public static readonly DirectProperty<ButtonImageDemo, object?> ImageProperty = AvaloniaProperty.RegisterDirect<ButtonImageDemo, object?>("Image", o => o.Image, (o, v) => o.Image = v);
     
     private string? text;
     public static readonly DirectProperty<ButtonImageDemo, string?> TextProperty = AvaloniaProperty.RegisterDirect<ButtonImageDemo, string?>("Text", o => o.Text, (o, v) => o.Text = v);
-    Type IStyleable.StyleKey => typeof(Button);
+    protected override Type StyleKeyOverride => typeof(Button);
 
     public object? Image
     {
@@ -49,7 +49,9 @@ public class ButtonImageDemo : Button, IStyleable
         if (hasImage && text != null)
         {
             var sp = new StackPanel() { Orientation = Orientation.Horizontal };
-            sp.Children.Add(new TextBlock(){Text = text, VerticalAlignment = VerticalAlignment.Center, Classes = new Classes("ButtonText")});
+            var tb = new TextBlock() { Text = text, VerticalAlignment = VerticalAlignment.Center };
+            tb.Classes.Add("ButtonText");
+            sp.Children.Add(tb);
             btn.Content = sp;
         }
         else if (hasImage)

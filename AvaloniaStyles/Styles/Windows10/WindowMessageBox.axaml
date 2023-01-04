@@ -1,0 +1,117 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    x:ClassModifier="internal">
+    <ControlTheme x:Key="{x:Type BaseMessageBoxWindow}" TargetType="BaseMessageBoxWindow">
+        <Setter Property="Background" Value="{DynamicResource SystemRegionBrush}"/>
+        <Setter Property="TransparencyBackgroundFallback" Value="{DynamicResource SystemControlBackgroundAltHighBrush}" />
+        <Setter Property="TopLevel.SystemBarColor" Value="{DynamicResource SystemControlBackgroundAltHighBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}"/>
+        <Setter Property="FontSize" Value="{DynamicResource ControlContentThemeFontSize}"/>
+        <Setter Property="FontFamily" Value="{DynamicResource ContentControlThemeFontFamily}" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Panel>
+                    <Border Name="PART_TransparencyFallback" IsHitTestVisible="False" />
+                    <Border Background="{TemplateBinding Background}" IsHitTestVisible="False" />
+                    <Panel Background="Transparent" Margin="{TemplateBinding WindowDecorationMargin}" />
+                    <VisualLayerManager>
+                        <VisualLayerManager.ChromeOverlayLayer>
+                            <TitleBar />
+                        </VisualLayerManager.ChromeOverlayLayer>
+                        <DockPanel LastChildFill="True">
+                            <ContentPresenter DockPanel.Dock="Bottom" 
+                                              Content="{TemplateBinding Content}"
+                                              Name="Buttons" 
+                                              HorizontalContentAlignment="Right" 
+                                              Background="{DynamicResource MessageBoxBottomPanelBackground}" 
+                                              BorderBrush="{DynamicResource MessageBoxBottomPanelBorder}"
+                                              BorderThickness="0,1,0,0"
+                                              Padding="10"/>
+                            <DockPanel LastChildFill="True" Margin="10">
+                                <ContentPresenter Content="{TemplateBinding Image}"
+                                                  VerticalContentAlignment="Top"
+                                                  VerticalAlignment="Top"
+                                                  Width="32" Height="32"
+                                                  Margin="0,0,15,0" />
+                                <TextBlock Text="{TemplateBinding Header}" Foreground="{DynamicResource MessageBoxTitleForeground}" TextWrapping="WrapWithOverflow" FontSize="16" DockPanel.Dock="Top" Margin="0,0,0,12" />
+                                <TextBlock Text="{TemplateBinding Message}" TextWrapping="WrapWithOverflow" FontSize="12" />
+                            </DockPanel>
+                        </DockPanel>
+                    </VisualLayerManager>
+                </Panel>
+            </ControlTemplate>
+        </Setter>
+    </ControlTheme>
+</ResourceDictionary>
+
+<!-- <Styles xmlns="https://github.com/avaloniaui" -->
+<!--         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"> -->
+<!--     <Style Selector="BaseMessageBoxWindow"> -->
+<!--         <Setter Property="FontFamily" Value="{DynamicResource ContentControlThemeFontFamily}"  /> -->
+<!--         <Setter Property="Background" Value="{DynamicResource SystemControlBackgroundAltHighBrush}" /> -->
+<!--         <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}"/> -->
+<!--         <Setter Property="Title" Value="{DynamicResource Title}"/> -->
+<!--         <Setter Property="WindowStartupLocation" Value="CenterOwner" /> -->
+<!--         <Setter Property="Template"> -->
+<!--             <ControlTemplate> -->
+<!--                 <Panel> -->
+<!--                     <Border Name="PART_TransparencyFallback" IsHitTestVisible="False" /> -->
+<!--                     <Border Background="{TemplateBinding Background}" IsHitTestVisible="False" /> -->
+<!--                     <Panel Background="Transparent" Margin="{TemplateBinding WindowDecorationMargin}" /> -->
+<!--                     <VisualLayerManager> -->
+<!--                         <VisualLayerManager.ChromeOverlayLayer> -->
+<!--                             <TitleBar /> -->
+<!--                         </VisualLayerManager.ChromeOverlayLayer> -->
+<!--                         <ContentPresenter Name="PART_ContentPresenter" -->
+<!--                                           ContentTemplate="{TemplateBinding ContentTemplate}" -->
+<!--                                           Content="{TemplateBinding Content}" -->
+<!--                                           Margin="{TemplateBinding Padding}" -->
+<!--                                           HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" -->
+<!--                                           VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"/> -->
+<!--                     </VisualLayerManager> -->
+<!--                 </Panel> -->
+<!--             </ControlTemplate> -->
+<!--         </Setter> -->
+<!--     </Style> -->
+<!--     <Style Selector="BaseMessageBoxWindow Separator"> -->
+<!--         <Setter Property="Width" Value="10" /> -->
+<!--     </Style> -->
+<!--     <Style Selector="BaseMessageBoxWindow StackPanel"> -->
+<!--         <Setter Property="Orientation" Value="Horizontal" /> -->
+<!--         <Setter Property="HorizontalAlignment" Value="Right" /> -->
+<!--         <Setter Property="Spacing" Value="6" /> -->
+<!--     </Style> -->
+<!-- </Styles> -->
+<!-- -->
+<!-- <ResourceDictionary xmlns="https://github.com/avaloniaui" -->
+<!--                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" -->
+<!--                     x:ClassModifier="internal"> -->
+<!--     <ControlTheme x:Key="{x:Type Window}" TargetType="Window"> -->
+<!--         <Setter Property="Background" Value="{DynamicResource SystemRegionBrush}"/> -->
+<!--         <Setter Property="TransparencyBackgroundFallback" Value="{DynamicResource SystemControlBackgroundAltHighBrush}" /> -->
+<!--         <Setter Property="TopLevel.SystemBarColor" Value="{DynamicResource SystemControlBackgroundAltHighBrush}"/> -->
+<!--         <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}"/> -->
+<!--         <Setter Property="FontSize" Value="{DynamicResource ControlContentThemeFontSize}"/> -->
+<!--         <Setter Property="FontFamily" Value="{DynamicResource ContentControlThemeFontFamily}" /> -->
+<!--         <Setter Property="Template"> -->
+<!--             <ControlTemplate> -->
+<!--                 <Panel> -->
+<!--                     <Border Name="PART_TransparencyFallback" IsHitTestVisible="False" /> -->
+<!--                     <Border Background="{TemplateBinding Background}" IsHitTestVisible="False" /> -->
+<!--                     <Panel Background="Transparent" Margin="{TemplateBinding WindowDecorationMargin}" /> -->
+<!--                     <VisualLayerManager> -->
+<!--                         <VisualLayerManager.ChromeOverlayLayer> -->
+<!--                             <TitleBar /> -->
+<!--                         </VisualLayerManager.ChromeOverlayLayer> -->
+<!--                         <ContentPresenter Name="PART_ContentPresenter" -->
+<!--                                           ContentTemplate="{TemplateBinding ContentTemplate}" -->
+<!--                                           Content="{TemplateBinding Content}" -->
+<!--                                           Margin="{TemplateBinding Padding}" -->
+<!--                                           HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" -->
+<!--                                           VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"/> -->
+<!--                     </VisualLayerManager> -->
+<!--                 </Panel> -->
+<!--             </ControlTemplate> -->
+<!--         </Setter> -->
+<!--     </ControlTheme> -->
+<!-- </ResourceDictionary> -->

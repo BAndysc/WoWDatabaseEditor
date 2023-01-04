@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;
 using WDE.Common.Services.MessageBox;
@@ -92,9 +93,9 @@ namespace WDE.MangosEventAiEditor.Exporter
             return lines.ToArray();
         }
 
-        public IQuery GenerateSql(IEventAiSolutionItem item, EventAiScript script)
+        public async Task<IQuery> GenerateSql(IEventAiSolutionItem item, EventAiScript script)
         {
-            return new ExporterHelper(script, databaseProvider, item, this, currentCoreVersion, nameRegistry).GetSql();
+            return await new ExporterHelper(script, databaseProvider, item, this, currentCoreVersion, nameRegistry).GetSql();
         }
     }
 }

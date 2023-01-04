@@ -8,7 +8,7 @@ namespace WDE.Common.Avalonia.Controls;
 
 public class VirtualizedTreeViewItem : TemplatedControl, ISelectable
 {
-    public static StyledProperty<IDataTemplate?> ContentTemplateProperty =
+    public static readonly StyledProperty<IDataTemplate?> ContentTemplateProperty =
         AvaloniaProperty.Register<VirtualizedTreeViewItem, IDataTemplate?>(nameof(ContentTemplate));
     
     public static readonly StyledProperty<bool> IsSelectedProperty =

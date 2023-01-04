@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Prism.Events;
+using WDE.Common;
 using WDE.Common.Database;
 using WDE.Common.Services;
 using WDE.Common.Services.QueryParser;
@@ -33,12 +34,12 @@ public class QueryReverseRemoteCommand : IReverseRemoteCommand
     public async Task Invoke(ICommandArguments arguments)
     {
         var query = arguments.TakeRestArguments;
-        Console.WriteLine(query);
+        LOG.LogInformation(query);
 
         var items = await queryParser.Value.GenerateItemsForQuery(query);
         
         foreach (var e in items.errors)
-            Console.WriteLine(e);
+            LOG.LogError(e);
         
         await mysqlExecutor.Value.ExecuteSql(query);
         

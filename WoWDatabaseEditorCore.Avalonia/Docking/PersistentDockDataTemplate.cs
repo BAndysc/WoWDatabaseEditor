@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using Avalonia;
 using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
@@ -16,29 +18,32 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
     {
         public static IDocumentManager? DocumentManager;
         private bool bound = false;
-        private Dictionary<IDocument, IControl> documents = new();
-        private Dictionary<ITool, IControl> tools = new();
+        private static Dictionary<IDocument, Control> documents = new();
+        private static Dictionary<ITool, Control> tools = new();
 
-        public bool Match(object data)
+        public bool Match(object? data)
         {
             return data is AvaloniaDocumentDockWrapper || data is AvaloniaToolDockWrapper;
         }
 
-        public IControl Build(object data, IControl? existing)
+        public Control Build(object? data, Control? existing)
         {
             Bind();
             if (data is AvaloniaDocumentDockWrapper documentDockWrapper)
             {
                 if (documents.TryGetValue(documentDockWrapper.ViewModel, out var view))
                 {
-                    var parent = view.VisualParent;
-                    if (parent?.VisualChildren is AvaloniaList<IVisual> children)
+                    var parent = view.GetVisualParent();
+                    if (parent?.GetVisualChildren() is AvaloniaList<Visual> children)
+                    {
+                        Console.WriteLine("Bandy: avalonia 11 fishy thing, to investigate [571XXA]");
                         children.Remove(view);
+                    }
                     ((ISetLogicalParent)(view)).SetParent(null);
                     return view;
                 }
                 
-                if (ViewBind.TryResolve(documentDockWrapper.ViewModel, out var documentView) && documentView is IControl control)
+                if (ViewBind.TryResolve(documentDockWrapper.ViewModel, out var documentView) && documentView is Control control)
                 {
                     documents[documentDockWrapper.ViewModel] = control;
                     documents[documentDockWrapper.ViewModel].Classes.Add("documentView");
@@ -50,13 +55,16 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
             {
                 if (tools.TryGetValue(toolDockWrapper.ViewModel, out var view))
                 {
-                    var parent = view.VisualParent;
-                    if (parent?.VisualChildren is AvaloniaList<IVisual> children)
+                    var parent = view.GetVisualParent();
+                    if (parent?.GetVisualChildren() is AvaloniaList<Visual> children)
+                    {
+                        Console.WriteLine("Bandy: avalonia 11 fishy thing, to investigate [571XXA]");
                         children.Remove(view);
+                    }
                     return view;
                 }
 
-                if (ViewBind.TryResolve(toolDockWrapper.ViewModel, out var documentView) && documentView is IControl control)
+                if (ViewBind.TryResolve(toolDockWrapper.ViewModel, out var documentView) && documentView is Control control)
                 {
                     tools[toolDockWrapper.ViewModel] = control;
                     tools[toolDockWrapper.ViewModel].DataContext = toolDockWrapper.ViewModel;
@@ -67,7 +75,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
             return new Panel();
         }
 
-        public IControl Build(object data)
+        public Control Build(object? data)
         {
             Bind();
             return Build(data, null);
@@ -81,7 +89,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
                 DocumentManager.OpenedDocuments.ToStream(false).Where(e => e.Type == CollectionEventType.Remove)
                     .SubscribeAction(item =>
                     {
-                        RemoveContextMenus(documents[item.Item]);
+                        //RemoveContextMenus(documents[item.Item]);
                         documents.Remove(item.Item);
                     });
                 foreach (var tool in DocumentManager.AllTools)
@@ -95,39 +103,39 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
                 }
             }
         }
-
-        // This might fix https://github.com/AvaloniaUI/Avalonia/issues/8214 in some cases, but dunno
-        private void RemoveContextMenus(IControl item)
-        {
-            Queue<(IControl, int)> queue = new();
-            queue.Enqueue((item, 0));
-            while (queue.Count > 0)
-            {
-                var (elem, level) = queue.Dequeue();
-                if (elem is ContentControl cc && cc.Content is IControl ic2)
-                {
-                    queue.Enqueue((ic2, level));
-                }
-                else if (elem is ContentPresenter cp && cp.Content is IControl ic3)
-                {
-                    queue.Enqueue((ic3, level));
-                }
-                if (elem is Control c)
-                {
-                    if (c.ContextMenu != null)
-                        c.ContextMenu = null;
-                    if (c.ContextFlyout != null)
-                        c.ContextFlyout = null;
-                }
-
-                foreach (var child in elem.GetVisualChildren())
-                {
-                    if (child is IControl ic)
-                    {
-                        queue.Enqueue((ic, level + 1));
-                    }
-                }
-            }
-        }
+        //
+        // // This might fix https://github.com/AvaloniaUI/Avalonia/issues/8214 in some cases, but dunno
+        // private void RemoveContextMenus(Control item)
+        // {
+        //     Queue<(Control, int)> queue = new();
+        //     queue.Enqueue((item, 0));
+        //     while (queue.Count > 0)
+        //     {
+        //         var (elem, level) = queue.Dequeue();
+        //         if (elem is ContentControl cc && cc.Content is Control ic2)
+        //         {
+        //             queue.Enqueue((ic2, level));
+        //         }
+        //         else if (elem is ContentPresenter cp && cp.Content is Control ic3)
+        //         {
+        //             queue.Enqueue((ic3, level));
+        //         }
+        //         if (elem is Control c)
+        //         {
+        //             if (c.ContextMenu != null)
+        //                 c.ContextMenu = null;
+        //             if (c.ContextFlyout != null)
+        //                 c.ContextFlyout = null;
+        //         }
+        //
+        //         foreach (var child in elem.GetVisualChildren())
+        //         {
+        //             if (child is Control ic)
+        //             {
+        //                 queue.Enqueue((ic, level + 1));
+        //             }
+        //         }
+        //     }
+        // }
     }
 }

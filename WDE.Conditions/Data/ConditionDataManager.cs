@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using WDE.Common.Modules;
 using WDE.Common.Parameters;
 using WDE.Module.Attributes;
 
@@ -30,13 +32,15 @@ namespace WDE.Conditions.Data
     }
 
     [SingleInstance, AutoRegister]
-    public class ConditionDataManager : IConditionDataManager
+    public class ConditionDataManager : IConditionDataManager, IGlobalAsyncInitializer
     {
         Dictionary<int, ConditionJsonData> conditionData = new ();
         Dictionary<string, ConditionJsonData> conditionDataByName = new ();
 
         Dictionary<int, ConditionSourcesJsonData> conditionSourceData = new ();
         Dictionary<string, ConditionSourcesJsonData> conditionSourceDataByName = new ();
+
+        private IReadOnlyList<ConditionGroupsJsonData> conditionGroups = Array.Empty<ConditionGroupsJsonData>();
 
         private readonly IConditionDataProvider provider;
         private readonly IParameterFactory parameterFactory;
@@ -45,8 +49,13 @@ namespace WDE.Conditions.Data
         {
             this.provider = provider;
             this.parameterFactory = parameterFactory;
-            LoadConditions(provider.GetConditions());
-            LoadConditionSources(provider.GetConditionSources());
+        }
+
+        public async Task Initialize()
+        {
+            LoadConditions(await provider.GetConditions());
+            LoadConditionSources(await provider.GetConditionSources());
+            conditionGroups = await provider.GetConditionGroups();
 
             RegisterDynamicParameters();
         }
@@ -147,9 +156,10 @@ namespace WDE.Conditions.Data
             return conditionSourceDataByName[name];
         }
 
-        public IEnumerable<ConditionGroupsJsonData> GetConditionGroups() => provider.GetConditionGroups();
+        public IEnumerable<ConditionGroupsJsonData> GetConditionGroups() => conditionGroups;
 
         public IEnumerable<ConditionJsonData> AllConditionData => conditionDataByName.Values;
+
         public IEnumerable<ConditionSourcesJsonData> AllConditionSourceData => conditionSourceData.Values;
     }
 }

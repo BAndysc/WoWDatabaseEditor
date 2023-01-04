@@ -10,9 +10,9 @@ namespace WDE.QueryGenerators.Generators.Creature;
 [RequiresCore("TrinityMaster", "TrinityCata", "TrinityWrath", "Azeroth", "CMaNGOS-WoTLK", "CMaNGOS-TBC", "CMaNGOS-Classic")]
 public class TrinityCreatureDiffQueryProvider : IUpdateQueryProvider<CreatureDiff>
 {
-    private readonly IDatabaseProvider databaseProvider;
+    private readonly ICachedDatabaseProvider databaseProvider;
 
-    public TrinityCreatureDiffQueryProvider(IDatabaseProvider databaseProvider)
+    public TrinityCreatureDiffQueryProvider(ICachedDatabaseProvider databaseProvider)
     {
         this.databaseProvider = databaseProvider;
     }
@@ -23,7 +23,7 @@ public class TrinityCreatureDiffQueryProvider : IUpdateQueryProvider<CreatureDif
     {
         var trans = Queries.BeginTransaction(DataDatabaseType.World);
 
-        var creatureEntry = databaseProvider.GetCreatureByGuid(diff.Guid, diff.Entry);
+        var creatureEntry = databaseProvider.GetCachedCreatureByGuid(diff.Guid, diff.Entry);
 
         if (creatureEntry != null)
             trans.Comment(creatureEntry.Guid.ToString());

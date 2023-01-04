@@ -23,7 +23,7 @@
              Text="{CompiledBinding SearchText}" />
 
     <ScrollViewer HorizontalScrollBarVisibility="Visible"
-                  Background="{DynamicResource ContentBackground}">
+                       Background="{DynamicResource ContentBackground}">
       <fastTableView:VeryFastTableView Items="{CompiledBinding  Items}"
                                        IsGroupingEnabled="True"
                                        x:Name="VeryFastTableView"
@@ -31,7 +31,7 @@
                                        MultiSelection="{CompiledBinding MultiSelection}"
                                        SelectedRowIndex="{CompiledBinding FocusedRowIndex}"
                                        DoubleTapped="VeryFastTableView_OnDoubleTapped"
-                                       TextBlock.FontFamily="{DynamicResource MonoFont}"
+                                       TextElement.FontFamily="{DynamicResource MonoFont}"
                                        Columns="{CompiledBinding Columns}">
         <fastTableView:VeryFastTableView.GroupHeaderTemplate>
           <DataTemplate x:DataType="viewModels:LootGroupViewModel">

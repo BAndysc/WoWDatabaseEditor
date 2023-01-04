@@ -18,31 +18,36 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 {
     public class CachedDatabaseProvider : ICachedDatabaseProvider
     {
+        private Dictionary<(uint entry, uint guid), ICreature> creaturesByGuid = new();
+        private Dictionary<(uint entry, uint guid), IGameObject> gameObjectsByGuid = new();
+
         private IReadOnlyList<ICreatureTemplate>? creatureTemplateCache;
         private Dictionary<uint, ICreatureTemplate> creatureTemplateByEntry = new();
         
-        private List<IGameObjectTemplate>? gameObjectTemplateCache;
+        private IReadOnlyList<IGameObjectTemplate>? gameObjectTemplateCache;
         private Dictionary<uint, IGameObjectTemplate> gameObjectTemplateByEntry = new();
 
-        private List<IQuestTemplate>? questTemplateCache;
+        private IReadOnlyList<IQuestTemplate>? questTemplateCache;
         private Dictionary<uint, IQuestTemplate> questTemplateByEntry = new();
+
+        private Dictionary<uint, ISceneTemplate> sceneByEntry = new();
         
         private Dictionary<uint, ICreatureModelInfo>? creatureModelInfos;
         
         private Dictionary<uint, IReadOnlyList<ICreatureText>?> creatureTextsCache = new();
 
-        private IList<IAreaTriggerTemplate>? areaTriggerTemplates;
-        private List<IGameEvent>? gameEventsCache;
-        private List<IConversationTemplate>? conversationTemplates;
-        private List<IGossipMenu>? gossipMenusCache;
-        private List<INpcText>? npcTextsCache;
+        private IReadOnlyList<IAreaTriggerTemplate>? areaTriggerTemplates;
+        private IReadOnlyList<IGameEvent>? gameEventsCache;
+        private IReadOnlyList<IConversationTemplate>? conversationTemplates;
+        private IReadOnlyList<IGossipMenu>? gossipMenusCache;
+        private IReadOnlyList<INpcText>? npcTextsCache;
         private Dictionary<uint, INpcText>? npcTextsByIdCache;
-        private List<ICreatureClassLevelStat>? creatureClassLevelStatsCache;
-        private IList<IDatabaseSpellDbc>? databaseSpellDbcCache;
+        private IReadOnlyList<ICreatureClassLevelStat>? creatureClassLevelStatsCache;
+        private IReadOnlyList<IDatabaseSpellDbc>? databaseSpellDbcCache;
 
-        private List<IBroadcastText>? broadcastTextsSortedCache;
+        private IReadOnlyList<IBroadcastText>? broadcastTextsSortedCache;
         private Dictionary<uint, int>? broadcastTextIndexByIdCache;
-        private StringTrie<IBroadcastText>? broadcastTextsCache;
+        private TrieDictionary<IBroadcastText>? broadcastTextsCache = new();
         
         private IAsyncDatabaseProvider nonCachedDatabase;
         private readonly ITaskRunner taskRunner;
@@ -163,6 +168,54 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         }
 
         public bool IsConnected => nonCachedDatabase.IsConnected;
+        public async Task<IReadOnlyList<ICreatureTemplate>> GetCreatureTemplatesAsync()
+        {
+            if (creatureTemplateCache != null)
+                return creatureTemplateCache;
+            return await nonCachedDatabase.GetCreatureTemplatesAsync();
+        }
+
+        public async Task<IReadOnlyList<IConversationTemplate>> GetConversationTemplatesAsync()
+        {
+            if (conversationTemplates != null)
+                return conversationTemplates;
+            return await nonCachedDatabase.GetConversationTemplatesAsync();
+        }
+
+        public async Task<IReadOnlyList<IGameEvent>> GetGameEventsAsync()
+        {
+            if (gameEventsCache != null)
+                return gameEventsCache;
+            return await nonCachedDatabase.GetGameEventsAsync();
+        }
+
+        public async Task<IReadOnlyList<IGameObjectTemplate>> GetGameObjectTemplatesAsync()
+        {
+            if (gameObjectTemplateCache != null)
+                return gameObjectTemplateCache;
+            return await nonCachedDatabase.GetGameObjectTemplatesAsync();
+        }
+
+        public async Task<IReadOnlyList<IQuestTemplate>> GetQuestTemplatesAsync()
+        {
+            if (questTemplateCache != null)
+                return questTemplateCache;
+            return await nonCachedDatabase.GetQuestTemplatesAsync();
+        }
+
+        public async Task<IReadOnlyList<INpcText>> GetNpcTextsAsync()
+        {
+            if (npcTextsCache != null)
+                return npcTextsCache;
+            return await nonCachedDatabase.GetNpcTextsAsync();
+        }
+
+        public async Task<IReadOnlyList<ICreatureClassLevelStat>> GetCreatureClassLevelStatsAsync()
+        {
+            if (creatureClassLevelStatsCache != null)
+                return creatureClassLevelStatsCache;
+            return await nonCachedDatabase.GetCreatureClassLevelStatsAsync();
+        }
 
         public async Task<ICreatureTemplate?> GetCreatureTemplate(uint entry)
         {
@@ -189,6 +242,30 @@ namespace WDE.MySqlDatabaseCommon.Database.World
                 return template;
 
             return null;
+        }
+
+        public ICreature? GetCachedCreatureByGuid(uint entry, uint guid)
+        {
+            if (creaturesByGuid.TryGetValue((entry, guid), out var creature))
+                return creature;
+            return null;
+        }
+
+        public IGameObject? GetCachedGameObjectByGuid(uint entry, uint guid)
+        {
+            if (gameObjectsByGuid.TryGetValue((entry, guid), out var gameObject))
+                return gameObject;
+            return null;
+        }
+
+        public IReadOnlyList<ICreatureTemplate>? GetCachedCreatureTemplates()
+        {
+            return creatureTemplateCache;
+        }
+
+        public IReadOnlyList<IGameObjectTemplate>? GetCachedGameobjectTemplates()
+        {
+            return gameObjectTemplateCache;
         }
 
         public Task<IReadOnlyList<ICreatureTemplateDifficulty>> GetCreatureTemplateDifficulties(uint entry)
@@ -223,6 +300,11 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             return null;
         }
 
+        public IReadOnlyList<IGameObjectTemplate>? GetCachedGameObjectTemplates()
+        {
+            return gameObjectTemplateCache;
+        }
+
         public async Task<IQuestTemplate?> GetQuestTemplate(uint entry)
         {
             await WaitForCache();
@@ -240,61 +322,34 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             return null;
         }
 
-        public IReadOnlyList<IGameObjectTemplate> GetGameObjectTemplates()
+        public ISceneTemplate? GetCachedSceneTemplate(uint entry)
         {
-            if (gameObjectTemplateCache != null)
-                return gameObjectTemplateCache;
-
-            return nonCachedDatabase.GetGameObjectTemplates();
+            if (sceneByEntry.TryGetValue(entry, out var scene))
+                return scene;
+            return null;
         }
 
         public Task<IAreaTriggerScript?> GetAreaTriggerScript(int entry) => WaitForCache(nonCachedDatabase.GetAreaTriggerScript(entry));
         
         public Task<IAreaTriggerTemplate?> GetAreaTriggerTemplate(int entry) => WaitForCache(nonCachedDatabase.GetAreaTriggerTemplate(entry));
 
-        public IReadOnlyList<ICreatureTemplate> GetCreatureTemplates()
-        {
-            if (creatureTemplateCache != null)
-                return creatureTemplateCache;
-
-            return nonCachedDatabase.GetCreatureTemplates();
-        }
-
-        public async Task<IList<IGameObject>> GetGameObjectsByEntryAsync(uint entry)
+        public async Task<IReadOnlyList<IGameObject>> GetGameObjectsByEntryAsync(uint entry)
         {
             await WaitForCache();
             return await nonCachedDatabase.GetGameObjectsByEntryAsync(entry);
         }
 
-        public IReadOnlyList<ICreature> GetCreatures()
-        {
-            return nonCachedDatabase.GetCreatures();
-        }
+        public Task<IReadOnlyList<ICreature>> GetCreaturesAsync() => WaitForCache(nonCachedDatabase.GetCreaturesAsync());
 
-        public Task<IList<ICreature>> GetCreaturesAsync() => WaitForCache(nonCachedDatabase.GetCreaturesAsync());
-
-        public Task<IList<IGameObject>> GetGameObjectsAsync() => WaitForCache(nonCachedDatabase.GetGameObjectsAsync());
+        public Task<IReadOnlyList<IGameObject>> GetGameObjectsAsync() => WaitForCache(nonCachedDatabase.GetGameObjectsAsync());
 
         public Task<IReadOnlyList<ICreature>> GetCreaturesAsync(IEnumerable<SpawnKey> guids) => nonCachedDatabase.GetCreaturesAsync(guids);
 
         public Task<IReadOnlyList<IGameObject>> GetGameObjectsAsync(IEnumerable<SpawnKey> guids) => nonCachedDatabase.GetGameObjectsAsync(guids);
 
-        public Task<IList<ICreature>> GetCreaturesByMapAsync(uint map) => WaitForCache(nonCachedDatabase.GetCreaturesByMapAsync(map));
+        public Task<IReadOnlyList<ICreature>> GetCreaturesByMapAsync(uint map) => WaitForCache(nonCachedDatabase.GetCreaturesByMapAsync(map));
         
-        public Task<IList<IGameObject>> GetGameObjectsByMapAsync(uint map) => WaitForCache(nonCachedDatabase.GetGameObjectsByMapAsync(map));
-
-        public IEnumerable<IGameObject> GetGameObjects()
-        {
-            return nonCachedDatabase.GetGameObjects();
-        }
-
-        public IReadOnlyList<IQuestTemplate> GetQuestTemplates()
-        {
-            if (questTemplateCache != null)
-                return questTemplateCache;
-
-            return nonCachedDatabase.GetQuestTemplates();
-        }
+        public Task<IReadOnlyList<IGameObject>> GetGameObjectsByMapAsync(uint map) => WaitForCache(nonCachedDatabase.GetGameObjectsByMapAsync(map));
 
         public Task<IReadOnlyList<IQuestObjective>> GetQuestObjectives(uint questId) => WaitForCache(nonCachedDatabase.GetQuestObjectives(questId));
 
@@ -304,126 +359,86 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public Task<IQuestRequestItem?> GetQuestRequestItem(uint entry) => WaitForCache(nonCachedDatabase.GetQuestRequestItem(entry));
 
-        public async Task<IList<IAreaTriggerTemplate>> GetAreaTriggerTemplatesAsync()
+        public async Task<IReadOnlyList<IAreaTriggerTemplate>> GetAreaTriggerTemplatesAsync()
         {
             await WaitForCache();
             return areaTriggerTemplates ?? await nonCachedDatabase.GetAreaTriggerTemplatesAsync();
         }
 
-        public IEnumerable<ICreatureClassLevelStat> GetCreatureClassLevelStats() =>
-            creatureClassLevelStatsCache ?? nonCachedDatabase.GetCreatureClassLevelStats();
-
-        public IEnumerable<IGameEvent> GetGameEvents() => gameEventsCache ?? nonCachedDatabase.GetGameEvents();
-        
-        public IEnumerable<IConversationTemplate> GetConversationTemplates() => conversationTemplates ?? nonCachedDatabase.GetConversationTemplates();
-
-        public IEnumerable<IGossipMenu> GetGossipMenus() => gossipMenusCache ?? nonCachedDatabase.GetGossipMenus();
-
-        public Task<List<IGossipMenu>> GetGossipMenusAsync() => gossipMenusCache == null
+        public Task<IReadOnlyList<IGossipMenu>> GetGossipMenusAsync() => gossipMenusCache == null
             ? WaitForCache(nonCachedDatabase.GetGossipMenusAsync())
             : Task.FromResult(gossipMenusCache);
 
         public Task<IGossipMenu?> GetGossipMenuAsync(uint menuId) => WaitForCache(nonCachedDatabase.GetGossipMenuAsync(menuId));
 
-        public Task<List<IGossipMenuOption>> GetGossipMenuOptionsAsync(uint menuId) => WaitForCache(nonCachedDatabase.GetGossipMenuOptionsAsync(menuId));
-        public List<IGossipMenuOption> GetGossipMenuOptions(uint menuId) => nonCachedDatabase.GetGossipMenuOptions(menuId);
+        public Task<IReadOnlyList<IGossipMenuOption>> GetGossipMenuOptionsAsync(uint menuId) => WaitForCache(nonCachedDatabase.GetGossipMenuOptionsAsync(menuId));
 
-        public IEnumerable<INpcText> GetNpcTexts() => npcTextsCache ?? nonCachedDatabase.GetNpcTexts();
-
-        public INpcText? GetNpcText(uint entry)
+        public async Task<INpcText?> GetNpcText(uint entry)
         {
-            if (npcTextsByIdCache == null)
-                return nonCachedDatabase.GetNpcText(entry);
-            npcTextsByIdCache.TryGetValue(entry, out var val);
-            return val;
+            await WaitForCache();
+            if (npcTextsByIdCache != null &&
+                npcTextsByIdCache.TryGetValue(entry, out var text))
+                return text;
+            return await nonCachedDatabase.GetNpcText(entry);
         }
 
-        public Task<List<IPointOfInterest>> GetPointsOfInterestsAsync() => WaitForCache(nonCachedDatabase.GetPointsOfInterestsAsync());
+        public Task<IReadOnlyList<IPointOfInterest>> GetPointsOfInterestsAsync() => WaitForCache(nonCachedDatabase.GetPointsOfInterestsAsync());
         
-        public async Task<List<IBroadcastText>> GetBroadcastTextsAsync()
+        public async Task<IReadOnlyList<IBroadcastText>> GetBroadcastTextsAsync()
         {
             await WaitForCache();
             return broadcastTextsSortedCache ?? await nonCachedDatabase.GetBroadcastTextsAsync();
         }
 
-        public Task<List<ICreatureText>> GetCreatureTextsByEntryAsync(uint entry) => WaitForCache(nonCachedDatabase.GetCreatureTextsByEntryAsync(entry));
+        public Task<IReadOnlyList<ICreatureText>> GetCreatureTextsByEntryAsync(uint entry) => WaitForCache(nonCachedDatabase.GetCreatureTextsByEntryAsync(entry));
 
-        public Task<IList<IItem>?> GetItemTemplatesAsync() => WaitForCache(nonCachedDatabase.GetItemTemplatesAsync());
-        public Task<IList<ISmartScriptLine>> FindSmartScriptLinesBy(IEnumerable<(IDatabaseProvider.SmartLinePropertyType what, int whatValue, int parameterIndex, long valueToSearch)> conditions) 
+        public Task<IReadOnlyList<IItem>?> GetItemTemplatesAsync() => WaitForCache(nonCachedDatabase.GetItemTemplatesAsync());
+        public Task<IReadOnlyList<ISmartScriptLine>> FindSmartScriptLinesBy(IEnumerable<(IDatabaseProvider.SmartLinePropertyType what, int whatValue, int parameterIndex, long valueToSearch)> conditions) 
             => WaitForCache(nonCachedDatabase.FindSmartScriptLinesBy(conditions));
 
-        public Task<IList<ISpawnGroupTemplate>> GetSpawnGroupTemplatesAsync() => WaitForCache(nonCachedDatabase.GetSpawnGroupTemplatesAsync());
-        public Task<IList<ISpawnGroupSpawn>> GetSpawnGroupSpawnsAsync() => WaitForCache(nonCachedDatabase.GetSpawnGroupSpawnsAsync());
+        public Task<IReadOnlyList<ISpawnGroupTemplate>> GetSpawnGroupTemplatesAsync() => WaitForCache(nonCachedDatabase.GetSpawnGroupTemplatesAsync());
+        public Task<IReadOnlyList<ISpawnGroupSpawn>> GetSpawnGroupSpawnsAsync() => WaitForCache(nonCachedDatabase.GetSpawnGroupSpawnsAsync());
         public Task<ISpawnGroupTemplate?> GetSpawnGroupTemplateByIdAsync(uint id) => WaitForCache(nonCachedDatabase.GetSpawnGroupTemplateByIdAsync(id));
         public Task<ISpawnGroupSpawn?> GetSpawnGroupSpawnByGuidAsync(uint guid, SpawnGroupTemplateType type) => WaitForCache(nonCachedDatabase.GetSpawnGroupSpawnByGuidAsync(guid, type));
         public Task<ISpawnGroupFormation?> GetSpawnGroupFormation(uint id) => WaitForCache(nonCachedDatabase.GetSpawnGroupFormation(id));
-        public Task<IList<ISpawnGroupFormation>?> GetSpawnGroupFormations() => WaitForCache(nonCachedDatabase.GetSpawnGroupFormations());
-        
-        public IReadOnlyList<ICreatureText>? GetCreatureTextsByEntry(uint entry)
-        {
-            if (creatureTextsCache.TryGetValue(entry, out var texts))
-                return texts;
+        public Task<IReadOnlyList<ISpawnGroupFormation>?> GetSpawnGroupFormations() => WaitForCache(nonCachedDatabase.GetSpawnGroupFormations());
 
-            creatureTextsCache[entry] = texts = nonCachedDatabase.GetCreatureTextsByEntry(entry);
-            return texts;
-        }
+        public Task<IReadOnlyList<ISmartScriptLine>> GetLinesCallingSmartTimedActionList(int timedActionList) => WaitForCache(nonCachedDatabase.GetLinesCallingSmartTimedActionList(timedActionList));
 
-        public Task<IList<ISmartScriptLine>> GetLinesCallingSmartTimedActionList(int timedActionList) => WaitForCache(nonCachedDatabase.GetLinesCallingSmartTimedActionList(timedActionList));
-
-        public IEnumerable<IAreaTriggerTemplate> GetAreaTriggerTemplates() =>
-            areaTriggerTemplates ?? nonCachedDatabase.GetAreaTriggerTemplates();
-
-        public IEnumerable<ISmartScriptLine> GetScriptFor(uint entry, int entryOrGuid, SmartScriptType type)
-        {
-            return nonCachedDatabase.GetScriptFor(entry, entryOrGuid, type);
-        }
-
-        public Task<IList<ISmartScriptLine>> GetScriptForAsync(uint entry, int entryOrGuid, SmartScriptType type) 
+        public Task<IReadOnlyList<ISmartScriptLine>> GetScriptForAsync(uint entry, int entryOrGuid, SmartScriptType type) 
             => WaitForCache(nonCachedDatabase.GetScriptForAsync(entry, entryOrGuid, type));
 
-        public IEnumerable<IConditionLine> GetConditionsFor(int sourceType, int sourceEntry, int sourceId)
+        public async Task<IReadOnlyList<IConditionLine>> GetConditionsForAsync(int sourceType, int sourceEntry, int sourceId)
         {
-            return nonCachedDatabase.GetConditionsFor(sourceType, sourceEntry, sourceId);
+            await WaitForCache();
+            return await nonCachedDatabase.GetConditionsForAsync(sourceType, sourceEntry, sourceId);
         }
         
-        public async Task<IList<IConditionLine>> GetConditionsForAsync(IDatabaseProvider.ConditionKeyMask keyMask, IDatabaseProvider.ConditionKey key)
+        public async Task<IReadOnlyList<IConditionLine>> GetConditionsForAsync(IDatabaseProvider.ConditionKeyMask keyMask, IDatabaseProvider.ConditionKey key)
         {
             await WaitForCache();
             return await nonCachedDatabase.GetConditionsForAsync(keyMask, key);
         }
 
-        public async Task<IList<IConditionLine>> GetConditionsForAsync(IDatabaseProvider.ConditionKeyMask keyMask, ICollection<IDatabaseProvider.ConditionKey> manualKeys)
+        public async Task<IReadOnlyList<IConditionLine>> GetConditionsForAsync(IDatabaseProvider.ConditionKeyMask keyMask, ICollection<IDatabaseProvider.ConditionKey> manualKeys)
         {
             await WaitForCache();
             return await nonCachedDatabase.GetConditionsForAsync(keyMask, manualKeys);
         }
 
-        public IEnumerable<ISpellScriptName> GetSpellScriptNames(int spellId)
+        public async Task<IReadOnlyList<ISpellScriptName>> GetSpellScriptNames(int spellId)
         {
-            return nonCachedDatabase.GetSpellScriptNames(spellId);
+            return await nonCachedDatabase.GetSpellScriptNames(spellId);
         }
 
         public Task<IReadOnlyList<int>> GetSmartScriptEntriesByType(SmartScriptType scriptType) =>
             WaitForCache(nonCachedDatabase.GetSmartScriptEntriesByType(scriptType));
 
-        public Task<IList<IPlayerChoice>?> GetPlayerChoicesAsync() => WaitForCache(nonCachedDatabase.GetPlayerChoicesAsync());
+        public Task<IReadOnlyList<IPlayerChoice>?> GetPlayerChoicesAsync() => WaitForCache(nonCachedDatabase.GetPlayerChoicesAsync());
 
-        public Task<IList<IPlayerChoiceResponse>?> GetPlayerChoiceResponsesAsync() => WaitForCache(nonCachedDatabase.GetPlayerChoiceResponsesAsync());
+        public Task<IReadOnlyList<IPlayerChoiceResponse>?> GetPlayerChoiceResponsesAsync() => WaitForCache(nonCachedDatabase.GetPlayerChoiceResponsesAsync());
 
-        public Task<IList<IPlayerChoiceResponse>?> GetPlayerChoiceResponsesAsync(int choiceId) => WaitForCache(nonCachedDatabase.GetPlayerChoiceResponsesAsync(choiceId));
-
-        public IEnumerable<ISmartScriptProjectItem> GetLegacyProjectItems() => nonCachedDatabase.GetLegacyProjectItems();
-        
-        public IEnumerable<ISmartScriptProject> GetLegacyProjects() => nonCachedDatabase.GetLegacyProjects();
-
-        public IBroadcastText? GetBroadcastTextByText(string text)
-        {
-            if (broadcastTextsCache == null)
-                return nonCachedDatabase.GetBroadcastTextByText(text);
-            if (broadcastTextsCache.TryGetValue(text, out var val))
-                return val;
-            return null;
-        }
+        public Task<IReadOnlyList<IPlayerChoiceResponse>?> GetPlayerChoiceResponsesAsync(int choiceId) => WaitForCache(nonCachedDatabase.GetPlayerChoiceResponsesAsync(choiceId));
 
         public async Task<IBroadcastText?> GetBroadcastTextByTextAsync(string text)
         {
@@ -447,51 +462,49 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public Task<IBroadcastTextLocale?> GetBroadcastTextLocaleByTextAsync(string text) => WaitForCache(nonCachedDatabase.GetBroadcastTextLocaleByTextAsync(text));
 
-        public Task<List<IEventScriptLine>> FindEventScriptLinesBy(IReadOnlyList<(uint command, int dataIndex, long valueToSearch)> conditions) 
+        public Task<IReadOnlyList<IEventScriptLine>> FindEventScriptLinesBy(IReadOnlyList<(uint command, int dataIndex, long valueToSearch)> conditions) 
             => WaitForCache(nonCachedDatabase.FindEventScriptLinesBy(conditions));
-        public Task<IList<ICreatureModelInfo>> GetCreatureModelInfoAsync() 
+        public Task<IReadOnlyList<ICreatureModelInfo>> GetCreatureModelInfoAsync() 
             => WaitForCache(nonCachedDatabase.GetCreatureModelInfoAsync());
 
-        public ICreatureModelInfo? GetCreatureModelInfo(uint displayId)
+        public async Task<ICreatureModelInfo?> GetCreatureModelInfo(uint displayId)
         {
             if (creatureModelInfos == null)
-                return nonCachedDatabase.GetCreatureModelInfo(displayId);
+                return await nonCachedDatabase.GetCreatureModelInfo(displayId);
             if (creatureModelInfos.TryGetValue(displayId, out var info))
                 return info;
             return null;
         }
 
-        public ISceneTemplate? GetSceneTemplate(uint sceneId) => nonCachedDatabase.GetSceneTemplate(sceneId);
-
         public Task<ISceneTemplate?> GetSceneTemplateAsync(uint sceneId) => WaitForCache(nonCachedDatabase.GetSceneTemplateAsync(sceneId));
 
-        public Task<IList<ISceneTemplate>?> GetSceneTemplatesAsync() => WaitForCache(nonCachedDatabase.GetSceneTemplatesAsync());
+        public Task<IReadOnlyList<ISceneTemplate>?> GetSceneTemplatesAsync() => WaitForCache(nonCachedDatabase.GetSceneTemplatesAsync());
 
         public Task<IPhaseName?> GetPhaseNameAsync(uint phaseId) => WaitForCache(nonCachedDatabase.GetPhaseNameAsync(phaseId));
 
-        public Task<IList<IPhaseName>?> GetPhaseNamesAsync() => WaitForCache(nonCachedDatabase.GetPhaseNamesAsync());
+        public Task<IReadOnlyList<IPhaseName>?> GetPhaseNamesAsync() => WaitForCache(nonCachedDatabase.GetPhaseNamesAsync());
 
         public Task<IReadOnlyList<INpcSpellClickSpell>> GetNpcSpellClickSpells(uint creatureId) => nonCachedDatabase.GetNpcSpellClickSpells(creatureId);
 
         public IList<IPhaseName>? GetPhaseNames() => nonCachedDatabase.GetPhaseNames();
 
-        public Task<IList<ICreatureAddon>> GetCreatureAddons() => WaitForCache(nonCachedDatabase.GetCreatureAddons());
+        public Task<IReadOnlyList<ICreatureAddon>> GetCreatureAddons() => WaitForCache(nonCachedDatabase.GetCreatureAddons());
 
-        public Task<IList<ICreatureTemplateAddon>> GetCreatureTemplateAddons() => WaitForCache(nonCachedDatabase.GetCreatureTemplateAddons());
+        public Task<IReadOnlyList<ICreatureTemplateAddon>> GetCreatureTemplateAddons() => WaitForCache(nonCachedDatabase.GetCreatureTemplateAddons());
 
-        public Task<IList<ICreatureEquipmentTemplate>?> GetCreatureEquipmentTemplates() => WaitForCache(nonCachedDatabase.GetCreatureEquipmentTemplates());
+        public Task<IReadOnlyList<ICreatureEquipmentTemplate>?> GetCreatureEquipmentTemplates() => WaitForCache(nonCachedDatabase.GetCreatureEquipmentTemplates());
 
-        public Task<IList<IMangosCreatureEquipmentTemplate>?> GetMangosCreatureEquipmentTemplates() => WaitForCache(nonCachedDatabase.GetMangosCreatureEquipmentTemplates());
+        public Task<IReadOnlyList<IMangosCreatureEquipmentTemplate>?> GetMangosCreatureEquipmentTemplates() => WaitForCache(nonCachedDatabase.GetMangosCreatureEquipmentTemplates());
 
-        public Task<IList<IGameEventCreature>> GetGameEventCreaturesAsync() => WaitForCache(nonCachedDatabase.GetGameEventCreaturesAsync());
+        public Task<IReadOnlyList<IGameEventCreature>> GetGameEventCreaturesAsync() => WaitForCache(nonCachedDatabase.GetGameEventCreaturesAsync());
 
-        public Task<IList<IGameEventGameObject>> GetGameEventGameObjectsAsync() => WaitForCache(nonCachedDatabase.GetGameEventGameObjectsAsync());
+        public Task<IReadOnlyList<IGameEventGameObject>> GetGameEventGameObjectsAsync() => WaitForCache(nonCachedDatabase.GetGameEventGameObjectsAsync());
 
-        public Task<IList<IGameEventCreature>?> GetGameEventCreaturesByGuidAsync(uint entry, uint guid) => WaitForCache(nonCachedDatabase.GetGameEventCreaturesByGuidAsync(entry, guid));
+        public Task<IReadOnlyList<IGameEventCreature>?> GetGameEventCreaturesByGuidAsync(uint entry, uint guid) => WaitForCache(nonCachedDatabase.GetGameEventCreaturesByGuidAsync(entry, guid));
 
-        public Task<IList<IGameEventGameObject>?> GetGameEventGameObjectsByGuidAsync(uint entry, uint guid) => WaitForCache(nonCachedDatabase.GetGameEventGameObjectsByGuidAsync(entry, guid));
+        public Task<IReadOnlyList<IGameEventGameObject>?> GetGameEventGameObjectsByGuidAsync(uint entry, uint guid) => WaitForCache(nonCachedDatabase.GetGameEventGameObjectsByGuidAsync(entry, guid));
 
-        public Task<IList<ICreatureEquipmentTemplate>?> GetCreatureEquipmentTemplates(uint entry) => WaitForCache(nonCachedDatabase.GetCreatureEquipmentTemplates(entry));
+        public Task<IReadOnlyList<ICreatureEquipmentTemplate>?> GetCreatureEquipmentTemplates(uint entry) => WaitForCache(nonCachedDatabase.GetCreatureEquipmentTemplates(entry));
 
         public Task<IGameObject?> GetGameObjectByGuidAsync(uint entry, uint guid) => WaitForCache(nonCachedDatabase.GetGameObjectByGuidAsync(entry, guid));
 
@@ -537,11 +550,11 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public Task<IReadOnlyList<IConversationActorTemplate>> GetConversationActorTemplates() => nonCachedDatabase.GetConversationActorTemplates();
 
-        public Task<List<IEventScriptLine>> GetEventScript(EventScriptType type, uint id) => WaitForCache(nonCachedDatabase.GetEventScript(type, id));
+        public Task<IReadOnlyList<IEventScriptLine>> GetEventScript(EventScriptType type, uint id) => WaitForCache(nonCachedDatabase.GetEventScript(type, id));
 
-        public Task<List<IEventAiLine>> GetEventAi(int id) => WaitForCache(nonCachedDatabase.GetEventAi(id));
+        public Task<IReadOnlyList<IEventAiLine>> GetEventAi(int id) => WaitForCache(nonCachedDatabase.GetEventAi(id));
 
-        public async Task<IList<IDatabaseSpellDbc>> GetSpellDbcAsync()
+        public async Task<IReadOnlyList<IDatabaseSpellDbc>> GetSpellDbcAsync()
         {
             await WaitForCache();
             
@@ -551,21 +564,15 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             return await nonCachedDatabase.GetSpellDbcAsync();
         }
         
-        public Task<IList<IDatabaseSpellEffectDbc>> GetSpellEffectDbcAsync() => WaitForCache(nonCachedDatabase.GetSpellEffectDbcAsync());
+        public Task<IReadOnlyList<IDatabaseSpellEffectDbc>> GetSpellEffectDbcAsync() => WaitForCache(nonCachedDatabase.GetSpellEffectDbcAsync());
 
-        public ICreature? GetCreatureByGuid(uint entry, uint guid) => nonCachedDatabase.GetCreatureByGuid(entry, guid);
+        public Task<ICreature?> GetCreatureByGuidAsync(uint entry, uint guid) => nonCachedDatabase.GetCreatureByGuidAsync(entry, guid);
 
-        public IGameObject? GetGameObjectByGuid(uint entry, uint guid) => nonCachedDatabase.GetGameObjectByGuid(entry, guid);
-        
-        public IEnumerable<ICreature> GetCreaturesByEntry(uint entry) => nonCachedDatabase.GetCreaturesByEntry(entry);
+        public Task<IReadOnlyList<ICreature>> GetCreaturesByEntryAsync(uint entry) => WaitForCache(nonCachedDatabase.GetCreaturesByEntryAsync(entry));
 
-        public IEnumerable<IGameObject> GetGameObjectsByEntry(uint entry) => nonCachedDatabase.GetGameObjectsByEntry(entry);
-        
-        public Task<IList<ICreature>> GetCreaturesByEntryAsync(uint entry) => WaitForCache(nonCachedDatabase.GetCreaturesByEntryAsync(entry));
+        public Task<IReadOnlyList<ICoreCommandHelp>> GetCommands() => nonCachedDatabase.GetCommands();
 
-        public IEnumerable<ICoreCommandHelp> GetCommands() => nonCachedDatabase.GetCommands();
-
-        public Task<IList<ITrinityString>> GetStringsAsync() => WaitForCache(nonCachedDatabase.GetStringsAsync());
+        public Task<IReadOnlyList<ITrinityString>> GetStringsAsync() => WaitForCache(nonCachedDatabase.GetStringsAsync());
 
         public Task<IReadOnlyList<IQuestScriptName>> GetQuestScriptNames(uint questId) => WaitForCache(nonCachedDatabase.GetQuestScriptNames(questId));
 
@@ -601,7 +608,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             {
                 try
                 {
-                    int steps = 11;
+                    int steps = 14;
 
                     progress.Report(0, steps, "Loading creatures");
                     cache.creatureTemplateCache = await cache.nonCachedDatabase.GetCreatureTemplatesAsync();
@@ -657,10 +664,22 @@ namespace WDE.MySqlDatabaseCommon.Database.World
                     // }).ConfigureAwait(true);
                     //cache.broadcastTextsCache = cachedTrie;
 
+                    progress.Report(11, steps, "Loading creature spawns");
+                    var creatures = await cache.nonCachedDatabase.GetCreaturesAsync();
+
+                    progress.Report(12, steps, "Loading gameobject spawns");
+                    var gameObjects = await cache.nonCachedDatabase.GetGameObjectsAsync();
+
+                    progress.Report(13, steps, "Loading scene templates");
+                    var sceneTemplates = await cache.nonCachedDatabase.GetSceneTemplatesAsync();
+
                     Dictionary<uint, ICreatureTemplate> creatureTemplateByEntry = new();
                     Dictionary<uint, IGameObjectTemplate> gameObjectTemplateByEntry = new();
                     Dictionary<uint, IQuestTemplate> questTemplateByEntry = new();
                     Dictionary<uint, ICreatureModelInfo> creatureModelInfos = new();
+                    Dictionary<(uint, uint), ICreature> creaturesByGuid = new();
+                    Dictionary<(uint, uint), IGameObject> gameObjectsByGuid = new();
+                    Dictionary<uint, ISceneTemplate> sceneByEntry = new();
 
                     foreach (var entity in cache.creatureTemplateCache)
                         creatureTemplateByEntry[entity.Entry] = entity;
@@ -673,11 +692,30 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
                     foreach (var entity in (await cache.nonCachedDatabase.GetCreatureModelInfoAsync()))
                         creatureModelInfos[entity.DisplayId] = entity;
-                    
+
+                    foreach (var spawn in creatures)
+                    {
+                        creaturesByGuid[(spawn.Entry, spawn.Guid)] = spawn;
+                        creaturesByGuid[(0, spawn.Guid)] = spawn;
+                    }
+
+                    foreach (var spawn in gameObjects)
+                    {
+                        gameObjectsByGuid[(spawn.Entry, spawn.Guid)] = spawn;
+                        gameObjectsByGuid[(0, spawn.Guid)] = spawn;
+                    }
+
+                    if (sceneTemplates != null)
+                        foreach (var entity in sceneTemplates)
+                            sceneByEntry[entity.SceneId] = entity;
+
                     cache.creatureTemplateByEntry = creatureTemplateByEntry;
                     cache.gameObjectTemplateByEntry = gameObjectTemplateByEntry;
                     cache.questTemplateByEntry = questTemplateByEntry;
                     cache.creatureModelInfos = creatureModelInfos;
+                    cache.creaturesByGuid = creaturesByGuid;
+                    cache.gameObjectsByGuid = gameObjectsByGuid;
+                    cache.sceneByEntry = sceneByEntry;
                 }
                 catch (Exception e)
                 {

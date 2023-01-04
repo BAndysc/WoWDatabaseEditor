@@ -20,9 +20,9 @@
                                                MinOffsetY="{Binding #Map.TopLeftVirtual.Y}"
                                                MaxOffsetX="{Binding #Map.BottomRightVirtual.X}"
                                                MaxOffsetY="{Binding #Map.BottomRightVirtual.Y}"
-                                               TopLeft="{TemplateBinding TopLeftVirtual, Mode=OneWayToSource}"
-                                               BottomRight="{TemplateBinding BottomRightVirtual, Mode=OneWayToSource}"
-                                               ZoomX="{TemplateBinding Zoom, Mode=OneWayToSource}"
+                                               TopLeft="{Binding TopLeftVirtual, Mode=OneWayToSource, RelativeSource={RelativeSource TemplatedParent}}"
+                                               BottomRight="{Binding BottomRightVirtual, Mode=OneWayToSource, RelativeSource={RelativeSource TemplatedParent}}"
+                                               ZoomX="{Binding Zoom, Mode=OneWayToSource, RelativeSource={RelativeSource TemplatedParent}}"
                                                HorizontalAlignment="Stretch">
                     <Panel MinWidth="10" MinHeight="10" >
                         <worldMap:WoWMapRenderer IsVisible="{TemplateBinding RenderBackground}" 

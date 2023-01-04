@@ -106,6 +106,7 @@ public partial class MultiParameterValueHolder<T> : IParameterValueHolder<T>, Sy
         HoldsMultipleValues = !isSameValue;
         hasCachedStringValue = false;
         OnPropertyChanged(nameof(Parameter));
+        OnPropertyChanged(nameof(GenericParameter));
         OnPropertyChanged(nameof(Value));
         OnPropertyChanged(nameof(String));
         OnPropertyChanged(nameof(Name));
@@ -129,6 +130,7 @@ public partial class MultiParameterValueHolder<T> : IParameterValueHolder<T>, Sy
             OnPropertyChanged();
             OnPropertyChanged(nameof(String));
             OnPropertyChanged(nameof(HasItems));
+            OnPropertyChanged(nameof(GenericParameter));
         }
     }
     
@@ -189,7 +191,9 @@ public partial class MultiParameterValueHolder<T> : IParameterValueHolder<T>, Sy
     public virtual bool HasItems => Parameter.HasItems;
     
     public string String => ToString();
-    
+
+    public IParameter GenericParameter => Parameter;
+
     public void ForceRefresh()
     {
         hasCachedStringValue = false;

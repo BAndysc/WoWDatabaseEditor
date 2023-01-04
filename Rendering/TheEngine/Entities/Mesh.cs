@@ -132,8 +132,6 @@ namespace TheEngine.Entities
             engine.Device.device.BindVertexArray(VertexArrayObject);
             VerticesBuffer.Activate(0);
             IndicesBuffer.Activate(0);
-            int location = 0;
-            int accumulatedSize = 0;
             int stride = 3 * 4 + 3 * 4 + 2 * 4 + 2 * 4 + 4 + 4; // 4 * 4 * 3 + 2 * 4 * 2;
             engine.Device.device.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, stride, new IntPtr(0));
             engine.Device.device.EnableVertexAttribArray(0);

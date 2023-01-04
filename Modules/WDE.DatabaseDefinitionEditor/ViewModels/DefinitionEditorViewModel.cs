@@ -11,6 +11,7 @@ using System.Windows.Input;
 using Avalonia.Input;
 using Avalonia.Threading;
 using DynamicData.Binding;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using PropertyChanged.SourceGenerator;
 using WDE.Common.CoreVersion;
@@ -420,7 +421,9 @@ public partial class DefinitionEditorViewModel : ObservableBase
                         var tf = tg.Fields[j];
                         var of = og.Fields[j];
                         if (tf != of)
-                        {Console.WriteLine("At index " + i + "/" + j + " there is a diff");}
+                        {
+                            LOG.LogWarning("At index " + i + "/" + j + " there is a diff");
+                        }
                     }                    
                 }
             }

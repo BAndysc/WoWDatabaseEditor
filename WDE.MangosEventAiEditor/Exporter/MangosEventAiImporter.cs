@@ -31,7 +31,6 @@ namespace WDE.MangosEventAiEditor.Exporter
         
         public async Task Import(EventAiScript script, bool doNotTouchIfPossible, IList<IEventAiLine> lines)
         {
-            int? entry = null;
             foreach (var line in lines)
             {
                 var @event = script.SafeEventFactory(line);

@@ -65,9 +65,9 @@ namespace WDE.CMMySqlDatabase
             mainThread.Dispatch(loadingEventAggregator.Publish<DatabaseLoadedEvent>);
         }
 
-        public Task<IList<IDbScriptRandomTemplate>?> GetScriptRandomTemplates(uint id, IMangosDatabaseProvider.RandomTemplateType type)
+        public Task<IReadOnlyList<IDbScriptRandomTemplate>?> GetScriptRandomTemplates(uint id, IMangosDatabaseProvider.RandomTemplateType type)
         {
-            return mangosImpl?.GetScriptRandomTemplates(id, type) ?? Task.FromResult<IList<IDbScriptRandomTemplate>?>(null);
+            return mangosImpl?.GetScriptRandomTemplates(id, type) ?? Task.FromResult<IReadOnlyList<IDbScriptRandomTemplate>?>(null);
         }
 
         public Task<ICreatureAiSummon?> GetCreatureAiSummon(uint entry)

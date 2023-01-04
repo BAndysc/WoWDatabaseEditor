@@ -47,9 +47,9 @@ namespace WDE.TrinitySmartScriptEditor.Providers
         {
             SmartScript script = new(item, smartFactory.Value, smartDataManager.Value, new EmptyMessageboxService(), editorFeatures.Value, importer.Value);
             var lines = (await database.Value.GetScriptFor(item.Entry ?? 0, item.EntryOrGuid, item.SmartType)).ToList();
-            var conditions = database.Value.GetConditionsForScript(item.Entry, item.EntryOrGuid, item.SmartType).ToList();
+            var conditions = (await database.Value.GetConditionsForScript(item.Entry, item.EntryOrGuid, item.SmartType)).ToList();
             await importer.Value.Import(script, true, lines, conditions, null);
-            return exporter.Value.GenerateSql(item, script);
+            return await exporter.Value.GenerateSql(item, script);
         }
 
         private class EmptyMessageboxService : IMessageBoxService

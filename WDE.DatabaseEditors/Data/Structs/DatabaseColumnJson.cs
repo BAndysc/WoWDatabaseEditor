@@ -92,7 +92,7 @@ namespace WDE.DatabaseEditors.Data.Structs
         {
             public static readonly DefaultValueEqualityComparer Default = new();
 
-            public bool Equals(object? x, object? y)
+            public new bool Equals(object? x, object? y)
             {
                 if (x == null && y == null)
                     return true;
@@ -106,7 +106,7 @@ namespace WDE.DatabaseEditors.Data.Structs
                     var d2 = Convert.ToDouble(y);
                     return Math.Abs(d1 - d2) < 0.0001;
                 }
-                catch (Exception _)
+                catch (Exception)
                 {
                     return false;
                 }

@@ -196,20 +196,22 @@ public class QuickSpawnMenu : IDisposable
         selectedIndex = 0;
         uint.TryParse(searchText, out var searchEntry);
         bool searchTextEmpty = string.IsNullOrEmpty(searchText);
-        
-        foreach (var creature in databaseProvider.GetCreatureTemplates())
-        {
-            if (searchTextEmpty || 
-                searchEntry == creature.Entry ||
-                creature.Name.Contains(searchText, StringComparison.InvariantCultureIgnoreCase))
-                items.Add(new ListItem(true, creature.Entry, creature.Name, creature.MinLevel == creature.MaxLevel ? creature.MinLevel.ToString() : $"{creature.MinLevel} - {creature.MaxLevel}"));
-        }
-        foreach (var gameobject in databaseProvider.GetGameObjectTemplates())
-        {
-            if (searchTextEmpty ||
-                searchEntry == gameobject.Entry ||
-                gameobject.Name.Contains(searchText, StringComparison.InvariantCultureIgnoreCase))
-                items.Add(new ListItem(false, gameobject.Entry, gameobject.Name, gameobject.Type.ToString()));
-        }
+
+        if (databaseProvider.GetCachedCreatureTemplates() is { } creatures)
+            foreach (var creature in creatures)
+            {
+                if (searchTextEmpty ||
+                    searchEntry == creature.Entry ||
+                    creature.Name.Contains(searchText, StringComparison.InvariantCultureIgnoreCase))
+                    items.Add(new ListItem(true, creature.Entry, creature.Name, creature.MinLevel == creature.MaxLevel ? creature.MinLevel.ToString() : $"{creature.MinLevel} - {creature.MaxLevel}"));
+            }
+        if (databaseProvider.GetCachedGameObjectTemplates() is { } gameobjects)
+            foreach (var gameobject in gameobjects)
+            {
+                if (searchTextEmpty ||
+                    searchEntry == gameobject.Entry ||
+                    gameobject.Name.Contains(searchText, StringComparison.InvariantCultureIgnoreCase))
+                    items.Add(new ListItem(false, gameobject.Entry, gameobject.Name, gameobject.Type.ToString()));
+            }
     }
 }

@@ -75,7 +75,7 @@ namespace WDE.SqlQueryGenerator.Test
         public void TestDeleteSimpleConditionIntConvertUint() => Test("`Id` = 3", r => r.Column<int>("Id") == (uint)3);
         
         [Test]
-        public void TestDeleteSimpleConditionUIntConvertInt() => Test("`Id` = -3", r => r.Column<uint>("Id") == -3);
+        public void TestDeleteSimpleConditionUIntConvertInt() => Test("`Id` = -3", r => r.Column<int>("Id") == -3);
         
         // Simple OR AND
         [Test]

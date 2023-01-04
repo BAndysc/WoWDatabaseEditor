@@ -50,9 +50,8 @@ namespace WDE.SQLEditor.Solutions
                 var index = projectItem.StringValue.IndexOf(":");
                 var id = projectItem.StringValue.Substring(0, index);
                 var name = projectItem.StringValue.Substring(index + 1);
-                solutionItem = new CustomSqlSolutionItem()
+                solutionItem = new CustomSqlSolutionItem(id)
                 {
-                    Id = id,
                     Name = name,
                     Query = (projectItem.Comment ?? "").Replace("\\n", "\n")
                 };
@@ -126,7 +125,7 @@ namespace WDE.SQLEditor.Solutions
 
         public Task<ISolutionItem?> CreateSolutionItem(string name)
         {
-            return Task.FromResult<ISolutionItem?>(new CustomSqlSolutionItem(){ Id = Guid.NewGuid().ToString(), Name = name});
+            return Task.FromResult<ISolutionItem?>(new CustomSqlSolutionItem(Guid.NewGuid().ToString()){ Name = name});
         }
     }
 }

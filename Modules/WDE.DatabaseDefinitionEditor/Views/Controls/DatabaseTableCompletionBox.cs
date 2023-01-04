@@ -15,9 +15,9 @@ using WDE.Common.Utils;
 
 namespace WDE.DatabaseDefinitionEditor.Views.Controls;
 
-public class DatabaseTableCompletionBox : CompletionComboBox, IStyleable
+public class DatabaseTableCompletionBox : CompletionComboBox
 {
-    Type IStyleable.StyleKey => typeof(CompletionComboBox);
+    protected override Type StyleKeyOverride => typeof(CompletionComboBox);
 
     public static readonly DirectProperty<DatabaseTableCompletionBox, string> TableNameProperty = AvaloniaProperty.RegisterDirect<DatabaseTableCompletionBox, string>(nameof(TableName), o => o.TableName, (o, v) => o.TableName = v, defaultBindingMode: BindingMode.TwoWay);
 
@@ -74,7 +74,7 @@ public class DatabaseTableCompletionBox : CompletionComboBox, IStyleable
     private CancellationTokenSource? cts;
 
     public static readonly StyledProperty<bool> CanSelectEmptyProperty =
-        AvaloniaProperty.Register<DatabaseColumnCompletionBox, bool>(nameof(CanSelectEmpty));
+        AvaloniaProperty.Register<DatabaseTableCompletionBox, bool>(nameof(CanSelectEmpty));
 
     public static readonly StyledProperty<DataDatabaseType> DatabaseProperty = AvaloniaProperty.Register<DatabaseTableCompletionBox, DataDatabaseType>("Database");
 

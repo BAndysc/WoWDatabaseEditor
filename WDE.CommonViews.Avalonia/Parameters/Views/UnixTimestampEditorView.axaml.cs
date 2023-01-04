@@ -4,7 +4,7 @@ using Avalonia.Markup.Xaml;
 
 namespace WDE.CommonViews.Avalonia.Parameters.Views;
 
-public class UnixTimestampEditorView : UserControl
+public partial class UnixTimestampEditorView : UserControl
 {
     public UnixTimestampEditorView()
     {

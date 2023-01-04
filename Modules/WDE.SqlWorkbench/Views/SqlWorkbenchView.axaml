@@ -41,7 +41,7 @@
               <Flyout>
                 <DockPanel>
                   <TextBlock FontWeight="Bold" DockPanel.Dock="Top">Change connection for this tab:</TextBlock>
-                  <ItemsControl Items="{CompiledBinding AllConnections}">
+                  <ItemsControl ItemsSource="{CompiledBinding AllConnections}">
                     <ItemsControl.ItemTemplate>
                       <DataTemplate>
                         <Button BorderThickness="0" Background="Transparent" HorizontalContentAlignment="Left" CommandParameter="{CompiledBinding .}" Command="{CompiledBinding #Root.((viewModels:SqlWorkbenchViewModel)DataContext).ChangeConnectionCommand}">
@@ -158,7 +158,7 @@
     
     <GridSplitter Classes="horizontal" Grid.Row="1" />
     
-    <TabControl Padding="0" Grid.Row="2" IsVisible="{CompiledBinding HasAnyResults}" Items="{CompiledBinding Results}" SelectedItem="{CompiledBinding SelectedResult}">
+    <TabControl Padding="0" Grid.Row="2" IsVisible="{CompiledBinding HasAnyResults}" ItemsSource="{CompiledBinding Results}" SelectedItem="{CompiledBinding SelectedResult}">
       <TabControl.Styles>
         <Style Selector="TabItem">
           <Setter Property="ContextMenu">

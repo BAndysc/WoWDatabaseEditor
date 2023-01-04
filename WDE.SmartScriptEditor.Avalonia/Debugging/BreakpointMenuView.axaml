@@ -18,7 +18,7 @@
     >
     <StackPanel>
       <TextBlock Text="Set breakpoint" FontWeight="Bold" TextAlignment="Center" />
-      <debugging:BreakpointContextMenu Items="{CompiledBinding MenuItems}"
+      <debugging:BreakpointContextMenu ItemsSource="{CompiledBinding MenuItems}"
                              BorderThickness="0"
                              Padding="0"
                              Margin="0">

@@ -4,7 +4,7 @@ using Avalonia.Markup.Xaml;
 
 namespace WDE.AnniversaryInfo.Views;
 
-public class TimelineView : UserControl
+public partial class TimelineView : UserControl
 {
     public TimelineView()
     {

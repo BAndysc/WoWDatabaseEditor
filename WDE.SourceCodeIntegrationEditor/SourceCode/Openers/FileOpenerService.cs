@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using WDE.Common;
 using WDE.Module.Attributes;
 
 namespace WDE.SourceCodeIntegrationEditor.SourceCode.Openers;
@@ -29,7 +30,7 @@ internal class FileOpenerService : IFileOpenerService
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                LOG.LogWarning(e);
             }
         }
 

@@ -168,8 +168,11 @@ public class BreakpointIcon : Control
             var exclaimationP1 = new Point(rect.Center.X, rect.Top + margin * 0.75f);
             var exclaimationP2 = new Point(rect.Center.X, rect.Bottom - margin * 1.75f);
             // poor's man exclamation mark (buy hey, it works and is fast)
-            context.DrawLine(pen, exclaimationP1, exclaimationP2);
-            context.DrawEllipse(pen!.Brush, null, new Point(rect.Center.X, rect.Bottom - margin), 1.5f, 1.5f);
+            if (pen != null)
+            {
+                context.DrawLine(pen, exclaimationP1, exclaimationP2);
+                context.DrawEllipse(pen.Brush, null, new Point(rect.Center.X, rect.Bottom - margin), 1.5f, 1.5f);
+            }
         }
 
         if (isBreakpointHit)

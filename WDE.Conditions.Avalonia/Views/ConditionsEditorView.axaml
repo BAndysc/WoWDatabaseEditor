@@ -29,7 +29,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="60" />
         </Grid.RowDefinitions>
-        <ListBox Grid.Row="1" VirtualizationMode="None" dnD:DragAndDrop.IsDropTarget="True" dnD:DragAndDrop.DropHandler="{CompiledBinding }" dnD:DragAndDrop.IsDragSource="True" Items="{CompiledBinding Conditions, Mode=OneTime}" SelectedItem="{CompiledBinding SelectedCondition}">
+        <ListBox Grid.Row="1" dnD:DragAndDrop.IsDropTarget="True" dnD:DragAndDrop.DropHandler="{CompiledBinding }" dnD:DragAndDrop.IsDragSource="True" ItemsSource="{CompiledBinding Conditions, Mode=OneTime}" SelectedItem="{CompiledBinding SelectedCondition}">
             <ListBox.KeyBindings>
                 <KeyBinding Command="{CompiledBinding RemoveItemCommand}" Gesture="Delete" />
                 <KeyBinding Command="{CompiledBinding RemoveItemCommand}" Gesture="Back" />
@@ -65,22 +65,34 @@
                     </controls1:CompletionComboBox.ItemTemplate>
                 </controls1:CompletionComboBox>
                 <views:LabeledControl Header="{CompiledBinding Name}" DataContext="{CompiledBinding Invert, Mode=OneWay}">
-                    <controls:ParameterValueHolderView PickCommand="{Binding #Root.DataContext.PickCommand}" />
+                    <ParameterBox Parameter="{ReflectionBinding GenericParameter}"
+                                  ParameterValue="{CompiledBinding Value}"
+                                  Context="{ReflectionBinding #Root.((viewModels:ConditionsEditorViewModel)DataContext).SelectedCondition}" />
                 </views:LabeledControl>
                 <views:LabeledControl Header="{CompiledBinding Name}" IsVisible="{CompiledBinding IsUsed}" DataContext="{CompiledBinding ConditionTarget, Mode=OneWay}">
-                    <controls:ParameterValueHolderView PickCommand="{Binding #Root.DataContext.PickCommand}" />
+                    <ParameterBox Parameter="{ReflectionBinding GenericParameter}"
+                                  ParameterValue="{CompiledBinding Value}"
+                                  Context="{ReflectionBinding #Root.((viewModels:ConditionsEditorViewModel)DataContext).SelectedCondition}" />
                 </views:LabeledControl>
                 <views:LabeledControl Header="{CompiledBinding Name}" IsVisible="{CompiledBinding IsUsed}" DataContext="{CompiledBinding ConditionValue1, Mode=OneWay}">
-                    <controls:ParameterValueHolderView PickCommand="{Binding #Root.DataContext.PickCommand}" />
+                    <ParameterBox Parameter="{ReflectionBinding GenericParameter}"
+                                  ParameterValue="{CompiledBinding Value}"
+                                  Context="{ReflectionBinding #Root.((viewModels:ConditionsEditorViewModel)DataContext).SelectedCondition}" />
                 </views:LabeledControl>
                 <views:LabeledControl Header="{CompiledBinding Name}" IsVisible="{CompiledBinding IsUsed}" DataContext="{CompiledBinding ConditionValue2, Mode=OneWay}">
-                    <controls:ParameterValueHolderView PickCommand="{Binding #Root.DataContext.PickCommand}" />
+                    <ParameterBox Parameter="{ReflectionBinding GenericParameter}"
+                                  ParameterValue="{CompiledBinding Value}"
+                                  Context="{ReflectionBinding #Root.((viewModels:ConditionsEditorViewModel)DataContext).SelectedCondition}" />
                 </views:LabeledControl>
                 <views:LabeledControl Header="{CompiledBinding Name}" IsVisible="{CompiledBinding IsUsed}" DataContext="{CompiledBinding ConditionValue3, Mode=OneWay}">
-                    <controls:ParameterValueHolderView PickCommand="{Binding #Root.DataContext.PickCommand}" />
+                    <ParameterBox Parameter="{ReflectionBinding GenericParameter}"
+                                  ParameterValue="{CompiledBinding Value}"
+                                  Context="{ReflectionBinding #Root.((viewModels:ConditionsEditorViewModel)DataContext).SelectedCondition}" />
                 </views:LabeledControl>
                 <views:LabeledControl Header="{CompiledBinding Name}" IsVisible="{CompiledBinding IsUsed}" DataContext="{CompiledBinding ConditionStringValue1, Mode=OneWay}">
-                    <controls:ParameterValueHolderView PickCommand="{Binding #Root.DataContext.PickCommand}" />
+                    <ParameterBox Parameter="{ReflectionBinding GenericParameter}"
+                                  ParameterValue="{CompiledBinding Value}"
+                                  Context="{ReflectionBinding #Root.((viewModels:ConditionsEditorViewModel)DataContext).SelectedCondition}" />
                 </views:LabeledControl>
             </StackPanel>
         </Border>

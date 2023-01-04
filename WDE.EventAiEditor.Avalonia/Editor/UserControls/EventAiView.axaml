@@ -38,6 +38,7 @@
             <Setter Property="HorizontalAlignment" Value="Stretch" />
             <Setter Property="HorizontalContentAlignment" Value="Left" />
             <Setter Property="VerticalContentAlignment" Value="Top" />
+            <Setter Property="Padding" Value="2" />
         </Style>
         <Style Selector="Button.FlatButton:pointerover /template/ ContentPresenter">
             <Setter Property="BorderBrush" Value="Transparent" />
@@ -53,7 +54,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" MinHeight="30" />
         </Grid.RowDefinitions>
-        <ItemsControl Focusable="False" Items="{CompiledBinding Together}" IsHitTestVisible="True" DockPanel.Dock="Top"
+        <ItemsControl Focusable="False" ItemsSource="{CompiledBinding Together}" IsHitTestVisible="True" DockPanel.Dock="Top"
                       Margin="7,0,7,0">
             <ItemsControl.DataTemplates>
                 <DataTemplate DataType="{x:Type models:EventAiEvent}">

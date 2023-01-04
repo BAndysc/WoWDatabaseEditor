@@ -89,7 +89,7 @@ public class PathEditor : IMapSpawnModule, System.IDisposable
                 var point = points[i];
                 ImGui.TableNextRow();
 
-                if (ImGui.Selectable("#" + i, false, ImGuiSelectableFlags.SpanAllColumns)) ;
+                ImGui.Selectable("#" + i, false, ImGuiSelectableFlags.SpanAllColumns);
                 
                 ImGui.TableNextColumn();
                 ImGui.Text((i+1).ToString());

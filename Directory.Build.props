@@ -2,10 +2,22 @@
 <Project>
     <PropertyGroup>
         <RestoreAdditionalProjectSources>
-            https://nuget-feed-all.avaloniaui.net/v3/index.json
+            https://nuget-feed-all.avaloniaui.net/v3/index.json;https://www.myget.org/F/xamlbehaviors-nightly/api/v3/index.json
         </RestoreAdditionalProjectSources>
         <NoWarn>CS0067,CS3021,CS1998,CA1416,CS1591</NoWarn>
-        <AvaloniaVersion>0.10.999-cibuild0044575-beta</AvaloniaVersion>
+        <NoWarn>$(NoWarn),CS0649</NoWarn> <!-- The private field 'field' is never used - this is fine to me -->
+        <NoWarn>$(NoWarn),NUnit2005,NUnit2049</NoWarn> <!-- I don't mind old NUnit syntax -->
+        <NoWarn>$(NoWarn),CS0436</NoWarn> <!-- PropertChanged.SourceGenerator issue with InternalsVisibleTo when both assemblies use PropertChanged.SourceGenerator -->
+
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <WarningsNotAsErrors>CS0414</WarningsNotAsErrors> <!-- The private field 'field' is assigned but its value is never used - this fine to me -->
+        <WarningsNotAsErrors>$(WarningsNotAsErrors),CS0169</WarningsNotAsErrors> <!-- The private field 'class member' is never used - this is perfectly fine to me -->
+        <WarningsNotAsErrors>$(WarningsNotAsErrors),NUnit2005</WarningsNotAsErrors> <!-- I don't mind old NUnit syntax -->
+        <WarningsNotAsErrors>$(WarningsNotAsErrors),CS0436</WarningsNotAsErrors> <!-- PropertChanged.SourceGenerator issue with InternalsVisibleTo when both assemblies use PropertChanged.SourceGenerator -->
+        <WarningsNotAsErrors>$(WarningsNotAsErrors),NU5104</WarningsNotAsErrors> <!-- I am not producing any nuget packages, so I don't care -->
+        <WarningsNotAsErrors>$(WarningsNotAsErrors),CS1574</WarningsNotAsErrors> <!-- Antlr4 generates invalid XML comments, but I don't generate docs, so I don't care -->
+
+        <WarningsAsErrors>$(WarningsAsErrors),AVP1000, AVP1001, AVP1002, AVP1010, AVP1011, AVP1012, AVP1013, AVP1020, AVP1021, AVP1022, AVP1030, AVP1031, AVP1032, AVP1040, AVA2001</WarningsAsErrors>
         <LangVersion>preview</LangVersion>
     </PropertyGroup>
     <PropertyGroup>

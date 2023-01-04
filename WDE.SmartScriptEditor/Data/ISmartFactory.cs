@@ -1,4 +1,5 @@
 ﻿using System;
+using WDE.Common;
 using WDE.Common.Database;
 using WDE.SmartScriptEditor.Models;
 
@@ -43,7 +44,7 @@ namespace WDE.SmartScriptEditor.Data
             } 
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                LOG.LogWarning(ex);
             }
         }
         
@@ -55,7 +56,7 @@ namespace WDE.SmartScriptEditor.Data
             } 
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                LOG.LogWarning(ex);
             }
         }
         
@@ -67,7 +68,7 @@ namespace WDE.SmartScriptEditor.Data
             } 
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                LOG.LogWarning(ex);
             }
         }
         
@@ -79,7 +80,7 @@ namespace WDE.SmartScriptEditor.Data
             } 
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                LOG.LogWarning(ex);
             }
         }
         
@@ -91,7 +92,7 @@ namespace WDE.SmartScriptEditor.Data
             } 
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                LOG.LogWarning(ex);
             }
         }
     }

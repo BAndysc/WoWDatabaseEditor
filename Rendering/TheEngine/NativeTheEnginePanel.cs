@@ -15,7 +15,7 @@ using MouseButton = TheEngine.Input.MouseButton;
 
 namespace TheEngine;
 
-public class NativeTheEnginePanel : Panel, IWindowHost, IDisposable, ICustomSimpleHitTest
+public class NativeTheEnginePanel : Panel, IWindowHost, IDisposable
 {
     protected Engine? engine;
     private Stopwatch sw = new Stopwatch();
@@ -109,8 +109,8 @@ public class NativeTheEnginePanel : Panel, IWindowHost, IDisposable, ICustomSimp
     {
         base.OnAttachedToVisualTree(e);
         sw.Restart();
-        globalKeyDownDisposable = ((IControl)e.Root).AddDisposableHandler(KeyDownEvent, GlobalKeyDown, RoutingStrategies.Tunnel);
-        globalKeyUpDisposable = ((IControl)e.Root).AddDisposableHandler(KeyUpEvent, GlobalKeyUp, RoutingStrategies.Tunnel);
+        globalKeyDownDisposable = ((Control)e.Root).AddDisposableHandler(KeyDownEvent, GlobalKeyDown, RoutingStrategies.Tunnel);
+        globalKeyUpDisposable = ((Control)e.Root).AddDisposableHandler(KeyUpEvent, GlobalKeyUp, RoutingStrategies.Tunnel);
     }
 
     private bool IsModifierKey(Key key) => key is Key.LeftShift or Key.LeftCtrl or Key.LeftAlt or Key.LWin;
@@ -267,7 +267,7 @@ public class NativeTheEnginePanel : Panel, IWindowHost, IDisposable, ICustomSimp
                 parent.Tick(delta);
                 engine.statsManager.Counters.FrameTime.Add(delta);
                 parent.sw.Restart();
-                Dispatcher.UIThread.Post(() => RaisePropertyChanged(FrameRateProperty, Optional<float>.Empty, parent.FrameRate), DispatcherPriority.Render);
+                Dispatcher.UIThread.Post(() => RaisePropertyChanged<float>(FrameRateProperty, 0, parent.FrameRate), DispatcherPriority.Render);
 
                 parent.updateStopwatch.Restart();
                 parent.Update(delta);

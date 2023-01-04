@@ -20,7 +20,7 @@ public class GraphNodeItemView : ListBoxItem
             return;
 
         var maxZ = ParentGraphControl.GetMaxZIndex();
-        ZIndex = maxZ + 1;
+        SetCurrentValue(ZIndexProperty, maxZ + 1);
     }
 
     #region Dependency properties
@@ -52,16 +52,16 @@ public class GraphNodeItemView : ListBoxItem
         get => GetValue(IsDraggingProperty);
         set => SetValue(IsDraggingProperty, value);
     }
-
-    public static readonly StyledProperty<int> ZIndexProperty = AvaloniaProperty.Register<GraphNodeItemView, int>(
-        nameof(ZIndex),
-        defaultBindingMode: BindingMode.TwoWay);
-
-    public int ZIndex
-    {
-        get => GetValue(ZIndexProperty);
-        set => SetValue(ZIndexProperty, value);
-    }
+    //
+    // public static readonly StyledProperty<int> ZIndexProperty = AvaloniaProperty.Register<GraphNodeItemView, int>(
+    //     nameof(ZIndex),
+    //     defaultBindingMode: BindingMode.TwoWay);
+    //
+    // public int ZIndex
+    // {
+    //     get => GetValue(ZIndexProperty);
+    //     set => SetValue(ZIndexProperty, value);
+    // }
 
     #endregion
 
@@ -76,7 +76,7 @@ public class GraphNodeItemView : ListBoxItem
             return;
 
         ParentGraphControl.ClearSelection();
-        IsSelected = true;
+        SetCurrentValue(IsSelectedProperty, true);
     }
 
     protected override void OnPointerPressed(PointerPressedEventArgs e)
@@ -124,7 +124,7 @@ public class GraphNodeItemView : ListBoxItem
         {
             startX = X;
             startY = Y;
-            IsDragging = true;
+            SetCurrentValue(IsDraggingProperty, true);
             //CaptureMouse();
         }
 
@@ -140,7 +140,7 @@ public class GraphNodeItemView : ListBoxItem
 
             if (IsDragging)
                 //ReleaseMouseCapture();
-                IsDragging = false;
+                SetCurrentValue(IsDraggingProperty, false);
         }
 
         e.Handled = true;

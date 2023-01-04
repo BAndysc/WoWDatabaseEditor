@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;
@@ -20,7 +21,10 @@ namespace WDE.Common.Utils
         public AsyncAutoCommand(Func<Task> execute,
             Func<bool>? canExecute = null,
             Action<Exception>? onException = null,
-            bool continueOnCapturedContext = false)
+            bool continueOnCapturedContext = false,
+            [CallerMemberName] string? caller = null,
+            [CallerFilePath] string? callerFile = null,
+            [CallerLineNumber] int? callerLineNumber = null)
         {
             command = new AsyncCommand(async () =>
                 {
@@ -39,7 +43,9 @@ namespace WDE.Common.Utils
                 {
                     IsBusy = false;
                     if (e is not TaskCanceledException)
-                        Console.WriteLine(e);
+                    {
+                        LOG.LogError(e, "Error in {0} at {1}:{2}", caller, callerFile, callerLineNumber);
+                    }
                     onException?.Invoke(e);
                 },
                 continueOnCapturedContext);
@@ -99,7 +105,7 @@ namespace WDE.Common.Utils
                     IsBusy = true;
                     try
                     {
-                        await execute(t);
+                        await execute(t!);
                     }
                     finally
                     {
@@ -284,7 +290,10 @@ namespace WDE.Common.Utils
             });
         }
 
-        private static async Task ShowError(IMessageBoxService messageBoxService, Exception e, string? header)
+        private static async Task ShowError(IMessageBoxService messageBoxService, Exception e, string? header,
+            [CallerMemberName] string? caller = null,
+            [CallerFilePath] string? callerFile = null,
+            [CallerLineNumber] int? callerLineNumber = null)
         {
             if (e is UserException userException)
             {
@@ -294,18 +303,18 @@ namespace WDE.Common.Utils
             {
                 if (aggregateException.InnerExceptions.Count == 1)
                 {
-                    Console.WriteLine(aggregateException.InnerExceptions[0]);
+                    LOG.LogError(aggregateException.InnerExceptions[0], "Error in {0} at {1}:{2}", caller, callerFile, callerLineNumber);
                     await messageBoxService.SimpleDialog("Error", header ?? "Error occured while executing the command", aggregateException.InnerExceptions[0].Message);
                 }
                 else
                 {
-                    Console.WriteLine(aggregateException);
+                    LOG.LogError(aggregateException, "Error in {0} at {1}:{2}", caller, callerFile, callerLineNumber);
                     await messageBoxService.SimpleDialog("Error", header ?? "Errors occured while executing the command", string.Join("\n", aggregateException.InnerExceptions.Select(x => "*) " + x.Message)));
                 }
             }
             else
             {
-                Console.WriteLine(e);
+                LOG.LogError(e, "Error in {0} at {1}:{2}", caller, callerFile, callerLineNumber);
                 await messageBoxService.SimpleDialog("Error", header ?? "Error occured while executing the command", e.Message);
             }
         }

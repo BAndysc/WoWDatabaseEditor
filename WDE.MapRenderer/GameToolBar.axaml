@@ -4,25 +4,25 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:mapRenderer="clr-namespace:WDE.MapRenderer"
              xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450" 
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="mapRenderer:GameViewModel"
             x:Class="WDE.MapRenderer.GameToolBar">
     <ToolbarPanel>
         <TextBlock Margin="0,0,10,0" VerticalAlignment="Center">Map:</TextBlock>
         <CompletionComboBox Items="{CompiledBinding Maps}" SelectedItem="{CompiledBinding SelectedMap, Mode=TwoWay}" />
         <ToolbarSpacer />
-            <ItemsPresenter Items="{CompiledBinding ToolBars}">
-                <ItemsPresenter.ItemsPanel>
+            <ItemsControl ItemsSource="{CompiledBinding ToolBars}">
+                <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <StackPanel Orientation="Horizontal"></StackPanel>
                     </ItemsPanelTemplate>
-                </ItemsPresenter.ItemsPanel>
-                <ItemsPresenter.ItemTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <ContentPresenter HorizontalAlignment="Left" DataContext="{Binding .}" Content="{Binding}" ContentTemplate="{x:Static utils:ToolbarDataTemplate.Template}" />
+                        <ContentControl HorizontalAlignment="Left" DataContext="{Binding .}" Content="{Binding}" ContentTemplate="{x:Static utils:ToolbarDataTemplate.Template}" />
                     </DataTemplate>
-                </ItemsPresenter.ItemTemplate>
-            </ItemsPresenter>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
         <ToolbarSpacer />
         <ToggleButton ToolTip.Tip="Toggle areatriggers visibility" IsChecked="{CompiledBinding ShowAreaTriggers, Mode=TwoWay}">
             <WdeImage ImageUri="Icons/icon_areatrigger.png" />
@@ -31,34 +31,36 @@
             <WdeImage ImageUri="Icons/icon_grid.png" />
         </ToggleButton>
         <DropDownButton>
-            <DropDownButton.Button>
-                <WdeImage ImageUri="Icons/icon_day_night.png" />
-            </DropDownButton.Button>
-            <StackPanel Orientation="Vertical" Width="400">
-                <CheckBox Name="TimeFlow" IsChecked="{CompiledBinding DisableTimeFlow, Mode=TwoWay}">Disable time flow</CheckBox>
-                <DockPanel LastChildFill="True" IsEnabled="{Binding #TimeFlow.IsChecked, Converter={x:Static InverseBoolConverter.Instance}}">
-                    <TextBlock VerticalAlignment="Center">Time speed: </TextBlock>
-                    <Slider Minimum="0" Maximum="6" IsSnapToTickEnabled="False" SmallChange="1" LargeChange="1" Value="{CompiledBinding TimeSpeedMultiplier}" />
-                </DockPanel>
-                <DockPanel LastChildFill="True">
-                    <TextBlock VerticalAlignment="Center">Time: </TextBlock>
-                    <Slider Minimum="0" Maximum="1439" Value="{CompiledBinding CurrentTime}" />
-                </DockPanel>
-                <CheckBox IsChecked="{CompiledBinding OverrideLighting, Mode=TwoWay}">Disable lightning</CheckBox>
-                <DockPanel LastChildFill="True">
-                    <TextBlock VerticalAlignment="Center">View distance: </TextBlock>
-                    <Slider Minimum="1" Maximum="24" SmallChange="0.1" LargeChange="1" Value="{CompiledBinding ViewDistance}" />
-                </DockPanel>
-                <DockPanel LastChildFill="True">
-                    <TextBlock VerticalAlignment="Center">Dynamic resolution scale: </TextBlock>
-                    <Slider Minimum="0.5" Maximum="1" SmallChange="0.1" LargeChange="0.1" Value="{CompiledBinding DynamicResolution}" />
-                </DockPanel>
-                <DockPanel LastChildFill="True">
-                    <TextBlock VerticalAlignment="Center">Textures quality: </TextBlock>
-                    <TextBlock DockPanel.Dock="Bottom" Opacity="0.5" IsVisible="{CompiledBinding ShowTextureQualityWarning}">Restart the game view to apply the change</TextBlock>
-                    <Slider TickFrequency="1" IsSnapToTickEnabled="True" Minimum="0" Maximum="6" SmallChange="1" LargeChange="1" Value="{CompiledBinding TextureQuality}" />
-                </DockPanel>
-            </StackPanel>
+            <WdeImage ImageUri="Icons/icon_day_night.png" />
+            <DropDownButton.Flyout>
+                <Flyout>
+                    <StackPanel Orientation="Vertical" Width="400">
+                        <CheckBox Name="TimeFlow" IsChecked="{CompiledBinding DisableTimeFlow, Mode=TwoWay}">Disable time flow</CheckBox>
+                        <DockPanel LastChildFill="True" IsEnabled="{Binding #TimeFlow.IsChecked, Converter={x:Static InverseBoolConverter.Instance}}">
+                            <TextBlock VerticalAlignment="Center">Time speed: </TextBlock>
+                            <Slider Minimum="0" Maximum="6" IsSnapToTickEnabled="False" SmallChange="1" LargeChange="1" Value="{CompiledBinding TimeSpeedMultiplier}" />
+                        </DockPanel>
+                        <DockPanel LastChildFill="True">
+                            <TextBlock VerticalAlignment="Center">Time: </TextBlock>
+                            <Slider Minimum="0" Maximum="1439" Value="{CompiledBinding CurrentTime}" />
+                        </DockPanel>
+                        <CheckBox IsChecked="{CompiledBinding OverrideLighting, Mode=TwoWay}">Disable lightning</CheckBox>
+                        <DockPanel LastChildFill="True">
+                            <TextBlock VerticalAlignment="Center">View distance: </TextBlock>
+                            <Slider Minimum="1" Maximum="24" SmallChange="0.1" LargeChange="1" Value="{CompiledBinding ViewDistance}" />
+                        </DockPanel>
+                        <DockPanel LastChildFill="True">
+                            <TextBlock VerticalAlignment="Center">Dynamic resolution scale: </TextBlock>
+                            <Slider Minimum="0.001" Maximum="1" SmallChange="0.1" LargeChange="0.1" Value="{CompiledBinding DynamicResolution}" />
+                        </DockPanel>
+                        <DockPanel LastChildFill="True">
+                            <TextBlock VerticalAlignment="Center">Textures quality: </TextBlock>
+                            <TextBlock DockPanel.Dock="Bottom" Opacity="0.5" IsVisible="{CompiledBinding ShowTextureQualityWarning}">Restart the game view to apply the change</TextBlock>
+                            <Slider TickFrequency="1" IsSnapToTickEnabled="True" Minimum="0" Maximum="6" SmallChange="1" LargeChange="1" Value="{CompiledBinding TextureQuality}" />
+                        </DockPanel>
+                    </StackPanel>
+                </Flyout>
+            </DropDownButton.Flyout>
         </DropDownButton>
     </ToolbarPanel>
 </UserControl>

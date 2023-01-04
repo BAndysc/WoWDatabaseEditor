@@ -408,7 +408,7 @@ namespace WoWDatabaseEditorCore.Managers
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e);
+                    LOG.LogError(e);
                     messageBoxService.ShowDialog(new MessageBoxFactory<bool>().SetTitle("Cannot open the editor")
                         .SetMainInstruction(
                             "Couldn't open item, because there was an error")

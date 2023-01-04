@@ -1,5 +1,5 @@
 ﻿using System.Reactive.Linq;
-using Dock.Model.ReactiveUI.Controls;
+using Dock.Model.Mvvm.Controls;
 using WDE.Common.Managers;
 using WDE.MVVM;
 using WDE.MVVM.Observable;

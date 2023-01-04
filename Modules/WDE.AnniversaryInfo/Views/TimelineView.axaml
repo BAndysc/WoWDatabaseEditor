@@ -42,7 +42,7 @@
     <Panel>
         <ScrollViewer HorizontalScrollBarVisibility="Disabled" Background="#474e5d">
             <DockPanel LastChildFill="True">
-                <ItemsControl Items="{CompiledBinding Cards}" Padding="0,20,0,20">
+                <ItemsControl ItemsSource="{CompiledBinding Cards}" Padding="0,20,0,20">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <DockPanel MaxWidth="1200" LastChildFill="False" />
@@ -55,7 +55,7 @@
                                 <Border Classes="Content" Grid.ColumnSpan="2">
                                     <DockPanel LastChildFill="True">
                                         <TextBlock DockPanel.Dock="Top" Classes="H2" Text="{CompiledBinding Date}" />
-                                        <ItemsControl Items="{CompiledBinding Content}">
+                                        <ItemsControl ItemsSource="{CompiledBinding Content}">
                                             <ItemsControl.ItemsPanel>
                                                 <ItemsPanelTemplate>
                                                     <StackPanel Spacing="15" Orientation="Vertical">

@@ -4,24 +4,25 @@ using Avalonia.VisualTree;
 
 namespace AvaloniaGraph.Controls;
 
-public abstract class ConnectionDragEventArgs : PointerEventArgs
+public abstract class ConnectionDragEventArgs : RoutedEventArgs
 {
     protected ConnectionDragEventArgs(RoutedEvent routedEvent,
-        IInteractive? source,
+        Interactive? source,
         GraphNodeItemView? elementItem,
         ConnectorItem sourceConnectorItem,
-        PointerEventArgs baseArgs) : base(routedEvent, source,
-        baseArgs.Pointer,
-        (baseArgs.Source as IVisual)?.VisualRoot,
-        baseArgs.GetPosition(null),
-        baseArgs.Timestamp,
-        baseArgs.GetCurrentPoint(null).Properties,
-        baseArgs.KeyModifiers)
+        PointerEventArgs baseArgs) : base(routedEvent, source)
     {
         ElementItem = elementItem;
         SourceConnector = sourceConnectorItem;
+        BaseArgs = baseArgs;
     }
 
+    public PointerEventArgs BaseArgs { get; }
     public GraphNodeItemView? ElementItem { get; }
     public ConnectorItem SourceConnector { get; }
+    
+    
+    public IPointer Pointer => BaseArgs.Pointer;
+    public ulong Timestamp => BaseArgs.Timestamp;
+    public KeyModifiers KeyModifiers  => BaseArgs.KeyModifiers;
 }

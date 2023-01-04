@@ -383,7 +383,7 @@ internal class LootItemParameterCell<T> : ITableCell, INotifyPropertyValueChange
             var newValueTyped = (T)Convert.ChangeType(newValue, typeof(T));
             return SetValue(newValueTyped);
         }
-        catch (FormatException e)
+        catch (FormatException)
         {
             return Task.CompletedTask;
         }

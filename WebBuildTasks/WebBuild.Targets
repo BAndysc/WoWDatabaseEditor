@@ -1,0 +1,19 @@
+<Project>
+    <!-- Reference the output of the task project, using properties that expand
+         to match the real output. -->
+    <!-- Using `TaskHostFactory` ensures that the task assembly will not be locked
+         at the end of the build. If it's omitted, that can cause build failures
+         in subsequent builds because the task assembly can't be written by the
+         next build. -->
+    <UsingTask TaskName="ProduceDirectoryListingTask"
+               AssemblyFile="$(MSBuildThisFileDirectory)\bin\$(Configuration)\net8.0\WebBuildTasks.dll"
+               TaskFactory="TaskHostFactory" />
+
+    <ItemGroup>
+        <!-- Add a ProjectReference to ensure that the task gets built before it
+             needs to be called. -->
+        <ProjectReference Include="..\WebBuildTasks\WebBuildTasks.csproj"
+                          ReferenceOutputAssembly="false" />
+    </ItemGroup>
+
+</Project>

@@ -1,8 +1,10 @@
 using System;
+using System.Reactive.Disposables;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.VisualTree;
+using WDE.MVVM.Observable;
 using WDE.SmartScriptEditor.Avalonia.Extensions;
 using WDE.SmartScriptEditor.Models;
 
@@ -34,7 +36,7 @@ public class SmartScriptOverlay : Control
         set => SetAndRaise(HideConditionsProperty, ref hideConditions, value);
     }
     
-    private ScrollViewer ScrollView => this.FindAncestorOfType<ScrollViewer>();
+    private ScrollViewer ScrollView => this.FindAncestorOfType<ScrollViewer>()!;
     private InverseRenderTransformPanel? Panel => this.FindAncestorOfType<InverseRenderTransformPanel>();
 
     private Rect VisibleRect
@@ -171,5 +173,32 @@ public class SmartScriptOverlay : Control
         {
             context.DrawGeometry(new SolidColorBrush(new Color(150, 0,0, 0), 1), null, full);
         }
+    }
+
+    private System.IDisposable? attachedScrollViewer;
+
+    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
+
+        if (ScrollView is { } sc)
+        {
+            var a = sc.GetObservable(ScrollViewer.OffsetProperty).SubscribeAction(_ =>
+            {
+                InvalidateVisual();
+            });
+            var b = sc.GetObservable(ScrollViewer.ViewportProperty).SubscribeAction(_ =>
+            {
+                InvalidateVisual();
+            });
+            attachedScrollViewer = new CompositeDisposable(a, b);
+        }
+    }
+
+    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnDetachedFromVisualTree(e);
+        attachedScrollViewer?.Dispose();
+        attachedScrollViewer = null;
     }
 }

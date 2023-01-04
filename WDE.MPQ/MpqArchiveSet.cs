@@ -37,7 +37,7 @@ namespace WDE.MPQ
                     if (bytes != null)
                         return bytes;
                 }
-                catch (Exception _)
+                catch (Exception)
                 {
                 }
             }
@@ -54,7 +54,7 @@ namespace WDE.MPQ
                     if (bytes != null)
                         return bytes;
                 }
-                catch (Exception _)
+                catch (Exception)
                 {
                 }
             }

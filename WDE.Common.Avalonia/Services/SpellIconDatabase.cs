@@ -15,7 +15,7 @@ using WDE.Module.Attributes;
 
 namespace WDE.Common.Avalonia.Services;
 
-[AutoRegister]
+[AutoRegister(Platforms.Desktop)]
 [SingleInstance]
 internal class SpellIconDatabase : ISpellIconDatabase
 {
@@ -62,7 +62,7 @@ internal class SpellIconDatabase : ISpellIconDatabase
             var dest = fileSystem.ResolvePhysicalPath(SpellIconsPath);
             var destPath = dest.FullName;
 
-            Console.WriteLine("Copying new icons to -> " + destPath);
+            LOG.LogInformation("Copying new icons to -> " + destPath);
             if (Directory.Exists(destPath))
                 Directory.Delete(destPath, true);
             Directory.CreateDirectory(destPath);
@@ -144,6 +144,22 @@ internal class SpellIconDatabase : ISpellIconDatabase
             return has;
         }
         image = null;
+        return false;
+    }
+}
+
+[FallbackAutoRegister]
+[SingleInstance]
+internal class NullSpellIconDatabase : ISpellIconDatabase
+{
+    public async Task<IImage?> GetIcon(uint spellId, CancellationToken cancellationToken = default)
+    {
+        return null;
+    }
+
+    public bool TryGetCached(uint spellId, out IImage? bitmap)
+    {
+        bitmap = null;
         return false;
     }
 }

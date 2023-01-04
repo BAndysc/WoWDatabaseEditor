@@ -14,7 +14,7 @@ namespace WDE.Updater.Client
         {
             return Task.Run(() =>
             {
-                using var md5 = HashAlgorithm.Create("MD5")!;
+                using var md5 = MD5.Create();
                 using var stream = File.OpenRead(file.FullName);
                 return BitConverter.ToString(md5.ComputeHash(stream)).Replace("-","").ToLower() == hash;
             });

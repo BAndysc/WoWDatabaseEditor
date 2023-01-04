@@ -3,7 +3,7 @@ using Avalonia.Markup.Xaml;
 
 namespace WDE.PacketViewer.Avalonia.Views
 {
-    public class PacketViewerConfigurationView : UserControl
+    public partial class PacketViewerConfigurationView : UserControl
     {
         public PacketViewerConfigurationView()
         {

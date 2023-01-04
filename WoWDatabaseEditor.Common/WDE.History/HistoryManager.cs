@@ -11,7 +11,7 @@ namespace WDE.History
     [AutoRegister]
     public class HistoryManager : IHistoryManager, INotifyPropertyChanged
     {
-        private IHistoryAction savedPoint;
+        private IHistoryAction? savedPoint;
         private bool forceNoSave;
         private bool acceptNew;
         private bool canRedo;
@@ -163,7 +163,7 @@ namespace WDE.History
             RecalculateValues();
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         public void Clear()
         {
@@ -187,7 +187,7 @@ namespace WDE.History
         }
 
         protected virtual void OnPropertyChanged([CallerMemberName]
-            string propertyName = null)
+            string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

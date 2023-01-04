@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
@@ -32,24 +33,14 @@ public class SimpleGraph : Control
             return;
 
 
-        maxText ??= new FormattedText()
-        {
-            Text = NiceNumber(MaxY),
-            FontSize = 7,
-            Typeface = Typeface.Default,
-        };
-        minText ??= new FormattedText()
-        {
-            Text = NiceNumber(MinY),
-            FontSize = 7,
-            Typeface = Typeface.Default,
-        };
+        maxText ??= new FormattedText(NiceNumber(MaxY), CultureInfo.CurrentCulture, FlowDirection.LeftToRight, Typeface.Default, 7, Foreground);
+        minText ??= new FormattedText(NiceNumber(MinY), CultureInfo.CurrentCulture, FlowDirection.LeftToRight, Typeface.Default, 7, Foreground);
         var graphWidth = Bounds.Width - 25;
 
-        var startY = maxText.Bounds.Height;
+        var startY = maxText.Height;
         var graphHeight = Bounds.Height - startY;
-        context.DrawText(Foreground, new Point(0, 0), maxText);
-        context.DrawText(Foreground, new Point(0, Bounds.Height - minText.Bounds.Height), minText);
+        context.DrawText(maxText, new Point(0, 0));
+        context.DrawText(minText, new Point(0, Bounds.Height - minText.Height));
 
         if (graphWidth < 0 || graphHeight < 0)
             return;
@@ -58,7 +49,7 @@ public class SimpleGraph : Control
         var range = (max - min);
         var widthPerPoint = graphWidth / len;
 
-        geom ??= new PolylineGeometry(){IsFilled = false};
+        geom = new PolylineGeometry(){IsFilled = true};
         geom.Points.Clear();
         geom.Points.Add(new Point(25, Bounds.Height));
 

@@ -12,39 +12,39 @@
              x:DataType="tools:DebugQueryToolViewModel"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300">
-    <components:ToolView.Icon>
-        <controls:MonochromaticIcon Name="Icon">
-            <controls:MonochromaticIcon.Source>
-                <DrawingImage>
-                    <DrawingImage.Drawing>
-                        <DrawingGroup>
-                            <DrawingGroup Opacity="1">
-                                <GeometryDrawing Brush="{Binding #Icon.Fill}" Geometry="F0 M16,16z M0,0z M2,9L2,13C2,13 2.996,14 8,14 13.004,14 14,13 14,13L14,9C14,9 12.985,10 8,10 3.015,10 2,9 2,9z">
-                                    <GeometryDrawing.Pen>
-                                        <Pen Brush="{Binding #Icon.BorderBrush}" Thickness="0.4" LineJoin="Round" />
-                                    </GeometryDrawing.Pen>
-                                </GeometryDrawing>
-                            </DrawingGroup>
-                            <DrawingGroup Opacity="1">
-                                <GeometryDrawing Brush="{Binding #Icon.Fill}" Geometry="F0 M16,16z M0,0z M2,4L2,8C2,8 2.996,9 8,9 13.004,9 14,8 14,8L14,4C14,4 12.985,5 8,5 3.015,5 2,4 2,4z">
-                                    <GeometryDrawing.Pen>
-                                        <Pen Brush="{Binding #Icon.BorderBrush}" Thickness="0.4" LineJoin="Round" />
-                                    </GeometryDrawing.Pen>
-                                </GeometryDrawing>
-                            </DrawingGroup>
-                            <DrawingGroup Opacity="1">
-                                <GeometryDrawing Brush="{Binding #Icon.Fill}" Geometry="F0 M16,16z M0,0z M2,3C2,3 2.126,1 8,1 13.874,1 14,3 14,3 14,3 13.976,4 8,4 2.024,4 2,3 2,3z">
-                                    <GeometryDrawing.Pen>
-                                        <Pen Brush="{Binding #Icon.BorderBrush}" Thickness="0.4" LineJoin="Round" />
-                                    </GeometryDrawing.Pen>
-                                </GeometryDrawing>
-                            </DrawingGroup>
-                        </DrawingGroup>
-                    </DrawingImage.Drawing>
-                </DrawingImage>
-            </controls:MonochromaticIcon.Source>
-        </controls:MonochromaticIcon>
-    </components:ToolView.Icon>
+    <!-- <components:ToolView.Icon> -->
+    <!--     <controls:MonochromaticIcon Name="Icon"> -->
+    <!--         <controls:MonochromaticIcon.Source> -->
+    <!--             <DrawingImage> -->
+    <!--                 <DrawingImage.Drawing> -->
+    <!--                     <DrawingGroup> -->
+    <!--                         <DrawingGroup Opacity="1"> -->
+    <!--                             <GeometryDrawing Brush="{Binding #Icon.Fill}" Geometry="F0 M16,16z M0,0z M2,9L2,13C2,13 2.996,14 8,14 13.004,14 14,13 14,13L14,9C14,9 12.985,10 8,10 3.015,10 2,9 2,9z"> -->
+    <!--                                 <GeometryDrawing.Pen> -->
+    <!--                                     <Pen Brush="{Binding #Icon.BorderBrush}" Thickness="0.4" LineJoin="Round" /> -->
+    <!--                                 </GeometryDrawing.Pen> -->
+    <!--                             </GeometryDrawing> -->
+    <!--                         </DrawingGroup> -->
+    <!--                         <DrawingGroup Opacity="1"> -->
+    <!--                             <GeometryDrawing Brush="{Binding #Icon.Fill}" Geometry="F0 M16,16z M0,0z M2,4L2,8C2,8 2.996,9 8,9 13.004,9 14,8 14,8L14,4C14,4 12.985,5 8,5 3.015,5 2,4 2,4z"> -->
+    <!--                                 <GeometryDrawing.Pen> -->
+    <!--                                     <Pen Brush="{Binding #Icon.BorderBrush}" Thickness="0.4" LineJoin="Round" /> -->
+    <!--                                 </GeometryDrawing.Pen> -->
+    <!--                             </GeometryDrawing> -->
+    <!--                         </DrawingGroup> -->
+    <!--                         <DrawingGroup Opacity="1"> -->
+    <!--                             <GeometryDrawing Brush="{Binding #Icon.Fill}" Geometry="F0 M16,16z M0,0z M2,3C2,3 2.126,1 8,1 13.874,1 14,3 14,3 14,3 13.976,4 8,4 2.024,4 2,3 2,3z"> -->
+    <!--                                 <GeometryDrawing.Pen> -->
+    <!--                                     <Pen Brush="{Binding #Icon.BorderBrush}" Thickness="0.4" LineJoin="Round" /> -->
+    <!--                                 </GeometryDrawing.Pen> -->
+    <!--                             </GeometryDrawing> -->
+    <!--                         </DrawingGroup> -->
+    <!--                     </DrawingGroup> -->
+    <!--                 </DrawingImage.Drawing> -->
+    <!--             </DrawingImage> -->
+    <!--         </controls:MonochromaticIcon.Source> -->
+    <!--     </controls:MonochromaticIcon> -->
+    <!-- </components:ToolView.Icon> -->
     
     <DockPanel LastChildFill="True">
         <Button Command="{CompiledBinding ClearConsole}" DockPanel.Dock="Top">Clear</Button>

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using WDE.Common;
 using WDE.Common.MPQ;
 using WDE.Module.Attributes;
 using WDE.MPQ.Casc;
@@ -53,7 +54,7 @@ namespace WDE.MPQ.Services
             {
                 if (file.Contains("Data/Cache") || file.Contains("Data\\Cache"))
                 {
-                    Console.WriteLine("Skipping " + file);
+                    LOG.LogInformation("Skipping " + file);
                     continue;
                 }
                 try

@@ -1,0 +1,30 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:managers="clr-namespace:WDE.Common.Managers;assembly=WDE.Common"
+        xmlns:avalonia="clr-namespace:WoWDatabaseEditorCore.Avalonia"
+        xmlns:controls="clr-namespace:WoWDatabaseEditorCore.Avalonia.Controls">
+  <Design.PreviewWith>
+    <controls:FakeWindowControl />
+  </Design.PreviewWith>
+
+  <Style Selector="controls|FakeWindowControl">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <!-- blocks the input -->
+        <controls:WindowPanel Background="#10000000">
+          <ContentPresenter Name="PART_ContentPresenter"
+                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                            Content="{TemplateBinding Content}"
+                            controls:WindowPanel.DesiredHeight="{CompiledBinding DesiredHeight}" x:DataType="managers:IDialogWindowBase"
+                            controls:WindowPanel.DesiredWidth="{CompiledBinding DesiredWidth}"
+                            />
+        </controls:WindowPanel>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+
+  <Style Selector="controls|FakeWindowControl controls|FakeWindow">
+    <Setter Property="Title" Value="{CompiledBinding Title}" x:DataType="managers:IDialogWindowBase" />
+    <Setter Property="Icon" Value="{ReflectionBinding Icon}" x:DataType="managers:IDialogWindowBase" />
+  </Style>
+</Styles>

@@ -14,7 +14,7 @@ using WDE.Common.Parameters;
 
 namespace WDE.DatabaseEditors.Avalonia.Controls
 {
-    public class FastFlagCellView : OpenableFastCellViewBase, IStyleable
+    public class FastFlagCellView : OpenableFastCellViewBase
     {
         public static readonly DirectProperty<FastFlagCellView, object?> SelectedItemProperty =
             AvaloniaProperty.RegisterDirect<FastFlagCellView, object?>(
@@ -50,7 +50,7 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
 
         protected override bool DismissOnWindowFocusLost => true;
 
-        Type IStyleable.StyleKey => typeof(FastCellView);
+        protected override Type StyleKeyOverride => typeof(FastCellView);
         
         private FlagComboBox? flagsComboBox;
 
@@ -72,22 +72,20 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
                 return;
             DispatcherTimer.RunOnce(() =>
             {
-                flagsComboBox!.RaiseEvent(new TextInputEventArgs
-                {
-                    Device = e.Device,
-                    Handled = false,
-                    Text = e.Text,
-                    Route = e.Route,
-                    RoutedEvent = e.RoutedEvent,
-                    Source = flagsComboBox
-                });
+                var args = new TextInputEventArgs();
+                args.Handled = false;
+                args.Text = e.Text;
+                args.Route = e.Route;
+                args.RoutedEvent = e.RoutedEvent;
+                args.Source = flagsComboBox;
+                flagsComboBox!.RaiseEvent(args);
             }, TimeSpan.FromMilliseconds(2));
         }
 
         private void CompletionComboBoxOnClosed()
         {
             EndEditing(true);
-            FocusManager.Instance!.Focus(this, NavigationMethod.Tab);
+            Focus(NavigationMethod.Tab);
         }
 
         protected override Control CreateEditingControl()
@@ -127,9 +125,9 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
                 SelectedValue = l;
         }
 
-        public override void DoCopy(IClipboard clipboard)
+        public override void DoCopy()
         {
-            clipboard.SetTextAsync(SelectedValue.ToString()!);
+            TopLevel.GetTopLevel(this)?.Clipboard?.SetTextAsync(SelectedValue.ToString()!);
         }
     }
 }

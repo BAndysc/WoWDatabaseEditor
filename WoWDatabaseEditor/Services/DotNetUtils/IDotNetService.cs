@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using WDE.Common;
 using WDE.Common.Services.Processes;
 using WDE.Module.Attributes;
 using WoWDatabaseEditorCore.Services.Processes;
@@ -45,7 +46,7 @@ namespace WoWDatabaseEditorCore.Services.DotNetUtils
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                LOG.LogWarning(e);
                 return true;
             }
         }

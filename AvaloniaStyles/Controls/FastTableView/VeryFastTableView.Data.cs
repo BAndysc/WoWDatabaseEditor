@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using Avalonia.Threading;
 using DynamicData;
 using WDE.Common.Utils;
 
@@ -61,18 +62,18 @@ public partial class VeryFastTableView
             return;
         if (Items == null)
         {
-            SelectedRowIndex = VerticalCursor.None;
+            SetCurrentValue(SelectedRowIndexProperty, VerticalCursor.None);
             return;
         }
 
         if (SelectedRowIndex.GroupIndex >= Items.Count)
         {
-            SelectedRowIndex = VerticalCursor.None;
+            SetCurrentValue(SelectedRowIndexProperty, VerticalCursor.None);
             return;
         }
 
         if (SelectedRowIndex.RowIndex >= Items[SelectedRowIndex.GroupIndex].Rows.Count)
-            SelectedRowIndex = VerticalCursor.None;
+            SetCurrentValue(SelectedRowIndexProperty, VerticalCursor.None);
     }
 
     private void ItemsChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -111,7 +112,9 @@ public partial class VeryFastTableView
         
         var rowIndex = Items[groupIndex].Rows.IndexOf(obj);
         if (IsRowVisible(new VerticalCursor(groupIndex, rowIndex)))
-            InvalidateVisual();
+        {
+            Dispatcher.UIThread.Post(InvalidateVisual);
+        }
     }
     
     

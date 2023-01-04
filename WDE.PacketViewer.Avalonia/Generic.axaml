@@ -1,0 +1,26 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:codeCompletion="clr-namespace:AvaloniaEdit.CodeCompletion;assembly=AvaloniaEdit"
+        xmlns:types="clr-namespace:WDE.Common.Avalonia.Types;assembly=WDE.Common.Avalonia"
+        xmlns:views="clr-namespace:WDE.PacketViewer.Avalonia.Views">
+  <Style Selector="codeCompletion|CompletionList">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border CornerRadius="5" ClipToBounds="True" Background="{DynamicResource ContentBackground}" BorderThickness="1" BorderBrush="{DynamicResource ContentBorderBrush}">
+          <codeCompletion:CompletionListBox CornerRadius="5" Background="Transparent" Name="PART_ListBox"
+                                            FontSize="10" HorizontalAlignment="Stretch">
+            <codeCompletion:CompletionListBox.ItemTemplate>
+              <DataTemplate x:DataType="views:PacketCompletionData">
+                <TextBlock Text="{CompiledBinding  Text}" />
+              </DataTemplate>
+            </codeCompletion:CompletionListBox.ItemTemplate>
+          </codeCompletion:CompletionListBox>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+  <Style Selector="codeCompletion|CompletionList > Border > ListBox > ListBoxItem">
+    <Setter Property="Padding" Value="8, 0, 8, 0" />
+    <Setter Property="Height" Value="20" />
+  </Style>
+</Styles>

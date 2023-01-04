@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using WDE.Common;
 
 namespace WDE.MySqlDatabaseCommon.Services;
 
@@ -37,7 +38,7 @@ internal class RollingLogFile
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"An error occurred while writing to the log file: {ex.Message}");
+            LOG.LogError($"An error occurred while writing to the log file: {ex.Message}");
         }
     }
 
@@ -60,7 +61,7 @@ internal class RollingLogFile
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"An error occurred during initialization: {ex.Message}");
+            LOG.LogError($"An error occurred during initialization: {ex.Message}");
         }
     }
 
@@ -84,7 +85,7 @@ internal class RollingLogFile
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"An error occurred while creating a new log file: {ex.Message}");
+            LOG.LogError($"An error occurred while creating a new log file: {ex.Message}");
         }
     }
 
@@ -107,14 +108,14 @@ internal class RollingLogFile
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"An error occurred while deleting old log files: {ex.Message}");
+                        LOG.LogError($"An error occurred while deleting old log files: {ex.Message}");
                     }
                 }
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"An error occurred while cleaning up old log files: {ex.Message}");
+            LOG.LogError($"An error occurred while cleaning up old log files: {ex.Message}");
         }
     }
 
@@ -175,7 +176,7 @@ internal class RollingLogFile
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"An error occurred while finding the last log file: {ex.Message}");
+            LOG.LogError($"An error occurred while finding the last log file: {ex.Message}");
         }
     }
 }

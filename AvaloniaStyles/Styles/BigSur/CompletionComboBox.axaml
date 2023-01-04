@@ -8,7 +8,7 @@
         <Setter Property="Background" Value="{DynamicResource RaisedContentBackground}" />
     </Style>
     <Style Selector="controls|CompletionComboBox ToggleButton:checked /template/ ContentPresenter#PART_ContentPresenter">
-        <Setter Property="TextBlock.Foreground" Value="{DynamicResource RaisedContentForeground.Accent}" />
+        <Setter Property="TextElement.Foreground" Value="{DynamicResource RaisedContentForeground.Accent}" />
         <Setter Property="Background" Value="{DynamicResource RaisedContentBackground.Accent}" />
         <Setter Property="BorderBrush" Value="{DynamicResource RaisedContentBorderBrush.Accent}" />
     </Style>

@@ -8,6 +8,7 @@ using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Metadata;
+using Avalonia.Threading;
 using WDE.Common.Avalonia.Services;
 using WDE.Common.Avalonia.Utils;
 using WDE.Common.Utils;
@@ -40,29 +41,29 @@ namespace WDE.Common.Avalonia.Controls
             // this probably will be removed
             // when avalonia has support for "RUN"
             drawer = new FormattedTextDrawer();
-            if (!Application.Current!.Styles.TryGetResource("MainFontSans", out var mainFontSans)
+            if (!Application.Current!.Styles.TryGetResource("MainFontSans", null, out var mainFontSans)
                 || mainFontSans is not FontFamily mainFontSansFamily)
                 return;
             
-            if (Application.Current.Styles.TryGetResource("SmartScripts.Event.Foreground", out var eventColor)
+            if (Application.Current.Styles.TryGetResource("SmartScripts.Event.Foreground", null, out var eventColor)
                 && eventColor is IBrush eventBrush)
             {
                 drawer.AddStyle(STYLE_DEFAULT, new Typeface(mainFontSansFamily), 12, eventBrush, 0);
             }
             
-            if (Application.Current.Styles.TryGetResource("SmartScripts.Event.Selected.Foreground", out var eventSelectedColor)
+            if (Application.Current.Styles.TryGetResource("SmartScripts.Event.Selected.Foreground", null, out var eventSelectedColor)
                 && eventSelectedColor is IBrush eventSelectedBrush)
             {
                 drawer.AddStyle(STYLE_DEFAULT_SELECTED, new Typeface(mainFontSansFamily), 12, eventSelectedBrush, 0);
             }
             
-            if (Application.Current.Styles.TryGetResource("SmartScripts.Parameter.Foreground", out var parameterColor)
+            if (Application.Current.Styles.TryGetResource("SmartScripts.Parameter.Foreground", null, out var parameterColor)
                 && parameterColor is IBrush parameterBrush)
             {
                 drawer.AddStyle(STYLE_PARAMETER, new Typeface("Consolas,Menlo,Courier,Courier New", FontStyle.Normal, FontWeight.Bold), 12, parameterBrush, 1);
             }
             
-            if (Application.Current.Styles.TryGetResource("SmartScripts.Source.Foreground", out var sourceColor)
+            if (Application.Current.Styles.TryGetResource("SmartScripts.Source.Foreground", null, out var sourceColor)
                 && sourceColor is IBrush sourceBrush)
             {
                 drawer.AddStyle(STYLE_SOURCE, new Typeface("Consolas,Menlo,Courier,Courier New", FontStyle.Normal, FontWeight.Bold), 12, sourceBrush, 1);
@@ -84,9 +85,9 @@ namespace WDE.Common.Avalonia.Controls
             InvalidateVisual();
         }
 
-        protected override void OnPointerLeave(PointerEventArgs e)
+        protected override void OnPointerExited(PointerEventArgs e)
         {
-            base.OnPointerLeave(e);
+            base.OnPointerExited(e);
             currentPos = new Point(-100, -100);
             InvalidateVisual();
         }
@@ -130,7 +131,7 @@ namespace WDE.Common.Avalonia.Controls
             return true;
         }
 
-        private static void ParseText(IControl? owner, string? text, Action<string, int, bool, bool, int, IImage?> action)
+        private static void ParseText(Control? owner, string? text, Action<string, int, bool, bool, int, IImage?> action)
         {
             if (text == null)
                 return;
@@ -196,8 +197,11 @@ namespace WDE.Common.Avalonia.Controls
                                     async Task LoadIcon()
                                     {
                                         await ViewBind.ResolveViewModel<ISpellIconDatabase>().GetIcon(spellId);
-                                        owner.InvalidateVisual();
-                                        owner.InvalidateMeasure();
+                                        Dispatcher.UIThread.Post(() =>
+                                        {
+                                            owner.InvalidateVisual();
+                                            owner.InvalidateMeasure();
+                                        });
                                     }
                                     LoadIcon().ListenErrors();   
                                 }
@@ -373,7 +377,7 @@ namespace WDE.Common.Avalonia.Controls
         }
         
         public static readonly StyledProperty<IBrush?> BackgroundProperty =
-            Border.BackgroundProperty.AddOwner<TextBlock>();
+            Border.BackgroundProperty.AddOwner<FormattedTextBlock>();
 
         /// <summary>
         /// Gets or sets a brush used to paint the control's background.
@@ -388,7 +392,7 @@ namespace WDE.Common.Avalonia.Controls
         /// Defines the <see cref="Padding"/> property.
         /// </summary>
         public static readonly StyledProperty<Thickness> PaddingProperty =
-            Decorator.PaddingProperty.AddOwner<TextBlock>();
+            Decorator.PaddingProperty.AddOwner<FormattedTextBlock>();
 
         private IList<object>? _ContextArray;
         public static readonly DirectProperty<FormattedTextBlock, IList<object>?> ContextArrayProperty = AvaloniaProperty.RegisterDirect<FormattedTextBlock, IList<object>?>("ContextArray", o => o.ContextArray, (o, v) => o.ContextArray = v);

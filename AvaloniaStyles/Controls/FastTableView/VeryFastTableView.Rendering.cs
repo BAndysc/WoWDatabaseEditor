@@ -1,8 +1,11 @@
 using System;
+using System.Globalization;
 using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Documents;
 using Avalonia.Media;
+using Avalonia.Styling;
 using WDE.Common.Utils;
 using WDE.MVVM.Observable;
 
@@ -19,7 +22,7 @@ public partial class VeryFastTableView
         {
             var scrollViewer = ScrollViewer;
             if (scrollViewer == null)
-                return Rect.Empty;
+                return default;
             return new Rect(scrollViewer.Offset.X, scrollViewer.Offset.Y + DrawingStartOffsetY, scrollViewer.Viewport.Width, scrollViewer.Viewport.Height - DrawingStartOffsetY);
         }
     }
@@ -45,11 +48,10 @@ public partial class VeryFastTableView
 
     public override void Render(DrawingContext context)
     {
-        base.Render(context);
         if (Items == null)
             return;
 
-        var font = new Typeface(TextBlock.GetFontFamily(this));
+        var font = new Typeface(TextElement.GetFontFamily(this));
         
         var actualWidth = Bounds.Width;
 
@@ -104,13 +106,13 @@ public partial class VeryFastTableView
             }
 
             // out of bounds in the upper part
-            if (groupStartY + groupHeight < DataViewport.Top)
+            if (groupStartY + groupHeight < viewPort.Top)
             {
                 if (group.Rows.Count % 2 == 1)
                     odd = !odd;
                 y += groupHeight;
             }
-            else if (groupStartY > DataViewport.Bottom) // below
+            else if (groupStartY > viewPort.Bottom) // below
             {
                 break;
             }
@@ -162,7 +164,7 @@ public partial class VeryFastTableView
 
                             // we draw only the visible columns
                             // todo: could be optimized so we don't iterate through all columns when we know we don't need to
-                            if (x + columnWidth > DataViewport.Left && x < DataViewport.Right)
+                            if (x + columnWidth > viewPort.Left && x < viewPort.Right)
                             {
                                 var rect = span == null ? new Rect(x, y, columnWidth, RowHeight) : CellRect(cellIndex, new VerticalCursor(groupIndex, rowIndex));
                                 var rectWidth = rect.Width;
@@ -177,26 +179,21 @@ public partial class VeryFastTableView
                                             var indexOfEndOfLine = text.IndexOf('\n');
                                             if (indexOfEndOfLine != -1)
                                                 text = text.Substring(0, indexOfEndOfLine);
-
+                                            
                                             rect = rect.WithWidth(rect.Width - ColumnSpacing);
-                                            var ft = new FormattedText
-                                            {
-                                                Text = text,
-                                                Constraint = new Size(rect.Width, rect.Height),
-                                                Typeface = font,
-                                                FontSize = 12
-                                            };
+                                            var ft = new FormattedText(
+                                                text, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, font, 12, textColor);
+                                            ft.MaxTextWidth = float.MaxValue; // rect.Width; // we don't want to wrap the text, so pass large width
+                                            ft.MaxTextHeight = rect.Height;
                                             if (Math.Abs(rectWidth - rect.Width) > 0.01)
                                             {
                                                 state.Dispose();
                                                 state = context.PushClip(rect);
                                             }
-
-                                            context.DrawText(textColor,
-                                                new Point(rect.X + ColumnSpacing, y + rect.Height / 2 - ft.Bounds.Height / 2),
-                                                ft);
+                                            context.DrawText(ft, new Point(rect.X + ColumnSpacing, y + rect.Height / 2 - ft.Height / 2));   
                                         }
                                     }
+                                
                                 }
                                 finally
                                 {
@@ -241,7 +238,7 @@ public partial class VeryFastTableView
             return;
         
         FontFamily font = FontFamily.Default;
-        if (Application.Current!.Styles.TryGetResource("MainFontSans", out var mainFontSans) && mainFontSans is FontFamily mainFontSansFamily)
+        if (Application.Current!.Styles.TryGetResource("MainFontSans", SystemTheme.EffectiveThemeIsDark ? ThemeVariant.Dark  : ThemeVariant.Light, out var mainFontSans) && mainFontSans is FontFamily mainFontSansFamily)
             font = mainFontSansFamily;
 
         var scrollViewer = ScrollViewer;
@@ -265,12 +262,11 @@ public partial class VeryFastTableView
                 continue;
             
             var column = Columns[i];
-            var ft = new FormattedText
+            var ft = new FormattedText(column.Header, CultureInfo.InvariantCulture, FlowDirection.LeftToRight,
+                new Typeface(font, FontStyle.Normal, FontWeight.Bold), 12, BorderPen.Brush)
             {
-                Text = column.Header,
-                Constraint = new Size(column.Width, RowHeight),
-                Typeface = new Typeface(font, FontStyle.Normal, FontWeight.Bold),
-                FontSize = 12
+                MaxTextWidth = float.MaxValue, // column.Width // we don't want text wrapping so pass float.MaxValue
+                MaxTextHeight = RowHeight
             };
             
             bool isMouseOverColumn = isMouseOverHeader && lastMouseLocation.X >= x && lastMouseLocation.X < x + column.Width;
@@ -278,7 +274,7 @@ public partial class VeryFastTableView
                 context.FillRectangle(lastMouseButtonPressed && !isMouseOverSplitter ? HeaderPressedBackground : HeaderHoverBackground, new Rect(x, y, column.Width, RowHeight));
             
             var state = context.PushClip(new Rect(x + ColumnSpacing, y, Math.Max(0, column.Width - ColumnSpacing * 2), RowHeight));
-            context.DrawText(BorderPen.Brush, new Point(x + ColumnSpacing, y + RowHeight / 2 - ft.Bounds.Height / 2), ft);
+            context.DrawText(ft, new Point(x + ColumnSpacing, y + RowHeight / 2 - ft.Height / 2));
             state.Dispose();
             
             x += column.Width;

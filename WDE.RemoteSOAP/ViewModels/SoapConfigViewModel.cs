@@ -11,7 +11,7 @@ using WDE.RemoteSOAP.Services.Soap;
 
 namespace WDE.RemoteSOAP.ViewModels
 {
-    [AutoRegister]
+    [AutoRegister(Platforms.Desktop)]
     public class SoapConfigViewModel : BindableBase, IFirstTimeWizardConfigurable
     {
         private readonly IConnectionSettingsProvider settings;

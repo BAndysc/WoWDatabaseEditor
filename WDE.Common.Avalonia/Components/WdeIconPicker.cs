@@ -42,7 +42,7 @@ public class WdeIconPicker : TemplatedControl
             return;
 
         inEvent = true;
-        IsNonNullIcon = IconPath != null;
+        SetCurrentValue(IsNonNullIconProperty, IconPath != null);
         inEvent = false;
     }
 
@@ -54,12 +54,12 @@ public class WdeIconPicker : TemplatedControl
         inEvent = true;
         if (IsNonNullIcon && IconPath == null)
         {
-            IconPath = lastNonNullIconPath;
+            SetCurrentValue(IconPathProperty, lastNonNullIconPath);
         }
         else if (!IsNonNullIcon)
         {
             lastNonNullIconPath = IconPath ?? "";
-            IconPath = null;
+            SetCurrentValue(IconPathProperty, null);
         }
         inEvent = false;
     }

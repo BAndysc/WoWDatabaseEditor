@@ -52,7 +52,7 @@ internal class MySQLParserServicesImpl
         int head = start;
         int tail = head;
         int end = head + length;
-        int newLine = 0;
+        //int newLine = 0;
 
         int currentLine = 0;
         int statementStart = 0;

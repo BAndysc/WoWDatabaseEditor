@@ -10,9 +10,9 @@ using Avalonia.Threading;
 namespace WDE.Common.Avalonia.Controls
 {
     // normal TextBox has bug when AcceptsReturn is false
-    public class FixedTextBox : TextBox, IStyleable
+    public class FixedTextBox : TextBox
     {
-        Type IStyleable.StyleKey => typeof(TextBox);
+        protected override Type StyleKeyOverride => typeof(TextBox);
         
         protected override void OnTextInput(TextInputEventArgs e)
         {
@@ -25,8 +25,7 @@ namespace WDE.Common.Avalonia.Controls
 
         protected override void OnKeyDown(KeyEventArgs e)
         {
-            var keymap = AvaloniaLocator.Current.GetRequiredService<PlatformHotkeyConfiguration>();
-            if (keymap.Paste.Any(g => g.Matches(e)))
+            if (KeyGestures.Paste.Matches(e))
             {
                 CustomPaste();
                 e.Handled = true;

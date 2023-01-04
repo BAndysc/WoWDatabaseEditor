@@ -4,7 +4,7 @@ using Avalonia.Markup.Xaml;
 
 namespace WoWDatabaseEditorCore.Avalonia.Services.PersonalGuidService;
 
-public class PersonalGuidConfigurationView : UserControl
+public partial class PersonalGuidConfigurationView : UserControl
 {
     public PersonalGuidConfigurationView()
     {

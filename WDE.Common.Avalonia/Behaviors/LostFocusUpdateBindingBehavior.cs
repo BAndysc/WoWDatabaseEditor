@@ -17,10 +17,10 @@ public class LostFocusUpdateBindingBehavior : Behavior<TextBox>
         });
     }
     
-    public static readonly StyledProperty<string> TextProperty = AvaloniaProperty.Register<LostFocusUpdateBindingBehavior, string>(
+    public static readonly StyledProperty<string?> TextProperty = AvaloniaProperty.Register<LostFocusUpdateBindingBehavior, string?>(
         nameof(Text), defaultBindingMode: BindingMode.TwoWay);
 
-    public string Text
+    public string? Text
     {
         get => GetValue(TextProperty);
         set => SetValue(TextProperty, value);
@@ -43,13 +43,13 @@ public class LostFocusUpdateBindingBehavior : Behavior<TextBox>
     private void OnLostFocus(object? sender, RoutedEventArgs e)
     {
         if (AssociatedObject != null)
-            Text = AssociatedObject.Text;
+            SetCurrentValue(TextProperty, AssociatedObject.Text);
     }
         
     private void OnBindingValueChanged()
     {
         if (AssociatedObject != null)
-            AssociatedObject.Text = Text;
+            AssociatedObject.SetCurrentValue(TextBox.TextProperty, Text);
     }
 }
 
@@ -64,10 +64,10 @@ public class NumericUpDownLostFocusUpdateBindingBehavior : Behavior<NumericUpDow
         });
     }
     
-    public static readonly StyledProperty<double> ValueProperty = AvaloniaProperty.Register<NumericUpDownLostFocusUpdateBindingBehavior, double>(
+    public static readonly StyledProperty<decimal?> ValueProperty = AvaloniaProperty.Register<NumericUpDownLostFocusUpdateBindingBehavior, decimal?>(
         nameof(Value), defaultBindingMode: BindingMode.TwoWay);
 
-    public double Value
+    public decimal? Value
     {
         get => GetValue(ValueProperty);
         set => SetValue(ValueProperty, value);
@@ -90,12 +90,12 @@ public class NumericUpDownLostFocusUpdateBindingBehavior : Behavior<NumericUpDow
     private void OnLostFocus(object? sender, RoutedEventArgs e)
     {
         if (AssociatedObject != null)
-            Value = AssociatedObject.Value;
+            SetCurrentValue(ValueProperty, AssociatedObject.Value);
     }
         
     private void OnBindingValueChanged()
     {
         if (AssociatedObject != null)
-            AssociatedObject.Value = Value;
+            AssociatedObject.SetCurrentValue(NumericUpDown.ValueProperty, Value);
     }
 }

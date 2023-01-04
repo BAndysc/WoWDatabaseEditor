@@ -229,6 +229,7 @@ namespace TheAvaloniaOpenGL
         /// call only from render thread
         /// </summary>
         /// <param name="renderTexture">render texture or null, then it resets to back buffer</param>
+        /// <param name="destFramebuffer"></para>
         internal void SetRenderTexture(RenderTexture? renderTexture, int destFramebuffer)
         {
             if (renderTexture == null)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using WDE.Common;
 using WDE.Common.CoreVersion;
 using WDE.Common.Managers;
 using WDE.Common.Services;
@@ -85,7 +86,7 @@ namespace WoWDatabaseEditorCore.Services.ServerIntegration
                     }
                 }
                 if (!anyCmd)
-                    Console.WriteLine("Got command " + line + " but didn't found any command to process this");
+                    LOG.LogWarning("Got command " + line + " but didn't found any command to process this");
             }
             ProcessAsync().ListenErrors();
         }
@@ -108,7 +109,7 @@ namespace WoWDatabaseEditorCore.Services.ServerIntegration
 
                 return response;
             }
-            catch (CouldNotConnectToRemoteServer _)
+            catch (CouldNotConnectToRemoteServer)
             {
                 statusBar.PublishNotification(new PlainNotification(NotificationType.Error,
                     "Couldn't connect to the remote server. Check remote server connection settings or check if the server is alive." ));
@@ -116,7 +117,7 @@ namespace WoWDatabaseEditorCore.Services.ServerIntegration
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                LOG.LogError(e);
                 return null;
             }
         }

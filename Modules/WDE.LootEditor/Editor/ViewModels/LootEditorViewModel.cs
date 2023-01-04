@@ -333,12 +333,14 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
                 return;
             
             var text = await clipboardService.GetText();
+            if (string.IsNullOrEmpty(text))
+                return;
             List<LootModel> entries = new List<LootModel>();
             try
             {
                 entries = JsonConvert.DeserializeObject<List<LootModel>>(text)!;
             }
-            catch (Exception e)
+            catch (Exception)
             {
             }
             
@@ -587,8 +589,6 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
             default:
                 throw new ArgumentOutOfRangeException();
         }
-
-        return new AsyncAutoCommand<LootGroup>(_ => Task.CompletedTask, _ => false);
     }
 
     private async Task AddItem(LootGroup group)

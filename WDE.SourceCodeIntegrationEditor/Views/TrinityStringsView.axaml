@@ -33,7 +33,7 @@
         <ScrollViewer controls:WizardPanel.StepTitle="Choose strings to generate sql for">
             <StackPanel>
                 <controls:GroupingHeader GroupName="Trinity strings not defined in database" />
-                <ItemsControl Padding="10,0" Items="{CompiledBinding TrinityStringsNoDatabase}">
+                <ItemsControl Padding="10,0" ItemsSource="{CompiledBinding TrinityStringsNoDatabase}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <CheckBox DockPanel.Dock="Left" IsChecked="{CompiledBinding IsSelected, Mode=TwoWay}" Margin="0,0,0,7">
@@ -49,7 +49,7 @@
         </ScrollViewer>
         
         <ScrollViewer controls:WizardPanel.StepTitle="Specify strings details">
-            <ItemsControl Items="{CompiledBinding ChosenStrings}">
+            <ItemsControl ItemsSource="{CompiledBinding ChosenStrings}">
                 <ItemsControl.Styles>
                     <Style Selector="ItemsControl:empty">
                         <Setter Property="Template">

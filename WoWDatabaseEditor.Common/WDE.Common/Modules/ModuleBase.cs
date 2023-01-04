@@ -5,6 +5,7 @@ using Prism.Ioc;
 using Prism.Modularity;
 using Unity;
 using Unity.Lifetime;
+using WDE.Common;
 using WDE.Common.CoreVersion;
 using WDE.Common.Windows;
 using WDE.Module.Attributes;
@@ -49,8 +50,33 @@ namespace WDE.Module
         
         protected void AutoRegisterByConvention(Assembly assembly, IContainerRegistry containerRegistry)
         {
+            Platforms currentPlatform = 0;
+            if (OperatingSystem.IsAndroid())
+                currentPlatform = Platforms.Android;
+            else if (OperatingSystem.IsIOS())
+                currentPlatform = Platforms.iOS;
+            else if (OperatingSystem.IsMacOS() || OperatingSystem.IsLinux() || OperatingSystem.IsWindows())
+                currentPlatform = Platforms.Desktop;
+            else if (OperatingSystem.IsBrowser())
+                currentPlatform = Platforms.Browser;
+            else
+                throw new Exception("Unknown platform");
+            
             //IUnityContainer unityContainer = ((IContainerExtension<IUnityContainer>)containerRegistry).Instance;
-            var defaultRegisters = assembly.GetTypes().Where(t => !t.IsAbstract && t.IsDefined(typeof(AutoRegisterAttribute), true));
+            var defaultRegisters = assembly.GetTypes().Where(t =>
+            {
+                if (t.IsAbstract)
+                    return false;
+                
+                var autoRegister = t.GetCustomAttribute<AutoRegisterAttribute>(true);
+                if (autoRegister == null)
+                    return false;
+
+                if (autoRegister.RequiredPlatforms == Platforms.None)
+                    return true;
+                
+                return (autoRegister.RequiredPlatforms & currentPlatform) != 0;
+            });
 
             foreach (Type register in defaultRegisters)
             {
@@ -76,13 +102,13 @@ namespace WDE.Module
                 unityContainer.RegisterSingleton(register);
 
             IUnityContainer uc = ((IContainerExtension<IUnityContainer>)unityContainer).Instance;
-
+            
             foreach (Type @interface in register.GetInterfaces())
             {
                 if (checkIfRegistered && unityContainer.IsRegistered(@interface, UnityContainer.All))
                     continue;
                 else if (checkIfRegistered)
-                    Console.WriteLine("Registering " + @interface + " as " + register + " because it's not registered yet");
+                    LOG.LogInformation("Registering " + @interface + " as " + register + " because it's not registered yet");
 
                 bool isUnique = !@interface.IsDefined(typeof(NonUniqueProviderAttribute), false);
 

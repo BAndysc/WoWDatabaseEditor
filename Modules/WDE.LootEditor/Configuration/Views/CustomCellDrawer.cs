@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Media;
+using Avalonia.Threading;
 using AvaloniaStyles.Controls.FastTableView;
 using WDE.Common.Avalonia.Services;
 using WDE.Common.Avalonia.Utils;
@@ -57,7 +58,7 @@ public class CustomCellDrawer : BaseCustomCellDrawer, ICustomCellDrawer
                 async Task FetchAsync()
                 {
                     await itemIconService.GetIcon((int)itemCell.Item);
-                    table.InvalidateVisual();
+                    Dispatcher.UIThread.Post(table.InvalidateVisual);
                 }
                 FetchAsync().ListenErrors();
             }

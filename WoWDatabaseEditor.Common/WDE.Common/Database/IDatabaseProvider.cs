@@ -10,130 +10,110 @@ namespace WDE.Common.Database
     public interface IDatabaseProvider
     {
         bool IsConnected { get; }
-        
+
+        Task<IReadOnlyList<ICreatureTemplate>> GetCreatureTemplatesAsync();
+        Task<IReadOnlyList<IConversationTemplate>> GetConversationTemplatesAsync();
+        Task<IReadOnlyList<IGameEvent>> GetGameEventsAsync();
+        Task<IReadOnlyList<IGameObjectTemplate>> GetGameObjectTemplatesAsync();
+        Task<IReadOnlyList<IQuestTemplate>> GetQuestTemplatesAsync();
+        Task<IReadOnlyList<INpcText>> GetNpcTextsAsync();
+        Task<IReadOnlyList<ICreatureClassLevelStat>> GetCreatureClassLevelStatsAsync();
+
         Task<ICreatureTemplate?> GetCreatureTemplate(uint entry);
-        IReadOnlyList<ICreatureTemplate> GetCreatureTemplates();
 
         Task<IReadOnlyList<ICreatureTemplateDifficulty>> GetCreatureTemplateDifficulties(uint entry);
         
         Task<IGameObjectTemplate?> GetGameObjectTemplate(uint entry);
-        IReadOnlyList<IGameObjectTemplate> GetGameObjectTemplates();
 
         Task<IAreaTriggerScript?> GetAreaTriggerScript(int entry);
         Task<IAreaTriggerTemplate?> GetAreaTriggerTemplate(int entry);
-        IEnumerable<IAreaTriggerTemplate> GetAreaTriggerTemplates();
-        Task<IList<IAreaTriggerTemplate>> GetAreaTriggerTemplatesAsync();
-
-        IEnumerable<ICreatureClassLevelStat> GetCreatureClassLevelStats();
+        Task<IReadOnlyList<IAreaTriggerTemplate>> GetAreaTriggerTemplatesAsync();
 
         Task<IQuestTemplate?> GetQuestTemplate(uint entry);
-        IReadOnlyList<IQuestTemplate> GetQuestTemplates();
         Task<IReadOnlyList<IQuestObjective>> GetQuestObjectives(uint questId);
         Task<IQuestObjective?> GetQuestObjective(uint questId, int storageIndex);
         Task<IQuestObjective?> GetQuestObjectiveById(uint objectiveId);
         Task<IQuestRequestItem?> GetQuestRequestItem(uint entry);
 
-        IEnumerable<IGameEvent> GetGameEvents();
-        IEnumerable<IConversationTemplate> GetConversationTemplates();
-        IEnumerable<IGossipMenu> GetGossipMenus();
-        Task<List<IGossipMenu>> GetGossipMenusAsync();
+        Task<IReadOnlyList<IGossipMenu>> GetGossipMenusAsync();
         Task<IGossipMenu?> GetGossipMenuAsync(uint menuId);
-        List<IGossipMenuOption> GetGossipMenuOptions(uint menuId);
-        Task<List<IGossipMenuOption>> GetGossipMenuOptionsAsync(uint menuId);
-        IEnumerable<INpcText> GetNpcTexts();
-        INpcText? GetNpcText(uint entry);
-        Task<List<IPointOfInterest>> GetPointsOfInterestsAsync();
+        Task<IReadOnlyList<IGossipMenuOption>> GetGossipMenuOptionsAsync(uint menuId);
+        Task<INpcText?> GetNpcText(uint entry);
+        Task<IReadOnlyList<IPointOfInterest>> GetPointsOfInterestsAsync();
 
-        Task<List<IBroadcastText>> GetBroadcastTextsAsync();
-        Task<List<ICreatureText>> GetCreatureTextsByEntryAsync(uint entry);
-        IReadOnlyList<ICreatureText>? GetCreatureTextsByEntry(uint entry);
+        Task<IReadOnlyList<IBroadcastText>> GetBroadcastTextsAsync();
+        Task<IReadOnlyList<ICreatureText>> GetCreatureTextsByEntryAsync(uint entry);
         
-        Task<IList<ISmartScriptLine>> GetLinesCallingSmartTimedActionList(int timedActionList);
-        IEnumerable<ISmartScriptLine> GetScriptFor(uint entry, int entryOrGuid, SmartScriptType type);
-        Task<IList<ISmartScriptLine>> GetScriptForAsync(uint entry, int entryOrGuid, SmartScriptType type);
+        Task<IReadOnlyList<ISmartScriptLine>> GetLinesCallingSmartTimedActionList(int timedActionList);
+        Task<IReadOnlyList<ISmartScriptLine>> GetScriptForAsync(uint entry, int entryOrGuid, SmartScriptType type);
 
-        IEnumerable<IConditionLine> GetConditionsFor(int sourceType, int sourceEntry, int sourceId);
+        Task<IReadOnlyList<IConditionLine>> GetConditionsForAsync(int sourceType, int sourceEntry, int sourceId);
 
-        Task<IList<IConditionLine>> GetConditionsForAsync(ConditionKeyMask keyMask, ConditionKey manualKey);
-        Task<IList<IConditionLine>> GetConditionsForAsync(ConditionKeyMask keyMask, ICollection<ConditionKey> manualKeys);
+        Task<IReadOnlyList<IConditionLine>> GetConditionsForAsync(ConditionKeyMask keyMask, ConditionKey manualKey);
+        Task<IReadOnlyList<IConditionLine>> GetConditionsForAsync(ConditionKeyMask keyMask, ICollection<ConditionKey> manualKeys);
         
-        IEnumerable<ISpellScriptName> GetSpellScriptNames(int spellId);
+        Task<IReadOnlyList<ISpellScriptName>> GetSpellScriptNames(int spellId);
 
         Task<IReadOnlyList<int>> GetSmartScriptEntriesByType(SmartScriptType scriptType);
 
         Task<IReadOnlyList<IQuestScriptName>> GetQuestScriptNames(uint questId) =>
             Task.FromResult<IReadOnlyList<IQuestScriptName>>(new List<IQuestScriptName>());
 
-        Task<IList<IPlayerChoice>?> GetPlayerChoicesAsync();
-        Task<IList<IPlayerChoiceResponse>?> GetPlayerChoiceResponsesAsync();
-        Task<IList<IPlayerChoiceResponse>?> GetPlayerChoiceResponsesAsync(int choiceId);
+        Task<IReadOnlyList<IPlayerChoice>?> GetPlayerChoicesAsync();
+        Task<IReadOnlyList<IPlayerChoiceResponse>?> GetPlayerChoiceResponsesAsync();
+        Task<IReadOnlyList<IPlayerChoiceResponse>?> GetPlayerChoiceResponsesAsync(int choiceId);
 
-        IEnumerable<ISmartScriptProjectItem> GetLegacyProjectItems();
-        IEnumerable<ISmartScriptProject> GetLegacyProjects();
-
-        IBroadcastText? GetBroadcastTextByText(string text);
         Task<IBroadcastText?> GetBroadcastTextByTextAsync(string text);
         Task<IBroadcastText?> GetBroadcastTextByIdAsync(uint id);
 
         Task<IBroadcastTextLocale?> GetBroadcastTextLocaleByTextAsync(string text);
 
-        ICreature? GetCreatureByGuid(uint entry, uint guid);
-        IGameObject? GetGameObjectByGuid(uint entry, uint guid);
-        IEnumerable<ICreature> GetCreaturesByEntry(uint entry);
-        IEnumerable<IGameObject> GetGameObjectsByEntry(uint entry);
-        Task<IList<ICreature>> GetCreaturesByEntryAsync(uint entry);
-        Task<IList<IGameObject>> GetGameObjectsByEntryAsync(uint entry);
-        IReadOnlyList<ICreature> GetCreatures();
-        Task<IList<ICreature>> GetCreaturesAsync();
-        Task<IList<IGameObject>> GetGameObjectsAsync();
+        Task<IReadOnlyList<ICreature>> GetCreaturesByEntryAsync(uint entry);
+        Task<IReadOnlyList<IGameObject>> GetGameObjectsByEntryAsync(uint entry);
+        Task<IReadOnlyList<ICreature>> GetCreaturesAsync();
+        Task<IReadOnlyList<IGameObject>> GetGameObjectsAsync();
         Task<IReadOnlyList<ICreature>> GetCreaturesAsync(IEnumerable<SpawnKey> guids);
         Task<IReadOnlyList<IGameObject>> GetGameObjectsAsync(IEnumerable<SpawnKey> guids);
-        Task<IList<ICreature>> GetCreaturesByMapAsync(uint map);
-        Task<IList<IGameObject>> GetGameObjectsByMapAsync(uint map);
-        IEnumerable<IGameObject> GetGameObjects();
+        Task<IReadOnlyList<ICreature>> GetCreaturesByMapAsync(uint map);
+        Task<IReadOnlyList<IGameObject>> GetGameObjectsByMapAsync(uint map);
 
-        IEnumerable<ICoreCommandHelp> GetCommands();
-        Task<IList<ITrinityString>> GetStringsAsync();
-        Task<IList<IDatabaseSpellDbc>> GetSpellDbcAsync();
-        Task<IList<IDatabaseSpellEffectDbc>> GetSpellEffectDbcAsync() => Task.FromResult<IList<IDatabaseSpellEffectDbc>>(new List<IDatabaseSpellEffectDbc>());
-        Task<IList<ISpawnGroupTemplate>> GetSpawnGroupTemplatesAsync();
-        Task<IList<ISpawnGroupSpawn>> GetSpawnGroupSpawnsAsync();
+        Task<IReadOnlyList<ITrinityString>> GetStringsAsync();
+        Task<IReadOnlyList<IDatabaseSpellDbc>> GetSpellDbcAsync();
+        Task<IReadOnlyList<IDatabaseSpellEffectDbc>> GetSpellEffectDbcAsync() => Task.FromResult<IReadOnlyList<IDatabaseSpellEffectDbc>>(new List<IDatabaseSpellEffectDbc>());
+        Task<IReadOnlyList<ISpawnGroupTemplate>> GetSpawnGroupTemplatesAsync();
+        Task<IReadOnlyList<ISpawnGroupSpawn>> GetSpawnGroupSpawnsAsync();
         Task<ISpawnGroupTemplate?> GetSpawnGroupTemplateByIdAsync(uint id);
         Task<ISpawnGroupSpawn?> GetSpawnGroupSpawnByGuidAsync(uint guid, SpawnGroupTemplateType type);
         Task<ISpawnGroupFormation?> GetSpawnGroupFormation(uint id);
-        Task<IList<ISpawnGroupFormation>?> GetSpawnGroupFormations();
+        Task<IReadOnlyList<ISpawnGroupFormation>?> GetSpawnGroupFormations();
 
-        Task<IList<IItem>?> GetItemTemplatesAsync() => Task.FromResult<IList<IItem>?>(null);
+        Task<IReadOnlyList<IItem>?> GetItemTemplatesAsync() => Task.FromResult<IReadOnlyList<IItem>?>(null);
 
-        Task<IList<ISmartScriptLine>> FindSmartScriptLinesBy(IEnumerable<(SmartLinePropertyType what, int whatValue, int parameterIndex, long valueToSearch)> conditions);
+        Task<IReadOnlyList<ISmartScriptLine>> FindSmartScriptLinesBy(IEnumerable<(SmartLinePropertyType what, int whatValue, int parameterIndex, long valueToSearch)> conditions);
 
-        Task<List<IEventScriptLine>> GetEventScript(EventScriptType type, uint id) => Task.FromResult(new List<IEventScriptLine>());
-        Task<List<IEventScriptLine>> FindEventScriptLinesBy(IReadOnlyList<(uint command, int dataIndex, long valueToSearch)> conditions) => Task.FromResult(new List<IEventScriptLine>());
+        Task<IReadOnlyList<IEventScriptLine>> GetEventScript(EventScriptType type, uint id) => Task.FromResult<IReadOnlyList<IEventScriptLine>>(new List<IEventScriptLine>());
+        Task<IReadOnlyList<IEventScriptLine>> FindEventScriptLinesBy(IReadOnlyList<(uint command, int dataIndex, long valueToSearch)> conditions) => Task.FromResult<IReadOnlyList<IEventScriptLine>>(new List<IEventScriptLine>());
 
-        Task<List<IEventAiLine>> GetEventAi(int id) => Task.FromResult(new List<IEventAiLine>());
+        Task<IReadOnlyList<IEventAiLine>> GetEventAi(int id) => Task.FromResult<IReadOnlyList<IEventAiLine>>(new List<IEventAiLine>());
 
-        Task<IList<ICreatureModelInfo>> GetCreatureModelInfoAsync();
-        ICreatureModelInfo? GetCreatureModelInfo(uint displayId);
-
-        ISceneTemplate? GetSceneTemplate(uint sceneId);
+        Task<IReadOnlyList<ICreatureModelInfo>> GetCreatureModelInfoAsync();
         Task<ISceneTemplate?> GetSceneTemplateAsync(uint sceneId);
-        Task<IList<ISceneTemplate>?> GetSceneTemplatesAsync();
+        Task<IReadOnlyList<ISceneTemplate>?> GetSceneTemplatesAsync();
         
         Task<IPhaseName?> GetPhaseNameAsync(uint phaseId);
-        IList<IPhaseName>? GetPhaseNames();
-        Task<IList<IPhaseName>?> GetPhaseNamesAsync();
+        Task<IReadOnlyList<IPhaseName>?> GetPhaseNamesAsync();
 
         Task<IReadOnlyList<INpcSpellClickSpell>> GetNpcSpellClickSpells(uint creatureId);
         
-        Task<IList<ICreatureAddon>> GetCreatureAddons();
-        Task<IList<ICreatureTemplateAddon>> GetCreatureTemplateAddons();
-        Task<IList<ICreatureEquipmentTemplate>?> GetCreatureEquipmentTemplates();
-        Task<IList<IMangosCreatureEquipmentTemplate>?> GetMangosCreatureEquipmentTemplates();
-        Task<IList<IGameEventCreature>> GetGameEventCreaturesAsync();
-        Task<IList<IGameEventGameObject>> GetGameEventGameObjectsAsync();
-        Task<IList<IGameEventCreature>?> GetGameEventCreaturesByGuidAsync(uint entry, uint guid);
-        Task<IList<IGameEventGameObject>?> GetGameEventGameObjectsByGuidAsync(uint entry, uint guid);
-        Task<IList<ICreatureEquipmentTemplate>?> GetCreatureEquipmentTemplates(uint entry);
+        Task<IReadOnlyList<ICreatureAddon>> GetCreatureAddons();
+        Task<IReadOnlyList<ICreatureTemplateAddon>> GetCreatureTemplateAddons();
+        Task<IReadOnlyList<ICreatureEquipmentTemplate>?> GetCreatureEquipmentTemplates();
+        Task<IReadOnlyList<IMangosCreatureEquipmentTemplate>?> GetMangosCreatureEquipmentTemplates();
+        Task<IReadOnlyList<IGameEventCreature>> GetGameEventCreaturesAsync();
+        Task<IReadOnlyList<IGameEventGameObject>> GetGameEventGameObjectsAsync();
+        Task<IReadOnlyList<IGameEventCreature>?> GetGameEventCreaturesByGuidAsync(uint entry, uint guid);
+        Task<IReadOnlyList<IGameEventGameObject>?> GetGameEventGameObjectsByGuidAsync(uint entry, uint guid);
+        Task<IReadOnlyList<ICreatureEquipmentTemplate>?> GetCreatureEquipmentTemplates(uint entry);
         Task<IGameObject?> GetGameObjectByGuidAsync(uint entry, uint guid);
         Task<ICreature?> GetCreaturesByGuidAsync(uint entry, uint guid);
         Task<ICreatureAddon?> GetCreatureAddon(uint entry, uint guid);
@@ -161,6 +141,13 @@ namespace WDE.Common.Database
         Task<IReadOnlyList<IConversationActor>> GetConversationActors();
         Task<IReadOnlyList<IConversationActorTemplate>> GetConversationActorTemplates();
         
+        Task<ICreature?> GetCreatureByGuidAsync(uint entry, uint guid);
+        Task<IReadOnlyList<ICoreCommandHelp>> GetCommands();
+        Task<ICreatureModelInfo?> GetCreatureModelInfo(uint displayId);
+
+        // @todo: make it async one day
+        IList<IPhaseName>? GetPhaseNames();
+
         public enum SmartLinePropertyType
         {
             Event,
@@ -247,9 +234,9 @@ namespace WDE.Common.Database
     [UniqueProvider]
     public interface IMangosDatabaseProvider : IDatabaseProvider
     {
-        Task<IList<IDbScriptRandomTemplate>?> GetScriptRandomTemplates(uint id, RandomTemplateType type)
+        Task<IReadOnlyList<IDbScriptRandomTemplate>?> GetScriptRandomTemplates(uint id, RandomTemplateType type)
         {
-            return Task.FromResult<IList<IDbScriptRandomTemplate>?>(null);
+            return Task.FromResult<IReadOnlyList<IDbScriptRandomTemplate>?>(null);
         }
         
         Task<ICreatureAiSummon?> GetCreatureAiSummon(uint entry);

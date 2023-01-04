@@ -8,14 +8,14 @@ using WDE.WorldMap.Extensions;
 
 namespace WDE.MapRenderer
 {
-    public class GameView : UserControl
+    public partial class GameView : UserControl
     {
         private Control enginePanel;
         
         public GameView()
         {
             InitializeComponent();
-            enginePanel = this.FindControl<Control>("TheEnginePanel");
+            enginePanel = this.GetControl<Control>("TheEnginePanel");
         }
 
 
@@ -28,7 +28,7 @@ namespace WDE.MapRenderer
         {
             DispatcherTimer.RunOnce(() =>
             {
-                this.FindControl<Control>("TheEnginePanel").Focus();
+                this.GetControl<Control>("TheEnginePanel").Focus();
             }, TimeSpan.FromMilliseconds(1));
             enginePanel.ContextMenu = new ContextMenu();
         }
@@ -57,7 +57,7 @@ namespace WDE.MapRenderer
                     e.Handled = true;
                 else if (enginePanel.ContextMenu != null)
                 {
-                    enginePanel.ContextMenu.Items = items.Select(i =>
+                    enginePanel.ContextMenu.ItemsSource = items.Select(i =>
                     {
                         if (i.Item1 == "-")
                             return (object)new Separator();

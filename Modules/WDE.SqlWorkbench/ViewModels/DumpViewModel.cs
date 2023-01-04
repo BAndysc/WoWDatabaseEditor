@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;
+using Microsoft.Extensions.Logging;
 using Prism.Commands;
 using PropertyChanged.SourceGenerator;
 using WDE.Common.Managers;
@@ -204,7 +205,7 @@ internal partial class DumpViewModel : ObservableBase, IWindowViewModel, IClosab
         catch (Exception e)
         {
             await messageBoxService.SimpleDialog("Error", "Can't fetch tables", e.Message);
-            Console.WriteLine(e);
+            LOG.LogError(e, "Can't fetch tables from database");
         }
         finally
         {
@@ -245,7 +246,7 @@ internal partial class DumpViewModel : ObservableBase, IWindowViewModel, IClosab
                 {
                     if (err.Contains("[Warning] Using a password on the command line interface can be insecure."))
                         return;
-                    Console.WriteLine(err);
+                    LOG.LogError(err);
                     ConsoleOutput += err + "\n";
                 },
                 pendingDump.Token);
