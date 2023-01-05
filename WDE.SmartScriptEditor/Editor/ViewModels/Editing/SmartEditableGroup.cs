@@ -24,14 +24,16 @@ public class SmartEditableGroup : System.IDisposable
         this.bulkEditSource = bulkEditSource;
     }
 
-    public void Add(string group, IReadOnlyList<SmartBaseElement> elements, IReadOnlyList<SmartBaseElement> originals)
+    public List<MultiParameterValueHolder<long>> Add(string group, IReadOnlyList<SmartBaseElement> elements, IReadOnlyList<SmartBaseElement> originals)
     {
+        List<MultiParameterValueHolder<long>> longParameters = new();
         for (int i = 0; i < elements[0].ParametersCount; ++i)
         {
             var parameterValues = elements.Select(x => x.GetParameter(i)).ToList();
             var originalParameters = originals.Select(x => x.GetParameter(i)).ToList();
             var holder = (CreateValueHolder(parameterValues, originalParameters), group);
             parameters.Add(holder);
+            longParameters.Add(holder.Item1);
         }
         
         for (int i = 0; i < elements[0].FloatParametersCount; ++i)
@@ -49,6 +51,8 @@ public class SmartEditableGroup : System.IDisposable
             var holder = (CreateValueHolder(parameterValues, originalParameters), group);
             stringParameters.Add(holder);
         }
+
+        return longParameters;
     }
 
     private MultiParameterValueHolder<long> CreateValueHolder(IReadOnlyList<ParameterValueHolder<long>> parameters,

@@ -16,6 +16,7 @@ namespace WDE.SmartScriptEditor.History
         private readonly SmartScriptBase script;
         private readonly ISmartFactory smartFactory;
         private System.IDisposable variablesDisposable;
+        private int nestedBulkEditingCounter;
 
         public SaiHistoryHandler(SmartScriptBase script, ISmartFactory smartFactory)
         {
@@ -312,12 +313,16 @@ namespace WDE.SmartScriptEditor.History
 
         private void OnBulkEditingFinished(string editName)
         {
-            EndBulkEdit(editName.RemoveTags());
+            nestedBulkEditingCounter--;
+            if (nestedBulkEditingCounter == 0)
+                EndBulkEdit(editName.RemoveTags());
         }
 
         private void OnBulkEditingStarted()
         {
-            StartBulkEdit();
+            if (nestedBulkEditingCounter == 0)
+                StartBulkEdit();
+            nestedBulkEditingCounter++;
         }
 
         private void Actions_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)

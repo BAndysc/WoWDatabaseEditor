@@ -1582,8 +1582,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             else
             {
                 var source = smartFactory.SourceFactory(SmartConstants.SourceSelf);
-                var target = smartFactory.TargetFactory(SmartConstants.TargetNone);
-                action = smartFactory.ActionFactory(SmartConstants.ActionNone, source, target);
+                var target = smartFactory.TargetFactory(script.SourceType == SmartScriptType.Creature ? SmartConstants.TargetSelf : SmartConstants.TargetNone);
+                action = smartFactory.ActionFactory(script.SourceType == SmartScriptType.Creature ? SmartConstants.ActionTalk : SmartConstants.ActionNone, source, target);
                 action.Parent = e; // <-- set the parent already, so that the edit window has the correct parent
                 if (preferences.AddingBehaviour == AddingElementBehaviour.JustAdd)
                 {
@@ -1885,30 +1885,49 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
             var bulkEdit = new ScriptBulkEdit(script);
             SmartEditableGroup editableGroup = new SmartEditableGroup(bulkEdit);
-            MultiPropertyValueHolder<int, SmartAction> actionType = new MultiPropertyValueHolder<int, SmartAction>(0,
-                actionsToEdit,
-                originalActions,
-                e => e.Id,
-                (e, id) => smartFactory.UpdateAction(e, id), bulkEdit);
+            
+            var sourceParameters = editableGroup.Add("Source", actionsToEdit.Select(a => a.Source).ToList(), originalActions.Select(a => a.Source).ToList());
+            var firstSourceParameter = editableGroup.Parameters[^actionsToEdit[0].Source.ParametersCount];
+            var actionParameters = editableGroup.Add("Action", actionsToEdit, originalActions);
+            var targetParameters = editableGroup.Add("Target", actionsToEdit.Select(a => a.Target).ToList(), originalActions.Select(a => a.Target).ToList());
+            var firstTargetParameter = editableGroup.Parameters[^actionsToEdit[0].Target.ParametersCount];
+            
+            editableGroup.Add("Comment", actionsToEdit, originalActions, a => a.CommentParameter);
+            
             MultiPropertyValueHolder<int, SmartSource> sourceType = new MultiPropertyValueHolder<int, SmartSource>(0,
                 actionsToEdit.Select(a => a.Source).ToList(),
                 originalActions.Select(a => a.Source).ToList(),
                 e => e.Id,
-                (e, id) => smartFactory.UpdateSource(e, id), bulkEdit);
+                (e, id) =>
+                {
+                    smartFactory.UpdateSource(e, id);
+                    FillNonzeroWithDefaults(SmartType.SmartSource, id, sourceParameters);
+                }, bulkEdit);
             MultiPropertyValueHolder<int, SmartTarget> targetType = new MultiPropertyValueHolder<int, SmartTarget>(0,
                 actionsToEdit.Select(a => a.Target).ToList(),
                 originalActions.Select(a => a.Target).ToList(),
                 e => e.Id,
-                (e, id) => smartFactory.UpdateTarget(e, id), bulkEdit);
+                (e, id) =>
+                {
+                    smartFactory.UpdateTarget(e, id);
+                    FillNonzeroWithDefaults(SmartType.SmartTarget, id, targetParameters);
+                }, bulkEdit);
+            MultiPropertyValueHolder<int, SmartAction> actionType = new MultiPropertyValueHolder<int, SmartAction>(0,
+                actionsToEdit,
+                originalActions,
+                e => e.Id,
+                (e, id) =>
+                {
+                    smartFactory.UpdateAction(e, id);
+                    FillNonzeroWithDefaults(SmartType.SmartAction, id, actionParameters);
+                    var actionData = smartDataManager.GetRawData(SmartType.SmartAction, id);
+                    if (actionData.TargetTypes != SmartSourceTargetType.None &&
+                        !targetType.HoldsMultipleValues &&
+                        targetType.Value == SmartConstants.TargetNone &&
+                        script.SourceType is SmartScriptType.Creature or SmartScriptType.GameObject or SmartScriptType.Template)
+                        targetType.Value = SmartConstants.TargetSelf;
+                }, bulkEdit);
             
-            editableGroup.Add("Source", actionsToEdit.Select(a => a.Source).ToList(), originalActions.Select(a => a.Source).ToList());
-            var firstSourceParameter = editableGroup.Parameters[^actionsToEdit[0].Source.ParametersCount];
-            editableGroup.Add("Action", actionsToEdit, originalActions);
-            editableGroup.Add("Target", actionsToEdit.Select(a => a.Target).ToList(), originalActions.Select(a => a.Target).ToList());
-            var firstTargetParameter = editableGroup.Parameters[^actionsToEdit[0].Target.ParametersCount];
-            
-            editableGroup.Add("Comment", actionsToEdit, originalActions, a => a.CommentParameter);
-
             bool modifiedSourceConditions = false;
             bool modifiedTargetConditions = false;
 
@@ -2258,18 +2277,20 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 }
             }, sourceConditions));
 
+            var parameters = editableGroup.Add("Event specific", eventsToEdit, originalEvents);
+            
             var selectEventTypeCommand = editableGroup.Add(new EditableActionData("Event", "General", async () =>
             {
                 int? newEventIndex = await ShowEventPicker();
                 if (!newEventIndex.HasValue)
                     return;
 
+                using var _ = bulkEdit.BulkEdit("Change event type");
                 eventType.Value = newEventIndex.Value;
+                FillNonzeroWithDefaults(SmartType.SmartEvent, newEventIndex.Value, parameters);
             }, eventType.ToObservable(e => e.Value).Select(id => eventType.HoldsMultipleValues ? "--" : smartDataManager.GetRawData(SmartType.SmartEvent, id).NameReadable),
                 null, eventType)).Command;
             
-            editableGroup.Add("Event specific", eventsToEdit, originalEvents);
-
             ParametersEditViewModel viewModel = new(itemFromListProvider, 
                 currentCoreVersion,
                 parameterPickerService,
@@ -2301,7 +2322,21 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
             return viewModel;
         }
-        
+
+        private void FillNonzeroWithDefaults(SmartType dataType, int newIndex, List<MultiParameterValueHolder<long>> parameters)
+        {
+            var newEventData = smartDataManager.GetRawData(dataType, newIndex);
+            if (newEventData.Parameters != null)
+            {
+                for (int i = 0; i < Math.Min(newEventData.Parameters.Count, parameters.Count); ++i)
+                {
+                    var parameterData = newEventData.Parameters[i];
+                    if (parameterData.DefaultVal != 0 && !parameters[i].HoldsMultipleValues && parameters[i].Value == 0)
+                        parameters[i].Value = parameterData.DefaultVal;
+                }
+            }
+        }
+
         private async Task<bool> EditEventCommand(IReadOnlyList<SmartEvent> originalEvents)
         {
             var viewModel = EventEditViewModel(originalEvents);

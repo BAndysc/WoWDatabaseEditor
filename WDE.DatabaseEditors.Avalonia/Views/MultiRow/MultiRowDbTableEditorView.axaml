@@ -105,7 +105,7 @@
         <Style Selector="multiRow|SelectablePanel">
             <Setter Property="Background" Value="{DynamicResource TreeViewItem.Content.Background.NormalAlternate}" />
         </Style>
-        <Style Selector="multiRow|SelectablePanel:nth-child(2n)">
+        <Style Selector="ContentPresenter:nth-child(2n) > multiRow|SelectablePanel">
             <Setter Property="Background" Value="{DynamicResource TreeViewItem.Content.Background.Normal}" />
         </Style>
         <Style Selector="multiRow|SelectablePanel:selected">
