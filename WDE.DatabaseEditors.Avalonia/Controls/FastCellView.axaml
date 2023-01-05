@@ -8,7 +8,7 @@
     <Style Selector="controls|ButtonFastCellView">
         <Setter Property="Template">
             <ControlTemplate>
-                <Button Name="PART_Button" Focusable="False" Command="{Binding ActionCommand}" CommandParameter="{Binding}" Content="{Binding ActionLabel}" />
+                <Button Name="PART_Button" Padding="0" Focusable="False" BorderThickness="0" Background="Transparent" Command="{Binding ActionCommand}" CommandParameter="{Binding}" Content="{Binding ActionLabel}" />
             </ControlTemplate>
         </Setter>  
     </Style>

@@ -14,7 +14,7 @@ namespace WDE.DatabaseEditors.ViewModels;
 [UniqueProvider]
 public interface IMetaColumnsSupportService
 {
-    (ICommand, string) GenerateCommand(string metaColumn, DatabaseEntity entity, DatabaseKey realKey);
+    (ICommand, string) GenerateCommand(ViewModelBase? viewModel, string metaColumn, DatabaseEntity entity, DatabaseKey realKey);
 }
 
 [AutoRegister]
@@ -34,7 +34,7 @@ public class MetaColumnsSupportService : IMetaColumnsSupportService
         this.remoteConnectorService = remoteConnectorService;
     }
     
-    public (ICommand, string) GenerateCommand(string metaColumn, DatabaseEntity entity, DatabaseKey realKey)
+    public (ICommand, string) GenerateCommand(ViewModelBase? viewModel, string metaColumn, DatabaseEntity entity, DatabaseKey realKey)
     {
         if (metaColumn.StartsWith("table:"))
         {
@@ -91,6 +91,16 @@ public class MetaColumnsSupportService : IMetaColumnsSupportService
                     var result = entity.FillTemplate(command);
                     return remoteConnectorService.ExecuteCommand(new AnonymousRemoteCommand(result));
                 }, () => !entity.Phantom), "Invoke");
+        }
+
+        if (metaColumn.StartsWith("picker"))
+        {
+            if (viewModel == null)
+                return  (new AlwaysDisabledCommand(), "⬅");
+            return (new DelegateCommand(() =>
+            {
+                viewModel.TryPick(entity);
+            }), "⬅");
         }
 
         return (new AlwaysDisabledCommand(), "(invalid)");

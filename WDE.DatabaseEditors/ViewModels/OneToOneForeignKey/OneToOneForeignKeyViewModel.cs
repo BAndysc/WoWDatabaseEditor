@@ -372,7 +372,7 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
                 }
                 else if (column.IsMetaColumn)
                 {
-                    var (cmd, name) = metaColumnsSupportService.GenerateCommand(column.Meta!, entity, key);
+                    var (cmd, name) = metaColumnsSupportService.GenerateCommand(null, column.Meta!, entity, key);
                     cellViewModel = new SingleRecordDatabaseCellViewModel(columnIndex, column.Name, cmd, row, entity, name);
                 }
                 else

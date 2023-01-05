@@ -75,7 +75,8 @@ public class TableEditorPickerService : ITableEditorPickerService
         ViewModelBase tableViewModel;
         if (definition.RecordMode == RecordMode.MultiRecord)
         {
-            var multiRow = containerProvider.Resolve<MultiRowDbTableEditorViewModel>((typeof(DatabaseTableSolutionItem), solutionItem));
+            var multiRow = containerProvider.Resolve<MultiRowDbTableEditorViewModel>((typeof(DatabaseTableSolutionItem), solutionItem),
+                (typeof(DocumentMode), DocumentMode.PickRow));
             tableViewModel = multiRow;
             multiRow.AllowMultipleKeys = false;
             if (initialValue.HasValue)
@@ -102,7 +103,8 @@ public class TableEditorPickerService : ITableEditorPickerService
         }
         else if (definition.RecordMode == RecordMode.SingleRow)
         {
-            var singleRow = containerProvider.Resolve<SingleRowDbTableEditorViewModel>((typeof(DatabaseTableSolutionItem), solutionItem));
+            var singleRow = containerProvider.Resolve<SingleRowDbTableEditorViewModel>((typeof(DatabaseTableSolutionItem), solutionItem),
+                (typeof(DocumentMode), DocumentMode.PickRow));
             tableViewModel = singleRow;
             string? where = customWhere;
             if (key != null)
@@ -127,6 +129,11 @@ public class TableEditorPickerService : ITableEditorPickerService
             throw new Exception("TemplateMode not (yet?) supported");
 
         var viewModel = containerProvider.Resolve<RowPickerViewModel>((typeof(ViewModelBase), tableViewModel), (typeof(bool), openInNoSaveMode));
+        
+        tableViewModel.EntityPicked += pickedEntity =>
+        {
+            viewModel.Pick(pickedEntity);
+        };
         if (await windowManager.ShowDialog(viewModel))
         {
             var col = viewModel.SelectedRow?.GetCell(column);

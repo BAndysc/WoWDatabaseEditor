@@ -60,6 +60,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
         private readonly IPersonalGuidRangeService personalGuidRangeService;
         private readonly IMetaColumnsSupportService metaColumnsSupportService;
         private readonly ITablePersonalSettings personalSettings;
+        private readonly DocumentMode mode;
         private readonly IDatabaseTableDataProvider tableDataProvider;
 
         private HashSet<DatabaseKey> keys = new HashSet<DatabaseKey>();
@@ -188,7 +189,8 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             IStatusBar statusBar, ITableEditorPickerService tableEditorPickerService,
             IMainThread mainThread, IPersonalGuidRangeService personalGuidRangeService,
             IClipboardService clipboardService, IMetaColumnsSupportService metaColumnsSupportService,
-            ITablePersonalSettings personalSettings)
+            ITablePersonalSettings personalSettings,
+            DocumentMode mode = DocumentMode.Editor)
             : base(history, solutionItem, solutionItemName, 
             solutionManager, solutionTasksService, eventAggregator, 
             queryGenerator, tableDataProvider, messageBoxService, taskRunner, parameterFactory,
@@ -209,6 +211,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             this.personalGuidRangeService = personalGuidRangeService;
             this.metaColumnsSupportService = metaColumnsSupportService;
             this.personalSettings = personalSettings;
+            this.mode = mode;
 
             splitMode = editorSettings.MultiRowSplitMode;
 
@@ -505,6 +508,8 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             {
                 columns = tableDefinition.Groups.SelectMany(g => g.Fields).ToList();
                 Debug.Assert(Columns.Count == 0);
+                if (mode == DocumentMode.PickRow)
+                    columns.Insert(0, new DatabaseColumnJson(){Name="Pick", Meta = "picker", PreferredWidth = 30});
                 Columns.AddRange(columns.Select(c => AutoDispose(new DatabaseColumnHeaderViewModel(c)
                 {
                     IsVisible = personalSettings.IsColumnVisible(TableDefinition.Id, c.DbColumnName),
@@ -647,7 +652,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                 }
                 else if (column.IsMetaColumn)
                 {
-                    var (command, title) = metaColumnsSupportService.GenerateCommand(column.Meta!, entity, entity.GenerateKey(TableDefinition));
+                    var (command, title) = metaColumnsSupportService.GenerateCommand(this, column.Meta!, entity, entity.GenerateKey(TableDefinition));
                     cellViewModel = AutoDisposeEntity(new SingleRecordDatabaseCellViewModel(columnIndex, column.Name, command, row, entity, title));
                 }
                 else

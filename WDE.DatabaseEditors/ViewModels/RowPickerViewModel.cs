@@ -80,7 +80,13 @@ public class RowPickerViewModel : ObservableBase, IDialog, IClosableDialog
         });
         Accept = PickSelected;
     }
-
+    
+    public void Pick(DatabaseEntity pickedEntity)
+    {
+        overrideSelectedRow = pickedEntity;
+        PickSelected.Execute(null);
+    }
+    
     private async Task AskIfSave(bool cancel)
     {
         if (baseViewModel.IsModified)
@@ -113,8 +119,9 @@ public class RowPickerViewModel : ObservableBase, IDialog, IClosableDialog
         else
             CloseCancel?.Invoke();
     }
-    
-    public DatabaseEntity? SelectedRow => baseViewModel.FocusedEntity;
+
+    private DatabaseEntity? overrideSelectedRow;
+    public DatabaseEntity? SelectedRow => overrideSelectedRow ?? baseViewModel.FocusedEntity;
     public ViewModelBase? MainViewModel => baseViewModel;
 
     public int DesiredWidth => 900;

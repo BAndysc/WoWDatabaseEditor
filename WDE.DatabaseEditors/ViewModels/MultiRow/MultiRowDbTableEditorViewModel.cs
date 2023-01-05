@@ -47,6 +47,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         private readonly IDatabaseEditorsSettings editorSettings;
         private readonly ITablePersonalSettings tablePersonalSettings;
         private readonly IMetaColumnsSupportService metaColumnsSupportService;
+        private readonly DocumentMode mode;
         private readonly IDatabaseTableDataProvider tableDataProvider;
 
         private Dictionary<DatabaseKey, DatabaseEntitiesGroupViewModel> byEntryGroups = new();
@@ -138,7 +139,8 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             IDatabaseTableCommandService commandService,
             IParameterPickerService parameterPickerService,
             IStatusBar statusBar, ITablePersonalSettings tablePersonalSettings,
-            IMetaColumnsSupportService metaColumnsSupportService) 
+            IMetaColumnsSupportService metaColumnsSupportService,
+            DocumentMode mode = DocumentMode.Editor) 
             : base(history, solutionItem, solutionItemName, 
             solutionManager, solutionTasksService, eventAggregator, 
             queryGenerator, tableDataProvider, messageBoxService, taskRunner, parameterFactory,
@@ -157,6 +159,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             this.editorSettings = editorSettings;
             this.tablePersonalSettings = tablePersonalSettings;
             this.metaColumnsSupportService = metaColumnsSupportService;
+            this.mode = mode;
 
             splitMode = editorSettings.MultiRowSplitMode;
 
@@ -303,6 +306,8 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             columns = tableDefinition.Groups.SelectMany(g => g.Fields)
                 .Where(c => c.DbColumnName != data.TableDefinition.TablePrimaryKeyColumnName)
                 .ToList();
+            if (mode == DocumentMode.PickRow)
+                columns.Insert(0, new DatabaseColumnJson(){Name="Pick", Meta = "picker", PreferredWidth = 30});
             autoIncrementColumn = columns.FirstOrDefault(c => c.AutoIncrement);
             if (Columns.Count == 0)
             {
@@ -434,7 +439,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                 }
                 else if (column.IsMetaColumn)
                 {
-                    var (command, title) = metaColumnsSupportService.GenerateCommand(column.Meta!, entity, entity.GenerateKey(TableDefinition));
+                    var (command, title) = metaColumnsSupportService.GenerateCommand(this, column.Meta!, entity, entity.GenerateKey(TableDefinition));
                     cellViewModel = AutoDispose(new DatabaseCellViewModel(columnIndex, column.Name, command, row, entity, title));
                 }
                 else

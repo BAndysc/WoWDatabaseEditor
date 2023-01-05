@@ -15,17 +15,17 @@ public class QuestStarterEnderParameter : IParameter<long>, ICustomPickerContext
     private readonly IDatabaseProvider databaseProvider;
     private readonly ITableEditorPickerService tableEditorPickerService;
     private readonly IQuestEntryProviderService questEntryProviderService;
-    private readonly bool isStarter;
+    private readonly string tableSuffix;
 
     public QuestStarterEnderParameter(IDatabaseProvider databaseProvider,
         ITableEditorPickerService tableEditorPickerService,
         IQuestEntryProviderService questEntryProviderService,
-        bool isStarter)
+        string tableSuffix)
     {
         this.databaseProvider = databaseProvider;
         this.tableEditorPickerService = tableEditorPickerService;
         this.questEntryProviderService = questEntryProviderService;
-        this.isStarter = isStarter;
+        this.tableSuffix = tableSuffix;
     }
 
     public bool AllowUnknownItems => true;
@@ -69,7 +69,7 @@ public class QuestStarterEnderParameter : IParameter<long>, ICustomPickerContext
         {
             var script = GetScript(context as SmartBaseElement);
             bool isGameObject = script!.SourceType == SmartScriptType.GameObject;
-            var table = (isGameObject ? "gameobject" : "creature") + "_quest" + (isStarter ? "starter" : "ender");
+            var table = (isGameObject ? "gameobject" : "creature") + "_" + (tableSuffix);
             try
             {
                 var id = await tableEditorPickerService.PickByColumn(table, new DatabaseKey(entry ?? 0), "quest", (uint)value);

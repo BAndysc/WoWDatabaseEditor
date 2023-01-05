@@ -354,5 +354,12 @@ namespace WDE.DatabaseEditors.ViewModels
         public virtual DatabaseEntity? FocusedEntity { get; }
         public abstract DatabaseEntity AddRow(DatabaseKey key);
         public abstract DatabaseKey? SelectedTableKey { get; }
+
+        public void TryPick(DatabaseEntity entity)
+        {
+            EntityPicked?.Invoke(entity);
+        }
+        
+        public event Action<DatabaseEntity>? EntityPicked;
     }
 }
