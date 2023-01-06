@@ -151,6 +151,9 @@ namespace WDE.SmartScriptEditor.Models
                     }
                 }
 
+                if (readable == null)
+                    return "(internal error 'Readable' is null, report at github)";
+                
                 try
                 {
                     string output = Smart.Format(readable,

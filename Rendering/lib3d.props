@@ -3,5 +3,8 @@
     <ItemGroup>
         <Using Include="System.Numerics" />
         <Using Include="System.Numerics.Matrix4x4" Alias="Matrix" />
+
+        <PackageReference Include="OpenTK.Core" Version="4.7.5" />
+        <PackageReference Include="OpenTK.Mathematics" Version="4.7.5" />
     </ItemGroup>
 </Project>

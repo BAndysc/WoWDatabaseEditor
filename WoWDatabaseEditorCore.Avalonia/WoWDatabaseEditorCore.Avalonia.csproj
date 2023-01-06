@@ -31,8 +31,10 @@
         <PackageReference Include="Avalonia.Controls.DataGrid" Version="$(AvaloniaVersion)" />
         <PackageReference Include="Prism.Core" Version="7.2.0.1422" />
         <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="2.88.0-preview.127" />
-        <PackageReference Include="SmartFormat.NET" Version="2.5.3" />
+        <PackageReference Include="SmartFormat.NET" Version="2.7.3" />
         <PackageReference Include="Avalonia.OpenTK" Version="0.10.999-cibuild0016933-beta" />
+        <PackageReference Include="OpenTK.Graphics" Version="4.7.5" />
+        <PackageReference Include="OpenTK.Core" Version="4.7.5" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\AvaloniaStyles\AvaloniaStyles.csproj" />

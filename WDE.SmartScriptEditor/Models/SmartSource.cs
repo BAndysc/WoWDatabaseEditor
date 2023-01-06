@@ -93,6 +93,9 @@ namespace WDE.SmartScriptEditor.Models
         {
             get
             {
+                if (ReadableHint == null)
+                    return "(internal error 'Readable' is null, report at github)";
+                
                 try
                 {
                     string output = Smart.Format(ReadableHint,

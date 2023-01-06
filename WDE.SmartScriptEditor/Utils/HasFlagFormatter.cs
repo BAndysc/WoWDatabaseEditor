@@ -15,6 +15,9 @@ public class HasFlagFormatter : IFormatter
         
         if (!long.TryParse(s, out var flagToCheck))
             throw new Exception("hasflag formatter: cannot parse flag to check: expected a number, got " + s);
+
+        if (formattingInfo.Format == null)
+            return true;
         
         var formats = formattingInfo.Format.Split('|');
 

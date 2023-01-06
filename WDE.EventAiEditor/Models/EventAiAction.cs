@@ -105,6 +105,8 @@ namespace WDE.EventAiEditor.Models
                             }
                         }
                     }
+                    if (readable == null)
+                        return "(internal error 'Readable' is null, report at github)";
                     
                     string output = Smart.Format(readable,
                         new
