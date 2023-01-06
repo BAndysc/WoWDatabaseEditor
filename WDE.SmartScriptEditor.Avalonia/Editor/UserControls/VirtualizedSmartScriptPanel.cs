@@ -91,6 +91,12 @@ public partial class VirtualizedSmartScriptPanel : Panel
         set => SetAndRaise(HideConditionsProperty, ref hideConditions, value);
     }
 
+    public static readonly DirectProperty<VirtualizedSmartScriptPanel, double> EventsWidthProperty = AvaloniaProperty.RegisterDirect<VirtualizedSmartScriptPanel, double>(nameof(EventsWidth), o => o.EventsWidth);
+    public double EventsWidth
+    {
+        get => EventWidth(Bounds.Width).Width;
+    }
+    
     private readonly bool compactView;
     private const double PaddingLeft = 5;
     private const double PaddingBottom = 5;
@@ -119,7 +125,7 @@ public partial class VirtualizedSmartScriptPanel : Panel
         var right = Math.Min(Math.Max(totalWidth - 50, PaddingLeft + EventPaddingLeft + 10), 350);
         return new HorizRect(x, right - x);
     }
-
+    
     static VirtualizedSmartScriptPanel()
     {
         HideCommentsProperty.Changed.AddClassHandler<VirtualizedSmartScriptPanel>((panel, _) => panel.InvalidateScript());
@@ -135,7 +141,12 @@ public partial class VirtualizedSmartScriptPanel : Panel
                 newScript.EventChanged += panel.EventChanged;
             }
         });
+        BoundsProperty.Changed.AddClassHandler<VirtualizedSmartScriptPanel>((panel, e) =>
+        {
+            panel.RaisePropertyChanged(EventsWidthProperty, default, panel.EventsWidth);
+        });
     }
+    
 
     public VirtualizedSmartScriptPanel()
     {
