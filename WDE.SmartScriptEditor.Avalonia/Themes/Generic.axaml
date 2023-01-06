@@ -9,7 +9,8 @@
         xmlns:themes="clr-namespace:WDE.SmartScriptEditor.Avalonia.Themes"
         xmlns:controls1="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
         xmlns:editing1="clr-namespace:WDE.SmartScriptEditor.Editor.ViewModels.Editing;assembly=WDE.SmartScriptEditor"
-        xmlns:models="clr-namespace:WDE.SmartScriptEditor.Models;assembly=WDE.SmartScriptEditor">
+        xmlns:models="clr-namespace:WDE.SmartScriptEditor.Models;assembly=WDE.SmartScriptEditor"
+        xmlns:extensions="clr-namespace:WDE.SmartScriptEditor.Avalonia.Extensions">
 
     <Styles.Resources>
         <!-- this is later also used in SmartScriptPanelLayout measurement, for performance reasons-->
@@ -255,12 +256,12 @@
                                     </views:ParameterDataTemplateSelector.BoolParameter>
                                     <views:ParameterDataTemplateSelector.FlagParameter>
                                         <DataTemplate>
-                                            <extendedTextBlock:FlagComboBox SelectedItem="{Binding Parameter.String}" SelectedValue="{Binding Parameter.Value}" Flags="{Binding Parameter.Items}" />
+                                            <extendedTextBlock:FlagComboBox SelectedItem="{Binding Parameter.String}" SelectedValue="{Binding Parameter.Value}" Watermark="{Binding Parameter.Value}"  Flags="{Binding Parameter.Items}" />
                                         </DataTemplate>
                                     </views:ParameterDataTemplateSelector.FlagParameter>
                                     <views:ParameterDataTemplateSelector.ItemsParameter>
                                         <DataTemplate>
-                                            <controls1:CompletionComboBox editing:ParameterEditorView.OnEnterPressed="true" SelectedItem="{Binding OptionValue}" Items="{Binding Items}" />
+                                            <controls1:CompletionComboBox editing:ParameterEditorView.OnEnterPressed="true" SelectedItem="{Binding OptionValue}" Watermark="{Binding OptionValue, Converter={x:Static extensions:ParameterOptionConverter.Instance}}" Items="{Binding Items}" />
                                         </DataTemplate>
                                     </views:ParameterDataTemplateSelector.ItemsParameter>
                                     <views:ParameterDataTemplateSelector.ButtonParameter>

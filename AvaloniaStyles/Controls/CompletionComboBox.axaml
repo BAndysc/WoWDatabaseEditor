@@ -51,7 +51,7 @@
                                 Background="{DynamicResource AutoCompleteBoxSuggestionsListBackground}"
                                 CornerRadius="{DynamicResource OverlayCornerRadius}">
                             <DockPanel>
-                                <TextBox Name="PART_SearchTextBox" Text="{TemplateBinding SearchText}" DockPanel.Dock="Top" />
+                                <TextBox Name="PART_SearchTextBox" Watermark="{TemplateBinding Watermark}" Text="{TemplateBinding SearchText}" DockPanel.Dock="Top" />
                                 <ListBox Name="PART_SelectingItemsControl"
                                          BorderThickness="0"
                                          Background="Transparent"

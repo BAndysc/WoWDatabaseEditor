@@ -13,6 +13,7 @@ using Avalonia.Controls.Templates;
 using Avalonia.Controls.Utils;
 using Avalonia.Data;
 using Avalonia.Input;
+using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -41,6 +42,7 @@ namespace AvaloniaStyles.Controls
         public event EventHandler<EnterPressedArgs>? OnEnterPressed;
         private Func<string, CancellationToken, Task<IEnumerable<object>>> asyncPopulator;
         private string searchText = string.Empty;
+        private string? watermark = null;
         private bool isDropDownOpen;
         private object? selectedItem;
         private IEnumerable<object>? items;
@@ -57,6 +59,12 @@ namespace AvaloniaStyles.Controls
             set => SetAndRaise(SearchTextProperty, ref searchText, value);
         }
         
+        public string? Watermark
+        {
+            get => watermark;
+            set => SetAndRaise(WatermarkProperty, ref watermark, value);
+        }
+
         public bool IsDropDownOpen
         {
             get => isDropDownOpen;
@@ -109,7 +117,14 @@ namespace AvaloniaStyles.Controls
             AvaloniaProperty.RegisterDirect<CompletionComboBox, IEnumerable<object>?>("Items", 
                 o => o.Items, 
                 (o, v) => o.Items = v);
-
+        
+        public static readonly DirectProperty<CompletionComboBox, string?> WatermarkProperty =
+            AvaloniaProperty.RegisterDirect<CompletionComboBox, string?>(
+                nameof(Watermark),
+                o => o.Watermark,
+                (o, v) => o.Watermark = v,
+                unsetValue: null);
+        
         public static readonly DirectProperty<CompletionComboBox, string> SearchTextProperty =
             AvaloniaProperty.RegisterDirect<CompletionComboBox, string>(
                 nameof(SearchText),
@@ -238,7 +253,8 @@ namespace AvaloniaStyles.Controls
         protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
         {
             SearchTextBox = e.NameScope.Find<TextBox>("PART_SearchTextBox");
-
+            SearchTextBox.AddHandler(KeyDownEvent, SearchTextBoxOnKeyDown, RoutingStrategies.Tunnel);
+            
             ToggleButton = e.NameScope.Find<ToggleButton>("PART_Button");
             
             ListBox = e.NameScope.Find<ListBox>("PART_SelectingItemsControl");
@@ -258,6 +274,24 @@ namespace AvaloniaStyles.Controls
             }
 
             base.OnApplyTemplate(e);
+        }
+
+        private void SearchTextBoxOnKeyDown(object? sender, KeyEventArgs e)
+        {
+            if (e.KeyModifiers == KeyModifiers.None)
+                return;
+            if (!string.IsNullOrWhiteSpace(SearchTextBox.Text))
+                return;
+            if (watermark == null)
+                return;
+            foreach (var binding in AvaloniaLocator.Current.GetService<PlatformHotkeyConfiguration>().Copy)
+            {
+                if (binding.Matches(e))
+                {
+                    AvaloniaLocator.Current.GetService<IClipboard>().SetTextAsync(watermark);
+                    e.Handled = true;
+                }
+            }
         }
 
         private void OnSelectorPointerReleased(object? sender, PointerReleasedEventArgs e)
