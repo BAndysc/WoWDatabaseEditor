@@ -1977,8 +1977,9 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
                 var selectAction = new EditableActionData("Type", "Action", async () =>
                 {
-                    int? newActionIndex = await ShowActionPicker(actionsToEdit[0].Parent,
-                        sourceType.HoldsMultipleValues ? null : sourceType.Value, false);
+                    int? newActionIndex = await ShowActionPicker(actionsToEdit[0].Parent, null,
+                        //sourceType.HoldsMultipleValues ? null : sourceType.Value, <--- not passing source type anymore, because the user might want to change the action type before changing the source type
+                        false);
                     if (!newActionIndex.HasValue)
                         return;
 

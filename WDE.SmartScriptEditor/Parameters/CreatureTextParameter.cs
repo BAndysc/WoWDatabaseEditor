@@ -58,7 +58,13 @@ public class CreatureTextParameter : IContextualParameter<long, SmartBaseElement
                 && script is SmartScript smartScript)
             {
                 if (smartScript.EntryOrGuid >= 0)
+                {
+                    if (smartScript.SourceType is SmartScriptType.Template or SmartScriptType.TimedActionList)
+                        return (uint)smartScript.EntryOrGuid / 100;
+                    
                     return (uint)smartScript.EntryOrGuid;
+                }
+
                 return databaseProvider.GetCreatureByGuid((uint)(-smartScript.EntryOrGuid))?.Entry;
             }
             else if (action.Source.Id == 9 || action.Source.Id == 59) // creature range or creature by spawn key
