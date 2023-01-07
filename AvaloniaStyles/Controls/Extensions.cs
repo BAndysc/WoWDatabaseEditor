@@ -159,7 +159,7 @@ namespace AvaloniaStyles.Controls
                     return;
 
                 var values = Enum.GetValues(type).Cast<object>().Zip(Enum.GetNames(type), (val, name) => new Option(val, type, combo, name)).ToList();
-                combo.AsyncPopulator = async (str, _) =>
+                combo.AsyncPopulator = async (items, str, _) =>
                 {
                     if (string.IsNullOrEmpty(str))
                         return values;

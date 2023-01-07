@@ -261,7 +261,7 @@
                                     </views:ParameterDataTemplateSelector.FlagParameter>
                                     <views:ParameterDataTemplateSelector.ItemsParameter>
                                         <DataTemplate>
-                                            <controls1:CompletionComboBox editing:ParameterEditorView.OnEnterPressed="true" SelectedItem="{Binding OptionValue}" Watermark="{Binding OptionValue, Converter={x:Static extensions:ParameterOptionConverter.Instance}}" Items="{Binding Items}" />
+                                            <controls1:CompletionComboBox editing:ParameterEditorView.OnEnterPressed="true" AsyncPopulator="{x:Static extensions:SmartScriptCompletionCombobox.AsyncPopulator}" SelectedItem="{Binding OptionValue}" Watermark="{Binding OptionValue, Converter={x:Static extensions:ParameterOptionConverter.Instance}}" Items="{Binding Items}" />
                                         </DataTemplate>
                                     </views:ParameterDataTemplateSelector.ItemsParameter>
                                     <views:ParameterDataTemplateSelector.ButtonParameter>

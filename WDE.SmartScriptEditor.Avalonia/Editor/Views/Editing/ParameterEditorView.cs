@@ -32,7 +32,13 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.Views.Editing
                 {
                     var box = (CompletionComboBox)sender!;
                     if (pressedArgs.SelectedItem == null && long.TryParse(pressedArgs.SearchText, out var l))
-                        box.SelectedItem = new ParameterOption(l, "(unknown)");
+                    {
+                        string name = "(unknown)";
+                        if (box.DataContext is EditableParameterViewModel<long> editableParam)
+                            name = editableParam.Parameter.Parameter.ToString(l);
+                        box.SelectedItem = new ParameterOption(l, name);
+                        pressedArgs.Handled = true;
+                    }
                 };
             });
             

@@ -27,7 +27,7 @@ public class QuickGoToViewModel : ObservableBase
         Items = new ObservableCollection<QuickGoToItemViewModel>();
         Providers = new ObservableCollection<IQuickGoToProvider>(providers.OrderBy(p => p.Order));
         
-        FindItemAsyncPopulator = (s, token) =>
+        FindItemAsyncPopulator = (_, s, token) =>
         {
             return Task.Run(() =>
             {
@@ -100,7 +100,7 @@ public class QuickGoToViewModel : ObservableBase
     
     public ObservableCollection<IQuickGoToProvider> Providers { get; }
    
-    public Func<string, CancellationToken, Task<IEnumerable<object>>> FindItemAsyncPopulator { get; }
+    public Func<IEnumerable<object>, string, CancellationToken, Task<IEnumerable<object>>> FindItemAsyncPopulator { get; }
 
     public QuickGoToItemViewModel? SelectedItem
     {

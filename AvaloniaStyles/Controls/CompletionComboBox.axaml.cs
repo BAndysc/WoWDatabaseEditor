@@ -40,14 +40,14 @@ namespace AvaloniaStyles.Controls
         public Func<object?, object?>? SelectedItemExtractor { get; set; }
         private ISelectionAdapter? adapter;
         public event EventHandler<EnterPressedArgs>? OnEnterPressed;
-        private Func<string, CancellationToken, Task<IEnumerable<object>>> asyncPopulator;
+        private Func<IEnumerable<object>, string, CancellationToken, Task<IEnumerable<object>>> asyncPopulator;
         private string searchText = string.Empty;
         private string? watermark = null;
         private bool isDropDownOpen;
         private object? selectedItem;
         private IEnumerable<object>? items;
 
-        public Func<string, CancellationToken, Task<IEnumerable<object>>> AsyncPopulator
+        public Func<IEnumerable<object>, string, CancellationToken, Task<IEnumerable<object>>> AsyncPopulator
         {
             get => asyncPopulator;
             set => SetAndRaise(AsyncPopulatorProperty, ref asyncPopulator, value);
@@ -131,8 +131,8 @@ namespace AvaloniaStyles.Controls
                 o => o.SearchText,
                 unsetValue: string.Empty);
         
-        public static readonly DirectProperty<CompletionComboBox, Func<string, CancellationToken, Task<IEnumerable<object>>>> AsyncPopulatorProperty =
-            AvaloniaProperty.RegisterDirect<CompletionComboBox, Func<string, CancellationToken, Task<IEnumerable<object>>>>(
+        public static readonly DirectProperty<CompletionComboBox, Func<IEnumerable<object>,string, CancellationToken, Task<IEnumerable<object>>>> AsyncPopulatorProperty =
+            AvaloniaProperty.RegisterDirect<CompletionComboBox, Func<IEnumerable<object>,string, CancellationToken, Task<IEnumerable<object>>>>(
                 nameof(AsyncPopulator),
                 o => o.AsyncPopulator,
                 (o, v) => o.AsyncPopulator = v);
@@ -161,7 +161,7 @@ namespace AvaloniaStyles.Controls
         public CompletionComboBox()
         {
             // Default async populator searches in Items (toString) using Fuzzy match or normal match depending on the collection size
-            asyncPopulator = async (s, token) =>
+            asyncPopulator = async (items, s, token) =>
             {
                 if (items is not IList o)
                     return Enumerable.Empty<object>();
@@ -173,15 +173,16 @@ namespace AvaloniaStyles.Controls
                 {
                     if (o.Count < 250)
                     {
-                        return Process.ExtractSorted(s, items.Select(item => item.ToString()), cutoff: 51)
-                            .Select(item => o[item.Index]!);   
+                        var result = Process.ExtractSorted(s, items.Select(item => item.ToString()), cutoff: 51)
+                            .Select(item => o[item.Index]!);
+                        return result;
                     }
 
                     List<object> picked = new();
                     var search = s.ToLower();
                     foreach (var item in o)
                     {
-                        if (item.ToString()!.ToLowerInvariant().Contains(search))
+                        if (item.ToString()!.Contains(search, StringComparison.InvariantCultureIgnoreCase))
                             picked.Add(item);
 
                         if (token.IsCancellationRequested)
@@ -200,15 +201,18 @@ namespace AvaloniaStyles.Controls
             if (!e.Handled && e.Text != "\n" && e.Text != "\r")
             {
                 IsDropDownOpen = true;
-                SearchTextBox.RaiseEvent(new TextInputEventArgs
+                DispatcherTimer.RunOnce(() =>
                 {
-                    Device = e.Device,
-                    Handled = false,
-                    Text = e.Text,
-                    Route = e.Route,
-                    RoutedEvent = e.RoutedEvent,
-                    Source = SearchTextBox
-                });
+                    SearchTextBox.RaiseEvent(new TextInputEventArgs
+                    {
+                        Device = e.Device,
+                        Handled = false,
+                        Text = e.Text,
+                        Route = e.Route,
+                        RoutedEvent = e.RoutedEvent,
+                        Source = SearchTextBox
+                    });
+                }, TimeSpan.FromMilliseconds(1));
                 e.Handled = true;
             }
         }
@@ -474,7 +478,7 @@ namespace AvaloniaStyles.Controls
         {
             try
             {
-                IEnumerable<object> result = await asyncPopulator.Invoke(searchText, cancellationToken);
+                IEnumerable<object> result = await asyncPopulator.Invoke(items ?? Array.Empty<object>(), searchText, cancellationToken);
                 var resultList = result is IList ? result : result?.ToList();
 
                 if (cancellationToken.IsCancellationRequested)

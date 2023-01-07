@@ -97,7 +97,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
                 {
                     if (p.Items != null && p.Items.TryGetValue(p.Value, out var option))
                         return new ParameterOption(p.Value, option.Name);
-                    return new ParameterOption(p.Value, "Unknown");
+                    return new ParameterOption(p.Value, p.Parameter.ToString(p.Value));
                 }
 
                 return null;
@@ -167,14 +167,16 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
         {
             Value = value;
             Name = name;
+            searchText = $"{Name} ({Value})";
         }
 
+        private string searchText;
         public long Value { get; }
         public string Name { get; }
 
         public override string ToString()
         {
-            return $"{Name} ({Value})";
+            return searchText;
         }
     }
 }

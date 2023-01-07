@@ -55,7 +55,7 @@ namespace WDE.Common.Avalonia.Controls
                     box.options.Add(new Option(box, pair.Key, pair.Value.Name, pair.Value.Description));
 
                 box.Items = box.options;
-                box.AsyncPopulator = async (str, _) =>
+                box.AsyncPopulator = async (items, str, _) =>
                 {
                     if (string.IsNullOrEmpty(str))
                         return box.options;
