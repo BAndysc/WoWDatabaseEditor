@@ -20,6 +20,8 @@
     </controls:BaseMessageBoxWindow.Image>
     <controls:BaseMessageBoxWindow.KeyBindings>
         <KeyBinding Gesture="Escape" Command="{Binding CancelButtonCommand}" />
+        <KeyBinding Gesture="Y" Command="{Binding YesButtonCommand}" />
+        <KeyBinding Gesture="N" Command="{Binding NoButtonCommand}" />
     </controls:BaseMessageBoxWindow.KeyBindings>
     <ItemsPresenter KeyboardNavigation.TabNavigation="Continue" Items="{Binding Buttons}" Name="ButtonsList">
         <ItemsPresenter.ItemTemplate>

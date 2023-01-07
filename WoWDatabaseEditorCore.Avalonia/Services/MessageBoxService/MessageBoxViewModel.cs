@@ -21,7 +21,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.MessageBoxService
         public MessageBoxViewModel(IMessageBox<T> model)
         {
             Model = model;
-            CancelButtonCommand = new DelegateCommand(() => { });
+            CancelButtonCommand = YesButtonCommand = NoButtonCommand = new DelegateCommand(() => { });
             foreach (var btn in model.Buttons)
             {
                 var vm = new MessageBoxButtonViewModel(btn.Name, btn == model.DefaultButton, new DelegateCommand(() =>
@@ -32,10 +32,17 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.MessageBoxService
                 Buttons.Add(vm);
                 if (btn == model.CancelButton)
                     CancelButtonCommand = vm.Command;
+                else if (btn.Name == "Yes")
+                    YesButtonCommand = vm.Command;
+                else if (btn.Name == "No")
+                    NoButtonCommand = vm.Command;
             }
         }
 
         public ICommand CancelButtonCommand { get; }
+        public ICommand YesButtonCommand { get; }
+        public ICommand NoButtonCommand { get; }
+        
         public T? SelectedOption { get; private set; }
         public ObservableCollection<MessageBoxButtonViewModel> Buttons { get; } = new();
         public event Action? Close;
