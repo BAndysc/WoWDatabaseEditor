@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using AsyncAwaitBestPractices.MVVM;
 using Prism.Commands;
 using Prism.Events;
 using ReactiveUI;
@@ -278,116 +279,158 @@ namespace WoWDatabaseEditorCore.ViewModels
             }
         }
 
+        private bool inCanClose;
         public async Task<bool> CanClose()
         {
-            var modifiedDocuments = DocumentManager.OpenedDocuments.Where(d => d.IsModified).ToList();
-
-            if (modifiedDocuments.Count > 0)
+            if (inCanClose)
             {
-                while (modifiedDocuments.Count > 0)
+                await messageBoxService.SimpleDialog("Closing in progress", "Closing in progress",
+                    "This app is already being closing (probably some async operation going in background)");
+                return false;
+            }
+
+            inCanClose = true;
+
+            try
+            {
+                var modifiedDocuments = DocumentManager.OpenedDocuments.Where(d => d.IsModified).ToList();
+
+                if (modifiedDocuments.Count > 0)
                 {
-                    var editor = modifiedDocuments[^1];
-                    var message = new MessageBoxFactory<MessageBoxButtonType>().SetTitle("Document is modified")
-                        .SetMainInstruction("Do you want to save the changes of " + editor.Title + "?")
+                    while (modifiedDocuments.Count > 0)
+                    {
+                        var editor = modifiedDocuments[^1];
+                        var message = new MessageBoxFactory<MessageBoxButtonType>().SetTitle("Document is modified")
+                            .SetMainInstruction("Do you want to save the changes of " + editor.Title + "?")
+                            .SetContent("Your changes will be lost if you don't save them.")
+                            .SetIcon(MessageBoxIcon.Warning)
+                            .WithYesButton(MessageBoxButtonType.Yes)
+                            .WithNoButton(MessageBoxButtonType.No)
+                            .WithCancelButton(MessageBoxButtonType.Cancel);
+
+                        if (modifiedDocuments.Count > 1)
+                        {
+                            message.SetExpandedInformation("Other modified documents:\n" +
+                                                           string.Join("\n",
+                                                               modifiedDocuments.SkipLast(1).Select(d => d.Title)));
+                            message.WithButton("Yes to all", MessageBoxButtonType.CustomA)
+                                .WithButton("No to all", MessageBoxButtonType.CustomB);
+                        }
+
+                        MessageBoxButtonType result = await messageBoxService.ShowDialog(message.Build());
+
+                        if (result == MessageBoxButtonType.Cancel)
+                            return false;
+
+                        if (result == MessageBoxButtonType.Yes)
+                        {
+                            if (editor is IBeforeSaveConfirmDocument before)
+                            {
+                                if (await before.ShallSavePreventClosing())
+                                    return false;
+                            }
+                            //editor.Save.Execute(null);
+                            if (editor is ISolutionItemDocument solutionItemDocument)
+                                await solutionTasksService.Save(solutionItemDocument);
+                            else
+                            {
+                                if (editor.Save is IAsyncCommand async)
+                                    await async.ExecuteAsync();
+                                else
+                                    editor.Save.Execute(null);
+                            }
+                            modifiedDocuments.RemoveAt(modifiedDocuments.Count - 1);
+                            DocumentManager.OpenedDocuments.Remove(editor);
+                        }
+                        else if (result == MessageBoxButtonType.No)
+                        {
+                            modifiedDocuments.RemoveAt(modifiedDocuments.Count - 1);
+                            DocumentManager.OpenedDocuments.Remove(editor);
+                        }
+                        else if (result == MessageBoxButtonType.CustomA)
+                        {
+                            foreach (var m in modifiedDocuments)
+                            {
+                                if (m is IBeforeSaveConfirmDocument before)
+                                {
+                                    if (await before.ShallSavePreventClosing())
+                                    {
+                                        return false;
+                                    }
+                                }
+                                if (m is ISolutionItemDocument solutionItemDocument)
+                                    await solutionTasksService.Save(solutionItemDocument);
+                                else
+                                    m.Save.Execute(null);
+                            }
+                            modifiedDocuments.Clear();
+                        }
+                        else if (result == MessageBoxButtonType.CustomB)
+                        {
+                            modifiedDocuments.Clear();
+                        }
+                    }
+                }
+                
+                while (DocumentManager.OpenedDocuments.Count > 0)
+                    DocumentManager.OpenedDocuments.RemoveAt(DocumentManager.OpenedDocuments.Count - 1);
+                
+                var modifiedTools = DocumentManager.AllTools
+                    .Select(t => t as ISavableTool)
+                    .Where(t => t != null)
+                    .Cast<ISavableTool>()
+                    .Where(t => t.IsModified)
+                    .ToList();
+
+                foreach (var tool in modifiedTools)
+                {
+                    var message = new MessageBoxFactory<MessageBoxButtonType>().SetTitle("Tool is modified")
+                        .SetMainInstruction("Do you want to save the changes of " + tool.Title + "?")
                         .SetContent("Your changes will be lost if you don't save them.")
                         .SetIcon(MessageBoxIcon.Warning)
                         .WithYesButton(MessageBoxButtonType.Yes)
                         .WithNoButton(MessageBoxButtonType.No)
                         .WithCancelButton(MessageBoxButtonType.Cancel);
 
-                    if (modifiedDocuments.Count > 1)
-                    {
-                        message.SetExpandedInformation("Other modified documents:\n" +
-                                                       string.Join("\n",
-                                                           modifiedDocuments.SkipLast(1).Select(d => d.Title)));
-                        message.WithButton("Yes to all", MessageBoxButtonType.CustomA)
-                            .WithButton("No to all", MessageBoxButtonType.CustomB);
-                    }
-
                     MessageBoxButtonType result = await messageBoxService.ShowDialog(message.Build());
-
                     if (result == MessageBoxButtonType.Cancel)
                         return false;
 
                     if (result == MessageBoxButtonType.Yes)
                     {
-                        if (editor is IBeforeSaveConfirmDocument before)
-                        {
-                            if (await before.ShallSavePreventClosing())
-                                return false;
-                        }
-                        //editor.Save.Execute(null);
-                        if (editor is ISolutionItemDocument solutionItemDocument)
-                            await solutionTasksService.Save(solutionItemDocument);
-                        else
-                            editor.Save.Execute(null);
-                        modifiedDocuments.RemoveAt(modifiedDocuments.Count - 1);
-                        DocumentManager.OpenedDocuments.Remove(editor);
+                        await SaveWithTimeout(tool);
                     }
                     else if (result == MessageBoxButtonType.No)
                     {
-                        modifiedDocuments.RemoveAt(modifiedDocuments.Count - 1);
-                        DocumentManager.OpenedDocuments.Remove(editor);
-                    }
-                    else if (result == MessageBoxButtonType.CustomA)
-                    {
-                        foreach (var m in modifiedDocuments)
-                        {
-                            if (m is IBeforeSaveConfirmDocument before)
-                            {
-                                if (await before.ShallSavePreventClosing())
-                                {
-                                    return false;
-                                }
-                            }
-                            if (m is ISolutionItemDocument solutionItemDocument)
-                                await solutionTasksService.Save(solutionItemDocument);
-                            else
-                                m.Save.Execute(null);
-                        }
-                        modifiedDocuments.Clear();
-                    }
-                    else if (result == MessageBoxButtonType.CustomB)
-                    {
-                        modifiedDocuments.Clear();
                     }
                 }
+                
+                return true;
             }
-            
-            while (DocumentManager.OpenedDocuments.Count > 0)
-                DocumentManager.OpenedDocuments.RemoveAt(DocumentManager.OpenedDocuments.Count - 1);
-            
-            var modifiedTools = DocumentManager.AllTools
-                .Select(t => t as ISavableTool)
-                .Where(t => t != null)
-                .Cast<ISavableTool>()
-                .Where(t => t.IsModified)
-                .ToList();
-
-            foreach (var tool in modifiedTools)
+            finally
             {
-                var message = new MessageBoxFactory<MessageBoxButtonType>().SetTitle("Tool is modified")
-                    .SetMainInstruction("Do you want to save the changes of " + tool.Title + "?")
-                    .SetContent("Your changes will be lost if you don't save them.")
-                    .SetIcon(MessageBoxIcon.Warning)
-                    .WithYesButton(MessageBoxButtonType.Yes)
-                    .WithNoButton(MessageBoxButtonType.No)
-                    .WithCancelButton(MessageBoxButtonType.Cancel);
-
-                MessageBoxButtonType result = await messageBoxService.ShowDialog(message.Build());
-                if (result == MessageBoxButtonType.Cancel)
-                    return false;
-
-                if (result == MessageBoxButtonType.Yes)
-                {
-                    tool.Save.Execute(null);
-                }
-                else if (result == MessageBoxButtonType.No)
-                {
-                }
+                inCanClose = false;
             }
-            
-            return true;
+        }
+
+        private async Task SaveWithTimeout(ISavableTool tool)
+        {
+            var delay = Task.Delay(10000);
+
+            var finishedTask = await Task.WhenAny(delay, tool.Save.ExecuteAsync());
+
+            if (finishedTask == delay)
+            {
+                if (await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
+                        .SetTitle("Error while saving")
+                        .SetMainInstruction("Couldn't save " + tool.Title)
+                        .SetContent(
+                            "The save operation timed out. It might be fatal error or just connection problems. Do you want to try again?")
+                        .WithYesButton(true)
+                        .WithNoButton(false)
+                        .Build()))
+                    await SaveWithTimeout(tool);
+            }
         }
 
         public async Task<bool> TryClose()

@@ -66,8 +66,22 @@ namespace WoWDatabaseEditorCore.ViewModels
             }
         }
 
+        private void RemoveFinishedTasks()
+        {
+            int i = 0;
+            while (Tasks.Count > 0 && i < Tasks.Count)
+            {
+                var task = Tasks[i];
+                if (task.State == TaskState.FinishedSuccess)
+                    Tasks.RemoveAt(i);
+                else
+                    i++;
+            }
+        }
+        
         private void NewTask((ITask, ITaskProgress) pair)
         {
+            RemoveFinishedTasks();
             Tasks.Add(new TaskViewModel(this, pair.Item1, pair.Item2));
         }
 
