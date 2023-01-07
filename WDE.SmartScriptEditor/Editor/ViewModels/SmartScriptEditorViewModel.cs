@@ -1925,7 +1925,13 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                         !targetType.HoldsMultipleValues &&
                         targetType.Value == SmartConstants.TargetNone &&
                         script.SourceType is SmartScriptType.Creature or SmartScriptType.GameObject or SmartScriptType.Template)
-                        targetType.Value = SmartConstants.TargetSelf;
+                        targetType.Value = id == SmartConstants.ActionTalk ? SmartConstants.TargetActionInvoker : SmartConstants.TargetSelf;
+                    else if (actionData.TargetTypes == SmartSourceTargetType.None)
+                    {
+                        targetType.Value = SmartConstants.TargetNone;
+                        foreach (var parameter in targetParameters)
+                            parameter.Value = 0;
+                    }
                 }, bulkEdit);
             
             bool modifiedSourceConditions = false;

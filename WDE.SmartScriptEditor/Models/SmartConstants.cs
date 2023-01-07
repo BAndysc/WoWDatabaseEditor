@@ -8,6 +8,7 @@
         public const int SourceStoredObject = 12;
         public const int TargetNone = 0;
         public const int TargetSelf = 1;
+        public const int TargetActionInvoker = 7;
         public const int ActionNone = 0;
         public const int ActionTalk = 1;
         public const int ActionCallTimedActionList = 80;
