@@ -31,8 +31,8 @@
                             <TextBlock Text="{Binding Key}" FontWeight="Thin" FontSize="17" />
                             <ItemsPresenter KeyboardNavigation.TabNavigation="Continue" Items="{Binding}" Margin="10,0,0,16">
                                 <ItemsPresenter.ItemTemplate>
-                                    <DataTemplate>
-                                        <editing:ParameterEditorView utils:FocusUtils.FocusFirst="{Binding FocusFirst}"
+                                    <DataTemplate x:DataType="viewModels:IEditableParameterViewModel">
+                                        <editing:ParameterEditorView utils:FocusUtils.FocusFirst="{CompiledBinding FocusFirst}"
                                                                      SpecialCopying="{Binding SpecialCopying}"
                                                                      Margin="0,0,0,5" />
                                     </DataTemplate>

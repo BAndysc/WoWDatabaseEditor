@@ -13,6 +13,7 @@ using WDE.Common.Parameters;
 using WDE.MVVM.Observable;
 using WDE.MVVM;
 using WDE.Common.Providers;
+using WDE.Common.Tasks;
 using WDE.Common.Utils;
 using WDE.Parameters.Models;
 using WDE.SmartScriptEditor.Models;
@@ -28,6 +29,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
         public ParametersEditViewModel(IItemFromListProvider itemFromListProvider,
             ICurrentCoreVersion currentCoreVersion,
             IParameterPickerService parameterPickerService,
+            IMainThread mainThread,
             SmartBaseElement? element,
             bool focusFirst,
             SmartEditableGroup editableGroup,
@@ -88,6 +90,13 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
                         }
                     }));
             }
+
+            // so that it doesn't get focused anymore
+            mainThread.Delay(() =>
+            {
+                foreach (var p in allParameters)
+                    p.FocusFirst = false;
+            }, TimeSpan.FromMilliseconds(1));
 
             Accept = new DelegateCommand(() =>
             {
