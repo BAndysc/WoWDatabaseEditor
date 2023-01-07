@@ -6,6 +6,7 @@ using WDE.Common.Parameters;
 using WDE.Common.Providers;
 using WDE.Common.Services;
 using WDE.Common.Utils;
+using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Models;
 
 namespace WDE.SmartScriptEditor.Parameters;
@@ -18,7 +19,10 @@ public class CreatureTextParameter : IContextualParameter<long, SmartBaseElement
     private readonly string tableName;
     private readonly string columnName;
 
-    public CreatureTextParameter(IDatabaseProvider databaseProvider,
+    private Dictionary<int, int> targetIdToCreatureEntryParameter = new();
+
+    public CreatureTextParameter(ISmartDataManager smartDataManager,
+        IDatabaseProvider databaseProvider,
         ITableEditorPickerService tableEditorPickerService,
         IItemFromListProvider itemFromListProvider,
         string tableName, string columnName)
@@ -28,6 +32,18 @@ public class CreatureTextParameter : IContextualParameter<long, SmartBaseElement
         this.itemFromListProvider = itemFromListProvider;
         this.tableName = tableName;
         this.columnName = columnName;
+
+        foreach (var data in smartDataManager.GetAllData(SmartType.SmartTarget))
+        {
+            if (data.Parameters == null)
+                continue;
+
+            for (int i = 0; i < data.Parameters.Count; ++i)
+            {
+                if (data.Parameters[i].Type == "CreatureParameter")
+                    targetIdToCreatureEntryParameter[data.Id] = i;
+            }
+        }
     }
 
     public bool AllowUnknownItems => true;
@@ -67,14 +83,10 @@ public class CreatureTextParameter : IContextualParameter<long, SmartBaseElement
 
                 return databaseProvider.GetCreatureByGuid((uint)(-smartScript.EntryOrGuid))?.Entry;
             }
-            else if (action.Source.Id == 9 || action.Source.Id == 59) // creature range or creature by spawn key
-                return (uint)action.Source.GetParameter(0).Value;
             else if (action.Source.Id == 10) // creature guid
                 return databaseProvider.GetCreatureByGuid((uint)action.Source.GetParameter(0).Value)?.Entry;
-            else if (action.Source.Id == 11) // creature distance
-                return (uint)action.Source.GetParameter(0).Value;
-            else if (action.Source.Id == 19) // closest creature
-                return (uint)action.Source.GetParameter(0).Value;
+            else if (targetIdToCreatureEntryParameter.TryGetValue(action.Source.Id, out var creatureEntryParameterIndex))
+                return (uint)action.Source.GetParameter(creatureEntryParameterIndex).Value;
             else if (action.Source.Id == 12 || action.Source.Id == 58) // stored target / actor
             {
                 var val = action.Source.GetParameter(0).Value;
