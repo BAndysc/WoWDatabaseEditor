@@ -166,6 +166,7 @@
                             <Button Classes="FlatButton"
                                     Content="Add action"
                                     Opacity="0.5"
+                                    HorizontalAlignment="Stretch"
                                     Command="{Binding DataContext.AddAction, ElementName=Rooot}"
                                     CommandParameter="{CompiledBinding}">
                             </Button>

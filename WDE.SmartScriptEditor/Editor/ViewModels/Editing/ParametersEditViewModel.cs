@@ -104,6 +104,11 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
                 saveAction?.Invoke();
                 CloseOk?.Invoke();
             });
+            AcceptOpenNext = new DelegateCommand(() =>
+            {
+                RequestOpenNextEdit = true;
+                Accept.Execute(null);
+            });
             Cancel = new DelegateCommand(() => CloseCancel?.Invoke());
 
             AutoDispose(editableGroup);
@@ -123,12 +128,14 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
         public string Readable { get; private set; } = "";
         public bool ShowCloseButtons { get; set; } = true;
         
+        public ICommand AcceptOpenNext { get; }
         public ICommand Accept { get; }
         public ICommand Cancel { get; }
         public int DesiredWidth => 545;
         public int DesiredHeight => 625;
         public string Title => "Edit";
         public bool Resizeable => true;
+        public bool RequestOpenNextEdit { get; private set; }
 
         public event Action? CloseCancel;
         public event Action? CloseOk;
