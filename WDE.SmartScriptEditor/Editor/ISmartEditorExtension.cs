@@ -15,6 +15,7 @@ public interface ISmartEditorExtension
 {
     Task BeforeLoad(SmartScriptEditorViewModel editorViewModel, ISmartScriptSolutionItem item) => Task.CompletedTask;
     IReadOnlyList<SmartExtensionCommand>? Commands => null;
+    ISmartHeaderViewModel? CreateHeader(SmartScriptEditorViewModel editorViewModel, ISmartScriptSolutionItem item) => null;
 }
 
 public class SmartExtensionNotification : ObservableBase

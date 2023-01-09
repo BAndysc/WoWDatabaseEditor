@@ -1,18 +1,24 @@
 ﻿<UserControl x:Class="WDE.SmartScriptEditor.Avalonia.Editor.Views.SmartScriptEditorView"
              xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:userControls="clr-namespace:WDE.SmartScriptEditor.Editor.UserControls"
-             xmlns:utils="clr-namespace:WDE.Common.Utils;assembly=WDE.Common"
-             xmlns:system="clr-namespace:System;assembly=System.Runtime"
+             Background="{DynamicResource SmartScripts.Background}"
              xmlns:userControls1="clr-namespace:WDE.SmartScriptEditor.Avalonia.Editor.UserControls"
              x:DataType="viewModels:SmartScriptEditorViewModel"
              xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
              xmlns:viewModels="clr-namespace:WDE.SmartScriptEditor.Editor.ViewModels;assembly=WDE.SmartScriptEditor"
-             xmlns:editor="clr-namespace:WDE.SmartScriptEditor.Editor;assembly=WDE.SmartScriptEditor">
+             xmlns:editor="clr-namespace:WDE.SmartScriptEditor.Editor;assembly=WDE.SmartScriptEditor"
+             PointerPressed="DeselectAll"
+             xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia">
     <Panel>
-        <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-            <userControls1:SmartScriptView Focusable="True" Name="SmartScriptView"/>
-        </ScrollViewer>
+        <DockPanel>
+            <ContentPresenter Content="{CompiledBinding HeaderViewModel}"
+                              DockPanel.Dock="Top"
+                              IsVisible="{CompiledBinding HeaderViewModel, Converter={x:Static NullConverter.IsNotNull}}"
+                              ContentTemplate="{x:Static utils:ViewDataTemplate.Template}" />
+            <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                <userControls1:SmartScriptView Focusable="True" Name="SmartScriptView"/>
+            </ScrollViewer>
+        </DockPanel>
         
         <Slider Minimum="0.5" Maximum="1"
                 HorizontalAlignment="Right"

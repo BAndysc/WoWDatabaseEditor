@@ -71,7 +71,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
             {
                 if (Parameter is not MultiParameterValueHolder<long> p)
                     return null;
-                return HasItems
+                return HasItems && p.Items != null
                     ? p.Items!.Select(pair => (object)new ParameterOption(pair.Key, pair.Value.Name)).ToList()
                     : null;
             }
