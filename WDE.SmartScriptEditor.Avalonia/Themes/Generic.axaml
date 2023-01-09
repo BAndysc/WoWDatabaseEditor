@@ -10,7 +10,8 @@
         xmlns:controls1="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
         xmlns:editing1="clr-namespace:WDE.SmartScriptEditor.Editor.ViewModels.Editing;assembly=WDE.SmartScriptEditor"
         xmlns:models="clr-namespace:WDE.SmartScriptEditor.Models;assembly=WDE.SmartScriptEditor"
-        xmlns:extensions="clr-namespace:WDE.SmartScriptEditor.Avalonia.Extensions">
+        xmlns:extensions="clr-namespace:WDE.SmartScriptEditor.Avalonia.Extensions"
+        xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia">
 
     <Styles.Resources>
         <!-- this is later also used in SmartScriptPanelLayout measurement, for performance reasons-->
@@ -251,6 +252,7 @@
                                         <DataTemplate>
                                             <CheckBox Focusable="True" VerticalContentAlignment="Center" HorizontalAlignment="Stretch"
                                                       DataContext="{Binding Parameter}"
+                                                      utils:Fix.DetachDataContext="True"
                                                       IsChecked="{Binding Value, Converter={x:Static converters:CommonConverters.LongToBoolConverter}}" />
                                         </DataTemplate>
                                     </views:ParameterDataTemplateSelector.BoolParameter>
