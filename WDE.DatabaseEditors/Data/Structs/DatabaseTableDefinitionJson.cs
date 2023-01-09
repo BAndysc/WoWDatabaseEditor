@@ -71,6 +71,9 @@ namespace WDE.DatabaseEditors.Data.Structs
 
         [JsonProperty(PropertyName = "primary_key")]
         public IList<string> PrimaryKey { get; set; } = null!;
+
+        [JsonProperty(PropertyName = "group_by_key")]
+        public string? GroupByKey { get; set; } = null;
         
         [JsonProperty(PropertyName = "conditions")]
         public DatabaseConditionReferenceJson? Condition { get; set; }

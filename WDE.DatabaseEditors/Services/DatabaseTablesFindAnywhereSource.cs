@@ -159,7 +159,20 @@ public class DatabaseTablesFindAnywhereSource : IFindAnywhereSource
                                 }
 
                                 if (found)
-                                    editor!.TryFind(key).ListenErrors();
+                                {
+                                    async Task SelectRow()
+                                    {
+                                        if (definition.GroupByKey != null)
+                                        {
+                                            editor!.FilterViewModel.SelectedColumn = editor!.FilterViewModel.Columns.FirstOrDefault(c => c.ColumnName == definition.GroupByKey);
+                                            editor!.FilterViewModel.SelectedOperator = editor!.FilterViewModel.Operators.First(o => o.Operator == "=");
+                                            editor!.FilterViewModel.FilterText = row[definition.GroupByKey].Item2?.ToString() ?? "";
+                                            await editor.FilterViewModel.ApplyFilter.ExecuteAsync();
+                                        }
+                                        await editor!.TryFind(key);
+                                    }
+                                    SelectRow().ListenErrors();
+                                }
                             });
                         }
                         else
