@@ -26,15 +26,22 @@ namespace WDE.DatabaseEditors.QueryGenerators
         private readonly IQueryGenerator<ConditionDeleteModel> conditionDeleteGenerator;
         private readonly IConditionQueryGenerator conditionQueryGenerator;
 
+        private Dictionary<string, ICustomQueryGenerator> customQueryGenerators = new();
+
         public QueryGenerator(ICreatureStatCalculatorService calculatorService,
             IParameterFactory parameterFactory,
             IQueryGenerator<ConditionDeleteModel> conditionDeleteGenerator,
-            IConditionQueryGenerator conditionQueryGenerator)
+            IConditionQueryGenerator conditionQueryGenerator,
+            IEnumerable<ICustomQueryGenerator> customQueryGenerators)
         {
             this.calculatorService = calculatorService;
             this.parameterFactory = parameterFactory;
             this.conditionDeleteGenerator = conditionDeleteGenerator;
             this.conditionQueryGenerator = conditionQueryGenerator;
+            foreach (var gen in customQueryGenerators)
+            {
+                this.customQueryGenerators[gen.TableName] = gen;
+            }
         }
         
         public IQuery GenerateQuery(IReadOnlyList<DatabaseKey> keys, IReadOnlyList<DatabaseKey>? deletedKeys, IDatabaseTableData tableData)
@@ -65,6 +72,11 @@ namespace WDE.DatabaseEditors.QueryGenerators
                     query.Add(GenerateUpdateQuery(tableData.TableDefinition, entity));
             }
 
+            if (customQueryGenerators.TryGetValue(tableData.TableDefinition.TableName, out var customQueryGenerator))
+            {
+                query.Add(customQueryGenerator.Generate(keys, deletedKeys, tableData));
+            }
+            
             return query.Close();
         }
 

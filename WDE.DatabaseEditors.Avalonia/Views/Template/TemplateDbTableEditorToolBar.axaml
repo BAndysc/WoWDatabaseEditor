@@ -12,7 +12,7 @@
              IsEnabled="{Binding TaskInProgress, Converter={x:Static converters:InverseBoolConverter.Instance}}"
              x:Class="WDE.DatabaseEditors.Avalonia.Views.Template.TemplateDbTableEditorToolBar">
     <controls:ToolbarPanel>
-        <components:ButtonImage Command="{CompiledBinding AddNewCommand, Mode=OneTime}" Text="Add new" Image="Icons/icon_add.png" />
+        <components:ButtonImage IsVisible="{CompiledBinding AllowMultipleKeys}" Command="{CompiledBinding AddNewCommand, Mode=OneTime}" Text="Add new" Image="Icons/icon_add.png" />
         <ItemsPresenter Items="{CompiledBinding Commands}">
             <ItemsPresenter.ItemsPanel>
                 <ItemsPanelTemplate>

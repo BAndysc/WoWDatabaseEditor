@@ -60,6 +60,8 @@ namespace WDE.DatabaseEditors.ViewModels.Template
         public IObservable<Func<DatabaseRowViewModel, bool>> CurrentFilter { get; }
         public SourceList<DatabaseRowViewModel> Rows { get; } = new();
         private HashSet<(DatabaseKey key, string columnName)> forceUpdateCells = new HashSet<(DatabaseKey, string)>();
+
+        [Notify] private bool allowMultipleKeys = true;
         
         public AsyncAutoCommand<DatabaseCellViewModel?> RemoveTemplateCommand { get; }
         public AsyncAutoCommand<DatabaseCellViewModel?> RevertCommand { get; }
@@ -143,6 +145,9 @@ namespace WDE.DatabaseEditors.ViewModels.Template
 
         private async Task AddNewEntity()
         {
+            if (!allowMultipleKeys)
+                return;
+            
             var parameter = parameterFactory.Factory(tableDefinition.Picker);
             var selected = await itemFromListProvider.GetItemFromList(parameter.Items, false);
             if (!selected.HasValue)

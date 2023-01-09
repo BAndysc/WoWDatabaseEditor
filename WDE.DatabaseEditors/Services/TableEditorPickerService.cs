@@ -17,6 +17,7 @@ using WDE.DatabaseEditors.ViewModels;
 using WDE.DatabaseEditors.ViewModels.MultiRow;
 using WDE.DatabaseEditors.ViewModels.OneToOneForeignKey;
 using WDE.DatabaseEditors.ViewModels.SingleRow;
+using WDE.DatabaseEditors.ViewModels.Template;
 using WDE.Module.Attributes;
 using WDE.MVVM;
 using WDE.MVVM.Observable;
@@ -156,9 +157,6 @@ public class TableEditorPickerService : ITableEditorPickerService
         if (definition == null)
             throw new UnsupportedTableException(table);
 
-        if (definition.RecordMode == RecordMode.Template)
-            throw new Exception("TemplateMode not (yet?) supported");
-
         ViewModelBase viewModelBase;
         bool openIsNoSaveMode = false;
         if (definition.RecordMode == RecordMode.SingleRow)
@@ -174,7 +172,7 @@ public class TableEditorPickerService : ITableEditorPickerService
                 singleRow.FilterViewModel.ApplyFilter.Execute(null);
             }
         }
-        else
+        else if (definition.RecordMode == RecordMode.MultiRecord)
         {
             Debug.Assert(definition.RecordMode == RecordMode.MultiRecord);
             Debug.Assert(condition == null);
@@ -184,6 +182,17 @@ public class TableEditorPickerService : ITableEditorPickerService
             var multiRow = containerProvider.Resolve<MultiRowDbTableEditorViewModel>((typeof(DatabaseTableSolutionItem), solutionItem));
             multiRow.AllowMultipleKeys = false;
             viewModelBase = multiRow;
+        }
+        else
+        {
+            Debug.Assert(definition.RecordMode == RecordMode.Template);
+            Debug.Assert(condition == null);
+            Debug.Assert(defaultPartialKey.HasValue);
+            var solutionItem = new DatabaseTableSolutionItem(defaultPartialKey.Value, true, false, definition.Id, false);
+            openIsNoSaveMode = await CheckIfItemIsOpened(solutionItem, definition);
+            var template = containerProvider.Resolve<TemplateDbTableEditorViewModel>((typeof(DatabaseTableSolutionItem), solutionItem));
+            template.AllowMultipleKeys = false;
+            viewModelBase = template;
         }
 
         var viewModel = containerProvider.Resolve<RowPickerViewModel>((typeof(ViewModelBase), viewModelBase), (typeof(bool), openIsNoSaveMode));
