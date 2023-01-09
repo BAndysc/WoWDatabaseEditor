@@ -40,7 +40,10 @@ namespace WDE.TrinityMySqlDatabase.Models
 
         [Column(Name = "name")] 
         public string Name { get; set; } = "";
-
+        
+        [Column(Name = "subname")]
+        public string? SubName { get; set; } = "";
+        
         [Column(Name = "AIName")]
         public string AIName { get; set; } = "";
 
@@ -96,7 +99,10 @@ namespace WDE.TrinityMySqlDatabase.Models
 
         [Column(Name = "name")] 
         public string Name { get; set; } = "";
-
+        
+        [Column(Name = "subname")]
+        public string? SubName { get; set; } = "";
+        
         [Column(Name = "AIName")]
         public string AIName { get; set; } = "";
 

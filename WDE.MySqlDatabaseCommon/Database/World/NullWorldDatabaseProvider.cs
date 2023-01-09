@@ -18,6 +18,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public IEnumerable<IGameObjectTemplate> GetGameObjectTemplates() => Enumerable.Empty<IGameObjectTemplate>();
         
         public Task<IAreaTriggerScript?> GetAreaTriggerScript(int entry) => Task.FromResult<IAreaTriggerScript?>(null);
+        
+        public async Task<IAreaTriggerTemplate?> GetAreaTriggerTemplate(int entry) => null;
 
         public IQuestTemplate? GetQuestTemplate(uint entry) => null;
 

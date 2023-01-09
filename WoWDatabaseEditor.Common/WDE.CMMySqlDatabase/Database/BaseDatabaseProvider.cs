@@ -175,6 +175,8 @@ namespace WDE.CMMySqlDatabase.Database
         {
             return null;
         }
+        
+        public async Task<IAreaTriggerTemplate?> GetAreaTriggerTemplate(int entry) => null;
 
         public IEnumerable<IAreaTriggerTemplate> GetAreaTriggerTemplates()
         {

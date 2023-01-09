@@ -321,4 +321,10 @@ public class TrinityMasterMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvid
         await using var model = Database();
         return await model.QuestObjective.FirstOrDefaultAsync(x => x.ObjectiveId == objectiveId);
     }
+
+    public override async Task<IAreaTriggerTemplate?> GetAreaTriggerTemplate(int entry)
+    {
+        await using var model = Database();
+        return await model.AreaTriggerTemplate.FirstOrDefaultAsync(x => x.Id == entry);
+    }
 }

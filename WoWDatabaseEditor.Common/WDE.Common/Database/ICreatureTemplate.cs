@@ -10,6 +10,7 @@ namespace WDE.Common.Database
         short MinLevel { get; }
         short MaxLevel { get; }
         string Name { get; }
+        string? SubName { get; }
         string AIName { get; }
         string ScriptName { get; }
         public GameDefines.UnitFlags UnitFlags { get; }

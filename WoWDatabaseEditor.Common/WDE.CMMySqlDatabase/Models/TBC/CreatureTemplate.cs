@@ -26,7 +26,10 @@ public class CreatureTemplateTBC : ICreatureTemplate
 
     [Column("Name")]
     public string Name { get; set; } = "";
-
+    
+    [Column(Name = "SubName")]
+    public string? SubName { get; set; } = "";
+    
     [Column("AIName")] 
     public string AIName { get; set; } = "";
 

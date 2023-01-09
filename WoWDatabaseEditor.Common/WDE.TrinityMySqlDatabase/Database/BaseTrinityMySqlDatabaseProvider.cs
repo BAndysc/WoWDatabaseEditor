@@ -192,6 +192,11 @@ namespace WDE.TrinityMySqlDatabase.Database
             return await model.AreaTriggerScript.FirstOrDefaultAsync(script => script.Entry == entry);
         }
 
+        public virtual async Task<IAreaTriggerTemplate?> GetAreaTriggerTemplate(int entry)
+        {
+            return null;
+        }
+
         public IEnumerable<IAreaTriggerTemplate> GetAreaTriggerTemplates()
         {
             if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(IAreaTriggerTemplate)))

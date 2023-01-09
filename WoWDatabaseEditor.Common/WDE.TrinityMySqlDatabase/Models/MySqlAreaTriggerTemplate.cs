@@ -13,8 +13,9 @@ namespace WDE.TrinityMySqlDatabase.Models
         [PrimaryKey]
         [Column(Name = "IsServerSide")]
         public bool IsServerSide { get; set; }
-        
-        // [Column(Name = "ScriptName")]
-        // public string? ScriptName { get; set; }
+
+        public string? Name => null;
+        public string? ScriptName => null;
+        public string? AIName => null;
     }
 }

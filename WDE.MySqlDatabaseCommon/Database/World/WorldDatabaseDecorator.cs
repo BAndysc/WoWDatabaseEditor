@@ -20,6 +20,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public IGameObjectTemplate? GetGameObjectTemplate(uint entry) => impl.GetGameObjectTemplate(entry);
         public IEnumerable<IGameObjectTemplate> GetGameObjectTemplates() => impl.GetGameObjectTemplates();
         public Task<IAreaTriggerScript?> GetAreaTriggerScript(int entry) => impl.GetAreaTriggerScript(entry);
+        public Task<IAreaTriggerTemplate?> GetAreaTriggerTemplate(int entry) => impl.GetAreaTriggerTemplate(entry);
 
         public IQuestTemplate? GetQuestTemplate(uint entry) => impl.GetQuestTemplate(entry);
         public IEnumerable<IAreaTriggerTemplate> GetAreaTriggerTemplates() => impl.GetAreaTriggerTemplates();
