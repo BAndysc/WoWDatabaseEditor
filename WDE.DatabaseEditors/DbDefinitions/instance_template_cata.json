@@ -1,6 +1,6 @@
 {
   "id": "instance_template",
-  "compatibility": ["TrinityWrath", "Azeroth"],
+  "compatibility": ["TrinityCata"],
   "name": "Instance Template",
   "description": "Edit or create instance templates",
   "table_name": "instance_template",
@@ -31,11 +31,6 @@
           "name": "Script name",
           "db_column_name": "script",
           "value_type": "string"
-        },
-        {
-          "name": "Allow mounts",
-          "db_column_name": "allowMount",
-          "value_type": "BoolParameter"
         }
       ]
     }

@@ -13,8 +13,8 @@ public class TrinityMasterDatabase : BaseTrinityDatabase
     public ITable<TrinityMasterMySqlServersideSpell> SpellDbc => GetTable<TrinityMasterMySqlServersideSpell>();
     public ITable<MySqlGameObjectCata> GameObject => GetTable<MySqlGameObjectCata>();
     public ITable<MySqlCreatureModelInfoShadowlands> CreatureModelInfo => GetTable<MySqlCreatureModelInfoShadowlands>();
-    public ITable<MySqlCreatureAddon> CreatureAddon => GetTable<MySqlCreatureAddon>();
-    public ITable<MySqlCreatureTemplateAddon> CreatureTemplateAddon => GetTable<MySqlCreatureTemplateAddon>();
+    public ITable<MySqlCreatureAddonMaster> CreatureAddon => GetTable<MySqlCreatureAddonMaster>();
+    public ITable<MySqlCreatureTemplateAddonMaster> CreatureTemplateAddon => GetTable<MySqlCreatureTemplateAddonMaster>();
     public ITable<MySqlWrathQuestTemplateAddon> QuestTemplateAddon => GetTable<MySqlWrathQuestTemplateAddon>();
     public ITable<MySqlPlayerChoice> PlayerChoice => GetTable<MySqlPlayerChoice>();
     public ITable<MySqlPlayerChoiceResponse> PlayerChoiceResponse => GetTable<MySqlPlayerChoiceResponse>();

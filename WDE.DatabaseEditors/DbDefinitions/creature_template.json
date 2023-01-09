@@ -192,16 +192,35 @@
           "value_type": "CreatureParameter"
         },
         {
-          "name": "Bytes 1",
-          "db_column_name": "bytes1",
-          "foreign_table": "creature_template_addon",
-          "value_type": "uint"
+          "name": "Stand state",
+          "db_column_name": "StandState",
+          "value_type": "StandStateParameter",
+          "foreign_table": "creature_template_addon"
         },
         {
-          "name": "Bytes 2",
-          "db_column_name": "bytes2",
+          "name": "AnimTier",
+          "db_column_name": "AnimTier",
+          "value_type": "AnimTierParameter",
+          "foreign_table": "creature_template_addon"
+        },
+        {
+          "name": "VisFlags",
+          "db_column_name": "VisFlags",
+          "value_type": "int",
+          "foreign_table": "creature_template_addon"
+        },
+        {
+          "name": "SheathState",
+          "db_column_name": "SheathState",
+          "value_type": "SheathStateParameter",
           "foreign_table": "creature_template_addon",
-          "value_type": "uint"
+          "default": 1
+        },
+        {
+          "name": "PvPFlags",
+          "db_column_name": "PvPFlags",
+          "value_type": "UnitPVPStateFlagParameter",
+          "foreign_table": "creature_template_addon"
         },
         {
           "name": "Emote",

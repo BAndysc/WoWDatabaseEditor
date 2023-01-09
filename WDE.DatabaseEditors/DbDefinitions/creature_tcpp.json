@@ -142,16 +142,34 @@
           "foreign_table": "creature_addon"
         },
         {
-          "name": "Bytes 1",
-          "db_column_name": "bytes1",
-          "value_type": "UnitBytes1Parameter",
+          "name": "Stand state",
+          "db_column_name": "StandState",
+          "value_type": "StandStateParameter",
           "foreign_table": "creature_addon"
         },
         {
-          "name": "Bytes 2",
-          "db_column_name": "bytes2",
-          "value_type": "UnitBytes2Parameter",
-          "default": 1,
+          "name": "AnimTier",
+          "db_column_name": "AnimTier",
+          "value_type": "AnimTierParameter",
+          "foreign_table": "creature_addon"
+        },
+        {
+          "name": "VisFlags",
+          "db_column_name": "VisFlags",
+          "value_type": "int",
+          "foreign_table": "creature_addon"
+        },
+        {
+          "name": "SheathState",
+          "db_column_name": "SheathState",
+          "value_type": "SheathStateParameter",
+          "foreign_table": "creature_addon",
+          "default": 1
+        },
+        {
+          "name": "PvPFlags",
+          "db_column_name": "PvPFlags",
+          "value_type": "UnitPVPStateFlagParameter",
           "foreign_table": "creature_addon"
         },
         {

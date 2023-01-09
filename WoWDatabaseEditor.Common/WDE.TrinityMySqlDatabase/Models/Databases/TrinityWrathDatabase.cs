@@ -13,7 +13,7 @@ public class TrinityWrathDatabase : BaseTrinityDatabase
     public ITable<MySqlGameObjectWrath> GameObject => GetTable<MySqlGameObjectWrath>();
     public ITable<MySqlItemTemplate> ItemTemplate => GetTable<MySqlItemTemplate>();
     public ITable<MySqlCreatureModelInfo> CreatureModelInfo => GetTable<MySqlCreatureModelInfo>();
-    public ITable<MySqlCreatureAddon> CreatureAddon => GetTable<MySqlCreatureAddon>();
+    public ITable<MySqlCreatureAddonWrath> CreatureAddon => GetTable<MySqlCreatureAddonWrath>();
     public ITable<MySqlCreatureTemplateAddon> CreatureTemplateAddon => GetTable<MySqlCreatureTemplateAddon>();
     public ITable<MySqlWrathQuestTemplateAddon> QuestTemplateAddon => GetTable<MySqlWrathQuestTemplateAddon>();
     public ITable<MySqlBroadcastTextLocale> BroadcastTextLocale => GetTable<MySqlBroadcastTextLocale>();
