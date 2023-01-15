@@ -8,6 +8,7 @@ namespace WDE.Common.Managers
         int DesiredHeight { get; }
         string Title { get; }
         bool Resizeable { get; }
+        bool AutoSize => false;
 
         ICommand Accept { get; }
         ICommand Cancel { get; }

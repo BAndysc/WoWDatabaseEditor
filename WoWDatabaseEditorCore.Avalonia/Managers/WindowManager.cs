@@ -78,8 +78,16 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
                 else
                 { 
                     DialogWindow view = new DialogWindow();
-                    view.Height = viewModel.DesiredHeight;
-                    view.Width = viewModel.DesiredWidth;
+                    if (viewModel.AutoSize)
+                    {
+                        view.MinHeight = viewModel.DesiredHeight;
+                        view.MinWidth = viewModel.DesiredWidth;
+                    }
+                    else
+                    {
+                        view.Height = viewModel.DesiredHeight;
+                        view.Width = viewModel.DesiredWidth;
+                    }
                     view.DataContext = viewModel;
                     return await mainWindowHolder.ShowDialog<bool>(view);
                 }

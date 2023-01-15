@@ -14,6 +14,18 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.AppearanceService
         {
             set
             {
+                if (EffectiveThemeIsDark)
+                {
+                    // values around 0 looks bad, so let's change them to look better
+                    if (value.L >= 0.45f && value.L <= 0.5f)
+                    {
+                        value.L = 0.45f;
+                    }
+                    else if (value.L >= 0.5f && value.L < 0.55f)
+                    {
+                        value.L = 0.55f;
+                    }
+                }
                 Application.Current.Resources["AccentHue"] = value;
             }
         }

@@ -8,6 +8,7 @@
              WindowStartupLocation="CenterOwner"
              ShowInTaskbar="False"
              CanResize="{CompiledBinding Resizeable}"
+             SizeToContent="{CompiledBinding AutoSize, Converter={x:Static BoolToSizeToContentConverter.Default}}"
              utils:ViewBind.Model="{CompiledBinding}"
              Title="{CompiledBinding Title}"
              Name="ThisWindow"
