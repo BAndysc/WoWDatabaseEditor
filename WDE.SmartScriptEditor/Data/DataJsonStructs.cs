@@ -225,6 +225,9 @@ namespace WDE.SmartScriptEditor.Data
         [JsonProperty(PropertyName = "search_tags")]
         public string? SearchTags { get; set; }
         
+        [JsonProperty(PropertyName = "default_for", ItemConverterType = typeof(StringEnumConverter))]
+        public IList<SmartScriptType>? DefaultFor { get; set; }
+        
         public bool HasParameters()
         {
             return Parameters != null && Parameters.Count > 0;

@@ -1850,7 +1850,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             }
             else
             {
-                id = SmartConstants.EventUpdateInCombat;
+                id = smartDataManager.GetDefaultEvent(script.SourceType)?.Id ?? SmartConstants.EventUpdateInCombat;
             }
             
             if (id.HasValue)

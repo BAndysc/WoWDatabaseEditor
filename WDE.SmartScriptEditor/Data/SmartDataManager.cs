@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
+using WDE.Common.Database;
 using WDE.Common.Parameters;
 using WDE.Module.Attributes;
 using WDE.SmartScriptEditor.Editor;
@@ -35,6 +36,8 @@ namespace WDE.SmartScriptEditor.Data
         void Reload(SmartType smartType);
 
         int MaxId(SmartType type);
+
+        SmartGenericJsonData? GetDefaultEvent(SmartScriptType type);
     }
 
     [AutoRegister]
@@ -43,6 +46,7 @@ namespace WDE.SmartScriptEditor.Data
     {
         private readonly Dictionary<SmartType, Dictionary<int, SmartGenericJsonData>> smartIdData = new();
         private readonly Dictionary<SmartType, Dictionary<string, SmartGenericJsonData>> smartNameData = new();
+        private readonly Dictionary<(SmartType, SmartScriptType), int> defaults = new();
         private readonly ISmartDataProvider provider;
         private readonly IEditorFeatures editorFeatures;
         private readonly IParameterFactory parameterFactory;
@@ -172,6 +176,10 @@ namespace WDE.SmartScriptEditor.Data
             }
             else
                 throw new SmartDataWithSuchIdExists($"{type} with id {data.Id} ({data.Name}) exists");
+
+            if (data.DefaultFor != null)
+                foreach (var scriptType in data.DefaultFor)
+                    defaults[(type, scriptType)] = data.Id;
         }
 
         private void Add(SmartType type, SmartGenericJsonData data)
@@ -219,6 +227,14 @@ namespace WDE.SmartScriptEditor.Data
             }
 
             return 0;
+        }
+
+        public SmartGenericJsonData? GetDefaultEvent(SmartScriptType type)
+        {
+            if (defaults.TryGetValue((SmartType.SmartEvent, type), out var id) &&
+                smartIdData[SmartType.SmartEvent].TryGetValue(id, out var data))
+                return data;
+            return null;
         }
     }
 
