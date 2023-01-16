@@ -1,6 +1,7 @@
 ﻿using System;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.VisualTree;
 using AvaloniaStyles.Controls;
@@ -17,7 +18,10 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.Views
         public SmartSelectView()
         {
             InitializeComponent();
+            var searchTextBox = this.FindControl<TextBox>("SearchTextBox");
+            searchTextBox.AddHandler(KeyDownEvent, InputElement_OnKeyDown, RoutingStrategies.Tunnel);
         }
+        
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);
@@ -26,7 +30,8 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.Views
         // down arrow focus first element
         private void InputElement_OnKeyDown(object? sender, KeyEventArgs e)
         {
-            if (e.Key != Key.Down)
+            var textBox = (TextBox)sender!;
+            if (!(e.Key == Key.Down || e.Key == Key.Right && textBox.SelectionStart == textBox.Text.Length))
                 return;
 
             if (DataContext is SmartSelectViewModel vm)

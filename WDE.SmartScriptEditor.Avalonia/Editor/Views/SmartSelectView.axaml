@@ -53,7 +53,7 @@
                                    AcceptsReturn="False"
                                    Watermark="Search"
                                    Text="{CompiledBinding SearchBox}"
-                                   KeyDown="InputElement_OnKeyDown"
+                                   Name="SearchTextBox"
                                    HorizontalAlignment="Right"
                                    VerticalContentAlignment="Center"
                                    utils:FocusUtils.FocusFirst="True" />
