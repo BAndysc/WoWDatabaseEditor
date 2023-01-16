@@ -2348,8 +2348,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
             viewModel.KeyBindings.Add(new CommandKeyBinding(new AsyncAutoCommand(() => selectEventTypeCommand()), "Ctrl+E"));
             viewModel.KeyBindings.Add(new CommandKeyBinding(new AsyncAutoCommand(() => selectEventTypeCommand()), "Cmd+E"));
-            viewModel.KeyBindings.Add(new CommandKeyBinding(viewModel.AcceptOpenNext, "Ctrl+A"));
-            viewModel.KeyBindings.Add(new CommandKeyBinding(viewModel.AcceptOpenNext, "Cmd+A"));
+            viewModel.KeyBindings.Add(new CommandKeyBinding(viewModel.AcceptOpenNext, "Ctrl+A", true));
+            viewModel.KeyBindings.Add(new CommandKeyBinding(viewModel.AcceptOpenNext, "Cmd+A", true));
 
             return viewModel;
         }
