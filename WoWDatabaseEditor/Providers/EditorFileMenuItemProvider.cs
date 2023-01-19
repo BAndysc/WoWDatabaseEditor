@@ -15,6 +15,7 @@ using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Solution;
 using WDE.Common.Utils;
+using WDE.Common.Windows;
 using WDE.Module.Attributes;
 using WDE.Solutions;
 using WoWDatabaseEditorCore.Managers;
@@ -62,7 +63,9 @@ namespace WoWDatabaseEditorCore.Providers
                 new DelegateCommand(
                         () =>
                         {
-                            if (DocumentManager.ActiveSolutionItemDocument != null)
+                            if (DocumentManager.SelectedTool != null && DocumentManager.SelectedTool is ISavableTool savable)
+                                savable.Save.Execute(null);
+                            else if (DocumentManager.ActiveSolutionItemDocument != null)
                                 solutionTasksService.Save(DocumentManager.ActiveSolutionItemDocument!).ListenErrors();
                             else
                             {
@@ -75,8 +78,9 @@ namespace WoWDatabaseEditorCore.Providers
                                 Func().ListenErrors();
                             }
                         },
-                () => solutionTasksService.CanSaveToDatabase && (DocumentManager.ActiveDocument?.Save.CanExecute(null) ?? false))
+                () => solutionTasksService.CanSaveToDatabase && (DocumentManager.SelectedTool is ISavableTool || (DocumentManager.ActiveDocument?.Save.CanExecute(null) ?? false)))
                     .ObservesProperty(() => DocumentManager.ActiveDocument)
+                    .ObservesProperty(() => DocumentManager.SelectedTool)
                     .ObservesProperty(() => DocumentManager.ActiveDocument!.IsModified), new("Control+S")));
             
             SubItems.Add(new ModuleMenuItem("_Generate query", 

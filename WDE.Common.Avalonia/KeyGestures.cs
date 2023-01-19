@@ -21,5 +21,7 @@ namespace WDE.Common.Avalonia
 
         public static KeyGesture Redo { get; } = AvaloniaLocator.Current
             .GetService<PlatformHotkeyConfiguration>()?.Redo.FirstOrDefault() ?? new KeyGesture(Key.Y, KeyModifiers.Control);
+        
+        public static KeyGesture Save { get; } = new KeyGesture(Key.S, AvaloniaLocator.Current.GetService<PlatformHotkeyConfiguration>()?.CommandModifiers ?? KeyModifiers.Control);
     }
 }
