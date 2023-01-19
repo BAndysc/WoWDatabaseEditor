@@ -9,7 +9,6 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         Task<IReadOnlyList<ICreatureTemplate>> GetCreatureTemplatesAsync();
         Task<List<IConversationTemplate>> GetConversationTemplatesAsync();
         Task<List<IGameEvent>> GetGameEventsAsync();
-        Task<List<IAreaTriggerTemplate>> GetAreaTriggerTemplatesAsync();
         Task<List<IGameObjectTemplate>> GetGameObjectTemplatesAsync();
         Task<List<IQuestTemplate>> GetQuestTemplatesAsync();
         Task<List<INpcText>> GetNpcTextsAsync();

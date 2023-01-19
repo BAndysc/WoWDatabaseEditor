@@ -106,6 +106,7 @@ namespace WDE.Parameters
             factory.Register("NpcTextParameter", AddDatabaseParameter(new NpcTextParameter(database)));
             factory.Register("PlayerChoiceParameter", AddAsyncDatabaseParameter(new PlayerChoiceParameter(database)));
             factory.Register("PlayerChoiceResponseParameter", AddAsyncDatabaseParameter(new PlayerChoiceResponseParameter(database)));
+            factory.Register("ServersideAreatriggerParameter", AddAsyncDatabaseParameter(new ServersideAreatriggerParameter(database)));
             factory.Register("ConversationTemplateParameter", new ConversationTemplateParameter(database));
             factory.Register("BoolParameter", new BoolParameter());
             factory.Register("FlagParameter", new FlagParameter());
@@ -656,6 +657,24 @@ namespace WDE.Parameters
             if (choices != null)
                 foreach (var item in choices)
                     Items.Add(item.ResponseId, new SelectOption(item.Answer));
+        }
+    }
+    
+    public class ServersideAreatriggerParameter : LateAsyncLoadParameter
+    {
+        private readonly IDatabaseProvider database;
+
+        public ServersideAreatriggerParameter(IDatabaseProvider database)
+        {
+            this.database = database;
+        }
+        
+        public override async Task LateLoad()
+        {
+            Items = new Dictionary<long, SelectOption>();
+            var templates = await database.GetAreaTriggerTemplatesAsync();
+            foreach (var template in templates)
+                Items.Add(template.Id, new SelectOption(template.Name ?? $"Serverside areatrigger {template.Id}"));
         }
     }
 }

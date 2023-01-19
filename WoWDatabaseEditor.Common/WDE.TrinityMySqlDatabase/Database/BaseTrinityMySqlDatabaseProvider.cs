@@ -232,7 +232,7 @@ namespace WDE.TrinityMySqlDatabase.Database
             return (from t in model.CreatureClassLevelStats select t).ToList<ICreatureClassLevelStat>();
         }
 
-        public async Task<List<IAreaTriggerTemplate>> GetAreaTriggerTemplatesAsync()
+        public async Task<IList<IAreaTriggerTemplate>> GetAreaTriggerTemplatesAsync()
         {
             if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(IAreaTriggerTemplate)))
                 return new List<IAreaTriggerTemplate>();

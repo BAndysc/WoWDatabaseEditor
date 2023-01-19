@@ -124,7 +124,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         
         public Task<List<IGameEvent>> GetGameEventsAsync() => Task.FromResult(new List<IGameEvent>());
 
-        public Task<List<IAreaTriggerTemplate>> GetAreaTriggerTemplatesAsync() => Task.FromResult(new List<IAreaTriggerTemplate>());
+        public Task<IList<IAreaTriggerTemplate>> GetAreaTriggerTemplatesAsync() => Task.FromResult<IList<IAreaTriggerTemplate>>(new List<IAreaTriggerTemplate>());
 
         public Task<List<IGameObjectTemplate>> GetGameObjectTemplatesAsync() => Task.FromResult(new List<IGameObjectTemplate>());
 

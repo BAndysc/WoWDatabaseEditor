@@ -1,6 +1,7 @@
 ﻿using System;
 using WDE.Common.Database;
 using WDE.Common.DBC;
+using WDE.Common.Parameters;
 using WDE.Common.Solution;
 using WDE.SmartScriptEditor.Models;
 
@@ -11,12 +12,17 @@ namespace WDE.SmartScriptEditor.Providers
         private readonly IDatabaseProvider database;
         private readonly ISpellStore spellStore;
         private readonly IDbcStore dbcStore;
+        private readonly IParameterFactory parameterFactory;
 
-        public SmartScriptNameProviderBase(IDatabaseProvider database, ISpellStore spellStore, IDbcStore dbcStore)
+        public SmartScriptNameProviderBase(IDatabaseProvider database, 
+            ISpellStore spellStore, 
+            IDbcStore dbcStore,
+            IParameterFactory parameterFactory)
         {
             this.database = database;
             this.spellStore = spellStore;
             this.dbcStore = dbcStore;
+            this.parameterFactory = parameterFactory;
         }
 
         protected virtual string? TryGetName(int entryOrGuid, SmartScriptType type)
@@ -62,6 +68,11 @@ namespace WDE.SmartScriptEditor.Providers
                         if (database.GetCreatureTemplate((uint)creatureId) is { } battleCreature)
                             return battleCreature.Name;
                     }
+                    break;
+                case SmartScriptType.AreaTriggerEntityServerSide:
+                    var param = parameterFactory.Factory("ServersideAreatriggerParameter");
+                    if (param.Items?.TryGetValue(entryOrGuid, out var name) ?? false)
+                        return name.Name;
                     break;
                 default:
                     return null;

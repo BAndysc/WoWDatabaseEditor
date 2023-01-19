@@ -31,7 +31,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         
         private Dictionary<uint, IReadOnlyList<ICreatureText>?> creatureTextsCache = new();
 
-        private List<IAreaTriggerTemplate>? areaTriggerTemplates;
+        private IList<IAreaTriggerTemplate>? areaTriggerTemplates;
         private List<IGameEvent>? gameEventsCache;
         private List<IConversationTemplate>? conversationTemplates;
         private List<IGossipMenu>? gossipMenusCache;
@@ -227,6 +227,11 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public async Task<IQuestObjective?> GetQuestObjectiveById(uint objectiveId) => await nonCachedDatabase.GetQuestObjectiveById(objectiveId);
 
         public Task<IQuestRequestItem?> GetQuestRequestItem(uint entry) => nonCachedDatabase.GetQuestRequestItem(entry);
+
+        public async Task<IList<IAreaTriggerTemplate>> GetAreaTriggerTemplatesAsync()
+        {
+            return areaTriggerTemplates ?? await nonCachedDatabase.GetAreaTriggerTemplatesAsync();
+        }
 
         public IEnumerable<ICreatureClassLevelStat> GetCreatureClassLevelStats() =>
             creatureClassLevelStatsCache ?? nonCachedDatabase.GetCreatureClassLevelStats();

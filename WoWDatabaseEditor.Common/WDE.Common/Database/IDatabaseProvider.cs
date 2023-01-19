@@ -20,6 +20,7 @@ namespace WDE.Common.Database
         Task<IAreaTriggerScript?> GetAreaTriggerScript(int entry);
         Task<IAreaTriggerTemplate?> GetAreaTriggerTemplate(int entry);
         IEnumerable<IAreaTriggerTemplate> GetAreaTriggerTemplates();
+        Task<IList<IAreaTriggerTemplate>> GetAreaTriggerTemplatesAsync();
 
         IEnumerable<ICreatureClassLevelStat> GetCreatureClassLevelStats();
 

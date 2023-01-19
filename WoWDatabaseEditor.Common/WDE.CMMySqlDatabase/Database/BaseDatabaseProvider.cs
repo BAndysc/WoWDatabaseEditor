@@ -189,7 +189,7 @@ namespace WDE.CMMySqlDatabase.Database
         
         public async Task<IList<ISmartScriptLine>> GetScriptForAsync(int entryOrGuid, SmartScriptType type) => new List<ISmartScriptLine>();
 
-        public async Task<List<IAreaTriggerTemplate>> GetAreaTriggerTemplatesAsync()
+        public async Task<IList<IAreaTriggerTemplate>> GetAreaTriggerTemplatesAsync()
         {
             return new List<IAreaTriggerTemplate>();
         }
