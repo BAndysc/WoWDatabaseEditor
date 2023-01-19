@@ -195,6 +195,10 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     if (smartDataManager.Contains(type, member))
                     {
                         SmartGenericJsonData data = smartDataManager.GetDataByName(type, member);
+                        
+                        if (data.Deprecated)
+                            continue;
+
                         if (predicate != null && !predicate(data))
                             continue;
 
