@@ -63,25 +63,33 @@ public class CreatureTextParameter : IContextualParameter<long, SmartBaseElement
 
     private uint? GetEntry(SmartBaseElement? element)
     {
+        uint? GetCreatureEntryFromScript(SmartScript smartScript)
+        {
+            if (smartScript.EntryOrGuid >= 0)
+            {
+                if (smartScript.SourceType is SmartScriptType.Template or SmartScriptType.TimedActionList)
+                    return (uint)smartScript.EntryOrGuid / 100;
+
+                return (uint)smartScript.EntryOrGuid;
+            }
+
+            return databaseProvider.GetCreatureByGuid((uint)(-smartScript.EntryOrGuid))?.Entry;
+        }
+
         var script = GetScript(element);
-        if (script == null)
+        if (script == null || script is not SmartScript smartScript)
             return null;
+        if (element is SmartEvent)
+        {
+            return GetCreatureEntryFromScript(smartScript);
+        }
         if (element is SmartAction action)
         {
             if ((action.GetParameter(2).Value != 0 ||
                 action.Source.Id == SmartConstants.SourceNone ||
-                action.Source.Id == SmartConstants.SourceSelf)
-                && script is SmartScript smartScript)
+                action.Source.Id == SmartConstants.SourceSelf))
             {
-                if (smartScript.EntryOrGuid >= 0)
-                {
-                    if (smartScript.SourceType is SmartScriptType.Template or SmartScriptType.TimedActionList)
-                        return (uint)smartScript.EntryOrGuid / 100;
-                    
-                    return (uint)smartScript.EntryOrGuid;
-                }
-
-                return databaseProvider.GetCreatureByGuid((uint)(-smartScript.EntryOrGuid))?.Entry;
+                return GetCreatureEntryFromScript(smartScript);
             }
             else if (action.Source.Id == 10) // creature guid
                 return databaseProvider.GetCreatureByGuid((uint)action.Source.GetParameter(0).Value)?.Entry;
