@@ -1,12 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows.Input;
+using Avalonia;
 using Avalonia.Collections;
 using Avalonia.Controls;
+using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using Avalonia.VisualTree;
 using Prism.Commands;
+using WDE.Common.Avalonia.Controls;
+using WDE.Common.Utils;
 using WDE.SmartScriptEditor.Editor.ViewModels;
+using WDE.SmartScriptEditor.Models;
 
 namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
 {
@@ -31,13 +37,14 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
             var dataContext = DataContext as SmartScriptEditorViewModel;
             var control = sender as Control;
             var contextMenu = control?.ContextMenu;
-
+            
             if (contextMenu == null || dataContext == null)
                 return;
 
+            var topLevel = control.GetVisualRoot() as TopLevel;
+            var pointerOverElement = topLevel?.GetValue(TopLevel.PointerOverElementProperty);
+
             var dynamicMenuItems = dataContext.GetDynamicContextMenuForSelected();
-            if (dynamicMenuItems == null)
-                return;
             
             var items = contextMenu.Items as AvaloniaList<object>;
             if (items == null)
@@ -68,12 +75,27 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
                 temporaryMenuItems.Add(separator);
             }
 
-            if (dynamicMenuItems.Count > 0)
+            bool anythingAdded = false;
+
+            if (pointerOverElement is FormattedTextBlock ftb && ftb.OverContext is ParameterWithContext context)
+            {
+                AddMenuItem("Copy parameter value", new DelegateCommand(() =>
+                {
+                    AvaloniaLocator.Current.GetService<IClipboard>().SetTextAsync(context.Parameter.Value.ToString()).ListenErrors();
+                }));
+                anythingAdded = true;
+            }
+            
+            if (dynamicMenuItems != null && dynamicMenuItems.Count > 0)
             {
                 foreach (var menu in dynamicMenuItems)
                     AddMenuItem(menu.Name, menu);
-                AddSeparator();
+                anythingAdded = true;
+            }
 
+            if (anythingAdded)
+            {
+                AddSeparator();
                 contextMenu.MenuClosed += MenuClosed;   
             }
         }
