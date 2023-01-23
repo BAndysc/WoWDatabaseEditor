@@ -123,20 +123,64 @@ namespace WDE.SmartScriptEditor.Data
         public static List<string> GetAllTypes() => new() {Self, Creature, GameObject, Player, Position};
     }
 
+    public enum SmartContextMenuCommand
+    {
+        None,
+        AddEvent,
+        OpenScript
+    }
+
+    public class SmartContextMenuCopyParameter
+    {
+        [JsonProperty(PropertyName = "const")]
+        public long? Const { get; set; }
+        
+        [JsonProperty(PropertyName = "from")]
+        public int From { get; set; }
+        
+        [JsonProperty(PropertyName = "to")]
+        public int To { get; set; }
+    }
+
+    public class SmartContextMenuData
+    {
+        [JsonProperty(PropertyName = "header")]
+        public string Header { get; set; } = "";
+        
+        [JsonProperty(PropertyName = "command", ItemConverterType = typeof(StringEnumConverter))]
+        public SmartContextMenuCommand Command { get; set; }
+        
+        // AddEvent
+        
+        [JsonProperty(PropertyName = "event_id")]
+        public string? EventId { get; set; }
+
+        [JsonProperty(PropertyName = "fill_parameters")]
+        public IList<SmartContextMenuCopyParameter>? FillParameters { get; set; }
+        
+        // OpenScript
+        
+        [JsonProperty(PropertyName = "script_type", ItemConverterType = typeof(StringEnumConverter))]
+        public SmartScriptType ScriptType { get; set; }
+
+        [JsonProperty(PropertyName = "entry_from_parameter")]
+        public int EntryFromParameter { get; set; }
+    }
+    
     [ExcludeFromCodeCoverage]
-    public struct SmartGenericJsonData
+    public class SmartGenericJsonData
     {
         [JsonProperty(PropertyName = "id")]
         public int Id { get; set; }
 
         [JsonProperty(PropertyName = "name")]
-        public string Name { get; set; }
+        public string Name { get; set; } = "";
 
         [JsonProperty(PropertyName = "name_readable")]
-        public string NameReadable { get; set; }
+        public string NameReadable { get; set; } = "";
 
         [JsonProperty(PropertyName = "help")]
-        public string Help { get; set; }
+        public string Help { get; set; } = "";
 
         [JsonProperty(PropertyName = "deprecated")]
         public bool Deprecated { get; set; }
@@ -151,7 +195,7 @@ namespace WDE.SmartScriptEditor.Data
         public IList<SmartStringParameterJsonData>? StringParameters { get; set; }
 
         [JsonProperty(PropertyName = "description")]
-        public string Description { get; set; }
+        public string Description { get; set; } = "";
 
         [JsonProperty(PropertyName = "types")]
         public SmartSourceTargetType RawTypes { get; set; }
@@ -218,15 +262,18 @@ namespace WDE.SmartScriptEditor.Data
         
         [JsonProperty(PropertyName = "builtin_rules")]
         public IList<string>? BuiltinRules { get; set; }
-        
+
         [JsonProperty(PropertyName = "tooltip")]
-        public string Tooltip { get; set; }
+        public string Tooltip { get; set; } = "";
 
         [JsonProperty(PropertyName = "search_tags")]
         public string? SearchTags { get; set; }
         
         [JsonProperty(PropertyName = "default_for", ItemConverterType = typeof(StringEnumConverter))]
         public IList<SmartScriptType>? DefaultFor { get; set; }
+        
+        [JsonProperty(PropertyName = "context_menu")]
+        public IList<SmartContextMenuData>? ContextMenu { get; set; }
         
         public bool HasParameters()
         {

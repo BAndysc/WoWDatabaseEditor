@@ -154,7 +154,7 @@ namespace WDE.SmartScriptEditor.Models
                 if (parentEventData?.Invoker == null)
                     return "Last action invoker";
 
-                return parentEventData.Value.Invoker.Name;
+                return parentEventData.Invoker.Name;
             }
             catch (Exception)
             {

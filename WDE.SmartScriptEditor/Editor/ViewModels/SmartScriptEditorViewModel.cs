@@ -15,6 +15,7 @@ using WDE.Common;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;
 using WDE.Common.Disposables;
+using WDE.Common.Events;
 using WDE.Common.History;
 using WDE.Common.Managers;
 using WDE.Common.Outliner;
@@ -146,7 +147,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             IGeneralSmartScriptSettingsProvider preferences,
             IOutlinerService outlinerService,
             ISmartScriptOutlinerModel outlinerData,
-            ISmartHighlighter highlighter)
+            ISmartHighlighter highlighter,
+            IDynamicContextMenuService dynamicContextMenuService)
         {
             History = history;
             this.smartScriptDatabase = smartScriptDatabase;
@@ -176,6 +178,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             this.outlinerService = outlinerService;
             this.outlinerData = outlinerData;
             this.highlighter = highlighter;
+            this.dynamicContextMenuService = dynamicContextMenuService;
+            this.eventAggregator = eventAggregator;
             selectedHighlighter = highlighter.Highlighters[0];
             script = null!;
             this.item = null!;
@@ -1424,7 +1428,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         private int LastSelectedGroupIndex =>
             Events.Select((e, index) => (e.IsSelected && e.IsBeginGroup, index)).Where(p => p.Item1).Select(p => p.index).LastOrDefault(-1);
 
-        private (int eventIndex, int actionIndex) FirstSelectedActionIndex =>
+        public (int eventIndex, int actionIndex) FirstSelectedActionIndex =>
             Events.SelectMany((e, eventIndex) => e.Actions.Select((a, actionIndex) => (a.IsSelected, eventIndex, actionIndex)))
                 .Where(p => p.IsSelected)
                 .Select(p => (p.eventIndex, p.actionIndex))
@@ -1571,7 +1575,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             obj.Parent?.Actions.Remove(obj);
         }
 
-        private async Task AddActionCommand(NewActionViewModel obj, bool openActionPickerInstantly)
+        internal async Task AddActionCommand(NewActionViewModel obj, bool openActionPickerInstantly)
         {
             SmartEvent? e = obj.Event;
             if (e == null)
@@ -1751,7 +1755,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     return (eventSupportsActionInvoker || !data.IsInvoker) &&
                            (data.UsableWithScriptTypes == null ||
                             data.UsableWithScriptTypes.Contains(script.SourceType)) &&
-                           (!actionData.HasValue || actionData.Value.TargetTypes == SmartSourceTargetType.None || (data.Types(script.SourceType) != SmartSourceTargetType.None && (actionData.Value.TargetTypes & data.Types(script.SourceType)) != 0));
+                           (actionData == null || actionData.TargetTypes == SmartSourceTargetType.None || (data.Types(script.SourceType) != SmartSourceTargetType.None && (actionData.TargetTypes & data.Types(script.SourceType)) != 0));
                 }, BuildStoredObjectsList());
         }
 
@@ -1768,7 +1772,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     if (data.IsOnlyTarget)
                         return false;
 
-                    if (actionData.HasValue && !IsSourceCompatibleWithAction(data, actionData.Value))
+                    if (actionData != null && !IsSourceCompatibleWithAction(data, actionData))
                         return false;
 
                     if (data.UsableWithEventTypes != null && parentEvent != null && !data.UsableWithEventTypes.Contains(parentEvent.Id))
@@ -1833,7 +1837,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     
                     return (data.UsableWithScriptTypes == null ||
                             data.UsableWithScriptTypes.Contains(script.SourceType)) &&
-                           (!sourceData.HasValue || IsSourceCompatibleWithAction(sourceData.Value, data)) &&
+                           (sourceData == null || IsSourceCompatibleWithAction(sourceData, data)) &&
                            (showCommentMetaAction || data.Id != SmartConstants.ActionComment);
                 });
             if (result.HasValue)
@@ -1974,19 +1978,19 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     var actionData = actionType.HoldsMultipleValues
                         ? (SmartGenericJsonData?)null
                         : smartDataManager.GetRawData(SmartType.SmartAction, actionType.Value);
-                    if (actionData.HasValue && !IsSourceCompatibleWithAction(newSourceData, actionData.Value))
+                    if (actionData != null && !IsSourceCompatibleWithAction(newSourceData, actionData))
                     {
                         var sourceData = smartDataManager.GetRawData(SmartType.SmartSource, newId);
                         var dialog = new MessageBoxFactory<bool>()
                             .SetTitle("Incorrect source for chosen action")
                             .SetMainInstruction(
-                                $"The source you have chosen ({sourceData.NameReadable}) is not supported with action {actionData.Value.NameReadable}");
-                        if (string.IsNullOrEmpty(actionData.Value.ImplicitSource))
+                                $"The source you have chosen ({sourceData.NameReadable}) is not supported with action {actionData.NameReadable}");
+                        if (string.IsNullOrEmpty(actionData.ImplicitSource))
                             dialog.SetContent(
-                                $"Selected source can be one of: {sourceData.RawTypes}. However, current action requires one of: {actionData.Value.TargetTypes}");
+                                $"Selected source can be one of: {sourceData.RawTypes}. However, current action requires one of: {actionData.TargetTypes}");
                         else
                             dialog.SetContent(
-                                $"In TrinityCore some actions do not support some sources, this is one of the case. Following action will ignore chosen source and will use source: {actionData.Value.ImplicitSource}");
+                                $"In TrinityCore some actions do not support some sources, this is one of the case. Following action will ignore chosen source and will use source: {actionData.ImplicitSource}");
                         await messageBoxService.ShowDialog(dialog.SetIcon(MessageBoxIcon.Information).Build());
                     }
 
@@ -2006,7 +2010,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     actionType.Value = newActionIndex.Value;
                 }, actionDataObservable.Select(a => a?.NameReadable ?? "---"), null, actionType);
                 
-                var canPickTarget = actionDataObservable.Select(actionData => !actionData.HasValue || actionData.Value.TargetTypes != SmartSourceTargetType.None);
+                var canPickTarget = actionDataObservable.Select(actionData => actionData == null || actionData.TargetTypes != SmartSourceTargetType.None);
 
                 var selectTarget = new EditableActionData("Type", "Target", async () =>
                 {
@@ -2380,6 +2384,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
         private ISmartScriptOutlinerModel outlinerData;
         private readonly ISmartHighlighter highlighter;
+        private readonly IDynamicContextMenuService dynamicContextMenuService;
+        private readonly IEventAggregator eventAggregator;
         private ValuePublisher<IOutlinerModel> outlinerModel = new ValuePublisher<IOutlinerModel>();
         public IObservable<IOutlinerModel> OutlinerModel => outlinerModel;
 
@@ -2443,6 +2449,24 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     c.ColorId = (selectedHighlighter.HighlightIndex, value);
                 }
             }
+        }
+
+        public IReadOnlyList<INamedCommand>? GetDynamicContextMenuForSelected()
+        {
+            if (AnyEventSelected)
+                return null;
+            
+            if (AnyActionSelected && !MultipleActionsSelected)
+            {
+                var selectedActionIndex = FirstSelectedActionIndex;
+                var selectedAction = Events[selectedActionIndex.eventIndex].Actions[selectedActionIndex.actionIndex];
+
+                var enumerable = dynamicContextMenuService.GenerateContextMenu(this, selectedAction);
+
+                return enumerable?.ToList();
+            }
+            
+            return null;
         }
     }
 }

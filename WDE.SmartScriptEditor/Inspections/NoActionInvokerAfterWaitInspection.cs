@@ -19,7 +19,7 @@ namespace WDE.SmartScriptEditor.Inspections
                 if (a.Source.Id != SmartConstants.SourceNone)
                 {
                     var sourceData = e.Parent?.TryGetSourceData(a.Source);
-                    if (sourceData.HasValue && sourceData.Value.IsInvoker)
+                    if (sourceData != null && sourceData.IsInvoker)
                         return new InspectionResult()
                         {
                             Severity = DiagnosticSeverity.Error,
@@ -30,7 +30,7 @@ namespace WDE.SmartScriptEditor.Inspections
                 if (a.Target.Id != SmartConstants.TargetNone)
                 {
                     var sourceData = e.Parent?.TryGetSourceData(a.Target);
-                    if (sourceData.HasValue && sourceData.Value.IsInvoker)
+                    if (sourceData != null && sourceData.IsInvoker)
                         return new InspectionResult()
                         {
                             Severity = DiagnosticSeverity.Error,

@@ -61,7 +61,7 @@
         RenderTransform="{CompiledBinding Scale, Converter={StaticResource FloatToScaleTransformConverter}}"
         >
         <Panel>
-            <DockPanel>
+            <DockPanel ContextRequested="Control_OnContextRequested">
                 <DockPanel.ContextMenu>
                     <ContextMenu>
                         <MenuItem Command="{CompiledBinding NewActionAboveCommand}" IsVisible="{CompiledBinding AnySelected}" Header="New action above" />
