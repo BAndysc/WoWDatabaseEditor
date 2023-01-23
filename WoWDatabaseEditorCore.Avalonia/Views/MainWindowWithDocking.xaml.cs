@@ -4,7 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using Avalonia.VisualTree;
 using AvaloniaStyles;
 using AvaloniaStyles.Controls;
 using Dock.Avalonia.Controls;
@@ -103,9 +106,10 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);
+            AddHandler(KeyUpEvent, OnKeyUpTunneled, RoutingStrategies.Tunnel);
             
             DockControl dock = this.FindControl<DockControl>("DockControl");
-
+            
             SerializedDock? serializedDock = null;
             if (fileSystem.Exists(DockSettingsFile))
             {
@@ -137,6 +141,38 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
                 }
             }
             WindowState = (lastSize.WasMaximized ?? false) ? WindowState.Maximized : WindowState.Normal;
+        }
+
+        private void OnKeyUpTunneled(object? sender, KeyEventArgs e)
+        {
+            // I can't do it in KeyBindings, because it needs to be handled in tunnel handler
+            // also don't do it in OnKeyDown, because it is not fired for control + tab
+            if (e.KeyModifiers.HasFlagFast(KeyModifiers.Control) &&
+                e.Key == Key.Tab)
+            {
+                var documentControl = FocusManager.Instance.Current?.FindAncestorOfType<DocumentControl>() ?? this.FindDescendantOfType<DocumentControl>();
+                if (documentControl?.DataContext is not FocusAwareDocumentDock documentDock)
+                    return;
+                    
+                if (documentDock.ActiveDockable == null || documentDock.VisibleDockables == null)
+                    return;
+                    
+                var activeDockableIndex = documentDock.VisibleDockables.IndexOf(documentDock.ActiveDockable);
+                if (activeDockableIndex == -1)
+                    return;
+
+                var direction = e.KeyModifiers.HasFlagFast(KeyModifiers.Shift) ? -1 : 1;
+
+                activeDockableIndex = activeDockableIndex + direction;
+                if (activeDockableIndex == documentDock.VisibleDockables.Count)
+                    activeDockableIndex = 0;
+                if (activeDockableIndex == -1)
+                    activeDockableIndex = documentDock.VisibleDockables.Count - 1;
+
+                documentDock.ActiveDockable = documentDock.VisibleDockables[activeDockableIndex];
+                
+                e.Handled = true;
+            }
         }
 
         protected override void OnDataContextChanged(EventArgs e)
