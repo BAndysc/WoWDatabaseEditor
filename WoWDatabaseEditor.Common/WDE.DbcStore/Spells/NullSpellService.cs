@@ -14,12 +14,20 @@ namespace WDE.DbcStore.Spells
         public uint? GetSpellFocus(uint spellId) => null;
         
         public TimeSpan? GetSpellCastingTime(uint spellId) => null;
+        
+        public TimeSpan? GetSpellDuration(uint spellId) => null;
+
+        public TimeSpan? GetSpellCategoryRecoveryTime(uint spellId) => null;
 
         public string? GetDescription(uint spellId) => null;
 
         public int GetSpellEffectsCount(uint spellId) => 0;
+        
+        public SpellAuraType GetSpellAuraType(uint spellId, int effectIndex) => SpellAuraType.None;
 
         public SpellEffectType GetSpellEffectType(uint spellId, int index) => SpellEffectType.None;
+
+        public SpellTargetFlags GetSpellTargetFlags(uint spellId) => SpellTargetFlags.None;
 
         public (SpellTarget, SpellTarget) GetSpellEffectTargetType(uint spellId, int index) =>
             (SpellTarget.NoTarget, SpellTarget.NoTarget);

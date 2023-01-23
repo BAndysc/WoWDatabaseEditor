@@ -283,6 +283,16 @@ namespace WDE.DbcStore.Spells.Wrath
             return null;
         }
 
+        public TimeSpan? GetSpellDuration(uint spellId)
+        {
+            return null;
+        }
+
+        public TimeSpan? GetSpellCategoryRecoveryTime(uint spellId)
+        {
+            return null;
+        }
+
         public string? GetDescription(uint spellId)
         {
             if (spellIndices.TryGetValue(spellId, out var spellIndex))
@@ -299,11 +309,21 @@ namespace WDE.DbcStore.Spells.Wrath
             return 0;
         }
 
+        public SpellAuraType GetSpellAuraType(uint spellId, int effectIndex)
+        {
+            return SpellAuraType.None;
+        }
+
         public SpellEffectType GetSpellEffectType(uint spellId, int index)
         {
             if (spellIndices.TryGetValue(spellId, out var spellIndex))
                 return spells[spellIndex].Effect[index];
             return SpellEffectType.None;
+        }
+
+        public SpellTargetFlags GetSpellTargetFlags(uint spellId)
+        {
+            return SpellTargetFlags.None;
         }
 
         public (SpellTarget, SpellTarget) GetSpellEffectTargetType(uint spellId, int index)

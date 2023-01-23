@@ -526,6 +526,33 @@ namespace WDE.Common.Services
     {
         PreventJumpingDuringPrecast = 0x1,
     }
+
+    [Flags]
+    public enum SpellTargetFlags : uint
+    {
+        None            = 0x00000000,
+        Unused1        = 0x00000001,               // not used
+        Unit            = 0x00000002,               // pguid
+        UnitRaid       = 0x00000004,               // not sent, used to validate target (if raid member)
+        UnitParty      = 0x00000008,               // not sent, used to validate target (if party member)
+        Item            = 0x00000010,               // pguid
+        SourceLocation = 0x00000020,               // pguid, 3 float
+        DestLocation   = 0x00000040,               // pguid, 3 float
+        UnitEnemy      = 0x00000080,               // not sent, used to validate target (if enemy)
+        UnitAlly       = 0x00000100,               // not sent, used to validate target (if ally) - Used by teaching spells
+        CorpseEnemy    = 0x00000200,               // pguid
+        UnitDead       = 0x00000400,               // not sent, used to validate target (if dead creature)
+        Gameobject      = 0x00000800,               // pguid, used with TARGET_GAMEOBJECT_TARGET
+        TradeItem      = 0x00001000,               // pguid
+        String          = 0x00002000,               // string
+        GameobjectItem = 0x00004000,               // not sent, used with TARGET_GAMEOBJECT_ITEM_TARGET
+        CorpseAlly     = 0x00008000,               // pguid
+        UnitMinipet    = 0x00010000,               // pguid, used to validate target (if non combat pet)
+        GlyphSlot      = 0x00020000,               // used in glyph spells
+        DestTarget     = 0x00040000,               // sometimes appears with DEST_TARGET spells (may appear or not for a given spell)
+        Unused20        = 0x00080000,               // uint32 counter, loop { vec3 - screen position (?), guid }, not used so far
+        UnitPassenger  = 0x00100000,               // guessed, used to validate target (if vehicle passenger)
+    }
     
     public enum SpellTarget
     {
@@ -848,7 +875,7 @@ namespace WDE.Common.Services
         TalentSpecSelect                 = 162,
         RemoveAura                        = 164,
     }
-    
+
     [UniqueProvider]
     public interface ISpellService
     {
@@ -857,9 +884,13 @@ namespace WDE.Common.Services
         uint? GetSkillLine(uint spellId);
         uint? GetSpellFocus(uint spellId);
         TimeSpan? GetSpellCastingTime(uint spellId);
+        TimeSpan? GetSpellDuration(uint spellId);
+        TimeSpan? GetSpellCategoryRecoveryTime(uint spellId);
         string? GetDescription(uint spellId);
         int GetSpellEffectsCount(uint spellId);
+        SpellAuraType GetSpellAuraType(uint spellId, int effectIndex);
         SpellEffectType GetSpellEffectType(uint spellId, int index);
+        SpellTargetFlags GetSpellTargetFlags(uint spellId);
         (SpellTarget a, SpellTarget b) GetSpellEffectTargetType(uint spellId, int index);
         uint GetSpellEffectMiscValueA(uint spellId, int index);
         uint GetSpellEffectTriggerSpell(uint spellId, int index);

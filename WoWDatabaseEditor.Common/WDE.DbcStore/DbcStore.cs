@@ -17,6 +17,7 @@ using WDE.DbcStore.FastReader;
 using WDE.DbcStore.Providers;
 using WDE.DbcStore.Spells;
 using WDE.DbcStore.Spells.Cataclysm;
+using WDE.DbcStore.Spells.Legion;
 using WDE.DbcStore.Spells.Wrath;
 using WDE.Module.Attributes;
 using WDE.MVVM.Observable;
@@ -62,6 +63,7 @@ namespace WDE.DbcStore
         private readonly NullSpellService nullSpellService;
         private readonly CataSpellService cataSpellService;
         private readonly WrathSpellService wrathSpellService;
+        private readonly LegionSpellService legionSpellService;
         private readonly DatabaseClientFileOpener opener;
         private readonly IParameterFactory parameterFactory;
         private readonly ITaskRunner taskRunner;
@@ -76,6 +78,7 @@ namespace WDE.DbcStore
             NullSpellService nullSpellService,
             CataSpellService cataSpellService,
             WrathSpellService wrathSpellService,
+            LegionSpellService legionSpellService,
             DatabaseClientFileOpener opener,
             DBCD.DBCD dbcd)
         {
@@ -88,6 +91,7 @@ namespace WDE.DbcStore
             this.nullSpellService = nullSpellService;
             this.cataSpellService = cataSpellService;
             this.wrathSpellService = wrathSpellService;
+            this.legionSpellService = legionSpellService;
             this.opener = opener;
             this.dbcd = dbcd;
 
@@ -418,6 +422,7 @@ namespace WDE.DbcStore
                         store.spellServiceImpl = store.cataSpellService;
                         break;
                     case DBCVersions.LEGION_26972:
+                        store.spellServiceImpl = store.legionSpellService;
                         break;
                 }
                 
@@ -683,6 +688,7 @@ namespace WDE.DbcStore
                     }
                     case DBCVersions.LEGION_26972:
                     {
+                        store.legionSpellService.Load(dbcSettingsProvider.GetSettings().Path);
                         max = 42;
                         Load("CriteriaTree.db2", 0, 1, AchievementCriteriaStore);
                         Load("AreaTrigger.db2", row => AreaTriggerStore.Add(row.GetInt(14), $"Area trigger"));
@@ -1008,11 +1014,13 @@ namespace WDE.DbcStore
         public uint? GetSkillLine(uint spellId) => spellServiceImpl.GetSkillLine(spellId);
         public uint? GetSpellFocus(uint spellId) => spellServiceImpl.GetSpellFocus(spellId);
         public TimeSpan? GetSpellCastingTime(uint spellId) => spellServiceImpl.GetSpellCastingTime(spellId);
-
+        public TimeSpan? GetSpellDuration(uint spellId) => spellServiceImpl.GetSpellDuration(spellId);
+        public TimeSpan? GetSpellCategoryRecoveryTime(uint spellId) => spellServiceImpl.GetSpellCategoryRecoveryTime(spellId);
         public string? GetDescription(uint spellId) => spellServiceImpl.GetDescription(spellId);
-
         public int GetSpellEffectsCount(uint spellId) => spellServiceImpl.GetSpellEffectsCount(spellId);
+        public SpellAuraType GetSpellAuraType(uint spellId, int effectIndex) => spellServiceImpl.GetSpellAuraType(spellId, effectIndex);
         public SpellEffectType GetSpellEffectType(uint spellId, int index) => spellServiceImpl.GetSpellEffectType(spellId, index);
+        public SpellTargetFlags GetSpellTargetFlags(uint spellId) => spellServiceImpl.GetSpellTargetFlags(spellId);
         public (SpellTarget, SpellTarget) GetSpellEffectTargetType(uint spellId, int index) => spellServiceImpl.GetSpellEffectTargetType(spellId, index);
         public uint GetSpellEffectMiscValueA(uint spellId, int index) => spellServiceImpl.GetSpellEffectMiscValueA(spellId, index);
         public uint GetSpellEffectTriggerSpell(uint spellId, int index) => spellServiceImpl.GetSpellEffectTriggerSpell(spellId, index);

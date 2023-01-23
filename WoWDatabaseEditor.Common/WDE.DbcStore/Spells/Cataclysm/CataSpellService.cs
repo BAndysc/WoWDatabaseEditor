@@ -280,6 +280,16 @@ namespace WDE.DbcStore.Spells.Cataclysm
             return null;
         }
 
+        public TimeSpan? GetSpellDuration(uint spellId)
+        {
+            return null;
+        }
+
+        public TimeSpan? GetSpellCategoryRecoveryTime(uint spellId)
+        {
+            return null;
+        }
+
         public string? GetDescription(uint spellId)
         {
             if (spells.TryGetValue(spellId, out var spell))
@@ -292,6 +302,11 @@ namespace WDE.DbcStore.Spells.Cataclysm
             if (spells.TryGetValue(spellId, out var spell))
                 return spell.SpellEffects?.Length ?? 0;
             return 0;
+        }
+
+        public SpellAuraType GetSpellAuraType(uint spellId, int effectIndex)
+        {
+            return SpellAuraType.None;
         }
 
         private bool TryGetEffect(uint spellId, int index, out SpellEffect effect)
@@ -318,6 +333,11 @@ namespace WDE.DbcStore.Spells.Cataclysm
             if (TryGetEffect(spellId, index, out var effect))
                 return effect.EffectType;
             return SpellEffectType.None;
+        }
+
+        public SpellTargetFlags GetSpellTargetFlags(uint spellId)
+        {
+            return SpellTargetFlags.None;
         }
 
         public (SpellTarget, SpellTarget) GetSpellEffectTargetType(uint spellId, int index)
