@@ -59,19 +59,22 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
             {
                 var canFocusThis = first && (focusFirstGroup == null || focusFirstGroup == parameter.name);
                 var focusThis = canFocusThis && parameter.parameter.IsUsed;
-                allParameters.Add(AutoDispose(new EditableParameterViewModel<long>(parameter.parameter, parameter.name, itemFromListProvider, currentCoreVersion, parameterPickerService, context){FocusFirst = focusThis}));
+                allParameters.Add(AutoDispose(new EditableParameterViewModel<long>(parameter.parameter, parameter.name, itemFromListProvider, currentCoreVersion, parameterPickerService, context){FocusFirst = focusThis, IsFirstParameter = focusThis}));
                 if (focusThis)
                     first = false;
             }
 
             foreach (var parameter in editableGroup.FloatParameters)
             {
-                allParameters.Add(AutoDispose(new EditableParameterViewModel<float>(parameter.parameter, parameter.name, itemFromListProvider, currentCoreVersion, parameterPickerService){FocusFirst = first}));
+                allParameters.Add(AutoDispose(new EditableParameterViewModel<float>(parameter.parameter, parameter.name, itemFromListProvider, currentCoreVersion, parameterPickerService){FocusFirst = first, IsFirstParameter = first}));
                 first = false;
             }
 
             foreach (var parameter in editableGroup.StringParameters)
-                allParameters.Add(AutoDispose(new EditableParameterViewModel<string>(parameter.parameter, parameter.name, itemFromListProvider, currentCoreVersion, parameterPickerService){FocusFirst=focusFirst}));
+            {
+                allParameters.Add(AutoDispose(new EditableParameterViewModel<string>(parameter.parameter, parameter.name, itemFromListProvider, currentCoreVersion, parameterPickerService){FocusFirst=first, IsFirstParameter = first}));
+                first = false;
+            }
 
             foreach (IEditableParameterViewModel parameter in allParameters)
             {

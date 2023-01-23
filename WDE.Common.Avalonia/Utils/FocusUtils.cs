@@ -46,7 +46,7 @@ namespace WDE.Common.Avalonia.Utils
             });
         }
 
-        private static bool FocusFirstFocusableChild(IInputElement? visual)
+        public static bool FocusFirstFocusableChild(IInputElement? visual)
         {
             if (visual == null)
                 return false;

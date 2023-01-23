@@ -31,6 +31,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
         public string Group { get; }
         
         public bool FocusFirst { get; set; }
+        
+        public bool IsFirstParameter { get; set; }
 
         public bool IsHidden { get; protected set; }
     }

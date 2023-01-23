@@ -8,5 +8,6 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
         string Group { get; }
         string Name { get; }
         bool FocusFirst { get; set; }
+        bool IsFirstParameter { get; set; }
     }
 }
