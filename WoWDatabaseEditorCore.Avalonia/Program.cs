@@ -25,13 +25,9 @@ namespace WoWDatabaseEditorCore.Avalonia
         // yet and stuff might break.
         public static void Main(string[] args)
         {
-            FixCurrentDirectory();
-            if (ProgramBootstrap.TryLaunchUpdaterIfNeeded())
+            if (!BeforeBuildApp(args))
                 return;
-            System.Threading.Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
-            SafeFireAndForgetExtensions.SetDefaultExceptionHandling(Console.WriteLine);
-            TaskScheduler.UnobservedTaskException += (sender, eventArgs) => Console.WriteLine(eventArgs.Exception);
-            GlobalApplication.Arguments.Init(args);
+
             var app = BuildAvaloniaApp();
             try
             {
@@ -42,6 +38,18 @@ namespace WoWDatabaseEditorCore.Avalonia
                 FatalErrorHandler.ExceptionOccured(e);
             }
             TheEngine.TheEngine.Deinit();
+        }
+
+        public static bool BeforeBuildApp(string[] args)
+        {
+            FixCurrentDirectory();
+            if (ProgramBootstrap.TryLaunchUpdaterIfNeeded())
+                return false;
+            System.Threading.Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
+            SafeFireAndForgetExtensions.SetDefaultExceptionHandling(Console.WriteLine);
+            TaskScheduler.UnobservedTaskException += (sender, eventArgs) => Console.WriteLine(eventArgs.Exception);
+            GlobalApplication.Arguments.Init(args);
+            return true;
         }
 
         private static void FixCurrentDirectory()
