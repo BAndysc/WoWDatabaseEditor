@@ -324,7 +324,11 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             }, () => FocusedCell != null);
             
             var definition = tableDefinitionProvider.GetDefinition(solutionItem.DefinitionId);
-            FilterViewModel = new MySqlFilterViewModel(definition, ScheduleLoading, parameterFactory, parameterPickerService);
+            FilterViewModel = new MySqlFilterViewModel(definition, () =>
+            {
+                OffsetQuery = 0;
+                return ScheduleLoading();
+            }, parameterFactory, parameterPickerService);
             
             var pseudoItem = new DatabaseTableSolutionItem(tableDefinition.Id, tableDefinition.IgnoreEquality);
             var savedItem = sessionService.Find(pseudoItem);
