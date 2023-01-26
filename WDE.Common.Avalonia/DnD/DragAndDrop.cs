@@ -660,6 +660,13 @@ namespace WDE.Common.Avalonia.DnD
         
         public void Update(TreeView treeView, ITreeItemContainerGenerator itemContainerGenerator, IDropInfo dropInfo)
         {
+            if (dropInfo.Effects == Common.Utils.DragDrop.DragDropEffects.None)
+            {
+                drawRect = new Rect();
+                InvalidateVisual();
+                return;
+            }
+            
             int indexOfDrop = dropInfo.InsertIndex;
             var container = itemContainerGenerator.ContainerFromIndex(indexOfDrop);
 

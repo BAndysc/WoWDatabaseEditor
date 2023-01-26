@@ -213,6 +213,7 @@ namespace WDE.DbcStore
             public Dictionary<long, string> GarrisonBuildingStore { get; internal set; } = new();
             public Dictionary<long, string> GarrisonTalentStore { get; internal set; } = new();
             public Dictionary<long, string> DifficultyStore { get; internal set; } = new();
+            private List<(string parameter, Dictionary<long, SelectOption> options)> parametersToRegister = new();
             
             public string Name => "DBC Loading";
             public bool WaitForOtherTasks => false;
@@ -234,10 +235,7 @@ namespace WDE.DbcStore
                     var id = row.GetUInt(keyIndex);
                     dict[id] = new SelectOption(getString(row));
                 });
-                parameterFactory.Register(parameter, new Parameter()
-                {
-                    Items = dict
-                });
+                parametersToRegister.Add((parameter, dict));
             }
 
             private void LoadAndRegister(string filename, string parameter, int keyIndex, int nameIndex, bool withLocale = false)
@@ -358,6 +356,15 @@ namespace WDE.DbcStore
                 store.ScenarioToStepStore = ScenarioToStepStore;
                 store.BattlePetSpeciesIdStore = BattlePetSpeciesIdStore;
                 store.CurrencyTypeStore = CurrencyTypeStore;
+
+                foreach (var (parameterName, options) in parametersToRegister)
+                {
+                    parameterFactory.Register(parameterName, new Parameter()
+                    {
+                        Items = options
+                    });
+                }
+                parametersToRegister.Clear();
                 
                 parameterFactory.Register("AchievementParameter", new DbcParameter(AchievementStore), QuickAccessMode.Full);
                 parameterFactory.Register("MovieParameter", new DbcParameter(MovieStore), QuickAccessMode.Limited);
