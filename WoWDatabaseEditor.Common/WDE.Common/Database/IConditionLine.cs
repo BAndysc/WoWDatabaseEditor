@@ -64,6 +64,7 @@ namespace WDE.Common.Database
         }
     }
     
+    // KEEP IT POCO!
     public class AbstractConditionLine : IConditionLine
     {
         public AbstractConditionLine() { }
@@ -135,6 +136,7 @@ namespace WDE.Common.Database
         public string? Comment { get; set; }
     }
     
+    // KEEP it POCO
     public class AbstractCondition : ICondition
     {
         public AbstractCondition() { }

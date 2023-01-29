@@ -46,7 +46,7 @@ namespace WDE.SmartScriptEditor.Data
             if (!parameterFactory.IsRegisteredLong("StoredTargetParameter"))
             {
                 parameterFactory.Register("EventScriptParameter", new Parameter());
-                parameterFactory.Register("PathParameter", new Parameter());
+                parameterFactory.Register("PathParameter", new WaypointsParameter(tableEditorPickerService));
                 parameterFactory.Register("LinkParameter", new Parameter());
                 parameterFactory.Register("TimedActionListParameter", new TimedActionListParameter(databaseProvider, itemFromListProvider));
                 parameterFactory.Register("GossipMenuOptionParameter", new GossipMenuOptionParameter(databaseProvider, tableEditorPickerService, itemFromListProvider));

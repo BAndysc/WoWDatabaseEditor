@@ -384,6 +384,11 @@ namespace WDE.CMMySqlDatabase.Database
             return await model.SceneTemplates.ToListAsync<ISceneTemplate>();
         }
 
+        public async Task<IPhaseName?> GetPhaseNameAsync(uint phaseId) => null;
+
+        public async Task<IList<IPhaseName>?> GetPhaseNamesAsync() => null;
+        public IList<IPhaseName>? GetPhaseNames() => null;
+
         public abstract Task<IList<ICreatureAddon>> GetCreatureAddons();
         public abstract Task<IList<ICreatureTemplateAddon>> GetCreatureTemplateAddons();
 

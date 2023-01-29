@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Input;
+using AsyncAwaitBestPractices.MVVM;
 using Prism.Commands;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;
@@ -12,6 +13,7 @@ using WDE.Common.History;
 using WDE.Common.Managers;
 using WDE.Common.Services;
 using WDE.Common.Types;
+using WDE.Common.Utils;
 using WDE.Module.Attributes;
 using WoWDatabaseEditorCore.CoreVersion;
 
@@ -74,7 +76,7 @@ namespace WoWDatabaseEditorCore.ViewModels
         public ICommand Copy { get; } = new DisabledCommand();
         public ICommand Cut { get; } = new DisabledCommand();
         public ICommand Paste { get; } = new DisabledCommand();
-        public ICommand Save { get; } = new DisabledCommand();
+        public IAsyncCommand Save { get; } = AlwaysDisabledAsyncCommand.Command;
         public AsyncAwaitBestPractices.MVVM.IAsyncCommand? CloseCommand { get; set; } = null;
         public bool CanClose { get; } = true;
         public bool IsModified { get; } = false;

@@ -288,7 +288,12 @@ namespace WDE.DatabaseEditors.Models
         private void SetValue(T? value, bool isNull)
         {
             if (this.isNull == isNull && Comparer<T>.Default.Compare(value, Value) == 0)
+            {
+                // calling Value here is intentional. Even if the parameter is not changed
+                // it is still possible that during parameter picking, the IParameter<T> Items were changed
+                OnPropertyChanged(nameof(Value));
                 return;
+            }
 
             var wasNull = this.isNull;
             this.isNull = isNull;

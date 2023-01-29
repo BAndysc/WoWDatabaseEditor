@@ -113,7 +113,8 @@ public class Program
         ioc.RegisterSingleton<DatabaseLogger>();
         ioc.RegisterInstance<IQueryEvaluator>(Substitute.For<IQueryEvaluator>());
         
-        ioc.RegisterSingleton<IMySqlExecutor, MySqlExecutor>();
+        ioc.RegisterSingleton<IMySqlExecutor, WorldMySqlExecutor>();
+        ioc.RegisterSingleton<IMySqlHotfixExecutor, NullHotfixMysqlExecutor>();
         ioc.RegisterSingleton<IDatabaseTableDataProvider, DatabaseTableDataProvider>();
         ioc.RegisterSingleton<IDatabaseTableModelGenerator, DatabaseTableModelGenerator>();
         ioc.RegisterSingleton<IDatabaseFieldFactory, DatabaseFieldFactory>();

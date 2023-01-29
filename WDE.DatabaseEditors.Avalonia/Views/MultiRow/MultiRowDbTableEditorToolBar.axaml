@@ -24,7 +24,7 @@
             <components:WdeImage ImageUri="Icons/icon_split_vert.png" />
         </ToggleButton>
         
-        <ItemsPresenter Items="{CompiledBinding Commands}">
+        <ItemsPresenter Items="{CompiledBinding ToolbarCommands}">
             <ItemsPresenter.ItemsPanel>
                 <ItemsPanelTemplate>
                     <controls:ToolbarPanel />

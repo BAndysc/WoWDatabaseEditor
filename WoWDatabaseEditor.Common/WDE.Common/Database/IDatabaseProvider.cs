@@ -110,6 +110,10 @@ namespace WDE.Common.Database
         Task<ISceneTemplate?> GetSceneTemplateAsync(uint sceneId);
         Task<IList<ISceneTemplate>?> GetSceneTemplatesAsync();
         
+        Task<IPhaseName?> GetPhaseNameAsync(uint phaseId);
+        IList<IPhaseName>? GetPhaseNames();
+        Task<IList<IPhaseName>?> GetPhaseNamesAsync();
+
         Task<IList<ICreatureAddon>> GetCreatureAddons();
         Task<IList<ICreatureTemplateAddon>> GetCreatureTemplateAddons();
         Task<IList<ICreatureEquipmentTemplate>?> GetCreatureEquipmentTemplates();

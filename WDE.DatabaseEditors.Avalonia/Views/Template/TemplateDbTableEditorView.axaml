@@ -11,10 +11,12 @@
              xmlns:viewModels="clr-namespace:WDE.DatabaseEditors.ViewModels.Template;assembly=WDE.DatabaseEditors"
              xmlns:controls2="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
              xmlns:system="clr-namespace:System;assembly=System.Runtime"
+             xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              IsEnabled="{Binding TaskInProgress, Converter={x:Static converters:InverseBoolConverter.Instance}}"
              x:Name="rootWindow"
              x:DataType="viewModels:TemplateDbTableEditorViewModel"
+             utils:KeyGestureBind.Bindings="{CompiledBinding KeyBindings}"
              x:Class="WDE.DatabaseEditors.Avalonia.Views.Template.TemplateDbTableEditorView">
     <UserControl.Resources>
         <converters:BoolToDoubleConverter WhenFalse="0" WhenTrue="1" x:Key="IsActiveToOpacityConverter" />

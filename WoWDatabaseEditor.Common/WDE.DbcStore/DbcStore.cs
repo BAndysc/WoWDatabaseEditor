@@ -384,7 +384,7 @@ namespace WDE.DbcStore
                 parameterFactory.Register("SoundParameter", new DbcParameter(SoundStore), QuickAccessMode.Limited);
                 parameterFactory.Register("ZoneAreaParameter", new DbcParameter(AreaStore), QuickAccessMode.Limited);
                 parameterFactory.Register("MapParameter", new DbcParameter(MapStore), QuickAccessMode.Limited);
-                parameterFactory.Register("PhaseParameter", new DbcParameter(PhaseStore), QuickAccessMode.Limited);
+                parameterFactory.Register("DbcPhaseParameter", new DbcParameter(PhaseStore), QuickAccessMode.Limited);
                 parameterFactory.Register("SpellFocusObjectParameter", new DbcParameter(SpellFocusObjectStore), QuickAccessMode.Limited);
                 parameterFactory.Register("QuestInfoParameter", new DbcParameter(QuestInfoStore));
                 parameterFactory.Register("CharTitleParameter", new DbcParameter(CharTitleStore));

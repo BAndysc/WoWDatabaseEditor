@@ -45,28 +45,7 @@ namespace WDE.DatabaseEditors.Data
                         f => f.DbColumnName.GetHashCode(),
                         (a, b) => a!.DbColumnName.Equals(b!.DbColumnName))))
             {
-                IValueHolder valueHolder;
-                var type = column.ValueType;
-
-                if (parameterFactory.IsRegisteredLong(type))
-                    type = "uint";
-                else if (parameterFactory.IsRegisteredString(type))
-                    type = "string";
-                else if (type.EndsWith("Parameter"))
-                    type = "uint";
-                
-                if (type == "float")
-                {
-                    valueHolder = new ValueHolder<float>(column.Default is float f ? f : 0.0f, column.CanBeNull && column.Default == null);
-                }
-                else if (type is "int" or "uint" or "long")
-                {
-                    valueHolder = new ValueHolder<long>(column.Default is long f ? f : 0, column.CanBeNull && column.Default == null);
-                }
-                else
-                    valueHolder = new ValueHolder<string>(column.Default is string f ? f : "", column.CanBeNull && column.Default == null);
-                
-                columns[column.DbColumnName] = databaseFieldFactory.CreateField(column.DbColumnName, valueHolder);
+                columns[column.DbColumnName] = databaseFieldFactory.CreateField(column, column.Default);
             }
 
             Debug.Assert(phantomEntity == key.IsPhantomKey);

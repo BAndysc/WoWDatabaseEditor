@@ -12,6 +12,7 @@ using WDE.Common.Types;
 using WDE.Common.Utils;
 using WDE.DatabaseEditors.Data.Interfaces;
 using WDE.DatabaseEditors.Data.Structs;
+using WDE.DatabaseEditors.Services;
 using WDE.Module.Attributes;
 using WDE.MVVM;
 using WDE.MVVM.Observable;
@@ -21,7 +22,7 @@ namespace WDE.DatabaseEditors.Tools
     [AutoRegister]
     public partial class CompatibilityCheckerViewModel : BindableBase
     {
-        private readonly IMySqlExecutor sqlExecutor;
+        private readonly IDatabaseQueryExecutor sqlExecutor;
         private List<DatabaseTableDefinitionJson> allDefinitions = new();
         public ObservableCollection<DatabaseTableDefinitionJson> Definitions { get; } = new();
 
@@ -54,9 +55,10 @@ namespace WDE.DatabaseEditors.Tools
 
             foreach (var table in columnsByTables)
             {
-                if (!await DatabaseContainsTable(table.Key))
+                var databaseTable = new DatabaseTable(value.DataDatabaseType, table.Key);
+                if (!await DatabaseContainsTable(databaseTable))
                 {
-                    raport.AppendLine($" [ ERROR ] Table {table.Key} doesn't exist! Cannot check compatibility");
+                    raport.AppendLine($" [ ERROR ] Table {databaseTable} doesn't exist! Cannot check compatibility");
                     foreach (var column in table.Value)
                         raport.AppendLine($"    [ ERROR ] Therefore column {table.Key}.{column.Name} doesn't exist");
                     raport.AppendLine();
@@ -65,7 +67,7 @@ namespace WDE.DatabaseEditors.Tools
                 
                 raport.AppendLine($" [  OK   ] Table {table.Key} exist");
 
-                var tableColumns = await sqlExecutor.GetTableColumns(table.Key);
+                var tableColumns = await sqlExecutor.GetTableColumns(value.DataDatabaseType, table.Key);
                 var columnsByName = tableColumns
                     .GroupBy(g => g.ColumnName)
                     .ToDictionary(g => g.Key, g => g.FirstOrDefault());
@@ -104,17 +106,22 @@ namespace WDE.DatabaseEditors.Tools
             Raport.FromString(raport.ToString());
         }
 
-        private HashSet<string>? cachedTables;
+        private HashSet<DatabaseTable>? cachedTables;
         
-        private async Task<bool> DatabaseContainsTable(string table)
+        private async Task<bool> DatabaseContainsTable(DatabaseTable table)
         {
-            cachedTables ??= (await sqlExecutor.GetTables()).ToHashSet();
+            if (cachedTables == null)
+            {
+                var world = await sqlExecutor.GetTables(DataDatabaseType.World);
+                var hotfix = await sqlExecutor.GetTables(DataDatabaseType.Hotfix);
+                cachedTables = new HashSet<DatabaseTable>(world.Concat(hotfix));
+            }
 
             return cachedTables.Contains(table);
         }
 
         public CompatibilityCheckerViewModel(ITableDefinitionProvider definitionProvider,
-            IMySqlExecutor sqlExecutor,
+            IDatabaseQueryExecutor sqlExecutor,
             INativeTextDocument document)
         {
             this.sqlExecutor = sqlExecutor;

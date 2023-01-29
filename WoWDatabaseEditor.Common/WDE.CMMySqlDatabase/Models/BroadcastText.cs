@@ -129,6 +129,9 @@ namespace WDE.CMMySqlDatabase.Models
             set { _EmoteDelay3 = (int)value; }
         }
 
+        public uint Sound1 { get; set; }
+        public uint Sound2 { get; set; }
+
         public uint SoundEntriesId
         {
             get => _SoundEntriesId1 > 0 ? (uint)_SoundEntriesId1 : 0;

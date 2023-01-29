@@ -30,13 +30,13 @@ namespace WDE.DatabaseEditors.Services;
 [SingleInstance]
 public class DatabaseTablesFindAnywhereSource : IFindAnywhereSource
 {
-    private readonly IMySqlExecutor executor;
+    private readonly IDatabaseQueryExecutor executor;
     private readonly ITableDefinitionProvider definitionProvider;
     private readonly Lazy<IDocumentManager> documentManager;
     private readonly IEventAggregator eventAggregator;
     private readonly IParameterFactory parameterFactory;
 
-    public DatabaseTablesFindAnywhereSource(IMySqlExecutor executor,
+    public DatabaseTablesFindAnywhereSource(IDatabaseQueryExecutor executor,
             ITableDefinitionProvider definitionProvider,
             Lazy<IDocumentManager> documentManager,
             IEventAggregator eventAggregator,
@@ -115,7 +115,7 @@ public class DatabaseTablesFindAnywhereSource : IFindAnywhereSource
                     continue;
                 
                 var select = where.Select();
-                var result = await executor.ExecuteSelectSql(select.QueryString);
+                var result = await executor.ExecuteSelectSql(definition, select.QueryString);
 
                 if (result.Count > 0)
                 {

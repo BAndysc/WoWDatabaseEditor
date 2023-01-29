@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using WDE.Common.Database;
 using WDE.Common.Managers;
 using WDE.Common.Parameters;
-using WDE.EventAiEditor.Utils;
-using WDE.Parameters.Models;
+using WDE.Common.Utils;
 
 namespace WDE.EventAiEditor.Data
 {

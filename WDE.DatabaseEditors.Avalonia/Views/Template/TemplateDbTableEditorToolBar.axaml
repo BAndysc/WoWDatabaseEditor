@@ -13,7 +13,7 @@
              x:Class="WDE.DatabaseEditors.Avalonia.Views.Template.TemplateDbTableEditorToolBar">
     <controls:ToolbarPanel>
         <components:ButtonImage IsVisible="{CompiledBinding AllowMultipleKeys}" Command="{CompiledBinding AddNewCommand, Mode=OneTime}" Text="Add new" Image="Icons/icon_add.png" />
-        <ItemsPresenter Items="{CompiledBinding Commands}">
+        <ItemsPresenter Items="{CompiledBinding ToolbarCommands}">
             <ItemsPresenter.ItemsPanel>
                 <ItemsPanelTemplate>
                     <controls:ToolbarPanel />

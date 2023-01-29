@@ -32,7 +32,7 @@ public partial class FindAnywhereResultsViewModel : ObservableBase, IFindAnywher
     public ICommand Copy  => AlwaysDisabledCommand.Command;
     public ICommand Cut  => AlwaysDisabledCommand.Command;
     public ICommand Paste  => AlwaysDisabledCommand.Command;
-    public ICommand Save  => AlwaysDisabledCommand.Command;
+    public IAsyncCommand Save  => AlwaysDisabledAsyncCommand.Command;
     public IAsyncCommand? CloseCommand { get; set; }
     public ImageUri? Icon => new ImageUri("icons/document_search.png");
     public bool CanClose => true;

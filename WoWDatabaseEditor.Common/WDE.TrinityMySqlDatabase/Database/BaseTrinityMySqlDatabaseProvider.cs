@@ -514,6 +514,12 @@ namespace WDE.TrinityMySqlDatabase.Database
             return await model.SceneTemplates.ToListAsync<ISceneTemplate>();
         }
 
+        public virtual async Task<IPhaseName?> GetPhaseNameAsync(uint phaseId) => null;
+
+        public virtual async Task<IList<IPhaseName>?> GetPhaseNamesAsync() => null;
+
+        public virtual IList<IPhaseName>? GetPhaseNames() => null;
+        
         public abstract Task<IList<ICreatureAddon>> GetCreatureAddons();
 
         public abstract Task<IList<ICreatureTemplateAddon>> GetCreatureTemplateAddons();

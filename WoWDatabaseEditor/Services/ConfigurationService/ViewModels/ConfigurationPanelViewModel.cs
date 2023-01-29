@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Input;
+using AsyncAwaitBestPractices.MVVM;
 using Prism.Commands;
 using Prism.Mvvm;
 using WDE.Common;
@@ -40,7 +41,7 @@ namespace WoWDatabaseEditorCore.Services.ConfigurationService.ViewModels
             if (ContainerTabItems.Count > 0)
                 SelectedTabItem = ContainerTabItems[0];
             
-            Save = new DelegateCommand(SaveAll);
+            Save = new AsyncAutoCommand(async () => SaveAll());
         }
 
         private ConfigurationGroupViewModel GetGroup(ConfigurableGroup group)
@@ -100,7 +101,7 @@ namespace WoWDatabaseEditorCore.Services.ConfigurationService.ViewModels
 
         public ImageUri? Icon => new ImageUri("Icons/settings.png");
         public string Title => "Settings";
-        public ICommand Save { get; }
+        public IAsyncCommand Save { get; }
         public ICommand Undo => AlwaysDisabledCommand.Command;
         public ICommand Redo => AlwaysDisabledCommand.Command;
         public ICommand Copy => AlwaysDisabledCommand.Command;

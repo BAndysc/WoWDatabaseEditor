@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Windows.Input;
+using AvaloniaStyles.Controls.FastTableView;
 using WDE.DatabaseEditors.Data;
 using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Models;
@@ -9,7 +10,7 @@ using WDE.MVVM.Observable;
 
 namespace WDE.DatabaseEditors.ViewModels.MultiRow
 {
-    public class DatabaseCellViewModel : BaseDatabaseCellViewModel
+    public class DatabaseCellViewModel : BaseDatabaseCellViewModel, ITableCell
     {
         public DatabaseEntityViewModel Parent { get; }
         public IDatabaseField? TableField { get; }
@@ -49,14 +50,15 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
 
             AutoDispose(parameterValue.ToObservable().SubscribeAction(_ =>
             {
+                Parent.RaiseChanged(this, tableField.FieldName);
                 OriginalValueTooltip =
                     tableField.IsModified ? "Original value: " + parameterValue.OriginalString : null;
                 RaisePropertyChanged(nameof(OriginalValueTooltip));
                 RaisePropertyChanged(nameof(AsBoolValue));
             }));
-            if (parameterValue.BaseParameter is DatabaseStringContextualParameter contextual)
+            if (parameterValue.BaseParameter is ITableAffectedByParameter contextual)
             {
-                var other = parent.Cells.FirstOrDefault(c => c.DbColumnName == contextual.Column);
+                var other = parent.Cells.FirstOrDefault(c => c.DbColumnName == contextual.AffectedByColumn);
                 if (other != null)
                 {
                     AutoDispose(other.ParameterValue!.ToObservable().Subscribe(_ =>
@@ -66,7 +68,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                 }
                 else
                 {
-                    Console.WriteLine("Couldn't find column " + contextual.Column);
+                    Console.WriteLine("Couldn't find column " + contextual.AffectedByColumn);
                 }
             }
         }
@@ -91,6 +93,21 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                 ActionLabel = s;
                 RaisePropertyChanged(nameof(ActionLabel));
             }));
+        }
+        
+        public void UpdateFromString(string newValue)
+        {
+            if (ParameterValue == null)
+                return;
+
+            ParameterValue.UpdateFromString(newValue);
+        }
+
+        public string? StringValue => ParameterValue?.ValueAsString;
+
+        public override string? ToString()
+        {
+            return ParameterValue?.String;
         }
     }
 }

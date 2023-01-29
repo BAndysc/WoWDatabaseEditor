@@ -19,4 +19,5 @@ public class TrinityMasterDatabase : BaseTrinityDatabase
     public ITable<MySqlPlayerChoice> PlayerChoice => GetTable<MySqlPlayerChoice>();
     public ITable<MySqlPlayerChoiceResponse> PlayerChoiceResponse => GetTable<MySqlPlayerChoiceResponse>();
     public ITable<MySqlQuestObjective> QuestObjective => GetTable<MySqlQuestObjective>();
+    public ITable<MySqlPhaseName> PhaseNames => GetTable<MySqlPhaseName>();
 }

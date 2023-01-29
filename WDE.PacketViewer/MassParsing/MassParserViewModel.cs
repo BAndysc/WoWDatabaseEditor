@@ -41,7 +41,7 @@ public partial class MassParserViewModel : ObservableBase, IDocument
     public ICommand Copy => AlwaysDisabledCommand.Command;
     public ICommand Cut => AlwaysDisabledCommand.Command;
     public ICommand Paste => AlwaysDisabledCommand.Command;
-    public ICommand Save=> AlwaysDisabledCommand.Command;
+    public IAsyncCommand Save=> AlwaysDisabledAsyncCommand.Command;
     public IAsyncCommand? CloseCommand { get; set; }
     public bool CanClose => true;
     public ImageUri? Icon => new ImageUri("Icons/document_mass_sniff.png");

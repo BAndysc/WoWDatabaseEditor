@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using WDE.Common.Database;
 using WDE.Common.Services;
+using WDE.Common.Utils;
 
 namespace WDE.DatabaseEditors.Data.Structs
 {
@@ -13,7 +16,7 @@ namespace WDE.DatabaseEditors.Data.Structs
         MultiRecord,
         SingleRow
     }
-    
+
     [ExcludeFromCodeCoverage]
     public class DatabaseTableDefinitionJson
     {
@@ -45,6 +48,10 @@ namespace WDE.DatabaseEditors.Data.Structs
         [JsonConverter(typeof(StringEnumConverter))]
         public RecordMode RecordMode { get; set; }
         
+        [JsonProperty(PropertyName = "database")]
+        [JsonConverter(typeof(StringEnumConverter))]
+        public DataDatabaseType DataDatabaseType { get; set; }
+
         [JsonProperty(PropertyName = "only_conditions")]
         public bool IsOnlyConditionsTable { get; set; }
         
@@ -115,6 +122,15 @@ namespace WDE.DatabaseEditors.Data.Structs
         [JsonIgnore] public bool IgnoreEquality => RecordMode == RecordMode.SingleRow;
     }
 
+    [Flags]
+    [JsonConverter(typeof(FlagJsonConverter))]
+    public enum DatabaseCommandUsage
+    {
+        Toolbar = 1,
+        ContextMenu = 2,
+        All = Toolbar | ContextMenu
+    }
+    
     public class DatabaseCommandDefinitionJson
     {
         [JsonProperty(PropertyName = "command_id")]
@@ -122,6 +138,13 @@ namespace WDE.DatabaseEditors.Data.Structs
         
         [JsonProperty(PropertyName = "parameters")]
         public string[]? Parameters { get; set; }
+
+        [JsonProperty(PropertyName = "keybinding")]
+        public string? KeyBinding { get; set; }
+        
+        [JsonProperty(PropertyName = "usage", DefaultValueHandling = DefaultValueHandling.Populate)]
+        [DefaultValue(DatabaseCommandUsage.All)]
+        public DatabaseCommandUsage Usage { get; set; } = DatabaseCommandUsage.All;
     }
     
     public class DatabaseConditionReferenceJson

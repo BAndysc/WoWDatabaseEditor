@@ -86,17 +86,18 @@ public class TableEditorPickerService : ITableEditorPickerService
                     .Where(@is => !@is)
                     .SubscribeOnce(@is =>
                     {
-                        var group = multiRow.Rows.FirstOrDefault(row => row.Key == key);
-                        if (group != null)
+                        var groupIndex = multiRow.Rows.IndexIf(row => row.Key == key);
+                        if (groupIndex != -1)
                         {
-                            var row = group.FirstOrDefault(r =>
+                            var group = multiRow.Rows[groupIndex];
+                            var rowIndex = group.IndexIf(r =>
                                 (r.Entity.GetCell(column) is DatabaseField<long> longField &&
                                  longField.Current.Value == initialValue) ||
                                 (backupColumn != null && r.Entity.GetCell(backupColumn) is DatabaseField<long> longField2 &&
                                  longField2.Current.Value == initialValue));
-                            if (row != null)
+                            if (rowIndex != -1)
                             {
-                                mainThread.Delay(() => multiRow.SelectedRow = row, TimeSpan.FromMilliseconds(1));
+                                mainThread.Delay(() => multiRow.FocusedRowIndex = new VerticalCursor(groupIndex, rowIndex), TimeSpan.FromMilliseconds(1));
                             }
                         }
                     });

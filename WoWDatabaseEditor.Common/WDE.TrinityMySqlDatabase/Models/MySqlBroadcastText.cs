@@ -36,7 +36,11 @@ namespace WDE.TrinityMySqlDatabase.Models
         
         [Column(Name = "EmoteDelay3")]
         public uint EmoteDelay3 { get; set; }
+
+        public uint Sound1 { get; set; }
         
+        public uint Sound2 { get; set; }
+
         [Column(Name = "SoundEntriesID")]
         public uint SoundEntriesId { get; set; }
         
@@ -80,7 +84,11 @@ namespace WDE.TrinityMySqlDatabase.Models
         
         [Column(Name = "EmoteDelay3")]
         public uint EmoteDelay3 { get; set; }
-        
+
+        public uint Sound1 { get; set; }
+
+        public uint Sound2 { get; set; }
+
         [Column(Name = "SoundEntriesId")]
         public uint SoundEntriesId { get; set; }
         

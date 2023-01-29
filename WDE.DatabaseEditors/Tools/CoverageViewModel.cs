@@ -10,6 +10,7 @@ using WDE.Common.Types;
 using WDE.Common.Utils;
 using WDE.DatabaseEditors.Data.Interfaces;
 using WDE.DatabaseEditors.Data.Structs;
+using WDE.DatabaseEditors.Services;
 using WDE.Module.Attributes;
 
 namespace WDE.DatabaseEditors.Tools;
@@ -17,33 +18,34 @@ namespace WDE.DatabaseEditors.Tools;
 [AutoRegister]
 public class CoverageViewModel
 {
-    private readonly IMySqlExecutor mySqlExecutor;
+    private readonly IDatabaseQueryExecutor mySqlExecutor;
     private readonly ICurrentCoreVersion currentCoreVersion;
     private readonly ITableDefinitionProvider tableDefinitionProvider;
 
-    public ObservableCollection<string> MissingTables { get; } = new();
-    public ObservableCollection<string> CoveredTables { get; } = new();
+    public ObservableCollection<DatabaseTable> MissingTables { get; } = new();
+    public ObservableCollection<DatabaseTable> CoveredTables { get; } = new();
     
-    public CoverageViewModel(IMySqlExecutor mySqlExecutor, 
+    public CoverageViewModel(IDatabaseQueryExecutor mySqlExecutor, 
         ICurrentCoreVersion currentCoreVersion,
         ITableDefinitionProvider tableDefinitionProvider)
     {
         this.mySqlExecutor = mySqlExecutor;
         this.currentCoreVersion = currentCoreVersion;
         this.tableDefinitionProvider = tableDefinitionProvider;
-        PopulateTables().ListenErrors();
+        PopulateTables(DataDatabaseType.World).ListenErrors();
+        PopulateTables(DataDatabaseType.Hotfix).ListenErrors();
     }
 
-    public async Task PopulateTables()
+    public async Task PopulateTables(DataDatabaseType type)
     {
-        var tables = await mySqlExecutor.GetTables();
+        var tables = await mySqlExecutor.GetTables(type);
         var current = tableDefinitionProvider.Definitions
-            .Select(x => x.TableName)
+            .Select(x => new DatabaseTable(x.DataDatabaseType, x.TableName))
             .Union(tableDefinitionProvider.Definitions
                 .Where(x => x.ForeignTableByName != null)
-                .SelectMany(x => x.ForeignTableByName!.Keys))
+                .SelectMany(x => x.ForeignTableByName!.Keys.Select(table => new DatabaseTable(x.DataDatabaseType, table))))
             .ToList();
-        MissingTables.AddRange(tables.Except(current));
-        CoveredTables.AddRange(tables.Intersect(current));
+        MissingTables.AddRange<DatabaseTable>(tables.Except(current));
+        CoveredTables.AddRange<DatabaseTable>(tables.Intersect(current));
     }
 }

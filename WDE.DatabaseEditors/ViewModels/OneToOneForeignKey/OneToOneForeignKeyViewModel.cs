@@ -27,6 +27,7 @@ using WDE.DatabaseEditors.Extensions;
 using WDE.DatabaseEditors.Loaders;
 using WDE.DatabaseEditors.Models;
 using WDE.DatabaseEditors.QueryGenerators;
+using WDE.DatabaseEditors.Services;
 using WDE.DatabaseEditors.Solution;
 using WDE.DatabaseEditors.Utils;
 using WDE.MVVM;
@@ -43,7 +44,7 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
     private readonly IClipboardService clipboardService;
     private readonly IWindowManager windowManager;
     private readonly IQueryGenerator queryGenerator;
-    private readonly IMySqlExecutor mySqlExecutor;
+    private readonly IDatabaseQueryExecutor mySqlExecutor;
     private readonly IMessageBoxService messageBoxService;
     private readonly IParameterPickerService parameterPickerService;
     private readonly ISolutionTasksService solutionTasksService;
@@ -84,7 +85,7 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
         IEventAggregator eventAggregator,
         IWindowManager windowManager,
         IQueryGenerator queryGenerator,
-        IMySqlExecutor mySqlExecutor,
+        IDatabaseQueryExecutor mySqlExecutor,
         IMessageBoxService messageBoxService,
         ISolutionItemEditorRegistry editorRegistry,
         IHistoryManager history,
@@ -234,7 +235,7 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
         var query = await GenerateThisQueryOnly();
         try
         {
-            await mySqlExecutor.ExecuteSql(query);
+            await mySqlExecutor.ExecuteSql(tableDefinition, query);
 
             if (solutionTasksService.CanReloadRemotely)
             {
@@ -454,7 +455,7 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
     public DelegateCommand<SingleRecordDatabaseCellViewModel?> RevertCommand { get; }
     public DelegateCommand<SingleRecordDatabaseCellViewModel?> SetNullCommand { get; }
     public AsyncAutoCommand<SingleRecordDatabaseCellViewModel> OpenParameterWindow { get; }
-    public ICommand Save { get; }
+    public IAsyncCommand Save { get; }
 
     public IAsyncCommand? CloseCommand { get; set; }
     public bool CanClose { get; set; }

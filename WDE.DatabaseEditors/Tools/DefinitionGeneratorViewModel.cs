@@ -3,7 +3,6 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using DynamicData;
 using Newtonsoft.Json;
 using Prism.Mvvm;
 using WDE.Common.CoreVersion;
@@ -12,7 +11,7 @@ using WDE.Common.Managers;
 using WDE.Common.Types;
 using WDE.Common.Utils;
 using WDE.DatabaseEditors.Data.Structs;
-using WDE.DatabaseEditors.Extensions;
+using WDE.DatabaseEditors.Services;
 using WDE.Module.Attributes;
 
 #pragma warning disable 4014
@@ -22,11 +21,11 @@ namespace WDE.DatabaseEditors.Tools
     [AutoRegister]
     public class DefinitionGeneratorViewModel : BindableBase
     {
-        private readonly IMySqlExecutor mySqlExecutor;
+        private readonly IDatabaseQueryExecutor mySqlExecutor;
         private readonly ICurrentCoreVersion currentCoreVersion;
 
         public AsyncAutoCommand SaveAllDefinitions { get; }
-        public ObservableCollection<string> Tables { get; } = new();
+        public ObservableCollection<DatabaseTable> Tables { get; } = new();
 
         private bool isLoading;
         public bool IsLoading
@@ -35,21 +34,21 @@ namespace WDE.DatabaseEditors.Tools
             set => SetProperty(ref isLoading, value);
         }
         
-        private string? selectedTable;
-        public string? SelectedTable
+        private DatabaseTable? selectedTable;
+        public DatabaseTable? SelectedTable
         {
             get => selectedTable;
             set
             {
                 SetProperty(ref selectedTable, value);
                 if (value != null)
-                    UpdateDefinition(value);
+                    UpdateDefinition(value.Value);
             }
         }
         
         public INativeTextDocument Definition { get; }
         
-        public DefinitionGeneratorViewModel(IMySqlExecutor mySqlExecutor, 
+        public DefinitionGeneratorViewModel(IDatabaseQueryExecutor mySqlExecutor, 
             ICurrentCoreVersion currentCoreVersion,
             INativeTextDocument nativeTextDocument,
             IWindowManager windowManager)
@@ -75,13 +74,14 @@ namespace WDE.DatabaseEditors.Tools
         public async Task PopulateTables()
         {
             IsLoading = true;
-            Tables.AddRange(await mySqlExecutor.GetTables());
+            Tables.AddRange(await mySqlExecutor.GetTables(DataDatabaseType.World));
+            Tables.AddRange(await mySqlExecutor.GetTables(DataDatabaseType.Hotfix));
             IsLoading = false;
         }
 
-        private async Task<string> GenerateDefinition(string tableName)
+        private async Task<string> GenerateDefinition(DatabaseTable tableName)
         {
-            var columns = await mySqlExecutor.GetTableColumns(tableName);
+            var columns = await mySqlExecutor.GetTableColumns(tableName.Database, tableName.Table);
 
             var primaryKeys = columns.Where(c => c.PrimaryKey).ToList();
 
@@ -109,14 +109,15 @@ namespace WDE.DatabaseEditors.Tools
             }
 
             DatabaseTableDefinitionJson tableDefinition = new();
-            tableDefinition.Id = tableName;
+            tableDefinition.Id = tableName.Table;
+            tableDefinition.DataDatabaseType = tableName.Database;
             tableDefinition.Compatibility = new List<string>() {currentCoreVersion.Current.Tag};
-            tableDefinition.Name = tableName.ToTitleCase();
-            tableDefinition.TableName = tableName;
+            tableDefinition.Name = tableName.Table.ToTitleCase();
+            tableDefinition.TableName = tableName.Table;
             tableDefinition.GroupName = "CATEGORY";
             tableDefinition.RecordMode = RecordMode.SingleRow;//primaryKeys.Count != 1 ? RecordMode.MultiRecord : RecordMode.SingleRow;
             if (tableDefinition.RecordMode == RecordMode.SingleRow)
-                tableDefinition.SingleSolutionName = tableDefinition.MultiSolutionName = $"{tableName.ToTitleCase()} Table";
+                tableDefinition.SingleSolutionName = tableDefinition.MultiSolutionName = $"{tableName.Table.ToTitleCase()} Table";
             else
             {
                 tableDefinition.SingleSolutionName = "{name} " + tableName + " editor";
@@ -142,7 +143,7 @@ namespace WDE.DatabaseEditors.Tools
             return SerializeDefinition(tableDefinition);
         }
         
-        private async Task UpdateDefinition(string tableName)
+        private async Task UpdateDefinition(DatabaseTable tableName)
         {
             IsLoading = true;
             Definition.FromString(await GenerateDefinition(tableName));

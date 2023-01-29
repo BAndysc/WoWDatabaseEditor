@@ -63,7 +63,7 @@ namespace WoWDatabaseEditorCore.ViewModels
         public ICommand Copy => AlwaysDisabledCommand.Command;
         public ICommand Cut => AlwaysDisabledCommand.Command;
         public ICommand Paste => AlwaysDisabledCommand.Command;
-        public ICommand Save => AlwaysDisabledCommand.Command;
+        public IAsyncCommand Save => AlwaysDisabledAsyncCommand.Command;
         public IAsyncCommand? CloseCommand { get; set; }
         public bool CanClose => true;
         public bool IsModified => false;

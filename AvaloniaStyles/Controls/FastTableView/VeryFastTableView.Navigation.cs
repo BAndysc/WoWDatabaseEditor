@@ -1,6 +1,6 @@
 using System;
 using Avalonia.Input;
-using Avalonia.Media;
+using WDE.Common.Utils;
 
 namespace AvaloniaStyles.Controls.FastTableView;
 
@@ -39,21 +39,52 @@ public partial class VeryFastTableView
         SelectedCellIndex = prev.Value;
         return true;
     }
+
+    private bool IsGroupIndexValid(VerticalCursor cursor)
+    {
+        var items = Items;
+        return items != null && cursor.GroupIndex >= 0 && cursor.GroupIndex < items.Count;
+    }
+
+    private bool IsRowIndexValid(VerticalCursor cursor)
+    {
+        var items = Items!;
+        return IsGroupIndexValid(cursor) && cursor.RowIndex >= 0 && cursor.RowIndex < items[cursor.GroupIndex].Rows.Count;
+    }
     
+    private bool MoveCursorUpDown(int diff)
+    {
+        var index = SelectedRowIndex;
+        if (Items == null)
+            return false;
+        
+        for (int group = index.GroupIndex, row = index.RowIndex + diff; group < Items.Count && group >= 0; group += diff)
+        {
+            if (IsGroupIndexValid(new VerticalCursor(group, row)))
+            {
+                for (int i = row; row < Items[group].Rows.Count && row >= 0; i += diff)
+                {
+                    if (IsRowIndexValid(new VerticalCursor(group, row)))
+                    {
+                        SelectedRowIndex = new VerticalCursor(group, row);
+                        return true;
+                    }
+                }
+                row = diff > 0 ? 0 : (IsGroupIndexValid(new VerticalCursor(group + diff, 0)) ? Items[group + diff].Rows.Count - 1 : 0);
+            }
+        }
+
+        return false;
+    }
+
     private bool MoveCursorDown()
     {
-        if (Rows == null || SelectedRowIndex == Rows?.Count - 1)
-            return false;
-        SelectedRowIndex++;
-        return true;
+        return MoveCursorUpDown(1);
     }
 
     private bool MoveCursorUp()
     {
-        if (SelectedRowIndex == 0)
-            return false;
-        SelectedRowIndex--;
-        return true;
+        return MoveCursorUpDown(-1);
     }
 
     private bool MoveCursorPrevious()
@@ -90,11 +121,11 @@ public partial class VeryFastTableView
                 MoveCursorPrevious();
                 break;
             case NavigationDirection.First:
-                SelectedRowIndex = 0;
+                SelectedRowIndex = new VerticalCursor(0, 0);
                 SelectedCellIndex = 0;
                 break;
             case NavigationDirection.Last:
-                SelectedRowIndex = Rows?.Count - 1 ?? - 1;
+                SelectedRowIndex = new VerticalCursor(Items?.Count ?? 0 - 1, Items?[^1]?.Rows?.Count ?? 0 - 1);
                 SelectedCellIndex = ColumnsCount - 1;
                 break;
             case NavigationDirection.Left:
@@ -122,15 +153,19 @@ public partial class VeryFastTableView
         MultiSelection.Add(SelectedRowIndex);
     }
 
-    private void EnsureRowVisible(int row)
+    private void EnsureRowVisible(VerticalCursor row)
     {
         if (ScrollViewer == null)
             return;
-        var top = row * RowHeight + DrawingStartOffsetY;
+
+        var viewRect = DataViewport;
+
+        var headerHeight = (IsGroupingEnabled ? RowHeight : 0);
+        var top = GetRowY(row);
         var bottom = top + RowHeight;
-        if (top < ScrollViewer!.Offset.Y + DrawingStartOffsetY * 2)
-            ScrollViewer.Offset = ScrollViewer.Offset.WithY(top - DrawingStartOffsetY);
-        else if (bottom > ScrollViewer.Offset.Y + ScrollViewer.Viewport.Height)
+        if (top < viewRect.Top + headerHeight)
+            ScrollViewer.Offset = ScrollViewer.Offset.WithY(top - (DrawingStartOffsetY + headerHeight));
+        else if (bottom > viewRect.Bottom)
             ScrollViewer.Offset = ScrollViewer.Offset.WithY(bottom - ScrollViewer.Viewport.Height);
     }
 

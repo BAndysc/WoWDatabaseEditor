@@ -2,6 +2,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using AsyncAwaitBestPractices.MVVM;
 using Prism.Commands;
 using Prism.Events;
 using WDE.Common;
@@ -50,11 +51,12 @@ public class RowPickerViewModel : ObservableBase, IDialog, IClosableDialog
         this.messageBoxService = messageBoxService;
         this.noSaveMode = noSaveMode;
         Watch(baseViewModel, o => o.IsModified, nameof(Title));
-        ExecuteChangedCommand = noSaveMode ? AlwaysDisabledCommand.Command : new AsyncAutoCommand(async () =>
+        ExecuteChangedCommand = noSaveMode ? AlwaysDisabledAsyncCommand.Command : new AsyncAutoCommand(async () =>
         {
-            baseViewModel.Save.Execute(null);
+            await baseViewModel.Save.ExecuteAsync();
             eventAggregator.GetEvent<DatabaseTableChanged>().Publish(baseViewModel.TableDefinition.TableName);
-            await taskRunner.ScheduleTask("Update session", async () => await sessionService.UpdateQuery(baseViewModel));
+            if (sessionService.IsOpened)
+                await taskRunner.ScheduleTask("Update session", async () => await sessionService.UpdateQuery(baseViewModel));
             if (solutionTasksService.CanReloadRemotely)
                 await solutionTasksService.ReloadSolutionRemotelyTask(baseViewModel.SolutionItem);
         });
@@ -102,7 +104,7 @@ public class RowPickerViewModel : ObservableBase, IDialog, IClosableDialog
             if (result == 0)
                 return;
             if (result == 2)
-                ExecuteChangedCommand.Execute(null);
+                await ExecuteChangedCommand.ExecuteAsync();
         }
         if (cancel)
             CloseCancel?.Invoke();
@@ -139,7 +141,7 @@ public class RowPickerViewModel : ObservableBase, IDialog, IClosableDialog
     public ICommand Accept { get; }
     public ICommand Cancel { get; }
 
-    public ICommand ExecuteChangedCommand { get; }
+    public IAsyncCommand ExecuteChangedCommand { get; }
     public ICommand GenerateCurrentSqlCommand { get; }
     public ICommand CopyCurrentSqlCommand { get; }
     public ICommand PickSelected { get; }

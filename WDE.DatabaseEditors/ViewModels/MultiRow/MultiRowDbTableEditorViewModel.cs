@@ -6,9 +6,11 @@ using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using DynamicData;
 using Prism.Commands;
 using Prism.Events;
+using PropertyChanged.SourceGenerator;
 using WDE.Common;
 using WDE.Common.Database;
 using WDE.Common.History;
@@ -32,15 +34,16 @@ using WDE.DatabaseEditors.QueryGenerators;
 using WDE.DatabaseEditors.Services;
 using WDE.DatabaseEditors.Solution;
 using WDE.MVVM;
+using WDE.MVVM.Observable;
 
 namespace WDE.DatabaseEditors.ViewModels.MultiRow
 {
-    public class MultiRowDbTableEditorViewModel : ViewModelBase
+    public partial class MultiRowDbTableEditorViewModel : ViewModelBase
     {
         private readonly IItemFromListProvider itemFromListProvider;
         private readonly IMessageBoxService messageBoxService;
         private readonly IParameterFactory parameterFactory;
-        private readonly IMySqlExecutor mySqlExecutor;
+        private readonly IDatabaseQueryExecutor mySqlExecutor;
         private readonly IQueryGenerator queryGenerator;
         private readonly IDatabaseTableModelGenerator modelGenerator;
         private readonly IConditionEditService conditionEditService;
@@ -53,16 +56,31 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         private Dictionary<DatabaseKey, DatabaseEntitiesGroupViewModel> byEntryGroups = new();
         public ObservableCollection<DatabaseEntitiesGroupViewModel> Rows { get; } = new();
 
-        private DatabaseEntityViewModel? selectedRow;
+        public override ICommand Copy { get; }
+        public override ICommand Paste { get; }
+        public override ICommand Cut { get; }
+
+        [AlsoNotify(nameof(FocusedEntity))] 
+        [AlsoNotify(nameof(SelectedRow))] 
+        [AlsoNotify(nameof(FocusedCell))]
+        [Notify] private VerticalCursor focusedRowIndex = VerticalCursor.None;
+        
+        [AlsoNotify(nameof(FocusedCell))]
+        [Notify] private int focusedCellIndex = -1;
+        public DatabaseCellViewModel? FocusedCell => SelectedRow != null && focusedCellIndex >= 0 && focusedCellIndex < SelectedRow.Cells.Count ? SelectedRow.Cells[focusedCellIndex] : null;
+        public ITableMultiSelection MultiSelection { get; } = new TableMultiSelection();
+        
         public DatabaseEntityViewModel? SelectedRow
         {
-            get => selectedRow;
-            set
-            {
-                SetProperty(ref selectedRow, value);
-                RaisePropertyChanged(nameof(FocusedEntity));
-            }
+            get => focusedRowIndex.GroupIndex >= 0 && focusedRowIndex.GroupIndex < Rows.Count &&
+                   focusedRowIndex.RowIndex >= 0 && focusedRowIndex.RowIndex < Rows[focusedRowIndex.GroupIndex].Count ?
+                Rows[focusedRowIndex.GroupIndex][focusedRowIndex.RowIndex] : null;
         }
+
+        public override bool SupportsMultiSelect => true;
+
+        public override ICollection<DatabaseEntity>? MultiSelectionEntities
+            => MultiSelection.All().Select(idx => Rows[idx.GroupIndex][idx.RowIndex].Entity).ToList();
 
         public override DatabaseEntity? FocusedEntity => SelectedRow?.Entity;
         
@@ -121,6 +139,12 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         public DelegateCommand<DatabaseCellViewModel?> DuplicateCommand { get; }
         public DelegateCommand<DatabaseEntitiesGroupViewModel> AddRowCommand { get; }
         public AsyncAutoCommand<DatabaseCellViewModel> OpenParameterWindow { get; }
+        public AsyncAutoCommand RevertSelectedCommand { get; }
+        public DelegateCommand SetNullSelectedCommand { get; }
+        public DelegateCommand DuplicateSelectedCommand { get; }
+        public AsyncAutoCommand DeleteRowSelectedCommand { get; }
+        public DelegateCommand CopySelectedRowsCommand { get; }
+        public AsyncAutoCommand PasteRowsCommand { get; } 
 
         public event Action<DatabaseEntity>? OnDeletedQuery;
         public event Action<DatabaseEntity>? OnKeyDeleted;
@@ -131,7 +155,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             IHistoryManager history, ITaskRunner taskRunner, IMessageBoxService messageBoxService,
             IEventAggregator eventAggregator, ISolutionManager solutionManager, 
             IParameterFactory parameterFactory, ISolutionTasksService solutionTasksService,
-            ISolutionItemNameRegistry solutionItemName, IMySqlExecutor mySqlExecutor,
+            ISolutionItemNameRegistry solutionItemName, IDatabaseQueryExecutor mySqlExecutor,
             IQueryGenerator queryGenerator, IDatabaseTableModelGenerator modelGenerator,
             ITableDefinitionProvider tableDefinitionProvider,
             IConditionEditService conditionEditService, ISolutionItemIconRegistry iconRegistry,
@@ -140,6 +164,8 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             IParameterPickerService parameterPickerService,
             IStatusBar statusBar, ITablePersonalSettings tablePersonalSettings,
             IMetaColumnsSupportService metaColumnsSupportService,
+            IClipboardService clipboardService,
+            ITextEntitySerializer serializer,
             DocumentMode mode = DocumentMode.Editor) 
             : base(history, solutionItem, solutionItemName, 
             solutionManager, solutionTasksService, eventAggregator, 
@@ -171,6 +197,102 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             EditConditionsCommand = new AsyncAutoCommand<DatabaseCellViewModel?>(EditConditions);
             AddRowCommand = new DelegateCommand<DatabaseEntitiesGroupViewModel>(AddRowByGroup);
             AddNewCommand = new AsyncAutoCommand(AddNewEntity);
+            RevertSelectedCommand = new AsyncAutoCommand(async () =>
+            {
+                if (focusedCellIndex == -1)
+                    return;
+                using var _ = BulkEdit("Batch revert");
+                foreach (var selected in MultiSelection.All())
+                {
+                    var row = Rows[selected.GroupIndex][selected.RowIndex];
+                    var cell = row.Cells[focusedCellIndex];
+                    await RevertCommand.ExecuteAsync(cell);
+                }
+            });
+            SetNullSelectedCommand = new DelegateCommand(() =>
+            {
+                if (focusedCellIndex == -1)
+                    return;
+                using var _ = BulkEdit("Batch set to null");
+                foreach (var selected in MultiSelection.All())
+                {
+                    var row = Rows[selected.GroupIndex][selected.RowIndex];
+                    var cell = row.Cells[focusedCellIndex];
+                    SetNullCommand.Execute(cell);
+                }
+            });
+            DuplicateSelectedCommand = new DelegateCommand(() =>
+            {
+                using var _ = BulkEdit("Batch duplicate");
+                foreach (var selected in MultiSelection.All().Reverse())
+                {
+                    var row = Rows[selected.GroupIndex][selected.RowIndex];
+                    var duplicate = row.Entity.Clone();
+                    ForceInsertEntity(duplicate, Entities.Count - 1);
+                }
+            });
+            DeleteRowSelectedCommand = new AsyncAutoCommand(async () =>
+            {
+                using var _ = BulkEdit("Batch delete");
+                foreach (var selected in MultiSelection.All().Reverse())
+                {
+                    var row = Rows[selected.GroupIndex][selected.RowIndex];
+                    await RemoveEntity(row.Entity);
+                }
+                MultiSelection.Clear();
+            });
+            Copy = new DelegateCommand(() =>
+            {
+                clipboardService.SetText(FocusedCell!.StringValue ?? "(null)");
+            }, () => FocusedCell != null).ObservesProperty(()=>FocusedCell);
+
+            Cut = new DelegateCommand(() =>
+            {
+                Copy.Execute(null);
+                if (FocusedCell!.CanBeSetToNull)
+                    FocusedCell!.ParameterValue?.SetNull();
+                else if (FocusedCell!.ParameterValue is IParameterValue<long> longValue)
+                    longValue.Value = 0;
+                else
+                    FocusedCell!.UpdateFromString("");
+            }, () => FocusedCell != null).ObservesProperty(()=>FocusedCell);
+            Paste = new AsyncAutoCommand(async () =>
+            {
+                if (await clipboardService.GetText() is { } text)
+                {
+                    using (BulkEdit("Bulk paste"))
+                    {
+                        foreach (var index in MultiSelection.All())
+                            Rows[index.GroupIndex][index.RowIndex].Cells[focusedCellIndex].UpdateFromString(text);
+                    }
+                }
+            }, () => FocusedCell != null);
+            CopySelectedRowsCommand = new DelegateCommand(() =>
+            {
+                var serialized = serializer.Serialize(MultiSelection.All()
+                    .Select(index => Rows[index.GroupIndex][index.RowIndex].Entity));
+                clipboardService.SetText(serialized);
+            });
+            PasteRowsCommand = new AsyncAutoCommand(async () =>
+            {
+                try
+                {
+                    var text = await clipboardService.GetText();
+                    var key = FocusedEntity?.Key ?? (Rows.Count > 0 ? Rows[0].Key : null);
+                    var deserialized = serializer.Deserialize(tableDefinition, text, key);
+                    foreach (var entity in deserialized)
+                    {
+                        if (key.HasValue)
+                            entity.SetTypedCellOrThrow(tableDefinition.PrimaryKey[0], key.Value[0]);
+                        ForceInsertEntity(entity, Entities.Count);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    statusBar.PublishNotification(new PlainNotification(NotificationType.Error, "Failed to paste rows (see the debug log output)"));
+                }
+            });
             
             Debug.Assert(tableDefinition.GroupByKeys.Count == 1);
 
@@ -195,8 +317,27 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                 if (freshEntity.GetCell(autoIncrementColumn.DbColumnName) is DatabaseField<long> lField)
                     lField.Current.Value = max;
             }
-            ForceInsertEntity(freshEntity, Entities.Count);
+
+            // insert at the end of the current group
+            ForceInsertEntity(freshEntity, GetLastIndexInEntitiesOfKey(key));
             return freshEntity;
+        }
+
+        private int GetLastIndexInEntitiesOfKey(DatabaseKey key)
+        {
+            var index = Entities.Count;
+            if (byEntryGroups.TryGetValue(key, out var group))
+            {
+                index = 0;
+                foreach (var g in Rows)
+                {
+                    index += g.Count;
+                    if (g == group)
+                        break;
+                }
+            }
+
+            return index;
         }
         
         private void AddRowByGroup(DatabaseEntitiesGroupViewModel group)
@@ -302,7 +443,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
 
         protected override async Task InternalLoadData(DatabaseTableData data)
         {
-            Rows.Clear();
+            Rows.RemoveAll();
             columns = tableDefinition.Groups.SelectMany(g => g.Fields)
                 .Where(c => c.DbColumnName != data.TableDefinition.TablePrimaryKeyColumnName)
                 .ToList();
@@ -331,7 +472,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             historyHandler = History.AddHandler(AutoDispose(new MultiRowTableEditorHistoryHandler(this)));
         }
 
-        protected override IDisposable BulkEdit(string name) => historyHandler?.BulkEdit(name) ?? Disposable.Empty;
+        public override IDisposable BulkEdit(string name) => historyHandler?.BulkEdit(name) ?? Disposable.Empty;
 
         private MultiRowTableEditorHistoryHandler? historyHandler;
         private bool allowMultipleKeys = true;
@@ -360,7 +501,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                     .SetIcon(MessageBoxIcon.Information)
                     .Build()))
                 {
-                    if (mySqlExecutor.IsConnected)
+                    if (mySqlExecutor.IsConnected(tableDefinition))
                     {
                         if (await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
                             .SetTitle("Execute DELETE query?")
@@ -372,7 +513,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                             .Build()))
                         {
                             OnDeletedQuery?.Invoke(entity);
-                            await mySqlExecutor.ExecuteSql(queryGenerator.GenerateDeleteQuery(tableDefinition, entity));
+                            await mySqlExecutor.ExecuteSql(tableDefinition, queryGenerator.GenerateDeleteQuery(tableDefinition, entity));
                             History.MarkNoSave();
                         }
                     }
@@ -386,9 +527,9 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         
         public void RedoExecuteDelete(DatabaseEntity entity)
         {
-            if (mySqlExecutor.IsConnected)
+            if (mySqlExecutor.IsConnected(tableDefinition))
             {
-                mySqlExecutor.ExecuteSql(queryGenerator.GenerateDeleteQuery(tableDefinition, entity));
+                mySqlExecutor.ExecuteSql(tableDefinition, queryGenerator.GenerateDeleteQuery(tableDefinition, entity));
                 History.MarkNoSave();
             }
         }
@@ -412,7 +553,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             Entities.RemoveAt(indexOfEntity);
             var vm = byEntryGroups[entity.Key].GetAndRemove(entity);
             if (SelectedRow == vm)
-                SelectedRow = null;
+                FocusedRowIndex = VerticalCursor.None;
 
             return true;
         }
@@ -434,7 +575,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
 
                 if (column.IsConditionColumn)
                 {
-                    var label = entity.ToObservable(e => e.Conditions).Select(c => "Conditions (" + (c?.Count(cond => cond.IsActualCondition()) ?? 0) + ")");
+                    var label = Observable.Select(entity.ToObservable(e => e.Conditions), c => "Conditions (" + (c?.Count(cond => cond.IsActualCondition()) ?? 0) + ")");
                     cellViewModel = AutoDispose(new DatabaseCellViewModel(columnIndex, "Conditions", EditConditionsCommand, row, entity, label));
                 }
                 else if (column.IsMetaColumn)
@@ -474,12 +615,25 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                 row.Cells.Add(cellViewModel);
                 columnIndex++;
             }
-            
+
+            DatabaseEntity? previousEntity = null;
+            bool isLastInGroup = GetLastIndexInEntitiesOfKey(entity.Key) == index;
+            if (Entities.Count > index && index >= 0)
+                previousEntity = Entities[index];
             Entities.Insert(index, entity);
             EnsureKey(entity.Key);
+
+            var group = byEntryGroups[entity.Key];
+            var indexWithinGroup = group.IndexIf(e => e.Entity == previousEntity);
+            var newIndex = isLastInGroup ? group.Count : Math.Clamp(indexWithinGroup, 0, group.Count);
+            group.Insert(newIndex, row);
             
-            byEntryGroups[entity.Key].Add(row);
-            SelectedRow = row;
+            FocusedRowIndex = new VerticalCursor(Rows.IndexOf(group), newIndex);
+            if (focusedRowIndex.IsValid)
+            {
+                MultiSelection.Clear();
+                MultiSelection.Add(focusedRowIndex);
+            }
             return true;
         }
 
@@ -517,6 +671,113 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         protected override List<EntityOrigianlField>? GetOriginalFields(DatabaseEntity entity)
         {
             return null; // because in multirow we always delete and reinsert all
+        }
+
+        public void UpdateSelectedCells(string text)
+        {
+            System.IDisposable disposable = new EmptyDisposable();
+            if (MultiSelection.MoreThanOne)
+                disposable = historyHandler!.BulkEdit("Bulk edit property");
+            foreach (var selected in MultiSelection.All())
+                Rows[selected.GroupIndex].Rows[selected.RowIndex].CellsList[focusedCellIndex].UpdateFromString(text);
+            disposable.Dispose();
+        }
+
+        public void SortByColumn(DatabaseColumnHeaderViewModel column, bool ascending)
+        {
+            List<List<int>> newGroupIndices = new List<List<int>>();
+            List<List<int>> oldGroupIndices = new List<List<int>>();
+
+            var primaryColumnIndex = Columns.IndexIf(i => i == column);
+            int secondarColumnIndex = -1;
+            if (TableDefinition.PrimaryKey.Count >= 3)
+            {
+                // i.e. for creature_text, primary keys are (entry, group, id)
+                // in MultiRow editor `entry` is hidden, because entries are grouped by it, so we want to check if
+                // the second primary key column is the one we sort by, because in this case, we want to sort by the third column as well
+                if (TableDefinition.PrimaryKey[0] == TableDefinition.TablePrimaryKeyColumnName &&
+                    TableDefinition.PrimaryKey[1] == column.DatabaseName)
+                    secondarColumnIndex = Columns.IndexIf(c => c.DatabaseName == TableDefinition.PrimaryKey[2]);
+            }
+
+            foreach (var group in Rows)
+            {
+                var newIndices = group.NewIndicesIfSorted(ascending, Compare.CreateComparer<DatabaseEntityViewModel>((a, b) =>
+                {
+                    var cellA = a!.Cells[primaryColumnIndex];
+                    var cellB = b!.Cells[primaryColumnIndex];
+                    int compareResult;
+                    if (cellA.IsLongValue)
+                        compareResult = cellA.AsLongValue.CompareTo(cellB.AsLongValue);
+                    else
+                        compareResult = string.Compare(cellA.StringValue, cellB.StringValue, StringComparison.Ordinal);
+                    
+                    if (compareResult != 0)
+                        return compareResult;
+                    
+                    // secondary column index, if exists, will be always long
+                    if (secondarColumnIndex != -1)
+                    {
+                        var cellA_2 = a.Cells[secondarColumnIndex];
+                        var cellB_2 = b.Cells[secondarColumnIndex];
+                        return cellA_2.AsLongValue.CompareTo(cellB_2.AsLongValue);
+                    }
+
+                    return 0;
+                }), out var oldIndices).ToList();
+                newGroupIndices.Add(newIndices);
+                oldGroupIndices.Add(oldIndices);
+            }
+            var action = new AnonymousHistoryAction("Sort by " + column.Name, () =>
+            {
+                for (var index = 0; index < newGroupIndices.Count; index++)
+                {
+                    var group = Rows[index];
+                    group.OrderByIndices(newGroupIndices[index]);
+                }
+            }, () =>
+            {
+                for (var index = 0; index < oldGroupIndices.Count; index++)
+                {
+                    var group = Rows[index];
+                    group.OrderByIndices(oldGroupIndices[index]);
+                }
+            });
+            if (historyHandler != null)
+                historyHandler?.DoAction(action);
+            else
+                action.Redo();
+        }
+
+        // we're gonna check for duplicate keys before saving the data to prevent data loss
+        protected override async Task<bool> BeforeSaveData()
+        {
+            HashSet<DatabaseKey> keys = new HashSet<DatabaseKey>();
+            bool anyDuplicate = false;
+            foreach (var group in Rows)
+            {
+                keys.Clear();
+                foreach (var row in group)
+                {
+                    var uniqueKey = row.Entity.ForceGenerateKey(tableDefinition);
+                    if (!keys.Add(uniqueKey))
+                    {
+                        row.Duplicate = true;
+                        anyDuplicate = true;
+                    }
+                    else
+                        row.Duplicate = false;
+                }
+            }
+
+            if (anyDuplicate)
+            {
+                await messageBoxService.SimpleDialog("Duplicates", "There are duplicates in the table",
+                    "The table can't be saved, because there are duplicate rows (same primary key). They are marked in red.\n\nEither change their key values or delete them.");
+                return false;
+            }
+
+            return true;
         }
     }
 }

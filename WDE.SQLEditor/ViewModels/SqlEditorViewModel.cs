@@ -28,9 +28,9 @@ namespace WDE.SQLEditor.ViewModels
             INativeTextDocument sql)
         {
             Code = sql;
-            ExecuteSql = new DelegateCommand(() =>
+            ExecuteSql = new AsyncAutoCommand(() =>
             {
-                taskRunner.ScheduleTask("Executing query",
+                return taskRunner.ScheduleTask("Executing query",
                     async () =>
                     {
                         statusBar.PublishNotification(new PlainNotification(NotificationType.Info, "Executing query"));
@@ -47,10 +47,7 @@ namespace WDE.SQLEditor.ViewModels
                     });
             }, () => databaseProvider.IsConnected);
             IsLoading = false;
-            Save = new DelegateCommand(() =>
-            {
-                ExecuteSql.Execute(null);
-            });
+            Save = ExecuteSql;
             Accept = Cancel = new DelegateCommand(() => CloseOk?.Invoke());
         }
 
@@ -101,7 +98,7 @@ namespace WDE.SQLEditor.ViewModels
             set => SetProperty(ref code, value);
         }
 
-        public ICommand ExecuteSql { get; }
+        public IAsyncCommand ExecuteSql { get; }
 
         public void Dispose()
         {
@@ -127,7 +124,7 @@ namespace WDE.SQLEditor.ViewModels
         public ICommand Copy { get; } = AlwaysDisabledCommand.Command;
         public ICommand Cut { get; } = AlwaysDisabledCommand.Command;
         public ICommand Paste { get; } = AlwaysDisabledCommand.Command;
-        public ICommand Save { get; }
+        public IAsyncCommand Save { get; }
         public IAsyncCommand CloseCommand { get; set; } = null;
         public bool CanClose { get; } = true;
         public bool IsModified { get; } = false;

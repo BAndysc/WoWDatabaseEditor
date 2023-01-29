@@ -28,6 +28,7 @@ using WDE.DatabaseEditors.Extensions;
 using WDE.DatabaseEditors.Loaders;
 using WDE.DatabaseEditors.Models;
 using WDE.DatabaseEditors.QueryGenerators;
+using WDE.DatabaseEditors.Services;
 using WDE.DatabaseEditors.Solution;
 using WDE.DatabaseEditors.Utils;
 using WDE.DatabaseEditors.ViewModels.SingleRow;
@@ -52,7 +53,7 @@ namespace WDE.DatabaseEditors.ViewModels
         protected readonly IDatabaseTableCommandService commandService;
         protected readonly IParameterPickerService parameterPickerService;
         protected readonly IStatusBar statusBar;
-        protected readonly IMySqlExecutor mySqlExecutor;
+        protected readonly IDatabaseQueryExecutor mySqlExecutor;
 
         protected ViewModelBase(IHistoryManager history,
             DatabaseTableSolutionItem solutionItem,
@@ -72,7 +73,7 @@ namespace WDE.DatabaseEditors.ViewModels
             IDatabaseTableCommandService commandService,
             IParameterPickerService parameterPickerService,
             IStatusBar statusBar,
-            IMySqlExecutor mySqlExecutor)
+            IDatabaseQueryExecutor mySqlExecutor)
         {
             this.solutionItemName = solutionItemName;
             this.solutionManager = solutionManager;
@@ -111,7 +112,7 @@ namespace WDE.DatabaseEditors.ViewModels
             nameGeneratorParameter = parameterFactory.Factory(tableDefinition.Picker);
         }
 
-        protected abstract System.IDisposable BulkEdit(string name);
+        public abstract System.IDisposable BulkEdit(string name);
 
         protected async Task EditParameter(IParameterValue parameterValue, DatabaseEntity entity)
         {
@@ -178,6 +179,8 @@ namespace WDE.DatabaseEditors.ViewModels
 
         protected async Task SaveSolutionItem()
         {
+            if (!await BeforeSaveData())
+                return;
             UpdateSolutionItem();
             solutionManager.Refresh(SolutionItem);
             await taskRunner.ScheduleTask($"Export {Title} to database",
@@ -188,7 +191,7 @@ namespace WDE.DatabaseEditors.ViewModels
                     progress.Report(1, 2, "Execute query");
                     try
                     {
-                        await mySqlExecutor.ExecuteSql(query);
+                        await mySqlExecutor.ExecuteSql(tableDefinition, query);
                         History.MarkAsSaved();
                         await AfterSave();
                         statusBar.PublishNotification(new PlainNotification(NotificationType.Success, "Saved to database"));
@@ -206,6 +209,7 @@ namespace WDE.DatabaseEditors.ViewModels
         protected virtual Task AfterSave() => Task.CompletedTask;
 
         protected virtual Task<bool> BeforeLoadData() => Task.FromResult(true);
+        protected virtual Task<bool> BeforeSaveData() => Task.FromResult(true);
 
         protected virtual async Task<DatabaseTableData?> LoadData()
         {
@@ -245,35 +249,44 @@ namespace WDE.DatabaseEditors.ViewModels
             if (tableDefinition.Commands == null)
                 return;
 
-            foreach (var command in tableDefinition.Commands)
+            foreach (var commandDefinition in tableDefinition.Commands)
             {
-                var cmd = commandService.FindCommand(command.CommandId);
-                if (cmd != null)
+                var cmdExecutor = commandService.FindCommand(commandDefinition.CommandId);
+                TableCommandViewModel command;
+                if (cmdExecutor != null)
                 {
-                    Commands.Add(new TableCommandViewModel(cmd, new AsyncAutoCommand( () =>
+                    command = new TableCommandViewModel(commandDefinition, cmdExecutor, new AsyncAutoCommand(() =>
                     {
                         return messageBoxService.WrapError(() =>
                             WrapBulkEdit(
-                            () => WrapBlockingTask(
-                                () => cmd.Process(command, new DatabaseTableData(tableDefinition, Entities), this)
-                                ), cmd.Name));
-                    })));
+                                () => WrapBlockingTask(
+                                    () => cmdExecutor.Process(commandDefinition,
+                                        new DatabaseTableData(tableDefinition, Entities), this)
+                                ), cmdExecutor.Name));
+                    }));
                 }
                 else
                 {
-                    var cmdPerKey = commandService.FindPerKeyCommand(command.CommandId);
+                    var cmdPerKey = commandService.FindPerKeyCommand(commandDefinition.CommandId);
                     if (cmdPerKey == null)  
-                        throw new Exception("Command " + command.CommandId + " not found!");
+                        throw new Exception("Command " + commandDefinition.CommandId + " not found!");
 
-                    Commands.Add(new TableCommandViewModel(cmdPerKey, new AsyncAutoCommand( () =>
+                    command = new TableCommandViewModel(commandDefinition, cmdPerKey, new AsyncAutoCommand(() =>
                     {
-                        return messageBoxService.WrapError(() => 
+                        return messageBoxService.WrapError(() =>
                             WrapBulkEdit(
-                                () => WrapBlockingTask(() => cmdPerKey.Process(command,
-                            new DatabaseTableData(tableDefinition, Entities), GenerateKeys().ToList(), this))
-                                    , cmdPerKey.Name));
-                    })));
+                                () => WrapBlockingTask(() => cmdPerKey.Process(commandDefinition,
+                                    new DatabaseTableData(tableDefinition, Entities), GenerateKeys().ToList(), this))
+                                , cmdPerKey.Name));
+                    }));
                 }
+                
+                if (commandDefinition.KeyBinding != null)
+                    KeyBindings.Add(new CommandKeyBinding(command.Command, commandDefinition.KeyBinding, true));
+                if (commandDefinition.Usage.HasFlagFast(DatabaseCommandUsage.Toolbar))
+                    ToolbarCommands.Add(command);
+                if (commandDefinition.Usage.HasFlagFast(DatabaseCommandUsage.ContextMenu))
+                    ContextCommands.Add(command);
             }
         }
 
@@ -306,7 +319,9 @@ namespace WDE.DatabaseEditors.ViewModels
         // DO NOT REORDER THINGS HERE, OR ELSE UNDO-REDO WILL BE BROKEN :(((
         public ObservableCollection<DatabaseEntity> Entities { get; } = new();
 
-        public ObservableCollection<TableCommandViewModel> Commands { get; } = new();
+        public ObservableCollection<TableCommandViewModel> ContextCommands { get; } = new();
+        public ObservableCollection<TableCommandViewModel> ToolbarCommands { get; } = new();
+        public List<CommandKeyBinding> KeyBindings { get; } = new();
 
         private DelegateCommand undoCommand;
         private DelegateCommand redoCommand;
@@ -344,7 +359,7 @@ namespace WDE.DatabaseEditors.ViewModels
         public virtual ICommand Copy => AlwaysDisabledCommand.Command;
         public virtual ICommand Cut => AlwaysDisabledCommand.Command;
         public virtual ICommand Paste => AlwaysDisabledCommand.Command;
-        public ICommand Save { get; }
+        public IAsyncCommand Save { get; }
         public IAsyncCommand? CloseCommand { get; set; } = null;
         public bool CanClose { get; } = true;
         public bool IsModified => !History.IsSaved;
@@ -354,6 +369,8 @@ namespace WDE.DatabaseEditors.ViewModels
         public virtual DatabaseEntity? FocusedEntity { get; }
         public abstract DatabaseEntity AddRow(DatabaseKey key);
         public abstract DatabaseKey? SelectedTableKey { get; }
+        public abstract ICollection<DatabaseEntity>? MultiSelectionEntities { get; }
+        public abstract bool SupportsMultiSelect { get; }
 
         public void TryPick(DatabaseEntity entity)
         {

@@ -14,6 +14,7 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              Name="rootWindow"
              x:DataType="singleRow:SingleRowDbTableEditorViewModel"
+             utils:KeyGestureBind.Bindings="{CompiledBinding KeyBindings}"
              IsEnabled="{Binding TaskInProgress, Converter={x:Static converters:InverseBoolConverter.Instance}}"
              x:Class="WDE.DatabaseEditors.Avalonia.Views.SingleRow.SingleRowDbTableEditorView">
     <UserControl.Resources>
@@ -166,7 +167,7 @@
                     MultiSelection="{CompiledBinding MultiSelection}"
                     Columns="{CompiledBinding Columns}"
                     ValueUpdateRequest="VeryFastTableView_OnValueUpdateRequest"
-                    Rows="{CompiledBinding Rows}">
+                    Items="{CompiledBinding OnlyGroup}">
                     <fastTableView:VeryFastTableView.CustomCellInteractor>
                         <singleRow1:CustomCellInteractor />
                     </fastTableView:VeryFastTableView.CustomCellInteractor>

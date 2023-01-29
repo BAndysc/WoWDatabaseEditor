@@ -107,6 +107,7 @@ namespace WDE.Parameters
             factory.Register("PlayerChoiceParameter", AddAsyncDatabaseParameter(new PlayerChoiceParameter(database)));
             factory.Register("PlayerChoiceResponseParameter", AddAsyncDatabaseParameter(new PlayerChoiceResponseParameter(database)));
             factory.Register("ServersideAreatriggerParameter", AddAsyncDatabaseParameter(new ServersideAreatriggerParameter(database)));
+            factory.Register("DatabasePhaseParameter", AddAsyncDatabaseParameter(new DatabasePhaseParameter(database)), QuickAccessMode.Limited);
             factory.Register("ConversationTemplateParameter", new ConversationTemplateParameter(database));
             factory.Register("BoolParameter", new BoolParameter());
             factory.Register("FlagParameter", new FlagParameter());
@@ -121,6 +122,7 @@ namespace WDE.Parameters
             factory.RegisterCombined("UnitBytes1Parameter", "StandStateParameter", "AnimTierParameter", (standState, animTier) => new UnitBytes1Parameter(standState, animTier, windowManager));
             factory.RegisterCombined("UnitBytes2Parameter", "SheathStateParameter",  "UnitPVPStateFlagParameter","UnitBytesPetFlagParameter", "ShapeshiftFormParameter", 
                 (sheath, pvp, pet, shapeShift) => new UnitBytes2Parameter(sheath, pvp, pet, shapeShift, windowManager));
+            factory.RegisterCombined("PhaseParameter", "DbcPhaseParameter", "DatabasePhaseParameter", (dbc, db) => new PhaseParameter(dbc, db));
             
             eventAggregator.GetEvent<DatabaseCacheReloaded>().Subscribe(type =>
             {
@@ -447,7 +449,7 @@ namespace WDE.Parameters
         }
     }
     
-    public class GossipMenuParameter : LateLoadParameter, IDatabaseObserver
+    public class GossipMenuParameter : LateLoadParameter, IDatabaseObserver, IDynamicParameter<long>
     {
         private readonly IDatabaseProvider database;
 
@@ -465,10 +467,13 @@ namespace WDE.Parameters
                         .FirstOrDefault() ?? "")
                         .Replace("\n", "")
                         .Truncate(100)));
+            ItemsChanged?.Invoke(this);
         }
 
         public Type ObservedType => typeof(IGossipMenu);
         public void Reload() => LateLoad();
+
+        public event Action<IParameter<long>>? ItemsChanged;
     }
 
     internal static class StringExtensions
@@ -675,6 +680,90 @@ namespace WDE.Parameters
             var templates = await database.GetAreaTriggerTemplatesAsync();
             foreach (var template in templates)
                 Items.Add(template.Id, new SelectOption(template.Name ?? $"Serverside areatrigger {template.Id}"));
+        }
+    }
+    
+    public class DatabasePhaseParameter : LateAsyncLoadParameter, IDatabaseObserver, IDynamicParameter<long>
+    {
+        private readonly IDatabaseProvider database;
+
+        public DatabasePhaseParameter(IDatabaseProvider database)
+        {
+            Items = new Dictionary<long, SelectOption>();
+            this.database = database;
+        }
+        
+        public override async Task LateLoad()
+        {
+            var phases = await database.GetPhaseNamesAsync();
+            Items!.Clear();
+            if (phases != null)
+                foreach (var phase in phases)
+                    Items.Add(phase.Id, new SelectOption(phase.Name));
+            ItemsChanged?.Invoke(this);
+        }
+
+        public Type ObservedType => typeof(IPhaseName);
+        
+        public void Reload()
+        {
+            // doing it synchronously is not the best idea
+            // but some things might depend on the fact that the name will be right after
+            // the Reload() method is invoked, so I couldn't make it async.
+            var phases = database.GetPhaseNames();
+            Items!.Clear();
+            if (phases != null)
+                foreach (var phase in phases)
+                    Items.Add(phase.Id, new SelectOption(phase.Name));
+            ItemsChanged?.Invoke(this);
+        }
+
+        public event Action<IParameter<long>>? ItemsChanged;
+    }
+
+    public class PhaseParameter : Parameter
+    {
+        private readonly IParameter<long> dbc;
+        private readonly IParameter<long> db;
+
+        public PhaseParameter(IParameter<long> dbc, IParameter<long> db)
+        {
+            Items = new Dictionary<long, SelectOption>();
+            this.dbc = dbc;
+            this.db = db;
+            if (db is IDynamicParameter<long> dyn)
+                dyn.ItemsChanged += Reload;
+            Reload();
+        }
+
+        private void Reload()
+        {
+            Items!.Clear();
+            if (dbc.Items != null)
+                foreach (var item in dbc.Items)
+                    Items.Add(item.Key, item.Value);
+            if (db.Items != null)
+                foreach (var item in db.Items)
+                    Items.Add(item.Key, item.Value);
+        }
+
+        private void Reload(IParameter<long> obj)
+        {
+            Reload();
+        }
+        
+        public override string ToString(long value, ToStringOptions options)
+        {          
+            if (dbc.Items != null && dbc.Items.TryGetValue(value, out var _))
+                return dbc.ToString(value, options);
+            return db.ToString(value, options);
+        }
+
+        public override string ToString(long value)
+        {
+            if (dbc.Items != null && dbc.Items.TryGetValue(value, out var _))
+                return dbc.ToString(value);
+            return db.ToString(value);
         }
     }
 }

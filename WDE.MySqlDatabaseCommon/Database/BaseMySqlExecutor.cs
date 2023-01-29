@@ -8,16 +8,16 @@ using Prism.Events;
 using WDE.Common.Database;
 using WDE.Common.Events;
 using WDE.Common.Tasks;
-using WDE.MySqlDatabaseCommon.Providers;
 using WDE.MySqlDatabaseCommon.Services;
 using WDE.SqlInterpreter;
 using WDE.SqlQueryGenerator;
 
 namespace WDE.MySqlDatabaseCommon.Database
 {
-    public class MySqlExecutor : IMySqlExecutor
+    public abstract class BaseMySqlExecutor : IMySqlExecutor, IMySqlHotfixExecutor
     {
-        private readonly IMySqlWorldConnectionStringProvider worldConnectionString;
+        private readonly string connectionString;
+        private readonly string databaseName;
         private readonly IDatabaseProvider databaseProvider;
         private readonly IQueryEvaluator queryEvaluator;
         private readonly IEventAggregator eventAggregator;
@@ -26,14 +26,16 @@ namespace WDE.MySqlDatabaseCommon.Database
         
         public bool IsConnected => databaseProvider.IsConnected;
 
-        public MySqlExecutor(IMySqlWorldConnectionStringProvider worldConnectionString,
+        public BaseMySqlExecutor(string connectionString, 
+            string databaseName,
             IDatabaseProvider databaseProvider,
             IQueryEvaluator queryEvaluator,
             IEventAggregator eventAggregator,
             IMainThread mainThread,
             DatabaseLogger databaseLogger)
         {
-            this.worldConnectionString = worldConnectionString;
+            this.connectionString = connectionString;
+            this.databaseName = databaseName;
             this.databaseProvider = databaseProvider;
             this.queryEvaluator = queryEvaluator;
             this.eventAggregator = eventAggregator;
@@ -50,7 +52,6 @@ namespace WDE.MySqlDatabaseCommon.Database
 
         public async Task<IList<MySqlDatabaseColumn>> GetTableColumns(string table)
         {
-            string databaseName = worldConnectionString.DatabaseName;
             var columns = await ExecuteSelectSql($"SELECT COLUMN_NAME, COLUMN_DEFAULT, IS_NULLABLE, DATA_TYPE, COLUMN_TYPE, COLUMN_KEY FROM information_schema.columns WHERE table_name = '{table}' AND table_schema = '{databaseName}' ORDER BY ordinal_position;");
 
             var list = new List<MySqlDatabaseColumn>();
@@ -162,7 +163,7 @@ namespace WDE.MySqlDatabaseCommon.Database
             
             using var writeLock = await DatabaseLock.WriteLock();
             
-            MySqlConnection conn = new(worldConnectionString.ConnectionString);
+            MySqlConnection conn = new(connectionString);
             MySqlTransaction transaction;
             try
             {
@@ -212,7 +213,7 @@ namespace WDE.MySqlDatabaseCommon.Database
             databaseLogger.Log(query, null, TraceLevel.Info);
             using var writeLock = await DatabaseLock.WriteLock();
             
-            MySqlConnection conn = new(worldConnectionString.ConnectionString);
+            MySqlConnection conn = new(connectionString);
             try
             {
                 conn.Open();

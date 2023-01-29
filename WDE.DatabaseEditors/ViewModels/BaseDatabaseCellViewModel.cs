@@ -99,6 +99,8 @@ namespace WDE.DatabaseEditors.ViewModels
             }
         }
 
+        public bool IsLongValue => ParameterValue is IParameterValue<long>;
+        
         public long AsLongValue
         {
             get => ((ParameterValue as IParameterValue<long>)?.Value ?? 0);

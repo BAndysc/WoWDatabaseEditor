@@ -12,6 +12,8 @@ namespace WDE.Common.Database
         uint EmoteDelay1 { get; }
         uint EmoteDelay2 { get; }
         uint EmoteDelay3 { get; }
+        uint Sound1 { get; }
+        uint Sound2 { get; }
         uint SoundEntriesId { get; }
         uint EmotesId { get; }
         uint Flags { get; }
@@ -39,6 +41,8 @@ namespace WDE.Common.Database
         public uint EmoteDelay1 { get; init; }
         public uint EmoteDelay2 { get; init; }
         public uint EmoteDelay3 { get; init; }
+        public uint Sound1 { get; init; }
+        public uint Sound2 { get; init; }
         public uint SoundEntriesId { get; init; }
         public uint EmotesId { get; init; }
         public uint Flags { get; init; }

@@ -1,7 +1,7 @@
 using System;
 using Newtonsoft.Json;
 
-namespace WDE.SmartScriptEditor.Utils
+namespace WDE.Common.Utils
 {
     public class FlagJsonConverter : JsonConverter
     {

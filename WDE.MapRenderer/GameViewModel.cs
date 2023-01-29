@@ -525,7 +525,7 @@ Tris: " + stats.TrianglesDrawn;
         public ICommand Copy => AlwaysDisabledCommand.Command;
         public ICommand Cut => AlwaysDisabledCommand.Command;
         public ICommand Paste => AlwaysDisabledCommand.Command;
-        public ICommand Save { get; }
+        public IAsyncCommand Save { get; }
         public IAsyncCommand? CloseCommand { get; set; }
 
         public bool CanClose => true;

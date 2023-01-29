@@ -1,10 +1,13 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
 using Prism.Commands;
 using WDE.Common.Services;
 using WDE.Common.Utils;
+using WDE.DatabaseEditors.CustomCommands;
 using WDE.DatabaseEditors.Data.Interfaces;
+using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Models;
 using WDE.DatabaseEditors.Utils;
 using WDE.Module.Attributes;
@@ -24,14 +27,17 @@ public class MetaColumnsSupportService : IMetaColumnsSupportService
     private readonly ITableEditorPickerService tableEditorPickerService;
     private readonly ITableDefinitionProvider definitionProvider;
     private readonly IRemoteConnectorService remoteConnectorService;
+    private readonly IDatabaseTableCommandService commandService;
 
     public MetaColumnsSupportService(ITableEditorPickerService tableEditorPickerService,
         ITableDefinitionProvider definitionProvider,
-        IRemoteConnectorService remoteConnectorService)
+        IRemoteConnectorService remoteConnectorService,
+        IDatabaseTableCommandService commandService)
     {
         this.tableEditorPickerService = tableEditorPickerService;
         this.definitionProvider = definitionProvider;
         this.remoteConnectorService = remoteConnectorService;
+        this.commandService = commandService;
     }
     
     public (ICommand, string) GenerateCommand(ViewModelBase? viewModel, string metaColumn, DatabaseEntity entity, DatabaseKey realKey)
@@ -91,6 +97,25 @@ public class MetaColumnsSupportService : IMetaColumnsSupportService
                     var result = entity.FillTemplate(command);
                     return remoteConnectorService.ExecuteCommand(new AnonymousRemoteCommand(result));
                 }, () => !entity.Phantom), "Invoke");
+        }
+        if (metaColumn.StartsWith("command:"))
+        {
+            var commandName = metaColumn.Substring(8);
+            string text = "⏩";
+            if (commandName.Contains(":"))
+            {
+                var colon = commandName.IndexOf(":", StringComparison.Ordinal);
+                text = commandName.Substring(colon + 1);
+                commandName = commandName.Substring(0, colon);
+            }
+            var command = commandService.FindCommand(commandName);
+            if (command == null || viewModel == null)
+                return (new AlwaysDisabledCommand(), "(invalid)");
+            
+            return (new AsyncAutoCommand(async () =>
+            {
+                await command.Process(new DatabaseCommandDefinitionJson(){CommandId = commandName}, new DatabaseTableData(viewModel.TableDefinition, viewModel.Entities), viewModel);
+            }), text);
         }
 
         if (metaColumn.StartsWith("picker"))

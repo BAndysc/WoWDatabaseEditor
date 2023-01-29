@@ -3,58 +3,82 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using DynamicData;
+using WDE.Common.Utils;
 
 namespace AvaloniaStyles.Controls.FastTableView;
 
 public partial class VeryFastTableView
 {
-    private void Rebind(IReadOnlyList<ITableRow>? old, IReadOnlyList<ITableRow>? @new)
+    private void Rebind(IReadOnlyList<ITableRowGroup>? old, IReadOnlyList<ITableRowGroup>? @new)
     {
         if (old != null)
         {
             if (old is INotifyCollectionChanged notify)
-                notify.CollectionChanged -= CollectionChanged;
+                notify.CollectionChanged -= ItemsChanged;
             foreach (var row in old)
-                row.Changed -= RowChanged;
+            {
+                row.RowChanged -= RowChanged;
+                row.RowsChanged -= RowsChanged;
+            }
         }
         if (@new != null)
         {
             if (@new is INotifyCollectionChanged notify)
-                notify.CollectionChanged += CollectionChanged;
+                notify.CollectionChanged += ItemsChanged;
             foreach (var row in @new)
-                row.Changed += RowChanged;
+            {
+                row.RowChanged += RowChanged;
+                row.RowsChanged += RowsChanged;
+            }
         }
+        InvalidateMeasure();
+        InvalidateVisual();
+        InvalidateArrange();
     }
 
-    private void CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    private void RowsChanged(ITableRowGroup obj)
     {
         InvalidateMeasure();
         InvalidateVisual();
+        InvalidateArrange();
+    }
+
+    private void ItemsChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        InvalidateMeasure();
+        InvalidateVisual();
+        InvalidateArrange();
         if (e.Action is NotifyCollectionChangedAction.Remove or NotifyCollectionChangedAction.Replace)
         {
-            foreach (ITableRow old in e.OldItems!)
+            foreach (ITableRowGroup old in e.OldItems!)
             {
-                old.Changed -= RowChanged;
+                old.RowChanged -= RowChanged;
+                old.RowsChanged -= RowsChanged;
             }
         }
         if (e.Action is NotifyCollectionChangedAction.Add or NotifyCollectionChangedAction.Replace)
         {
-            foreach (ITableRow @new in e.NewItems!)
+            foreach (ITableRowGroup @new in e.NewItems!)
             {
-                @new.Changed += RowChanged;
+                @new.RowChanged += RowChanged;
+                @new.RowsChanged += RowsChanged;
             }
         }
         if (e.Action == NotifyCollectionChangedAction.Reset)
             throw new Exception("RESET it not supported, because cannot unbind from old items");
     }
 
-    private void RowChanged(ITableRow obj)
+    private void RowChanged(ITableRowGroup group, ITableRow obj)
     {
-        if (Rows == null)
+        if (Items == null)
+            return;
+
+        var groupIndex = ListEx.IndexOf(Items, group);
+        if (groupIndex == -1)
             return;
         
-        var index = Rows.IndexOf(obj);
-        if (IsRowVisible(index))
+        var rowIndex = Items[groupIndex].Rows.IndexOf(obj);
+        if (IsRowVisible(new VerticalCursor(groupIndex, rowIndex)))
             InvalidateVisual();
     }
     

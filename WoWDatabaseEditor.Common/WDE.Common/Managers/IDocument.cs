@@ -31,7 +31,7 @@ namespace WDE.Common.Managers
         ICommand Copy { get; }
         ICommand Cut { get; }
         ICommand Paste { get; }
-        ICommand Save { get; }
+        IAsyncCommand Save { get; }
         IAsyncCommand? CloseCommand { get; set; }
         bool CanClose { get; }
     }

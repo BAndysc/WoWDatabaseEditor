@@ -30,6 +30,7 @@ using WDE.DatabaseEditors.History;
 using WDE.DatabaseEditors.Loaders;
 using WDE.DatabaseEditors.Models;
 using WDE.DatabaseEditors.QueryGenerators;
+using WDE.DatabaseEditors.Services;
 using WDE.DatabaseEditors.Solution;
 using WDE.MVVM;
 using WDE.MVVM.Observable;
@@ -44,7 +45,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
         private readonly IItemFromListProvider itemFromListProvider;
         private readonly IMessageBoxService messageBoxService;
         private readonly IParameterFactory parameterFactory;
-        private readonly IMySqlExecutor mySqlExecutor;
+        private readonly IDatabaseQueryExecutor mySqlExecutor;
         private readonly IQueryGenerator queryGenerator;
         private readonly ITeachingTipService teachingTipService;
         private readonly ICreatureStatCalculatorService creatureStatCalculatorService;
@@ -69,6 +70,8 @@ namespace WDE.DatabaseEditors.ViewModels.Template
         public AsyncAutoCommand<DatabaseCellViewModel> OpenParameterWindow { get; }
         private readonly Dictionary<string, ReactiveProperty<bool>> groupVisibilityByName = new();
         public override DatabaseKey? SelectedTableKey => null;
+        public override bool SupportsMultiSelect => false;
+        public override ICollection<DatabaseEntity>? MultiSelectionEntities => null;
 
         public AsyncAutoCommand AddNewCommand { get; }
 
@@ -80,7 +83,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             IHistoryManager history, ITaskRunner taskRunner, IMessageBoxService messageBoxService,
             IEventAggregator eventAggregator, ISolutionManager solutionManager, 
             IParameterFactory parameterFactory, ISolutionTasksService solutionTasksService,
-            ISolutionItemNameRegistry solutionItemName, IMySqlExecutor mySqlExecutor,
+            ISolutionItemNameRegistry solutionItemName, IDatabaseQueryExecutor mySqlExecutor,
             IQueryGenerator queryGenerator, ITeachingTipService teachingTipService,
             ICreatureStatCalculatorService creatureStatCalculatorService,
             ITableDefinitionProvider tableDefinitionProvider,
@@ -408,7 +411,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
         }
 
         private TemplateTableEditorHistoryHandler? historyHandler;
-        protected override IDisposable BulkEdit(string name) => historyHandler?.BulkEdit(name) ?? Disposable.Empty;
+        public override IDisposable BulkEdit(string name) => historyHandler?.BulkEdit(name) ?? Disposable.Empty;
         
         private void RowOnFieldModified()
         {

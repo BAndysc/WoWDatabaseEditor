@@ -327,4 +327,22 @@ public class TrinityMasterMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvid
         await using var model = Database();
         return await model.AreaTriggerTemplate.FirstOrDefaultAsync(x => x.Id == entry);
     }
+
+    public override async Task<IPhaseName?> GetPhaseNameAsync(uint phaseId)
+    {
+        await using var model = Database();
+        return await model.PhaseNames.FirstOrDefaultAsync(x => x.Id == phaseId);
+    }
+
+    public override async Task<IList<IPhaseName>?> GetPhaseNamesAsync()
+    {
+        await using var model = Database();
+        return await model.PhaseNames.ToListAsync<IPhaseName>();
+    }
+
+    public override IList<IPhaseName>? GetPhaseNames()
+    {
+        using var model = Database();
+        return model.PhaseNames.ToList<IPhaseName>();
+    }
 }

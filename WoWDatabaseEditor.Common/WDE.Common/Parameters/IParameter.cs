@@ -21,6 +21,11 @@ namespace WDE.Common.Parameters
 
         Dictionary<T, SelectOption>? Items { get; }
     }
+    
+    public interface IDynamicParameter<T> : IParameter<T> where T : notnull
+    {
+        event Action<IParameter<T>>? ItemsChanged; 
+    }
 
     public interface IParameterFromString<T>
     {

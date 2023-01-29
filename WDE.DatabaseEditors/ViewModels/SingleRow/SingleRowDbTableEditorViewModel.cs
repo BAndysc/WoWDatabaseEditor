@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -50,7 +51,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
     {
         private readonly IMessageBoxService messageBoxService;
         private readonly IParameterFactory parameterFactory;
-        private readonly IMySqlExecutor mySqlExecutor;
+        private readonly IDatabaseQueryExecutor mySqlExecutor;
         private readonly IQueryGenerator queryGenerator;
         private readonly IDatabaseTableModelGenerator modelGenerator;
         private readonly IConditionEditService conditionEditService;
@@ -70,17 +71,22 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
         private HashSet<(DatabaseKey key, string columnName)> forceUpdateCells = new HashSet<(DatabaseKey, string)>();
         private List<IDisposable> rowsDisposable = new();
         public ObservableCollection<DatabaseEntityViewModel> Rows { get; } = new();
+        public IReadOnlyList<ITableRowGroup> OnlyGroup { get; }
 
         private bool showOnlyModified;
         public override DatabaseKey? SelectedTableKey => FocusedEntity?.GenerateKey(tableDefinition);
-        [AlsoNotify(nameof(FocusedEntity))] [AlsoNotify(nameof(FocusedRow))] [Notify] private int focusedRowIndex;
+        [AlsoNotify(nameof(FocusedEntity))] [AlsoNotify(nameof(FocusedRow))] [Notify] private VerticalCursor focusedRowIndex;
         [AlsoNotify(nameof(FocusedCell))] [Notify] private int focusedCellIndex = -1;
         public override DatabaseEntity? FocusedEntity => FocusedRow?.Entity;
-        public DatabaseEntityViewModel? FocusedRow => focusedRowIndex >= 0 && focusedRowIndex < Rows.Count ? Rows[focusedRowIndex] : null;
+        public DatabaseEntityViewModel? FocusedRow => focusedRowIndex.RowIndex >= 0 && focusedRowIndex.RowIndex < Rows.Count ? Rows[focusedRowIndex.RowIndex] : null;
         public SingleRecordDatabaseCellViewModel? FocusedCell => FocusedRow != null && focusedCellIndex >= 0 && focusedCellIndex < FocusedRow.Cells.Count ? FocusedRow.Cells[focusedCellIndex] : null;
+        public override bool SupportsMultiSelect => true;
+        public override ICollection<DatabaseEntity>? MultiSelectionEntities
+            => MultiSelection.All().Select(idx => Rows[idx.RowIndex].Entity).ToList();
         [Notify] private string rowsSummaryText = "";
-        [Notify] private int limitQuery = 300;
-        [Notify] private long offsetQuery;
+        [Notify] private uint limitQuery = 300;
+        [Notify] private ulong offsetQuery;
+        [Notify] private ulong allRows;
         public override ICommand Copy { get; }
         public override ICommand Paste { get; }
         public override ICommand Cut { get; }
@@ -153,7 +159,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
         private IList<DatabaseColumnJson> columns = new List<DatabaseColumnJson>();
         public ObservableCollection<DatabaseColumnHeaderViewModel> Columns { get; } = new();
         public ObservableCollection<int> HiddenColumns { get; } = new();
-        public IMultiIndexContainer MultiSelection { get; } = new MultiIndexContainer();
+        public ITableMultiSelection MultiSelection { get; } = new TableMultiSelection();
         public MySqlFilterViewModel FilterViewModel { get; }
 
         public AsyncAutoCommand AddNewCommand { get; }
@@ -179,7 +185,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             IHistoryManager history, ITaskRunner taskRunner, IMessageBoxService messageBoxService,
             IEventAggregator eventAggregator, ISolutionManager solutionManager, 
             IParameterFactory parameterFactory, ISolutionTasksService solutionTasksService,
-            ISolutionItemNameRegistry solutionItemName, IMySqlExecutor mySqlExecutor,
+            ISolutionItemNameRegistry solutionItemName, IDatabaseQueryExecutor mySqlExecutor,
             IQueryGenerator queryGenerator, IDatabaseTableModelGenerator modelGenerator,
             ITableDefinitionProvider tableDefinitionProvider,
             IConditionEditService conditionEditService, ISolutionItemIconRegistry iconRegistry,
@@ -231,7 +237,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                 if (MultiSelection.MoreThanOne)
                     disp = historyHandler!.BulkEdit("Bulk set null");
                 foreach (var x in MultiSelection.AllReversed())
-                    Rows[x].Cells[focusedCellIndex].ParameterValue?.SetNull();
+                    Rows[x.RowIndex].Cells[focusedCellIndex].ParameterValue?.SetNull();
                 disp?.Dispose();
             }, () => FocusedCell != null && FocusedCell.CanBeSetToNull).ObservesProperty(() => FocusedCell);
 
@@ -240,8 +246,8 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                 using (BulkAction("Bulk revert"))
                 {
                     foreach (var x in MultiSelection.AllReversed())
-                        if (Rows[x].Cells[focusedCellIndex].CanBeReverted)
-                            Rows[x].Cells[focusedCellIndex].ParameterValue?.Revert();
+                        if (Rows[x.RowIndex].Cells[focusedCellIndex].CanBeReverted)
+                            Rows[x.RowIndex].Cells[focusedCellIndex].ParameterValue?.Revert();
                 }
             }, () => FocusedCell != null && FocusedCell.CanBeReverted);
             AutoDispose(this.ToObservable(() => FocusedCell).Subscribe(_ => RevertSelectedCommand.RaiseCanExecuteChanged()));
@@ -251,7 +257,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                 using (BulkAction("Bulk delete"))
                 {
                     foreach (var x in MultiSelection.AllReversed())
-                        ForceRemoveEntity(Entities[x]);
+                        ForceRemoveEntity(Entities[x.RowIndex]);
                     MultiSelection.Clear();   
                 }
             }, () => FocusedRow != null);
@@ -261,13 +267,13 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             {
                 var duplicate = FocusedRow!.Entity.Clone(DatabaseKey.PhantomKey, false);
                 await SetupPersonalGuidValue(duplicate);
-                ForceInsertEntity(duplicate, FocusedRowIndex + 1);
+                ForceInsertEntity(duplicate, FocusedRowIndex.RowIndex + 1);
             }, () => FocusedRow != null);
             AutoDispose(this.ToObservable(() => FocusedRow).Subscribe(_ => DuplicateSelectedCommand.RaiseCanExecuteChanged()));
 
             GenerateInsertQueryForSelectedCommand = new DelegateCommand(() =>
             {
-                var selectedKeys = MultiSelection.All().Select(index => Entities[index].GenerateKey(TableDefinition)).ToList();
+                var selectedKeys = MultiSelection.All().Select(index => Entities[index.RowIndex].GenerateKey(TableDefinition)).ToList();
                 var tableData = new DatabaseTableData(TableDefinition, Entities);
                 var query = queryGenerator.GenerateInsertQuery(selectedKeys, tableData);
                 var item = new MetaSolutionSQL(new JustQuerySolutionItem(query));
@@ -285,12 +291,12 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
 
             PreviousDataPage = new AsyncAutoCommand(() =>
             {
-                OffsetQuery = Math.Max(0, OffsetQuery - LimitQuery);
+                OffsetQuery = (ulong)Math.Max(0, (long)OffsetQuery - (long)LimitQuery);
                 return ScheduleLoading();
             });
             NextDataPage = new AsyncAutoCommand(() =>
             {
-                OffsetQuery = Math.Max(0, OffsetQuery + LimitQuery);
+                OffsetQuery = allRows <= 0 ? OffsetQuery + LimitQuery : Math.Min(allRows - 1, OffsetQuery + LimitQuery);
                 return ScheduleLoading();
             });
             RefreshQuery = new AsyncAutoCommand(ScheduleLoading);
@@ -318,7 +324,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                     using (BulkAction("Bulk paste"))
                     {
                         foreach (var index in MultiSelection.All())
-                            Rows[index].Cells[focusedCellIndex].UpdateFromString(text);
+                            Rows[index.RowIndex].Cells[focusedCellIndex].UpdateFromString(text);
                     }
                 }
             }, () => FocusedCell != null);
@@ -344,8 +350,49 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                     keys.Add(entries.Key);
                 }
             }
+
+            OnlyGroup = new List<ITableRowGroup>() { new FakeGroup(Rows) };
             
             ScheduleLoading();
+        }
+
+        private class FakeGroup : ITableRowGroup
+        {
+            public event Action<ITableRowGroup, ITableRow>? RowChanged;
+            public event Action<ITableRowGroup>? RowsChanged;
+            public IReadOnlyList<ITableRow> Rows { get; set; }
+
+            public FakeGroup(ObservableCollection<DatabaseEntityViewModel> rows)
+            {
+                Rows = rows;
+                rows.CollectionChanged += RowsOnCollectionChanged;
+            }
+
+            private void RowsOnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+            {
+                RowsChanged?.Invoke(this);
+                if (e.Action == NotifyCollectionChangedAction.Add)
+                {
+                    foreach (ITableRow row in e.NewItems!)
+                    {
+                        row.Changed += RowOnChanged;
+                    }
+                }
+                else if (e.Action == NotifyCollectionChangedAction.Remove)
+                {
+                    foreach (ITableRow row in e.OldItems!)
+                    {
+                        row.Changed -= RowOnChanged;
+                    }
+                }
+                else
+                    throw new Exception("Operation not supported, becuase there is not way to unbind for " + e.Action);
+            }
+
+            private void RowOnChanged(ITableRow obj)
+            {
+                RowChanged?.Invoke(this, obj);
+            }
         }
 
         private IDisposable BulkAction(string text)
@@ -392,7 +439,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
         private async Task AddNewEntity()
         {
             DatabaseKey key = new DatabaseKey();
-            var index = FocusedRow == null ? Entities.Count : focusedRowIndex + 1;
+            var index = FocusedRow == null ? Entities.Count : focusedRowIndex.RowIndex + 1;
             var freshEntity = modelGenerator.CreateEmptyEntity(tableDefinition, key, true);
             if (DefaultPartialKey.HasValue)
             {
@@ -457,7 +504,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
 
         protected override async Task<DatabaseTableData?> LoadData()
         {
-            return await databaseTableDataProvider.Load(solutionItem.DefinitionId, FilterViewModel.BuildWhere(), offsetQuery, limitQuery, showOnlyModified ? keys.ToArray() : null) as DatabaseTableData;
+            return await databaseTableDataProvider.Load(solutionItem.DefinitionId, FilterViewModel.BuildWhere(), (long)offsetQuery, (int)limitQuery, showOnlyModified ? keys.ToArray() : null) as DatabaseTableData;
         }
 
         private DatabaseKey? beforeLoadSelectedRow;
@@ -480,7 +527,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             }
             beforeLoadSelectedRow = FocusedRow?.Entity?.GenerateKey(TableDefinition);
             // save existing changes
-            FocusedRowIndex = -1;
+            FocusedRowIndex = VerticalCursor.None;
             UpdateSolutionItem();
 
             if (historyHandler != null)
@@ -489,6 +536,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                 History.RemoveHandler(historyHandler);
                 historyHandler = null;
             }
+
             return true;
         }
 
@@ -496,7 +544,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
         {
             UpdateSolutionItem();
             solutionManager.Refresh(SolutionItem);
-            await mySqlExecutor.ExecuteSql(await GenerateQuery());
+            await mySqlExecutor.ExecuteSql(tableDefinition, await GenerateQuery());
             await sessionService.UpdateQuery(this);
             MaterializePhantomEntities();
             History.MarkAsSaved();
@@ -550,11 +598,14 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
 
             await AsyncAddEntities(data.Entities);
 
-            FocusedRowIndex = beforeLoadSelectedRow.HasValue ? Entities.IndexIf(e => e.GenerateKey(TableDefinition) == beforeLoadSelectedRow) : (Entities.Count > 0 ? 0 : -1);
+            FocusedRowIndex = new VerticalCursor(0,
+                beforeLoadSelectedRow.HasValue
+                    ? Entities.IndexIf(e => e.GenerateKey(TableDefinition) == beforeLoadSelectedRow)
+                    : (Entities.Count > 0 ? 0 : -1));
             
-            var allRows = await tableDataProvider.GetCount(tableDefinition.Id, FilterViewModel.BuildWhere(), showOnlyModified ? keys : null);
+            AllRows = (ulong)await tableDataProvider.GetCount(tableDefinition.Id, FilterViewModel.BuildWhere(), showOnlyModified ? keys : null);
             var start = allRows == 0 ? 0 : offsetQuery + 1;
-            RowsSummaryText = $"{start} - {offsetQuery + data.Entities.Count} of {allRows} rows";
+            RowsSummaryText = $"{start} - {(long)offsetQuery + data.Entities.Count} of {allRows} rows";
             historyHandler = History.AddHandler(new SingleRowTableEditorHistoryHandler(this));
         }
 
@@ -572,7 +623,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             return settings;
         }
         
-        protected override IDisposable BulkEdit(string name) => historyHandler?.BulkEdit(name) ?? Disposable.Empty;
+        public override IDisposable BulkEdit(string name) => historyHandler?.BulkEdit(name) ?? Disposable.Empty;
 
         private SingleRowTableEditorHistoryHandler? historyHandler;
 
@@ -607,7 +658,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             
             Entities.RemoveAt(indexOfEntity);
             if (FocusedRow?.Entity == entity)
-                FocusedRowIndex = -1;
+                FocusedRowIndex = VerticalCursor.None;
             
             Rows[indexOfEntity].ChangedCell -= OnRowChangedCell;
             Rows[indexOfEntity].Changed -= OnRowChanged;
@@ -695,8 +746,8 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             
             Entities.Insert(index, entity);
             Rows.Insert(index, row);
-            focusedRowIndex = -1;
-            FocusedRowIndex = index;
+            focusedRowIndex = VerticalCursor.None;
+            FocusedRowIndex = new VerticalCursor(0, index);
             return true;
         }
 
@@ -783,9 +834,9 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             {
                 await AddEntity(entity);
             }
-            focusedRowIndex = -1;
+            focusedRowIndex = VerticalCursor.None;
             if (Rows.Count > 0)
-                FocusedRowIndex = 0;
+                FocusedRowIndex = new VerticalCursor(0, 0);
         }
 
         public override async Task<IList<(ISolutionItem, IQuery)>> GenerateSplitQuery()
@@ -924,6 +975,12 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
         {
             var condition = $"`{tableDefinition.GroupByKeys[0]}` < {key[0]}";
 
+            if (key.Count != tableDefinition.GroupByKeys.Count)
+            {
+                var expected = string.Join(", ", tableDefinition.GroupByKeys);
+                throw new Exception($"Key count does not match group by count! The key is: {key}. Expected columns: ({expected})");
+            }
+            
             for (int i = 1; i < key.Count; ++i)
             {
                 var sb = new StringBuilder();
@@ -949,16 +1006,16 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
 
             var query = where.Select("COUNT(*) AS C");
 
-            var result = await mySqlExecutor.ExecuteSelectSql(query.QueryString);
+            var result = await mySqlExecutor.ExecuteSelectSql(tableDefinition, query.QueryString);
 
             var count = result[0]["C"];
             var offset = Convert.ToInt64(count.Item2);
-            var modifiedOffset = Math.Max(0, offset - LimitQuery + 1);
+            var modifiedOffset = (ulong)Math.Max(0, offset - LimitQuery / 2 + 1);
             OffsetQuery = modifiedOffset;
             await ScheduleLoading();
             mainThread.Delay(() =>
             {
-                FocusedRowIndex = (int)(offset - modifiedOffset);
+                FocusedRowIndex = new VerticalCursor(0, (int)((ulong)offset - modifiedOffset));
                 MultiSelection.Clear();
                 MultiSelection.Add(FocusedRowIndex);
             }, TimeSpan.FromMilliseconds(1));
@@ -970,7 +1027,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             if (MultiSelection.MoreThanOne)
                 disposable = historyHandler!.BulkEdit("Bulk edit property");
             foreach (var selected in MultiSelection.All())
-                Rows[selected].CellsList[focusedCellIndex].UpdateFromString(text);
+                Rows[selected.RowIndex].CellsList[focusedCellIndex].UpdateFromString(text);
             disposable.Dispose();
         }
     }

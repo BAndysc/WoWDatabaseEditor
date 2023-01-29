@@ -119,6 +119,9 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public ISceneTemplate? GetSceneTemplate(uint sceneId) => impl.GetSceneTemplate(sceneId);
         public Task<ISceneTemplate?> GetSceneTemplateAsync(uint sceneId) => impl.GetSceneTemplateAsync(sceneId);
         public Task<IList<ISceneTemplate>?> GetSceneTemplatesAsync() => impl.GetSceneTemplatesAsync();
+        public async Task<IPhaseName?> GetPhaseNameAsync(uint phaseId) => await impl.GetPhaseNameAsync(phaseId);
+        public async Task<IList<IPhaseName>?> GetPhaseNamesAsync() => await impl.GetPhaseNamesAsync();
+        public IList<IPhaseName>? GetPhaseNames() => impl.GetPhaseNames();
         public Task<IList<ICreatureAddon>> GetCreatureAddons() => impl.GetCreatureAddons();
 
         public Task<IList<ICreatureTemplateAddon>> GetCreatureTemplateAddons() => impl.GetCreatureTemplateAddons();

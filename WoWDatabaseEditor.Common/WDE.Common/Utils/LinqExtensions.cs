@@ -59,5 +59,29 @@ namespace WDE.Common.Utils
             foreach (var x in collection)
                 action(x, index++);
         }
+        
+        public static IEnumerable<int> OldIndicesIfSorted<T>(this IEnumerable<T> source, bool ascending, IComparer<T> comparer)
+        {
+            var withIndices = source
+                .Select((item, index) => (item: item, index: index));
+            
+            IOrderedEnumerable<(T item, int index)> sorted;
+            if (ascending)
+                sorted = withIndices.OrderBy(a => a.item, comparer);
+            else
+                sorted = withIndices.OrderByDescending(a => a.item, comparer);
+            
+            return sorted.Select(a => a.index);
+        }
+
+        public static IEnumerable<int> NewIndicesIfSorted<T>(this IEnumerable<T> source, bool ascending, IComparer<T> comparer, out List<int> oldIndices)
+        {
+            oldIndices = source
+                .OldIndicesIfSorted(ascending, comparer).ToList();
+            return  oldIndices
+                .Select((oldIndex, index) => new { oldIndex, index })
+                .OrderBy(a => a.oldIndex)
+                .Select(a => a.index);
+        }
     }
 }

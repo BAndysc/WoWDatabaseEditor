@@ -3,16 +3,39 @@ using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
-using Avalonia.VisualTree;
+using WDE.Common.Utils;
+using WDE.MVVM.Observable;
 
 namespace AvaloniaStyles.Controls.FastTableView;
 
 public partial class VeryFastTableView
 {
+    /// <summary>
+    /// Viewport rect WITHOUT a header
+    /// </summary>
+    private Rect DataViewport
+    {
+        get
+        {
+            var scrollViewer = ScrollViewer;
+            if (scrollViewer == null)
+                return Rect.Empty;
+            return new Rect(scrollViewer.Offset.X, scrollViewer.Offset.Y + DrawingStartOffsetY, scrollViewer.Viewport.Width, scrollViewer.Viewport.Height - DrawingStartOffsetY);
+        }
+    }
+
     protected override Size MeasureOverride(Size availableSize)
     {
-        availableSize = availableSize.WithHeight(((Rows?.Count ?? 0) + 1) * RowHeight + DrawingStartOffsetY);
-        availableSize = availableSize.WithWidth(0);
+        if (Items == null)
+            return new Size(0, 0);
+
+        var height = DrawingStartOffsetY;
+        foreach (var group in Items)
+        {
+            height += (IsGroupingEnabled ? RowHeight : 0) /* header */ + group.Rows.Count * RowHeight;
+        }
+
+        availableSize = new Size(0, height + RowHeight); // always add extra row height for scrollbar
         if (Columns != null)
         {
             availableSize = availableSize.WithWidth(Columns.Where(c=>c.IsVisible).Select(c => c.Width).Sum());
@@ -22,21 +45,18 @@ public partial class VeryFastTableView
 
     public override void Render(DrawingContext context)
     {
-        if (Rows == null)
+        base.Render(context);
+        if (Items == null)
             return;
 
         var font = new Typeface(TextBlock.GetFontFamily(this));
         
         var actualWidth = Bounds.Width;
 
-        var scrollViewer = this.FindAncestorOfType<ScrollViewer>();
-
-        // determine the first and last visible row
-        var startIndex = Math.Max(0, (int)(scrollViewer.Offset.Y / RowHeight) - 1);
-        var endIndex = Math.Min(startIndex + scrollViewer.Viewport.Height / RowHeight + 2, Rows.Count);
-
-        double y = startIndex * RowHeight + DrawingStartOffsetY;
-        bool odd = startIndex % 2 == 0;
+        var viewPort = DataViewport;
+        
+        double y = DrawingStartOffsetY;
+        bool odd = false;
 
         Span<double> columnWidths = stackalloc double[Columns?.Count ?? 0];
         if (Columns != null)
@@ -46,82 +66,114 @@ public partial class VeryFastTableView
         }
 
         var cellDrawer = CustomCellDrawer;
-        
+
         // we draw only the visible rows
+        DrawingContext.PushedState? viewPortClip = IsGroupingEnabled ? context.PushClip(viewPort.Deflate(new Thickness(0, RowHeight, 0, 0))) : null;
         var selectionIterator = MultiSelection.ContainsIterator;
-        for (var index = startIndex; index < endIndex; index++)
+        int groupIndex = 0;
+        foreach (var group in Items)
         {
-            var row = Rows[index];
-            double x = 0;
-            var rowRect = new Rect(0, y, actualWidth, RowHeight);
+            var groupStartY = y;
+            var groupHeight = (IsGroupingEnabled ? RowHeight : 0) + RowHeight * group.Rows.Count;
             
-            // background
-            bool isSelected = selectionIterator.Contains(index);
-            context.FillRectangle(isSelected ? (SelectedRowBackground) : (odd ? OddRowBackground : EvenRowBackground), rowRect);
-
-            cellDrawer?.DrawRow(context, row, rowRect);
-            
-            var textColor = isSelected ? FocusTextBrush : TextBrush;
-            
-            int cellIndex = 0;
-            foreach (var cell in row.CellsList)
+            // out of bounds in the upper part
+            if (groupStartY + groupHeight < DataViewport.Top)
             {
-                if (cellIndex >= columnWidths.Length)
-                    return;
-                
-                if (!IsColumnVisible(cellIndex))
-                {
-                    cellIndex++;
-                    continue;
-                }
-
-                var columnWidth = columnWidths[cellIndex];
-
-                // we draw only the visible columns
-                // todo: could be optimized so we don't iterate through all columns when we know we don't need to
-                if (x + columnWidth > scrollViewer.Offset.X && x < scrollViewer.Offset.X + scrollViewer.Viewport.Width)
-                {
-                    var rect = new Rect(x, y, Math.Max(0, columnWidth - ColumnSpacing), RowHeight);
-                    var rectWidth = rect.Width;
-                    var state = context.PushClip(rect);
-                    if (cellDrawer == null || !cellDrawer.Draw(context, ref rect, cell))
-                    {
-                        var text = cell.ToString();
-                        if (!string.IsNullOrEmpty(text))
-                        {
-                            var ft = new FormattedText
-                            {
-                                Text = text,
-                                Constraint = new Size(rect.Width, RowHeight),
-                                Typeface = font,
-                                FontSize = 12
-                            };
-                            if (Math.Abs(rectWidth - rect.Width) > 0.01)
-                            {
-                                state.Dispose();
-                                state = context.PushClip(rect);
-                            }
-                            context.DrawText(textColor, new Point(rect.X + ColumnSpacing, y + RowHeight / 2 - ft.Bounds.Height / 2), ft);   
-                        }
-                    }
-                    
-                    state.Dispose();
-
-                }
-
-                x += columnWidth;
-                cellIndex++;
+                if (group.Rows.Count % 2 == 1)
+                    odd = !odd;
+                y += groupHeight;
             }
-            
-            y += RowHeight;
-            odd = !odd;
-        }
+            else if (groupStartY > DataViewport.Bottom) // below
+            {
+                break;
+            }
+            else
+            {
+                y += (IsGroupingEnabled ? RowHeight : 0); // header
+                int rowIndex = 0;
+                foreach (var row in group.Rows)
+                {
+                    double x = 0;
+                    var rowRect = new Rect(0, y, actualWidth, RowHeight);
 
+                    if (viewPort.Intersects(rowRect))
+                    {
+                        // background
+                        bool isSelected = selectionIterator.Contains(new VerticalCursor(groupIndex, rowIndex));
+                        context.FillRectangle(isSelected ? (SelectedRowBackground) : (odd ? OddRowBackground : EvenRowBackground), rowRect);
+
+                        cellDrawer?.DrawRow(context, row, rowRect);
+                        
+                        var textColor = isSelected ? FocusTextBrush : TextBrush;
+                        
+                        int cellIndex = 0;
+                        foreach (var cell in row.CellsList)
+                        {
+                            if (cellIndex >= columnWidths.Length)
+                                return;
+                            
+                            if (!IsColumnVisible(cellIndex))
+                            {
+                                cellIndex++;
+                                continue;
+                            }
+
+                            var columnWidth = columnWidths[cellIndex];
+
+                            // we draw only the visible columns
+                            // todo: could be optimized so we don't iterate through all columns when we know we don't need to
+                            if (x + columnWidth > DataViewport.Left && x < DataViewport.Right)
+                            {
+                                var rect = new Rect(x, y, columnWidth, RowHeight);
+                                var rectWidth = rect.Width;
+                                var state = context.PushClip(rect);
+                                if (cellDrawer == null || !cellDrawer.Draw(context, ref rect, cell))
+                                {
+                                    var text = cell.ToString();
+                                    if (!string.IsNullOrEmpty(text))
+                                    {
+                                        rect = rect.WithWidth(rect.Width - ColumnSpacing);
+                                        var ft = new FormattedText
+                                        {
+                                            Text = text,
+                                            Constraint = new Size(rect.Width, RowHeight),
+                                            Typeface = font,
+                                            FontSize = 12
+                                        };
+                                        if (Math.Abs(rectWidth - rect.Width) > 0.01)
+                                        {
+                                            state.Dispose();
+                                            state = context.PushClip(rect);
+                                        }
+                                        context.DrawText(textColor, new Point(rect.X + ColumnSpacing, y + RowHeight / 2 - ft.Bounds.Height / 2), ft);   
+                                    }
+                                }
+                                
+                                state.Dispose();
+
+                            }
+
+                            x += columnWidth;
+                            cellIndex++;
+                        }                        
+                    }
+
+                    y += RowHeight;
+                    odd = !odd;
+                    rowIndex += 1;
+                }
+            }
+
+            groupIndex++;
+        }
+        
         if (IsKeyboardFocusWithin && IsSelectedCellValid && !editor.IsOpened)
         {
             context.DrawRectangle(FocusOuterPen, SelectedCellRect, 4);
             context.DrawRectangle(FocusPen, SelectedCellRect, 4);
         }
+        if (viewPortClip.HasValue)
+            viewPortClip.Value.Dispose();
 
         RenderHeaders(context);
     }
@@ -138,15 +190,18 @@ public partial class VeryFastTableView
         var scrollViewer = ScrollViewer;
         if (scrollViewer == null)
             return;
+        
         double y = scrollViewer.Offset.Y;
         double height = RowHeight;
         double x = 0;
         
         // draw the background
         context.DrawRectangle(HeaderBackground, null, new Rect(scrollViewer.Offset.X, y, scrollViewer.Viewport.Width, height));
-        context.DrawLine(HeaderBorderBackground, new Point(scrollViewer.Offset.X, y + height - 1), new Point(scrollViewer.Offset.X + scrollViewer.Viewport.Width, y + height - 1));
-        
+
         // small todo: we could optimize this by only drawing the visible columns
+        var isMouseOverHeader = IsPointHeader(lastMouseLocation);
+        var isMouseOverSplitter = IsOverColumnSplitter(lastMouseLocation.X, out var columnSplitterIndex);
+        var interactiveHeader = InteractiveHeader;
         for (int i = 0; i < Columns.Count; ++i)
         {
             if (!IsColumnVisible(i))
@@ -160,6 +215,11 @@ public partial class VeryFastTableView
                 Typeface = new Typeface(font, FontStyle.Normal, FontWeight.Bold),
                 FontSize = 12
             };
+            
+            bool isMouseOverColumn = isMouseOverHeader && lastMouseLocation.X >= x && lastMouseLocation.X < x + column.Width;
+            if (isMouseOverColumn && interactiveHeader)
+                context.FillRectangle(lastMouseButtonPressed && !isMouseOverSplitter ? HeaderPressedBackground : HeaderHoverBackground, new Rect(x, y, column.Width, RowHeight));
+            
             var state = context.PushClip(new Rect(x + ColumnSpacing, y, Math.Max(0, column.Width - ColumnSpacing * 2), RowHeight));
             context.DrawText(BorderPen.Brush, new Point(x + ColumnSpacing, y + RowHeight / 2 - ft.Bounds.Height / 2), ft);
             state.Dispose();
@@ -167,8 +227,11 @@ public partial class VeryFastTableView
             x += column.Width;
             
             if (i != Columns.Count - 1) // if not last
-                context.DrawLine(HeaderBorderBackground, new Point(x, y), new Point(x, y + height));
+                context.DrawLine(HeaderBorderBackground, new Point(x, y), new Point(x, y + scrollViewer.Viewport.Height));
         }
+        
+        // draw the bottom border
+        context.DrawLine(HeaderBorderBackground, new Point(scrollViewer.Offset.X, y + height - 1), new Point(scrollViewer.Offset.X + scrollViewer.Viewport.Width, y + height - 1));
     }
 
     private bool IsPointHeader(Point p)
@@ -212,11 +275,36 @@ public partial class VeryFastTableView
         return columnVisibility[index];
     }
     
-    private int? GetRowIndexByY(double y)
+    private VerticalCursor? GetRowIndexByY(double mouseY)
     {
-        var index = (int)((y - DrawingStartOffsetY) / RowHeight);
-        if (index >= Rows!.Count || index < 0)
+        if (Items == null)
             return null;
-        return index;
+        double y = DrawingStartOffsetY;
+        var groupIndex = 0;
+        foreach (var group in Items)
+        {
+            var groupStartY = y;
+            var groupHeight = (IsGroupingEnabled ? RowHeight : 0) + RowHeight * group.Rows.Count;
+
+            if (groupStartY + groupHeight < mouseY)
+                y += groupHeight;
+            else
+            {
+                var rowIndex = 0;
+                y += IsGroupingEnabled ? RowHeight : 0; // row height for the header
+                foreach (var row in group.Rows)
+                {
+                    var rowEnd = y + RowHeight;
+                    if (mouseY >= y && mouseY < rowEnd)
+                        return new VerticalCursor(groupIndex, rowIndex);
+                    y = rowEnd;
+                    rowIndex++;
+                }
+            }
+
+            groupIndex++;   
+        }
+
+        return null;
     }
 }

@@ -41,9 +41,9 @@ namespace WDE.SQLEditor.ViewModels
             AutoDispose(sql.Length.SubscribeAction(_ => IsModified = true));
             IsModified = false;
             SolutionItem = solutionItem;
-            ExecuteSql = new DelegateCommand(() =>
+            ExecuteSql = new AsyncAutoCommand(() =>
             {
-                taskRunner.ScheduleTask("Executing query",
+                return taskRunner.ScheduleTask("Executing query",
                     async () =>
                     {
                         statusBar.PublishNotification(new PlainNotification(NotificationType.Info, "Executing query"));
@@ -60,11 +60,11 @@ namespace WDE.SQLEditor.ViewModels
                     });
             }, () => databaseProvider.IsConnected);
             IsLoading = false;
-            Save = new DelegateCommand(() =>
+            Save = new AsyncAutoCommand(async () =>
             {
                 solutionItem.Query = code.ToString();
-                ExecuteSql.Execute(null);
                 IsModified = false;
+                await ExecuteSql.ExecuteAsync();
             });
         }
 
@@ -74,7 +74,7 @@ namespace WDE.SQLEditor.ViewModels
             set => SetProperty(ref code, value);
         }
 
-        public ICommand ExecuteSql { get; }
+        public IAsyncCommand ExecuteSql { get; }
 
         private bool isLoading = false;
         private bool isModified;
@@ -91,7 +91,7 @@ namespace WDE.SQLEditor.ViewModels
         public ICommand Copy { get; } = AlwaysDisabledCommand.Command;
         public ICommand Cut { get; } = AlwaysDisabledCommand.Command;
         public ICommand Paste { get; } = AlwaysDisabledCommand.Command;
-        public ICommand Save { get; }
+        public IAsyncCommand Save { get; }
         public IAsyncCommand CloseCommand { get; set; } = null;
         public bool CanClose { get; } = true;
 

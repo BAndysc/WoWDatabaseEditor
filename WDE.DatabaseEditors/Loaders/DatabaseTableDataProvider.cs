@@ -10,6 +10,7 @@ using WDE.Common.Services.MessageBox;
 using WDE.DatabaseEditors.Data.Interfaces;
 using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Models;
+using WDE.DatabaseEditors.Services;
 using WDE.Module.Attributes;
 
 namespace WDE.DatabaseEditors.Loaders
@@ -19,13 +20,13 @@ namespace WDE.DatabaseEditors.Loaders
     public class DatabaseTableDataProvider : IDatabaseTableDataProvider
     {
         private readonly ITableDefinitionProvider tableDefinitionProvider;
-        private readonly IMySqlExecutor sqlExecutor;
+        private readonly IDatabaseQueryExecutor sqlExecutor;
         private readonly IMessageBoxService messageBoxService;
         private readonly IDatabaseProvider databaseProvider;
         private readonly IDatabaseTableModelGenerator tableModelGenerator;
         
         public DatabaseTableDataProvider(ITableDefinitionProvider tableDefinitionProvider, 
-            IMySqlExecutor sqlExecutor,
+            IDatabaseQueryExecutor sqlExecutor,
             IMessageBoxService messageBoxService,
             IDatabaseProvider databaseProvider,
             IDatabaseTableModelGenerator tableModelGenerator)
@@ -119,7 +120,7 @@ namespace WDE.DatabaseEditors.Loaders
             var sql = $"SELECT COUNT(*) AS num FROM {definition.TableName} {where}";
             try
             {
-                var result = await sqlExecutor.ExecuteSelectSql(sql);
+                var result = await sqlExecutor.ExecuteSelectSql(definition, sql);
                 if (result.Count == 0)
                     return 0;
                 return Convert.ToInt64(result[0]["num"].Item2);
@@ -191,7 +192,7 @@ namespace WDE.DatabaseEditors.Loaders
                 var sqlStatement = BuildSQLQueryForSingleRow(definition, customWhere, offset, Math.Min(limit ?? 300, 3000));
                 try
                 {
-                    result = await sqlExecutor.ExecuteSelectSql(sqlStatement);
+                    result = await sqlExecutor.ExecuteSelectSql(definition, sqlStatement);
 
                     if (definition.Condition != null)
                     {
@@ -326,7 +327,7 @@ namespace WDE.DatabaseEditors.Loaders
                     var sqlStatement = BuildSQLQueryFromTableDefinition(definition, keys);
                     try
                     {
-                        result = await sqlExecutor.ExecuteSelectSql(sqlStatement);
+                        result = await sqlExecutor.ExecuteSelectSql(definition, sqlStatement);
 
                         if (definition.Condition != null)
                         {

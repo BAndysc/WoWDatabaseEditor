@@ -276,10 +276,8 @@ namespace WDE.EventAiEditor.Editor.ViewModels
                 } 
             });
             
-            SaveCommand = new DelegateCommand(() =>
-            {
-                taskRunner.ScheduleTask("Save script to database", SaveAllToDb);
-            });
+            SaveCommand = new AsyncAutoCommand(() => 
+                taskRunner.ScheduleTask("Save script to database", SaveAllToDb));
 
             DeleteAction = new DelegateCommand<EventAiAction>(DeleteActionCommand);
             DeleteSelected = new DelegateCommand(() =>
@@ -623,7 +621,7 @@ namespace WDE.EventAiEditor.Editor.ViewModels
         public AsyncCommand CutCommand { get; set; }
         public AsyncCommand PasteCommand { get; set; }
         public event Action? OnPaste;
-        public DelegateCommand SaveCommand { get; set; }
+        public IAsyncCommand SaveCommand { get; set; }
         public DelegateCommand DeleteSelected { get; set; }
         public DelegateCommand EditSelected { get; set; }
 
@@ -664,7 +662,7 @@ namespace WDE.EventAiEditor.Editor.ViewModels
         public ICommand Copy => CopyCommand;
         public ICommand Cut => CutCommand;
         public ICommand Paste => PasteCommand;
-        public ICommand Save => SaveCommand;
+        public IAsyncCommand Save => SaveCommand;
         public IAsyncCommand? CloseCommand { get; set; }
 
         private bool disposed = false;

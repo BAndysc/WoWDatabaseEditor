@@ -3,7 +3,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 
-namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls;
+namespace AvaloniaStyles.Controls;
 
 public class RecyclableViewList
 {
@@ -43,7 +43,7 @@ public class RecyclableViewList
         // find a remaining control that has context data context
         for (int i = counter; i < controls.Count; ++i)
         {
-            if (controls[i].DataContext == context)
+            if (ReferenceEquals(controls[i].DataContext, context))
             {
                 var found = controls[i];
                 var atCounter = controls[counter];

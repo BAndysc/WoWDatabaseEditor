@@ -1469,7 +1469,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         public ICommand Copy => CopyCommand;
         public ICommand Cut => CutCommand;
         public ICommand Paste => PasteCommand;
-        public ICommand Save => SaveCommand;
+        public IAsyncCommand Save => SaveCommand;
         public IAsyncCommand? CloseCommand { get; set; }
         
         private void SetSolutionItem(ISmartScriptSolutionItem newItem)

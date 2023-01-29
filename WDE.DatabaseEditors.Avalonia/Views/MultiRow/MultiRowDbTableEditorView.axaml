@@ -11,9 +11,11 @@
              xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia"
              xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
              xmlns:vm="clr-namespace:WDE.DatabaseEditors.ViewModels.MultiRow;assembly=WDE.DatabaseEditors"
+             xmlns:fastTableView="clr-namespace:AvaloniaStyles.Controls.FastTableView;assembly=AvaloniaStyles"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              Name="rootWindow"
              x:DataType="vm:MultiRowDbTableEditorViewModel"
+             utils:KeyGestureBind.Bindings="{CompiledBinding KeyBindings}"
              IsEnabled="{CompiledBinding TaskInProgress, Converter={x:Static converters:InverseBoolConverter.Instance}}"
              x:Class="WDE.DatabaseEditors.Avalonia.Views.MultiRow.MultiRowDbTableEditorView">
     <UserControl.Resources>
@@ -202,45 +204,49 @@
           utils:GridUtils.DynamicColumns="{CompiledBinding SplitHorizontal, Converter={StaticResource ColumnsConverter}}"
     >
         <ScrollViewer HorizontalScrollBarVisibility="Auto" AllowAutoHide="False">
-            <DockPanel Grid.IsSharedSizeScope="True" LastChildFill="True">
-                <Border Classes="header" DockPanel.Dock="Top">
-                    <Grid helpers:GridColumnsBinder.ColumnsWithHeader="{CompiledBinding Columns, Mode=OneTime}" />
-                </Border>
-                <ItemsPresenter Items="{CompiledBinding Rows, Mode=OneTime}">
-                    <ItemsPresenter.ItemTemplate>
-                        <DataTemplate x:DataType="vm:DatabaseEntityViewModel">
-                            <StackPanel
-                                KeyboardNavigation.TabNavigation="Continue">
-                                <controls1:GroupingHeader GroupName="{Binding Name, Mode=OneTime}">
-                                    <controls1:GroupingHeader.CustomContent>
-                                        <Button Command="{Binding ElementName=rootWindow, Path=DataContext.AddRowCommand, Mode=OneTime}" CommandParameter="{CompiledBinding ., Mode=OneTime}">+</Button>
-                                    </controls1:GroupingHeader.CustomContent>
-                                </controls1:GroupingHeader>
-                                <ItemsControl multiRow:SelectablePanel.SelectedItem="{Binding #rootWindow.DataContext.SelectedRow, Mode=TwoWay}" 
-                                              multiRow:SelectablePanel.ObserveItems="True"
-                                              Items="{CompiledBinding ., Mode=OneTime}" 
-                                              ClipToBounds="False"
-                                              MinHeight="20" 
-                                              utils:FocusUtils.FocusFirst="True"
-                                              ItemTemplate="{StaticResource RowTemplate}" />
-                                </StackPanel>
-                        </DataTemplate>
-                    </ItemsPresenter.ItemTemplate>
-                </ItemsPresenter>
-            </DockPanel>
-            <ScrollViewer.Styles>
-                <Style Selector="GridSplitter">
-                    <Setter Property="Focusable" Value="False"></Setter>
-                    <Setter Property="Template">
-                        <ControlTemplate>
-                            <Border 
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                Background="{DynamicResource TextControlBackground}"/>
-                        </ControlTemplate>
-                    </Setter>
-                </Style>
-            </ScrollViewer.Styles>
+            <!--
+                HiddenColumns="{CompiledBinding HiddenColumns}"-->
+            <fastTableView:VeryFastTableView
+                InteractiveHeader="True"
+                ValueUpdateRequest="VeryFastTableView_OnValueUpdateRequest"
+                TextBlock.FontFamily="Consolas,Menlo,Courier,Courier New"
+                SelectedCellIndex="{CompiledBinding FocusedCellIndex}"
+                SelectedRowIndex="{CompiledBinding FocusedRowIndex}"
+                MultiSelection="{CompiledBinding MultiSelection}"
+                Columns="{CompiledBinding Columns}"
+                ColumnPressed="VeryFastTableView_OnColumnPressed"
+                AttachedToVisualTree="Visual_OnAttachedToVisualTree"
+                DetachedFromVisualTree="Visual_OnDetachedFromVisualTree"
+                Items="{CompiledBinding Rows}">
+                <fastTableView:VeryFastTableView.CustomCellInteractor>
+                    <multiRow:CustomCellInteractor />
+                </fastTableView:VeryFastTableView.CustomCellInteractor>
+                <fastTableView:VeryFastTableView.CustomCellDrawer>
+                    <multiRow:CustomCellDrawer />
+                </fastTableView:VeryFastTableView.CustomCellDrawer>
+                <fastTableView:VeryFastTableView.GroupHeaderTemplate>
+                    <DataTemplate x:DataType="vm:DatabaseEntitiesGroupViewModel">
+                        <controls1:GroupingHeader GroupName="{CompiledBinding Name}">
+                            <controls1:GroupingHeader.CustomContent>
+                                <Button Command="{Binding ElementName=rootWindow, Path=DataContext.AddRowCommand, Mode=OneTime}" CommandParameter="{CompiledBinding ., Mode=OneTime}">+</Button>
+                            </controls1:GroupingHeader.CustomContent>
+                        </controls1:GroupingHeader>
+                    </DataTemplate>
+                </fastTableView:VeryFastTableView.GroupHeaderTemplate>
+                <fastTableView:VeryFastTableView.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Revert value" Command="{CompiledBinding RevertSelectedCommand}" />
+                        <MenuItem Header="Set to null" Command="{CompiledBinding SetNullSelectedCommand}" />
+                        <MenuItem Header="-"></MenuItem>
+<!--                        <MenuItem Header="New row" Command="{CompiledBinding InsertRowBelowCommand}" />-->
+                        <MenuItem Header="Delete row" Command="{CompiledBinding DeleteRowSelectedCommand}" />
+                        <MenuItem Header="Duplicate row"  Command="{CompiledBinding DuplicateSelectedCommand}"/>
+                        <MenuItem Header="-"></MenuItem>
+                        <MenuItem Header="Copy row" Command="{CompiledBinding CopySelectedRowsCommand}" />
+                        <MenuItem Header="Paste row"  Command="{CompiledBinding PasteRowsCommand}"/>
+                    </ContextMenu>
+                </fastTableView:VeryFastTableView.ContextMenu>
+            </fastTableView:VeryFastTableView>
         </ScrollViewer>
         <GridSplitter IsVisible="{CompiledBinding SplitView}"
                       Background="#CCC"

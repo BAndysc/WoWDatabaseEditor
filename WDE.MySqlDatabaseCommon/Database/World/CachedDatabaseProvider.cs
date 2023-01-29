@@ -73,6 +73,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
                     Refresh(RefreshNpcTexts);
                 else if (tableName == creatureTextInsertProvider.TableName)
                     Refresh(RefreshCreatureTexts);
+                else if (tableName == "phase_name" || tableName == "phase_names")
+                    Refresh(() => Task.FromResult(typeof(IPhaseName)));
                 else if (tableName == "quest_template" || tableName == "quest_template_addon")
                     Refresh(RefreshQuestTemplates);
             }, true);
@@ -367,6 +369,12 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public Task<ISceneTemplate?> GetSceneTemplateAsync(uint sceneId) => nonCachedDatabase.GetSceneTemplateAsync(sceneId);
 
         public Task<IList<ISceneTemplate>?> GetSceneTemplatesAsync() => nonCachedDatabase.GetSceneTemplatesAsync();
+
+        public async Task<IPhaseName?> GetPhaseNameAsync(uint phaseId) => await nonCachedDatabase.GetPhaseNameAsync(phaseId);
+
+        public async Task<IList<IPhaseName>?> GetPhaseNamesAsync() => await nonCachedDatabase.GetPhaseNamesAsync();
+        public IList<IPhaseName>? GetPhaseNames() => nonCachedDatabase.GetPhaseNames();
+
         public Task<IList<ICreatureAddon>> GetCreatureAddons() => nonCachedDatabase.GetCreatureAddons();
 
         public Task<IList<ICreatureTemplateAddon>> GetCreatureTemplateAddons() => nonCachedDatabase.GetCreatureTemplateAddons();

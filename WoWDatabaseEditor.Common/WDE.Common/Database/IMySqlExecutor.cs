@@ -42,6 +42,18 @@ namespace WDE.Common.Database
         }
     }
 
+    [UniqueProvider]
+    public interface IMySqlHotfixExecutor
+    {
+        bool IsConnected { get; }
+
+        Task ExecuteSql(IQuery query, bool rollback = false);
+        Task ExecuteSql(string query, bool rollback = false);
+        Task<IList<Dictionary<string, (Type, object)>>> ExecuteSelectSql(string query);
+        Task<IList<string>> GetTables();
+        Task<IList<MySqlDatabaseColumn>> GetTableColumns(string table);
+    }
+
     public struct MySqlDatabaseColumn
     {
         public string ColumnName { get; set; }

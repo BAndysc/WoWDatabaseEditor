@@ -146,19 +146,24 @@ public class DatabaseContextualParameter : IContextualParameter<long, DatabaseEn
     }
 }
 
-public class DatabaseStringContextualParameter : IContextualParameter<string, DatabaseEntity>, ICustomPickerContextualParameter<string>
+public interface ITableAffectedByParameter
+{
+    public string AffectedByColumn { get; }
+}
+
+public class DatabaseStringContextualParameter : IContextualParameter<string, DatabaseEntity>, ICustomPickerContextualParameter<string>, ITableAffectedByParameter
 {
     private readonly IParameterPickerService pickerService;
     private Dictionary<string, IParameter<long>> longParameters = new();
     private Dictionary<string, IParameter<string>> stringParameters = new();
-    public readonly string Column;
     private IParameter<long> defaultParameter;
+    public string AffectedByColumn { get; }
 
     public DatabaseStringContextualParameter(IParameterFactory factory, 
         IParameterPickerService pickerService,
         ContextualParameterSimpleStringSwitchJson simpleSwitch)
     {
-        Column = simpleSwitch.Column;
+        AffectedByColumn = simpleSwitch.Column;
         defaultParameter = simpleSwitch.Default == null ? Parameter.Instance : factory.Factory(simpleSwitch.Default);
         this.pickerService = pickerService;
         foreach (var param in simpleSwitch.Values)
@@ -176,7 +181,7 @@ public class DatabaseStringContextualParameter : IContextualParameter<string, Da
     {
         if (context is DatabaseEntity entity)
         {
-            var cell = entity.GetTypedValueOrThrow<string>(Column);
+            var cell = entity.GetTypedValueOrThrow<string>(AffectedByColumn);
             if (cell == null)
                 return ("", false);
             if (longParameters.TryGetValue(cell, out var parameter))
@@ -207,9 +212,9 @@ public class DatabaseStringContextualParameter : IContextualParameter<string, Da
     
     public string ToString(string value, DatabaseEntity entity)
     {
-        var cell = entity.GetTypedValueOrThrow<string>(Column);
+        var cell = entity.GetTypedValueOrThrow<string>(AffectedByColumn);
         if (cell == null)
-            return value + " (invalid " + Column + " value)";
+            return value + " (invalid " + AffectedByColumn + " value)";
         if (longParameters.TryGetValue(cell, out var parameter))
         {
             if (long.TryParse(value, out var v))

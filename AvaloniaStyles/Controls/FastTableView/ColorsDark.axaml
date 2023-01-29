@@ -5,6 +5,8 @@
         <AccentSolidColorBrush Hue="{DynamicResource AccentHue}" x:Key="FastTableView.SelectedRowBackground" BaseColor="#2C4C70" />
         <SolidColorBrush x:Key="FastTableView.EvenRowBackground" Color="#2A2A2A" />
         <SolidColorBrush x:Key="FastTableView.HeaderBackground" Color="#101010" />
+        <SolidColorBrush x:Key="FastTableView.HeaderHoverBackground" Color="#3A3A3A" />
+        <SolidColorBrush x:Key="FastTableView.HeaderPressedBackground" Color="#242424" />
         <SolidColorBrush x:Key="FastTableView.TextBrush" Color="#D2D2D2" />
         <SolidColorBrush x:Key="FastTableView.FocusTextBrush" Color="#D2D2D2" />
         <AccentSolidColorBrush Hue="{DynamicResource AccentHue}" x:Key="FastTableView.HoverRowBackground" Color="#577CDB" />

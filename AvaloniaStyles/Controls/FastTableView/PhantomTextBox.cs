@@ -96,9 +96,17 @@ public abstract class PhantomControlBase<T> where T : Control
 
 public class PhantomTextBox : PhantomControlBase<TextBox>
 {
-    private Action<string>? currentOnApply = null;
+    public enum ActionAfterSave
+    {
+        None,
+        MoveUp,
+        MoveDown
+    }
+    
+    private Action<string, ActionAfterSave>? currentOnApply = null;
+    private ActionAfterSave actionAfterSave;
 
-    public void Spawn(Visual parent, Rect position, string text, bool selectAll, Action<string> onApply)
+    public void Spawn(Visual parent, Rect position, string text, bool selectAll, Action<string, ActionAfterSave> onApply)
     {
         currentOnApply = onApply;
         var textBox = new TextBox()
@@ -112,6 +120,24 @@ public class PhantomTextBox : PhantomControlBase<TextBox>
         {
             Gesture = new KeyGesture(Key.Enter),
             Command = new DelegateCommand(() => Despawn(true))
+        });
+        textBox.KeyBindings.Add(new KeyBinding()
+        {
+            Gesture = new KeyGesture(Key.Up),
+            Command = new DelegateCommand(() =>
+            {
+                actionAfterSave = ActionAfterSave.MoveUp;
+                Despawn(true);
+            })
+        });
+        textBox.KeyBindings.Add(new KeyBinding()
+        {
+            Gesture = new KeyGesture(Key.Down),
+            Command = new DelegateCommand(() =>
+            {
+                actionAfterSave = ActionAfterSave.MoveDown;
+                Despawn(true);
+            })
         });
         textBox.KeyBindings.Add(new KeyBinding()
         {
@@ -144,7 +170,7 @@ public class PhantomTextBox : PhantomControlBase<TextBox>
 
     protected override void Save(TextBox element)
     {
-        currentOnApply?.Invoke(element.Text);
+        currentOnApply?.Invoke(element.Text, actionAfterSave);
     }
 }
 

@@ -1,11 +1,19 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
 
 namespace AvaloniaStyles.Controls.FastTableView;
+
+public interface ITableRowGroup
+{
+    public IReadOnlyList<ITableRow> Rows { get; }
+    event Action<ITableRowGroup, ITableRow>? RowChanged;
+    event Action<ITableRowGroup>? RowsChanged;
+}
 
 public interface ITableRow
 {

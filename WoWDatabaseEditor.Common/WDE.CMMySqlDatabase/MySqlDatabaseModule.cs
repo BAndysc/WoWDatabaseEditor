@@ -25,7 +25,8 @@ namespace WDE.CMMySqlDatabase
             containerRegistry.RegisterSingleton<CachedDatabaseProvider>();
             containerRegistry.RegisterSingleton<NullWorldDatabaseProvider>();
             containerRegistry.RegisterSingleton<NullAuthDatabaseProvider>();
-            containerRegistry.RegisterSingleton<IMySqlExecutor, MySqlExecutor>();
+            containerRegistry.RegisterSingleton<IMySqlExecutor, WorldMySqlExecutor>();
+            containerRegistry.RegisterSingleton<IMySqlHotfixExecutor, NullHotfixMysqlExecutor>();
             containerRegistry.RegisterSingleton<IAuthMySqlExecutor, AuthMySqlExecutor>();
             containerRegistry.RegisterSingleton<ICreatureStatCalculatorService, CreatureStatCalculatorService>();
             containerRegistry.RegisterSingleton<ICodeEditorViewModel, DebugQueryToolViewModel>();
