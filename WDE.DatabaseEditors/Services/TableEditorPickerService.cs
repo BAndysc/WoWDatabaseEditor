@@ -116,15 +116,21 @@ public class TableEditorPickerService : ITableEditorPickerService
                     where = $"({where}) AND ";
                 where += $"`{definition.GroupByKeys[0]}` = {key.Value[0]}";
             }
-            if (initialValue.HasValue)
+
+            async Task SetFilterAndFind()
             {
-                singleRow.TryFind(key.HasValue ? key.Value.WithAlso(initialValue.Value) : new DatabaseKey(initialValue.Value)).ListenErrors();
+                if (where != null)
+                {
+                    singleRow.FilterViewModel.FilterText = where;
+                    await singleRow.FilterViewModel.ApplyFilter.ExecuteAsync();
+                }
+                if (initialValue.HasValue)
+                {
+                    await singleRow.TryFind(key?.WithAlso(initialValue.Value) ?? new DatabaseKey(initialValue.Value));
+                }
             }
-            if (where != null)
-            {
-                singleRow.FilterViewModel.FilterText = where;
-                singleRow.FilterViewModel.ApplyFilter.Execute(null);
-            }
+
+            SetFilterAndFind().ListenErrors();
         }
         else
             throw new Exception("TemplateMode not (yet?) supported");
