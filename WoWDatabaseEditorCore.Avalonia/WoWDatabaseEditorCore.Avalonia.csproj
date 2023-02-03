@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <OutputType>WinExe</OutputType>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFramework>net7.0</TargetFramework>
         <Configurations>Debug;Release</Configurations>
         <Platforms>AnyCPU</Platforms>
         <ApplicationIcon>Icon.ico</ApplicationIcon>
@@ -12,6 +12,7 @@
         <DefineConstants Condition="$([MSBuild]::IsOSPlatform('Windows'))">$(DefineConstants);USE_OPENTK</DefineConstants>
     </PropertyGroup>
     <PropertyGroup>
+        <SelfContained>false</SelfContained>
         <PublishSingleFile>true</PublishSingleFile>
         <OutputPath>..\bin\$(Configuration)\</OutputPath>
     </PropertyGroup>

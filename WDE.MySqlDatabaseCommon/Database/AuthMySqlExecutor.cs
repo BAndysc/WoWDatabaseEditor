@@ -38,7 +38,7 @@ namespace WDE.MySqlDatabaseCommon.Database
             MySqlTransaction transaction;
             try
             {
-                conn.Open();
+                await conn.OpenAsync();
                 transaction = await conn.BeginTransactionAsync();
             }
             catch (Exception e)

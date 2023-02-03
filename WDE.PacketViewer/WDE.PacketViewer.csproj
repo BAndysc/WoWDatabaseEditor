@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFramework>net7.0</TargetFramework>
         <OutputType>Library</OutputType>
         <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
         <Nullable>enable</Nullable>
@@ -16,16 +16,16 @@
         <OutputPath>..\bin\$(Configuration)\</OutputPath>
     </PropertyGroup>
     <Import Project="..\Module.props" />
+    <Import Project="..\AntlrSupport.props" />
     <Import Project="..\Rendering\lib3d.props" />
     <ItemGroup>
         <PackageReference Include="Nito.AsyncEx.Coordination" Version="5.1.2" />
-        <PackageReference Include="System.Runtime.Experimental" Version="6.0.0" />
 
         <PackageReference Include="Antlr4.Runtime.Standard">
             <Version>4.9.3</Version>
         </PackageReference>
         <PackageReference Include="Antlr4BuildTasks">
-            <Version>8.17.0</Version>
+            <Version>12.2.0</Version>
         </PackageReference>
         <PackageReference Include="DynamicData" Version="7.2.1" />
         <PackageReference Include="Google.Protobuf" Version="3.21.9" />

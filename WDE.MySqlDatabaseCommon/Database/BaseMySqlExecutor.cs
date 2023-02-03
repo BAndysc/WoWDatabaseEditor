@@ -167,7 +167,7 @@ namespace WDE.MySqlDatabaseCommon.Database
             MySqlTransaction transaction;
             try
             {
-                conn.Open();
+                await conn.OpenAsync();
                 transaction = await conn.BeginTransactionAsync();
             }
             catch (Exception e)
@@ -216,7 +216,7 @@ namespace WDE.MySqlDatabaseCommon.Database
             MySqlConnection conn = new(connectionString);
             try
             {
-                conn.Open();
+                await conn.OpenAsync();
             }
             catch (Exception e)
             {

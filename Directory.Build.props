@@ -8,4 +8,15 @@
         <AvaloniaVersion>0.10.999-cibuild0016933-beta</AvaloniaVersion>
         <LangVersion>preview</LangVersion>
     </PropertyGroup>
+    <PropertyGroup>
+        <!-- SolutionDir is not defined when building projects explicitly -->
+        <SolutionDir Condition=" '$(SolutionDir)' == '' ">$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), WoWDatabaseEditor.sln))\</SolutionDir>
+        <!-- Output paths -->
+        <BaseIntermediateOutputPath>$(SolutionDir)bin\obj\$(Configuration)\$(MSBuildProjectName)\</BaseIntermediateOutputPath>
+        <IntermediateOutputPath>$(SolutionDir)bin\obj\$(Configuration)\$(MSBuildProjectName)\</IntermediateOutputPath>
+        <MSBuildProjectExtensionsPath>$(IntermediateOutputPath)\</MSBuildProjectExtensionsPath>
+        <!-- <OutputPath>$(SolutionDir)bin\out\$(Configuration)\</OutputPath>-->
+        <OutDir>$(OutputPath)</OutDir>
+        <DocumentationFile>$(SolutionDir)bin\doc\$(Configuration)\$(MSBuildProjectName).xml</DocumentationFile>
+    </PropertyGroup>
 </Project>
