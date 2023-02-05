@@ -556,6 +556,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             rowsDisposable.ForEach(x => x.Dispose());
             rowsDisposable.Clear();
             Rows.RemoveAll();
+            entities.Add(new CustomObservableCollection<DatabaseEntity>());
             if (columns.Count == 0)
             {
                 columns = tableDefinition.Groups.SelectMany(g => g.Fields).ToList();
@@ -656,7 +657,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                 forceInsertKeys.Remove(entity.Key);
             }
             
-            Entities.RemoveAt(indexOfEntity);
+            entities[0].RemoveAt(indexOfEntity);
             if (FocusedRow?.Entity == entity)
                 FocusedRowIndex = VerticalCursor.None;
             
@@ -744,7 +745,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                 columnIndex++;
             }
             
-            Entities.Insert(index, entity);
+            entities[0].Insert(index, entity);
             Rows.Insert(index, row);
             focusedRowIndex = VerticalCursor.None;
             FocusedRowIndex = new VerticalCursor(0, index);
@@ -1007,8 +1008,8 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             var query = where.Select("COUNT(*) AS C");
 
             var result = await mySqlExecutor.ExecuteSelectSql(tableDefinition, query.QueryString);
-
-            var count = result[0]["C"];
+            
+            var count = result.Count == 0 ? (typeof(long), 0L) :  result[0]["C"];
             var offset = Convert.ToInt64(count.Item2);
             var modifiedOffset = (ulong)Math.Max(0, offset - LimitQuery / 2 + 1);
             OffsetQuery = modifiedOffset;

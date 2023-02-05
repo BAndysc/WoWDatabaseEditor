@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using WDE.Common.Database;
 using WDE.Common.History;
 using WDE.Common.Services;
+using WDE.Common.Utils;
 using WDE.DatabaseEditors.Models;
 using WDE.DatabaseEditors.ViewModels;
 using WDE.DatabaseEditors.ViewModels.SingleRow;
@@ -33,7 +34,7 @@ public class SingleRowTableEditorHistoryHandler : HistoryHandler, IDisposable
 
     private void BindTableData()
     {
-        disposable = viewModel.Entities.ToStream(false).SubscribeAction(e =>
+        disposable = viewModel.EntitiesObservable[0].ToStream(false).SubscribeAction(e =>
         {
             if (e.Type == CollectionEventType.Add)
             {

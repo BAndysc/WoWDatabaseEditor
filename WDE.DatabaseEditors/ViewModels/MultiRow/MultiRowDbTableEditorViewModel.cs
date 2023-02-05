@@ -228,7 +228,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                 {
                     var row = Rows[selected.GroupIndex][selected.RowIndex];
                     var duplicate = row.Entity.Clone();
-                    ForceInsertEntity(duplicate, Entities.Count - 1);
+                    ForceInsertEntity(duplicate, selected.RowIndex + 1);
                 }
             });
             DeleteRowSelectedCommand = new AsyncAutoCommand(async () =>
@@ -275,22 +275,30 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             });
             PasteRowsCommand = new AsyncAutoCommand(async () =>
             {
+                IDisposable? bulk = null;
                 try
                 {
                     var text = await clipboardService.GetText();
                     var key = FocusedEntity?.Key ?? (Rows.Count > 0 ? Rows[0].Key : null);
                     var deserialized = serializer.Deserialize(tableDefinition, text, key);
+                    if (deserialized.Count > 1)
+                        bulk = BulkEdit("Paste rows");
+                    int index = focusedRowIndex.RowIndex + 1;
                     foreach (var entity in deserialized)
                     {
                         if (key.HasValue)
                             entity.SetTypedCellOrThrow(tableDefinition.PrimaryKey[0], key.Value[0]);
-                        ForceInsertEntity(entity, Entities.Count);
+                        ForceInsertEntity(entity, index++);
                     }
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine(e);
                     statusBar.PublishNotification(new PlainNotification(NotificationType.Error, "Failed to paste rows (see the debug log output)"));
+                }
+                finally
+                {
+                    bulk?.Dispose();
                 }
             });
             
@@ -319,27 +327,13 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             }
 
             // insert at the end of the current group
-            ForceInsertEntity(freshEntity, GetLastIndexInEntitiesOfKey(key));
+            var index = 0;
+            if (byEntryGroups.TryGetValue(key, out var group))
+                index = group.Count;
+            ForceInsertEntity(freshEntity, index);
             return freshEntity;
         }
 
-        private int GetLastIndexInEntitiesOfKey(DatabaseKey key)
-        {
-            var index = Entities.Count;
-            if (byEntryGroups.TryGetValue(key, out var group))
-            {
-                index = 0;
-                foreach (var g in Rows)
-                {
-                    index += g.Count;
-                    if (g == group)
-                        break;
-                }
-            }
-
-            return index;
-        }
-        
         private void AddRowByGroup(DatabaseEntitiesGroupViewModel group)
         {
             AddRow(group.Key);
@@ -391,7 +385,8 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             if (view != null)
             {
                 var duplicate = view.Parent.Entity.Clone();
-                ForceInsertEntity(duplicate, 0);
+                var index = byEntryGroups[view.Parent.Key].IndexOf(view.Parent);
+                ForceInsertEntity(duplicate, index + 1);
             }
         }
 
@@ -546,21 +541,33 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         
         public override bool ForceRemoveEntity(DatabaseEntity entity)
         {
-            var indexOfEntity = Entities.IndexOf(entity);
-            if (indexOfEntity == -1)
+            var indexOfEntity = Entities.GetIndex(entity);
+            if (indexOfEntity.index == -1)
                 return false;
-            
-            Entities.RemoveAt(indexOfEntity);
-            var vm = byEntryGroups[entity.Key].GetAndRemove(entity);
-            if (SelectedRow == vm)
-                FocusedRowIndex = VerticalCursor.None;
 
+            var vm = byEntryGroups[entity.Key][indexOfEntity.index];
+            
+            historyHandler!.DoAction(new AnonymousHistoryAction("Remove row", () =>
+            {
+                entities[indexOfEntity.group].Insert(indexOfEntity.index, entity);
+                byEntryGroups[entity.Key].Insert(indexOfEntity.index, vm);
+            }, () =>
+            {
+                entities[indexOfEntity.group].RemoveAt(indexOfEntity.index);
+                var vm = byEntryGroups[entity.Key].GetAndRemove(entity);
+                if (SelectedRow == vm)
+                    FocusedRowIndex = VerticalCursor.None;    
+            }));
+            
             return true;
         }
         
         public async Task<bool> AddEntity(DatabaseEntity entity)
         {
-            return ForceInsertEntity(entity, Entities.Count);
+            int index = 0;
+            if (byEntryGroups.TryGetValue(entity.Key, out var group))
+                index = group.Count;
+            return ForceInsertEntity(entity, index);
         }
 
         public override bool ForceInsertEntity(DatabaseEntity entity, int index, bool undoing = false)
@@ -616,24 +623,31 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                 columnIndex++;
             }
 
-            DatabaseEntity? previousEntity = null;
-            bool isLastInGroup = GetLastIndexInEntitiesOfKey(entity.Key) == index;
-            if (Entities.Count > index && index >= 0)
-                previousEntity = Entities[index];
-            Entities.Insert(index, entity);
-            EnsureKey(entity.Key);
-
-            var group = byEntryGroups[entity.Key];
-            var indexWithinGroup = group.IndexIf(e => e.Entity == previousEntity);
-            var newIndex = isLastInGroup ? group.Count : Math.Clamp(indexWithinGroup, 0, group.Count);
-            group.Insert(newIndex, row);
-            
-            FocusedRowIndex = new VerticalCursor(Rows.IndexOf(group), newIndex);
-            if (focusedRowIndex.IsValid)
+            var action = new AnonymousHistoryAction("New row", () =>
             {
-                MultiSelection.Clear();
-                MultiSelection.Add(focusedRowIndex);
-            }
+                if (!byEntryGroups.TryGetValue(entity.Key, out var group))
+                    return;
+                
+                var groupIndex = Rows.IndexOf(group);
+                
+                group.RemoveAt(index);
+                entities[groupIndex].RemoveAt(index);
+            }, () =>
+            {
+                EnsureKey(entity.Key);
+                var group = byEntryGroups[entity.Key];
+                var groupIndex = Rows.IndexOf(group);
+                entities[groupIndex].Insert(index, entity);
+                group.Insert(index, row);
+                FocusedRowIndex = new VerticalCursor(groupIndex, index);
+                if (focusedRowIndex.IsValid)
+                {
+                    MultiSelection.Clear();
+                    MultiSelection.Add(focusedRowIndex);
+                }
+            });
+            historyHandler!.DoAction(action);
+
             return true;
         }
 
@@ -641,7 +655,9 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         {
             if (keys.Remove(entity))
             {
-                Rows.Remove(byEntryGroups[entity]);
+                var index = Rows.IndexOf(byEntryGroups[entity]);
+                Rows.RemoveAt(index);
+                entities.RemoveAt(index);
                 byEntryGroups.Remove(entity);
             }
         }
@@ -657,6 +673,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             {
                 byEntryGroups[entity] = new DatabaseEntitiesGroupViewModel(entity, GenerateName(entity[0]));
                 Rows.Add(byEntryGroups[entity]);
+                entities.Add(new CustomObservableCollection<DatabaseEntity>());
             }
         }
 
@@ -733,6 +750,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                 for (var index = 0; index < newGroupIndices.Count; index++)
                 {
                     var group = Rows[index];
+                    EntitiesObservable[index].OrderByIndices(newGroupIndices[index]);
                     group.OrderByIndices(newGroupIndices[index]);
                 }
             }, () =>
@@ -740,6 +758,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                 for (var index = 0; index < oldGroupIndices.Count; index++)
                 {
                     var group = Rows[index];
+                    EntitiesObservable[index].OrderByIndices(oldGroupIndices[index]);
                     group.OrderByIndices(oldGroupIndices[index]);
                 }
             });

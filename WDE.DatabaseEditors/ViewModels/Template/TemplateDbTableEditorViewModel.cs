@@ -268,7 +268,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             if (indexOfEntity == -1)
                 return false;
             
-            Entities.RemoveAt(indexOfEntity);
+            entities[0].RemoveAt(indexOfEntity);
             Header.RemoveAt(indexOfEntity);
             foreach (var row in Rows.Items)
                 row.Cells.RemoveAt(indexOfEntity);
@@ -365,7 +365,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
                 row.Cells.Insert(index, cellViewModel);
             }
 
-            Entities.Insert(index, entity);
+            entities[0].Insert(index, entity);
             var name = parameterFactory.Factory(tableDefinition.Picker).ToString(entity.Key[0]);
             Header.Insert(index, name);
 
@@ -387,6 +387,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             Rows.Clear();
             Header.Clear();
             groupVisibilityByName.Clear();
+            entities.Add(new CustomObservableCollection<DatabaseEntity>());
 
             int categoryIndex = 0;
             int columnIndex = 0;

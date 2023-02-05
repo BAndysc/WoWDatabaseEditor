@@ -91,6 +91,7 @@ namespace WDE.DatabaseEditors.ViewModels
             this.statusBar = statusBar;
             this.mySqlExecutor = mySqlExecutor;
             this.solutionItem = solutionItem;
+            Entities = new FlatReadOnlyList<DatabaseEntity>(entities);
             History = history;
             
             undoCommand = new DelegateCommand(History.Undo, CanUndo);
@@ -238,7 +239,8 @@ namespace WDE.DatabaseEditors.ViewModels
 
             solutionItem.UpdateEntitiesWithOriginalValues(data.Entities);
             
-            Entities.RemoveAll();
+            entities.Do(e => e.RemoveAll());
+            entities.RemoveAll();
             await InternalLoadData(data);
             IsLoading = false;
             return true;
@@ -317,7 +319,10 @@ namespace WDE.DatabaseEditors.ViewModels
         protected DatabaseTableDefinitionJson tableDefinition = null!;
         public DatabaseTableDefinitionJson TableDefinition => tableDefinition;
         // DO NOT REORDER THINGS HERE, OR ELSE UNDO-REDO WILL BE BROKEN :(((
-        public ObservableCollection<DatabaseEntity> Entities { get; } = new();
+        //public ObservableCollection<DatabaseEntity> Entities { get; } = new();
+        public FlatReadOnlyList<DatabaseEntity> Entities { get; }
+        protected ObservableCollection<CustomObservableCollection<DatabaseEntity>> entities = new();
+        public ObservableCollection<CustomObservableCollection<DatabaseEntity>> EntitiesObservable => entities;
 
         public ObservableCollection<TableCommandViewModel> ContextCommands { get; } = new();
         public ObservableCollection<TableCommandViewModel> ToolbarCommands { get; } = new();

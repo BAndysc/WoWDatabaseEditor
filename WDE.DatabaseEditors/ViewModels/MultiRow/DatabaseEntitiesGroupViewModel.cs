@@ -1,17 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Linq;
 using AvaloniaStyles.Controls.FastTableView;
-using DynamicData.Binding;
 using WDE.Common.Services;
 using WDE.DatabaseEditors.Models;
 
 namespace WDE.DatabaseEditors.ViewModels.MultiRow
 {
-    public class DatabaseEntitiesGroupViewModel : ObservableCollectionExtended<DatabaseEntityViewModel>, ITableRowGroup
+    public class DatabaseEntitiesGroupViewModel : CustomObservableCollection<DatabaseEntityViewModel>, ITableRowGroup
     {
-        private bool pauseNotifications = false;
         public DatabaseKey Key { get; }
         public string Name { get; }
 
@@ -19,13 +16,20 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         {
             Key = key;
             Name = name;
-            base.CollectionChanged += OnCollectionChanged;
         }
 
-        private void OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        public override void OrderByIndices(List<int> indices)
+        {
+            base.OrderByIndices(indices);
+            RowsChanged?.Invoke(this);
+        }
+
+        protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
         {
             if (pauseNotifications)
                 return;
+            
+            base.OnCollectionChanged(e);
             
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
@@ -75,26 +79,6 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         public override string ToString()
         {
             return Name;
-        }
-
-        /// <summary>
-        /// fast ordering, without firing notifications
-        /// </summary>
-        /// <param name="columnIndex"></param>
-        public void OrderByIndices(List<int> indices)
-        {
-            var sorted = indices.Select(i => this[i]).ToList();
-            pauseNotifications = true;
-            try
-            {
-                Clear();
-                AddRange(sorted);
-                RowsChanged?.Invoke(this);
-            }
-            finally
-            {
-                pauseNotifications = false;
-            }
         }
     }
 }
