@@ -66,10 +66,10 @@
         </Style>
     </ExtendedWindow.Styles>
     
-    <NativeMenu.Menu>
+    <ManagedMenu.Menu>
         <NativeMenu utils:MenuBind.MenuItems="{CompiledBinding MenuItemProviders}">
         </NativeMenu>
-    </NativeMenu.Menu>
+    </ManagedMenu.Menu>
     
     <controls:ExtendedWindow.ToolBar>
         <controls:ToolBar>

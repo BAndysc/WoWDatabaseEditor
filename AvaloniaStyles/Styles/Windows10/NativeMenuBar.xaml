@@ -6,7 +6,7 @@
     <Setter Property="Template">
         <ControlTemplate>
             <Menu
-                Items="{Binding $parent[TopLevel].(NativeMenu.Menu).Items, FallbackValue={x:Null}}">
+                Items="{Binding $parent[TopLevel].(ManagedMenu.Menu).Items, FallbackValue={x:Null}}">
                 <Menu.Styles>
                     <Style Selector="MenuItem">
                         <Setter Property="(converters:NativeMenuItemHelper.IsChecked)" Value="{Binding IsChecked}"></Setter>

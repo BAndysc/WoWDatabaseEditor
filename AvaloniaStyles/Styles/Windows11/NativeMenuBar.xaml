@@ -9,7 +9,7 @@
     </Style.Resources>
     <Setter Property="Template">
         <ControlTemplate>
-            <Button Width="34" Height="34" IsVisible="{Binding $parent[TopLevel].(NativeMenu.Menu).Items, FallbackValue=False, Converter={StaticResource ListCountToBoolConverter}}">
+            <Button Width="34" Height="34" IsVisible="{Binding $parent[TopLevel].(ManagedMenu.Menu).Items, FallbackValue=False, Converter={StaticResource ListCountToBoolConverter}}">
                 <Button.Content>
                     <Path Fill="{Binding $parent[Button].Foreground}">
                         <Path.Data>
@@ -26,7 +26,7 @@
                 </Interaction.Behaviors>
                 <Button.ContextMenu>
                     <ContextMenu
-                        Items="{Binding $parent[TopLevel].(NativeMenu.Menu).Items, FallbackValue={x:Null}}">
+                        Items="{Binding $parent[TopLevel].(ManagedMenu.Menu).Items, FallbackValue={x:Null}}">
                     </ContextMenu>
                 </Button.ContextMenu>
                 <Button.Styles>
