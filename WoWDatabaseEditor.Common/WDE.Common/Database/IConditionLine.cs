@@ -40,6 +40,16 @@ namespace WDE.Common.Database
 
     public static class ConditionLineExtensions
     {
+        public static bool IsParentCondition(this ICondition condition)
+        {
+            return condition.ConditionIndex > 0;
+        }
+        
+        public static bool IsActualCondition(this ICondition condition)
+        {
+            return !condition.IsParentCondition();
+        }
+        
         public static long GetConditionValue(this ICondition line, int i)
         {
             switch (i)

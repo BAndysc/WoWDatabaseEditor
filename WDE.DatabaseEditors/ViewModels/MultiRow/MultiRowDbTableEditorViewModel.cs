@@ -434,7 +434,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
 
                 if (column.IsConditionColumn)
                 {
-                    var label = entity.ToObservable(e => e.Conditions).Select(c => "Edit (" + (c?.Count ?? 0) + ")");
+                    var label = entity.ToObservable(e => e.Conditions).Select(c => "Conditions (" + (c?.Count(cond => cond.IsActualCondition()) ?? 0) + ")");
                     cellViewModel = AutoDispose(new DatabaseCellViewModel(columnIndex, "Conditions", EditConditionsCommand, row, entity, label));
                 }
                 else if (column.IsMetaColumn)
