@@ -313,6 +313,11 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             return nonCachedDatabase.GetConditionsForAsync(keyMask, key);
         }
 
+        public Task<IList<IConditionLine>> GetConditionsForAsync(IDatabaseProvider.ConditionKeyMask keyMask, ICollection<IDatabaseProvider.ConditionKey> manualKeys)
+        {
+            return nonCachedDatabase.GetConditionsForAsync(keyMask, manualKeys);
+        }
+
         public IEnumerable<ISpellScriptName> GetSpellScriptNames(int spellId)
         {
             return nonCachedDatabase.GetSpellScriptNames(spellId);

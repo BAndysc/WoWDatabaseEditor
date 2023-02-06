@@ -8,7 +8,11 @@ public class DatabaseConditionColumnConverter : JsonConverter
 {
     public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
     {
-        throw new NotImplementedException();
+        var cond = (DatabaseConditionColumn)value!;
+        if (cond.IsAbs)
+            writer.WriteValue("abs(" + cond.Name + ")");
+        else
+            writer.WriteValue(cond.Name);
     }
 
     public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
@@ -19,7 +23,6 @@ public class DatabaseConditionColumnConverter : JsonConverter
         if (value == null)
             return null;
 
-        //reader.Read();
         if (value.StartsWith("abs("))
             return new DatabaseConditionColumn()
             {
@@ -35,6 +38,6 @@ public class DatabaseConditionColumnConverter : JsonConverter
 
     public override bool CanConvert(Type objectType)
     {
-        throw new NotImplementedException();
+        return objectType == typeof(DatabaseConditionColumn);
     }
 }

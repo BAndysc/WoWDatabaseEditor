@@ -53,6 +53,7 @@ namespace WDE.Common.Database
         IEnumerable<IConditionLine> GetConditionsFor(int sourceType, int sourceEntry, int sourceId);
 
         Task<IList<IConditionLine>> GetConditionsForAsync(ConditionKeyMask keyMask, ConditionKey manualKey);
+        Task<IList<IConditionLine>> GetConditionsForAsync(ConditionKeyMask keyMask, ICollection<ConditionKey> manualKeys);
         
         IEnumerable<ISpellScriptName> GetSpellScriptNames(int spellId);
 

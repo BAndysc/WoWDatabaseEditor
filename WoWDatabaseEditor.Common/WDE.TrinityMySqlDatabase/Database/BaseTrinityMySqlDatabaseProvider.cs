@@ -334,6 +334,23 @@ namespace WDE.TrinityMySqlDatabase.Database
                 .ToListAsync<IConditionLine>();
         }
 
+        public async Task<IList<IConditionLine>> GetConditionsForAsync(IDatabaseProvider.ConditionKeyMask keyMask, ICollection<IDatabaseProvider.ConditionKey> manualKeys)
+        {
+            if (manualKeys.Count == 0)
+                return new List<IConditionLine>();
+            
+            await using var model = Database();
+            var predicate = PredicateBuilder.New<MySqlConditionLine>();
+            foreach (var key in manualKeys)
+            {
+                predicate = predicate.Or(x => x.SourceType == key.SourceType &&
+                                              (!keyMask.HasFlagFast(IDatabaseProvider.ConditionKeyMask.SourceGroup) || x.SourceGroup == (key.SourceGroup ?? 0)) &&
+                                              (!keyMask.HasFlagFast(IDatabaseProvider.ConditionKeyMask.SourceEntry)  || x.SourceEntry == (key.SourceEntry ?? 0)) &&
+                                              (!keyMask.HasFlagFast(IDatabaseProvider.ConditionKeyMask.SourceId)  || x.SourceId == (key.SourceId ?? 0)));
+            }
+            return await model.Conditions.Where(predicate).ToListAsync<IConditionLine>();
+        }
+        
         public async Task<IList<int>> GetSmartScriptEntriesByType(SmartScriptType scriptType)
         {
             var type = (int)scriptType;

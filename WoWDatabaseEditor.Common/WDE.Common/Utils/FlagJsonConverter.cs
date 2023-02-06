@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace WDE.Common.Utils
@@ -51,7 +52,26 @@ namespace WDE.Common.Utils
 
         public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
         {
-            throw new Exception("Not yet implemented :(");
+            if (value == null)
+            {
+                writer.WriteNull();
+                return;
+            }
+            List<string> flags = new List<string>();
+            var flagValues = Enum.GetValues(value.GetType());
+            var names = Enum.GetNames(value.GetType());
+            
+            var valueNumber = Convert.ToInt64(value);
+            int i = 0;
+            foreach (var flag in flagValues)
+            {
+                var flagAsNumber = Convert.ToInt64(flag);
+                if ((valueNumber & flagAsNumber) == flagAsNumber)
+                    flags.Add(names[i]);
+                i++;
+            }
+
+            writer.WriteValue(string.Join(",", flags));
         }
 
         public override bool CanConvert(Type objectType)

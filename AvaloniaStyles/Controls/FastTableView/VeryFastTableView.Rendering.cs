@@ -11,7 +11,7 @@ namespace AvaloniaStyles.Controls.FastTableView;
 public partial class VeryFastTableView
 {
     /// <summary>
-    /// Viewport rect WITHOUT a header
+    /// Viewport rect WITHOUT the header
     /// </summary>
     private Rect DataViewport
     {
@@ -32,7 +32,7 @@ public partial class VeryFastTableView
         var height = DrawingStartOffsetY;
         foreach (var group in Items)
         {
-            height += (IsGroupingEnabled ? RowHeight : 0) /* header */ + group.Rows.Count * RowHeight;
+            height += (IsGroupingEnabled ? HeaderRowHeight : 0) + group.Rows.Count * RowHeight;
         }
 
         availableSize = new Size(0, height + RowHeight); // always add extra row height for scrollbar
@@ -68,13 +68,13 @@ public partial class VeryFastTableView
         var cellDrawer = CustomCellDrawer;
 
         // we draw only the visible rows
-        DrawingContext.PushedState? viewPortClip = IsGroupingEnabled ? context.PushClip(viewPort.Deflate(new Thickness(0, RowHeight, 0, 0))) : null;
+        DrawingContext.PushedState? viewPortClip = IsGroupingEnabled ? context.PushClip(viewPort.Deflate(new Thickness(0, HeaderRowHeight, 0, 0))) : null;
         var selectionIterator = MultiSelection.ContainsIterator;
         int groupIndex = 0;
         foreach (var group in Items)
         {
             var groupStartY = y;
-            var groupHeight = (IsGroupingEnabled ? RowHeight : 0) + RowHeight * group.Rows.Count;
+            var groupHeight = (IsGroupingEnabled ? HeaderRowHeight : 0) + RowHeight * group.Rows.Count;
             
             // out of bounds in the upper part
             if (groupStartY + groupHeight < DataViewport.Top)
@@ -89,7 +89,7 @@ public partial class VeryFastTableView
             }
             else
             {
-                y += (IsGroupingEnabled ? RowHeight : 0); // header
+                y += (IsGroupingEnabled ? HeaderRowHeight : 0); // header
                 int rowIndex = 0;
                 foreach (var row in group.Rows)
                 {
@@ -284,14 +284,14 @@ public partial class VeryFastTableView
         foreach (var group in Items)
         {
             var groupStartY = y;
-            var groupHeight = (IsGroupingEnabled ? RowHeight : 0) + RowHeight * group.Rows.Count;
+            var groupHeight = (IsGroupingEnabled ? HeaderRowHeight : 0) + RowHeight * group.Rows.Count;
 
             if (groupStartY + groupHeight < mouseY)
                 y += groupHeight;
             else
             {
                 var rowIndex = 0;
-                y += IsGroupingEnabled ? RowHeight : 0; // row height for the header
+                y += IsGroupingEnabled ? HeaderRowHeight : 0; // row height for the header
                 foreach (var row in group.Rows)
                 {
                     var rowEnd = y + RowHeight;

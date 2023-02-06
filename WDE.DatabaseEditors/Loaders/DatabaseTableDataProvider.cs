@@ -196,6 +196,7 @@ namespace WDE.DatabaseEditors.Loaders
 
                     if (definition.Condition != null)
                     {
+                        List<(Dictionary<string, (Type, object)>, int? sourceGroup, int? sourceEntry, int? sourceId)> conditionsToLoad = new();
                         foreach (var row in result)
                         {
                             int? sourceGroup = null, sourceEntry = null, sourceId = null;
@@ -215,12 +216,22 @@ namespace WDE.DatabaseEditors.Loaders
                                 int.TryParse(idData.Item2.ToString(), out var idInt))
                                 sourceId = idInt;
 
-                            IList<IConditionLine>? conditionList = await databaseProvider.GetConditionsForAsync(keyMask,
-                                new IDatabaseProvider.ConditionKey(definition.Condition.SourceType, sourceGroup,
-                                    sourceEntry, sourceId));
-                            if (conditionList == null || conditionList.Count == 0)
-                                conditionList = new List<IConditionLine>();
-                            row.Add("conditions", (typeof(IList<IConditionLine>), conditionList!));
+                            conditionsToLoad.Add((row, sourceGroup, sourceEntry, sourceId));
+                            row.Add("conditions", (typeof(IList<IConditionLine>), new List<IConditionLine>()));
+                        }
+                        
+                        var allConditions = await databaseProvider.GetConditionsForAsync(keyMask, conditionsToLoad.Select(c => 
+                            new IDatabaseProvider.ConditionKey(definition.Condition.SourceType, c.sourceGroup, c.sourceEntry, c.sourceId)).ToList());
+                        
+                        var groupedConditions = allConditions.GroupBy(line => (keyMask.HasFlagFast(IDatabaseProvider.ConditionKeyMask.SourceGroup) ? (int?)line.SourceGroup : null,
+                            keyMask.HasFlagFast(IDatabaseProvider.ConditionKeyMask.SourceEntry) ? (int?)line.SourceEntry : null,
+                            keyMask.HasFlagFast(IDatabaseProvider.ConditionKeyMask.SourceId) ? (int?)line.SourceId : null))
+                            .ToDictionary(key => key.Key, values => values.ToList());
+                        
+                        foreach (var (row, sourceGroup, sourceEntry, sourceId) in conditionsToLoad)
+                        {
+                            if (groupedConditions.TryGetValue((sourceGroup, sourceEntry, sourceId), out var conditionList))
+                                row["conditions"] = (typeof(IList<IConditionLine>), conditionList);
                         }
                     }
                 }
@@ -331,6 +342,7 @@ namespace WDE.DatabaseEditors.Loaders
 
                         if (definition.Condition != null)
                         {
+                            List<(Dictionary<string, (Type, object)>, int? sourceGroup, int? sourceEntry, int? sourceId)> conditionsToLoad = new();
                             foreach (var row in result)
                             {
                                 int? sourceGroup = null, sourceEntry = null, sourceId = null;
@@ -350,12 +362,22 @@ namespace WDE.DatabaseEditors.Loaders
                                     int.TryParse(idData.Item2.ToString(), out var idInt))
                                     sourceId = idInt;
 
-                                IList<IConditionLine>? conditionList = await databaseProvider.GetConditionsForAsync(keyMask,
-                                    new IDatabaseProvider.ConditionKey(definition.Condition.SourceType, sourceGroup,
-                                        sourceEntry, sourceId));
-                                if (conditionList == null || conditionList.Count == 0)
-                                    conditionList = new List<IConditionLine>();
-                                row.Add("conditions", (typeof(IList<IConditionLine>), conditionList!));
+                                conditionsToLoad.Add((row, sourceGroup, sourceEntry, sourceId));
+                                row.Add("conditions", (typeof(IList<IConditionLine>), new List<IConditionLine>()));
+                            }
+                            
+                            var allConditions = await databaseProvider.GetConditionsForAsync(keyMask, conditionsToLoad.Select(c => 
+                                new IDatabaseProvider.ConditionKey(definition.Condition.SourceType, c.sourceGroup, c.sourceEntry, c.sourceId)).ToList());
+                        
+                            var groupedConditions = allConditions.GroupBy(line => (keyMask.HasFlagFast(IDatabaseProvider.ConditionKeyMask.SourceGroup) ? (int?)line.SourceGroup : null,
+                                    keyMask.HasFlagFast(IDatabaseProvider.ConditionKeyMask.SourceEntry) ? (int?)line.SourceEntry : null,
+                                    keyMask.HasFlagFast(IDatabaseProvider.ConditionKeyMask.SourceId) ? (int?)line.SourceId : null))
+                                .ToDictionary(key => key.Key, values => values.ToList());
+                        
+                            foreach (var (row, sourceGroup, sourceEntry, sourceId) in conditionsToLoad)
+                            {
+                                if (groupedConditions.TryGetValue((sourceGroup, sourceEntry, sourceId), out var conditionList))
+                                    row["conditions"] = (typeof(IList<IConditionLine>), conditionList);
                             }
                         }
                     }

@@ -12,10 +12,6 @@
              IsEnabled="{Binding TaskInProgress, Converter={x:Static converters:InverseBoolConverter.Instance}}"
              x:Class="WDE.DatabaseEditors.Avalonia.Views.SingleRow.SingleRowDbTableEditorToolBar">
     <controls:ToolbarPanel>
-        <components:ButtonImage Command="{CompiledBinding AddNewCommand, Mode=OneTime}" 
-                                Text="Add new key" 
-                                Image="Icons/icon_add.png"/>
-        
         <ToggleButton ToolTip.Tip="Split view horizontally" IsChecked="{CompiledBinding SplitHorizontal, Mode=TwoWay}">
             <components:WdeImage ImageUri="Icons/icon_split_horiz.png" />
         </ToggleButton>

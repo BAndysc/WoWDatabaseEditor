@@ -160,7 +160,7 @@ public partial class VeryFastTableView
 
         var viewRect = DataViewport;
 
-        var headerHeight = (IsGroupingEnabled ? RowHeight : 0);
+        var headerHeight = (IsGroupingEnabled ? HeaderRowHeight : 0);
         var top = GetRowY(row);
         var bottom = top + RowHeight;
         if (top < viewRect.Top + headerHeight)

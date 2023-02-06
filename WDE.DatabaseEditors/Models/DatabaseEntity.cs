@@ -10,6 +10,7 @@ using WDE.Common.History;
 using WDE.Common.Services;
 using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.History;
+using WDE.DatabaseEditors.Utils;
 
 namespace WDE.DatabaseEditors.Models
 {
@@ -52,7 +53,7 @@ namespace WDE.DatabaseEditors.Models
         
         public DatabaseKey ForceGenerateKey(DatabaseTableDefinitionJson definition)
         {
-            return new DatabaseKey(definition.PrimaryKey.Select(GetTypedValueOrThrow<long>));
+            return new DatabaseKey(definition.PrimaryKey.Select(GetLongMapping));
         }
         
         public DatabaseKey Key
@@ -120,6 +121,18 @@ namespace WDE.DatabaseEditors.Models
             if (typed == null)
                 throw new Exception("No column named " + columnName + " with type " + typeof(T));
             return typed.Current.Value;
+        }
+
+        public long GetLongMapping(string columnName)
+        {
+            var cell = GetCell(columnName);
+            if (cell == null)
+                throw new Exception("No column named " + columnName);
+            if (cell is DatabaseField<long> l)
+                return l.Current.Value;
+            if (cell is DatabaseField<string> s)
+                return StringToLongMapping.Instance[s.Current.Value ?? ""];
+            throw new Exception("No column named " + columnName + " with type " + typeof(long) + " or " + typeof(string));
         }
 
         public DatabaseEntity Clone(DatabaseKey? newKey = null, bool? existInDatabase = null)

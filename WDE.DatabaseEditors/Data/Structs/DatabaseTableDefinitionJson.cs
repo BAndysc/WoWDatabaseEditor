@@ -79,6 +79,9 @@ namespace WDE.DatabaseEditors.Data.Structs
         [JsonProperty(PropertyName = "primary_key")]
         public IList<string> PrimaryKey { get; set; } = null!;
 
+        [JsonProperty(PropertyName = "commands")]
+        public IList<DatabaseCommandDefinitionJson>? Commands { get; set; }
+
         [JsonProperty(PropertyName = "group_by_key")]
         public string? GroupByKey { get; set; } = null;
         
@@ -91,9 +94,6 @@ namespace WDE.DatabaseEditors.Data.Structs
         [JsonProperty(PropertyName = "groups")]
         public IList<DatabaseColumnsGroupJson> Groups { get; set; } = new List<DatabaseColumnsGroupJson>();
 
-        [JsonProperty(PropertyName = "commands")]
-        public IList<DatabaseCommandDefinitionJson>? Commands { get; set; }
-        
         [JsonProperty(PropertyName = "auto_key")]
         [JsonConverter(typeof(StringEnumConverter))]
         public GuidType? AutoKeyValue { get; set; }

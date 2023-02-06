@@ -25,6 +25,7 @@ public class SingleRecordDatabaseCellViewModel : BaseDatabaseCellViewModel, ITab
     public string ActionLabel { get; set; } = "";
     
     public string ColumnName { get; }
+    public string? DbColumnName { get; }
     public bool IsBool => ParameterValue is IParameterValue<long> holder2 && holder2.Parameter is BoolParameter;
     public bool IsModified => TableField?.IsModified ?? false;
     
@@ -34,6 +35,7 @@ public class SingleRecordDatabaseCellViewModel : BaseDatabaseCellViewModel, ITab
         CanBeNull = columnDefinition.CanBeNull;
         IsReadOnly = columnDefinition.IsReadOnly;
         ColumnName = columnDefinition.Name;
+        DbColumnName = columnDefinition.DbColumnName;
         Parent = parent;
         TableField = tableField;
         ParameterValue = parameterValue;

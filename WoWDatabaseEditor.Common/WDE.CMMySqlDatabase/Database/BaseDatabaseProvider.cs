@@ -246,6 +246,11 @@ namespace WDE.CMMySqlDatabase.Database
             return new List<IConditionLine>();
         }
 
+        public async Task<IList<IConditionLine>> GetConditionsForAsync(IDatabaseProvider.ConditionKeyMask keyMask, ICollection<IDatabaseProvider.ConditionKey> manualKeys)
+        {
+            return new List<IConditionLine>();
+        }
+
         public async Task<IList<int>> GetSmartScriptEntriesByType(SmartScriptType scriptType)
         {
             return new List<int>();

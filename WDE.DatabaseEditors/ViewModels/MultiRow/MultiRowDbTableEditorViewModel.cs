@@ -2,12 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using DynamicData;
+using Newtonsoft.Json;
 using Prism.Commands;
 using Prism.Events;
 using PropertyChanged.SourceGenerator;
@@ -143,6 +145,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         public DelegateCommand SetNullSelectedCommand { get; }
         public DelegateCommand DuplicateSelectedCommand { get; }
         public AsyncAutoCommand DeleteRowSelectedCommand { get; }
+        public DelegateCommand InsertRowBelowCommand { get; }
         public DelegateCommand CopySelectedRowsCommand { get; }
         public AsyncAutoCommand PasteRowsCommand { get; } 
 
@@ -197,6 +200,19 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             EditConditionsCommand = new AsyncAutoCommand<DatabaseCellViewModel?>(EditConditions);
             AddRowCommand = new DelegateCommand<DatabaseEntitiesGroupViewModel>(AddRowByGroup);
             AddNewCommand = new AsyncAutoCommand(AddNewEntity);
+            InsertRowBelowCommand = new DelegateCommand(() =>
+            {
+                if (FocusedRowIndex.IsValid)
+                {
+                    var group = Rows[focusedRowIndex.GroupIndex];
+                    AddRow(group.Key, focusedRowIndex.RowIndex + 1);
+                }
+                else if (Rows.Count > 0)
+                {
+                    var group = Rows[^1];
+                    AddRow(group.Key, group.Count);
+                }
+            });
             RevertSelectedCommand = new AsyncAutoCommand(async () =>
             {
                 if (focusedCellIndex == -1)
@@ -307,7 +323,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             ScheduleLoading();
         }
 
-        public override DatabaseEntity AddRow(DatabaseKey key)
+        public DatabaseEntity AddRow(DatabaseKey key, int? index)
         {
             var freshEntity = modelGenerator.CreateEmptyEntity(tableDefinition, key, false);
             if (autoIncrementColumn != null)
@@ -326,13 +342,12 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                     lField.Current.Value = max;
             }
 
-            // insert at the end of the current group
-            var index = 0;
-            if (byEntryGroups.TryGetValue(key, out var group))
-                index = group.Count;
-            ForceInsertEntity(freshEntity, index);
+            int elementsInGroup = byEntryGroups.TryGetValue(key, out var group) ? group.Count : 0;
+            ForceInsertEntity(freshEntity, Math.Clamp(index ?? elementsInGroup, 0, elementsInGroup));
             return freshEntity;
         }
+        
+        public override DatabaseEntity AddRow(DatabaseKey key) => AddRow(key, null);
 
         private void AddRowByGroup(DatabaseEntitiesGroupViewModel group)
         {
@@ -546,8 +561,8 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                 return false;
 
             var vm = byEntryGroups[entity.Key][indexOfEntity.index];
-            
-            historyHandler!.DoAction(new AnonymousHistoryAction("Remove row", () =>
+                
+            DoAction(new AnonymousHistoryAction("Remove row", () =>
             {
                 entities[indexOfEntity.group].Insert(indexOfEntity.index, entity);
                 byEntryGroups[entity.Key].Insert(indexOfEntity.index, vm);
@@ -561,7 +576,15 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             
             return true;
         }
-        
+
+        private void DoAction(IHistoryAction action)
+        {
+            if (historyHandler != null)
+                historyHandler.DoAction(action);
+            else
+                action.Redo();
+        }
+
         public async Task<bool> AddEntity(DatabaseEntity entity)
         {
             int index = 0;
@@ -646,7 +669,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                     MultiSelection.Add(focusedRowIndex);
                 }
             });
-            historyHandler!.DoAction(action);
+            DoAction(action);
 
             return true;
         }
@@ -694,7 +717,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         {
             System.IDisposable disposable = new EmptyDisposable();
             if (MultiSelection.MoreThanOne)
-                disposable = historyHandler!.BulkEdit("Bulk edit property");
+                disposable = BulkEdit("Bulk edit property");
             foreach (var selected in MultiSelection.All())
                 Rows[selected.GroupIndex].Rows[selected.RowIndex].CellsList[focusedCellIndex].UpdateFromString(text);
             disposable.Dispose();
@@ -762,10 +785,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                     group.OrderByIndices(oldGroupIndices[index]);
                 }
             });
-            if (historyHandler != null)
-                historyHandler?.DoAction(action);
-            else
-                action.Redo();
+            DoAction(action);
         }
 
         // we're gonna check for duplicate keys before saving the data to prevent data loss

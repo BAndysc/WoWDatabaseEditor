@@ -15,7 +15,7 @@ public partial class VeryFastTableView
             return base.ArrangeOverride(finalSize);
         
         var viewPort = DataViewport;
-        var stickyHeaderRect = new Rect(viewPort.X, viewPort.Top, viewPort.Width, RowHeight);
+        var stickyHeaderRect = new Rect(viewPort.X, viewPort.Top, viewPort.Width, HeaderRowHeight);
 
         headerViews.Reset(template);
         
@@ -23,8 +23,8 @@ public partial class VeryFastTableView
         double y = DrawingStartOffsetY;
         foreach (var group in Items)
         {
-            var headerRect = new Rect(viewPort.X, y, viewPort.Width, RowHeight);
-            var groupRect = new Rect(0, y, finalSize.Width, RowHeight + group.Rows.Count * RowHeight);
+            var headerRect = new Rect(viewPort.X, y, viewPort.Width, HeaderRowHeight);
+            var groupRect = new Rect(0, y, finalSize.Width, HeaderRowHeight + group.Rows.Count * RowHeight);
 
             y += groupRect.Height;
 

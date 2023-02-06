@@ -103,112 +103,126 @@
         <StaticResource ResourceKey="FieldValueDataTemplate" />
     </UserControl.DataTemplates>
     
-    <Grid utils:GridUtils.DynamicRows="{CompiledBinding SplitVertical, Converter={StaticResource RowsConverter}}"
-          utils:GridUtils.DynamicColumns="{CompiledBinding SplitHorizontal, Converter={StaticResource ColumnsConverter}}"
-    >
-        <DockPanel>
-            <singleRow1:MySqlFilterControl DockPanel.Dock="Top" DataContext="{CompiledBinding FilterViewModel}" />
-            <Border DockPanel.Dock="Bottom" Background="{DynamicResource SlightlyHighlightedBackground}" Padding="2">
-                <DockPanel>
-                    <Button DockPanel.Dock="Left" Content="Columns">
-                        <Button.Flyout>
-                            <Flyout>
-                                <ScrollViewer MaxHeight="500">
-                                    <ItemsControl Items="{CompiledBinding Columns}">
-                                        <ItemsControl.ItemsPanel>
-                                            <ItemsPanelTemplate>
-                                                <StackPanel Spacing="3" />
-                                            </ItemsPanelTemplate>
-                                        </ItemsControl.ItemsPanel>
-                                        <ItemsControl.ItemTemplate>
-                                            <DataTemplate>
-                                                <CheckBox HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch" IsChecked="{CompiledBinding IsVisible}" Content="{CompiledBinding Name}" />
-                                            </DataTemplate>
-                                        </ItemsControl.ItemTemplate>
-                                    </ItemsControl>
-                                </ScrollViewer>
-                            </Flyout>
-                        </Button.Flyout>
-                    </Button>
-                    <CheckBox DockPanel.Dock="Left" IsChecked="{CompiledBinding ShowOnlyModified}">Only modified</CheckBox>
-                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
-                        <Button Command="{CompiledBinding PreviousDataPage}" Width="32">
-                            <Path Stretch="Uniform" Height="16" Data="{StaticResource caret_left_regular}" Fill="{Binding $parent[Button].Foreground}" />
-                        </Button>
-                        <Button Width="32">
-                            <Path Stretch="Uniform" Height="16" Data="{StaticResource  settings_regular}" Fill="{Binding $parent[Button].Foreground}" />
+    <Panel>
+            <Grid utils:GridUtils.DynamicRows="{CompiledBinding SplitVertical, Converter={StaticResource RowsConverter}}"
+          utils:GridUtils.DynamicColumns="{CompiledBinding SplitHorizontal, Converter={StaticResource ColumnsConverter}}">
+            <DockPanel>
+                <singleRow1:MySqlFilterControl DockPanel.Dock="Top" DataContext="{CompiledBinding FilterViewModel}" />
+                <Border DockPanel.Dock="Bottom" Background="{DynamicResource SlightlyHighlightedBackground}" Padding="2">
+                    <DockPanel>
+                        <Button DockPanel.Dock="Left" Content="Columns">
                             <Button.Flyout>
                                 <Flyout>
-                                    <StackPanel Spacing="6">
-                                        <StackPanel.KeyBindings>
-                                            <KeyBinding Gesture="Enter" Command="{CompiledBinding RefreshQuery}" />
-                                        </StackPanel.KeyBindings>
-                                        <TextBlock FontWeight="Bold">Limit:</TextBlock>
-                                        <TextBox Width="180" Text="{CompiledBinding LimitQuery}" />
-                                        <TextBlock FontWeight="Bold">Offset:</TextBlock>
-                                        <TextBox Width="180" Text="{CompiledBinding OffsetQuery}" />
-                                    </StackPanel>
+                                    <ScrollViewer MaxHeight="500">
+                                        <ItemsControl Items="{CompiledBinding Columns}">
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate>
+                                                    <StackPanel Spacing="3" />
+                                                </ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <CheckBox HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch" IsChecked="{CompiledBinding IsVisible}" Content="{CompiledBinding Name}" />
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </ScrollViewer>
                                 </Flyout>
                             </Button.Flyout>
                         </Button>
-                        <Button Command="{CompiledBinding NextDataPage}" Width="32">
-                            <Path Stretch="Uniform" Height="16" Data="{StaticResource caret_right_regular}" Fill="{Binding $parent[Button].Foreground}" />
-                        </Button>
-                    </StackPanel>
-                    <TextBlock TextAlignment="Center" HorizontalAlignment="Stretch" VerticalAlignment="Center" Opacity="0.7" Text="{CompiledBinding RowsSummaryText}" />              
-                </DockPanel>
-            </Border>
-            <ScrollViewer HorizontalScrollBarVisibility="Auto" AllowAutoHide="False">
-                <fastTableView:VeryFastTableView
-                    TextBlock.FontFamily="Consolas,Menlo,Courier,Courier New"
-                    SelectedRowIndex="{CompiledBinding FocusedRowIndex}"
-                    SelectedCellIndex="{CompiledBinding FocusedCellIndex}"
-                    HiddenColumns="{CompiledBinding HiddenColumns}"
-                    MultiSelection="{CompiledBinding MultiSelection}"
-                    Columns="{CompiledBinding Columns}"
-                    ValueUpdateRequest="VeryFastTableView_OnValueUpdateRequest"
-                    Items="{CompiledBinding OnlyGroup}">
-                    <fastTableView:VeryFastTableView.CustomCellInteractor>
-                        <singleRow1:CustomCellInteractor />
-                    </fastTableView:VeryFastTableView.CustomCellInteractor>
-                    <fastTableView:VeryFastTableView.CustomCellDrawer>
-                        <singleRow1:CustomCellDrawer />
-                    </fastTableView:VeryFastTableView.CustomCellDrawer>
-                    <fastTableView:VeryFastTableView.ContextFlyout>
-                        <MenuFlyout>
-                            <MenuItem Header="Revert value" Command="{CompiledBinding RevertSelectedCommand}" />
-                            <MenuItem Header="Set to null" Command="{CompiledBinding SetNullSelectedCommand}" />
-                            <MenuItem Header="-"></MenuItem>
-                            <MenuItem Header="Delete row" Command="{CompiledBinding DeleteRowSelectedCommand}" />
-                            <MenuItem Header="Duplicate row"  Command="{CompiledBinding DuplicateSelectedCommand}"/>
-                            <MenuItem Header="-"></MenuItem>
-                            <MenuItem Header="Generate insert query"  Command="{CompiledBinding GenerateInsertQueryForSelectedCommand}"/>
-                        </MenuFlyout>
-                    </fastTableView:VeryFastTableView.ContextFlyout>
-                </fastTableView:VeryFastTableView>
-            </ScrollViewer>
-        </DockPanel>
-        <GridSplitter IsVisible="{CompiledBinding SplitView}"
-                      Background="#CCC"
-                      Grid.Row="{CompiledBinding SplitVertical, Converter={StaticResource BoolToInt1}}" 
-                      Grid.Column="{CompiledBinding SplitHorizontal, Converter={StaticResource BoolToInt1}}"  />
-        <Border IsVisible="{CompiledBinding SplitView}"
-                Grid.Row="{CompiledBinding SplitVertical, Converter={StaticResource BoolToInt2}}" 
-                Grid.Column="{CompiledBinding SplitHorizontal, Converter={StaticResource BoolToInt2}}" 
-                Background="{DynamicResource SlightlyDifferentBackground}" Padding="3">
-            <DockPanel LastChildFill="True">
-                <controls1:GroupingHeader GroupName="Selected row" DockPanel.Dock="Top" />
-                <ScrollViewer AllowAutoHide="False" HorizontalScrollBarVisibility="Disabled" Padding="0,0,16,0">
-                    <ContentControl ContentTemplate="{StaticResource VerticalRowTemplate}" Content="{CompiledBinding FocusedRow}">
-            
-                    </ContentControl>
+                        <CheckBox DockPanel.Dock="Left" IsChecked="{CompiledBinding ShowOnlyModified}">Only modified</CheckBox>
+                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                            <Button Command="{CompiledBinding PreviousDataPage}" Width="32">
+                                <Path Stretch="Uniform" Height="16" Data="{StaticResource caret_left_regular}" Fill="{Binding $parent[Button].Foreground}" />
+                            </Button>
+                            <Button Width="32">
+                                <Path Stretch="Uniform" Height="16" Data="{StaticResource  settings_regular}" Fill="{Binding $parent[Button].Foreground}" />
+                                <Button.Flyout>
+                                    <Flyout>
+                                        <StackPanel Spacing="6">
+                                            <StackPanel.KeyBindings>
+                                                <KeyBinding Gesture="Enter" Command="{CompiledBinding RefreshQuery}" />
+                                            </StackPanel.KeyBindings>
+                                            <TextBlock FontWeight="Bold">Limit:</TextBlock>
+                                            <TextBox Width="180" Text="{CompiledBinding LimitQuery}" />
+                                            <TextBlock FontWeight="Bold">Offset:</TextBlock>
+                                            <TextBox Width="180" Text="{CompiledBinding OffsetQuery}" />
+                                        </StackPanel>
+                                    </Flyout>
+                                </Button.Flyout>
+                            </Button>
+                            <Button Command="{CompiledBinding NextDataPage}" Width="32">
+                                <Path Stretch="Uniform" Height="16" Data="{StaticResource caret_right_regular}" Fill="{Binding $parent[Button].Foreground}" />
+                            </Button>
+                        </StackPanel>
+                        <TextBlock TextAlignment="Center" HorizontalAlignment="Stretch" VerticalAlignment="Center" Opacity="0.7" Text="{CompiledBinding RowsSummaryText}" />              
+                    </DockPanel>
+                </Border>
+                <ScrollViewer HorizontalScrollBarVisibility="Auto" AllowAutoHide="False">
+                    <fastTableView:VeryFastTableView
+                        TextBlock.FontFamily="Consolas,Menlo,Courier,Courier New"
+                        SelectedRowIndex="{CompiledBinding FocusedRowIndex}"
+                        SelectedCellIndex="{CompiledBinding FocusedCellIndex}"
+                        HiddenColumns="{CompiledBinding HiddenColumns}"
+                        MultiSelection="{CompiledBinding MultiSelection}"
+                        Columns="{CompiledBinding Columns}"
+                        ValueUpdateRequest="VeryFastTableView_OnValueUpdateRequest"
+                        Items="{CompiledBinding OnlyGroup}">
+                        <fastTableView:VeryFastTableView.CustomCellInteractor>
+                            <singleRow1:CustomCellInteractor />
+                        </fastTableView:VeryFastTableView.CustomCellInteractor>
+                        <fastTableView:VeryFastTableView.CustomCellDrawer>
+                            <singleRow1:CustomCellDrawer />
+                        </fastTableView:VeryFastTableView.CustomCellDrawer>
+                        <fastTableView:VeryFastTableView.GroupHeaderTemplate>
+                            <DataTemplate>
+                                <controls1:GroupingHeader Background="{DynamicResource ContentBackground}" GroupName="">
+                                    <controls1:GroupingHeader.CustomContent>
+                                        <Button Width="23" Height="23" FontSize="16" Command="{Binding ElementName=rootWindow, Path=DataContext.AddNewCommand}">+</Button>
+                                    </controls1:GroupingHeader.CustomContent>
+                                </controls1:GroupingHeader>
+                            </DataTemplate>
+                        </fastTableView:VeryFastTableView.GroupHeaderTemplate>
+                        <fastTableView:VeryFastTableView.ContextFlyout>
+                            <MenuFlyout>
+                                <MenuItem Header="Revert value" Command="{CompiledBinding RevertSelectedCommand}" />
+                                <MenuItem Header="Set to null" Command="{CompiledBinding SetNullSelectedCommand}" />
+                                <MenuItem Header="-"></MenuItem>
+                                <MenuItem Header="Delete row" Command="{CompiledBinding DeleteRowSelectedCommand}" />
+                                <MenuItem Header="Duplicate row"  Command="{CompiledBinding DuplicateSelectedCommand}"/>
+                                <MenuItem Header="-"></MenuItem>
+                                <MenuItem Header="Generate insert query"  Command="{CompiledBinding GenerateInsertQueryForSelectedCommand}"/>
+                            </MenuFlyout>
+                        </fastTableView:VeryFastTableView.ContextFlyout>
+                    </fastTableView:VeryFastTableView>
                 </ScrollViewer>
             </DockPanel>
-            <Border.Styles>
-                <Style Selector=":is(controls2|OpenableFastCellViewBase)">
-                    <Setter Property="DisableDoubleClick" Value="True" />
-                </Style>
-            </Border.Styles>
+            <GridSplitter IsVisible="{CompiledBinding SplitView}"
+                          Background="#CCC"
+                          Grid.Row="{CompiledBinding SplitVertical, Converter={StaticResource BoolToInt1}}" 
+                          Grid.Column="{CompiledBinding SplitHorizontal, Converter={StaticResource BoolToInt1}}"  />
+            <Border IsVisible="{CompiledBinding SplitView}"
+                    Grid.Row="{CompiledBinding SplitVertical, Converter={StaticResource BoolToInt2}}" 
+                    Grid.Column="{CompiledBinding SplitHorizontal, Converter={StaticResource BoolToInt2}}" 
+                    Background="{DynamicResource SlightlyDifferentBackground}" Padding="3">
+                <DockPanel LastChildFill="True">
+                    <controls1:GroupingHeader GroupName="Selected row" DockPanel.Dock="Top" />
+                    <ScrollViewer AllowAutoHide="False" HorizontalScrollBarVisibility="Disabled" Padding="0,0,16,0">
+                        <ContentControl ContentTemplate="{StaticResource VerticalRowTemplate}" Content="{CompiledBinding FocusedRow}">
+                
+                        </ContentControl>
+                    </ScrollViewer>
+                </DockPanel>
+                <Border.Styles>
+                    <Style Selector=":is(controls2|OpenableFastCellViewBase)">
+                        <Setter Property="DisableDoubleClick" Value="True" />
+                    </Style>
+                </Border.Styles>
+            </Border>
+        </Grid>
+        
+        <Border Background="{DynamicResource ContentBackground}" Opacity="0.8" IsVisible="{CompiledBinding IsLoading}">
+            <TextBlock VerticalAlignment="Center" TextAlignment="Center" HorizontalAlignment="Center" FontSize="16">Loading table...</TextBlock>
         </Border>
-    </Grid>
+    </Panel>
 </UserControl>

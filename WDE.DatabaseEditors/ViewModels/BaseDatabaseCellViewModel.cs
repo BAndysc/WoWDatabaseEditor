@@ -113,6 +113,26 @@ namespace WDE.DatabaseEditors.ViewModels
             }
         }
         
+        public string? AsStringValue
+        {
+            get
+            {
+                if (ParameterValue is IParameterValue<string> strParam)
+                    return strParam.IsNull ? null : strParam.Value;
+                return null;
+            }
+            set
+            {
+                if (ParameterValue is IParameterValue<string> strParam)
+                {
+                    if (value is null)
+                        strParam.SetNull();
+                    else
+                        strParam.Value = value;
+                }
+            }
+        }
+
         public bool? AsBoolValue
         {
             get

@@ -129,6 +129,7 @@ namespace AvaloniaStyles.Controls
             AvaloniaProperty.RegisterDirect<CompletionComboBox, string>(
                 nameof(SearchText),
                 o => o.SearchText,
+                (o, v) => o.SearchText = v,
                 unsetValue: string.Empty);
         
         public static readonly DirectProperty<CompletionComboBox, Func<IEnumerable<object>,string, CancellationToken, Task<IEnumerable<object>>>> AsyncPopulatorProperty =
@@ -239,9 +240,9 @@ namespace AvaloniaStyles.Controls
                         if (box.SearchTextBox == null) // before template applied
                             return;
                         
-                        box.SearchTextBox.Text = "";
+                        box.SearchText = "";
                         FocusManager.Instance.Focus(box.SearchTextBox, NavigationMethod.Pointer);
-                        box.SearchTextBox.SelectionEnd = box.SearchTextBox.SelectionStart = box.SearchTextBox.Text.Length;
+                        box.SearchTextBox.SelectionEnd = box.SearchTextBox.SelectionStart = box.SearchText.Length;
                     }, TimeSpan.FromMilliseconds(16));
 
                     box.TextUpdated("");
@@ -249,7 +250,7 @@ namespace AvaloniaStyles.Controls
                     if (box.SearchTextBox == null) // before template applied
                         return;
                     
-                    box.SearchTextBox.Text = "";
+                    box.SearchText = "";
                 }
             });
         }
@@ -284,7 +285,7 @@ namespace AvaloniaStyles.Controls
         {
             if (e.KeyModifiers == KeyModifiers.None)
                 return;
-            if (!string.IsNullOrWhiteSpace(SearchTextBox.Text))
+            if (!string.IsNullOrWhiteSpace(SearchText))
                 return;
             if (watermark == null)
                 return;

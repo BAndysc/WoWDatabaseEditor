@@ -14,6 +14,7 @@ public partial class VeryFastTableView : Panel, IKeyboardNavigationHandler
 {
     private static double ColumnSpacing = 10;
     private static double RowHeight = 28;
+    private static double HeaderRowHeight = 36;
     private static double DrawingStartOffsetY = RowHeight;
     private static ISolidColorBrush OddRowBackground = new SolidColorBrush(Colors.White);
     private static ISolidColorBrush SelectedRowBackground = new SolidColorBrush(Color.FromRgb(87, 124, 219));
@@ -402,7 +403,7 @@ public partial class VeryFastTableView : Panel, IKeyboardNavigationHandler
         if (Items == null)
             return DrawingStartOffsetY;
         var y = DrawingStartOffsetY;
-        var headerHeight = IsGroupingEnabled ? RowHeight : 0;
+        var headerHeight = IsGroupingEnabled ? HeaderRowHeight : 0;
         for (int i = 0; i < row.GroupIndex; ++i)
         {
             var rowsInGroup = Items[i].Rows.Count;
@@ -424,7 +425,8 @@ public partial class VeryFastTableView : Panel, IKeyboardNavigationHandler
         if (scroll == null)
             return false;
         
-        var y = GetRowY(row);
-        return y < scroll.Offset.Y + scroll.Viewport.Height && y + RowHeight > scroll.Offset.Y;
+        var top = GetRowY(row);
+        var bottom = top + RowHeight;
+        return top < scroll.Offset.Y + scroll.Viewport.Height && bottom > scroll.Offset.Y;
     }
 }

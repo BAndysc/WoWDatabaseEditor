@@ -74,6 +74,9 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public Task<IList<IConditionLine>> GetConditionsForAsync(IDatabaseProvider.ConditionKeyMask keyMask, IDatabaseProvider.ConditionKey key) =>
             impl.GetConditionsForAsync(keyMask, key);
 
+        public Task<IList<IConditionLine>> GetConditionsForAsync(IDatabaseProvider.ConditionKeyMask keyMask, ICollection<IDatabaseProvider.ConditionKey> manualKeys) => 
+            impl.GetConditionsForAsync(keyMask, manualKeys);
+
         public IEnumerable<ISpellScriptName> GetSpellScriptNames(int spellId) => impl.GetSpellScriptNames(spellId);
 
         public async Task<IList<IPlayerChoiceResponse>?> GetPlayerChoiceResponsesAsync(int choiceId) => await impl.GetPlayerChoiceResponsesAsync(choiceId);
