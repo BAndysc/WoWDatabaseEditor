@@ -70,17 +70,18 @@ public class TableOpenService : ITableOpenService
             if (data.Entities.Count == 0)
                 return null; 
                     
-            if (!data.Entities[0].ExistInDatabase)
-            {
-                if (!await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
-                        .SetTitle("Entity doesn't exist in database")
-                        .SetMainInstruction($"Entity {data.Entities[0].Key} doesn't exist in the database")
-                        .SetContent(
-                            "WoW Database Editor will be generating DELETE/INSERT query instead of UPDATE. Do you want to continue?")
-                        .WithYesButton(true)
-                        .WithNoButton(false).Build()))
-                    return null;
-            }
+            // actually, why not, let's allow creating new entities via this editor
+            // if (!data.Entities[0].ExistInDatabase)
+            // {
+            //     if (!await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
+            //             .SetTitle("Entity doesn't exist in database")
+            //             .SetMainInstruction($"Entity {data.Entities[0].Key} doesn't exist in the database")
+            //             .SetContent(
+            //                 "WoW Database Editor will be generating DELETE/INSERT query instead of UPDATE. Do you want to continue?")
+            //             .WithYesButton(true)
+            //             .WithNoButton(false).Build()))
+            //         return null;
+            // }
             return new DatabaseTableSolutionItem(data.Entities[0].Key, data.Entities[0].ExistInDatabase, data.Entities[0].ConditionsModified, definition.Id, definition.IgnoreEquality);
         }
     }

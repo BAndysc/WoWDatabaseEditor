@@ -157,5 +157,9 @@
             In the template editing, the editor remembers previous field value (even between application restarts).
 As long as you do not remove this item from solution, you can revert to previous value with right click menu.   
             </controls2:TeachingTip>
+        
+        <Border Background="{DynamicResource ContentBackground}" Opacity="0.8" IsVisible="{CompiledBinding IsLoading}">
+            <TextBlock VerticalAlignment="Center" TextAlignment="Center" HorizontalAlignment="Center" FontSize="16">Loading table...</TextBlock>
+        </Border>
     </Panel>
 </UserControl>

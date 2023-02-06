@@ -171,17 +171,18 @@ namespace WDE.DatabaseEditors.ViewModels.Template
                         .Build());
                     continue;
                 }
-                if (!entity.ExistInDatabase)
-                {
-                    if (!await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
-                        .SetTitle("Entity doesn't exist in database")
-                        .SetMainInstruction($"Entity {entity.Key} doesn't exist in the database")
-                        .SetContent(
-                            "WoW Database Editor will be generating DELETE/INSERT query instead of UPDATE. Do you want to continue?")
-                        .WithYesButton(true)
-                        .WithNoButton(false).Build()))
-                        continue;
-                }
+                // actually, why not, let's allow creating new entities via this editor
+                // if (!entity.ExistInDatabase)
+                // {
+                //     if (!await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
+                //         .SetTitle("Entity doesn't exist in database")
+                //         .SetMainInstruction($"Entity {entity.Key} doesn't exist in the database")
+                //         .SetContent(
+                //             "WoW Database Editor will be generating DELETE/INSERT query instead of UPDATE. Do you want to continue?")
+                //         .WithYesButton(true)
+                //         .WithNoButton(false).Build()))
+                //         continue;
+                // }
                 await AddEntity(entity);
             }
         }
@@ -369,10 +370,15 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             var name = parameterFactory.Factory(tableDefinition.Picker).ToString(entity.Key[0]);
             Header.Insert(index, name);
 
-            var typeCell = entity.GetCell("type");
-            if (typeCell == null)
-                return true;
-            typeCell.PropertyChanged += (_, _) => ReEvalVisibility();
+            foreach (var column in tableDefinition.Groups
+                         .Select(g => g.ShowIf?.ColumnName)
+                         .Where(column => column != null)
+                         .Distinct())
+            {
+                var typeCell = entity.GetCell(column!);
+                if (typeCell != null)
+                    typeCell.PropertyChanged += (_, _) => ReEvalVisibility();
+            }
 
             ReEvalVisibility();
             
