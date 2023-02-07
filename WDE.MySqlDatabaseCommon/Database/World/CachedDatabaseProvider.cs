@@ -181,7 +181,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public Task<IAreaTriggerScript?> GetAreaTriggerScript(int entry) => nonCachedDatabase.GetAreaTriggerScript(entry);
         
-        public async Task<IAreaTriggerTemplate?> GetAreaTriggerTemplate(int entry) => null;
+        public Task<IAreaTriggerTemplate?> GetAreaTriggerTemplate(int entry) => nonCachedDatabase.GetAreaTriggerTemplate(entry);
 
         public IEnumerable<ICreatureTemplate> GetCreatureTemplates()
         {
