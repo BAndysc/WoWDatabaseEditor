@@ -9,6 +9,7 @@ using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Expressions;
 using WDE.DatabaseEditors.Extensions;
 using WDE.DatabaseEditors.Models;
+using WDE.DatabaseEditors.Services;
 using WDE.DatabaseEditors.ViewModels.SingleRow;
 using WDE.Module.Attributes;
 using WDE.QueryGenerators.Base;
@@ -21,20 +22,20 @@ namespace WDE.DatabaseEditors.QueryGenerators
     [AutoRegister]
     public class QueryGenerator : IQueryGenerator
     {
-        private readonly ICreatureStatCalculatorService calculatorService;
+        private readonly ICommentGeneratorService commentGeneratorService;
         private readonly IParameterFactory parameterFactory;
         private readonly IQueryGenerator<ConditionDeleteModel> conditionDeleteGenerator;
         private readonly IConditionQueryGenerator conditionQueryGenerator;
 
         private Dictionary<string, ICustomQueryGenerator> customQueryGenerators = new();
 
-        public QueryGenerator(ICreatureStatCalculatorService calculatorService,
+        public QueryGenerator(ICommentGeneratorService commentGeneratorService,
             IParameterFactory parameterFactory,
             IQueryGenerator<ConditionDeleteModel> conditionDeleteGenerator,
             IConditionQueryGenerator conditionQueryGenerator,
             IEnumerable<ICustomQueryGenerator> customQueryGenerators)
         {
-            this.calculatorService = calculatorService;
+            this.commentGeneratorService = commentGeneratorService;
             this.parameterFactory = parameterFactory;
             this.conditionDeleteGenerator = conditionDeleteGenerator;
             this.conditionQueryGenerator = conditionQueryGenerator;
@@ -239,13 +240,8 @@ namespace WDE.DatabaseEditors.QueryGenerators
                     var cells = table.Value.ToDictionary(c => c.DbColumnName, c =>
                     {
                         var cell = entity.GetCell(c.DbColumnName)!;
-                        if (c.AutogenerateComment != null && cell is DatabaseField<string> sField)
-                        {
-                            var evaluator = new DatabaseExpressionEvaluator(calculatorService, parameterFactory, tableData.TableDefinition, c.AutogenerateComment!);
-                            var comment = evaluator.Evaluate(entity);
-                            if (comment is string s)
-                                return s.AddComment(sField.Current.Value);
-                        }
+                        if (c.AutogenerateComment != null)
+                            return commentGeneratorService.GenerateFinalComment(entity, tableData.TableDefinition, c.DbColumnName);
 
                         var columnDefinition = tableData.TableDefinition.TableColumns[cell.FieldName];
                         if (!columnDefinition.CanBeNull && cell.Object is null)

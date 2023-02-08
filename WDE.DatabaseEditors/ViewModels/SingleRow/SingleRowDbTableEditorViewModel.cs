@@ -402,10 +402,10 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             return Disposable.Empty;
         }
 
-        public override DatabaseEntity AddRow(DatabaseKey key)
+        public override DatabaseEntity AddRow(DatabaseKey key, int? index = null)
         {
             var freshEntity = modelGenerator.CreateEmptyEntity(tableDefinition, key, true);
-            ForceInsertEntity(freshEntity, Entities.Count);
+            ForceInsertEntity(freshEntity, index ?? Entities.Count);
             return freshEntity;
         }
         

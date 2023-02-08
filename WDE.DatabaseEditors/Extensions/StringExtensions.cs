@@ -18,12 +18,21 @@ namespace WDE.DatabaseEditors.Extensions
         
         public static string? GetComment(this string? str, bool canBeNull)
         {
+            return GetCommentUnlessDefault(str, null, canBeNull);
+        }
+        
+        public static string? GetCommentUnlessDefault(this string? str, string? defaultValue, bool canBeNull)
+        {
             if (string.IsNullOrEmpty(str))
                 return canBeNull ? null : "";
 
             int indexOf = str.IndexOf(" // ", StringComparison.Ordinal);
             if (indexOf == -1)
-                return canBeNull ? null : "";
+            {
+                if (str == defaultValue)
+                    return canBeNull ? null : "";
+                return str;
+            }
 
             return str.Substring(indexOf + 4);
         }

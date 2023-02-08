@@ -6,7 +6,7 @@ namespace WDE.DatabaseEditors.ViewModels
 {
     public interface ITableContext
     {
-        DatabaseEntity AddRow(DatabaseKey key);
+        DatabaseEntity AddRow(DatabaseKey key, int? index = null);
         DatabaseKey? SelectedTableKey { get; }
         bool SupportsMultiSelect { get; }
         ICollection<DatabaseEntity>? MultiSelectionEntities { get; }

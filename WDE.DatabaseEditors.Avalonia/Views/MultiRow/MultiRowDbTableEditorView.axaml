@@ -227,7 +227,7 @@
                         <DataTemplate x:DataType="vm:DatabaseEntitiesGroupViewModel">
                             <controls1:GroupingHeader Background="{DynamicResource ContentBackground}" GroupName="{CompiledBinding Name}">
                                 <controls1:GroupingHeader.CustomContent>
-                                    <Button Width="23" Height="23" FontSize="16" Command="{Binding ElementName=rootWindow, Path=DataContext.AddRowCommand, Mode=OneTime}" CommandParameter="{CompiledBinding ., Mode=OneTime}">+</Button>
+                                    <Button Width="23" Height="23" FontSize="16" Command="{Binding ElementName=rootWindow, Path=DataContext.AddRowCommand, Mode=OneTime}" CommandParameter="{CompiledBinding .}">+</Button>
                                 </controls1:GroupingHeader.CustomContent>
                             </controls1:GroupingHeader>
                         </DataTemplate>

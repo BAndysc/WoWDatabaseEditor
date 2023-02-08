@@ -52,6 +52,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         private readonly IDatabaseEditorsSettings editorSettings;
         private readonly ITablePersonalSettings tablePersonalSettings;
         private readonly IMetaColumnsSupportService metaColumnsSupportService;
+        private readonly ICommentGeneratorService commentGeneratorService;
         private readonly DocumentMode mode;
         private readonly IDatabaseTableDataProvider tableDataProvider;
 
@@ -169,6 +170,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             IMetaColumnsSupportService metaColumnsSupportService,
             IClipboardService clipboardService,
             ITextEntitySerializer serializer,
+            ICommentGeneratorService commentGeneratorService,
             DocumentMode mode = DocumentMode.Editor) 
             : base(history, solutionItem, solutionItemName, 
             solutionManager, solutionTasksService, eventAggregator, 
@@ -188,6 +190,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             this.editorSettings = editorSettings;
             this.tablePersonalSettings = tablePersonalSettings;
             this.metaColumnsSupportService = metaColumnsSupportService;
+            this.commentGeneratorService = commentGeneratorService;
             this.mode = mode;
 
             splitMode = editorSettings.MultiRowSplitMode;
@@ -299,7 +302,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                     var deserialized = serializer.Deserialize(tableDefinition, text, key);
                     if (deserialized.Count > 1)
                         bulk = BulkEdit("Paste rows");
-                    int index = focusedRowIndex.RowIndex + 1;
+                    int index = focusedRowIndex.RowIndex == -1 ? (Rows.Count > 0 ? Rows[0].Count : 0) : focusedRowIndex.RowIndex + 1;
                     foreach (var entity in deserialized)
                     {
                         if (key.HasValue)
@@ -323,7 +326,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             ScheduleLoading();
         }
 
-        public DatabaseEntity AddRow(DatabaseKey key, int? index)
+        public override DatabaseEntity AddRow(DatabaseKey key, int? index)
         {
             var freshEntity = modelGenerator.CreateEmptyEntity(tableDefinition, key, false);
             if (autoIncrementColumn != null)
@@ -343,15 +346,13 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             }
 
             int elementsInGroup = byEntryGroups.TryGetValue(key, out var group) ? group.Count : 0;
-            ForceInsertEntity(freshEntity, Math.Clamp(index ?? elementsInGroup, 0, elementsInGroup));
+            ForceInsertEntity(freshEntity, index ?? elementsInGroup);
             return freshEntity;
         }
         
-        public override DatabaseEntity AddRow(DatabaseKey key) => AddRow(key, null);
-
         private void AddRowByGroup(DatabaseEntitiesGroupViewModel group)
         {
-            AddRow(group.Key);
+            AddRow(group.Key, null);
         }
 
         private async Task AddNewEntity()
@@ -382,11 +383,10 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                 return;
 
             OnKeyAdded?.Invoke(key);
-            
             EnsureKey(key);
-
-            foreach (var entity in data.Entities)
-                await AddEntity(entity);
+            
+            using var _ = BulkEdit("Load data");
+            AddEntities(data.Entities);
         }
         
         private void SetToNull(DatabaseCellViewModel? view)
@@ -478,7 +478,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             foreach (var entity in solutionItem.Entries)
                 EnsureKey(entity.Key);
 
-            await AsyncAddEntities(data.Entities);
+            AddEntities(data.Entities);
             historyHandler = History.AddHandler(AutoDispose(new MultiRowTableEditorHistoryHandler(this)));
         }
 
@@ -585,11 +585,8 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                 action.Redo();
         }
 
-        public async Task<bool> AddEntity(DatabaseEntity entity)
+        public bool AddEntity(DatabaseEntity entity, int index)
         {
-            int index = 0;
-            if (byEntryGroups.TryGetValue(entity.Key, out var group))
-                index = group.Count;
             return ForceInsertEntity(entity, index);
         }
 
@@ -628,8 +625,10 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                     {
                         if (column.AutogenerateComment != null)
                         {
-                            stringParam.Current.Value = stringParam.Current.Value.GetComment(column.CanBeNull);
-                            stringParam.Original.Value = stringParam.Original.Value.GetComment(column.CanBeNull);
+                            var autoGenComment = commentGeneratorService.GenerateAutoCommentOnly(entity, TableDefinition, column.DbColumnName);
+                            
+                            stringParam.Current.Value = stringParam.Current.Value.GetCommentUnlessDefault(autoGenComment, column.CanBeNull);
+                            stringParam.Original.Value = stringParam.Original.Value.GetCommentUnlessDefault(autoGenComment, column.CanBeNull);
                         }
                         parameterValue = new ParameterValue<string, DatabaseEntity>(entity, stringParam.Current, stringParam.Original, parameterFactory.FactoryString(column.ValueType));
                     }
@@ -700,12 +699,14 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             }
         }
 
-        private async Task AsyncAddEntities(IReadOnlyList<DatabaseEntity> tableDataEntities)
+        private void AddEntities(IReadOnlyList<DatabaseEntity> tableDataEntities)
         {
+            int index = 0;
+            if (tableDataEntities.Count > 0 && byEntryGroups.TryGetValue(tableDataEntities[0].Key, out var group))
+                index = group.Count;
+            
             foreach (var entity in tableDataEntities)
-            {
-                await AddEntity(entity);
-            }
+                AddEntity(entity, index++);
         }
         
         protected override List<EntityOrigianlField>? GetOriginalFields(DatabaseEntity entity)

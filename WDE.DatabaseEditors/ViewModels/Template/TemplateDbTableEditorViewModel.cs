@@ -244,7 +244,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
 
         private Task EditParameter(DatabaseCellViewModel cell) => EditParameter(cell.ParameterValue!, cell.ParentEntity);
 
-        public override DatabaseEntity AddRow(DatabaseKey key)
+        public override DatabaseEntity AddRow(DatabaseKey key, int? index = null)
         {
             throw new NotImplementedException();
         }
