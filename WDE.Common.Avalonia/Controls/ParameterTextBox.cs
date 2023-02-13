@@ -25,6 +25,20 @@ namespace WDE.Common.Avalonia.Controls
                 base.CustomPaste();
         }
 
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            base.OnKeyDown(e);
+            if (e.Key == Key.S && 
+                e.KeyModifiers == KeyModifiers.None && 
+                float.TryParse(Text, out var textAsFloat) && 
+                SelectionStart == Text.Length)
+            {
+                Text = ((long)(textAsFloat * 1000)).ToString();
+                SelectionStart = SelectionEnd = Text.Length;
+                e.Handled = true;
+            }
+        }
+
         private async void PasteAsync()
         {
             var text = await ((IClipboard)AvaloniaLocator.Current.GetService(typeof(IClipboard))).GetTextAsync();
