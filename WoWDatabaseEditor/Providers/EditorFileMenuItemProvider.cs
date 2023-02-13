@@ -104,6 +104,8 @@ namespace WoWDatabaseEditorCore.Providers
             SubItems.Add(new ModuleManuSeparatorItem());
             SubItems.Add(new ModuleMenuItem("Close current tab", new AsyncAutoCommand(() => 
                 documentManager.ActiveDocument?.CloseCommand?.ExecuteAsync() ?? Task.CompletedTask), new MenuShortcut("Control+W")));
+            SubItems.Add(new ModuleMenuItem("Close all tabs", new AsyncAutoCommand(async () => 
+                await documentManager.TryCloseAllDocuments()), new MenuShortcut("Control+Shift+W")));
             SubItems.Add(new ModuleMenuItem("_Exit", new DelegateCommand(() => application.TryClose())));
             
             this.eventAggregator.GetEvent<DocumentManager.DocumentClosedEvent>()

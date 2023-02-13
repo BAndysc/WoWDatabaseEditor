@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Threading.Tasks;
 using WDE.Common.Windows;
 using WDE.Module.Attributes;
 
@@ -22,6 +23,7 @@ namespace WDE.Common.Managers
         void OpenTool<T>() where T : ITool;
         T GetTool<T>() where T : ITool;
         void OpenTool(Type toolType);
+        Task<bool> TryCloseAllDocuments();
         void ActivateDocumentInTheBackground(IDocument document);
         // Indicated whether active document should be brought to front (False) or not (True)
         bool BackgroundMode { get; }
