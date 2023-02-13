@@ -248,6 +248,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             ? nonCachedDatabase.GetGossipMenusAsync()
             : Task.FromResult(gossipMenusCache);
 
+        public Task<IGossipMenu?> GetGossipMenuAsync(uint menuId) => nonCachedDatabase.GetGossipMenuAsync(menuId);
+
         public Task<List<IGossipMenuOption>> GetGossipMenuOptionsAsync(uint menuId) => nonCachedDatabase.GetGossipMenuOptionsAsync(menuId);
         public List<IGossipMenuOption> GetGossipMenuOptions(uint menuId) => nonCachedDatabase.GetGossipMenuOptions(menuId);
 

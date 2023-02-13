@@ -10,6 +10,8 @@
         string Name { get; }
         string AIName { get; }
         string ScriptName { get; }
+        uint this[int dataIndex] { get; }
+        uint DataCount { get; }
     }
     
     public enum GameobjectType
@@ -50,5 +52,19 @@
         DestructibleBuilding  = 33,
         GuildBank             = 34,
         Trapdoor               = 35
+    }
+
+    public static class GameObjectTemplateExtensions
+    {
+        public static uint GetGossipMenuId(this IGameObjectTemplate template)
+        {
+            if (template.Type == GameobjectType.QuestGiver)
+                return template[3];
+            
+            if (template.Type == GameobjectType.Goober)
+                return template[19];
+
+            return 0;
+        }
     }
 }

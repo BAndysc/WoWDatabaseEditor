@@ -6,11 +6,13 @@ using WDE.Common.Parameters;
 using WDE.Common.Providers;
 using WDE.Common.Services;
 using WDE.Common.Utils;
+using WDE.Conditions.Shared;
 using WDE.SmartScriptEditor.Models;
 
 namespace WDE.SmartScriptEditor.Parameters;
 
-public class GossipMenuOptionParameter : IContextualParameter<long, SmartBaseElement>, ICustomPickerContextualParameter<long>
+public class GossipMenuOptionParameter : IContextualParameter<long, SmartBaseElement>, ICustomPickerContextualParameter<long>,
+    IAffectedByOtherParametersParameter
 {
     private readonly IDatabaseProvider databaseProvider;
     private readonly ITableEditorPickerService tableEditorPickerService;
@@ -116,4 +118,7 @@ public class GossipMenuOptionParameter : IContextualParameter<long, SmartBaseEle
     {
         return value.ToString();
     }
+
+    private static int[] affectedBy => new[] { 0 }; // gossip menu id
+    public IEnumerable<int> AffectedByParameters() => affectedBy;
 }

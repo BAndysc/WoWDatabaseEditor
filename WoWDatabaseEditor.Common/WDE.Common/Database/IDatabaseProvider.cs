@@ -35,6 +35,7 @@ namespace WDE.Common.Database
         IEnumerable<IConversationTemplate> GetConversationTemplates();
         IEnumerable<IGossipMenu> GetGossipMenus();
         Task<List<IGossipMenu>> GetGossipMenusAsync();
+        Task<IGossipMenu?> GetGossipMenuAsync(uint menuId);
         List<IGossipMenuOption> GetGossipMenuOptions(uint menuId);
         Task<List<IGossipMenuOption>> GetGossipMenuOptionsAsync(uint menuId);
         IEnumerable<INpcText> GetNpcTexts();

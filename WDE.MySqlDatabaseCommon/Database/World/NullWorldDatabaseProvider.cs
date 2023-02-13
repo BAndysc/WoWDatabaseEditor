@@ -134,6 +134,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public Task<List<IGossipMenu>> GetGossipMenusAsync() => Task.FromResult(new List<IGossipMenu>());
 
+        public Task<IGossipMenu?> GetGossipMenuAsync(uint menuId) => Task.FromResult<IGossipMenu?>(null);
+        
         public Task<List<INpcText>> GetNpcTextsAsync() => Task.FromResult(new List<INpcText>());
 
         public Task<List<ICreatureClassLevelStat>> GetCreatureClassLevelStatsAsync() => Task.FromResult(new List<ICreatureClassLevelStat>());

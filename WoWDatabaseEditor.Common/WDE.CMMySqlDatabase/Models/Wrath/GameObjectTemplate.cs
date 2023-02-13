@@ -52,6 +52,43 @@ namespace WDE.CMMySqlDatabase.Models.Wrath
         [Column("maxgold"                             )] public uint   Maxgold        { get; set; } // mediumint(8) unsigned
         [Column("ScriptName"    , CanBeNull    = false)] public string ScriptName     { get; set; } = null!; // varchar(64)
 
+        public uint this[int dataIndex]
+        {
+            get
+            {
+                switch (dataIndex)
+                {
+                    case 0: return Data0;
+                    case 1: return (uint)Data1;
+                    case 2: return Data2;
+                    case 3: return Data3;
+                    case 4: return Data4;
+                    case 5: return Data5;
+                    case 6: return (uint)Data6;
+                    case 7: return Data7;
+                    case 8: return Data8;
+                    case 9: return Data9;
+                    case 10: return Data10;
+                    case 11: return Data11;
+                    case 12: return Data12;
+                    case 13: return Data13;
+                    case 14: return Data14;
+                    case 15: return Data15;
+                    case 16: return Data16;
+                    case 17: return Data17;
+                    case 18: return Data18;
+                    case 19: return Data19;
+                    case 20: return Data20;
+                    case 21: return Data21;
+                    case 22: return Data22;
+                    case 23: return Data23;
+                    default: return 0;
+                }
+            }
+        }
+
+        public uint DataCount => 24;
+
         // not implemented in cmangos
         public string AIName { get; set; } = null!;
         public GameobjectType Type => (GameobjectType)Type_;

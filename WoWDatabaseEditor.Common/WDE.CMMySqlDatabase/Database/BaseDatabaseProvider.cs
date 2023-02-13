@@ -139,6 +139,30 @@ namespace WDE.CMMySqlDatabase.Database
                 .ToList<IGossipMenu>();
         }
 
+        public async Task<IGossipMenu?> GetGossipMenuAsync(uint menuId)
+        {
+            await using var model = Database();
+
+            List<GossipMenuLineWoTLK> gossips;
+            if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(INpcText)))
+            {
+                gossips = await model.GossipMenus.Where(g => g.MenuId == menuId).ToListAsync();
+            }
+            else
+            {
+                gossips = await (from gossip in model.GossipMenus
+                    where gossip.MenuId == menuId
+                    join p in model.NpcTexts on gossip.TextId equals p.Id into lj
+                    from lp in lj.DefaultIfEmpty()
+                    select gossip.SetText(lp)).ToListAsync();   
+            }
+
+            if (gossips.Count == 0)
+                return null;
+
+            return new GossipMenuWoTLK(menuId, gossips.Where(t => t.Text != null).Select(t => t.Text!).ToList());
+        }
+
         public abstract Task<List<IGossipMenuOption>> GetGossipMenuOptionsAsync(uint menuId);
         public abstract List<IGossipMenuOption> GetGossipMenuOptions(uint menuId);
 

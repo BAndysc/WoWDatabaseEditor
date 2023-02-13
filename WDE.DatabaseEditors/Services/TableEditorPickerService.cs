@@ -97,7 +97,12 @@ public class TableEditorPickerService : ITableEditorPickerService
                                  longField2.Current.Value == initialValue));
                             if (rowIndex != -1)
                             {
-                                mainThread.Delay(() => multiRow.FocusedRowIndex = new VerticalCursor(groupIndex, rowIndex), TimeSpan.FromMilliseconds(1));
+                                mainThread.Delay(() =>
+                                {
+                                    multiRow.FocusedRowIndex = new VerticalCursor(groupIndex, rowIndex);
+                                    multiRow.MultiSelection.Clear();
+                                    multiRow.MultiSelection.Add(multiRow.FocusedRowIndex);
+                                }, TimeSpan.FromMilliseconds(1));
                             }
                         }
                     });

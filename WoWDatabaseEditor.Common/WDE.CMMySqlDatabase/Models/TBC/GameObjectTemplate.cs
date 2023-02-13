@@ -10,6 +10,10 @@ namespace WDE.CMMySqlDatabase.Models.TBC
         [Column("name"          , CanBeNull    = false)] public string Name           { get; set; } = null!; // varchar(100)
         [Column("type"                                )] public byte   Type_           { get; set; } // tinyint(3) unsigned
         [Column("ScriptName"    , CanBeNull    = false)] public string ScriptName     { get; set; } = null!; // varchar(64)
+
+        public uint this[int dataIndex] => 0;
+
+        public uint DataCount => 0;
         [Column("size"                                )] public float  Size           { get; set; } // float
         [Column("displayId"                           )] public uint   DisplayId      { get; set; } // mediumint(8) unsigned
 

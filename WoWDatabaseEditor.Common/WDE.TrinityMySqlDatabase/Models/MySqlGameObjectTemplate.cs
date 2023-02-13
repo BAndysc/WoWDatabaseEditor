@@ -27,5 +27,9 @@ namespace WDE.TrinityMySqlDatabase.Models
 
         [Column(Name = "ScriptName")] 
         public string ScriptName { get; set; } = "";
+
+        public uint this[int dataIndex] => 0;
+
+        public uint DataCount => 0;
     }
 }
