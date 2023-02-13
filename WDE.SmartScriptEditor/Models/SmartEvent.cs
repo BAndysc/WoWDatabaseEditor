@@ -77,7 +77,11 @@ namespace WDE.SmartScriptEditor.Models
             cooldownMax = new ParameterValueHolder<long>("Cooldown max", Parameter.Instance, 0);
 
             flags.PropertyChanged += (sender, _) => CallOnChanged(sender);
-            timerId.PropertyChanged += (sender, _) => CallOnChanged(sender);
+            timerId.PropertyChanged += (sender, _) =>
+            {
+                CallOnChanged(sender);
+                OnPropertyChanged(nameof(TimerIdNumber));
+            };
             chance.PropertyChanged += (sender, _) =>
             {
                 CallOnChanged(sender);
@@ -120,6 +124,7 @@ namespace WDE.SmartScriptEditor.Models
             }
         }
 
+        public long TimerIdNumber => timerId.Value;
         public string? ChanceString => chance.Value == 100 ? null : $"{chance.Value}%";
 
         public ParameterValueHolder<long> CooldownMax => cooldownMax;

@@ -17,6 +17,7 @@
         <!-- this is later also used in SmartScriptPanelLayout measurement, for performance reasons-->
         <themes:IndentToMarginConverter x:Key="IndentToMarginConverter" LeftMultiplier="24" />
         <converters:NullConverter x:Key="NullToBoolConverter" Inverted="True" />
+        <converters:IntToBoolConverter x:Key="TimerToBoolConverter" TrueValue="1" FalseValue="0" UnknownValues="True" />
         <converters:EmptyStringToBoolConverter x:Key="EmptyStringToBoolConverter" WhenNullOrEmpty="False" />
         <converters:NumberToThicknessConverter x:Key="NumberToMarginConverter" Left="10" />
         <DrawingImage x:Key="BoxIcons.RegularWorld">
@@ -156,9 +157,12 @@
                     <Border Name="Main" BorderThickness="1" CornerRadius="4,0,0,4" DockPanel.Dock="Top">
                         <Border Padding="5" Background="{TemplateBinding SpecialBackground}" Name="Inner">
                             <DockPanel LastChildFill="True">
-                                <controls:SmartEventFlagsView TextBlock.Foreground="{DynamicResource SmartScripts.Event.Flag.Background}" DockPanel.Dock="Right"/>
-                                <Border VerticalAlignment="Center" CornerRadius="3" Background="{DynamicResource SmartScripts.Event.Chance.Background}" DockPanel.Dock="Right" IsVisible="{CompiledBinding ChanceString, Converter={StaticResource NullToBoolConverter}}">
+                                <controls:SmartEventFlagsView Margin="2,0,0,0" TextBlock.Foreground="{DynamicResource SmartScripts.Event.Flag.Background}" DockPanel.Dock="Right"/>
+                                <Border ToolTip.Tip="Event chance" Margin="2,0,0,0" VerticalAlignment="Center" CornerRadius="3" Background="{DynamicResource SmartScripts.Event.Chance.Background}" DockPanel.Dock="Right" IsVisible="{CompiledBinding ChanceString, Converter={StaticResource NullToBoolConverter}}">
                                     <TextBlock Padding="2,1" Foreground="White" FontWeight="Bold" FontSize="11" Text="{CompiledBinding ChanceString}"/>
+                                </Border>
+                                <Border ToolTip.Tip="Timer ID" Padding="4,1,4,1" VerticalAlignment="Center" CornerRadius="10" Background="{DynamicResource SmartScripts.Event.Timer.Background}" DockPanel.Dock="Right" IsVisible="{CompiledBinding TimerIdNumber, Converter={StaticResource TimerToBoolConverter}}">
+                                    <TextBlock Foreground="White" FontWeight="Bold" FontSize="11" Text="{CompiledBinding TimerIdNumber}"/>
                                 </Border>
                                 <extendedTextBlock:FormattedTextBlock
                                     ContextArray="{CompiledBinding Context}"
