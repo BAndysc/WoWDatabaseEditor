@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using WDE.Common.CoreVersion;
 using WDE.Common.Database;
 using WDE.Common.Parameters;
 using WDE.Common.Services;
@@ -26,6 +27,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
         private readonly IParameterFactory parameterFactory;
         private readonly IQueryGenerator<ConditionDeleteModel> conditionDeleteGenerator;
         private readonly IConditionQueryGenerator conditionQueryGenerator;
+        private readonly ICurrentCoreVersion currentCoreVersion;
 
         private Dictionary<string, ICustomQueryGenerator> customQueryGenerators = new();
 
@@ -33,12 +35,14 @@ namespace WDE.DatabaseEditors.QueryGenerators
             IParameterFactory parameterFactory,
             IQueryGenerator<ConditionDeleteModel> conditionDeleteGenerator,
             IConditionQueryGenerator conditionQueryGenerator,
+            ICurrentCoreVersion currentCoreVersion,
             IEnumerable<ICustomQueryGenerator> customQueryGenerators)
         {
             this.commentGeneratorService = commentGeneratorService;
             this.parameterFactory = parameterFactory;
             this.conditionDeleteGenerator = conditionDeleteGenerator;
             this.conditionQueryGenerator = conditionQueryGenerator;
+            this.currentCoreVersion = currentCoreVersion;
             foreach (var gen in customQueryGenerators)
             {
                 this.customQueryGenerators[gen.TableName] = gen;
@@ -254,17 +258,25 @@ namespace WDE.DatabaseEditors.QueryGenerators
                             isDefault = false;
                         return FixUnixTimestampAndNullability(columnDefinition, cell.Object);
                     });
-                    if (!isMainTable)
+                    if (isMainTable)
+                    {
+                        if (tableData.TableDefinition.AutofillBuildColumn is { } autofillBuildColumn)
+                            cells[autofillBuildColumn] = currentCoreVersion.Current.Build;
+                    }
+                    else
                     {
                         if (isDefault)
                             continue;
 
                         var newCells = new Dictionary<string, object?>();
-                        var foreignKeys = tableData.TableDefinition.ForeignTableByName![table.Key].ForeignKeys;
+                        var foreignTableDefinition = tableData.TableDefinition.ForeignTableByName![table.Key];
+                        var foreignKeys = foreignTableDefinition.ForeignKeys;
                         for (int i = 0; i < foreignKeys.Length; ++i)
                             newCells[foreignKeys[i]] = entity.GetTypedValueOrThrow<long>(tableData.TableDefinition.PrimaryKey![i]);
                         foreach (var old in cells)
                             newCells[old.Key] = old.Value;
+                        if (foreignTableDefinition.AutofillBuildColumn is { } autofillBuildColumn)
+                            newCells[autofillBuildColumn] = currentCoreVersion.Current.Build;
                         cells = newCells;
                     }
 
@@ -502,9 +514,12 @@ namespace WDE.DatabaseEditors.QueryGenerators
                         .ToList();
                     
                     IList<string> groupByKeys = definition.GroupByKeys;
+                    string? autoFillBuildColumn = definition.AutofillBuildColumn;
                     if (table.Key != definition.TableName)
                     {
-                        groupByKeys = definition.ForeignTableByName![table.Key].ForeignKeys.Take(groupByKeys.Count).ToList();
+                        var foreignTableDefinition = definition.ForeignTableByName![table.Key];
+                        autoFillBuildColumn = foreignTableDefinition.AutofillBuildColumn;
+                        groupByKeys = foreignTableDefinition.ForeignKeys.Take(groupByKeys.Count).ToList();
                         query.Table(table.Key)
                             .InsertIgnore(
                                 definition.ForeignTableByName[table.Key].ForeignKeys
@@ -521,6 +536,9 @@ namespace WDE.DatabaseEditors.QueryGenerators
                     for (int i = 1; i < updates.Count; ++i)
                         update = update.Set(updates[i].FieldName, FixUnixTimestampAndNullability(definition.TableColumns[updates[i].FieldName], updates[i].Object));
 
+                    if (autoFillBuildColumn != null)
+                        update = update.Set(autoFillBuildColumn, currentCoreVersion.Current.Build);
+                    
                     update.Update();
                 }
 
@@ -540,8 +558,11 @@ namespace WDE.DatabaseEditors.QueryGenerators
                 {
                     if (table.Key == definition.TableName)
                     {
+                        var cells = table.Value.ToDictionary(t => t.FieldName, t => t.Object);
+                        if (definition.AutofillBuildColumn is {} autofillBuildColumn)
+                            cells[autofillBuildColumn] = currentCoreVersion.Current.Build;
                         query.Table(table.Key)
-                            .Insert(table.Value.ToDictionary(t => t.FieldName, t => t.Object));
+                            .Insert(cells);
                     }
                     else
                     {
@@ -551,7 +572,8 @@ namespace WDE.DatabaseEditors.QueryGenerators
                             var updates = table.Value
                                 .Where(f => f.IsModified)
                                 .ToList();
-                            var primaryKeyColumn = definition.ForeignTableByName![table.Key].ForeignKeys.Take(definition.GroupByKeys.Count).ToList();
+                            var foreignTableDefinition = definition.ForeignTableByName![table.Key];
+                            var primaryKeyColumn = foreignTableDefinition.ForeignKeys.Take(definition.GroupByKeys.Count).ToList();
                             query.Table(table.Key)
                                 .InsertIgnore(
                                     definition.ForeignTableByName[table.Key].ForeignKeys
@@ -565,6 +587,9 @@ namespace WDE.DatabaseEditors.QueryGenerators
                                 .Set(updates[0].FieldName, FixUnixTimestampAndNullability(definition.TableColumns[updates[0].FieldName], updates[0].Object));
                             for (int i = 1; i < updates.Count; ++i)
                                 update = update.Set(updates[i].FieldName, FixUnixTimestampAndNullability(definition.TableColumns[updates[i].FieldName], updates[i].Object));
+
+                            if (foreignTableDefinition.AutofillBuildColumn is { } autofillBuildColumn)
+                                update = update.Set(autofillBuildColumn, currentCoreVersion.Current.Build);
 
                             update.Update();
                         }

@@ -91,6 +91,9 @@ namespace WDE.DatabaseEditors.Data.Structs
         [JsonProperty(PropertyName = "foreign_tables")]
         public IList<DatabaseForeignTableJson>? ForeignTable { get; set; }
         
+        [JsonProperty(PropertyName = "autofill_build_column")]
+        public string? AutofillBuildColumn { get; set; } = null;
+
         [JsonProperty(PropertyName = "groups")]
         public IList<DatabaseColumnsGroupJson> Groups { get; set; } = new List<DatabaseColumnsGroupJson>();
 

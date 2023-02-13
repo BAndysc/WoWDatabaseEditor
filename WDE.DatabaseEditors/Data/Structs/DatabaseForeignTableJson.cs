@@ -9,5 +9,8 @@ namespace WDE.DatabaseEditors.Data.Structs
         
         [JsonProperty(PropertyName = "foreign_key")]
         public string[] ForeignKeys { get; set; }
+
+        [JsonProperty(PropertyName = "autofill_build_column")]
+        public string? AutofillBuildColumn { get; set; }
     }
 }
