@@ -170,6 +170,14 @@ namespace WDE.Common.Database
                 SourceEntry = sourceEntry;
                 SourceId = sourceId;
             }
+
+            public ConditionKey WithMask(ConditionKeyMask mask)
+            {
+                return new ConditionKey(SourceType,
+                    mask.HasFlagFast(ConditionKeyMask.SourceGroup) ? SourceGroup : null,
+                    mask.HasFlagFast(ConditionKeyMask.SourceEntry) ? SourceEntry : null,
+                    mask.HasFlagFast(ConditionKeyMask.SourceId) ? SourceId : null);
+            }
         }
     }
 

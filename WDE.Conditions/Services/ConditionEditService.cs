@@ -7,6 +7,7 @@ using WDE.Common.Managers;
 using WDE.Common.Services;
 using WDE.Conditions.ViewModels;
 using WDE.Module.Attributes;
+using WDE.SqlQueryGenerator;
 
 namespace WDE.Conditions.Services
 {
@@ -15,18 +16,29 @@ namespace WDE.Conditions.Services
     {
         private readonly IWindowManager windowManager;
         private readonly IContainerProvider containerProvider;
+        private readonly IConditionQueryGenerator queryGenerator;
+        private readonly IMySqlExecutor executor;
+        private readonly IDatabaseProvider databaseProvider;
 
-        public ConditionEditService(IWindowManager windowManager, IContainerProvider containerProvider)
+        public ConditionEditService(IWindowManager windowManager,
+            IContainerProvider containerProvider,
+            IConditionQueryGenerator queryGenerator,
+            IMySqlExecutor executor,
+            IDatabaseProvider databaseProvider)
         {
             this.windowManager = windowManager;
             this.containerProvider = containerProvider;
+            this.queryGenerator = queryGenerator;
+            this.executor = executor;
+            this.databaseProvider = databaseProvider;
         }
     
-        public async Task<IEnumerable<ICondition>?> EditConditions(int conditionSourceType, IReadOnlyList<ICondition>? conditions)
+        public async Task<IEnumerable<ICondition>?> EditConditions(int conditionSourceType, IReadOnlyList<ICondition>? conditions, string? customTitle)
         {
             using var vm = containerProvider.Resolve<ConditionsEditorViewModel>(
                 (typeof(IEnumerable<ICondition>), conditions ?? Enumerable.Empty<ICondition>()),
                 (typeof(int), conditionSourceType));
+            vm.Title = customTitle ?? vm.Title;
             
             if (await windowManager.ShowDialog(vm))
             {
@@ -34,6 +46,23 @@ namespace WDE.Conditions.Services
             }
 
             return null;
+        }
+        
+        public async Task EditConditions(IDatabaseProvider.ConditionKeyMask conditionKeyMask, IDatabaseProvider.ConditionKey conditionKey, string? customTitle)
+        {
+            var conditions = await databaseProvider.GetConditionsForAsync(conditionKeyMask, conditionKey);
+            var edited = await EditConditions(conditionKey.SourceType, (IReadOnlyList<ICondition>)conditions, customTitle);
+            if (edited == null)
+                return;
+
+            var newConditions = edited.Select(x => new AbstractConditionLine(conditionKey, x));
+            
+            var delete = queryGenerator.BuildDeleteQuery(conditionKey.WithMask(conditionKeyMask));
+            var insert = queryGenerator.BuildInsertQuery(newConditions.ToList<IConditionLine>());
+            var transaction = Queries.BeginTransaction();
+            transaction.Add(delete);
+            transaction.Add(insert);
+            await executor.ExecuteSql(transaction.Close());
         }
     }
 }

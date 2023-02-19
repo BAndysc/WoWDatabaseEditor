@@ -8,6 +8,7 @@ using DBCD;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;
 using WDE.Common.DBC;
+using WDE.Common.Game;
 using WDE.Common.Parameters;
 using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
@@ -213,6 +214,7 @@ namespace WDE.DbcStore
             public Dictionary<long, string> GarrisonBuildingStore { get; internal set; } = new();
             public Dictionary<long, string> GarrisonTalentStore { get; internal set; } = new();
             public Dictionary<long, string> DifficultyStore { get; internal set; } = new();
+            public Dictionary<long, string> LockTypeStore { get; internal set; } = new();
             private List<(string parameter, Dictionary<long, SelectOption> options)> parametersToRegister = new();
             
             public string Name => "DBC Loading";
@@ -417,6 +419,7 @@ namespace WDE.DbcStore
                 parameterFactory.Register("GarrisonBuildingParameter", new DbcParameter(GarrisonBuildingStore));
                 parameterFactory.Register("GarrisonTalentParameter", new DbcParameter(GarrisonTalentStore));
                 parameterFactory.Register("DifficultyParameter", new DbcParameter(DifficultyStore));
+                parameterFactory.Register("LockTypeParameter", new DbcParameter(LockTypeStore));
                 
                 parameterFactory.RegisterDepending("BattlePetSpeciesParameter", "CreatureParameter", (creature) => new BattlePetSpeciesParameter(store, parameterFactory, creature));
 
@@ -520,6 +523,7 @@ namespace WDE.DbcStore
                             else
                                 ItemDbcStore[id] = "Item " + id;
                         });
+                        Load("LockType.dbc", 0, 1, LockTypeStore, true);
                         LoadAndRegister("SpellCastTimes.dbc", "SpellCastTimeParameter", 0, row => GetCastTimeDescription(row.GetInt(1), row.GetInt(2), row.GetInt(3)));
                         LoadAndRegister("SpellDuration.dbc", "SpellDurationParameter", 0, row => GetDurationTimeDescription(row.GetInt(1), row.GetInt(2), row.GetInt(3)));
                         LoadAndRegister("SpellRange.dbc", "SpellRangeParameter", 0, 6, true);
@@ -602,6 +606,7 @@ namespace WDE.DbcStore
                             else
                                 ItemDbcStore[id] = "Item " + id;
                         });
+                        Load("LockType.dbc", 0, 1, LockTypeStore);
                         LoadAndRegister("SpellCastTimes.dbc", "SpellCastTimeParameter", 0, row => GetCastTimeDescription(row.GetInt(1), row.GetInt(2), row.GetInt(3)));
                         LoadAndRegister("SpellDuration.dbc", "SpellDurationParameter", 0, row => GetDurationTimeDescription(row.GetInt(1), row.GetInt(2), row.GetInt(3)));
                         LoadAndRegister("SpellRange.dbc", "SpellRangeParameter", 0, 6);
@@ -687,6 +692,7 @@ namespace WDE.DbcStore
                             else
                                 ItemDbcStore[id] = "Item " + id;
                         });
+                        Load("LockType.dbc", 0, 1, LockTypeStore);
                         LoadAndRegister("SpellCastTimes.dbc", "SpellCastTimeParameter", 0, row => GetCastTimeDescription(row.GetInt(1), row.GetInt(2), row.GetInt(3)));
                         LoadAndRegister("SpellDuration.dbc", "SpellDurationParameter", 0, row => GetDurationTimeDescription(row.GetInt(1), row.GetInt(2), row.GetInt(3)));
                         LoadAndRegister("SpellRange.dbc", "SpellRangeParameter", 0, 6);
@@ -790,6 +796,7 @@ namespace WDE.DbcStore
                         Load("QuestSort.db2", 0, 1, QuestSortStore);
                         Load("CharTitles.db2", 0, 1, CharTitleStore);
                         Load("SkillLine.db2", 0, 1, SkillStore);
+                        Load("LockType.db2", 4, 0, LockTypeStore);
                         Load("CreatureDisplayInfo.db2", row => CreatureDisplayInfoStore.Add(row.GetInt(0), row.GetUShort(2)));
                         LoadAndRegister("SpellCastTimes.db2", "SpellCastTimeParameter", 0, row => GetCastTimeDescription(row.GetInt(1), row.GetInt(3), row.GetInt(2)));
                         LoadAndRegister("SpellDuration.db2", "SpellDurationParameter", 0, row => GetDurationTimeDescription(row.GetInt(1), row.GetInt(3), row.GetInt(2)));
@@ -903,6 +910,35 @@ namespace WDE.DbcStore
                 });
                 foreach (var (group, list) in areaGroupToArea)
                     areaGroupStore.Add(group, BuildAreaGroupName(list));
+            }
+
+            private string GetLockDescription(Func<int, long> getLockKeyType, Func<int, long> getLockProperty, Func<int, long> getSkill)
+            {
+                for (int i = 0; i < 8; ++i)
+                {
+                    var type = (LockKeyType)getLockKeyType(i);
+                    
+                    if (type == LockKeyType.None)
+                        continue;
+                    
+                    var lockProperty = getLockProperty(i);
+                    var skill = getSkill(i);
+
+                    if (type == LockKeyType.Item)
+                    {
+                        
+                    }
+                    else if (type == LockKeyType.Skill)
+                    {
+                        
+                    }
+                    else if (type == LockKeyType.Spell)
+                    {
+                        
+                    }
+                }
+
+                return "";
             }
 
             private string GetRadiusDescription(float @base, float perLevel, float max)

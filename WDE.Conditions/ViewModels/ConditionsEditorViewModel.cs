@@ -189,7 +189,7 @@ namespace WDE.Conditions.ViewModels
         
         public int DesiredWidth => 800;
         public int DesiredHeight => 600;
-        public string Title => "Conditions edit";
+        public string Title { get; set; } = "Conditions edit";
         public bool Resizeable => true;
 
         public event Action? CloseCancel;

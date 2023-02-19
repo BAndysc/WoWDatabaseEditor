@@ -8,6 +8,7 @@ namespace WDE.Common.Services
     [UniqueProvider]
     public interface IConditionEditService
     {
-        Task<IEnumerable<ICondition>?> EditConditions(int conditionSourceType, IReadOnlyList<ICondition>? conditions);
+        Task<IEnumerable<ICondition>?> EditConditions(int conditionSourceType, IReadOnlyList<ICondition>? conditions, string? customTitle = null);
+        Task EditConditions(IDatabaseProvider.ConditionKeyMask conditionKeyMask, IDatabaseProvider.ConditionKey conditionKey, string? customTitle = null);
     }
 }

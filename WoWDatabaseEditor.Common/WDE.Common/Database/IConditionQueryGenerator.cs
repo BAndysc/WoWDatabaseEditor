@@ -8,6 +8,6 @@ namespace WDE.Common.Database
     public interface IConditionQueryGenerator
     {
         IQuery BuildDeleteQuery(IDatabaseProvider.ConditionKey conditionKey);
-        IQuery BuildInsertQuery(IList<IConditionLine> conditions);
+        IQuery BuildInsertQuery(IReadOnlyList<IConditionLine> conditions);
     }
 }

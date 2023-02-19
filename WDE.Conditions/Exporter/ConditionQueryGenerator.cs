@@ -19,7 +19,7 @@ namespace WDE.Conditions.Exporter
                 .Delete();
         }
 
-        public IQuery BuildInsertQuery(IList<IConditionLine> conditions)
+        public IQuery BuildInsertQuery(IReadOnlyList<IConditionLine> conditions)
         {
             return Queries.Table("conditions")
                 .BulkInsert(conditions.Select(c => c.ToSqlObject()));

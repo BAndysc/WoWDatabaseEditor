@@ -86,6 +86,9 @@ namespace WDE.Common.Database
             NegativeCondition = line.NegativeCondition;
             Comment = line.Comment;
         }
+        
+        public AbstractConditionLine(IDatabaseProvider.ConditionKey key, ICondition condition) 
+            : this(key.SourceType, key.SourceGroup ?? 0, key.SourceEntry ?? 0, key.SourceId ?? 0, condition) {}
 
         public AbstractConditionLine(int sourceType, int sourceGroup, int sourceEntry, int sourceId, ICondition condition)
         {

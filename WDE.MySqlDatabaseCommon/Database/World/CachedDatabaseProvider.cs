@@ -65,6 +65,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             {
                 if (tableName == "creature_template")
                     Refresh(RefreshCreatureTemplate);
+                else if (tableName == "gameobject_template")
+                    Refresh(RefreshGameObjectTemplate);
                 //if (tableName == "creature")
                 //    Refresh(RefreshCreature);
                 else if (tableName == "gossip_menu")
@@ -111,6 +113,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         private async Task<Type> RefreshCreatureTemplate()
         {
+            creatureTemplateCache = null;
+            creatureTemplateByEntry.Clear();
             var templates = await nonCachedDatabase.GetCreatureTemplatesAsync().ConfigureAwait(false);
             Dictionary<uint, ICreatureTemplate> tempDict = templates.ToDictionary(t => t.Entry);
             creatureTemplateCache = templates;
@@ -118,6 +122,17 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             return typeof(ICreatureTemplate);
         }
 
+        private async Task<Type> RefreshGameObjectTemplate()
+        {
+            gameObjectTemplateCache = null;
+            gameObjectTemplateByEntry.Clear();
+            var templates = await nonCachedDatabase.GetGameObjectTemplatesAsync().ConfigureAwait(false);
+            Dictionary<uint, IGameObjectTemplate> tempDict = templates.ToDictionary(t => t.Entry);
+            gameObjectTemplateCache = templates;
+            gameObjectTemplateByEntry = tempDict;
+            return typeof(ICreatureTemplate);
+        }
+        
         private async Task<Type> RefreshQuestTemplates()
         {
             var templates = await nonCachedDatabase.GetQuestTemplatesAsync().ConfigureAwait(false);
