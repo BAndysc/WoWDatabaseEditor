@@ -21,14 +21,17 @@ namespace WDE.Common.Avalonia.Controls
         public (bool, Rect) Draw(DrawingContext context, string text, int styleId, bool canWrap, ref double x, ref double y, double leftPadding, double maxX)
         {
             var ft = cache.GetFormattedText(text, styleId);
-            lineHeight = Math.Max(lineHeight, ft.Bounds.Height);
+            var ftHeight = ft.Bounds.Height;
+            if (text.Length == 0 || text.Length == 1 && char.IsWhiteSpace(text[0]))
+                ftHeight = 0;
+            lineHeight = Math.Max(lineHeight, ftHeight);
 
             if (!styles.TryGetValue(styleId, out var style))
                 return (false, Rect.Empty);
 
             bool wrapped = false;
 
-            if (canWrap && x + ft.Bounds.Width > maxX)
+            if (canWrap && (x + ft.Bounds.Width > maxX || text == "\n"))
             {
                 x = leftPadding;
                 y += lineHeight;
@@ -52,14 +55,18 @@ namespace WDE.Common.Avalonia.Controls
             
             context.DrawLine(style.pen, new Point(bounds.X, bounds.Bottom), new Point(bounds.X + bounds.Width, bounds.Bottom));
         }
-
+        
         public (bool wasWrapped, Rect bounds) Measure(string text, int styleId, bool canWrap, ref double x, ref double y, double maxX)
         {
             var ft = cache.GetFormattedText(text, styleId);
-            lineHeight = Math.Max(lineHeight, ft.Bounds.Height);
+            var ftHeight = ft.Bounds.Height;
+            if (text.Length == 0 || text.Length == 1 && char.IsWhiteSpace(text[0]))
+                ftHeight = 0;
+            
+            lineHeight = Math.Max(lineHeight, ftHeight);
 
             bool wrapped = false;
-            if (canWrap && x + ft.Bounds.Width > maxX)
+            if (canWrap && (x + ft.Bounds.Width > maxX || text == "\n"))
             {
                 x = 0;
                 y += lineHeight;

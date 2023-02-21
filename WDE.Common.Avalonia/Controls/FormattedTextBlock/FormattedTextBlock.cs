@@ -185,6 +185,8 @@ namespace WDE.Common.Avalonia.Controls
                     continue;
 
                 action(toFulsh.ToString(), partIndex, source, parameter, contextId);
+                if (s == '\n' && state == State.Text)
+                    action("\n", partIndex, source, parameter, contextId);
             }
         }
 

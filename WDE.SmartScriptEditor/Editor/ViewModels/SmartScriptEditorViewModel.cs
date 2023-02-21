@@ -1196,20 +1196,36 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 }
             });
 
-            async Task NewAction(bool below)
+            (int eventIndex, int actionIndex)? IndexForNewActionOrComment(bool below)
             {
                 var index = below ? LastSelectedActionIndex : FirstSelectedActionIndex;
                 if (index.actionIndex == -1 || index.eventIndex == -1)
                 {
                     index = (below ? LastSelectedEventIndex : FirstSelectedEventIndex, 0);
                     if (index.eventIndex == -1)
-                        return;
+                        return null;
                 }
 
                 if (below)
                     index = (index.eventIndex, index.actionIndex + 1);
+                return index;
+            }
 
-                await AddActionCommand(new NewActionViewModel() { Event = Events[index.eventIndex], InsertIndex = index.actionIndex }, false);
+            async Task NewAction(bool below)
+            {
+                var index = IndexForNewActionOrComment(below);
+                if (!index.HasValue)
+                    return;
+                await AddActionCommand(new NewActionViewModel() { Event = Events[index.Value.eventIndex], InsertIndex = index.Value.actionIndex }, false);
+            }
+            
+            async Task NewComment(bool below)
+            {
+                var index = IndexForNewActionOrComment(below);
+                if (!index.HasValue)
+                    return;
+                
+                await AddComment(new NewActionViewModel() { Event = Events[index.Value.eventIndex], InsertIndex = index.Value.actionIndex });
             }
             
             async Task NewEvent(bool below)
@@ -1292,6 +1308,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             
             NewActionAboveCommand = new AsyncCommand(() => NewAction(false));
             NewActionBelowCommand = new AsyncCommand(() => NewAction(true));
+            NewCommentAboveCommand = new AsyncCommand(() => NewComment(false));
+            NewCommentBelowCommand = new AsyncCommand(() => NewComment(true));
             NewEventAboveCommand = new AsyncCommand(() => NewEvent(false));
             NewEventBelowCommand = new AsyncCommand(() => NewEvent(true));
             NewGroupAboveCommand = new AsyncCommand(() => NewGroup(false));
@@ -1386,6 +1404,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         public DelegateCommand DeleteSelected { get; set; }
         public DelegateCommand EditSelected { get; set; }
 
+        public AsyncCommand NewCommentAboveCommand { get; set; }
+        public AsyncCommand NewCommentBelowCommand { get; set; }
         public AsyncCommand NewActionAboveCommand { get; set; }
         public AsyncCommand NewActionBelowCommand { get; set; }
         public AsyncCommand NewEventAboveCommand { get; set; }
@@ -1401,6 +1421,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         public DelegateCommand SelectionLeft { get; set; }
         public DelegateCommand SelectAll { get; set; }
 
+        public bool AnyEventOrActionSelected => AnyEventSelected || AnyActionSelected;
         public bool AnySelected => AnyGroupSelected || AnyEventSelected || AnyActionSelected;
         private bool AnyGlobalVariableSelected => script.GlobalVariables.Any(e => e.IsSelected);
         private bool MultipleGlobalVariablesSelected => script.GlobalVariables.Count(e => e.IsSelected) >= 2;
@@ -1517,6 +1538,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             RaisePropertyChanged(nameof(AnySelected));
             RaisePropertyChanged(nameof(AnyActionSelected));
             RaisePropertyChanged(nameof(AnyEventSelected));
+            RaisePropertyChanged(nameof(AnyEventOrActionSelected));
             EditConditionsCommand.RaiseCanExecuteChanged();
             if (!smartEditorViewModel.IsOpened)
                 return;
@@ -1575,6 +1597,43 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             obj.Parent?.Actions.Remove(obj);
         }
 
+        private int GetDefaultSourceIdForType(SmartScriptType type)
+        {
+            switch (type)
+            {
+                case SmartScriptType.Creature:
+                case SmartScriptType.GameObject:
+                case SmartScriptType.Template:
+                case SmartScriptType.TimedActionList:
+                    return SmartConstants.SourceSelf;
+                default:
+                    return SmartConstants.TargetActionInvoker;
+            }
+        }
+
+        internal async Task AddComment(NewActionViewModel obj)
+        {
+            SmartEvent? e = obj.Event;
+            if (e == null)
+                return;
+
+            StringPickerViewModel pickerVm = new StringPickerViewModel("", false, true);
+            if (!await windowManager.ShowDialog(pickerVm))
+                return;
+            
+            var source = smartFactory.SourceFactory(SmartConstants.SourceNone);
+            var target = smartFactory.TargetFactory(SmartConstants.TargetNone);
+            var comment = smartFactory.ActionFactory(SmartConstants.ActionComment, source, target);
+            comment.Comment = pickerVm.Content;
+
+            DeselectAll.Execute();
+            if (!obj.InsertIndex.HasValue || obj.InsertIndex < 0 || obj.InsertIndex > e.Actions.Count)
+                e.Actions.Add(comment);
+            else
+                e.Actions.Insert(obj.InsertIndex.Value, comment);
+            comment.IsSelected = true;
+        }
+        
         internal async Task AddActionCommand(NewActionViewModel obj, bool openActionPickerInstantly)
         {
             SmartEvent? e = obj.Event;
@@ -1589,7 +1648,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             }
             else
             {
-                var source = smartFactory.SourceFactory(SmartConstants.SourceSelf);
+                var source = smartFactory.SourceFactory(GetDefaultSourceIdForType(script.SourceType));
                 var target = smartFactory.TargetFactory(script.SourceType == SmartScriptType.Creature ? SmartConstants.TargetSelf : SmartConstants.TargetNone);
                 action = smartFactory.ActionFactory(script.SourceType == SmartScriptType.Creature ? SmartConstants.ActionTalk : SmartConstants.ActionNone, source, target);
                 action.Parent = e; // <-- set the parent already, so that the edit window has the correct parent

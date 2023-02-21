@@ -64,15 +64,18 @@
             <DockPanel ContextRequested="Control_OnContextRequested">
                 <DockPanel.ContextMenu>
                     <ContextMenu>
-                        <MenuItem Command="{CompiledBinding NewActionAboveCommand}" IsVisible="{CompiledBinding AnySelected}" Header="New action above" />
-                        <MenuItem Command="{CompiledBinding NewActionBelowCommand}" IsVisible="{CompiledBinding AnySelected}" Header="New action below" />
-                        <Separator IsVisible="{CompiledBinding AnySelected}" />
+                        <MenuItem Command="{CompiledBinding NewActionAboveCommand}" IsVisible="{CompiledBinding AnyEventOrActionSelected}" Header="New action above" />
+                        <MenuItem Command="{CompiledBinding NewActionBelowCommand}" IsVisible="{CompiledBinding AnyEventOrActionSelected}" Header="New action below" />
+                        <Separator IsVisible="{CompiledBinding AnyEventOrActionSelected}" />
                         <MenuItem IsVisible="{CompiledBinding AnySelected}" Command="{CompiledBinding NewEventAboveCommand}" Header="New event above" />
                         <MenuItem Command="{CompiledBinding NewEventBelowCommand}" Header="New event below" />
                         <Separator />
                         <MenuItem IsVisible="{CompiledBinding AnySelected}" Command="{CompiledBinding NewGroupAboveCommand}" Header="New group above" />
                         <MenuItem Command="{CompiledBinding NewGroupBelowCommand}" Header="New group below" />
                         <Separator />
+                        <MenuItem Command="{CompiledBinding NewCommentAboveCommand}" IsVisible="{CompiledBinding AnyEventOrActionSelected}" Header="New comment above" />
+                        <MenuItem Command="{CompiledBinding NewCommentBelowCommand}" IsVisible="{CompiledBinding AnyEventOrActionSelected}" Header="New comment below" />
+                        <Separator IsVisible="{CompiledBinding AnyEventOrActionSelected}" />
                         <MenuItem Command="{CompiledBinding AddLinkCommand}" IsVisible="{CompiledBinding AnySelected}"  Header="Add link" />
                         <MenuItem Command="{CompiledBinding EditConditionsCommand}" Header="Edit conditions" />
                         <MenuItem Command="{CompiledBinding DefineGlobalVariable}" Header="Define a global variable" />
