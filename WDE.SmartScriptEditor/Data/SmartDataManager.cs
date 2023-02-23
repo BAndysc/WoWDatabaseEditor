@@ -81,6 +81,9 @@ namespace WDE.SmartScriptEditor.Data
                     if (param.Values == null || param.Values.Count == 0)
                         continue;
 
+                    if (param.Type != "FlagParameter" && param.Type != "SwitchParameter" && parameterFactory.IsRegisteredLong(param.Type))
+                        continue; // SmartTarget will register its parameters, so SmartSource doesn't have to do it again
+
                     string key = $"{editorFeatures.Name}_{type}_{data.Name}_{index}";
                     if (!parameterFactory.IsRegisteredLong(key))
                         parameterFactory.Register(key,
