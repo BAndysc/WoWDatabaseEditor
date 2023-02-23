@@ -665,7 +665,7 @@ namespace WDE.Parameters
         }
     }
     
-    public class ServersideAreatriggerParameter : LateAsyncLoadParameter
+    public class ServersideAreatriggerParameter : LateAsyncLoadParameter, IDatabaseObserver
     {
         private readonly IDatabaseProvider database;
 
@@ -680,6 +680,13 @@ namespace WDE.Parameters
             var templates = await database.GetAreaTriggerTemplatesAsync();
             foreach (var template in templates)
                 Items.Add(template.Id, new SelectOption(template.Name ?? $"Serverside areatrigger {template.Id}"));
+        }
+
+        public Type ObservedType => typeof(IAreaTriggerTemplate);
+        
+        public void Reload()
+        {
+            LateLoad().ListenErrors();
         }
     }
     

@@ -79,6 +79,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
                     Refresh(() => Task.FromResult(typeof(IPhaseName)));
                 else if (tableName == "quest_template" || tableName == "quest_template_addon")
                     Refresh(RefreshQuestTemplates);
+                else if (tableName == "areatrigger_template")
+                    Refresh(RefreshAreatriggerTemplates);
             }, true);
         }
 
@@ -140,6 +142,13 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             questTemplateCache = templates;
             questTemplateByEntry = tempDict;
             return typeof(IQuestTemplate);
+        }
+
+        private async Task<Type> RefreshAreatriggerTemplates()
+        {
+            var templates = await nonCachedDatabase.GetAreaTriggerTemplatesAsync().ConfigureAwait(false);
+            areaTriggerTemplates = templates;
+            return typeof(IAreaTriggerTemplate);
         }
         
         public Task TryConnect()
