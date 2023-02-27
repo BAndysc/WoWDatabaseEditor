@@ -198,7 +198,8 @@
                 </ScrollViewer>
             </DockPanel>
             <GridSplitter IsVisible="{CompiledBinding SplitView}"
-                          Background="#CCC"
+                          Classes.horizontal="{CompiledBinding SplitVertical}"
+                          Classes.vertical="{CompiledBinding SplitHorizontal}"
                           Grid.Row="{CompiledBinding SplitVertical, Converter={StaticResource BoolToInt1}}" 
                           Grid.Column="{CompiledBinding SplitHorizontal, Converter={StaticResource BoolToInt1}}"  />
             <Border IsVisible="{CompiledBinding SplitView}"
@@ -207,7 +208,7 @@
                     Background="{DynamicResource SlightlyDifferentBackground}" Padding="3">
                 <DockPanel LastChildFill="True">
                     <controls1:GroupingHeader GroupName="Selected row" DockPanel.Dock="Top" />
-                    <ScrollViewer AllowAutoHide="False" HorizontalScrollBarVisibility="Disabled" Padding="0,0,16,0">
+                    <ScrollViewer AllowAutoHide="False" HorizontalScrollBarVisibility="Disabled" Padding="8,0,16,0">
                         <ContentControl ContentTemplate="{StaticResource VerticalRowTemplate}" Content="{CompiledBinding FocusedRow}">
                 
                         </ContentControl>
