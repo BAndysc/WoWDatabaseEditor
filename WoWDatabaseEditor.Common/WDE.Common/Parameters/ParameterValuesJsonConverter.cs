@@ -59,6 +59,12 @@ public class ParameterValuesJsonConverter : JsonConverter
                     Debug.Assert(reader.TokenType == JsonToken.PropertyName);
                     var propName = (string?)reader.Value;
                     reader.Read();
+                    if (propName != "name" && propName != "description")
+                    {
+                        while (reader.TokenType != JsonToken.EndArray)
+                            reader.Read();
+                        continue;
+                    }
                     Debug.Assert(reader.TokenType == JsonToken.String);
                     var propValue = (string?)reader.Value;
                     if (propName == "name")

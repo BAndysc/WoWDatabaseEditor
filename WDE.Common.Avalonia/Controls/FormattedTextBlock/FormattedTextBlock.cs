@@ -179,7 +179,7 @@ namespace WDE.Common.Avalonia.Controls
                 }
 
                 if (state == State.Text && index == text.Length - 1)
-                    toFulsh = text.AsSpan(startIndex);
+                    toFulsh = text.AsSpan(startIndex).TrimEnd();
 
                 if (toFulsh == null)
                     continue;
