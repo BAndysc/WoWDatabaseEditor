@@ -1230,7 +1230,12 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             
             async Task NewEvent(bool below)
             {
-                var index = below ? LastSelectedEventIndex : FirstSelectedEventIndex;
+                int index;
+                if (AnyGroupSelected)
+                    index = below ? LastSelectedGroupIndex : FirstSelectedGroupIndex;
+                else
+                    index = below ? LastSelectedEventIndex : FirstSelectedEventIndex;
+
                 if (index == -1)
                     index = Events.Count - 1;
 
@@ -1242,7 +1247,13 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
             async Task NewGroup(bool below)
             {
-                var index = below ? LastSelectedEventIndex : FirstSelectedEventIndex;
+                int index;
+                
+                if (AnyGroupSelected)
+                    index = below ? LastSelectedGroupIndex : FirstSelectedGroupIndex;
+                else
+                    index = below ? LastSelectedEventIndex : FirstSelectedEventIndex;
+
                 if (index == -1)
                     index = Events.Count - 1;
 
