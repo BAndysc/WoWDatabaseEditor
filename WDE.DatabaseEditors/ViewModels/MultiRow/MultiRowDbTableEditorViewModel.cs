@@ -63,6 +63,8 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         public override ICommand Paste { get; }
         public override ICommand Cut { get; }
 
+        [Notify] private string searchText = "";
+        
         [AlsoNotify(nameof(FocusedEntity))] 
         [AlsoNotify(nameof(SelectedRow))] 
         [AlsoNotify(nameof(FocusedCell))]

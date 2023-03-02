@@ -29,11 +29,13 @@ public partial class VeryFastTableView
     public static readonly StyledProperty<ITableMultiSelection> MultiSelectionProperty = AvaloniaProperty.Register<VeryFastTableView, ITableMultiSelection>(nameof(MultiSelection), defaultValue: new TableMultiSelection());
     public static readonly StyledProperty<IDataTemplate?> GroupHeaderTemplateProperty = AvaloniaProperty.Register<VeryFastTableView, IDataTemplate?>(nameof(GroupHeaderTemplate));
     public static readonly StyledProperty<bool> InteractiveHeaderProperty = AvaloniaProperty.Register<VeryFastTableView, bool>(nameof(InteractiveHeader));
+    public static readonly StyledProperty<string> RowFilterParameterProperty = AvaloniaProperty.Register<VeryFastTableView, string>("RowFilterParameter");
 
     public static readonly RoutedEvent<ColumnPressedEventArgs> ColumnPressedEvent = RoutedEvent.Register<VeryFastTableView, ColumnPressedEventArgs>("ColumnPressed", RoutingStrategies.Tunnel | RoutingStrategies.Bubble);
 
     private List<bool> columnVisibility = new List<bool>();
-    
+    public static readonly StyledProperty<IRowFilterPredicate?> RowFilterProperty = AvaloniaProperty.Register<VeryFastTableView, IRowFilterPredicate?>("RowFilter");
+
     public IReadOnlyList<int>? HiddenColumns
     {
         get => GetValue(HiddenColumnsProperty);
@@ -101,4 +103,16 @@ public partial class VeryFastTableView
     }
     
     public bool IsGroupingEnabled => GroupHeaderTemplate != null;
+
+    public string RowFilterParameter
+    {
+        get => GetValue(RowFilterParameterProperty);
+        set => SetValue(RowFilterParameterProperty, value);
+    }
+
+    public IRowFilterPredicate? RowFilter
+    {
+        get => (IRowFilterPredicate?)GetValue(RowFilterProperty);
+        set => SetValue(RowFilterProperty, value);
+    }
 }

@@ -167,6 +167,7 @@
                         MultiSelection="{CompiledBinding MultiSelection}"
                         Columns="{CompiledBinding Columns}"
                         ValueUpdateRequest="VeryFastTableView_OnValueUpdateRequest"
+                        RowFilterParameter="{CompiledBinding SearchText}"
                         Items="{CompiledBinding OnlyGroup}">
                         <fastTableView:VeryFastTableView.CustomCellInteractor>
                             <singleRow1:CustomCellInteractor />
@@ -174,6 +175,9 @@
                         <fastTableView:VeryFastTableView.CustomCellDrawer>
                             <singleRow1:CustomCellDrawer />
                         </fastTableView:VeryFastTableView.CustomCellDrawer>
+                        <fastTableView:VeryFastTableView.RowFilter>
+                            <singleRow1:RowFilterPredicate />
+                        </fastTableView:VeryFastTableView.RowFilter>
                         <fastTableView:VeryFastTableView.GroupHeaderTemplate>
                             <DataTemplate>
                                 <controls1:GroupingHeader Background="{DynamicResource ContentBackground}" GroupName="">

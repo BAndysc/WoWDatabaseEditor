@@ -216,7 +216,11 @@
                     ColumnPressed="VeryFastTableView_OnColumnPressed"
                     AttachedToVisualTree="Visual_OnAttachedToVisualTree"
                     DetachedFromVisualTree="Visual_OnDetachedFromVisualTree"
+                    RowFilterParameter="{CompiledBinding SearchText}"
                     Items="{CompiledBinding Rows}">
+                    <fastTableView:VeryFastTableView.RowFilter>
+                        <multiRow:RowFilterPredicate />
+                    </fastTableView:VeryFastTableView.RowFilter>
                     <fastTableView:VeryFastTableView.CustomCellInteractor>
                         <multiRow:CustomCellInteractor />
                     </fastTableView:VeryFastTableView.CustomCellInteractor>

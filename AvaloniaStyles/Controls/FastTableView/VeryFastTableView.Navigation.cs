@@ -57,20 +57,29 @@ public partial class VeryFastTableView
         var index = SelectedRowIndex;
         if (Items == null)
             return false;
+
+        var rowFilter = RowFilter;
+        var rowFilterParameter = RowFilterParameter;
+        var items = Items;
         
-        for (int group = index.GroupIndex, row = index.RowIndex + diff; group < Items.Count && group >= 0; group += diff)
+        for (int group = index.GroupIndex, row = index.RowIndex + diff; group < items.Count && group >= 0; group += diff)
         {
             if (IsGroupIndexValid(new VerticalCursor(group, row)))
             {
-                for (int i = row; row < Items[group].Rows.Count && row >= 0; i += diff)
+                for (;row < items[group].Rows.Count && row >= 0;)
                 {
                     if (IsRowIndexValid(new VerticalCursor(group, row)))
                     {
-                        SelectedRowIndex = new VerticalCursor(group, row);
-                        return true;
+                        if (IsFilteredRowVisible(items[group].Rows[row], rowFilter, rowFilterParameter))
+                        {
+                            SelectedRowIndex = new VerticalCursor(group, row);
+                            return true;
+                        }
                     }
+                    
+                    row += diff;
                 }
-                row = diff > 0 ? 0 : (IsGroupIndexValid(new VerticalCursor(group + diff, 0)) ? Items[group + diff].Rows.Count - 1 : 0);
+                row = diff > 0 ? 0 : (IsGroupIndexValid(new VerticalCursor(group + diff, 0)) ? items[group + diff].Rows.Count - 1 : 0);
             }
         }
 
@@ -158,6 +167,9 @@ public partial class VeryFastTableView
         if (ScrollViewer == null)
             return;
 
+        if (!row.IsValid)
+            return;
+        
         var viewRect = DataViewport;
 
         var headerHeight = (IsGroupingEnabled ? HeaderRowHeight : 0);

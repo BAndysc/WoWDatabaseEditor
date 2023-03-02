@@ -87,6 +87,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
         [Notify] private uint limitQuery = 300;
         [Notify] private ulong offsetQuery;
         [Notify] private ulong allRows;
+        [Notify] private string searchText = "";
         public override ICommand Copy { get; }
         public override ICommand Paste { get; }
         public override ICommand Cut { get; }

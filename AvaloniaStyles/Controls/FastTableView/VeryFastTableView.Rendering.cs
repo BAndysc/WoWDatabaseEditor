@@ -30,18 +30,42 @@ public partial class VeryFastTableView
             return new Size(0, 0);
 
         var height = DrawingStartOffsetY;
+        var headerHeight = (IsGroupingEnabled ? HeaderRowHeight : 0);
+        var rowFilter = RowFilter;
+        var rowFilterParameter = RowFilterParameter;
         foreach (var group in Items)
         {
-            height += (IsGroupingEnabled ? HeaderRowHeight : 0) + group.Rows.Count * RowHeight;
+            height += headerHeight;
+            if (rowFilter == null)
+                height += group.Rows.Count * RowHeight;
+            else
+            {
+                foreach (var row in group.Rows)
+                {
+                    if (IsFilteredRowVisible(row, rowFilter, rowFilterParameter))
+                        height += RowHeight;
+                }
+            }
         }
 
-        availableSize = new Size(0, height + RowHeight); // always add extra row height for scrollbar
+        availableSize = new Size(0, height + RowHeight); // always add an extra row height for scrollbar
         if (Columns != null)
         {
             availableSize = availableSize.WithWidth(Columns.Where(c=>c.IsVisible).Select(c => c.Width).Sum());
         }
         return availableSize;
     }
+
+    private bool IsFilteredRowVisible(ITableRow row, IRowFilterPredicate? filter, object? parameter)
+    {
+        if (filter == null)
+            return true;
+
+        return filter.IsVisible(row, parameter);
+    }
+
+
+    private bool IsFilteredRowVisible(ITableRow row) => IsFilteredRowVisible(row, RowFilter, RowFilterParameter);
 
     public override void Render(DrawingContext context)
     {
@@ -66,6 +90,8 @@ public partial class VeryFastTableView
         }
 
         var cellDrawer = CustomCellDrawer;
+        var rowFiler = RowFilter;
+        var rowFilterParameter = RowFilterParameter;
 
         // we draw only the visible rows
         DrawingContext.PushedState? viewPortClip = IsGroupingEnabled ? context.PushClip(viewPort.Deflate(new Thickness(0, HeaderRowHeight, 0, 0))) : null;
@@ -90,9 +116,14 @@ public partial class VeryFastTableView
             else
             {
                 y += (IsGroupingEnabled ? HeaderRowHeight : 0); // header
-                int rowIndex = 0;
+                int rowIndex = -1; // we start at -1, because we add 1 in the beginning of the loop
                 foreach (var row in group.Rows)
                 {
+                    rowIndex += 1;
+                    
+                    if (!IsFilteredRowVisible(row, rowFiler, rowFilterParameter))
+                        continue;
+                    
                     double x = 0;
                     var rowRect = new Rect(0, y, actualWidth, RowHeight);
 
@@ -160,7 +191,6 @@ public partial class VeryFastTableView
 
                     y += RowHeight;
                     odd = !odd;
-                    rowIndex += 1;
                 }
             }
 
@@ -281,24 +311,45 @@ public partial class VeryFastTableView
             return null;
         double y = DrawingStartOffsetY;
         var groupIndex = 0;
+
+        var rowFilter = RowFilter;
+        var rowFilterParameter = RowFilterParameter;
+        var headerHeight = (IsGroupingEnabled ? HeaderRowHeight : 0);
+        
         foreach (var group in Items)
         {
             var groupStartY = y;
-            var groupHeight = (IsGroupingEnabled ? HeaderRowHeight : 0) + RowHeight * group.Rows.Count;
+            var groupHeight = headerHeight;
+            
+            if (rowFilter == null) 
+                groupHeight += RowHeight * group.Rows.Count;
+            else
+            {
+                foreach (var row in group.Rows)
+                {
+                    if (IsFilteredRowVisible(row, rowFilter, rowFilterParameter))
+                        groupHeight += RowHeight;
+                }
+            }
 
             if (groupStartY + groupHeight < mouseY)
                 y += groupHeight;
             else
             {
-                var rowIndex = 0;
-                y += IsGroupingEnabled ? HeaderRowHeight : 0; // row height for the header
+                y += headerHeight;
+                
+                var rowIndex = -1;
                 foreach (var row in group.Rows)
                 {
+                    rowIndex++;
+
+                    if (!IsFilteredRowVisible(row, rowFilter, rowFilterParameter))
+                        continue;
+                    
                     var rowEnd = y + RowHeight;
                     if (mouseY >= y && mouseY < rowEnd)
                         return new VerticalCursor(groupIndex, rowIndex);
                     y = rowEnd;
-                    rowIndex++;
                 }
             }
 

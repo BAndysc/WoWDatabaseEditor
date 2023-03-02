@@ -15,6 +15,8 @@ public partial class VeryFastTableView
             return base.ArrangeOverride(finalSize);
         
         var viewPort = DataViewport;
+        var rowFilter = RowFilter;
+        var rowFilterParameter = RowFilterParameter;
         var stickyHeaderRect = new Rect(viewPort.X, viewPort.Top, viewPort.Width, HeaderRowHeight);
 
         headerViews.Reset(template);
@@ -24,7 +26,16 @@ public partial class VeryFastTableView
         foreach (var group in Items)
         {
             var headerRect = new Rect(viewPort.X, y, viewPort.Width, HeaderRowHeight);
-            var groupRect = new Rect(0, y, finalSize.Width, HeaderRowHeight + group.Rows.Count * RowHeight);
+            var groupHeight = HeaderRowHeight;
+            if (rowFilter == null)
+                groupHeight += group.Rows.Count * RowHeight;
+            else
+            {
+                foreach (var row in group.Rows)
+                    if (IsFilteredRowVisible(row, rowFilter, rowFilterParameter))
+                        groupHeight += RowHeight;
+            }
+            var groupRect = new Rect(0, y, finalSize.Width, groupHeight);
 
             y += groupRect.Height;
 

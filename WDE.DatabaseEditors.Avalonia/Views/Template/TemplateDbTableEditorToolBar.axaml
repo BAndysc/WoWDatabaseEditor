@@ -30,7 +30,7 @@
         </ItemsPresenter>
         <ToolbarSpacer />
         <StackPanel DockPanel.Dock="Right" HorizontalAlignment="Right" Orientation="Horizontal">
-            <TextBlock VerticalAlignment="Center" Padding="0,0,15,0">Search: </TextBlock>
+            <TextBlock Opacity="0.5" VerticalAlignment="Center" Padding="0,0,15,0">Search: </TextBlock>
             <TextBox MinHeight="24" Padding="0" Name="SearchTextBox" Width="200" HorizontalAlignment="Right" Text="{CompiledBinding SearchText, Mode=TwoWay}" />
         </StackPanel>
     </controls:ToolbarPanel>

@@ -83,8 +83,16 @@ public partial class VeryFastTableView : Panel, IKeyboardNavigationHandler
         });
         AffectsRender<VeryFastTableView>(SelectedRowIndexProperty);
         AffectsRender<VeryFastTableView>(SelectedCellIndexProperty);
+        AffectsRender<VeryFastTableView>(RowFilterProperty);
+        AffectsRender<VeryFastTableView>(RowFilterParameterProperty);
+        AffectsMeasure<VeryFastTableView>(RowFilterProperty);
+        AffectsMeasure<VeryFastTableView>(RowFilterParameterProperty);
+        AffectsArrange<VeryFastTableView>(RowFilterProperty);
+        AffectsArrange<VeryFastTableView>(RowFilterParameterProperty);
         FocusableProperty.OverrideDefaultValue<VeryFastTableView>(true);
         BackgroundProperty.OverrideDefaultValue<VeryFastTableView>(Brushes.Transparent);
+
+        RowFilterParameterProperty.Changed.AddClassHandler<VeryFastTableView>((table, e) => table.RemoveInvisibleFromSelection());
     }
     
     public VeryFastTableView()
@@ -114,6 +122,43 @@ public partial class VeryFastTableView : Panel, IKeyboardNavigationHandler
             Command = openAndErase
         });
         headerViews = new RecyclableViewList(this);
+    }
+
+    private void RemoveInvisibleFromSelection()
+    {
+        var items = Items;
+
+        if (items == null)
+            return;
+        
+        var selection = MultiSelection;
+        var rowFilter = RowFilter;
+        var rowFilterParameter = RowFilterParameter;
+        var containsIterator = selection.ContainsIterator;
+        
+        if (rowFilter == null)
+            return; // no filter means the selection is all good
+
+        List<(int groupIndex, int rowIndex)> toRemove = new List<(int groupIndex, int rowIndex)>();
+        
+        for (var groupIndex = 0; groupIndex < items.Count; groupIndex++)
+        {
+            var group = items[groupIndex];
+            for (var rowIndex = 0; rowIndex < group.Rows.Count; rowIndex++)
+            {
+                var row = group.Rows[rowIndex];
+                var cursor = new VerticalCursor(groupIndex, rowIndex);
+                var inSelection = containsIterator.Contains(cursor);
+                
+                if (inSelection && !IsFilteredRowVisible(row, rowFilter, rowFilterParameter))
+                    toRemove.Add((groupIndex, rowIndex));
+            }
+        }
+
+        foreach (var (groupIndex, rowIndex) in toRemove)
+        {
+            selection.Remove(new VerticalCursor(groupIndex, rowIndex));
+        }
     }
 
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
@@ -257,13 +302,20 @@ public partial class VeryFastTableView : Panel, IKeyboardNavigationHandler
                         }
                         else
                         {
+                            var rowFilter = RowFilter;
+                            var rowFilterParameter = RowFilterParameter;
+                            var items = Items!;
+                            
                             var min = SelectedRowIndex < index.Value ? SelectedRowIndex : index.Value;
                             var max = SelectedRowIndex > index.Value ? SelectedRowIndex : index.Value;
                             VerticalCursor cursor = min;
                             while (cursor != max)
                             {
-                                MultiSelection.Add(cursor);
+                                if (IsRowIndexValid(cursor) &&
+                                    IsFilteredRowVisible(items[cursor.GroupIndex].Rows[cursor.RowIndex], rowFilter, rowFilterParameter))
+                                    MultiSelection.Add(cursor);
                                 cursor = cursor.AddRowIndex(1);
+ 
                                 if (!IsRowIndexValid(cursor))
                                     cursor = cursor.AddGroupIndex(1);
                             }
@@ -398,19 +450,35 @@ public partial class VeryFastTableView : Panel, IKeyboardNavigationHandler
         return new Rect(widthRect.x, GetRowY(row), width, RowHeight);
     }
 
-    public double GetRowY(VerticalCursor row)
+    public double GetRowY(VerticalCursor cursor)
     {
         if (Items == null)
             return DrawingStartOffsetY;
         var y = DrawingStartOffsetY;
         var headerHeight = IsGroupingEnabled ? HeaderRowHeight : 0;
-        for (int i = 0; i < row.GroupIndex; ++i)
+        var rowFilter = RowFilter;
+        var rowFilterParameter = RowFilterParameter;
+        
+        for (int i = 0; i <= cursor.GroupIndex; ++i)
         {
             var rowsInGroup = Items[i].Rows.Count;
-            y += headerHeight+ rowsInGroup * RowHeight;
+            if (i == cursor.GroupIndex)
+                rowsInGroup = cursor.RowIndex;
+            
+            y += headerHeight;
+        
+            if (rowFilter == null)
+                y += rowsInGroup * RowHeight;
+            else
+            {
+                for (var index = 0; index < rowsInGroup; index++)
+                {
+                    var row = Items[i].Rows[index];
+                    if (IsFilteredRowVisible(row, rowFilter, rowFilterParameter))
+                        y += RowHeight;
+                }
+            }
         }
-
-        y += headerHeight + row.RowIndex * RowHeight;
         return y;
     }
 
