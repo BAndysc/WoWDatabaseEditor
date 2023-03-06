@@ -89,7 +89,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
             
             InitializeComponent();
             this.AttachDevTools();
-            mainWindowHolder.Window = this;
+            mainWindowHolder.RootWindow = this;
             if (SystemTheme.EffectiveTheme is SystemThemeOptions.LightWindows11 or SystemThemeOptions.DarkWindows11)
             {
                 this.Classes.Add("win11");

@@ -1,58 +1,52 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 using WDE.Module.Attributes;
 
 namespace WoWDatabaseEditorCore.Avalonia.Views
 {
     public interface IMainWindowHolder
     {
-        Window Window { get; set; }
-        Stack<Window> WindowStack { get; }
+        Window RootWindow { get; set; }
         Task<T> ShowDialog<T>(Window window);
+        void Show(Window window);
     }
 
     [AutoRegister]
     [SingleInstance]
     public class MainWindowHolderHolder : IMainWindowHolder
     {
-        private Window window = null!;
-
-        public Window Window
+        public Window RootWindow { get; set; } = null!;
+        
+        private Window? FindTopWindow()
         {
-            get => window;
-            set
-            {
-                window = value;
-                WindowStack.Push(value);
-            }
+            var windows = ((IClassicDesktopStyleApplicationLifetime?)Application.Current.ApplicationLifetime)?.Windows;
+
+            if (windows == null)
+                throw new Exception("No windows found! Are you running it in web assembly?");
+            
+            return windows.SingleOrDefault(w => w.IsActive);
         }
-
-        public Stack<Window> WindowStack { get; } = new();
-
+        
         public Task<T> ShowDialog<T>(Window window)
         {
-            if (this.window.WindowState == WindowState.Minimized)
-                this.window.WindowState = WindowState.Normal;
-            var parent = WindowStack.Peek();
-            window.Closed += WindowOnClosed;
-            WindowStack.Push(window);
-            return window.ShowDialog<T>(parent);
+            var top = FindTopWindow();
+            if (top != null && top.WindowState == WindowState.Minimized)
+                top.WindowState = WindowState.Normal;
+            return window.ShowDialog<T>(top);
         }
 
-        private void WindowOnClosed(object? sender, EventArgs e)
+        public void Show(Window window)
         {
-            var window = (sender as Window)!;
-            if (!ReferenceEquals(WindowStack.Peek(), window))
-            {
-                Debug.Assert(false, "Dialog window closed in wrong order?!!");
-                var stackTrace = new StackTrace(true);
-                Console.WriteLine("Dialog window closed in wrong order?!\n" + stackTrace);
-            }
-            WindowStack.Pop();
-            window.Closed -= WindowOnClosed;
+            var top = FindTopWindow();
+            if (top != null && top.WindowState == WindowState.Minimized)
+                top.WindowState = WindowState.Normal;
+            window.Show(top);
         }
     }
 }

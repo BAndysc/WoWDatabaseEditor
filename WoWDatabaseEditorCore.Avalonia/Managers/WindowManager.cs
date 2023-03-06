@@ -29,7 +29,64 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
         {
             this.mainWindowHolder = mainWindowHolder;
         }
-        
+
+        private class WindowWrapper : IAbstractWindow
+        {
+            private readonly WeakReference<Window> window;
+
+            public WindowWrapper(WeakReference<Window> window)
+            {
+                this.window = window;
+            }
+            
+            public void Activate()
+            {
+                if (window.TryGetTarget(out var target))
+                    target.Activate();
+            }
+        }
+
+        public IAbstractWindow ShowWindow(IDialog viewModel, out Task task)
+        {
+            try
+            {
+                TaskCompletionSource taskCompletionSource = new TaskCompletionSource();
+                DialogWindow view = new DialogWindow();
+                if (viewModel.AutoSize)
+                {
+                    view.MinHeight = viewModel.DesiredHeight;
+                    view.MinWidth = viewModel.DesiredWidth;
+                }
+                else
+                {
+                    view.Height = viewModel.DesiredHeight;
+                    view.Width = viewModel.DesiredWidth;
+                }
+                view.DataContext = viewModel;
+                view.ShowInTaskbar = true;
+                view.ShowActivated = true;
+                view.Tag = taskCompletionSource;
+                view.Closed += StandaloneWindowClosed;
+                view.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+                view.Show();
+                task = taskCompletionSource.Task;
+                return new WindowWrapper(new WeakReference<Window>(view));
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+        }
+
+        private void StandaloneWindowClosed(object? sender, EventArgs e)
+        {
+            var window = ((DialogWindow)sender!);
+            var task = (TaskCompletionSource)window.Tag!;
+            window.Closed -= StandaloneWindowClosed;
+            task.SetResult();
+        }
+
         public async Task<bool> ShowDialog(IDialog viewModel)
         {
             try
@@ -70,7 +127,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
                     {
                         popup.PlacementTarget = c;
                     }
-                    ((DockPanel)mainWindowHolder.Window.GetVisualRoot().VisualChildren[0].VisualChildren[0].VisualChildren[0]).Children.Add(popup);
+                    ((DockPanel)mainWindowHolder.RootWindow.GetVisualRoot().VisualChildren[0].VisualChildren[0].VisualChildren[0]).Children.Add(popup);
                     popup.PlacementMode = PlacementMode.Pointer;
                     popup.IsOpen = true;
                     return await tcs.Task;
@@ -101,7 +158,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
 
         public Task<string?> ShowFolderPickerDialog(string defaultDirectory)
         {
-            return new OpenFolderDialog() {Directory = defaultDirectory}.ShowAsync(mainWindowHolder.Window);
+            return new OpenFolderDialog() {Directory = defaultDirectory}.ShowAsync(mainWindowHolder.RootWindow);
         }
 
         public async Task<string?> ShowOpenFileDialog(string filter, string? defaultDirectory = null)
@@ -119,7 +176,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
                         Name = x.First,
                         Extensions = x.Second.Split(",").ToList()
                     }).ToList()
-            }.ShowAsync(mainWindowHolder.Window);
+            }.ShowAsync(mainWindowHolder.RootWindow);
             
             if (result == null || result.Length == 0)
                 return null;
@@ -142,7 +199,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
                         Name = x.First,
                         Extensions = x.Second.Split(",").ToList()
                     }).ToList()
-            }.ShowAsync(mainWindowHolder.Window);
+            }.ShowAsync(mainWindowHolder.RootWindow);
             
             if (string.IsNullOrEmpty(result))
                 return null;
@@ -162,7 +219,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
 
         public void Activate()
         {
-            mainWindowHolder.Window?.ActivateWorkaround();
+            mainWindowHolder.RootWindow?.ActivateWorkaround();
         }
     }
 }

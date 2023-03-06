@@ -6,6 +6,8 @@ namespace WDE.Common.Managers
     [UniqueProvider]
     public interface IWindowManager
     {
+        IAbstractWindow ShowWindow(IDialog viewModel, out Task task);
+        
         Task<bool> ShowDialog(IDialog viewModel);
 
         Task<string?> ShowFolderPickerDialog(string defaultDirectory);
@@ -16,6 +18,11 @@ namespace WDE.Common.Managers
 
         void OpenUrl(string url);
 
+        void Activate();
+    }
+
+    public interface IAbstractWindow
+    {
         void Activate();
     }
 }

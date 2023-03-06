@@ -42,7 +42,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.AppearanceService.ViewModels
             useCustomScaling = currentSettings.UseCustomScaling;
             scalingValue = Math.Clamp(currentSettings.CustomScaling, 0.5, 4);
             RecommendedScalingPercentage =
-                (int)(((mainWindowHolder.Window?.Screens?.Primary ?? mainWindowHolder.Window?.Screens?.All?.FirstOrDefault())?.PixelDensity ?? 1) * 100);
+                (int)(((mainWindowHolder.RootWindow?.Screens?.Primary ?? mainWindowHolder.RootWindow?.Screens?.All?.FirstOrDefault())?.PixelDensity ?? 1) * 100);
             AllowCustomScaling = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
             
             Save = new DelegateCommand(() =>

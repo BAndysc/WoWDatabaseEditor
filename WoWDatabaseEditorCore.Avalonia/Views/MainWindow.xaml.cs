@@ -28,7 +28,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
             var primaryScreen = Screens.Primary ?? Screens.All.FirstOrDefault();
             GlobalApplication.HighDpi = (primaryScreen?.PixelDensity ?? 1) > 1.5f;
             InitializeComponent();
-            mainWindowHolder.Window = this;
+            mainWindowHolder.RootWindow = this;
             this.AttachDevTools();
         }
         
