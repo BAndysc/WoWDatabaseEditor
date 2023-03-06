@@ -3,15 +3,20 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Prism.Events;
 using DBCD;
+using WDE.Common.Collections;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;
 using WDE.Common.DBC;
+using WDE.Common.DBC.Structs;
 using WDE.Common.Game;
 using WDE.Common.Parameters;
+using WDE.Common.Providers;
 using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
+using WDE.Common.TableData;
 using WDE.Common.Tasks;
 using WDE.Common.Utils;
 using WDE.DbcStore.FastReader;
@@ -20,6 +25,7 @@ using WDE.DbcStore.Spells;
 using WDE.DbcStore.Spells.Cataclysm;
 using WDE.DbcStore.Spells.Legion;
 using WDE.DbcStore.Spells.Wrath;
+using WDE.DbcStore.Structs;
 using WDE.Module.Attributes;
 using WDE.MVVM.Observable;
 
@@ -55,12 +61,13 @@ namespace WDE.DbcStore
 
     [AutoRegister]
     [SingleInstance]
-    public class DbcStore : IDbcStore, ISpellService
+    public class DbcStore : IDbcStore, ISpellService, IMapAreaStore
     {
         private readonly IDbcSettingsProvider dbcSettingsProvider;
         private readonly IMessageBoxService messageBoxService;
         private readonly IEventAggregator eventAggregator;
         private readonly ICurrentCoreVersion currentCoreVersion;
+        private readonly ITabularDataPicker dataPicker;
         private readonly NullSpellService nullSpellService;
         private readonly CataSpellService cataSpellService;
         private readonly WrathSpellService wrathSpellService;
@@ -76,6 +83,7 @@ namespace WDE.DbcStore
             IMessageBoxService messageBoxService,
             IEventAggregator eventAggregator,
             ICurrentCoreVersion currentCoreVersion,
+            ITabularDataPicker dataPicker,
             NullSpellService nullSpellService,
             CataSpellService cataSpellService,
             WrathSpellService wrathSpellService,
@@ -89,6 +97,7 @@ namespace WDE.DbcStore
             this.messageBoxService = messageBoxService;
             this.eventAggregator = eventAggregator;
             this.currentCoreVersion = currentCoreVersion;
+            this.dataPicker = dataPicker;
             this.nullSpellService = nullSpellService;
             this.cataSpellService = cataSpellService;
             this.wrathSpellService = wrathSpellService;
@@ -134,6 +143,15 @@ namespace WDE.DbcStore
         public Dictionary<long, Dictionary<long, long>> ScenarioToStepStore { get; internal set; } = new();
         public Dictionary<long, long> BattlePetSpeciesIdStore { get; internal set; } = new();
 
+        public IReadOnlyList<IArea> Areas { get; internal set; } = Array.Empty<IArea>();
+        public Dictionary<uint, IArea> AreaById { get; internal set; } = new();
+
+        public IReadOnlyList<IMap> Maps { get; internal set; } = Array.Empty<IMap>();
+        public Dictionary<uint, IMap> MapById { get; internal set; } = new();
+        
+        public IArea? GetAreaById(uint id) => AreaById.TryGetValue(id, out var area) ? area : null;
+        public IMap? GetMapById(uint id) => MapById.TryGetValue(id, out var map) ? map : null;
+        
         internal void Load()
         {            
             parameterFactory.Register("RaceMaskParameter", new RaceMaskParameter(currentCoreVersion.Current.GameVersionFeatures.AllRaces), QuickAccessMode.Limited);
@@ -142,19 +160,20 @@ namespace WDE.DbcStore
                 !Directory.Exists(dbcSettingsProvider.GetSettings().Path))
             {
                 // we create a new fake task, that will not be started, but finalized so that (empty) parameters are registered
-                var fakeTask = new DbcLoadTask(parameterFactory, opener, dbcSettingsProvider, this);
+                var fakeTask = new DbcLoadTask(parameterFactory, dataPicker, opener, dbcSettingsProvider, this);
                 fakeTask.FinishMainThread();
                 return;
             }
 
             IsConfigured = true;
-            taskRunner.ScheduleTask(new DbcLoadTask(parameterFactory, opener, dbcSettingsProvider, this));
+            taskRunner.ScheduleTask(new DbcLoadTask(parameterFactory, dataPicker, opener, dbcSettingsProvider, this));
         }
 
         private class DbcLoadTask : IThreadedTask
         {
             private readonly IDbcSettingsProvider dbcSettingsProvider;
             private readonly IParameterFactory parameterFactory;
+            private readonly ITabularDataPicker dataPicker;
             private readonly DbcStore store;
             private readonly DBDProvider dbdProvider = null!;
             private readonly DBCProvider dbcProvider = null!;
@@ -216,14 +235,21 @@ namespace WDE.DbcStore
             public Dictionary<long, string> DifficultyStore { get; internal set; } = new();
             public Dictionary<long, string> LockTypeStore { get; internal set; } = new();
             private List<(string parameter, Dictionary<long, SelectOption> options)> parametersToRegister = new();
+            public List<AreaEntry> Areas { get; } = new();
+            public List<MapEntry> Maps { get; } = new();
             
             public string Name => "DBC Loading";
             public bool WaitForOtherTasks => false;
             private DatabaseClientFileOpener opener;
             
-            public DbcLoadTask(IParameterFactory parameterFactory, DatabaseClientFileOpener opener, IDbcSettingsProvider settingsProvider, DbcStore store)
+            public DbcLoadTask(IParameterFactory parameterFactory,
+                ITabularDataPicker dataPicker,
+                DatabaseClientFileOpener opener,
+                IDbcSettingsProvider settingsProvider, 
+                DbcStore store)
             {
                 this.parameterFactory = parameterFactory;
+                this.dataPicker = dataPicker;
                 this.store = store;
                 this.opener = opener;
                 dbcSettingsProvider = settingsProvider;
@@ -266,10 +292,12 @@ namespace WDE.DbcStore
                 int locale = (int) DBCLocales.LANG_enUS;
 
                 if (useLocale)
-                    locale = (int) dbcSettingsProvider.GetSettings().DBCLocale;
+                    locale = LocaleOffset;
 
                 Load(filename, row => dictionary.Add(row.GetInt(id), row.GetString(nameIndex + locale)));
             }
+            
+            private int LocaleOffset => (int) dbcSettingsProvider.GetSettings().DBCLocale;
             
             private void Load(string filename, int id, int nameIndex, Dictionary<long, long> dictionary)
             {
@@ -358,6 +386,10 @@ namespace WDE.DbcStore
                 store.ScenarioToStepStore = ScenarioToStepStore;
                 store.BattlePetSpeciesIdStore = BattlePetSpeciesIdStore;
                 store.CurrencyTypeStore = CurrencyTypeStore;
+                store.Areas = Areas;
+                store.AreaById = Areas.ToDictionary(a => a.Id, a => (IArea)a);
+                store.Maps = Maps;
+                store.MapById = Maps.ToDictionary(a => a.Id, a => (IMap)a);
 
                 foreach (var (parameterName, options) in parametersToRegister)
                 {
@@ -384,7 +416,6 @@ namespace WDE.DbcStore
                 parameterFactory.Register("RaceParameter", new DbcParameter(RaceStore));
                 parameterFactory.Register("SkillParameter", new DbcParameter(SkillStore), QuickAccessMode.Limited);
                 parameterFactory.Register("SoundParameter", new DbcParameter(SoundStore), QuickAccessMode.Limited);
-                parameterFactory.Register("ZoneAreaParameter", new DbcParameter(AreaStore), QuickAccessMode.Limited);
                 parameterFactory.Register("MapParameter", new DbcParameter(MapStore), QuickAccessMode.Limited);
                 parameterFactory.Register("DbcPhaseParameter", new DbcParameter(PhaseStore), QuickAccessMode.Limited);
                 parameterFactory.Register("SpellFocusObjectParameter", new DbcParameter(SpellFocusObjectStore), QuickAccessMode.Limited);
@@ -420,6 +451,16 @@ namespace WDE.DbcStore
                 parameterFactory.Register("GarrisonTalentParameter", new DbcParameter(GarrisonTalentStore));
                 parameterFactory.Register("DifficultyParameter", new DbcParameter(DifficultyStore));
                 parameterFactory.Register("LockTypeParameter", new DbcParameter(LockTypeStore));
+                
+                parameterFactory.Register("ZoneAreaParameter", 
+                    new DbcParameterWithPicker<IArea>(dataPicker, AreaStore, "zone or area", area => area.Id,
+                        () => store.Areas,
+                        (area, text) => area.Name.Contains(text, StringComparison.InvariantCultureIgnoreCase) || area.Id.Contains(text),
+                        new TabularDataColumn(nameof(IArea.Id), "Entry", 60), 
+                        new TabularDataColumn(nameof(IArea.Name), "Name", 160), 
+                        new TabularDataColumn(nameof(IArea.ParentArea) + "." + nameof(IArea.Name), "Parent", 160), 
+                        new TabularDataColumn(nameof(IArea.Map) + "." + nameof(IMap.Name), "Map", 120)), QuickAccessMode.Limited);
+
                 
                 parameterFactory.RegisterDepending("BattlePetSpeciesParameter", "CreatureParameter", (creature) => new BattlePetSpeciesParameter(store, parameterFactory, creature));
 
@@ -459,10 +500,31 @@ namespace WDE.DbcStore
                         Load("FactionTemplate.dbc", 0, 1, FactionTemplateStore);
                         Load("Spell.dbc", 0, 136, SpellStore, true);
                         Load("Movie.dbc", 0, 1, MovieStore);
-                        Load("Map.dbc", 0, 5, MapStore, true);
-                        Load("Map.dbc", 0, 1, MapDirectoryStore);
+                        Load("Map.dbc", row =>
+                        {
+                            var map = new MapEntry()
+                            {
+                                Id = row.GetUInt(0),
+                                Name = row.GetString(5 + LocaleOffset),
+                                Directory = row.GetString(1),
+                                Type = (InstanceType)row.GetUInt(2),
+                            };
+                            Maps.Add(map);
+                        });
                         Load("Achievement.dbc", 0, 4, AchievementStore, true);
-                        Load("AreaTable.dbc", 0, 11, AreaStore, true);
+                        Load("AreaTable.dbc", row =>
+                        {
+                            var entry = new AreaEntry()
+                            {
+                                Id = row.GetUInt(0),
+                                MapId = row.GetUInt(1),
+                                ParentAreaId = row.GetUInt(2),
+                                Flags1 = row.GetUInt(4),
+                                Name = row.GetString(11 + LocaleOffset)
+                            };
+                            Areas.Add(entry);
+                        });
+                        FillMapAreas();
                         Load("chrClasses.dbc", 0, 4, ClassStore, true);
                         Load("chrRaces.dbc", 0, 14, RaceStore, true);
                         Load("Emotes.dbc", row =>
@@ -541,10 +603,31 @@ namespace WDE.DbcStore
                         Load("CurrencyTypes.db2", 0, 2, CurrencyTypeStore);
                         Load("Spell.dbc", 0, 21, SpellStore);
                         Load("Movie.dbc", 0, 1, MovieStore);
-                        Load("Map.dbc", 0, 6, MapStore);
-                        Load("Map.dbc", 0, 1, MapDirectoryStore);
+                        Load("Map.dbc", row =>
+                        {
+                            var map = new MapEntry()
+                            {
+                                Id = row.GetUInt(0),
+                                Name = row.GetString(6),
+                                Directory = row.GetString(1),
+                                Type = (InstanceType)row.GetUInt(2),
+                            };
+                            Maps.Add(map);
+                        });
                         Load("Achievement.dbc", 0, 4, AchievementStore);
-                        Load("AreaTable.dbc", 0, 11, AreaStore);
+                        Load("AreaTable.dbc", row =>
+                        {
+                            var entry = new AreaEntry()
+                            {
+                                Id = row.GetUInt(0),
+                                MapId = row.GetUInt(1),
+                                ParentAreaId = row.GetUInt(2),
+                                Flags1 = row.GetUInt(4),
+                                Name = row.GetString(11)
+                            };
+                            Areas.Add(entry);
+                        });
+                        FillMapAreas();
                         Load("chrClasses.dbc", 0, 3, ClassStore);
                         Load("chrRaces.dbc", 0, 14, RaceStore);
                         Load("Emotes.dbc", row =>
@@ -628,10 +711,32 @@ namespace WDE.DbcStore
                         Load("CurrencyTypes.dbc", 0, 2, CurrencyTypeStore);
                         Load("Spell.dbc", 0, 1, SpellStore);
                         Load("Movie.dbc", row => MovieStore.Add(row.GetInt(0), fileData.GetValueOrDefault(row.GetInt(3)) ?? "Unknown movie"));
-                        Load("Map.dbc", 0, 5, MapStore);
-                        Load("Map.dbc", 0, 1, MapDirectoryStore);
+                        Load("Map.dbc", row =>
+                        {
+                            var map = new MapEntry()
+                            {
+                                Id = row.GetUInt(0),
+                                Name = row.GetString(5),
+                                Directory = row.GetString(1),
+                                Type = (InstanceType)row.GetUInt(2),
+                            };
+                            Maps.Add(map);
+                        });
                         Load("Achievement.dbc", 0, 4, AchievementStore);
-                        Load("AreaTable.dbc", 0, 13, AreaStore);
+                        Load("AreaTable.dbc", row =>
+                        {
+                            var entry = new AreaEntry()
+                            {
+                                Id = row.GetUInt(0),
+                                MapId = row.GetUInt(1),
+                                ParentAreaId = row.GetUInt(2),
+                                Flags1 = row.GetUInt(4),
+                                Flags2 = row.GetUInt(5),
+                                Name = row.GetString(13)
+                            };
+                            Areas.Add(entry);
+                        });
+                        FillMapAreas();
                         Load("ChrClasses.dbc", 0, 3, ClassStore);
                         Load("ChrRaces.dbc", 0, 14, RaceStore);
                         Load("Difficulty.dbc", 0, 11, DifficultyStore);
@@ -705,7 +810,31 @@ namespace WDE.DbcStore
                         max = 42;
                         Load("CriteriaTree.db2", 0, 1, AchievementCriteriaStore);
                         Load("AreaTrigger.db2", row => AreaTriggerStore.Add(row.GetInt(14), $"Area trigger"));
-                        Load("AreaTable.db2", 0, 2, AreaStore);
+                        Load("AreaTable.db2", row =>
+                        {
+                            var entry = new AreaEntry()
+                            {
+                                Id = row.GetUInt(0),
+                                MapId = row.GetUInt(6),
+                                ParentAreaId = row.GetUInt(7),
+                                Flags1 = row.GetUInt(3, 0),
+                                Flags2 = row.GetUInt(3, 1),
+                                Name = row.GetString(2)
+                            };
+                            Areas.Add(entry);
+                        });
+                        Load("Map.db2", row =>
+                        {
+                            var map = new MapEntry()
+                            {
+                                Id = row.GetUInt(0),
+                                Name = row.GetString(2),
+                                Directory = row.GetString(1),
+                                Type = (InstanceType)row.GetUInt(17),
+                            };
+                            Maps.Add(map);
+                        });
+                        FillMapAreas();
                         LoadLegionAreaGroup(AreaGroupStore);
                         Load("BattlemasterList.db2", 0, 1, BattlegroundStore);
                         Load("CurrencyTypes.db2", 0, 1, CurrencyTypeStore);
@@ -779,8 +908,6 @@ namespace WDE.DbcStore
                                 HolidaysStore[id] = "Holiday " + id;
                         });
                         Load("Languages.db2", 1, 0, LanguageStore);
-                        Load("Map.db2", 0, 1, MapDirectoryStore);
-                        Load("Map.db2", 0, 2, MapStore);
                         Load("MailTemplate.DB2", row =>
                         {
                             var body = row.GetString(1);
@@ -894,6 +1021,26 @@ namespace WDE.DbcStore
                         break;
                     default:
                         return;
+                }
+            }
+
+            private void FillMapAreas()
+            {
+                var mapById = Maps.ToDictionary(x => x.Id, x => x);
+                var areasById = Areas.ToDictionary(x => x.Id, x => x);
+                foreach (var area in Areas)
+                {
+                    area.Map = mapById.TryGetValue(area.MapId, out var map) ? map : null;
+                    if (area.ParentAreaId != 0)
+                        area.ParentArea = areasById.TryGetValue(area.ParentAreaId, out var parentArea) ? parentArea : null;
+                    
+                    AreaStore.Add(area.Id, area.Name);
+                }
+
+                foreach (var map in Maps)
+                {
+                    MapStore.Add(map.Id, map.Name);
+                    MapDirectoryStore.Add(map.Id, map.Directory);
                 }
             }
 
@@ -1120,6 +1267,47 @@ namespace WDE.DbcStore
         }
 
         public bool AllowUnknownItems => true;
+    }
+
+    public class DbcParameterWithPicker<T> : DbcParameter, ICustomPickerParameter<long>
+    {
+        private readonly ITabularDataPicker dataPicker;
+        private readonly string dbc;
+        private readonly Func<T, long> getId;
+        private readonly Func<IReadOnlyList<T>> getListOf;
+        private readonly Func<T, string, bool> filter;
+        private readonly ITabularDataColumn[] columns;
+
+        public DbcParameterWithPicker(ITabularDataPicker dataPicker,
+            Dictionary<long, string> storage,
+            string dbc,
+            Func<T, long> getId,
+            Func<IReadOnlyList<T>> getListOf,
+            Func<T, string, bool> filter,
+            params ITabularDataColumn[] columns) : base(storage)
+        {
+            this.dataPicker = dataPicker;
+            this.dbc = dbc;
+            this.getId = getId;
+            this.getListOf = getListOf;
+            this.filter = filter;
+            this.columns = columns;
+        }
+        
+        public async Task<(long, bool)> PickValue(long value)
+        {
+            var result = await dataPicker.PickRow(new TabularDataBuilder<T>()
+                .SetData(getListOf().AsIndexedCollection())
+                .SetTitle($"Pick {dbc}")
+                .SetFilter(filter)
+                .SetColumns(columns)
+                .Build());
+
+            if (result == null)
+                return (0, false);
+            
+            return (getId(result), true);
+        }
     }
     
     public class BattlePetSpeciesParameter : ParameterNumbered
