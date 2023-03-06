@@ -20,20 +20,20 @@ namespace WDE.DatabaseEditors.Services;
 public class TableOpenService : ITableOpenService
 {
     private readonly IParameterFactory parameterFactory;
-    private readonly IItemFromListProvider itemFromListProvider;
+    private readonly IParameterPickerService parameterPickerService;
     private readonly IDatabaseTableDataProvider tableDataProvider;
     private readonly ITableDefinitionProvider definitionProvider;
     private readonly IMessageBoxService messageBoxService;
 
     public TableOpenService(
         IParameterFactory parameterFactory,
-        IItemFromListProvider itemFromListProvider,
+        IParameterPickerService parameterPickerService,
         IDatabaseTableDataProvider tableDataProvider,
         ITableDefinitionProvider definitionProvider,
         IMessageBoxService messageBoxService)
     {
         this.parameterFactory = parameterFactory;
-        this.itemFromListProvider = itemFromListProvider;
+        this.parameterPickerService = parameterPickerService;
         this.tableDataProvider = tableDataProvider;
         this.definitionProvider = definitionProvider;
         this.messageBoxService = messageBoxService;
@@ -47,10 +47,10 @@ public class TableOpenService : ITableOpenService
         Debug.Assert(definition.GroupByKeys.Count == 1);
         
         var parameter = parameterFactory.Factory(definition.Picker);
-        var key = await itemFromListProvider.GetItemFromList(parameter.HasItems ? parameter.Items! : new Dictionary<long, SelectOption>(), false);
-        if (key.HasValue)
+        var (key, ok) = await parameterPickerService.PickParameter(parameter, 0);
+        if (ok)
         {
-            return await Create(definition, new DatabaseKey(key.Value));
+            return await Create(definition, new DatabaseKey(key));
         }
         return null;
     }

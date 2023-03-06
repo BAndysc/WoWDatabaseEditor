@@ -1,9 +1,13 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using WDE.Common.Collections;
 using WDE.Common.Database;
 using WDE.Common.Parameters;
+using WDE.Common.Providers;
 using WDE.Common.Services;
+using WDE.Common.TableData;
 using WDE.Common.Utils;
 
 namespace WDE.DatabaseEditors.Parameters;
@@ -12,11 +16,18 @@ public class BroadcastTextParameter : IParameter<long>, IAsyncParameter<long>, I
 {
     private readonly IDatabaseProvider databaseProvider;
     private readonly ITableEditorPickerService tableEditorPickerService;
+    private readonly IMySqlHotfixExecutor executor;
+    private readonly ITabularDataPicker tabularDataPicker;
 
-    public BroadcastTextParameter(IDatabaseProvider databaseProvider, ITableEditorPickerService tableEditorPickerService)
+    public BroadcastTextParameter(IDatabaseProvider databaseProvider,
+        ITableEditorPickerService tableEditorPickerService,
+        IMySqlHotfixExecutor executor,
+        ITabularDataPicker tabularDataPicker)
     {
         this.databaseProvider = databaseProvider;
         this.tableEditorPickerService = tableEditorPickerService;
+        this.executor = executor;
+        this.tabularDataPicker = tabularDataPicker;
     }
 
     public async Task<string> ToStringAsync(long val, CancellationToken token)
@@ -31,13 +42,29 @@ public class BroadcastTextParameter : IParameter<long>, IAsyncParameter<long>, I
 
         return $"{text.TrimToLength(60)} ({val})";
     }
-
+    
     public async Task<(long, bool)> PickValue(long value)
     {
-        var result = await tableEditorPickerService.PickByColumn("broadcast_text", default, "Id", value);
-        if (result.HasValue)
-            return (result.Value, true);
-        return (0, false);
+        var texts = await databaseProvider.GetBroadcastTextsAsync();
+        var selected = await tabularDataPicker.PickRow(new TabularDataBuilder<IBroadcastText>()
+            .SetTitle("Pick broadcast text")
+            .SetData(texts.AsIndexedCollection())
+            .SetColumns(new TabularDataColumn(nameof(IBroadcastText.Id), "Id", 65),
+                new TabularDataColumn(nameof(IBroadcastText.Text), "Male Text", 200),
+                new TabularDataColumn(nameof(IBroadcastText.Text1), "Female Text", 200))
+            .SetFilter((text, search) =>
+            {
+                var idHas = text.Id.Contains(search);
+                var maleHas = text.Text?.Contains(search, StringComparison.InvariantCultureIgnoreCase) ?? false;
+                var femaleHas = text.Text1?.Contains(search, StringComparison.InvariantCultureIgnoreCase) ?? false;
+                return idHas || maleHas || femaleHas;
+            })
+            .Build());
+        
+        if (selected == null)
+            return (0, false);
+
+        return (selected.Id, true);
     }
 
     public string? Prefix => null;
