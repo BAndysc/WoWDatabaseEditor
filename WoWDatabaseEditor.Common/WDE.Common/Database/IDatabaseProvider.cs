@@ -42,6 +42,7 @@ namespace WDE.Common.Database
         INpcText? GetNpcText(uint entry);
         Task<List<IPointOfInterest>> GetPointsOfInterestsAsync();
 
+        Task<List<IBroadcastText>> GetBroadcastTextsAsync();
         Task<List<ICreatureText>> GetCreatureTextsByEntryAsync(uint entry);
         IReadOnlyList<ICreatureText>? GetCreatureTextsByEntry(uint entry);
         

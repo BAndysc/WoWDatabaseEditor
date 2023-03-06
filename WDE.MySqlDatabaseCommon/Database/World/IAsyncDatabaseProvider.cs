@@ -13,6 +13,5 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         Task<List<IQuestTemplate>> GetQuestTemplatesAsync();
         Task<List<INpcText>> GetNpcTextsAsync();
         Task<List<ICreatureClassLevelStat>> GetCreatureClassLevelStatsAsync();
-        Task<List<IBroadcastText>> GetBroadcastTextsAsync();
     }
 }

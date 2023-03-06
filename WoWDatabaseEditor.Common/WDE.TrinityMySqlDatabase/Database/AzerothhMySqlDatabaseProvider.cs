@@ -50,7 +50,7 @@ public class AzerothhMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvider<Az
     public override async Task<List<IBroadcastText>> GetBroadcastTextsAsync()
     {
         await using var model = Database();
-        return await (from t in model.BroadcastTexts select t).ToListAsync<IBroadcastText>();
+        return await (from t in model.BroadcastTexts orderby t.Id select t).ToListAsync<IBroadcastText>();
     }
     
     public override IBroadcastText? GetBroadcastTextByText(string text)

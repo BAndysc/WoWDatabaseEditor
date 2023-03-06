@@ -40,6 +40,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         private List<ICreatureClassLevelStat>? creatureClassLevelStatsCache;
         private IList<IDatabaseSpellDbc>? databaseSpellDbcCache;
 
+        private List<IBroadcastText>? broadcastTextsSortedCache;
         private StringTrie<IBroadcastText>? broadcastTextsCache;
         
         private IAsyncDatabaseProvider nonCachedDatabase;
@@ -288,6 +289,11 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         }
 
         public Task<List<IPointOfInterest>> GetPointsOfInterestsAsync() => nonCachedDatabase.GetPointsOfInterestsAsync();
+        
+        public async Task<List<IBroadcastText>> GetBroadcastTextsAsync()
+        {
+            return broadcastTextsSortedCache ?? await nonCachedDatabase.GetBroadcastTextsAsync();
+        }
 
         public Task<List<ICreatureText>> GetCreatureTextsByEntryAsync(uint entry) => nonCachedDatabase.GetCreatureTextsByEntryAsync(entry);
 
@@ -526,20 +532,21 @@ namespace WDE.MySqlDatabaseCommon.Database.World
                     cache.databaseSpellDbcCache = await cache.nonCachedDatabase.GetSpellDbcAsync();
                     
                     progress.Report(10, steps, "Loading broadcast texts");
-                    // todo: is there any benefit of caching this?
-                    /*var broadcastTexts = await cache.nonCachedDatabase.GetBroadcastTextsAsync();
-                    var cachedTrie = new StringTrie<IBroadcastText>();
-                    await Task.Run(() =>
-                    {
-                        foreach (var text in broadcastTexts)
-                        {
-                            if (text.Text != null)
-                                cachedTrie[text.Text] = text;
-                            if (text.Text1 != null)
-                                cachedTrie[text.Text1] = text;
-                        }
-                    }).ConfigureAwait(true);
-                    cache.broadcastTextsCache = cachedTrie;*/
+                    var broadcastTexts = await cache.nonCachedDatabase.GetBroadcastTextsAsync();
+                    cache.broadcastTextsSortedCache = broadcastTexts;
+                    // to expensive to cache
+                    // var cachedTrie = new StringTrie<IBroadcastText>();
+                    // await Task.Run(() =>
+                    // {
+                    //     foreach (var text in broadcastTexts)
+                    //     {
+                    //         if (text.Text != null)
+                    //             cachedTrie[text.Text] = text;
+                    //         if (text.Text1 != null)
+                    //             cachedTrie[text.Text1] = text;
+                    //     }
+                    // }).ConfigureAwait(true);
+                    //cache.broadcastTextsCache = cachedTrie;
 
                     Dictionary<uint, ICreatureTemplate> creatureTemplateByEntry = new();
                     Dictionary<uint, IGameObjectTemplate> gameObjectTemplateByEntry = new();
