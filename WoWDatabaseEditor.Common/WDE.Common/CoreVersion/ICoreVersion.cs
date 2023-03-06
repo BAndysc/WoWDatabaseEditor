@@ -23,6 +23,8 @@ namespace WDE.Common.CoreVersion
         bool SupportsEventScripts => false;
         PhasingType PhasingType { get; }
         int Build { get; }
+        // todo: this can be moved to settings as a configurable option
+        IEnumerable<(string id, bool enabled)> TopBarQuickTableEditors => Array.Empty<(string, bool)>();
     }
 
     public enum PhasingType

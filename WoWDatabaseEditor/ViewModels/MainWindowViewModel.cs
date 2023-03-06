@@ -73,10 +73,12 @@ namespace WoWDatabaseEditorCore.ViewModels
             QuickGoToViewModel quickGoToViewModel,
             ProfilesViewModel profilesViewModel,
             IGlobalServiceRoot globalServiceRoot,
+            TopBarQuickAccessViewModel topBarQuickAccessViewModel,
             Func<IFindAnywhereDialogViewModel> findAnywhereCreator)
         {
             DocumentManager = documentManager;
             StatusBar = statusBar;
+            TopBarQuickAccess = topBarQuickAccessViewModel;
             this.messageBoxService = messageBoxService;
             this.aboutViewModelCreator = aboutViewModelCreator;
             this.quickStartCreator = quickStartCreator;
@@ -208,6 +210,7 @@ namespace WoWDatabaseEditorCore.ViewModels
         public IQuickAccessViewModel QuickAccessViewModel { get; }
         public QuickGoToViewModel QuickGoToViewModel { get; }
         public ProfilesViewModel ProfilesViewModel { get; }
+        public TopBarQuickAccessViewModel TopBarQuickAccess { get; }
 
         public List<IMainMenuItem> MenuItemProviders { get; }
 
@@ -243,7 +246,7 @@ namespace WoWDatabaseEditorCore.ViewModels
                     tablesToolService.Close();
             }
         }
-        
+
         private void ShowAbout()
         {
             DocumentManager.OpenDocument(aboutViewModelCreator());

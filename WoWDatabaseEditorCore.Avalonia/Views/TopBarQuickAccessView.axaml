@@ -1,0 +1,32 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:WoWDatabaseEditorCore.ViewModels;assembly=WoWDatabaseEditorCore"
+             xmlns:quickAccess="clr-namespace:WDE.Common.QuickAccess;assembly=WDE.Common"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:TopBarQuickAccessViewModel"
+             x:Name="Root"
+             x:Class="WoWDatabaseEditorCore.Avalonia.Views.TopBarQuickAccessView">
+    <ItemsControl Items="{CompiledBinding Editors}">
+        <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+                <ToolbarPanel />
+            </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="quickAccess:ITopBarQuickAccessItem">
+                <Button ToolTip.Tip="{CompiledBinding Name}"
+                        Command="{CompiledBinding Command}"
+                        Width="30"
+                        Height="30"
+                        Padding="4"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        CommandParameter="{CompiledBinding .}">
+                    <WdeImage Image="{CompiledBinding Icon}"></WdeImage>
+                </Button>
+            </DataTemplate>
+        </ItemsControl.ItemTemplate>
+    </ItemsControl>
+</UserControl>

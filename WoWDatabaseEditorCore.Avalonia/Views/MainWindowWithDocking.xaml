@@ -95,6 +95,10 @@
                     <Border Width="30" />
                     
                     <profiles1:ProfilesControl DataContext="{CompiledBinding ProfilesViewModel}"/>
+                    
+                    <Border Width="30" />
+                    
+                    <views:TopBarQuickAccessView DataContext="{CompiledBinding TopBarQuickAccess}" />
                 </StackPanel>
             </controls:ToolBar.TopContent>
             <controls:ToolBar.LeftContent>
