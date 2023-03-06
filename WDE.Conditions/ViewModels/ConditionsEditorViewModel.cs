@@ -30,6 +30,7 @@ namespace WDE.Conditions.ViewModels
             IConditionsFactory conditionsFactory,
             IConditionDataManager conditionDataManager,
             IItemFromListProvider itemFromListProvider,
+            IParameterPickerService parameterPickerService,
             IHistoryManager historyManager,
             IEnumerable<ICondition>? conditions,
             int conditionSourceType)
@@ -69,9 +70,9 @@ namespace WDE.Conditions.ViewModels
                 if (!prh.HasItems) 
                     return;
 
-                var newItem = await itemFromListProvider.GetItemFromList(prh.Items, prh.Parameter is FlagParameter, prh.Value);
-                if (newItem.HasValue)
-                    prh.Value = newItem.Value;
+                var (newItem, ok) = await parameterPickerService.PickParameter(prh.Parameter, prh.Value);
+                if (ok)
+                    prh.Value = newItem;
             });
             AddItemCommand = new DelegateCommand(() =>
             {

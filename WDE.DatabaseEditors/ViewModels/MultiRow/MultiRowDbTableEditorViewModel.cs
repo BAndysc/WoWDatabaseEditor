@@ -360,13 +360,13 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         private async Task AddNewEntity()
         {
             var parameter = parameterFactory.Factory(tableDefinition.Picker);
-            var selected = await itemFromListProvider.GetItemFromList(parameter.Items, false);
-            if (!selected.HasValue)
+            var (selected, ok) = await parameterPickerService.PickParameter(parameter, 0);
+            if (!ok)
                 return;
 
             Debug.Assert(tableDefinition.GroupByKeys.Count == 1);
 
-            DatabaseKey key = new DatabaseKey(selected.Value);
+            DatabaseKey key = new DatabaseKey(selected);
 
             if (ContainsKey(key))
             {

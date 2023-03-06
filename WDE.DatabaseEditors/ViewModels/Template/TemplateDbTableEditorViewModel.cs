@@ -152,11 +152,11 @@ namespace WDE.DatabaseEditors.ViewModels.Template
                 return;
             
             var parameter = parameterFactory.Factory(tableDefinition.Picker);
-            var selected = await itemFromListProvider.GetItemFromList(parameter.Items, false);
-            if (!selected.HasValue)
+            var (selected, ok) = await parameterPickerService.PickParameter(parameter, 0);
+            if (!ok)
                 return;
 
-            var data = await tableDataProvider.Load(tableDefinition.Id, null, null,null, new []{new DatabaseKey(selected.Value)});
+            var data = await tableDataProvider.Load(tableDefinition.Id, null, null,null, new []{new DatabaseKey(selected)});
             if (data == null) 
                 return;
 
