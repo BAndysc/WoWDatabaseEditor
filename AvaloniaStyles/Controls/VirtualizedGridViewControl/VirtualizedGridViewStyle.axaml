@@ -1,0 +1,70 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Design.PreviewWith>
+        <Border Padding="20">
+            <!-- Add Controls for Previewer Here -->
+        </Border>
+    </Design.PreviewWith>
+
+    <!-- more or less style is based on the ListBox style -->
+    
+    <Style Selector="VirtualizedGridView">
+        <Setter Property="TextBlock.Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+        <Setter Property="Background" Value="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+        <Setter Property="BorderThickness" Value="{DynamicResource ListBoxBorderThemeThickness}" />
+        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+        <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />        
+        <Setter Property="ItemHeight" Value="24" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border Name="border"
+                        ClipToBounds="{TemplateBinding ClipToBounds}"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius}">
+                    <DockPanel LastChildFill="True" Grid.IsSharedSizeScope="True">
+                        <GridViewHeader DockPanel.Dock="Top">
+                            <Grid Name="PART_header">
+                            </Grid>
+                        </GridViewHeader>
+                        <ScrollViewer Name="PART_ScrollViewer"
+                                      HorizontalScrollBarVisibility="{TemplateBinding (ScrollViewer.HorizontalScrollBarVisibility)}"
+                                      VerticalScrollBarVisibility="{TemplateBinding (ScrollViewer.VerticalScrollBarVisibility)}">
+                            <Border Padding="{TemplateBinding Padding}">
+                                <VirtualizedGridViewItemPresenter Items="{TemplateBinding Items}" 
+                                                                  ItemHeight="{TemplateBinding ItemHeight}"
+                                                                  SelectedIndex="{TemplateBinding SelectedIndex}"
+                                                                  Columns="{TemplateBinding Columns}"
+                                                                  Name="PART_Children">
+                                </VirtualizedGridViewItemPresenter>
+                            </Border>
+                        </ScrollViewer>
+                    </DockPanel>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    
+    <!-- just default styles that look good in majority of usecases -->
+    <Style Selector="VirtualizedGridView ListBoxItem TextBlock">
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="VirtualizedGridView ListBoxItem CheckBox">
+        <Setter Property="MinWidth" Value="0" />
+        <Setter Property="MinHeight" Value="0" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+    </Style>
+    
+    <Style Selector="VirtualizedGridView ListBoxItem">
+        <!-- important to have proper column widths -->
+        <Setter Property="Padding" Value="0" />
+    </Style>
+    
+    <Style Selector="VirtualizedGridView GridSplitter">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="Gray" />
+        <Setter Property="BorderThickness" Value="0,0,1,0" />
+    </Style>
+</Styles>

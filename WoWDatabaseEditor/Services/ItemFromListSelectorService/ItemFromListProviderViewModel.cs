@@ -87,13 +87,13 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
 
             Columns = new ObservableCollection<ColumnDescriptor>
             {
-                new("Key", "Entry", 80),
-                new("Name", "Name", 220),
-                new("Description", "Description", 320)
+                ColumnDescriptor.TextColumn("Key", "Entry", 80),
+                ColumnDescriptor.TextColumn("Name", "Name", 220),
+                ColumnDescriptor.TextColumn("Description", "Description", 320)
             };
 
             if (asFlags)
-                Columns.Insert(0, new ColumnDescriptor("", "IsChecked", 35, true));
+                Columns.Insert(0, ColumnDescriptor.CheckBoxColumn("", "IsChecked", 35));
 
             if (items == null || items.Count == 0)
                 SearchText = current != null ? current.ToString() ?? "" : "";

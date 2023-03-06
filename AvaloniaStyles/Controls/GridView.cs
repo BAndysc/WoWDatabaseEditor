@@ -64,7 +64,7 @@ namespace AvaloniaStyles.Controls
     
     public class GridView : TemplatedControl
     {
-        private const int SplitterWidth = 5;
+        internal const int SplitterWidth = 5;
         
         public static readonly DirectProperty<GridView, IEnumerable> ItemsProperty =
             AvaloniaProperty.RegisterDirect<GridView, IEnumerable>(nameof(Items), o => o.Items, (o, v) => o.Items = v);
@@ -392,9 +392,10 @@ namespace AvaloniaStyles.Controls
                     }
                     else
                     {
+                        var displayMember = column.Property;
                         control = new TextBlock()
                         {
-                            [!TextBlock.TextProperty] = new Binding(column.Property)
+                            [!TextBlock.TextProperty] = new Binding(displayMember)
                         };
                     }
                     

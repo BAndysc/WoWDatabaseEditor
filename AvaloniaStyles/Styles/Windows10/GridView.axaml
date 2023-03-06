@@ -29,4 +29,22 @@
     <Style Selector="controls|GridView ListBoxItem TextBlock">
         <Setter Property="Padding" Value="8,0,0,0" />
     </Style>
+    
+    
+    <Style Selector="controls|VirtualizedGridView">
+        <Setter Property="BorderBrush" Value="{DynamicResource TextControlBorderBrush}"/>
+    </Style>
+    <Style Selector="controls|VirtualizedGridView GridSplitter">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border 
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}"
+                    Background="{DynamicResource TextControlBackground}"/>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    <Style Selector="controls|VirtualizedGridView ListBoxItem TextBlock">
+        <Setter Property="Padding" Value="8,0,0,0" />
+    </Style>
 </Styles>

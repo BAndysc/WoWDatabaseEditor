@@ -25,4 +25,23 @@
             </ControlTemplate>
         </Setter>
     </Style>
+    
+    
+    <Style Selector="VirtualizedGridView">
+        <Setter Property="CornerRadius" Value="4"/>
+    </Style>
+    <Style Selector="VirtualizedGridView GridViewHeader">
+        <Setter Property="CornerRadius" Value="4,4,0,0" />
+    </Style>
+    <Style Selector="VirtualizedGridView GridSplitter">
+        <Setter Property="BorderBrush" Value="#3f000000"></Setter>
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border 
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}"
+                    Background="Transparent"/>
+            </ControlTemplate>
+        </Setter>
+    </Style>
 </Styles>

@@ -31,9 +31,9 @@ namespace WoWDatabaseEditorCore.Services.CreatureEntrySelectorService
         {
             List<ColumnDescriptor> columns = new()
             {
-                new ColumnDescriptor("Entry", "Entry", 50),
-                new ColumnDescriptor("Name", "Name"),
-                new ColumnDescriptor("Script", "AIName")
+                ColumnDescriptor.TextColumn("Entry", "Entry", 50),
+                ColumnDescriptor.TextColumn("Name", "Name"),
+                ColumnDescriptor.TextColumn("Script", "AIName")
             };
 
             var context = new GenericSelectorDialogViewModel<T>(columns, GetList(), entryGetter, index);

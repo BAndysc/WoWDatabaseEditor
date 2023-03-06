@@ -34,11 +34,12 @@ namespace WDE.Common.Avalonia.Utils
                         Content = col.HeaderText
                     };
                     column.IsReadOnly = !col.CheckboxMember;
-                    column.Binding = new Binding(col.DisplayMember);
+                    var displayMember = col.DisplayMember;
+                    column.Binding = new Binding(displayMember);
                     dataGrid.Columns.Add(column);
                 }
             }
-            else if (o is GridView gridView)
+            else if (o is GridView || o is VirtualizedGridView)
             {
                 var columns = arg2.Select(col => new GridColumnDefinition()
                 {
@@ -47,7 +48,10 @@ namespace WDE.Common.Avalonia.Utils
                     PreferedWidth = (int) (col.PreferredWidth ?? 100),
                     Checkable = col.CheckboxMember
                 }).ToList();
-                gridView.Columns = columns;
+                if (o is GridView gridView)
+                    gridView.Columns = columns;
+                else if (o is VirtualizedGridView virtualizedGridView)
+                    virtualizedGridView.Columns = columns;
             }
 
             return arg2;
