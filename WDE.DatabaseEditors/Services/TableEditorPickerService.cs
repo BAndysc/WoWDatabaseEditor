@@ -181,6 +181,7 @@ public class TableEditorPickerService : ITableEditorPickerService
             if (condition != null)
             {
                 singleRow.FilterViewModel.FilterText = condition;
+                singleRow.FilterViewModel.SelectedColumn = singleRow.FilterViewModel.RawSqlColumn;
                 singleRow.FilterViewModel.ApplyFilter.Execute(null);
             }
         }
