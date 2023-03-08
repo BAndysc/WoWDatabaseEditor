@@ -70,7 +70,7 @@ public partial class VeryFastTableView
                 {
                     if (IsRowIndexValid(new VerticalCursor(group, row)))
                     {
-                        if (IsFilteredRowVisible(items[group].Rows[row], rowFilter, rowFilterParameter))
+                        if (IsFilteredRowVisible(items[group], items[group].Rows[row], rowFilter, rowFilterParameter))
                         {
                             SelectedRowIndex = new VerticalCursor(group, row);
                             return true;

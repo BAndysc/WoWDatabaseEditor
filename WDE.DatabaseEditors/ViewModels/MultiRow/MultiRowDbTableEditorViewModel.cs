@@ -143,6 +143,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         public DelegateCommand<DatabaseCellViewModel?> SetNullCommand { get; }
         public DelegateCommand<DatabaseCellViewModel?> DuplicateCommand { get; }
         public DelegateCommand<DatabaseEntitiesGroupViewModel> AddRowCommand { get; }
+        public DelegateCommand<DatabaseEntitiesGroupViewModel> CollapseExpandCommand { get; }
         public AsyncAutoCommand<DatabaseCellViewModel> OpenParameterWindow { get; }
         public AsyncAutoCommand RevertSelectedCommand { get; }
         public DelegateCommand SetNullSelectedCommand { get; }
@@ -204,6 +205,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             DuplicateCommand = new DelegateCommand<DatabaseCellViewModel?>(Duplicate, vm => vm != null);
             EditConditionsCommand = new AsyncAutoCommand<DatabaseCellViewModel?>(EditConditions);
             AddRowCommand = new DelegateCommand<DatabaseEntitiesGroupViewModel>(AddRowByGroup);
+            CollapseExpandCommand = new DelegateCommand<DatabaseEntitiesGroupViewModel>(group => group.IsExpanded = !group.IsExpanded);
             AddNewCommand = new AsyncAutoCommand(AddNewEntity);
             InsertRowBelowCommand = new DelegateCommand(() =>
             {

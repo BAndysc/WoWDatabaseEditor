@@ -150,7 +150,7 @@ public partial class VeryFastTableView : Panel, IKeyboardNavigationHandler
                 var cursor = new VerticalCursor(groupIndex, rowIndex);
                 var inSelection = containsIterator.Contains(cursor);
                 
-                if (inSelection && !IsFilteredRowVisible(row, rowFilter, rowFilterParameter))
+                if (inSelection && !IsFilteredRowVisible(group, row, rowFilter, rowFilterParameter))
                     toRemove.Add((groupIndex, rowIndex));
             }
         }
@@ -312,7 +312,7 @@ public partial class VeryFastTableView : Panel, IKeyboardNavigationHandler
                             while (cursor != max)
                             {
                                 if (IsRowIndexValid(cursor) &&
-                                    IsFilteredRowVisible(items[cursor.GroupIndex].Rows[cursor.RowIndex], rowFilter, rowFilterParameter))
+                                    IsFilteredRowVisible(items[cursor.GroupIndex], items[cursor.GroupIndex].Rows[cursor.RowIndex], rowFilter, rowFilterParameter))
                                     MultiSelection.Add(cursor);
                                 cursor = cursor.AddRowIndex(1);
  
@@ -464,18 +464,21 @@ public partial class VeryFastTableView : Panel, IKeyboardNavigationHandler
             var rowsInGroup = Items[i].Rows.Count;
             if (i == cursor.GroupIndex)
                 rowsInGroup = cursor.RowIndex;
-            
+
             y += headerHeight;
-        
-            if (rowFilter == null)
-                y += rowsInGroup * RowHeight;
-            else
+            
+            if (Items[i].IsExpanded)
             {
-                for (var index = 0; index < rowsInGroup; index++)
+                if (rowFilter == null)
+                    y += rowsInGroup * RowHeight;
+                else
                 {
-                    var row = Items[i].Rows[index];
-                    if (IsFilteredRowVisible(row, rowFilter, rowFilterParameter))
-                        y += RowHeight;
+                    for (var index = 0; index < rowsInGroup; index++)
+                    {
+                        var row = Items[i].Rows[index];
+                        if (IsFilteredRowVisible(Items[i], row, rowFilter, rowFilterParameter))
+                            y += RowHeight;
+                    }
                 }
             }
         }

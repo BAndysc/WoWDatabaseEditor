@@ -36,15 +36,18 @@ public partial class VeryFastTableView
         foreach (var group in Items)
         {
             height += headerHeight;
-            if (rowFilter == null)
-                height += group.Rows.Count * RowHeight;
-            else
+            if (group.IsExpanded)
             {
-                foreach (var row in group.Rows)
+                if (rowFilter == null)
+                    height += group.Rows.Count * RowHeight;
+                else
                 {
-                    if (IsFilteredRowVisible(row, rowFilter, rowFilterParameter))
-                        height += RowHeight;
-                }
+                    foreach (var row in group.Rows)
+                    {
+                        if (IsFilteredRowVisible(group, row, rowFilter, rowFilterParameter))
+                            height += RowHeight;
+                    }
+                }  
             }
         }
 
@@ -56,16 +59,16 @@ public partial class VeryFastTableView
         return availableSize;
     }
 
-    private bool IsFilteredRowVisible(ITableRow row, IRowFilterPredicate? filter, object? parameter)
+    private bool IsFilteredRowVisible(ITableRowGroup group, ITableRow row, IRowFilterPredicate? filter, object? parameter)
     {
         if (filter == null)
-            return true;
+            return group.IsExpanded;
 
-        return filter.IsVisible(row, parameter);
+        return group.IsExpanded && filter.IsVisible(row, parameter);
     }
 
 
-    private bool IsFilteredRowVisible(ITableRow row) => IsFilteredRowVisible(row, RowFilter, RowFilterParameter);
+    private bool IsFilteredRowVisible(ITableRowGroup group, ITableRow row) => IsFilteredRowVisible(group, row, RowFilter, RowFilterParameter);
 
     public override void Render(DrawingContext context)
     {
@@ -100,7 +103,24 @@ public partial class VeryFastTableView
         foreach (var group in Items)
         {
             var groupStartY = y;
-            var groupHeight = (IsGroupingEnabled ? HeaderRowHeight : 0) + RowHeight * group.Rows.Count;
+            var groupHeight = (IsGroupingEnabled ? HeaderRowHeight : 0);
+            int visibleRowsCount = 0;
+            if (group.IsExpanded)
+            {
+                if (rowFiler == null)
+                {
+                    visibleRowsCount = group.Rows.Count;
+                }
+                else
+                {
+                    foreach (var row in group.Rows)
+                    {
+                        if (IsFilteredRowVisible(group, row, rowFiler, rowFilterParameter))
+                            visibleRowsCount++;
+                    }
+                }
+                groupHeight += visibleRowsCount * RowHeight;
+            }
             
             // out of bounds in the upper part
             if (groupStartY + groupHeight < DataViewport.Top)
@@ -121,7 +141,7 @@ public partial class VeryFastTableView
                 {
                     rowIndex += 1;
                     
-                    if (!IsFilteredRowVisible(row, rowFiler, rowFilterParameter))
+                    if (!IsFilteredRowVisible(group, row, rowFiler, rowFilterParameter))
                         continue;
                     
                     double x = 0;
@@ -320,15 +340,18 @@ public partial class VeryFastTableView
         {
             var groupStartY = y;
             var groupHeight = headerHeight;
-            
-            if (rowFilter == null) 
-                groupHeight += RowHeight * group.Rows.Count;
-            else
+
+            if (group.IsExpanded)
             {
-                foreach (var row in group.Rows)
+                if (rowFilter == null) 
+                    groupHeight += RowHeight * group.Rows.Count;
+                else
                 {
-                    if (IsFilteredRowVisible(row, rowFilter, rowFilterParameter))
-                        groupHeight += RowHeight;
+                    foreach (var row in group.Rows)
+                    {
+                        if (IsFilteredRowVisible(group, row, rowFilter, rowFilterParameter))
+                            groupHeight += RowHeight;
+                    }
                 }
             }
 
@@ -343,7 +366,7 @@ public partial class VeryFastTableView
                 {
                     rowIndex++;
 
-                    if (!IsFilteredRowVisible(row, rowFilter, rowFilterParameter))
+                    if (!IsFilteredRowVisible(group, row, rowFilter, rowFilterParameter))
                         continue;
                     
                     var rowEnd = y + RowHeight;

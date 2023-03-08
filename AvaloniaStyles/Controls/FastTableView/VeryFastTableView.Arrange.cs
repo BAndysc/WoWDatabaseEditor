@@ -27,13 +27,16 @@ public partial class VeryFastTableView
         {
             var headerRect = new Rect(viewPort.X, y, viewPort.Width, HeaderRowHeight);
             var groupHeight = HeaderRowHeight;
-            if (rowFilter == null)
-                groupHeight += group.Rows.Count * RowHeight;
-            else
+            if (group.IsExpanded)
             {
-                foreach (var row in group.Rows)
-                    if (IsFilteredRowVisible(row, rowFilter, rowFilterParameter))
-                        groupHeight += RowHeight;
+                if (rowFilter == null)
+                    groupHeight += group.Rows.Count * RowHeight;
+                else
+                {
+                    foreach (var row in group.Rows)
+                        if (IsFilteredRowVisible(group, row, rowFilter, rowFilterParameter))
+                            groupHeight += RowHeight;
+                }   
             }
             var groupRect = new Rect(0, y, finalSize.Width, groupHeight);
 

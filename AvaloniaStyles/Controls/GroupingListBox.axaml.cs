@@ -43,6 +43,19 @@ namespace AvaloniaStyles.Controls
             get => customContent;
             set => SetAndRaise(CustomContentProperty, ref customContent, value);
         }
+        
+        public static readonly DirectProperty<GroupingHeader, IControl?> CustomRightContentProperty =
+            AvaloniaProperty.RegisterDirect<GroupingHeader, IControl?>(
+                nameof(CustomRightContent),
+                o => o.CustomRightContent,
+                (o, v) => o.CustomRightContent = v);
+
+        private IControl? customRightContent;
+        public IControl? CustomRightContent
+        {
+            get => customRightContent;
+            set => SetAndRaise(CustomRightContentProperty, ref customRightContent, value);
+        }
     }
     
     // yes, this implementation is quite dirty

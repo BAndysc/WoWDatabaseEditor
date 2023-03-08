@@ -1,16 +1,29 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using AvaloniaStyles.Controls.FastTableView;
 using WDE.Common.Services;
 using WDE.DatabaseEditors.Models;
 
 namespace WDE.DatabaseEditors.ViewModels.MultiRow
 {
-    public class DatabaseEntitiesGroupViewModel : CustomObservableCollection<DatabaseEntityViewModel>, ITableRowGroup
+    public partial class DatabaseEntitiesGroupViewModel : CustomObservableCollection<DatabaseEntityViewModel>, ITableRowGroup
     {
+        private bool isExpanded = true;
         public DatabaseKey Key { get; }
         public string Name { get; }
+        
+        public bool IsExpanded
+        {
+            get => isExpanded;
+            set
+            {
+                isExpanded = value;
+                RowsChanged?.Invoke(this);
+                OnPropertyChanged(new PropertyChangedEventArgs(nameof(IsExpanded)));
+            }
+        }
 
         public DatabaseEntitiesGroupViewModel(DatabaseKey key, string name)
         {

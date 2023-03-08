@@ -10,6 +10,7 @@ namespace AvaloniaStyles.Controls.FastTableView;
 
 public interface ITableRowGroup
 {
+    public bool IsExpanded => true;
     public IReadOnlyList<ITableRow> Rows { get; }
     event Action<ITableRowGroup, ITableRow>? RowChanged;
     event Action<ITableRowGroup>? RowsChanged;
