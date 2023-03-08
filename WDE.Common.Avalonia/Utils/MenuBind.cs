@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Reactive.Disposables;
 using System.Reflection;
 using System.Windows.Input;
 using Avalonia;
@@ -10,6 +11,7 @@ using Avalonia.LogicalTree;
 using AvaloniaEdit;
 using AvaloniaEdit.Editing;
 using Prism.Commands;
+using WDE.Common.Avalonia.Components;
 using WDE.Common.Avalonia.Controls;
 using WDE.Common.Menu;
 using WDE.Common.Utils;
@@ -20,6 +22,22 @@ namespace WDE.Common.Avalonia.Utils
 {
     public static class MenuBind
     {
+        public static readonly AvaloniaProperty IconProperty = AvaloniaProperty.RegisterAttached<MenuItem, string?>("Icon",
+            typeof(MenuBind));
+        public static string? GetIcon(MenuItem control) => (string?)control.GetValue(IconProperty);
+        public static void SetIcon(MenuItem control, string? value) => control.SetValue(IconProperty, value);
+        private static IDisposable iconSubscription;
+        static MenuBind()
+        {
+            iconSubscription = IconProperty.Changed.SubscribeAction(args =>
+            {
+                var menuItem = (MenuItem)args.Sender!;
+                var newIcon = (string?)args.NewValue;
+                if (newIcon != null)
+                    menuItem.Icon = new WdeImage() { ImageUri = newIcon };
+            });
+        }
+
         public static readonly AvaloniaProperty MenuItemsProperty = AvaloniaProperty.RegisterAttached<NativeMenu, IList<IMainMenuItem>>("Model",
             typeof(MenuBind),coerce: OnMenuChanged);
         
