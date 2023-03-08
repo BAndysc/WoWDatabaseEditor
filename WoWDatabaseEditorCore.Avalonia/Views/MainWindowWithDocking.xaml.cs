@@ -85,7 +85,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
             
             // we have to do it before InitializeComponent!
             var primaryScreen = Screens.Primary ?? Screens.All.FirstOrDefault();
-            GlobalApplication.HighDpi = (primaryScreen?.PixelDensity ?? 1) > 1.5f;
+            GlobalApplication.HighDpi = true;// (primaryScreen?.PixelDensity ?? 1) > 1.5f; // enable hidpi res for everyone? check if it results in higher quality icons
             
             InitializeComponent();
             this.AttachDevTools();

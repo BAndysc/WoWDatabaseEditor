@@ -1,3 +1,4 @@
+using WDE.Common.CoreVersion;
 using WDE.Common.Database;
 using WDE.Common.Solution;
 using WDE.Common.Types;
@@ -7,6 +8,15 @@ namespace WDE.SmartScriptEditor
 {
     public abstract class SmartScriptIconBaseProvider<T> : ISolutionItemIconProvider<T> where T : ISmartScriptSolutionItem
     {
+        private readonly IDatabaseProvider databaseProvider;
+        private readonly ICurrentCoreVersion currentCoreVersion;
+
+        public SmartScriptIconBaseProvider(IDatabaseProvider databaseProvider, ICurrentCoreVersion currentCoreVersion)
+        {
+            this.databaseProvider = databaseProvider;
+            this.currentCoreVersion = currentCoreVersion;
+        }
+
         public virtual ImageUri GetIcon(T item)
         {
             switch (item.SmartType)
@@ -22,7 +32,19 @@ namespace WDE.SmartScriptEditor
                 case SmartScriptType.Gossip:
                     return new ImageUri("Icons/document.png");
                 case SmartScriptType.Quest:
-                    return new ImageUri("Icons/document_quest.png");
+                {
+                    var template = databaseProvider.GetQuestTemplate((uint)item.Entry);
+                    if (template != null && template.AllowableRaces != 0)
+                    {
+                        var onlyHorde = (template.AllowableRaces & ~ (CharacterRaces.AllHorde)) == 0;
+                        var onlyAlliance = (template.AllowableRaces & ~ (CharacterRaces.AllAlliance)) == 0;
+                        if (onlyHorde)
+                            return new ImageUri("Icons/document_quest_horde.png");
+                        if (onlyAlliance)
+                            return new ImageUri("Icons/document_quest_ally.png");
+                    }
+                    return new ImageUri("Icons/document_quest_2.png");
+                }
                 case SmartScriptType.Spell:
                     return new ImageUri("Icons/document_spell.png");
                 case SmartScriptType.Transport:
