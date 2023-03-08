@@ -218,20 +218,20 @@ namespace WDE.DatabaseEditors.ViewModels.Template
         {
             if (string.IsNullOrEmpty(text)) 
                 return _ => true;
-            var lower = text.ToLower();
+            var lower = text.ToLower().Trim();
             if (lower.Contains("||"))
             {
                 var parts = lower.Split("||").Select(a => a.Trim()).ToList();
                 return item =>
                 {
                     foreach (var p in parts)
-                        if (item.Name.ToLower().Contains(p))
+                        if (item.Name.Contains(p, StringComparison.OrdinalIgnoreCase))
                             return true;
                     return false;
                 };
             }
             else
-                return item => item.Name.ToLower().Contains(lower);
+                return item => item.Name.Contains(lower, StringComparison.OrdinalIgnoreCase);
         }
         
         private bool ContainsEntity(DatabaseEntity entity)

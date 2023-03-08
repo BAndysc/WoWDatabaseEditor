@@ -815,8 +815,8 @@ namespace WDE.DbcStore
                             var entry = new AreaEntry()
                             {
                                 Id = row.GetUInt(0),
-                                MapId = row.GetUInt(6),
-                                ParentAreaId = row.GetUInt(7),
+                                MapId = row.GetUInt(5),
+                                ParentAreaId = row.GetUInt(6),
                                 Flags1 = row.GetUInt(3, 0),
                                 Flags2 = row.GetUInt(3, 1),
                                 Name = row.GetString(2)

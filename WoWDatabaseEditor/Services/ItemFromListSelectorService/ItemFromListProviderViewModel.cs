@@ -55,7 +55,7 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
                     var result = new List<CheckableSelectOption<T>>();
                     
                     long searchNumber;
-                    var lowerSearchText = search.ToLower();
+                    var lowerSearchText = search.Trim().ToLower();
                     if (typeof(T) == typeof(long) && long.TryParse(search, out searchNumber))
                     {
                         foreach (var element in source)

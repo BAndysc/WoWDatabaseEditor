@@ -67,7 +67,7 @@ public partial class TabularDataPickerViewModel : ObservableBase, IDialog
     private void Filter(string text)
     {
         var selectedItem = SelectedItem;
-        if (string.IsNullOrEmpty(text))
+        if (string.IsNullOrWhiteSpace(text))
         {
             Items = allItems;
             RaisePropertyChanged(nameof(Items));
@@ -87,6 +87,7 @@ public partial class TabularDataPickerViewModel : ObservableBase, IDialog
         }
         
         List<object> filtered = new();
+        text = text.Trim();
         var numberFilter = long.TryParse(text, out var number);
         if (numberFilter && numberPredicate != null)
         {

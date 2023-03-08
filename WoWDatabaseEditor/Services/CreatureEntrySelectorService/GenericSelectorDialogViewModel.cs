@@ -32,8 +32,8 @@ namespace WoWDatabaseEditorCore.Services.CreatureEntrySelectorService
             {
                 if (string.IsNullOrEmpty(val))
                     return model => true;
-                var lowerCase = val.ToLower();
-                return model => index(model).ToLower().Contains(lowerCase);
+                var lowerCase = val.ToLower().Trim();
+                return model => index(model).Contains(lowerCase, StringComparison.InvariantCultureIgnoreCase);
             });
             items
                 .Connect()
