@@ -15,6 +15,12 @@ namespace WDE.CMMySqlDatabase.Models
 //         public string Name { get; set; } = "";
         [Column("Title"                                      )] public string  Name                   { get; set; } = ""; // text
 
+        [Column(Name = "MinLevel")]
+        public int MinLevel { get; set; }
+
+        [Column(Name = "QuestSortID")]
+        public int QuestSortId { get; set; }
+        
 //         [Column(Name="AllowableRaces")]
 //         public CharacterRaces AllowableRaces { get; set; }
         //[Column("RequiredRaces"                            )] public CharacterRaces AllowableRaces   { get; set; } // smallint(5) unsigned

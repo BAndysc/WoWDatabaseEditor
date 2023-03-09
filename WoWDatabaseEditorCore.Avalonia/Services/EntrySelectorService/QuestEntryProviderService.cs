@@ -1,12 +1,16 @@
+using System;
 using System.Threading.Tasks;
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using Avalonia.Data;
+using Avalonia.Data.Converters;
 using Avalonia.Layout;
 using WDE.Common;
 using WDE.Common.Avalonia.Controls;
 using WDE.Common.Collections;
 using WDE.Common.Database;
+using WDE.Common.Parameters;
 using WDE.Common.TableData;
 using WDE.Common.Utils;
 using WDE.Module.Attributes;
@@ -18,15 +22,30 @@ public class QuestEntryProviderService : IQuestEntryProviderService
 {
     private readonly ITabularDataPicker tabularDataPicker;
     private readonly IDatabaseProvider database;
+    private readonly IParameterFactory parameterFactory;
 
-    public QuestEntryProviderService(ITabularDataPicker tabularDataPicker, IDatabaseProvider database)
+    public QuestEntryProviderService(ITabularDataPicker tabularDataPicker,
+        IDatabaseProvider database,
+        IParameterFactory parameterFactory)
     {
         this.tabularDataPicker = tabularDataPicker;
         this.database = database;
+        this.parameterFactory = parameterFactory;
     }
 
     public async Task<uint?> GetEntryFromService(uint? questId = null)
     {
+        var questSortParameter = parameterFactory.Factory("ZoneOrQuestSortParameter");
+
+        var questSortConverter = new FuncValueConverter<int, string>(id =>
+        {
+            if (id == 0)
+                return "";
+            if (questSortParameter.Items?.TryGetValue(id, out var item) == true)
+                return item.Name;
+            return id.ToString();
+        });
+        
         var templates = database.GetQuestTemplates();
         var index = questId.HasValue ? templates.IndexIf(t => t.Entry == questId) : -1;
         var result = await tabularDataPicker.PickRow(new TabularDataBuilder<IQuestTemplate>()
@@ -43,6 +62,12 @@ public class QuestEntryProviderService : IQuestEntryProviderService
                         Spacing = 2,
                         Mode = GameTeamImageMode.MustContainAny,
                         IgnoreIfBoth = true
+                    })),
+                new TabularDataColumn(nameof(IQuestTemplate.MinLevel), "Min level", 36, new FuncDataTemplate(_ => true,
+                    (_, _) => new TextBlock()
+                    {
+                        [!TextBlock.TextProperty] = new Binding(nameof(IQuestTemplate.MinLevel)){StringFormat = "[{0}]"},
+                        VerticalAlignment = VerticalAlignment.Center
                     })),
                 new TabularDataColumn(nameof(IQuestTemplate.Name), "Title", 200),
                 new TabularDataColumn(nameof(IQuestTemplate.AllowableClasses), "Classes", 110, new FuncDataTemplate(_ => true,
@@ -63,7 +88,21 @@ public class QuestEntryProviderService : IQuestEntryProviderService
                         Margin = new Thickness(2),
                         Spacing = 2,
                         IgnoreIfAllPerTeam = true
+                    })),
+                new TabularDataColumn(nameof(IQuestTemplate.QuestSortId), "Zone", 150, new FuncDataTemplate(_ => true,
+                    (_, _) => new TextBlock()
+                    {
+                        [!TextBlock.TextProperty] = new Binding(nameof(IQuestTemplate.QuestSortId)){Converter = questSortConverter},
+                        VerticalAlignment = VerticalAlignment.Center
                     })))
+            .SetFilter((template, filter) =>
+            {
+                if (template.Entry.Contains(filter))
+                    return true;
+                if (template.Name?.Contains(filter, StringComparison.OrdinalIgnoreCase) ?? false)
+                    return true;
+                return false;
+            })
             .Build(), index);
         return result?.Entry;
     }

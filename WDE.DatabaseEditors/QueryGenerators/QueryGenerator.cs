@@ -261,7 +261,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
                     if (isMainTable)
                     {
                         if (tableData.TableDefinition.AutofillBuildColumn is { } autofillBuildColumn)
-                            cells[autofillBuildColumn] = currentCoreVersion.Current.Version;
+                            cells[autofillBuildColumn] = currentCoreVersion.Current.Version.Build;
                     }
                     else
                     {
@@ -276,7 +276,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
                         foreach (var old in cells)
                             newCells[old.Key] = old.Value;
                         if (foreignTableDefinition.AutofillBuildColumn is { } autofillBuildColumn)
-                            newCells[autofillBuildColumn] = currentCoreVersion.Current.Version;
+                            newCells[autofillBuildColumn] = currentCoreVersion.Current.Version.Build;
                         cells = newCells;
                     }
 
@@ -537,7 +537,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
                         update = update.Set(updates[i].FieldName, FixUnixTimestampAndNullability(definition.TableColumns[updates[i].FieldName], updates[i].Object));
 
                     if (autoFillBuildColumn != null)
-                        update = update.Set(autoFillBuildColumn, currentCoreVersion.Current.Version);
+                        update = update.Set(autoFillBuildColumn, currentCoreVersion.Current.Version.Build);
                     
                     update.Update();
                 }
@@ -560,7 +560,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
                     {
                         var cells = table.Value.ToDictionary(t => t.FieldName, t => t.Object);
                         if (definition.AutofillBuildColumn is {} autofillBuildColumn)
-                            cells[autofillBuildColumn] = currentCoreVersion.Current.Version;
+                            cells[autofillBuildColumn] = currentCoreVersion.Current.Version.Build;
                         query.Table(table.Key)
                             .Insert(cells);
                     }
@@ -589,7 +589,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
                                 update = update.Set(updates[i].FieldName, FixUnixTimestampAndNullability(definition.TableColumns[updates[i].FieldName], updates[i].Object));
 
                             if (foreignTableDefinition.AutofillBuildColumn is { } autofillBuildColumn)
-                                update = update.Set(autofillBuildColumn, currentCoreVersion.Current.Version);
+                                update = update.Set(autofillBuildColumn, currentCoreVersion.Current.Version.Build);
 
                             update.Update();
                         }

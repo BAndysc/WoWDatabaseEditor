@@ -4,7 +4,9 @@
     {
         uint Entry { get; }
         string Name { get; }
-
+        int MinLevel { get; }
+        int QuestSortId { get; }
+        
         CharacterClasses AllowableClasses { get; }
         CharacterRaces AllowableRaces { get; }
         

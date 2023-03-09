@@ -16,6 +16,12 @@ namespace WDE.TrinityMySqlDatabase.Models
         [Column(Name = "LogTitle")]
         public string Name { get; set; } = "";
 
+        [Column(Name = "MinLevel")]
+        public int MinLevel { get; set; }
+
+        [Column(Name = "QuestSortID")]
+        public int QuestSortId { get; set; }
+        
         public CharacterClasses AllowableClasses => addon == null ? CharacterClasses.None : (CharacterClasses)addon.AllowableClasses;
 
         [Column(Name="AllowableRaces")]
@@ -51,6 +57,12 @@ namespace WDE.TrinityMySqlDatabase.Models
         [Column(Name = "LogTitle")]
         public string Name { get; set; } = "";
 
+        [Column(Name = "MinLevel")]
+        public int MinLevel { get; set; }
+
+        [Column(Name = "QuestSortID")]
+        public int QuestSortId { get; set; }
+        
         public CharacterClasses AllowableClasses => addon == null ? CharacterClasses.None : (CharacterClasses)addon.AllowableClasses;
 
         public CharacterRaces AllowableRaces => addon?.AllowableRaces ?? CharacterRaces.All;
@@ -85,6 +97,12 @@ namespace WDE.TrinityMySqlDatabase.Models
         [Column(Name = "LogTitle")]
         public string Name { get; set; } = "";
 
+        [Column(Name = "MinLevel")]
+        public int MinLevel { get; set; }
+
+        [Column(Name = "QuestSortID")]
+        public int QuestSortId { get; set; }
+        
         public CharacterClasses AllowableClasses => addon == null ? CharacterClasses.None : (CharacterClasses)addon.AllowableClasses;
 
         public int BreadcrumbForQuestId => addon?.BreadcrumbForQuest ?? 0;
