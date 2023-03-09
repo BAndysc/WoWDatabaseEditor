@@ -22,7 +22,7 @@ public class CMangosTbcVersion : ICoreVersion, IDatabaseFeatures, ISmartScriptFe
     public bool SupportsRbac => false;
     public bool SupportsConditionTargetVictim => false;
     public PhasingType PhasingType => PhasingType.NoPhasing;
-    public int Build => 8606;
+    public GameVersion Version { get; } = new(2, 4, 3, 8606);
 
     public ISet<Type> UnsupportedTables { get; } = new HashSet<Type>{typeof(IAreaTriggerTemplate),
         typeof(IConversationTemplate),

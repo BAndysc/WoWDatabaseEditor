@@ -22,9 +22,25 @@ namespace WDE.Common.CoreVersion
         bool SupportsReverseCommands => false;
         bool SupportsEventScripts => false;
         PhasingType PhasingType { get; }
-        int Build { get; }
+        GameVersion Version { get; }
         // todo: this can be moved to settings as a configurable option
         IEnumerable<(string id, bool enabled)> TopBarQuickTableEditors => Array.Empty<(string, bool)>();
+    }
+
+    public struct GameVersion
+    {
+        public GameVersion(int major, int minor, int patch, int build)
+        {
+            Major = major;
+            Minor = minor;
+            Patch = patch;
+            Build = build;
+        }
+
+        public int Major { get; }
+        public int Minor { get; }
+        public int Patch { get; }
+        public int Build { get; }
     }
 
     public enum PhasingType

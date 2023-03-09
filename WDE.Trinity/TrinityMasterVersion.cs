@@ -19,8 +19,8 @@ namespace WDE.Trinity
         public IGameVersionFeatures GameVersionFeatures => this;
         public IDatabaseFeatures DatabaseFeatures => this;
         public IEventAiFeatures EventAiFeatures => this;
-        public PhasingType PhasingType => PhasingType.PhaseIds;
-        public int Build => 45745;
+        public PhasingType PhasingType => PhasingType.PhaseIds; 
+        public GameVersion Version { get; } = new(10, 0, 5, 48397);
 
         public ISet<Type> UnsupportedTables { get; } = new HashSet<Type>() {typeof(INpcText), typeof(ICreatureClassLevelStat), typeof(IBroadcastText)};
         public bool AlternativeTrinityDatabase => false;

@@ -25,7 +25,7 @@ namespace WoWDatabaseEditorCore.CoreVersion
         public bool AlternativeTrinityDatabase => false;
         public WaypointTables SupportedWaypoints => 0;
         public PhasingType PhasingType => PhasingType.PhaseIds;
-        public int Build => 0;
+        public GameVersion Version { get; } = default;
 
         public string TableName => "(null)";
         public string ConditionsFile => "SmartData/conditions.json";

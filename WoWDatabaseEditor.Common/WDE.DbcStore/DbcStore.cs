@@ -12,6 +12,7 @@ using WDE.Common.Database;
 using WDE.Common.DBC;
 using WDE.Common.DBC.Structs;
 using WDE.Common.Game;
+using WDE.Common.Managers;
 using WDE.Common.Parameters;
 using WDE.Common.Providers;
 using WDE.Common.Services;
@@ -68,6 +69,7 @@ namespace WDE.DbcStore
         private readonly IEventAggregator eventAggregator;
         private readonly ICurrentCoreVersion currentCoreVersion;
         private readonly ITabularDataPicker dataPicker;
+        private readonly IWindowManager windowManager;
         private readonly NullSpellService nullSpellService;
         private readonly CataSpellService cataSpellService;
         private readonly WrathSpellService wrathSpellService;
@@ -84,6 +86,7 @@ namespace WDE.DbcStore
             IEventAggregator eventAggregator,
             ICurrentCoreVersion currentCoreVersion,
             ITabularDataPicker dataPicker,
+            IWindowManager windowManager,
             NullSpellService nullSpellService,
             CataSpellService cataSpellService,
             WrathSpellService wrathSpellService,
@@ -98,6 +101,7 @@ namespace WDE.DbcStore
             this.eventAggregator = eventAggregator;
             this.currentCoreVersion = currentCoreVersion;
             this.dataPicker = dataPicker;
+            this.windowManager = windowManager;
             this.nullSpellService = nullSpellService;
             this.cataSpellService = cataSpellService;
             this.wrathSpellService = wrathSpellService;
@@ -234,6 +238,7 @@ namespace WDE.DbcStore
             public Dictionary<long, string> GarrisonTalentStore { get; internal set; } = new();
             public Dictionary<long, string> DifficultyStore { get; internal set; } = new();
             public Dictionary<long, string> LockTypeStore { get; internal set; } = new();
+            public Dictionary<long, string> VignetteStore { get; internal set; } = new();
             private List<(string parameter, Dictionary<long, SelectOption> options)> parametersToRegister = new();
             public List<AreaEntry> Areas { get; } = new();
             public List<MapEntry> Maps { get; } = new();
@@ -451,6 +456,9 @@ namespace WDE.DbcStore
                 parameterFactory.Register("GarrisonTalentParameter", new DbcParameter(GarrisonTalentStore));
                 parameterFactory.Register("DifficultyParameter", new DbcParameter(DifficultyStore));
                 parameterFactory.Register("LockTypeParameter", new DbcParameter(LockTypeStore));
+                parameterFactory.Register("VignetteParameter", new DbcParameterWowTools(VignetteStore, "vignette", store.currentCoreVersion, store.windowManager));
+                parameterFactory.Register("VehicleParameter", new WoWToolsParameter("vehicle", store.currentCoreVersion, store.windowManager));
+                parameterFactory.Register("LockParameter", new WoWToolsParameter("lock", store.currentCoreVersion, store.windowManager));
                 
                 parameterFactory.Register("ZoneAreaParameter", 
                     new DbcParameterWithPicker<IArea>(dataPicker, AreaStore, "zone or area", area => area.Id,
@@ -798,6 +806,7 @@ namespace WDE.DbcStore
                                 ItemDbcStore[id] = "Item " + id;
                         });
                         Load("LockType.dbc", 0, 1, LockTypeStore);
+                        Load("Vignette.dbc", 0, 1, VignetteStore);
                         LoadAndRegister("SpellCastTimes.dbc", "SpellCastTimeParameter", 0, row => GetCastTimeDescription(row.GetInt(1), row.GetInt(2), row.GetInt(3)));
                         LoadAndRegister("SpellDuration.dbc", "SpellDurationParameter", 0, row => GetDurationTimeDescription(row.GetInt(1), row.GetInt(2), row.GetInt(3)));
                         LoadAndRegister("SpellRange.dbc", "SpellRangeParameter", 0, 6);
@@ -936,6 +945,7 @@ namespace WDE.DbcStore
                         Load("BattlePetSpecies.db2", 8, 2, BattlePetSpeciesIdStore);
                         Load("BattlePetAbility.db2", 0, 1, BattlePetAbilityStore);
                         Load("Scenario.db2", 0, 1, ScenarioStore);
+                        Load("Vignette.db2", 0, 1, VignetteStore);
                         Load("GarrClassSpec.db2", 7, 0, GarrisonClassSpecStore);
                         Load("GarrTalent.db2", 7, 0, GarrisonTalentStore);
                         Load("GarrBuilding.db2", row =>
@@ -1269,6 +1279,60 @@ namespace WDE.DbcStore
         public bool AllowUnknownItems => true;
     }
 
+    public class WoWToolsParameter : Parameter, ICustomPickerParameter<long>
+    {
+        private readonly string dbcName;
+        private readonly IWindowManager windowManager;
+        private readonly string buildString;
+
+        public override bool HasItems => true;
+        public bool AllowUnknownItems => true;
+
+        public WoWToolsParameter(string dbcName, 
+            ICurrentCoreVersion currentCoreVersion, 
+            IWindowManager windowManager)
+        {
+            this.dbcName = dbcName;
+            this.windowManager = windowManager;
+            var version = currentCoreVersion.Current.Version;
+            var build = version.Build == 18414 ? 18273 : version.Build;
+            buildString = $"{version.Major}.{version.Minor}.{version.Patch}.{build}";
+        }
+        
+        public Task<(long, bool)> PickValue(long value)
+        {
+            windowManager.OpenUrl($"https://wow.tools/dbc/?dbc={dbcName}&build={buildString}#page=1&colFilter[0]=exact%3A{value}");
+            return Task.FromResult((0L, false));
+        }
+    }
+
+    public class DbcParameterWowTools : DbcParameter, ICustomPickerParameter<long>
+    {
+        private readonly string dbcName;
+        private readonly IWindowManager windowManager;
+        private readonly string buildString;
+        
+        public override bool HasItems => true;
+        
+        public DbcParameterWowTools(Dictionary<long, string> storage, 
+            string dbcName, 
+            ICurrentCoreVersion currentCoreVersion, 
+            IWindowManager windowManager) : base(storage)
+        {
+            this.dbcName = dbcName;
+            this.windowManager = windowManager;
+            var version = currentCoreVersion.Current.Version;
+            var build = version.Build == 18414 ? 18273 : version.Build;
+            buildString = $"{version.Major}.{version.Minor}.{version.Patch}.{build}";
+        }
+        
+        public Task<(long, bool)> PickValue(long value)
+        {
+            windowManager.OpenUrl($"https://wow.tools/dbc/?dbc={dbcName}&build={buildString}#page=1&colFilter[0]=exact%3A{value}");
+            return Task.FromResult((0L, false));
+        }
+    }
+    
     public class DbcParameterWithPicker<T> : DbcParameter, ICustomPickerParameter<long>
     {
         private readonly ITabularDataPicker dataPicker;

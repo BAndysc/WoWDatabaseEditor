@@ -22,7 +22,7 @@ public class CMangosWrathVersion : ICoreVersion, IDatabaseFeatures, ISmartScript
     public bool SupportsRbac => false;
     public bool SupportsConditionTargetVictim => false;
     public PhasingType PhasingType => PhasingType.PhaseMasks;
-    public int Build => 12340;
+    public GameVersion Version { get; } = new(3, 3, 5, 12340);
 
     public ISet<Type> UnsupportedTables { get; } = new HashSet<Type>{typeof(IAreaTriggerTemplate),
         typeof(IConversationTemplate),

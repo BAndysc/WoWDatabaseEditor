@@ -20,7 +20,7 @@ namespace WDE.Trinity
         public IDatabaseFeatures DatabaseFeatures => this;
         public IEventAiFeatures EventAiFeatures => this;
         public PhasingType PhasingType => PhasingType.PhaseMasks;
-        public int Build => 12340;
+        public GameVersion Version { get; } = new(3, 3, 5, 12340);
 
         public ISet<Type> UnsupportedTables { get; } = new HashSet<Type>{typeof(IAreaTriggerTemplate), typeof(IConversationTemplate), typeof(ISceneTemplate), typeof(IAreaTriggerCreateProperties)};
         public bool AlternativeTrinityDatabase => false;
