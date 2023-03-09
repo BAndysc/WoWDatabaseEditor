@@ -354,6 +354,14 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
 
             OnlyGroup = new List<ITableRowGroup>() { new FakeGroup(Rows) };
             
+            KeyBindings.Add(new CommandKeyBinding(new DelegateCommand(() =>
+            {
+                for (int i = 0, count = Entities.Count; i < count; i++)
+                {
+                    MultiSelection.Add(new VerticalCursor(0, i));
+                }
+            }), "Ctrl+A"));
+            
             ScheduleLoading();
         }
 

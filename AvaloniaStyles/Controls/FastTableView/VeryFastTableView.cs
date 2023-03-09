@@ -63,6 +63,10 @@ public partial class VeryFastTableView : Panel, IKeyboardNavigationHandler
         {
             view.Rebind(e.OldValue as IReadOnlyList<ITableRowGroup>, e.NewValue as IReadOnlyList<ITableRowGroup>);
         });
+        MultiSelectionProperty.Changed.AddClassHandler<VeryFastTableView>((view, e) =>
+        {
+            view.Rebind(e.OldValue as ITableMultiSelection, e.NewValue as ITableMultiSelection);
+        });
         HiddenColumnsProperty.Changed.AddClassHandler<VeryFastTableView>((view, e) =>
         {
             view.RebindHiddenColumns(e.OldValue as IReadOnlyList<int>, e.NewValue as IReadOnlyList<int>);

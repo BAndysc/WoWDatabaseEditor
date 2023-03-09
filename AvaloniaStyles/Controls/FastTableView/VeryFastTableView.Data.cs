@@ -9,6 +9,15 @@ namespace AvaloniaStyles.Controls.FastTableView;
 
 public partial class VeryFastTableView
 {
+    private void Rebind(ITableMultiSelection? old, ITableMultiSelection? @new)
+    {
+        if (old != null)
+            old.SelectionChanged -= InvalidateVisual;
+        if (@new != null)
+            @new.SelectionChanged += InvalidateVisual;
+        InvalidateVisual();
+    }
+    
     private void Rebind(IReadOnlyList<ITableRowGroup>? old, IReadOnlyList<ITableRowGroup>? @new)
     {
         if (old != null)
