@@ -279,7 +279,7 @@ namespace WDE.TrinityMySqlDatabase.Database
 
         public abstract Task<IList<IGameObject>> GetGameObjectsAsync();
 
-        public abstract IEnumerable<IQuestTemplate> GetQuestTemplates();
+        public abstract IReadOnlyList<IQuestTemplate> GetQuestTemplates();
         
         public virtual async Task<IList<IQuestObjective>> GetQuestObjectives(uint questId) => new List<IQuestObjective>();
 

@@ -241,7 +241,7 @@ public class AzerothhMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvider<Az
             select t.SetAddon(subaddon));
     }
         
-    public override IEnumerable<IQuestTemplate> GetQuestTemplates()
+    public override IReadOnlyList<IQuestTemplate> GetQuestTemplates()
     {
         using var model = Database();
 

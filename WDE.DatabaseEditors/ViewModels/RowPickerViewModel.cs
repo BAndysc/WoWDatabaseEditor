@@ -13,6 +13,7 @@ using WDE.Common.Services.MessageBox;
 using WDE.Common.Sessions;
 using WDE.Common.Solution;
 using WDE.Common.Tasks;
+using WDE.Common.Types;
 using WDE.Common.Utils;
 using WDE.DatabaseEditors.Models;
 using WDE.DatabaseEditors.QueryGenerators;
@@ -23,7 +24,7 @@ using WDE.SqlQueryGenerator;
 
 namespace WDE.DatabaseEditors.ViewModels;
 
-public class RowPickerViewModel : ObservableBase, IDialog, IClosableDialog
+public class RowPickerViewModel : ObservableBase, IDialog, IWindowViewModel, IClosableDialog
 {
     private readonly ViewModelBase baseViewModel;
     private readonly ISolutionItemEditorRegistry solutionItemEditorRegistry;
@@ -128,6 +129,7 @@ public class RowPickerViewModel : ObservableBase, IDialog, IClosableDialog
 
     public int DesiredWidth => 900;
     public int DesiredHeight => 600;
+    public ImageUri? Icon => baseViewModel.Icon;
     public string Title
     {
         get

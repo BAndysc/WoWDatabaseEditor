@@ -153,10 +153,10 @@ namespace WDE.TrinitySmartScriptEditor
 
         public override async Task<ISolutionItem?> CreateSolutionItem()
         {
-            int? entry = await service.Value.GetEntryFromService();
+            uint? entry = await service.Value.GetEntryFromService();
             if (!entry.HasValue)
                 return null;
-            return new SmartScriptSolutionItem(entry.Value, SmartScriptType.Quest);
+            return new SmartScriptSolutionItem((int)entry.Value, SmartScriptType.Quest);
         }
     }
 

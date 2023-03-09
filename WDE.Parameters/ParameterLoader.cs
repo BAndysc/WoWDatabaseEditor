@@ -6,12 +6,15 @@ using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Prism.Events;
+using WDE.Common;
+using WDE.Common.Collections;
 using WDE.Common.Database;
 using WDE.Common.Events;
 using WDE.Common.Managers;
 using WDE.Common.Parameters;
 using WDE.Common.Providers;
 using WDE.Common.Services;
+using WDE.Common.TableData;
 using WDE.Common.Utils;
 using WDE.MVVM.Observable;
 using WDE.Parameters.Models;
@@ -30,6 +33,8 @@ namespace WDE.Parameters
         private readonly IItemFromListProvider itemFromListProvider;
         private readonly IEventAggregator eventAggregator;
         private readonly ILoadingEventAggregator loadingEventAggregator;
+        private readonly ITabularDataPicker tabularDataPicker;
+        private readonly IQuestEntryProviderService questEntryProviderService;
         private readonly Lazy<IWindowManager> windowManager;
         private readonly IQuickAccessRegisteredParameters quickAccessRegisteredParameters;
 
@@ -42,6 +47,8 @@ namespace WDE.Parameters
             IItemFromListProvider itemFromListProvider,
             IEventAggregator eventAggregator,
             ILoadingEventAggregator loadingEventAggregator,
+            ITabularDataPicker tabularDataPicker,
+            IQuestEntryProviderService questEntryProviderService,
             Lazy<IWindowManager> windowManager,
             IQuickAccessRegisteredParameters quickAccessRegisteredParameters)
         {
@@ -51,6 +58,8 @@ namespace WDE.Parameters
             this.itemFromListProvider = itemFromListProvider;
             this.eventAggregator = eventAggregator;
             this.loadingEventAggregator = loadingEventAggregator;
+            this.tabularDataPicker = tabularDataPicker;
+            this.questEntryProviderService = questEntryProviderService;
             this.windowManager = windowManager;
             this.quickAccessRegisteredParameters = quickAccessRegisteredParameters;
         }
@@ -99,7 +108,7 @@ namespace WDE.Parameters
             factory.Register("CreatureParameter", AddDatabaseParameter(new CreatureParameter(database, serverIntegration)), QuickAccessMode.Limited);
             factory.Register("CreatureGameobjectNameParameter", AddDatabaseParameter(new CreatureGameobjectNameParameter(database)));
             factory.Register("CreatureGameobjectParameter", AddDatabaseParameter(new CreatureGameobjectParameter(database)));
-            factory.Register("QuestParameter", AddDatabaseParameter(new QuestParameter(database)), QuickAccessMode.Limited);
+            factory.Register("QuestParameter", AddDatabaseParameter(new QuestParameter(database, questEntryProviderService)), QuickAccessMode.Limited);
             factory.Register("PrevQuestParameter", AddDatabaseParameter(new PrevQuestParameter(database)));
             factory.Register("GameobjectParameter", AddDatabaseParameter(new GameobjectParameter(database, serverIntegration, itemFromListProvider)), QuickAccessMode.Limited);
             factory.Register("GossipMenuParameter", AddDatabaseParameter(new GossipMenuParameter(database)));
@@ -325,7 +334,7 @@ namespace WDE.Parameters
 
         public async Task<(long, bool)> PickValue(long value)
         {
-            var dialog = new UnixTimestampEditorViewModel();
+            using var dialog = new UnixTimestampEditorViewModel();
             dialog.DateTime = AsDateTime(value).UtcDateTime;
             dialog.MinDate = dialog.MinDate.AddSeconds(startOffset);
             dialog.MaxDate = dialog.MaxDate.AddSeconds(-startOffset);
@@ -507,13 +516,15 @@ namespace WDE.Parameters
         public void Reload() => LateLoad();
     }
     
-    public class QuestParameter : LateLoadParameter
+    public class QuestParameter : LateLoadParameter, ICustomPickerParameter<long>
     {
         private readonly IDatabaseProvider database;
+        private readonly IQuestEntryProviderService questEntryProvider;
 
-        public QuestParameter(IDatabaseProvider database)
+        public QuestParameter(IDatabaseProvider database, IQuestEntryProviderService questEntryProvider)
         {
             this.database = database;
+            this.questEntryProvider = questEntryProvider;
         }
 
         public override void LateLoad()
@@ -521,6 +532,12 @@ namespace WDE.Parameters
             Items = new Dictionary<long, SelectOption>();
             foreach (IQuestTemplate item in database.GetQuestTemplates())
                 Items.Add(item.Entry, new SelectOption(item.Name ?? "Quest " + item.Entry));
+        }
+
+        public async Task<(long, bool)> PickValue(long value)
+        {
+            var result = await questEntryProvider.GetEntryFromService((uint)value);
+            return (result ?? 0, result.HasValue);
         }
     }
     

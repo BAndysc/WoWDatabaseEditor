@@ -239,7 +239,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             return nonCachedDatabase.GetGameObjects();
         }
 
-        public IEnumerable<IQuestTemplate> GetQuestTemplates()
+        public IReadOnlyList<IQuestTemplate> GetQuestTemplates()
         {
             if (questTemplateCache != null)
                 return questTemplateCache;

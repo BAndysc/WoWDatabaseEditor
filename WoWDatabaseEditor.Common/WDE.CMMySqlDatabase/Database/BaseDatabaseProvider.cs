@@ -230,7 +230,7 @@ namespace WDE.CMMySqlDatabase.Database
                 select t;
         }
         
-        public virtual IEnumerable<IQuestTemplate> GetQuestTemplates()
+        public virtual IReadOnlyList<IQuestTemplate> GetQuestTemplates()
         {
             using var model = Database();
 

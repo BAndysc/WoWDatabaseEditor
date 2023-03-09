@@ -25,7 +25,7 @@ namespace WDE.Common.Database
         IEnumerable<ICreatureClassLevelStat> GetCreatureClassLevelStats();
 
         IQuestTemplate? GetQuestTemplate(uint entry);
-        IEnumerable<IQuestTemplate> GetQuestTemplates();
+        IReadOnlyList<IQuestTemplate> GetQuestTemplates();
         Task<IList<IQuestObjective>> GetQuestObjectives(uint questId);
         Task<IQuestObjective?> GetQuestObjective(uint questId, int storageIndex);
         Task<IQuestObjective?> GetQuestObjectiveById(uint objectiveId);

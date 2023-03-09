@@ -35,22 +35,32 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
             //(Content as IInputElement)?.Focus();
         }
 
+        private IDialog? boundDialog;
+        
         protected override void OnDataContextChanged(EventArgs e)
         {
             base.OnDataContextChanged(e);
+            if (boundDialog != null)
+            {
+                boundDialog.CloseCancel -= DialogWindowOnCloseCancel;
+                boundDialog.CloseOk -= DialogWindowOnCloseOk;
+                boundDialog = null;
+            }
             if (DataContext is IDialog dialogWindow)
             {
                 dialogWindow.CloseCancel += DialogWindowOnCloseCancel;
                 dialogWindow.CloseOk += DialogWindowOnCloseOk;
+                boundDialog = dialogWindow;
             }
         }
 
         protected override void OnClosed(EventArgs e)
         {
-            if (DataContext is IDialog dialogWindow)
+            if (boundDialog != null)
             {
-                dialogWindow.CloseCancel -= DialogWindowOnCloseCancel;
-                dialogWindow.CloseOk -= DialogWindowOnCloseOk;
+                boundDialog.CloseCancel -= DialogWindowOnCloseCancel;
+                boundDialog.CloseOk -= DialogWindowOnCloseOk;
+                boundDialog = null;
             }
             base.OnClosed(e);
         }

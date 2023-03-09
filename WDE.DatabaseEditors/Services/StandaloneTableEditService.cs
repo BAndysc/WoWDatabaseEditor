@@ -23,7 +23,7 @@ public class StandaloneTableEditService : IStandaloneTableEditService
     private readonly IWindowManager windowManager;
     private readonly IContainerProvider containerProvider;
     private readonly ITableDefinitionProvider definitionProvider;
-    private Dictionary<string, IAbstractWindow> openedWindows = new();
+    private Dictionary<string, IAbstractWindowView> openedWindows = new();
 
     public StandaloneTableEditService(IWindowManager windowManager,
         ITableOpenService tableOpenService,
@@ -73,7 +73,7 @@ public class StandaloneTableEditService : IStandaloneTableEditService
         WindowLifetimeTask(table, window, task).ListenErrors();
     }
 
-    private async Task WindowLifetimeTask(string table, IAbstractWindow window, Task lifetime)
+    private async Task WindowLifetimeTask(string table, IAbstractWindowView window, Task lifetime)
     {
         await lifetime;
         openedWindows.Remove(table);

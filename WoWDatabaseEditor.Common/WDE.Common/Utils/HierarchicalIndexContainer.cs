@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using WDE.Common.Disposables;
 
 namespace WDE.Common.Utils;
 
@@ -110,6 +111,8 @@ public interface ITableMultiSelection
     ITableEfficientContainsIterator ContainsIterator { get; }
     bool MoreThanOne { get; }
     bool Empty { get; }
+    event Action? SelectionChanged;
+    IDisposable PauseNotifications();
 }
 
 public interface ITableEfficientContainsIterator : System.IDisposable
@@ -132,12 +135,16 @@ public class TableMultiSelection : ITableMultiSelection
     public void Add(VerticalCursor index)
     {
         GroupContainer(index).Add(index.RowIndex);
+        Notify();
     }
 
     public void Remove(VerticalCursor index)
     {
         if (perGroupContainer.ContainsKey(index.GroupIndex))
+        {
             GroupContainer(index).Remove(index.RowIndex);
+            Notify();
+        }
     }
 
     public bool Contains(VerticalCursor index)
@@ -150,6 +157,7 @@ public class TableMultiSelection : ITableMultiSelection
     public void Clear()
     {
         perGroupContainer.Clear();
+        Notify();
     }
 
     public IEnumerable<VerticalCursor> All()
@@ -175,6 +183,34 @@ public class TableMultiSelection : ITableMultiSelection
     public bool MoreThanOne => All().Count() > 1;
 
     public bool Empty => perGroupContainer.Count == 0 || perGroupContainer.All(g => g.Value.Empty);
+    public event Action? SelectionChanged;
+    private bool pendingNotification;
+    private int notificationsBlockedStack = 0;
+    
+    public IDisposable PauseNotifications()
+    {
+        notificationsBlockedStack++;
+        bool disposed = false;
+        return new ActionDisposable(() =>
+        {
+            if (disposed)
+                return;
+            disposed = true;
+            notificationsBlockedStack--;
+            if (notificationsBlockedStack == 0 && pendingNotification)
+                SelectionChanged?.Invoke();
+        });
+    }
+
+    private void Notify()
+    {
+        if (notificationsBlockedStack > 0)
+        {
+            pendingNotification = true;
+            return;
+        }
+        SelectionChanged?.Invoke();
+    }
 
     private class TableEfficientContainsIterator : ITableEfficientContainsIterator
     {

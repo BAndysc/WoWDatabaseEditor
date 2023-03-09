@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Templates;
 using Avalonia.Data;
 using AvaloniaStyles.Controls;
 using WDE.Common.Types;
@@ -46,7 +47,8 @@ namespace WDE.Common.Avalonia.Utils
                     Name = col.HeaderText,
                     Property = col.DisplayMember,
                     PreferedWidth = (int) (col.PreferredWidth ?? 100),
-                    Checkable = col.CheckboxMember
+                    Checkable = col.CheckboxMember,
+                    DataTemplate = col.DataTemplate as IDataTemplate
                 }).ToList();
                 if (o is GridView gridView)
                     gridView.Columns = columns;

@@ -6,7 +6,7 @@ namespace WDE.Common.Managers
     [UniqueProvider]
     public interface IWindowManager
     {
-        IAbstractWindow ShowWindow(IDialog viewModel, out Task task);
+        IAbstractWindowView ShowWindow(IWindowViewModel viewModel, out Task task);
         
         Task<bool> ShowDialog(IDialog viewModel);
 
@@ -21,7 +21,7 @@ namespace WDE.Common.Managers
         void Activate();
     }
 
-    public interface IAbstractWindow
+    public interface IAbstractWindowView
     {
         void Activate();
     }

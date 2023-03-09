@@ -16,9 +16,9 @@ public class TabularDataPicker : ITabularDataPicker
         this.windowManager = windowManager;
     }
     
-    public async Task<T?> PickRow<T>(ITabularDataArgs<T> args)
+    public async Task<T?> PickRow<T>(ITabularDataArgs<T> args, int defaultSelection)
     {
-        var viewModel = new TabularDataPickerViewModel(args.AsObject());
+        using var viewModel = new TabularDataPickerViewModel(args.AsObject(), defaultSelection);
         await windowManager.ShowDialog(viewModel);
         return viewModel.SelectedItem == null ? default : (T)viewModel.SelectedItem;
     }

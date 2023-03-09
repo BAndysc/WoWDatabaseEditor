@@ -9,6 +9,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.VisualTree;
+using WDE.Common.Avalonia.Components;
 using WDE.Common.Avalonia.Utils;
 using WDE.Common.Managers;
 using WDE.Module.Attributes;
@@ -30,7 +31,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
             this.mainWindowHolder = mainWindowHolder;
         }
 
-        private class WindowWrapper : IAbstractWindow
+        private class WindowWrapper : IAbstractWindowView
         {
             private readonly WeakReference<Window> window;
 
@@ -46,7 +47,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
             }
         }
 
-        public IAbstractWindow ShowWindow(IDialog viewModel, out Task task)
+        public IAbstractWindowView ShowWindow(IWindowViewModel viewModel, out Task task)
         {
             try
             {
@@ -65,6 +66,15 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
                 view.DataContext = viewModel;
                 view.ShowInTaskbar = true;
                 view.ShowActivated = true;
+                if (viewModel.Icon.HasValue)
+                {
+                    var bitmap = WdeImage.LoadBitmap(viewModel.Icon.Value);
+                    if (bitmap != null)
+                    {
+                        view.Icon = new WindowIcon(bitmap);
+                        view.ManagedIcon = bitmap;
+                    }
+                }
                 view.Tag = taskCompletionSource;
                 view.Closed += StandaloneWindowClosed;
                 view.WindowStartupLocation = WindowStartupLocation.CenterScreen;

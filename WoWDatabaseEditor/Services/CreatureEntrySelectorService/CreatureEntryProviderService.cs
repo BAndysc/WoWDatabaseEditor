@@ -75,21 +75,6 @@ namespace WoWDatabaseEditorCore.Services.CreatureEntrySelectorService
         }
     }
 
-    public class QuestEntryProviderService : GenericDatabaseProviderService<IQuestTemplate>, IQuestEntryProviderService
-    {
-        private readonly IDatabaseProvider database;
-
-        public QuestEntryProviderService(IWindowManager windowManager, IDatabaseProvider database) : base(windowManager, t => (int)t.Entry, t => t.Name + " " + t.Entry)
-        {
-            this.database = database;
-        }
-
-        protected override IEnumerable<IQuestTemplate> GetList()
-        {
-            return database.GetQuestTemplates().OrderBy(template => template.Entry);
-        }
-    }
-
     public class SpellMiniEntry
     {
         public SpellMiniEntry(uint entry, string name)

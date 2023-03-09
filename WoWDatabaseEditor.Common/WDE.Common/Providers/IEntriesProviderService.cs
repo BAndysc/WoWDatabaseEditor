@@ -18,7 +18,7 @@ namespace WDE.Common
     [UniqueProvider]
     public interface IQuestEntryProviderService
     {
-        Task<int?> GetEntryFromService();
+        Task<uint?> GetEntryFromService(uint? questId = null);
     }
 
     [UniqueProvider]

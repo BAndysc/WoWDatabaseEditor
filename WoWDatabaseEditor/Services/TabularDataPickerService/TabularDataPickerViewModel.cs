@@ -39,16 +39,22 @@ public partial class TabularDataPickerViewModel : ObservableBase, IDialog
     
     public object? SelectedItem => selectedIndex >= 0 && selectedIndex < Items.Count ? Items[selectedIndex] : null;
 
-    public TabularDataPickerViewModel(ITabularDataArgs<object> args)
+    public TabularDataPickerViewModel(ITabularDataArgs<object> args, int defaultSelection = -1)
     {
         Title = args.Title;
         Columns = args.Columns
-            .Select((c, index) => ColumnDescriptor.TextColumn(c.Header, c.PropertyName, c.Width, false))
+            .Select((c, index) =>
+            {
+                if (c.DataTemplate is { })
+                    return ColumnDescriptor.DataTemplateColumn(c.Header, c.DataTemplate, c.Width, false);
+                return ColumnDescriptor.TextColumn(c.Header, c.PropertyName, c.Width, false);
+            })
             .ToList();
         allItems = args.Data;
         filterPredicate = args.FilterPredicate;
         numberPredicate = args.NumberPredicate;
         Items = args.Data;
+        selectedIndex = defaultSelection;
         
         Accept = new DelegateCommand(() =>
         {
@@ -127,7 +133,7 @@ public partial class TabularDataPickerViewModel : ObservableBase, IDialog
         }
     }
 
-    public int DesiredWidth => 600;
+    public int DesiredWidth => 700;
     public int DesiredHeight => 750;
     public string Title { get; }
     public bool Resizeable => true;

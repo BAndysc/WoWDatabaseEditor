@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using WDE.Common.Database;
@@ -23,7 +24,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public IQuestTemplate? GetQuestTemplate(uint entry) => null;
 
-        public IEnumerable<IQuestTemplate> GetQuestTemplates() => Enumerable.Empty<IQuestTemplate>();
+        public IReadOnlyList<IQuestTemplate> GetQuestTemplates() => Array.Empty<IQuestTemplate>();
         
         public async Task<IList<IQuestObjective>> GetQuestObjectives(uint questId) => new List<IQuestObjective>();
 
