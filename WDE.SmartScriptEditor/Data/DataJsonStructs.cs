@@ -128,6 +128,11 @@ namespace WDE.SmartScriptEditor.Data
     {
         None,
         AddEvent,
+        /// <summary>
+        /// note: this is a hack, a better way would be to have generic command 'ShouldShow', but for now
+        /// it is enough
+        /// </summary>
+        AddEventIfAura,
         OpenScript
     }
 

@@ -4,6 +4,7 @@ using System.Windows.Input;
 using Prism.Commands;
 using Prism.Events;
 using WDE.Common.Events;
+using WDE.Common.Services;
 using WDE.Common.Types;
 using WDE.Common.Utils;
 using WDE.Module.Attributes;
@@ -28,6 +29,7 @@ public class DynamicContextMenuService : IDynamicContextMenuService
     private readonly ISmartFactory smartFactory;
     private readonly IEventAggregator eventAggregator;
     private readonly ISmartScriptFactory scriptFactory;
+    private readonly ISpellService spellService;
     private readonly IGeneralSmartScriptSettingsProvider preferences;
     private Dictionary<int, List<Entry>> perActionMenus = new();
 
@@ -47,12 +49,14 @@ public class DynamicContextMenuService : IDynamicContextMenuService
         ISmartFactory smartFactory,
         IEventAggregator eventAggregator,
         ISmartScriptFactory scriptFactory,
+        ISpellService spellService,
         IGeneralSmartScriptSettingsProvider preferences)
     {
         this.dataManager = dataManager;
         this.smartFactory = smartFactory;
         this.eventAggregator = eventAggregator;
         this.scriptFactory = scriptFactory;
+        this.spellService = spellService;
         this.preferences = preferences;
         foreach (var actionData in dataManager.GetAllData(SmartType.SmartAction))
         {
@@ -66,10 +70,29 @@ public class DynamicContextMenuService : IDynamicContextMenuService
             {
                 Func<SmartAction, bool>? shouldShow = null;
                 INamedCommand<SmartScriptEditorViewModel> command;
-                if (menuItem.Command == SmartContextMenuCommand.AddEvent)
+                if (menuItem.Command is SmartContextMenuCommand.AddEvent or SmartContextMenuCommand.AddEventIfAura)
                 {
                     shouldShow = action => action.Source.Id <= SmartConstants.SourceSelf;
 
+                    if (menuItem.Command == SmartContextMenuCommand.AddEventIfAura)
+                    {
+                        var oldShouldShow = shouldShow;
+                        shouldShow = action =>
+                        {
+                            if (!oldShouldShow(action))
+                                return false;
+
+                            var spellId = (uint)action.GetParameter(0).Value;
+                            for (int i = 0, count = spellService.GetSpellEffectsCount(spellId); i < count; ++i)
+                            {
+                                if (spellService.GetSpellEffectType(spellId, i) == SpellEffectType.ApplyAura)
+                                    return true;
+                            }
+
+                            return false;
+                        };
+                    }
+                    
                     if (menuItem.EventId == null)
                         command = new NamedDelegateCommand<SmartScriptEditorViewModel>(menuItem.Header, _ => {}, _ => false);
                     else
