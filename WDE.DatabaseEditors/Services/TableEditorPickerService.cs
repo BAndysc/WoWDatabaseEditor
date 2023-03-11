@@ -141,7 +141,7 @@ public class TableEditorPickerService : ITableEditorPickerService
         else
             throw new Exception("TemplateMode not (yet?) supported");
 
-        var viewModel = containerProvider.Resolve<RowPickerViewModel>((typeof(ViewModelBase), tableViewModel), (typeof(bool), openInNoSaveMode));
+        using  var viewModel = containerProvider.Resolve<RowPickerViewModel>((typeof(ViewModelBase), tableViewModel), (typeof(bool), openInNoSaveMode));
         
         tableViewModel.EntityPicked += pickedEntity =>
         {
@@ -208,7 +208,7 @@ public class TableEditorPickerService : ITableEditorPickerService
             viewModelBase = template;
         }
 
-        var viewModel = containerProvider.Resolve<RowPickerViewModel>((typeof(ViewModelBase), viewModelBase), (typeof(bool), openIsNoSaveMode));
+        using var viewModel = containerProvider.Resolve<RowPickerViewModel>((typeof(ViewModelBase), viewModelBase), (typeof(bool), openIsNoSaveMode));
         viewModel.DisablePicking = true;
         await windowManager.ShowDialog(viewModel);
     }
@@ -226,7 +226,7 @@ public class TableEditorPickerService : ITableEditorPickerService
 
         var openIsNoSaveMode = await CheckIfItemIsOpened(fakeSolutionItem, definition);
 
-        var viewModel = containerProvider.Resolve<OneToOneForeignKeyViewModel>(
+        using var viewModel = containerProvider.Resolve<OneToOneForeignKeyViewModel>(
             (typeof(DatabaseKey), key), 
             (typeof(bool), openIsNoSaveMode),
             (typeof(DatabaseTableDefinitionJson), definition));

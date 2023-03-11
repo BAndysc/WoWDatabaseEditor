@@ -186,7 +186,7 @@ namespace WDE.PacketViewer.Services
 
         public async Task<IFilterData?> OpenFilterDialog(IReadOnlyFilterData? currentFilterData)
         {
-            var vm = containerProvider.Resolve<PacketFilterDialogViewModel>((typeof(IReadOnlyFilterData),
+            using var vm = containerProvider.Resolve<PacketFilterDialogViewModel>((typeof(IReadOnlyFilterData),
                 currentFilterData));
             if (await windowManager.ShowDialog(vm))
                 return vm.FilterData;

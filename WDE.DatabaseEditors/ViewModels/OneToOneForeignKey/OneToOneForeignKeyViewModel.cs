@@ -149,7 +149,7 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
         {
             var sql = await GenerateThisQueryOnly();
             var item = new MetaSolutionSQL(new JustQuerySolutionItem(sql.QueryString));
-            var editor = editorRegistry.GetEditor(item);
+            using var editor = editorRegistry.GetEditor(item);
             await windowManager.ShowDialog((IDialog)editor);
         });
         OpenParameterWindow = new AsyncAutoCommand<SingleRecordDatabaseCellViewModel>(EditParameter);

@@ -441,7 +441,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             {
                 var variable = new GlobalVariable();
                 variable.Name = "New name";
-                var vm = new GlobalVariableEditDialogViewModel(variable);
+                using var vm = new GlobalVariableEditDialogViewModel(variable);
                 if (await windowManager.ShowDialog(vm))
                 {
                     variable.Key = vm.Key;
@@ -1261,7 +1261,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     index++;
 
                 var fakeGroup = new SmartGroup(SmartEvent.NewBeginGroup());
-                if (await windowManager.ShowDialog(new SmartGroupEditViewModel(fakeGroup)))
+                using var vm = new SmartGroupEditViewModel(fakeGroup);
                 {
                     using var _ = script.BulkEdit("Insert group");
                     var group = script.InsertGroupBegin(ref index, fakeGroup.Header, fakeGroup.Description);
@@ -2218,9 +2218,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
         private async Task<bool> EditActionCommand(IReadOnlyList<SmartAction> smartActions, bool openActionPickerInstantly)
         {
-            var viewModel = ActionEditViewModel(smartActions, false, openActionPickerInstantly);
+            using var viewModel = ActionEditViewModel(smartActions, false, openActionPickerInstantly);
             var result = await windowManager.ShowDialog(viewModel);
-            viewModel.Dispose();
             return result;
         }
 
@@ -2286,9 +2285,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
         private async Task<bool> EditConditionCommand(IReadOnlyList<SmartCondition> originalCondition)
         {
-            var viewModel = ConditionEditViewModel(originalCondition);
+            using var viewModel = ConditionEditViewModel(originalCondition);
             bool result = await windowManager.ShowDialog(viewModel);
-            viewModel.Dispose();
             return result;
         }
         
@@ -2444,9 +2442,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
         private async Task<(bool ok, bool requestOpenNext)> EditEventCommand(IReadOnlyList<SmartEvent> originalEvents)
         {
-            var viewModel = EventEditViewModel(originalEvents);
+            using var viewModel = EventEditViewModel(originalEvents);
             bool result = await windowManager.ShowDialog(viewModel);
-            viewModel.Dispose();
             return (result, viewModel.RequestOpenNextEdit);
         }
 

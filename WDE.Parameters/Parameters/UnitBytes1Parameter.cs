@@ -43,7 +43,7 @@ namespace WDE.Parameters.Parameters
 
         public async Task<(long, bool)> PickValue(long value)
         {
-            var vm = new UnitBytes1EditorViewModel(value);
+            using var vm = new UnitBytes1EditorViewModel(value);
             if (await windowManager.Value.ShowDialog(vm))
                 return (vm.Bytes1, true);
             return (0, false);

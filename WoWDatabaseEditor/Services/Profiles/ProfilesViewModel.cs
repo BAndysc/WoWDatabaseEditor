@@ -73,13 +73,13 @@ public partial class ProfilesViewModel : ObservableBase
         
         CreateNewProfileCommand = new DelegateCommand(() =>
         {
-            var vm = createViewModel();
+            using var vm = createViewModel();
             windowManager.ShowDialog(vm).ListenErrors();
         });
 
         EditProfile = new AsyncAutoCommand<ProfileViewModel>(async p =>
         {
-            var vm = createViewModel();
+            using var vm = createViewModel();
             vm.ProfileName = p.ProfileName;
             vm.NoCreate = true;
             if (await windowManager.ShowDialog(vm))

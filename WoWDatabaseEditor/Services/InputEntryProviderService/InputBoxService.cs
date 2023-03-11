@@ -18,7 +18,7 @@ namespace WoWDatabaseEditorCore.Services.InputEntryProviderService
         
         public async Task<uint?> GetUInt(string title, string description)
         {
-            var vm = new InputEntryProviderViewModel<uint>(title, description, 0);
+            using var vm = new InputEntryProviderViewModel<uint>(title, description, 0);
             if (await windowManager.Value.ShowDialog(vm))
                 return vm.Entry;
             return null;
@@ -26,7 +26,7 @@ namespace WoWDatabaseEditorCore.Services.InputEntryProviderService
 
         public async Task<string?> GetString(string title, string description, string defaultValue = "")
         {
-            var vm = new InputEntryProviderViewModel<string>(title, description, defaultValue, s => !string.IsNullOrEmpty(s));
+            using var vm = new InputEntryProviderViewModel<string>(title, description, defaultValue, s => !string.IsNullOrEmpty(s));
             if (await windowManager.Value.ShowDialog(vm))
                 return vm.Entry;
             return null;

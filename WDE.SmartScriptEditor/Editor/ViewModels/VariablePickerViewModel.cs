@@ -174,7 +174,7 @@ public class VariablePickerService : IVariablePickerService
     
     public async Task<long?> PickVariable(GlobalVariableType type, SmartScriptBase script, long? currentValue)
     {
-        var vm = containerProvider.Resolve<VariablePickerViewModel>((typeof(GlobalVariableType), type),
+        using var vm = containerProvider.Resolve<VariablePickerViewModel>((typeof(GlobalVariableType), type),
             (typeof(SmartScriptBase), script), (typeof(long?), currentValue));
 
         if (await windowManager.ShowDialog(vm))

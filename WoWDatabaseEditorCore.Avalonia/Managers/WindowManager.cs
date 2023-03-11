@@ -94,6 +94,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
             var window = ((DialogWindow)sender!);
             var task = (TaskCompletionSource)window.Tag!;
             window.Closed -= StandaloneWindowClosed;
+            window.DataContext = null;
             task.SetResult();
         }
 
@@ -156,7 +157,9 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
                         view.Width = viewModel.DesiredWidth;
                     }
                     view.DataContext = viewModel;
-                    return await mainWindowHolder.ShowDialog<bool>(view);
+                    var result = await mainWindowHolder.ShowDialog<bool>(view);
+                    view.DataContext = null;
+                    return result;
                 }
             }
             catch (Exception e)

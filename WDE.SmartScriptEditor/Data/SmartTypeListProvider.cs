@@ -31,7 +31,7 @@ namespace WDE.SmartScriptEditor.Data
         public async System.Threading.Tasks.Task<(int, bool)?> Get(SmartType type, Func<SmartGenericJsonData, bool> predicate, List<(int, string)>? customItems)
         {
             var title = GetTitleForType(type);
-            SmartSelectViewModel model = new(title, type, predicate, customItems, smartDataManager, conditionDataManager, favouriteSmartsService);
+            using SmartSelectViewModel model = new(title, type, predicate, customItems, smartDataManager, conditionDataManager, favouriteSmartsService);
 
             if (await windowManager.ShowDialog(model) && model.SelectedItem != null)
             {

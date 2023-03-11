@@ -6,6 +6,7 @@ using AsyncAwaitBestPractices.MVVM;
 using Prism.Commands;
 using Prism.Events;
 using WDE.Common;
+using WDE.Common.Disposables;
 using WDE.Common.Events;
 using WDE.Common.Managers;
 using WDE.Common.Services;
@@ -70,7 +71,7 @@ public class RowPickerViewModel : ObservableBase, IDialog, IWindowViewModel, ICl
         {
             var sql = await baseViewModel.GenerateQuery();
             var item = new MetaSolutionSQL(new JustQuerySolutionItem(sql.QueryString));
-            var editor = solutionItemEditorRegistry.GetEditor(item);
+            using var editor = solutionItemEditorRegistry.GetEditor(item);
             await windowManager.ShowDialog((IDialog)editor);
         });
         PickSelected = new AsyncAutoCommand(async () =>
@@ -82,6 +83,7 @@ public class RowPickerViewModel : ObservableBase, IDialog, IWindowViewModel, ICl
             CloseCancel?.Invoke();
         });
         Accept = PickSelected;
+        AutoDispose(new ActionDisposable(baseViewModel.Dispose));
     }
     
     public void Pick(DatabaseEntity pickedEntity)
