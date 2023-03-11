@@ -61,9 +61,12 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
                         foreach (var element in source)
                         {
                             // todo: get rid of boxing
-                            if ((long)(object)element.Entry == searchNumber)
+                            var entryAsLong = (long)(object)element.Entry;
+                            if (entryAsLong.Contains(search))
                                 result.Add(element);
-                            else if (element.Name.Contains(lowerSearchText, StringComparison.InvariantCultureIgnoreCase))
+                            else if (asFlags && (searchNumber & entryAsLong) == entryAsLong)
+                                result.Add(element);
+                            else if (element.Name.Contains(lowerSearchText, StringComparison.OrdinalIgnoreCase))
                                 result.Add(element);
                             if (token.IsCancellationRequested)
                                 return null;
@@ -73,7 +76,7 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
                     {
                         foreach (var element in source)
                         {
-                            if (element.Name.Contains(lowerSearchText, StringComparison.InvariantCultureIgnoreCase))
+                            if (element.Name.Contains(lowerSearchText, StringComparison.OrdinalIgnoreCase))
                                 result.Add(element);
                             if (token.IsCancellationRequested)
                                 return null;

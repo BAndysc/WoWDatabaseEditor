@@ -74,36 +74,4 @@ namespace WoWDatabaseEditorCore.Services.CreatureEntrySelectorService
             return database.GetGameObjectTemplates().OrderBy(template => template.Entry);
         }
     }
-
-    public class SpellMiniEntry
-    {
-        public SpellMiniEntry(uint entry, string name)
-        {
-            Entry = entry;
-            Name = name;
-        }
-
-        public uint Entry { get; set; }
-        public string Name { get; set; }
-    }
-
-    public class SpellEntryProviderService : GenericDatabaseProviderService<SpellMiniEntry>, ISpellEntryProviderService
-    {
-        private readonly ISpellStore spellStore;
-
-        public SpellEntryProviderService(IWindowManager windowManager, ISpellStore spellStore) : base(windowManager, t => (int)t.Entry, t => t.Name + " " + t.Entry)
-        {
-            this.spellStore = spellStore;
-        }
-
-        protected override IEnumerable<SpellMiniEntry> GetList()
-        {
-            List<SpellMiniEntry> spells = new();
-
-            foreach (var pair in spellStore.SpellsWithName)
-                spells.Add(new SpellMiniEntry(pair.key, pair.name));
-
-            return spells;
-        }
-    }
 }

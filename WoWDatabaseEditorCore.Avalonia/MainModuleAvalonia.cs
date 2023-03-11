@@ -21,7 +21,6 @@ namespace WoWDatabaseEditorCore.Avalonia
             viewLocator.Bind<GenericSelectorDialogViewModel<ICreatureTemplate>, GenericSelectorDialogView>();
             viewLocator.Bind<GenericSelectorDialogViewModel<IGameObjectTemplate>, GenericSelectorDialogView>();
             viewLocator.Bind<GenericSelectorDialogViewModel<IQuestTemplate>, GenericSelectorDialogView>();
-            viewLocator.Bind<GenericSelectorDialogViewModel<SpellMiniEntry>, GenericSelectorDialogView>();
 
             viewLocator.Bind<InputEntryProviderViewModel<uint>, InputEntryProviderView>();
             viewLocator.Bind<InputEntryProviderViewModel<string>, InputEntryProviderView>();

@@ -876,10 +876,23 @@ namespace WDE.Common.Services
         RemoveAura                        = 164,
     }
 
-    [UniqueProvider]
     public interface ISpellService
     {
         bool Exists(uint spellId);
+        int SpellCount { get; }
+        uint GetSpellId(int index);
+        string GetName(uint spellId);
+        int GetSpellEffectsCount(uint spellId);
+        SpellAuraType GetSpellAuraType(uint spellId, int effectIndex);
+        SpellEffectType GetSpellEffectType(uint spellId, int index);
+        SpellTargetFlags GetSpellTargetFlags(uint spellId);
+        (SpellTarget a, SpellTarget b) GetSpellEffectTargetType(uint spellId, int index);
+        event Action<ISpellService>? Changed;
+    }
+    
+    [UniqueProvider]
+    public interface IDbcSpellService : ISpellService
+    {
         T GetAttributes<T>(uint spellId) where T : unmanaged, Enum;
         uint? GetSkillLine(uint spellId);
         uint? GetSpellFocus(uint spellId);
@@ -887,13 +900,13 @@ namespace WDE.Common.Services
         TimeSpan? GetSpellDuration(uint spellId);
         TimeSpan? GetSpellCategoryRecoveryTime(uint spellId);
         string? GetDescription(uint spellId);
-        int GetSpellEffectsCount(uint spellId);
-        SpellAuraType GetSpellAuraType(uint spellId, int effectIndex);
-        SpellEffectType GetSpellEffectType(uint spellId, int index);
-        SpellTargetFlags GetSpellTargetFlags(uint spellId);
-        (SpellTarget a, SpellTarget b) GetSpellEffectTargetType(uint spellId, int index);
         uint GetSpellEffectMiscValueA(uint spellId, int index);
         uint GetSpellEffectTriggerSpell(uint spellId, int index);
+    }
+
+    [UniqueProvider]
+    public interface IDatabaseSpellService : ISpellService
+    {
     }
 
     public static class Extensions

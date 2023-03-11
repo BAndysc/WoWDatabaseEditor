@@ -17,7 +17,7 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
     [SingleInstance]
     public class ActionReactionProcessorCreator : IActionReactionProcessorCreator
     {
-        private readonly ISpellService spellService;
+        private readonly IDbcSpellService spellService;
         private readonly IContainerProvider provider;
         private readonly Func<IUnitPositionFollower> unitFollower;
         private readonly Func<IWaypointProcessor> waypointProcessor;
@@ -27,7 +27,7 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
         private readonly Func<IDatabaseProvider> databaseProvider;
 
         public ActionReactionProcessorCreator(
-            ISpellService spellService,
+            IDbcSpellService spellService,
             IContainerProvider provider,
             Func<IUnitPositionFollower> unitFollower,
             Func<IWaypointProcessor> waypointProcessor,

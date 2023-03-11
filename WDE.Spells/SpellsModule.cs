@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Prism.Events;
 using Prism.Ioc;
+using WDE.Common;
 using WDE.Common.Database;
 using WDE.Common.Events;
 using WDE.Common.Parameters;
@@ -24,7 +25,8 @@ namespace WDE.Spells
                 .Subscribe(() =>
                     {
                         var factory = containerProvider.Resolve<IParameterFactory>();
-                        factory.RegisterCombined("SpellParameter", "DbcSpellParameter", "DatabaseSpellParameter", (dbc, db) => new SpellParameter(dbc, db), QuickAccessMode.Limited);
+                        var spellPicker = this.containerProvider.Resolve<ISpellEntryProviderService>();
+                        factory.RegisterCombined("SpellParameter", "DbcSpellParameter", "DatabaseSpellParameter", (dbc, db) => new SpellParameter(spellPicker, dbc, db), QuickAccessMode.Limited);
                         factory.RegisterDepending("MultiSpellParameter", "SpellParameter",  spells => new MultiSpellParameter(spells));
                         factory.RegisterDepending("SpellAreaSpellParameter", "SpellParameter", spells => new SpellAreaSpellParameter(spells));
                         factory.RegisterDepending("SpellOrRankedSpellParameter", "SpellParameter", spells => new SpellOrRankedSpellParameter(spells));

@@ -175,10 +175,10 @@ namespace WDE.TrinitySmartScriptEditor
 
         public override async Task<ISolutionItem?> CreateSolutionItem()
         {
-            int? entry = await service.Value.GetEntryFromService();
+            uint? entry = await service.Value.GetEntryFromService();
             if (!entry.HasValue)
                 return null;
-            return new SmartScriptSolutionItem(entry.Value, SmartScriptType.Aura);
+            return new SmartScriptSolutionItem((int)entry.Value, SmartScriptType.Aura);
         }
     }
 
@@ -197,10 +197,10 @@ namespace WDE.TrinitySmartScriptEditor
 
         public override async Task<ISolutionItem?> CreateSolutionItem()
         {
-            int? entry = await service.Value.GetEntryFromService();
+            uint? entry = await service.Value.GetEntryFromService();
             if (!entry.HasValue)
                 return null;
-            return new SmartScriptSolutionItem(entry.Value, SmartScriptType.Spell);
+            return new SmartScriptSolutionItem((int)entry.Value, SmartScriptType.Spell);
         }
     }
 

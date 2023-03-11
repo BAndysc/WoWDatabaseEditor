@@ -90,6 +90,7 @@ namespace WDE.Common.Database
         IEnumerable<ICoreCommandHelp> GetCommands();
         Task<IList<ITrinityString>> GetStringsAsync();
         Task<IList<IDatabaseSpellDbc>> GetSpellDbcAsync();
+        Task<IList<IDatabaseSpellEffectDbc>> GetSpellEffectDbcAsync() => Task.FromResult<IList<IDatabaseSpellEffectDbc>>(new List<IDatabaseSpellEffectDbc>());
         Task<IList<ISpawnGroupTemplate>> GetSpawnGroupTemplatesAsync();
         Task<IList<ISpawnGroupSpawn>> GetSpawnGroupSpawnsAsync();
         Task<ISpawnGroupTemplate?> GetSpawnGroupTemplateByIdAsync(uint id);

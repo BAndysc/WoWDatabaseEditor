@@ -29,7 +29,7 @@ public class DynamicContextMenuService : IDynamicContextMenuService
     private readonly ISmartFactory smartFactory;
     private readonly IEventAggregator eventAggregator;
     private readonly ISmartScriptFactory scriptFactory;
-    private readonly ISpellService spellService;
+    private readonly IDbcSpellService spellService;
     private readonly IGeneralSmartScriptSettingsProvider preferences;
     private Dictionary<int, List<Entry>> perActionMenus = new();
 
@@ -49,7 +49,7 @@ public class DynamicContextMenuService : IDynamicContextMenuService
         ISmartFactory smartFactory,
         IEventAggregator eventAggregator,
         ISmartScriptFactory scriptFactory,
-        ISpellService spellService,
+        IDbcSpellService spellService,
         IGeneralSmartScriptSettingsProvider preferences)
     {
         this.dataManager = dataManager;

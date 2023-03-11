@@ -24,6 +24,6 @@ namespace WDE.Common
     [UniqueProvider]
     public interface ISpellEntryProviderService
     {
-        Task<int?> GetEntryFromService();
+        Task<uint?> GetEntryFromService(uint? spellId = null);
     }
 }

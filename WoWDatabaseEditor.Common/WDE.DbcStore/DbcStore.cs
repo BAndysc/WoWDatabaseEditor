@@ -62,7 +62,7 @@ namespace WDE.DbcStore
 
     [AutoRegister]
     [SingleInstance]
-    public class DbcStore : IDbcStore, ISpellService, IMapAreaStore
+    public class DbcStore : IDbcStore, IDbcSpellService, IMapAreaStore
     {
         private readonly IDbcSettingsProvider dbcSettingsProvider;
         private readonly IMessageBoxService messageBoxService;
@@ -484,6 +484,9 @@ namespace WDE.DbcStore
                         store.spellServiceImpl = store.legionSpellService;
                         break;
                 }
+
+                store.spellServiceImpl.Changed += _ => store.InvokeChangedSpells();
+                store.InvokeChangedSpells();
                 
                 store.eventAggregator.GetEvent<DbcLoadedEvent>().Publish(store);
             }
@@ -1207,15 +1210,23 @@ namespace WDE.DbcStore
             }
         }
 
-        private ISpellService spellServiceImpl;
-        public bool Exists(uint spellId) => spellServiceImpl.Exists(spellId);
+        private void InvokeChangedSpells()
+        {
+            Changed?.Invoke(this);
+        }
 
+        private IDbcSpellService spellServiceImpl;
+        public bool Exists(uint spellId) => spellServiceImpl.Exists(spellId);
+        public int SpellCount => spellServiceImpl.SpellCount;
+        public uint GetSpellId(int index) => spellServiceImpl.GetSpellId(index);
         public T GetAttributes<T>(uint spellId) where T : unmanaged, Enum => spellServiceImpl.GetAttributes<T>(spellId);
         public uint? GetSkillLine(uint spellId) => spellServiceImpl.GetSkillLine(spellId);
         public uint? GetSpellFocus(uint spellId) => spellServiceImpl.GetSpellFocus(spellId);
         public TimeSpan? GetSpellCastingTime(uint spellId) => spellServiceImpl.GetSpellCastingTime(spellId);
         public TimeSpan? GetSpellDuration(uint spellId) => spellServiceImpl.GetSpellDuration(spellId);
         public TimeSpan? GetSpellCategoryRecoveryTime(uint spellId) => spellServiceImpl.GetSpellCategoryRecoveryTime(spellId);
+        public string GetName(uint spellId) => spellServiceImpl.GetName(spellId);
+        public event Action<ISpellService>? Changed;
         public string? GetDescription(uint spellId) => spellServiceImpl.GetDescription(spellId);
         public int GetSpellEffectsCount(uint spellId) => spellServiceImpl.GetSpellEffectsCount(spellId);
         public SpellAuraType GetSpellAuraType(uint spellId, int effectIndex) => spellServiceImpl.GetSpellAuraType(spellId, effectIndex);

@@ -6,9 +6,16 @@ namespace WDE.Common.DBC
     [UniqueProvider]
     public interface ISpellStore
     {
-        IEnumerable<uint> Spells { get; }
-        IEnumerable<(uint key, string name)> SpellsWithName { get; }
+        IReadOnlyList<ISpellEntry> Spells { get; }
         bool HasSpell(uint entry);
         string? GetName(uint entry);
+    }
+
+    public interface ISpellEntry
+    {
+        uint Id { get; }
+        string Name { get; }
+        string Aura { get; }
+        string Targets { get; }
     }
 }

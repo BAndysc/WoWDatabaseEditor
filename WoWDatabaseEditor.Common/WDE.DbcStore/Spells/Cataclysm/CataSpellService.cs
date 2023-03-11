@@ -7,7 +7,7 @@ using WDE.DbcStore.FastReader;
 
 namespace WDE.DbcStore.Spells.Cataclysm
 {
-    public class CataSpellService : ISpellService
+    public class CataSpellService : IDbcSpellService
     {
         private readonly DatabaseClientFileOpener opener;
 
@@ -85,6 +85,7 @@ namespace WDE.DbcStore.Spells.Cataclysm
         private Dictionary<uint, SpellCastTime> spellCastTimes = new();
         private Dictionary<uint, SpellCastingRequirements> requirements = new();
         private Dictionary<uint, SpellData> spells = new();
+        private List<SpellData> spellsList = new();
 
         public CataSpellService(DatabaseClientFileOpener opener)
         {
@@ -142,7 +143,7 @@ namespace WDE.DbcStore.Spells.Cataclysm
                 var castingRequirements = row.GetUInt(34);
                 var description = row.GetString(23);
 
-                spells[id] = new SpellData()
+                var spellData = spells[id] = new SpellData()
                 {
                     Id = id,
                     Attr0 = attr0,
@@ -163,6 +164,7 @@ namespace WDE.DbcStore.Spells.Cataclysm
                     Name = row.GetString(21),
                     Description = string.IsNullOrEmpty(description) ? null : description
                 };
+                spellsList.Add(spellData);
             }
 
             foreach (var row in opener.Open(Path.Join(path, "SpellEffect.dbc")))
@@ -220,9 +222,15 @@ namespace WDE.DbcStore.Spells.Cataclysm
                 var spell = spells[spellId];
                 spell.SkillLine = skillLine;
             }
+            
+            Changed?.Invoke(this);
         }
 
         public bool Exists(uint spellId) => spells.ContainsKey(spellId);
+
+        public int SpellCount => spellsList.Count;
+
+        public uint GetSpellId(int index) => spellsList[index].Id;
 
         public T GetAttributes<T>(uint spellId) where T : unmanaged, Enum
         {
@@ -289,6 +297,15 @@ namespace WDE.DbcStore.Spells.Cataclysm
         {
             return null;
         }
+
+        public string GetName(uint spellId)
+        {
+            if (spells.TryGetValue(spellId, out var spell))
+                return spell.Name;
+            return "Unknown";
+        }
+
+        public event Action<ISpellService>? Changed;
 
         public string? GetDescription(uint spellId)
         {

@@ -72,7 +72,7 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
     
     public class EventDetectorProcessor : PacketProcessor<bool>
     {
-        private readonly ISpellService spellService;
+        private readonly IDbcSpellService spellService;
         private readonly IUnitPositionFollower positionFollower;
         private readonly IRandomMovementDetector movementDetector;
         private readonly IChatEmoteSoundProcessor chatProcessor;
@@ -225,7 +225,7 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
         }
         
         public EventDetectorProcessor(
-            ISpellService spellService,
+            IDbcSpellService spellService,
             IUnitPositionFollower positionFollower,
             IRandomMovementDetector movementDetector, 
             IChatEmoteSoundProcessor chatProcessor,

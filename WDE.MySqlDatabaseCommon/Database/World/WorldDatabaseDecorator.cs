@@ -119,6 +119,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public IEnumerable<ICoreCommandHelp> GetCommands() => impl.GetCommands();
         public Task<IList<ITrinityString>> GetStringsAsync() => impl.GetStringsAsync();
         public Task<IList<IDatabaseSpellDbc>> GetSpellDbcAsync() => impl.GetSpellDbcAsync();
+        public Task<IList<IDatabaseSpellEffectDbc>> GetSpellEffectDbcAsync() => impl.GetSpellEffectDbcAsync();
         public Task<List<IEventScriptLine>> FindEventScriptLinesBy(IReadOnlyList<(uint command, int dataIndex, long valueToSearch)> conditions) => impl.FindEventScriptLinesBy(conditions);
         public Task<IList<ICreatureModelInfo>> GetCreatureModelInfoAsync() => impl.GetCreatureModelInfoAsync();
 

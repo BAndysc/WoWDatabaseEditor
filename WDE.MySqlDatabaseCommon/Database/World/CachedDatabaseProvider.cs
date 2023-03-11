@@ -464,6 +464,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             return nonCachedDatabase.GetSpellDbcAsync();
         }
         
+        public Task<IList<IDatabaseSpellEffectDbc>> GetSpellEffectDbcAsync() => nonCachedDatabase.GetSpellEffectDbcAsync();
+
         public ICreature? GetCreatureByGuid(uint guid) => nonCachedDatabase.GetCreatureByGuid(guid);
 
         public IGameObject? GetGameObjectByGuid(uint guid) => nonCachedDatabase.GetGameObjectByGuid(guid);

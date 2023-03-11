@@ -1,7 +1,9 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
+using WDE.Common.Collections;
 using WDE.Common.DBC;
-using WDE.Common.Parameters;
+using WDE.Common.Services;
 using WDE.Module.Attributes;
 
 namespace WDE.Spells
@@ -10,34 +12,121 @@ namespace WDE.Spells
     [SingleInstance]
     public class SpellStore : ISpellStore
     {
-        private readonly IParameterFactory parameterFactory;
+        private MergedSpellService merged;
 
-        public SpellStore(IParameterFactory parameterFactory)
+        public SpellStore(IDbcSpellService dbcSpellService, IDatabaseSpellService databaseSpellService)
         {
-            this.parameterFactory = parameterFactory;
+            merged = new MergedSpellService(dbcSpellService, databaseSpellService);
         }
 
-        public IEnumerable<uint> Spells => parameterFactory.Factory("SpellParameter").Items?.Select(i => (uint)i.Key) ??
-                                           Enumerable.Empty<uint>();
-
-        public IEnumerable<(uint, string)> SpellsWithName => parameterFactory.Factory("SpellParameter").Items?.Select(i => ((uint)i.Key, i.Value.Name)) ??
-                                           Enumerable.Empty<(uint, string)>();
+        public IReadOnlyList<ISpellEntry> Spells => merged;
         
-        public bool HasSpell(uint entry)
-        {
-            if (!parameterFactory.IsRegisteredLong("SpellParameter"))
-                return false;
-            var param = parameterFactory.Factory("SpellParameter");
-            return param.Items != null && param.Items.ContainsKey(entry);
-        }
+        public bool HasSpell(uint entry) => merged.ContainsSpell(entry);
 
         public string? GetName(uint entry)
         {
-            if (!HasSpell(entry))
+            if (!merged.ContainsSpell(entry))
                 return null;
-            
-            var param = parameterFactory.Factory("SpellParameter");
-            return param.Items![entry].Name;
+
+            var spell = merged.GetBySpellId(entry);
+            return spell.Name;
+        }
+    }
+    
+    internal class SpellEntry : ISpellEntry
+    {
+        public uint Id { get; }
+        public string Name { get; set; }
+        public string Aura { get; set; } = "";
+        public string Targets { get; set; } = "";
+
+        public SpellEntry(uint id, string name)
+        {
+            Id = id;
+            Name = name;
+        }
+    }
+
+    internal class MergedSpellService : IIndexedCollection<ISpellEntry>, IReadOnlyList<ISpellEntry>
+    {
+        private readonly ISpellService[] services;
+        private List<SpellEntry> cachedSpells = new();
+        private Dictionary<uint, int> spellIdToIndex = new();
+
+        public MergedSpellService(params ISpellService[] services)
+        {
+            this.services = services;
+            foreach (var service in services)
+            {
+                service.Changed += _ =>
+                {
+                    Cache();
+                    OnCountChanged?.Invoke();
+                };
+            }
+            Cache();
+        }
+
+        private void Cache()
+        {
+            cachedSpells.Clear();
+            spellIdToIndex.Clear();
+            HashSet<SpellTarget> distinctTargets = new();
+            foreach (var service in services)
+            {
+                for (int i = 0, count = service.SpellCount; i < count; ++i)
+                {
+                    var spellId = service.GetSpellId(i);
+                    var entry = new SpellEntry(spellId, service.GetName(spellId));
+                    var effectsCount = service.GetSpellEffectsCount(spellId);
+                    distinctTargets.Clear();
+                    
+                    for (int j = 0; j < effectsCount; ++j)
+                    {
+                        var effectType = service.GetSpellEffectType(spellId, j);
+                        var aura = service.GetSpellAuraType(spellId, j);
+                        var targets = service.GetSpellEffectTargetType(spellId, j);
+                        if (targets.a != SpellTarget.NoTarget)
+                            distinctTargets.Add(targets.a);
+    
+                        if (targets.b != SpellTarget.NoTarget)
+                            distinctTargets.Add(targets.b);
+                        
+                        if (aura != SpellAuraType.None)
+                        {
+                            entry.Aura += $"{aura} ";
+                        }
+                    }
+                    entry.Targets = string.Join(", ", distinctTargets);
+                    spellIdToIndex[spellId] = cachedSpells.Count;
+                    cachedSpells.Add(entry);
+                }
+            }
+        }
+
+        public bool ContainsSpell(uint spellId) => spellIdToIndex.ContainsKey(spellId);
+        
+        public ISpellEntry GetBySpellId(uint spellId)
+        {
+            if (!spellIdToIndex.TryGetValue(spellId, out var index))
+                throw new Exception("Spell not found");
+            return cachedSpells[index];
+        }
+        
+        public ISpellEntry this[int index] => cachedSpells[index];
+
+        public int Count => cachedSpells.Count;
+        
+        public event Action? OnCountChanged;
+        
+        public IEnumerator<ISpellEntry> GetEnumerator()
+        {
+            return cachedSpells.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }

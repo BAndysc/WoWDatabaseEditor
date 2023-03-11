@@ -17,7 +17,7 @@ namespace WDE.DbcStore.Spells;
 [SingleInstance]
 public class SpellFindAnywhereSource : IFindAnywhereSource
 {
-    private readonly Lazy<ISpellService> spellServiceLazy;
+    private readonly Lazy<IDbcSpellService> spellServiceLazy;
     private readonly Lazy<ISpellStore> spellStoreLazy;
     private readonly Lazy<IMessageBoxService> messageBoxService;
     private readonly Lazy<IMainThread> mainThreadLazy;
@@ -26,7 +26,7 @@ public class SpellFindAnywhereSource : IFindAnywhereSource
     
     public FindAnywhereSourceType SourceType => FindAnywhereSourceType.Dbc;
 
-    public SpellFindAnywhereSource(Lazy<ISpellService> spellService,
+    public SpellFindAnywhereSource(Lazy<IDbcSpellService> spellService,
         Lazy<ISpellStore> spellStore,
         Lazy<IMessageBoxService> messageBoxService,
         Lazy<IMainThread> mainThreadLazy)
@@ -73,10 +73,13 @@ public class SpellFindAnywhereSource : IFindAnywhereSource
 
         await Task.Run(() =>
         {
-            foreach (var (spell, name) in spellStore.SpellsWithName)
+            for (int j = 0, count = spellService.SpellCount; j < count; ++j)
             {
                 if (cancellationToken.IsCancellationRequested)
                     return;
+
+                var spell = spellService.GetSpellId(j);
+                var name = spellService.GetName(spell);
                 
                 for (int i = 0; i < spellService.GetSpellEffectsCount(spell); ++i)
                 {

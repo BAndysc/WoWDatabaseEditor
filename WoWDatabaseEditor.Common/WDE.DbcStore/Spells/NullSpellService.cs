@@ -3,9 +3,13 @@ using WDE.Common.Services;
 
 namespace WDE.DbcStore.Spells
 {
-    public class NullSpellService : ISpellService
+    public class NullSpellService : IDbcSpellService
     {
         public bool Exists(uint spellId) => true;
+        
+        public int SpellCount => 0;
+
+        public uint GetSpellId(int index) => 0;
 
         public T GetAttributes<T>(uint spellId) where T : unmanaged, Enum => default;
 
@@ -18,6 +22,9 @@ namespace WDE.DbcStore.Spells
         public TimeSpan? GetSpellDuration(uint spellId) => null;
 
         public TimeSpan? GetSpellCategoryRecoveryTime(uint spellId) => null;
+        public string GetName(uint spellId) => "Unknown";
+
+        public event Action<ISpellService>? Changed;
 
         public string? GetDescription(uint spellId) => null;
 

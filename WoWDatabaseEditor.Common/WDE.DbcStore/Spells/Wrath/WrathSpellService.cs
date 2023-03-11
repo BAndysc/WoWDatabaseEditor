@@ -6,7 +6,7 @@ using WDE.DbcStore.FastReader;
 
 namespace WDE.DbcStore.Spells.Wrath
 {
-    public class WrathSpellService : ISpellService
+    public class WrathSpellService : IDbcSpellService
     {
         private Dictionary<uint, SpellCastTime> spellCastTimes = new();
         private SpellStructure[] spells = null!;
@@ -220,12 +220,18 @@ namespace WDE.DbcStore.Spells.Wrath
                 
                 spells[spellIndices[spellId]].SkillLine = skillLine;
             }
+            
+            Changed?.Invoke(this);
         }
         
         public bool Exists(uint spellId)
         {
             return spellIndices.ContainsKey(spellId);
         }
+
+        public int SpellCount => spells.Length;
+
+        public uint GetSpellId(int index) => spells[index].Id;
 
         public T GetAttributes<T>(uint spellId) where T : unmanaged, Enum
         {
@@ -292,6 +298,15 @@ namespace WDE.DbcStore.Spells.Wrath
         {
             return null;
         }
+
+        public string GetName(uint spellId)
+        {
+            if (spellIndices.TryGetValue(spellId, out var spellIndex))
+                return spells[spellIndex].Name;
+            return "Unknown";
+        }
+
+        public event Action<ISpellService>? Changed;
 
         public string? GetDescription(uint spellId)
         {

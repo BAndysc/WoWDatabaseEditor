@@ -48,7 +48,7 @@ namespace WDE.PacketViewer.Processing.Processors
         private readonly IWaypointProcessor waypointProcessor;
         private readonly IChatEmoteSoundProcessor chatProcessor;
         private readonly IRandomMovementDetector randomMovementDetector;
-        private readonly ISpellService spellService;
+        private readonly IDbcSpellService spellService;
         private readonly IUpdateObjectFollower updateObjectFollower;
         private readonly IPlayerGuidFollower playerGuidFollower;
         private readonly ISpellCastProcessor spellCastProcessor;
@@ -73,7 +73,7 @@ namespace WDE.PacketViewer.Processing.Processors
             IWaypointProcessor waypointProcessor,
             IChatEmoteSoundProcessor chatProcessor,
             IRandomMovementDetector randomMovementDetector,
-            ISpellService spellService,
+            IDbcSpellService spellService,
             IUpdateObjectFollower updateObjectFollower,
             HighLevelUpdateDump highLevelUpdateDump,
             IDespawnDetector despawnDetector,

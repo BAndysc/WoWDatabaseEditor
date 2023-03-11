@@ -54,7 +54,7 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
     
     public class ActionGenerator : PacketProcessor<IEnumerable<ActionHappened>?>
     {
-        private readonly ISpellService spellService;
+        private readonly IDbcSpellService spellService;
         private readonly IUnitPositionFollower unitPosition;
         private readonly IChatEmoteSoundProcessor chatEmote;
         private readonly IUpdateObjectFollower updateObjectFollower;
@@ -63,7 +63,7 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
         private readonly IAuraSlotTracker auraSlotTracker;
 
         public ActionGenerator(
-            ISpellService spellService,
+            IDbcSpellService spellService,
             IUnitPositionFollower unitPosition, 
             IChatEmoteSoundProcessor chatEmote,
             IUpdateObjectFollower updateObjectFollower,

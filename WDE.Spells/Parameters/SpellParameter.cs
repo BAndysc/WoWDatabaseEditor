@@ -1,11 +1,16 @@
+using System.Threading.Tasks;
+using WDE.Common;
 using WDE.Common.Parameters;
 
 namespace WDE.Spells.Parameters
 {
-    internal class SpellParameter : ParameterNumbered
+    internal class SpellParameter : ParameterNumbered, ICustomPickerParameter<long>
     {
-        public SpellParameter(IParameter<long> dbc, IParameter<long> db)
+        private readonly ISpellEntryProviderService picker;
+
+        public SpellParameter(ISpellEntryProviderService picker, IParameter<long> dbc, IParameter<long> db)
         {
+            this.picker = picker;
             Items = new();
             if (dbc.Items != null)
             {
@@ -18,6 +23,12 @@ namespace WDE.Spells.Parameters
                 foreach (var i in db.Items)
                     Items[i.Key] = i.Value;
             }
+        }
+
+        public async Task<(long, bool)> PickValue(long value)
+        {
+            var picked = await picker.GetEntryFromService();
+            return (picked ?? 0, picked.HasValue);
         }
     }
 }

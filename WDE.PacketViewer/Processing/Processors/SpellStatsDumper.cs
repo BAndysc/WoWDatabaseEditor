@@ -16,7 +16,7 @@ namespace WDE.PacketViewer.Processing.Processors
     {
         private readonly ISpellStore spellStore;
         private readonly IDatabaseProvider databaseProvider;
-        private readonly ISpellService spellService;
+        private readonly IDbcSpellService spellService;
         private readonly Dictionary<UniversalGuid, CreatureState> states = new();
 
         private class SpellHistory
@@ -51,7 +51,7 @@ namespace WDE.PacketViewer.Processing.Processors
 
         public SpellStatsDumper(ISpellStore spellStore,
             IDatabaseProvider databaseProvider,
-            ISpellService spellService)
+            IDbcSpellService spellService)
         {
             this.spellStore = spellStore;
             this.databaseProvider = databaseProvider;

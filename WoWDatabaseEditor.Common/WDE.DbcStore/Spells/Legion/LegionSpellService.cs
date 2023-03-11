@@ -6,10 +6,11 @@ using WDE.DbcStore.FastReader;
 
 namespace WDE.DbcStore.Spells.Legion;
 
-public class LegionSpellService : ISpellService
+public class LegionSpellService : IDbcSpellService
 {
     private readonly DatabaseClientFileOpener opener;
     private readonly Dictionary<uint, SpellData> spells = new();
+    private readonly List<SpellData> spellsList = new();
 
     private struct SpellCastTime
     {
@@ -45,6 +46,7 @@ public class LegionSpellService : ISpellService
     {
         public uint Id;
         public uint[] Attributes = new uint[14];
+        public string Name = "";
         public SpellCastTime? CastTime;
         public SpellDuration? Duration;
         public SpellCooldown? Cooldown;
@@ -170,9 +172,26 @@ public class LegionSpellService : ISpellService
                 spell.Effects[effectIndex] = effect;
             }
         }
+
+        foreach (var row in opener.Open(Path.Join(path, "Spell.db2")))
+        {
+            var id = row.GetUInt(0);
+            var name = row.GetString(1);
+
+            if (!spells.TryGetValue(id, out var spellData))
+                spells[id] = spellData = new SpellData() { Id = id };
+            spellData.Name = name;
+            spellsList.Add(spellData);
+        }
+            
+        Changed?.Invoke(this);
     }
 
     public bool Exists(uint spellId) => spells.ContainsKey(spellId);
+
+    public int SpellCount => spellsList.Count;
+
+    public uint GetSpellId(int index) => spellsList[index].Id;
 
     public T GetAttributes<T>(uint spellId) where T : unmanaged, Enum
     {
@@ -258,6 +277,15 @@ public class LegionSpellService : ISpellService
             return spell.Cooldown == null ? null : TimeSpan.FromMilliseconds(spell.Cooldown.Value.CategoryRecoveryTime);
         return null;
     }
+
+    public string GetName(uint spellId)
+    {
+        if (spells.TryGetValue(spellId, out var spell))
+            return spell.Name;
+        return "Unknown";
+    }
+
+    public event Action<ISpellService>? Changed;
 
     public string? GetDescription(uint spellId)
     {
