@@ -25,7 +25,7 @@ public class PhantomCompletionComboBox : PhantomControlBase<CompletionComboBox>
         flagsComboBox.HideButton = true;
         flagsComboBox.IsLightDismissEnabled = false; // we are handling it ourselves, without doing .Handled = true so that as soon as user press outside of popup, the click is treated as actual click
         flagsComboBox.Closed += CompletionComboBoxOnClosed;
-
+        
         if (!AttachAsAdorner(parent, position, flagsComboBox))
             return;
 
@@ -50,40 +50,47 @@ public class PhantomCompletionComboBox : PhantomControlBase<CompletionComboBox>
 
     protected override void Save(CompletionComboBox element)
     {
-        long? newValue = null;
-        string? strValue = null;
-        if (element.SelectedItem is BaseDatabaseCellViewModel.ParameterOption option)
-            newValue = option.Value;
-        else if (long.TryParse(element.SearchText, out var longVal))
-            newValue = longVal;
-        else if (element.SelectedItem is BaseDatabaseCellViewModel.ParameterStringOption strOption)
-            strValue = strOption.Value;
-        else if (!string.IsNullOrWhiteSpace(element.SearchText))
-            strValue = element.SearchText;
-
-        if (newValue.HasValue)
+        if (cellModel.IsLongValue)
         {
-            if (context.MultiSelectionEntities!.Count == 1)
+            long? newValue = null;
+            if (element.SelectedItem is BaseDatabaseCellViewModel.ParameterOption option)
+                newValue = option.Value;
+            else if (long.TryParse(element.SearchText, out var longVal))
+                newValue = longVal;
+
+            if (newValue.HasValue)
             {
-                cellModel.AsLongValue = newValue.Value;
-            }
-            else
-            {
-                using var _ = context.BulkEdit("Change " + column);
-                context.MultiSelectionEntities!.Each(entity => entity.SetTypedCellOrThrow(column, newValue.Value));
+                if (context.MultiSelectionEntities!.Count == 1)
+                {
+                    cellModel.AsLongValue = newValue.Value;
+                }
+                else
+                {
+                    using var _ = context.BulkEdit("Change " + column);
+                    context.MultiSelectionEntities!.Each(entity => entity.SetTypedCellOrThrow(column, newValue.Value));
+                }
             }
         }
-        else if (strValue != null)
+        else
         {
-            if (context.MultiSelectionEntities!.Count == 1)
+            string? strValue = null;
+            if (element.SelectedItem is BaseDatabaseCellViewModel.ParameterStringOption strOption)
+                strValue = strOption.Value;
+            else if (!string.IsNullOrWhiteSpace(element.SearchText))
+                strValue = element.SearchText;
+            
+            if (strValue != null)
             {
-                cellModel.AsStringValue = strValue;
+                if (context.MultiSelectionEntities!.Count == 1)
+                {
+                    cellModel.AsStringValue = strValue;
+                }
+                else
+                {
+                    using var _ = context.BulkEdit("Change " + column);
+                    context.MultiSelectionEntities!.Each(entity => entity.SetTypedCellOrThrow(column, strValue));
+                }   
             }
-            else
-            {
-                using var _ = context.BulkEdit("Change " + column);
-                context.MultiSelectionEntities!.Each(entity => entity.SetTypedCellOrThrow(column, strValue));
-            }   
         }
     }
 }
