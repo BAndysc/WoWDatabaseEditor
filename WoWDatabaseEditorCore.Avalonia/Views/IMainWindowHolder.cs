@@ -30,15 +30,20 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
             if (windows == null)
                 throw new Exception("No windows found! Are you running it in web assembly?");
             
-            return windows.SingleOrDefault(w => w.IsActive);
+            return windows.SingleOrDefault(w => w.IsActive) ?? windows.SingleOrDefault(w => w is MainWindowWithDocking);
         }
         
         public Task<T> ShowDialog<T>(Window window)
         {
             var top = FindTopWindow();
-            if (top != null && top.WindowState == WindowState.Minimized)
-                top.WindowState = WindowState.Normal;
-            return window.ShowDialog<T>(top);
+            if (top != null)
+            {
+                if (top.WindowState == WindowState.Minimized)
+                    top.WindowState = WindowState.Normal;
+                return window.ShowDialog<T>(top);
+            }
+
+            throw new Exception("Trying to show dialog without any active window! Are you closing the editor already?");
         }
 
         public void Show(Window window)
