@@ -8,6 +8,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.LogicalTree;
+using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 
@@ -114,8 +115,10 @@ public class PhantomTextBox : PhantomControlBase<TextBox>
         };
         textBox.MinWidth = 0;
         textBox.MinHeight = 0;
-        textBox.Padding = new Thickness(5, 0, 0, 0);
+        textBox.Padding = new Thickness(5 + 3, -2, 0, 0);
+        textBox.Margin = new Thickness(0,  0, 0, 0);
         textBox.Text = text;
+        textBox.FontFamily = new FontFamily("Consolas,Menlo,Courier,Courier New");
         textBox.KeyBindings.Add(new KeyBinding()
         {
             Gesture = new KeyGesture(Key.Enter),
