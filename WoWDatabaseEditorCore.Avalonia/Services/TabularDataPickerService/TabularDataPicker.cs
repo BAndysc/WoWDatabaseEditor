@@ -18,7 +18,7 @@ public class TabularDataPicker : ITabularDataPicker
     
     public async Task<T?> PickRow<T>(ITabularDataArgs<T> args, int defaultSelection)
     {
-        using var viewModel = new TabularDataPickerViewModel(args.AsObject(), defaultSelection);
+        using var viewModel = new Avalonia.Services.TabularDataPickerService.TabularDataPickerViewModel(args.AsObject(), defaultSelection);
         await windowManager.ShowDialog(viewModel);
         return viewModel.SelectedItem == null ? default : (T)viewModel.SelectedItem;
     }

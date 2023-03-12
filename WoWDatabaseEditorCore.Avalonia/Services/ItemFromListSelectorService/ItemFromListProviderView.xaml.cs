@@ -1,11 +1,15 @@
 ﻿using System;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Input.Platform;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using AvaloniaStyles.Controls;
+using Prism.Commands;
 using WDE.Common.Avalonia.Controls;
+using WoWDatabaseEditorCore.Services.ItemFromListSelectorService;
 
 namespace WoWDatabaseEditorCore.Avalonia.Services.ItemFromListSelectorService
 {
@@ -22,6 +26,14 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.ItemFromListSelectorService
         private void InitializeComponent()
         {
             AvaloniaXamlLoader.Load(this);
+            KeyBindings.Add(new KeyBinding()
+            {
+                Command = new DelegateCommand(() =>
+                {
+                    this.FindControl<TextBox>("SearchBox").Focus();
+                }),
+                Gesture = new KeyGesture(Key.F, AvaloniaLocator.Current.GetService<PlatformHotkeyConfiguration>().CommandModifiers)
+            });
         }
 
         private void InputElement_OnKeyDown(object? sender, KeyEventArgs e)

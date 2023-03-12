@@ -1,8 +1,10 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Input.Platform;
 using Avalonia.Markup.Xaml;
 using AvaloniaStyles.Controls;
+using Prism.Commands;
 
 namespace WoWDatabaseEditorCore.Avalonia.Services.TabularDataPickerService;
 
@@ -16,6 +18,14 @@ public partial class TabularDataPickerView : UserControl
     private void InitializeComponent()
     {
         AvaloniaXamlLoader.Load(this);
+        KeyBindings.Add(new KeyBinding()
+        {
+            Command = new DelegateCommand(() =>
+            {
+                this.FindControl<TextBox>("SearchBox").Focus();
+            }),
+            Gesture = new KeyGesture(Key.F, AvaloniaLocator.Current.GetService<PlatformHotkeyConfiguration>().CommandModifiers)
+        });
     }
 
     // quality of life feature: arrow down in searchbox focuses first element

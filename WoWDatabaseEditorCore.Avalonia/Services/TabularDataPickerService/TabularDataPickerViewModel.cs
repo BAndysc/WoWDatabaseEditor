@@ -1,26 +1,21 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Reactive.Linq;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 using System.Windows.Input;
-using Avalonia.Controls;
-using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Templates;
+using Avalonia.Data;
 using Avalonia.Threading;
 using Prism.Commands;
 using PropertyChanged.SourceGenerator;
+using WDE.Common.Avalonia.Controls;
 using WDE.Common.Collections;
 using WDE.Common.Managers;
-using WDE.Common.Providers;
 using WDE.Common.TableData;
 using WDE.Common.Types;
-using WDE.Common.Utils;
 using WDE.MVVM;
 
-namespace WoWDatabaseEditorCore.Services.TabularDataPickerService;
+namespace WoWDatabaseEditorCore.Avalonia.Services.TabularDataPickerService;
 
 public partial class TabularDataPickerViewModel : ObservableBase, IDialog
 {
@@ -47,6 +42,14 @@ public partial class TabularDataPickerViewModel : ObservableBase, IDialog
             {
                 if (c.DataTemplate is { })
                     return ColumnDescriptor.DataTemplateColumn(c.Header, c.DataTemplate, c.Width, false);
+                else if (c is ITabularDataAsyncColumn asyncColumn)
+                {
+                    return ColumnDescriptor.DataTemplateColumn(c.Header, new FuncDataTemplate(_ => true, (_, _) => new AsyncDynamicTextBlock()
+                    {
+                        [!AsyncDynamicTextBlock.ValueProperty] = new Binding(c.PropertyName),
+                        Evaluator = asyncColumn.ComputeAsync
+                    }), c.Width, false);
+                }
                 return ColumnDescriptor.TextColumn(c.Header, c.PropertyName, c.Width, false);
             })
             .ToList();
@@ -56,18 +59,21 @@ public partial class TabularDataPickerViewModel : ObservableBase, IDialog
         Items = args.Data;
         selectedIndex = defaultSelection;
         
-        Accept = new DelegateCommand(() =>
+        acceptCommand = new DelegateCommand(() =>
         {
+            if (SelectedItem == null && Items.Count > 0)
+                SelectedIndex = 0;
             CloseOk?.Invoke();
-        }, () => SelectedItem != null).ObservesProperty(() => SelectedItem);
+        }, () => SelectedItem != null || Items.Count > 0).ObservesProperty(() => SelectedItem);
         Cancel = new DelegateCommand(() =>
         {
             CloseCancel?.Invoke();
         });
         
-        this.ToObservable(() => SearchText)
+        this.ToObservable<string, TabularDataPickerViewModel>(() => SearchText)
             .Throttle(TimeSpan.FromMilliseconds(50), AvaloniaScheduler.Instance)
             .Subscribe(Filter);
+        On(() => Items, _ => acceptCommand.RaiseCanExecuteChanged());
     }
 
     private void Filter(string text)
@@ -137,7 +143,8 @@ public partial class TabularDataPickerViewModel : ObservableBase, IDialog
     public int DesiredHeight => 750;
     public string Title { get; }
     public bool Resizeable => true;
-    public ICommand Accept { get; }
+    private DelegateCommand acceptCommand;
+    public ICommand Accept => acceptCommand;
     public ICommand Cancel { get; }
     public event Action? CloseCancel;
     public event Action? CloseOk;

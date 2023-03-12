@@ -3,22 +3,18 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
-             xmlns:tabularDataPickerService="clr-namespace:WoWDatabaseEditorCore.Services.TabularDataPickerService;assembly=WoWDatabaseEditorCore"
+             xmlns:tabularDataPickerService="clr-namespace:WoWDatabaseEditorCore.Avalonia.Services.TabularDataPickerService"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="tabularDataPickerService:TabularDataPickerViewModel"
              Margin="5"
              x:Class="WoWDatabaseEditorCore.Avalonia.Services.TabularDataPickerService.TabularDataPickerView">
-    <!-- <GridView -->
-    <!--     utils:DataGridColumns.ColumnsSource="{CompiledBinding  Columns}" -->
-    <!--     Items="{CompiledBinding Items}"> -->
-    <!--      -->
-    <!-- </GridView> -->
     <DockPanel>
         <TextBox
             Text="{CompiledBinding SearchText}"
             Watermark="Search"
             KeyDown="SearchBox_OnKeyDown"
             DockPanel.Dock="Top" 
+            Name="SearchBox"
             utils:FocusUtils.FocusFirst="True" />
         <OkCancelButtons DockPanel.Dock="Bottom" 
                          AcceptCommand="{CompiledBinding Accept}"
