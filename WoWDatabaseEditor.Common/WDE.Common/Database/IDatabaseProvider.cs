@@ -12,7 +12,7 @@ namespace WDE.Common.Database
         bool IsConnected { get; }
         
         ICreatureTemplate? GetCreatureTemplate(uint entry);
-        IEnumerable<ICreatureTemplate> GetCreatureTemplates();
+        IReadOnlyList<ICreatureTemplate> GetCreatureTemplates();
 
         IGameObjectTemplate? GetGameObjectTemplate(uint entry);
         IEnumerable<IGameObjectTemplate> GetGameObjectTemplates();
@@ -80,7 +80,7 @@ namespace WDE.Common.Database
         IEnumerable<IGameObject> GetGameObjectsByEntry(uint entry);
         Task<IList<ICreature>> GetCreaturesByEntryAsync(uint entry);
         Task<IList<IGameObject>> GetGameObjectsByEntryAsync(uint entry);
-        IEnumerable<ICreature> GetCreatures();
+        IReadOnlyList<ICreature> GetCreatures();
         Task<IList<ICreature>> GetCreaturesAsync();
         Task<IList<IGameObject>> GetGameObjectsAsync();
         Task<IList<ICreature>> GetCreaturesByMapAsync(uint map);

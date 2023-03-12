@@ -208,7 +208,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         
         public Task<IAreaTriggerTemplate?> GetAreaTriggerTemplate(int entry) => nonCachedDatabase.GetAreaTriggerTemplate(entry);
 
-        public IEnumerable<ICreatureTemplate> GetCreatureTemplates()
+        public IReadOnlyList<ICreatureTemplate> GetCreatureTemplates()
         {
             if (creatureTemplateCache != null)
                 return creatureTemplateCache;
@@ -221,7 +221,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             return nonCachedDatabase.GetGameObjectsByEntryAsync(entry);
         }
 
-        public IEnumerable<ICreature> GetCreatures()
+        public IReadOnlyList<ICreature> GetCreatures()
         {
             return nonCachedDatabase.GetCreatures();
         }

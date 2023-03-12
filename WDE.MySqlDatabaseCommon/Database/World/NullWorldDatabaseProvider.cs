@@ -12,11 +12,11 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         
         public ICreatureTemplate? GetCreatureTemplate(uint entry) => null;
 
-        public IEnumerable<ICreatureTemplate> GetCreatureTemplates() => Enumerable.Empty<ICreatureTemplate>();
+        public IReadOnlyList<ICreatureTemplate> GetCreatureTemplates() => Array.Empty<ICreatureTemplate>();
 
         public IGameObjectTemplate? GetGameObjectTemplate(uint entry) => null;
 
-        public IEnumerable<IGameObjectTemplate> GetGameObjectTemplates() => Enumerable.Empty<IGameObjectTemplate>();
+        public IEnumerable<IGameObjectTemplate> GetGameObjectTemplates() => Array.Empty<IGameObjectTemplate>();
         
         public Task<IAreaTriggerScript?> GetAreaTriggerScript(int entry) => Task.FromResult<IAreaTriggerScript?>(null);
         
@@ -98,7 +98,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public Task<IList<IGameObject>> GetGameObjectsByEntryAsync(uint entry) => Task.FromResult<IList<IGameObject>>(new List<IGameObject>());
 
-        public IEnumerable<ICreature> GetCreatures() => Enumerable.Empty<ICreature>();
+        public IReadOnlyList<ICreature> GetCreatures() => Array.Empty<ICreature>();
         public Task<IList<ICreature>> GetCreaturesByMapAsync(uint map) => Task.FromResult<IList<ICreature>>(new List<ICreature>());
         
         public Task<IList<IGameObject>> GetGameObjectsByMapAsync(uint map) => Task.FromResult<IList<IGameObject>>(new List<IGameObject>());

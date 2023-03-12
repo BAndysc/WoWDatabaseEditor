@@ -16,7 +16,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public bool IsConnected => impl.IsConnected;
         public ICreatureTemplate? GetCreatureTemplate(uint entry) => impl.GetCreatureTemplate(entry);
-        public IEnumerable<ICreatureTemplate> GetCreatureTemplates() => impl.GetCreatureTemplates();
+        public IReadOnlyList<ICreatureTemplate> GetCreatureTemplates() => impl.GetCreatureTemplates();
         public IGameObjectTemplate? GetGameObjectTemplate(uint entry) => impl.GetGameObjectTemplate(entry);
         public IEnumerable<IGameObjectTemplate> GetGameObjectTemplates() => impl.GetGameObjectTemplates();
         public Task<IAreaTriggerScript?> GetAreaTriggerScript(int entry) => impl.GetAreaTriggerScript(entry);
@@ -108,7 +108,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public Task<IList<ICreature>> GetCreaturesByEntryAsync(uint entry) => impl.GetCreaturesByEntryAsync(entry);
         public Task<IList<IGameObject>> GetGameObjectsByEntryAsync(uint entry) => impl.GetGameObjectsByEntryAsync(entry);
 
-        public IEnumerable<ICreature> GetCreatures() => impl.GetCreatures();
+        public IReadOnlyList<ICreature> GetCreatures() => impl.GetCreatures();
         public Task<IList<ICreature>> GetCreaturesAsync() => impl.GetCreaturesAsync();
         public Task<IList<IGameObject>> GetGameObjectsAsync() => impl.GetGameObjectsAsync();
         public Task<IList<ICreature>> GetCreaturesByMapAsync(uint map) => impl.GetCreaturesByMapAsync(map);

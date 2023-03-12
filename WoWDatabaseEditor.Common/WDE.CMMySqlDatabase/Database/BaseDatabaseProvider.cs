@@ -22,7 +22,7 @@ namespace WDE.CMMySqlDatabase.Database
     {
         public bool IsConnected => true;
         public abstract ICreatureTemplate? GetCreatureTemplate(uint entry);
-        public abstract IEnumerable<ICreatureTemplate> GetCreatureTemplates();
+        public abstract IReadOnlyList<ICreatureTemplate> GetCreatureTemplates();
 
         private readonly ICurrentCoreVersion currentCoreVersion;
 
@@ -309,7 +309,7 @@ namespace WDE.CMMySqlDatabase.Database
         public abstract IEnumerable<ICreature> GetCreaturesByEntry(uint entry);
 
 
-        public abstract IEnumerable<ICreature> GetCreatures();
+        public abstract IReadOnlyList<ICreature> GetCreatures();
         public abstract Task<IList<ICreature>> GetCreaturesByMapAsync(uint map);
         public abstract Task<IList<IGameObject>> GetGameObjectsByMapAsync(uint map);
         public abstract IEnumerable<IGameObject> GetGameObjects();

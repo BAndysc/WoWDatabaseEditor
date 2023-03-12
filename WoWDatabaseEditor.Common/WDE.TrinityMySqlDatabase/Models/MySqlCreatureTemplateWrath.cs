@@ -56,6 +56,9 @@ namespace WDE.TrinityMySqlDatabase.Models
         [Column(Name = "npcflag")]
         public GameDefines.NpcFlags NpcFlags { get; set; }
         
+        [Column(Name = "faction")]
+        public uint FactionTemplate { get; set; }
+        
         public uint? EquipmentTemplateId => null;
         
         public int ModelsCount => 4;
@@ -115,6 +118,9 @@ namespace WDE.TrinityMySqlDatabase.Models
         [Column(Name = "npcflag")]
         public GameDefines.NpcFlags NpcFlags { get; set; }
 
+        [Column(Name = "faction")]
+        public uint FactionTemplate { get; set; }
+        
         public uint? EquipmentTemplateId => null;
 
         private IReadOnlyList<CreatureTemplateModel>? models;

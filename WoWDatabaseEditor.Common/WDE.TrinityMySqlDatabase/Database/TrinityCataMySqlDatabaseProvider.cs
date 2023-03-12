@@ -23,7 +23,7 @@ public class TrinityCataMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvider
         return model.CreatureTemplate.FirstOrDefault(ct => ct.Entry == entry);
     }
 
-    public override IEnumerable<ICreatureTemplate> GetCreatureTemplates()
+    public override IReadOnlyList<ICreatureTemplate> GetCreatureTemplates()
     {
         using var model = Database();
         return model.CreatureTemplate.OrderBy(t => t.Entry).ToList<ICreatureTemplate>();
@@ -89,7 +89,7 @@ public class TrinityCataMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvider
         return model.Creature.Where(g => g.Entry == entry).ToList();
     }
 
-    public override IEnumerable<ICreature> GetCreatures()
+    public override IReadOnlyList<ICreature> GetCreatures()
     {
         using var model = Database();
         return model.Creature.OrderBy(t => t.Entry).ToList<ICreature>();

@@ -57,6 +57,9 @@ public class CreatureTemplateTBC : ICreatureTemplate
     [Column("EquipmentTemplateId")]
     public uint? EquipmentTemplateId { get; set; }
 
+    [Column(Name = "Faction")]
+    public uint FactionTemplate { get; set; }
+    
     public int ModelsCount => 4;
     public uint GetModel(int index)
     {
