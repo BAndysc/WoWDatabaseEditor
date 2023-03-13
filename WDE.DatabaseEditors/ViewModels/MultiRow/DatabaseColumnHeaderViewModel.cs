@@ -22,7 +22,9 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             Help = column.Help;
             PreferredWidth = column.PreferredWidth;
             width = PreferredWidth ?? 100;
-            if (DatabaseName.Length > 0)
+            if (!string.IsNullOrWhiteSpace(column.ColumnIdForUi))
+                ColumnIdForUi = column.ColumnIdForUi;
+            else if (DatabaseName.Length > 0)
                 ColumnIdForUi = DatabaseName;
             else
                 ColumnIdForUi = string.Concat(Name.Where(char.IsLetter));

@@ -466,16 +466,18 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             autoIncrementColumn = columns.FirstOrDefault(c => c.AutoIncrement);
             if (Columns.Count == 0)
             {
-                Columns.AddRange(columns.Select(c => AutoDispose(new DatabaseColumnHeaderViewModel(c)
+                Columns.AddRange(columns.Select(c =>
                 {
-                    Width = tablePersonalSettings.GetColumnWidth(TableDefinition.Id, c.DbColumnName, c.PreferredWidth ?? 120)
-                })));
+                    var column = new DatabaseColumnHeaderViewModel(c);
+                    column.Width = tablePersonalSettings.GetColumnWidth(TableDefinition.Id, column.ColumnIdForUi, c.PreferredWidth ?? 120);
+                    return AutoDispose(column);
+                }));
                 Columns.Each(col => col.ToObservable(c => c.Width)
                     .Skip(1)
                     .Throttle(TimeSpan.FromMilliseconds(300))
                     .Subscribe(width =>
                     {
-                        tablePersonalSettings.UpdateWidth(TableDefinition.Id, col.DatabaseName, col.PreferredWidth ?? 100,  ((int)(width) / 5) * 5);
+                        tablePersonalSettings.UpdateWidth(TableDefinition.Id, col.ColumnIdForUi, col.PreferredWidth ?? 100,  ((int)(width) / 5) * 5);
                     }));   
             }
             

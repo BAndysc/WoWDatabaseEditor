@@ -572,11 +572,13 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                 Debug.Assert(Columns.Count == 0);
                 if (mode == DocumentMode.PickRow)
                     columns.Insert(0, new DatabaseColumnJson(){Name="Pick", Meta = "picker", PreferredWidth = 30});
-                Columns.AddRange(columns.Select(c => AutoDispose(new DatabaseColumnHeaderViewModel(c)
+                Columns.AddRange(columns.Select(c =>
                 {
-                    IsVisible = personalSettings.IsColumnVisible(TableDefinition.Id, c.DbColumnName),
-                    Width = personalSettings.GetColumnWidth(TableDefinition.Id, c.DbColumnName, c.PreferredWidth ?? 100)
-                })));
+                    var column = new DatabaseColumnHeaderViewModel(c);
+                    column.Width = personalSettings.GetColumnWidth(TableDefinition.Id, column.ColumnIdForUi, c.PreferredWidth ?? 120);
+                    column.IsVisible = personalSettings.IsColumnVisible(TableDefinition.Id, column.ColumnIdForUi);
+                    return AutoDispose(column);
+                }));
                 Columns.Each((col, i) => AutoDispose(col.ToObservable(x => x.IsVisible)
                     .Subscribe(@is =>
                     {
@@ -585,7 +587,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                             if (HiddenColumns.Contains(i))
                             {
                                 HiddenColumns.Remove(i);
-                                personalSettings.UpdateVisibility(TableDefinition.Id, col.DatabaseName, @is);
+                                personalSettings.UpdateVisibility(TableDefinition.Id, col.ColumnIdForUi, @is);
                             }
                         }
                         else
@@ -593,7 +595,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                             if (!HiddenColumns.Contains(i))
                             {
                                 HiddenColumns.Add(i);
-                                personalSettings.UpdateVisibility(TableDefinition.Id, col.DatabaseName, @is);
+                                personalSettings.UpdateVisibility(TableDefinition.Id, col.ColumnIdForUi, @is);
                             }
                         }
                     })));
@@ -602,7 +604,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                     .Throttle(TimeSpan.FromMilliseconds(300))
                     .Subscribe(width =>
                     {
-                        personalSettings.UpdateWidth(TableDefinition.Id, col.DatabaseName, col.PreferredWidth ?? 100,  ((int)(width) / 5) * 5);
+                        personalSettings.UpdateWidth(TableDefinition.Id, col.ColumnIdForUi, col.PreferredWidth ?? 100,  ((int)(width) / 5) * 5);
                     }));
             }
 

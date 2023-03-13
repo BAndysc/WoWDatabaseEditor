@@ -12,7 +12,10 @@ namespace WDE.DatabaseEditors.Data.Structs
         
         [JsonProperty(PropertyName = "db_column_name")]
         public string DbColumnName { get; set; } = "";
-        
+
+        [JsonProperty(PropertyName = "column_id")]
+        public string? ColumnIdForUi { get; set; }
+
         [JsonProperty(PropertyName = "foreign_table")]
         public string? ForeignTable { get; set; }
         
