@@ -1250,7 +1250,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 int index;
                 
                 if (AnyGroupSelected)
-                    index = below ? LastSelectedGroupIndex : FirstSelectedGroupIndex;
+                    index = below ? LastSelectedGroupEndIndex : FirstSelectedGroupIndex;
                 else
                     index = below ? LastSelectedEventIndex : FirstSelectedEventIndex;
 
@@ -1262,10 +1262,13 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
                 var fakeGroup = new SmartGroup(SmartEvent.NewBeginGroup());
                 using var vm = new SmartGroupEditViewModel(fakeGroup);
+                if (await windowManager.ShowDialog(vm))
                 {
                     using var _ = script.BulkEdit("Insert group");
+                    DeselectAll.Execute();
                     var group = script.InsertGroupBegin(ref index, fakeGroup.Header, fakeGroup.Description);
                     script.InsertGroupEnd(index + 1);
+                    group.IsSelected = true;
                 }
             }
 
@@ -1459,6 +1462,9 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
         private int LastSelectedGroupIndex =>
             Events.Select((e, index) => (e.IsSelected && e.IsBeginGroup, index)).Where(p => p.Item1).Select(p => p.index).LastOrDefault(-1);
+
+        private int LastSelectedGroupEndIndex =>
+            Events.Select((e, index) => (e.IsSelected && e.IsEndGroup, index)).Where(p => p.Item1).Select(p => p.index).LastOrDefault(-1);
 
         public (int eventIndex, int actionIndex) FirstSelectedActionIndex =>
             Events.SelectMany((e, eventIndex) => e.Actions.Select((a, actionIndex) => (a.IsSelected, eventIndex, actionIndex)))
