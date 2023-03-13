@@ -4,12 +4,14 @@ using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Prism.Events;
 using DBCD;
 using WDE.Common.Collections;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;
+using WDE.Common.Database.Counters;
 using WDE.Common.DBC;
 using WDE.Common.DBC.Structs;
 using WDE.Common.Game;
@@ -71,6 +73,7 @@ namespace WDE.DbcStore
         private readonly ICurrentCoreVersion currentCoreVersion;
         private readonly ITabularDataPicker dataPicker;
         private readonly IWindowManager windowManager;
+        private readonly IDatabaseRowsCountProvider databaseRowsCountProvider;
         private readonly NullSpellService nullSpellService;
         private readonly CataSpellService cataSpellService;
         private readonly WrathSpellService wrathSpellService;
@@ -88,6 +91,7 @@ namespace WDE.DbcStore
             ICurrentCoreVersion currentCoreVersion,
             ITabularDataPicker dataPicker,
             IWindowManager windowManager,
+            IDatabaseRowsCountProvider databaseRowsCountProvider,
             NullSpellService nullSpellService,
             CataSpellService cataSpellService,
             WrathSpellService wrathSpellService,
@@ -103,6 +107,7 @@ namespace WDE.DbcStore
             this.currentCoreVersion = currentCoreVersion;
             this.dataPicker = dataPicker;
             this.windowManager = windowManager;
+            this.databaseRowsCountProvider = databaseRowsCountProvider;
             this.nullSpellService = nullSpellService;
             this.cataSpellService = cataSpellService;
             this.wrathSpellService = wrathSpellService;
@@ -474,17 +479,35 @@ namespace WDE.DbcStore
                 parameterFactory.Register("VignetteParameter", new DbcParameterWowTools(VignetteStore, "vignette", store.currentCoreVersion, store.windowManager));
                 parameterFactory.Register("VehicleParameter", new WoWToolsParameter("vehicle", store.currentCoreVersion, store.windowManager));
                 parameterFactory.Register("LockParameter", new WoWToolsParameter("lock", store.currentCoreVersion, store.windowManager));
-                
-                parameterFactory.Register("ZoneAreaParameter", 
-                    new DbcParameterWithPicker<IArea>(dataPicker, AreaStore, "zone or area", area => area.Id,
-                        () => store.Areas,
-                        (area, text) => area.Name.Contains(text, StringComparison.InvariantCultureIgnoreCase) || area.Id.Contains(text),
-                        new TabularDataColumn(nameof(IArea.Id), "Entry", 60), 
-                        new TabularDataColumn(nameof(IArea.Name), "Name", 160), 
-                        new TabularDataColumn(nameof(IArea.ParentArea) + "." + nameof(IArea.Name), "Parent", 160), 
-                        new TabularDataColumn(nameof(IArea.Map) + "." + nameof(IMap.Name), "Map", 120)), QuickAccessMode.Limited);
 
-                
+                void RegisterZoneAreParameter(string key, TabularDataAsyncColumn<uint>? counterColumn = null)
+                {
+                    parameterFactory.Register(key, 
+                        new DbcParameterWithPicker<IArea>(dataPicker, AreaStore, "zone or area", area => area.Id,
+                            () => store.Areas,
+                            (area, text) => area.Name.Contains(text, StringComparison.InvariantCultureIgnoreCase) || area.Id.Contains(text),
+                            new TabularDataColumn(nameof(IArea.Id), "Entry", 60), 
+                            new TabularDataColumn(nameof(IArea.Name), "Name", 160), 
+                            new TabularDataColumn(nameof(IArea.ParentArea) + "." + nameof(IArea.Name), "Parent", 160), 
+                            new TabularDataColumn(nameof(IArea.Map) + "." + nameof(IMap.Name), "Map", 120),
+                            counterColumn), QuickAccessMode.Limited);   
+                }
+                RegisterZoneAreParameter("ZoneAreaParameter");
+                RegisterZoneAreParameter("ZoneArea(spell_area)Parameter", 
+                    new TabularDataAsyncColumn<uint>(nameof(IArea.Id), "Count", async (zoneId, token) =>
+                {
+                    if (zoneId == 0)
+                        return "0";
+                    return (await store.databaseRowsCountProvider.GetRowsCountByPrimaryKey("spell_area", zoneId, token)).ToString();
+                }, 50));
+                RegisterZoneAreParameter("ZoneArea(phase_definitions)Parameter", 
+                    new TabularDataAsyncColumn<uint>(nameof(IArea.Id), "Count", async (zoneId, token) =>
+                {
+                    if (zoneId == 0)
+                        return "0";
+                    return (await store.databaseRowsCountProvider.GetRowsCountByPrimaryKey("phase_definitions", zoneId, token)).ToString();
+                }, 50));
+
                 parameterFactory.RegisterDepending("BattlePetSpeciesParameter", "CreatureParameter", (creature) => new BattlePetSpeciesParameter(store, parameterFactory, creature));
 
                 switch (dbcSettingsProvider.GetSettings().DBCVersion)
@@ -1446,14 +1469,14 @@ namespace WDE.DbcStore
             Func<T, long> getId,
             Func<IReadOnlyList<T>> getListOf,
             Func<T, string, bool> filter,
-            params ITabularDataColumn[] columns) : base(storage)
+            params ITabularDataColumn?[] columns) : base(storage)
         {
             this.dataPicker = dataPicker;
             this.dbc = dbc;
             this.getId = getId;
             this.getListOf = getListOf;
             this.filter = filter;
-            this.columns = columns;
+            this.columns = columns.Where(c => c != null).Cast<ITabularDataColumn>().ToArray();
         }
         
         public async Task<(long, bool)> PickValue(long value)

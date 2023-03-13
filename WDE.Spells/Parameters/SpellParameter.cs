@@ -7,10 +7,12 @@ namespace WDE.Spells.Parameters
     internal class SpellParameter : ParameterNumbered, ICustomPickerParameter<long>, ISpellParameter
     {
         private readonly ISpellEntryProviderService picker;
+        private readonly string? customCounterTable;
 
-        public SpellParameter(ISpellEntryProviderService picker, IParameter<long> dbc, IParameter<long> db)
+        public SpellParameter(ISpellEntryProviderService picker, IParameter<long> dbc, IParameter<long> db, string? customCounterTable = null) 
         {
             this.picker = picker;
+            this.customCounterTable = customCounterTable;
             Items = new();
             if (dbc.Items != null)
             {
@@ -27,7 +29,7 @@ namespace WDE.Spells.Parameters
 
         public async Task<(long, bool)> PickValue(long value)
         {
-            var picked = await picker.GetEntryFromService((uint)value);
+            var picked = await picker.GetEntryFromService((uint)value, customCounterTable);
             return (picked ?? 0, picked.HasValue);
         }
     }

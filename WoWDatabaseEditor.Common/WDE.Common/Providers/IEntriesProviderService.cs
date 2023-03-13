@@ -6,7 +6,7 @@ namespace WDE.Common
     [UniqueProvider]
     public interface ICreatureEntryOrGuidProviderService
     {
-        Task<int?> GetEntryFromService(uint? entry = null);
+        Task<int?> GetEntryFromService(uint? entry = null, string? customCounterTable = null);
     }
 
     [UniqueProvider]
@@ -24,6 +24,6 @@ namespace WDE.Common
     [UniqueProvider]
     public interface ISpellEntryProviderService
     {
-        Task<uint?> GetEntryFromService(uint? spellId = null);
+        Task<uint?> GetEntryFromService(uint? spellId = null, string? customCounterTable = null);
     }
 }

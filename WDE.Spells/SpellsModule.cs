@@ -26,7 +26,13 @@ namespace WDE.Spells
                     {
                         var factory = containerProvider.Resolve<IParameterFactory>();
                         var spellPicker = this.containerProvider.Resolve<ISpellEntryProviderService>();
-                        factory.RegisterCombined("SpellParameter", "DbcSpellParameter", "DatabaseSpellParameter", (dbc, db) => new SpellParameter(spellPicker, dbc, db), QuickAccessMode.Limited);
+
+                        void RegisterSpellParameter(string key, string? customCounterTable = null) =>
+                           factory.RegisterCombined(key, "DbcSpellParameter", "DatabaseSpellParameter", (dbc, db) => new SpellParameter(spellPicker, dbc, db, customCounterTable), QuickAccessMode.Limited);
+                        
+                        RegisterSpellParameter("SpellParameter");
+                        RegisterSpellParameter("Spell(spell_override)Parameter", "spell_override");
+                        
                         factory.RegisterDepending("MultiSpellParameter", "SpellParameter",  spells => new MultiSpellParameter(spells));
                         factory.RegisterDepending("SpellAreaSpellParameter", "SpellParameter", spells => new SpellAreaSpellParameter(spells));
                         factory.RegisterDepending("SpellOrRankedSpellParameter", "SpellParameter", spells => new SpellOrRankedSpellParameter(spells));

@@ -109,6 +109,8 @@ namespace WDE.Parameters
             factory.Register("DecifloatParameter", new FloatIntParameter(100));
             factory.Register("GameEventParameter", AddDatabaseParameter(new GameEventParameter(database)), QuickAccessMode.Limited);
             factory.Register("CreatureParameter", AddDatabaseParameter(new CreatureParameter(database, creaturePicker, serverIntegration)), QuickAccessMode.Limited);
+            factory.Register("Creature(creature_text)Parameter", AddDatabaseParameter(new CreatureParameter(database, creaturePicker, serverIntegration, "creature_text")), QuickAccessMode.Limited);
+            factory.Register("Creature(smart_ai_text)Parameter", AddDatabaseParameter(new CreatureParameter(database, creaturePicker, serverIntegration, "smart_ai_text")), QuickAccessMode.Limited);
             factory.Register("CreatureGameobjectNameParameter", AddDatabaseParameter(new CreatureGameobjectNameParameter(database)));
             factory.Register("CreatureGameobjectParameter", AddDatabaseParameter(new CreatureGameobjectParameter(database)));
             factory.Register("QuestParameter", AddDatabaseParameter(new QuestParameter(database, questEntryProviderService)), QuickAccessMode.Limited);
@@ -401,20 +403,25 @@ namespace WDE.Parameters
     {
         private readonly IDatabaseProvider database;
         private readonly ICreatureEntryOrGuidProviderService picker;
+        private readonly string? customCounterTable;
 
         public async Task<(long, bool)> PickValue(long value)
         {
-            var result = await picker.GetEntryFromService((uint)value);
+            var result = await picker.GetEntryFromService((uint)value, customCounterTable);
             return (result ?? 0, result.HasValue);
         }
 
         public override Func<Task<object?>>? SpecialCommand { get; }
 
-        public CreatureParameter(IDatabaseProvider database, ICreatureEntryOrGuidProviderService picker, IServerIntegration serverIntegration)
+        public CreatureParameter(IDatabaseProvider database, 
+            ICreatureEntryOrGuidProviderService picker,
+            IServerIntegration serverIntegration, 
+            string? customCounterTable = null)
         {
             Items = new Dictionary<long, SelectOption>();
             this.database = database;
             this.picker = picker;
+            this.customCounterTable = customCounterTable;
             SpecialCommand = async () =>
             {
                 var entry = await serverIntegration.GetSelectedEntry();

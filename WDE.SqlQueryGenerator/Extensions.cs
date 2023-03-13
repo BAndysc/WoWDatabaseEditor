@@ -241,6 +241,14 @@ namespace WDE.SqlQueryGenerator
             return new Query(query.Table, $"SELECT {string.Join(", ", columns)} FROM `{query.Table.TableName}` WHERE {query.Condition};");
         }
 
+        public static IQuery SelectGroupBy(this IWhere query, string[] groupBy, params string[] columns)
+        {
+            var by = string.Join(", ", groupBy.Select(col => $"`{col}`"));
+            if (query.Condition == "1")
+                return new Query(query.Table, $"SELECT {string.Join(", ", columns)} FROM `{query.Table.TableName}` GROUP BY {by};");
+            return new Query(query.Table, $"SELECT {string.Join(", ", columns)} FROM `{query.Table.TableName}` WHERE {query.Condition} GROUP BY {by};");
+        }
+
         public static IUpdateQuery ToUpdateQuery(this IWhere query)
         {
             return new UpdateQuery(query);
