@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Prism.Events;
@@ -62,7 +63,7 @@ namespace WDE.DbcStore
 
     [AutoRegister]
     [SingleInstance]
-    public class DbcStore : IDbcStore, IDbcSpellService, IMapAreaStore
+    public class DbcStore : IDbcStore, IDbcSpellService, IMapAreaStore, IFactionTemplateStore
     {
         private readonly IDbcSettingsProvider dbcSettingsProvider;
         private readonly IMessageBoxService messageBoxService;
@@ -153,8 +154,16 @@ namespace WDE.DbcStore
         public IReadOnlyList<IMap> Maps { get; internal set; } = Array.Empty<IMap>();
         public Dictionary<uint, IMap> MapById { get; internal set; } = new();
         
+        public IReadOnlyList<FactionTemplate> FactionTemplates { get; internal set; } = Array.Empty<FactionTemplate>();
+        public Dictionary<uint, FactionTemplate> FactionTemplateById { get; internal set; } = new();
+        
+        public IReadOnlyList<Faction> Factions { get; internal set; } = Array.Empty<Faction>();
+        public Dictionary<ushort, Faction> FactionsById { get; internal set; } = new();
+        
         public IArea? GetAreaById(uint id) => AreaById.TryGetValue(id, out var area) ? area : null;
         public IMap? GetMapById(uint id) => MapById.TryGetValue(id, out var map) ? map : null;
+        public FactionTemplate? GetFactionTemplate(uint templateId) => FactionTemplateById.TryGetValue(templateId, out var faction) ? faction : null;
+        public Faction? GetFaction(ushort factionId) => FactionsById.TryGetValue(factionId, out var faction) ? faction : null;
         
         internal void Load()
         {            
@@ -242,7 +251,9 @@ namespace WDE.DbcStore
             private List<(string parameter, Dictionary<long, SelectOption> options)> parametersToRegister = new();
             public List<AreaEntry> Areas { get; } = new();
             public List<MapEntry> Maps { get; } = new();
-            
+            public List<FactionTemplate> FactionTemplates { get; } = new();
+            public List<Faction> Factions { get; } = new();
+             
             public string Name => "DBC Loading";
             public bool WaitForOtherTasks => false;
             private DatabaseClientFileOpener opener;
@@ -395,6 +406,10 @@ namespace WDE.DbcStore
                 store.AreaById = Areas.ToDictionary(a => a.Id, a => (IArea)a);
                 store.Maps = Maps;
                 store.MapById = Maps.ToDictionary(a => a.Id, a => (IMap)a);
+                store.FactionTemplates = FactionTemplates;
+                store.FactionTemplateById = FactionTemplates.ToDictionary(a => a.TemplateId, a => (FactionTemplate)a);
+                store.Factions = Factions;
+                store.FactionsById = Factions.ToDictionary(a => a.FactionId, a => a);
 
                 foreach (var (parameterName, options) in parametersToRegister)
                 {
@@ -507,8 +522,26 @@ namespace WDE.DbcStore
                         max = 43;
                         Load("AreaTrigger.dbc", row => AreaTriggerStore.Add(row.GetInt(0), $"Area trigger"));
                         Load("SkillLine.dbc", 0, 3, SkillStore, true);
-                        Load("Faction.dbc", 0, 23, FactionStore, true);
-                        Load("FactionTemplate.dbc", 0, 1, FactionTemplateStore);
+                        Load("Faction.dbc", row =>
+                        {
+                            var faction = new Faction(row.GetUShort(0), row.GetString(23 + LocaleOffset));
+                            Factions.Add(faction);
+                            FactionStore[faction.FactionId] = faction.Name;
+                        });
+                        Load("FactionTemplate.dbc", row =>
+                        {
+                            var template = new FactionTemplate()
+                            {
+                                TemplateId = row.GetUInt(0),
+                                Faction = row.GetUShort(1),
+                                Flags = row.GetUShort(2),
+                                FactionGroup = (FactionGroupMask)row.GetUShort(3),
+                                FriendGroup = (FactionGroupMask)row.GetUShort(4),
+                                EnemyGroup = (FactionGroupMask)row.GetUShort(5)
+                            };
+                            FactionTemplates.Add(template);
+                            FactionTemplateStore[row.GetUInt(0)] = row.GetUInt(1);
+                        });
                         Load("Spell.dbc", 0, 136, SpellStore, true);
                         Load("Movie.dbc", 0, 1, MovieStore);
                         Load("Map.dbc", row =>
@@ -609,8 +642,26 @@ namespace WDE.DbcStore
                         max = 44;
                         Load("AreaTrigger.dbc", row => AreaTriggerStore.Add(row.GetInt(0), $"Area trigger"));
                         Load("SkillLine.dbc", 0, 2, SkillStore);
-                        Load("Faction.dbc", 0, 23, FactionStore);
-                        Load("FactionTemplate.dbc", 0, 1, FactionTemplateStore);
+                        Load("Faction.dbc", row =>
+                        {
+                            var faction = new Faction(row.GetUShort(0), row.GetString(23));
+                            Factions.Add(faction);
+                            FactionStore[faction.FactionId] = faction.Name;
+                        });
+                        Load("FactionTemplate.dbc", row =>
+                        {
+                            var template = new FactionTemplate()
+                            {
+                                TemplateId = row.GetUInt(0),
+                                Faction = row.GetUShort(1),
+                                Flags = row.GetUShort(2),
+                                FactionGroup = (FactionGroupMask)row.GetUShort(3),
+                                FriendGroup = (FactionGroupMask)row.GetUShort(4),
+                                EnemyGroup = (FactionGroupMask)row.GetUShort(5)
+                            };
+                            FactionTemplates.Add(template);
+                            FactionTemplateStore[row.GetUInt(0)] = row.GetUInt(1);
+                        });
                         Load("CurrencyTypes.db2", 0, 2, CurrencyTypeStore);
                         Load("Spell.dbc", 0, 21, SpellStore);
                         Load("Movie.dbc", 0, 1, MovieStore);
@@ -717,8 +768,26 @@ namespace WDE.DbcStore
                         Load("AreaTrigger.dbc", row => AreaTriggerStore.Add(row.GetInt(0), $"Area trigger"));
                         Load("BattlemasterList.dbc", 0, 19, BattlegroundStore);
                         Load("SkillLine.dbc", 0, 2, SkillStore);
-                        Load("Faction.dbc", 0, 23, FactionStore);
-                        Load("FactionTemplate.dbc", 0, 1, FactionTemplateStore);
+                        Load("Faction.dbc", row =>
+                        {
+                            var faction = new Faction(row.GetUShort(0), row.GetString(23));
+                            Factions.Add(faction);
+                            FactionStore[faction.FactionId] = faction.Name;
+                        });
+                        Load("FactionTemplate.dbc", row =>
+                        {
+                            var template = new FactionTemplate()
+                            {
+                                TemplateId = row.GetUInt(0),
+                                Faction = row.GetUShort(1),
+                                Flags = row.GetUShort(2),
+                                FactionGroup = (FactionGroupMask)row.GetUShort(3),
+                                FriendGroup = (FactionGroupMask)row.GetUShort(4),
+                                EnemyGroup = (FactionGroupMask)row.GetUShort(5)
+                            };
+                            FactionTemplates.Add(template);
+                            FactionTemplateStore[row.GetUInt(0)] = row.GetUInt(1);
+                        });
                         Load("CurrencyTypes.dbc", 0, 2, CurrencyTypeStore);
                         Load("Spell.dbc", 0, 1, SpellStore);
                         Load("Movie.dbc", row => MovieStore.Add(row.GetInt(0), fileData.GetValueOrDefault(row.GetInt(3)) ?? "Unknown movie"));
@@ -926,8 +995,26 @@ namespace WDE.DbcStore
                             var name = body.TrimToLength(50);
                             MailTemplateStore.Add(row.GetUInt(0), name.Replace("\n", ""));
                         });
-                        Load("Faction.db2", 3, 1, FactionStore);
-                        Load("FactionTemplate.db2", row => FactionTemplateStore.Add(row.GetInt(0), row.GetUShort(1)));
+                        Load("Faction.db2", row =>
+                        {
+                            var faction = new Faction(row.GetUShort(3), row.GetString(1));
+                            Factions.Add(faction);
+                            FactionStore[faction.FactionId] = faction.Name;
+                        });
+                        Load("FactionTemplate.db2", row =>
+                        {
+                            var template = new FactionTemplate()
+                            {
+                                TemplateId = row.Key,
+                                Faction = row.GetUShort(1),
+                                Flags = row.GetUShort(2),
+                                FactionGroup = (FactionGroupMask)row.GetUShort(5),
+                                FriendGroup = (FactionGroupMask)row.GetUShort(6),
+                                EnemyGroup = (FactionGroupMask)row.GetUShort(7)
+                            };
+                            FactionTemplates.Add(template);
+                            FactionTemplateStore.Add(row.GetInt(0), row.GetUShort(1));
+                        });
                         // Load("Phase.db2", 1, 0, PhaseStore); // no names in legion :(
                         Load("SoundKitName.db2", 0, 1, SoundStore);
                         Load("SpellFocusObject.db2", 0, 1, SpellFocusObjectStore);
