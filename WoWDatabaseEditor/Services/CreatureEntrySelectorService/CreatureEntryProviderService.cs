@@ -45,21 +45,6 @@ namespace WoWDatabaseEditorCore.Services.CreatureEntrySelectorService
         }
     }
 
-    public class CreatureEntryOrGuidProviderService : GenericDatabaseProviderService<ICreatureTemplate>, ICreatureEntryOrGuidProviderService
-    {
-        private readonly IDatabaseProvider database;
-
-        public CreatureEntryOrGuidProviderService(IWindowManager windowManager, IDatabaseProvider database) : base(windowManager, t => (int)t.Entry, t => t.Name + " " + t.Entry)
-        {
-            this.database = database;
-        }
-
-        protected override IEnumerable<ICreatureTemplate> GetList()
-        {
-            return database.GetCreatureTemplates().OrderBy(template => template.Entry);
-        }
-    }
-
     public class GameobjectEntryOrGuidProviderService : GenericDatabaseProviderService<IGameObjectTemplate>, IGameobjectEntryOrGuidProviderService
     {
         private readonly IDatabaseProvider database;

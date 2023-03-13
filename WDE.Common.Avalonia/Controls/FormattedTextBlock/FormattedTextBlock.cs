@@ -1,11 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
+using Avalonia.Media.Imaging;
 using Avalonia.Metadata;
+using WDE.Common.Avalonia.Services;
+using WDE.Common.Avalonia.Utils;
+using WDE.Common.Utils;
 
 namespace WDE.Common.Avalonia.Controls
 {
@@ -94,7 +99,38 @@ namespace WDE.Common.Avalonia.Controls
             Slash
         }
 
-        private static void ParseText(string? text, Action<string, int, bool, bool, int> action)
+        private static bool TryParseTag(ReadOnlySpan<char> text, out ReadOnlySpan<char> tag, out int? param)
+        {
+            tag = default;
+            param = default;
+
+            if (text.Length == 0)
+                return false;
+            
+            if (text[0] == '[')
+                text = text.Slice(1);
+            if (text[^1] == ']')
+                text = text.Slice(0, text.Length - 1);
+            
+            var indexOfSeparator = text.IndexOf('=');
+            if (indexOfSeparator == -1)
+            {
+                tag = text;
+                return true;
+            }
+            
+            tag = text.Slice(0, indexOfSeparator);
+            var paramText = text.Slice(indexOfSeparator + 1);
+            if (int.TryParse(paramText, out var p))
+            {
+                param = p;
+                return true;
+            }
+
+            return true;
+        }
+
+        private static void ParseText(IControl? owner, string? text, Action<string, int, bool, bool, int, IImage?> action)
         {
             if (text == null)
                 return;
@@ -102,6 +138,7 @@ namespace WDE.Common.Avalonia.Controls
             int partIndex = 0;
             bool parameter = false;
             bool source = false;
+            IImage? drawBitmap = null;
             int contextId = -1;
 
             State state = State.Text;
@@ -141,13 +178,35 @@ namespace WDE.Common.Avalonia.Controls
                 {
                     partIndex++;
 
-                    if (text[startIndex] == 'p')
-                        parameter = true;
-                    if (text[startIndex] == 's')
-                        source = true;
-
-                    if (text[startIndex + 1] == '=' && char.IsDigit(text[startIndex + 2]))
-                        contextId = text[startIndex + 2] - '0';
+                    if (TryParseTag(text.AsSpan(startIndex, index - startIndex), out var tag, out var param))
+                    {
+                        if (tag.Equals("p", StringComparison.Ordinal))
+                            parameter = true;
+                        else if (tag.Equals("s", StringComparison.Ordinal))
+                            source = true;
+                        else if (tag.Equals("spell", StringComparison.Ordinal) &&
+                                 param.HasValue)
+                        {
+                            var iconsDb = ViewBind.ResolveViewModel<ISpellIconDatabase>();
+                            var spellId = (uint)param.Value;
+                            if (!iconsDb.TryGetCached(spellId, out drawBitmap))
+                            {
+                                if (owner != null)
+                                {
+                                    async Task LoadIcon()
+                                    {
+                                        await ViewBind.ResolveViewModel<ISpellIconDatabase>().GetIcon(spellId);
+                                        owner.InvalidateVisual();
+                                        owner.InvalidateMeasure();
+                                    }
+                                    LoadIcon().ListenErrors();   
+                                }
+                            }
+                        }
+                        
+                        if (param.HasValue)
+                            contextId = param.Value;
+                    }
 
                     startIndex = index + 1;
                     state = State.Text;
@@ -184,9 +243,10 @@ namespace WDE.Common.Avalonia.Controls
                 if (toFulsh == null)
                     continue;
 
-                action(toFulsh.ToString(), partIndex, source, parameter, contextId);
+                action(toFulsh.ToString(), partIndex, source, parameter, contextId, drawBitmap);
                 if (s == '\n' && state == State.Text)
-                    action("\n", partIndex, source, parameter, contextId);
+                    action("\n", partIndex, source, parameter, contextId, null);
+                drawBitmap = null;
             }
         }
 
@@ -213,8 +273,14 @@ namespace WDE.Common.Avalonia.Controls
             bool overLink = false;
             overContextId = -1;
 
-            ParseText(Text, (text, partIndex, source, parameter, contextId) =>
+            ParseText(this, Text, (text, partIndex, source, parameter, contextId, bitmap) =>
             {
+                if (bitmap != null)
+                {
+                    context.DrawImage(bitmap, new Rect(x, y, 16, 16));
+                    x += 16;
+                }
+                
                 var styleId = parameter ? STYLE_PARAMETER : (source ? STYLE_SOURCE : (IsSelected ? STYLE_DEFAULT_SELECTED : STYLE_DEFAULT));
    
                 Rect bounds;
@@ -249,8 +315,10 @@ namespace WDE.Common.Avalonia.Controls
             bool everWrapped = false;
             double x = 0, y = 0;
             int? hoverPartIndex = null;
-            ParseText(text, (t, partIndex, source, parameter, contextId) =>
+            ParseText(null, text, (t, partIndex, source, parameter, contextId, bitmap) =>
             {
+                if (bitmap != null)
+                    x += 16;
                 var styleId = parameter ? STYLE_PARAMETER : (source ? STYLE_SOURCE : STYLE_DEFAULT);
                 (wasWrapped, bounds) = drawer.Measure(t, styleId, !wasWrapped, ref x, ref y, maxWidth);
                 if (bounds.Contains(testPoint) && contextId != -1)

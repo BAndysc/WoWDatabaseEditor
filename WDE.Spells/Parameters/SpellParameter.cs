@@ -4,7 +4,7 @@ using WDE.Common.Parameters;
 
 namespace WDE.Spells.Parameters
 {
-    internal class SpellParameter : ParameterNumbered, ICustomPickerParameter<long>
+    internal class SpellParameter : ParameterNumbered, ICustomPickerParameter<long>, ISpellParameter
     {
         private readonly ISpellEntryProviderService picker;
 
@@ -27,7 +27,7 @@ namespace WDE.Spells.Parameters
 
         public async Task<(long, bool)> PickValue(long value)
         {
-            var picked = await picker.GetEntryFromService();
+            var picked = await picker.GetEntryFromService((uint)value);
             return (picked ?? 0, picked.HasValue);
         }
     }

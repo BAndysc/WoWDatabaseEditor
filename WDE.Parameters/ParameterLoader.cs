@@ -34,6 +34,7 @@ namespace WDE.Parameters
         private readonly IEventAggregator eventAggregator;
         private readonly ILoadingEventAggregator loadingEventAggregator;
         private readonly ITabularDataPicker tabularDataPicker;
+        private readonly ICreatureEntryOrGuidProviderService creaturePicker;
         private readonly IQuestEntryProviderService questEntryProviderService;
         private readonly Lazy<IWindowManager> windowManager;
         private readonly IQuickAccessRegisteredParameters quickAccessRegisteredParameters;
@@ -48,6 +49,7 @@ namespace WDE.Parameters
             IEventAggregator eventAggregator,
             ILoadingEventAggregator loadingEventAggregator,
             ITabularDataPicker tabularDataPicker,
+            ICreatureEntryOrGuidProviderService creaturePicker,
             IQuestEntryProviderService questEntryProviderService,
             Lazy<IWindowManager> windowManager,
             IQuickAccessRegisteredParameters quickAccessRegisteredParameters)
@@ -59,6 +61,7 @@ namespace WDE.Parameters
             this.eventAggregator = eventAggregator;
             this.loadingEventAggregator = loadingEventAggregator;
             this.tabularDataPicker = tabularDataPicker;
+            this.creaturePicker = creaturePicker;
             this.questEntryProviderService = questEntryProviderService;
             this.windowManager = windowManager;
             this.quickAccessRegisteredParameters = quickAccessRegisteredParameters;
@@ -105,7 +108,7 @@ namespace WDE.Parameters
             factory.Register("FloatParameter", new FloatIntParameter(1000));
             factory.Register("DecifloatParameter", new FloatIntParameter(100));
             factory.Register("GameEventParameter", AddDatabaseParameter(new GameEventParameter(database)), QuickAccessMode.Limited);
-            factory.Register("CreatureParameter", AddDatabaseParameter(new CreatureParameter(database, serverIntegration)), QuickAccessMode.Limited);
+            factory.Register("CreatureParameter", AddDatabaseParameter(new CreatureParameter(database, creaturePicker, serverIntegration)), QuickAccessMode.Limited);
             factory.Register("CreatureGameobjectNameParameter", AddDatabaseParameter(new CreatureGameobjectNameParameter(database)));
             factory.Register("CreatureGameobjectParameter", AddDatabaseParameter(new CreatureGameobjectParameter(database)));
             factory.Register("QuestParameter", AddDatabaseParameter(new QuestParameter(database, questEntryProviderService)), QuickAccessMode.Limited);
@@ -394,16 +397,24 @@ namespace WDE.Parameters
         void Reload();
     }
     
-    public class CreatureParameter : LateLoadParameter
+    public class CreatureParameter : LateLoadParameter, ICustomPickerParameter<long>
     {
         private readonly IDatabaseProvider database;
-        
+        private readonly ICreatureEntryOrGuidProviderService picker;
+
+        public async Task<(long, bool)> PickValue(long value)
+        {
+            var result = await picker.GetEntryFromService((uint)value);
+            return (result ?? 0, result.HasValue);
+        }
+
         public override Func<Task<object?>>? SpecialCommand { get; }
 
-        public CreatureParameter(IDatabaseProvider database, IServerIntegration serverIntegration)
+        public CreatureParameter(IDatabaseProvider database, ICreatureEntryOrGuidProviderService picker, IServerIntegration serverIntegration)
         {
             Items = new Dictionary<long, SelectOption>();
             this.database = database;
+            this.picker = picker;
             SpecialCommand = async () =>
             {
                 var entry = await serverIntegration.GetSelectedEntry();

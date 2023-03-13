@@ -6,7 +6,7 @@ namespace WDE.Common
     [UniqueProvider]
     public interface ICreatureEntryOrGuidProviderService
     {
-        Task<int?> GetEntryFromService();
+        Task<int?> GetEntryFromService(uint? entry = null);
     }
 
     [UniqueProvider]

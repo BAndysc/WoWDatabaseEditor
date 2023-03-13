@@ -1,11 +1,14 @@
+using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Media.TextFormatting;
 using AvaloniaStyles.Controls.FastTableView;
 using WDE.Common.Avalonia;
+using WDE.Common.Avalonia.Services;
 using WDE.Common.Avalonia.Utils;
 using WDE.Common.Parameters;
+using WDE.Common.Utils;
 using WDE.DatabaseEditors.Avalonia.Services;
 using WDE.DatabaseEditors.Models;
 using WDE.DatabaseEditors.ViewModels.SingleRow;
@@ -30,6 +33,8 @@ public class CustomCellDrawer : CustomCellDrawerInteractorBase, ICustomCellDrawe
     private static IPen ButtonBackgroundHoverPen = new Pen(new SolidColorBrush(Color.FromRgb(245, 245, 245)), 0);
     private static IPen ButtonBackgroundPressedPen = new Pen(new SolidColorBrush(Color.FromRgb(215, 215, 215)), 0);
     private static IPen ButtonBackgroundDisabledPen = new Pen(new SolidColorBrush(Color.FromRgb(170, 170, 170)), 0);
+    private static IItemIconsService itemIconService;
+    private static ISpellIconDatabase spellIconService;
     
     private Point mouseCursor;
     private bool leftPressed;
@@ -44,6 +49,8 @@ public class CustomCellDrawer : CustomCellDrawerInteractorBase, ICustomCellDrawe
         ButtonBackgroundHoverPen.GetResource("FastTableView.ButtonBackgroundHoverPen", ButtonBackgroundHoverPen, out ButtonBackgroundHoverPen);
         ButtonBackgroundPressedPen.GetResource("FastTableView.ButtonBackgroundPressedPen", ButtonBackgroundPressedPen, out ButtonBackgroundPressedPen);
         ButtonBackgroundDisabledPen.GetResource("FastTableView.ButtonBackgroundDisabledPen", ButtonBackgroundDisabledPen, out ButtonBackgroundDisabledPen);
+        itemIconService = ViewBind.ResolveViewModel<IItemIconsService>();
+        spellIconService = ViewBind.ResolveViewModel<ISpellIconDatabase>();
     }
 
     public void DrawRow(DrawingContext context, ITableRow r, Rect rect)
@@ -98,7 +105,7 @@ public class CustomCellDrawer : CustomCellDrawerInteractorBase, ICustomCellDrawe
         state.Dispose();
     }
 
-    public bool Draw(DrawingContext context, ref Rect rect, ITableCell c)
+    public bool Draw(DrawingContext context, IFastTableContext table, ref Rect rect, ITableCell c)
     {
         if (c is not SingleRecordDatabaseCellViewModel cell)
             return false;
@@ -125,13 +132,33 @@ public class CustomCellDrawer : CustomCellDrawerInteractorBase, ICustomCellDrawe
             }
         }
         
+        IImage? icn = null;
+        bool drawIcon = false;
         if (cell.ParameterValue?.BaseParameter is IItemParameter && cell.TableField is DatabaseField<long> longField)
         {
-            var icons = ViewBind.ResolveViewModel<IItemIconsService>();
-            var icn = icons.GetIcon((uint)longField.Current.Value);
+            icn = itemIconService.GetIcon((uint)longField.Current.Value);
+            drawIcon = true;
+        }
+        else if (cell.ParameterValue?.BaseParameter is ISpellParameter && cell.TableField is DatabaseField<long> longSpellField)
+        {
+            var spellId = (uint)longSpellField.Current.Value;
+            if (!spellIconService.TryGetCached(spellId, out icn))
+            {
+                async Task UpdateIcon(uint spell)
+                {
+                    await spellIconService.GetIcon(spell);
+                    table.InvalidateVisual();
+                }
+                UpdateIcon(spellId).ListenErrors();
+            }
+            drawIcon = true;
+        }
+
+        if (drawIcon)
+        {
             if (icn != null)
             {
-                context.DrawImage(icn, new Rect(rect.X, rect.Center.Y - 18/2, 18, 18));
+                context.DrawImage(icn, new Rect(rect.X + 2, rect.Center.Y - 18 / 2, 18, 18));
             }
             rect = rect.Deflate(new Thickness(20, 0, 0, 0));
         }

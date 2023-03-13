@@ -32,7 +32,7 @@ public class SpellImage : Control
         });
     }
 
-    private Bitmap? currentBitmap;
+    private IImage? currentBitmap;
     private CancellationTokenSource? currentTask;
     
     private async Task UpdateBitmapAsync()

@@ -10,7 +10,7 @@ using WDE.Common.Utils;
 
 namespace AvaloniaStyles.Controls.FastTableView;
 
-public partial class VeryFastTableView : Panel, IKeyboardNavigationHandler
+public partial class VeryFastTableView : Panel, IKeyboardNavigationHandler, IFastTableContext
 {
     private static double ColumnSpacing = 10;
     private static double RowHeight = 28;

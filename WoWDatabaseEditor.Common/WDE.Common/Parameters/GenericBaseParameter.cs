@@ -18,6 +18,8 @@ namespace WDE.Common.Parameters
     
     public interface IItemParameter : IParameter<long> {}
 
+    public interface ISpellParameter : IParameter<long> { }
+
     public abstract class GenericBaseParameter<T> : IParameter<T> where T : notnull
     {
         public Dictionary<T, SelectOption>? Items { get; set; }

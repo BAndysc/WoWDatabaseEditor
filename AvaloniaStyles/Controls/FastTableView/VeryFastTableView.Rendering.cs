@@ -153,7 +153,7 @@ public partial class VeryFastTableView
                         bool isSelected = selectionIterator.Contains(new VerticalCursor(groupIndex, rowIndex));
                         context.FillRectangle(isSelected ? (SelectedRowBackground) : (odd ? OddRowBackground : EvenRowBackground), rowRect);
 
-                        cellDrawer?.DrawRow(context, row, rowRect);
+                        cellDrawer?.DrawRow(context, this, row, rowRect);
                         
                         var textColor = isSelected ? FocusTextBrush : TextBrush;
                         
@@ -178,7 +178,7 @@ public partial class VeryFastTableView
                                 var rect = new Rect(x, y, columnWidth, RowHeight);
                                 var rectWidth = rect.Width;
                                 var state = context.PushClip(rect);
-                                if (cellDrawer == null || !cellDrawer.Draw(context, ref rect, cell))
+                                if (cellDrawer == null || !cellDrawer.Draw(context, this, ref rect, cell))
                                 {
                                     var text = cell.ToString();
                                     if (!string.IsNullOrEmpty(text))
