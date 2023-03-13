@@ -25,6 +25,8 @@ namespace WDE.SmartScriptEditor.Data
 
         bool Contains(SmartType type, string id);
 
+        bool TryGetRawData(SmartType type, int id, out SmartGenericJsonData data);
+        
         SmartGenericJsonData GetRawData(SmartType type, int id);
 
         SmartGenericJsonData GetDataByName(SmartType type, string name);
@@ -111,6 +113,18 @@ namespace WDE.SmartScriptEditor.Data
                 return false;
 
             return smartNameData[type].ContainsKey(id);
+        }
+
+        public bool TryGetRawData(SmartType type, int id, out SmartGenericJsonData data)
+        {
+            if (smartIdData[type].TryGetValue(id, out var data_))
+            {
+                data = data_;
+                return true;
+            }
+
+            data = null!;
+            return false;
         }
 
         public SmartGenericJsonData GetRawData(SmartType type, int id)

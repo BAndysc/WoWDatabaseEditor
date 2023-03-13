@@ -33,6 +33,69 @@ namespace WDE.SmartScriptEditor.Data
         void UpdateTarget(SmartTarget smartTarget, int id);
     }
 
+    public static class SmartFactoryExtensions
+    {
+        public static void SafeUpdateEvent(this ISmartFactory factory, SmartEvent smart, int id)
+        {
+            try 
+            {
+                factory.UpdateEvent(smart, id);
+            } 
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+        }
+        
+        public static void SafeUpdateAction(this ISmartFactory factory, SmartAction smart, int id)
+        {
+            try 
+            {
+                factory.UpdateAction(smart, id);
+            } 
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+        }
+        
+        public static void SafeUpdateCondition(this ISmartFactory factory, SmartCondition smart, int id)
+        {
+            try 
+            {
+                factory.UpdateCondition(smart, id);
+            } 
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+        }
+        
+        public static void SafeUpdateSource(this ISmartFactory factory, SmartSource smart, int id)
+        {
+            try 
+            {
+                factory.UpdateSource(smart, id);
+            } 
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+        }
+        
+        public static void SafeUpdateTarget(this ISmartFactory factory, SmartTarget smart, int id)
+        {
+            try 
+            {
+                factory.UpdateTarget(smart, id);
+            } 
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+        }
+    }
+
     public class InvalidSmartSourceException : Exception
     {
         public InvalidSmartSourceException(int id) : base("Invalid source with id " + id) { }

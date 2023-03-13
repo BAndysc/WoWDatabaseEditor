@@ -135,7 +135,16 @@ public partial class MultiPropertyValueHolder<T, R> : IParameterValueHolder<T>, 
         {
             suspendNotifications = true;
             for (int i = 0; i < values.Count; ++i)
-                setter(values[i],  value);
+            {
+                try
+                {
+                    setter(values[i], value);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
             suspendNotifications = false;
             RefreshSource();
         }
@@ -147,7 +156,16 @@ public partial class MultiPropertyValueHolder<T, R> : IParameterValueHolder<T>, 
         {
             suspendNotifications = true;
             for (int i = 0; i < originals.Count; ++i)
-                setter(originals[i],  value);
+            {
+                try
+                {
+                    setter(originals[i], value);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
             suspendNotifications = false;
             RefreshSource();
         }

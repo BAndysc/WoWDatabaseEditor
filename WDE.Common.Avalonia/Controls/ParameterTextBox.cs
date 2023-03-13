@@ -25,18 +25,45 @@ namespace WDE.Common.Avalonia.Controls
                 base.CustomPaste();
         }
 
+        private bool justHandledS = false;
         protected override void OnKeyDown(KeyEventArgs e)
         {
-            base.OnKeyDown(e);
-            if (e.Key == Key.S && 
-                e.KeyModifiers == KeyModifiers.None && 
-                float.TryParse(Text, out var textAsFloat) && 
+            justHandledS = false;
+            if (e.Key == Key.S &&
+                e.KeyModifiers == KeyModifiers.None &&
+                float.TryParse(Text, out var textAsFloat) &&
                 SelectionStart == Text.Length)
             {
                 Text = ((long)(textAsFloat * 1000)).ToString();
                 SelectionStart = SelectionEnd = Text.Length;
                 e.Handled = true;
+                justHandledS = true;
             }
+            else if (e.Key is Key.Down or Key.Up &&
+                     e.KeyModifiers is KeyModifiers.Control or KeyModifiers.Meta)
+            {
+                var nextTextBox = e.Key is Key.Down ? FindNext<ParameterTextBox>(this) : FindPrev<ParameterTextBox>(this);
+                if (nextTextBox != null)
+                {
+                    nextTextBox.Text = Text;
+                    nextTextBox.Focus();
+                    nextTextBox.SelectionStart = nextTextBox.SelectionEnd = nextTextBox.Text.Length;
+                    e.Handled = true;
+                }
+            }
+            else
+                base.OnKeyDown(e);
+        }
+
+        protected override void OnTextInput(TextInputEventArgs e)
+        {
+            if (justHandledS &&
+                (e.Text?.Equals("s", StringComparison.OrdinalIgnoreCase) ?? false))
+            {
+                e.Handled = true;
+            }
+            else
+                base.OnTextInput(e);
         }
 
         private async void PasteAsync()
@@ -89,6 +116,32 @@ namespace WDE.Common.Avalonia.Controls
             }
 
             return FindNext<T>(parent);
+        }
+        
+        private static T? FindPrev<T>(IVisual? start) where T : class, IVisual 
+        {
+            if (start == null)
+                return null;
+
+            var parent = start.GetVisualParent();
+            if (parent == null)
+                return null;
+
+            int startChildrenIndex = parent.VisualChildren.Count - 1;
+            while (startChildrenIndex >= 0 &&
+                   parent.VisualChildren[startChildrenIndex] != start)
+                startChildrenIndex--;
+            
+            startChildrenIndex--;
+            
+            for (int i = startChildrenIndex; i >= 0 ; --i)
+            {
+                var find = parent.VisualChildren[i].FindDescendantOfType<T>(true);
+                if (find != null)
+                    return find;
+            }
+
+            return FindPrev<T>(parent);
         }
         
         protected override void OnGotFocus(GotFocusEventArgs e)

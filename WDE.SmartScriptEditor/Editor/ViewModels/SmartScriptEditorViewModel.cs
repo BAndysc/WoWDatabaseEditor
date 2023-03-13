@@ -479,7 +479,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                             var newId = newSource.Value.Item2
                                 ? SmartConstants.SourceStoredObject
                                 : newSource.Value.Item1;
-                            smartFactory.UpdateSource(sourceTargetEdit.RelatedAction.Source, newId);
+                            smartFactory.SafeUpdateSource(sourceTargetEdit.RelatedAction.Source, newId);
                             
                             if (newSource.Value.Item2)
                                 sourceTargetEdit.RelatedAction.Source.GetParameter(0).Value = newSource.Value.Item1;
@@ -493,7 +493,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                             var newId = newTarget.Value.Item2
                                 ? SmartConstants.SourceStoredObject
                                 : newTarget.Value.Item1;
-                            smartFactory.UpdateTarget(sourceTargetEdit.RelatedAction.Target, newId);
+                            smartFactory.SafeUpdateTarget(sourceTargetEdit.RelatedAction.Target, newId);
                             
                             if (newTarget.Value.Item2)
                                 sourceTargetEdit.RelatedAction.Target.GetParameter(0).Value = newTarget.Value.Item1;
@@ -1990,7 +1990,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 e => e.Id,
                 (e, id) =>
                 {
-                    smartFactory.UpdateSource(e, id);
+                    smartFactory.SafeUpdateSource(e, id);
                     FillNonzeroWithDefaults(SmartType.SmartSource, id, sourceParameters);
                 }, bulkEdit);
             MultiPropertyValueHolder<int, SmartTarget> targetType = new MultiPropertyValueHolder<int, SmartTarget>(0,
@@ -1999,7 +1999,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 e => e.Id,
                 (e, id) =>
                 {
-                    smartFactory.UpdateTarget(e, id);
+                    smartFactory.SafeUpdateTarget(e, id);
                     FillNonzeroWithDefaults(SmartType.SmartTarget, id, targetParameters);
                 }, bulkEdit);
             MultiPropertyValueHolder<int, SmartAction> actionType = new MultiPropertyValueHolder<int, SmartAction>(0,
@@ -2008,7 +2008,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 e => e.Id,
                 (e, id) =>
                 {
-                    smartFactory.UpdateAction(e, id);
+                    smartFactory.SafeUpdateAction(e, id);
                     FillNonzeroWithDefaults(SmartType.SmartAction, id, actionParameters);
                     var actionData = smartDataManager.GetRawData(SmartType.SmartAction, id);
                     if (actionData.TargetTypes != SmartSourceTargetType.None &&
@@ -2256,7 +2256,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 conditionsToEdit,
                 originalConditions,
                 e => e.Id,
-                (e, id) => smartFactory.UpdateCondition(e, id), bulk);
+                (e, id) => smartFactory.SafeUpdateCondition(e, id), bulk);
             
             editableGroup.Add(new EditableActionData("Condition", "General", async () =>
             {
@@ -2340,7 +2340,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 e => e.Id,
                 (e, id) =>
                 {
-                    smartFactory.UpdateEvent(e, id);
+                    smartFactory.SafeUpdateEvent(e, id);
                 },
                 bulkEdit);
             
@@ -2434,7 +2434,9 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
         private void FillNonzeroWithDefaults(SmartType dataType, int newIndex, List<MultiParameterValueHolder<long>> parameters)
         {
-            var newEventData = smartDataManager.GetRawData(dataType, newIndex);
+            if (!smartDataManager.TryGetRawData(dataType, newIndex, out var newEventData))
+                return;
+            
             if (newEventData.Parameters != null)
             {
                 for (int i = 0; i < Math.Min(newEventData.Parameters.Count, parameters.Count); ++i)
