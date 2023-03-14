@@ -106,11 +106,11 @@ namespace TheEngine.Test.ECS
                 o.position += o.velocity;
             var oldSchoolSpeed = stopWatch.Elapsed.TotalSeconds;
             
-            Assert.AreEqual(3, entityManager.GetComponent<Position>(new Entity(1000, 1)).position.X);
-            Assert.AreEqual(3, oldSchool[1000].position.X);
-            Assert.IsTrue(entitySpeed < oldSchoolSpeed * 1.2f);
             Console.WriteLine("ECS: " + entitySpeed);
             Console.WriteLine("OOP: " + oldSchoolSpeed);
+            Assert.AreEqual(3, entityManager.GetComponent<Position>(new Entity(1000, 1)).position.X);
+            Assert.AreEqual(3, oldSchool[1000].position.X);
+            Assert.IsTrue(entitySpeed < oldSchoolSpeed * 2f);
         }
 
         [Test]

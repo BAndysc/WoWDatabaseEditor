@@ -1,19 +1,15 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Runtime.CompilerServices;
 using Newtonsoft.Json;
-using Prism.Events;
 using Prism.Ioc;
-using WDE.Common.Database;
-using WDE.Common.DBC;
-using WDE.Common.Events;
 using WDE.Common.Parameters;
 using WDE.Common.Services;
 using WDE.DatabaseEditors.Data;
-using WDE.DatabaseEditors.Models;
 using WDE.DatabaseEditors.Parameters;
 using WDE.Module;
 using WDE.Module.Attributes;
 using WDE.MVVM.Observable;
+
+[assembly: InternalsVisibleTo("DatabaseTester")]
 
 namespace WDE.DatabaseEditors
 {

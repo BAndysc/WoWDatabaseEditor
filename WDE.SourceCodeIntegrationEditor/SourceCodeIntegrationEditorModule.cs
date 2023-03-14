@@ -2,7 +2,7 @@
 
 namespace WDE.SourceCodeIntegrationEditor
 {
-    //public class SourceCodeIntegrationEditorModule : ModuleBase
-    //{
-    //}
+    public class SourceCodeIntegrationEditorModule : ModuleBase
+    {
+    }
 }

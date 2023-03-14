@@ -3,7 +3,7 @@
     <PropertyGroup>
         <OutputType>WinExe</OutputType>
         <TargetFramework>net7.0</TargetFramework>
-        <RuntimeIdentifiers>win8-x64;osx-x64;linux-x64;osx-arm64</RuntimeIdentifiers>
+        <RuntimeIdentifiers>win8-x64;osx-x64;linux-x64;osx-arm64;win-x64</RuntimeIdentifiers>
         <Configurations>Debug;Release</Configurations>
         <Platforms>AnyCPU</Platforms>
         <Nullable>enable</Nullable>

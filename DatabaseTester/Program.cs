@@ -17,6 +17,7 @@ using WDE.DatabaseEditors.Data;
 using WDE.DatabaseEditors.Data.Interfaces;
 using WDE.DatabaseEditors.Factories;
 using WDE.DatabaseEditors.Loaders;
+using WDE.DatabaseEditors.Services;
 using WDE.MySqlDatabaseCommon.Database;
 using WDE.MySqlDatabaseCommon.Providers;
 using WDE.MySqlDatabaseCommon.Services;
@@ -53,6 +54,47 @@ public class Program
         {
             throw new Exception("Operation not supported");
         }
+    }
+
+    private static bool TryGetDefaultObjectForType(Type type, out object? obj)
+    {
+        obj = null;
+        if (type == typeof(string))
+            obj = "";
+        else if (type.IsGenericType &&
+                 type.GetGenericTypeDefinition() == typeof(Nullable<>) &&
+                 TryGetDefaultObjectForType(type.GetGenericArguments()[0], out var innerNullable))
+        {
+            obj = innerNullable;
+        }
+        else if (type.IsGenericType &&
+                 type.GetGenericTypeDefinition() == typeof(IReadOnlyList<>) &&
+                 TryGetDefaultObjectForType(type.GetGenericArguments()[0], out var inner))
+        {
+            var listType = typeof(List<>).MakeGenericType(type.GetGenericArguments()[0]);
+            var list = Activator.CreateInstance(listType);
+            listType.GetMethod("Add", BindingFlags.Public | BindingFlags.Instance)!.Invoke(
+                list, new object?[]{inner});
+            obj = list;
+        }
+        else if (type.IsValueType)
+            obj = Activator.CreateInstance(type);
+        return obj != null;
+    }
+
+    private static bool TryGetDefaultParameterArray(MethodInfo method, out object?[] arguments)
+    {
+        var parameters = method.GetParameters();
+        arguments = new object?[parameters.Length];
+        
+        for (int i = 0; i < parameters.Length; ++i)
+        {
+            if (!TryGetDefaultObjectForType(parameters[i].ParameterType, out var obj))
+                return false;
+            arguments[i] = obj;
+        }
+
+        return true;
     }
     
     public static async Task<int> Test<T>(string[] args, params ICoreVersion[] cores) where T : class, IDatabaseProvider
@@ -118,6 +160,7 @@ public class Program
         ioc.RegisterSingleton<IDatabaseTableDataProvider, DatabaseTableDataProvider>();
         ioc.RegisterSingleton<IDatabaseTableModelGenerator, DatabaseTableModelGenerator>();
         ioc.RegisterSingleton<IDatabaseFieldFactory, DatabaseFieldFactory>();
+        ioc.RegisterSingleton<IDatabaseQueryExecutor, DatabaseQueryExecutor>();
         
         ioc.RegisterSingleton<ITableDefinitionDeserializer, TableDefinitionDeserializer>();
         ioc.RegisterSingleton<ITableDefinitionJsonProvider, TableDefinitionJsonProvider>();
@@ -164,27 +207,33 @@ public class Program
         }
         
         var allMethods = typeof(T).GetMethods();
+        HashSet<string> methodsHandledManually = new HashSet<string>()
+        {
+            "Equals",
+            "FindEventScriptLinesBy",
+            "FindSmartScriptLinesBy",
+            "GetConditionsForAsync",
+            "InstallConditions"
+        };
+
         foreach (var method in allMethods)
         {
-            var p = method.GetParameters();
-
+            if (methodsHandledManually.Contains(method.Name))
+                continue;
+            
             object? ret = null;
-            if (p.Length == 0)
+            if (TryGetDefaultParameterArray(method, out var arguments))
             {
                 Console.WriteLine(method.Name);
-                ret = method.Invoke(worldDb, new object?[] { });
+                ret = method.Invoke(worldDb, arguments);
             }
-            else if (p.Length == 1 && p[0].ParameterType == typeof(uint))
+            else
             {
-                Console.WriteLine(method.Name);
-                ret = method.Invoke(worldDb, new object?[] { (uint)0 });
+                var p = method.GetParameters();
+                var types = string.Join(", ", p.Select(x => x.ParameterType));
+                Console.WriteLine($"Skipping method: {method.Name}({types}), due to unsupported parameters");
             }
-            else if (p.Length == 1 && p[0].ParameterType == typeof(string))
-            {
-                Console.WriteLine(method.Name);
-                ret = method.Invoke(worldDb, new object?[] { "" });
-            }
-
+            
             if (ret is Task t)
                 await t;
         }
@@ -192,6 +241,8 @@ public class Program
         // methods with > 1 parameters
         worldDb.GetScriptFor(0, SmartScriptType.Creature);
         worldDb.GetConditionsFor(0, 0, 0);
+        await worldDb.FindSmartScriptLinesBy(new (IDatabaseProvider.SmartLinePropertyType what, int whatValue, int parameterIndex, long valueToSearch)[] { (IDatabaseProvider.SmartLinePropertyType.Action, 0, 0, 0) });
+        
         return 0;
     }
     
