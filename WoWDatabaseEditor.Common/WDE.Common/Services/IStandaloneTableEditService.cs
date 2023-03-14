@@ -5,5 +5,5 @@ namespace WDE.Common.Services;
 [UniqueProvider]
 public interface IStandaloneTableEditService
 {
-    void OpenEditor(string tableId);
+    void OpenEditor(string tableId, DatabaseKey? key = null);
 }

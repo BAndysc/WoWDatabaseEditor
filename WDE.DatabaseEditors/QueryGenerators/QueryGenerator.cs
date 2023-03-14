@@ -51,7 +51,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
         
         public IQuery GenerateQuery(IReadOnlyList<DatabaseKey> keys, IReadOnlyList<DatabaseKey>? deletedKeys, IDatabaseTableData tableData)
         {
-            if (tableData.TableDefinition.IsOnlyConditionsTable)
+            if (tableData.TableDefinition.IsOnlyConditionsTable is OnlyConditionMode.IgnoreTableCompletely or OnlyConditionMode.TableReadOnly)
                 return BuildConditions(keys, tableData);
             if (tableData.TableDefinition.RecordMode == RecordMode.MultiRecord)
                 return GenerateInsertQuery(keys, tableData);

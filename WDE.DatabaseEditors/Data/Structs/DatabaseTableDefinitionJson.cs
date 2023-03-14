@@ -53,7 +53,8 @@ namespace WDE.DatabaseEditors.Data.Structs
         public DataDatabaseType DataDatabaseType { get; set; }
 
         [JsonProperty(PropertyName = "only_conditions")]
-        public bool IsOnlyConditionsTable { get; set; }
+        [JsonConverter(typeof(StringEnumConverter))]
+        public OnlyConditionMode IsOnlyConditionsTable { get; set; }
         
         [JsonProperty(PropertyName = "skip_quick_load")]
         public bool SkipQuickLoad { get; set; }
@@ -123,6 +124,16 @@ namespace WDE.DatabaseEditors.Data.Structs
         
         // single row table type ignores solution item entries quality, because there is no keys
         [JsonIgnore] public bool IgnoreEquality => RecordMode == RecordMode.SingleRow;
+    }
+
+    public enum OnlyConditionMode
+    {
+        None,
+        IgnoreTableCompletely,
+        /// <summary>
+        /// table data is loaded, but not generated in queries (neither remove nor update nor insert), only conditions
+        /// </summary>
+        TableReadOnly
     }
 
     [Flags]

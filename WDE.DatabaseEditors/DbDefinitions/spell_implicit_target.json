@@ -13,7 +13,7 @@
   "icon_path": "Icons/document_spell_implicit_target.png",
   "group_name": "Common scripting tables",
   "picker": "SpellParameter",
-  "only_conditions": true,
+  "only_conditions": "IgnoreTableCompletely",
   "primary_key": [
     "spell_id"
   ],

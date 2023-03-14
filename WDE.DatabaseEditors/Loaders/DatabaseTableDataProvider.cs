@@ -265,7 +265,7 @@ namespace WDE.DatabaseEditors.Loaders
             else if (keys != null && keys.Length > 0)
             {
                 Debug.Assert(customWhere == null, "Custom where with non single record mode is not supported");
-                if (definition.IsOnlyConditionsTable)
+                if (definition.IsOnlyConditionsTable == OnlyConditionMode.IgnoreTableCompletely)
                 {
                     if (definition.Condition == null)
                         throw new Exception("only_conditions + no conditions make no sense");

@@ -23,7 +23,7 @@ public class StandaloneTableEditService : IStandaloneTableEditService
     private readonly IWindowManager windowManager;
     private readonly IContainerProvider containerProvider;
     private readonly ITableDefinitionProvider definitionProvider;
-    private Dictionary<string, IAbstractWindowView> openedWindows = new();
+    private Dictionary<(string, DatabaseKey?), IAbstractWindowView> openedWindows = new();
 
     public StandaloneTableEditService(IWindowManager windowManager,
         ITableOpenService tableOpenService,
@@ -35,9 +35,9 @@ public class StandaloneTableEditService : IStandaloneTableEditService
         this.definitionProvider = definitionProvider;
     }
     
-    public void OpenEditor(string table)
+    public void OpenEditor(string table, DatabaseKey? key)
     {
-        if (openedWindows.TryGetValue(table, out var window))
+        if (openedWindows.TryGetValue((table, key), out var window))
         {
             window.Activate();
             return;
@@ -47,7 +47,15 @@ public class StandaloneTableEditService : IStandaloneTableEditService
         if (definition == null)
             throw new UnsupportedTableException(table);
 
-        var solutionItem = new DatabaseTableSolutionItem(table, definition.IgnoreEquality);
+        if (key.HasValue && definition.GroupByKeys.Count != key.Value.Count)
+        {
+            var expectedKeys = "(" + string.Join(", ", definition.GroupByKeys) + ")";
+            throw new UnsupportedTableException($"Trying to edit table {table} with key {key} but it has {expectedKeys} keys");
+        }
+        
+        var solutionItem = key.HasValue
+            ? new DatabaseTableSolutionItem(key.Value, true, false, table, definition.IgnoreEquality)
+            : new DatabaseTableSolutionItem(table, definition.IgnoreEquality);
 
         ViewModelBase tableViewModel;
         if (definition.RecordMode == RecordMode.MultiRecord)
@@ -69,13 +77,13 @@ public class StandaloneTableEditService : IStandaloneTableEditService
         bool openInNoSaveMode = false;
         var viewModel = containerProvider.Resolve<RowPickerViewModel>((typeof(ViewModelBase), tableViewModel), (typeof(bool), openInNoSaveMode));
         window = windowManager.ShowWindow(viewModel, out var task);
-        openedWindows[table] = window;
-        WindowLifetimeTask(table, window, task).ListenErrors();
+        openedWindows[(table, key)] = window;
+        WindowLifetimeTask(table, key, window, task).ListenErrors();
     }
 
-    private async Task WindowLifetimeTask(string table, IAbstractWindowView window, Task lifetime)
+    private async Task WindowLifetimeTask(string table, DatabaseKey? key, IAbstractWindowView window, Task lifetime)
     {
         await lifetime;
-        openedWindows.Remove(table);
+        openedWindows.Remove((table, key));
     }
 }

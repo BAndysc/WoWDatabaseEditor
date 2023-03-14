@@ -13,7 +13,7 @@
   "icon_path": "Icons/document_quest_conditions.png",
   "group_name": "Common scripting tables",
   "picker": "QuestParameter",
-  "only_conditions": true,
+  "only_conditions": "IgnoreTableCompletely",
   "primary_key": [
     "quest_id"
   ],

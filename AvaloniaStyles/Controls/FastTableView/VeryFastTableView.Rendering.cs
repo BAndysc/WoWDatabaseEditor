@@ -183,6 +183,10 @@ public partial class VeryFastTableView
                                     var text = cell.ToString();
                                     if (!string.IsNullOrEmpty(text))
                                     {
+                                        var indexOfEndOfLine = text.IndexOf('\n');
+                                        if (indexOfEndOfLine != -1)
+                                            text = text.Substring(0, indexOfEndOfLine);
+                                        
                                         rect = rect.WithWidth(rect.Width - ColumnSpacing);
                                         var ft = new FormattedText
                                         {

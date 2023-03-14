@@ -55,7 +55,7 @@ public class DatabaseTablesFindAnywhereSource : IFindAnywhereSource
     {
         foreach (var definition in definitionProvider.Definitions)
         {
-            if (definition.IsOnlyConditionsTable)
+            if (definition.IsOnlyConditionsTable == OnlyConditionMode.IgnoreTableCompletely)
                 continue;
 
             if (!searchType.HasFlagFast(FindAnywhereSourceType.Spawns) &&
