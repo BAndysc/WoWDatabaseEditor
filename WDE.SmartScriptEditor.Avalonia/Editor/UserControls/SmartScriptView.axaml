@@ -22,6 +22,8 @@
         <KeyBinding Gesture="Back" Command="{CompiledBinding DeleteSelected}" />
         <KeyBinding Gesture="Delete" Command="{CompiledBinding DeleteSelected}" />
         <KeyBinding Gesture="Enter" Command="{CompiledBinding EditSelected}" />
+        <KeyBinding Gesture="Ctrl+Shift+N" Command="{CompiledBinding NewActionAboveCommand}" />
+        <KeyBinding Gesture="Ctrl+N" Command="{CompiledBinding NewActionBelowCommand}" />
         <KeyBinding Gesture="Ctrl+A" Command="{CompiledBinding SelectAll}" />
         <KeyBinding Gesture="Ctrl+Up" Command="{CompiledBinding SelectionUp}"
                     CommandParameter="{StaticResource TrueValue}" />
