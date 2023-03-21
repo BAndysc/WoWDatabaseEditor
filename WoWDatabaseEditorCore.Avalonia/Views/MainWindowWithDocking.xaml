@@ -17,7 +17,7 @@
           mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
           mvvm:ViewModelLocator.AutoWireViewModel="True"
           x:Class="WoWDatabaseEditorCore.Avalonia.Views.MainWindowWithDocking"
-          TransparencyLevelHint="AcrylicBlur"
+          TransparencyLevelHint="None"
           Icon="../Icon.png"
           ManagedIcon="../Icon.png"
           Name="Root"
