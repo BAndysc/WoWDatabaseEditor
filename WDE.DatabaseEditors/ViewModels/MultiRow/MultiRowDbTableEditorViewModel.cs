@@ -151,6 +151,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         public AsyncAutoCommand DeleteRowSelectedCommand { get; }
         public DelegateCommand InsertRowBelowCommand { get; }
         public DelegateCommand CopySelectedRowsCommand { get; }
+        public DelegateCommand SelectAllCommand { get; }
         public AsyncAutoCommand PasteRowsCommand { get; } 
 
         public event Action<DatabaseEntity>? OnDeletedQuery;
@@ -324,6 +325,31 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                     bulk?.Dispose();
                 }
             });
+            var cutRowsCommand = new DelegateCommand(() =>
+            {
+                CopySelectedRowsCommand.Execute();
+                DeleteRowSelectedCommand.Execute(null);
+            });
+            SelectAllCommand = new DelegateCommand(() =>
+            {
+                if (Rows.Count == 0)
+                    return;
+                
+                var groupIndex = focusedRowIndex.GroupIndex < 0 || focusedRowIndex.GroupIndex >= Rows.Count ? 0 : focusedRowIndex.GroupIndex;
+                var rowsInGroup = Rows[groupIndex].Count;
+                
+                MultiSelection.Clear();
+                for (var row = 0; row < rowsInGroup; row++)
+                    MultiSelection.Add(new VerticalCursor(groupIndex, row));
+            });
+            KeyBindings.Add(new CommandKeyBinding(CopySelectedRowsCommand, "Ctrl+C"));
+            KeyBindings.Add(new CommandKeyBinding(CopySelectedRowsCommand, "Cmd+C"));
+            KeyBindings.Add(new CommandKeyBinding(PasteRowsCommand, "Ctrl+V"));
+            KeyBindings.Add(new CommandKeyBinding(PasteRowsCommand, "Cmd+V"));
+            KeyBindings.Add(new CommandKeyBinding(SelectAllCommand, "Ctrl+A"));
+            KeyBindings.Add(new CommandKeyBinding(SelectAllCommand, "Cmd+A"));
+            KeyBindings.Add(new CommandKeyBinding(cutRowsCommand, "Ctrl+X"));
+            KeyBindings.Add(new CommandKeyBinding(cutRowsCommand, "Cmd+X"));
             
             Debug.Assert(tableDefinition.GroupByKeys.Count == 1);
 

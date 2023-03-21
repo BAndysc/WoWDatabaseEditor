@@ -202,6 +202,11 @@ public partial class VeryFastTableView : Panel, IKeyboardNavigationHandler, IFas
         {
             e.Handled = move = (e.KeyModifiers & KeyModifiers.Shift) != 0 ? MoveCursorPrevious() : MoveCursorNext();
         }
+        else if (e.Key == Key.F2)
+        {
+            OpenEditor();
+            e.Handled = true;
+        }
         if (move)
         {
             var oldSelectionHasNewFocus = MultiSelection.Contains(SelectedRowIndex);
