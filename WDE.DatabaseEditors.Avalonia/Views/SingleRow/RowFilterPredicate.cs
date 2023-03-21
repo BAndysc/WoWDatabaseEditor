@@ -1,5 +1,6 @@
 using System;
 using AvaloniaStyles.Controls.FastTableView;
+using WDE.Common.Utils;
 using WDE.DatabaseEditors.Models;
 using WDE.DatabaseEditors.ViewModels.SingleRow;
 
@@ -27,7 +28,7 @@ public class RowFilterPredicate : IRowFilterPredicate
                 if (cell.ParameterValue is not IParameterValue<long> value)
                     continue;
 
-                if (value.Value == searchTextNum.Value)
+                if (value.Value.Contains(searchText))
                     return true;
             }
             else
