@@ -199,6 +199,12 @@ namespace WDE.DatabaseEditors.ViewModels
                     }
                     catch (IMySqlExecutor.QueryFailedDatabaseException e)
                     {
+                        await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
+                            .SetTitle("Error")
+                            .SetMainInstruction("Couldn't apply SQL")
+                            .SetContent(e.Message)
+                            .WithOkButton(true)
+                            .Build());
                         statusBar.PublishNotification(new PlainNotification(NotificationType.Error, "Couldn't apply SQL: " + e.Message));
                         throw;
                     }

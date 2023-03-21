@@ -329,7 +329,7 @@ namespace WDE.SqlQueryGenerator
             if (o is DateTime dt)
                 return dt.ToUniversalTime().ToString("yyyy-MM-dd HH:mm:ss").ToSqlEscapeString();
             if (o is SqlTimestamp ts)
-                return "FROM_UNIXTIME(" + ts.Value + ")";
+                return ts.Value == 0 ? "'0000-00-00 00:00:00'" : "FROM_UNIXTIME(" + ts.Value + ")";
             if (o is Guid g)
                 return g.ToString().ToSqlEscapeString();
             if (o.GetType().IsEnum)

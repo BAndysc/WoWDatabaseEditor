@@ -334,6 +334,8 @@ namespace WDE.Parameters
         
         public override string ToString(long key)
         {
+            if (key == 0) 
+                return "0000-00-00 00:00:00";
             return AsDateTime(key).ToString("yyyy-MM-dd HH:mm:ss");
         }
 
