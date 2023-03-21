@@ -459,6 +459,8 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             }
             await SetupPersonalGuidValue(freshEntity);
             ForceInsertEntity(freshEntity, index);
+            MultiSelection.Clear();
+            MultiSelection.Add(FocusedRowIndex);
         }
         
         private void SetToNull(SingleRecordDatabaseCellViewModel? view)

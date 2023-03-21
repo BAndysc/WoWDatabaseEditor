@@ -57,7 +57,7 @@ public class CustomCellDrawer : CustomCellDrawerInteractorBase, ICustomCellDrawe
         spellIconService = ViewBind.ResolveViewModel<ISpellIconDatabase>();
     }
 
-    public void DrawRow(DrawingContext context, ITableRow r, Rect rect)
+    public void DrawRow(DrawingContext context,  IFastTableContext table, ITableRow r, Rect rect)
     {
         if (r is not DatabaseEntityViewModel row)
             return;

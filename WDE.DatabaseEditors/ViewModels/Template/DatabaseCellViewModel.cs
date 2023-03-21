@@ -85,5 +85,13 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             ActionLabel = actionLabel;
             inConstructor = false;
         }
+        
+        public void UpdateFromString(string newValue)
+        {
+            if (ParameterValue == null)
+                return;
+
+            ParameterValue.UpdateFromString(newValue);
+        }
     }
 }

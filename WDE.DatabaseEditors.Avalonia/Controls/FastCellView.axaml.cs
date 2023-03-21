@@ -1,7 +1,6 @@
 using System;
 using System.Globalization;
 using System.Reactive.Disposables;
-using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
@@ -93,7 +92,23 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
         {
             if (textBox != null && commit)
             {
-                if (Value is long)
+                if (DataContext is ViewModels.SingleRow.SingleRecordDatabaseCellViewModel singleRecordViewModel)
+                {
+                    singleRecordViewModel.UpdateFromString(textBox.Text);
+                }
+                else if (DataContext is ViewModels.OneToOneForeignKey.SingleRecordDatabaseCellViewModel oneToOneRecordViewModel)
+                {
+                    oneToOneRecordViewModel.UpdateFromString(textBox.Text);
+                }
+                else if (DataContext is ViewModels.MultiRow.DatabaseCellViewModel multiRowViewModel)
+                {
+                    multiRowViewModel.UpdateFromString(textBox.Text);
+                }
+                else if (DataContext is ViewModels.Template.DatabaseCellViewModel templateViewModel)
+                {
+                    templateViewModel.UpdateFromString(textBox.Text);
+                }
+                else if (Value is long)
                 {
                     if (long.TryParse(textBox.Text, out var value))
                         Value = value;

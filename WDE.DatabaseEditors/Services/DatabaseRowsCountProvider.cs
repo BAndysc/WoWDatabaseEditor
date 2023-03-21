@@ -42,7 +42,21 @@ public class DatabaseRowsCountProvider : IDatabaseRowsCountProvider
 
         return await provider.GetCount(primaryKey, token);
     }
-    
+
+    public async Task<int> GetCreaturesCountByEntry(long entry, CancellationToken token)
+    {
+        var table = "creature_(by_entry)";
+        if (!providers.TryGetValue(table, out var provider))
+        {
+            var definition = definitionProvider.GetDefinition("creature");
+            if (definition == null || !definition.TableColumns.ContainsKey("id"))
+                return 0;
+            provider = new BulkAsyncTableRowProvider(executor, definition, "id");
+            providers[table] = provider;
+        }
+
+        return await provider.GetCount(entry, token);
+    }
 
     private class BulkAsyncTableRowProvider
     {
@@ -51,14 +65,16 @@ public class DatabaseRowsCountProvider : IDatabaseRowsCountProvider
         private Dictionary<long, TaskCompletionSource<int>> tasks = new();
         private Dictionary<long, List<CancellationToken>> requests = new();
         private ValuePublisher<long> valuePublisher = new ValuePublisher<long>();
+        private string groupByColumn;
 
-        public BulkAsyncTableRowProvider(IMySqlExecutor executor, DatabaseTableDefinitionJson tableDefinition)
+        public BulkAsyncTableRowProvider(IMySqlExecutor executor, DatabaseTableDefinitionJson tableDefinition, string? customGroupByColumn = null)
         {
             if (string.IsNullOrWhiteSpace(tableDefinition.TablePrimaryKeyColumnName))
                 throw new Exception($"Table {this.tableDefinition} primary key column name is not defined");
             
             this.executor = executor;
             this.tableDefinition = tableDefinition;
+            groupByColumn = customGroupByColumn ?? tableDefinition.TablePrimaryKeyColumnName;
             valuePublisher.Throttle(TimeSpan.FromSeconds((1)))
                 .SubscribeAction(_ =>
                 {
@@ -83,13 +99,13 @@ public class DatabaseRowsCountProvider : IDatabaseRowsCountProvider
             }
 
             var query = Queries.Table(tableDefinition.TableName)
-                .WhereIn(tableDefinition.TablePrimaryKeyColumnName, primaryKeysToFetch)
-                .SelectGroupBy(new[]{tableDefinition.TablePrimaryKeyColumnName}, $"`{tableDefinition.TablePrimaryKeyColumnName}`", "COUNT(*) AS c");
+                .WhereIn(groupByColumn, primaryKeysToFetch)
+                .SelectGroupBy(new[]{groupByColumn}, $"`{groupByColumn}`", "COUNT(*) AS c");
             
             var result = await executor.ExecuteSelectSql(query.QueryString);
             foreach (var row in result)
             {
-                var primaryKey = Convert.ToInt64(row[tableDefinition.TablePrimaryKeyColumnName].Item2);
+                var primaryKey = Convert.ToInt64(row[groupByColumn].Item2);
                 var count = Convert.ToInt32(row["c"].Item2);
                 done.Add(primaryKey);
                 

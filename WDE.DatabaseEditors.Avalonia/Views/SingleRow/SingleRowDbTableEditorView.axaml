@@ -87,15 +87,15 @@
         <StyleInclude Source="avares://WDE.DatabaseEditors.Avalonia/Controls/FastCellView.axaml" />
         <StyleInclude Source="avares://WDE.DatabaseEditors.Avalonia/Controls/FastBoolCellView.axaml" />
 
-        <Style Selector=":is(controls2|FastCellViewBase)">
+        <Style Selector=":is(controls2|FastCellViewBase)" x:DataType="singleRow:SingleRecordDatabaseCellViewModel">
             <!--<Setter Property="IsModified" Value="{Binding IsModified}" />-->
             <Setter Property="SetNullCommand" Value="{Binding ElementName=rootWindow, Path=DataContext.SetNullCommand, Mode=OneTime}" />
             <Setter Property="RevertCommand" Value="{Binding ElementName=rootWindow, Path=DataContext.RevertCommand, Mode=OneTime}" />
             <Setter Property="DuplicateCommand" Value="{Binding ElementName=rootWindow, Path=DataContext.DuplicateCommand, Mode=OneTime}" />
             <Setter Property="RemoveTemplateCommand" Value="{Binding ElementName=rootWindow, Path=DataContext.RemoveTemplateCommand, Mode=OneTime}" />
-            <Setter Property="CanBeNull" Value="{Binding CanBeSetToNull, Mode=OneTime}" />
+            <Setter Property="CanBeNull" Value="{CompiledBinding CanBeSetToNull, Mode=OneTime}" />
         </Style>
-        <Style Selector="controls2|FastCellView">
+        <Style Selector="controls2|FastCellView" x:DataType="singleRow:SingleRecordDatabaseCellViewModel">
             <Setter Property="ChooseParameterCommand" Value="{Binding ElementName=rootWindow, Path=DataContext.OpenParameterWindow, Mode=OneTime}" />
         </Style>
     </UserControl.Styles>
@@ -158,7 +158,7 @@
                         <TextBlock TextAlignment="Center" HorizontalAlignment="Stretch" VerticalAlignment="Center" Opacity="0.7" Text="{CompiledBinding RowsSummaryText}" />              
                     </DockPanel>
                 </Border>
-                <ScrollViewer HorizontalScrollBarVisibility="Auto" AllowAutoHide="False">
+                <ScrollViewer Padding="0,0,15,15" HorizontalScrollBarVisibility="Auto" AllowAutoHide="False">
                     <fastTableView:VeryFastTableView
                         TextBlock.FontFamily="Consolas,Menlo,Courier,Courier New"
                         SelectedRowIndex="{CompiledBinding FocusedRowIndex}"

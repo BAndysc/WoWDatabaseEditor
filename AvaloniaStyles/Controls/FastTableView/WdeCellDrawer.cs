@@ -61,4 +61,8 @@ public class WdeCellDrawer : ICustomCellDrawer
         
         return false;
     }
+
+    public void DrawRow(DrawingContext context, IFastTableContext table, ITableRow row, Rect rect)
+    {
+    }
 }

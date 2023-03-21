@@ -83,6 +83,14 @@ public class CreatureEntryOrGuidProviderService : ICreatureEntryOrGuidProviderSe
                 return count.ToString();
             }, 50));
         }
+        else
+        {
+            columns.Add(new TabularDataAsyncColumn<uint>(nameof(ICreatureTemplate.Entry), "Spawns", async (creatureId, token) =>
+            {
+                var count = await databaseRowsCountProvider.GetCreaturesCountByEntry(creatureId, token);
+                return count.ToString();
+            }, 50));
+        }
         
         var result = await tabularDataPicker.PickRow(new TabularDataBuilder<ICreatureTemplate>()
             .SetTitle("Pick a creature")

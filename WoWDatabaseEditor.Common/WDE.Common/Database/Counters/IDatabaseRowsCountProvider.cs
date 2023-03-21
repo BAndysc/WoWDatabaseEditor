@@ -8,4 +8,5 @@ namespace WDE.Common.Database.Counters;
 public interface IDatabaseRowsCountProvider
 {
     Task<int> GetRowsCountByPrimaryKey(string table, long primaryKey, CancellationToken token);
+    Task<int> GetCreaturesCountByEntry(long entry, CancellationToken token);
 }

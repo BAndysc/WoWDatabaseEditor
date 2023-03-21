@@ -253,6 +253,8 @@ namespace WDE.DbcStore
             public Dictionary<long, string> DifficultyStore { get; internal set; } = new();
             public Dictionary<long, string> LockTypeStore { get; internal set; } = new();
             public Dictionary<long, string> VignetteStore { get; internal set; } = new();
+            public Dictionary<long, string> AdventureJournalStore { get; internal set; } = new();
+            
             private List<(string parameter, Dictionary<long, SelectOption> options)> parametersToRegister = new();
             public List<AreaEntry> Areas { get; } = new();
             public List<MapEntry> Maps { get; } = new();
@@ -476,6 +478,7 @@ namespace WDE.DbcStore
                 parameterFactory.Register("GarrisonTalentParameter", new DbcParameter(GarrisonTalentStore));
                 parameterFactory.Register("DifficultyParameter", new DbcParameter(DifficultyStore));
                 parameterFactory.Register("LockTypeParameter", new DbcParameter(LockTypeStore));
+                parameterFactory.Register("AdventureJournalParameter", new DbcParameter(AdventureJournalStore));
                 parameterFactory.Register("VignetteParameter", new DbcParameterWowTools(VignetteStore, "vignette", store.currentCoreVersion, store.windowManager));
                 parameterFactory.Register("VehicleParameter", new WoWToolsParameter("vehicle", store.currentCoreVersion, store.windowManager));
                 parameterFactory.Register("LockParameter", new WoWToolsParameter("lock", store.currentCoreVersion, store.windowManager));
@@ -1093,6 +1096,7 @@ namespace WDE.DbcStore
                             else
                                 CharSpecializationStore.Add(specId, $"{name}");
                         });
+                        Load("AdventureJournal.db2", 0, 1, AdventureJournalStore);
                         break;
                     }
                     case DBCVersions.SHADOWLANDS_41079:
