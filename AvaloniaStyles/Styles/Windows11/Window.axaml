@@ -31,14 +31,14 @@
     <Style Selector="ExtendedWindow">
         <Setter Property="FontFamily" Value="{DynamicResource ContentControlThemeFontFamily}"  />
         <Setter Property="ExtendClientAreaTitleBarHeightHint" Value="24" />
-        <Setter Property="ExtendClientAreaToDecorationsHint" Value="True" />
-        <Setter Property="Chrome" Value="NoSystemChrome" />
+        <Setter Property="ExtendClientAreaToDecorationsHint" Value="False" />
+        <Setter Property="Chrome" Value="AlwaysSystemChrome" />
         <Setter Property="Background" Value="{DynamicResource WindowContentBackground}" />
         <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}"/>
         <Setter Property="Template">
             <ControlTemplate>
-                <Border BorderThickness="0.5" BorderBrush="{DynamicResource OuterWindowBorderColor}" Name="PART_windowBorder">
-                    <Border ClipToBounds="True" BorderThickness="0.5" BorderBrush="{DynamicResource InnerWindowBorderColor}" Name="PART_windowBorder_inner">
+                <Border BorderThickness="0" BorderBrush="{DynamicResource OuterWindowBorderColor}" Name="PART_windowBorder">
+                    <Border ClipToBounds="True" BorderThickness="0" BorderBrush="{DynamicResource InnerWindowBorderColor}" Name="PART_windowBorder_inner">
                         <VisualLayerManager>
                             <DockPanel LastChildFill="True" Margin="{TemplateBinding OffScreenMargin}">
                                 <Panel DockPanel.Dock="Top">
@@ -49,9 +49,10 @@
                                             <ContentPresenter DockPanel.Dock="Left" HorizontalAlignment="Left" Content="{Binding ToolBar.TopContent, RelativeSource={RelativeSource Mode=TemplatedParent}}">
                                             </ContentPresenter>
 
-                                            <WindowControlButtons DockPanel.Dock="Right"/>
+                                            <!--<WindowControlButtons DockPanel.Dock="Right"/>-->
                                             <ContentPresenter DockPanel.Dock="Right" HorizontalAlignment="Left" Content="{Binding ToolBar.RightContent, RelativeSource={RelativeSource Mode=TemplatedParent}}" />           
 
+                                            <!--
                                             <StackPanel ClipToBounds="True" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                                                 <TextBlock 
                                                     IsHitTestVisible="False" 
@@ -67,6 +68,7 @@
                                                     Foreground="{DynamicResource TitleBarForeground}"
                                                     Text="{TemplateBinding SubTitle}" />
                                             </StackPanel>
+                                            -->
                                         </DockPanel>
                                         <ToolbarPanel HorizontalAlignment="Stretch" DockPanel.Dock="Top" Margin="5,2,2,2">
                                             <ContentPresenter HorizontalAlignment="Left" Content="{Binding ToolBar.LeftContent, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
