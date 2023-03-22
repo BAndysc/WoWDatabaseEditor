@@ -21,6 +21,28 @@ namespace WDE.Common.Database
         int ModelsCount { get; }
         uint GetModel(int index);
     }
+
+    public class AbstractCreatureTemplate : ICreatureTemplate
+    {
+        public uint Entry { get; init; }
+        public float Scale { get; init; }
+        public uint GossipMenuId { get; init; }
+        public uint FactionTemplate { get; init; }
+        public short MinLevel { get; init; }
+        public short MaxLevel { get; init; }
+        public string Name { get; init; } = "";
+        public string? SubName { get; init; }
+        public string AIName { get; init; } = "";
+        public string ScriptName { get; init; } = "";
+        public GameDefines.UnitFlags UnitFlags { get; init; }
+        public GameDefines.NpcFlags NpcFlags { get; init; }
+        public uint? EquipmentTemplateId { get; init; }
+        public int ModelsCount { get; init; }
+        public uint GetModel(int index)
+        {
+            return 0;
+        }
+    }
     
     public class GameDefines
     {

@@ -205,7 +205,7 @@
         
         <Grid utils:GridUtils.DynamicRows="{CompiledBinding SplitVertical, Converter={StaticResource RowsConverter}}"
           utils:GridUtils.DynamicColumns="{CompiledBinding SplitHorizontal, Converter={StaticResource ColumnsConverter}}">
-            <ScrollViewer Padding="0,0,15,15" HorizontalScrollBarVisibility="Auto" AllowAutoHide="False">
+            <ScrollViewer Padding="0,0,15,15" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible" AllowAutoHide="False">
                 <fastTableView:VeryFastTableView
                     InteractiveHeader="True"
                     ValueUpdateRequest="VeryFastTableView_OnValueUpdateRequest"

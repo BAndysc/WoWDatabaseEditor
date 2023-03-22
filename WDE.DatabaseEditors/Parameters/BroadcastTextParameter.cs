@@ -59,6 +59,17 @@ public class BroadcastTextParameter : IParameter<long>, IAsyncParameter<long>, I
                 var femaleHas = text.Text1?.Contains(search, StringComparison.InvariantCultureIgnoreCase) ?? false;
                 return idHas || maleHas || femaleHas;
             })
+            .SetExactMatchPredicate((template, search) => template.Id.Is(search))
+            .SetExactMatchCreator(search =>
+            {
+                if (!uint.TryParse(search, out var entry))
+                    return null;
+                return new AbstractBroadcastText()
+                {
+                    Id = entry,
+                    Text = "Pick non existing"
+                };
+            })
             .Build());
         
         if (selected == null)

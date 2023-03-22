@@ -413,6 +413,11 @@ namespace WDE.Parameters
             return (result ?? 0, result.HasValue);
         }
 
+        public async Task<IReadOnlyCollection<long>> PickMultipleValues()
+        {
+            return (await picker.GetEntriesFromService()).Select(x => (long)x).ToList();
+        }
+
         public override Func<Task<object?>>? SpecialCommand { get; }
 
         public CreatureParameter(IDatabaseProvider database, 

@@ -196,7 +196,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             return nonCachedDatabase.GetQuestTemplate(entry);
         }
 
-        public IEnumerable<IGameObjectTemplate> GetGameObjectTemplates()
+        public IReadOnlyList<IGameObjectTemplate> GetGameObjectTemplates()
         {
             if (gameObjectTemplateCache != null)
                 return gameObjectTemplateCache;
@@ -355,7 +355,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             return nonCachedDatabase.GetSpellScriptNames(spellId);
         }
 
-        public Task<IList<int>> GetSmartScriptEntriesByType(SmartScriptType scriptType) =>
+        public Task<IReadOnlyList<int>> GetSmartScriptEntriesByType(SmartScriptType scriptType) =>
             nonCachedDatabase.GetSmartScriptEntriesByType(scriptType);
 
         public async Task<IList<IPlayerChoice>?> GetPlayerChoicesAsync() => await nonCachedDatabase.GetPlayerChoicesAsync();

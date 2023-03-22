@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
@@ -33,10 +35,9 @@ public class QuestEntryProviderService : IQuestEntryProviderService
         this.parameterFactory = parameterFactory;
     }
 
-    public async Task<uint?> GetEntryFromService(uint? questId = null)
+    private ITabularDataArgs<IQuestTemplate> BuildTable(uint? questId, out int index)
     {
         var questSortParameter = parameterFactory.Factory("ZoneOrQuestSortParameter");
-
         var questSortConverter = new FuncValueConverter<int, string>(id =>
         {
             if (id == 0)
@@ -47,8 +48,8 @@ public class QuestEntryProviderService : IQuestEntryProviderService
         });
         
         var templates = database.GetQuestTemplates();
-        var index = questId.HasValue ? templates.IndexIf(t => t.Entry == questId) : -1;
-        var result = await tabularDataPicker.PickRow(new TabularDataBuilder<IQuestTemplate>()
+        index = questId.HasValue ? templates.IndexIf(t => t.Entry == questId) : -1;
+        return new TabularDataBuilder<IQuestTemplate>()
             .SetTitle("Pick a quest")
             .SetData(templates.AsIndexedCollection())
             .SetColumns(new TabularDataColumn(nameof(IQuestTemplate.Entry), "Entry", 60),
@@ -66,11 +67,13 @@ public class QuestEntryProviderService : IQuestEntryProviderService
                 new TabularDataColumn(nameof(IQuestTemplate.MinLevel), "Min level", 36, new FuncDataTemplate(_ => true,
                     (_, _) => new TextBlock()
                     {
-                        [!TextBlock.TextProperty] = new Binding(nameof(IQuestTemplate.MinLevel)){StringFormat = "[{0}]"},
+                        [!TextBlock.TextProperty] = new Binding(nameof(IQuestTemplate.MinLevel))
+                            { StringFormat = "[{0}]" },
                         VerticalAlignment = VerticalAlignment.Center
                     })),
                 new TabularDataColumn(nameof(IQuestTemplate.Name), "Title", 200),
-                new TabularDataColumn(nameof(IQuestTemplate.AllowableClasses), "Classes", 110, new FuncDataTemplate(_ => true,
+                new TabularDataColumn(nameof(IQuestTemplate.AllowableClasses), "Classes", 110, new FuncDataTemplate(
+                    _ => true,
                     (_, _) => new GameClassesImage()
                     {
                         [!GameClassesImage.GameClassesProperty] = new Binding(nameof(IQuestTemplate.AllowableClasses)),
@@ -79,7 +82,8 @@ public class QuestEntryProviderService : IQuestEntryProviderService
                         Margin = new Thickness(2),
                         Spacing = 2
                     })),
-                new TabularDataColumn(nameof(IQuestTemplate.AllowableRaces), "Races", 150, new FuncDataTemplate(_ => true,
+                new TabularDataColumn(nameof(IQuestTemplate.AllowableRaces), "Races", 150, new FuncDataTemplate(
+                    _ => true,
                     (_, _) => new GameRacesImage()
                     {
                         [!GameRacesImage.RacesProperty] = new Binding(nameof(IQuestTemplate.AllowableRaces)),
@@ -92,7 +96,8 @@ public class QuestEntryProviderService : IQuestEntryProviderService
                 new TabularDataColumn(nameof(IQuestTemplate.QuestSortId), "Zone", 150, new FuncDataTemplate(_ => true,
                     (_, _) => new TextBlock()
                     {
-                        [!TextBlock.TextProperty] = new Binding(nameof(IQuestTemplate.QuestSortId)){Converter = questSortConverter},
+                        [!TextBlock.TextProperty] = new Binding(nameof(IQuestTemplate.QuestSortId))
+                            { Converter = questSortConverter },
                         VerticalAlignment = VerticalAlignment.Center
                     })))
             .SetFilter((template, filter) =>
@@ -103,7 +108,20 @@ public class QuestEntryProviderService : IQuestEntryProviderService
                     return true;
                 return false;
             })
-            .Build(), index);
+            .Build();
+    }
+
+    public async Task<uint?> GetEntryFromService(uint? questId = null)
+    {
+        var table = BuildTable(questId, out var index);
+        var result = await tabularDataPicker.PickRow(table, index);
         return result?.Entry;
+    }
+
+    public async Task<IReadOnlyCollection<uint>> GetEntriesFromService()
+    {
+        var table = BuildTable(null, out _);
+        var templates = await tabularDataPicker.PickRows(table);
+        return templates.Select(t => t.Entry).ToList();
     }
 }

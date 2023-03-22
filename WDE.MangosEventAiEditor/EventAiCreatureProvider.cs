@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using WDE.Common;
 using WDE.Common.Solution;
@@ -26,7 +28,13 @@ namespace WDE.MangosEventAiEditor
                 return null;
             return new EventAiSolutionItem(entry.Value);
         }
-        
+
+        public override async Task<IReadOnlyCollection<ISolutionItem>> CreateMultipleSolutionItems()
+        {
+            var entries = await creatureEntryProvider.Value.GetEntriesFromService();
+            return entries.Select(e => new EventAiSolutionItem(e)).ToList();
+        }
+
         public Task<ISolutionItem?> CreateRelatedSolutionItem(RelatedSolutionItem related)
         {
             return Task.FromResult<ISolutionItem?>(

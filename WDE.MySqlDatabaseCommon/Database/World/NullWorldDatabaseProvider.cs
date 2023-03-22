@@ -16,7 +16,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public IGameObjectTemplate? GetGameObjectTemplate(uint entry) => null;
 
-        public IEnumerable<IGameObjectTemplate> GetGameObjectTemplates() => Array.Empty<IGameObjectTemplate>();
+        public IReadOnlyList<IGameObjectTemplate> GetGameObjectTemplates() => Array.Empty<IGameObjectTemplate>();
         
         public Task<IAreaTriggerScript?> GetAreaTriggerScript(int entry) => Task.FromResult<IAreaTriggerScript?>(null);
         
@@ -75,8 +75,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         
         public IEnumerable<ISmartScriptProject> GetLegacyProjects() => Enumerable.Empty<ISmartScriptProject>();
 
-        public Task<IList<int>> GetSmartScriptEntriesByType(SmartScriptType scriptType) =>
-            Task.FromResult<IList<int>>(new List<int>());
+        public Task<IReadOnlyList<int>> GetSmartScriptEntriesByType(SmartScriptType scriptType) =>
+            Task.FromResult<IReadOnlyList<int>>(new List<int>());
 
         public async Task<IList<IPlayerChoice>?> GetPlayerChoicesAsync() => null;
 

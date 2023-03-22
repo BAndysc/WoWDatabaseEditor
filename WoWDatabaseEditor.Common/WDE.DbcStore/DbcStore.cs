@@ -489,6 +489,13 @@ namespace WDE.DbcStore
                         new DbcParameterWithPicker<IArea>(dataPicker, AreaStore, "zone or area", area => area.Id,
                             () => store.Areas,
                             (area, text) => area.Name.Contains(text, StringComparison.InvariantCultureIgnoreCase) || area.Id.Contains(text),
+                            (area, text) => area.Id.Is(text),
+                            (text) =>
+                            {
+                                if (!uint.TryParse(text, out var id))
+                                    return null;
+                                return new AreaEntry() { Id = id, Name = "Pick non existing"};
+                            },
                             new TabularDataColumn(nameof(IArea.Id), "Entry", 60), 
                             new TabularDataColumn(nameof(IArea.Name), "Name", 160), 
                             new TabularDataColumn(nameof(IArea.ParentArea) + "." + nameof(IArea.Name), "Parent", 160), 
@@ -1458,13 +1465,15 @@ namespace WDE.DbcStore
         }
     }
     
-    public class DbcParameterWithPicker<T> : DbcParameter, ICustomPickerParameter<long>
+    public class DbcParameterWithPicker<T> : DbcParameter, ICustomPickerParameter<long> where T : class
     {
         private readonly ITabularDataPicker dataPicker;
         private readonly string dbc;
         private readonly Func<T, long> getId;
         private readonly Func<IReadOnlyList<T>> getListOf;
         private readonly Func<T, string, bool> filter;
+        private readonly Func<T, string, bool> isExactMatch;
+        private readonly Func<string, T?> exactMatchCreator;
         private readonly ITabularDataColumn[] columns;
 
         public DbcParameterWithPicker(ITabularDataPicker dataPicker,
@@ -1473,6 +1482,8 @@ namespace WDE.DbcStore
             Func<T, long> getId,
             Func<IReadOnlyList<T>> getListOf,
             Func<T, string, bool> filter,
+            Func<T, string, bool> isExactMatch,
+            Func<string, T?> exactMatchCreator,
             params ITabularDataColumn?[] columns) : base(storage)
         {
             this.dataPicker = dataPicker;
@@ -1480,22 +1491,38 @@ namespace WDE.DbcStore
             this.getId = getId;
             this.getListOf = getListOf;
             this.filter = filter;
+            this.isExactMatch = isExactMatch;
+            this.exactMatchCreator = exactMatchCreator;
             this.columns = columns.Where(c => c != null).Cast<ITabularDataColumn>().ToArray();
         }
         
         public async Task<(long, bool)> PickValue(long value)
         {
-            var result = await dataPicker.PickRow(new TabularDataBuilder<T>()
-                .SetData(getListOf().AsIndexedCollection())
-                .SetTitle($"Pick {dbc}")
-                .SetFilter(filter)
-                .SetColumns(columns)
-                .Build());
+            var result = await dataPicker.PickRow(BuildTable());
 
             if (result == null)
                 return (0, false);
             
             return (getId(result), true);
+        }
+
+        public async Task<IReadOnlyCollection<long>> PickMultipleValues()
+        {
+            var result = await dataPicker.PickRows(BuildTable());
+            
+            return result.Select(getId).ToArray();
+        }
+        
+        private ITabularDataArgs<T> BuildTable()
+        {
+            return new TabularDataBuilder<T>()
+                .SetData(getListOf().AsIndexedCollection())
+                .SetTitle($"Pick {dbc}")
+                .SetFilter(filter)
+                .SetExactMatchPredicate(isExactMatch)
+                .SetExactMatchCreator(exactMatchCreator)
+                .SetColumns(columns)
+                .Build();
         }
     }
     

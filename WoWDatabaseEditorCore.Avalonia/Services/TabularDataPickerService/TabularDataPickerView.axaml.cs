@@ -37,8 +37,13 @@ public partial class TabularDataPickerView : UserControl
             if (gridView == null)
                 return;
 
-            if (gridView.SelectedIndex == null || gridView.SelectedIndex == -1)
-                gridView.SelectedIndex = 0;
+            if (gridView.FocusedIndex == null || gridView.FocusedIndex == -1)
+            {
+                gridView.FocusedIndex = 0;
+                gridView.Selection.Clear();
+                if (gridView.Items.Count > 0)
+                    gridView.Selection.Add(0);
+            }
             gridView.Focus();
 
             e.Handled = true;

@@ -18,14 +18,14 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.EntrySelectorService;
 
 [AutoRegister]
 [SingleInstance]
-public class CreatureEntryOrGuidProviderService : ICreatureEntryOrGuidProviderService
+public class GameObjectEntryProviderService : IGameobjectEntryOrGuidProviderService
 {
     private readonly ITabularDataPicker tabularDataPicker;
     private readonly IFactionTemplateStore factionTemplateStore;
     private readonly IDatabaseRowsCountProvider databaseRowsCountProvider;
     private readonly IDatabaseProvider databaseProvider;
 
-    public CreatureEntryOrGuidProviderService(ITabularDataPicker tabularDataPicker,
+    public GameObjectEntryProviderService(ITabularDataPicker tabularDataPicker,
         IFactionTemplateStore factionTemplateStore,
         IDatabaseRowsCountProvider databaseRowsCountProvider,
         IDatabaseProvider databaseProvider)
@@ -36,15 +36,15 @@ public class CreatureEntryOrGuidProviderService : ICreatureEntryOrGuidProviderSe
         this.databaseProvider = databaseProvider;
     }
     
-    private ITabularDataArgs<ICreatureTemplate> BuildTable(string? customCounterTable, uint? entry, out int index)
+    private ITabularDataArgs<IGameObjectTemplate> BuildTable(string? customCounterTable, uint? entry, out int index)
     {
         index = -1;
-        var creatures = databaseProvider.GetCreatureTemplates();
+        var gameObjects = databaseProvider.GetGameObjectTemplates();
 
         if (entry.HasValue)
         {
-            for (int i = 0, count = creatures.Count; i < count; ++i)
-                if (creatures[i].Entry == entry)
+            for (int i = 0, count = gameObjects.Count; i < count; ++i)
+                if (gameObjects[i].Entry == entry)
                 {
                     index = i;
                     break;
@@ -53,59 +53,40 @@ public class CreatureEntryOrGuidProviderService : ICreatureEntryOrGuidProviderSe
 
         var columns = new List<ITabularDataColumn>()
         {
-            new TabularDataColumn(nameof(ICreatureTemplate.Entry), "Entry", 60),
-            new TabularDataColumn(nameof(ICreatureTemplate.FactionTemplate), "React", 50, new FuncDataTemplate(
-                _ => true,
-                (_, _) => new TeamFactionReactionView()
-                {
-                    [!TeamFactionReactionView.FactionTemplateIdProperty] =
-                        new Binding(nameof(ICreatureTemplate.FactionTemplate))
-                })),
-            new TabularDataColumn(nameof(ICreatureTemplate.Name), "Name", 180),
-            new TabularDataColumn(nameof(ICreatureTemplate.SubName), "Sub name", 110),
-            new TabularDataAsyncColumn<ICreatureTemplate>(".", "Level", (template, token) =>
-            {
-                string level = template.MinLevel == template.MaxLevel
-                    ? template.MinLevel.ToString()
-                    : $"{template.MinLevel} - {template.MaxLevel}";
-                return Task.FromResult<string?>(level);
-            }, 50),
-            new TabularDataAsyncColumn<uint>(nameof(ICreatureTemplate.FactionTemplate), "Faction", (factionTemplate, token)
-                => Task.FromResult<string?>(factionTemplateStore.GetFactionByTemplate(factionTemplate)?.Name ??
-                                            factionTemplate.ToString()), 90)
+            new TabularDataColumn(nameof(IGameObjectTemplate.Entry), "Entry", 80),
+            new TabularDataColumn(nameof(IGameObjectTemplate.Name), "Name", 210),
+            new TabularDataColumn(nameof(IGameObjectTemplate.Type), "Type", 120)
         };
         if (customCounterTable != null)
         {
-            columns.Add(new TabularDataAsyncColumn<uint>(nameof(ICreatureTemplate.Entry), "Count", async (spellId, token) =>
+            columns.Add(new TabularDataAsyncColumn<uint>(nameof(IGameObjectTemplate.Entry), "Count", async (entry, token) =>
             {
-                var count = await databaseRowsCountProvider.GetRowsCountByPrimaryKey(customCounterTable, spellId, token);
+                var count = await databaseRowsCountProvider.GetRowsCountByPrimaryKey(customCounterTable, entry, token);
                 return count.ToString();
             }, 50));
         }
         else
         {
-            columns.Add(new TabularDataAsyncColumn<uint>(nameof(ICreatureTemplate.Entry), "Spawns",
-                async (creatureId, token) =>
+            columns.Add(new TabularDataAsyncColumn<uint>(nameof(IGameObjectTemplate.Entry), "Spawns",
+                async (entry, token) =>
                 {
-                    var count = await databaseRowsCountProvider.GetCreaturesCountByEntry(creatureId, token);
+                    var count = await databaseRowsCountProvider.GetGameObjectCountByEntry(entry, token);
                     return count.ToString();
                 }, 50));
         }
 
-        var table = new TabularDataBuilder<ICreatureTemplate>()
-            .SetTitle("Pick a creature")
-            .SetData(creatures.AsIndexedCollection())
+        var table = new TabularDataBuilder<IGameObjectTemplate>()
+            .SetTitle("Pick a gameobject")
+            .SetData(gameObjects.AsIndexedCollection())
             .SetColumns(columns)
             .SetFilter((template, text) => template.Entry.Contains(text) ||
-                                           template.Name.Contains(text, StringComparison.OrdinalIgnoreCase) ||
-                                           (template.SubName?.Contains(text, StringComparison.OrdinalIgnoreCase) ??
-                                            false))
+                                           template.Name.Contains(text, StringComparison.OrdinalIgnoreCase))
             .SetExactMatchPredicate((template, search) => template.Entry.Is(search))
             .SetExactMatchCreator(search =>
             {
                 if (!uint.TryParse(search, out var entry))
                     return null;
-                return new AbstractCreatureTemplate()
+                return new AbstractGameObjectTemplate()
                 {
                     Entry = entry,
                     Name = "Pick non existing"

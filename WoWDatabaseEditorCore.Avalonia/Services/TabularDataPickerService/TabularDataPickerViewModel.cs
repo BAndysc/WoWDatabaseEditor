@@ -13,6 +13,7 @@ using WDE.Common.Collections;
 using WDE.Common.Managers;
 using WDE.Common.TableData;
 using WDE.Common.Types;
+using WDE.Common.Utils;
 using WDE.MVVM;
 
 namespace WoWDatabaseEditorCore.Avalonia.Services.TabularDataPickerService;
@@ -21,22 +22,34 @@ public partial class TabularDataPickerViewModel : ObservableBase, IDialog
 {
     [Notify] 
     private string searchText = "";
-    
-    [Notify] 
-    [AlsoNotify(nameof(SelectedItem))] 
-    private int selectedIndex = -1;
-    
+
+    public IMultiIndexContainer Selection { get; } = new MultiIndexContainer();
+
+    [Notify]
+    [AlsoNotify(nameof(FocusedItem))]
+    private int focusedIndex = -1;
+
+    private bool ignoreSelectionChange = false;
+    private HashSet<object> selectedItems = new HashSet<object>();
+
+    public IReadOnlyCollection<object> SelectedItems => selectedItems;
+
     private IIndexedCollection<object> allItems;
     private readonly Func<object, string, bool> filterPredicate;
     private readonly Func<object, long, bool>? numberPredicate;
+    private readonly Func<object,string,bool>? exactMatchPredicate;
+    private readonly Func<string, object?>? exactMatchCreator;
     public IIndexedCollection<object> Items { get; private set; }
     public IReadOnlyList<ColumnDescriptor> Columns { get; }
     
-    public object? SelectedItem => selectedIndex >= 0 && selectedIndex < Items.Count ? Items[selectedIndex] : null;
+    public object? FocusedItem => focusedIndex >= 0 && focusedIndex < Items.Count ? Items[focusedIndex] : null;
 
-    public TabularDataPickerViewModel(ITabularDataArgs<object> args, int defaultSelection = -1)
+    public bool MultiSelect { get; }
+    
+    public TabularDataPickerViewModel(ITabularDataArgs<object> args, bool multiSelection, IReadOnlyList<int>? defaultSelection = null)
     {
         Title = args.Title;
+        MultiSelect = multiSelection;
         Columns = args.Columns
             .Select((c, index) =>
             {
@@ -56,15 +69,47 @@ public partial class TabularDataPickerViewModel : ObservableBase, IDialog
         allItems = args.Data;
         filterPredicate = args.FilterPredicate;
         numberPredicate = args.NumberPredicate;
+        exactMatchPredicate = args.ExactMatchPredicate;
+        exactMatchCreator = args.ExactMatchCreator;
         Items = args.Data;
-        selectedIndex = defaultSelection;
+        if (defaultSelection != null && defaultSelection.Count > 0)
+        {
+            focusedIndex = defaultSelection[0];
+            foreach (var index in defaultSelection)
+            {
+                if (index >= 0 && index < Items.Count)
+                    Selection.Add(index);   
+            }
+        }
+        
+        Selection.Cleared += () =>
+        {
+            if (ignoreSelectionChange)
+                return;
+            selectedItems.Clear();
+        };
+        Selection.Added += i =>
+        {
+            if (ignoreSelectionChange)
+                return;
+            selectedItems.Add(Items[i]);
+        };
+        Selection.Removed += i =>
+        {
+            if (ignoreSelectionChange)
+                return;
+            selectedItems.Remove(Items[i]);
+        };
         
         acceptCommand = new DelegateCommand(() =>
         {
-            if (SelectedItem == null && Items.Count > 0)
-                SelectedIndex = 0;
+            if (FocusedItem == null && Items.Count > 0)
+            {
+                FocusedIndex = 0;
+                Selection.Add(FocusedIndex);
+            }
             CloseOk?.Invoke();
-        }, () => SelectedItem != null || Items.Count > 0).ObservesProperty(() => SelectedItem);
+        }, () => FocusedItem != null || Items.Count > 0).ObservesProperty(() => FocusedItem);
         Cancel = new DelegateCommand(() =>
         {
             CloseCancel?.Invoke();
@@ -76,31 +121,45 @@ public partial class TabularDataPickerViewModel : ObservableBase, IDialog
         On(() => Items, _ => acceptCommand.RaiseCanExecuteChanged());
     }
 
+    private void UpdateSelectionAfterFilter()
+    {
+        if (selectedItems.Count == 0)
+            return;
+        
+        try
+        {
+            ignoreSelectionChange = true;
+            Selection.Clear();
+            FocusedIndex = -1;
+            for (int i = 0, count = Items.Count; i < count; ++i)
+            {
+                if (selectedItems.Contains(Items[i]))
+                {
+                    Selection.Add(i);
+                    FocusedIndex = i;
+                }
+            }
+        }
+        finally
+        {
+            ignoreSelectionChange = false;
+        }
+    }
+    
     private void Filter(string text)
     {
-        var selectedItem = SelectedItem;
         if (string.IsNullOrWhiteSpace(text))
         {
             Items = allItems;
             RaisePropertyChanged(nameof(Items));
-            if (selectedItem != null)
-            {
-                SelectedIndex = -1;
-                for (int i = 0; i < allItems.Count; ++i)
-                {
-                    if (allItems[i] == selectedItem)
-                    {
-                        SelectedIndex = i;
-                        break;
-                    }
-                }
-            }
+            UpdateSelectionAfterFilter();
             return;
         }
         
         List<object> filtered = new();
         text = text.Trim();
         var numberFilter = long.TryParse(text, out var number);
+        bool hasExactMatch = false;
         if (numberFilter && numberPredicate != null)
         {
             for (int i = 0, count = allItems.Count; i < count; i++)
@@ -109,6 +168,8 @@ public partial class TabularDataPickerViewModel : ObservableBase, IDialog
                 var accept = numberPredicate(item, number);
                 if (accept)
                     filtered.Add(item);
+                if (!hasExactMatch && exactMatchPredicate != null)
+                    hasExactMatch = exactMatchPredicate(item, text);
             }
         }
         else
@@ -119,24 +180,21 @@ public partial class TabularDataPickerViewModel : ObservableBase, IDialog
                 var accept = filterPredicate(item, text);
                 if (accept)
                     filtered.Add(item);
+                if (!hasExactMatch && exactMatchPredicate != null)
+                    hasExactMatch = exactMatchPredicate(item, text);
             }
+        }
+
+        if (!hasExactMatch && exactMatchCreator != null)
+        {
+            var dynamic = exactMatchCreator(text);
+            if (dynamic != null)
+                filtered.Add(dynamic);
         }
 
         Items = filtered.AsIndexedCollection();
         RaisePropertyChanged(nameof(Items));
-        
-        SelectedIndex = -1;
-        if (selectedItem != null)
-        {
-            for (int i = 0, count = filtered.Count; i < count; ++i)
-            {
-                if (filtered[i] == selectedItem)
-                {
-                    SelectedIndex = i;
-                    break;
-                }
-            }
-        }
+        UpdateSelectionAfterFilter();
     }
 
     public int DesiredWidth => 700;

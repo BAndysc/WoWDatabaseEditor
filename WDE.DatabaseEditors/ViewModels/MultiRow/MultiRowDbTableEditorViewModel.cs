@@ -388,35 +388,45 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         private async Task AddNewEntity()
         {
             var parameter = parameterFactory.Factory(tableDefinition.Picker);
-            var (selected, ok) = await parameterPickerService.PickParameter(parameter, 0);
-            if (!ok)
-                return;
+            var keys = await parameterPickerService.PickMultiple(parameter);
 
+            if (keys.Count > 150)
+            {
+                await messageBoxService.SimpleDialog("Too many items", "Too many items", "You are trying to add too many items at once, sorry");
+                return;
+            }
+            
             Debug.Assert(tableDefinition.GroupByKeys.Count == 1);
 
-            DatabaseKey key = new DatabaseKey(selected);
-
-            if (ContainsKey(key))
+            var containedKeys = keys.Where(val => ContainsKey(new DatabaseKey(val))).ToList();
+            
+            if (containedKeys.Count > 0)
             {
                 await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
                     .SetTitle("Key already added")
-                    .SetMainInstruction($"Key {key} is already added to this editor")
+                    .SetMainInstruction($"Key {containedKeys[0]} is already added to this editor")
                     .SetContent("To add a new row, click (+) sign next to the key name")
                     .WithOkButton(true)
                     .SetIcon(MessageBoxIcon.Warning)
                     .Build());
-                return;
             }
             
-            var data = await tableDataProvider.Load(tableDefinition.Id, null, null,null, new[]{key});
-            if (data == null) 
-                return;
-
-            OnKeyAdded?.Invoke(key);
-            EnsureKey(key);
-            
             using var _ = BulkEdit("Load data");
-            AddEntities(data.Entities);
+            foreach (var keyValue in keys)
+            {
+                DatabaseKey key = new DatabaseKey(keyValue);
+
+                if (ContainsKey(key))
+                    continue;
+            
+                var data = await tableDataProvider.Load(tableDefinition.Id, null, null,null, new[]{key});
+                if (data == null) 
+                    continue;
+
+                OnKeyAdded?.Invoke(key);
+                EnsureKey(key);
+                AddEntities(data.Entities);   
+            }
         }
         
         private void SetToNull(DatabaseCellViewModel? view)

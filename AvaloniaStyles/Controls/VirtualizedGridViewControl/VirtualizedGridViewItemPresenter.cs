@@ -11,6 +11,7 @@ using Avalonia.Data;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using WDE.Common.Collections;
+using WDE.Common.Utils;
 using WDE.MVVM.Observable;
 
 namespace AvaloniaStyles.Controls;
@@ -23,8 +24,11 @@ public class VirtualizedGridViewItemPresenter : Panel
     private IIndexedCollection<object>? items = IIndexedCollection<object>.Empty;
     public static readonly DirectProperty<VirtualizedGridViewItemPresenter, IIndexedCollection<object>?> ItemsProperty = AvaloniaProperty.RegisterDirect<VirtualizedGridViewItemPresenter, IIndexedCollection<object>?>(nameof(Items), o => o.Items, (o, v) => o.Items = v);
 
-    private int? selectedIndex;
-    public static readonly DirectProperty<VirtualizedGridViewItemPresenter, int?> SelectedIndexProperty = AvaloniaProperty.RegisterDirect<VirtualizedGridViewItemPresenter, int?>(nameof(SelectedIndex), o => o.SelectedIndex, (o, v) => o.SelectedIndex = v);
+    private int? focusedIndex;
+    public static readonly DirectProperty<VirtualizedGridViewItemPresenter, int?> FocusedIndexProperty = AvaloniaProperty.RegisterDirect<VirtualizedGridViewItemPresenter, int?>(nameof(FocusedIndex), o => o.FocusedIndex, (o, v) => o.FocusedIndex = v);
+    
+    private IMultiIndexContainer selection = new MultiIndexContainer();
+    public static readonly DirectProperty<VirtualizedGridViewItemPresenter, IMultiIndexContainer> SelectionProperty = AvaloniaProperty.RegisterDirect<VirtualizedGridViewItemPresenter, IMultiIndexContainer>(nameof(Selection), o => o.Selection, (o, v) => o.Selection = v, new MultiIndexContainer(), BindingMode.OneWay);
 
     private IEnumerable<GridColumnDefinition> columns = new AvaloniaList<GridColumnDefinition>();
     public static readonly DirectProperty<VirtualizedGridViewItemPresenter, IEnumerable<GridColumnDefinition>> ColumnsProperty =
@@ -80,10 +84,10 @@ public class VirtualizedGridViewItemPresenter : Panel
     
     static VirtualizedGridViewItemPresenter()
     {
-        AffectsArrange<VirtualizedGridViewItemPresenter>(SelectedIndexProperty);
+        AffectsArrange<VirtualizedGridViewItemPresenter>(FocusedIndexProperty);
         AffectsMeasure<VirtualizedGridViewItemPresenter>(ItemsProperty);
         AffectsArrange<VirtualizedGridViewItemPresenter>(ItemsProperty);
-        SelectedIndexProperty.Changed.AddClassHandler<VirtualizedGridViewItemPresenter>((panel, e) => panel.AutoScrollToSelectedIndex());
+        FocusedIndexProperty.Changed.AddClassHandler<VirtualizedGridViewItemPresenter>((panel, e) => panel.AutoScrollToFocusedIndex());
         ItemsProperty.Changed.AddClassHandler<VirtualizedGridViewItemPresenter>((panel, e) =>
         {
             if (panel.attachedToVisualTree)
@@ -92,15 +96,48 @@ public class VirtualizedGridViewItemPresenter : Panel
                 panel.BindItems();
             }
         });
+        SelectionProperty.Changed.AddClassHandler<VirtualizedGridViewItemPresenter>((panel, e) =>
+        {
+            panel.BindSelection();
+        });
     }
 
-    private void AutoScrollToSelectedIndex()
+    private IMultiIndexContainer? boundSelection;
+    
+    private void BindSelection()
     {
-        if (ScrollViewer is not { } scrollViewer || !selectedIndex.HasValue)
+        UnbindSelection();
+        if (selection != null && attachedToVisualTree)
+        {
+            boundSelection = selection;
+            boundSelection.Cleared += OnSelectionCleared;
+            boundSelection.Added += OnSelectionAdded;
+            boundSelection.Removed += OnSelectionRemoved;
+        }
+    }
+
+    private void UnbindSelection()
+    {
+        if (boundSelection != null)
+        {
+            boundSelection.Cleared -= OnSelectionCleared;
+            boundSelection.Added -= OnSelectionAdded;
+            boundSelection.Removed -= OnSelectionRemoved;
+            boundSelection = null;
+        }
+    }
+
+    private void OnSelectionRemoved(int index) => InvalidateArrange();
+    private void OnSelectionAdded(int index) => InvalidateArrange();
+    private void OnSelectionCleared() => InvalidateArrange();
+
+    private void AutoScrollToFocusedIndex()
+    {
+        if (ScrollViewer is not { } scrollViewer || !focusedIndex.HasValue)
             return;
         
         var visibleRect = new Rect(new Point(scrollViewer.Offset.X, scrollViewer.Offset.Y), scrollViewer.Viewport);
-        var itemRect = new Rect(0, selectedIndex.Value * itemHeight, scrollViewer.Viewport.Width, itemHeight);
+        var itemRect = new Rect(0, focusedIndex.Value * itemHeight, scrollViewer.Viewport.Width, itemHeight);
 
         if (visibleRect.Contains(itemRect))
             return;
@@ -123,10 +160,16 @@ public class VirtualizedGridViewItemPresenter : Panel
         set => SetAndRaise(ItemsProperty, ref items, value);
     }
     
-    public int? SelectedIndex
+    public int? FocusedIndex
     {
-        get => selectedIndex;
-        set => SetAndRaise(SelectedIndexProperty, ref selectedIndex, value);
+        get => focusedIndex;
+        set => SetAndRaise(FocusedIndexProperty, ref focusedIndex, value);
+    }
+
+    public IMultiIndexContainer Selection
+    {
+        get => selection;
+        set => SetAndRaise(SelectionProperty, ref selection, value);
     }
 
     public IEnumerable<GridColumnDefinition> Columns
@@ -155,11 +198,13 @@ public class VirtualizedGridViewItemPresenter : Panel
         }
         
         BindItems();
+        BindSelection();
     }
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
         UnbindItems();
+        UnbindSelection();
         visualTreeSubscription.Dispose();
         visualTreeSubscription = Disposable.Empty;
         attachedToVisualTree = false;
@@ -213,12 +258,13 @@ public class VirtualizedGridViewItemPresenter : Panel
         var lastVisibleItem = Math.Min(items.Count - 1, (int)((scrollOffset + scrollHeight) / itemHeight));
     
         views.Reset(containerTemplate);
+        var selectionIterator = selection.ContainsIterator;
         for (int i = firstVisibleItem; i <= lastVisibleItem; i++)
         {
             var dataContext = items[i];
             var child = views.GetNext(dataContext);
             var rect = new Rect(0, i * itemHeight, finalSize.Width, itemHeight);
-            ((ListBoxItem)child).IsSelected = selectedIndex == i;
+            ((ListBoxItem)child).IsSelected = selectionIterator.Contains(i);
             ((ListBoxItem)child).Tag = i;
             child.Measure(rect.Size);
             child.Arrange(rect);

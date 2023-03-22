@@ -35,7 +35,8 @@
                             <Border Padding="{TemplateBinding Padding}">
                                 <VirtualizedGridViewItemPresenter Items="{TemplateBinding Items}" 
                                                                   ItemHeight="{TemplateBinding ItemHeight}"
-                                                                  SelectedIndex="{TemplateBinding SelectedIndex}"
+                                                                  FocusedIndex="{TemplateBinding FocusedIndex}"
+                                                                  Selection="{TemplateBinding Selection}"
                                                                   Columns="{TemplateBinding Columns}"
                                                                   Name="PART_Children">
                                 </VirtualizedGridViewItemPresenter>

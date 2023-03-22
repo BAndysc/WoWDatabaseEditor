@@ -18,7 +18,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public ICreatureTemplate? GetCreatureTemplate(uint entry) => impl.GetCreatureTemplate(entry);
         public IReadOnlyList<ICreatureTemplate> GetCreatureTemplates() => impl.GetCreatureTemplates();
         public IGameObjectTemplate? GetGameObjectTemplate(uint entry) => impl.GetGameObjectTemplate(entry);
-        public IEnumerable<IGameObjectTemplate> GetGameObjectTemplates() => impl.GetGameObjectTemplates();
+        public IReadOnlyList<IGameObjectTemplate> GetGameObjectTemplates() => impl.GetGameObjectTemplates();
         public Task<IAreaTriggerScript?> GetAreaTriggerScript(int entry) => impl.GetAreaTriggerScript(entry);
         public Task<IAreaTriggerTemplate?> GetAreaTriggerTemplate(int entry) => impl.GetAreaTriggerTemplate(entry);
 
@@ -89,7 +89,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         
         public IEnumerable<ISmartScriptProject> GetLegacyProjects() => impl.GetLegacyProjects();
 
-        public Task<IList<int>> GetSmartScriptEntriesByType(SmartScriptType scriptType) =>
+        public Task<IReadOnlyList<int>> GetSmartScriptEntriesByType(SmartScriptType scriptType) =>
             impl.GetSmartScriptEntriesByType(scriptType);
 
         public async Task<IList<IPlayerChoice>?> GetPlayerChoicesAsync() => await impl.GetPlayerChoicesAsync();

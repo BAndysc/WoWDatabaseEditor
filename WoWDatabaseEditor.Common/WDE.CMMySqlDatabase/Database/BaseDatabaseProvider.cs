@@ -218,7 +218,7 @@ namespace WDE.CMMySqlDatabase.Database
             return new List<IAreaTriggerTemplate>();
         }
         
-        public abstract IEnumerable<IGameObjectTemplate> GetGameObjectTemplates();
+        public abstract IReadOnlyList<IGameObjectTemplate> GetGameObjectTemplates();
         public abstract Task<List<IGameObjectTemplate>> GetGameObjectTemplatesAsync();
         public abstract IGameObjectTemplate? GetGameObjectTemplate(uint entry);
         public abstract Task<IList<IGameObject>> GetGameObjectsAsync();
@@ -275,7 +275,7 @@ namespace WDE.CMMySqlDatabase.Database
             return new List<IConditionLine>();
         }
 
-        public async Task<IList<int>> GetSmartScriptEntriesByType(SmartScriptType scriptType)
+        public async Task<IReadOnlyList<int>> GetSmartScriptEntriesByType(SmartScriptType scriptType)
         {
             return new List<int>();
         }

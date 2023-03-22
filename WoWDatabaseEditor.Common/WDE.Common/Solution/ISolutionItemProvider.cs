@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using WDE.Common.CoreVersion;
 using WDE.Common.Solution;
@@ -22,6 +23,14 @@ namespace WDE.Common
         bool ByDefaultHideFromQuickStart => false;
 
         Task<ISolutionItem?> CreateSolutionItem();
+        
+        async Task<IReadOnlyCollection<ISolutionItem>> CreateMultipleSolutionItems()
+        {
+            var item = await CreateSolutionItem();
+            if (item == null)
+                return Array.Empty<ISolutionItem>();
+            return new[] {item};
+        }
     }
 
     public interface INumberSolutionItemProvider : ISolutionItemProvider

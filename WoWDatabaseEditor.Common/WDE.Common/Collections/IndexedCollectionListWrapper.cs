@@ -3,11 +3,11 @@ using System.Collections.Generic;
 
 namespace WDE.Common.Collections;
 
-internal class IndexedCollectionListWrapper<T> : IIndexedCollection<T>
+internal class IndexedCollectionReadOnlyListWrapper<T> : IIndexedCollection<T>
 {
     private readonly IReadOnlyList<T> list;
 
-    public IndexedCollectionListWrapper(IReadOnlyList<T> list)
+    public IndexedCollectionReadOnlyListWrapper(IReadOnlyList<T> list)
     {
         this.list = list;
     }

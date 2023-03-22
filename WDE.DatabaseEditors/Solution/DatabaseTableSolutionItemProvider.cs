@@ -98,6 +98,11 @@ namespace WDE.DatabaseEditors.Solution
             return tableOpenService.TryCreate(definition);
         }
 
+        public Task<IReadOnlyCollection<ISolutionItem>> CreateMultipleSolutionItems()
+        {
+            throw new System.NotImplementedException();
+        }
+
         public Task<ISolutionItem?> CreateRelatedSolutionItem(RelatedSolutionItem related)
         {
             if (definition.Picker == "GossipMenuParameter" &&

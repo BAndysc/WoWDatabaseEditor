@@ -6,6 +6,6 @@ public static class IndexedCollectionExtensions
 {
     public static IIndexedCollection<T> AsIndexedCollection<T>(this IReadOnlyList<T> list)
     {
-        return new IndexedCollectionListWrapper<T>(list);
+        return new IndexedCollectionReadOnlyListWrapper<T>(list);
     }
 }

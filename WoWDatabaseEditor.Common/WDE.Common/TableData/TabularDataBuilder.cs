@@ -5,11 +5,13 @@ using WDE.Common.Utils;
 
 namespace WDE.Common.TableData;
 
-public class TabularDataBuilder<T> : ITabularDataArgs<T>
+public class TabularDataBuilder<T> : ITabularDataArgs<T> where T : class
 {
     public string Title { get; private set; } = null!;
     public System.Func<T, string, bool> FilterPredicate { get; private set; } = (_, _) => false;
     public System.Func<T, long, bool>? NumberPredicate { get; private set; }
+    public Func<T, string, bool>? ExactMatchPredicate { get; private set; }
+    public Func<string, T?>? ExactMatchCreator { get; private set; }
     public IIndexedCollection<T> Data { get; private set; } = new EmptyIndexedCollection<T>();
     public IReadOnlyList<ITabularDataColumn> Columns { get; private set; } = Array.Empty<ITabularDataColumn>();
 
@@ -46,6 +48,18 @@ public class TabularDataBuilder<T> : ITabularDataArgs<T>
     public TabularDataBuilder<T> SetColumns(params ITabularDataColumn[] columns)
     {
         Columns = columns;
+        return this;
+    }
+    
+    public TabularDataBuilder<T> SetExactMatchPredicate(Func<T, string, bool>? exactMatchPredicate)
+    {
+        ExactMatchPredicate = exactMatchPredicate;
+        return this;
+    }
+    
+    public TabularDataBuilder<T> SetExactMatchCreator(Func<string, T?>? exactMatchCreator)
+    {
+        ExactMatchCreator = exactMatchCreator;
         return this;
     }
 

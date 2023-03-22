@@ -1,15 +1,14 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using WDE.Common;
 using WDE.Common.Parameters;
-using WDE.Common.Providers;
 using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
 using WDE.DatabaseEditors.Data.Interfaces;
 using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Loaders;
-using WDE.DatabaseEditors.Models;
 using WDE.DatabaseEditors.Solution;
 using WDE.Module.Attributes;
 
@@ -54,7 +53,30 @@ public class TableOpenService : ITableOpenService
         }
         return null;
     }
-    
+
+    public async Task<IReadOnlyCollection<ISolutionItem>> TryCreateMultiple(DatabaseTableDefinitionJson definition)
+    {
+        if (definition.RecordMode == RecordMode.SingleRow)
+        {
+            var item = await Create(definition, default);
+            return item != null ? new ISolutionItem[] { item } : Array.Empty<ISolutionItem>();
+        }
+        
+        Debug.Assert(definition.GroupByKeys.Count == 1);
+        
+        var parameter = parameterFactory.Factory(definition.Picker);
+        var keys = await parameterPickerService.PickMultiple(parameter);
+        List<ISolutionItem> items = new();
+        foreach (var key in keys)
+        {
+            var item = await Create(definition, new DatabaseKey(key));
+            if (item != null)
+                items.Add(item);
+        }
+
+        return items;
+    }
+
     public async Task<ISolutionItem?> Create(DatabaseTableDefinitionJson definition, DatabaseKey key)
     {
         if (definition.RecordMode == RecordMode.MultiRecord)

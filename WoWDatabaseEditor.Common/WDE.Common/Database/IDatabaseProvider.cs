@@ -15,7 +15,7 @@ namespace WDE.Common.Database
         IReadOnlyList<ICreatureTemplate> GetCreatureTemplates();
 
         IGameObjectTemplate? GetGameObjectTemplate(uint entry);
-        IEnumerable<IGameObjectTemplate> GetGameObjectTemplates();
+        IReadOnlyList<IGameObjectTemplate> GetGameObjectTemplates();
 
         Task<IAreaTriggerScript?> GetAreaTriggerScript(int entry);
         Task<IAreaTriggerTemplate?> GetAreaTriggerTemplate(int entry);
@@ -59,7 +59,7 @@ namespace WDE.Common.Database
         
         IEnumerable<ISpellScriptName> GetSpellScriptNames(int spellId);
 
-        Task<IList<int>> GetSmartScriptEntriesByType(SmartScriptType scriptType);
+        Task<IReadOnlyList<int>> GetSmartScriptEntriesByType(SmartScriptType scriptType);
 
         Task<IList<IPlayerChoice>?> GetPlayerChoicesAsync();
         Task<IList<IPlayerChoiceResponse>?> GetPlayerChoiceResponsesAsync();

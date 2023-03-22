@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using WDE.Common;
 using WDE.Common.CoreVersion;
@@ -41,4 +42,5 @@ public abstract class EventAiSolutionItemProvider : ISolutionItemProvider
     }
 
     public abstract Task<ISolutionItem?> CreateSolutionItem();
+    public abstract Task<IReadOnlyCollection<ISolutionItem>> CreateMultipleSolutionItems();
 }

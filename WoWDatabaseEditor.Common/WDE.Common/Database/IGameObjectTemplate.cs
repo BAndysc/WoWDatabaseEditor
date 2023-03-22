@@ -16,6 +16,19 @@ namespace WDE.Common.Database
         uint DataCount { get; }
     }
     
+    public class AbstractGameObjectTemplate : IGameObjectTemplate
+    {
+        public uint Entry { get; init; }
+        public uint DisplayId { get; init; }
+        public float Size { get; init; }
+        public GameobjectType Type { get; init; }
+        public string Name { get; init; } = "";
+        public string AIName { get; init; } = "";
+        public string ScriptName { get; init; } = "";
+        public uint this[int dataIndex] => 0;
+        public uint DataCount => 0;
+    }
+    
     public enum GameobjectType
     {
         Door = 0,

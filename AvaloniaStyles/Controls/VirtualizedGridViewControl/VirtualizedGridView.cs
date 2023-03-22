@@ -9,6 +9,7 @@ using Avalonia.Input;
 using Avalonia.Input.Platform;
 using Avalonia.VisualTree;
 using WDE.Common.Collections;
+using WDE.Common.Utils;
 
 namespace AvaloniaStyles.Controls;
 
@@ -20,13 +21,19 @@ public class VirtualizedGridView : TemplatedControl
     private IIndexedCollection<object> items = IIndexedCollection<object>.Empty;
     public static readonly DirectProperty<VirtualizedGridView, IIndexedCollection<object>> ItemsProperty = AvaloniaProperty.RegisterDirect<VirtualizedGridView, IIndexedCollection<object>>(nameof(Items), o => o.Items, (o, v) => o.Items = v);
 
-    private int? selectedIndex;
-    public static readonly DirectProperty<VirtualizedGridView, int?> SelectedIndexProperty = AvaloniaProperty.RegisterDirect<VirtualizedGridView, int?>(nameof(SelectedIndex), o => o.SelectedIndex, (o, v) => o.SelectedIndex = v, -1, BindingMode.TwoWay);
+    private IMultiIndexContainer selection = new MultiIndexContainer();
+    public static readonly DirectProperty<VirtualizedGridView, IMultiIndexContainer> SelectionProperty = AvaloniaProperty.RegisterDirect<VirtualizedGridView, IMultiIndexContainer>(nameof(Selection), o => o.Selection, (o, v) => o.Selection = v, new MultiIndexContainer(), BindingMode.OneWay);
+
+    private int? focusedIndex;
+    public static readonly DirectProperty<VirtualizedGridView, int?> FocusedIndexProperty = AvaloniaProperty.RegisterDirect<VirtualizedGridView, int?>(nameof(FocusedIndex), o => o.FocusedIndex, (o, v) => o.FocusedIndex = v, -1, BindingMode.TwoWay);
 
     private IEnumerable<GridColumnDefinition> columns = new AvaloniaList<GridColumnDefinition>();
     public static readonly DirectProperty<VirtualizedGridView, IEnumerable<GridColumnDefinition>> ColumnsProperty =
         AvaloniaProperty.RegisterDirect<VirtualizedGridView, IEnumerable<GridColumnDefinition>>(nameof(Columns), o => o.Columns, (o, v) => o.Columns = v);
-        
+
+    private bool multiSelect;
+    public static readonly DirectProperty<VirtualizedGridView, bool> MultiSelectProperty = AvaloniaProperty.RegisterDirect<VirtualizedGridView, bool>(nameof(MultiSelect), o => o.MultiSelect, (o, v) => o.MultiSelect = v);
+    
     public double ItemHeight
     {
         get => itemHeight;
@@ -39,10 +46,22 @@ public class VirtualizedGridView : TemplatedControl
         set => SetAndRaise(ItemsProperty, ref items, value);
     }
     
-    public int? SelectedIndex
+    public IMultiIndexContainer Selection
     {
-        get => selectedIndex;
-        set => SetAndRaise(SelectedIndexProperty, ref selectedIndex, value);
+        get => selection;
+        set => SetAndRaise(SelectionProperty, ref selection, value);
+    }
+    
+    public int? FocusedIndex
+    {
+        get => focusedIndex;
+        set => SetAndRaise(FocusedIndexProperty, ref focusedIndex, value);
+    }
+    
+    public bool MultiSelect
+    {
+        get => multiSelect;
+        set => SetAndRaise(MultiSelectProperty, ref multiSelect, value);
     }
         
     public IEnumerable<GridColumnDefinition> Columns
@@ -57,14 +76,21 @@ public class VirtualizedGridView : TemplatedControl
         if (e.Handled)
             return;
 
-        if (e.Key == Key.Up)
+        if (e.Key is Key.Up or Key.Down)
         {
-            SelectedIndex = IsIndexValid(selectedIndex) ? ClampIndex(selectedIndex!.Value - 1) : ClampIndex(Items.Count - 1);
-            e.Handled = true;
-        }
-        else if (e.Key == Key.Down)
-        {
-            SelectedIndex = IsIndexValid(selectedIndex) ? ClampIndex(selectedIndex!.Value + 1) : ClampIndex(0);
+            var rangeModifier = e.KeyModifiers.HasFlagFast(KeyModifiers.Shift);
+            var toggleModifier = e.KeyModifiers.HasFlagFast(AvaloniaLocator.Current.GetService<PlatformHotkeyConfiguration>().CommandModifiers);
+
+            int index;
+            if (e.Key == Key.Up)
+            {
+                index = IsIndexValid(focusedIndex) ? ClampIndex(focusedIndex!.Value - 1) : ClampIndex(Items.Count - 1);
+            }
+            else
+            {
+                index = IsIndexValid(focusedIndex) ? ClampIndex(focusedIndex!.Value + 1) : ClampIndex(0);
+            }
+            UpdateSelectionFromIndex(rangeModifier, toggleModifier, index);
             e.Handled = true;
         }
     }
@@ -127,13 +153,45 @@ public class VirtualizedGridView : TemplatedControl
 
         if (container != null && container.Tag is int index)
         {
-            SelectedIndex = index;
+            UpdateSelectionFromIndex(rangeModifier, toggleModifier, index);
             return true;
         }
 
         return false;
     }
-    
+
+    private void UpdateSelectionFromIndex(bool rangeModifier, bool toggleModifier, int index)
+    {
+        rangeModifier &= MultiSelect;
+        toggleModifier &= MultiSelect;
+
+        if (!toggleModifier)
+            selection.Clear();
+
+        if (rangeModifier)
+        {
+            var oldFocusedIndex = Math.Max(0, focusedIndex ?? 0);
+            if (oldFocusedIndex < index)
+            {
+                for (int i = oldFocusedIndex; i <= index; ++i)
+                    selection.Add(i);
+            }
+            else
+            {
+                for (int i = index; i <= oldFocusedIndex; ++i)
+                    selection.Add(i);
+            }
+        }
+        else
+        {
+            if (toggleModifier && selection.Contains(index))
+                selection.Remove(index);
+            else
+                selection.Add(index);
+            FocusedIndex = index;
+        }
+    }
+
     /// <inheritdoc/>
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
@@ -148,8 +206,8 @@ public class VirtualizedGridView : TemplatedControl
                 e.Handled = UpdateSelectionFromEventSource(
                     e.Source,
                     true,
-                    e.KeyModifiers.HasAllFlags(KeyModifiers.Shift),
-                    e.KeyModifiers.HasAllFlags(AvaloniaLocator.Current.GetService<PlatformHotkeyConfiguration>().CommandModifiers),
+                    e.KeyModifiers.HasFlagFast(KeyModifiers.Shift),
+                    e.KeyModifiers.HasFlagFast(AvaloniaLocator.Current.GetService<PlatformHotkeyConfiguration>().CommandModifiers),
                     point.Properties.IsRightButtonPressed);
             }
         }

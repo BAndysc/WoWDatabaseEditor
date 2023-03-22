@@ -203,7 +203,7 @@ public class DatabaseProviderTBC : BaseDatabaseProvider<TBCDatabase>
         return await model.Creature.FirstOrDefaultAsync(x => x.Guid == guid);
     }
     
-    public override IEnumerable<IGameObjectTemplate> GetGameObjectTemplates()
+    public override IReadOnlyList<IGameObjectTemplate> GetGameObjectTemplates()
     {
         using var model = Database();
         return (from t in model.GameObjectTemplate orderby t.Entry select t).ToList<IGameObjectTemplate>();

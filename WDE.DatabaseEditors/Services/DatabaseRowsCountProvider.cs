@@ -58,6 +58,21 @@ public class DatabaseRowsCountProvider : IDatabaseRowsCountProvider
         return await provider.GetCount(entry, token);
     }
 
+    public async Task<int> GetGameObjectCountByEntry(long entry, CancellationToken token)
+    {
+        var table = "gameobject_(by_entry)";
+        if (!providers.TryGetValue(table, out var provider))
+        {
+            var definition = definitionProvider.GetDefinition("gameobject");
+            if (definition == null || !definition.TableColumns.ContainsKey("id"))
+                return 0;
+            provider = new BulkAsyncTableRowProvider(executor, definition, "id");
+            providers[table] = provider;
+        }
+
+        return await provider.GetCount(entry, token);
+    }
+
     private class BulkAsyncTableRowProvider
     {
         private readonly IMySqlExecutor executor;
@@ -97,6 +112,9 @@ public class DatabaseRowsCountProvider : IDatabaseRowsCountProvider
                 
                 cancelledPrimaryKeys.Add(primaryKey);
             }
+
+            if (primaryKeysToFetch.Count == 0)
+                return;
 
             var query = Queries.Table(tableDefinition.TableName)
                 .WhereIn(groupByColumn, primaryKeysToFetch)

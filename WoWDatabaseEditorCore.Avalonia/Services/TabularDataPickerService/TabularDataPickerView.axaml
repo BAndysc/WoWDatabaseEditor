@@ -23,7 +23,9 @@
             Name="GridView"
             Margin="0,10,0,10"
             utils:DataGridColumns.ColumnsSource="{CompiledBinding  Columns}"
-            SelectedIndex="{CompiledBinding SelectedIndex}"
+            Selection="{CompiledBinding Selection}"
+            MultiSelect="{CompiledBinding MultiSelect}"
+            FocusedIndex="{CompiledBinding FocusedIndex}"
             Items="{CompiledBinding Items}">
             <Interaction.Behaviors>
                 <EventTriggerBehavior EventName="DoubleTapped">

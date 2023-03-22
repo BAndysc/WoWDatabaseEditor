@@ -1,8 +1,10 @@
+using System.Collections;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using WDE.Common.Managers;
-using WDE.Common.Providers;
 using WDE.Common.TableData;
 using WDE.Module.Attributes;
+using WoWDatabaseEditorCore.Avalonia.Services.TabularDataPickerService;
 
 namespace WoWDatabaseEditorCore.Services.TabularDataPickerService;
 
@@ -16,10 +18,39 @@ public class TabularDataPicker : ITabularDataPicker
         this.windowManager = windowManager;
     }
     
-    public async Task<T?> PickRow<T>(ITabularDataArgs<T> args, int defaultSelection)
+    public async Task<T?> PickRow<T>(ITabularDataArgs<T> args, int defaultSelection) where T : class
     {
-        using var viewModel = new Avalonia.Services.TabularDataPickerService.TabularDataPickerViewModel(args.AsObject(), defaultSelection);
+        List<int>? selection = null;
+        if (defaultSelection >= 0)
+            selection = new List<int>(1) {defaultSelection};
+        
+        using var viewModel = new TabularDataPickerViewModel(args.AsObject(), false, selection);
         await windowManager.ShowDialog(viewModel);
-        return viewModel.SelectedItem == null ? default : (T)viewModel.SelectedItem;
+        return viewModel.FocusedItem == null ? default : (T)viewModel.FocusedItem;
+    }
+
+    public async Task<IReadOnlyCollection<T>> PickRows<T>(ITabularDataArgs<T> args, IReadOnlyList<int>? defaultSelection = null) where T : class
+    {
+        using var viewModel = new TabularDataPickerViewModel(args.AsObject(), true, defaultSelection);
+        await windowManager.ShowDialog(viewModel);
+        return new CastCollection<T>(viewModel.SelectedItems);
+    }
+
+    private class CastCollection<T> : IReadOnlyCollection<T>
+    {
+        private IReadOnlyCollection<object> untyped;
+
+        public CastCollection(IReadOnlyCollection<object> untyped) 
+            => this.untyped = untyped;
+
+        public IEnumerator<T> GetEnumerator()
+        {
+            foreach (var item in untyped)
+                yield return (T)item;
+        }
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        public int Count => untyped.Count;
     }
 }

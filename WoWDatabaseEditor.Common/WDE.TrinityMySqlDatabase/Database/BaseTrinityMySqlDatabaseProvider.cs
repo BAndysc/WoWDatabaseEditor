@@ -265,7 +265,7 @@ namespace WDE.TrinityMySqlDatabase.Database
             return await (from t in model.AreaTriggerTemplate orderby t.Id select t).ToListAsync<IAreaTriggerTemplate>();
         }
         
-        public IEnumerable<IGameObjectTemplate> GetGameObjectTemplates()
+        public IReadOnlyList<IGameObjectTemplate> GetGameObjectTemplates()
         {
             using var model = Database();
             return (from t in model.GameObjectTemplate orderby t.Entry select t).ToList<IGameObjectTemplate>();
@@ -375,7 +375,7 @@ namespace WDE.TrinityMySqlDatabase.Database
             return await model.Conditions.Where(predicate).ToListAsync<IConditionLine>();
         }
         
-        public async Task<IList<int>> GetSmartScriptEntriesByType(SmartScriptType scriptType)
+        public async Task<IReadOnlyList<int>> GetSmartScriptEntriesByType(SmartScriptType scriptType)
         {
             var type = (int)scriptType;
             await using var model = Database();

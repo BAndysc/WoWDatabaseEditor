@@ -56,6 +56,14 @@ namespace WDE.Common.Parameters
     public interface ICustomPickerParameter<T> : IParameter<T> where T : notnull
     {
         Task<(T, bool)> PickValue(T value);
+
+        async Task<IReadOnlyCollection<T>> PickMultipleValues()
+        {
+            var (value, ok) = await PickValue(default!);
+            if (ok)
+                return new[] {value};
+            return Array.Empty<T>();
+        }
     }
     
     public interface IAsyncParameter<T> : IParameter<T> where T : notnull

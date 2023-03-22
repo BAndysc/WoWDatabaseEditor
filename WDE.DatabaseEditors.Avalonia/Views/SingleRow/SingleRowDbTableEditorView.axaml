@@ -158,7 +158,7 @@
                         <TextBlock TextAlignment="Center" HorizontalAlignment="Stretch" VerticalAlignment="Center" Opacity="0.7" Text="{CompiledBinding RowsSummaryText}" />              
                     </DockPanel>
                 </Border>
-                <ScrollViewer Padding="0,0,15,15" HorizontalScrollBarVisibility="Auto" AllowAutoHide="False">
+                <ScrollViewer Padding="0,0,15,15" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible" AllowAutoHide="False">
                     <fastTableView:VeryFastTableView
                         TextBlock.FontFamily="Consolas,Menlo,Courier,Courier New"
                         SelectedRowIndex="{CompiledBinding FocusedRowIndex}"

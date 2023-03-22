@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using WDE.Common;
 using WDE.Common.Parameters;
@@ -31,6 +33,11 @@ namespace WDE.Spells.Parameters
         {
             var picked = await picker.GetEntryFromService((uint)value, customCounterTable);
             return (picked ?? 0, picked.HasValue);
+        }
+        
+        public async Task<IReadOnlyCollection<long>> PickMultipleValues()
+        {
+            return (await picker.GetEntriesFromService()).Select(x => (long)x).ToList();
         }
     }
 }

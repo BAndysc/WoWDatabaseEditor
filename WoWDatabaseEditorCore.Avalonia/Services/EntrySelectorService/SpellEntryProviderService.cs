@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls.Templates;
@@ -33,9 +34,9 @@ public class SpellEntryProviderService : ISpellEntryProviderService
         this.spellStore = spellStore;
     }
 
-    public async Task<uint?> GetEntryFromService(uint? spellId = null, string? customCounterTable = null)
+    private ITabularDataArgs<ISpellEntry> BuildTable(string? customCounterTable, uint? spellId, out int index)
     {
-        var index = -1;
+        index = -1;
         var spells = spellStore.Spells;
         
         if (spellId.HasValue)
@@ -71,14 +72,27 @@ public class SpellEntryProviderService : ISpellEntryProviderService
                 return count.ToString();
             }, 50));
         }
-        
-        var result = await tabularDataPicker.PickRow(new TabularDataBuilder<ISpellEntry>()
+
+        return new TabularDataBuilder<ISpellEntry>()
             .SetTitle("Pick a spell")
             .SetData(spells.AsIndexedCollection())
             .SetColumns(columns)
-            .SetFilter((entry, text) => entry.Id.Contains(text) || entry.Name.Contains(text, StringComparison.OrdinalIgnoreCase))
-            .Build(), index);
+            .SetFilter((entry, text) =>
+                entry.Id.Contains(text) || entry.Name.Contains(text, StringComparison.OrdinalIgnoreCase))
+            .Build();
+    }
+
+    public async Task<uint?> GetEntryFromService(uint? spellId = null, string? customCounterTable = null)
+    {
+        var table = BuildTable(customCounterTable, spellId, out var index);
+        var result = await tabularDataPicker.PickRow(table, index);
         return result?.Id;
     }
 
+    public async Task<IReadOnlyCollection<uint>> GetEntriesFromService(string? customCounterTable = null)
+    {
+        var table = BuildTable(customCounterTable, null, out _);
+        var spells = await tabularDataPicker.PickRows(table);
+        return spells.Select(x => x.Id).ToList();
+    }
 }
