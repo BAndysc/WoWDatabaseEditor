@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace WDE.Common.Utils
 {
@@ -65,6 +66,34 @@ namespace WDE.Common.Utils
             return -1;
         }
         
+        public static int IndexIf<T>(this IList<T> list, Func<T, bool> pred)
+        {
+            for (int i = 0; i < list.Count; i++)
+            {
+                if (pred(list[i]))
+                {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+
+        public static int IndexIf<T>(this List<T> list, Func<T, bool> pred)
+        {
+            return ((IList<T>)list).IndexIf(pred);
+        }
+
+        public static int IndexIf<T>(this T[] list, Func<T, bool> pred)
+        {
+            return ((IList<T>)list).IndexIf(pred);
+        }
+        
+        public static int IndexIf<T>(this ObservableCollection<T> list, Func<T, bool> pred)
+        {
+            return ((IList<T>)list).IndexIf(pred);
+        }
+
         public static T? RemoveIf<T>(this IList<T> list, Func<T, bool> pred)
         {
             for (int i = list.Count - 1; i >= 0; i--)
