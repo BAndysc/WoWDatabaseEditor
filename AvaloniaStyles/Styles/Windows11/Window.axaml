@@ -1,5 +1,6 @@
 <Styles xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:converters="clr-namespace:AvaloniaStyles.Converters">
     <Design.PreviewWith>
         <Border Padding="20">
             <!-- Add Controls for Previewer Here -->
@@ -7,6 +8,7 @@
     </Design.PreviewWith>
 
     <Styles.Resources>
+        <converters:ChromeToBoolConverter x:Key="ChromeToBoolConverter" NoChrome="True" AlwaysChrome="False" MacChromeOnly="True" />
         <AccentSolidColorBrush Hue="{DynamicResource AccentHue}" Color="#4168CF" x:Key="TopBarButtonBackground" />
         <LightSolidColorBrush Light="0.1" Base="{DynamicResource TopBarButtonBackground}" x:Key="TopBarButtonHoverBackground" />
         <LightSolidColorBrush Light="-0.1" Base="{DynamicResource TopBarButtonBackground}" x:Key="TopBarButtonPressedBackground" />
@@ -31,8 +33,8 @@
     <Style Selector="ExtendedWindow">
         <Setter Property="FontFamily" Value="{DynamicResource ContentControlThemeFontFamily}"  />
         <Setter Property="ExtendClientAreaTitleBarHeightHint" Value="24" />
-        <Setter Property="ExtendClientAreaToDecorationsHint" Value="False" />
-        <Setter Property="Chrome" Value="AlwaysSystemChrome" />
+        <Setter Property="ExtendClientAreaToDecorationsHint" Value="True" />
+        <Setter Property="Chrome" Value="NoSystemChrome" />
         <Setter Property="Background" Value="{DynamicResource WindowContentBackground}" />
         <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}"/>
         <Setter Property="Template">
@@ -49,18 +51,20 @@
                                             <ContentPresenter DockPanel.Dock="Left" HorizontalAlignment="Left" Content="{Binding ToolBar.TopContent, RelativeSource={RelativeSource Mode=TemplatedParent}}">
                                             </ContentPresenter>
 
-                                            <!--<WindowControlButtons DockPanel.Dock="Right"/>-->
+                                            <WindowControlButtons IsVisible="{TemplateBinding Chrome, Converter={StaticResource ChromeToBoolConverter}}" DockPanel.Dock="Right"/>
                                             <ContentPresenter DockPanel.Dock="Right" HorizontalAlignment="Left" Content="{Binding ToolBar.RightContent, RelativeSource={RelativeSource Mode=TemplatedParent}}" />           
 
-                                            <!--
+                                            
                                             <StackPanel ClipToBounds="True" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                                                 <TextBlock 
+                                                    IsVisible="{TemplateBinding Chrome, Converter={StaticResource ChromeToBoolConverter}}"
                                                     IsHitTestVisible="False" 
                                                     VerticalAlignment="Center" 
                                                     Opacity="0.9"
                                                     Foreground="{DynamicResource TitleBarForeground}"
                                                     Text="{TemplateBinding Title}" />
                                                 <TextBlock 
+                                                    IsVisible="{TemplateBinding Chrome, Converter={StaticResource ChromeToBoolConverter}}"
                                                     IsHitTestVisible="False" 
                                                     VerticalAlignment="Center" 
                                                     Margin="10,0,0,0"
@@ -68,7 +72,6 @@
                                                     Foreground="{DynamicResource TitleBarForeground}"
                                                     Text="{TemplateBinding SubTitle}" />
                                             </StackPanel>
-                                            -->
                                         </DockPanel>
                                         <ToolbarPanel HorizontalAlignment="Stretch" DockPanel.Dock="Top" Margin="5,2,2,2">
                                             <ContentPresenter HorizontalAlignment="Left" Content="{Binding ToolBar.LeftContent, RelativeSource={RelativeSource Mode=TemplatedParent}}" />

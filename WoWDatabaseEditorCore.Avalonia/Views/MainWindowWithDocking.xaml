@@ -21,6 +21,8 @@
           Icon="../Icon.png"
           ManagedIcon="../Icon.png"
           Name="Root"
+          ExtendClientAreaToDecorationsHint="False"
+          Chrome="AlwaysSystemChrome"
           SubTitle="{CompiledBinding Subtitle}"
           Classes="MainWindow"
           x:DataType="viewModels:MainWindowViewModel"
