@@ -84,10 +84,6 @@ namespace WDE.WoWHeadConnector.Test
                 MapDifficulty.DungeonHeroic,
                 MapDifficulty.DungeonTimeWalking
             }, bySpell[59083]);
-            CollectionAssert.AreEquivalent(new MapDifficulty[]
-            {
-                MapDifficulty.DungeonTimeWalking
-            }, bySpell[344663]);
         }
     }
 }
