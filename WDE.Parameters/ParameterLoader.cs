@@ -107,6 +107,7 @@ namespace WDE.Parameters
             factory.Register("UnusedParameter", UnusedParameter.Instance);
             factory.Register("FloatParameter", new FloatIntParameter(1000));
             factory.Register("DecifloatParameter", new FloatIntParameter(100));
+            factory.Register("MillisecondsParameter", new MillisecondsParameter());
             factory.Register("GameEventParameter", AddDatabaseParameter(new GameEventParameter(database)), QuickAccessMode.Limited);
             factory.Register("CreatureParameter", AddDatabaseParameter(new CreatureParameter(database, creaturePicker, serverIntegration)), QuickAccessMode.Limited);
             factory.Register("Creature(creature_text)Parameter", AddDatabaseParameter(new CreatureParameter(database, creaturePicker, serverIntegration, "creature_text")), QuickAccessMode.Limited);
@@ -250,6 +251,68 @@ namespace WDE.Parameters
                     return null;
             }
             return minutes;
+        }
+    }
+    
+    public class MillisecondsParameter : Parameter, IParameterFromString<long?>
+    {
+        public override string ToString(long milliseconds)
+        {
+            int days = (int) (milliseconds / (1440 * 60 * 1000));
+            milliseconds -= days * 1440 * 60 * 1000;
+            int hours = (int) (milliseconds / (60 * 60 * 1000));
+            milliseconds -= hours * 60 * 60 * 1000;
+            int minutes = (int) (milliseconds / (60 * 1000));
+            milliseconds -= minutes * 60 * 1000;
+            int seconds = (int) (milliseconds / 1000);
+            milliseconds -= seconds * 1000;
+            StringBuilder sb = new();
+             if (days > 0)
+                sb.Append(days).Append("d ");
+             if (hours > 0)
+                sb.Append(hours).Append("h ");
+             if (minutes > 0)
+                sb.Append(minutes).Append("min ");
+             if (milliseconds > 0 && (milliseconds % 100) == 0)
+             {
+                 float secs = seconds + milliseconds / 1000.0f;
+                 sb.Append($"{secs:0.0}s");
+             }
+             else
+             {
+                 if (seconds > 0)
+                     sb.Append(seconds).Append("s ");
+                 if (milliseconds > 0)
+                     sb.Append(milliseconds).Append("ms ");   
+             }
+
+             return sb.ToString();
+        }
+
+        public long? FromString(string value)
+        {
+            if (long.TryParse(value, out var val))
+                return val;
+            var parts = value.Split(' ');
+            long milliseconds = 0;
+            for (int i = 0; i < parts.Length; i++)
+            {
+                var part = parts[i];
+                if (!(part.Length > 1 && float.TryParse(part[..^1], out var num)) &&
+                    !(part.Length > 3 && float.TryParse(part[..^3], out num)))
+                    return null;
+                if (part.EndsWith("d"))
+                    milliseconds += (long)(num * 1440 * 60 * 1000);
+                else if (part.EndsWith("h"))
+                    milliseconds += (long)(num * 60 * 60 * 1000);
+                else if (part.EndsWith("min"))
+                    milliseconds += (long)(num * 60 * 1000);
+                else if (part.EndsWith("s"))
+                    milliseconds += (long)(num * 1000);
+                else
+                    return null;
+            }
+            return milliseconds;
         }
     }
 
