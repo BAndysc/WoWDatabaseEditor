@@ -196,7 +196,8 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor
         protected override Size ArrangeOverride(Size finalSize)
         {
             var scrollViewer = ScrollViewer!;
-            var viewPortRect = new Rect(scrollViewer.Offset.X, scrollViewer.Offset.Y, scrollViewer.Viewport.Width, scrollViewer.Viewport.Height);
+            // extended viewport rect to display more items than the viewport for proper on arrows (UP/DOWN) down scrolling
+            var viewPortRect = new Rect(scrollViewer.Offset.X, scrollViewer.Offset.Y, scrollViewer.Viewport.Width, scrollViewer.Viewport.Height).Inflate(60);
             var arrangeRect = new Rect(finalSize);
 
             var visualChildren = VisualChildren;
@@ -275,13 +276,13 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor
                 case NavigationDirection.Previous:
                     break;
                 case NavigationDirection.Left:
-                    return GetElementInDir(index.Value, (-1, 0)) ?? from;
+                    return GetElementInDir(index.Value, (-1, 0))!;
                 case NavigationDirection.Right:
-                    return GetElementInDir(index.Value, (1, 0)) ?? from;
+                    return GetElementInDir(index.Value, (1, 0))!;
                 case NavigationDirection.Up:
-                    return GetElementInDir(index.Value, (0, -1)) ?? from;
+                    return GetElementInDir(index.Value, (0, -1))!;
                 case NavigationDirection.Down:
-                    return GetElementInDir(index.Value, (0, 1)) ?? from;
+                    return GetElementInDir(index.Value, (0, 1))!;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(direction), direction, null);
             }
