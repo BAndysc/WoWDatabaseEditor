@@ -1623,6 +1623,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 case SmartScriptType.Template:
                 case SmartScriptType.TimedActionList:
                     return SmartConstants.SourceSelf;
+                case SmartScriptType.BattlePet:
+                    return SmartConstants.TargetBattlePet;
                 default:
                     return SmartConstants.TargetActionInvoker;
             }
@@ -1812,7 +1814,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         private async Task<int?> ShowEventPicker()
         {
             var result = await smartTypeListProvider.Get(SmartType.SmartEvent,
-                data => data.UsableWithScriptTypes == null || data.UsableWithScriptTypes.Contains(script.SourceType));
+                data => data.UsableWithScriptTypes == null || data.UsableWithScriptTypes.Value.HasFlagFast(script.SourceType.ToMask()));
             if (result.HasValue)
                 return result.Value.Item1;
             return null;
@@ -1830,7 +1832,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     
                     return (eventSupportsActionInvoker || !data.IsInvoker) &&
                            (data.UsableWithScriptTypes == null ||
-                            data.UsableWithScriptTypes.Contains(script.SourceType)) &&
+                            data.UsableWithScriptTypes.Value.HasFlagFast(script.SourceType.ToMask())) &&
                            (actionData == null || actionData.TargetTypes == SmartSourceTargetType.None || (data.Types(script.SourceType) != SmartSourceTargetType.None && (actionData.TargetTypes & data.Types(script.SourceType)) != 0));
                 }, BuildStoredObjectsList());
         }
@@ -1854,7 +1856,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     if (data.UsableWithEventTypes != null && parentEvent != null && !data.UsableWithEventTypes.Contains(parentEvent.Id))
                         return false;
                     
-                    return data.UsableWithScriptTypes == null || data.UsableWithScriptTypes.Contains(script.SourceType);
+                    return data.UsableWithScriptTypes == null || data.UsableWithScriptTypes.Value.HasFlagFast(script.SourceType.ToMask());
                 }, BuildStoredObjectsList());
         }
 
@@ -1869,6 +1871,48 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 .ToList();
         }
 
+        /// <summary>
+        /// all possible target types for current script type (cached)
+        /// </summary>
+        private SmartSourceTargetType? cachedPossibleTargets;
+        
+        /// <summary>
+        /// all possible target IDs for current script type (cached)
+        /// </summary>
+        private HashSet<int> possibleTargetIds = null!;
+        
+        private bool IsActionCompatibleWithAnyTargetForThisScriptType(SmartGenericJsonData actionData)
+        {
+            SmartGenericJsonData? actionImplicitSourceData = null;
+            if (actionData.ImplicitSource != null)
+                actionImplicitSourceData = smartDataManager.GetDataByName(SmartType.SmartTarget, actionData.ImplicitSource);
+
+            if (cachedPossibleTargets == null)
+            {
+                cachedPossibleTargets = SmartSourceTargetType.None;
+                possibleTargetIds = new HashSet<int>();
+                foreach (var target in smartDataManager.GetAllData(SmartType.SmartTarget))
+                {
+                    if (target.UsableWithScriptTypes != null && !target.UsableWithScriptTypes.Value.HasFlagFast(script.SourceType.ToMask()))
+                        continue;
+
+                    cachedPossibleTargets |= target.Types(script.SourceType);
+
+                    possibleTargetIds.Add(target.Id);
+                }
+            }
+            
+            if (actionImplicitSourceData != null && possibleTargetIds.Contains(actionImplicitSourceData.Id))
+                return true;
+
+            if (actionData.ImplicitSource == null)
+            {
+                return (actionData.Sources & cachedPossibleTargets) != 0;
+            }
+            
+            return false;
+        }
+        
         private bool IsSourceCompatibleWithAction(SmartGenericJsonData sourceData, SmartGenericJsonData actionData)
         {
             if (actionData.ImplicitSource != null)
@@ -1881,7 +1925,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
                 // kinda hack to show actions with NONE source with user pick SELF source
                 // because it is natural for users to use SELF source for those actions
-                return actionImplicitSource == SmartConstants.SourceNone && (sourceData.Id == SmartConstants.SourceSelf || sourceData.NameReadable == "Self");
+                return actionImplicitSource == SmartConstants.SourceNone && (sourceData.Id == SmartConstants.SourceSelf || sourceData.NameReadable == "Self" || sourceData.NameReadable == "Battle pet");
             }
             else
             {
@@ -1912,7 +1956,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                         return false;
                     
                     return (data.UsableWithScriptTypes == null ||
-                            data.UsableWithScriptTypes.Contains(script.SourceType)) &&
+                            data.UsableWithScriptTypes.Value.HasFlagFast(script.SourceType.ToMask())) &&
+                           (IsActionCompatibleWithAnyTargetForThisScriptType(data)) &&
                            (sourceData == null || IsSourceCompatibleWithAction(sourceData, data)) &&
                            (showCommentMetaAction || data.Id != SmartConstants.ActionComment);
                 });

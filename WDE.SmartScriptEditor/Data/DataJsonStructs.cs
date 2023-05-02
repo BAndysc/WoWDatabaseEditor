@@ -99,7 +99,7 @@ namespace WDE.SmartScriptEditor.Data
         Self = 0x800000,
         
         Unit = Creature | Player,
-        WorldObject = Unit | GameObject | AreaTrigger | Dummy | Conversation | BattlePet | DynObj
+        WorldObject = Unit | GameObject | AreaTrigger | Dummy | Conversation | DynObj
     }
 
     [ExcludeFromCodeCoverage]
@@ -254,8 +254,9 @@ namespace WDE.SmartScriptEditor.Data
         [JsonProperty(PropertyName = "invoker")]
         public DataJsonInvoker? Invoker { get; set; }
 
-        [JsonProperty(PropertyName = "usable_with_script_types", ItemConverterType = typeof(StringEnumConverter))]
-        public IList<SmartScriptType>? UsableWithScriptTypes { get; set; }
+        [JsonProperty(PropertyName = "usable_with_script_types")]
+        [JsonConverter(typeof(EnumMaskConverter))]
+        public SmartScriptTypeMask? UsableWithScriptTypes { get; set; }
 
         [JsonProperty(PropertyName = "usable_with_event_types")]
         public IList<int>? UsableWithEventTypes { get; set; }

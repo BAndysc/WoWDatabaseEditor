@@ -10,6 +10,7 @@
         public const int TargetSelf = 1;
         public const int TargetVictim = 2;
         public const int TargetActionInvoker = 7;
+        public const int TargetBattlePet = 70;
         public const int ActionNone = 0;
         public const int ActionTalk = 1;
         public const int ActionCast = 11;
