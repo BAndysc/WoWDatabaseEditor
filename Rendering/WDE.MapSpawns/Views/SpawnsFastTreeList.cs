@@ -39,7 +39,7 @@ public class SpawnsFastTreeList : FastTreeView<SpawnEntry, SpawnInstance>
                 {
                     var index = tree.Items!.IndexOf(newSelection);
                     if (index == -1)
-                        index = tree.Items!.IndexIf(x => x is SpawnEntry group && group.Entry == newSelection.Entry);
+                        index = ((IList<INodeType>)tree.Items!).IndexIf(x => x is SpawnEntry group && group.Entry == newSelection.Entry);
                     if (index != -1)
                     {
                         float y = index * RowHeight;
