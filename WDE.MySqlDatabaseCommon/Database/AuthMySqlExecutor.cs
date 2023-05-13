@@ -30,7 +30,7 @@ namespace WDE.MySqlDatabaseCommon.Database
             if (string.IsNullOrEmpty(query) || !IsConnected)
                 return;
 
-            databaseLogger.Log(query, null, TraceLevel.Info);
+            databaseLogger.Log(query, null, TraceLevel.Info, QueryType.WriteQuery);
             
             using var writeLock = await DatabaseLock.WriteLock();
             

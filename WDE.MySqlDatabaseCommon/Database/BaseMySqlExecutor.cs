@@ -159,7 +159,7 @@ namespace WDE.MySqlDatabaseCommon.Database
             if (string.IsNullOrWhiteSpace(query) || !IsConnected)
                 return;
 
-            databaseLogger.Log(query, null, TraceLevel.Info);
+            databaseLogger.Log(query, null, TraceLevel.Info, QueryType.WriteQuery);
             
             using var writeLock = await DatabaseLock.WriteLock();
             
@@ -210,7 +210,7 @@ namespace WDE.MySqlDatabaseCommon.Database
             if (string.IsNullOrEmpty(query) || !IsConnected)
                 return new List<Dictionary<string, (Type, object)>>();
 
-            databaseLogger.Log(query, null, TraceLevel.Info);
+            databaseLogger.Log(query, null, TraceLevel.Info, QueryType.ReadQuery);
             using var writeLock = await DatabaseLock.WriteLock();
             
             MySqlConnection conn = new(connectionString);

@@ -44,5 +44,10 @@ namespace WDE.Common.Services
         {
             File.WriteAllBytes(fs.ResolvePhysicalPath(virtualPath).FullName, bytes);
         }
+        
+        public static string[] GetFiles(this IFileSystem fs, string virtualPath)
+        {
+            return Directory.GetFiles(fs.ResolvePhysicalPath(virtualPath).FullName);
+        }
     }
 }

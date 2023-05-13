@@ -66,7 +66,7 @@ namespace WDE.MySqlDatabaseCommon.Tools
             });
         }
 
-        private void OnTrace(string? arg1, string? arg2, TraceLevel tl)
+        private void OnTrace(string? arg1, string? arg2, TraceLevel tl, QueryType queryType)
         {
             mainThread.Dispatch(() =>
             {
