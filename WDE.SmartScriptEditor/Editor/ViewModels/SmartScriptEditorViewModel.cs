@@ -1907,7 +1907,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
             if (actionData.ImplicitSource == null)
             {
-                return (actionData.Sources & cachedPossibleTargets) != 0;
+                var sources = actionData.TargetIsSource ? actionData.TargetTypes : actionData.Sources;
+                return (sources & cachedPossibleTargets) != 0;
             }
             
             return false;
