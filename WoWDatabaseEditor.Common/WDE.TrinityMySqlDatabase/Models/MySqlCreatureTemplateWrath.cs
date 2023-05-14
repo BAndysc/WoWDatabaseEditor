@@ -91,13 +91,16 @@ namespace WDE.TrinityMySqlDatabase.Models
         [Column(Name = "scale")]
         public float Scale { get; set; }
 
-        [Column(Name = "gossip_menu_id")] 
+        // change to creature_template_gossip 1 to many table
+        // [Column(Name = "gossip_menu_id")] 
         public uint GossipMenuId { get; set; }
 
-        [Column(Name = "minlevel")]
+        // master no longer have min/max level
+        //[Column(Name = "minlevel")]
         public short MinLevel { get; set; }
         
-        [Column(Name = "maxlevel")]
+        // master no longer have min/max level
+        //[Column(Name = "maxlevel")]
         public short MaxLevel { get; set; }
 
         [Column(Name = "name")] 
