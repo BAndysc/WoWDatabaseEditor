@@ -20,7 +20,6 @@ internal class NoPhaseGameObjectQueryProvider : IInsertQueryProvider<GameObjectS
             position_x = t.X,
             position_y = t.Y,
             position_z = t.Z,
-            state = t.State,
             rotation0 = t.Rotation0,
             rotation1 = t.Rotation1,
             rotation2 = t.Rotation2,

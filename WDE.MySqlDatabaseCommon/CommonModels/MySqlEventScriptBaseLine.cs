@@ -4,31 +4,66 @@ using WDE.Common.Database;
 namespace WDE.MySqlDatabaseCommon.CommonModels;
 
 [Table(Name = "waypoint_scripts")]
-public class MySqlWaypointScriptLine : MySqlEventScriptBaseLine
+public class MySqlWaypointScriptNoCommentLine : MySqlEventScriptBaseLine
 {
     public override EventScriptType Type => EventScriptType.Waypoint;
+    
+    public override string Comment => "";
 }
 
 [Table(Name = "spell_scripts")]
-public class MySqlSpellScriptLine : MySqlEventScriptBaseLine
+public class MySqlSpellScriptNoCommentLine : MySqlEventScriptBaseLine
 {
     public override EventScriptType Type => EventScriptType.Spell;
     
     [Column(Name = "effIndex")]
     public uint EffectIdx { get; set; }
-
+    
+    public override string Comment => "";
+    
     public override uint? EffectIndex => EffectIdx;
 }
 
 [Table(Name = "event_scripts")]
-public class MySqlEventScriptLine : MySqlEventScriptBaseLine
+public class MySqlEventScriptNoCommentLine : MySqlEventScriptBaseLine
 {
     public override EventScriptType Type => EventScriptType.Event;
+
+    public override string Comment => "";
+}
+
+[Table(Name = "waypoint_scripts")]
+public class MySqlWaypointScriptLine : MySqlWaypointScriptNoCommentLine
+{
+    public override string Comment => comment;
+
+    [Column(Name = "comment")] 
+    public string comment { get; set; } = "";
+}
+
+[Table(Name = "spell_scripts")]
+public class MySqlSpellScriptLine : MySqlSpellScriptNoCommentLine
+{
+    public override string Comment => comment;
+
+    [Column(Name = "comment")] 
+    public string comment { get; set; } = "";
+}
+
+
+[Table(Name = "event_scripts")]
+public class MySqlEventScriptLine : MySqlEventScriptNoCommentLine
+{
+    public override string Comment => comment;
+
+    [Column(Name = "comment")] 
+    public string comment { get; set; } = "";
 }
 
 public abstract class MySqlEventScriptBaseLine : IEventScriptLine
 {
     public abstract EventScriptType Type { get; }
+    public abstract string Comment { get; }
 
     [Column(Name = "id")]
     public uint Id { get; set; }
@@ -61,7 +96,4 @@ public abstract class MySqlEventScriptBaseLine : IEventScriptLine
 
     [Column(Name = "o")]
     public float O { get; set; }
-
-    [Column(Name = "comment")] 
-    public string Comment { get; set; } = "";
 }

@@ -71,18 +71,15 @@ namespace WDE.WoWHeadConnector.Test
             }, bySpell[48700]);
             CollectionAssert.AreEquivalent(new MapDifficulty[]
             {
-                MapDifficulty.DungeonHeroic,
-                MapDifficulty.DungeonTimeWalking
+                MapDifficulty.DungeonHeroic
             }, bySpell[59081]);
             CollectionAssert.AreEquivalent(new MapDifficulty[]
             {
-                MapDifficulty.DungeonHeroic,
-                MapDifficulty.DungeonTimeWalking
+                MapDifficulty.DungeonHeroic
             }, bySpell[59082]);
             CollectionAssert.AreEquivalent(new MapDifficulty[]
             {
-                MapDifficulty.DungeonHeroic,
-                MapDifficulty.DungeonTimeWalking
+                MapDifficulty.DungeonHeroic
             }, bySpell[59083]);
         }
     }

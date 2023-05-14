@@ -36,7 +36,9 @@ namespace WDE.Common.Database
         uint PathId { get; }
         uint Mount { get; }
         uint MountCreatureId { get; }
-        uint Bytes1 { get; }
+        byte StandState { get; }
+        byte VisFlags { get; }
+        byte AnimTier { get; }
         byte Sheath { get; }
         byte PvP { get; }
         uint Emote { get; }

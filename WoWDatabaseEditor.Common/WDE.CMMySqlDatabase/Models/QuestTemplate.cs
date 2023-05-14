@@ -18,7 +18,7 @@ namespace WDE.CMMySqlDatabase.Models
         [Column(Name = "MinLevel")]
         public int MinLevel { get; set; }
 
-        [Column(Name = "QuestSortID")]
+        [Column(Name = "ZoneOrSort")]
         public int QuestSortId { get; set; }
         
 //         [Column(Name="AllowableRaces")]

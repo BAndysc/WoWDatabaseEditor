@@ -373,21 +373,7 @@ namespace WDE.CMMySqlDatabase.Database
 
         public abstract ICreatureModelInfo? GetCreatureModelInfo(uint displayId);
 
-        public async Task<List<IEventScriptLine>> GetEventScript(EventScriptType type, uint id)
-        {
-            await using var model = Database();
-            switch (type)
-            {
-                case EventScriptType.Event:
-                    return await model.EventScripts.Where(s => s.Id == id).ToListAsync<IEventScriptLine>();
-                case EventScriptType.Spell:
-                    return await model.SpellScripts.Where(s => s.Id == id).ToListAsync<IEventScriptLine>();
-                case EventScriptType.Waypoint:
-                    return await model.WaypointScripts.Where(s => s.Id == id).ToListAsync<IEventScriptLine>();
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
-            }
-        }
+        public async Task<List<IEventScriptLine>> GetEventScript(EventScriptType type, uint id) => new();
 
         public ISceneTemplate? GetSceneTemplate(uint sceneId)
         {

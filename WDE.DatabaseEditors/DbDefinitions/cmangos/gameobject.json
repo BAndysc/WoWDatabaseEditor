@@ -94,16 +94,6 @@
           "name": "Spawn time secs max",
           "db_column_name": "spawntimesecsmax",
           "value_type": "int"
-        },
-        {
-          "name": "Anim progress",
-          "db_column_name": "animprogress",
-          "value_type": "uint"
-        },
-        {
-          "name": "State",
-          "db_column_name": "state",
-          "value_type": "GameobjectStateParameter"
         }
       ]
     }

@@ -487,7 +487,7 @@ namespace WDE.TrinityMySqlDatabase.Database
         
         public virtual Task<IList<IItem>?> GetItemTemplatesAsync() => Task.FromResult<IList<IItem>?>(null);
 
-        private ExpressionStarter<T> GenerateWhereConditionsForEventScript<T>(IEnumerable<(uint command, int dataIndex, long valueToSearch)> conditions) where T : IEventScriptLine
+        protected ExpressionStarter<T> GenerateWhereConditionsForEventScript<T>(IEnumerable<(uint command, int dataIndex, long valueToSearch)> conditions) where T : IEventScriptLine
         {
             var predicate = PredicateBuilder.New<T>();
             foreach (var value in conditions)
@@ -502,7 +502,7 @@ namespace WDE.TrinityMySqlDatabase.Database
             return predicate;
         }
 
-        public async Task<List<IEventScriptLine>> FindEventScriptLinesBy(IReadOnlyList<(uint command, int dataIndex, long valueToSearch)> conditions)
+        public virtual async Task<List<IEventScriptLine>> FindEventScriptLinesBy(IReadOnlyList<(uint command, int dataIndex, long valueToSearch)> conditions)
         {
             await using var model = Database();
             var events = await model.EventScripts.Where(GenerateWhereConditionsForEventScript<MySqlEventScriptLine>(conditions)).ToListAsync<IEventScriptLine>();
@@ -515,7 +515,7 @@ namespace WDE.TrinityMySqlDatabase.Database
 
         public abstract ICreatureModelInfo? GetCreatureModelInfo(uint displayId);
 
-        public async Task<List<IEventScriptLine>> GetEventScript(EventScriptType type, uint id)
+        public virtual async Task<List<IEventScriptLine>> GetEventScript(EventScriptType type, uint id)
         {
             await using var model = Database();
             switch (type)
@@ -581,7 +581,7 @@ namespace WDE.TrinityMySqlDatabase.Database
             return await model.SmartScriptWaypoint.Where(wp => wp.PathId == pathId).OrderBy(wp => wp.PointId).ToListAsync<ISmartScriptWaypoint>();
         }
 
-        public async Task<IReadOnlyList<IScriptWaypoint>?> GetScriptWaypoints(uint pathId)
+        public virtual async Task<IReadOnlyList<IScriptWaypoint>?> GetScriptWaypoints(uint pathId)
         {
             await using var model = Database();
             return await model.ScriptWaypoint.Where(wp => wp.PathId == pathId).OrderBy(wp => wp.PointId).ToListAsync<IScriptWaypoint>();

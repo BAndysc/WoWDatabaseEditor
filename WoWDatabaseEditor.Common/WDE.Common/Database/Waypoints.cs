@@ -45,7 +45,7 @@ public interface ISmartScriptWaypoint : IWaypoint
 {
     public uint PathId { get; }
     public uint PointId { get; }
-    public float Orientation { get; }
+    public float? Orientation { get; }
     public float? Velocity { get; }
     public uint Delay { get; }
     public bool? SmoothTransition { get; }

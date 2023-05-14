@@ -345,4 +345,16 @@ public class TrinityMasterMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvid
         using var model = Database();
         return model.PhaseNames.ToList<IPhaseName>();
     }
+    
+    public override async Task<IReadOnlyList<ISmartScriptWaypoint>?> GetSmartScriptWaypoints(uint pathId)
+    {
+        await using var model = Database();
+        return await model.WaypointData.Where(wp => wp.PathId == pathId).OrderBy(wp => wp.PointId).ToListAsync<ISmartScriptWaypoint>();
+    }
+    
+    public override async Task<IReadOnlyList<IScriptWaypoint>?> GetScriptWaypoints(uint pathId)
+    {
+        await using var model = Database();
+        return await model.WaypointData.Where(wp => wp.PathId == pathId).OrderBy(wp => wp.PointId).ToListAsync<IScriptWaypoint>();
+    }
 }

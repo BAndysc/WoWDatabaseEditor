@@ -97,7 +97,8 @@ namespace WDE.TrinityMySqlDatabase.Models
         [Column(Name = "LogTitle")]
         public string Name { get; set; } = "";
 
-        [Column(Name = "MinLevel")]
+        // master no longer has min level
+        //[Column(Name = "MinLevel")]
         public int MinLevel { get; set; }
 
         [Column(Name = "QuestSortID")]

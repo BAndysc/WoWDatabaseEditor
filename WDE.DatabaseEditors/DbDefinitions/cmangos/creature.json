@@ -46,18 +46,6 @@
           "default": 1
         },
         {
-          "name": "Model",
-          "db_column_name": "modelid",
-          "value_type": "CreatureModelDataParameter",
-          "zero_is_blank": true
-        },
-        {
-          "name": "Equipment Id",
-          "db_column_name": "equipment_id",
-          "value_type": "TableReference(creature_equip_template#entry)Parameter",
-          "zero_is_blank": true
-        },
-        {
           "name": "Position X",
           "db_column_name": "position_x",
           "value_type": "float"
@@ -94,30 +82,6 @@
           "db_column_name": "spawndist",
           "value_type": "float",
           "default": 5.0
-        },
-        {
-          "name": "Current waypoint",
-          "db_column_name": "currentwaypoint",
-          "value_type": "uint",
-          "zero_is_blank": true
-        },
-        {
-          "name": "Current health",
-          "db_column_name": "curhealth",
-          "value_type": "uint",
-          "default": 1,
-          "zero_is_blank": true
-        },
-        {
-          "name": "Current mana",
-          "db_column_name": "curmana",
-          "value_type": "uint",
-          "zero_is_blank": true
-        },
-        {
-          "name": "Is Dead",
-          "db_column_name": "DeathState",
-          "value_type": "BoolParameter"
         },
         {
           "name": "Movement Type",

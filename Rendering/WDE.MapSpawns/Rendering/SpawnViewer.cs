@@ -246,9 +246,8 @@ public class SpawnViewer : IGameModule
                 
                 if (creatureSpawnInstance.Addon is {} addon)
                 {
-                    var bytes1 = ((long)addon.Bytes1).SplitBytes1();
                     creatureInstance.Animation = animationSystem.GetAnimationType(creatureInstance.Model,
-                        addon.Emote, bytes1.standState, (AnimTier)bytes1.animTier) ?? M2AnimationType.Stand;
+                        addon.Emote, addon.StandState, (AnimTier)addon.AnimTier) ?? M2AnimationType.Stand;
 
                     if (addon.Mount != 0)
                     {

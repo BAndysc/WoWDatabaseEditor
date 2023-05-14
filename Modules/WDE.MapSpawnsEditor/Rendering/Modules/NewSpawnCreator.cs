@@ -139,8 +139,7 @@ public class NewSpawnCreator : System.IDisposable, IMapSpawnModule
             yield return ci.Load();
             if (templateAddon.Result is {} addon)
             {
-                var bytes1 = ((long)addon.Bytes1).SplitBytes1();
-                ci.Animation = animationSystem.GetAnimationType(ci.Model, addon.Emote, bytes1.standState, (AnimTier)bytes1.animTier) ?? M2AnimationType.Stand;
+                ci.Animation = animationSystem.GetAnimationType(ci.Model, addon.Emote, addon.StandState, (AnimTier)addon.AnimTier) ?? M2AnimationType.Stand;
 
                 if (addon.Mount != 0)
                     yield return ci.LoadMount(addon.Mount);   

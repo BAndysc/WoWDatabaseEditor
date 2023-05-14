@@ -23,12 +23,10 @@ namespace WDE.CMMySqlDatabase.Models.Wrath
         public int? PhaseId => null;
         
         public int? PhaseGroup => null;
-        
-        [Column(Name = "equipment_id")]
-        public int EquipmentId { get; set; }
 
-        [Column(Name = "modelid")]
-        public uint Model { get; set; }
+        public int EquipmentId => 0;
+
+        public uint Model => 0;
 
         [Column(Name = "MovementType")]
         public MovementType MovementType { get; set; }

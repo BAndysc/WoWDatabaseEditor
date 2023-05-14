@@ -4,7 +4,7 @@ using WDE.Common.Database;
 namespace WDE.MySqlDatabaseCommon.CommonModels;
 
 [Table(Name = "waypoint_data")]
-public class WaypointData : IWaypointData
+public class WaypointData : IWaypointData, ISmartScriptWaypoint, IScriptWaypoint
 {
     [PrimaryKey]
     [Column(Name = "id")]
@@ -13,7 +13,9 @@ public class WaypointData : IWaypointData
     [PrimaryKey]
     [Column(Name = "point")]
     public uint PointId { get; set; }
-    
+
+    public uint WaitTime => Delay;
+
     [Column(Name = "position_x")]
     public float X { get; set; }
     
@@ -32,6 +34,8 @@ public class WaypointData : IWaypointData
     public uint Delay { get; set; }
 
     public virtual bool? SmoothTransition { get; set; }
+
+    public string? Comment { get; }
 
     [Column(Name = "move_type")]
     public int MoveType { get; set; }
@@ -92,7 +96,7 @@ public class SmartScriptWaypoint : ISmartScriptWaypoint
     public float Z { get; set; }
     
     [Column(Name = "orientation")]
-    public float Orientation { get; set; }
+    public float? Orientation { get; set; }
 
     public virtual float? Velocity { get; set; }
 

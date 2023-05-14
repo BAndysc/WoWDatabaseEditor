@@ -12,10 +12,12 @@ public abstract class BaseCreatureAddon : IBaseCreatureAddon
 
     public uint MountCreatureId => 0;
     
-    [Column(Name = "bytes1")]
-    public uint Bytes1 { get; set; }
+    [Column(Name = "stand_state")]
+    public byte StandState { get; set; }
+    public byte VisFlags => 0;
+    public byte AnimTier => 0;
     
-    [Column(Name = "b2_0_sheath")]
+    [Column(Name = "sheath_state")]
     public byte Sheath { get; set; }
 
     public abstract byte PvP { get; set; }
@@ -41,7 +43,7 @@ public class CreatureAddonWrath : BaseCreatureAddon, ICreatureAddon
     [Column(Name = "guid")]
     public uint Guid { get; set; }
     
-    [Column(Name = "b2_1_pvp_state")]
+    [Column(Name = "pvp_flags")]
     public override byte PvP { get; set; }
 }
 
@@ -53,7 +55,7 @@ public class CreatureTemplateAddonWrath : BaseCreatureAddon, ICreatureTemplateAd
     [Column(Name = "entry")]
     public uint Entry { get; set; }
     
-    [Column(Name = "b2_1_pvp_state")]
+    [Column(Name = "pvp_flags")]
     public override byte PvP { get; set; }
 }
 
@@ -64,8 +66,7 @@ public class CreatureAddonTBC : BaseCreatureAddon, ICreatureAddon
     [Identity]
     [Column(Name = "guid")]
     public uint Guid { get; set; }
-    
-    [Column(Name = "b2_1_flags")]
+
     public override byte PvP { get; set; }
 }
 
@@ -76,7 +77,6 @@ public class CreatureTemplateAddonTBC : BaseCreatureAddon, ICreatureTemplateAddo
     [Identity]
     [Column(Name = "entry")]
     public uint Entry { get; set; }
-    
-    [Column(Name = "b2_1_flags")]
+
     public override byte PvP { get; set; }
 }

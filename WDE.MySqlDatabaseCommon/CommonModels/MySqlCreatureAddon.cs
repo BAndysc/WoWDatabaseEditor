@@ -11,8 +11,9 @@ public abstract class MySqlBaseCreatureAddon : IBaseCreatureAddon
     public uint Mount { get; set; }
 
     public abstract uint MountCreatureId { get; set; }
-
-    public abstract uint Bytes1 { get; }
+    public abstract byte StandState { get; }
+    public abstract byte VisFlags { get; }
+    public abstract byte AnimTier { get; }
     public abstract byte Sheath { get; }
     public abstract byte PvP { get; }
 
@@ -28,12 +29,20 @@ public abstract class MySqlBaseCreatureAddon : IBaseCreatureAddon
 
 public abstract class MySqlBaseCreatureAddonTrinity : MySqlBaseCreatureAddon
 {
-    public override uint Bytes1 => StandState;
     public override byte Sheath => sheath;
     public override byte PvP => pvP;
-    
+    public override byte StandState => standState;
+    public override byte VisFlags => visFlags;
+    public override byte AnimTier => animTier;
+
     [Column(Name = "StandState")]
-    public byte StandState { get; set; }
+    public byte standState { get; set; }
+    
+    [Column(Name = "AnimTier")]
+    public byte animTier { get; set; }
+    
+    [Column(Name = "VisFlags")]
+    public byte visFlags { get; set; }
     
     [Column(Name = "SheathState")]
     public byte sheath { get; set; }
@@ -101,7 +110,7 @@ public class MySqlCreatureTemplateAddonCata : MySqlBaseCreatureAddonTrinity, ICr
 }
 
 [Table(Name = "creature_addon")]
-public class MySqlCreatureAddonMaster: MySqlBaseCreatureAddon, ICreatureAddon
+public class MySqlCreatureAddonMaster : MySqlBaseCreatureAddonTrinity, ICreatureAddon
 {
     [PrimaryKey]
     [Identity]
@@ -113,20 +122,10 @@ public class MySqlCreatureAddonMaster: MySqlBaseCreatureAddon, ICreatureAddon
 
     [Column(Name = "MountCreatureID")]
     public override uint MountCreatureId { get; set; }
-
-    public override uint Bytes1 => bytes1;
-    public override byte Sheath => (byte)(bytes2 & 0xFF);
-    public override byte PvP => (byte)((bytes2 >> 8) & 0xFF);
-
-    [Column(Name = "bytes1")]
-    public uint bytes1 { get; set; }
-    
-    [Column(Name = "bytes2")]
-    public uint bytes2 { get; set; }
 }
 
 [Table(Name = "creature_template_addon")]
-public class MySqlCreatureTemplateAddonMaster : MySqlBaseCreatureAddon, ICreatureTemplateAddon
+public class MySqlCreatureTemplateAddonMaster : MySqlBaseCreatureAddonTrinity, ICreatureTemplateAddon
 {
     [PrimaryKey]
     [Identity]
@@ -138,16 +137,6 @@ public class MySqlCreatureTemplateAddonMaster : MySqlBaseCreatureAddon, ICreatur
 
     [Column(Name = "MountCreatureID")]
     public override uint MountCreatureId { get; set; }
-    
-    public override uint Bytes1 => bytes1;
-    public override byte Sheath => (byte)(bytes2 & 0xFF);
-    public override byte PvP => (byte)((bytes2 >> 8) & 0xFF);
-
-    [Column(Name = "bytes1")]
-    public uint bytes1 { get; set; }
-    
-    [Column(Name = "bytes2")]
-    public uint bytes2 { get; set; }
 }
 
 [Table(Name = "creature_addon")]
@@ -162,8 +151,9 @@ public class MySqlCreatureAddonAC: MySqlBaseCreatureAddon, ICreatureAddon
     public override uint PathId { get; set; }
 
     public override uint MountCreatureId { get; set; }
-
-    public override uint Bytes1 => bytes1;
+    public override byte StandState => (byte)(bytes1 & 0xFF);
+    public override byte VisFlags => (byte)((bytes1 >> 16) & 0xFF);
+    public override byte AnimTier => (byte)((bytes1 >> 24) & 0xFF);
     public override byte Sheath => (byte)(bytes2 & 0xFF);
     public override byte PvP => (byte)((bytes2 >> 8) & 0xFF);
 
@@ -187,7 +177,9 @@ public class MySqlCreatureTemplateAddonAC : MySqlBaseCreatureAddon, ICreatureTem
 
     public override uint MountCreatureId { get; set; }
     
-    public override uint Bytes1 => bytes1;
+    public override byte StandState => (byte)(bytes1 & 0xFF);
+    public override byte VisFlags => (byte)((bytes1 >> 16) & 0xFF);
+    public override byte AnimTier => (byte)((bytes1 >> 24) & 0xFF);
     public override byte Sheath => (byte)(bytes2 & 0xFF);
     public override byte PvP => (byte)((bytes2 >> 8) & 0xFF);
 
