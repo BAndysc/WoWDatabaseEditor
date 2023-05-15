@@ -42,7 +42,7 @@ public enum CharacterRaces : uint
     AllCatataclysm = AllWrath | Worgen | Goblin,
     AllMoP = AllCatataclysm | Pandaren | PandarenAlliance | PandarenHorde,
     AllWoD = AllMoP,
-    AllLegion = AllWoD,
-    AllBfA = AllLegion,
-    AllShadowlands = AllBfA | Nightborne | HighmountainTauren | VoidElf | LightforgedDraenei | ZandalariTroll | KulTiran | DarkIronDwarf | Vulpera | MagharOrc | Mechagnome
+    AllLegion = AllWoD | Nightborne | HighmountainTauren | VoidElf | LightforgedDraenei,
+    AllBfA = AllLegion | ZandalariTroll | KulTiran | DarkIronDwarf | Vulpera | MagharOrc | Mechagnome,
+    AllShadowlands = AllBfA
 }
