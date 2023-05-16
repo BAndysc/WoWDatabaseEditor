@@ -17,6 +17,21 @@
         uint NextQuestInChain { get; }
     }
 
+    public class AbstractQuestTemplate : IQuestTemplate
+    {
+        public uint Entry { get; set; }
+        public string Name { get; set; } = "";
+        public int MinLevel { get; set; }
+        public int QuestSortId { get; set; }
+        public CharacterClasses AllowableClasses { get; set; }
+        public CharacterRaces AllowableRaces { get; set; }
+        public int PrevQuestId { get; set; }
+        public int NextQuestId { get; set; }
+        public int ExclusiveGroup { get; set; }
+        public int BreadcrumbForQuestId { get; set; }
+        public uint NextQuestInChain { get; set; }
+    }
+
     public interface IQuestObjective
     {
         uint ObjectiveId { get; }

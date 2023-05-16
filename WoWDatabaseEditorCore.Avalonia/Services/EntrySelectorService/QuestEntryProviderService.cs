@@ -108,6 +108,17 @@ public class QuestEntryProviderService : IQuestEntryProviderService
                     return true;
                 return false;
             })
+            .SetExactMatchPredicate((template, search) => template.Entry.Is(search))
+            .SetExactMatchCreator(search =>
+            {
+                if (!uint.TryParse(search, out var entry))
+                    return null;
+                return new AbstractQuestTemplate()
+                {
+                    Entry = entry,
+                    Name = "Pick non existing"
+                };
+            })
             .Build();
     }
 

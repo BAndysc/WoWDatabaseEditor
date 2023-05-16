@@ -103,13 +103,43 @@ public class CreatureEntryOrGuidProviderService : ICreatureEntryOrGuidProviderSe
             .SetExactMatchPredicate((template, search) => template.Entry.Is(search))
             .SetExactMatchCreator(search =>
             {
-                if (!uint.TryParse(search, out var entry))
+                if (!int.TryParse(search, out var entry))
                     return null;
-                return new AbstractCreatureTemplate()
+                if (entry >= 0)
                 {
-                    Entry = entry,
-                    Name = "Pick non existing"
-                };
+                    return new AbstractCreatureTemplate()
+                    {
+                        Entry = (uint)entry,
+                        Name = "Pick non existing"
+                    };
+                }
+                else
+                {
+                    var creature = databaseProvider.GetCreatureByGuid((uint)(-entry));
+                    var template = creature == null ? null : databaseProvider.GetCreatureTemplate(creature.Entry);
+                    if (template != null)
+                    {
+                        return new ExtendedAbstractCreatureTemplate()
+                        {
+                            Guid = entry,
+                            Entry = template.Entry,
+                            FactionTemplate = template.FactionTemplate,
+                            Name = "Guid " + (-entry) + " :: " + template.Name,
+                            SubName = template.SubName,
+                            MinLevel = template.MinLevel,
+                            MaxLevel = template.MaxLevel
+                        };
+                    }
+                    else
+                    {
+                        return new ExtendedAbstractCreatureTemplate()
+                        {
+                            Entry = 0,
+                            Guid = entry,
+                            Name = "Non existing guid " + (-entry)
+                        };
+                    }
+                }
             })
             .Build();
         return table;
@@ -121,7 +151,7 @@ public class CreatureEntryOrGuidProviderService : ICreatureEntryOrGuidProviderSe
 
         var result = await tabularDataPicker.PickRow(table, index);
         
-        return (int?)result?.Entry;
+        return result == null ? null : ExtractGuidOrEntry(result);
     }
 
     public async Task<IReadOnlyCollection<int>> GetEntriesFromService(string? customCounterTable = null)
@@ -130,6 +160,18 @@ public class CreatureEntryOrGuidProviderService : ICreatureEntryOrGuidProviderSe
 
         var result = await tabularDataPicker.PickRows(table);
         
-        return result.Select(x => (int)x.Entry).ToList();
+        return result.Select(ExtractGuidOrEntry).ToList();
+    }
+
+    private int ExtractGuidOrEntry(ICreatureTemplate creatureTemplate)
+    {
+        if (creatureTemplate is ExtendedAbstractCreatureTemplate extended)
+            return extended.Guid;
+        return (int)creatureTemplate.Entry;
+    }
+    
+    private class ExtendedAbstractCreatureTemplate : AbstractCreatureTemplate
+    {
+        public int Guid { get; set; }
     }
 }

@@ -84,13 +84,40 @@ public class GameObjectEntryProviderService : IGameobjectEntryOrGuidProviderServ
             .SetExactMatchPredicate((template, search) => template.Entry.Is(search))
             .SetExactMatchCreator(search =>
             {
-                if (!uint.TryParse(search, out var entry))
+                if (!int.TryParse(search, out var entry))
                     return null;
-                return new AbstractGameObjectTemplate()
+                if (entry >= 0)
                 {
-                    Entry = entry,
-                    Name = "Pick non existing"
-                };
+                    return new AbstractGameObjectTemplate()
+                    {
+                        Entry = (uint)entry,
+                        Name = "Pick non existing"
+                    };
+                }
+                else
+                {
+                    var creature = databaseProvider.GetGameObjectByGuid((uint)(-entry));
+                    var template = creature == null ? null : databaseProvider.GetGameObjectTemplate(creature.Entry);
+                    if (template != null)
+                    {
+                        return new ExtendedAbstractGameObjectTemplate()
+                        {
+                            Guid = entry,
+                            Entry = template.Entry,
+                            Name = "Guid " + (-entry) + " :: " + template.Name,
+                            Type = template.Type
+                        };
+                    }
+                    else
+                    {
+                        return new ExtendedAbstractGameObjectTemplate()
+                        {
+                            Entry = 0,
+                            Guid = entry,
+                            Name = "Non existing guid " + (-entry)
+                        };
+                    }
+                }
             })
             .Build();
         return table;
@@ -112,5 +139,17 @@ public class GameObjectEntryProviderService : IGameobjectEntryOrGuidProviderServ
         var result = await tabularDataPicker.PickRows(table);
         
         return result.Select(x => (int)x.Entry).ToList();
+    }
+
+    private int ExtractGuidOrEntry(IGameObjectTemplate gameobjectTemplate)
+    {
+        if (gameobjectTemplate is ExtendedAbstractGameObjectTemplate extended)
+            return extended.Guid;
+        return (int)gameobjectTemplate.Entry;
+    }
+    
+    private class ExtendedAbstractGameObjectTemplate : AbstractGameObjectTemplate
+    {
+        public int Guid { get; set; }
     }
 }
