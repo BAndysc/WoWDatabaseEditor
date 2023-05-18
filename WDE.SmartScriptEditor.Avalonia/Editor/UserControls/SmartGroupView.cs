@@ -14,7 +14,8 @@ public class SmartGroupView : SelectableTemplatedControl
     public static readonly DirectProperty<SmartGroupView, string> HeaderProperty = AvaloniaProperty.RegisterDirect<SmartGroupView, string>(nameof(Header), o => o.Header, (o, v) => o.Header = v);
     public static readonly DirectProperty<SmartGroupView, string?> DescriptionProperty = AvaloniaProperty.RegisterDirect<SmartGroupView, string?>(nameof(Description), o => o.Description, (o, v) => o.Description = v);
     public static readonly StyledProperty<bool> IsExpandedProperty = AvaloniaProperty.Register<SmartGroupView, bool>(nameof(IsExpanded));
-
+    public static readonly StyledProperty<ICommand?> ToggleAllCommandProperty = AvaloniaProperty.Register<SmartGroupView, ICommand?>(nameof(ToggleAllCommand));
+    
     public static readonly AvaloniaProperty DeselectAllButGroupsRequestProperty =
         AvaloniaProperty.Register<SmartGroupView, ICommand>(nameof(DeselectAllButGroupsRequest));
 
@@ -66,6 +67,12 @@ public class SmartGroupView : SelectableTemplatedControl
         set => SetValue(IsExpandedProperty, value);
     }
     
+    public ICommand? ToggleAllCommand
+    {
+        get => GetValue(ToggleAllCommandProperty);
+        set => SetValue(ToggleAllCommandProperty, value);
+    }
+
     protected override void DeselectOthers()
     {
         DeselectAllButGroupsRequest?.Execute(null);

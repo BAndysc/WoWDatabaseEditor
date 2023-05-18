@@ -150,6 +150,7 @@
                                                          IsSelected="{CompiledBinding IsSelected, Mode=TwoWay}"
                                                          DeselectAllButGroupsRequest="{Binding DataContext.DeselectAllButGroups, ElementName=Rooot}"
                                                          DeselectAllRequest="{Binding DataContext.DeselectAll, ElementName=Rooot}"
+                                                         ToggleAllCommand="{Binding DataContext.ToggleAllGroups, ElementName=Rooot}"
                                                          Description="{CompiledBinding Description}">
                             </userControls:SmartGroupView>
                         </DataTemplate>

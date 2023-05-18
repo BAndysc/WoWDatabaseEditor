@@ -132,7 +132,9 @@
             <ControlTemplate>
                 <Border Name="PART_Border" BorderThickness="1" CornerRadius="4" Padding="6">
                     <DockPanel>
-                        <CheckBox DockPanel.Dock="Left" IsChecked="{TemplateBinding IsExpanded, Mode=TwoWay}" />
+                        <controls:ToggleAllCheckBox DockPanel.Dock="Left" 
+                                                    AltCommand="{TemplateBinding ToggleAllCommand}"
+                                                    IsChecked="{TemplateBinding IsExpanded, Mode=TwoWay}" />
                         <TextBlock FontWeight="Bold" FontSize="14" Text="{TemplateBinding Header}" DockPanel.Dock="Top" TextWrapping="WrapWithOverflow" />
                         <TextBlock Opacity="0.8" Text="{TemplateBinding Description}" TextWrapping="WrapWithOverflow" />
                     </DockPanel>

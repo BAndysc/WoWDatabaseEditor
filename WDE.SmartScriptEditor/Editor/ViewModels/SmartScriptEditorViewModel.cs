@@ -206,6 +206,18 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     smartEditorViewModel.ShowEditor(null, null);
             });
             EditEvent = new DelegateCommand(EditSelectedEventsCommand);
+            ToggleAllGroups = new DelegateCommand<bool?>(@is =>
+            {
+                using var bulk = Script.BulkEdit("Toggle groups");
+                foreach (var e in Events)
+                {
+                    if (!e.IsBeginGroup)
+                        continue;
+
+                    var group = new SmartGroup(e);
+                    group.IsExpanded = !(@is ?? false);
+                }
+            });
             DeselectAllButGroups = new DelegateCommand(() =>
             {
                 foreach (var gv in script.GlobalVariables)
@@ -1389,7 +1401,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         public DelegateCommand DeselectAllButEvents { get; set; }
         public DelegateCommand DeselectAllButGroups { get; set; }
         public DelegateCommand RemoveAllComments { get; }
-        
+        public DelegateCommand<bool?> ToggleAllGroups { get; }
+
         public AsyncAutoCommand<object> DirectEditParameter { get; }
         public AsyncAutoCommand<object> DirectOpenParameter { get; }
         public DelegateCommand<DropActionsConditionsArgs> OnDropConditions { get; set; }
