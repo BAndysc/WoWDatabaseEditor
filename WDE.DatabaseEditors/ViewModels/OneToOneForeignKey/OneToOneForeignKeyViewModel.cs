@@ -508,4 +508,6 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
         else
             CloseCancel?.Invoke();
     }
+
+    public event Action? Close;
 }

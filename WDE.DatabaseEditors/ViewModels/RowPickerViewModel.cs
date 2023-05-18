@@ -125,6 +125,8 @@ public class RowPickerViewModel : ObservableBase, IDialog, IWindowViewModel, ICl
             CloseCancel?.Invoke();
     }
 
+    public event Action? Close;
+
     private DatabaseEntity? overrideSelectedRow;
     public DatabaseEntity? SelectedRow => overrideSelectedRow ?? baseViewModel.FocusedEntity;
     public ViewModelBase? MainViewModel => baseViewModel;

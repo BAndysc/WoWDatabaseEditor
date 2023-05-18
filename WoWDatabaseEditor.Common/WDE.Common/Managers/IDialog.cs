@@ -28,5 +28,6 @@ namespace WDE.Common.Managers
     public interface IClosableDialog
     {
         void OnClose();
+        event System.Action Close;
     }
 }
