@@ -595,6 +595,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
                         }
                     }
                 }
+                query.Add(BuildConditions(new []{entity.Key}, new DatabaseTableData(definition, new[]{entity})));
             }
 
             return query.Close();
