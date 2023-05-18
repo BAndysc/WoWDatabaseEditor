@@ -10,6 +10,8 @@ namespace WDE.Common.Managers
         
         Task<bool> ShowDialog(IDialog viewModel);
 
+        IAbstractWindowView ShowStandaloneDocument(IDocument document, out Task task);
+        
         Task<string?> ShowFolderPickerDialog(string defaultDirectory);
         
         Task<string?> ShowOpenFileDialog(string filter, string? defaultDirectory = null);

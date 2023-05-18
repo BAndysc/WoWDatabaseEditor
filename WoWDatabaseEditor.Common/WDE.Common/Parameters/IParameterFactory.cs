@@ -16,8 +16,8 @@ namespace WDE.Common.Parameters
     {
         IParameter<long> Factory(string type);
         IParameter<string> FactoryString(string type);
-        bool IsRegisteredLong(string type);
-        bool IsRegisteredString(string type);
+        bool IsRegisteredLong(string? type);
+        bool IsRegisteredString(string? type);
         T Register<T>(string key, T parameter, QuickAccessMode quickAccessMode = QuickAccessMode.None) where T : IParameter<long>;
         void Register(string key, IParameter<string> parameter);
         void Updated(IParameter parameter);

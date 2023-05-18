@@ -169,6 +169,14 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
             }
         }
 
+        public IAbstractWindowView ShowStandaloneDocument(IDocument document, out Task task)
+        {
+            var vm = new WindowViewModelDocumentWrapper(document);
+            var window = ShowWindow(vm, out task);
+            task.ContinueWith(_ => vm.Dispose());
+            return window;
+        }
+
         public Task<string?> ShowFolderPickerDialog(string defaultDirectory)
         {
             return new OpenFolderDialog() {Directory = defaultDirectory}.ShowAsync(mainWindowHolder.RootWindow);

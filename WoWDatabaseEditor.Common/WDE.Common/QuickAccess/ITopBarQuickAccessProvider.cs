@@ -9,6 +9,7 @@ namespace WDE.Common.QuickAccess;
 public interface ITopBarQuickAccessProvider
 {
     IEnumerable<ITopBarQuickAccessItem> Items { get; }
+    int Order { get; }
 }
 
 public interface ITopBarQuickAccessItem
