@@ -423,9 +423,9 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             if (await ContainsKey(key, excludeIndex))
             {
                 await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
-                    .SetTitle("Key already added")
-                    .SetMainInstruction($"Key {key} is already added to this editor")
-                    .SetContent("You cannot add it again, just edit existing.")
+                    .SetTitle("Primary key exists in the database")
+                    .SetMainInstruction($"Primary key {key} already exists in the database.")
+                    .SetContent("Thus it cannot be saved, because it would cause a conflict. Please change the primary key or remove this row in order to save (nothing has been saved)")
                     .WithOkButton(true)
                     .SetIcon(MessageBoxIcon.Error)
                     .Build());
