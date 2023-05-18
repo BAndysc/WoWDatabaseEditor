@@ -20,6 +20,8 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
         public async Task<long?> GetItemFromList(Dictionary<long, SelectOption>? items, bool flags, long? current = null, string? title = null)
         {
             using LongItemFromListProviderViewModel vm = new(items, flags, current, title);
+            if (current.HasValue && current.Value != 0)
+                vm.SearchText = current.Value.ToString();
             if (await windowManager.ShowDialog(vm))
                 return vm.GetEntry();
             return null;
@@ -28,6 +30,8 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
         public async Task<string?> GetItemFromList(Dictionary<string, SelectOption>? items, bool multiSelect, string? current = null, string? title = null)
         {
             using StringItemFromListProviderViewModel vm = new(items, multiSelect, current, title);
+            if (current != null)
+                vm.SearchText = current;
             if (await windowManager.ShowDialog(vm))
                 return vm.GetEntry();
             return null;

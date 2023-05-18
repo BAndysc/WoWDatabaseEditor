@@ -18,20 +18,24 @@ public class TabularDataPicker : ITabularDataPicker
         this.windowManager = windowManager;
     }
     
-    public async Task<T?> PickRow<T>(ITabularDataArgs<T> args, int defaultSelection) where T : class
+    public async Task<T?> PickRow<T>(ITabularDataArgs<T> args, int defaultSelection, string? defaultSearchText = null) where T : class
     {
         List<int>? selection = null;
         if (defaultSelection >= 0)
             selection = new List<int>(1) {defaultSelection};
         
         using var viewModel = new TabularDataPickerViewModel(args.AsObject(), false, selection);
+        if (defaultSearchText != null)
+            viewModel.SearchText = defaultSearchText;
         await windowManager.ShowDialog(viewModel);
         return viewModel.FocusedItem == null ? default : (T)viewModel.FocusedItem;
     }
 
-    public async Task<IReadOnlyCollection<T>> PickRows<T>(ITabularDataArgs<T> args, IReadOnlyList<int>? defaultSelection = null) where T : class
+    public async Task<IReadOnlyCollection<T>> PickRows<T>(ITabularDataArgs<T> args, IReadOnlyList<int>? defaultSelection = null, string? defaultSearchText = null) where T : class
     {
         using var viewModel = new TabularDataPickerViewModel(args.AsObject(), true, defaultSelection);
+        if (defaultSearchText != null)
+            viewModel.SearchText = defaultSearchText;
         await windowManager.ShowDialog(viewModel);
         return new CastCollection<T>(viewModel.SelectedItems);
     }

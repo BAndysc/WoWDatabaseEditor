@@ -149,7 +149,7 @@ public class CreatureEntryOrGuidProviderService : ICreatureEntryOrGuidProviderSe
     {
         var table = BuildTable(customCounterTable, entry, out var index);
 
-        var result = await tabularDataPicker.PickRow(table, index);
+        var result = await tabularDataPicker.PickRow(table, index, entry.HasValue && entry > 0 ? entry.ToString() : null);
         
         return result == null ? null : ExtractGuidOrEntry(result);
     }
