@@ -36,6 +36,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
         }
 
         private IDialog? boundDialog;
+        private IClosableDialog? boundWindow;
         
         protected override void OnDataContextChanged(EventArgs e)
         {
@@ -46,11 +47,21 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
                 boundDialog.CloseOk -= DialogWindowOnCloseOk;
                 boundDialog = null;
             }
+            if (boundWindow != null)
+            {
+                boundWindow.Close -= WindowOnClose;
+                boundWindow = null;
+            }
             if (DataContext is IDialog dialogWindow)
             {
                 dialogWindow.CloseCancel += DialogWindowOnCloseCancel;
                 dialogWindow.CloseOk += DialogWindowOnCloseOk;
                 boundDialog = dialogWindow;
+            }
+            if (DataContext is IClosableDialog closable)
+            {
+                closable.Close += WindowOnClose;
+                boundWindow = closable;
             }
         }
 
@@ -62,7 +73,18 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
                 boundDialog.CloseOk -= DialogWindowOnCloseOk;
                 boundDialog = null;
             }
+            if (boundWindow != null)
+            {
+                boundWindow.Close -= WindowOnClose;
+                boundWindow = null;
+            }
             base.OnClosed(e);
+        }
+        
+        private void WindowOnClose()
+        {
+            reallyCloseNow = true;
+            Close(true);
         }
         
         private void DialogWindowOnCloseOk()
