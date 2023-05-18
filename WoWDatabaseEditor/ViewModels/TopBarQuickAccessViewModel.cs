@@ -15,6 +15,6 @@ public class TopBarQuickAccessViewModel : ObservableBase
 
     public TopBarQuickAccessViewModel(IEnumerable<ITopBarQuickAccessProvider> providers)
     {
-        Editors.AddRange(providers.SelectMany(p => p.Items));
+        Editors.AddRange(providers.OrderBy(x => x.Order).SelectMany(p => p.Items));
     }
 }

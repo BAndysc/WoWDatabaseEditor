@@ -46,6 +46,8 @@ public class TablesTopBarQuickAccessProvider : ITopBarQuickAccessProvider
     
     public IEnumerable<ITopBarQuickAccessItem> Items { get; }
     
+    public int Order => 0;
+
     private class TableTopBarQuickAccessItem : ITopBarQuickAccessItem
     {
         public TableTopBarQuickAccessItem(string name, ImageUri icon, ICommand command)

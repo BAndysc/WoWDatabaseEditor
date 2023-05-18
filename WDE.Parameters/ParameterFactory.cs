@@ -61,16 +61,22 @@ namespace WDE.Parameters
             return StringParameter.Instance;
         }
 
-        public bool IsRegisteredLong(string type)
+        public bool IsRegisteredLong(string? type)
         {
+            if (type == null)
+                return false;
+            
             if (type.StartsWith("TableReference("))
                 Factory(type);
             
             return parameters.ContainsKey(type);
         }
 
-        public bool IsRegisteredString(string type)
+        public bool IsRegisteredString(string? type)
         {
+            if (type == null)
+                return false;
+
             return stringParameters.ContainsKey(type);
         }
 

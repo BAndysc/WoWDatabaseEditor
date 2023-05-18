@@ -3,8 +3,10 @@ using WDE.Common.Database;
 using WDE.Module;
 using WoWDatabaseEditorCore.Avalonia.Services.CreatureEntrySelectorService;
 using WDE.Common.Windows;
+using WoWDatabaseEditorCore.Avalonia.Managers;
 using WoWDatabaseEditorCore.Avalonia.Services.InputEntryProviderService;
 using WoWDatabaseEditorCore.Avalonia.Services.ItemFromListSelectorService;
+using WoWDatabaseEditorCore.Avalonia.Views;
 using WoWDatabaseEditorCore.Services.InputEntryProviderService;
 using WoWDatabaseEditorCore.Services.ItemFromListSelectorService;
 
@@ -23,6 +25,8 @@ namespace WoWDatabaseEditorCore.Avalonia
             viewLocator.Bind<LongItemFromListProviderViewModel, ItemFromListProviderView>();
             viewLocator.Bind<StringItemFromListProviderViewModel, ItemFromListProviderView>();
             viewLocator.Bind<FloatItemFromListProviderViewModel, ItemFromListProviderView>();
+            viewLocator.Bind<WindowViewModelDocumentWrapper, WindowViewDocumentWrapper>();
+            viewLocator.BindToolBar<WindowViewModelDocumentWrapper, WindowToolbarDocumentWrapper>();
         }
     }
 }
