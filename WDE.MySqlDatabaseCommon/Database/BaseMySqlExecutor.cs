@@ -196,7 +196,10 @@ namespace WDE.MySqlDatabaseCommon.Database
                 await conn.CloseAsync();
                 throw new IMySqlExecutor.QueryFailedDatabaseException(ex);
             }
-            await conn.CloseAsync();
+            finally
+            {
+                await conn.CloseAsync();
+            }
 
             foreach (var tableName in queryEvaluator.Extract(query).Select(q => q.TableName).Distinct())
             {
