@@ -80,7 +80,7 @@ public class ContextualParametersProvider : IContextualParametersProvider
     }
 }
 
-public class DatabaseContextualParameter : IContextualParameter<long, DatabaseEntity>, ICustomPickerContextualParameter<long>
+public class DatabaseContextualParameter : IContextualParameter<long, DatabaseEntity>, ICustomPickerContextualParameter<long>, ITableAffectedByParameter
 {
     private readonly IParameterPickerService pickerService;
     private Dictionary<long, IParameter<long>> parameters = new();
@@ -144,6 +144,8 @@ public class DatabaseContextualParameter : IContextualParameter<long, DatabaseEn
 
         return parameter.ToString(value);
     }
+
+    public string AffectedByColumn => column;
 }
 
 public interface ITableAffectedByParameter
