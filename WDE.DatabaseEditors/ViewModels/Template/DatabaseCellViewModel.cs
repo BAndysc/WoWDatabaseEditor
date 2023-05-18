@@ -16,7 +16,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
         public bool CanBeNull => Parent.CanBeNull;
         public bool CanBeSetToNull => CanBeNull && !Parent.IsReadOnly;
         public bool CanBeReverted => !Parent.IsReadOnly;
-        public string? ActionLabel { get; }
+        public string? ActionLabel { get; private set; }
         public ICommand? ActionCommand { get; }
         private bool inConstructor = true;
 
@@ -83,6 +83,21 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             Parent = parent;
             ActionCommand = command;
             ActionLabel = actionLabel;
+            inConstructor = false;
+        }
+        
+        public DatabaseCellViewModel(DatabaseRowViewModel parent, 
+            DatabaseEntity parentEntity,
+            ICommand command,
+            System.IObservable<string> actionLabel) : base(parentEntity)
+        {
+            Parent = parent;
+            ActionCommand = command;
+            AutoDispose(actionLabel.SubscribeAction(str =>
+            {
+                ActionLabel = str;
+                RaisePropertyChanged(nameof(ActionLabel));
+            }));
             inConstructor = false;
         }
         

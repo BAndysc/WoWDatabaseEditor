@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Newtonsoft.Json;
+using WDE.Common.Database;
 using WDE.Common.Parameters;
 
 namespace WDE.Conditions.Data
@@ -67,6 +68,18 @@ namespace WDE.Conditions.Data
 
         [JsonProperty(PropertyName = "sourceId")]
         public ConditionSourceParamsJsonData SourceId;
+
+        public IDatabaseProvider.ConditionKeyMask GetMask()
+        {
+            IDatabaseProvider.ConditionKeyMask mask = IDatabaseProvider.ConditionKeyMask.None;
+            if (!string.IsNullOrEmpty(Group.Name))
+                mask |= IDatabaseProvider.ConditionKeyMask.SourceGroup;
+            if (!string.IsNullOrEmpty(Entry.Name))
+                mask |= IDatabaseProvider.ConditionKeyMask.SourceEntry;
+            if (!string.IsNullOrEmpty(SourceId.Name))
+                mask |= IDatabaseProvider.ConditionKeyMask.SourceId;
+            return mask;
+        }
     }
 
     [ExcludeFromCodeCoverage]

@@ -50,6 +50,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
         private readonly ITeachingTipService teachingTipService;
         private readonly ICreatureStatCalculatorService creatureStatCalculatorService;
         private readonly ISessionService sessionService;
+        private readonly IConditionEditService conditionEditService;
         private readonly ITableEditorPickerService tableEditorPickerService;
         private readonly IMetaColumnsSupportService metaColumnsSupportService;
 
@@ -66,6 +67,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
         
         public AsyncAutoCommand<DatabaseCellViewModel?> RemoveTemplateCommand { get; }
         public AsyncAutoCommand<DatabaseCellViewModel?> RevertCommand { get; }
+        public AsyncAutoCommand<DatabaseCellViewModel?> EditConditionsCommand { get; }
         public DelegateCommand<DatabaseCellViewModel?> SetNullCommand { get; }
         public AsyncAutoCommand<DatabaseCellViewModel> OpenParameterWindow { get; }
         private readonly Dictionary<string, ReactiveProperty<bool>> groupVisibilityByName = new();
@@ -90,6 +92,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             ISolutionItemIconRegistry iconRegistry, ISessionService sessionService,
             IDatabaseTableCommandService commandService,
             IParameterPickerService parameterPickerService,
+            IConditionEditService conditionEditService,
             IStatusBar statusBar, ITableEditorPickerService tableEditorPickerService,
             IMetaColumnsSupportService metaColumnsSupportService) : base(history, solutionItem, solutionItemName, 
             solutionManager, solutionTasksService, eventAggregator, 
@@ -106,6 +109,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             this.teachingTipService = teachingTipService;
             this.creatureStatCalculatorService = creatureStatCalculatorService;
             this.sessionService = sessionService;
+            this.conditionEditService = conditionEditService;
             this.tableEditorPickerService = tableEditorPickerService;
             this.metaColumnsSupportService = metaColumnsSupportService;
 
@@ -130,6 +134,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
 
             RemoveTemplateCommand = new AsyncAutoCommand<DatabaseCellViewModel?>(RemoveTemplate, vm => vm != null);
             RevertCommand = new AsyncAutoCommand<DatabaseCellViewModel?>(Revert, cell => cell is DatabaseCellViewModel vm && vm.CanBeReverted && vm.IsModified);
+            EditConditionsCommand = new AsyncAutoCommand<DatabaseCellViewModel?>(EditConditions);
             SetNullCommand = new DelegateCommand<DatabaseCellViewModel?>(SetToNull, vm => vm != null && vm.CanBeSetToNull);
             AddNewCommand = new AsyncAutoCommand(AddNewEntity);
 
@@ -138,6 +143,26 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             Debug.Assert(tableDefinition.PrimaryKey.Count == 1);
             
             ScheduleLoading();
+        }
+
+        private async Task EditConditions(DatabaseCellViewModel? view)
+        {
+            if (view == null)
+                return;
+            
+            var conditionList = view.ParentEntity.Conditions;
+            
+            var newConditions = await conditionEditService.EditConditions(tableDefinition.Condition!.SourceType, conditionList);
+            if (newConditions == null)
+                return;
+
+            view.ParentEntity.Conditions = newConditions.ToList();
+            if (tableDefinition.Condition.SetColumn != null)
+            {
+                var hasColumn = view.ParentEntity.GetCell(tableDefinition.Condition.SetColumn);
+                if (hasColumn is DatabaseField<long> lf)
+                    lf.Current.Value = view.ParentEntity.Conditions.Count > 0 ? 1 : 0;
+            }
         }
 
         protected override void UpdateSolutionItem()
@@ -298,7 +323,12 @@ namespace WDE.DatabaseEditors.ViewModels.Template
                 var column = row.ColumnData;
                 DatabaseCellViewModel cellViewModel;
                 
-                if (column.IsMetaColumn)
+                if (column.IsConditionColumn)
+                {
+                    var label = Observable.Select(entity.ToObservable(e => e.Conditions), c => "Conditions (" + (c?.Count(cond => cond.IsActualCondition()) ?? 0) + ")");
+                    cellViewModel = AutoDispose(new DatabaseCellViewModel(row, entity, EditConditionsCommand, label));
+                }
+                else if (column.IsMetaColumn)
                 {
                     if (column.Meta!.StartsWith("expression:"))
                     {
