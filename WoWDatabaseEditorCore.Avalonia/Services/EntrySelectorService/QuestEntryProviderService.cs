@@ -125,7 +125,7 @@ public class QuestEntryProviderService : IQuestEntryProviderService
     public async Task<uint?> GetEntryFromService(uint? questId = null)
     {
         var table = BuildTable(questId, out var index);
-        var result = await tabularDataPicker.PickRow(table, index);
+        var result = await tabularDataPicker.PickRow(table, index, questId.HasValue && questId > 0 ? questId.ToString() : null);
         return result?.Entry;
     }
 

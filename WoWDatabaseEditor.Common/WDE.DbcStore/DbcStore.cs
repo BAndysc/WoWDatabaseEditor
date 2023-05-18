@@ -1498,7 +1498,7 @@ namespace WDE.DbcStore
         
         public async Task<(long, bool)> PickValue(long value)
         {
-            var result = await dataPicker.PickRow(BuildTable());
+            var result = await dataPicker.PickRow(BuildTable(), defaultSearchText: value > 0 ? value.ToString() : null);
 
             if (result == null)
                 return (0, false);

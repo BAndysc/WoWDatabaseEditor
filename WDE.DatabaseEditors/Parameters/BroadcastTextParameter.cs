@@ -70,7 +70,7 @@ public class BroadcastTextParameter : IParameter<long>, IAsyncParameter<long>, I
                     Text = "Pick non existing"
                 };
             })
-            .Build());
+            .Build(), defaultSearchText: value > 0 ? value.ToString() : null);
         
         if (selected == null)
             return (0, false);

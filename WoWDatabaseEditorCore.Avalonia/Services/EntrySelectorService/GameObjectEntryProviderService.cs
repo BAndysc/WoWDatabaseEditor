@@ -127,7 +127,7 @@ public class GameObjectEntryProviderService : IGameobjectEntryOrGuidProviderServ
     {
         var table = BuildTable(customCounterTable, entry, out var index);
 
-        var result = await tabularDataPicker.PickRow(table, index);
+        var result = await tabularDataPicker.PickRow(table, index, entry.HasValue && entry > 0 ? entry.ToString() : null);
         
         return (int?)result?.Entry;
     }

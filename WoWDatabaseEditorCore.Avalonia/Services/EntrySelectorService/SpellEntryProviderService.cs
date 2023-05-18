@@ -85,7 +85,7 @@ public class SpellEntryProviderService : ISpellEntryProviderService
     public async Task<uint?> GetEntryFromService(uint? spellId = null, string? customCounterTable = null)
     {
         var table = BuildTable(customCounterTable, spellId, out var index);
-        var result = await tabularDataPicker.PickRow(table, index);
+        var result = await tabularDataPicker.PickRow(table, index, spellId.HasValue && spellId > 0 ? spellId.ToString() : null);
         return result?.Id;
     }
 
