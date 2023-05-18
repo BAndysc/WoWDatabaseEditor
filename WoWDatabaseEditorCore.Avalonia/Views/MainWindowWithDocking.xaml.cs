@@ -66,7 +66,8 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
                     }
                     else if (pressedArgs.SelectedItem == null && long.TryParse(pressedArgs.SearchText, out var l))
                     {
-                        box.SelectedItem = new QuickGoToItemViewModel(l, "(unknown)");
+                        var firstItem = box.Items?.Cast<QuickGoToItemViewModel>().FirstOrDefault(x => x.Key == l);
+                        box.SelectedItem = firstItem ?? new QuickGoToItemViewModel(l, "(unknown)");
                         pressedArgs.Handled = true;
                     }
                 };
