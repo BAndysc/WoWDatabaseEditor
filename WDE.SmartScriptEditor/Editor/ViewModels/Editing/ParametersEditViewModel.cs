@@ -30,6 +30,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
             ICurrentCoreVersion currentCoreVersion,
             IParameterPickerService parameterPickerService,
             IMainThread mainThread,
+            string title,
             SmartBaseElement? element,
             bool focusFirst,
             SmartEditableGroup editableGroup,
@@ -37,6 +38,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
             string? focusFirstGroup = null,
             object? context = null)
         {
+            Title = title;
             this.parameterPickerService = parameterPickerService;
             HashSet<IEditableParameterViewModel> visible = new();
             SourceList<IEditableParameterViewModel> visibleParameters = new();
@@ -136,7 +138,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
         public ICommand Cancel { get; }
         public int DesiredWidth => 545;
         public int DesiredHeight => 625;
-        public string Title => "Edit";
+        public string Title { get; }
         public bool Resizeable => true;
         public bool RequestOpenNextEdit { get; private set; }
 
