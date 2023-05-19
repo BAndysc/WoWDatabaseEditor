@@ -68,12 +68,12 @@ public class ConditionsFindAnywhereSource : IFindAnywhereSource
                 }
                 else if (cond.Parameters[i].Type == "ConditionObjectGuidParameter")
                 {
-                    if (parameterNames.IndexOf("CreatureGUIDParameter") != -1)
+                    if (parameterNames.Any(x => x.StartsWith("CreatureGUID")))
                     {
                         where = where.OrWhere(row => row.Column<int>("ConditionValue1") == 3 &&
                                                      row.Column<long>("ConditionValue3") == parameterValue);
                     }
-                    else if (parameterNames.IndexOf("GameobjectGUIDParameter") != -1)
+                    else if (parameterNames.Any(x => x.StartsWith("GameobjectGUID")))
                     {
                         where = where.OrWhere(row => row.Column<int>("ConditionValue1") == 5 &&
                                                      row.Column<long>("ConditionValue3") == parameterValue);
