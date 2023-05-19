@@ -8,13 +8,13 @@ using WDE.DatabaseEditors.Models;
 
 namespace WDE.DatabaseEditors.Parameters;
 
-public class CreatureTextWithFallback : StringParameter, IAsyncContextualParameter<string, DatabaseEntity>,
+public class GossipOptionTextWithFallback : StringParameter, IAsyncContextualParameter<string, DatabaseEntity>,
     ICustomPickerContextualParameter<string>,
     ITableAffectedByParameter
 {
     private readonly IDatabaseProvider databaseProvider;
 
-    public CreatureTextWithFallback(IWindowManager windowManager, IDatabaseProvider databaseProvider) : base(windowManager)
+    public GossipOptionTextWithFallback(IWindowManager windowManager, IDatabaseProvider databaseProvider) : base(windowManager)
     {
         this.databaseProvider = databaseProvider;
     }
@@ -24,7 +24,7 @@ public class CreatureTextWithFallback : StringParameter, IAsyncContextualParamet
         if (!string.IsNullOrWhiteSpace(value))
             return value;
         
-        var broadcastTextId = context.GetTypedValueOrThrow<long>("broadcasttextid");
+        var broadcastTextId = context.GetTypedValueOrThrow<long>("broadcasttext_option_text");
         if (broadcastTextId == 0)
             return "";
 
@@ -37,12 +37,12 @@ public class CreatureTextWithFallback : StringParameter, IAsyncContextualParamet
         if (!string.IsNullOrWhiteSpace(value))
             return value;
 
-        var broadcastTextId = context.GetTypedValueOrThrow<long>("broadcasttextid");
+        var broadcastTextId = context.GetTypedValueOrThrow<long>("broadcasttext_option_text");
         if (broadcastTextId != 0)
             return $"BroadcastText {broadcastTextId} (fetching)";
         return "";
     }
-    
+
     public async Task<(string, bool)> PickValue(string value, object context)
     {
         var vm = new StringPickerViewModel(context is DatabaseEntity entity ? await ToStringAsync(value, default, entity) : value,
@@ -54,5 +54,5 @@ public class CreatureTextWithFallback : StringParameter, IAsyncContextualParamet
         return ("", false);
     }
 
-    public string AffectedByColumn => "broadcasttextid";
+    public string AffectedByColumn => "broadcasttext_option_text";
 }

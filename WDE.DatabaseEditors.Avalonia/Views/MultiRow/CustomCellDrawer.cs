@@ -161,9 +161,11 @@ public class CustomCellDrawer : CustomCellDrawerInteractorBase, ICustomCellDrawe
             rect = rect.Deflate(new Thickness(20, 0, 0, 0));
         }
 
-        if (cell.DbColumnName == "text")
+        if (cell.DbColumnName == "text" || cell.DbColumnName == "option_text")
         {
             var broadcastTextId = cell.Parent.Entity.GetCell("broadcasttextid") as DatabaseField<long>;
+            if (broadcastTextId == null)
+                broadcastTextId = cell.Parent.Entity.GetCell("broadcasttext_option_text") as DatabaseField<long>;
             if (broadcastTextId != null && cell.TableField is DatabaseField<string> textField && string.IsNullOrWhiteSpace(textField.Current.Value))
             {
                 rect = rect.Deflate(new Thickness(10, 0, 0, 0));
