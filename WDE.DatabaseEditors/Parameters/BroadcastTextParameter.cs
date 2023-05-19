@@ -32,7 +32,7 @@ public class BroadcastTextParameter : IParameter<long>, IAsyncParameter<long>, I
 
     public async Task<string> ToStringAsync(long val, CancellationToken token)
     {
-        if (val >= uint.MaxValue || val < 0)
+        if (val >= uint.MaxValue || val <= 0)
             return ToString(val);
         
         var result = await databaseProvider.GetBroadcastTextByIdAsync((uint)val);
@@ -82,7 +82,7 @@ public class BroadcastTextParameter : IParameter<long>, IAsyncParameter<long>, I
     public bool HasItems => true;
     public bool AllowUnknownItems => true;
     
-    public string ToString(long value) => "broadcast text " + value;
+    public string ToString(long value) => value == 0 ? "0" : "broadcast text " + value;
 
     public Dictionary<long, SelectOption>? Items => null;
 }

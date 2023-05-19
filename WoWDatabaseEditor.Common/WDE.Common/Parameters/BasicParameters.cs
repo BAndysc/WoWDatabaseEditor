@@ -90,7 +90,7 @@ namespace WDE.Common.Parameters
     
     public class StringParameter : GenericBaseParameter<string>, ICustomPickerParameter<string>
     {
-        private readonly IWindowManager windowManager;
+        protected readonly IWindowManager windowManager;
         private static StringParameter? instance;
         public static StringParameter Instance
         {
