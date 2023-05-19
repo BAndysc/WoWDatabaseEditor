@@ -44,8 +44,11 @@ namespace WDE.DatabaseEditors
                 factory.RegisterDepending("DbScriptRandomTemplateTargetValueParameter", "BroadcastTextParameter", bcast => new DbScriptRandomTemplateTargetValueParameter(containerProvider.Resolve<IParameterPickerService>(), bcast));
                 factory.Register("LootReferenceParameter", containerProvider.Resolve<LootReferenceParameter>());
                 factory.Register("EquipmentCreatureGuidParameter", containerProvider.Resolve<EquipmentCreatureGuidParameter>());
-                factory.Register("CreatureGUIDParameter", factory.Factory("TableReference(creature#guid)Parameter"));
-                factory.Register("GameobjectGUIDParameter", factory.Factory("TableReference(gameobject#guid)Parameter"));
+                factory.Register("CreatureGUIDParameter", this.containerProvider.Resolve<CreatureGUIDParameter>());
+                factory.Register("GameobjectGUIDParameter", this.containerProvider.Resolve<GameObjectGUIDParameter>());
+                factory.Register("CreatureGUID(PickerOnly)Parameter", this.containerProvider.Resolve<CreatureGUIDPickerOnlyParameter>());
+                factory.Register("GameobjectGUID(PickerOnly)Parameter", this.containerProvider.Resolve<GameObjectGUIDPickerOnlyParameter>());
+                factory.Register("CreatureGUID(EntryOnly)Parameter", this.containerProvider.Resolve<CreatureGUIDEntryOnlyParameter>());
             });
         }
     }

@@ -128,6 +128,7 @@ public class TableEditorPickerService : ITableEditorPickerService
                 if (where != null)
                 {
                     singleRow.FilterViewModel.FilterText = where;
+                    singleRow.FilterViewModel.SelectedColumn = singleRow.FilterViewModel.RawSqlColumn;
                     await singleRow.FilterViewModel.ApplyFilter.ExecuteAsync();
                 }
                 if (initialValue.HasValue)
