@@ -69,6 +69,7 @@ namespace WDE.Common.Database
         uint NpcFlag { get; }
         int ActionMenuId { get; }
         uint ActionPoiId { get; }
+        uint ActionScriptId { get; }
         uint BoxCoded { get; }
         uint BoxMoney { get; }
         string? BoxText { get; }

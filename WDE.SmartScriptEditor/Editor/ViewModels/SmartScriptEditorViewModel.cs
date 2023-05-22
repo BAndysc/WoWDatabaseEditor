@@ -2188,7 +2188,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     var editingMultipleSourceConditions = anyHasSourceConditions && actionsToEdit.Count > 1;
                     var editingMultipleTargetConditions = anyHasTargetConditions && actionsToEdit.Count > 1;
 
-                    var sourceConditions = new ReactiveProperty<string>(editingMultipleSourceConditions ? "Conditions (warning: multiple actions)" : $"Conditions ({actionsToEdit[0].Source.Conditions?.Count(c => c.IsActualCondition()) ?? 0})");
+                    var sourceConditions = new ReactiveProperty<string>(editingMultipleSourceConditions ? "Conditions (warning: multiple actions)" : $"Conditions ({actionsToEdit[0].Source.Conditions.CountActualConditions()})");
                     editableGroup.Add(new EditableActionData("Conditions", "Source", async () =>
                     {
                         var newConditions = await conditionEditService.EditConditions(30, actionsToEdit[0].Source.Conditions);
@@ -2198,11 +2198,11 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                             modifiedSourceConditions = true;
                             foreach (var action in actionsToEdit)
                                 action.Source.Conditions = conditions.ToList();
-                            sourceConditions.Value = $"Conditions ({actionsToEdit[0].Source.Conditions?.Count(c => c.IsActualCondition()) ?? 0})";
+                            sourceConditions.Value = $"Conditions ({actionsToEdit[0].Source.Conditions.CountActualConditions()})";
                         }
                     }, sourceConditions));
                     
-                    var targetConditions = new ReactiveProperty<string>(editingMultipleTargetConditions ? "Conditions (warning: multiple actions)" : $"Conditions ({actionsToEdit[0].Target.Conditions?.Count(c => c.IsActualCondition()) ?? 0})");
+                    var targetConditions = new ReactiveProperty<string>(editingMultipleTargetConditions ? "Conditions (warning: multiple actions)" : $"Conditions ({actionsToEdit[0].Target.Conditions.CountActualConditions()})");
                     editableGroup.Add(new EditableActionData("Conditions", "Target", async () =>
                     {
                         var newConditions = await conditionEditService.EditConditions(30, actionsToEdit[0].Target.Conditions);
@@ -2212,7 +2212,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                             modifiedTargetConditions = true;
                             foreach (var action in actionsToEdit)
                                 action.Target.Conditions = conditions.ToList();
-                            targetConditions.Value = $"Conditions ({actionsToEdit[0].Target.Conditions?.Count(c => c.IsActualCondition()) ?? 0})";
+                            targetConditions.Value = $"Conditions ({actionsToEdit[0].Target.Conditions.CountActualConditions()})";
                         }
                     }, targetConditions, canPickTarget.Not()));
                 }

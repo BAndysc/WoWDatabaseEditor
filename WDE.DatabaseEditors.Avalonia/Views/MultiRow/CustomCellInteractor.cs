@@ -12,7 +12,7 @@ using WDE.DatabaseEditors.ViewModels.MultiRow;
 
 namespace WDE.DatabaseEditors.Avalonia.Views.MultiRow;
 
-public class CustomCellInteractor : SingleRow.CustomCellDrawerInteractorBase, ICustomCellInteractor
+public class CustomCellInteractor : ICustomCellInteractor
 {
     private IParameterPickerService ParameterPickerService => ViewBind.ContainerProvider.Resolve<IParameterPickerService>();
     private PhantomFlagsComboBox flagPicker = new();
@@ -69,7 +69,7 @@ public class CustomCellInteractor : SingleRow.CustomCellDrawerInteractorBase, IC
         if (c is not DatabaseCellViewModel cell)
             return false;
 
-        var threeDots = GetThreeDotRectForCell(cellRect);
+        var threeDots = cellRect.GetThreeDotRectForCell();
         if (leftButton && threeDots.Deflate(3).Contains(mouse) && cell.HasItems && !cell.UseItemPicker && !cell.UseFlagsPicker)
         {
             switch (cell.ParameterValue)

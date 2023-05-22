@@ -16,6 +16,24 @@ namespace WDE.SqlQueryGenerator.Test
         }
         
         [Test]
+        public void TestInsertSingleObjectTwoProps()
+        {
+            var query = Queries
+                .Table("a")
+                .Insert(new { b = 1, c = 2 });
+            Assert.AreEqual($"INSERT INTO `a` (`b`, `c`) VALUES (1, 2);", query.QueryString);
+        }
+
+        [Test]
+        public void TestInsertSingleObjectThreeProps()
+        {
+            var query = Queries
+                .Table("a")
+                .Insert(new { b = 1, c = 2, d = 3 });
+            Assert.AreEqual($"INSERT INTO `a` (`b`, `c`, `d`) VALUES {Environment.NewLine}(1, 2, 3);", query.QueryString);
+        }
+
+        [Test]
         public void TestInsertTwoSimpleObjects()
         {
             var query = Queries

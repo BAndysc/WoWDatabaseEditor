@@ -131,7 +131,6 @@ namespace WDE.DbcStore
         public Dictionary<long, string> MapStore { get; internal set;} = new();
         public Dictionary<long, string> SoundStore { get;internal set; } = new();
         public Dictionary<long, string> MovieStore { get; internal set;} = new();
-        public Dictionary<long, string> CurrencyTypeStore { get; internal set;} = new();
         public Dictionary<long, string> ClassStore { get; internal set;} = new();
         public Dictionary<long, string> RaceStore { get; internal set;} = new();
         public Dictionary<long, string> EmoteStore { get;internal set; } = new();
@@ -140,6 +139,7 @@ namespace WDE.DbcStore
         public Dictionary<long, string> TextEmoteStore { get;internal set; } = new();
         public Dictionary<long, string> AchievementStore { get; internal set;} = new();
         public Dictionary<long, string> ItemStore { get; internal set;} = new();
+        public Dictionary<long, string> CurrencyTypeStore { get; internal set;} = new();
         public Dictionary<long, string> SpellFocusObjectStore { get; internal set; } = new();
         public Dictionary<long, string> QuestInfoStore { get; internal set; } = new();
         public Dictionary<long, string> CharTitleStore { get; internal set; } = new();
