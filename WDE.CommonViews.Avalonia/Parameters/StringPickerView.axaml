@@ -16,6 +16,7 @@
         <TextBox Name="TextBox" Text="{CompiledBinding Content}" 
                  VerticalContentAlignment="Top"
                  utils:FocusUtils.FocusFirst="True"
+                 TextWrapping="Wrap"
                  AcceptsReturn="{CompiledBinding MultiLine}">
         </TextBox>
     </DockPanel>
