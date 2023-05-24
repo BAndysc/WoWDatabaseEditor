@@ -4,6 +4,7 @@ using System.Linq;
 using WDE.Common.QuickAccess;
 using WDE.Module.Attributes;
 using WDE.MVVM;
+using WoWDatabaseEditorCore.Extensions;
 
 namespace WoWDatabaseEditorCore.ViewModels;
 
