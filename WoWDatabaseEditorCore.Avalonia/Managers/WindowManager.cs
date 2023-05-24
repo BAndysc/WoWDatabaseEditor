@@ -228,12 +228,13 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
             return result;
         }
         
-        public void OpenUrl(string url)
+        public void OpenUrl(string url, string arguments)
         {
             var psi = new System.Diagnostics.ProcessStartInfo
             {
                 UseShellExecute = true,
-                FileName = url
+                FileName = url,
+                Arguments = arguments
             };
             System.Diagnostics.Process.Start(psi);
         }
