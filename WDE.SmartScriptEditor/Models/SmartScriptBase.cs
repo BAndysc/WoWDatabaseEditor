@@ -139,7 +139,7 @@ namespace WDE.SmartScriptEditor.Models
         private void GlobalVariableChanged(object? sender, PropertyChangedEventArgs? _)
         {
             foreach (var e in Events)
-                e.InvalidateReadable();
+                e.InvalidateAllParameters();
             InvalidateVisual?.Invoke();
         }
 

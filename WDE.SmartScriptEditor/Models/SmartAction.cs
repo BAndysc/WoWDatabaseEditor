@@ -220,6 +220,13 @@ namespace WDE.SmartScriptEditor.Models
         {
             CallOnChanged(sender);
         }
+        
+        public override void InvalidateAllParameters()
+        {
+            source.InvalidateAllParameters();
+            target.InvalidateAllParameters();
+            base.InvalidateAllParameters();
+        }
 
         public SmartAction Copy()
         {

@@ -170,6 +170,23 @@ namespace WDE.SmartScriptEditor.Models
             OnPropertyChanged(nameof(Readable));
         }
 
+        public virtual void InvalidateAllParameters()
+        {
+            foreach (var p in @params)
+                p.RefreshStringText();
+            if (floatParams != null)
+            {
+                foreach (var p in floatParams)
+                    p.RefreshStringText();
+            }
+            if (stringParams != null)
+            {
+                foreach (var p in stringParams)
+                    p.RefreshStringText();
+            }
+            InvalidateReadable();
+        }
+
         protected void OnPropertyChanged([CallerMemberName]
             string? propertyName = null)
         {
