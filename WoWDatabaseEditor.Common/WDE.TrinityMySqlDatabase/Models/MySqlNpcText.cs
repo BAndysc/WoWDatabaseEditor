@@ -10,6 +10,8 @@ namespace WDE.TrinityMySqlDatabase.Models
         [Column(Name = "ID")]
         public uint Id { get; set; }
 
+        public uint BroadcastTextId { get; set; }
+
         [Column(Name = "text0_0")]
         public string? Text0_0 { get; set; }
         

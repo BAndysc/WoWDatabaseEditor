@@ -12,37 +12,18 @@ using WDE.Common.Utils;
 
 namespace WDE.DatabaseEditors.Parameters;
 
-public class BroadcastTextParameter : IParameter<long>, IAsyncParameter<long>, ICustomPickerParameter<long>
+public class BroadcastTextOnlyPickerParameter : IParameter<long>, ICustomPickerParameter<long>
 {
     private readonly IDatabaseProvider databaseProvider;
-    private readonly ITableEditorPickerService tableEditorPickerService;
-    private readonly IMySqlHotfixExecutor executor;
     private readonly ITabularDataPicker tabularDataPicker;
 
-    public BroadcastTextParameter(IDatabaseProvider databaseProvider,
-        ITableEditorPickerService tableEditorPickerService,
-        IMySqlHotfixExecutor executor,
+    public BroadcastTextOnlyPickerParameter(IDatabaseProvider databaseProvider,
         ITabularDataPicker tabularDataPicker)
     {
         this.databaseProvider = databaseProvider;
-        this.tableEditorPickerService = tableEditorPickerService;
-        this.executor = executor;
         this.tabularDataPicker = tabularDataPicker;
     }
 
-    public async Task<string> ToStringAsync(long val, CancellationToken token)
-    {
-        if (val >= uint.MaxValue || val <= 0)
-            return ToString(val);
-        
-        var result = await databaseProvider.GetBroadcastTextByIdAsync((uint)val);
-        var text = (string.IsNullOrEmpty(result?.Text) ? result?.Text1 : result?.Text);
-        if (text == null || result == null)
-            return ToString(val);
-
-        return $"{text.TrimToLength(60)} ({val})";
-    }
-    
     public async Task<(long, bool)> PickValue(long value)
     {
         var texts = await databaseProvider.GetBroadcastTextsAsync();
@@ -81,8 +62,34 @@ public class BroadcastTextParameter : IParameter<long>, IAsyncParameter<long>, I
     public string? Prefix => null;
     public bool HasItems => true;
     public bool AllowUnknownItems => true;
-    
-    public string ToString(long value) => value == 0 ? "0" : "broadcast text " + value;
+
+    public string ToString(long value) => value.ToString();
 
     public Dictionary<long, SelectOption>? Items => null;
+}
+
+public class BroadcastTextParameter : BroadcastTextOnlyPickerParameter, IAsyncParameter<long>
+{
+    private readonly IDatabaseProvider databaseProvider;
+    private readonly ITabularDataPicker tabularDataPicker;
+
+    public BroadcastTextParameter(IDatabaseProvider databaseProvider,
+        ITabularDataPicker tabularDataPicker) : base (databaseProvider, tabularDataPicker)
+    {
+        this.databaseProvider = databaseProvider;
+        this.tabularDataPicker = tabularDataPicker;
+    }
+
+    public async Task<string> ToStringAsync(long val, CancellationToken token)
+    {
+        if (val >= uint.MaxValue || val <= 0)
+            return ToString(val);
+        
+        var result = await databaseProvider.GetBroadcastTextByIdAsync((uint)val);
+        var text = (string.IsNullOrEmpty(result?.Text) ? result?.Text1 : result?.Text);
+        if (text == null || result == null)
+            return ToString(val);
+
+        return $"{text.TrimToLength(60)} ({val})";
+    }
 }
