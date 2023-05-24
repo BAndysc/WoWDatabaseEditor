@@ -99,7 +99,7 @@ public partial class VariablePickerViewModel : ObservableBase, IDialog
         }, () => SelectedItem != null).ObservesProperty(() => SelectedItem);
         
         Items.DisposeOnRemove();
-        AutoDispose(new ActionDisposable(() => Items.Clear()));
+        AutoDispose(new ActionDisposable(() => Items.RemoveAll()));
     }
 
     [Notify] private VariableItemViewModel? selectedItem;

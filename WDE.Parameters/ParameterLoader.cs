@@ -117,8 +117,8 @@ namespace WDE.Parameters
             factory.Register("QuestParameter", AddDatabaseParameter(new QuestParameter(database, questEntryProviderService)), QuickAccessMode.Limited);
             factory.Register("PrevQuestParameter", AddDatabaseParameter(new PrevQuestParameter(database)));
             factory.Register("GameobjectParameter", AddDatabaseParameter(new GameobjectParameter(database, serverIntegration, itemFromListProvider)), QuickAccessMode.Limited);
-            factory.Register("GossipMenuParameter", AddDatabaseParameter(new GossipMenuParameter(database)));
-            factory.Register("NpcTextParameter", AddDatabaseParameter(new NpcTextParameter(database)));
+            factory.Register("GossipMenuParameter", AddAsyncDatabaseParameter(new GossipMenuParameter(database)));
+            factory.Register("NpcTextParameter", AddAsyncDatabaseParameter(new NpcTextParameter(database)));
             factory.Register("PlayerChoiceParameter", AddAsyncDatabaseParameter(new PlayerChoiceParameter(database)));
             factory.Register("PlayerChoiceResponseParameter", AddAsyncDatabaseParameter(new PlayerChoiceResponseParameter(database)));
             factory.Register("ServersideAreatriggerParameter", AddAsyncDatabaseParameter(new ServersideAreatriggerParameter(database)));
@@ -546,7 +546,7 @@ namespace WDE.Parameters
         }
     }
     
-    public class GossipMenuParameter : LateLoadParameter, IDatabaseObserver, IDynamicParameter<long>
+    public class GossipMenuParameter : LateAsyncLoadParameter, IDatabaseObserver, IDynamicParameter<long>
     {
         private readonly IDatabaseProvider database;
 
@@ -555,15 +555,28 @@ namespace WDE.Parameters
             this.database = database;
         }
 
-        public override void LateLoad()
+        public override async Task LateLoad()
         {
             Items = new Dictionary<long, SelectOption>();
             foreach (IGossipMenu item in database.GetGossipMenus())
-                Items.Add(item.MenuId, new SelectOption((item.Text
-                        .Select(t => t.Text0_0 ?? t.Text0_1 ?? "")
-                        .FirstOrDefault() ?? "")
-                        .Replace("\n", "")
-                        .Truncate(100)));
+            {
+                var text = item.Text
+                    .Select(t => t.Text0_0 ?? t.Text0_1 ?? "")
+                    .FirstOrDefault();
+                if (text == null && item.Text.Select(t => t.BroadcastTextId).FirstOrDefault() is { } broadcastId and > 0)
+                {
+                    var broadcastText = await database.GetBroadcastTextByIdAsync(broadcastId);
+                    if (broadcastText != null)
+                    {
+                        text = broadcastText.Text ?? broadcastText.Text1;
+                    }
+                }
+
+                text ??= "";
+                Items.Add(item.MenuId, new SelectOption(text
+                    .Replace("\n", "")
+                    .Truncate(100)));
+            }
             ItemsChanged?.Invoke(this);
         }
 
@@ -583,7 +596,7 @@ namespace WDE.Parameters
         }
     }
 
-    public class NpcTextParameter : LateLoadParameter, IDatabaseObserver
+    public class NpcTextParameter : LateAsyncLoadParameter, IDatabaseObserver
     {
         private readonly IDatabaseProvider database;
 
@@ -592,11 +605,20 @@ namespace WDE.Parameters
             this.database = database;
         }
 
-        public override void LateLoad()
+        public override async Task LateLoad()
         {
             Items = new Dictionary<long, SelectOption>();
             foreach (INpcText item in database.GetNpcTexts())
-                Items.Add(item.Id, new SelectOption(item.Text0_0 ?? item.Text0_1 ?? ""));
+            {
+                var text = item.Text0_0 ?? item.Text0_1;
+                if (text == null && item.BroadcastTextId > 0)
+                {
+                    var broadcastText = await database.GetBroadcastTextByIdAsync(item.BroadcastTextId);
+                    if (broadcastText != null)
+                        text = broadcastText.Text ?? broadcastText.Text1;
+                }
+                Items.Add(item.Id, new SelectOption(text ?? ""));
+            }
         }
 
         public Type ObservedType => typeof(INpcText);
