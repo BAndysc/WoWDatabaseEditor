@@ -303,6 +303,15 @@ namespace WDE.SmartScriptEditor.Models
             foreach (var c in Conditions)
                 c.InvalidateReadable();
         }
+        
+        public override void InvalidateAllParameters()
+        {
+            base.InvalidateAllParameters();
+            foreach (var a in Actions)
+                a.InvalidateAllParameters();
+            foreach (var c in Conditions)
+                c.InvalidateAllParameters();
+        }
     }
 
     [Flags]
