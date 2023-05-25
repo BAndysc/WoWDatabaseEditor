@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using WDE.Common.Database;
 using WDE.Common.Parameters;
@@ -11,7 +12,7 @@ using WDE.SmartScriptEditor.Models;
 
 namespace WDE.SmartScriptEditor.Parameters;
 
-public class CreatureTextParameter : IContextualParameter<long, SmartBaseElement>, ICustomPickerContextualParameter<long>
+public class CreatureTextParameter : IContextualParameter<long, SmartBaseElement>, IAsyncContextualParameter<long, SmartBaseElement>, ICustomPickerContextualParameter<long>
 {
     private readonly IDatabaseProvider databaseProvider;
     private readonly ITableEditorPickerService tableEditorPickerService;
@@ -143,20 +144,38 @@ public class CreatureTextParameter : IContextualParameter<long, SmartBaseElement
 
     public Dictionary<long, SelectOption>? Items { get; set; }
     
-    public string ToString(long value, SmartBaseElement context)
+    public async Task<string> ToStringAsync(long value, CancellationToken token, SmartBaseElement context)
     {
         var entry = GetEntry(context);
         if (entry == null)
             return value.ToString();
-        var text = databaseProvider.GetCreatureTextsByEntry(entry.Value);
-        if (text == null || text.Count == 0)
+        
+        var texts = databaseProvider.GetCreatureTextsByEntry(entry.Value);
+        if (texts == null || texts.Count == 0)
             return value.ToString();
-        var firstOrDefault = text.FirstOrDefault(x => x.GroupId == value);
-        return firstOrDefault == null ? value.ToString() : $"{firstOrDefault.Text?.TrimToLength(60)} ({value})";
-    }
+        
+        var firstOrDefault = texts.FirstOrDefault(x => x.GroupId == value);
+
+        if (firstOrDefault == null)
+            return value.ToString();
+
+        var text = firstOrDefault.Text;
+
+        if (string.IsNullOrWhiteSpace(text) && firstOrDefault.BroadcastTextId > 0)
+        {
+            var broadcastText = await databaseProvider.GetBroadcastTextByIdAsync(firstOrDefault.BroadcastTextId);
+            text = broadcastText?.Text ?? broadcastText?.Text1;
+        }
     
-    public string ToString(long value)
-    {
+        if (text != null)
+           return text.TrimToLength(60) + $" ({value})";
+
         return value.ToString();
     }
+
+    public string ToString(long value, SmartBaseElement context) 
+        => value.ToString();
+
+    public string ToString(long value) 
+        => value.ToString();
 }
