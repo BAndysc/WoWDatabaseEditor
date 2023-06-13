@@ -29,6 +29,11 @@ namespace WDE.Common.Managers
     public interface IAbstractWindowView
     {
         void Activate();
+        bool IsMaximized { get; }
+        (int x, int y) Position { get; }
+        (int x, int y) Size { get; }
+        void Reposition(int x, int y, bool isMaximized, int width, int height);
+        event Action? OnClosing;
     }
 
     public static class WindowManagerExtensions

@@ -38,6 +38,10 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
             public WindowWrapper(WeakReference<Window> window)
             {
                 this.window = window;
+                if (window.TryGetTarget(out var target))
+                {
+                    target.Closing += (sender, args) => OnClosing?.Invoke();
+                }
             }
             
             public void Activate()
@@ -45,6 +49,73 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
                 if (window.TryGetTarget(out var target))
                     target.Activate();
             }
+
+            public bool IsMaximized
+            {
+                get
+                {
+                    if (window.TryGetTarget(out var target))
+                        return target.WindowState == WindowState.Maximized;
+                    return false;
+                }
+            }
+
+            public (int x, int y) Position
+            {
+                get
+                {
+                    if (window.TryGetTarget(out var target))
+                    {
+                        var pos = target.Position;
+                        return (pos.X, pos.Y);
+                    }
+                    return (0, 0);
+                }
+            }
+
+            public (int x, int y) Size
+            {
+                get
+                {
+                    if (window.TryGetTarget(out var target))
+                    {
+                        // we use screen coords for size so that size is custom app scaling independent 
+                        var screenTopLeftPoint = target.PointToScreen(new Point(target.Position.X, target.Position.Y));
+                        var screenBottomRightPoint = target.PointToScreen(new Point(target.Position.X + target.ClientSize.Width, target.Position.Y + target.ClientSize.Height));
+                        var width = screenBottomRightPoint.X - screenTopLeftPoint.X;
+                        var height = screenBottomRightPoint.Y - screenTopLeftPoint.Y;
+                        return (width, height);
+                    }
+                    return (100, 100);
+                }
+            }
+
+            public void Reposition(int x, int y, bool isMaximized, int width, int height)
+            {
+                if (window.TryGetTarget(out var target))
+                {
+                    var point = new PixelPoint(x, y);
+                    var screen = target.Screens.ScreenFromPoint(point);
+                    if (screen == null)
+                        return;
+                    
+                    target.Position = point;
+
+                    if (isMaximized)
+                    {
+                        target.WindowState = WindowState.Maximized;
+                    }
+                    else
+                    {
+                        var tl = target.PointToClient(new PixelPoint(x, y));
+                        var br = target.PointToClient(new PixelPoint(x + width, y + height));
+                        target.Width = Math.Max(br.X - tl.X, 100);
+                        target.Height = Math.Max(br.Y - tl.Y, 100);
+                    }
+                }
+            }
+            
+            public event Action? OnClosing;
         }
 
         public IAbstractWindowView ShowWindow(IWindowViewModel viewModel, out Task task)
