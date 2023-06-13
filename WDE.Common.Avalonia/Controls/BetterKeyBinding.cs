@@ -26,6 +26,8 @@ namespace WDE.Common.Avalonia.Controls
 
         public bool CanExecute(object? parameter)
         {
+            if (FocusManager.Instance.Current is TextBox tb)
+                return true;
             return CustomCommand.CanExecute(parameter);
         }
 
@@ -38,7 +40,7 @@ namespace WDE.Common.Avalonia.Controls
                 ev.KeyModifiers = Gesture.KeyModifiers;
                 ev.RoutedEvent = InputElement.KeyDownEvent;
                 tb.RaiseEvent(ev);
-                if (!ev.Handled)
+                if (!ev.Handled && CanExecute(parameter))
                     CustomCommand.Execute(parameter);
             }
             else
