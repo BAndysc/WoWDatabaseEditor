@@ -23,16 +23,19 @@ public class StandaloneTableEditService : IStandaloneTableEditService
     private readonly IWindowManager windowManager;
     private readonly IContainerProvider containerProvider;
     private readonly ITableDefinitionProvider definitionProvider;
+    private readonly IStandaloneTableEditorSettings windowsSettings;
     private Dictionary<(string, DatabaseKey?), IAbstractWindowView> openedWindows = new();
 
-    public StandaloneTableEditService(IWindowManager windowManager,
+    internal StandaloneTableEditService(IWindowManager windowManager,
         ITableOpenService tableOpenService,
         IContainerProvider containerProvider,
-        ITableDefinitionProvider definitionProvider)
+        ITableDefinitionProvider definitionProvider,
+        IStandaloneTableEditorSettings windowsSettings)
     {
         this.windowManager = windowManager;
         this.containerProvider = containerProvider;
         this.definitionProvider = definitionProvider;
+        this.windowsSettings = windowsSettings;
     }
     
     public void OpenEditor(string table, DatabaseKey? key)
@@ -77,7 +80,18 @@ public class StandaloneTableEditService : IStandaloneTableEditService
         bool openInNoSaveMode = false;
         var viewModel = containerProvider.Resolve<RowPickerViewModel>((typeof(ViewModelBase), tableViewModel), (typeof(bool), openInNoSaveMode));
         window = windowManager.ShowWindow(viewModel, out var task);
+        if (windowsSettings.GetWindowState(table, out var maximized, out var x, out var y, out var width, out var height))
+        {
+            window.Reposition(x, y, maximized, width, height);
+        }
         openedWindows[(table, key)] = window;
+        window.OnClosing += () =>
+        {
+            var position = window.Position;
+            var size = window.Size;
+            var maximized = window.IsMaximized;
+            windowsSettings.UpdateWindowState(table, maximized, position.x, position.y, size.x, size.y);
+        };
         WindowLifetimeTask(table, key, window, task).ListenErrors();
     }
 
