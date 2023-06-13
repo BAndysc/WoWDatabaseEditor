@@ -108,6 +108,7 @@
                                 Selected="{CompiledBinding IsSelected, Mode=TwoWay}"
                                 userControls:SmartScriptPanelLayout.Selected="{CompiledBinding IsSelected, Mode=TwoWay}"
                                 DirectEditParameter="{Binding DataContext.DirectEditParameter, ElementName=Rooot}"
+                                DirectOpenParameter="{Binding DataContext.DirectOpenParameter, ElementName=Rooot}"
                                 DeselectActionsOfDeselectedEventsRequest="{Binding DataContext.DeselectAllButEvents, ElementName=Rooot}"
                                 DeselectAllRequest="{Binding DataContext.DeselectAll, ElementName=Rooot}"
                                 IsSelected="{CompiledBinding IsSelected, Mode=TwoWay}"

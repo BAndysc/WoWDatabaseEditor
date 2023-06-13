@@ -878,7 +878,7 @@ namespace WDE.Parameters
                     Items.Add(item.Key, item.Value);
             if (db.Items != null)
                 foreach (var item in db.Items)
-                    Items.Add(item.Key, item.Value);
+                    Items[item.Key] = item.Value;
         }
 
         private void Reload(IParameter<long> obj)
