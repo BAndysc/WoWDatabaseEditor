@@ -90,7 +90,8 @@ public class VirtualizedGridView : TemplatedControl
             {
                 index = IsIndexValid(focusedIndex) ? ClampIndex(focusedIndex!.Value + 1) : ClampIndex(0);
             }
-            UpdateSelectionFromIndex(rangeModifier, toggleModifier, index);
+            if (IsIndexValid(index))
+                UpdateSelectionFromIndex(rangeModifier, toggleModifier, index);
             e.Handled = true;
         }
     }
@@ -151,7 +152,7 @@ public class VirtualizedGridView : TemplatedControl
     {
         var container = GetContainerFromEventSource(eventSource);
 
-        if (container != null && container.Tag is int index)
+        if (container != null && container.Tag is int index && IsIndexValid(index))
         {
             UpdateSelectionFromIndex(rangeModifier, toggleModifier, index);
             return true;
