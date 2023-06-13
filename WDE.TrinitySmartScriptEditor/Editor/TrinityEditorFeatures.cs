@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using WDE.Common.CoreVersion;
+using WDE.Common.Database;
 using WDE.Common.Parameters;
 using WDE.Module.Attributes;
+using WDE.SmartScriptEditor;
 using WDE.SmartScriptEditor.Editor;
 using WDE.SmartScriptEditor.Models;
 
@@ -23,6 +25,7 @@ namespace WDE.TrinitySmartScriptEditor.Editor
         public ParametersCount TargetParametersCount { get; } = new ParametersCount(3, 4, 0);
         public IParameter<long> ConditionTargetParameter { get; }
         public IParameter<long> EventFlagsParameter => SmartEventFlagParameter.Instance;
+        public ISmartScriptSolutionItem CreateSolutionItem(SmartScriptType type, int entry) => new SmartScriptSolutionItem(entry, type);
 
         public TrinityEditorFeatures(ICurrentCoreVersion coreVersion)
         {

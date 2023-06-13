@@ -1,4 +1,6 @@
+using WDE.Common.Database;
 using WDE.Common.Parameters;
+using WDE.SmartScriptEditor.Models;
 
 namespace WDE.SmartScriptEditor.Editor
 {
@@ -18,6 +20,7 @@ namespace WDE.SmartScriptEditor.Editor
         ParametersCount TargetParametersCount { get; }
         IParameter<long> ConditionTargetParameter { get; }
         IParameter<long> EventFlagsParameter { get; }
+        ISmartScriptSolutionItem CreateSolutionItem(SmartScriptType type, int entry);
     }
 
     public readonly struct ParametersCount

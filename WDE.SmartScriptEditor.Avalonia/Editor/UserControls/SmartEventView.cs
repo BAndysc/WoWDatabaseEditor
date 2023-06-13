@@ -23,6 +23,8 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
                 o => o.DeselectActionsOfDeselectedEventsRequest,
                 (o, v) => o.DeselectActionsOfDeselectedEventsRequest = v);
         
+        public static AvaloniaProperty DirectOpenParameterProperty =
+            AvaloniaProperty.Register<SmartEventView, ICommand>(nameof(DirectOpenParameter));
         
         public static readonly DirectProperty<SmartEventView, ICommand?> DirectEditParameterProperty =
             AvaloniaProperty.RegisterDirect<SmartEventView, ICommand?>(
@@ -51,6 +53,12 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
             set => SetAndRaise(DirectEditParameterProperty, ref directEditParameter, value);
         }
 
+        public ICommand DirectOpenParameter
+        {
+            get => (ICommand) GetValue(DirectOpenParameterProperty);
+            set => SetValue(DirectOpenParameterProperty, value);
+        }
+
         protected override void OnEdit()
         {
             EditEventCommand?.Execute(DataContext);
@@ -58,7 +66,10 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
 
         protected override void OnDirectEdit(bool controlPressed, object context)
         {
-            DirectEditParameter?.Execute(context);
+            if (controlPressed) 
+                DirectOpenParameter?.Execute(context);
+            else
+                DirectEditParameter?.Execute(context);
         }
         
         protected override void DeselectOthers()

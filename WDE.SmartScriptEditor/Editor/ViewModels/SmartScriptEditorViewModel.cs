@@ -38,6 +38,7 @@ using WDE.SmartScriptEditor.Exporter;
 using WDE.SmartScriptEditor.Models;
 using WDE.SmartScriptEditor.History;
 using WDE.SmartScriptEditor.Inspections;
+using WDE.SmartScriptEditor.Parameters;
 using WDE.SmartScriptEditor.Services;
 using WDE.SmartScriptEditor.Settings;
 using WDE.SqlQueryGenerator;
@@ -517,7 +518,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             {
                 if (obj is ParameterWithContext param)
                 {
-//                    param.
+                    if (param.Parameter.Parameter is IDoActionOnControlClickParameter doActionParameter)
+                        await doActionParameter.Invoke(param.Parameter.Value);
                 }
             });
             /*SaveCommand = new AsyncAutoCommand(SaveAllToDb,

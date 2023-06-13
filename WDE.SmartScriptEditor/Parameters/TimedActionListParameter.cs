@@ -1,21 +1,30 @@
 using System.Linq;
 using System.Threading.Tasks;
+using Prism.Events;
 using WDE.Common.Database;
+using WDE.Common.Events;
 using WDE.Common.Parameters;
 using WDE.Common.Providers;
+using WDE.SmartScriptEditor.Editor;
 
 namespace WDE.SmartScriptEditor.Parameters;
 
-public class TimedActionListParameter : Parameter, ICustomPickerParameter<long>
+public class TimedActionListParameter : Parameter, ICustomPickerParameter<long>, IDoActionOnControlClickParameter
 {
     private readonly IDatabaseProvider databaseProvider;
     private readonly IItemFromListProvider itemFromListProvider;
+    private readonly IEventAggregator eventAggregator;
+    private readonly IEditorFeatures editorFeatures;
 
     public TimedActionListParameter(IDatabaseProvider databaseProvider,
-        IItemFromListProvider itemFromListProvider)
+        IItemFromListProvider itemFromListProvider,
+        IEventAggregator eventAggregator,
+        IEditorFeatures editorFeatures)
     {
         this.databaseProvider = databaseProvider;
         this.itemFromListProvider = itemFromListProvider;
+        this.eventAggregator = eventAggregator;
+        this.editorFeatures = editorFeatures;
     }
     
     public override string ToString(long key)
@@ -46,5 +55,11 @@ public class TimedActionListParameter : Parameter, ICustomPickerParameter<long>
         if (result.HasValue)
             return (result.Value, true);
         return (0, false);
+    }
+
+    public async Task Invoke(long value)
+    {
+        var item = editorFeatures.CreateSolutionItem(SmartScriptType.TimedActionList, (int)value);
+        eventAggregator.GetEvent<EventRequestOpenItem>().Publish(item);
     }
 }

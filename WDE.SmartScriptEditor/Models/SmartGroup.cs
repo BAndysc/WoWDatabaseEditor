@@ -1,3 +1,4 @@
+using WDE.Common.Database;
 using WDE.Common.Parameters;
 using WDE.SmartScriptEditor.Editor;
 
@@ -74,4 +75,5 @@ public class SmartGroupFakeEditorFeatures : IEditorFeatures
     public ParametersCount TargetParametersCount { get; } = new ParametersCount(0, 0, 0);
     public IParameter<long> ConditionTargetParameter => Parameter.Instance;
     public IParameter<long> EventFlagsParameter => Parameter.Instance;
+    public ISmartScriptSolutionItem CreateSolutionItem(SmartScriptType type, int entry) => throw new System.NotImplementedException();
 }
