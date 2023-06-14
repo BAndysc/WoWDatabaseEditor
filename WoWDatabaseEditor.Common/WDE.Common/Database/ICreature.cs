@@ -55,4 +55,12 @@ namespace WDE.Common.Database
     {
         uint Entry { get; }
     }
+
+    public static class CreatureExtensions
+    {
+        public static SpawnKey Key(this ICreature that)
+        {
+            return new SpawnKey(that.Entry, that.Guid);
+        }
+    }
 }

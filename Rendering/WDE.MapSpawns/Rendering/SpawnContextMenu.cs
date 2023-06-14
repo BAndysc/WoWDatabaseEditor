@@ -63,6 +63,7 @@ public class SpawnContextMenu
                 var diff = new CreatureDiff()
                 {
                     Guid = inst.Guid,
+                    Entry = inst.Entry,
                     Position = inst.WorldObject!.Position,
                     Orientation = creature.Creature!.Orientation
                 };
@@ -73,6 +74,7 @@ public class SpawnContextMenu
                 var diff = new GameObjectDiff()
                 {
                     Guid = inst.Guid,
+                    Entry = inst.Entry,
                     Position = inst.WorldObject!.Position,
                     Orientation = go.GameObject!.Orientation,
                     Rotation = go.GameObject!.Rotation

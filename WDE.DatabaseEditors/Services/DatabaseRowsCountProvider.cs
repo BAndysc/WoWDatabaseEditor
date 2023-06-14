@@ -49,9 +49,10 @@ public class DatabaseRowsCountProvider : IDatabaseRowsCountProvider
         if (!providers.TryGetValue(table, out var provider))
         {
             var definition = definitionProvider.GetDefinition("creature");
-            if (definition == null || !definition.TableColumns.ContainsKey("id"))
+            if (definition == null || (!definition.TableColumns.ContainsKey("id") && !definition.TableColumns.ContainsKey("entry")))
                 return 0;
-            provider = new BulkAsyncTableRowProvider(executor, definition, "id");
+            var columnToGroupBy = definition.TableColumns.ContainsKey("entry") ? "entry" : "id";
+            provider = new BulkAsyncTableRowProvider(executor, definition, columnToGroupBy);
             providers[table] = provider;
         }
 

@@ -77,7 +77,7 @@ namespace WDE.DbcStore
                     return;
                 Items = new();
                 foreach (var i in items)
-                    Items.Add(i.Entry, new SelectOption(i.Name));
+                    Items[i.Entry] = new SelectOption(i.Name);
             }
         }
         

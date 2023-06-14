@@ -6,6 +6,7 @@ using WDE.Common.Events;
 using WDE.Common.Parameters;
 using WDE.Common.Providers;
 using WDE.SmartScriptEditor.Editor;
+using WDE.SmartScriptEditor.Services;
 
 namespace WDE.SmartScriptEditor.Parameters;
 
@@ -15,16 +16,19 @@ public class TimedActionListParameter : Parameter, ICustomPickerParameter<long>,
     private readonly IItemFromListProvider itemFromListProvider;
     private readonly IEventAggregator eventAggregator;
     private readonly IEditorFeatures editorFeatures;
+    private readonly ISmartScriptFactory smartScriptFactory;
 
     public TimedActionListParameter(IDatabaseProvider databaseProvider,
         IItemFromListProvider itemFromListProvider,
         IEventAggregator eventAggregator,
-        IEditorFeatures editorFeatures)
+        IEditorFeatures editorFeatures,
+        ISmartScriptFactory smartScriptFactory)
     {
         this.databaseProvider = databaseProvider;
         this.itemFromListProvider = itemFromListProvider;
         this.eventAggregator = eventAggregator;
         this.editorFeatures = editorFeatures;
+        this.smartScriptFactory = smartScriptFactory;
     }
     
     public override string ToString(long key)
@@ -59,7 +63,7 @@ public class TimedActionListParameter : Parameter, ICustomPickerParameter<long>,
 
     public async Task Invoke(long value)
     {
-        var item = editorFeatures.CreateSolutionItem(SmartScriptType.TimedActionList, (int)value);
+        var item = editorFeatures.HasCreatureEntry ?  smartScriptFactory.Factory((uint)value, 0, SmartScriptType.TimedActionList) : smartScriptFactory.Factory(null, (int)value, SmartScriptType.TimedActionList);
         eventAggregator.GetEvent<EventRequestOpenItem>().Publish(item);
     }
 }

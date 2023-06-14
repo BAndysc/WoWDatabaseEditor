@@ -66,6 +66,14 @@ public class CreatureTextParameter : IContextualParameter<long, SmartBaseElement
     {
         uint? GetCreatureEntryFromScript(SmartScript smartScript)
         {
+            if (smartScript.Entry.HasValue)
+            {
+                if (smartScript.SourceType is SmartScriptType.Template or SmartScriptType.TimedActionList)
+                    return smartScript.Entry.Value / 100;
+
+                return smartScript.Entry.Value;
+            }
+            
             if (smartScript.EntryOrGuid >= 0)
             {
                 if (smartScript.SourceType is SmartScriptType.Template or SmartScriptType.TimedActionList)
@@ -74,7 +82,7 @@ public class CreatureTextParameter : IContextualParameter<long, SmartBaseElement
                 return (uint)smartScript.EntryOrGuid;
             }
 
-            return databaseProvider.GetCreatureByGuid((uint)(-smartScript.EntryOrGuid))?.Entry;
+            return databaseProvider.GetCreatureByGuid(0, (uint)(-smartScript.EntryOrGuid))?.Entry;
         }
 
         var script = GetScript(element);
@@ -93,7 +101,7 @@ public class CreatureTextParameter : IContextualParameter<long, SmartBaseElement
                 return GetCreatureEntryFromScript(smartScript);
             }
             else if (action.Source.Id == 10) // creature guid
-                return databaseProvider.GetCreatureByGuid((uint)action.Source.GetParameter(0).Value)?.Entry;
+                return databaseProvider.GetCreatureByGuid(0, (uint)action.Source.GetParameter(0).Value)?.Entry;
             else if (targetIdToCreatureEntryParameter.TryGetValue(action.Source.Id, out var creatureEntryParameterIndex))
                 return (uint)action.Source.GetParameter(creatureEntryParameterIndex).Value;
             else if (action.Source.Id == 12 || action.Source.Id == 58) // stored target / actor

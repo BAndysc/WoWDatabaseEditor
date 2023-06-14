@@ -23,7 +23,7 @@ public class TrinityCreatureDiffQueryProvider : IUpdateQueryProvider<CreatureDif
     {
         var trans = Queries.BeginTransaction();
 
-        var creatureEntry = databaseProvider.GetCreatureByGuid(diff.Guid);
+        var creatureEntry = databaseProvider.GetCreatureByGuid(diff.Guid, diff.Entry);
 
         if (creatureEntry != null)
             trans.Comment(creatureEntry.Guid.ToString());

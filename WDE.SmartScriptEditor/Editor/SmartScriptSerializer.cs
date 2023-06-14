@@ -59,6 +59,7 @@ namespace WDE.SmartScriptEditor.Exporter
         }
 
         public static AbstractSmartScriptLine[] ToSmartScriptLines(this SmartEvent e,
+            uint? creatureEntry,
             int scriptEntryOrGuid,
             SmartScriptType scriptSourceType,
             int id,
@@ -86,6 +87,7 @@ namespace WDE.SmartScriptEditor.Exporter
                 SmartAction a = actions[index];
                 AbstractSmartScriptLine line = new()
                 {
+                    CreatureEntry = creatureEntry,
                     EntryOrGuid = scriptEntryOrGuid,
                     ScriptSourceType = (int) scriptSourceType,
                     Id = id + (autoLinks ? index : 0),

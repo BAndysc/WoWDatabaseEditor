@@ -6,7 +6,8 @@ namespace WDE.SmartScriptEditor.Models
 {
     public interface ISmartScriptSolutionItem : ISolutionItem
     {
-        int Entry { get; }
+        uint? Entry { get; }
+        int EntryOrGuid { get; }
         SmartScriptType SmartType { get; }
         void UpdateDependants(HashSet<long> usedTimed);
     }

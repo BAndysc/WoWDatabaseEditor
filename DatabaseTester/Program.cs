@@ -239,7 +239,7 @@ public class Program
         }
 
         // methods with > 1 parameters
-        worldDb.GetScriptFor(0, SmartScriptType.Creature);
+        worldDb.GetScriptFor(0, 0, SmartScriptType.Creature);
         worldDb.GetConditionsFor(0, 0, 0);
         await worldDb.FindSmartScriptLinesBy(new (IDatabaseProvider.SmartLinePropertyType what, int whatValue, int parameterIndex, long valueToSearch)[] { (IDatabaseProvider.SmartLinePropertyType.Action, 0, 0, 0) });
         

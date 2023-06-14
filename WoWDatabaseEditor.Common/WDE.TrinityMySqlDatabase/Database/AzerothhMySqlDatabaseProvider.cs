@@ -76,7 +76,7 @@ public class AzerothhMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvider<Az
         return null;
     }
     
-    public override ICreature? GetCreatureByGuid(uint guid)
+    public override ICreature? GetCreatureByGuid(uint entry, uint guid)
     {
         using var model = Database();
         return model.Creature.FirstOrDefault(c => c.Guid == guid);
@@ -149,7 +149,7 @@ public class AzerothhMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvider<Az
         return model.GameObject.ToList<IGameObject>();
     }
     
-    public override IGameObject? GetGameObjectByGuid(uint guid)
+    public override IGameObject? GetGameObjectByGuid(uint entry, uint guid)
     {
         using var model = Database();
         return model.GameObject.FirstOrDefault(g => g.Guid == guid);
@@ -196,13 +196,13 @@ public class AzerothhMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvider<Az
         return model.CreatureModelInfo.FirstOrDefault(x => x.DisplayId == displayId);
     }
 
-    public override async Task<IGameObject?> GetGameObjectByGuidAsync(uint guid)
+    public override async Task<IGameObject?> GetGameObjectByGuidAsync(uint entry, uint guid)
     {
         await using var model = Database();
         return await model.GameObject.FirstOrDefaultAsync(x => x.Guid == guid);
     }
 
-    public override async Task<ICreature?> GetCreaturesByGuidAsync(uint guid)
+    public override async Task<ICreature?> GetCreaturesByGuidAsync(uint entry, uint guid)
     {
         await using var model = Database();
         return await model.Creature.FirstOrDefaultAsync(x => x.Guid == guid);
@@ -220,7 +220,7 @@ public class AzerothhMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvider<Az
         return await model.CreatureTemplateAddon.ToListAsync<ICreatureTemplateAddon>();
     }
         
-    public override async Task<ICreatureAddon?> GetCreatureAddon(uint guid)
+    public override async Task<ICreatureAddon?> GetCreatureAddon(uint entry, uint guid)
     {
         await using var model = Database();
         return await model.CreatureAddon.FirstOrDefaultAsync<ICreatureAddon>(x => x.Guid == guid);

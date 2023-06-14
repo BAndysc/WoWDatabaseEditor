@@ -56,7 +56,9 @@ public class GossipMenuOptionParameter : IContextualParameter<long, SmartBaseEle
         
         uint? entry = 0;
         if (script.EntryOrGuid < 0)
-            entry = databaseProvider.GetCreatureByGuid((uint)(-script.EntryOrGuid))?.Entry;
+            entry = databaseProvider.GetCreatureByGuid(0, (uint)(-script.EntryOrGuid))?.Entry;
+        else if (script.Entry.HasValue)
+            entry = script.Entry.Value;
         else
             entry = (uint)script.EntryOrGuid;
         

@@ -45,7 +45,7 @@ public class CreatureGUIDParameter : CreatureGUIDPickerOnlyParameter, IAsyncPara
     
     public async Task<string> ToStringAsync(long val, CancellationToken token)
     {
-        var creature = await databaseProvider.GetCreaturesByGuidAsync((uint)val);
+        var creature = await databaseProvider.GetCreaturesByGuidAsync(0, (uint)val);
         if (creature == null)
             return val + " (not found)";
 
@@ -72,7 +72,7 @@ public class CreatureGUIDEntryOnlyParameter : CreatureGUIDPickerOnlyParameter, I
     
     public async Task<string> ToStringAsync(long val, CancellationToken token)
     {
-        var creature = await databaseProvider.GetCreaturesByGuidAsync((uint)val);
+        var creature = await databaseProvider.GetCreaturesByGuidAsync(0, (uint)val);
         if (creature == null)
             return "(not found)";
 

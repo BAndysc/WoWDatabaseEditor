@@ -19,12 +19,12 @@ namespace WDE.TrinitySmartScriptEditor.Editor
             this.databaseProvider = databaseProvider;
         }
         
-        public Task<IList<ISmartScriptLine>> GetScriptFor(int entryOrGuid, SmartScriptType type)
+        public Task<IList<ISmartScriptLine>> GetScriptFor(uint entry, int entryOrGuid, SmartScriptType type)
         {
-            return databaseProvider.GetScriptForAsync(entryOrGuid, type);
+            return databaseProvider.GetScriptForAsync(entry, entryOrGuid, type);
         }
         
-        public IEnumerable<IConditionLine> GetConditionsForScript(int entryOrGuid, SmartScriptType type)
+        public IEnumerable<IConditionLine> GetConditionsForScript(uint? entry, int entryOrGuid, SmartScriptType type)
         {
             return databaseProvider.GetConditionsFor(SmartConstants.ConditionSourceSmartScript, entryOrGuid, (int)type);
         }
@@ -34,6 +34,6 @@ namespace WDE.TrinitySmartScriptEditor.Editor
             return databaseProvider.FindSmartScriptLinesBy(conditions);
         }
 
-        public IEnumerable<IConditionLine> GetConditionsForSourceTarget(int entryOrGuid, SmartScriptType type) => Enumerable.Empty<IConditionLine>();
+        public IEnumerable<IConditionLine> GetConditionsForSourceTarget(uint? entry, int entryOrGuid, SmartScriptType type) => Enumerable.Empty<IConditionLine>();
     }
 }

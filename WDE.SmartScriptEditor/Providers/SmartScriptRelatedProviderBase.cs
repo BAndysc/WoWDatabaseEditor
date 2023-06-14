@@ -43,21 +43,27 @@ namespace WDE.SmartScriptEditor.Providers
                 item.SmartType != SmartScriptType.Quest)
                 return Task.FromResult<RelatedSolutionItem?>(null);
 
-            if (item.Entry >= 0)
+            if (item.Entry.HasValue)
             {
                 return Task.FromResult<RelatedSolutionItem?>(
-                    new RelatedSolutionItem(SmartScriptToRelatedType(item.SmartType), item.Entry));
+                    new RelatedSolutionItem(SmartScriptToRelatedType(item.SmartType), item.Entry.Value));
+            }
+            
+            if (item.EntryOrGuid >= 0)
+            {
+                return Task.FromResult<RelatedSolutionItem?>(
+                    new RelatedSolutionItem(SmartScriptToRelatedType(item.SmartType), item.EntryOrGuid));
             }
 
             if (item.SmartType == SmartScriptType.Creature)
             {
-                var creature = databaseProvider.GetCreatureByGuid((uint)(-item.Entry));
+                var creature = databaseProvider.GetCreatureByGuid(0, (uint)(-item.EntryOrGuid));
                 if (creature == null)
                     return Task.FromResult<RelatedSolutionItem?>(null);
                 return Task.FromResult<RelatedSolutionItem?>(new RelatedSolutionItem(RelatedSolutionItem.RelatedType.CreatureEntry, creature.Entry));
             }
             
-            var gameobject = databaseProvider.GetGameObjectByGuid((uint)(-item.Entry));
+            var gameobject = databaseProvider.GetGameObjectByGuid(0, (uint)(-item.EntryOrGuid));
             if (gameobject == null)
                 return Task.FromResult<RelatedSolutionItem?>(null);
             return Task.FromResult<RelatedSolutionItem?>(new RelatedSolutionItem(RelatedSolutionItem.RelatedType.GameobjectEntry, gameobject.Entry));

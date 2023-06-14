@@ -57,7 +57,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public Task<IList<ISmartScriptLine>> GetLinesCallingSmartTimedActionList(int timedActionList) => Task.FromResult<IList<ISmartScriptLine>>(new List<ISmartScriptLine>());
 
-        public IEnumerable<ISmartScriptLine> GetScriptFor(int entryOrGuid, SmartScriptType type) => Enumerable.Empty<ISmartScriptLine>();
+        public IEnumerable<ISmartScriptLine> GetScriptFor(uint entry, int entryOrGuid, SmartScriptType type) => Enumerable.Empty<ISmartScriptLine>();
 
         public Task InstallConditions(IEnumerable<IConditionLine> conditions, IDatabaseProvider.ConditionKeyMask keyMask, IDatabaseProvider.ConditionKey? manualKey = null) => Task.FromResult(false);
 
@@ -90,9 +90,9 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public Task<IBroadcastText?> GetBroadcastTextByTextAsync(string text) => Task.FromResult<IBroadcastText?>(null);
 
-        public ICreature? GetCreatureByGuid(uint guid) => null;
+        public ICreature? GetCreatureByGuid(uint entry, uint guid) => null;
 
-        public IGameObject? GetGameObjectByGuid(uint guid) => null;
+        public IGameObject? GetGameObjectByGuid(uint entry, uint guid) => null;
         
         public IEnumerable<ICreature> GetCreaturesByEntry(uint entry) => Enumerable.Empty<ICreature>();
 
@@ -143,7 +143,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public Task<List<IBroadcastText>> GetBroadcastTextsAsync() => Task.FromResult(new List<IBroadcastText>());
 
-        public async Task<IList<ISmartScriptLine>> GetScriptForAsync(int entryOrGuid, SmartScriptType type) => new List<ISmartScriptLine>();
+        public async Task<IList<ISmartScriptLine>> GetScriptForAsync(uint entry, int entryOrGuid, SmartScriptType type) => new List<ISmartScriptLine>();
 
         public Task<List<IEventScriptLine>> GetEventScript(EventScriptType type, uint id) => Task.FromResult(new List<IEventScriptLine>());
         public Task<IList<ICreatureModelInfo>> GetCreatureModelInfoAsync()
@@ -170,12 +170,12 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public async Task<IList<IGameEventCreature>> GetGameEventCreaturesAsync() => new List<IGameEventCreature>();
         public async Task<IList<IGameEventGameObject>> GetGameEventGameObjectsAsync() => new List<IGameEventGameObject>();
-        public async Task<IList<IGameEventCreature>?> GetGameEventCreaturesByGuidAsync(uint guid) => new List<IGameEventCreature>();
-        public async Task<IList<IGameEventGameObject>?> GetGameEventGameObjectsByGuidAsync(uint guid) => new List<IGameEventGameObject>();
+        public async Task<IList<IGameEventCreature>?> GetGameEventCreaturesByGuidAsync(uint entry, uint guid) => new List<IGameEventCreature>();
+        public async Task<IList<IGameEventGameObject>?> GetGameEventGameObjectsByGuidAsync(uint entry, uint guid) => new List<IGameEventGameObject>();
         public async Task<IList<ICreatureEquipmentTemplate>?> GetCreatureEquipmentTemplates(uint entry) => new List<ICreatureEquipmentTemplate>();
-        public async Task<IGameObject?> GetGameObjectByGuidAsync(uint guid) => null;
-        public async Task<ICreature?> GetCreaturesByGuidAsync(uint guid) => null;
-        public async Task<ICreatureAddon?> GetCreatureAddon(uint guid) => null;
+        public async Task<IGameObject?> GetGameObjectByGuidAsync(uint entry, uint guid) => null;
+        public async Task<ICreature?> GetCreaturesByGuidAsync(uint entry, uint guid) => null;
+        public async Task<ICreatureAddon?> GetCreatureAddon(uint entry, uint guid) => null;
         public async Task<ICreatureTemplateAddon?> GetCreatureTemplateAddon(uint entry) => null;
         public async Task<IReadOnlyList<IWaypointData>?> GetWaypointData(uint pathId) => null;
         public async Task<IReadOnlyList<ISmartScriptWaypoint>?> GetSmartScriptWaypoints(uint pathId) => null;

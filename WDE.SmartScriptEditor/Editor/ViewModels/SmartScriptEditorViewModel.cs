@@ -716,7 +716,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                         }).ToList();
                     
                     var eventLines = selectedEvents
-                        .SelectMany((e, index) => e.ToSmartScriptLines(script.EntryOrGuid, script.SourceType, index))
+                        .SelectMany((e, index) => e.ToSmartScriptLines(script.Entry, script.EntryOrGuid, script.SourceType, index))
                         .ToList();
 
                     var conditionLines = selectedEvents
@@ -758,7 +758,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                             fakeEvent.AddAction(a.Copy());
 
                         var lines = fakeEvent
-                            .ToSmartScriptLines(script.EntryOrGuid, script.SourceType, 0);
+                            .ToSmartScriptLines(script.Entry, script.EntryOrGuid, script.SourceType, 0);
 
                         var serialized = JsonConvert.SerializeObject(new ClipboardEvents() { Lines = lines.ToList(), TargetConditions = targetConditions});
                         clipboard.SetText(serialized);
@@ -1531,7 +1531,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             this.item = newItem;
             Title = newItem.SmartType == SmartScriptType.TimedActionList ?
                 itemNameRegistry.GetName(newItem) :
-                itemNameRegistry.GetName(newItem) + $" ({newItem.Entry})";
+                itemNameRegistry.GetName(newItem) + $" ({newItem.EntryOrGuid})";
             
             Script = new SmartScript(this.item, smartFactory, smartDataManager, messageBoxService, editorFeatures, smartScriptImporter);
 
@@ -1600,9 +1600,9 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         private async Task AsyncLoad()
         {
             await editorExtension.BeforeLoad(this, item);
-            var lines = (await smartScriptDatabase.GetScriptFor(item.Entry, item.SmartType)).ToList();
-            var conditions = smartScriptDatabase.GetConditionsForScript(item.Entry, item.SmartType).ToList();
-            var targetSourceConditions = smartScriptDatabase.GetConditionsForSourceTarget(item.Entry, item.SmartType).ToList();
+            var lines = (await smartScriptDatabase.GetScriptFor(item.Entry ?? 0, item.EntryOrGuid, item.SmartType)).ToList();
+            var conditions = smartScriptDatabase.GetConditionsForScript(item.Entry, item.EntryOrGuid, item.SmartType).ToList();
+            var targetSourceConditions = smartScriptDatabase.GetConditionsForSourceTarget(item.Entry, item.EntryOrGuid, item.SmartType).ToList();
             await smartScriptImporter.Import(script, false, lines, conditions, targetSourceConditions);
             IsLoading = false;
             History.AddHandler(new SaiHistoryHandler(script, smartFactory));

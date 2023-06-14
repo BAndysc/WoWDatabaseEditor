@@ -9,6 +9,7 @@ using WDE.Common.Types;
 using WDE.Common.Utils;
 using WDE.Module.Attributes;
 using WDE.SmartScriptEditor.Data;
+using WDE.SmartScriptEditor.Editor;
 using WDE.SmartScriptEditor.Editor.ViewModels;
 using WDE.SmartScriptEditor.Models;
 using WDE.SmartScriptEditor.Settings;
@@ -30,6 +31,7 @@ public class DynamicContextMenuService : IDynamicContextMenuService
     private readonly IEventAggregator eventAggregator;
     private readonly ISmartScriptFactory scriptFactory;
     private readonly IDbcSpellService spellService;
+    private readonly IEditorFeatures editorFeatures;
     private readonly IGeneralSmartScriptSettingsProvider preferences;
     private Dictionary<int, List<Entry>> perActionMenus = new();
 
@@ -50,6 +52,7 @@ public class DynamicContextMenuService : IDynamicContextMenuService
         IEventAggregator eventAggregator,
         ISmartScriptFactory scriptFactory,
         IDbcSpellService spellService,
+        IEditorFeatures editorFeatures,
         IGeneralSmartScriptSettingsProvider preferences)
     {
         this.dataManager = dataManager;
@@ -57,6 +60,7 @@ public class DynamicContextMenuService : IDynamicContextMenuService
         this.eventAggregator = eventAggregator;
         this.scriptFactory = scriptFactory;
         this.spellService = spellService;
+        this.editorFeatures = editorFeatures;
         this.preferences = preferences;
         foreach (var actionData in dataManager.GetAllData(SmartType.SmartAction))
         {
@@ -119,10 +123,9 @@ public class DynamicContextMenuService : IDynamicContextMenuService
                 return;
             
             var selectedAction = vm.Events[selectedActionIndex.eventIndex].Actions[selectedActionIndex.actionIndex];
-
-            var script = scriptFactory.Factory(
-                (int)selectedAction.GetParameter(menuItem.EntryFromParameter).Value,
-                menuItem.ScriptType);
+            var value = selectedAction.GetParameter(menuItem.EntryFromParameter).Value;
+            
+            var script = editorFeatures.HasCreatureEntry ? scriptFactory.Factory((uint)value, 0, menuItem.ScriptType) : scriptFactory.Factory(null, (int)value, menuItem.ScriptType);
             eventAggregator.GetEvent<EventRequestOpenItem>().Publish(script);
         });
     }

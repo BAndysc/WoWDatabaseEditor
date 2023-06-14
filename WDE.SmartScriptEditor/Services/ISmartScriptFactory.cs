@@ -6,5 +6,5 @@ namespace WDE.SmartScriptEditor.Services;
 //[UniqueProvider]
 public interface ISmartScriptFactory
 {
-    ISmartScriptSolutionItem Factory(int entryOrGuid, SmartScriptType type);
+    ISmartScriptSolutionItem Factory(uint? entry, int entryOrGuid, SmartScriptType type);
 }

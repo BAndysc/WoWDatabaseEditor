@@ -24,4 +24,12 @@ namespace WDE.Common.Database
 
         uint SpawnKey => 0;
     }
+
+    public static class GameObjectExtensions
+    {
+        public static SpawnKey Key(this IGameObject that)
+        {
+            return new SpawnKey(that.Entry, that.Guid);
+        }
+    }
 }

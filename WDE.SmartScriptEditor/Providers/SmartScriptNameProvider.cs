@@ -25,14 +25,16 @@ namespace WDE.SmartScriptEditor.Providers
             this.parameterFactory = parameterFactory;
         }
 
-        protected virtual string? TryGetName(int entryOrGuid, SmartScriptType type)
+        protected virtual string? TryGetName(uint? scriptEntry, int entryOrGuid, SmartScriptType type)
         {
             uint? entry = 0;
             switch (type)
             {
                 case SmartScriptType.Creature:
                     if (entryOrGuid < 0)
-                        entry = database.GetCreatureByGuid((uint)-entryOrGuid)?.Entry;
+                        entry = database.GetCreatureByGuid(0, (uint)-entryOrGuid)?.Entry;
+                    else if (scriptEntry.HasValue)
+                        entry = scriptEntry.Value;
                     else
                         entry = (uint)entryOrGuid;
                     
@@ -41,7 +43,9 @@ namespace WDE.SmartScriptEditor.Providers
                     break;
                 case SmartScriptType.GameObject:
                     if (entryOrGuid < 0)
-                        entry = database.GetGameObjectByGuid((uint)-entryOrGuid)?.Entry;
+                        entry = database.GetGameObjectByGuid(0, (uint)-entryOrGuid)?.Entry;
+                    else if (scriptEntry.HasValue)
+                        entry = scriptEntry.Value;
                     else
                         entry = (uint)entryOrGuid;
                     
@@ -83,15 +87,15 @@ namespace WDE.SmartScriptEditor.Providers
         
         public virtual string GetName(T item)
         {
-            var name = TryGetName(item.Entry, item.SmartType);
+            var name = TryGetName(item.Entry, item.EntryOrGuid, item.SmartType);
             if (!string.IsNullOrEmpty(name))
             {
-                if (item.Entry < 0 && (item.SmartType == SmartScriptType.Creature || item.SmartType == SmartScriptType.GameObject))
-                    return name + " with guid " + -item.Entry;
+                if (item.EntryOrGuid < 0 && (item.SmartType == SmartScriptType.Creature || item.SmartType == SmartScriptType.GameObject))
+                    return name + " with guid " + -item.EntryOrGuid;
                 return name;
             }
             
-            int entry = item.Entry;
+            int entry = item.EntryOrGuid;
 
             if (entry > 0)
             {

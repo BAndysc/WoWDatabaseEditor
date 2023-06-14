@@ -8,6 +8,8 @@ namespace WDE.TrinityMySqlDatabase.Models
     [Table(Name = "smart_scripts")]
     public class MySqlSmartScriptLine : ISmartScriptLine
     {
+        public uint? CreatureEntry => null;
+        
         [Column(Name = "entryorguid")]
         [PrimaryKey]
         public int EntryOrGuid { get; set; }

@@ -321,12 +321,12 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public IEnumerable<IAreaTriggerTemplate> GetAreaTriggerTemplates() =>
             areaTriggerTemplates ?? nonCachedDatabase.GetAreaTriggerTemplates();
 
-        public IEnumerable<ISmartScriptLine> GetScriptFor(int entryOrGuid, SmartScriptType type)
+        public IEnumerable<ISmartScriptLine> GetScriptFor(uint entry, int entryOrGuid, SmartScriptType type)
         {
-            return nonCachedDatabase.GetScriptFor(entryOrGuid, type);
+            return nonCachedDatabase.GetScriptFor(entry, entryOrGuid, type);
         }
 
-        public async Task<IList<ISmartScriptLine>> GetScriptForAsync(int entryOrGuid, SmartScriptType type) => await nonCachedDatabase.GetScriptForAsync(entryOrGuid, type);
+        public async Task<IList<ISmartScriptLine>> GetScriptForAsync(uint entry, int entryOrGuid, SmartScriptType type) => await nonCachedDatabase.GetScriptForAsync(entry, entryOrGuid, type);
 
         public async Task InstallConditions(IEnumerable<IConditionLine> conditions,
             IDatabaseProvider.ConditionKeyMask keyMask,
@@ -424,17 +424,17 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public Task<IList<IGameEventGameObject>> GetGameEventGameObjectsAsync() => nonCachedDatabase.GetGameEventGameObjectsAsync();
 
-        public Task<IList<IGameEventCreature>?> GetGameEventCreaturesByGuidAsync(uint guid) => nonCachedDatabase.GetGameEventCreaturesByGuidAsync(guid);
+        public Task<IList<IGameEventCreature>?> GetGameEventCreaturesByGuidAsync(uint entry, uint guid) => nonCachedDatabase.GetGameEventCreaturesByGuidAsync(entry, guid);
 
-        public Task<IList<IGameEventGameObject>?> GetGameEventGameObjectsByGuidAsync(uint guid) => nonCachedDatabase.GetGameEventGameObjectsByGuidAsync(guid);
+        public Task<IList<IGameEventGameObject>?> GetGameEventGameObjectsByGuidAsync(uint entry, uint guid) => nonCachedDatabase.GetGameEventGameObjectsByGuidAsync(entry, guid);
 
         public Task<IList<ICreatureEquipmentTemplate>?> GetCreatureEquipmentTemplates(uint entry) => nonCachedDatabase.GetCreatureEquipmentTemplates(entry);
 
-        public Task<IGameObject?> GetGameObjectByGuidAsync(uint guid) => nonCachedDatabase.GetGameObjectByGuidAsync(guid);
+        public Task<IGameObject?> GetGameObjectByGuidAsync(uint entry, uint guid) => nonCachedDatabase.GetGameObjectByGuidAsync(entry, guid);
 
-        public Task<ICreature?> GetCreaturesByGuidAsync(uint guid) => nonCachedDatabase.GetCreaturesByGuidAsync(guid);
+        public Task<ICreature?> GetCreaturesByGuidAsync(uint entry, uint guid) => nonCachedDatabase.GetCreaturesByGuidAsync(entry, guid);
 
-        public Task<ICreatureAddon?> GetCreatureAddon(uint guid) => nonCachedDatabase.GetCreatureAddon(guid);
+        public Task<ICreatureAddon?> GetCreatureAddon(uint entry, uint guid) => nonCachedDatabase.GetCreatureAddon(entry, guid);
 
         public Task<ICreatureTemplateAddon?> GetCreatureTemplateAddon(uint entry) => nonCachedDatabase.GetCreatureTemplateAddon(entry);
        
@@ -466,9 +466,9 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         
         public Task<IList<IDatabaseSpellEffectDbc>> GetSpellEffectDbcAsync() => nonCachedDatabase.GetSpellEffectDbcAsync();
 
-        public ICreature? GetCreatureByGuid(uint guid) => nonCachedDatabase.GetCreatureByGuid(guid);
+        public ICreature? GetCreatureByGuid(uint entry, uint guid) => nonCachedDatabase.GetCreatureByGuid(entry, guid);
 
-        public IGameObject? GetGameObjectByGuid(uint guid) => nonCachedDatabase.GetGameObjectByGuid(guid);
+        public IGameObject? GetGameObjectByGuid(uint entry, uint guid) => nonCachedDatabase.GetGameObjectByGuid(entry, guid);
         
         public IEnumerable<ICreature> GetCreaturesByEntry(uint entry) => nonCachedDatabase.GetCreaturesByEntry(entry);
 

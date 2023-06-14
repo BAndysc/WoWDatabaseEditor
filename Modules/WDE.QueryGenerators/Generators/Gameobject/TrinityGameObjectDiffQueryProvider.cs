@@ -23,7 +23,7 @@ public class TrinityGameObjectDiffQueryProvider : IUpdateQueryProvider<GameObjec
     {
         var trans = Queries.BeginTransaction();
 
-        var gameObjectEntry = databaseProvider.GetGameObjectByGuid(diff.Guid);
+        var gameObjectEntry = databaseProvider.GetGameObjectByGuid(diff.Guid, diff.Entry);
 
         if (gameObjectEntry != null)
             trans.Comment(gameObjectEntry.Guid.ToString());

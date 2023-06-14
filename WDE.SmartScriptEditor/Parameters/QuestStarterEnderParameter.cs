@@ -51,10 +51,12 @@ public class QuestStarterEnderParameter : IParameter<long>, ICustomPickerContext
         if (script.EntryOrGuid < 0)
         {
             if (script.SourceType == SmartScriptType.GameObject)
-                return databaseProvider.GetGameObjectByGuid((uint)(-script.EntryOrGuid))?.Entry;
+                return databaseProvider.GetGameObjectByGuid(0, (uint)(-script.EntryOrGuid))?.Entry;
             else
-                return databaseProvider.GetCreatureByGuid((uint)(-script.EntryOrGuid))?.Entry;
+                return databaseProvider.GetCreatureByGuid(0, (uint)(-script.EntryOrGuid))?.Entry;
         }
+        if (script.Entry.HasValue)
+            return script.Entry.Value;
         return (uint)script.EntryOrGuid;
     }
 

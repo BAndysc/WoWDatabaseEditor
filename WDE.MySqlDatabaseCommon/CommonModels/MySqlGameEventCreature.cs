@@ -10,6 +10,8 @@ public class MySqlGameEventCreature : IGameEventCreature
     [Column(Name = "eventEntry")]
     public short Event { get; set; }
 
+    public uint CreatureEntry { get; set; }
+
     [PrimaryKey]
     [Column(Name = "guid")]
     public uint Guid { get; set; }

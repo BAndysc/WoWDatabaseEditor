@@ -50,7 +50,7 @@ public class SpawnDeleter : IMapSpawnModule
         if (query == null)
             return;
             
-        pendingGameChangesService.AddQuery(spawn is CreatureSpawnInstance ? GuidType.Creature : GuidType.GameObject, spawn.Guid, query);
+        pendingGameChangesService.AddQuery(spawn is CreatureSpawnInstance ? GuidType.Creature : GuidType.GameObject, spawn.Entry, spawn.Guid, query);
             
         spawn.Dispose();
         spawnSelectionService.SelectedSpawn.Value = null;

@@ -54,7 +54,7 @@ namespace WDE.CMMySqlDatabase.Database
             return new List<ISmartScriptLine>();
         }
 
-        public IEnumerable<ISmartScriptLine> GetScriptFor(int entryOrGuid, SmartScriptType type)
+        public IEnumerable<ISmartScriptLine> GetScriptFor(uint entry, int entryOrGuid, SmartScriptType type)
         {
             return new List<ISmartScriptLine>();
         }
@@ -211,7 +211,7 @@ namespace WDE.CMMySqlDatabase.Database
 
         public abstract Task<List<IBroadcastText>> GetBroadcastTextsAsync();
         
-        public async Task<IList<ISmartScriptLine>> GetScriptForAsync(int entryOrGuid, SmartScriptType type) => new List<ISmartScriptLine>();
+        public async Task<IList<ISmartScriptLine>> GetScriptForAsync(uint entry, int entryOrGuid, SmartScriptType type) => new List<ISmartScriptLine>();
 
         public async Task<IList<IAreaTriggerTemplate>> GetAreaTriggerTemplatesAsync()
         {
@@ -298,9 +298,9 @@ namespace WDE.CMMySqlDatabase.Database
             return await model.BroadcastTextLocale.FirstOrDefaultAsync(b => b.Text == text || b.Text1 == text);
         }
 
-        public abstract ICreature? GetCreatureByGuid(uint guid);
+        public abstract ICreature? GetCreatureByGuid(uint entry, uint guid);
 
-        public abstract IGameObject? GetGameObjectByGuid(uint guid);
+        public abstract IGameObject? GetGameObjectByGuid(uint entry, uint guid);
 
         public abstract IEnumerable<IGameObject> GetGameObjectsByEntry(uint entry);
         public abstract Task<IList<ICreature>> GetCreaturesByEntryAsync(uint entry);
@@ -424,13 +424,13 @@ namespace WDE.CMMySqlDatabase.Database
             return await model.GameEventGameObject.ToListAsync<IGameEventGameObject>();
         }
 
-        public async Task<IList<IGameEventCreature>?> GetGameEventCreaturesByGuidAsync(uint guid)
+        public async Task<IList<IGameEventCreature>?> GetGameEventCreaturesByGuidAsync(uint entry, uint guid)
         {
             await using var model = Database();
             return await model.GameEventCreature.Where(x => x.Guid == guid).ToListAsync<IGameEventCreature>();
         }
 
-        public async Task<IList<IGameEventGameObject>?> GetGameEventGameObjectsByGuidAsync(uint guid)
+        public async Task<IList<IGameEventGameObject>?> GetGameEventGameObjectsByGuidAsync(uint entry, uint guid)
         {
             await using var model = Database();
             return await model.GameEventGameObject.Where(x => x.Guid == guid).ToListAsync<IGameEventGameObject>();
@@ -447,10 +447,10 @@ namespace WDE.CMMySqlDatabase.Database
             return await model.CreatureEquipmentTemplate.ToListAsync<IMangosCreatureEquipmentTemplate>();
         }
 
-        public abstract Task<IGameObject?> GetGameObjectByGuidAsync(uint guid);
+        public abstract Task<IGameObject?> GetGameObjectByGuidAsync(uint entry, uint guid);
 
-        public abstract Task<ICreature?> GetCreaturesByGuidAsync(uint guid);
-        public abstract Task<ICreatureAddon?> GetCreatureAddon(uint guid);
+        public abstract Task<ICreature?> GetCreaturesByGuidAsync(uint entry, uint guid);
+        public abstract Task<ICreatureAddon?> GetCreatureAddon(uint entry, uint guid);
         public abstract Task<ICreatureTemplateAddon?> GetCreatureTemplateAddon(uint entry);
 
         public async Task<IReadOnlyList<IWaypointData>?> GetWaypointData(uint pathId) => null;

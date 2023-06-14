@@ -96,7 +96,7 @@ public class GameObjectEntryProviderService : IGameobjectEntryOrGuidProviderServ
                 }
                 else
                 {
-                    var creature = databaseProvider.GetGameObjectByGuid((uint)(-entry));
+                    var creature = databaseProvider.GetGameObjectByGuid(0, (uint)(-entry));
                     var template = creature == null ? null : databaseProvider.GetGameObjectTemplate(creature.Entry);
                     if (template != null)
                     {

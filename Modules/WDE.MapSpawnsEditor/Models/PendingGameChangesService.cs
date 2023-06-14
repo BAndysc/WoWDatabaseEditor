@@ -13,14 +13,14 @@ namespace WDE.MapSpawnsEditor.Models;
 public interface IPendingGameChangesService
 {
     bool HasAnyPendingChanges();
-    bool HasGuidPendingChange(GuidType type, uint guid);
-    void AddQuery(GuidType type, uint guid, IQuery query);
+    bool HasGuidPendingChange(GuidType type, uint entry, uint guid);
+    void AddQuery(GuidType type, uint entry, uint guid, IQuery query);
     void AddGlobalQuery(IQuery query);
-    List<(GuidType, uint)> CancelAll();
+    List<(GuidType, uint entry, uint guid)> CancelAll();
     Task SaveAll();
     event Action? HasPendingChanged;
     event Action<IQuery>? QueryExecuted;
-    event Action<List<(GuidType, uint)>>? RequestReload;
+    event Action<List<(GuidType, uint entry, uint guid)>>? RequestReload;
 }
 
 [AutoRegister]
@@ -33,10 +33,10 @@ public class PendingGameChangesService : IPendingGameChangesService
     private readonly ISessionService sessionService;
     private List<IQuery> pendingChanges = new();
     private List<IQuery> globalPendingChanges = new();
-    private HashSet<(GuidType, uint)> pendingGuidChanges = new();
+    private HashSet<(GuidType, uint entry, uint guid)> pendingGuidChanges = new();
 
     public event Action<IQuery>? QueryExecuted;
-    public event Action<List<(GuidType, uint)>>? RequestReload;
+    public event Action<List<(GuidType, uint entry, uint guid)>>? RequestReload;
     public event Action? HasPendingChanged;
 
     public PendingGameChangesService(IMessageBoxService messageBoxService,
@@ -55,14 +55,14 @@ public class PendingGameChangesService : IPendingGameChangesService
         return pendingGuidChanges.Count != 0 || globalPendingChanges.Count != 0;
     }
 
-    public bool HasGuidPendingChange(GuidType type, uint guid)
+    public bool HasGuidPendingChange(GuidType type, uint entry, uint guid)
     {
-        return globalPendingChanges.Count > 0 || pendingGuidChanges.Contains((type, guid));
+        return globalPendingChanges.Count > 0 || pendingGuidChanges.Contains((type, entry, guid));
     }
 
-    public void AddQuery(GuidType type, uint guid, IQuery query)
+    public void AddQuery(GuidType type, uint entry, uint guid, IQuery query)
     {
-        pendingGuidChanges.Add((type, guid));
+        pendingGuidChanges.Add((type, entry, guid));
         pendingChanges.Add(query);
         HasPendingChanged?.Invoke();
     }
@@ -72,7 +72,7 @@ public class PendingGameChangesService : IPendingGameChangesService
         globalPendingChanges.Add(query);
     }
 
-    public List<(GuidType, uint)> CancelAll()
+    public List<(GuidType, uint entry, uint guid)> CancelAll()
     {
         var list = pendingGuidChanges.ToList();
         pendingChanges.Clear();
@@ -82,7 +82,7 @@ public class PendingGameChangesService : IPendingGameChangesService
         return list;
     }
 
-    private List<IQuery> Flush(out List<(GuidType, uint)> toReload)
+    private List<IQuery> Flush(out List<(GuidType, uint entry, uint guid)> toReload)
     {
         toReload = pendingGuidChanges.ToList();
         var list = globalPendingChanges;

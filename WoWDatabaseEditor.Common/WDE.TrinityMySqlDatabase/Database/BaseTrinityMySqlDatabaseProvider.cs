@@ -67,7 +67,7 @@ namespace WDE.TrinityMySqlDatabase.Database
                 .ToListAsync<ISmartScriptLine>();
         }
 
-        public IEnumerable<ISmartScriptLine> GetScriptFor(int entryOrGuid, SmartScriptType type)
+        public IEnumerable<ISmartScriptLine> GetScriptFor(uint entry, int entryOrGuid, SmartScriptType type)
         {
             using var model = Database();
             return model.SmartScript.Where(line => line.EntryOrGuid == entryOrGuid && line.ScriptSourceType == (int) type).ToList();
@@ -241,7 +241,7 @@ namespace WDE.TrinityMySqlDatabase.Database
 
         public abstract Task<List<IBroadcastText>> GetBroadcastTextsAsync();
         
-        public async Task<IList<ISmartScriptLine>> GetScriptForAsync(int entryOrGuid, SmartScriptType type)
+        public async Task<IList<ISmartScriptLine>> GetScriptForAsync(uint entry, int entryOrGuid, SmartScriptType type)
         {
             await using var model = Database();
             return await model.SmartScript.Where(line => line.EntryOrGuid == entryOrGuid && line.ScriptSourceType == (int) type).ToListAsync<ISmartScriptLine>();
@@ -400,9 +400,9 @@ namespace WDE.TrinityMySqlDatabase.Database
 
         public abstract Task<IBroadcastTextLocale?> GetBroadcastTextLocaleByTextAsync(string text);
 
-        public abstract ICreature? GetCreatureByGuid(uint guid);
+        public abstract ICreature? GetCreatureByGuid(uint entry, uint guid);
 
-        public abstract IGameObject? GetGameObjectByGuid(uint guid);
+        public abstract IGameObject? GetGameObjectByGuid(uint entry, uint guid);
 
         public abstract IEnumerable<IGameObject> GetGameObjectsByEntry(uint entry);
         public abstract Task<IList<ICreature>> GetCreaturesByEntryAsync(uint entry);
@@ -565,7 +565,7 @@ namespace WDE.TrinityMySqlDatabase.Database
 
         public abstract Task<IList<ICreatureTemplateAddon>> GetCreatureTemplateAddons();
 
-        public abstract Task<ICreatureAddon?> GetCreatureAddon(uint guid);
+        public abstract Task<ICreatureAddon?> GetCreatureAddon(uint entry, uint guid);
 
         public abstract Task<ICreatureTemplateAddon?> GetCreatureTemplateAddon(uint entry);
         
@@ -613,13 +613,13 @@ namespace WDE.TrinityMySqlDatabase.Database
             return await model.GameEventGameObject.ToListAsync<IGameEventGameObject>();
         }
 
-        public async Task<IList<IGameEventCreature>?> GetGameEventCreaturesByGuidAsync(uint guid)
+        public async Task<IList<IGameEventCreature>?> GetGameEventCreaturesByGuidAsync(uint entry, uint guid)
         {
             await using var model = Database();
             return await model.GameEventCreature.Where(x => x.Guid == guid).ToListAsync<IGameEventCreature>();
         }
 
-        public async Task<IList<IGameEventGameObject>?> GetGameEventGameObjectsByGuidAsync(uint guid)
+        public async Task<IList<IGameEventGameObject>?> GetGameEventGameObjectsByGuidAsync(uint entry, uint guid)
         {
             await using var model = Database();
             return await model.GameEventGameObject.Where(x => x.Guid == guid).ToListAsync<IGameEventGameObject>();
@@ -633,9 +633,9 @@ namespace WDE.TrinityMySqlDatabase.Database
 
         public async Task<IList<IMangosCreatureEquipmentTemplate>?> GetMangosCreatureEquipmentTemplates() => null;
 
-        public abstract Task<IGameObject?> GetGameObjectByGuidAsync(uint guid);
+        public abstract Task<IGameObject?> GetGameObjectByGuidAsync(uint entry, uint guid);
 
-        public abstract Task<ICreature?> GetCreaturesByGuidAsync(uint guid);
+        public abstract Task<ICreature?> GetCreaturesByGuidAsync(uint entry, uint guid);
 
         public async Task<IList<IAuthRbacPermission>> GetRbacPermissionsAsync()
         {
