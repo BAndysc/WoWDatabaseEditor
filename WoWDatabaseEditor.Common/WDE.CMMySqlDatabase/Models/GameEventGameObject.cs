@@ -10,6 +10,8 @@ public class GameEventGameObject : IGameEventGameObject
     [Column(Name = "event")]
     public short Event { get; set; }
 
+    public uint GameObjectEntry { get; set; }
+
     [PrimaryKey]
     [Column(Name = "guid")]
     public uint Guid { get; set; }

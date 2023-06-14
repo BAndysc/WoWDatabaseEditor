@@ -115,7 +115,7 @@ public class CreatureEntryOrGuidProviderService : ICreatureEntryOrGuidProviderSe
                 }
                 else
                 {
-                    var creature = databaseProvider.GetCreatureByGuid((uint)(-entry));
+                    var creature = databaseProvider.GetCreatureByGuid(0, (uint)(-entry));
                     var template = creature == null ? null : databaseProvider.GetCreatureTemplate(creature.Entry);
                     if (template != null)
                     {

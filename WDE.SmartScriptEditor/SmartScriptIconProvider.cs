@@ -33,7 +33,7 @@ namespace WDE.SmartScriptEditor
                     return new ImageUri("Icons/document.png");
                 case SmartScriptType.Quest:
                 {
-                    var template = databaseProvider.GetQuestTemplate((uint)item.Entry);
+                    var template = databaseProvider.GetQuestTemplate((uint)item.EntryOrGuid);
                     if (template != null && template.AllowableRaces != 0)
                     {
                         var onlyHorde = (template.AllowableRaces & ~ (CharacterRaces.AllHorde)) == 0;

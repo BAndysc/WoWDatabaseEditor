@@ -40,9 +40,9 @@ public class SpawnGroupTool : IMapSpawnModule
         if (spawn.SpawnGroup == null)
             return;
         
-        await spawnGroupWizard.LeaveSpawnGroup(spawn.SpawnGroup.Id, spawn.Guid, spawn is CreatureSpawnInstance ? SpawnGroupTemplateType.Creature : SpawnGroupTemplateType.GameObject);
+        await spawnGroupWizard.LeaveSpawnGroup(spawn.SpawnGroup.Id, spawn.Entry, spawn.Guid, spawn is CreatureSpawnInstance ? SpawnGroupTemplateType.Creature : SpawnGroupTemplateType.GameObject);
         
-        await spawnsContainer.Reload(spawn is CreatureSpawnInstance ? GuidType.Creature : GuidType.GameObject, spawn.Guid, zoneAreaManager, dbcManager);
+        await spawnsContainer.Reload(spawn is CreatureSpawnInstance ? GuidType.Creature : GuidType.GameObject, spawn.Entry, spawn.Guid, zoneAreaManager, dbcManager);
     }
     
     public async Task AssignSpawnGroup(SpawnInstance spawn)
@@ -50,9 +50,9 @@ public class SpawnGroupTool : IMapSpawnModule
         if (lastSpawnGroup == null)
             return;
 
-        await spawnGroupWizard.AssignGuid(lastSpawnGroup.Id, spawn.Guid, spawn is CreatureSpawnInstance ? SpawnGroupTemplateType.Creature : SpawnGroupTemplateType.GameObject);
+        await spawnGroupWizard.AssignGuid(lastSpawnGroup.Id, spawn.Entry, spawn.Guid, spawn is CreatureSpawnInstance ? SpawnGroupTemplateType.Creature : SpawnGroupTemplateType.GameObject);
         
-        await spawnsContainer.Reload(spawn is CreatureSpawnInstance ? GuidType.Creature : GuidType.GameObject, spawn.Guid, zoneAreaManager, dbcManager);
+        await spawnsContainer.Reload(spawn is CreatureSpawnInstance ? GuidType.Creature : GuidType.GameObject, spawn.Entry, spawn.Guid, zoneAreaManager, dbcManager);
     }
 
     public async Task EditSpawnGroup(SpawnInstance spawn)

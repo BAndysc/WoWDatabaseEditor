@@ -25,7 +25,7 @@ namespace WDE.TrinitySmartScriptEditor.Providers
             return new AbstractSmartScriptProjectItem()
             {
                 Type = (byte)(100 + (byte) item.SmartType),
-                Value = item.Entry
+                Value = item.EntryOrGuid
             };
         }
     }

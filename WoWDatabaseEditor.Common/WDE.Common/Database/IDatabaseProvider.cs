@@ -47,8 +47,8 @@ namespace WDE.Common.Database
         IReadOnlyList<ICreatureText>? GetCreatureTextsByEntry(uint entry);
         
         Task<IList<ISmartScriptLine>> GetLinesCallingSmartTimedActionList(int timedActionList);
-        IEnumerable<ISmartScriptLine> GetScriptFor(int entryOrGuid, SmartScriptType type);
-        Task<IList<ISmartScriptLine>> GetScriptForAsync(int entryOrGuid, SmartScriptType type);
+        IEnumerable<ISmartScriptLine> GetScriptFor(uint entry, int entryOrGuid, SmartScriptType type);
+        Task<IList<ISmartScriptLine>> GetScriptForAsync(uint entry, int entryOrGuid, SmartScriptType type);
 
         Task InstallConditions(IEnumerable<IConditionLine> conditions, ConditionKeyMask keyMask, ConditionKey? manualKey = null);
 
@@ -74,8 +74,8 @@ namespace WDE.Common.Database
 
         Task<IBroadcastTextLocale?> GetBroadcastTextLocaleByTextAsync(string text);
 
-        ICreature? GetCreatureByGuid(uint guid);
-        IGameObject? GetGameObjectByGuid(uint guid);
+        ICreature? GetCreatureByGuid(uint entry, uint guid);
+        IGameObject? GetGameObjectByGuid(uint entry, uint guid);
         IEnumerable<ICreature> GetCreaturesByEntry(uint entry);
         IEnumerable<IGameObject> GetGameObjectsByEntry(uint entry);
         Task<IList<ICreature>> GetCreaturesByEntryAsync(uint entry);
@@ -124,12 +124,12 @@ namespace WDE.Common.Database
         Task<IList<IMangosCreatureEquipmentTemplate>?> GetMangosCreatureEquipmentTemplates();
         Task<IList<IGameEventCreature>> GetGameEventCreaturesAsync();
         Task<IList<IGameEventGameObject>> GetGameEventGameObjectsAsync();
-        Task<IList<IGameEventCreature>?> GetGameEventCreaturesByGuidAsync(uint guid);
-        Task<IList<IGameEventGameObject>?> GetGameEventGameObjectsByGuidAsync(uint guid);
+        Task<IList<IGameEventCreature>?> GetGameEventCreaturesByGuidAsync(uint entry, uint guid);
+        Task<IList<IGameEventGameObject>?> GetGameEventGameObjectsByGuidAsync(uint entry, uint guid);
         Task<IList<ICreatureEquipmentTemplate>?> GetCreatureEquipmentTemplates(uint entry);
-        Task<IGameObject?> GetGameObjectByGuidAsync(uint guid);
-        Task<ICreature?> GetCreaturesByGuidAsync(uint guid);
-        Task<ICreatureAddon?> GetCreatureAddon(uint guid);
+        Task<IGameObject?> GetGameObjectByGuidAsync(uint entry, uint guid);
+        Task<ICreature?> GetCreaturesByGuidAsync(uint entry, uint guid);
+        Task<ICreatureAddon?> GetCreatureAddon(uint entry, uint guid);
         Task<ICreatureTemplateAddon?> GetCreatureTemplateAddon(uint entry);
 
         Task<IReadOnlyList<IWaypointData>?> GetWaypointData(uint pathId);

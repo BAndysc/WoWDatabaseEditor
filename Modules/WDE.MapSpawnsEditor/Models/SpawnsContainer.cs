@@ -17,9 +17,9 @@ public interface ISpawnsContainer
     PerChunkHolder<List<SpawnInstance>> SpawnsPerChunk { get; }
     FlatTreeList<SpawnGroup, SpawnInstance> Spawns { get; }
     void Clear();
-    Task Reload(GuidType type, uint guid, ZoneAreaManager zoneAreaManager, DbcManager dbcManager);
-    Task ReloadCreature(uint guid, ZoneAreaManager zoneAreaManager, DbcManager dbcManager);
-    Task ReloadGameobject(uint guid, ZoneAreaManager zoneAreaManager, DbcManager dbcManager);
+    Task Reload(GuidType type, uint entry, uint guid, ZoneAreaManager zoneAreaManager, DbcManager dbcManager);
+    Task ReloadCreature(uint entry, uint guid, ZoneAreaManager zoneAreaManager, DbcManager dbcManager);
+    Task ReloadGameobject(uint entry, uint guid, ZoneAreaManager zoneAreaManager, DbcManager dbcManager);
     event Action<CreatureSpawnInstance>? OnCreatureModified;
     event Action<GameObjectSpawnInstance>? OnGameobjectModified;
 }
@@ -74,17 +74,17 @@ public class SpawnsContainer : ISpawnsContainer
         LoadedMap = null;
     }
 
-    public Task Reload(GuidType type, uint guid, ZoneAreaManager zoneAreaManager, DbcManager dbcManager)
+    public Task Reload(GuidType type, uint entry, uint guid, ZoneAreaManager zoneAreaManager, DbcManager dbcManager)
     {
         if (type == GuidType.Creature)
-            return ReloadCreature(guid, zoneAreaManager, dbcManager);
+            return ReloadCreature(entry, guid, zoneAreaManager, dbcManager);
         else
-            return ReloadGameobject(guid, zoneAreaManager, dbcManager);
+            return ReloadGameobject(entry, guid, zoneAreaManager, dbcManager);
     }
 
-    public async Task ReloadCreature(uint guid, ZoneAreaManager zoneAreaManager, DbcManager dbcManager)
+    public async Task ReloadCreature(uint entry, uint guid, ZoneAreaManager zoneAreaManager, DbcManager dbcManager)
     {
-        var creatureData = await databaseProvider.GetCreaturesByGuidAsync(guid);
+        var creatureData = await databaseProvider.GetCreaturesByGuidAsync(entry, guid);
 
         if (creatureData == null)
         {
@@ -95,11 +95,11 @@ public class SpawnsContainer : ISpawnsContainer
         }
         else
         {
-            var events = await databaseProvider.GetGameEventCreaturesByGuidAsync(guid);
+            var events = await databaseProvider.GetGameEventCreaturesByGuidAsync(entry, guid);
             var areaId = zoneAreaManager.GetAreaId(creatureData.Map, new Vector3(creatureData.X, creatureData.Y, creatureData.Z));
             var template = databaseProvider.GetCreatureTemplate(creatureData.Entry);
             var addonTemplate = await databaseProvider.GetCreatureTemplateAddon(creatureData.Entry);
-            var addon = await databaseProvider.GetCreatureAddon(creatureData.Guid);
+            var addon = await databaseProvider.GetCreatureAddon(creatureData.Entry, creatureData.Guid);
             var spawnGroup = await databaseProvider.GetSpawnGroupSpawnByGuidAsync(creatureData.Guid, SpawnGroupTemplateType.Creature);
             var spawnGroupTemplate = spawnGroup == null ? null : await databaseProvider.GetSpawnGroupTemplateByIdAsync(spawnGroup.TemplateId);
             
@@ -154,9 +154,9 @@ public class SpawnsContainer : ISpawnsContainer
         }
     }
 
-    public async Task ReloadGameobject(uint guid, ZoneAreaManager zoneAreaManager, DbcManager dbcManager)
+    public async Task ReloadGameobject(uint entry, uint guid, ZoneAreaManager zoneAreaManager, DbcManager dbcManager)
     {
-        var gameobjectData = await databaseProvider.GetGameObjectByGuidAsync(guid);
+        var gameobjectData = await databaseProvider.GetGameObjectByGuidAsync(entry, guid);
 
         if (gameobjectData == null)
         {
@@ -167,7 +167,7 @@ public class SpawnsContainer : ISpawnsContainer
         }
         else
         {
-            var gameobjectEvents = await databaseProvider.GetGameEventGameObjectsByGuidAsync(guid);
+            var gameobjectEvents = await databaseProvider.GetGameEventGameObjectsByGuidAsync(entry, guid);
             var areaId = zoneAreaManager.GetAreaId(gameobjectData.Map, new Vector3(gameobjectData.X, gameobjectData.Y, gameobjectData.Z));
             var template = databaseProvider.GetGameObjectTemplate(gameobjectData.Entry);
             

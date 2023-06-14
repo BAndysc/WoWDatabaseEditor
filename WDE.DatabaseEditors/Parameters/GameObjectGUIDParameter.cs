@@ -44,7 +44,7 @@ public class GameObjectGUIDParameter : GameObjectGUIDPickerOnlyParameter, IAsync
 
     public async Task<string> ToStringAsync(long val, CancellationToken token)
     {
-        var creature = await databaseProvider.GetGameObjectByGuidAsync((uint)val);
+        var creature = await databaseProvider.GetGameObjectByGuidAsync(0, (uint)val);
         if (creature == null)
             return val + " (not found)";
 

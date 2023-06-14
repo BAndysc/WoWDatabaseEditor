@@ -61,7 +61,7 @@ public class SpawnGroupWizard : ISpawnGroupWizard
         };
     }
 
-    public async Task<bool> AssignGuid(uint template, uint guid, SpawnGroupTemplateType type)
+    public async Task<bool> AssignGuid(uint template, uint entry, uint guid, SpawnGroupTemplateType type)
     {
         var query = spawnQueryGenerator.Insert(new AbstractSpawnGroupSpawn()
         {
@@ -73,13 +73,13 @@ public class SpawnGroupWizard : ISpawnGroupWizard
         if (query == null)
             throw new Exception("Failed to assign a spawn group to the creature: couldn't generate query");
         
-        pendingGameChangesService.AddQuery(type == SpawnGroupTemplateType.Creature ? GuidType.Creature : GuidType.GameObject, guid, query);
+        pendingGameChangesService.AddQuery(type == SpawnGroupTemplateType.Creature ? GuidType.Creature : GuidType.GameObject, entry, guid, query);
         await pendingGameChangesService.SaveAll();
 
         return true;
     }
 
-    public async Task<bool> LeaveSpawnGroup(uint template, uint guid, SpawnGroupTemplateType type)
+    public async Task<bool> LeaveSpawnGroup(uint template, uint entry, uint guid, SpawnGroupTemplateType type)
     {
         var query = spawnQueryGenerator.Delete(new AbstractSpawnGroupSpawn()
         {
@@ -91,7 +91,7 @@ public class SpawnGroupWizard : ISpawnGroupWizard
         if (query == null)
             throw new Exception("Failed to leave a spawn group: couldn't generate query");
 
-        pendingGameChangesService.AddQuery(type == SpawnGroupTemplateType.Creature ? GuidType.Creature : GuidType.GameObject, guid, query);
+        pendingGameChangesService.AddQuery(type == SpawnGroupTemplateType.Creature ? GuidType.Creature : GuidType.GameObject, entry, guid, query);
         await pendingGameChangesService.SaveAll();
 
         return true;
@@ -120,7 +120,7 @@ public class SpawnGroupWizard : ISpawnGroupWizard
 public interface ISpawnGroupWizard
 {
     Task<ISpawnGroupTemplate?> CreateSpawnGroup();
-    Task<bool> AssignGuid(uint template, uint guid, SpawnGroupTemplateType type);
-    Task<bool> LeaveSpawnGroup(uint template, uint guid, SpawnGroupTemplateType type);
+    Task<bool> AssignGuid(uint template, uint entry, uint guid, SpawnGroupTemplateType type);
+    Task<bool> LeaveSpawnGroup(uint template, uint entry, uint guid, SpawnGroupTemplateType type);
     Task EditSpawnGroup(uint templateId);
 }

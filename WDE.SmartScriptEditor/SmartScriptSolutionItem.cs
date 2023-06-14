@@ -12,21 +12,22 @@ namespace WDE.SmartScriptEditor
     {
         public SmartScriptSolutionItem(int entry, SmartScriptType smartType)
         {
-            Entry = entry;
+            EntryOrGuid = entry;
             SmartType = smartType;
         }
 
-        public int Entry { get; }
+        public uint? Entry => null;
+        public int EntryOrGuid { get; }
         public SmartScriptType SmartType { get; }
         
         public void UpdateDependants(HashSet<long> usedTimed)
         {
             for (int i = Items.Count - 1; i >= 0; --i)
             {
-                if (!usedTimed.Contains(((SmartScriptSolutionItem) Items[i]).Entry))
+                if (!usedTimed.Contains(((SmartScriptSolutionItem) Items[i]).EntryOrGuid))
                     Items.RemoveAt(i);
                 else
-                    usedTimed.Remove(((SmartScriptSolutionItem) Items[i]).Entry);
+                    usedTimed.Remove(((SmartScriptSolutionItem) Items[i]).EntryOrGuid);
             }
 
             foreach (var t in usedTimed)
@@ -42,16 +43,16 @@ namespace WDE.SmartScriptEditor
         [JsonIgnore] 
         public ObservableCollection<ISolutionItem> Items { get; set; } = new();
 
-        public string? ExtraId => SmartType is SmartScriptType.AreaTrigger or SmartScriptType.TimedActionList ? null : Entry.ToString();
+        public string? ExtraId => SmartType is SmartScriptType.AreaTrigger or SmartScriptType.TimedActionList ? null : EntryOrGuid.ToString();
 
         [JsonIgnore]
         public bool IsExportable => true;
 
-        public ISolutionItem Clone() => new SmartScriptSolutionItem(Entry, SmartType);
+        public ISolutionItem Clone() => new SmartScriptSolutionItem(EntryOrGuid, SmartType);
 
         protected bool Equals(SmartScriptSolutionItem other)
         {
-            return Entry == other.Entry && SmartType == other.SmartType;
+            return EntryOrGuid == other.EntryOrGuid && SmartType == other.SmartType;
         }
 
         public override bool Equals(object? obj)
@@ -64,7 +65,7 @@ namespace WDE.SmartScriptEditor
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Entry, (int)SmartType);
+            return HashCode.Combine(EntryOrGuid, (int)SmartType);
         }
     }
 }

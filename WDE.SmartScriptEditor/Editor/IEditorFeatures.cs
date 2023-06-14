@@ -14,13 +14,13 @@ namespace WDE.SmartScriptEditor.Editor
         bool SourceHasPosition { get; }
         bool UseExternalConditionsEditor => false;
         bool CanReorderConditions => true;
+        bool HasCreatureEntry => false;
         ParametersCount ConditionParametersCount { get; }
         ParametersCount EventParametersCount { get; }
         ParametersCount ActionParametersCount { get; }
         ParametersCount TargetParametersCount { get; }
         IParameter<long> ConditionTargetParameter { get; }
         IParameter<long> EventFlagsParameter { get; }
-        ISmartScriptSolutionItem CreateSolutionItem(SmartScriptType type, int entry);
     }
 
     public readonly struct ParametersCount

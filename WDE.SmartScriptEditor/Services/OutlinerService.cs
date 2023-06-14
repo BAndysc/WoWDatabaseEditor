@@ -35,12 +35,15 @@ public class OutlinerModel : ISmartScriptOutlinerModel
 {
     private readonly ISolutionItemIconRegistry iconRegistry;
     private readonly ISolutionItemNameRegistry nameRegistry;
+    private readonly IEditorFeatures editorFeatures;
     private readonly ISmartScriptFactory factory;
 
-    public OutlinerModel(ISmartScriptFactory factory,
+    public OutlinerModel(IEditorFeatures editorFeatures,
+        ISmartScriptFactory factory,
         ISolutionItemIconRegistry iconRegistry,
         ISolutionItemNameRegistry nameRegistry)
     {
+        this.editorFeatures = editorFeatures;
         this.factory = factory;
         this.iconRegistry = iconRegistry;
         this.nameRegistry = nameRegistry;
@@ -56,7 +59,7 @@ public class OutlinerModel : ISmartScriptOutlinerModel
     {
         foreach (var (type, entry) in data)
         {
-            var solutionItem = factory.Factory(entry, type);
+            var solutionItem = editorFeatures.HasCreatureEntry ? factory.Factory((uint)entry, 0, type) : factory.Factory(null, entry, type);
             var relatedType = GetRelatedTypeForScriptType(type);
             yield return (relatedType, new FindAnywhereResult(
                 iconRegistry.GetIcon(solutionItem),

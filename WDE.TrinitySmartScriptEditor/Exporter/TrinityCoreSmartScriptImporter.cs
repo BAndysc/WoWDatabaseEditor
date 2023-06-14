@@ -193,7 +193,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
 
                     if (mergeList)
                     {
-                        var timedScript = databaseProvider.GetScriptFor((int)action.GetParameter(0).Value,
+                        var timedScript = databaseProvider.GetScriptFor(0, (int)action.GetParameter(0).Value,
                             SmartScriptType.TimedActionList);
                         var beginInlineAction = smartFactory.ActionFactory(SmartConstants.ActionBeginInlineActionList,
                             smartFactory.SourceFactory(SmartConstants.SourceSelf),

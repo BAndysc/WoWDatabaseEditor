@@ -10,7 +10,7 @@ namespace WDE.TrinitySmartScriptEditor.Services;
 [SingleInstance]
 public class SmartScriptFactory : ISmartScriptFactory
 {
-    public ISmartScriptSolutionItem Factory(int entryOrGuid, SmartScriptType type)
+    public ISmartScriptSolutionItem Factory(uint? entry, int entryOrGuid, SmartScriptType type)
     {
         return new SmartScriptSolutionItem(entryOrGuid, type);
     }

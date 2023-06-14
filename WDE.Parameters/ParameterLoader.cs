@@ -641,7 +641,7 @@ namespace WDE.Parameters
         {
             Items = new Dictionary<long, SelectOption>();
             foreach (IQuestTemplate item in database.GetQuestTemplates())
-                Items.Add(item.Entry, new SelectOption(item.Name ?? "Quest " + item.Entry));
+                Items[item.Entry] = new SelectOption(item.Name ?? "Quest " + item.Entry);
         }
 
         public async Task<(long, bool)> PickValue(long value)
@@ -665,8 +665,8 @@ namespace WDE.Parameters
             Items = new Dictionary<long, SelectOption>();
             foreach (IQuestTemplate item in database.GetQuestTemplates())
             {
-                Items.Add(-item.Entry, new SelectOption(item.Name, "quest must be active"));
-                Items.Add(item.Entry, new SelectOption(item.Name, "quest must be completed"));
+                Items[-item.Entry] = new SelectOption(item.Name, "quest must be active");
+                Items[item.Entry] = new SelectOption(item.Name, "quest must be completed");
             }
         }
     }

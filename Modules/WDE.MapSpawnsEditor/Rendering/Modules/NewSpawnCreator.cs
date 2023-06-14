@@ -212,7 +212,7 @@ public class NewSpawnCreator : System.IDisposable, IMapSpawnModule
                     Z = worldObjectInstance.Position.Z,
                     O = ((CreatureInstance)worldObjectInstance).Orientation
                 });
-                pendingGameChangesService.AddQuery(GuidType.Creature, guid, query!);
+                pendingGameChangesService.AddQuery(GuidType.Creature, entry, guid, query!);
                 yield return pendingGameChangesService.SaveAll();
             }
             else
@@ -235,14 +235,14 @@ public class NewSpawnCreator : System.IDisposable, IMapSpawnModule
                     Rotation3 = rot.W,
                     State = 1
                 });
-                pendingGameChangesService.AddQuery(GuidType.GameObject, guid, query!);
+                pendingGameChangesService.AddQuery(GuidType.GameObject, entry, guid, query!);
                 yield return pendingGameChangesService.SaveAll();
             }
             
             if (creature)
-                yield return spawnsContainer.ReloadCreature(guid, zoneAreaManager, dbcManager);
+                yield return spawnsContainer.ReloadCreature(entry, guid, zoneAreaManager, dbcManager);
             else
-                yield return spawnsContainer.ReloadGameobject(guid, zoneAreaManager, dbcManager);
+                yield return spawnsContainer.ReloadGameobject(entry, guid, zoneAreaManager, dbcManager);
         }
         worldObjectInstance.Dispose();
     }

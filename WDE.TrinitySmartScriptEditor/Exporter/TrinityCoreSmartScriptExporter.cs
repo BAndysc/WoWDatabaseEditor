@@ -158,7 +158,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                         eventToSerialize.Parent = script;
                         eventToSerialize.Actions.Add(actualAction);
                         
-                        var serialized = eventToSerialize.ToSmartScriptLines(script.EntryOrGuid, script.SourceType, eventId++, false, 0);
+                        var serialized = eventToSerialize.ToSmartScriptLines(null, script.EntryOrGuid, script.SourceType, eventId++, false, 0);
 
                         if (serialized.Length != 1)
                             throw new InvalidOperationException();
@@ -185,7 +185,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                     {
                         if (toSerialize.Actions.Count == 0)
                             continue;
-                        var serialized = toSerialize.ToSmartScriptLines(script.EntryOrGuid, script.SourceType, eventId, true);
+                        var serialized = toSerialize.ToSmartScriptLines(null, script.EntryOrGuid, script.SourceType, eventId, true);
                         eventId += serialized.Length;
                         lines.AddRange(serialized);
                     }
@@ -325,7 +325,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                                     after.Parent = new SmartScript(new SmartScriptSolutionItem(currentInlineActionListId.Value, SmartScriptType.TimedActionList), smartFactory, smartDataManager, messageBoxService, editorFeatures, importer);
                                     after.AddAction(actualAction);
                         
-                                    var serialized = after.ToSmartScriptLines(currentInlineActionListId.Value, SmartScriptType.TimedActionList, timedEventId++, false, 0);
+                                    var serialized = after.ToSmartScriptLines(null, currentInlineActionListId.Value, SmartScriptType.TimedActionList, timedEventId++, false, 0);
 
                                     if (serialized.Length != 1)
                                         throw new InvalidOperationException();

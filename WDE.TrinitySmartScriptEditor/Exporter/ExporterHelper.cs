@@ -128,10 +128,12 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                 case SmartScriptType.Creature:
                 {
                     uint? entry;
-                    if (script.EntryOrGuid >= 0)
+                    if (script.Entry.HasValue)
+                        entry = script.Entry.Value;
+                    else if (script.EntryOrGuid >= 0)
                         entry = (uint)script.EntryOrGuid;
                     else
-                        entry = databaseProvider.GetCreatureByGuid((uint)-script.EntryOrGuid)?.Entry;
+                        entry = databaseProvider.GetCreatureByGuid(0, (uint)-script.EntryOrGuid)?.Entry;
 
                     if (entry.HasValue)
                     {
@@ -159,10 +161,12 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                 case SmartScriptType.GameObject:
                 {
                     uint? entry;
-                    if (script.EntryOrGuid >= 0)
+                    if (script.Entry.HasValue)
+                        entry = script.Entry.Value;
+                    else if (script.EntryOrGuid >= 0)
                         entry = (uint)script.EntryOrGuid;
                     else
-                        entry = databaseProvider.GetCreatureByGuid((uint)-script.EntryOrGuid)?.Entry;
+                        entry = databaseProvider.GetCreatureByGuid(0, (uint)-script.EntryOrGuid)?.Entry;
 
                     if (entry.HasValue)
                     {

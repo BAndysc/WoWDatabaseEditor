@@ -18,7 +18,7 @@ namespace WDE.EventAiEditor.Providers
         {
             uint? entry = 0;
             if (entryOrGuid < 0)
-                entry = database.GetCreatureByGuid((uint)-entryOrGuid)?.Entry;
+                entry = database.GetCreatureByGuid(0, (uint)-entryOrGuid)?.Entry;
             else
                 entry = (uint)entryOrGuid;
                     

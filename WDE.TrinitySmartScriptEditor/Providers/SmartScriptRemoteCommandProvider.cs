@@ -13,7 +13,7 @@ namespace WDE.TrinitySmartScriptEditor.Providers
         public IRemoteCommand[] GenerateCommand(SmartScriptSolutionItem item) =>
             new IRemoteCommand[]
             {
-                new CreatureTemplateReloadRemoteCommand((uint) item.Entry), 
+                new CreatureTemplateReloadRemoteCommand((uint) item.EntryOrGuid), 
                 SmartScriptReloadRemoteCommand.Singleton,
                 ConditionsReloadRemoteCommand.Singleton
             };

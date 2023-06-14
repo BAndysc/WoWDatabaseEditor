@@ -227,8 +227,8 @@ public class SpawnViewer : IGameModule, ISavable
     {
         var guidType = spawn is CreatureSpawnInstance ? GuidType.Creature : GuidType.GameObject;
         var tableName = guidType is GuidType.Creature ? "creature" : "gameobject";
-        List<(GuidType, uint)>? toReload = null;
-        if (pendingGameChangesService.HasGuidPendingChange(guidType, spawn.Guid))
+        List<(GuidType, uint entry, uint guid)>? toReload = null;
+        if (pendingGameChangesService.HasGuidPendingChange(guidType, spawn.Entry, spawn.Guid))
         {
             var result = await messageBoxService.ShowDialog(new MessageBoxFactory<int>()
                 .SetTitle("Pending changes")
@@ -251,12 +251,12 @@ public class SpawnViewer : IGameModule, ISavable
             }
         }
         await tableEditorPickerService.ShowForeignKey1To1(tableName, new(spawn.Guid));
-        await spawnsContainer.Reload(guidType, spawn.Guid, zoneAreaManager, dbcManager);
+        await spawnsContainer.Reload(guidType, spawn.Entry, spawn.Guid, zoneAreaManager, dbcManager);
         
         if (toReload != null)
         {
-            foreach (var (type, guid) in toReload)
-                await spawnsContainer.Reload(type, guid, zoneAreaManager, dbcManager);
+            foreach (var (type, entry, guid) in toReload)
+                await spawnsContainer.Reload(type, entry, guid, zoneAreaManager, dbcManager);
         }
     }
 
@@ -361,12 +361,12 @@ public class SpawnViewer : IGameModule, ISavable
         gameContext.StartCoroutine(ReloadCreature(obj));
     }
 
-    private void RequestReloadGuids(List<(GuidType, uint)> toReload)
+    private void RequestReloadGuids(List<(GuidType, uint entry, uint guid)> toReload)
     {
         async Task Do()
         {
-            foreach (var (type, guid) in toReload)
-                await spawnsContainer.Reload(type, guid, zoneAreaManager, dbcManager);
+            foreach (var (type, entry, guid) in toReload)
+                await spawnsContainer.Reload(type, entry, guid, zoneAreaManager, dbcManager);
         }
         Do().ListenErrors();
     }

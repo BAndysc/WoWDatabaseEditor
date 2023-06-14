@@ -4,6 +4,8 @@ namespace WDE.Common.Database
 {
     public interface ISmartScriptLine
     {
+        uint? CreatureEntry { get; }
+        
         int EntryOrGuid { get; }
 
         int ScriptSourceType { get; }
@@ -105,6 +107,7 @@ namespace WDE.Common.Database
 
     public class AbstractSmartScriptLine : ISmartScriptLine
     {
+        public uint? CreatureEntry { get; set; }
         public int EntryOrGuid { get; set; }
         public int ScriptSourceType { get; set; }
         public int Id { get; set; }

@@ -93,7 +93,7 @@ namespace WDE.MangosEventAiEditor.Exporter
             if (script.EntryOrGuid >= 0)
                 entry = (uint)script.EntryOrGuid;
             else
-                entry = databaseProvider.GetCreatureByGuid((uint)-script.EntryOrGuid)?.Entry;
+                entry = databaseProvider.GetCreatureByGuid(0, (uint)-script.EntryOrGuid)?.Entry;
 
             if (entry.HasValue)
             {
