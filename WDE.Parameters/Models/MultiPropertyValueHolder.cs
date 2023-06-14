@@ -21,14 +21,14 @@ public partial class MultiPropertyValueHolder<T, R> : IParameterValueHolder<T>, 
     private readonly IReadOnlyList<R> values;
     private readonly IReadOnlyList<R> originals;
     private readonly Func<R, T> getter;
-    private readonly Action<R, T> setter;
+    private readonly Action<R, bool, T> setter;
     private readonly IBulkEditSource? bulkEditSource;
 
     public MultiPropertyValueHolder(T defaultValue, 
         IReadOnlyList<R> values,
         IReadOnlyList<R> originals,
         Func<R, T> getter,
-        Action<R, T> setter,
+        Action<R, bool, T> setter,
         IBulkEditSource? bulkEditSource)
     {
         this.defaultValue = defaultValue;
@@ -138,7 +138,7 @@ public partial class MultiPropertyValueHolder<T, R> : IParameterValueHolder<T>, 
             {
                 try
                 {
-                    setter(values[i], value);
+                    setter(values[i], false, value);
                 }
                 catch (Exception e)
                 {
@@ -159,7 +159,7 @@ public partial class MultiPropertyValueHolder<T, R> : IParameterValueHolder<T>, 
             {
                 try
                 {
-                    setter(originals[i], value);
+                    setter(originals[i], true, value);
                 }
                 catch (Exception e)
                 {

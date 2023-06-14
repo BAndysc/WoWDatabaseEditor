@@ -107,6 +107,7 @@ namespace WDE.Parameters
             factory.Register("UnusedParameter", UnusedParameter.Instance);
             factory.Register("FloatParameter", new FloatIntParameter(1000));
             factory.Register("DecifloatParameter", new FloatIntParameter(100));
+            factory.Register("OneTenthParameter", new FloatIntParameter(10));
             factory.Register("MillisecondsParameter", new MillisecondsParameter());
             factory.Register("GameEventParameter", AddDatabaseParameter(new GameEventParameter(database)), QuickAccessMode.Limited);
             factory.Register("CreatureParameter", AddDatabaseParameter(new CreatureParameter(database, creaturePicker, serverIntegration)), QuickAccessMode.Limited);

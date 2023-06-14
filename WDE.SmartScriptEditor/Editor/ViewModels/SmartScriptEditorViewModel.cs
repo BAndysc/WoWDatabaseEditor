@@ -2049,27 +2049,32 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 actionsToEdit.Select(a => a.Source).ToList(),
                 originalActions.Select(a => a.Source).ToList(),
                 e => e.Id,
-                (e, id) =>
+                (e, isOriginal, id) =>
                 {
                     smartFactory.SafeUpdateSource(e, id);
-                    FillNonzeroWithDefaults(SmartType.SmartSource, id, sourceParameters);
+                    if (!isOriginal)
+                        FillNonzeroWithDefaults(SmartType.SmartSource, id, sourceParameters);
                 }, bulkEdit);
             MultiPropertyValueHolder<int, SmartTarget> targetType = new MultiPropertyValueHolder<int, SmartTarget>(0,
                 actionsToEdit.Select(a => a.Target).ToList(),
                 originalActions.Select(a => a.Target).ToList(),
                 e => e.Id,
-                (e, id) =>
+                (e, isOriginal, id) =>
                 {
                     smartFactory.SafeUpdateTarget(e, id);
-                    FillNonzeroWithDefaults(SmartType.SmartTarget, id, targetParameters);
+                    if (!isOriginal)
+                        FillNonzeroWithDefaults(SmartType.SmartTarget, id, targetParameters);
                 }, bulkEdit);
             MultiPropertyValueHolder<int, SmartAction> actionType = new MultiPropertyValueHolder<int, SmartAction>(0,
                 actionsToEdit,
                 originalActions,
                 e => e.Id,
-                (e, id) =>
+                (e, isOriginal, id) =>
                 {
                     smartFactory.SafeUpdateAction(e, id);
+                    if (isOriginal)
+                        return;
+                    
                     FillNonzeroWithDefaults(SmartType.SmartAction, id, actionParameters);
                     var actionData = smartDataManager.GetRawData(SmartType.SmartAction, id);
                     if (actionData.TargetTypes != SmartSourceTargetType.None &&
@@ -2318,7 +2323,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 conditionsToEdit,
                 originalConditions,
                 e => e.Id,
-                (e, id) => smartFactory.SafeUpdateCondition(e, id), bulk);
+                (e, isOriginal, id) => smartFactory.SafeUpdateCondition(e, id), bulk);
             
             editableGroup.Add(new EditableActionData("Condition", "General", async () =>
             {
@@ -2401,7 +2406,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 eventsToEdit,
                 originalEvents,
                 e => e.Id,
-                (e, id) =>
+                (e, isOriginal, id) =>
                 {
                     smartFactory.SafeUpdateEvent(e, id);
                 },
