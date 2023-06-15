@@ -36,15 +36,17 @@ public class TableEditorPickerService : ITableEditorPickerService
     private readonly Lazy<IDocumentManager> documentManager;
     private readonly IMessageBoxService messageBoxService;
     private readonly IWindowManager windowManager;
+    private readonly IStandaloneTableEditorSettings windowsSettings;
 
-    public TableEditorPickerService(ITableOpenService tableOpenService, 
+    internal TableEditorPickerService(ITableOpenService tableOpenService, 
         ITableDefinitionProvider definitionProvider, 
         IContainerProvider containerProvider,
         IMainThread mainThread,
         ISessionService sessionService,
         Lazy<IDocumentManager> documentManager,
         IMessageBoxService messageBoxService,
-        IWindowManager windowManager)
+        IWindowManager windowManager,
+        IStandaloneTableEditorSettings windowsSettings)
     {
         this.tableOpenService = tableOpenService;
         this.definitionProvider = definitionProvider;
@@ -54,6 +56,7 @@ public class TableEditorPickerService : ITableEditorPickerService
         this.documentManager = documentManager;
         this.messageBoxService = messageBoxService;
         this.windowManager = windowManager;
+        this.windowsSettings = windowsSettings;
     }
     
     public async Task<long?> PickByColumn(string table, DatabaseKey? key, string column, long? initialValue, string? backupColumn = null, string? customWhere = null)
@@ -148,7 +151,10 @@ public class TableEditorPickerService : ITableEditorPickerService
         {
             viewModel.Pick(pickedEntity);
         };
-        if (await windowManager.ShowDialog(viewModel))
+        var task = windowManager.ShowDialog(viewModel, out var window);
+        if (window != null)
+            windowsSettings.SetupWindow(table, window);
+        if (await task)
         {
             var col = viewModel.SelectedRow?.GetCell(column);
             if (col is DatabaseField<long> longColumn)
@@ -211,7 +217,11 @@ public class TableEditorPickerService : ITableEditorPickerService
 
         using var viewModel = containerProvider.Resolve<RowPickerViewModel>((typeof(ViewModelBase), viewModelBase), (typeof(bool), openIsNoSaveMode));
         viewModel.DisablePicking = true;
-        await windowManager.ShowDialog(viewModel);
+        
+        var task = windowManager.ShowDialog(viewModel, out var window);
+        if (window != null)
+            windowsSettings.SetupWindow(table, window);
+        await task;
     }
 
     public async Task ShowForeignKey1To1(string table, DatabaseKey key)
@@ -232,7 +242,10 @@ public class TableEditorPickerService : ITableEditorPickerService
             (typeof(bool), openIsNoSaveMode),
             (typeof(DatabaseTableDefinitionJson), definition));
 
-        await windowManager.ShowDialog(viewModel);
+        var task = windowManager.ShowDialog(viewModel, out var window);
+        if (window != null)
+            windowsSettings.SetupWindow(table, window);
+        await task;
 
         if (viewModel.PendingSaveTask != null)
             await viewModel.PendingSaveTask;

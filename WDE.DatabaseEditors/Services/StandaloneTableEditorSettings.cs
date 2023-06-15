@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using WDE.Common.Managers;
 using WDE.Common.Services;
 using WDE.Module.Attributes;
 
@@ -9,6 +10,7 @@ internal interface IStandaloneTableEditorSettings
     bool HasWindowState(string table);
     bool GetWindowState(string table, out bool maximized, out int x, out int y, out int width, out int height);
     void UpdateWindowState(string table, bool maximized, int x, int y, int width, int height);
+    void SetupWindow(string table, IAbstractWindowView window);
 }
 
 [AutoRegister]
@@ -73,5 +75,20 @@ internal class StandaloneTableEditorSettings : IStandaloneTableEditorSettings
             Height = height
         };
         userSettings.Update(settings);
+    }
+
+    public void SetupWindow(string table, IAbstractWindowView window)
+    {
+        if (GetWindowState(table, out var maximized, out var x, out var y, out var width, out var height))
+        {
+            window.Reposition(x, y, maximized, width, height);
+        }
+        window.OnClosing += () =>
+        {
+            var position = window.Position;
+            var size = window.Size;
+            var maximized = window.IsMaximized;
+            UpdateWindowState(table, maximized, position.x, position.y, size.x, size.y);
+        };
     }
 }

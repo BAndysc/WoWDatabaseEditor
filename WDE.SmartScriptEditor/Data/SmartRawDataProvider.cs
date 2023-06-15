@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using WDE.Common.Services.MessageBox;
+using WDE.Common.Utils;
 using WDE.Module.Attributes;
 
 namespace WDE.SmartScriptEditor.Data
@@ -17,18 +20,61 @@ namespace WDE.SmartScriptEditor.Data
 
         private readonly ISmartDataJsonProvider jsonProvider;
         private readonly ISmartDataSerializationProvider serializationProvider;
+        private readonly IMessageBoxService messageBoxService;
 
         public SmartRawDataProvider(ISmartDataJsonProvider jsonProvider,
-            ISmartDataSerializationProvider serializationProvider)
+            ISmartDataSerializationProvider serializationProvider,
+            IMessageBoxService messageBoxService)
         {
             this.jsonProvider = jsonProvider;
             this.serializationProvider = serializationProvider;
-            actions = serializationProvider.DeserializeSmartData<SmartGenericJsonData>(jsonProvider.GetActionsJson());
-            events = serializationProvider.DeserializeSmartData<SmartGenericJsonData>(jsonProvider.GetEventsJson());
-            targets = serializationProvider.DeserializeSmartData<SmartGenericJsonData>(jsonProvider.GetTargetsJson());
-            eventsGroups = serializationProvider.DeserializeSmartData<SmartGroupsJsonData>(jsonProvider.GetEventsGroupsJson());
-            actionsGroups = serializationProvider.DeserializeSmartData<SmartGroupsJsonData>(jsonProvider.GetActionsGroupsJson());
-            targetsGroups = serializationProvider.DeserializeSmartData<SmartGroupsJsonData>(jsonProvider.GetTargetsGroupsJson());
+            this.messageBoxService = messageBoxService;
+            actions = DeserializeData(jsonProvider.GetActionsJson(), "actions.json");
+            events = DeserializeData(jsonProvider.GetEventsJson(), "events.json");
+            targets = DeserializeData(jsonProvider.GetTargetsJson(), "targets.json");
+            eventsGroups = DeserializeGroups(jsonProvider.GetEventsGroupsJson(), "events_groups.json");
+            actionsGroups = DeserializeGroups(jsonProvider.GetActionsGroupsJson(), "actions_groups.json");
+            targetsGroups = DeserializeGroups(jsonProvider.GetTargetsGroupsJson(), "targets_groups.json");
+        }
+
+        private List<SmartGenericJsonData> DeserializeData(string json, string fileName)
+        {
+            try
+            {
+                return serializationProvider.DeserializeSmartData<SmartGenericJsonData>(json);
+            }
+            catch (Exception e)
+            {
+                messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
+                    .SetTitle("Error while loading smart data")
+                    .SetMainInstruction("Smart data file is corrupted")
+                    .SetContent("File " + fileName +
+                                " is corrupted, either this is a faulty update or you have made a faulty change.\n\nThe SAI editor will not work correctly.\n\n"  + e.Message)
+                    .WithOkButton(true)
+                    .Build()).ListenErrors();
+            }
+
+            return new List<SmartGenericJsonData>();
+        }
+
+        private List<SmartGroupsJsonData> DeserializeGroups(string json, string fileName)
+        {
+            try
+            {
+                return serializationProvider.DeserializeSmartData<SmartGroupsJsonData>(json);
+            }
+            catch (Exception e)
+            {
+                messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
+                    .SetTitle("Error while loading smart groups")
+                    .SetMainInstruction("Smart groups file is corrupted")
+                    .SetContent("File " + fileName +
+                                " is corrupted, either this is a faulty update or you have made a faulty change.\n\nThe SAI editor will not work correctly.\n\n"  + e.Message)
+                    .WithOkButton(true)
+                    .Build()).ListenErrors();
+            }
+
+            return new List<SmartGroupsJsonData>();
         }
 
         public IEnumerable<SmartGenericJsonData> GetActions() => actions;

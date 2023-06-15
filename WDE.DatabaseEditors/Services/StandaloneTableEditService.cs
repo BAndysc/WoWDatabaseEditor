@@ -80,18 +80,8 @@ public class StandaloneTableEditService : IStandaloneTableEditService
         bool openInNoSaveMode = false;
         var viewModel = containerProvider.Resolve<RowPickerViewModel>((typeof(ViewModelBase), tableViewModel), (typeof(bool), openInNoSaveMode));
         window = windowManager.ShowWindow(viewModel, out var task);
-        if (windowsSettings.GetWindowState(table, out var maximized, out var x, out var y, out var width, out var height))
-        {
-            window.Reposition(x, y, maximized, width, height);
-        }
+        windowsSettings.SetupWindow(table, window);
         openedWindows[(table, key)] = window;
-        window.OnClosing += () =>
-        {
-            var position = window.Position;
-            var size = window.Size;
-            var maximized = window.IsMaximized;
-            windowsSettings.UpdateWindowState(table, maximized, position.x, position.y, size.x, size.y);
-        };
         WindowLifetimeTask(table, key, window, task).ListenErrors();
     }
 

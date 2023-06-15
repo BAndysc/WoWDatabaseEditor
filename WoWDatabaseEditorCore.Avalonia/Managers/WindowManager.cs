@@ -169,7 +169,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
             task.SetResult();
         }
 
-        public async Task<bool> ShowDialog(IDialog viewModel)
+        public Task<bool> ShowDialog(IDialog viewModel, out IAbstractWindowView? window)
         {
             try
             {
@@ -212,11 +212,13 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
                     ((DockPanel)mainWindowHolder.RootWindow.GetVisualRoot().VisualChildren[0].VisualChildren[0].VisualChildren[0]).Children.Add(popup);
                     popup.PlacementMode = PlacementMode.Pointer;
                     popup.IsOpen = true;
-                    return await tcs.Task;
+                    window = null;
+                    return tcs.Task;
                 }
                 else
                 { 
                     DialogWindow view = new DialogWindow();
+                    window = new WindowWrapper(new WeakReference<Window>(view));
                     if (viewModel.AutoSize)
                     {
                         view.MinHeight = viewModel.DesiredHeight;
@@ -228,9 +230,15 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
                         view.Width = viewModel.DesiredWidth;
                     }
                     view.DataContext = viewModel;
-                    var result = await mainWindowHolder.ShowDialog<bool>(view);
-                    view.DataContext = null;
-                    return result;
+
+                    async Task<bool> inner()
+                    {
+                        var result = await mainWindowHolder.ShowDialog<bool>(view);
+                        view.DataContext = null;
+                        return result;
+                    }
+
+                    return inner();
                 }
             }
             catch (Exception e)
@@ -238,6 +246,11 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
                 Console.WriteLine(e);
                 throw;
             }
+        }
+
+        public Task<bool> ShowDialog(IDialog viewModel)
+        {
+            return ShowDialog(viewModel, out _);
         }
 
         public IAbstractWindowView ShowStandaloneDocument(IDocument document, out Task task)

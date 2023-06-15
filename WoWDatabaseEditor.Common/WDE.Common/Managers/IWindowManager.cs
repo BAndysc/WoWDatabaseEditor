@@ -12,6 +12,8 @@ namespace WDE.Common.Managers
         IAbstractWindowView ShowWindow(IWindowViewModel viewModel, out Task task);
         
         Task<bool> ShowDialog(IDialog viewModel);
+        
+        Task<bool> ShowDialog(IDialog viewModel, out IAbstractWindowView? window);
 
         IAbstractWindowView ShowStandaloneDocument(IDocument document, out Task task);
         
