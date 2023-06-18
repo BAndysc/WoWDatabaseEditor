@@ -20,6 +20,16 @@ namespace WDE.Common.Database
 
         int ChatTypeId => 0; // used in mangos, but helpful there
     }
+
+    public static class BroadcastTextExtensions
+    {
+        public static string? FirstText(this IBroadcastText self)
+        {
+            if (!string.IsNullOrEmpty(self.Text))
+                return self.Text;
+            return self.Text1;
+        }
+    }
     
     public interface IBroadcastTextLocale
     {

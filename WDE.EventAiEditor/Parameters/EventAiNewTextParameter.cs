@@ -27,7 +27,7 @@ public class EventAiNewTextParameter : IParameter<long>, IAsyncParameter<long>, 
             return ToString(val);
         
         var result = await databaseProvider.GetBroadcastTextByIdAsync((uint)val);
-        var text = (string.IsNullOrEmpty(result?.Text) ? result?.Text1 : result?.Text);
+        var text = result?.FirstText();
         if (text == null || result == null)
             return ToString(val);
 

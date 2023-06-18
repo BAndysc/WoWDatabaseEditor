@@ -564,12 +564,12 @@ namespace WDE.Parameters
                 var text = item.Text
                     .Select(t => t.Text0_0 ?? t.Text0_1 ?? "")
                     .FirstOrDefault();
-                if (text == null && item.Text.Select(t => t.BroadcastTextId).FirstOrDefault() is { } broadcastId and > 0)
+                if (string.IsNullOrWhiteSpace(text) && item.Text.Select(t => t.BroadcastTextId).FirstOrDefault() is { } broadcastId and > 0)
                 {
                     var broadcastText = await database.GetBroadcastTextByIdAsync(broadcastId);
                     if (broadcastText != null)
                     {
-                        text = broadcastText.Text ?? broadcastText.Text1;
+                        text = broadcastText.FirstText();
                     }
                 }
 
@@ -616,7 +616,7 @@ namespace WDE.Parameters
                 {
                     var broadcastText = await database.GetBroadcastTextByIdAsync(item.BroadcastTextId);
                     if (broadcastText != null)
-                        text = broadcastText.Text ?? broadcastText.Text1;
+                        text = broadcastText.FirstText();
                 }
                 Items.Add(item.Id, new SelectOption(text ?? ""));
             }

@@ -164,7 +164,7 @@ public class CreatureTextParameter : IContextualParameter<long, SmartBaseElement
         if (string.IsNullOrWhiteSpace(text) && firstOrDefault.BroadcastTextId > 0)
         {
             var broadcastText = await databaseProvider.GetBroadcastTextByIdAsync(firstOrDefault.BroadcastTextId);
-            text = broadcastText?.Text ?? broadcastText?.Text1;
+            text = broadcastText?.FirstText() ?? "";
         }
     
         if (text != null)

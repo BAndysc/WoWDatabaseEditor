@@ -29,7 +29,7 @@ public class GossipOptionTextWithFallback : StringParameter, IAsyncContextualPar
             return "";
 
         var text = await databaseProvider.GetBroadcastTextByIdAsync((uint)broadcastTextId);
-        return text?.Text ?? text?.Text1 ?? "";
+        return text?.FirstText() ?? "";
     }
 
     public string ToString(string value, DatabaseEntity context)

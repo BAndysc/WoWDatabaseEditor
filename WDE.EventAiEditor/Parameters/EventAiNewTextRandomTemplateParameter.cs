@@ -51,7 +51,7 @@ public class EventAiNewTextRandomTemplateParameter : IParameter<long>, IAsyncPar
         var strings = texts
             .Where(t => t.Text != null || t.Text1 != null)
             .Take(2)
-            .Select(t => (t.Text ?? t.Text1)!.TrimToLength(40) + $" ({t.Id})")
+            .Select(t => t.FirstText()!.TrimToLength(40) + $" ({t.Id})")
             .Select(t => $"[p=2]{t.TrimToLength(40)}[/p]");
 
         var orMore = texts.Count >= 3 ? $" or {texts.Count - 2} more" : "";
@@ -62,7 +62,7 @@ public class EventAiNewTextRandomTemplateParameter : IParameter<long>, IAsyncPar
     private async Task<string> GetBroadcastTextAsync(long id)
     {
         var result = await databaseProvider.GetBroadcastTextByIdAsync((uint)id);
-        var text = (string.IsNullOrEmpty(result?.Text) ? result?.Text1 : result?.Text);
+        var text = result?.FirstText();
         if (text == null || result == null)
             return ToString(id);
 
