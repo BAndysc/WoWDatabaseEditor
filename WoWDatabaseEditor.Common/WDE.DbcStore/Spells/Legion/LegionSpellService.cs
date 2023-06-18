@@ -40,6 +40,9 @@ public class LegionSpellService : IDbcSpellService
         public SpellAuraType AuraType;
         public SpellTarget TargetA;
         public SpellTarget TargetB;
+        public int MiscValueA;
+        public int MiscValueB;
+        public uint TriggerSpell;
     }
     
     private class SpellData
@@ -157,6 +160,9 @@ public class LegionSpellService : IDbcSpellService
             var targetA = row.GetUInt(28, 0);
             var targetB = row.GetUInt(28, 1);
             var spellId = row.GetUInt(29);
+            var miscValueA = row.GetInt(26, 0);
+            var miscValueB = row.GetInt(26, 1);
+            var triggerSpell = row.GetUInt(17);
 
             if (spells.TryGetValue(spellId, out var spell))
             {
@@ -166,6 +172,9 @@ public class LegionSpellService : IDbcSpellService
                     AuraType = (SpellAuraType)auraType,
                     TargetA = (SpellTarget)targetA,
                     TargetB = (SpellTarget)targetB,
+                    MiscValueA = miscValueA,
+                    MiscValueB = miscValueB,
+                    TriggerSpell = triggerSpell
                 };
                 if (spell.Effects == null || spell.Effects.Length <= effectIndex)
                     Array.Resize(ref spell.Effects, (int)effectIndex + 1);
@@ -340,11 +349,15 @@ public class LegionSpellService : IDbcSpellService
 
     public uint GetSpellEffectMiscValueA(uint spellId, int index)
     {
-        return default;
+        if (TryGetEffect(spellId, index, out var effect))
+            return (uint)effect.MiscValueA;
+        return 0;
     }
 
     public uint GetSpellEffectTriggerSpell(uint spellId, int index)
     {
-        return default;
+        if (TryGetEffect(spellId, index, out var effect))
+            return effect.TriggerSpell;
+        return 0;
     }
 }
