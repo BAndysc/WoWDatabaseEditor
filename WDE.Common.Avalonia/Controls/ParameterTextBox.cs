@@ -29,6 +29,8 @@ namespace WDE.Common.Avalonia.Controls
         protected override void OnKeyDown(KeyEventArgs e)
         {
             justHandledS = false;
+            
+            // S multiplies the value by 1000
             if (e.Key == Key.S &&
                 e.KeyModifiers == KeyModifiers.None &&
                 float.TryParse(Text, out var textAsFloat) &&
@@ -39,6 +41,19 @@ namespace WDE.Common.Avalonia.Controls
                 e.Handled = true;
                 justHandledS = true;
             }
+            // ctrl + num: set value to TAG + num
+            else if (e.Key >= Key.D0 && e.Key <= Key.D9  &&
+                     e.KeyModifiers is KeyModifiers.Control or KeyModifiers.Meta)
+            {
+                var num = (int)(e.Key - Key.D0);
+                if (Tag != null && long.TryParse(Tag.ToString(), out var tagNumber))
+                {
+                    Text = (tagNumber * 100 + num).ToString();
+                    SelectionStart = SelectionEnd = Text.Length;
+                    e.Handled = true;
+                }
+            }
+            // ctrl up down - traverse through textboxes
             else if (e.Key is Key.Down or Key.Up &&
                      e.KeyModifiers is KeyModifiers.Control or KeyModifiers.Meta)
             {

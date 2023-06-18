@@ -30,6 +30,7 @@
                                         <controls:ParameterTextBox VerticalContentAlignment="Center"
                                                                    Focusable="True"
                                                                    Name="TextBox"
+                                                                   Tag="{Binding Tag, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=controls:ParameterValueHolderView}}"
                                                                    SpecialCopying="{Binding SpecialCopying, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=controls:ParameterValueHolderView}}"
                                                                    Text="{Binding Value, Mode=TwoWay}"
                                                                    FontFamily="Consolas,Menlo,Courier,Courier New"

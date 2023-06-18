@@ -26,10 +26,13 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
 
         public List<CommandKeyBinding> KeyBindings { get; } = new List<CommandKeyBinding>();
         
+        public long EntryOrGuid { get; }
+        
         public ParametersEditViewModel(IItemFromListProvider itemFromListProvider,
             ICurrentCoreVersion currentCoreVersion,
             IParameterPickerService parameterPickerService,
             IMainThread mainThread,
+            long entryOrGuid,
             string title,
             SmartBaseElement? element,
             bool focusFirst,
@@ -39,6 +42,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
             object? context = null)
         {
             Title = title;
+            EntryOrGuid = entryOrGuid;
             this.parameterPickerService = parameterPickerService;
             HashSet<IEditableParameterViewModel> visible = new();
             SourceList<IEditableParameterViewModel> visibleParameters = new();

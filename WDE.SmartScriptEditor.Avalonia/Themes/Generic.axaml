@@ -249,6 +249,7 @@
                                         <DataTemplate>
                                             <extendedTextBlock:ParameterValueHolderView
                                                 DataContext="{Binding Parameter}"
+                                                Tag="{Binding Tag, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=editing:ParameterEditorView}}"
                                                 SpecialCopying="{Binding DataContext.SpecialCopying, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=editing:ParameterEditorView}, FallbackValue=False}" 
                                                 SpecialCommand="{Binding DataContext.SpecialCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=editing:ParameterEditorView}, FallbackValue=False}" 
                                                 PickCommand="{Binding DataContext.SelectItemAction, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=editing:ParameterEditorView}}" />
