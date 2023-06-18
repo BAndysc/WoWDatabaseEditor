@@ -2001,7 +2001,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 ev.Parent = script;
 
                 bool acceptInsert = preferences.AddingBehaviour == AddingElementBehaviour.JustAdd ||
-                                    !ev.GetParameter(0).IsUsed;
+                                    preferences.AddingBehaviour == AddingElementBehaviour.Wizard && !ev.GetParameter(0).IsUsed;
                 var requestOpenNext = false;
 
                 if (!acceptInsert)
