@@ -269,7 +269,9 @@ namespace WDE.SmartScriptEditor.History
             smartEvent.CooldownMax.OnValueChanged += Parameter_OnValueChanged;
             smartEvent.TimerId.OnValueChanged += Parameter_OnValueChanged;
 
-            BindSmartBase(smartEvent);
+            if (!smartEvent.IsBeginGroup) // BeginGroup is not a real event, its values are used for opened/closed state
+                                          // so we shouldn't bind to it
+                BindSmartBase(smartEvent);
 
             smartEvent.Actions.CollectionChanged += Actions_CollectionChanged;
             smartEvent.Conditions.CollectionChanged += Conditions_CollectionChanged;
