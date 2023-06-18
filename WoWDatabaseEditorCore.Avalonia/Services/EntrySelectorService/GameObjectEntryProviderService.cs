@@ -138,7 +138,7 @@ public class GameObjectEntryProviderService : IGameobjectEntryOrGuidProviderServ
 
         var result = await tabularDataPicker.PickRows(table);
         
-        return result.Select(x => (int)x.Entry).ToList();
+        return result == null ? Array.Empty<int>() : result.Select(x => (int)x.Entry).ToList();
     }
 
     private int ExtractGuidOrEntry(IGameObjectTemplate gameobjectTemplate)

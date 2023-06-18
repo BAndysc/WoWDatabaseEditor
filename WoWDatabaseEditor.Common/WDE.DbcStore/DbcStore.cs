@@ -499,8 +499,9 @@ namespace WDE.DbcStore
                             new TabularDataColumn(nameof(IArea.Id), "Entry", 60), 
                             new TabularDataColumn(nameof(IArea.Name), "Name", 160), 
                             new TabularDataColumn(nameof(IArea.ParentArea) + "." + nameof(IArea.Name), "Parent", 160), 
-                            new TabularDataColumn(nameof(IArea.Map) + "." + nameof(IMap.Name), "Map", 120),
-                            counterColumn), QuickAccessMode.Limited);   
+                            new TabularDataColumn(nameof(IArea.Map) + "." + nameof(IMap.Id), "Map", 40),
+                            new TabularDataColumn(nameof(IArea.Map) + "." + nameof(IMap.Name), "Map name", 120),
+                            counterColumn), QuickAccessMode.Limited);
                 }
                 RegisterZoneAreParameter("ZoneAreaParameter");
                 RegisterZoneAreParameter("ZoneArea(spell_area)Parameter", 
@@ -1510,7 +1511,7 @@ namespace WDE.DbcStore
         {
             var result = await dataPicker.PickRows(BuildTable());
             
-            return result.Select(getId).ToArray();
+            return result == null ? Array.Empty<long>() : result.Select(getId).ToArray();
         }
         
         private ITabularDataArgs<T> BuildTable()

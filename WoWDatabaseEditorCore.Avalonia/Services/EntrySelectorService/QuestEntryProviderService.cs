@@ -133,6 +133,6 @@ public class QuestEntryProviderService : IQuestEntryProviderService
     {
         var table = BuildTable(null, out _);
         var templates = await tabularDataPicker.PickRows(table);
-        return templates.Select(t => t.Entry).ToList();
+        return templates == null ? Array.Empty<uint>() : templates.Select(t => t.Entry).ToList();
     }
 }

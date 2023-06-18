@@ -93,6 +93,6 @@ public class SpellEntryProviderService : ISpellEntryProviderService
     {
         var table = BuildTable(customCounterTable, null, out _);
         var spells = await tabularDataPicker.PickRows(table);
-        return spells.Select(x => x.Id).ToList();
+        return spells == null ? Array.Empty<uint>() : spells.Select(x => x.Id).ToList();
     }
 }

@@ -5,7 +5,7 @@ using WDE.Common.Utils;
 
 namespace WDE.Common.TableData;
 
-public class TabularDataBuilder<T> : ITabularDataArgs<T> where T : class
+public class TabularDataBuilder<T> : ITabularDataArgs<T> 
 {
     public string Title { get; private set; } = null!;
     public System.Func<T, string, bool> FilterPredicate { get; private set; } = (_, _) => false;

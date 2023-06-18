@@ -160,7 +160,7 @@ public class CreatureEntryOrGuidProviderService : ICreatureEntryOrGuidProviderSe
 
         var result = await tabularDataPicker.PickRows(table);
         
-        return result.Select(ExtractGuidOrEntry).ToList();
+        return result == null ? Array.Empty<int>() : result.Select(ExtractGuidOrEntry).ToList();
     }
 
     private int ExtractGuidOrEntry(ICreatureTemplate creatureTemplate)

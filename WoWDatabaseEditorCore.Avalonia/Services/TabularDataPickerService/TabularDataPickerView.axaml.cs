@@ -1,8 +1,12 @@
+using System;
+using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Input.Platform;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using Avalonia.Threading;
 using AvaloniaStyles.Controls;
 using Prism.Commands;
 
@@ -48,5 +52,28 @@ public partial class TabularDataPickerView : UserControl
 
             e.Handled = true;
         }
+    }
+    
+    private void GridView_OnKeyDown(object? sender, KeyEventArgs e)
+    {
+        // add missing functionality - space on the item (un)checks the checkbox
+        if (e.Key == Key.Space && 
+            sender is VirtualizedGridView gridView &&
+            gridView.UseCheckBoxes &&
+            gridView.FocusedIndex is { } focusedIndex)
+        {
+            if (gridView.CheckedIndices.Contains(focusedIndex))
+                gridView.CheckedIndices.Remove(focusedIndex);
+            else
+                gridView.CheckedIndices.Add(focusedIndex);
+            e.Handled = true;
+        }
+    }
+
+    private void GridView_OnColumnWidthChanged(object? sender, RoutedEventArgs e)
+    {
+        var gv = this.FindControl<VirtualizedGridView>("GridView");
+        if (gv is { } && DataContext is TabularDataPickerViewModel vm)
+            vm.SaveColumnsWidth(gv.GetColumnsWidth().ToList());
     }
 }

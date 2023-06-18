@@ -30,9 +30,15 @@ public class VirtualizedGridViewItemPresenter : Panel
     private IMultiIndexContainer selection = new MultiIndexContainer();
     public static readonly DirectProperty<VirtualizedGridViewItemPresenter, IMultiIndexContainer> SelectionProperty = AvaloniaProperty.RegisterDirect<VirtualizedGridViewItemPresenter, IMultiIndexContainer>(nameof(Selection), o => o.Selection, (o, v) => o.Selection = v, new MultiIndexContainer(), BindingMode.OneWay);
 
+    private IMultiIndexContainer checkedIndices = new MultiIndexContainer();
+    public static readonly DirectProperty<VirtualizedGridViewItemPresenter, IMultiIndexContainer> CheckedIndicesProperty = AvaloniaProperty.RegisterDirect<VirtualizedGridViewItemPresenter, IMultiIndexContainer>(nameof(CheckedIndices), o => o.CheckedIndices, (o, v) => o.CheckedIndices = v, new MultiIndexContainer(), BindingMode.OneWay);
+
     private IEnumerable<GridColumnDefinition> columns = new AvaloniaList<GridColumnDefinition>();
     public static readonly DirectProperty<VirtualizedGridViewItemPresenter, IEnumerable<GridColumnDefinition>> ColumnsProperty =
         AvaloniaProperty.RegisterDirect<VirtualizedGridViewItemPresenter, IEnumerable<GridColumnDefinition>>(nameof(Columns), o => o.Columns, (o, v) => o.Columns = v);
+
+    private bool useCheckBoxes;
+    public static readonly DirectProperty<VirtualizedGridViewItemPresenter, bool> UseCheckBoxesProperty = AvaloniaProperty.RegisterDirect<VirtualizedGridViewItemPresenter, bool>(nameof(UseCheckBoxes), o => o.UseCheckBoxes, (o, v) => o.UseCheckBoxes = v);
 
     private RecyclableViewList views;
     private IDataTemplate itemTemplate;
@@ -45,6 +51,18 @@ public class VirtualizedGridViewItemPresenter : Panel
         {
             var parent = ConstructGrid();
             int i = 0;
+
+            if (UseCheckBoxes)
+            {
+                Control checkbox = new VirtualizedGridCheckBox()
+                {
+                    [!VirtualizedGridCheckBox.CheckedIndicesProperty] = this[!CheckedIndicesProperty],
+                    [!VirtualizedGridCheckBox.IndexProperty] = new Binding("$parent[1].Tag")
+                };
+                Grid.SetColumn(checkbox, 2 * i++);
+                parent.Children.Add(checkbox);
+            }
+            
             foreach (var column in Columns)
             {
                 IControl control;
@@ -171,7 +189,19 @@ public class VirtualizedGridViewItemPresenter : Panel
         get => selection;
         set => SetAndRaise(SelectionProperty, ref selection, value);
     }
+    
+    public bool UseCheckBoxes
+    {
+        get => useCheckBoxes;
+        set => SetAndRaise(UseCheckBoxesProperty, ref useCheckBoxes, value);
+    }
 
+    public IMultiIndexContainer CheckedIndices
+    {
+        get => checkedIndices;
+        set => SetAndRaise(CheckedIndicesProperty, ref checkedIndices, value);
+    }
+    
     public IEnumerable<GridColumnDefinition> Columns
     {
         get => columns;
@@ -276,25 +306,38 @@ public class VirtualizedGridViewItemPresenter : Panel
     private Grid ConstructGrid()
     {
         Grid grid = new();
-        SetupGridColumns(Columns, grid, false);
+        SetupGridColumns(Columns, grid, false, UseCheckBoxes);
         return grid;
     }
 
-    internal static void SetupGridColumns(IEnumerable<GridColumnDefinition> columns, Grid grid, bool isHeader)
+    internal static void SetupGridColumns(IEnumerable<GridColumnDefinition> columns, Grid grid, bool isHeader, bool addCheckboxColumn)
     {
         int i = 0;
-        foreach (var column in columns)
+        void AddColumn(int preferredWidth)
         {
-            var c = new ColumnDefinition(isHeader ? new GridLength(column.PreferedWidth, GridUnitType.Pixel) : default)
+            var c = new ColumnDefinition(isHeader ? new GridLength(preferredWidth, GridUnitType.Pixel) : default)
             {
                 SharedSizeGroup = $"col{(i++)}",
                 MinWidth = 10,
             };
             grid.ColumnDefinitions.Add(c);
-            grid.ColumnDefinitions.Add(new ColumnDefinition(GridView.SplitterWidth, GridUnitType.Pixel));
+            AddSplitter(grid);
         }
+
+        if (addCheckboxColumn)
+        {
+            AddColumn(50);
+        }
+        
+        foreach (var column in columns)
+            AddColumn(column.PreferedWidth);
     }
-    
+
+    internal static void AddSplitter(Grid grid)
+    {
+        grid.ColumnDefinitions.Add(new ColumnDefinition(GridView.SplitterWidth, GridUnitType.Pixel));
+    }
+
     private IDisposable visualTreeSubscription = Disposable.Empty;
     ScrollViewer? ScrollViewer => this.FindAncestorOfType<ScrollViewer>();
 }

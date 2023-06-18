@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Avalonia;
 using Avalonia.Collections;
 using Avalonia.Controls;
@@ -7,9 +8,12 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Data;
 using Avalonia.Input;
 using Avalonia.Input.Platform;
+using Avalonia.Interactivity;
 using Avalonia.VisualTree;
+using DynamicData;
 using WDE.Common.Collections;
 using WDE.Common.Utils;
+using WDE.MVVM.Observable;
 
 namespace AvaloniaStyles.Controls;
 
@@ -24,6 +28,9 @@ public class VirtualizedGridView : TemplatedControl
     private IMultiIndexContainer selection = new MultiIndexContainer();
     public static readonly DirectProperty<VirtualizedGridView, IMultiIndexContainer> SelectionProperty = AvaloniaProperty.RegisterDirect<VirtualizedGridView, IMultiIndexContainer>(nameof(Selection), o => o.Selection, (o, v) => o.Selection = v, new MultiIndexContainer(), BindingMode.OneWay);
 
+    private IMultiIndexContainer checkedIndices = new MultiIndexContainer();
+    public static readonly DirectProperty<VirtualizedGridView, IMultiIndexContainer> CheckedIndicesProperty = AvaloniaProperty.RegisterDirect<VirtualizedGridView, IMultiIndexContainer>(nameof(CheckedIndices), o => o.CheckedIndices, (o, v) => o.CheckedIndices = v, new MultiIndexContainer(), BindingMode.OneWay);
+
     private int? focusedIndex;
     public static readonly DirectProperty<VirtualizedGridView, int?> FocusedIndexProperty = AvaloniaProperty.RegisterDirect<VirtualizedGridView, int?>(nameof(FocusedIndex), o => o.FocusedIndex, (o, v) => o.FocusedIndex = v, -1, BindingMode.TwoWay);
 
@@ -33,6 +40,18 @@ public class VirtualizedGridView : TemplatedControl
 
     private bool multiSelect;
     public static readonly DirectProperty<VirtualizedGridView, bool> MultiSelectProperty = AvaloniaProperty.RegisterDirect<VirtualizedGridView, bool>(nameof(MultiSelect), o => o.MultiSelect, (o, v) => o.MultiSelect = v);
+    
+    private bool useCheckBoxes;
+    public static readonly DirectProperty<VirtualizedGridView, bool> UseCheckBoxesProperty = AvaloniaProperty.RegisterDirect<VirtualizedGridView, bool>(nameof(UseCheckBoxes), o => o.UseCheckBoxes, (o, v) => o.UseCheckBoxes = v);
+
+    public static readonly RoutedEvent<RoutedEventArgs> ColumnWidthChangedEvent =
+        RoutedEvent.Register<VirtualizedGridView, RoutedEventArgs>(nameof(ColumnWidthChanged), RoutingStrategies.Bubble);
+
+    public event EventHandler<RoutedEventArgs> ColumnWidthChanged
+    {
+        add => AddHandler(ColumnWidthChangedEvent, value);
+        remove => RemoveHandler(ColumnWidthChangedEvent, value);
+    }
     
     public double ItemHeight
     {
@@ -52,6 +71,12 @@ public class VirtualizedGridView : TemplatedControl
         set => SetAndRaise(SelectionProperty, ref selection, value);
     }
     
+    public IMultiIndexContainer CheckedIndices
+    {
+        get => checkedIndices;
+        set => SetAndRaise(CheckedIndicesProperty, ref checkedIndices, value);
+    }
+
     public int? FocusedIndex
     {
         get => focusedIndex;
@@ -63,13 +88,24 @@ public class VirtualizedGridView : TemplatedControl
         get => multiSelect;
         set => SetAndRaise(MultiSelectProperty, ref multiSelect, value);
     }
-        
+    
+    public bool UseCheckBoxes
+    {
+        get => useCheckBoxes;
+        set => SetAndRaise(UseCheckBoxesProperty, ref useCheckBoxes, value);
+    }
+    
     public IEnumerable<GridColumnDefinition> Columns
     {
         get => columns;
         set => SetAndRaise(ColumnsProperty, ref columns, value);
     }
 
+    private VirtualizedGridViewItemPresenter? children;
+    private Grid? header;
+
+    public VirtualizedGridViewItemPresenter? ItemPresenter => children;
+    
     protected override void OnKeyDown(KeyEventArgs e)
     {
         base.OnKeyDown(e);
@@ -113,33 +149,72 @@ public class VirtualizedGridView : TemplatedControl
         return null;
     }
 
+    public IEnumerable<int> GetColumnsWidth()
+    {
+        if (header == null)
+            yield break;
+        for (var i = useCheckBoxes ? 2 : 0; // first two columns are checkboxes and splitter, they are not customizable, so skip
+             i < header.ColumnDefinitions.Count - 1; // -1, because last column is an empty space
+             i += 2) // every second column is a splitter
+        {
+            var column = header.ColumnDefinitions[i];
+            yield return (int)column.Width.Value;
+        }
+    }
+
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
-        var header = e.NameScope.Find<Grid>("PART_header");
-                
+        header = e.NameScope.Find<Grid>("PART_header");
+        children = e.NameScope.Find<VirtualizedGridViewItemPresenter>("PART_Children");
+
         header.ColumnDefinitions.Clear();
         header.Children.Clear();
-        VirtualizedGridViewItemPresenter.SetupGridColumns(columns, header, true);
+        
+        VirtualizedGridViewItemPresenter.SetupGridColumns(columns, header, true, useCheckBoxes);
 
         // additional column in header makes it easier to resize
         header.ColumnDefinitions.Add(new ColumnDefinition(20, GridUnitType.Pixel));
-            
+        
         int i = 0;
-        foreach (var column in Columns)
+        void AddHeaderCell(string name)
         {
             var headerCell = new GridViewColumnHeader()
             {
-                ColumnName = column.Name
+                ColumnName = name
             };
-            headerCell.ColumnName = column.Name;
+            headerCell.ColumnName = name;
+            headerCell.GetObservable(BoundsProperty).SubscribeAction(_ =>
+            {
+                ColumnsSizeChanged();
+            });
             Grid.SetColumn(headerCell, i++);
             header.Children.Add(headerCell);
-                    
+
             var splitter = new GridSplitter();
             splitter.Focusable = false;
             Grid.SetColumn(splitter, i++);
             header.Children.Add(splitter);
         }
+
+        if (useCheckBoxes)
+            AddHeaderCell("");
+        
+        foreach (var column in Columns)
+            AddHeaderCell(column.Name);
+    }
+
+    private void ColumnsSizeChanged()
+    {
+        RaiseEvent(new RoutedEventArgs()
+        {
+            RoutedEvent = ColumnWidthChangedEvent,
+            Source = this
+        });
+        int width = 20; // 20 extra width for the last column
+        foreach (var column in GetColumnsWidth())
+            width += column + GridView.SplitterWidth;
+        if (children != null)
+            children.Width = width;
     }
 
     protected bool UpdateSelectionFromEventSource(

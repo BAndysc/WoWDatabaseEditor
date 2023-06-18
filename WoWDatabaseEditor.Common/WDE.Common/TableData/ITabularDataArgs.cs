@@ -4,7 +4,7 @@ using WDE.Common.Utils;
 
 namespace WDE.Common.TableData;
 
-public interface ITabularDataArgs<T> where T : class
+public interface ITabularDataArgs<T>
 {
     string Title { get; }
     IReadOnlyList<ITabularDataColumn> Columns { get; }

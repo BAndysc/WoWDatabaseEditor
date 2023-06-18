@@ -26,7 +26,11 @@
             Selection="{CompiledBinding Selection}"
             MultiSelect="{CompiledBinding MultiSelect}"
             FocusedIndex="{CompiledBinding FocusedIndex}"
-            Items="{CompiledBinding Items}">
+            CheckedIndices="{CompiledBinding CheckedIndices}"
+            UseCheckBoxes="{CompiledBinding CheckBoxes}"
+            Items="{CompiledBinding Items}"
+            KeyDown="GridView_OnKeyDown"
+            ColumnWidthChanged="GridView_OnColumnWidthChanged">
             <Interaction.Behaviors>
                 <EventTriggerBehavior EventName="DoubleTapped">
                     <InvokeCommandAction Command="{CompiledBinding Accept}" />

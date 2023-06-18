@@ -19,6 +19,7 @@ public interface IMultiIndexContainer
     event Action? Cleared;
     event Action<int>? Added;
     event Action<int>? Removed;
+    event Action? Changed;
 }
 
 public interface IEfficientContainsIterator
@@ -81,6 +82,7 @@ public class MultiIndexContainer : IMultiIndexContainer
         {
             ranges.Add((num, num));
             Added?.Invoke(num);
+            Changed?.Invoke();
         }
         else
         {
@@ -94,6 +96,7 @@ public class MultiIndexContainer : IMultiIndexContainer
                 else
                     throw new Exception();
                 Added?.Invoke(num);
+                Changed?.Invoke();
             }
             else if (indexSmaller > ranges.Count - 1)
             {
@@ -102,6 +105,7 @@ public class MultiIndexContainer : IMultiIndexContainer
                 else 
                     ranges.Add((num, num));
                 Added?.Invoke(num);
+                Changed?.Invoke();
             }
             else
             {
@@ -119,6 +123,7 @@ public class MultiIndexContainer : IMultiIndexContainer
                     else
                         throw new Exception();
                     Added?.Invoke(num);
+                    Changed?.Invoke();
                 }
                 else if (ranges[indexSmaller].start == num + 1)
                 {
@@ -132,6 +137,7 @@ public class MultiIndexContainer : IMultiIndexContainer
                     else
                         throw new Exception();
                     Added?.Invoke(num);
+                    Changed?.Invoke();
                 }
                 else if (ranges[indexSmaller].start > num + 1)
                 {
@@ -144,6 +150,7 @@ public class MultiIndexContainer : IMultiIndexContainer
                     else
                         throw new Exception();
                     Added?.Invoke(num);
+                    Changed?.Invoke();
                 }
                 else
                 {
@@ -182,6 +189,7 @@ public class MultiIndexContainer : IMultiIndexContainer
             ranges.Insert(index + 1, (num + 1, end));
         }
         Removed?.Invoke(num);
+        Changed?.Invoke();
     }
 
     public bool Contains(int num)
@@ -202,6 +210,7 @@ public class MultiIndexContainer : IMultiIndexContainer
     {
         ranges.Clear();
         Cleared?.Invoke();
+        Changed?.Invoke();
     }
 
     public IEnumerable<int> All()
@@ -240,6 +249,7 @@ public class MultiIndexContainer : IMultiIndexContainer
     public event Action? Cleared;
     public event Action<int>? Added;
     public event Action<int>? Removed;
+    public event Action? Changed;
 
     private class EfficientContainsIterator : IEfficientContainsIterator
     {

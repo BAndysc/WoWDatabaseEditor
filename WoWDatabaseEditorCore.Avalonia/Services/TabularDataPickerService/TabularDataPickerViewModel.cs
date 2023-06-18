@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Windows.Input;
+using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using Avalonia.Data;
+using Avalonia.Data.Converters;
 using Avalonia.Threading;
 using Prism.Commands;
 using PropertyChanged.SourceGenerator;
@@ -20,19 +22,28 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.TabularDataPickerService;
 
 public partial class TabularDataPickerViewModel : ObservableBase, IDialog
 {
+    private readonly ITabularDataPickerPreferences preferences;
+    private readonly ITabularDataArgs<object> args;
+
     [Notify] 
     private string searchText = "";
 
     public IMultiIndexContainer Selection { get; } = new MultiIndexContainer();
+    
+    public IMultiIndexContainer CheckedIndices { get; } = new MultiIndexContainer();
 
     [Notify]
     [AlsoNotify(nameof(FocusedItem))]
     private int focusedIndex = -1;
 
+    private bool ignoreCheckedIndicesChange = false;
     private bool ignoreSelectionChange = false;
     private HashSet<object> selectedItems = new HashSet<object>();
+    private HashSet<object> checkedItems = new HashSet<object>();
 
     public IReadOnlyCollection<object> SelectedItems => selectedItems;
+    
+    public IReadOnlyCollection<object> CheckedItems => checkedItems;
 
     private IIndexedCollection<object> allItems;
     private readonly Func<object, string, bool> filterPredicate;
@@ -46,24 +57,43 @@ public partial class TabularDataPickerViewModel : ObservableBase, IDialog
 
     public bool MultiSelect { get; }
     
-    public TabularDataPickerViewModel(ITabularDataArgs<object> args, bool multiSelection, IReadOnlyList<int>? defaultSelection = null)
+    public bool CheckBoxes { get; }
+    
+    public TabularDataPickerViewModel(ITabularDataPickerPreferences preferences,
+        ITabularDataArgs<object> args, 
+        bool multiSelection, 
+        bool checkBoxes,
+        string defaultSearchText,
+        IReadOnlyList<int>? defaultSelection = null)
     {
+        this.preferences = preferences;
+        this.args = args;
         Title = args.Title;
         MultiSelect = multiSelection;
+        CheckBoxes = checkBoxes;
+        var savedWidths = preferences.GetSavedColumnsWidth(Title);
         Columns = args.Columns
             .Select((c, index) =>
             {
-                if (c.DataTemplate is { })
-                    return ColumnDescriptor.DataTemplateColumn(c.Header, c.DataTemplate, c.Width, false);
+                var width = c.Width;
+                if (savedWidths?.TryGetValue(c.Header, out var size) ?? false)
+                    width = size;
+                if (c.DataTemplate is IDataTemplate)
+                    return ColumnDescriptor.DataTemplateColumn(c.Header, c.DataTemplate, width, false);
+                else if (c.DataTemplate is Func<object, string> f)
+                    return ColumnDescriptor.DataTemplateColumn(c.Header, new FuncDataTemplate(_ => true, (_, _) => new TextBlock()
+                    {
+                        [!TextBlock.TextProperty] = new Binding(c.PropertyName){Converter = new FuncValueConverter<object, string>(o => f(o))}
+                    }), width, false);
                 else if (c is ITabularDataAsyncColumn asyncColumn)
                 {
                     return ColumnDescriptor.DataTemplateColumn(c.Header, new FuncDataTemplate(_ => true, (_, _) => new AsyncDynamicTextBlock()
                     {
                         [!AsyncDynamicTextBlock.ValueProperty] = new Binding(c.PropertyName),
                         Evaluator = asyncColumn.ComputeAsync
-                    }), c.Width, false);
+                    }), width, false);
                 }
-                return ColumnDescriptor.TextColumn(c.Header, c.PropertyName, c.Width, false);
+                return ColumnDescriptor.TextColumn(c.Header, c.PropertyName, width, false);
             })
             .ToList();
         allItems = args.Data;
@@ -72,15 +102,6 @@ public partial class TabularDataPickerViewModel : ObservableBase, IDialog
         exactMatchPredicate = args.ExactMatchPredicate;
         exactMatchCreator = args.ExactMatchCreator;
         Items = args.Data;
-        if (defaultSelection != null && defaultSelection.Count > 0)
-        {
-            focusedIndex = defaultSelection[0];
-            foreach (var index in defaultSelection)
-            {
-                if (index >= 0 && index < Items.Count)
-                    Selection.Add(index);   
-            }
-        }
         
         Selection.Cleared += () =>
         {
@@ -100,6 +121,39 @@ public partial class TabularDataPickerViewModel : ObservableBase, IDialog
                 return;
             selectedItems.Remove(Items[i]);
         };
+        if (checkBoxes)
+        {
+            CheckedIndices.Cleared += () =>
+            {
+                if (ignoreCheckedIndicesChange)
+                    return;
+                checkedItems.Clear();
+            };
+            CheckedIndices.Added += i =>
+            {
+                if (ignoreCheckedIndicesChange)
+                    return;
+                checkedItems.Add(Items[i]);
+            };
+            CheckedIndices.Removed += i =>
+            {
+                if (ignoreCheckedIndicesChange)
+                    return;
+                checkedItems.Remove(Items[i]);
+            };
+        }
+        
+        if (defaultSelection != null && defaultSelection.Count > 0)
+        {
+            focusedIndex = defaultSelection[0];
+            foreach (var index in defaultSelection)
+            {
+                if (index >= 0 && index < Items.Count)
+                {
+                    (checkBoxes ? CheckedIndices : Selection).Add(index);
+                }   
+            }
+        }
         
         acceptCommand = new DelegateCommand(() =>
         {
@@ -114,35 +168,66 @@ public partial class TabularDataPickerViewModel : ObservableBase, IDialog
         {
             CloseCancel?.Invoke();
         });
+
+        if (this.preferences.GetWindowState(args.Title, out _, out _, out _, out int width, out int height))
+        {
+            DesiredWidth = width;
+            DesiredHeight = height;
+        }
+        else
+        {
+            DesiredWidth = 700;
+            DesiredHeight = 750;
+        }
         
+        searchText = defaultSearchText;
+        Filter(defaultSearchText);
         this.ToObservable<string, TabularDataPickerViewModel>(() => SearchText)
             .Throttle(TimeSpan.FromMilliseconds(50), AvaloniaScheduler.Instance)
             .Subscribe(Filter);
         On(() => Items, _ => acceptCommand.RaiseCanExecuteChanged());
     }
 
-    private void UpdateSelectionAfterFilter()
+    private void UpdateCheckBoxAndSelectionAfterFilter()
     {
-        if (selectedItems.Count == 0)
-            return;
-        
-        try
+        if (selectedItems.Count > 0)
         {
-            ignoreSelectionChange = true;
-            Selection.Clear();
-            FocusedIndex = -1;
-            for (int i = 0, count = Items.Count; i < count; ++i)
+            try
             {
-                if (selectedItems.Contains(Items[i]))
+                ignoreSelectionChange = true;
+                Selection.Clear();
+                FocusedIndex = -1;
+                for (int i = 0, count = Items.Count; i < count; ++i)
                 {
-                    Selection.Add(i);
-                    FocusedIndex = i;
+                    if (selectedItems.Contains(Items[i]))
+                    {
+                        Selection.Add(i);
+                        FocusedIndex = i;
+                    }
                 }
             }
+            finally
+            {
+                ignoreSelectionChange = false;
+            }   
         }
-        finally
+
+        if (checkedItems.Count > 0)
         {
-            ignoreSelectionChange = false;
+            try
+            {
+                ignoreCheckedIndicesChange = true;
+                CheckedIndices.Clear();
+                for (int i = 0, count = Items.Count; i < count; ++i)
+                {
+                    if (checkedItems.Contains(Items[i]))
+                        CheckedIndices.Add(i);
+                }
+            }
+            finally
+            {
+                ignoreCheckedIndicesChange = false;
+            }
         }
     }
     
@@ -152,7 +237,7 @@ public partial class TabularDataPickerViewModel : ObservableBase, IDialog
         {
             Items = allItems;
             RaisePropertyChanged(nameof(Items));
-            UpdateSelectionAfterFilter();
+            UpdateCheckBoxAndSelectionAfterFilter();
             return;
         }
         
@@ -194,11 +279,33 @@ public partial class TabularDataPickerViewModel : ObservableBase, IDialog
 
         Items = filtered.AsIndexedCollection();
         RaisePropertyChanged(nameof(Items));
-        UpdateSelectionAfterFilter();
+        UpdateCheckBoxAndSelectionAfterFilter();
     }
-
-    public int DesiredWidth => 700;
-    public int DesiredHeight => 750;
+    
+    public void SaveColumnsWidth(List<int> widths)
+    {
+        if (widths.Count != args.Columns.Count)
+        {
+            Console.WriteLine("When trying to save columns width, the number of columns is different from the number of widths!!! So can't save. Report to the developer.");
+            return;
+        }
+        
+        List<(string, int)> widthsToSave = new(); 
+        for (int i = 0, count = args.Columns.Count; i < count; ++i)
+        {
+            var key = args.Columns[i].Header;
+            var width = widths[i];
+            if (Math.Abs(width - (int)(args.Columns[i].Width)) < 5)
+                continue;
+            if (width < 1)
+                continue;
+            widthsToSave.Add((key, width));
+        }
+        preferences.UpdateColumnsWidth(Title, widthsToSave);
+    }
+    
+    public int DesiredWidth { get; }
+    public int DesiredHeight { get; }
     public string Title { get; }
     public bool Resizeable => true;
     private DelegateCommand acceptCommand;

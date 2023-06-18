@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using WDE.Common;
+using WDE.Common.Collections;
 using WDE.Common.CoreVersion;
 using WDE.Common.Managers;
 using WDE.Common.Parameters;
 using WDE.Common.Providers;
+using WDE.Common.TableData;
 using WDE.Common.Types;
+using WDE.Common.Utils;
 using WDE.Module.Attributes;
 using WDE.PacketViewer.Utils;
 
@@ -46,12 +49,13 @@ namespace WDE.PacketViewer.Solutions
     public class PacketDocumentSolutionItemWithCustomVersionProvider : ISolutionItemProvider
     {
         private readonly IWindowManager windowManager;
-        private readonly IItemFromListProvider itemFromListProvider;
+        private readonly ITabularDataPicker tabularDataPicker;
 
-        public PacketDocumentSolutionItemWithCustomVersionProvider(IWindowManager windowManager, IItemFromListProvider itemFromListProvider)
+        public PacketDocumentSolutionItemWithCustomVersionProvider(IWindowManager windowManager, 
+            ITabularDataPicker tabularDataPicker)
         {
             this.windowManager = windowManager;
-            this.itemFromListProvider = itemFromListProvider;
+            this.tabularDataPicker = tabularDataPicker;
         }
     
         public string GetName() => "WoW Sniff (custom build)";
@@ -72,7 +76,14 @@ namespace WDE.PacketViewer.Solutions
             var items = Enum
                 .GetValues<ClientVersionBuild>()
                 .ToDictionary(v => (long)v, v => new SelectOption(v.ToString().Replace("V_", "").Replace("_", ".")));
-            var version = await itemFromListProvider.GetItemFromList(items, false);
+
+            var version = await tabularDataPicker.PickStructRow(new TabularDataBuilder<ClientVersionBuild>()
+                .SetColumns(new TabularDataColumn(".", "Build"))
+                .SetTitle("Pick client version")
+                .SetData(Enum.GetValues<ClientVersionBuild>().AsIndexedCollection())
+                .SetFilter((build, search) => ((int)build).Contains(search))
+                .Build());
+            
             if (version == null)
                 return null;
             return new PacketDocumentSolutionItem(file, (int)version.Value);

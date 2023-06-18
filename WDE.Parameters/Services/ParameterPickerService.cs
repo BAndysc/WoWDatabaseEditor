@@ -16,12 +16,15 @@ namespace WDE.Parameters.Services;
 public class ParameterPickerService : IParameterPickerService
 {
     private readonly IItemFromListProvider itemFromListProvider;
+    private readonly IParameterFactory parameterFactory;
     private readonly ITabularDataPicker tabularDataPicker;
 
     public ParameterPickerService(IItemFromListProvider itemFromListProvider,
+        IParameterFactory parameterFactory,
         ITabularDataPicker tabularDataPicker)
     {
         this.itemFromListProvider = itemFromListProvider;
+        this.parameterFactory = parameterFactory;
         this.tabularDataPicker = tabularDataPicker;
     }
     
@@ -46,6 +49,12 @@ public class ParameterPickerService : IParameterPickerService
         }
 
         return (default, false);
+    }
+
+    public async Task<(long value, bool ok)> PickParameter(string parameterName, long currentValue, object? context = null)
+    {
+        var parameter = parameterFactory.Factory(parameterName);
+        return await PickParameter(parameter, currentValue, context);
     }
 
     private class LongPickerItem
@@ -119,7 +128,7 @@ public class ParameterPickerService : IParameterPickerService
                 })
                 .Build());
             
-            return values.Select(x => (T)(object)x.Key).ToList();
+            return values == null ? Array.Empty<T>() : values.Select(x => (T)(object)x.Key).ToList();
         }
 
         if (parameter is IParameter<string> stringParameter && typeof(T) == typeof(string))
@@ -147,7 +156,7 @@ public class ParameterPickerService : IParameterPickerService
                 .SetExactMatchCreator(search => new StringPickerItem(search, "Pick non existing", null))
                 .Build());
             
-            return values.Select(x => (T)(object)x.Key).ToList();
+            return values == null ? Array.Empty<T>() : values.Select(x => (T)(object)x.Key).ToList();
         }
 
         return Array.Empty<T>();
