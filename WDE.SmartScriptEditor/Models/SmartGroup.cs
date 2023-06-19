@@ -75,4 +75,5 @@ public class SmartGroupFakeEditorFeatures : IEditorFeatures
     public ParametersCount TargetParametersCount { get; } = new ParametersCount(0, 0, 0);
     public IParameter<long> ConditionTargetParameter => Parameter.Instance;
     public IParameter<long> EventFlagsParameter => Parameter.Instance;
+    public int TargetConditionId => -1;
 }

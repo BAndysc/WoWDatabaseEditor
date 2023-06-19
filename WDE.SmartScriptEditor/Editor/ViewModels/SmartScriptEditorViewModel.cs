@@ -2199,7 +2199,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     var sourceConditions = new ReactiveProperty<string>(editingMultipleSourceConditions ? "Conditions (warning: multiple actions)" : $"Conditions ({actionsToEdit[0].Source.Conditions?.Count(c => c.IsActualCondition()) ?? 0})");
                     editableGroup.Add(new EditableActionData("Conditions", "Source", async () =>
                     {
-                        var newConditions = await conditionEditService.EditConditions(30, actionsToEdit[0].Source.Conditions);
+                        var newConditions = await conditionEditService.EditConditions(editorFeatures.TargetConditionId, actionsToEdit[0].Source.Conditions);
                         if (newConditions != null)
                         {
                             var conditions = newConditions.ToList();
@@ -2213,7 +2213,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     var targetConditions = new ReactiveProperty<string>(editingMultipleTargetConditions ? "Conditions (warning: multiple actions)" : $"Conditions ({actionsToEdit[0].Target.Conditions?.Count(c => c.IsActualCondition()) ?? 0})");
                     editableGroup.Add(new EditableActionData("Conditions", "Target", async () =>
                     {
-                        var newConditions = await conditionEditService.EditConditions(30, actionsToEdit[0].Target.Conditions);
+                        var newConditions = await conditionEditService.EditConditions(editorFeatures.TargetConditionId, actionsToEdit[0].Target.Conditions);
                         if (newConditions != null)
                         {
                             var conditions = newConditions.ToList();

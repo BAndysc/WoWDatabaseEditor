@@ -35,6 +35,12 @@ namespace WDE.Common.Database
         long EventParam4 { get; }
 
         long EventParam5 { get; }
+
+        long EventParam6 { get; }
+
+        long EventParam7 { get; }
+
+        long EventParam8 { get; }
         
         float EventFloatParam1 { get; }
         
@@ -61,6 +67,8 @@ namespace WDE.Common.Database
         long ActionParam6 { get; }
         
         long ActionParam7 { get; }
+        
+        long ActionParam8 { get; }
         
         float ActionFloatParam1 { get; }
         
@@ -123,6 +131,9 @@ namespace WDE.Common.Database
         public long EventParam3 { get; set; }
         public long EventParam4 { get; set; }
         public long EventParam5 { get; set; }
+        public long EventParam6 { get; set; }
+        public long EventParam7 { get; set; }
+        public long EventParam8 { get; set; }
         public float EventFloatParam1 { get; set; }
         public float EventFloatParam2 { get; set; }
         public string? EventStringParam { get; set; }
@@ -136,6 +147,7 @@ namespace WDE.Common.Database
         public long ActionParam5 { get; set; }
         public long ActionParam6 { get; set; }
         public long ActionParam7 { get; set; }
+        public long ActionParam8 { get; set; }
         public float ActionFloatParam1 { get; set; }
         public float ActionFloatParam2 { get; set; }
         public int SourceType { get; set; }
@@ -175,6 +187,12 @@ namespace WDE.Common.Database
                     return line.EventParam4;
                 case 4:
                     return line.EventParam5;
+                case 5:
+                    return line.EventParam6;
+                case 6:
+                    return line.EventParam7;
+                case 7:
+                    return line.EventParam8;
             }
 
             throw new IndexOutOfRangeException();
@@ -222,6 +240,8 @@ namespace WDE.Common.Database
                     return line.ActionParam6;
                 case 6:
                     return line.ActionParam7;
+                case 7:
+                    return line.ActionParam8;
             }
 
             throw new IndexOutOfRangeException();

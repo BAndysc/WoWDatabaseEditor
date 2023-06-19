@@ -48,7 +48,7 @@ namespace WDE.SmartScriptEditor.Providers
                 return Task.FromResult<RelatedSolutionItem?>(
                     new RelatedSolutionItem(SmartScriptToRelatedType(item.SmartType), item.Entry.Value));
             }
-            
+
             if (item.EntryOrGuid >= 0)
             {
                 return Task.FromResult<RelatedSolutionItem?>(

@@ -116,8 +116,10 @@ namespace WDE.SqlQueryGenerator
                     var cols = string.Join(", ", properties.Select(c => $"`{c.Name}`"));
                     var insert = mode == QueryInsertMode.Insert ? "INSERT" : (mode == QueryInsertMode.InsertIgnore ? "INSERT IGNORE" : "REPLACE");
                     sb.Append($"{insert} INTO `{table.TableName}` ({cols}) VALUES ");
+                    if (properties.Length > 2)
+                        sb.AppendLine();
                 }
-                else if (i == 1)
+                else if (i == 1 && properties.Length <= 2)
                 {
                     sb.AppendLine();
                 }

@@ -52,6 +52,13 @@ namespace WDE.TrinityMySqlDatabase.Models
         public long EventParam4 { get; set; }
 
         public long EventParam5 { get; set; }
+
+        public long EventParam6 => 0;
+
+        public long EventParam7 => 0;
+
+        public long EventParam8 => 0;
+
         public float EventFloatParam1 { get; set; }
         public float EventFloatParam2 { get; set; }
         public string? EventStringParam { get; set; }
@@ -78,6 +85,9 @@ namespace WDE.TrinityMySqlDatabase.Models
         public long ActionParam6 { get; set; }
 
         public long ActionParam7 { get; set; }
+
+        public long ActionParam8 => 0;
+
         public float ActionFloatParam1 { get; set; }
         public float ActionFloatParam2 { get; set; }
 
