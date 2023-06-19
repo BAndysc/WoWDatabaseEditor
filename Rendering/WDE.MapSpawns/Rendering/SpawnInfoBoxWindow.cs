@@ -18,10 +18,10 @@ public class SpawnInfoBoxWindow
     {
         if (!(selectionService.SelectedSpawn.Value is { } selectedSpawn) || !selectedSpawn.IsSpawned)
             return;
-        
+
         CreatureSpawnInstance? creature = selectedSpawn as CreatureSpawnInstance;
         GameObjectSpawnInstance? go = selectedSpawn as GameObjectSpawnInstance;
-        
+
         ImGui.Begin("Selected spawn");
         
         if (creature != null)
@@ -44,8 +44,14 @@ public class SpawnInfoBoxWindow
             ImGui.LabelText("Orientation", creature.Creature!.Orientation.ToString());
         else if (go != null)
         {
-            var rot = go.GameObject!.Rotation.ToEulerDeg();
-            ImGui.LabelText("Rotation", $"Z: {rot.X:0.0}, Y: {rot.Y:0.0} Z: {rot.Z:0.0}");
+            var rot = go.GameObject!.Rotation;
+            var euler = rot.ToEulerDeg();
+            ImGui.LabelText("Orientation", go.GameObject!.Orientation.ToString());
+            ImGui.Text("Rotation (Euler/Real)");
+            ImGui.LabelText("X (Euler/Real)", $"{euler.X:0.0} / {rot.X:0.0}");
+            ImGui.LabelText("Y (Euler/Real)", $"{euler.Y:0.0} / {rot.Y:0.0}");
+            ImGui.LabelText("Z (Euler/Real)", $"{euler.Z:0.0} / {rot.Z:0.0}");
+            ImGui.LabelText("W (Euler/Real)", $"{rot.W:0.0}");
         }
 
         ImGui.End();
