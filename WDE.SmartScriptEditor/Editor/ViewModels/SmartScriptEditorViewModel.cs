@@ -1529,9 +1529,10 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         {
             Debug.Assert(this.item == null);
             this.item = newItem;
+            var number = newItem.Entry.HasValue ? (long)newItem.Entry.Value : newItem.EntryOrGuid;
             Title = newItem.SmartType == SmartScriptType.TimedActionList ?
                 itemNameRegistry.GetName(newItem) :
-                itemNameRegistry.GetName(newItem) + $" ({newItem.EntryOrGuid})";
+                itemNameRegistry.GetName(newItem) + $" ({number})";
             
             Script = new SmartScript(this.item, smartFactory, smartDataManager, messageBoxService, editorFeatures, smartScriptImporter);
 

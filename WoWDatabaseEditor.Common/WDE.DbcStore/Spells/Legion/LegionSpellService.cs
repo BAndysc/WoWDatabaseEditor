@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using WDE.Common.Services;
 using WDE.DbcStore.FastReader;
+using WDE.Module.Attributes;
 
 namespace WDE.DbcStore.Spells.Legion;
 
-public class LegionSpellService : IDbcSpellService
+public class LegionSpellService : IDbcSpellService, IDbcSpellLoader
 {
     private readonly DatabaseClientFileOpener opener;
     private readonly Dictionary<uint, SpellData> spells = new();
@@ -360,4 +361,6 @@ public class LegionSpellService : IDbcSpellService
             return effect.TriggerSpell;
         return 0;
     }
+
+    public DBCVersions Version => DBCVersions.LEGION_26972;
 }

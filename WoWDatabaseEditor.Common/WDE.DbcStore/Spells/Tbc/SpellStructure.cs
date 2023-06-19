@@ -1,7 +1,7 @@
 using System;
 using WDE.Common.Services;
 
-namespace WDE.DbcStore.Spells.Wrath
+namespace WDE.DbcStore.Spells.Tbc
 {
     public class SpellCastTime
     {
@@ -15,6 +15,7 @@ namespace WDE.DbcStore.Spells.Wrath
     {
         public uint Id;
         public uint Category;
+        public uint CastUi;
         public uint DispelType;
         public uint Mechanic;
         public SpellAttr0 Attributes;
@@ -24,17 +25,12 @@ namespace WDE.DbcStore.Spells.Wrath
         public SpellAttr4 AttributesExD;
         public SpellAttr5 AttributesExE;
         public SpellAttr6 AttributesExF;
-        public SpellAttr7 AttributesExG;
-        public FixedUintArray2 ShapeshiftMask;
-        public FixedUintArray2 ShapeshiftExclude;
+        public uint ShapeshiftMask;
+        public uint ShapeshiftExclude;
         public uint Targets;
         public uint TargetCreatureType;
         public uint RequiresSpellFocus;
         public uint FacingCasterFlags;
-        public uint CasterAuraState;
-        public uint TargetAuraState;
-        public uint ExcludeCasterAuraState;
-        public uint ExcludeTargetAuraState;
         public uint CasterAuraSpell;
         public uint TargetAuraSpell;
         public uint ExcludeCasterAuraSpell;
@@ -69,6 +65,8 @@ namespace WDE.DbcStore.Spells.Wrath
         public uint EquippedItemInvTypes;
         public FixedEffectTypeArray3 Effect;
         public FixedUintArray3 EffectDieSides;
+        public FixedUintArray3 EffectBaseDice;
+        public FixedUintArray3 EffectDicePerLevel;
         public FixedFloatArray3 EffectRealPointsPerLevel;
         public FixedUintArray3 EffectBasePoints;
         public FixedUintArray3 EffectMechanic;
@@ -84,9 +82,6 @@ namespace WDE.DbcStore.Spells.Wrath
         public FixedUintArray3 EffectMiscValueB;
         public FixedUintArray3 EffectTriggerSpell;
         public FixedFloatArray3 EffectPointsPerCombo;
-        public FixedUintArray3 EffectSpellClassMaskA;
-        public FixedUintArray3 EffectSpellClassMaskB;
-        public FixedUintArray3 EffectSpellClassMaskC;
         public FixedUintArray2 SpellVisualId;
         public uint SpellIconId;
         public uint ActiveIconId;
@@ -100,7 +95,7 @@ namespace WDE.DbcStore.Spells.Wrath
         public uint StartRecoveryTime;
         public uint MaxTargetLevel;
         public uint SpellClassSet;
-        public FixedUintArray3 SpellClassMask;
+        public FixedUintArray2 SpellClassMask;
         public uint MaxTargets;
         public uint DefenseType;
         public uint PreventionType;

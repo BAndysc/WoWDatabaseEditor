@@ -1,7 +1,9 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;
 using WDE.Common.Solution;
+using WDE.SmartScriptEditor.Editor;
 using WDE.SmartScriptEditor.Editor.UserControls;
 using WDE.SmartScriptEditor.Models;
 using WDE.SqlQueryGenerator;
@@ -45,7 +47,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
             var (serializedScript, serializedConditions) = scriptExporter.ToDatabaseCompatibleSmartScript(script);
             BuildDelete(query, serializedScript);
             BuildUpdate(query);
-            BuildInsert(query, serializedScript, serializedConditions);
+            BuildInsert(query, serializedScript, serializedConditions ?? Array.Empty<IConditionLine>());
             return query.Close();
         }
         

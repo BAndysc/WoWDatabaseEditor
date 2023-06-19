@@ -1,9 +1,10 @@
 using System;
 using WDE.Common.Services;
+using WDE.Module.Attributes;
 
 namespace WDE.DbcStore.Spells
 {
-    public class NullSpellService : IDbcSpellService
+    public class NullSpellService : IDbcSpellService, IDbcSpellLoader
     {
         public bool Exists(uint spellId) => true;
         
@@ -42,5 +43,12 @@ namespace WDE.DbcStore.Spells
         public uint GetSpellEffectMiscValueA(uint spellId, int index) => 0;
         
         public uint GetSpellEffectTriggerSpell(uint spellId, int index) => 0;
+
+        public DBCVersions Version => 0;
+        
+        public void Load(string path)
+        {
+            
+        }
     }
 }

@@ -5,16 +5,16 @@ using WDE.Common.Services;
 using WDE.DbcStore.FastReader;
 using WDE.Module.Attributes;
 
-namespace WDE.DbcStore.Spells.Wrath
+namespace WDE.DbcStore.Spells.Tbc
 {
-    public class WrathSpellService : IDbcSpellService, IDbcSpellLoader
+    public class TbcSpellService : IDbcSpellService, IDbcSpellLoader
     {
         private Dictionary<uint, SpellCastTime> spellCastTimes = new();
         private SpellStructure[] spells = null!;
         private Dictionary<uint, int> spellIndices = new();
         private readonly DatabaseClientFileOpener opener;
 
-        public WrathSpellService(DatabaseClientFileOpener opener)
+        public TbcSpellService(DatabaseClientFileOpener opener)
         {
             this.opener = opener;
         }
@@ -49,6 +49,7 @@ namespace WDE.DbcStore.Spells.Wrath
                 
                 spell.Id = row.GetUInt(i++);
                 spell.Category = row.GetUInt(i++);
+                spell.CastUi = row.GetUInt(i++);
                 spell.DispelType = row.GetUInt(i++);
                 spell.Mechanic = row.GetUInt(i++);
                 spell.Attributes = (SpellAttr0)row.GetUInt(i++);
@@ -58,19 +59,12 @@ namespace WDE.DbcStore.Spells.Wrath
                 spell.AttributesExD = (SpellAttr4)row.GetUInt(i++);
                 spell.AttributesExE = (SpellAttr5)row.GetUInt(i++);
                 spell.AttributesExF = (SpellAttr6)row.GetUInt(i++);
-                spell.AttributesExG = (SpellAttr7)row.GetUInt(i++);
-                spell.ShapeshiftMask[0] = row.GetUInt(i++);
-                spell.ShapeshiftMask[1] = row.GetUInt(i++);
-                spell.ShapeshiftExclude[0] = row.GetUInt(i++);
-                spell.ShapeshiftExclude[1] = row.GetUInt(i++);
+                spell.ShapeshiftMask = row.GetUInt(i++);
+                spell.ShapeshiftExclude = row.GetUInt(i++);
                 spell.Targets = row.GetUInt(i++);
                 spell.TargetCreatureType = row.GetUInt(i++);
                 spell.RequiresSpellFocus = row.GetUInt(i++);
                 spell.FacingCasterFlags = row.GetUInt(i++);
-                spell.CasterAuraState = row.GetUInt(i++);
-                spell.TargetAuraState = row.GetUInt(i++);
-                spell.ExcludeCasterAuraState = row.GetUInt(i++);
-                spell.ExcludeTargetAuraState = row.GetUInt(i++);
                 spell.CasterAuraSpell = row.GetUInt(i++);
                 spell.TargetAuraSpell = row.GetUInt(i++);
                 spell.ExcludeCasterAuraSpell = row.GetUInt(i++);
@@ -112,6 +106,12 @@ namespace WDE.DbcStore.Spells.Wrath
                 spell.EffectDieSides[0] = row.GetUInt(i++);
                 spell.EffectDieSides[1] = row.GetUInt(i++);
                 spell.EffectDieSides[2] = row.GetUInt(i++);
+                spell.EffectBaseDice[0] = row.GetUInt(i++);
+                spell.EffectBaseDice[1] = row.GetUInt(i++);
+                spell.EffectBaseDice[2] = row.GetUInt(i++);
+                spell.EffectDicePerLevel[0] = row.GetUInt(i++);
+                spell.EffectDicePerLevel[1] = row.GetUInt(i++);
+                spell.EffectDicePerLevel[2] = row.GetUInt(i++);
                 spell.EffectRealPointsPerLevel[0] = row.GetFloat(i++);
                 spell.EffectRealPointsPerLevel[1] = row.GetFloat(i++);
                 spell.EffectRealPointsPerLevel[2] = row.GetFloat(i++);
@@ -157,15 +157,6 @@ namespace WDE.DbcStore.Spells.Wrath
                 spell.EffectPointsPerCombo[0] = row.GetFloat(i++);
                 spell.EffectPointsPerCombo[1] = row.GetFloat(i++);
                 spell.EffectPointsPerCombo[2] = row.GetFloat(i++);
-                spell.EffectSpellClassMaskA[0] = row.GetUInt(i++);
-                spell.EffectSpellClassMaskA[1] = row.GetUInt(i++);
-                spell.EffectSpellClassMaskA[2] = row.GetUInt(i++);
-                spell.EffectSpellClassMaskB[0] = row.GetUInt(i++);
-                spell.EffectSpellClassMaskB[1] = row.GetUInt(i++);
-                spell.EffectSpellClassMaskB[2] = row.GetUInt(i++);
-                spell.EffectSpellClassMaskC[0] = row.GetUInt(i++);
-                spell.EffectSpellClassMaskC[1] = row.GetUInt(i++);
-                spell.EffectSpellClassMaskC[2] = row.GetUInt(i++);
                 spell.SpellVisualId[0] = row.GetUInt(i++);
                 spell.SpellVisualId[1] = row.GetUInt(i++);
                 spell.SpellIconId = row.GetUInt(i++);
@@ -182,7 +173,6 @@ namespace WDE.DbcStore.Spells.Wrath
                 spell.SpellClassSet = row.GetUInt(i++);
                 spell.SpellClassMask[0] = row.GetUInt(i++);
                 spell.SpellClassMask[1] = row.GetUInt(i++);
-                spell.SpellClassMask[2] = row.GetUInt(i++);
                 spell.MaxTargets = row.GetUInt(i++);
                 spell.DefenseType = row.GetUInt(i++);
                 spell.PreventionType = row.GetUInt(i++);
@@ -262,10 +252,7 @@ namespace WDE.DbcStore.Spells.Wrath
 
             if (typeof(T) == typeof(SpellAttr6))
                 return (T)(object)spell.AttributesExF;
-
-            if (typeof(T) == typeof(SpellAttr7))
-                return (T)(object)spell.AttributesExG;
-
+            
             return default;
         }
 
@@ -363,6 +350,6 @@ namespace WDE.DbcStore.Spells.Wrath
             return 0;
         }
 
-        public DBCVersions Version => DBCVersions.WOTLK_12340;
+        public DBCVersions Version => DBCVersions.TBC_8606;
     }
 }

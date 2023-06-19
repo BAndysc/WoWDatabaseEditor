@@ -9,6 +9,11 @@ using WDE.Common.Events;
 using WDE.Common.Parameters;
 using WDE.Common.Services;
 using WDE.Common.Utils;
+using WDE.DbcStore.Spells;
+using WDE.DbcStore.Spells.Cataclysm;
+using WDE.DbcStore.Spells.Legion;
+using WDE.DbcStore.Spells.Tbc;
+using WDE.DbcStore.Spells.Wrath;
 using WDE.Module;
 using WDE.Module.Attributes;
 using WDE.MVVM.Observable;
@@ -19,7 +24,17 @@ namespace WDE.DbcStore
     public class DbcStoreModule : ModuleBase
     {
         private IContainerProvider containerProvider = null!;
-        
+
+        public override void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+            base.RegisterTypes(containerRegistry);
+            containerRegistry.Register<IDbcSpellLoader, TbcSpellService>(nameof(TbcSpellService));
+            containerRegistry.Register<IDbcSpellLoader, WrathSpellService>(nameof(WrathSpellService));
+            containerRegistry.Register<IDbcSpellLoader, CataSpellService>(nameof(CataSpellService));
+            containerRegistry.Register<IDbcSpellLoader, MopSpellService>(nameof(MopSpellService));
+            containerRegistry.Register<IDbcSpellLoader, LegionSpellService>(nameof(LegionSpellService));
+        }
+
         // this could be moved to somewhere else. ItemModule?
         public override void OnInitialized(IContainerProvider containerProvider)
         {

@@ -45,7 +45,7 @@ namespace WDE.DbcStore.ViewModels
             Watch(() => DBCVersion, () => CanPickLocale);
         }
         
-        public bool CanPickLocale => DBCVersion == global::WDE.DbcStore.DBCVersions.WOTLK_12340;
+        public bool CanPickLocale => DBCVersion is global::WDE.DbcStore.DBCVersions.WOTLK_12340 or WDE.DbcStore.DBCVersions.TBC_8606;
 
         public string Path
         {

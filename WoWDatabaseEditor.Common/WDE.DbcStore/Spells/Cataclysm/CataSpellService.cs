@@ -4,10 +4,11 @@ using System.IO;
 using System.Linq;
 using WDE.Common.Services;
 using WDE.DbcStore.FastReader;
+using WDE.Module.Attributes;
 
 namespace WDE.DbcStore.Spells.Cataclysm
 {
-    public class CataSpellService : IDbcSpellService
+    public class CataSpellService : IDbcSpellService, IDbcSpellLoader
     {
         private readonly DatabaseClientFileOpener opener;
 
@@ -377,5 +378,7 @@ namespace WDE.DbcStore.Spells.Cataclysm
                 return effect.EffectTriggerSpell;
             return 0;
         }
+
+        public virtual DBCVersions Version => DBCVersions.CATA_15595;
     }
 }
