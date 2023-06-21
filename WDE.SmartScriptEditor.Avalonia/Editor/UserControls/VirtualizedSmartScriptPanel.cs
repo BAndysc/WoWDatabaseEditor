@@ -8,6 +8,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using Avalonia.Input;
 using Avalonia.Input.Platform;
+using Avalonia.Threading;
 using Avalonia.VisualTree;
 using JetBrains.Profiler.Api;
 using WDE.Common.Avalonia.Utils;
@@ -267,6 +268,7 @@ public partial class VirtualizedSmartScriptPanel : Panel
         if (script is SmartScriptBase newScript)
         {
             newScript.InvalidateVisual += InvalidateScript;
+            Dispatcher.UIThread.Post(InvalidateScript); // <- not sure why it is needed. Without it sometimes the script is not rendered initially
             attachedScript = newScript;
         }
         if (ScrollView is { } sc)
@@ -671,31 +673,42 @@ public partial class VirtualizedSmartScriptPanel : Panel
         else if (draggingConditions)
         {
             bool found = false;
-            foreach (var tuple in ScriptIterator)
+            if (!hideConditions)
             {
-                if (tuple is (null, var ev, var _, var groupExpanded, var eventIndex))
+                foreach (var tuple in ScriptIterator)
                 {
-                    if (!groupExpanded)
-                        continue;
-                    
-                    int conditionIndex = 0;
-                    foreach (var condition in ev!.Conditions)
+                    if (tuple is (null, var ev, var _, var groupExpanded, var eventIndex))
                     {
-                        var overTuple = (y: condition.Position.Y + (condition.Position.Height + ActionSpacing) / 2,
-                            condition.Position.Height + ActionSpacing, eventIndex, conditionIndex);
-                        if (overTuple.y > mouseY)
+                        if (!groupExpanded)
+                            continue;
+                    
+                        int conditionIndex = 0;
+                        double conditionsHeight = 0;
+                        foreach (var condition in ev!.Conditions)
                         {
-                            overIndexCondition = overTuple;
-                            found = true;
-                            break;
+                            var overTuple = (y: condition.Position.Y + (condition.Position.Height + ActionSpacing) / 2, condition.Position.Height + ActionSpacing, conditionIndex: conditionIndex, eventIndex);
+                            conditionsHeight += condition.Position.Height + ActionSpacing;
+                            if (overTuple.y > mouseY)
+                            {
+                                overIndexCondition = overTuple;
+                                found = true;
+                                break;
+                            }
+
+                            conditionIndex++;
                         }
 
-                        conditionIndex++;
+                        if (found)
+                            break;
+                
+                        var rest = (y: ev.Position.Y + (ev.CachedHeight ?? 0) + conditionsHeight + (ev.Position.Height - conditionsHeight) / 2, ev.Position.Height - conditionsHeight, ev.Conditions.Count, eventIndex);
+                        if (rest.y > mouseY)
+                        {
+                            overIndexCondition = rest;
+                            break;
+                        }
                     }
-
-                    if (found)
-                        break;
-                }
+                }   
             }
             InvalidateVisual();
         }

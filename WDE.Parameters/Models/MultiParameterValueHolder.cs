@@ -18,18 +18,21 @@ public partial class MultiParameterValueHolder<T> : IParameterValueHolder<T>, Sy
     private readonly IReadOnlyList<IParameterValueHolder<T>> values;
     private readonly IReadOnlyList<IParameterValueHolder<T>> originals;
     private readonly IBulkEditSource? bulkEditSource;
+    private readonly object? context;
 
     public MultiParameterValueHolder(IParameter<T> defaultParameter, 
         T defaultValue, 
         IReadOnlyList<IParameterValueHolder<T>> values,
         IReadOnlyList<IParameterValueHolder<T>> originals,
-        IBulkEditSource? bulkEditSource)
+        IBulkEditSource? bulkEditSource,
+        object? context)
     {
         this.defaultParameter = defaultParameter;
         this.defaultValue = defaultValue;
         this.values = values;
         this.originals = originals;
         this.bulkEditSource = bulkEditSource;
+        this.context = context;
         Debug.Assert(values.Count > 0);
         foreach (var v in values)
         {
@@ -42,6 +45,8 @@ public partial class MultiParameterValueHolder<T> : IParameterValueHolder<T>, Sy
         RefreshSource();
         wasTouched = false;
     }
+
+    public object? Context => context;
 
     private void OnSourceChanged(object? sender, PropertyChangedEventArgs e)
     {

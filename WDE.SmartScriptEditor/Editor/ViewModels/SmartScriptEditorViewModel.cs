@@ -1009,6 +1009,30 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 return (-1, -1);
             }
 
+            (int eventIndex, int conditionIndex) GetNextVisibleCondition(int startEvent, int startCondition, int direction)
+            {
+                if (hideConditions)
+                    return (-1, -1);
+                var eventIndex = startEvent;
+                var conditionIndex = startCondition + direction;
+                while (eventIndex >= 0 && eventIndex < script!.Events.Count)
+                {
+                    if (conditionIndex < 0 || conditionIndex >= Events[eventIndex].Conditions.Count)
+                    {
+                        var nextEventIndex = GetNextVisibleEvent(eventIndex, direction);
+                        if (nextEventIndex == eventIndex)
+                            return (startEvent, startCondition);
+                        eventIndex = nextEventIndex;
+                        conditionIndex = direction > 0 ? 0 : Events[eventIndex].Conditions.Count - 1;
+                    }
+                    else
+                    {
+                        return (eventIndex, conditionIndex);
+                    }
+                }
+                return (-1, -1);
+            }
+
             SmartGroup? GetNextGroup(int start, int direction)
             {
                 var index = start + direction;
@@ -1116,23 +1140,12 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 }
                 else if (AnyConditionSelected)
                 {            
-                    int nextConditionIndex = diff < 0 ? FirstSelectedConditionIndex.conditionIndex + diff : LastSelectedConditionIndex.conditionIndex + diff;
-                    int nextEventIndex = diff < 0 ? FirstSelectedConditionIndex.eventIndex : LastSelectedConditionIndex.eventIndex;
+                    (int nextEventIndex, int nextConditionIndex) = GetNextVisibleCondition(
+                        diff < 0 ? FirstSelectedConditionIndex.eventIndex : LastSelectedConditionIndex.eventIndex,
+                        diff < 0 ? FirstSelectedConditionIndex.conditionIndex : LastSelectedConditionIndex.conditionIndex,
+                        diff);
                     
-                    while (nextConditionIndex == -1 || nextConditionIndex >= Events[nextEventIndex].Conditions.Count)
-                    {
-                        nextEventIndex = GetNextVisibleEvent(nextEventIndex, diff);
-                        if (nextEventIndex >= 0 && nextEventIndex < Events.Count)
-                        {
-                            nextConditionIndex = diff > 0
-                                ? Events[nextEventIndex].Conditions.Count > 0 ? 0 : -1
-                                : Events[nextEventIndex].Conditions.Count - 1;
-                        }
-                        else
-                            break;
-                    }
-
-                    if (nextConditionIndex != -1 && nextEventIndex >= 0 && nextEventIndex < Events.Count)
+                    if (nextConditionIndex != -1 && nextEventIndex != -1)
                     {
                         if (!addToSelection)
                             DeselectAll.Execute();
@@ -2044,7 +2057,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             var targetParameters = editableGroup.Add("Target", actionsToEdit.Select(a => a.Target).ToList(), originalActions.Select(a => a.Target).ToList());
             var firstTargetParameter = editableGroup.Parameters[^actionsToEdit[0].Target.ParametersCount];
             
-            editableGroup.Add("Comment", actionsToEdit, originalActions, a => a.CommentParameter);
+            editableGroup.Add("Comment", actionsToEdit, originalActions, a => a.CommentParameter, actionsToEdit[0]);
             
             MultiPropertyValueHolder<int, SmartSource> sourceType = new MultiPropertyValueHolder<int, SmartSource>(0,
                 actionsToEdit.Select(a => a.Source).ToList(),
@@ -2268,7 +2281,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                             }
                         }
                     }
-                }, focusFirstGroup: "Action", context: actionsToEdit[0]); 
+                }, focusFirstGroup: "Action"); 
             viewModel.AutoDispose(actionType);
             viewModel.AutoDispose(sourceType);
             viewModel.AutoDispose(targetType);
@@ -2316,8 +2329,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             var bulk = new ScriptBulkEdit(script);
             SmartEditableGroup editableGroup = new(bulk);
 
-            editableGroup.Add("General", conditionsToEdit, originalConditions, c => c.Inverted);
-            editableGroup.Add("General", conditionsToEdit, originalConditions, c => c.ConditionTarget);
+            editableGroup.Add("General", conditionsToEdit, originalConditions, c => c.Inverted, conditionsToEdit[0]);
+            editableGroup.Add("General", conditionsToEdit, originalConditions, c => c.ConditionTarget, conditionsToEdit[0]);
 
             editableGroup.Add("Condition", conditionsToEdit, originalConditions);
             
@@ -2354,7 +2367,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                         editableGroup.Apply();
                     }
                 },
-                "Condition", conditionsToEdit[0]);
+                "Condition");
             viewModel.AutoDispose(conditionType);
             
             return viewModel;
@@ -2415,19 +2428,19 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 },
                 bulkEdit);
             
-            editableGroup.Add("General", eventsToEdit, originalEvents, e => e.Chance);
-            editableGroup.Add("General", eventsToEdit, originalEvents, e => e.Flags);
-            editableGroup.Add("General", eventsToEdit, originalEvents, e => e.Phases);
+            editableGroup.Add("General", eventsToEdit, originalEvents, e => e.Chance, eventsToEdit[0]);
+            editableGroup.Add("General", eventsToEdit, originalEvents, e => e.Flags, eventsToEdit[0]);
+            editableGroup.Add("General", eventsToEdit, originalEvents, e => e.Phases, eventsToEdit[0]);
             
             if (editorFeatures.SupportsEventCooldown)
             {
-                editableGroup.Add("General", eventsToEdit, originalEvents, e => e.CooldownMin);
-                editableGroup.Add("General", eventsToEdit, originalEvents, e => e.CooldownMax);
+                editableGroup.Add("General", eventsToEdit, originalEvents, e => e.CooldownMin, eventsToEdit[0]);
+                editableGroup.Add("General", eventsToEdit, originalEvents, e => e.CooldownMax, eventsToEdit[0]);
             }
             
             if (editorFeatures.SupportsEventTimerId)
             {
-                editableGroup.Add("General", eventsToEdit, originalEvents, e => e.TimerId);
+                editableGroup.Add("General", eventsToEdit, originalEvents, e => e.TimerId, eventsToEdit[0]);
             }
 
             bool modifiedConditions = false;
@@ -2511,7 +2524,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                         }
                     }
                 },
-                "Event specific", context: eventsToEdit[0]);
+                "Event specific");
             viewModel.AutoDispose(eventType);
 
             viewModel.KeyBindings.Add(new CommandKeyBinding(new AsyncAutoCommand(() => selectEventTypeCommand()), "Ctrl+E"));

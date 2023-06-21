@@ -38,8 +38,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
             bool focusFirst,
             SmartEditableGroup editableGroup,
             System.Action? saveAction = null,
-            string? focusFirstGroup = null,
-            object? context = null)
+            string? focusFirstGroup = null)
         {
             Title = title;
             EntryOrGuid = entryOrGuid;
@@ -63,6 +62,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
             bool first = focusFirst;
             foreach (var parameter in editableGroup.Parameters)
             {
+                var context = parameter.parameter.Context;
                 var canFocusThis = first && (focusFirstGroup == null || focusFirstGroup == parameter.name);
                 var focusThis = canFocusThis && parameter.parameter.IsUsed;
                 allParameters.Add(AutoDispose(new EditableParameterViewModel<long>(parameter.parameter, parameter.name, itemFromListProvider, currentCoreVersion, parameterPickerService, context){FocusFirst = focusThis, IsFirstParameter = focusThis}));

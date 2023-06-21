@@ -47,9 +47,9 @@ public partial class VirtualizedSmartScriptPanel
             }
             else if (draggingConditions)
             {
-                double x = 1;
+                double x = sizing.conditionRect.X;
                 double y = overIndexCondition.y - overIndexCondition.height / 2 - 1;
-                context.DrawArrow(new Pen(Brushes.Gray, 3), new Point(x, y), new Point(x + sizing.conditionRect.Right, y), 10);         
+                context.DrawArrow(new Pen(Brushes.Gray, 3), new Point(x, y), new Point(sizing.conditionRect.Right, y), 10);         
             }
             else if (draggingEvents)
             {

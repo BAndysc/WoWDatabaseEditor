@@ -31,7 +31,7 @@ public class SmartEditableGroup : System.IDisposable
         {
             var parameterValues = elements.Select(x => x.GetParameter(i)).ToList();
             var originalParameters = originals.Select(x => x.GetParameter(i)).ToList();
-            var holder = (CreateValueHolder(parameterValues, originalParameters), group);
+            var holder = (CreateValueHolder(elements[0], parameterValues, originalParameters), group);
             parameters.Add(holder);
             longParameters.Add(holder.Item1);
         }
@@ -40,7 +40,7 @@ public class SmartEditableGroup : System.IDisposable
         {
             var parameterValues = elements.Select(x => x.GetFloatParameter(i)).ToList();
             var originalParameters = originals.Select(x => x.GetFloatParameter(i)).ToList();
-            var holder = (CreateValueHolder(parameterValues, originalParameters), group);
+            var holder = (CreateValueHolder(elements[0],parameterValues, originalParameters), group);
             floatParameters.Add(holder);
         }
         
@@ -48,45 +48,47 @@ public class SmartEditableGroup : System.IDisposable
         {
             var parameterValues = elements.Select(x => x.GetStringParameter(i)).ToList();
             var originalParameters = originals.Select(x => x.GetStringParameter(i)).ToList();
-            var holder = (CreateValueHolder(parameterValues, originalParameters), group);
+            var holder = (CreateValueHolder(elements[0], parameterValues, originalParameters), group);
             stringParameters.Add(holder);
         }
 
         return longParameters;
     }
 
-    private MultiParameterValueHolder<long> CreateValueHolder(IReadOnlyList<ParameterValueHolder<long>> parameters,
+    private MultiParameterValueHolder<long> CreateValueHolder(SmartBaseElement context, IReadOnlyList<ParameterValueHolder<long>> parameters,
         IReadOnlyList<ParameterValueHolder<long>> originals)
     {
-        return new MultiParameterValueHolder<long>(Parameter.Instance, 0, parameters, originals, bulkEditSource);
+        return new MultiParameterValueHolder<long>(Parameter.Instance, 0, parameters, originals, bulkEditSource, context);
     }
 
-    private MultiParameterValueHolder<string> CreateValueHolder(IReadOnlyList<ParameterValueHolder<string>> parameters,
+    private MultiParameterValueHolder<string> CreateValueHolder(SmartBaseElement context,IReadOnlyList<ParameterValueHolder<string>> parameters,
         IReadOnlyList<ParameterValueHolder<string>> originals)
     {
-        return new MultiParameterValueHolder<string>(StringParameter.Instance, "", parameters, originals, bulkEditSource);
+        return new MultiParameterValueHolder<string>(StringParameter.Instance, "", parameters, originals, bulkEditSource, context);
     }
 
-    private MultiParameterValueHolder<float> CreateValueHolder(IReadOnlyList<ParameterValueHolder<float>> parameters,
+    private MultiParameterValueHolder<float> CreateValueHolder(SmartBaseElement context,IReadOnlyList<ParameterValueHolder<float>> parameters,
         IReadOnlyList<ParameterValueHolder<float>> originals)
     {
-        return new MultiParameterValueHolder<float>(FloatParameter.Instance, 0, parameters, originals, bulkEditSource);
+        return new MultiParameterValueHolder<float>(FloatParameter.Instance, 0, parameters, originals, bulkEditSource, context);
     }
 
     public void Add<R>(string group, 
         IEnumerable<R> elements, 
         IEnumerable<R> original, 
-        System.Func<R, ParameterValueHolder<long>> extractor)
+        System.Func<R, ParameterValueHolder<long>> extractor,
+        SmartBaseElement context)
     {
-        parameters.Add((CreateValueHolder(elements.Select(extractor).ToList(), original.Select(extractor).ToList()), group));
+        parameters.Add((CreateValueHolder(context, elements.Select(extractor).ToList(), original.Select(extractor).ToList()), group));
     }
     
     public void Add<R>(string group, 
         IEnumerable<R> elements, 
         IEnumerable<R> original, 
-        System.Func<R, ParameterValueHolder<string>> extractor)
+        System.Func<R, ParameterValueHolder<string>> extractor,
+        SmartBaseElement context)
     {
-        stringParameters.Add((CreateValueHolder(elements.Select(extractor).ToList(), original.Select(extractor).ToList()), group));
+        stringParameters.Add((CreateValueHolder(context, elements.Select(extractor).ToList(), original.Select(extractor).ToList()), group));
     }
 
     public void Apply()

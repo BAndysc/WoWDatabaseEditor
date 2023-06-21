@@ -100,10 +100,10 @@ public class CreatureTextParameter : IContextualParameter<long, SmartBaseElement
             {
                 return GetCreatureEntryFromScript(smartScript);
             }
-            else if (action.Source.Id == 10) // creature guid
-                return databaseProvider.GetCreatureByGuid(0, (uint)action.Source.GetParameter(0).Value)?.Entry;
             else if (targetIdToCreatureEntryParameter.TryGetValue(action.Source.Id, out var creatureEntryParameterIndex))
                 return (uint)action.Source.GetParameter(creatureEntryParameterIndex).Value;
+            else if (action.Source.Id == 10) // creature guid
+                return databaseProvider.GetCreatureByGuid(0, (uint)action.Source.GetParameter(0).Value)?.Entry;
             else if (action.Source.Id == 12 || action.Source.Id == 58) // stored target / actor
             {
                 var val = action.Source.GetParameter(0).Value;
