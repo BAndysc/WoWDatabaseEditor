@@ -34,7 +34,7 @@ public class GeneralSmartScriptSettingsProvider : IGeneralSmartScriptSettingsPro
     public GeneralSmartScriptSettingsProvider(IUserSettings userSettings)
     {
         this.userSettings = userSettings;
-        currentData = userSettings.Get<Data>(new Data(){});
+        currentData = userSettings.Get<Data>(new Data(){DefaultScale = 1, ViewType = SmartScriptViewType.Compact});
     }
 
     private void Save()
