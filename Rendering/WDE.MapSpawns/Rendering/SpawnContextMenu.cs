@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Windows.Input;
 using Prism.Commands;
 using WDE.Common.Services;
@@ -7,6 +8,7 @@ using WDE.MapSpawns.Models;
 using WDE.MapSpawns.ViewModels;
 using WDE.SqlQueryGenerator;
 using WDE.Common.Database;
+using WDE.Common.Utils;
 using WDE.QueryGenerators.Base;
 using WDE.QueryGenerators.Models;
 
@@ -17,7 +19,8 @@ public class SpawnContextMenu
     private readonly ISpawnSelectionService spawnSelectionService;
     private readonly IMySqlExecutor mySqlExecutor;
     private readonly IMessageBoxService messageBoxService;
-    private readonly IQueryGenerator<PositionAndRotationDiff> positionAndRotation;
+    private readonly IQueryGenerator<CreatureDiff> creatureQueryGenerator;
+    private readonly IQueryGenerator<GameObjectDiff> gameObjectQueryGenerator;
 
     private ICommand CopyGuidCommand { get; }
     private ICommand CopyPositionCommand { get; }
@@ -29,55 +32,57 @@ public class SpawnContextMenu
         IClipboardService clipboardService,
         IMySqlExecutor mySqlExecutor,
         IMessageBoxService messageBoxService,
-        IQueryGenerator<PositionAndRotationDiff> positionAndRotation)
+        IQueryGenerator<CreatureDiff> creatureQueryGenerator,
+        IQueryGenerator<GameObjectDiff> gameObjectQueryGenerator)
     {
         this.spawnSelectionService = spawnSelectionService;
         this.mySqlExecutor = mySqlExecutor;
         this.messageBoxService = messageBoxService;
-        this.positionAndRotation = positionAndRotation;
+        this.creatureQueryGenerator = creatureQueryGenerator;
+        this.gameObjectQueryGenerator = gameObjectQueryGenerator;
 
         CopyGuidCommand = new DelegateCommand<SpawnInstance>(inst => clipboardService.SetText(inst.Guid.ToString()));
         CopyPositionCommand = new DelegateCommand<SpawnInstance>(inst => clipboardService.SetText($"X: {inst.WorldObject!.Position.X} Y: {inst.WorldObject!.Position.Y} Z: {inst.WorldObject!.Position.Z}"));
         CopyOrientationCommand = new DelegateCommand<SpawnInstance>(inst =>
         {
-            CreatureSpawnInstance? creature = inst as CreatureSpawnInstance;
-            GameObjectSpawnInstance? go = inst as GameObjectSpawnInstance;
-
-            if (creature != null) 
+            if (inst is CreatureSpawnInstance creature) 
             { 
-                clipboardService.SetText(creature.Creature!.Orientation.ToString()); 
+                clipboardService.SetText(creature.Creature!.Orientation.ToString(CultureInfo.InvariantCulture)); 
             }
-            else if (go != null) 
+            else if (inst is GameObjectSpawnInstance go) 
             {
-                clipboardService.SetText(go.GameObject!.Orientation.ToString());
+                clipboardService.SetText(go.GameObject!.Orientation.ToString(CultureInfo.InvariantCulture));
             }
         });
-        UpdateValuesCommand = new DelegateCommand<SpawnInstance>(async (inst) =>
+        UpdateValuesCommand = new AsyncAutoCommand<SpawnInstance>(async (inst) =>
         {
-            var transaction = Queries.BeginTransaction();
+            IQuery? query = null;
 
-            CreatureSpawnInstance? creature = inst as CreatureSpawnInstance;
-            GameObjectSpawnInstance? go = inst as GameObjectSpawnInstance;
-
-            var typeString = creature != null ? "creature" : "gameobject";
-
-            var orientation = creature != null ? creature.Creature!.Orientation : go!.GameObject!.Orientation;
-
-            var diff = new PositionAndRotationDiff()
+            if (inst is CreatureSpawnInstance creature)
             {
-                Guid = inst.Guid,
-                Type = typeString,
-                Position = inst.WorldObject!.Position,
-                Orientation = orientation,
-            };
-
-            if (go != null)
+                var diff = new CreatureDiff()
+                {
+                    Guid = inst.Guid,
+                    Position = inst.WorldObject!.Position,
+                    Orientation = creature.Creature!.Orientation
+                };
+                query = creatureQueryGenerator.Update(diff);
+            }
+            else if (inst is GameObjectSpawnInstance go)
             {
-                diff.Rotation = go.GameObject!.Rotation;
+                var diff = new GameObjectDiff()
+                {
+                    Guid = inst.Guid,
+                    Position = inst.WorldObject!.Position,
+                    Orientation = go.GameObject!.Orientation,
+                    Rotation = go.GameObject!.Rotation
+                };
+                query = gameObjectQueryGenerator.Update(diff);
             }
 
-            var query = positionAndRotation.Update(diff);
-
+            if (query == null)
+                return;
+            
             try
             {
                 await mySqlExecutor.ExecuteSql(query!);

@@ -13,21 +13,24 @@ public class QueryGeneratorTester
     private readonly IQueryGenerator<ISpawnGroupTemplate> spawnGroupTemplate;
     private readonly IQueryGenerator<ISpawnGroupSpawn> spawnGroupSpawn;
     private readonly IQueryGenerator<QuestChainDiff> questChain;
-    private readonly IQueryGenerator<PositionAndRotationDiff> positionAndRotation;
+    private readonly IQueryGenerator<CreatureDiff> creatureDiff;
+    private readonly IQueryGenerator<GameObjectDiff> gameobjectDiff;
 
     public QueryGeneratorTester(IQueryGenerator<CreatureSpawnModelEssentials> creature,
         IQueryGenerator<GameObjectSpawnModelEssentials> gameobject,
         IQueryGenerator<ISpawnGroupTemplate> spawnGroupTemplate,
         IQueryGenerator<ISpawnGroupSpawn> spawnGroupSpawn,
         IQueryGenerator<QuestChainDiff> questChain,
-        IQueryGenerator<PositionAndRotationDiff> positionAndRotation)
+        IQueryGenerator<CreatureDiff> creatureDiff,
+        IQueryGenerator<GameObjectDiff> gameobjectDiff)
     {
         this.creature = creature;
         this.gameobject = gameobject;
         this.spawnGroupTemplate = spawnGroupTemplate;
         this.spawnGroupSpawn = spawnGroupSpawn;
         this.questChain = questChain;
-        this.positionAndRotation = positionAndRotation;
+        this.creatureDiff = creatureDiff;
+        this.gameobjectDiff = gameobjectDiff;
     }
 
     public IEnumerable<string?> Tables()
@@ -82,11 +85,18 @@ public class QueryGeneratorTester
             NextQuestId = 3,
             PrevQuestId = -1
         });
-        yield return positionAndRotation.Update(new PositionAndRotationDiff()
+        yield return creatureDiff.Update(new CreatureDiff()
         {
             Guid = int.MaxValue - 1,
             Position = Vector3.Zero,
             Orientation = 0
+        });
+        yield return gameobjectDiff.Update(new GameObjectDiff()
+        {
+            Guid = int.MaxValue - 1,
+            Position = Vector3.Zero,
+            Orientation = 0,
+            Rotation = Quaternion.Identity
         });
     }
 }

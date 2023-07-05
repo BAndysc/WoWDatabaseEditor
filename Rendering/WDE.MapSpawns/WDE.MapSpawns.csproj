@@ -16,7 +16,7 @@
     <Import Project="..\lib3d.props" />
 
     <ItemGroup>
-        <ProjectReference Include="..\..\WDE.DatabaseEditors\WDE.DatabaseEditors.csproj" />
+        <ProjectReference Include="..\..\Modules\WDE.QueryGenerators\WDE.QueryGenerators.csproj" />
         <ProjectReference Include="..\..\WDE.MapRenderer\WDE.MapRenderer.csproj" />
         <ProjectReference Include="..\..\WDE.MpqReader\WDE.MpqReader.csproj" />
         <ProjectReference Include="..\..\WDE.MVVM\WDE.MVVM.csproj" />

@@ -6,6 +6,6 @@ namespace WDE.QueryGenerators.Base;
 [NonUniqueProvider]
 public interface IUpdateQueryProvider<T>
 {
-    IQuery Update(T t);
+    IQuery Update(T diff);
     int Priority => 0;
 }
