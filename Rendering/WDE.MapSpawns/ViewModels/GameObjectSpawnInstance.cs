@@ -12,6 +12,7 @@ public class GameObjectSpawnInstance : SpawnInstance
     public override uint Guid => data.Guid;
     public override uint Entry => data.Entry;
     public override Vector3 Position => new Vector3(data.X, data.Y, data.Z);
+    public float Orientation => data.Orientation;
     public Quaternion Rotation => new Quaternion(data.Rotation0, data.Rotation1, data.Rotation2, data.Rotation3);
     public override (int, int) Chunk => new Vector3(data.X, data.Y, data.Z).WoWPositionToChunk();
     public sealed override string Header { get; protected set; }

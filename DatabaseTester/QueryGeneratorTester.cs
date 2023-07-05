@@ -1,3 +1,4 @@
+using System.Numerics;
 using WDE.Common.Database;
 using WDE.QueryGenerators.Base;
 using WDE.QueryGenerators.Models;
@@ -12,18 +13,21 @@ public class QueryGeneratorTester
     private readonly IQueryGenerator<ISpawnGroupTemplate> spawnGroupTemplate;
     private readonly IQueryGenerator<ISpawnGroupSpawn> spawnGroupSpawn;
     private readonly IQueryGenerator<QuestChainDiff> questChain;
+    private readonly IQueryGenerator<PositionAndRotationDiff> positionAndRotation;
 
     public QueryGeneratorTester(IQueryGenerator<CreatureSpawnModelEssentials> creature,
         IQueryGenerator<GameObjectSpawnModelEssentials> gameobject,
         IQueryGenerator<ISpawnGroupTemplate> spawnGroupTemplate,
         IQueryGenerator<ISpawnGroupSpawn> spawnGroupSpawn,
-        IQueryGenerator<QuestChainDiff> questChain)
+        IQueryGenerator<QuestChainDiff> questChain,
+        IQueryGenerator<PositionAndRotationDiff> positionAndRotation)
     {
         this.creature = creature;
         this.gameobject = gameobject;
         this.spawnGroupTemplate = spawnGroupTemplate;
         this.spawnGroupSpawn = spawnGroupSpawn;
         this.questChain = questChain;
+        this.positionAndRotation = positionAndRotation;
     }
 
     public IEnumerable<string?> Tables()
@@ -77,6 +81,12 @@ public class QueryGeneratorTester
             ExclusiveGroup = -2,
             NextQuestId = 3,
             PrevQuestId = -1
+        });
+        yield return positionAndRotation.Update(new PositionAndRotationDiff()
+        {
+            Guid = int.MaxValue - 1,
+            Position = Vector3.Zero,
+            Orientation = 0
         });
     }
 }

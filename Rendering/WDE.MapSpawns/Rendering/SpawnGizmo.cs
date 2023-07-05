@@ -75,7 +75,7 @@ public class SpawnGizmo : Dragger<SpawnInstance>
             return Quaternion.CreateFromAxisAngle(Vectors.Up, cr.Creature!.Orientation);
         else if (item is GameObjectSpawnInstance go)
             return go.GameObject!.Rotation;
-        
+
         return Quaternion.Identity;
     }
 
