@@ -63,7 +63,7 @@ public partial class PathPreviewViewModel : ObservableBase, IWizard, IMapContext
 
                 if (supportedWaypoints.HasFlagFast(WaypointTables.WaypointData))
                 {
-                    var addon = (IBaseCreatureAddon?)await databaseProvider.GetCreatureAddon(creature.Guid);
+                    var addon = (IBaseCreatureAddon?)await databaseProvider.GetCreatureAddon(creature.Entry, creature.Guid);
 
                     if (addon == null)
                         addon = await databaseProvider.GetCreatureTemplateAddon(creature.Entry);
