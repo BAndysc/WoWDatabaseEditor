@@ -12,7 +12,7 @@ namespace WDE.Trinity
     public class TrinityMasterVersion : ICoreVersion, IDatabaseFeatures, ISmartScriptFeatures, IConditionFeatures, IGameVersionFeatures, IEventAiFeatures
     {
         public string Tag => "TrinityMaster";
-        public string FriendlyName => "TrinityCore Shadowlands";
+        public string FriendlyName => "TrinityCore Dragonflight";
         public ImageUri Icon { get; } = new ImageUri("Icons/core_tc.png");
         public ISmartScriptFeatures SmartScriptFeatures => this;
         public IConditionFeatures ConditionFeatures => this;
@@ -20,7 +20,7 @@ namespace WDE.Trinity
         public IDatabaseFeatures DatabaseFeatures => this;
         public IEventAiFeatures EventAiFeatures => this;
         public PhasingType PhasingType => PhasingType.PhaseIds; 
-        public GameVersion Version { get; } = new(10, 0, 5, 48397);
+        public GameVersion Version { get; } = new(10, 0, 5, 49444);
 
         public ISet<Type> UnsupportedTables { get; } = new HashSet<Type>() {typeof(INpcText), typeof(ICreatureClassLevelStat), typeof(IBroadcastText)};
         public bool AlternativeTrinityDatabase => false;
@@ -43,8 +43,8 @@ namespace WDE.Trinity
         public string ConditionsFile => "SmartData/conditions.json";
         public string ConditionGroupsFile => "SmartData/conditions_groups.json";
         public string ConditionSourcesFile => "SmartData/condition_sources.json";
-        public CharacterRaces AllRaces => CharacterRaces.AllShadowlands;
-        public CharacterClasses AllClasses => CharacterClasses.AllShadowlands;
+        public CharacterRaces AllRaces => CharacterRaces.AllDragonflight;
+        public CharacterClasses AllClasses => CharacterClasses.AllDragonflight;
         public bool SupportsEventScripts => true;
     }
 }
