@@ -35,9 +35,9 @@ public enum CharacterRaces : uint
     DracthyrHorde = 32768,
     All = Human | Orc | Dwarf | NightElf | Undead | Tauren | Gnome | Troll | Goblin | BloodElf | Draenei |
           Worgen | Pandaren | PandarenAlliance | PandarenHorde | Nightborne | HighmountainTauren | VoidElf | LightforgedDraenei | 
-          ZandalariTroll | KulTiran | DarkIronDwarf | Vulpera | MagharOrc | Mechagnome,
-    AllHorde = Orc | Undead | Tauren | Troll | Goblin | BloodElf | PandarenHorde | Nightborne | HighmountainTauren | ZandalariTroll | Vulpera | MagharOrc,
-    AllAlliance = Human | Dwarf | NightElf | Gnome | Draenei | Worgen | PandarenAlliance | VoidElf | LightforgedDraenei | KulTiran | DarkIronDwarf | Mechagnome,
+          ZandalariTroll | KulTiran | DarkIronDwarf | Vulpera | MagharOrc | Mechagnome | DracthyrAlliance | DracthyrHorde,
+    AllHorde = Orc | Undead | Tauren | Troll | Goblin | BloodElf | PandarenHorde | Nightborne | HighmountainTauren | ZandalariTroll | Vulpera | MagharOrc | DracthyrHorde,
+    AllAlliance = Human | Dwarf | NightElf | Gnome | Draenei | Worgen | PandarenAlliance | VoidElf | LightforgedDraenei | KulTiran | DarkIronDwarf | Mechagnome | DracthyrAlliance,
     AllVanilla = Human | Orc | Dwarf | NightElf | Undead | Tauren | Gnome | Troll,
     AllTbc = AllVanilla | Draenei | BloodElf,
     AllWrath = AllTbc,
