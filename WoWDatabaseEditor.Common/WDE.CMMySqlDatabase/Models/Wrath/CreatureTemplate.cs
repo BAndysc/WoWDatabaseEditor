@@ -117,7 +117,6 @@ namespace WDE.CMMySqlDatabase.Models.Wrath
         [Column("VehicleTemplateId"                           )] public uint    VehicleTemplateId      { get; set; } // mediumint(8) unsigned
         [Column("GossipMenuId"                                )] public uint    GossipMenuId           { get; set; } // mediumint(8) unsigned
         [Column("InteractionPauseTimer"                       )] public int     InteractionPauseTimer  { get; set; } // int(10)
-        [Column("VisibilityDistanceType"                      )] public sbyte   VisibilityDistanceType { get; set; } // tinyint(4)
         /// <summary>
         /// Time before corpse despawns
         /// </summary>
