@@ -27,5 +27,6 @@ public enum CharacterClasses
     AllWoD = AllMoP,
     AllLegion = AllWoD | DemonHunter,
     AllBfA = AllLegion,
-    AllShadowlands = AllBfA
+    AllShadowlands = AllBfA,
+    AllDragonflight = AllShadowlands,
 }

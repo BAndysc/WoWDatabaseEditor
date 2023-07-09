@@ -37,7 +37,8 @@ namespace WDE.DbcStore
         CATA_15595 = 15595,
         MOP_18414 = 18414,
         LEGION_26972 = 26972,
-        SHADOWLANDS_41079 = 41079
+        SHADOWLANDS_41079 = 41079,
+        DRAGONFLIGHT_49444 = 49444
     }
 
     public enum DBCLocales
