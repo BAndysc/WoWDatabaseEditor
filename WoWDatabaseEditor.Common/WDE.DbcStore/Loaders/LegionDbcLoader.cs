@@ -207,5 +207,6 @@ internal class LegionDbcLoader : BaseDbcLoader
                 data.CharSpecializationStore.Add(specId, $"{name}");
         });
         Load("AdventureJournal.db2", 0, 1, data.AdventureJournalStore);
+        Load("WorldMapArea.db2", 15, 0, data.WorldMapAreaStore);
     }
 }

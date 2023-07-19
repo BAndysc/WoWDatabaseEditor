@@ -273,6 +273,7 @@ namespace WDE.DbcStore
                 parameterFactory.Register("VignetteParameter", new DbcParameterWowTools(data.VignetteStore, "vignette", store.currentCoreVersion, store.windowManager));
                 parameterFactory.Register("VehicleParameter", new WoWToolsParameter("vehicle", store.currentCoreVersion, store.windowManager));
                 parameterFactory.Register("LockParameter", new WoWToolsParameter("lock", store.currentCoreVersion, store.windowManager));
+                parameterFactory.Register("WorldMapAreaParameter", new DbcParameter(data.WorldMapAreaStore));
 
                 void RegisterZoneAreParameter(string key, TabularDataAsyncColumn<uint>? counterColumn = null)
                 {
