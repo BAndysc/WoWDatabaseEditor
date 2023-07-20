@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Prism.Ioc;
 using WDE.Common.Managers;
@@ -50,16 +51,19 @@ public class StandaloneTableEditService : IStandaloneTableEditService
         if (definition == null)
             throw new UnsupportedTableException(table);
 
-        if (key.HasValue && definition.GroupByKeys.Count != key.Value.Count)
+        if (key.HasValue 
+            &&
+            definition.RecordMode != RecordMode.SingleRow /* for single row, we allow partial keys */
+            && definition.GroupByKeys.Count != key.Value.Count)
         {
             var expectedKeys = "(" + string.Join(", ", definition.GroupByKeys) + ")";
-            throw new UnsupportedTableException($"Trying to edit table {table} with key {key} but it has {expectedKeys} keys");
+            throw new UnsupportedTableException($"Trying to edit table {table} with a key {key} but the expected key was: {expectedKeys}");
         }
-        
-        var solutionItem = key.HasValue
-            ? new DatabaseTableSolutionItem(key.Value, true, false, table, definition.IgnoreEquality)
-            : new DatabaseTableSolutionItem(table, definition.IgnoreEquality);
 
+        var solutionItem = !key.HasValue || definition.RecordMode == RecordMode.SingleRow
+            ? new DatabaseTableSolutionItem(table, definition.IgnoreEquality)
+            : new DatabaseTableSolutionItem(key.Value, true, false, table, definition.IgnoreEquality);
+            
         ViewModelBase tableViewModel;
         if (definition.RecordMode == RecordMode.MultiRecord)
         {
@@ -69,6 +73,15 @@ public class StandaloneTableEditService : IStandaloneTableEditService
         else if (definition.RecordMode == RecordMode.SingleRow)
         {
             var singleRow = containerProvider.Resolve<SingleRowDbTableEditorViewModel>((typeof(DatabaseTableSolutionItem), solutionItem));
+            if (key.HasValue)
+            {
+                var where = string.Join("AND", Enumerable.Range(0, key.Value.Count)
+                    .Select(x => $"`{definition.PrimaryKey[x]}` = {key.Value[x]}"));
+                singleRow.DefaultPartialKey = key;
+                singleRow.FilterViewModel.FilterText = where;
+                singleRow.FilterViewModel.SelectedColumn = singleRow.FilterViewModel.RawSqlColumn;
+                singleRow.FilterViewModel.ApplyFilter.Execute(null);
+            }
             tableViewModel = singleRow;
         }
         else
