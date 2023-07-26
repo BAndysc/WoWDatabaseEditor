@@ -1876,7 +1876,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     if (!eventSupportsActionInvoker && data.IsInvoker)
                         return false;
                     
-                    if (data.IsOnlyTarget)
+                    if (data.IsOnlyTarget && script.SourceType != SmartScriptType.StaticSpell && script.SourceType != SmartScriptType.Spell)
                         return false;
 
                     if (actionData != null && !IsSourceCompatibleWithAction(data, actionData))

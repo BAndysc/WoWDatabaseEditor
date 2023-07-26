@@ -203,7 +203,7 @@ namespace WDE.SmartScriptEditor.Data
         {
             if (type == SmartType.SmartSource)
                 ActualAdd(SmartType.SmartTarget, data);
-            else if (type == SmartType.SmartTarget && !data.IsOnlyTarget)
+            else if (type == SmartType.SmartTarget)
                 ActualAdd(SmartType.SmartSource, data);
 
             ActualAdd(type, data);
