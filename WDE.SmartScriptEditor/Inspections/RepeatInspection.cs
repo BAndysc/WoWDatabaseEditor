@@ -1,4 +1,5 @@
 using System;
+using WDE.Common.Database;
 using WDE.Common.Managers;
 using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Models;
@@ -18,6 +19,9 @@ namespace WDE.SmartScriptEditor.Inspections
 
         public InspectionResult? Inspect(SmartEvent e)
         {
+            if (e.Parent is { SourceType: SmartScriptType.TimedActionList })
+                return null;
+            
             if (e.GetParameter(pram).Value != 0 || (e.Flags.Value & SmartConstants.EventFlagNotRepeatable) != 0)
                 return null;
             return new InspectionResult()
