@@ -14,7 +14,7 @@
   "group_name": "Advanced",
   "icon_path": "Icons/document_table.png",
   "reload_command": "reload reputation_spillover_template",
-  "picker": "RawFactionParameter",
+  "picker": "FactionParameter",
   "primary_key": [
     "faction"
   ],
@@ -25,13 +25,13 @@
         {
           "name": "Faction",
           "db_column_name": "faction",
-          "value_type": "RawFactionParameter",
+          "value_type": "FactionParameter",
           "preferred_width": 185.0
         },
         {
           "name": "Faction 1",
           "db_column_name": "faction1",
-          "value_type": "RawFactionParameter",
+          "value_type": "FactionParameter",
           "preferred_width": 225.0
         },
         {
@@ -49,7 +49,7 @@
         {
           "name": "Faction 2",
           "db_column_name": "faction2",
-          "value_type": "RawFactionParameter",
+          "value_type": "FactionParameter",
           "zero_is_blank": true,
           "preferred_width": 175.0
         },
@@ -69,7 +69,7 @@
         {
           "name": "Faction 3",
           "db_column_name": "faction3",
-          "value_type": "RawFactionParameter",
+          "value_type": "FactionParameter",
           "zero_is_blank": true,
           "preferred_width": 105.0
         },
@@ -89,7 +89,7 @@
         {
           "name": "Faction 4",
           "db_column_name": "faction4",
-          "value_type": "RawFactionParameter",
+          "value_type": "FactionParameter",
           "zero_is_blank": true
         },
         {

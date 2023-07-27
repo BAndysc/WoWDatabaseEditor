@@ -97,7 +97,7 @@
         {
           "name": "Faction",
           "db_column_name": "faction",
-          "value_type": "FactionParameter"
+          "value_type": "FactionTemplateParameter"
         },
         {
           "name": "Min level",

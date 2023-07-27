@@ -9,7 +9,7 @@ public class PrettyFlagParameter
 {
     private IParameter<long> unitFlagsParameter;
     private IParameter<long> unitFlags2Parameter;
-    private IParameter<long> factionParameter;
+    private IParameter<long> FactionTemplateParameter;
     private IParameter<long> emoteParameter;
     private IParameter<long> npcFlagsParameter;
     private IParameter<long> gameobjectBytes1Parameter;
@@ -24,7 +24,7 @@ public class PrettyFlagParameter
     {
         unitFlagsParameter = parameterFactory.Factory("UnitFlagParameter");
         unitFlags2Parameter = parameterFactory.Factory("UnitFlags2Parameter");
-        factionParameter = parameterFactory.Factory("FactionParameter");
+        FactionTemplateParameter = parameterFactory.Factory("FactionTemplateParameter");
         emoteParameter = parameterFactory.Factory("EmoteParameter");
         npcFlagsParameter = parameterFactory.Factory("NpcFlagParameter");
         gameobjectModel = parameterFactory.Factory("GameObjectDisplayInfoParameter");
@@ -56,7 +56,7 @@ public class PrettyFlagParameter
                 return modelParameter;
             case "UNIT_FIELD_FACTIONTEMPLATE":
             case "GAMEOBJECT_FACTION":
-                return factionParameter;
+                return FactionTemplateParameter;
             case "GAMEOBJECT_FLAGS":
                 return gameObjectFlags;
             case "UNIT_FIELD_FLAGS":

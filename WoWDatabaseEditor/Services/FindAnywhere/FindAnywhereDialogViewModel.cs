@@ -48,7 +48,7 @@ public partial class FindAnywhereDialogViewModel : ObservableBase, IFindAnywhere
         Sources.Add(new FindSourceDialog("Game object entry", "GameobjectParameter", "CreatureGameobjectParameter"));
         Sources.Add(new FindSourceDialog("Game object spawn by guid", "GameobjectGUIDParameter"));
         Sources.Add(new FindSourceDialogSpawnByEntry("Game object spawn by entry", "GameobjectParameter", "GameobjectGUIDParameter"));
-        Sources.Add(new FindSourceDialog("Faction", "FactionParameter"));
+        Sources.Add(new FindSourceDialog("Faction", "FactionTemplateParameter"));
         Sources.Add(new FindSourceDialog("Map", "MapParameter"));
         Sources.Add(new FindSourceDialog("Zone/area", "ZoneAreaParameter"));
         Sources.Add(new FindSourceDialog("Emote", "EmoteParameter"));

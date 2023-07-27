@@ -30,7 +30,7 @@
         {
           "name": "Rew On Kill Rep Faction 1",
           "db_column_name": "RewOnKillRepFaction1",
-          "value_type": "RawFactionParameter",
+          "value_type": "FactionParameter",
           "preferred_width": 150.0
         },
         {
@@ -54,7 +54,7 @@
         {
           "name": "Rew On Kill Rep Faction 2",
           "db_column_name": "RewOnKillRepFaction2",
-          "value_type": "RawFactionParameter",
+          "value_type": "FactionParameter",
           "preferred_width": 120.0
         },
         {

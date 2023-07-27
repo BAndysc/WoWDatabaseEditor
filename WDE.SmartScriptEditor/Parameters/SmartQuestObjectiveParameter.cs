@@ -75,8 +75,8 @@ public class SmartQuestObjectiveParameter : IAsyncContextualParameter<long, Smar
                  return "Learn " + spellParameter.ToString(questObjective.ObjectId, ToStringOptions.WithoutNumber);
              case QuestObjectiveType.MinReputation:
              case QuestObjectiveType.MaxReputation:
-                 var factionParameter = parameterFactory.Factory("FactionParameter");
-                 return "Earn reputation with " + factionParameter.ToString(questObjective.ObjectId);
+                 var FactionTemplateParameter = parameterFactory.Factory("FactionTemplateParameter");
+                 return "Earn reputation with " + FactionTemplateParameter.ToString(questObjective.ObjectId);
              case QuestObjectiveType.Money:
                  return "Money";
              case QuestObjectiveType.PlayerKills:

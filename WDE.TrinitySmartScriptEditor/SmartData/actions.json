@@ -37,7 +37,7 @@
         "name": "SMART_ACTION_SET_FACTION",
         "parameters": [
             {
-                "type": "FactionParameter",
+                "type": "FactionTemplateParameter",
                 "name": "Faction Id",
                 "description": "Use 0 to reset"
             }

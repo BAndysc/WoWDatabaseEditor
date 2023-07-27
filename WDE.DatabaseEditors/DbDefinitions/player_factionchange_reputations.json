@@ -25,13 +25,13 @@
         {
           "name": "Alliance faction",
           "db_column_name": "alliance_id",
-          "value_type": "RawFactionParameter",
+          "value_type": "FactionParameter",
           "preferred_width": 315.0
         },
         {
           "name": "Horde faction",
           "db_column_name": "horde_id",
-          "value_type": "RawFactionParameter",
+          "value_type": "FactionParameter",
           "preferred_width": 355.0
         }
       ]

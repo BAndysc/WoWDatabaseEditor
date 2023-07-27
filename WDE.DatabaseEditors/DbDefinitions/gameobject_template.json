@@ -43,7 +43,7 @@
         {
           "name": "Faction",
           "db_column_name": "faction",
-          "value_type": "FactionParameter",
+          "value_type": "FactionTemplateParameter",
           "foreign_table": "gameobject_template_addon"
         },
         {

@@ -29,7 +29,7 @@
         {
           "name": "Faction",
           "db_column_name": "faction",
-          "value_type": "FactionParameter",
+          "value_type": "FactionTemplateParameter",
           "preferred_width": 160.0,
           "zero_is_blank": true
         },

@@ -564,7 +564,7 @@
         {
           "name": "Reward faction id 1",
           "db_column_name": "RewardFactionID1",
-          "value_type": "FactionParameter",
+          "value_type": "FactionTemplateParameter",
           "help": "Faction for which the quest give reputation points.\nNumber of gain or lost reputation points for Faction at quest completion. This is special reputation rewarding. Normal reputation reward to quest rewarding creature faction calculated and added automatically."
         },
         {
@@ -580,7 +580,7 @@
         {
           "name": "Reward faction id 2",
           "db_column_name": "RewardFactionID2",
-          "value_type": "FactionParameter"
+          "value_type": "FactionTemplateParameter"
         },
         {
           "name": "Reward faction value 2",
@@ -595,7 +595,7 @@
         {
           "name": "Reward faction id 3",
           "db_column_name": "RewardFactionID3",
-          "value_type": "FactionParameter"
+          "value_type": "FactionTemplateParameter"
         },
         {
           "name": "Reward faction value 3",
@@ -610,7 +610,7 @@
         {
           "name": "Reward faction id 4",
           "db_column_name": "RewardFactionID4",
-          "value_type": "FactionParameter"
+          "value_type": "FactionTemplateParameter"
         },
         {
           "name": "Reward faction value 4",
@@ -625,7 +625,7 @@
         {
           "name": "Reward faction id 5",
           "db_column_name": "RewardFactionID5",
-          "value_type": "FactionParameter"
+          "value_type": "FactionTemplateParameter"
         },
         {
           "name": "Reward faction value 5",

@@ -33,7 +33,7 @@
         "name": "ACTION_T_SET_FACTION",
         "parameters": [
             {
-                "type": "FactionParameter",
+                "type": "FactionTemplateParameter",
                 "name": "Faction"
             },
             {

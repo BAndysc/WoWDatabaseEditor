@@ -220,8 +220,8 @@ namespace WDE.DbcStore
                 
                 parameterFactory.Register("AchievementParameter", new DbcParameter(data.AchievementStore), QuickAccessMode.Full);
                 parameterFactory.Register("MovieParameter", new DbcParameter(data.MovieStore), QuickAccessMode.Limited);
-                parameterFactory.Register("RawFactionParameter", new DbcParameter(data.FactionStore), QuickAccessMode.Limited);
-                parameterFactory.Register("FactionParameter", new FactionParameter(data.FactionStore, data.FactionTemplateStore), QuickAccessMode.Limited);
+                parameterFactory.Register("FactionParameter", new DbcParameter(data.FactionStore), QuickAccessMode.Limited);
+                parameterFactory.Register("FactionTemplateParameter", new FactionTemplateParameter(data.FactionStore, data.FactionTemplateStore), QuickAccessMode.Limited);
                 parameterFactory.Register("DbcSpellParameter", new DbcParameter(data.SpellStore));
                 parameterFactory.Register("CurrencyTypeParameter", new DbcParameter(data.CurrencyTypeStore));
                 parameterFactory.Register("ItemDbcParameter", new DbcParameter(data.ItemStore));
@@ -391,9 +391,9 @@ namespace WDE.DbcStore
         public uint GetSpellEffectTriggerSpell(uint spellId, int index) => spellServiceImpl.GetSpellEffectTriggerSpell(spellId, index);
     }
 
-    internal class FactionParameter : ParameterNumbered
+    internal class FactionTemplateParameter : ParameterNumbered
     {
-        public FactionParameter(Dictionary<long, string> factionStore, Dictionary<long, long> factionTemplateStore)
+        public FactionTemplateParameter(Dictionary<long, string> factionStore, Dictionary<long, long> factionTemplateStore)
         {
             Items = new Dictionary<long, SelectOption>();
             foreach (var factionTemplate in factionTemplateStore)

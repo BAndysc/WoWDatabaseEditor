@@ -7,7 +7,7 @@
             "1": "CreatureParameter",
             "2": "ClassParameter",
             "3": "PercentageParameter",
-            "4": "FactionParameter",
+            "4": "FactionTemplateParameter",
             "5": "SpellParameter",
             "6": "ZoneAreaParameter",
             "7": "SpellParameter",

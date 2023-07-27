@@ -14,7 +14,7 @@
   "group_name": "Advanced",
   "icon_path": "Icons/document_table.png",
   "reload_command": "reload reputation_reward_rate",
-  "picker": "RawFactionParameter",
+  "picker": "FactionParameter",
   "primary_key": [
     "faction"
   ],
@@ -25,7 +25,7 @@
         {
           "name": "Faction",
           "db_column_name": "faction",
-          "value_type": "RawFactionParameter",
+          "value_type": "FactionParameter",
           "preferred_width": 255.0
         },
         {
