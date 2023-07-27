@@ -21,6 +21,10 @@ public class GeneralSmartScriptSettingsProvider : IGeneralSmartScriptSettingsPro
         public ActionEditViewOrder ActionEditViewOrder;
 
         public bool InsertActionOnEventInsert;
+
+        [DefaultValue(true)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
+        public bool AutomaticallyApplyNonRepeatableFlag;
         
         [DefaultValue(1)]
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
@@ -52,6 +56,12 @@ public class GeneralSmartScriptSettingsProvider : IGeneralSmartScriptSettingsPro
     {
         get => currentData.AddingBehaviour;
         set => currentData.AddingBehaviour = value;
+    }
+
+    public bool AutomaticallyApplyNonRepeatableFlag
+    {
+        get => currentData.AutomaticallyApplyNonRepeatableFlag;
+        set => currentData.AutomaticallyApplyNonRepeatableFlag = value;
     }
 
     public float DefaultScale

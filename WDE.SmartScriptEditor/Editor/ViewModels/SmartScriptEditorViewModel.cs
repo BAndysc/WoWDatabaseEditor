@@ -2501,17 +2501,20 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                             var data = smartDataManager.GetRawData(SmartType.SmartEvent, e.Id);
                             if (data.Parameters == null || !data.IsTimed)
                                 continue;
-                            
-                            var repeatMaximum = data.Parameters.IndexIf(p => p.Name == "Repeat Maximum");
-                            
-                            if (repeatMaximum == -1)
-                                continue;
 
-                            var value = e.GetParameter(repeatMaximum).Value;
-                            if (value == 0)
-                                e.Flags.Value |= SmartConstants.EventFlagNotRepeatable;
-                            else
-                                e.Flags.Value &= ~SmartConstants.EventFlagNotRepeatable;
+                            if (preferences.AutomaticallyApplyNonRepeatableFlag)
+                            {
+                                var repeatMaximum = data.Parameters.IndexIf(p => p.Name == "Repeat Maximum");
+                            
+                                if (repeatMaximum == -1)
+                                    continue;
+
+                                var value = e.GetParameter(repeatMaximum).Value;
+                                if (value == 0)
+                                    e.Flags.Value |= SmartConstants.EventFlagNotRepeatable;
+                                else
+                                    e.Flags.Value &= ~SmartConstants.EventFlagNotRepeatable;   
+                            }
                         }
                         if (!editOriginal && modifiedConditions)
                         {

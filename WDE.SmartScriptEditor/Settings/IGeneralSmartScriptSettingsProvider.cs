@@ -9,6 +9,7 @@ public interface IGeneralSmartScriptSettingsProvider
     AddingElementBehaviour AddingBehaviour { get; set; }
     ActionEditViewOrder ActionEditViewOrder { get; set; }
     bool InsertActionOnEventInsert { get; set; }
+    bool AutomaticallyApplyNonRepeatableFlag { get; set; }
     float DefaultScale { get; set; }
     void Apply();
 }

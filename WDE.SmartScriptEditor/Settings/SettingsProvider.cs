@@ -15,6 +15,7 @@ public class SettingsProvider : IGeneralSettingsGroup
     private ListOptionGenericSetting addingBehaviour;
     private ListOptionGenericSetting actionEditViewOrder;
     private BoolGenericSetting insertActionOnEventInsert;
+    private BoolGenericSetting automaticallyApplyNonRepeatableFlag;
     private FloatSliderGenericSetting defaultScale;
     
     public void Save()
@@ -24,6 +25,7 @@ public class SettingsProvider : IGeneralSettingsGroup
         smartSettingsProvider.ActionEditViewOrder = (ActionEditViewOrder)actionEditViewOrder.SelectedOption;
         smartSettingsProvider.DefaultScale = defaultScale.Value;
         smartSettingsProvider.InsertActionOnEventInsert = insertActionOnEventInsert.Value;
+        smartSettingsProvider.AutomaticallyApplyNonRepeatableFlag = automaticallyApplyNonRepeatableFlag.Value;
         smartSettingsProvider.Apply();
     }
 
@@ -55,6 +57,9 @@ public class SettingsProvider : IGeneralSettingsGroup
         insertActionOnEventInsert = new BoolGenericSetting("Insert a new action on event insert",
             smartSettingsProvider.InsertActionOnEventInsert, null);
         
+        automaticallyApplyNonRepeatableFlag = new BoolGenericSetting("Automatically apply non-repeatable flag",
+            smartSettingsProvider.AutomaticallyApplyNonRepeatableFlag, null);
+        
         defaultScale = new FloatSliderGenericSetting("Default scaling",
             smartSettingsProvider.DefaultScale,
             0.5f,
@@ -66,6 +71,7 @@ public class SettingsProvider : IGeneralSettingsGroup
             addingBehaviour,
             actionEditViewOrder,
             insertActionOnEventInsert,
+            automaticallyApplyNonRepeatableFlag,
             defaultScale
         };
     }
