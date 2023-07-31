@@ -83,6 +83,7 @@ namespace WDE.Common.Database
             ConditionValue1 = line.ConditionValue1;
             ConditionValue2 = line.ConditionValue2;
             ConditionValue3 = line.ConditionValue3;
+            ConditionValue4 = line.ConditionValue4;
             NegativeCondition = line.NegativeCondition;
             Comment = line.Comment;
         }
@@ -104,6 +105,7 @@ namespace WDE.Common.Database
             ConditionValue1 = condition.ConditionValue1;
             ConditionValue2 = condition.ConditionValue2;
             ConditionValue3 = condition.ConditionValue3;
+            ConditionValue4 = condition.ConditionValue4;
             NegativeCondition = condition.NegativeCondition;
             Comment = condition.Comment;
         }
