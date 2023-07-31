@@ -46,8 +46,21 @@ namespace WDE.SmartScriptEditor.Data
     [SingleInstance]
     public class SmartDataManager : ISmartDataManager
     {
-        private readonly Dictionary<SmartType, Dictionary<int, SmartGenericJsonData>> smartIdData = new();
-        private readonly Dictionary<SmartType, Dictionary<string, SmartGenericJsonData>> smartNameData = new();
+        private readonly Dictionary<SmartType, Dictionary<int, SmartGenericJsonData>> smartIdData = new()
+        {
+            [SmartType.SmartAction] = new Dictionary<int, SmartGenericJsonData>(),
+            [SmartType.SmartEvent] = new Dictionary<int, SmartGenericJsonData>(),
+            [SmartType.SmartTarget] = new Dictionary<int, SmartGenericJsonData>(),
+            [SmartType.SmartSource] = new Dictionary<int, SmartGenericJsonData>(),
+        };
+
+        private readonly Dictionary<SmartType, Dictionary<string, SmartGenericJsonData>> smartNameData = new()
+        {
+            [SmartType.SmartAction] = new Dictionary<string, SmartGenericJsonData>(),
+            [SmartType.SmartEvent] = new Dictionary<string, SmartGenericJsonData>(),
+            [SmartType.SmartTarget] = new Dictionary<string, SmartGenericJsonData>(),
+            [SmartType.SmartSource] = new Dictionary<string, SmartGenericJsonData>(),
+        };
         private readonly Dictionary<(SmartType, SmartScriptType), int> defaults = new();
         private readonly ISmartDataProvider provider;
         private readonly IEditorFeatures editorFeatures;
