@@ -26,7 +26,10 @@
                             Margin="0,0,0,-1"
                             ZIndex="1"
                             DockPanel.Dock="{TemplateBinding TabStripPlacement}"/>
-            <Border Name="PART_SelectedContentHostBorder" ZIndex="0" CornerRadius="{TemplateBinding CornerRadius}">
+            <Border Name="PART_SelectedContentHostBorder" ZIndex="0" 
+                    BorderBrush="{DynamicResource TabControlBorder}"
+                    BorderThickness="0,1,0,0"
+                    CornerRadius="{TemplateBinding CornerRadius}">
               <ContentPresenter Name="PART_SelectedContentHost"
                                 Margin="{TemplateBinding Padding}"
                                 HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
@@ -57,7 +60,7 @@
     <Setter Property="Foreground" Value="{DynamicResource TabItemHeaderForegroundUnselected}" />
     <Setter Property="CornerRadius" Value="{DynamicResource ControlCornerTopRadius}" />
     <Setter Property="Padding" Value="10,6" />
-    <Setter Property="Margin" Value="-1,0,5,0" />
+    <Setter Property="Margin" Value="-1,0,0,0" />
     <Setter Property="MinHeight" Value="0" />
     <Setter Property="VerticalContentAlignment" Value="Center" />
     <Setter Property="Template">

@@ -15,8 +15,8 @@
         <Pen Thickness="2" x:Key="FastTableView.FocusPen" Brush="Black" />
         <Pen Thickness="3" x:Key="FastTableView.FocusOuterPen" Brush="White" />
         
-        <Pen Thickness="1" Brush="Red" x:Key="FastTableView.ModifiedCellPen" />
-        <Pen Thickness="1" Brush="Orange" x:Key="FastTableView.PhantomRowPen" />
+        <Pen Thickness="1" Brush="Orange" x:Key="FastTableView.ModifiedCellPen" />
+        <Pen Thickness="1" Brush="#5AB6FF" x:Key="FastTableView.PhantomRowPen" />
         <Pen Thickness="1" Brush="#1E1E1E" x:Key="FastTableView.ButtonTextPen" />
         <Pen Thickness="1" Brush="#F5F5F5" x:Key="FastTableView.ButtonBorderPen" />
         <Pen Thickness="1" Brush="White" x:Key="FastTableView.ButtonBackgroundPen" />

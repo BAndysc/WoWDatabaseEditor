@@ -25,8 +25,8 @@ public abstract class CustomCellDrawerInteractorBase
 
 public class CustomCellDrawer : CustomCellDrawerInteractorBase, ICustomCellDrawer
 {
-    private static IPen ModifiedCellPen = new Pen(Brushes.Red, 1);
-    private static IPen PhantomRowPen = new Pen(Brushes.Orange, 1);
+    private static IPen ModifiedCellPen = new Pen(Brushes.Orange, 1);
+    private static IPen PhantomRowPen = new Pen(Brushes.CornflowerBlue, 1);
     private static IPen ButtonTextPen = new Pen(new SolidColorBrush(Color.FromRgb(30, 30, 30)), 1);
     private static IPen ButtonBorderPen = new Pen(new SolidColorBrush(Color.FromRgb(245, 245, 245)), 1);
     private static IPen ButtonBackgroundPen = new Pen(new SolidColorBrush(Colors.White), 0);
@@ -118,7 +118,7 @@ public class CustomCellDrawer : CustomCellDrawerInteractorBase, ICustomCellDrawe
         
         if (cell.IsModified && cell.Parent.Entity.ExistInDatabase)
         {
-            context.DrawRectangle(null, ModifiedCellPen, rect);
+            context.DrawRectangle(null, ModifiedCellPen, rect.Deflate(1));
             // don't return true, because we want to draw original value anyway
         }
 

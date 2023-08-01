@@ -4,6 +4,6 @@
     <Style Selector="TabItem:selected">
         <Setter Property="BorderBrush" Value="{DynamicResource TabControlBorderSelected}" />
         <Setter Property="TextBlock.FontWeight" Value="Bold" />
-        <Setter Property="Margin" Value="-1,0,5,0"></Setter>
+        <Setter Property="Margin" Value="-1,0,0,0"></Setter>
     </Style>
 </Styles>

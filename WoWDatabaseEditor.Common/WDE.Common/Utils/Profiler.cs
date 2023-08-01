@@ -13,6 +13,17 @@ public static class Profiler
     {
         mainThread = _mainThread;
     }
+
+    public static void Start()
+    {
+        MeasureProfiler.StartCollectingData();
+    }
+    
+    public static void Stop()
+    {
+        MeasureProfiler.StopCollectingData();
+        MeasureProfiler.SaveData();
+    }
     
     public static void ProfileOneFrame()
     {

@@ -159,7 +159,7 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
             base.Render(context);
             if (isModified)
             {
-                context.DrawRectangle(Brushes.Red, null, new Rect(0, 6, 12, 12));
+                context.DrawRectangle(Brushes.Orange, null, new Rect(0, 6, 12, 12));
             }
         }
 

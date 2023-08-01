@@ -101,7 +101,8 @@ public class PhantomTextBox : PhantomControlBase<TextBox>
     {
         None,
         MoveUp,
-        MoveDown
+        MoveDown,
+        MoveNext
     }
     
     private Action<string, ActionAfterSave>? currentOnApply = null;
@@ -123,6 +124,15 @@ public class PhantomTextBox : PhantomControlBase<TextBox>
         {
             Gesture = new KeyGesture(Key.Enter),
             Command = new DelegateCommand(() => Despawn(true))
+        });
+        textBox.KeyBindings.Add(new KeyBinding()
+        {
+            Gesture = new KeyGesture(Key.Tab),
+            Command = new DelegateCommand(() =>
+            {
+                actionAfterSave = ActionAfterSave.MoveNext;
+                Despawn(true);
+            })
         });
         textBox.KeyBindings.Add(new KeyBinding()
         {

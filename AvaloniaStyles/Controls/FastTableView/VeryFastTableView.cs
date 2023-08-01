@@ -444,7 +444,22 @@ public partial class VeryFastTableView : Panel, IKeyboardNavigationHandler, IFas
             {
                 ValueUpdateRequest?.Invoke(text);
                 if (action != PhantomTextBox.ActionAfterSave.None)
-                    Move(this, action == PhantomTextBox.ActionAfterSave.MoveDown ? NavigationDirection.Down : NavigationDirection.Up);
+                {
+                    switch (action)
+                    {
+                        case PhantomTextBox.ActionAfterSave.MoveUp:
+                            Move(this, NavigationDirection.Up);
+                            break;
+                        case PhantomTextBox.ActionAfterSave.MoveDown:
+                            Move(this, NavigationDirection.Down);
+                            break;
+                        case PhantomTextBox.ActionAfterSave.MoveNext:
+                            Move(this, NavigationDirection.Next);
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException(nameof(action), action, null);
+                    }
+                }
             });   
         }
     }
