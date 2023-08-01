@@ -53,7 +53,7 @@ namespace WDE.SmartScriptEditor.Providers
                         return database.GetCachedGameObjectTemplate(entry.Value)?.Name;
                     break;
                 case SmartScriptType.Quest:
-                    return database.GetCachedCreatureTemplate((uint)entryOrGuid)?.Name;
+                    return database.GetCachedQuestTemplate((uint)entryOrGuid)?.Name;
                 case SmartScriptType.Aura:
                 case SmartScriptType.Spell:
                 case SmartScriptType.StaticSpell:
