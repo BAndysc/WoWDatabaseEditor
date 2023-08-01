@@ -15,7 +15,7 @@ namespace WDE.PacketViewer.Processing.Processors
     public class SpellStatsDumper : PacketProcessor<bool>, IPacketTextDumper
     {
         private readonly ISpellStore spellStore;
-        private readonly IDatabaseProvider databaseProvider;
+        private readonly ICachedDatabaseProvider databaseProvider;
         private readonly IDbcSpellService spellService;
         private readonly Dictionary<UniversalGuid, CreatureState> states = new();
 
@@ -50,7 +50,7 @@ namespace WDE.PacketViewer.Processing.Processors
         }
 
         public SpellStatsDumper(ISpellStore spellStore,
-            IDatabaseProvider databaseProvider,
+            ICachedDatabaseProvider databaseProvider,
             IDbcSpellService spellService)
         {
             this.spellStore = spellStore;
@@ -140,7 +140,7 @@ namespace WDE.PacketViewer.Processing.Processors
 
         public string CreatureName(uint entry)
         {
-            var template = databaseProvider.GetCreatureTemplate(entry);
+            var template = databaseProvider.GetCachedCreatureTemplate(entry);
             if (template != null)
                 return $"{entry,7} {template.Name}";
             return $"{entry,7}";

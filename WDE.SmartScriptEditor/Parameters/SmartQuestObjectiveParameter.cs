@@ -14,14 +14,14 @@ public class SmartQuestObjectiveParameter : IAsyncContextualParameter<long, Smar
     IAsyncContextualParameter<long, IConditionViewModel>,
     IAffectedByOtherParametersParameter
 {
-    private readonly IDatabaseProvider databaseProvider;
+    private readonly ICachedDatabaseProvider databaseProvider;
     private readonly IItemFromListProvider itemFromListProvider;
     private readonly IParameterPickerService parameterPickerService;
     private readonly IParameterFactory parameterFactory;
     private readonly bool byIndex;
     public bool AllowUnknownItems => true;
 
-    public SmartQuestObjectiveParameter(IDatabaseProvider databaseProvider, 
+    public SmartQuestObjectiveParameter(ICachedDatabaseProvider databaseProvider, 
         IItemFromListProvider itemFromListProvider,
         IParameterPickerService parameterPickerService,
         IParameterFactory parameterFactory,
@@ -59,12 +59,12 @@ public class SmartQuestObjectiveParameter : IAsyncContextualParameter<long, Smar
          {
              case QuestObjectiveType.Monster:
              case QuestObjectiveType.TalkTo:
-                 return databaseProvider.GetCreatureTemplate((uint)questObjective.ObjectId)?.Name ?? "NPC " + questObjective.ObjectId;
+                 return databaseProvider.GetCachedCreatureTemplate((uint)questObjective.ObjectId)?.Name ?? "NPC " + questObjective.ObjectId;
              case QuestObjectiveType.Item:
                  var itemParameter = parameterFactory.Factory("ItemParameter");
                  return "Get " + itemParameter.ToString(questObjective.ObjectId, ToStringOptions.WithoutNumber);
              case QuestObjectiveType.GamObject:
-                 return databaseProvider.GetGameObjectTemplate((uint)questObjective.ObjectId)?.Name ?? "Object " + questObjective.ObjectId;
+                 return databaseProvider.GetCachedGameObjectTemplate((uint)questObjective.ObjectId)?.Name ?? "Object " + questObjective.ObjectId;
              case QuestObjectiveType.Currency:
              case QuestObjectiveType.HaveCurrency:
              case QuestObjectiveType.ObtainCurrency:
@@ -84,9 +84,9 @@ public class SmartQuestObjectiveParameter : IAsyncContextualParameter<long, Smar
              case QuestObjectiveType.AreaTrigger:
                  return "Reach areatrigger " + questObjective.ObjectId;
              case QuestObjectiveType.WinPetBattleAgainstNpc:
-                 return "Defeat " + (databaseProvider.GetCreatureTemplate((uint)questObjective.ObjectId)?.Name ?? "npc " + questObjective.ObjectId);
+                 return "Defeat " + (databaseProvider.GetCachedCreatureTemplate((uint)questObjective.ObjectId)?.Name ?? "npc " + questObjective.ObjectId);
              case QuestObjectiveType.DefeatBattlePet:
-                 return  (databaseProvider.GetCreatureTemplate((uint)questObjective.ObjectId)?.Name ?? "npc " + questObjective.ObjectId) + " defeated";
+                 return  (databaseProvider.GetCachedCreatureTemplate((uint)questObjective.ObjectId)?.Name ?? "npc " + questObjective.ObjectId) + " defeated";
              case QuestObjectiveType.WinPvPPetBattles:
                  return "Win PvP pet battles";
              case QuestObjectiveType.CriteriaTree:

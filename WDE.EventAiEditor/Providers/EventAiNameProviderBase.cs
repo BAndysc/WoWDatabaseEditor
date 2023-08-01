@@ -7,9 +7,9 @@ namespace WDE.EventAiEditor.Providers
 {
     public class EventAiNameProviderBase<T> : ISolutionNameProvider<T> where T : IEventAiSolutionItem
     {
-        private readonly IDatabaseProvider database;
+        private readonly ICachedDatabaseProvider database;
 
-        public EventAiNameProviderBase(IDatabaseProvider database)
+        public EventAiNameProviderBase(ICachedDatabaseProvider database)
         {
             this.database = database;
         }
@@ -23,7 +23,7 @@ namespace WDE.EventAiEditor.Providers
                 entry = (uint)entryOrGuid;
                     
             if (entry.HasValue)
-                return database.GetCreatureTemplate(entry.Value)?.Name;
+                return database.GetCachedCreatureTemplate(entry.Value)?.Name;
 
             return null;
         }

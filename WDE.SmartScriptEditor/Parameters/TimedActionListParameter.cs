@@ -12,13 +12,13 @@ namespace WDE.SmartScriptEditor.Parameters;
 
 public class TimedActionListParameter : Parameter, ICustomPickerParameter<long>, IDoActionOnControlClickParameter
 {
-    private readonly IDatabaseProvider databaseProvider;
+    private readonly ICachedDatabaseProvider databaseProvider;
     private readonly IItemFromListProvider itemFromListProvider;
     private readonly IEventAggregator eventAggregator;
     private readonly IEditorFeatures editorFeatures;
     private readonly ISmartScriptFactory smartScriptFactory;
 
-    public TimedActionListParameter(IDatabaseProvider databaseProvider,
+    public TimedActionListParameter(ICachedDatabaseProvider databaseProvider,
         IItemFromListProvider itemFromListProvider,
         IEventAggregator eventAggregator,
         IEditorFeatures editorFeatures,
@@ -40,7 +40,7 @@ public class TimedActionListParameter : Parameter, ICustomPickerParameter<long>,
     {
         var entry = (uint)(value / 100);
         var id = value % 100;
-        var name = databaseProvider.GetCreatureTemplate(entry);
+        var name = databaseProvider.GetCachedCreatureTemplate(entry);
         
         if (name == null)
             return value.ToString();

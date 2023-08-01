@@ -5,24 +5,31 @@ using WDE.Common.DBC;
 
 namespace WDE.MySqlDatabaseCommon.Database.World
 {
-    public class WorldDatabaseDecorator : IDatabaseProvider
+    public class WorldDatabaseDecorator : ICachedDatabaseProvider
     {
-        protected IDatabaseProvider impl;
+        protected ICachedDatabaseProvider impl;
 
-        public WorldDatabaseDecorator(IDatabaseProvider provider)
+        public WorldDatabaseDecorator(ICachedDatabaseProvider provider)
         {
             impl = provider;
         }
 
         public bool IsConnected => impl.IsConnected;
-        public ICreatureTemplate? GetCreatureTemplate(uint entry) => impl.GetCreatureTemplate(entry);
+        public Task<ICreatureTemplate?> GetCreatureTemplate(uint entry) => impl.GetCreatureTemplate(entry);
+        public ICreatureTemplate? GetCachedCreatureTemplate(uint entry) => impl.GetCachedCreatureTemplate(entry);
+
         public IReadOnlyList<ICreatureTemplate> GetCreatureTemplates() => impl.GetCreatureTemplates();
-        public IGameObjectTemplate? GetGameObjectTemplate(uint entry) => impl.GetGameObjectTemplate(entry);
+        public Task<IGameObjectTemplate?> GetGameObjectTemplate(uint entry) => impl.GetGameObjectTemplate(entry);
+        public IGameObjectTemplate? GetCachedGameObjectTemplate(uint entry) => impl.GetCachedGameObjectTemplate(entry);
+
         public IReadOnlyList<IGameObjectTemplate> GetGameObjectTemplates() => impl.GetGameObjectTemplates();
         public Task<IAreaTriggerScript?> GetAreaTriggerScript(int entry) => impl.GetAreaTriggerScript(entry);
         public Task<IAreaTriggerTemplate?> GetAreaTriggerTemplate(int entry) => impl.GetAreaTriggerTemplate(entry);
 
-        public IQuestTemplate? GetQuestTemplate(uint entry) => impl.GetQuestTemplate(entry);
+        public Task<IQuestTemplate?> GetQuestTemplate(uint entry) => impl.GetQuestTemplate(entry);
+        public IQuestTemplate? GetCachedQuestTemplate(uint entry) => impl.GetCachedQuestTemplate(entry);
+        public async Task WaitForCache() => await impl.WaitForCache();
+
         public IEnumerable<IAreaTriggerTemplate> GetAreaTriggerTemplates() => impl.GetAreaTriggerTemplates();
         public Task<IList<IAreaTriggerTemplate>> GetAreaTriggerTemplatesAsync() => impl.GetAreaTriggerTemplatesAsync();
 
@@ -66,11 +73,6 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             impl.GetScriptFor(entry, entryOrGuid, type);
 
         public async Task<IList<ISmartScriptLine>> GetScriptForAsync(uint entry, int entryOrGuid, SmartScriptType type) => await impl.GetScriptForAsync(entry, entryOrGuid, type);
-
-        public Task InstallConditions(IEnumerable<IConditionLine> conditions,
-            IDatabaseProvider.ConditionKeyMask keyMask,
-            IDatabaseProvider.ConditionKey? manualKey = null) =>
-            impl.InstallConditions(conditions, keyMask, manualKey);
 
         public IEnumerable<IConditionLine> GetConditionsFor(int sourceType, int sourceEntry, int sourceId) =>
             impl.GetConditionsFor(sourceType, sourceEntry, sourceId);

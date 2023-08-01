@@ -16,8 +16,14 @@ public class TrinityWrathMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvide
     public TrinityWrathMySqlDatabaseProvider(IWorldDatabaseSettingsProvider settings, IAuthDatabaseSettingsProvider authSettings, DatabaseLogger databaseLogger, ICurrentCoreVersion currentCoreVersion) : base(settings, authSettings, databaseLogger, currentCoreVersion)
     {
     }
+    
+    public override void ConnectOrThrow()
+    {
+        using var model = Database();
+        _ = model.CreatureTemplate.FirstOrDefault();
+    }
 
-    public override ICreatureTemplate? GetCreatureTemplate(uint entry)
+    public override async Task<ICreatureTemplate?> GetCreatureTemplate(uint entry)
     {
         using var model = Database();
         return model.CreatureTemplate.FirstOrDefault(ct => ct.Entry == entry);
@@ -256,7 +262,7 @@ public class TrinityWrathMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvide
         return await GetQuestsQuery(model).ToListAsync<IQuestTemplate>();
     }
 
-    public override IQuestTemplate? GetQuestTemplate(uint entry)
+    public override async Task<IQuestTemplate?> GetQuestTemplate(uint entry)
     {
         using var model = Database();
         var addon = model.QuestTemplateAddon.FirstOrDefault(addon => addon.Entry == entry);

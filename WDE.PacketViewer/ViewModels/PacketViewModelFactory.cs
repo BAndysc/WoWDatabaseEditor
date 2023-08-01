@@ -12,7 +12,7 @@ namespace WDE.PacketViewer.ViewModels
     [AutoRegister]
     public class PacketViewModelFactory
     {
-        private readonly IDatabaseProvider databaseProvider;
+        private readonly ICachedDatabaseProvider databaseProvider;
         private readonly ISpellStore spellStore;
         private static EntryExtractorProcessor entryExtractorProcessor = new ();
         private static GuidExtractorProcessor guidExtractorProcessor = new ();
@@ -23,7 +23,7 @@ namespace WDE.PacketViewer.ViewModels
 
         private UniversalGuid? playerGuid;
 
-        public PacketViewModelFactory(IDatabaseProvider databaseProvider, 
+        public PacketViewModelFactory(ICachedDatabaseProvider databaseProvider, 
             ISpellStore spellStore)
         {
             this.databaseProvider = databaseProvider;
@@ -62,7 +62,7 @@ namespace WDE.PacketViewer.ViewModels
                 {
                     if (!creatureNames.TryGetValue(entry, out name))
                     {
-                        var template = databaseProvider.GetCreatureTemplate(entry);
+                        var template = databaseProvider.GetCachedCreatureTemplate(entry);
                         if (template != null)
                             name = creatureNames[entry] = template.Name;
                     }
@@ -73,7 +73,7 @@ namespace WDE.PacketViewer.ViewModels
                 {
                     if (!gameobjectNames.TryGetValue(entry, out name))
                     {
-                        var template = databaseProvider.GetGameObjectTemplate(entry);
+                        var template = databaseProvider.GetCachedGameObjectTemplate(entry);
                         if (template != null)
                             name = gameobjectNames[entry] = template.Name;
                     }
@@ -88,22 +88,22 @@ namespace WDE.PacketViewer.ViewModels
             if (packet.KindCase == PacketHolder.KindOneofCase.QuestGiverAcceptQuest)
             {
                 entry = packet.QuestGiverAcceptQuest.QuestId;
-                name = databaseProvider.GetQuestTemplate(entry)?.Name;
+                name = databaseProvider.GetCachedQuestTemplate(entry)?.Name;
             }
             else if (packet.KindCase == PacketHolder.KindOneofCase.QuestGiverRequestItems)
             {
                 entry = packet.QuestGiverRequestItems.QuestId;
-                name = databaseProvider.GetQuestTemplate(entry)?.Name;
+                name = databaseProvider.GetCachedQuestTemplate(entry)?.Name;
             }
             else if (packet.KindCase == PacketHolder.KindOneofCase.QuestGiverQuestComplete)
             {
                 entry = packet.QuestGiverQuestComplete.QuestId;
-                name = databaseProvider.GetQuestTemplate(entry)?.Name;
+                name = databaseProvider.GetCachedQuestTemplate(entry)?.Name;
             }
             else if (packet.KindCase == PacketHolder.KindOneofCase.QuestGiverCompleteQuestRequest)
             {
                 entry = packet.QuestGiverCompleteQuestRequest.QuestId;
-                name = databaseProvider.GetQuestTemplate(entry)?.Name;
+                name = databaseProvider.GetCachedQuestTemplate(entry)?.Name;
             }
 
             if (guid != null && playerGuid != null && guid.Equals(playerGuid))

@@ -14,11 +14,11 @@ namespace WDE.SmartScriptEditor.Parameters;
 public class GossipMenuOptionParameter : IContextualParameter<long, SmartBaseElement>, ICustomPickerContextualParameter<long>,
     IAffectedByOtherParametersParameter
 {
-    private readonly IDatabaseProvider databaseProvider;
+    private readonly ICachedDatabaseProvider databaseProvider;
     private readonly ITableEditorPickerService tableEditorPickerService;
     private readonly IItemFromListProvider itemFromListProvider;
 
-    public GossipMenuOptionParameter(IDatabaseProvider databaseProvider,
+    public GossipMenuOptionParameter(ICachedDatabaseProvider databaseProvider,
         ITableEditorPickerService tableEditorPickerService,
         IItemFromListProvider itemFromListProvider)
     {
@@ -65,7 +65,7 @@ public class GossipMenuOptionParameter : IContextualParameter<long, SmartBaseEle
         if (!entry.HasValue)
             return null;
 
-        return databaseProvider.GetCreatureTemplate(entry.Value)?.GossipMenuId;
+        return databaseProvider.GetCachedCreatureTemplate(entry.Value)?.GossipMenuId;
     }
 
     public async Task<(long, bool)> PickValue(long value, object context)

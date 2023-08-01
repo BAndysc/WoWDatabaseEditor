@@ -21,7 +21,7 @@ namespace WDE.CMMySqlDatabase.Database
     public abstract class BaseDatabaseProvider<T> : IAsyncDatabaseProvider, IAuthDatabaseProvider, IMangosDatabaseProvider where T : BaseDatabaseTables, new()
     {
         public bool IsConnected => true;
-        public abstract ICreatureTemplate? GetCreatureTemplate(uint entry);
+        public abstract Task<ICreatureTemplate?> GetCreatureTemplate(uint entry);
         public abstract IReadOnlyList<ICreatureTemplate> GetCreatureTemplates();
 
         private readonly ICurrentCoreVersion currentCoreVersion;
@@ -87,6 +87,7 @@ namespace WDE.CMMySqlDatabase.Database
             return new List<IConversationTemplate>();
         }
 
+        public abstract void ConnectOrThrow();
         public abstract Task<IReadOnlyList<ICreatureTemplate>> GetCreatureTemplatesAsync();
         public abstract Task<IList<ICreature>> GetCreaturesAsync();
 
@@ -220,7 +221,7 @@ namespace WDE.CMMySqlDatabase.Database
         
         public abstract IReadOnlyList<IGameObjectTemplate> GetGameObjectTemplates();
         public abstract Task<List<IGameObjectTemplate>> GetGameObjectTemplatesAsync();
-        public abstract IGameObjectTemplate? GetGameObjectTemplate(uint entry);
+        public abstract Task<IGameObjectTemplate?> GetGameObjectTemplate(uint entry);
         public abstract Task<IList<IGameObject>> GetGameObjectsAsync();
 
         protected virtual IQueryable<QuestTemplateWoTLK> GetQuestsQuery(BaseDatabaseTables model)
@@ -244,7 +245,7 @@ namespace WDE.CMMySqlDatabase.Database
             return await o.ToListAsync<IQuestTemplate>();
         }
 
-        public virtual IQuestTemplate? GetQuestTemplate(uint entry)
+        public virtual async Task<IQuestTemplate?> GetQuestTemplate(uint entry)
         {
             using var model = Database();
             return model.QuestTemplate.FirstOrDefault(q => q.Entry == entry);

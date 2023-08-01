@@ -97,7 +97,7 @@ public class SpawnsContainer : ISpawnsContainer
         {
             var events = await databaseProvider.GetGameEventCreaturesByGuidAsync(entry, guid);
             var areaId = zoneAreaManager.GetAreaId(creatureData.Map, new Vector3(creatureData.X, creatureData.Y, creatureData.Z));
-            var template = databaseProvider.GetCreatureTemplate(creatureData.Entry);
+            var template = await databaseProvider.GetCreatureTemplate(creatureData.Entry);
             var addonTemplate = await databaseProvider.GetCreatureTemplateAddon(creatureData.Entry);
             var addon = await databaseProvider.GetCreatureAddon(creatureData.Entry, creatureData.Guid);
             var spawnGroup = await databaseProvider.GetSpawnGroupSpawnByGuidAsync(creatureData.Guid, SpawnGroupTemplateType.Creature);
@@ -169,7 +169,7 @@ public class SpawnsContainer : ISpawnsContainer
         {
             var gameobjectEvents = await databaseProvider.GetGameEventGameObjectsByGuidAsync(entry, guid);
             var areaId = zoneAreaManager.GetAreaId(gameobjectData.Map, new Vector3(gameobjectData.X, gameobjectData.Y, gameobjectData.Z));
-            var template = databaseProvider.GetGameObjectTemplate(gameobjectData.Entry);
+            var template = await databaseProvider.GetGameObjectTemplate(gameobjectData.Entry);
             
             if (template == null)
                 return;
@@ -237,7 +237,7 @@ public class SpawnsContainer : ISpawnsContainer
             var areaId = zoneAreaManager.GetAreaId(creatureSpawn.Map, new Vector3(creatureSpawn.X, creatureSpawn.Y, creatureSpawn.Z));
 
             creatureTemplateAddons.TryGetValue(creatureSpawn.Entry, out var creatureTemplateAddon);
-            var template = databaseProvider.GetCreatureTemplate(creatureSpawn.Entry);
+            var template = await databaseProvider.GetCreatureTemplate(creatureSpawn.Entry);
             
             if (template == null)
                 continue;
@@ -276,7 +276,7 @@ public class SpawnsContainer : ISpawnsContainer
         {
             var areaId = zoneAreaManager.GetAreaId(gameobjectData.Map, new Vector3(gameobjectData.X, gameobjectData.Y, gameobjectData.Z));
 
-            var template = databaseProvider.GetGameObjectTemplate(gameobjectData.Entry);
+            var template = await databaseProvider.GetGameObjectTemplate(gameobjectData.Entry);
             
             if (template == null)
                 continue;

@@ -9,12 +9,12 @@ namespace WDE.SmartScriptEditor.Providers
 {
     public class SmartScriptNameProviderBase<T> : ISolutionNameProvider<T> where T : ISmartScriptSolutionItem
     {
-        private readonly IDatabaseProvider database;
+        private readonly ICachedDatabaseProvider database;
         private readonly ISpellStore spellStore;
         private readonly IDbcStore dbcStore;
         private readonly IParameterFactory parameterFactory;
 
-        public SmartScriptNameProviderBase(IDatabaseProvider database, 
+        public SmartScriptNameProviderBase(ICachedDatabaseProvider database, 
             ISpellStore spellStore, 
             IDbcStore dbcStore,
             IParameterFactory parameterFactory)
@@ -39,7 +39,7 @@ namespace WDE.SmartScriptEditor.Providers
                         entry = (uint)entryOrGuid;
                     
                     if (entry.HasValue)
-                        return database.GetCreatureTemplate(entry.Value)?.Name;
+                        return database.GetCachedCreatureTemplate(entry.Value)?.Name;
                     break;
                 case SmartScriptType.GameObject:
                     if (entryOrGuid < 0)
@@ -50,10 +50,10 @@ namespace WDE.SmartScriptEditor.Providers
                         entry = (uint)entryOrGuid;
                     
                     if (entry.HasValue)
-                        return database.GetGameObjectTemplate(entry.Value)?.Name;
+                        return database.GetCachedGameObjectTemplate(entry.Value)?.Name;
                     break;
                 case SmartScriptType.Quest:
-                    return database.GetQuestTemplate((uint)entryOrGuid)?.Name;
+                    return database.GetCachedCreatureTemplate((uint)entryOrGuid)?.Name;
                 case SmartScriptType.Aura:
                 case SmartScriptType.Spell:
                 case SmartScriptType.StaticSpell:
@@ -69,7 +69,7 @@ namespace WDE.SmartScriptEditor.Providers
                 case SmartScriptType.BattlePet:
                     if (dbcStore.BattlePetSpeciesIdStore?.TryGetValue(entryOrGuid, out var creatureId) ?? false)
                     {
-                        if (database.GetCreatureTemplate((uint)creatureId) is { } battleCreature)
+                        if (database.GetCachedCreatureTemplate((uint)creatureId) is { } battleCreature)
                             return battleCreature.Name;
                     }
                     break;

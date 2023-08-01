@@ -24,11 +24,11 @@ namespace WDE.DatabaseEditors.Solution
     {
         private readonly ITableDefinitionProvider definitionProvider;
         private readonly ITableOpenService tableOpenService;
-        private readonly IDatabaseProvider databaseProvider;
+        private readonly ICachedDatabaseProvider databaseProvider;
 
         public DatabaseTableSolutionItemProviderProvider(ITableDefinitionProvider definitionProvider,
             ITableOpenService tableOpenService,
-            IDatabaseProvider databaseProvider)
+            ICachedDatabaseProvider databaseProvider)
         {
             this.definitionProvider = definitionProvider;
             this.tableOpenService = tableOpenService;
@@ -56,7 +56,7 @@ namespace WDE.DatabaseEditors.Solution
 
     internal class DatabaseTableSolutionItemProvider : ISolutionItemProvider, IRelatedSolutionItemCreator
     {
-        protected readonly IDatabaseProvider databaseProvider;
+        protected readonly ICachedDatabaseProvider databaseProvider;
         protected readonly ITableOpenService tableOpenService;
         protected readonly DatabaseTableDefinitionJson definition;
         protected readonly ImageUri itemIcon;
@@ -65,7 +65,7 @@ namespace WDE.DatabaseEditors.Solution
         public bool ByDefaultHideFromQuickStart { get; }
 
         internal DatabaseTableSolutionItemProvider(DatabaseTableDefinitionJson definition,
-            IDatabaseProvider databaseProvider,
+            ICachedDatabaseProvider databaseProvider,
             ITableOpenService tableOpenService,
             bool isCompatible,
             bool byDefaultIsHiddenInQuickLoad)
@@ -103,17 +103,17 @@ namespace WDE.DatabaseEditors.Solution
             throw new System.NotImplementedException();
         }
 
-        public Task<ISolutionItem?> CreateRelatedSolutionItem(RelatedSolutionItem related)
+        public async Task<ISolutionItem?> CreateRelatedSolutionItem(RelatedSolutionItem related)
         {
             if (definition.Picker == "GossipMenuParameter" &&
                 related.Type == RelatedSolutionItem.RelatedType.CreatureEntry)
             {
-                var template = databaseProvider.GetCreatureTemplate((uint)related.Entry);
+                var template = await databaseProvider.GetCreatureTemplate((uint)related.Entry);
                 if (template == null || template.GossipMenuId == 0)
-                    return Task.FromResult<ISolutionItem?>(null);
-                return tableOpenService.Create(definition, new DatabaseKey(template.GossipMenuId));
+                    return null;
+                return await tableOpenService.Create(definition, new DatabaseKey(template.GossipMenuId));
             }
-            return tableOpenService.Create(definition, new DatabaseKey(related.Entry));
+            return await tableOpenService.Create(definition, new DatabaseKey(related.Entry));
         }
 
         public bool CanCreatedRelatedSolutionItem(RelatedSolutionItem related)
@@ -121,7 +121,7 @@ namespace WDE.DatabaseEditors.Solution
             if (related.Type == RelatedSolutionItem.RelatedType.CreatureEntry &&
                 definition.Picker == "GossipMenuParameter")
             {
-                var template = databaseProvider.GetCreatureTemplate((uint)related.Entry);
+                var template = databaseProvider.GetCachedCreatureTemplate((uint)related.Entry);
                 return template != null && template.GossipMenuId != 0;
             }
             
@@ -145,7 +145,7 @@ namespace WDE.DatabaseEditors.Solution
 
         public string ParameterName => definition.Picker;
 
-        internal DatabaseTableSolutionItemNumberedProvider(DatabaseTableDefinitionJson definition, IDatabaseProvider databaseProvider, ITableOpenService tableOpenService, bool isCompatible, bool byDefaultIsHiddenInQuickLoad) : base(definition, databaseProvider, tableOpenService, isCompatible, byDefaultIsHiddenInQuickLoad)
+        internal DatabaseTableSolutionItemNumberedProvider(DatabaseTableDefinitionJson definition, ICachedDatabaseProvider databaseProvider, ITableOpenService tableOpenService, bool isCompatible, bool byDefaultIsHiddenInQuickLoad) : base(definition, databaseProvider, tableOpenService, isCompatible, byDefaultIsHiddenInQuickLoad)
         {
         }
     }

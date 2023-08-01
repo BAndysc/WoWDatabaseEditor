@@ -16,8 +16,14 @@ public class DatabaseProviderClassic : BaseDatabaseProvider<ClassicDatabase>
     public DatabaseProviderClassic(IWorldDatabaseSettingsProvider settings, IAuthDatabaseSettingsProvider authSettings, DatabaseLogger databaseLogger, ICurrentCoreVersion currentCoreVersion) : base(settings, authSettings, databaseLogger, currentCoreVersion)
     {
     }
+    
+    public override void ConnectOrThrow()
+    {
+        using var model = Database();
+        _ = model.CreatureTemplate.FirstOrDefault();
+    }
 
-    public override ICreatureTemplate? GetCreatureTemplate(uint entry)
+    public override async Task<ICreatureTemplate?> GetCreatureTemplate(uint entry)
     {
         using var model = Database();
         return model.CreatureTemplate.FirstOrDefault(ct => ct.Entry == entry);
@@ -216,7 +222,7 @@ public class DatabaseProviderClassic : BaseDatabaseProvider<ClassicDatabase>
         return await (o).ToListAsync<IGameObjectTemplate>();
     }
         
-    public override IGameObjectTemplate? GetGameObjectTemplate(uint entry)
+    public override async Task<IGameObjectTemplate?> GetGameObjectTemplate(uint entry)
     {
         using var model = Database();
         return model.GameObjectTemplate.FirstOrDefault(g => g.Entry == entry);

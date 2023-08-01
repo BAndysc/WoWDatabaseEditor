@@ -6,23 +6,25 @@ using WDE.Common.Database;
 
 namespace WDE.MySqlDatabaseCommon.Database.World
 {
-    public class NullWorldDatabaseProvider : IAsyncDatabaseProvider
+    public class NullWorldDatabaseProvider : IAsyncDatabaseProvider, ICachedDatabaseProvider
     {
         public bool IsConnected => false;
         
-        public ICreatureTemplate? GetCreatureTemplate(uint entry) => null;
-
+        public async Task<ICreatureTemplate?> GetCreatureTemplate(uint entry) => null;
+        public ICreatureTemplate? GetCachedCreatureTemplate(uint entry) => null;
         public IReadOnlyList<ICreatureTemplate> GetCreatureTemplates() => Array.Empty<ICreatureTemplate>();
 
-        public IGameObjectTemplate? GetGameObjectTemplate(uint entry) => null;
-
+        public async Task<IGameObjectTemplate?> GetGameObjectTemplate(uint entry) => null;
+        public IGameObjectTemplate? GetCachedGameObjectTemplate(uint entry) => null;
         public IReadOnlyList<IGameObjectTemplate> GetGameObjectTemplates() => Array.Empty<IGameObjectTemplate>();
         
         public Task<IAreaTriggerScript?> GetAreaTriggerScript(int entry) => Task.FromResult<IAreaTriggerScript?>(null);
         
         public async Task<IAreaTriggerTemplate?> GetAreaTriggerTemplate(int entry) => null;
 
-        public IQuestTemplate? GetQuestTemplate(uint entry) => null;
+        public async Task<IQuestTemplate?> GetQuestTemplate(uint entry) => null;
+        public IQuestTemplate? GetCachedQuestTemplate(uint entry) => null;
+        public async Task WaitForCache() { }
 
         public IReadOnlyList<IQuestTemplate> GetQuestTemplates() => Array.Empty<IQuestTemplate>();
         
@@ -116,6 +118,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public Task<IList<IDatabaseSpellDbc>> GetSpellDbcAsync() => Task.FromResult<IList<IDatabaseSpellDbc>>(new List<IDatabaseSpellDbc>());
        
         public Task<IList<ISmartScriptLine>> FindSmartScriptLinesBy(IEnumerable<(IDatabaseProvider.SmartLinePropertyType what, int whatValue, int parameterIndex, long valueToSearch)> conditions) => Task.FromResult<IList<ISmartScriptLine>>(new List<ISmartScriptLine>());
+
+        public void ConnectOrThrow() { }
 
         public Task<IReadOnlyList<ICreatureTemplate>> GetCreatureTemplatesAsync() => Task.FromResult<IReadOnlyList<ICreatureTemplate>>(new List<ICreatureTemplate>());
 

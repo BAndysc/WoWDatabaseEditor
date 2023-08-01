@@ -70,7 +70,7 @@ namespace WDE.PacketViewer.Processing.Processors
             StringBuilder sb = new();
             foreach (var state in states)
             {
-                var template = databaseProvider.GetQuestTemplate(state.Key);
+                var template = await databaseProvider.GetQuestTemplate(state.Key);
                 sb.AppendLine(template == null ? $"Quest {state.Key}:" : $"{template.Name} ({template.Entry}):");
                 sb.AppendLine("  Accepted: " + (state.Value.Accepted == -1 ? "(not in sniff)" : state.Value.Accepted));
                 if (state.Value.Failed != -1)

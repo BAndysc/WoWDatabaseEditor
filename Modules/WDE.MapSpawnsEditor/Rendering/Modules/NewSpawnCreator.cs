@@ -22,7 +22,7 @@ public class NewSpawnCreator : System.IDisposable, IMapSpawnModule
 {
     private readonly IGameContext gameContext;
     private readonly RaycastSystem raycastSystem;
-    private readonly IDatabaseProvider databaseProvider;
+    private readonly ICachedDatabaseProvider databaseProvider;
     private readonly IInputManager inputManager;
     private readonly ISpawnsContainer spawnsContainer;
     private readonly ISpawnSelectionService spawnSelectionService;
@@ -41,7 +41,7 @@ public class NewSpawnCreator : System.IDisposable, IMapSpawnModule
 
     public NewSpawnCreator(IGameContext gameContext,
         RaycastSystem raycastSystem,
-        IDatabaseProvider databaseProvider,
+        ICachedDatabaseProvider databaseProvider,
         IInputManager inputManager,
         ISpawnsContainer spawnsContainer,
         ISpawnSelectionService spawnSelectionService,
@@ -128,7 +128,7 @@ public class NewSpawnCreator : System.IDisposable, IMapSpawnModule
         
         if (creature)
         {
-            var template = databaseProvider.GetCreatureTemplate(entry);
+            var template = databaseProvider.GetCachedCreatureTemplate(entry);
             if (template == null)
                 yield break;
 
@@ -153,7 +153,7 @@ public class NewSpawnCreator : System.IDisposable, IMapSpawnModule
         }
         else
         {
-            var template = databaseProvider.GetGameObjectTemplate(entry);
+            var template = databaseProvider.GetCachedGameObjectTemplate(entry);
             if (template == null)
                 yield break;
             

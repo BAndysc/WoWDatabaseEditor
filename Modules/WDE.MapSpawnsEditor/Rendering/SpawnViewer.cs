@@ -41,7 +41,7 @@ public class SpawnViewerProxy : ISpawnViewerProxy
 
 public class SpawnViewer : IGameModule, ISavable
 {
-    private readonly IDatabaseProvider databaseProvider;
+    private readonly ICachedDatabaseProvider databaseProvider;
     private readonly ISpawnsContainer spawnsContainer;
     private readonly IGameContext gameContext;
     private readonly IEntityManager entityManager;
@@ -73,7 +73,7 @@ public class SpawnViewer : IGameModule, ISavable
     private readonly NewSpawnCreator newSpawnCreator;
     private readonly List<IMapSpawnModule> mapModules;
 
-    public SpawnViewer(IDatabaseProvider databaseProvider,
+    public SpawnViewer(ICachedDatabaseProvider databaseProvider,
         ISpawnsContainer spawnsContainer,
         IGameContext gameContext,
         IEntityManager entityManager,
@@ -379,7 +379,7 @@ public class SpawnViewer : IGameModule, ISavable
             spawn.Dispose();
         }
         
-        var template = databaseProvider.GetCreatureTemplate(spawn.Entry);
+        var template = databaseProvider.GetCachedCreatureTemplate(spawn.Entry);
 
         if (template == null)
             yield break;
@@ -422,7 +422,7 @@ public class SpawnViewer : IGameModule, ISavable
             spawn.Dispose();
         }
         
-        var template = databaseProvider.GetGameObjectTemplate(spawn.Entry);
+        var template = databaseProvider.GetCachedGameObjectTemplate(spawn.Entry);
 
         if (template == null)
             yield break;

@@ -23,12 +23,12 @@ public class CreatureEntryOrGuidProviderService : ICreatureEntryOrGuidProviderSe
     private readonly ITabularDataPicker tabularDataPicker;
     private readonly IFactionTemplateStore factionTemplateStore;
     private readonly IDatabaseRowsCountProvider databaseRowsCountProvider;
-    private readonly IDatabaseProvider databaseProvider;
+    private readonly ICachedDatabaseProvider databaseProvider;
 
     public CreatureEntryOrGuidProviderService(ITabularDataPicker tabularDataPicker,
         IFactionTemplateStore factionTemplateStore,
         IDatabaseRowsCountProvider databaseRowsCountProvider,
-        IDatabaseProvider databaseProvider)
+        ICachedDatabaseProvider databaseProvider)
     {
         this.tabularDataPicker = tabularDataPicker;
         this.factionTemplateStore = factionTemplateStore;
@@ -116,7 +116,7 @@ public class CreatureEntryOrGuidProviderService : ICreatureEntryOrGuidProviderSe
                 else
                 {
                     var creature = databaseProvider.GetCreatureByGuid(0, (uint)(-entry));
-                    var template = creature == null ? null : databaseProvider.GetCreatureTemplate(creature.Entry);
+                    var template = creature == null ? null : databaseProvider.GetCachedCreatureTemplate(creature.Entry);
                     if (template != null)
                     {
                         return new ExtendedAbstractCreatureTemplate()

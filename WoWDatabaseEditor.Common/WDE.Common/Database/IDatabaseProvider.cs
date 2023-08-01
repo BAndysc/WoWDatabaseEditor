@@ -11,10 +11,10 @@ namespace WDE.Common.Database
     {
         bool IsConnected { get; }
         
-        ICreatureTemplate? GetCreatureTemplate(uint entry);
+        Task<ICreatureTemplate?> GetCreatureTemplate(uint entry);
         IReadOnlyList<ICreatureTemplate> GetCreatureTemplates();
 
-        IGameObjectTemplate? GetGameObjectTemplate(uint entry);
+        Task<IGameObjectTemplate?> GetGameObjectTemplate(uint entry);
         IReadOnlyList<IGameObjectTemplate> GetGameObjectTemplates();
 
         Task<IAreaTriggerScript?> GetAreaTriggerScript(int entry);
@@ -24,7 +24,7 @@ namespace WDE.Common.Database
 
         IEnumerable<ICreatureClassLevelStat> GetCreatureClassLevelStats();
 
-        IQuestTemplate? GetQuestTemplate(uint entry);
+        Task<IQuestTemplate?> GetQuestTemplate(uint entry);
         IReadOnlyList<IQuestTemplate> GetQuestTemplates();
         Task<IList<IQuestObjective>> GetQuestObjectives(uint questId);
         Task<IQuestObjective?> GetQuestObjective(uint questId, int storageIndex);
@@ -49,8 +49,6 @@ namespace WDE.Common.Database
         Task<IList<ISmartScriptLine>> GetLinesCallingSmartTimedActionList(int timedActionList);
         IEnumerable<ISmartScriptLine> GetScriptFor(uint entry, int entryOrGuid, SmartScriptType type);
         Task<IList<ISmartScriptLine>> GetScriptForAsync(uint entry, int entryOrGuid, SmartScriptType type);
-
-        Task InstallConditions(IEnumerable<IConditionLine> conditions, ConditionKeyMask keyMask, ConditionKey? manualKey = null);
 
         IEnumerable<IConditionLine> GetConditionsFor(int sourceType, int sourceEntry, int sourceId);
 

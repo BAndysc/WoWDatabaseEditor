@@ -48,7 +48,7 @@ public class GameObjectGUIDParameter : GameObjectGUIDPickerOnlyParameter, IAsync
         if (creature == null)
             return val + " (not found)";
 
-        var template = databaseProvider.GetGameObjectTemplate(creature.Entry);
+        var template = await databaseProvider.GetGameObjectTemplate(creature.Entry);
 
         if (template == null)
             return val.ToString();

@@ -11,11 +11,11 @@ namespace WDE.QueryGenerators.Generators.Quests;
 [RequiresCore("TrinityMaster", "TrinityCata", "TrinityWrath", "AzerothCore")]
 public class TrinityQuestQueryProvider : IUpdateQueryProvider<QuestChainDiff>
 {
-    private readonly IDatabaseProvider databaseProvider;
+    private readonly ICachedDatabaseProvider databaseProvider;
     public string TableName => "quest_template_addon";
     private bool hasBreadcrumb;
 
-    public TrinityQuestQueryProvider(IDatabaseProvider databaseProvider, ICurrentCoreVersion currentCoreVersion)
+    public TrinityQuestQueryProvider(ICachedDatabaseProvider databaseProvider, ICurrentCoreVersion currentCoreVersion)
     {
         this.databaseProvider = databaseProvider;
         hasBreadcrumb = currentCoreVersion.Current.Tag != "AzerothCore";
@@ -31,7 +31,7 @@ public class TrinityQuestQueryProvider : IUpdateQueryProvider<QuestChainDiff>
 
         var trans = Queries.BeginTransaction();
 
-        var template = databaseProvider.GetQuestTemplate(diff.Id);
+        var template = databaseProvider.GetCachedQuestTemplate(diff.Id);
         if (template != null)
             trans.Comment(template.Name);
         

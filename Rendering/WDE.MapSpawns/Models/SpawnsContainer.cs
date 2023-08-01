@@ -84,7 +84,7 @@ public class SpawnsContainer : ISpawnsContainer
 
             foreach (var creatureEntry in creatureSpawns.GroupBy(c => c.Entry))
             {
-                var template = databaseProvider.GetCreatureTemplate(creatureEntry.Key);
+                var template = await databaseProvider.GetCreatureTemplate(creatureEntry.Key);
                 
                 if (template == null)
                     continue;
@@ -121,7 +121,7 @@ public class SpawnsContainer : ISpawnsContainer
 
             foreach (var gameObjectEntry in gameObjectSpawns.GroupBy(c => c.Entry))
             {
-                var template = databaseProvider.GetGameObjectTemplate(gameObjectEntry.Key);
+                var template = await databaseProvider.GetGameObjectTemplate(gameObjectEntry.Key);
                 
                 if (template == null)
                     continue;

@@ -29,7 +29,7 @@ public class QuickSpawnMenu : IDisposable
     }
     
     private readonly IInputManager inputManager;
-    private readonly IDatabaseProvider databaseProvider;
+    private readonly ICachedDatabaseProvider databaseProvider;
     private readonly ModelPreviewRenderer modelPreviewRenderer;
 
     private List<ListItem> items = new();
@@ -40,7 +40,7 @@ public class QuickSpawnMenu : IDisposable
     private string searchText = "";
     
     public QuickSpawnMenu(IInputManager inputManager,
-        IDatabaseProvider databaseProvider,
+        ICachedDatabaseProvider databaseProvider,
         
         ModelPreviewRenderer modelPreviewRenderer)
     {
@@ -61,9 +61,9 @@ public class QuickSpawnMenu : IDisposable
         {
             uint? displayId;
             if (items[selectedIndex].IsCreature)
-                displayId = databaseProvider.GetCreatureTemplate(items[selectedIndex].Entry)?.GetModel(0);
+                displayId = databaseProvider.GetCachedCreatureTemplate(items[selectedIndex].Entry)?.GetModel(0);
             else
-                displayId = databaseProvider.GetGameObjectTemplate(items[selectedIndex].Entry)?.DisplayId;
+                displayId = databaseProvider.GetCachedGameObjectTemplate(items[selectedIndex].Entry)?.DisplayId;
             modelPreviewRenderer.SetModel(displayId ?? 0, items[selectedIndex].IsCreature ? GuidType.Creature : GuidType.GameObject);
             prevSelectedIndex = selectedIndex;
         }

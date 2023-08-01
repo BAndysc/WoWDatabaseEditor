@@ -21,7 +21,7 @@ namespace WDE.TrinityMySqlDatabase.Database
     public abstract class BaseTrinityMySqlDatabaseProvider<T> : IAsyncDatabaseProvider, IAuthDatabaseProvider where T : BaseTrinityDatabase, new()
     {
         public bool IsConnected => true;
-        public abstract ICreatureTemplate? GetCreatureTemplate(uint entry);
+        public abstract Task<ICreatureTemplate?> GetCreatureTemplate(uint entry);
         public abstract IReadOnlyList<ICreatureTemplate> GetCreatureTemplates();
 
         private readonly ICurrentCoreVersion currentCoreVersion;
@@ -100,6 +100,7 @@ namespace WDE.TrinityMySqlDatabase.Database
             return (from t in model.ConversationTemplate orderby t.Id select t).ToList<IConversationTemplate>();
         }
 
+        public abstract void ConnectOrThrow();
         public abstract Task<IReadOnlyList<ICreatureTemplate>> GetCreatureTemplatesAsync();
         public abstract Task<IList<ICreature>> GetCreaturesAsync();
 
@@ -289,9 +290,9 @@ namespace WDE.TrinityMySqlDatabase.Database
         
         public abstract Task<List<IQuestTemplate>> GetQuestTemplatesAsync();
 
-        public abstract IQuestTemplate? GetQuestTemplate(uint entry);
+        public abstract Task<IQuestTemplate?> GetQuestTemplate(uint entry);
 
-        public IGameObjectTemplate? GetGameObjectTemplate(uint entry)
+        public async Task<IGameObjectTemplate?> GetGameObjectTemplate(uint entry)
         {
             using var model = Database();
             return model.GameObjectTemplate.FirstOrDefault(g => g.Entry == entry);

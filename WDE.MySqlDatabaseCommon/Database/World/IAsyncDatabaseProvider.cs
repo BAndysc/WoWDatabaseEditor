@@ -6,6 +6,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 {
     public interface IAsyncDatabaseProvider : IDatabaseProvider
     {
+        void ConnectOrThrow();
         Task<IReadOnlyList<ICreatureTemplate>> GetCreatureTemplatesAsync();
         Task<List<IConversationTemplate>> GetConversationTemplatesAsync();
         Task<List<IGameEvent>> GetGameEventsAsync();

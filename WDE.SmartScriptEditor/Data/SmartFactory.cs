@@ -28,7 +28,7 @@ namespace WDE.SmartScriptEditor.Data
         public SmartFactory(IParameterFactory parameterFactory, 
             IEditorFeatures editorFeatures,
             ISmartDataManager smartDataManager, 
-            IDatabaseProvider databaseProvider,
+            ICachedDatabaseProvider databaseProvider,
             IConditionDataManager conditionDataManager,
             ITableEditorPickerService tableEditorPickerService,
             IItemFromListProvider itemFromListProvider,

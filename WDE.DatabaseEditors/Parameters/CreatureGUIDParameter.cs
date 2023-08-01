@@ -49,7 +49,7 @@ public class CreatureGUIDParameter : CreatureGUIDPickerOnlyParameter, IAsyncPara
         if (creature == null)
             return val + " (not found)";
 
-        var template = databaseProvider.GetCreatureTemplate(creature.Entry);
+        var template = await databaseProvider.GetCreatureTemplate(creature.Entry);
 
         if (template == null)
             return val.ToString();
@@ -76,7 +76,7 @@ public class CreatureGUIDEntryOnlyParameter : CreatureGUIDPickerOnlyParameter, I
         if (creature == null)
             return "(not found)";
 
-        var template = databaseProvider.GetCreatureTemplate(creature.Entry);
+        var template = await databaseProvider.GetCreatureTemplate(creature.Entry);
 
         if (template == null)
             return "(no template)";

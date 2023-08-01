@@ -106,13 +106,13 @@ namespace WDE.PacketViewer.Processing.Processors
         }
         
         private readonly IChatEmoteSoundProcessor chatEmoteSoundProcessor;
-        private readonly IDatabaseProvider databaseProvider;
+        private readonly ICachedDatabaseProvider databaseProvider;
         private readonly bool asDiff;
 
         private readonly Dictionary<uint, State> perEntryState = new();
 
         public CreatureTextDumper(IChatEmoteSoundProcessor chatEmoteSoundProcessor, 
-            IDatabaseProvider databaseProvider,
+            ICachedDatabaseProvider databaseProvider,
             bool asDiff) : base (chatEmoteSoundProcessor)
         {
             this.chatEmoteSoundProcessor = chatEmoteSoundProcessor;
@@ -182,7 +182,7 @@ namespace WDE.PacketViewer.Processing.Processors
                     sniffText.GroupId = (byte)(++maxId);
                 }
                 
-                var template = databaseProvider.GetCreatureTemplate(entry.Key);
+                var template = databaseProvider.GetCachedCreatureTemplate(entry.Key);
                 if (template != null)
                     trans.Comment(template.Name);
                 trans.Table("creature_text")

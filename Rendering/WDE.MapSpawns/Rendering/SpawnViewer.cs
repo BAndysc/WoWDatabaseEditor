@@ -24,7 +24,7 @@ namespace WDE.MapSpawns.Rendering;
 
 public class SpawnViewer : IGameModule
 {
-    private readonly IDatabaseProvider databaseProvider;
+    private readonly ICachedDatabaseProvider databaseProvider;
     private readonly ISpawnsContainer spawnsContainer;
     private readonly IGameContext gameContext;
     private readonly IEntityManager entityManager;
@@ -47,7 +47,7 @@ public class SpawnViewer : IGameModule
     private SpawnDragger spawnDragger;
     private readonly SpawnContextMenu spawnContextMenu;
 
-    public SpawnViewer(IDatabaseProvider databaseProvider,
+    public SpawnViewer(ICachedDatabaseProvider databaseProvider,
         ISpawnsContainer spawnsContainer,
         IGameContext gameContext,
         IEntityManager entityManager,
@@ -220,7 +220,7 @@ public class SpawnViewer : IGameModule
             
             if (spawn is CreatureSpawnInstance creatureSpawnInstance)
             {
-                var template = databaseProvider.GetCreatureTemplate(spawn.Entry);
+                var template = databaseProvider.GetCachedCreatureTemplate(spawn.Entry);
 
                 if (template == null)
                     continue;
@@ -262,7 +262,7 @@ public class SpawnViewer : IGameModule
             }
             else if (spawn is GameObjectSpawnInstance gameObjectSpawnInstance)
             {
-                var template = databaseProvider.GetGameObjectTemplate(spawn.Entry);
+                var template = databaseProvider.GetCachedGameObjectTemplate(spawn.Entry);
 
                 if (template == null)
                     continue;

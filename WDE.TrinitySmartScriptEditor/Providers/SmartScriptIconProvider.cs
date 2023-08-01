@@ -8,7 +8,7 @@ namespace WDE.TrinitySmartScriptEditor.Providers
     [AutoRegisterToParentScope]
     public class SmartScriptIconProvider : SmartScriptIconBaseProvider<SmartScriptSolutionItem>
     {
-        public SmartScriptIconProvider(IDatabaseProvider databaseProvider, ICurrentCoreVersion currentCoreVersion) : base(databaseProvider, currentCoreVersion)
+        public SmartScriptIconProvider(ICachedDatabaseProvider databaseProvider, ICurrentCoreVersion currentCoreVersion) : base(databaseProvider, currentCoreVersion)
         {
         }
     }

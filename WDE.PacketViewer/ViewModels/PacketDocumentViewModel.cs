@@ -59,7 +59,7 @@ namespace WDE.PacketViewer.ViewModels
         public PacketDocumentViewModel(PacketDocumentSolutionItem solutionItem, 
             IMainThread mainThread,
             MostRecentlySearchedService mostRecentlySearchedService,
-            IDatabaseProvider databaseProvider,
+            ICachedDatabaseProvider databaseProvider,
             Func<INativeTextDocument> nativeTextDocumentCreator,
             IMessageBoxService messageBoxService,
             IPacketFilteringService filteringService,

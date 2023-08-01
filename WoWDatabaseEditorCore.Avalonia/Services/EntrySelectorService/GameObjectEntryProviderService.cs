@@ -23,12 +23,12 @@ public class GameObjectEntryProviderService : IGameobjectEntryOrGuidProviderServ
     private readonly ITabularDataPicker tabularDataPicker;
     private readonly IFactionTemplateStore factionTemplateStore;
     private readonly IDatabaseRowsCountProvider databaseRowsCountProvider;
-    private readonly IDatabaseProvider databaseProvider;
+    private readonly ICachedDatabaseProvider databaseProvider;
 
     public GameObjectEntryProviderService(ITabularDataPicker tabularDataPicker,
         IFactionTemplateStore factionTemplateStore,
         IDatabaseRowsCountProvider databaseRowsCountProvider,
-        IDatabaseProvider databaseProvider)
+        ICachedDatabaseProvider databaseProvider)
     {
         this.tabularDataPicker = tabularDataPicker;
         this.factionTemplateStore = factionTemplateStore;
@@ -97,7 +97,7 @@ public class GameObjectEntryProviderService : IGameobjectEntryOrGuidProviderServ
                 else
                 {
                     var creature = databaseProvider.GetGameObjectByGuid(0, (uint)(-entry));
-                    var template = creature == null ? null : databaseProvider.GetGameObjectTemplate(creature.Entry);
+                    var template = creature == null ? null : databaseProvider.GetCachedGameObjectTemplate(creature.Entry);
                     if (template != null)
                     {
                         return new ExtendedAbstractGameObjectTemplate()

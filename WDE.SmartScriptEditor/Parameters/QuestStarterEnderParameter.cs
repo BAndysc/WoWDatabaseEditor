@@ -12,12 +12,12 @@ namespace WDE.SmartScriptEditor.Parameters;
 
 public class QuestStarterEnderParameter : IParameter<long>, ICustomPickerContextualParameter<long>
 {
-    private readonly IDatabaseProvider databaseProvider;
+    private readonly ICachedDatabaseProvider databaseProvider;
     private readonly ITableEditorPickerService tableEditorPickerService;
     private readonly IQuestEntryProviderService questEntryProviderService;
     private readonly string tableSuffix;
 
-    public QuestStarterEnderParameter(IDatabaseProvider databaseProvider,
+    public QuestStarterEnderParameter(ICachedDatabaseProvider databaseProvider,
         ITableEditorPickerService tableEditorPickerService,
         IQuestEntryProviderService questEntryProviderService,
         string tableSuffix)
@@ -101,7 +101,7 @@ public class QuestStarterEnderParameter : IParameter<long>, ICustomPickerContext
     
     public string ToString(long value)
     {
-        var text = databaseProvider.GetQuestTemplate((uint)value);
+        var text = databaseProvider.GetCachedQuestTemplate((uint)value);
         if (text == null)
             return value.ToString();
         return $"{text.Name} ({value})";

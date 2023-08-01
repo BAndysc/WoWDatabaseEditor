@@ -331,7 +331,7 @@ namespace WDE.PacketViewer.Processing.Processors
             foreach (var menu in gossiperToFirstMenuId
                 .Where(entry => !templatesNotExistingInDb.Contains(entry.Key)))
             {
-                var template = databaseProvider.GetCreatureTemplate(menu.Key);
+                var template = await databaseProvider.GetCreatureTemplate(menu.Key);
                 string? comment = template?.Name;
                 if (overridenDatabaseGossipMenu.TryGetValue(menu.Key, out var originalMenu))
                     comment = $"{template?.Name} (was {originalMenu} in db)";
@@ -717,7 +717,7 @@ namespace WDE.PacketViewer.Processing.Processors
             
             foreach (var entry in gossiperToFirstMenuId.Keys.ToList())
             {
-                var template = databaseProvider.GetCreatureTemplate(entry);
+                var template = await databaseProvider.GetCreatureTemplate(entry);
                 if (template != null)
                 {
                     if (template.GossipMenuId == gossiperToFirstMenuId[entry])

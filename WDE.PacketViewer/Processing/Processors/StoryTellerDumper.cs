@@ -42,7 +42,7 @@ namespace WDE.PacketViewer.Processing.Processors
             }
         }
         
-        private readonly IDatabaseProvider databaseProvider;
+        private readonly ICachedDatabaseProvider databaseProvider;
         private readonly IDbcStore dbcStore;
         private readonly ISpellStore spellStore;
         private readonly IWaypointProcessor waypointProcessor;
@@ -66,7 +66,7 @@ namespace WDE.PacketViewer.Processing.Processors
 
         public bool RequiresSplitUpdateObject => true;
         
-        public StoryTellerDumper(IDatabaseProvider databaseProvider, 
+        public StoryTellerDumper(ICachedDatabaseProvider databaseProvider, 
             IDbcStore dbcStore,
             ISpellStore spellStore,
             IParameterFactory parameterFactory,
@@ -164,14 +164,14 @@ namespace WDE.PacketViewer.Processing.Processors
         {
             if (type == UniversalHighGuid.Creature || type == UniversalHighGuid.Vehicle || type == UniversalHighGuid.Pet)
             {
-                var cr = databaseProvider.GetCreatureTemplate(id);
+                var cr = databaseProvider.GetCachedCreatureTemplate(id);
                 if (cr == null)
                     return null;
                 return $"{cr.Name} ({id}) (GUID {shortGuid})";
             }
             else if (type == UniversalHighGuid.GameObject || type == UniversalHighGuid.Transport || type == UniversalHighGuid.WorldTransaction)
             {
-                var cr = databaseProvider.GetGameObjectTemplate(id);
+                var cr = databaseProvider.GetCachedGameObjectTemplate(id);
                 if (cr == null)
                     return null;
                 return $"{cr.Name} ({id}) (GUID {shortGuid})";
@@ -395,7 +395,7 @@ namespace WDE.PacketViewer.Processing.Processors
         
         private string GetQuestName(uint questId)
         {
-            var template = databaseProvider.GetQuestTemplate(questId);
+            var template = databaseProvider.GetCachedQuestTemplate(questId);
             return (template == null ? questId.ToString() : $"{template.Name} ({questId})");
         }
 

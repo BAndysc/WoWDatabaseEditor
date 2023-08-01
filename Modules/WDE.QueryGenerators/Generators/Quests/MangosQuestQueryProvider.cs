@@ -11,10 +11,10 @@ namespace WDE.QueryGenerators.Generators.Quests;
 [RequiresCore("CMaNGOS-WoTLK", "CMaNGOS-TBC", "CMaNGOS-Classic")]
 public class MangosQuestQueryProvider : IUpdateQueryProvider<QuestChainDiff>
 {
-    private readonly IDatabaseProvider databaseProvider;
+    private readonly ICachedDatabaseProvider databaseProvider;
     public string TableName => "quest_template";
 
-    public MangosQuestQueryProvider(IDatabaseProvider databaseProvider)
+    public MangosQuestQueryProvider(ICachedDatabaseProvider databaseProvider)
     {
         this.databaseProvider = databaseProvider;
     }
@@ -45,7 +45,7 @@ public class MangosQuestQueryProvider : IUpdateQueryProvider<QuestChainDiff>
         if (diff.BreadcrumbQuestId.HasValue)
             update = update.Set("BreadcrumbForQuestId", diff.BreadcrumbQuestId.Value);
         
-        var template = databaseProvider.GetQuestTemplate(diff.Id);
+        var template = databaseProvider.GetCachedQuestTemplate(diff.Id);
         if (template != null)
             trans.Comment(template.Name);
         update.Update();

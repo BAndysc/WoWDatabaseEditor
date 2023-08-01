@@ -8,10 +8,10 @@ namespace WDE.SmartScriptEditor
 {
     public abstract class SmartScriptIconBaseProvider<T> : ISolutionItemIconProvider<T> where T : ISmartScriptSolutionItem
     {
-        private readonly IDatabaseProvider databaseProvider;
+        private readonly ICachedDatabaseProvider databaseProvider;
         private readonly ICurrentCoreVersion currentCoreVersion;
 
-        public SmartScriptIconBaseProvider(IDatabaseProvider databaseProvider, ICurrentCoreVersion currentCoreVersion)
+        public SmartScriptIconBaseProvider(ICachedDatabaseProvider databaseProvider, ICurrentCoreVersion currentCoreVersion)
         {
             this.databaseProvider = databaseProvider;
             this.currentCoreVersion = currentCoreVersion;
@@ -33,7 +33,7 @@ namespace WDE.SmartScriptEditor
                     return new ImageUri("Icons/document.png");
                 case SmartScriptType.Quest:
                 {
-                    var template = databaseProvider.GetQuestTemplate((uint)item.EntryOrGuid);
+                    var template = databaseProvider.GetCachedQuestTemplate((uint)item.EntryOrGuid);
                     if (template != null && template.AllowableRaces != 0)
                     {
                         var onlyHorde = (template.AllowableRaces & ~ (CharacterRaces.AllHorde)) == 0;

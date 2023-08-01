@@ -706,11 +706,12 @@ namespace WDE.Parameters
                 if (entry == null || entry.Count == 0)
                     return null;
                 
-                var options = entry.GroupBy(e => e.Entry)
-                    .OrderBy(group => group.Key)
-                    .ToDictionary(g => (long)g.Key,
-                        g => new SelectOption(database.GetGameObjectTemplate(g.Key)?.Name ?? "Unknown name",
-                            $"{g.First().Distance} yd away"));
+                Dictionary<long, SelectOption> options = new Dictionary<long, SelectOption>();
+                foreach (var pair in entry.GroupBy(e => e.Entry)
+                             .OrderBy(group => group.Key))
+                {
+                    options[(long)pair.Key] = new SelectOption((await database.GetGameObjectTemplate(pair.Key))?.Name ?? "Unknown name",$"{pair.First().Distance} yd away");
+                }
 
                 if (options.Count == 1)
                     return (uint)options.Keys.First();

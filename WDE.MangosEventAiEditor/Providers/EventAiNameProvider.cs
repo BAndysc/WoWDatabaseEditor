@@ -8,7 +8,7 @@ namespace WDE.MangosEventAiEditor.Providers
     [AutoRegisterToParentScope]
     public class EventAiNameProvider : EventAiNameProviderBase<EventAiSolutionItem>
     {
-        public EventAiNameProvider(IDatabaseProvider database) : base(database)
+        public EventAiNameProvider(ICachedDatabaseProvider database) : base(database)
         {
         }
         
