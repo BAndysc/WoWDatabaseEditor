@@ -1,0 +1,64 @@
+{
+  "id": "npc_vendor",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Npc Vendor",
+  "single_solution_name": "Npc {name} Vendor",
+  "multi_solution_name": "Npc Vendor",
+  "description": "This table allows you to change the items a vendor sells, or to create a vendor list for an NPC who does not sell items unless an event is active.",
+  "table_name": "npc_vendor",
+  "table_index_name": "entry",
+  "record_mode": "MultiRecord",
+  "skip_quick_load": true,
+  "group_name": "NPC Vendor",
+  "icon_path": "Icons/document_loot.png",
+  "picker": "CreatureParameter",
+  "primary_key": [
+    "item"
+  ],
+  "groups": [
+    {
+      "group_name": "group",
+      "fields": [
+        {
+          "name": "Vendor npc entry",
+          "db_column_name": "entry",
+          "value_type": "CreatureParameter"
+        },
+        {
+          "name": "Slot",
+          "db_column_name": "slot",
+          "value_type": "int",
+          "preferred_width": 135.0
+        },
+        {
+          "name": "Item",
+          "db_column_name": "item",
+          "value_type": "ItemParameter",
+          "preferred_width": 280.0
+        },
+        {
+          "name": "Max count",
+          "db_column_name": "maxcount",
+          "value_type": "uint"
+        },
+        {
+          "name": "Increment time",
+          "db_column_name": "incrtime",
+          "value_type": "uint"
+        },
+        {
+          "name": "Extended Cost",
+          "db_column_name": "ExtendedCost",
+          "value_type": "ExtendedCostParameter"
+        },
+        {
+          "name": "VerifiedBuild",
+          "db_column_name": "VerifiedBuild",
+          "value_type": "uint"
+        }
+      ]
+    }
+  ]
+}
