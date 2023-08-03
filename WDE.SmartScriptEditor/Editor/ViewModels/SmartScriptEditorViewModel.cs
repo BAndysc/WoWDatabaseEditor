@@ -2086,11 +2086,15 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 (e, isOriginal, id) =>
                 {
                     smartFactory.SafeUpdateAction(e, id);
+                    var actionData = smartDataManager.GetRawData(SmartType.SmartAction, id);
+
+                    if (actionData.ImplicitSource != null && smartDataManager.GetDataByName(SmartType.SmartSource, actionData.ImplicitSource) is { } data)
+                        sourceType.Value = data.Id;
+                    
                     if (isOriginal)
                         return;
                     
                     FillNonzeroWithDefaults(SmartType.SmartAction, id, actionParameters);
-                    var actionData = smartDataManager.GetRawData(SmartType.SmartAction, id);
                     if (actionData.TargetTypes != SmartSourceTargetType.None &&
                         !targetType.HoldsMultipleValues &&
                         targetType.Value == SmartConstants.TargetNone &&
