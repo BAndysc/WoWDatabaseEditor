@@ -1726,20 +1726,48 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
         private async Task<SmartAction?> AddActionWizard(SmartEvent e)
         {
-            var sourcePick = await ShowSourcePicker(e);
+            int actionId;
+            int sourceId;
+            int? storedTargetEntry;
+            SmartGenericJsonData actionData;
+            if (preferences.ActionEditViewOrder == ActionEditViewOrder.SourceActionTarget)
+            {
+                var sourcePick = await ShowSourcePicker(e);
 
-            if (!sourcePick.HasValue)
-                return null;
-
-            int sourceId = sourcePick.Value.Item2 ? SmartConstants.SourceStoredObject : sourcePick.Value.Item1;
+                if (!sourcePick.HasValue)
+                    return null;
+                
+                bool sourceIsStored = sourcePick.Value.Item2;
+                sourceId = sourceIsStored ? SmartConstants.SourceStoredObject : sourcePick.Value.Item1;
+                storedTargetEntry = sourceIsStored ? sourcePick.Value.Item1 : null;
             
-            int? actionId = await ShowActionPicker(e, sourceId);
+                var actionPick = await ShowActionPicker(e, sourceId);
 
-            if (!actionId.HasValue)
-                return null;
+                if (!actionPick.HasValue)
+                    return null;
 
-            SmartGenericJsonData actionData = smartDataManager.GetRawData(SmartType.SmartAction, actionId.Value);
+                actionId = actionPick.Value;
+                actionData = smartDataManager.GetRawData(SmartType.SmartAction, actionId);
+            }
+            else
+            {
+                var actionPick = await ShowActionPicker(e, null);
 
+                if (!actionPick.HasValue)
+                    return null;
+
+                actionId = actionPick.Value;
+                actionData = smartDataManager.GetRawData(SmartType.SmartAction, actionId);
+                var sourcePick = await ShowSourcePicker(e, actionData);
+                
+                if (!sourcePick.HasValue)
+                    return null;
+
+                bool sourceIsStored = sourcePick.Value.Item2;
+                sourceId = sourceIsStored ? SmartConstants.SourceStoredObject : sourcePick.Value.Item1;
+                storedTargetEntry = sourceIsStored ? sourcePick.Value.Item1 : null;
+            }
+            
             SmartTarget? target;
 
             if (!actionData.TargetIsSource && !actionData.DoNotProposeTarget && actionData.TargetTypes != SmartSourceTargetType.None)
@@ -1762,10 +1790,10 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             }
             
             SmartSource source = smartFactory.SourceFactory(sourceId);
-            if (sourcePick.Value.Item2)
-                source.GetParameter(0).Value = sourcePick.Value.Item1;
+            if (storedTargetEntry.HasValue)
+                source.GetParameter(0).Value = storedTargetEntry.Value;
 
-            SmartAction ev = smartFactory.ActionFactory(actionId.Value, source, target);
+            SmartAction ev = smartFactory.ActionFactory(actionId, source, target);
             SmartGenericJsonData targetData = smartDataManager.GetRawData(SmartType.SmartTarget, target.Id);
             ev.Parent = e;
             bool anyUsed = ev.GetParameter(0).IsUsed ||
