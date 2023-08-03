@@ -97,7 +97,7 @@ public class Program
         return true;
     }
     
-    public static async Task<int> Test<T>(string[] args, params ICoreVersion[] cores) where T : class, IDatabaseProvider
+    public static async Task<int> Test<T>(string[] args, params ICoreVersion[] cores) where T : class, ICachedDatabaseProvider
     {
         if (args.Length < 7)
         {
@@ -172,6 +172,7 @@ public class Program
 
         var worldDb = ioc.Resolve<T>();
         ioc.RegisterInstance<IDatabaseProvider>(worldDb);
+        ioc.RegisterInstance<ICachedDatabaseProvider>(worldDb);
 
         var allDefinitions = ioc.Resolve<ITableDefinitionProvider>().Definitions;
         var loader = ioc.Resolve<IDatabaseTableDataProvider>();
