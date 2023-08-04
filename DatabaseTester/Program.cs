@@ -214,6 +214,7 @@ public class Program
             "FindEventScriptLinesBy",
             "FindSmartScriptLinesBy",
             "GetConditionsForAsync",
+            "GetEventScript",
         };
 
         foreach (var method in allMethods)
@@ -244,6 +245,9 @@ public class Program
         await worldDb.GetConditionsForAsync(IDatabaseProvider.ConditionKeyMask.All, new IDatabaseProvider.ConditionKey(0, 0, 0, 0));
         await worldDb.GetConditionsForAsync(IDatabaseProvider.ConditionKeyMask.All, new List<IDatabaseProvider.ConditionKey>(){new IDatabaseProvider.ConditionKey(0, 0, 0, 0)});
         await worldDb.FindSmartScriptLinesBy(new (IDatabaseProvider.SmartLinePropertyType what, int whatValue, int parameterIndex, long valueToSearch)[] { (IDatabaseProvider.SmartLinePropertyType.Action, 0, 0, 0) });
+
+        foreach (var type in Enum.GetValues<EventScriptType>())
+            await worldDb.GetEventScript(type, 0);
         
         return 0;
     }
