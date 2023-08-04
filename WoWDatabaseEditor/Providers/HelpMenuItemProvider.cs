@@ -19,7 +19,6 @@ namespace WoWDatabaseEditorCore.Providers
         private readonly Func<AboutViewModel> aboutViewModelCreator;
         private readonly Func<DebugConsoleViewModel> debugConsole;
         private readonly ITextDocumentService textDocumentService;
-        private readonly IAnniversarySummaryService anniversarySummaryService;
         public IDocumentManager DocumentManager { get; }
         
         public string ItemName { get; } = "_Help";
@@ -30,14 +29,12 @@ namespace WoWDatabaseEditorCore.Providers
             Func<AboutViewModel> aboutViewModelCreator, 
             Func<DebugConsoleViewModel> debugConsole,
             ITextDocumentService textDocumentService,
-            IReportBugService reportBugService,
-            IAnniversarySummaryService anniversarySummaryService)
+            IReportBugService reportBugService)
         {
             DocumentManager = documentManager;
             this.aboutViewModelCreator = aboutViewModelCreator;
             this.debugConsole = debugConsole;
             this.textDocumentService = textDocumentService;
-            this.anniversarySummaryService = anniversarySummaryService;
             SubItems = new List<IMenuItem>();
             SubItems.Add(new ModuleMenuItem("Report a bug", new DelegateCommand(reportBugService.ReportBug)));
             SubItems.Add(new ModuleMenuItem("Send feedback", new DelegateCommand(reportBugService.SendFeedback)));
@@ -46,7 +43,6 @@ namespace WoWDatabaseEditorCore.Providers
             SubItems.Add(new ModuleMenuItem("Debug clear unused memory", new DelegateCommand(CallGC)));
             SubItems.Add(new ModuleMenuItem("Open debug SQL console", new DelegateCommand(OpenDebugSqlConsole)));
             SubItems.Add(new ModuleManuSeparatorItem());
-            SubItems.Add(new ModuleMenuItem("Open 2021 Summary", new DelegateCommand(anniversarySummaryService.OpenSummary)));
             SubItems.Add(new ModuleMenuItem("About", new DelegateCommand(OpenAbout)));
         }
 

@@ -91,15 +91,15 @@
                     <TextBlock VerticalAlignment="Bottom" FontSize="34" TextWrapping="WrapWithOverflow" Text="{CompiledBinding ProgramTitle}" />
                     <TextBlock VerticalAlignment="Bottom" FontSize="20" Opacity="0.7" Margin="10,0,0,0" TextWrapping="WrapWithOverflow" Text="{CompiledBinding ProgramSubtitle}" />
                     
-                    <WdeImage Cursor="Hand" x:Name="Party2021" VerticalAlignment="Bottom" ImageUri="Icons/document_party_big.png"
-                              IsVisible="{CompiledBinding ShowAnniversaryBox, Converter={x:Static BoolConverters.Not}}"
-                              Width="32" Height="32" Margin="0,0,0,5" ToolTip.Tip="Open 2021 Summary">
-                        <Interaction.Behaviors>
-                            <EventTriggerBehavior EventName="PointerPressed" SourceObject="{CompiledBinding #Party2021}">
-                                <InvokeCommandAction Command="{Binding #Root.DataContext.OpenYearlySummary}" />
-                            </EventTriggerBehavior>
-                        </Interaction.Behaviors>
-                    </WdeImage>
+                    <!-- <WdeImage Cursor="Hand" x:Name="Party2021" VerticalAlignment="Bottom" ImageUri="Icons/document_party_big.png" -->
+                    <!--           IsVisible="{CompiledBinding ShowAnniversaryBox, Converter={x:Static BoolConverters.Not}}" -->
+                    <!--           Width="32" Height="32" Margin="0,0,0,5" ToolTip.Tip="Open 2021 Summary"> -->
+                    <!--     <Interaction.Behaviors> -->
+                    <!--         <EventTriggerBehavior EventName="PointerPressed" SourceObject="{CompiledBinding #Party2021}"> -->
+                    <!--             <InvokeCommandAction Command="{Binding #Root.DataContext.OpenYearlySummary}" /> -->
+                    <!--         </EventTriggerBehavior> -->
+                    <!--     </Interaction.Behaviors> -->
+                    <!-- </WdeImage> -->
                     
                     <ContentControl DockPanel.Dock="Right" VerticalAlignment="Stretch" VerticalContentAlignment="Center" DataContext="{CompiledBinding QuickStartPanel}" utils:ViewBind.Model="{CompiledBinding}"></ContentControl>
                 </DockPanel>
@@ -116,24 +116,24 @@
                 </StackPanel>
             </Border>
             
-            <Border Classes="infoBox" IsVisible="{CompiledBinding ShowAnniversaryBox}">
-                <DockPanel>
-                    <WdeImage VerticalAlignment="Center" ImageUri="Icons/document_party_big.png" Width="32" Height="32" />
-                    <Button DockPanel.Dock="Right" Command="{CompiledBinding CloseAnniversaryBox}">Dismiss</Button>
-                    <StackPanel Orientation="Vertical" TextBlock.FontSize="13">
-                        <TextBlock FontWeight="Bold" TextWrapping="WrapWithOverflow">Year 2021 is over!</TextBlock>
-                        <TextBlock Cursor="Hand" TextWrapping="WrapWithOverflow" x:Name="Text"
-                                   Text="Click here to see the history of the editor (including old screenshots 🤩)">
-                            <Interaction.Behaviors>
-                                <EventTriggerBehavior EventName="PointerPressed" SourceObject="{CompiledBinding #Text}">
-                                    <InvokeCommandAction Command="{Binding #Root.DataContext.OpenYearlySummary}" />
-                                </EventTriggerBehavior>
-                            </Interaction.Behaviors>
-                        </TextBlock>
-                        <TextBlock Opacity="0.5" FontSize="11">(or use Help -> Open 2021 Summary)</TextBlock>
-                    </StackPanel>
-                </DockPanel>
-            </Border>
+            <!-- <Border Classes="infoBox" IsVisible="{CompiledBinding ShowAnniversaryBox}"> -->
+            <!--     <DockPanel> -->
+            <!--         <WdeImage VerticalAlignment="Center" ImageUri="Icons/document_party_big.png" Width="32" Height="32" /> -->
+            <!--         <Button DockPanel.Dock="Right" Command="{CompiledBinding CloseAnniversaryBox}">Dismiss</Button> -->
+            <!--         <StackPanel Orientation="Vertical" TextBlock.FontSize="13"> -->
+            <!--             <TextBlock FontWeight="Bold" TextWrapping="WrapWithOverflow">Year 2021 is over!</TextBlock> -->
+            <!--             <TextBlock Cursor="Hand" TextWrapping="WrapWithOverflow" x:Name="Text" -->
+            <!--                        Text="Click here to see the history of the editor (including old screenshots 🤩)"> -->
+            <!--                 <Interaction.Behaviors> -->
+            <!--                     <EventTriggerBehavior EventName="PointerPressed" SourceObject="{CompiledBinding #Text}"> -->
+            <!--                         <InvokeCommandAction Command="{Binding #Root.DataContext.OpenYearlySummary}" /> -->
+            <!--                     </EventTriggerBehavior> -->
+            <!--                 </Interaction.Behaviors> -->
+            <!--             </TextBlock> -->
+            <!--             <TextBlock Opacity="0.5" FontSize="11">(or use Help -> Open 2021 Summary)</TextBlock> -->
+            <!--         </StackPanel> -->
+            <!--     </DockPanel> -->
+            <!-- </Border> -->
             
             <Grid>
                 <Grid.ColumnDefinitions>

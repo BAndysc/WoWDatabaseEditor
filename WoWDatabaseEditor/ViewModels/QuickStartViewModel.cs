@@ -39,7 +39,6 @@ namespace WoWDatabaseEditorCore.ViewModels
         private readonly IMostRecentlyUsedService mostRecentlyUsedService;
         private readonly IDotNetService dotNetService;
         private bool showGiveStarBox;
-        private bool showAnniversaryBox;
         public AboutViewModel AboutViewModel { get; }
         public ObservableCollection<NewItemPrototypeInfo> FlatItemPrototypes { get; } = new();
         public ObservableCollection<MostRecentlyUsedViewModel> MostRecentlyUsedItems { get; } = new();
@@ -54,13 +53,7 @@ namespace WoWDatabaseEditorCore.ViewModels
             get => showGiveStarBox;
             set => SetProperty(ref showGiveStarBox, value);
         }
-
-        public bool ShowAnniversaryBox
-        {
-            get => showAnniversaryBox;
-            set => SetProperty(ref showAnniversaryBox, value);
-        }
-
+        
         public string ProgramTitle { get; }
         
         public string ProgramSubtitle { get; }
@@ -86,7 +79,6 @@ namespace WoWDatabaseEditorCore.ViewModels
             IProgramNameService programNameService,
             IQuickLoadSettings quickLoadSettings,
             AboutViewModel aboutViewModel,
-            IAnniversarySummaryService anniversarySummaryService,
             IEnumerable<IQuickStartPanel> quickStartPanels)
         {
             this.iconRegistry = iconRegistry;
@@ -159,14 +151,6 @@ namespace WoWDatabaseEditorCore.ViewModels
                 DismissCommand.Execute(null);
             });
 
-            OpenYearlySummary = new DelegateCommand(anniversarySummaryService.OpenSummary);
-
-            CloseAnniversaryBox = new DelegateCommand(() =>
-            {
-                anniversarySummaryService.HideAnniversaryBox();
-                ShowAnniversaryBox = false;
-            });
-            
             parameterFactory.OnRegister().Safe().SubscribeAction(_ =>
             {
                 ReloadMruList();
@@ -177,8 +161,6 @@ namespace WoWDatabaseEditorCore.ViewModels
                 mainThread.Dispatch(ReloadMruList);
             }, true));
 
-            ShowAnniversaryBox = anniversarySummaryService.ShowAnniversaryBox;
-            
             ShowGiveStarBox = statisticsService.RunCounter > 20 &&
                               !applicationReleaseConfiguration.GetBool("SKIP_STAR_BOX").GetValueOrDefault() &&
                               !userSettings.Get<QuickStartSettings>().DismissedLeaveStarBox;
@@ -207,8 +189,6 @@ namespace WoWDatabaseEditorCore.ViewModels
         public AsyncAutoCommand<NewItemPrototypeInfo> LoadItemCommand { get; }
         public AsyncAutoCommand<IWizardProvider> LoadWizard { get; }
         public AsyncAutoCommand<MostRecentlyUsedViewModel> OpenMostRecentlyUsedCommand { get; }
-        public ICommand OpenYearlySummary { get; }
-        public ICommand CloseAnniversaryBox { get; }
         
         public ImageUri? Icon => new ImageUri("Icons/wde_icon.png");
         public string Title => "Quick start";
