@@ -47,6 +47,5 @@ public class CMangosWrathVersion : ICoreVersion, IDatabaseFeatures, ISmartScript
     public string ConditionSourcesFile => "SmartData/condition_sources.json";
     public CharacterRaces AllRaces => CharacterRaces.AllWrath;
     public CharacterClasses AllClasses => CharacterClasses.AllWrath;
-    public bool SupportsEventScripts => false;
     bool IEventAiFeatures.IsSupported => true;
 }

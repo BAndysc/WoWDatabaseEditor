@@ -24,12 +24,15 @@ public class Providers : ISolutionNameProvider<EventScriptSolutionItem>,
 {
     private readonly IContainerProvider ioc;
     private readonly ISpellStore spellStore;
+    private readonly ICachedDatabaseProvider databaseProvider;
 
     public Providers(IContainerProvider ioc,
-        ISpellStore spellStore)
+        ISpellStore spellStore,
+        ICachedDatabaseProvider databaseProvider)
     {
         this.ioc = ioc;
         this.spellStore = spellStore;
+        this.databaseProvider = databaseProvider;
     }
     
     public string GetName(EventScriptSolutionItem item)
@@ -47,6 +50,20 @@ public class Providers : ISolutionNameProvider<EventScriptSolutionItem>,
             }
             case EventScriptType.Waypoint:
                 return $"Waypoints action {item.Id} script";
+            case EventScriptType.QuestStart:
+                var questStart = databaseProvider.GetCachedQuestTemplate(item.Id);
+                var questStartName = questStart == null ? $"Quest {item.Id}" : questStart.Name + " (" + item.Id + ")";
+                return questStartName + " start script";
+            case EventScriptType.QuestEnd:
+                var questEnd = databaseProvider.GetCachedQuestTemplate(item.Id);
+                var questEndName = questEnd == null ? $"Quest {item.Id}" : questEnd.Name + " (" + item.Id + ")";
+                return questEndName + " end script";
+            case EventScriptType.Gossip:
+                return "Gossip " + item.Id + " script";
+            case EventScriptType.GameObjectUse:
+                var gameobject = databaseProvider.GetCachedGameObjectTemplate(item.Id);
+                var name = gameobject == null ? $"Gameobject {item.Id}" : gameobject.Name + " (" + item.Id + ")";
+                return "On " + name + " use script";
             default:
                 throw new ArgumentOutOfRangeException();
         }
@@ -96,6 +113,50 @@ public class SpellScriptProvider : EventScriptBaseProvider
     protected override EventScriptType Type => EventScriptType.Spell;
 }
 
+[AutoRegister]
+[SingleInstance]
+public class QuestStartScriptProvider : EventScriptBaseProvider
+{
+    public QuestStartScriptProvider(IParameterFactory parameterFactory, IParameterPickerService pickerService) : base(parameterFactory, pickerService)
+    {
+    }
+
+    protected override EventScriptType Type => EventScriptType.QuestStart;
+}
+
+[AutoRegister]
+[SingleInstance]
+public class QuestEndScriptProvider : EventScriptBaseProvider
+{
+    public QuestEndScriptProvider(IParameterFactory parameterFactory, IParameterPickerService pickerService) : base(parameterFactory, pickerService)
+    {
+    }
+
+    protected override EventScriptType Type => EventScriptType.QuestEnd;
+}
+
+[AutoRegister]
+[SingleInstance]
+public class GossipScriptProvider : EventScriptBaseProvider
+{
+    public GossipScriptProvider(IParameterFactory parameterFactory, IParameterPickerService pickerService) : base(parameterFactory, pickerService)
+    {
+    }
+
+    protected override EventScriptType Type => EventScriptType.Gossip;
+}
+
+[AutoRegister]
+[SingleInstance]
+public class GameObjectUseScriptProvider : EventScriptBaseProvider
+{
+    public GameObjectUseScriptProvider(IParameterFactory parameterFactory, IParameterPickerService pickerService) : base(parameterFactory, pickerService)
+    {
+    }
+    
+    protected override EventScriptType Type => EventScriptType.GameObjectUse;
+}
+
 public abstract class EventScriptBaseProvider : ISolutionItemProvider
 {
     protected abstract EventScriptType Type { get; }
@@ -121,7 +182,7 @@ public abstract class EventScriptBaseProvider : ISolutionItemProvider
 
     public bool IsCompatibleWithCore(ICoreVersion core)
     {
-        return core.SupportsEventScripts;
+        return core.SupportedEventScripts.HasFlagFast(Type);
     }
 
     public async Task<ISolutionItem?> CreateSolutionItem()

@@ -20,7 +20,7 @@ namespace WDE.Common.CoreVersion
         bool SupportsRbac => true;
         bool SupportsSpecialCommands => false;
         bool SupportsReverseCommands => false;
-        bool SupportsEventScripts => false;
+        EventScriptType SupportedEventScripts => 0;
         PhasingType PhasingType { get; }
         GameVersion Version { get; }
         // todo: this can be moved to settings as a configurable option

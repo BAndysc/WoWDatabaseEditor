@@ -32,6 +32,30 @@ public class MySqlEventScriptNoCommentLine : MySqlEventScriptBaseLine
     public override string Comment => "";
 }
 
+[Table(Name = "quest_start_scripts")]
+public class MySqlQuestStartScriptNoCommentLine : MySqlEventScriptBaseLine
+{
+    public override EventScriptType Type => EventScriptType.QuestStart;
+
+    public override string Comment => "";
+}
+
+[Table(Name = "quest_end_scripts")]
+public class MySqlQuestEndScriptNoCommentLine : MySqlEventScriptBaseLine
+{
+    public override EventScriptType Type => EventScriptType.QuestEnd;
+
+    public override string Comment => "";
+}
+
+[Table(Name = "gameobject_scripts")]
+public class MySqlGameObjectUseScriptNoCommentLine : MySqlEventScriptBaseLine
+{
+    public override EventScriptType Type => EventScriptType.GameObjectUse;
+
+    public override string Comment => "";
+}
+
 [Table(Name = "waypoint_scripts")]
 public class MySqlWaypointScriptLine : MySqlWaypointScriptNoCommentLine
 {

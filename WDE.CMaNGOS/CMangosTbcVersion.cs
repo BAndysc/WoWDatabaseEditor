@@ -47,6 +47,5 @@ public class CMangosTbcVersion : ICoreVersion, IDatabaseFeatures, ISmartScriptFe
     public string ConditionSourcesFile => "SmartData/condition_sources.json";
     public CharacterRaces AllRaces => CharacterRaces.AllTbc;
     public CharacterClasses AllClasses => CharacterClasses.AllTbc;
-    public bool SupportsEventScripts => false;
     bool IEventAiFeatures.IsSupported => true;
 }

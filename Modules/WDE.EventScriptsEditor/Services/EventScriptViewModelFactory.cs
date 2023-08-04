@@ -44,6 +44,30 @@ public class EventScriptViewModelFactory : IEventScriptViewModelFactory
                 sourceOrTargetPlayer = target;
                 sourceOrTargetCreature = source;
                 break;
+            case EventScriptType.Gossip:
+                source = "Creature";
+                target = "(null)";
+                sourceOrTargetPlayer = target;
+                sourceOrTargetCreature = source;
+                break;
+            case EventScriptType.QuestStart:
+                source = "Quest giver";
+                target = "Player";
+                sourceOrTargetPlayer = target;
+                sourceOrTargetCreature = source;
+                break;
+            case EventScriptType.QuestEnd:
+                source = "Quest ender";
+                target = "Player";
+                sourceOrTargetPlayer = target;
+                sourceOrTargetCreature = source;
+                break;
+            case EventScriptType.GameObjectUse:
+                source = "Player";
+                target = "Gameobject";
+                sourceOrTargetPlayer = target;
+                sourceOrTargetCreature = source;
+                break;
             default:
                 source = target = sourceOrTargetPlayer = sourceOrTargetCreature = "(non supported script type)";
                 break;

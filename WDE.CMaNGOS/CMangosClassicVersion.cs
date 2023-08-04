@@ -47,6 +47,5 @@ public class CMangosClassicVersion : ICoreVersion, IDatabaseFeatures, ISmartScri
     public string ConditionSourcesFile => "SmartData/condition_sources.json";
     public CharacterRaces AllRaces => CharacterRaces.AllVanilla;
     public CharacterClasses AllClasses => CharacterClasses.AllVanilla;
-    public bool SupportsEventScripts => false;
     bool IEventAiFeatures.IsSupported => true;
 }

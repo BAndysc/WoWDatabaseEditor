@@ -295,6 +295,11 @@ public class TrinityCataMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvider
                 return await model.SpellScripts.Where(s => s.Id == id).ToListAsync<IEventScriptLine>();
             case EventScriptType.Waypoint:
                 return await model.WaypointScripts.Where(s => s.Id == id).ToListAsync<IEventScriptLine>();
+            case EventScriptType.Gossip:
+            case EventScriptType.QuestStart:
+            case EventScriptType.QuestEnd:
+            case EventScriptType.GameObjectUse:
+                return new List<IEventScriptLine>();
             default:
                 throw new ArgumentOutOfRangeException(nameof(type), type, null);
         }

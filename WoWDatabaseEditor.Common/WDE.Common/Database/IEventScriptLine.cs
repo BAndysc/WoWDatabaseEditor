@@ -1,10 +1,17 @@
+using System;
+
 namespace WDE.Common.Database;
 
+[Flags]
 public enum EventScriptType
 {
-    Event,
-    Spell,
-    Waypoint
+    Event = 1,
+    Spell = 2,
+    Waypoint = 4,
+    Gossip = 8,
+    GameObjectUse = 16,
+    QuestStart = 32,
+    QuestEnd = 64
 }
 
 public interface IEventScriptLine
