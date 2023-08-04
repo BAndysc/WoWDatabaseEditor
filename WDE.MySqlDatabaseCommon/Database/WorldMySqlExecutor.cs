@@ -9,6 +9,8 @@ namespace WDE.MySqlDatabaseCommon.Database;
 
 public class WorldMySqlExecutor : BaseMySqlExecutor
 {
+    private readonly IDatabaseProvider databaseProvider;
+
     public WorldMySqlExecutor(IMySqlWorldConnectionStringProvider worldConnectionString,
         IDatabaseProvider databaseProvider,
         IQueryEvaluator queryEvaluator,
@@ -22,5 +24,8 @@ public class WorldMySqlExecutor : BaseMySqlExecutor
         mainThread,
         databaseLogger)
     {
+        this.databaseProvider = databaseProvider;
     }
+
+    public override bool IsConnected => databaseProvider.IsConnected;
 }

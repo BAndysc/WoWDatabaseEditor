@@ -24,11 +24,11 @@ public class TrinityMasterMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvid
 
     public override async Task<ICreatureTemplate?> GetCreatureTemplate(uint entry)
     {
-        using var model = Database();
-        var template = model.CreatureTemplate.FirstOrDefault(ct => ct.Entry == entry);
+        await using var model = Database();
+        var template = await model.CreatureTemplate.FirstOrDefaultAsync(ct => ct.Entry == entry);
         if (template == null)
             return null;
-        var models = model.CreatureTemplateModel.Where(x => x.CreatureId == entry).ToList();
+        var models = await model.CreatureTemplateModel.Where(x => x.CreatureId == entry).ToListAsync();
         return template.WithModels(models);
     }
 
@@ -238,9 +238,9 @@ public class TrinityMasterMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvid
 
     public override async Task<IQuestTemplate?> GetQuestTemplate(uint entry)
     {
-        using var model = Database();
-        var addon = model.QuestTemplateAddon.FirstOrDefault(addon => addon.Entry == entry);
-        return model.MasterQuestTemplate.FirstOrDefault(q => q.Entry == entry)?.SetAddon(addon);
+        await using var model = Database();
+        var addon = await model.QuestTemplateAddon.FirstOrDefaultAsync(addon => addon.Entry == entry);
+        return (await model.MasterQuestTemplate.FirstOrDefaultAsync(q => q.Entry == entry))?.SetAddon(addon);
     }
     
     public override async Task<IList<ICreatureModelInfo>> GetCreatureModelInfoAsync()

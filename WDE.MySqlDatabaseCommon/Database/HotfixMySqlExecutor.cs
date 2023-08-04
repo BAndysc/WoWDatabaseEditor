@@ -9,6 +9,8 @@ namespace WDE.MySqlDatabaseCommon.Database;
 
 public class HotfixMySqlExecutor : BaseMySqlExecutor
 {
+    private readonly IMySqlHotfixConnectionStringProvider hotfixConnectionString;
+
     public HotfixMySqlExecutor(IMySqlHotfixConnectionStringProvider hotfixConnectionString,
         IDatabaseProvider databaseProvider,
         IQueryEvaluator queryEvaluator,
@@ -22,5 +24,8 @@ public class HotfixMySqlExecutor : BaseMySqlExecutor
         mainThread,
         databaseLogger)
     {
+        this.hotfixConnectionString = hotfixConnectionString;
     }
+
+    public override bool IsConnected => !hotfixConnectionString.IsEmpty;
 }

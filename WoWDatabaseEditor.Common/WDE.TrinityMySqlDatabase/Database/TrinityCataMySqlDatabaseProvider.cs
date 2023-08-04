@@ -26,8 +26,8 @@ public class TrinityCataMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvider
     
     public override async Task<ICreatureTemplate?> GetCreatureTemplate(uint entry)
     {
-        using var model = Database();
-        return model.CreatureTemplate.FirstOrDefault(ct => ct.Entry == entry);
+        await using var model = Database();
+        return await model.CreatureTemplate.FirstOrDefaultAsync(ct => ct.Entry == entry);
     }
 
     public override IReadOnlyList<ICreatureTemplate> GetCreatureTemplates()
@@ -210,9 +210,9 @@ public class TrinityCataMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvider
 
     public override async Task<IQuestTemplate?> GetQuestTemplate(uint entry)
     {
-        using var model = Database();
-        MySqlCataQuestTemplateAddon? addon = model.CataQuestTemplateAddon.FirstOrDefault(addon => addon.Entry == entry);
-        return model.CataQuestTemplate.FirstOrDefault(q => q.Entry == entry)?.SetAddon(addon);
+        await using var model = Database();
+        MySqlCataQuestTemplateAddon? addon = await model.CataQuestTemplateAddon.FirstOrDefaultAsync(addon => addon.Entry == entry);
+        return (await model.CataQuestTemplate.FirstOrDefaultAsync(q => q.Entry == entry))?.SetAddon(addon);
     }
 
     public override async Task<IList<ICreatureModelInfo>> GetCreatureModelInfoAsync()

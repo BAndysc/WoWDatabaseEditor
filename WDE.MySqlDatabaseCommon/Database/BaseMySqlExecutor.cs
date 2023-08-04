@@ -24,7 +24,7 @@ namespace WDE.MySqlDatabaseCommon.Database
         private readonly IMainThread mainThread;
         private readonly DatabaseLogger databaseLogger;
         
-        public bool IsConnected => databaseProvider.IsConnected;
+        public abstract bool IsConnected { get; }
 
         public BaseMySqlExecutor(string connectionString, 
             string databaseName,

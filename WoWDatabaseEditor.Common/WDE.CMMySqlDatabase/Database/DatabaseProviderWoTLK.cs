@@ -25,8 +25,8 @@ public class DatabaseProviderWoTLK : BaseDatabaseProvider<WoTLKDatabase>
 
     public override async Task<ICreatureTemplate?> GetCreatureTemplate(uint entry)
     {
-        using var model = Database();
-        return model.CreatureTemplate.FirstOrDefault(ct => ct.Entry == entry);
+        await using var model = Database();
+        return await model.CreatureTemplate.FirstOrDefaultAsync(ct => ct.Entry == entry);
     }
 
     public override IReadOnlyList<ICreatureTemplate> GetCreatureTemplates()
@@ -224,8 +224,8 @@ public class DatabaseProviderWoTLK : BaseDatabaseProvider<WoTLKDatabase>
         
     public override async Task<IGameObjectTemplate?> GetGameObjectTemplate(uint entry)
     {
-        using var model = Database();
-        return model.GameObjectTemplate.FirstOrDefault(g => g.Entry == entry);
+        await using var model = Database();
+        return await model.GameObjectTemplate.FirstOrDefaultAsync(g => g.Entry == entry);
     }
     
     public override async Task<List<ICreatureClassLevelStat>> GetCreatureClassLevelStatsAsync()

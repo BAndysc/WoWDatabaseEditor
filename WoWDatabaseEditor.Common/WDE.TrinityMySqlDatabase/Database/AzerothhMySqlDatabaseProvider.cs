@@ -25,8 +25,8 @@ public class AzerothhMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvider<Az
     
     public override async Task<ICreatureTemplate?> GetCreatureTemplate(uint entry)
     {
-        using var model = Database();
-        return model.CreatureTemplate.FirstOrDefault(ct => ct.Entry == entry);
+        await using var model = Database();
+        return await model.CreatureTemplate.FirstOrDefaultAsync(ct => ct.Entry == entry);
     }
 
     public override IReadOnlyList<ICreatureTemplate> GetCreatureTemplates()

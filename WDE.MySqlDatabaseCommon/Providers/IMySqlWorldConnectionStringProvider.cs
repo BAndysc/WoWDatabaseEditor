@@ -4,5 +4,6 @@ namespace WDE.MySqlDatabaseCommon.Providers
     {
         public string ConnectionString { get; }
         public string DatabaseName { get; }
+        public bool IsEmpty { get; }
     }
 }

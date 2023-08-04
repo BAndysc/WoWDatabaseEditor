@@ -39,11 +39,13 @@ namespace WDE.TrinityMySqlDatabase.Database
 
         public IEnumerable<IConnectionStringSettings> ConnectionStrings { get; }
 
+        public bool IsEmpty => string.IsNullOrEmpty(worldAccess.Host) || string.IsNullOrEmpty(worldAccess.Database) || string.IsNullOrEmpty(worldAccess.User);
+        
         public string ConnectionString =>
-            $"Server={worldAccess.Host};Port={worldAccess.Port ?? 3306};Database={worldAccess.Database};Uid={worldAccess.User};Pwd={worldAccess.Password};AllowUserVariables=True";
+            $"Server={worldAccess.Host};Port={worldAccess.Port ?? 3306};Database={worldAccess.Database};Uid={worldAccess.User};Pwd={worldAccess.Password};AllowUserVariables=True;TreatTinyAsBoolean=False";
 
         public string AuthConnectionString =>
-            $"Server={authAccess.Host};Port={authAccess.Port ?? 3306};Database={authAccess.Database};Uid={authAccess.User};Pwd={authAccess.Password};AllowUserVariables=True";
+            $"Server={authAccess.Host};Port={authAccess.Port ?? 3306};Database={authAccess.Database};Uid={authAccess.User};Pwd={authAccess.Password};AllowUserVariables=True;TreatTinyAsBoolean=False";
 
         public string DatabaseName { get; }
     }

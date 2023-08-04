@@ -25,8 +25,8 @@ public class TrinityWrathMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvide
 
     public override async Task<ICreatureTemplate?> GetCreatureTemplate(uint entry)
     {
-        using var model = Database();
-        return model.CreatureTemplate.FirstOrDefault(ct => ct.Entry == entry);
+        await using var model = Database();
+        return await model.CreatureTemplate.FirstOrDefaultAsync(ct => ct.Entry == entry);
     }
 
     public override IReadOnlyList<ICreatureTemplate> GetCreatureTemplates()
@@ -264,8 +264,8 @@ public class TrinityWrathMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvide
 
     public override async Task<IQuestTemplate?> GetQuestTemplate(uint entry)
     {
-        using var model = Database();
-        var addon = model.QuestTemplateAddon.FirstOrDefault(addon => addon.Entry == entry);
-        return model.QuestTemplate.FirstOrDefault(q => q.Entry == entry)?.SetAddon(addon);
+        await using var model = Database();
+        var addon = await model.QuestTemplateAddon.FirstOrDefaultAsync(addon => addon.Entry == entry);
+        return (await model.QuestTemplate.FirstOrDefaultAsync(q => q.Entry == entry))?.SetAddon(addon);
     }
 }

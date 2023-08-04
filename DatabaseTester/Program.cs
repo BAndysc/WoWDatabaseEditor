@@ -133,7 +133,7 @@ public class Program
         currentCoreVersion.Current.ReturnsForAnyArgs(core);
 
         var databaseConn = Substitute.For<IMySqlWorldConnectionStringProvider>();
-        var connString = $"Server={dbSettings.Settings.Host};Port={dbSettings.Settings.Port ?? 3306};Database={dbSettings.Settings.Database};Uid={dbSettings.Settings.User};Pwd={dbSettings.Settings.Password};AllowUserVariables=True";
+        var connString = $"Server={dbSettings.Settings.Host};Port={dbSettings.Settings.Port ?? 3306};Database={dbSettings.Settings.Database};Uid={dbSettings.Settings.User};Pwd={dbSettings.Settings.Password};AllowUserVariables=True;TreatTinyAsBoolean=False";
         databaseConn.ConnectionString.ReturnsForAnyArgs(connString);
         
         
@@ -214,7 +214,6 @@ public class Program
             "FindEventScriptLinesBy",
             "FindSmartScriptLinesBy",
             "GetConditionsForAsync",
-            "InstallConditions"
         };
 
         foreach (var method in allMethods)
@@ -242,6 +241,8 @@ public class Program
         // methods with > 1 parameters
         worldDb.GetScriptFor(0, 0, SmartScriptType.Creature);
         worldDb.GetConditionsFor(0, 0, 0);
+        await worldDb.GetConditionsForAsync(IDatabaseProvider.ConditionKeyMask.All, new IDatabaseProvider.ConditionKey(0, 0, 0, 0));
+        await worldDb.GetConditionsForAsync(IDatabaseProvider.ConditionKeyMask.All, new List<IDatabaseProvider.ConditionKey>(){new IDatabaseProvider.ConditionKey(0, 0, 0, 0)});
         await worldDb.FindSmartScriptLinesBy(new (IDatabaseProvider.SmartLinePropertyType what, int whatValue, int parameterIndex, long valueToSearch)[] { (IDatabaseProvider.SmartLinePropertyType.Action, 0, 0, 0) });
         
         return 0;
