@@ -7,7 +7,7 @@ using WDE.SqlQueryGenerator;
 namespace WDE.QueryGenerators.Generators.Gameobject;
 
 [AutoRegister]
-[RequiresCore("TrinityMaster", "TrinityCata", "TrinityWrath", "AzerothCore", "CMaNGOS-WoTLK", "CMaNGOS-TBC", "CMaNGOS-Classic")]
+[RequiresCore("TrinityMaster", "TrinityCata", "TrinityWrath", "Azeroth", "CMaNGOS-WoTLK", "CMaNGOS-TBC", "CMaNGOS-Classic")]
 public class TrinityGameObjectDiffQueryProvider : IUpdateQueryProvider<GameObjectDiff>
 {
     private readonly IDatabaseProvider databaseProvider;

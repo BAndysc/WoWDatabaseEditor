@@ -57,6 +57,20 @@ namespace WDE.Common.Database
         uint MenuId { get; }
         IEnumerable<INpcText> Text { get; }
     }
+
+    public interface IGossipMenuLine
+    {
+        uint MenuId { get; }
+        uint TextId { get; }
+
+        /// <summary>
+        /// a special field used only in IQueryGenerator&lt;IGossipMenuOption&gt;.
+        /// this is the comment outputted in the sql query.
+        /// We might need a better way  for handling this type of comments
+        /// </summary>
+        // ReSharper disable once InconsistentNaming
+        string? __comment { get; }
+    }
     
     public interface IGossipMenuOption
     {
@@ -75,5 +89,51 @@ namespace WDE.Common.Database
         int BoxBroadcastTextId { get; }
         int VerifiedBuild { get; }
         bool HasOptionType { get; }
+
+        /// <summary>
+        /// a special field used only in IQueryGenerator&lt;IGossipMenuOption&gt;.
+        /// this is the comment outputted in the sql query.
+        /// We might need a better way  for handling this type of comments
+        /// </summary>
+        // ReSharper disable once InconsistentNaming
+        string? __comment => null;
+        
+
+        /// <summary>
+        /// a special field used only in IQueryGenerator&lt;IGossipMenuOption&gt;.
+        /// If true, the record will not be inserted to the database.
+        /// We might need a better way  for handling this type of comments
+        /// </summary>
+        // ReSharper disable once InconsistentNaming
+        bool __ignored => false;
+    }
+
+    public class AbstractGossipMenuOption : IGossipMenuOption
+    {
+        public uint MenuId { get; set; }
+        public uint OptionIndex { get; set; }
+        public GossipOptionIcon Icon { get; set; }
+        public string? Text { get; set; }
+        public int BroadcastTextId { get; set; }
+        public GossipOption OptionType { get; set; }
+        public uint NpcFlag { get; set; }
+        public int ActionMenuId { get; set; }
+        public uint ActionPoiId { get; set; }
+        public uint BoxCoded { get; set; }
+        public uint BoxMoney { get; set; }
+        public string? BoxText { get; set; }
+        public int BoxBroadcastTextId { get; set; }
+        public int VerifiedBuild { get; set; }
+        public bool HasOptionType { get; set; }
+
+        public string? __comment { get; set; }
+        public bool __ignored { get; set; }
+    }
+
+    public class AbstractGossipMenuLine : IGossipMenuLine
+    {
+        public uint MenuId { get; set; }
+        public uint TextId { get; set; }
+        public string? __comment { get; set; }
     }
 }

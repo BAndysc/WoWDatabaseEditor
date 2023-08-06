@@ -7,16 +7,15 @@ namespace WDE.QueryGenerators.Generators.SpawnGroups;
 
 [AutoRegister]
 [RequiresCore("CMaNGOS-WoTLK", "CMaNGOS-TBC", "CMaNGOS-Classic")]
-internal class MangosSpawnGroupSpawnQueryProvider : IInsertQueryProvider<ISpawnGroupSpawn>, IDeleteQueryProvider<ISpawnGroupSpawn> 
+internal class MangosSpawnGroupSpawnQueryProvider : BaseInsertQueryProvider<ISpawnGroupSpawn>, IDeleteQueryProvider<ISpawnGroupSpawn> 
 {
-    public IQuery Insert(ISpawnGroupSpawn spawn)
+    protected override object Convert(ISpawnGroupSpawn spawn)
     {
-        return Queries.Table(TableName)
-            .Insert(new
+        return new
             {
                 Id = spawn.TemplateId,
                 Guid = spawn.Guid
-            });
+            };
     }
 
     public IQuery Delete(ISpawnGroupSpawn t)
@@ -27,5 +26,5 @@ internal class MangosSpawnGroupSpawnQueryProvider : IInsertQueryProvider<ISpawnG
             .Delete();
     }
 
-    public string TableName => "spawn_group_spawn";
+    public override string TableName => "spawn_group_spawn";
 }

@@ -34,6 +34,7 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
+        <ProjectReference Include="..\Modules\WDE.QueryGenerators\WDE.QueryGenerators.csproj" />
         <ProjectReference Include="..\Rendering\TheMaths\TheMaths.csproj" />
         <ProjectReference Include="..\WDE.MVVM\WDE.MVVM.csproj" />
         <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />

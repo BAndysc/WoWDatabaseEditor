@@ -7,11 +7,11 @@ namespace WDE.QueryGenerators.Generators.Creature;
 
 [AutoRegister]
 [RequiresCore("TrinityMaster")]
-internal class MasterCreatureQueryProvider : IInsertQueryProvider<CreatureSpawnModelEssentials>
+internal class MasterCreatureQueryProvider : BaseInsertQueryProvider<CreatureSpawnModelEssentials>
 {
-    public IQuery Insert(CreatureSpawnModelEssentials t)
+    protected override object Convert(CreatureSpawnModelEssentials t)
     {
-        return Queries.Table("creature").Insert(new
+        return new
         {
             guid = t.Guid,
             id = t.Entry,
@@ -21,8 +21,8 @@ internal class MasterCreatureQueryProvider : IInsertQueryProvider<CreatureSpawnM
             position_y = t.Y,
             position_z = t.Z,
             orientation = t.O,
-        });
+        };
     }
 
-    public string TableName => "creature";
+    public override string TableName => "creature";
 }

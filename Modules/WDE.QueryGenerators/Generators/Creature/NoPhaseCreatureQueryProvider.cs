@@ -7,11 +7,11 @@ namespace WDE.QueryGenerators.Generators.Creature;
 
 [AutoRegister]
 [RequiresCore("CMaNGOS-TBC", "CMaNGOS-Classic")]
-internal class NoPhaseCreatureQueryProvider : IInsertQueryProvider<CreatureSpawnModelEssentials>
+internal class NoPhaseCreatureQueryProvider : BaseInsertQueryProvider<CreatureSpawnModelEssentials>
 {
-    public IQuery Insert(CreatureSpawnModelEssentials t)
+    protected override object Convert(CreatureSpawnModelEssentials t)
     {
-        return Queries.Table("creature").Insert(new
+        return new
         {
             guid = t.Guid,
             id = t.Entry,
@@ -21,8 +21,8 @@ internal class NoPhaseCreatureQueryProvider : IInsertQueryProvider<CreatureSpawn
             position_y = t.Y,
             position_z = t.Z,
             orientation = t.O,
-        });
+        };
     }
 
-    public string TableName => "creature";
+    public override string TableName => "creature";
 }

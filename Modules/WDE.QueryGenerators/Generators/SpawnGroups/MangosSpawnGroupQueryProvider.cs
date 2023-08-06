@@ -23,6 +23,20 @@ internal class MangosSpawnGroupQueryProvider : IInsertQueryProvider<ISpawnGroupT
             });
     }
 
+    public IQuery BulkInsert(IReadOnlyCollection<ISpawnGroupTemplate> collection)
+    {
+        if (collection.Any(template => template.Type == SpawnGroupTemplateType.Any))
+            throw new ArgumentException("Template Type may not be `Any`!");
+
+        return Queries.Table(TableName)
+            .BulkInsert(collection.Select(template => new
+            {
+                Id = template.Id,
+                Name = template.Name,
+                Type = (int)template.Type
+            }));
+    }
+
     public IQuery Delete(ISpawnGroupTemplate t)
     {
         return Queries.Table(TableName)

@@ -6,7 +6,7 @@ using WDE.SqlQueryGenerator;
 namespace WDE.QueryGenerators.Generators.SpawnGroups;
 
 [AutoRegister]
-[RequiresCore("TrinityMaster", "TrinityCata", "TrinityWrath", "AzerothCore")]
+[RequiresCore("TrinityMaster", "TrinityCata", "TrinityWrath")]
 internal class TrinitySpawnGroupSpawnQueryProvider : IInsertQueryProvider<ISpawnGroupSpawn>, IDeleteQueryProvider<ISpawnGroupSpawn> 
 {
     public IQuery Insert(ISpawnGroupSpawn spawn)
@@ -21,6 +21,20 @@ internal class TrinitySpawnGroupSpawnQueryProvider : IInsertQueryProvider<ISpawn
                 spawnType = (int)spawn.Type,
                 spawnId = spawn.Guid
             });
+    }
+
+    public IQuery BulkInsert(IReadOnlyCollection<ISpawnGroupSpawn> collection)
+    {
+        if (collection.Any(spawn => spawn.Type == SpawnGroupTemplateType.Any))
+            throw new ArgumentException("Spawn Type may not be `Any`!");
+        
+        return Queries.Table(TableName)
+            .BulkInsert(collection.Select(spawn => new
+            {
+                groupId = spawn.TemplateId,
+                spawnType = (int)spawn.Type,
+                spawnId = spawn.Guid
+            }));
     }
 
     public IQuery Delete(ISpawnGroupSpawn spawn)

@@ -6,28 +6,29 @@ using WDE.SqlQueryGenerator;
 namespace WDE.QueryGenerators.Generators.Creature;
 
 [AutoRegister]
-public class CreatureTextGenerator : IInsertQueryProvider<ICreatureText>, IDeleteQueryProvider<ICreatureText>
+[RequiresCore("TrinityMaster", "TrinityCata", "TrinityWrath", "Azeroth")]
+public class CreatureTextGenerator : BaseInsertQueryProvider<ICreatureText>, IDeleteQueryProvider<ICreatureText>
 {
-    public string TableName => "creature_text";
+    public override string TableName => "creature_text";
     
-    public IQuery Insert(ICreatureText t)
+    protected override object Convert(ICreatureText t)
     {
-        return Queries.Table(TableName)
-            .Insert(new
-            {
-                CreatureID = t.CreatureId,
-                GroupID = t.GroupId,
-                ID = t.Id,
-                BroadcastTextId = t.BroadcastTextId,
-                Text = t.Text,
-                Type = (int)t.Type,
-                Language = t.Language,
-                Probability = t.Probability,
-                Emote = t.Emote,
-                Duration = t.Duration,
-                Sound = t.Sound,
-                comment = t.Comment
-            });
+        return new
+        {
+            CreatureID = t.CreatureId,
+            GroupID = t.GroupId,
+            ID = t.Id,
+            BroadcastTextId = t.BroadcastTextId,
+            Text = t.Text,
+            Type = (int)t.Type,
+            Language = t.Language,
+            Probability = t.Probability,
+            Emote = t.Emote,
+            Duration = t.Duration,
+            Sound = t.Sound,
+            comment = t.Comment,
+            __comment = t.__comment
+        };
     }
 
     public IQuery Delete(ICreatureText t)
@@ -36,4 +37,11 @@ public class CreatureTextGenerator : IInsertQueryProvider<ICreatureText>, IDelet
             .Where(row => row.Column<uint>("CreatureID") == t.CreatureId)
             .Delete();
     }
+}
+
+[AutoRegister]
+[RequiresCore("CMaNGOS-TBC", "CMaNGOS-Classic", "CMaNGOS-WoTLK")]
+public class CmangosCreatureTextGenerator : NotSupportedQueryProvider<ICreatureText>
+{
+    public override string TableName => "creature_text";
 }

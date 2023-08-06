@@ -30,7 +30,10 @@ namespace WDE.AzerothCore
             typeof(IAuthRbacLinkedPermission),
             typeof(IPointOfInterest),
             typeof(ISceneTemplate), 
-            typeof(IAreaTriggerCreateProperties)
+            typeof(IAreaTriggerCreateProperties),
+            typeof(ISpawnGroupSpawn),
+            typeof(ISpawnGroupFormation),
+            typeof(ISpawnGroupTemplate)
         };
         
         public ISet<SmartScriptType> SupportedTypes { get; } = new HashSet<SmartScriptType>

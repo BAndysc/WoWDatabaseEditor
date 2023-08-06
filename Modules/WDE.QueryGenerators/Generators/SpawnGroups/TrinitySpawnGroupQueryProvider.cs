@@ -6,17 +6,16 @@ using WDE.SqlQueryGenerator;
 namespace WDE.QueryGenerators.Generators.SpawnGroups;
 
 [AutoRegister]
-[RequiresCore("TrinityMaster", "TrinityCata", "TrinityWrath", "AzerothCore")]
-internal class TrinitySpawnGroupQueryProvider : IInsertQueryProvider<ISpawnGroupTemplate>, IDeleteQueryProvider<ISpawnGroupTemplate>
+[RequiresCore("TrinityMaster", "TrinityCata", "TrinityWrath")]
+internal class TrinitySpawnGroupQueryProvider : BaseInsertQueryProvider<ISpawnGroupTemplate>, IDeleteQueryProvider<ISpawnGroupTemplate>
 {
-    public IQuery Insert(ISpawnGroupTemplate template)
+    protected override object Convert(ISpawnGroupTemplate template)
     {
-        return Queries.Table("spawn_group_template")
-            .Insert(new
+        return new
             {
                 groupId = template.Id,
                 groupName = template.Name
-            });
+            };
     }
     
     public IQuery Delete(ISpawnGroupTemplate t)
@@ -26,5 +25,5 @@ internal class TrinitySpawnGroupQueryProvider : IInsertQueryProvider<ISpawnGroup
             .Delete();
     }
 
-    public string TableName => "spawn_group_template";
+    public override string TableName => "spawn_group_template";
 }

@@ -20,4 +20,7 @@ public class TrinityMasterDatabase : BaseTrinityDatabase
     public ITable<MySqlPlayerChoiceResponse> PlayerChoiceResponse => GetTable<MySqlPlayerChoiceResponse>();
     public ITable<MySqlQuestObjective> QuestObjective => GetTable<MySqlQuestObjective>();
     public ITable<MySqlPhaseName> PhaseNames => GetTable<MySqlPhaseName>();
+    public ITable<MySqlEventScriptLine> EventScripts => GetTable<MySqlEventScriptLine>();
+    public ITable<MySqlWaypointScriptLine> WaypointScripts => GetTable<MySqlWaypointScriptLine>();
+    public ITable<MySqlSpellScriptLine> SpellScripts => GetTable<MySqlSpellScriptLine>();
 }

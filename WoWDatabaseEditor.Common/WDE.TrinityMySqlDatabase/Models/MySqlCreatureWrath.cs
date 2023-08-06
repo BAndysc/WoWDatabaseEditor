@@ -72,7 +72,6 @@ namespace WDE.TrinityMySqlDatabase.Models
         
         public int? PhaseGroup => null;
 
-        [Column(Name = "modelid")]
         public uint Model { get; set; }
         
         [Column(Name = "equipment_id")]

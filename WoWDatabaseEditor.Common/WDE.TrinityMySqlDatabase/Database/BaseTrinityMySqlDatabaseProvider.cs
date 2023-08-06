@@ -503,39 +503,13 @@ namespace WDE.TrinityMySqlDatabase.Database
             return predicate;
         }
 
-        public virtual async Task<List<IEventScriptLine>> FindEventScriptLinesBy(IReadOnlyList<(uint command, int dataIndex, long valueToSearch)> conditions)
-        {
-            await using var model = Database();
-            var events = await model.EventScripts.Where(GenerateWhereConditionsForEventScript<MySqlEventScriptLine>(conditions)).ToListAsync<IEventScriptLine>();
-            var spells = await model.SpellScripts.Where(GenerateWhereConditionsForEventScript<MySqlSpellScriptLine>(conditions)).ToListAsync<IEventScriptLine>();
-            var waypoints = await model.WaypointScripts.Where(GenerateWhereConditionsForEventScript<MySqlWaypointScriptLine>(conditions)).ToListAsync<IEventScriptLine>();
-            return events.Concat(spells).Concat(waypoints).ToList();
-        }
+        public abstract Task<List<IEventScriptLine>> FindEventScriptLinesBy(IReadOnlyList<(uint command, int dataIndex, long valueToSearch)> conditions);
 
         public abstract Task<IList<ICreatureModelInfo>> GetCreatureModelInfoAsync();
 
         public abstract ICreatureModelInfo? GetCreatureModelInfo(uint displayId);
 
-        public virtual async Task<List<IEventScriptLine>> GetEventScript(EventScriptType type, uint id)
-        {
-            await using var model = Database();
-            switch (type)
-            {
-                case EventScriptType.Event:
-                    return await model.EventScripts.Where(s => s.Id == id).ToListAsync<IEventScriptLine>();
-                case EventScriptType.Spell:
-                    return await model.SpellScripts.Where(s => s.Id == id).ToListAsync<IEventScriptLine>();
-                case EventScriptType.Waypoint:
-                    return await model.WaypointScripts.Where(s => s.Id == id).ToListAsync<IEventScriptLine>();
-                case EventScriptType.Gossip:
-                case EventScriptType.QuestStart:
-                case EventScriptType.QuestEnd:
-                case EventScriptType.GameObjectUse:
-                    return new List<IEventScriptLine>();
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
-            }
-        }
+        public abstract Task<List<IEventScriptLine>> GetEventScript(EventScriptType type, uint id);
 
         public ISceneTemplate? GetSceneTemplate(uint sceneId)
         {
@@ -664,24 +638,32 @@ namespace WDE.TrinityMySqlDatabase.Database
         
         public async Task<IList<ISpawnGroupTemplate>> GetSpawnGroupTemplatesAsync()
         {
+            if (!Supports<ISpawnGroupTemplate>())
+                return new List<ISpawnGroupTemplate>();
             await using var model = Database();
             return await model.SpawnGroupTemplate.ToListAsync<ISpawnGroupTemplate>();
         }
     
         public async Task<IList<ISpawnGroupSpawn>> GetSpawnGroupSpawnsAsync()
         {
+            if (!Supports<ISpawnGroupSpawn>())
+                return new List<ISpawnGroupSpawn>();
             await using var model = Database();
             return await model.SpawnGroupSpawns.ToListAsync<ISpawnGroupSpawn>();
         }
     
         public async Task<ISpawnGroupTemplate?> GetSpawnGroupTemplateByIdAsync(uint id)
         {
+            if (!Supports<ISpawnGroupTemplate>())
+                return null;
             await using var model = Database();
             return await model.SpawnGroupTemplate.FirstOrDefaultAsync<ISpawnGroupTemplate>(x => x.Id == id);
         }
     
         public async Task<ISpawnGroupSpawn?> GetSpawnGroupSpawnByGuidAsync(uint guid, SpawnGroupTemplateType type)
         {
+            if (!Supports<ISpawnGroupSpawn>())
+                return null;
             await using var model = Database();
             return await model.SpawnGroupSpawns.FirstOrDefaultAsync<ISpawnGroupSpawn>(x => x.Guid == guid && x.Type == type);
         }

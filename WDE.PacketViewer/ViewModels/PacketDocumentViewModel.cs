@@ -611,6 +611,11 @@ namespace WDE.PacketViewer.ViewModels
             {
                 textOutput = await RunProcessorsThreaded(processors, token);
             }
+            catch (AggregateException e)
+            {
+                Console.WriteLine(e.InnerExceptions[0]);
+                throw e.InnerExceptions[0];
+            }
             catch (Exception e)
             {
                 Console.WriteLine(e);

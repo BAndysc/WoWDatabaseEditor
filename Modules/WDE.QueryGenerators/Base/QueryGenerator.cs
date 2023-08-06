@@ -22,9 +22,11 @@ internal class QueryGenerator<R> : IQueryGenerator<R>
             Console.WriteLine("Couldn't find a provider for " + typeof(R));
     }
 
-    public IQuery? Insert(R element) => insertProvider?.Insert(element);
-    public IQuery? Delete(R element) => deleteProvider?.Delete(element);
-    public IQuery? Update(R element) => updateProvider?.Update(element);
+    public IQuery? TryInsert(R element) => insertProvider?.Insert(element);
+    public IQuery? TryBulkInsert(IReadOnlyCollection<R> elements) => insertProvider?.BulkInsert(elements);
+
+    public IQuery? TryDelete(R element) => deleteProvider?.Delete(element);
+    public IQuery? TryUpdate(R element) => updateProvider?.Update(element);
 
     public string? TableName => insertProvider?.TableName;
 }

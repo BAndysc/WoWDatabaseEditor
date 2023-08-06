@@ -18,11 +18,14 @@ using WDE.DatabaseEditors.Data.Interfaces;
 using WDE.DatabaseEditors.Factories;
 using WDE.DatabaseEditors.Loaders;
 using WDE.DatabaseEditors.Services;
+using WDE.Module;
 using WDE.MySqlDatabaseCommon.Database;
 using WDE.MySqlDatabaseCommon.Providers;
 using WDE.MySqlDatabaseCommon.Services;
 using WDE.QueryGenerators;
+using WDE.QueryGenerators.Base;
 using WDE.SqlInterpreter;
+using WDE.SqlQueryGenerator;
 using WDE.Trinity;
 using WDE.TrinityMySqlDatabase;
 using WDE.TrinityMySqlDatabase.Data;
@@ -138,6 +141,19 @@ public class Program
         
         
         var ioc = new UnityContainer().AddExtension(new Diagnostic());
+
+        var queryGenerators = typeof(T).Assembly.GetTypes()
+            .Where(type => type.GetInterfaces().Where(i => i.IsGenericType)
+                .Select(i => i.GetGenericTypeDefinition())
+                .Any(i => i == typeof(IInsertQueryProvider<>) ||
+                          i == typeof(IDeleteQueryProvider<>) ||
+                          i == typeof(IUpdateQueryProvider<>)));
+        foreach (var queryGenerator in queryGenerators)
+        {
+            foreach (var @interface in queryGenerator.GetInterfaces())
+                ioc.RegisterSingleton(@interface, queryGenerator);
+        }
+        
         ioc.RegisterInstance<IContainerProvider>(new UnityContainerProvider(ioc));
         ioc.RegisterInstance<IMessageBoxService>(new ConsoleMessageBoxService());
         ioc.RegisterInstance<IWorldDatabaseSettingsProvider>(dbSettings);
@@ -149,6 +165,7 @@ public class Program
         ioc.RegisterInstance<ITaskRunner>(new SyncTaskRunner());
         ioc.RegisterInstance<IStatusBar>(Substitute.For<IStatusBar>());
         ioc.RegisterInstance<IParameterFactory>(Substitute.For<IParameterFactory>());
+        ioc.RegisterInstance<IUserSettings>(Substitute.For<IUserSettings>());
 
         ioc.RegisterInstance<IMySqlWorldConnectionStringProvider>(databaseConn);
         ioc.RegisterInstance<IMainThread>(new SyncMainThread());
@@ -169,7 +186,7 @@ public class Program
         var queryGeneratorModule = new QueryGeneratorModule();
         queryGeneratorModule.InitializeCore(core.Tag);
         queryGeneratorModule.RegisterTypes(new UnityContainerRegistry(ioc));
-
+        
         var worldDb = ioc.Resolve<T>();
         ioc.RegisterInstance<IDatabaseProvider>(worldDb);
         ioc.RegisterInstance<ICachedDatabaseProvider>(worldDb);
@@ -193,11 +210,22 @@ public class Program
             await executor.ExecuteSql($"ALTER TABLE `{tableName}` ENGINE = InnoDB");
         }
 
-        foreach (var query in tester.Generate().Where(x => x != null))
+        foreach (var queryGenerator in tester.Generate())
         {
+            IQuery query;
             try
             {
-                await executor.ExecuteSql(query!);
+                query = queryGenerator();
+            }
+            catch (TableNotSupportedException e)
+            {
+                Console.WriteLine("Skipping table: " + e.TableName + " because it is not supported by the selected core.");
+                continue;
+            }
+            
+            try
+            {
+                await executor.ExecuteSql(query, true);
             }
             catch (Exception e)
             {
@@ -247,12 +275,15 @@ public class Program
         await worldDb.FindSmartScriptLinesBy(new (IDatabaseProvider.SmartLinePropertyType what, int whatValue, int parameterIndex, long valueToSearch)[] { (IDatabaseProvider.SmartLinePropertyType.Action, 0, 0, 0) });
 
         foreach (var type in Enum.GetValues<EventScriptType>())
+        {
+            Console.WriteLine($"GetEventScript({type})");
             await worldDb.GetEventScript(type, 0);
+        }
         
         return 0;
     }
     
-    private static void FixCurrentDirectory()
+    public static void FixCurrentDirectory()
     {
         var path = Assembly.GetExecutingAssembly().Location;
         if (string.IsNullOrEmpty(path))

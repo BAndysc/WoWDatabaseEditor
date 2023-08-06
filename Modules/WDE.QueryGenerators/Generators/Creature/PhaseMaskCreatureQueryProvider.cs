@@ -6,12 +6,12 @@ using WDE.SqlQueryGenerator;
 namespace WDE.QueryGenerators.Generators.Creature;
 
 [AutoRegister]
-[RequiresCore("CMaNGOS-WoTLK", "Azeroth", "TrinityWrath")]
-internal class PhaseMaskCreatureQueryProvider : IInsertQueryProvider<CreatureSpawnModelEssentials>
+[RequiresCore("CMaNGOS-WoTLK", "TrinityWrath")]
+internal class PhaseMaskCreatureQueryProvider : BaseInsertQueryProvider<CreatureSpawnModelEssentials>
 {
-    public IQuery Insert(CreatureSpawnModelEssentials t)
+    protected override object Convert(CreatureSpawnModelEssentials t)
     {
-        return Queries.Table("creature").Insert(new
+        return new
         {
             guid = t.Guid,
             id = t.Entry,
@@ -22,8 +22,32 @@ internal class PhaseMaskCreatureQueryProvider : IInsertQueryProvider<CreatureSpa
             position_y = t.Y,
             position_z = t.Z,
             orientation = t.O,
-        });
+        };
     }
 
-    public string TableName => "creature";
+    public override string TableName => "creature";
+}
+
+
+[AutoRegister]
+[RequiresCore("Azeroth")]
+internal class AzerothCreatureQueryProvider : BaseInsertQueryProvider<CreatureSpawnModelEssentials>
+{
+    protected override object Convert(CreatureSpawnModelEssentials t)
+    {
+        return new
+        {
+            guid = t.Guid,
+            id1 = t.Entry,
+            map = t.Map,
+            spawnMask = t.SpawnMask,
+            phaseMask = t.PhaseMask,
+            position_x = t.X,
+            position_y = t.Y,
+            position_z = t.Z,
+            orientation = t.O,
+        };
+    }
+
+    public override string TableName => "creature";
 }

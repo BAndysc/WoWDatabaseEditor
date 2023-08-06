@@ -7,5 +7,6 @@ namespace WDE.QueryGenerators.Base;
 public interface IUpdateQueryProvider<T>
 {
     IQuery Update(T diff);
+    string TableName { get; }
     int Priority => 0;
 }

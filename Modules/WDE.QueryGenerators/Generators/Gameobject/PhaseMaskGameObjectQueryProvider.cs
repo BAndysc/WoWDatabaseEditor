@@ -7,11 +7,11 @@ namespace WDE.QueryGenerators.Generators.Gameobject;
 
 [AutoRegister]
 [RequiresCore( "Azeroth", "TrinityWrath")]
-internal class PhaseMaskGameObjectQueryProvider : IInsertQueryProvider<GameObjectSpawnModelEssentials>
+internal class PhaseMaskGameObjectQueryProvider : BaseInsertQueryProvider<GameObjectSpawnModelEssentials>
 {
-    public IQuery Insert(GameObjectSpawnModelEssentials t)
+    protected override object Convert(GameObjectSpawnModelEssentials t)
     {
-        return Queries.Table("gameobject").Insert(new
+        return new
         {
             guid = t.Guid,
             id = t.Entry,
@@ -26,19 +26,19 @@ internal class PhaseMaskGameObjectQueryProvider : IInsertQueryProvider<GameObjec
             rotation1 = t.Rotation1,
             rotation2 = t.Rotation2,
             rotation3 = t.Rotation3,
-        });
+        };
     }
 
-    public string TableName => "gameobject";
+    public override string TableName => "gameobject";
 }
 
 [AutoRegister]
 [RequiresCore("CMaNGOS-WoTLK")]
-internal class CmangosWrathGameObjectQueryProvider : IInsertQueryProvider<GameObjectSpawnModelEssentials>
+internal class CmangosWrathGameObjectQueryProvider : BaseInsertQueryProvider<GameObjectSpawnModelEssentials>
 {
-    public IQuery Insert(GameObjectSpawnModelEssentials t)
+    protected override object Convert(GameObjectSpawnModelEssentials t)
     {
-        return Queries.Table("gameobject").Insert(new
+        return new
         {
             guid = t.Guid,
             id = t.Entry,
@@ -52,8 +52,8 @@ internal class CmangosWrathGameObjectQueryProvider : IInsertQueryProvider<GameOb
             rotation1 = t.Rotation1,
             rotation2 = t.Rotation2,
             rotation3 = t.Rotation3,
-        });
+        };
     }
 
-    public string TableName => "gameobject";
+    public override string TableName => "gameobject";
 }

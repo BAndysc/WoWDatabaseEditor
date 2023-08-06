@@ -7,11 +7,11 @@ namespace WDE.QueryGenerators.Generators.Gameobject;
 
 [AutoRegister]
 [RequiresCore("TrinityMaster")]
-internal class MasterGameObjectQueryProvider : IInsertQueryProvider<GameObjectSpawnModelEssentials>
+internal class MasterGameObjectQueryProvider : BaseInsertQueryProvider<GameObjectSpawnModelEssentials>
 {
-    public IQuery Insert(GameObjectSpawnModelEssentials t)
+    protected override object Convert(GameObjectSpawnModelEssentials t)
     {
-        return Queries.Table("gameobject").Insert(new
+        return new
         {
             guid = t.Guid,
             id = t.Entry,
@@ -25,8 +25,8 @@ internal class MasterGameObjectQueryProvider : IInsertQueryProvider<GameObjectSp
             rotation1 = t.Rotation1,
             rotation2 = t.Rotation2,
             rotation3 = t.Rotation3,
-        });
+        };
     }
 
-    public string TableName => "gameobject";
+    public override string TableName => "gameobject";
 }

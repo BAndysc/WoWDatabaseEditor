@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using WDE.Common.Database;
 using WDE.PacketViewer.Processing.Runners;
+using WDE.QueryGenerators.Base;
 using WDE.SqlQueryGenerator;
 using WowPacketParser.Proto;
 using WowPacketParser.Proto.Processing;
@@ -107,16 +108,19 @@ namespace WDE.PacketViewer.Processing.Processors
         
         private readonly IChatEmoteSoundProcessor chatEmoteSoundProcessor;
         private readonly ICachedDatabaseProvider databaseProvider;
+        private readonly IQueryGenerator<ICreatureText> queryGenerator;
         private readonly bool asDiff;
 
         private readonly Dictionary<uint, State> perEntryState = new();
 
         public CreatureTextDumper(IChatEmoteSoundProcessor chatEmoteSoundProcessor, 
             ICachedDatabaseProvider databaseProvider,
+            IQueryGenerator<ICreatureText> queryGenerator,
             bool asDiff) : base (chatEmoteSoundProcessor)
         {
             this.chatEmoteSoundProcessor = chatEmoteSoundProcessor;
             this.databaseProvider = databaseProvider;
+            this.queryGenerator = queryGenerator;
             this.asDiff = asDiff;
         }
 
@@ -185,30 +189,28 @@ namespace WDE.PacketViewer.Processing.Processors
                 var template = databaseProvider.GetCachedCreatureTemplate(entry.Key);
                 if (template != null)
                     trans.Comment(template.Name);
-                trans.Table("creature_text")
-                    .Where(row => row.Column<uint>("CreatureID") == entry.Key)
-                    .Delete();
-                trans.Table("creature_text")
-                    .BulkInsert(entry.Value.texts
-                        .OrderBy(t => t.GroupId)
-                        .ThenBy(t => t.Id)
-                        .Select(text => new
-                        {
-                            CreatureID = entry.Key,
-                            GroupID = text.GroupId,
-                            ID = text.Id,
-                            Text = text.Text,
-                            Type = (uint)text.Type,
-                            Language = text.Language,
-                            Probability = text.Probability,
-                            Duration = text.Duration,
-                            TextRange = (uint)text.Range,
-                            Emote = text.Emote,
-                            Sound = text.Sound,
-                            BroadcastTextId = text.BroadcastTextId,
-                            comment = text.Comment ?? template?.Name ?? "",
-                            __comment = !text.IsInSniffText ? "not in sniff" : null
-                        }));
+
+                trans.Add(queryGenerator.Delete(new AbstractCreatureText() { CreatureId = entry.Key }));
+                trans.Add(queryGenerator.BulkInsert(entry.Value.texts
+                    .OrderBy(t => t.GroupId)
+                    .ThenBy(t => t.Id)
+                    .Select(text => new AbstractCreatureText()
+                    {
+                        CreatureId = entry.Key,
+                        GroupId = text.GroupId,
+                        Id = text.Id,
+                        Text = text.Text,
+                        Type = text.Type,
+                        Language = (byte)text.Language,
+                        Probability = text.Probability,
+                        Duration = text.Duration,
+                        TextRange = text.Range,
+                        Emote = text.Emote,
+                        Sound = text.Sound,
+                        BroadcastTextId = text.BroadcastTextId,
+                        Comment = text.Comment ?? template?.Name ?? "",
+                        __comment = !text.IsInSniffText ? "not in sniff" : null
+                    }).ToList()));
                 trans.BlankLine();
             }
             

@@ -1,9 +1,11 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using LinqToDB;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;
+using WDE.MySqlDatabaseCommon.CommonModels;
 using WDE.MySqlDatabaseCommon.Providers;
 using WDE.MySqlDatabaseCommon.Services;
 using WDE.TrinityMySqlDatabase.Models;
@@ -362,5 +364,35 @@ public class TrinityMasterMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvid
     {
         await using var model = Database();
         return await model.WaypointData.Where(wp => wp.PathId == pathId).OrderBy(wp => wp.PointId).ToListAsync<IScriptWaypoint>();
+    }
+    
+    public override async Task<List<IEventScriptLine>> GetEventScript(EventScriptType type, uint id)
+    {
+        await using var model = Database();
+        switch (type)
+        {
+            case EventScriptType.Event:
+                return await model.EventScripts.Where(s => s.Id == id).ToListAsync<IEventScriptLine>();
+            case EventScriptType.Spell:
+                return await model.SpellScripts.Where(s => s.Id == id).ToListAsync<IEventScriptLine>();
+            case EventScriptType.Waypoint:
+                return await model.WaypointScripts.Where(s => s.Id == id).ToListAsync<IEventScriptLine>();
+            case EventScriptType.Gossip:
+            case EventScriptType.QuestStart:
+            case EventScriptType.QuestEnd:
+            case EventScriptType.GameObjectUse:
+                return new List<IEventScriptLine>();
+            default:
+                throw new ArgumentOutOfRangeException(nameof(type), type, null);
+        }
+    }
+    
+    public override async Task<List<IEventScriptLine>> FindEventScriptLinesBy(IReadOnlyList<(uint command, int dataIndex, long valueToSearch)> conditions)
+    {
+        await using var model = Database();
+        var events = await model.EventScripts.Where(GenerateWhereConditionsForEventScript<MySqlEventScriptLine>(conditions)).ToListAsync<IEventScriptLine>();
+        var spells = await model.SpellScripts.Where(GenerateWhereConditionsForEventScript<MySqlSpellScriptLine>(conditions)).ToListAsync<IEventScriptLine>();
+        var waypoints = await model.WaypointScripts.Where(GenerateWhereConditionsForEventScript<MySqlWaypointScriptLine>(conditions)).ToListAsync<IEventScriptLine>();
+        return events.Concat(spells).Concat(waypoints).ToList();
     }
 }

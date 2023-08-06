@@ -34,6 +34,14 @@ namespace WDE.Common.Database
         uint BroadcastTextId { get; }
         CreatureTextRange TextRange { get; }
         string? Comment { get; }
+
+        /// <summary>
+        /// a special field used only in IQueryGenerator&lt;ICreatureText&gt;
+        /// this is the comment outputted in the sql query.
+        /// We might need a better way  for handling this type of comments
+        /// </summary>
+        // ReSharper disable once InconsistentNaming
+        string? __comment => null;
     }
     
     public class AbstractCreatureText : ICreatureText
@@ -51,5 +59,6 @@ namespace WDE.Common.Database
         public uint BroadcastTextId { get; set; }
         public CreatureTextRange TextRange { get; set; }
         public string? Comment { get; set; }
+        public string? __comment { get; set; }
     }
 }

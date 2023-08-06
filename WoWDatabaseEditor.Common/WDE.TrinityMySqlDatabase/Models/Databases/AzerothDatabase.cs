@@ -16,4 +16,7 @@ public class AzerothDatabase : BaseTrinityDatabase
     public ITable<MySqlCreatureAddonAC> CreatureAddon => GetTable<MySqlCreatureAddonAC>();
     public ITable<MySqlCreatureTemplateAddonAC> CreatureTemplateAddon => GetTable<MySqlCreatureTemplateAddonAC>();
     public ITable<MySqlAzerothQuestTemplateAddon> QuestTemplateAddon => GetTable<MySqlAzerothQuestTemplateAddon>();
+    public ITable<MySqlEventScriptNoCommentLine> EventScripts => GetTable<MySqlEventScriptNoCommentLine>();
+    public ITable<MySqlWaypointScriptNoCommentLine> WaypointScripts => GetTable<MySqlWaypointScriptNoCommentLine>();
+    public ITable<MySqlSpellScriptNoCommentLine> SpellScripts => GetTable<MySqlSpellScriptNoCommentLine>();
 }

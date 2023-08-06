@@ -7,6 +7,7 @@ namespace WDE.QueryGenerators.Base;
 public interface IInsertQueryProvider<T>
 {
     IQuery Insert(T t);
+    IQuery BulkInsert(IReadOnlyCollection<T> collection);
     string TableName { get; }
     int Priority => 0;
 }

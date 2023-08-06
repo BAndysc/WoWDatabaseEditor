@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using WDE.Common.Database;
 using WDE.Common.Utils;
 using WDE.PacketViewer.Utils;
+using WDE.QueryGenerators.Base;
+using WDE.QueryGenerators.Models;
 using WDE.SqlQueryGenerator;
 using WowPacketParser.Proto;
 using WowPacketParser.Proto.Processing;
@@ -14,6 +16,12 @@ namespace WDE.PacketViewer.Processing.Processors
     public class GossipExtractProcessor : PacketProcessor<bool>, IPacketTextDumper
     {
         private readonly IDatabaseProvider databaseProvider;
+        private readonly IQueryGenerator<IGossipMenuOption> gossipMenuOptionGenerator;
+        private readonly IQueryGenerator<IGossipMenuLine> gossipMenuGenerator;
+        private readonly IQueryGenerator<CreatureGossipUpdate> creatureTemplateGenerator;
+        private readonly IQueryGenerator<IPointOfInterest> poiGenerator;
+        private readonly IQueryGenerator<INpcTextFull> npcTextInsertGenerator;
+        private readonly IQueryGenerator<INpcText> npcTextDeleteGenerator;
         private UniversalGuid? lastGossiper;
         private Dictionary<uint, uint> gossiperToFirstMenuId = new();
         private GossipMenu? currentGossipMenu;
@@ -29,9 +37,21 @@ namespace WDE.PacketViewer.Processing.Processors
         private HashSet<uint> menuOptionsMissingInDb = new();
         private HashSet<uint> menuMissingInDb = new();
 
-        public GossipExtractProcessor(IDatabaseProvider databaseProvider)
+        public GossipExtractProcessor(IDatabaseProvider databaseProvider,
+            IQueryGenerator<IGossipMenuOption> gossipMenuOptionGenerator,
+            IQueryGenerator<IGossipMenuLine> gossipMenuGenerator,
+            IQueryGenerator<CreatureGossipUpdate> creatureTemplateGenerator,
+            IQueryGenerator<IPointOfInterest> poiGenerator,
+            IQueryGenerator<INpcTextFull> npcTextInsertGenerator,
+            IQueryGenerator<INpcText> npcTextDeleteGenerator)
         {
             this.databaseProvider = databaseProvider;
+            this.gossipMenuOptionGenerator = gossipMenuOptionGenerator;
+            this.gossipMenuGenerator = gossipMenuGenerator;
+            this.creatureTemplateGenerator = creatureTemplateGenerator;
+            this.poiGenerator = poiGenerator;
+            this.npcTextInsertGenerator = npcTextInsertGenerator;
+            this.npcTextDeleteGenerator = npcTextDeleteGenerator;
         }
         
         private class GossipMenu
@@ -336,10 +356,12 @@ namespace WDE.PacketViewer.Processing.Processors
                 if (overridenDatabaseGossipMenu.TryGetValue(menu.Key, out var originalMenu))
                     comment = $"{template?.Name} (was {originalMenu} in db)";
                 
-                multiQuery.Table("creature_template")
-                    .Where(row => row.Column<uint>("entry") == menu.Key)
-                    .Set("gossip_menu_id", menu.Value)
-                    .Update(comment);
+                multiQuery.Add(creatureTemplateGenerator.Update(new CreatureGossipUpdate()
+                {
+                    Entry = menu.Key,
+                    GossipMenuId = menu.Value,
+                    __comment = comment
+                }));
             }
 
             bool first = true;
@@ -352,10 +374,11 @@ namespace WDE.PacketViewer.Processing.Processors
                     multiQuery.Comment("Entries not existing in creature_template:");
                     first = false;
                 }
-                multiQuery.Table("creature_template")
-                    .Where(row => row.Column<uint>("entry") == menu.Key)
-                    .Set("gossip_menu_id", menu.Value)
-                    .Update();
+                multiQuery.Add(creatureTemplateGenerator.Update(new CreatureGossipUpdate()
+                {
+                    Entry = menu.Key,
+                    GossipMenuId = menu.Value,
+                }));
             }
 
             var npcTextsToInsert =
@@ -365,9 +388,11 @@ namespace WDE.PacketViewer.Processing.Processors
                 multiQuery.Comment("");
                 multiQuery.Comment(" [ NPC TEXT ]");
                 multiQuery.Comment("");
-                multiQuery.Table("npc_text")
-                    .WhereIn("ID", npcTextsToInsert.Select(npcText => npcText.entry))
-                    .Delete();
+                foreach (var npcText in npcTextsToInsert)
+                    multiQuery.Add(npcTextDeleteGenerator.Delete(new AbstractNpcText()
+                    {
+                        Id = npcText.entry
+                    }));
 
                 var inserts = await npcTextsToInsert.SelectAsync(async npcText =>
                 {
@@ -379,13 +404,13 @@ namespace WDE.PacketViewer.Processing.Processors
                     var bcast6 = await GetBroadcastText(npcText.Item2[5].broadcastText);
                     var bcast7 = await GetBroadcastText(npcText.Item2[6].broadcastText);
                     var bcast8 = await GetBroadcastText(npcText.Item2[7].broadcastText);
-                    return new
+                    return new AbstractNpcTextFull()
                     {
-                        ID = npcText.entry,
-                        text0_0 = bcast1?.Text,
-                        text0_1 = bcast1?.Text1,
-                        BroadcastTextID0 = bcast1?.Id ?? 0,
-                        lang0 = bcast1?.Language ?? 0,
+                        Id = npcText.entry,
+                        Text0_0 = bcast1?.Text,
+                        Text0_1 = bcast1?.Text1,
+                        BroadcastTextID0 = (int?)bcast1?.Id ?? 0,
+                        Lang0 = (byte?)bcast1?.Language ?? 0,
                         Probability0 = npcText.Item2[0].probability,
                         EmoteDelay0_0 = bcast1?.EmoteDelay1 ?? 0,
                         Emote0_0 = bcast1?.EmoteId1 ?? 0,
@@ -395,10 +420,10 @@ namespace WDE.PacketViewer.Processing.Processors
                         Emote0_2 = bcast1?.EmoteId3 ?? 0,
 
 
-                        text1_0 = bcast2?.Text,
-                        text1_1 = bcast2?.Text1,
-                        BroadcastTextID1 = bcast2?.Id ?? 0,
-                        lang1 = bcast2?.Language ?? 0,
+                        Text1_0 = bcast2?.Text,
+                        Text1_1 = bcast2?.Text1,
+                        BroadcastTextID1 = (int?)bcast2?.Id ?? 0,
+                        Lang1 = (byte?)bcast2?.Language ?? 0,
                         Probability1 = npcText.Item2[1].probability,
                         EmoteDelay1_0 = bcast2?.EmoteDelay1 ?? 0,
                         Emote1_0 = bcast2?.EmoteId1 ?? 0,
@@ -407,10 +432,10 @@ namespace WDE.PacketViewer.Processing.Processors
                         EmoteDelay1_2 = bcast2?.EmoteDelay3 ?? 0,
                         Emote1_2 = bcast2?.EmoteId3 ?? 0,
 
-                        text2_0 = bcast3?.Text,
-                        text2_1 = bcast3?.Text1,
-                        BroadcastTextID2 = bcast3?.Id ?? 0,
-                        lang2 = bcast3?.Language ?? 0,
+                        Text2_0 = bcast3?.Text,
+                        Text2_1 = bcast3?.Text1,
+                        BroadcastTextID2 = (int?)bcast3?.Id ?? 0,
+                        Lang2 = (byte?)bcast3?.Language ?? 0,
                         Probability2 = npcText.Item2[2].probability,
                         EmoteDelay2_0 = bcast3?.EmoteDelay1 ?? 0,
                         Emote2_0 = bcast3?.EmoteId1 ?? 0,
@@ -420,10 +445,10 @@ namespace WDE.PacketViewer.Processing.Processors
                         Emote2_2 = bcast3?.EmoteId3 ?? 0,
 
 
-                        text3_0 = bcast4?.Text,
-                        text3_1 = bcast4?.Text1,
-                        BroadcastTextID3 = bcast4?.Id ?? 0,
-                        lang3 = bcast4?.Language ?? 0,
+                        Text3_0 = bcast4?.Text,
+                        Text3_1 = bcast4?.Text1,
+                        BroadcastTextID3 = (int?)bcast4?.Id ?? 0,
+                        Lang3 = (byte?)bcast4?.Language ?? 0,
                         Probability3 = npcText.Item2[3].probability,
                         EmoteDelay3_0 = bcast4?.EmoteDelay1 ?? 0,
                         Emote3_0 = bcast4?.EmoteId1 ?? 0,
@@ -432,10 +457,10 @@ namespace WDE.PacketViewer.Processing.Processors
                         EmoteDelay3_2 = bcast4?.EmoteDelay3 ?? 0,
                         Emote3_2 = bcast4?.EmoteId3 ?? 0,
 
-                        text4_0 = bcast5?.Text,
-                        text4_1 = bcast5?.Text1,
-                        BroadcastTextID4 = bcast5?.Id ?? 0,
-                        lang4 = bcast5?.Language ?? 0,
+                        Text4_0 = bcast5?.Text,
+                        Text4_1 = bcast5?.Text1,
+                        BroadcastTextID4 = (int?)bcast5?.Id ?? 0,
+                        Lang4 = (byte?)bcast5?.Language ?? 0,
                         Probability4 = npcText.Item2[3].probability,
                         EmoteDelay4_0 = bcast5?.EmoteDelay1 ?? 0,
                         Emote4_0 = bcast5?.EmoteId1 ?? 0,
@@ -445,10 +470,10 @@ namespace WDE.PacketViewer.Processing.Processors
                         Emote4_2 = bcast5?.EmoteId3 ?? 0,
 
 
-                        text5_0 = bcast6?.Text,
-                        text5_1 = bcast6?.Text1,
-                        BroadcastTextID5 = bcast6?.Id ?? 0,
-                        lang5 = bcast6?.Language ?? 0,
+                        Text5_0 = bcast6?.Text,
+                        Text5_1 = bcast6?.Text1,
+                        BroadcastTextID5 = (int?)bcast6?.Id ?? 0,
+                        Lang5 = (byte?)bcast6?.Language ?? 0,
                         Probability5 = npcText.Item2[5].probability,
                         EmoteDelay5_0 = bcast6?.EmoteDelay1 ?? 0,
                         Emote5_0 = bcast6?.EmoteId1 ?? 0,
@@ -458,10 +483,10 @@ namespace WDE.PacketViewer.Processing.Processors
                         Emote5_2 = bcast6?.EmoteId3 ?? 0,
 
 
-                        text6_0 = bcast7?.Text,
-                        text6_1 = bcast7?.Text1,
-                        BroadcastTextID6 = bcast7?.Id ?? 0,
-                        lang6 = bcast7?.Language ?? 0,
+                        Text6_0 = bcast7?.Text,
+                        Text6_1 = bcast7?.Text1,
+                        BroadcastTextID6 = (int?)bcast7?.Id ?? 0,
+                        Lang6 = (byte?)bcast7?.Language ?? 0,
                         Probability6 = npcText.Item2[6].probability,
                         EmoteDelay6_0 = bcast7?.EmoteDelay1 ?? 0,
                         Emote6_0 = bcast7?.EmoteId1 ?? 0,
@@ -470,10 +495,10 @@ namespace WDE.PacketViewer.Processing.Processors
                         EmoteDelay6_2 = bcast7?.EmoteDelay3 ?? 0,
                         Emote6_2 = bcast7?.EmoteId3 ?? 0,
 
-                        text7_0 = bcast8?.Text,
-                        text7_1 = bcast8?.Text1,
-                        BroadcastTextID7 = bcast8?.Id ?? 0,
-                        lang7 = bcast8?.Language ?? 0,
+                        Text7_0 = bcast8?.Text,
+                        Text7_1 = bcast8?.Text1,
+                        BroadcastTextID7 = (int?)bcast8?.Id ?? 0,
+                        Lang7 = (byte?)bcast8?.Language ?? 0,
                         Probability7 = npcText.Item2[7].probability,
                         EmoteDelay7_0 = bcast8?.EmoteDelay1 ?? 0,
                         Emote7_0 = bcast8?.EmoteId1 ?? 0,
@@ -484,8 +509,7 @@ namespace WDE.PacketViewer.Processing.Processors
                     };
                 });
                 
-                multiQuery.Table("npc_text")
-                    .BulkInsert(inserts);
+                multiQuery.Add(npcTextInsertGenerator.BulkInsert(inserts.ToList()));
             
                 multiQuery.BlankLine();
                 multiQuery.BlankLine();
@@ -509,23 +533,24 @@ namespace WDE.PacketViewer.Processing.Processors
                 multiQuery.Comment(" [ POINTS OF INTEREST ]");
                 multiQuery.Comment("");
 
-                multiQuery.Table("points_of_interest")
-                    .WhereIn("ID", Enumerable.Range((int)freePoiNum, poiToAdd.Count))
-                    .Delete();
+                foreach (var freeId in Enumerable.Range((int)freePoiNum, poiToAdd.Count))
+                    multiQuery.Add(poiGenerator.Delete(new AbstractPointOfInterest()
+                    {
+                        Id = (uint)freeId
+                    }));
 
                 var id = freePoiNum;
-                multiQuery.Table("points_of_interest")
-                    .BulkInsert(poiToAdd.Select(option => new
-                    {
-                        ID = id++,
-                        PositionX = option.ActionPoi!.Coordinates.X,
-                        PositionY = option.ActionPoi.Coordinates.Y,
-                        Icon = option.ActionPoi.Icon,
-                        Flags = option.ActionPoi.Flags,
-                        Importance = option.ActionPoi.Importance,
-                        Name = option.ActionPoi.Name,
-                        VerifiedBuild  = 0,
-                    }));
+                multiQuery.Add(poiGenerator.BulkInsert(poiToAdd.Select(option => new AbstractPointOfInterest
+                {
+                    Id = id++,
+                    PositionX = option.ActionPoi!.Coordinates.X,
+                    PositionY = option.ActionPoi.Coordinates.Y,
+                    Icon = option.ActionPoi.Icon,
+                    Flags = option.ActionPoi.Flags,
+                    Importance = option.ActionPoi.Importance,
+                    Name = option.ActionPoi.Name,
+                    VerifiedBuild  = 0,
+                }).ToList()));
 
                 id = freePoiNum;
                 foreach (var option in poiToAdd)
@@ -606,25 +631,25 @@ namespace WDE.PacketViewer.Processing.Processors
                     continue;
 
                 any = true;
-                multiQuery.Table("gossip_menu")
-                    .Where(row => row.Column<uint>("MenuID") == menu.Key)
-                    .Delete();
+                multiQuery.Add(gossipMenuGenerator.Delete(new AbstractGossipMenuLine()
+                {
+                    MenuId = menu.Key
+                }));
             }
 
-            multiQuery.Table("gossip_menu")
-                .BulkInsert(menus
-                    .Where(menu => menusAlreadyInDb.Contains(menu.Key) == existing)
-                    .SelectMany(menu => menu.Value.TextsId.Select(text => new
-                    {
-                        MenuID = menu.Key,
-                        TextID = text,
-                        __comment = (string?)null
-                    }).Concat(menu.Value.DatabaseOnlyTextsId.Select(dbText => new
-                    {
-                        MenuID = menu.Key,
-                        TextID = dbText,
-                        __comment = (string?)"not in sniff"
-                    }))));
+            multiQuery.Add(gossipMenuGenerator.BulkInsert(menus
+                .Where(menu => menusAlreadyInDb.Contains(menu.Key) == existing)
+                .SelectMany(menu => menu.Value.TextsId.Select(text => new AbstractGossipMenuLine()
+                {
+                    MenuId = menu.Key,
+                    TextId = text,
+                    __comment = (string?)null
+                }).Concat(menu.Value.DatabaseOnlyTextsId.Select(dbText => new AbstractGossipMenuLine()
+                {
+                    MenuId = menu.Key,
+                    TextId = dbText,
+                    __comment = (string?)"not in sniff"
+                }))).ToList()));
 
             if (any)
             {
@@ -633,55 +658,53 @@ namespace WDE.PacketViewer.Processing.Processors
             }
         }
 
-        private static void DumpGossipMenuOptions(IMultiQuery multiQuery, KeyValuePair<uint, GossipMenu> menu)
+        private void DumpGossipMenuOptions(IMultiQuery multiQuery, KeyValuePair<uint, GossipMenu> menu)
         {
-            multiQuery.Table("gossip_menu_option")
-                .Where(row => row.Column<uint>("MenuID") == menu.Key)
-                .Delete();
-            var options = menu.Value.Options.Select(option => (option.Index, (object)new
+            multiQuery.Add(gossipMenuOptionGenerator.Delete(new AbstractGossipMenuOption(){MenuId = menu.Key}));
+            var options = menu.Value.Options.Select(option => (option.Index, new AbstractGossipMenuOption
             {
-                MenuID = menu.Key,
-                OptionID = option.Index,
-                OptionIcon = (uint)option.Icon,
-                OptionText = option.Text,
-                OptionBroadcastTextID = option.BroadcastTextId,
-                OptionType = (uint)option.OptionType,
-                OptionNpcFlag = (uint)option.NpcFlags,
-                ActionMenuID = option.LinkedMenuId,
-                ActionPoiID = option.ActionPoiId,
-                BoxCoded = option.BoxCoded ? 1 : 0,
+                MenuId = menu.Key,
+                OptionIndex = option.Index,
+                Icon = option.Icon,
+                Text = option.Text,
+                BroadcastTextId = (int)option.BroadcastTextId,
+                OptionType = option.OptionType,
+                NpcFlag = (uint)option.NpcFlags,
+                ActionMenuId = option.LinkedMenuId,
+                ActionPoiId = option.ActionPoiId,
+                BoxCoded = option.BoxCoded ? 1U : 0,
                 BoxMoney = option.BoxMoney,
                 BoxText = option.BoxText,
-                BoxBroadcastTextID = option.BoxTextBroadcastId,
+                BoxBroadcastTextId = (int)option.BoxTextBroadcastId,
                 __comment = (string?)null,
                 __ignored = false
             })).Concat(menu.Value.DatabaseOptions.Select(option =>
             {
                 var isConflicting = menu.Value.Options.Any(o => o.Index == option.Index);
-                return (option.Index, (object)new
+                return (option.Index, new AbstractGossipMenuOption
                 {
-                    MenuID = menu.Key,
-                    OptionID = option.Index,
-                    OptionIcon = (uint)option.Icon,
-                    OptionText = option.Text,
-                    OptionBroadcastTextID = option.BroadcastTextId,
-                    OptionType = (uint)option.OptionType,
-                    OptionNpcFlag = (uint)option.NpcFlags,
-                    ActionMenuID = option.LinkedMenuId,
-                    ActionPoiID = option.ActionPoiId,
-                    BoxCoded = option.BoxCoded ? 1 : 0,
+                    MenuId = menu.Key,
+                    OptionIndex = option.Index,
+                    Icon = option.Icon,
+                    Text = option.Text,
+                    BroadcastTextId = (int)option.BroadcastTextId,
+                    OptionType = option.OptionType,
+                    NpcFlag = (uint)option.NpcFlags,
+                    ActionMenuId = option.LinkedMenuId,
+                    ActionPoiId = option.ActionPoiId,
+                    BoxCoded = option.BoxCoded ? 1U : 0,
                     BoxMoney = option.BoxMoney,
                     BoxText = option.BoxText,
-                    BoxBroadcastTextID = option.BoxTextBroadcastId,
+                    BoxBroadcastTextId = (int)option.BoxTextBroadcastId,
                     __comment = "not in sniff" + (isConflicting ? ", CONFLICTING ID" : ""),
                     __ignored = isConflicting
                 });
             }));
             
-            multiQuery.Table("gossip_menu_option")
-                .BulkInsert(options
-                    .OrderBy(o => o.Index)
-                    .Select(o => o.Item2));
+            multiQuery.Add(gossipMenuOptionGenerator.BulkInsert(options
+                .OrderBy(o => o.Index)
+                .Select(o => o.Item2)
+                .ToList()));
             multiQuery.BlankLine();
         }
 

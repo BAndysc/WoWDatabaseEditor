@@ -8,7 +8,7 @@ using WDE.SqlQueryGenerator;
 namespace WDE.QueryGenerators.Generators.Quests;
 
 [AutoRegister]
-[RequiresCore("TrinityMaster", "TrinityCata", "TrinityWrath", "AzerothCore")]
+[RequiresCore("TrinityMaster", "TrinityCata", "TrinityWrath", "Azeroth")]
 public class TrinityQuestQueryProvider : IUpdateQueryProvider<QuestChainDiff>
 {
     private readonly ICachedDatabaseProvider databaseProvider;
@@ -18,7 +18,7 @@ public class TrinityQuestQueryProvider : IUpdateQueryProvider<QuestChainDiff>
     public TrinityQuestQueryProvider(ICachedDatabaseProvider databaseProvider, ICurrentCoreVersion currentCoreVersion)
     {
         this.databaseProvider = databaseProvider;
-        hasBreadcrumb = currentCoreVersion.Current.Tag != "AzerothCore";
+        hasBreadcrumb = currentCoreVersion.Current.Tag != "Azeroth";
     }
     
     public IQuery Update(QuestChainDiff diff)

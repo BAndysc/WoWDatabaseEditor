@@ -1,11 +1,13 @@
 using WDE.SqlQueryGenerator;
+using Extensions = AvaloniaStyles.Controls.Extensions;
 
 namespace WDE.QueryGenerators.Base;
 
-public interface IQueryGenerator<R>
+public interface IQueryGenerator<T>
 {
-    IQuery? Insert(R element);
-    IQuery? Delete(R element);
-    IQuery? Update(R element);
+    IQuery? TryInsert(T element);
+    IQuery? TryBulkInsert(IReadOnlyCollection<T> elements);
+    IQuery? TryDelete(T element);
+    IQuery? TryUpdate(T element);
     string? TableName { get; }
 }
