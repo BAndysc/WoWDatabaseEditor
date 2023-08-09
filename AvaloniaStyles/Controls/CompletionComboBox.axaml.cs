@@ -240,7 +240,7 @@ namespace AvaloniaStyles.Controls
                         if (box.SearchTextBox == null) // before template applied
                             return;
                         
-                        box.SearchText = "";
+                        //box.SearchText = "";
                         FocusManager.Instance.Focus(box.SearchTextBox, NavigationMethod.Pointer);
                         box.SearchTextBox.SelectionEnd = box.SearchTextBox.SelectionStart = box.SearchText.Length;
                     }, TimeSpan.FromMilliseconds(16));
