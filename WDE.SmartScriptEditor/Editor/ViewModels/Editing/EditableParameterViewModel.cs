@@ -71,7 +71,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
             {
                 if (Parameter is not MultiParameterValueHolder<long> p)
                     return null;
-                return HasItems && p.Items != null
+                return HasItems && UseModernPicker && p.Items != null
                     ? p.Items!.Select(pair => (object)new ParameterOption(pair.Key, pair.Value.Name)).ToList()
                     : null;
             }
@@ -169,15 +169,15 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
         {
             Value = value;
             Name = name;
-            searchText = $"{Name} ({Value})";
         }
 
-        private string searchText;
+        private string? searchText;
         public long Value { get; }
         public string Name { get; }
 
         public override string ToString()
         {
+            searchText ??= $"{Name} ({Value})";
             return searchText;
         }
     }
