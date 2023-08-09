@@ -46,6 +46,7 @@ namespace WDE.DatabaseEditors
                 factory.Register("LootReferenceParameter", containerProvider.Resolve<LootReferenceParameter>());
                 factory.Register("EquipmentCreatureGuidParameter", containerProvider.Resolve<EquipmentCreatureGuidParameter>());
                 factory.Register("CreatureGUIDParameter", this.containerProvider.Resolve<CreatureGUIDParameter>());
+                factory.Register("QuestObjectiveByStorageIndex(entry)Parameter",this.containerProvider.Resolve<QuestObjectiveByStorageIndexParameter>((typeof(string), "entry")));
                 factory.Register("GameobjectGUIDParameter", this.containerProvider.Resolve<GameObjectGUIDParameter>());
                 factory.Register("CreatureGUID(PickerOnly)Parameter", this.containerProvider.Resolve<CreatureGUIDPickerOnlyParameter>());
                 factory.Register("GameobjectGUID(PickerOnly)Parameter", this.containerProvider.Resolve<GameObjectGUIDPickerOnlyParameter>());
