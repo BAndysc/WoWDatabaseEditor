@@ -59,6 +59,9 @@ namespace WDE.Common.Database
 
         Task<IReadOnlyList<int>> GetSmartScriptEntriesByType(SmartScriptType scriptType);
 
+        Task<IReadOnlyList<IQuestScriptName>> GetQuestScriptNames(uint questId) =>
+            Task.FromResult<IReadOnlyList<IQuestScriptName>>(new List<IQuestScriptName>());
+
         Task<IList<IPlayerChoice>?> GetPlayerChoicesAsync();
         Task<IList<IPlayerChoiceResponse>?> GetPlayerChoiceResponsesAsync();
         Task<IList<IPlayerChoiceResponse>?> GetPlayerChoiceResponsesAsync(int choiceId);

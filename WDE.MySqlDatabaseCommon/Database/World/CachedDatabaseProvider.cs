@@ -524,6 +524,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public Task<IList<ITrinityString>> GetStringsAsync() => WaitForCache(nonCachedDatabase.GetStringsAsync());
 
+        public Task<IReadOnlyList<IQuestScriptName>> GetQuestScriptNames(uint questId) => WaitForCache(nonCachedDatabase.GetQuestScriptNames(questId));
+
         private bool cacheInProgress = false;
         private Task cacheTask = Task.CompletedTask;
 
