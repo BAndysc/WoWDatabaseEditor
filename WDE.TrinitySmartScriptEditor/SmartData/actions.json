@@ -152,7 +152,7 @@
                 "name": "ReactState"
             }
         ],
-        "description": "{source}: Set react state to {pram1}",
+        "description": "\\[a]{source}: Set react state to {pram1}",
         "name_readable": "Set react state",
         "target_types": ["Creature"],
         "target_is_source": true
@@ -171,32 +171,32 @@
         "name": "SMART_ACTION_RANDOM_EMOTE",
         "parameters": [
             {
-                "type": "EmoteParameter",
+                "type": "EmoteOneShotParameter",
                 "name": "Emote 1",
                 "description": "If 0, the emote will be skipped"
             },
             {
-                "type": "EmoteParameter",
+                "type": "EmoteOneShotParameter",
                 "name": "Emote 2",
                 "description": "If 0, the emote will be skipped"
             },
             {
-                "type": "EmoteParameter",
+                "type": "EmoteOneShotParameter",
                 "name": "Emote 3",
                 "description": "If 0, the emote will be skipped"
             },
             {
-                "type": "EmoteParameter",
+                "type": "EmoteOneShotParameter",
                 "name": "Emote 4",
                 "description": "If 0, the emote will be skipped"
             },
             {
-                "type": "EmoteParameter",
+                "type": "EmoteOneShotParameter",
                 "name": "Emote 5",
                 "description": "If 0, the emote will be skipped"
             },
             {
-                "type": "EmoteParameter",
+                "type": "EmoteOneShotParameter",
                 "name": "Emote 6",
                 "description": "If 0, the emote will be skipped"
             }

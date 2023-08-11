@@ -136,8 +136,10 @@ public class Program
         currentCoreVersion.Current.ReturnsForAnyArgs(core);
 
         var databaseConn = Substitute.For<IMySqlWorldConnectionStringProvider>();
+        var databaseName = dbSettings.Settings.Database;
         var connString = $"Server={dbSettings.Settings.Host};Port={dbSettings.Settings.Port ?? 3306};Database={dbSettings.Settings.Database};Uid={dbSettings.Settings.User};Pwd={dbSettings.Settings.Password};AllowUserVariables=True;TreatTinyAsBoolean=False";
         databaseConn.ConnectionString.ReturnsForAnyArgs(connString);
+        databaseConn.DatabaseName.ReturnsForAnyArgs(databaseName);
         
         
         var ioc = new UnityContainer().AddExtension(new Diagnostic());
@@ -193,9 +195,34 @@ public class Program
 
         var allDefinitions = ioc.Resolve<ITableDefinitionProvider>().Definitions;
         var loader = ioc.Resolve<IDatabaseTableDataProvider>();
+        var sqlExecutor = ioc.Resolve<WorldMySqlExecutor>();
         foreach (var definition in allDefinitions)
         {
             Console.WriteLine("Table editor: " + definition.TableName);
+            
+            
+            var columnsByTables = definition.Groups.SelectMany(g => g.Fields)
+                .Where(g => !g.IsMetaColumn && ! g.IsConditionColumn)
+                .GroupBy(g => g.ForeignTable ?? definition.TableName)
+                .ToDictionary(g => g.Key, g => g.ToList());
+
+            foreach (var table in columnsByTables)
+            {
+                var tableColumns = await sqlExecutor.GetTableColumns(table.Key);
+                var columnsByName = tableColumns
+                    .GroupBy(g => g.ColumnName)
+                    .ToDictionary(g => g.Key, g => g.FirstOrDefault());
+            
+                foreach (var column in columnsByName.Keys)
+                {
+                    if (table.Value.Find(t => t.DbColumnName == column) == null &&
+                        (definition.ForeignTable == null ||
+                        definition.ForeignTable.FirstOrDefault(f => f.TableName == table.Key) is { } x &&
+                        !(x.ForeignKeys?.Contains(column) ?? false)))
+                        Console.WriteLine($" [ ERROR ] Column {table.Key}.{column} not found in definition!");
+                }
+            }
+            
             await loader.Load(definition.Id, null, null, null, new[]{new DatabaseKey(definition.GroupByKeys.Select(x => 1L))});
         }
 

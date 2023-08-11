@@ -74,7 +74,7 @@
         {
           "name": "Emote",
           "db_column_name": "Emote",
-          "value_type": "EmoteParameter"
+          "value_type": "EmoteOneShotParameter"
         },
         {
           "name": "Duration",

@@ -224,7 +224,7 @@
           "name": "Emote",
           "db_column_name": "emote",
           "foreign_table": "creature_template_addon",
-          "value_type": "EmoteParameter"
+          "value_type": "EmoteStateParameter"
         },
         {
           "name": "Visibility Distance Type",

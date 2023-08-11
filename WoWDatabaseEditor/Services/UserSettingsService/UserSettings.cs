@@ -46,6 +46,8 @@ namespace WoWDatabaseEditorCore.Services.UserSettingsService
             catch (Exception e)
             {
                 statusBar.Value.PublishNotification(new PlainNotification(NotificationType.Error, "Error while loading settings: " + e));
+                Console.WriteLine("Error while loading settings: " + fileSystem?.ResolvePhysicalPath(settingsFile)?.FullName);
+                Console.WriteLine(e);
                 return defaultValue;
             }
         }
