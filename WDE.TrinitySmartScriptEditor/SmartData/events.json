@@ -333,7 +333,7 @@
     "builtin_rules": [
       "minmax(3, 4)"
     ],
-    "description": "On {pram1value:choose(0):any spell|spell {pram1}}{pram2value:choose(0):| of school {pram2}} hit {pram3value:choose(0):|(wait {pram3} - {pram4} ms before next trigger)}",
+    "description": "On {pram1value:choose(0):any spell|spell [spell={pram1value}] {pram1}}{pram2value:choose(0):| of school {pram2}} hit {pram3value:choose(0):|(wait {pram3} - {pram4} ms before next trigger)}",
     "name_readable": "On spell hit",
     "invoker": {
       "name": "Caster",
@@ -349,7 +349,54 @@
       "Creature"
     ],
     "is_timed": true,
+    "tags": ["TrinityWrath", "TrinityMaster", "TrinityCata"],
     "name": "SMART_EVENT_RANGE",
+    "builtin_rules": [
+      "minmax(1, 2)",
+      "minmax(3, 4)",
+      "is_repeat(4)"
+    ],
+    "parameters": [
+      {
+        "type": "Parameter",
+        "name": "Minimum Distance",
+        "description": "Minimum distance between creature and its victim to trigger the event"
+      },
+      {
+        "type": "Parameter",
+        "name": "Maximum Distance",
+        "required": true,
+        "description": "Maximum distance between creature and its victim to trigger the event"
+      },
+      {
+        "type": "Parameter",
+        "name": "Cooldown Minimum",
+        "description": "Minimum delay after this event can be triggered again"
+      },
+      {
+        "type": "Parameter",
+        "name": "Cooldown Maximum",
+        "description": "Maximum delay after this event can be triggered again"
+      }
+    ],
+    "description": "When victim in range {pram1} - {pram2} yards {pram4value:choose(0):(once)|(cooldown {pram3} - {pram4} ms)}",
+    "name_readable": "Range",
+    "invoker": {
+      "name": "Victim",
+      "types": [
+        "Player",
+        "Creature"
+      ]
+    }
+  },
+  {
+    "id": 9,
+    "usable_with_script_types": [
+      "Creature"
+    ],
+    "tags": ["Azeroth"],
+    "is_timed": true,
+    "name": "SMART_EVENT_RANGE_AC",
     "builtin_rules": [
       "minmax(1, 2)",
       "minmax(3, 4)",
@@ -394,6 +441,7 @@
       "Creature"
     ],
     "name": "SMART_EVENT_OOC_LOS",
+    "tags": ["TrinityWrath", "TrinityMaster", "TrinityCata"],
     "parameters": [
       {
         "type": "SwitchParameter",
@@ -417,6 +465,55 @@
         "type": "Parameter",
         "name": "Cooldown Maximum",
         "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
+      }
+    ],
+    "builtin_rules": [
+      "minmax(3, 4)"
+    ],
+    "description": "On {pram1} unit in line of sight (OOC)",
+    "name_readable": "On move in line of sight (out of combat)",
+    "invoker": {
+      "name": "Unit in LOS",
+      "types": [
+        "Player",
+        "Creature"
+      ]
+    }
+  },
+  {
+    "id": 10,
+    "usable_with_script_types": [
+      "Creature"
+    ],
+    "name": "SMART_EVENT_OOC_LOS_AC",
+    "tags": ["Azeroth"],
+    "parameters": [
+      {
+        "type": "SwitchParameter",
+        "name": "Hostility mode",
+        "values": {
+          "0": {"name": "only hostile"},
+          "1": {"name": "only non hostile"},
+          "2": {"name": "any"}
+        }
+      },
+      {
+        "type": "Parameter",
+        "name": "Max distance"
+      },
+      {
+        "type": "Parameter",
+        "name": "Cooldown Minimum",
+        "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
+      },
+      {
+        "type": "Parameter",
+        "name": "Cooldown Maximum",
+        "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
+      },
+      {
+        "type": "BoolParameter",
+        "name": "Player only"
       }
     ],
     "builtin_rules": [
@@ -643,6 +740,7 @@
     ],
     "is_timed": true,
     "name": "SMART_EVENT_FRIENDLY_MISSING_BUFF",
+    "tags": ["TrinityWrath", "TrinityMaster", "TrinityCata"],
     "parameters": [
       {
         "type": "SpellParameter",
@@ -663,6 +761,54 @@
         "type": "Parameter",
         "name": "Cooldown Maximum",
         "description": "Maximum delay after this event can be triggered again"
+      }
+    ],
+    "builtin_rules": [
+      "minmax(3, 4)",
+      "is_repeat(4)"
+    ],
+    "description": "When friendly unit in range {pram2} yards has not got aura {pram1} {pram4value:choose(0):(once)|(cooldown {pram3} - {pram4} ms)}",
+    "name_readable": "When nearby friendly missing buff",
+    "invoker": {
+      "name": "Friendly unit",
+      "types": [
+        "Creature",
+        "Player"
+      ]
+    }
+  },
+  {
+    "id": 16,
+    "usable_with_script_types": [
+      "Creature"
+    ],
+    "is_timed": true,
+    "name": "SMART_EVENT_FRIENDLY_MISSING_BUFF_AC",
+    "tags": ["Azeroth"],
+    "parameters": [
+      {
+        "type": "SpellParameter",
+        "name": "Spell",
+        "description": "Spell id to check"
+      },
+      {
+        "type": "Parameter",
+        "name": "Radius",
+        "description": "Radius to check in"
+      },
+      {
+        "type": "Parameter",
+        "name": "Cooldown Minimum",
+        "description": "Minimum delay after this event can be triggered again"
+      },
+      {
+        "type": "Parameter",
+        "name": "Cooldown Maximum",
+        "description": "Maximum delay after this event can be triggered again"
+      },
+      {
+        "type": "BoolParameter",
+        "name": "Only in combat"
       }
     ],
     "builtin_rules": [
@@ -954,6 +1100,7 @@
       "Creature"
     ],
     "name": "SMART_EVENT_IC_LOS",
+    "tags": ["TrinityWrath", "TrinityMaster", "TrinityCata"],
     "parameters": [
       {
         "type": "SwitchParameter",
@@ -977,6 +1124,55 @@
         "type": "Parameter",
         "name": "Cooldown Maximum",
         "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
+      }
+    ],
+    "builtin_rules": [
+      "minmax(3, 4)"
+    ],
+    "description": "On {pram1} unit in line of sight (in combat){pram3value:choose(0):| (wait {pram3} - {pram4} ms before next event trigger)}",
+    "name_readable": "On move in line of sight (in combat)",
+    "invoker": {
+      "name": "Unit in LOS",
+      "types": [
+        "Player",
+        "Creature"
+      ]
+    }
+  },
+  {
+    "id": 26,
+    "usable_with_script_types": [
+      "Creature"
+    ],
+    "name": "SMART_EVENT_IC_LOS_AC",
+    "tags": ["Azeroth"],
+    "parameters": [
+      {
+        "type": "SwitchParameter",
+        "name": "Hostility mode",
+        "values": {
+          "0": {"name": "only hostile"},
+          "1": {"name": "only non hostile"},
+          "2": {"name": "any"}
+        }
+      },
+      {
+        "type": "Parameter",
+        "name": "Maximum distance"
+      },
+      {
+        "type": "Parameter",
+        "name": "Cooldown Minimum",
+        "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
+      },
+      {
+        "type": "Parameter",
+        "name": "Cooldown Maximum",
+        "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
+      },
+      {
+        "type": "BoolParameter",
+        "name": "Player only"
       }
     ],
     "builtin_rules": [
@@ -2132,7 +2328,7 @@
       "Creature"
     ],
     "tags": [
-      "Azeroth", "TrinityWrath", "TrinityMaster"
+      "TrinityWrath", "TrinityMaster"
     ],
     "is_timed": true,
     "name": "SMART_EVENT_FRIENDLY_HEALTH_PCT",
@@ -2155,6 +2351,56 @@
         "type": "Parameter",
         "name": "Cooldown Maximum",
         "description": "Maximum delay after this event can be triggered again"
+      }
+    ],
+    "builtin_rules": [
+      "minmax(1, 2)",
+      "minmax(3, 4)",
+      "is_repeat(4)"
+    ],
+    "description": "When target has HP between {pram1} - {pram2} {pram4value:choose(0):(once)|(cooldown {pram3} - {pram4} ms)}",
+    "name_readable": "Targets health %",
+    "invoker": {
+      "name": "Friendly unit",
+      "types": [
+        "Creature",
+        "Player"
+      ]
+    }
+  },
+  {
+    "id": 74,
+    "usable_with_script_types": [
+      "Creature"
+    ],
+    "tags": [
+      "Azeroth"
+    ],
+    "is_timed": true,
+    "name": "SMART_EVENT_FRIENDLY_HEALTH_PCT_AC",
+    "parameters": [
+      {
+        "type": "PercentageParameter",
+        "name": "Minimum HP",
+        "description": "Target from first action must be: CREATURE_RANGE, CREATURE_GUID, CREATURE_DISTANCE, CLOSEST_CREATURE, CLOSEST_PLAYER, PLAYER_RANGE, PLAYER_DISTANCE"
+      },
+      {
+        "type": "PercentageParameter",
+        "name": "Maximum HP"
+      },
+      {
+        "type": "Parameter",
+        "name": "Cooldown Minimum",
+        "description": "Minimum delay after this event can be triggered again"
+      },
+      {
+        "type": "Parameter",
+        "name": "Cooldown Maximum",
+        "description": "Maximum delay after this event can be triggered again"
+      },
+      {
+        "type": "Parameter",
+        "name": "Radius"
       }
     ],
     "builtin_rules": [
@@ -2538,7 +2784,11 @@
       },
       {
         "type": "FloatParameter",
-        "name": "Cooldown"
+        "name": "Cooldown min"
+      },
+      {
+        "type": "FloatParameter",
+        "name": "Cooldown max"
       }
     ],
     "usable_with_script_types": [
@@ -2546,7 +2796,14 @@
       "Gameobject"
     ],
     "is_timed": true,
-    "description": "When {pram1value:choose(0|1):any player|any player|at least {pram1} players} within {pram2} yd nearby {pram4value:choose(0):(once)|(cooldown {pram4} seconds)}"
+    "description": "When {pram1value:choose(0|1):any player|any player|at least {pram1} players} within {pram2} yd nearby {pram4value:choose(0):(once)|(cooldown {pram4} seconds)}",
+    "invoker": {
+      "name": "Found unit",
+      "types": [
+        "Creature",
+        "Player"
+      ]
+    }
   },
   {
     "id": 102,
@@ -2570,6 +2827,57 @@
       },
       {
         "type": "FloatParameter",
+        "name": "Cooldown min"
+      },
+      {
+        "type": "FloatParameter",
+        "name": "Cooldown max"
+      }
+    ],
+    "usable_with_script_types": [
+      "Creature",
+      "Gameobject"
+    ],
+    "is_timed": true,
+    "description": "When {pram1value:choose(0|1):no players|at most 1 player|at most {pram1} players} within {pram2} yd nearby {pram4value:choose(0):(once)|(cooldown {pram4} seconds)}",
+    "invoker": {
+      "name": "Found unit",
+      "types": [
+        "Creature",
+        "Player"
+      ]
+    }
+  },
+  {
+    "id": 103,
+    "name": "SMART_EVENT_NEAR_UNIT_AC",
+    "name_readable": "When at least x units nearby",
+    "tags": [
+      "Azeroth"
+    ],
+    "parameters": [
+      {
+        "type": "SwitchParameter",
+        "name": "Type",
+        "values": {
+          "0": {"name": "Creature"},
+          "1": {"name": "Gameobject"}
+        }
+      },
+      {
+        "type": "Parameter",
+        "name": "Entry"
+      },
+      {
+        "type": "Parameter",
+        "name": "Minimum count"
+      },
+      {
+        "type": "Parameter",
+        "name": "Range"
+      },
+      {
+        "type": "Parameter",
         "name": "Cooldown"
       }
     ],
@@ -2578,6 +2886,152 @@
       "Gameobject"
     ],
     "is_timed": true,
-    "description": "When {pram1value:choose(0|1):no players|at most 1 player|at most {pram1} players} within {pram2} yd nearby {pram4value:choose(0):(once)|(cooldown {pram4} seconds)}"
+    "description": "When {pram3value:choose(0|1):any {pram1}|at least 1 {pram1}|at least {pram3} {pram1}s} with entry {pram2} within {pram4} yd nearby {pram5value:choose(0):(once)|(cooldown {pram5} seconds)}",
+    "invoker": {
+      "name": "Found unit",
+      "types": [
+        "Creature",
+        "Player"
+      ]
+    }
+  },
+  {
+    "id": 104,
+    "name": "SMART_EVENT_NEAR_UNIT_NEGATION_AC",
+    "name_readable": "When at most x units nearby",
+    "tags": [
+      "Azeroth"
+    ],
+    "parameters": [
+      {
+        "type": "SwitchParameter",
+        "name": "Type",
+        "values": {
+          "0": {"name": "Creature"},
+          "1": {"name": "Gameobject"}
+        }
+      },
+      {
+        "type": "Parameter",
+        "name": "Entry"
+      },
+      {
+        "type": "Parameter",
+        "name": "Minimum count"
+      },
+      {
+        "type": "Parameter",
+        "name": "Range"
+      },
+      {
+        "type": "Parameter",
+        "name": "Cooldown"
+      }
+    ],
+    "usable_with_script_types": [
+      "Creature",
+      "Gameobject"
+    ],
+    "is_timed": true,
+    "description": "When {pram3value:choose(0|1):no {pram1}s|at most 1 {pram1}|at most {pram3} {pram1}s} with entry {pram2} within {pram4} yd nearby {pram5value:choose(0):(once)|(cooldown {pram5} seconds)}",
+    "invoker": {
+      "name": "Found unit",
+      "types": [
+        "Creature",
+        "Player"
+      ]
+    }
+  },
+  {
+    "id": 105,
+    "name": "SMART_EVENT_AREA_CASTING_AC",
+    "name_readable": "Area casting",
+    "tags": [
+      "Azeroth"
+    ],
+    "parameters": [
+      {
+        "type": "Parameter",
+        "name": "Initial cooldown min"
+      },
+      {
+        "type": "Parameter",
+        "name": "Initial cooldown max"
+      },
+      {
+        "type": "FloatParameter",
+        "name": "Cooldown min"
+      },
+      {
+        "type": "FloatParameter",
+        "name": "Cooldown max"
+      },
+      {
+        "type": "Parameter",
+        "name": "Range min"
+      },
+      {
+        "type": "Parameter",
+        "name": "Range max"
+      }
+    ],
+    "usable_with_script_types": [
+      "Creature"
+    ],
+    "is_timed": true,
+    "description": "When victim within {pram5}-{pram6} yd casting",
+    "invoker": {
+      "name": "Victim",
+      "types": [
+        "Creature",
+        "Player"
+      ]
+    }
+  },
+  {
+    "id": 106,
+    "name": "SMART_EVENT_AREA_RANGE_AC",
+    "name_readable": "Area range",
+    "tags": [
+      "Azeroth"
+    ],
+    "parameters": [
+      {
+        "type": "Parameter",
+        "name": "Initial cooldown min"
+      },
+      {
+        "type": "Parameter",
+        "name": "Initial cooldown max"
+      },
+      {
+        "type": "FloatParameter",
+        "name": "Cooldown min"
+      },
+      {
+        "type": "FloatParameter",
+        "name": "Cooldown max"
+      },
+      {
+        "type": "Parameter",
+        "name": "Range min"
+      },
+      {
+        "type": "Parameter",
+        "name": "Range max"
+      }
+    ],
+    "usable_with_script_types": [
+      "Creature"
+    ],
+    "is_timed": true,
+    "description": "When victim within {pram5}-{pram6} yd",
+    "invoker": {
+      "name": "Victim",
+      "types": [
+        "Creature",
+        "Player"
+      ]
+    }
   }
 ]

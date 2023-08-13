@@ -23,4 +23,5 @@ public class TrinityMasterDatabase : BaseTrinityDatabase
     public ITable<MySqlEventScriptLine> EventScripts => GetTable<MySqlEventScriptLine>();
     public ITable<MySqlWaypointScriptLine> WaypointScripts => GetTable<MySqlWaypointScriptLine>();
     public ITable<MySqlSpellScriptLine> SpellScripts => GetTable<MySqlSpellScriptLine>();
+    public ITable<MySqlSmartScriptLine> SmartScript => GetTable<MySqlSmartScriptLine>();
 }

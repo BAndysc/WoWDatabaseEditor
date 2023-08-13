@@ -260,6 +260,16 @@
           "value_type": "float"
         },
         {
+          "name": "Swim speed",
+          "db_column_name": "speed_swim",
+          "value_type": "float"
+        },
+        {
+          "name": "Flight speed",
+          "db_column_name": "speed_flight",
+          "value_type": "float"
+        },
+        {
           "name": "Movement type",
           "db_column_name": "MovementType",
           "value_type": "uint"
@@ -309,6 +319,11 @@
     {
       "group_name": "Combat",
       "fields": [
+        {
+          "name": "Detection range",
+          "db_column_name": "detection_range",
+          "value_type": "float"
+        },
         {
           "name": "Damage school",
           "db_column_name": "dmgschool",
@@ -362,6 +377,11 @@
         {
           "name": "Damage mod",
           "db_column_name": "DamageModifier",
+          "value_type": "float"
+        },
+        {
+          "name": "Experience mod",
+          "db_column_name": "ExperienceModifier",
           "value_type": "float"
         },
         {

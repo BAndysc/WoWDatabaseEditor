@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using LinqKit;
 using LinqToDB;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;
@@ -394,5 +395,62 @@ public class TrinityMasterMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvid
         var spells = await model.SpellScripts.Where(GenerateWhereConditionsForEventScript<MySqlSpellScriptLine>(conditions)).ToListAsync<IEventScriptLine>();
         var waypoints = await model.WaypointScripts.Where(GenerateWhereConditionsForEventScript<MySqlWaypointScriptLine>(conditions)).ToListAsync<IEventScriptLine>();
         return events.Concat(spells).Concat(waypoints).ToList();
+    }
+    
+    public override IEnumerable<ISmartScriptLine> GetScriptFor(uint entry, int entryOrGuid, SmartScriptType type)
+    {
+        using var model = Database();
+        return model.SmartScript.Where(line => line.EntryOrGuid == entryOrGuid && line.ScriptSourceType == (int) type).ToList();
+    }
+    
+    public override async Task<IList<ISmartScriptLine>> GetScriptForAsync(uint entry, int entryOrGuid, SmartScriptType type)
+    {
+        await using var model = Database();
+        return await model.SmartScript.Where(line => line.EntryOrGuid == entryOrGuid && line.ScriptSourceType == (int) type).ToListAsync<ISmartScriptLine>();
+    }
+
+    public override async Task<IList<ISmartScriptLine>> FindSmartScriptLinesBy(IEnumerable<(IDatabaseProvider.SmartLinePropertyType what, int whatValue, int parameterIndex, long valueToSearch)> conditions)
+    {
+        await using var model = Database();
+        var predicate = PredicateBuilder.New<MySqlSmartScriptLine>();
+        foreach (var value in conditions)
+        {
+            if (value.what == IDatabaseProvider.SmartLinePropertyType.Action)
+            {
+                if (value.parameterIndex == 1)
+                    predicate = predicate.Or(o => o.ActionType == value.whatValue && o.ActionParam1 == value.valueToSearch);
+                else if (value.parameterIndex == 2)
+                    predicate = predicate.Or(o => o.ActionType == value.whatValue && o.ActionParam2 == value.valueToSearch);
+                else if (value.parameterIndex == 3)
+                    predicate = predicate.Or(o => o.ActionType == value.whatValue && o.ActionParam3 == value.valueToSearch);
+                else if (value.parameterIndex == 4)
+                    predicate = predicate.Or(o => o.ActionType == value.whatValue && o.ActionParam4 == value.valueToSearch);
+                else if (value.parameterIndex == 5)
+                    predicate = predicate.Or(o => o.ActionType == value.whatValue && o.ActionParam5 == value.valueToSearch);
+                else if (value.parameterIndex == 6)
+                    predicate = predicate.Or(o => o.ActionType == value.whatValue && o.ActionParam6 == value.valueToSearch);
+            }
+            else if (value.what == IDatabaseProvider.SmartLinePropertyType.Event)
+            {
+                if (value.parameterIndex == 1)
+                    predicate = predicate.Or(o => o.EventType == value.whatValue && o.EventParam1 == value.valueToSearch);
+                else if (value.parameterIndex == 2)
+                    predicate = predicate.Or(o => o.EventType == value.whatValue && o.EventParam2 == value.valueToSearch);
+                else if (value.parameterIndex == 3)
+                    predicate = predicate.Or(o => o.EventType == value.whatValue && o.EventParam3 == value.valueToSearch);
+                else if (value.parameterIndex == 4)
+                    predicate = predicate.Or(o => o.EventType == value.whatValue && o.EventParam4 == value.valueToSearch);
+            }
+            else if (value.what == IDatabaseProvider.SmartLinePropertyType.Target)
+            {
+                if (value.parameterIndex == 1)
+                    predicate = predicate.Or(o => o.TargetType == value.whatValue && o.TargetParam1 == value.valueToSearch);
+                else if (value.parameterIndex == 2)
+                    predicate = predicate.Or(o => o.TargetType == value.whatValue && o.TargetParam2 == value.valueToSearch);
+                else if (value.parameterIndex == 3)
+                    predicate = predicate.Or(o => o.TargetType == value.whatValue && o.TargetParam3 == value.valueToSearch);
+            }
+        }
+        return await model.SmartScript.Where(predicate).ToListAsync<ISmartScriptLine>();    
     }
 }

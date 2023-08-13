@@ -23,4 +23,5 @@ public class TrinityCataDatabase : BaseTrinityDatabase
     public ITable<MySqlEventScriptNoCommentLine> EventScripts => GetTable<MySqlEventScriptNoCommentLine>();
     public ITable<MySqlWaypointScriptNoCommentLine> WaypointScripts => GetTable<MySqlWaypointScriptNoCommentLine>();
     public ITable<MySqlSpellScriptNoCommentLine> SpellScripts => GetTable<MySqlSpellScriptNoCommentLine>();
+    public ITable<MySqlSmartScriptLine> SmartScript => GetTable<MySqlSmartScriptLine>();
 }

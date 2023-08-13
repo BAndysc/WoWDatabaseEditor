@@ -19,4 +19,5 @@ public class AzerothDatabase : BaseTrinityDatabase
     public ITable<MySqlEventScriptNoCommentLine> EventScripts => GetTable<MySqlEventScriptNoCommentLine>();
     public ITable<MySqlWaypointScriptNoCommentLine> WaypointScripts => GetTable<MySqlWaypointScriptNoCommentLine>();
     public ITable<MySqlSpellScriptNoCommentLine> SpellScripts => GetTable<MySqlSpellScriptNoCommentLine>();
+    public ITable<AzerothMySqlSmartScriptLine> SmartScript => GetTable<AzerothMySqlSmartScriptLine>();
 }

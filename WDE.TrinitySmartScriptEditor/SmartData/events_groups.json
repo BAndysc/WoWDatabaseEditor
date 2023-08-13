@@ -60,6 +60,7 @@
             "SMART_EVENT_TARGET_BUFFED",
             "SMART_EVENT_VICTIM_CASTING",
             "SMART_EVENT_FRIENDLY_MISSING_BUFF",
+            "SMART_EVENT_FRIENDLY_MISSING_BUFF_AC",
             "SMART_EVENT_DUMMY_EFFECT",
             "SMART_EVENT_ON_SPELL_START",
             "SMART_EVENT_ON_SPELL_FAILED",
@@ -102,8 +103,11 @@
         "name": "Line of sight",
         "group_members": [
             "SMART_EVENT_RANGE",
+            "SMART_EVENT_RANGE_AC",
             "SMART_EVENT_OOC_LOS",
-            "SMART_EVENT_IC_LOS"
+            "SMART_EVENT_IC_LOS",
+            "SMART_EVENT_OOC_LOS_AC",
+            "SMART_EVENT_IC_LOS_AC"
         ]
     },
     {
@@ -146,7 +150,11 @@
             "SMART_EVENT_DISTANCE_GAMEOBJECT",
             "SMART_EVENT_IS_BEHIND_TARGET",
             "SMART_EVENT_NEAR_PLAYERS_AC",
-            "SMART_EVENT_NEAR_PLAYERS_NEGATION_AC"
+            "SMART_EVENT_NEAR_PLAYERS_NEGATION_AC",
+            "SMART_EVENT_NEAR_UNIT_AC",
+            "SMART_EVENT_NEAR_UNIT_NEGATION_AC",
+            "SMART_EVENT_AREA_CASTING_AC",
+            "SMART_EVENT_AREA_RANGE_AC"
         ]
     },
     {
@@ -158,6 +166,7 @@
             "SMART_EVENT_TARGET_HEALTH_PCT",
             "SMART_EVENT_FRIENDLY_HEALTH",
             "SMART_EVENT_FRIENDLY_HEALTH_PCT",
+            "SMART_EVENT_FRIENDLY_HEALTH_PCT_AC",
             "SMART_EVENT_FRIENDLY_HEALTH_PCT_TC_CATA",
             "SMART_EVENT_TARGET_MANA_PCT"
         ]

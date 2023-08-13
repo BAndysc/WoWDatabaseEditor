@@ -514,6 +514,11 @@
           "help": "Money earned by completing the quest (if value > 0) or money requirement to complete the quest (if value < 0)."
         },
         {
+          "name": "Reward money difficulty",
+          "db_column_name": "RewardMoneyDifficulty",
+          "value_type": "MoneyParameter"
+        },
+        {
           "name": "Reward bonus money",
           "db_column_name": "RewardBonusMoney",
           "value_type": "MoneyParameter",

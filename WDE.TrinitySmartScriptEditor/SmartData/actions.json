@@ -231,11 +231,11 @@
         ],
         "description_rules": [
             {
-                "description": "{source}: Cast spell {pram1}{pram2value:choose(0):| with flags {pram2}} on {target}{pram3value:choose(0):| with {pram3} trigger flags}{pram4value:choose(0|1):| (limit to {pram4} target)| (limit to {pram4} targets)}",
+                "description": "{source}: Cast spell [spell={pram1value}] {pram1}{pram2value:choose(0):| with flags {pram2}} on {target}{pram3value:choose(0):| with {pram3} trigger flags}{pram4value:choose(0|1):| (limit to {pram4} target)| (limit to {pram4} targets)}",
                 "condition": "(action.param(2) & 2) == 2"
             }
         ],
-        "description": "{source}: Cast spell {pram1}{pram2value:choose(0):| with flags {pram2}} on {target}{pram4value:choose(0|1):| (limit to {pram4} target)| (limit to {pram4} targets)}",
+        "description": "{source}: Cast spell [spell={pram1value}] {pram1}{pram2value:choose(0):| with flags {pram2}} on {target}{pram4value:choose(0|1):| (limit to {pram4} target)| (limit to {pram4} targets)}",
         "name_readable": "Cast",
         "target_types": ["Player", "Creature"],
         "target_is_source": false,
@@ -709,7 +709,7 @@
                 "name": "Only owned auras"
             }
         ],
-        "description": "{source}: {pram1value:choose(0):Remove all auras|Remove{pram2value:choose(0):| {pram2} charges of} aura due to spell {pram1}}",
+        "description": "{source}: {pram1value:choose(0):Remove all auras|Remove{pram2value:choose(0):| {pram2} charges of} aura due to spell [spell={pram1value}] {pram1}}",
         "name_readable": "Remove aura",
         "target_types": ["Creature", "Player"],
         "target_is_source": true
@@ -1835,7 +1835,7 @@
                 "required": true
             }
         ],
-        "description": "{source}: Add aura {pram1}",
+        "description": "{source}: Add aura [spell={pram1value}] {pram1}",
         "name_readable": "Add aura",
         "target_types": ["Creature", "Player"],
         "target_is_source": true
@@ -1851,7 +1851,7 @@
                 "required": true
             }
         ],
-        "description": "{source}: Add aura {pram1}",
+        "description": "{source}: Add aura [spell={pram1value}] {pram1}",
         "name_readable": "Add aura",
         "target_types": ["Creature", "Player"],
         "target_is_source": true
@@ -2009,7 +2009,7 @@
         ],
         "description_rules": [
             {
-                "description": "{pram4value:choose(0):|Random {pram4} }{source}: Cast spell {pram1}{pram2value:choose(0):| with flags {pram2}} on self{pram3value:choose(0):| with {pram3} trigger flags}",
+                "description": "{pram4value:choose(0):|Random {pram4} }{source}: Cast spell [spell={pram1value}] {pram1}{pram2value:choose(0):| with flags {pram2}} on self{pram3value:choose(0):| with {pram3} trigger flags}",
                 "condition": "(action.param(2) & 2) == 2"
             }
         ],
@@ -2033,7 +2033,7 @@
                 "name": "Cast Flags"
             }
         ],
-        "description": "{source}: Cast spell {pram1}{pram2value:choose(0):| with flags {pram2}} at {target}",
+        "description": "{source}: Cast spell [spell={pram1value}] {pram1}{pram2value:choose(0):| with flags {pram2}} at {target}",
         "name_readable": "Cross cast",
         "target_types": ["Creature", "Player"],
         "sources": ["Creature", "Player", "GameObject"],
@@ -2213,7 +2213,7 @@
                 "name": "Instant"
             }
         ],
-        "description": "{source}: Interrupt {pram2value:choose(0):any |}casted spell{pram2value:choose(0):| {pram2}}",
+        "description": "{source}: Interrupt {pram2value:choose(0):any |}casted spell{pram2value:choose(0):| [spell={pram2value}] {pram2}}",
         "name_readable": "Interrupt spell",
         "target_types": ["Creature", "Player"],
         "target_is_source": true
@@ -3067,7 +3067,7 @@
         ],
         "description_rules": [
             {
-                "description": "{source}: Cast spell {pram1}{pram2value:choose(0):| with flags {pram2}} on {target}{pram3value:choose(0):| with {pram3} trigger flags}{pram4value:choose(0|1):| (limit to {pram4} target)| (limit to {pram4} targets)}",
+                "description": "{source}: Cast spell [spell={pram1value}] {pram1}{pram2value:choose(0):| with flags {pram2}} on {target}{pram3value:choose(0):| with {pram3} trigger flags}{pram4value:choose(0|1):| (limit to {pram4} target)| (limit to {pram4} targets)}",
                 "condition": "(action.param(2) & 2) == 2"
             }
         ],
@@ -3511,7 +3511,7 @@
                 "name": "Value"
             }
         ],
-        "description": "{source}: Apply immunity {pram1} to {pram3}{pram2value:choose(0):| with spell id {pram2}}",
+        "description": "{source}: Apply immunity {pram1} to {pram3}{pram2value:choose(0):| with spell [spell={pram2value}] {pram2}}",
         "name_readable": "Apply immunity",
         "target_types": ["Creature", "Player"],
         "target_is_source": true
@@ -3534,7 +3534,7 @@
                 "name": "Value"
             }
         ],
-        "description": "{source}: Remove immunity {pram1} value {pram3}{pram2value:choose(0):| with spell id {pram2}}",
+        "description": "{source}: Remove immunity {pram1} value {pram3}{pram2value:choose(0):| with spell [spell={pram2value}] {pram2}}",
         "name_readable": "Remove immunity",
         "target_types": ["Creature", "Player"],
         "target_is_source": true
@@ -3704,7 +3704,7 @@
                 "name": "Base points 2"
             }
         ],
-        "description": "{source}: Cast spell {pram1} with flags {pram2} on {target} with custom values:{pram3value:choose(0):| base points 0: {pram3}}{pram4value:choose(0):|, base points 1: {pram4}}{pram5value:choose(0):|, base points 2: {pram5}}",
+        "description": "{source}: Cast spell [spell={pram1value}] {pram1} with flags {pram2} on {target} with custom values:{pram3value:choose(0):| base points 0: {pram3}}{pram4value:choose(0):|, base points 1: {pram4}}{pram5value:choose(0):|, base points 2: {pram5}}",
         "name_readable": "Cast custom spell",
         "target_types": ["Creature", "Player"],
         "target_is_source": false,

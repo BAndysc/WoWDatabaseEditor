@@ -14,7 +14,6 @@ namespace WDE.TrinityMySqlDatabase.Models
         }
 
         public ITable<MySqlAreaTriggerScript> AreaTriggerScript => GetTable<MySqlAreaTriggerScript>();
-        public ITable<MySqlSmartScriptLine> SmartScript => GetTable<MySqlSmartScriptLine>();
         public ITable<MySqlGameObjectTemplate> GameObjectTemplate => GetTable<MySqlGameObjectTemplate>();
         public ITable<MySqlQuestTemplate> QuestTemplate => GetTable<MySqlQuestTemplate>();
         public ITable<MySqlQuestRequestItem> QuestRequestItems => GetTable<MySqlQuestRequestItem>();
@@ -43,5 +42,6 @@ namespace WDE.TrinityMySqlDatabase.Models
         public ITable<SmartScriptWaypoint> SmartScriptWaypoint => GetTable<SmartScriptWaypoint>();
         public ITable<MySqlSpawnGroupSpawn> SpawnGroupSpawns => GetTable<MySqlSpawnGroupSpawn>();
         public ITable<MySqlSpawnGroupTemplate> SpawnGroupTemplate => GetTable<MySqlSpawnGroupTemplate>();
+        public ITable<MySqlSmartScriptLine> BaseSmartScript => GetTable<MySqlSmartScriptLine>();
     }
 }

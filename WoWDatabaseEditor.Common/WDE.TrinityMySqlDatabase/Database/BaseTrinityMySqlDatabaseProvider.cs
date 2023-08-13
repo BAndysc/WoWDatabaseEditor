@@ -60,18 +60,29 @@ namespace WDE.TrinityMySqlDatabase.Database
         public async Task<IList<ISmartScriptLine>> GetLinesCallingSmartTimedActionList(int timedActionList)
         {
             await using var model = Database();
-            return await model.SmartScript.Where(line =>
+            return await model.BaseSmartScript.Where(line =>
                     (line.ActionType == 80 && line.ActionParam1 == timedActionList) ||
                     (line.ActionType == 88 && timedActionList >= line.ActionParam1 && timedActionList <= line.ActionParam2) ||
                    (line.ActionType == 87 && (line.ActionParam1 == timedActionList || line.ActionParam2 == timedActionList || line.ActionParam3 == timedActionList || line.ActionParam4 == timedActionList || line.ActionParam5 == timedActionList || line.ActionParam6 == timedActionList)))
                 .ToListAsync<ISmartScriptLine>();
         }
 
-        public IEnumerable<ISmartScriptLine> GetScriptFor(uint entry, int entryOrGuid, SmartScriptType type)
+        public async Task<IReadOnlyList<int>> GetSmartScriptEntriesByType(SmartScriptType scriptType)
         {
-            using var model = Database();
-            return model.SmartScript.Where(line => line.EntryOrGuid == entryOrGuid && line.ScriptSourceType == (int) type).ToList();
+            var type = (int)scriptType;
+            await using var model = Database();
+            return await model.BaseSmartScript
+                .Where(t => t.ScriptSourceType == type)
+                .GroupBy(t => t.EntryOrGuid, t => t.EntryOrGuid)
+                .Select(t => t.Key)
+                .ToListAsync();
         }
+
+        public abstract IEnumerable<ISmartScriptLine> GetScriptFor(uint entry, int entryOrGuid, SmartScriptType type);
+
+        public abstract Task<IList<ISmartScriptLine>> GetScriptForAsync(uint entry, int entryOrGuid, SmartScriptType type);
+
+        public abstract Task<IList<ISmartScriptLine>> FindSmartScriptLinesBy(IEnumerable<(IDatabaseProvider.SmartLinePropertyType what, int whatValue, int parameterIndex, long valueToSearch)> conditions);
         
         public async Task<IQuestRequestItem?> GetQuestRequestItem(uint entry)
         {
@@ -242,12 +253,6 @@ namespace WDE.TrinityMySqlDatabase.Database
 
         public abstract Task<List<IBroadcastText>> GetBroadcastTextsAsync();
         
-        public async Task<IList<ISmartScriptLine>> GetScriptForAsync(uint entry, int entryOrGuid, SmartScriptType type)
-        {
-            await using var model = Database();
-            return await model.SmartScript.Where(line => line.EntryOrGuid == entryOrGuid && line.ScriptSourceType == (int) type).ToListAsync<ISmartScriptLine>();
-        }
-
         public IEnumerable<ICreatureClassLevelStat> GetCreatureClassLevelStats()
         {
             if (currentCoreVersion.Current.DatabaseFeatures.UnsupportedTables.Contains(typeof(ICreatureClassLevelStat)))
@@ -376,17 +381,6 @@ namespace WDE.TrinityMySqlDatabase.Database
             return await model.Conditions.Where(predicate).ToListAsync<IConditionLine>();
         }
         
-        public async Task<IReadOnlyList<int>> GetSmartScriptEntriesByType(SmartScriptType scriptType)
-        {
-            var type = (int)scriptType;
-            await using var model = Database();
-            return await model.SmartScript
-                .Where(t => t.ScriptSourceType == type)
-                .GroupBy(t => t.EntryOrGuid, t => t.EntryOrGuid)
-                .Select(t => t.Key)
-                .ToListAsync();
-        }
-
         public virtual async Task<IList<IPlayerChoice>?> GetPlayerChoicesAsync() => null;
 
         public virtual async Task<IList<IPlayerChoiceResponse>?> GetPlayerChoiceResponsesAsync() => null;
@@ -441,51 +435,6 @@ namespace WDE.TrinityMySqlDatabase.Database
         public abstract Task<IBroadcastText?> GetBroadcastTextByTextAsync(string text);
         public abstract Task<IBroadcastText?> GetBroadcastTextByIdAsync(uint id);
 
-        public async Task<IList<ISmartScriptLine>> FindSmartScriptLinesBy(IEnumerable<(IDatabaseProvider.SmartLinePropertyType what, int whatValue, int parameterIndex, long valueToSearch)> conditions)
-        {
-            await using var model = Database();
-            var predicate = PredicateBuilder.New<MySqlSmartScriptLine>();
-            foreach (var value in conditions)
-            {
-                if (value.what == IDatabaseProvider.SmartLinePropertyType.Action)
-                {
-                    if (value.parameterIndex == 1)
-                        predicate = predicate.Or(o => o.ActionType == value.whatValue && o.ActionParam1 == value.valueToSearch);
-                    else if (value.parameterIndex == 2)
-                        predicate = predicate.Or(o => o.ActionType == value.whatValue && o.ActionParam2 == value.valueToSearch);
-                    else if (value.parameterIndex == 3)
-                        predicate = predicate.Or(o => o.ActionType == value.whatValue && o.ActionParam3 == value.valueToSearch);
-                    else if (value.parameterIndex == 4)
-                        predicate = predicate.Or(o => o.ActionType == value.whatValue && o.ActionParam4 == value.valueToSearch);
-                    else if (value.parameterIndex == 5)
-                        predicate = predicate.Or(o => o.ActionType == value.whatValue && o.ActionParam5 == value.valueToSearch);
-                    else if (value.parameterIndex == 6)
-                        predicate = predicate.Or(o => o.ActionType == value.whatValue && o.ActionParam6 == value.valueToSearch);
-                }
-                else if (value.what == IDatabaseProvider.SmartLinePropertyType.Event)
-                {
-                    if (value.parameterIndex == 1)
-                        predicate = predicate.Or(o => o.EventType == value.whatValue && o.EventParam1 == value.valueToSearch);
-                    else if (value.parameterIndex == 2)
-                        predicate = predicate.Or(o => o.EventType == value.whatValue && o.EventParam2 == value.valueToSearch);
-                    else if (value.parameterIndex == 3)
-                        predicate = predicate.Or(o => o.EventType == value.whatValue && o.EventParam3 == value.valueToSearch);
-                    else if (value.parameterIndex == 4)
-                        predicate = predicate.Or(o => o.EventType == value.whatValue && o.EventParam4 == value.valueToSearch);
-                }
-                else if (value.what == IDatabaseProvider.SmartLinePropertyType.Target)
-                {
-                    if (value.parameterIndex == 1)
-                        predicate = predicate.Or(o => o.TargetType == value.whatValue && o.TargetParam1 == value.valueToSearch);
-                    else if (value.parameterIndex == 2)
-                        predicate = predicate.Or(o => o.TargetType == value.whatValue && o.TargetParam2 == value.valueToSearch);
-                    else if (value.parameterIndex == 3)
-                        predicate = predicate.Or(o => o.TargetType == value.whatValue && o.TargetParam3 == value.valueToSearch);
-                }
-            }
-            return await model.SmartScript.Where(predicate).ToListAsync<ISmartScriptLine>();    
-        }
-        
         public virtual Task<IList<IItem>?> GetItemTemplatesAsync() => Task.FromResult<IList<IItem>?>(null);
 
         protected ExpressionStarter<T> GenerateWhereConditionsForEventScript<T>(IEnumerable<(uint command, int dataIndex, long valueToSearch)> conditions) where T : IEventScriptLine
