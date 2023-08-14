@@ -1,0 +1,66 @@
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
+using Avalonia.Data;
+using Avalonia.Metadata;
+
+namespace WDE.Common.Avalonia.Controls;
+
+public class NullableTextBox : TemplatedControl
+{
+    private string lastNonNullText = "";
+    
+    public static readonly StyledProperty<string?> TextProperty =
+        AvaloniaProperty.Register<NullableTextBox, string?>("Text", null, false, BindingMode.TwoWay);
+
+    public static readonly StyledProperty<bool> IsNotNullProperty = AvaloniaProperty.Register<NullableTextBox, bool>("IsNull");
+
+    static NullableTextBox()
+    {
+        TextProperty.Changed.AddClassHandler<NullableTextBox>((x, _) => x.UpdateIsNull());
+        IsNotNullProperty.Changed.AddClassHandler<NullableTextBox>((x, _) => x.UpdateText());
+    }
+
+    private bool inEvent = false;
+    
+    private void UpdateText()
+    {
+        if (inEvent)
+            return;
+        
+        inEvent = true;
+        if (IsNotNull && Text == null)
+        {
+            Text = lastNonNullText;
+        }
+        else if (!IsNotNull)
+        {
+            lastNonNullText = Text ?? "";
+            Text = null;
+        }
+        inEvent = false;
+    }
+
+    private void UpdateIsNull()
+    {
+        if (inEvent)
+            return;
+        
+        inEvent = true;
+        IsNotNull = Text != null;
+        inEvent = false;
+    }
+
+    [Content]
+    public string? Text
+    {
+        get => GetValue(TextProperty);
+        set => SetValue(TextProperty, value);
+    }
+
+    public bool IsNotNull
+    {
+        get => GetValue(IsNotNullProperty);
+        set => SetValue(IsNotNullProperty, value);
+    }
+}

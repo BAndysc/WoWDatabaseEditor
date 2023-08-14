@@ -76,6 +76,9 @@ public partial class VeryFastTableView : Panel, IKeyboardNavigationHandler, IFas
             var list = e.NewValue as IReadOnlyList<ITableColumnHeader>;
             while (list != null && view.columnVisibility.Count < list.Count)
                 view.columnVisibility.Add(true);
+            view.InvalidateVisual();
+            view.InvalidateMeasure();
+            view.InvalidateArrange();
         });
         SelectedRowIndexProperty.Changed.AddClassHandler<VeryFastTableView>((view, e) =>
         {
@@ -238,6 +241,8 @@ public partial class VeryFastTableView : Panel, IKeyboardNavigationHandler, IFas
     protected override void OnPointerLeave(PointerEventArgs e)
     {
         Cursor = Cursor.Default;
+        lastMouseLocation = new Point(-1, -1);
+        InvalidateVisual();
         base.OnPointerLeave(e);
     }
 
@@ -268,7 +273,7 @@ public partial class VeryFastTableView : Panel, IKeyboardNavigationHandler, IFas
             InvalidateVisual();
     }
 
-    private Point lastMouseLocation;
+    private Point lastMouseLocation = new Point(-1, -1);
     private bool lastMouseButtonPressed;
     private int? currentlyResizedColumn = null;
     private double resizingColumnStartWidth = 0;

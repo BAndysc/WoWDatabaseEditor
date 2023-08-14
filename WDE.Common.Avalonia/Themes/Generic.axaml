@@ -122,4 +122,15 @@
             </ControlTemplate>
         </Setter>
     </Style>
+    
+    <Style Selector="controls|NullableTextBox">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <DockPanel>
+                    <CheckBox ToolTip.Tip="Is null?" IsChecked="{TemplateBinding IsNotNull, Mode=TwoWay}" DockPanel.Dock="Left" />
+                    <TextBox Text="{TemplateBinding Text, Mode=TwoWay}" IsEnabled="{TemplateBinding IsNotNull}" />
+                </DockPanel>
+            </ControlTemplate>
+        </Setter>
+    </Style>
 </Styles>

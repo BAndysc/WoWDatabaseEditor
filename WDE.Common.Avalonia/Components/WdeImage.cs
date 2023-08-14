@@ -68,6 +68,8 @@ namespace WDE.Common.Avalonia.Components
         
         private static Bitmap? LoadBitmapImpl(ImageUri img)
         {
+            if (img.Uri == null)
+                return null;
             string uri = img.Uri;
             if (SystemTheme.EffectiveThemeIsDark)
             {

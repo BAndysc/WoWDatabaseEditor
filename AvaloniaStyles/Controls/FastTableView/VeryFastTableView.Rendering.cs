@@ -161,7 +161,7 @@ public partial class VeryFastTableView
                         foreach (var cell in row.CellsList)
                         {
                             if (cellIndex >= columnWidths.Length)
-                                return;
+                                continue;
                             
                             if (!IsColumnVisible(cellIndex))
                             {

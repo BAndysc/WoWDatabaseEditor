@@ -183,7 +183,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
                     popup.Width = viewModel.DesiredWidth;
                     popup.DataContext = viewModel;
                     var pres = new ContentPresenter();
-                    ViewBind.SetModel(pres, viewModel);
+                    pres.Content = viewModel;
                     popup.Child = new Border(){Child = pres, Background = Brushes.White, BorderThickness = new Thickness(1), BorderBrush = Brushes.DarkGray};
                     viewModel.CloseCancel += () =>
                     {
