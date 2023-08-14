@@ -173,6 +173,7 @@ internal class LegionDbcLoader : BaseDbcLoader
         Load("Scenario.db2", 0, 1, data.ScenarioStore);
         Load("Vignette.db2", 0, 1, data.VignetteStore);
         Load("GarrClassSpec.db2", 7, 0, data.GarrisonClassSpecStore);
+        Load("GarrMission.db2", 19, 0, data.GarrisonMissionStore);
         Load("GarrTalent.db2", 7, 0, data.GarrisonTalentStore);
         Load("GarrBuilding.db2", row =>
         {

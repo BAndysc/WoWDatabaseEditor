@@ -60,6 +60,7 @@ public class DbcData
     public Dictionary<long, string> CharSpecializationStore { get; internal set;} = new();
     public Dictionary<long, string> GarrisonClassSpecStore { get; internal set; } = new();
     public Dictionary<long, string> GarrisonBuildingStore { get; internal set; } = new();
+    public Dictionary<long, string> GarrisonMissionStore { get; internal set; } = new();
     public Dictionary<long, string> GarrisonTalentStore { get; internal set; } = new();
     public Dictionary<long, string> DifficultyStore { get; internal set; } = new();
     public Dictionary<long, string> LockTypeStore { get; internal set; } = new();
