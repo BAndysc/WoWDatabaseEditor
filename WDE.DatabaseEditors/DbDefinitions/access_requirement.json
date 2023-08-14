@@ -63,8 +63,7 @@
           "help": "An item that you must have in your inventory to enter the instance. This item can not be in the bank.",
           "db_column_name": "item",
           "value_type": "ItemParameter",
-          "zero_is_blank": true,
-          "preferred_width": 100.0
+          "zero_is_blank": true
         },
         {
           "name": "Item 2",

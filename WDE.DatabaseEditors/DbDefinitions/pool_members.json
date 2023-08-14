@@ -26,8 +26,7 @@
         {
           "name": "Spawn Id",
           "db_column_name": "spawnId",
-          "value_type": "PoolMemberSpawnIdParameter",
-          "preferred_width": 100.0
+          "value_type": "PoolMemberSpawnIdParameter"
         },
         {
           "name": "Type",

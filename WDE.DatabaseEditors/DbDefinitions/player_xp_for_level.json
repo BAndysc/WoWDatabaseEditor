@@ -29,8 +29,7 @@
         {
           "name": "Experience",
           "db_column_name": "Experience",
-          "value_type": "uint",
-          "preferred_width": 100.0
+          "value_type": "uint"
         }
       ]
     }

@@ -62,8 +62,7 @@
         {
           "name": "Holiday Stage",
           "db_column_name": "holidayStage",
-          "value_type": "uint",
-          "preferred_width": 100.0
+          "value_type": "uint"
         },
         {
           "name": "Description",

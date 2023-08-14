@@ -64,8 +64,7 @@
         {
           "name": "Alliance Start Orientation",
           "db_column_name": "AllianceStartO",
-          "value_type": "float",
-          "preferred_width": 100.0
+          "value_type": "float"
         },
         {
           "name": "Horde Start Loc",
