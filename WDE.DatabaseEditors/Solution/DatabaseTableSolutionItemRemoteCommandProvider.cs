@@ -36,7 +36,7 @@ namespace WDE.DatabaseEditors.Solution
             var split = definition.ReloadCommand.Split(',');
 
             var priority = 0;
-            foreach (var cmd in split)
+            foreach (var cmd in split.Select(x => x.Trim()))
             {
                 if (cmd.Contains("{}"))
                 {
