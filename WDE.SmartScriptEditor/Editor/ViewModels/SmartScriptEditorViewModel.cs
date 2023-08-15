@@ -858,9 +858,6 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                                 smartAction.Comment = smartLine.Comment.Contains(" // ")
                                     ? smartLine.Comment.Substring(smartLine.Comment.IndexOf(" // ") + 4).Trim()
                                     : "";
-                                Events[eventIndex.Value].Actions.Insert(actionIndex!.Value, smartAction);
-                                smartAction.IsSelected = true;
-                                actionIndex++;
 
                                 if (smartLine.SourceConditionId > 0 &&
                                     targetConditions != null &&
@@ -871,6 +868,10 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                                     targetConditions != null &&
                                     targetConditions.TryGetValue(smartLine.TargetConditionId, out var sourceConditionsTarget))
                                     smartAction.Target.Conditions = sourceConditionsTarget;
+                                
+                                Events[eventIndex.Value].Actions.Insert(actionIndex!.Value, smartAction);
+                                smartAction.IsSelected = true;
+                                actionIndex++;
                             }
                         }
                     }
