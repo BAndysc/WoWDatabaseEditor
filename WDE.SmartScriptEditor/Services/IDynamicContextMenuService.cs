@@ -76,7 +76,7 @@ public class DynamicContextMenuService : IDynamicContextMenuService
                 INamedCommand<SmartScriptEditorViewModel> command;
                 if (menuItem.Command is SmartContextMenuCommand.AddEvent or SmartContextMenuCommand.AddEventIfAura)
                 {
-                    shouldShow = action => action.Source.Id <= SmartConstants.SourceSelf;
+                    shouldShow = action => action.Source.Id >= SmartConstants.SourceNone;
 
                     if (menuItem.Command == SmartContextMenuCommand.AddEventIfAura)
                     {
