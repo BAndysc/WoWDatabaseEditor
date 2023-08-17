@@ -20,6 +20,7 @@
     
     <ItemGroup>
       <ProjectReference Include="..\AvaloniaStyles\AvaloniaStyles.csproj" />
+      <ProjectReference Include="..\Modules\WDE.DatabaseDefinitionEditor\WDE.DatabaseDefinitionEditor.csproj" />
       <ProjectReference Include="..\Modules\WDE.EventScriptsEditor\WDE.EventScriptsEditor.csproj" />
       <ProjectReference Include="..\Modules\WDE.PathPreviewTool\WDE.PathPreviewTool.csproj" />
       <ProjectReference Include="..\Modules\WDE.QueryGenerators\WDE.QueryGenerators.csproj" />

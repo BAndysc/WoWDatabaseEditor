@@ -393,6 +393,7 @@ public partial class DefinitionEditorViewModel : ObservableBase
         }
         else
         {
+            File.WriteAllText(definition.Definition.AbsoluteFileName, Serialize(exported));
             ItemsDemo.Add(new DemoItemGroup(tableVm));
             SelectedTable = tableVm;
             UpdateRawDefinition();

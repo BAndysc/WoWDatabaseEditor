@@ -2,6 +2,8 @@ using System.Windows.Input;
 using Prism.Commands;
 using Prism.Mvvm;
 using WDE.Common;
+using WDE.Common.Managers;
+using WDE.Common.Types;
 using WDE.Common.Utils;
 using WDE.Module.Attributes;
 
@@ -10,7 +12,7 @@ using WDE.Module.Attributes;
 namespace WDE.DatabaseDefinitionEditor.ViewModels
 {
     [AutoRegister]
-    public class ToolsViewModel : BindableBase, IConfigurable
+    public class ToolsViewModel : BindableBase, IConfigurable, IWindowViewModel
     {
         public ICommand Save { get; }
         public string Name => "Database table editor";
@@ -49,5 +51,11 @@ namespace WDE.DatabaseDefinitionEditor.ViewModels
                 Definitions.PopulateTables();
             }
         }
+
+        public int DesiredWidth => 1024;
+        public int DesiredHeight => 768;
+        public string Title => "Table definitions editor";
+        public bool Resizeable => true;
+        public ImageUri? Icon => new ImageUri("Icons/icon_edit.png");
     }
 }
