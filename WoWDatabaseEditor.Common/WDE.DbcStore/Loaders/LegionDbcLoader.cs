@@ -40,6 +40,15 @@ internal class LegionDbcLoader : BaseDbcLoader
             };
             data.Areas.Add(entry);
         });
+
+        Load("ConversationLine.db2", row =>
+        {
+            uint Id = row.GetUInt(0);
+            uint BroadcastTextId = row.GetUInt(1);
+           // var broadcastText = await database.GetBroadcastTextByIdAsync(BroadcastTextId); TODO
+            data.ConversationLineStore.Add(Id, BroadcastTextId.ToString());
+        });
+
         Load("Map.db2", row =>
         {
             var map = new MapEntry()

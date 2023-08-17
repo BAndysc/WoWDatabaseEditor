@@ -67,6 +67,7 @@ public class DbcData
     public Dictionary<long, string> VignetteStore { get; internal set; } = new();
     public Dictionary<long, string> AdventureJournalStore { get; internal set; } = new();
     public Dictionary<long, string> WorldMapAreaStore { get; internal set; } = new();
+    public Dictionary<long, string> ConversationLineStore { get; internal set; } = new();
 
     public List<(string parameter, Dictionary<long, SelectOption> options)> parametersToRegister = new();
     public List<AreaEntry> Areas { get; } = new();
