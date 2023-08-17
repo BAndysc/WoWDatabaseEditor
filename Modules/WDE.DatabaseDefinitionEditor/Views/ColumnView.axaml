@@ -1,0 +1,114 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:definitionEditor="clr-namespace:WDE.DatabaseDefinitionEditor.ViewModels.DefinitionEditor"
+             xmlns:views="clr-namespace:WDE.DatabaseDefinitionEditor.Views"
+             xmlns:tools="clr-namespace:WDE.DatabaseDefinitionEditor.ViewModels"
+             xmlns:metaColumns="clr-namespace:WDE.DatabaseDefinitionEditor.ViewModels.DefinitionEditor.MetaColumns"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="WDE.DatabaseDefinitionEditor.Views.ColumnView"
+             x:DataType="definitionEditor:ColumnViewModel">
+    <views:TwoColumnsPanel>
+     
+        <TextBlock ToolTip.Tip="A friendly name displayed for the column">Friendly name:</TextBlock>
+        <TextBox Text="{CompiledBinding Header}" />
+        
+        <TextBlock ToolTip.Tip="The default width for the column. The user can change it later and the user preference will be saved (default = 100 units)">Preferred width:</TextBlock>
+        <TextBox Text="{CompiledBinding IntWidth}" />
+        
+        <TextBlock ToolTip.Tip="The help text displayed in the tooltip when the user hovers over the column header">Help:</TextBlock>
+        <NullableTextBox Text="{CompiledBinding Help}" />
+        
+        <TextBlock ToolTip.Tip="When there is more than one columns for the same database column (yes, you can have two columns in the editor for the same database column, they will share the value, but can use a different parameter), you need to provide an unique id, otherwise the column width will not be saved properly.">Column id for ui:</TextBlock>
+        <NullableTextBox Text="{CompiledBinding ColumnIdForUi}" />
+
+        <TextBlock>Flags:</TextBlock>
+        <CheckBox ToolTip.Tip="When true, the value for this column can't be changed by the user in the editor." IsChecked="{CompiledBinding IsReadOnly}">Read only</CheckBox>
+        
+        <TextBlock xml:space="preserve" ToolTip.Tip="A 'column' in the editor can represent either:
+- an actual database column
+- a button that opens the conditions editor
+- a special button which meaning can be customized (meta column)">Column type:</TextBlock>
+        <ComboBox Items="{x:Static tools:DefinitionEditorStatic.ColumnTypes}" SelectedItem="{CompiledBinding ColumnType}" />
+        
+        <views:TwoColumnsPanel views:TwoColumnsPanel.ColumnSpan="2"
+                               IsVisible="{CompiledBinding IsDatabaseColumnType}">
+            <TextBlock ToolTip.Tip="Name of the column in the database">Database column:</TextBlock>
+            <CompletionComboBox Items="{CompiledBinding DatabaseSourceColumns}" SelectedItem="{CompiledBinding DatabaseColumnName}">
+                <CompletionComboBox.ItemTemplate>
+                    <DataTemplate x:DataType="definitionEditor:DatabaseSourceColumnViewModel">
+                        <DockPanel LastChildFill="False">
+                            <TextBlock Text="{CompiledBinding TableName, StringFormat={}{0}.}" IsVisible="{CompiledBinding IsForeignTable}" Opacity="0.5" />
+                            <TextBlock Text="{CompiledBinding ColumnName}" />
+                            <TextBlock Text="{CompiledBinding TypeName}" DockPanel.Dock="Right" />
+                            <TextBlock Text="(nullable)" Margin="10,0,0,0" IsVisible="{CompiledBinding Nullable}" DockPanel.Dock="Right" />
+                        </DockPanel>
+                    </DataTemplate>
+                </CompletionComboBox.ItemTemplate>
+            </CompletionComboBox>
+
+            <TextBlock ToolTip.Tip="Type of this field. It can be either a simple type (string, int...) or a 'parameter' with options.">Value type or parameter:</TextBlock>
+            <CompletionComboBox Items="{CompiledBinding AllParameters}" SelectedItem="{CompiledBinding ValueType}">
+                <CompletionComboBox.ItemTemplate>
+                    <DataTemplate x:DataType="definitionEditor:ColumnValueTypeViewModel">
+                        <TextBlock Text="{CompiledBinding Name}" />
+                    </DataTemplate>
+                </CompletionComboBox.ItemTemplate>
+            </CompletionComboBox>
+
+            <TextBlock>Flags:</TextBlock>
+            <StackPanel Spacing="5">
+                <CheckBox ToolTip.Tip="If true, this column will be part of the table primary key" IsChecked="{CompiledBinding IsPrimaryKey}">Primary key</CheckBox>
+                <CheckBox ToolTip.Tip="If true, the field can represent a null value" IsChecked="{CompiledBinding CanBeNull}">Can be null</CheckBox>
+                <CheckBox ToolTip.Tip="If true and the field value is '0', it won't be displayed in the editor, for cleaner look" IsChecked="{CompiledBinding IsZeroBlank}">Zero is blank</CheckBox>
+                <CheckBox ToolTip.Tip="If true, upon a row insertion, this column will automatically receive a value of MAX_VALUE + 1. I.e. can be used for `groupId` in `creature_text`" IsChecked="{CompiledBinding IsAutoIncrement}">Auto increment</CheckBox>
+            </StackPanel>
+
+            <TextBlock xml:space="preserve" ToolTip.Tip="If not null, for string columns, a special string depending on this autogen comment will be generated.
+You can use c# like syntax for building the string.
+
+EXAMPLE:
+thisString.entry + ' seat ' + str(this.seat_id) + ': ' + thisString.accessory_entry
+
+This will generate a comment, it will substitute `thisString.COLUMN` with a string representation for the COLUMN and `this.COLUMN` for the literal (i.e. numeric) representation for the column.">Autogenerate comment:</TextBlock>
+            <NullableTextBox FontFamily="Consolas,Menlo,Courier,Courier New" Text="{CompiledBinding AutogenerateComment}" />
+
+            <TextBlock ToolTip.Tip="If not null, it will be used as the default value for new rows in this table. If not set, the default is: NULL if the column is nullable, 0 if the column is numeric, an empty string if the column is a string.">Default value:</TextBlock>
+            <NullableTextBox Text="{CompiledBinding DefaultValue}" />
+
+            <TextBlock ToolTip.Tip="This value will be used for the preview below only.">Preview value:</TextBlock>
+            <Grid ColumnDefinitions="*,5,Auto">
+                <TextBox Text="{CompiledBinding StringValue}" />
+                <Button Grid.Column="2" Command="{CompiledBinding PickParameterCommand}" CommandParameter="{CompiledBinding .}">...</Button>
+            </Grid>
+        </views:TwoColumnsPanel>
+
+        <views:TwoColumnsPanel views:TwoColumnsPanel.ColumnSpan="2" IsVisible="{CompiledBinding IsMetaColumnType}">
+            <TextBlock>Column type:</TextBlock>
+            <ComboBox
+                SelectedItem="{CompiledBinding SelectedMetaColumnType}"
+                Items="{CompiledBinding Parent.Parent.Parent.MetaColumnFactory.Types}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate x:DataType="metaColumns:MetaColumnTypeViewModel">
+                         <DockPanel>
+                             <TextBlock DockPanel.Dock="Top" FontWeight="Bold" Text="{CompiledBinding Name}" />
+                             <TextBlock Text="{CompiledBinding Description}" />
+                         </DockPanel>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+
+            <ContentControl views:TwoColumnsPanel.ColumnSpan="2" Content="{CompiledBinding MetaViewModel}"></ContentControl>
+        </views:TwoColumnsPanel>
+
+        <views:TwoColumnsPanel views:TwoColumnsPanel.ColumnSpan="2" IsVisible="{CompiledBinding IsConditionColumnType}">
+        </views:TwoColumnsPanel>
+        
+        <views:TwoColumnsPanel.Styles>
+            <Style Selector="TextBlock">
+                <Setter Property="VerticalAlignment" Value="Center" />
+            </Style>
+        </views:TwoColumnsPanel.Styles>
+    </views:TwoColumnsPanel>
+</UserControl>

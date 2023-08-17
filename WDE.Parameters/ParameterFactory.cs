@@ -89,6 +89,7 @@ namespace WDE.Parameters
                 pending2.Publish(parameter);
             registration.OnNext(parameter);
             quickAccessRegisteredParameters.Register(quickAccessMode, key, key.Replace("Parameter", "").ToTitleCase());
+            keyRegistration.OnNext(key);
             return parameter;
         }
 
@@ -100,6 +101,7 @@ namespace WDE.Parameters
             if (pendingStringObservables.TryGetValue(key, out var pending2))
                 pending2.Publish(parameter);
             registration.OnNext(parameter);
+            keyRegistration.OnNext(key);
         }
 
         public IEnumerable<string> GetKeys() => data.Keys.Union(parameters.Keys);
@@ -141,8 +143,10 @@ namespace WDE.Parameters
         }
 
         public IObservable<IParameter> OnRegister() => registration;
+        public IObservable<string> OnRegisterKey() => keyRegistration;
 
         private readonly Subject<IParameter> registration = new();
+        private readonly Subject<string> keyRegistration = new();
         private readonly Dictionary<string, OnDemandSingleValuePublisher<IParameter>> pendingObservables = new();
         private readonly Dictionary<string, OnDemandSingleValuePublisher<IParameter<long>>> pendingLongObservables = new();
         private readonly Dictionary<string, OnDemandSingleValuePublisher<IParameter<string>>> pendingStringObservables = new();

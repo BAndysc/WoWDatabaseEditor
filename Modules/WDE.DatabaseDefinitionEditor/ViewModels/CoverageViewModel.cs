@@ -1,19 +1,14 @@
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;
-using WDE.Common.Managers;
-using WDE.Common.Types;
 using WDE.Common.Utils;
 using WDE.DatabaseEditors.Data.Interfaces;
-using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Services;
 using WDE.Module.Attributes;
 
-namespace WDE.DatabaseEditors.Tools;
+namespace WDE.DatabaseDefinitionEditor.ViewModels;
 
 [AutoRegister]
 public class CoverageViewModel

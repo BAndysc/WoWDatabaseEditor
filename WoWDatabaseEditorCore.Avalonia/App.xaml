@@ -6,8 +6,13 @@
              xmlns:controls1="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
              xmlns:components="clr-namespace:WDE.Common.Avalonia.Components;assembly=WDE.Common.Avalonia"
              xmlns:proportionalStackPanel="clr-namespace:Dock.ProportionalStackPanel;assembly=Dock.ProportionalStackPanel"
+             xmlns:avalonia="clr-namespace:WoWDatabaseEditorCore.Avalonia"
              x:Class="WoWDatabaseEditorCore.Avalonia.App"
              Name="WoW Database Editor">
+    <Application.DataTemplates>
+        <avalonia:AvaloniaViewLocator />
+    </Application.DataTemplates>
+
     <Application.Resources>
     <DrawingImage x:Key="StatusBarIconNotice">
         <DrawingImage.Drawing>
@@ -57,6 +62,7 @@
         <StyleInclude Source="avares://WDE.EventAiEditor.Avalonia/Themes/Generic.axaml"/>
         <StyleInclude Source="avares://AvaloniaStyles/Controls/FastTableView/Style.axaml" />
         <StyleInclude Source="avares://Avalonia.Controls.TreeDataGrid/Themes/Fluent.axaml"/>
+        <StyleInclude Source="avares://WDE.DatabaseDefinitionEditor/Themes/Generic.axaml" />
         <Style Selector="ListBox /template/ ItemsPresenter#PART_ItemsPresenter">
             <Setter Property="(KeyboardNavigation.TabNavigation)" Value="Continue" />
         </Style>

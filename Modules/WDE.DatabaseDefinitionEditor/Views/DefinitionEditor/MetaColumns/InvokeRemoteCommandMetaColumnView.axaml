@@ -1,0 +1,17 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:metaColumns="clr-namespace:WDE.DatabaseDefinitionEditor.ViewModels.DefinitionEditor.MetaColumns"
+             xmlns:views="clr-namespace:WDE.DatabaseDefinitionEditor.Views"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="metaColumns:InvokeRemoteCommandMetaColumnViewModel"
+             x:Class="WDE.DatabaseDefinitionEditor.Views.DefinitionEditor.MetaColumns.InvokeRemoteCommandMetaColumnView">
+  <views:TwoColumnsPanel>
+    <TextBlock>Remote command:</TextBlock>
+    <TextBox FontFamily="Consolas,Menlo,Courier,Courier New" Text="{CompiledBinding Command}" />
+    
+    <TextBlock />
+    <TextBlock Opacity="0.5" TextWrapping="WrapWithOverflow">You can reference a column value by wrapping it in a brackets: `{}`. I.e. `.reload creature {guid}` will invoke command with substituted guids of edited rows.</TextBlock>
+  </views:TwoColumnsPanel>
+</UserControl>

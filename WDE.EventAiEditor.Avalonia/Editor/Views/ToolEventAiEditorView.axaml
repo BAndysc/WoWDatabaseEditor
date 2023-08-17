@@ -43,5 +43,5 @@
         </controls:MonochromaticIcon>
     </components:ToolView.Icon>
     
-    <ContentPresenter DataContext="{CompiledBinding EditorViewModel}" utils:ViewBind.Model="{CompiledBinding}" />
+    <ContentPresenter Content="{CompiledBinding EditorViewModel}" />
 </components:ToolView>

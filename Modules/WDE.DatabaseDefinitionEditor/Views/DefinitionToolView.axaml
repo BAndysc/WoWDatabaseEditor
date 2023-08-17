@@ -4,10 +4,13 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:avaloniaEdit="https://github.com/avaloniaui/avaloniaedit"
              xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia"
-             xmlns:tools="clr-namespace:WDE.DatabaseEditors.Tools;assembly=WDE.DatabaseEditors"
+             xmlns:definitionEditor="clr-namespace:WDE.DatabaseDefinitionEditor.ViewModels.DefinitionEditor"
+             xmlns:views="clr-namespace:WDE.DatabaseDefinitionEditor.Views"
+             xmlns:tools="clr-namespace:WDE.DatabaseDefinitionEditor.ViewModels"
+             xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="tools:ToolsViewModel"
-             x:Class="WDE.CommonViews.Avalonia.DatabaseEditors.DefinitionToolView">
+             x:Class="WDE.DatabaseDefinitionEditor.Views.DefinitionToolView">
     <UserControl.Resources>
         <converters:NativeTextDocumentConverter x:Key="DocumentConverter" />
         <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
@@ -41,7 +44,6 @@
                     <TextBlock DockPanel.Dock="Top" FontWeight="Bold" Padding="4" TextWrapping="WrapWithOverflow">All provided table definitions:</TextBlock>
                     <TextBox DockPanel.Dock="Top" Margin="5" Watermark="Search" Text="{CompiledBinding SearchText}" />
                     <ListBox Items="{CompiledBinding Definitions, Mode=OneTime}"
-                             VirtualizationMode="None"
                              SelectedItem="{CompiledBinding SelectedDefinition, Mode=TwoWay}">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
@@ -72,6 +74,18 @@
                 <TextBlock  Text="Covered tables:" FontWeight="Bold" Grid.Row="2" />
                 <ListBox Grid.Row="3" Items="{CompiledBinding CoveredTables}" />
             </Grid>
+        </TabItem>
+        <TabItem Header="Definition editor">
+            <Panel>
+                <views:DefinitionEditorView DataContext="{CompiledBinding DefinitionEditor}"/>
+                <TeachingTip IsOpened="{CompiledBinding DefinitionEditor.ShowIntroTip}" VerticalAlignment="Bottom" Margin="20" Header="Welcome to the definition editor. Please read it before use.">
+                    <StackPanel Spacing="5">
+                        <TextBlock>This is a brand new table definition editor, which allows you easily create and modify table definitions. Before use, please keep in mind there are few quirks:</TextBlock>
+                        <TextBlock>Unlike many other features in the editor, definition editor DOESN'T SUPPORT UNDO.</TextBlock>
+                        <TextBlock>Each label has a tooltip explaining all the fields. Hover it to get help.</TextBlock>
+                    </StackPanel>
+                </TeachingTip>
+            </Panel>
         </TabItem>
     </TabControl>
 </UserControl>

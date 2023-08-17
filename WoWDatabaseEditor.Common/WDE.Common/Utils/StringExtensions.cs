@@ -6,6 +6,13 @@ namespace WDE.Common.Utils
 {
     public static class StringExtensions
     {
+        public static string? NullIfEmpty(this string? s)
+        {
+            if (string.IsNullOrEmpty(s))
+                return null;
+            return s;
+        }
+
         public static string ToHumanFriendlyFileSize(this ulong size)
         {
             if (size < 1024)

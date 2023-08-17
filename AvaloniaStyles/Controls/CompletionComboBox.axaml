@@ -9,7 +9,11 @@
         <Setter Property="Padding" Value="0,0,0,0" />
     </Style>
     
-    <Style Selector="controls1|CompletionComboBox.NoPadding ListBoxItem > ContentPresenter">
+    <Style Selector="controls1|CompletionComboBox ListBoxItem">
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    </Style>
+
+    <Style Selector="controls1|CompletionComboBox ListBoxItem > ContentPresenter">
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
     </Style>
     

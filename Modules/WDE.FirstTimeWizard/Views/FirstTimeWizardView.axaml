@@ -32,7 +32,7 @@
         <Panel>
             <DockPanel IsVisible="{CompiledBinding NoCoreVersion}">
                 <TextBlock DockPanel.Dock="Top" Margin="10,15,0,15" TextWrapping="WrapWithOverflow" FontSize="14">Firstly, select your emulator. This will enable appropriate modules.</TextBlock>
-                <ContentControl DataContext="{CompiledBinding CoreVersionViewModel}" utils:ViewBind.Model="{CompiledBinding}" />
+                <ContentControl Content="{CompiledBinding CoreVersionViewModel}" />
             </DockPanel>
             <Panel IsVisible="{CompiledBinding HasCoreVersion}">
                 <Grid ColumnDefinitions="200,5,*">
@@ -57,7 +57,7 @@
                                        Margin="0,5,0,5" 
                                        IsVisible="{CompiledBinding SelectedConfigurable.ShortDescription, Converter={x:Static NullConverter.IsNotNull}}"
                                        Text="{CompiledBinding SelectedConfigurable.ShortDescription}" />
-                            <ContentControl DataContext="{CompiledBinding SelectedConfigurable}" utils:ViewBind.Model="{CompiledBinding}" HorizontalContentAlignment="Stretch"
+                            <ContentControl Content="{CompiledBinding SelectedConfigurable}" HorizontalContentAlignment="Stretch"
                                             VerticalContentAlignment="Stretch" />
                         </DockPanel>
                     </DockPanel>

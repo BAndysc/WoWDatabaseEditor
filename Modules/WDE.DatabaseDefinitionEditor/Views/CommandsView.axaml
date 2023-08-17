@@ -1,0 +1,36 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:definitionEditor="clr-namespace:WDE.DatabaseDefinitionEditor.ViewModels.DefinitionEditor"
+             xmlns:views="clr-namespace:WDE.DatabaseDefinitionEditor.Views"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="definitionEditor:DefinitionViewModel"
+             x:Class="WDE.DatabaseDefinitionEditor.Views.CommandsView">
+  <Grid ColumnDefinitions="Auto,5,*">
+    <DockPanel MinWidth="200">
+      <ToolbarPanel DockPanel.Dock="Top">
+        <ButtonImage ToolTip.Tip="Add a new command" Image="Icons/icon_add.png" Command="{CompiledBinding AddCommand}" />
+        <ButtonImage ToolTip.Tip="Delete the selected command" Image="Icons/icon_delete.png" Command="{CompiledBinding DeleteSelectedCommand}" IsEnabled="{CompiledBinding SelectedCommand, Converter={x:Static NullConverter.IsNotNull}}" />
+      </ToolbarPanel>
+            
+      <ListBox Items="{CompiledBinding Commands}" SelectedItem="{CompiledBinding SelectedCommand}">
+        <ListBox.KeyBindings>
+          <KeyBinding Gesture="Delete" Command="{CompiledBinding DeleteSelectedCommand}" />
+          <KeyBinding Gesture="Back" Command="{CompiledBinding DeleteSelectedCommand}" />
+        </ListBox.KeyBindings>
+        <ListBox.ItemTemplate>
+          <DataTemplate>
+            <TextBlock Text="{CompiledBinding CommandId}"/>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+    </DockPanel>
+    <GridSplitter Grid.Column="1" Classes="vertical" />
+    <ScrollViewer Grid.Column="2" Margin="10,0,0,0">
+      <Panel IsEnabled="{CompiledBinding SelectedCommand, Converter={x:Static NullConverter.IsNotNull}}">
+        <views:CommandView DataContext="{CompiledBinding SelectedCommand}" />
+      </Panel>
+    </ScrollViewer>
+  </Grid>
+</UserControl>

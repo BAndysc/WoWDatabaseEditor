@@ -11,7 +11,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Extensions;
 
 public static class SmartScriptCompletionCombobox
 {
-    public static Func<IEnumerable<object>, string, CancellationToken, Task<IEnumerable<object>>> AsyncPopulator
+    public static Func<IEnumerable, string, CancellationToken, Task<IEnumerable>> AsyncPopulator
     {
         get
         {
@@ -29,7 +29,7 @@ public static class SmartScriptCompletionCombobox
                     if (o.Count < 250)
                     {
                         int exactMatchIndex = -1;
-                        var result = Process.ExtractSorted(s, items.Select(item => item.ToString()), cutoff: 51)
+                        var result = Process.ExtractSorted(s, items.Cast<object>().Select(item => item.ToString()), cutoff: 51)
                             .Select((item, index) =>
                             {
                                 var option = (ParameterOption)o[item.Index]!;

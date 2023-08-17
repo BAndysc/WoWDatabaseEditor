@@ -1,0 +1,59 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:database="clr-namespace:WDE.Common.Database;assembly=WDE.Common"
+        xmlns:controls="clr-namespace:WDE.DatabaseDefinitionEditor.Views.Controls">
+  <Styles.Resources>
+    <DataTemplate x:Key="MySqlColumnDataTemplate" x:DataType="database:MySqlDatabaseColumn">
+      <DockPanel LastChildFill="False">
+        <TextBlock Text="{CompiledBinding ColumnName}" Margin="0,0,20,0" />
+        <Image Source="{StaticResource StatusBarIconWarning}" Width="16" Height="16" DockPanel.Dock="Right" 
+               ToolTip.Tip="It looks like this column doesn't exist in the database" 
+               IsVisible="{CompiledBinding ManagedType, Converter={x:Static NullConverter.IsNull}}"  />
+        <TextBlock Text="{CompiledBinding DatabaseType}" DockPanel.Dock="Right" />
+        <TextBlock Text="(nullable)" Margin="10,0,0,0" IsVisible="{CompiledBinding Nullable}" DockPanel.Dock="Right" />
+      </DockPanel>
+    </DataTemplate>
+    
+    <DataTemplate x:Key="MySqlTableDataTemplate" x:DataType="controls:DatabaseTableViewModel">
+      <DockPanel LastChildFill="False">
+        <TextBlock Text="{CompiledBinding Name}" Margin="0,0,20,0" />
+        <Image Source="{StaticResource StatusBarIconWarning}" Width="16" Height="16" DockPanel.Dock="Right" 
+               ToolTip.Tip="It looks like this table doesn't exist in the database" 
+               IsVisible="{CompiledBinding ExistInDatabase, Converter={x:Static BoolConverters.Not}}"  />
+      </DockPanel>
+    </DataTemplate>
+    
+    <DataTemplate x:Key="DatabaseTableCommandDataTemplate" x:DataType="controls:DatabaseTableCommandViewModel">
+      <DockPanel>
+        <WdeImage Image="{CompiledBinding Icon}" Width="16" Height="16" Margin="0,0,5,0" />
+        <TextBlock Text="{CompiledBinding CommandId}" Opacity="0.6" DockPanel.Dock="Right" />
+        <TextBlock Text="{CompiledBinding Name}" />
+      </DockPanel>
+    </DataTemplate>
+  </Styles.Resources>
+  
+  
+  <Style Selector="controls|NullableDatabaseColumnCompletionBox">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <DockPanel>
+          <CheckBox ToolTip.Tip="Is null?" IsChecked="{TemplateBinding IsNotNull, Mode=TwoWay}" DockPanel.Dock="Left" />
+          <controls:DatabaseColumnCompletionBox 
+            TableName="{TemplateBinding TableName}"
+            ColumnName="{TemplateBinding ColumnName, Mode=TwoWay}"
+            Database="{TemplateBinding Database}"
+            CanSelectEmpty="False"
+            IsEnabled="{TemplateBinding IsNotNull}" />
+        </DockPanel>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+  
+  <Style Selector="controls|KeyBindingBox">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <controls:TextBoxWithNoInput x:Name="PART_TextBox" IsReadOnly="True" />
+      </ControlTemplate>
+    </Setter>
+  </Style>
+</Styles>

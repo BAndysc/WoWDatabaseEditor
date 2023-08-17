@@ -11,16 +11,22 @@ public partial class VeryFastTableView
     {
         var template = GroupHeaderTemplate;
         
-        if (!IsGroupingEnabled || template == null || Items == null)
+        if (template == null || Items == null)
             return base.ArrangeOverride(finalSize);
+        
+        headerViews.Reset(template);
+
+        if (!IsGroupingEnabled)
+        {
+            headerViews.Finish();
+            return finalSize;
+        }
         
         var viewPort = DataViewport;
         var rowFilter = RowFilter;
         var rowFilterParameter = RowFilterParameter;
         var stickyHeaderRect = new Rect(viewPort.X, viewPort.Top, viewPort.Width, HeaderRowHeight);
 
-        headerViews.Reset(template);
-        
         bool hasSticky = false;
         double y = DrawingStartOffsetY;
         foreach (var group in Items)

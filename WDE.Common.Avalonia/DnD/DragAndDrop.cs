@@ -523,6 +523,8 @@ namespace WDE.Common.Avalonia.DnD
                 dropInfo.InsertPosition =
                     (RelativeInsertPosition) ((int) dropInfo.InsertPosition &
                                               ~(int) RelativeInsertPosition.TargetItemCenter);
+            else if (dropInfo.DropTargetAdorner == DropTargetAdorners.Highlight)
+                dropInfo.InsertPosition &= ~(RelativeInsertPosition.AfterTargetItem | RelativeInsertPosition.BeforeTargetItem);
             adorner.Adorner?.Update(treeView, treeItemContainerGenerator, dropInfo);
         }
 

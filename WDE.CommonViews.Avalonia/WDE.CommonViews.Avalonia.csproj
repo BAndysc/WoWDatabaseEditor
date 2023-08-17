@@ -19,7 +19,6 @@
         <ProjectReference Include="..\AvaloniaEdit\src\AvaloniaEdit\AvaloniaEdit.csproj" />
         <ProjectReference Include="..\Modules\WDE.Sessions\WDE.Sessions.csproj" />
         <ProjectReference Include="..\WDE.Common.Avalonia\WDE.Common.Avalonia.csproj" />
-        <ProjectReference Include="..\WDE.DatabaseEditors\WDE.DatabaseEditors.csproj" />
         <ProjectReference Include="..\WDE.MPQ\WDE.MPQ.csproj" />
         <ProjectReference Include="..\WDE.MySqlDatabaseCommon\WDE.MySqlDatabaseCommon.csproj" />
         <ProjectReference Include="..\WDE.Parameters\WDE.Parameters.csproj" />
@@ -37,23 +36,5 @@
         <None Update="Resources\*">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
-    </ItemGroup>
-    <ItemGroup>
-      <Compile Update="Sessions\SessionToolView.axaml.cs">
-        <DependentUpon>SessionToolView.axaml</DependentUpon>
-        <SubType>Code</SubType>
-      </Compile>
-      <Compile Update="SQLEditor\Views\CustomQueryEditorView.axaml.cs">
-        <DependentUpon>CustomQueryEditorView.axaml</DependentUpon>
-        <SubType>Code</SubType>
-      </Compile>
-      <Compile Update="Parameters\Views\UnitBytes1EditorView.axaml.cs">
-        <DependentUpon>UnitBytes1EditorView.axaml</DependentUpon>
-        <SubType>Code</SubType>
-      </Compile>
-      <Compile Update="Parameters\Views\UnitBytes2EditorView.axaml.cs">
-        <DependentUpon>UnitBytes2EditorView.axaml</DependentUpon>
-        <SubType>Code</SubType>
-      </Compile>
     </ItemGroup>
 </Project>

@@ -1,9 +1,9 @@
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
-namespace WDE.CommonViews.Avalonia.DatabaseEditors
+namespace WDE.DatabaseDefinitionEditor.Views
 {
-    public class DefinitionToolView : UserControl
+    public partial class DefinitionToolView : UserControl
     {
         public DefinitionToolView()
         {

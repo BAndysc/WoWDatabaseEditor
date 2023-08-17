@@ -217,6 +217,7 @@
                     ColumnPressed="VeryFastTableView_OnColumnPressed"
                     AttachedToVisualTree="Visual_OnAttachedToVisualTree"
                     DetachedFromVisualTree="Visual_OnDetachedFromVisualTree"
+                    IsGroupingEnabled="True"
                     RowFilterParameter="{CompiledBinding SearchText}"
                     Items="{CompiledBinding Rows}">
                     <fastTableView:VeryFastTableView.RowFilter>

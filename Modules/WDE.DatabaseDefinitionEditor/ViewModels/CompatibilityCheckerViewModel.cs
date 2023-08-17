@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DynamicData;
 using Prism.Mvvm;
 using PropertyChanged.SourceGenerator;
 using WDE.Common.Database;
@@ -17,7 +16,7 @@ using WDE.Module.Attributes;
 using WDE.MVVM;
 using WDE.MVVM.Observable;
 
-namespace WDE.DatabaseEditors.Tools
+namespace WDE.DatabaseDefinitionEditor.ViewModels
 {
     [AutoRegister]
     public partial class CompatibilityCheckerViewModel : BindableBase
@@ -127,7 +126,7 @@ namespace WDE.DatabaseEditors.Tools
             this.sqlExecutor = sqlExecutor;
             allDefinitions.AddRange(definitionProvider.AllDefinitions);
             Raport = document;
-            this.ToObservable(o => o.SearchText)
+            this.ToObservable<string, CompatibilityCheckerViewModel>(o => o.SearchText)
                 .SubscribeAction(_ => DoSearch());
         }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using WDE.Common.CoreVersion;
 using WDE.Common.Services.MessageBox;
@@ -70,6 +71,7 @@ namespace WDE.DatabaseEditors.Data
                     }
 
                     definition.FileName = source.file;
+                    definition.AbsoluteFileName = new FileInfo(source.file).FullName;
 
                     if (definition.ForeignTable != null)
                     {

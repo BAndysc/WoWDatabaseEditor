@@ -67,7 +67,10 @@ namespace WDE.Common.Utils
             {
                 var flagAsNumber = Convert.ToInt64(flag);
                 if ((valueNumber & flagAsNumber) == flagAsNumber)
+                {
                     flags.Add(names[i]);
+                    valueNumber &=~ flagAsNumber;
+                }
                 i++;
             }
 

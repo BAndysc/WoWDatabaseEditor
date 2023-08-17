@@ -39,6 +39,9 @@ namespace WoWDatabaseEditorCore.Managers
             if (viewModel.AssemblyQualifiedName == null)
                 return false;
 
+            if (!viewModel.Name.EndsWith("ViewModel"))
+                return false;
+
             var viewString = viewModel.AssemblyQualifiedName!.Replace("ViewModel", "View");
             view = Type.GetType(viewString)!;
 

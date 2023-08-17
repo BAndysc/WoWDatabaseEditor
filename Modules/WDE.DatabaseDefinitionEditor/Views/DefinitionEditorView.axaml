@@ -1,0 +1,110 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:fastTableView="clr-namespace:AvaloniaStyles.Controls.FastTableView;assembly=AvaloniaStyles"
+             xmlns:definitionEditor="clr-namespace:WDE.DatabaseDefinitionEditor.ViewModels.DefinitionEditor"
+             xmlns:tools="clr-namespace:WDE.DatabaseDefinitionEditor.ViewModels"
+             xmlns:views="clr-namespace:WDE.DatabaseDefinitionEditor.Views"
+             xmlns:avaloniaEdit="https://github.com/avaloniaui/avaloniaedit"
+             xmlns:styles="clr-namespace:AvaloniaStyles.Styles;assembly=AvaloniaStyles"
+             xmlns:controls="clr-namespace:WDE.DatabaseDefinitionEditor.Views.Controls"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="WDE.DatabaseDefinitionEditor.Views.DefinitionEditorView"
+             Background="{DynamicResource SlightlyHighlightedBackground}"
+             x:Name="Root"
+             x:DataType="tools:DefinitionEditorViewModel">
+    <Grid ColumnDefinitions="200,10,*">
+        <DockPanel LastChildFill="True">
+            <TextBlock DockPanel.Dock="Top" FontWeight="Bold" Padding="4" TextWrapping="WrapWithOverflow">Definitions:</TextBlock>
+            <ComboBox DockPanel.Dock="Top" Items="{CompiledBinding DefinitionSources}"
+                      Margin="5"
+                      HorizontalAlignment="Stretch"
+                      SelectedItem="{CompiledBinding SelectedDefinitionSource}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate DataType="tools:DefinitionSourceViewModel">
+                        <TextBlock Text="{CompiledBinding   SourceName}" />
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            <TextBox DockPanel.Dock="Top" Margin="5" Watermark="Search" Text="{CompiledBinding SearchText}" />
+            <ToolbarPanel DockPanel.Dock="Top" Margin="5,5, 5, 0">
+                <ButtonImage ToolTip.Tip="Import a new table" Image="Icons/icon_down.png">
+                    <ButtonImage.Flyout>
+                        <Flyout>
+                            <StackPanel Spacing="5">
+                                <TextBlock>Pick a table to import:</TextBlock>
+                                <ComboBox HorizontalAlignment="Stretch" SelectedItem="{CompiledBinding ImportTableDatabaseType}" Items="{x:Static tools:DefinitionEditorStatic.DataDatabaseTypes}" />
+                                <controls:DatabaseTableCompletionBox
+                                    Database="{CompiledBinding ImportTableDatabaseType}"
+                                    TableName="{CompiledBinding ImportTableName}"/>
+                                <Button Command="{CompiledBinding ImportTableCommand}">Import</Button>
+                            </StackPanel>
+                        </Flyout>
+                    </ButtonImage.Flyout>
+                </ButtonImage>
+                <ButtonImage ToolTip.Tip="Create an empty table" Image="Icons/icon_new.png" Command="{CompiledBinding CreateEmptyTableCommand}" />
+            </ToolbarPanel>
+            <controls:OnReleaseListBox Items="{CompiledBinding Definitions}"
+                              Margin="5,0,5,5"
+                              SelectedItem="{CompiledBinding SelectedDefinition, Mode=TwoWay}">
+                <controls:OnReleaseListBox.ItemsPanel>
+                    <!-- virtualization seems to be bugged with ava 11 -->
+                    <ItemsPanelTemplate>
+                        <StackPanel />
+                    </ItemsPanelTemplate>
+                </controls:OnReleaseListBox.ItemsPanel>
+                <controls:OnReleaseListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Vertical">
+                            <TextBlock Text="{CompiledBinding TableName, Mode=OneTime}" FontWeight="Bold" />
+                            <TextBlock Text="{CompiledBinding RelativePath, Mode=OneTime}" TextWrapping="WrapWithOverflow" />
+                        </StackPanel>
+                    </DataTemplate>
+                </controls:OnReleaseListBox.ItemTemplate>
+            </controls:OnReleaseListBox>
+        </DockPanel>
+        <GridSplitter Grid.Column="1" Classes="vertical" />
+    
+        <Grid Grid.RowDefinitions="*,5,Auto" Grid.Column="2" IsEnabled="{CompiledBinding SelectedTable, Converter={x:Static NullConverter.IsNotNull}}">
+            <TabControl SelectionChanged="SelectingItemsControl_OnSelectionChanged" x:Name="TabControl">
+                <TabItem Header="Table">
+                    <ScrollViewer>
+                        <views:DefinitionView DataContext="{CompiledBinding SelectedTable}" />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Header="Conditions">
+                    <ScrollViewer>
+                        <views:ConditionsView DataContext="{CompiledBinding SelectedTable}" />
+                    </ScrollViewer>
+                </TabItem>
+                <TabItem Header="Foreign tables">
+                    <views:ForeignTables DataContext="{CompiledBinding SelectedTable}" />
+                </TabItem>
+                <TabItem Header="Commands">
+                    <views:CommandsView DataContext="{CompiledBinding SelectedTable}" />
+                </TabItem>
+                <TabItem Header="Columns">
+                    <views:ColumnsView  DataContext="{CompiledBinding SelectedTable}" />
+                </TabItem>
+                <TabItem Header="Raw json" x:Name="RawJsonTab">
+                    <avaloniaEdit:TextEditor SyntaxHighlighting="Json" 
+                                             Document="{CompiledBinding RawDefinitionDocument, Converter={x:Static NativeTextDocumentConverter.Instance}}" 
+                                             BorderThickness="0"
+                                             ShowLineNumbers="True"
+                                             FontFamily="Consolas,Menlo,Courier,Courier New" />
+                </TabItem>
+            </TabControl>
+    
+            <GridSplitter Classes="horizontal" Grid.Row="1" />
+            
+            <Panel Grid.Row="2">
+                <views:TemplateModePreview DataContext="{CompiledBinding SelectedTable}"
+                                           IsVisible="{CompiledBinding IsTemplate}"
+                                           />
+                <views:NonTemplateModePreview
+                                           IsVisible="{CompiledBinding SelectedTable.IsTemplate, FallbackValue=False, Converter={x:Static BoolConverters.Not}}"/>
+            </Panel>
+        </Grid>
+    </Grid>
+</UserControl>

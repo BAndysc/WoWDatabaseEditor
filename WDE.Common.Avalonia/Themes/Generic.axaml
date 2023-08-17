@@ -128,7 +128,7 @@
             <ControlTemplate>
                 <DockPanel>
                     <CheckBox ToolTip.Tip="Is null?" IsChecked="{TemplateBinding IsNotNull, Mode=TwoWay}" DockPanel.Dock="Left" />
-                    <TextBox Text="{TemplateBinding Text, Mode=TwoWay}" IsEnabled="{TemplateBinding IsNotNull}" />
+                    <TextBox Watermark="{TemplateBinding Watermark}" Text="{TemplateBinding Text, Mode=TwoWay}" IsEnabled="{TemplateBinding IsNotNull}" />
                 </DockPanel>
             </ControlTemplate>
         </Setter>

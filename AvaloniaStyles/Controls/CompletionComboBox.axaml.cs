@@ -40,14 +40,14 @@ namespace AvaloniaStyles.Controls
         public Func<object?, object?>? SelectedItemExtractor { get; set; }
         private ISelectionAdapter? adapter;
         public event EventHandler<EnterPressedArgs>? OnEnterPressed;
-        private Func<IEnumerable<object>, string, CancellationToken, Task<IEnumerable<object>>> asyncPopulator;
+        private Func<IEnumerable, string, CancellationToken, Task<IEnumerable>> asyncPopulator;
         private string searchText = string.Empty;
         private string? watermark = null;
         private bool isDropDownOpen;
         private object? selectedItem;
-        private IEnumerable<object>? items;
+        private IEnumerable? items;
 
-        public Func<IEnumerable<object>, string, CancellationToken, Task<IEnumerable<object>>> AsyncPopulator
+        public Func<IEnumerable, string, CancellationToken, Task<IEnumerable>> AsyncPopulator
         {
             get => asyncPopulator;
             set => SetAndRaise(AsyncPopulatorProperty, ref asyncPopulator, value);
@@ -71,7 +71,7 @@ namespace AvaloniaStyles.Controls
             set => SetAndRaise(IsDropDownOpenProperty, ref  isDropDownOpen, value);
         }
         
-        public IEnumerable<object>? Items
+        public IEnumerable? Items
         {
             get => items;
             set => SetAndRaise(ItemsProperty, ref items, value);
@@ -113,8 +113,8 @@ namespace AvaloniaStyles.Controls
         public static readonly StyledProperty<IDataTemplate> ItemTemplateProperty =
             AvaloniaProperty.Register<CompletionComboBox, IDataTemplate>(nameof(ItemTemplate));
         
-        public static readonly DirectProperty<CompletionComboBox, IEnumerable<object>?> ItemsProperty = 
-            AvaloniaProperty.RegisterDirect<CompletionComboBox, IEnumerable<object>?>("Items", 
+        public static readonly DirectProperty<CompletionComboBox, IEnumerable?> ItemsProperty = 
+            AvaloniaProperty.RegisterDirect<CompletionComboBox, IEnumerable?>("Items", 
                 o => o.Items, 
                 (o, v) => o.Items = v);
         
@@ -132,8 +132,8 @@ namespace AvaloniaStyles.Controls
                 (o, v) => o.SearchText = v,
                 unsetValue: string.Empty);
         
-        public static readonly DirectProperty<CompletionComboBox, Func<IEnumerable<object>,string, CancellationToken, Task<IEnumerable<object>>>> AsyncPopulatorProperty =
-            AvaloniaProperty.RegisterDirect<CompletionComboBox, Func<IEnumerable<object>,string, CancellationToken, Task<IEnumerable<object>>>>(
+        public static readonly DirectProperty<CompletionComboBox, Func<IEnumerable,string, CancellationToken, Task<IEnumerable>>> AsyncPopulatorProperty =
+            AvaloniaProperty.RegisterDirect<CompletionComboBox, Func<IEnumerable,string, CancellationToken, Task<IEnumerable>>>(
                 nameof(AsyncPopulator),
                 o => o.AsyncPopulator,
                 (o, v) => o.AsyncPopulator = v);
@@ -174,7 +174,7 @@ namespace AvaloniaStyles.Controls
                 {
                     if (o.Count < 250)
                     {
-                        var result = Process.ExtractSorted(s, items.Select(item => item.ToString()), cutoff: 51)
+                        var result = Process.ExtractSorted(s, items.Cast<object>().Select(item => item.ToString()), cutoff: 51)
                             .Select(item => o[item.Index]!);
                         return result;
                     }
@@ -230,6 +230,11 @@ namespace AvaloniaStyles.Controls
                 {
                     box.ButtonItemTemplate = args.NewValue as IDataTemplate;
                 }
+            });
+            ItemsProperty.Changed.AddClassHandler<CompletionComboBox>((box, args) =>
+            {
+                if (box.IsDropDownOpen)
+                    box.TextUpdated(box.SearchText);
             });
             IsDropDownOpenProperty.Changed.AddClassHandler<CompletionComboBox>((box, args) =>
             {
@@ -479,8 +484,8 @@ namespace AvaloniaStyles.Controls
         {
             try
             {
-                IEnumerable<object> result = await asyncPopulator.Invoke(items ?? Array.Empty<object>(), searchText, cancellationToken);
-                var resultList = result is IList ? result : result?.ToList();
+                IEnumerable result = await asyncPopulator.Invoke(items ?? Array.Empty<object>(), searchText, cancellationToken);
+                var resultList = result is IList ? (IList)result : result.Cast<object>()?.ToList();
 
                 if (cancellationToken.IsCancellationRequested)
                     return;
@@ -491,7 +496,7 @@ namespace AvaloniaStyles.Controls
                     {
                         view.Clear();
                         if (resultList != null)
-                            view.InsertRange(0, resultList);
+                            view.InsertRange(0, resultList.Cast<object>());
                     }
                 });
             }

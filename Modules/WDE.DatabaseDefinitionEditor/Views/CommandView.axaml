@@ -1,0 +1,61 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:definitionEditor="clr-namespace:WDE.DatabaseDefinitionEditor.ViewModels.DefinitionEditor"
+             xmlns:views="clr-namespace:WDE.DatabaseDefinitionEditor.Views"
+             xmlns:controls="clr-namespace:WDE.DatabaseDefinitionEditor.Views.Controls"
+             xmlns:dnD="clr-namespace:WDE.Common.Avalonia.DnD;assembly=WDE.Common.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="definitionEditor:CommandViewModel"
+             x:Class="WDE.DatabaseDefinitionEditor.Views.CommandView">
+  <views:TwoColumnsPanel>
+    <TextBlock ToolTip.Tip="A name of the command, as named in the editor code">Command id:</TextBlock>
+    <controls:DatabaseTableCommandCompletionBox CommandId="{CompiledBinding CommandId}" />
+    
+    <TextBlock ToolTip.Tip="Default key binding for this command.">Key binding:</TextBlock>
+    <DockPanel>
+      <CheckBox IsChecked="{CompiledBinding HasGesture}" />
+      <controls:KeyBindingBox IsEnabled="{CompiledBinding HasGesture}" KeyGesture="{CompiledBinding KeyGesture}" />
+    </DockPanel>
+    
+    <TextBlock>Flags:</TextBlock>
+    <StackPanel Spacing="5">
+      <CheckBox ToolTip.Tip="When true, this command will be available in the table editor toolbar" IsChecked="{CompiledBinding ShowInToolbar}">Show in toolbar</CheckBox>
+      <CheckBox ToolTip.Tip="When true, this command will be available in the table editor context menu" IsChecked="{CompiledBinding ShowInContextMenu}">Show in context menu</CheckBox>
+    </StackPanel>
+    
+    <TextBlock ToolTip.Tip="A command might need parameters, i.e. references to certain columns. Please refer to the command code">Parameters:</TextBlock>
+    <StackPanel Orientation="5">
+      
+      <ToolbarPanel>
+        <ButtonImage Image="Icons/icon_add.png" Command="{CompiledBinding AddParameterCommand}" />
+        <ButtonImage Image="Icons/icon_delete.png" Command="{CompiledBinding DeleteSelectedParameterCommand}" IsEnabled="{CompiledBinding SelectedParameter, Converter={x:Static NullConverter.IsNotNull}}" />
+      </ToolbarPanel>
+            
+      <ListBox dnD:DragAndDrop.IsDropTarget="True" dnD:DragAndDrop.DropHandler="{CompiledBinding }" dnD:DragAndDrop.IsDragSource="True" Items="{CompiledBinding Parameters}" SelectedItem="{CompiledBinding SelectedParameter}">
+        <ListBox.KeyBindings>
+          <KeyBinding Gesture="Delete" Command="{CompiledBinding DeleteSelectedParameterCommand}" />
+          <KeyBinding Gesture="Back" Command="{CompiledBinding DeleteSelectedParameterCommand}" />
+        </ListBox.KeyBindings>
+        <ListBox.ItemTemplate>
+          <DataTemplate>
+            <TextBlock Text="{CompiledBinding ColumnName}"/>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+            
+      <Panel IsEnabled="{CompiledBinding SelectedParameter, Converter={x:Static NullConverter.IsNotNull}}">
+        <controls:DatabaseColumnCompletionBox DataContext="{CompiledBinding SelectedParameter}" 
+                                              Database="{CompiledBinding Parent.Parent.DataDatabaseType}"
+                                              TableName="{CompiledBinding Parent.Parent.TableName}"
+                                              ColumnName="{CompiledBinding ColumnName}" />
+      </Panel>
+    </StackPanel>
+    <views:TwoColumnsPanel.Styles>
+      <Style Selector="TextBlock">
+        <Setter Property="VerticalAlignment" Value="Center" />
+      </Style>
+    </views:TwoColumnsPanel.Styles>
+  </views:TwoColumnsPanel>
+</UserControl>

@@ -1,0 +1,89 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:views="clr-namespace:WDE.DatabaseDefinitionEditor.Views"
+             xmlns:definitionEditor="clr-namespace:WDE.DatabaseDefinitionEditor.ViewModels.DefinitionEditor"
+             xmlns:controls="clr-namespace:WDE.DatabaseDefinitionEditor.Views.Controls"
+             xmlns:dnD="clr-namespace:WDE.Common.Avalonia.DnD;assembly=WDE.Common.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="definitionEditor:DefinitionViewModel"
+             x:Class="WDE.DatabaseDefinitionEditor.Views.ConditionsView">
+    <views:TwoColumnsPanel>
+        <TextBlock ToolTip.Tip="The editor supports inline conditions editing. If this table has associated condition (i.e. gossip_menu has a condition type 14), then use this feature. This refers to the TrinityCore-like conditions (`conditions` table).">Condition:</TextBlock>
+        <CheckBox IsChecked="{CompiledBinding HasCondition}">Enable</CheckBox>
+        
+        <views:TwoColumnsPanel ColumnSpan="2" IsVisible="{CompiledBinding HasCondition, FallbackValue=False}">
+            <views:TwoColumnsPanel DataContext="{CompiledBinding Condition}" Margin="0,0,0,20">
+                <TextBlock ToolTip.Tip="`conditions`.`ConditionSourceOrReferenceId`. I.e. 14 for gossip_menu">Condition source type id:</TextBlock>
+                <TextBox Text="{CompiledBinding  SourceType}" />
+                
+                <TextBlock ToolTip.Tip="Which column should be used to fill `conditions`.`source_group`">source_group column:</TextBlock>
+                <DockPanel>
+                    <CheckBox ToolTip.Tip="When true, the absolute value of the column value will be used." Margin="10,0,0,0" DockPanel.Dock="Right" IsChecked="{CompiledBinding SourceGroupColumnAbs}">Take abs()</CheckBox>
+                    <controls:NullableDatabaseColumnCompletionBox 
+                        ColumnName="{CompiledBinding SourceGroupColumn}"
+                        Database="{CompiledBinding Parent.DataDatabaseType}"
+                        TableName="{CompiledBinding Parent.TableName}" />
+                </DockPanel>
+                
+                <TextBlock ToolTip.Tip="Which column should be used to fill `conditions`.`source_entry`">source_entry column:</TextBlock>
+                <controls:NullableDatabaseColumnCompletionBox 
+                    ColumnName="{CompiledBinding SourceEntryColumn}"
+                    Database="{CompiledBinding Parent.DataDatabaseType}"
+                    TableName="{CompiledBinding Parent.TableName}" />
+                
+                <TextBlock ToolTip.Tip="Which column should be used to fill `conditions`.`source_id`">source_id column:</TextBlock>
+                <controls:NullableDatabaseColumnCompletionBox 
+                    ColumnName="{CompiledBinding SourceIdColumn}"
+                    Database="{CompiledBinding Parent.DataDatabaseType}"
+                    TableName="{CompiledBinding Parent.TableName}" />
+                
+                <TextBlock ToolTip.Tip="Some tables might need to have a certain column set to True (1) when there are conditions for it. Even though this seem redundant, this is actually a good way to speed the core up - thanks to this, the core doesn't need to check conditions if there are non.">Set to 1 if any condition:</TextBlock>
+                <controls:NullableDatabaseColumnCompletionBox 
+                    ColumnName="{CompiledBinding SetColumn}"
+                    Database="{CompiledBinding Parent.DataDatabaseType}"
+                    TableName="{CompiledBinding Parent.TableName}" />
+                
+                <TextBlock ToolTip.Tip="A list of condition targets for this condition source.">Targets:</TextBlock>
+                <ToolbarPanel>
+                    <ButtonImage ToolTip.Tip="Add a new condition target" Image="Icons/icon_add.png" Command="{CompiledBinding AddTarget}" />
+                    <ButtonImage ToolTip.Tip="Delete the selected condition target" Image="Icons/icon_delete.png" Command="{CompiledBinding DeleteSelectedTarget}" IsEnabled="{CompiledBinding SelectedTarget, Converter={x:Static NullConverter.IsNotNull}}" />
+                </ToolbarPanel>
+
+                <TextBlock />
+                <StackPanel Spacing="5">
+                    <ListBox dnD:DragAndDrop.IsDropTarget="True" dnD:DragAndDrop.DropHandler="{CompiledBinding }" dnD:DragAndDrop.IsDragSource="True" Items="{CompiledBinding Targets}" SelectedItem="{CompiledBinding SelectedTarget}">
+                        <ListBox.KeyBindings>
+                            <KeyBinding Gesture="Delete" Command="{CompiledBinding DeleteSelectedTarget}" />
+                            <KeyBinding Gesture="Back" Command="{CompiledBinding DeleteSelectedTarget}" />
+                        </ListBox.KeyBindings>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <DockPanel>
+                                    <TextBlock Text="{CompiledBinding Id}" FontWeight="Bold" MinWidth="20"/>
+                                    <TextBlock Text="{CompiledBinding Name}" />
+                                </DockPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                
+                    <Panel IsEnabled="{CompiledBinding SelectedTarget, Converter={x:Static NullConverter.IsNotNull}}">
+                        <views:TwoColumnsPanel DataContext="{CompiledBinding SelectedTarget}">
+                            <TextBlock ToolTip.Tip="`conditions`.`ConditionTarget`">Target id:</TextBlock>
+                            <TextBox Text="{CompiledBinding Id}" />
+
+                            <TextBlock ToolTip.Tip="A friendly name for `conditions`.`ConditionTarget`">Friendly name:</TextBlock>
+                            <TextBox Text="{CompiledBinding Name}" />
+                        </views:TwoColumnsPanel>
+                    </Panel>
+                </StackPanel>
+            </views:TwoColumnsPanel>
+        </views:TwoColumnsPanel>
+        <views:TwoColumnsPanel.Styles>
+            <Style Selector="TextBlock">
+                <Setter Property="VerticalAlignment" Value="Center" />
+            </Style>
+        </views:TwoColumnsPanel.Styles>
+    </views:TwoColumnsPanel>
+</UserControl>

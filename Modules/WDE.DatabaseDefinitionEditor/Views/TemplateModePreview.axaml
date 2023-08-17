@@ -1,0 +1,55 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:WDE.DatabaseDefinitionEditor.ViewModels"
+             xmlns:styles="clr-namespace:AvaloniaStyles.Styles;assembly=AvaloniaStyles"
+             xmlns:definitionEditor="clr-namespace:WDE.DatabaseDefinitionEditor.ViewModels.DefinitionEditor"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="definitionEditor:DefinitionViewModel"
+             x:Class="WDE.DatabaseDefinitionEditor.Views.TemplateModePreview">
+      <TabControl Items="{CompiledBinding Groups}">
+        <TabControl.ItemTemplate>
+            <DataTemplate>
+                <TextBlock Text="{CompiledBinding GroupName}" />
+            </DataTemplate>
+        </TabControl.ItemTemplate>
+        <TabControl.ContentTemplate>
+            <DataTemplate DataType="definitionEditor:ColumnGroupViewModel">
+                <ScrollViewer HorizontalScrollBarVisibility="Auto">
+                    <StackPanel Orientation="Vertical" Margin="0, 10, 0, 0">
+                        <Border Height="20" Background="{DynamicResource TreeViewItem.Header.Background.Special}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Padding="10,0,0,0" 
+                                           Text="{CompiledBinding GroupName}" 
+                                           Foreground="{DynamicResource TreeViewItem.Header.Foreground.Special}" 
+                                           Width="180"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+                        <ItemsControl Focusable="False" Items="{CompiledBinding  Columns}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <DockPanel Classes="alternating" Height="24">
+                                        <TextBlock ToolTip.Tip="{CompiledBinding Help}" Text="{CompiledBinding Header, Mode=OneTime}" Width="180" VerticalAlignment="Center" Padding="10,0,10,0" />
+                                        <TextBlock VerticalAlignment="Center" Text="{CompiledBinding Preview}" />
+                                    </DockPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </ScrollViewer>
+            </DataTemplate>
+        </TabControl.ContentTemplate>
+    </TabControl>
+    <UserControl.Styles>
+        <styles:StyleIncludeColorAware DarkSource="avares://WDE.DatabaseEditors.Avalonia/Views/ColorsDark.axaml"
+                                       LightSource="avares://WDE.DatabaseEditors.Avalonia/Views/ColorsLight.axaml"/>
+        <Style Selector="ContentPresenter DockPanel.alternating">
+            <Setter Property="Background" Value="{DynamicResource TreeViewItem.Content.Background.NormalAlternate}" />
+        </Style>
+        <Style Selector="ContentPresenter:nth-child(2n) DockPanel.alternating">
+            <Setter Property="Background" Value="{DynamicResource TreeViewItem.Content.Background.Normal}" />
+        </Style>
+    </UserControl.Styles>
+</UserControl>

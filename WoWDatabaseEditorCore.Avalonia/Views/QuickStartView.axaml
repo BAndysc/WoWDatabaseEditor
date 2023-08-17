@@ -101,7 +101,7 @@
                     <!--     </Interaction.Behaviors> -->
                     <!-- </WdeImage> -->
                     
-                    <ContentControl DockPanel.Dock="Right" VerticalAlignment="Stretch" VerticalContentAlignment="Center" DataContext="{CompiledBinding QuickStartPanel}" utils:ViewBind.Model="{CompiledBinding}"></ContentControl>
+                    <ContentControl DockPanel.Dock="Right" VerticalAlignment="Stretch" VerticalContentAlignment="Center" Content="{CompiledBinding QuickStartPanel}" />
                 </DockPanel>
             </Border>
             

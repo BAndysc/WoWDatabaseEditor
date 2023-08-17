@@ -62,5 +62,6 @@ namespace WDE.Common.Database
         public string DatabaseType { get; set; }
         public Type? ManagedType { get; set; }
         public object? DefaultValue { get; set; }
+        public override string ToString() => ColumnName;
     }
 }

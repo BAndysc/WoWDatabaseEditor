@@ -48,7 +48,7 @@
                                Margin="0,0,0,17" 
                                IsVisible="{CompiledBinding SelectedTabItem.ShortDescription, Converter={StaticResource IsNullConverter}}"
                                Text="{CompiledBinding SelectedTabItem.ShortDescription}" />
-                    <ContentControl DataContext="{CompiledBinding SelectedTabItem}" utils:ViewBind.Model="{CompiledBinding}" HorizontalContentAlignment="Stretch"
+                    <ContentControl Content="{CompiledBinding SelectedTabItem}" HorizontalContentAlignment="Stretch"
                                     VerticalContentAlignment="Stretch" />
                 </DockPanel>
             </DockPanel>

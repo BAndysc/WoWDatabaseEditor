@@ -1,0 +1,27 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:metaColumns="clr-namespace:WDE.DatabaseDefinitionEditor.ViewModels.DefinitionEditor.MetaColumns"
+             xmlns:views="clr-namespace:WDE.DatabaseDefinitionEditor.Views"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="metaColumns:ExpressionMetaColumnViewModel"
+             x:Class="WDE.DatabaseDefinitionEditor.Views.DefinitionEditor.MetaColumns.ExpressionMetaColumnView">
+  <views:TwoColumnsPanel>
+    <TextBlock>Expression:</TextBlock>
+    <TextBox FontFamily="Consolas,Menlo,Courier,Courier New" Text="{CompiledBinding Expression}" />
+    
+    <TextBlock />
+    <StackPanel Orientation="5" Opacity="0.6">
+      <TextBlock TextWrapping="WrapWithOverflow">You can use JavaScript like syntax here. Check some examples below:</TextBlock>
+      
+      <Border Height="10" />
+      <TextBlock TextWrapping="WrapWithOverflow">Concatenate entry value with a hardcoded string (dash) and the spellId.</TextBlock>
+      <TextBlock FontFamily="Consolas,Menlo,Courier,Courier New">thisString.entry + ' - ' + thisString.spellId</TextBlock>
+      
+      <Border Height="10" />
+      <TextBlock TextWrapping="WrapWithOverflow">Calculates armor based on the minlevel and unit_class columns, then multiplies the result by the armorModifier column, then ceil the float value and convert it to a string. Concatenates with a dash and the same computation for maxLevel column.</TextBlock>
+      <TextBlock FontFamily="Consolas,Menlo,Courier,Courier New">str(ceil(GetArmor(this.minlevel, this.unit_class) * this.ArmorModifier)) + ' - ' + str(ceil(GetArmor(this.maxlevel, this.unit_class) * this.ArmorModifier))</TextBlock>
+    </StackPanel>
+  </views:TwoColumnsPanel>
+</UserControl>

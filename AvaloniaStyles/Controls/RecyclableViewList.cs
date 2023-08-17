@@ -61,6 +61,7 @@ public class RecyclableViewList
         
         control = controls[counter++];
         control.DataContext = context;
+        control.IsVisible = true;
         control.InvalidateMeasure();
         control.InvalidateArrange();
         return control;
@@ -70,7 +71,7 @@ public class RecyclableViewList
     {
         for (int i = counter; i < controls.Count; ++i)
         {
-            controls[i].Arrange(new Rect(0, 0, 1, 1));
+            controls[i].IsVisible = false;
             controls[i].DataContext = null;
         }
 

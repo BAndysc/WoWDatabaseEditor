@@ -139,6 +139,7 @@ namespace WDE.MySqlDatabaseCommon.Database
                     case "char":
                     case "varchar":
                     case "text":
+                    case "mediumtext":
                     case "longtext":
                         c.ManagedType = typeof(string);
                         c.DefaultValue = defaultValue;

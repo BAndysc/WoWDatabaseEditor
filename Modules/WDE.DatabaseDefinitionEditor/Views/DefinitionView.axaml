@@ -1,0 +1,198 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:definitionEditor="clr-namespace:WDE.DatabaseDefinitionEditor.ViewModels.DefinitionEditor"
+             xmlns:views="clr-namespace:WDE.DatabaseDefinitionEditor.Views"
+             xmlns:tools="clr-namespace:WDE.DatabaseDefinitionEditor.ViewModels"
+             xmlns:controls="clr-namespace:WDE.DatabaseDefinitionEditor.Views.Controls"
+             xmlns:dnD="clr-namespace:WDE.Common.Avalonia.DnD;assembly=WDE.Common.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="WDE.DatabaseDefinitionEditor.Views.DefinitionView"
+             x:Name="Root"
+             x:DataType="definitionEditor:DefinitionViewModel">
+    <views:TwoColumnsPanel>
+        <TextBlock ToolTip.Tip="Whether you edit world or hotfix database">Database:</TextBlock>
+        <ComboBox Items="{x:Static tools:DefinitionEditorStatic.DataDatabaseTypes}" SelectedItem="{CompiledBinding DataDatabaseType}" />
+        
+        <TextBlock ToolTip.Tip="Table name in the database">Table name:</TextBlock>
+        <controls:DatabaseTableCompletionBox Database="{CompiledBinding DataDatabaseType}" TableName="{CompiledBinding TableName}" /> 
+
+        <TextBlock ToolTip.Tip="Legacy ID for this definition. Please use the table name here again.">Id:</TextBlock>
+        <TextBox Text="{CompiledBinding Id}" />
+
+        <TextBlock ToolTip.Tip="This table is compatible with following cores">Compatibility:</TextBlock>
+        <CompletionComboBox Items="{CompiledBinding Compatibility}">
+            <CompletionComboBox.ItemTemplate>
+                <DataTemplate DataType="definitionEditor:CoreVersionViewModel">
+                    <CheckBox IsChecked="{CompiledBinding IsChecked}">
+                        <DockPanel>
+                            <WdeImage Image="{CompiledBinding  Icon}" Width="16" Height="16" Margin="0,0,5,0" />
+                            <TextBlock Text="{CompiledBinding  Tag}" />
+                        </DockPanel>
+                    </CheckBox>
+                </DataTemplate>
+            </CompletionComboBox.ItemTemplate>
+            <CompletionComboBox.ButtonItemTemplate>
+                <DataTemplate DataType="definitionEditor:CoreVersionViewModel">
+                    <TextBlock Text="{CompiledBinding #Root.((definitionEditor:DefinitionViewModel)DataContext).CompatibilityString}" />
+                </DataTemplate>
+            </CompletionComboBox.ButtonItemTemplate>
+        </CompletionComboBox>
+
+        <TextBlock xml:space="preserve" ToolTip.Tip="The display mode of this editor. Template is a vertical view and can be used for tables with single column primary key, i.e. creature_template.
+
+MultiRecord and SingleRow can be used for tables with multi (or single) column primary key. However with MultiRecord you still have to specify Table Primary Key Column, which will be used for grouping items. In SingleRow there is no grouping. You always see the whole table.">Table record mode:</TextBlock>
+        <ComboBox Items="{x:Static tools:DefinitionEditorStatic.RecordModes}" SelectedItem="{CompiledBinding RecordMode}" />
+
+        <TextBlock ToolTip.Tip="Friendly name used i.e. in menus">Friendly name:</TextBlock>
+        <TextBox Text="{CompiledBinding Name}" />
+        
+        <views:TwoColumnsPanel ColumnSpan="2"
+                               IsVisible="{CompiledBinding IsSingleRow, Converter={x:Static BoolConverters.Not}}">
+            <TextBlock ToolTip.Tip="In Template or MultiRecord mode, this name will be used as the tab name if there is only one edited item (i.e. single creature in the creature_text editor)">Single solution name:</TextBlock>
+            <TextBox Watermark="\{key\} will be replaced by the entity primary key. \{name\} will be replaced by the entity primary key string parameter value" Text="{CompiledBinding SingleSolutionName}" />
+
+            <TextBlock ToolTip.Tip="In Template or MultiRecord mode, this name will be used as the tab name if you have more than one edited items (i.e. you edit multiple creatures in creature_text editor)">Multi solution name:</TextBlock>
+            <TextBox Text="{CompiledBinding MultiSolutionName}" />
+        </views:TwoColumnsPanel>
+
+        <TextBlock ToolTip.Tip="Human friendly description used in the New Item window">Friendly description:</TextBlock>
+        <TextBox Text="{CompiledBinding Description}" />
+
+        <TextBlock ToolTip.Tip="In Template and MultiRecord, this is the main, primary key column. This column will be used for grouping." 
+                   IsVisible="{CompiledBinding IsSingleRow, Converter={x:Static BoolConverters.Not}}">Primary key column:</TextBlock>
+        <controls:DatabaseColumnCompletionBox TableName="{CompiledBinding TableName}"
+                                              ColumnName="{CompiledBinding TablePrimaryKeyColumnName}"
+                                              CanSelectEmpty="True"
+                                              Database="{CompiledBinding DataDatabaseType}"
+                                              IsVisible="{CompiledBinding IsSingleRow, Converter={x:Static BoolConverters.Not}}" />
+
+        <TextBlock ToolTip.Tip="Condition only mode is a special mode for tables, where there is a certain condition source type and no matching table. I.e. spell implicit target (13) condition source, doesn't relate to any table. It is just a condition. Due to lack of a generic condition editor, the workaround in the editor is to create a special editor for such nonexisting table `spell_implicit_target`." IsVisible="{CompiledBinding IsMultiRecord}">Is only conditions table:</TextBlock>
+        <ComboBox IsVisible="{CompiledBinding IsMultiRecord}" Items="{x:Static tools:DefinitionEditorStatic.OnlyConditionModes}" SelectedItem="{CompiledBinding IsOnlyConditionsTable}" />
+
+        <TextBlock>Flags:</TextBlock>
+        <StackPanel Spacing="5">
+            <CheckBox ToolTip.Tip="If true, the table will not be offered in the quick load panel in the start page." IsChecked="{CompiledBinding SkipQuickLoad}">Skip quick load</CheckBox>
+        </StackPanel>
+
+        <TextBlock ToolTip.Tip="This will be the group name in Solution Explorer and File -> Add New panel. Purely visual.">Friendly group name:</TextBlock>
+        <NullableTextBox Text="{CompiledBinding GroupName}" />
+
+        <TextBlock ToolTip.Tip="Self explanatory, I guess? Did you really hover this to get help?">Icon:</TextBlock>
+        <DockPanel>
+            <CheckBox IsChecked="{CompiledBinding IsNonNullIcon}" />
+            <CompletionComboBox SelectedItem="{CompiledBinding IconPath}"
+                                IsEnabled="{CompiledBinding IsNonNullIcon}"
+                      Items="{x:Static tools:DefinitionEditorStatic.IconsSource}">
+                <CompletionComboBox.ItemTemplate>
+                    <DataTemplate DataType="definitionEditor:IconViewModel">
+                        <DockPanel>
+                            <WdeImage Image="{CompiledBinding  Icon}" Width="16" Height="16" Margin="0,0,5,0" />
+                            <TextBlock Text="{CompiledBinding  Path}" />
+                        </DockPanel>
+                    </DataTemplate>
+                </CompletionComboBox.ItemTemplate>
+            </CompletionComboBox>
+        </DockPanel>
+
+        <TextBlock ToolTip.Tip="Comma separated (,) list of command that will be invoked upon table save. {} will be substituted by a comma separated list of values of the first column in the primary key.">Reload command:</TextBlock>
+        <NullableTextBox FontFamily="Consolas,Menlo,Courier,Courier New" Watermark="Comma (,) separated list" Text="{CompiledBinding ReloadCommand}" />
+
+        <TextBlock ToolTip.Tip="A list of columns that will be used for sorting the output of the table. If empty, primary keys will be used for sorting." IsVisible="{CompiledBinding IsTemplate, Converter={x:Static BoolConverters.Not}}">SortBy:</TextBlock>
+        <StackPanel Spacing="5" IsVisible="{CompiledBinding IsTemplate, Converter={x:Static BoolConverters.Not}}">
+            <ToolbarPanel>
+                <ButtonImage Image="Icons/icon_add.png" Command="{CompiledBinding AddSortBy}" />
+                <ButtonImage Image="Icons/icon_delete.png" Command="{CompiledBinding DeleteSelectedSortBy}" IsEnabled="{CompiledBinding SelectedSortBy, Converter={x:Static NullConverter.IsNotNull}}" />
+            </ToolbarPanel>
+            
+            <ListBox dnD:DragAndDrop.IsDropTarget="True" dnD:DragAndDrop.DropHandler="{CompiledBinding }" dnD:DragAndDrop.IsDragSource="True" Items="{CompiledBinding SortBy}" SelectedItem="{CompiledBinding SelectedSortBy}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{CompiledBinding ColumnName}" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            
+            <Panel  IsEnabled="{CompiledBinding SelectedSortBy, Converter={x:Static NullConverter.IsNotNull}}">
+                <controls:DatabaseColumnCompletionBox 
+                    DataContext="{CompiledBinding SelectedSortBy}"
+                    TableName="{CompiledBinding Parent.TableName}"
+                    Database="{CompiledBinding Parent.DataDatabaseType}"
+                    ColumnName="{CompiledBinding ColumnName}" />
+            </Panel>
+        </StackPanel>
+        
+        <TextBlock ToolTip.Tip="This is the parameter type for picker when opening a new editor for this table." IsVisible="{CompiledBinding IsSingleRow, Converter={x:Static BoolConverters.Not}}">Picker:</TextBlock>
+        <CompletionComboBox Items="{CompiledBinding AllParameters}" SelectedItem="{CompiledBinding Picker}" IsVisible="{CompiledBinding IsSingleRow, Converter={x:Static BoolConverters.Not}}">
+            <CompletionComboBox.ItemTemplate>
+                <DataTemplate DataType="definitionEditor:ColumnValueTypeViewModel">
+                    <TextBlock Text="{CompiledBinding Name}" />
+                </DataTemplate>
+            </CompletionComboBox.ItemTemplate>
+        </CompletionComboBox>
+
+        <!-- This is not used column!! -->
+        <!-- <TextBlock  IsVisible="{CompiledBinding IsSingleRow, Converter={x:Static BoolConverters.Not}}">Table name source column:</TextBlock> -->
+        <!-- <controls:NullableDatabaseColumnCompletionBox TableName="{CompiledBinding TableName}"  -->
+        <!--                                       ColumnName="{CompiledBinding TableNameSource}" -->
+        <!--                                       IsVisible="{CompiledBinding IsSingleRow, Converter={x:Static BoolConverters.Not}}" /> -->
+        
+        <TextBlock ToolTip.Tip="This is used only for Search Anywhere feature. If a row from this table is found and the user opens this row, an editor will be opened with this column used for filtering.
+
+I.e. user looks for sound = 1423 and it finds row in the creature_text table with primary key: CreatureId=19522, GroupId=1, Id=2. If you set 'Group By Column' to 'CreatureId', upon opening the search result, it will open an editor for creature_text with CreatureId=19522"
+                   IsVisible="{CompiledBinding IsSingleRow}">Group by column:</TextBlock>
+        <controls:NullableDatabaseColumnCompletionBox
+            IsVisible="{CompiledBinding IsSingleRow}"
+            Database="{CompiledBinding DataDatabaseType}"
+            TableName="{CompiledBinding TableName}"
+            ColumnName="{CompiledBinding GroupByKey}" />
+        
+        <TextBlock ToolTip.Tip="By default the editor takes Primary Keys from the columns in order of the columns precedence. If you want to have a custom primary key order, use this." IsVisible="{CompiledBinding IsTemplate, Converter={x:Static BoolConverters.Not}}">Custom primary key order:</TextBlock>
+        <CheckBox IsChecked="{CompiledBinding HasCustomPrimaryKeyOrder}" IsVisible="{CompiledBinding IsTemplate, Converter={x:Static BoolConverters.Not}}">Enable</CheckBox>
+        
+        <views:TwoColumnsPanel ColumnSpan="2" IsVisible="{CompiledBinding HasCustomPrimaryKeyOrder}">
+            <TextBlock />
+            <StackPanel Spacing="5" IsVisible="{CompiledBinding IsTemplate, Converter={x:Static BoolConverters.Not}}">
+                <ToolbarPanel>
+                    <ButtonImage Image="Icons/icon_add.png" Command="{CompiledBinding AddCustomPrimaryKey}" />
+                    <ButtonImage Image="Icons/icon_delete.png" Command="{CompiledBinding DeleteSelectedPrimaryKey}" IsEnabled="{CompiledBinding SelectedCustomPrimaryKey, Converter={x:Static NullConverter.IsNotNull}}" />
+                </ToolbarPanel>
+            
+                <ListBox dnD:DragAndDrop.IsDropTarget="True" dnD:DragAndDrop.DropHandler="{CompiledBinding }" dnD:DragAndDrop.IsDragSource="True" Items="{CompiledBinding CustomPrimaryKey}" SelectedItem="{CompiledBinding SelectedCustomPrimaryKey}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{CompiledBinding ColumnName}" />
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            
+                <Panel  IsEnabled="{CompiledBinding SelectedCustomPrimaryKey, Converter={x:Static NullConverter.IsNotNull}}">
+                    <controls:DatabaseColumnCompletionBox 
+                        DataContext="{CompiledBinding SelectedCustomPrimaryKey}"
+                        TableName="{CompiledBinding Parent.TableName}"
+                        Database="{CompiledBinding Parent.DataDatabaseType}"
+                        ColumnName="{CompiledBinding ColumnName}" />
+                </Panel>
+            </StackPanel>
+        </views:TwoColumnsPanel>
+        
+        <TextBlock ToolTip.Tip="When not null, the editor will override the value of this column to current core version build upon generating the SQL.">Autofill build column:</TextBlock>
+        <controls:NullableDatabaseColumnCompletionBox
+            Database="{CompiledBinding DataDatabaseType}"
+            TableName="{CompiledBinding TableName}"
+            ColumnName="{CompiledBinding AutofillBuildColumn}" />
+
+        <TextBlock ToolTip.Tip="When not null, upon row insertion or duplication, the editor will set the first column of the primary key to the next value of creature/gameobject guid, depending on this setting.
+
+This is only used for `creature` and `gameobject` tables editor." IsVisible="{CompiledBinding IsSingleRow}">Auto key value:</TextBlock>
+        <ComboBox Items="{x:Static tools:DefinitionEditorStatic.GuidTypes}" 
+                  IsVisible="{CompiledBinding IsSingleRow}"
+                  SelectedItem="{CompiledBinding AutoKeyValue}" />
+        <views:TwoColumnsPanel.Styles>
+            <Style Selector="TextBlock">
+                <Setter Property="VerticalAlignment" Value="Center" />
+            </Style>
+        </views:TwoColumnsPanel.Styles>
+    </views:TwoColumnsPanel>
+</UserControl>

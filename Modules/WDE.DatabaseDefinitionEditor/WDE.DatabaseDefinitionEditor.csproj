@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <OutputType>Library</OutputType>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <Configurations>Debug;Release</Configurations>
+        <Platforms>AnyCPU</Platforms>
+        <Nullable>enable</Nullable>
+        <WarningsAsErrors>nullable</WarningsAsErrors>
+    </PropertyGroup>
+    <PropertyGroup>
+        <OutputPath>..\bin\$(Configuration)\</OutputPath>
+    </PropertyGroup>
+    <Import Project="..\..\Module.props" />
+    <Import Project="..\..\Avalonia.props" />
+    <ItemGroup>
+      <ProjectReference Include="..\..\WDE.DatabaseEditors\WDE.DatabaseEditors.csproj" />
+      <ProjectReference Include="..\..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />
+    </ItemGroup>
+</Project>

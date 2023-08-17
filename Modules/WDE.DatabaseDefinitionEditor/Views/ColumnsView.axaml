@@ -1,0 +1,84 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:definitionEditor="clr-namespace:WDE.DatabaseDefinitionEditor.ViewModels.DefinitionEditor"
+             xmlns:views="clr-namespace:WDE.DatabaseDefinitionEditor.Views"
+             xmlns:viewModels="clr-namespace:WDE.DatabaseDefinitionEditor.ViewModels"
+             xmlns:dnD="clr-namespace:WDE.Common.Avalonia.DnD;assembly=WDE.Common.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="definitionEditor:DefinitionViewModel"
+             x:Name="Root"
+             x:Class="WDE.DatabaseDefinitionEditor.Views.ColumnsView">
+  <DockPanel ClipToBounds="True">
+      <DockPanel>
+          <ToolbarPanel DockPanel.Dock="Top">
+              <ButtonImage Text="Group" ToolTip.Tip="Add a new group" Image="Icons/icon_add_2.png" Command="{CompiledBinding AddGroupCommand}" />
+              <ButtonImage Text="Column" ToolTip.Tip="Add a new column" Image="Icons/icon_add.png" Command="{CompiledBinding AddColumnCommand}" />
+              <ButtonImage ToolTip.Tip="Delete the column or group" Image="Icons/icon_delete.png" Command="{CompiledBinding DeleteSelectedColumnOrGroup}" IsEnabled="{CompiledBinding SelectedColumnOrGroup, Converter={x:Static NullConverter.IsNotNull}}" />
+              <ToolbarSpacer />
+              <ButtonImage ToolTip.Tip="Import missing columns" Image="Icons/icon_missing.png" Command="{CompiledBinding ImportMissingColumnsCommand}" />
+              <ButtonImage ToolTip.Tip="Import foreign table columns" Image="Icons/icon_down.png">
+                  <ButtonImage.Flyout>
+                      <Flyout>
+                          <DockPanel>
+                              <TextBlock DockPanel.Dock="Top">Foreign tables:</TextBlock>
+                              <ItemsControl Items="{CompiledBinding ForeignTables}">
+                                  <ItemsControl.ItemsPanel>
+                                      <ItemsPanelTemplate>
+                                          <StackPanel Spacing="5" />
+                                      </ItemsPanelTemplate>
+                                  </ItemsControl.ItemsPanel>
+                                  <ItemsControl.ItemTemplate>
+                                      <DataTemplate>
+                                          <Button Content="{CompiledBinding TableName, StringFormat=Import {0}}" 
+                                                  Command="{CompiledBinding #Root.((definitionEditor:DefinitionViewModel)DataContext).ImportForeignTableCommand}"
+                                                  CommandParameter="{CompiledBinding .}"
+                                          />
+                                      </DataTemplate>
+                                  </ItemsControl.ItemTemplate>
+                              </ItemsControl>
+                          </DockPanel>
+                      </Flyout>
+                  </ButtonImage.Flyout>
+              </ButtonImage>
+          </ToolbarPanel>
+          <TreeView DockPanel.Dock="Left"
+                    MinWidth="200"
+                    dnD:DragAndDrop.IsDropTarget="True"
+                    dnD:DragAndDrop.DropHandler="{CompiledBinding .}" 
+                    dnD:DragAndDrop.IsDragSource="True"
+                    Background="{DynamicResource ThemeBackgroundBrush}"
+                    BorderThickness="{DynamicResource ThemeBorderThickness}"
+                    BorderBrush="{DynamicResource ThemeBorderMidBrush}"
+                    Items="{CompiledBinding Groups}"
+                    SelectedItem="{CompiledBinding SelectedColumnOrGroup}">
+              <TreeView.DataTemplates>
+                  <TreeDataTemplate DataType="definitionEditor:ColumnViewModel" x:DataType="definitionEditor:ColumnViewModel">
+                      <TextBlock Text="{CompiledBinding Header}" />
+                  </TreeDataTemplate>
+                  <TreeDataTemplate DataType="definitionEditor:ColumnGroupViewModel" ItemsSource="{CompiledBinding Columns}">
+                      <TextBlock Text="{CompiledBinding GroupName}"></TextBlock>
+                  </TreeDataTemplate>
+              </TreeView.DataTemplates>
+              <TreeView.Styles>
+                  <Style Selector="TreeViewItem" x:DataType="definitionEditor:ColumnGroupViewModel">
+                      <Setter Property="IsExpanded" Value="{CompiledBinding IsExpanded, Mode=TwoWay}"/>
+                  </Style>
+              </TreeView.Styles>
+          </TreeView>
+      </DockPanel>
+    <ScrollViewer IsEnabled="{CompiledBinding SelectedColumnOrGroup, Converter={x:Static NullConverter.IsNotNull}}">
+        <ContentControl Margin="10" Content="{CompiledBinding SelectedColumnOrGroup}">
+            <ContentControl.DataTemplates>
+                <DataTemplate DataType="definitionEditor:ColumnViewModel">
+                    <views:ColumnView />
+                </DataTemplate>
+                <DataTemplate DataType="definitionEditor:ColumnGroupViewModel">
+                    <views:GroupView />
+                </DataTemplate>
+            </ContentControl.DataTemplates>
+        </ContentControl>
+    </ScrollViewer>
+</DockPanel>
+</UserControl>

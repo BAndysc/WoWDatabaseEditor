@@ -1,0 +1,23 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:metaColumns="clr-namespace:WDE.DatabaseDefinitionEditor.ViewModels.DefinitionEditor.MetaColumns"
+             xmlns:views="clr-namespace:WDE.DatabaseDefinitionEditor.Views"
+             xmlns:controls="clr-namespace:WDE.DatabaseDefinitionEditor.Views.Controls"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="metaColumns:MultiRecordTableReferenceMetaColumnViewModel"
+             x:Class="WDE.DatabaseDefinitionEditor.Views.DefinitionEditor.MetaColumns.MultiRecordTableReferenceMetaColumnView">
+  <views:TwoColumnsPanel>
+    <TextBlock>Referenced table (only MultiRecord!):</TextBlock>
+    <controls:DatabaseTableCompletionBox
+      Database="{CompiledBinding Parent.Parent.Parent.DataDatabaseType}"
+      TableName="{CompiledBinding TableName}" />
+    
+    <TextBlock>Key column:</TextBlock>
+    <controls:DatabaseColumnCompletionBox
+      Database="{CompiledBinding Parent.Parent.Parent.DataDatabaseType}"
+      TableName="{CompiledBinding Parent.Parent.Parent.TableName}"
+      ColumnName="{CompiledBinding KeyColumnName}" />
+  </views:TwoColumnsPanel>
+</UserControl>

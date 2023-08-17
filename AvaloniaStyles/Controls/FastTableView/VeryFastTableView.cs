@@ -92,10 +92,13 @@ public partial class VeryFastTableView : Panel, IKeyboardNavigationHandler, IFas
         AffectsRender<VeryFastTableView>(SelectedCellIndexProperty);
         AffectsRender<VeryFastTableView>(RowFilterProperty);
         AffectsRender<VeryFastTableView>(RowFilterParameterProperty);
+        AffectsRender(IsGroupingEnabledProperty);
         AffectsMeasure<VeryFastTableView>(RowFilterProperty);
         AffectsMeasure<VeryFastTableView>(RowFilterParameterProperty);
+        AffectsMeasure<VeryFastTableView>(IsGroupingEnabledProperty);
         AffectsArrange<VeryFastTableView>(RowFilterProperty);
         AffectsArrange<VeryFastTableView>(RowFilterParameterProperty);
+        AffectsArrange<VeryFastTableView>(IsGroupingEnabledProperty);
         FocusableProperty.OverrideDefaultValue<VeryFastTableView>(true);
         BackgroundProperty.OverrideDefaultValue<VeryFastTableView>(Brushes.Transparent);
 

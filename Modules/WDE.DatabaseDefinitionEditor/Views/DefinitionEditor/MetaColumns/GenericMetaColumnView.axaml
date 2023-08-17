@@ -1,0 +1,17 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:metaColumns="clr-namespace:WDE.DatabaseDefinitionEditor.ViewModels.DefinitionEditor.MetaColumns"
+             xmlns:views="clr-namespace:WDE.DatabaseDefinitionEditor.Views"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="metaColumns:GenericMetaColumnViewModel"
+             x:Class="WDE.DatabaseDefinitionEditor.Views.DefinitionEditor.MetaColumns.GenericMetaColumnView">
+  <views:TwoColumnsPanel>
+    <TextBlock>Generic:</TextBlock>
+    <TextBox FontFamily="Consolas,Menlo,Courier,Courier New" Text="{CompiledBinding Text}" />
+    
+    <TextBlock />
+    <TextBlock Opacity="0.5" TextWrapping="WrapWithOverflow">Note: this is a fallback when no proper editor was found for the current meta column. Looks like some new view should be added to the editor. Please report to the author.</TextBlock>
+  </views:TwoColumnsPanel>
+</UserControl>

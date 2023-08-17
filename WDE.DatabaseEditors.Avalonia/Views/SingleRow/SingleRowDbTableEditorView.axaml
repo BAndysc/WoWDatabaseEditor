@@ -167,6 +167,7 @@
                         MultiSelection="{CompiledBinding MultiSelection}"
                         Columns="{CompiledBinding Columns}"
                         ValueUpdateRequest="VeryFastTableView_OnValueUpdateRequest"
+                        IsGroupingEnabled="True"
                         RowFilterParameter="{CompiledBinding SearchText}"
                         Items="{CompiledBinding OnlyGroup}">
                         <fastTableView:VeryFastTableView.CustomCellInteractor>

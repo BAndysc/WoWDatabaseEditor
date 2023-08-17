@@ -35,5 +35,6 @@ namespace WDE.Common.Parameters
         IObservable<IParameter<long>> OnRegisterLong(string key);
         IObservable<IParameter<string>> OnRegisterString(string key);
         IObservable<IParameter> OnRegister();
+        IObservable<string> OnRegisterKey();
     }
 }

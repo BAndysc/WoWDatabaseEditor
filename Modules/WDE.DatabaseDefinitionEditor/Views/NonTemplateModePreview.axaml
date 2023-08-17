@@ -1,0 +1,30 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:WDE.DatabaseDefinitionEditor.ViewModels"
+             xmlns:fastTableView="clr-namespace:AvaloniaStyles.Controls.FastTableView;assembly=AvaloniaStyles"
+             xmlns:definitionEditor="clr-namespace:WDE.DatabaseDefinitionEditor.ViewModels.DefinitionEditor"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:DefinitionEditorViewModel"
+             x:Class="WDE.DatabaseDefinitionEditor.Views.NonTemplateModePreview">
+  <ScrollViewer Grid.Row="2" HorizontalScrollBarVisibility="Auto">
+    <fastTableView:VeryFastTableView Items="{CompiledBinding ItemsDemo}"
+                                     ColumnPressed="VeryFastTableView_OnColumnPressed"
+                                     InteractiveHeader="True"
+                                     x:Name="TableView"
+                                     IsGroupingEnabled="{CompiledBinding SelectedTable.IsMultiRecord, FallbackValue=False}"
+                                     SelectedCellIndex="{CompiledBinding SelectedCellIndex, Mode=TwoWay}"
+                                     Columns="{CompiledBinding SelectedTable.ColumnsPreview, FallbackValue=Null}">
+      <fastTableView:VeryFastTableView.GroupHeaderTemplate>
+        <DataTemplate DataType="definitionEditor:DemoItemGroup">
+          <GroupingHeader ClipToBounds="True" Background="{DynamicResource ContentBackground}" GroupName="{CompiledBinding GroupHeader}">
+            <GroupingHeader.CustomContent>
+              <Button Width="23" Height="23" FontSize="16" IsEnabled="False">+</Button>
+            </GroupingHeader.CustomContent>
+          </GroupingHeader>
+        </DataTemplate>
+      </fastTableView:VeryFastTableView.GroupHeaderTemplate>
+    </fastTableView:VeryFastTableView>
+  </ScrollViewer>
+</UserControl>

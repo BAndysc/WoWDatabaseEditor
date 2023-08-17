@@ -30,6 +30,7 @@ public partial class VeryFastTableView
     public static readonly StyledProperty<IDataTemplate?> GroupHeaderTemplateProperty = AvaloniaProperty.Register<VeryFastTableView, IDataTemplate?>(nameof(GroupHeaderTemplate));
     public static readonly StyledProperty<bool> InteractiveHeaderProperty = AvaloniaProperty.Register<VeryFastTableView, bool>(nameof(InteractiveHeader));
     public static readonly StyledProperty<string> RowFilterParameterProperty = AvaloniaProperty.Register<VeryFastTableView, string>("RowFilterParameter");
+    public static readonly StyledProperty<bool> IsGroupingEnabledProperty = AvaloniaProperty.Register<VeryFastTableView, bool>("IsGroupingEnabled");
 
     public static readonly RoutedEvent<ColumnPressedEventArgs> ColumnPressedEvent = RoutedEvent.Register<VeryFastTableView, ColumnPressedEventArgs>("ColumnPressed", RoutingStrategies.Tunnel | RoutingStrategies.Bubble);
 
@@ -102,8 +103,6 @@ public partial class VeryFastTableView
         set => SetValue(InteractiveHeaderProperty, value);
     }
     
-    public bool IsGroupingEnabled => GroupHeaderTemplate != null;
-
     public string RowFilterParameter
     {
         get => GetValue(RowFilterParameterProperty);
@@ -114,5 +113,11 @@ public partial class VeryFastTableView
     {
         get => (IRowFilterPredicate?)GetValue(RowFilterProperty);
         set => SetValue(RowFilterProperty, value);
+    }
+    
+    public bool IsGroupingEnabled
+    {
+        get => (bool)GetValue(IsGroupingEnabledProperty);
+        set => SetValue(IsGroupingEnabledProperty, value);
     }
 }
