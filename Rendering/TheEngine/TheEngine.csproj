@@ -51,7 +51,7 @@
     </ItemGroup>
     
     <ItemGroup>
-      <PackageReference Include="ImGui.NET" Version="1.87.3" />
+      <PackageReference Include="ImGui.NET" Version="1.89.7.1" />
       <PackageReference Include="JetBrains.Profiler.Api" Version="1.2.0" />
       <PackageReference Include="OpenTK.Windowing.Desktop" Version="4.7.5" />
         <PackageReference Include="OpenTK.Core" Version="4.7.5" />
