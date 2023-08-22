@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
@@ -94,7 +95,7 @@ public class UpdateHistoryViewModel : ObservableBase
     private IUpdateFieldsHistory? currentHistory;
     private UniversalGuid? currentGuid;
 
-    public Func<IEnumerable<object>, string, CancellationToken, Task<IEnumerable<object>>> FindGuidAsyncPopulator { get; }
+    public Func<IEnumerable, string, CancellationToken, Task<IEnumerable>> FindGuidAsyncPopulator { get; }
     public ObservableCollection<UniversalGuid> Guids { get; } = new();
     public ObservableCollection<IUpdateItem> CurrentValues { get; } = new ObservableCollection<IUpdateItem>();
 
@@ -179,7 +180,7 @@ public class UpdateHistoryViewModel : ObservableBase
                     if (guid.ToWowParserString().Contains(s))
                         result.Add(guid);
                 }
-                return (IEnumerable<object>)result;
+                return (IEnumerable)result;
             }, token);
         };
     }

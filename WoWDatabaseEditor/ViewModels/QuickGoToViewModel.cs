@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -52,7 +53,7 @@ public class QuickGoToViewModel : ObservableBase
                             result.Add(item);
                     }
                 }
-                return (IEnumerable<object>)result;
+                return (IEnumerable)result;
             }, token);
         };
         
@@ -100,7 +101,7 @@ public class QuickGoToViewModel : ObservableBase
     
     public ObservableCollection<IQuickGoToProvider> Providers { get; }
    
-    public Func<IEnumerable<object>, string, CancellationToken, Task<IEnumerable<object>>> FindItemAsyncPopulator { get; }
+    public Func<IEnumerable, string, CancellationToken, Task<IEnumerable>> FindItemAsyncPopulator { get; }
 
     public QuickGoToItemViewModel? SelectedItem
     {
