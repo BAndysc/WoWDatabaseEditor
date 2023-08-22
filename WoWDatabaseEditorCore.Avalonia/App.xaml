@@ -75,5 +75,22 @@
         <Style Selector="controls1|ToolbarPanel > ItemsPresenter components|WdeImage">
             <Setter Property="Height" Value="20" />
         </Style>
+        
+        
+        <Style Selector="TextBox.noErrors DataValidationErrors">
+            <!-- I don't want to display data validation errors here -->
+            <!-- https://github.com/AvaloniaUI/Avalonia/blob/release/0.10.17/src/Avalonia.Themes.Fluent/Controls/DataValidationErrors.xaml -->
+            <Setter Property="Template">
+                <ControlTemplate TargetType="DataValidationErrors">
+                    <ContentPresenter Name="PART_ContentPresenter"
+                                      Padding="{TemplateBinding Padding}"
+                                      Background="{TemplateBinding Background}"
+                                      BorderThickness="{TemplateBinding BorderThickness}"
+                                      CornerRadius="{TemplateBinding CornerRadius}"
+                                      Content="{TemplateBinding Content}"
+                                      ContentTemplate="{TemplateBinding ContentTemplate}" />
+                </ControlTemplate>
+            </Setter>
+        </Style>
     </Application.Styles>
 </Application>
