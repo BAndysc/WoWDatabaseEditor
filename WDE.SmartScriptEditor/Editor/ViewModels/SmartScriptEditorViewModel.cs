@@ -531,7 +531,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 });*/
             SaveCommand = new AsyncAutoCommand(() =>
             {
-                return taskRunner.ScheduleTask("Save script to database", SaveAllToDb);
+                return taskRunner.ScheduleTask("Save script to database", () => messageBoxService.WrapError(SaveAllToDb));
             });
 
             DeleteAction = new DelegateCommand<SmartAction>(DeleteActionCommand);
