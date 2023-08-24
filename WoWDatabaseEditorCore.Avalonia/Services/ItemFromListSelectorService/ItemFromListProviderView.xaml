@@ -28,7 +28,6 @@
             Items="{Binding FilteredItems}" Margin="0,0,0,6"
             IsVisible="{Binding ShowItemsList}"
             utils:DataGridColumns.ColumnsSource="{Binding  Columns}"
-            KeyDown="InputElement_OnKeyDown"
             Name="GridView">
             <Interaction.Behaviors>
                 <EventTriggerBehavior EventName="DoubleTapped">

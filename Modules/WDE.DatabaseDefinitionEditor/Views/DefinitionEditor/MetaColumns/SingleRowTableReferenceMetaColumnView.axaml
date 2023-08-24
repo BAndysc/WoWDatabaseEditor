@@ -8,7 +8,7 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="metaColumns:SingleRowTableReferenceMetaColumnViewModel"
              x:Class="WDE.DatabaseDefinitionEditor.Views.DefinitionEditor.MetaColumns.SingleRowTableReferenceMetaColumnView">
-  <views:TwoColumnsPanel>
+  <TwoColumnsPanel>
     <TextBlock>Referenced table (only SingleRow!):</TextBlock>
     <controls:DatabaseTableCompletionBox
       Database="{CompiledBinding Parent.Parent.Parent.DataDatabaseType}"
@@ -22,5 +22,5 @@
       Database="{CompiledBinding Parent.Parent.Parent.DataDatabaseType}"
       TableName="{CompiledBinding Parent.Parent.Parent.TableName}"
       ColumnName="{CompiledBinding PartialKeyColumn}" />
-  </views:TwoColumnsPanel>
+  </TwoColumnsPanel>
 </UserControl>

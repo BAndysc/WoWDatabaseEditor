@@ -8,7 +8,7 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="metaColumns:One2OneMetaColumnViewModel"
              x:Class="WDE.DatabaseDefinitionEditor.Views.DefinitionEditor.MetaColumns.One2OneMetaColumnView">
-    <views:TwoColumnsPanel>
+    <TwoColumnsPanel>
       <TextBlock>Referenced table:</TextBlock>
       <controls:DatabaseTableCompletionBox
         Database="{CompiledBinding Parent.Parent.Parent.DataDatabaseType}"
@@ -16,5 +16,5 @@
       
       <TextBlock />
       <CheckBox IsChecked="{CompiledBinding DynamicKey}">Dynamic key</CheckBox>
-    </views:TwoColumnsPanel>
+    </TwoColumnsPanel>
 </UserControl>

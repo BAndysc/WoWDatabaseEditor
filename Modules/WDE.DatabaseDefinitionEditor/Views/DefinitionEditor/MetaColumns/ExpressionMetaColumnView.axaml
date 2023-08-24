@@ -7,7 +7,7 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="metaColumns:ExpressionMetaColumnViewModel"
              x:Class="WDE.DatabaseDefinitionEditor.Views.DefinitionEditor.MetaColumns.ExpressionMetaColumnView">
-  <views:TwoColumnsPanel>
+  <TwoColumnsPanel>
     <TextBlock>Expression:</TextBlock>
     <TextBox FontFamily="Consolas,Menlo,Courier,Courier New" Text="{CompiledBinding Expression}" />
     
@@ -23,5 +23,5 @@
       <TextBlock TextWrapping="WrapWithOverflow">Calculates armor based on the minlevel and unit_class columns, then multiplies the result by the armorModifier column, then ceil the float value and convert it to a string. Concatenates with a dash and the same computation for maxLevel column.</TextBlock>
       <TextBlock FontFamily="Consolas,Menlo,Courier,Courier New">str(ceil(GetArmor(this.minlevel, this.unit_class) * this.ArmorModifier)) + ' - ' + str(ceil(GetArmor(this.maxlevel, this.unit_class) * this.ArmorModifier))</TextBlock>
     </StackPanel>
-  </views:TwoColumnsPanel>
+  </TwoColumnsPanel>
 </UserControl>

@@ -11,7 +11,7 @@
              x:Class="WDE.DatabaseDefinitionEditor.Views.DefinitionView"
              x:Name="Root"
              x:DataType="definitionEditor:DefinitionViewModel">
-    <views:TwoColumnsPanel>
+    <TwoColumnsPanel>
         <TextBlock ToolTip.Tip="Whether you edit world or hotfix database">Database:</TextBlock>
         <ComboBox Items="{x:Static tools:DefinitionEditorStatic.DataDatabaseTypes}" SelectedItem="{CompiledBinding DataDatabaseType}" />
         
@@ -48,14 +48,14 @@ MultiRecord and SingleRow can be used for tables with multi (or single) column p
         <TextBlock ToolTip.Tip="Friendly name used i.e. in menus">Friendly name:</TextBlock>
         <TextBox Text="{CompiledBinding Name}" />
         
-        <views:TwoColumnsPanel ColumnSpan="2"
+        <TwoColumnsPanel ColumnSpan="2"
                                IsVisible="{CompiledBinding IsSingleRow, Converter={x:Static BoolConverters.Not}}">
             <TextBlock ToolTip.Tip="In Template or MultiRecord mode, this name will be used as the tab name if there is only one edited item (i.e. single creature in the creature_text editor)">Single solution name:</TextBlock>
             <TextBox Watermark="\{key\} will be replaced by the entity primary key. \{name\} will be replaced by the entity primary key string parameter value" Text="{CompiledBinding SingleSolutionName}" />
 
             <TextBlock ToolTip.Tip="In Template or MultiRecord mode, this name will be used as the tab name if you have more than one edited items (i.e. you edit multiple creatures in creature_text editor)">Multi solution name:</TextBlock>
             <TextBox Text="{CompiledBinding MultiSolutionName}" />
-        </views:TwoColumnsPanel>
+        </TwoColumnsPanel>
 
         <TextBlock ToolTip.Tip="Human friendly description used in the New Item window">Friendly description:</TextBlock>
         <TextBox Text="{CompiledBinding Description}" />
@@ -151,7 +151,7 @@ I.e. user looks for sound = 1423 and it finds row in the creature_text table wit
         <TextBlock ToolTip.Tip="By default the editor takes Primary Keys from the columns in order of the columns precedence. If you want to have a custom primary key order, use this." IsVisible="{CompiledBinding IsTemplate, Converter={x:Static BoolConverters.Not}}">Custom primary key order:</TextBlock>
         <CheckBox IsChecked="{CompiledBinding HasCustomPrimaryKeyOrder}" IsVisible="{CompiledBinding IsTemplate, Converter={x:Static BoolConverters.Not}}">Enable</CheckBox>
         
-        <views:TwoColumnsPanel ColumnSpan="2" IsVisible="{CompiledBinding HasCustomPrimaryKeyOrder}">
+        <TwoColumnsPanel ColumnSpan="2" IsVisible="{CompiledBinding HasCustomPrimaryKeyOrder}">
             <TextBlock />
             <StackPanel Spacing="5" IsVisible="{CompiledBinding IsTemplate, Converter={x:Static BoolConverters.Not}}">
                 <ToolbarPanel>
@@ -175,7 +175,7 @@ I.e. user looks for sound = 1423 and it finds row in the creature_text table wit
                         ColumnName="{CompiledBinding ColumnName}" />
                 </Panel>
             </StackPanel>
-        </views:TwoColumnsPanel>
+        </TwoColumnsPanel>
         
         <TextBlock ToolTip.Tip="When not null, the editor will override the value of this column to current core version build upon generating the SQL.">Autofill build column:</TextBlock>
         <controls:NullableDatabaseColumnCompletionBox
@@ -189,10 +189,10 @@ This is only used for `creature` and `gameobject` tables editor." IsVisible="{Co
         <ComboBox Items="{x:Static tools:DefinitionEditorStatic.GuidTypes}" 
                   IsVisible="{CompiledBinding IsSingleRow}"
                   SelectedItem="{CompiledBinding AutoKeyValue}" />
-        <views:TwoColumnsPanel.Styles>
+        <TwoColumnsPanel.Styles>
             <Style Selector="TextBlock">
                 <Setter Property="VerticalAlignment" Value="Center" />
             </Style>
-        </views:TwoColumnsPanel.Styles>
-    </views:TwoColumnsPanel>
+        </TwoColumnsPanel.Styles>
+    </TwoColumnsPanel>
 </UserControl>

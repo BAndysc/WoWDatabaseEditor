@@ -7,7 +7,7 @@ using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.VisualTree;
 
-namespace WDE.DatabaseDefinitionEditor.Views;
+namespace AvaloniaStyles.Controls;
 
 public class TwoColumnsPanel : Panel
 {

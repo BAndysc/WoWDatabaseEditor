@@ -35,31 +35,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.ItemFromListSelectorService
                 Gesture = new KeyGesture(Key.F, AvaloniaLocator.Current.GetService<PlatformHotkeyConfiguration>().CommandModifiers)
             });
         }
-
-        private void InputElement_OnKeyDown(object? sender, KeyEventArgs e)
-        {
-            // add missing functionality - space on the item (un)checks the checkbox
-            if (e.Key == Key.Space && sender is GridView gridView)
-            {
-                ListBox? list = gridView.ListBoxImpl;
-                if (list?.SelectedItem == null)
-                    return;
-
-                var selected = list.ItemContainerGenerator.ContainerFromIndex(list.SelectedIndex);
-
-                if (selected == null)
-                    return;
-
-                var checkBox = selected.FindDescendantOfType<CheckBox>();
-
-                if (checkBox != null)
-                {
-                    checkBox.IsChecked = !checkBox.IsChecked;
-                    e.Handled = true;
-                }
-            }
-        }
-
+        
         // quality of life feature: arrow down in searchbox focuses first element
         private void SearchBox_OnKeyDown(object? sender, KeyEventArgs e)
         {

@@ -7,11 +7,11 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="metaColumns:InvokeRemoteCommandMetaColumnViewModel"
              x:Class="WDE.DatabaseDefinitionEditor.Views.DefinitionEditor.MetaColumns.InvokeRemoteCommandMetaColumnView">
-  <views:TwoColumnsPanel>
+  <TwoColumnsPanel>
     <TextBlock>Remote command:</TextBlock>
     <TextBox FontFamily="Consolas,Menlo,Courier,Courier New" Text="{CompiledBinding Command}" />
     
     <TextBlock />
     <TextBlock Opacity="0.5" TextWrapping="WrapWithOverflow">You can reference a column value by wrapping it in a brackets: `{}`. I.e. `.reload creature {guid}` will invoke command with substituted guids of edited rows.</TextBlock>
-  </views:TwoColumnsPanel>
+  </TwoColumnsPanel>
 </UserControl>

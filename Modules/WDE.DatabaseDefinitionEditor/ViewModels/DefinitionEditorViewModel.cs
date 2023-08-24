@@ -95,13 +95,17 @@ public partial class DefinitionEditorViewModel : ObservableBase
     public ObservableCollectionExtended<DemoItemGroup> ItemsDemo { get; } = new ObservableCollectionExtended<DemoItemGroup>();
 
     public event Action? OnDataChanged;
-    
+
+    private bool waitingForDefinitionChange;
     private DefinitionStubViewModel? selectedDefinition;
     public DefinitionStubViewModel? SelectedDefinition
     {
         get => selectedDefinition;
         set
         {
+            if (waitingForDefinitionChange)
+                return;
+            
             var oldStub = selectedDefinition;
             SetProperty(ref selectedDefinition, value);
             refreshInProgress?.Cancel();
@@ -329,14 +333,22 @@ public partial class DefinitionEditorViewModel : ObservableBase
 
     private async Task SaveAndRefreshPreview(DefinitionStubViewModel? old, DefinitionStubViewModel? definition,CancellationToken cancel)
     {
-        if (!await EnsureSaved())
+        waitingForDefinitionChange = true;
+        try
         {
-            selectedDefinition = old;
-            RaisePropertyChanged(nameof(SelectedDefinition));
-            return;
-        }
+            if (!await EnsureSaved())
+            {
+                selectedDefinition = old;
+                RaisePropertyChanged(nameof(SelectedDefinition));
+                return;
+            }
 
-        await RefreshPreview(definition?.Definition, definition, cancel);
+            await RefreshPreview(definition?.Definition, definition, cancel);
+        }
+        finally
+        {
+            waitingForDefinitionChange = false;
+        }
     }
     
     private async Task<bool> RefreshPreview(DatabaseTableDefinitionJson? json, DefinitionStubViewModel? definition, CancellationToken cancel)

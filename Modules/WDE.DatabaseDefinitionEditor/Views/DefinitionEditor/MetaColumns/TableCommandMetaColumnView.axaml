@@ -8,11 +8,11 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="metaColumns:TableCommandMetaColumnViewModel"
              x:Class="WDE.DatabaseDefinitionEditor.Views.DefinitionEditor.MetaColumns.TableCommandMetaColumnView">
-  <views:TwoColumnsPanel>
+  <TwoColumnsPanel>
     <TextBlock ToolTip.Tip="A name of the command, as named in the editor code">Command id:</TextBlock>
     <controls:DatabaseTableCommandCompletionBox CommandId="{CompiledBinding CommandId}" />
     
     <TextBlock>Custom button text:</TextBlock>
     <NullableTextBox Text="{CompiledBinding CustomButtonText}" />
-  </views:TwoColumnsPanel>
+  </TwoColumnsPanel>
 </UserControl>

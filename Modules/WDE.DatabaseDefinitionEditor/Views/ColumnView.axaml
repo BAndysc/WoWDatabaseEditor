@@ -9,7 +9,7 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="WDE.DatabaseDefinitionEditor.Views.ColumnView"
              x:DataType="definitionEditor:ColumnViewModel">
-    <views:TwoColumnsPanel>
+    <TwoColumnsPanel>
      
         <TextBlock ToolTip.Tip="A friendly name displayed for the column">Friendly name:</TextBlock>
         <TextBox Text="{CompiledBinding Header}" />
@@ -32,7 +32,7 @@
 - a special button which meaning can be customized (meta column)">Column type:</TextBlock>
         <ComboBox Items="{x:Static tools:DefinitionEditorStatic.ColumnTypes}" SelectedItem="{CompiledBinding ColumnType}" />
         
-        <views:TwoColumnsPanel views:TwoColumnsPanel.ColumnSpan="2"
+        <TwoColumnsPanel TwoColumnsPanel.ColumnSpan="2"
                                IsVisible="{CompiledBinding IsDatabaseColumnType}">
             <TextBlock ToolTip.Tip="Name of the column in the database">Database column:</TextBlock>
             <CompletionComboBox Items="{CompiledBinding DatabaseSourceColumns}" SelectedItem="{CompiledBinding DatabaseColumnName}">
@@ -82,9 +82,9 @@ This will generate a comment, it will substitute `thisString.COLUMN` with a stri
                 <TextBox Text="{CompiledBinding StringValue}" />
                 <Button Grid.Column="2" Command="{CompiledBinding PickParameterCommand}" CommandParameter="{CompiledBinding .}">...</Button>
             </Grid>
-        </views:TwoColumnsPanel>
+        </TwoColumnsPanel>
 
-        <views:TwoColumnsPanel views:TwoColumnsPanel.ColumnSpan="2" IsVisible="{CompiledBinding IsMetaColumnType}">
+        <TwoColumnsPanel TwoColumnsPanel.ColumnSpan="2" IsVisible="{CompiledBinding IsMetaColumnType}">
             <TextBlock>Column type:</TextBlock>
             <ComboBox
                 SelectedItem="{CompiledBinding SelectedMetaColumnType}"
@@ -99,16 +99,16 @@ This will generate a comment, it will substitute `thisString.COLUMN` with a stri
                 </ComboBox.ItemTemplate>
             </ComboBox>
 
-            <ContentControl views:TwoColumnsPanel.ColumnSpan="2" Content="{CompiledBinding MetaViewModel}"></ContentControl>
-        </views:TwoColumnsPanel>
+            <ContentControl TwoColumnsPanel.ColumnSpan="2" Content="{CompiledBinding MetaViewModel}"></ContentControl>
+        </TwoColumnsPanel>
 
-        <views:TwoColumnsPanel views:TwoColumnsPanel.ColumnSpan="2" IsVisible="{CompiledBinding IsConditionColumnType}">
-        </views:TwoColumnsPanel>
+        <TwoColumnsPanel TwoColumnsPanel.ColumnSpan="2" IsVisible="{CompiledBinding IsConditionColumnType}">
+        </TwoColumnsPanel>
         
-        <views:TwoColumnsPanel.Styles>
+        <TwoColumnsPanel.Styles>
             <Style Selector="TextBlock">
                 <Setter Property="VerticalAlignment" Value="Center" />
             </Style>
-        </views:TwoColumnsPanel.Styles>
-    </views:TwoColumnsPanel>
+        </TwoColumnsPanel.Styles>
+    </TwoColumnsPanel>
 </UserControl>

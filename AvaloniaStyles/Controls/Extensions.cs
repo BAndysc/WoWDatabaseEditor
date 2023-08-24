@@ -88,7 +88,7 @@ namespace AvaloniaStyles.Controls
                     if (completionBoxReference.TryGetTarget(out var completionBox))
                     {
                         var current = Convert.ToUInt32(completionBox.SelectedItem!);
-                        return (current & EnumInteger) > 0;                        
+                        return EnumInteger == 0 && current == 0 || EnumInteger > 0 && (current & EnumInteger) == EnumInteger;                        
                     }
 
                     return false;
@@ -99,7 +99,12 @@ namespace AvaloniaStyles.Controls
                     {
                         var current = Convert.ToUInt32(completionBox.SelectedItem!);
                         if (value)
-                            completionBox.SelectedItem = Enum.ToObject(type, current | EnumInteger);
+                        {
+                            if (EnumInteger == 0)
+                                completionBox.SelectedItem = Enum.ToObject(type, 0);
+                            else
+                                completionBox.SelectedItem = Enum.ToObject(type, current | EnumInteger);
+                        }
                         else
                             completionBox.SelectedItem = Enum.ToObject(type, current & ~EnumInteger);
                     }

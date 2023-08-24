@@ -368,6 +368,33 @@ namespace AvaloniaStyles.Controls
         {
         }
 
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            base.OnKeyDown(e);
+            if (e.Handled)
+                return;
+
+            if (e.Key == Key.Space)
+            {
+                ListBox? list = ListBoxImpl;
+                if (list?.SelectedItem == null)
+                    return;
+
+                var selected = list.ItemContainerGenerator.ContainerFromIndex(list.SelectedIndex);
+
+                if (selected == null)
+                    return;
+
+                var checkBox = selected.FindDescendantOfType<CheckBox>();
+
+                if (checkBox != null)
+                {
+                    checkBox.IsChecked = !checkBox.IsChecked;
+                    e.Handled = true;
+                }
+            }
+        }
+
         public GridView()
         {
             Selection = new SelectionModel<object>();

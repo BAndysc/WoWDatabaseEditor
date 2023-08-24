@@ -32,7 +32,7 @@
     <GridSplitter Classes="vertical" Grid.Column="1" />
     
     <ScrollViewer Margin="10,0,0,0" Grid.Column="2" IsEnabled="{CompiledBinding SelectedForeignTable, Converter={x:Static NullConverter.IsNotNull}}">
-      <views:TwoColumnsPanel DataContext="{CompiledBinding SelectedForeignTable}">
+      <TwoColumnsPanel DataContext="{CompiledBinding SelectedForeignTable}">
         <TextBlock ToolTip.Tip="The database name of this foreign table">Foreign table name:</TextBlock>
         <controls:DatabaseTableCompletionBox Database="{CompiledBinding Parent.DataDatabaseType}"
                                              TableName="{CompiledBinding TableName}" />
@@ -64,16 +64,16 @@
           </ListBox>
             
           <Panel IsEnabled="{CompiledBinding SelectedForeignKey, Converter={x:Static NullConverter.IsNotNull}}">
-            <views:TwoColumnsPanel DataContext="{CompiledBinding SelectedForeignKey}">
+            <TwoColumnsPanel DataContext="{CompiledBinding SelectedForeignKey}">
               <TextBlock>Foreign column name:</TextBlock>
               <controls:DatabaseColumnCompletionBox Database="{CompiledBinding Parent.Parent.DataDatabaseType}"
                                                    TableName="{CompiledBinding Parent.TableName}"
                                                    ColumnName="{CompiledBinding ColumnName}" />
-            </views:TwoColumnsPanel>
+            </TwoColumnsPanel>
           </Panel>
         </StackPanel>
         
-      </views:TwoColumnsPanel>
+      </TwoColumnsPanel>
     </ScrollViewer>
     
   </Grid>
