@@ -197,8 +197,8 @@ internal class LegionDbcLoader : BaseDbcLoader
         Load("ScenarioStep.db2", row =>
         {
             var stepId = row.Key;
-            var description = row.GetString(0);
-            var name = row.GetString(1);
+            var description = row.GetString(1);
+            var name = row.GetString(2);
             var scenarioId = row.GetUInt(3);
             var stepIndex = row.GetUInt(6);
             data.ScenarioStepStore[stepId] = name;

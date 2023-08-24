@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using WDE.Common.DBC;
 using WDE.Common.Parameters;
@@ -51,7 +52,7 @@ public class SmartScenarioStepParameter : IContextualParameter<long, SmartBaseEl
             }
         }
 
-        var result = await itemFromListProvider.GetItemFromList(options, false, value, "Pick scenario step");
+        var result = await itemFromListProvider.GetItemFromList(options.OrderBy(x => x.Key).ToDictionary(x => x.Key, x => x.Value), false, value, "Pick scenario step");
         if (result.HasValue)
             return (result.Value, true);
         return (0, false);
