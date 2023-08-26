@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Generator.Equals;
 
 namespace WDE.Common.Parameters
 {
@@ -30,7 +31,8 @@ namespace WDE.Common.Parameters
         public virtual Func<Task<object?>>? SpecialCommand => null;
     }
 
-    public class SelectOption
+    [Equatable]
+    public partial class SelectOption
     {
         public SelectOption(string name, string? description)
         {
@@ -46,7 +48,10 @@ namespace WDE.Common.Parameters
         {
         }
 
+        [DefaultEquality]
         public string Name { get; set; } = "";
+
+        [DefaultEquality]
         public string? Description { get; set; }
 
         public override string ToString()

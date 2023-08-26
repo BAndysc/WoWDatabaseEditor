@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using WDE.Common.CoreVersion;
@@ -197,38 +198,14 @@ namespace WDE.SmartScriptEditor.Inspections
 
             if (ev.BuiltinRules != null)
             {
-                foreach (var builtinRule in ev.BuiltinRules)
+                foreach (var rule in ev.BuiltinRules)
                 {
-                    int brace = builtinRule.IndexOf("(");
-                    if (brace == -1 || builtinRule.Length == 0 || builtinRule[^1] != ')')
-                        continue;
-
-                    string type = builtinRule.Substring(0, brace);
-                    List<int> prams = builtinRule
-                        .Substring(brace + 1, builtinRule.Length - brace - 2)
-                        .Split(',')
-                        .Select(int.Parse).ToList();
-
-                    if (type == "nonzero")
+                    yield return rule.Type switch
                     {
-                        if (prams.Count == 1)
-                            yield return (ev.Id, new NonZeroInspection(ev, prams[0] - 1));
-                    }
-                    else if (type == "is_repeat")
-                    {
-                        if (prams.Count == 1)
-                            yield return (ev.Id, new RepeatInspection(ev, prams[0] - 1));
-                    }
-                    else if (type == "minmax")
-                    {
-                        if (prams.Count == 2)
-                            yield return (ev.Id, new MinMaxInspection(ev, prams[0] - 1, prams[1] - 1));
-                    }
-                    else if (type == "percent")
-                    {
-                        if (prams.Count == 1)
-                            yield return (ev.Id, new PercentValueInspection(ev, prams[0] - 1));
-                    }
+                        SmartBuiltInRuleType.IsRepeat => (ev.Id, new RepeatInspection(ev, rule.Parameter1)),
+                        SmartBuiltInRuleType.MinMax => (ev.Id, new MinMaxInspection(ev, rule.Parameter1, rule.Parameter2)),
+                        _ => throw new Exception("Couldn't understand builtin rule type: " + rule.Type)
+                    };
                 }
             }
         }

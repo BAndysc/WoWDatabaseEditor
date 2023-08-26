@@ -24,9 +24,9 @@ namespace WoWDatabaseEditorCore.Services.InputEntryProviderService
             return null;
         }
 
-        public async Task<string?> GetString(string title, string description, string defaultValue = "")
+        public async Task<string?> GetString(string title, string description, string defaultValue = "", bool multiline = false)
         {
-            using var vm = new InputEntryProviderViewModel<string>(title, description, defaultValue, s => !string.IsNullOrEmpty(s));
+            using var vm = new InputEntryProviderViewModel<string>(title, description, defaultValue, s => !string.IsNullOrEmpty(s), multiline);
             if (await windowManager.Value.ShowDialog(vm))
                 return vm.Entry;
             return null;

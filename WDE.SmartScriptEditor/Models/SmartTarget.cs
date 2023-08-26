@@ -1,11 +1,4 @@
-﻿using System;
-using System.Globalization;
-using System.Linq;
-using SmartFormat;
-using SmartFormat.Core.Formatting;
-using SmartFormat.Core.Parsing;
-using WDE.Common.Parameters;
-using WDE.Parameters.Models;
+﻿using System.Linq;
 using WDE.SmartScriptEditor.Editor;
 
 namespace WDE.SmartScriptEditor.Models

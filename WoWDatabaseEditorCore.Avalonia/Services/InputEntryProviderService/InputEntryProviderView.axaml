@@ -21,11 +21,9 @@
         </Image>
         <TextBlock Margin="0,0,0,10" DockPanel.Dock="Top" Text="{Binding Title}" FontSize="16" FontWeight="Bold" TextWrapping="WrapWithOverflow" />
         <TextBlock Margin="0,0,0,10" DockPanel.Dock="Top" Text="{Binding Description}" TextWrapping="WrapWithOverflow" />
-        <TextBox utils:FocusUtils.FocusFirst="True" Margin="0,0,0,10" Text="{Binding Entry}" HorizontalAlignment="Stretch" AcceptsReturn="False" DockPanel.Dock="Top" AcceptsTab="False" />
-        
-        
         <OkCancelButtons DockPanel.Dock="Bottom"
                          AcceptCommand="{Binding Save}"
                          CancelCommand="{Binding Cancel}" />
+        <TextBox utils:FocusUtils.FocusFirst="True" Margin="0,0,0,10" Text="{Binding Entry}" HorizontalAlignment="Stretch" AcceptsReturn="{Binding !Multiline}" AcceptsTab="False" />
     </DockPanel>
 </UserControl>

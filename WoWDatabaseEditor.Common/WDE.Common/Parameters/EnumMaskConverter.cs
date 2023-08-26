@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Newtonsoft.Json;
 
@@ -8,7 +9,46 @@ public class EnumMaskConverter : JsonConverter
 {
     public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
     {
-        throw new NotImplementedException();
+        if (value == null)
+        {
+            writer.WriteNull();
+            return;
+        }
+        
+        var enumType = GetEnumType(value.GetType());
+        var enumValue = Convert.ToUInt64(value);
+        var values = Enum.GetValues(enumType);
+        var names = Enum.GetNames(enumType);
+
+        List<string> namesList = new();
+        string? thisOneMissingEnum = null;
+        
+        for (int i = values.Length - 1; i >= 0; --i)
+        {
+            var v = Convert.ToUInt64(values.GetValue(i));
+            if (v == 0)
+                continue;
+            
+            if ((enumValue & v) == v)
+            {
+                namesList.Add(names[i]);
+                enumValue &= ~v;
+            }
+            else if ((enumValue & v) == 0)
+            {
+                thisOneMissingEnum = names[i];
+            }
+        }
+        if (enumValue > 0)
+            namesList.Add(enumValue.ToString());
+
+        if (namesList.Count == values.Length - 1 && thisOneMissingEnum != null) // all but one
+            writer.WriteValue($"~{thisOneMissingEnum}");
+        else
+        {
+            namesList.Reverse();
+            writer.WriteValue(string.Join(",", namesList));
+        }
     }
 
     private Type GetEnumType(Type type)
@@ -26,7 +66,11 @@ public class EnumMaskConverter : JsonConverter
         if (text[0] == '~')
         {
             var value = Convert.ToUInt64(Enum.Parse(enumType, text.Slice(1), true));
-            return ~value;
+            ulong allowedValues = 0;
+            var possibleValues = Enum.GetValues(enumType);
+            foreach (var v in possibleValues)
+                allowedValues |= Convert.ToUInt64(v);
+            return (~value) & allowedValues;
         }
         else
         {
@@ -45,6 +89,8 @@ public class EnumMaskConverter : JsonConverter
             {
                 value |= GetEnumValue(enumType, text.AsSpan(start, end - start));
                 start = end + 1;
+                if (start >= text.Length)
+                    break;
                 end = text.IndexOf(',', start);
                 if (end == -1)
                     end = text.Length;

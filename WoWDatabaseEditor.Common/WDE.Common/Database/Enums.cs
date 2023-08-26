@@ -1,4 +1,6 @@
-﻿namespace WDE.Common.Database
+﻿using System;
+
+namespace WDE.Common.Database
 {
     public enum SmartScriptType
     {
@@ -36,6 +38,7 @@
         }
     }
     
+    [Flags]
     public enum SmartScriptTypeMask
     {
         Creature = 1 << SmartScriptType.Creature,

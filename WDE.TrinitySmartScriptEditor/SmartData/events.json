@@ -1,3037 +1,2677 @@
 [
-  {
-    "id": 0,
-    "usable_with_script_types": [
-      "Creature",
-      "TimedActionList"
-    ],
-    "name": "SMART_EVENT_UPDATE_IC",
-    "search_tags": "update ic",
-    "parameters": [
-      {
-        "type": "FloatParameter",
-        "name": "Initial Minimum"
-      },
-      {
-        "type": "FloatParameter",
-        "name": "Initial Maximum"
-      },
-      {
-        "type": "FloatParameter",
-        "name": "Repeat Minimum"
-      },
-      {
-        "type": "FloatParameter",
-        "name": "Repeat Maximum"
-      }
-    ],
-    "is_timed": true,
-    "description": "When in combat and timer at the beginning between {pram1} and {pram2} ms (and later repeats every {pram3} and {pram4} ms)",
-    "name_readable": "Every X seconds (in combat)",
-    "builtin_rules": [
-      "minmax(1, 2)",
-      "minmax(3, 4)"
-    ],
-    "description_rules": [
-      {
-        "description": "After {pram1} seconds",
-        "condition": "script.source_type == 9 && event.param(1) == event.param(2)"
-      },
-      {
-        "description": "Once (IC)",
-        "condition": "event.param(1) == 0 && event.param(2) == 0 && event.param(3) == 0 && event.param(4) == 0"
-      },
-      {
-        "description": "After {pram1} - {pram2} seconds",
-        "condition": "script.source_type == 9 && event.param(1) != event.param(2)"
-      },
-      {
-        "description": "Every {pram1} seconds (IC)",
-        "condition": "event.param(1) == event.param(2) && event.param(2) == event.param(3) && event.param(3) == event.param(4)"
-      },
-      {
-        "description": "Time = {pram1} seconds (IC)",
-        "condition": "event.param(3) == 0 && event.param(1) == event.param(2)"
-      },
-      {
-        "description": "Time between {pram1} - {pram2} seconds (IC)",
-        "condition": "event.param(3) == 0"
-      },
-      {
-        "description": "Every {pram1} - {pram2} seconds (IC)",
-        "condition": "event.param(1) == event.param(3) && event.param(2) == event.param(4)"
-      },
-      {
-        "description": "Every {pram3} seconds ({pram1}s initially) (IC)",
-        "condition": "event.param(1) == event.param(2) && event.param(3) == event.param(4)"
-      },
-      {
-        "description": "Every {pram3} - {pram4} seconds ({pram1} - {pram2}s initially) (IC)"
-      }
-    ]
-  },
-  {
-    "id": 1,
-    "usable_with_script_types": [
-      "Creature",
-      "Gameobject",
-      "Instance"
-    ],
-    "is_timed": true,
-    "name": "SMART_EVENT_UPDATE_OOC",
-    "search_tags": "update occ",
-    "parameters": [
-      {
-        "type": "FloatParameter",
-        "name": "Initial Minimum"
-      },
-      {
-        "type": "FloatParameter",
-        "name": "Initial Maximum"
-      },
-      {
-        "type": "FloatParameter",
-        "name": "Repeat Minimum"
-      },
-      {
-        "type": "FloatParameter",
-        "name": "Repeat Maximum"
-      }
-    ],
-    "builtin_rules": [
-      "minmax(1, 2)",
-      "minmax(3, 4)"
-    ],
-    "description": "When out of combat and timer at the begining between {pram1} and {pram2} ms (and later repeats every {pram3} and {pram4} ms)",
-    "name_readable": "Every X seconds (out of combat)",
-    "description_rules": [
-      {
-        "description": "After {pram1} seconds",
-        "condition": "script.source_type == 9"
-      },
-      {
-        "description": "After {pram1} - {pram2} seconds",
-        "condition": "script.source_type == 9 && event.param(1) != event.param(2)"
-      },
-      {
-        "description": "Once (OOC)",
-        "condition": "event.param(1) == 0 && event.param(2) == 0 && event.param(3) == 0 && event.param(4) == 0"
-      },
-      {
-        "description": "Every {pram1} seconds (OOC)",
-        "condition": "event.param(1) == event.param(2) && event.param(2) == event.param(3) && event.param(3) == event.param(4)"
-      },
-      {
-        "description": "Time = {pram1} seconds (OOC)",
-        "condition": "event.param(3) == 0 && event.param(1) == event.param(2)"
-      },
-      {
-        "description": "Time between {pram1} - {pram2} seconds (OOC)",
-        "condition": "event.param(3) == 0"
-      },
-      {
-        "description": "Every {pram1} - {pram2} seconds (OOC)",
-        "condition": "event.param(1) == event.param(3) && event.param(2) == event.param(4)"
-      },
-      {
-        "description": "Every {pram3} seconds ({pram1}s initially) (OOC)",
-        "condition": "event.param(1) == event.param(2) && event.param(3) == event.param(4)"
-      },
-      {
-        "description": "Every {pram3} - {pram4} seconds ({pram1} - {pram2}s initially) (OOC)"
-      }
-    ]
-  },
-  {
-    "id": 2,
-    "usable_with_script_types": [
-      "Creature"
-    ],
-    "is_timed": true,
-    "name": "SMART_EVENT_HEALT_PCT",
-    "parameters": [
-      {
-        "type": "PercentageParameter",
-        "name": "HP Minimum"
-      },
-      {
-        "type": "PercentageParameter",
-        "name": "HP Maximum"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Minimum",
-        "description": "Minimum delay after this event can be triggered again"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Maximum",
-        "description": "Maximum delay after this event can be triggered again"
-      }
-    ],
-    "description": "When health between {pram1}-{pram2}% {pram4value:choose(0):(once)|(cooldown {pram3} - {pram4} ms)}",
-    "name_readable": "When health between",
-    "builtin_rules": [
-      "minmax(1, 2)",
-      "minmax(3, 4)",
-      "is_repeat(4)"
-    ]
-  },
-  {
-    "id": 3,
-    "usable_with_script_types": [
-      "Creature"
-    ],
-    "is_timed": true,
-    "name": "SMART_EVENT_MANA_PCT",
-    "parameters": [
-      {
-        "type": "PercentageParameter",
-        "name": "Mana Minimum"
-      },
-      {
-        "type": "PercentageParameter",
-        "name": "Mana Maximum"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Minimum",
-        "description": "Minimum delay after this event can be triggered again"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Maximum",
-        "description": "Maximum delay after this event can be triggered again"
-      }
-    ],
-    "description": "When mana between {pram1}-{pram2}% {pram4value:choose(0):(once)|(cooldown {pram3} - {pram4} ms)}",
-    "name_readable": "When mana between",
-    "builtin_rules": [
-      "minmax(1, 2)",
-      "minmax(3, 4)",
-      "is_repeat(4)"
-    ]
-  },
-  {
-    "id": 4,
-    "usable_with_script_types": [
-      "Creature"
-    ],
-    "name": "SMART_EVENT_AGGRO",
-    "description": "On aggro",
-    "name_readable": "On aggro",
-    "invoker": {
-      "name": "Attacked unit",
-      "types": [
-        "Creature",
-        "Player"
-      ]
-    }
-  },
-  {
-    "id": 5,
-    "usable_with_script_types": [
-      "Creature"
-    ],
-    "name": "SMART_EVENT_KILL",
-    "parameters": [
-      {
-        "type": "Parameter",
-        "name": "Cooldown Minimum",
-        "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Maximum",
-        "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
-      },
-      {
-        "type": "BoolParameter",
-        "name": "Player only",
-        "description": "If false, only creatures will trigger the event, if true, only player will trigger the event"
-      },
-      {
-        "type": "CreatureParameter",
-        "name": "Creature",
-        "description": "Takes into account only if \"Player only\" is True"
-      }
-    ],
-    "description": "On kill {pram3value:choose(0):creature {pram4}|player} {pram1value:choose(0):|(wait {pram1} - {pram2} ms before next trigger of this event)}",
-    "name_readable": "On kill",
-    "builtin_rules": [
-      "minmax(1, 2)"
-    ],
-    "rules": [
-      {
-        "rule": "event.param(3) == 0 || (event.param(3) == 1 && event.param(4) == 0)",
-        "level": "Info",
-        "description": "`Creature` parameter has no effect when `Player Only` is true"
-      }
-    ],
-    "invoker": {
-      "name": "Killed unit",
-      "types": [
-        "Creature",
-        "Player"
-      ]
-    }
-  },
-  {
-    "id": 6,
-    "usable_with_script_types": [
-      "Creature"
-    ],
-    "name": "SMART_EVENT_DEATH",
-    "description": "On death",
-    "name_readable": "On death",
-    "invoker": {
-      "name": "Killer",
-      "types": [
-        "Creature",
-        "Player"
-      ]
-    }
-  },
-  {
-    "id": 7,
-    "usable_with_script_types": [
-      "Creature"
-    ],
-    "name": "SMART_EVENT_EVADE",
-    "description": "On evade",
-    "name_readable": "On evade"
-  },
-  {
-    "id": 8,
-    "usable_with_script_types": [
-      "Creature",
-      "Gameobject"
-    ],
-    "name": "SMART_EVENT_SPELLHIT",
-    "parameters": [
-      {
-        "type": "SpellParameter",
-        "name": "Spell",
-        "description": "If 0, any spell will trigger the event"
-      },
-      {
-        "type": "SpellSchoolMaskParameter",
-        "name": "School",
-        "description": "School of spell"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Minimum",
-        "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Maximum",
-        "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
-      }
-    ],
-    "builtin_rules": [
-      "minmax(3, 4)"
-    ],
-    "description": "On {pram1value:choose(0):any spell|spell [spell={pram1value}] {pram1}}{pram2value:choose(0):| of school {pram2}} hit {pram3value:choose(0):|(wait {pram3} - {pram4} ms before next trigger)}",
-    "name_readable": "On spell hit",
-    "invoker": {
-      "name": "Caster",
-      "types": [
-        "Player",
-        "Creature"
-      ]
-    }
-  },
-  {
-    "id": 9,
-    "usable_with_script_types": [
-      "Creature"
-    ],
-    "is_timed": true,
-    "tags": ["TrinityWrath", "TrinityMaster", "TrinityCata"],
-    "name": "SMART_EVENT_RANGE",
-    "builtin_rules": [
-      "minmax(1, 2)",
-      "minmax(3, 4)",
-      "is_repeat(4)"
-    ],
-    "parameters": [
-      {
-        "type": "Parameter",
-        "name": "Minimum Distance",
-        "description": "Minimum distance between creature and its victim to trigger the event"
-      },
-      {
-        "type": "Parameter",
-        "name": "Maximum Distance",
-        "required": true,
-        "description": "Maximum distance between creature and its victim to trigger the event"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Minimum",
-        "description": "Minimum delay after this event can be triggered again"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Maximum",
-        "description": "Maximum delay after this event can be triggered again"
-      }
-    ],
-    "description": "When victim in range {pram1} - {pram2} yards {pram4value:choose(0):(once)|(cooldown {pram3} - {pram4} ms)}",
-    "name_readable": "Range",
-    "invoker": {
-      "name": "Victim",
-      "types": [
-        "Player",
-        "Creature"
-      ]
-    }
-  },
-  {
-    "id": 9,
-    "usable_with_script_types": [
-      "Creature"
-    ],
-    "tags": ["Azeroth"],
-    "is_timed": true,
-    "name": "SMART_EVENT_RANGE_AC",
-    "builtin_rules": [
-      "minmax(1, 2)",
-      "minmax(3, 4)",
-      "is_repeat(4)"
-    ],
-    "parameters": [
-      {
-        "type": "Parameter",
-        "name": "Minimum Distance",
-        "description": "Minimum distance between creature and its victim to trigger the event"
-      },
-      {
-        "type": "Parameter",
-        "name": "Maximum Distance",
-        "required": true,
-        "description": "Maximum distance between creature and its victim to trigger the event"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Minimum",
-        "description": "Minimum delay after this event can be triggered again"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Maximum",
-        "description": "Maximum delay after this event can be triggered again"
-      }
-    ],
-    "description": "When victim in range {pram1} - {pram2} yards {pram4value:choose(0):(once)|(cooldown {pram3} - {pram4} ms)}",
-    "name_readable": "Range",
-    "invoker": {
-      "name": "Victim",
-      "types": [
-        "Player",
-        "Creature"
-      ]
-    }
-  },
-  {
-    "id": 10,
-    "usable_with_script_types": [
-      "Creature"
-    ],
-    "name": "SMART_EVENT_OOC_LOS",
-    "tags": ["TrinityWrath", "TrinityMaster", "TrinityCata"],
-    "parameters": [
-      {
-        "type": "SwitchParameter",
-        "name": "Hostility mode",
-        "values": {
-          "0": {"name": "only hostile"},
-          "1": {"name": "only non hostile"},
-          "2": {"name": "any"}
-        }
-      },
-      {
-        "type": "Parameter",
-        "name": "Max distance"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Minimum",
-        "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Maximum",
-        "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
-      }
-    ],
-    "builtin_rules": [
-      "minmax(3, 4)"
-    ],
-    "description": "On {pram1} unit in line of sight (OOC)",
-    "name_readable": "On move in line of sight (out of combat)",
-    "invoker": {
-      "name": "Unit in LOS",
-      "types": [
-        "Player",
-        "Creature"
-      ]
-    }
-  },
-  {
-    "id": 10,
-    "usable_with_script_types": [
-      "Creature"
-    ],
-    "name": "SMART_EVENT_OOC_LOS_AC",
-    "tags": ["Azeroth"],
-    "parameters": [
-      {
-        "type": "SwitchParameter",
-        "name": "Hostility mode",
-        "values": {
-          "0": {"name": "only hostile"},
-          "1": {"name": "only non hostile"},
-          "2": {"name": "any"}
-        }
-      },
-      {
-        "type": "Parameter",
-        "name": "Max distance"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Minimum",
-        "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Maximum",
-        "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
-      },
-      {
-        "type": "BoolParameter",
-        "name": "Player only"
-      }
-    ],
-    "builtin_rules": [
-      "minmax(3, 4)"
-    ],
-    "description": "On {pram1} unit in line of sight (OOC)",
-    "name_readable": "On move in line of sight (out of combat)",
-    "invoker": {
-      "name": "Unit in LOS",
-      "types": [
-        "Player",
-        "Creature"
-      ]
-    }
-  },
-  {
-    "id": 11,
-    "usable_with_script_types": [
-      "Creature",
-      "Gameobject"
-    ],
-    "name": "SMART_EVENT_RESPAWN",
-    "parameters": [
-      {
-        "type": "SwitchParameter",
-        "name": "Respawn type",
-        "values": {
-          "0": {
-            "name": "SMART_SCRIPT_RESPAWN_CONDITION_NONE",
-            "description": "Any respawn type"
-          },
-          "1": {
-            "name": "SMART_SCRIPT_RESPAWN_CONDITION_MAP",
-            "description": "Compare map"
-          },
-          "2": {
-            "name": "SMART_SCRIPT_RESPAWN_CONDITION_AREA",
-            "description": "Compare area (zone)"
-          }
+    {
+        "id": 0,
+        "name": "SMART_EVENT_UPDATE_IC",
+        "name_readable": "Every X seconds (in combat)",
+        "parameters": [
+            {
+                "name": "Initial Minimum",
+                "type": "FloatParameter"
+            },
+            {
+                "name": "Initial Maximum",
+                "type": "FloatParameter"
+            },
+            {
+                "name": "Repeat Minimum",
+                "type": "FloatParameter"
+            },
+            {
+                "name": "Repeat Maximum",
+                "type": "FloatParameter"
+            }
+        ],
+        "description": "When in combat and timer at the beginning between {pram1} and {pram2} ms (and later repeats every {pram3} and {pram4} ms)",
+        "is_timed": true,
+        "usable_with_script_types": "Creature,TimedActionList",
+        "description_rules": [
+            {
+                "description": "After {pram1} seconds",
+                "condition": "script.source_type == 9 && event.param(1) == event.param(2)"
+            },
+            {
+                "description": "Once (IC)",
+                "condition": "event.param(1) == 0 && event.param(2) == 0 && event.param(3) == 0 && event.param(4) == 0"
+            },
+            {
+                "description": "After {pram1} - {pram2} seconds",
+                "condition": "script.source_type == 9 && event.param(1) != event.param(2)"
+            },
+            {
+                "description": "Every {pram1} seconds (IC)",
+                "condition": "event.param(1) == event.param(2) && event.param(2) == event.param(3) && event.param(3) == event.param(4)"
+            },
+            {
+                "description": "Time = {pram1} seconds (IC)",
+                "condition": "event.param(3) == 0 && event.param(1) == event.param(2)"
+            },
+            {
+                "description": "Time between {pram1} - {pram2} seconds (IC)",
+                "condition": "event.param(3) == 0"
+            },
+            {
+                "description": "Every {pram1} - {pram2} seconds (IC)",
+                "condition": "event.param(1) == event.param(3) && event.param(2) == event.param(4)"
+            },
+            {
+                "description": "Every {pram3} seconds ({pram1}s initially) (IC)",
+                "condition": "event.param(1) == event.param(2) && event.param(3) == event.param(4)"
+            },
+            {
+                "description": "Every {pram3} - {pram4} seconds ({pram1} - {pram2}s initially) (IC)"
+            }
+        ],
+        "builtin_rules": [
+            "minmax(1,2)",
+            "minmax(3,4)"
+        ],
+        "search_tags": "update ic"
+    },
+    {
+        "id": 1,
+        "name": "SMART_EVENT_UPDATE_OOC",
+        "name_readable": "Every X seconds (out of combat)",
+        "parameters": [
+            {
+                "name": "Initial Minimum",
+                "type": "FloatParameter"
+            },
+            {
+                "name": "Initial Maximum",
+                "type": "FloatParameter"
+            },
+            {
+                "name": "Repeat Minimum",
+                "type": "FloatParameter"
+            },
+            {
+                "name": "Repeat Maximum",
+                "type": "FloatParameter"
+            }
+        ],
+        "description": "When out of combat and timer at the begining between {pram1} and {pram2} ms (and later repeats every {pram3} and {pram4} ms)",
+        "is_timed": true,
+        "usable_with_script_types": "Creature,GameObject,Instance",
+        "description_rules": [
+            {
+                "description": "After {pram1} seconds",
+                "condition": "script.source_type == 9"
+            },
+            {
+                "description": "After {pram1} - {pram2} seconds",
+                "condition": "script.source_type == 9 && event.param(1) != event.param(2)"
+            },
+            {
+                "description": "Once (OOC)",
+                "condition": "event.param(1) == 0 && event.param(2) == 0 && event.param(3) == 0 && event.param(4) == 0"
+            },
+            {
+                "description": "Every {pram1} seconds (OOC)",
+                "condition": "event.param(1) == event.param(2) && event.param(2) == event.param(3) && event.param(3) == event.param(4)"
+            },
+            {
+                "description": "Time = {pram1} seconds (OOC)",
+                "condition": "event.param(3) == 0 && event.param(1) == event.param(2)"
+            },
+            {
+                "description": "Time between {pram1} - {pram2} seconds (OOC)",
+                "condition": "event.param(3) == 0"
+            },
+            {
+                "description": "Every {pram1} - {pram2} seconds (OOC)",
+                "condition": "event.param(1) == event.param(3) && event.param(2) == event.param(4)"
+            },
+            {
+                "description": "Every {pram3} seconds ({pram1}s initially) (OOC)",
+                "condition": "event.param(1) == event.param(2) && event.param(3) == event.param(4)"
+            },
+            {
+                "description": "Every {pram3} - {pram4} seconds ({pram1} - {pram2}s initially) (OOC)"
+            }
+        ],
+        "builtin_rules": [
+            "minmax(1,2)",
+            "minmax(3,4)"
+        ],
+        "search_tags": "update occ"
+    },
+    {
+        "id": 2,
+        "name": "SMART_EVENT_HEALT_PCT",
+        "name_readable": "When health between",
+        "parameters": [
+            {
+                "name": "HP Minimum",
+                "type": "PercentageParameter"
+            },
+            {
+                "name": "HP Maximum",
+                "type": "PercentageParameter"
+            },
+            {
+                "name": "Cooldown Minimum",
+                "description": "Minimum delay after this event can be triggered again",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown Maximum",
+                "description": "Maximum delay after this event can be triggered again",
+                "type": "Parameter"
+            }
+        ],
+        "description": "When health between {pram1}-{pram2}% {pram4value:choose(0):(once)|(cooldown {pram3} - {pram4} ms)}",
+        "is_timed": true,
+        "usable_with_script_types": "Creature",
+        "builtin_rules": [
+            "minmax(1,2)",
+            "minmax(3,4)",
+            "is_repeat(4)"
+        ]
+    },
+    {
+        "id": 3,
+        "name": "SMART_EVENT_MANA_PCT",
+        "name_readable": "When mana between",
+        "parameters": [
+            {
+                "name": "Mana Minimum",
+                "type": "PercentageParameter"
+            },
+            {
+                "name": "Mana Maximum",
+                "type": "PercentageParameter"
+            },
+            {
+                "name": "Cooldown Minimum",
+                "description": "Minimum delay after this event can be triggered again",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown Maximum",
+                "description": "Maximum delay after this event can be triggered again",
+                "type": "Parameter"
+            }
+        ],
+        "description": "When mana between {pram1}-{pram2}% {pram4value:choose(0):(once)|(cooldown {pram3} - {pram4} ms)}",
+        "is_timed": true,
+        "usable_with_script_types": "Creature",
+        "builtin_rules": [
+            "minmax(1,2)",
+            "minmax(3,4)",
+            "is_repeat(4)"
+        ]
+    },
+    {
+        "id": 4,
+        "name": "SMART_EVENT_AGGRO",
+        "name_readable": "On aggro",
+        "description": "On aggro",
+        "invoker": {
+            "name": "Attacked unit",
+            "types": "Unit"
         },
-        "description": "Respawn type to check"
-      },
-      {
-        "type": "ZoneAreaParameter",
-        "name": "Map Id",
-        "description": "Respawn Type must be either SMART_SCRIPT_RESPAWN_CONDITION_NONE or SMART_SCRIPT_RESPAWN_CONDITION_MAP"
-      },
-      {
-        "type": "ZoneAreaParameter",
-        "name": "Zone",
-        "description": "Respawn Type must be either SMART_SCRIPT_RESPAWN_CONDITION_NONE or SMART_SCRIPT_RESPAWN_CONDITION_AREA"
-      }
-    ],
-    "description": "On respawn {pram2value:choose(0):{pram3value:choose(0):|in zone {pram3}}|on map {pram2}{pram3value:choose(0):| and in zone {pram3}}}",
-    "name_readable": "On respawn"
-  },
-  {
-    "id": 12,
-    "usable_with_script_types": [
-      "Creature"
-    ],
-    "is_timed": true,
-    "name": "SMART_EVENT_TARGET_HEALTH_PCT",
-    "tags": ["Azeroth", "TrinityMaster", "TrinityCata"],
-    "parameters": [
-      {
-        "type": "PercentageParameter",
-        "name": "HP Minimum"
-      },
-      {
-        "type": "PercentageParameter",
-        "name": "HP Maximum"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Minimum",
-        "description": "Minimum delay after this event can be triggered again"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Maximum",
-        "description": "Maximum delay after this event can be triggered again"
-      }
-    ],
-    "builtin_rules": [
-      "minmax(1, 2)",
-      "minmax(3, 4)",
-      "is_repeat(4)"
-    ],
-    "description": "When victim health between {pram1} - {pram2} {pram4value:choose(0):(once)|(cooldown {pram3} - {pram4} ms)}",
-    "name_readable": "When victim's health between",
-    "invoker": {
-      "name": "Victim",
-      "types": [
-        "Player",
-        "Creature"
-      ]
-    }
-  },
-  {
-    "id": 13,
-    "usable_with_script_types": [
-      "Creature"
-    ],
-    "is_timed": true,
-    "name": "SMART_EVENT_VICTIM_CASTING",
-    "parameters": [
-      {
-        "type": "Parameter",
-        "name": "Cooldown Minimum",
-        "description": "Minimum delay after this event can be triggered again"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Maximum",
-        "description": "Maximum delay after this event can be triggered again"
-      },
-      {
-        "type": "SpellParameter",
-        "name": "Spell",
-        "description": "If 0, any spell will trigger the event"
-      }
-    ],
-    "builtin_rules": [
-      "minmax(1, 2)",
-      "is_repeat(2)"
-    ],
-    "description": "When victim is casting {pram3value:choose(0):any|}spell{pram3value:choose(0):| {pram3}} {pram4value:choose(0):(once)|(cooldown {pram3} - {pram4} ms)}",
-    "name_readable": "When victim is casting",
-    "invoker": {
-      "name": "Victim",
-      "types": [
-        "Player",
-        "Creature"
-      ]
-    }
-  },
-  {
-    "id": 14,
-    "usable_with_script_types": [
-      "Creature"
-    ],
-    "is_timed": true,
-    "name": "SMART_EVENT_FRIENDLY_HEALTH",
-    "tags": ["Azeroth", "TrinityMaster", "TrinityCata"],
-    "parameters": [
-      {
-        "type": "Parameter",
-        "name": "HP Deficit",
-        "description": "Absolute value"
-      },
-      {
-        "type": "Parameter",
-        "name": "Radius",
-        "description": "Radius to check for friendly creatures"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Minimum",
-        "description": "Minimum delay after this event can be triggered again"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Maximum",
-        "description": "Maximum delay after this event can be triggered again"
-      }
-    ],
-    "builtin_rules": [
-      "minmax(3, 4)",
-      "is_repeat(4)"
-    ],
-    "description": "When friendly unit in range {pram2} yards has lost more than {pram1} hp {pram4value:choose(0):(once)|(cooldown {pram3} - {pram4} ms)}",
-    "name_readable": "When nerby unit health between",
-    "invoker": {
-      "name": "Friendly unit",
-      "types": [
-        "Creature",
-        "Player"
-      ]
-    }
-  },
-  {
-    "id": 15,
-    "usable_with_script_types": [
-      "Creature"
-    ],
-    "is_timed": true,
-    "name": "SMART_EVENT_FRIENDLY_IS_CC",
-    "parameters": [
-      {
-        "type": "Parameter",
-        "name": "Radius",
-        "description": "Radius to check for"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Minimum",
-        "description": "Minimum delay after this event can be triggered again"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Maximum",
-        "description": "Maximum delay after this event can be triggered again"
-      }
-    ],
-    "builtin_rules": [
-      "is_repeat(3)",
-      "minmax(2, 3)"
-    ],
-    "description": "When friendly unit in range {pram1} yards is either: feared, charmed, stunned, frozen or confused {pram4value:choose(0):(once)|(cooldown {pram3} - {pram4} ms)}",
-    "name_readable": "When nearby unit is CC",
-    "invoker": {
-      "name": "Friendly unit",
-      "types": [
-        "Creature",
-        "Player"
-      ]
-    }
-  },
-  {
-    "id": 16,
-    "usable_with_script_types": [
-      "Creature"
-    ],
-    "is_timed": true,
-    "name": "SMART_EVENT_FRIENDLY_MISSING_BUFF",
-    "tags": ["TrinityWrath", "TrinityMaster", "TrinityCata"],
-    "parameters": [
-      {
-        "type": "SpellParameter",
-        "name": "Spell",
-        "description": "Spell id to check"
-      },
-      {
-        "type": "Parameter",
-        "name": "Radius",
-        "description": "Radius to check in"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Minimum",
-        "description": "Minimum delay after this event can be triggered again"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Maximum",
-        "description": "Maximum delay after this event can be triggered again"
-      }
-    ],
-    "builtin_rules": [
-      "minmax(3, 4)",
-      "is_repeat(4)"
-    ],
-    "description": "When friendly unit in range {pram2} yards has not got aura {pram1} {pram4value:choose(0):(once)|(cooldown {pram3} - {pram4} ms)}",
-    "name_readable": "When nearby friendly missing buff",
-    "invoker": {
-      "name": "Friendly unit",
-      "types": [
-        "Creature",
-        "Player"
-      ]
-    }
-  },
-  {
-    "id": 16,
-    "usable_with_script_types": [
-      "Creature"
-    ],
-    "is_timed": true,
-    "name": "SMART_EVENT_FRIENDLY_MISSING_BUFF_AC",
-    "tags": ["Azeroth"],
-    "parameters": [
-      {
-        "type": "SpellParameter",
-        "name": "Spell",
-        "description": "Spell id to check"
-      },
-      {
-        "type": "Parameter",
-        "name": "Radius",
-        "description": "Radius to check in"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Minimum",
-        "description": "Minimum delay after this event can be triggered again"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Maximum",
-        "description": "Maximum delay after this event can be triggered again"
-      },
-      {
-        "type": "BoolParameter",
-        "name": "Only in combat"
-      }
-    ],
-    "builtin_rules": [
-      "minmax(3, 4)",
-      "is_repeat(4)"
-    ],
-    "description": "When friendly unit in range {pram2} yards has not got aura {pram1} {pram4value:choose(0):(once)|(cooldown {pram3} - {pram4} ms)}",
-    "name_readable": "When nearby friendly missing buff",
-    "invoker": {
-      "name": "Friendly unit",
-      "types": [
-        "Creature",
-        "Player"
-      ]
-    }
-  },
-  {
-    "id": 17,
-    "usable_with_script_types": [
-      "Creature",
-      "Gameobject"
-    ],
-    "name": "SMART_EVENT_SUMMONED_UNIT",
-    "parameters": [
-      {
-        "type": "CreatureParameter",
-        "name": "Creature",
-        "description": "If 0, any creature will trigger the event"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Minimum",
-        "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Maximum",
-        "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
-      }
-    ],
-    "builtin_rules": [
-      "minmax(2, 3)"
-    ],
-    "description": "On summoned {pram1value:choose(0):any|}unit {pram1value:choose(0):|{pram1}} {pram2value:choose(0):|(wait {pram2} - {pram3} ms before next event trigger)}",
-    "name_readable": "On creature summon",
-    "invoker": {
-      "name": "Summon",
-      "types": [
-        "Creature"
-      ]
-    }
-  },
-  {
-    "id": 18,
-    "usable_with_script_types": [
-      "Creature"
-    ],
-    "is_timed": true,
-    "name": "SMART_EVENT_TARGET_MANA_PCT",
-    "tags": ["Azeroth", "TrinityMaster", "TrinityCata"],
-    "parameters": [
-      {
-        "type": "PercentageParameter",
-        "name": "Minimum mana"
-      },
-      {
-        "type": "PercentageParameter",
-        "name": "Maximum mana"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Minimum",
-        "description": "Minimum delay after this event can be triggered again"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Maximum",
-        "description": "Maximum delay after this event can be triggered again"
-      }
-    ],
-    "builtin_rules": [
-      "minmax(1, 2)",
-      "minmax(3, 4)",
-      "is_repeat(4)"
-    ],
-    "description": "When victim has mana between {pram1} - {pram2}% {pram4value:choose(0):(once)|(cooldown {pram3} - {pram4} ms)}",
-    "name_readable": "When victim mana between",
-    "invoker": {
-      "name": "Victim",
-      "types": [
-        "Player",
-        "Creature"
-      ]
-    }
-  },
-  {
-    "id": 19,
-    "usable_with_script_types": [
-      "Creature",
-      "Gameobject"
-    ],
-    "name": "SMART_EVENT_ACCEPTED_QUEST",
-    "parameters": [
-      {
-        "type": "QuestStarterParameter",
-        "name": "Quest",
-        "description": "If 0, any quest will trigger the event"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Minimum",
-        "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Maximum",
-        "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
-      }
-    ],
-    "description": "On player accepted {pram1value:choose(0):any quest|quest {pram1}}",
-    "name_readable": "On quest accept",
-    "invoker": {
-      "name": "Player who accepted quest",
-      "types": [
-        "Player"
-      ]
-    }
-  },
-  {
-    "id": 20,
-    "usable_with_script_types": [
-      "Creature",
-      "Gameobject"
-    ],
-    "name": "SMART_EVENT_REWARD_QUEST",
-    "parameters": [
-      {
-        "type": "QuestEnderParameter",
-        "name": "Quest",
-        "description": "If 0, any quest will trigger the event"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Minimum",
-        "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Maximum",
-        "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
-      }      
-    ],
-    "description": "On player rewarded {pram1value:choose(0):any quest|quest {pram1}}",
-    "name_readable": "On quest reward",
-    "invoker": {
-      "name": "Rewarded player",
-      "types": [
-        "Player"
-      ]
-    }
-  },
-  {
-    "id": 21,
-    "usable_with_script_types": [
-      "Creature"
-    ],
-    "name": "SMART_EVENT_REACHED_HOME",
-    "description": "On home reached",
-    "name_readable": "On home reached"
-  },
-  {
-    "id": 22,
-    "usable_with_script_types": [
-      "Creature"
-    ],
-    "name": "SMART_EVENT_RECEIVE_EMOTE",
-    "parameters": [
-      {
-        "type": "TextEmoteParameter",
-        "name": "Emote",
-        "required": true,
-        "description": "Note: \"0\" does NOT mean any emote"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Minimum",
-        "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Maximum",
-        "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
-      }
-    ],
-    "builtin_rules": [
-      "minmax(2, 3)"
-    ],
-    "description": "On emote {pram1} received from player {pram2value:choose(0):|(wait {pram2} - {pram3} ms before next event trigger)}",
-    "name_readable": "On emote received",
-    "invoker": {
-      "name": "Emote sender",
-      "types": [
-        "Player"
-      ]
-    }
-  },
-  {
-    "id": 23,
-    "usable_with_script_types": [
-      "Creature"
-    ],
-    "is_timed": true,
-    "name": "SMART_EVENT_HAS_AURA",
-    "parameters": [
-      {
-        "type": "SpellParameter",
-        "name": "Spell"
-      },
-      {
-        "type": "Parameter",
-        "name": "Stack amount",
-        "description": "If 0, any amount will trigger the quest"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Minimum",
-        "description": "Minimum delay after this event can be triggered again"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Maximum",
-        "description": "Maximum delay after this event can be triggered again"
-      }
-    ],
-    "builtin_rules": [
-      "minmax(3, 4)",
-      "is_repeat(4)"
-    ],
-    "description": "When creature has{pram2value:choose(0):| {pram2} stacks of} aura {pram1} {pram4value:choose(0):(once)|(cooldown {pram3} - {pram4} ms)}",
-    "name_readable": "When has aura"
-  },
-  {
-    "id": 24,
-    "usable_with_script_types": [
-      "Creature"
-    ],
-    "is_timed": true,
-    "name": "SMART_EVENT_TARGET_BUFFED",
-    "parameters": [
-      {
-        "type": "SpellParameter",
-        "name": "Spell",
-        "required": true
-      },
-      {
-        "type": "Parameter",
-        "name": "Minimum stack amount"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Minimum",
-        "description": "Minimum delay after this event can be triggered again"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Maximum",
-        "description": "Maximum delay after this event can be triggered again"
-      }
-    ],
-    "builtin_rules": [
-      "minmax(3, 4)",
-      "is_repeat(4)"
-    ],
-    "description": "When victim has at least {pram2} stacks of aura {pram1} {pram4value:choose(0):(once)|(cooldown {pram3} - {pram4} ms)}",
-    "name_readable": "When target has aura"
-  },
-  {
-    "id": 25,
-    "usable_with_script_types": [
-      "Creature"
-    ],
-    "name": "SMART_EVENT_RESET",
-    "description": "On reset",
-    "name_readable": "On reset"
-  },
-  {
-    "id": 26,
-    "usable_with_script_types": [
-      "Creature"
-    ],
-    "name": "SMART_EVENT_IC_LOS",
-    "tags": ["TrinityWrath", "TrinityMaster", "TrinityCata"],
-    "parameters": [
-      {
-        "type": "SwitchParameter",
-        "name": "Hostility mode",
-        "values": {
-          "0": {"name": "only hostile"},
-          "1": {"name": "only non hostile"},
-          "2": {"name": "any"}
-        }
-      },
-      {
-        "type": "Parameter",
-        "name": "Maximum distance"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Minimum",
-        "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Maximum",
-        "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
-      }
-    ],
-    "builtin_rules": [
-      "minmax(3, 4)"
-    ],
-    "description": "On {pram1} unit in line of sight (in combat){pram3value:choose(0):| (wait {pram3} - {pram4} ms before next event trigger)}",
-    "name_readable": "On move in line of sight (in combat)",
-    "invoker": {
-      "name": "Unit in LOS",
-      "types": [
-        "Player",
-        "Creature"
-      ]
-    }
-  },
-  {
-    "id": 26,
-    "usable_with_script_types": [
-      "Creature"
-    ],
-    "name": "SMART_EVENT_IC_LOS_AC",
-    "tags": ["Azeroth"],
-    "parameters": [
-      {
-        "type": "SwitchParameter",
-        "name": "Hostility mode",
-        "values": {
-          "0": {"name": "only hostile"},
-          "1": {"name": "only non hostile"},
-          "2": {"name": "any"}
-        }
-      },
-      {
-        "type": "Parameter",
-        "name": "Maximum distance"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Minimum",
-        "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Maximum",
-        "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
-      },
-      {
-        "type": "BoolParameter",
-        "name": "Player only"
-      }
-    ],
-    "builtin_rules": [
-      "minmax(3, 4)"
-    ],
-    "description": "On {pram1} unit in line of sight (in combat){pram3value:choose(0):| (wait {pram3} - {pram4} ms before next event trigger)}",
-    "name_readable": "On move in line of sight (in combat)",
-    "invoker": {
-      "name": "Unit in LOS",
-      "types": [
-        "Player",
-        "Creature"
-      ]
-    }
-  },
-  {
-    "id": 27,
-    "usable_with_script_types": [
-      "Creature"
-    ],
-    "name": "SMART_EVENT_PASSENGER_BOARDED",
-    "parameters": [
-      {
-        "type": "Parameter",
-        "name": "Cooldown Minimum",
-        "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Maximum",
-        "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
-      }
-    ],
-    "builtin_rules": [
-      "minmax(1, 2)"
-    ],
-    "description": "On passenger boarded (vehicle){pram1value:choose(0):| (wait {pram1} - {pram2} ms before next event trigger)}",
-    "name_readable": "On passenger boarded",
-    "invoker": {
-      "name": "Passenger",
-      "types": [
-        "Creature",
-        "Player"
-      ]
-    }
-  },
-  {
-    "id": 28,
-    "usable_with_script_types": [
-      "Creature"
-    ],
-    "name": "SMART_EVENT_PASSENGER_REMOVED",
-    "parameters": [
-      {
-        "type": "Parameter",
-        "name": "Cooldown Minimum",
-        "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Maximum",
-        "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
-      }
-    ],
-    "builtin_rules": [
-      "minmax(1, 2)"
-    ],
-    "description": "On passenger removed (vehicle){pram1value:choose(0):| (wait {pram1} - {pram2} ms before next event trigger)}",
-    "name_readable": "On passenger removed",
-    "invoker": {
-      "name": "Passenger",
-      "types": [
-        "Creature",
-        "Player"
-      ]
-    }
-  },
-  {
-    "id": 29,
-    "usable_with_script_types": [
-      "Creature"
-    ],
-    "name": "SMART_EVENT_CHARMED",
-    "description": "On creature got charmed by another unit",
-    "name_readable": "On charmed"
-  },
-  {
-    "id": 30,
-    "usable_with_script_types": [
-      "Creature"
-    ],
-    "name": "SMART_EVENT_CHARMED_TARGET",
-    "tags": ["Azeroth", "TrinityCata", "TrinityMaster"],
-    "description": "On creature charmed another unit",
-    "name_readable": "On charmed target [DEPRECATED]"
-  },
-  {
-    "id": 31,
-    "usable_with_script_types": [
-      "Creature"
-    ],
-    "name": "SMART_EVENT_SPELLHIT_TARGET",
-    "parameters": [
-      {
-        "type": "SpellParameter",
-        "name": "Spell"
-      },
-      {
-        "type": "SpellSchoolMaskParameter",
-        "name": "School",
-        "description": "If 0, any spell school will trigger the event"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Minimum",
-        "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Maximum",
-        "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
-      }
-    ],
-    "builtin_rules": [
-      "minmax(3, 4)"
-    ],
-    "description": "On spell {pram1} {pram2value:choose(0):|of school {pram2}} hit a target{pram3value:choose(0):| (wait {pram3} - {pram4} ms before next event trigger)}",
-    "name_readable": "On spellhit target",
-    "invoker": {
-      "name": "Spell target",
-      "types": [
-        "Creature",
-        "Player"
-      ]
-    }
-  },
-  {
-    "id": 32,
-    "usable_with_script_types": [
-      "Creature"
-    ],
-    "name": "SMART_EVENT_DAMAGED",
-    "parameters": [
-      {
-        "type": "Parameter",
-        "name": "Minimum damage",
-        "description": "Minimum damage to trigger the event"
-      },
-      {
-        "type": "Parameter",
-        "name": "Maximum damage",
-        "required": true,
-        "description": "Must be set, or else the event will not trigger."
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Minimum",
-        "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Maximum",
-        "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
-      }
-    ],
-    "builtin_rules": [
-      "minmax(1, 2)",
-      "minmax(3, 4)"
-    ],
-    "description": "On creature damaged by {pram1} - {pram2} HP{pram3value:choose(0):| (wait {pram3} - {pram4} ms before next event trigger)}",
-    "name_readable": "On damage take",
-    "invoker": {
-      "name": "Attacker",
-      "types": [
-        "Creature",
-        "Player"
-      ]
-    }
-  },
-  {
-    "id": 33,
-    "usable_with_script_types": [
-      "Creature"
-    ],
-    "name": "SMART_EVENT_DAMAGED_TARGET",
-    "parameters": [
-      {
-        "type": "Parameter",
-        "name": "Minimum damage",
-        "description": "Minimum damage to trigger the event"
-      },
-      {
-        "type": "Parameter",
-        "name": "Maximum damage",
-        "required": true,
-        "description": "Must be set, or else the event will not trigger."
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Minimum",
-        "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Maximum",
-        "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
-      }
-    ],
-    "builtin_rules": [
-      "minmax(1, 2)",
-      "minmax(3, 4)"
-    ],
-    "description": "On creature dealt damage to victim between {pram1} - {pram2} HP{pram3value:choose(0):| (wait {pram3} - {pram4} ms before next event trigger)}",
-    "name_readable": "On damage deal",
-    "invoker": {
-      "name": "Attacked unit",
-      "types": [
-        "Creature",
-        "Player"
-      ]
-    }
-  },
-  {
-    "id": 34,
-    "usable_with_script_types": [
-      "Creature"
-    ],
-    "name": "SMART_EVENT_MOVEMENTINFORM",
-    "parameters": [
-      {
-        "type": "SwitchParameter",
-        "name": "Movement Type",
-        "values": {
-          "0": {
-            "name": "Any"
-          },
-          "1": {
-            "name": "RANDOM_MOTION_TYPE"
-          },
-          "2": {
-            "name": "WAYPOINT_MOTION_TYPE"
-          },
-          "3": {
-            "name": "ANIMAL_RANDOM_MOTION_TYPE"
-          },
-          "4": {
-            "name": "CONFUSED_MOTION_TYPE"
-          },
-          "5": {
-            "name": "CHASE_MOTION_TYPE"
-          },
-          "6": {
-            "name": "HOME_MOTION_TYPE"
-          },
-          "7": {
-            "name": "FLIGHT_MOTION_TYPE"
-          },
-          "8": {
-            "name": "POINT_MOTION_TYPE"
-          },
-          "9": {
-            "name": "FLEEING_MOTION_TYPE"
-          },
-          "10": {
-            "name": "DISTRACT_MOTION_TYPE"
-          },
-          "11": {
-            "name": "ASSISTANCE_MOTION_TYPE"
-          },
-          "12": {
-            "name": "ASSISTANCE_DISTRACT_MOTION_TYPE"
-          },
-          "13": {
-            "name": "TIMED_FLEEING_MOTION_TYPE"
-          },
-          "14": {
-            "name": "FOLLOW_MOTION_TYPE"
-          },
-          "15": {
-            "name": "ROTATE_MOTION_TYPE"
-          },
-          "16": {
-            "name": "EFFECT_MOTION_TYPE"
-          },
-          "17": {
-            "name": "NULL_MOTION_TYPE"
-          }
-        }
-      },
-      {
-        "type": "Parameter",
-        "name": "Point ID",
-        "description": "If 0, any point will trigger the event"
-      }
-    ],
-    "description": "On movement {pram1value:choose(0):|of type {pram1} }inform{pram2value:choose(0):|, point {pram2}}",
-    "name_readable": "On movement inform"
-  },
-  {
-    "id": 35,
-    "usable_with_script_types": [
-      "Creature",
-      "Gameobject"
-    ],
-    "name": "SMART_EVENT_SUMMON_DESPAWNED",
-    "parameters": [
-      {
-        "type": "CreatureParameter",
-        "name": "Entry",
-        "description": "If 0, any creature will trigger the event. NOT SURE???"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Minimum",
-        "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Maximum",
-        "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
-      }
-    ],
-    "builtin_rules": [
-      "minmax(2, 3)"
-    ],
-    "description": "On summoned creature {pram1value:choose(0):|{pram1} }despawn{pram2value:choose(0):| (wait {pram2} - {pram3} ms before next event trigger)}",
-    "name_readable": "On summon despawn",
-    "invoker": {
-      "name": "Summoned unit",
-      "types": [
-        "Creature"
-      ]
-    }
-  },
-  {
-    "id": 36,
-    "usable_with_script_types": [
-      "Creature"
-    ],
-    "name": "SMART_EVENT_CORPSE_REMOVED",
-    "description": "On creature corpse removed",
-    "name_readable": "On corpse remove"
-  },
-  {
-    "id": 37,
-    "usable_with_script_types": [
-      "Creature",
-      "Gameobject",
-      "AreaTriggerEntity",
-      "AreaTriggerEntityServerSide"
-    ],
-    "name": "SMART_EVENT_AI_INIT",
-    "description": "On AI initialize",
-    "name_readable": "On initialize"
-  },
-  {
-    "id": 38,
-    "usable_with_script_types": [
-      "Creature",
-      "Gameobject"
-    ],
-    "name": "SMART_EVENT_DATA_SET",
-    "parameters": [
-      {
-        "type": "DataVariableParameter",
-        "name": "Id",
-        "description": "Variable id"
-      },
-      {
-        "type": "Parameter",
-        "name": "Value",
-        "description": "Value of variable to trigger"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Minimum",
-        "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Maximum",
-        "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
-      }
-    ],
-    "builtin_rules": [
-      "minmax(3, 4)"
-    ],
-    "description": "On {pram1} set to {pram2}{pram3value:choose(0):| (wait {pram3} - {pram4} ms before next event trigger)}",
-    "name_readable": "On data set"
-  },
-  {
-    "id": 39,
-    "usable_with_script_types": [
-      "Creature"
-    ],
-    "name": "SMART_EVENT_WAYPOINT_START",
-    "tags": ["Azeroth", "TrinityCata", "TrinityMaster"],
-    "parameters": [
-      {
-        "type": "Parameter",
-        "name": "Point Id (Unused)",
-        "description": "Ignored by core"
-      },
-      {
-        "type": "Parameter",
-        "name": "Path",
-        "description": "Path ID, if 0, any path will trigger the event"
-      }
-    ],
-    "description": "On {pram2value:choose(0):any path|path {pram2}} started",
-    "name_readable": "On waypoints start"
-  },
-  {
-    "id": 40,
-    "usable_with_script_types": [
-      "Creature"
-    ],
-    "name": "SMART_EVENT_WAYPOINT_REACHED",
-    "parameters": [
-      {
-        "type": "Parameter",
-        "name": "Point ID",
-        "description": "Point ID, if 0, any point will trigger the event"
-      },
-      {
-        "type": "Parameter",
-        "name": "Path",
-        "description": "Path ID, if 0, any path will trigger the event"
-      }
-    ],
-    "description": "On {pram1value:choose(0):any waypoint|wapoint {pram1}} of {pram2value:choose(0):any path|path {pram2}} reached",
-    "name_readable": "On waypoint reach"
-  },
-  {
-    "id": 41,
-    "usable_with_script_types": [
-      "Transport"
-    ],
-    "name": "SMART_EVENT_TRANSPORT_ADDPLAYER",
-    "description": "On player added to transport",
-    "name_readable": "On player added to the transport"
-  },
-  {
-    "id": 42,
-    "usable_with_script_types": [
-      "Transport"
-    ],
-    "name": "SMART_EVENT_TRANSPORT_ADDCREATURE",
-    "parameters": [
-      {
-        "type": "Parameter",
-        "name": "Entry",
-        "description": "If 0, any creature will trigger the event"
-      }
-    ],
-    "description": "On creature added to transport",
-    "name_readable": "On creature added to transport"
-  },
-  {
-    "id": 43,
-    "usable_with_script_types": [
-      "Transport"
-    ],
-    "name": "SMART_EVENT_TRANSPORT_REMOVE_PLAYER",
-    "description": "On player removed from transport",
-    "name_readable": "On player removed from transport"
-  },
-  {
-    "id": 44,
-    "usable_with_script_types": [
-      "Transport"
-    ],
-    "name": "SMART_EVENT_TRANSPORT_RELOCATE",
-    "parameters": [
-      {
-        "type": "Parameter",
-        "name": "Point Id"
-      }
-    ],
-    "description": "On player relocate",
-    "name_readable": "On player relocate"
-  },
-  {
-    "id": 45,
-    "usable_with_script_types": [
-      "Instance"
-    ],
-    "name": "SMART_EVENT_INSTANCE_PLAYER_ENTER",
-    "parameters": [
-      {
-        "type": "Parameter",
-        "name": "Team",
-        "description": "If 0, any team"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Minimum",
-        "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Maximum",
-        "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
-      }
-    ],
-    "builtin_rules": [
-      "minmax(2, 3)"
-    ],
-    "description": "On player entered instance{pram2value:choose(0):| (wait {pram2} - {pram3} ms before next event trigger)}",
-    "name_readable": "On player enter instance"
-  },
-  {
-    "id": 46,
-    "usable_with_script_types": [
-      "AreaTrigger",
-      "AreaTriggerEntity",
-      "AreaTriggerEntityServerSide"
-    ],
-    "name": "SMART_EVENT_AREATRIGGER_ONTRIGGER",
-    "parameters": [
-      {
-        "type": "Parameter",
-        "name": "Trigger",
-        "description": "Area trigger ID. If 0, any area trigger will trigger the event. Probably senseless - area trigger script always is bind to one area trigger. Isn't it?"
-      }
-    ],
-    "description": "On trigger",
-    "name_readable": "On trigger",
-    "invoker": {
-      "name": "Triggering player",
-      "types": [
-        "Player"
-      ]
-    }
-  },
-  {
-    "id": 47,
-    "usable_with_script_types": [
-      "Quest"
-    ],
-    "name": "SMART_EVENT_QUEST_ACCEPTED",
-    "description": "On quest accepted",
-    "name_readable": "On quest accept",
-    "invoker": {
-      "name": "Player who accepted",
-      "types": [
-        "Player"
-      ]
-    }
-  },
-  {
-    "id": 48,
-    "usable_with_script_types": [
-      "Quest"
-    ],
-    "parameters": [
-      {
-        "type": "Parameter",
-        "name": "Objective id"
-      }
-    ],
-    "name": "SMART_EVENT_QUEST_OBJ_COPLETETION",
-    "description": "On quest objective {pram1} completed",
-    "name_readable": "On quest objective completion",
-    "invoker": {
-      "name": "Player",
-      "types": [
-        "Player"
-      ]
-    }
-  },
-  {
-    "id": 49,
-    "usable_with_script_types": [
-      "Quest"
-    ],
-    "name": "SMART_EVENT_QUEST_COMPLETION",
-    "description": "On quest completed",
-    "name_readable": "On quest complete",
-    "invoker": {
-      "name": "Player who accepted",
-      "types": [
-        "Player"
-      ]
-    }
-  },
-  {
-    "id": 50,
-    "usable_with_script_types": [
-      "Quest"
-    ],
-    "name": "SMART_EVENT_QUEST_REWARDED",
-    "description": "On quest rewarded",
-    "name_readable": "On quest reward",
-    "invoker": {
-      "name": "Rewarded player",
-      "types": [
-        "Player"
-      ]
-    }
-  },
-  {
-    "id": 51,
-    "usable_with_script_types": [
-      "Quest"
-    ],
-    "name": "SMART_EVENT_QUEST_FAIL",
-    "description": "On quest failed",
-    "name_readable": "On quest fail",
-    "invoker": {
-      "name": "Player",
-      "types": [
-        "Player"
-      ]
-    }
-  },
-  {
-    "id": 52,
-    "usable_with_script_types": [
-      "Creature",
-      "Gameobject"
-    ],
-    "name": "SMART_EVENT_TEXT_OVER",
-    "parameters": [
-      {
-        "type": "Parameter",
-        "name": "Group Id",
-        "description": "Group ID from creature_text"
-      },
-      {
-        "type": "CreatureParameter",
-        "name": "Creature",
-        "description": "Creature who talks, if 0, any creature will trigger the event"
-      }
-    ],
-    "description": "When text {pram1}{pram2value:choose(0):| said by creature {pram2}} is over",
-    "name_readable": "On text over"
-  },
-  {
-    "id": 53,
-    "usable_with_script_types": [
-      "Creature"
-    ],
-    "name": "SMART_EVENT_RECEIVE_HEAL",
-    "parameters": [
-      {
-        "type": "Parameter",
-        "name": "Minimum heal"
-      },
-      {
-        "type": "Parameter",
-        "name": "Maximum heal"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Minimum",
-        "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Maximum",
-        "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
-      }
-    ],
-    "builtin_rules": [
-      "minmax(1, 2)",
-      "minmax(3, 4)"
-    ],
-    "description": "On creature {pram2value:choose(0):healed|healed by {pram1} - {pram2} HP}{pram3value:choose(0):| (wait {pram3} - {pram4} ms before next event trigger)}",
-    "name_readable": "On heal receive",
-    "invoker": {
-      "name": "Healer",
-      "types": [
-        "Creature",
-        "Player"
-      ]
-    }
-  },
-  {
-    "id": 54,
-    "usable_with_script_types": [
-      "Creature"
-    ],
-    "name": "SMART_EVENT_JUST_SUMMONED",
-    "description": "On just summoned",
-    "name_readable": "On self summon",
-    "invoker": {
-      "name": "Summoner",
-      "types": [
-        "Creature",
-        "Player"
-      ]
-    }
-  },
-  {
-    "id": 55,
-    "usable_with_script_types": [
-      "Creature"
-    ],
-    "name": "SMART_EVENT_WAYPOINT_PAUSED",
-    "parameters": [
-      {
-        "type": "Parameter",
-        "name": "Point ID",
-        "description": "Point ID, if 0, any point will trigger the event"
-      },
-      {
-        "type": "Parameter",
-        "name": "Path",
-        "description": "Path ID, if 0, any path will trigger the event"
-      }
-    ],
-    "description": "On {pram1value:choose(0):any waypoint|wapoint {pram1}} of {pram2value:choose(0):any path|path {pram2}} paused",
-    "name_readable": "On waypoints pause"
-  },
-  {
-    "id": 56,
-    "usable_with_script_types": [
-      "Creature"
-    ],
-    "name": "SMART_EVENT_WAYPOINT_RESUMED",
-    "parameters": [
-      {
-        "type": "Parameter",
-        "name": "Point ID",
-        "description": "Point ID, if 0, any point will trigger the event"
-      },
-      {
-        "type": "Parameter",
-        "name": "Path",
-        "description": "Path ID, if 0, any path will trigger the event"
-      }
-    ],
-    "description": "On {pram1value:choose(0):any waypoint|waypoint {pram1}} of {pram2value:choose(0):any path|path {pram2}} resumed",
-    "name_readable": "On waypoints resume"
-  },
-  {
-    "id": 57,
-    "usable_with_script_types": [
-      "Creature"
-    ],
-    "name": "SMART_EVENT_WAYPOINT_STOPPED",
-    "parameters": [
-      {
-        "type": "Parameter",
-        "name": "Point ID",
-        "description": "Point ID, if 0, any point will trigger the event"
-      },
-      {
-        "type": "Parameter",
-        "name": "Path",
-        "description": "Path ID, if 0, any path will trigger the event"
-      }
-    ],
-    "description": "On {pram1value:choose(0):any waypoint|waypoint {pram1}} of {pram2value:choose(0):any path|path {pram2}} stopped",
-    "name_readable": "On waypoints stopped"
-  },
-  {
-    "id": 58,
-    "usable_with_script_types": [
-      "Creature"
-    ],
-    "name": "SMART_EVENT_WAYPOINT_ENDED",
-    "parameters": [
-      {
-        "type": "Parameter",
-        "name": "Point ID",
-        "description": "Point ID, if 0, any point will trigger the event"
-      },
-      {
-        "type": "Parameter",
-        "name": "Path",
-        "description": "Path ID, if 0, any path will trigger the event"
-      }
-    ],
-    "description": "On {pram1value:choose(0):any waypoint|waypoint {pram1}} of {pram2value:choose(0):any path|path {pram2}} ended",
-    "name_readable": "On waypoints finished"
-  },
-  {
-    "id": 59,
-    "usable_with_script_types": [
-      "Creature",
-      "Gameobject"
-    ],
-    "name": "SMART_EVENT_TIMED_EVENT_TRIGGERED",
-    "parameters": [
-      {
-        "type": "TimedEventParameter",
-        "name": "ID",
-        "description": "Timed event ID, which triggers the event. Note: 0 does NOT mean any event"
-      }
-    ],
-    "description": "On timed event {pram1} triggered",
-    "name_readable": "On timed event trigger"
-  },
-  {
-    "id": 60,
-    "usable_with_script_types": [
-      "Creature",
-      "Gameobject",
-      "AreaTriggerEntity",
-      "AreaTriggerEntityServerSide"
-    ],
-    "name": "SMART_EVENT_UPDATE",
-    "search_tags": "update",
-    "parameters": [
-      {
-        "type": "FloatParameter",
-        "name": "Initial Minimum"
-      },
-      {
-        "type": "FloatParameter",
-        "name": "Initial Maximum"
-      },
-      {
-        "type": "FloatParameter",
-        "name": "Repeat Minimum"
-      },
-      {
-        "type": "FloatParameter",
-        "name": "Repeat Maximum"
-      }
-    ],
-    "is_timed": true,
-    "description": "Every {pram3} and {pram4} ms (for the first time, timer between {pram1} and {pram2} ms)",
-    "name_readable": "Every X seconds",
-    "builtin_rules": [
-      "minmax(1, 2)",
-      "minmax(3, 4)"
-    ],
-    "description_rules": [
-      {
-        "description": "After {pram1} seconds",
-        "condition": "script.source_type == 9"
-      },
-      {
-        "description": "Once",
-        "condition": "event.param(1) == 0 && event.param(2) == 0 && event.param(3) == 0 && event.param(4) == 0"
-      },
-      {
-        "description": "After {pram1} - {pram2} seconds",
-        "condition": "script.source_type == 9 && event.param(1) != event.param(2)"
-      },
-      {
-        "description": "Every {pram1} seconds",
-        "condition": "event.param(1) == event.param(2) && event.param(2) == event.param(3) && event.param(3) == event.param(4)"
-      },
-      {
-        "description": "Time = {pram1} seconds",
-        "condition": "event.param(3) == 0 && event.param(1) == event.param(2)"
-      },
-      {
-        "description": "Time between {pram1} - {pram2} seconds",
-        "condition": "event.param(3) == 0"
-      },
-      {
-        "description": "Every {pram1} - {pram2} seconds",
-        "condition": "event.param(1) == event.param(3) && event.param(2) == event.param(4)"
-      },
-      {
-        "description": "Every {pram3} seconds ({pram1}s initially)",
-        "condition": "event.param(1) == event.param(2) && event.param(3) == event.param(4)"
-      },
-      {
-        "description": "Every {pram3} - {pram4} seconds ({pram1} - {pram2}s initially)"
-      }
-    ]
-  },
-  {
-    "id": 61,
-    "usable_with_script_types": [
-      "Creature",
-      "Gameobject",
-      "Instance",
-      "AreaTrigger",
-      "Quest",
-      "Transport",
-      "Event",
-      "Gossip",
-      "Spell"
-    ],
-    "name": "SMART_EVENT_LINK",
-    "description": "On link",
-    "name_readable": "Link"
-  },
-  {
-    "id": 62,
-    "usable_with_script_types": [
-      "Creature",
-      "Gameobject"
-    ],
-    "name": "SMART_EVENT_GOSSIP_SELECT",
-    "parameters": [
-      {
-        "type": "GossipMenuParameter",
-        "name": "Menu ID",
-        "description": "Menu ID (gossip_menu)"
-      },
-      {
-        "type": "GossipMenuOptionParameter",
-        "name": "Action ID",
-        "description": "Option ID (gossip_menu_option)"
-      }
-    ],
-    "description": "On gossip action {pram2}{pram1value:choose(0):| from menu [p=0]{pram1value}[/p] selected}",
-    "name_readable": "On gossip select",
-    "invoker": {
-      "name": "Gossip player",
-      "types": [
-        "Player"
-      ]
-    }
-  },
-  {
-    "id": 63,
-    "usable_with_script_types": [
-      "Creature",
-      "Gameobject",
-      "AreaTriggerEntity",
-      "AreaTriggerEntityServerSide"
-    ],
-    "name": "SMART_EVENT_JUST_CREATED",
-    "description": "On just created",
-    "name_readable": "On just created"
-  },
-  {
-    "id": 64,
-    "usable_with_script_types": [
-      "Creature",
-      "Gameobject"
-    ],
-    "tags": ["TrinityCata", "TrinityMaster", "Azeroth"],
-    "name": "SMART_EVENT_GOSSIP_HELLO",
-    "description": "On player opened gossip",
-    "parameters": [
-      {
-        "type": "BoolParameter",
-        "name": "No report use"
-      }
-    ],
-    "name_readable": "On gossip hello",
-    "invoker": {
-      "name": "Gossip player",
-      "types": [
-        "Player"
-      ]
-    }
-  },
-  {
-    "id": 64,
-    "usable_with_script_types": [
-      "Creature",
-      "Gameobject"
-    ],
-    "parameters": [
-      {
-        "type": "SwitchParameter",
-        "name": "Mode",
-        "values": {
-          "0": {"name": "any gossip or report use"},
-          "1": {"name": "any gossip only"},
-          "2": {"name": "any report use only"}
-        }
-      }
-    ],
-    "tags": ["TrinityWrath"],
-    "name": "SMART_EVENT_GOSSIP_HELLO_TC_WRATH",
-    "description": "On player opened gossip",
-    "name_readable": "On gossip hello",
-    "invoker": {
-      "name": "Gossip player",
-      "types": [
-        "Player"
-      ]
-    }
-  },
-  {
-    "id": 65,
-    "usable_with_script_types": [
-      "Creature"
-    ],
-    "name": "SMART_EVENT_FOLLOW_COMPLETED",
-    "description": "On follow completed",
-    "name_readable": "On follow complete"
-  },
-  {
-    "id": 66,
-    "usable_with_script_types": [
-      "Spell"
-    ],
-    "name": "SMART_EVENT_DUMMY_EFFECT",
-    "parameters": [
-      {
-        "type": "SpellParameter",
-        "name": "Spell"
-      },
-      {
-        "type": "Parameter",
-        "name": "Effect Index"
-      }
-    ],
-    "description": "Spell {pram1} dummy effect",
-    "name_readable": "On dummy effect"
-  },
-  {
-    "id": 67,
-    "usable_with_script_types": [
-      "Creature"
-    ],
-    "is_timed": true,
-    "name": "SMART_EVENT_IS_BEHIND_TARGET",
-    "tags": ["Azeroth", "TrinityMaster", "TrinityCata"],
-    "parameters": [
-      {
-        "type": "FloatParameter",
-        "name": "Cooldown Minimum",
-        "description": "Minimum delay after this event can be triggered again"
-      },
-      {
-        "type": "FloatParameter",
-        "name": "Cooldown Maximum",
-        "description": "Maximum delay after this event can be triggered again"
-      }
-    ],
-    "builtin_rules": [
-      "minmax(1, 2)",
-      "is_repeat(2)"
-    ],
-    "description": "When victim is behind me {pram2value:choose(0):(once)|(cooldown {pram1}-{pram2} seconds)}",
-    "name_readable": "When is behind victim"
-  },
-  {
-    "id": 68,
-    "usable_with_script_types": [
-      "Creature",
-      "Gameobject"
-    ],
-    "name": "SMART_EVENT_GAME_EVENT_START",
-    "parameters": [
-      {
-        "type": "GameEventParameter",
-        "name": "Event",
-        "description": "From table game_event.Entry"
-      }
-    ],
-    "description": "On game event {pram1} started",
-    "name_readable": "On game event start"
-  },
-  {
-    "id": 69,
-    "usable_with_script_types": [
-      "Creature",
-      "Gameobject"
-    ],
-    "name": "SMART_EVENT_GAME_EVENT_END",
-    "parameters": [
-      {
-        "type": "GameEventParameter",
-        "name": "Event",
-        "description": "From table game_event.Entry"
-      }
-    ],
-    "description": "On game event {pram1} ended",
-    "name_readable": "On game event end"
-  },
-  {
-    "id": 70,
-    "usable_with_script_types": [
-      "Gameobject"
-    ],
-    "name": "SMART_EVENT_GO_STATE_CHANGED",
-    "parameters": [
-      {
-        "type": "SwitchParameter",
-        "name": "State",
-        "values": {
-          "0": {
-            "name": "GO_NOT_READY"
-          },
-          "1": {
-            "name": "GO_READY",
-            "description": "can be ready but despawned, and then not possible activate until spawn"
-          },
-          "2": {
-            "name": "GO_ACTIVATED"
-          },
-          "3": {
-            "name": "GO_JUST_DEACTIVATED"
-          }
+        "usable_with_script_types": "Creature"
+    },
+    {
+        "id": 5,
+        "name": "SMART_EVENT_KILL",
+        "name_readable": "On kill",
+        "parameters": [
+            {
+                "name": "Cooldown Minimum",
+                "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown Maximum",
+                "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)",
+                "type": "Parameter"
+            },
+            {
+                "name": "Player only",
+                "description": "If false, only creatures will trigger the event, if true, only player will trigger the event",
+                "type": "BoolParameter"
+            },
+            {
+                "name": "Creature",
+                "description": "Takes into account only if \"Player only\" is True",
+                "type": "CreatureParameter"
+            }
+        ],
+        "description": "On kill {pram3value:choose(0):creature {pram4}|player} {pram1value:choose(0):|(wait {pram1} - {pram2} ms before next trigger of this event)}",
+        "invoker": {
+            "name": "Killed unit",
+            "types": "Unit"
         },
-        "description": "Gameobject loot state"
-      }
-    ],
-    "description": "On loot state changed to {pram1}",
-    "name_readable": "On loot state changed",
-    "invoker": {
-      "name": "Invoker",
-      "types": [
-        "Creature",
-        "Player"
-      ]
+        "usable_with_script_types": "Creature",
+        "rules": [
+            {
+                "rule": "event.param(3) == 0 || (event.param(3) == 1 && event.param(4) == 0)",
+                "description": "`Creature` parameter has no effect when `Player Only` is true",
+                "level": "Info"
+            }
+        ],
+        "builtin_rules": [
+            "minmax(1,2)"
+        ]
+    },
+    {
+        "id": 6,
+        "name": "SMART_EVENT_DEATH",
+        "name_readable": "On death",
+        "description": "On death",
+        "invoker": {
+            "name": "Killer",
+            "types": "Unit"
+        },
+        "usable_with_script_types": "Creature"
+    },
+    {
+        "id": 7,
+        "name": "SMART_EVENT_EVADE",
+        "name_readable": "On evade",
+        "description": "On evade",
+        "usable_with_script_types": "Creature"
+    },
+    {
+        "id": 8,
+        "name": "SMART_EVENT_SPELLHIT",
+        "name_readable": "On spell hit",
+        "parameters": [
+            {
+                "name": "Spell",
+                "description": "If 0, any spell will trigger the event",
+                "type": "SpellParameter"
+            },
+            {
+                "name": "School",
+                "description": "School of spell",
+                "type": "SpellSchoolMaskParameter"
+            },
+            {
+                "name": "Cooldown Minimum",
+                "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown Maximum",
+                "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)",
+                "type": "Parameter"
+            }
+        ],
+        "description": "On {pram1value:choose(0):any spell|spell [spell={pram1value}] {pram1}}{pram2value:choose(0):| of school {pram2}} hit {pram3value:choose(0):|(wait {pram3} - {pram4} ms before next trigger)}",
+        "invoker": {
+            "name": "Caster",
+            "types": "Unit"
+        },
+        "usable_with_script_types": "Creature,GameObject",
+        "builtin_rules": [
+            "minmax(3,4)"
+        ]
+    },
+    {
+        "id": 9,
+        "name": "SMART_EVENT_RANGE",
+        "name_readable": "Range",
+        "parameters": [
+            {
+                "name": "Minimum Distance",
+                "description": "Minimum distance between creature and its victim to trigger the event",
+                "type": "Parameter"
+            },
+            {
+                "name": "Maximum Distance",
+                "description": "Maximum distance between creature and its victim to trigger the event",
+                "type": "Parameter",
+                "required": true
+            },
+            {
+                "name": "Cooldown Minimum",
+                "description": "Minimum delay after this event can be triggered again",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown Maximum",
+                "description": "Maximum delay after this event can be triggered again",
+                "type": "Parameter"
+            }
+        ],
+        "description": "When victim in range {pram1} - {pram2} yards {pram4value:choose(0):(once)|(cooldown {pram3} - {pram4} ms)}",
+        "tags": [
+            "TrinityWrath",
+            "TrinityMaster",
+            "TrinityCata"
+        ],
+        "is_timed": true,
+        "invoker": {
+            "name": "Victim",
+            "types": "Unit"
+        },
+        "usable_with_script_types": "Creature",
+        "builtin_rules": [
+            "minmax(1,2)",
+            "minmax(3,4)",
+            "is_repeat(4)"
+        ]
+    },
+    {
+        "id": 9,
+        "name": "SMART_EVENT_RANGE_AC",
+        "name_readable": "Range",
+        "parameters": [
+            {
+                "name": "Minimum Distance",
+                "description": "Minimum distance between creature and its victim to trigger the event",
+                "type": "Parameter"
+            },
+            {
+                "name": "Maximum Distance",
+                "description": "Maximum distance between creature and its victim to trigger the event",
+                "type": "Parameter",
+                "required": true
+            },
+            {
+                "name": "Cooldown Minimum",
+                "description": "Minimum delay after this event can be triggered again",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown Maximum",
+                "description": "Maximum delay after this event can be triggered again",
+                "type": "Parameter"
+            }
+        ],
+        "description": "When victim in range {pram1} - {pram2} yards {pram4value:choose(0):(once)|(cooldown {pram3} - {pram4} ms)}",
+        "tags": [
+            "Azeroth"
+        ],
+        "is_timed": true,
+        "invoker": {
+            "name": "Victim",
+            "types": "Unit"
+        },
+        "usable_with_script_types": "Creature",
+        "builtin_rules": [
+            "minmax(1,2)",
+            "minmax(3,4)",
+            "is_repeat(4)"
+        ]
+    },
+    {
+        "id": 10,
+        "name": "SMART_EVENT_OOC_LOS",
+        "name_readable": "On move in line of sight (out of combat)",
+        "parameters": [
+            {
+                "name": "Hostility mode",
+                "type": "SwitchParameter",
+                "values": {
+                    "0": "only hostile",
+                    "1": "only non hostile",
+                    "2": "any"
+                }
+            },
+            {
+                "name": "Max distance",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown Minimum",
+                "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown Maximum",
+                "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)",
+                "type": "Parameter"
+            }
+        ],
+        "description": "On {pram1} unit in line of sight (OOC)",
+        "tags": [
+            "TrinityWrath",
+            "TrinityMaster",
+            "TrinityCata"
+        ],
+        "invoker": {
+            "name": "Unit in LOS",
+            "types": "Unit"
+        },
+        "usable_with_script_types": "Creature",
+        "builtin_rules": [
+            "minmax(3,4)"
+        ]
+    },
+    {
+        "id": 10,
+        "name": "SMART_EVENT_OOC_LOS_AC",
+        "name_readable": "On move in line of sight (out of combat)",
+        "parameters": [
+            {
+                "name": "Hostility mode",
+                "type": "SwitchParameter",
+                "values": {
+                    "0": "only hostile",
+                    "1": "only non hostile",
+                    "2": "any"
+                }
+            },
+            {
+                "name": "Max distance",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown Minimum",
+                "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown Maximum",
+                "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)",
+                "type": "Parameter"
+            },
+            {
+                "name": "Player only",
+                "type": "BoolParameter"
+            }
+        ],
+        "description": "On {pram1} unit in line of sight (OOC)",
+        "tags": [
+            "Azeroth"
+        ],
+        "invoker": {
+            "name": "Unit in LOS",
+            "types": "Unit"
+        },
+        "usable_with_script_types": "Creature",
+        "builtin_rules": [
+            "minmax(3,4)"
+        ]
+    },
+    {
+        "id": 11,
+        "name": "SMART_EVENT_RESPAWN",
+        "name_readable": "On respawn",
+        "parameters": [
+            {
+                "name": "Respawn type",
+                "description": "Respawn type to check",
+                "type": "SwitchParameter",
+                "values": {
+                    "0": {
+                        "name": "SMART_SCRIPT_RESPAWN_CONDITION_NONE",
+                        "description": "Any respawn type"
+                    },
+                    "1": {
+                        "name": "SMART_SCRIPT_RESPAWN_CONDITION_MAP",
+                        "description": "Compare map"
+                    },
+                    "2": {
+                        "name": "SMART_SCRIPT_RESPAWN_CONDITION_AREA",
+                        "description": "Compare area (zone)"
+                    }
+                }
+            },
+            {
+                "name": "Map Id",
+                "description": "Respawn Type must be either SMART_SCRIPT_RESPAWN_CONDITION_NONE or SMART_SCRIPT_RESPAWN_CONDITION_MAP",
+                "type": "ZoneAreaParameter"
+            },
+            {
+                "name": "Zone",
+                "description": "Respawn Type must be either SMART_SCRIPT_RESPAWN_CONDITION_NONE or SMART_SCRIPT_RESPAWN_CONDITION_AREA",
+                "type": "ZoneAreaParameter"
+            }
+        ],
+        "description": "On respawn {pram2value:choose(0):{pram3value:choose(0):|in zone {pram3}}|on map {pram2}{pram3value:choose(0):| and in zone {pram3}}}",
+        "usable_with_script_types": "Creature,GameObject"
+    },
+    {
+        "id": 12,
+        "name": "SMART_EVENT_TARGET_HEALTH_PCT",
+        "name_readable": "When victim's health between",
+        "parameters": [
+            {
+                "name": "HP Minimum",
+                "type": "PercentageParameter"
+            },
+            {
+                "name": "HP Maximum",
+                "type": "PercentageParameter"
+            },
+            {
+                "name": "Cooldown Minimum",
+                "description": "Minimum delay after this event can be triggered again",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown Maximum",
+                "description": "Maximum delay after this event can be triggered again",
+                "type": "Parameter"
+            }
+        ],
+        "description": "When victim health between {pram1} - {pram2} {pram4value:choose(0):(once)|(cooldown {pram3} - {pram4} ms)}",
+        "tags": [
+            "Azeroth",
+            "TrinityMaster",
+            "TrinityCata"
+        ],
+        "is_timed": true,
+        "invoker": {
+            "name": "Victim",
+            "types": "Unit"
+        },
+        "usable_with_script_types": "Creature",
+        "builtin_rules": [
+            "minmax(1,2)",
+            "minmax(3,4)",
+            "is_repeat(4)"
+        ]
+    },
+    {
+        "id": 13,
+        "name": "SMART_EVENT_VICTIM_CASTING",
+        "name_readable": "When victim is casting",
+        "parameters": [
+            {
+                "name": "Cooldown Minimum",
+                "description": "Minimum delay after this event can be triggered again",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown Maximum",
+                "description": "Maximum delay after this event can be triggered again",
+                "type": "Parameter"
+            },
+            {
+                "name": "Spell",
+                "description": "If 0, any spell will trigger the event",
+                "type": "SpellParameter"
+            }
+        ],
+        "description": "When victim is casting {pram3value:choose(0):any|}spell{pram3value:choose(0):| {pram3}} {pram4value:choose(0):(once)|(cooldown {pram3} - {pram4} ms)}",
+        "is_timed": true,
+        "invoker": {
+            "name": "Victim",
+            "types": "Unit"
+        },
+        "usable_with_script_types": "Creature",
+        "builtin_rules": [
+            "minmax(1,2)",
+            "is_repeat(2)"
+        ]
+    },
+    {
+        "id": 14,
+        "name": "SMART_EVENT_FRIENDLY_HEALTH",
+        "name_readable": "When nerby unit health between",
+        "parameters": [
+            {
+                "name": "HP Deficit",
+                "description": "Absolute value",
+                "type": "Parameter"
+            },
+            {
+                "name": "Radius",
+                "description": "Radius to check for friendly creatures",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown Minimum",
+                "description": "Minimum delay after this event can be triggered again",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown Maximum",
+                "description": "Maximum delay after this event can be triggered again",
+                "type": "Parameter"
+            }
+        ],
+        "description": "When friendly unit in range {pram2} yards has lost more than {pram1} hp {pram4value:choose(0):(once)|(cooldown {pram3} - {pram4} ms)}",
+        "tags": [
+            "Azeroth",
+            "TrinityMaster",
+            "TrinityCata"
+        ],
+        "is_timed": true,
+        "invoker": {
+            "name": "Friendly unit",
+            "types": "Unit"
+        },
+        "usable_with_script_types": "Creature",
+        "builtin_rules": [
+            "minmax(3,4)",
+            "is_repeat(4)"
+        ]
+    },
+    {
+        "id": 15,
+        "name": "SMART_EVENT_FRIENDLY_IS_CC",
+        "name_readable": "When nearby unit is CC",
+        "parameters": [
+            {
+                "name": "Radius",
+                "description": "Radius to check for",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown Minimum",
+                "description": "Minimum delay after this event can be triggered again",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown Maximum",
+                "description": "Maximum delay after this event can be triggered again",
+                "type": "Parameter"
+            }
+        ],
+        "description": "When friendly unit in range {pram1} yards is either: feared, charmed, stunned, frozen or confused {pram4value:choose(0):(once)|(cooldown {pram3} - {pram4} ms)}",
+        "is_timed": true,
+        "invoker": {
+            "name": "Friendly unit",
+            "types": "Unit"
+        },
+        "usable_with_script_types": "Creature",
+        "builtin_rules": [
+            "is_repeat(3)",
+            "minmax(2,3)"
+        ]
+    },
+    {
+        "id": 16,
+        "name": "SMART_EVENT_FRIENDLY_MISSING_BUFF",
+        "name_readable": "When nearby friendly missing buff",
+        "parameters": [
+            {
+                "name": "Spell",
+                "description": "Spell id to check",
+                "type": "SpellParameter"
+            },
+            {
+                "name": "Radius",
+                "description": "Radius to check in",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown Minimum",
+                "description": "Minimum delay after this event can be triggered again",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown Maximum",
+                "description": "Maximum delay after this event can be triggered again",
+                "type": "Parameter"
+            }
+        ],
+        "description": "When friendly unit in range {pram2} yards has not got aura {pram1} {pram4value:choose(0):(once)|(cooldown {pram3} - {pram4} ms)}",
+        "tags": [
+            "TrinityWrath",
+            "TrinityMaster",
+            "TrinityCata"
+        ],
+        "is_timed": true,
+        "invoker": {
+            "name": "Friendly unit",
+            "types": "Unit"
+        },
+        "usable_with_script_types": "Creature",
+        "builtin_rules": [
+            "minmax(3,4)",
+            "is_repeat(4)"
+        ]
+    },
+    {
+        "id": 16,
+        "name": "SMART_EVENT_FRIENDLY_MISSING_BUFF_AC",
+        "name_readable": "When nearby friendly missing buff",
+        "parameters": [
+            {
+                "name": "Spell",
+                "description": "Spell id to check",
+                "type": "SpellParameter"
+            },
+            {
+                "name": "Radius",
+                "description": "Radius to check in",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown Minimum",
+                "description": "Minimum delay after this event can be triggered again",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown Maximum",
+                "description": "Maximum delay after this event can be triggered again",
+                "type": "Parameter"
+            },
+            {
+                "name": "Only in combat",
+                "type": "BoolParameter"
+            }
+        ],
+        "description": "When friendly unit in range {pram2} yards has not got aura {pram1} {pram4value:choose(0):(once)|(cooldown {pram3} - {pram4} ms)}",
+        "tags": [
+            "Azeroth"
+        ],
+        "is_timed": true,
+        "invoker": {
+            "name": "Friendly unit",
+            "types": "Unit"
+        },
+        "usable_with_script_types": "Creature",
+        "builtin_rules": [
+            "minmax(3,4)",
+            "is_repeat(4)"
+        ]
+    },
+    {
+        "id": 17,
+        "name": "SMART_EVENT_SUMMONED_UNIT",
+        "name_readable": "On creature summon",
+        "parameters": [
+            {
+                "name": "Creature",
+                "description": "If 0, any creature will trigger the event",
+                "type": "CreatureParameter"
+            },
+            {
+                "name": "Cooldown Minimum",
+                "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown Maximum",
+                "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)",
+                "type": "Parameter"
+            }
+        ],
+        "description": "On summoned {pram1value:choose(0):any|}unit {pram1value:choose(0):|{pram1}} {pram2value:choose(0):|(wait {pram2} - {pram3} ms before next event trigger)}",
+        "invoker": {
+            "name": "Summon",
+            "types": "Creature"
+        },
+        "usable_with_script_types": "Creature,GameObject",
+        "builtin_rules": [
+            "minmax(2,3)"
+        ]
+    },
+    {
+        "id": 18,
+        "name": "SMART_EVENT_TARGET_MANA_PCT",
+        "name_readable": "When victim mana between",
+        "parameters": [
+            {
+                "name": "Minimum mana",
+                "type": "PercentageParameter"
+            },
+            {
+                "name": "Maximum mana",
+                "type": "PercentageParameter"
+            },
+            {
+                "name": "Cooldown Minimum",
+                "description": "Minimum delay after this event can be triggered again",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown Maximum",
+                "description": "Maximum delay after this event can be triggered again",
+                "type": "Parameter"
+            }
+        ],
+        "description": "When victim has mana between {pram1} - {pram2}% {pram4value:choose(0):(once)|(cooldown {pram3} - {pram4} ms)}",
+        "tags": [
+            "Azeroth",
+            "TrinityMaster",
+            "TrinityCata"
+        ],
+        "is_timed": true,
+        "invoker": {
+            "name": "Victim",
+            "types": "Unit"
+        },
+        "usable_with_script_types": "Creature",
+        "builtin_rules": [
+            "minmax(1,2)",
+            "minmax(3,4)",
+            "is_repeat(4)"
+        ]
+    },
+    {
+        "id": 19,
+        "name": "SMART_EVENT_ACCEPTED_QUEST",
+        "name_readable": "On quest accept",
+        "parameters": [
+            {
+                "name": "Quest",
+                "description": "If 0, any quest will trigger the event",
+                "type": "QuestStarterParameter"
+            },
+            {
+                "name": "Cooldown Minimum",
+                "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown Maximum",
+                "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)",
+                "type": "Parameter"
+            }
+        ],
+        "description": "On player accepted {pram1value:choose(0):any quest|quest {pram1}}",
+        "invoker": {
+            "name": "Player who accepted quest",
+            "types": "Player"
+        },
+        "usable_with_script_types": "Creature,GameObject"
+    },
+    {
+        "id": 20,
+        "name": "SMART_EVENT_REWARD_QUEST",
+        "name_readable": "On quest reward",
+        "parameters": [
+            {
+                "name": "Quest",
+                "description": "If 0, any quest will trigger the event",
+                "type": "QuestEnderParameter"
+            },
+            {
+                "name": "Cooldown Minimum",
+                "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown Maximum",
+                "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)",
+                "type": "Parameter"
+            }
+        ],
+        "description": "On player rewarded {pram1value:choose(0):any quest|quest {pram1}}",
+        "invoker": {
+            "name": "Rewarded player",
+            "types": "Player"
+        },
+        "usable_with_script_types": "Creature,GameObject"
+    },
+    {
+        "id": 21,
+        "name": "SMART_EVENT_REACHED_HOME",
+        "name_readable": "On home reached",
+        "description": "On home reached",
+        "usable_with_script_types": "Creature"
+    },
+    {
+        "id": 22,
+        "name": "SMART_EVENT_RECEIVE_EMOTE",
+        "name_readable": "On emote received",
+        "parameters": [
+            {
+                "name": "Emote",
+                "description": "Note: \"0\" does NOT mean any emote",
+                "type": "TextEmoteParameter",
+                "required": true
+            },
+            {
+                "name": "Cooldown Minimum",
+                "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown Maximum",
+                "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)",
+                "type": "Parameter"
+            }
+        ],
+        "description": "On emote {pram1} received from player {pram2value:choose(0):|(wait {pram2} - {pram3} ms before next event trigger)}",
+        "invoker": {
+            "name": "Emote sender",
+            "types": "Player"
+        },
+        "usable_with_script_types": "Creature",
+        "builtin_rules": [
+            "minmax(2,3)"
+        ]
+    },
+    {
+        "id": 23,
+        "name": "SMART_EVENT_HAS_AURA",
+        "name_readable": "When has aura",
+        "parameters": [
+            {
+                "name": "Spell",
+                "type": "SpellParameter"
+            },
+            {
+                "name": "Stack amount",
+                "description": "If 0, any amount will trigger the quest",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown Minimum",
+                "description": "Minimum delay after this event can be triggered again",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown Maximum",
+                "description": "Maximum delay after this event can be triggered again",
+                "type": "Parameter"
+            }
+        ],
+        "description": "When creature has{pram2value:choose(0):| {pram2} stacks of} aura {pram1} {pram4value:choose(0):(once)|(cooldown {pram3} - {pram4} ms)}",
+        "is_timed": true,
+        "usable_with_script_types": "Creature",
+        "builtin_rules": [
+            "minmax(3,4)",
+            "is_repeat(4)"
+        ]
+    },
+    {
+        "id": 24,
+        "name": "SMART_EVENT_TARGET_BUFFED",
+        "name_readable": "When target has aura",
+        "parameters": [
+            {
+                "name": "Spell",
+                "type": "SpellParameter",
+                "required": true
+            },
+            {
+                "name": "Minimum stack amount",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown Minimum",
+                "description": "Minimum delay after this event can be triggered again",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown Maximum",
+                "description": "Maximum delay after this event can be triggered again",
+                "type": "Parameter"
+            }
+        ],
+        "description": "When victim has at least {pram2} stacks of aura {pram1} {pram4value:choose(0):(once)|(cooldown {pram3} - {pram4} ms)}",
+        "is_timed": true,
+        "usable_with_script_types": "Creature",
+        "builtin_rules": [
+            "minmax(3,4)",
+            "is_repeat(4)"
+        ]
+    },
+    {
+        "id": 25,
+        "name": "SMART_EVENT_RESET",
+        "name_readable": "On reset",
+        "description": "On reset",
+        "usable_with_script_types": "Creature"
+    },
+    {
+        "id": 26,
+        "name": "SMART_EVENT_IC_LOS",
+        "name_readable": "On move in line of sight (in combat)",
+        "parameters": [
+            {
+                "name": "Hostility mode",
+                "type": "SwitchParameter",
+                "values": {
+                    "0": "only hostile",
+                    "1": "only non hostile",
+                    "2": "any"
+                }
+            },
+            {
+                "name": "Maximum distance",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown Minimum",
+                "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown Maximum",
+                "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)",
+                "type": "Parameter"
+            }
+        ],
+        "description": "On {pram1} unit in line of sight (in combat){pram3value:choose(0):| (wait {pram3} - {pram4} ms before next event trigger)}",
+        "tags": [
+            "TrinityWrath",
+            "TrinityMaster",
+            "TrinityCata"
+        ],
+        "invoker": {
+            "name": "Unit in LOS",
+            "types": "Unit"
+        },
+        "usable_with_script_types": "Creature",
+        "builtin_rules": [
+            "minmax(3,4)"
+        ]
+    },
+    {
+        "id": 26,
+        "name": "SMART_EVENT_IC_LOS_AC",
+        "name_readable": "On move in line of sight (in combat)",
+        "parameters": [
+            {
+                "name": "Hostility mode",
+                "type": "SwitchParameter",
+                "values": {
+                    "0": "only hostile",
+                    "1": "only non hostile",
+                    "2": "any"
+                }
+            },
+            {
+                "name": "Maximum distance",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown Minimum",
+                "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown Maximum",
+                "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)",
+                "type": "Parameter"
+            },
+            {
+                "name": "Player only",
+                "type": "BoolParameter"
+            }
+        ],
+        "description": "On {pram1} unit in line of sight (in combat){pram3value:choose(0):| (wait {pram3} - {pram4} ms before next event trigger)}",
+        "tags": [
+            "Azeroth"
+        ],
+        "invoker": {
+            "name": "Unit in LOS",
+            "types": "Unit"
+        },
+        "usable_with_script_types": "Creature",
+        "builtin_rules": [
+            "minmax(3,4)"
+        ]
+    },
+    {
+        "id": 27,
+        "name": "SMART_EVENT_PASSENGER_BOARDED",
+        "name_readable": "On passenger boarded",
+        "parameters": [
+            {
+                "name": "Cooldown Minimum",
+                "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown Maximum",
+                "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)",
+                "type": "Parameter"
+            }
+        ],
+        "description": "On passenger boarded (vehicle){pram1value:choose(0):| (wait {pram1} - {pram2} ms before next event trigger)}",
+        "invoker": {
+            "name": "Passenger",
+            "types": "Unit"
+        },
+        "usable_with_script_types": "Creature",
+        "builtin_rules": [
+            "minmax(1,2)"
+        ]
+    },
+    {
+        "id": 28,
+        "name": "SMART_EVENT_PASSENGER_REMOVED",
+        "name_readable": "On passenger removed",
+        "parameters": [
+            {
+                "name": "Cooldown Minimum",
+                "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown Maximum",
+                "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)",
+                "type": "Parameter"
+            }
+        ],
+        "description": "On passenger removed (vehicle){pram1value:choose(0):| (wait {pram1} - {pram2} ms before next event trigger)}",
+        "invoker": {
+            "name": "Passenger",
+            "types": "Unit"
+        },
+        "usable_with_script_types": "Creature",
+        "builtin_rules": [
+            "minmax(1,2)"
+        ]
+    },
+    {
+        "id": 29,
+        "name": "SMART_EVENT_CHARMED",
+        "name_readable": "On charmed",
+        "description": "On creature got charmed by another unit",
+        "usable_with_script_types": "Creature"
+    },
+    {
+        "id": 30,
+        "name": "SMART_EVENT_CHARMED_TARGET",
+        "name_readable": "On charmed target [DEPRECATED]",
+        "description": "On creature charmed another unit",
+        "tags": [
+            "Azeroth",
+            "TrinityCata",
+            "TrinityMaster"
+        ],
+        "usable_with_script_types": "Creature"
+    },
+    {
+        "id": 31,
+        "name": "SMART_EVENT_SPELLHIT_TARGET",
+        "name_readable": "On spellhit target",
+        "parameters": [
+            {
+                "name": "Spell",
+                "type": "SpellParameter"
+            },
+            {
+                "name": "School",
+                "description": "If 0, any spell school will trigger the event",
+                "type": "SpellSchoolMaskParameter"
+            },
+            {
+                "name": "Cooldown Minimum",
+                "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown Maximum",
+                "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)",
+                "type": "Parameter"
+            }
+        ],
+        "description": "On spell {pram1} {pram2value:choose(0):|of school {pram2}} hit a target{pram3value:choose(0):| (wait {pram3} - {pram4} ms before next event trigger)}",
+        "invoker": {
+            "name": "Spell target",
+            "types": "Unit"
+        },
+        "usable_with_script_types": "Creature",
+        "builtin_rules": [
+            "minmax(3,4)"
+        ]
+    },
+    {
+        "id": 32,
+        "name": "SMART_EVENT_DAMAGED",
+        "name_readable": "On damage take",
+        "parameters": [
+            {
+                "name": "Minimum damage",
+                "description": "Minimum damage to trigger the event",
+                "type": "Parameter"
+            },
+            {
+                "name": "Maximum damage",
+                "description": "Must be set, or else the event will not trigger.",
+                "type": "Parameter",
+                "required": true
+            },
+            {
+                "name": "Cooldown Minimum",
+                "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown Maximum",
+                "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)",
+                "type": "Parameter"
+            }
+        ],
+        "description": "On creature damaged by {pram1} - {pram2} HP{pram3value:choose(0):| (wait {pram3} - {pram4} ms before next event trigger)}",
+        "invoker": {
+            "name": "Attacker",
+            "types": "Unit"
+        },
+        "usable_with_script_types": "Creature",
+        "builtin_rules": [
+            "minmax(1,2)",
+            "minmax(3,4)"
+        ]
+    },
+    {
+        "id": 33,
+        "name": "SMART_EVENT_DAMAGED_TARGET",
+        "name_readable": "On damage deal",
+        "parameters": [
+            {
+                "name": "Minimum damage",
+                "description": "Minimum damage to trigger the event",
+                "type": "Parameter"
+            },
+            {
+                "name": "Maximum damage",
+                "description": "Must be set, or else the event will not trigger.",
+                "type": "Parameter",
+                "required": true
+            },
+            {
+                "name": "Cooldown Minimum",
+                "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown Maximum",
+                "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)",
+                "type": "Parameter"
+            }
+        ],
+        "description": "On creature dealt damage to victim between {pram1} - {pram2} HP{pram3value:choose(0):| (wait {pram3} - {pram4} ms before next event trigger)}",
+        "invoker": {
+            "name": "Attacked unit",
+            "types": "Unit"
+        },
+        "usable_with_script_types": "Creature",
+        "builtin_rules": [
+            "minmax(1,2)",
+            "minmax(3,4)"
+        ]
+    },
+    {
+        "id": 34,
+        "name": "SMART_EVENT_MOVEMENTINFORM",
+        "name_readable": "On movement inform",
+        "parameters": [
+            {
+                "name": "Movement Type",
+                "type": "SwitchParameter",
+                "values": {
+                    "0": "Any",
+                    "1": "RANDOM_MOTION_TYPE",
+                    "2": "WAYPOINT_MOTION_TYPE",
+                    "3": "ANIMAL_RANDOM_MOTION_TYPE",
+                    "4": "CONFUSED_MOTION_TYPE",
+                    "5": "CHASE_MOTION_TYPE",
+                    "6": "HOME_MOTION_TYPE",
+                    "7": "FLIGHT_MOTION_TYPE",
+                    "8": "POINT_MOTION_TYPE",
+                    "9": "FLEEING_MOTION_TYPE",
+                    "10": "DISTRACT_MOTION_TYPE",
+                    "11": "ASSISTANCE_MOTION_TYPE",
+                    "12": "ASSISTANCE_DISTRACT_MOTION_TYPE",
+                    "13": "TIMED_FLEEING_MOTION_TYPE",
+                    "14": "FOLLOW_MOTION_TYPE",
+                    "15": "ROTATE_MOTION_TYPE",
+                    "16": "EFFECT_MOTION_TYPE",
+                    "17": "NULL_MOTION_TYPE"
+                }
+            },
+            {
+                "name": "Point ID",
+                "description": "If 0, any point will trigger the event",
+                "type": "Parameter"
+            }
+        ],
+        "description": "On movement {pram1value:choose(0):|of type {pram1} }inform{pram2value:choose(0):|, point {pram2}}",
+        "usable_with_script_types": "Creature"
+    },
+    {
+        "id": 35,
+        "name": "SMART_EVENT_SUMMON_DESPAWNED",
+        "name_readable": "On summon despawn",
+        "parameters": [
+            {
+                "name": "Entry",
+                "description": "If 0, any creature will trigger the event. NOT SURE???",
+                "type": "CreatureParameter"
+            },
+            {
+                "name": "Cooldown Minimum",
+                "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown Maximum",
+                "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)",
+                "type": "Parameter"
+            }
+        ],
+        "description": "On summoned creature {pram1value:choose(0):|{pram1} }despawn{pram2value:choose(0):| (wait {pram2} - {pram3} ms before next event trigger)}",
+        "invoker": {
+            "name": "Summoned unit",
+            "types": "Creature"
+        },
+        "usable_with_script_types": "Creature,GameObject",
+        "builtin_rules": [
+            "minmax(2,3)"
+        ]
+    },
+    {
+        "id": 36,
+        "name": "SMART_EVENT_CORPSE_REMOVED",
+        "name_readable": "On corpse remove",
+        "description": "On creature corpse removed",
+        "usable_with_script_types": "Creature"
+    },
+    {
+        "id": 37,
+        "name": "SMART_EVENT_AI_INIT",
+        "name_readable": "On initialize",
+        "description": "On AI initialize",
+        "usable_with_script_types": "Creature,GameObject,AreaTriggerEntity,AreaTriggerEntityServerSide"
+    },
+    {
+        "id": 38,
+        "name": "SMART_EVENT_DATA_SET",
+        "name_readable": "On data set",
+        "parameters": [
+            {
+                "name": "Id",
+                "description": "Variable id",
+                "type": "DataVariableParameter"
+            },
+            {
+                "name": "Value",
+                "description": "Value of variable to trigger",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown Minimum",
+                "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown Maximum",
+                "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)",
+                "type": "Parameter"
+            }
+        ],
+        "description": "On {pram1} set to {pram2}{pram3value:choose(0):| (wait {pram3} - {pram4} ms before next event trigger)}",
+        "usable_with_script_types": "Creature,GameObject",
+        "builtin_rules": [
+            "minmax(3,4)"
+        ]
+    },
+    {
+        "id": 39,
+        "name": "SMART_EVENT_WAYPOINT_START",
+        "name_readable": "On waypoints start",
+        "parameters": [
+            {
+                "name": "Point Id (Unused)",
+                "description": "Ignored by core",
+                "type": "Parameter"
+            },
+            {
+                "name": "Path",
+                "description": "Path ID, if 0, any path will trigger the event",
+                "type": "Parameter"
+            }
+        ],
+        "description": "On {pram2value:choose(0):any path|path {pram2}} started",
+        "tags": [
+            "Azeroth",
+            "TrinityCata",
+            "TrinityMaster"
+        ],
+        "usable_with_script_types": "Creature"
+    },
+    {
+        "id": 40,
+        "name": "SMART_EVENT_WAYPOINT_REACHED",
+        "name_readable": "On waypoint reach",
+        "parameters": [
+            {
+                "name": "Point ID",
+                "description": "Point ID, if 0, any point will trigger the event",
+                "type": "Parameter"
+            },
+            {
+                "name": "Path",
+                "description": "Path ID, if 0, any path will trigger the event",
+                "type": "Parameter"
+            }
+        ],
+        "description": "On {pram1value:choose(0):any waypoint|wapoint {pram1}} of {pram2value:choose(0):any path|path {pram2}} reached",
+        "usable_with_script_types": "Creature"
+    },
+    {
+        "id": 41,
+        "name": "SMART_EVENT_TRANSPORT_ADDPLAYER",
+        "name_readable": "On player added to the transport",
+        "description": "On player added to transport",
+        "usable_with_script_types": "Transport"
+    },
+    {
+        "id": 42,
+        "name": "SMART_EVENT_TRANSPORT_ADDCREATURE",
+        "name_readable": "On creature added to transport",
+        "parameters": [
+            {
+                "name": "Entry",
+                "description": "If 0, any creature will trigger the event",
+                "type": "Parameter"
+            }
+        ],
+        "description": "On creature added to transport",
+        "usable_with_script_types": "Transport"
+    },
+    {
+        "id": 43,
+        "name": "SMART_EVENT_TRANSPORT_REMOVE_PLAYER",
+        "name_readable": "On player removed from transport",
+        "description": "On player removed from transport",
+        "usable_with_script_types": "Transport"
+    },
+    {
+        "id": 44,
+        "name": "SMART_EVENT_TRANSPORT_RELOCATE",
+        "name_readable": "On player relocate",
+        "parameters": [
+            {
+                "name": "Point Id",
+                "type": "Parameter"
+            }
+        ],
+        "description": "On player relocate",
+        "usable_with_script_types": "Transport"
+    },
+    {
+        "id": 45,
+        "name": "SMART_EVENT_INSTANCE_PLAYER_ENTER",
+        "name_readable": "On player enter instance",
+        "parameters": [
+            {
+                "name": "Team",
+                "description": "If 0, any team",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown Minimum",
+                "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown Maximum",
+                "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)",
+                "type": "Parameter"
+            }
+        ],
+        "description": "On player entered instance{pram2value:choose(0):| (wait {pram2} - {pram3} ms before next event trigger)}",
+        "usable_with_script_types": "Instance",
+        "builtin_rules": [
+            "minmax(2,3)"
+        ]
+    },
+    {
+        "id": 46,
+        "name": "SMART_EVENT_AREATRIGGER_ONTRIGGER",
+        "name_readable": "On trigger",
+        "parameters": [
+            {
+                "name": "Trigger",
+                "description": "Area trigger ID. If 0, any area trigger will trigger the event. Probably senseless - area trigger script always is bind to one area trigger. Isn't it?",
+                "type": "Parameter"
+            }
+        ],
+        "description": "On trigger",
+        "invoker": {
+            "name": "Triggering player",
+            "types": "Player"
+        },
+        "usable_with_script_types": "AreaTrigger,AreaTriggerEntity,AreaTriggerEntityServerSide"
+    },
+    {
+        "id": 47,
+        "name": "SMART_EVENT_QUEST_ACCEPTED",
+        "name_readable": "On quest accept",
+        "description": "On quest accepted",
+        "invoker": {
+            "name": "Player who accepted",
+            "types": "Player"
+        },
+        "usable_with_script_types": "Quest"
+    },
+    {
+        "id": 48,
+        "name": "SMART_EVENT_QUEST_OBJ_COPLETETION",
+        "name_readable": "On quest objective completion",
+        "parameters": [
+            {
+                "name": "Objective id",
+                "type": "Parameter"
+            }
+        ],
+        "description": "On quest objective {pram1} completed",
+        "invoker": {
+            "name": "Player",
+            "types": "Player"
+        },
+        "usable_with_script_types": "Quest"
+    },
+    {
+        "id": 49,
+        "name": "SMART_EVENT_QUEST_COMPLETION",
+        "name_readable": "On quest complete",
+        "description": "On quest completed",
+        "invoker": {
+            "name": "Player who accepted",
+            "types": "Player"
+        },
+        "usable_with_script_types": "Quest"
+    },
+    {
+        "id": 50,
+        "name": "SMART_EVENT_QUEST_REWARDED",
+        "name_readable": "On quest reward",
+        "description": "On quest rewarded",
+        "invoker": {
+            "name": "Rewarded player",
+            "types": "Player"
+        },
+        "usable_with_script_types": "Quest"
+    },
+    {
+        "id": 51,
+        "name": "SMART_EVENT_QUEST_FAIL",
+        "name_readable": "On quest fail",
+        "description": "On quest failed",
+        "invoker": {
+            "name": "Player",
+            "types": "Player"
+        },
+        "usable_with_script_types": "Quest"
+    },
+    {
+        "id": 52,
+        "name": "SMART_EVENT_TEXT_OVER",
+        "name_readable": "On text over",
+        "parameters": [
+            {
+                "name": "Group Id",
+                "description": "Group ID from creature_text",
+                "type": "Parameter"
+            },
+            {
+                "name": "Creature",
+                "description": "Creature who talks, if 0, any creature will trigger the event",
+                "type": "CreatureParameter"
+            }
+        ],
+        "description": "When text {pram1}{pram2value:choose(0):| said by creature {pram2}} is over",
+        "usable_with_script_types": "Creature,GameObject"
+    },
+    {
+        "id": 53,
+        "name": "SMART_EVENT_RECEIVE_HEAL",
+        "name_readable": "On heal receive",
+        "parameters": [
+            {
+                "name": "Minimum heal",
+                "type": "Parameter"
+            },
+            {
+                "name": "Maximum heal",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown Minimum",
+                "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown Maximum",
+                "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)",
+                "type": "Parameter"
+            }
+        ],
+        "description": "On creature {pram2value:choose(0):healed|healed by {pram1} - {pram2} HP}{pram3value:choose(0):| (wait {pram3} - {pram4} ms before next event trigger)}",
+        "invoker": {
+            "name": "Healer",
+            "types": "Unit"
+        },
+        "usable_with_script_types": "Creature",
+        "builtin_rules": [
+            "minmax(1,2)",
+            "minmax(3,4)"
+        ]
+    },
+    {
+        "id": 54,
+        "name": "SMART_EVENT_JUST_SUMMONED",
+        "name_readable": "On self summon",
+        "description": "On just summoned",
+        "invoker": {
+            "name": "Summoner",
+            "types": "Unit"
+        },
+        "usable_with_script_types": "Creature"
+    },
+    {
+        "id": 55,
+        "name": "SMART_EVENT_WAYPOINT_PAUSED",
+        "name_readable": "On waypoints pause",
+        "parameters": [
+            {
+                "name": "Point ID",
+                "description": "Point ID, if 0, any point will trigger the event",
+                "type": "Parameter"
+            },
+            {
+                "name": "Path",
+                "description": "Path ID, if 0, any path will trigger the event",
+                "type": "Parameter"
+            }
+        ],
+        "description": "On {pram1value:choose(0):any waypoint|wapoint {pram1}} of {pram2value:choose(0):any path|path {pram2}} paused",
+        "usable_with_script_types": "Creature"
+    },
+    {
+        "id": 56,
+        "name": "SMART_EVENT_WAYPOINT_RESUMED",
+        "name_readable": "On waypoints resume",
+        "parameters": [
+            {
+                "name": "Point ID",
+                "description": "Point ID, if 0, any point will trigger the event",
+                "type": "Parameter"
+            },
+            {
+                "name": "Path",
+                "description": "Path ID, if 0, any path will trigger the event",
+                "type": "Parameter"
+            }
+        ],
+        "description": "On {pram1value:choose(0):any waypoint|waypoint {pram1}} of {pram2value:choose(0):any path|path {pram2}} resumed",
+        "usable_with_script_types": "Creature"
+    },
+    {
+        "id": 57,
+        "name": "SMART_EVENT_WAYPOINT_STOPPED",
+        "name_readable": "On waypoints stopped",
+        "parameters": [
+            {
+                "name": "Point ID",
+                "description": "Point ID, if 0, any point will trigger the event",
+                "type": "Parameter"
+            },
+            {
+                "name": "Path",
+                "description": "Path ID, if 0, any path will trigger the event",
+                "type": "Parameter"
+            }
+        ],
+        "description": "On {pram1value:choose(0):any waypoint|waypoint {pram1}} of {pram2value:choose(0):any path|path {pram2}} stopped",
+        "usable_with_script_types": "Creature"
+    },
+    {
+        "id": 58,
+        "name": "SMART_EVENT_WAYPOINT_ENDED",
+        "name_readable": "On waypoints finished",
+        "parameters": [
+            {
+                "name": "Point ID",
+                "description": "Point ID, if 0, any point will trigger the event",
+                "type": "Parameter"
+            },
+            {
+                "name": "Path",
+                "description": "Path ID, if 0, any path will trigger the event",
+                "type": "Parameter"
+            }
+        ],
+        "description": "On {pram1value:choose(0):any waypoint|waypoint {pram1}} of {pram2value:choose(0):any path|path {pram2}} ended",
+        "usable_with_script_types": "Creature"
+    },
+    {
+        "id": 59,
+        "name": "SMART_EVENT_TIMED_EVENT_TRIGGERED",
+        "name_readable": "On timed event trigger",
+        "parameters": [
+            {
+                "name": "ID",
+                "description": "Timed event ID, which triggers the event. Note: 0 does NOT mean any event",
+                "type": "TimedEventParameter"
+            }
+        ],
+        "description": "On timed event {pram1} triggered",
+        "usable_with_script_types": "Creature,GameObject"
+    },
+    {
+        "id": 60,
+        "name": "SMART_EVENT_UPDATE",
+        "name_readable": "Every X seconds",
+        "parameters": [
+            {
+                "name": "Initial Minimum",
+                "type": "FloatParameter"
+            },
+            {
+                "name": "Initial Maximum",
+                "type": "FloatParameter"
+            },
+            {
+                "name": "Repeat Minimum",
+                "type": "FloatParameter"
+            },
+            {
+                "name": "Repeat Maximum",
+                "type": "FloatParameter"
+            }
+        ],
+        "description": "Every {pram3} and {pram4} ms (for the first time, timer between {pram1} and {pram2} ms)",
+        "is_timed": true,
+        "usable_with_script_types": "Creature,GameObject,AreaTriggerEntity,AreaTriggerEntityServerSide",
+        "description_rules": [
+            {
+                "description": "After {pram1} seconds",
+                "condition": "script.source_type == 9"
+            },
+            {
+                "description": "Once",
+                "condition": "event.param(1) == 0 && event.param(2) == 0 && event.param(3) == 0 && event.param(4) == 0"
+            },
+            {
+                "description": "After {pram1} - {pram2} seconds",
+                "condition": "script.source_type == 9 && event.param(1) != event.param(2)"
+            },
+            {
+                "description": "Every {pram1} seconds",
+                "condition": "event.param(1) == event.param(2) && event.param(2) == event.param(3) && event.param(3) == event.param(4)"
+            },
+            {
+                "description": "Time = {pram1} seconds",
+                "condition": "event.param(3) == 0 && event.param(1) == event.param(2)"
+            },
+            {
+                "description": "Time between {pram1} - {pram2} seconds",
+                "condition": "event.param(3) == 0"
+            },
+            {
+                "description": "Every {pram1} - {pram2} seconds",
+                "condition": "event.param(1) == event.param(3) && event.param(2) == event.param(4)"
+            },
+            {
+                "description": "Every {pram3} seconds ({pram1}s initially)",
+                "condition": "event.param(1) == event.param(2) && event.param(3) == event.param(4)"
+            },
+            {
+                "description": "Every {pram3} - {pram4} seconds ({pram1} - {pram2}s initially)"
+            }
+        ],
+        "builtin_rules": [
+            "minmax(1,2)",
+            "minmax(3,4)"
+        ],
+        "search_tags": "update"
+    },
+    {
+        "id": 61,
+        "name": "SMART_EVENT_LINK",
+        "name_readable": "Link",
+        "description": "On link",
+        "usable_with_script_types": "Creature,GameObject,AreaTrigger,Event,Gossip,Quest,Spell,Transport,Instance"
+    },
+    {
+        "id": 62,
+        "name": "SMART_EVENT_GOSSIP_SELECT",
+        "name_readable": "On gossip select",
+        "parameters": [
+            {
+                "name": "Menu ID",
+                "description": "Menu ID (gossip_menu)",
+                "type": "GossipMenuParameter"
+            },
+            {
+                "name": "Action ID",
+                "description": "Option ID (gossip_menu_option)",
+                "type": "GossipMenuOptionParameter"
+            }
+        ],
+        "description": "On gossip action {pram2}{pram1value:choose(0):| from menu [p=0]{pram1value}[/p] selected}",
+        "invoker": {
+            "name": "Gossip player",
+            "types": "Player"
+        },
+        "usable_with_script_types": "Creature,GameObject"
+    },
+    {
+        "id": 63,
+        "name": "SMART_EVENT_JUST_CREATED",
+        "name_readable": "On just created",
+        "description": "On just created",
+        "usable_with_script_types": "Creature,GameObject,AreaTriggerEntity,AreaTriggerEntityServerSide"
+    },
+    {
+        "id": 64,
+        "name": "SMART_EVENT_GOSSIP_HELLO",
+        "name_readable": "On gossip hello",
+        "parameters": [
+            {
+                "name": "No report use",
+                "type": "BoolParameter"
+            }
+        ],
+        "description": "On player opened gossip",
+        "tags": [
+            "TrinityCata",
+            "TrinityMaster",
+            "Azeroth"
+        ],
+        "invoker": {
+            "name": "Gossip player",
+            "types": "Player"
+        },
+        "usable_with_script_types": "Creature,GameObject"
+    },
+    {
+        "id": 64,
+        "name": "SMART_EVENT_GOSSIP_HELLO_TC_WRATH",
+        "name_readable": "On gossip hello",
+        "parameters": [
+            {
+                "name": "Mode",
+                "type": "SwitchParameter",
+                "values": {
+                    "0": "any gossip or report use",
+                    "1": "any gossip only",
+                    "2": "any report use only"
+                }
+            }
+        ],
+        "description": "On player opened gossip",
+        "tags": [
+            "TrinityWrath"
+        ],
+        "invoker": {
+            "name": "Gossip player",
+            "types": "Player"
+        },
+        "usable_with_script_types": "Creature,GameObject"
+    },
+    {
+        "id": 65,
+        "name": "SMART_EVENT_FOLLOW_COMPLETED",
+        "name_readable": "On follow complete",
+        "description": "On follow completed",
+        "usable_with_script_types": "Creature"
+    },
+    {
+        "id": 66,
+        "name": "SMART_EVENT_DUMMY_EFFECT",
+        "name_readable": "On dummy effect",
+        "parameters": [
+            {
+                "name": "Spell",
+                "type": "SpellParameter"
+            },
+            {
+                "name": "Effect Index",
+                "type": "Parameter"
+            }
+        ],
+        "description": "Spell {pram1} dummy effect",
+        "usable_with_script_types": "Spell"
+    },
+    {
+        "id": 67,
+        "name": "SMART_EVENT_IS_BEHIND_TARGET",
+        "name_readable": "When is behind victim",
+        "parameters": [
+            {
+                "name": "Cooldown Minimum",
+                "description": "Minimum delay after this event can be triggered again",
+                "type": "FloatParameter"
+            },
+            {
+                "name": "Cooldown Maximum",
+                "description": "Maximum delay after this event can be triggered again",
+                "type": "FloatParameter"
+            }
+        ],
+        "description": "When victim is behind me {pram2value:choose(0):(once)|(cooldown {pram1}-{pram2} seconds)}",
+        "tags": [
+            "Azeroth",
+            "TrinityMaster",
+            "TrinityCata"
+        ],
+        "is_timed": true,
+        "usable_with_script_types": "Creature",
+        "builtin_rules": [
+            "minmax(1,2)",
+            "is_repeat(2)"
+        ]
+    },
+    {
+        "id": 68,
+        "name": "SMART_EVENT_GAME_EVENT_START",
+        "name_readable": "On game event start",
+        "parameters": [
+            {
+                "name": "Event",
+                "description": "From table game_event.Entry",
+                "type": "GameEventParameter"
+            }
+        ],
+        "description": "On game event {pram1} started",
+        "usable_with_script_types": "Creature,GameObject"
+    },
+    {
+        "id": 69,
+        "name": "SMART_EVENT_GAME_EVENT_END",
+        "name_readable": "On game event end",
+        "parameters": [
+            {
+                "name": "Event",
+                "description": "From table game_event.Entry",
+                "type": "GameEventParameter"
+            }
+        ],
+        "description": "On game event {pram1} ended",
+        "usable_with_script_types": "Creature,GameObject"
+    },
+    {
+        "id": 70,
+        "name": "SMART_EVENT_GO_STATE_CHANGED",
+        "name_readable": "On loot state changed",
+        "parameters": [
+            {
+                "name": "State",
+                "description": "Gameobject loot state",
+                "type": "SwitchParameter",
+                "values": {
+                    "0": {
+                        "name": "GO_NOT_READY"
+                    },
+                    "1": {
+                        "name": "GO_READY",
+                        "description": "can be ready but despawned, and then not possible activate until spawn"
+                    },
+                    "2": {
+                        "name": "GO_ACTIVATED"
+                    },
+                    "3": {
+                        "name": "GO_JUST_DEACTIVATED"
+                    }
+                }
+            }
+        ],
+        "description": "On loot state changed to {pram1}",
+        "invoker": {
+            "name": "Invoker",
+            "types": "Unit"
+        },
+        "usable_with_script_types": "GameObject"
+    },
+    {
+        "id": 71,
+        "name": "SMART_EVENT_GO_EVENT_INFORM",
+        "name_readable": "On event inform",
+        "parameters": [
+            {
+                "name": "Event ID",
+                "description": "For example, gameobject of type \"gobber\"",
+                "type": "EventScriptParameter"
+            }
+        ],
+        "description": "On game object event {pram1} triggered",
+        "usable_with_script_types": "GameObject"
+    },
+    {
+        "id": 72,
+        "name": "SMART_EVENT_ACTION_DONE",
+        "name_readable": "On action",
+        "parameters": [
+            {
+                "name": "Action ID",
+                "type": "DoActionParameter"
+            }
+        ],
+        "description": "On {pram1}",
+        "usable_with_script_types": "Creature"
+    },
+    {
+        "id": 73,
+        "name": "SMART_EVENT_ON_SPELLCLICK",
+        "name_readable": "On spellclick",
+        "description": "On spellclick",
+        "invoker": {
+            "name": "Clicker",
+            "types": "Player"
+        },
+        "usable_with_script_types": "Creature"
+    },
+    {
+        "id": 74,
+        "name": "SMART_EVENT_FRIENDLY_HEALTH_PCT",
+        "name_readable": "Targets health %",
+        "parameters": [
+            {
+                "name": "Minimum HP",
+                "description": "Target from first action must be: CREATURE_RANGE, CREATURE_GUID, CREATURE_DISTANCE, CLOSEST_CREATURE, CLOSEST_PLAYER, PLAYER_RANGE, PLAYER_DISTANCE",
+                "type": "PercentageParameter"
+            },
+            {
+                "name": "Maximum HP",
+                "type": "PercentageParameter"
+            },
+            {
+                "name": "Cooldown Minimum",
+                "description": "Minimum delay after this event can be triggered again",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown Maximum",
+                "description": "Maximum delay after this event can be triggered again",
+                "type": "Parameter"
+            }
+        ],
+        "description": "When target has HP between {pram1} - {pram2} {pram4value:choose(0):(once)|(cooldown {pram3} - {pram4} ms)}",
+        "tags": [
+            "TrinityWrath",
+            "TrinityMaster"
+        ],
+        "is_timed": true,
+        "invoker": {
+            "name": "Friendly unit",
+            "types": "Unit"
+        },
+        "usable_with_script_types": "Creature",
+        "builtin_rules": [
+            "minmax(1,2)",
+            "minmax(3,4)",
+            "is_repeat(4)"
+        ]
+    },
+    {
+        "id": 74,
+        "name": "SMART_EVENT_FRIENDLY_HEALTH_PCT_AC",
+        "name_readable": "Targets health %",
+        "parameters": [
+            {
+                "name": "Minimum HP",
+                "description": "Target from first action must be: CREATURE_RANGE, CREATURE_GUID, CREATURE_DISTANCE, CLOSEST_CREATURE, CLOSEST_PLAYER, PLAYER_RANGE, PLAYER_DISTANCE",
+                "type": "PercentageParameter"
+            },
+            {
+                "name": "Maximum HP",
+                "type": "PercentageParameter"
+            },
+            {
+                "name": "Cooldown Minimum",
+                "description": "Minimum delay after this event can be triggered again",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown Maximum",
+                "description": "Maximum delay after this event can be triggered again",
+                "type": "Parameter"
+            },
+            {
+                "name": "Radius",
+                "type": "Parameter"
+            }
+        ],
+        "description": "When target has HP between {pram1} - {pram2} {pram4value:choose(0):(once)|(cooldown {pram3} - {pram4} ms)}",
+        "tags": [
+            "Azeroth"
+        ],
+        "is_timed": true,
+        "invoker": {
+            "name": "Friendly unit",
+            "types": "Unit"
+        },
+        "usable_with_script_types": "Creature",
+        "builtin_rules": [
+            "minmax(1,2)",
+            "minmax(3,4)",
+            "is_repeat(4)"
+        ]
+    },
+    {
+        "id": 74,
+        "name": "SMART_EVENT_FRIENDLY_HEALTH_PCT_TC_CATA",
+        "name_readable": "Targets health %",
+        "parameters": [
+            {
+                "name": "Minimum HP",
+                "description": "Target from first action must be: CREATURE_RANGE, CREATURE_GUID, CREATURE_DISTANCE, CLOSEST_CREATURE, CLOSEST_PLAYER, PLAYER_RANGE, PLAYER_DISTANCE",
+                "type": "PercentageParameter"
+            },
+            {
+                "name": "Maximum HP",
+                "type": "PercentageParameter"
+            },
+            {
+                "name": "Radius",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown",
+                "type": "Parameter"
+            }
+        ],
+        "description": "When nearby friendly unit in {pram3} yd has HP between {pram1} - {pram2} {pram5value:choose(0):(once)|(cooldown {pram4} - {pram5} ms)}",
+        "tags": [
+            "TrinityCata"
+        ],
+        "is_timed": true,
+        "invoker": {
+            "name": "Friendly unit",
+            "types": "Unit"
+        },
+        "usable_with_script_types": "Creature",
+        "builtin_rules": [
+            "minmax(1,2)",
+            "minmax(3,4)",
+            "is_repeat(4)"
+        ]
+    },
+    {
+        "id": 75,
+        "name": "SMART_EVENT_DISTANCE_CREATURE",
+        "name_readable": "When creature in range",
+        "parameters": [
+            {
+                "name": "GUID",
+                "type": "Parameter"
+            },
+            {
+                "name": "Creature",
+                "type": "CreatureParameter"
+            },
+            {
+                "name": "Distance",
+                "type": "Parameter",
+                "required": true
+            },
+            {
+                "name": "Cooldown",
+                "description": "Core will check whether the event should fire every [parameter] seconds",
+                "type": "FloatParameter"
+            }
+        ],
+        "description": "When creature {pram1value:choose(0):{pram2}| with guid {pram1}} in range {pram3} {pram4value:choose(0):(once)|(cooldown {pram4} sec)}",
+        "is_timed": true,
+        "invoker": {
+            "name": "Found creature",
+            "types": "Creature"
+        },
+        "usable_with_script_types": "Creature",
+        "builtin_rules": [
+            "is_repeat(4)"
+        ]
+    },
+    {
+        "id": 76,
+        "name": "SMART_EVENT_DISTANCE_GAMEOBJECT",
+        "name_readable": "When gameobject in range",
+        "parameters": [
+            {
+                "name": "GUID",
+                "type": "Parameter"
+            },
+            {
+                "name": "Gameobject",
+                "type": "GameobjectParameter"
+            },
+            {
+                "name": "Distance",
+                "type": "Parameter",
+                "required": true
+            },
+            {
+                "name": "Cooldown",
+                "description": "Core will check whether the event should fire every [parameter] seconds",
+                "type": "FloatParameter"
+            }
+        ],
+        "description": "When gameobject {pram1value:choose(0):{pram2}| with guid {pram1}} in range {pram3} {pram4value:choose(0):(once)|(cooldown {pram4} seconds)}",
+        "is_timed": true,
+        "invoker": {
+            "name": "Found gameobject",
+            "types": "Creature"
+        },
+        "usable_with_script_types": "Creature",
+        "builtin_rules": [
+            "is_repeat(4)"
+        ]
+    },
+    {
+        "id": 77,
+        "name": "SMART_EVENT_COUNTER_SET",
+        "name_readable": "On counter set",
+        "parameters": [
+            {
+                "name": "Counter ID",
+                "type": "Parameter"
+            },
+            {
+                "name": "Value",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown Minimum",
+                "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown Maximum",
+                "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)",
+                "type": "Parameter"
+            }
+        ],
+        "description": "On counter {pram1} set to {pram2}{pram3value:choose(0):| (wait {pram3} - {pram4} ms before next event trigger)}",
+        "usable_with_script_types": "Creature,GameObject",
+        "builtin_rules": [
+            "minmax(3,4)"
+        ]
+    },
+    {
+        "id": 78,
+        "name": "SMART_EVENT_SCENE_START",
+        "name_readable": "On scene start",
+        "description": "On Scene Start",
+        "tags": [
+            "TrinityMaster"
+        ],
+        "usable_with_script_types": "Scene"
+    },
+    {
+        "id": 80,
+        "name": "SMART_EVENT_SCENE_CANCEL",
+        "name_readable": "On scene canceled",
+        "description": "On Scene Cancel",
+        "tags": [
+            "TrinityMaster"
+        ],
+        "usable_with_script_types": "Scene"
+    },
+    {
+        "id": 81,
+        "name": "SMART_EVENT_SCENE_COMPLETE",
+        "name_readable": "On scene completed",
+        "description": "On Scene Complete",
+        "tags": [
+            "TrinityMaster"
+        ],
+        "usable_with_script_types": "Scene"
+    },
+    {
+        "id": 82,
+        "name": "SMART_EVENT_SUMMONED_UNIT_DIES",
+        "name_readable": "On summon death",
+        "parameters": [
+            {
+                "name": "Entry",
+                "description": "If 0, any creature will trigger the event",
+                "type": "CreatureParameter"
+            },
+            {
+                "name": "Cooldown Minimum",
+                "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown Maximum",
+                "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)",
+                "type": "Parameter"
+            }
+        ],
+        "description": "On summoned creature {pram1value:choose(0):|{pram1} }died{pram2value:choose(0):| (wait {pram2} - {pram3} ms before next event trigger)}",
+        "tags": [
+            "TrinityWrath"
+        ],
+        "invoker": {
+            "name": "Summoned unit",
+            "types": "Creature"
+        },
+        "usable_with_script_types": "Creature,GameObject",
+        "builtin_rules": [
+            "minmax(2,3)"
+        ]
+    },
+    {
+        "id": 83,
+        "name": "SMART_EVENT_ON_SPELL_CAST",
+        "name_readable": "On spell cast",
+        "parameters": [
+            {
+                "name": "Spell",
+                "description": "If 0, any spell will trigger the event",
+                "type": "SpellParameter"
+            },
+            {
+                "name": "Cooldown Minimum",
+                "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown Maximum",
+                "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)",
+                "type": "Parameter"
+            }
+        ],
+        "description": "On {pram1value:choose(0):any spell|spell {pram1}} cast {pram2value:choose(0):|(wait {pram2} - {pram3} ms before next trigger)}",
+        "tags": [
+            "TrinityWrath",
+            "TrinityMaster"
+        ],
+        "invoker": {
+            "name": "Caster",
+            "types": "Unit"
+        },
+        "usable_with_script_types": "Creature,GameObject",
+        "builtin_rules": [
+            "minmax(2,3)"
+        ]
+    },
+    {
+        "id": 84,
+        "name": "SMART_EVENT_ON_SPELL_FAILED",
+        "name_readable": "On spell failed",
+        "parameters": [
+            {
+                "name": "Spell",
+                "description": "If 0, any spell will trigger the event",
+                "type": "SpellParameter"
+            },
+            {
+                "name": "Cooldown Minimum",
+                "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown Maximum",
+                "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)",
+                "type": "Parameter"
+            }
+        ],
+        "description": "On {pram1value:choose(0):any spell|spell {pram1}} failed {pram2value:choose(0):|(wait {pram2} - {pram3} ms before next trigger)}",
+        "tags": [
+            "TrinityWrath",
+            "TrinityMaster"
+        ],
+        "invoker": {
+            "name": "Caster",
+            "types": "Unit"
+        },
+        "usable_with_script_types": "Creature,GameObject",
+        "builtin_rules": [
+            "minmax(2,3)"
+        ]
+    },
+    {
+        "id": 85,
+        "name": "SMART_EVENT_ON_SPELL_START",
+        "name_readable": "On spell start",
+        "parameters": [
+            {
+                "name": "Spell",
+                "description": "If 0, any spell will trigger the event",
+                "type": "SpellParameter"
+            },
+            {
+                "name": "Cooldown Minimum",
+                "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown Maximum",
+                "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)",
+                "type": "Parameter"
+            }
+        ],
+        "description": "On {pram1value:choose(0):any spell|spell {pram1}} start {pram2value:choose(0):|(wait {pram2} - {pram3} ms before next trigger)}",
+        "tags": [
+            "TrinityWrath",
+            "TrinityMaster"
+        ],
+        "invoker": {
+            "name": "Caster",
+            "types": "Unit"
+        },
+        "usable_with_script_types": "Creature,GameObject",
+        "builtin_rules": [
+            "minmax(2,3)"
+        ]
+    },
+    {
+        "id": 101,
+        "name": "SMART_EVENT_NEAR_PLAYERS_AC",
+        "name_readable": "When at least x players nearby",
+        "parameters": [
+            {
+                "name": "Minimum number of players to trigger event",
+                "type": "Parameter"
+            },
+            {
+                "name": "Radius",
+                "type": "Parameter"
+            },
+            {
+                "name": "First check cooldown",
+                "type": "FloatParameter"
+            },
+            {
+                "name": "Cooldown min",
+                "type": "FloatParameter"
+            },
+            {
+                "name": "Cooldown max",
+                "type": "FloatParameter"
+            }
+        ],
+        "description": "When {pram1value:choose(0|1):any player|any player|at least {pram1} players} within {pram2} yd nearby {pram4value:choose(0):(once)|(cooldown {pram4} seconds)}",
+        "tags": [
+            "Azeroth"
+        ],
+        "is_timed": true,
+        "invoker": {
+            "name": "Found unit",
+            "types": "Unit"
+        },
+        "usable_with_script_types": "Creature,GameObject"
+    },
+    {
+        "id": 102,
+        "name": "SMART_EVENT_NEAR_PLAYERS_NEGATION_AC",
+        "name_readable": "When at most x players nearby",
+        "parameters": [
+            {
+                "name": "Maximum number of players to trigger event",
+                "type": "Parameter"
+            },
+            {
+                "name": "Radius",
+                "type": "Parameter"
+            },
+            {
+                "name": "First check cooldown",
+                "type": "FloatParameter"
+            },
+            {
+                "name": "Cooldown min",
+                "type": "FloatParameter"
+            },
+            {
+                "name": "Cooldown max",
+                "type": "FloatParameter"
+            }
+        ],
+        "description": "When {pram1value:choose(0|1):no players|at most 1 player|at most {pram1} players} within {pram2} yd nearby {pram4value:choose(0):(once)|(cooldown {pram4} seconds)}",
+        "tags": [
+            "Azeroth"
+        ],
+        "is_timed": true,
+        "invoker": {
+            "name": "Found unit",
+            "types": "Unit"
+        },
+        "usable_with_script_types": "Creature,GameObject"
+    },
+    {
+        "id": 103,
+        "name": "SMART_EVENT_NEAR_UNIT_AC",
+        "name_readable": "When at least x units nearby",
+        "parameters": [
+            {
+                "name": "Type",
+                "type": "SwitchParameter",
+                "values": {
+                    "0": "Creature",
+                    "1": "Gameobject"
+                }
+            },
+            {
+                "name": "Entry",
+                "type": "Parameter"
+            },
+            {
+                "name": "Minimum count",
+                "type": "Parameter"
+            },
+            {
+                "name": "Range",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown",
+                "type": "Parameter"
+            }
+        ],
+        "description": "When {pram3value:choose(0|1):any {pram1}|at least 1 {pram1}|at least {pram3} {pram1}s} with entry {pram2} within {pram4} yd nearby {pram5value:choose(0):(once)|(cooldown {pram5} seconds)}",
+        "tags": [
+            "Azeroth"
+        ],
+        "is_timed": true,
+        "invoker": {
+            "name": "Found unit",
+            "types": "Unit"
+        },
+        "usable_with_script_types": "Creature,GameObject"
+    },
+    {
+        "id": 104,
+        "name": "SMART_EVENT_NEAR_UNIT_NEGATION_AC",
+        "name_readable": "When at most x units nearby",
+        "parameters": [
+            {
+                "name": "Type",
+                "type": "SwitchParameter",
+                "values": {
+                    "0": "Creature",
+                    "1": "Gameobject"
+                }
+            },
+            {
+                "name": "Entry",
+                "type": "Parameter"
+            },
+            {
+                "name": "Minimum count",
+                "type": "Parameter"
+            },
+            {
+                "name": "Range",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown",
+                "type": "Parameter"
+            }
+        ],
+        "description": "When {pram3value:choose(0|1):no {pram1}s|at most 1 {pram1}|at most {pram3} {pram1}s} with entry {pram2} within {pram4} yd nearby {pram5value:choose(0):(once)|(cooldown {pram5} seconds)}",
+        "tags": [
+            "Azeroth"
+        ],
+        "is_timed": true,
+        "invoker": {
+            "name": "Found unit",
+            "types": "Unit"
+        },
+        "usable_with_script_types": "Creature,GameObject"
+    },
+    {
+        "id": 105,
+        "name": "SMART_EVENT_AREA_CASTING_AC",
+        "name_readable": "Area casting",
+        "parameters": [
+            {
+                "name": "Initial cooldown min",
+                "type": "Parameter"
+            },
+            {
+                "name": "Initial cooldown max",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown min",
+                "type": "FloatParameter"
+            },
+            {
+                "name": "Cooldown max",
+                "type": "FloatParameter"
+            },
+            {
+                "name": "Range min",
+                "type": "Parameter"
+            },
+            {
+                "name": "Range max",
+                "type": "Parameter"
+            }
+        ],
+        "description": "When victim within {pram5}-{pram6} yd casting",
+        "tags": [
+            "Azeroth"
+        ],
+        "is_timed": true,
+        "invoker": {
+            "name": "Victim",
+            "types": "Unit"
+        },
+        "usable_with_script_types": "Creature"
+    },
+    {
+        "id": 106,
+        "name": "SMART_EVENT_AREA_RANGE_AC",
+        "name_readable": "Area range",
+        "parameters": [
+            {
+                "name": "Initial cooldown min",
+                "type": "Parameter"
+            },
+            {
+                "name": "Initial cooldown max",
+                "type": "Parameter"
+            },
+            {
+                "name": "Cooldown min",
+                "type": "FloatParameter"
+            },
+            {
+                "name": "Cooldown max",
+                "type": "FloatParameter"
+            },
+            {
+                "name": "Range min",
+                "type": "Parameter"
+            },
+            {
+                "name": "Range max",
+                "type": "Parameter"
+            }
+        ],
+        "description": "When victim within {pram5}-{pram6} yd",
+        "tags": [
+            "Azeroth"
+        ],
+        "is_timed": true,
+        "invoker": {
+            "name": "Victim",
+            "types": "Unit"
+        },
+        "usable_with_script_types": "Creature"
     }
-  },
-  {
-    "id": 71,
-    "usable_with_script_types": [
-      "Gameobject"
-    ],
-    "name": "SMART_EVENT_GO_EVENT_INFORM",
-    "parameters": [
-      {
-        "type": "EventScriptParameter",
-        "name": "Event ID",
-        "description": "For example, gameobject of type \"gobber\""
-      }
-    ],
-    "description": "On game object event {pram1} triggered",
-    "name_readable": "On event inform"
-  },
-  {
-    "id": 72,
-    "usable_with_script_types": [
-      "Creature"
-    ],
-    "name": "SMART_EVENT_ACTION_DONE",
-    "parameters": [
-      {
-        "type": "DoActionParameter",
-        "name": "Action ID"
-      }
-    ],
-    "description": "On {pram1}",
-    "name_readable": "On action"
-  },
-  {
-    "id": 73,
-    "usable_with_script_types": [
-      "Creature"
-    ],
-    "name": "SMART_EVENT_ON_SPELLCLICK",
-    "description": "On spellclick",
-    "name_readable": "On spellclick",
-    "invoker": {
-      "name": "Clicker",
-      "types": [
-        "Player"
-      ]
-    }
-  },
-  {
-    "id": 74,
-    "usable_with_script_types": [
-      "Creature"
-    ],
-    "tags": [
-      "TrinityWrath", "TrinityMaster"
-    ],
-    "is_timed": true,
-    "name": "SMART_EVENT_FRIENDLY_HEALTH_PCT",
-    "parameters": [
-      {
-        "type": "PercentageParameter",
-        "name": "Minimum HP",
-        "description": "Target from first action must be: CREATURE_RANGE, CREATURE_GUID, CREATURE_DISTANCE, CLOSEST_CREATURE, CLOSEST_PLAYER, PLAYER_RANGE, PLAYER_DISTANCE"
-      },
-      {
-        "type": "PercentageParameter",
-        "name": "Maximum HP"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Minimum",
-        "description": "Minimum delay after this event can be triggered again"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Maximum",
-        "description": "Maximum delay after this event can be triggered again"
-      }
-    ],
-    "builtin_rules": [
-      "minmax(1, 2)",
-      "minmax(3, 4)",
-      "is_repeat(4)"
-    ],
-    "description": "When target has HP between {pram1} - {pram2} {pram4value:choose(0):(once)|(cooldown {pram3} - {pram4} ms)}",
-    "name_readable": "Targets health %",
-    "invoker": {
-      "name": "Friendly unit",
-      "types": [
-        "Creature",
-        "Player"
-      ]
-    }
-  },
-  {
-    "id": 74,
-    "usable_with_script_types": [
-      "Creature"
-    ],
-    "tags": [
-      "Azeroth"
-    ],
-    "is_timed": true,
-    "name": "SMART_EVENT_FRIENDLY_HEALTH_PCT_AC",
-    "parameters": [
-      {
-        "type": "PercentageParameter",
-        "name": "Minimum HP",
-        "description": "Target from first action must be: CREATURE_RANGE, CREATURE_GUID, CREATURE_DISTANCE, CLOSEST_CREATURE, CLOSEST_PLAYER, PLAYER_RANGE, PLAYER_DISTANCE"
-      },
-      {
-        "type": "PercentageParameter",
-        "name": "Maximum HP"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Minimum",
-        "description": "Minimum delay after this event can be triggered again"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Maximum",
-        "description": "Maximum delay after this event can be triggered again"
-      },
-      {
-        "type": "Parameter",
-        "name": "Radius"
-      }
-    ],
-    "builtin_rules": [
-      "minmax(1, 2)",
-      "minmax(3, 4)",
-      "is_repeat(4)"
-    ],
-    "description": "When target has HP between {pram1} - {pram2} {pram4value:choose(0):(once)|(cooldown {pram3} - {pram4} ms)}",
-    "name_readable": "Targets health %",
-    "invoker": {
-      "name": "Friendly unit",
-      "types": [
-        "Creature",
-        "Player"
-      ]
-    }
-  },
-  {
-    "id": 74,
-    "usable_with_script_types": [
-      "Creature"
-    ],
-    "tags": [
-      "TrinityCata"
-    ],
-    "is_timed": true,
-    "name": "SMART_EVENT_FRIENDLY_HEALTH_PCT_TC_CATA",
-    "parameters": [
-      {
-        "type": "PercentageParameter",
-        "name": "Minimum HP",
-        "description": "Target from first action must be: CREATURE_RANGE, CREATURE_GUID, CREATURE_DISTANCE, CLOSEST_CREATURE, CLOSEST_PLAYER, PLAYER_RANGE, PLAYER_DISTANCE"
-      },
-      {
-        "type": "PercentageParameter",
-        "name": "Maximum HP"
-      },
-      {
-        "type": "Parameter",
-        "name": "Radius"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown"
-      }
-    /*,
-      {
-        "type": "Parameter",
-        "name": "Repeat Maximum",
-        "description": "Core will check whether this event should fire every min - max milliseconds"
-      }*/
-    ],
-    "builtin_rules": [
-      "minmax(1, 2)",
-      "minmax(3, 4)",
-      "is_repeat(4)"
-    ],
-    "description": "When nearby friendly unit in {pram3} yd has HP between {pram1} - {pram2} {pram5value:choose(0):(once)|(cooldown {pram4} - {pram5} ms)}",
-    "name_readable": "Targets health %",
-    "invoker": {
-      "name": "Friendly unit",
-      "types": [
-        "Creature",
-        "Player"
-      ]
-    }
-  },  
-  {
-    "id": 75,
-    "usable_with_script_types": [
-      "Creature"
-    ],
-    "is_timed": true,
-    "name": "SMART_EVENT_DISTANCE_CREATURE",
-    "parameters": [
-      {
-        "type": "Parameter",
-        "name": "GUID"
-      },
-      {
-        "type": "CreatureParameter",
-        "name": "Creature"
-      },
-      {
-        "type": "Parameter",
-        "name": "Distance",
-        "required": true
-      },
-      {
-        "type": "FloatParameter",
-        "name": "Cooldown",
-        "description": "Core will check whether the event should fire every [parameter] seconds"
-      }
-    ],
-    "builtin_rules": [
-      "is_repeat(4)"
-    ],
-    "description": "When creature {pram1value:choose(0):{pram2}| with guid {pram1}} in range {pram3} {pram4value:choose(0):(once)|(cooldown {pram4} sec)}",
-    "name_readable": "When creature in range",
-    "invoker": {
-      "name": "Found creature",
-      "types": [
-        "Creature"
-      ]
-    }
-  },
-  {
-    "id": 76,
-    "usable_with_script_types": [
-      "Creature"
-    ],
-    "is_timed": true,
-    "name": "SMART_EVENT_DISTANCE_GAMEOBJECT",
-    "parameters": [
-      {
-        "type": "Parameter",
-        "name": "GUID"
-      },
-      {
-        "type": "GameobjectParameter",
-        "name": "Gameobject"
-      },
-      {
-        "type": "Parameter",
-        "name": "Distance"
-      },
-      {
-        "type": "FloatParameter",
-        "name": "Cooldown",
-        "description": "Core will check whether the event should fire every [parameter] seconds"
-      }
-    ],
-    "builtin_rules": [
-      "nonzero(3)",
-      "is_repeat(4)"
-    ],
-    "description": "When gameobject {pram1value:choose(0):{pram2}| with guid {pram1}} in range {pram3} {pram4value:choose(0):(once)|(cooldown {pram4} seconds)}",
-    "name_readable": "When gameobject in range",
-    "invoker": {
-      "name": "Found gameobject",
-      "types": [
-        "Creature"
-      ]
-    }
-  },
-  {
-    "id": 77,
-    "usable_with_script_types": [
-      "Creature",
-      "Gameobject"
-    ],
-    "name": "SMART_EVENT_COUNTER_SET",
-    "parameters": [
-      {
-        "type": "Parameter",
-        "name": "Counter ID"
-      },
-      {
-        "type": "Parameter",
-        "name": "Value"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Minimum",
-        "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Maximum",
-        "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
-      }
-    ],
-    "builtin_rules": [
-      "minmax(3, 4)"
-    ],
-    "description": "On counter {pram1} set to {pram2}{pram3value:choose(0):| (wait {pram3} - {pram4} ms before next event trigger)}",
-    "name_readable": "On counter set"
-  },
-  {
-    "id": 82,
-    "usable_with_script_types": [
-      "Creature",
-      "Gameobject"
-    ],
-    "name": "SMART_EVENT_SUMMONED_UNIT_DIES",
-    "tags": ["TrinityWrath"],
-    "parameters": [
-      {
-        "type": "CreatureParameter",
-        "name": "Entry",
-        "description": "If 0, any creature will trigger the event"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Minimum",
-        "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Maximum",
-        "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
-      }
-    ],
-    "builtin_rules": [
-      "minmax(2, 3)"
-    ],
-    "description": "On summoned creature {pram1value:choose(0):|{pram1} }died{pram2value:choose(0):| (wait {pram2} - {pram3} ms before next event trigger)}",
-    "name_readable": "On summon death",
-    "invoker": {
-      "name": "Summoned unit",
-      "types": [
-        "Creature"
-      ]
-    }
-  },
-  {
-    "id": 83,
-    "usable_with_script_types": [
-      "Creature",
-      "Gameobject"
-    ],
-    "name": "SMART_EVENT_ON_SPELL_CAST",
-    "tags": [ "TrinityWrath", "TrinityMaster" ],
-    "parameters": [
-      {
-        "type": "SpellParameter",
-        "name": "Spell",
-        "description": "If 0, any spell will trigger the event"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Minimum",
-        "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Maximum",
-        "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
-      }
-    ],
-    "builtin_rules": [
-      "minmax(2, 3)"
-    ],
-    "description": "On {pram1value:choose(0):any spell|spell {pram1}} cast {pram2value:choose(0):|(wait {pram2} - {pram3} ms before next trigger)}",
-    "name_readable": "On spell cast",
-    "invoker": {
-      "name": "Caster",
-      "types": [
-        "Player",
-        "Creature"
-      ]
-    }
-  },
-
-  {
-    "id": 84,
-    "usable_with_script_types": [
-      "Creature",
-      "Gameobject"
-    ],
-    "name": "SMART_EVENT_ON_SPELL_FAILED",
-    "tags": [ "TrinityWrath", "TrinityMaster" ],
-    "parameters": [
-      {
-        "type": "SpellParameter",
-        "name": "Spell",
-        "description": "If 0, any spell will trigger the event"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Minimum",
-        "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Maximum",
-        "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
-      }
-    ],
-    "builtin_rules": [
-      "minmax(2, 3)"
-    ],
-    "description": "On {pram1value:choose(0):any spell|spell {pram1}} failed {pram2value:choose(0):|(wait {pram2} - {pram3} ms before next trigger)}",
-    "name_readable": "On spell failed",
-    "invoker": {
-      "name": "Caster",
-      "types": [
-        "Player",
-        "Creature"
-      ]
-    }
-  },
-
-  {
-    "id": 85,
-    "usable_with_script_types": [
-      "Creature",
-      "Gameobject"
-    ],
-    "name": "SMART_EVENT_ON_SPELL_START",
-    "tags": [ "TrinityWrath", "TrinityMaster" ],
-    "parameters": [
-      {
-        "type": "SpellParameter",
-        "name": "Spell",
-        "description": "If 0, any spell will trigger the event"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Minimum",
-        "description": "If set (along with cooldown max), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown Maximum",
-        "description": "If set (along with cooldown min), event will NOT trigger more OFTEN than between min - max milliseconds (randomly)"
-      }
-    ],
-    "builtin_rules": [
-      "minmax(2, 3)"
-    ],
-    "description": "On {pram1value:choose(0):any spell|spell {pram1}} start {pram2value:choose(0):|(wait {pram2} - {pram3} ms before next trigger)}",
-    "name_readable": "On spell start",
-    "invoker": {
-      "name": "Caster",
-      "types": [
-        "Player",
-        "Creature"
-      ]
-    }
-  },
-  {
-    "id": 78,
-    "usable_with_script_types": [
-      "Scene",
-    ],
-    "name": "SMART_EVENT_SCENE_START",
-    "tags": [ "TrinityMaster" ],
-    "description": "On Scene Start",
-    "name_readable": "On scene start"
-  },
-  {
-    "id": 80,
-    "usable_with_script_types": [
-      "Scene",
-    ],
-    "name": "SMART_EVENT_SCENE_CANCEL",
-    "tags": [ "TrinityMaster" ],
-    "description": "On Scene Cancel",
-    "name_readable": "On scene canceled"
-  },
-  {
-    "id": 81,
-    "usable_with_script_types": [
-      "Scene",
-    ],
-    "name": "SMART_EVENT_SCENE_COMPLETE",
-    "tags": [ "TrinityMaster" ],
-    "description": "On Scene Complete",
-    "name_readable": "On scene completed"
-  },
-  {
-    "id": 101,
-    "name": "SMART_EVENT_NEAR_PLAYERS_AC",
-    "name_readable": "When at least x players nearby",
-    "tags": [
-      "Azeroth"
-    ],
-    "parameters": [
-      {
-        "type": "Parameter",
-        "name": "Minimum number of players to trigger event"
-      },
-      {
-        "type": "Parameter",
-        "name": "Radius"
-      },
-      {
-        "type": "FloatParameter",
-        "name": "First check cooldown"
-      },
-      {
-        "type": "FloatParameter",
-        "name": "Cooldown min"
-      },
-      {
-        "type": "FloatParameter",
-        "name": "Cooldown max"
-      }
-    ],
-    "usable_with_script_types": [
-      "Creature",
-      "Gameobject"
-    ],
-    "is_timed": true,
-    "description": "When {pram1value:choose(0|1):any player|any player|at least {pram1} players} within {pram2} yd nearby {pram4value:choose(0):(once)|(cooldown {pram4} seconds)}",
-    "invoker": {
-      "name": "Found unit",
-      "types": [
-        "Creature",
-        "Player"
-      ]
-    }
-  },
-  {
-    "id": 102,
-    "name": "SMART_EVENT_NEAR_PLAYERS_NEGATION_AC",
-    "name_readable": "When at most x players nearby",
-    "tags": [
-      "Azeroth"
-    ],
-    "parameters": [
-      {
-        "type": "Parameter",
-        "name": "Maximum number of players to trigger event"
-      },
-      {
-        "type": "Parameter",
-        "name": "Radius"
-      },
-      {
-        "type": "FloatParameter",
-        "name": "First check cooldown"
-      },
-      {
-        "type": "FloatParameter",
-        "name": "Cooldown min"
-      },
-      {
-        "type": "FloatParameter",
-        "name": "Cooldown max"
-      }
-    ],
-    "usable_with_script_types": [
-      "Creature",
-      "Gameobject"
-    ],
-    "is_timed": true,
-    "description": "When {pram1value:choose(0|1):no players|at most 1 player|at most {pram1} players} within {pram2} yd nearby {pram4value:choose(0):(once)|(cooldown {pram4} seconds)}",
-    "invoker": {
-      "name": "Found unit",
-      "types": [
-        "Creature",
-        "Player"
-      ]
-    }
-  },
-  {
-    "id": 103,
-    "name": "SMART_EVENT_NEAR_UNIT_AC",
-    "name_readable": "When at least x units nearby",
-    "tags": [
-      "Azeroth"
-    ],
-    "parameters": [
-      {
-        "type": "SwitchParameter",
-        "name": "Type",
-        "values": {
-          "0": {"name": "Creature"},
-          "1": {"name": "Gameobject"}
-        }
-      },
-      {
-        "type": "Parameter",
-        "name": "Entry"
-      },
-      {
-        "type": "Parameter",
-        "name": "Minimum count"
-      },
-      {
-        "type": "Parameter",
-        "name": "Range"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown"
-      }
-    ],
-    "usable_with_script_types": [
-      "Creature",
-      "Gameobject"
-    ],
-    "is_timed": true,
-    "description": "When {pram3value:choose(0|1):any {pram1}|at least 1 {pram1}|at least {pram3} {pram1}s} with entry {pram2} within {pram4} yd nearby {pram5value:choose(0):(once)|(cooldown {pram5} seconds)}",
-    "invoker": {
-      "name": "Found unit",
-      "types": [
-        "Creature",
-        "Player"
-      ]
-    }
-  },
-  {
-    "id": 104,
-    "name": "SMART_EVENT_NEAR_UNIT_NEGATION_AC",
-    "name_readable": "When at most x units nearby",
-    "tags": [
-      "Azeroth"
-    ],
-    "parameters": [
-      {
-        "type": "SwitchParameter",
-        "name": "Type",
-        "values": {
-          "0": {"name": "Creature"},
-          "1": {"name": "Gameobject"}
-        }
-      },
-      {
-        "type": "Parameter",
-        "name": "Entry"
-      },
-      {
-        "type": "Parameter",
-        "name": "Minimum count"
-      },
-      {
-        "type": "Parameter",
-        "name": "Range"
-      },
-      {
-        "type": "Parameter",
-        "name": "Cooldown"
-      }
-    ],
-    "usable_with_script_types": [
-      "Creature",
-      "Gameobject"
-    ],
-    "is_timed": true,
-    "description": "When {pram3value:choose(0|1):no {pram1}s|at most 1 {pram1}|at most {pram3} {pram1}s} with entry {pram2} within {pram4} yd nearby {pram5value:choose(0):(once)|(cooldown {pram5} seconds)}",
-    "invoker": {
-      "name": "Found unit",
-      "types": [
-        "Creature",
-        "Player"
-      ]
-    }
-  },
-  {
-    "id": 105,
-    "name": "SMART_EVENT_AREA_CASTING_AC",
-    "name_readable": "Area casting",
-    "tags": [
-      "Azeroth"
-    ],
-    "parameters": [
-      {
-        "type": "Parameter",
-        "name": "Initial cooldown min"
-      },
-      {
-        "type": "Parameter",
-        "name": "Initial cooldown max"
-      },
-      {
-        "type": "FloatParameter",
-        "name": "Cooldown min"
-      },
-      {
-        "type": "FloatParameter",
-        "name": "Cooldown max"
-      },
-      {
-        "type": "Parameter",
-        "name": "Range min"
-      },
-      {
-        "type": "Parameter",
-        "name": "Range max"
-      }
-    ],
-    "usable_with_script_types": [
-      "Creature"
-    ],
-    "is_timed": true,
-    "description": "When victim within {pram5}-{pram6} yd casting",
-    "invoker": {
-      "name": "Victim",
-      "types": [
-        "Creature",
-        "Player"
-      ]
-    }
-  },
-  {
-    "id": 106,
-    "name": "SMART_EVENT_AREA_RANGE_AC",
-    "name_readable": "Area range",
-    "tags": [
-      "Azeroth"
-    ],
-    "parameters": [
-      {
-        "type": "Parameter",
-        "name": "Initial cooldown min"
-      },
-      {
-        "type": "Parameter",
-        "name": "Initial cooldown max"
-      },
-      {
-        "type": "FloatParameter",
-        "name": "Cooldown min"
-      },
-      {
-        "type": "FloatParameter",
-        "name": "Cooldown max"
-      },
-      {
-        "type": "Parameter",
-        "name": "Range min"
-      },
-      {
-        "type": "Parameter",
-        "name": "Range max"
-      }
-    ],
-    "usable_with_script_types": [
-      "Creature"
-    ],
-    "is_timed": true,
-    "description": "When victim within {pram5}-{pram6} yd",
-    "invoker": {
-      "name": "Victim",
-      "types": [
-        "Creature",
-        "Player"
-      ]
-    }
-  }
 ]

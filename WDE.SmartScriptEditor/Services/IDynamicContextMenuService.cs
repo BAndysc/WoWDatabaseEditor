@@ -147,8 +147,11 @@ public class DynamicContextMenuService : IDynamicContextMenuService
             {
                 foreach (var param in menuItem.FillParameters)
                 {
+                    if (!param.Const.HasValue && !param.From.HasValue)
+                        continue;
+                    
                     var destParam = @event.GetParameter(param.To);
-                    destParam.Value = param.Const ?? selectedAction.GetParameter(param.From).Value;
+                    destParam.Value = param.Const ?? selectedAction.GetParameter(param.From!.Value).Value;
                 }
             }
             vm.Events.Insert(selectedActionIndex.eventIndex + 1, @event); // +1 to add below

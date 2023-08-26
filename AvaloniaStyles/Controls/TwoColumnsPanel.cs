@@ -112,6 +112,7 @@ public class TwoColumnsPanel : Panel
         double maxLeftWidth = 0;
         double rowSpacing = RowSpacing;
         double height = -rowSpacing; // a trick to not have spacing in the last element
+        double maxRightWidth = 0;
 
         maxLeftWidth = Math.Max(MeasureChildrenLeftColumns(), Math.Max(MeasureParentsLeftColumn(), MeasureLeftColumn()));
         currentLeftColumnWidth = maxLeftWidth;
@@ -136,9 +137,10 @@ public class TwoColumnsPanel : Panel
 
             leftHeight = left.DesiredSize.Height;
             height += Math.Max(leftHeight, rightHeight) + rowSpacing;
+            maxRightWidth = Math.Max(maxRightWidth, right?.DesiredSize.Width ?? 0);
         }
         
-        return new Size(availableSize.Width, Math.Max(0, height));
+        return new Size(maxRightWidth + maxLeftWidth, Math.Max(0, height));
     }
 
     protected override Size ArrangeOverride(Size finalSize)

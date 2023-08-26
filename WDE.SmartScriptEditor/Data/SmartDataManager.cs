@@ -208,8 +208,11 @@ namespace WDE.SmartScriptEditor.Data
                 throw new SmartDataWithSuchIdExists($"{type} with id {data.Id} ({data.Name}) exists");
 
             if (data.DefaultFor != null)
-                foreach (var scriptType in data.DefaultFor)
-                    defaults[(type, scriptType)] = data.Id;
+            {
+                foreach (var scriptType in Enum.GetValues<SmartScriptType>())
+                    if (data.DefaultFor.Value.HasFlagFast(scriptType.ToMask()))
+                        defaults[(type, scriptType)] = data.Id;
+            }
         }
 
         private void Add(SmartType type, SmartGenericJsonData data)

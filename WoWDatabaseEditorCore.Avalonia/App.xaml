@@ -14,7 +14,8 @@
     </Application.DataTemplates>
 
     <Application.Resources>
-    <DrawingImage x:Key="StatusBarIconNotice">
+        <FontFamily x:Key="MonoFont">Consolas,Menlo,Courier,Courier New</FontFamily>
+        <DrawingImage x:Key="StatusBarIconNotice">
         <DrawingImage.Drawing>
             <DrawingGroup >
                 <DrawingGroup.Transform>

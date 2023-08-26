@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using System.Linq;
 using Newtonsoft.Json;
 
 namespace WDE.Common.Parameters;
@@ -10,7 +11,42 @@ public class ParameterValuesJsonConverter : JsonConverter
 {
     public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
     {
-        throw new NotImplementedException();
+        if (value == null)
+        {
+            writer.WriteNull();
+            return;
+        }
+
+        if (value.GetType() != typeof(Dictionary<long, SelectOption>))
+            throw new Exception("Expected type Dictionary<long, SelectOption>");
+
+        var dict = (Dictionary<long, SelectOption>)value;
+        
+        writer.WriteStartObject();
+
+        var anyHasDescription = dict.Values.Any(v => !string.IsNullOrEmpty(v.Description));
+        var useExtendedFormat = anyHasDescription;
+        
+        foreach (var pair in dict)
+        {
+            writer.WritePropertyName(pair.Key.ToString());
+            if (useExtendedFormat)
+            {
+                writer.WriteStartObject();
+                writer.WritePropertyName("name");
+                writer.WriteValue(pair.Value.Name);
+                if (pair.Value.Description != null)
+                {
+                    writer.WritePropertyName("description");
+                    writer.WriteValue(pair.Value.Description);
+                }
+                writer.WriteEndObject();
+            }
+            else
+                writer.WriteValue(pair.Value.Name);
+        }
+        
+        writer.WriteEndObject();
     }
 
     // Supports following formats:
@@ -61,9 +97,10 @@ public class ParameterValuesJsonConverter : JsonConverter
                     reader.Read();
                     if (propName != "name" && propName != "description")
                     {
-                        while (reader.TokenType != JsonToken.EndArray)
-                            reader.Read();
-                        continue;
+                        throw new Exception("Not expected a key " + propName + " in SelectOption!");
+                        // while (reader.TokenType != JsonToken.EndArray)
+                        //     reader.Read();
+                        // continue;
                     }
                     Debug.Assert(reader.TokenType == JsonToken.String);
                     var propValue = (string?)reader.Value;
@@ -71,6 +108,8 @@ public class ParameterValuesJsonConverter : JsonConverter
                         name = propValue!;
                     else if (propName == "description")
                         description = propValue!;
+                    else
+                        throw new Exception("Not expected a key " + propName + " in SelectOption!");
                 }
 
                 Debug.Assert(name != null);
