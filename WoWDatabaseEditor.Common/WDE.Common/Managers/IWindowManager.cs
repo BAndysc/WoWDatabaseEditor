@@ -34,6 +34,7 @@ namespace WDE.Common.Managers
         bool IsMaximized { get; }
         (int x, int y) Position { get; }
         (int x, int y) Size { get; }
+        (int x, int y) LogicalSize { get; }
         void Reposition(int x, int y, bool isMaximized, int width, int height);
         event Action? OnClosing;
     }

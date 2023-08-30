@@ -77,7 +77,7 @@ public class TabularDataPickerPreferences : ITabularDataPickerPreferences
         window.OnClosing += () =>
         {
             var position = window.Position;
-            var size = window.Size;
+            var size = window.LogicalSize; // we use LogicalSize here, because then we set Width directly
             var maximized = window.IsMaximized;
             UpdateWindowState(key, maximized, position.x, position.y, size.x, size.y);
         };

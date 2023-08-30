@@ -73,13 +73,25 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
                 }
             }
 
+            public (int x, int y) LogicalSize
+            {
+                get
+                {
+                    if (window.TryGetTarget(out var target))
+                    {
+                        return ((int)target.Width, (int)target.Height);
+                    }
+                    return (100, 100);
+                }
+            }
+            
             public (int x, int y) Size
             {
                 get
                 {
                     if (window.TryGetTarget(out var target))
                     {
-                        // we use screen coords for size so that size is custom app scaling independent 
+                        // we use screen coords for size so that size is custom app scaling independent
                         var screenTopLeftPoint = target.PointToScreen(new Point(target.Position.X, target.Position.Y));
                         var screenBottomRightPoint = target.PointToScreen(new Point(target.Position.X + target.ClientSize.Width, target.Position.Y + target.ClientSize.Height));
                         var width = screenBottomRightPoint.X - screenTopLeftPoint.X;
