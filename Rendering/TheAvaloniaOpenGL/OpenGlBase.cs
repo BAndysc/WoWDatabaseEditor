@@ -6,6 +6,7 @@ using Avalonia.Logging;
 using Avalonia.Media;
 using Avalonia.OpenGL;
 using Avalonia.OpenGL.Imaging;
+using Avalonia.Threading;
 using static Avalonia.OpenGL.GlConsts;
 
 namespace TheAvaloniaOpenGL
@@ -25,6 +26,7 @@ namespace TheAvaloniaOpenGL
         public (int, int) PixelSize => (_bitmap.PixelSize.Width, _bitmap.PixelSize.Height);
         public sealed override void Render(DrawingContext context)
         {
+            Dispatcher.UIThread.Post(InvalidateVisual);
             if(!EnsureInitialized())
                 return;
             

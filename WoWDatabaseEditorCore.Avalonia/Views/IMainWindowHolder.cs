@@ -25,7 +25,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
         
         private Window? FindTopWindow()
         {
-            var windows = ((IClassicDesktopStyleApplicationLifetime?)Application.Current.ApplicationLifetime)?.Windows;
+            var windows = ((IClassicDesktopStyleApplicationLifetime?)Application.Current!.ApplicationLifetime)?.Windows;
 
             if (windows == null)
                 throw new Exception("No windows found! Are you running it in web assembly?");

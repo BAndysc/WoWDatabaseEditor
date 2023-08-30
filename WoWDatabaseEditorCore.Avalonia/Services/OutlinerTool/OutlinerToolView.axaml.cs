@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using WoWDatabaseEditorCore.Services.OutlinerTool;
 
@@ -21,7 +22,7 @@ public class OutlinerToolView : UserControl
         AvaloniaXamlLoader.Load(this);
     }
 
-    private void InputElement_OnDoubleTapped(object? sender, TappedEventArgs e)
+    private void InputElement_OnDoubleTapped(object? sender, RoutedEventArgs e)
     {
         if (treeView.SelectedNode is OutlinerItemViewModel vm && DataContext is OutlinerToolViewModel dataContext)
         {

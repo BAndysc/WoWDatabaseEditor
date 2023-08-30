@@ -41,7 +41,7 @@ namespace WDE.Common.Avalonia.Utils
         public static readonly AvaloniaProperty MenuItemsProperty = AvaloniaProperty.RegisterAttached<NativeMenu, IList<IMainMenuItem>>("Model",
             typeof(MenuBind),coerce: OnMenuChanged);
         
-        public static IList<IMainMenuItem> GetMenuItems(NativeMenu control) => (IList<IMainMenuItem>)control.GetValue(MenuItemsProperty);
+        public static IList<IMainMenuItem> GetMenuItems(NativeMenu control) => (IList<IMainMenuItem>)control.GetValue(MenuItemsProperty)!;
         public static void SetMenuItems(NativeMenu control, object value) => control.SetValue(MenuItemsProperty, value);
         
         private static IList<IMainMenuItem> OnMenuChanged(IAvaloniaObject targetLocation, IList<IMainMenuItem> viewModel)
@@ -94,7 +94,7 @@ namespace WDE.Common.Avalonia.Utils
         public static readonly AvaloniaProperty MenuItemsGesturesProperty = AvaloniaProperty.RegisterAttached<Window, IList<IMainMenuItem>>("MenuItemsGestures",
             typeof(MenuBind),coerce: OnMenuGesturesChanged);
         
-        public static IList<IMainMenuItem> GetMenuItemsGestures(Window control) => (IList<IMainMenuItem>)control.GetValue(MenuItemsGesturesProperty);
+        public static IList<IMainMenuItem> GetMenuItemsGestures(Window control) => (IList<IMainMenuItem>)control.GetValue(MenuItemsGesturesProperty)!;
         public static void SetMenuItemsGestures(Window control, object value) => control.SetValue(MenuItemsGesturesProperty, value);
 
         private static ICommand WrapCommand(ICommand command, IMenuCommandItem cmd)
@@ -109,7 +109,7 @@ namespace WDE.Common.Avalonia.Utils
             // However application wise shortcuts take higher priority
             // and effectively TextBox doesn't handle copy/paste/cut/undo/redo -.-
             var original = command;
-            command = OverrideCommand<ICustomCopyPaste>(command, Key.C, KeyModifiers.None, key, modifierKey, cmd, tb => tb.DoCopy((IClipboard)AvaloniaLocator.Current.GetService(typeof(IClipboard))));
+            command = OverrideCommand<ICustomCopyPaste>(command, Key.C, KeyModifiers.None, key, modifierKey, cmd, tb => tb.DoCopy((IClipboard)AvaloniaLocator.Current.GetService(typeof(IClipboard))!));
             command = OverrideCommand<ICustomCopyPaste>(command, Key.V, KeyModifiers.None, key, modifierKey, cmd, tb => tb.DoPaste().ListenErrors());
             command = OverrideCommand<TextBox>(command, Key.C, KeyModifiers.None, key, modifierKey, cmd, tb => tb.Copy());
             command = OverrideCommand<TextBox>(command, Key.X, KeyModifiers.None, key, modifierKey, cmd, tb => tb.Cut());
@@ -224,13 +224,13 @@ namespace WDE.Common.Avalonia.Utils
             return new DelegateCommand(() =>
             {
                 bool executed = false;
-                if (FocusManager.Instance.Current is T t)
+                if (FocusManager.Instance!.Current is T t)
                     executed = func(t);
                 if (!executed && command.CanExecute(null))
                     command.Execute(null);
             }, () =>
             {
-                if (FocusManager.Instance.Current is T t)
+                if (FocusManager.Instance!.Current is T t)
                     return true;
                 return command.CanExecute(null);
             });
@@ -243,13 +243,13 @@ namespace WDE.Common.Avalonia.Utils
 
             return new DelegateCommand(() =>
             {
-                if (FocusManager.Instance.Current is T t)
+                if (FocusManager.Instance!.Current is T t)
                     func(t);
                 else if (command.CanExecute(null))
                     command.Execute(null);
             }, () =>
             {
-                if (FocusManager.Instance.Current is T t)
+                if (FocusManager.Instance!.Current is T t)
                     return true;
                 return command.CanExecute(null);
             });

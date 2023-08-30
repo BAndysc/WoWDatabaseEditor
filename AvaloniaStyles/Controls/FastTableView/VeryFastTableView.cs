@@ -36,7 +36,7 @@ public partial class VeryFastTableView : Panel, IKeyboardNavigationHandler, IFas
     private static bool GetResource<T>(string key, T defaultVal, out T outT)
     {
         outT = defaultVal;
-        if (Application.Current.Styles.TryGetResource(key, out var res) && res is T t)
+        if (Application.Current!.Styles.TryGetResource(key, out var res) && res is T t)
         {
             outT = t;
             return true;

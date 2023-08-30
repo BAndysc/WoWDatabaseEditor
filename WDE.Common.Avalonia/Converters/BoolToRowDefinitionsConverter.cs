@@ -10,14 +10,14 @@ namespace WDE.Common.Avalonia.Converters
         public RowDefinitions TrueValue { get; set; } = new();
         public RowDefinitions FalseValue { get; set; } = new();
         
-        public object? Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
             if (value is bool b)
                 return b ? TrueValue : FalseValue;
             return null;
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
         }
@@ -28,14 +28,14 @@ namespace WDE.Common.Avalonia.Converters
         public ColumnDefinitions TrueValue { get; set; } = new();
         public ColumnDefinitions FalseValue { get; set; } = new();
         
-        public object? Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
             if (value is bool b)
                 return b ? TrueValue : FalseValue;
             return null;
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
         }

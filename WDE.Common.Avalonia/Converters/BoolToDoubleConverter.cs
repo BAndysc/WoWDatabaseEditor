@@ -9,7 +9,7 @@ namespace WDE.Common.Avalonia.Converters
         public double WhenTrue { get; set; } = 1;
         public double WhenFalse { get; set; } = 0;
 
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
             var flag = false;
             if (value is bool)
@@ -17,7 +17,7 @@ namespace WDE.Common.Avalonia.Converters
             return flag ? WhenTrue : WhenFalse;
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
             if (value is double d)
             {

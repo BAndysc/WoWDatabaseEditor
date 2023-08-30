@@ -21,7 +21,7 @@ namespace TheEngine
 #if USE_OPENTK
     public class TheEnginePanel : OpenTKGlControl2, IWindowHost, IDisposable
 #else
-    public class TheEnginePanel : OpenGlBase2, IWindowHost, IDisposable
+    public class TheEnginePanel : OpenGlBase, IWindowHost, IDisposable
 #endif
     {
         public static KeyGesture Undo { get; } = AvaloniaLocator.Current
@@ -46,11 +46,12 @@ namespace TheEngine
             framerate.Add(delta);
         }
 
-        public TheEnginePanel() : base(new OpenGlControlSettings
+        public TheEnginePanel() : base(
+            /*new OpenGlControlSettings
         {
             ContinuouslyRender = true,
             //DeInitializeOnVisualTreeDetachment = false,
-        })
+        }*/)
         {
             Focusable = true;
         }
@@ -160,7 +161,7 @@ namespace TheEngine
         {
             if (delayedDispose)
             {
-                Cleanup();
+                DoCleanup();
                 delayedDispose = false;
                 return;
             }
@@ -325,7 +326,7 @@ namespace TheEngine
 
         public void Dispose()
         {
-            Cleanup();
+            DoCleanup();
         }
     }
 }

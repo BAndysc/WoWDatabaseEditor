@@ -57,7 +57,7 @@ namespace WDE.Common.Avalonia.Controls
                 {
                     ParameterTextBox tb = this.FindDescendantOfType<ParameterTextBox>();
                     if (tb != null)
-                        FocusManager.Instance.Focus(tb, NavigationMethod.Tab);
+                        FocusManager.Instance!.Focus(tb, NavigationMethod.Tab);
                 });
             }
         }

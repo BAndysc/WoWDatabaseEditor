@@ -205,7 +205,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
                             tcs.SetResult(false);
                         }
                     });
-                    if (FocusManager.Instance.Current is Control c)
+                    if (FocusManager.Instance!.Current is Control c)
                     {
                         popup.PlacementTarget = c;
                     }

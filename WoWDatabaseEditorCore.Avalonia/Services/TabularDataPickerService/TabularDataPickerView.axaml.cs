@@ -28,7 +28,7 @@ public partial class TabularDataPickerView : UserControl
             {
                 this.FindControl<TextBox>("SearchBox").Focus();
             }),
-            Gesture = new KeyGesture(Key.F, AvaloniaLocator.Current.GetService<PlatformHotkeyConfiguration>().CommandModifiers)
+            Gesture = new KeyGesture(Key.F, AvaloniaLocator.Current.GetRequiredService<PlatformHotkeyConfiguration>().CommandModifiers)
         });
     }
 

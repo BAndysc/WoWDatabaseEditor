@@ -9,7 +9,7 @@
             x:Class="WDE.MapRenderer.GameToolBar">
     <ToolbarPanel>
         <TextBlock Margin="0,0,10,0" VerticalAlignment="Center">Map:</TextBlock>
-        <ComboBox Items="{CompiledBinding Maps}" SelectedItem="{CompiledBinding SelectedMap, Mode=TwoWay}" />
+        <CompletionComboBox Items="{CompiledBinding Maps}" SelectedItem="{CompiledBinding SelectedMap, Mode=TwoWay}" />
         <ToolbarSpacer />
             <ItemsPresenter Items="{CompiledBinding ToolBars}">
                 <ItemsPresenter.ItemsPanel>

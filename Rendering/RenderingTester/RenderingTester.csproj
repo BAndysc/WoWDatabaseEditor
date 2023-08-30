@@ -7,10 +7,6 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
-    <Target Condition="$([MSBuild]::IsOSPlatform('OSX'))" Name="CustomAfterBuild" AfterTargets="Build">
-        <Copy SourceFiles="$(OutputPath)\runtimes\osx-universal\native\libcimgui.dylib" DestinationFolder="$(OutputPath)\runtimes\osx\native\" ContinueOnError="false" />
-    </Target>
-    
     <ItemGroup>
       <PackageReference Include="ImGui.NET" Version="1.89.7.1" />
       <PackageReference Include="JetBrains.Profiler.Api" Version="1.2.0" />

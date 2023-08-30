@@ -10,12 +10,12 @@ namespace WoWDatabaseEditorCore.Avalonia.Services
     {
         public Task<string> GetText()
         {
-            return Application.Current.Clipboard.GetTextAsync();
+            return Application.Current!.Clipboard!.GetTextAsync();
         }
 
         public void SetText(string text)
         {
-            Application.Current.Clipboard.SetTextAsync(text);
+            Application.Current!.Clipboard!.SetTextAsync(text);
         }
     }
 }

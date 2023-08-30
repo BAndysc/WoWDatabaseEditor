@@ -1,6 +1,7 @@
 ﻿using System.Windows.Input;
 using Avalonia.Input;
 using WDE.Common.Avalonia.Controls;
+using WDE.Common.Utils;
 using AvaloniaProperty = Avalonia.AvaloniaProperty;
 
 namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
@@ -22,19 +23,19 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
 
         public ICommand DirectEditParameter
         {
-            get => (ICommand) GetValue(DirectEditParameterProperty);
+            get => (ICommand?) GetValue(DirectEditParameterProperty) ?? AlwaysDisabledCommand.Command;
             set => SetValue(DirectEditParameterProperty, value);
         }
         
         public ICommand DeselectAllButConditionsRequest
         {
-            get => (ICommand) GetValue(DeselectAllButConditionsRequestProperty);
+            get => (ICommand?) GetValue(DeselectAllButConditionsRequestProperty) ?? AlwaysDisabledCommand.Command;
             set => SetValue(DeselectAllButConditionsRequestProperty, value);
         }
 
         public ICommand EditConditionCommand
         {
-            get => (ICommand) GetValue(EditConditionCommandProperty);
+            get => (ICommand?) GetValue(EditConditionCommandProperty) ?? AlwaysDisabledCommand.Command;
             set => SetValue(EditConditionCommandProperty, value);
         }
 

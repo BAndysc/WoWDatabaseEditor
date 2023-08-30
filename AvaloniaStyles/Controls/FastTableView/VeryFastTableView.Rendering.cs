@@ -238,7 +238,7 @@ public partial class VeryFastTableView
             return;
         
         FontFamily font = FontFamily.Default;
-        if (Application.Current.Styles.TryGetResource("MainFontSans", out var mainFontSans) && mainFontSans is FontFamily mainFontSansFamily)
+        if (Application.Current!.Styles.TryGetResource("MainFontSans", out var mainFontSans) && mainFontSans is FontFamily mainFontSansFamily)
             font = mainFontSansFamily;
 
         var scrollViewer = ScrollViewer;

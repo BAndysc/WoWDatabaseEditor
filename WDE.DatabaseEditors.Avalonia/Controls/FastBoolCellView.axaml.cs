@@ -28,7 +28,7 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
                 
                 if (!that.IsFocused)
                 {
-                    FocusManager.Instance.Focus(that, NavigationMethod.Tab);
+                    FocusManager.Instance!.Focus(that, NavigationMethod.Tab);
                     e.Handled = true;
                 }
             }, RoutingStrategies.Tunnel);

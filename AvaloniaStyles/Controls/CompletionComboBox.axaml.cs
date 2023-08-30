@@ -246,7 +246,7 @@ namespace AvaloniaStyles.Controls
                             return;
                         
                         //box.SearchText = "";
-                        FocusManager.Instance.Focus(box.SearchTextBox, NavigationMethod.Pointer);
+                        FocusManager.Instance!.Focus(box.SearchTextBox, NavigationMethod.Pointer);
                         box.SearchTextBox.SelectionEnd = box.SearchTextBox.SelectionStart = box.SearchText.Length;
                     }, TimeSpan.FromMilliseconds(16));
 
@@ -294,11 +294,11 @@ namespace AvaloniaStyles.Controls
                 return;
             if (watermark == null)
                 return;
-            foreach (var binding in AvaloniaLocator.Current.GetService<PlatformHotkeyConfiguration>().Copy)
+            foreach (var binding in AvaloniaLocator.Current.GetRequiredService<PlatformHotkeyConfiguration>().Copy)
             {
                 if (binding.Matches(e))
                 {
-                    AvaloniaLocator.Current.GetService<IClipboard>().SetTextAsync(watermark);
+                    AvaloniaLocator.Current.GetRequiredService<IClipboard>().SetTextAsync(watermark);
                     e.Handled = true;
                 }
             }
@@ -422,7 +422,7 @@ namespace AvaloniaStyles.Controls
                                 // don't ever let textbox lost focus
                                 if (IsDropDownOpen)
                                 {
-                                    Dispatcher.UIThread.Post(() => FocusManager.Instance.Focus(textBox));
+                                    Dispatcher.UIThread.Post(() => FocusManager.Instance!.Focus(textBox));
                                 }
                             }));
                 }
@@ -440,7 +440,7 @@ namespace AvaloniaStyles.Controls
         private void Close()
         {
             IsDropDownOpen = false;
-            FocusManager.Instance.Focus(ToggleButton, NavigationMethod.Tab);
+            FocusManager.Instance!.Focus(ToggleButton, NavigationMethod.Tab);
             Closed?.Invoke();
         }
         

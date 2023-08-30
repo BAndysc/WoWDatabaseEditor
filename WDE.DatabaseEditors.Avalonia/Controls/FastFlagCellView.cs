@@ -85,7 +85,7 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
         private void CompletionComboBoxOnClosed()
         {
             EndEditing(true);
-            FocusManager.Instance.Focus(this, NavigationMethod.Tab);
+            FocusManager.Instance!.Focus(this, NavigationMethod.Tab);
         }
 
         protected override Control CreateEditingControl()

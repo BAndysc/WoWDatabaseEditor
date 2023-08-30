@@ -26,14 +26,14 @@ namespace WDE.Common.Avalonia.Controls
 
         public bool CanExecute(object? parameter)
         {
-            if (FocusManager.Instance.Current is TextBox tb)
+            if (FocusManager.Instance!.Current is TextBox tb)
                 return true;
             return CustomCommand.CanExecute(parameter);
         }
 
         public void Execute(object? parameter)
         {
-            if (FocusManager.Instance.Current is TextBox tb)
+            if (FocusManager.Instance!.Current is TextBox tb)
             {
                 var ev = Activator.CreateInstance<KeyEventArgs>();
                 ev.Key = Gesture.Key;

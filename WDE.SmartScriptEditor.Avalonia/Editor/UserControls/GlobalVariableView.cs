@@ -1,6 +1,7 @@
 ﻿using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls;
+using WDE.Common.Utils;
 using WDE.SmartScriptEditor.Avalonia.Editor.Views;
 using WDE.SmartScriptEditor.Editor.ViewModels;
 using WDE.SmartScriptEditor.Models;
@@ -20,7 +21,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
 
         public ICommand DeselectAllButGlobalVariablesRequest
         {
-            get => (ICommand) GetValue(DeselectAllButGlobalVariablesRequestProperty);
+            get => (ICommand?) GetValue(DeselectAllButGlobalVariablesRequestProperty) ?? AlwaysDisabledCommand.Command;
             set => SetValue(DeselectAllButGlobalVariablesRequestProperty, value);
         }
 

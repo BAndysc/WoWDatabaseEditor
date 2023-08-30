@@ -43,7 +43,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.Views
                     var index = listBox.SelectedIndex;
                     if (index < 0 || index >= listBox.ItemCount)
                         index = 0;
-                    FocusManager.Instance.Focus(listBox.ItemContainerGenerator.ContainerFromIndex(index), NavigationMethod.Tab);
+                    FocusManager.Instance!.Focus(listBox.ItemContainerGenerator.ContainerFromIndex(index), NavigationMethod.Tab);
                 }
                 e.Handled = true;
             }

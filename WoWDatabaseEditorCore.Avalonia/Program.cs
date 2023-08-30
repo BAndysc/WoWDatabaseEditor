@@ -9,7 +9,6 @@ using AsyncAwaitBestPractices;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.OpenGL;
-using Avalonia.OpenTK;
 using Avalonia.ReactiveUI;
 using WDE.Common.Tasks;
 using WoWDatabaseEditorCore.Managers;
@@ -62,24 +61,24 @@ namespace WoWDatabaseEditorCore.Avalonia
                 Directory.SetCurrentDirectory(exePath.Directory.FullName);
         }
 
-        private static T SafeUseOpenTK<T>(T builder, IList<GlVersion> probeVersions) where T : AppBuilderBase<T>, new()
-        {
-            return builder.AfterPlatformServicesSetup(_ =>
-            {
-                var method = typeof(AvaloniaOpenTKIntegration).GetMethod("Initialize",
-                        BindingFlags.NonPublic | BindingFlags.Static);
-
-                try
-                {
-                    method!.Invoke(null, new object?[]{probeVersions});
-                }
-                catch (Exception e)
-                {
-                    GlobalApplication.Supports3D = false;
-                    Console.WriteLine(e);
-                }
-            });
-        }
+        // private static T SafeUseOpenTK<T>(T builder, IList<GlVersion> probeVersions) where T : AppBuilderBase<T>, new()
+        // {
+        //     return builder.AfterPlatformServicesSetup(_ =>
+        //     {
+        //         var method = typeof(AvaloniaOpenTKIntegration).GetMethod("Initialize",
+        //                 BindingFlags.NonPublic | BindingFlags.Static);
+        //
+        //         try
+        //         {
+        //             method!.Invoke(null, new object?[]{probeVersions});
+        //         }
+        //         catch (Exception e)
+        //         {
+        //             GlobalApplication.Supports3D = false;
+        //             Console.WriteLine(e);
+        //         }
+        //     });
+        // }
         
         // Avalonia configuration, don't remove; also used by visual designer.
         public static AppBuilder BuildAvaloniaApp()
@@ -96,21 +95,30 @@ namespace WoWDatabaseEditorCore.Avalonia
 
             configuration = SafeUseOpenTK(configuration, new List<GlVersion> { new GlVersion(GlProfileType.OpenGL, 4, 1, true) });
 #endif
-            if (GlobalApplication.Arguments.IsArgumentSet("wgl"))
+            if (OperatingSystem.IsWindows())
             {
-                configuration = configuration.
-                    With(new Win32PlatformOptions() { UseWgl = true, 
-                        AllowEglInitialization = false,
-                        WglProfiles = new List<GlVersion>()
-                    {
-                        new GlVersion(GlProfileType.OpenGL, 4, 6),
-                        new GlVersion(GlProfileType.OpenGL, 4, 5),
-                        new GlVersion(GlProfileType.OpenGL, 4, 4),
-                        new GlVersion(GlProfileType.OpenGL, 4, 3),
-                        new GlVersion(GlProfileType.OpenGL, 4, 2),
-                        new GlVersion(GlProfileType.OpenGL, 4, 1),
-                        new GlVersion(GlProfileType.OpenGL, 3, 3),
-                    }});
+                GlobalApplication.Supports3D = false;
+                if (GlobalApplication.Arguments.IsArgumentSet("wgl"))
+                {
+                    configuration = configuration.
+                        With(new Win32PlatformOptions() { UseWgl = true, 
+                            AllowEglInitialization = false,
+                            WglProfiles = new List<GlVersion>()
+                            {
+                                new GlVersion(GlProfileType.OpenGL, 4, 6),
+                                new GlVersion(GlProfileType.OpenGL, 4, 5),
+                                new GlVersion(GlProfileType.OpenGL, 4, 4),
+                                new GlVersion(GlProfileType.OpenGL, 4, 3),
+                                new GlVersion(GlProfileType.OpenGL, 4, 2),
+                                new GlVersion(GlProfileType.OpenGL, 4, 1),
+                                new GlVersion(GlProfileType.OpenGL, 3, 3),
+                            }});
+                    GlobalApplication.Supports3D = true;
+                }
+            }
+            else
+            {
+                GlobalApplication.Supports3D = true;
             }
 
             return configuration;

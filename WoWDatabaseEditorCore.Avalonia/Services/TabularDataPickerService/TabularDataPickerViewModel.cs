@@ -83,7 +83,7 @@ public partial class TabularDataPickerViewModel : ObservableBase, IDialog
                 else if (c.DataTemplate is Func<object, string> f)
                     return ColumnDescriptor.DataTemplateColumn(c.Header, new FuncDataTemplate(_ => true, (_, _) => new TextBlock()
                     {
-                        [!TextBlock.TextProperty] = new Binding(c.PropertyName){Converter = new FuncValueConverter<object, string>(o => f(o))}
+                        [!TextBlock.TextProperty] = new Binding(c.PropertyName){Converter = new FuncValueConverter<object, string>(o => f(o!))}
                     }), width, false);
                 else if (c is ITabularDataAsyncColumn asyncColumn)
                 {

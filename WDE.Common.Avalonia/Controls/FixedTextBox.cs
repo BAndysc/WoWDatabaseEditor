@@ -25,7 +25,7 @@ namespace WDE.Common.Avalonia.Controls
 
         protected override void OnKeyDown(KeyEventArgs e)
         {
-            var keymap = AvaloniaLocator.Current.GetService<PlatformHotkeyConfiguration>();
+            var keymap = AvaloniaLocator.Current.GetRequiredService<PlatformHotkeyConfiguration>();
             if (keymap.Paste.Any(g => g.Matches(e)))
             {
                 CustomPaste();

@@ -7,6 +7,7 @@ using Avalonia.Input;
 using Avalonia.Input.Platform;
 using Avalonia.Media;
 using WDE.Common.Avalonia.Controls;
+using WDE.Common.Utils;
 
 namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
 {
@@ -28,7 +29,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
 
         public ICommand DeselectAllRequest
         {
-            get => (ICommand) GetValue(DeselectAllRequestProperty);
+            get => (ICommand?) GetValue(DeselectAllRequestProperty) ?? AlwaysDisabledCommand.Command;
             set => SetValue(DeselectAllRequestProperty, value);
         }
         public static readonly DirectProperty<SelectableTemplatedControl, bool> IsSelectedProperty =

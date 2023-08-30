@@ -8,14 +8,14 @@ namespace WDE.Common.Avalonia.Converters
     {
         public string Format { get; set; } = "MM/dd/yyyy HH:mm";
         
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
             if (value is DateTime dt)
                 return dt.ToString(Format);
             return "not a date";
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
             throw new Exception();
         }

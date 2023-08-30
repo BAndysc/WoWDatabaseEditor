@@ -7,7 +7,7 @@ public static class ResourcesUtils
     public static bool Get<T>(string key, T defaultVal, out T outT)
     {
         outT = defaultVal;
-        if (Application.Current.Styles.TryGetResource(key, out var res) && res is T t)
+        if (Application.Current!.Styles.TryGetResource(key, out var res) && res is T t)
         {
             outT = t;
             return true;

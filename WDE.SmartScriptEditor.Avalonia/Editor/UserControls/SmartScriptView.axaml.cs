@@ -81,7 +81,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
             {
                 AddMenuItem("Copy parameter value", new DelegateCommand(() =>
                 {
-                    AvaloniaLocator.Current.GetService<IClipboard>().SetTextAsync(context.Parameter.Value.ToString()).ListenErrors();
+                    AvaloniaLocator.Current.GetRequiredService<IClipboard>().SetTextAsync(context.Parameter.Value.ToString()).ListenErrors();
                 }));
                 anythingAdded = true;
             }

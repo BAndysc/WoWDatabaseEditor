@@ -13,6 +13,7 @@ using Avalonia.VisualTree;
 using JetBrains.Profiler.Api;
 using WDE.Common.Avalonia.Utils;
 using WDE.Common.Managers;
+using WDE.Common.Utils;
 using WDE.MVVM.Observable;
 using WDE.SmartScriptEditor.Editor.UserControls;
 using WDE.SmartScriptEditor.Models;
@@ -33,14 +34,14 @@ public partial class VirtualizedSmartScriptPanel : Panel
     public static readonly StyledProperty<IDataTemplate> NewConditionItemTemplateProperty = AvaloniaProperty.Register<VirtualizedSmartScriptPanel, IDataTemplate>(nameof(NewConditionItemTemplate));
 
     public static readonly AvaloniaProperty SelectedProperty = AvaloniaProperty.RegisterAttached<VirtualizedSmartScriptPanel, IControl, bool>("Selected");
-    public static bool GetSelected(IControl control) => (bool)control.GetValue(SelectedProperty);
+    public static bool GetSelected(IControl control) => (bool?)control.GetValue(SelectedProperty) ?? false;
     public static void SetSelected(IControl control, bool value) => control.SetValue(SelectedProperty, value);
 
     public static readonly AvaloniaProperty DropItemsProperty = AvaloniaProperty.Register<VirtualizedSmartScriptPanel, ICommand>(nameof(DropItems));
 
     public ICommand DropItems
     {
-        get => (ICommand) GetValue(DropItemsProperty);
+        get => (ICommand?) GetValue(DropItemsProperty) ?? AlwaysDisabledCommand.Command;
         set => SetValue(DropItemsProperty, value);
     }
 
@@ -48,7 +49,7 @@ public partial class VirtualizedSmartScriptPanel : Panel
 
     public ICommand DropGroups
     {
-        get => (ICommand) GetValue(DropGroupsProperty);
+        get => (ICommand?) GetValue(DropGroupsProperty) ?? AlwaysDisabledCommand.Command;
         set => SetValue(DropGroupsProperty, value);
     }
 
@@ -56,7 +57,7 @@ public partial class VirtualizedSmartScriptPanel : Panel
 
     public ICommand DropActions
     {
-        get => (ICommand) GetValue(DropActionsProperty);
+        get => (ICommand?) GetValue(DropActionsProperty) ?? AlwaysDisabledCommand.Command;
         set => SetValue(DropActionsProperty, value);
     }
 
@@ -64,7 +65,7 @@ public partial class VirtualizedSmartScriptPanel : Panel
 
     public ICommand DropConditions
     {
-        get => (ICommand) GetValue(DropConditionsProperty);
+        get => (ICommand?) GetValue(DropConditionsProperty) ?? AlwaysDisabledCommand.Command;
         set => SetValue(DropConditionsProperty, value);
     }
     

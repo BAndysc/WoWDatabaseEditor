@@ -2,7 +2,6 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Avalonia.Input;
 using JetBrains.Profiler.Api;
-using OpenTK.Graphics.OpenGL4;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
@@ -32,7 +31,7 @@ public class TheEngineOpenTkWindow : GameWindow, IWindowHost
 
     protected override void OnLoad()
     {
-        IDevice device = new OpenTKDevice();
+        IDevice device = null!;//new OpenTKDevice();
 #if DEBUG && DEBUG_OPENGL
         device = new DebugDevice(device);
 #endif
@@ -73,7 +72,8 @@ public class TheEngineOpenTkWindow : GameWindow, IWindowHost
         renderStopwatch.Stop();
         engine.statsManager.Counters.TotalRender.Add(renderStopwatch.Elapsed.Milliseconds);
         renderStopwatch.Restart();
-        GL.Finish();
+        throw new NotImplementedException();
+        //GL.Finish();
         SwapBuffers();
         renderStopwatch.Stop();
         engine.statsManager.Counters.PresentTime.Add(renderStopwatch.Elapsed.Milliseconds);

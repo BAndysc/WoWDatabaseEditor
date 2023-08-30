@@ -13,6 +13,7 @@ using Avalonia.Media;
 using Avalonia.VisualTree;
 using WDE.Common.Avalonia.Utils;
 using WDE.Common.Managers;
+using WDE.Common.Utils;
 using WDE.SmartScriptEditor.Editor.UserControls;
 using WDE.SmartScriptEditor.Editor.ViewModels;
 using WDE.SmartScriptEditor.Models;
@@ -837,7 +838,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
 
         public SmartScript Script
         {
-            get => (SmartScript) GetValue(ScriptProperty);
+            get => (SmartScript) GetValue(ScriptProperty)!;
             set => SetValue(ScriptProperty, value);
         }
 
@@ -858,14 +859,14 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
         public float ActionSpacing => 2;
 
         public static readonly AvaloniaProperty SelectedProperty = AvaloniaProperty.RegisterAttached<SmartScriptPanelLayout, IControl, bool>("Selected");
-        public static bool GetSelected(IControl control) => (bool)control.GetValue(SelectedProperty);
+        public static bool GetSelected(IControl control) => (bool?)control.GetValue(SelectedProperty) ?? false;
         public static void SetSelected(IControl control, bool value) => control.SetValue(SelectedProperty, value);
 
         public static readonly AvaloniaProperty DropItemsProperty = AvaloniaProperty.Register<SmartScriptPanelLayout, ICommand>(nameof(DropItems));
 
         public ICommand DropItems
         {
-            get => (ICommand) GetValue(DropItemsProperty);
+            get => (ICommand?) GetValue(DropItemsProperty) ?? AlwaysDisabledCommand.Command;
             set => SetValue(DropItemsProperty, value);
         }
 
@@ -873,7 +874,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
 
         public ICommand DropActions
         {
-            get => (ICommand) GetValue(DropActionsProperty);
+            get => (ICommand?) GetValue(DropActionsProperty) ?? AlwaysDisabledCommand.Command;
             set => SetValue(DropActionsProperty, value);
         }
 
@@ -881,7 +882,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
 
         public ICommand DropConditions
         {
-            get => (ICommand) GetValue(DropConditionsProperty);
+            get => (ICommand?) GetValue(DropConditionsProperty) ?? AlwaysDisabledCommand.Command;
             set => SetValue(DropConditionsProperty, value);
         }
     }

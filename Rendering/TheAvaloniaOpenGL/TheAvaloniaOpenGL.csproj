@@ -6,7 +6,7 @@
         <Nullable>enable</Nullable>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <RestoreAdditionalProjectSources>
-            https://nuget.avaloniaui.net/repository/avalonia-all/index.json
+            https://nuget-feed-all.avaloniaui.net/v3/index.json
         </RestoreAdditionalProjectSources>
     </PropertyGroup>
 
@@ -20,8 +20,7 @@
     <ItemGroup>
       <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
       <PackageReference Include="SixLabors.ImageSharp" Version="1.0.4" />
-      <PackageReference Include="Avalonia" Version="0.10.999-cibuild0016933-beta" />
-      <PackageReference Include="Avalonia.OpenTK" Version="0.10.999-cibuild0016933-beta" />
+      <PackageReference Include="Avalonia" Version="0.10.22" />
     </ItemGroup>
 
 </Project>

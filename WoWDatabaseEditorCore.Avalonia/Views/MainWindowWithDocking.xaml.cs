@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Avalonia;
@@ -151,7 +152,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
             if (e.KeyModifiers.HasFlagFast(KeyModifiers.Control) &&
                 e.Key == Key.Tab)
             {
-                var documentControl = FocusManager.Instance.Current?.FindAncestorOfType<DocumentControl>() ?? this.FindDescendantOfType<DocumentControl>();
+                var documentControl = FocusManager.Instance!.Current?.FindAncestorOfType<DocumentControl>() ?? this.FindDescendantOfType<DocumentControl>();
                 if (documentControl?.DataContext is not FocusAwareDocumentDock documentDock)
                     return;
                     

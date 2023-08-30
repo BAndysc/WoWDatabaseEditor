@@ -54,7 +54,7 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
                 }
                 else if (!that.IsFocused)
                 {
-                    FocusManager.Instance.Focus(that, NavigationMethod.Tab);
+                    FocusManager.Instance!.Focus(that, NavigationMethod.Tab);
                     e.Handled = true;
                 }
             }, RoutingStrategies.Tunnel);
@@ -67,7 +67,7 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
             if (isReadOnly)
                 return;
             
-            var text = await ((IClipboard)AvaloniaLocator.Current.GetService(typeof(IClipboard))).GetTextAsync();
+            var text = await ((IClipboard)AvaloniaLocator.Current.GetService(typeof(IClipboard))!).GetTextAsync();
 
             if (string.IsNullOrEmpty(text))
                 return;
@@ -85,7 +85,7 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
             base.OnKeyDown(e);
             if (CopyGesture?.Matches(e) ?? false)
             {
-                DoCopy((IClipboard)AvaloniaLocator.Current.GetService(typeof(IClipboard)));
+                DoCopy((IClipboard)AvaloniaLocator.Current.GetService(typeof(IClipboard))!);
                 e.Handled = true;
             }
             else if (PasteGesture?.Matches(e) ?? false)
@@ -117,7 +117,7 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
             opened = false;
             editingControl = null;
             
-            FocusManager.Instance.Focus(this, NavigationMethod.Tab);
+            FocusManager.Instance!.Focus(this, NavigationMethod.Tab);
         }
 
         protected abstract void EndEditingInternal(bool commit);

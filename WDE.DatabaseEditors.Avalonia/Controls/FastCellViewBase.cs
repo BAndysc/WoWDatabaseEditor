@@ -209,7 +209,7 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
                 if (next != null)
                 {
                     EndEditing();
-                    FocusManager.Instance.Focus(next, NavigationMethod.Tab);
+                    FocusManager.Instance!.Focus(next, NavigationMethod.Tab);
                     args.Handled = true;
                 }
             }
@@ -245,7 +245,7 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
                     return;
                 
                 this.EndEditing();
-                FocusManager.Instance.Focus(newCell, NavigationMethod.Tab);
+                FocusManager.Instance!.Focus(newCell, NavigationMethod.Tab);
                 args.Handled = true;
             }
         }

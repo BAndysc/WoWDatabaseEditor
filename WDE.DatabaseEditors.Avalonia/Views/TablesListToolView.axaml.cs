@@ -4,6 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Utils;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -40,7 +41,7 @@ public class TablesListToolView : UserControl
         }, TimeSpan.FromMilliseconds(1));
     }
 
-    private void InputElement_OnDoubleTapped(object? sender, TappedEventArgs e)
+    private void InputElement_OnDoubleTapped(object? sender, RoutedEventArgs e)
     {
         if (sender is ListBox itemsBox && e.Source is IVisual visual)
         {

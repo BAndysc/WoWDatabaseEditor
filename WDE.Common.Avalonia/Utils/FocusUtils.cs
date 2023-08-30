@@ -53,7 +53,7 @@ namespace WDE.Common.Avalonia.Utils
 
             if (visual.Focusable)
             {
-                FocusManager.Instance.Focus(visual, GetFocusFirstMethod((IControl)visual));
+                FocusManager.Instance!.Focus(visual, GetFocusFirstMethod((IControl)visual));
                 if (visual is TextBox tb)
                 {
                     tb.SelectAll();

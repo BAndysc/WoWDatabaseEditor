@@ -21,13 +21,13 @@ namespace AvaloniaStyles.Controls
     {
         public static EnumToIntConverter Instance { get; } = new();
         
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
             var val = System.Convert.ToUInt32(value);
             return $"{value} ({val})";
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
         }

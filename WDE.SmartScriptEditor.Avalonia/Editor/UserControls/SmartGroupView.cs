@@ -1,6 +1,7 @@
 using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls;
+using WDE.Common.Utils;
 using WDE.SmartScriptEditor.Avalonia.Editor.Views.Editing;
 using WDE.SmartScriptEditor.Editor.ViewModels.Editing;
 using WDE.SmartScriptEditor.Models;
@@ -21,7 +22,7 @@ public class SmartGroupView : SelectableTemplatedControl
 
     public ICommand DeselectAllButGroupsRequest
     {
-        get => (ICommand) GetValue(DeselectAllButGroupsRequestProperty);
+        get => (ICommand?) GetValue(DeselectAllButGroupsRequestProperty) ?? AlwaysDisabledCommand.Command;
         set => SetValue(DeselectAllButGroupsRequestProperty, value);
     }
 

@@ -11,6 +11,7 @@ using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using WDE.Common.Managers;
+using WDE.Common.Utils;
 using WDE.EventAiEditor.Editor.UserControls;
 using WDE.EventAiEditor.Editor.ViewModels;
 using WDE.EventAiEditor.Models;
@@ -604,7 +605,7 @@ namespace WDE.EventAiEditor.Avalonia.Editor.UserControls
 
         public EventAiScript Script
         {
-            get => (EventAiScript) GetValue(ScriptProperty);
+            get => (EventAiScript) GetValue(ScriptProperty)!;
             set => SetValue(ScriptProperty, value);
         }
 
@@ -624,14 +625,14 @@ namespace WDE.EventAiEditor.Avalonia.Editor.UserControls
         public float ActionSpacing => 2;
 
         public static readonly AvaloniaProperty SelectedProperty = AvaloniaProperty.RegisterAttached<EventAiPanelLayout, IControl, bool>("Selected");
-        public static bool GetSelected(IControl control) => (bool)control.GetValue(SelectedProperty);
+        public static bool GetSelected(IControl control) => (bool?)control.GetValue(SelectedProperty) ?? false;
         public static void SetSelected(IControl control, bool value) => control.SetValue(SelectedProperty, value);
 
         public static readonly AvaloniaProperty DropItemsProperty = AvaloniaProperty.Register<EventAiPanelLayout, ICommand>(nameof(DropItems));
 
         public ICommand DropItems
         {
-            get => (ICommand) GetValue(DropItemsProperty);
+            get => (ICommand?) GetValue(DropItemsProperty) ?? AlwaysDisabledCommand.Command;
             set => SetValue(DropItemsProperty, value);
         }
 
@@ -639,7 +640,7 @@ namespace WDE.EventAiEditor.Avalonia.Editor.UserControls
 
         public ICommand DropActions
         {
-            get => (ICommand) GetValue(DropActionsProperty);
+            get => (ICommand?) GetValue(DropActionsProperty) ?? AlwaysDisabledCommand.Command;
             set => SetValue(DropActionsProperty, value);
         }
     }

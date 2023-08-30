@@ -83,7 +83,7 @@ namespace WDE.Common.Avalonia.Controls
 
         private async void PasteAsync()
         {
-            var text = await ((IClipboard)AvaloniaLocator.Current.GetService(typeof(IClipboard))).GetTextAsync();
+            var text = await ((IClipboard)AvaloniaLocator.Current.GetService(typeof(IClipboard))!).GetTextAsync();
 
             if (text is null) 
                 return;

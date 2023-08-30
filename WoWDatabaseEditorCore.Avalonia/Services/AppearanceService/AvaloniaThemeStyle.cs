@@ -26,7 +26,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Services.AppearanceService
                         value.L = 0.55f;
                     }
                 }
-                Application.Current.Resources["AccentHue"] = value;
+                Application.Current!.Resources["AccentHue"] = value;
             }
         }
 

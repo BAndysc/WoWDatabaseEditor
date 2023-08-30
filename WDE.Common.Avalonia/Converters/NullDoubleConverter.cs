@@ -12,12 +12,12 @@ public class NullDoubleConverter : IValueConverter
     public double WhenNull { get; set; }
     public double WhenNotNull { get; set; }
         
-    public object Convert(object? value, Type targetType, object parameter, CultureInfo culture)
+    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         return value == null ? WhenNull : WhenNotNull;
     }
 
-    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         throw new Exception();
     }

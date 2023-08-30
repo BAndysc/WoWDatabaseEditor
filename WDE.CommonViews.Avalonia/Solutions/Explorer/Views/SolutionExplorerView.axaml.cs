@@ -22,7 +22,7 @@ namespace WDE.CommonViews.Avalonia.Solutions.Explorer.Views
             AvaloniaXamlLoader.Load(this);
         }
 
-        private void Tv_OnDoubleTapped(object? sender, TappedEventArgs e)
+        private void Tv_OnDoubleTapped(object? sender, RoutedEventArgs e)
         {
             if (DataContext is SolutionExplorerViewModel vm && vm.SelectedItem != null)
                 vm.RequestOpenItem.Execute(vm.SelectedItem);

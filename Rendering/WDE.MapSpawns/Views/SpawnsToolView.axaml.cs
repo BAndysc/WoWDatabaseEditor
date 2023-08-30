@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 
 namespace WDE.MapSpawns.Views;
@@ -17,7 +18,7 @@ public class SpawnsToolView : UserControl
         AvaloniaXamlLoader.Load(this);
     }
 
-    private void InputElement_OnDoubleTapped(object? sender, TappedEventArgs e)
+    private void InputElement_OnDoubleTapped(object? sender, RoutedEventArgs e)
     {
     }
 }

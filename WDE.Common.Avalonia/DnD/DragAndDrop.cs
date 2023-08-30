@@ -76,7 +76,7 @@ namespace WDE.Common.Avalonia.DnD
 
         static DragAndDrop()
         {
-            platformCopyKeyModifier = AvaloniaLocator.Current.GetService<PlatformHotkeyConfiguration>().CommandModifiers;
+            platformCopyKeyModifier = AvaloniaLocator.Current.GetRequiredService<PlatformHotkeyConfiguration>().CommandModifiers;
             adorner = new AdornerHelper();
             IsDropTargetProperty.Changed.Subscribe(args =>
             {

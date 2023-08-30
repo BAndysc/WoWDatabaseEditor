@@ -3,7 +3,6 @@ using System.Text;
 using Avalonia.OpenGL;
 using Avalonia.Platform.Interop;
 using OpenGLBindings;
-using OpenTK.Graphics.ES11;
 using BlitFramebufferFilter = OpenGLBindings.BlitFramebufferFilter;
 using ClearBufferMask = OpenGLBindings.ClearBufferMask;
 using CullFaceMode = OpenGLBindings.CullFaceMode;

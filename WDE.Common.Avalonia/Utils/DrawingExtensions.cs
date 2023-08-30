@@ -1,6 +1,7 @@
 using System;
 using Avalonia;
 using Avalonia.Media;
+using Avalonia.Media.TextFormatting;
 
 namespace WDE.Common.Avalonia.Utils;
 
@@ -28,5 +29,12 @@ public static class DrawingExtensions
         triangle.Points.Add(p2 + perp * arrowSize / 2);
         triangle.Points.Add(p2 - perp * arrowSize / 2);
         ctx.DrawGeometry(pen.Brush, null, triangle);
+    }
+
+    public static void Draw(this TextLayout layout, DrawingContext context, Point p)
+    {
+        double offset = layout.MaxWidth / 2 - layout.Size.Width / 2;
+        using var _ = context.PushPostTransform(Matrix.CreateTranslation(p.X + offset, p.Y));
+        layout.Draw(context);
     }
 }

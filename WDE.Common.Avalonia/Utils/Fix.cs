@@ -12,7 +12,7 @@ public static class Fix
     /// </summary>
     public static readonly AvaloniaProperty DetachDataContextProperty = AvaloniaProperty.RegisterAttached<Control, bool>("DetachDataContext", typeof(Fix));
         
-    public static bool GetDetachDataContext(Control control) => (bool)control.GetValue(DetachDataContextProperty);
+    public static bool GetDetachDataContext(Control control) => (bool)control.GetValue(DetachDataContextProperty)!;
     public static void SetDetachDataContext(Control control, bool value) => control.SetValue(DetachDataContextProperty, value);
 
     static Fix()

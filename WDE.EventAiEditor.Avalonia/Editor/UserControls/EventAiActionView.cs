@@ -3,6 +3,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using WDE.Common.Avalonia.Controls;
+using WDE.Common.Utils;
 using WDE.EventAiEditor.Models;
 
 namespace WDE.EventAiEditor.Avalonia.Editor.UserControls
@@ -27,19 +28,19 @@ namespace WDE.EventAiEditor.Avalonia.Editor.UserControls
 
         public ICommand DeselectAllButActionsRequest
         {
-            get => (ICommand) GetValue(DeselectAllButActionsRequestProperty);
+            get => (ICommand?) GetValue(DeselectAllButActionsRequestProperty) ?? AlwaysDisabledCommand.Command;
             set => SetValue(DeselectAllButActionsRequestProperty, value);
         }
 
         public ICommand EditActionCommand
         {
-            get => (ICommand) GetValue(EditActionCommandProperty);
+            get => (ICommand?) GetValue(EditActionCommandProperty) ?? AlwaysDisabledCommand.Command;
             set => SetValue(EditActionCommandProperty, value);
         }
         
         public ICommand DirectEditParameter
         {
-            get => (ICommand) GetValue(DirectEditParameterProperty);
+            get => (ICommand?) GetValue(DirectEditParameterProperty) ?? AlwaysDisabledCommand.Command;
             set => SetValue(DirectEditParameterProperty, value);
         }
 

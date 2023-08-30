@@ -85,7 +85,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
         public SmartEventFlagsView()
         {
             flagsMapping = ViewBind.ResolveViewModel<SmartEventFlagMapping>();
-            if (Application.Current.Styles.TryGetResource("SmartScripts.Event.Flag.Foreground", out var eventFlagForegroundColor)
+            if (Application.Current!.Styles.TryGetResource("SmartScripts.Event.Flag.Foreground", out var eventFlagForegroundColor)
                 && eventFlagForegroundColor is IBrush eventFlagForegroundBrush)
             {
                 foreground = eventFlagForegroundBrush;

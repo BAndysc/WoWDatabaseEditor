@@ -2,10 +2,10 @@
 <Project>
     <PropertyGroup>
         <RestoreAdditionalProjectSources>
-            https://nuget.avaloniaui.net/repository/avalonia-all/index.json
+            https://nuget-feed-all.avaloniaui.net/v3/index.json
         </RestoreAdditionalProjectSources>
         <NoWarn>CS0067,CS3021,CS1998,CA1416,CS1591</NoWarn>
-        <AvaloniaVersion>0.10.999-cibuild0016933-beta</AvaloniaVersion>
+        <AvaloniaVersion>0.10.22</AvaloniaVersion>
         <LangVersion>preview</LangVersion>
     </PropertyGroup>
     <PropertyGroup>

@@ -9,14 +9,14 @@ namespace WDE.Common.Avalonia.Converters
         public string? WhenTrue { get; set; }
         public string? WhenFalse { get; set; }
             
-        public object? Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
             if (value is bool b)
                 return b ? WhenTrue : WhenFalse;
             return null;
         }
     
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
         }

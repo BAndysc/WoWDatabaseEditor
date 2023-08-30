@@ -115,7 +115,7 @@ public class VirtualizedGridView : TemplatedControl
         if (e.Key is Key.Up or Key.Down)
         {
             var rangeModifier = e.KeyModifiers.HasFlagFast(KeyModifiers.Shift);
-            var toggleModifier = e.KeyModifiers.HasFlagFast(AvaloniaLocator.Current.GetService<PlatformHotkeyConfiguration>().CommandModifiers);
+            var toggleModifier = e.KeyModifiers.HasFlagFast(AvaloniaLocator.Current.GetRequiredService<PlatformHotkeyConfiguration>().CommandModifiers);
 
             int index;
             if (e.Key == Key.Up)
@@ -283,7 +283,7 @@ public class VirtualizedGridView : TemplatedControl
                     e.Source,
                     true,
                     e.KeyModifiers.HasFlagFast(KeyModifiers.Shift),
-                    e.KeyModifiers.HasFlagFast(AvaloniaLocator.Current.GetService<PlatformHotkeyConfiguration>().CommandModifiers),
+                    e.KeyModifiers.HasFlagFast(AvaloniaLocator.Current.GetRequiredService<PlatformHotkeyConfiguration>().CommandModifiers),
                     point.Properties.IsRightButtonPressed);
             }
         }

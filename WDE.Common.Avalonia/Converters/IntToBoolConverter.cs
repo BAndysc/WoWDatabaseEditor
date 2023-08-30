@@ -20,7 +20,7 @@ namespace WDE.Common.Avalonia.Converters
             return UnknownValues;
         }
 
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
             if (value is int i)
                 return Convert(i);
@@ -29,7 +29,7 @@ namespace WDE.Common.Avalonia.Converters
             return UnknownValues;
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
         {
             if (targetType == typeof(int))
             {

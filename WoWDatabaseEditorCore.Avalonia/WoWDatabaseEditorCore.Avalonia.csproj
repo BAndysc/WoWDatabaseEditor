@@ -8,8 +8,6 @@
         <Nullable>enable</Nullable>
         <WarningsAsErrors>nullable</WarningsAsErrors>
         <AssemblyName>WoWDatabaseEditorCore.Avalonia.GUI</AssemblyName>
-        <DefineConstants Condition="$(UseOpenGl) == 'true'">$(DefineConstants);USE_OPENTK</DefineConstants>
-        <DefineConstants Condition="$([MSBuild]::IsOSPlatform('Windows'))">$(DefineConstants);USE_OPENTK</DefineConstants>
     </PropertyGroup>
     <PropertyGroup>
         <SelfContained>false</SelfContained>
@@ -33,7 +31,6 @@
         <PackageReference Include="Prism.Core" Version="7.2.0.1422" />
         <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="2.88.0-preview.127" />
         <PackageReference Include="SmartFormat.NET" Version="2.7.3" />
-        <PackageReference Include="Avalonia.OpenTK" Version="0.10.999-cibuild0016933-beta" />
         <PackageReference Include="OpenTK.Graphics" Version="4.7.5" />
         <PackageReference Include="OpenTK.Core" Version="4.7.5" />
     </ItemGroup>

@@ -66,11 +66,11 @@ namespace WDE.Common.CoreVersion
     [Flags]
     public enum WaypointTables
     {
-        WaypointData = 0x1,  // waypoint_data
-        SmartScriptWaypoint = 0x2, // waypoints
-        ScriptWaypoint = 0x4, // script_waypoint
-        MangosWaypointPath = 0x8, // waypoint_path
-        MangosCreatureMovement = 0x16 // creature_movement(_template)
+        WaypointData = 1,  // waypoint_data
+        SmartScriptWaypoint = 2, // waypoints
+        ScriptWaypoint = 4, // script_waypoint
+        MangosWaypointPath = 8, // waypoint_path
+        MangosCreatureMovement = 16 // creature_movement(_template)
     }
     
     public interface IDatabaseFeatures

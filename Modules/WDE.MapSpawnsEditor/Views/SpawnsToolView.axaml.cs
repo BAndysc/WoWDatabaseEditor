@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -47,7 +48,7 @@ public class SpawnsToolView : UserControl
         
         Dispatcher.UIThread.Post(() =>
         {
-            FocusManager.Instance.Focus(panel, NavigationMethod.Tab);
+            FocusManager.Instance!.Focus(panel, NavigationMethod.Tab);
         }, DispatcherPriority.Render);
     }
 
@@ -59,7 +60,7 @@ public class SpawnsToolView : UserControl
         disposable = null;
     }
 
-    private void InputElement_OnDoubleTapped(object? sender, TappedEventArgs e)
+    private void InputElement_OnDoubleTapped(object? sender, RoutedEventArgs e)
     {
         if (DataContext is SpawnsToolViewModel vm && vm.SelectedNode is SpawnInstance selectedSpawn)
         {
