@@ -1644,7 +1644,18 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             obj.Parent?.Actions.Remove(obj);
         }
 
-        private int GetDefaultSourceIdForType(SmartScriptType type)
+        private static int GetDefaultTargetIdForType(SmartScriptType scriptSourceType, SmartGenericJsonData eventData)
+        {
+            if (scriptSourceType == SmartScriptType.Creature)
+                return SmartConstants.TargetSelf;
+            
+            if (eventData.Invoker != null)
+                return SmartConstants.TargetActionInvoker;
+
+            return SmartConstants.TargetNone;
+        }
+        
+        private static int GetDefaultSourceIdForType(SmartScriptType type)
         {
             switch (type)
             {
@@ -1697,8 +1708,9 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             }
             else
             {
+                var eventData = smartDataManager.GetRawData(SmartType.SmartEvent, e.Id);
                 var source = smartFactory.SourceFactory(GetDefaultSourceIdForType(script.SourceType));
-                var target = smartFactory.TargetFactory(script.SourceType == SmartScriptType.Creature ? SmartConstants.TargetSelf : SmartConstants.TargetNone);
+                var target = smartFactory.TargetFactory(GetDefaultTargetIdForType(script.SourceType, eventData));
                 action = smartFactory.ActionFactory(script.SourceType == SmartScriptType.Creature ? SmartConstants.ActionTalk : SmartConstants.ActionNone, source, target);
                 action.Parent = e; // <-- set the parent already, so that the edit window has the correct parent
                 if (preferences.AddingBehaviour == AddingElementBehaviour.JustAdd)

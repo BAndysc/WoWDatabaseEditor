@@ -51,7 +51,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
                     Id = "tool",
                     Title = "Tools",
                     Proportion = 0.2f,
-                    CanFloat = false,
+                    CanFloat = false
                 };
                 if (position == ToolPreferedPosition.Left)
                 {
