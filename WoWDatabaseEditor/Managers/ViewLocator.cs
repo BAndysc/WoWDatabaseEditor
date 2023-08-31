@@ -10,8 +10,8 @@ namespace WoWDatabaseEditorCore.Managers
     [AutoRegister]
     public class ViewLocator : IViewLocator
     {
-        private Dictionary<Type, Type> staticBinding = new();
-        private Dictionary<Type, Type> staticToolBarsBinding = new();
+        private Dictionary<Type, Type?> staticBinding = new();
+        private Dictionary<Type, Type?> staticToolBarsBinding = new();
         
         public void Bind(Type viewModel, Type view)
         {
@@ -23,7 +23,7 @@ namespace WoWDatabaseEditorCore.Managers
             staticBinding.Add(typeof(T), typeof(R));
         }
 
-        public bool TryResolve(Type viewModel, out Type view)
+        public bool TryResolve(Type? viewModel, out Type view)
         {
             view = null!;
 
@@ -33,14 +33,20 @@ namespace WoWDatabaseEditorCore.Managers
             if (staticBinding.TryGetValue(viewModel, out var view_))
             {
                 view = view_!;
-                return true;
+                return view_ != null;
             }
 
             if (viewModel.AssemblyQualifiedName == null)
+            {
+                staticBinding[viewModel] = null;
                 return false;
+            }
 
             if (!viewModel.Name.EndsWith("ViewModel"))
+            {
+                staticBinding[viewModel] = null;
                 return false;
+            }
 
             var viewString = viewModel.AssemblyQualifiedName!.Replace("ViewModel", "View");
             view = Type.GetType(viewString)!;
@@ -57,8 +63,7 @@ namespace WoWDatabaseEditorCore.Managers
                 view = Type.GetType(viewString.Replace(assemblyName!, assemblyName + "." + GlobalApplication.Backend).Replace(", Version=", ".GUI, Version="))!;
             }
 
-            if (view != null)
-                staticBinding[viewModel] = view;
+            staticBinding[viewModel] = view;
             
             return view != null;
         }
@@ -78,11 +83,15 @@ namespace WoWDatabaseEditorCore.Managers
             if (staticToolBarsBinding.TryGetValue(viewModel, out var view_))
             {
                 toolBar = view_!;
-                return true;
+                staticToolBarsBinding[viewModel] = toolBar;
+                return view_ != null;
             }
-            
+
             if (viewModel.AssemblyQualifiedName == null)
+            {
+                staticToolBarsBinding[viewModel] = toolBar;
                 return false;
+            }
 
             var viewString = viewModel.AssemblyQualifiedName!.Replace("ViewModel", "ToolBar").Replace("ToolBars", "Views");
             toolBar = Type.GetType(viewString)!;
@@ -99,8 +108,7 @@ namespace WoWDatabaseEditorCore.Managers
                 toolBar = Type.GetType(viewString.Replace(assemblyName!, assemblyName + "." + GlobalApplication.Backend).Replace(", Version=", ".GUI, Version="))!;
             }
 
-            if (toolBar != null)
-                staticToolBarsBinding[viewModel] = toolBar;
+            staticToolBarsBinding[viewModel] = toolBar;
             
             return toolBar != null;
         }
