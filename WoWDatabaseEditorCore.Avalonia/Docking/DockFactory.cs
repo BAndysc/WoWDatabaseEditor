@@ -51,10 +51,12 @@ namespace WoWDatabaseEditorCore.Avalonia.Docking
                     Id = "tool",
                     Title = "Tools",
                     Proportion = 0.2f,
-                    CanFloat = false
+                    CanFloat = false,
                 };
                 if (position == ToolPreferedPosition.Left)
                 {
+                    if (layout is ProportionalDock dock)
+                        dock.Orientation = Orientation.Horizontal;
                     InsertDockable(layout, CreateProportionalDockSplitter(), 0);
                     InsertDockable(layout, toolDock, 0);
                 }
