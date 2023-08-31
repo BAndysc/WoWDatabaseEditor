@@ -16,6 +16,7 @@ namespace WDE.DatabaseEditors.CustomCommands
         string Name { get; }
         string CommandId { get; }
         Task Process(DatabaseCommandDefinitionJson definition, IDatabaseTableData tableData, ITableContext tableContext);
+        bool CanExecute(DatabaseCommandDefinitionJson definition, DatabaseEntity entity, ITableContext context) => true;
     }
     
     [NonUniqueProvider]

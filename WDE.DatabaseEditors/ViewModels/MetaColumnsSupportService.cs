@@ -111,11 +111,13 @@ public class MetaColumnsSupportService : IMetaColumnsSupportService
             var command = commandService.FindCommand(commandName);
             if (command == null || viewModel == null)
                 return (new AlwaysDisabledCommand(), "(invalid)");
+
+            var definition = new DatabaseCommandDefinitionJson() { CommandId = commandName };
             
             return (new AsyncAutoCommand(async () =>
             {
-                await command.Process(new DatabaseCommandDefinitionJson(){CommandId = commandName}, new DatabaseTableData(viewModel.TableDefinition, viewModel.Entities), viewModel);
-            }), text);
+                await command.Process(definition, new DatabaseTableData(viewModel.TableDefinition, viewModel.Entities), viewModel);
+            }, () => command.CanExecute(definition, entity, viewModel)), text);
         }
 
         if (metaColumn.StartsWith("picker"))
