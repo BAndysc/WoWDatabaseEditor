@@ -77,13 +77,29 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
 
             bool anythingAdded = false;
 
-            if (pointerOverElement is FormattedTextBlock ftb && ftb.OverContext is ParameterWithContext context)
+            if (pointerOverElement is FormattedTextBlock ftb)
             {
-                AddMenuItem("Copy parameter value", new DelegateCommand(() =>
+                if (ftb.OverContext is ParameterWithContext context)
                 {
-                    AvaloniaLocator.Current.GetRequiredService<IClipboard>().SetTextAsync(context.Parameter.Value.ToString()).ListenErrors();
-                }));
-                anythingAdded = true;
+                    AddMenuItem("Copy parameter value", new DelegateCommand(() =>
+                    {
+                        AvaloniaLocator.Current.GetRequiredService<IClipboard>().SetTextAsync(context.Parameter.Value.ToString()).ListenErrors();
+                    }));
+                    anythingAdded = true;
+                }
+                else if (ftb.OverContext is MetaSmartSourceTargetEdit sourceTarget)
+                {
+                    SmartSource sourceOrTarget = sourceTarget.IsSource ? sourceTarget.RelatedAction.Source : sourceTarget.RelatedAction.Target;
+                    if (sourceOrTarget.IsPosition)
+                    {
+                        AddMenuItem("Copy coords", new DelegateCommand(() =>
+                        {
+                            var coords = $"({sourceOrTarget.X}, {sourceOrTarget.Y}, {sourceOrTarget.Z}, {sourceOrTarget.O})";
+                            AvaloniaLocator.Current.GetRequiredService<IClipboard>().SetTextAsync(coords).ListenErrors();
+                        }));
+                        anythingAdded = true;   
+                    }
+                }
             }
             
             if (dynamicMenuItems != null && dynamicMenuItems.Count > 0)
