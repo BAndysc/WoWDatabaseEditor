@@ -41,6 +41,8 @@ public class QuickAccessViewModel : ObservableBase, IQuickAccessViewModel
     private CancellationTokenSource? pendingSearch;
     
     private bool isOpened;
+    
+    public bool IsSearching => pendingSearch != null;
 
     public QuickAccessViewModel(IQuickAccessService quickAccessService, IMainThread mainThread)
     {
@@ -48,7 +50,7 @@ public class QuickAccessViewModel : ObservableBase, IQuickAccessViewModel
         this.mainThread = mainThread;
         AutoDispose(this
             .ToObservable(x => x.SearchText)
-            .Throttle(TimeSpan.FromMilliseconds(100))
+            .Throttle(TimeSpan.FromMilliseconds(10))
             .ObserveOn(SynchronizationContext.Current!)
             .Subscribe(text =>
         {
@@ -83,6 +85,9 @@ public class QuickAccessViewModel : ObservableBase, IQuickAccessViewModel
         {
             Items.Sort((x, y) => x!.Score.CompareTo(y!.Score));
         }
+
+        if (token == pendingSearch)
+            pendingSearch = null;
     }
 
     public void OpenSearch(string? text)

@@ -1,4 +1,5 @@
 using System;
+using System.Reactive;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Utils;
@@ -82,12 +83,12 @@ public class QuickAccessView : UserControl
     {
         if (e.Key == Key.Down || e.Key == Key.Up)
         {
-            adapter.HandleKeyDown(e);
+            ArrowDown(e);
             e.Handled = true;
         }
         else if (e.Key == Key.Enter)
         {
-            ResultCommit(sender, e);
+            AcceptSelection();
             e.Handled = true;
         }
         else if (e.Key == Key.Escape)
@@ -96,5 +97,66 @@ public class QuickAccessView : UserControl
                 vm.CloseSearch();
             e.Handled = true;
         }
+    }
+
+    private int pendingArrowDown;
+    private bool pendingEnter;
+    private bool timerRunning;
+    
+    private void AcceptSelection()
+    {
+        if (DataContext is not QuickAccessViewModel vm)
+            return;
+
+        if (vm.IsSearching)
+        {
+            pendingEnter = true;
+            StartTimer();
+        }
+        else
+            ResultCommit(null, null!);
+    }
+
+    private void StartTimer()
+    {
+        if (timerRunning)
+            return;
+
+        DispatcherTimer.Run(() =>
+        {
+            if (DataContext is not QuickAccessViewModel vm)
+            {
+                timerRunning = false;
+                return false;
+            }
+
+            if (vm.IsSearching)
+                return true;
+            
+            for (int i = 0; i < pendingArrowDown; ++i)
+                adapter.HandleKeyDown(new KeyEventArgs(){Key = Key.Down});
+            pendingArrowDown = 0;
+            
+            if (pendingEnter)
+                ResultCommit(null, null!);
+            pendingEnter = false;
+
+            timerRunning = false;
+            return false;
+        }, TimeSpan.FromMilliseconds(1));
+    }
+
+    private void ArrowDown(KeyEventArgs e)
+    {
+        if (DataContext is not QuickAccessViewModel vm)
+            return;
+
+        if (vm.IsSearching)
+        {
+            pendingArrowDown++;
+            StartTimer();
+        }
+        else
+            adapter.HandleKeyDown(e);
     }
 }
