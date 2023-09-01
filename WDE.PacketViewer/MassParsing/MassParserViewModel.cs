@@ -192,8 +192,15 @@ public partial class MassParserViewModel : ObservableBase, IDocument
                     
                     foreach (var packet in packets.Packets_)
                     {
-                        textProcessor?.Process(packet);
-                        documentDumper?.Process(packet);
+                        try
+                        {
+                            textProcessor?.Process(packet);
+                            documentDumper?.Process(packet);
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(e);
+                        }
                     }
                 }
 
