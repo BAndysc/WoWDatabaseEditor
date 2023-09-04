@@ -29,7 +29,7 @@
                 <ItemsPresenter.ItemTemplate>
                     <DataTemplate>
                         <StackPanel>
-                            <TextBlock Text="{Binding Key}" FontWeight="Thin" FontSize="17" />
+                            <TextBlock Text="{Binding Key}" FontWeight="Light" FontSize="17" />
                             <ItemsPresenter KeyboardNavigation.TabNavigation="Continue" Items="{Binding}" Margin="10,0,0,16">
                                 <ItemsPresenter.ItemTemplate>
                                     <DataTemplate x:DataType="viewModels:IEditableParameterViewModel">
