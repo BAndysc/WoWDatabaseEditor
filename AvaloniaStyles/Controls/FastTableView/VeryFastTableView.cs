@@ -416,7 +416,11 @@ public partial class VeryFastTableView : Panel, IKeyboardNavigationHandler, IFas
             return;
         }
 
-        if (IsSelectedCellValid && Items != null)
+        if (IsPointHeader(e.GetPosition(this)))
+        {
+            e.Handled = true;
+        }
+        else if (IsSelectedCellValid && Items != null)
         {
             var cell = Items[SelectedRowIndex.GroupIndex].Rows[SelectedRowIndex.RowIndex].CellsList[SelectedCellIndex];
             if (CustomCellInteractor != null && CustomCellInteractor.PointerUp(cell,
