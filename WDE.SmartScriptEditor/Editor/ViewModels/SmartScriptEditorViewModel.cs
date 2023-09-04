@@ -653,7 +653,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                             nextActionToSelect.IsSelected = true;
                     }
                 }
-                else if (AnyConditionSelected && !editorFeatures.UseExternalConditionsEditor) // with external editor, you may not delete conditions in sai directly
+                else if (AnyConditionSelected) // with external editor, you may not delete conditions in sai directly
                 {
                     using (script.BulkEdit("Delete conditions"))
                     {
@@ -667,10 +667,16 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                             for (int j = e.Conditions.Count - 1; j >= 0; --j)
                             {
                                 if (e.Conditions[j].IsSelected)
+                                {
+                                    for (int k = j + 1; k < e.Conditions.Count && e.Conditions[k].Indent > e.Conditions[j].Indent; ++k)
+                                    {
+                                        e.Conditions[k].Indent--;
+                                    }
                                     e.Conditions.RemoveAt(j);
+                                }
                             }
                         }
-
+                        
                         if (nextSelect.HasValue)
                         {
                             if (nextSelect.Value.conditionIndex < Events[nextSelect.Value.eventIndex].Conditions.Count)

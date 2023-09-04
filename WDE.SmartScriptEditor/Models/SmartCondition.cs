@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using PropertyChanged.SourceGenerator;
 using SmartFormat;
 using WDE.Common.Parameters;
 using WDE.Parameters;
@@ -51,8 +52,22 @@ namespace WDE.SmartScriptEditor.Models
                 Context.Add(null);
             Context.Add(new ParameterWithContext(conditionTarget, this));
         }
-        
-        public int Indent { get; set; }
+
+        public event Action<SmartCondition, int, int>? OnIndentChanged;
+        private int indent;
+        public int Indent
+        {
+            get => indent;
+            set
+            {
+                if (indent == value)
+                    return;
+                var old = indent;
+                indent = value;
+                OnPropertyChanged();
+                OnIndentChanged?.Invoke(this, old, value);
+            }
+        }
 
         public SmartEvent? Parent
         {

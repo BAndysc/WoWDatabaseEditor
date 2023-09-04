@@ -226,6 +226,7 @@ namespace WDE.SmartScriptEditor.History
             smartCondition.OnIdChanged += SmartConditionOnOnIdChanged;
             smartCondition.BulkEditingStarted += OnBulkEditingStarted;
             smartCondition.BulkEditingFinished += OnBulkEditingFinished;
+            smartCondition.OnIndentChanged += OnConditionIndentChanged;
             
             BindSmartBase(smartCondition);
 
@@ -233,8 +234,20 @@ namespace WDE.SmartScriptEditor.History
             smartCondition.ConditionTarget.OnValueChanged += Parameter_OnValueChanged;
         }
 
+        private void OnConditionIndentChanged(SmartCondition condition, int old, int @new)
+        {
+            PushAction(new AnonymousHistoryAction("Change condition indent", () =>
+            {
+                condition.Indent = old;
+            }, () =>
+            {
+                condition.Indent = @new;
+            }));
+        }
+
         private void UnbindCondition(SmartCondition smartCondition)
         {
+            smartCondition.OnIndentChanged -= OnConditionIndentChanged;
             smartCondition.BulkEditingStarted -= OnBulkEditingStarted;
             smartCondition.BulkEditingFinished -= OnBulkEditingFinished;
 
