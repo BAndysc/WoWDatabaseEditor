@@ -13,6 +13,7 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Styling;
 using AvaloniaStyles.Controls;
+using AvaloniaStyles.Converters;
 using FuzzySharp;
 using WDE.Common.Parameters;
 using WDE.MVVM.Observable;
@@ -108,7 +109,8 @@ namespace WDE.Common.Avalonia.Controls
                         Padding = new Thickness(7,5,7,5),
                         VerticalAlignment = VerticalAlignment.Stretch,
                         HorizontalAlignment = HorizontalAlignment.Stretch,
-                        [~ToggleButton.IsCheckedProperty] = new Binding("IsChecked", BindingMode.TwoWay)
+                        [~ToggleButton.IsCheckedProperty] = new Binding("IsChecked", BindingMode.TwoWay),
+                        [!ToolTip.TipProperty] = new Binding("OptionValue") {Converter = IntToHexStringConverter.Instance}
                     };
 
                     return checkBox;

@@ -11,6 +11,7 @@ using Avalonia.Controls.Templates;
 using Avalonia.Data;
 using Avalonia.Data.Converters;
 using Avalonia.Layout;
+using AvaloniaStyles.Converters;
 using FuzzySharp;
 using JetBrains.Annotations;
 using WDE.MVVM.Observable;
@@ -188,8 +189,14 @@ namespace AvaloniaStyles.Controls
                     combo.ButtonItemTemplate = new FuncDataTemplate(_ => true, (_, _) => new TextBlock() { [!TextBlock.TextProperty] = new Binding(".") }, true);
                     combo.ItemTemplate = new FuncDataTemplate(_ => true, (_, _) =>
                     {
-                        var panel = new StackPanel() { Orientation = Orientation.Horizontal, Margin = new Thickness(7,5,7,5)};
-                        panel.Children.Add(new TextBlock(){Width = 80, Padding = new Thickness(0,0,3,0), [!TextBlock.TextProperty] = new Binding("EnumInteger")});
+                        var panel = new StackPanel()
+                        {
+                            Orientation = Orientation.Horizontal,
+                            Margin = new Thickness(7,5,7,5)
+                        };
+                        panel.Children.Add(new TextBlock(){Width = 80, 
+                            Padding = new Thickness(0,0,3,0),
+                            [!TextBlock.TextProperty] = new Binding("EnumInteger")});
                         panel.Children.Add(new TextBlock(){[!TextBlock.TextProperty] = new Binding("Text")});
                         var checkBox = new CheckBox
                         { 
@@ -198,7 +205,8 @@ namespace AvaloniaStyles.Controls
                             Padding = new Thickness(3,1,3,1),
                             VerticalAlignment = VerticalAlignment.Stretch,
                             HorizontalAlignment = HorizontalAlignment.Stretch,
-                            [~ToggleButton.IsCheckedProperty] = new Binding("IsChecked", BindingMode.TwoWay)
+                            [~ToggleButton.IsCheckedProperty] = new Binding("IsChecked", BindingMode.TwoWay),
+                            [!ToolTip.TipProperty] = new Binding("EnumInteger") {Converter = IntToHexStringConverter.Instance}
                         };
 
                         return checkBox;
