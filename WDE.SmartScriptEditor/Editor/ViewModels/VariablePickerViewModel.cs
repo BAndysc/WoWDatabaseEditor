@@ -97,6 +97,12 @@ public partial class VariablePickerViewModel : ObservableBase, IDialog
                 SelectedItem = null;
             }
         }, () => SelectedItem != null).ObservesProperty(() => SelectedItem);
+
+        PickVariable = new DelegateCommand<VariableItemViewModel>(item =>
+        {
+            SelectedItem = item;
+            Accept.Execute(null);
+        });
         
         Items.DisposeOnRemove();
         AutoDispose(new ActionDisposable(() => Items.RemoveAll()));
@@ -107,6 +113,7 @@ public partial class VariablePickerViewModel : ObservableBase, IDialog
 
     public DelegateCommand AddItemCommand { get; }
     public DelegateCommand RemoveItemCommand { get; }
+    public DelegateCommand<VariableItemViewModel> PickVariable { get; }
     
     public int DesiredWidth => 700;
     public int DesiredHeight => 500;

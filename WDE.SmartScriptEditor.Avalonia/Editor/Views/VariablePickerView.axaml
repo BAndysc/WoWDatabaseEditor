@@ -5,6 +5,7 @@
              xmlns:viewModels="clr-namespace:WDE.SmartScriptEditor.Editor.ViewModels;assembly=WDE.SmartScriptEditor"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="viewModels:VariablePickerViewModel"
+             x:Name="Root"
              x:Class="WDE.SmartScriptEditor.Avalonia.Editor.Views.VariablePickerView">
     <UserControl.Resources>
         <BoolToDoubleConverter x:Key="BoolToDoubleConverter" WhenTrue="0.4" WhenFalse="1" />
@@ -19,6 +20,17 @@
             Items="{CompiledBinding Items}"
             SelectedItem="{CompiledBinding SelectedItem}">
             <GridView.Columns>
+                <GridColumnDefinition Name="Pick"
+                                      Property="."
+                                      PreferedWidth="40">
+                    <GridColumnDefinition.DataTemplate>
+                        <DataTemplate DataType="viewModels:VariableItemViewModel">
+                            <Button Command="{CompiledBinding  #Root.((viewModels:VariablePickerViewModel)DataContext).PickVariable}"
+                                    CommandParameter="{CompiledBinding .}"
+                                    Padding="0"><TextBlock Padding="0" ClipToBounds="False" LineHeight="13">⬅</TextBlock></Button>
+                        </DataTemplate>
+                    </GridColumnDefinition.DataTemplate>
+                </GridColumnDefinition>
                 <GridColumnDefinition Name="Id"
                                        Property="Id"
                                        PreferedWidth="70">
