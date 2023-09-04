@@ -77,9 +77,5 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
         {
             DeselectActionsOfDeselectedEventsRequest?.Execute(null);
         }
-
-        public static readonly AvaloniaProperty SelectedProperty = AvaloniaProperty.RegisterAttached<SmartEventView, IControl, bool>("Selected");
-        public static bool GetSelected(IControl control) => (bool?)control.GetValue(SelectedProperty) ?? false;
-        public static void SetSelected(IControl control, bool value) => control.SetValue(SelectedProperty, value);
     }
 }

@@ -90,7 +90,7 @@ public abstract class SmartHighlighter : ISmartHighlighter
         highlighters.Add(new(header, parameter, highlighters.Count));
     }
 
-    public void SetHighlightParameter(string parameter)
+    public void SetHighlightParameter(string? parameter)
     {
         if (string.IsNullOrEmpty(parameter))
         {

@@ -253,7 +253,7 @@ namespace WDE.SmartScriptEditor.Models
             return null;
         }
 
-        public SmartGroup InsertGroupBegin(ref int index, string header, string? description)
+        public SmartGroup InsertGroupBegin(ref int index, string header, string? description, bool expanded)
         {   
             var previousGroup = FindMatchingBackwards(index - 1, e => e.IsGroup);
             if (previousGroup != null && previousGroup.IsBeginGroup)
@@ -267,6 +267,7 @@ namespace WDE.SmartScriptEditor.Models
             var groupBeginView = new SmartGroup(groupBegin);
             groupBeginView.Header = header;
             groupBeginView.Description = description;
+            groupBeginView.IsExpanded = expanded;
             Events.Insert(index, groupBegin);
             return groupBeginView;
         }
@@ -305,7 +306,7 @@ namespace WDE.SmartScriptEditor.Models
                             index++;
                         Events.Remove(endGroup);
                     }
-                    group = InsertGroupBegin(ref index, header, description);
+                    group = InsertGroupBegin(ref index, header, description, true);
                     index++;
                     newEvents.Add(group.InnerEvent);
                     hasOpenedGroup = true;

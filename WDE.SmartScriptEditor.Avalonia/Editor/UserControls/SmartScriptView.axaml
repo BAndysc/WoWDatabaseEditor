@@ -37,6 +37,7 @@
         <KeyBinding Gesture="Left" Command="{CompiledBinding SelectionLeft}" />
         <KeyBinding Gesture="Up" Command="{CompiledBinding SelectionUp}" CommandParameter="{StaticResource FalseValue}" />
         <KeyBinding Gesture="Down" Command="{CompiledBinding SelectionDown}" CommandParameter="{StaticResource FalseValue}" />
+        <KeyBinding Gesture="Ctrl+G" Command="{CompiledBinding GroupSelectedEventsCommand}" />
 
     </UserControl.KeyBindings>
     
@@ -105,8 +106,6 @@
                         <DataTemplate DataType="{x:Type models:SmartEvent}">
                             <userControls:SmartEventView
                                 SpecialBackground="{CompiledBinding ColorId, Converter={StaticResource ColorIdToNiceColorConverter}}"
-                                Selected="{CompiledBinding IsSelected, Mode=TwoWay}"
-                                userControls:SmartScriptPanelLayout.Selected="{CompiledBinding IsSelected, Mode=TwoWay}"
                                 DirectEditParameter="{Binding DataContext.DirectEditParameter, ElementName=Rooot}"
                                 DirectOpenParameter="{Binding DataContext.DirectOpenParameter, ElementName=Rooot}"
                                 DeselectActionsOfDeselectedEventsRequest="{Binding DataContext.DeselectAllButEvents, ElementName=Rooot}"

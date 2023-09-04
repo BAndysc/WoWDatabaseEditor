@@ -16,4 +16,5 @@
     <ProjectReference Include="..\WDE.SmartScriptEditor\WDE.SmartScriptEditor.csproj" />
 </ItemGroup>
 
+
 </Project>

@@ -114,7 +114,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         
         public IList<SmartExtensionCommand> ExtensionCommands { get; }
 
-        [Notify] private HighlightViewModel selectedHighlighter; 
+        [Notify] private HighlightViewModel? selectedHighlighter; 
         public IReadOnlyList<HighlightViewModel> Highlighters => highlighter.Highlighters;
 
         public SmartScriptEditorViewModel(ISmartScriptSolutionItem item,
@@ -534,8 +534,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 return taskRunner.ScheduleTask("Save script to database", () => messageBoxService.WrapError(SaveAllToDb));
             });
 
-            DeleteAction = new DelegateCommand<SmartAction>(DeleteActionCommand);
-            DeleteSelected = new DelegateCommand(() =>
+            void DoDeleteSelected(bool deleteGroupContent)
             {
                 if (AnyGlobalVariableSelected)
                 {
@@ -586,8 +585,15 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                             }
                             else if (inGroup)
                             {
-                                innerEvents.Add(e);
-                                i++;
+                                if (deleteGroupContent)
+                                {
+                                    Events.RemoveAt(i);
+                                }
+                                else
+                                {
+                                    innerEvents.Add(e);
+                                    i++;
+                                }
                             }
                             else
                                 i++;
@@ -675,6 +681,12 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                         }
                     }
                 }
+            }
+            
+            DeleteAction = new DelegateCommand<SmartAction>(DeleteActionCommand);
+            DeleteSelected = new DelegateCommand(() =>
+            {
+                DoDeleteSelected(false);
             });
 
             UndoCommand = new DelegateCommand(history.Undo, () => history.CanUndo);
@@ -782,7 +794,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             CutCommand = new AsyncCommand(async () =>
             {
                 await CopyCommand.ExecuteAsync();
-                DeleteSelected.Execute();
+                DoDeleteSelected(true);
             });
             PasteCommand = new AsyncCommand(async () =>
             {
@@ -1273,6 +1285,15 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 await AddEventCommand(index);
             }
 
+            async Task<SmartGroup?> NewGroupDialog()
+            {
+                var fakeGroup = new SmartGroup(SmartEvent.NewBeginGroup());
+                using var vm = new SmartGroupEditViewModel(fakeGroup);
+                if (await windowManager.ShowDialog(vm))
+                    return fakeGroup;
+                return null;
+            }
+
             async Task NewGroup(bool below)
             {
                 int index;
@@ -1288,13 +1309,11 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 if (below)
                     index++;
 
-                var fakeGroup = new SmartGroup(SmartEvent.NewBeginGroup());
-                using var vm = new SmartGroupEditViewModel(fakeGroup);
-                if (await windowManager.ShowDialog(vm))
+                if (await NewGroupDialog() is { } fakeGroup)
                 {
                     using var _ = script.BulkEdit("Insert group");
                     DeselectAll.Execute();
-                    var group = script.InsertGroupBegin(ref index, fakeGroup.Header, fakeGroup.Description);
+                    var group = script.InsertGroupBegin(ref index, fakeGroup.Header, fakeGroup.Description, true);
                     script.InsertGroupEnd(index + 1);
                     group.IsSelected = true;
                 }
@@ -1357,6 +1376,60 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             NewGroupAboveCommand = new AsyncCommand(() => NewGroup(false));
             NewGroupBelowCommand = new AsyncCommand(() => NewGroup(true));
 
+            GroupSelectedEventsCommand = new AsyncAutoCommand(async () =>
+            {
+                var firstSelectedEventIndex = FirstSelectedEventIndex;
+                var index = firstSelectedEventIndex;
+                if (index == -1)
+                    return;
+
+                if (await NewGroupDialog() is not { } fakeGroup)
+                    return;
+
+                // if the first event is in a group, add a group below it
+                while (index < Events.Count && Events[index].Group != null)
+                    index++;
+
+                using var _ = script.BulkEdit("Group events");
+                
+                int selectedEventsCount = 0;
+                for (int i = Events.Count - 1; i >= index;)
+                {
+                    if (!Events[i].IsEvent || !Events[i].IsSelected)
+                    {
+                        --i;
+                        continue;
+                    }
+
+                    var e = Events[i];
+                    e.IsSelected = false;
+                    Events.RemoveAt(i);
+                    Events.Insert(index, e);
+                    selectedEventsCount++;
+                }
+                for (int i = index; i >= firstSelectedEventIndex;)
+                {
+                    if (!Events[i].IsEvent || !Events[i].IsSelected)
+                    {
+                        --i;
+                        continue;
+                    }
+
+                    var e = Events[i];
+                    e.IsSelected = false;
+                    Events.RemoveAt(i);
+                    if (i < index)
+                        index--;
+                    Events.Insert(index, e);
+                    selectedEventsCount++;
+                }
+                
+                DeselectAll.Execute();
+                var group = script.InsertGroupBegin(ref index, fakeGroup.Header, fakeGroup.Description, true);
+                script.InsertGroupEnd(index + 1 + selectedEventsCount);
+                group.IsSelected = true;
+            }, () => AnyEventSelected);
+            
             EditConditionsCommand = new AsyncCommand(() => ExternalConditionEdit(Events.Where(e => e.IsSelected).ToList()),
                 _ => AnyEventSelected);
             
@@ -1457,6 +1530,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         public AsyncCommand NewGroupBelowCommand { get; set; }
         public AsyncCommand EditConditionsCommand { get; set; }
         public DelegateCommand AddLinkCommand { get; set; }
+        public AsyncAutoCommand GroupSelectedEventsCommand { get; }
 
         public DelegateCommand<bool?> SelectionUp { get; set; }
         public DelegateCommand<bool?> SelectionDown { get; set; }
@@ -1587,6 +1661,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             RaisePropertyChanged(nameof(AnyEventSelected));
             RaisePropertyChanged(nameof(AnyEventOrActionSelected));
             EditConditionsCommand.RaiseCanExecuteChanged();
+            GroupSelectedEventsCommand.RaiseCanExecuteChanged();
             if (!smartEditorViewModel.IsOpened)
                 return;
                 
@@ -2651,12 +2726,12 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         
         private void RecolorEvent(SmartEvent e)
         {
-            highlighter.SetHighlightParameter(selectedHighlighter.Parameter);
+            highlighter.SetHighlightParameter(selectedHighlighter?.Parameter);
             e.ColorId = (0, 0);
             if (highlighter.Highlight(e, out var eventParameterIndex))
             {
                 var value = e.GetParameter(eventParameterIndex).Value;
-                e.ColorId = (selectedHighlighter.HighlightIndex, value);
+                e.ColorId = (selectedHighlighter?.HighlightIndex ?? 0, value);
             }
             foreach (var a in e.Actions)
             {
@@ -2664,7 +2739,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 if (highlighter.Highlight(a, out var actionParameterIndex))
                 {
                     var value = a.GetParameter(actionParameterIndex).Value;
-                    a.ColorId = (selectedHighlighter.HighlightIndex, value);
+                    a.ColorId = (selectedHighlighter?.HighlightIndex ?? 0, value);
                 }
             }
             foreach (var c in e.Conditions)
@@ -2673,7 +2748,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 if (highlighter.Highlight(c, out var conditionParameterIndex))
                 {
                     var value = c.GetParameter(conditionParameterIndex).Value;
-                    c.ColorId = (selectedHighlighter.HighlightIndex, value);
+                    c.ColorId = (selectedHighlighter?.HighlightIndex ?? 0, value);
                 }
             }
         }

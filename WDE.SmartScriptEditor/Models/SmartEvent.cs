@@ -103,6 +103,7 @@ namespace WDE.SmartScriptEditor.Models
                 group = value?.InnerEvent;
                 if (group != null)
                     group.PropertyChanged += GroupPropertyChanged;
+                OnPropertyChanged(nameof(IsSelected));
             }
         }
 
