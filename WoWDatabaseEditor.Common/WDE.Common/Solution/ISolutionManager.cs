@@ -14,7 +14,6 @@ namespace WDE.Common
          * returns true if this SolutionManager can contain any ISolutionItem
          */
         bool CanContainAnyItem { get; }
-        void Initialize();
         void Refresh(ISolutionItem item);
         void RefreshAll();
 
