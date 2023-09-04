@@ -29,6 +29,11 @@ public abstract class FastTreeView<P, C> : Control where P : IParentType where C
     {
         ResourcesUtils.Get("FastTableView.SelectedRowBackground", HoverRowBackground, out HoverRowBackground);
         ResourcesUtils.Get("FastTableView.HoverRowBackground", HoverRowBackground, out HoverRowBackground);
+        SelectedNodeProperty.Changed.AddClassHandler<FastTreeView<P, C>>((tree, args) =>
+        {
+            if (args.NewValue is INodeType node)
+                tree.ScrollToNode(node);
+        });
         ItemsProperty.Changed.AddClassHandler<FastTreeView<P, C>>((tree, args) => tree.ItemsChanged(args));
         AffectsRender<FastTreeView<P, C>>(IsFilteredProperty);
         AffectsMeasure<FastTreeView<P, C>>(IsFilteredProperty);
@@ -36,7 +41,7 @@ public abstract class FastTreeView<P, C> : Control where P : IParentType where C
         AffectsMeasure<FastTreeView<P, C>>(RequestRenderProperty);
         FocusableProperty.OverrideDefaultValue<FastTreeView<P, C>>(true);
     }
-
+    
     private void ItemsChanged(AvaloniaPropertyChangedEventArgs args)
     {
         var old = (FlatTreeList<P,C>?)args.OldValue;
@@ -193,7 +198,7 @@ public abstract class FastTreeView<P, C> : Control where P : IParentType where C
             while (currentIndex + direction >= 0 && currentIndex + direction < items.Count && !items[currentIndex].IsVisible)
                 currentIndex += direction;
         }
-        if (currentIndex < 0 || currentIndex >= items.Count)
+        if (currentIndex < 0 || currentIndex >= items.Count || !items[currentIndex].IsVisible)
             currentIndex = -1;
         return currentIndex;
     }
@@ -211,6 +216,70 @@ public abstract class FastTreeView<P, C> : Control where P : IParentType where C
         MouseOverRow = null;
     }
 
+    private void ScrollToNode(INodeType node)
+    {
+        if (Items is not { } items)
+            return;
+        
+        if (ScrollViewer is not { } scrollViewer)
+            return;
+
+        var index = items.IndexOf(node);
+        var rowRect = GetRowRect(index);
+
+        if (rowRect == null)
+            return;
+        
+        var startOffset = scrollViewer.Offset.Y;
+        var endOffset = startOffset + scrollViewer.Viewport.Height;
+
+        var visibleRect = new Rect(0, startOffset, scrollViewer.Viewport.Width, scrollViewer.Viewport.Height);
+
+        if (visibleRect.Intersects(rowRect.Value))
+            return;
+        
+        if (rowRect.Value.Bottom > endOffset)
+            scrollViewer.Offset = new Vector(scrollViewer.Offset.X, rowRect.Value.Bottom - scrollViewer.Viewport.Height);
+        else if (rowRect.Value.Top < startOffset)
+            scrollViewer.Offset = new Vector(scrollViewer.Offset.X, rowRect.Value.Top);
+    }
+
+    private Rect? GetRowRect(int index)
+    {
+        if (Items is not { } items)
+            return default;
+        
+        if (IsFiltered)
+        {
+            float y = 0;
+            for (int i = 0; i < items.Count; ++i)
+            {
+                var row = items[i];
+
+                if (i == index)
+                {
+                    if (row.IsVisible)
+                        return new Rect(0, y, Bounds.Width, RowHeight);
+                    return null;
+                }
+                
+                if (!row.IsVisible)
+                    continue;
+
+                y += RowHeight;
+            }
+
+            return null;
+        }
+        else
+        {
+            if (index < 0 || index >= items.Count)
+                return null;
+            
+            return new Rect(0, index * RowHeight, Bounds.Width, RowHeight);
+        }
+    }
+    
     public override void Render(DrawingContext context)
     {
         base.Render(context);
@@ -219,10 +288,8 @@ public abstract class FastTreeView<P, C> : Control where P : IParentType where C
             return;
         
         var actualWidth = Bounds.Width;
-
-        var scrollViewer = this.FindAncestorOfType<ScrollViewer>();
-
-        if (scrollViewer == null)
+        
+        if (ScrollViewer is not { } scrollViewer)
         {
             context.DrawText(Brushes.Red, default, 
                 new FormattedText("FastTreeView must be wrapped in ScrollViewer!", 
