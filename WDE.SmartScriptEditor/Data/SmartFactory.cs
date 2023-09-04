@@ -80,15 +80,16 @@ namespace WDE.SmartScriptEditor.Data
             }
         }
 
-        public SmartEvent EventFactory(int id)
+        public SmartEvent EventFactory(SmartScriptBase? parent, int id)
         {
             if (!smartDataManager.Contains(SmartType.SmartEvent, id))
                 throw new InvalidSmartEventException(id);
 
             SmartEvent ev = new(id, editorFeatures);
+            ev.Parent = parent;
             ev.Chance.Value = 100;
             SmartGenericJsonData raw = smartDataManager.GetRawData(SmartType.SmartEvent, id);
-            SetParameterObjects(ev, raw);
+            SetParameterObjects(ev.Parent, ev, raw);
             return ev;
         }
         
@@ -98,12 +99,13 @@ namespace WDE.SmartScriptEditor.Data
                 return;
 
             SmartGenericJsonData raw = smartDataManager.GetRawData(SmartType.SmartEvent, id);
-            SetParameterObjects(ev, raw, true);
+            SetParameterObjects(ev.Parent, ev, raw, true);
         }
         
         public SmartEvent EventFactory(ISmartScriptLine line)
         {
-            SmartEvent ev = EventFactory(line.EventType);
+            // pass null as parent, it will be set later
+            SmartEvent ev = EventFactory(null, line.EventType);
 
             ev.Chance.Value = line.EventChance;
             ev.Phases.Value = line.EventPhaseMask;
@@ -169,7 +171,7 @@ namespace WDE.SmartScriptEditor.Data
             action.ActionFlags = raw.Flags;
             action.CommentParameter.IsUsed = raw.CommentField != null;
             action.CommentParameter.Name = raw.CommentField ?? "Comment";
-            SetParameterObjects(action, raw);
+            SetParameterObjects(action.Parent?.Parent, action, raw);
             UpdateTargetPositionVisibility(action.Target);
 
             return action;
@@ -202,7 +204,7 @@ namespace WDE.SmartScriptEditor.Data
             smartAction.ActionFlags = raw.Flags;
             smartAction.CommentParameter.IsUsed = raw.CommentField != null;
             smartAction.CommentParameter.Name = raw.CommentField ?? "Comment";
-            SetParameterObjects(smartAction, raw, true);
+            SetParameterObjects(smartAction.Parent?.Parent, smartAction, raw, true);
             UpdateTargetPositionVisibility(smartAction.Target);
         }
 
@@ -258,7 +260,7 @@ namespace WDE.SmartScriptEditor.Data
             
             SmartTarget target = new(id, editorFeatures);
 
-            SetParameterObjects(target, data);
+            SetParameterObjects(target.Parent?.Parent?.Parent, target, data);
 
             var targetTypes = data.RawTypes;
 
@@ -284,7 +286,7 @@ namespace WDE.SmartScriptEditor.Data
             var targetTypes = raw.RawTypes;
             smartTarget.IsPosition = targetTypes.HasFlagFast(SmartSourceTargetType.Position);
             
-            SetParameterObjects(smartTarget, raw, true);
+            SetParameterObjects(smartTarget.Parent?.Parent?.Parent, smartTarget, raw, true);
             UpdateTargetPositionVisibility(smartTarget);
         }
 
@@ -306,7 +308,7 @@ namespace WDE.SmartScriptEditor.Data
             
             SmartSource source = new(id, editorFeatures);
 
-            SetParameterObjects(source, data);
+            SetParameterObjects(source.Parent?.Parent?.Parent, source, data);
 
             var sourceTypes = data.RawTypes;
 
@@ -329,7 +331,7 @@ namespace WDE.SmartScriptEditor.Data
                 return;
             }
             
-            SetParameterObjects(smartSource, raw, true);
+            SetParameterObjects(smartSource.Parent?.Parent?.Parent, smartSource, raw, true);
             
             var sourceTypes = raw.RawTypes;
             smartSource.IsPosition = sourceTypes.HasFlagFast(SmartSourceTargetType.Position);
@@ -373,7 +375,7 @@ namespace WDE.SmartScriptEditor.Data
             return source;
         }
 
-        private void SetParameterObjects(SmartBaseElement element, SmartGenericJsonData data, bool update = false)
+        private void SetParameterObjects(SmartScriptBase? script, SmartBaseElement element, SmartGenericJsonData data, bool update = false)
         {
             if (data.DescriptionRules != null)
             {
@@ -424,7 +426,7 @@ namespace WDE.SmartScriptEditor.Data
                     IParameter<long> parameter = parameterFactory.Factory(key);
                     element.GetParameter(i).Name = data.Parameters[i].Name;
                     if (!update)
-                        element.GetParameter(i).Value = data.Parameters[i].DefaultVal;
+                        element.GetParameter(i).Value = data.Parameters[i].GetEffectiveDefaultValue(script);
                     element.GetParameter(i).Parameter = parameter;
                     element.GetParameter(i).IsUsed = parameter != UnusedParameter.Instance;
                 }

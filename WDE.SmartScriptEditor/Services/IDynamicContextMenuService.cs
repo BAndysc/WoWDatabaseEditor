@@ -142,7 +142,7 @@ public class DynamicContextMenuService : IDynamicContextMenuService
             var selectedAction = vm.Events[selectedActionIndex.eventIndex].Actions[selectedActionIndex.actionIndex];
                             
             using var _ = vm.Script.BulkEdit(menuItem.Header);
-            var @event = smartFactory.EventFactory(eventData.Id);
+            var @event = smartFactory.EventFactory(vm.Script, eventData.Id);
             if (menuItem.FillParameters != null)
             {
                 foreach (var param in menuItem.FillParameters)

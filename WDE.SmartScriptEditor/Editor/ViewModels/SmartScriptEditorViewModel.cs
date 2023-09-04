@@ -1359,7 +1359,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     else 
                         return;
                     
-                    var @event = smartFactory.EventFactory(SmartConstants.EventLink);
+                    var @event = smartFactory.EventFactory(script, SmartConstants.EventLink);
                     var action = smartFactory.ActionFactory(SmartConstants.ActionLink, null, null);
                     @event.GetParameter(0).Value = action.GetParameter(0).Value = GetNextLinkId();
                     Events[eventIndex].Actions.Insert(actionIndex + 1, action);
@@ -2133,7 +2133,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             if (id.HasValue)
             {
                 DeselectAll.Execute();
-                SmartEvent ev = smartFactory.EventFactory(id.Value);
+                SmartEvent ev = smartFactory.EventFactory(script, id.Value);
                 ev.Parent = script;
 
                 bool acceptInsert = preferences.AddingBehaviour == AddingElementBehaviour.JustAdd ||
@@ -2675,8 +2675,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 for (int i = 0; i < Math.Min(newEventData.Parameters.Count, parameters.Count); ++i)
                 {
                     var parameterData = newEventData.Parameters[i];
-                    if (parameterData.DefaultVal != 0 && !parameters[i].HoldsMultipleValues && parameters[i].Value == 0)
-                        parameters[i].Value = parameterData.DefaultVal;
+                    if (parameterData.GetEffectiveDefaultValue(script) != 0 && !parameters[i].HoldsMultipleValues && parameters[i].Value == 0)
+                        parameters[i].Value = parameterData.GetEffectiveDefaultValue(script);
                 }
             }
         }

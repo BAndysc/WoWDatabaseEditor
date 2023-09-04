@@ -150,7 +150,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                 {
                     for (var index = 0; index < e.Actions.Count; ++index)
                     {
-                        SmartEvent eventToSerialize = index == 0 ? e.ShallowCopy() : smartFactory.EventFactory(SmartConstants.EventUpdateInCombat);
+                        SmartEvent eventToSerialize = index == 0 ? e.ShallowCopy() : smartFactory.EventFactory(null, SmartConstants.EventUpdateInCombat);
 
                         SmartAction actualAction = e.Actions[index].Copy();
                         AdjustCoreCompatibleAction(actualAction);
@@ -212,7 +212,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                     {
                         if (previousWasWait)
                         {
-                            var eventTimed = smartFactory.EventFactory(SmartConstants.EventTriggerTimed);
+                            var eventTimed = smartFactory.EventFactory(null, SmartConstants.EventTriggerTimed);
                             eventTimed.Parent = script;
                             eventTimed.GetParameter(0).Value = nextTriggerId++;
                             additionalEvents.Add(eventTimed);
@@ -263,13 +263,13 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                                     if (previousActionType == SmartConstants.ActionStartWaypointsPath)
                                     {
                                         var pathId = e.Actions[index - 1].GetParameter(1).Value;
-                                        eventFinishedMovement = smartFactory.EventFactory(SmartConstants.EventWaypointsEnded);
+                                        eventFinishedMovement = smartFactory.EventFactory(null, SmartConstants.EventWaypointsEnded);
                                         eventFinishedMovement.GetParameter(1).Value = pathId;
                                     }
                                     else if (previousActionType == SmartConstants.ActionMovePoint)
                                     {
                                         var pointId = e.Actions[index - 1].GetParameter(0).Value;
-                                        eventFinishedMovement = smartFactory.EventFactory(SmartConstants.EventMovementInform);
+                                        eventFinishedMovement = smartFactory.EventFactory(null, SmartConstants.EventMovementInform);
                                         eventFinishedMovement.GetParameter(0).Value = SmartConstants.MovementTypePointMotionType;
                                         eventFinishedMovement.GetParameter(1).Value = pointId;
                                     }
@@ -291,7 +291,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                                 }
                                 else
                                 {
-                                    SmartEvent after = smartFactory.EventFactory(SmartConstants.EventUpdateInCombat);
+                                    SmartEvent after = smartFactory.EventFactory(null, SmartConstants.EventUpdateInCombat);
                                     after.GetParameter(0).Value = afterTimeMin;
                                     after.GetParameter(1).Value = afterTimeMax;
                                     SmartAction actualAction = e.Actions[index].Copy();
@@ -304,7 +304,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                                         actualAction.GetParameter(2).Value = 500;
                                         actualAction.Comment = SmartConstants.CommentInlineRepeatActionList;
                                         
-                                        var eventTimedTriggerRepeat = smartFactory.EventFactory(SmartConstants.EventTriggerTimed);
+                                        var eventTimedTriggerRepeat = smartFactory.EventFactory(null, SmartConstants.EventTriggerTimed);
                                         eventTimedTriggerRepeat.Parent = script;
                                         eventTimedTriggerRepeat.GetParameter(0).Value = nextTriggerId++;
                                         additionalEvents.Add(eventTimedTriggerRepeat);

@@ -6,7 +6,7 @@ namespace WDE.SmartScriptEditor.Data
 {
     public interface ISmartFactory
     {
-        SmartEvent EventFactory(int id);
+        SmartEvent EventFactory(SmartScriptBase? parent, int id);
 
         SmartEvent EventFactory(ISmartScriptLine line);
 

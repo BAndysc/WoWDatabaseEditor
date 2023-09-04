@@ -9,10 +9,17 @@ using WDE.Common.Database;
 using WDE.Common.Managers;
 using WDE.Common.Parameters;
 using WDE.Common.Utils;
+using WDE.SmartScriptEditor.Models;
 using WDE.SmartScriptEditor.Utils;
 
 namespace WDE.SmartScriptEditor.Data
 {
+    public enum ParameterSpecialDefaultValue
+    {
+        None,
+        EntryOrGuid
+    }
+    
     [Equatable]
     public partial struct SmartParameterJsonData
     {
@@ -35,6 +42,11 @@ namespace WDE.SmartScriptEditor.Data
         [DefaultEquality]
         [JsonProperty(PropertyName = "defaultVal")]
         public long DefaultVal { get; set; }
+        
+        [DefaultEquality]
+        [JsonProperty(PropertyName = "special_default")]
+        [JsonConverter(typeof(StringEnumConverter))]
+        public ParameterSpecialDefaultValue SpecialDefaultVal { get; set; }
 
         [DefaultEquality]
         [JsonProperty(PropertyName = "enter_to_accept")]
@@ -44,6 +56,21 @@ namespace WDE.SmartScriptEditor.Data
         [JsonProperty(PropertyName = "values")]
         [JsonConverter(typeof(ParameterValuesJsonConverter))]
         public Dictionary<long, SelectOption>? Values { get; set; }
+    }
+
+    public static class SmartParameterJsonDataExtensions
+    {
+        public static long GetEffectiveDefaultValue(this SmartParameterJsonData data, SmartScriptBase? scriptBase)
+        {
+            if (data.SpecialDefaultVal == ParameterSpecialDefaultValue.EntryOrGuid)
+            {
+                if (scriptBase is SmartScript script)
+                    return script.EntryOrGuid;
+                return 0;
+            }
+
+            return data.DefaultVal;
+        }
     }
     
     [ExcludeFromCodeCoverage]
