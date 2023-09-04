@@ -123,7 +123,7 @@ public class TableEditorPickerService : ITableEditorPickerService
                     where = "";
                 else
                     where = $"({where}) AND ";
-                where += $"`{definition.GroupByKeys[0]}` = {key.Value[0]}";
+                where += $"`{definition.TableName}`.`{definition.GroupByKeys[0]}` = {key.Value[0]}";
             }
 
             async Task SetFilterAndFind()

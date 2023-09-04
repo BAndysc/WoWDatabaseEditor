@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using WDE.Common.Parameters;
@@ -53,7 +54,17 @@ public class ContextualParametersProvider : IContextualParametersProvider
                 ObservableExtensions.SubscribeOnce(observable, val =>
                 {
                     Debug.Assert(val == required.Count);
-                    parameterFactory.Register(deserialized.Name, new DatabaseContextualParameter(parameterFactory, pickerService, deserialized.SimpleSwitch));
+                    IParameter<long> parameter;
+
+                    var anyIsAsync = deserialized.SimpleSwitch.Values.Values.Select(parameterFactory.Factory)
+                        .Any(param => param is IAsyncParameter<long> || param is IAsyncContextualParameter<long, DatabaseEntity>);
+                    
+                    if (anyIsAsync)
+                        parameter = new AsyncDatabaseContextualParameter(parameterFactory, pickerService, deserialized.SimpleSwitch);
+                    else
+                        parameter = new DatabaseContextualParameter(parameterFactory, pickerService, deserialized.SimpleSwitch);
+                    
+                    parameterFactory.Register(deserialized.Name, parameter);
                 });
             }
             else if (deserialized.SimpleStringSwitch != null)
@@ -82,11 +93,11 @@ public class ContextualParametersProvider : IContextualParametersProvider
 
 public class DatabaseContextualParameter : IContextualParameter<long, DatabaseEntity>, ICustomPickerContextualParameter<long>, ITableAffectedByParameter
 {
-    private readonly IParameterPickerService pickerService;
-    private Dictionary<long, IParameter<long>> parameters = new();
-    private Dictionary<IParameter<long>, List<long>> reverseParameters = new();
-    private string column;
-    private IParameter<long> defaultParameter;
+    protected readonly IParameterPickerService pickerService;
+    protected Dictionary<long, IParameter<long>> parameters = new();
+    protected Dictionary<IParameter<long>, List<long>> reverseParameters = new();
+    protected string column;
+    protected IParameter<long> defaultParameter;
 
     public string DependantColumn => column;
 
@@ -146,6 +157,29 @@ public class DatabaseContextualParameter : IContextualParameter<long, DatabaseEn
     }
 
     public string AffectedByColumn => column;
+}
+
+public class AsyncDatabaseContextualParameter : DatabaseContextualParameter, IAsyncContextualParameter<long, DatabaseEntity>
+{
+    public AsyncDatabaseContextualParameter(IParameterFactory factory, IParameterPickerService pickerService, ContextualParameterSimpleSwitchJson simpleSwitch) : base(factory, pickerService, simpleSwitch)
+    {
+    }
+    
+    public async Task<string> ToStringAsync(long value, CancellationToken token, DatabaseEntity entity)
+    {
+        var parameter = defaultParameter;
+        var cell = entity.GetTypedValueOrThrow<long>(column);
+        if (parameters.TryGetValue(cell, out var _parameter))
+            parameter = _parameter;
+
+        if (parameter is IAsyncContextualParameter<long, DatabaseEntity> asyncContextualParameter)
+            return await asyncContextualParameter.ToStringAsync(value, token, entity);
+
+        if (parameter is IAsyncParameter<long> asyncParameter)
+            return await asyncParameter.ToStringAsync(value, token);
+        
+        return parameter.ToString(value);
+    }
 }
 
 public interface ITableAffectedByParameter
