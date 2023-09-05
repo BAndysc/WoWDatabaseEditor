@@ -41,7 +41,7 @@ namespace WoWDatabaseEditorCore.Services.ItemFromListSelectorService
                 var table = new TabularDataBuilder<KeyValuePair<long, SelectOption>>()
                     .SetTitle(title ?? "Pick")
                     .SetColumns(columns)
-                    .SetFilter((obj, search) => obj.Key.Contains(search) || obj.Value.Name.Contains(search, StringComparison.OrdinalIgnoreCase))
+                    .SetFilter((obj, search) => obj.Key.Contains(search) || obj.Value.Name.Contains(search, StringComparison.OrdinalIgnoreCase) || (obj.Value.Description != null && obj.Value.Description.Contains(search, StringComparison.OrdinalIgnoreCase)))
                     .SetExactMatchPredicate((obj, search) => obj.Key.Is(search) || !long.TryParse(search, out _))
                     .SetExactMatchCreator(text => new KeyValuePair<long, SelectOption>(long.Parse(text), new SelectOption("Pick non existing")))
                     .SetData(data.AsIndexedCollection());

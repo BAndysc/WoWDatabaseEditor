@@ -282,8 +282,10 @@ namespace WDE.DbcStore
                     parameterFactory.Register(key, 
                         new DbcParameterWithPicker<IArea>(dataPicker, data.AreaStore, "zone or area", area => area.Id,
                             () => store.Areas,
-                            (area, text) => area.Name.Contains(text, StringComparison.InvariantCultureIgnoreCase) || area.Id.Contains(text),
-                            (area, text) => area.Id.Is(text),
+                            (area, text) => area.Name.Contains(text, StringComparison.InvariantCultureIgnoreCase) || area.Id.Contains(text) || 
+                                area.MapId.Contains(text) || (area.Map != null && area.Map.Name.Contains(text, StringComparison.InvariantCultureIgnoreCase)) ||
+                                area.ParentAreaId.Contains(text) || (area.ParentArea != null && area.ParentArea.Name.Contains(text, StringComparison.InvariantCultureIgnoreCase)),
+                            (area, text) => area.Id.Is(text) || area.MapId.Is(text) || area.ParentAreaId.Is(text),
                             (text) =>
                             {
                                 if (!uint.TryParse(text, out var id))

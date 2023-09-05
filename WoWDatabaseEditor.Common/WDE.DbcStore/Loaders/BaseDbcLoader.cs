@@ -244,11 +244,11 @@ internal abstract class BaseDbcLoader : IDbcLoader
         if (areas.Count == 1)
         {
             if (data.AreaStore.TryGetValue(areas[0], out var name))
-                return name;
+                return string.Format("{0} [{1}]", name, areas[0]);
             return "Area " + areas[0];
         }
         
-        return string.Join(", ", areas.Select(area => data.AreaStore.TryGetValue(area, out var name) ? name : "Area " + area));
+        return string.Join(", ", areas.Select(area => data.AreaStore.TryGetValue(area, out var name) ? string.Format("{0} [{1}]", name, area) : "Area " + area));
     }
     
     protected string BuildAreaGroupName(DbcData data, IDbcIterator row, int start, int count)
