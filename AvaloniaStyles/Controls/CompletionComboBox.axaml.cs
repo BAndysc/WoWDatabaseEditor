@@ -107,6 +107,12 @@ namespace AvaloniaStyles.Controls
             set => SetValue(IsLightDismissEnabledProperty, value);
         }
         
+        public bool SetSelectedItemToNullBeforeCommit
+        {
+            get => GetValue(SetSelectedItemToNullBeforeCommitProperty);
+            set => SetValue(SetSelectedItemToNullBeforeCommitProperty, value);
+        }
+
         public static readonly StyledProperty<IDataTemplate?> ButtonItemTemplateProperty =
             AvaloniaProperty.Register<CompletionComboBox, IDataTemplate?>(nameof(ButtonItemTemplate));
         
@@ -150,6 +156,9 @@ namespace AvaloniaStyles.Controls
                 o => o.SelectedItem,
                 (o, v) => o.SelectedItem = v,
                 defaultBindingMode: BindingMode.TwoWay);
+        
+        public static readonly StyledProperty<bool> SetSelectedItemToNullBeforeCommitProperty =
+            AvaloniaProperty.Register<CompletionComboBox, bool>(nameof(SetSelectedItemToNullBeforeCommit));
 
         public static readonly StyledProperty<bool> IsLightDismissEnabledProperty =
             AvaloniaProperty.Register<CompletionComboBox, bool>(nameof (IsLightDismissEnabled), true);
@@ -428,11 +437,13 @@ namespace AvaloniaStyles.Controls
                 }
             }
         }
-        
+
         private void Commit(object? item)
         {
             if (SelectedItemExtractor != null)
                 item = SelectedItemExtractor(item);
+            if (SetSelectedItemToNullBeforeCommit)
+                SelectedItem = null;
             SelectedItem = item;
             Close();
         }
