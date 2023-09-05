@@ -25,7 +25,7 @@
             utils:DataGridColumns.ColumnsSource="{CompiledBinding  Columns}"
             Selection="{CompiledBinding Selection}"
             MultiSelect="{CompiledBinding MultiSelect}"
-            FocusedIndex="{CompiledBinding FocusedIndex}"
+            FocusedIndex="{CompiledBinding FocusedIndex, Mode=TwoWay}"
             CheckedIndices="{CompiledBinding CheckedIndices}"
             UseCheckBoxes="{CompiledBinding CheckBoxes}"
             Items="{CompiledBinding Items}"

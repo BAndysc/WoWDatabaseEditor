@@ -25,14 +25,13 @@ public class VirtualizedGridView : TemplatedControl
     private IIndexedCollection<object> items = IIndexedCollection<object>.Empty;
     public static readonly DirectProperty<VirtualizedGridView, IIndexedCollection<object>> ItemsProperty = AvaloniaProperty.RegisterDirect<VirtualizedGridView, IIndexedCollection<object>>(nameof(Items), o => o.Items, (o, v) => o.Items = v);
 
+    public static readonly StyledProperty<int?> FocusedIndexProperty = AvaloniaProperty.Register<VirtualizedGridView, int?>(nameof(FocusedIndex));
+    
     private IMultiIndexContainer selection = new MultiIndexContainer();
     public static readonly DirectProperty<VirtualizedGridView, IMultiIndexContainer> SelectionProperty = AvaloniaProperty.RegisterDirect<VirtualizedGridView, IMultiIndexContainer>(nameof(Selection), o => o.Selection, (o, v) => o.Selection = v, new MultiIndexContainer(), BindingMode.OneWay);
 
     private IMultiIndexContainer checkedIndices = new MultiIndexContainer();
     public static readonly DirectProperty<VirtualizedGridView, IMultiIndexContainer> CheckedIndicesProperty = AvaloniaProperty.RegisterDirect<VirtualizedGridView, IMultiIndexContainer>(nameof(CheckedIndices), o => o.CheckedIndices, (o, v) => o.CheckedIndices = v, new MultiIndexContainer(), BindingMode.OneWay);
-
-    private int? focusedIndex;
-    public static readonly DirectProperty<VirtualizedGridView, int?> FocusedIndexProperty = AvaloniaProperty.RegisterDirect<VirtualizedGridView, int?>(nameof(FocusedIndex), o => o.FocusedIndex, (o, v) => o.FocusedIndex = v, -1, BindingMode.TwoWay);
 
     private IEnumerable<GridColumnDefinition> columns = new AvaloniaList<GridColumnDefinition>();
     public static readonly DirectProperty<VirtualizedGridView, IEnumerable<GridColumnDefinition>> ColumnsProperty =
@@ -53,6 +52,17 @@ public class VirtualizedGridView : TemplatedControl
         remove => RemoveHandler(ColumnWidthChangedEvent, value);
     }
     
+    public int? FocusedIndex
+    {
+        get
+        {
+            var index = GetValue(FocusedIndexProperty);
+            if (!IsIndexValid(index))
+                return null;
+            return index;
+        }
+        set => SetValue(FocusedIndexProperty, value);
+    }
     public double ItemHeight
     {
         get => itemHeight;
@@ -77,12 +87,6 @@ public class VirtualizedGridView : TemplatedControl
         set => SetAndRaise(CheckedIndicesProperty, ref checkedIndices, value);
     }
 
-    public int? FocusedIndex
-    {
-        get => focusedIndex;
-        set => SetAndRaise(FocusedIndexProperty, ref focusedIndex, value);
-    }
-    
     public bool MultiSelect
     {
         get => multiSelect;
@@ -120,11 +124,11 @@ public class VirtualizedGridView : TemplatedControl
             int index;
             if (e.Key == Key.Up)
             {
-                index = IsIndexValid(focusedIndex) ? ClampIndex(focusedIndex!.Value - 1) : ClampIndex(Items.Count - 1);
+                index = IsIndexValid(FocusedIndex) ? ClampIndex(FocusedIndex!.Value - 1) : ClampIndex(Items.Count - 1);
             }
             else
             {
-                index = IsIndexValid(focusedIndex) ? ClampIndex(focusedIndex!.Value + 1) : ClampIndex(0);
+                index = IsIndexValid(FocusedIndex) ? ClampIndex(FocusedIndex!.Value + 1) : ClampIndex(0);
             }
             if (IsIndexValid(index))
                 UpdateSelectionFromIndex(rangeModifier, toggleModifier, index);
@@ -246,7 +250,7 @@ public class VirtualizedGridView : TemplatedControl
 
         if (rangeModifier)
         {
-            var oldFocusedIndex = Math.Max(0, focusedIndex ?? 0);
+            var oldFocusedIndex = Math.Max(0, FocusedIndex ?? 0);
             if (oldFocusedIndex < index)
             {
                 for (int i = oldFocusedIndex; i <= index; ++i)
@@ -290,4 +294,5 @@ public class VirtualizedGridView : TemplatedControl
     }
     
     private ScrollViewer? ScrollViewer => this.FindDescendantOfType<ScrollViewer>();
+
 }

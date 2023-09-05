@@ -23,9 +23,6 @@ public class VirtualizedGridViewItemPresenter : Panel
     
     private IIndexedCollection<object>? items = IIndexedCollection<object>.Empty;
     public static readonly DirectProperty<VirtualizedGridViewItemPresenter, IIndexedCollection<object>?> ItemsProperty = AvaloniaProperty.RegisterDirect<VirtualizedGridViewItemPresenter, IIndexedCollection<object>?>(nameof(Items), o => o.Items, (o, v) => o.Items = v);
-
-    private int? focusedIndex;
-    public static readonly DirectProperty<VirtualizedGridViewItemPresenter, int?> FocusedIndexProperty = AvaloniaProperty.RegisterDirect<VirtualizedGridViewItemPresenter, int?>(nameof(FocusedIndex), o => o.FocusedIndex, (o, v) => o.FocusedIndex = v);
     
     private IMultiIndexContainer selection = new MultiIndexContainer();
     public static readonly DirectProperty<VirtualizedGridViewItemPresenter, IMultiIndexContainer> SelectionProperty = AvaloniaProperty.RegisterDirect<VirtualizedGridViewItemPresenter, IMultiIndexContainer>(nameof(Selection), o => o.Selection, (o, v) => o.Selection = v, new MultiIndexContainer(), BindingMode.OneWay);
@@ -37,6 +34,8 @@ public class VirtualizedGridViewItemPresenter : Panel
     public static readonly DirectProperty<VirtualizedGridViewItemPresenter, IEnumerable<GridColumnDefinition>> ColumnsProperty =
         AvaloniaProperty.RegisterDirect<VirtualizedGridViewItemPresenter, IEnumerable<GridColumnDefinition>>(nameof(Columns), o => o.Columns, (o, v) => o.Columns = v);
 
+    public static readonly StyledProperty<int?> FocusedIndexProperty = AvaloniaProperty.Register<VirtualizedGridViewItemPresenter, int?>(nameof(FocusedIndex));
+    
     private bool useCheckBoxes;
     public static readonly DirectProperty<VirtualizedGridViewItemPresenter, bool> UseCheckBoxesProperty = AvaloniaProperty.RegisterDirect<VirtualizedGridViewItemPresenter, bool>(nameof(UseCheckBoxes), o => o.UseCheckBoxes, (o, v) => o.UseCheckBoxes = v);
 
@@ -151,11 +150,11 @@ public class VirtualizedGridViewItemPresenter : Panel
 
     private void AutoScrollToFocusedIndex()
     {
-        if (ScrollViewer is not { } scrollViewer || !focusedIndex.HasValue)
+        if (ScrollViewer is not { } scrollViewer || !FocusedIndex.HasValue)
             return;
         
         var visibleRect = new Rect(new Point(scrollViewer.Offset.X, scrollViewer.Offset.Y), scrollViewer.Viewport);
-        var itemRect = new Rect(0, focusedIndex.Value * itemHeight, scrollViewer.Viewport.Width, itemHeight);
+        var itemRect = new Rect(0, FocusedIndex.Value * itemHeight, scrollViewer.Viewport.Width, itemHeight);
 
         if (visibleRect.Contains(itemRect))
             return;
@@ -180,8 +179,14 @@ public class VirtualizedGridViewItemPresenter : Panel
     
     public int? FocusedIndex
     {
-        get => focusedIndex;
-        set => SetAndRaise(FocusedIndexProperty, ref focusedIndex, value);
+        get
+        {
+            var index = GetValue(FocusedIndexProperty);
+            if (!IsIndexValid(index))
+                return null;
+            return index;
+        }
+        set => SetValue(FocusedIndexProperty, value);
     }
 
     public IMultiIndexContainer Selection
@@ -338,6 +343,8 @@ public class VirtualizedGridViewItemPresenter : Panel
         grid.ColumnDefinitions.Add(new ColumnDefinition(GridView.SplitterWidth, GridUnitType.Pixel));
     }
 
+    private bool IsIndexValid(int? index) => index != null && index >= 0 && index < items?.Count;
+    
     private IDisposable visualTreeSubscription = Disposable.Empty;
     ScrollViewer? ScrollViewer => this.FindAncestorOfType<ScrollViewer>();
 }

@@ -48,7 +48,7 @@
                                                                           HorizontalAlignment="Left"
                                                                           MaxWidth="10000"
                                                                           ItemHeight="{TemplateBinding ItemHeight}"
-                                                                          FocusedIndex="{TemplateBinding FocusedIndex}"
+                                                                          FocusedIndex="{TemplateBinding FocusedIndex, Mode=TwoWay}"
                                                                           Selection="{TemplateBinding Selection}"
                                                                           CheckedIndices="{TemplateBinding CheckedIndices}"
                                                                           UseCheckBoxes="{TemplateBinding UseCheckBoxes}"
