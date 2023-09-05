@@ -38,6 +38,9 @@
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
-        <TextBox Name="SearchTextBox" Padding="8,0" MinHeight="22" Watermark="Search in script" Text="{CompiledBinding SearchText}" />
+        <TextBox Name="SearchTextBox" Padding="8,0" MinHeight="22" MinWidth="150" Watermark="Search in script" Text="{CompiledBinding SearchText}" />
+        <Button Padding="2" Background="Transparent" BorderBrush="{x:Null}" ToolTip.Tip="Clear search" Command="{CompiledBinding ClearSearchCommand}">
+            <WdeImage ImageUri="Icons/icon_close.png" Width="12" Height="12"></WdeImage>
+        </Button>
     </ToolbarPanel>
 </UserControl>

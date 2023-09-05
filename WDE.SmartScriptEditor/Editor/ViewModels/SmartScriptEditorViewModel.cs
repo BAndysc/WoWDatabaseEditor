@@ -80,6 +80,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         
         public ISmartHeaderViewModel? HeaderViewModel { get; private set; }
 
+        public DelegateCommand ClearSearchCommand { get; }
+
         public ImageUri? Icon { get; }
 
         private bool isLoading = true;
@@ -197,6 +199,11 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 {
                     RecolorEvent(e);
                 }
+            });
+            
+            ClearSearchCommand = new DelegateCommand(() => 
+            {
+                SearchText = "";
             });
 
             ExtensionCommands = editorExtension.Commands?.ToList() ?? new List<SmartExtensionCommand>();
