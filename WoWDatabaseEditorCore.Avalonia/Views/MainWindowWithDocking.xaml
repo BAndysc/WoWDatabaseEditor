@@ -142,7 +142,7 @@
                             </CompletionComboBox.ItemTemplate>
                         </CompletionComboBox>
                         <TextBlock Opacity="0.6" FontSize="9" VerticalAlignment="Center">Type:</TextBlock>
-                        <ComboBox Width="100" Items="{CompiledBinding Providers}" SelectedItem="{CompiledBinding SelectedProvider}">
+                        <ComboBox Items="{CompiledBinding Providers}" SelectedItem="{CompiledBinding SelectedProvider}">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{CompiledBinding Name}"/>
