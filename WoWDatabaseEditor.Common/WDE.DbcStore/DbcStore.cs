@@ -204,6 +204,7 @@ namespace WDE.DbcStore
                 store.ScenarioToStepStore = data.ScenarioToStepStore;
                 store.BattlePetSpeciesIdStore = data.BattlePetSpeciesIdStore;
                 store.Areas = data.Areas;
+                store.CharShipmentContainers = data.CharShipmentContainers;
                 store.AreaById = data.Areas.ToDictionary(a => a.Id, a => (IArea)a);
                 store.Maps = data.Maps;
                 store.MapById = data.Maps.ToDictionary(a => a.Id, a => (IMap)a);
