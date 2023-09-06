@@ -271,6 +271,9 @@ namespace WDE.DbcStore
                 parameterFactory.Register("GarrisonClassSpecParameter", new DbcParameter(data.GarrisonClassSpecStore));
                 parameterFactory.Register("GarrisonBuildingParameter", new DbcParameter(data.GarrisonBuildingStore));
                 parameterFactory.Register("GarrisonTalentParameter", new DbcParameter(data.GarrisonTalentStore));
+                parameterFactory.Register("GarrisonTalentHasOrHasNotParameter", new DbcParameter(data.GarrisonTalentStore.Select(x => new KeyValuePair<long, string>(x.Key, "has " + x.Value))
+                    .Concat(data.GarrisonTalentStore.Select(x => new KeyValuePair<long, string>(-x.Key, "doesn't have " + x.Value)))
+                    .ToDictionary(x => x.Key, x => x.Value)));
                 parameterFactory.Register("GarrisonMissionParameter", new DbcParameter(data.GarrisonMissionStore));
                 parameterFactory.Register("DifficultyParameter", new DbcParameter(data.DifficultyStore));
                 parameterFactory.Register("LockTypeParameter", new DbcParameter(data.LockTypeStore));
