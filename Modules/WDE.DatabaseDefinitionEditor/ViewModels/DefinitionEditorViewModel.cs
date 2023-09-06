@@ -56,8 +56,6 @@ public partial class DefinitionEditorViewModel : ObservableBase
 
     [Notify] private int selectedCellIndex;
 
-    [Notify] private DefinitionSourceViewModel? selectedDefinitionSource;
-    
     [Notify] private bool showIntroTip;
 
     public ICommand CreateEmptyTableCommand { get; }
@@ -113,7 +111,41 @@ public partial class DefinitionEditorViewModel : ObservableBase
             messageBoxService.WrapError(() => SaveAndRefreshPreview(oldStub, value, refreshInProgress.Token)).ListenErrors();
         }
     }
+    
+    private DefinitionSourceViewModel? selectedDefinitionSource;
+    public DefinitionSourceViewModel? SelectedDefinitionSource
+    {
+        get => selectedDefinitionSource;
+        set
+        {
+            if (waitingForDefinitionChange)
+                return;
 
+            var oldStub = selectedDefinition;
+            var oldSource = selectedDefinitionSource;
+            SetProperty(ref selectedDefinitionSource, value);
+            
+            refreshInProgress?.Cancel();
+            refreshInProgress = new CancellationTokenSource();
+            messageBoxService.WrapError(async () =>
+            {
+                if (!await SaveAndRefreshPreview(oldStub, null, refreshInProgress.Token))
+                {
+                    SetProperty(ref selectedDefinitionSource, oldSource);
+                }
+                else
+                {
+                    allDefinitions.Clear();
+                    if (value != null)
+                        allDefinitions.AddRange(value.Definitions.OrderBy(x => x.TableName));
+                    SelectedDefinition = null;
+                    SelectedTable = null;
+                    DoSearch();   
+                }
+            }).ListenErrors();
+        }
+    }
+    
     public ObservableCollectionExtended<ColumnValueTypeViewModel> AllParameters { get; } = new();
     
     public AsyncAutoCommand<ColumnViewModel> PickParameterCommand { get; }
@@ -181,16 +213,6 @@ public partial class DefinitionEditorViewModel : ObservableBase
                     SelectedTable.SelectedColumnOrGroup = (ColumnViewModel)SelectedTable.ColumnsPreview[x];
             });
         
-        On(() => SelectedDefinitionSource, def =>
-        {
-            allDefinitions.Clear();
-            if (def != null)
-                allDefinitions.AddRange(def.Definitions.OrderBy(x => x.TableName));
-            SelectedDefinition = null;
-            SelectedTable = null;
-            DoSearch();
-        });
-
         AllParameters.Add(ColumnValueTypeViewModel.FromValueType("long", true));
         AllParameters.Add(ColumnValueTypeViewModel.FromValueType("ulong", true));
         AllParameters.Add(ColumnValueTypeViewModel.FromValueType("int", true));
@@ -331,7 +353,7 @@ public partial class DefinitionEditorViewModel : ObservableBase
     
     private CancellationTokenSource? refreshInProgress;
 
-    private async Task SaveAndRefreshPreview(DefinitionStubViewModel? old, DefinitionStubViewModel? definition,CancellationToken cancel)
+    private async Task<bool> SaveAndRefreshPreview(DefinitionStubViewModel? old, DefinitionStubViewModel? definition,CancellationToken cancel)
     {
         waitingForDefinitionChange = true;
         try
@@ -340,7 +362,7 @@ public partial class DefinitionEditorViewModel : ObservableBase
             {
                 selectedDefinition = old;
                 RaisePropertyChanged(nameof(SelectedDefinition));
-                return;
+                return false;
             }
 
             await RefreshPreview(definition?.Definition, definition, cancel);
@@ -349,6 +371,8 @@ public partial class DefinitionEditorViewModel : ObservableBase
         {
             waitingForDefinitionChange = false;
         }
+
+        return true;
     }
     
     private async Task<bool> RefreshPreview(DatabaseTableDefinitionJson? json, DefinitionStubViewModel? definition, CancellationToken cancel)
