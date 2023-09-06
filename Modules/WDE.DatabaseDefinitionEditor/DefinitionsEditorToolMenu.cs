@@ -13,7 +13,7 @@ namespace WDE.DatabaseDefinitionEditor;
 [AutoRegister]
 public class DefinitionsEditorToolMenu : IToolMenuItem
 {
-    private readonly Func<ToolsViewModel> creator;
+    private readonly Func<StandaloneDefinitionEditorViewModel> creator;
     private readonly Lazy<IWindowManager> windowManager;
     public string ItemName => "Table definitions editor";
     public ICommand ItemCommand { get; }
@@ -21,7 +21,7 @@ public class DefinitionsEditorToolMenu : IToolMenuItem
 
     private IAbstractWindowView? openedWindow;
     
-    public DefinitionsEditorToolMenu(Func<ToolsViewModel> creator,
+    public DefinitionsEditorToolMenu(Func<StandaloneDefinitionEditorViewModel> creator,
         Lazy<IWindowManager> windowManager)
     {
         this.creator = creator;
@@ -38,7 +38,6 @@ public class DefinitionsEditorToolMenu : IToolMenuItem
     private async Task OpenNewWindow()
     {
         var vm = creator();
-        vm.ConfigurableOpened();
         openedWindow = windowManager.Value.ShowWindow(vm, out var task);
         await task;
         openedWindow = null;

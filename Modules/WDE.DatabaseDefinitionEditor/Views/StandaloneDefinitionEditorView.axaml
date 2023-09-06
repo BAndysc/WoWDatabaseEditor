@@ -1,0 +1,16 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:WDE.DatabaseDefinitionEditor.ViewModels"
+             xmlns:views="clr-namespace:WDE.DatabaseDefinitionEditor.Views"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:StandaloneDefinitionEditorViewModel"
+             x:Class="WDE.DatabaseDefinitionEditor.Views.StandaloneDefinitionEditorView">
+  <DockPanel>
+    <OkCancelButtons AcceptCommand="{CompiledBinding  ToolsViewModel.Save}" AcceptText="Save" CancelCommand="{CompiledBinding CloseWindow}" DockPanel.Dock="Bottom">
+      
+    </OkCancelButtons>
+    <views:DefinitionToolView  DataContext="{CompiledBinding ToolsViewModel}"/>
+  </DockPanel>
+</UserControl>

@@ -300,7 +300,7 @@ public partial class DefinitionEditorViewModel : ObservableBase
         return !exported.Equals(definition.DefinitionStub.Definition);
     }
 
-    private async Task<bool> EnsureSaved()
+    public async Task<bool> EnsureSaved()
     {
         if (selectedTable == null)
             return true;
