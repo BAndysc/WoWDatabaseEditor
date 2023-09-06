@@ -1,6 +1,7 @@
 using System.Text;
 using WDE.Common.DBC;
 using WDE.Common.DBC.Structs;
+using WDE.Common.Parameters;
 using WDE.Common.Tasks;
 using WDE.Common.Utils;
 using WDE.DbcStore.Providers;
@@ -22,7 +23,7 @@ internal class LegionDbcLoader : BaseDbcLoader
     public override DBCVersions Version => DBCVersions.LEGION_26972;
 
     public override int StepsCount => 42;
-    
+
     protected override void LoadDbcCore(DbcData data, ITaskProgress progress)
     {
         Load("CriteriaTree.db2", 0, 1, data.AchievementCriteriaStore);
@@ -45,7 +46,7 @@ internal class LegionDbcLoader : BaseDbcLoader
         {
             uint Id = row.GetUInt(0);
             uint BroadcastTextId = row.GetUInt(1);
-           // var broadcastText = await database.GetBroadcastTextByIdAsync(BroadcastTextId); TODO
+            // var broadcastText = await database.GetBroadcastTextByIdAsync(BroadcastTextId); TODO
             data.ConversationLineStore.Add(Id, BroadcastTextId.ToString());
         });
 
@@ -89,7 +90,7 @@ internal class LegionDbcLoader : BaseDbcLoader
                 {
                     if (!data.ItemStore.TryGetValue(item, out var itemName))
                         itemName = "item " + item;
-                    
+
                     if (itemsCount == 1)
                         desc.Append($"{itemName}, ");
                     else
@@ -106,10 +107,10 @@ internal class LegionDbcLoader : BaseDbcLoader
         Load("ItemSet.db2", 0, 1, data.ItemSetStore);
         Load("LFGDungeons.db2", 0, 1, data.LFGDungeonStore);
         Load("chrRaces.db2", 30, 2, data.RaceStore);
-        Load("achievement.db2", row =>  data.AchievementStore.Add(row.GetInt(12), row.GetString(0)));
+        Load("achievement.db2", row => data.AchievementStore.Add(row.GetInt(12), row.GetString(0)));
         Load("spell.db2", row => data.SpellStore.Add(row.Key, row.GetString(1)));
         Load("chrClasses.db2", 19, 1, data.ClassStore);
-        
+
         Load("Emotes.db2", row =>
         {
             var id = row.Key;
@@ -121,7 +122,7 @@ internal class LegionDbcLoader : BaseDbcLoader
                 data.EmoteStateStore.Add(id, name);
             data.EmoteStore.Add(id, name);
         });
-        
+
         Load("EmotesText.db2", 0, 1, data.TextEmoteStore);
         Load("HolidayNames.db2", 0, 1, data.HolidayNamesStore);
         Load("Holidays.db2", row =>
@@ -174,8 +175,8 @@ internal class LegionDbcLoader : BaseDbcLoader
         LoadAndRegister(data, "SpellRange.db2", "SpellRangeParameter", 0, 1);
         LoadAndRegister(data, "SpellRadius.db2", "SpellRadiusParameter", 0, row => GetRadiusDescription(row.GetFloat(1), row.GetFloat(2), row.GetFloat(4)));
         Load("SpellItemEnchantment.db2", 0, 1, data.SpellItemEnchantmentStore);
-        Load("TaxiNodes.db2",  0, 1, data.TaxiNodeStore);
-        Load("TaxiPath.db2",  row => data.TaxiPathsStore.Add(row.GetInt(2), (row.GetUShort(0), row.GetUShort(1))));
+        Load("TaxiNodes.db2", 0, 1, data.TaxiNodeStore);
+        Load("TaxiPath.db2", row => data.TaxiPathsStore.Add(row.GetInt(2), (row.GetUShort(0), row.GetUShort(1))));
         Load("SceneScriptPackage.db2", 0, 1, data.SceneStore);
         Load("BattlePetSpecies.db2", 8, 2, data.BattlePetSpeciesIdStore);
         Load("BattlePetAbility.db2", 0, 1, data.BattlePetAbilityStore);
@@ -218,5 +219,20 @@ internal class LegionDbcLoader : BaseDbcLoader
         });
         Load("AdventureJournal.db2", 0, 1, data.AdventureJournalStore);
         Load("WorldMapArea.db2", 15, 0, data.WorldMapAreaStore);
+        Load("CharShipmentContainer.db2", row =>
+        {
+            var shipment = new CharShipmentContainerEntry()
+            {
+                Id = row.Key,
+                Name = row.GetString(1),
+                Description = row.GetString(2),
+            };
+            string name = shipment.Name;
+            if (name == "")
+                name = shipment.Description != "" ? shipment.Description : "- no name -";
+
+            data.CharShipmentContainerStore[row.Key] = name;
+            data.CharShipmentContainers.Add(shipment);
+        });
     }
 }

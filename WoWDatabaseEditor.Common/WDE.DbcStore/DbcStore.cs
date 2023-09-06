@@ -135,7 +135,10 @@ namespace WDE.DbcStore
         
         public IReadOnlyList<Faction> Factions { get; internal set; } = Array.Empty<Faction>();
         public Dictionary<ushort, Faction> FactionsById { get; internal set; } = new();
-        
+
+        public IReadOnlyList<ICharShipmentContainer> CharShipmentContainers { get; internal set; } = Array.Empty<ICharShipmentContainer>();
+        public Dictionary<ushort, ICharShipmentContainer> CharShipmentContainerById { get; internal set; } = new();
+
         public IArea? GetAreaById(uint id) => AreaById.TryGetValue(id, out var area) ? area : null;
         public IMap? GetMapById(uint id) => MapById.TryGetValue(id, out var map) ? map : null;
         public FactionTemplate? GetFactionTemplate(uint templateId) => FactionTemplateById.TryGetValue(templateId, out var faction) ? faction : null;
@@ -276,6 +279,28 @@ namespace WDE.DbcStore
                 parameterFactory.Register("LockParameter", new WoWToolsParameter("lock", store.currentCoreVersion, store.windowManager));
                 parameterFactory.Register("WorldMapAreaParameter", new DbcParameter(data.WorldMapAreaStore));
                 parameterFactory.Register("ConversationLineParameter", new DbcParameter(data.ConversationLineStore));
+
+                void RegisterCharShipmentContainerParameter(string key, TabularDataAsyncColumn<uint>? counterColumn = null)
+                {
+                    parameterFactory.Register(key,
+                        new DbcParameterWithPicker<ICharShipmentContainer>(dataPicker, data.CharShipmentContainerStore, "shipment container", container => container.Id,
+                        () => store.CharShipmentContainers,
+                        (container, text) => container.Name.Contains(text, StringComparison.InvariantCultureIgnoreCase) ||
+                            container.Id.Contains(text) ||
+                            container.Description.Contains(text, StringComparison.InvariantCultureIgnoreCase),
+                        (container, text) => container.Id.Is(text),
+                        (text) =>
+                        {
+                            if (!uint.TryParse(text, out var id))
+                                return null;
+                            return new CharShipmentContainerEntry() { Id = id, Name = "Pick non existing" };
+                        },
+                        new TabularDataColumn(nameof(ICharShipmentContainer.Id), "Entry", 60),
+                        new TabularDataColumn(nameof(ICharShipmentContainer.Name), "Name", 160),
+                        new TabularDataColumn(nameof(ICharShipmentContainer.Description), "Description", 200),
+                        counterColumn), QuickAccessMode.Full);
+                }
+                RegisterCharShipmentContainerParameter("CharShipmentContainerParameter");
 
                 void RegisterZoneAreParameter(string key, TabularDataAsyncColumn<uint>? counterColumn = null)
                 {

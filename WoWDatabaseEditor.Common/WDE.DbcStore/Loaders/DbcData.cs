@@ -74,4 +74,6 @@ public class DbcData
     public List<MapEntry> Maps { get; } = new();
     public List<FactionTemplate> FactionTemplates { get; } = new();
     public List<Faction> Factions { get; } = new();
+    public Dictionary<long, string> CharShipmentContainerStore { get; } = new();
+    public List<CharShipmentContainerEntry> CharShipmentContainers { get; } = new();
 }
