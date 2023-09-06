@@ -513,6 +513,8 @@ namespace WDE.DbcStore
         private readonly Func<string, T?> exactMatchCreator;
         private readonly ITabularDataColumn[] columns;
 
+        public bool NeverUseComboBoxPicker => true;
+
         public DbcParameterWithPicker(ITabularDataPicker dataPicker,
             Dictionary<long, string> storage,
             string dbc,

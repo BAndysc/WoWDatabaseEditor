@@ -59,6 +59,8 @@ namespace WDE.DatabaseEditors.Models
                 return parameter.Items;
             }
         }
+        
+        public bool NeverUseComboBoxPicker => Parameter.NeverUseComboBoxPicker;
 
         public IParameter BaseParameter => parameter;
 

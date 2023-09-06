@@ -10,6 +10,7 @@ namespace WDE.Common.Parameters
         string? Prefix { get; }
         bool HasItems { get; }
         bool AllowUnknownItems => false;
+        bool NeverUseComboBoxPicker => false;
         Func<Task<object?>>? SpecialCommand => null;
     }
     

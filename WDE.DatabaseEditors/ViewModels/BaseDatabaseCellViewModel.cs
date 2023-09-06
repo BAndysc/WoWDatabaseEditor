@@ -156,8 +156,8 @@ namespace WDE.DatabaseEditors.ViewModels
         public bool HasItems => ParameterValue?.BaseParameter.HasItems ?? false;
 
         public bool UseItemPicker =>
-            (ParameterValue is IParameterValue<long> vm) && vm.Items != null && vm.Items.Count < 300 ||
-            (ParameterValue is IParameterValue<string> vm2) && vm2.Items != null && vm2.Items.Count < 300;
+            (ParameterValue is IParameterValue<long> vm) && !vm.BaseParameter.NeverUseComboBoxPicker && vm.Items != null && vm.Items.Count < 300 ||
+            (ParameterValue is IParameterValue<string> vm2) && !vm2.BaseParameter.NeverUseComboBoxPicker && vm2.Items != null && vm2.Items.Count < 300;
         public bool UseFlagsPicker => (ParameterValue is IParameterValue<long> vm) && vm.Parameter.HasItems && vm.Parameter is FlagParameter;
     }
 }

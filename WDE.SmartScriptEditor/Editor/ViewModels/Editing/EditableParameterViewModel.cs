@@ -89,7 +89,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
         
         public bool IsHidden => Parameter.ForceHidden || !(Parameter.IsUsed || IsValueNonEmpty);
 
-        public bool UseModernPicker => HasItems && Parameter.Parameter.Items != null && Parameter is MultiParameterValueHolder<long> && Parameter.Parameter.Items!.Count < 1000;
+        public bool UseModernPicker => HasItems && Parameter.Parameter.Items != null && !Parameter.Parameter.NeverUseComboBoxPicker && Parameter is MultiParameterValueHolder<long> && Parameter.Parameter.Items!.Count < 1000;
 
         public ParameterOption? OptionValue
         {

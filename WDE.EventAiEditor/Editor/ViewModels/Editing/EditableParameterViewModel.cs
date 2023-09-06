@@ -80,7 +80,7 @@ namespace WDE.EventAiEditor.Editor.ViewModels.Editing
         
         public bool IsHidden => Parameter.ForceHidden || !Parameter.IsUsed && (Parameter is not ParameterValueHolder<long> p || p.Value == 0);
 
-        public bool UseModernPicker => HasItems && Parameter.Parameter.Items != null && Parameter is ParameterValueHolder<long> && Parameter.Parameter.Items!.Count < 1000;
+        public bool UseModernPicker => HasItems && Parameter.Parameter.Items != null && !Parameter.Parameter.NeverUseComboBoxPicker && Parameter is ParameterValueHolder<long> && Parameter.Parameter.Items!.Count < 1000;
 
         public ParameterOption? OptionValue
         {
