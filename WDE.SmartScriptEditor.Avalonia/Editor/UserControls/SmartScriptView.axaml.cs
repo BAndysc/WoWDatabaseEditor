@@ -94,7 +94,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
                     {
                         AddMenuItem("Copy coords", new DelegateCommand(() =>
                         {
-                            var coords = $"{sourceOrTarget.X}, {sourceOrTarget.Y}, {sourceOrTarget.Z}, {sourceOrTarget.O}";
+                            var coords = $"{sourceOrTarget.X} {sourceOrTarget.Y} {sourceOrTarget.Z} {sourceOrTarget.O}";
                             AvaloniaLocator.Current.GetRequiredService<IClipboard>().SetTextAsync(coords).ListenErrors();
                         }));
                         anythingAdded = true;   
