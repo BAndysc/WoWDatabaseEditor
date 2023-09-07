@@ -118,5 +118,27 @@ namespace WDE.Common.Database
             PlayerVehicle        = 0x02000000,
             Mailbox               = 0x04000000
         }
+        
+        [Flags]
+        public enum NpcFlags2 : long
+        {
+            None                        = 0x00000000,
+            ItemUpgradeMaster           = 0x00000001,
+            GarrisonArchitect           = 0x00000002,
+            Steering                    = 0x00000004,
+            AreaSpiritHealerIndividual  = 0x00000008,
+            ShipmentCrafter             = 0x00000010,
+            GarrisonMissionNPC          = 0x00000020,
+            TradeSkillNPC               = 0x00000040,
+            BlackMarketView             = 0x00000080,
+            FollowerRecruiter           = 0x00000100,
+            OrderHallTechTree           = 0x00000200,
+            ContributionCollector       = 0x00000400,
+            ArgusTeleporter             = 0x00000800,
+            UIItemInteraction           = 0x00001000,
+            AzeriteRespec               = 0x00004000,
+            IslandQueue                 = 0x00008000,
+            SupressNPCSounds            = 0x00010000,
+        }
     }
 }
