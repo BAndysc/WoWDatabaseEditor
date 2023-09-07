@@ -144,6 +144,8 @@ namespace WDE.DbcStore
         public FactionTemplate? GetFactionTemplate(uint templateId) => FactionTemplateById.TryGetValue(templateId, out var faction) ? faction : null;
         public Faction? GetFaction(ushort factionId) => FactionsById.TryGetValue(factionId, out var faction) ? faction : null;
         
+        public IReadOnlyList<ICharShipment> CharShipments { get; set; } = Array.Empty<ICharShipment>();
+        
         internal void Load()
         {            
             parameterFactory.Register("RaceMaskParameter", new RaceMaskParameter(currentCoreVersion.Current.GameVersionFeatures.AllRaces), QuickAccessMode.Limited);
@@ -212,7 +214,19 @@ namespace WDE.DbcStore
                 store.FactionTemplateById = data.FactionTemplates.ToDictionary(a => a.TemplateId, a => (FactionTemplate)a);
                 store.Factions = data.Factions;
                 store.FactionsById = data.Factions.ToDictionary(a => a.FactionId, a => a);
+                store.CharShipments = data.CharShipments;
 
+                var followerById = data.GarrisonFollowers.ToDictionary(x => x.Id, x => x);
+                var containersById = data.CharShipmentContainers.ToDictionary(x => x.Id, x => x);
+                
+                foreach (var shipment in data.CharShipments)
+                {
+                    if (followerById.TryGetValue(shipment.GarrisonFollowerId, out var follower))
+                        shipment.Follower = follower;
+                    if (containersById.TryGetValue(shipment.ContainerId, out var container))
+                        shipment.Container = container;
+                }
+                
                 foreach (var (parameterName, options) in data.parametersToRegister)
                 {
                     parameterFactory.Register(parameterName, new Parameter()
@@ -284,6 +298,9 @@ namespace WDE.DbcStore
                 parameterFactory.Register("WorldMapAreaParameter", new DbcParameter(data.WorldMapAreaStore));
                 parameterFactory.Register("ConversationLineParameter", new DbcParameter(data.ConversationLineStore));
 
+                parameterFactory.RegisterCombined("CharShipmentParameter", "SpellParameter", "CreatureParameter", "ItemParameter",
+                    (spells, creatures, items) => new CharShipmentParameter(dataPicker, store.CharShipments, spells, creatures, items), QuickAccessMode.Limited);
+                
                 void RegisterCharShipmentContainerParameter(string key, TabularDataAsyncColumn<uint>? counterColumn = null)
                 {
                     parameterFactory.Register(key,
@@ -528,6 +545,112 @@ namespace WDE.DbcStore
         {
             windowManager.OpenUrl($"https://wow.tools/dbc/?dbc={dbcName}&build={buildString}#page=1&colFilter[0]=exact%3A{value}");
             return Task.FromResult((0L, false));
+        }
+    }
+
+    public class CharShipmentParameter : DbcParameter, ICustomPickerParameter<long>
+    {
+        private readonly ITabularDataPicker dataPicker;
+        private readonly IParameter<long> spells;
+        private readonly IParameter<long> creatures;
+        private readonly IParameter<long> items;
+        private readonly IIndexedCollection<ICharShipment> data;
+        private readonly ITabularDataColumn[] columns;
+
+        public bool NeverUseComboBoxPicker => true;
+
+        public CharShipmentParameter(ITabularDataPicker dataPicker,
+            IReadOnlyList<ICharShipment> data,
+            IParameter<long> spells, 
+            IParameter<long> creatures, 
+            IParameter<long> items) : base(data.ToDictionary(x => (long)x.Id, x =>
+        {
+            if (x.DummyItemId > 0)
+                return items.ToString(x.DummyItemId, ToStringOptions.WithoutNumber);
+            if (x.SpellId > 0)
+                return spells.ToString(x.SpellId, ToStringOptions.WithoutNumber).Replace("Create ", "").TrimStart();
+            return "";
+        }))
+        {
+            this.dataPicker = dataPicker;
+            this.spells = spells;
+            this.creatures = creatures;
+            this.items = items;
+            this.data = data.AsIndexedCollection();
+            columns = new ITabularDataColumn[]
+            {
+                new TabularDataColumn(nameof(ICharShipment.Id), "Entry", 60), 
+                new TabularDataColumn(nameof(ICharShipment.TreasureId), "Treasure id", 60), 
+                new TabularDataSyncColumn<uint>(nameof(ICharShipment.SpellId), "Spell", (spellId) => spells.ToString(spellId), 160), 
+                new TabularDataSyncColumn<uint>(nameof(ICharShipment.DummyItemId), "Dummy item", (itemId) => items.ToString(itemId), 160), 
+                new TabularDataSyncColumn<uint>(nameof(ICharShipment.OnCompleteSpellId), "On complete spell", (spellId) => spells.ToString(spellId), 160), 
+                new TabularDataSyncColumn<IGarrisonFollower>(nameof(ICharShipment.Follower), "Follower",  (follower) =>
+                {
+                    if (follower.HordeCreatureEntry == follower.AllianceCreatureEntry)
+                    {
+                        var name = creatures.ToString(follower.HordeCreatureEntry, ToStringOptions.WithoutNumber);
+                        return name + " (" + follower.Id + ")";
+                    }
+                    var hordeName = creatures.ToString(follower.HordeCreatureEntry, ToStringOptions.WithoutNumber);
+                    var allianceName = creatures.ToString(follower.AllianceCreatureEntry, ToStringOptions.WithoutNumber);
+                    return hordeName + " / " + allianceName + " (" + follower.Id + ")";
+                }, 160), 
+                new TabularDataColumn(nameof(ICharShipment.ContainerId), "Container id", 60), 
+                new TabularDataColumn(nameof(ICharShipment.Container) + "." + nameof(ICharShipmentContainer.Name), "Container Name", 160)
+            };
+        }
+
+        public async Task<ICharShipment?> OpenPicker(long value, long? containerIdFilter)
+        {
+            string? searchText = containerIdFilter.HasValue ? $"t:'Container id' = '{containerIdFilter.Value}' " : null;
+            if (value > 0)
+                searchText = searchText == null ? value.ToString() : searchText + " " + value;
+            return await dataPicker.PickRow(BuildTable(), defaultSearchText: searchText);
+        }
+        
+        public async Task<(long, bool)> PickValue(long value)
+        {
+            var result = await OpenPicker(value, null);
+
+            if (result == null)
+                return (0, false);
+            
+            return (result.Id, true);
+        }
+
+        public async Task<IReadOnlyCollection<long>> PickMultipleValues()
+        {
+            var result = await dataPicker.PickRows(BuildTable());
+            
+            return result == null ? Array.Empty<long>() : result.Select(x => (long)x.Id).ToArray();
+        }
+        
+        private ITabularDataArgs<ICharShipment> BuildTable()
+        {
+            return new TabularDataBuilder<ICharShipment>()
+                .SetData(data)
+                .SetTitle($"Pick char shipment")
+                .SetFilter(FilterPredicate)
+                .SetExactMatchPredicate((area, text) => area.Id.Is(text))
+                .SetExactMatchCreator(ExactMatchCreator)
+                .SetColumns(columns)
+                .Build();
+        }
+
+        private ICharShipment? ExactMatchCreator(string text)
+        {
+            if (!uint.TryParse(text, out var id)) 
+                return null;
+            return new CharShipmentEntry() { Id = id };
+        }
+
+        private bool FilterPredicate(ICharShipment shipment, string text)
+        {
+            return shipment.Id.Contains(text) || shipment.TreasureId.Contains(text) || shipment.SpellId.Contains(text) || shipment.DummyItemId.Contains(text) || shipment.OnCompleteSpellId.Contains(text) || shipment.GarrisonFollowerId.Contains(text) || shipment.ContainerId.Contains(text) || shipment.SpellId > 0 && spells.ToString(shipment.SpellId)
+                .Contains(text, StringComparison.OrdinalIgnoreCase) || shipment.OnCompleteSpellId > 0 && spells.ToString(shipment.OnCompleteSpellId)
+                .Contains(text, StringComparison.OrdinalIgnoreCase) || shipment.Follower != null && creatures.ToString(shipment.Follower.HordeCreatureEntry)
+                .Contains(text, StringComparison.OrdinalIgnoreCase) || shipment.Follower != null && creatures.ToString(shipment.Follower.AllianceCreatureEntry)
+                .Contains(text, StringComparison.OrdinalIgnoreCase) || shipment.Container != null && shipment.Container.Name.Contains(text, StringComparison.OrdinalIgnoreCase);
         }
     }
     

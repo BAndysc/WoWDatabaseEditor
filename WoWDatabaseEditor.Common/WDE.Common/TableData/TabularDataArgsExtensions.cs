@@ -8,7 +8,7 @@ public static class TabularDataArgsExtensions
     public static ITabularDataArgs<object> AsObject<T>(this ITabularDataArgs<T> args)  where T : class
     {
         var exactMatchCreature = args.ExactMatchCreator == null ? null : (Func<string, object?>)(x => args.ExactMatchCreator(x));
-        return new TabularDataBuilder<object>()
+        return new TabularDataBuilder<object>(typeof(T))
             .SetData(args.Data)
             .SetColumns(args.Columns)
             .SetFilter((x, search) => args.FilterPredicate((T)x, search))

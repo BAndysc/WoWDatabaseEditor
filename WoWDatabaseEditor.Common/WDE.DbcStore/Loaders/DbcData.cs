@@ -76,4 +76,6 @@ public class DbcData
     public List<Faction> Factions { get; } = new();
     public Dictionary<long, string> CharShipmentContainerStore { get; } = new();
     public List<CharShipmentContainerEntry> CharShipmentContainers { get; } = new();
+    public List<GarrisonFollowerEntry> GarrisonFollowers { get; } = new();
+    public List<CharShipmentEntry> CharShipments { get; } = new();
 }

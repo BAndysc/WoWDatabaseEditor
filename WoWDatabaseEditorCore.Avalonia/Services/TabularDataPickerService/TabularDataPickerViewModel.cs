@@ -58,6 +58,8 @@ public partial class TabularDataPickerViewModel : ObservableBase, IDialog
     public bool MultiSelect { get; }
     
     public bool CheckBoxes { get; }
+
+    private Dictionary<string, Func<object, string, bool>> propertyFilters = new();
     
     public TabularDataPickerViewModel(ITabularDataPickerPreferences preferences,
         ITabularDataArgs<object> args, 
@@ -72,6 +74,53 @@ public partial class TabularDataPickerViewModel : ObservableBase, IDialog
         MultiSelect = multiSelection;
         CheckBoxes = checkBoxes;
         var savedWidths = preferences.GetSavedColumnsWidth(Title);
+        foreach (var col in args.Columns)
+        {
+            var property = args.Type.GetProperty(col.PropertyName);
+            
+            if (property == null)
+                continue;
+            
+            if (col.DataTemplate is Func<object, string> f)
+            {
+                propertyFilters[col.Header] = (x, text) =>
+                {
+                    var val = property.GetValue(x);
+                    if (val == null)
+                        return false;
+                    return f(val).Contains(text, StringComparison.OrdinalIgnoreCase);
+                };
+            }
+            else if (col.DataTemplate is Func<object, string?> f2)
+            {
+                propertyFilters[col.Header] = (x, text) =>
+                {
+                    var val = property.GetValue(x);
+                    if (val == null)
+                        return false;
+                    return f2(val)?.Contains(text, StringComparison.OrdinalIgnoreCase) ?? false;
+                };
+            }
+            else if (col.DataTemplate is { })
+                continue;
+
+            if (property.PropertyType == typeof(uint))
+                propertyFilters[col.Header] = (x, text) => ((uint?)property.GetValue(x))?.Is(text) ?? false;
+            else if (property.PropertyType == typeof(int))
+                propertyFilters[col.Header] = (x, text) => ((int?)property.GetValue(x))?.Is(text) ?? false;
+            else if (property.PropertyType == typeof(long))
+                propertyFilters[col.Header] = (x, text) => ((long?)property.GetValue(x))?.Is(text) ?? false;
+            else if (property.PropertyType == typeof(ulong))
+                propertyFilters[col.Header] = (x, text) => ((ulong?)property.GetValue(x))?.Is(text) ?? false;
+            else if (property.PropertyType == typeof(short))
+                propertyFilters[col.Header] = (x, text) => ((short?)property.GetValue(x))?.Is(text) ?? false;
+            else if (property.PropertyType == typeof(ushort))
+                propertyFilters[col.Header] = (x, text) => ((ushort?)property.GetValue(x))?.Is(text) ?? false;
+            else if (property.PropertyType == typeof(string))
+                propertyFilters[col.Header] = (x, text) => ((string?)property.GetValue(x))?.Contains(text, StringComparison.OrdinalIgnoreCase) ?? false;
+            else
+                continue;
+        }
         Columns = args.Columns
             .Select((c, index) =>
             {
@@ -83,7 +132,12 @@ public partial class TabularDataPickerViewModel : ObservableBase, IDialog
                 else if (c.DataTemplate is Func<object, string> f)
                     return ColumnDescriptor.DataTemplateColumn(c.Header, new FuncDataTemplate(_ => true, (_, _) => new TextBlock()
                     {
-                        [!TextBlock.TextProperty] = new Binding(c.PropertyName){Converter = new FuncValueConverter<object, string>(o => f(o!))}
+                        [!TextBlock.TextProperty] = new Binding(c.PropertyName){Converter = new FuncValueConverter<object, string?>(o => f(o!))}
+                    }), width, false);
+                else if (c.DataTemplate is Func<object, string?> f2)
+                    return ColumnDescriptor.DataTemplateColumn(c.Header, new FuncDataTemplate(_ => true, (_, _) => new TextBlock()
+                    {
+                        [!TextBlock.TextProperty] = new Binding(c.PropertyName){Converter = new FuncValueConverter<object, string?>(o => f2(o!))}
                     }), width, false);
                 else if (c is ITabularDataAsyncColumn asyncColumn)
                 {
@@ -230,20 +284,24 @@ public partial class TabularDataPickerViewModel : ObservableBase, IDialog
             }
         }
     }
-    
-    private void Filter(string text)
+
+    private void Filter(string input)
     {
-        if (string.IsNullOrWhiteSpace(text))
+        if (string.IsNullOrWhiteSpace(input))
         {
             Items = allItems;
             RaisePropertyChanged(nameof(Items));
             UpdateCheckBoxAndSelectionAfterFilter();
             return;
         }
+
+        var searchInput = new SearchInput(input.Trim());
+
+        Func<object, string, bool>? advancedFilter = null;
+        if (searchInput.UseAdvancedFiltering && propertyFilters.TryGetValue(searchInput.Column!, out advancedFilter)) ;
         
         List<object> filtered = new();
-        text = text.Trim();
-        var numberFilter = long.TryParse(text, out var number);
+        var numberFilter = long.TryParse(searchInput.Text, out var number);
         bool hasExactMatch = false;
         if (numberFilter && numberPredicate != null)
         {
@@ -251,10 +309,13 @@ public partial class TabularDataPickerViewModel : ObservableBase, IDialog
             {
                 object item = allItems[i];
                 var accept = numberPredicate(item, number);
+                if (accept && advancedFilter != null)
+                    accept &= advancedFilter(item, searchInput.Value!);
+                
                 if (accept)
                     filtered.Add(item);
                 if (!hasExactMatch && exactMatchPredicate != null)
-                    hasExactMatch = exactMatchPredicate(item, text);
+                    hasExactMatch = exactMatchPredicate(item, searchInput.Text);
             }
         }
         else
@@ -262,17 +323,20 @@ public partial class TabularDataPickerViewModel : ObservableBase, IDialog
             for (int i = 0, count = allItems.Count; i < count; i++)
             {
                 object item = allItems[i];
-                var accept = filterPredicate(item, text);
+                var accept = filterPredicate(item, searchInput.Text);
+                if (accept && advancedFilter != null)
+                    accept &= advancedFilter(item, searchInput.Value!);
+
                 if (accept)
                     filtered.Add(item);
                 if (!hasExactMatch && exactMatchPredicate != null)
-                    hasExactMatch = exactMatchPredicate(item, text);
+                    hasExactMatch = exactMatchPredicate(item, searchInput.Text);
             }
         }
 
         if (!hasExactMatch && exactMatchCreator != null)
         {
-            var dynamic = exactMatchCreator(text);
+            var dynamic = exactMatchCreator(searchInput.Text);
             if (dynamic != null)
                 filtered.Add(dynamic);
         }
@@ -313,5 +377,92 @@ public partial class TabularDataPickerViewModel : ObservableBase, IDialog
     public ICommand Cancel { get; }
     public event Action? CloseCancel;
     public event Action? CloseOk;
+
+    private struct SearchInput
+    {
+        public readonly string Text;
+        public readonly string? Column;
+        public readonly string? Value;
+        public readonly bool UseAdvancedFiltering;
+
+        public SearchInput(string input)
+        {
+            Text = input;
+            UseAdvancedFiltering = false;
+            Column = Value = null;
+            if (input.StartsWith("t:"))
+            {
+                var txt = input.AsSpan(2);
+                Column = ReadWord(txt, out var skip).ToString();
+                if (skip >= txt.Length)
+                    return;
+                
+                txt = txt.Slice(skip);
+                SkipWhitespace(txt, out skip);
+                if (skip >= txt.Length)
+                    return;
+                
+                txt = txt.Slice(skip);
+                if (txt.Length == 0 || txt[0] != '=')
+                    return;
+                
+                txt = txt.Slice(1);
+                SkipWhitespace(txt, out skip);
+                if (skip >= txt.Length)
+                    return;
+                
+                txt = txt.Slice(skip);
+                Value = ReadWord(txt, out skip).ToString();
+                if (skip > txt.Length)
+                    return;
+                
+                txt = txt.Slice(skip);
+                SkipWhitespace(txt, out skip);
+                
+                txt = txt.Slice(skip);
+                Text = txt.ToString();
+                UseAdvancedFiltering = true;
+            }
+        }
+        
+        
+        private ReadOnlySpan<char> ReadWord(ReadOnlySpan<char> str, out int skipChars)
+        {
+            skipChars = 0;
+            if (str.Length == 0)
+                return default;
+        
+            int start = 0;
+            var readUntil = ' ';
+            if (str[0] == '"')
+            {
+                readUntil = '"';
+                start++;
+            }
+            else if (str[0] == '\'')
+            {
+                readUntil = '\'';
+                start++;
+            }
+
+            if (start == str.Length)
+                return default;
+        
+            int end = start + 1;
+            while (end < str.Length && str[end] != readUntil)
+                end++;
+        
+            skipChars = end + start;
+        
+            return str.Slice(start, end - start);
+        }
+    
+        private void SkipWhitespace(ReadOnlySpan<char> str, out int skipChars)
+        {
+            skipChars = 0;
+            while (skipChars < str.Length && char.IsWhiteSpace(str[skipChars]))
+                skipChars++;
+        }
+    }
 }
 

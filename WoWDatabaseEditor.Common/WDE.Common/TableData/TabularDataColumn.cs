@@ -42,3 +42,20 @@ public class TabularDataAsyncColumn<T> : ITabularDataAsyncColumn
         return compute((T)property, token);
     }
 }
+
+public class TabularDataSyncColumn<T> : ITabularDataColumn
+{
+    public TabularDataSyncColumn(string propertyName, string header, Func<T, string?> compute, float width = 100)
+    {
+        Func<object, string?> compute2 = (x) => compute((T)x);
+        DataTemplate = compute2;
+        PropertyName = propertyName;
+        Header = header;
+        Width = width;
+    }
+
+    public string Header { get; }
+    public string PropertyName { get; }
+    public float Width { get; }
+    public object? DataTemplate { get; }
+}

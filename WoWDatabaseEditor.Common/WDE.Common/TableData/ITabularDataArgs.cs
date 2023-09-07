@@ -13,4 +13,5 @@ public interface ITabularDataArgs<T>
     System.Func<T, string, bool>? ExactMatchPredicate { get; }
     System.Func<string, T?>? ExactMatchCreator { get; }
     IIndexedCollection<T> Data { get; }
+    System.Type Type { get; }
 }

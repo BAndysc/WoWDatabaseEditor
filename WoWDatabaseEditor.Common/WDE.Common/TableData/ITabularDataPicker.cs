@@ -21,7 +21,7 @@ public static class TabularDataPickerExtensions
     /// </summary>
     public static async Task<T?> PickStructRow<T>(this ITabularDataPicker self, ITabularDataArgs<T> args, int defaultSelection = -1, string? defaultSearchText = null) where T : struct
     {
-        var builder = new TabularDataBuilder<object>()
+        var builder = new TabularDataBuilder<object>(typeof(T))
             .SetColumns(args.Columns)
             .SetTitle(args.Title)
             .SetData(new BoxingIndexedCollection<T>(args.Data))
@@ -46,7 +46,7 @@ public static class TabularDataPickerExtensions
     /// </summary>
     public static async Task<IReadOnlyList<T>?> PickStructRows<T>(this ITabularDataPicker self, ITabularDataArgs<T> args, IReadOnlyList<int>? defaultSelection = null, string? defaultSearchText = null, bool useCheckBoxes = false) where T : struct
     {
-        var builder = new TabularDataBuilder<object>()
+        var builder = new TabularDataBuilder<object>(typeof(T))
             .SetColumns(args.Columns)
             .SetTitle(args.Title)
             .SetData(new BoxingIndexedCollection<T>(args.Data))

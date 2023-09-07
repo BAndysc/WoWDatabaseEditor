@@ -234,5 +234,27 @@ internal class LegionDbcLoader : BaseDbcLoader
             data.CharShipmentContainerStore[row.Key] = name;
             data.CharShipmentContainers.Add(shipment);
         });
+        Load("CharShipment.db2", row =>
+        {
+            data.CharShipments.Add(new CharShipmentEntry()
+            {
+                Id = row.Key,
+                TreasureId = row.GetUInt(1),
+                SpellId = row.GetUInt(3),
+                DummyItemId = row.GetUInt(4),
+                OnCompleteSpellId = row.GetUInt(5),
+                ContainerId = row.GetUInt(6),
+                GarrisonFollowerId = row.GetUInt(7)
+            });
+        });
+        Load("GarrFollower.db2", row =>
+        {
+            data.GarrisonFollowers.Add(new GarrisonFollowerEntry
+            {
+                Id = row.Key,
+                HordeCreatureEntry = row.GetUInt(3),
+                AllianceCreatureEntry = row.GetUInt(4)
+            });
+        });
     }
 }

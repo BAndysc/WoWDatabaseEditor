@@ -13,8 +13,15 @@ public class TabularDataBuilder<T> : ITabularDataArgs<T>
     public Func<T, string, bool>? ExactMatchPredicate { get; private set; }
     public Func<string, T?>? ExactMatchCreator { get; private set; }
     public IIndexedCollection<T> Data { get; private set; } = new EmptyIndexedCollection<T>();
+    public Type Type { get; } = typeof(T);
     public IReadOnlyList<ITabularDataColumn> Columns { get; private set; } = Array.Empty<ITabularDataColumn>();
 
+    public TabularDataBuilder(System.Type? type = null)
+    {
+        if (type != null)
+            Type = type;
+    }
+    
     public TabularDataBuilder<T> SetTitle(string title)
     {
         Title = title;
