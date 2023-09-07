@@ -586,6 +586,8 @@ namespace WDE.DbcStore
                 new TabularDataSyncColumn<uint>(nameof(ICharShipment.OnCompleteSpellId), "On complete spell", (spellId) => spells.ToString(spellId), 160), 
                 new TabularDataSyncColumn<IGarrisonFollower>(nameof(ICharShipment.Follower), "Follower",  (follower) =>
                 {
+                    if (follower == null)
+                        return " - ";
                     if (follower.HordeCreatureEntry == follower.AllianceCreatureEntry)
                     {
                         var name = creatures.ToString(follower.HordeCreatureEntry, ToStringOptions.WithoutNumber);
