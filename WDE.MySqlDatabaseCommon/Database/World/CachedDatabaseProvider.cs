@@ -41,6 +41,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         private IList<IDatabaseSpellDbc>? databaseSpellDbcCache;
 
         private List<IBroadcastText>? broadcastTextsSortedCache;
+        private Dictionary<uint, int>? broadcastTextIndexByIdCache;
         private StringTrie<IBroadcastText>? broadcastTextsCache;
         
         private IAsyncDatabaseProvider nonCachedDatabase;
@@ -425,7 +426,16 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             return null;
         }
 
-        public Task<IBroadcastText?> GetBroadcastTextByIdAsync(uint id) => WaitForCache(nonCachedDatabase.GetBroadcastTextByIdAsync(id));
+        public async Task<IBroadcastText?> GetBroadcastTextByIdAsync(uint id)
+        {
+            await WaitForCache();
+            if (broadcastTextIndexByIdCache == null)
+                return await nonCachedDatabase.GetBroadcastTextByIdAsync(id);
+            if (broadcastTextIndexByIdCache.TryGetValue(id, out var index))
+                return broadcastTextsSortedCache![index];
+            return null;
+        }
+
         public Task<IBroadcastTextLocale?> GetBroadcastTextLocaleByTextAsync(string text) => WaitForCache(nonCachedDatabase.GetBroadcastTextLocaleByTextAsync(text));
 
         public Task<List<IEventScriptLine>> FindEventScriptLinesBy(IReadOnlyList<(uint command, int dataIndex, long valueToSearch)> conditions) 
@@ -599,6 +609,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
                     progress.Report(10, steps, "Loading broadcast texts");
                     var broadcastTexts = await cache.nonCachedDatabase.GetBroadcastTextsAsync();
                     cache.broadcastTextsSortedCache = broadcastTexts;
+                    cache.broadcastTextIndexByIdCache = broadcastTexts.Select((t, i) => (t.Id, i)).ToDictionary(t => t.Id, t => t.i);
                     // to expensive to cache
                     // var cachedTrie = new StringTrie<IBroadcastText>();
                     // await Task.Run(() =>
