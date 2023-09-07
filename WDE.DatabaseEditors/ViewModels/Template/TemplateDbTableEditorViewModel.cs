@@ -73,7 +73,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
         private readonly Dictionary<string, ReactiveProperty<bool>> groupVisibilityByName = new();
         public override DatabaseKey? SelectedTableKey => null;
         public override bool SupportsMultiSelect => false;
-        public override ICollection<DatabaseEntity>? MultiSelectionEntities => null;
+        public override IReadOnlyList<DatabaseEntity>? MultiSelectionEntities => null;
 
         public AsyncAutoCommand AddNewCommand { get; }
 

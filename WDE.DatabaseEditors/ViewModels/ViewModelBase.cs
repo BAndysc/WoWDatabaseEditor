@@ -380,7 +380,7 @@ namespace WDE.DatabaseEditors.ViewModels
         public virtual DatabaseEntity? FocusedEntity { get; }
         public abstract DatabaseEntity AddRow(DatabaseKey key, int? index = null);
         public abstract DatabaseKey? SelectedTableKey { get; }
-        public abstract ICollection<DatabaseEntity>? MultiSelectionEntities { get; }
+        public abstract IReadOnlyList<DatabaseEntity>? MultiSelectionEntities { get; }
         public abstract bool SupportsMultiSelect { get; }
 
         public void TryPick(DatabaseEntity entity)

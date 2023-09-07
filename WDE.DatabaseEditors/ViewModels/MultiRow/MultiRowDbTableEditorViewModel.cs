@@ -84,7 +84,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
 
         public override bool SupportsMultiSelect => true;
 
-        public override ICollection<DatabaseEntity>? MultiSelectionEntities
+        public override IReadOnlyList<DatabaseEntity>? MultiSelectionEntities
             => MultiSelection.All().Select(idx => Rows[idx.GroupIndex][idx.RowIndex].Entity).ToList();
 
         public override DatabaseEntity? FocusedEntity => SelectedRow?.Entity;

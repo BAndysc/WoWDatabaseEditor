@@ -81,7 +81,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
         public DatabaseEntityViewModel? FocusedRow => focusedRowIndex.RowIndex >= 0 && focusedRowIndex.RowIndex < Rows.Count ? Rows[focusedRowIndex.RowIndex] : null;
         public SingleRecordDatabaseCellViewModel? FocusedCell => FocusedRow != null && focusedCellIndex >= 0 && focusedCellIndex < FocusedRow.Cells.Count ? FocusedRow.Cells[focusedCellIndex] : null;
         public override bool SupportsMultiSelect => true;
-        public override ICollection<DatabaseEntity>? MultiSelectionEntities
+        public override IReadOnlyList<DatabaseEntity>? MultiSelectionEntities
             => MultiSelection.All().Select(idx => Rows[idx.RowIndex].Entity).ToList();
         [Notify] private string rowsSummaryText = "";
         [Notify] private uint limitQuery = 300;

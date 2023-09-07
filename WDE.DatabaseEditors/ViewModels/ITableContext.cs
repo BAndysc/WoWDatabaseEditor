@@ -9,7 +9,7 @@ namespace WDE.DatabaseEditors.ViewModels
         DatabaseEntity AddRow(DatabaseKey key, int? index = null);
         DatabaseKey? SelectedTableKey { get; }
         bool SupportsMultiSelect { get; }
-        ICollection<DatabaseEntity>? MultiSelectionEntities { get; }
+        IReadOnlyList<DatabaseEntity>? MultiSelectionEntities { get; }
         System.IDisposable BulkEdit(string text);
     }
 }
