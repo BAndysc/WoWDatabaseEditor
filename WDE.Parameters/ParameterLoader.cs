@@ -790,7 +790,7 @@ namespace WDE.Parameters
             var choices = await database.GetPlayerChoiceResponsesAsync();
             if (choices != null)
                 foreach (var item in choices)
-                    Items.Add(item.ResponseId, new SelectOption(item.Answer));
+                    Items.Add(item.ResponseId, new SelectOption(string.IsNullOrEmpty(item.Header) ? item.Answer : item.Header));
         }
     }
     
