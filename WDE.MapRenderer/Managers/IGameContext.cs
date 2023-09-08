@@ -14,7 +14,7 @@ namespace WDE.MapRenderer.Managers
 {
     public interface IGameFiles
     {
-        Task<PooledArray<byte>?> ReadFile(FileId fileId, bool silent = false);
+        Task<PooledArray<byte>?> ReadFile(FileId fileId, bool silent = false, int? maxReadBytes = null);
         PooledArray<byte>? ReadFileSyncPool(FileId fileId);
         byte[]? ReadFileSync(FileId fileId);
         byte[]? ReadFileSyncLocked(FileId fileId, bool silent = false);
@@ -23,6 +23,7 @@ namespace WDE.MapRenderer.Managers
         string AdtObj0(string mapName, int x, int y);
         string AdtLod0(string mapName, int x, int y);
         string Wdt(string mapName);
+        string Wdl(string mapName);
         bool Initialize();
         GameFilesVersion WoWVersion { get; }
     }

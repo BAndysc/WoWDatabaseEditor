@@ -13,4 +13,10 @@
 
         public static string SHADER_INCLUDE_DIR = "internalShaders";
     }
+
+    public enum IndexType
+    {
+        Short = 2,
+        Int = 4
+    }
 }

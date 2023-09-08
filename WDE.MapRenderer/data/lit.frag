@@ -101,7 +101,8 @@ void main()
         - min(0, sign(fract(WorldPos.y / 533.333) * 533.333 - 0.5));
     
     FragColor = mix(FragColor, FragColor + vec4(0.4, 0.4, 0.4, 0), clamp(isBorderOfChunk * showGrid, 0, 1));
-    
+    FragColor = ApplyFog(FragColor, WorldPos.xyz);    
+
     //FragColor = FragColor * 0.000001 + vec4(Normal.xyz / 2 + 0.5, 1);
     ObjectIndexOutputBuffer = uint(0);
 }

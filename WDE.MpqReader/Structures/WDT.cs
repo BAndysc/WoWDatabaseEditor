@@ -19,6 +19,13 @@ namespace WDE.MpqReader.Structures
         // TODO : MOP+ flags
     }
 
+    public enum AdtChunkType
+    {
+        None,
+        AllWater,
+        Regular
+    }
+    
     public class WDTChunk
     {
         private static float BlockSize = 533.33333f;
@@ -28,6 +35,7 @@ namespace WDE.MpqReader.Structures
         public Vector3 MiddlePosition => ChunkToWoWPosition(X, Y);
         public uint chunkFlags { get; }
         public bool HasAdt => (chunkFlags & 1) == 1;
+        public bool IsAllWater => (chunkFlags & 2) == 2;
         
         private static Vector3 ChunkToWoWPosition(uint x, uint y)
         {

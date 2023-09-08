@@ -95,9 +95,12 @@ namespace WoWDatabaseEditorCore.Avalonia
 
             configuration = SafeUseOpenTK(configuration, new List<GlVersion> { new GlVersion(GlProfileType.OpenGL, 4, 1, true) });
 #endif
-            if (OperatingSystem.IsWindows())
-            {
+
+            if (OperatingSystem.IsLinux())
                 GlobalApplication.Supports3D = false;
+            else if (OperatingSystem.IsWindows())
+            {
+                GlobalApplication.Supports3D = true;
                 if (GlobalApplication.Arguments.IsArgumentSet("wgl"))
                 {
                     configuration = configuration.
@@ -113,7 +116,6 @@ namespace WoWDatabaseEditorCore.Avalonia
                                 new GlVersion(GlProfileType.OpenGL, 4, 1),
                                 new GlVersion(GlProfileType.OpenGL, 3, 3),
                             }});
-                    GlobalApplication.Supports3D = true;
                 }
             }
             else

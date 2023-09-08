@@ -1,4 +1,6 @@
-﻿namespace WDE.MpqReader.Readers
+﻿using System.Runtime.CompilerServices;
+
+namespace WDE.MpqReader.Readers
 {
     public interface IBinaryReader
     {
@@ -13,5 +15,21 @@
         ulong ReadUInt64();
         int Offset { get; set; }
         int Size { get; }
+    }
+
+    public static class BinaryReaderExtensions
+    {
+        public static T ReadStruct<T>(this IBinaryReader reader) where T: unmanaged
+        {
+            var size = Unsafe.SizeOf<T>();
+            var bytes = reader.ReadBytes(size);
+            unsafe
+            {
+                fixed (byte* ptr = bytes.Span)
+                {
+                    return *(T*)ptr;
+                }
+            }
+        }
     }
 }

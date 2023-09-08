@@ -36,6 +36,7 @@ public class LoadingManager : IDisposable
     private readonly IUIManager uiManager;
     private readonly ChunkManager chunkManager;
     private readonly GlobalWorldMapObjectManager globalWorldMapObjectManager;
+    private readonly LowDetailHeightMapManager lowDetailHeightMapManager;
     private readonly ZoneAreaManager zoneAreaManager;
     private readonly WorldManager worldManager;
     private int? currentLoadedMap;
@@ -48,6 +49,7 @@ public class LoadingManager : IDisposable
         IUIManager uiManager,
         ChunkManager chunkManager, 
         GlobalWorldMapObjectManager globalWorldMapObjectManager,
+        LowDetailHeightMapManager lowDetailHeightMapManager,
         ZoneAreaManager zoneAreaManager,
         WorldManager worldManager)
     {
@@ -55,6 +57,7 @@ public class LoadingManager : IDisposable
         this.uiManager = uiManager;
         this.chunkManager = chunkManager;
         this.globalWorldMapObjectManager = globalWorldMapObjectManager;
+        this.lowDetailHeightMapManager = lowDetailHeightMapManager;
         this.zoneAreaManager = zoneAreaManager;
         this.worldManager = worldManager;
 
@@ -86,6 +89,8 @@ public class LoadingManager : IDisposable
         
         yield return chunkManager.UnloadAllChunks();
 
+        lowDetailHeightMapManager.Unload();
+        
         yield return zoneAreaManager.Load();
         
         yield return worldManager.LoadMap(newToken.CancellationToken);
@@ -93,6 +98,8 @@ public class LoadingManager : IDisposable
         if (loadingToken == newToken)
             EssentialLoadingInProgress = false;
 
+        lowDetailHeightMapManager.Load();
+        
         yield return globalWorldMapObjectManager.Load();
         
         yield return worldManager.LoadOptionals(newToken.CancellationToken);

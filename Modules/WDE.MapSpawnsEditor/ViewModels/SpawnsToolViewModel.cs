@@ -25,6 +25,7 @@ public partial class SpawnsToolViewModel : ObservableBase, ITool
     [Notify] private bool isSelected;
 
     [Notify] private string searchText = "";
+    [Notify] private bool showAllPhases = false;
     public FlatTreeList<SpawnGroup, SpawnInstance> SpawnItems { get; }
     public ObservableCollection<GameEventViewModel> Events { get; }
     public ObservableCollection<GamePhaseViewModel> AllPhases { get; }
@@ -52,6 +53,9 @@ public partial class SpawnsToolViewModel : ObservableBase, ITool
         SpawnItems = spawnsContainer.Spawns;
         Events = gameEventService.GameEvents;
         AllPhases = gamePhaseService.Phases;
+        
+        On(() => ShowAllPhases, @is => gamePhaseService.ShowAllPhases = @is);
+        
         spawnSelectionService.SelectedSpawn.Subscribe(newSelectedSpawn =>
         {
             selectedNode = newSelectedSpawn;

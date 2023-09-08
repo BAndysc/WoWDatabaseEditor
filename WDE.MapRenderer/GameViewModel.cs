@@ -19,6 +19,7 @@ using WDE.Common.Types;
 using WDE.Common.Utils;
 using WDE.Common.Windows;
 using WDE.MapRenderer.Managers;
+using WDE.MapRenderer.Modules;
 using WDE.MapRenderer.StaticData;
 using WDE.Module.Attributes;
 using WDE.MpqReader.DBC;
@@ -287,7 +288,9 @@ Tris: " + stats.TrianglesDrawn;
             Properties.TextureQuality = settings.TextureQuality;
 
             gameView.RegisterGameModule(container => container.Resolve<GameProxy>((typeof(GameViewModel), this)));
-            
+            gameView.RegisterGameModule(container => container.Resolve<DebugInfoGameModule>());
+            gameView.RegisterGameModule(container => container.Resolve<WorldMapGameModule>());
+
             ToggleMapVisibilityCommand = new DelegateCommand(() => IsMapVisible = !IsMapVisible);
             ToggleStatsVisibilityCommand = new DelegateCommand(() => DisplayStats = !DisplayStats);
             

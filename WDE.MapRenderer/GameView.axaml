@@ -17,14 +17,14 @@
     </UserControl.KeyBindings>
     <DockPanel LastChildFill="True">
         <Panel>
-            <theEngine:TheEnginePanel Name="TheEnginePanel" Game="{CompiledBinding  CurrentGame}"
+            <theEngine:NativeTheEnginePanel Name="TheEnginePanel" Game="{CompiledBinding  CurrentGame}"
                                       PointerPressed="TheEnginePanel_OnPointerPressed"
                                       PointerReleased="TheEnginePanel_OnPointerReleased"
                                       PointerMoved="TheEnginePanel_OnPointerMoved"
                                       ContextRequested="TheEnginePanel_OnContextRequested">
-                <theEngine:TheEnginePanel.ContextMenu>
-                </theEngine:TheEnginePanel.ContextMenu>
-            </theEngine:TheEnginePanel>
+                <theEngine:NativeTheEnginePanel.ContextMenu>
+                </theEngine:NativeTheEnginePanel.ContextMenu>
+            </theEngine:NativeTheEnginePanel>
             <Border Margin="100,40" IsVisible="{CompiledBinding IsMapVisible}" BorderThickness="10" BorderBrush="DarkGray">
                 <worldMap:WoWMapViewer MapViewModel="{CompiledBinding   }"
                                        MapsPath="{CompiledBinding MapData.Path}"

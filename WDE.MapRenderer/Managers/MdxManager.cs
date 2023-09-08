@@ -566,11 +566,14 @@ namespace WDE.MapRenderer.Managers
 
                 TextureHandle? th = null;
                 TextureHandle? th2 = null;
+                TextureHandle? th3 = null;
                 for (int i = 0; i < (batch.textureCount >= 5 ? 1 : batch.textureCount); ++i)
                 {
                     if (batch.textureLookupId + i >= m2.textureLookupTable.Length)
                     {
-                        if (th.HasValue)
+                        if (th2.HasValue)
+                            th3 = textureManager.EmptyTexture;
+                        else if (th.HasValue)
                             th2 = textureManager.EmptyTexture;
                         else
                             th = textureManager.EmptyTexture;
@@ -580,7 +583,9 @@ namespace WDE.MapRenderer.Managers
                     var texId = m2.textureLookupTable[batch.textureLookupId + i];
                     if (texId == -1)
                     {
-                        if (th.HasValue)
+                        if (th2.HasValue)
+                            th3 = textureManager.EmptyTexture;
+                        else if (th.HasValue)
                             th2 = textureManager.EmptyTexture;
                         else
                             th = textureManager.EmptyTexture;
@@ -605,7 +610,7 @@ namespace WDE.MapRenderer.Managers
                                 // This is for player characters... Creatures always come with a baked texture.
                                 // texFile = charSectionsStore.First(x => x.RaceID == displayinfoextra.Race
                                 // && x.BaseSection == 0 && x.ColorIndex == displayinfoextra.SkinColor).TextureName1;
-                                texFile = displayinfoextra.Texture.FileType == FileId.Type.FileName ? "textures\\BakedNpcTextures\\" + displayinfoextra.Texture.FileName : textureFileDataStore[(int)displayinfoextra.Texture.FileDataId].FileData;
+                                texFile = displayinfoextra.Texture.FileType == FileId.Type.FileName ? "textures\\BakedNpcTextures\\" + displayinfoextra.Texture.FileName : textureFileDataStore.TryGetValue((int)displayinfoextra.Texture.FileDataId, out var data) ? data.FileData : null;
                             }
 
                             // only seen for tauren female facial features
@@ -725,14 +730,16 @@ namespace WDE.MapRenderer.Managers
                         }
                         yield return textureManager.GetTexture(texFile, tcs);
                         var resTex = tcs.Task.Result;
-                        if (th.HasValue)
+                        if (th2.HasValue)
+                            th3 = resTex;
+                        else if (th.HasValue)
                             th2 = resTex;
                         else
                             th = resTex;
                     }
                 }
 
-                var material = CreateMaterial(m2, in batch, th, th2);
+                var material = CreateMaterial(m2, in batch, th, th2, th3);
 
                 materials[j - 1] = (material, batch.skinSectionIndex);
             }
@@ -761,7 +768,7 @@ namespace WDE.MapRenderer.Managers
             result.SetResult(mdx);    
         }
 
-        private Material CreateMaterial(M2 m2, in M2Batch batch, TextureHandle? textureHandle1, TextureHandle? textureHandle2)
+        private Material CreateMaterial(M2 m2, in M2Batch batch, TextureHandle? textureHandle1, TextureHandle? textureHandle2, TextureHandle? textureHandle3)
         {
             ref readonly var materialDef = ref m2.materials[batch.materialIndex];
             var material = materialManager.CreateMaterial("data/m2.json");
@@ -769,6 +776,7 @@ namespace WDE.MapRenderer.Managers
             material.SetBuffer("boneMatrices", identityBonesBuffer);
             material.SetTexture("texture1", textureHandle1 ?? textureManager.EmptyTexture);
             material.SetTexture("texture2", textureHandle2 ?? textureManager.EmptyTexture);
+            material.SetTexture("texture3", textureHandle3 ?? textureManager.EmptyTexture);
 
             var trans = 1.0f;
             if (batch.colorIndex != -1 && m2.colors.Length < batch.colorIndex)
@@ -852,8 +860,18 @@ namespace WDE.MapRenderer.Managers
                 material.DestinationBlending = Blending.SrcColor;
                 material.SetUniform("alphaTest", 1.0f / 255.0f);
             }
+            else if (materialDef.blending_mode == M2Blend.M2BlendBlendAdd)
+            {
+                material.BlendingEnabled = true;
+                material.SourceBlending = Blending.One;
+                material.DestinationBlending = Blending.OneMinusSrcAlpha;
+                material.SetUniform("alphaTest", 1.0f / 255.0f);
+            }
             else
+            {
+                Console.WriteLine("Unspported blend mode " + materialDef.blending_mode);
                 material.SetUniform("notSupported", 1);
+            }
 
             material.ZWrite = !material.BlendingEnabled;
             //material.DepthTesting = materialDef.flags.HasFlagFast(M2MaterialFlags.DepthTest); // produces wrong results :thonk:
@@ -976,11 +994,14 @@ namespace WDE.MapRenderer.Managers
 
                 TextureHandle? th = null;
                 TextureHandle? th2 = null;
+                TextureHandle? th3 = null;
                 for (int i = 0; i < (batch.textureCount >= 5 ? 1 : batch.textureCount); ++i)
                 {
                     if (batch.textureLookupId + i >= m2.textureLookupTable.Length)
                     {
-                        if (th.HasValue)
+                        if (th2.HasValue)
+                            th3 = textureManager.EmptyTexture;
+                        else if (th.HasValue)
                             th2 = textureManager.EmptyTexture;
                         else
                             th = textureManager.EmptyTexture;
@@ -990,7 +1011,9 @@ namespace WDE.MapRenderer.Managers
                     var texId = m2.textureLookupTable[batch.textureLookupId + i];
                     if (texId == -1)
                     {
-                        if (th.HasValue)
+                        if (th2.HasValue)
+                            th3 = textureManager.EmptyTexture;
+                        else if (th.HasValue)
                             th2 = textureManager.EmptyTexture;
                         else
                             th = textureManager.EmptyTexture;
@@ -1011,14 +1034,16 @@ namespace WDE.MapRenderer.Managers
                         var tcs = new TaskCompletionSource<TextureHandle>();
                         yield return textureManager.GetTexture(texFile, tcs);
                         var resTex = tcs.Task.Result;
-                        if (th.HasValue)
+                        if (th2.HasValue)
+                            th3 = resTex;
+                        else if (th.HasValue)
                             th2 = resTex;
                         else
                             th = resTex;
                     }
                 }
 
-                materials[j - 1] = (CreateMaterial(m2, in batch, th, th2), batch.skinSectionIndex);
+                materials[j - 1] = (CreateMaterial(m2, in batch, th, th2, th3), batch.skinSectionIndex);
             }
             
             if (j == 0)
@@ -1071,8 +1096,33 @@ namespace WDE.MapRenderer.Managers
                 yield break;
             }
 
+            bool isWmo = false;
             if (displayInfo.ModelName.FileType == FileId.Type.FileName &&
                 displayInfo.ModelName.FileName.EndsWith("wmo", StringComparison.InvariantCultureIgnoreCase))
+            {
+                isWmo = true;
+            }
+            else if (displayInfo.ModelName.FileType == FileId.Type.FileId)
+            {
+                var header = gameFiles.ReadFile(displayInfo.ModelName, maxReadBytes: 4);
+                yield return header;
+
+                if (header.Result == null)
+                {
+                    Console.WriteLine("Cannot find model " + gameObjectDisplayId);
+                    gameObjectmeshes[gameObjectDisplayId] = null;
+                    completion.SetResult(null);
+                    gameObjectMeshesCurrentlyLoaded.Remove(gameObjectDisplayId);
+                    result.SetResult(null);
+                    yield break;
+                }
+
+                if (header.Result[0] == 'R' && header.Result[1] == 'E' && header.Result[2] == 'V' && header.Result[3] == 'M')
+                    isWmo = true;
+                header.Result.Dispose();
+            }
+            
+            if (isWmo)
             {
                 var wmoInstance = new TaskCompletionSource<WmoManager.WmoInstance?>();
                 yield return wmoManager.LoadWorldMapObject(displayInfo.ModelName, wmoInstance);
@@ -1121,11 +1171,14 @@ namespace WDE.MapRenderer.Managers
                 
                 TextureHandle? th = null;
                 TextureHandle? th2 = null;
+                TextureHandle? th3 = null;
                 for (int i = 0; i < (batch.textureCount >= 5 ? 1 : batch.textureCount); ++i)
                 {
                     if (batch.textureLookupId + i >= m2.textureLookupTable.Length)
                     {
-                        if (th.HasValue)
+                        if (th2.HasValue)
+                            th3 = textureManager.EmptyTexture;
+                        else if (th.HasValue)
                             th2 = textureManager.EmptyTexture;
                         else
                             th = textureManager.EmptyTexture;
@@ -1135,7 +1188,9 @@ namespace WDE.MapRenderer.Managers
                     var texId = m2.textureLookupTable[batch.textureLookupId + i];
                     if (texId == -1)
                     {
-                        if (th.HasValue)
+                        if (th2.HasValue)
+                            th3 = textureManager.EmptyTexture;
+                        else if (th.HasValue)
                             th2 = textureManager.EmptyTexture;
                         else
                             th = textureManager.EmptyTexture;
@@ -1146,14 +1201,16 @@ namespace WDE.MapRenderer.Managers
                         var tcs = new TaskCompletionSource<TextureHandle>();
                         yield return textureManager.GetTexture(texFile, tcs);
                         var resTex = tcs.Task.Result;
-                        if (th.HasValue)
+                        if (th2.HasValue)
+                            th3 = resTex;
+                        else if (th.HasValue)
                             th2 = resTex;
                         else
                             th = resTex;
                     }
                 }
 
-                materials[j - 1] = (CreateMaterial(m2, in batch, th, th2), batch.skinSectionIndex);
+                materials[j - 1] = (CreateMaterial(m2, in batch, th, th2, th3), batch.skinSectionIndex);
             }
 
             if (j == 0)
@@ -1234,11 +1291,14 @@ namespace WDE.MapRenderer.Managers
 
                 TextureHandle? th = null;
                 TextureHandle? th2 = null;
+                TextureHandle? th3 = null;
                 for (int i = 0; i < (batch.textureCount >= 5 ? 1 : batch.textureCount); ++i)
                 {
                     if (batch.textureLookupId + i >= m2.textureLookupTable.Length)
                     {
-                        if (th.HasValue)
+                        if (th2.HasValue)
+                            th3 = textureManager.EmptyTexture;
+                        else if (th.HasValue)
                             th2 = textureManager.EmptyTexture;
                         else
                             th = textureManager.EmptyTexture;
@@ -1248,7 +1308,9 @@ namespace WDE.MapRenderer.Managers
                     var texId = m2.textureLookupTable[batch.textureLookupId + i];
                     if (texId == -1)
                     {
-                        if (th.HasValue)
+                        if (th2.HasValue)
+                            th3 = textureManager.EmptyTexture;
+                        else if (th.HasValue)
                             th2 = textureManager.EmptyTexture;
                         else
                             th = textureManager.EmptyTexture;
@@ -1259,14 +1321,16 @@ namespace WDE.MapRenderer.Managers
                         var tcs = new TaskCompletionSource<TextureHandle>();
                         yield return textureManager.GetTexture(texFile, tcs);
                         var resTex = tcs.Task.Result;
-                        if (th.HasValue)
+                        if (th2.HasValue)
+                            th3 = resTex;
+                        else if (th.HasValue)
                             th2 = resTex;
                         else
                             th = resTex;
                     }
                 }
 
-                materials[j - 1] = (CreateMaterial(m2, in batch, th, th2), batch.skinSectionIndex);
+                materials[j - 1] = (CreateMaterial(m2, in batch, th, th2, th3), batch.skinSectionIndex);
             }
             
             if (j == 0)
@@ -1416,15 +1480,26 @@ namespace WDE.MapRenderer.Managers
             
             yield return new WaitForTask(Task.Run(() =>
             {
-                m2 = M2.Read(new MemoryBinaryReader(file.Result), gameFiles.WoWVersion, path, p =>
+                try
                 {
-                    // TODO: can I use ReadFileSync? Can be problematic...
-                    var bytes = gameFiles.ReadFileSyncLocked(p, true);
-                    if (bytes == null)
-                        return null;
-                    return new MemoryBinaryReader(bytes);
-                });
-                file.Result.Dispose();
+                    m2 = M2.Read(new MemoryBinaryReader(file.Result), gameFiles.WoWVersion, path, p =>
+                    {
+                        // TODO: can I use ReadFileSync? Can be problematic...
+                        var bytes = gameFiles.ReadFileSyncLocked(p, true);
+                        if (bytes == null)
+                            return null;
+                        return new MemoryBinaryReader(bytes);
+                    });
+                }
+                catch (Exception e)
+                {
+                    File.WriteAllBytes("/Users/bartek/Programowanie/temp/problematyczne modele/" + path, file.Result.AsArray().AsSpan(file.Result.Length).ToArray());
+                    File.WriteAllText("/Users/bartek/Programowanie/temp/problematyczne modele/" + path + ".txt", e.ToString());
+                }
+                finally
+                {
+                    file.Result.Dispose();
+                }
             }));
 
             if (m2 == null)

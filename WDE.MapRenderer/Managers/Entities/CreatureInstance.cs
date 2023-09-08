@@ -177,8 +177,10 @@ public class CreatureInstance : WorldObjectInstance
             renderers.Add(renderer);
         }
 
+        var size = instance.mesh.Bounds.Size / 2;
+        
         textEntity = gameContext.UiManager.DrawPersistentWorldText("calibri", new Vector2(0.5f, 0.5f), creatureTemplate.Name, 0.25f, Matrix.Identity, 50);
-        entityManager.AddComponent(textEntity, new CopyParentTransform(){Parent = objectEntity});
+        entityManager.AddComponent(textEntity, new CopyParentTransform(){Parent = objectEntity, Local = Matrix4x4.CreateTranslation(new Vector3(0, 0, size.Z))});
         entityManager.AddComponent(textEntity, new DirtyPosition(true));
         handles.Add(textEntity);
     }

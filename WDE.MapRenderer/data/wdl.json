@@ -1,0 +1,17 @@
+{
+  "Pixel": {
+    "Path": "data/wdl.frag"
+  },
+  "ZWrite": true,
+  "Instancing": true,
+  "Vertex": {
+    "Path": "data/wdl.vert",
+    "Input": [
+      {"Type": "Float4"},
+      {"Type": "Float4"},
+      {"Type": "Float4"},
+      {"Type": "Float2"},
+      {"Type": "Float2"}
+    ]
+  }
+}

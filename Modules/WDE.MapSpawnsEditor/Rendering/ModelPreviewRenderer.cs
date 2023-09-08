@@ -72,7 +72,7 @@ public class ModelPreviewRenderer
             AmbientColor = Vector4.Zero
         };
 
-        sceneData = new SceneData(previewCamera, mainLight, secondaryLight);
+        sceneData = new SceneData(previewCamera, new FogSettings(){Enabled = false}, mainLight, secondaryLight);
         bonesMatrix = gameContext.Engine.CreateBuffer<Matrix>(BufferTypeEnum.StructuredBufferVertexOnly, 1, BufferInternalFormat.Float4);
     }
 

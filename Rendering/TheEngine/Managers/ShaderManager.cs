@@ -58,11 +58,16 @@ namespace TheEngine.Managers
                 {
                     var handle = shaderHandles[usedShader];
 
-                    var recompiled = engine.Device.CreateShader(usedShader.path, new string[] { Constants.SHADER_INCLUDE_DIR, RemoveFileName(usedShader.path) }, usedShader.instancing);
-
-                    byHandleShaders[handle.Handle].Dispose();
-
-                    byHandleShaders[handle.Handle] = recompiled;
+                    try
+                    {
+                        var recompiled = engine.Device.CreateShader(usedShader.path, new string[] { Constants.SHADER_INCLUDE_DIR, RemoveFileName(usedShader.path) }, usedShader.instancing);
+                        byHandleShaders[handle.Handle].Dispose();
+                        byHandleShaders[handle.Handle] = recompiled;
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("Couldn't compile reshader " + usedShader.path + " " + e.Message);
+                    }
                 }
 
                 engine.materialManager.InvalidateShaderCache();

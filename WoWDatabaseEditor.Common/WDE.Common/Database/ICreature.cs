@@ -1,3 +1,5 @@
+using WDE.Common.Utils;
+
 namespace WDE.Common.Database
 {
     public interface ICreature
@@ -7,7 +9,7 @@ namespace WDE.Common.Database
         
         uint Map { get; }
         uint? PhaseMask { get; }
-        int? PhaseId { get; }
+        SmallReadOnlyList<int>? PhaseId { get; }
         int? PhaseGroup { get; }
         int EquipmentId { get; }
         uint Model { get; }

@@ -112,7 +112,9 @@ namespace WDE.PacketViewer.ViewModels
             if (packet.KindCase == PacketHolder.KindOneofCase.SpellGo
                 || packet.KindCase == PacketHolder.KindOneofCase.SpellStart)
             {
-                var spellId = packet.SpellGo?.Data.Spell ?? packet.SpellStart.Data.Spell;
+                if (packet.SpellGo != null && packet.SpellGo.Data == null || packet.SpellStart != null && packet.SpellStart.Data == null)
+                    return null;
+                var spellId = packet.SpellGo?.Data.Spell ?? packet.SpellStart!.Data.Spell;
                 var spellName = spellStore.HasSpell(spellId) ? spellStore.GetName(spellId) : null;
                 if (spellName != null)
                 {

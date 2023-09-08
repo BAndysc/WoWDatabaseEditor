@@ -18,6 +18,12 @@ layout (std140) uniform SceneData
 	vec4 secondaryLightDir;
 	vec3 secondaryLightColor;
 	float secondaryLightIntensity;
+
+	float fogStart;
+	float fogEnd;
+	float fogEnabled;
+	float padding4;
+	vec4 fogColor;
 	
 	float screenWidth;
 	float screenHeight;
@@ -203,4 +209,14 @@ vec3 lighting(vec3 col, vec3 normal)
 	return col * min(diffuse + ambient, vec3(1.2));
 }
 
+vec4 ApplyFog(vec4 color, vec3 worldPosition)
+{
+	float d = distance(cameraPos.xyz, worldPosition);
+
+	float fogFactor = clamp((d - fogStart) / (fogEnd - fogStart), 0.0, 1.0);
+
+	fogFactor = mix(0, fogFactor, fogEnabled);
+	
+	return mix(color, fogColor, fogFactor);
+}
 #endif

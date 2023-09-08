@@ -3,7 +3,10 @@ using System.Buffers;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using OpenGLBindings;
+using TheAvaloniaOpenGL;
 using TheAvaloniaOpenGL.Resources;
 using TheEngine.Handles;
 using TheEngine.Interfaces;
@@ -19,16 +22,19 @@ namespace TheEngine.Entities
 
         internal int VertexArrayObject { get; private set; }
         internal NativeBuffer<UniversalVertex>? VerticesBuffer { get; private set; }
-        internal NativeBuffer<ushort>? IndicesBuffer { get; private set; }
+        internal NativeBuffer<byte>? IndicesBuffer { get; private set; }
 
         private BoundingBox bounds;
         private Vector3[]? positions = null;
-        private ushort[]? indices;
+        private ushort[]? shortIndices;
+        private uint[]? bigIndices;
         private int indicesCount = 0;
         private int verticesCount = 0;
         private (int start, int length)[]? submeshesRange;
 
         public BoundingBox Bounds => bounds;
+        
+        public IndexType IndexType => bigIndices != null ? IndexType.Int : IndexType.Short;
         
         public void Activate()
         {
@@ -67,14 +73,14 @@ namespace TheEngine.Entities
             if (disposed)
                 throw new Exception("Mesh is disposed");
             Debug.Assert(positions != null);
-            Debug.Assert(indices != null);
+            Debug.Assert(shortIndices != null || bigIndices != null);
             int start = IndexStart(submesh);
             int count = IndexCount(submesh);
             for (int i = start; i + 2 < start + count; i += 3)
             {
-                ushort j = indices[i];
-                ushort k = indices[i+1];
-                ushort l = indices[i+2];
+                uint j = shortIndices != null ? shortIndices[i] : bigIndices![i];
+                uint k = shortIndices != null ? shortIndices[i+1] : bigIndices![i+1];
+                uint l = shortIndices != null ? shortIndices[i+2] : bigIndices![i+2];
                 
                 if (verticesCount > j &&
                     verticesCount > k &&
@@ -97,7 +103,7 @@ namespace TheEngine.Entities
             if (!managedOnly)
             {
                 VerticesBuffer = engine.Device.CreateBuffer<UniversalVertex>(BufferTypeEnum.Vertex, 1);
-                IndicesBuffer = engine.Device.CreateBuffer<ushort>(BufferTypeEnum.Index, 1);
+                IndicesBuffer = engine.Device.CreateBuffer<byte>(BufferTypeEnum.Index, 4);
                 SetupDeviceBuffers(engine);
             }
         }
@@ -108,14 +114,14 @@ namespace TheEngine.Entities
             Handle = handle;
             positions = vertices.Select(x => x.position).ToArray();
             this.verticesCount = vertices.Length;
-            this.indices = indices;
+            this.shortIndices = indices;
             this.indicesCount = indicesCount;
             this.managedOnly = managedOnly;
             BuildBoundingBox();
             if (!managedOnly)
             {
                 VerticesBuffer = engine.Device.CreateBuffer<UniversalVertex>(BufferTypeEnum.Vertex, vertices);
-                IndicesBuffer = engine.Device.CreateBuffer<ushort>(BufferTypeEnum.Index, indices.AsSpan(0, indicesCount));
+                IndicesBuffer = engine.Device.CreateBuffer<byte>(BufferTypeEnum.Index, MemoryMarshal.AsBytes(indices.AsSpan(0, indicesCount)));
                 SetupDeviceBuffers(engine);
             }
         }
@@ -162,10 +168,10 @@ namespace TheEngine.Entities
 
         public void SetSubmeshIndicesRange(int submesh, int start, int length)
         {
-            Debug.Assert(indices.Length >= start + length);
+            Debug.Assert((shortIndices?.Length ?? bigIndices!.Length) >= start + length);
             if (submeshesRange == null && submesh == 0)
             {
-                if (start == 0 && length == indices.Length)
+                if (start == 0 && length == (shortIndices?.Length ?? bigIndices!.Length))
                 {
                     // ok
                 }
@@ -185,9 +191,12 @@ namespace TheEngine.Entities
 
         public void SetIndices(ReadOnlySpan<ushort> indices, int submesh)
         {
+            if (bigIndices != null)
+                throw new Exception("Can't SetIndices(ushort) on a mesh that was created with SetIndices(uint)");
+            
             if (submeshesRange == null && submesh == 0)
             {
-                this.indices = indices.ToArray();
+                this.shortIndices = indices.ToArray();
                 indicesCount = indices.Length;
             }
             else if (submeshesRange == null && submesh != 0)
@@ -198,11 +207,11 @@ namespace TheEngine.Entities
                 if (existingIndices.length == 0) // no indices so far
                 {
                     var newIndices = new ushort[indicesCount + indices.Length];
-                    Array.Copy(this.indices, newIndices, indicesCount);
+                    Array.Copy(this.shortIndices, newIndices, indicesCount);
                     indices.CopyTo(newIndices.AsSpan(indicesCount, indices.Length));
                     //Array.Copy(indices, 0, newIndices, this.indices.Length, indices.Length);
                     submeshesRange[submesh] = (indicesCount, indices.Length);
-                    this.indices = newIndices;
+                    this.shortIndices = newIndices;
                     indicesCount = newIndices.Length;
                 }
                 else // for this submesh there are some indices already
@@ -214,6 +223,40 @@ namespace TheEngine.Entities
                 throw new Exception("Submesh out of range");
         }
 
+        public void SetIndices(ReadOnlySpan<uint> indices, int submesh)
+        {
+            if (shortIndices != null)
+                throw new Exception("Can't SetIndices(ushort) on a mesh that was created with SetIndices(uint)");
+            
+            if (submeshesRange == null && submesh == 0)
+            {
+                this.bigIndices = indices.ToArray();
+                indicesCount = indices.Length;
+            }
+            else if (submeshesRange == null && submesh != 0)
+                throw new Exception("You need to call SetSubmeshCount first!");
+            else if (submeshesRange != null && submeshesRange.Length > submesh)
+            {
+                var existingIndices = submeshesRange[submesh];
+                if (existingIndices.length == 0) // no indices so far
+                {
+                    var newIndices = new uint[indicesCount + indices.Length];
+                    Array.Copy(this.shortIndices, newIndices, indicesCount);
+                    indices.CopyTo(newIndices.AsSpan(indicesCount, indices.Length));
+                    //Array.Copy(indices, 0, newIndices, this.indices.Length, indices.Length);
+                    submeshesRange[submesh] = (indicesCount, indices.Length);
+                    this.bigIndices = newIndices;
+                    indicesCount = newIndices.Length;
+                }
+                else // for this submesh there are some indices already
+                {
+                    throw new Exception("sorry, overriding indices with submeshes is not yet supported");
+                }
+            }
+            else
+                throw new Exception("Submesh out of range");
+        }
+        
         public void SetVertices(ReadOnlySpan<Vector3> vertices)
         {
             if (positions == null || positions.Length < vertices.Length)
@@ -290,9 +333,12 @@ namespace TheEngine.Entities
                 throw new Exception("You may call rebuild only on unmanaged meshes");
             Debug.Assert(!managedOnly);
             Debug.Assert(positions != null);
-            Debug.Assert(indices != null);
+            Debug.Assert(shortIndices != null || bigIndices != null);
             BuildBoundingBox();
-            IndicesBuffer?.UpdateBuffer(indices.AsSpan(0, indicesCount));
+            if (shortIndices != null)
+               IndicesBuffer?.UpdateBuffer(MemoryMarshal.AsBytes(shortIndices.AsSpan(0, indicesCount)));
+            else
+                IndicesBuffer?.UpdateBuffer(MemoryMarshal.AsBytes(bigIndices.AsSpan(0, indicesCount)));
             //vertices = null;
             //indices = null;
         }

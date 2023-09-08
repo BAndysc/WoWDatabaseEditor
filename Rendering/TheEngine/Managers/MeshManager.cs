@@ -47,6 +47,24 @@ namespace TheEngine.Managers
         }
 
         // @todo: not thread safe!
+        public IMesh CreateMesh(Vector3[] vertices, uint[] indices)
+        {
+            var handle = new MeshHandle(meshes.Count);
+
+            var mesh = new Mesh(engine, handle, false);
+            mesh.SetVertices(vertices);
+            mesh.SetIndices(indices, 0);
+            mesh.RebuildIndices();
+
+            meshes.Add(mesh);
+            #if TRACK_ALLOCATIONS
+            allocations.Add(new System.Diagnostics.StackTrace(2));
+            #endif
+
+            return mesh;
+        }
+        
+        // @todo: not thread safe!
         public IMesh CreateMesh(in MeshData meshData)
         {
             var handle = new MeshHandle(meshes.Count);

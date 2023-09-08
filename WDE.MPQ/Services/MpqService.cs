@@ -51,7 +51,7 @@ namespace WDE.MPQ.Services
             List<IMpqArchive> archives = new();
             foreach (var file in files)
             {
-                if (file.Contains("Data/Cache"))
+                if (file.Contains("Data/Cache") || file.Contains("Data\\Cache"))
                 {
                     Console.WriteLine("Skipping " + file);
                     continue;

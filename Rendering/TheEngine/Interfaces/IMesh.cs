@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using TheAvaloniaOpenGL;
 using TheEngine.Handles;
 using TheMaths;
 
@@ -20,6 +21,7 @@ namespace TheEngine.Interfaces
         BoundingBox Bounds { get; }
 
         MeshHandle Handle { get; }
+        IndexType IndexType { get; }
         IEnumerable<(Vector4, Vector4, Vector4)> GetFaces(int submesh);
     }
 }

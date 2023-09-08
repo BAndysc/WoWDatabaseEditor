@@ -130,7 +130,7 @@ namespace TheEngine.Utils.ImGuiHelper
             var io = ImGui.GetIO();
             if (this.DisplaySize == io.DisplaySize)
                 return;
-            this.DisplaySize = io.DisplaySize;
+            this.DisplaySize = io.DisplaySize / io.DisplayFramebufferScale;
             UpdatePlacement();
         }
 

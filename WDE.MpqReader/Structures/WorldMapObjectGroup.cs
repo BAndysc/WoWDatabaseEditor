@@ -15,6 +15,7 @@ namespace WDE.MpqReader.Structures
         public readonly PooledArray<ushort> Indices;
         public readonly PooledArray<Vector3> Vertices;
         public readonly PooledArray<Color>? VertexColors;
+        public readonly PooledArray<Color>? VertexColors2;
         public readonly ushort[] CollisionOnlyIndices;
         public readonly PooledArray<Vector3> Normals;
         public readonly List<PooledArray<Vector2>> UVs = new();
@@ -31,7 +32,7 @@ namespace WDE.MpqReader.Structures
             reader.ReadInt32(); // version
 
             var secondChunkName = reader.ReadUInt32();
-            Debug.Assert(secondChunkName == 0x4d4f4750);// == 'P' && secondChunkName[1] == 'G' && secondChunkName[2] == 'O' && secondChunkName[3] == 'M');
+            Debug.Assert(secondChunkName == 0x4d4f4750, "secondChunkName == " + secondChunkName);// == 'P' && secondChunkName[1] == 'G' && secondChunkName[2] == 'O' && secondChunkName[3] == 'M');
             reader.ReadInt32();
             Header = new WorldMapObjectGroupHeader(reader);
 
@@ -48,9 +49,17 @@ namespace WDE.MpqReader.Structures
                 if (chunkName == "MOPY")
                     Polygons = ParsePolygons(partialReader, size);
                 else if (chunkName == "MOVI")
+                {
+                    if (Indices != null)
+                        throw new Exception("Duplicate MOVT chunk");
                     Indices = ParseIndices(partialReader, size, Polygons);
+                }
                 else if (chunkName == "MOVT")
+                {
+                    if (Vertices != null)
+                        throw new Exception("Duplicate MOVT chunk");
                     Vertices = ReadVectors3(partialReader, size);
+                }
                 else if (chunkName == "MONR")
                     Normals = ReadVectors3(partialReader, size);
                 else if (chunkName == "MOTV")
@@ -58,7 +67,13 @@ namespace WDE.MpqReader.Structures
                 else if (chunkName == "MOBA")
                     Batches = ReadBatches(partialReader, size);
                 else if (chunkName == "MOCV")
-                    VertexColors = ReadVertexColors(partialReader, size);
+                {
+                    var colors = ReadVertexColors(partialReader, size);
+                    if (VertexColors == null)
+                        VertexColors = colors;
+                    else
+                        VertexColors2 = colors;
+                }
                 else if (chunkName == "MLIQ")
                     Liquid = new WorldMapObjectLiquid(reader, in wmoHeader, in Header);
                 else if (chunkName == "MORB")
@@ -205,6 +220,7 @@ namespace WDE.MpqReader.Structures
         public void Dispose()
         {
             VertexColors?.Dispose();
+            VertexColors2?.Dispose();
             Polygons.Dispose();
             Indices.Dispose();
             Vertices.Dispose();

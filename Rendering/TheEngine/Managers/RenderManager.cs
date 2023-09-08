@@ -480,7 +480,7 @@ namespace TheEngine.Managers
             SetShader(material.Shader);
             EnableMaterial(material, false, null);
             SetMesh((Mesh)planeMesh);
-            engine.Device.DrawIndexed(engine.meshManager.GetMeshByHandle(planeMesh.Handle).IndexCount(0), 0, 0);
+            engine.Device.DrawIndexed(engine.meshManager.GetMeshByHandle(planeMesh.Handle).IndexCount(0), 0, 0, planeMesh.IndexType);
         }
         
         public void FinalizeRendering(int dstFrameBuffer)
@@ -576,6 +576,8 @@ namespace TheEngine.Managers
                         continue;
                     ref var parentLocalToWorld = ref cacheLocalToWorld[parents[i].Parent];
                     localToWorld[i] = parentLocalToWorld;
+                    if (parents[i].Local.HasValue)
+                        localToWorld[i] = new LocalToWorld(){Matrix = parents[i].Local.Value * localToWorld[i].Matrix};
                     dirtyPosition[i].Enable();
                 }
             });
@@ -867,7 +869,7 @@ namespace TheEngine.Managers
                     Stats.IndicesDrawn += indicesCount;
                     Stats.TrianglesDrawn += indicesCount / 3;
                     Stats.NonInstancedDraws++;
-                    engine.Device.DrawIndexed(indicesCount, mesh.IndexStart(meshId), 0);
+                    engine.Device.DrawIndexed(indicesCount, mesh.IndexStart(meshId), 0, mesh.IndexType);
                     //draw.Stop();
                 }
                 else
@@ -918,14 +920,14 @@ namespace TheEngine.Managers
                     //materialtimer.Stop();
                     
 #if DEBUG
-                currentShader.Validate();
+                    currentShader.Validate();
 #endif
                     //draw.Start();
                     var indicesCount = mesh.IndexCount(meshId);
                     Stats.IndicesDrawn += indicesCount * (toBatch + 1);
                     Stats.TrianglesDrawn += (indicesCount / 3) * (toBatch + 1);
                     Stats.InstancedDraws++;
-                    engine.Device.DrawIndexedInstanced(indicesCount,  toBatch + 1, mesh.IndexStart(meshId), 0, 0);
+                    engine.Device.DrawIndexedInstanced(indicesCount,  toBatch + 1, mesh.IndexStart(meshId), 0, 0, mesh.IndexType);
                     
                     i += toBatch;
                 }
@@ -983,7 +985,7 @@ namespace TheEngine.Managers
             objectBuffer.UpdateBuffer(ref objectData);
             var start = mesh.IndexStart(submesh);
             var count = mesh.IndexCount(submesh);
-            engine.Device.DrawIndexed(count, start, 0);
+            engine.Device.DrawIndexed(count, start, 0, mesh.IndexType);
         }
 
         public void DrawLine(Vector3 start, Vector3 end, Vector4 color)
@@ -1026,7 +1028,7 @@ namespace TheEngine.Managers
             SetMesh((Mesh)mesh);
             var start = mesh.IndexStart(submesh);
             var count = mesh.IndexCount(submesh);
-            engine.Device.DrawIndexedInstanced(count, instancesCount, start, 0, 0);
+            engine.Device.DrawIndexedInstanced(count, instancesCount, start, 0, 0, mesh.IndexType);
         }
 
         public void RenderInstancedIndirect(IMesh mesh, Material material, int submesh, int instancesCount)
@@ -1036,7 +1038,7 @@ namespace TheEngine.Managers
             SetMesh((Mesh)mesh);
             var start = mesh.IndexStart(submesh);
             var count = mesh.IndexCount(submesh);
-            engine.Device.DrawIndexedInstanced(count, instancesCount, start, 0, 0);
+            engine.Device.DrawIndexedInstanced(count, instancesCount, start, 0, 0, mesh.IndexType);
         }
 
         public float ViewDistanceModifier
@@ -1051,7 +1053,7 @@ namespace TheEngine.Managers
 
         public void ActivateScene(in SceneData? scene)
         {
-            var data = scene ?? new SceneData(engine.cameraManger.MainCamera, engine.lightManager.MainLight, engine.lightManager.SecondaryLight);
+            var data = scene ?? new SceneData(engine.cameraManger.MainCamera, engine.lightManager.Fog, engine.lightManager.MainLight, engine.lightManager.SecondaryLight);
             UpdateSceneBuffer(in data);
             sceneBuffer.UpdateBuffer(ref sceneData);
             sceneBuffer.Activate(Constants.SCENE_BUFFER_INDEX);
@@ -1078,6 +1080,10 @@ namespace TheEngine.Managers
             sceneData.SecondaryLightColor = data.SecondaryLight.LightColor.XYZ();
             sceneData.SecondaryLightIntensity = data.SecondaryLight.LightIntensity;
             sceneData.AmbientColor = data.MainLight.AmbientColor;
+            sceneData.fogStart = data.Fog.Start;
+            sceneData.fogEnd = data.Fog.End;
+            sceneData.fogColor = data.Fog.Color;
+            sceneData.fogEnabled = data.Fog.Enabled ? 1 : 0;
             sceneData.Time = (float)engine.TotalTime;
             sceneData.ZNear = camera.NearClip;
             sceneData.ZFar = camera.FarClip;

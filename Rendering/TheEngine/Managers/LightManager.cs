@@ -11,7 +11,9 @@ namespace TheEngine.Managers
 
         public DirectionalLight MainLight { get; set; }
         public DirectionalLight SecondaryLight { get; set; }
-
+        private FogSettings fog;
+        public ref FogSettings Fog => ref fog;
+        
         internal LightManager(Engine engine)
         {
             this.engine = engine;
@@ -24,6 +26,14 @@ namespace TheEngine.Managers
             SecondaryLight = new DirectionalLight();
             SecondaryLight.LightIntensity = 0;
             SecondaryLight.AmbientColor = Vector4.Zero;
+
+            Fog = new FogSettings()
+            {
+                Enabled = false,
+                Start = 0,
+                End = 0,
+                Color = new Vector4(0, 0, 0, 1)
+            };
         }
 
         public void Dispose()

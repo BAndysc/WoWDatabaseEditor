@@ -37,6 +37,7 @@ namespace WDE.MapRenderer.Managers
         public LiquidTypeStore LiquidTypeStore { get; }
         public LiquidObjectStore LiquidObjectStore { get; }
         public LiquidMaterialStore LiquidMaterialStore { get; }
+        public WorldMapAreaStore WorldMapAreaStore { get; }
 
         private IEnumerable<object> OpenDbc(string name)
         {
@@ -126,6 +127,7 @@ namespace WDE.MapRenderer.Managers
             ItemDisplayInfoStore = new((dynamic)OpenDbc("ItemDisplayInfo"), gameFiles.WoWVersion, ModelFileDataStore, TextureFileDataStore);
             LightParamStore = new (gameFiles.WoWVersion, (dynamic)OpenDbc("LightParams"), LightIntParamStore, LightFloatParamStore, LightDataStore);
             LightStore = new ((dynamic)OpenDbc("Light"), LightParamStore);
+            WorldMapAreaStore = new((dynamic)OpenDbc("WorldMapArea"), gameFiles.WoWVersion);
         }
 
         public IEnumerable<(System.Type, object)> Stores()

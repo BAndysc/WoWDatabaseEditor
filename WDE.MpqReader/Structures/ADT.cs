@@ -478,6 +478,31 @@ namespace WDE.MpqReader.Structures
             b0 |= (ulong)(b) << (index * 8);
         }
         
+        public bool Equals(Bitset64 other)
+        {
+            return b0 == other.b0;
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is Bitset64 other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            return b0.GetHashCode();
+        }
+
+        public static bool operator ==(Bitset64 left, Bitset64 right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(Bitset64 left, Bitset64 right)
+        {
+            return !left.Equals(right);
+        }
+
         public static Bitset64 Empty { get; } = new() { b0 = 0 };
         public static Bitset64 Full { get; } = new() { b0 = 0xFFFFFFFFFFFFFFFFUL };
     }

@@ -4,6 +4,7 @@ using Prism.Events;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;
 using WDE.Common.DBC;
+using WDE.Common.Utils;
 using WDE.MapSpawns.ViewModels;
 using WDE.Module.Attributes;
 using WDE.MVVM;
@@ -17,7 +18,7 @@ public interface IGamePhaseService
     ObservableCollection<GamePhaseViewModel> Phases { get; }
     ObservableCollection<GamePhaseViewModel> ActivePhases { get; }
     IObservable<IReadOnlyList<GamePhaseViewModel>> ActivePhasesObservable { get; }
-    bool IsPhaseActive(int? phaseId, int? phaseGroup);
+    bool IsPhaseActive(SmallReadOnlyList<int>? phaseId, int? phaseGroup);
     bool PhaseMaskOverlaps(uint phaseMask);
 }
 
@@ -30,13 +31,18 @@ public class GamePhaseService : IGamePhaseService
     public ObservableCollection<GamePhaseViewModel> ActivePhases { get; } = new();
     public IObservable<IReadOnlyList<GamePhaseViewModel>> ActivePhasesObservable { get; }
 
-    public bool IsPhaseActive(int? phaseId, int? phaseGroup)
+    public bool IsPhaseActive(SmallReadOnlyList<int>? phaseIds, int? phaseGroup)
     {
-        if (!phaseId.HasValue && !phaseGroup.HasValue)
+        if (!phaseIds.HasValue && !phaseGroup.HasValue)
             return true;
-        
-        if (phaseId.HasValue)
-            return ActivePhases.Any(x => x.Entry == phaseId.Value);
+
+        if (phaseIds.HasValue)
+        {
+            foreach (var phaseId in phaseIds)
+                if (ActivePhases.All(x => x.Entry != phaseId))
+                    return false;
+            return true;
+        }
 
         throw new Exception("Phase group not yet implemented (implement dbc loading first)");
     }

@@ -1,5 +1,6 @@
 using LinqToDB.Mapping;
 using WDE.Common.Database;
+using WDE.Common.Utils;
 
 namespace WDE.TrinityMySqlDatabase.Models
 {
@@ -16,7 +17,7 @@ namespace WDE.TrinityMySqlDatabase.Models
         [Column(Name = "map")]
         public uint Map { get; set; }
 
-        public int? PhaseId => null;
+        public SmallReadOnlyList<int>? PhaseId => null;
         
         public int? PhaseGroup => null;
         
@@ -76,9 +77,11 @@ namespace WDE.TrinityMySqlDatabase.Models
         public uint Map { get; set; }
 
         public uint? PhaseMask => null;
-        
+
         [Column(Name = "PhaseId")]
-        public int? PhaseId { get; set; }
+        public int? phaseId { get; set; }
+
+        public SmallReadOnlyList<int>? PhaseId => phaseId is null or 0 ? null : new SmallReadOnlyList<int>(phaseId.Value);
         
         [Column(Name = "PhaseGroup")]
         public int? PhaseGroup { get; set; }

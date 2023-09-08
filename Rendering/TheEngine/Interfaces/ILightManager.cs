@@ -6,5 +6,6 @@ namespace TheEngine.Interfaces
     {
        DirectionalLight MainLight { get; }
        DirectionalLight SecondaryLight { get; }
+       ref FogSettings Fog { get; }
     }
 }

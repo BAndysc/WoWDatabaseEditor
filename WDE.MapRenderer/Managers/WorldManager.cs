@@ -15,7 +15,7 @@ public class WorldManager : System.IDisposable
     private readonly NotificationsCenter notificationsCenter;
     private readonly ZoneAreaManager zoneAreaManager;
     private readonly AreaTableStore areaTableStore;
-    private bool[,] presentChunks = new bool[64, 64];
+    private AdtChunkType[,] presentChunks = new AdtChunkType[64, 64];
     private Vector3? teleportPosition;
     
     public WorldManager(IGameFiles gameFiles,
@@ -34,6 +34,7 @@ public class WorldManager : System.IDisposable
     }
     
     public WDT? CurrentWdt { get; private set; }
+    public WDL? CurrentWdl { get; private set; }
 
     private uint? prevAreaId;
     public void Update(float delta)
@@ -60,26 +61,34 @@ public class WorldManager : System.IDisposable
     
     public IEnumerator LoadMap(CancellationToken cancel)
     {
-        var fullName = gameFiles.Wdt(gameContext.CurrentMap.Directory);
-        var wdtBytesTask = gameFiles.ReadFile(fullName);
+        var wdtPath = gameFiles.Wdt(gameContext.CurrentMap.Directory);
+        var wdlPath = gameFiles.Wdl(gameContext.CurrentMap.Directory);
+        var wdtBytesTask = gameFiles.ReadFile(wdtPath);
+        var wdlBytesTask = gameFiles.ReadFile(wdlPath);
         yield return wdtBytesTask;
+        yield return wdlBytesTask;
 
         using var wdtBytes = wdtBytesTask.Result;
+        using var wdlBytes = wdlBytesTask.Result;
         if (wdtBytes == null)
         {
-            Console.WriteLine("Couldn't load map " + fullName + ". This is quite fatal...");
+            Console.WriteLine("Couldn't load map " + wdtPath + ". This is quite fatal...");
             yield break;
         }
-
+        
         ClearData();
         
         CurrentWdt = new WDT(new MemoryBinaryReader(wdtBytes), gameFiles.WoWVersion);
+        if (wdlBytes != null)
+            CurrentWdl = new WDL(new MemoryBinaryReader(wdlBytes));
+        else
+            CurrentWdl = null;
 
         Vector3 middlePosSum = Vector3.Zero;
         int chunks = 0;
         foreach (var chunk in CurrentWdt.Chunks)
         {
-            presentChunks[chunk.Y, chunk.X] = chunk.HasAdt;
+            presentChunks[chunk.Y, chunk.X] = chunk.HasAdt ? (chunk.IsAllWater ? AdtChunkType.AllWater : AdtChunkType.Regular) : AdtChunkType.None;
             if (chunk.HasAdt)
             {
                 middlePosSum += chunk.MiddlePosition;
@@ -120,7 +129,7 @@ public class WorldManager : System.IDisposable
         {
             for (int x = 0; x < 64; ++x)
             {
-                presentChunks[y, x] = false;
+                presentChunks[y, x] = AdtChunkType.None;
             }
         }
     }
@@ -129,9 +138,13 @@ public class WorldManager : System.IDisposable
     {
     }
 
-    public bool IsChunkPresent(int chunkX, int chunkY)
+    public bool IsChunkPresent(int chunkX, int chunkY, out AdtChunkType type)
     {
-        return chunkX >= 0 && chunkX < 64 && chunkY >= 0 && chunkY < 64 && presentChunks[chunkY, chunkY];
+        type = default;
+        if (chunkX < 0 || chunkX >= 64 || chunkY < 0 || chunkY >= 64 || presentChunks[chunkY, chunkX] == AdtChunkType.None)
+            return false;
+        type = presentChunks[chunkY, chunkX];
+        return true;
     }
 
     public void SetNextTeleportPosition(Vector3? teleportPosition) => this.teleportPosition = teleportPosition;

@@ -51,11 +51,7 @@ namespace WDE.MapRenderer
                 await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
                     .SetTitle("Can't load game view")
                     .SetMainInstruction("Can't load the game view")
-                    .SetContent(
-                        "Unfortunately due to a change in the UI framework, the 3D view stopped working on Windows. " +
-                        "I am working on a fix, but for now you can use the 3D view on Linux or MacOS. Sorry.\n\n\n" +
-                        "If you reaaally want to enable it, add --wgl flag to the command line arguments. This will force enable 3D in Windows, " +
-                        "but it tends to be unstable (or unusable completely).")
+                    .SetContent("Unfortunately the 3D view is not supported on your platform (Linux, right?) ")
                     .WithOkButton(false)
                     .Build());
                 return null!;

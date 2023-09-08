@@ -23,4 +23,8 @@
         <ProjectReference Include="..\..\WoWDatabaseEditor\WoWDatabaseEditorCore.csproj" />
         <ProjectReference Include="..\RenderingTester\RenderingTester.csproj" />
     </ItemGroup>
+    
+    <PropertyGroup>
+        <ApplicationManifest>app.manifest</ApplicationManifest>
+    </PropertyGroup>
 </Project>

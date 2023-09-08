@@ -460,7 +460,7 @@ public class DummyCreature : ICreature
     public uint Entry { get; set; }
     public uint Map { get; set; }
     public uint? PhaseMask { get; set; }
-    public int? PhaseId { get; set; }
+    public SmallReadOnlyList<int>? PhaseId { get; set; }
     public int? PhaseGroup { get; set; }
     public int EquipmentId { get; set; }
     public uint Model { get; set; }
@@ -478,7 +478,7 @@ public class DummyGameObject : IGameObject
     public uint Entry { get; set; }
     public uint Map { get; set; }
     public uint? PhaseMask { get; set; }
-    public int? PhaseId { get; set; }
+    public SmallReadOnlyList<int>? PhaseId { get; set; }
     public int? PhaseGroup { get; set; }
     public float X { get; set; }
     public float Y { get; set; }

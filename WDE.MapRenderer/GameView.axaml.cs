@@ -10,12 +10,12 @@ namespace WDE.MapRenderer
 {
     public class GameView : UserControl
     {
-        private TheEnginePanel enginePanel;
+        private Control enginePanel;
         
         public GameView()
         {
             InitializeComponent();
-            enginePanel = this.FindControl<TheEnginePanel>("TheEnginePanel");
+            enginePanel = this.FindControl<Control>("TheEnginePanel");
         }
 
 
@@ -28,7 +28,7 @@ namespace WDE.MapRenderer
         {
             DispatcherTimer.RunOnce(() =>
             {
-                this.FindControl<TheEnginePanel>("TheEnginePanel").Focus();
+                this.FindControl<Control>("TheEnginePanel").Focus();
             }, TimeSpan.FromMilliseconds(1));
             enginePanel.ContextMenu = new ContextMenu();
         }

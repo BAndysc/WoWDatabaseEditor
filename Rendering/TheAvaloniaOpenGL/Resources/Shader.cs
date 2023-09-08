@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
+﻿using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using OpenGLBindings;
-using TheMaths;
 
 namespace TheAvaloniaOpenGL.Resources
 {
@@ -257,8 +253,7 @@ namespace TheAvaloniaOpenGL.Resources
             var error = device.LinkProgramAndGetError(ProgramHandle);
             if (error != null && error.Trim().Length > 0)
             {
-                Console.WriteLine("Error, EXITING: '" + error + "'");
-                Environment.Exit(2);
+                throw new Exception(error);
             }
             device.UseProgram(ProgramHandle);
 

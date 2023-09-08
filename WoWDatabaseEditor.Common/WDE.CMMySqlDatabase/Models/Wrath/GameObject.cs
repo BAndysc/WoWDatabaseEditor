@@ -1,5 +1,6 @@
 using LinqToDB.Mapping;
 using WDE.Common.Database;
+using WDE.Common.Utils;
 
 namespace WDE.CMMySqlDatabase.Models.Wrath
 {
@@ -19,7 +20,7 @@ namespace WDE.CMMySqlDatabase.Models.Wrath
         [Column(Name = "phaseMask")]
         public uint? PhaseMask { get; set; }
 
-        public int? PhaseId => null;
+        public SmallReadOnlyList<int>? PhaseId => null;
         
         public int? PhaseGroup => null;
 

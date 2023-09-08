@@ -4,11 +4,13 @@ using Prism.Ioc;
 using Unity;
 using Unity.Extension;
 using Unity.Resolution;
+using WDE.Common.Database.Counters;
 using WDE.Common.Managers;
 using WDE.Common.Modules;
 using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Services.QueryParser.Models;
+using WDE.Common.TableData;
 using WDE.Common.Tasks;
 using WDE.Common.Utils;
 using WDE.MapRenderer;
@@ -220,7 +222,7 @@ public class ScopedContainer : BaseScopedContainer
         childContainer.AddExtension(lt);
         lt.TypeDefaultLifetime = new ContainerControlledLifetimeManager();
         var extensions = new UnityContainerExtension(childContainer);
-        var scope = new ScopedContainer(extensions, new UnityContainerRegistry(childContainer), childContainer);
+        var scope = new ScopedContainer(extensions, new UnityContainerRegistry(childContainer, extensions), childContainer);
         extensions.RegisterInstance<IScopedContainer>(scope);
         extensions.RegisterInstance<IContainerExtension>(scope);
         extensions.RegisterInstance<IContainerProvider>(scope);
@@ -260,5 +262,86 @@ public class DummyTableEditorPickerService : ITableEditorPickerService
     {
         Console.WriteLine("Objects editing not supported in standalone window");
         return Task.CompletedTask;
+    }
+}
+
+public class DummyTabularDataPicker : ITabularDataPicker
+{
+    public async Task<T?> PickRow<T>(ITabularDataArgs<T> args, int defaultSelection = -1, string? defaultSearchText = null) where T : class
+    {
+        return default(T?);
+    }
+
+    public async Task<IReadOnlyCollection<T>?> PickRows<T>(ITabularDataArgs<T> args, IReadOnlyList<int>? defaultSelection = null, string? defaultSearchText = null,
+        bool useCheckBoxes = false) where T : class
+    {
+        return null;
+    }
+}
+
+public class DummyWindowManager : IWindowManager
+{
+    public IAbstractWindowView ShowWindow(IWindowViewModel viewModel, out Task task)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task<bool> ShowDialog(IDialog viewModel)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<bool> ShowDialog(IDialog viewModel, out IAbstractWindowView? window)
+    {
+        window = null;
+        throw new NotImplementedException();
+    }
+
+    public IAbstractWindowView ShowStandaloneDocument(IDocument document, out Task task)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task<string?> ShowFolderPickerDialog(string defaultDirectory)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task<string?> ShowOpenFileDialog(string filter, string? defaultDirectory = null)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task<string?> ShowSaveFileDialog(string filter, string? defaultDirectory = null, string? initialFileName = null)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void OpenUrl(string url, string arguments = "")
+    {
+        throw new NotImplementedException();
+    }
+
+    public void Activate()
+    {
+        throw new NotImplementedException();
+    }
+}
+
+public class DummyDatabaseRowsCountProvider : IDatabaseRowsCountProvider
+{
+    public async Task<int> GetRowsCountByPrimaryKey(string table, long primaryKey, CancellationToken token)
+    {
+        return 0;
+    }
+
+    public async Task<int> GetCreaturesCountByEntry(long entry, CancellationToken token)
+    {
+        return 0;
+    }
+
+    public async Task<int> GetGameObjectCountByEntry(long entry, CancellationToken token)
+    {
+        return 0;
     }
 }

@@ -356,7 +356,7 @@ public class ImGuiController : IDisposable
 
                     device.Scissor((int)clipMin.X, (int)(io.DisplaySize.Y - clipMax.Y), (int)(clipMax.X - clipMin.X), (int)(clipMax.Y - clipMin.Y));
 
-                    engine.Device.DrawIndexed((int)pcmd.ElemCount, (int)pcmd.IdxOffset + (int)idxOffset, (int)pcmd.VtxOffset + vtxOffset);
+                    engine.Device.DrawIndexed((int)pcmd.ElemCount, (int)pcmd.IdxOffset + (int)idxOffset, (int)pcmd.VtxOffset + vtxOffset, IndexType.Short);
                 }
             }
             vtxOffset += cmdList.VtxBuffer.Size;

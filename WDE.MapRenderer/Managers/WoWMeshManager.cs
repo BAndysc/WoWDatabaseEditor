@@ -141,7 +141,7 @@ namespace WDE.MapRenderer.Managers
             var format = mh2o.LiquidVertexFormat;
 
             // optimized path
-            if (format == 2 || mh2o.IsSingleHeight || mh2o.HeightMap == null)
+            if ((format == 2 || mh2o.IsSingleHeight || mh2o.HeightMap == null) && mh2o.RenderBitArray == Bitset64.Full)
             {
                 var offset = new Vector3(-mh2o.Y_Offset * Constants.UnitSize, -mh2o.X_Offset * Constants.UnitSize, mh2o.MinHeightLevel);
                 vertices = new Vector3[4]
@@ -168,7 +168,7 @@ namespace WDE.MapRenderer.Managers
                     for (int x = 0; x < mh2o.Width + 1; ++x)
                     {
                         var v_index = y * (mh2o.Width + 1) + x;
-                        vertices[v_index] = new Vector3(-Constants.UnitSize * (y + mh2o.Y_Offset), -Constants.UnitSize * (x + mh2o.X_Offset), mh2o.HeightMap[v_index]);
+                        vertices[v_index] = new Vector3(-Constants.UnitSize * (y + mh2o.Y_Offset), -Constants.UnitSize * (x + mh2o.X_Offset), mh2o.HeightMap?[v_index] ?? mh2o.MinHeightLevel);
                     }
                 }
                 int index = 0;

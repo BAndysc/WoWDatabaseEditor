@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace TheAvaloniaOpenGL.Resources
+﻿namespace TheAvaloniaOpenGL.Resources
 {
     public enum TextureFormat
     {

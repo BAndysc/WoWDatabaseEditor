@@ -58,5 +58,24 @@ namespace TheEngine.Interfaces
             renderManager.DrawLine(new Vector3(max.X, max.Y, max.Z), new Vector3(min.X, max.Y, max.Z), color);
             renderManager.DrawLine(new Vector3(min.X, max.Y, max.Z), new Vector3(min.X, min.Y, max.Z), color);
         }
+        
+        public static void DrawFrustum(this IRenderManager renderManager, BoundingFrustum f, Vector4 color)
+        {
+            Vector3[] corners = f.GetCorners();
+            
+            // Draw the frustum edges
+            for (int i = 0; i < 4; i++)
+            {
+                renderManager.DrawLine(corners[i], corners[(i + 1) % 4], color);
+                renderManager.DrawLine(corners[i + 4], corners[(i + 1) % 4 + 4], color);
+                renderManager.DrawLine(corners[i], corners[i + 4], color);
+            }
+
+            // Draw the near and far plane connections
+            for (int i = 0; i < 4; i++)
+            {
+                renderManager.DrawLine(corners[i], corners[i + 4], color);
+            }
+        }
     }
 }

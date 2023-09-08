@@ -1,4 +1,3 @@
-using System;
 using System.Text;
 using Avalonia.OpenGL;
 using Avalonia.Platform.Interop;

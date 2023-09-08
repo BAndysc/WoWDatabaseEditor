@@ -78,14 +78,18 @@ namespace WDE.MapRenderer.Managers
                 yield break;
             }
 
-            var wmo = WMO.Read(new MemoryBinaryReader(bytes.Result));
+            var wmo = WMO.Read(new MemoryBinaryReader(bytes.Result), gameFiles.WoWVersion);
             bytes.Result.Dispose();
 
             List<WorldMapObjectGroup> groups = new();
             for (int i = 0; i < wmo.Header.nGroups; ++i)
             {
-                var groupFile = path.Replace(".wmo", "_" + i.ToString().PadLeft(3, '0') + ".wmo",
-                    StringComparison.OrdinalIgnoreCase);
+                FileId groupFile;
+                if (wmo.GroupFileDataIdsPerLods != null)
+                    groupFile = wmo.GroupFileDataIdsPerLods[0, i];
+                else
+                    groupFile = path.Replace(".wmo", "_" + i.ToString().PadLeft(3, '0') + ".wmo", StringComparison.OrdinalIgnoreCase);
+                
                 var bytesGroup = gameFiles.ReadFile(groupFile);
                 yield return bytesGroup;
                 if (bytesGroup.Result == null)
@@ -105,7 +109,10 @@ namespace WDE.MapRenderer.Managers
             foreach (var group in groups)
             {
                 if (group.Batches == null)
+                {
+                    group.Dispose();
                     continue;
+                }
                 
                 ushort[] indices = new ushort[group.Indices.Length + group.CollisionOnlyIndices.Length];
                 Array.Copy(group.Indices.AsArray(), indices, group.Indices.Length);
@@ -122,7 +129,7 @@ namespace WDE.MapRenderer.Managers
                 foreach (var batch in group.Batches)
                 {
                     wmoMesh.SetSubmeshIndicesRange(j++, (int)batch.startIndex, batch.count);
-                    var mat = CreateMaterial(wmo, group, batch.material_id, out var tex1, out var tex2);
+                    var mat = CreateMaterial(wmo, group, batch.material_id, out var tex1, out var tex2, out var tex3);
                     
                     if (tex1 != null)
                     {
@@ -164,7 +171,7 @@ namespace WDE.MapRenderer.Managers
             result.SetResult(wmoInstance);
         }
 
-        private Material CreateMaterial(WMO wmo, WorldMapObjectGroup group, int materialId, out string? tex1, out string? tex2)
+        private Material CreateMaterial(WMO wmo, WorldMapObjectGroup group, int materialId, out string? tex1, out string? tex2, out string? tex3)
         {
             ref readonly var materialDef = ref wmo.Materials[materialId];
             var mat = materialManager.CreateMaterial("data/wmo.json");
@@ -234,6 +241,7 @@ namespace WDE.MapRenderer.Managers
 
             tex1 = materialDef.texture1Name;
             tex2 = materialDef.texture2Name;
+            tex3 = materialDef.texture3Name;
             mat.SetTexture("texture1", textureManager.EmptyTexture);
             mat.SetTexture("texture2", textureManager.EmptyTexture);
             

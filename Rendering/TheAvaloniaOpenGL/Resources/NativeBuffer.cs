@@ -1,5 +1,4 @@
-﻿using System;
-using OpenGLBindings;
+﻿using OpenGLBindings;
 using TheMaths;
 
 namespace TheAvaloniaOpenGL.Resources

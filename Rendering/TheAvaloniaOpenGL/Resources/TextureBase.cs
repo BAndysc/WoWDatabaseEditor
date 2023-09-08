@@ -1,4 +1,3 @@
-using System;
 using OpenGLBindings;
 
 namespace TheAvaloniaOpenGL.Resources

@@ -1,5 +1,6 @@
 using LinqToDB.Mapping;
 using WDE.Common.Database;
+using WDE.Common.Utils;
 
 namespace WDE.CMMySqlDatabase.Models.TBC
 {
@@ -18,7 +19,7 @@ namespace WDE.CMMySqlDatabase.Models.TBC
 
         public uint? PhaseMask => null;
 
-        public int? PhaseId => null;
+        public SmallReadOnlyList<int>? PhaseId => null;
         
         public int? PhaseGroup => null;
 

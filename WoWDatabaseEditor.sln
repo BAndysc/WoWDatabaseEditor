@@ -234,6 +234,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WowPacketParserModule.V3_4_
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.DatabaseDefinitionEditor", "Modules\WDE.DatabaseDefinitionEditor\WDE.DatabaseDefinitionEditor.csproj", "{C2611439-ADC8-4EB8-B04A-D860382E396E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AvaloniaRenderingTester", "Rendering\AvaloniaRenderingTester\AvaloniaRenderingTester.csproj", "{9095B533-4B28-4799-90A1-48749B1DFC83}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -648,6 +650,10 @@ Global
 		{C2611439-ADC8-4EB8-B04A-D860382E396E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C2611439-ADC8-4EB8-B04A-D860382E396E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C2611439-ADC8-4EB8-B04A-D860382E396E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9095B533-4B28-4799-90A1-48749B1DFC83}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9095B533-4B28-4799-90A1-48749B1DFC83}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9095B533-4B28-4799-90A1-48749B1DFC83}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9095B533-4B28-4799-90A1-48749B1DFC83}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -739,6 +745,7 @@ Global
 		{57B25824-378E-4B4B-B335-71E158E03268} = {5B4101BE-5A22-4B88-9E94-FFC484E04BDE}
 		{0E392E29-04EF-465D-9DC7-C98711BB6B7C} = {5B4101BE-5A22-4B88-9E94-FFC484E04BDE}
 		{C2611439-ADC8-4EB8-B04A-D860382E396E} = {106EEB05-E9AB-453A-ADD0-96505F405D76}
+		{9095B533-4B28-4799-90A1-48749B1DFC83} = {46568AE8-448D-49BC-8E33-E549CCD8124F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3E63D4A5-8159-4344-B556-1E1D8D63DA99}

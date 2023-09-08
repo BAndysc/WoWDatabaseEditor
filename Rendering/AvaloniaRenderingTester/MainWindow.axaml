@@ -8,5 +8,5 @@
         x:Class="AvaloniaRenderingTester.MainWindow"
         x:DataType="avaloniaRenderingTester:MainWindow"
         Title="AvaloniaRenderingTester">
-    <theEngine:TheEnginePanel Game="{CompiledBinding Game}" />
+    <theEngine:NativeTheEnginePanel Game="{CompiledBinding Game}" />
 </Window>

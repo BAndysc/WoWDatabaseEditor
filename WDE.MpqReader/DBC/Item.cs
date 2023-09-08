@@ -3,7 +3,7 @@ using WDE.MpqReader.Structures;
 
 namespace WDE.MpqReader.DBC;
 
-public class Item
+public readonly struct Item
 {
     public readonly uint Id;
     public readonly uint ClassId;

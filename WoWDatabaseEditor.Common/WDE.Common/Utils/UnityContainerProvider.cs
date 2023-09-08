@@ -139,13 +139,15 @@ public class ContainerControlledLifetimeManager : SynchronizedLifetimeManager,
     #endregion
 }
 
-public class UnityContainerRegistry : IContainerRegistry
+public class UnityContainerRegistry : IContainerExtension<IUnityContainer>
 {
     private readonly IUnityContainer container;
+    private readonly IContainerExtension<IUnityContainer> extension;
 
-    public UnityContainerRegistry(IUnityContainer container)
+    public UnityContainerRegistry(IUnityContainer container, IContainerExtension<IUnityContainer> extension)
     {
         this.container = container;
+        this.extension = extension;
     }
     public IContainerRegistry RegisterInstance(Type type, object instance)
     {
@@ -196,6 +198,33 @@ public class UnityContainerRegistry : IContainerRegistry
     {
         return container.IsRegistered(type, name);
     }
+
+    public void FinalizeExtension()
+    {
+        extension.FinalizeExtension();
+    }
+
+    public object Resolve(Type type)
+    {
+        return extension.Resolve(type);
+    }
+
+    public object Resolve(Type type, params (Type Type, object Instance)[] parameters)
+    {
+        return extension.Resolve(type, parameters);
+    }
+
+    public object Resolve(Type type, string name)
+    {
+        return extension.Resolve(type, name);
+    }
+
+    public object Resolve(Type type, string name, params (Type Type, object Instance)[] parameters)
+    {
+        return extension.Resolve(type, name, parameters);
+    }
+
+    public IUnityContainer Instance => extension.Instance;
 }
 
 public class UnityContainerProvider : IContainerProvider

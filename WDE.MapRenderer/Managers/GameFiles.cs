@@ -59,7 +59,7 @@ public class GameFiles : IGameFiles, IDisposable
         }
     }
 
-    public async Task<PooledArray<byte>?> ReadFile(FileId fileId, bool silent = false)
+    public async Task<PooledArray<byte>?> ReadFile(FileId fileId, bool silent = false, int? maxReadBytes = null)
     {
         lock (mpqSync)
         {
@@ -73,16 +73,16 @@ public class GameFiles : IGameFiles, IDisposable
 
             if (size < 50_000)
             {
-                var b = mpqSync.ReadFilePool(fileId);
+                var b = mpqSync.ReadFilePool(fileId, maxReadBytes: maxReadBytes);
                 return b;
             }
         }
-        
+
         await semaphore.WaitAsync();
         Debug.Assert(mpqPool.Count > 0);
         IMpqArchive archive = mpqPool[^1];
         mpqPool.RemoveAt(mpqPool.Count - 1);
-        var bytes = await Task.Run(() => archive.ReadFilePool(fileId));
+        var bytes = await Task.Run(() => archive.ReadFilePool(fileId, maxReadBytes: maxReadBytes));
         mpqPool.Add(archive);
         semaphore.Release();
         
@@ -120,6 +120,8 @@ public class GameFiles : IGameFiles, IDisposable
     public string AdtLod0(string mapName, int x, int y) => $"World\\Maps\\{mapName}\\{mapName}_{x}_{y}_lod.adt";
     
     public string Wdt(string mapName) => $"World\\Maps\\{mapName}\\{mapName}.wdt";
+
+    public string Wdl(string mapName) => $"World\\Maps\\{mapName}\\{mapName}.wdl";
 
     public PooledArray<byte>? ReadFileSyncPool(FileId fileId)
     {

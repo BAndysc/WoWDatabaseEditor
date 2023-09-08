@@ -44,7 +44,7 @@ public class SpawnsToolView : UserControl
     private void OnFocusRequest()
     {
         var root = this.GetVisualRoot();
-        var panel = root.FindDescendantOfType<TheEnginePanel>();
+        var panel = root.FindDescendantOfType<NativeTheEnginePanel>();
         
         Dispatcher.UIThread.Post(() =>
         {

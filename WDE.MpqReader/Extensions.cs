@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using WDE.Common.MPQ;
 using WDE.MpqReader.Structures;
 
@@ -16,11 +17,14 @@ namespace WDE.MpqReader
             return buf;
         }
 
-        public static PooledArray<byte>? ReadFilePool(this IMpqArchive archive, FileId path)
+        public static PooledArray<byte>? ReadFilePool(this IMpqArchive archive, FileId path, int? maxReadBytes = null)
         {
             var size = archive.GetFileSize(path.ToString());
             if (!size.HasValue)
                 return null;
+
+            if (maxReadBytes.HasValue)
+                size = Math.Min(size.Value, maxReadBytes.Value);
 
             var buf = new PooledArray<byte>(size.Value);
             int? read = archive.ReadFile(buf.AsArray(),  size.Value, path.ToString());

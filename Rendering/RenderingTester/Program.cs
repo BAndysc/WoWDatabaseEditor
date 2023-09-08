@@ -11,10 +11,12 @@ using Unity;
 using WDE.AzerothCore;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;
+using WDE.Common.Database.Counters;
 using WDE.Common.DBC;
 using WDE.Common.Managers;
 using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
+using WDE.Common.TableData;
 using WDE.Common.Tasks;
 using WDE.Common.Utils;
 using WDE.DbcStore;
@@ -25,6 +27,7 @@ using WDE.MapSpawns;
 using WDE.Module;
 using WDE.MPQ;
 using WDE.Parameters;
+using WDE.QueryGenerators;
 using WDE.SqlInterpreter;
 using WDE.Trinity;
 using WDE.TrinityMySqlDatabase;
@@ -40,8 +43,9 @@ var nativeWindowSettings = new NativeWindowSettings()
 
 var container = new UnityContainer();
 container.AddExtension(new Diagnostic());
-var scopedContainer = new ScopedContainer(new UnityContainerExtension(container), new UnityContainerRegistry(container), container);
-var registry = new UnityContainerRegistry(container);
+var extensions = new UnityContainerExtension(container);
+var scopedContainer = new ScopedContainer(new UnityContainerExtension(container), new UnityContainerRegistry(container, extensions), container);
+var registry = new UnityContainerRegistry(container, extensions);
 var provider = new UnityContainerProvider(container);
 
 registry.RegisterInstance<IScopedContainer>(scopedContainer);
@@ -54,6 +58,9 @@ registry.Register<IGameProperties, DummyGameProperties>();
 registry.Register<IMessageBoxService, DummyMessageBox>();
 registry.Register<IDatabaseClientFileOpener, DatabaseClientFileOpener>();
 registry.Register<ITableEditorPickerService, DummyTableEditorPickerService>();
+registry.Register<ITabularDataPicker, DummyTabularDataPicker>();
+registry.Register<IWindowManager, DummyWindowManager>();
+registry.Register<IDatabaseRowsCountProvider, DummyDatabaseRowsCountProvider>();
 registry.Register<IQueryEvaluator, DummyQueryEvaluator>();
 var context = new SingleThreadSynchronizationContext(Thread.CurrentThread.ManagedThreadId);
 var mainThread = new MainThread(context);
@@ -63,6 +70,7 @@ registry.RegisterInstance<IEventAggregator>(new EventAggregator());
 SetupModules(new DbcStoreModule(),
     new MpqModule(),
     new WoWDatabaseEditorCore.MainModule(),
+    new QueryGeneratorModule(),
     new TrinityMySqlDatabaseModule(),
     new ParametersModule(),
     new TrinityModule(),

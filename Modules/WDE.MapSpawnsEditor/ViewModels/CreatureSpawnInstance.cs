@@ -1,4 +1,5 @@
 using WDE.Common.Database;
+using WDE.Common.Utils;
 using WDE.MapRenderer.Managers.Entities;
 using WDE.MapRenderer.StaticData;
 using WDE.MapSpawnsEditor.Models;
@@ -12,6 +13,8 @@ public class CreatureSpawnInstance : SpawnInstance
     public override uint Guid => data.Guid;
     public override uint Entry => data.Entry;
     public override Vector3 Position => new Vector3(data.X, data.Y, data.Z);
+    public override uint PhaseMask => data.PhaseMask ?? 0;
+    public override SmallReadOnlyList<int>? Phases => data.PhaseId;
     public override uint Map => data.Map;
     public MovementType MovementType => data.MovementType;
     public float WanderDistance => data.WanderDistance;
@@ -44,14 +47,7 @@ public class CreatureSpawnInstance : SpawnInstance
     
     public override bool IsVisibleInPhase(IGamePhaseService gamePhaseService)
     {
-        if (data.PhaseMask.HasValue)
-        {
-            return gamePhaseService.PhaseMaskOverlaps(data.PhaseMask.Value);
-        }
-        else
-        {
-            return gamePhaseService.IsPhaseActive(data.PhaseId, data.PhaseGroup);
-        }
+        return gamePhaseService.IsVisible(data.PhaseMask, data.PhaseId, data.PhaseGroup);
     }
 
     public override void Dispose()

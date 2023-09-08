@@ -94,10 +94,10 @@ namespace TheAvaloniaOpenGL
             device.ImmediateContext.Rasterizer.State = rasterizerState;*/
         }
 
-        public void DrawIndexed(object indexCount, int v1, int v2)
-        {
-            throw new NotImplementedException();
-        }
+        // public void DrawIndexed(object indexCount, int v1, int v2)
+        // {
+        //     throw new NotImplementedException();
+        // }
 
         // Safe multithread call
         public Sampler CreateSampler(/* todo */)
@@ -192,20 +192,35 @@ namespace TheAvaloniaOpenGL
             device.DrawArrays(PrimitiveType.Lines, startLocation, new IntPtr(verticesCount));
         }
         
+        private DrawElementsType ToOpenGlIndexType(IndexType type, out int bytesSize)
+        {
+            switch (type)
+            {
+                case IndexType.Short:
+                    bytesSize = 2;
+                    return DrawElementsType.UnsignedShort;
+                case IndexType.Int:
+                    bytesSize = 4;
+                    return DrawElementsType.UnsignedInt;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+            }
+        }
+        
         // call only form render thread
-        public void DrawIndexed(int indexCount, int startIndexLocation, int baseVertexLocationBytes)
+        public void DrawIndexed(int indexCount, int startIndexLocation, int baseVertexLocationBytes, IndexType type)
         {
             if (baseVertexLocationBytes == 0)
-                device.DrawElements(PrimitiveType.Triangles, indexCount, DrawElementsType.UnsignedShort, new IntPtr(startIndexLocation * 2));
+                device.DrawElements(PrimitiveType.Triangles, indexCount, ToOpenGlIndexType(type, out var bytesSize), new IntPtr(startIndexLocation * bytesSize));
             else
-                device.DrawElementsBaseVertex(PrimitiveType.Triangles, indexCount, DrawElementsType.UnsignedShort, new IntPtr(startIndexLocation * 2), baseVertexLocationBytes);
+                device.DrawElementsBaseVertex(PrimitiveType.Triangles, indexCount, ToOpenGlIndexType(type, out var bytesSize), new IntPtr(startIndexLocation * bytesSize), baseVertexLocationBytes);
             //device.ImmediateContext.DrawIndexed(indexCount, startIndexLocation, baseVertexLocation);
         }
 
         // call only form render thread
-        public void DrawIndexedInstanced(int indexCountPerInstance, int instanceCount, int startIndexLocation, int baseVertexLocation, int startInstanceLocation)
+        public void DrawIndexedInstanced(int indexCountPerInstance, int instanceCount, int startIndexLocation, int baseVertexLocation, int startInstanceLocation, IndexType type)
         {
-            device.DrawElementsInstanced(PrimitiveType.Triangles, indexCountPerInstance, DrawElementsType.UnsignedShort, new IntPtr(startIndexLocation * 2), instanceCount);
+            device.DrawElementsInstanced(PrimitiveType.Triangles, indexCountPerInstance, ToOpenGlIndexType(type, out var bytesSize), new IntPtr(startIndexLocation * bytesSize), instanceCount);
             //device.ImmediateContext.DrawIndexedInstanced(indexCountPerInstance, instanceCount, startIndexLocation, baseVertexLocation, startInstanceLocation);
         }
 

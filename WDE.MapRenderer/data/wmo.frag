@@ -82,8 +82,8 @@ void main()
     vec3 interiorLight = diffuse * max3(Color.rgb, vec3(0.3));
     vec3 finalColor = mix(lighted, interiorLight, interior);
     finalColor = mix(finalColor, diffuse, or(brightAtNight, unlit));
-   
-    FragColor = vec4(finalColor, 1);
+
+    FragColor = ApplyFog(vec4(finalColor, 1), WorldPos.xyz);
     ObjectIndexOutputBuffer = objectIndex;
   
     //FragColor = vec4(mix(FragColor.rgb, vec3(1, 0, 0), notSupported), FragColor.a);

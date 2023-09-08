@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define USE_OPENTK
+
+using System;
 using System.Diagnostics;
 using System.IO;
 using Avalonia;
@@ -18,11 +20,11 @@ using TheMaths;
 
 namespace TheEngine
 {
-#if USE_OPENTK
-    public class TheEnginePanel : OpenTKGlControl2, IWindowHost, IDisposable
-#else
-    public class TheEnginePanel : OpenGlBase, IWindowHost, IDisposable
-#endif
+//#if USE_OPENTK
+//    public class TheEnginePanel : OpenTKGlControl2, IWindowHost, IDisposable
+//#else
+    public class TheEnginePanel : NativeOpenGlControlBase /*OpenGlBase*/, IWindowHost, IDisposable
+//#endif
     {
         public static KeyGesture Undo { get; } = AvaloniaLocator.Current
             .GetService<PlatformHotkeyConfiguration>()?.Undo.FirstOrDefault() ?? new KeyGesture(Key.Z, KeyModifiers.Control);
@@ -130,7 +132,7 @@ namespace TheEngine
 #if DEBUG && DEBUG_OPENGL
                 device = new DebugDevice(device);
 #endif
-                engine = new Engine(device, new Configuration(), this, true);
+                engine = new Engine(device, new Configuration(), this, false);
 #else
                 IDevice device;
                 var real = new RealDevice(gl);

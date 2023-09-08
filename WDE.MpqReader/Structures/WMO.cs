@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using TheMaths;
+using WDE.Common.MPQ;
 using WDE.MpqReader.Readers;
 using Plane = TheMaths.Plane;
 
@@ -48,8 +49,9 @@ namespace WDE.MpqReader.Structures
         public readonly WorldMapObjectMaterial[] Materials;
         public readonly Vector3[] PortalVertices;
         public readonly WmoPortal[] Portals;
+        public readonly uint[,]? GroupFileDataIdsPerLods;
 
-        public WMO(IBinaryReader reader)
+        public WMO(IBinaryReader reader, GameFilesVersion version)
         {
             Dictionary<int, string> offsets = null!;
             Dictionary<int, string> textureOffsets = null!;
@@ -64,7 +66,7 @@ namespace WDE.MpqReader.Structures
                 var partialReader = new LimitedReader(reader, size);
 
                 if (chunkName == "MOHD")
-                    Header = WMOHeader.Read(partialReader);
+                    Header = WMOHeader.Read(partialReader, version);
                 else if (chunkName == "MOTX")
                     Textures = ChunkedUtils.ReadZeroTerminatedStringArrays(partialReader, true, out textureOffsets);
                 else if (chunkName == "MODD")
@@ -79,14 +81,31 @@ namespace WDE.MpqReader.Structures
                     PortalVertices = ReadVertices(partialReader);
                 else if (chunkName == "MOPT")
                     Portals = ReadPortals(partialReader);
+                else if (chunkName == "GFID")
+                    GroupFileDataIdsPerLods = ReadGroupFileIds(partialReader);
             
                 reader.Offset = offset + size;
             }
         }
 
-        public static WMO Read(IBinaryReader reader)
+        private uint[,]? ReadGroupFileIds(LimitedReader reader)
         {
-            return new WMO(reader);
+            var lodsCount = !Header.flags.HasFlagFast(WorldMapObjectFlags.FlagLod) ? 1 : (Header.lodCount == 0 ? 3 : Header.lodCount);
+            uint[,] data = new uint[lodsCount, Header.nGroups];
+            for (int i = 0; i < lodsCount; ++i)
+            {
+                for (int j = 0; j < Header.nGroups; ++j)
+                {
+                    data[i, j] = reader.ReadUInt32();
+                }
+            }
+
+            return data;
+        }
+
+        public static WMO Read(IBinaryReader reader, GameFilesVersion version)
+        {
+            return new WMO(reader, version);
         }
 
         private WmoPortal[] ReadPortals(LimitedReader reader)
@@ -357,8 +376,9 @@ namespace WDE.MpqReader.Structures
         public readonly uint wmoID;
         public readonly CAaBox bounding_box;                                    // in the alpha, this bounding box was computed upon loading
         public readonly WorldMapObjectFlags flags;
+        public readonly ushort lodCount;
 
-        public WMOHeader(IBinaryReader reader)
+        public WMOHeader(IBinaryReader reader, GameFilesVersion version)
         {
             nTextures = reader.ReadUInt32();
             nGroups = reader.ReadUInt32();
@@ -371,11 +391,15 @@ namespace WDE.MpqReader.Structures
             wmoID = reader.ReadUInt32();
             bounding_box = CAaBox.Read(reader);
             flags = (WorldMapObjectFlags)reader.ReadUInt16();
+            if (version >= GameFilesVersion.Legion_7_3_5)
+                lodCount = reader.ReadUInt16();
+            else
+                lodCount = 0;
         }
 
-        public static WMOHeader Read(IBinaryReader reader)
+        public static WMOHeader Read(IBinaryReader reader, GameFilesVersion version)
         {
-            return new WMOHeader(reader);
+            return new WMOHeader(reader, version);
         }
     }
 }

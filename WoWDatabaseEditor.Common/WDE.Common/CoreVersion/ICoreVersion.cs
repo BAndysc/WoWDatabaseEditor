@@ -47,7 +47,8 @@ namespace WDE.Common.CoreVersion
     {
         NoPhasing,
         PhaseMasks,
-        PhaseIds
+        PhaseIds,
+        Both
     }
     
     public interface IGameVersionFeatures

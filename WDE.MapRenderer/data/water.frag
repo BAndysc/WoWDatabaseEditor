@@ -28,26 +28,26 @@ vec3 WorldPosFromDepth(float depth, vec2 TexCoord) {
 }
 
 void main()
-{   
+{
     //
     vec3 offset = texture(_WaterTexture, WorldPos.xy / 100 + vec2(time, time) / 100000).xyz;
     vec3 offset2 = texture(_WaterTexture, WorldPos.xy / 100 - vec2(time, time) / 100000).xyz;
     offset = NormalBlend((offset - 0.5) * 2, (offset2 - 0.5) * 2);
 
     vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);
-    
+
     float depth = texture(_DepthTexture, screenPos).r;
     vec3 terrainWorldPos = WorldPosFromDepth(depth, screenPos);
     vec3 originalTerrainWorldPos = terrainWorldPos;
-    
-    
+
+
     float displacementStrength = clamp(abs(WorldPos.z - originalTerrainWorldPos.z) / 2, 0, 1);
 
-    float foamFactor = 1 - clamp(abs(WorldPos.z - originalTerrainWorldPos.z) / (2* Noise(offset.xy, 2)), 0, 1);
+    float foamFactor = 1 - clamp(abs(WorldPos.z - originalTerrainWorldPos.z) / (0.1 * (Noise(offset.xy, 2) + 0.5)), 0, 1);
     foamFactor = step(0.5, foamFactor);
     float foamFactor2 = foamFactor * offset.z;
 
-    float timeDivider = 100000;
+    float timeDivider = 200000;
 
     float cameraIsMedium = clamp(abs(cameraPos.z - WorldPos.z) / 30, 0, 1);
     float cameraIsFar = clamp(abs(cameraPos.z - WorldPos.z) / 500, 0, 1);
@@ -66,13 +66,13 @@ void main()
 
     normal = lerp(lerp(normalVeryNear, normal, cameraIsMedium), normalFar, cameraIsFar);
     vec3 viewDir = normalize(cameraPos.xyz - WorldPos.xyz);
-    vec3 reflectDir = reflect(lightDir.xyz, normal);  
+    vec3 reflectDir = reflect(lightDir.xyz, normal);
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), 16);
 
     // displacement
-    
+
     if (terrainWorldPos.z < WorldPos.z)
-        screenPos = screenPos + vec2(offset.x, 0) * 0.05 * displacementStrength;
+    screenPos = screenPos + vec2(offset.x, 0) * 0.05 * displacementStrength;
     depth = texture(_DepthTexture, screenPos).r;
     terrainWorldPos = WorldPosFromDepth(depth, screenPos);
     vec4 sceneColor = texture(_SceneColor, screenPos);
@@ -91,4 +91,5 @@ void main()
 
 
     FragColor = color * 0.0001 + vec4(sceneColor.xyz * (1-waterColor.a) + waterColor.xyz * waterColor.a, 1);
+    FragColor = ApplyFog(FragColor, WorldPos.xyz);
 }

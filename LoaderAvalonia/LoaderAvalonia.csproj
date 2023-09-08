@@ -18,6 +18,10 @@
         <Copy SourceFiles="$(OutputPath)\runtimes\osx-universal\native\libcimgui.dylib" DestinationFolder="$(OutputPath)\runtimes\osx\native\" ContinueOnError="false" />
     </Target>
     
+    <PropertyGroup>
+        <ApplicationManifest>app.manifest</ApplicationManifest>
+    </PropertyGroup>
+    
     <ItemGroup>
       <ProjectReference Include="..\AvaloniaStyles\AvaloniaStyles.csproj" />
       <ProjectReference Include="..\Modules\WDE.DatabaseDefinitionEditor\WDE.DatabaseDefinitionEditor.csproj" />

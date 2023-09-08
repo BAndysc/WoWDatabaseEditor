@@ -57,13 +57,16 @@ namespace WDE.MapRenderer.Managers
             textureManager.DisposeTexture(noiseTexture);
         }
 
-        public Light? BestLight => bestLight;
-
-        private Light? bestLight = null;
+        public CombinedLight? BestLight { get; private set; }
+        private Light? destLight = null;
+        private Light? previousLight = null;
+        private float t = 0;
+        
         public void Update(float delta)
         {
             var position = cameraManager.Position;
             var bestDistance = float.MaxValue;
+            Light? newLight = null;
             foreach (var lightning in lightStore)
             {
                 if (lightning.Continent != gameContext.CurrentMap.Id)
@@ -75,9 +78,31 @@ namespace WDE.MapRenderer.Managers
                     if (distance < bestDistance)
                     {
                         bestDistance = distance;
-                        bestLight = lightning;
+                        newLight = lightning;
                     }
                 }
+            }
+
+            if (newLight != null)
+            {
+                if (previousLight == null)
+                {
+                    previousLight = newLight;
+                    destLight = newLight;
+                    BestLight = new CombinedLight(previousLight, destLight);
+                }
+                else if (destLight != newLight)
+                {
+                    previousLight = destLight;
+                    destLight = newLight;
+                    t = 0;
+                    BestLight = new CombinedLight(previousLight, destLight);
+                }
+            }
+            if (BestLight != null)
+            {
+                t += delta / 1000;
+                BestLight.Mix = Math.Clamp(t, 0, 1);
             }
             
             if (gameProperties.OverrideLighting)
@@ -89,15 +114,21 @@ namespace WDE.MapRenderer.Managers
                 lightManager.SecondaryLight.LightColor = Vector4.One;
                 lightManager.SecondaryLight.LightIntensity = 0;
             }
-            else if (bestLight != null)
+            else if (BestLight != null)
             {
-                var lightColor = bestLight.NormalWeather.GetLightParameter(LightIntParamType.GeneralLightning).GetColorAtTime(timeManager.Time);
-                var ambientLight = bestLight.NormalWeather.GetLightParameter(LightIntParamType.AmbientLight).GetColorAtTime(timeManager.Time);
+                var lightColor = BestLight.NormalWeather.GetLightParameter(LightIntParamType.GeneralLightning).GetColorAtTime(timeManager.Time);
+                var ambientLight = BestLight.NormalWeather.GetLightParameter(LightIntParamType.AmbientLight).GetColorAtTime(timeManager.Time);
 
                 lightManager.MainLight.LightColor = lightColor.ToRgbaVector();
                 lightManager.MainLight.AmbientColor = ambientLight.ToRgbaVector();
                 
                 lightManager.SecondaryLight.LightColor = lightColor.ToRgbaVector();
+
+                lightManager.Fog.Color = BestLight.NormalWeather.GetLightParameter(LightIntParamType.FogInTheBackground).GetColorAtTime(timeManager.Time).ToRgbaVector();
+                lightManager.Fog.Enabled = true;
+                lightManager.Fog.End = Math.Max(BestLight.NormalWeather.GetLightParameter(LightFloatParamType.FogDistance).GetAtTime(timeManager.Time) / 36, 1000);
+                var mult = Math.Max(BestLight.NormalWeather.GetLightParameter(LightFloatParamType.FogMultiplier).GetAtTime(timeManager.Time), 0.5f);
+                lightManager.Fog.Start = lightManager.Fog.End * mult;
             }
 
             float timeOfDay = (timeManager.Time.TotalMinutes + timeManager.MinuteFraction) / 1440.0f;
@@ -120,21 +151,21 @@ namespace WDE.MapRenderer.Managers
         {
             Time time = timeManager.Time;
 
-            if (bestLight != null)
+            if (BestLight != null)
             {
                 //-30, 225
                 float preciseMinutes = (timeManager.Time.TotalMinutes + timeManager.MinuteFraction);
                 float timeOfDay = preciseMinutes / 1440.0f;
                 float timeOfDayHalf = ((preciseMinutes + 1440/2.0f) % 1440) / 1440.0f;
                 
-                var top = bestLight.NormalWeather.GetLightParameter(LightIntParamType.SkyTopMost).GetColorAtTime(time);
-                var middle = bestLight.NormalWeather.GetLightParameter(LightIntParamType.SkyMiddle).GetColorAtTime(time);
-                var towardsHorizon = bestLight.NormalWeather.GetLightParameter(LightIntParamType.SkyToHorizon).GetColorAtTime(time);
-                var horizon = bestLight.NormalWeather.GetLightParameter(LightIntParamType.SkyHorizon).GetColorAtTime(time);
-                var justAboveHorizon = bestLight.NormalWeather.GetLightParameter(LightIntParamType.SkyJustAboveHorizon).GetColorAtTime(time);
-                var sunColor = bestLight.NormalWeather.GetLightParameter(LightIntParamType.SunColor).GetColorAtTime(time);
-                var cloudsColor1 = bestLight.NormalWeather.GetLightParameter(LightIntParamType.Clouds1).GetColorAtTime(time);
-                var cloudsDensity = bestLight.NormalWeather.GetLightParameter(LightFloatParamType.CloudDensity).GetAtTime(time);
+                var top = BestLight.NormalWeather.GetLightParameter(LightIntParamType.SkyTopMost).GetColorAtTime(time);
+                var middle = BestLight.NormalWeather.GetLightParameter(LightIntParamType.SkyMiddle).GetColorAtTime(time);
+                var towardsHorizon = BestLight.NormalWeather.GetLightParameter(LightIntParamType.SkyToHorizon).GetColorAtTime(time);
+                var horizon = BestLight.NormalWeather.GetLightParameter(LightIntParamType.SkyHorizon).GetColorAtTime(time);
+                var justAboveHorizon = BestLight.NormalWeather.GetLightParameter(LightIntParamType.SkyJustAboveHorizon).GetColorAtTime(time);
+                var sunColor = BestLight.NormalWeather.GetLightParameter(LightIntParamType.SunColor).GetColorAtTime(time);
+                var cloudsColor1 = BestLight.NormalWeather.GetLightParameter(LightIntParamType.Clouds1).GetColorAtTime(time);
+                var cloudsDensity = BestLight.NormalWeather.GetLightParameter(LightFloatParamType.CloudDensity).GetAtTime(time);
                 skyMaterial.BlendingEnabled = true;
                 skyMaterial.SourceBlending = Blending.SrcAlpha;
                 skyMaterial.DestinationBlending = Blending.OneMinusSrcAlpha;

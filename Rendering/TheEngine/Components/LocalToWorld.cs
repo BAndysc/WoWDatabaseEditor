@@ -7,6 +7,7 @@ namespace TheEngine.Components
     public struct CopyParentTransform : IComponentData
     {
         public Entity Parent { get; set; }
+        public Matrix? Local { get; set; }
     }
 
     public static class CopyParentTransformExtensions

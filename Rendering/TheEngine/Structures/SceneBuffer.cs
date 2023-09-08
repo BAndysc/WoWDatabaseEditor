@@ -25,6 +25,12 @@ namespace TheEngine.Structures
         
         public Vector3 SecondaryLightColor;
         public float SecondaryLightIntensity;
+
+        public float fogStart;
+        public float fogEnd;
+        public float fogEnabled;
+        public float Align1;
+        public Vector4 fogColor;
         
         public float ScreenWidth;
         public float ScreenHeight;

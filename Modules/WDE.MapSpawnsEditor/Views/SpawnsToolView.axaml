@@ -32,20 +32,23 @@
             <Button Content="Active phases">
                 <Button.Flyout>
                     <Flyout>
-                        <ScrollViewer MaxHeight="600">
-                            <ItemsRepeater Items="{CompiledBinding AllPhases}">
-                                <ItemsRepeater.ItemTemplate>
-                                    <DataTemplate x:DataType="viewModels:GamePhaseViewModel">
-                                        <CheckBox Margin="0,3,0,3" IsChecked="{CompiledBinding Active}">
-                                            <StackPanel Orientation="Horizontal">
-                                                <TextBlock MinWidth="23" FontFamily="Consolas,Menlo,Courier,Courier New" Opacity="0.7" Text="{CompiledBinding Entry}" />
-                                                <TextBlock Text="{CompiledBinding Name}" />
-                                            </StackPanel>
-                                        </CheckBox>
-                                    </DataTemplate>
-                                </ItemsRepeater.ItemTemplate>
-                            </ItemsRepeater>
-                        </ScrollViewer>
+                        <DockPanel>
+                            <CheckBox DockPanel.Dock="Top" IsChecked="{CompiledBinding ShowAllPhases}">Show all phase ids and masks</CheckBox>
+                            <ScrollViewer MaxHeight="600">
+                                <ItemsRepeater Items="{CompiledBinding AllPhases}">
+                                    <ItemsRepeater.ItemTemplate>
+                                        <DataTemplate x:DataType="viewModels:GamePhaseViewModel">
+                                            <CheckBox Margin="0,3,0,3" IsChecked="{CompiledBinding Active}">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock MinWidth="23" FontFamily="Consolas,Menlo,Courier,Courier New" Opacity="0.7" Text="{CompiledBinding Entry}" />
+                                                    <TextBlock Text="{CompiledBinding Name}" />
+                                                </StackPanel>
+                                            </CheckBox>
+                                        </DataTemplate>
+                                    </ItemsRepeater.ItemTemplate>
+                                </ItemsRepeater>
+                            </ScrollViewer>
+                        </DockPanel>
                     </Flyout>
                 </Button.Flyout>
             </Button>

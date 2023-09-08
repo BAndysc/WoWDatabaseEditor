@@ -857,11 +857,11 @@ namespace WDE.Parameters
         public event Action<IParameter<long>>? ItemsChanged;
     }
 
-    public class PhaseParameter : Parameter
+    public class PhaseParameter : Parameter, IDynamicParameter<long>
     {
         private readonly IParameter<long> dbc;
         private readonly IParameter<long> db;
-
+        
         public PhaseParameter(IParameter<long> dbc, IParameter<long> db)
         {
             Items = new Dictionary<long, SelectOption>();
@@ -881,6 +881,7 @@ namespace WDE.Parameters
             if (db.Items != null)
                 foreach (var item in db.Items)
                     Items[item.Key] = item.Value;
+            ItemsChanged?.Invoke(this);
         }
 
         private void Reload(IParameter<long> obj)
@@ -901,5 +902,7 @@ namespace WDE.Parameters
                 return dbc.ToString(value);
             return db.ToString(value);
         }
+
+        public event Action<IParameter<long>>? ItemsChanged;
     }
 }

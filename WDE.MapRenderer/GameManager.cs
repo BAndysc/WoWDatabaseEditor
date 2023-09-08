@@ -41,6 +41,7 @@ namespace WDE.MapRenderer
         private LoadingManager loadingManager = null!;
         private ZoneAreaManager zoneAreaManager = null!;
         private AnimationSystem animationSystem = null!;
+        private LowDetailHeightMapManager lowDetailHeightMapManager = null!;
 
         public CoroutineManager CoroutineManager => coroutineManager;
         public NotificationsCenter NotificationsCenter => notificationsCenter;
@@ -135,6 +136,7 @@ namespace WDE.MapRenderer
             raycastSystem = ResolveOrCreate<RaycastSystem>();
             moduleManager = ResolveOrCreate<ModuleManager>();
             animationSystem = ResolveOrCreate<AnimationSystem>();
+            lowDetailHeightMapManager = ResolveOrCreate<LowDetailHeightMapManager>();
             
             IsInitialized = true;
             return true;
@@ -188,6 +190,7 @@ namespace WDE.MapRenderer
                 return;
             }
 
+            lowDetailHeightMapManager.Render();
             meshManager.Render();
             renderManager.ViewDistanceModifier = gameProperties.ViewDistanceModifier;
             renderManager.SetDynamicResolutionScale(gameProperties.DynamicResolution);

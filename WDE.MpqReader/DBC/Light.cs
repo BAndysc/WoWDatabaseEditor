@@ -1,5 +1,6 @@
 using WDE.Common.DBC;
 using WDE.Common.MPQ;
+using WDE.MpqReader.Structures;
 
 namespace WDE.MpqReader.DBC
 {
@@ -130,6 +131,109 @@ namespace WDE.MpqReader.DBC
         }
     }
 
+    public class CombinedLight
+    {
+        public readonly CombinedLightParams?[] LightParams;
+        public CombinedLightParams NormalWeather => LightParams[0];
+
+        public float Mix { get; set; }
+
+        public CombinedLight(Light a, Light b)
+        {
+            if (a.LightParams.Length != b.LightParams.Length)
+                throw new Exception("Light params count mismatch");
+            
+            LightParams = new CombinedLightParams?[a.LightParams.Length];
+            for (int i = 0; i < a.LightParams.Length; ++i)
+            {
+                if (a.LightParams[i] == null || b.LightParams[i] == null)
+                    continue;
+                
+                LightParams[i] = new CombinedLightParams(this, a.LightParams[i]!, b.LightParams[i]!);
+            }
+
+            Mix = 0;
+        }
+        
+        public class CombinedLightParams
+        {
+            public readonly CombinedLightIntParam[] IntParams;
+            public readonly CombinedLightFloatParam[] FloatParams;
+
+            public CombinedLightParams(CombinedLight parent, LightParam a, LightParam b)
+            {
+                IntParams = new CombinedLightIntParam[a.IntParams.Length];
+                FloatParams = new CombinedLightFloatParam[a.FloatParams.Length];
+                for (int i = 0; i < a.IntParams.Length; ++i)
+                    IntParams[i] = new CombinedLightIntParam(parent, a.IntParams[i], b.IntParams[i]);
+                for (int i = 0; i < a.FloatParams.Length; ++i)
+                    FloatParams[i] = new CombinedLightFloatParam(parent, a.FloatParams[i], b.FloatParams[i]);
+            }
+
+            public CombinedLightIntParam GetLightParameter(LightIntParamType type)
+            {
+                return IntParams[(int)type];
+            }
+        
+            public CombinedLightFloatParam GetLightParameter(LightFloatParamType type)
+            {
+                return FloatParams[(int)type];
+            }
+            
+            public abstract class CombinedLightParam<T> where T : unmanaged
+            {
+                private readonly CombinedLight parent;
+                private readonly LightParam<T>? a;
+                private readonly LightParam<T>? b;
+
+                public CombinedLightParam(CombinedLight parent, LightParam<T>? a, LightParam<T>? b)
+                {
+                    this.parent = parent;
+                    this.a = a;
+                    this.b = b;
+                }
+
+                protected abstract T Lerp(T a, T b, float t);
+
+                public T GetAtTime(Time time)
+                {
+                    var valA = a?.GetAtTime(time) ?? default;
+                    var valB = b?.GetAtTime(time) ?? default;
+                    return Lerp(valA, valB, parent.Mix);
+                }
+            }
+
+            public class CombinedLightIntParam : CombinedLightParam<CArgb>
+            {
+                public CombinedLightIntParam(CombinedLight parent, LightParam<CArgb>? a, LightParam<CArgb>? b) : base(parent, a, b)
+                {
+                }
+
+                protected override CArgb Lerp(CArgb colorLower, CArgb colorHigher, float t)
+                {
+                    var r = colorLower.r + (colorHigher.r - colorLower.r) * t;
+                    var g = colorLower.g + (colorHigher.g - colorLower.g) * t;
+                    var b = colorLower.b + (colorHigher.b - colorLower.b) * t;
+                    return new CArgb((byte)r, (byte)g, (byte)b, 255);
+                }
+
+                public CArgb GetColorAtTime(Time time) => GetAtTime(time);
+            }
+
+            public class CombinedLightFloatParam : CombinedLightParam<float>
+            {
+                public CombinedLightFloatParam(CombinedLight parent, LightParam<float>? a, LightParam<float>? b) : base(parent, a, b)
+                {
+                }
+
+                protected override float Lerp(float a, float b, float t)
+                {
+                    return a + (b - a) * t;
+                }
+            }
+        }
+    }
+    
     public class Light
     {
         private static readonly float YardToInch = 36;
@@ -145,7 +249,7 @@ namespace WDE.MpqReader.DBC
         public readonly LightParam?[] LightParams;
 
         public LightParam NormalWeather => LightParams[0];
-        
+
         public Light(IDbcIterator row, LightParamStore lightParamStore)
         {
             int i = 0;

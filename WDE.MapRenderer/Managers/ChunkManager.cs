@@ -294,6 +294,7 @@ namespace WDE.MapRenderer.Managers
             file.Result.Dispose();
             fileTex0.Result?.Dispose();
             fileObj0.Result?.Dispose();
+            fileLod.Result?.Dispose();
 
             if (adt == null)
                 yield break;
@@ -615,8 +616,9 @@ namespace WDE.MapRenderer.Managers
                 entityManager.GetComponent<MeshRenderer>(waterEntity).MeshHandle = waterMesh.Handle;
                 entityManager.GetComponent<MeshRenderer>(waterEntity).Opaque = false;
                 localBounds = waterMesh.Bounds;
-                localBounds = localBounds.WithSize(localBounds.Size with { Z = 1 });
-                entityManager.GetComponent<WorldMeshBounds>(waterEntity) = RenderManager.LocalToWorld((MeshBounds)localBounds, new LocalToWorld() { Matrix = trsMatrix });
+                localBounds = localBounds.WithSize(localBounds.Size with { Z = Math.Max(localBounds.Size.Z, 10) });
+                var worldBounds = RenderManager.LocalToWorld((MeshBounds)localBounds, new LocalToWorld() { Matrix = trsMatrix });
+                entityManager.GetComponent<WorldMeshBounds>(waterEntity) = worldBounds;
 
                 chunk.entities.Add(waterEntity);
                 chunk.meshes.Add(waterMesh);
@@ -780,7 +782,7 @@ namespace WDE.MapRenderer.Managers
         {
             if (loadingManager.Value.EssentialLoadingInProgress)
                 return;
-
+            
             RenderGrid = gameProperties.ShowGrid;
             
             int D = 1;
@@ -850,6 +852,11 @@ namespace WDE.MapRenderer.Managers
             chunksXY.Clear();
             foreach (var chunk in chunksCopy)
                 yield return UnloadChunk(chunk);
+        }
+
+        public bool IsLoaded(int y, int x)
+        {
+            return loadedChunks.Contains((y, x));
         }
     }
 }
