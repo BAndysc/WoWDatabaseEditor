@@ -34,7 +34,9 @@ public class GossipMenuOption : IGossipMenuOption
         
     [Column(Name = "action_poi_id")]
     public uint ActionPoiId { get; set; }
-        
+
+    public uint ActionScriptId => 0;
+
     [Column(Name = "box_coded")]
     public uint BoxCoded { get; set; }
         

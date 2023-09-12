@@ -7,6 +7,7 @@ using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using WDE.Common.Utils;
+using WDE.MVVM.Observable;
 
 namespace AvaloniaStyles.Controls.FastTableView;
 
@@ -92,7 +93,7 @@ public partial class VeryFastTableView : Panel, IKeyboardNavigationHandler, IFas
         AffectsRender<VeryFastTableView>(SelectedCellIndexProperty);
         AffectsRender<VeryFastTableView>(RowFilterProperty);
         AffectsRender<VeryFastTableView>(RowFilterParameterProperty);
-        AffectsRender(IsGroupingEnabledProperty);
+        AffectsRender<VeryFastTableView>(IsGroupingEnabledProperty);
         AffectsMeasure<VeryFastTableView>(RowFilterProperty);
         AffectsMeasure<VeryFastTableView>(RowFilterParameterProperty);
         AffectsMeasure<VeryFastTableView>(IsGroupingEnabledProperty);
@@ -178,6 +179,17 @@ public partial class VeryFastTableView : Panel, IKeyboardNavigationHandler, IFas
             InvalidateMeasure();
             InvalidateArrange();
         });
+        if (ScrollViewer is { } sc)
+        {
+            sc.GetObservable(ScrollViewer.OffsetProperty).SubscribeAction(_ =>
+            {
+                InvalidateArrange();
+            });
+            sc.GetObservable(BoundsProperty).SubscribeAction(_ =>
+            {
+                InvalidateArrange();
+            });
+        }
     }
 
     protected override void OnKeyDown(KeyEventArgs e)

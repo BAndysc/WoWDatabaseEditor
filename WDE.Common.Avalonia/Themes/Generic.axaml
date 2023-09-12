@@ -104,7 +104,7 @@
         <Setter Property="Template">
             <ControlTemplate>
                 <Panel Background="Transparent" Name="PART_Panel">
-                    <TextBlock HorizontalAlignment="Stretch" VerticalAlignment="Center" TextAlignment="Left" Text="{TemplateBinding Text}"></TextBlock>
+                    <TextBlock Name="PART_TextBlock" HorizontalAlignment="Stretch" VerticalAlignment="Center" TextAlignment="Left" Text="{TemplateBinding Text}"></TextBlock>
                 </Panel>
             </ControlTemplate>
         </Setter>

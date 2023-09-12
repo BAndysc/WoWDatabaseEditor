@@ -15,6 +15,8 @@ namespace WDE.Common.DBC
         Dictionary<long, string> ClassStore { get; }
         Dictionary<long, string> RaceStore { get; }
         Dictionary<long, string> EmoteStore { get; }
+        Dictionary<long, string> CurrencyTypeStore { get; }
+        Dictionary<long, string> ItemStore { get; }
         Dictionary<long, string> MapDirectoryStore { get; }
         Dictionary<long, string> SceneStore { get; }
         Dictionary<long, Dictionary<long, long>> ScenarioToStepStore { get; }

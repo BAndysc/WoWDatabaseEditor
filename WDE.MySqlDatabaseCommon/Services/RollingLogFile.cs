@@ -145,11 +145,15 @@ internal class RollingLogFile
             var logFiles = directory.GetFiles("*.log", SearchOption.TopDirectoryOnly);
             DateTime lastDate = DateTime.MinValue;
             int lastFileNumber = 0;
+            var today = DateTime.Today;
 
             foreach (var file in logFiles)
             {
                 if (TryExtractDateFromFileName(file.Name, out var fileDate, out var fileNumber))
                 {
+                    if (fileDate.Date < today)
+                        continue;
+                    
                     if (fileDate > lastDate)
                     {
                         lastDate = fileDate;

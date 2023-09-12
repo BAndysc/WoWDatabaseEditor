@@ -17,27 +17,43 @@ public class EditableTextBlock : TemplatedControl
     private AdornerLayer? adornerLayer = null;
     private TextBox? textBox = null;
     private Panel panel = null!;
+    private TextBlock textBlock = null!;
 
     private IDisposable? clickDisposable = null;
     
     private string text = "";
     public static readonly DirectProperty<EditableTextBlock, string> TextProperty = AvaloniaProperty.RegisterDirect<EditableTextBlock, string>("Text", o => o.Text, (o, v) => o.Text = v, defaultBindingMode: BindingMode.TwoWay);
-    
+    public static readonly StyledProperty<bool> UseAdornerProperty = AvaloniaProperty.Register<EditableTextBlock, bool>(nameof(UseAdorner), defaultValue: true);
+    public static readonly StyledProperty<bool> SinglePressToEditProperty = AvaloniaProperty.Register<EditableTextBlock, bool>("SinglePressToEdit");
+
     public string Text
     {
         get => text;
         set => SetAndRaise(TextProperty, ref text, value);
     }
 
+    public bool UseAdorner
+    {
+        get => (bool)GetValue(UseAdornerProperty);
+        set => SetValue(UseAdornerProperty, value);
+    }
+
+    public bool SinglePressToEdit
+    {
+        get => (bool)GetValue(SinglePressToEditProperty);
+        set => SetValue(SinglePressToEditProperty, value);
+    }
+
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
-        panel = e.NameScope.Find<Panel>("PART_Panel");
+        panel = e.NameScope.Get<Panel>("PART_Panel");
+        textBlock = e.NameScope.Get<TextBlock>("PART_TextBlock");
     }
 
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
-        if (e.ClickCount == 2)
+        if (e.ClickCount == 2 || SinglePressToEdit)
         {
             SpawnTextBox();
             e.Handled = true;
@@ -51,7 +67,11 @@ public class EditableTextBlock : TemplatedControl
         textBox = new TextBox()
         {
         };
+        textBox.Padding = textBlock.Padding;
+        textBox.Margin = textBox.Margin;
+        textBox.BorderThickness = new Thickness(0);
         textBox.Text = text;
+        textBox.MinWidth = 0;
         textBox.KeyBindings.Add(new KeyBinding()
         {
             Gesture = new KeyGesture(Key.Enter),
@@ -64,14 +84,21 @@ public class EditableTextBlock : TemplatedControl
         });
         textBox.LostFocus += TextBox_LostFocus;
 
-        adornerLayer = AdornerLayer.GetAdornerLayer(this);
-        if (adornerLayer == null)
+        if (UseAdorner)
         {
-            DespawnTextBox(false);
-            return;
+            adornerLayer = AdornerLayer.GetAdornerLayer(this);
+            if (adornerLayer == null)
+            {
+                DespawnTextBox(false);
+                return;
+            }
+            AdornerLayer.SetAdornedElement(textBox, this);
+            adornerLayer.Children.Add(textBox);
         }
-        adornerLayer.Children.Add(textBox);
-        AdornerLayer.SetAdornedElement(textBox, this);
+        else
+        {
+            panel.Children.Add(textBox);
+        }
 
         DispatcherTimer.RunOnce(textBox.Focus, TimeSpan.FromMilliseconds(1));
         textBox.SelectAll();
@@ -110,8 +137,15 @@ public class EditableTextBlock : TemplatedControl
         if (textBox == null)
             return;
         textBox.LostFocus -= TextBox_LostFocus;
-        adornerLayer?.Children.Remove(textBox);
-        adornerLayer = null;
+        if (UseAdorner)
+        {
+            adornerLayer?.Children.Remove(textBox);
+            adornerLayer = null;
+        }
+        else
+        {
+            panel.Children.Remove(textBox);
+        }
 
         clickDisposable?.Dispose();
         clickDisposable = null;

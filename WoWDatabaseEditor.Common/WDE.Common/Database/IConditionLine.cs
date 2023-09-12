@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace WDE.Common.Database
 {
@@ -48,6 +50,11 @@ namespace WDE.Common.Database
         public static bool IsActualCondition(this ICondition condition)
         {
             return !condition.IsParentCondition();
+        }
+
+        public static int CountActualConditions(this IReadOnlyList<ICondition>? list)
+        {
+            return list?.Count(cond => cond.IsActualCondition()) ?? 0;
         }
         
         public static long GetConditionValue(this ICondition line, int i)

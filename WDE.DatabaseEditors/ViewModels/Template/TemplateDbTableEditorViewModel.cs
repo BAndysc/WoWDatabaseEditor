@@ -325,7 +325,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
                 
                 if (column.IsConditionColumn)
                 {
-                    var label = Observable.Select(entity.ToObservable(e => e.Conditions), c => "Conditions (" + (c?.Count(cond => cond.IsActualCondition()) ?? 0) + ")");
+                    var label = Observable.Select(entity.ToObservable(e => e.Conditions), c => "Conditions (" + c.CountActualConditions() + ")");
                     cellViewModel = AutoDispose(new DatabaseCellViewModel(row, entity, EditConditionsCommand, label));
                 }
                 else if (column.IsMetaColumn)

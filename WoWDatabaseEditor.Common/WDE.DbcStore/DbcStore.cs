@@ -111,6 +111,8 @@ namespace WDE.DbcStore
         }
         
         public bool IsConfigured { get; private set; }
+        public Dictionary<long, string> CurrencyTypeStore { get; internal set;} = new();
+        public Dictionary<long, string> ItemStore { get; set; } = new();
         public Dictionary<long, string> AreaTriggerStore { get; internal set; } = new();
         public Dictionary<long, string> PhaseStore { get; internal set; } = new();
         public Dictionary<long, string> MapStore { get; internal set; } = new();
@@ -205,10 +207,12 @@ namespace WDE.DbcStore
                 store.ScenarioStepStore = data.ScenarioStepStore;
                 store.ScenarioToStepStore = data.ScenarioToStepStore;
                 store.BattlePetSpeciesIdStore = data.BattlePetSpeciesIdStore;
+                store.CurrencyTypeStore = data.CurrencyTypeStore;
                 store.Areas = data.Areas;
                 store.CharShipmentContainers = data.CharShipmentContainers;
                 store.AreaById = data.Areas.ToDictionary(a => a.Id, a => (IArea)a);
                 store.Maps = data.Maps;
+                store.ItemStore = data.ItemStore;
                 store.MapById = data.Maps.ToDictionary(a => a.Id, a => (IMap)a);
                 store.FactionTemplates = data.FactionTemplates;
                 store.FactionTemplateById = data.FactionTemplates.ToDictionary(a => a.TemplateId, a => (FactionTemplate)a);

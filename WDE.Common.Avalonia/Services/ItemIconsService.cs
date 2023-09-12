@@ -6,20 +6,13 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
-using ReactiveUI;
 using WDE.Common.Database;
 using WDE.Common.Parameters;
 using WDE.Common.Services;
 using WDE.Common.Utils;
 using WDE.Module.Attributes;
 
-namespace WDE.DatabaseEditors.Avalonia.Services;
-
-public interface IItemIconsService
-{
-    IImage? GetIcon(string name);
-    IImage? GetIcon(uint itemId);
-}
+namespace WDE.Common.Avalonia.Services;
 
 [AutoRegister]
 [SingleInstance]

@@ -53,7 +53,7 @@ public partial class VeryFastTableView
                 var control = headerViews.GetNext(group);
                 control.Arrange(headerRect);
             }
-            else if (viewPort.Intersects(groupRect))
+            else if (viewPort.Intersects(groupRect) && groupRect.Y < viewPort.Top)
             {
                 var control = headerViews.GetNext(group);
                 control.Arrange(stickyHeaderRect);
