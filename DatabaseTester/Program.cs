@@ -187,7 +187,7 @@ public class Program
 
         var queryGeneratorModule = new QueryGeneratorModule();
         queryGeneratorModule.InitializeCore(core.Tag);
-        queryGeneratorModule.RegisterTypes(new UnityContainerRegistry(ioc));
+        queryGeneratorModule.RegisterTypes(new UnityContainerRegistry(ioc, new UnityContainerExtension(ioc)));
         
         var worldDb = ioc.Resolve<T>();
         ioc.RegisterInstance<IDatabaseProvider>(worldDb);

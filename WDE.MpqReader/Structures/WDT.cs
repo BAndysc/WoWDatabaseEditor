@@ -15,7 +15,8 @@ namespace WDE.MpqReader.Structures
         AdtHasBigAlpha = 4,
         AdtHasDoodadRefsSortedBySizeCat = 8,
         FlagLightingVertices = 16,
-        AdtHasUpsideDownGround = 32
+        AdtHasUpsideDownGround = 32,
+        AdtHasHeightTexturing = 128
         // TODO : MOP+ flags
     }
 

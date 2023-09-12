@@ -37,15 +37,19 @@ void main()
     vec2 screenPos = vec2(gl_FragCoord.x / screenWidth, gl_FragCoord.y / screenHeight);
 
     float depth = texture(_DepthTexture, screenPos).r;
+    float originalDepth = depth;
     vec3 terrainWorldPos = WorldPosFromDepth(depth, screenPos);
     vec3 originalTerrainWorldPos = terrainWorldPos;
 
+    float distanceToCamera = distance(WorldPos.xyz, cameraPos.xyz);
+    float cameraDistanceFactor = 1 - clamp(distanceToCamera, 0, 300) / 300;
 
     float displacementStrength = clamp(abs(WorldPos.z - originalTerrainWorldPos.z) / 2, 0, 1);
 
-    float foamFactor = 1 - clamp(abs(WorldPos.z - originalTerrainWorldPos.z) / (0.1 * (Noise(offset.xy, 2) + 0.5)), 0, 1);
-    foamFactor = step(0.5, foamFactor);
-    float foamFactor2 = foamFactor * offset.z;
+    float foamFactor = 1 - clamp(abs(WorldPos.z - originalTerrainWorldPos.z) / (0.5 * (Noise(offset.xy, 2) + 0.5)), 0, 1);
+    foamFactor *= cameraDistanceFactor;
+    //foamFactor = step(0.5, foamFactor);
+    float foamFactor2 = 0;//foamFactor * offset.z * cameraDistanceFactor;
 
     float timeDivider = 200000;
 
@@ -71,23 +75,25 @@ void main()
 
     // displacement
 
-    if (terrainWorldPos.z < WorldPos.z)
+    vec2 origScreenPos = screenPos;
     screenPos = screenPos + vec2(offset.x, 0) * 0.05 * displacementStrength;
     depth = texture(_DepthTexture, screenPos).r;
     terrainWorldPos = WorldPosFromDepth(depth, screenPos);
+    if (gl_FragCoord.z > depth)
+    screenPos = origScreenPos;
     vec4 sceneColor = texture(_SceneColor, screenPos);
 
     // 1 deep
     // 0 shallow
     float diffHeight = clamp((WorldPos.z - terrainWorldPos.z) / 30, 0, 1);
 
-    vec4 waterColor = lerp(shallowColor, deepColor, diffHeight);
-    vec4 foamColor = vec4(1, 1, 1, 1 * foamFactor2);
+    vec4 waterColor = lerp(vec4(shallowColor.xyz, 0.5), deepColor, diffHeight);
+    vec4 foamColor = vec4(2, 2, 2, 0.5);
 
     waterColor = waterColor + vec4(1, 1, 1, 0) * spec;
 
-    waterColor = lerp(waterColor, foamColor, foamFactor);
-    waterColor.a = waterColor.a;// * (1-foamFactor);
+    //waterColor = lerp(waterColor, foamColor, foamFactor);
+    waterColor.a = (1-foamFactor) * waterColor.a;//0.3;//waterColor.a * (1-foamFactor);
 
 
     FragColor = color * 0.0001 + vec4(sceneColor.xyz * (1-waterColor.a) + waterColor.xyz * waterColor.a, 1);

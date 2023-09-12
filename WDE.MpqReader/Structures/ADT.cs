@@ -94,7 +94,7 @@ namespace WDE.MpqReader.Structures
     
     public class AdtChunk
     {
-        private readonly WdtFlags? wdtFlags;
+        private readonly WdtFlags wdtFlags;
         public Vector3 BasePosition { get; }
         public float[] Heights { get; } = new float[9 * 9 + 8 * 8];
         public Vector3[] Normals { get; } = new Vector3[9 * 9 + 8 * 8];
@@ -109,7 +109,7 @@ namespace WDE.MpqReader.Structures
         
         public AdtChunk(IBinaryReader reader, WdtFlags? wdtFlags, GameFilesVersion gameFilesVersion)
         {
-            this.wdtFlags = wdtFlags;
+            this.wdtFlags = wdtFlags ?? 0;
             chunkFlags = reader.ReadInt32();
             var ix = reader.ReadInt32();
             var iy = reader.ReadInt32();
@@ -301,7 +301,7 @@ namespace WDE.MpqReader.Structures
                         }
                     }
                 }
-                else if ((wdtFlags & WdtFlags.AdtHasBigAlpha) != 0) // 4096 uncompressed mode  if 0x4 or 0x80 set
+                else if (wdtFlags.HasFlagFast(WdtFlags.AdtHasBigAlpha) || wdtFlags.HasFlagFast(WdtFlags.AdtHasHeightTexturing)) // 4096 uncompressed mode
                 {
                     for (int y = 0; y < 64; ++y)
                     {

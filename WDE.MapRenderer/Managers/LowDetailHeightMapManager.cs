@@ -62,7 +62,7 @@ public class LowDetailHeightMapManager : IDisposable
 
                 subMesh++;
 
-                if (chunkManager.IsLoaded(y, x))
+                if (chunkManager.IsTerrainLoaded(y, x))
                     continue;
 
                 renderManager.Render(lowLevelMesh, material, subMesh - 1, Matrix4x4.Identity);

@@ -66,7 +66,7 @@ public class NativeOpenGlControlBase : NativeControlHost, ICustomSimpleHitTest
             context.MakeCurrentContext(window);
             OnOpenGlRender(null, 0);
             window?.SwapBuffers();
-            context.MakeCurrentContext(null);
+            context?.MakeCurrentContext(null);
             sw.Stop();
             PresentTime = (uint)sw.Elapsed.TotalMilliseconds;
             return true;

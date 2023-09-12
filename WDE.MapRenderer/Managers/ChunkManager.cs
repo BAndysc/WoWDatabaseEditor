@@ -31,6 +31,7 @@ namespace WDE.MapRenderer.Managers
         public NativeBuffer<Vector4>? heightsNormalBuffer;
         public float[,] heights;
         public Material? material;
+        public bool terrainLoaded;
         public CancellationTokenSource? loading = new CancellationTokenSource();
         public uint[,] areaIds = new uint[16,16];
         public Task? chunkLoading;
@@ -541,6 +542,7 @@ namespace WDE.MapRenderer.Managers
             terrainEntity.SetForceDisabledRendering(entityManager, !RenderTerrain);
             chunk.terrainEntity = terrainEntity;
             chunk.entities.Add(terrainEntity);
+            chunk.terrainLoaded = true;
 
             // water here
             if (adt.HasLiquid)
@@ -857,6 +859,11 @@ namespace WDE.MapRenderer.Managers
         public bool IsLoaded(int y, int x)
         {
             return loadedChunks.Contains((y, x));
+        }
+
+        public bool IsTerrainLoaded(int y, int x)
+        {
+            return chunksXY.TryGetValue((y, x), out var chunk) && chunk.terrainLoaded;
         }
     }
 }
