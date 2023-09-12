@@ -16,7 +16,7 @@ internal class MasterGameObjectQueryProvider : BaseInsertQueryProvider<GameObjec
             guid = t.Guid,
             id = t.Entry,
             map = t.Map,
-            phaseId = t.PhaseId,
+            phaseId = t.PhaseId.FirstOrDefault(),
             position_x = t.X,
             position_y = t.Y,
             position_z = t.Z,

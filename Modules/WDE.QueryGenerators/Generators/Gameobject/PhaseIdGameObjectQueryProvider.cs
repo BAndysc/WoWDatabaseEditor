@@ -18,7 +18,7 @@ internal class PhaseIdGameObjectQueryProvider : BaseInsertQueryProvider<GameObje
             map = t.Map,
             spawnMask = t.SpawnMask,
             phaseMask = t.PhaseMask,
-            phaseId = t.PhaseId,
+            phaseId = t.PhaseId.FirstOrDefault(),
             position_x = t.X,
             position_y = t.Y,
             position_z = t.Z,
