@@ -7,6 +7,8 @@ namespace TheEngine.ECS
         private readonly Dictionary<ulong, int> archetypeToDataIndex = new();
         private readonly List<ChunkDataManager> data = new();
 
+        public long UnmanagedMemoryUsage => data.Select(d => d.UnmanagedMemoryUsage).Sum();
+        
         internal void AddEntity(Entity entity, Archetype archetype)
         {
             var hash = archetype.Hash;

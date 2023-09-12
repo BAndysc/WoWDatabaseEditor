@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Diagnostics;
 using TheEngine.Data;
 using TheEngine.Entities;
 using TheEngine.Handles;
@@ -252,6 +253,14 @@ namespace WDE.MapRenderer.Managers
         {
             foreach (var wmo in meshes.Values)
                 wmo?.Dispose(meshManager);
+        }
+
+        public void UnloadAllMeshes()
+        {
+            foreach (var wmo in meshes.Values)
+                wmo?.Dispose(meshManager);
+            meshes.Clear();
+            meshesCurrentlyLoaded.Clear();
         }
     }
 }

@@ -10,5 +10,6 @@ namespace TheEngine.Interfaces
         IMesh CreateMesh(in MeshData mesh);
         void DisposeMesh(IMesh mesh);
         IMesh CreateManagedOnlyMesh(ReadOnlySpan<Vector3> vertices, ReadOnlySpan<ushort> indices);
+        long UnmanagedMemoryUsage { get; }
     }
 }

@@ -1,6 +1,7 @@
 using Avalonia.Input;
 using JetBrains.Profiler.Api;
 using TheEngine.Coroutines;
+using TheEngine.ECS;
 using TheEngine.Interfaces;
 using IInputManager = TheEngine.Interfaces.IInputManager;
 
@@ -12,17 +13,26 @@ public class DebugInfoGameModule : IGameModule
     private readonly CoroutineManager coroutineManager;
     private readonly IStatsManager statsManager;
     private readonly IInputManager inputManager;
+    private readonly ITextureManager textureManager;
+    private readonly IEntityManager entityManager;
+    private readonly IMeshManager meshManager;
     public object? ViewModel => null;
 
     public DebugInfoGameModule(IUIManager uiManager,
         CoroutineManager coroutineManager,
         IStatsManager statsManager,
-        IInputManager inputManager)
+        IInputManager inputManager,
+        ITextureManager textureManager,
+        IEntityManager entityManager,
+        IMeshManager meshManager)
     {
         this.uiManager = uiManager;
         this.coroutineManager = coroutineManager;
         this.statsManager = statsManager;
         this.inputManager = inputManager;
+        this.textureManager = textureManager;
+        this.entityManager = entityManager;
+        this.meshManager = meshManager;
     }
 
     public void Dispose()
@@ -84,5 +94,8 @@ public class DebugInfoGameModule : IGameModule
         ui2.Text("calibri", $"Batches: " + (stats.NonInstancedDraws + stats.InstancedDraws), 12, Vector4.One);
         ui2.Text("calibri", $"Batches saved by instancing: " + stats.InstancedDrawSaved, 12, Vector4.One);
         ui2.Text("calibri", $"Tris: " + stats.TrianglesDrawn, 12, Vector4.One);
+        ui2.Text("calibri", $"Mesh memory: {meshManager.UnmanagedMemoryUsage / 1024 / 1024:N1} MB", 12, Vector4.One);
+        ui2.Text("calibri", $"Textures memory: {textureManager.UnmanagedMemoryUsage / 1024 / 1024:N1} MB", 12, Vector4.One);
+        ui2.Text("calibri", $"Entities memory: {entityManager.UnmanagedMemoryUsage / 1024 / 1024:N1} MB", 12, Vector4.One);
     }
 }

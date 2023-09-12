@@ -34,5 +34,10 @@ namespace WDE.MapRenderer
         }
 
         IEnumerable<(string, ICommand, object?)>? GenerateContextMenu() => null;
+
+        IEnumerator LoadMap(int map)
+        {
+            yield break;
+        }
     }
 }

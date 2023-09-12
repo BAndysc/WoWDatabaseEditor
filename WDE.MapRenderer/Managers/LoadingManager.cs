@@ -38,6 +38,10 @@ public class LoadingManager : IDisposable
     private readonly GlobalWorldMapObjectManager globalWorldMapObjectManager;
     private readonly LowDetailHeightMapManager lowDetailHeightMapManager;
     private readonly ZoneAreaManager zoneAreaManager;
+    private readonly WoWTextureManager textureManager;
+    private readonly ModuleManager moduleManager;
+    private readonly MdxManager mdxManager;
+    private readonly WmoManager wmoManager;
     private readonly WorldManager worldManager;
     private int? currentLoadedMap;
     private LoadingToken? loadingToken;
@@ -51,6 +55,10 @@ public class LoadingManager : IDisposable
         GlobalWorldMapObjectManager globalWorldMapObjectManager,
         LowDetailHeightMapManager lowDetailHeightMapManager,
         ZoneAreaManager zoneAreaManager,
+        WoWTextureManager textureManager,
+        ModuleManager moduleManager,
+        MdxManager mdxManager,
+        WmoManager wmoManager,
         WorldManager worldManager)
     {
         this.gameContext = gameContext;
@@ -59,6 +67,10 @@ public class LoadingManager : IDisposable
         this.globalWorldMapObjectManager = globalWorldMapObjectManager;
         this.lowDetailHeightMapManager = lowDetailHeightMapManager;
         this.zoneAreaManager = zoneAreaManager;
+        this.textureManager = textureManager;
+        this.moduleManager = moduleManager;
+        this.mdxManager = mdxManager;
+        this.wmoManager = wmoManager;
         this.worldManager = worldManager;
 
         this.loadingNotificationBox = new SimpleBox(BoxPlacement.BottomCenter);
@@ -90,11 +102,30 @@ public class LoadingManager : IDisposable
         yield return chunkManager.UnloadAllChunks();
 
         lowDetailHeightMapManager.Unload();
+
+        textureManager.UnloadAllTextures();
+
+        wmoManager.UnloadAllMeshes();
+        
+        mdxManager.UnloadAllMeshes();
         
         yield return zoneAreaManager.Load();
         
         yield return worldManager.LoadMap(newToken.CancellationToken);
 
+        if (worldManager.CurrentWdt == null) // map not loaded
+        {
+            newToken.MarkAsLoaded();
+            if (loadingToken == newToken)
+            {
+                EssentialLoadingInProgress = false;
+                loadingToken = null;
+            }
+            yield break;
+        }
+        
+        yield return moduleManager.ForEach(x => x.LoadMap(map));
+        
         if (loadingToken == newToken)
             EssentialLoadingInProgress = false;
 

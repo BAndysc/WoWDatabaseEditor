@@ -33,6 +33,8 @@ namespace TheEngine.ECS
         internal IEnumerable<Type> KnownTypes => typeToIndexMapping.Keys;
         internal IEnumerable<Type> KnownManagedTypes => typeToManagedIndexMapping.Keys;
         
+        public long UnmanagedMemoryUsage => dataManager.UnmanagedMemoryUsage;
+        
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void ResizeIfNeeded()
         {

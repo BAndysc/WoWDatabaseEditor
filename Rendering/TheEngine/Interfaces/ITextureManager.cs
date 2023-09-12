@@ -27,6 +27,6 @@ namespace TheEngine.Interfaces
          * @new handle becomes invalid
          */
         void ReplaceHandles(TextureHandle old, TextureHandle @new);
-
+        long UnmanagedMemoryUsage { get; }
     }
 }

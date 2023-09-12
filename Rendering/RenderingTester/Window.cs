@@ -15,6 +15,7 @@ using WDE.Common.Tasks;
 using WDE.Common.Utils;
 using WDE.MapRenderer;
 using WDE.MapRenderer.Managers;
+using WDE.MapRenderer.Modules;
 using WDE.MapSpawns;
 using WDE.MapSpawns.Rendering;
 using WDE.Module;
@@ -37,6 +38,7 @@ public class DummyGameView : IGameView
         new List<Func<IContainerProvider, IGameModule>>()
         {
             provider => provider.Resolve<StandaloneCustomGameModule>(),
+            provider => provider.Resolve<DebugInfoGameModule>(), 
             provider => provider.Resolve<DebugWindow>(),
             provider => provider.Resolve<SpawnViewer>()
         };
@@ -62,6 +64,7 @@ public class DummyGameProperties : IGameProperties
     public int TextureQuality { get; set; } = 3;
     public float DynamicResolution { get; set; } = 1;
     public bool RenderGui { get; set; } = true;
+    public bool DontDrawEntities { get; set; }
 }
 
 public class DummyMessageBox : IMessageBoxService

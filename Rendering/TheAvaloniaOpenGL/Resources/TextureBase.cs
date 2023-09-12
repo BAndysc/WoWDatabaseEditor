@@ -113,7 +113,9 @@ namespace TheAvaloniaOpenGL.Resources
             device.TexParameteri(textureTarget, TextureParameterName.TextureWrapT, (int)openGlMode);
             UnbindTexture();
         }
-    
+
+        public abstract int UnmanagedMemoryBytes { get; }
+
         public void Dispose()
         {
             device.DeleteTexture(Handle);

@@ -27,6 +27,8 @@ namespace TheAvaloniaOpenGL.Resources
                         device.TexImage3D(TextureTarget.Texture2DArray, i, InternalFormat.Rgba, width, height, texturesCount, 0, PixelFormat.Rgba, PixelType.UnsignedByte, new IntPtr(dataPtr));
                     device.CheckError("setting array");
                 }
+                
+                UnmanagedMemoryBytes += width * height * texturesCount * 4;
 
                 width /= 2;
                 height /= 2;
@@ -37,5 +39,7 @@ namespace TheAvaloniaOpenGL.Resources
 
             UnbindTexture();
         }
+
+        public sealed override int UnmanagedMemoryBytes { get; }
     }
 }

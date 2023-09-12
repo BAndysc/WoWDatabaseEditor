@@ -30,5 +30,7 @@
         void Activate(int slot);
         void SetFiltering(FilteringMode mode);
         void SetWrapping(WrapMode mode);
+        
+        int UnmanagedMemoryBytes { get; }
     }
 }

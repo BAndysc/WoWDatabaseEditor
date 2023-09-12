@@ -127,6 +127,7 @@ public class SpawnViewer : IGameModule, ISavable
         this.newSpawnCreator = newSpawnCreator;
         this.mapModules = mapModules.ToList();
         this.mapModules.Add(pathEditor);
+        this.mapModules.Add(newSpawnCreator);
         postProcess = new HighlightPostProcess(gameContext.Engine, Color.Aqua);
 
         spawnViewerProxy.CurrentViewer = this;
@@ -160,7 +161,6 @@ public class SpawnViewer : IGameModule, ISavable
             if (module is IDisposable disp)
                 disp.Dispose();
         }
-        newSpawnCreator.Dispose();
 
         pendingGameChangesService.HasPendingChanged -= PendingGameChangesServiceOnHasPendingChanged;
         spawnsContainer.OnCreatureModified -= SpawnsContainerOnOnCreatureModified;
@@ -183,8 +183,6 @@ public class SpawnViewer : IGameModule, ISavable
 
     public void Update(float delta)
     {
-        UpdateSpawnsData();
-     
         foreach (var module in mapModules)
             module.Update(delta);
         
@@ -263,7 +261,6 @@ public class SpawnViewer : IGameModule, ISavable
     public void Render(float delta)
     {
         postProcess.Render(spawnSelectionService.SelectedSpawn.Value?.WorldObject?.Renderers);
-        newSpawnCreator.Render(delta);
         foreach (var module in mapModules)
             module.Render(delta);
     }
@@ -272,7 +269,6 @@ public class SpawnViewer : IGameModule, ISavable
     {
         foreach (var module in mapModules)
             module.RenderGUI();
-        newSpawnCreator.RenderGUI();
     }
 
     public void RenderTransparent()
@@ -281,26 +277,19 @@ public class SpawnViewer : IGameModule, ISavable
         foreach (var module in mapModules)
             module.RenderTransparent(0); // todo: pass delta here
     }
-
-    private uint? loadedMap;
-    private void UpdateSpawnsData()
+    
+    public IEnumerator LoadMap(int mapId)
     {
-        if (loadedMap.HasValue && loadedMap.Value == gameContext.CurrentMap.Id)
-            return;
-
-        loadedMap = (uint)gameContext.CurrentMap.Id;
-        gameContext.StartCoroutine(LoadSpawnDataCoroutine(loadedMap.Value));
-    }
-
-    private IEnumerator LoadSpawnDataCoroutine(uint mapId)
-    {
+        foreach (var module in mapModules)
+            yield return module.LoadMap(mapId);
+        
         while (spawnsContainer.IsLoading && gameContext.CurrentMap.Id == mapId)
             yield return null;
 
         if (gameContext.CurrentMap.Id != mapId) // could have changed while waiting
             yield break;
         
-        spawnsContainer.LoadMap(mapId, zoneAreaManager, dbcManager);
+        spawnsContainer.LoadMap((uint)mapId, zoneAreaManager, dbcManager);
     }
     
     private void RefreshVisibility()

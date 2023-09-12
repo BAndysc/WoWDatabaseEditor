@@ -12,6 +12,7 @@ namespace TheAvaloniaOpenGL.Resources
         {
             ToInternalFormat(textureFormat, out var internalFormat, out var pixelFormat, out var pixelType);
             var expectedSize = width * height * SizeOf(pixelType) * ComponentsCount(pixelFormat);
+            UnmanagedMemoryBytes = expectedSize;
             if (pixels == null)
             {
                 if (tempBufferEmptyZeroBytes.Length < expectedSize)
@@ -38,9 +39,26 @@ namespace TheAvaloniaOpenGL.Resources
         internal unsafe Texture(IDevice device, Rgba32[][]? pixels, int width, int height, bool generateMips)
             :base(device, width, height, TextureTarget.Texture2D)
         {
+            var expectedSize = width * height * SizeOf(PixelType.UnsignedByte) * ComponentsCount(PixelFormat.Rgba);
+            UnmanagedMemoryBytes = expectedSize;
+            {
+                int w = width / 2;
+                int h = height / 2;
+                while (w > 1 && h > 1)
+                {
+                    expectedSize += w * h * SizeOf(PixelType.UnsignedByte) * ComponentsCount(PixelFormat.Rgba);
+                    w /= 2;
+                    h /= 2;
+                }
+            }
+            
             if (pixels == null)
             {
-                device.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, new IntPtr(0));
+                if (tempBufferEmptyZeroBytes.Length < expectedSize)
+                    tempBufferEmptyZeroBytes = new byte[expectedSize];
+                
+                fixed (void* pData = tempBufferEmptyZeroBytes)
+                    device.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, new IntPtr(pData));
             }
             else
             {
@@ -68,9 +86,26 @@ namespace TheAvaloniaOpenGL.Resources
         internal unsafe Texture(IDevice device, Rgba32* pixels, int width, int height, bool generateMips)
             :base(device, width, height, TextureTarget.Texture2D)
         {
+            var expectedSize = width * height * SizeOf(PixelType.UnsignedByte) * ComponentsCount(PixelFormat.Rgba);
+            UnmanagedMemoryBytes = expectedSize;
+            {
+                int w = width / 2;
+                int h = height / 2;
+                while (generateMips && w > 1 && h > 1)
+                {
+                    expectedSize += w * h * SizeOf(PixelType.UnsignedByte) * ComponentsCount(PixelFormat.Rgba);
+                    w /= 2;
+                    h /= 2;
+                }
+            }
+
             if (pixels == null)
             {
-                device.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, new IntPtr(0));
+                if (tempBufferEmptyZeroBytes.Length < expectedSize)
+                    tempBufferEmptyZeroBytes = new byte[expectedSize];
+                
+                fixed (void* pData = tempBufferEmptyZeroBytes)
+                    device.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, width, height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, new IntPtr(pData));
             }
             else
             {
@@ -89,9 +124,16 @@ namespace TheAvaloniaOpenGL.Resources
         internal unsafe Texture(IDevice device, float[]? pixels, int width, int height)
             :base (device, width, height, TextureTarget.Texture2D)
         {
+            var expectedSize = width * height * SizeOf(PixelType.Float) * ComponentsCount(PixelFormat.Red);
+            UnmanagedMemoryBytes = expectedSize;
+            
             if (pixels == null)
             {
-                device.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.R32f, width, height, 0, PixelFormat.Red, PixelType.Float, new IntPtr(0));
+                if (tempBufferEmptyZeroBytes.Length < expectedSize)
+                    tempBufferEmptyZeroBytes = new byte[expectedSize];
+                
+                fixed (void* pData = tempBufferEmptyZeroBytes)
+                    device.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.R32f, width, height, 0, PixelFormat.Red, PixelType.Float, new IntPtr(pData));
             }
             else
             {
@@ -109,9 +151,16 @@ namespace TheAvaloniaOpenGL.Resources
         internal unsafe Texture(IDevice device, Vector4[]? pixels, int width, int height)
         :base (device, width, height, TextureTarget.Texture2D)
         {
+            var expectedSize = width * height * SizeOf(PixelType.Float) * ComponentsCount(PixelFormat.Rgba);
+            UnmanagedMemoryBytes = expectedSize;
+            
             if (pixels == null)
             {
-                device.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba32f, width, height, 0, PixelFormat.Rgba, PixelType.Float, new IntPtr(0));
+                if (tempBufferEmptyZeroBytes.Length < expectedSize)
+                    tempBufferEmptyZeroBytes = new byte[expectedSize];
+                
+                fixed (void* pData = tempBufferEmptyZeroBytes)
+                    device.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba32f, width, height, 0, PixelFormat.Rgba, PixelType.Float, new IntPtr(pData));
             }
             else
             {
@@ -212,5 +261,7 @@ namespace TheAvaloniaOpenGL.Resources
                     throw new ArgumentOutOfRangeException(nameof(format), format, null);
             }
         }
+
+        public override int UnmanagedMemoryBytes { get; }
     }
 }

@@ -77,6 +77,8 @@ namespace TheAvaloniaOpenGL.Resources
             throw new Exception();
         }
 
+        public int UnmanagedMemoryBytes { get; }
+
         public void Dispose()
         {
             //TextureResource.Dispose();

@@ -70,13 +70,14 @@ public class WorldManager : System.IDisposable
 
         using var wdtBytes = wdtBytesTask.Result;
         using var wdlBytes = wdlBytesTask.Result;
+        
+        ClearData();
+        
         if (wdtBytes == null)
         {
             Console.WriteLine("Couldn't load map " + wdtPath + ". This is quite fatal...");
             yield break;
         }
-        
-        ClearData();
         
         CurrentWdt = new WDT(new MemoryBinaryReader(wdtBytes), gameFiles.WoWVersion);
         if (wdlBytes != null)
@@ -125,6 +126,8 @@ public class WorldManager : System.IDisposable
 
     private void ClearData()
     {
+        CurrentWdl = null;
+        CurrentWdt = null;
         for (int y = 0; y < 64; ++y)
         {
             for (int x = 0; x < 64; ++x)

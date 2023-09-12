@@ -91,6 +91,11 @@ public class NewSpawnCreator : System.IDisposable, IMapSpawnModule
         quickSpawnMenu.Dispose();
     }
 
+    public IEnumerator LoadMap(int mapId)
+    {
+        return quickSpawnMenu.LoadMap(mapId);
+    }
+
     public void Render(float delta)
     {
         quickSpawnMenu.Render(delta);

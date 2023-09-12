@@ -227,6 +227,9 @@ namespace WDE.MapRenderer.Managers
         {
             if (y < 0 || y >= 64 || x < 0 || x >= 64)
                 yield break;
+
+            if (worldManager.CurrentWdt == null)
+                yield break;
             
             if (!loadedChunks.Add((y, x)))
                 yield break;
@@ -398,6 +401,7 @@ namespace WDE.MapRenderer.Managers
                     entityManager.GetComponent<MeshRenderer>(entity).MeshHandle = subChunkMesh.Handle;
                     entityManager.GetComponent<WorldMeshBounds>(entity) = (WorldMeshBounds)subChunkMesh.Bounds;
                     chunk.entities.Add(entity);
+                    chunk.meshes.Add(subChunkMesh);
 
                     Rgba32[] holeMap = new Rgba32[4 * 4];
                     if (chunksEnumerator2.Current.Holes != null)
@@ -635,7 +639,6 @@ namespace WDE.MapRenderer.Managers
                 chunk.loading = null;
                 yield break;
             }
-            
             yield return LoadObjects(adt, chunk, cancelationToken);
 
             yield return LoadModules(chunk, cancelationToken);

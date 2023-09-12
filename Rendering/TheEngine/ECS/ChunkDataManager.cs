@@ -20,6 +20,8 @@ namespace TheEngine.ECS
         private Entity[] entityMapping;
         private int[] sparseReverseEntityMapping = new int[1];
 
+        public long UnmanagedMemoryUsage { get; private set; }
+        
         public unsafe ChunkDataManager(Archetype archetype)
         {
             Archetype = archetype;
@@ -126,11 +128,14 @@ namespace TheEngine.ECS
         {
             if (capacity <= used)
             {
+                UnmanagedMemoryUsage = 0;
                 capacity = capacity * 2 + 1;
                 Array.Resize(ref entityMapping, capacity);
                 for (int i = 0; i < componentsCount; ++i)
                 {
-                    AllocOrRealloc(ref componentData[i], (ulong)capacity * (ulong)Archetype.Components[i].SizeBytes);
+                    var size = (ulong)capacity * (ulong)Archetype.Components[i].SizeBytes;
+                    AllocOrRealloc(ref componentData[i], size);
+                    UnmanagedMemoryUsage += (long)size;
                     //Array.Resize(ref componentData[i], capacity * Archetype.Components[i].SizeBytes);
                 }
                 for (int i = 0; i < managedComponentsCount; ++i)
@@ -227,6 +232,7 @@ namespace TheEngine.ECS
             {
                 var array = managedComponentData[i];
                 array[index] = array[swapWith];
+                array[swapWith] = null;
                 i++;
             }
             

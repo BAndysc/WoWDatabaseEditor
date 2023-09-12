@@ -1,5 +1,5 @@
 ﻿#if DEBUG
-#define DEBUG_CREATE_CALLSTACK
+//#define DEBUG_CREATE_CALLSTACK
 #endif
 
 using System;
@@ -121,7 +121,9 @@ namespace TheEngine.Managers
 #endif
             this[@new] = null;
         }
-        
+
+        public long UnmanagedMemoryUsage => allTextures.Where(t => t != null).Select(t => (long)t!.UnmanagedMemoryBytes).Sum();
+
         public TextureHandle LoadTexture(string path)
         {
             if (texturesByPath.TryGetValue(path, out var handle))

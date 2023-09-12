@@ -91,6 +91,12 @@ public class ModelPreviewRenderer
         gameContext.StartCoroutine(LoadModel(displayId, type));
     }
 
+    public IEnumerator LoadMap(int mapId)
+    {
+        currentModelInstance = null;
+        yield break;
+    }
+
     private IEnumerator LoadModel(uint displayId, GuidType type)
     {
         if (type == GuidType.Creature)

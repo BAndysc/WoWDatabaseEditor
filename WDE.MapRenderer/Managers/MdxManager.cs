@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Diagnostics;
 using TheAvaloniaOpenGL.Resources;
 using TheEngine;
 using TheEngine.Coroutines;
@@ -1446,9 +1447,9 @@ namespace WDE.MapRenderer.Managers
             path = path.Replace("mdx", "M2", StringComparison.InvariantCultureIgnoreCase);
             path = path.Replace("mdl", "M2", StringComparison.InvariantCultureIgnoreCase); // apparently there are still some MDL models	
             
-            if (m2s.ContainsKey(path))
+            if (m2s.TryGetValue(path, out var preloaded))
             {
-                result.SetResult(m2s[path]);
+                result.SetResult(preloaded);
                 yield break;
             }
 
@@ -1943,6 +1944,25 @@ namespace WDE.MapRenderer.Managers
             foreach (var mesh in internalMeshes.Values)
                 if (mesh.HasValue)
                     meshManager.DisposeMesh(mesh.Value.Item1);
+        }
+
+        public void UnloadAllMeshes()
+        {
+            foreach (var mesh in internalMeshes.Values)
+                if (mesh.HasValue)
+                    meshManager.DisposeMesh(mesh.Value.Item1);
+            internalMeshes.Clear();
+            internalMeshesCurrentlyLoaded.Clear();
+            meshes.Clear();
+            meshesCurrentlyLoaded.Clear();
+            gameObjectmeshes.Clear();
+            gameObjectMeshesCurrentlyLoaded.Clear();
+            m2s.Clear();
+            m2sCurrentlyLoaded.Clear();
+            itemMeshes.Clear();
+            itemMeshesCurrentlyLoaded.Clear();
+            creatureMeshesCurrentlyLoaded.Clear();
+            creaturemeshes.Clear();
         }
     }
 }

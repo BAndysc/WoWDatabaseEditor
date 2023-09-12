@@ -3,6 +3,7 @@
 using System;
 using System.Buffers;
 using System.Collections.Generic;
+using TheAvaloniaOpenGL;
 using TheEngine.Data;
 using TheEngine.Entities;
 using TheEngine.Handles;
@@ -118,6 +119,17 @@ namespace TheEngine.Managers
             #endif
 
             return mesh;
+        }
+
+        public long UnmanagedMemoryUsage
+        {
+            get
+            {
+                var vertexSize = Utilities.SizeOf<UniversalVertex>();
+                
+                return meshes.Where(m => m != null).Select(m => (long)(m.VerticesBuffer?.Length ?? 0) * vertexSize + 
+                                                                (long)(m.IndicesBuffer?.Length ?? 0) * (m.IndexType == IndexType.Short ? 2 : 4)).Sum();
+            }
         }
 
         public void Dispose()

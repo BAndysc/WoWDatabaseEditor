@@ -62,6 +62,12 @@ namespace WDE.MapRenderer.Managers
                 blp = new BLP(bytes.Result.AsArray(), 0, bytes.Result.Length, maxSize);
             });
             bytes.Result.Dispose();
+
+            if (!texts.ContainsKey(texturePath))
+            {
+                // this means in the meantime somebody called UnloadAllTextures
+                yield break;
+            }
         
             Debug.Assert(texts[texturePath] == handle);
             var generateMips = blp.Header.Mips == BLP.MipmapLevelAndFlagType.MipsNone;
@@ -86,5 +92,12 @@ namespace WDE.MapRenderer.Managers
 
         private int maxSize;
         private int[] maxSizes = new[] { 0, 1024, 512, 256, 128, 64, 32, 16, 8, 4 };
+
+        public void UnloadAllTextures()
+        {
+            foreach (var tex in texts.Values)
+                textureManager.DisposeTexture(tex);
+            texts.Clear();
+        }
     }
 }

@@ -279,7 +279,13 @@ namespace TheEngine.Entities
                 foreach (var pair in textureHandles)
                 {
                     var texture = engine.textureManager.GetTextureByHandle(pair.Value);
-                    texture.Activate(slot);
+                    if (texture == null)
+                    {
+                        Console.WriteLine("Trying to bind a disposed texture!!! Fix this ASAP");
+                        engine.textureManager.GetTextureByHandle(engine.textureManager.EmptyTexture).Activate(slot);
+                    }
+                    else
+                        texture.Activate(slot);
                     shader.SetUniformInt(pair.Key, slot);
                     slot++;
                 }

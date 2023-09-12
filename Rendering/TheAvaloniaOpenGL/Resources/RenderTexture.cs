@@ -68,9 +68,9 @@ namespace TheAvaloniaOpenGL.Resources
             this.device = device;
         }
         
-        public int Width => underlyingTexture.Width;
+        public int Width => underlyingTexture?.Width ?? 0;
 
-        public int Height => underlyingTexture.Height;
+        public int Height => underlyingTexture?.Height ?? 0;
         
         public void Activate(int slot)
         {
@@ -94,6 +94,8 @@ namespace TheAvaloniaOpenGL.Resources
                 foreach (var t in nextTextures)
                     t.SetWrapping(mode);
         }
+
+        public int UnmanagedMemoryBytes => underlyingTexture?.UnmanagedMemoryBytes ?? 0;
 
         public void Clear(float r, float g, float b, float a)
         {

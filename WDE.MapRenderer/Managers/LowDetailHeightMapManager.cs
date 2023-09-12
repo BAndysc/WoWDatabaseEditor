@@ -76,6 +76,7 @@ public class LowDetailHeightMapManager : IDisposable
         {
             meshManager.DisposeMesh(lowLevelMesh);
             lowLevelMesh = null;
+            currentWdl = null;
         }
     }
 

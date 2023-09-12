@@ -1,3 +1,4 @@
+using System.Collections;
 using Avalonia.Input;
 using ImGuiNET;
 using WDE.Common.Database;
@@ -54,6 +55,11 @@ public class QuickSpawnMenu : IDisposable
         modelPreviewRenderer.Dispose();
     }
 
+    public IEnumerator LoadMap(int mapId)
+    {
+        return modelPreviewRenderer.LoadMap(mapId);
+    }
+    
     private int prevSelectedIndex = -1;
     public void Render(float delta)
     {

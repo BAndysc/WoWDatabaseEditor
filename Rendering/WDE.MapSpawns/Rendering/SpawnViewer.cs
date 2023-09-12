@@ -113,8 +113,6 @@ public class SpawnViewer : IGameModule
 
     public void Update(float delta)
     {
-        UpdateSpawnsData();
-        
         if (spawnDragger.Update(delta))
             return;
         
@@ -171,17 +169,7 @@ public class SpawnViewer : IGameModule
         spawnDragger.RenderTransparent();
     }
 
-    private uint? loadedMap;
-    private void UpdateSpawnsData()
-    {
-        if (loadedMap.HasValue && loadedMap.Value == gameContext.CurrentMap.Id)
-            return;
-
-        loadedMap = (uint)gameContext.CurrentMap.Id;
-        gameContext.StartCoroutine(LoadSpawnDataCoroutine(loadedMap.Value));
-    }
-
-    private IEnumerator LoadSpawnDataCoroutine(uint mapId)
+    public IEnumerator LoadMap(int mapId)
     {
         while (spawnsContainer.IsLoading && gameContext.CurrentMap.Id == mapId)
             yield return null;
@@ -189,7 +177,7 @@ public class SpawnViewer : IGameModule
         if (gameContext.CurrentMap.Id != mapId) // could have changed while waiting
             yield break;
         
-        spawnsContainer.LoadMap(mapId);
+        spawnsContainer.LoadMap((uint)mapId);
     }
     
     private void RefreshVisibility()
