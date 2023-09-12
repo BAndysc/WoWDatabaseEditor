@@ -36,8 +36,7 @@ namespace WDE.Solutions.Manager
                 if (document is not ISolutionItemDocument solutionItemDocument)
                     continue;
 
-                // ReSharper disable once PossibleUnintendedReferenceComparison
-                if (solutionItemDocument.SolutionItem == item)
+                if (ReferenceEquals(solutionItemDocument.SolutionItem, item) && !solutionItemDocument.IsLoading)
                     return solutionItemDocument.GenerateQuery();
             }
 
@@ -51,8 +50,7 @@ namespace WDE.Solutions.Manager
                 if (document is not ISolutionItemDocument solutionItemDocument)
                     continue;
 
-                // ReSharper disable once PossibleUnintendedReferenceComparison
-                if (solutionItemDocument.SolutionItem == item)
+                if (ReferenceEquals(solutionItemDocument.SolutionItem, item) && !solutionItemDocument.IsLoading)
                 {
                     if (solutionItemDocument is ISplitSolutionItemQueryGenerator splitGenerator)
                         return await splitGenerator.GenerateSplitQuery();

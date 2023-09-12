@@ -41,6 +41,7 @@ namespace WDE.Common.Managers
         ISolutionItem SolutionItem { get; }
         Task<IQuery> GenerateQuery();
         bool ShowExportToolbarButtons => true;
+        bool IsLoading => false;
     }
 
     public interface ISplitSolutionItemQueryGenerator
