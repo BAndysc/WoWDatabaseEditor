@@ -83,6 +83,37 @@ namespace WoWDatabaseEditorCore.Providers
                     .ObservesProperty(() => DocumentManager.SelectedTool)
                     .ObservesProperty(() => DocumentManager.ActiveDocument!.IsModified), new("Control+S")));
             
+            SubItems.Add(new ModuleMenuItem("_Save all", 
+                new DelegateCommand(
+                        () =>
+                        {
+                            foreach (var x in DocumentManager.AllTools)
+                            {
+                                if (x is ISavableTool savableTool)
+                                    savableTool.Save.ExecuteAsync();
+                            }
+
+                            foreach (var x in DocumentManager.OpenedDocuments)
+                            {
+                                if (!x.IsModified)
+                                    continue;
+                                
+                                if (x is ISolutionItemDocument sid)
+                                    solutionTasksService.Save(sid).ListenErrors(); // it adds 'save' to the queue, so it's ok not to wait here
+                                else
+                                {
+                                    async Task Func()
+                                    {
+                                        if (x is not IBeforeSaveConfirmDocument confirm || !await confirm.ShallSavePreventClosing()) 
+                                            await x.Save.ExecuteAsync();
+                                    }
+
+                                    Func().ListenErrors();
+                                }   
+                            }
+                        },
+                        () => solutionTasksService.CanSaveToDatabase), new("Control+Shift+S")));
+
             SubItems.Add(new ModuleMenuItem("_Generate query", 
                 new DelegateCommand(
                         () => solutionSqlService.OpenDocumentWithSqlFor(DocumentManager.ActiveSolutionItemDocument!.SolutionItem),
