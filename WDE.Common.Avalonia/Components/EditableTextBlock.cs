@@ -62,7 +62,12 @@ public class EditableTextBlock : TemplatedControl
             base.OnPointerPressed(e);
     }
 
-    private void SpawnTextBox()
+    public void BeginEditing(string overrideText)
+    {
+        SpawnTextBox(overrideText);
+    }
+
+    private void SpawnTextBox(string? overrideText = null)
     {
         textBox = new TextBox()
         {
@@ -70,7 +75,7 @@ public class EditableTextBlock : TemplatedControl
         textBox.Padding = textBlock.Padding;
         textBox.Margin = textBox.Margin;
         textBox.BorderThickness = new Thickness(0);
-        textBox.Text = text;
+        textBox.Text = overrideText ?? text;
         textBox.MinWidth = 0;
         textBox.KeyBindings.Add(new KeyBinding()
         {
@@ -101,7 +106,10 @@ public class EditableTextBlock : TemplatedControl
         }
 
         DispatcherTimer.RunOnce(textBox.Focus, TimeSpan.FromMilliseconds(1));
-        textBox.SelectAll();
+        if (overrideText == null)
+            textBox.SelectAll();
+        else
+            textBox.SelectionStart = textBox.SelectionEnd = textBox.Text.Length;
 
         if (this.GetVisualRoot() is TopLevel toplevel)
         {

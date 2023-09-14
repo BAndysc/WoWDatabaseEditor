@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using WDE.Common.Collections;
+using WDE.Common.Managers;
 using WDE.Common.Parameters;
 using WDE.Common.Providers;
 using WDE.Common.TableData;
 using WDE.Common.Utils;
 using WDE.Module.Attributes;
+using WDE.Parameters.ViewModels;
 
 namespace WDE.Parameters.Services;
 
@@ -18,14 +20,17 @@ public class ParameterPickerService : IParameterPickerService
     private readonly IItemFromListProvider itemFromListProvider;
     private readonly IParameterFactory parameterFactory;
     private readonly ITabularDataPicker tabularDataPicker;
+    private readonly IWindowManager windowManager;
 
     public ParameterPickerService(IItemFromListProvider itemFromListProvider,
         IParameterFactory parameterFactory,
-        ITabularDataPicker tabularDataPicker)
+        ITabularDataPicker tabularDataPicker,
+        IWindowManager windowManager)
     {
         this.itemFromListProvider = itemFromListProvider;
         this.parameterFactory = parameterFactory;
         this.tabularDataPicker = tabularDataPicker;
+        this.windowManager = windowManager;
     }
     
     public async Task<(T?, bool)> PickParameter<T>(IParameter<T> parameter, T currentValue, object? context = null) where T : notnull
@@ -160,6 +165,14 @@ public class ParameterPickerService : IParameterPickerService
         }
 
         return Array.Empty<T>();
+    }
+
+    public async Task<IReadOnlyList<long>?> PickMultipleSimple(IReadOnlyList<long> current, IParameter<long> parameter)
+    {
+        using var vm = new MultipleParametersPickerViewModel(this, parameter, current);
+        if (await windowManager.ShowDialog(vm))
+            return vm.Result;
+        return null;
     }
 
     private async Task<(T?, bool accept, bool hasCustomPicker)> TryPickUsingCustomParameter<T>(IParameter<T> parameter, T? currentValue, object? context = null) where T : notnull

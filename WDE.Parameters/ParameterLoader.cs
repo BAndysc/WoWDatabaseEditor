@@ -37,6 +37,7 @@ namespace WDE.Parameters
         private readonly ICreatureEntryOrGuidProviderService creaturePicker;
         private readonly IQuestEntryProviderService questEntryProviderService;
         private readonly Lazy<IWindowManager> windowManager;
+        private readonly Lazy<IParameterPickerService> parameterPickerService;
         private readonly IQuickAccessRegisteredParameters quickAccessRegisteredParameters;
 
         private Dictionary<Type, List<IDatabaseObserver>> reloadable = new();
@@ -52,6 +53,7 @@ namespace WDE.Parameters
             ICreatureEntryOrGuidProviderService creaturePicker,
             IQuestEntryProviderService questEntryProviderService,
             Lazy<IWindowManager> windowManager,
+            Lazy<IParameterPickerService> parameterPickerService,
             IQuickAccessRegisteredParameters quickAccessRegisteredParameters)
         {
             this.database = database;
@@ -64,6 +66,7 @@ namespace WDE.Parameters
             this.creaturePicker = creaturePicker;
             this.questEntryProviderService = questEntryProviderService;
             this.windowManager = windowManager;
+            this.parameterPickerService = parameterPickerService;
             this.quickAccessRegisteredParameters = quickAccessRegisteredParameters;
         }
 
@@ -139,6 +142,7 @@ namespace WDE.Parameters
             factory.RegisterCombined("UnitBytes2Parameter", "SheathStateParameter",  "UnitPVPStateFlagParameter","UnitBytesPetFlagParameter", "ShapeshiftFormParameter", 
                 (sheath, pvp, pet, shapeShift) => new UnitBytes2Parameter(sheath, pvp, pet, shapeShift, windowManager));
             factory.RegisterCombined("PhaseParameter", "DbcPhaseParameter", "DatabasePhaseParameter", (dbc, db) => new PhaseParameter(dbc, db));
+            factory.RegisterDepending("MultiPhaseParameter", "PhaseParameter", phases => new MultiStringParameter(phases, parameterPickerService.Value));
             
             eventAggregator.GetEvent<DatabaseCacheReloaded>().Subscribe(type =>
             {

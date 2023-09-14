@@ -49,6 +49,8 @@ namespace WDE.CommonViews.Avalonia
             viewLocator.Bind<UnitBytes1EditorViewModel, UnitBytes1EditorView>();
             viewLocator.Bind<UnitBytes2EditorViewModel, UnitBytes2EditorView>();
             viewLocator.Bind<UnixTimestampEditorViewModel, UnixTimestampEditorView>();
+            viewLocator.Bind<MultipleParametersPickerViewModel, MultipleParametersPickerView>();
+            viewLocator.BindToolBar<MultipleParametersPickerViewModel, MultipleParametersPickerToolBar>();
             // history
             viewLocator.Bind<HistoryViewModel, HistoryView>();
             // dbc store

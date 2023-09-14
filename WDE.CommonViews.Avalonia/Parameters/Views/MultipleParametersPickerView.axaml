@@ -1,0 +1,48 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:WDE.Parameters.ViewModels;assembly=WDE.Parameters"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:MultipleParametersPickerViewModel"
+             x:Name="Root"
+             x:Class="WDE.CommonViews.Avalonia.Parameters.Views.MultipleParametersPickerView">
+  <DockPanel>
+    <OkCancelButtons Margin="0,10,0,0" DockPanel.Dock="Bottom" AcceptCommand="{CompiledBinding Accept}" CancelCommand="{CompiledBinding Cancel}" />
+    <GridView Items="{CompiledBinding PickedElements}"
+              KeyDown="Grid_OnKeyDown"
+              TextInput="GridView_OnTextInput"
+              x:Name="GridView"
+              >
+      <GridView.Columns>
+        <GridColumnDefinition Name="" PreferedWidth="40" Property=".">
+          <GridColumnDefinition.DataTemplate>
+            <DataTemplate x:DataType="viewModels:MultipleParametersPickerItemViewModel">
+              <ButtonImage Image="Icons/icon_delete_mono.png" Width="20" Height="20" 
+                           Padding="2"
+                           IsVisible="{CompiledBinding !IsPhantom}"
+                           Command="{CompiledBinding  #Root.((viewModels:MultipleParametersPickerViewModel)DataContext).DeleteItemCommand}"
+                           CommandParameter="{CompiledBinding .}"/>
+            </DataTemplate>
+          </GridColumnDefinition.DataTemplate>
+        </GridColumnDefinition>
+        <GridColumnDefinition Name="Key" PreferedWidth="120" Property=".">
+          <GridColumnDefinition.DataTemplate>
+            <DataTemplate x:DataType="viewModels:MultipleParametersPickerItemViewModel">
+              <DockPanel Background="Transparent">
+                <Button DockPanel.Dock="Right"
+                        Command="{CompiledBinding #Root.((viewModels:MultipleParametersPickerViewModel)DataContext).PickKeyCommand}" 
+                        CommandParameter="{CompiledBinding .}"
+                        IsVisible="{CompiledBinding $parent[DockPanel].IsPointerOver}">
+                  <TextBlock Padding="0">...</TextBlock>
+                </Button>
+                <EditableTextBlock VerticalAlignment="Stretch" Text="{CompiledBinding Key}" />
+              </DockPanel>
+            </DataTemplate>
+          </GridColumnDefinition.DataTemplate>
+        </GridColumnDefinition>
+        <GridColumnDefinition Name="Name" PreferedWidth="320" Property="Name" />
+      </GridView.Columns>
+    </GridView>
+  </DockPanel>
+</UserControl>
