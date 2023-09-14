@@ -185,6 +185,7 @@ internal class LegionDbcLoader : BaseDbcLoader
         Load("GarrClassSpec.db2", 7, 0, data.GarrisonClassSpecStore);
         Load("GarrMission.db2", 19, 0, data.GarrisonMissionStore);
         Load("GarrTalent.db2", 7, 0, data.GarrisonTalentStore);
+        Load("WorldSafeLocs.db2", 0, 1, data.WorldSafeLocsStore);
         Load("GarrBuilding.db2", row =>
         {
             var id = row.Key;
