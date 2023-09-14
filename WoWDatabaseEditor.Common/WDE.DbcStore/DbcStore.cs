@@ -305,6 +305,8 @@ namespace WDE.DbcStore
                 parameterFactory.RegisterCombined("CharShipmentParameter", "SpellParameter", "CreatureParameter", "ItemParameter",
                     (spells, creatures, items) => new CharShipmentParameter(dataPicker, store.CharShipments, spells, creatures, items), QuickAccessMode.Limited);
                 
+                parameterFactory.RegisterDepending("GarrisonFollowerParameter", "CreatureParameter", creature => new GarrisonFollowerParameter(dataPicker, creature, data.GarrisonFollowers));
+                
                 void RegisterCharShipmentContainerParameter(string key, TabularDataAsyncColumn<uint>? counterColumn = null)
                 {
                     parameterFactory.Register(key,
@@ -552,6 +554,73 @@ namespace WDE.DbcStore
         }
     }
 
+    public class GarrisonFollowerParameter : DbcParameter, ICustomPickerParameter<long>
+    {
+        private readonly ITabularDataPicker tabularDataPicker;
+        private readonly IParameter<long> creatureParameter;
+        private readonly List<GarrisonFollowerEntry> followers;
+        private Dictionary<uint, GarrisonFollowerEntry> followersById;
+
+        public GarrisonFollowerParameter(ITabularDataPicker tabularDataPicker, 
+            IParameter<long> creatureParameter,
+            List<GarrisonFollowerEntry> followers)
+        {
+            this.tabularDataPicker = tabularDataPicker;
+            this.creatureParameter = creatureParameter;
+            this.followers = followers;
+            followersById = followers.ToDictionary(x => x.Id, x => x);
+        }
+
+        public override string ToString(long key)
+        {
+            if (followersById.TryGetValue((uint)key, out var follower))
+            {
+                var entry = follower.HordeCreatureEntry == 0 ? follower.AllianceCreatureEntry : follower.HordeCreatureEntry;
+                if (entry == 0)
+                    return key.ToString();
+
+                var name = creatureParameter.ToString(entry, ToStringOptions.WithoutNumber);
+                return name + " (" + key + ")";
+            }
+            else
+                return key.ToString();
+        }
+
+        public async Task<(long, bool)> PickValue(long value)
+        {
+            var result = await tabularDataPicker.PickRow(new TabularDataBuilder<IGarrisonFollower>()
+                .SetData(followers.AsIndexedCollection())
+                .SetTitle("Pick follower")
+                .SetColumns(new TabularDataColumn(nameof(IGarrisonFollower.Id), "Id", 70),
+                    new TabularDataSyncColumn<uint>(nameof(IGarrisonFollower.AllianceCreatureEntry),
+                        "Alliance creature",
+                        id => creatureParameter.ToString(id), 170),
+                    new TabularDataSyncColumn<IGarrisonFollower>(".", "Horde creature",
+                        follower =>
+                        {
+                            if (follower.HordeCreatureEntry == follower.AllianceCreatureEntry)
+                                return "––〃––";
+                            return creatureParameter.ToString(follower.HordeCreatureEntry);
+                        }, 170))
+                .SetExactMatchPredicate((x, search) => x.Id.Is(search))
+                .SetExactMatchCreator(search =>
+                {
+                    if (uint.TryParse(search, out var id))
+                        return new GarrisonFollowerEntry() { Id = id };
+                    return null;
+                })
+                .SetFilter((follower, search) =>
+                {
+                    return follower.Id.Contains(search) ||
+                           creatureParameter.ToString(follower.HordeCreatureEntry).Contains(search, StringComparison.OrdinalIgnoreCase)||
+                           creatureParameter.ToString(follower.AllianceCreatureEntry).Contains(search, StringComparison.OrdinalIgnoreCase);
+                })
+                .Build());
+
+            return (result?.Id ?? default, result != null);
+        }
+    }
+    
     public class CharShipmentParameter : DbcParameter, ICustomPickerParameter<long>
     {
         private readonly ITabularDataPicker dataPicker;
