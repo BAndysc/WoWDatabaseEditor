@@ -83,6 +83,7 @@ namespace WDE.SmartScriptEditor.Models
                 var old = conditions;
                 conditions = value;
                 OnConditionsChanged?.Invoke(this, old, value);
+                InvalidateReadable();
                 parent?.InvalidateReadable();
             }
         }
