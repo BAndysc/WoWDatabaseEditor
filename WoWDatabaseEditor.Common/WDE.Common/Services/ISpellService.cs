@@ -661,8 +661,8 @@ namespace WDE.Common.Services
         UnitPassenger7                     = 103,
         UnitConeEnemy104                  = 104,
         UnitUnk105                         = 105, // 1 spell
-        DestChannelCaster                  = 106,
-        UnkDestAreaUnk107                = 107, // not enough info - only generic spells avalible
+        DestRandomEntry                  = 106,
+        DestAreaEntryExtra                = 107, // not enough info - only generic spells avalible
         GameobjectCone108                  = 108,
         GameobjectCone109                  = 109,
         UnitConeEntry110                  = 110,
@@ -697,10 +697,10 @@ namespace WDE.Common.Services
         Unk139                              = 139,
         Unk140                              = 140,
         Unk141                              = 141,
-        Unk142                              = 142,
+        DestNearbyEntryOrSelfPos            = 142,
         Unk143                              = 143,
         Unk144                              = 144,
-        Unk145                              = 145,
+        DestNearbyGO                        = 145,
         Unk146                              = 146,
         Unk147                              = 147,
         Unk148                              = 148,
