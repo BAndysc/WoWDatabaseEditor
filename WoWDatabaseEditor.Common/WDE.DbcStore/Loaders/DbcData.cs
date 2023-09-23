@@ -60,7 +60,6 @@ public class DbcData
     public Dictionary<long, string> CharSpecializationStore { get; internal set;} = new();
     public Dictionary<long, string> GarrisonClassSpecStore { get; internal set; } = new();
     public Dictionary<long, string> GarrisonBuildingStore { get; internal set; } = new();
-    public Dictionary<long, string> GarrisonMissionStore { get; internal set; } = new();
     public Dictionary<long, string> GarrisonTalentStore { get; internal set; } = new();
     public Dictionary<long, string> DifficultyStore { get; internal set; } = new();
     public Dictionary<long, string> LockTypeStore { get; internal set; } = new();
@@ -70,6 +69,11 @@ public class DbcData
     public Dictionary<long, string> ConversationLineStore { get; internal set; } = new();
 
     public List<(string parameter, Dictionary<long, SelectOption> options)> parametersToRegister = new();
+    public List<UiTextureKit> UiTextureKits { get; } = new();
+    public List<GarrMissionType> GarrMissionTypes { get; } = new();
+    public List<CurrencyCategory> CurrencyCategories { get; } = new();
+    public List<CurrencyType> CurrencyTypes { get; } = new();
+    public List<GarrMission> Missions { get; } = new();
     public List<AreaEntry> Areas { get; } = new();
     public List<MapEntry> Maps { get; } = new();
     public List<FactionTemplate> FactionTemplates { get; } = new();

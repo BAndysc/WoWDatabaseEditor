@@ -183,7 +183,76 @@ internal class LegionDbcLoader : BaseDbcLoader
         Load("Scenario.db2", 0, 1, data.ScenarioStore);
         Load("Vignette.db2", 0, 1, data.VignetteStore);
         Load("GarrClassSpec.db2", 7, 0, data.GarrisonClassSpecStore);
-        Load("GarrMission.db2", 19, 0, data.GarrisonMissionStore);
+        Load("GarrMission.db2", data.Missions, row =>
+            new GarrMission()
+            {
+                Name = row.GetString(0),
+                Description = row.GetString(1),
+                Location = row.GetString(2),
+                MissionDuration = row.GetInt(3),
+                OfferDuration = row.GetUInt(4),
+                MapPos0 = row.GetFloat(5, 0),
+                MapPos1 = row.GetFloat(5, 1),
+                WorldPos0 = row.GetFloat(6, 0),
+                WorldPos1 = row.GetFloat(6, 1),
+                TargetItemLevel = row.GetUShort(7),
+                UiTextureKitId = row.GetUShort(8),
+                MissionCostCurrencyTypeId = row.GetUShort(9),
+                TargetLevel = (byte)row.GetUInt(10),
+                EnvGarrMechanicTypeId = (sbyte)row.GetInt(11),
+                MaxFollowers = (byte)row.GetUInt(12),
+                OfferedGarrMissionTextureId = (byte)row.GetUInt(13),
+                GarrMissionTypeId = (byte)row.GetUInt(14),
+                GarrFollowerTypeId = (byte)row.GetUInt(15),
+                BaseCompletionChance = (byte)row.GetUInt(16),
+                FollowerDeathChance = (byte)row.GetUInt(17),
+                GarrTypeId = (byte)row.GetUInt(18),
+                Id = row.GetInt(19),
+                TravelDuration = row.GetInt(20),
+                PlayerConditionId = row.GetUInt(21),
+                MissionCost = row.GetUInt(22),
+                Flags = row.GetUInt(23),
+                BaseFollowerXp = row.GetUInt(24),
+                AreaId = row.GetUInt(25),
+                OvermaxRewardPackId = row.GetUInt(26),
+                EnvGarrMechanicId = row.GetUInt(27),
+                GarrMissionSetId = row.GetUInt(28),
+            });
+        Load("UiTextureKit.db2", data.UiTextureKits, row =>
+            new UiTextureKit()
+            {
+                Id = (int)row.Key,
+                KitPrefix = row.GetString(1)
+            });
+        Load("GarrMissionType.db2", data.GarrMissionTypes, row => 
+            new GarrMissionType()
+            {
+                Id = (byte)row.Key,
+                Name = row.GetString(1),
+                UiTextureAtlasMemberId = row.GetInt(2),
+                UiTextureKitId = row.GetInt(3)
+            });
+        Load("CurrencyCategory.db2", data.CurrencyCategories, row => 
+            new CurrencyCategory()
+            {
+                Id = (int)row.Key,
+                Name = row.GetString(1)
+            });
+        Load("CurrencyTypes.db2", data.CurrencyTypes, row => 
+            new CurrencyType()
+            {
+                Id = row.GetInt(0),
+                Name = row.GetString(1),
+                Description = row.GetString(2),
+                MaxQuantity = row.GetUInt(3),
+                MaxEarnablePerWeek = row.GetUInt(4),
+                Flags = (CurrencyTypesFlags)row.GetUInt(5),
+                CategoryId = (byte)row.GetUShort(6),
+                SpellCategory = (byte)row.GetUShort(7),
+                Quality = (byte)row.GetUShort(8),
+                InventoryIconFileId = row.GetInt(9),
+                SpellWeight = row.GetUInt(10),
+            });
         Load("GarrTalent.db2", 7, 0, data.GarrisonTalentStore);
         Load("WorldSafeLocs.db2", 0, 1, data.WorldSafeLocsStore);
         Load("GarrBuilding.db2", row =>

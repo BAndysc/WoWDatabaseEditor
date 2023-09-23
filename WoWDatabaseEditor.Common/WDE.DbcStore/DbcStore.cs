@@ -62,7 +62,7 @@ namespace WDE.DbcStore
 
     [AutoRegister]
     [SingleInstance]
-    public class DbcStore : IDbcStore, IDbcSpellService, IMapAreaStore, IFactionTemplateStore
+    public class DbcStore : IDbcStore, IDbcSpellService, IMapAreaStore, IFactionTemplateStore, IGarrMissionStore
     {
         private readonly IDbcSettingsProvider dbcSettingsProvider;
         private readonly IMessageBoxService messageBoxService;
@@ -141,6 +141,10 @@ namespace WDE.DbcStore
         public IReadOnlyList<ICharShipmentContainer> CharShipmentContainers { get; internal set; } = Array.Empty<ICharShipmentContainer>();
         public Dictionary<ushort, ICharShipmentContainer> CharShipmentContainerById { get; internal set; } = new();
 
+        public IReadOnlyList<IGarrMission> Missions { get; internal set; } = Array.Empty<IGarrMission>();
+        public Dictionary<int, IGarrMission> GarrMissionById { get; internal set; } = new();
+        public IGarrMission? GetMissionById(int id) => GarrMissionById.TryGetValue(id, out var mission) ? mission : null;
+        
         public IArea? GetAreaById(uint id) => AreaById.TryGetValue(id, out var area) ? area : null;
         public IMap? GetMapById(uint id) => MapById.TryGetValue(id, out var map) ? map : null;
         public FactionTemplate? GetFactionTemplate(uint templateId) => FactionTemplateById.TryGetValue(templateId, out var faction) ? faction : null;
@@ -211,6 +215,8 @@ namespace WDE.DbcStore
                 store.Areas = data.Areas;
                 store.CharShipmentContainers = data.CharShipmentContainers;
                 store.AreaById = data.Areas.ToDictionary(a => a.Id, a => (IArea)a);
+                store.Missions = data.Missions;
+                store.GarrMissionById = data.Missions.ToDictionary(a => a.Id, a => (IGarrMission)a);
                 store.Maps = data.Maps;
                 store.ItemStore = data.ItemStore;
                 store.MapById = data.Maps.ToDictionary(a => a.Id, a => (IMap)a);
@@ -220,6 +226,29 @@ namespace WDE.DbcStore
                 store.FactionsById = data.Factions.ToDictionary(a => a.FactionId, a => a);
                 store.CharShipments = data.CharShipments;
 
+                var currencyCategoryById = data.CurrencyCategories.ToDictionary(x => x.Id, x => x);
+                foreach (var curr in data.CurrencyTypes)
+                {
+                    if (currencyCategoryById.TryGetValue(curr.CategoryId, out var category))
+                        curr.Category = category;
+                }
+                
+                var currenciesById = data.CurrencyTypes.ToDictionary(x => x.Id, x => x);
+                
+                var uiTextureById = data.UiTextureKits.ToDictionary(x => x.Id, x => x);
+                var garrMissionTypeById = data.GarrMissionTypes.ToDictionary(x => x.Id, x => x);
+                foreach (var mission in data.Missions)
+                {
+                    if (uiTextureById.TryGetValue(mission.UiTextureKitId, out var kit))
+                        mission.UiTextureKit = kit;
+                    
+                    if (garrMissionTypeById.TryGetValue(mission.GarrMissionTypeId, out var type))
+                        mission.GarrMissionType = type;
+                    
+                    if (currenciesById.TryGetValue(mission.MissionCostCurrencyTypeId, out var currency))
+                        mission.MissionCostCurrencyType = currency;
+                }
+                
                 var followerById = data.GarrisonFollowers.ToDictionary(x => x.Id, x => x);
                 var containersById = data.CharShipmentContainers.ToDictionary(x => x.Id, x => x);
                 
@@ -292,7 +321,7 @@ namespace WDE.DbcStore
                 parameterFactory.Register("GarrisonTalentHasOrHasNotParameter", new DbcParameter(data.GarrisonTalentStore.Select(x => new KeyValuePair<long, string>(x.Key, "has " + x.Value))
                     .Concat(data.GarrisonTalentStore.Select(x => new KeyValuePair<long, string>(-x.Key, "doesn't have " + x.Value)))
                     .ToDictionary(x => x.Key, x => x.Value)));
-                parameterFactory.Register("GarrisonMissionParameter", new DbcParameter(data.GarrisonMissionStore));
+                parameterFactory.Register("GarrisonMissionParameter", new DbcParameter(data.Missions.ToDictionary(x => (long)x.Id, x => x.Name)));
                 parameterFactory.Register("DifficultyParameter", new DbcParameter(data.DifficultyStore));
                 parameterFactory.Register("LockTypeParameter", new DbcParameter(data.LockTypeStore));
                 parameterFactory.Register("AdventureJournalParameter", new DbcParameter(data.AdventureJournalStore));

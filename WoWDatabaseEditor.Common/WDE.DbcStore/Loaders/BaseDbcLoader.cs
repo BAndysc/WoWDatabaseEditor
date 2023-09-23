@@ -75,8 +75,26 @@ internal abstract class BaseDbcLoader : IDbcLoader
         if (!File.Exists(path))
             return;
 
-        foreach (var entry in opener.Open(path))
+        var dbc = opener.Open(path);
+
+        foreach (var entry in dbc)
             foreachRow(entry);
+    }
+    
+    protected void Load<T>(string filename, List<T> outputList, Func<IDbcIterator, T> creator)
+    {
+        progress?.Report(currentStep++, StepsCount, $"Loading {filename}");
+        var path = $"{dbcSettingsProvider.GetSettings().Path}/{filename}";
+
+        if (!File.Exists(path))
+            return;
+
+        var dbc = opener.Open(path);
+
+        outputList.Capacity = (int)dbc.RecordCount;
+        
+        foreach (var entry in dbc)
+            outputList.Add(creator(entry));
     }
     
     protected void Load(string filename, int id, int nameIndex, Dictionary<long, string> dictionary, bool useLocale = false)
