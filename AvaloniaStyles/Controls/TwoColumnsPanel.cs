@@ -27,6 +27,12 @@ public class TwoColumnsPanel : Panel
         set => SetValue(ColumnSpacingProperty, value);
     }
 
+    public bool IgnoreOtherPanelsInMeasurement
+    {
+        get => GetValue(IgnoreOtherPanelsInMeasurementProperty);
+        set => SetValue(IgnoreOtherPanelsInMeasurementProperty, value);
+    }
+
     public static int GetColumnSpan(Control control) => control.GetValue(ColumnSpanProperty);
 
     public static void SetColumnSpan(Control control, int value) => control.SetValue(ColumnSpanProperty, value);
@@ -82,7 +88,8 @@ public class TwoColumnsPanel : Panel
     }
 
     private double currentLeftColumnWidth = 0;
-    
+    public static readonly StyledProperty<bool> IgnoreOtherPanelsInMeasurementProperty = AvaloniaProperty.Register<TwoColumnsPanel, bool>("IgnoreOtherPanelsInMeasurement");
+
     private double MeasureParentsLeftColumn()
     {
         double maxParentWidth = 0;
@@ -99,7 +106,9 @@ public class TwoColumnsPanel : Panel
     private double MeasureChildrenLeftColumns()
     {
         double maxChildWidth = 0;
-        foreach (var inner in this.GetVisualDescendants().Select(x => x as TwoColumnsPanel).Where(x => x != null))
+        foreach (var inner in this.GetVisualDescendants().Select(x => x as TwoColumnsPanel)
+                     .Where(x => x != null)
+                     .Where(x => !x!.IgnoreOtherPanelsInMeasurement))
         {
             maxChildWidth = Math.Max(maxChildWidth, inner!.MeasureLeftColumn());
         }
@@ -114,7 +123,10 @@ public class TwoColumnsPanel : Panel
         double height = -rowSpacing; // a trick to not have spacing in the last element
         double maxRightWidth = 0;
 
-        maxLeftWidth = Math.Max(MeasureChildrenLeftColumns(), Math.Max(MeasureParentsLeftColumn(), MeasureLeftColumn()));
+        if (IgnoreOtherPanelsInMeasurement)
+            maxLeftWidth = MeasureLeftColumn();
+        else
+           maxLeftWidth = Math.Max(MeasureChildrenLeftColumns(), Math.Max(MeasureParentsLeftColumn(), MeasureLeftColumn()));
         currentLeftColumnWidth = maxLeftWidth;
 
         var rightAvailableSize = new Size(Math.Max(0, availableSize.Width - maxLeftWidth - ColumnSpacing), availableSize.Height);

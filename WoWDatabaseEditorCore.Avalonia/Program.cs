@@ -10,6 +10,8 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.OpenGL;
 using Avalonia.ReactiveUI;
+using Projektanker.Icons.Avalonia;
+using Projektanker.Icons.Avalonia.MaterialDesign;
 using WDE.Common.Tasks;
 using WoWDatabaseEditorCore.Managers;
 
@@ -89,7 +91,8 @@ namespace WoWDatabaseEditorCore.Avalonia
                 // .With(new AvaloniaNativePlatformOptions { UseGpu = false })
                 //.With(new Win32PlatformOptions(){AllowEglInitialization = false})
                 .UseReactiveUI()
-                .LogToTrace();
+                .LogToTrace()
+                .WithIcons(x => x.Register<MaterialDesignIconProvider>());
 #if USE_OPENTK
             Console.WriteLine("Initializing OpenGL");
 

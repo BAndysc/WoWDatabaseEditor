@@ -42,11 +42,6 @@
     <PackageReference Include="Unity.RegistrationByConvention">
       <Version>5.11.1</Version>
     </PackageReference>
-    <PackageReference Include="PropertyChanged.SourceGenerator">
-      <Version>1.0.3</Version>
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
     <PackageReference Include="FuzzySharp" Version="2.0.2" />
   </ItemGroup>
 </Project>

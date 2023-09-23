@@ -22,9 +22,10 @@ public class EditableTextBlock : TemplatedControl
     private IDisposable? clickDisposable = null;
     
     private string text = "";
-    public static readonly DirectProperty<EditableTextBlock, string> TextProperty = AvaloniaProperty.RegisterDirect<EditableTextBlock, string>("Text", o => o.Text, (o, v) => o.Text = v, defaultBindingMode: BindingMode.TwoWay);
+    public static readonly DirectProperty<EditableTextBlock, string> TextProperty = AvaloniaProperty.RegisterDirect<EditableTextBlock, string>(nameof(Text), o => o.Text, (o, v) => o.Text = v, defaultBindingMode: BindingMode.TwoWay);
     public static readonly StyledProperty<bool> UseAdornerProperty = AvaloniaProperty.Register<EditableTextBlock, bool>(nameof(UseAdorner), defaultValue: true);
-    public static readonly StyledProperty<bool> SinglePressToEditProperty = AvaloniaProperty.Register<EditableTextBlock, bool>("SinglePressToEdit");
+    public static readonly StyledProperty<bool> SinglePressToEditProperty = AvaloniaProperty.Register<EditableTextBlock, bool>(nameof(SinglePressToEdit));
+    public static readonly StyledProperty<bool> IsReadOnlyProperty = AvaloniaProperty.Register<EditableTextBlock, bool>(nameof(IsReadOnly));
 
     public string Text
     {
@@ -44,6 +45,12 @@ public class EditableTextBlock : TemplatedControl
         set => SetValue(SinglePressToEditProperty, value);
     }
 
+    public bool IsReadOnly
+    {
+        get => GetValue(IsReadOnlyProperty);
+        set => SetValue(IsReadOnlyProperty, value);
+    }
+
     protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
     {
         base.OnApplyTemplate(e);
@@ -53,6 +60,8 @@ public class EditableTextBlock : TemplatedControl
 
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
+        if (textBox != null)
+            return;
         if (e.ClickCount == 2 || SinglePressToEdit)
         {
             SpawnTextBox();
@@ -76,7 +85,9 @@ public class EditableTextBlock : TemplatedControl
         textBox.Margin = textBox.Margin;
         textBox.BorderThickness = new Thickness(0);
         textBox.Text = overrideText ?? text;
+        textBox.FontFamily = textBlock.FontFamily;
         textBox.MinWidth = 0;
+        textBox.IsReadOnly = IsReadOnly;
         textBox.KeyBindings.Add(new KeyBinding()
         {
             Gesture = new KeyGesture(Key.Enter),

@@ -5,6 +5,8 @@
         <PackageReference Include="Avalonia.ReactiveUI" Version="$(AvaloniaVersion)" />
         <PackageReference Include="Avalonia.Desktop" Version="$(AvaloniaVersion)" />
         <PackageReference Include="Avalonia.Xaml.Behaviors" Version="0.10.10" />
+        <PackageReference Include="Projektanker.Icons.Avalonia" Version="5.13.0" />
+        <PackageReference Include="Projektanker.Icons.Avalonia.MaterialDesign" Version="5.13.0" />
         <ProjectReference Include="$(MSBuildThisFileDirectory)\Prism.Avalonia\src\Prism.Avalonia\Prism.Avalonia.csproj" />
     </ItemGroup>
     <ItemGroup>
