@@ -78,8 +78,8 @@
             </ListBox.ItemsPanel>
             <ListBox.Styles>
                 <Style Selector="ListBoxItem" x:DataType="viewModels:EventOrActionItem">
-                    <Setter Property="(editor:FastGroupingWrapPanel.Group)" Value="{CompiledBinding Group}" />
-                    <Setter Property="IsVisible" Value="{CompiledBinding ShowItem}"></Setter>
+                    <Setter Property="(editor:FastGroupingWrapPanel.Group)" Value="{CompiledBinding Group}" />	
+                    <Setter Property="(editor:FastGroupingWrapPanel.Active)" Value="{CompiledBinding ShowItem}"></Setter>
                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                     <Setter Property="ClipToBounds" Value="False" />
                     <Setter Property="Padding" Value="7,5,2,7"></Setter>
