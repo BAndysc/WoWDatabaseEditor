@@ -2638,7 +2638,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                             if (preferences.AutomaticallyApplyNonRepeatableFlag &&
                                 script.SourceType != SmartScriptType.TimedActionList)
                             {
-                                var repeatMaximum = data.Parameters.IndexIf(p => p.Name == "Repeat Maximum");
+                                var repeatMaximum = data.Parameters.IndexIf(p => p.Name.Equals("Repeat Maximum", StringComparison.OrdinalIgnoreCase));
                             
                                 if (repeatMaximum == -1)
                                     continue;
