@@ -13,6 +13,11 @@ namespace WDE.PacketViewer.Processing.Runners
             this.r1 = r1;
         }
 
+        public override void Initialize(ulong gameBuild)
+        {
+            r1.Initialize(gameBuild);
+        }
+
         public bool PreProcess(PacketHolder packet)
         {
             r1.Process(packet);
@@ -35,6 +40,12 @@ namespace WDE.PacketViewer.Processing.Runners
         {
             this.r1 = r1;
             this.r2 = r2;
+        }
+
+        public override void Initialize(ulong gameBuild)
+        {
+            r1.Initialize(gameBuild);
+            r2.Initialize(gameBuild);
         }
 
         public bool PreProcess(PacketHolder packet)
@@ -65,6 +76,13 @@ namespace WDE.PacketViewer.Processing.Runners
             this.r1 = r1;
             this.r2 = r2;
             this.r3 = r3;
+        }
+
+        public override void Initialize(ulong gameBuild)
+        {
+            r1.Initialize(gameBuild);
+            r2.Initialize(gameBuild);
+            r3.Initialize(gameBuild);
         }
 
         public bool PreProcess(PacketHolder packet)
@@ -102,6 +120,14 @@ namespace WDE.PacketViewer.Processing.Runners
             this.r2 = r2;
             this.r3 = r3;
             this.r4 = r4;
+        }
+        
+        public override void Initialize(ulong gameBuild)
+        {
+            r1.Initialize(gameBuild);
+            r2.Initialize(gameBuild);
+            r3.Initialize(gameBuild);
+            r4.Initialize(gameBuild);
         }
 
         public bool PreProcess(PacketHolder packet)
@@ -147,6 +173,15 @@ namespace WDE.PacketViewer.Processing.Runners
             this.r5 = r5;
         }
 
+        public override void Initialize(ulong gameBuild)
+        {
+            r1.Initialize(gameBuild);
+            r2.Initialize(gameBuild);
+            r3.Initialize(gameBuild);
+            r4.Initialize(gameBuild);
+            r5.Initialize(gameBuild);
+        }
+        
         public bool PreProcess(PacketHolder packet)
         {
             r1.Process(packet);
@@ -194,6 +229,16 @@ namespace WDE.PacketViewer.Processing.Runners
             this.r4 = r4;
             this.r5 = r5;
             this.r6 = r6;
+        }
+        
+        public override void Initialize(ulong gameBuild)
+        {
+            r1.Initialize(gameBuild);
+            r2.Initialize(gameBuild);
+            r3.Initialize(gameBuild);
+            r4.Initialize(gameBuild);
+            r5.Initialize(gameBuild);
+            r6.Initialize(gameBuild);
         }
 
         public bool PreProcess(PacketHolder packet)

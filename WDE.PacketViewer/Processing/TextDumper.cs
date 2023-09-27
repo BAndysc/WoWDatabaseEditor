@@ -21,7 +21,12 @@ namespace WDE.PacketViewer.Processing
             this.inner = new NothingToBoolProcessor(inner);
             this.sb = sb;
         }
-        
+
+        public void Initialize(ulong gameBuild)
+        {
+            inner.Initialize(gameBuild);
+        }
+
         public bool Process(PacketHolder packet)
         {
             return inner.Process(packet);

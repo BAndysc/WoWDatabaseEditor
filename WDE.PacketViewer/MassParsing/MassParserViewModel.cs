@@ -180,6 +180,9 @@ public partial class MassParserViewModel : ObservableBase, IDocument
                     if (perFileStateProcessor != null)
                         perFileStateProcessor.ClearAllState();
                     
+                    textProcessor?.Initialize(packets.GameVersion);
+                    documentDumper?.Initialize(packets.GameVersion);
+
                     if (twoStep != null)
                     {
                         foreach (var packet in packets.Packets_)
@@ -189,7 +192,7 @@ public partial class MassParserViewModel : ObservableBase, IDocument
 
                         await twoStep.PostProcessFirstStep();
                     }
-                    
+
                     foreach (var packet in packets.Packets_)
                     {
                         try

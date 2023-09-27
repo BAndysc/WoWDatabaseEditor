@@ -14,7 +14,7 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
 {
     public interface IRelatedPacketsFinder
     {
-        IFilterData Find(IList<PacketViewModel> packets, IList<PacketViewModel> unfilteredPackets, int start, CancellationToken token);
+        IFilterData Find(ulong gameBuild, IList<PacketViewModel> packets, IList<PacketViewModel> unfilteredPackets, int start, CancellationToken token);
     }
     
     [AutoRegister]
@@ -33,11 +33,13 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
             
         }
         
-        public IFilterData Find(IList<PacketViewModel> packets, IList<PacketViewModel> unfilteredPackets, int start, CancellationToken token)
+        public IFilterData Find(ulong gameBuild, IList<PacketViewModel> packets, IList<PacketViewModel> unfilteredPackets, int start, CancellationToken token)
         {
             var processor = actionReactionProcessorCreator.Create();
             EventHappened? happenReason = null;
 
+            processor.Initialize(gameBuild);
+            
             foreach (var f in packets)
             {
                 processor.PreProcess(f.Packet);

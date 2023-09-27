@@ -54,6 +54,7 @@ namespace WDE.PacketViewer.ViewModels
         private readonly IActionReactionProcessorCreator actionReactionProcessorCreator;
         private readonly IRelatedPacketsFinder relatedPacketsFinder;
         private readonly ISniffLoader sniffLoader;
+        private readonly PrettyFlagParameter prettyFlagParameter;
         private readonly PacketViewModelFactory packetViewModelCreator;
 
         public PacketDocumentViewModel(PacketDocumentSolutionItem solutionItem, 
@@ -89,6 +90,7 @@ namespace WDE.PacketViewer.ViewModels
             this.actionReactionProcessorCreator = actionReactionProcessorCreator;
             this.relatedPacketsFinder = relatedPacketsFinder;
             this.sniffLoader = sniffLoader;
+            this.prettyFlagParameter = prettyFlagParameter;
             History = history;
             history.LimitStack(20);
             packetViewModelCreator = new PacketViewModelFactory(databaseProvider, spellStore);
@@ -583,6 +585,7 @@ namespace WDE.PacketViewer.ViewModels
             {
                 AllPacketsSplit = new();
                 var splitter = new SplitUpdateProcessor(new GuidExtractorProcessor());
+                splitter.Initialize(sniffGameBuild);
                 foreach (var packet in AllPackets)
                 {
                     var splitted = splitter.Process(packet.Packet);
@@ -801,6 +804,8 @@ namespace WDE.PacketViewer.ViewModels
             {
                 int j = 0;
                 var all = splitUpdate ? AllPacketsSplit! : AllPackets;
+                
+                dumper.Initialize(sniffGameBuild);
                 for (var index = 0; index < FilteredPackets.Count; index++)
                 {
                     var packet = FilteredPackets[index];
@@ -823,6 +828,7 @@ namespace WDE.PacketViewer.ViewModels
             }
             else
             {
+                dumper.Initialize(sniffGameBuild);
                 foreach (var packet in FilteredPackets)
                 {
                     processed++;
@@ -853,8 +859,10 @@ namespace WDE.PacketViewer.ViewModels
             try
             {
                 var packets = await sniffLoader.LoadSniff(solutionItem.File, solutionItem.CustomVersion, currentActionToken.Token, true, this);
+                
                 if (!packetStore.Load((DumpFormatType)packets.DumpType))
                     await messageBoxService.SimpleDialog("Error", "Failed to load packet text output", "Failed to load _parsed.txt output file. Without this file, text output will be missing in the packets.");
+                
                 
                 if (currentActionToken.IsCancellationRequested)
                 {
@@ -863,6 +871,8 @@ namespace WDE.PacketViewer.ViewModels
                     return;
                 }
                 
+                sniffGameBuild = packets.GameVersion;
+                prettyFlagParameter.InitializeBuild(sniffGameBuild);
                 using (AllPackets.SuspendNotifications())
                 {
                     foreach (var packet in packets.Packets_)
@@ -909,7 +919,7 @@ namespace WDE.PacketViewer.ViewModels
             {
                 var all = splitUpdate ? AllPacketsSplit! : AllPackets;
                 return await Task.Run(() =>
-                    relatedPacketsFinder.Find(filteredPackets, all, start, token), token);
+                    relatedPacketsFinder.Find(sniffGameBuild, filteredPackets, all, start, token), token);
             }
             catch (TaskCanceledException)
             {
@@ -960,6 +970,7 @@ namespace WDE.PacketViewer.ViewModels
                     if (ReasonPanelVisibility)
                     {
                         actionReactionProcessor = actionReactionProcessorCreator.Create();
+                        actionReactionProcessor.Initialize(sniffGameBuild);
                         foreach (var f in filteredPackets)
                             actionReactionProcessor.PreProcess(f.Packet);
                         foreach (var f in filteredPackets)
@@ -1128,6 +1139,7 @@ namespace WDE.PacketViewer.ViewModels
         public ObservableCollection<PossibleActionViewModel> PossibleActions { get; } = new();
         public ObservableCollection<DetectedActionViewModel> DetectedActions { get; } = new();
         public ObservableCollection<DetectedEventViewModel> DetectedEvents { get; } = new();
+        private ulong sniffGameBuild;
         
         public IFilterData FilterData { get; set; } = new FilterData();
         public ICommand ToggleFindCommand { get; }

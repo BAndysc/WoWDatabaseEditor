@@ -91,7 +91,6 @@ public class UpdateHistoryViewModel : ObservableBase
     }
     
     private readonly Func<IUpdateFieldsHistory> historyCreator;
-    private readonly PrettyFlagParameter prettyFlagParameter;
     private IUpdateFieldsHistory? currentHistory;
     private UniversalGuid? currentGuid;
 
@@ -122,7 +121,6 @@ public class UpdateHistoryViewModel : ObservableBase
         IObservable<PacketViewModel?> selectedPacket)
     {
         this.historyCreator = historyCreator;
-        this.prettyFlagParameter = prettyFlagParameter;
 
         JumpToPacket = goToPacket;
         CurrentGuid = currentGuid;

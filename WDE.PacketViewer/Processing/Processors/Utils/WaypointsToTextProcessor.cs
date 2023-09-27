@@ -23,6 +23,11 @@ namespace WDE.PacketViewer.Processing.Processors.Utils
             this.parsingSettings = parsingSettings;
         }
 
+        public void Initialize(ulong gameBuild)
+        {
+            waypointProcessor.Initialize(gameBuild);
+        }
+
         public bool Process(PacketHolder packet) => waypointProcessor.Process(packet);
 
         public async Task<string> Generate()

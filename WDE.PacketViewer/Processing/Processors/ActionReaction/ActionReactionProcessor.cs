@@ -269,6 +269,17 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
         
         // reverse lookup: event packet id -> what are possible actions, this event caused
         private Dictionary<int, List<(int packetId, double chance, EventHappened happened)>>? reverseLookup;
+
+        public void Initialize(ulong gameBuild)
+        {
+            chatEmoteSoundProcessor.Initialize(gameBuild);
+            waypointsProcessor.Initialize(gameBuild);
+            auraSlotTracker.Initialize(gameBuild);
+            playerGuidFollower.Initialize(gameBuild);
+            unitPositionFollower.Initialize(gameBuild);
+            updateObjectFollower.Initialize(gameBuild);
+            eventDetectorProcessor.Initialize(gameBuild);
+        }
         
         public void ProcessUnfiltered(PacketHolder packet)
         {

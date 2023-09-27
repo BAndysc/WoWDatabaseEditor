@@ -4,9 +4,9 @@ using WDE.Module.Attributes;
 namespace WDE.PacketViewer.Processing.Processors.Utils;
 
 [AutoRegister]
-[SingleInstance]
 public class PrettyFlagParameter
 {
+    private ulong gameBuild;
     private IParameter<long> unitFlagsParameter;
     private IParameter<long> unitFlags2Parameter;
     private IParameter<long> FactionTemplateParameter;
@@ -19,6 +19,8 @@ public class PrettyFlagParameter
     private readonly IParameter<long> itemName;
     private readonly IParameter<long> gameObjectFlags;
     private readonly IParameter<long> gameobjectModel;
+    private readonly IParameter<long> unitBytes0PostMop;
+    private readonly IParameter<long> unitBytes0PreMop;
 
     public PrettyFlagParameter(IParameterFactory parameterFactory)
     {
@@ -29,13 +31,19 @@ public class PrettyFlagParameter
         npcFlagsParameter = parameterFactory.Factory("NpcFlagParameter");
         gameobjectModel = parameterFactory.Factory("GameObjectDisplayInfoParameter");
         gameobjectBytes1Parameter = parameterFactory.Factory("GameobjectBytes1Parameter");
-        unitBytesParameters[0] = parameterFactory.Factory("UnitBytes0Parameter");
+        unitBytes0PostMop = parameterFactory.Factory("UnitBytes0PostMopParameter");
+        unitBytes0PreMop = parameterFactory.Factory("UnitBytes0PreMopParameter");
         unitBytesParameters[1] = parameterFactory.Factory("UnitBytes1Parameter");
         unitBytesParameters[2] = parameterFactory.Factory("UnitBytes2Parameter");
         modelParameter = parameterFactory.Factory("CreatureModelDataParameter");
         objectName = parameterFactory.Factory("CreatureGameobjectNameParameter");
         itemName = parameterFactory.Factory("ItemParameter");
         gameObjectFlags = parameterFactory.Factory("GameObjectFlagParameter");
+    }
+
+    public void InitializeBuild(ulong gameBuild)
+    {
+        this.gameBuild = gameBuild;
     }
     
     public IParameter<long>? GetPrettyParameter(string field)
@@ -68,7 +76,7 @@ public class PrettyFlagParameter
             case "UNIT_NPC_FLAGS":
                 return npcFlagsParameter;
             case "UNIT_FIELD_BYTES_0":
-                return unitBytesParameters[0];
+                return gameBuild >= 17359 ? unitBytes0PostMop : unitBytes0PreMop;
             case "UNIT_FIELD_BYTES_1":
                 return unitBytesParameters[1];
             case "UNIT_FIELD_BYTES_2":

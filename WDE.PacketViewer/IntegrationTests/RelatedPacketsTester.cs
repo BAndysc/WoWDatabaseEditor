@@ -97,7 +97,7 @@ namespace WDE.PacketViewer.IntegrationTests
             {   
                 try
                 {
-                    TestSingle(store, @group, split);
+                    TestSingle(sniff.GameVersion, store, @group, split);
                 }
                 catch (Exception e)
                 {
@@ -113,12 +113,12 @@ namespace WDE.PacketViewer.IntegrationTests
             }
         }
 
-        private void TestSingle(PacketViewModelStore store, RelatedPacketsTestCase @group, List<PacketViewModel> split)
+        private void TestSingle(ulong gameBuild, PacketViewModelStore store, RelatedPacketsTestCase @group, List<PacketViewModel> split)
         {
             Console.WriteLine("\n\n" + @group.TestName);
             var startPackets = FindPacket(store, split, @group.SearchTextStartPacket);
             Console.WriteLine($"Text: '{@group.SearchTextStartPacket}' found in packet id {startPackets!.Id}");
-            var result = relatedPacketsFinder.Find(split, split, startPackets!.Id, CancellationToken.None);
+            var result = relatedPacketsFinder.Find(gameBuild, split, split, startPackets!.Id, CancellationToken.None);
 
             var mustIncludeGuids = @group.MustIncludeGuid.StringToGuids().ToList();
             var mayIncludeGuids = @group.MightIncludeGuid.StringToGuids().ToList();

@@ -25,6 +25,24 @@ public static class UpdateValueExtensions
 
         return null;
     }
+    
+    private static float? GetFloat(this UpdateValuesObjectDataFields fields, string field)
+    {
+        if (field == "OBJECT_FIELD_SCALE_X")
+            return fields.Scale;
+        
+        if (fields.Unit != null)
+        {
+            foreach (var getter in floatGetters)
+            {
+                var pair = getter(fields.Unit);
+                if (pair.Item1 == field)
+                    return pair.Item2;
+            }
+        }
+
+        return null;
+    }
 
     private static UniversalGuid? GetGuid(this UpdateValuesObjectDataFields fields, string field)
     {
@@ -41,6 +59,16 @@ public static class UpdateValueExtensions
         return null;
     }
 
+    public static bool TryGetFloat(this UpdateValues update, string field, out float value)
+    {
+        if (update.ValuesCase == UpdateValues.ValuesOneofCase.Legacy)
+            return update.Legacy.Floats.TryGetValue(field, out value);
+
+        var val = GetFloat(update.Fields, field);
+        value = val ?? 0;
+        return val.HasValue;
+    }
+    
     public static bool TryGetInt(this UpdateValues update, string field, out long value)
     {
         if (update.ValuesCase == UpdateValues.ValuesOneofCase.Legacy)
@@ -78,7 +106,7 @@ public static class UpdateValueExtensions
     private static IEnumerable<System.Func<UpdateValuesObjectDataFields, (string, long?)>> objectIntGetters = new System.Func<UpdateValuesObjectDataFields, (string, long?)>[]
     {
         fields => ("OBJECT_DYNAMIC_FLAGS", fields.DynamicFlags),
-        fields => ("OBJECT_FIELD_ENTRY", fields.EntryID),
+        fields => ("OBJECT_FIELD_ENTRY", fields.EntryID)
     };
     
     private static IEnumerable<System.Func<UpdateValuesUnitDataFields, (string, long?)>> intGetters = new System.Func<UpdateValuesUnitDataFields, (string, long?)>[]
@@ -88,7 +116,7 @@ public static class UpdateValueExtensions
             var race = fields.Race.HasValue ? (byte)fields.Race : (byte)0;
             var @class = fields.ClassId.HasValue ? (byte)fields.ClassId : (byte)0;
             var gender = fields.Sex.HasValue ? (byte)fields.Sex : (byte)0;
-            var total = (race | (@class << 8) | (gender << 16));
+            var total = (race | (@class << 8) | (gender << 24));
             return ("UNIT_FIELD_BYTES_0", fields.Race.HasValue | fields.ClassId.HasValue | fields.Sex.HasValue ? total : null);
         },
         fields =>
@@ -129,6 +157,7 @@ public static class UpdateValueExtensions
         fields => ("UNIT_FIELD_DISPLAYID", fields.DisplayID),
         fields => ("UNIT_FIELD_NATIVEDISPLAYID", fields.NativeDisplayID),
         fields => ("UNIT_FIELD_MOUNTDISPLAYID", fields.MountDisplayID),
+        fields => ("UNIT_FIELD_INTERACT_SPELLID", fields.InteractSpellID),
         // UNIT_FIELD_MINDAMAGE
         // UNIT_FIELD_MAXDAMAGE
         // UNIT_FIELD_MINOFFHANDDAMAGE
@@ -145,6 +174,7 @@ public static class UpdateValueExtensions
     {
         fields => ("UNIT_FIELD_COMBATREACH", fields.CombatReach),
         fields => ("UNIT_FIELD_BOUNDINGRADIUS", fields.BoundingRadius),
+        fields => ("UNIT_FIELD_DISPLAY_SCALE", fields.DisplayScale)
     };
 
     private static IEnumerable<System.Func<UpdateValuesUnitDataFields, (string, UniversalGuid?)>> guidGetters = new System.Func<UpdateValuesUnitDataFields, (string, UniversalGuid?)>[]

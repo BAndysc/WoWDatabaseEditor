@@ -106,6 +106,19 @@ namespace WDE.PacketViewer.Processing.Processors
                 writer = new WriterBuilder();
         }
 
+        public override void Initialize(ulong gameBuild)
+        {
+            prettyFlagParameter.InitializeBuild(gameBuild);
+            playerGuidFollower.Initialize(gameBuild);
+            updateObjectFollower.Initialize(gameBuild);
+            fromGuidSpawnTimeProcessor.Initialize(gameBuild);
+            auraSlotTracker.Initialize(gameBuild);
+            waypointProcessor.Initialize(gameBuild);
+            chatProcessor.Initialize(gameBuild);
+            spellCastProcessor.Initialize(gameBuild);
+            despawnDetector.Initialize(gameBuild);
+        }
+
         private string? pendingAppend;
 
         private void SetAppendOnNext(string? line)

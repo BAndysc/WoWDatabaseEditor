@@ -2,12 +2,17 @@ namespace WDE.Common.Utils;
 
 public static class UnitBytesExtensions
 {
-    public static Bytes0 SplitBytes0(this long l)
+    public static Bytes0 SplitBytes0(this long l, ulong gameBuild)
     {
-        return new Bytes0((byte)(l & 0xFF),
-            (byte)((l >> 8) & 0xFF),
-            (byte)((l >> 16) & 0xFF),
-            (byte)((l >> 24) & 0xFF));
+        if (gameBuild >= 17359)
+            return new Bytes0((byte)(l & 0xFF),
+                (byte)((l >> 8) & 0xFF),
+                (byte)((l >> 24) & 0xFF), 0);
+        else
+            return new Bytes0((byte)(l & 0xFF),
+                (byte)((l >> 8) & 0xFF),
+                (byte)((l >> 16) & 0xFF),
+                (byte)((l >> 24) & 0xFF));
     }
     
     public static Bytes1 SplitBytes1(this long l)
@@ -26,9 +31,12 @@ public static class UnitBytesExtensions
             (byte)((l >> 24) & 0xFF));
     }
 
-    public static uint ToUint(this Bytes0 bytes)
+    public static uint ToUint(this Bytes0 bytes, ulong gameBuild)
     {
-        return (uint)((bytes.powerType << 24) | (bytes.gender << 16) | (bytes.@class << 8) | bytes.race);
+        if (gameBuild >= 17359)
+            return (uint)((bytes.gender << 24) | (bytes.@class << 8) | bytes.race);
+        else
+            return (uint)((bytes.powerType << 24) | (bytes.gender << 16) | (bytes.@class << 8) | bytes.race);
     }
 
     public static uint ToUint(this Bytes1 bytes)

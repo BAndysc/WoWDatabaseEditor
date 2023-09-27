@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Prism.Events;
 using WDE.Common;
 using WDE.Common.Collections;
+using WDE.Common.CoreVersion;
 using WDE.Common.Database;
 using WDE.Common.Events;
 using WDE.Common.Managers;
@@ -36,6 +37,7 @@ namespace WDE.Parameters
         private readonly ITabularDataPicker tabularDataPicker;
         private readonly ICreatureEntryOrGuidProviderService creaturePicker;
         private readonly IQuestEntryProviderService questEntryProviderService;
+        private readonly ICurrentCoreVersion currentCoreVersion;
         private readonly Lazy<IWindowManager> windowManager;
         private readonly Lazy<IParameterPickerService> parameterPickerService;
         private readonly IQuickAccessRegisteredParameters quickAccessRegisteredParameters;
@@ -52,6 +54,7 @@ namespace WDE.Parameters
             ITabularDataPicker tabularDataPicker,
             ICreatureEntryOrGuidProviderService creaturePicker,
             IQuestEntryProviderService questEntryProviderService,
+            ICurrentCoreVersion currentCoreVersion,
             Lazy<IWindowManager> windowManager,
             Lazy<IParameterPickerService> parameterPickerService,
             IQuickAccessRegisteredParameters quickAccessRegisteredParameters)
@@ -65,6 +68,7 @@ namespace WDE.Parameters
             this.tabularDataPicker = tabularDataPicker;
             this.creaturePicker = creaturePicker;
             this.questEntryProviderService = questEntryProviderService;
+            this.currentCoreVersion = currentCoreVersion;
             this.windowManager = windowManager;
             this.parameterPickerService = parameterPickerService;
             this.quickAccessRegisteredParameters = quickAccessRegisteredParameters;
@@ -136,8 +140,14 @@ namespace WDE.Parameters
             factory.Register("UnixTimestampParameter", new UnixTimestampParameter(0, windowManager));
             factory.Register("UnixTimestampSince2000Parameter", new UnixTimestampParameter(946684800, windowManager));
             factory.Register("GameobjectBytes1Parameter", new GameObjectBytes1Parameter());
+            
             factory.RegisterCombined("UnitBytes0Parameter", "RaceParameter",  "ClassParameter","GenderParameter", "PowerParameter", 
-                (race, @class, gender, power) => new UnitBytesParameter(race, @class, gender, power));
+                (race, @class, gender, power) => currentCoreVersion.Current.Version.Build >= 17359 ? new UnitBytesPostMopParameter(race, @class, gender, power) : new UnitBytesPreMopParameter(race, @class, gender, power));
+            factory.RegisterCombined("UnitBytes0PostMopParameter", "RaceParameter",  "ClassParameter","GenderParameter", "PowerParameter", 
+                (race, @class, gender, power) => new UnitBytesPostMopParameter(race, @class, gender, power));
+            factory.RegisterCombined("UnitBytes0PreMopParameter", "RaceParameter",  "ClassParameter","GenderParameter", "PowerParameter", 
+                (race, @class, gender, power) => new UnitBytesPreMopParameter(race, @class, gender, power));
+            
             factory.RegisterCombined("UnitBytes1Parameter", "StandStateParameter", "AnimTierParameter", (standState, animTier) => new UnitBytes1Parameter(standState, animTier, windowManager));
             factory.RegisterCombined("UnitBytes2Parameter", "SheathStateParameter",  "UnitPVPStateFlagParameter","UnitBytesPetFlagParameter", "ShapeshiftFormParameter", 
                 (sheath, pvp, pet, shapeShift) => new UnitBytes2Parameter(sheath, pvp, pet, shapeShift, windowManager));

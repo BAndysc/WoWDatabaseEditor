@@ -14,7 +14,12 @@ namespace WDE.PacketViewer.Processing.Processors
         {
             this.guidExtractorProcessor = guidExtractorProcessor;
         }
-        
+
+        public override void Initialize(ulong gameBuild)
+        {
+            guidExtractorProcessor.Initialize(gameBuild);
+        }
+
         private string GenerateText(PacketBase basePacket, string text)
         {
             int indexOfFirstLine = basePacket.StringData.IndexOf("\n", StringComparison.Ordinal);

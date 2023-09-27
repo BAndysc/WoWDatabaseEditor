@@ -11,7 +11,12 @@ namespace WDE.PacketViewer.Processing
         {
             this.nothingProcessor = nothingProcessor;
         }
-        
+
+        public void Initialize(ulong gameBuild)
+        {
+            nothingProcessor.Initialize(gameBuild);
+        }
+
         public bool Process(PacketHolder packet)
         {
             nothingProcessor.Process(packet);
