@@ -25,6 +25,7 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
         private readonly Func<IPlayerGuidFollower> player;
         private readonly Func<IAuraSlotTracker> auraSlotTracker;
         private readonly Func<IDatabaseProvider> databaseProvider;
+        private readonly IParsingSettings settings;
 
         public ActionReactionProcessorCreator(
             IDbcSpellService spellService,
@@ -34,7 +35,8 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
             Func<IUpdateObjectFollower> update,
             Func<IPlayerGuidFollower> player,
             Func<IAuraSlotTracker> auraSlotTracker,
-            Func<IDatabaseProvider> databaseProvider)
+            Func<IDatabaseProvider> databaseProvider,
+            IParsingSettings settings)
         {
             this.spellService = spellService;
             this.provider = provider;
@@ -44,12 +46,13 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
             this.player = player;
             this.auraSlotTracker = auraSlotTracker;
             this.databaseProvider = databaseProvider;
+            this.settings = settings;
         }
         
         public ActionReactionProcessor Create()
         {
             var unitFollower = this.unitFollower();
-            var chatEmote = provider.Resolve<IChatEmoteSoundProcessor>((typeof(IParsingSettings), new ParsingSettingsViewModel()));
+            var chatEmote = provider.Resolve<IChatEmoteSoundProcessor>((typeof(IParsingSettings), settings));
             var waypointProcessor = this.waypointProcessor();
             var update = this.update();
             var player = this.player();
@@ -67,7 +70,7 @@ namespace WDE.PacketViewer.Processing.Processors.ActionReaction
         public ActionReactionToTextProcessor CreateTextProcessor()
         {
             var unitFollower = this.unitFollower();
-            var chatEmote = provider.Resolve<IChatEmoteSoundProcessor>((typeof(IParsingSettings), new ParsingSettingsViewModel()));
+            var chatEmote = provider.Resolve<IChatEmoteSoundProcessor>((typeof(IParsingSettings), settings));
             var waypointProcessor = this.waypointProcessor();
             var update = this.update();
             var player = this.player();

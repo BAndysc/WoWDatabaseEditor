@@ -78,6 +78,7 @@ namespace WDE.PacketViewer.ViewModels
             PacketDocumentSolutionNameProvider solutionNameProvider,
             ISniffLoader sniffLoader,
             ISpellStore spellStore,
+            IParsingSettings parsingSettings,
             PrettyFlagParameter prettyFlagParameter,
             Func<IUpdateFieldsHistory> historyCreator)
         {
@@ -91,6 +92,7 @@ namespace WDE.PacketViewer.ViewModels
             this.relatedPacketsFinder = relatedPacketsFinder;
             this.sniffLoader = sniffLoader;
             this.prettyFlagParameter = prettyFlagParameter;
+            ParsingSettings = parsingSettings;
             History = history;
             history.LimitStack(20);
             packetViewModelCreator = new PacketViewModelFactory(databaseProvider, spellStore);
@@ -1005,7 +1007,8 @@ namespace WDE.PacketViewer.ViewModels
         }
 
         #region Properties
-        public ParsingSettingsViewModel ParsingSettings { get; } = new();
+
+        public IParsingSettings ParsingSettings { get; }
         
         private string? mostRecentlySearchedItem;
         public string? MostRecentlySearchedItem

@@ -7,6 +7,7 @@
              xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia"
              xmlns:viewModels="clr-namespace:WDE.PacketViewer.ViewModels;assembly=WDE.PacketViewer"
              xmlns:parsing="clr-namespace:WDE.PacketViewer.Processing;assembly=WDE.PacketViewer"
+             xmlns:paths="clr-namespace:WDE.PacketViewer.Processing.Processors.Paths;assembly=WDE.PacketViewer"
              x:DataType="viewModels:PacketDocumentViewModel"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              Name="Root"
@@ -49,7 +50,13 @@
                 <CheckBox IsChecked="{CompiledBinding TranslateChatToEnglish}">Use broadcast_text_locale to translate CHAT texts to English</CheckBox>
                 <Border Height="20" />
                 <TextBlock FontWeight="Bold">Waypoint dump type:</TextBlock>
-                <controls:CompletionComboBox SelectedItem="{Binding WaypointsDumpType, Mode=TwoWay}" controls:Extensions.EnumType="{x:Type parsing:WaypointsDumpType}" />
+                <controls:CompletionComboBox SelectedItem="{CompiledBinding WaypointsExporter, Mode=TwoWay}" Items="{CompiledBinding Exporters}">
+                    <controls:CompletionComboBox.ItemTemplate>
+                        <DataTemplate x:DataType="paths:ISniffWaypointsExporter">
+                            <TextBlock Text="{CompiledBinding Name}" />
+                        </DataTemplate>
+                    </controls:CompletionComboBox.ItemTemplate>
+                </controls:CompletionComboBox>
             </StackPanel>
         </controls:DropDownButton>
 

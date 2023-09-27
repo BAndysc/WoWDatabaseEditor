@@ -336,6 +336,9 @@ namespace WDE.PacketViewer.Processing.Processors
                         var thisForward = Vector2.Normalize(thisPoint - prevPoint);
                         var dotProduct = Vector2.Dot(prevForward, thisForward);
 
+                        if (float.IsNaN(dotProduct))
+                            continue; // it can happen if two points have the same x and y, i.e. the creature is flying
+
                         if (index != s.Waypoints.Count - 1 && // if this is the last point, then we want to check its angle
                             Math.Abs(dotProduct) > 0.90f) // going almost straight, let's ignore the point, as it is most likely a Z correction waypoint
                         {

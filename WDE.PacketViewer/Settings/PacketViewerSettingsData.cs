@@ -10,5 +10,6 @@ namespace WDE.PacketViewer.Settings
         public bool WrapLines { get; init; }
         public string? DefaultFilter { get; init; }
         public ParserConfiguration Parser { get; init; }
+        public string? DefaultWaypointExporterId { get; init; }
     }
 }

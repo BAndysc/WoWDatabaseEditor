@@ -349,6 +349,16 @@ namespace WDE.SqlQueryGenerator
         {
             return new Query(query, $" -- {comment}");
         }
+        
+        public static IQuery StartBlockComment(this IMultiQuery query, string comment)
+        {
+            return new Query(query, $" /* {comment}");
+        }
+        
+        public static IQuery EndBlockComment(this IMultiQuery query)
+        {
+            return new Query(query, $" */");
+        }
 
         public static IQuery DefineVariable(this IMultiQuery query, string variableName, object? value)
         {

@@ -33,6 +33,7 @@ public partial class MassParserViewModel : ObservableBase, IDocument
     private readonly IDocumentManager documentManager;
     private readonly IMainThread mainThread;
     private readonly ITextDocumentService textDocumentService;
+    private readonly IParsingSettings parsingSettings;
     public ICommand Undo => AlwaysDisabledCommand.Command;
     public ICommand Redo => AlwaysDisabledCommand.Command;
     public IHistoryManager? History { get; set; }
@@ -67,6 +68,7 @@ public partial class MassParserViewModel : ObservableBase, IDocument
         IDocumentManager documentManager,
         IMainThread mainThread,
         ITextDocumentService textDocumentService,
+        IParsingSettings parsingSettings,
         IWindowManager windowManager)
     {
         this.messageBoxService = messageBoxService;
@@ -74,6 +76,7 @@ public partial class MassParserViewModel : ObservableBase, IDocument
         this.documentManager = documentManager;
         this.mainThread = mainThread;
         this.textDocumentService = textDocumentService;
+        this.parsingSettings = parsingSettings;
         foreach (var dumper in dumperProviders)
             if (!dumper.RequiresSplitUpdateObject && dumper.CanProcessMultipleFiles)
                 Processors.Add(new (dumper));
@@ -155,9 +158,9 @@ public partial class MassParserViewModel : ObservableBase, IDocument
                 IPerFileStateProcessor? perFileStateProcessor = null;
 
                 if (dumper.IsTextDumper)
-                    textProcessor = await dumper.CreateTextProcessor(new ParsingSettingsViewModel());
+                    textProcessor = await dumper.CreateTextProcessor(this.parsingSettings);
                 else if (dumper.IsDocumentDumper)
-                    documentDumper = await dumper.CreateDocumentProcessor(new ParsingSettingsViewModel());
+                    documentDumper = await dumper.CreateDocumentProcessor(this.parsingSettings);
 
                 if (textProcessor is ITwoStepPacketBoolProcessor twoStep_)
                     twoStep = twoStep_;
