@@ -1,3 +1,4 @@
+using System;
 using NUnit.Framework;
 
 namespace WDE.SqlQueryGenerator.Test
@@ -32,5 +33,18 @@ namespace WDE.SqlQueryGenerator.Test
             Assert.AreEqual("UPDATE `a` SET `b` = 2 WHERE `b` = 3;", query.QueryString);
         }
 
+        [Test]
+        public void SetWithComment()
+        {
+            var query = Queries.Table("a").Where(r => true).Set("b", 2, "x").Update();
+            Assert.AreEqual("UPDATE `a` SET `b` = 2; -- x", query.QueryString);
+        }
+
+        [Test]
+        public void SetWithCommentAndWhere()
+        {
+            var query = Queries.Table("a").Where(r => r.Column<int>("c") == 4).Set("b", 2, "x").Update();
+            Assert.AreEqual($"UPDATE `a` SET `b` = 2 -- x{Environment.NewLine}                WHERE `c` = 4;", query.QueryString);
+        }
     }
 }

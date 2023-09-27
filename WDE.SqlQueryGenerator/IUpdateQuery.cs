@@ -5,8 +5,14 @@ namespace WDE.SqlQueryGenerator
 {
     public interface IUpdateQuery
     {
+        public enum Operator
+        {
+            Set,
+            SetOr
+        }
+        
         public IWhere Condition { get; }
-        public IEnumerable<(string, string)> Updates { get; }
+        public IReadOnlyList<(string column, string value, Operator op, string? comment)> Updates { get; }
         bool Empty => !Updates.Any();
     }
 }

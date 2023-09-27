@@ -256,23 +256,93 @@ namespace WDE.SqlQueryGenerator
             return new UpdateQuery(query);
         }
         
-        public static IUpdateQuery Set<T>(this IWhere query, string key, T? value)
+        public static IUpdateQuery Set<T>(this IWhere query, string key, T? value, string? comment = null)
         {
-            return new UpdateQuery(query, key, value.ToSql());
+            return new UpdateQuery(query, key, value.ToSql(), comment, IUpdateQuery.Operator.Set);
         }
         
-        public static IUpdateQuery Set<T>(this IUpdateQuery query, string key, T? value)
+        public static IUpdateQuery SetOr<T>(this IWhere query, string key, T? value, string? comment = null)
         {
-            return new UpdateQuery(query, key, value.ToSql());
+            return new UpdateQuery(query, key, value.ToSql(), comment, IUpdateQuery.Operator.SetOr);
+        }
+        
+        public static IUpdateQuery Set<T>(this IUpdateQuery query, string key, T? value, string? comment = null)
+        {
+            return new UpdateQuery(query, key, value.ToSql(), comment, IUpdateQuery.Operator.Set);
         }
 
+        public static IUpdateQuery SetOr<T>(this IUpdateQuery query, string key, T? value, string? comment = null)
+        {
+            return new UpdateQuery(query, key, value.ToSql(), comment, IUpdateQuery.Operator.SetOr);
+        }
+        
         public static IQuery Update(this IUpdateQuery query, string? comment = null)
         {
-            var upd = string.Join(", ", query.Updates.Select(pair => $"`{pair.Item1}` = {pair.Item2}"));
-            string where = "";
-            if (query.Condition.Condition != "1")
-                where = $" WHERE {query.Condition.Condition}";
-            return new Query(query.Condition.Table, $"UPDATE `{query.Condition.Table.TableName}` SET {upd}{where};" + (comment == null ? "" : " -- " + comment));
+            if (query.Empty)
+                return Queries.Empty();
+            
+            var beginning = $"UPDATE `{query.Condition.Table.TableName}` SET ";
+            var beginningLength = beginning.Length;
+            var indent = new string(' ', beginningLength);
+
+            StringBuilder sb = new StringBuilder();
+            sb.Append(beginning);
+
+            var hasWhere = query.Condition.Condition != "1";
+            
+            for (int i = 0; i < query.Updates.Count; ++i)
+            {
+                var isFirst = i == 0;
+                var isLast = i == query.Updates.Count - 1;
+                
+                var update = query.Updates[i];
+
+                string value;
+                if (update.op == IUpdateQuery.Operator.Set)
+                    value = update.value;
+                else if (update.op == IUpdateQuery.Operator.SetOr)
+                    value = $"`{update.column}` | {update.value}";
+                else
+                    throw new ArgumentOutOfRangeException(nameof(update.op));
+                    
+                sb.Append($"`{update.column}` = {value}");
+
+                if (!isLast)
+                    sb.Append(',');
+                else
+                {
+                    if (!hasWhere)
+                        sb.Append(';');
+                }
+                
+                if (!string.IsNullOrEmpty(update.comment))
+                {
+                    sb.Append($" -- {update.comment}");
+                    if (!isLast || hasWhere)
+                    {
+                        sb.AppendLine();
+                        sb.Append(indent);
+                    }
+                }
+                else if (update.comment != null)
+                {
+                    sb.AppendLine();
+                    sb.Append(indent);
+                }
+                else
+                {
+                    if (!isLast)
+                        sb.Append(' ');
+                }
+            }
+            
+            if (hasWhere)
+                sb.Append($" WHERE {query.Condition.Condition};");
+
+            if (comment != null)
+                sb.Append($" -- {comment}");
+
+            return new Query(query.Condition.Table, sb.ToString());
         }
 
         public static IQuery Comment(this IMultiQuery query, string comment)
@@ -335,7 +405,7 @@ namespace WDE.SqlQueryGenerator
             if (o is Guid g)
                 return g.ToString().ToSqlEscapeString();
             if (o.GetType().IsEnum)
-                return ((long)(object)o).ToString();
+                return Convert.ToInt64(o).ToString();
             if (o is RawText raw)
                 return raw.ToString();
             if (o is Variable var)
