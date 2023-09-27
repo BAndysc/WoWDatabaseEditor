@@ -62,6 +62,29 @@ public class TimeConverter : IValueConverter
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
+        if (value is string s)
+        {
+            string[] parts = s.Split(' ');
+            long days = 0, hours = 0, minutes = 0, seconds = 0;
+            foreach (var part in parts)
+            {
+                if (part.EndsWith("d"))
+                    days = long.Parse(part.Substring(0, part.Length - 1));
+                else if (part.EndsWith("h"))
+                    hours = long.Parse(part.Substring(0, part.Length - 1));
+                else if (part.EndsWith("m"))
+                    minutes = long.Parse(part.Substring(0, part.Length - 1));
+                else if (part.EndsWith("s"))
+                    seconds = long.Parse(part.Substring(0, part.Length - 1));
+                else
+                    throw new NotImplementedException();
+            }
+
+            if (Units == TimeConverterSourceUnits.Minutes)
+                return days * 24 * 60 + hours * 60 + minutes;
+            else
+                throw new NotImplementedException();
+        }
         throw new NotImplementedException();
     }
 }
