@@ -590,6 +590,8 @@ namespace WDE.DbcStore
         private readonly List<GarrisonFollowerEntry> followers;
         private Dictionary<uint, GarrisonFollowerEntry> followersById;
 
+        public override bool HasItems => true;
+
         public GarrisonFollowerParameter(ITabularDataPicker tabularDataPicker, 
             IParameter<long> creatureParameter,
             List<GarrisonFollowerEntry> followers)
