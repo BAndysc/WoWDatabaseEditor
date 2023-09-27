@@ -29,7 +29,9 @@ public class CreatureTemplateTBC : ICreatureTemplate
     
     [Column(Name = "SubName")]
     public string? SubName { get; set; } = "";
-    
+
+    public string? IconName { get; set; }
+
     [Column("AIName")] 
     public string AIName { get; set; } = "";
 
@@ -38,6 +40,14 @@ public class CreatureTemplateTBC : ICreatureTemplate
 
     [Column("UnitFlags")]
     public GameDefines.UnitFlags UnitFlags { get; set; }
+
+    public GameDefines.UnitFlags2 UnitFlags2 => 0;
+    
+    [Column(Name = "speed_walk")]
+    public float SpeedWalk { get; set; }
+        
+    [Column(Name = "speed_run")]
+    public float SpeedRun { get; set; }
 
     [Column("NpcFlags")]
     public GameDefines.NpcFlags NpcFlags { get; set; }
@@ -56,6 +66,26 @@ public class CreatureTemplateTBC : ICreatureTemplate
 
     [Column("EquipmentTemplateId")]
     public uint? EquipmentTemplateId { get; set; }
+
+    public short RequiredExpansion { get; set; }
+    public byte Rank { get; set; }
+    public byte UnitClass { get; set; }
+    public int Family { get; set; }
+    public byte Type { get; set; }
+    public uint TypeFlags { get; set; }
+    public uint VehicleId { get; set; }
+    public float HealthMod { get; set; }
+    public float ManaMod { get; set; }
+    public bool RacialLeader { get; set; }
+    public uint MovementId { get; set; }
+    public uint KillCredit1 { get; set; }
+    public uint KillCredit2 { get; set; }
+
+    [Column(Name = "InhabitType")]
+    public GameDefines.InhabitType InhabitType { get; set; }
+
+    [Column(Name = "ExtraFlags")]
+    public uint FlagsExtra { get; set; }
 
     [Column(Name = "Faction")]
     public uint FactionTemplate { get; set; }

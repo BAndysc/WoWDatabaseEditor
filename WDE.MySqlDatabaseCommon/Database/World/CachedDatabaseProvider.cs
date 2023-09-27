@@ -462,6 +462,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public Task<IList<IPhaseName>?> GetPhaseNamesAsync() => WaitForCache(nonCachedDatabase.GetPhaseNamesAsync());
 
+        public Task<IReadOnlyList<INpcSpellClickSpell>> GetNpcSpellClickSpells(uint creatureId) => nonCachedDatabase.GetNpcSpellClickSpells(creatureId);
+
         public IList<IPhaseName>? GetPhaseNames() => nonCachedDatabase.GetPhaseNames();
 
         public Task<IList<ICreatureAddon>> GetCreatureAddons() => WaitForCache(nonCachedDatabase.GetCreatureAddons());

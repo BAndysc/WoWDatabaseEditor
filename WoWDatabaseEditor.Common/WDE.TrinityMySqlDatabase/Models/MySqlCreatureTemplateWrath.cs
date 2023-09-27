@@ -52,14 +52,70 @@ namespace WDE.TrinityMySqlDatabase.Models
         
         [Column(Name = "unit_flags")]
         public GameDefines.UnitFlags UnitFlags { get; set; }
-        
+
+        [Column(Name = "unit_flags2")]
+        public GameDefines.UnitFlags2 UnitFlags2 { get; set; }
+
         [Column(Name = "npcflag")]
         public GameDefines.NpcFlags NpcFlags { get; set; }
         
+        [Column(Name = "speed_walk")]
+        public float SpeedWalk { get; set; }
+        
+        [Column(Name = "speed_run")]
+        public float SpeedRun { get; set; }
+
         [Column(Name = "faction")]
         public uint FactionTemplate { get; set; }
         
         public uint? EquipmentTemplateId => null;
+        
+        [Column(Name = "IconName")] 
+        public string? IconName { get; set; }
+
+        [Column(Name = "exp")] 
+        public short RequiredExpansion { get; set; }
+        
+        [Column(Name = "rank")] 
+        public byte Rank { get; set; }
+        
+        [Column(Name = "unit_class")] 
+        public byte UnitClass { get; set; }
+        
+        [Column(Name = "family")] 
+        public int Family { get; set; }
+        
+        [Column(Name = "type")] 
+        public byte Type { get; set; }
+        
+        [Column(Name = "type_flags")] 
+        public uint TypeFlags { get; set; }
+        
+        [Column(Name = "VehicleId")] 
+        public uint VehicleId { get; set; }
+        
+        [Column(Name = "HealthModifier")] 
+        public float HealthMod { get; set; }
+        
+        [Column(Name = "ManaModifier")] 
+        public float ManaMod { get; set; }
+        
+        [Column(Name = "RacialLeader")] 
+        public bool RacialLeader { get; set; }
+        
+        [Column(Name = "movementId")] 
+        public uint MovementId { get; set; }
+        
+        [Column(Name = "KillCredit1")] 
+        public uint KillCredit1 { get; set; }
+        
+        [Column(Name = "KillCredit2")] 
+        public uint KillCredit2 { get; set; }
+
+        [Column(Name = "flags_extra")]
+        public uint FlagsExtra { get; set; }
+        
+        public GameDefines.InhabitType InhabitType => 0;
         
         public int ModelsCount => 4;
         public uint GetModel(int index)
@@ -117,14 +173,67 @@ namespace WDE.TrinityMySqlDatabase.Models
         
         [Column(Name = "unit_flags")]
         public GameDefines.UnitFlags UnitFlags { get; set; }
+
+        [Column(Name = "unit_flags2")]
+        public GameDefines.UnitFlags2 UnitFlags2 { get; set; }
         
         [Column(Name = "npcflag")]
         public GameDefines.NpcFlags NpcFlags { get; set; }
+        
+        [Column(Name = "speed_walk")]
+        public float SpeedWalk { get; set; }
+        
+        [Column(Name = "speed_run")]
+        public float SpeedRun { get; set; }
 
         [Column(Name = "faction")]
         public uint FactionTemplate { get; set; }
         
         public uint? EquipmentTemplateId => null;
+        
+        [Column(Name = "IconName")] 
+        public string? IconName { get; set; }
+
+        [Column(Name = "RequiredExpansion")] 
+        public short RequiredExpansion { get; set; }
+        
+        [Column(Name = "rank")] 
+        public byte Rank { get; set; }
+        
+        [Column(Name = "unit_class")] 
+        public byte UnitClass { get; set; }
+        
+        [Column(Name = "family")] 
+        public int Family { get; set; }
+        
+        [Column(Name = "type")] 
+        public byte Type { get; set; }
+        
+        public uint TypeFlags { get; set; }
+        
+        [Column(Name = "VehicleId")] 
+        public uint VehicleId { get; set; }
+        
+        public float HealthMod { get; set; }
+        
+        public float ManaMod { get; set; }
+        
+        [Column(Name = "RacialLeader")] 
+        public bool RacialLeader { get; set; }
+        
+        [Column(Name = "movementId")] 
+        public uint MovementId { get; set; }
+        
+        [Column(Name = "KillCredit1")] 
+        public uint KillCredit1 { get; set; }
+        
+        [Column(Name = "KillCredit2")] 
+        public uint KillCredit2 { get; set; }
+
+        [Column(Name = "flags_extra")]
+        public uint FlagsExtra { get; set; }
+
+        public GameDefines.InhabitType InhabitType => 0;
 
         private IReadOnlyList<CreatureTemplateModel>? models;
         

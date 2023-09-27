@@ -12,12 +12,31 @@ namespace WDE.Common.Database
         short MaxLevel { get; }
         string Name { get; }
         string? SubName { get; }
+        string? IconName { get; }
         string AIName { get; }
         string ScriptName { get; }
-        public GameDefines.UnitFlags UnitFlags { get; }
-        public GameDefines.NpcFlags NpcFlags { get; }
+        GameDefines.UnitFlags UnitFlags { get; }
+        GameDefines.UnitFlags2 UnitFlags2 { get; }
+        GameDefines.NpcFlags NpcFlags { get; }
+        float SpeedWalk { get; }
+        float SpeedRun { get; }
         uint? EquipmentTemplateId { get; }
-        
+        short RequiredExpansion { get; }
+        byte Rank { get; }
+        byte UnitClass { get; }
+        int Family { get; }
+        byte Type { get; }
+        uint TypeFlags { get; }
+        uint VehicleId { get; }
+        float HealthMod { get; }
+        float ManaMod { get; }
+        bool RacialLeader { get; }
+        uint MovementId { get; }
+        uint KillCredit1 { get; }
+        uint KillCredit2 { get; }
+        uint FlagsExtra { get; }
+        GameDefines.InhabitType InhabitType { get; }
+
         int ModelsCount { get; }
         uint GetModel(int index);
     }
@@ -32,12 +51,31 @@ namespace WDE.Common.Database
         public short MaxLevel { get; init; }
         public string Name { get; init; } = "";
         public string? SubName { get; init; }
+        public string? IconName { get; init; }
         public string AIName { get; init; } = "";
         public string ScriptName { get; init; } = "";
         public GameDefines.UnitFlags UnitFlags { get; init; }
+        public GameDefines.UnitFlags2 UnitFlags2 { get; init; }
         public GameDefines.NpcFlags NpcFlags { get; init; }
+        public float SpeedWalk { get; init; }
+        public float SpeedRun { get; init; }
         public uint? EquipmentTemplateId { get; init; }
+        public short RequiredExpansion { get; init; }
+        public byte Rank { get; init; }
+        public byte UnitClass { get; init; }
+        public int Family { get; init; }
+        public byte Type { get; init; }
+        public uint TypeFlags { get; init; }
+        public uint VehicleId { get; init; }
+        public float HealthMod { get; init; }
+        public float ManaMod { get; init; }
+        public bool RacialLeader { get; init; }
+        public uint MovementId { get; init; }
+        public uint KillCredit1 { get; init; }
+        public uint KillCredit2 { get; init; }
+        public uint FlagsExtra { get; init; }
         public int ModelsCount { get; init; }
+        public GameDefines.InhabitType InhabitType { get; init; }
         public uint GetModel(int index)
         {
             return 0;
@@ -46,6 +84,15 @@ namespace WDE.Common.Database
     
     public class GameDefines
     {
+        [Flags]
+        public enum InhabitType : uint
+        {
+            Ground = 1,
+            Water = 2,
+            Air = 4,
+            Root = 8,
+        }
+        
         [Flags]
         public enum UnitFlags : uint
         {
@@ -62,7 +109,7 @@ namespace WDE.Common.Database
             Looting              = 0x00000400,
             PetInCombat          = 0x00000800,
             Pvp                  = 0x00001000,
-            Silenced             = 0x00002000,
+            Silenced             = 0x00002000, // UNIT_FLAG_FORCE_NAMEPLATE in 9.x
             CannotSwim           = 0x00004000,
             Swimming             = 0x00008000,
             NonAttackable2       = 0x00010000,
@@ -74,16 +121,65 @@ namespace WDE.Common.Database
             Confused             = 0x00400000,
             Fleeing              = 0x00800000,
             PlayerControlled     = 0x01000000,
-            NotSelectable        = 0x02000000,
+            Uninteractible       = 0x02000000,
             Skinnable            = 0x04000000,
             Mount                = 0x08000000,
             Unk28                = 0x10000000,
             PreventEmotesFromChatText = 0x20000000,
             Sheathe              = 0x40000000,
-            Unk31                = 0x80000000,
+            Immune               = 0x80000000,
             
             ServerSideControlled = Rename | PetInCombat | InCombat | PreventEmotesFromChatText,
-            AllowedDatabaseFlags = ImmuneToPc | ImmuneToNpc | NotSelectable | Pacified | Swimming,
+            AllowedDatabaseFlags = ImmuneToPc | ImmuneToNpc | CannotSwim | Swimming | Uninteractible | Pacified,
+        }
+
+        [Flags]
+        public enum UnitFlags2 : uint
+        {
+            FeignDeath                                     = 0x00000001,
+            HideBody                                       = 0x00000002,   // TITLE Hide Body DESCRIPTION Hide unit model (show only player equip)
+            IgnoreReputation                               = 0x00000004,
+            ComprehendLang                                 = 0x00000008,
+            MirrorImage                                    = 0x00000010,
+            DontFadeIn                                     = 0x00000020,   // TITLE Don't Fade In DESCRIPTION Unit model instantly appears when summoned (does not fade in)
+            ForceMovement                                  = 0x00000040,
+            DisarmOffhand                                  = 0x00000080,
+            DisablePredStats                               = 0x00000100,   // Player has disabled predicted stats (Used by raid frames)
+            AllowChangingTalents                           = 0x00000200,   // Allows changing talents outside rest area
+            DisarmRanged                                   = 0x00000400,   // this does not disable ranged weapon display (maybe additional flag needed?)
+            RegeneratePower                                = 0x00000800,
+            RestrictPartyInteraction                       = 0x00001000,   // Restrict interaction to party or raid
+            PreventSpellClick                              = 0x00002000,   // Prevent spellclick
+            InteractWhileHostile                           = 0x00004000,   // TITLE Interact while Hostile
+            CannotTurn                                     = 0x00008000,   // TITLE Cannot Turn
+            Unk2                                           = 0x00010000,
+            PlayDeathAnim                                  = 0x00020000,   // Plays special death animation upon death
+            AllowCheatSpells                               = 0x00040000,   // Allows casting spells with AttributesEx7 & SPELL_ATTR7_IS_CHEAT_SPELL
+            SuppressHighlightWhenTargetedOrMousedOver      = 0x00080000,   // TITLE Suppress highlight when targeted or moused over
+            TreatAsRaidUnitForHelpfulSpells                = 0x00100000,   // TITLE Treat as Raid Unit For Helpful Spells (Instances ONLY)
+            LargeAoi                                       = 0x00200000,   // TITLE Large (AOI)
+            GiganticAoi                                    = 0x00400000,   // TITLE Gigantic (AOI)
+            NoActions                                      = 0x00800000,
+            AiWillOnlySwimIfTargetSwims                    = 0x01000000,   // TITLE AI will only swim if target swims
+            DontGenerateCombatLogWhenEngagedWithNpcs       = 0x02000000,   // TITLE Don't generate combat log when engaged with NPC's
+            UntargetableByClient                           = 0x04000000,   // TITLE Untargetable By Client
+            AttackerIgnoresMinimumRanges                   = 0x08000000,   // TITLE Attacker Ignores Minimum Ranges
+            UninteractibleIfHostile                        = 0x10000000,   // TITLE Uninteractible If Hostile
+            Unused11                                       = 0x20000000,
+            InfiniteAoi                                    = 0x40000000,   // TITLE Infinite (AOI)
+            Unused13                                       = 0x80000000,
+
+            DisallowedDatabaseFlags                        = (FeignDeath | IgnoreReputation | ComprehendLang |
+                                                               MirrorImage | ForceMovement | DisarmOffhand |
+                                                               DisablePredStats | AllowChangingTalents | DisarmRanged |
+                                                            /* UNIT_FLAG2_REGENERATE_POWER | */ RestrictPartyInteraction |
+                                                               PreventSpellClick | InteractWhileHostile | /* UNIT_FLAG2_UNK2 | */
+                                                            /* UNIT_FLAG2_PLAY_DEATH_ANIM | */ AllowCheatSpells | SuppressHighlightWhenTargetedOrMousedOver |
+                                                               TreatAsRaidUnitForHelpfulSpells | LargeAoi | GiganticAoi | NoActions |
+                                                               AiWillOnlySwimIfTargetSwims | DontGenerateCombatLogWhenEngagedWithNpcs | AttackerIgnoresMinimumRanges |
+                                                               UninteractibleIfHostile | Unused11 | InfiniteAoi | Unused13),  // SKIP
+
+            AllowedDatabaseFlags                            = (0xFFFFFFFF & ~DisallowedDatabaseFlags) // SKIP
         }
         
         [Flags]

@@ -403,6 +403,12 @@ namespace WDE.CMMySqlDatabase.Database
         public async Task<IPhaseName?> GetPhaseNameAsync(uint phaseId) => null;
 
         public async Task<IList<IPhaseName>?> GetPhaseNamesAsync() => null;
+        
+        public async Task<IReadOnlyList<INpcSpellClickSpell>> GetNpcSpellClickSpells(uint creatureId)
+        {
+            return Array.Empty<INpcSpellClickSpell>();
+        }
+
         public IList<IPhaseName>? GetPhaseNames() => null;
 
         public abstract Task<IList<ICreatureAddon>> GetCreatureAddons();

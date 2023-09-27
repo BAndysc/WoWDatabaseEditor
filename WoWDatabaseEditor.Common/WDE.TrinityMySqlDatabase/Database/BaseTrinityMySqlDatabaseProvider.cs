@@ -487,6 +487,11 @@ namespace WDE.TrinityMySqlDatabase.Database
         public virtual async Task<IPhaseName?> GetPhaseNameAsync(uint phaseId) => null;
 
         public virtual async Task<IList<IPhaseName>?> GetPhaseNamesAsync() => null;
+        
+        public async Task<IReadOnlyList<INpcSpellClickSpell>> GetNpcSpellClickSpells(uint creatureId)
+        {
+            return Array.Empty<INpcSpellClickSpell>();
+        }
 
         public virtual IList<IPhaseName>? GetPhaseNames() => null;
         

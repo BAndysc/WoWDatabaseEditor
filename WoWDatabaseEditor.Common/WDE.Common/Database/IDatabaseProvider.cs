@@ -119,6 +119,8 @@ namespace WDE.Common.Database
         IList<IPhaseName>? GetPhaseNames();
         Task<IList<IPhaseName>?> GetPhaseNamesAsync();
 
+        Task<IReadOnlyList<INpcSpellClickSpell>> GetNpcSpellClickSpells(uint creatureId);
+        
         Task<IList<ICreatureAddon>> GetCreatureAddons();
         Task<IList<ICreatureTemplateAddon>> GetCreatureTemplateAddons();
         Task<IList<ICreatureEquipmentTemplate>?> GetCreatureEquipmentTemplates();
