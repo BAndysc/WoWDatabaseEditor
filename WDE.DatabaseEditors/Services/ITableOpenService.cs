@@ -13,4 +13,7 @@ public interface ITableOpenService
     Task<ISolutionItem?> TryCreate(DatabaseTableDefinitionJson definition);
     Task<IReadOnlyCollection<ISolutionItem>> TryCreateMultiple(DatabaseTableDefinitionJson definition);
     Task<ISolutionItem?> Create(DatabaseTableDefinitionJson definition, DatabaseKey key);
+    
+    Task<ISolutionItem?> TryCreate(string tableName);
+    Task<IReadOnlyCollection<ISolutionItem>> TryCreateMultiple(string tableName);
 }

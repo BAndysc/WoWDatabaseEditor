@@ -108,4 +108,19 @@ public class TableOpenService : ITableOpenService
         }
     }
 
+    public async Task<ISolutionItem?> TryCreate(string tableName)
+    {
+        var definition = definitionProvider.GetDefinitionByTableName(tableName);
+        if (definition == null)
+            throw new Exception("Can't find an editor for table " + tableName + " in the database");
+        return await TryCreate(definition);
+    }
+
+    public async Task<IReadOnlyCollection<ISolutionItem>> TryCreateMultiple(string tableName)
+    {
+        var definition = definitionProvider.GetDefinitionByTableName(tableName);
+        if (definition == null)
+            throw new Exception("Can't find an editor for table " + tableName + " in the database");
+        return await TryCreateMultiple(definition);
+    }
 }

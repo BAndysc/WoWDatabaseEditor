@@ -11,17 +11,43 @@ namespace WDE.DatabaseEditors.Solution
 {
     public class DatabaseTableSolutionItem : ISolutionItem
     {
-        public DatabaseTableSolutionItem(DatabaseKey entry, bool existsInDatabase, bool conditionModified, string definitionId, bool ignoreEquality)
+        public DatabaseTableSolutionItem(DatabaseKey entry, 
+            bool existsInDatabase, 
+            bool conditionModified, 
+            string definitionId, 
+            bool ignoreEquality, 
+            Guid guid, 
+            DateTime created, 
+            DateTime modified,
+            int build) : this(definitionId, ignoreEquality, guid, created, modified, build)
         {
             Entries.Add(new SolutionItemDatabaseEntity(entry, existsInDatabase, conditionModified));
-            DefinitionId = definitionId;
-            IgnoreEquality = ignoreEquality;
+        }
+        
+        public DatabaseTableSolutionItem(DatabaseKey entry, 
+            bool existsInDatabase, 
+            bool conditionModified, 
+            string definitionId, 
+            bool ignoreEquality) : this(definitionId, ignoreEquality)
+        {
+            Entries.Add(new SolutionItemDatabaseEntity(entry, existsInDatabase, conditionModified));
         }
 
         public DatabaseTableSolutionItem(string definitionId, bool ignoreEquality)
+            :this(definitionId, ignoreEquality, System.Guid.NewGuid(), DateTime.Now, DateTime.Now, 0) {}
+        
+        public DatabaseTableSolutionItem(string definitionId, bool ignoreEquality, 
+            Guid guid, 
+            DateTime created, 
+            DateTime modified,
+            int build)
         {
             DefinitionId = definitionId;
             IgnoreEquality = ignoreEquality;
+            Guid = guid;
+            Created = created;
+            Modified = modified;
+            Build = build;
         }
 
         public DatabaseTableSolutionItem()
@@ -29,7 +55,7 @@ namespace WDE.DatabaseEditors.Solution
             DefinitionId = null!;
         }
 
-        public ISolutionItem Clone() => new DatabaseTableSolutionItem(DefinitionId, IgnoreEquality)
+        public ISolutionItem Clone() => new DatabaseTableSolutionItem(DefinitionId, IgnoreEquality, Guid, Created, Modified, Build)
         {
             Entries = Entries.Select(e => new SolutionItemDatabaseEntity(e)).ToList(),
             DeletedEntries = DeletedEntries.ToList()
@@ -38,6 +64,18 @@ namespace WDE.DatabaseEditors.Solution
         public List<DatabaseKey> DeletedEntries { get; set; } = new();
         public List<SolutionItemDatabaseEntity> Entries { get; set; } = new();
 
+        [JsonProperty] 
+        public readonly Guid Guid;
+        
+        [JsonProperty] 
+        public readonly DateTime Created;
+        
+        [JsonProperty] 
+        public readonly DateTime Modified;
+        
+        [JsonProperty] 
+        public readonly int Build;
+        
         [JsonProperty]
         public readonly string DefinitionId;
 
