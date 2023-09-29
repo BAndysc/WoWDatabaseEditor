@@ -36,6 +36,7 @@ public partial class VeryFastTableView
 
     private List<bool> columnVisibility = new List<bool>();
     public static readonly StyledProperty<IRowFilterPredicate?> RowFilterProperty = AvaloniaProperty.Register<VeryFastTableView, IRowFilterPredicate?>("RowFilter");
+    public static readonly StyledProperty<bool> IsReadOnlyProperty = AvaloniaProperty.Register<VeryFastTableView, bool>("IsReadOnly");
 
     public IReadOnlyList<int>? HiddenColumns
     {
@@ -119,5 +120,11 @@ public partial class VeryFastTableView
     {
         get => (bool)GetValue(IsGroupingEnabledProperty);
         set => SetValue(IsGroupingEnabledProperty, value);
+    }
+
+    public bool IsReadOnly
+    {
+        get => (bool)GetValue(IsReadOnlyProperty);
+        set => SetValue(IsReadOnlyProperty, value);
     }
 }

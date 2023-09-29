@@ -104,34 +104,16 @@ public partial class VeryFastTableView : Panel, IKeyboardNavigationHandler, IFas
         BackgroundProperty.OverrideDefaultValue<VeryFastTableView>(Brushes.Transparent);
 
         RowFilterParameterProperty.Changed.AddClassHandler<VeryFastTableView>((table, e) => table.RemoveInvisibleFromSelection());
+        
+        IsReadOnlyProperty.Changed.AddClassHandler<VeryFastTableView>((table, e) =>
+        {
+            table.UpdateKeyBindings();
+        });
     }
-    
+
     public VeryFastTableView()
     {
-        var openAndErase = new DelegateCommand(() =>
-        {
-            if (IsSelectedCellValid)
-                OpenEditor("");
-        });
-        KeyBindings.Add(new KeyBinding()
-        {
-            Gesture = new KeyGesture(Key.Enter),
-            Command = new DelegateCommand(() =>
-            {
-                if (IsSelectedCellValid)
-                    OpenEditor();
-            })
-        });
-        KeyBindings.Add(new KeyBinding()
-        {
-            Gesture = new KeyGesture(Key.Back),
-            Command = openAndErase
-        });
-        KeyBindings.Add(new KeyBinding()
-        {
-            Gesture = new KeyGesture(Key.Delete),
-            Command = openAndErase
-        });
+        UpdateKeyBindings();
         headerViews = new RecyclableViewList(this);
     }
 
@@ -246,7 +228,7 @@ public partial class VeryFastTableView : Panel, IKeyboardNavigationHandler, IFas
         if (e.Handled)
             return;
         
-        if (IsSelectedCellValid)
+        if (IsSelectedCellValid && !IsReadOnly)
         {
             OpenEditor(e.Text);
             e.Handled = true;
@@ -459,6 +441,8 @@ public partial class VeryFastTableView : Panel, IKeyboardNavigationHandler, IFas
 
     private void OpenEditor(string? customText = null)
     {
+        if (IsReadOnly)
+            return;
         if (Items == null)
             return;
         if (CustomCellInteractor == null ||
@@ -547,5 +531,37 @@ public partial class VeryFastTableView : Panel, IKeyboardNavigationHandler, IFas
         var top = GetRowY(row);
         var bottom = top + RowHeight;
         return top < scroll.Offset.Y + scroll.Viewport.Height && bottom > scroll.Offset.Y;
+    }
+    
+    private void UpdateKeyBindings()
+    {
+        KeyBindings.Clear();
+        if (IsReadOnly)
+            return;
+        
+        var openAndErase = new DelegateCommand(() =>
+        {
+            if (IsSelectedCellValid)
+                OpenEditor("");
+        });
+        KeyBindings.Add(new KeyBinding()
+        {
+            Gesture = new KeyGesture(Key.Enter),
+            Command = new DelegateCommand(() =>
+            {
+                if (IsSelectedCellValid)
+                    OpenEditor();
+            })
+        });
+        KeyBindings.Add(new KeyBinding()
+        {
+            Gesture = new KeyGesture(Key.Back),
+            Command = openAndErase
+        });
+        KeyBindings.Add(new KeyBinding()
+        {
+            Gesture = new KeyGesture(Key.Delete),
+            Command = openAndErase
+        });
     }
 }
