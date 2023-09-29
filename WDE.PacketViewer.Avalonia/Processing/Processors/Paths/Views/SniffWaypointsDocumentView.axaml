@@ -1,0 +1,126 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:WDE.PacketViewer.Processing.Processors.Paths.ViewModels;assembly=WDE.PacketViewer"
+             xmlns:views="clr-namespace:WDE.PacketViewer.Avalonia.Processing.Processors.Paths.Views"
+             xmlns:avaloniaEdit="https://github.com/avaloniaui/avaloniaedit"
+             xmlns:paths="clr-namespace:WDE.PacketViewer.Processing.Processors.Paths;assembly=WDE.PacketViewer"
+             xmlns:panAndZoom="clr-namespace:WDE.WorldMap.PanAndZoom;assembly=WDE.Common.Avalonia"
+             xmlns:fastTableView="clr-namespace:AvaloniaStyles.Controls.FastTableView;assembly=AvaloniaStyles"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:SniffWaypointsDocumentViewModel"
+             x:Class="WDE.PacketViewer.Avalonia.Processing.Processors.Paths.Views.SniffWaypointsDocumentView">
+  <Grid ColumnDefinitions="300,5,*">
+    
+    <Grid RowDefinitions="*,5,*">
+      
+      <DockPanel>
+        <GroupingHeader DockPanel.Dock="Top" GroupName="Units" />
+        <TreeView Items="{CompiledBinding Creatures}"
+                  SelectedItem="{CompiledBinding SelectedObject}"
+        >
+          <TreeView.DataTemplates>
+            <TreeDataTemplate x:DataType="viewModels:CreaturePathsViewModel"
+                              DataType="viewModels:CreaturePathsViewModel"
+                              ItemsSource="{CompiledBinding Guids}">
+              <DockPanel HorizontalAlignment="Stretch" LastChildFill="False">
+                <TextBlock Text="{CompiledBinding Name}" DockPanel.Dock="Left" />
+                <TextBlock Text="{CompiledBinding Entry}" DockPanel.Dock="Right" />
+              </DockPanel>
+            </TreeDataTemplate>
+            <TreeDataTemplate x:DataType="viewModels:CreatureGuidViewModel"
+                              DataType="viewModels:CreatureGuidViewModel">
+              <DockPanel HorizontalAlignment="Stretch" LastChildFill="False">
+                <TextBlock Text="{CompiledBinding NiceString}" />
+                <TextBlock Text="{CompiledBinding RandomnessPct, StringFormat={}{0}%}" Opacity="0.5" Margin="5,0,0,0" DockPanel.Dock="Right" />
+              </DockPanel>
+            </TreeDataTemplate>
+          </TreeView.DataTemplates>
+        </TreeView>
+      </DockPanel>
+      
+      <GridSplitter Grid.Row="1" Classes="horizontal" />
+      
+      <DockPanel Grid.Row="2">
+        <GroupingHeader DockPanel.Dock="Top" GroupName="Points" />
+        <ScrollViewer IsVisible="{CompiledBinding SelectedGuid, Converter={x:Static NullConverter.IsNotNull}}">
+          <fastTableView:VeryFastTableView  Columns="{CompiledBinding Columns}" 
+                                            Items="{CompiledBinding SelectedGuid.Paths}"
+                                            MultiSelection="{CompiledBinding PointsSelection}"
+                                            IsReadOnly="True"
+                                            IsGroupingEnabled="True">
+            <fastTableView:VeryFastTableView.GroupHeaderTemplate>
+              <DataTemplate x:DataType="viewModels:CreaturePathViewModel">
+                <CheckBox IsChecked="{CompiledBinding IsVisible}" />
+              </DataTemplate>
+            </fastTableView:VeryFastTableView.GroupHeaderTemplate>
+            <fastTableView:VeryFastTableView.KeyBindings>
+              <KeyBinding Gesture="Back" Command="{CompiledBinding DeleteSelectedWaypointsCommand}" />
+              <KeyBinding Gesture="Delete" Command="{CompiledBinding DeleteSelectedWaypointsCommand}" />
+            </fastTableView:VeryFastTableView.KeyBindings>
+          </fastTableView:VeryFastTableView>
+        </ScrollViewer>
+      </DockPanel>
+    </Grid>
+    
+    <GridSplitter Classes="vertical" Grid.Column="1" />
+    
+    <Grid RowDefinitions="400,5,*" Grid.Column="2">
+      <!--
+                                           MinOffsetX="{Binding #Map.TopLeftVirtual.X}"
+                                     MinOffsetY="{Binding #Map.TopLeftVirtual.Y}"
+                                     MaxOffsetX="{Binding #Map.BottomRightVirtual.X}"
+                                     MaxOffsetY="{Binding #Map.BottomRightVirtual.Y}"
+                                     TopLeft="{TemplateBinding TopLeftVirtual, Mode=OneWayToSource}"
+                                     BottomRight="{TemplateBinding BottomRightVirtual, Mode=OneWayToSource}"
+                                     ZoomX="{TemplateBinding Zoom, Mode=OneWayToSource}"
+                                     -->
+      <DockPanel>
+        <GroupingHeader DockPanel.Dock="Top" GroupName="2D preview" />
+        <panAndZoom:ExtendedZoomBorder Name="ZoomBorder" Stretch="None" ZoomSpeed="1.04"
+                                       MinWidth="10" MinHeight="10" 
+                                       EnablePan="True" PanButton="Left"
+                                       Background="#174287"
+                                       Focusable="True"
+                                       VerticalAlignment="Stretch" 
+                                       EnableConstrains="False"
+                                       ClipToBounds="True" 
+                                       HorizontalAlignment="Stretch">
+          <views:WaypointsPreviewControl Selection="{CompiledBinding PointsSelection}" Creature="{CompiledBinding SelectedGuid}" />
+        </panAndZoom:ExtendedZoomBorder>
+      </DockPanel>
+    
+      <GridSplitter Classes="horizontal" Grid.Row="1" />
+      
+      <DockPanel Grid.Row="2">
+        <GroupingHeader DockPanel.Dock="Top" GroupName="Output" />
+        <ToolbarPanel DockPanel.Dock="Top">
+          <ButtonImage Image="Icons/icon_play_save.png" ToolTip.Tip="Execute SQL and save items in the current session" Command="{CompiledBinding ExecuteSqlSaveSessionCommand}" />
+          <ButtonImage Image="Icons/icon_play.png" ToolTip.Tip="Execute SQL without saving items in a session" Command="{CompiledBinding ExecuteSqlCommand}" /> 
+
+          <TextBlock VerticalAlignment="Center">Output: </TextBlock>
+          <CompletionComboBox Items="{CompiledBinding ParsingSettings.Exporters}"
+                              SelectedItem="{CompiledBinding ParsingSettings.WaypointsExporter}"
+                              PropertyChanged="ExporterComboBox_PropertyChanged"
+          >
+            <CompletionComboBox.ItemTemplate>
+              <DataTemplate x:DataType="paths:ISniffWaypointsExporter">
+                <TextBlock Text="{CompiledBinding  Name}" />
+              </DataTemplate>
+            </CompletionComboBox.ItemTemplate>
+          </CompletionComboBox>
+          
+          <TextBlock VerticalAlignment="Center">Base path id: </TextBlock>
+          <TextBox Text="{CompiledBinding BasePathId}" />
+        </ToolbarPanel>
+        <avaloniaEdit:TextEditor 
+                                 AvalonEditExtra.SyntaxExtension="sql" 
+                                 Document="{CompiledBinding TextOutput, Converter={x:Static NativeTextDocumentConverter.Instance}}"
+                                 FontFamily="{DynamicResource MonoFont}" />
+      </DockPanel>
+      
+    </Grid>
+    
+  </Grid>
+</UserControl>

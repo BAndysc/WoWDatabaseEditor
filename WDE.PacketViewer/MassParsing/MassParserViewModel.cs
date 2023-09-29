@@ -221,7 +221,7 @@ public partial class MassParserViewModel : ObservableBase, IDocument
                 else if (documentDumper != null)
                 {
                     await documentDumper.Process();
-                    var doc = documentDumper.Generate(null);
+                    var doc = await documentDumper.Generate(null);
                     documentManager.OpenDocument(doc);
                 }
             });
