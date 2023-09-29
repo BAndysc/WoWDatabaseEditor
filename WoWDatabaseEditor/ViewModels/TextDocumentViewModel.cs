@@ -26,19 +26,16 @@ namespace WoWDatabaseEditorCore.ViewModels
     public class TextDocumentViewModel : BindableBase, IDocument
     {
         public TextDocumentViewModel(IWindowManager windowManager,
-            ITaskRunner taskRunner,
             IStatusBar statusBar,
-            IMySqlExecutor mySqlExecutor,
             IDatabaseProvider databaseProvider,
             INativeTextDocument nativeTextDocument,
-            IQueryParserService queryParserService,
-            ISessionService sessionService,
-            IMessageBoxService messageBoxService)
+            ITextDocumentService textDocumentService)
         {
             Extension = "txt";
             Title = "New file";
             this.statusBar = statusBar;
             document = nativeTextDocument;
+            this.textDocumentService = textDocumentService;
 
             SaveCommand = new AsyncAutoCommand(async () =>
             {
@@ -46,57 +43,10 @@ namespace WoWDatabaseEditorCore.ViewModels
                 if (path != null)
                     await File.WriteAllTextAsync(path, document.ToString());
             });
-            ExecuteSqlSaveSession = new DelegateCommand(() =>
-            {
-                taskRunner.ScheduleTask("Executing query",
-                 () => WrapStatusbar(async () =>
-                 {
-                     var query = Document.ToString();
-                     IList<ISolutionItem>? solutionItems = null;
-                     IList<string>? errors = null;
-                     if (inspectQuery && sessionService.IsOpened && !sessionService.IsPaused)
-                     {
-                         (solutionItems, errors) = await queryParserService.GenerateItemsForQuery(query);
-                     }
-
-                     await mySqlExecutor.ExecuteSql(query);
-
-                     if (solutionItems != null)
-                     {
-                         foreach (var item in solutionItems)
-                             await sessionService.UpdateQuery(item);
-                         if (errors!.Count > 0)
-                         {
-                             await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
-                                 .SetTitle("Apply query")
-                                 .SetMainInstruction("Some queries couldn't be transformed into session items")
-                                 .SetContent("Details:\n\n" + string.Join("\n", errors.Select(s => "  - " + s)))
-                                 .WithOkButton(true)
-                                 .Build());
-                         }
-                     }
-                 }));
-            }, () => databaseProvider.IsConnected);
-            ExecuteSql = new DelegateCommand(() =>
-            {
-                taskRunner.ScheduleTask("Executing query",
-                     () => WrapStatusbar(() => mySqlExecutor.ExecuteSql(Document.ToString())));
-            }, () => databaseProvider.IsConnected);
-        }
-
-        private async Task WrapStatusbar(Func<Task> action)
-        {
-            statusBar.PublishNotification(new PlainNotification(NotificationType.Info, "Executing query"));
-            try
-            {
-                await action();
-                statusBar.PublishNotification(new PlainNotification(NotificationType.Success, "Query executed"));
-            }
-            catch (Exception e)
-            {
-                statusBar.PublishNotification(new PlainNotification(NotificationType.Error, "Failure during query execution: " + e.Message));
-                Console.WriteLine(e);
-            }
+            ExecuteSqlSaveSession = new AsyncAutoCommand(() => textDocumentService.ExecuteSqlSaveSession(Document.ToString(), inspectQuery),
+                () => databaseProvider.IsConnected);
+            ExecuteSql = new AsyncAutoCommand(() => this.textDocumentService.ExecuteSql(Document.ToString()),
+                () => databaseProvider.IsConnected);
         }
 
         public TextDocumentViewModel Set(string title, string content, string extension = "txt", bool inspectQuery = false)
@@ -115,6 +65,8 @@ namespace WoWDatabaseEditorCore.ViewModels
 
         private readonly IStatusBar statusBar;
         private INativeTextDocument document;
+        private readonly ITextDocumentService textDocumentService;
+
         public INativeTextDocument Document
         {
             get => document;

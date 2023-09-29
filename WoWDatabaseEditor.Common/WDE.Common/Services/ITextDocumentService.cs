@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using WDE.Common.Managers;
 using WDE.Module.Attributes;
 
@@ -7,5 +8,7 @@ namespace WDE.Common.Services
     public interface ITextDocumentService
     {
         IDocument CreateDocument(string title, string text, string extension, bool inspectQuery = false);
+        Task ExecuteSqlSaveSession(string sql, bool inspectQuery);
+        Task ExecuteSql(string sql);
     }
 }
