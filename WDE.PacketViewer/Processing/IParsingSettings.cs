@@ -7,6 +7,7 @@ namespace WDE.PacketViewer.Processing;
 [UniqueProvider]
 public interface IParsingSettings
 {
+    bool PreferOneLineSql { get; set; }
     bool TranslateChatToEnglish { get; set; }
     ISniffWaypointsExporter? WaypointsExporter { get; set; }
     IList<ISniffWaypointsExporter> Exporters { get; }

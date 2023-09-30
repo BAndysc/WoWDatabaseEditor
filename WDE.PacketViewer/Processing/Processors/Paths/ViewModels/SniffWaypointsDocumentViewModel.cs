@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
@@ -9,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;
 using AvaloniaStyles.Controls.FastTableView;
+using DynamicData.Binding;
 using Prism.Commands;
 using PropertyChanged.SourceGenerator;
 using WDE.Common.Database;
@@ -214,7 +216,7 @@ public partial class SniffWaypointsDocumentViewModel : ObservableBase, IDocument
             group = new CreaturePathsViewModel(guid.Entry, template?.Name ?? "Unknown creature");
         }
 
-        var creatureInstance = new CreatureGuidViewModel(guid, randomness * 100, paths);
+        var creatureInstance = new CreatureGuidViewModel(this, guid, randomness * 100, paths);
         if (creatureInstance.Paths.Count > 0)
         {
             group.Guids.Add(creatureInstance);
@@ -244,8 +246,9 @@ public class CreaturePathsViewModel : ObservableBase
 
 public class CreatureGuidViewModel : ObservableBase
 {
-    public CreatureGuidViewModel(UniversalGuid guid, float randomnessPct, IWaypointProcessor.UnitMovementState movement)
+    public CreatureGuidViewModel(SniffWaypointsDocumentViewModel parent, UniversalGuid guid, float randomnessPct, IWaypointProcessor.UnitMovementState movement)
     {
+        Parent = parent;
         Guid = guid;
         RandomnessPct = randomnessPct;
         Movement = movement;
@@ -254,8 +257,15 @@ public class CreatureGuidViewModel : ObservableBase
         Vector3? previousPoint = null;
         foreach (var path in movement.Paths)
         {
-            var pathViewModel = new CreaturePathViewModel();
+            if (path.Segments.Count == 0)
+                continue;
+
+            var initialPosition = path.Segments[0].InitialNpcPosition;
+            
+            var pathViewModel = new CreaturePathViewModel(this, TimeSpan.FromMilliseconds(path.TotalMoveTime), new Vector3(initialPosition.X, initialPosition.Y, initialPosition.Z));
             int pointId = 1;
+            
+            using var _ = pathViewModel.Waypoints.SuspendNotifications();
             
             foreach (var waypoint in path.Segments.SelectMany(x => x.Waypoints))
             {
@@ -282,21 +292,55 @@ public class CreatureGuidViewModel : ObservableBase
         }
     }
 
+    public SniffWaypointsDocumentViewModel Parent { get; }
     public UniversalGuid Guid { get; }
     public float RandomnessPct { get; }
     public IWaypointProcessor.UnitMovementState Movement { get; }
     public string NiceString { get; }
     public ObservableCollection<CreaturePathViewModel> Paths { get; } = new();
+
+    public void PathVisibilityChanged()
+    {
+        Parent.UpdateQuery();
+    }
 }
 
 public partial class CreaturePathViewModel : ObservableBase, ITableRowGroup
 {
+    private readonly TimeSpan duration;
+    private readonly Vector3 initialPosition;
     [Notify] private bool isVisible = true;
+    [Notify] private float totalDistance;
+    [Notify] private float averageSpeed;
+    public string Duration => $"{(int)duration.TotalSeconds} s {(int)duration.Milliseconds} ms";
     
-    public ObservableCollection<CreatureWaypointViewModel> Waypoints { get; } = new();
+    public ObservableCollectionExtended<CreatureWaypointViewModel> Waypoints { get; } = new();
     public IReadOnlyList<ITableRow> Rows => Waypoints;
     public event Action<ITableRowGroup, ITableRow>? RowChanged;
     public event Action<ITableRowGroup>? RowsChanged;
+
+    public CreaturePathViewModel(CreatureGuidViewModel vm, TimeSpan duration, Vector3 initialPosition)
+    {
+        this.duration = duration;
+        this.initialPosition = initialPosition;
+        Waypoints.CollectionChanged += WaypointsOnCollectionChanged;
+        
+        On(() => IsVisible, _ => vm.PathVisibilityChanged());
+    }
+
+    private void WaypointsOnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        Vector3 previousPoint = initialPosition;
+        float distance = 0;
+        foreach (var p in Waypoints)
+        {
+            distance += (p.Point - previousPoint).Length();
+            previousPoint = p.Point;
+        }
+
+        TotalDistance = distance;
+        AverageSpeed = distance / (float)duration.TotalSeconds;
+    }
 
     public void RemoveAt(int index)
     {

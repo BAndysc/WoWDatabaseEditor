@@ -27,6 +27,7 @@ namespace WDE.PacketViewer.ViewModels
         private bool alwaysHidePlayerMovePackets;
         private string defaultTestCasePath = "";
         private string? defaultWaypointExporterId;
+        private bool preferOneLineSql;
 
         public bool AlwaysSplitUpdates
         {
@@ -61,6 +62,7 @@ namespace WDE.PacketViewer.ViewModels
             alwaysSplitUpdates = settings.Settings.AlwaysSplitUpdates;
             alwaysHidePlayerMovePackets = settings.Settings.AlwaysHidePlayerMovePackets;
             defaultWaypointExporterId = settings.Settings.DefaultWaypointExporterId;
+            preferOneLineSql = settings.Settings.PreferOneLineSql;
             DefaultFilterText = nativeText;
             DefaultFilterText.FromString(settings.Settings.DefaultFilter ?? "");
 
@@ -115,7 +117,8 @@ namespace WDE.PacketViewer.ViewModels
                     DefaultFilter = string.IsNullOrEmpty(defaultFilter) ? null : defaultFilter,
                     AlwaysHidePlayerMovePackets = alwaysHidePlayerMovePackets,
                     Parser = parser,
-                    DefaultWaypointExporterId = defaultWaypointExporterId
+                    DefaultWaypointExporterId = defaultWaypointExporterId,
+                    PreferOneLineSql = preferOneLineSql
                 };
                 IsModified = false;
             });

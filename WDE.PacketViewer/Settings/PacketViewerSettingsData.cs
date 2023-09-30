@@ -11,5 +11,6 @@ namespace WDE.PacketViewer.Settings
         public string? DefaultFilter { get; init; }
         public ParserConfiguration Parser { get; init; }
         public string? DefaultWaypointExporterId { get; init; }
+        public bool PreferOneLineSql { get; init; }
     }
 }

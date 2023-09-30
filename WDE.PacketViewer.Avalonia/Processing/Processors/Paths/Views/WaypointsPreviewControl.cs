@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using System.Numerics;
 using Avalonia;
@@ -17,6 +20,12 @@ public class WaypointsPreviewControl : Control
     static WaypointsPreviewControl()
     {
         AffectsRender<WaypointsPreviewControl>(CreatureProperty);
+        CreatureProperty.Changed.AddClassHandler<WaypointsPreviewControl>((control, e) =>
+        {
+            control.UnbindCreature();
+            if (e.NewValue is CreatureGuidViewModel creature)
+                control.BindCreature(creature);
+        });
     }
     
     public override void Render(DrawingContext context)
@@ -108,6 +117,8 @@ public class WaypointsPreviewControl : Control
     }
     
     private ITableMultiSelection? boundSelection;
+    private CreatureGuidViewModel? boundCreature;
+    private List<CreaturePathViewModel> boundPaths = new();
 
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
@@ -118,11 +129,70 @@ public class WaypointsPreviewControl : Control
             boundSelection = null;
         }
 
+        UnbindCreature();
+
         if (Selection is { } selection)
         {
             selection.SelectionChanged += OnSelectionChanged;
             boundSelection = selection;
         }
+
+        if (Creature is { } creature)
+        {
+            BindCreature(creature);
+        }
+    }
+
+    private void UnbindCreature()
+    {
+        if (boundCreature != null)
+        {
+            boundCreature.Paths.CollectionChanged -= OnPathChanged;
+            foreach (CreaturePathViewModel n in boundPaths)
+            {
+                n.PropertyChanged -= OnPathPropertyChanged;
+            }
+
+            boundPaths.Clear();
+            boundCreature = null;
+        }
+    }
+
+    private void BindCreature(CreatureGuidViewModel creature)
+    {
+        creature.Paths.CollectionChanged += OnPathChanged;
+        foreach (CreaturePathViewModel n in creature.Paths)
+        {
+            n.PropertyChanged += OnPathPropertyChanged;
+            boundPaths.Add(n);
+        }
+
+        boundCreature = creature;
+    }
+
+    private void OnPathChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        if (e.NewItems != null)
+        {
+            foreach (CreaturePathViewModel n in e.NewItems)
+            {
+                n.PropertyChanged += OnPathPropertyChanged;
+                boundPaths.Add(n);
+            }
+        }
+        if (e.OldItems != null)
+        {
+            foreach (CreaturePathViewModel o in e.OldItems)
+            {
+                o.PropertyChanged -= OnPathPropertyChanged;
+                boundPaths.Remove(o);
+            }
+        }
+    }
+
+    private void OnPathPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        InvalidateVisual();
     }
 
     private void OnSelectionChanged()

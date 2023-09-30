@@ -10,6 +10,7 @@
              xmlns:fastTableView="clr-namespace:AvaloniaStyles.Controls.FastTableView;assembly=AvaloniaStyles"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="viewModels:SniffWaypointsDocumentViewModel"
+             x:Name="Root"
              x:Class="WDE.PacketViewer.Avalonia.Processing.Processors.Paths.Views.SniffWaypointsDocumentView">
   <Grid ColumnDefinitions="300,5,*">
     
@@ -52,7 +53,15 @@
                                             IsGroupingEnabled="True">
             <fastTableView:VeryFastTableView.GroupHeaderTemplate>
               <DataTemplate x:DataType="viewModels:CreaturePathViewModel">
-                <CheckBox IsChecked="{CompiledBinding IsVisible}" />
+                <CheckBox IsChecked="{CompiledBinding IsVisible}" 
+                          HorizontalAlignment="Stretch" VerticalAlignment="Stretch" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch">
+                  <Grid ColumnDefinitions="Auto,10,*,5,*,5,*" Background="{DynamicResource ContentBackground}">
+                    <TextBlock Grid.Column="0" VerticalAlignment="Center" >Path</TextBlock>
+                    <TextBlock Grid.Column="2" VerticalAlignment="Center" Text="{CompiledBinding Duration}" />
+                    <TextBlock Grid.Column="4" VerticalAlignment="Center" Text="{CompiledBinding TotalDistance, StringFormat={}{0:0.0}yd}" />
+                    <TextBlock Grid.Column="6" VerticalAlignment="Center" Text="{CompiledBinding  AverageSpeed, StringFormat={}{0:0.0}yd/s}" />
+                  </Grid>
+                </CheckBox>
               </DataTemplate>
             </fastTableView:VeryFastTableView.GroupHeaderTemplate>
             <fastTableView:VeryFastTableView.KeyBindings>

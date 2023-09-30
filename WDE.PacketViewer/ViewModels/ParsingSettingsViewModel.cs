@@ -17,6 +17,7 @@ public partial class ParsingSettingsViewModel : ObservableBase, IParsingSettings
 {
     private readonly IPacketViewerSettings packetViewerSettings;
     [Notify] private bool translateChatToEnglish;
+    [Notify] private bool preferOneLineSql;
     [Notify] private ISniffWaypointsExporter? waypointsExporter;
     
     public IList<ISniffWaypointsExporter> Exporters { get; }
@@ -28,6 +29,7 @@ public partial class ParsingSettingsViewModel : ObservableBase, IParsingSettings
         Exporters = exporters.ToList();
         waypointsExporter = Exporters.FirstOrDefault(x => x.Id == this.packetViewerSettings.Settings.DefaultWaypointExporterId)
                             ?? Exporters.FirstOrDefault();
+        preferOneLineSql = this.packetViewerSettings.Settings.PreferOneLineSql;
 
         this.ToObservable(x => x.WaypointsExporter)
             .Skip(1)
@@ -39,6 +41,17 @@ public partial class ParsingSettingsViewModel : ObservableBase, IParsingSettings
                 this.packetViewerSettings.Settings = this.packetViewerSettings.Settings with
                 {
                     DefaultWaypointExporterId = x.Id
+                };
+            });
+        
+        
+        this.ToObservable(x => x.PreferOneLineSql)
+            .Skip(1)
+            .SubscribeAction(x =>
+            {
+                this.packetViewerSettings.Settings = this.packetViewerSettings.Settings with
+                {
+                    PreferOneLineSql = x
                 };
             });
     }

@@ -49,6 +49,9 @@
                 <TextBlock FontWeight="Bold">Chat:</TextBlock>
                 <CheckBox IsChecked="{CompiledBinding TranslateChatToEnglish}">Use broadcast_text_locale to translate CHAT texts to English</CheckBox>
                 <Border Height="20" />
+                <TextBlock FontWeight="Bold">Query generation:</TextBlock>
+                <CheckBox IsChecked="{CompiledBinding PreferOneLineSql}">Prefer one-line SQLs</CheckBox>
+                <Border Height="20" />
                 <TextBlock FontWeight="Bold">Waypoint dump type:</TextBlock>
                 <controls:CompletionComboBox SelectedItem="{CompiledBinding WaypointsExporter, Mode=TwoWay}" Items="{CompiledBinding Exporters}">
                     <controls:CompletionComboBox.ItemTemplate>
