@@ -43,10 +43,10 @@ public class CreatureTemplateTBC : ICreatureTemplate
 
     public GameDefines.UnitFlags2 UnitFlags2 => 0;
     
-    [Column(Name = "speed_walk")]
+    [Column(Name = "SpeedWalk")]
     public float SpeedWalk { get; set; }
         
-    [Column(Name = "speed_run")]
+    [Column(Name = "SpeedRun")]
     public float SpeedRun { get; set; }
 
     [Column("NpcFlags")]
