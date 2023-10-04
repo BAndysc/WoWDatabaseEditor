@@ -13,6 +13,7 @@ using Avalonia.ReactiveUI;
 using Projektanker.Icons.Avalonia;
 using Projektanker.Icons.Avalonia.MaterialDesign;
 using WDE.Common.Tasks;
+using WoWDatabaseEditorCore.Avalonia.Utils;
 using WoWDatabaseEditorCore.Managers;
 
 namespace WoWDatabaseEditorCore.Avalonia
@@ -50,6 +51,16 @@ namespace WoWDatabaseEditorCore.Avalonia
             SafeFireAndForgetExtensions.SetDefaultExceptionHandling(Console.WriteLine);
             TaskScheduler.UnobservedTaskException += (sender, eventArgs) => Console.WriteLine(eventArgs.Exception);
             GlobalApplication.Arguments.Init(args);
+
+            if (GlobalApplication.Arguments.GetValue("console") != null)
+            {
+                if (OperatingSystem.IsWindows())
+                {
+                    if (!Win32.AttachConsole(Win32.ATTACH_PARENT_PROCESS))
+                        Win32.AllocConsole();
+                }
+            }
+            
             return true;
         }
 
