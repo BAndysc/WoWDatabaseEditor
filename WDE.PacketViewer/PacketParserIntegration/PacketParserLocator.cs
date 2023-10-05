@@ -25,11 +25,11 @@ namespace WDE.PacketViewer.PacketParserIntegration
             return new[]
                 {
 #if DEBUG
-                    @"..\..\..\WowPacketParser\WowPacketParser\bin\Debug\WowPacketParser.exe",
-                    @"../../../WowPacketParser/WowPacketParser/bin/Debug/WowPacketParser.dll",
+                    @"..\..\..\WoWPacketParser\WowPacketParser\bin\Debug\WowPacketParser.exe",
+                    @"../../../WoWPacketParser/WowPacketParser/bin/Debug/WowPacketParser.dll",
 #endif
-                    @"..\..\..\WowPacketParser\WowPacketParser\bin\Release\WowPacketParser.exe",
-                    @"../../../WowPacketParser/WowPacketParser/bin/Release/WowPacketParser.dll",
+                    @"..\..\..\WoWPacketParser\WowPacketParser\bin\Release\WowPacketParser.exe",
+                    @"../../../WoWPacketParser/WowPacketParser/bin/Release/WowPacketParser.dll",
                     
                     @"WoWPacketParser\WowPacketParser.exe",
                     @"WoWPacketParser/WowPacketParser.dll",

@@ -5,7 +5,7 @@
         <TargetFramework>net7.0</TargetFramework>
         <Configurations>Debug;Release</Configurations>
         <Platforms>AnyCPU</Platforms>
-        <ApplicationIcon>../WowDatabaseEditorCore.Avalonia/Icon.ico</ApplicationIcon>
+        <ApplicationIcon>../WoWDatabaseEditorCore.Avalonia/Icon.ico</ApplicationIcon>
         <AssemblyName>WoWDatabaseEditorCore.Avalonia</AssemblyName>
         <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
     </PropertyGroup>
