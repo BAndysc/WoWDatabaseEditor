@@ -9,6 +9,7 @@ namespace WDE.Common.History
         private readonly List<IHistoryAction> bulkEditing = new();
         private readonly List<IHistoryAction> bulkEditingDoneActions = new();
         private bool inBulkEditing;
+        private bool inPause;
         public event EventHandler<IHistoryAction> ActionPush = delegate { };
         public event EventHandler<IHistoryAction> ActionDone = delegate { };
 
@@ -40,8 +41,30 @@ namespace WDE.Common.History
             }
         }
 
+        public IDisposable Pause()
+        {
+            StartPause();
+            return new EndPauseDisposable(this);
+        }
+        
+        protected void StartPause()
+        {
+            inPause = true;
+        }
+
+        protected void EndPause()
+        {
+            if (inPause)
+            {
+                inPause = false;
+            }
+        }
+
         public void PushAction(IHistoryAction action)
         {
+            if (inPause)
+                return;
+            
             if (inBulkEditing)
                 bulkEditing.Add(action);
             else
@@ -50,6 +73,9 @@ namespace WDE.Common.History
         
         public void DoAction(IHistoryAction action)
         {
+            if (inPause)
+                return;
+
             if (inBulkEditing)
                 bulkEditingDoneActions.Add(action);
             else
@@ -70,6 +96,21 @@ namespace WDE.Common.History
             public void Dispose()
             {
                 historyHandler.EndBulkEdit(name);
+            }
+        }
+
+        private readonly struct EndPauseDisposable : System.IDisposable
+        {
+            private readonly HistoryHandler historyHandler;
+
+            public EndPauseDisposable(HistoryHandler historyHandler)
+            {
+                this.historyHandler = historyHandler;
+            }
+
+            public void Dispose()
+            {
+                historyHandler.EndPause();
             }
         }
     }

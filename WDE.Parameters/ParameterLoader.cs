@@ -625,8 +625,8 @@ namespace WDE.Parameters
             Items = new Dictionary<long, SelectOption>();
             foreach (INpcText item in database.GetNpcTexts())
             {
-                var text = item.Text0_0 ?? item.Text0_1;
-                if (text == null && item.BroadcastTextId > 0)
+                var text = string.IsNullOrEmpty(item.Text0_0) ? item.Text0_1 : item.Text0_0;
+                if (string.IsNullOrEmpty(text) && item.BroadcastTextId > 0)
                 {
                     var broadcastText = await database.GetBroadcastTextByIdAsync(item.BroadcastTextId);
                     if (broadcastText != null)
@@ -638,7 +638,7 @@ namespace WDE.Parameters
 
         public Type ObservedType => typeof(INpcText);
         
-        public void Reload() => LateLoad();
+        public void Reload() => LateLoad().ListenErrors();
     }
     
     public class QuestParameter : LateLoadParameter, ICustomPickerParameter<long>

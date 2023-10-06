@@ -9,12 +9,13 @@ public interface ITableColumnHeader
 
 public class TableTableColumnHeader : ITableColumnHeader
 {
-    public TableTableColumnHeader(string header)
+    public TableTableColumnHeader(string header, double width = 120)
     {
         Header = header;
+        Width = width;
     }
 
     public string Header { get; set; }
-    public double Width { get; set; } = 120;
+    public double Width { get; set; }
     public bool IsVisible { get; set; } = true;
 }
