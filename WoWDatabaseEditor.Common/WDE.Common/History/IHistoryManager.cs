@@ -13,6 +13,7 @@ namespace WDE.Common.History
 
         int UndoCount { get; }
         int RedoCount { get; }
+        bool IsUndoing { get; }
 
         ObservableCollection<IHistoryAction> Past { get; }
         ObservableCollection<IHistoryAction> Future { get; }

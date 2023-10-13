@@ -60,6 +60,7 @@ namespace WDE.History
             }
         }
 
+        public bool IsUndoing => !acceptNew;
         public int UndoCount => Past.Count;
         public int RedoCount => Future.Count;
 

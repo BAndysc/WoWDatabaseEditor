@@ -84,6 +84,7 @@ public class EditableTextBlock : TemplatedControl
         textBox.Padding = textBlock.Padding;
         textBox.Margin = textBox.Margin;
         textBox.BorderThickness = new Thickness(0);
+        textBox.MinHeight = 0;
         textBox.Text = overrideText ?? text;
         textBox.FontFamily = textBlock.FontFamily;
         textBox.MinWidth = 0;
