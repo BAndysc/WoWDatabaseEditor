@@ -28,9 +28,14 @@ public partial class VeryFastTableView
     public static readonly StyledProperty<ICustomCellInteractor?> CustomCellInteractorProperty = AvaloniaProperty.Register<VeryFastTableView, ICustomCellInteractor?>(nameof(CustomCellInteractor));
     public static readonly StyledProperty<ITableMultiSelection> MultiSelectionProperty = AvaloniaProperty.Register<VeryFastTableView, ITableMultiSelection>(nameof(MultiSelection), defaultValue: new TableMultiSelection());
     public static readonly StyledProperty<IDataTemplate?> GroupHeaderTemplateProperty = AvaloniaProperty.Register<VeryFastTableView, IDataTemplate?>(nameof(GroupHeaderTemplate));
+    public static readonly StyledProperty<IDataTemplate?> AdditionalGroupSubHeaderProperty = AvaloniaProperty.Register<VeryFastTableView, IDataTemplate?>(nameof(AdditionalGroupSubHeaderTemplate));
     public static readonly StyledProperty<bool> InteractiveHeaderProperty = AvaloniaProperty.Register<VeryFastTableView, bool>(nameof(InteractiveHeader));
     public static readonly StyledProperty<string> RowFilterParameterProperty = AvaloniaProperty.Register<VeryFastTableView, string>("RowFilterParameter");
     public static readonly StyledProperty<bool> IsGroupingEnabledProperty = AvaloniaProperty.Register<VeryFastTableView, bool>("IsGroupingEnabled");
+
+    public static readonly StyledProperty<double> SubHeaderHeightProperty = AvaloniaProperty.Register<VeryFastTableView, double>(nameof(SubHeaderHeight), defaultValue: 0);
+
+    public static readonly StyledProperty<bool> IsDynamicHeaderHeightProperty = AvaloniaProperty.Register<VeryFastTableView, bool>("DynamicRowHeight");
 
     public static readonly RoutedEvent<ColumnPressedEventArgs> ColumnPressedEvent = RoutedEvent.Register<VeryFastTableView, ColumnPressedEventArgs>("ColumnPressed", RoutingStrategies.Tunnel | RoutingStrategies.Bubble);
 
@@ -38,6 +43,11 @@ public partial class VeryFastTableView
     public static readonly StyledProperty<IRowFilterPredicate?> RowFilterProperty = AvaloniaProperty.Register<VeryFastTableView, IRowFilterPredicate?>("RowFilter");
     public static readonly StyledProperty<bool> IsReadOnlyProperty = AvaloniaProperty.Register<VeryFastTableView, bool>("IsReadOnly");
 
+    public bool IsDynamicHeaderHeight
+    {
+        get => GetValue(IsDynamicHeaderHeightProperty);
+        set => SetValue(IsDynamicHeaderHeightProperty, value);
+    }
     public IReadOnlyList<int>? HiddenColumns
     {
         get => GetValue(HiddenColumnsProperty);
@@ -97,6 +107,12 @@ public partial class VeryFastTableView
         get => GetValue(GroupHeaderTemplateProperty);
         set => SetValue(GroupHeaderTemplateProperty, value);
     }
+    
+    public IDataTemplate? AdditionalGroupSubHeaderTemplate
+    {
+        get => GetValue(AdditionalGroupSubHeaderProperty);
+        set => SetValue(AdditionalGroupSubHeaderProperty, value);
+    }
 
     public bool InteractiveHeader
     {
@@ -126,5 +142,11 @@ public partial class VeryFastTableView
     {
         get => (bool)GetValue(IsReadOnlyProperty);
         set => SetValue(IsReadOnlyProperty, value);
+    }
+    
+    public double SubHeaderHeight
+    {
+        get => GetValue(SubHeaderHeightProperty);
+        set => SetValue(SubHeaderHeightProperty, value);
     }
 }

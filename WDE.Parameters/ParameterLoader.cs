@@ -596,7 +596,7 @@ namespace WDE.Parameters
         }
 
         public Type ObservedType => typeof(IGossipMenu);
-        public void Reload() => LateLoad();
+        public void Reload() => LateLoad().ListenErrors();
 
         public event Action<IParameter<long>>? ItemsChanged;
     }

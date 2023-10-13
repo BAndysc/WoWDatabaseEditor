@@ -40,6 +40,7 @@ public partial class VeryFastTableView
                 row.RowsChanged += RowsChanged;
             }
         }
+
         InvalidateMeasure();
         InvalidateVisual();
         InvalidateArrange();

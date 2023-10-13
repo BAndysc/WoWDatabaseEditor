@@ -11,19 +11,22 @@
                 Name="Root"
                 x:DataType="viewModels:PacketFilterDialogViewModel"
                 x:Class="WDE.PacketViewer.Avalonia.Views.PacketFilterDialogView">
+    <DialogViewBase.KeyBindings>
+        <BetterKeyBinding Gesture="Enter" CustomCommand="{CompiledBinding Accept}" />
+    </DialogViewBase.KeyBindings>
     <Grid RowDefinitions="Auto,*,Auto">
         <ScrollViewer Grid.Row="1">
             <StackPanel Spacing="10">
                 <Expander Header="{CompiledBinding EntriesHeader}" HorizontalContentAlignment="Stretch">
                     <StackPanel>
-                        <TextBlock TextWrapping="WrapWithOverflow">
+                        <TextBlock TextWrapping="Wrap">
                             Comma separated list of entries. If "include entry" list is not empty, only packets with "included" entries will be displayed. If included is empty, all packets with those entries will be skipped (warning: some packets do not have entry in the viewer).
                         </TextBlock>
                         
                         <Grid ColumnDefinitions="*,5,*" RowDefinitions="Auto,*" MinHeight="300">
                             <controls:GroupingHeader Grid.Row="0" Grid.Column="0" GroupName="Excluded" />
                             <TextBox Grid.Row="1" Grid.Column="0"  Text="{CompiledBinding ExcludedEntries}" 
-                                     TextWrapping="WrapWithOverflow" 
+                                     TextWrapping="Wrap" 
                                      VerticalContentAlignment="Top" 
                                      AcceptsReturn="True" />
 
@@ -31,7 +34,7 @@
                             
                             <controls:GroupingHeader Grid.Row="0" Grid.Column="2" GroupName="Included" />
                             <TextBox Grid.Row="1" Grid.Column="2"  Text="{CompiledBinding IncludedEntries}" 
-                                     TextWrapping="WrapWithOverflow" 
+                                     TextWrapping="Wrap" 
                                      VerticalContentAlignment="Top" 
                                      AcceptsReturn="True" />
                         </Grid>
@@ -39,14 +42,14 @@
                 </Expander>
                 <Expander Header="{CompiledBinding OpcodesHeader}" HorizontalContentAlignment="Stretch">
                     <StackPanel>
-                        <TextBlock TextWrapping="WrapWithOverflow">
+                        <TextBlock TextWrapping="Wrap">
                             Comma separated list of opcodes. If included list is non empty, only packets with those opcodes will be displayed. If included is empty, all packets with opcodes in excluded list will be skipped.
                         </TextBlock>
                         
                         <Grid ColumnDefinitions="*,5,*" RowDefinitions="Auto,*" MinHeight="300">
                             <controls:GroupingHeader Grid.Row="0" Grid.Column="0" GroupName="Excluded" />
                             <TextBox Grid.Row="1" Grid.Column="0"  Text="{CompiledBinding ExcludedOpcodes}" 
-                                     TextWrapping="WrapWithOverflow" 
+                                     TextWrapping="Wrap" 
                                      VerticalContentAlignment="Top" 
                                      AcceptsReturn="True" />
                     
@@ -54,7 +57,7 @@
                             
                             <controls:GroupingHeader Grid.Row="0" Grid.Column="2" GroupName="Included" />
                             <TextBox Grid.Row="1" Grid.Column="2"  Text="{CompiledBinding IncludedOpcodes}" 
-                                     TextWrapping="WrapWithOverflow" 
+                                     TextWrapping="Wrap" 
                                      VerticalContentAlignment="Top" 
                                      AcceptsReturn="True" />
                         </Grid>
@@ -62,7 +65,7 @@
                 </Expander>
                 <Expander Header="{CompiledBinding GuidsHeader}" HorizontalContentAlignment="Stretch">
                     <StackPanel>
-                        <TextBlock TextWrapping="WrapWithOverflow">
+                        <TextBlock TextWrapping="Wrap">
                             If included list is non empty, only packets with those GUIDs in them will be displayed. If included is empty, all packets with guid in excluded list will be skipped.
                         </TextBlock>
                         <Grid ColumnDefinitions="*,5,*" RowDefinitions="Auto,*" MinHeight="300">
@@ -127,7 +130,7 @@
                 
                 <Expander Header="Min-max packet number" HorizontalContentAlignment="Stretch">
                     <StackPanel>
-                        <TextBlock TextWrapping="WrapWithOverflow">
+                        <TextBlock TextWrapping="Wrap">
                             Minimum and maximum packet number to include in the list.
                         </TextBlock>
                         <Grid ColumnDefinitions="Auto,5,*,20,Auto,5,*">
@@ -142,10 +145,10 @@
                 
                 <Expander Header="Force include packet numbers" HorizontalContentAlignment="Stretch">
                     <Grid MinHeight="250" RowDefinitions="Auto,*">
-                        <TextBlock TextWrapping="WrapWithOverflow">
+                        <TextBlock TextWrapping="Wrap">
                             Comma separated list of packet numbers that will be included, even if other conditions fail.
                         </TextBlock>
-                        <TextBox Text="{CompiledBinding CommaSeparatedPackets}" TextWrapping="WrapWithOverflow" VerticalContentAlignment="Top" AcceptsReturn="True" Grid.Row="1" />
+                        <TextBox Text="{CompiledBinding CommaSeparatedPackets}" TextWrapping="Wrap" VerticalContentAlignment="Top" AcceptsReturn="True" Grid.Row="1" />
                     </Grid>
                 </Expander>
             </StackPanel>

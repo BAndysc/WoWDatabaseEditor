@@ -1,7 +1,9 @@
+using System;
 using System.Collections.Generic;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
+using Projektanker.Icons.Avalonia;
 
 namespace AvaloniaStyles.Controls;
 
@@ -19,15 +21,17 @@ public class RecyclableViewList
         this.behind = behind;
     }
     
-    public void Reset(IDataTemplate template)
+    public void Reset(IDataTemplate? template)
     {
         this.template = template;
         counter = 0;
     }
 
-    public IControl GetNext(object context)
+    public bool TryGetNext(object context, out IControl control)
     {
-        IControl control;
+        control = null!;
+        if (template == null)
+            return false;
         if (counter >= controls.Count)
         {
             control = template!.Build(null!);
@@ -38,7 +42,7 @@ public class RecyclableViewList
             else
                 owner.Children.Add(control);
             counter++;
-            return control;
+            return true;
         }
         // find a remaining control that has context data context
         for (int i = counter; i < controls.Count; ++i)
@@ -52,19 +56,27 @@ public class RecyclableViewList
                 controls[i] = atCounter;
                 
                 ++counter;
-                return found;
+                control = found;
+                return true;
             }
             else if (controls[i].DataContext == null)
                 break;
         }
-        
         
         control = controls[counter++];
         control.DataContext = context;
         control.IsVisible = true;
         control.InvalidateMeasure();
         control.InvalidateArrange();
-        return control;
+        return true;
+    }
+    
+    public IControl GetNext(object context)
+    {
+        if (!TryGetNext(context, out var control))
+            throw new Exception("Template is null!");
+
+        return control!;
     }
 
     public void Finish()

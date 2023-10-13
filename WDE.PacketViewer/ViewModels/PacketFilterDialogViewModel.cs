@@ -104,19 +104,19 @@ namespace WDE.PacketViewer.ViewModels
                 MaxPacketNumber = serialized.Value.MaxPacket ?? 0;
                 
                 if (serialized.Value.ExcludedEntries != null)
-                    ExcludedEntries = string.Join(", ", serialized.Value.ExcludedEntries);
+                    ExcludedEntries = string.Join("\n", serialized.Value.ExcludedEntries);
                 if (serialized.Value.IncludedEntries != null)
-                    IncludedEntries = string.Join(", ", serialized.Value.IncludedEntries);
+                    IncludedEntries = string.Join("\n", serialized.Value.IncludedEntries);
                 if (serialized.Value.ExcludedGuids != null)
                     ExcludedGuids.AddRange(serialized.Value.ExcludedGuids.StringToGuids());
                 if (serialized.Value.IncludedGuids != null)
                     IncludedGuids.AddRange(serialized.Value.IncludedGuids.StringToGuids());
                 if (serialized.Value.ExcludedOpcodes != null)
-                    ExcludedOpcodes = string.Join(", ", serialized.Value.ExcludedOpcodes);
+                    ExcludedOpcodes = string.Join("\n", serialized.Value.ExcludedOpcodes);
                 if (serialized.Value.IncludedOpcodes != null)
-                    IncludedOpcodes = string.Join(", ", serialized.Value.IncludedOpcodes);
+                    IncludedOpcodes = string.Join("\n", serialized.Value.IncludedOpcodes);
                 if (serialized.Value.ForceIncludedNumbers != null)
-                    CommaSeparatedPackets = string.Join(", ", serialized.Value.ForceIncludedNumbers);
+                    CommaSeparatedPackets = string.Join("\n", serialized.Value.ForceIncludedNumbers);
             });
             
             if (filterData != null)
@@ -127,19 +127,19 @@ namespace WDE.PacketViewer.ViewModels
                 MaxPacketNumber = filterData.MaxPacketNumber ?? 0;
                 
                 if (filterData.ExcludedEntries != null)
-                    ExcludedEntries = string.Join(", ", filterData.ExcludedEntries);
+                    ExcludedEntries = string.Join("\n", filterData.ExcludedEntries);
                 if (filterData.IncludedEntries != null)
-                    IncludedEntries = string.Join(", ", filterData.IncludedEntries);
+                    IncludedEntries = string.Join("\n", filterData.IncludedEntries);
                 if (filterData.ExcludedGuids != null)
                     ExcludedGuids.AddRange(filterData.ExcludedGuids);
                 if (filterData.IncludedGuids != null)
                     IncludedGuids.AddRange(filterData.IncludedGuids);
                 if (filterData.ExcludedOpcodes != null)
-                    ExcludedOpcodes = string.Join(", ", filterData.ExcludedOpcodes);
+                    ExcludedOpcodes = string.Join("\n", filterData.ExcludedOpcodes);
                 if (filterData.IncludedOpcodes != null)
-                    IncludedOpcodes = string.Join(", ", filterData.IncludedOpcodes);
+                    IncludedOpcodes = string.Join("\n", filterData.IncludedOpcodes);
                 if (filterData.ForceIncludePacketNumbers != null)
-                    CommaSeparatedPackets = string.Join(", ", filterData.ForceIncludePacketNumbers);
+                    CommaSeparatedPackets = string.Join("\n", filterData.ForceIncludePacketNumbers);
             }
 
             DeleteIncludedGuid = new DelegateCommand<UniversalGuid?>(guid =>
@@ -180,7 +180,7 @@ namespace WDE.PacketViewer.ViewModels
             if (string.IsNullOrEmpty(str))
                 return null;
 
-            var list = str.Split(",")
+            var list = str.Split(',', '\n')
                 .Select(s => s.Trim())
                 .Where(can)
                 .Select(convert)
@@ -260,15 +260,15 @@ namespace WDE.PacketViewer.ViewModels
         
         public int DesiredWidth => 500;
         public int DesiredHeight => 700;
-        public string Title => "Packet basic filtering";
+        public string Title => "Basic packets filtering";
         public bool Resizeable => true;
         
         public string EntriesHeader
         {
             get
             {
-                var excluded = string.IsNullOrEmpty(excludedEntries) ? 0 : excludedEntries.Count(l => l == ',') + 1;
-                var included = string.IsNullOrEmpty(includedEntries) ? 0 : includedEntries.Count(l => l == ',') + 1;
+                var excluded = string.IsNullOrEmpty(excludedEntries) ? 0 : excludedEntries.Count(l => l == ',' || l == '\n') + 1;
+                var included = string.IsNullOrEmpty(includedEntries) ? 0 : includedEntries.Count(l => l == ',' || l == '\n') + 1;
                 if (excluded == 0 && included == 0)
                     return "Entries";
                 if (included > 0)
@@ -281,8 +281,8 @@ namespace WDE.PacketViewer.ViewModels
         {
             get
             {
-                var excluded = string.IsNullOrEmpty(excludedOpcodes) ? 0 : excludedOpcodes.Count(l => l == ',') + 1;
-                var included = string.IsNullOrEmpty(includedOpcodes) ? 0 : includedOpcodes.Count(l => l == ',') + 1;
+                var excluded = string.IsNullOrEmpty(excludedOpcodes) ? 0 : excludedOpcodes.Count(l => l == ',' || l == '\n') + 1;
+                var included = string.IsNullOrEmpty(includedOpcodes) ? 0 : includedOpcodes.Count(l => l == ',' || l == '\n') + 1;
                 if (included + excluded == 0)
                     return "Opcodes";
                 if (included > 0)

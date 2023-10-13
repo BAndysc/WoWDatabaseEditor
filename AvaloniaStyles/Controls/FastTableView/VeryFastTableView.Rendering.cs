@@ -24,41 +24,6 @@ public partial class VeryFastTableView
         }
     }
 
-    protected override Size MeasureOverride(Size availableSize)
-    {
-        if (Items == null)
-            return new Size(0, 0);
-
-        var height = DrawingStartOffsetY;
-        var headerHeight = (IsGroupingEnabled ? HeaderRowHeight : 0);
-        var rowFilter = RowFilter;
-        var rowFilterParameter = RowFilterParameter;
-        foreach (var group in Items)
-        {
-            height += headerHeight;
-            if (group.IsExpanded)
-            {
-                if (rowFilter == null)
-                    height += group.Rows.Count * RowHeight;
-                else
-                {
-                    foreach (var row in group.Rows)
-                    {
-                        if (IsFilteredRowVisible(group, row, rowFilter, rowFilterParameter))
-                            height += RowHeight;
-                    }
-                }  
-            }
-        }
-
-        availableSize = new Size(0, height + RowHeight); // always add an extra row height for scrollbar
-        if (Columns != null)
-        {
-            availableSize = availableSize.WithWidth(Columns.Where(c=>c.IsVisible).Select(c => c.Width).Sum());
-        }
-        return availableSize;
-    }
-
     private bool IsFilteredRowVisible(ITableRowGroup group, ITableRow row, IRowFilterPredicate? filter, object? parameter)
     {
         if (filter == null)
@@ -97,13 +62,15 @@ public partial class VeryFastTableView
         var rowFilterParameter = RowFilterParameter;
 
         // we draw only the visible rows
-        DrawingContext.PushedState? viewPortClip = IsGroupingEnabled ? context.PushClip(viewPort.Deflate(new Thickness(0, HeaderRowHeight, 0, 0))) : null;
+        DrawingContext.PushedState? viewPortClip = IsGroupingEnabled ? context.PushClip(viewPort.Deflate(new Thickness(0, lastStickyHeaderHeight, 0, 0))) : null;
         var selectionIterator = MultiSelection.ContainsIterator;
         int groupIndex = 0;
-        foreach (var group in Items)
+        for (var index = 0; index < Items.Count; index++)
         {
+            var group = Items[index];
             var groupStartY = y;
-            var groupHeight = (IsGroupingEnabled ? HeaderRowHeight : 0);
+            var headerHeight = GetTotalHeaderHeight(index);
+            var groupHeight = headerHeight;
             int visibleRowsCount = 0;
             if (group.IsExpanded)
             {
@@ -119,9 +86,10 @@ public partial class VeryFastTableView
                             visibleRowsCount++;
                     }
                 }
+
                 groupHeight += visibleRowsCount * RowHeight;
             }
-            
+
             // out of bounds in the upper part
             if (groupStartY + groupHeight < DataViewport.Top)
             {
@@ -135,15 +103,15 @@ public partial class VeryFastTableView
             }
             else
             {
-                y += (IsGroupingEnabled ? HeaderRowHeight : 0); // header
+                y += headerHeight;
                 int rowIndex = -1; // we start at -1, because we add 1 in the beginning of the loop
                 foreach (var row in group.Rows)
                 {
                     rowIndex += 1;
-                    
+
                     if (!IsFilteredRowVisible(group, row, rowFiler, rowFilterParameter))
                         continue;
-                    
+
                     double x = 0;
                     var rowRect = new Rect(0, y, actualWidth, RowHeight);
 
@@ -151,18 +119,20 @@ public partial class VeryFastTableView
                     {
                         // background
                         bool isSelected = selectionIterator.Contains(new VerticalCursor(groupIndex, rowIndex));
-                        context.FillRectangle(isSelected ? (SelectedRowBackground) : (odd ? OddRowBackground : EvenRowBackground), rowRect);
+                        context.FillRectangle(
+                            isSelected ? (SelectedRowBackground) : (odd ? OddRowBackground : EvenRowBackground),
+                            rowRect);
 
                         cellDrawer?.DrawRow(context, this, row, rowRect);
-                        
+
                         var textColor = isSelected ? FocusTextBrush : TextBrush;
-                        
+
                         int cellIndex = 0;
                         foreach (var cell in row.CellsList)
                         {
                             if (cellIndex >= columnWidths.Length)
                                 continue;
-                            
+
                             if (!IsColumnVisible(cellIndex))
                             {
                                 cellIndex++;
@@ -186,7 +156,7 @@ public partial class VeryFastTableView
                                         var indexOfEndOfLine = text.IndexOf('\n');
                                         if (indexOfEndOfLine != -1)
                                             text = text.Substring(0, indexOfEndOfLine);
-                                        
+
                                         rect = rect.WithWidth(rect.Width - ColumnSpacing);
                                         var ft = new FormattedText
                                         {
@@ -200,17 +170,19 @@ public partial class VeryFastTableView
                                             state.Dispose();
                                             state = context.PushClip(rect);
                                         }
-                                        context.DrawText(textColor, new Point(rect.X + ColumnSpacing, y + RowHeight / 2 - ft.Bounds.Height / 2), ft);   
+
+                                        context.DrawText(textColor,
+                                            new Point(rect.X + ColumnSpacing, y + RowHeight / 2 - ft.Bounds.Height / 2),
+                                            ft);
                                     }
                                 }
-                                
-                                state.Dispose();
 
+                                state.Dispose();
                             }
 
                             x += columnWidth;
                             cellIndex++;
-                        }                        
+                        }
                     }
 
                     y += RowHeight;
@@ -220,7 +192,7 @@ public partial class VeryFastTableView
 
             groupIndex++;
         }
-        
+
         if (IsKeyboardFocusWithin && IsSelectedCellValid && !editor.IsOpened)
         {
             context.DrawRectangle(FocusOuterPen, SelectedCellRect, 4);
@@ -338,16 +310,16 @@ public partial class VeryFastTableView
 
         var rowFilter = RowFilter;
         var rowFilterParameter = RowFilterParameter;
-        var headerHeight = (IsGroupingEnabled ? HeaderRowHeight : 0);
-        
-        foreach (var group in Items)
+
+        for (var index = 0; index < Items.Count; index++)
         {
+            var group = Items[index];
             var groupStartY = y;
-            var groupHeight = headerHeight;
+            var groupHeight = GetTotalHeaderHeight(index);
 
             if (group.IsExpanded)
             {
-                if (rowFilter == null) 
+                if (rowFilter == null)
                     groupHeight += RowHeight * group.Rows.Count;
                 else
                 {
@@ -363,8 +335,8 @@ public partial class VeryFastTableView
                 y += groupHeight;
             else
             {
-                y += headerHeight;
-                
+                y += GetTotalHeaderHeight(index);
+
                 var rowIndex = -1;
                 foreach (var row in group.Rows)
                 {
@@ -372,7 +344,7 @@ public partial class VeryFastTableView
 
                     if (!IsFilteredRowVisible(group, row, rowFilter, rowFilterParameter))
                         continue;
-                    
+
                     var rowEnd = y + RowHeight;
                     if (mouseY >= y && mouseY < rowEnd)
                         return new VerticalCursor(groupIndex, rowIndex);
@@ -380,7 +352,7 @@ public partial class VeryFastTableView
                 }
             }
 
-            groupIndex++;   
+            groupIndex++;
         }
 
         return null;

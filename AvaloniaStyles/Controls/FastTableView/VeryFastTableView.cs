@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -111,10 +112,25 @@ public partial class VeryFastTableView : Panel, IKeyboardNavigationHandler, IFas
         });
     }
 
+    private Panel headersViewParent;
+    private Panel subheadersViewParent;
+    
     public VeryFastTableView()
     {
         UpdateKeyBindings();
-        headerViews = new RecyclableViewList(this);
+        headersViewParent = new NoArrangePanel();
+        subheadersViewParent = new NoArrangePanel();
+        Children.Add(subheadersViewParent);
+        Children.Add(headersViewParent);
+        headerViews = new RecyclableViewList(headersViewParent);
+        subheaderViews = new RecyclableViewList(subheadersViewParent);
+        headersViewParent.ClipToBounds = subheadersViewParent.ClipToBounds = true;
+    }
+
+    private class NoArrangePanel : Panel
+    {
+        protected override Size ArrangeOverride(Size finalSize) => finalSize;
+        protected override Size MeasureOverride(Size availableSize) => availableSize;
     }
 
     private void RemoveInvisibleFromSelection()
@@ -275,7 +291,6 @@ public partial class VeryFastTableView : Panel, IKeyboardNavigationHandler, IFas
     private int? currentlyResizedColumn = null;
     private double resizingColumnStartWidth = 0;
     private double resizingColumnStartPointerX = 0;
-
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
         base.OnPointerPressed(e);
@@ -487,7 +502,6 @@ public partial class VeryFastTableView : Panel, IKeyboardNavigationHandler, IFas
         if (Items == null)
             return DrawingStartOffsetY;
         var y = DrawingStartOffsetY;
-        var headerHeight = IsGroupingEnabled ? HeaderRowHeight : 0;
         var rowFilter = RowFilter;
         var rowFilterParameter = RowFilterParameter;
         
@@ -497,7 +511,7 @@ public partial class VeryFastTableView : Panel, IKeyboardNavigationHandler, IFas
             if (i == cursor.GroupIndex)
                 rowsInGroup = cursor.RowIndex;
 
-            y += headerHeight;
+            y += GetTotalHeaderHeight(i);
             
             if (Items[i].IsExpanded)
             {
@@ -544,24 +558,73 @@ public partial class VeryFastTableView : Panel, IKeyboardNavigationHandler, IFas
             if (IsSelectedCellValid)
                 OpenEditor("");
         });
-        KeyBindings.Add(new KeyBinding()
+        KeyBindings.Add(new BetterKeyBinding()
         {
             Gesture = new KeyGesture(Key.Enter),
-            Command = new DelegateCommand(() =>
+            CustomCommand = new DelegateCommand(() =>
             {
                 if (IsSelectedCellValid)
                     OpenEditor();
             })
         });
-        KeyBindings.Add(new KeyBinding()
+        KeyBindings.Add(new BetterKeyBinding()
         {
             Gesture = new KeyGesture(Key.Back),
-            Command = openAndErase
+            CustomCommand = openAndErase
         });
-        KeyBindings.Add(new KeyBinding()
+        KeyBindings.Add(new BetterKeyBinding()
         {
             Gesture = new KeyGesture(Key.Delete),
-            Command = openAndErase
+            CustomCommand = openAndErase
         });
+    }
+    
+    
+    /***
+     * This is KeyBinding that forwards the gesture to the focused TextBox first
+     */
+    private class BetterKeyBinding : KeyBinding, ICommand
+    {
+        public static readonly StyledProperty<ICommand> CustomCommandProperty = AvaloniaProperty.Register<KeyBinding, ICommand>(nameof (CustomCommand));
+
+        public ICommand CustomCommand
+        {
+            get => GetValue(CustomCommandProperty);
+            set => SetValue(CustomCommandProperty, value);
+        }
+        
+        public BetterKeyBinding()
+        {
+            Command = this;
+        }
+
+        public bool CanExecute(object? parameter)
+        {
+            if (FocusManager.Instance!.Current is TextBox tb)
+                return true;
+            return CustomCommand.CanExecute(parameter);
+        }
+
+        public void Execute(object? parameter)
+        {
+            if (FocusManager.Instance!.Current is TextBox tb)
+            {
+                var ev = Activator.CreateInstance<KeyEventArgs>();
+                ev.Key = Gesture.Key;
+                ev.KeyModifiers = Gesture.KeyModifiers;
+                ev.RoutedEvent = InputElement.KeyDownEvent;
+                tb.RaiseEvent(ev);
+                if (!ev.Handled && CanExecute(parameter))
+                    CustomCommand.Execute(parameter);
+            }
+            else
+                CustomCommand.Execute(parameter);
+        }
+
+        public event EventHandler? CanExecuteChanged
+        {
+            add => CustomCommand.CanExecuteChanged += value;
+            remove => CustomCommand.CanExecuteChanged -= value;
+        }
     }
 }

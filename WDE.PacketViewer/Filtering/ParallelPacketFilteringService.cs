@@ -40,10 +40,33 @@ namespace WDE.PacketViewer.Filtering
                     return false;
             }
             
-            if (filterData.IncludedOpcodes != null)
+            if (filterData.IncludedOpcodes != null || filterData.IncludedOpcodesWildcards != null)
             {
-                if (!filterData.IncludedOpcodes.Contains(packet.Opcode))
-                    return false;
+                bool any = false;
+                if (filterData.IncludedOpcodes != null)
+                {
+                    foreach (var opcode in filterData.IncludedOpcodes)
+                        if (opcode == packet.Opcode)
+                        {
+                            any = true;
+                            break;
+                        }
+                }
+                
+                if (filterData.IncludedOpcodesWildcards != null)
+                {
+                    foreach (var prefix in filterData.IncludedOpcodesWildcards)
+                    {
+                        if (packet.Opcode.StartsWith(prefix))
+                        {
+                            any = true;
+                            break;
+                        }
+                    }
+
+                    if (!any)
+                        return false;
+                }
             }
             else if (filterData.ExcludedOpcodes != null)
             {
@@ -51,21 +74,6 @@ namespace WDE.PacketViewer.Filtering
                     return false;
             }
 
-            if (filterData.IncludedOpcodesWildcards != null)
-            {
-                bool any = false;
-                foreach (var prefix in filterData.IncludedOpcodesWildcards)
-                {
-                    if (packet.Opcode.StartsWith(prefix))
-                    {
-                        any = true;
-                        break;
-                    }
-                }
-
-                if (!any)
-                    return false;
-            }
             if (filterData.ExcludedOpcodesWildcards != null)
             {
                 foreach (var prefix in filterData.ExcludedOpcodesWildcards)
