@@ -1,3 +1,6 @@
+using System.ComponentModel;
+using PropertyChanged.SourceGenerator;
+
 namespace AvaloniaStyles.Controls.FastTableView;
 
 public interface ITableColumnHeader
@@ -7,8 +10,10 @@ public interface ITableColumnHeader
     bool IsVisible { get; }
 }
 
-public class TableTableColumnHeader : ITableColumnHeader
+public partial class TableTableColumnHeader : INotifyPropertyChanged, ITableColumnHeader
 {
+    [Notify] private double width;
+    
     public TableTableColumnHeader(string header, double width = 120)
     {
         Header = header;
@@ -16,6 +21,5 @@ public class TableTableColumnHeader : ITableColumnHeader
     }
 
     public string Header { get; set; }
-    public double Width { get; set; }
     public bool IsVisible { get; set; } = true;
 }
