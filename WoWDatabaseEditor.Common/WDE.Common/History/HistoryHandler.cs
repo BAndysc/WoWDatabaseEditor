@@ -8,7 +8,7 @@ namespace WDE.Common.History
     {
         private readonly List<IHistoryAction> bulkEditing = new();
         private readonly List<IHistoryAction> bulkEditingDoneActions = new();
-        private bool inBulkEditing;
+        private int inBulkEditingNestLevel;
         private bool inPause;
         public event EventHandler<IHistoryAction> ActionPush = delegate { };
         public event EventHandler<IHistoryAction> ActionDone = delegate { };
@@ -21,16 +21,17 @@ namespace WDE.Common.History
         
         protected void StartBulkEdit()
         {
-            inBulkEditing = true;
-            bulkEditing.Clear();
-            bulkEditingDoneActions.Clear();
+            if (inBulkEditingNestLevel++ == 0)
+            {
+                bulkEditing.Clear();
+                bulkEditingDoneActions.Clear();
+            }
         }
 
         protected void EndBulkEdit(string name)
         {
-            if (inBulkEditing)
+            if (--inBulkEditingNestLevel == 0)
             {
-                inBulkEditing = false;
                 // todo: this should be one history action
                 if (bulkEditing.Count > 0)
                     PushAction(new CompoundHistoryAction(name, bulkEditing.ToArray()));
@@ -65,7 +66,7 @@ namespace WDE.Common.History
             if (inPause)
                 return;
             
-            if (inBulkEditing)
+            if (inBulkEditingNestLevel > 0)
                 bulkEditing.Add(action);
             else
                 ActionPush(this, action);
@@ -76,7 +77,7 @@ namespace WDE.Common.History
             if (inPause)
                 return;
 
-            if (inBulkEditing)
+            if (inBulkEditingNestLevel > 0)
                 bulkEditingDoneActions.Add(action);
             else
                 ActionDone(this, action);

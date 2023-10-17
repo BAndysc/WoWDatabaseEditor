@@ -9,6 +9,13 @@ namespace WDE.Common.Services.MessageBox
         Task<T?> ShowDialog<T>(IMessageBox<T> messageBox);
     }
 
+    public enum SaveDialogResult
+    {
+        Save,
+        DontSave,
+        Cancel
+    }
+
     public static class MessageBoxServiceExtensions
     {
         public static Task SimpleDialog(this IMessageBoxService service, string title, string header, string content)

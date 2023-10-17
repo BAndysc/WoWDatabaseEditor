@@ -38,5 +38,11 @@ namespace WDE.Common.Tasks
             mainThread = thread;
             Backend = backend;
         }
+
+        public static void Deinitialize()
+        {
+            mainThread = null;
+            Backend = AppBackend.Uninitialized;
+        }
     }
 }
