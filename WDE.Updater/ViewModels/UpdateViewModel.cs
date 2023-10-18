@@ -48,13 +48,28 @@ namespace WDE.Updater.ViewModels
             CheckForUpdatesCommand = new DelegateCommand(() =>
             {
                 if (updateService.CanCheckForUpdates())
-                    taskRunner.ScheduleTask("Check for updates", UpdatesCheck);
+                    taskRunner.ScheduleTask(new UpdateTask(this));
             }, updateService.CanCheckForUpdates);
             
             if (!settingsProvider.Settings.DisableAutoUpdates)
                 CheckForUpdatesCommand.Execute(null);
         }
         
+        private class UpdateTask : IAsyncTask
+        {
+            private readonly UpdateViewModel parent;
+            public string Name => "Check for updates";
+            
+            public bool WaitForOtherTasks => false;
+
+            public UpdateTask(UpdateViewModel parent)
+            {
+                this.parent = parent;
+            }
+            
+            public Task Run(ITaskProgress progress) => parent.UpdatesCheck();
+        }
+
         private async Task UpdatesCheck()
         {
             try
@@ -99,10 +114,25 @@ namespace WDE.Updater.ViewModels
         {
             statusBar.PublishNotification(
                 new PlainNotification(NotificationType.Info, "Downloading..."));
-            taskRunner.ScheduleTask("Downloading update", DownloadUpdateTask);
+            taskRunner.ScheduleTask(new DownloadUpdateTask(this));
         }
+        
+        private class DownloadUpdateTask : IAsyncTask
+        {
+            private readonly UpdateViewModel parent;
+            public string Name => "Downloading update";
+            
+            public bool WaitForOtherTasks => false;
 
-        private async Task DownloadUpdateTask(ITaskProgress taskProgress)
+            public DownloadUpdateTask(UpdateViewModel parent)
+            {
+                this.parent = parent;
+            }
+            
+            public Task Run(ITaskProgress progress) => parent.DownloadUpdateTaskImpl(progress);
+        }
+        
+        private async Task DownloadUpdateTaskImpl(ITaskProgress taskProgress)
         {
             try
             {

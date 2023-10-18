@@ -45,6 +45,7 @@ namespace WDE.Updater.Test.ViewModels
             new UpdateViewModel(updateService, taskRunner, statusBar, settingsProvider, platformService, fileSystem, standaloneUpdater, application, messageBoxService);
             
             taskRunner.DidNotReceive().ScheduleTask(Arg.Any<string>(), Arg.Any<Func<Task>>());
+            taskRunner.DidNotReceive().ScheduleTask(Arg.Any<IAsyncTask>());
         }
 
         [Test]
@@ -54,7 +55,7 @@ namespace WDE.Updater.Test.ViewModels
             settingsProvider.Settings.Returns(new UpdaterSettings() {DisableAutoUpdates = false});
             new UpdateViewModel(updateService, taskRunner, statusBar, settingsProvider, platformService, fileSystem, standaloneUpdater, application, messageBoxService);
             
-            taskRunner.Received().ScheduleTask(Arg.Any<string>(), Arg.Any<Func<Task>>());
+            taskRunner.Received().ScheduleTask(Arg.Any<IAsyncTask>());
         }
 
         [Test]
