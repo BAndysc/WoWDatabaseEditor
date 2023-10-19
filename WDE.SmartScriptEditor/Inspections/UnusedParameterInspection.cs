@@ -17,7 +17,7 @@ namespace WDE.SmartScriptEditor.Inspections
                     {
                         Severity = DiagnosticSeverity.Info,
                         Message = $" {index}{nd} parameter of {ofWhat} is not used, but has non zero value.",
-                        Line = e.LineId
+                        Line = e.VirtualLineId
                     };
                 }
             }

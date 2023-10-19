@@ -61,7 +61,7 @@ namespace WDE.SmartScriptEditor.Inspections
                 {
                     yield return new InspectionResult()
                     {
-                        Line = e.LineId,
+                        Line = e.VirtualLineId,
                         Severity = DiagnosticSeverity.Info,
                         Message = "Timed event " + e.GetParameter(0).Value + " never triggered."
                     };
@@ -100,7 +100,7 @@ namespace WDE.SmartScriptEditor.Inspections
                     {
                         Message = "Triggering non existing timed event (" + id + ").",
                         Severity = DiagnosticSeverity.Warning,
-                        Line = action.LineId
+                        Line = action.VirtualLineId
                     };
                 }
             }

@@ -24,7 +24,7 @@ namespace WDE.SmartScriptEditor.Inspections
                     return new InspectionResult()
                     {
                         Severity = DiagnosticSeverity.Error,
-                        Line = a.LineId,
+                        Line = a.VirtualLineId,
                         Message = "You can not use 'WAIT' in On Death event. When the creature dies, it is no longer updated, so no action can be played with a delay"
                     };
             }

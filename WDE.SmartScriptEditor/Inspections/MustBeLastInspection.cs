@@ -33,7 +33,7 @@ public class MustBeLastInspection : IEventInspection
                 {
                     Severity = DiagnosticSeverity.Error,
                     Message = $"Action `{e.Actions[i].Readable.RemoveTags()}` must be the last action",
-                    Line = e.Actions[i].LineId
+                    Line = e.Actions[i].VirtualLineId
                 };
         }
         

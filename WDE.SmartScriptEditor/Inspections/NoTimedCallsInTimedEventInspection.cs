@@ -19,7 +19,7 @@ namespace WDE.SmartScriptEditor.Inspections
             return new InspectionResult()
             {
                 Severity = DiagnosticSeverity.Error,
-                Line = a.LineId,
+                Line = a.VirtualLineId,
                 Message = "You may not create timed event inside a timed event, core will crash"
             };
         }

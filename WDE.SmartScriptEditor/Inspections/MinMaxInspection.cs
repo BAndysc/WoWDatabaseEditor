@@ -26,7 +26,7 @@ namespace WDE.SmartScriptEditor.Inspections
                 return null;
             return new InspectionResult()
             {
-                Line = e.LineId,
+                Line = e.VirtualLineId,
                 Message = $"`{parameterName}` must be less or equal to `{parameterName2}`",
                 Severity = DiagnosticSeverity.Error
             };

@@ -37,7 +37,7 @@ namespace WDE.SmartScriptEditor.Inspections
                     {
                         yield return new InspectionResult()
                         {
-                            Line = e.LineId,
+                            Line = e.VirtualLineId,
                             Severity = DiagnosticSeverity.Error,
                             Message = "WAIT action can't work in On Evade and On Kill unless you put action 'Disable AI Reset State'"
                         };

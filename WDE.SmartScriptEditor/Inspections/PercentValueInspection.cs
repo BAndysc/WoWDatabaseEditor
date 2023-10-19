@@ -21,7 +21,7 @@ namespace WDE.SmartScriptEditor.Inspections
             
             return new InspectionResult()
             {
-                Line = e.LineId,
+                Line = e.VirtualLineId,
                 Message = $"`{parameterName}` is percent and can not be greater than 100%.",
                 Severity = DiagnosticSeverity.Error
             };

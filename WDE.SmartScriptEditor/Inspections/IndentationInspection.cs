@@ -18,7 +18,7 @@ namespace WDE.SmartScriptEditor.Inspections
                         return new InspectionResult()
                         {
                             Severity = DiagnosticSeverity.Error,
-                            Line = action.LineId,
+                            Line = action.VirtualLineId,
                             Message = "[END] without matching begin block, script will not work at all"
                         };
                     }
@@ -34,7 +34,7 @@ namespace WDE.SmartScriptEditor.Inspections
                 return new InspectionResult()
                 {
                     Severity = DiagnosticSeverity.Error,
-                    Line = e.Actions[^1].LineId,
+                    Line = e.Actions[^1].VirtualLineId,
                     Message = "Missing [END] action, script will not work at all."
                 };
             }

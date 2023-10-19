@@ -24,7 +24,7 @@ namespace WDE.SmartScriptEditor.Inspections
                 {
                     Severity = rule.Level,
                     Message = rule.Description,
-                    Line = ev.LineId
+                    Line = ev.VirtualLineId
                 };
             }
             return null;
@@ -41,7 +41,7 @@ namespace WDE.SmartScriptEditor.Inspections
                 {
                     Severity = rule.Level,
                     Message = rule.Description,
-                    Line = a.LineId
+                    Line = a.VirtualLineId
                 };
             }
             return null;

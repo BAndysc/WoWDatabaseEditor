@@ -143,24 +143,49 @@ namespace WDE.SmartScriptEditor.Models
             InvalidateVisual?.Invoke();
         }
 
+        private class NestedEventIds
+        {
+            private List<int> stack = new List<int>() { 1 };
+
+            public int Next() => stack[^1]++;
+
+            public void AddNestLevel() => stack.Add(1);
+
+            public void Pop() => stack.RemoveAt(stack.Count - 1);
+
+            public void PopAll()
+            {
+                while (stack.Count > 1)
+                    stack.RemoveAt(stack.Count - 1);
+            }
+        }
+
         private void RenumerateEvents()
         {
-            int index = 1;
+            int virtualLineId = 1;
+            NestedEventIds eventId = new NestedEventIds();
             foreach (var e in Events)
             {
                 if (e.IsGroup)
+                {
+                    eventId.Next();
                     continue;
+                }
                 
-                e.LineId = index;
+                e.VirtualLineId = virtualLineId;
                 if (e.Actions.Count == 0)
                 {
-                    index++;
+                    e.DestinationEventId = null;
+                    virtualLineId++;
                 }
                 else
                 {
                     int indent = 0;
+                    bool inInlineActionList = false;
                     foreach (var a in e.Actions)
                     {
+                        a.IsInInlineActionList = inInlineActionList;
+                        
                         if (a.ActionFlags.HasFlagFast(ActionFlags.DecreaseIndent) && indent > 0)
                             indent--;
                         
@@ -169,9 +194,39 @@ namespace WDE.SmartScriptEditor.Models
                         if (a.ActionFlags.HasFlagFast(ActionFlags.IncreaseIndent))
                             indent++;
                         
-                        a.LineId = index;
-                        index++;
-                    }   
+                        a.VirtualLineId = virtualLineId++;
+                        if (a.Id == SmartConstants.ActionLink ||
+                            a.Id == SmartConstants.ActionComment ||
+                            (inInlineActionList && a.Id == SmartConstants.ActionAfter))
+                        {
+                            a.DestinationEventId = null;
+                        }
+                        else if (a.Id == SmartConstants.ActionBeginInlineActionList)
+                        {
+                            eventId.PopAll();
+                            a.DestinationEventId = eventId.Next();
+                            eventId.AddNestLevel();
+                            inInlineActionList = true;
+                        }
+                        else if (inInlineActionList && a.Id == SmartConstants.ActionAfterMovement)
+                        {
+                            eventId.Pop();
+                            a.DestinationEventId = eventId.Next();
+                            a.IsInInlineActionList = false;
+                            eventId.AddNestLevel();
+                        }
+                        else if (inInlineActionList && a.Id == SmartConstants.ActionRepeatTimedActionList)
+                        {
+                            eventId.Pop();
+                            a.DestinationEventId = eventId.Next();
+                            a.IsInInlineActionList = false;
+                        }
+                        else
+                        {
+                            a.DestinationEventId = eventId.Next();
+                        }
+                    }
+                    eventId.PopAll();
                 }
             }
         }

@@ -28,7 +28,7 @@ namespace WDE.SmartScriptEditor.Inspections
             
             return new InspectionResult()
             {
-                Line = a.Parent?.LineId ?? -1,
+                Line = a.Parent?.VirtualLineId ?? -1,
                 Severity = DiagnosticSeverity.Error,
                 Message = "Used " + (isSource ? "source" : "target") + " requires action invoker, but event `" + parentEventData.NameReadable + "` doesn't provide one."
             };

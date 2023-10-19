@@ -40,12 +40,18 @@ namespace WDE.SmartScriptEditor.Models
             set => parent = value;
         }
 
-        public override int LineId
+        public override int VirtualLineId
         {
-            get => parent?.LineId ?? -1;
+            get => parent?.VirtualLineId ?? -1;
             set { }
         }
         
+        public override int? DestinationEventId
+        {
+            get => parent?.DestinationEventId;
+            set { }
+        }
+
         public float X
         {
             get => this.GetFloatValueOrDefault(0);

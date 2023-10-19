@@ -26,7 +26,7 @@ namespace WDE.SmartScriptEditor.Inspections
             {
                 return new InspectionResult()
                 {
-                    Line = e.LineId,
+                    Line = e.VirtualLineId,
                     Message = $"`{parameterName}` is 0, the event will be triggered only once. If this is on purpose, add NOT_REPEATABLE flag.",
                     Severity = DiagnosticSeverity.Error
                 };
@@ -36,7 +36,7 @@ namespace WDE.SmartScriptEditor.Inspections
             {
                 return new InspectionResult()
                 {
-                    Line = e.LineId,
+                    Line = e.VirtualLineId,
                     Message = $"`{parameterName}` is non zero, but NOT_REPEATABLE is applied, so it will be invoked only once. Remove the flag or fix the timers.",
                     Severity = DiagnosticSeverity.Warning
                 };

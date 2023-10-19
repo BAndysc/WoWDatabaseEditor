@@ -21,14 +21,14 @@ public class RepeatTimedActionListOnlyInBeginInlineTimedActionListInspection : I
                     return new InspectionResult()
                     {
                         Severity = DiagnosticSeverity.Error,
-                        Line = a.LineId,
+                        Line = a.VirtualLineId,
                         Message = "`Repeat actionlist` action can only work within `begin inline actionlist`"
                     };
                 if (index != e.Actions.Count - 1)
                     return new InspectionResult()
                     {
                         Severity = DiagnosticSeverity.Error,
-                        Line = a.LineId,
+                        Line = a.VirtualLineId,
                         Message = "`Repeat actionlist` action must be the last action of the event, otherwise the next events will be forgotten"
                     };
             }

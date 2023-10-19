@@ -29,7 +29,7 @@ namespace WDE.SmartScriptEditor.Inspections
                 {
                     yield return new InspectionResult()
                     {
-                        Line = current.LineId,
+                        Line = current.VirtualLineId,
                         Severity = DiagnosticSeverity.Info,
                         Message = "The event is a duplicate of the previous one. You can put all actions in a single event."
                     };

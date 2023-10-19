@@ -34,7 +34,7 @@ namespace WDE.SmartScriptEditor.Inspections
                 {
                     yield return new InspectionResult()
                     {
-                        Line = current.LineId,
+                        Line = current.VirtualLineId,
                         Severity = DiagnosticSeverity.Info,
                         Message = "This event can be merged with the previous one."
                     };

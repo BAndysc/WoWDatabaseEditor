@@ -18,7 +18,7 @@ namespace WDE.SmartScriptEditor.Inspections
                         return new InspectionResult()
                         {
                             Severity = DiagnosticSeverity.Error,
-                            Line = a.LineId,
+                            Line = a.VirtualLineId,
                             Message = "`Begin inline action list` can be used only ONCE in a single event!"
                         };
                 }

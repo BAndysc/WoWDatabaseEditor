@@ -23,7 +23,7 @@ namespace WDE.SmartScriptEditor.Inspections
                         return new InspectionResult()
                         {
                             Severity = DiagnosticSeverity.Error,
-                            Line = a.LineId,
+                            Line = a.VirtualLineId,
                             Message = "You may not use action invoker after wait action, core limitation"
                         };
                 }
@@ -34,7 +34,7 @@ namespace WDE.SmartScriptEditor.Inspections
                         return new InspectionResult()
                         {
                             Severity = DiagnosticSeverity.Error,
-                            Line = a.LineId,
+                            Line = a.VirtualLineId,
                             Message = "You may not use action invoker after wait action, core limitation"
                         };
                 }

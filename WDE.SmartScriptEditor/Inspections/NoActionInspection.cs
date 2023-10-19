@@ -14,7 +14,7 @@ namespace WDE.SmartScriptEditor.Inspections
             {
                 Severity = DiagnosticSeverity.Warning,
                 Message = "Event has no actions, will not be saved to database.",
-                Line = e.LineId
+                Line = e.VirtualLineId
             };
         }
     }

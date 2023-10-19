@@ -39,7 +39,7 @@ namespace WDE.SmartScriptEditor.Inspections
                     {
                         Severity = DiagnosticSeverity.Warning,
                         Message = "Action is not asynchronous, it can not be awaited. " + (nextIsAwait ? "Next 'wait for previous' will not do anything." : "Being in await block does nothing."),
-                        Line = e.Actions[i].LineId
+                        Line = e.Actions[i].VirtualLineId
                     };
             }
 

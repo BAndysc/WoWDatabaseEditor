@@ -20,7 +20,22 @@ namespace WDE.SmartScriptEditor.Models
         public event EventHandler OnChanged = delegate { };
         public event Action<SmartBaseElement, int, int> OnIdChanged = delegate { };
 
-        public virtual int LineId { get; set; }
+        /// <summary>
+        /// a line id, used only within the editor (doesn't match exported EventId). Unique within a script,
+        /// even when using begin inline actionlist
+        /// </summary>
+        public virtual int VirtualLineId { get; set; }
+        
+        /// <summary>
+        /// the destination event id (smart_script.id). Can be null when the action/event is not exportable.
+        /// Can also repeat within a single script when using inline timed action lists (because they generate few output scripts)
+        /// </summary>
+        public virtual int? DestinationEventId { get; set; }
+        
+        /// <summary>
+        /// True for actions which will be exported into a timed actionlists.
+        /// </summary>
+        public bool IsInInlineActionList { get; set; }
         private readonly ParameterValueHolder<long>[] @params;
         private readonly ParameterValueHolder<float>[]? floatParams;
         private readonly ParameterValueHolder<string>[]? stringParams;

@@ -92,7 +92,7 @@ namespace WDE.SmartScriptEditor.Exporter
                     ScriptSourceType = (int) scriptSourceType,
                     Id = id + (autoLinks ? index : 0),
                     Link = linkTo ?? 0,
-                    LineId = a.LineId,
+                    LineId = a.VirtualLineId,
                     EventType = e.Id,
                     EventPhaseMask = (int) e.Phases.Value,
                     EventChance = (int) e.Chance.Value,

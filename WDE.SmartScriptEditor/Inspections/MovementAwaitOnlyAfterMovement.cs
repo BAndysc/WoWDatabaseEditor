@@ -24,14 +24,14 @@ namespace WDE.SmartScriptEditor.Inspections
                         return new InspectionResult()
                         {
                             Severity = DiagnosticSeverity.Error,
-                            Line = a.LineId,
+                            Line = a.VirtualLineId,
                             Message = "`After previous movement` action cannot be the very first event action! It makes no sense"
                         };
                     if (!hasBeginInlineActionList)
                         return new InspectionResult()
                         {
                             Severity = DiagnosticSeverity.Error,
-                            Line = a.LineId,
+                            Line = a.VirtualLineId,
                             Message = "`After previous movement` action can only work within `begin inline actionlist` at the moment"
                         };
                     if (prev.Id != SmartConstants.ActionStartWaypointsPath &&
@@ -39,7 +39,7 @@ namespace WDE.SmartScriptEditor.Inspections
                         return new InspectionResult()
                         {
                             Severity = DiagnosticSeverity.Error,
-                            Line = a.LineId,
+                            Line = a.VirtualLineId,
                             Message = "`After previous movement` action can only be placed after `Waypoint path start` action!"
                         };
                 }

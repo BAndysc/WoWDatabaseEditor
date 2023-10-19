@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
@@ -77,7 +78,6 @@ public partial class VirtualizedSmartScriptPanel
         
         var visibleRect = VisibleRect;
 
-        int index = 0;
         bool inGroup = false;
         bool groupIsExpanded = false;
         foreach (var e in script.Events)
@@ -94,30 +94,21 @@ public partial class VirtualizedSmartScriptPanel
             else
             {
                 if (inGroup && !groupIsExpanded)
-                {
-                    index += Math.Max(1, e.Actions.Count);
                     continue;
-                }
              
                 if (e.Actions.Count == 0)
                 {
-                    index++;
-                
                     if (!visibleRect.Intersects(e.EventPosition.ToRect()))
                         continue;
                 
                     double yPos = e.Position.Y;
 
-                    var ft = NumberCache.Get(index);
-                    context.DrawText(Brushes.DarkGray, new Point(PaddingLeft, yPos + 5), ft);
-                    DrawProblems(context, index, yPos);
+                    DrawProblems(context, e.VirtualLineId, new Point(0, yPos));
                 }
                 else
                 {
                     foreach (var a in e.Actions)
                     {
-                        index++;
-                        
                         if (a.Id == SmartConstants.ActionComment && HideComments)
                             continue;
 
@@ -126,20 +117,24 @@ public partial class VirtualizedSmartScriptPanel
                     
                         double yPos = a.Position.Y;
 
-                        var ft = NumberCache.Get(index);
-                        context.DrawText(Brushes.DarkGray, new Point(PaddingLeft, yPos + 5), ft);
-                        DrawProblems(context, index, yPos);
+                        float x = a.IsInInlineActionList ? 10 : 0;
+                        if (a.DestinationEventId is { } eventId)
+                        {
+                            var ft = NumberCache.Get(eventId);
+                            context.DrawText(Brushes.DarkGray, new Point(PaddingLeft + x, yPos + 5), ft);
+                        }
+                        DrawProblems(context, a.VirtualLineId, new Point(x, yPos));
                     }
                 }
             }
         }
     }
     
-    private void DrawProblems(DrawingContext dc, int index, double yPos)
+    private void DrawProblems(DrawingContext dc, int index, Point pos)
     {
         if (Problems != null && Problems.TryGetValue(index, out var severity))
         { 
-            dc.DrawText(severity is DiagnosticSeverity.Error or DiagnosticSeverity.Critical ? Brushes.Red : Brushes.Orange, new Point(PaddingLeft, yPos + 5 + 10), vvvvText);   
+            dc.DrawText(severity is DiagnosticSeverity.Error or DiagnosticSeverity.Critical ? Brushes.Red : Brushes.Orange, new Point(PaddingLeft + pos.X, pos.Y + 5 + 10), vvvvText);   
         }
     }
 

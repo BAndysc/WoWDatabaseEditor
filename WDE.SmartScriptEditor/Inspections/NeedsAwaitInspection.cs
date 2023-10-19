@@ -53,7 +53,7 @@ public class NeedsAwaitInspection : IEventInspection
             {
                 Severity = DiagnosticSeverity.Error,
                 Message = "Event contains a 'Loop', but no wait or await actions found. This will loop!",
-                Line = e.LineId
+                Line = e.VirtualLineId
             };
 
         return null;

@@ -20,7 +20,7 @@ namespace WDE.SmartScriptEditor.Inspections
                 return null;
             return new InspectionResult()
             {
-                Line = e.LineId,
+                Line = e.VirtualLineId,
                 Message = $"`{parameterName}` can not be 0.",
                 Severity = DiagnosticSeverity.Error
             };

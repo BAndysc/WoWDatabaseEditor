@@ -35,7 +35,7 @@ namespace WDE.SmartScriptEditor.Inspections
                         {
                             Severity = DiagnosticSeverity.Info,
                             Message = $"Parameter `{e.GetParameter(i).Name}` uses non existing flag {unknownFlag}",
-                            Line = e.LineId
+                            Line = e.VirtualLineId
                         }; 
                     }
                     
@@ -48,7 +48,7 @@ namespace WDE.SmartScriptEditor.Inspections
                         {
                             Severity = DiagnosticSeverity.Info,
                             Message = $"Parameter `{e.GetParameter(i).Name}` value out of range ({e.GetParameter(i).Value})",
-                            Line = e.LineId
+                            Line = e.VirtualLineId
                         };   
                     }
                 }

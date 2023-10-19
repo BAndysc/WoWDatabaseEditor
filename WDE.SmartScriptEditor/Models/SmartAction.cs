@@ -235,7 +235,9 @@ namespace WDE.SmartScriptEditor.Models
             se.ActionFlags = ActionFlags;
             se.DescriptionRules = DescriptionRules;
             //se.Conditions = Conditions?.ToList();
-            se.LineId = LineId;
+            se.VirtualLineId = VirtualLineId;
+            se.DestinationEventId = DestinationEventId;
+            se.IsInInlineActionList = IsInInlineActionList;
             se.CopyParameters(this);
             se.comment.Copy(comment);
             return se;
