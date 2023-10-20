@@ -24,7 +24,7 @@ public partial class VeryFastTableView
         }
     }
 
-    private bool IsFilteredRowVisible(ITableRowGroup group, ITableRow row, IRowFilterPredicate? filter, object? parameter)
+    protected bool IsFilteredRowVisible(ITableRowGroup group, ITableRow row, IRowFilterPredicate? filter, object? parameter)
     {
         if (filter == null)
             return group.IsExpanded;
@@ -67,6 +67,7 @@ public partial class VeryFastTableView
         int groupIndex = 0;
         for (var index = 0; index < Items.Count; index++)
         {
+            y += Items[index].MarginTop;
             var group = Items[index];
             var groupStartY = y;
             var headerHeight = GetTotalHeaderHeight(index);
@@ -314,6 +315,7 @@ public partial class VeryFastTableView
         for (var index = 0; index < Items.Count; index++)
         {
             var group = Items[index];
+            y += group.MarginTop;
             var groupStartY = y;
             var groupHeight = GetTotalHeaderHeight(index);
 

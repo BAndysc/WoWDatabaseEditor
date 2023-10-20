@@ -8,7 +8,7 @@ namespace AvaloniaStyles.Controls.FastTableView;
 
 public partial class VeryFastTableView
 {
-    private double GetTotalHeaderHeight(int index)
+    protected double GetTotalHeaderHeight(int index)
     {
         if (!IsGroupingEnabled)
             return 0;
@@ -19,7 +19,7 @@ public partial class VeryFastTableView
         return HeaderRowHeight + SubHeaderHeight;
     }
     
-    private double GetHeaderHeight(int index)
+    protected double GetHeaderHeight(int index)
     {
         if (!IsGroupingEnabled)
             return 0;
@@ -30,7 +30,7 @@ public partial class VeryFastTableView
         return HeaderRowHeight;
     }
 
-    private double GetSubheaderHeight(int index)
+    protected double GetSubheaderHeight(int index)
     {
         if (!IsGroupingEnabled)
             return 0;
@@ -52,6 +52,7 @@ public partial class VeryFastTableView
         int index = 0;
         foreach (var group in Items)
         {
+            height += group.MarginTop;
             height += GetTotalHeaderHeight(index++);
             if (group.IsExpanded)
             {

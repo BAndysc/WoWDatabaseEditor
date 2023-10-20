@@ -14,22 +14,22 @@ namespace AvaloniaStyles.Controls.FastTableView;
 
 public partial class VeryFastTableView : Panel, IKeyboardNavigationHandler, IFastTableContext
 {
-    private static double ColumnSpacing = 10;
-    private static double RowHeight = 28;
-    private static double HeaderRowHeight = 36;
-    private static double DrawingStartOffsetY = RowHeight;
-    private static ISolidColorBrush OddRowBackground = new SolidColorBrush(Colors.White);
-    private static ISolidColorBrush SelectedRowBackground = new SolidColorBrush(Color.FromRgb(87, 124, 219));
-    private static ISolidColorBrush EvenRowBackground = new SolidColorBrush(Color.FromRgb(240, 240, 240));
-    private static ISolidColorBrush HeaderBackground = new SolidColorBrush(Colors.White);
-    private static ISolidColorBrush HeaderPressedBackground = new SolidColorBrush(Colors.Gray);
-    private static ISolidColorBrush HeaderHoverBackground = new SolidColorBrush(Colors.LightGray);
-    private static IPen HeaderBorderBackground = new Pen(new SolidColorBrush(Color.FromRgb(220, 220, 220)), 1);
-    private static IPen BorderPen = new Pen(new SolidColorBrush(Colors.Black), 1);
-    private static IPen FocusPen = new Pen(new SolidColorBrush(Colors.Black), 2);
-    private static IPen FocusOuterPen = new Pen(new SolidColorBrush(Colors.White), 3);
-    private static ISolidColorBrush TextBrush = new SolidColorBrush(Color.FromRgb(41, 41, 41));
-    private static ISolidColorBrush FocusTextBrush = OddRowBackground;
+    protected static double ColumnSpacing = 10;
+    protected static double RowHeight = 28;
+    protected static double HeaderRowHeight = 36;
+    protected static double DrawingStartOffsetY = RowHeight;
+    protected static ISolidColorBrush OddRowBackground = new SolidColorBrush(Colors.White);
+    protected static ISolidColorBrush SelectedRowBackground = new SolidColorBrush(Color.FromRgb(87, 124, 219));
+    protected static ISolidColorBrush EvenRowBackground = new SolidColorBrush(Color.FromRgb(240, 240, 240));
+    protected static ISolidColorBrush HeaderBackground = new SolidColorBrush(Colors.White);
+    protected static ISolidColorBrush HeaderPressedBackground = new SolidColorBrush(Colors.Gray);
+    protected static ISolidColorBrush HeaderHoverBackground = new SolidColorBrush(Colors.LightGray);
+    protected static IPen HeaderBorderBackground = new Pen(new SolidColorBrush(Color.FromRgb(220, 220, 220)), 1);
+    protected static IPen BorderPen = new Pen(new SolidColorBrush(Colors.Black), 1);
+    protected static IPen FocusPen = new Pen(new SolidColorBrush(Colors.Black), 2);
+    protected static IPen FocusOuterPen = new Pen(new SolidColorBrush(Colors.White), 3);
+    protected static ISolidColorBrush TextBrush = new SolidColorBrush(Color.FromRgb(41, 41, 41));
+    protected static ISolidColorBrush FocusTextBrush = OddRowBackground;
 
     public int ColumnsCount => Columns?.Count ?? 0;
 
@@ -511,6 +511,7 @@ public partial class VeryFastTableView : Panel, IKeyboardNavigationHandler, IFas
             if (i == cursor.GroupIndex)
                 rowsInGroup = cursor.RowIndex;
 
+            y += Items[i].MarginTop;
             y += GetTotalHeaderHeight(i);
             
             if (Items[i].IsExpanded)
@@ -531,7 +532,7 @@ public partial class VeryFastTableView : Panel, IKeyboardNavigationHandler, IFas
         return y;
     }
 
-    private ScrollViewer? ScrollViewer => this.FindAncestorOfType<ScrollViewer>();
+    protected ScrollViewer? ScrollViewer => this.FindAncestorOfType<ScrollViewer>();
 
     private bool IsRowVisible(VerticalCursor row, ScrollViewer? scroll = null)
     {

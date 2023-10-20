@@ -5,8 +5,8 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate>
-                    <Grid Background="{TemplateBinding Background}" VerticalAlignment="Center" DockPanel.Dock="Top" ColumnDefinitions="15,Auto,Auto,*,Auto">
-                        <Rectangle Margin="0,7,0,0"/>
+                    <DockPanel Background="{TemplateBinding Background}" VerticalAlignment="Center" Dock="Top" LastChildFill="True">
+                        <Rectangle Margin="0,7,0,0" Width="15" />
                         <ContentPresenter Content="{TemplateBinding CustomContent}" Grid.Column="1" Padding="3" 
                                           Margin="0,5,0,0" />
                         <ContentPresenter Content="{TemplateBinding GroupName}" 
@@ -14,10 +14,20 @@
                                           Grid.Column="2" Padding="0,3,3,3" 
                                           Margin="0,5,0,0">
                         </ContentPresenter>
-                        <Rectangle Grid.Column="3" Margin="0,7,0,0"  />
-                        <ContentPresenter Content="{TemplateBinding CustomRightContent}" Grid.Column="4" Padding="3" 
-                                          Margin="0,5,0,0" />
-                        <Grid.Styles>
+
+                        <ContentPresenter Content="{TemplateBinding CustomRightContent}" Padding="3" 
+                                          Margin="0,5,0,0" 
+                                          DockPanel.Dock="Right"
+                                          />
+                        
+                        <Grid ColumnDefinitions="5,Auto,*" ClipToBounds="True">
+                            <Rectangle Grid.Column="0" Margin="0,7,0,0"  />
+                            <ContentPresenter Content="{TemplateBinding CustomCenterContent}" Grid.Column="1" Padding="3" 
+                                              Margin="0,5,0,0" />
+                            <Rectangle Grid.Column="2" Margin="0,7,0,0"  />
+                        </Grid>
+                        <!-- fill -->
+                        <DockPanel.Styles>
                             <Style Selector="TextBlock">
                                 <Setter Property="FontWeight" Value="Bold" />
                                 <Setter Property="Foreground" Value="{DynamicResource GroupingHeaderColor}"/>
@@ -26,8 +36,8 @@
                                 <Setter Property="Height" Value="1" />
                                 <Setter Property="Fill" Value="{DynamicResource GroupingHeaderColor}"></Setter>
                             </Style>
-                        </Grid.Styles>
-                    </Grid>
+                        </DockPanel.Styles>
+                    </DockPanel>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

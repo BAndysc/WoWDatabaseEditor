@@ -39,7 +39,7 @@ namespace WDE.DatabaseEditors
                 var factory = containerProvider.Resolve<IParameterFactory>();
                 factory.Register("CreatureTextTextStringParameter", containerProvider.Resolve<CreatureTextWithFallback>());
                 factory.Register("GossipOptionTextStringParameter", containerProvider.Resolve<GossipOptionTextWithFallback>());
-                factory.Register("BroadcastTextOnlyPickerParameter", containerProvider.Resolve<BroadcastTextParameter>());
+                factory.Register("BroadcastTextOnlyPickerParameter", containerProvider.Resolve<BroadcastTextOnlyPickerParameter>());
                 factory.Register("BroadcastTextParameter", containerProvider.Resolve<BroadcastTextParameter>());
                 factory.RegisterDepending("CreatureTemplateSpellListIdParameter", "CreatureParameter", (a) => new CreatureTemplateSpellListIdParameter(a, parameterPickerService));
                 factory.RegisterDepending("DbScriptRandomTemplateTargetValueParameter", "BroadcastTextParameter", bcast => new DbScriptRandomTemplateTargetValueParameter(containerProvider.Resolve<IParameterPickerService>(), bcast));

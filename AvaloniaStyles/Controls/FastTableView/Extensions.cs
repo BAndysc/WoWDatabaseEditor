@@ -12,6 +12,11 @@ internal static class Extensions
             outT = t;
             return true;
         }
+        if (Application.Current!.Resources.TryGetResource(key, out var res2) && res2 is T t2)
+        {
+            outT = t2;
+            return true;
+        }
         return false;
     }
 }

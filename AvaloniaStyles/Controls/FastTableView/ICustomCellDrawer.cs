@@ -34,6 +34,7 @@ public abstract class BaseCustomCellDrawer : ICustomCellDrawer
     private static IPen ButtonBackgroundDisabledPen = new Pen(new SolidColorBrush(Color.FromRgb(170, 170, 170)), 0);
     private static ISolidColorBrush TextBrush = new SolidColorBrush(Color.FromRgb(41, 41, 41));
     private static ISolidColorBrush FocusTextBrush = new SolidColorBrush(Colors.White);
+    private static FontFamily MonoFont = FontFamily.Default;
 
     protected Point mouseCursor;
     protected bool leftPressed;
@@ -50,6 +51,7 @@ public abstract class BaseCustomCellDrawer : ICustomCellDrawer
         ButtonBackgroundDisabledPen.GetResource("FastTableView.ButtonBackgroundDisabledPen", ButtonBackgroundDisabledPen, out ButtonBackgroundDisabledPen);
         TextBrush.GetResource("FastTableView.TextBrush", TextBrush, out TextBrush);
         FocusTextBrush.GetResource("FastTableView.FocusTextBrush", FocusTextBrush, out FocusTextBrush);
+        MonoFont.GetResource("MonoFont", MonoFont, out MonoFont);
     }
 
     public bool UpdateCursor(Point point, bool leftPressed)
@@ -59,16 +61,16 @@ public abstract class BaseCustomCellDrawer : ICustomCellDrawer
         return true;
     }
 
-    protected void DrawText(DrawingContext context, Rect rect, string text, Color? color = null)
+    protected void DrawText(DrawingContext context, Rect rect, string text, Color? color = null, float opacity = 0.4f)
     {
         var ft = new FormattedText
         {
             Text = text,
             Constraint = new Size(rect.Width, rect.Height),
-            Typeface = Typeface.Default,
+            Typeface = new Typeface(MonoFont),//Typeface.Default,
             FontSize = 12
         };
-        var textColor = new SolidColorBrush(color ?? TextBrush.Color, 0.4f);
+        var textColor = new SolidColorBrush(color ?? TextBrush.Color, opacity);
         context.DrawText(textColor, new Point(rect.X, rect.Center.Y - ft.Bounds.Height / 2), ft);
     }
 

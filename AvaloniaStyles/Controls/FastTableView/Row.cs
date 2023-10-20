@@ -15,6 +15,7 @@ public interface ITableRowGroup
     public IReadOnlyList<ITableRow> Rows { get; }
     event Action<ITableRowGroup, ITableRow>? RowChanged;
     event Action<ITableRowGroup>? RowsChanged;
+    double MarginTop => 0;
 }
 
 public interface ITableRow
