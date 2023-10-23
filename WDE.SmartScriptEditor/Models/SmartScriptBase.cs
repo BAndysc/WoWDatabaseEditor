@@ -145,7 +145,12 @@ namespace WDE.SmartScriptEditor.Models
 
         private class NestedEventIds
         {
-            private List<int> stack = new List<int>() { 1 };
+            private List<int> stack = new List<int>();
+
+            public NestedEventIds(int initial)
+            {
+                stack.Add(initial);
+            }
 
             public int Next() => stack[^1]++;
 
@@ -163,7 +168,7 @@ namespace WDE.SmartScriptEditor.Models
         private void RenumerateEvents()
         {
             int virtualLineId = 1;
-            NestedEventIds eventId = new NestedEventIds();
+            NestedEventIds eventId = new NestedEventIds(GlobalVariables.Count + 1);
             foreach (var e in Events)
             {
                 if (e.IsGroup)
