@@ -632,7 +632,7 @@ namespace WDE.Parameters
                     if (broadcastText != null)
                         text = broadcastText.FirstText();
                 }
-                Items.Add(item.Id, new SelectOption(text ?? ""));
+                Items.Add(item.Id, new SelectOption(text?.Replace("\n", "\\n") ?? ""));
             }
         }
 
