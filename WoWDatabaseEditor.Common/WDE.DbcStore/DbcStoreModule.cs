@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Prism.Events;
@@ -45,6 +46,7 @@ namespace WDE.DbcStore
                     {
                         var factory = containerProvider.Resolve<IParameterFactory>();
                         factory.RegisterCombined("ItemParameter", "ItemDbcParameter", "ItemDatabaseParameter", (dbc, db) => new ItemParameter(dbc, db), QuickAccessMode.Limited);
+                        factory.RegisterCombined("ItemCurrencyParameter", "ItemParameter", "CurrencyTypeParameter", (items, currencies) => new ItemOrCurrencyParameter(items, currencies), QuickAccessMode.None);
                     },
                     ThreadOption.PublisherThread,
                     true);
@@ -110,6 +112,26 @@ namespace WDE.DbcStore
                 if (db.Items != null)
                 {
                     foreach (var i in db.Items)
+                        Items[i.Key] = i.Value;
+                }
+            }
+        }
+        
+        internal class ItemOrCurrencyParameter : ParameterNumbered, IItemParameter
+        {
+            public ItemOrCurrencyParameter(IParameter<long> items, IParameter<long> currencies)
+            {
+                Items = new();
+            
+                if (currencies.Items != null)
+                {
+                    foreach (var i in currencies.Items.Reverse())
+                        Items[-i.Key] = i.Value;
+                }
+                
+                if (items.Items != null)
+                {
+                    foreach (var i in items.Items)
                         Items[i.Key] = i.Value;
                 }
             }

@@ -57,7 +57,7 @@ public class QuestObjectiveByStorageIndexParameter : IAsyncContextualParameter<l
              case QuestObjectiveType.Currency:
              case QuestObjectiveType.HaveCurrency:
              case QuestObjectiveType.ObtainCurrency:
-                 var currencyParameter = parameterFactory.Factory("CurrencyParameter");
+                 var currencyParameter = parameterFactory.Factory("CurrencyTypeParameter");
                  return "Get " + currencyParameter.ToString(questObjective.ObjectId, ToStringOptions.WithoutNumber);
              case QuestObjectiveType.LearnSpell:
                  var spellParameter = parameterFactory.Factory("SpellParameter");
