@@ -135,6 +135,17 @@ namespace WDE.DbcStore
                         Items[i.Key] = i.Value;
                 }
             }
+
+            public override string ToString(long key, ToStringOptions options)
+            {
+                if (options.withNumber)
+                    return ToString(key);
+
+                if (Items != null && Items.TryGetValue(key, out var option))
+                    return option.Name;
+                
+                return "";
+            }
         }
     }
 }

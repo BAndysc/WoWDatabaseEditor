@@ -241,7 +241,7 @@ internal class LegionDbcLoader : BaseDbcLoader
         Load("CurrencyTypes.db2", data.CurrencyTypes, row => 
             new CurrencyType()
             {
-                Id = row.GetInt(0),
+                Id = row.GetUInt(0),
                 Name = row.GetString(1),
                 Description = row.GetString(2),
                 MaxQuantity = row.GetUInt(3),
@@ -250,7 +250,7 @@ internal class LegionDbcLoader : BaseDbcLoader
                 CategoryId = (byte)row.GetUShort(6),
                 SpellCategory = (byte)row.GetUShort(7),
                 Quality = (byte)row.GetUShort(8),
-                InventoryIconFileId = row.GetInt(9),
+                InventoryIconFileId = row.GetUInt(9),
                 SpellWeight = row.GetUInt(10),
             });
         Load("GarrTalent.db2", 7, 0, data.GarrisonTalentStore);
@@ -324,6 +324,21 @@ internal class LegionDbcLoader : BaseDbcLoader
                 Id = row.Key,
                 HordeCreatureEntry = row.GetUInt(3),
                 AllianceCreatureEntry = row.GetUInt(4)
+            });
+        });
+        Load("ItemDisplayInfo.db2", row =>
+        {
+            data.ItemDisplayInfos.Add(new ItemDisplayInfoEntry()
+            {
+                Id = row.GetUInt(0)
+            });
+        });
+        Load("Item.db2", row =>
+        {
+            data.Items.Add(new DbcItemEntry()
+            {
+                Id = row.GetUInt(0),
+                InventoryIconFileDataId = row.GetUInt(1)
             });
         });
     }

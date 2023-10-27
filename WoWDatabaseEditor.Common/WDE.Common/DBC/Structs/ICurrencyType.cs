@@ -2,7 +2,7 @@ namespace WDE.Common.DBC.Structs;
 
 public interface ICurrencyType
 {
-    int Id { get; }
+    uint Id { get; }
     string Name { get; }
     string Description { get; }
     uint MaxQuantity { get; }
@@ -11,14 +11,18 @@ public interface ICurrencyType
     byte CategoryId { get; }
     byte SpellCategory { get; }
     byte Quality { get; }
-    int InventoryIconFileId { get; }
+    string? InventoryIconPath { get; }
+    uint? InventoryIconFileId { get; }
     uint SpellWeight { get; }
     ICurrencyCategory? Category { get; }
+    
+    bool UsesFileId => InventoryIconFileId.HasValue;
+    bool UsesFilePath => InventoryIconPath != null;
 }
 
 public class CurrencyType : ICurrencyType
 {
-    public int Id { get; init; }
+    public uint Id { get; init; }
     public string Name { get; init; } = "";
     public string Description { get; init; } = "";
     public uint MaxQuantity { get; init; }
@@ -27,7 +31,8 @@ public class CurrencyType : ICurrencyType
     public byte CategoryId { get; init; }
     public byte SpellCategory { get; init; }
     public byte Quality { get; init; }
-    public int InventoryIconFileId { get; init; }
+    public string? InventoryIconPath { get; init; }
+    public uint? InventoryIconFileId { get; init; }
     public uint SpellWeight { get; init; }
     public ICurrencyCategory? Category { get; set; }
 }

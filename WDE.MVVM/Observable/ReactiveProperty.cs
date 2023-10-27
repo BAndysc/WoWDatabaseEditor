@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("WDE.MVVM.Test")]
 namespace WDE.MVVM.Observable
 {
-    public class ReactiveProperty<T> : IObservable<T>, System.IDisposable
+    public class ReactiveProperty<T> : IReadOnlyReactiveProperty<T>, System.IDisposable
     {
         private readonly IEqualityComparer<T> comparer;
         private bool isFinished;

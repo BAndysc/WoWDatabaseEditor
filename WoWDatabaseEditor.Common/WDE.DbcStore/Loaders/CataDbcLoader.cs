@@ -45,7 +45,7 @@ internal class CataDbcLoader : BaseDbcLoader
             data.FactionTemplates.Add(template);
             data.FactionTemplateStore[row.GetUInt(0)] = row.GetUInt(1);
         });
-        Load("CurrencyTypes.db2", 0, 2, data.CurrencyTypeStore);
+        Load("CurrencyTypes.dbc", 0, 2, data.CurrencyTypeStore);
         Load("Spell.dbc", 0, 21, data.SpellStore);
         Load("Movie.dbc", 0, 1, data.MovieStore);
         Load("Map.dbc", row =>
@@ -101,7 +101,14 @@ internal class CataDbcLoader : BaseDbcLoader
         Load("TaxiPath.dbc",  row => data.TaxiPathsStore.Add(row.GetUInt(0), (row.GetInt(1), row.GetInt(2))));
         Load("SpellItemEnchantment.dbc", 0, 14, data.SpellItemEnchantmentStore);
         Load("AreaGroup.dbc",  row => data.AreaGroupStore.Add(row.GetUInt(0), BuildAreaGroupName(data, row, 1, 6)));
-        Load("ItemDisplayInfo.dbc", 0, 5, data.ItemDisplayInfoStore);
+        Load("ItemDisplayInfo.dbc", row =>
+        {
+            data.ItemDisplayInfos.Add(new ItemDisplayInfoEntry()
+            {
+                Id = row.GetUInt(0),
+                InventoryIconPath = row.GetString(5)
+            });
+        });
         Load("MailTemplate.dbc", row =>
         {
             var subject = row.GetString(1);
@@ -127,12 +134,11 @@ internal class CataDbcLoader : BaseDbcLoader
         Load("Achievement_Criteria.dbc", 0, 10, data.AchievementCriteriaStore);
         Load("Item.dbc", row =>
         {
-            var id = row.GetUInt(0);
-            var displayId = row.GetUInt(5);
-            if (data.ItemDisplayInfoStore.TryGetValue(displayId, out var name))
-                data.ItemDbcStore[id] = name;
-            else
-                data.ItemDbcStore[id] = "Item " + id;
+            data.Items.Add(new DbcItemEntry()
+            {
+                Id = row.GetUInt(0),
+                DisplayInfoId = row.GetUInt(5)
+            });
         });
         Load("LockType.dbc", 0, 1, data.LockTypeStore);
         LoadAndRegister(data, "SpellCastTimes.dbc", "SpellCastTimeParameter", 0, row => GetCastTimeDescription(row.GetInt(1), row.GetInt(2), row.GetInt(3)));

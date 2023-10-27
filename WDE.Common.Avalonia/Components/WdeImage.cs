@@ -52,6 +52,8 @@ namespace WDE.Common.Avalonia.Components
             var bitmap = LoadBitmap(img);
             if (bitmap != null)
                 d.SetValue(SourceProperty, bitmap);
+            else
+                d.ClearValue(SourceProperty);
 
             return img;
         }

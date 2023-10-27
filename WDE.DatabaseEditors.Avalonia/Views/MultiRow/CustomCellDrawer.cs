@@ -77,7 +77,15 @@ public class CustomCellDrawer : BaseCustomCellDrawer, ICustomCellDrawer
         bool drawIcon = false;
         if (cell.ParameterValue?.BaseParameter is IItemParameter && cell.TableField is DatabaseField<long> longField)
         {
-            icn = itemIconService.GetIcon((uint)longField.Current.Value);
+            if (!itemIconService.GetCachedItemIcon((uint)longField.Current.Value, out icn))
+            {
+                async Task FetchAsync()
+                {
+                    await itemIconService.GetIcon((int)longField.Current.Value);
+                    table.InvalidateVisual();
+                }
+                FetchAsync().ListenErrors();
+            }
             drawIcon = true;
         }
         else if (cell.ParameterValue?.BaseParameter is ISpellParameter && cell.TableField is DatabaseField<long> longSpellField)

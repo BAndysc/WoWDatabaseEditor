@@ -40,7 +40,6 @@ public class DbcData
     public Dictionary<long, (int, int)> TaxiPathsStore { get; internal set;} = new();
     public Dictionary<long, string> SpellItemEnchantmentStore { get; internal set;} = new();
     public Dictionary<long, string> AreaGroupStore { get; internal set;} = new();
-    public Dictionary<long, string> ItemDisplayInfoStore { get; internal set;} = new();
     public Dictionary<long, string> MailTemplateStore { get; internal set;} = new();
     public Dictionary<long, string> LFGDungeonStore { get; internal set;} = new();
     public Dictionary<long, string> ItemSetStore { get; internal set;} = new();
@@ -50,7 +49,7 @@ public class DbcData
     public Dictionary<long, string> WorldSafeLocsStore { get; internal set;} = new();
     public Dictionary<long, string> BattlegroundStore { get; internal set;} = new();
     public Dictionary<long, string> AchievementCriteriaStore { get; internal set;} = new();
-    public Dictionary<long, string> ItemDbcStore { get; internal set;} = new(); // item.dbc, not item-sparse.dbc
+    //public Dictionary<long, string> ItemDbcStore { get; internal set;} = new(); // item.dbc, not item-sparse.dbc
     public Dictionary<long, string> SceneStore { get; internal set;} = new();
     public Dictionary<long, string> ScenarioStore { get; internal set;} = new();
     public Dictionary<long, string> ScenarioStepStore { get; internal set;} = new();
@@ -82,4 +81,6 @@ public class DbcData
     public List<CharShipmentContainerEntry> CharShipmentContainers { get; } = new();
     public List<GarrisonFollowerEntry> GarrisonFollowers { get; } = new();
     public List<CharShipmentEntry> CharShipments { get; } = new();
+    public List<ItemDisplayInfoEntry> ItemDisplayInfos { get; } = new();
+    public List<DbcItemEntry> Items { get; } = new();
 }

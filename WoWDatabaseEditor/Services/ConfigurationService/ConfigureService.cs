@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Linq;
 using AsyncAwaitBestPractices.MVVM;
+using WDE.Common;
 using WDE.Common.Managers;
 using WDE.Common.Services;
 using WDE.Common.Utils;
@@ -23,7 +25,7 @@ namespace WoWDatabaseEditorCore.Services.ConfigurationService
             this.settings = settings;
         }
 
-        public void ShowSettings()
+        private void ShowSettings(Type? panelToOpen)
         {
             if (openedPanel == null)
             {
@@ -36,8 +38,16 @@ namespace WoWDatabaseEditorCore.Services.ConfigurationService
                     openedPanel = null;
                 });
             }
+
+            if (panelToOpen != null &&
+                openedPanel.ContainerTabItems.FirstOrDefault(x => x.GetType() == panelToOpen) is { } configurable)
+                openedPanel.SelectedTabItem = configurable;
             
             documentManager.OpenDocument(openedPanel);
         }
+
+        public void ShowSettings() => ShowSettings(null);
+        
+        public void ShowSettings<T>() where T : IConfigurable => ShowSettings(typeof(T));
     }
 }

@@ -23,6 +23,7 @@
                         <Grid ColumnDefinitions="5,Auto,*" ClipToBounds="True">
                             <Rectangle Grid.Column="0" Margin="0,7,0,0"  />
                             <ContentPresenter Content="{TemplateBinding CustomCenterContent}" Grid.Column="1" Padding="3" 
+                                              IsVisible="{TemplateBinding CustomCenterContent, Converter={x:Static ObjectConverters.IsNotNull}}"
                                               Margin="0,5,0,0" />
                             <Rectangle Grid.Column="2" Margin="0,7,0,0"  />
                         </Grid>

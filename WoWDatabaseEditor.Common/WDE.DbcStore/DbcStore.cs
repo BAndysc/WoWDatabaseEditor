@@ -27,7 +27,7 @@ using WDE.DbcStore.Spells.Wrath;
 using WDE.DbcStore.Structs;
 using WDE.Module.Attributes;
 using WDE.MVVM.Observable;
-
+    
 namespace WDE.DbcStore
 {
     public enum DBCVersions
@@ -62,7 +62,7 @@ namespace WDE.DbcStore
 
     [AutoRegister]
     [SingleInstance]
-    public class DbcStore : IDbcStore, IDbcSpellService, IMapAreaStore, IFactionTemplateStore, IGarrMissionStore
+    public class DbcStore : IDbcStore, IDbcSpellService, IMapAreaStore, IFactionTemplateStore, IGarrMissionStore, IItemStore
     {
         private readonly IDbcSettingsProvider dbcSettingsProvider;
         private readonly IMessageBoxService messageBoxService;
@@ -150,6 +150,18 @@ namespace WDE.DbcStore
         public FactionTemplate? GetFactionTemplate(uint templateId) => FactionTemplateById.TryGetValue(templateId, out var faction) ? faction : null;
         public Faction? GetFaction(ushort factionId) => FactionsById.TryGetValue(factionId, out var faction) ? faction : null;
         
+        public IReadOnlyList<IItemDisplayInfo> ItemDisplayInfos { get; internal set; } = Array.Empty<IItemDisplayInfo>();
+        public Dictionary<uint, ItemDisplayInfoEntry> ItemDisplayInfosById { get; internal set; } = new();
+        public IItemDisplayInfo? GetItemDisplayInfoById(uint id) => ItemDisplayInfosById.TryGetValue(id, out var item) ? item : null;
+        
+        public IReadOnlyList<IDbcItem> Items { get; internal set; } = Array.Empty<IDbcItem>();
+        public Dictionary<uint, DbcItemEntry> ItemsById { get; internal set; } = new();
+        public IDbcItem? GetItemById(uint id) => ItemsById.TryGetValue(id, out var item) ? item : null;
+
+        public IReadOnlyList<ICurrencyType> CurrencyTypes { get; internal set; } = Array.Empty<ICurrencyType>();
+        public Dictionary<uint, CurrencyType> CurrencyTypeById { get; internal set; } = new();
+        public ICurrencyType? GetCurrencyTypeById(uint id) => CurrencyTypeById.TryGetValue(id, out var currency) ? currency : null;
+        
         public IReadOnlyList<ICharShipment> CharShipments { get; set; } = Array.Empty<ICharShipment>();
         
         internal void Load()
@@ -225,6 +237,17 @@ namespace WDE.DbcStore
                 store.Factions = data.Factions;
                 store.FactionsById = data.Factions.ToDictionary(a => a.FactionId, a => a);
                 store.CharShipments = data.CharShipments;
+                store.ItemDisplayInfos = data.ItemDisplayInfos;
+                store.ItemDisplayInfosById = data.ItemDisplayInfos.ToDictionary(a => a.Id, a => a);
+                store.Items = data.Items;
+                store.ItemsById = data.Items.ToDictionary(a => a.Id, a => a);
+                store.Items.Each(x =>
+                {
+                    if (store.GetItemDisplayInfoById(x.DisplayInfoId) is { } displayInfo)
+                        x.DisplayInfo = displayInfo;
+                });
+                store.CurrencyTypes = data.CurrencyTypes;
+                store.CurrencyTypeById = data.CurrencyTypes.ToDictionary(a => a.Id, a => a);
 
                 var currencyCategoryById = data.CurrencyCategories.ToDictionary(x => x.Id, x => x);
                 foreach (var curr in data.CurrencyTypes)
@@ -232,8 +255,6 @@ namespace WDE.DbcStore
                     if (currencyCategoryById.TryGetValue(curr.CategoryId, out var category))
                         curr.Category = category;
                 }
-                
-                var currenciesById = data.CurrencyTypes.ToDictionary(x => x.Id, x => x);
                 
                 var uiTextureById = data.UiTextureKits.ToDictionary(x => x.Id, x => x);
                 var garrMissionTypeById = data.GarrMissionTypes.ToDictionary(x => x.Id, x => x);
@@ -245,7 +266,7 @@ namespace WDE.DbcStore
                     if (garrMissionTypeById.TryGetValue(mission.GarrMissionTypeId, out var type))
                         mission.GarrMissionType = type;
                     
-                    if (currenciesById.TryGetValue(mission.MissionCostCurrencyTypeId, out var currency))
+                    if (store.CurrencyTypeById.TryGetValue(mission.MissionCostCurrencyTypeId, out var currency))
                         mission.MissionCostCurrencyType = currency;
                 }
                 
@@ -300,7 +321,6 @@ namespace WDE.DbcStore
                 parameterFactory.Register("TaxiNodeParameter", new DbcParameter(data.TaxiNodeStore));
                 parameterFactory.Register("SpellItemEnchantmentParameter", new DbcParameter(data.SpellItemEnchantmentStore));
                 parameterFactory.Register("AreaGroupParameter", new DbcParameter(data.AreaGroupStore));
-                parameterFactory.Register("ItemDisplayInfoParameter", new DbcParameter(data.ItemDisplayInfoStore));
                 parameterFactory.Register("MailTemplateParameter", new DbcParameter(data.MailTemplateStore));
                 parameterFactory.Register("LFGDungeonParameter", new DbcParameter(data.LFGDungeonStore));
                 parameterFactory.Register("ItemSetParameter", new DbcParameter(data.ItemSetStore));
@@ -309,7 +329,6 @@ namespace WDE.DbcStore
                 parameterFactory.Register("WorldSafeLocParameter", new DbcParameter(data.WorldSafeLocsStore));
                 parameterFactory.Register("BattlegroundParameter", new DbcParameter(data.BattlegroundStore));
                 parameterFactory.Register("AchievementCriteriaParameter", new DbcParameter(data.AchievementCriteriaStore));
-                parameterFactory.Register("ItemVisualParameter", new DbcParameter(data.ItemDbcStore));
                 parameterFactory.Register("SceneScriptParameter", new DbcParameter(data.SceneStore));
                 parameterFactory.Register("ScenarioParameter", new DbcParameter(data.ScenarioStore));
                 parameterFactory.Register("ScenarioStepParameter", new DbcParameter(data.ScenarioStepStore));
@@ -330,6 +349,7 @@ namespace WDE.DbcStore
                 parameterFactory.Register("LockParameter", new WoWToolsParameter("lock", store.currentCoreVersion, store.windowManager));
                 parameterFactory.Register("WorldMapAreaParameter", new DbcParameter(data.WorldMapAreaStore));
                 parameterFactory.Register("ConversationLineParameter", new DbcParameter(data.ConversationLineStore));
+                parameterFactory.Register("ItemVisualParameter", new ItemVisualParameter(store));
 
                 parameterFactory.RegisterCombined("CharShipmentParameter", "SpellParameter", "CreatureParameter", "ItemParameter",
                     (spells, creatures, items) => new CharShipmentParameter(dataPicker, store.CharShipments, spells, creatures, items), QuickAccessMode.Limited);
@@ -910,6 +930,18 @@ namespace WDE.DbcStore
             Items = new Dictionary<long, SelectOption>();
             foreach (int key in storage.Keys)
                 Items.Add(1L << (key + offset), new SelectOption(storage[key]));
+        }
+    }
+
+    public class ItemVisualParameter : ParameterNumbered
+    {
+        public ItemVisualParameter(IItemStore store)
+        {
+            Items = new Dictionary<long, SelectOption>();
+            foreach (var item in store.Items)
+            {
+                Items[item.Id] = new SelectOption(item.DisplayInfo?.InventoryIconPath ?? "Item " + item.Id);
+            }
         }
     }
 
