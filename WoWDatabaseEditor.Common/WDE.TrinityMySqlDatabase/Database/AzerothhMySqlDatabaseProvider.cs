@@ -44,6 +44,11 @@ public class AzerothhMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvider<Az
         return await model.CreatureTemplate.OrderBy(t => t.Entry).ToListAsync<ICreatureTemplate>();
     }
 
+    public override async Task<IReadOnlyList<ICreatureTemplateDifficulty>> GetCreatureTemplateDifficulties(uint entry)
+    {
+        return Array.Empty<ICreatureTemplateDifficulty>();
+    }
+
     public override async Task<List<IGossipMenuOption>> GetGossipMenuOptionsAsync(uint menuId)
     {
         await using var model = Database();
@@ -359,5 +364,26 @@ public class AzerothhMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvider<Az
             }
         }
         return await model.SmartScript.Where(predicate).ToListAsync<ISmartScriptLine>();    
+    }
+    
+    public override async Task<(IReadOnlyList<ICreatureTemplate>, IReadOnlyList<ICreatureTemplateDifficulty>)> GetCreatureLootCrossReference(uint lootId)
+    {
+        await using var database = Database();
+        var creatures = await database.CreatureTemplate.Where(x => x.LootId == lootId).ToListAsync();
+        return (creatures, Array.Empty<ICreatureTemplateDifficulty>());
+    }
+
+    public override async Task<(IReadOnlyList<ICreatureTemplate>, IReadOnlyList<ICreatureTemplateDifficulty>)> GetCreatureSkinningLootCrossReference(uint lootId)
+    {
+        await using var database = Database();
+        var creatures = await database.CreatureTemplate.Where(x => x.SkinningLootId == lootId).ToListAsync();
+        return (creatures, Array.Empty<ICreatureTemplateDifficulty>());
+    }
+
+    public override async Task<(IReadOnlyList<ICreatureTemplate>, IReadOnlyList<ICreatureTemplateDifficulty>)> GetCreaturePickPocketLootCrossReference(uint lootId)
+    {
+        await using var database = Database();
+        var creatures = await database.CreatureTemplate.Where(x => x.PickpocketLootId == lootId).ToListAsync();
+        return (creatures, Array.Empty<ICreatureTemplateDifficulty>());
     }
 }

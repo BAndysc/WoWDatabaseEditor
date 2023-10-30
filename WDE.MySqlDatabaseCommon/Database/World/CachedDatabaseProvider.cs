@@ -191,6 +191,11 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             return null;
         }
 
+        public Task<IReadOnlyList<ICreatureTemplateDifficulty>> GetCreatureTemplateDifficulties(uint entry)
+        {
+            return nonCachedDatabase.GetCreatureTemplateDifficulties(entry);
+        }
+
         public async Task<IGameObjectTemplate?> GetGameObjectTemplate(uint entry)
         {
             await WaitForCache();
@@ -505,6 +510,24 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public Task<IReadOnlyList<IMangosCreatureMovementTemplate>?> GetMangosCreatureMovementTemplate(uint entry, uint? pathId) => WaitForCache(nonCachedDatabase.GetMangosCreatureMovementTemplate(entry, pathId));
         
         public Task<IMangosWaypointsPathName?> GetMangosPathName(uint pathId) => WaitForCache(nonCachedDatabase.GetMangosPathName(pathId));
+
+        public Task<IReadOnlyList<ILootEntry>> GetLoot(LootSourceType type, uint entry) => nonCachedDatabase.GetLoot(type, entry);
+
+        public Task<IReadOnlyList<ILootEntry>> GetLoot(LootSourceType type) => nonCachedDatabase.GetLoot(type);
+
+        public Task<ILootTemplateName?> GetLootTemplateName(LootSourceType type, uint entry) => nonCachedDatabase.GetLootTemplateName(type, entry);
+        
+        public Task<IReadOnlyList<ILootTemplateName>> GetLootTemplateName(LootSourceType type) => nonCachedDatabase.GetLootTemplateName(type);
+
+        public Task<(IReadOnlyList<ICreatureTemplate>, IReadOnlyList<ICreatureTemplateDifficulty>)> GetCreatureLootCrossReference(uint lootId) => nonCachedDatabase.GetCreatureLootCrossReference(lootId);
+
+        public Task<(IReadOnlyList<ICreatureTemplate>, IReadOnlyList<ICreatureTemplateDifficulty>)> GetCreatureSkinningLootCrossReference(uint lootId) => nonCachedDatabase.GetCreatureSkinningLootCrossReference(lootId);
+
+        public Task<(IReadOnlyList<ICreatureTemplate>, IReadOnlyList<ICreatureTemplateDifficulty>)> GetCreaturePickPocketLootCrossReference(uint lootId) => nonCachedDatabase.GetCreaturePickPocketLootCrossReference(lootId);
+
+        public Task<IReadOnlyList<IGameObjectTemplate>> GetGameObjectLootCrossReference(uint lootId) => nonCachedDatabase.GetGameObjectLootCrossReference(lootId);
+
+        public Task<IReadOnlyList<ILootEntry>> GetReferenceLootCrossReference(uint lootId) => nonCachedDatabase.GetReferenceLootCrossReference(lootId);
 
         public Task<List<IEventScriptLine>> GetEventScript(EventScriptType type, uint id) => WaitForCache(nonCachedDatabase.GetEventScript(type, id));
 

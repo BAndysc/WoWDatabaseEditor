@@ -19,6 +19,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public ICreatureTemplate? GetCachedCreatureTemplate(uint entry) => impl.GetCachedCreatureTemplate(entry);
 
         public IReadOnlyList<ICreatureTemplate> GetCreatureTemplates() => impl.GetCreatureTemplates();
+        public Task<IReadOnlyList<ICreatureTemplateDifficulty>> GetCreatureTemplateDifficulties(uint entry) => impl.GetCreatureTemplateDifficulties(entry);
+
         public Task<IGameObjectTemplate?> GetGameObjectTemplate(uint entry) => impl.GetGameObjectTemplate(entry);
         public IGameObjectTemplate? GetCachedGameObjectTemplate(uint entry) => impl.GetCachedGameObjectTemplate(entry);
 
@@ -173,6 +175,24 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public Task<IReadOnlyList<IMangosCreatureMovementTemplate>?> GetMangosCreatureMovementTemplate(uint entry, uint? pathId) => impl.GetMangosCreatureMovementTemplate(entry, pathId);
 
         public Task<IMangosWaypointsPathName?> GetMangosPathName(uint pathId) => impl.GetMangosPathName(pathId);
+
+        public Task<IReadOnlyList<ILootEntry>> GetLoot(LootSourceType type, uint entry) => impl.GetLoot(type, entry);
+        
+        public Task<IReadOnlyList<ILootEntry>> GetLoot(LootSourceType type) => impl.GetLoot(type);
+
+        public Task<ILootTemplateName?> GetLootTemplateName(LootSourceType type, uint entry) => impl.GetLootTemplateName(type, entry);
+        
+        public Task<IReadOnlyList<ILootTemplateName>> GetLootTemplateName(LootSourceType type) => impl.GetLootTemplateName(type);
+
+        public Task<(IReadOnlyList<ICreatureTemplate>, IReadOnlyList<ICreatureTemplateDifficulty>)> GetCreatureLootCrossReference(uint lootId) => impl.GetCreatureLootCrossReference(lootId);
+
+        public Task<(IReadOnlyList<ICreatureTemplate>, IReadOnlyList<ICreatureTemplateDifficulty>)> GetCreatureSkinningLootCrossReference(uint lootId) => impl.GetCreatureSkinningLootCrossReference(lootId);
+
+        public Task<(IReadOnlyList<ICreatureTemplate>, IReadOnlyList<ICreatureTemplateDifficulty>)> GetCreaturePickPocketLootCrossReference(uint lootId) => impl.GetCreaturePickPocketLootCrossReference(lootId);
+
+        public Task<IReadOnlyList<IGameObjectTemplate>> GetGameObjectLootCrossReference(uint lootId) => impl.GetGameObjectLootCrossReference(lootId);
+
+        public Task<IReadOnlyList<ILootEntry>> GetReferenceLootCrossReference(uint lootId) => impl.GetReferenceLootCrossReference(lootId);
 
         public Task<List<IEventScriptLine>> GetEventScript(EventScriptType type, uint id) => impl.GetEventScript(type, id);
         

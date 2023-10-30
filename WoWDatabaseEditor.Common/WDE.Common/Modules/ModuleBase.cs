@@ -54,11 +54,11 @@ namespace WDE.Module
 
             foreach (Type register in defaultRegisters)
             {
-                RegisterType(register, containerRegistry);
+                RegisterType(register, containerRegistry, false);
             }
         }
 
-        protected void RegisterType(Type register, IContainerRegistry unityContainer)
+        protected void RegisterType(Type register, IContainerRegistry unityContainer, bool checkIfRegistered)
         {
             if (string.IsNullOrEmpty(coreTag))
                 throw new Exception("Core must be set before registering the types!");
@@ -77,6 +77,9 @@ namespace WDE.Module
                     
             foreach (Type @interface in register.GetInterfaces())
             {
+                if (checkIfRegistered && unityContainer.IsRegistered(@interface, UnityContainer.All))
+                    continue;
+
                 bool isUnique = !@interface.IsDefined(typeof(NonUniqueProviderAttribute), false);
 
                 string name = register + @interface.ToString();
@@ -91,6 +94,16 @@ namespace WDE.Module
             }
         }
 
+        public void RegisterFallbackTypes(IContainerRegistry container)
+        {
+            var fallbackRegisters = GetType().Assembly.GetTypes().Where(t => !t.IsAbstract && t.IsDefined(typeof(FallbackAutoRegisterAttribute), true));
+
+            foreach (Type register in fallbackRegisters)
+            {
+                RegisterType(register, container, true);
+            }   
+        }
+        
         public virtual void FinalizeRegistration(IContainerRegistry container)
         {
         }

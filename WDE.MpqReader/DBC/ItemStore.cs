@@ -4,7 +4,7 @@ namespace WDE.MpqReader.DBC;
 
 public class ItemStore : BaseDbcStore<uint, Item>
 {
-    public ItemStore(IEnumerable<IDbcIterator> rows, ItemAppearanceStore itemAppearanceStore)
+    public ItemStore(IEnumerable<IDbcIterator> rows, ItemModifiedAppearanceStore itemModifiedAppearanceStore,  ItemAppearanceStore itemAppearanceStore)
     {
         foreach (var row in rows)
         {
@@ -13,11 +13,11 @@ public class ItemStore : BaseDbcStore<uint, Item>
         }
     }
     
-    public ItemStore(IEnumerable<IWdcIterator> rows, ItemAppearanceStore itemAppearanceStore)
+    public ItemStore(IEnumerable<IWdcIterator> rows, ItemModifiedAppearanceStore itemModifiedAppearanceStore, ItemAppearanceStore itemAppearanceStore)
     {
         foreach (var row in rows)
         {
-            var o = new Item(row, itemAppearanceStore);
+            var o = new Item(row, itemModifiedAppearanceStore, itemAppearanceStore);
             store[o.Id] = o;
         }
     }

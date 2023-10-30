@@ -83,4 +83,6 @@ public class DbcData
     public List<CharShipmentEntry> CharShipments { get; } = new();
     public List<ItemDisplayInfoEntry> ItemDisplayInfos { get; } = new();
     public List<DbcItemEntry> Items { get; } = new();
+    public List<ItemAppearanceEntry> ItemAppearances { get; } = new();
+    public List<ItemModifiedAppearanceEntry> ItemModifiedAppearances { get; } = new();
 }

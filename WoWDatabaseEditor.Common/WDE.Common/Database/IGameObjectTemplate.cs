@@ -108,6 +108,23 @@ namespace WDE.Common.Database
 
             return 0;
         }
+        
+        public static uint? GetLootId(this IGameObjectTemplate template)
+        {
+            if (template.Type is GameobjectType.Chest &&
+                template[1] == 0)
+            {
+                return template[30];
+            }
+            
+            if (template.Type is GameobjectType.Chest or
+                GameobjectType.FishingHole or
+                GameobjectType.GatheringNode or
+                GameobjectType.ChallengeModeReward)
+                return template[1];
+
+            return null;
+        }
 
         public static uint GetMainPlayerCondition(this IGameObjectTemplate template)
         {

@@ -1,12 +1,13 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using LinqToDB.Mapping;
 using WDE.Common.Database;
+using WDE.Common.Utils;
 
 namespace WDE.TrinityMySqlDatabase.Models
 {
     [ExcludeFromCodeCoverage]
-    [Table(Name = "smart_scripts")]
-    public class MySqlSmartScriptLine : ISmartScriptLine
+    public abstract class BaseSqlSmartScriptLine : ISmartScriptLine
     {
         public uint? CreatureEntry => null;
         
@@ -24,6 +25,8 @@ namespace WDE.TrinityMySqlDatabase.Models
 
         [Column(Name = "link")]
         public int Link { get; set; }
+
+        public abstract SmallReadOnlyList<uint>? Difficulties { get; }
 
         [Column(Name = "event_type")]
         public int EventType { get; set; }
@@ -120,9 +123,9 @@ namespace WDE.TrinityMySqlDatabase.Models
         [Column]
         public string Comment { get; set; } = "";
 
-        public MySqlSmartScriptLine() { }
+        public BaseSqlSmartScriptLine() { }
 
-        public MySqlSmartScriptLine(ISmartScriptLine line)
+        public BaseSqlSmartScriptLine(ISmartScriptLine line)
         {
             EntryOrGuid = line.EntryOrGuid;
             ScriptSourceType = line.ScriptSourceType;
@@ -214,5 +217,31 @@ namespace WDE.TrinityMySqlDatabase.Models
             get => 0;
             set { }
         }
+    }
+    
+    [Table(Name = "smart_scripts")]
+    public class MasterMySqlSmartScriptLine : BaseSqlSmartScriptLine
+    {
+        [Column(Name = "Difficulties")]
+        public string difficulties { get; set; } = "";
+
+        public override SmallReadOnlyList<uint>? Difficulties
+        {
+            get
+            {
+                if (string.IsNullOrWhiteSpace(difficulties))
+                    return null;
+
+                return new SmallReadOnlyList<uint>(difficulties.Split(',')
+                    .Where(x => uint.TryParse(x, out _))
+                    .Select(uint.Parse));
+            }
+        }
+    }
+    
+    [Table(Name = "smart_scripts")]
+    public class MySqlSmartScriptLine : BaseSqlSmartScriptLine
+    {
+        public override SmallReadOnlyList<uint>? Difficulties => default;
     }
 }

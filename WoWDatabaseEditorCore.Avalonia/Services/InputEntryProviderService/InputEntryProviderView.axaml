@@ -9,7 +9,7 @@
         <KeyBinding Gesture="Escape" Command="{Binding Cancel}" />
         <KeyBinding Gesture="Enter" Command="{Binding Save}" />
     </UserControl.KeyBindings>
-    <DockPanel Margin="15" LastChildFill="False">
+    <DockPanel Margin="15" LastChildFill="True">
         <Image DockPanel.Dock="Left" Width="64" Height="64" VerticalAlignment="Center" Margin="0,0,10,0">
             <Image.Source>
                 <DrawingImage>

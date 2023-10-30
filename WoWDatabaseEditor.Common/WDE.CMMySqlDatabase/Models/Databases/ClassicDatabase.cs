@@ -7,7 +7,7 @@ namespace WDE.CMMySqlDatabase.Models;
 
 public class ClassicDatabase : BaseDatabaseTables
 {
-    public ITable<CreatureTemplateTBC> CreatureTemplate => GetTable<CreatureTemplateTBC>();
+    public ITable<CreatureTemplateClassic> CreatureTemplate => GetTable<CreatureTemplateClassic>();
     public ITable<GameObjectTemplateTBC> GameObjectTemplate => GetTable<GameObjectTemplateTBC>();
     public ITable<CreatureTBC> Creature => GetTable<CreatureTBC>();
     public ITable<CreatureAddonTBC> CreatureAddon => GetTable<CreatureAddonTBC>();

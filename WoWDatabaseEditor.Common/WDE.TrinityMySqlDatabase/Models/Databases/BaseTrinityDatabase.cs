@@ -43,5 +43,17 @@ namespace WDE.TrinityMySqlDatabase.Models
         public ITable<MySqlSpawnGroupSpawn> SpawnGroupSpawns => GetTable<MySqlSpawnGroupSpawn>();
         public ITable<MySqlSpawnGroupTemplate> SpawnGroupTemplate => GetTable<MySqlSpawnGroupTemplate>();
         public ITable<MySqlSmartScriptLine> BaseSmartScript => GetTable<MySqlSmartScriptLine>();
+        public ITable<ItemLootTemplate> ItemLootTemplate => GetTable<ItemLootTemplate>();
+        public ITable<PickpocketingLootTemplate> PickpocketingLootTemplate => GetTable<PickpocketingLootTemplate>();
+        public ITable<CreatureLootTemplate> CreatureLootTemplate => GetTable<CreatureLootTemplate>();
+        public ITable<DisenchantLootTemplate> DisenchantLootTemplate => GetTable<DisenchantLootTemplate>();
+        public ITable<ProspectingLootTemplate> ProspectingLootTemplate => GetTable<ProspectingLootTemplate>();
+        public ITable<MillingLootTemplate> MillingLootTemplate => GetTable<MillingLootTemplate>();
+        public ITable<ReferenceLootTemplate> ReferenceLootTemplate => GetTable<ReferenceLootTemplate>();
+        public ITable<SpellLootTemplate> SpellLootTemplate => GetTable<SpellLootTemplate>();
+        public ITable<MailLootTemplate> MailLootTemplate => GetTable<MailLootTemplate>();
+        public ITable<GameObjectLootTemplate> GameObjectLootTemplate => GetTable<GameObjectLootTemplate>();
+        public ITable<FishingLootTemplate> FishingLootTemplate => GetTable<FishingLootTemplate>();
+        public ITable<SkinningLootTemplate> SkinningLootTemplate => GetTable<SkinningLootTemplate>();
     }
 }

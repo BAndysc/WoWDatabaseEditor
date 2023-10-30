@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using WDE.Common.Utils;
 
 namespace WDE.Common.Database
 {
@@ -16,6 +18,8 @@ namespace WDE.Common.Database
         
         int LineId { get; }
 
+        SmallReadOnlyList<uint>? Difficulties { get; }
+        
         int EventType { get; }
 
         int EventPhaseMask { get; }
@@ -121,6 +125,7 @@ namespace WDE.Common.Database
         public int Id { get; set; }
         public int Link { get; set; }
         public int LineId { get; set; }
+        public SmallReadOnlyList<uint>? Difficulties { get; set; }
         public int EventType { get; set; }
         public int EventPhaseMask { get; set; }
         public int EventChance { get; set; }

@@ -12,6 +12,13 @@ public class CreatureTemplateTBC : ICreatureTemplate
     [Column("Entry")]
     public uint Entry { get; set; }
 
+    [Column(Name = "HeroicEntry")]
+    public uint DifficultyEntry1 { get; set; }
+
+    public uint DifficultyEntry2 => 0;
+
+    public uint DifficultyEntry3 => 0;
+
     [Column("Scale")]
     public float Scale { get; set; }
 
@@ -107,4 +114,17 @@ public class CreatureTemplateTBC : ICreatureTemplate
 
         throw new Exception("Model out of range");
     }
+    
+    [Column("LootId")] 
+    public uint LootId { get; set; }
+    
+    [Column("PickpocketLootId")] 
+    public uint PickpocketLootId { get; set; }
+    
+    [Column("SkinningLootId")] 
+    public uint SkinningLootId { get; set; }
+    
+    public int LootCount => 1;
+        
+    public uint GetLootId(int index) => LootId;
 }

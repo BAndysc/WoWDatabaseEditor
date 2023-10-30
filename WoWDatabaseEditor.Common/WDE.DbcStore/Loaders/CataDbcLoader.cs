@@ -46,6 +46,20 @@ internal class CataDbcLoader : BaseDbcLoader
             data.FactionTemplateStore[row.GetUInt(0)] = row.GetUInt(1);
         });
         Load("CurrencyTypes.dbc", 0, 2, data.CurrencyTypeStore);
+        Load("CurrencyTypes.dbc", data.CurrencyTypes, row => 
+            new CurrencyType()
+            {
+                Id = row.GetUInt(0),
+                CategoryId = (byte)row.GetUShort(1),
+                Name = row.GetString(2),
+                InventoryIconPath = row.GetString(3),
+                SpellWeight = row.GetUInt(5),
+                SpellCategory = (byte)row.GetUShort(6),
+                MaxQuantity = row.GetUInt(7),
+                MaxEarnablePerWeek = row.GetUInt(8),
+                Flags = (CurrencyTypesFlags)row.GetUInt(9),
+                Description = row.GetString(10)
+            });
         Load("Spell.dbc", 0, 21, data.SpellStore);
         Load("Movie.dbc", 0, 1, data.MovieStore);
         Load("Map.dbc", row =>

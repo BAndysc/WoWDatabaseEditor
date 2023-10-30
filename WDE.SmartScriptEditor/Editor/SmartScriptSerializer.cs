@@ -91,6 +91,7 @@ namespace WDE.SmartScriptEditor.Exporter
                     EntryOrGuid = scriptEntryOrGuid,
                     ScriptSourceType = (int) scriptSourceType,
                     Id = id + (autoLinks ? index : 0),
+                    Difficulties = default,
                     Link = linkTo ?? 0,
                     LineId = a.VirtualLineId,
                     EventType = e.Id,

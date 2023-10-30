@@ -10,8 +10,8 @@ environment:
     secure: SXvCUsowLsFFH1P7e3IsqldBlcPD0gQ8qpsSM8s73VUImWk+NW0dbnLjbytCriqD6O3+FiBLKWkE/v0bNckEJkwFDU8y2ZuNjmB2NIyAQViPyi72/a3vRPM7ruJH+BY0
   REPO_TOKEN:
       secure: 0qeEEToZuwVcvYxnrAA5DeRQmdRMeYmrtmJKGUVFeTFteeMrw4z6pPUEE3wley1p
-services:
-  - mysql
+init:
+  - ps: Start-Service MySQL80
 install:
 - cmd: git submodule update --init --recursive
 before_build:
@@ -117,7 +117,7 @@ test_script:
 - cmd: >-
     cd test
     
-    bash database_test.sh localhost 3306 root 'Password12!' 'C:\Program Files\MySQL\MySQL Server 5.7\bin\mysql'
+    bash database_test.sh localhost 3306 root 'Password12!' 'C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql'
 
     cd ../
 

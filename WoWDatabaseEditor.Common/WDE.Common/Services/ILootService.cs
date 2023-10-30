@@ -7,5 +7,6 @@ namespace WDE.Common.Services;
 [UniqueProvider]
 public interface ILootService
 {
-    Task EditLoot(LootSourceType type, uint entry);
+    Task OpenStandaloneLootEditor();
+    Task EditLoot(LootSourceType type, uint solutionEntry, uint difficultyId);
 }

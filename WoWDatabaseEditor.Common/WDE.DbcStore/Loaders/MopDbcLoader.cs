@@ -52,6 +52,21 @@ internal class MopDbcLoader : BaseDbcLoader
             data.FactionTemplateStore[row.GetUInt(0)] = row.GetUInt(1);
         });
         Load("CurrencyTypes.dbc", 0, 2, data.CurrencyTypeStore);
+        Load("CurrencyTypes.dbc", data.CurrencyTypes, row => 
+            new CurrencyType()
+            {
+                Id = row.GetUInt(0),
+                CategoryId = (byte)row.GetUShort(1),
+                Name = row.GetString(2),
+                InventoryIconPath = row.GetString(3),
+                SpellWeight = row.GetUInt(5),
+                SpellCategory = (byte)row.GetUShort(6),
+                MaxQuantity = row.GetUInt(7),
+                MaxEarnablePerWeek = row.GetUInt(8),
+                Flags = (CurrencyTypesFlags)row.GetUInt(9),
+                Quality = (byte)row.GetUShort(10),
+                Description = row.GetString(11)
+            });
         Load("Spell.dbc", 0, 1, data.SpellStore);
         Load("Movie.dbc", row => data.MovieStore.Add(row.GetInt(0), fileData.GetValueOrDefault(row.GetInt(3)) ?? "Unknown movie"));
         Load("Map.dbc", row =>

@@ -13,7 +13,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public async Task<ICreatureTemplate?> GetCreatureTemplate(uint entry) => null;
         public ICreatureTemplate? GetCachedCreatureTemplate(uint entry) => null;
         public IReadOnlyList<ICreatureTemplate> GetCreatureTemplates() => Array.Empty<ICreatureTemplate>();
-
+        public async Task<IReadOnlyList<ICreatureTemplateDifficulty>> GetCreatureTemplateDifficulties(uint entry) => Array.Empty<ICreatureTemplateDifficulty>();
+        
         public async Task<IGameObjectTemplate?> GetGameObjectTemplate(uint entry) => null;
         public IGameObjectTemplate? GetCachedGameObjectTemplate(uint entry) => null;
         public IReadOnlyList<IGameObjectTemplate> GetGameObjectTemplates() => Array.Empty<IGameObjectTemplate>();
@@ -190,6 +191,17 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public async Task<IReadOnlyList<IMangosCreatureMovement>?> GetMangosCreatureMovement(uint guid) => null;
         public async Task<IReadOnlyList<IMangosCreatureMovementTemplate>?> GetMangosCreatureMovementTemplate(uint entry, uint? pathId) => null;
         public async Task<IMangosWaypointsPathName?> GetMangosPathName(uint pathId) => null;
+        public async Task<IReadOnlyList<ILootEntry>> GetLoot(LootSourceType type, uint entry) => Array.Empty<ILootEntry>();
+        public async Task<IReadOnlyList<ILootEntry>> GetLoot(LootSourceType type) => Array.Empty<ILootEntry>();
+        public async Task<ILootTemplateName?> GetLootTemplateName(LootSourceType type, uint entry) => null;
+        public async Task<IReadOnlyList<ILootTemplateName>> GetLootTemplateName(LootSourceType type) => Array.Empty<ILootTemplateName>();
+
+        public async Task<(IReadOnlyList<ICreatureTemplate>, IReadOnlyList<ICreatureTemplateDifficulty>)> GetCreatureLootCrossReference(uint lootId) => (Array.Empty<ICreatureTemplate>(), Array.Empty<ICreatureTemplateDifficulty>());
+        public async Task<(IReadOnlyList<ICreatureTemplate>, IReadOnlyList<ICreatureTemplateDifficulty>)> GetCreatureSkinningLootCrossReference(uint lootId) => (Array.Empty<ICreatureTemplate>(), Array.Empty<ICreatureTemplateDifficulty>());
+        public async Task<(IReadOnlyList<ICreatureTemplate>, IReadOnlyList<ICreatureTemplateDifficulty>)> GetCreaturePickPocketLootCrossReference(uint lootId) => (Array.Empty<ICreatureTemplate>(), Array.Empty<ICreatureTemplateDifficulty>());
+        public async Task<IReadOnlyList<IGameObjectTemplate>> GetGameObjectLootCrossReference(uint lootId) => Array.Empty<IGameObjectTemplate>();
+        public async Task<IReadOnlyList<ILootEntry>> GetReferenceLootCrossReference(uint lootId) => Array.Empty<ILootEntry>();
+
         public Task<IList<ISpawnGroupTemplate>> GetSpawnGroupTemplatesAsync() => Task.FromResult<IList<ISpawnGroupTemplate>>(new List<ISpawnGroupTemplate>());
         public Task<IList<ISpawnGroupSpawn>> GetSpawnGroupSpawnsAsync() => Task.FromResult<IList<ISpawnGroupSpawn>>(new List<ISpawnGroupSpawn>());
         public Task<ISpawnGroupTemplate?> GetSpawnGroupTemplateByIdAsync(uint id) => Task.FromResult<ISpawnGroupTemplate?>(null);

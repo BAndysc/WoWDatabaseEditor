@@ -14,6 +14,8 @@ namespace WDE.Common.Database
         Task<ICreatureTemplate?> GetCreatureTemplate(uint entry);
         IReadOnlyList<ICreatureTemplate> GetCreatureTemplates();
 
+        Task<IReadOnlyList<ICreatureTemplateDifficulty>> GetCreatureTemplateDifficulties(uint entry);
+        
         Task<IGameObjectTemplate?> GetGameObjectTemplate(uint entry);
         IReadOnlyList<IGameObjectTemplate> GetGameObjectTemplates();
 
@@ -143,6 +145,17 @@ namespace WDE.Common.Database
         Task<IReadOnlyList<IMangosCreatureMovementTemplate>?> GetMangosCreatureMovementTemplate(uint entry, uint? pathId);
         Task<IMangosWaypointsPathName?> GetMangosPathName(uint pathId);
             
+        Task<IReadOnlyList<ILootEntry>> GetLoot(LootSourceType type, uint entry);
+        Task<IReadOnlyList<ILootEntry>> GetLoot(LootSourceType type);
+        Task<ILootTemplateName?> GetLootTemplateName(LootSourceType type, uint entry);
+        Task<IReadOnlyList<ILootTemplateName>> GetLootTemplateName(LootSourceType type);
+        
+        Task<(IReadOnlyList<ICreatureTemplate>, IReadOnlyList<ICreatureTemplateDifficulty>)> GetCreatureLootCrossReference(uint lootId);
+        Task<(IReadOnlyList<ICreatureTemplate>, IReadOnlyList<ICreatureTemplateDifficulty>)> GetCreatureSkinningLootCrossReference(uint lootId);
+        Task<(IReadOnlyList<ICreatureTemplate>, IReadOnlyList<ICreatureTemplateDifficulty>)> GetCreaturePickPocketLootCrossReference(uint lootId);
+        Task<IReadOnlyList<IGameObjectTemplate>> GetGameObjectLootCrossReference(uint lootId);
+        Task<IReadOnlyList<ILootEntry>> GetReferenceLootCrossReference(uint lootId);
+        
         public enum SmartLinePropertyType
         {
             Event,

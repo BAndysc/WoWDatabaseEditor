@@ -23,6 +23,11 @@ namespace WDE.CMMySqlDatabase.Database
         public bool IsConnected => true;
         public abstract Task<ICreatureTemplate?> GetCreatureTemplate(uint entry);
         public abstract IReadOnlyList<ICreatureTemplate> GetCreatureTemplates();
+        
+        public async Task<IReadOnlyList<ICreatureTemplateDifficulty>> GetCreatureTemplateDifficulties(uint entry)
+        {
+            return Array.Empty<ICreatureTemplateDifficulty>();
+        }
 
         private readonly ICurrentCoreVersion currentCoreVersion;
 
@@ -492,7 +497,134 @@ namespace WDE.CMMySqlDatabase.Database
             await using var model = Database();
             return await model.WaypointPathName.FirstOrDefaultAsync(x => x.PathId == pathId);
         }
+
+        public async Task<ILootTemplateName?> GetLootTemplateName(LootSourceType type, uint entry)
+        {
+            if (type != LootSourceType.Reference)
+                return null;
+            await using var model = Database();
+            return await model.ReferenceLootTemplateNames.FirstOrDefaultAsync(x => x.Entry == entry);
+        }
         
+        public async Task<IReadOnlyList<ILootTemplateName>> GetLootTemplateName(LootSourceType type)
+        {
+            if (type != LootSourceType.Reference)
+                return Array.Empty<ILootTemplateName>();
+            await using var model = Database();
+            return await model.ReferenceLootTemplateNames.OrderBy(x => x.Entry).ToListAsync();
+        }
+
+        public abstract Task<(IReadOnlyList<ICreatureTemplate>, IReadOnlyList<ICreatureTemplateDifficulty>)> GetCreatureLootCrossReference(uint lootId);
+
+        public abstract Task<(IReadOnlyList<ICreatureTemplate>, IReadOnlyList<ICreatureTemplateDifficulty>)> GetCreatureSkinningLootCrossReference(uint lootId);
+
+        public abstract Task<(IReadOnlyList<ICreatureTemplate>, IReadOnlyList<ICreatureTemplateDifficulty>)> GetCreaturePickPocketLootCrossReference(uint lootId);
+
+        public async Task<IReadOnlyList<ILootEntry>> GetReferenceLootCrossReference(uint lootId)
+        {
+            if (lootId == 0)
+                return Array.Empty<ILootEntry>();
+            await using var database = Database();
+            int minCountOrRef = -(int)lootId;
+            var loot = new[]
+            {
+                await database.CreatureLootTemplate.Where(x => x.MinCountOrReference == minCountOrRef).ToListAsync<ILootEntry>(),
+                await database.GameObjectLootTemplate.Where(x => x.MinCountOrReference == minCountOrRef).ToListAsync<ILootEntry>(),
+                await database.ItemLootTemplate.Where(x => x.MinCountOrReference == minCountOrRef).ToListAsync<ILootEntry>(),
+                await database.FishingLootTemplate.Where(x => x.MinCountOrReference == minCountOrRef).ToListAsync<ILootEntry>(),
+                await database.SkinningLootTemplate.Where(x => x.MinCountOrReference == minCountOrRef).ToListAsync<ILootEntry>(),
+                await database.DisenchantLootTemplate.Where(x => x.MinCountOrReference == minCountOrRef).ToListAsync<ILootEntry>(),
+                await database.ProspectingLootTemplate.Where(x => x.MinCountOrReference == minCountOrRef).ToListAsync<ILootEntry>(),
+                await database.MailLootTemplate.Where(x => x.MinCountOrReference == minCountOrRef).ToListAsync<ILootEntry>()
+            };
+            return loot.SelectMany(x => x).ToList();
+        }
+        
+        public async Task<IReadOnlyList<ILootEntry>> GetLoot(LootSourceType type)
+        {
+            await using var database = Database();
+            switch (type)
+            {
+                case LootSourceType.Item:
+                    return await database.ItemLootTemplate.OrderBy(x => x.Entry)
+                        .ThenBy(x => x.GroupId)
+                        .ThenBy(x => x.ItemOrCurrencyId)
+                        .ToListAsync<ILootEntry>();
+                case LootSourceType.GameObject:
+                    return await database.GameObjectLootTemplate.OrderBy(x => x.Entry)
+                        .ThenBy(x => x.GroupId)
+                        .ThenBy(x => x.ItemOrCurrencyId)
+                        .ToListAsync<ILootEntry>();
+                case LootSourceType.Fishing:
+                    return await database.FishingLootTemplate.OrderBy(x => x.Entry)
+                        .ThenBy(x => x.GroupId)
+                        .ThenBy(x => x.ItemOrCurrencyId)
+                        .ToListAsync<ILootEntry>();
+                case LootSourceType.Skinning:
+                    return await database.SkinningLootTemplate.OrderBy(x => x.Entry)
+                        .ThenBy(x => x.GroupId)
+                        .ThenBy(x => x.ItemOrCurrencyId)
+                        .ToListAsync<ILootEntry>();
+                case LootSourceType.Disenchant:
+                    return await database.DisenchantLootTemplate.OrderBy(x => x.Entry)
+                        .ThenBy(x => x.GroupId)
+                        .ThenBy(x => x.ItemOrCurrencyId)
+                        .ToListAsync<ILootEntry>();
+                case LootSourceType.Prospecting:
+                    return await database.ProspectingLootTemplate.OrderBy(x => x.Entry)
+                        .ThenBy(x => x.GroupId)
+                        .ThenBy(x => x.ItemOrCurrencyId)
+                        .ToListAsync<ILootEntry>();
+                case LootSourceType.Reference:
+                    return await database.ReferenceLootTemplate.OrderBy(x => x.Entry)
+                        .ThenBy(x => x.GroupId)
+                        .ThenBy(x => x.ItemOrCurrencyId)
+                        .ToListAsync<ILootEntry>();
+                case LootSourceType.Creature:
+                    return await database.CreatureLootTemplate.OrderBy(x => x.Entry)
+                        .ThenBy(x => x.GroupId)
+                        .ThenBy(x => x.ItemOrCurrencyId)
+                        .ToListAsync<ILootEntry>();
+                case LootSourceType.Mail:
+                    return await database.MailLootTemplate.OrderBy(x => x.Entry)
+                        .ThenBy(x => x.GroupId)
+                        .ThenBy(x => x.ItemOrCurrencyId)
+                        .ToListAsync<ILootEntry>();
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+            }
+        }
+        
+        public async Task<IReadOnlyList<ILootEntry>> GetLoot(LootSourceType type, uint entry)
+        {
+            await using var database = Database();
+            switch (type)
+            {
+                case LootSourceType.Item:
+                    return await database.ItemLootTemplate.Where(x => x.Entry == entry).ToListAsync<ILootEntry>();
+                case LootSourceType.GameObject:
+                    return await database.GameObjectLootTemplate.Where(x => x.Entry == entry).ToListAsync<ILootEntry>();
+                case LootSourceType.Fishing:
+                    return await database.FishingLootTemplate.Where(x => x.Entry == entry).ToListAsync<ILootEntry>();
+                case LootSourceType.Skinning:
+                    return await database.SkinningLootTemplate.Where(x => x.Entry == entry).ToListAsync<ILootEntry>();
+                case LootSourceType.Disenchant:
+                    return await database.DisenchantLootTemplate.Where(x => x.Entry == entry).ToListAsync<ILootEntry>();
+                case LootSourceType.Prospecting:
+                    return await database.ProspectingLootTemplate.Where(x => x.Entry == entry).ToListAsync<ILootEntry>();
+                case LootSourceType.Reference:
+                    return await database.ReferenceLootTemplate.Where(x => x.Entry == entry).ToListAsync<ILootEntry>();
+                case LootSourceType.Creature:
+                    return await database.CreatureLootTemplate.Where(x => x.Entry == entry).ToListAsync<ILootEntry>();
+                case LootSourceType.Mail:
+                    return await database.MailLootTemplate.Where(x => x.Entry == entry).ToListAsync<ILootEntry>();
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+            }
+        }
+
+        public abstract Task<IReadOnlyList<IGameObjectTemplate>> GetGameObjectLootCrossReference(uint lootId);
+
         public async Task<List<IEventAiLine>> GetEventAi(int entryOrGuid) 
         {
             await using var model = Database();

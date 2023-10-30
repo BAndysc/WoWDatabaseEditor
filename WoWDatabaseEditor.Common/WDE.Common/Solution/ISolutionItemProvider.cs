@@ -33,6 +33,14 @@ namespace WDE.Common
         }
     }
 
+    /// <summary>
+    /// SolutionItemProvider for things that items that are directly related to a single specific table 
+    /// </summary>
+    public interface IRawDatabaseTableSolutionItemProvider : ISolutionItemProvider
+    {
+        string TableName { get; }
+    }
+    
     public interface INumberSolutionItemProvider : ISolutionItemProvider
     {
         Task<ISolutionItem?> CreateSolutionItem(long number);

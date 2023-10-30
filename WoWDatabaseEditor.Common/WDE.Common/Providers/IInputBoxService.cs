@@ -7,6 +7,6 @@ namespace WDE.Common.Providers
     public interface IInputBoxService
     {
         Task<uint?> GetUInt(string title, string description);
-        Task<string?> GetString(string title, string description, string defaultValue = "", bool multiline = false);
+        Task<string?> GetString(string title, string description, string defaultValue = "", bool multiline = false, bool allowEmpty = false);
     }
 }

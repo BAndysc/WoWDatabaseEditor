@@ -38,6 +38,10 @@ namespace WDE.TrinityMySqlDatabase.Models
         [Column(Name = "RewardNextQuest")]
         public uint NextQuestInChain { get; set; }
 
+        public uint RewardMailTemplateId => addon?.RewardMailTemplateId ?? 0;
+
+        public uint QuestRewardId => 0;
+
         public MySqlQuestTemplate SetAddon(MySqlBaseQuestTemplateAddon? addon)
         {
             this.addon = addon;
@@ -78,6 +82,10 @@ namespace WDE.TrinityMySqlDatabase.Models
         [Column(Name = "RewardNextQuest")]
         public uint NextQuestInChain { get; set; }
 
+        public uint RewardMailTemplateId => addon?.RewardMailTemplateId ?? 0;
+
+        public uint QuestRewardId => 0;
+        
         public MySqlCataQuestTemplate SetAddon(MySqlCataQuestTemplateAddon? addon)
         {
             this.addon = addon;
@@ -111,6 +119,8 @@ namespace WDE.TrinityMySqlDatabase.Models
         [Column(Name="AllowableRaces")]
         private ulong allowableRaces { get; set; }
 
+        public uint RewardMailTemplateId => addon?.RewardMailTemplateId ?? 0;
+        
         public CharacterRaces AllowableRaces
         {
             get
@@ -137,6 +147,8 @@ namespace WDE.TrinityMySqlDatabase.Models
         [Column(Name = "RewardNextQuest")]
         public uint NextQuestInChain { get; set; }
 
+        public uint QuestRewardId => 0;
+        
         public MySqlMasterQuestTemplate SetAddon(MySqlBaseQuestTemplateAddon? addon)
         {
             this.addon = addon;

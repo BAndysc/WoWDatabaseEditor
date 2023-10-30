@@ -24,4 +24,17 @@ public class TrinityCataDatabase : BaseTrinityDatabase
     public ITable<MySqlWaypointScriptNoCommentLine> WaypointScripts => GetTable<MySqlWaypointScriptNoCommentLine>();
     public ITable<MySqlSpellScriptNoCommentLine> SpellScripts => GetTable<MySqlSpellScriptNoCommentLine>();
     public ITable<MySqlSmartScriptLine> SmartScript => GetTable<MySqlSmartScriptLine>();
+    
+    public ITable<ItemLootTemplateWithCurrency> ItemLootTemplateWithCurrency => GetTable<ItemLootTemplateWithCurrency>();
+    public ITable<PickpocketingLootTemplateWithCurrency> PickpocketingLootTemplateWithCurrency => GetTable<PickpocketingLootTemplateWithCurrency>();
+    public ITable<CreatureLootTemplateWithCurrency> CreatureLootTemplateWithCurrency => GetTable<CreatureLootTemplateWithCurrency>();
+    public ITable<DisenchantLootTemplateWithCurrency> DisenchantLootTemplateWithCurrency => GetTable<DisenchantLootTemplateWithCurrency>();
+    public ITable<ProspectingLootTemplateWithCurrency> ProspectingLootTemplateWithCurrency => GetTable<ProspectingLootTemplateWithCurrency>();
+    public ITable<MillingLootTemplateWithCurrency> MillingLootTemplateWithCurrency => GetTable<MillingLootTemplateWithCurrency>();
+    public ITable<ReferenceLootTemplateWithCurrency> ReferenceLootTemplateWithCurrency => GetTable<ReferenceLootTemplateWithCurrency>();
+    public ITable<SpellLootTemplateWithCurrency> SpellLootTemplateWithCurrency => GetTable<SpellLootTemplateWithCurrency>();
+    public ITable<MailLootTemplateWithCurrency> MailLootTemplateWithCurrency => GetTable<MailLootTemplateWithCurrency>();
+    public ITable<GameObjectLootTemplateWithCurrency> GameObjectLootTemplateWithCurrency => GetTable<GameObjectLootTemplateWithCurrency>();
+    public ITable<FishingLootTemplateWithCurrency> FishingLootTemplateWithCurrency => GetTable<FishingLootTemplateWithCurrency>();
+    public ITable<SkinningLootTemplateWithCurrency> SkinningLootTemplateWithCurrency => GetTable<SkinningLootTemplateWithCurrency>();
 }

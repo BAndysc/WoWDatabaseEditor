@@ -1,0 +1,22 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:WDE.LootEditor.Editor.ViewModels"
+             xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:EditLootGroupDialogViewModel"
+             x:Class="WDE.LootEditor.Editor.Views.EditLootGroupDialogView">
+  <DockPanel>
+    <OkCancelButtons DockPanel.Dock="Bottom" AcceptCommand="{CompiledBinding Accept}" CancelCommand="{CompiledBinding Cancel}" />
+    <TwoColumnsPanel>
+      <TextBlock VerticalAlignment="Center">Name:</TextBlock>
+      <TextBox utils:FocusUtils.FocusFirst="True" Text="{CompiledBinding Name}" />
+    
+      <TextBlock IsVisible="{CompiledBinding HasFlags}" VerticalAlignment="Center">Flags:</TextBlock>
+      <StackPanel IsVisible="{CompiledBinding HasFlags}" Orientation="Vertical">
+        <CheckBox IsChecked="{CompiledBinding DontLoadRecursively}">Don't load loot recursively in the editor</CheckBox>
+      </StackPanel>
+    </TwoColumnsPanel>
+  </DockPanel>
+</UserControl>

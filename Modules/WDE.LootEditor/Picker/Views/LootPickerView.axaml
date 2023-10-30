@@ -1,0 +1,69 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
+             xmlns:fastTableView="clr-namespace:AvaloniaStyles.Controls.FastTableView;assembly=AvaloniaStyles"
+             xmlns:views="clr-namespace:WDE.LootEditor.Picker.Views"
+             xmlns:viewModels="clr-namespace:WDE.LootEditor.Picker.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:LootPickerViewModel"
+             x:Class="WDE.LootEditor.Picker.Views.LootPickerView">
+  <DockPanel>
+    
+    <DockPanel Dock="Bottom" Margin="0,5,0,0" LastChildFill="False">
+      <CheckBox VerticalAlignment="Center" IsChecked="{CompiledBinding FlattenReferences}">Flatten references</CheckBox>
+      <OkCancelButtons AcceptCommand="{CompiledBinding Accept}" CancelCommand="{CompiledBinding Cancel}" DockPanel.Dock="Right"/>
+    </DockPanel>
+    
+    <TextBox utils:FocusUtils.FocusFirst="True"
+             DockPanel.Dock="Top"
+             Margin="0,0,0,5"
+             KeyDown="InputElement_OnKeyDown"
+             Text="{CompiledBinding SearchText}" />
+
+    <ScrollViewer HorizontalScrollBarVisibility="Visible"
+                  Background="{DynamicResource ContentBackground}">
+      <fastTableView:VeryFastTableView Items="{CompiledBinding  Items}"
+                                       IsGroupingEnabled="True"
+                                       x:Name="VeryFastTableView"
+                                       IsReadOnly="True"
+                                       MultiSelection="{CompiledBinding MultiSelection}"
+                                       SelectedRowIndex="{CompiledBinding FocusedRowIndex}"
+                                       DoubleTapped="VeryFastTableView_OnDoubleTapped"
+                                       TextBlock.FontFamily="{DynamicResource MonoFont}"
+                                       Columns="{CompiledBinding Columns}">
+        <fastTableView:VeryFastTableView.GroupHeaderTemplate>
+          <DataTemplate x:DataType="viewModels:LootGroupViewModel">
+            <GroupingHeader GroupName="{CompiledBinding Header}">
+              <GroupingHeader.CustomRightContent>
+                <StackPanel Orientation="Horizontal" Spacing="5" IsVisible="{CompiledBinding HasHiddenItems}">
+                  <TextBlock Text="Displaying" />
+                  <TextBlock Text="{CompiledBinding VisibleItemsCount}" />
+                  <TextBlock Text="out of" />
+                  <TextBlock Text="{CompiledBinding AllItemsCount}" />
+                  <TextBlock Text="items" />
+                  
+                  <StackPanel.Styles>
+                    <Style Selector="TextBlock">
+                      <Setter Property="Opacity" Value="0.5" />
+                      <Setter Property="FontWeight" Value="Normal" />
+                      <Setter Property="FontFamily" Value="{DynamicResource ContentControlThemeFontFamily}" />
+                      <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+                    </Style>
+                  </StackPanel.Styles>
+                </StackPanel>
+              </GroupingHeader.CustomRightContent>
+            </GroupingHeader>
+          </DataTemplate>
+        </fastTableView:VeryFastTableView.GroupHeaderTemplate>
+        <fastTableView:VeryFastTableView.CustomCellDrawer>
+          <views:CustomCellDrawer />
+        </fastTableView:VeryFastTableView.CustomCellDrawer>
+        <fastTableView:VeryFastTableView.CustomCellInteractor>
+          <views:CustomCellInteractor />
+        </fastTableView:VeryFastTableView.CustomCellInteractor>
+      </fastTableView:VeryFastTableView>
+    </ScrollViewer>
+  </DockPanel>
+</UserControl>

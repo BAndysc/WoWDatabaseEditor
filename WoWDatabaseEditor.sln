@@ -236,6 +236,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.DatabaseDefinitionEdito
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AvaloniaRenderingTester", "Rendering\AvaloniaRenderingTester\AvaloniaRenderingTester.csproj", "{9095B533-4B28-4799-90A1-48749B1DFC83}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WDE.LootEditor", "Modules\WDE.LootEditor\WDE.LootEditor.csproj", "{4012763E-3E9C-49E0-89AA-1F99ED47781C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -654,6 +656,10 @@ Global
 		{9095B533-4B28-4799-90A1-48749B1DFC83}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9095B533-4B28-4799-90A1-48749B1DFC83}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9095B533-4B28-4799-90A1-48749B1DFC83}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4012763E-3E9C-49E0-89AA-1F99ED47781C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4012763E-3E9C-49E0-89AA-1F99ED47781C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4012763E-3E9C-49E0-89AA-1F99ED47781C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4012763E-3E9C-49E0-89AA-1F99ED47781C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -746,6 +752,7 @@ Global
 		{0E392E29-04EF-465D-9DC7-C98711BB6B7C} = {5B4101BE-5A22-4B88-9E94-FFC484E04BDE}
 		{C2611439-ADC8-4EB8-B04A-D860382E396E} = {106EEB05-E9AB-453A-ADD0-96505F405D76}
 		{9095B533-4B28-4799-90A1-48749B1DFC83} = {46568AE8-448D-49BC-8E33-E549CCD8124F}
+		{4012763E-3E9C-49E0-89AA-1F99ED47781C} = {106EEB05-E9AB-453A-ADD0-96505F405D76}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3E63D4A5-8159-4344-B556-1E1D8D63DA99}

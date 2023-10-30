@@ -16,16 +16,16 @@ namespace AvaloniaStyles.Controls
 {
     public class GroupingHeader : TemplatedControl
     {
-        public static readonly DirectProperty<GroupingHeader, string> GroupNameProperty =
-            AvaloniaProperty.RegisterDirect<GroupingHeader, string>(
+        public static readonly DirectProperty<GroupingHeader, object?> GroupNameProperty =
+            AvaloniaProperty.RegisterDirect<GroupingHeader, object?>(
                 nameof(GroupName),
                 o => o.GroupName,
                 (o, v) => o.GroupName = v);
 
-        private string groupName = "";
+        private object? groupName = "";
         
         [Content]
-        public string GroupName
+        public object? GroupName
         {
             get => groupName;
             set => SetAndRaise(GroupNameProperty, ref groupName, value);

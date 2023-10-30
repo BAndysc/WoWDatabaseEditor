@@ -43,7 +43,6 @@ namespace WDE.DatabaseEditors
                 factory.Register("BroadcastTextParameter", containerProvider.Resolve<BroadcastTextParameter>());
                 factory.RegisterDepending("CreatureTemplateSpellListIdParameter", "CreatureParameter", (a) => new CreatureTemplateSpellListIdParameter(a, parameterPickerService));
                 factory.RegisterDepending("DbScriptRandomTemplateTargetValueParameter", "BroadcastTextParameter", bcast => new DbScriptRandomTemplateTargetValueParameter(containerProvider.Resolve<IParameterPickerService>(), bcast));
-                factory.Register("LootReferenceParameter", containerProvider.Resolve<LootReferenceParameter>());
                 factory.Register("EquipmentCreatureGuidParameter", containerProvider.Resolve<EquipmentCreatureGuidParameter>());
                 factory.Register("CreatureGUIDParameter", this.containerProvider.Resolve<CreatureGUIDParameter>());
                 factory.Register("QuestObjectiveByStorageIndex(entry)Parameter",this.containerProvider.Resolve<QuestObjectiveByStorageIndexParameter>((typeof(string), "entry")));

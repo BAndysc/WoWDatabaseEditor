@@ -77,7 +77,7 @@ public class CustomCellDrawer : BaseCustomCellDrawer, ICustomCellDrawer
         bool drawIcon = false;
         if (cell.ParameterValue?.BaseParameter is IItemParameter && cell.TableField is DatabaseField<long> longField)
         {
-            if (!itemIconService.GetCachedItemIcon((uint)longField.Current.Value, out icn))
+            if (!itemIconService.TryGetCachedItemIcon((uint)longField.Current.Value, out icn))
             {
                 async Task FetchAsync()
                 {

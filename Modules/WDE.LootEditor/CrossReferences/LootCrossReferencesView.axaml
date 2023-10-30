@@ -1,0 +1,41 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:crossReferences="clr-namespace:WDE.LootEditor.CrossReferences"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="crossReferences:LootCrossReferencesViewModel"
+             x:Name="Root"
+             x:Class="WDE.LootEditor.CrossReferences.LootCrossReferencesView">
+  
+  <Border Margin="10" Background="{DynamicResource ContentBackground}" BorderThickness="1" BorderBrush="{DynamicResource ContentBorderBrush}">
+    <Panel>
+      <ScrollViewer>
+        <ItemsRepeater Items="{CompiledBinding Items}" IsEnabled="{CompiledBinding !IsLoading}">
+          <ItemsRepeater.ItemTemplate>
+            <DataTemplate x:DataType="crossReferences:CrossReferenceViewModel">
+              <Button BorderThickness="0" 
+                      Background="Transparent" 
+                      HorizontalContentAlignment="Stretch"
+                      HorizontalAlignment="Stretch"
+                      Command="{CompiledBinding #Root.((crossReferences:LootCrossReferencesViewModel)DataContext).OpenCrossReferenceCommand}"
+                      CommandParameter="{CompiledBinding .}">
+                <DockPanel LastChildFill="True" HorizontalAlignment="Stretch">
+                  <TextBlock Text="{CompiledBinding Entry}" Width="60" />
+                  <TextBlock Text="{CompiledBinding Type}" Opacity="0.5" DockPanel.Dock="Right" />
+                  <TextBlock Text="{CompiledBinding Name}" />
+                </DockPanel>
+              </Button>
+            </DataTemplate>
+          </ItemsRepeater.ItemTemplate>
+          <ItemsRepeater.Layout>
+            <StackLayout Orientation="Vertical" />
+          </ItemsRepeater.Layout>
+        </ItemsRepeater>
+      </ScrollViewer>
+      
+      <TextBlock Text="Loading..." Opacity="0.5" VerticalAlignment="Center" HorizontalAlignment="Center" IsVisible="{CompiledBinding IsLoading}" />
+    </Panel>
+  </Border>
+  
+</UserControl>

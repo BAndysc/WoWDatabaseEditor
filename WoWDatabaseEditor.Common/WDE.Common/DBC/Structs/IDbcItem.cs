@@ -20,3 +20,33 @@ public class DbcItemEntry : IDbcItem
     
     public IItemDisplayInfo? DisplayInfo { get; set; }
 }
+
+public interface IItemAppearance
+{
+    public uint Id { get; }
+    
+    public uint InventoryIconFileDataId { get; }
+}
+
+public class ItemAppearanceEntry : IItemAppearance
+{
+    public uint Id { get; init; }
+    public uint InventoryIconFileDataId { get; init; }
+}
+
+public interface IItemModifiedAppearance
+{
+    public uint ItemId { get; }
+    
+    public uint ItemAppearanceId { get; }
+    
+    public IItemAppearance? ItemAppearance { get; set; }
+}
+
+public class ItemModifiedAppearanceEntry : IItemModifiedAppearance
+{
+    public uint ItemId { get; init; }
+    public uint ItemAppearanceId { get; init; }
+    
+    public IItemAppearance? ItemAppearance { get; set; }
+}

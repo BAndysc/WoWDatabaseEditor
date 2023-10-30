@@ -5,6 +5,9 @@ namespace WDE.Common.Database
     public interface ICreatureTemplate
     {
         uint Entry { get; }
+        uint DifficultyEntry1 { get; }
+        uint DifficultyEntry2 { get; }
+        uint DifficultyEntry3 { get; }
         float Scale { get; }
         uint GossipMenuId { get; }
         uint FactionTemplate { get; }
@@ -39,11 +42,20 @@ namespace WDE.Common.Database
 
         int ModelsCount { get; }
         uint GetModel(int index);
+        
+        int LootCount { get; }
+        uint GetLootId(int index);
+        
+        uint SkinningLootId { get; }
+        uint PickpocketLootId { get; }
     }
 
     public class AbstractCreatureTemplate : ICreatureTemplate
     {
         public uint Entry { get; init; }
+        public uint DifficultyEntry1 { get; init; }
+        public uint DifficultyEntry2 { get; init; }
+        public uint DifficultyEntry3 { get; init; }
         public float Scale { get; init; }
         public uint GossipMenuId { get; init; }
         public uint FactionTemplate { get; init; }
@@ -80,6 +92,13 @@ namespace WDE.Common.Database
         {
             return 0;
         }
+        public int LootCount { get; init; }
+        public uint GetLootId(int index)
+        {
+            return 0;
+        }
+        public uint SkinningLootId { get; init; }
+        public uint PickpocketLootId { get; init; }
     }
     
     public class GameDefines

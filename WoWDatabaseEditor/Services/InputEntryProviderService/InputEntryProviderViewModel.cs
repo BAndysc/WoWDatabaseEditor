@@ -43,6 +43,7 @@ namespace WoWDatabaseEditorCore.Services.InputEntryProviderService
         public int DesiredHeight { get; } = 230;
         public string Title { get; }
         public bool Resizeable { get; } = true;
+
         public event Action? CloseCancel;
         public event Action? CloseOk;
     }

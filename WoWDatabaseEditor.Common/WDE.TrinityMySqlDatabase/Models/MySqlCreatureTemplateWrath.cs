@@ -14,6 +14,15 @@ namespace WDE.TrinityMySqlDatabase.Models
         [Column(Name = "entry")]
         public uint Entry { get; set; }
 
+        [Column(Name = "difficulty_entry_1")]
+        public uint DifficultyEntry1 { get; set; }
+
+        [Column(Name = "difficulty_entry_2")]
+        public uint DifficultyEntry2 { get; set; }
+
+        [Column(Name = "difficulty_entry_3")]
+        public uint DifficultyEntry3 { get; set; }
+
         [Column(Name = "modelid1")]
         public uint ModelId1 { get; set; }
 
@@ -134,6 +143,19 @@ namespace WDE.TrinityMySqlDatabase.Models
 
             throw new Exception("Model out of range");
         }
+        
+        [Column("lootid")] 
+        public uint LootId { get; set; }
+    
+        [Column("pickpocketloot")] 
+        public uint PickpocketLootId { get; set; }
+    
+        [Column("skinloot")] 
+        public uint SkinningLootId { get; set; }
+    
+        public int LootCount => 1;
+        
+        public uint GetLootId(int index) => LootId;
     }
     
     [Table(Name = "creature_template")]
@@ -143,7 +165,13 @@ namespace WDE.TrinityMySqlDatabase.Models
         [Identity]
         [Column(Name = "entry")]
         public uint Entry { get; set; }
+
+        public uint DifficultyEntry1 => 0;
         
+        public uint DifficultyEntry2 => 0;
+        
+        public uint DifficultyEntry3 => 0;
+
         [Column(Name = "scale")]
         public float Scale { get; set; }
 
@@ -251,6 +279,16 @@ namespace WDE.TrinityMySqlDatabase.Models
             this.models = models;
             return this;
         }
+
+        public uint LootId => 0;
+
+        public uint PickpocketLootId => 0;
+
+        public uint SkinningLootId => 0;
+    
+        public int LootCount => 1;
+        
+        public uint GetLootId(int index) => LootId;
     }
 
     [Table(Name = "creature_template_model")]

@@ -40,5 +40,18 @@ namespace WDE.CMMySqlDatabase.Models
         public ITable<SpawnGroup> SpawnGroupTemplate => GetTable<SpawnGroup>();
         public ITable<SpawnGroupSpawn> SpawnGroupSpawns => GetTable<SpawnGroupSpawn>();
         public ITable<SpawnGroupFormation> SpawnGroupFormations => GetTable<SpawnGroupFormation>();
+        public ITable<ReferenceLootTemplateName> ReferenceLootTemplateNames => GetTable<ReferenceLootTemplateName>();
+        public ITable<ItemLootTemplate> ItemLootTemplate => GetTable<ItemLootTemplate>();
+        public ITable<CreatureLootTemplate> CreatureLootTemplate => GetTable<CreatureLootTemplate>();
+        public ITable<DisenchantLootTemplate> DisenchantLootTemplate => GetTable<DisenchantLootTemplate>();
+        public ITable<ProspectingLootTemplate> ProspectingLootTemplate => GetTable<ProspectingLootTemplate>();
+        public ITable<MillingLootTemplate> MillingLootTemplate => GetTable<MillingLootTemplate>();
+        public ITable<ReferenceLootTemplate> ReferenceLootTemplate => GetTable<ReferenceLootTemplate>();
+        public ITable<SpellLootTemplate> SpellLootTemplate => GetTable<SpellLootTemplate>();
+        public ITable<MailLootTemplate> MailLootTemplate => GetTable<MailLootTemplate>();
+        public ITable<GameObjectLootTemplate> GameObjectLootTemplate => GetTable<GameObjectLootTemplate>();
+        public ITable<FishingLootTemplate> FishingLootTemplate => GetTable<FishingLootTemplate>();
+        public ITable<SkinningLootTemplate> SkinningLootTemplate => GetTable<SkinningLootTemplate>();
+        public ITable<PickpocketingLootTemplate> PickpocketingLootTemplate => GetTable<PickpocketingLootTemplate>();
     }
 }

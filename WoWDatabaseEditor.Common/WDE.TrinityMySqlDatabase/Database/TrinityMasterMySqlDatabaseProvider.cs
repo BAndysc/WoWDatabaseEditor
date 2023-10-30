@@ -77,6 +77,12 @@ public class TrinityMasterMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvid
         MergeCreatureTemplateModels(templates, models);
         return templates;
     }
+    
+    public override async Task<IReadOnlyList<ICreatureTemplateDifficulty>> GetCreatureTemplateDifficulties(uint entry)
+    {
+        await using var model = Database();
+        return await model.CreatureTemplateDifficulty.Where(x => x.Entry == entry).ToListAsync<ICreatureTemplateDifficulty>();
+    }
 
     public override async Task<List<IGossipMenuOption>> GetGossipMenuOptionsAsync(uint menuId)
     {
@@ -412,7 +418,7 @@ public class TrinityMasterMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvid
     public override async Task<IList<ISmartScriptLine>> FindSmartScriptLinesBy(IEnumerable<(IDatabaseProvider.SmartLinePropertyType what, int whatValue, int parameterIndex, long valueToSearch)> conditions)
     {
         await using var model = Database();
-        var predicate = PredicateBuilder.New<MySqlSmartScriptLine>();
+        var predicate = PredicateBuilder.New<MasterMySqlSmartScriptLine>();
         foreach (var value in conditions)
         {
             if (value.what == IDatabaseProvider.SmartLinePropertyType.Action)
@@ -452,5 +458,26 @@ public class TrinityMasterMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvid
             }
         }
         return await model.SmartScript.Where(predicate).ToListAsync<ISmartScriptLine>();    
+    }
+    
+    public override async Task<(IReadOnlyList<ICreatureTemplate>, IReadOnlyList<ICreatureTemplateDifficulty>)> GetCreatureLootCrossReference(uint lootId)
+    {
+        await using var database = Database();
+        var difficulties = await database.CreatureTemplateDifficulty.Where(x => x.LootId == lootId).ToListAsync();
+        return (Array.Empty<ICreatureTemplate>(), difficulties);
+    }
+
+    public override async Task<(IReadOnlyList<ICreatureTemplate>, IReadOnlyList<ICreatureTemplateDifficulty>)> GetCreatureSkinningLootCrossReference(uint lootId)
+    {
+        await using var database = Database();
+        var difficulties = await database.CreatureTemplateDifficulty.Where(x => x.SkinningLootId == lootId).ToListAsync();
+        return (Array.Empty<ICreatureTemplate>(), difficulties);
+    }
+
+    public override async Task<(IReadOnlyList<ICreatureTemplate>, IReadOnlyList<ICreatureTemplateDifficulty>)> GetCreaturePickPocketLootCrossReference(uint lootId)
+    {
+        await using var database = Database();
+        var difficulties = await database.CreatureTemplateDifficulty.Where(x => x.PickpocketLootId == lootId).ToListAsync();
+        return (Array.Empty<ICreatureTemplate>(), difficulties);
     }
 }

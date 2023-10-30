@@ -100,6 +100,7 @@ namespace WDE.Common.CoreVersion
         bool SupportsConditionTargetVictim => false;
         string CreatureSmartAiName => "SmartAI";
         string GameObjectSmartAiName => "SmartGameObjectAI";
+        bool DifficultyInSeparateColumn => false;
 
         string? ForceLoadTag => null;
         string TableName { get; }

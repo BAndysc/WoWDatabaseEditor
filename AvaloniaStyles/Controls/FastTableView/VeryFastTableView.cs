@@ -384,6 +384,8 @@ public partial class VeryFastTableView : Panel, IKeyboardNavigationHandler, IFas
         if (!e.Handled && IsSelectedCellValid && Items != null)
         {
             var properties = e.GetCurrentPoint(this).Properties;
+            if (SelectedCellIndex >= Items[SelectedRowIndex.GroupIndex].Rows[SelectedRowIndex.RowIndex].CellsList.Count)
+                throw new Exception();
             var cell = Items[SelectedRowIndex.GroupIndex].Rows[SelectedRowIndex.RowIndex].CellsList[SelectedCellIndex];
             if (CustomCellInteractor != null && CustomCellInteractor.PointerDown(cell,
                     SelectedCellRect,
@@ -487,6 +489,7 @@ public partial class VeryFastTableView : Panel, IKeyboardNavigationHandler, IFas
         }
     }
     
+    public bool IsSelectedRowValid => IsRowIndexValid(SelectedRowIndex);
     public bool IsSelectedCellValid => SelectedCellIndex >= 0 && SelectedCellIndex < ColumnsCount && IsRowIndexValid(SelectedRowIndex);
     public Rect SelectedCellRect => CellRect(SelectedCellIndex, SelectedRowIndex);
 

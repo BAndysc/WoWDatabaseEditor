@@ -1,0 +1,136 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:configuration="clr-namespace:WDE.LootEditor.Configuration"
+             xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
+             xmlns:dnD="clr-namespace:WDE.Common.Avalonia.DnD;assembly=WDE.Common.Avalonia"
+             xmlns:fastTableView="clr-namespace:AvaloniaStyles.Controls.FastTableView;assembly=AvaloniaStyles"
+             xmlns:configuration1="clr-namespace:WDE.LootEditor.Configuration"
+             xmlns:services="clr-namespace:WDE.LootEditor.Services"
+             xmlns:views="clr-namespace:WDE.LootEditor.Configuration.Views"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="configuration1:LootEditorConfiguration"
+             x:Name="Root"
+             x:Class="WDE.LootEditor.Configuration.Views.LootEditorConfigurationView">
+  <UserControl.Styles>
+    <Style Selector="TextBlock">
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+  </UserControl.Styles>
+  <Grid
+    ColumnDefinitions="300,5,*"
+    >
+    
+    <DockPanel>
+      <ToolbarPanel DockPanel.Dock="Top">
+        <ButtonImage Image="Icons/icon_add.png" Command="{CompiledBinding AddNewButtonCommand}" ToolTip.Tip="Add a new button" />
+        <ButtonImage Image="Icons/icon_delete.png" Command="{CompiledBinding DeleteSelectedButtonsCommand}" ToolTip.Tip="Remove selected buttons" />
+      </ToolbarPanel>
+      <ListBox Items="{CompiledBinding Buttons}"
+               SelectionMode="Multiple"
+               SelectedItems="{CompiledBinding SelectedButtons}"
+               SelectedItem="{CompiledBinding SelectedButton}"
+               dnD:DragAndDrop.IsDropTarget="True"
+               dnD:DragAndDrop.DropHandler="{CompiledBinding .}" 
+               dnD:DragAndDrop.IsDragSource="True"
+               >
+        <ListBox.ItemTemplate>
+          <DataTemplate>
+            <DockPanel>
+              <WdeImage ImageUri="{CompiledBinding Icon}" Width="19" Height="19" />
+              <TextBlock Text="{CompiledBinding Type}" Opacity="0.5" DockPanel.Dock="Right" />
+
+              <TextBlock Text="{CompiledBinding ButtonTextOrToolTip}" />
+            </DockPanel>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+    </DockPanel>
+    
+    <GridSplitter Classes="vertical" Grid.Column="1" />
+    
+    <ScrollViewer  Grid.Column="2" HorizontalScrollBarVisibility="Disabled"
+                   IsVisible="{CompiledBinding SelectedButton, Converter={x:Static NullConverter.IsNotNull}}">
+      <TwoColumnsPanel
+                     DataContext="{CompiledBinding SelectedButton}"
+                     IsEnabled="{CompiledBinding ., Converter={x:Static NullConverter.IsNotNull}}">
+        
+        <TextBlock>Type:</TextBlock>
+        <CompletionComboBox controls:Extensions.EnumType="{x:Type services:LootButtonType}" SelectedItem="{CompiledBinding Type}" />
+        
+        <TextBlock>Button text:</TextBlock>
+        <NullableTextBox Text="{CompiledBinding ButtonText}" />
+        
+        <TextBlock>Button tooltip:</TextBlock>
+        <NullableTextBox Text="{CompiledBinding ButtonToolTip}" />
+        
+        <TextBlock>Icon:</TextBlock>
+        <DockPanel>
+          <CheckBox IsChecked="{CompiledBinding IsNonNullIcon}" />
+          <Button DockPanel.Dock="Right" Command="{CompiledBinding PickCustomIconCommand}">...</Button>
+          <CompletionComboBox SelectedItem="{CompiledBinding Icon}"
+                              IsEnabled="{CompiledBinding IsNonNullIcon}"
+                              Items="{x:Static configuration1:StaticIcons.IconsSource}">
+            <CompletionComboBox.ItemTemplate>
+              <DataTemplate DataType="configuration1:IconViewModel">
+                <DockPanel>
+                  <WdeImage Image="{CompiledBinding  Icon}" Width="16" Height="16" Margin="0,0,5,0" />
+                  <TextBlock Text="{CompiledBinding  Path}" />
+                </DockPanel>
+              </DataTemplate>
+            </CompletionComboBox.ItemTemplate>
+          </CompletionComboBox>
+        </DockPanel>
+        
+        <TextBlock TwoColumnsPanel.ColumnSpan="2" IsVisible="{CompiledBinding IsCustomItemSetType}">
+          Items to insert:
+        </TextBlock>
+        
+        <ScrollViewer controls:TwoColumnsPanel.ColumnSpan="2"
+                      MinHeight="300"
+                      HorizontalScrollBarVisibility="Visible"
+                      Background="{DynamicResource ContentBackground}"
+                      IsVisible="{CompiledBinding IsCustomItemSetType}">
+          <fastTableView:VeryFastTableView Items="{CompiledBinding .}"
+                                           IsGroupingEnabled="True"
+                                           ValueUpdateRequest="VeryFastTableView_OnValueUpdateRequest"
+                                           x:Name="VeryFastTableView"
+                                           SelectedCellIndex="{CompiledBinding FocusedCellIndex}"
+                                           SelectedRowIndex="{CompiledBinding FocusedRowIndex}"
+                                           MultiSelection="{CompiledBinding MultiSelection}"
+                                           TextBlock.FontFamily="{DynamicResource MonoFont}"
+                                           Columns="{CompiledBinding #Root.((configuration1:LootEditorConfiguration)DataContext).CustomItemsColumns}"
+          >
+            <fastTableView:VeryFastTableView.GroupHeaderTemplate>
+              <DataTemplate x:DataType="configuration1:LootEditorButtonSettingViewModel">
+                <GroupingHeader>
+                  <GroupingHeader.CustomContent>
+                    <ButtonImage Width="23"
+                            Height="23"
+                            Padding="1"
+                            Command="{CompiledBinding AddNewItemCommand}"
+                            Image="Icons/icon_add_mono.png">
+                    </ButtonImage>
+                  </GroupingHeader.CustomContent>
+                </GroupingHeader>
+              </DataTemplate>
+            </fastTableView:VeryFastTableView.GroupHeaderTemplate>
+            <fastTableView:VeryFastTableView.CustomCellDrawer>
+              <views:CustomCellDrawer />
+            </fastTableView:VeryFastTableView.CustomCellDrawer>
+            <fastTableView:VeryFastTableView.CustomCellInteractor>
+              <views:CustomCellInteractor />
+            </fastTableView:VeryFastTableView.CustomCellInteractor>
+            <fastTableView:VeryFastTableView.ContextMenu>
+              <ContextMenu>
+                <MenuItem Header="Delete selected loot items" Command="{CompiledBinding DeleteSelectedLootItemsCommand}" />
+              </ContextMenu>
+            </fastTableView:VeryFastTableView.ContextMenu>
+          </fastTableView:VeryFastTableView>
+        </ScrollViewer>
+      </TwoColumnsPanel>
+    </ScrollViewer>
+    
+  </Grid>
+</UserControl>

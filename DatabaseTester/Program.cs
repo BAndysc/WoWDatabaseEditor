@@ -307,6 +307,20 @@ public class Program
             await worldDb.GetEventScript(type, 0);
         }
         
+        foreach (var type in Enum.GetValues<LootSourceType>())
+        {
+            Console.Write($"GetLoot({type})... ");
+            try
+            {
+                await worldDb.GetLoot(type, 0);
+                Console.WriteLine("OK");
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                Console.WriteLine("Not supported (but it's ok)");
+            }
+        }
+        
         return 0;
     }
     

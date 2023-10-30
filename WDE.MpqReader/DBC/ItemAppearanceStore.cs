@@ -1,4 +1,5 @@
 using WDE.Common.DBC;
+using WDE.Common.DBC.Structs;
 
 namespace WDE.MpqReader.DBC;
 

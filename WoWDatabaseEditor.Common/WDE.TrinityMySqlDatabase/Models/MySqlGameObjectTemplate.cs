@@ -28,8 +28,24 @@ namespace WDE.TrinityMySqlDatabase.Models
         [Column(Name = "ScriptName")] 
         public string ScriptName { get; set; } = "";
 
-        public uint this[int dataIndex] => 0;
+        [Column(Name = "Data0")]
+        public uint Data0 { get; set; }
 
-        public uint DataCount => 0;
+        [Column(Name = "Data1")]
+        public int Data1 { get; set; }
+
+        public uint this[int dataIndex]
+        {
+            get
+            {
+                if (dataIndex == 0)
+                    return Data0;
+                if (dataIndex == 1)
+                    return Data1 < 0 ? 0 : (uint)Data1;
+                return 0;
+            }
+        }
+        
+        public uint DataCount => 2;
     }
 }

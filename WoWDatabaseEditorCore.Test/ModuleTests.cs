@@ -48,7 +48,7 @@ public class ModuleTests
         public override void RegisterTypes(IContainerRegistry containerRegistry)
         {
             base.RegisterTypes(containerRegistry);
-            RegisterType(typeof(Implementation), containerRegistry);
+            RegisterType(typeof(Implementation), containerRegistry, false);
         }
     }
 }

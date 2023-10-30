@@ -15,6 +15,9 @@
         int ExclusiveGroup { get; }
         int BreadcrumbForQuestId { get; }
         uint NextQuestInChain { get; }
+        
+        uint RewardMailTemplateId { get; }
+        uint QuestRewardId { get; }
     }
 
     public class AbstractQuestTemplate : IQuestTemplate
@@ -30,6 +33,8 @@
         public int ExclusiveGroup { get; set; }
         public int BreadcrumbForQuestId { get; set; }
         public uint NextQuestInChain { get; set; }
+        public uint RewardMailTemplateId { get; set; }
+        public uint QuestRewardId { get; set; }
     }
 
     public interface IQuestObjective

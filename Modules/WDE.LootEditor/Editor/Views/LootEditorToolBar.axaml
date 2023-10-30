@@ -1,0 +1,22 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:WDE.LootEditor.Editor.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:LootEditorViewModel"
+             IsEnabled="{CompiledBinding !IsLoading}"
+             x:Class="WDE.LootEditor.Editor.Views.LootEditorToolBar">
+  <ToolbarPanel>
+    <ButtonImage Command="{CompiledBinding AddNewLootCommand}" 
+                 Text="Add new loot id" 
+                 Image="Icons/icon_add.png"/>
+
+    <ToolbarSpacer />
+        
+    <StackPanel DockPanel.Dock="Right" HorizontalAlignment="Right" Orientation="Horizontal">
+      <TextBlock Opacity="0.5" VerticalAlignment="Center" Padding="0,0,15,0">Search: </TextBlock>
+      <TextBox MinHeight="24" Padding="0" Name="SearchTextBox" Width="200" HorizontalAlignment="Right" Text="{CompiledBinding SearchText, Mode=TwoWay}" />
+    </StackPanel>
+  </ToolbarPanel>
+</UserControl>

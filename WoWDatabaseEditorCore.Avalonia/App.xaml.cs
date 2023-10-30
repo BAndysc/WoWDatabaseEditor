@@ -43,6 +43,7 @@ namespace WoWDatabaseEditorCore.Avalonia
     public class App : PrismApplication
     {
         private IModulesManager? modulesManager;
+        private ICurrentCoreSettings currentCoreSettings = null!;
 
         public App()
         {
@@ -113,7 +114,7 @@ namespace WoWDatabaseEditorCore.Avalonia
             var vfs = new VirtualFileSystem();
             var fs = new FileSystem(vfs);
             var userSettings = new UserSettings(fs, new Lazy<IStatusBar>(new DummyStatusBar()));
-            var currentCoreSettings = new CurrentCoreSettings(userSettings);
+            currentCoreSettings = new CurrentCoreSettings(userSettings);
             containerRegistry.RegisterInstance(typeof(ICurrentCoreSettings), currentCoreSettings);
             
             modulesManager = new ModulesManager(currentCoreSettings);
@@ -196,6 +197,11 @@ namespace WoWDatabaseEditorCore.Avalonia
             {
                 var implementedInterfaces = AllClasses.FromAssemblies(assembly)
                     .Where(t => t.IsDefined(typeof(AutoRegisterAttribute), true))
+                    .Where(t =>
+                    {
+                        var requiresCoreAttribute = t.GetCustomAttribute<RequiresCoreAttribute>();
+                        return requiresCoreAttribute == null || requiresCoreAttribute.Tags.Contains(currentCoreSettings.CurrentCore);
+                    })
                     .SelectMany(t => t.GetInterfaces())
                     .Where(t => t.IsDefined(typeof(UniqueProviderAttribute)))
                     .ToList();
@@ -210,7 +216,7 @@ namespace WoWDatabaseEditorCore.Avalonia
                     if (intersection.Count > 0)
                         conflictingAssemblies.Add(new Conflict(assembly, otherAssembly.Key));
                 }
-
+                
                 providedInterfaces.Add(assembly, implementedInterfaces.ToList());
             }
 
@@ -244,6 +250,8 @@ namespace WoWDatabaseEditorCore.Avalonia
             this.InitializeModules();
 
             var loadedModules = Container.Resolve<IEnumerable<ModuleBase>>();
+            foreach (var module in loadedModules)
+                module.RegisterFallbackTypes((IContainerRegistry)Container);
             foreach (var module in loadedModules)
                 module.FinalizeRegistration((IContainerRegistry)Container);
 

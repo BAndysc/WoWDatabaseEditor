@@ -1,0 +1,45 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:standalone="clr-namespace:WDE.LootEditor.Editor.Standalone"
+             xmlns:controls="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
+             xmlns:database="clr-namespace:WDE.Common.Database;assembly=WDE.Common"
+             xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="standalone:StandaloneLootEditorViewModel"
+             x:Class="WDE.LootEditor.Editor.Standalone.StandaloneLootEditorToolBar">
+  <UserControl.KeyBindings>
+    <BetterKeyBinding Gesture="Enter" Command="{CompiledBinding LoadLootCommand}" />
+  </UserControl.KeyBindings>
+  <ToolbarPanel>
+
+    <ButtonImage Image="Icons/icon_save.png" ToolTip.Tip="Save conditions" Command="{CompiledBinding SaveCommand}" />
+        
+    <ButtonImage Image="Icons/icon_to_sql.png" ToolTip.Tip="Generate query" Command="{CompiledBinding GenerateQueryCommand}" />
+    
+    <TextBlock Text="Type:" VerticalAlignment="Center" Opacity="0.5" />
+    <CompletionComboBox SelectedItem="{CompiledBinding LootType, Mode=TwoWay}" controls:Extensions.EnumType="{x:Type database:LootSourceType}" />
+    
+    <Border Width="20" />
+    
+    <TextBlock Text="Difficulty:" VerticalAlignment="Center" Opacity="0.5" />
+    <CompletionComboBox SelectedItem="{CompiledBinding Difficulty, Mode=TwoWay}" 
+                        Items="{CompiledBinding Difficulties}"
+                        IsEnabled="{CompiledBinding CanChooseDifficulty}" />
+    
+    <Border Width="20" />
+
+    <TextBlock Text="Entry:" VerticalAlignment="Center" Opacity="0.5" />
+    <TextBox Classes="noErrors" Text="{CompiledBinding SolutionEntry}" />
+    <ButtonImage Image="Icons/icon_picker_color.png" ToolTip.Tip="Pick entry" Command="{CompiledBinding PickEntryCommand}" />
+    
+    <ButtonImage Image="Icons/icon_restore.png" ToolTip.Tip="Load" Command="{CompiledBinding LoadLootCommand}" />
+
+    <ContentPresenter DataContext="{CompiledBinding ViewModel}" 
+                      Content="{CompiledBinding .}"
+                      IsEnabled="{CompiledBinding ., Converter={x:Static NullConverter.IsNotNull}}" 
+                      ContentTemplate="{x:Static utils:ToolbarDataTemplate.Template}"
+    />
+  </ToolbarPanel>
+</UserControl>

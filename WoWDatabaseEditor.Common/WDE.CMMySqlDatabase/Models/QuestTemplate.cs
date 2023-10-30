@@ -40,6 +40,11 @@ namespace WDE.CMMySqlDatabase.Models
         //         [Column(Name = "RewardNextQuest")]
         //         public uint NextQuestInChain { get; set; }
 
+        [Column(Name = "RewMailTemplateId")]
+        public uint RewardMailTemplateId { get; set; }
+
+        public uint QuestRewardId => 0;
+
         // TODO: remove this hack by setting NextQuestInChain as int instead uint (this will ignore next quest id < 0)
         [Column("NextQuestId"                                )] public int    NextQuestInChainU            { get; set; } // mediumint(9)
         public uint NextQuestInChain => NextQuestInChainU > 0 ? (uint)NextQuestInChainU : 0;

@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using LinqToDB.Mapping;
 using WDE.Common.Database;
+using WDE.Common.Utils;
 
 namespace WDE.TrinityMySqlDatabase.Models
 {
@@ -121,7 +122,9 @@ namespace WDE.TrinityMySqlDatabase.Models
 
         [Column]
         public string Comment { get; set; } = "";
-
+        
+        public SmallReadOnlyList<uint>? Difficulties => null;
+        
         public AzerothMySqlSmartScriptLine() { }
 
         public AzerothMySqlSmartScriptLine(ISmartScriptLine line)

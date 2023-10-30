@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -262,5 +263,34 @@ public class DatabaseProviderWoTLK : BaseDatabaseProvider<WoTLKDatabase>
     {
         await using var model = Database();
         return await model.CreatureTemplateAddon.FirstOrDefaultAsync<ICreatureTemplateAddon>(x => x.Entry == entry);
+    }
+    
+    public override async Task<(IReadOnlyList<ICreatureTemplate>, IReadOnlyList<ICreatureTemplateDifficulty>)> GetCreatureLootCrossReference(uint lootId)
+    {
+        await using var database = Database();
+        var creatures = await database.CreatureTemplate.Where(x => x.LootId == lootId).ToListAsync();
+        return (creatures, Array.Empty<ICreatureTemplateDifficulty>());
+    }
+
+    public override async Task<(IReadOnlyList<ICreatureTemplate>, IReadOnlyList<ICreatureTemplateDifficulty>)> GetCreatureSkinningLootCrossReference(uint lootId)
+    {
+        await using var database = Database();
+        var creatures = await database.CreatureTemplate.Where(x => x.SkinningLootId == lootId).ToListAsync();
+        return (creatures, Array.Empty<ICreatureTemplateDifficulty>());
+    }
+
+    public override async Task<(IReadOnlyList<ICreatureTemplate>, IReadOnlyList<ICreatureTemplateDifficulty>)> GetCreaturePickPocketLootCrossReference(uint lootId)
+    {
+        await using var database = Database();
+        var creatures = await database.CreatureTemplate.Where(x => x.PickpocketLootId == lootId).ToListAsync();
+        return (creatures, Array.Empty<ICreatureTemplateDifficulty>());
+    }
+    
+    public override async Task<IReadOnlyList<IGameObjectTemplate>> GetGameObjectLootCrossReference(uint lootId)
+    {
+        await using var database = Database();
+        return await database.GameObjectTemplate.Where(template =>
+            template.Type == GameobjectType.Chest && template.Data1 == lootId ||
+            template.Type == GameobjectType.FishingHole && template.Data1 == lootId).ToListAsync();
     }
 }

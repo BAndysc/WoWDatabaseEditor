@@ -157,7 +157,9 @@ namespace WDE.DbcStore
         public IReadOnlyList<IDbcItem> Items { get; internal set; } = Array.Empty<IDbcItem>();
         public Dictionary<uint, DbcItemEntry> ItemsById { get; internal set; } = new();
         public IDbcItem? GetItemById(uint id) => ItemsById.TryGetValue(id, out var item) ? item : null;
-
+        public Dictionary<uint, List<ItemModifiedAppearanceEntry>> ItemModifiedAppearances { get; internal set; } = new();
+        public IReadOnlyList<IItemModifiedAppearance>? GetItemModifiedAppearances(uint itemId) => ItemModifiedAppearances.TryGetValue(itemId, out var item) ? item : null;
+        
         public IReadOnlyList<ICurrencyType> CurrencyTypes { get; internal set; } = Array.Empty<ICurrencyType>();
         public Dictionary<uint, CurrencyType> CurrencyTypeById { get; internal set; } = new();
         public ICurrencyType? GetCurrencyTypeById(uint id) => CurrencyTypeById.TryGetValue(id, out var currency) ? currency : null;
@@ -246,6 +248,14 @@ namespace WDE.DbcStore
                     if (store.GetItemDisplayInfoById(x.DisplayInfoId) is { } displayInfo)
                         x.DisplayInfo = displayInfo;
                 });
+                var itemAppearancesById = data.ItemAppearances.ToDictionary(x => x.Id, x => x);
+                data.ItemModifiedAppearances.Each(x =>
+                {
+                   if (itemAppearancesById.TryGetValue(x.ItemAppearanceId, out var appearance))
+                       x.ItemAppearance = appearance;
+                });
+                store.ItemModifiedAppearances = data.ItemModifiedAppearances.GroupBy(x => x.ItemId)
+                    .ToDictionary(x => x.Key, x => x.ToList());
                 store.CurrencyTypes = data.CurrencyTypes;
                 store.CurrencyTypeById = data.CurrencyTypes.ToDictionary(a => a.Id, a => a);
 

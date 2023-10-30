@@ -6,6 +6,7 @@ namespace WDE.TrinityMySqlDatabase.Models;
 public class TrinityMasterDatabase : BaseTrinityDatabase
 {
     public ITable<MySqlCreatureTemplateMaster> CreatureTemplate => GetTable<MySqlCreatureTemplateMaster>();
+    public ITable<MySqlCreatureTemplateDifficulty> CreatureTemplateDifficulty => GetTable<MySqlCreatureTemplateDifficulty>();
     public ITable<CreatureTemplateModel> CreatureTemplateModel => GetTable<CreatureTemplateModel>();
     public ITable<MySqlCreatureMaster> Creature => GetTable<MySqlCreatureMaster>();
     public ITable<MySqlBroadcastText> BroadcastTexts => GetTable<MySqlBroadcastText>();
@@ -23,5 +24,5 @@ public class TrinityMasterDatabase : BaseTrinityDatabase
     public ITable<MySqlEventScriptLine> EventScripts => GetTable<MySqlEventScriptLine>();
     public ITable<MySqlWaypointScriptLine> WaypointScripts => GetTable<MySqlWaypointScriptLine>();
     public ITable<MySqlSpellScriptLine> SpellScripts => GetTable<MySqlSpellScriptLine>();
-    public ITable<MySqlSmartScriptLine> SmartScript => GetTable<MySqlSmartScriptLine>();
+    public ITable<MasterMySqlSmartScriptLine> SmartScript => GetTable<MasterMySqlSmartScriptLine>();
 }

@@ -23,6 +23,7 @@ namespace WDE.TrinityMySqlDatabase.Database
         public bool IsConnected => true;
         public abstract Task<ICreatureTemplate?> GetCreatureTemplate(uint entry);
         public abstract IReadOnlyList<ICreatureTemplate> GetCreatureTemplates();
+        public abstract Task<IReadOnlyList<ICreatureTemplateDifficulty>> GetCreatureTemplateDifficulties(uint entry);
 
         private readonly ICurrentCoreVersion currentCoreVersion;
 
@@ -624,6 +625,152 @@ namespace WDE.TrinityMySqlDatabase.Database
         
         public async Task<ISpawnGroupFormation?> GetSpawnGroupFormation(uint id) => null;
         public async Task<IList<ISpawnGroupFormation>?> GetSpawnGroupFormations() => null;
+        
+        public virtual async Task<IReadOnlyList<ILootEntry>> GetLoot(LootSourceType type)
+        {
+            await using var database = Database();
+            switch (type)
+            {
+                case LootSourceType.Item:
+                    return await database.ItemLootTemplate.OrderBy(x => x.Entry)
+                        .ThenBy(x => x.GroupId)
+                        .ThenBy(x => x.Item)
+                        .ToListAsync<ILootEntry>();
+                case LootSourceType.GameObject:
+                    return await database.GameObjectLootTemplate.OrderBy(x => x.Entry)
+                        .ThenBy(x => x.GroupId)
+                        .ThenBy(x => x.Item)
+                        .ToListAsync<ILootEntry>();
+                case LootSourceType.Fishing:
+                    return await database.FishingLootTemplate.OrderBy(x => x.Entry)
+                        .ThenBy(x => x.GroupId)
+                        .ThenBy(x => x.Item)
+                        .ToListAsync<ILootEntry>();
+                case LootSourceType.Pickpocketing:
+                    return await database.PickpocketingLootTemplate.OrderBy(x => x.Entry)
+                        .ThenBy(x => x.GroupId)
+                        .ThenBy(x => x.Item)
+                        .ToListAsync<ILootEntry>();
+                case LootSourceType.Skinning:
+                    return await database.SkinningLootTemplate.OrderBy(x => x.Entry)
+                        .ThenBy(x => x.GroupId)
+                        .ThenBy(x => x.Item)
+                        .ToListAsync<ILootEntry>();
+                case LootSourceType.Disenchant:
+                    return await database.DisenchantLootTemplate.OrderBy(x => x.Entry)
+                        .ThenBy(x => x.GroupId)
+                        .ThenBy(x => x.Item)
+                        .ToListAsync<ILootEntry>();
+                case LootSourceType.Prospecting:
+                    return await database.ProspectingLootTemplate.OrderBy(x => x.Entry)
+                        .ThenBy(x => x.GroupId)
+                        .ThenBy(x => x.Item)
+                        .ToListAsync<ILootEntry>();
+                case LootSourceType.Milling:
+                    return await database.MillingLootTemplate.OrderBy(x => x.Entry)
+                        .ThenBy(x => x.GroupId)
+                        .ThenBy(x => x.Item)
+                        .ToListAsync<ILootEntry>();
+                case LootSourceType.Reference:
+                    return await database.ReferenceLootTemplate.OrderBy(x => x.Entry)
+                        .ThenBy(x => x.GroupId)
+                        .ThenBy(x => x.Item)
+                        .ToListAsync<ILootEntry>();
+                case LootSourceType.Creature:
+                    return await database.CreatureLootTemplate.OrderBy(x => x.Entry)
+                        .ThenBy(x => x.GroupId)
+                        .ThenBy(x => x.Item)
+                        .ToListAsync<ILootEntry>();
+                case LootSourceType.Mail:
+                    return await database.MailLootTemplate.OrderBy(x => x.Entry)
+                        .ThenBy(x => x.GroupId)
+                        .ThenBy(x => x.Item)
+                        .ToListAsync<ILootEntry>();
+                case LootSourceType.Spell:
+                    return await database.SpellLootTemplate.OrderBy(x => x.Entry)
+                        .ThenBy(x => x.GroupId)
+                        .ThenBy(x => x.Item)
+                        .ToListAsync<ILootEntry>();
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+            }
+        }
+
+        public async Task<ILootTemplateName?> GetLootTemplateName(LootSourceType type, uint entry) => null;
+        
+        public async Task<IReadOnlyList<ILootTemplateName>> GetLootTemplateName(LootSourceType type) => Array.Empty<ILootTemplateName>();
+
+        public abstract Task<(IReadOnlyList<ICreatureTemplate>, IReadOnlyList<ICreatureTemplateDifficulty>)>
+            GetCreatureLootCrossReference(uint lootId);
+
+        public abstract Task<(IReadOnlyList<ICreatureTemplate>, IReadOnlyList<ICreatureTemplateDifficulty>)>
+            GetCreatureSkinningLootCrossReference(uint lootId);
+
+        public abstract Task<(IReadOnlyList<ICreatureTemplate>, IReadOnlyList<ICreatureTemplateDifficulty>)>
+            GetCreaturePickPocketLootCrossReference(uint lootId);
+
+        public async Task<IReadOnlyList<IGameObjectTemplate>> GetGameObjectLootCrossReference(uint lootId)
+        {
+            await using var database = Database();
+            return await database.GameObjectTemplate.Where(template =>
+                template.Type == GameobjectType.Chest && template.Data1 == lootId).ToListAsync();
+        }
+
+        public virtual async Task<IReadOnlyList<ILootEntry>> GetReferenceLootCrossReference(uint lootId)
+        {
+            if (lootId == 0)
+                return Array.Empty<ILootEntry>();
+            await using var database = Database();
+            var loot = new[]
+            {
+                await database.CreatureLootTemplate.Where(x => x.Reference == lootId).ToListAsync<ILootEntry>(),
+                await database.GameObjectLootTemplate.Where(x => x.Reference == lootId).ToListAsync<ILootEntry>(),
+                await database.ItemLootTemplate.Where(x => x.Reference == lootId).ToListAsync<ILootEntry>(),
+                await database.FishingLootTemplate.Where(x => x.Reference == lootId).ToListAsync<ILootEntry>(),
+                await database.PickpocketingLootTemplate.Where(x => x.Reference == lootId).ToListAsync<ILootEntry>(),
+                await database.SkinningLootTemplate.Where(x => x.Reference == lootId).ToListAsync<ILootEntry>(),
+                await database.DisenchantLootTemplate.Where(x => x.Reference == lootId).ToListAsync<ILootEntry>(),
+                await database.ProspectingLootTemplate.Where(x => x.Reference == lootId).ToListAsync<ILootEntry>(),
+                await database.MillingLootTemplate.Where(x => x.Reference == lootId).ToListAsync<ILootEntry>(),
+                await database.MailLootTemplate.Where(x => x.Reference == lootId).ToListAsync<ILootEntry>(),
+                await database.SpellLootTemplate.Where(x => x.Reference == lootId).ToListAsync<ILootEntry>()
+            };
+            return loot.SelectMany(x => x).ToList();
+        }
+
+        public virtual async Task<IReadOnlyList<ILootEntry>> GetLoot(LootSourceType type, uint entry)
+        {
+            await using var database = Database();
+            switch (type)
+            {
+                case LootSourceType.Item:
+                    return await database.ItemLootTemplate.Where(x => x.Entry == entry).ToListAsync<ILootEntry>();
+                case LootSourceType.GameObject:
+                    return await database.GameObjectLootTemplate.Where(x => x.Entry == entry).ToListAsync<ILootEntry>();
+                case LootSourceType.Fishing:
+                    return await database.FishingLootTemplate.Where(x => x.Entry == entry).ToListAsync<ILootEntry>();
+                case LootSourceType.Pickpocketing:
+                    return await database.PickpocketingLootTemplate.Where(x => x.Entry == entry).ToListAsync<ILootEntry>();
+                case LootSourceType.Skinning:
+                    return await database.SkinningLootTemplate.Where(x => x.Entry == entry).ToListAsync<ILootEntry>();
+                case LootSourceType.Disenchant:
+                    return await database.DisenchantLootTemplate.Where(x => x.Entry == entry).ToListAsync<ILootEntry>();
+                case LootSourceType.Prospecting:
+                    return await database.ProspectingLootTemplate.Where(x => x.Entry == entry).ToListAsync<ILootEntry>();
+                case LootSourceType.Milling:
+                    return await database.MillingLootTemplate.Where(x => x.Entry == entry).ToListAsync<ILootEntry>();
+                case LootSourceType.Reference:
+                    return await database.ReferenceLootTemplate.Where(x => x.Entry == entry).ToListAsync<ILootEntry>();
+                case LootSourceType.Creature:
+                    return await database.CreatureLootTemplate.Where(x => x.Entry == entry).ToListAsync<ILootEntry>();
+                case LootSourceType.Mail:
+                    return await database.MailLootTemplate.Where(x => x.Entry == entry).ToListAsync<ILootEntry>();
+                case LootSourceType.Spell:
+                    return await database.SpellLootTemplate.Where(x => x.Entry == entry).ToListAsync<ILootEntry>();
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+            }
+        }
         
         private bool Supports<R>()
         {

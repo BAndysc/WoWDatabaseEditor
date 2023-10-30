@@ -1,0 +1,145 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:fastTableView="clr-namespace:AvaloniaStyles.Controls.FastTableView;assembly=AvaloniaStyles"
+             xmlns:viewModels="clr-namespace:WDE.LootEditor.Editor.ViewModels"
+             xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
+             xmlns:views="clr-namespace:WDE.LootEditor.Editor.Views"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:LootEditorViewModel"
+             x:Name="Root"
+             x:Class="WDE.LootEditor.Editor.Views.LootEditorView">
+    <UserControl.Resources>
+        <MultiplyNumberConverter x:Key="MultiplyHeightConverter" MultiplyBy="0.5" />
+    </UserControl.Resources>
+    <Panel>
+      <ScrollViewer Padding="0,0,15,15" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible" AllowAutoHide="False">
+            <fastTableView:VeryFastTableView Items="{CompiledBinding  Loots}"
+                                             Columns="{CompiledBinding LootColumns}"
+                                             ValueUpdateRequest="VeryFastTableView_OnValueUpdateRequest"
+                                             SelectedCellIndex="{CompiledBinding FocusedCellIndex}"
+                                             SelectedRowIndex="{CompiledBinding FocusedRowIndex}"
+                                             MultiSelection="{CompiledBinding MultiSelection}"
+                                             InteractiveHeader="True"
+                                             IsGroupingEnabled="True"
+                                             x:Name="VeryFastTableView"
+                                             ColumnPressed="VeryFastTableView_OnColumnPressed"
+                                             RowFilterParameter="{CompiledBinding SearchText}"
+                                             TextBlock.FontFamily="Consolas,Menlo,Courier,Courier New">
+                <fastTableView:VeryFastTableView.RowFilter>
+                    <views:RowFilterPredicate />
+                </fastTableView:VeryFastTableView.RowFilter>
+                <fastTableView:VeryFastTableView.GroupHeaderTemplate>
+                    <DataTemplate x:DataType="viewModels:LootGroup">
+                        <GroupingHeader>
+                            <GroupingHeader.GroupName>
+                                <Panel>
+                                    <Button Content="{CompiledBinding Header}" BorderThickness="0" Background="Transparent" 
+                                            Command="{CompiledBinding #Root.((viewModels:LootEditorViewModel)DataContext).EditGroupNameCommand}"
+                                            IsVisible="{CompiledBinding CanHaveName}"
+                                            CommandParameter="{CompiledBinding .}"
+                                    />
+                                    <TextBlock Text="{CompiledBinding Header}" IsVisible="{CompiledBinding !CanHaveName}" />
+                                </Panel>
+                            </GroupingHeader.GroupName>
+                            <Interaction.Behaviors>
+                                <DataTriggerBehavior Binding="{CompiledBinding IsFocused}" Value="True">
+                                    <ChangePropertyAction PropertyName="Background" Value="{DynamicResource TextControlSelectionHighlightColor}" />
+                                </DataTriggerBehavior>
+                                <DataTriggerBehavior Binding="{CompiledBinding IsFocused}" Value="False">
+                                    <ChangePropertyAction PropertyName="Background" Value="{DynamicResource ContentBackground}" />
+                                </DataTriggerBehavior>
+                            </Interaction.Behaviors>
+                            <GroupingHeader.CustomContent>
+                                <ButtonImage Padding="1" Image="Icons/icon_remove_mono.png" Width="23" Height="23" Command="{CompiledBinding #Root.((viewModels:LootEditorViewModel)DataContext).RemoveLootCommand}" CommandParameter="{CompiledBinding .}"
+                                             IsVisible="{CompiledBinding CanBeUnloaded}"
+                                             ToolTip.Tip="Remove this loot entry"
+                                />
+                            </GroupingHeader.CustomContent>
+                            <GroupingHeader.CustomCenterContent>
+                                <ItemsControl Items="{CompiledBinding #Root.((viewModels:LootEditorViewModel)DataContext).Buttons}">
+                                    <ItemsControl.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem Header="Edit buttons" Command="{CompiledBinding #Root.((viewModels:LootEditorViewModel)DataContext).OpenLootConfigurationCommand}"/>
+                                            <MenuItem Header="Convert group to a button" CommandParameter="{CompiledBinding  $parent[GroupingHeader].DataContext}" 
+                                                      Command="{CompiledBinding #Root.((viewModels:LootEditorViewModel)DataContext).ConvertGroupToButtonCommand}"/>
+                                        </ContextMenu>
+                                    </ItemsControl.ContextMenu>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Button Height="23"
+                                                    Padding="2"
+                                                    ToolTip.Tip="{CompiledBinding ToolTip}" 
+                                                    Command="{CompiledBinding Command}" 
+                                                    CommandParameter="{CompiledBinding  $parent[GroupingHeader].DataContext}">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <WdeImage Width="19" Height="19" Image="{CompiledBinding Icon}" IsVisible="{CompiledBinding HasIcon}" />
+                                                    <TextBlock FontFamily="{DynamicResource ContentControlThemeFontFamily}"
+                                                               Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}"
+                                                               FontWeight="Normal"
+                                                               FontSize="12"
+                                                               VerticalAlignment="Center" Text="{CompiledBinding Text}" IsVisible="{CompiledBinding Text}" />
+                                                </StackPanel>
+                                            </Button>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Horizontal" Spacing="2" />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                </ItemsControl>
+                            </GroupingHeader.CustomCenterContent>
+                            <GroupingHeader.CustomRightContent>
+                                <StackPanel Orientation="Horizontal" Spacing="5">
+                                    <Button BorderThickness="0" Background="Transparent" Command="{CompiledBinding #Root.((viewModels:LootEditorViewModel)DataContext).OpenCrossReferencesCommand}" CommandParameter="{CompiledBinding .}">
+                                        <TextBlock Opacity="0.5"
+                                                   FontFamily="{DynamicResource ContentControlThemeFontFamily}"
+                                                   Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}"
+                                                   FontWeight="Normal"
+                                                   FontSize="12"
+                                                   VerticalAlignment="Center" 
+                                                   Text="{CompiledBinding CrossReferencesCount, StringFormat=Cross refs: {0}}"
+                                                   IsVisible="{CompiledBinding HasCrossReferencesCounter}" />
+                                    </Button>
+                                    <Button Width="23" Height="23" FontSize="16" 
+                                            Command="{CompiledBinding #Root.((viewModels:LootEditorViewModel)DataContext).CollapseExpandCommand}"
+                                            CommandParameter="{CompiledBinding .}">
+                                        <Interaction.Behaviors>
+                                            <utils:ControlPointerReleasedTriggerBehavior>
+                                                <InvokeCommandAction Command="{CompiledBinding #Root.((viewModels:LootEditorViewModel)DataContext).CollapseExpandAllCommand}" CommandParameter="{CompiledBinding .}" />
+                                            </utils:ControlPointerReleasedTriggerBehavior>
+                                        </Interaction.Behaviors>
+                                        <Panel>
+                                            <WdeImage ImageUri="Icons/icon_collapse_all.png" IsVisible="{CompiledBinding IsExpanded}" />
+                                            <WdeImage ImageUri="Icons/icon_expand_all.png" IsVisible="{CompiledBinding !IsExpanded}" />
+                                        </Panel>
+                                    </Button>
+                                </StackPanel>
+                            </GroupingHeader.CustomRightContent>
+                        </GroupingHeader>
+                    </DataTemplate>
+                </fastTableView:VeryFastTableView.GroupHeaderTemplate>
+                <fastTableView:VeryFastTableView.CustomCellDrawer>
+                    <views:CustomCellDrawer />
+                </fastTableView:VeryFastTableView.CustomCellDrawer>
+                <fastTableView:VeryFastTableView.CustomCellInteractor>
+                    <views:CustomCellInteractor />
+                </fastTableView:VeryFastTableView.CustomCellInteractor>
+                <fastTableView:VeryFastTableView.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Copy" Command="{CompiledBinding Copy}" />
+                        <MenuItem Header="Cut" Command="{CompiledBinding Cut}" />
+                        <MenuItem Header="Paste" Command="{CompiledBinding Paste}" />
+                        <MenuItem Header="Delete selected loot items" Command="{CompiledBinding DeleteSelectedLootItemsCommand}" />
+                    </ContextMenu>
+                </fastTableView:VeryFastTableView.ContextMenu>
+            </fastTableView:VeryFastTableView>
+        </ScrollViewer>
+        
+        <Border Background="{DynamicResource SlightlyHighlightedBackground}" Opacity="0.5" IsVisible="{CompiledBinding IsLoading}">
+            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center">Loading...</TextBlock>
+        </Border>
+    </Panel>
+</UserControl>

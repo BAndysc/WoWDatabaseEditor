@@ -341,5 +341,21 @@ internal class LegionDbcLoader : BaseDbcLoader
                 InventoryIconFileDataId = row.GetUInt(1)
             });
         });
+        Load("ItemAppearance.db2", row =>
+        {
+            data.ItemAppearances.Add(new ItemAppearanceEntry()
+            {
+                Id = row.GetUInt(0),
+                InventoryIconFileDataId = row.GetUInt(2)
+            });
+        });
+        Load("ItemModifiedAppearance.db2", row =>
+        {
+            data.ItemModifiedAppearances.Add(new ItemModifiedAppearanceEntry()
+            {
+                ItemId = row.GetUInt(0),
+                ItemAppearanceId = row.GetUInt(3)
+            });
+        });
     }
 }

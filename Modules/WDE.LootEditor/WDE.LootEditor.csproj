@@ -11,14 +11,6 @@
         <ProjectReference Include="..\..\WDE.MVVM\WDE.MVVM.csproj" />
         <ProjectReference Include="..\..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />
     </ItemGroup>
-    <ItemGroup>
-        <PackageReference Include="FuzzySharp" Version="2.0.2" />
-    </ItemGroup>
-    <ItemGroup>
-      <Folder Include="Queries" />
-      <Folder Include="ViewModels" />
-      <Folder Include="Views" />
-    </ItemGroup>
     <Import Project="..\..\Avalonia.props" />
     <PropertyGroup>
         <OutputPath>..\..\bin\$(Configuration)\</OutputPath>

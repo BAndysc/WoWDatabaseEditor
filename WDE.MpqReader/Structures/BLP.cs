@@ -1,4 +1,5 @@
 using System;
+using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using WDE.MpqReader.Readers;
 
@@ -144,6 +145,27 @@ namespace WDE.MpqReader.Structures
             MipsHandmade = 0x2, // not supported
             FlagsMipmapMask = 0xF, // level
             FlagsUnk0X10 = 0x10,
+        }
+    }
+
+    public static class BlpExtensions
+    {
+        public static void SaveToPng(this BLP blp, string path, int mipLevel)
+        {
+            int width = (int)blp.RealWidth;
+            int height = (int)blp.RealHeight;
+            for (int i = 0; i < mipLevel; ++i)
+            {
+                width /= 2;
+                height /= 2;
+            }
+            using Image<Rgba32> img = new Image<Rgba32>(width, height);
+            for (int y = 0; y < height; ++y)
+            {
+                var span = img.GetPixelRowSpan(y);
+                blp.Data[mipLevel].AsSpan(y * width, width).CopyTo(span);
+            }
+            img.SaveAsPng(path);
         }
     }
 

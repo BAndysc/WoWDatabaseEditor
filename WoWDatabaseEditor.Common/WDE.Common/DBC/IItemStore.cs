@@ -10,6 +10,8 @@ public interface IItemStore
     
     IReadOnlyList<IDbcItem> Items { get; }
     IDbcItem? GetItemById(uint id);
+
+    IReadOnlyList<IItemModifiedAppearance>? GetItemModifiedAppearances(uint itemId);
     
     IReadOnlyList<ICurrencyType> CurrencyTypes { get; }
     ICurrencyType? GetCurrencyTypeById(uint id);

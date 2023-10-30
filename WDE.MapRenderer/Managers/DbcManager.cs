@@ -1,5 +1,10 @@
+using System.Text;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Processing;
 using WDE.Common.DBC;
 using WDE.Common.MPQ;
+using WDE.Common.Utils;
 using WDE.MpqReader.DBC;
 using WDE.MpqReader.Structures;
 
@@ -17,7 +22,9 @@ namespace WDE.MapRenderer.Managers
         public EmoteStore EmoteStore { get; }
         public AnimationDataStore AnimationDataStore { get; }
         public ItemAppearanceStore ItemAppearanceStore { get; }
+        public ItemModifiedAppearanceStore ItemModifiedAppearanceStore { get; }
         public ItemStore ItemStore { get; }
+        public CurrencyTypeStore CurrencyTypeStore { get; }
         public ItemDisplayInfoStore ItemDisplayInfoStore { get; }
         public CreatureModelDataStore CreatureModelDataStore { get; }
         public GameObjectDisplayInfoStore GameObjectDisplayInfoStore { get; }
@@ -76,7 +83,10 @@ namespace WDE.MapRenderer.Managers
             AnimationDataStore = new((dynamic)OpenDbc("AnimationData"), gameFiles.WoWVersion);
             GameObjectDisplayInfoStore = new((dynamic)OpenDbc("GameObjectDisplayInfo"));
             if (gameFiles.WoWVersion == GameFilesVersion.Legion_7_3_5)
+            {
                 ItemAppearanceStore = new((dynamic)OpenDbc("ItemAppearance"));
+                ItemModifiedAppearanceStore = new((dynamic)OpenDbc("ItemModifiedAppearance"));
+            }
             else
                 ItemAppearanceStore = new();
             HelmetGeosetVisDataStore = new((dynamic)OpenDbc("HelmetGeosetVisData"));
@@ -86,6 +96,7 @@ namespace WDE.MapRenderer.Managers
             MapStore = new ((dynamic)OpenDbc("Map"), gameFiles.WoWVersion);
             LiquidTypeStore = new((dynamic)OpenDbc("LiquidType"));
             LiquidMaterialStore = new((dynamic)OpenDbc("LiquidMaterial"));
+            CurrencyTypeStore = new((dynamic)OpenDbc("CurrencyTypes"));
             if (gameFiles.WoWVersion == GameFilesVersion.Wrath_3_3_5a)
             {
                 LightIntParamStore = new ((dynamic)OpenDbc("LightIntBand"));
@@ -122,12 +133,35 @@ namespace WDE.MapRenderer.Managers
                 ModelFileDataStore = new((dynamic)OpenDbc("ModelFileData"));
                 LiquidObjectStore = new((dynamic)OpenDbc("LiquidObject"));
             }
-            ItemStore = new((dynamic)OpenDbc("Item"), ItemAppearanceStore);
+            ItemStore = new((dynamic)OpenDbc("Item"), ItemModifiedAppearanceStore, ItemAppearanceStore);
             CharSectionsStore = new((dynamic)OpenDbc("CharSections"), TextureFileDataStore);
             ItemDisplayInfoStore = new((dynamic)OpenDbc("ItemDisplayInfo"), gameFiles.WoWVersion, ModelFileDataStore, TextureFileDataStore);
             LightParamStore = new (gameFiles.WoWVersion, (dynamic)OpenDbc("LightParams"), LightIntParamStore, LightFloatParamStore, LightDataStore);
             LightStore = new ((dynamic)OpenDbc("Light"), LightParamStore);
             WorldMapAreaStore = new((dynamic)OpenDbc("WorldMapArea"), gameFiles.WoWVersion);
+
+            HashSet<uint> visited = new HashSet<uint>();
+            List<(uint, uint)> mapping = new();
+            foreach (var item in ItemStore)
+            {
+                if (item.InventoryIcon!.Value.FileDataId == 0)
+                    continue;
+                
+                mapping.Add((item.Id, item.InventoryIcon!.Value.FileDataId));
+                
+                if (!visited.Add(item.InventoryIcon!.Value.FileDataId))
+                    continue;
+
+                var bytes = gameFiles.ReadFileSync(item.InventoryIcon!.Value);
+                if (bytes == null)
+                    continue;
+
+                var blp = new BLP(bytes, 0, bytes.Length, 64);
+                blp.SaveToPng($"/Users/bartek/.local/share/WoWDatabaseEditor/common/item_icons/{item.InventoryIcon!.Value.FileDataId}.png", 0);
+            }
+            
+            mapping.Sort();
+            File.WriteAllText("/Users/bartek/.local/share/WoWDatabaseEditor/common/item_icons/icons.txt", string.Join("\n", mapping.Select(x => $"{x.Item1},{x.Item2}")));
         }
 
         public IEnumerable<(System.Type, object)> Stores()

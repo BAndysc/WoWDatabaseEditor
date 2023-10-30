@@ -145,5 +145,9 @@ namespace WDE.CMMySqlDatabase.Models.Wrath
 
             throw new Exception("Model out of range");
         }
+
+        public int LootCount => 1;
+        
+        public uint GetLootId(int index) => LootId;
     }
 }

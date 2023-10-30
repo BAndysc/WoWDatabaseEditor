@@ -85,42 +85,87 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                 else
                     entryOrGuid = query.Raw(line.EntryOrGuid.ToString());
             }
-            return new
+
+            var difficulties = line.Difficulties.HasValue ? string.Join(",", line.Difficulties) : "";
+            if (currentCoreVersion.Current.SmartScriptFeatures.DifficultyInSeparateColumn)
             {
-                entryorguid = entryOrGuid,
-                source_type = (int) line.ScriptSourceType,
-                id = line.Id,
-                link = line.Link,
+                return new
+                {
+                    entryorguid = entryOrGuid,
+                    source_type = (int) line.ScriptSourceType,
+                    id = line.Id,
+                    link = line.Link,
+                    Difficulties = difficulties,
 
-                event_type = line.EventType,
-                event_phase_mask = line.EventPhaseMask,
-                event_chance = line.EventChance,
-                event_flags = line.EventFlags,
-                event_param1 = line.EventParam1,
-                event_param2 = line.EventParam2,
-                event_param3 = line.EventParam3,
-                event_param4 = line.EventParam4,
+                    event_type = line.EventType,
+                    event_phase_mask = line.EventPhaseMask,
+                    event_chance = line.EventChance,
+                    event_flags = line.EventFlags,
+                    event_param1 = line.EventParam1,
+                    event_param2 = line.EventParam2,
+                    event_param3 = line.EventParam3,
+                    event_param4 = line.EventParam4,
 
-                action_type = line.ActionType,
-                action_param1 = line.ActionParam1,
-                action_param2 = line.ActionParam2,
-                action_param3 = line.ActionParam3,
-                action_param4 = line.ActionParam4,
-                action_param5 = line.ActionParam5,
-                action_param6 = line.ActionParam6,
+                    action_type = line.ActionType,
+                    action_param1 = line.ActionParam1,
+                    action_param2 = line.ActionParam2,
+                    action_param3 = line.ActionParam3,
+                    action_param4 = line.ActionParam4,
+                    action_param5 = line.ActionParam5,
+                    action_param6 = line.ActionParam6,
 
-                target_type = line.TargetType,
-                target_param1 = line.TargetParam1,
-                target_param2 = line.TargetParam2,
-                target_param3 = line.TargetParam3,
+                    target_type = line.TargetType,
+                    target_param1 = line.TargetParam1,
+                    target_param2 = line.TargetParam2,
+                    target_param3 = line.TargetParam3,
 
-                target_x = line.TargetX,
-                target_y = line.TargetY,
-                target_z = line.TargetZ,
-                target_o = line.TargetO,
+                    target_x = line.TargetX,
+                    target_y = line.TargetY,
+                    target_z = line.TargetZ,
+                    target_o = line.TargetO,
 
-                comment = line.Comment
-            };
+                    comment = line.Comment
+                };
+            }
+            else
+            {
+                return new
+                {
+                    entryorguid = entryOrGuid,
+                    source_type = (int) line.ScriptSourceType,
+                    id = line.Id,
+                    link = line.Link,
+
+                    event_type = line.EventType,
+                    event_phase_mask = line.EventPhaseMask,
+                    event_chance = line.EventChance,
+                    event_flags = line.EventFlags,
+                    event_param1 = line.EventParam1,
+                    event_param2 = line.EventParam2,
+                    event_param3 = line.EventParam3,
+                    event_param4 = line.EventParam4,
+
+                    action_type = line.ActionType,
+                    action_param1 = line.ActionParam1,
+                    action_param2 = line.ActionParam2,
+                    action_param3 = line.ActionParam3,
+                    action_param4 = line.ActionParam4,
+                    action_param5 = line.ActionParam5,
+                    action_param6 = line.ActionParam6,
+
+                    target_type = line.TargetType,
+                    target_param1 = line.TargetParam1,
+                    target_param2 = line.TargetParam2,
+                    target_param3 = line.TargetParam3,
+
+                    target_x = line.TargetX,
+                    target_y = line.TargetY,
+                    target_z = line.TargetZ,
+                    target_o = line.TargetO,
+
+                    comment = line.Comment
+                };   
+            }
         }
 
         private void BuildUpdate(IMultiQuery query)

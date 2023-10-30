@@ -22,6 +22,9 @@ namespace WDE.TrinityMySqlDatabase.Models
         [Column(Name = "AllowableClasses")]
         public uint AllowableClasses { get; set; }
         
+        [Column(Name = "RewardMailTemplateId")]
+        public uint RewardMailTemplateId { get; set; }
+
         public abstract int BreadcrumbForQuest { get; set; } 
     }
     

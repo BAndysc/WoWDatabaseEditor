@@ -116,6 +116,8 @@ public class IntCell : ITableCell
             setter(i);
     }
 
+    public int Value => getter();
+
     public string? StringValue => getter().ToString();
 
     public override string ToString() => StringValue ?? "(null)";
@@ -138,6 +140,8 @@ public class UIntCell : ITableCell
         if (uint.TryParse(newValue, out var i))
             setter(i);
     }
+
+    public uint Value => getter();
 
     public string? StringValue => getter().ToString();
 
