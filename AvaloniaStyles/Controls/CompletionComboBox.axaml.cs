@@ -18,6 +18,7 @@ using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using FuzzySharp;
+using WDE.Common.Utils;
 using WDE.MVVM.Utils;
 
 namespace AvaloniaStyles.Controls
@@ -202,6 +203,52 @@ namespace AvaloniaStyles.Controls
                     return picked;
                 }, token);
             };
+            KeyBindings.Add(new KeyBinding()
+            {
+                Gesture = new KeyGesture(Key.C, KeyModifiers.Control),
+                Command = new DelegateCommand(Copy)
+            });
+            KeyBindings.Add(new KeyBinding()
+            {
+                Gesture = new KeyGesture(Key.C, KeyModifiers.Meta),
+                Command = new DelegateCommand(Copy)
+            });
+            KeyBindings.Add(new KeyBinding()
+            {
+                Gesture = new KeyGesture(Key.V, KeyModifiers.Control),
+                Command = new AsyncAutoCommand(Paste)
+            });
+            KeyBindings.Add(new KeyBinding()
+            {
+                Gesture = new KeyGesture(Key.V, KeyModifiers.Meta),
+                Command = new AsyncAutoCommand(Paste)
+            });
+        }
+
+        private void Copy()
+        {
+            if (SelectedItem != null)
+            {
+                if (watermark is not null)
+                    AvaloniaLocator.Current.GetRequiredService<IClipboard>().SetTextAsync(watermark);
+            }
+        }
+
+        private async Task Paste()
+        {
+            var text = await AvaloniaLocator.Current.GetRequiredService<IClipboard>().GetTextAsync();
+            //IsDropDownOpen = true;
+            //await Task.Delay(1);
+            SearchText = text;
+            SearchTextBox.RaiseEvent(new KeyEventArgs()
+            {
+                Device = null,
+                Handled = false,
+                Key = Key.Enter,
+                Route = RoutingStrategies.Tunnel,
+                RoutedEvent = KeyDownEvent,
+                Source = SearchTextBox
+            });
         }
 
         protected override void OnTextInput(TextInputEventArgs e)
