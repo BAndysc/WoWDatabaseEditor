@@ -65,7 +65,7 @@ namespace WDE.Conditions.Services
             await executor.ExecuteSql(transaction.Close());
         }
 
-        public async Task EditStandaloneConditions(IDatabaseProvider.ConditionKey conditionKey)
+        public void OpenStandaloneConditions(IDatabaseProvider.ConditionKey conditionKey)
         {
             throw new System.NotImplementedException();
         }

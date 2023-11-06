@@ -8,5 +8,6 @@ namespace WDE.Common.Services;
 public interface ILootService
 {
     Task OpenStandaloneLootEditor();
+    void OpenStandaloneLootEditor(LootSourceType type, uint solutionEntry, uint difficultyId);
     Task EditLoot(LootSourceType type, uint solutionEntry, uint difficultyId);
 }

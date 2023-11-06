@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Prism.Events;
@@ -7,6 +8,7 @@ using WDE.Common.Database;
 using WDE.Common.Events;
 using WDE.Common.Managers;
 using WDE.Common.Services;
+using WDE.Common.Utils;
 using WDE.LootEditor.Editor.Standalone;
 using WDE.LootEditor.Solution;
 using WDE.Module.Attributes;
@@ -21,6 +23,7 @@ public class LootService : ILootService
     private readonly Func<StandaloneLootEditorViewModel> creator;
 
     private IAbstractWindowView? currentWindow;
+    private Dictionary<(LootSourceType, uint), IAbstractWindowView> typedWindows = new();
     
     public LootService(IWindowManager windowManager,
         IEventAggregator eventAggregator,
@@ -46,6 +49,31 @@ public class LootService : ILootService
             vm.LoadLootCommand.Execute(null);
             await WindowLifetimeTask(currentWindow, task);
         }
+    }
+
+    public void OpenStandaloneLootEditor(LootSourceType type, uint solutionEntry, uint difficultyId)
+    {
+        if (typedWindows.TryGetValue((type, solutionEntry), out var window))
+        {
+            window.Activate();
+        }
+        else
+        {
+            using var vm = creator();
+            vm.LootType = type;
+            vm.SolutionEntry = solutionEntry;
+            vm.CanChangeLootType = false;
+            vm.CanChangeEntry = false;
+            typedWindows[(type, solutionEntry)] = window = windowManager.ShowWindow(vm, out var task);
+            vm.LoadLootCommand.Execute(null);
+            WindowLifetimeTask(window, type, solutionEntry, task).ListenErrors();
+        }
+    }
+
+    private async Task WindowLifetimeTask(IAbstractWindowView window, LootSourceType type, uint solutionEntry, Task lifetime)
+    {
+        await lifetime;
+        typedWindows.Remove((type, solutionEntry));
     }
 
     private async Task WindowLifetimeTask(IAbstractWindowView window, Task lifetime)

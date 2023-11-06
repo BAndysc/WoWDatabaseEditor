@@ -16,8 +16,8 @@ namespace WDE.Common.Services
         Task EditConditions(IDatabaseProvider.ConditionKeyMask conditionKeyMask, IDatabaseProvider.ConditionKey conditionKey, string? customTitle = null);
 
         /// <summary>
-        /// Opens the condition editor with prefilled condition key (but then it can be changed)
+        /// Opens the condition editor for the specific key
         /// </summary>
-        Task EditStandaloneConditions(IDatabaseProvider.ConditionKey conditionKey);
+        void OpenStandaloneConditions(IDatabaseProvider.ConditionKey conditionKey);
     }
 }

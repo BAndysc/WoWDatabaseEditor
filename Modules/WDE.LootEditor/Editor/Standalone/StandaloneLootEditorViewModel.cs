@@ -45,7 +45,9 @@ public partial class StandaloneLootEditorViewModel : ObservableBase, IDialog, IW
             TryChange(old, difficulty, solutionEntry).ListenErrors();
         }
     }
-    
+
+    [Notify] private bool canChangeLootType = true;
+    [Notify] private bool canChangeEntry = true;
     [Notify] private uint solutionEntry;
     [Notify] private LootEditorViewModel? viewModel;
     private DifficultyViewModel? difficulty;

@@ -174,7 +174,7 @@ namespace WDE.Common.Database
             None = 0
         }
 
-        public struct ConditionKey
+        public struct ConditionKey : IEquatable<ConditionKey>
         {
             public readonly int SourceType;
             public readonly int? SourceGroup;
@@ -195,6 +195,31 @@ namespace WDE.Common.Database
                     mask.HasFlagFast(ConditionKeyMask.SourceGroup) ? SourceGroup : null,
                     mask.HasFlagFast(ConditionKeyMask.SourceEntry) ? SourceEntry : null,
                     mask.HasFlagFast(ConditionKeyMask.SourceId) ? SourceId : null);
+            }
+            
+            public bool Equals(ConditionKey other)
+            {
+                return SourceType == other.SourceType && SourceGroup == other.SourceGroup && SourceEntry == other.SourceEntry && SourceId == other.SourceId;
+            }
+
+            public override bool Equals(object? obj)
+            {
+                return obj is ConditionKey other && Equals(other);
+            }
+
+            public override int GetHashCode()
+            {
+                return HashCode.Combine(SourceType, SourceGroup, SourceEntry, SourceId);
+            }
+
+            public static bool operator ==(ConditionKey left, ConditionKey right)
+            {
+                return left.Equals(right);
+            }
+
+            public static bool operator !=(ConditionKey left, ConditionKey right)
+            {
+                return !left.Equals(right);
             }
         }
     }

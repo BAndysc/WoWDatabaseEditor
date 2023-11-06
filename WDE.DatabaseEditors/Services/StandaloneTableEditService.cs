@@ -25,7 +25,7 @@ public class StandaloneTableEditService : IStandaloneTableEditService
     private readonly IContainerProvider containerProvider;
     private readonly ITableDefinitionProvider definitionProvider;
     private readonly IStandaloneTableEditorSettings windowsSettings;
-    private Dictionary<(string, DatabaseKey?), IAbstractWindowView> openedWindows = new();
+    private Dictionary<(string, DatabaseKey?, string?), IAbstractWindowView> openedWindows = new();
 
     internal StandaloneTableEditService(IWindowManager windowManager,
         ITableOpenService tableOpenService,
@@ -39,9 +39,9 @@ public class StandaloneTableEditService : IStandaloneTableEditService
         this.windowsSettings = windowsSettings;
     }
     
-    public void OpenEditor(string table, DatabaseKey? key)
+    public void OpenEditor(string table, DatabaseKey? key, string? customWhere = null)
     {
-        if (openedWindows.TryGetValue((table, key), out var window))
+        if (openedWindows.TryGetValue((table, key, customWhere), out var window))
         {
             window.Activate();
             return;
@@ -73,10 +73,10 @@ public class StandaloneTableEditService : IStandaloneTableEditService
         else if (definition.RecordMode == RecordMode.SingleRow)
         {
             var singleRow = containerProvider.Resolve<SingleRowDbTableEditorViewModel>((typeof(DatabaseTableSolutionItem), solutionItem));
-            if (key.HasValue)
+            if (key.HasValue || !string.IsNullOrWhiteSpace(customWhere))
             {
-                var where = string.Join("AND", Enumerable.Range(0, key.Value.Count)
-                    .Select(x => $"`{definition.PrimaryKey[x]}` = {key.Value[x]}"));
+                var where = customWhere ?? (key.HasValue ? string.Join("AND", Enumerable.Range(0, key.Value.Count)
+                    .Select(x => $"`{definition.PrimaryKey[x]}` = {key.Value[x]}")) : "");
                 singleRow.DefaultPartialKey = key;
                 singleRow.FilterViewModel.FilterText = where;
                 singleRow.FilterViewModel.SelectedColumn = singleRow.FilterViewModel.RawSqlColumn;
@@ -94,13 +94,18 @@ public class StandaloneTableEditService : IStandaloneTableEditService
         var viewModel = containerProvider.Resolve<RowPickerViewModel>((typeof(ViewModelBase), tableViewModel), (typeof(bool), openInNoSaveMode));
         window = windowManager.ShowWindow(viewModel, out var task);
         windowsSettings.SetupWindow(table, window);
-        openedWindows[(table, key)] = window;
-        WindowLifetimeTask(table, key, window, task).ListenErrors();
+        openedWindows[(table, key, customWhere)] = window;
+        WindowLifetimeTask(table, key, customWhere, window, task).ListenErrors();
     }
 
-    private async Task WindowLifetimeTask(string table, DatabaseKey? key, IAbstractWindowView window, Task lifetime)
+    public void OpenEditor(string tableId, string? customWhere)
+    {
+        
+    }
+
+    private async Task WindowLifetimeTask(string table, DatabaseKey? key, string? customWhere, IAbstractWindowView window, Task lifetime)
     {
         await lifetime;
-        openedWindows.Remove((table, key));
+        openedWindows.Remove((table, key, customWhere));
     }
 }
