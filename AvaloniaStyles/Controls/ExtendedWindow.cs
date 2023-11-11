@@ -10,6 +10,8 @@ using Avalonia.Media;
 using Avalonia.Platform;
 using Avalonia.Styling;
 using Avalonia.Threading;
+using Avalonia.Win32;
+using AvaloniaStyles.Utils;
 
 namespace AvaloniaStyles.Controls
 {
@@ -116,6 +118,35 @@ namespace AvaloniaStyles.Controls
                 if (state.NewValue is ExtendedWindowChrome b)
                     window.UpdateChromeHints(b);
             });
+
+            BackgroundProperty.Changed.AddClassHandler<ExtendedWindow>((window, e) =>
+            {
+                window.BindBackgroundBrush(e.NewValue as Brush);
+            });
+        }
+
+        private Brush? _backgroundBrush;
+        
+        private void BindBackgroundBrush(Brush? brush)
+        {
+            if (_backgroundBrush != null)
+            {
+                _backgroundBrush.Invalidated -= BackgroundBrushOnInvalidated;
+            }
+
+            _backgroundBrush = brush;
+            
+            if (brush != null)
+            {
+                brush.Invalidated += BackgroundBrushOnInvalidated;
+                BackgroundBrushOnInvalidated(null, EventArgs.Empty);
+            }
+        }
+
+        private void BackgroundBrushOnInvalidated(object? sender, EventArgs e)
+        {
+            if (Background is ISolidColorBrush brush)
+                Win32.SetTitleBarColor(PlatformImpl.Handle.Handle, brush.Color);
         }
 
         private void UpdateChromeHints(ExtendedWindowChrome chrome)
@@ -141,6 +172,7 @@ namespace AvaloniaStyles.Controls
                 PseudoClasses.Add(":macos");
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
+                Win32.SetDarkMode(PlatformImpl.Handle.Handle, SystemTheme.EffectiveThemeIsDark);
                 PseudoClasses.Add(":windows");
                 if (Environment.OSVersion.Version.Build >= 22000)
                     PseudoClasses.Add(":win11");

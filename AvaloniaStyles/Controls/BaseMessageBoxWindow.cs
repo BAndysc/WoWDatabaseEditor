@@ -3,8 +3,10 @@ using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
+using Avalonia.Media;
 using Avalonia.Platform;
 using Avalonia.Styling;
+using AvaloniaStyles.Utils;
 
 namespace AvaloniaStyles.Controls
 {
@@ -47,6 +49,7 @@ namespace AvaloniaStyles.Controls
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
                 PseudoClasses.Add(":linux");
 
+            Win32.SetDarkMode(PlatformImpl.Handle.Handle, SystemTheme.EffectiveThemeIsDark);
         }
         
         Type IStyleable.StyleKey => typeof(BaseMessageBoxWindow);
@@ -55,6 +58,8 @@ namespace AvaloniaStyles.Controls
         {
             base.OnApplyTemplate(e);
             ExtendClientAreaChromeHints = ExtendClientAreaChromeHints.NoChrome;
+            if (Background is ISolidColorBrush brush)
+                Win32.SetTitleBarColor(PlatformImpl.Handle.Handle, brush.Color);
         }
     }
 }

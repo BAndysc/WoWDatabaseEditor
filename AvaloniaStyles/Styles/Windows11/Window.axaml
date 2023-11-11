@@ -108,13 +108,15 @@
     <Style Selector="ExtendedWindow:macos /template/ Border#PART_windowBorder_inner">
         <Setter Property="CornerRadius" Value="10"/>
     </Style>
-    <!-- and windows >= 11 has rounded borders too -->
-    <Style Selector="ExtendedWindow:win11 /template/ Border#PART_windowBorder">
-        <Setter Property="CornerRadius" Value="9"/>
-    </Style>
-    <Style Selector="ExtendedWindow:win11 /template/ Border#PART_windowBorder_inner">
-        <Setter Property="CornerRadius" Value="10"/>
-    </Style>
+    <!-- disabled, because currently the titlebar is drawn by the OS, not by us, so applying an additional corner radius
+         causes ugly white background to be drawn -->
+    <!-- ~1~ and windows >= 11 has rounded borders too @1@ -->
+    <!-- <Style Selector="ExtendedWindow:win11 /template/ Border#PART_windowBorder"> -->
+    <!--     <Setter Property="CornerRadius" Value="9"/> -->
+    <!-- </Style> -->
+    <!-- <Style Selector="ExtendedWindow:win11 /template/ Border#PART_windowBorder_inner"> -->
+    <!--     <Setter Property="CornerRadius" Value="10"/> -->
+    <!-- </Style> -->
     
     <Style Selector="ExtendedWindow:macos /template/ Border#PART_titlebarBorder">
         <Setter Property="CornerRadius" Value="9,9,0,0"/>
