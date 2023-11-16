@@ -26,6 +26,8 @@ internal abstract class BaseDbcLoader : IDbcLoader
 
     private ITaskProgress progress;
 
+    protected int localeIndex;
+
     public BaseDbcLoader(IDbcSettingsProvider dbcSettingsProvider, 
         IDatabaseClientFileOpener opener,
         DBCD.DBCD dbcd)
@@ -41,9 +43,10 @@ internal abstract class BaseDbcLoader : IDbcLoader
 
     protected abstract void LoadDbcCore(DbcData data, ITaskProgress progress);
     
-    public void LoadDbc(DbcData data, ITaskProgress progress)
+    public void LoadDbc(DbcData data, int localeIndex, ITaskProgress progress)
     {
         this.progress = progress;
+        this.localeIndex = localeIndex;
         LoadDbcCore(data, progress);
     }
 
@@ -225,7 +228,49 @@ internal abstract class BaseDbcLoader : IDbcLoader
 
         return "";
     }
+    
+    private StringBuilder sb = new StringBuilder();
+    
+    protected string GetRangeDescription(float minHostile, float maxHostile, string name, float? minFriendly = null, float? maxFriendly = null)
+    {
+        sb.Clear();
+        if ((!minFriendly.HasValue || minHostile == minFriendly.Value) && (!maxFriendly.HasValue || maxHostile == maxFriendly.Value))
+        {
+            if (minHostile == 0)
+                return $"{name} ({maxHostile} yd)";
+            
+            return $"{name} ({minHostile}-{maxHostile} yd)";
+        }
 
+        sb.Append(name);
+        sb.Append(' ');
+        sb.Append('(');
+
+        sb.Append("hostile: ");
+        if (minHostile == 0)
+            sb.Append(maxHostile);
+        else
+        {
+            sb.Append(minHostile);
+            sb.Append(" - ");
+            sb.Append(maxHostile);
+        }
+        sb.Append("yd, friendly: ");
+        
+        if (minFriendly == 0)
+            sb.Append(maxFriendly);
+        else
+        {
+            sb.Append(minFriendly);
+            sb.Append(" - ");
+            sb.Append(maxFriendly);
+        }
+        sb.Append("yd");
+        
+        sb.Append(')');
+        return sb.ToString();
+    }
+    
     protected string GetRadiusDescription(float @base, float perLevel, float max)
     {
         if (perLevel == 0)

@@ -445,7 +445,9 @@ namespace WDE.DbcStore
 
                 spellLoader.Load(dbcSettingsProvider.GetSettings().Path);
                 
-                loader.LoadDbc(data, progress);
+                int locale = (int) dbcSettingsProvider.GetSettings().DBCLocale;
+                
+                loader.LoadDbc(data, locale, progress);
                 
                 switch (dbcSettingsProvider.GetSettings().DBCLocale)
                 {

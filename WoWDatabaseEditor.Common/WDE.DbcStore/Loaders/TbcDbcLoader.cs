@@ -124,7 +124,7 @@ internal class TbcDbcLoader : BaseDbcLoader
         Load("LockType.dbc", 0, 1, data.LockTypeStore, true);
         LoadAndRegister(data, "SpellCastTimes.dbc", "SpellCastTimeParameter", 0, row => GetCastTimeDescription(row.GetInt(1), row.GetInt(2), row.GetInt(3)));
         LoadAndRegister(data, "SpellDuration.dbc", "SpellDurationParameter", 0, row => GetDurationTimeDescription(row.GetInt(1), row.GetInt(2), row.GetInt(3)));
-        LoadAndRegister(data, "SpellRange.dbc", "SpellRangeParameter", 0, 4, true);
+        LoadAndRegister(data, "SpellRange.dbc", "SpellRangeParameter", 0, row => GetRangeDescription(row.GetFloat(1), row.GetFloat(2), row.GetString(4 + localeIndex)));
         LoadAndRegister(data, "SpellRadius.dbc", "SpellRadiusParameter", 0, row => GetRadiusDescription(row.GetFloat(1), row.GetFloat(2), row.GetFloat(3)));
     }
 }

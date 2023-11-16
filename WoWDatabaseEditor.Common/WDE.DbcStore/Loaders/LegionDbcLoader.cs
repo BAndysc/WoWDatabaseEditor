@@ -172,7 +172,7 @@ internal class LegionDbcLoader : BaseDbcLoader
         Load("CreatureDisplayInfo.db2", row => data.CreatureDisplayInfoStore.Add(row.GetInt(0), row.GetUShort(2)));
         LoadAndRegister(data, "SpellCastTimes.db2", "SpellCastTimeParameter", 0, row => GetCastTimeDescription(row.GetInt(1), row.GetInt(3), row.GetInt(2)));
         LoadAndRegister(data, "SpellDuration.db2", "SpellDurationParameter", 0, row => GetDurationTimeDescription(row.GetInt(1), row.GetInt(3), row.GetInt(2)));
-        LoadAndRegister(data, "SpellRange.db2", "SpellRangeParameter", 0, 1);
+        LoadAndRegister(data, "SpellRange.db2", "SpellRangeParameter", 0, row => GetRangeDescription(row.GetFloat(3, 0), row.GetFloat(4, 0), row.GetString(1), row.GetFloat(3, 1), row.GetFloat(3, 2)));
         LoadAndRegister(data, "SpellRadius.db2", "SpellRadiusParameter", 0, row => GetRadiusDescription(row.GetFloat(1), row.GetFloat(2), row.GetFloat(4)));
         Load("SpellItemEnchantment.db2", 0, 1, data.SpellItemEnchantmentStore);
         Load("TaxiNodes.db2", 0, 1, data.TaxiNodeStore);

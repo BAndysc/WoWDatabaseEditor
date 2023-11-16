@@ -7,5 +7,5 @@ namespace WDE.DbcStore.Loaders;
 internal interface IDbcLoader
 {
     DBCVersions Version { get; }
-    void LoadDbc(DbcData data, ITaskProgress progress);
+    void LoadDbc(DbcData data, int localeIndex, ITaskProgress progress);
 }
