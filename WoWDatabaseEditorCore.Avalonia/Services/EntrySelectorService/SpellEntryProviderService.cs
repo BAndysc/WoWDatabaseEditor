@@ -80,6 +80,13 @@ public class SpellEntryProviderService : ISpellEntryProviderService
             .SetColumns(columns)
             .SetFilter((entry, text) =>
                 entry.Id.Contains(text) || entry.Name.Contains(text, StringComparison.OrdinalIgnoreCase))
+            .SetExactMatchPredicate((entry, text) => entry.Id.Is(text))
+            .SetExactMatchCreator((text) =>
+            {
+                if (uint.TryParse(text, out var entry))
+                    return new AbstractSpellEntry() { Id = entry, Name = "Non existing spell" };
+                return null;
+            })
             .Build();
     }
 

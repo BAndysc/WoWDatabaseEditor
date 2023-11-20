@@ -18,4 +18,12 @@ namespace WDE.Common.DBC
         string Aura { get; }
         string Targets { get; }
     }
+
+    public class AbstractSpellEntry : ISpellEntry
+    {
+        public uint Id { get; set; }
+        public string Name { get; set; } = "";
+        public string Aura { get; set; } = "";
+        public string Targets { get; set; } = "";
+    }
 }

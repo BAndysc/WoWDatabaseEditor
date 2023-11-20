@@ -102,6 +102,7 @@ namespace WDE.Spells
                     cachedSpells.Add(entry);
                 }
             }
+            cachedSpells.Sort((a, b) => a.Id.CompareTo(b.Id));
         }
 
         public bool ContainsSpell(uint spellId) => spellIdToIndex.ContainsKey(spellId);

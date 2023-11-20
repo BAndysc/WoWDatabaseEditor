@@ -338,7 +338,7 @@ public partial class TabularDataPickerViewModel : ObservableBase, IDialog
         {
             var dynamic = exactMatchCreator(searchInput.Text);
             if (dynamic != null)
-                filtered.Add(dynamic);
+                filtered.Insert(0, dynamic);
         }
 
         Items = filtered.AsIndexedCollection();
