@@ -78,7 +78,7 @@ public class CreatureEntryOrGuidProviderService : ICreatureEntryOrGuidProviderSe
         {
             columns.Add(new TabularDataAsyncColumn<uint>(nameof(ICreatureTemplate.Entry), "Count", async (spellId, token) =>
             {
-                var count = await databaseRowsCountProvider.GetRowsCountByPrimaryKey(customCounterTable, spellId, token);
+                var count = await databaseRowsCountProvider.GetRowsCountByPrimaryKey(DatabaseTable.WorldTable(customCounterTable), spellId, token);
                 return count.ToString();
             }, 50));
         }

@@ -49,5 +49,5 @@ internal class TrinitySpawnGroupSpawnQueryProvider : IInsertQueryProvider<ISpawn
             .Delete();
     }
 
-    public string TableName => "spawn_group";
+    public DatabaseTable TableName => DatabaseTable.WorldTable("spawn_group");
 }

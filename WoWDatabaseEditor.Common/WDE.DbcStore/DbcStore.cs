@@ -416,14 +416,14 @@ namespace WDE.DbcStore
                 {
                     if (zoneId == 0)
                         return "0";
-                    return (await store.databaseRowsCountProvider.GetRowsCountByPrimaryKey("spell_area", zoneId, token)).ToString();
+                    return (await store.databaseRowsCountProvider.GetRowsCountByPrimaryKey(DatabaseTable.WorldTable("spell_area"), zoneId, token)).ToString();
                 }, 50));
                 RegisterZoneAreParameter("ZoneArea(phase_definitions)Parameter", 
                     new TabularDataAsyncColumn<uint>(nameof(IArea.Id), "Count", async (zoneId, token) =>
                 {
                     if (zoneId == 0)
                         return "0";
-                    return (await store.databaseRowsCountProvider.GetRowsCountByPrimaryKey("phase_definitions", zoneId, token)).ToString();
+                    return (await store.databaseRowsCountProvider.GetRowsCountByPrimaryKey(DatabaseTable.WorldTable("phase_definitions"), zoneId, token)).ToString();
                 }, 50));
 
                 parameterFactory.RegisterDepending("BattlePetSpeciesParameter", "CreatureParameter", (creature) => new BattlePetSpeciesParameter(store, parameterFactory, creature));

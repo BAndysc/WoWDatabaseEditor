@@ -70,7 +70,7 @@ namespace WDE.SqlQueryGenerator
                     properties = o.Keys.ToList();
                     var cols = string.Join(", ", properties.Select(c => $"`{c}`"));
                     var insert = mode == QueryInsertMode.Insert ? "INSERT" : (mode == QueryInsertMode.InsertIgnore ? "INSERT IGNORE" : "REPLACE");
-                    sb.Append($"{insert} INTO `{table.TableName}` ({cols}) VALUES");
+                    sb.Append($"{insert} INTO `{table.TableName.Table}` ({cols}) VALUES");
                     if (objects.Count > 1 || properties.Count > 1)
                         sb.AppendLine();
                     else
@@ -115,7 +115,7 @@ namespace WDE.SqlQueryGenerator
                         .ToArray();
                     var cols = string.Join(", ", properties.Select(c => $"`{c.Name}`"));
                     var insert = mode == QueryInsertMode.Insert ? "INSERT" : (mode == QueryInsertMode.InsertIgnore ? "INSERT IGNORE" : "REPLACE");
-                    sb.Append($"{insert} INTO `{table.TableName}` ({cols}) VALUES ");
+                    sb.Append($"{insert} INTO `{table.TableName.Table}` ({cols}) VALUES ");
                     if (properties.Length > 2)
                         sb.AppendLine();
                 }
@@ -225,30 +225,30 @@ namespace WDE.SqlQueryGenerator
         public static IQuery Delete(this IWhere query)
         {
             if (query.Condition == "1")
-                return new Query(query.Table, $"DELETE FROM `{query.Table.TableName}`;");
-            return new Query(query.Table, $"DELETE FROM `{query.Table.TableName}` WHERE {query.Condition};");
+                return new Query(query.Table, $"DELETE FROM `{query.Table.TableName.Table}`;");
+            return new Query(query.Table, $"DELETE FROM `{query.Table.TableName.Table}` WHERE {query.Condition};");
         }
         
         public static IQuery Select(this IWhere query)
         {
             if (query.Condition == "1")
-                return new Query(query.Table, $"SELECT * FROM `{query.Table.TableName}`;");
-            return new Query(query.Table, $"SELECT * FROM `{query.Table.TableName}` WHERE {query.Condition};");
+                return new Query(query.Table, $"SELECT * FROM `{query.Table.TableName.Table}`;");
+            return new Query(query.Table, $"SELECT * FROM `{query.Table.TableName.Table}` WHERE {query.Condition};");
         }
         
         public static IQuery Select(this IWhere query, params string[] columns)
         {
             if (query.Condition == "1")
-                return new Query(query.Table, $"SELECT {string.Join(", ", columns)} FROM `{query.Table.TableName}`;");
-            return new Query(query.Table, $"SELECT {string.Join(", ", columns)} FROM `{query.Table.TableName}` WHERE {query.Condition};");
+                return new Query(query.Table, $"SELECT {string.Join(", ", columns)} FROM `{query.Table.TableName.Table}`;");
+            return new Query(query.Table, $"SELECT {string.Join(", ", columns)} FROM `{query.Table.TableName.Table}` WHERE {query.Condition};");
         }
 
         public static IQuery SelectGroupBy(this IWhere query, string[] groupBy, params string[] columns)
         {
             var by = string.Join(", ", groupBy.Select(col => $"`{col}`"));
             if (query.Condition == "1")
-                return new Query(query.Table, $"SELECT {string.Join(", ", columns)} FROM `{query.Table.TableName}` GROUP BY {by};");
-            return new Query(query.Table, $"SELECT {string.Join(", ", columns)} FROM `{query.Table.TableName}` WHERE {query.Condition} GROUP BY {by};");
+                return new Query(query.Table, $"SELECT {string.Join(", ", columns)} FROM `{query.Table.TableName.Table}` GROUP BY {by};");
+            return new Query(query.Table, $"SELECT {string.Join(", ", columns)} FROM `{query.Table.TableName.Table}` WHERE {query.Condition} GROUP BY {by};");
         }
 
         public static IUpdateQuery ToUpdateQuery(this IWhere query)
@@ -279,9 +279,9 @@ namespace WDE.SqlQueryGenerator
         public static IQuery Update(this IUpdateQuery query, string? comment = null)
         {
             if (query.Empty)
-                return Queries.Empty();
+                return Queries.Empty(query.Database);
             
-            var beginning = $"UPDATE `{query.Condition.Table.TableName}` SET ";
+            var beginning = $"UPDATE `{query.Condition.Table.TableName.Table}` SET ";
             var beginningLength = beginning.Length;
             var indent = new string(' ', beginningLength);
 

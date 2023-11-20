@@ -26,7 +26,7 @@ public class NullLootEditorFeatures : ILootEditorFeatures
 
     public int GetMaxLootEntryForType(LootSourceType type, uint difficultyId) => 0;
 
-    public string GetTableNameFor(LootSourceType type) => "";
+    public DatabaseTable GetTableNameFor(LootSourceType type) => default;
 
     public IReadOnlyList<LootSourceType> SupportedTypes => Array.Empty<LootSourceType>();
 }

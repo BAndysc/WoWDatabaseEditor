@@ -21,7 +21,7 @@ public class DatabaseRowsCountProvider : IDatabaseRowsCountProvider
 {
     private readonly IMySqlExecutor executor;
     private readonly ITableDefinitionProvider definitionProvider;
-    private Dictionary<string, BulkAsyncTableRowProvider> providers = new();
+    private Dictionary<DatabaseTable, BulkAsyncTableRowProvider> providers = new();
 
     public DatabaseRowsCountProvider(IMySqlExecutor executor, ITableDefinitionProvider definitionProvider)
     {
@@ -29,7 +29,7 @@ public class DatabaseRowsCountProvider : IDatabaseRowsCountProvider
         this.definitionProvider = definitionProvider;
     }
 
-    public async Task<int> GetRowsCountByPrimaryKey(string table, long primaryKey, CancellationToken token)
+    public async Task<int> GetRowsCountByPrimaryKey(DatabaseTable table, long primaryKey, CancellationToken token)
     {
         if (!providers.TryGetValue(table, out var provider))
         {
@@ -45,10 +45,10 @@ public class DatabaseRowsCountProvider : IDatabaseRowsCountProvider
 
     public async Task<int> GetCreaturesCountByEntry(long entry, CancellationToken token)
     {
-        var table = "creature_(by_entry)";
+        var table = DatabaseTable.WorldTable("creature_(by_entry)");
         if (!providers.TryGetValue(table, out var provider))
         {
-            var definition = definitionProvider.GetDefinition("creature");
+            var definition = definitionProvider.GetDefinition(DatabaseTable.WorldTable("creature"));
             if (definition == null || (!definition.TableColumns.ContainsKey("id") && !definition.TableColumns.ContainsKey("entry")))
                 return 0;
             var columnToGroupBy = definition.TableColumns.ContainsKey("entry") ? "entry" : "id";
@@ -61,10 +61,10 @@ public class DatabaseRowsCountProvider : IDatabaseRowsCountProvider
 
     public async Task<int> GetGameObjectCountByEntry(long entry, CancellationToken token)
     {
-        var table = "gameobject_(by_entry)";
+        var table = DatabaseTable.WorldTable("gameobject_(by_entry)");
         if (!providers.TryGetValue(table, out var provider))
         {
-            var definition = definitionProvider.GetDefinition("gameobject");
+            var definition = definitionProvider.GetDefinition(DatabaseTable.WorldTable("gameobject"));
             if (definition == null || (!definition.TableColumns.ContainsKey("id") && !definition.TableColumns.ContainsKey("entry")))
                 return 0;
             var columnToGroupBy = definition.TableColumns.ContainsKey("entry") ? "entry" : "id";
@@ -118,7 +118,7 @@ public class DatabaseRowsCountProvider : IDatabaseRowsCountProvider
             if (primaryKeysToFetch.Count == 0)
                 return;
 
-            var query = Queries.Table(tableDefinition.TableName)
+            var query = Queries.Table(tableDefinition.Id)
                 .WhereIn(groupByColumn, primaryKeysToFetch)
                 .SelectGroupBy(new[]{groupByColumn}, $"`{groupByColumn}`", "COUNT(*) AS c");
             

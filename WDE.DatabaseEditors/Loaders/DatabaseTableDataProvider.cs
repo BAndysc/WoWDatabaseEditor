@@ -101,9 +101,9 @@ namespace WDE.DatabaseEditors.Loaders
                 $"SELECT {names} FROM {tableDefinitionJson.TableName} {joins} WHERE `{tableName}`.`{tablePrimaryKey}` IN ({string.Join(", ", entries)});";
         }
         
-        public async Task<long> GetCount(string definitionId, string? customWhere, IEnumerable<DatabaseKey>? keys)
+        public async Task<long> GetCount(DatabaseTable tableName, string? customWhere, IEnumerable<DatabaseKey>? keys)
         {
-            var definition = tableDefinitionProvider.GetDefinition(definitionId);
+            var definition = tableDefinitionProvider.GetDefinitionByTableName(tableName);
             if (definition == null)
                 return 0;
 
@@ -161,9 +161,9 @@ namespace WDE.DatabaseEditors.Loaders
             }
         }
         
-        public async Task<IDatabaseTableData?> Load(string definitionId, string? customWhere, long? offset, int? limit, DatabaseKey[]? keys)
+        public async Task<IDatabaseTableData?> Load(DatabaseTable tableName, string? customWhere, long? offset, int? limit, DatabaseKey[]? keys)
         {
-            var definition = tableDefinitionProvider.GetDefinition(definitionId);
+            var definition = tableDefinitionProvider.GetDefinitionByTableName(tableName);
             if (definition == null)
                 return null;
             

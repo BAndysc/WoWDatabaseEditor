@@ -67,7 +67,7 @@ public class EventAiNewTextParameter : IParameter<long>, IAsyncParameter<long>, 
     
     public async Task<(long, bool)> PickValue(long value)
     {
-        var result = await tableEditorPickerService.PickByColumn("broadcast_text", default, "Id", value);
+        var result = await tableEditorPickerService.PickByColumn(DatabaseTable.WorldTable("broadcast_text"), default, "Id", value);
         if (result.HasValue)
             return (result.Value, true);
         return (0, false);

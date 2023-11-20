@@ -24,7 +24,7 @@ namespace WDE.Common.CoreVersion
         PhasingType PhasingType { get; }
         GameVersion Version { get; }
         // todo: this can be moved to settings as a configurable option
-        IEnumerable<(string id, bool enabled)> TopBarQuickTableEditors => Array.Empty<(string, bool)>();
+        IEnumerable<(DatabaseTable id, bool enabled)> TopBarQuickTableEditors => Array.Empty<(DatabaseTable, bool)>();
     }
 
     public struct GameVersion
@@ -103,7 +103,7 @@ namespace WDE.Common.CoreVersion
         bool DifficultyInSeparateColumn => false;
 
         string? ForceLoadTag => null;
-        string TableName { get; }
+        DatabaseTable TableName { get; }
 
         string? ActionsPath => null;
         string? EventsPath => null;

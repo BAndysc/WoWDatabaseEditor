@@ -29,13 +29,13 @@ namespace WDE.DatabaseEditors.Solution
         
         public IDocument GetEditor(DatabaseTableSolutionItem item)
         {
-            var definition = tableDefinitionProvider.GetDefinition(item.DefinitionId);
+            var definition = tableDefinitionProvider.GetDefinition(item.TableName);
             if (definition == null)
             {
-                if (tableDefinitionProvider.CoreCompatibility(item.DefinitionId) is { } compatibility)
+                if (tableDefinitionProvider.CoreCompatibility(item.TableName) is { } compatibility)
                     throw new Exception("This item was created with different core compatibility mode and cannot be opened now. If you want to open the item, switch to any of those core compatibility modes: " + string.Join(", ", compatibility));
 
-                throw new Exception("Cannot find table editor for definition " + item.DefinitionId + ". If you think this is a bug, please report it via Help -> Report a bug");
+                throw new Exception("Cannot find table editor for definition " + item.TableName + ". If you think this is a bug, please report it via Help -> Report a bug");
             }
             
             if (definition.RecordMode == RecordMode.MultiRecord)

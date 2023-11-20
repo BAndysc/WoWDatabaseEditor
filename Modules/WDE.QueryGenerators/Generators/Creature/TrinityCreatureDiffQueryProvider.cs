@@ -17,11 +17,11 @@ public class TrinityCreatureDiffQueryProvider : IUpdateQueryProvider<CreatureDif
         this.databaseProvider = databaseProvider;
     }
 
-    public string TableName => "creature";
+    public DatabaseTable TableName => DatabaseTable.WorldTable("creature");
     
     public IQuery Update(CreatureDiff diff)
     {
-        var trans = Queries.BeginTransaction();
+        var trans = Queries.BeginTransaction(DataDatabaseType.World);
 
         var creatureEntry = databaseProvider.GetCreatureByGuid(diff.Guid, diff.Entry);
 

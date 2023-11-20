@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Misc;
+using WDE.Common.Database;
 using WDE.Common.Services.QueryParser.Models;
 using WDE.SqlInterpreter.Extensions;
 
@@ -10,8 +11,18 @@ namespace WDE.SqlInterpreter
 {
     internal class SqlVisitor : MySqlParserBaseVisitor<bool>
     {
+        private readonly string? worldTableName;
+        private readonly string? hotfixTableName;
+        private readonly DataDatabaseType defaultContext;
         private Dictionary<string, object> variables = new();
 
+        public SqlVisitor(string? worldTableName, string? hotfixTableName, DataDatabaseType defaultContext)
+        {
+            this.worldTableName = worldTableName;
+            this.hotfixTableName = hotfixTableName;
+            this.defaultContext = defaultContext;
+        }
+        
         private string GetOriginalText(ParserRuleContext context)
         {
             return context.Start.InputStream.GetText(new Interval(context.Start.StartIndex, context.Stop.StopIndex));
@@ -97,14 +108,48 @@ namespace WDE.SqlInterpreter
             return false;
         }
 
+        private bool ParseDatabaseTable(MySqlParser.UidContext[]? uids, out DatabaseTable tableName)
+        {
+            tableName = default;
+            
+            if (uids == null)
+                return false;
+            
+            var tableNameId = uids[^1].GetText().DropQuotes();
+            var databaseNameId = uids.Length >= 2 ? uids[^2].GetText().DropQuotes() : null;
+
+            if (tableNameId == null)
+                return false;
+
+            if (databaseNameId == null)
+            {
+                tableName = new DatabaseTable(defaultContext, tableNameId);
+                return true;
+            }
+
+            if (databaseNameId == worldTableName)
+            {
+                tableName = DatabaseTable.WorldTable(tableNameId);
+                return true;
+            }
+            
+            if (databaseNameId == hotfixTableName)
+            {
+                tableName = DatabaseTable.HotfixTable(tableNameId);
+                return true;
+            }
+
+            return false;
+        }
+        
         public override bool VisitDeleteStatement(MySqlParser.DeleteStatementContext context)
         {
             if (context.singleDeleteStatement() == null)
                 return false;
-            
-            var tableName = context.singleDeleteStatement().tableName().fullId().uid()[^1].GetText().DropQuotes();
-            
-            if (tableName == null)
+
+            var identifiers = context.singleDeleteStatement().tableName().fullId().uid();
+
+            if (!ParseDatabaseTable(identifiers, out var tableName))
                 return false;
 
             if (!TryParseSimpleCondition(context.singleDeleteStatement().expression(), out var where))
@@ -119,12 +164,12 @@ namespace WDE.SqlInterpreter
         {
             if (context.singleUpdateStatement() == null)
                 return false;
-            
-            var tableName = context.singleUpdateStatement().tableName().fullId().uid()[^1].GetText().DropQuotes();
-            
-            if (tableName == null)
-                return false;
 
+            var identifiers = context.singleUpdateStatement().tableName().fullId().uid();
+            
+            if (!ParseDatabaseTable(identifiers, out var tableName))
+                return false;
+            
             if (context.singleUpdateStatement().updatedElement().Length == 0)
                 return false;
 
@@ -143,11 +188,11 @@ namespace WDE.SqlInterpreter
         
         public override bool VisitInsertStatement(MySqlParser.InsertStatementContext context)
         {
-            var tableName = context.tableName().fullId().uid()[^1].GetText().DropQuotes();
-
-            if (tableName == null)
+            var identifiers = context.tableName().fullId().uid();
+            
+            if (!ParseDatabaseTable(identifiers, out var tableName))
                 return false;
-
+            
             if (context.columns == null)
                 return false;
             

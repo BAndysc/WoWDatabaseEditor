@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using Newtonsoft.Json;
+using WDE.Common.Database;
 using WDE.Common.Managers;
 using WDE.Common.Services;
 using WDE.Module.Attributes;
@@ -7,10 +9,10 @@ namespace WDE.DatabaseEditors.Services;
 
 internal interface IStandaloneTableEditorSettings
 {
-    bool HasWindowState(string table);
-    bool GetWindowState(string table, out bool maximized, out int x, out int y, out int width, out int height);
-    void UpdateWindowState(string table, bool maximized, int x, int y, int width, int height);
-    void SetupWindow(string table, IAbstractWindowView window);
+    bool HasWindowState(DatabaseTable table);
+    bool GetWindowState(DatabaseTable table, out bool maximized, out int x, out int y, out int width, out int height);
+    void UpdateWindowState(DatabaseTable table, bool maximized, int x, int y, int width, int height);
+    void SetupWindow(DatabaseTable table, IAbstractWindowView window);
 }
 
 [AutoRegister]
@@ -18,12 +20,18 @@ internal interface IStandaloneTableEditorSettings
 internal class StandaloneTableEditorSettings : IStandaloneTableEditorSettings
 {
     private readonly IUserSettings userSettings;
-    private Data settings;
+    private Dictionary<DatabaseTable, WindowState> states;
 
     public StandaloneTableEditorSettings(IUserSettings userSettings)
     {
         this.userSettings = userSettings;
-        settings = userSettings.Get<Data>(new Data())!;
+        var data = userSettings.Get<Data>(new Data())!;
+        states = new();
+        foreach (var pair in data.LegacyStates)
+            states[DatabaseTable.WorldTable(pair.Key)] = pair.Value;
+ 
+        foreach (var pair in data.NewStates)
+            states[pair.Key] = pair.Value;
     }
 
     private struct WindowState
@@ -37,17 +45,19 @@ internal class StandaloneTableEditorSettings : IStandaloneTableEditorSettings
 
     private class Data : ISettings
     {
-        public Dictionary<string, WindowState> States { get; set; } = new Dictionary<string, WindowState>();
+        [JsonProperty("States")]
+        public Dictionary<string, WindowState> LegacyStates { get; set; } = new();
+        public Dictionary<DatabaseTable, WindowState> NewStates { get; set; } = new();
     }
 
-    public bool HasWindowState(string table)
+    public bool HasWindowState(DatabaseTable table)
     {
-        return settings.States.ContainsKey(table);
+        return states.ContainsKey(table);
     }
 
-    public bool GetWindowState(string table, out bool maximized, out int x, out int y, out int width, out int height)
+    public bool GetWindowState(DatabaseTable table, out bool maximized, out int x, out int y, out int width, out int height)
     {
-        if (settings.States.TryGetValue(table, out var state))
+        if (states.TryGetValue(table, out var state))
         {
             maximized = state.Maximized;
             x = state.X;
@@ -64,9 +74,9 @@ internal class StandaloneTableEditorSettings : IStandaloneTableEditorSettings
         return false;
     }
 
-    public void UpdateWindowState(string table, bool maximized, int x, int y, int width, int height)
+    public void UpdateWindowState(DatabaseTable table, bool maximized, int x, int y, int width, int height)
     {
-        settings.States[table] = new WindowState()
+        states[table] = new WindowState()
         {
             Maximized = maximized,
             X = x,
@@ -74,10 +84,10 @@ internal class StandaloneTableEditorSettings : IStandaloneTableEditorSettings
             Width = width,
             Height = height
         };
-        userSettings.Update(settings);
+        userSettings.Update(new Data(){NewStates = states});
     }
 
-    public void SetupWindow(string table, IAbstractWindowView window)
+    public void SetupWindow(DatabaseTable table, IAbstractWindowView window)
     {
         if (GetWindowState(table, out var maximized, out var x, out var y, out var width, out var height))
         {

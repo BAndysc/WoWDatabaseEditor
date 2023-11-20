@@ -2,6 +2,7 @@
 using System.Text;
 using System.Threading.Tasks;
 using WDE.Common;
+using WDE.Common.Database;
 using WDE.Common.Solution;
 using WDE.Module.Attributes;
 using WDE.SqlQueryGenerator;
@@ -20,7 +21,7 @@ namespace WDE.Solutions.Providers
 
         public async Task<IQuery> GenerateSql(SolutionFolderItem item)
         {
-            IMultiQuery query = Queries.BeginTransaction();
+            IMultiQuery query = Queries.BeginTransaction(DataDatabaseType.World);
             query.Comment(item.MyName);
             foreach (ISolutionItem i in item.Items)
             {

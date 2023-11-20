@@ -12,5 +12,8 @@
     <PropertyGroup>
         <OutputPath>..\bin\$(Configuration)\</OutputPath>
     </PropertyGroup>
+    <ItemGroup>
+      <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    </ItemGroup>
     <Import Project="..\Module.props" />
 </Project>

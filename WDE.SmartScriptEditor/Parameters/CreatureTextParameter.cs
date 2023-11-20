@@ -17,7 +17,7 @@ public class CreatureTextParameter : IContextualParameter<long, SmartBaseElement
     private readonly IDatabaseProvider databaseProvider;
     private readonly ITableEditorPickerService tableEditorPickerService;
     private readonly IItemFromListProvider itemFromListProvider;
-    private readonly string tableName;
+    private readonly DatabaseTable tableName;
     private readonly string columnName;
 
     private Dictionary<int, int> targetIdToCreatureEntryParameter = new();
@@ -26,7 +26,7 @@ public class CreatureTextParameter : IContextualParameter<long, SmartBaseElement
         IDatabaseProvider databaseProvider,
         ITableEditorPickerService tableEditorPickerService,
         IItemFromListProvider itemFromListProvider,
-        string tableName, string columnName)
+        DatabaseTable tableName, string columnName)
     {
         this.databaseProvider = databaseProvider;
         this.tableEditorPickerService = tableEditorPickerService;

@@ -1,3 +1,4 @@
+using WDE.Common.Database;
 using WDE.Module.Attributes;
 using WDE.QueryGenerators.Base;
 using WDE.QueryGenerators.Models;
@@ -11,7 +12,7 @@ internal class CreatureDeleteQueryProvider : IDeleteQueryProvider<CreatureSpawnM
 {
     public IQuery Delete(CreatureSpawnModelEssentials t)
     {
-        return Queries.Table("creature")
+        return Queries.Table(DatabaseTable.WorldTable("creature"))
             .Where(row => row.Column<uint>("guid") == t.Guid)
             .Delete();
     }

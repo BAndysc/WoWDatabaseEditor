@@ -26,7 +26,6 @@ public partial class DefinitionViewModel : ObservableBase, IDropTarget
     private readonly DefinitionEditorViewModel parent;
     public DefinitionStubViewModel DefinitionStub { get; }
 
-    [Notify] private string id = "";
     //[Notify] private IList<string> compatibility = System.Array.Empty<string>();
     public List<CoreVersionViewModel> Compatibility { get; }
     [Notify] private string name = "";
@@ -124,7 +123,6 @@ public partial class DefinitionViewModel : ObservableBase, IDropTarget
         DefinitionStub = stub;
         SourceFile = model.AbsoluteFileName;
         AllParameters = parent.AllParameters;
-        id = model.Id;
         Compatibility = parent.AllCoreVersions.Select(x => new CoreVersionViewModel(x)).ToList();
         foreach (var core in Compatibility)
         {

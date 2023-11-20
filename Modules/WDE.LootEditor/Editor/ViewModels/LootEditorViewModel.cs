@@ -995,7 +995,7 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
         if (!VerifyDuplicateKeys())
             throw new LootDuplicateKeysException("Some loot items are duplicated, which is illegal. The duplicate rows have been marked red and selected. Please fix it and save again.");
         
-        var transaction = Queries.BeginTransaction();
+        var transaction = Queries.BeginTransaction(DataDatabaseType.World);
         var updateQuery = queryGenerator.GenerateUpdateLootIds(solutionItem.Type, solutionItem.Entry, solutionItem.Difficulty, Roots);
         transaction.Add(updateQuery);
         

@@ -1,3 +1,4 @@
+using WDE.Common.Database;
 using WDE.SqlQueryGenerator;
 
 namespace WDE.QueryGenerators.Base;
@@ -16,5 +17,5 @@ public abstract class BaseInsertQueryProvider<T> : IInsertQueryProvider<T>
 
     protected abstract object Convert(T obj);
 
-    public abstract string TableName { get; }
+    public abstract DatabaseTable TableName { get; }
 }

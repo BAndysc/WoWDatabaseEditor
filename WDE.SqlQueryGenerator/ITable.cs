@@ -1,8 +1,10 @@
+using WDE.Common.Database;
+
 namespace WDE.SqlQueryGenerator
 {
     public interface ITable
     {
-        string TableName { get; }
+        DatabaseTable TableName { get; }
         IMultiQuery? CurrentQuery { get; set; }
     }
 }

@@ -44,7 +44,7 @@ public class ConditionsFindAnywhereSource : IFindAnywhereSource
                 .WithButton("Sorry again", false, true, true)
                 .Build()).ListenErrors();
         });
-        var table = Queries.Table("conditions");
+        var table = Queries.Table(DatabaseTable.WorldTable("conditions"));
         var where = table.ToWhere();
         foreach (var cond in dataManager.AllConditionData)
         {

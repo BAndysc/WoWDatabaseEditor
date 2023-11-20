@@ -1,3 +1,4 @@
+using WDE.Common.Database;
 using WDE.SqlQueryGenerator;
 
 namespace WDE.QueryGenerators.Base;
@@ -28,5 +29,5 @@ internal class QueryGenerator<R> : IQueryGenerator<R>
     public IQuery? TryDelete(R element) => deleteProvider?.Delete(element);
     public IQuery? TryUpdate(R element) => updateProvider?.Update(element);
 
-    public string? TableName => insertProvider?.TableName;
+    public DatabaseTable? TableName => insertProvider?.TableName;
 }

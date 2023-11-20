@@ -1,16 +1,17 @@
 using System.Linq;
 using NUnit.Framework;
+using WDE.Common.Database;
 
 namespace WDE.SqlInterpreter.Test
 {
     public class TestTableName
     {
-        private QueryEvaluator evaluator = null!;
+        private BaseQueryEvaluator evaluator = null!;
     
         [SetUp]
         public void Setup()
         {
-            evaluator = new();
+            evaluator = new("world", "hotfix", DataDatabaseType.Hotfix);
         }
 
         [Test]
@@ -31,35 +32,56 @@ namespace WDE.SqlInterpreter.Test
         public void QuotesSingle()
         {
             var result = evaluator.ExtractInserts("INSERT INTO 'abc' ('id') VALUES (5);").ToList();
-            Assert.AreEqual("abc", result[0].TableName);
+            Assert.AreEqual(DatabaseTable.HotfixTable("abc"), result[0].TableName);
         }
 
         [Test]
         public void QuotesDouble()
         {
             var result = evaluator.ExtractInserts("INSERT INTO \"abc\" ('id') VALUES (5);").ToList();
-            Assert.AreEqual("abc", result[0].TableName);
+            Assert.AreEqual(DatabaseTable.HotfixTable("abc"), result[0].TableName);
         }
 
         [Test]
         public void QuotesBacktick()
         {
             var result = evaluator.ExtractInserts("INSERT INTO `abc` ('id') VALUES (5);").ToList();
-            Assert.AreEqual("abc", result[0].TableName);
+            Assert.AreEqual(DatabaseTable.HotfixTable("abc"), result[0].TableName);
         }
 
         [Test]
         public void QuotesEscape()
         {
             var result = evaluator.ExtractInserts("INSERT INTO `ab'c` ('id') VALUES (5);").ToList();
-            Assert.AreEqual("ab'c", result[0].TableName);
+            Assert.AreEqual(DatabaseTable.HotfixTable("ab'c"), result[0].TableName);
         }
 
         [Test]
-        public void TableNameWithDatabaseName()
+        public void TableNameWithHotfixDatabaseName()
         {
-            var result = evaluator.ExtractInserts("INSERT INTO `db`.`table` ('id') VALUES (5);").ToList();
-            Assert.AreEqual("table", result[0].TableName);
+            var result = evaluator.ExtractInserts("INSERT INTO `hotfix`.`table` ('id') VALUES (5);").ToList();
+            Assert.AreEqual(DatabaseTable.HotfixTable("table"), result[0].TableName);
+        }
+
+        [Test]
+        public void TableNameWithWorldDatabaseName()
+        {
+            var result = evaluator.ExtractInserts("INSERT INTO `world`.`table` ('id') VALUES (5);").ToList();
+            Assert.AreEqual(DatabaseTable.WorldTable("table"), result[0].TableName);
+        }
+
+        [Test]
+        public void TableNameWithNoDatabaseName()
+        {
+            var result = evaluator.ExtractInserts("INSERT INTO `table` ('id') VALUES (5);").ToList();
+            Assert.AreEqual(DatabaseTable.HotfixTable("table"), result[0].TableName);
+        }
+
+        [Test]
+        public void TableNameWithUnknownDatabaseName()
+        {
+            var result = evaluator.ExtractInserts("INSERT INTO `unknown`.`table` ('id') VALUES (5);").ToList();
+            Assert.AreEqual(0, result.Count);
         }
     }
 }

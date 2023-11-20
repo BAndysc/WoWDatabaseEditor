@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Newtonsoft.Json;
 using WDE.Common;
+using WDE.Common.Database;
 using WDE.Common.Services;
 using WDE.DatabaseEditors.Models;
 
@@ -14,12 +15,12 @@ namespace WDE.DatabaseEditors.Solution
         public DatabaseTableSolutionItem(DatabaseKey entry, 
             bool existsInDatabase, 
             bool conditionModified, 
-            string definitionId, 
+            DatabaseTable tableName, 
             bool ignoreEquality, 
             Guid guid, 
             DateTime created, 
             DateTime modified,
-            int build) : this(definitionId, ignoreEquality, guid, created, modified, build)
+            int build) : this(tableName, ignoreEquality, guid, created, modified, build)
         {
             Entries.Add(new SolutionItemDatabaseEntity(entry, existsInDatabase, conditionModified));
         }
@@ -27,22 +28,22 @@ namespace WDE.DatabaseEditors.Solution
         public DatabaseTableSolutionItem(DatabaseKey entry, 
             bool existsInDatabase, 
             bool conditionModified, 
-            string definitionId, 
-            bool ignoreEquality) : this(definitionId, ignoreEquality)
+            DatabaseTable tableName, 
+            bool ignoreEquality) : this(tableName, ignoreEquality)
         {
             Entries.Add(new SolutionItemDatabaseEntity(entry, existsInDatabase, conditionModified));
         }
 
-        public DatabaseTableSolutionItem(string definitionId, bool ignoreEquality)
-            :this(definitionId, ignoreEquality, System.Guid.NewGuid(), DateTime.Now, DateTime.Now, 0) {}
+        public DatabaseTableSolutionItem(DatabaseTable tableName, bool ignoreEquality)
+            :this(tableName, ignoreEquality, System.Guid.NewGuid(), DateTime.Now, DateTime.Now, 0) {}
         
-        public DatabaseTableSolutionItem(string definitionId, bool ignoreEquality, 
+        public DatabaseTableSolutionItem(DatabaseTable tableName, bool ignoreEquality, 
             Guid guid, 
             DateTime created, 
             DateTime modified,
             int build)
         {
-            DefinitionId = definitionId;
+            TableName = tableName;
             IgnoreEquality = ignoreEquality;
             Guid = guid;
             Created = created;
@@ -52,10 +53,9 @@ namespace WDE.DatabaseEditors.Solution
 
         public DatabaseTableSolutionItem()
         {
-            DefinitionId = null!;
         }
 
-        public ISolutionItem Clone() => new DatabaseTableSolutionItem(DefinitionId, IgnoreEquality, Guid, Created, Modified, Build)
+        public ISolutionItem Clone() => new DatabaseTableSolutionItem(TableName, IgnoreEquality, Guid, Created, Modified, Build)
         {
             Entries = Entries.Select(e => new SolutionItemDatabaseEntity(e)).ToList(),
             DeletedEntries = DeletedEntries.ToList()
@@ -76,8 +76,8 @@ namespace WDE.DatabaseEditors.Solution
         [JsonProperty] 
         public readonly int Build;
         
-        [JsonProperty]
-        public readonly string DefinitionId;
+        [JsonProperty("DefinitionId")]
+        public readonly DatabaseTable TableName;
 
         [JsonProperty]
         public readonly bool IgnoreEquality;
@@ -96,7 +96,7 @@ namespace WDE.DatabaseEditors.Solution
 
         private bool Equals(DatabaseTableSolutionItem other)
         {
-            if (DefinitionId != other.DefinitionId)
+            if (TableName != other.TableName)
                 return false;
 
             if (IgnoreEquality)
@@ -130,7 +130,7 @@ namespace WDE.DatabaseEditors.Solution
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(DefinitionId);
+            return HashCode.Combine(TableName);
         }
     }
 

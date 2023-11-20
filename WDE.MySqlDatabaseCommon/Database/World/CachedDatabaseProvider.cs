@@ -65,23 +65,23 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             this.parameterFactory = parameterFactory;
             eventAggregator.GetEvent<DatabaseTableChanged>().Subscribe(tableName =>
             {
-                if (tableName == "creature_template")
+                if (tableName == DatabaseTable.WorldTable("creature_template"))
                     Refresh(RefreshCreatureTemplate);
-                else if (tableName == "gameobject_template")
+                else if (tableName == DatabaseTable.WorldTable("gameobject_template"))
                     Refresh(RefreshGameObjectTemplate);
                 //if (tableName == "creature")
                 //    Refresh(RefreshCreature);
-                else if (tableName == "gossip_menu")
+                else if (tableName == DatabaseTable.WorldTable("gossip_menu"))
                     Refresh(RefreshGossipMenu);
-                else if (tableName == "npc_text")
+                else if (tableName == DatabaseTable.WorldTable("npc_text"))
                     Refresh(RefreshNpcTexts);
                 else if (tableName == creatureTextInsertProvider.TableName)
                     Refresh(RefreshCreatureTexts);
-                else if (tableName == "phase_name" || tableName == "phase_names")
+                else if (tableName == DatabaseTable.WorldTable("phase_name") || tableName == DatabaseTable.WorldTable("phase_names"))
                     Refresh(() => Task.FromResult(typeof(IPhaseName)));
-                else if (tableName == "quest_template" || tableName == "quest_template_addon")
+                else if (tableName == DatabaseTable.WorldTable("quest_template") || tableName == DatabaseTable.WorldTable("quest_template_addon"))
                     Refresh(RefreshQuestTemplates);
-                else if (tableName == "areatrigger_template")
+                else if (tableName == DatabaseTable.WorldTable("areatrigger_template"))
                     Refresh(RefreshAreatriggerTemplates);
             }, true);
         }

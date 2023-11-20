@@ -22,10 +22,9 @@ namespace WDE.DatabaseEditors.Data.Structs
     [ExcludeFromCodeCoverage]
     public partial class DatabaseTableDefinitionJson
     {
-        [DefaultEquality]
-        [JsonProperty(PropertyName = "id")] 
-        public string Id { get; set; } = "";
-
+        [JsonIgnore] 
+        public DatabaseTable Id => new DatabaseTable(DataDatabaseType, TableName);
+        
         [SetEquality]
         [JsonProperty(PropertyName = "compatibility")] 
         public IList<string> Compatibility { get; set; } = System.Array.Empty<string>();

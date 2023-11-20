@@ -1,16 +1,17 @@
 using System.Linq;
 using NUnit.Framework;
+using WDE.Common.Database;
 
 namespace WDE.SqlInterpreter.Test
 {
     public class TestUpdate
     {
-        private QueryEvaluator evaluator = null!;
+        private BaseQueryEvaluator evaluator = null!;
     
         [SetUp]
         public void Setup()
         {
-            evaluator = new();
+            evaluator = new("world", "hotfix", DataDatabaseType.World);
         }
     
         [Test]
@@ -18,7 +19,7 @@ namespace WDE.SqlInterpreter.Test
         {
             var result = evaluator.ExtractUpdates("UPDATE `abc` SET `a` = 5 WHERE `b` = 5;").ToList();
             Assert.AreEqual(1, result.Count);
-            Assert.AreEqual("abc", result[0].TableName);
+            Assert.AreEqual(DatabaseTable.WorldTable("abc"), result[0].TableName);
             CollectionAssert.AreEqual(new string[]{"a"}, result[0].Updates.Select(s => s.ColumnName));
             Assert.AreEqual(1, result[0].Where.Conditions.Length);
             Assert.AreEqual(1, result[0].Where.Conditions[0].Columns.Length);
@@ -31,7 +32,7 @@ namespace WDE.SqlInterpreter.Test
         {
             var result = evaluator.ExtractUpdates("UPDATE `abc` SET `a` = 5 WHERE `b` IN (5, 6, 7, 8);").ToList();
             Assert.AreEqual(1, result.Count);
-            Assert.AreEqual("abc", result[0].TableName);
+            Assert.AreEqual(DatabaseTable.WorldTable("abc"), result[0].TableName);
             CollectionAssert.AreEqual(new string[]{"a"}, result[0].Updates.Select(s => s.ColumnName));
             Assert.AreEqual(4, result[0].Where.Conditions.Length);
             Assert.AreEqual(1, result[0].Where.Conditions[0].Columns.Length);
@@ -44,7 +45,7 @@ namespace WDE.SqlInterpreter.Test
         {
             var result = evaluator.ExtractUpdates("UPDATE `abc` SET `a` = 5, `b` = 6 WHERE `b` IN (5, 6, 7, 8);").ToList();
             Assert.AreEqual(1, result.Count);
-            Assert.AreEqual("abc", result[0].TableName);
+            Assert.AreEqual(DatabaseTable.WorldTable("abc"), result[0].TableName);
             CollectionAssert.AreEqual(new string[]{"a", "b"}, result[0].Updates.Select(s => s.ColumnName));
         }
     
@@ -53,7 +54,7 @@ namespace WDE.SqlInterpreter.Test
         {
             var result = evaluator.ExtractUpdates("UPDATE `abc` SET `a` = 5 WHERE `b` = 5 AND `c` = 4;").ToList();
             Assert.AreEqual(1, result.Count);
-            Assert.AreEqual("abc", result[0].TableName);
+            Assert.AreEqual(DatabaseTable.WorldTable("abc"), result[0].TableName);
             CollectionAssert.AreEqual(new string[]{"a"}, result[0].Updates.Select(s => s.ColumnName));
             Assert.AreEqual(1, result[0].Where.Conditions.Length);
             Assert.AreEqual("b", result[0].Where.Conditions[0].Columns[0]);
@@ -67,7 +68,7 @@ namespace WDE.SqlInterpreter.Test
         {
             var result = evaluator.ExtractUpdates("UPDATE `abc` SET `a` = 5 WHERE (`b` = 5 AND `c` = 4) OR (`b` = 3 AND `d` = 9);").ToList();
             Assert.AreEqual(1, result.Count);
-            Assert.AreEqual("abc", result[0].TableName);
+            Assert.AreEqual(DatabaseTable.WorldTable("abc"), result[0].TableName);
             CollectionAssert.AreEqual(new string[]{"a"}, result[0].Updates.Select(s => s.ColumnName));
             Assert.AreEqual(2, result[0].Where.Conditions.Length);
             Assert.AreEqual("b", result[0].Where.Conditions[0].Columns[0]);
@@ -86,7 +87,7 @@ namespace WDE.SqlInterpreter.Test
         {
             var result = evaluator.ExtractUpdates("UPDATE `abc` SET `a` = 5 WHERE (((`b` = 5 AND `c` = 4)) OR (`b` = 3 AND `d` = 9) OR (`x` = 3));").ToList();
             Assert.AreEqual(1, result.Count);
-            Assert.AreEqual("abc", result[0].TableName);
+            Assert.AreEqual(DatabaseTable.WorldTable("abc"), result[0].TableName);
             CollectionAssert.AreEqual(new string[]{"a"}, result[0].Updates.Select(s => s.ColumnName));
             Assert.AreEqual(3, result[0].Where.Conditions.Length);
             Assert.AreEqual("b", result[0].Where.Conditions[0].Columns[0]);
@@ -108,7 +109,7 @@ namespace WDE.SqlInterpreter.Test
         {
             var result = evaluator.ExtractUpdates("UPDATE creature_template SET faction = 35 WHERE entry = 31779").ToList();
             Assert.AreEqual(1, result.Count);
-            Assert.AreEqual("creature_template", result[0].TableName);
+            Assert.AreEqual(DatabaseTable.WorldTable("creature_template"), result[0].TableName);
             CollectionAssert.AreEqual(new string[]{"faction"}, result[0].Updates.Select(s => s.ColumnName));
             Assert.AreEqual(1, result[0].Where.Conditions.Length);
             Assert.AreEqual(1, result[0].Where.Conditions[0].Columns.Length);
@@ -121,7 +122,7 @@ namespace WDE.SqlInterpreter.Test
         {
             var result = evaluator.ExtractUpdates("UPDATE creature SET position_x = 6443.63, position_y = 2039.9923, position_z = 551.1352, orientation = 2.6383197 WHERE guid = 121393").ToList();
             Assert.AreEqual(1, result.Count);
-            Assert.AreEqual("creature", result[0].TableName);
+            Assert.AreEqual(DatabaseTable.WorldTable("creature"), result[0].TableName);
             CollectionAssert.AreEqual(new string[]{"position_x", "position_y", "position_z", "orientation"}, result[0].Updates.Select(s => s.ColumnName));
             CollectionAssert.AreEqual(new float[]{6443.63f, 2039.9923f, 551.1352f, 2.6383197f}, result[0].Updates.Select(s => s.Value).Cast<float>());
             Assert.AreEqual(1, result[0].Where.Conditions.Length);
@@ -135,7 +136,7 @@ namespace WDE.SqlInterpreter.Test
         {
             var result = evaluator.ExtractUpdates("update `abc` set `a` = 5 where `b` = 5;").ToList();
             Assert.AreEqual(1, result.Count);
-            Assert.AreEqual("abc", result[0].TableName);
+            Assert.AreEqual(DatabaseTable.WorldTable("abc"), result[0].TableName);
             CollectionAssert.AreEqual(new string[]{"a"}, result[0].Updates.Select(s => s.ColumnName));
             Assert.AreEqual(1, result[0].Where.Conditions.Length);
             Assert.AreEqual(1, result[0].Where.Conditions[0].Columns.Length);

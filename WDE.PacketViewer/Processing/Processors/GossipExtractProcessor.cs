@@ -320,7 +320,7 @@ namespace WDE.PacketViewer.Processing.Processors
         
         public async Task<string> Generate()
         {
-            var multiQuery = Queries.BeginTransaction();
+            var multiQuery = Queries.BeginTransaction(DataDatabaseType.World);
 
             await DeleteExisting();
 

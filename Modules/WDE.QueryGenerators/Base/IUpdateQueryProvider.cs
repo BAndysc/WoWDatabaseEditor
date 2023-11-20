@@ -1,3 +1,4 @@
+using WDE.Common.Database;
 using WDE.Module.Attributes;
 using WDE.SqlQueryGenerator;
 
@@ -7,6 +8,6 @@ namespace WDE.QueryGenerators.Base;
 public interface IUpdateQueryProvider<T>
 {
     IQuery Update(T diff);
-    string TableName { get; }
+    DatabaseTable TableName { get; }
     int Priority => 0;
 }

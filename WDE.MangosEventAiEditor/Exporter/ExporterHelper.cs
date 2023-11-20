@@ -17,7 +17,7 @@ namespace WDE.MangosEventAiEditor.Exporter
         private readonly ICurrentCoreVersion currentCoreVersion;
         private readonly ISolutionItemNameRegistry nameProvider;
 
-        private string EventAiTableName => "creature_ai_scripts";
+        private DatabaseTable EventAiTableName => DatabaseTable.WorldTable("creature_ai_scripts");
         
         public ExporterHelper(EventAiScript script, 
             IDatabaseProvider databaseProvider,
@@ -36,7 +36,7 @@ namespace WDE.MangosEventAiEditor.Exporter
 
         public IQuery GetSql()
         {
-            var query = Queries.BeginTransaction();
+            var query = Queries.BeginTransaction(DataDatabaseType.World);
             query.Comment(nameProvider.GetName(item));
             var serializedScript = scriptExporter.ToDatabaseCompatibleEventAi(script);
             BuildDelete(query, item.EntryOrGuid, serializedScript);
@@ -98,7 +98,7 @@ namespace WDE.MangosEventAiEditor.Exporter
             if (entry.HasValue)
             {
                 query
-                    .Table("creature_template")
+                    .Table(DatabaseTable.WorldTable("creature_template"))
                     .Where(t => t.Column<int>("Entry") == (int)entry.Value)
                     .Set("AIName", "EventAI")
                     .Set("ScriptName", "")

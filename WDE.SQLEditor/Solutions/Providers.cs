@@ -34,7 +34,7 @@ namespace WDE.SQLEditor.Solutions
     {
         public Task<IQuery> GenerateSql(CustomSqlSolutionItem item)
         {
-            return Task.FromResult(Queries.Raw(item.Query));
+            return Task.FromResult(Queries.Raw(item.Database, item.Query));
         }
     }
     

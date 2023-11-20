@@ -4,6 +4,7 @@ using Prism.Ioc;
 using Unity;
 using Unity.Extension;
 using Unity.Resolution;
+using WDE.Common.Database;
 using WDE.Common.Database.Counters;
 using WDE.Common.Managers;
 using WDE.Common.Modules;
@@ -246,19 +247,19 @@ public class DummyQueryEvaluator : IQueryEvaluator
 
 public class DummyTableEditorPickerService : ITableEditorPickerService
 {
-    public async Task<long?> PickByColumn(string table, DatabaseKey? key, string column, long? initialValue, string? backupColumn = null, string? customWhere = null)
+    public async Task<long?> PickByColumn(DatabaseTable table, DatabaseKey? key, string column, long? initialValue, string? backupColumn = null, string? customWhere = null)
     {
         Console.WriteLine("Objects editing not supported in standalone window");
         return null;
     }
 
-    public Task ShowTable(string table, string? condition, DatabaseKey? defaultPartialKey = null)
+    public Task ShowTable(DatabaseTable table, string? condition, DatabaseKey? defaultPartialKey = null)
     {
         Console.WriteLine("Objects editing not supported in standalone window");
         return Task.CompletedTask;
     }
 
-    public Task ShowForeignKey1To1(string table, DatabaseKey key)
+    public Task ShowForeignKey1To1(DatabaseTable table, DatabaseKey key)
     {
         Console.WriteLine("Objects editing not supported in standalone window");
         return Task.CompletedTask;
@@ -330,7 +331,7 @@ public class DummyWindowManager : IWindowManager
 
 public class DummyDatabaseRowsCountProvider : IDatabaseRowsCountProvider
 {
-    public async Task<int> GetRowsCountByPrimaryKey(string table, long primaryKey, CancellationToken token)
+    public async Task<int> GetRowsCountByPrimaryKey(DatabaseTable table, long primaryKey, CancellationToken token)
     {
         return 0;
     }

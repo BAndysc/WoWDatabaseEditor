@@ -1,25 +1,27 @@
+using WDE.Common.Database;
+
 namespace WDE.SqlQueryGenerator
 {
     public static class Queries
     {
-        public static IMultiQuery BeginTransaction()
+        public static IMultiQuery BeginTransaction(DataDatabaseType type)
         {
-            return new MultiQuery();
+            return new MultiQuery(type);
         }
 
-        public static ITable Table(string name)
+        public static ITable Table(DatabaseTable name)
         {
             return new Table(name);
         }
 
-        public static IQuery Empty()
+        public static IQuery Empty(DataDatabaseType type)
         {
-            return new Query("");
+            return new Query(type, "");
         }
 
-        public static IQuery Raw(string sql)
+        public static IQuery Raw(DataDatabaseType type, string sql)
         {
-            return new Query(sql);
+            return new Query(type, sql);
         }
     }
 }

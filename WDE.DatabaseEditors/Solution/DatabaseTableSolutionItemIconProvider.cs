@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using WDE.Common.Database;
 using WDE.Common.Solution;
 using WDE.Common.Types;
 using WDE.DatabaseEditors.Data.Interfaces;
@@ -11,7 +12,7 @@ namespace WDE.DatabaseEditors.Solution
     public class DatabaseTableSolutionItemIconProvider : ISolutionItemIconProvider<DatabaseTableSolutionItem>
     {
         private readonly ITableDefinitionProvider tableDefinitionProvider;
-        private Dictionary<string, ImageUri> definitionToIcon = new();
+        private Dictionary<DatabaseTable, ImageUri> definitionToIcon = new();
 
         public DatabaseTableSolutionItemIconProvider(ITableDefinitionProvider tableDefinitionProvider)
         {
@@ -24,7 +25,7 @@ namespace WDE.DatabaseEditors.Solution
         
         public ImageUri GetIcon(DatabaseTableSolutionItem item)
         {
-            if (definitionToIcon.TryGetValue(item.DefinitionId, out var icon))
+            if (definitionToIcon.TryGetValue(item.TableName, out var icon))
                 return icon;
             return new ImageUri("Icons/document.png");
         }

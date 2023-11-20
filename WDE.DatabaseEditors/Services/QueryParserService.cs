@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Prism.Ioc;
 using WDE.Common;
+using WDE.Common.Database;
 using WDE.Common.Services;
 using WDE.Common.Services.QueryParser;
 using WDE.Common.Services.QueryParser.Models;
@@ -45,7 +46,7 @@ namespace WDE.DatabaseEditors.Services
         {
             private readonly IQueryEvaluator queryEvaluator;
             private readonly IList<IQueryParserProvider> parsers;
-            private HashSet<string> missingTables = new();
+            private HashSet<DatabaseTable> missingTables = new();
             private List<ISolutionItem> found = new();
             private List<string> errors = new();
 

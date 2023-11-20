@@ -1,3 +1,4 @@
+using WDE.Common.Database;
 using WDE.Module.Attributes;
 using WDE.QueryGenerators.Base;
 using WDE.QueryGenerators.Models;
@@ -24,5 +25,5 @@ internal class NoPhaseCreatureQueryProvider : BaseInsertQueryProvider<CreatureSp
         };
     }
 
-    public override string TableName => "creature";
+    public override DatabaseTable TableName => DatabaseTable.WorldTable("creature");
 }

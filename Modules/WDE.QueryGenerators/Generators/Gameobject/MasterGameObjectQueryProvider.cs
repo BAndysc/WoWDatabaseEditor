@@ -1,3 +1,4 @@
+using WDE.Common.Database;
 using WDE.Module.Attributes;
 using WDE.QueryGenerators.Base;
 using WDE.QueryGenerators.Models;
@@ -28,5 +29,5 @@ internal class MasterGameObjectQueryProvider : BaseInsertQueryProvider<GameObjec
         };
     }
 
-    public override string TableName => "gameobject";
+    public override DatabaseTable TableName => DatabaseTable.WorldTable("gameobject");
 }

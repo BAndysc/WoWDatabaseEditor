@@ -1,13 +1,15 @@
+using WDE.Common.Database;
+
 namespace WDE.SqlQueryGenerator
 {
     internal class Table : ITable
     {
-        internal Table(string tableName)
+        internal Table(DatabaseTable tableName)
         {
             this.TableName = tableName;
         }
 
-        public string TableName { get; }
+        public DatabaseTable TableName { get; }
         public IMultiQuery? CurrentQuery { get; set; }
     }
 }

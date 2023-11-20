@@ -20,7 +20,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
         private readonly IConditionQueryGenerator conditionQueryGenerator;
         private readonly ISolutionItemNameRegistry nameProvider;
 
-        private string SmartScriptTableName => currentCoreVersion.Current.SmartScriptFeatures.TableName;
+        private DatabaseTable SmartScriptTableName => currentCoreVersion.Current.SmartScriptFeatures.TableName;
         
         public ExporterHelper(SmartScript script, 
             IDatabaseProvider databaseProvider,
@@ -41,7 +41,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
 
         public IQuery GetSql()
         {
-            var query = Queries.BeginTransaction();
+            var query = Queries.BeginTransaction(DataDatabaseType.World);
             query.Comment(nameProvider.GetName(item));
             query.DefineVariable("ENTRY", script.EntryOrGuid);
             var (serializedScript, serializedConditions) = scriptExporter.ToDatabaseCompatibleSmartScript(script);
@@ -185,12 +185,12 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                     if (entry.HasValue)
                     {
                         var condition = query
-                            .Table("creature_template")
+                            .Table(DatabaseTable.WorldTable("creature_template"))
                             .Where(t => t.Column<int>("entry") == t.Variable<int>("ENTRY"));
                         
                         if (script.EntryOrGuid != entry.Value)
                             condition = query
-                                .Table("creature_template")
+                                .Table(DatabaseTable.WorldTable("creature_template"))
                                 .Where(t => t.Column<uint>("entry") == entry.Value);
                         
                         var update = condition
@@ -218,12 +218,12 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                     if (entry.HasValue)
                     {
                         var condition = query
-                            .Table("gameobject_template")
+                            .Table(DatabaseTable.WorldTable("gameobject_template"))
                             .Where(t => t.Column<int>("entry") == t.Variable<int>("ENTRY"));
                         
                         if (script.EntryOrGuid != entry.Value)
                             condition = query
-                                .Table("gameobject_template")
+                                .Table(DatabaseTable.WorldTable("gameobject_template"))
                                 .Where(t => t.Column<uint>("entry") == entry.Value);
                         condition
                             .Set("AIName", currentCoreVersion.Current.SmartScriptFeatures.GameObjectSmartAiName)
@@ -234,12 +234,12 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                     break;
                 }
                 case SmartScriptType.Quest:
-                    query.Table("quest_template_addon")
+                    query.Table(DatabaseTable.WorldTable("quest_template_addon"))
                         .InsertIgnore(new
                         {
                             ID = query.Variable("ENTRY")
                         });
-                    query.Table("quest_template_addon")
+                    query.Table(DatabaseTable.WorldTable("quest_template_addon"))
                         .Where(r => r.Column<int>("ID") == r.Variable<int>("ENTRY"))
                         .Set("ScriptName", "SmartQuest")
                         .Update();
@@ -254,10 +254,10 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                     query.Comment("TrinityCore doesn't support Smart Cinematic Script");
                     break;
                 case SmartScriptType.AreaTrigger:
-                    query.Table("areatrigger_scripts")
+                    query.Table(DatabaseTable.WorldTable("areatrigger_scripts"))
                         .Where(r => r.Column<int>("entry") == r.Variable<int>("ENTRY"))
                         .Delete();
-                    query.Table("areatrigger_scripts")
+                    query.Table(DatabaseTable.WorldTable("areatrigger_scripts"))
                         .Insert(new
                         {
                             entry = query.Variable("ENTRY"),
@@ -265,19 +265,19 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                         });
                     break;
                 case SmartScriptType.AreaTriggerEntityServerSide:
-                    query.Table("areatrigger_template")
+                    query.Table(DatabaseTable.WorldTable("areatrigger_template"))
                         .Where(r => r.Column<int>("Id") == r.Variable<int>("ENTRY") && r.Column<bool>("IsServerSide"))
                         .Set("ScriptName", "SmartAreaTriggerAI")
                         .Update();
                     break;
                 case SmartScriptType.AreaTriggerEntity:
-                    query.Table("areatrigger_template")
+                    query.Table(DatabaseTable.WorldTable("areatrigger_template"))
                         .Where(r => r.Column<int>("Id") == r.Variable<int>("ENTRY") && !r.Column<bool>("IsServerSide"))
                         .Set("ScriptName", "SmartAreaTriggerAI")
                         .Update();
                     break;
                 case SmartScriptType.Scene:
-                    query.Table("scene_template")
+                    query.Table(DatabaseTable.WorldTable("scene_template"))
                         .Where(r => r.Column<int>("SceneId") == r.Variable<int>("ENTRY"))
                         .Set("ScriptName", "SmartScene")
                         .Update();

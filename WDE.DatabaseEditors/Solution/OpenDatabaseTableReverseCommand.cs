@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Prism.Events;
+using WDE.Common.Database;
 using WDE.Common.Events;
 using WDE.Common.Managers;
 using WDE.Common.Services;
@@ -34,7 +35,7 @@ namespace WDE.DatabaseEditors.Solution
             if (!arguments.TryGetString(out var tableName))
                 return Task.CompletedTask;
 
-            var definition = tableDefinitionProvider.GetDefinition(tableName);
+            var definition = tableDefinitionProvider.GetDefinition(DatabaseTable.WorldTable(tableName));
             if (definition == null)
                 return Task.CompletedTask;
 
@@ -59,7 +60,7 @@ namespace WDE.DatabaseEditors.Solution
             if (!arguments.TryGetUint(out var entry))
                 return Task.CompletedTask;
 
-            eventAggregator.GetEvent<EventRequestOpenItem>().Publish(new DatabaseTableSolutionItem(new DatabaseKey(entry), true, false, tableName, definition.IgnoreEquality));
+            eventAggregator.GetEvent<EventRequestOpenItem>().Publish(new DatabaseTableSolutionItem(new DatabaseKey(entry), true, false, DatabaseTable.WorldTable(tableName), definition.IgnoreEquality));
             return Task.CompletedTask;
         }
 

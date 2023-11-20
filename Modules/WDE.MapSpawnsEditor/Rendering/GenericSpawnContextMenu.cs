@@ -66,8 +66,8 @@ public class GenericSpawnContextMenu : ISpawnContextMenu
         });
         OpenScriptCommand = new DelegateCommand<SpawnInstance>(externalEdits.OpenScript);
         OpenSpawnScriptCommand = new DelegateCommand<SpawnInstance>(externalEdits.OpenSpawnScript);
-        OpenCreatureTemplate = new DelegateCommand<CreatureSpawnInstance>(inst => Open(new DatabaseTableSolutionItem(new DatabaseKey(inst.Entry), true, false, "creature_template", false)));
-        OpenGameobjectTemplate = new DelegateCommand<GameObjectSpawnInstance>(inst => Open(new DatabaseTableSolutionItem(new DatabaseKey(inst.Entry), true, false, "gameobject_template", false)));
+        OpenCreatureTemplate = new DelegateCommand<CreatureSpawnInstance>(inst => Open(new DatabaseTableSolutionItem(new DatabaseKey(inst.Entry), true, false, DatabaseTable.WorldTable("creature_template"), false)));
+        OpenGameobjectTemplate = new DelegateCommand<GameObjectSpawnInstance>(inst => Open(new DatabaseTableSolutionItem(new DatabaseKey(inst.Entry), true, false, DatabaseTable.WorldTable("gameobject_template"), false)));
         CreateSpawnGroupCommand = new AsyncAutoCommand<SpawnInstance>(spawnGroupTool.CreateAndAssignSpawnGroup);
         LeaveCurrentSpawnGroupCommand = new AsyncAutoCommand<SpawnInstance>(spawnGroupTool.LeaveSpawnGroup);
         AssignToTheLastSpawnGroupCommand = new AsyncAutoCommand<SpawnInstance>(spawnGroupTool.AssignSpawnGroup, spawn => spawnGroupTool.LastSpawnGroup != null && spawn?.SpawnGroup == null);

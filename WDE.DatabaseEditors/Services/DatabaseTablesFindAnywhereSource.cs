@@ -67,14 +67,14 @@ public class DatabaseTablesFindAnywhereSource : IFindAnywhereSource
                 continue;
             
             HashSet<DatabaseKey> added = new();
-            foreach (var tableGroup in definition.Groups.SelectMany(group => group.Fields.Select(column => (group, column))).GroupBy(c => c.column.ForeignTable ?? definition.TableName))
+            foreach (var tableGroup in definition.Groups.SelectMany(group => group.Fields.Select(column => (group, column))).GroupBy(c => new DatabaseTable(definition.DataDatabaseType, c.column.ForeignTable ?? definition.TableName)))
             {
                 added.Clear();
                 var tableName = tableGroup.Key;
                 var table = Queries.Table(tableName);
                 var where = table.ToWhere();
 
-                if (tableName == definition.TableName && definition.Picker != null && parameterNames.IndexOf(definition.Picker) != -1)
+                if (tableName == definition.Id && definition.Picker != null && parameterNames.IndexOf(definition.Picker) != -1)
                 {
                     where = where.OrWhere(row => row.Column<long>(definition.TablePrimaryKeyColumnName) == parameterValue);
                 }
@@ -177,10 +177,10 @@ public class DatabaseTablesFindAnywhereSource : IFindAnywhereSource
                         }
                         else
                         {
-                            if (tableName == definition.TableName)
+                            if (tableName == definition.Id)
                                 key = new DatabaseKey(Convert.ToInt64(row[definition.TablePrimaryKeyColumnName].Item2));
                             else
-                                key = new DatabaseKey(Convert.ToInt64(row[definition.ForeignTableByName![tableName].ForeignKeys[0]].Item2));
+                                key = new DatabaseKey(Convert.ToInt64(row[definition.ForeignTableByName![tableName.Table].ForeignKeys[0]].Item2));
 
                             if (!added.Add(key))
                                 continue;
@@ -190,7 +190,7 @@ public class DatabaseTablesFindAnywhereSource : IFindAnywhereSource
                         resultContext.AddResult(new FindAnywhereResult(
                             new ImageUri(definition.IconPath!),
                             key[0],
-                            tableName,
+                            tableName.ToString(),
                             string.Join(", ", row.Select(pair => pair.Key + ": " + pair.Value.Item2)),
                             item,
                             commad

@@ -18,9 +18,6 @@
         <TextBlock ToolTip.Tip="Table name in the database">Table name:</TextBlock>
         <controls:DatabaseTableCompletionBox Database="{CompiledBinding DataDatabaseType}" TableName="{CompiledBinding TableName}" /> 
 
-        <TextBlock ToolTip.Tip="Legacy ID for this definition. Please use the table name here again.">Id:</TextBlock>
-        <TextBox Text="{CompiledBinding Id}" />
-
         <TextBlock ToolTip.Tip="This table is compatible with following cores">Compatibility:</TextBlock>
         <CompletionComboBox Items="{CompiledBinding Compatibility}">
             <CompletionComboBox.ItemTemplate>

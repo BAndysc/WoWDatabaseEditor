@@ -104,7 +104,7 @@ public class EventAiNewTextRandomTemplateParameter : IParameter<long>, IAsyncPar
     
     public async Task<(long, bool)> PickValue(long value)
     {
-        var result = await tableEditorPickerService.PickByColumn("dbscript_random_templates", default, "id", value, null, "type = 0");
+        var result = await tableEditorPickerService.PickByColumn(DatabaseTable.WorldTable("dbscript_random_templates"), default, "id", value, null, "type = 0");
         if (result.HasValue)
             return (result.Value, true);
         return (0, false);

@@ -1,16 +1,17 @@
 using System.Linq;
 using NUnit.Framework;
+using WDE.Common.Database;
 
 namespace WDE.SqlInterpreter.Test
 {
     public class TestColumnNames
     {
-        private QueryEvaluator evaluator = null!;
+        private BaseQueryEvaluator evaluator = null!;
     
         [SetUp]
         public void Setup()
         {
-            evaluator = new();
+            evaluator = new("world", "hotfix", DataDatabaseType.World);
         }
 
         [Test]

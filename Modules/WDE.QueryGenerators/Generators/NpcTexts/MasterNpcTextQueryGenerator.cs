@@ -42,5 +42,5 @@ public class MasterNpcTextQueryGenerator : BaseInsertQueryProvider<INpcTextFull>
             .Delete();
     }
     
-    public override string TableName => "npc_text";
+    public override DatabaseTable TableName => DatabaseTable.WorldTable("npc_text");
 }

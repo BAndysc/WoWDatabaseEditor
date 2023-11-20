@@ -2,6 +2,7 @@ using JetBrains.Annotations;
 using TheEngine.Interfaces;
 using TheEngine.PhysicsSystem;
 using TheMaths;
+using WDE.Common.Database;
 using WDE.Common.Services;
 using WDE.MapRenderer.Utils;
 using WDE.MapSpawnsEditor.Models;
@@ -94,7 +95,7 @@ public class SpawnGizmo : Dragger<SpawnInstance>
             
             if (o is CreatureSpawnInstance cr && cr.IsSpawned)
             {
-                pendingGameChangesService.AddQuery(GuidType.Creature, o.Entry, o.Guid, Queries.Table("creature")
+                pendingGameChangesService.AddQuery(GuidType.Creature, o.Entry, o.Guid, Queries.Table(DatabaseTable.WorldTable("creature"))
                     .Where(row => row.Column<uint>("guid") == o.Guid)
                     .Set("orientation", cr.Creature!.Orientation)
                     .Update());
@@ -102,7 +103,7 @@ public class SpawnGizmo : Dragger<SpawnInstance>
             else if (o is GameObjectSpawnInstance g && g.IsSpawned)
             {
                 var rot = g.GameObject!.Rotation;
-                pendingGameChangesService.AddQuery(GuidType.GameObject, o.Entry, o.Guid, Queries.Table("gameobject")
+                pendingGameChangesService.AddQuery(GuidType.GameObject, o.Entry, o.Guid, Queries.Table(DatabaseTable.WorldTable("gameobject"))
                     .Where(row => row.Column<uint>("guid") == o.Guid)
                     .Set("rotation0", rot.X)
                     .Set("rotation1", rot.Y)
@@ -124,7 +125,7 @@ public class SpawnGizmo : Dragger<SpawnInstance>
                 continue;
             
             var guidType = o is CreatureSpawnInstance ? GuidType.Creature : GuidType.GameObject;
-            pendingGameChangesService.AddQuery(guidType, o.Entry, o.Guid, Queries.Table(guidType == GuidType.Creature ? "creature" : "gameobject")
+            pendingGameChangesService.AddQuery(guidType, o.Entry, o.Guid, Queries.Table(guidType == GuidType.Creature ? DatabaseTable.WorldTable("creature") : DatabaseTable.WorldTable("gameobject"))
                 .Where(row => row.Column<uint>("guid") == o.Guid)
                 .Set("position_x", o.WorldObject!.Position.X)
                 .Set("position_y", o.WorldObject.Position.Y)

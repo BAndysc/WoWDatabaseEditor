@@ -226,7 +226,7 @@ public class SpawnViewer : IGameModule, ISavable
     private async Task OpenEditor(SpawnInstance spawn)
     {
         var guidType = spawn is CreatureSpawnInstance ? GuidType.Creature : GuidType.GameObject;
-        var tableName = guidType is GuidType.Creature ? "creature" : "gameobject";
+        var tableName = guidType is GuidType.Creature ? DatabaseTable.WorldTable("creature") : DatabaseTable.WorldTable("gameobject");
         List<(GuidType, uint entry, uint guid)>? toReload = null;
         if (pendingGameChangesService.HasGuidPendingChange(guidType, spawn.Entry, spawn.Guid))
         {

@@ -1,3 +1,4 @@
+using WDE.Common.Database;
 using WDE.Module.Attributes;
 using WDE.QueryGenerators.Base;
 using WDE.QueryGenerators.Models;
@@ -11,7 +12,7 @@ internal class GameObjectDeleteQueryProvider : IDeleteQueryProvider<GameObjectSp
 {
     public IQuery Delete(GameObjectSpawnModelEssentials t)
     {
-        return Queries.Table("gameobject")
+        return Queries.Table(DatabaseTable.WorldTable("gameobject"))
             .Where(row => row.Column<uint>("guid") == t.Guid)
             .Delete();
     }

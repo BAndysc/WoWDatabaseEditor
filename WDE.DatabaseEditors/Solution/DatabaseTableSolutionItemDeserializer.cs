@@ -30,7 +30,7 @@ namespace WDE.DatabaseEditors.Solution
                 if (split.Length != 2 && split.Length != 3)
                     return false;
 
-                var table = split[0];
+                var table = DatabaseTable.Parse(split[0]);
                 var items = split[1].Split(',')
                     .Select(i => i.EndsWith('c') ? (strKey: i.Substring(0, i.Length - 1), conditionModified: true) : (strKey: i, conditionModified: false))
                     .Where(pair => DatabaseKey.TryDeserialize(pair.strKey, out var _))
@@ -40,7 +40,7 @@ namespace WDE.DatabaseEditors.Solution
                     .Where(i => DatabaseKey.TryDeserialize(i, out var _))
                     .Select(DatabaseKey.Deserialize);
 
-                var definition = tableDefinitionProvider.GetDefinition(table);
+                var definition = tableDefinitionProvider.GetDefinitionByTableName(table);
                 if (definition == null)
                     return false;
                 
@@ -78,7 +78,7 @@ namespace WDE.DatabaseEditors.Solution
             return new AbstractSmartScriptProjectItem()
             {
                 Type = 32,
-                StringValue = $"{item.DefinitionId}:{items}:{deletedKeys}",
+                StringValue = $"{item.TableName}:{items}:{deletedKeys}",
                 Comment = entries
             };
         }

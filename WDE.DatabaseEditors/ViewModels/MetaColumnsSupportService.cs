@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
 using Prism.Commands;
+using WDE.Common.Database;
 using WDE.Common.Services;
 using WDE.Common.Utils;
 using WDE.DatabaseEditors.CustomCommands;
@@ -17,7 +18,7 @@ namespace WDE.DatabaseEditors.ViewModels;
 [UniqueProvider]
 public interface IMetaColumnsSupportService
 {
-    (ICommand, string) GenerateCommand(ViewModelBase? viewModel, string metaColumn, DatabaseEntity entity, DatabaseKey realKey);
+    (ICommand, string) GenerateCommand(ViewModelBase? viewModel, DataDatabaseType database, string metaColumn, DatabaseEntity entity, DatabaseKey realKey);
 }
 
 [AutoRegister]
@@ -40,14 +41,14 @@ public class MetaColumnsSupportService : IMetaColumnsSupportService
         this.commandService = commandService;
     }
     
-    public (ICommand, string) GenerateCommand(ViewModelBase? viewModel, string metaColumn, DatabaseEntity entity, DatabaseKey realKey)
+    public (ICommand, string) GenerateCommand(ViewModelBase? viewModel, DataDatabaseType database, string metaColumn, DatabaseEntity entity, DatabaseKey realKey)
     {
         if (metaColumn.StartsWith("table:"))
         {
             var parts = metaColumn.Substring(6).Split(';');
             if (parts.Length < 2)
                 throw new NotSupportedException("Invalid table meta column: " + metaColumn + ". Expected `table:<tableName>;<condition>(;<keys>)?`");
-            var table = parts[0];
+            var table = DatabaseTable.Parse(parts[0], database);
             var condition = parts[1];
             var keyParts = parts.Length == 3 ? parts[2].Split(',') : new string[]{};
             return (new DelegateCommand(
@@ -59,7 +60,7 @@ public class MetaColumnsSupportService : IMetaColumnsSupportService
         }
         if (metaColumn.StartsWith("tableByKey:"))
         {
-            var table = metaColumn.Substring(11, metaColumn.IndexOf(";") - 11);
+            var table = DatabaseTable.Parse(metaColumn.Substring(11, metaColumn.IndexOf(";") - 11), database);
             var key = metaColumn.Substring(metaColumn.IndexOf(";") + 1);
             return (new DelegateCommand(() =>
             {
@@ -68,7 +69,7 @@ public class MetaColumnsSupportService : IMetaColumnsSupportService
         }
         if (metaColumn.StartsWith("one2one:"))
         {
-            var table = metaColumn.Substring(8);
+            var table = DatabaseTable.Parse(metaColumn.Substring(8), database);
             return (new DelegateCommand(
                 () =>
                 {
@@ -77,11 +78,11 @@ public class MetaColumnsSupportService : IMetaColumnsSupportService
         }
         if (metaColumn.StartsWith("one2one_dynamic_key:"))
         {
-            var table = metaColumn.Substring(20);
+            var table = DatabaseTable.Parse(metaColumn.Substring(20), database);
             return (new DelegateCommand(
                 () =>
                 {
-                    var definition = definitionProvider.GetDefinition(table);
+                    var definition = definitionProvider.GetDefinitionByTableName(table);
                     if (definition == null)
                         throw new UnsupportedTableException(table);
                     var generatedKey = entity.ForceGenerateKey(definition);

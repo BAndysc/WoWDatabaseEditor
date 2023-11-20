@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using WDE.Common.Database;
 using WDE.Common.Services;
 using WDE.DatabaseEditors.Loaders;
 using WDE.DatabaseEditors.Models;
@@ -10,7 +11,7 @@ namespace WDE.DatabaseEditors.Services;
 
 public interface ITableEntityDuplicatorService
 {
-    public Task<IQuery?> GenerateDuplicationQuery(string table, DatabaseKey originalKey, DatabaseKey newKey);
+    public Task<IQuery?> GenerateDuplicationQuery(DatabaseTable table, DatabaseKey originalKey, DatabaseKey newKey);
 }
 
 [AutoRegister]
@@ -27,7 +28,7 @@ public class TableEntityDuplicatorService : ITableEntityDuplicatorService
         this.queryGenerator = queryGenerator;
     }
 
-    public async Task<IQuery?> GenerateDuplicationQuery(string table, DatabaseKey originalKey, DatabaseKey newKey)
+    public async Task<IQuery?> GenerateDuplicationQuery(DatabaseTable table, DatabaseKey originalKey, DatabaseKey newKey)
     {
         var data = await dataProvider.Load(table, null, 0, 1, new[]{originalKey});
         if (data == null || data.Entities.Count == 0)

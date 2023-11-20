@@ -9,7 +9,7 @@ namespace WDE.QueryGenerators.Generators.SpawnGroups;
 [RequiresCore("Azeroth")]
 public class SpawnGroupTemplateQueryProvider : NotSupportedQueryProvider<ISpawnGroupTemplate>
 {
-    public override string TableName => "spawn_group_template";
+    public override DatabaseTable TableName => DatabaseTable.WorldTable("spawn_group_template");
 }
 
 [AutoRegister]
@@ -17,5 +17,5 @@ public class SpawnGroupTemplateQueryProvider : NotSupportedQueryProvider<ISpawnG
 [RequiresCore("Azeroth")]
 public class SpawnGroupQueryProvider : NotSupportedQueryProvider<ISpawnGroupSpawn>
 {
-    public override string TableName => "spawn_group";
+    public override DatabaseTable TableName => DatabaseTable.WorldTable("spawn_group");
 }

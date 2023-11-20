@@ -1,3 +1,4 @@
+using WDE.Common.Database;
 using WDE.Module.Attributes;
 using WDE.SqlQueryGenerator;
 
@@ -8,6 +9,6 @@ public interface IInsertQueryProvider<T>
 {
     IQuery Insert(T t);
     IQuery BulkInsert(IReadOnlyCollection<T> collection);
-    string TableName { get; }
+    DatabaseTable TableName { get; }
     int Priority => 0;
 }

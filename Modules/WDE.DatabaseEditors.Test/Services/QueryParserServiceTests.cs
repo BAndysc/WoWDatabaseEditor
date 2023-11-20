@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using NSubstitute;
 using NSubstitute.Core;
 using NUnit.Framework;
+using WDE.Common.Database;
 using WDE.Common.Services;
 using WDE.Common.Services.QueryParser;
 using WDE.Common.Sessions;
@@ -29,7 +30,8 @@ public class QueryParserServiceTests
 
         var definition = new DatabaseTableDefinitionJson()
         {
-            Id = "table",
+            DataDatabaseType = DataDatabaseType.Hotfix,
+            TableName = "table",
             RecordMode = RecordMode.SingleRow,
             PrimaryKey = new List<string>() { "spawnId", "spawnType" },
             Groups = new List<DatabaseColumnsGroupJson>()
@@ -71,15 +73,11 @@ public class QueryParserServiceTests
                 })));
 
         tableDefinitionProvider
-            .GetDefinition("table")
-            .Returns(definition);
-
-        tableDefinitionProvider
-            .GetDefinitionByTableName("table")
+            .GetDefinitionByTableName(DatabaseTable.HotfixTable("table"))
             .Returns(definition);
 
 
-        var evaluator = new QueryEvaluator();
+        var evaluator = new BaseQueryEvaluator("world", null, DataDatabaseType.Hotfix);
         parserService = new QueryParserService(
             evaluator,
             () => new QueryParserService.Context(evaluator, new []{new GenericTableQueryParserProvider(tableDefinitionProvider, dataLoader, sessionService)})
@@ -94,7 +92,7 @@ public class QueryParserServiceTests
         Assert.AreEqual(0, result.errors.Count);
         Assert.AreEqual(1, result.items.Count);
         var item = (DatabaseTableSolutionItem)result.items[0];
-        Assert.AreEqual("table", item.DefinitionId);
+        Assert.AreEqual(DatabaseTable.HotfixTable("table"), item.TableName);
         Assert.AreEqual(1, item.Entries.Count);
         Assert.AreEqual(new DatabaseKey(18675, 0), item.Entries[0].Key);
         Assert.AreEqual(false, item.Entries[0].ExistsInDatabase);
@@ -108,7 +106,7 @@ public class QueryParserServiceTests
         Assert.AreEqual(0, result.errors.Count);
         Assert.AreEqual(1, result.items.Count);
         var item = (DatabaseTableSolutionItem)result.items[0];
-        Assert.AreEqual("table", item.DefinitionId);
+        Assert.AreEqual(DatabaseTable.HotfixTable("table"), item.TableName);
         Assert.AreEqual(1, item.Entries.Count);
         Assert.AreEqual(new DatabaseKey(18675, 0), item.Entries[0].Key);
         Assert.AreEqual(false, item.Entries[0].ExistsInDatabase);
@@ -122,7 +120,7 @@ public class QueryParserServiceTests
         Assert.AreEqual(0, result.errors.Count);
         Assert.AreEqual(1, result.items.Count);
         var item = (DatabaseTableSolutionItem)result.items[0];
-        Assert.AreEqual("table", item.DefinitionId);
+        Assert.AreEqual(DatabaseTable.HotfixTable("table"), item.TableName);
         Assert.AreEqual(2, item.Entries.Count);
         Assert.AreEqual(new DatabaseKey(18675, 0), item.Entries[0].Key);
         Assert.AreEqual(new DatabaseKey(18675, 1), item.Entries[1].Key);
@@ -138,7 +136,7 @@ public class QueryParserServiceTests
         Assert.AreEqual(0, result.errors.Count);
         Assert.AreEqual(1, result.items.Count);
         var item = (DatabaseTableSolutionItem)result.items[0];
-        Assert.AreEqual("table", item.DefinitionId);
+        Assert.AreEqual(DatabaseTable.HotfixTable("table"), item.TableName);
         Assert.AreEqual(0, item.Entries.Count);
         Assert.AreEqual(new DatabaseKey(18675, 0), item.DeletedEntries[0]);
     }
@@ -151,7 +149,7 @@ public class QueryParserServiceTests
         Assert.AreEqual(0, result.errors.Count);
         Assert.AreEqual(1, result.items.Count);
         var item = (DatabaseTableSolutionItem)result.items[0];
-        Assert.AreEqual("table", item.DefinitionId);
+        Assert.AreEqual(DatabaseTable.HotfixTable("table"), item.TableName);
         Assert.AreEqual(0, item.DeletedEntries.Count);
         Assert.AreEqual(1, item.Entries.Count);
         Assert.AreEqual(new DatabaseKey(18675, 0), item.Entries[0].Key);

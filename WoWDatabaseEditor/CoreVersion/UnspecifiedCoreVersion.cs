@@ -27,7 +27,7 @@ namespace WoWDatabaseEditorCore.CoreVersion
         public PhasingType PhasingType => PhasingType.PhaseIds;
         public GameVersion Version { get; } = default;
 
-        public string TableName => "(null)";
+        public DatabaseTable TableName => DatabaseTable.WorldTable("(null)");
         public string ConditionsFile => "SmartData/conditions.json";
         public string ConditionGroupsFile => "SmartData/conditions_groups.json";
         public string ConditionSourcesFile => "SmartData/condition_sources.json";

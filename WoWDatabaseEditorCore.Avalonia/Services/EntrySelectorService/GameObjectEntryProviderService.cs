@@ -61,7 +61,7 @@ public class GameObjectEntryProviderService : IGameobjectEntryOrGuidProviderServ
         {
             columns.Add(new TabularDataAsyncColumn<uint>(nameof(IGameObjectTemplate.Entry), "Count", async (entry, token) =>
             {
-                var count = await databaseRowsCountProvider.GetRowsCountByPrimaryKey(customCounterTable, entry, token);
+                var count = await databaseRowsCountProvider.GetRowsCountByPrimaryKey(DatabaseTable.WorldTable(customCounterTable), entry, token);
                 return count.ToString();
             }, 50));
         }

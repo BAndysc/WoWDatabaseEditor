@@ -45,7 +45,6 @@ public class DefinitionExporterService : IDefinitionExporterService
         
         return new DatabaseTableDefinitionJson()
         {
-            Id = vm.Id,
             Compatibility = vm.Compatibility.Where(c => c.IsChecked).Select(core => core.Tag).ToList(),
             Name = vm.Name,
             SingleSolutionName = vm.SingleSolutionName,

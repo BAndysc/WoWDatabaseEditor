@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using WDE.Common.Database;
 using WDE.Common.Parameters;
 using WDE.Common.Services;
 
@@ -16,7 +17,7 @@ public class WaypointsParameter : IParameter<long>, ICustomPickerParameter<long>
     
     public async Task<(long, bool)> PickValue(long value)
     {
-        await pickerService.ShowTable("waypoints", null, new DatabaseKey(value));
+        await pickerService.ShowTable(DatabaseTable.WorldTable("waypoints"), null, new DatabaseKey(value));
         return (0, false);
     }
 

@@ -1,6 +1,8 @@
+using WDE.Common.Database;
+
 namespace WDE.Common.Services.QueryParser.Models;
 
 public interface IBaseQuery
 {
-    string TableName { get; }
+    DatabaseTable TableName { get; }
 }

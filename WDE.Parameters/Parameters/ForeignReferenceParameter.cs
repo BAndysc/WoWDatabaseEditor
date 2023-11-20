@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using WDE.Common.Database;
 using WDE.Common.Parameters;
 using WDE.Common.Services;
 
@@ -8,12 +9,12 @@ namespace WDE.Parameters.Parameters;
 public class ForeignReferenceParameter : ICustomPickerParameter<long>
 {
     private readonly ITableEditorPickerService tableEditorPickerService;
-    private readonly string tableName;
+    private readonly DatabaseTable tableName;
     private readonly string columnName;
 
     public ForeignReferenceParameter(
         ITableEditorPickerService tableEditorPickerService,
-        string tableName,
+        DatabaseTable tableName,
         string columnName)
     {
         this.tableEditorPickerService = tableEditorPickerService;

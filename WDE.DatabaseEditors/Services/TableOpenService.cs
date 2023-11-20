@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using WDE.Common;
+using WDE.Common.Database;
 using WDE.Common.Parameters;
 using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
@@ -108,7 +109,7 @@ public class TableOpenService : ITableOpenService
         }
     }
 
-    public async Task<ISolutionItem?> TryCreate(string tableName)
+    public async Task<ISolutionItem?> TryCreate(DatabaseTable tableName)
     {
         var definition = definitionProvider.GetDefinitionByTableName(tableName);
         if (definition == null)
@@ -116,7 +117,7 @@ public class TableOpenService : ITableOpenService
         return await TryCreate(definition);
     }
 
-    public async Task<IReadOnlyCollection<ISolutionItem>> TryCreateMultiple(string tableName)
+    public async Task<IReadOnlyCollection<ISolutionItem>> TryCreateMultiple(DatabaseTable tableName)
     {
         var definition = definitionProvider.GetDefinitionByTableName(tableName);
         if (definition == null)

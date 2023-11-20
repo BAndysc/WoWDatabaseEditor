@@ -100,7 +100,7 @@ public class SpawnGroupWizard : ISpawnGroupWizard
     public Task EditSpawnGroup(uint templateId)
     {
         if (templateQueryGenerator.TableName != null)
-            return tableEditorPickerService.ShowForeignKey1To1(templateQueryGenerator.TableName, new(templateId));
+            return tableEditorPickerService.ShowForeignKey1To1(templateQueryGenerator.TableName.Value, new(templateId));
         return Task.CompletedTask;
     }
 

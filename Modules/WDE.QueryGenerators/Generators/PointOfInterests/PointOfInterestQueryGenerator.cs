@@ -32,5 +32,5 @@ public class PointOfInterestQueryGenerator : BaseInsertQueryProvider<IPointOfInt
             .Delete();
     }
     
-    public override string TableName => "points_of_interest";
+    public override DatabaseTable TableName => DatabaseTable.WorldTable("points_of_interest");
 }

@@ -6,6 +6,7 @@ using AsyncAwaitBestPractices.MVVM;
 using Prism.Commands;
 using Prism.Events;
 using WDE.Common;
+using WDE.Common.Database;
 using WDE.Common.Disposables;
 using WDE.Common.Events;
 using WDE.Common.Managers;
@@ -56,7 +57,7 @@ public class RowPickerViewModel : ObservableBase, IDialog, IWindowViewModel, ICl
         ExecuteChangedCommand = noSaveMode ? AlwaysDisabledAsyncCommand.Command : new AsyncAutoCommand(async () =>
         {
             await baseViewModel.Save.ExecuteAsync();
-            eventAggregator.GetEvent<DatabaseTableChanged>().Publish(baseViewModel.TableDefinition.TableName);
+            eventAggregator.GetEvent<DatabaseTableChanged>().Publish(baseViewModel.TableDefinition.Id);
             if (sessionService.IsOpened)
                 await taskRunner.ScheduleTask("Update session", async () => await sessionService.UpdateQuery(baseViewModel));
             if (solutionTasksService.CanReloadRemotely)
@@ -70,7 +71,7 @@ public class RowPickerViewModel : ObservableBase, IDialog, IWindowViewModel, ICl
         GenerateCurrentSqlCommand = new AsyncAutoCommand(async () =>
         {
             var sql = await baseViewModel.GenerateQuery();
-            var item = new MetaSolutionSQL(new JustQuerySolutionItem(sql.QueryString));
+            var item = new MetaSolutionSQL(new JustQuerySolutionItem(sql));
             using var editor = solutionItemEditorRegistry.GetEditor(item);
             await windowManager.ShowDialog((IDialog)editor);
         });
@@ -159,20 +160,17 @@ public class RowPickerViewModel : ObservableBase, IDialog, IWindowViewModel, ICl
 public class JustQuerySolutionItem : ISolutionItem
 {
     public string Query { get; }
+    public DataDatabaseType Database { get; }
     public bool IsContainer => false;
     public ObservableCollection<ISolutionItem>? Items => null;
     public string? ExtraId => null;
     public bool IsExportable => true;
     public ISolutionItem Clone() => throw new NotImplementedException();
 
-    public JustQuerySolutionItem(string query)
-    {
-        Query = query;
-    }
-    
     public JustQuerySolutionItem(IQuery query)
     {
         Query = query.QueryString;
+        Database = query.Database;
     }
 }
 
@@ -182,6 +180,6 @@ public class JustQuerySolutionItemGenerator : ISolutionItemSqlProvider<JustQuery
 {
     public Task<IQuery> GenerateSql(JustQuerySolutionItem item)
     {
-        return Task.FromResult(Queries.Raw(item.Query));
+        return Task.FromResult(Queries.Raw(item.Database, item.Query));
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using WDE.Common.CoreVersion;
+using WDE.Common.Database;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Utils;
 using WDE.DatabaseEditors.Data.Interfaces;
@@ -17,10 +18,10 @@ namespace WDE.DatabaseEditors.Data
     {
         private readonly IMessageBoxService messageBoxService;
         private readonly List<DatabaseTableDefinitionJson> incompatibleDefinitionList = new();
-        private readonly Dictionary<string, DatabaseTableDefinitionJson> incompatibleDefinitions = new();
-        private readonly Dictionary<string, DatabaseTableDefinitionJson> definitions = new();
-        private readonly Dictionary<string, DatabaseTableDefinitionJson> definitionsByTableName = new();
-        private readonly Dictionary<string, DatabaseTableDefinitionJson> definitionsByForeignTableName = new();
+        private readonly Dictionary<DatabaseTable, DatabaseTableDefinitionJson> incompatibleDefinitions = new();
+        private readonly Dictionary<DatabaseTable, DatabaseTableDefinitionJson> definitions = new();
+        private readonly Dictionary<DatabaseTable, DatabaseTableDefinitionJson> definitionsByTableName = new();
+        private readonly Dictionary<DatabaseTable, DatabaseTableDefinitionJson> definitionsByForeignTableName = new();
 
         public TableDefinitionProvider(ITableDefinitionDeserializer serializationProvider,
             ITableDefinitionJsonProvider jsonProvider,
@@ -86,17 +87,17 @@ namespace WDE.DatabaseEditors.Data
                         fileToExtraCompatibility.TryGetValue(source.file, out var reference) &&
                         reference.Any(r => r.Compatibility == currentCoreVersion.Current.Tag))
                     {
-                        definitions[definition.Id] = definition;
-                        definitionsByTableName[definition.TableName] = definition;
+                        definitions[new DatabaseTable(definition.DataDatabaseType, definition.TableName)] = definition;
+                        definitionsByTableName[new DatabaseTable(definition.DataDatabaseType, definition.TableName)] = definition;
                         if (definition.ForeignTable != null)
                         {
                             foreach (var foreign in definition.ForeignTable)
-                                definitionsByForeignTableName[foreign.TableName] = definition;
+                                definitionsByForeignTableName[new DatabaseTable(definition.DataDatabaseType, foreign.TableName)] = definition;
                         }
                     }
                     else
                     {
-                        incompatibleDefinitions[definition.Id] = definition;
+                        incompatibleDefinitions[new DatabaseTable(definition.DataDatabaseType, definition.TableName)] = definition;
                         incompatibleDefinitionList.Add(definition);
                     }
                 }
@@ -118,39 +119,32 @@ namespace WDE.DatabaseEditors.Data
                 .ListenErrors();
         }
 
-        public IEnumerable<string>? CoreCompatibility(string definitionId)
+        public IEnumerable<string>? CoreCompatibility(DatabaseTable definitionId)
         {
             if (incompatibleDefinitions.TryGetValue(definitionId, out var definition))
                 return definition.Compatibility;
             return null;
         }
 
-        public DatabaseTableDefinitionJson? GetDefinitionByTableName(string? tableName)
+        public DatabaseTableDefinitionJson? GetDefinitionByTableName(DatabaseTable? tableName)
         {
             if (tableName == null)
                 return null;
             
-            if (definitionsByTableName.TryGetValue(tableName, out var definition))
+            if (definitionsByTableName.TryGetValue(tableName.Value, out var definition))
                 return definition;
             
             return null;
         }
         
-        public DatabaseTableDefinitionJson? GetDefinitionByForeignTableName(string? tableName)
+        public DatabaseTableDefinitionJson? GetDefinitionByForeignTableName(DatabaseTable? tableName)
         {
             if (tableName == null)
                 return null;
             
-            if (definitionsByForeignTableName.TryGetValue(tableName, out var definition))
+            if (definitionsByForeignTableName.TryGetValue(tableName.Value, out var definition))
                 return definition;
             
-            return null;
-        }
-
-        public DatabaseTableDefinitionJson? GetDefinition(string? definitionId)
-        {
-            if (definitionId != null && definitions.TryGetValue(definitionId, out var definition))
-                return definition;
             return null;
         }
 

@@ -12,7 +12,7 @@ namespace WDE.QueryGenerators.Generators.Quests;
 public class MangosQuestQueryProvider : IUpdateQueryProvider<QuestChainDiff>
 {
     private readonly ICachedDatabaseProvider databaseProvider;
-    public string TableName => "quest_template";
+    public DatabaseTable TableName => DatabaseTable.WorldTable("quest_template");
 
     public MangosQuestQueryProvider(ICachedDatabaseProvider databaseProvider)
     {
@@ -25,9 +25,9 @@ public class MangosQuestQueryProvider : IUpdateQueryProvider<QuestChainDiff>
             (!diff.BreadcrumbQuestId.HasValue) &&
             !diff.NextQuestId.HasValue &&
             !diff.PrevQuestId.HasValue)
-            return Queries.Empty();
+            return Queries.Empty(DataDatabaseType.World);
 
-        var trans = Queries.BeginTransaction();
+        var trans = Queries.BeginTransaction(DataDatabaseType.World);
 
         trans.Table(TableName)
             .InsertIgnore(new { entry = diff.Id });

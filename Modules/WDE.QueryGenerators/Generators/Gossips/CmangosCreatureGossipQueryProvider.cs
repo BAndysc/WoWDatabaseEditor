@@ -1,3 +1,4 @@
+using WDE.Common.Database;
 using WDE.Module.Attributes;
 using WDE.QueryGenerators.Base;
 using WDE.QueryGenerators.Models;
@@ -21,5 +22,5 @@ public class CmangosCreatureGossipQueryProvider : IUpdateQueryProvider<CreatureG
         return update.Update(diff.__comment);
     }
 
-    public string TableName => "creature_template";
+    public DatabaseTable TableName => DatabaseTable.WorldTable("creature_template");
 }

@@ -108,7 +108,7 @@ namespace WDE.DatabaseEditors.ViewModels
                 RaisePropertyChanged(nameof(IsModified));
             };
             
-            tableDefinition = tableDefinitionProvider.GetDefinition(solutionItem.DefinitionId)!;
+            tableDefinition = tableDefinitionProvider.GetDefinitionByTableName(solutionItem.TableName)!;
             LoadAndCreateCommands();
             nameGeneratorParameter = parameterFactory.Factory(tableDefinition.Picker);
         }
@@ -220,7 +220,7 @@ namespace WDE.DatabaseEditors.ViewModels
 
         protected virtual async Task<DatabaseTableData?> LoadData()
         {
-            return await databaseTableDataProvider.Load(solutionItem.DefinitionId, null, null, null, solutionItem.Entries.Select(e => e.Key).ToArray()) as DatabaseTableData; ;
+            return await databaseTableDataProvider.Load(solutionItem.TableName, null, null, null, solutionItem.Entries.Select(e => e.Key).ToArray()) as DatabaseTableData; ;
         }
         
         protected async Task<bool> InternalLoadData()

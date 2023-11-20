@@ -1,3 +1,4 @@
+using WDE.Common.Database;
 using WDE.Module.Attributes;
 using WDE.QueryGenerators.Base;
 using WDE.QueryGenerators.Models;
@@ -25,7 +26,7 @@ internal class PhaseMaskCreatureQueryProvider : BaseInsertQueryProvider<Creature
         };
     }
 
-    public override string TableName => "creature";
+    public override DatabaseTable TableName => DatabaseTable.WorldTable("creature");
 }
 
 
@@ -49,5 +50,5 @@ internal class AzerothCreatureQueryProvider : BaseInsertQueryProvider<CreatureSp
         };
     }
 
-    public override string TableName => "creature";
+    public override DatabaseTable TableName => DatabaseTable.WorldTable("creature");
 }

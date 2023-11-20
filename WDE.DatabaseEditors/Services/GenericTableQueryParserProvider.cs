@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using WDE.Common.Database;
 using WDE.Common.Services;
 using WDE.Common.Services.QueryParser;
 using WDE.Common.Services.QueryParser.Models;
@@ -23,8 +24,8 @@ public class GenericTableQueryParserProvider : IQueryParserProvider
     private readonly IDatabaseTableDataProvider loader;
     private readonly ISessionService sessionService;
 
-    private Dictionary<string, DatabaseTableSolutionItem> byTable = new();
-    private Dictionary<string, List<DatabaseKey>> byTableToDelete = new();
+    private Dictionary<DatabaseTable, DatabaseTableSolutionItem> byTable = new();
+    private Dictionary<DatabaseTable, List<DatabaseKey>> byTableToDelete = new();
     
     public GenericTableQueryParserProvider(ITableDefinitionProvider tableDefinitionProvider,
         IDatabaseTableDataProvider loader,
@@ -186,7 +187,7 @@ public class GenericTableQueryParserProvider : IQueryParserProvider
         if (defi == null)
         {
             defi = tableDefinitionProvider.GetDefinitionByForeignTableName(query.TableName);
-            if (defi?.ForeignTableByName?.TryGetValue(query.TableName, out var foreignTable_) ?? false)
+            if (defi?.ForeignTableByName?.TryGetValue(query.TableName.Table, out var foreignTable_) ?? false)
                 foreignTable = foreignTable_;
         }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Prism.Ioc;
+using WDE.Common.Database;
 using WDE.Common.Managers;
 using WDE.Common.Services;
 using WDE.Common.Utils;
@@ -25,7 +26,7 @@ public class StandaloneTableEditService : IStandaloneTableEditService
     private readonly IContainerProvider containerProvider;
     private readonly ITableDefinitionProvider definitionProvider;
     private readonly IStandaloneTableEditorSettings windowsSettings;
-    private Dictionary<(string, DatabaseKey?, string?), IAbstractWindowView> openedWindows = new();
+    private Dictionary<(DatabaseTable, DatabaseKey?, string?), IAbstractWindowView> openedWindows = new();
 
     internal StandaloneTableEditService(IWindowManager windowManager,
         ITableOpenService tableOpenService,
@@ -39,7 +40,7 @@ public class StandaloneTableEditService : IStandaloneTableEditService
         this.windowsSettings = windowsSettings;
     }
     
-    public void OpenEditor(string table, DatabaseKey? key, string? customWhere = null)
+    public void OpenEditor(DatabaseTable table, DatabaseKey? key, string? customWhere = null)
     {
         if (openedWindows.TryGetValue((table, key, customWhere), out var window))
         {
@@ -47,7 +48,7 @@ public class StandaloneTableEditService : IStandaloneTableEditService
             return;
         }
         
-        var definition = definitionProvider.GetDefinition(table);
+        var definition = definitionProvider.GetDefinitionByTableName(table);
         if (definition == null)
             throw new UnsupportedTableException(table);
 
@@ -57,7 +58,7 @@ public class StandaloneTableEditService : IStandaloneTableEditService
             && definition.GroupByKeys.Count != key.Value.Count)
         {
             var expectedKeys = "(" + string.Join(", ", definition.GroupByKeys) + ")";
-            throw new UnsupportedTableException($"Trying to edit table {table} with a key {key} but the expected key was: {expectedKeys}");
+            throw new UnsupportedTableException(table, $"Trying to edit table {table} with a key {key} but the expected key was: {expectedKeys}");
         }
 
         var solutionItem = !key.HasValue || definition.RecordMode == RecordMode.SingleRow
@@ -103,7 +104,7 @@ public class StandaloneTableEditService : IStandaloneTableEditService
         
     }
 
-    private async Task WindowLifetimeTask(string table, DatabaseKey? key, string? customWhere, IAbstractWindowView window, Task lifetime)
+    private async Task WindowLifetimeTask(DatabaseTable table, DatabaseKey? key, string? customWhere, IAbstractWindowView window, Task lifetime)
     {
         await lifetime;
         openedWindows.Remove((table, key, customWhere));

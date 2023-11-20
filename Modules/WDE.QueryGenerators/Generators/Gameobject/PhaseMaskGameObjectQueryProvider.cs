@@ -1,3 +1,4 @@
+using WDE.Common.Database;
 using WDE.Module.Attributes;
 using WDE.QueryGenerators.Base;
 using WDE.QueryGenerators.Models;
@@ -29,7 +30,7 @@ internal class PhaseMaskGameObjectQueryProvider : BaseInsertQueryProvider<GameOb
         };
     }
 
-    public override string TableName => "gameobject";
+    public override DatabaseTable TableName => DatabaseTable.WorldTable("gameobject");
 }
 
 [AutoRegister]
@@ -55,5 +56,5 @@ internal class CmangosWrathGameObjectQueryProvider : BaseInsertQueryProvider<Gam
         };
     }
 
-    public override string TableName => "gameobject";
+    public override DatabaseTable TableName => DatabaseTable.WorldTable("gameobject");
 }

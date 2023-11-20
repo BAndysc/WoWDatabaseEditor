@@ -330,7 +330,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                 }
             }, () => FocusedCell != null);
             
-            var definition = tableDefinitionProvider.GetDefinition(solutionItem.DefinitionId);
+            var definition = tableDefinitionProvider.GetDefinition(solutionItem.TableName);
             FilterViewModel = new MySqlFilterViewModel(definition, () =>
             {
                 OffsetQuery = 0;
@@ -515,7 +515,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
 
         protected override async Task<DatabaseTableData?> LoadData()
         {
-            return await databaseTableDataProvider.Load(solutionItem.DefinitionId, FilterViewModel.BuildWhere(), (long)offsetQuery, (int)limitQuery, showOnlyModified ? keys.ToArray() : null) as DatabaseTableData;
+            return await databaseTableDataProvider.Load(solutionItem.TableName, FilterViewModel.BuildWhere(), (long)offsetQuery, (int)limitQuery, showOnlyModified ? keys.ToArray() : null) as DatabaseTableData;
         }
 
         private DatabaseKey? beforeLoadSelectedRow;
@@ -721,7 +721,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                 }
                 else if (column.IsMetaColumn)
                 {
-                    var (command, title) = metaColumnsSupportService.GenerateCommand(this, column.Meta!, entity, entity.GenerateKey(TableDefinition));
+                    var (command, title) = metaColumnsSupportService.GenerateCommand(this, tableDefinition.DataDatabaseType, column.Meta!, entity, entity.GenerateKey(TableDefinition));
                     cellViewModel = AutoDisposeEntity(new SingleRecordDatabaseCellViewModel(columnIndex, column.Name, command, row, entity, title));
                 }
                 else
@@ -898,7 +898,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             {
                 data = await databaseTableDataProvider.Load(tableDefinition.Id, null, null, keys.Count, oldKeys);
                 if (data == null)
-                    return Queries.Raw("ERROR");
+                    return Queries.Raw(DataDatabaseType.World, "ERROR");
                 solutionItem.UpdateEntitiesWithOriginalValues(data.Entities);
             }
 
@@ -909,7 +909,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
             if (!saveQuery)
                 return query;
 
-            IMultiQuery multi = Queries.BeginTransaction();
+            IMultiQuery multi = Queries.BeginTransaction(tableDefinition.DataDatabaseType);
             multi.Add(query);
             foreach (var pair in forceUpdateCells)
             {
@@ -1006,7 +1006,7 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                 condition = $"({condition}) OR ({sb.ToString()})";
             }
 
-            var where = Queries.Table(tableDefinition.TableName)
+            var where = Queries.Table(tableDefinition.Id)
                 .Where(r => r.Raw<bool>(condition));
 
             if (customWhere != null)

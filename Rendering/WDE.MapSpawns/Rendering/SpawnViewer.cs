@@ -152,7 +152,7 @@ public class SpawnViewer : IGameModule
 
     private async Task OpenEditor(SpawnInstance spawn)
     {
-        await tableEditorPickerService.ShowForeignKey1To1(spawn is CreatureSpawnInstance ? "creature" : "gameobject", new(spawn.Guid));
+        await tableEditorPickerService.ShowForeignKey1To1(spawn is CreatureSpawnInstance ? DatabaseTable.WorldTable("creature") : DatabaseTable.WorldTable("gameobject"), new(spawn.Guid));
         // here we can reload the spawn to load new values
     }
 

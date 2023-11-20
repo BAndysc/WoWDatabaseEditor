@@ -1183,7 +1183,7 @@ namespace WDE.PacketViewer.ViewModels
         public IHistoryManager? History { get; }
         public UpdateHistoryViewModel UpdateHistoryViewModel { get; }
         public ISolutionItem SolutionItem { get; }
-        public Task<IQuery> GenerateQuery() => Task.FromResult(Queries.Empty());
+        public Task<IQuery> GenerateQuery() => Task.FromResult(Queries.Empty(DataDatabaseType.World));
 
         public bool ShowExportToolbarButtons => false;
     }

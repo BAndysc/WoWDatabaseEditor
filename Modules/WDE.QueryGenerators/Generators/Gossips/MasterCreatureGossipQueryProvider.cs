@@ -1,3 +1,4 @@
+using WDE.Common.Database;
 using WDE.Module.Attributes;
 using WDE.QueryGenerators.Base;
 using WDE.QueryGenerators.Models;
@@ -12,7 +13,7 @@ public class MasterCreatureGossipQueryProvider : IUpdateQueryProvider<CreatureGo
 {
     public IQuery Update(CreatureGossipUpdate diff)
     {
-        var trans = Queries.BeginTransaction();
+        var trans = Queries.BeginTransaction(DataDatabaseType.World);
         trans.Table(TableName)
             .Where(row => row.Column<uint>("CreatureID") == diff.Entry &&
                           row.Column<uint>("MenuID") == diff.GossipMenuId)
@@ -28,5 +29,5 @@ public class MasterCreatureGossipQueryProvider : IUpdateQueryProvider<CreatureGo
         return trans.Close();
     }
 
-    public string TableName => "creature_template_gossip";
+    public DatabaseTable TableName => DatabaseTable.WorldTable("creature_template_gossip");
 }

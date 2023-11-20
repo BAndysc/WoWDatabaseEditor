@@ -43,7 +43,7 @@ public class QuestRequestItemsProcessor : PacketProcessor<bool>, IPacketTextDump
 
     public async Task<string> Generate()
     {
-        var q = Queries.BeginTransaction();
+        var q = Queries.BeginTransaction(DataDatabaseType.World);
         foreach (var id in completionTexts.Keys)
         {
             int? emoteCompleted = null;
@@ -60,8 +60,8 @@ public class QuestRequestItemsProcessor : PacketProcessor<bool>, IPacketTextDump
 
             if (existing == null)
             {
-                q.Table("quest_request_items").Where(row => row.Column<uint>("ID") == id).Delete();
-                q.Table("quest_request_items")
+                q.Table(DatabaseTable.WorldTable("quest_request_items")).Where(row => row.Column<uint>("ID") == id).Delete();
+                q.Table(DatabaseTable.WorldTable("quest_request_items"))
                     .Insert(new
                     {
                         ID = id,
@@ -73,7 +73,7 @@ public class QuestRequestItemsProcessor : PacketProcessor<bool>, IPacketTextDump
             }
             else
             {
-                var update = q.Table("quest_request_items")
+                var update = q.Table(DatabaseTable.WorldTable("quest_request_items"))
                     .Where(row => row.Column<uint>("ID") == id).ToUpdateQuery();
 
                 if (existing.EmoteOnComplete != emoteCompleted && emoteCompleted.HasValue)

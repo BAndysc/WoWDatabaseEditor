@@ -30,7 +30,7 @@ public class GameObjectGUIDPickerOnlyParameter : IParameter<long>, ICustomPicker
 
     public async Task<(long, bool)> PickValue(long value)
     {
-        var result = await editorPickerService.PickByColumn("gameobject", new DatabaseKey(value), "guid", null);
+        var result = await editorPickerService.PickByColumn(DatabaseTable.WorldTable("gameobject"), new DatabaseKey(value), "guid", null);
         return (result ?? 0, result.HasValue);
     }
 }

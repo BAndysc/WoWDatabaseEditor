@@ -154,7 +154,7 @@ namespace WDE.PacketViewer.Processing.Processors
 
         public async Task<string> Generate()
         {
-            var trans = Queries.BeginTransaction();
+            var trans = Queries.BeginTransaction(DataDatabaseType.World);
             if (!asDiff)
                 trans.Comment("Warning!! This SQL will override current texts");
             foreach (var entry in perEntryState)

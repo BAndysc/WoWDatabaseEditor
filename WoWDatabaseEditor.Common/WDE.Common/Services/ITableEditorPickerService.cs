@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using WDE.Common.Database;
 using WDE.Module.Attributes;
 
 namespace WDE.Common.Services;
@@ -11,9 +12,9 @@ namespace WDE.Common.Services;
 [UniqueProvider]
 public interface ITableEditorPickerService
 {
-    Task<long?> PickByColumn(string table, DatabaseKey? key, string column, long? initialValue, string? backupColumn = null, string? customWhere = null);
-    Task ShowTable(string table, string? condition, DatabaseKey? defaultPartialKey = null);
-    Task ShowForeignKey1To1(string table, DatabaseKey key);
+    Task<long?> PickByColumn(DatabaseTable table, DatabaseKey? key, string column, long? initialValue, string? backupColumn = null, string? customWhere = null);
+    Task ShowTable(DatabaseTable table, string? condition, DatabaseKey? defaultPartialKey = null);
+    Task ShowForeignKey1To1(DatabaseTable table, DatabaseKey key);
 }
 
 public readonly struct DatabaseKey : IComparable<DatabaseKey>
@@ -285,7 +286,11 @@ public class DatabaseKeyConverter : JsonConverter
 
 public class UnsupportedTableException : Exception
 {
-    public UnsupportedTableException(string table) : base($"Table {table} is not supported")
+    public UnsupportedTableException(DatabaseTable table) : base($"Table {table} is not supported")
+    {
+    }
+    
+    public UnsupportedTableException(DatabaseTable table, string message) : base($"Error with table {table}: {message}")
     {
     }
 }

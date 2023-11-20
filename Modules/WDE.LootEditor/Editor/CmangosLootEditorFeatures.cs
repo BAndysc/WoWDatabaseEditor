@@ -71,7 +71,12 @@ public class CmangosLootEditorFeatures : ILootEditorFeatures
 
     public int GetMaxLootEntryForType(LootSourceType type, uint difficultyId) => 1;
 
-    public string GetTableNameFor(LootSourceType type)
+    public DatabaseTable GetTableNameFor(LootSourceType type)
+    {
+        return DatabaseTable.WorldTable(GetTableName(type));
+    }
+    
+    private string GetTableName(LootSourceType type)
     {
         switch (type)
         {

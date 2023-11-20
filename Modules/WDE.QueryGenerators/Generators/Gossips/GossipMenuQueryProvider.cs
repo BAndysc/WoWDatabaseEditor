@@ -27,5 +27,5 @@ public class GossipMenuQueryProvider : BaseInsertQueryProvider<IGossipMenuLine>,
             .Delete();
     }
 
-    public override string TableName => "gossip_menu";
+    public override DatabaseTable TableName => DatabaseTable.WorldTable("gossip_menu");
 }

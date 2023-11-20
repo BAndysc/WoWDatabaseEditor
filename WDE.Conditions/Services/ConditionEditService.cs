@@ -59,7 +59,7 @@ namespace WDE.Conditions.Services
             
             var delete = queryGenerator.BuildDeleteQuery(conditionKey.WithMask(conditionKeyMask));
             var insert = queryGenerator.BuildInsertQuery(newConditions.ToList<IConditionLine>());
-            var transaction = Queries.BeginTransaction();
+            var transaction = Queries.BeginTransaction(DataDatabaseType.World);
             transaction.Add(delete);
             transaction.Add(insert);
             await executor.ExecuteSql(transaction.Close());

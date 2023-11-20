@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using WDE.Common.Database;
 using WDE.Common.Parameters;
 using WDE.Common.Services;
 using WDE.Common.Utils;
@@ -44,7 +45,8 @@ namespace WDE.Parameters
             {
                 var indexOf = type.IndexOf("#", StringComparison.Ordinal);
                 var indexOfEnd = type.IndexOf(")", indexOf, StringComparison.Ordinal);
-                var referenceTable = type.Substring("TableReference(".Length, indexOf - "TableReference(".Length);
+                var referenceDatabaseAndTable = type.Substring("TableReference(".Length, indexOf - "TableReference(".Length);
+                var referenceTable = DatabaseTable.Parse(referenceDatabaseAndTable);
                 var referenceColumn = type.Substring(indexOf + 1, indexOfEnd - indexOf - 1);
                 parameter = new ForeignReferenceParameter(tableEditorPickerService.Value, referenceTable, referenceColumn);
                 Register(type, parameter);

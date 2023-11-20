@@ -28,7 +28,7 @@ public abstract class BaseTrinityLootQueryGenerator : ILootQueryGenerator
     
     public IQuery GenerateQuery(IReadOnlyList<LootGroupModel> models)
     {
-        var transaction = Queries.BeginTransaction();
+        var transaction = Queries.BeginTransaction(DataDatabaseType.World);
 
         foreach (var group in models)
         {
@@ -61,7 +61,7 @@ public abstract class BaseTrinityLootQueryGenerator : ILootQueryGenerator
     public IQuery GenerateUpdateLootIds(LootSourceType sourceType, uint solutionEntry, uint difficultyId, IReadOnlyList<LootEntry> rootLootEntries)
     {
         if (sourceType.SolutionEntryIsLootEntry() || !sourceType.CanUpdateSourceLootEntry())
-            return Queries.Empty();
+            return Queries.Empty(DataDatabaseType.World);
 
         if (rootLootEntries.Count > editorFeatures.GetMaxLootEntryForType(sourceType, difficultyId))
             throw new Exception($"Too many root loot entries for {sourceType} (max {editorFeatures.GetMaxLootEntryForType(sourceType, difficultyId)})");
@@ -73,35 +73,35 @@ public abstract class BaseTrinityLootQueryGenerator : ILootQueryGenerator
             case LootSourceType.Creature:
                 if (difficultyId == 0)
                 {
-                    return Queries.Table("creature_template")
+                    return Queries.Table(DatabaseTable.WorldTable("creature_template"))
                         .Where(row => row.Column<uint>("entry") == solutionEntry)
                         .Set("lootid", lootId)
                         .Update();                    
                 }
                 else
                 {
-                    return Queries.Table("creature_template_difficulty")
+                    return Queries.Table(DatabaseTable.WorldTable("creature_template_difficulty"))
                         .Where(row => row.Column<uint>("Entry") == solutionEntry &&
                                       row.Column<uint>("DifficultyID") == difficultyId)
                         .Set("LootID", lootId)
                         .Update();
                 }
             case LootSourceType.GameObject:
-                return Queries.Table("gameobject_template")
+                return Queries.Table(DatabaseTable.WorldTable("gameobject_template"))
                     .Where(row => row.Column<uint>("entry") == solutionEntry)
                     .Set("data1", lootId)
                     .Update();
             case LootSourceType.Skinning:
                 if (difficultyId == 0)
                 {
-                    return Queries.Table("creature_template")
+                    return Queries.Table(DatabaseTable.WorldTable("creature_template"))
                         .Where(row => row.Column<uint>("entry") == solutionEntry)
                         .Set("skinloot", lootId)
                         .Update();
                 }
                 else
                 {
-                    return Queries.Table("creature_template_difficulty")
+                    return Queries.Table(DatabaseTable.WorldTable("creature_template_difficulty"))
                         .Where(row => row.Column<uint>("Entry") == solutionEntry &&
                                       row.Column<uint>("DifficultyID") == difficultyId)
                         .Set("SkinLootID", lootId)
@@ -110,14 +110,14 @@ public abstract class BaseTrinityLootQueryGenerator : ILootQueryGenerator
             case LootSourceType.Pickpocketing:
                 if (difficultyId == 0)
                 {
-                    return Queries.Table("creature_template")
+                    return Queries.Table(DatabaseTable.WorldTable("creature_template"))
                         .Where(row => row.Column<uint>("entry") == solutionEntry)
                         .Set("pickpocketloot", lootId)
                         .Update();
                 }
                 else
                 {
-                    return Queries.Table("creature_template_difficulty")
+                    return Queries.Table(DatabaseTable.WorldTable("creature_template_difficulty"))
                         .Where(row => row.Column<uint>("Entry") == solutionEntry &&
                                       row.Column<uint>("DifficultyID") == difficultyId)
                         .Set("PickPocketLootID", lootId)

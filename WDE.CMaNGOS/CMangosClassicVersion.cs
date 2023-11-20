@@ -40,7 +40,7 @@ public class CMangosClassicVersion : ICoreVersion, IDatabaseFeatures, ISmartScri
     public bool AlternativeTrinityDatabase => true;
     public WaypointTables SupportedWaypoints => WaypointTables.MangosWaypointPath | WaypointTables.MangosCreatureMovement;
     public bool SpawnGroupTemplateHasType => true;
-    public string TableName => "smart_scripts";
+    public DatabaseTable TableName => DatabaseTable.WorldTable("smart_scripts");
 
     public string ConditionsFile => "SmartData/conditions.json";
     public string ConditionGroupsFile => "SmartData/conditions_groups.json";

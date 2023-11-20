@@ -9,6 +9,7 @@ using Avalonia.Layout;
 using WDE.Common;
 using WDE.Common.Avalonia.Controls;
 using WDE.Common.Collections;
+using WDE.Common.Database;
 using WDE.Common.Database.Counters;
 using WDE.Common.DBC;
 using WDE.Common.TableData;
@@ -68,7 +69,7 @@ public class SpellEntryProviderService : ISpellEntryProviderService
         {
             columns.Add(new TabularDataAsyncColumn<uint>(nameof(ISpellEntry.Id), "Count", async (spellId, token) =>
             {
-                var count = await databaseRowsCountProvider.GetRowsCountByPrimaryKey(customCounterTable, spellId, token);
+                var count = await databaseRowsCountProvider.GetRowsCountByPrimaryKey(DatabaseTable.WorldTable(customCounterTable), spellId, token);
                 return count.ToString();
             }, 50));
         }

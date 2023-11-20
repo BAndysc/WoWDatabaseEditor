@@ -55,7 +55,6 @@ public class DefinitionGeneratorService : IDefinitionGeneratorService
         }
 
         DatabaseTableDefinitionJson tableDefinition = new();
-        tableDefinition.Id = tableName.Table;
         tableDefinition.DataDatabaseType = tableName.Database;
         tableDefinition.Compatibility = new List<string>() {currentCoreVersion.Current.Tag};
         tableDefinition.Name = tableName.Table.ToTitleCase();

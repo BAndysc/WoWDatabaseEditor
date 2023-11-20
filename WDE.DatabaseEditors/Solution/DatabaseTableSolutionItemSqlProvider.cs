@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using WDE.Common.Database;
 using WDE.Common.Solution;
 using WDE.DatabaseEditors.Extensions;
 using WDE.DatabaseEditors.Loaders;
@@ -28,7 +29,7 @@ namespace WDE.DatabaseEditors.Solution
             IDatabaseTableData? tableData = await LoadTable(item);
 
             if (tableData == null)
-                return Queries.Raw("-- Unable to load data for {item} from the database");
+                return Queries.Raw(DataDatabaseType.World, "-- Unable to load data for {item} from the database");
 
             item.UpdateEntitiesWithOriginalValues(tableData.Entities);
             return queryGenerator.GenerateQuery(item.Entries.Select(e => e.Key).ToList(), item.DeletedEntries, tableData);
@@ -37,7 +38,7 @@ namespace WDE.DatabaseEditors.Solution
         private Task<IDatabaseTableData?> LoadTable(DatabaseTableSolutionItem item)
         {
             //todo single record scenario?
-            return tableDataProvider.Load(item.DefinitionId, null, null,null ,item.Entries.Select(e => e.Key).ToArray());
+            return tableDataProvider.Load(item.TableName, null, null,null ,item.Entries.Select(e => e.Key).ToArray());
         }
     }
 }

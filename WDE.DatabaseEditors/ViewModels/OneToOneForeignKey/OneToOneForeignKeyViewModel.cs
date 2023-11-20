@@ -96,8 +96,8 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
         DatabaseKey key,
         bool noSaveMode)
     {
-        if (tableDefinition.RecordMode != RecordMode.SingleRow)
-            throw new Exception("Only single row mode is supported, otherwise it won't be one - to - one relation");
+        //if (tableDefinition.RecordMode != RecordMode.SingleRow)
+        //    throw new Exception("Only single row mode is supported, otherwise it won't be one - to - one relation");
         
         this.dataProvider = dataProvider;
         this.modelGenerator = modelGenerator;
@@ -129,7 +129,7 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
         ExecuteChangedCommand = noSaveMode ? new AsyncAutoCommand(() => Task.CompletedTask, () => false) : new AsyncAutoCommand(async () =>
         {
             await SaveData();
-            eventAggregator.GetEvent<DatabaseTableChanged>().Publish(tableDefinition.TableName);
+            eventAggregator.GetEvent<DatabaseTableChanged>().Publish(tableDefinition.Id);
             if (sessionService.IsOpened && !sessionService.IsPaused)
             {
                 UpdateSolutionItemWithEverything();
@@ -148,7 +148,7 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
         GenerateCurrentSqlCommand = new AsyncAutoCommand(async () =>
         {
             var sql = await GenerateThisQueryOnly();
-            var item = new MetaSolutionSQL(new JustQuerySolutionItem(sql.QueryString));
+            var item = new MetaSolutionSQL(new JustQuerySolutionItem(sql));
             using var editor = editorRegistry.GetEditor(item);
             await windowManager.ShowDialog((IDialog)editor);
         });
@@ -297,7 +297,7 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
         {
             data = await dataProvider.Load(tableDefinition.Id, null, null, oldKeys.Length, oldKeys);
             if (data == null)
-                return Queries.Raw("ERROR");
+                return Queries.Raw(tableDefinition.DataDatabaseType, "ERROR");
             solutionItem.UpdateEntitiesWithOriginalValues(data.Entities);
         }
 
@@ -314,11 +314,11 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
             return queryGenerator.GenerateDeleteQuery(tableDefinition, key);
 
         if (!wasPresentInDatabase && !PresentInDatabase)
-            return Queries.Empty();
+            return Queries.Empty(tableDefinition.DataDatabaseType);
 
         var query = queryGenerator.GenerateQuery(new[] { key }, null, new DatabaseTableData(tableDefinition, new[] { Row!.Entity }));
         
-        IMultiQuery multi = Queries.BeginTransaction();
+        IMultiQuery multi = Queries.BeginTransaction(tableDefinition.DataDatabaseType);
         multi.Add(query);
         foreach (var pair in forceUpdateCells)
         {
@@ -373,7 +373,7 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
                 }
                 else if (column.IsMetaColumn)
                 {
-                    var (cmd, name) = metaColumnsSupportService.GenerateCommand(null, column.Meta!, entity, key);
+                    var (cmd, name) = metaColumnsSupportService.GenerateCommand(null, tableDefinition.DataDatabaseType, column.Meta!, entity, key);
                     cellViewModel = new SingleRecordDatabaseCellViewModel(columnIndex, column.Name, cmd, row, entity, name);
                 }
                 else

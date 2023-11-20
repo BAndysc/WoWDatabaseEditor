@@ -27,5 +27,5 @@ public class CmangosGossipMenuQueryProvider : BaseInsertQueryProvider<IGossipMen
             .Delete();
     }
 
-    public override string TableName => "gossip_menu";
+    public override DatabaseTable TableName => DatabaseTable.WorldTable("gossip_menu");
 }

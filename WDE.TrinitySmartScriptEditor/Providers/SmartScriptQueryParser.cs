@@ -13,12 +13,12 @@ public class SmartScriptQueryParser : IQueryParserProvider
 {
     public Task<bool> ParseDelete(DeleteQuery query, IQueryParsingContext context)
     {
-        return Task.FromResult(query.TableName == "smart_scripts");
+        return Task.FromResult(query.TableName == DatabaseTable.WorldTable("smart_scripts"));
     }
 
     public async Task<bool> ParseInsert(InsertQuery query, IQueryParsingContext context)
     {
-        if (query.TableName != "smart_scripts")
+        if (query.TableName != DatabaseTable.WorldTable("smart_scripts"))
             return false;
 
         var entry = query.Columns.IndexOfIgnoreCase("entryorguid");
@@ -45,7 +45,7 @@ public class SmartScriptQueryParser : IQueryParserProvider
 
     public Task<bool> ParseUpdate(UpdateQuery query, IQueryParsingContext context)
     {
-        return Task.FromResult(query.TableName == "smart_scripts");
+        return Task.FromResult(query.TableName == DatabaseTable.WorldTable("smart_scripts"));
     }
 
     public void Finish(IQueryParsingContext context)

@@ -28,7 +28,7 @@ public class CmangosLootQueryGenerator : ILootQueryGenerator
     
     public IQuery GenerateQuery(IReadOnlyList<LootGroupModel> models)
     {
-        var transaction = Queries.BeginTransaction();
+        var transaction = Queries.BeginTransaction(DataDatabaseType.World);
 
         foreach (var group in models)
         {
@@ -43,13 +43,13 @@ public class CmangosLootQueryGenerator : ILootQueryGenerator
 
             if (type == LootSourceType.Reference)
             {
-                transaction.Table("reference_loot_template_names")
+                transaction.Table(DatabaseTable.WorldTable("reference_loot_template_names"))
                     .Where(row => row.Column<uint>("entry") == entry)
                     .Delete();
 
                 if (!string.IsNullOrWhiteSpace(name))
                 {
-                    transaction.Table("reference_loot_template_names")
+                    transaction.Table(DatabaseTable.WorldTable("reference_loot_template_names"))
                         .Insert(new
                         {
                             entry = entry,
@@ -97,7 +97,7 @@ public class CmangosLootQueryGenerator : ILootQueryGenerator
     public IQuery GenerateUpdateLootIds(LootSourceType sourceType, uint solutionEntry, uint difficultyId, IReadOnlyList<LootEntry> rootLootEntries)
     {
         if (sourceType.SolutionEntryIsLootEntry() || !sourceType.CanUpdateSourceLootEntry())
-            return Queries.Empty();
+            return Queries.Empty(DataDatabaseType.World);
 
         if (difficultyId != 0)
             throw new Exception("Difficulty expected to be 0");
@@ -110,22 +110,22 @@ public class CmangosLootQueryGenerator : ILootQueryGenerator
         switch (sourceType)
         {
             case LootSourceType.Creature:
-                return Queries.Table("creature_template")
+                return Queries.Table(DatabaseTable.WorldTable("creature_template"))
                     .Where(row => row.Column<uint>("Entry") == solutionEntry)
                     .Set("LootId", lootId)
                     .Update();
             case LootSourceType.GameObject:
-                return Queries.Table("gameobject_template")
+                return Queries.Table(DatabaseTable.WorldTable("gameobject_template"))
                     .Where(row => row.Column<uint>("Entry") == solutionEntry)
                     .Set("Data1", lootId)
                     .Update();
             case LootSourceType.Skinning:
-                return Queries.Table("creature_template")
+                return Queries.Table(DatabaseTable.WorldTable("creature_template"))
                     .Where(row => row.Column<uint>("Entry") == solutionEntry)
                     .Set("SkinningLootId", lootId)
                     .Update();
             case LootSourceType.Pickpocketing:
-                return Queries.Table("creature_template")
+                return Queries.Table(DatabaseTable.WorldTable("creature_template"))
                     .Where(row => row.Column<uint>("Entry") == solutionEntry)
                     .Set("PickpocketLootId", lootId)
                     .Update();

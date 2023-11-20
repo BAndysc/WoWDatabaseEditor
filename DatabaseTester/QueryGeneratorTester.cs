@@ -54,7 +54,7 @@ public class QueryGeneratorTester
         this.npcTextDelete = npcTextDelete;
     }
 
-    public IEnumerable<string?> Tables()
+    public IEnumerable<DatabaseTable?> Tables()
     {
         yield return creature.TableName;
         yield return gameobject.TableName;

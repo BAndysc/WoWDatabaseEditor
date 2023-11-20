@@ -12,7 +12,7 @@ namespace WDE.QueryGenerators.Generators.Quests;
 public class TrinityQuestQueryProvider : IUpdateQueryProvider<QuestChainDiff>
 {
     private readonly ICachedDatabaseProvider databaseProvider;
-    public string TableName => "quest_template_addon";
+    public DatabaseTable TableName => DatabaseTable.WorldTable("quest_template_addon");
     private bool hasBreadcrumb;
 
     public TrinityQuestQueryProvider(ICachedDatabaseProvider databaseProvider, ICurrentCoreVersion currentCoreVersion)
@@ -27,9 +27,9 @@ public class TrinityQuestQueryProvider : IUpdateQueryProvider<QuestChainDiff>
             (!hasBreadcrumb || hasBreadcrumb && !diff.BreadcrumbQuestId.HasValue) &&
             !diff.NextQuestId.HasValue &&
             !diff.PrevQuestId.HasValue)
-            return Queries.Empty();
+            return Queries.Empty(DataDatabaseType.World);
 
-        var trans = Queries.BeginTransaction();
+        var trans = Queries.BeginTransaction(DataDatabaseType.World);
 
         var template = databaseProvider.GetCachedQuestTemplate(diff.Id);
         if (template != null)

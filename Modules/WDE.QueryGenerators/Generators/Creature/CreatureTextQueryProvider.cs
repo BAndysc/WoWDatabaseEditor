@@ -9,7 +9,7 @@ namespace WDE.QueryGenerators.Generators.Creature;
 [RequiresCore("TrinityMaster", "TrinityCata", "TrinityWrath", "Azeroth")]
 public class CreatureTextGenerator : BaseInsertQueryProvider<ICreatureText>, IDeleteQueryProvider<ICreatureText>
 {
-    public override string TableName => "creature_text";
+    public override DatabaseTable TableName => DatabaseTable.WorldTable("creature_text");
     
     protected override object Convert(ICreatureText t)
     {
@@ -43,5 +43,5 @@ public class CreatureTextGenerator : BaseInsertQueryProvider<ICreatureText>, IDe
 [RequiresCore("CMaNGOS-TBC", "CMaNGOS-Classic", "CMaNGOS-WoTLK")]
 public class CmangosCreatureTextGenerator : NotSupportedQueryProvider<ICreatureText>
 {
-    public override string TableName => "creature_text";
+    public override DatabaseTable TableName => DatabaseTable.WorldTable("creature_text");
 }

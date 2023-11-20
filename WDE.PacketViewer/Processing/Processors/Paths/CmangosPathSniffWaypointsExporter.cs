@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using WDE.Common.Database;
 using WDE.Module.Attributes;
 using WDE.SqlQueryGenerator;
 using WowPacketParser.Proto;
@@ -19,7 +20,7 @@ public class CmangosPathSniffWaypointsExporter : ISniffWaypointsExporter
 
     public async Task Export(StringBuilder sb, int basePathNum, UniversalGuid guid, IWaypointProcessor.UnitMovementState state, float randomness)
     {
-        var q = Queries.BeginTransaction();
+        var q = Queries.BeginTransaction(DataDatabaseType.World);
         List<object> toInsert = new();
             
         uint pathEntry = guid.Entry;
@@ -35,7 +36,7 @@ public class CmangosPathSniffWaypointsExporter : ISniffWaypointsExporter
                 q.StartBlockComment("Those paths are out of range, because a single entry can have up to 100 paths");
             
             int pointid = 1;
-            q.Table("waypoint_path").Where(row => row.Column<uint>("PathId") == pathEntry).Delete();
+            q.Table(DatabaseTable.WorldTable("waypoint_path")).Where(row => row.Column<uint>("PathId") == pathEntry).Delete();
             toInsert.Clear();
             foreach (var segment in path.Segments)
             {
@@ -59,7 +60,7 @@ public class CmangosPathSniffWaypointsExporter : ISniffWaypointsExporter
             }
 
             if (toInsert.Count > 0)
-                q.Table("waypoint_path").BulkInsert(toInsert);
+                q.Table(DatabaseTable.WorldTable("waypoint_path")).BulkInsert(toInsert);
 
             if (outOfRange)
                 q.EndBlockComment();

@@ -1,3 +1,4 @@
+using WDE.Common.Database;
 using WDE.Module.Attributes;
 using WDE.SqlQueryGenerator;
 
@@ -7,7 +8,7 @@ namespace WDE.QueryGenerators.Base;
 [SingleInstance]
 public abstract class NotSupportedQueryProvider<T> : IInsertQueryProvider<T>, IDeleteQueryProvider<T>, IUpdateQueryProvider<T>
 {
-    public abstract string TableName { get; }
+    public abstract DatabaseTable TableName { get; }
     
     public IQuery Insert(T t) => throw new TableNotSupportedException(TableName);
 
@@ -20,9 +21,9 @@ public abstract class NotSupportedQueryProvider<T> : IInsertQueryProvider<T>, ID
 
 public class TableNotSupportedException : Exception
 {
-    public string TableName { get; }
+    public DatabaseTable TableName { get; }
     
-    public TableNotSupportedException(string tableName) : base("Currently selected database doesn't support table " + tableName)
+    public TableNotSupportedException(DatabaseTable tableName) : base("Currently selected database doesn't support table " + tableName)
     {
         TableName = tableName;
     }

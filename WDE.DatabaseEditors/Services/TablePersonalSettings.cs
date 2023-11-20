@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reactive.Linq;
+using WDE.Common.Database;
 using WDE.Common.Services;
 using WDE.Module.Attributes;
 using WDE.MVVM.Observable;
@@ -12,7 +13,7 @@ namespace WDE.DatabaseEditors.Services;
 public class TablePersonalSettings : ITablePersonalSettings
 {
     private readonly IUserSettings userSettings;
-    private Dictionary<string, TablePersonalData> data = new();
+    private Dictionary<DatabaseTable, TablePersonalData> data = new();
     private ValuePublisher<Unit> saveRequests = new();
 
     public TablePersonalSettings(IUserSettings userSettings)
@@ -30,7 +31,7 @@ public class TablePersonalSettings : ITablePersonalSettings
         userSettings.Update(new Data(){data = data});;
     }
 
-    public double GetColumnWidth(string table, string column, double defaultWidth)
+    public double GetColumnWidth(DatabaseTable table, string column, double defaultWidth)
     {
         if (!data.TryGetValue(table, out var tableData))
             return defaultWidth;
@@ -41,7 +42,7 @@ public class TablePersonalSettings : ITablePersonalSettings
         return defaultWidth;
     }
 
-    public bool IsColumnVisible(string table, string column, bool defaultIsVisible = true)
+    public bool IsColumnVisible(DatabaseTable table, string column, bool defaultIsVisible = true)
     {
         if (!data.TryGetValue(table, out var tableData))
             return defaultIsVisible;
@@ -49,7 +50,7 @@ public class TablePersonalSettings : ITablePersonalSettings
         return !tableData.hiddenColumns.Contains(column) && defaultIsVisible;
     }
 
-    public void UpdateWidth(string table, string column, double defaultWidth, double width)
+    public void UpdateWidth(DatabaseTable table, string column, double defaultWidth, double width)
     {
         bool isDefault = Math.Abs(defaultWidth - width) < 5;
         if (!data.TryGetValue(table, out var tableData))
@@ -65,7 +66,7 @@ public class TablePersonalSettings : ITablePersonalSettings
         saveRequests.Publish(default);
     }
 
-    public void UpdateVisibility(string table, string column, bool isVisible)
+    public void UpdateVisibility(DatabaseTable table, string column, bool isVisible)
     {
         if (!data.TryGetValue(table, out var tableData))
         {
@@ -97,9 +98,9 @@ public class TablePersonalSettings : ITablePersonalSettings
 
     private class Data : ISettings
     {
-        public Dictionary<string, TablePersonalData> data = new();
+        public Dictionary<DatabaseTable, TablePersonalData> data = new();
         
-        public Data(Dictionary<string, TablePersonalData>? data = null)
+        public Data(Dictionary<DatabaseTable, TablePersonalData>? data = null)
         {
             this.data = data ?? new();
         }

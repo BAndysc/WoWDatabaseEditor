@@ -44,5 +44,5 @@ internal class MangosSpawnGroupQueryProvider : IInsertQueryProvider<ISpawnGroupT
             .Delete();
     }
     
-    public string TableName => "spawn_group";
+    public DatabaseTable TableName => DatabaseTable.WorldTable("spawn_group");
 }

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using WDE.Common.Database;
 using WDE.Common.Parameters;
 using WDE.Common.Services;
 using WDE.DatabaseEditors.Models;
@@ -23,7 +24,7 @@ public class EquipmentCreatureGuidParameter : ICustomPickerContextualParameter<l
         if (context is DatabaseEntity entity)
         {
             var entry = entity.GetTypedValueOrThrow<long>("id");
-            var result = await pickerService.PickByColumn("creature_equip_template", new DatabaseKey(entry), "ID", value);
+            var result = await pickerService.PickByColumn(DatabaseTable.WorldTable("creature_equip_template"), new DatabaseKey(entry), "ID", value);
             return (result ?? 0, result.HasValue);
         }
 

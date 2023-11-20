@@ -340,7 +340,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
                     }
                     else
                     {
-                        var (command, title) = metaColumnsSupportService.GenerateCommand(this, column.Meta!, entity, entity.GenerateKey(TableDefinition));
+                        var (command, title) = metaColumnsSupportService.GenerateCommand(this, tableDefinition.DataDatabaseType, column.Meta!, entity, entity.GenerateKey(TableDefinition));
                         cellViewModel = AutoDispose(new DatabaseCellViewModel(row, entity, command, column.Name));
                     }
                 }
@@ -493,7 +493,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
 
         protected override async Task<IQuery> GenerateSaveQuery()
         {
-            IMultiQuery multi = Queries.BeginTransaction();
+            IMultiQuery multi = Queries.BeginTransaction(tableDefinition.DataDatabaseType);
             multi.Add(await base.GenerateSaveQuery());
             
             foreach (var pair in forceUpdateCells)

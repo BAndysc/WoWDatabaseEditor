@@ -17,11 +17,11 @@ public class TrinityGameObjectDiffQueryProvider : IUpdateQueryProvider<GameObjec
         this.databaseProvider = databaseProvider;
     }
 
-    public string TableName => "gameobject";
+    public DatabaseTable TableName => DatabaseTable.WorldTable("gameobject");
     
     public IQuery Update(GameObjectDiff diff)
     {
-        var trans = Queries.BeginTransaction();
+        var trans = Queries.BeginTransaction(DataDatabaseType.World);
 
         var gameObjectEntry = databaseProvider.GetGameObjectByGuid(diff.Guid, diff.Entry);
 

@@ -21,7 +21,7 @@ namespace WDE.DatabaseEditors.Solution
 
         public IRemoteCommand[] GenerateCommand(DatabaseTableSolutionItem item)
         {
-            var definition = tableDefinitionProvider.GetDefinition(item.DefinitionId);
+            var definition = tableDefinitionProvider.GetDefinition(item.TableName);
             if (definition == null)
                 return Array.Empty<IRemoteCommand>();
             if (definition.ReloadCommand == null)

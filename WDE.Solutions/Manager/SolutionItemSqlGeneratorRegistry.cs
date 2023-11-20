@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Prism.Events;
 using WDE.Common;
+using WDE.Common.Database;
 using WDE.Common.Events;
 using WDE.Common.Managers;
 using WDE.Common.Solution;
@@ -74,7 +75,7 @@ namespace WDE.Solutions.Manager
             }
             else
             {
-                return Queries.Raw($"--- INTERNAL WoW Database Editor ERROR ---\n\n{item.GetType()} unknown SQL generator. Development info: You need to register class implementing ISolutionItemSqlProvider<T> interface");
+                return Queries.Raw(DataDatabaseType.World, $"--- INTERNAL WoW Database Editor ERROR ---\n\n{item.GetType()} unknown SQL generator. Development info: You need to register class implementing ISolutionItemSqlProvider<T> interface");
             }
         }
     }

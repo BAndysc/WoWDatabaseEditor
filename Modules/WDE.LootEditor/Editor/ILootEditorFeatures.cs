@@ -14,6 +14,6 @@ public interface ILootEditorFeatures
     bool LootGroupHasFlags(LootSourceType lootType);
     int GetConditionSourceTypeFor(LootSourceType type);
     int GetMaxLootEntryForType(LootSourceType type, uint difficultyId);
-    string GetTableNameFor(LootSourceType type);
+    DatabaseTable GetTableNameFor(LootSourceType type);
     IReadOnlyList<LootSourceType> SupportedTypes { get; }
 }

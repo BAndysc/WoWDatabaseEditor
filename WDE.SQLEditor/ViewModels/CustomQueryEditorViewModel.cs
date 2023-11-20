@@ -5,6 +5,7 @@ using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;
 using Prism.Commands;
 using Prism.Mvvm;
+using PropertyChanged.SourceGenerator;
 using WDE.Common;
 using WDE.Common.Database;
 using WDE.Common.History;
@@ -22,11 +23,13 @@ using WDE.SqlQueryGenerator;
 namespace WDE.SQLEditor.ViewModels
 {
     [AutoRegister]
-    public class CustomQueryEditorViewModel : ObservableBase, ISolutionItemDocument
+    public partial class CustomQueryEditorViewModel : ObservableBase, ISolutionItemDocument
     {
         private INativeTextDocument code;
         public ImageUri? Icon { get; } = new("Icons/document_sql.png");
 
+        [Notify] private DataDatabaseType database;
+        
         public CustomQueryEditorViewModel(IMySqlExecutor mySqlExecutor, 
             IStatusBar statusBar, 
             IDatabaseProvider databaseProvider,
@@ -105,7 +108,7 @@ namespace WDE.SQLEditor.ViewModels
         public ISolutionItem SolutionItem { get; }
         public Task<IQuery> GenerateQuery()
         {
-            return Task.FromResult(Queries.Raw(code.ToString()));
+            return Task.FromResult(Queries.Raw(database, code.ToString()));
         }
     }
 }

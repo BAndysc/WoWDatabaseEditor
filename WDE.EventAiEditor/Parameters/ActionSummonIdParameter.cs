@@ -41,7 +41,7 @@ public class ActionSummonIdParameter : IParameter<long>, IAsyncParameter<long>, 
     
     public async Task<(long, bool)> PickValue(long value)
     {
-        var result = await tableEditorPickerService.PickByColumn("creature_ai_summons", default, "id", value);
+        var result = await tableEditorPickerService.PickByColumn(DatabaseTable.WorldTable("creature_ai_summons"), default, "id", value);
         if (result.HasValue)
             return (result.Value, true);
         return (0, false);

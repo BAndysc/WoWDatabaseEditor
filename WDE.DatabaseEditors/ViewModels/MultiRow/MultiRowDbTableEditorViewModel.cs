@@ -649,7 +649,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                 }
                 else if (column.IsMetaColumn)
                 {
-                    var (command, title) = metaColumnsSupportService.GenerateCommand(this, column.Meta!, entity, entity.GenerateKey(TableDefinition));
+                    var (command, title) = metaColumnsSupportService.GenerateCommand(this, tableDefinition.DataDatabaseType, column.Meta!, entity, entity.GenerateKey(TableDefinition));
                     cellViewModel = AutoDispose(new DatabaseCellViewModel(columnIndex, column.Name, command, row, entity, title));
                 }
                 else

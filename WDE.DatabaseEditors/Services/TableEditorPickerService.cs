@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Prism.Ioc;
+using WDE.Common.Database;
 using WDE.Common.Managers;
 using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
@@ -59,9 +60,9 @@ public class TableEditorPickerService : ITableEditorPickerService
         this.windowsSettings = windowsSettings;
     }
     
-    public async Task<long?> PickByColumn(string table, DatabaseKey? key, string column, long? initialValue, string? backupColumn = null, string? customWhere = null)
+    public async Task<long?> PickByColumn(DatabaseTable table, DatabaseKey? key, string column, long? initialValue, string? backupColumn = null, string? customWhere = null)
     {
-        var definition = definitionProvider.GetDefinition(table);
+        var definition = definitionProvider.GetDefinitionByTableName(table);
         if (definition == null)
             throw new UnsupportedTableException(table);
 
@@ -170,9 +171,9 @@ public class TableEditorPickerService : ITableEditorPickerService
         return null;
     }
 
-    public async Task ShowTable(string table, string? condition, DatabaseKey? defaultPartialKey = null)
+    public async Task ShowTable(DatabaseTable table, string? condition, DatabaseKey? defaultPartialKey = null)
     {
-        var definition = definitionProvider.GetDefinition(table);
+        var definition = definitionProvider.GetDefinitionByTableName(table);
         if (definition == null)
             throw new UnsupportedTableException(table);
 
@@ -224,9 +225,9 @@ public class TableEditorPickerService : ITableEditorPickerService
         await task;
     }
 
-    public async Task ShowForeignKey1To1(string table, DatabaseKey key)
+    public async Task ShowForeignKey1To1(DatabaseTable table, DatabaseKey key)
     {
-        var definition = definitionProvider.GetDefinition(table);
+        var definition = definitionProvider.GetDefinitionByTableName(table);
         if (definition == null)
             throw new UnsupportedTableException(table);
 

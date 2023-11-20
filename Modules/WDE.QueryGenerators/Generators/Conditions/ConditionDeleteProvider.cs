@@ -1,3 +1,4 @@
+using WDE.Common.Database;
 using WDE.Module.Attributes;
 using WDE.QueryGenerators.Base;
 using WDE.QueryGenerators.Models;
@@ -14,9 +15,9 @@ public class ConditionDeleteProvider : IDeleteQueryProvider<ConditionDeleteModel
         var columnKey = t.BySourceEntry == null ? (t.BySourceGroup == null ? t.BySourceId == null ? null : "SourceId" : "SourceGroup") : "SourceEntry";
         
         if (columnKey == null || list == null)
-            return Queries.Empty();
+            return Queries.Empty(DataDatabaseType.World);
 
-        return Queries.Table("conditions")
+        return Queries.Table(DatabaseTable.WorldTable("conditions"))
             .Where(r => r.Column<int>("SourceTypeOrReferenceId") == t.SourceTypeOrReferenceId)
             .WhereIn(columnKey, list)
             .Delete();

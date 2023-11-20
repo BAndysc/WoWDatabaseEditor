@@ -39,5 +39,5 @@ public class TrinityMasterGossipMenuOptionQueryProvider : BaseInsertQueryProvide
             .Delete();
     }
 
-    public override string TableName => "gossip_menu_option";
+    public override DatabaseTable TableName => DatabaseTable.WorldTable("gossip_menu_option");
 }

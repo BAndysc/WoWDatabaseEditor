@@ -39,7 +39,7 @@ namespace WDE.Trinity
             SmartScriptType.Scene
         };
 
-        public string TableName => "smart_scripts";
+        public DatabaseTable TableName => DatabaseTable.WorldTable("smart_scripts");
         public bool DifficultyInSeparateColumn => true;
         public string ConditionsFile => "SmartData/conditions.json";
         public string ConditionGroupsFile => "SmartData/conditions_groups.json";

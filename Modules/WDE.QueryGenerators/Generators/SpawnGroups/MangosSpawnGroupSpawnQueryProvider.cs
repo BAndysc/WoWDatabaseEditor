@@ -26,5 +26,5 @@ internal class MangosSpawnGroupSpawnQueryProvider : BaseInsertQueryProvider<ISpa
             .Delete();
     }
 
-    public override string TableName => "spawn_group_spawn";
+    public override DatabaseTable TableName => DatabaseTable.WorldTable("spawn_group_spawn");
 }

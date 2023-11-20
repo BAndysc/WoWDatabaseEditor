@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;
 using Prism.Commands;
 using Prism.Mvvm;
+using PropertyChanged.SourceGenerator;
 using WDE.Common.Database;
 using WDE.Common.History;
 using WDE.Common.Managers;
@@ -16,12 +18,21 @@ using IDocument = WDE.Common.Managers.IDocument;
 
 namespace WDE.SQLEditor.ViewModels
 {
-    public class SqlEditorViewModel : BindableBase, IDocument, IDialog
+    public partial class SqlEditorViewModel : BindableBase, IDocument, IDialog
     {
         private INativeTextDocument code;
         public ImageUri? Icon { get; } = new("Icons/document_sql.png");
 
+        [Notify] private DataDatabaseType database;
+
+        public static IList<DataDatabaseType> DatabaseTypes { get; } = new List<DataDatabaseType>()
+        {
+            DataDatabaseType.World,
+            DataDatabaseType.Hotfix
+        };
+        
         private SqlEditorViewModel(IMySqlExecutor mySqlExecutor, 
+            IMySqlHotfixExecutor hotfixExecutor,
             IStatusBar statusBar, 
             IDatabaseProvider databaseProvider,
             ITaskRunner taskRunner, 
@@ -33,15 +44,20 @@ namespace WDE.SQLEditor.ViewModels
                 return taskRunner.ScheduleTask("Executing query",
                     async () =>
                     {
-                        statusBar.PublishNotification(new PlainNotification(NotificationType.Info, "Executing query"));
+                        statusBar.PublishNotification(new PlainNotification(NotificationType.Info, $"Executing {database} query"));
                         try
                         {
-                            await mySqlExecutor.ExecuteSql(Code.ToString());
-                            statusBar.PublishNotification(new PlainNotification(NotificationType.Success, "Query executed"));
+                            if (database == DataDatabaseType.Hotfix)
+                                await hotfixExecutor.ExecuteSql(Code.ToString());
+                            else if (database == DataDatabaseType.World)
+                                await mySqlExecutor.ExecuteSql(Code.ToString());
+                            else
+                                throw new Exception($"Unknown database type: {database}");
+                            statusBar.PublishNotification(new PlainNotification(NotificationType.Success, $"{database} Query executed"));
                         }
                         catch (Exception e)
                         {
-                            statusBar.PublishNotification(new PlainNotification(NotificationType.Error, "Failure during query execution"));
+                            statusBar.PublishNotification(new PlainNotification(NotificationType.Error, $"Failure during {database} query execution"));
                             Console.WriteLine(e);
                         }
                     });
@@ -52,6 +68,7 @@ namespace WDE.SQLEditor.ViewModels
         }
 
         public SqlEditorViewModel(IMySqlExecutor mySqlExecutor, 
+            IMySqlHotfixExecutor hotfixExecutor,
             IStatusBar statusBar,
             IDatabaseProvider databaseProvider, 
             ITaskRunner taskRunner,
@@ -59,7 +76,7 @@ namespace WDE.SQLEditor.ViewModels
             ISolutionItemSqlGeneratorRegistry sqlGeneratorsRegistry,
             INativeTextDocument sql,
             IMainThread mainThread,
-            MetaSolutionSQL item) : this(mySqlExecutor, statusBar, databaseProvider, taskRunner, sql)
+            MetaSolutionSQL item) : this(mySqlExecutor, hotfixExecutor, statusBar, databaseProvider, taskRunner, sql)
         {
             IsLoading = true;
             taskRunner.ScheduleTask("Generating SQL",
@@ -68,8 +85,17 @@ namespace WDE.SQLEditor.ViewModels
                     StringBuilder sb = new();
                     try
                     {
+                        DataDatabaseType? previousType = null;
                         foreach (var subitem in item.ItemsToGenerate)
-                            sb.AppendLine((await sqlGeneratorsRegistry.GenerateSql(subitem)).QueryString);
+                        {
+                            var q = await sqlGeneratorsRegistry.GenerateSql(subitem);
+                            if (previousType.HasValue && q.Database != previousType)
+                                messageBoxService.SimpleDialog("WARNING!!", "Warning!", "Somehow some queries in this SQL refers to World database and some refers to Hotfix. Be cautious before applying.");
+                            previousType = q.Database;
+                            sb.AppendLine(q.QueryString);
+                        }
+
+                        Database = previousType ?? DataDatabaseType.World;
                     }
                     catch (Exception e)
                     {

@@ -279,7 +279,7 @@ public partial class DefinitionEditorViewModel : ObservableBase
                 resultFile += ".json";
 
             var emptyDefinition = new DatabaseTableDefinitionJson();
-            emptyDefinition.Id = emptyDefinition.TableName = Path.GetFileNameWithoutExtension(resultFile);
+            emptyDefinition.TableName = Path.GetFileNameWithoutExtension(resultFile);
             emptyDefinition.AbsoluteFileName = resultFile;
             emptyDefinition.FileName = Path.GetRelativePath(Environment.CurrentDirectory, resultFile);
             
