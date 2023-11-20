@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using WDE.Common.Services;
 using WDE.Module.Attributes;
@@ -14,6 +16,7 @@ namespace WDE.RemoteSOAP.Services
     {
         private readonly IConnectionSettingsProvider connectionSettings;
         private readonly TrinitySoapClient? trinitySoapClient;
+        public event Action<string, TimeSpan, RemoteCommandType>? OnLog;
 
         public bool IsConnected => trinitySoapClient != null;
 
@@ -33,8 +36,13 @@ namespace WDE.RemoteSOAP.Services
         {
             if (trinitySoapClient == null)
                 return "";
-
-            var response = await trinitySoapClient.ExecuteCommand(command.GenerateCommand());
+            
+            var cmd = command.GenerateCommand();
+            OnLog?.Invoke(cmd, TimeSpan.Zero, RemoteCommandType.Send);
+            var sw = new Stopwatch();
+            sw.Start();
+            var response = await trinitySoapClient.ExecuteCommand(cmd);
+            OnLog?.Invoke(response.Message, sw.Elapsed, RemoteCommandType.Receive);
             return response.Message;
         }
 

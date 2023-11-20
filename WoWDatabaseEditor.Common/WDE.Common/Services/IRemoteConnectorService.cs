@@ -5,9 +5,17 @@ using WDE.Module.Attributes;
 
 namespace WDE.Common.Services
 {
+    public enum RemoteCommandType
+    {
+        Send,
+        Receive,
+        Debug
+    }
+    
     [UniqueProvider]
     public interface IRemoteConnectorService
     {
+        event Action<string, TimeSpan, RemoteCommandType> OnLog;
         bool IsConnected { get; }
         
         Task<string> ExecuteCommand(IRemoteCommand command);
