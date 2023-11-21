@@ -109,7 +109,7 @@ public partial class LootPickerViewModel : ObservableBase, IDialog
         {
             foreach (var item in allItems)
             {
-                if (isSearchNumber && searchNumber == item.LootEntry ||
+                if (isSearchNumber && item.LootEntry.Contains(searchText) ||
                     item.Name != null && item.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase))
                     item.PerformSearch(""); // workaround to add all items, because we matched the loot entry
                 
