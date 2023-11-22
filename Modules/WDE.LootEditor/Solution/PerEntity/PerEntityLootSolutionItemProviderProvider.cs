@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using WDE.Common;
@@ -10,21 +9,21 @@ using WDE.LootEditor.Editor;
 using WDE.LootEditor.Utils;
 using WDE.Module.Attributes;
 
-namespace WDE.LootEditor.Solution;
+namespace WDE.LootEditor.Solution.PerEntity;
 
 [AutoRegister]
-public class LootSolutionItemProviderProvider : ISolutionItemProviderProvider
+public class PerEntityLootSolutionItemProviderProvider : ISolutionItemProviderProvider
 {
     private readonly ILootEditorFeatures features;
     private readonly IParameterPickerService parameterPickerService;
 
-    private class LootSolutionItemProvider : ISolutionItemProvider, IRawDatabaseTableSolutionItemProvider
+    private class PerEntityLootSolutionItemProvider : ISolutionItemProvider, IRawDatabaseTableSolutionItemProvider
     {
         private readonly IParameterPickerService parameterPickerService;
         private readonly string parameterName;
         private readonly LootSourceType type;
 
-        public LootSolutionItemProvider(IParameterPickerService parameterPickerService,
+        public PerEntityLootSolutionItemProvider(IParameterPickerService parameterPickerService,
             string parameterName,
             LootSourceType type)
         {
@@ -41,7 +40,7 @@ public class LootSolutionItemProviderProvider : ISolutionItemProviderProvider
 
         public string GetGroupName() => "Loot";
 
-        public bool IsCompatibleWithCore(ICoreVersion core) => true;
+        public bool IsCompatibleWithCore(ICoreVersion core) => core.LootEditingMode == LootEditingMode.PerLogicalEntity;
 
         public bool ByDefaultHideFromQuickStart => type != LootSourceType.Creature && type != LootSourceType.GameObject;
 
@@ -49,14 +48,14 @@ public class LootSolutionItemProviderProvider : ISolutionItemProviderProvider
         {
             var entry = await parameterPickerService.PickParameter(parameterName);
             if (entry.ok)
-                return new LootSolutionItem(type, (uint)entry.value, 0); // todo: how to pick difficulty?
+                return new PerEntityLootSolutionItem(type, (uint)entry.value, 0); // todo: how to pick difficulty?
             return null;
         }
 
         public string TableName => $"{type.ToString().ToLower()}_loot_template";
     }
 
-    public LootSolutionItemProviderProvider(ILootEditorFeatures features,
+    public PerEntityLootSolutionItemProviderProvider(ILootEditorFeatures features,
         IParameterPickerService parameterPickerService)
     {
         this.features = features;
@@ -70,7 +69,7 @@ public class LootSolutionItemProviderProvider : ISolutionItemProviderProvider
             if (supportedType is LootSourceType.Disenchant)
                 continue; // need to research how to implement them (i.e. for disenchant we need to know DisenchantID from the dbc)
             
-            yield return new LootSolutionItemProvider(parameterPickerService,
+            yield return new PerEntityLootSolutionItemProvider(parameterPickerService,
                 supportedType.GetParameterFor(),
                 supportedType);
         }

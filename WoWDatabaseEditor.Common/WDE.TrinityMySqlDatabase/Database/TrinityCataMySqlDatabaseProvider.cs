@@ -513,7 +513,8 @@ public class TrinityCataMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvider
             await database.ProspectingLootTemplateWithCurrency.Where(x => x.Reference == lootId).ToListAsync<ILootEntry>(),
             await database.MillingLootTemplateWithCurrency.Where(x => x.Reference == lootId).ToListAsync<ILootEntry>(),
             await database.MailLootTemplateWithCurrency.Where(x => x.Reference == lootId).ToListAsync<ILootEntry>(),
-            await database.SpellLootTemplateWithCurrency.Where(x => x.Reference == lootId).ToListAsync<ILootEntry>()
+            await database.SpellLootTemplateWithCurrency.Where(x => x.Reference == lootId).ToListAsync<ILootEntry>(),
+            await database.ReferenceLootTemplate.Where(x => x.Reference == lootId).ToListAsync<ILootEntry>(),
         };
         return loot.SelectMany(x => x).ToList();
     }

@@ -3,15 +3,15 @@ using System.Collections.ObjectModel;
 using WDE.Common;
 using WDE.Common.Database;
 
-namespace WDE.LootEditor.Solution;
+namespace WDE.LootEditor.Solution.PerEntity;
 
-public class LootSolutionItem : ISolutionItem, IEquatable<LootSolutionItem>
+public class PerEntityLootSolutionItem : ISolutionItem, IEquatable<PerEntityLootSolutionItem>
 {
     private readonly LootSourceType type;
     private readonly uint entry;
     private readonly uint difficulty; // todo: reconsider if the difficulty should be here
 
-    public LootSolutionItem(LootSourceType type, uint entry, uint difficulty)
+    public PerEntityLootSolutionItem(LootSourceType type, uint entry, uint difficulty)
     {
         this.type = type;
         this.entry = entry;
@@ -34,10 +34,10 @@ public class LootSolutionItem : ISolutionItem, IEquatable<LootSolutionItem>
     
     public ISolutionItem Clone()
     {
-        return new LootSolutionItem(type, entry, difficulty);
+        return new PerEntityLootSolutionItem(type, entry, difficulty);
     }
     
-    public bool Equals(LootSolutionItem? other)
+    public bool Equals(PerEntityLootSolutionItem? other)
     {
         if (ReferenceEquals(null, other)) return false;
         if (ReferenceEquals(this, other)) return true;
@@ -50,7 +50,7 @@ public class LootSolutionItem : ISolutionItem, IEquatable<LootSolutionItem>
         if (ReferenceEquals(null, obj)) return false;
         if (ReferenceEquals(this, obj)) return true;
         if (obj.GetType() != this.GetType()) return false;
-        return Equals((LootSolutionItem)obj);
+        return Equals((PerEntityLootSolutionItem)obj);
     }
 
     public override int GetHashCode()
@@ -58,12 +58,12 @@ public class LootSolutionItem : ISolutionItem, IEquatable<LootSolutionItem>
         return HashCode.Combine((int)type, entry, type == LootSourceType.Creature ? difficulty : 0);
     }
 
-    public static bool operator ==(LootSolutionItem? left, LootSolutionItem? right)
+    public static bool operator ==(PerEntityLootSolutionItem? left, PerEntityLootSolutionItem? right)
     {
         return Equals(left, right);
     }
 
-    public static bool operator !=(LootSolutionItem? left, LootSolutionItem? right)
+    public static bool operator !=(PerEntityLootSolutionItem? left, PerEntityLootSolutionItem? right)
     {
         return !Equals(left, right);
     }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Prism.Events;
 using Prism.Ioc;
+using WDE.Common.CoreVersion;
 using WDE.Common.Database;
 using WDE.Common.Events;
 using WDE.Common.Managers;
@@ -20,23 +21,27 @@ public class LootService : ILootService
 {
     private readonly IWindowManager windowManager;
     private readonly IEventAggregator eventAggregator;
+    private readonly ICurrentCoreVersion currentCoreVersion;
     private readonly Func<StandaloneLootEditorViewModel> creator;
 
     private IAbstractWindowView? currentWindow;
     private Dictionary<(LootSourceType, uint), IAbstractWindowView> typedWindows = new();
+    private bool onlyOneWindow = false;
     
     public LootService(IWindowManager windowManager,
         IEventAggregator eventAggregator,
+        ICurrentCoreVersion currentCoreVersion,
         Func<StandaloneLootEditorViewModel> creator)
     {
         this.windowManager = windowManager;
         this.eventAggregator = eventAggregator;
+        this.currentCoreVersion = currentCoreVersion;
         this.creator = creator;
     }
     
     public async Task OpenStandaloneLootEditor()
     {
-        if (currentWindow != null)
+        if (onlyOneWindow && currentWindow != null)
         {
             currentWindow.Activate();
         }
@@ -46,7 +51,8 @@ public class LootService : ILootService
             vm.LootType = LootSourceType.Creature;
             vm.SolutionEntry = 1;
             currentWindow = windowManager.ShowWindow(vm, out var task);
-            vm.LoadLootCommand.Execute(null);
+            if (vm.IsPerEntityLootEditingMode) // in the per table editing mode, it will open default empty loot by default
+                vm.LoadLootCommand.Execute(null);
             await WindowLifetimeTask(currentWindow, task);
         }
     }
@@ -62,8 +68,11 @@ public class LootService : ILootService
             using var vm = creator();
             vm.LootType = type;
             vm.SolutionEntry = solutionEntry;
-            vm.CanChangeLootType = false;
-            vm.CanChangeEntry = false;
+            if (currentCoreVersion.Current.LootEditingMode == LootEditingMode.PerLogicalEntity)
+            {
+                vm.CanChangeLootType = false;
+                vm.CanChangeEntry = false;
+            }
             typedWindows[(type, solutionEntry)] = window = windowManager.ShowWindow(vm, out var task);
             vm.LoadLootCommand.Execute(null);
             WindowLifetimeTask(window, type, solutionEntry, task).ListenErrors();

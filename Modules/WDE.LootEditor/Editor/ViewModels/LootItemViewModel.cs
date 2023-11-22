@@ -119,7 +119,7 @@ public partial class LootItemViewModel : ObservableBase, ITableRow
         else
             cells.Add(new ActionCell(ParentVm.EditConditionsCommand, this, () => $"Conditions ({conditions.CountActualConditions()})"));
 
-        if (ParentVm.LootEditorFeatures.HasCommentField(ParentVm.SolutionItem.Type))
+        if (ParentVm.LootEditorFeatures.HasCommentField(ParentVm.LootSourceType))
             cells.Add(Comment);
         
         if (ParentVm.LootEditorFeatures.HasPatchField)

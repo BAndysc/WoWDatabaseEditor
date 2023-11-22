@@ -535,7 +535,8 @@ namespace WDE.CMMySqlDatabase.Database
                 await database.SkinningLootTemplate.Where(x => x.MinCountOrReference == minCountOrRef).ToListAsync<ILootEntry>(),
                 await database.DisenchantLootTemplate.Where(x => x.MinCountOrReference == minCountOrRef).ToListAsync<ILootEntry>(),
                 await database.ProspectingLootTemplate.Where(x => x.MinCountOrReference == minCountOrRef).ToListAsync<ILootEntry>(),
-                await database.MailLootTemplate.Where(x => x.MinCountOrReference == minCountOrRef).ToListAsync<ILootEntry>()
+                await database.MailLootTemplate.Where(x => x.MinCountOrReference == minCountOrRef).ToListAsync<ILootEntry>(),
+                await database.ReferenceLootTemplate.Where(x => x.MinCountOrReference == minCountOrRef).ToListAsync<ILootEntry>()
             };
             return loot.SelectMany(x => x).ToList();
         }

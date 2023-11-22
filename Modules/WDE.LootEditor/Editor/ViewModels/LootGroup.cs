@@ -9,6 +9,7 @@ using System.Windows.Input;
 using AvaloniaStyles.Controls.FastTableView;
 using Prism.Commands;
 using PropertyChanged.SourceGenerator;
+using WDE.Common.CoreVersion;
 using WDE.Common.Database;
 using WDE.Common.History;
 using WDE.Common.Utils;
@@ -61,9 +62,12 @@ public partial class LootGroup : ObservableBase, ITableRowGroup
     
     public LootSourceType LootSourceType { get; }
 
-    public bool CanBeUnloaded => !ParentVm.SolutionItem.SolutionEntryIsLootEntry() && ParentVm.SolutionItem.Type.CanUpdateSourceLootEntry() && LootSourceType != LootSourceType.Reference;
+    public bool CanBeUnloaded => (ParentVm.LootEditingMode == LootEditingMode.PerDatabaseTable && !IsDynamicallyLoadedReference) ||
+                                 ParentVm.LootEditingMode == LootEditingMode.PerLogicalEntity && !ParentVm.PerEntityLootSolutionItem!.SolutionEntryIsLootEntry() && ParentVm.PerEntityLootSolutionItem!.Type.CanUpdateSourceLootEntry() && LootSourceType != LootSourceType.Reference;
 
-    public bool IsDynamicallyLoadedReference => LootSourceType == LootSourceType.Reference && (uint)LootEntry != ParentVm.SolutionItem.Entry;
+    public bool IsDynamicallyLoadedReference => LootSourceType == LootSourceType.Reference &&
+                                                ((ParentVm.PerEntityLootSolutionItem != null && (uint)LootEntry != ParentVm.PerEntityLootSolutionItem.Entry) ||
+                                                (ParentVm.PerEntityLootSolutionItem == null && !ParentVm.PerDatabaseSolutionItems.Contains(LootEntry)));
     
     public LootEntry LootEntry { get; }
     
@@ -282,6 +286,8 @@ public partial class LootGroup : ObservableBase, ITableRowGroup
             option.SetAsSaved();
         IsGroupModified = false;
     }
+
+    public void RaisePropertyChangedPublic(string name) => RaisePropertyChanged(name);
 }
 
 

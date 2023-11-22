@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -11,6 +12,7 @@ using Newtonsoft.Json;
 using Prism.Commands;
 using PropertyChanged.SourceGenerator;
 using WDE.Common;
+using WDE.Common.CoreVersion;
 using WDE.Common.Database;
 using WDE.Common.DBC;
 using WDE.Common.History;
@@ -29,6 +31,8 @@ using WDE.LootEditor.Models;
 using WDE.LootEditor.QueryGenerator;
 using WDE.LootEditor.Services;
 using WDE.LootEditor.Solution;
+using WDE.LootEditor.Solution.PerDatabaseTable;
+using WDE.LootEditor.Solution.PerEntity;
 using WDE.LootEditor.Utils;
 using WDE.MVVM;
 using WDE.MVVM.Observable;
@@ -43,7 +47,8 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
     public IParameterFactory ParameterFactory { get; }
     public ILootEditorFeatures LootEditorFeatures { get; }
     public IDatabaseProvider DatabaseProvider { get; }
-    private readonly LootSolutionItem solutionItem;
+    private readonly PerEntityLootSolutionItem? perEntitySolutionItem;
+    private readonly PerDatabaseTableLootSolutionItem? perDbSolutionItem;
     private readonly IHistoryManager historyManager;
     private readonly ILootLoader lootLoader;
     private readonly IConditionEditService conditionEditService;
@@ -57,7 +62,9 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
     private readonly IWoWHeadLootImporter woWHeadLootImporter;
     private readonly IFileSystem fileSystem;
     private readonly IMySqlExecutor mySqlExecutor;
+    private readonly ICurrentCoreVersion currentCoreVersion;
 
+    public LootEditingMode LootEditingMode => currentCoreVersion.Current.LootEditingMode;
     public ICommand Undo { get; }
     public ICommand Redo { get; }
     public IHistoryManager History => historyManager;
@@ -88,8 +95,8 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
         focusedRowIndex.RowIndex >= 0 && focusedRowIndex.RowIndex < Loots[focusedRowIndex.GroupIndex].Rows.Count ?
             Loots[focusedRowIndex.GroupIndex].LootItems[focusedRowIndex.RowIndex] : null;
 
-    public LootSolutionItem SolutionItem => solutionItem;
-
+    public ObservableCollection<LootEntry> PerDatabaseSolutionItems { get; } = new();
+    
     public AsyncAutoCommand<LootItemViewModel> EditConditionsCommand { get; }
     
     public DelegateCommand<LootGroup> CollapseExpandCommand { get; }
@@ -118,8 +125,9 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
     
     private Dictionary<(LootSourceType, LootEntry), string> lootTemplateNames = new();
     
-    internal LootEditorViewModel(LootSolutionItem solutionItem,
-        IHistoryManager historyManager,
+    public LootSourceType LootSourceType { get; }
+    
+    internal LootEditorViewModel(IHistoryManager historyManager,
         ILootLoader lootLoader,
         IConditionEditService conditionEditService,
         ILootEditorPreferences preferences,
@@ -142,14 +150,23 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
         IDatabaseProvider databaseProvider,
         IWindowManager windowManager,
         IClipboardService clipboardService,
-        ILootCrossReferencesService crossReferencesService)
+        ICurrentCoreVersion currentCoreVersion,
+        ILootCrossReferencesService crossReferencesService,
+        PerDatabaseTableLootSolutionItem? perDbSolutionItem = null,
+        PerEntityLootSolutionItem? perEntitySolutionItem = null)
     {
+        if (perDbSolutionItem == null && perEntitySolutionItem == null ||
+            perDbSolutionItem != null && perEntitySolutionItem != null)
+            throw new ArgumentException("Either perDbSolutionItem or solutionItem must be set");
+        
         DbcStore = dbcStore;
         ItemStore = itemStore;
         ParameterFactory = parameterFactory;
         LootEditorFeatures = lootEditorFeatures;
         DatabaseProvider = databaseProvider;
-        this.solutionItem = solutionItem;
+        LootSourceType = perDbSolutionItem?.Type ?? perEntitySolutionItem!.Type;
+        this.perEntitySolutionItem = perEntitySolutionItem;
+        this.perDbSolutionItem = perDbSolutionItem;
         this.historyManager = historyManager;
         historyManager.AddHandler(HistoryHandler);
         this.lootLoader = lootLoader;
@@ -164,10 +181,51 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
         this.woWHeadLootImporter = woWHeadLootImporter;
         this.fileSystem = fileSystem;
         this.mySqlExecutor = mySqlExecutor;
+        this.currentCoreVersion = currentCoreVersion;
 
+        Debug.Assert(perEntitySolutionItem != null && LootEditingMode == LootEditingMode.PerLogicalEntity ||
+                     perEntitySolutionItem == null && LootEditingMode == LootEditingMode.PerDatabaseTable);
+        
         Undo = historyManager.UndoCommand();
         Redo = historyManager.RedoCommand();
 
+        PerDatabaseSolutionItems.CollectionChanged += (sender, e) =>
+        {
+            Loots.Each(x => x.RaisePropertyChangedPublic(nameof(x.CanBeUnloaded)));
+            if (this.historyManager.IsUndoing)
+                return;
+            
+            var isSaved = History.IsSaved;
+            if (e.Action == NotifyCollectionChangedAction.Add)
+            {
+                var added = e.NewItems!.Cast<LootEntry>().ToList();
+                HistoryHandler.PushAction(new AnonymousHistoryAction("Add loot to the editor", () =>
+                {
+                    foreach (var x in added)
+                        PerDatabaseSolutionItems.Remove(x);
+                }, () =>
+                {
+                    PerDatabaseSolutionItems.AddRange(added);
+                }));
+            }
+            else if (e.Action == NotifyCollectionChangedAction.Remove)
+            {
+                var removed = e.OldItems!.Cast<LootEntry>().ToList();
+                HistoryHandler.PushAction(new AnonymousHistoryAction("Remove loot from the editor", () =>
+                {
+                    PerDatabaseSolutionItems.AddRange(removed);
+                }, () =>
+                {
+                    foreach (var x in removed)
+                        PerDatabaseSolutionItems.Remove(x);
+                }));
+            }
+            else
+                throw new Exception("Not implemented, because " + e.Action + " wasn't expected"); 
+            if (isSaved)
+                historyManager.MarkAsSaved();
+        };
+        
         Save = new AsyncAutoCommand(async () =>
         {
             await taskRunner.ScheduleTask($"Export {Title} to database",
@@ -225,7 +283,7 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
         LootColumns.Add(new TableTableColumnHeader("Min count or ref"){Width = 100});
         LootColumns.Add(new TableTableColumnHeader("Max count"){Width = 100});
         LootColumns.Add(new TableTableColumnHeader(lootEditorFeatures.HasConditionId ? "Condition id" : "Conditions"){Width = 120});
-        if (LootEditorFeatures.HasCommentField(solutionItem.Type))
+        if (LootEditorFeatures.HasCommentField(LootSourceType))
             LootColumns.Add(new TableTableColumnHeader("Comment"){Width = 300});
         if (LootEditorFeatures.HasPatchField)
         {
@@ -363,15 +421,14 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
 
         AddNewLootCommand = new AsyncAutoCommand(async () =>
         {
-            var picker = await lootPickerService.PickLoot(solutionItem.Type);
-            if (!picker.HasValue)
-                return;
+            var lootIds = await lootPickerService.PickLoots(LootSourceType);
 
-            using var _ = HistoryHandler.WithinBulk("Add loot");
-            await LoadLoot(solutionItem.Type, new LootEntry(picker.Value));
-            await LoadRecursively();
-        }, () => solutionItem.Type.CanUpdateSourceLootEntry() &&
-                 Loots.Count(x => x.LootSourceType == solutionItem.Type) < lootEditorFeatures.GetMaxLootEntryForType(solutionItem.Type, solutionItem.Difficulty));
+            foreach (var lootId in lootIds)
+               await AddLootId(new LootEntry(lootId));
+        }, () => 
+            LootEditingMode == LootEditingMode.PerDatabaseTable ||
+            perEntitySolutionItem!.Type.CanUpdateSourceLootEntry() &&
+                 Loots.Count(x => x.LootSourceType == perEntitySolutionItem.Type) < lootEditorFeatures.GetMaxLootEntryForType(perEntitySolutionItem.Type, perEntitySolutionItem.Difficulty));
         
         DeleteSelectedLootItemsCommand = new AsyncAutoCommand(async () =>
         {
@@ -400,6 +457,7 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
 
             using var _ = HistoryHandler.WithinBulk("Remove loot");
             Loots.Remove(group);
+            PerDatabaseSolutionItems.Remove(group.LootEntry);
             await LoadRecursively();
         });
         
@@ -445,7 +503,7 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
             {
                 if ((def.ButtonType is LootButtonType.ImportFromWowHead ||
                      def.ButtonType is LootButtonType.ImportQuestItemsFromWowHead) &&
-                    ((solutionItem.Type is not LootSourceType.Creature and not LootSourceType.GameObject) ||
+                    ((LootSourceType is not LootSourceType.Creature and not LootSourceType.GameObject) ||
                     !woWHeadLootImporter.IsAvailable))
                     continue;
 
@@ -457,10 +515,13 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
             }
         }));
         
-        Title = $"{solutionItemNameRegistry.GetName(solutionItem)} ({solutionItem.Entry})";
+        if (perEntitySolutionItem != null)
+            Title = $"{solutionItemNameRegistry.GetName(perEntitySolutionItem)} ({perEntitySolutionItem.Entry})";
+        else
+            Title = $"{LootSourceType} loot editor";
         IsInitialLoading = true;
     }
-
+    
     public Task BeginLoad()
     {
         return taskRunner.ScheduleTask("Loading loot", Load);
@@ -551,12 +612,12 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
     private async Task WoWHeadImport(LootGroup group, bool onlyQuestItems)
     {
         IList<AbstractLootEntry> loot;
-        if (solutionItem.Type == LootSourceType.Creature)
-            loot = await woWHeadLootImporter.GetCreatureLoot(solutionItem.Entry, onlyQuestItems);
-        else if (solutionItem.Type == LootSourceType.GameObject)
-            loot = await woWHeadLootImporter.GetGameObjectLoot(solutionItem.Entry, onlyQuestItems);
+        if (LootSourceType == LootSourceType.Creature)
+            loot = await woWHeadLootImporter.GetCreatureLoot(perEntitySolutionItem?.Entry ?? (uint)group.LootEntry, onlyQuestItems);
+        else if (LootSourceType == LootSourceType.GameObject)
+            loot = await woWHeadLootImporter.GetGameObjectLoot(perEntitySolutionItem?.Entry ?? throw new NotImplementedException(), onlyQuestItems);
         else
-            throw new Exception($"Loot type ({solutionItem.Type}) not supported");
+            throw new Exception($"Loot type ({LootSourceType}) not supported");
 
         using var _ = HistoryHandler.WithinBulk("Import from WoWHead");
         foreach (var item in loot)
@@ -704,14 +765,20 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
     public async Task Load()
     {
         ItemParameter = ParameterFactory.Factory("ItemParameter");
+        if (perEntitySolutionItem == null)
+        {
+            IsInitialLoading = false;
+            return;
+        }
+        
         using var pause = HistoryHandler.Pause();
         try
         {
-            var entries = await lootLoader.GetLootEntries(solutionItem.Type, solutionItem.Entry, solutionItem.Difficulty);
+            var entries = await lootLoader.GetLootEntries(perEntitySolutionItem.Type, perEntitySolutionItem.Entry, perEntitySolutionItem.Difficulty);
             foreach (var entry in entries)
             {
                 if ((uint)entry > 0)
-                    await LoadLoot(solutionItem.Type, entry);
+                    await LoadLoot(perEntitySolutionItem.Type, entry);
             }
 
             await LoadRecursively();
@@ -735,7 +802,7 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
 
     private HashSet<(LootSourceType, LootEntry)> lootToNeverLoadAgain = new();
     
-    public async Task LoadLoot(LootSourceType type, LootEntry entry)
+    private async Task LoadLoot(LootSourceType type, LootEntry entry)
     {
         if (HasLootEntry(type, entry))
             return;
@@ -746,7 +813,8 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
         var name = await lootLoader.GetLootTemplateName(type, entry);
 
         if (name != null &&
-            (type != solutionItem.Type || (uint)entry != solutionItem.Entry) && // meaning the loot is dynamically loaded
+            (type != LootSourceType || (perEntitySolutionItem != null && (uint)entry != perEntitySolutionItem.Entry) ||
+             perEntitySolutionItem == null && !PerDatabaseSolutionItems.Contains(entry)) && // meaning the loot is dynamically loaded
             name.DontLoadRecursively)
         {
             lootTemplateNames[(type, entry)] = name.Name;
@@ -759,6 +827,7 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
 
         var lootGroup = new LootGroup(this, type, entry, name);
         lootGroup.LootItems.AddRange(lootModels.Select(o => new LootItemViewModel(lootGroup, o)));
+        lootGroup.SetAsSaved();
 
         Loots.Add(lootGroup);
         
@@ -805,7 +874,7 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
 
         foreach (var root in roots)
         {
-            if (FindLoot(solutionItem.Type, root) is { } lootGroup)
+            if (FindLoot(LootSourceType, root) is { } lootGroup)
                 Dfs(lootGroup);
         }
 
@@ -839,7 +908,7 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
         
         foreach (var lootEntry in lootEntryRemoved ?? Enumerable.Empty<LootEntry>())
         {
-            var vm = FindLoot(solutionItem.Type, lootEntry);
+            var vm = FindLoot(LootSourceType, lootEntry);
             if (vm != null && vm.IsModified)
             {
                 modifiedRootLootGroupToBeUnloaded.Add(vm.LootEntry);
@@ -848,7 +917,9 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
 
         if (modifiedRefsToBeUnloaded.Count > 0 || modifiedRootLootGroupToBeUnloaded.Count > 0)
         {
-            var result = await userQuestionsService.AskToSave(solutionItem.Type,
+            var result = await userQuestionsService.AskToSave(
+                LootEditingMode,
+                LootSourceType,
                 modifiedRefsToBeUnloaded,
                 modifiedRootLootGroupToBeUnloaded);
 
@@ -986,9 +1057,10 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
     public LootGroup? FindLoot(LootSourceType type, LootEntry entry) => Loots.FirstOrDefault(x => x.LootSourceType == type && x.LootEntry == entry);
 
     private IReadOnlyList<LootEntry> Roots => 
-        Loots.Where(x => x.LootSourceType != LootSourceType.Reference || (uint)x.LootEntry == solutionItem.Entry)
-            .Select(x => x.LootEntry)
-            .ToList();
+        (LootEditingMode == LootEditingMode.PerDatabaseTable) ? PerDatabaseSolutionItems :
+            Loots.Where(x => x.LootSourceType != LootSourceType.Reference || (uint)x.LootEntry == perEntitySolutionItem!.Entry)
+                .Select(x => x.LootEntry)
+                .ToList();
     
     public async Task<IQuery> GenerateQuery()
     {
@@ -996,8 +1068,12 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
             throw new LootDuplicateKeysException("Some loot items are duplicated, which is illegal. The duplicate rows have been marked red and selected. Please fix it and save again.");
         
         var transaction = Queries.BeginTransaction(DataDatabaseType.World);
-        var updateQuery = queryGenerator.GenerateUpdateLootIds(solutionItem.Type, solutionItem.Entry, solutionItem.Difficulty, Roots);
-        transaction.Add(updateQuery);
+        if (LootEditingMode == LootEditingMode.PerLogicalEntity)
+        {
+            Debug.Assert(perEntitySolutionItem != null);
+            var updateQuery = queryGenerator.GenerateUpdateLootIds(LootSourceType, perEntitySolutionItem.Entry, perEntitySolutionItem.Difficulty, Roots);
+            transaction.Add(updateQuery);
+        }
         
         foreach (var group in Loots)
         {
@@ -1040,9 +1116,11 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
 
         return duplicates.Count == 0;
     }
-
-    ISolutionItem ISolutionItemDocument.SolutionItem => SolutionItem;
-
+    
+    public PerEntityLootSolutionItem? PerEntityLootSolutionItem => perEntitySolutionItem;
+    
+    public ISolutionItem SolutionItem => ((ISolutionItem?)perDbSolutionItem ?? perEntitySolutionItem)!;
+    
     public void SortElements()
     {
         using var bulk = HistoryHandler.WithinBulk("Sort loot");
@@ -1054,5 +1132,45 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
             group.LootItems.RemoveAll();
             group.LootItems.AddRange(copy);
         }
+    }
+
+    /// <summary>
+    /// Adds loot from a specific entity. Can be used when in "per database" mode ONLY.
+    /// </summary>
+    /// <param name="lootType"></param>
+    /// <param name="entityEntry"></param>
+    /// <param name="difficultyId"></param>
+    /// <exception cref="Exception"></exception>
+    public async Task AddLootFromEntity(LootSourceType lootType, uint entityEntry, uint difficultyId)
+    {
+        if (perEntitySolutionItem != null)
+            throw new Exception("Can't load from entity when in per entity mode.");
+        
+        if (lootType != LootSourceType)
+            throw new Exception("Cannot edit two different loot type at once. Please open a new loot editor.");
+        
+        var wasSavedBeforeLoading = historyManager.IsSaved;
+        var entries = await lootLoader.GetLootEntries(lootType, entityEntry, difficultyId);
+        var bulk = HistoryHandler.WithinBulk("Add loot");
+        foreach (var entry in entries)
+            await AddLootId(entry);
+        ReorderOptionGroups();
+        
+        bulk.Dispose();
+        if (wasSavedBeforeLoading)
+            historyManager.MarkAsSaved();
+    }
+
+    public async Task AddLootId(LootEntry lootEntry)
+    {
+        var wasSavedBeforeLoading = historyManager.IsSaved;
+        
+        if (perEntitySolutionItem == null && !PerDatabaseSolutionItems.Contains(lootEntry))
+            PerDatabaseSolutionItems.Add(lootEntry);
+        await LoadLoot(LootSourceType, lootEntry);
+        await LoadRecursively();
+        
+        if (perEntitySolutionItem == null && wasSavedBeforeLoading)
+            historyManager.MarkAsSaved();
     }
 }

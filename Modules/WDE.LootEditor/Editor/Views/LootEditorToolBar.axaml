@@ -9,7 +9,8 @@
              x:Class="WDE.LootEditor.Editor.Views.LootEditorToolBar">
   <ToolbarPanel>
     <ButtonImage Command="{CompiledBinding AddNewLootCommand}" 
-                 Text="Add new loot id" 
+                 Text="Add new raw loot id" 
+                 ToolTip.Tip="Loads a new loot id, not loot for a specific entity, but with given loot id"
                  Image="Icons/icon_add.png"/>
 
     <ToolbarSpacer />

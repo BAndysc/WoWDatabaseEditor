@@ -10,22 +10,22 @@ using WDE.LootEditor.Editor;
 using WDE.LootEditor.Editor.ViewModels;
 using WDE.Module.Attributes;
 
-namespace WDE.LootEditor.Solution;
+namespace WDE.LootEditor.Solution.PerEntity;
 
 [AutoRegister]
-public class LootSolutionItemProviders :
-    ISolutionNameProvider<LootSolutionItem>,
-    ISolutionItemIconProvider<LootSolutionItem>,
-    ISolutionItemEditorProvider<LootSolutionItem>,
-    ISolutionItemRemoteCommandProvider<LootSolutionItem>,
-    ISolutionItemSerializer<LootSolutionItem>,
-    ISolutionItemDeserializer<LootSolutionItem>
+public class PerEntityLootSolutionItemProviders :
+    ISolutionNameProvider<PerEntityLootSolutionItem>,
+    ISolutionItemIconProvider<PerEntityLootSolutionItem>,
+    ISolutionItemEditorProvider<PerEntityLootSolutionItem>,
+    ISolutionItemRemoteCommandProvider<PerEntityLootSolutionItem>,
+    ISolutionItemSerializer<PerEntityLootSolutionItem>,
+    ISolutionItemDeserializer<PerEntityLootSolutionItem>
 {
     private readonly IContainerProvider containerProvider;
     private readonly ICachedDatabaseProvider databaseProvider;
     private readonly ILootEditorFeatures lootEditorFeatures;
 
-    public LootSolutionItemProviders(IContainerProvider containerProvider, 
+    public PerEntityLootSolutionItemProviders(IContainerProvider containerProvider, 
         ICachedDatabaseProvider databaseProvider,
         ILootEditorFeatures lootEditorFeatures)
     {
@@ -34,24 +34,24 @@ public class LootSolutionItemProviders :
         this.lootEditorFeatures = lootEditorFeatures;
     }
     
-    public ImageUri GetIcon(LootSolutionItem icon)
+    public ImageUri GetIcon(PerEntityLootSolutionItem icon)
     {
         return new ImageUri("Icons/document_loot_big.png");
     }
 
-    public IDocument GetEditor(LootSolutionItem item)
+    public IDocument GetEditor(PerEntityLootSolutionItem item)
     {
-        var doc = containerProvider.Resolve<LootEditorViewModel>((typeof(LootSolutionItem), item));
+        var doc = containerProvider.Resolve<LootEditorViewModel>((typeof(PerEntityLootSolutionItem), item), (typeof(LootSourceType), item.Type));
         doc.BeginLoad().ListenErrors();
         return doc;
     }
 
-    public IRemoteCommand[] GenerateCommand(LootSolutionItem item)
+    public IRemoteCommand[] GenerateCommand(PerEntityLootSolutionItem item)
     {
         return new IRemoteCommand[] { new AnonymousRemoteCommand($"reload {lootEditorFeatures.GetTableNameFor(item.Type)}") };
     }
 
-    public string GetName(LootSolutionItem item)
+    public string GetName(PerEntityLootSolutionItem item)
     {
         if (item.Type == LootSourceType.Creature)
         {
@@ -71,7 +71,7 @@ public class LootSolutionItemProviders :
             return item.Type.ToString() + " " + item.Entry + " loot";
     }
 
-    public ISmartScriptProjectItem Serialize(LootSolutionItem item, bool forMostRecentlyUsed)
+    public ISmartScriptProjectItem Serialize(PerEntityLootSolutionItem item, bool forMostRecentlyUsed)
     {
         return new AbstractSmartScriptProjectItem()
         {
@@ -92,7 +92,7 @@ public class LootSolutionItemProviders :
 
         uint.TryParse(projectItem.Comment, out var difficulty);
 
-        solutionItem = new LootSolutionItem((LootSourceType)projectItem.Value2.Value, (uint)projectItem.Value, difficulty);
+        solutionItem = new PerEntityLootSolutionItem((LootSourceType)projectItem.Value2.Value, (uint)projectItem.Value, difficulty);
         return true;
     }
 }

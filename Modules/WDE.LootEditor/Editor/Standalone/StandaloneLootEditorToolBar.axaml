@@ -37,7 +37,12 @@
     <TextBox Classes="noErrors" IsEnabled="{CompiledBinding CanChangeEntry}" Text="{CompiledBinding SolutionEntry}" />
     <ButtonImage Image="Icons/icon_picker_color.png" ToolTip.Tip="Pick entry" IsEnabled="{CompiledBinding CanChangeEntry}" Command="{CompiledBinding PickEntryCommand}" />
     
-    <ButtonImage Image="Icons/icon_restore.png" ToolTip.Tip="Load" Command="{CompiledBinding LoadLootCommand}" />
+    <ButtonImage IsVisible="{CompiledBinding IsPerEntityLootEditingMode}" 
+                 Image="Icons/icon_restore.png" ToolTip.Tip="Load" Command="{CompiledBinding LoadLootCommand}" />
+    
+    <ButtonImage IsVisible="{CompiledBinding IsPerDatabaseTableLootEditingMode}" 
+                 Image="Icons/icon_down.png" Text="{CompiledBinding LootType, StringFormat=Load {0} loot}" ToolTip.Tip="Load loot id from the selected entity" 
+                 Command="{CompiledBinding LoadLootCommand}" />
 
     <ContentPresenter DataContext="{CompiledBinding ViewModel}" 
                       Content="{CompiledBinding .}"

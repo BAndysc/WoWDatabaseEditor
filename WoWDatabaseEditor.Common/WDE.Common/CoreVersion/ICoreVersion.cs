@@ -23,6 +23,7 @@ namespace WDE.Common.CoreVersion
         EventScriptType SupportedEventScripts => 0;
         PhasingType PhasingType { get; }
         GameVersion Version { get; }
+        LootEditingMode LootEditingMode => LootEditingMode.PerLogicalEntity;
         // todo: this can be moved to settings as a configurable option
         IEnumerable<(DatabaseTable id, bool enabled)> TopBarQuickTableEditors => Array.Empty<(DatabaseTable, bool)>();
     }
@@ -49,6 +50,21 @@ namespace WDE.Common.CoreVersion
         PhaseMasks,
         PhaseIds,
         Both
+    }
+
+    public enum LootEditingMode
+    {
+        /// <summary>
+        /// in the loot editor, you edit a specific LootId from *_loot_template. I.e. creature X can have loot id Y,
+        /// but if you want to edit loot Y, you need to put this loot id
+        /// </summary>
+        PerDatabaseTable,
+        
+        /// <summary>
+        /// in the loot editor, you edit loot for a specific entity, i.e. for a specific creature.
+        /// I.e. you open the loot editor for a creature X and it will automatically load appropriate loot id 
+        /// </summary>
+        PerLogicalEntity
     }
     
     public interface IGameVersionFeatures

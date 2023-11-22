@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Prism.Ioc;
@@ -44,5 +46,18 @@ public class LootPickerService : ILootPickerService
             return null;
 
         return vm.FocusedGroup?.LootEntry ?? vm.Items.FirstOrDefault()?.LootEntry;
+    }
+
+    public async Task<IReadOnlyList<uint>> PickLoots(LootSourceType lootType)
+    {
+        if (lootType == LootSourceType.Creature)
+        {
+            var creature = await creatureEntryOrGuidProviderService.GetEntriesFromService();
+            return creature.Select(x => (uint)x).ToList();
+        }
+        var lootId = await PickLoot(lootType);
+        if (lootId.HasValue)
+            return new[]{lootId.Value};
+        return Array.Empty<uint>();
     }
 }

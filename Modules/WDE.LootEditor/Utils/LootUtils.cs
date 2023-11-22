@@ -1,6 +1,7 @@
 using System;
 using WDE.Common.Database;
 using WDE.LootEditor.Solution;
+using WDE.LootEditor.Solution.PerEntity;
 
 namespace WDE.LootEditor.Utils;
 
@@ -84,7 +85,7 @@ public static class LootUtils
         }
     }
     
-    public static bool SolutionEntryIsLootEntry(this LootSolutionItem solutionItem)
+    public static bool SolutionEntryIsLootEntry(this PerEntityLootSolutionItem solutionItem)
     {
         return solutionItem.Type.SolutionEntryIsLootEntry();
     }

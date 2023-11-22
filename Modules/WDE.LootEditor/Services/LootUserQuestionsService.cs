@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using WDE.Common.CoreVersion;
 using WDE.Common.Database;
 using WDE.Common.Services.MessageBox;
 using WDE.Module.Attributes;
@@ -20,6 +21,7 @@ internal class LootUserQuestionsService : ILootUserQuestionsService
     }
     
     public async Task<SaveDialogResult> AskToSave(
+        LootEditingMode lootEditingMode,
         LootSourceType sourceType,
         ICollection<LootEntry> referencesToBeUnloaded,
         ICollection<LootEntry> rootsToBeRemoved)
@@ -42,11 +44,14 @@ internal class LootUserQuestionsService : ILootUserQuestionsService
         {
             foreach (var lootEntry in rootsToBeRemoved)
                 messsage.AppendLine($" > loot {sourceType} {lootEntry}");
-            messsage.AppendLine($"to be removed from the {sourceType} loot.");
+            if (lootEditingMode == LootEditingMode.PerLogicalEntity)
+                messsage.AppendLine($"to be removed from the {sourceType} loot.");
+            else
+                messsage.AppendLine($"to be unloaded.");
         }
         
         messsage.AppendLine();
-        messsage.Append("However, these loot refs are modified. Do you want to save all changes?");
+        messsage.Append("However, these loots are modified. Do you want to save all changes?");
             
         return await messageBoxService.ShowDialog<SaveDialogResult>(new MessageBoxFactory<SaveDialogResult>()
             .SetTitle("Save changes?")
