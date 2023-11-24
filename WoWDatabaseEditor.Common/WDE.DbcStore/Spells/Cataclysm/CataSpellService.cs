@@ -25,7 +25,7 @@ namespace WDE.DbcStore.Spells.Cataclysm
             public uint Id { get; init; }
             public SpellEffectType EffectType { get; init; }
             public float EffectAmplitude { get; init; }
-            public uint AuraType { get; init; }
+            public SpellAuraType AuraType { get; init; }
             public uint AuraPeriod { get; init; }
             public uint EffectBasePoints { get; init; }
             public float EffectBonusCoefficient { get; init; }
@@ -176,7 +176,7 @@ namespace WDE.DbcStore.Spells.Cataclysm
                     Id = row.GetUInt(i++),
                     EffectType = (SpellEffectType)row.GetUInt(i++),
                     EffectAmplitude = row.GetFloat(i++),
-                    AuraType = row.GetUInt(i++),
+                    AuraType = (SpellAuraType)row.GetUInt(i++),
                     AuraPeriod = row.GetUInt(i++),
                     EffectBasePoints = row.GetUInt(i++),
                     EffectBonusCoefficient = row.GetFloat(i++),
@@ -324,6 +324,8 @@ namespace WDE.DbcStore.Spells.Cataclysm
 
         public SpellAuraType GetSpellAuraType(uint spellId, int effectIndex)
         {
+            if (TryGetEffect(spellId, effectIndex, out var effect))
+                return effect.AuraType;
             return SpellAuraType.None;
         }
 
