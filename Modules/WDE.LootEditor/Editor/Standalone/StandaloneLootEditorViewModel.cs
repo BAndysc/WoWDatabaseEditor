@@ -97,7 +97,7 @@ public partial class StandaloneLootEditorViewModel : ObservableBase, IDialog, IW
         }
         else
         {
-            ViewModel = containerProvider.Resolve<LootEditorViewModel>((typeof(PerDatabaseTableLootSolutionItem), new PerDatabaseTableLootSolutionItem(lootType)));
+            ViewModel = containerProvider.Resolve<LootEditorViewModel>((typeof(PerDatabaseTableLootSolutionItem), new PerDatabaseTableLootSolutionItem(lootType)), ((typeof(PerEntityLootSolutionItem), null)));
             await ViewModel.BeginLoad();
         }
     }
@@ -232,14 +232,14 @@ public partial class StandaloneLootEditorViewModel : ObservableBase, IDialog, IW
                 var (actualEntryToLoad, difficultyId) = await GetActualEntryAndDifficulty();
                 var solutionItem = new PerEntityLootSolutionItem(lootType, actualEntryToLoad, difficultyId);
                 ViewModel?.Dispose();
-                ViewModel = containerProvider.Resolve<LootEditorViewModel>((typeof(PerEntityLootSolutionItem), solutionItem));
+                ViewModel = containerProvider.Resolve<LootEditorViewModel>((typeof(PerEntityLootSolutionItem), solutionItem), (typeof(PerDatabaseTableLootSolutionItem), null));
                 await ViewModel.BeginLoad();
             });
         }
         else
         {
             Title = $"{lootType} loot editor";
-            viewModel = containerProvider.Resolve<LootEditorViewModel>((typeof(PerDatabaseTableLootSolutionItem), solutionItem ?? new PerDatabaseTableLootSolutionItem(lootType)));
+            viewModel = containerProvider.Resolve<LootEditorViewModel>((typeof(PerDatabaseTableLootSolutionItem), solutionItem ?? new PerDatabaseTableLootSolutionItem(lootType)), (typeof(PerEntityLootSolutionItem), null));
             viewModel.BeginLoad().ListenErrors();
             LoadLootCommand = new AsyncAutoCommand(async () =>
             {

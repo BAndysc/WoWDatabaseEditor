@@ -8,6 +8,7 @@ using WDE.Common.Types;
 using WDE.Common.Utils;
 using WDE.LootEditor.Editor;
 using WDE.LootEditor.Editor.ViewModels;
+using WDE.LootEditor.Solution.PerDatabaseTable;
 using WDE.Module.Attributes;
 
 namespace WDE.LootEditor.Solution.PerEntity;
@@ -41,7 +42,7 @@ public class PerEntityLootSolutionItemProviders :
 
     public IDocument GetEditor(PerEntityLootSolutionItem item)
     {
-        var doc = containerProvider.Resolve<LootEditorViewModel>((typeof(PerEntityLootSolutionItem), item), (typeof(LootSourceType), item.Type));
+        var doc = containerProvider.Resolve<LootEditorViewModel>((typeof(PerEntityLootSolutionItem), item), (typeof(PerDatabaseTableLootSolutionItem), null));
         doc.BeginLoad().ListenErrors();
         return doc;
     }

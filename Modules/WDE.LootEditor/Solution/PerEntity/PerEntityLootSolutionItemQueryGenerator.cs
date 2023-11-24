@@ -3,6 +3,7 @@ using Prism.Ioc;
 using WDE.Common.Database;
 using WDE.Common.Solution;
 using WDE.LootEditor.Editor.ViewModels;
+using WDE.LootEditor.Solution.PerDatabaseTable;
 using WDE.Module.Attributes;
 using WDE.SqlQueryGenerator;
 
@@ -20,7 +21,7 @@ public class PerEntityLootSolutionItemQueryGenerator : ISolutionItemSqlProvider<
     
     public async Task<IQuery> GenerateSql(PerEntityLootSolutionItem item)
     {
-        using var viewModel = containerProvider.Resolve<LootEditorViewModel>((typeof(PerEntityLootSolutionItem), item), (typeof(LootSourceType), item.Type));
+        using var viewModel = containerProvider.Resolve<LootEditorViewModel>((typeof(PerEntityLootSolutionItem), item), (typeof(PerDatabaseTableLootSolutionItem), null));
         await viewModel.Load();
         return await viewModel.GenerateQuery();
     }
