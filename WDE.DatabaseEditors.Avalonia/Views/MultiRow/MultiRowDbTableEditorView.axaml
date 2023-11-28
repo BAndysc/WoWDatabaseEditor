@@ -251,7 +251,7 @@
                         </DataTemplate>
                     </fastTableView:VeryFastTableView.GroupHeaderTemplate>
                     <fastTableView:VeryFastTableView.ContextMenu>
-                        <ContextMenu>
+                        <FixedContextMenu>
                             <MenuItem Header="Revert value" Command="{CompiledBinding RevertSelectedCommand}" />
                             <MenuItem Header="Set to null" Command="{CompiledBinding SetNullSelectedCommand}" />
                             <MenuItem Header="-"></MenuItem>
@@ -261,7 +261,7 @@
                             <MenuItem Header="-"></MenuItem>
                             <MenuItem Header="Copy row" Command="{CompiledBinding CopySelectedRowsCommand}" />
                             <MenuItem Header="Paste row"  Command="{CompiledBinding PasteRowsCommand}"/>
-                        </ContextMenu>
+                        </FixedContextMenu>
                     </fastTableView:VeryFastTableView.ContextMenu>
                 </fastTableView:VeryFastTableView>
             </ScrollViewer>

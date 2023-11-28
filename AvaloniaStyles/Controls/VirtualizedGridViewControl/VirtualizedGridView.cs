@@ -214,11 +214,22 @@ public class VirtualizedGridView : TemplatedControl
             RoutedEvent = ColumnWidthChangedEvent,
             Source = this
         });
+        UpdateChildWidth(Bounds.Width);
+    }
+
+    protected override Size ArrangeOverride(Size finalSize)
+    {
+        UpdateChildWidth(finalSize.Width);
+        return base.ArrangeOverride(finalSize);
+    }
+
+    private void UpdateChildWidth(double controlWidth)
+    {
         int width = 20; // 20 extra width for the last column
         foreach (var column in GetColumnsWidth())
             width += column + GridView.SplitterWidth;
         if (children != null)
-            children.Width = width;
+            children.Width = Math.Max(width, controlWidth - 2);
     }
 
     protected bool UpdateSelectionFromEventSource(

@@ -70,15 +70,18 @@ namespace WoWDatabaseEditorCore.ViewModels
             IWindowManager windowManager,
             ITablesToolService tablesToolService,
             Lazy<IGameViewService> gameViewService,
+            Lazy<ISqlEditorService> sqlEditorService,
             QuickGoToViewModel quickGoToViewModel,
             ProfilesViewModel profilesViewModel,
             IGlobalServiceRoot globalServiceRoot,
             TopBarQuickAccessViewModel topBarQuickAccessViewModel,
+            SessionRestoreService sessionRestoreService,
             Func<IFindAnywhereDialogViewModel> findAnywhereCreator)
         {
             DocumentManager = documentManager;
             StatusBar = statusBar;
             TopBarQuickAccess = topBarQuickAccessViewModel;
+            SessionRestoreService = sessionRestoreService;
             this.messageBoxService = messageBoxService;
             this.aboutViewModelCreator = aboutViewModelCreator;
             this.quickStartCreator = quickStartCreator;
@@ -137,6 +140,11 @@ namespace WoWDatabaseEditorCore.ViewModels
             Open3DCommand = new DelegateCommand(() =>
             {
                 gameViewService.Value.Open();
+            });
+
+            OpenSqlDocumentCommand = new DelegateCommand(() =>
+            {
+                sqlEditorService.Value.NewDocument();
             });
             
             DocumentManager.ToObservable(dm => dm.ActiveDocument)
@@ -211,6 +219,7 @@ namespace WoWDatabaseEditorCore.ViewModels
         public QuickGoToViewModel QuickGoToViewModel { get; }
         public ProfilesViewModel ProfilesViewModel { get; }
         public TopBarQuickAccessViewModel TopBarQuickAccess { get; }
+        public SessionRestoreService SessionRestoreService { get; }
 
         public List<IMainMenuItem> MenuItemProviders { get; }
 
@@ -234,6 +243,8 @@ namespace WoWDatabaseEditorCore.ViewModels
         public ICommand FindAnywhereCommand { get; }
         
         public ICommand Open3DCommand { get; }
+        
+        public ICommand OpenSqlDocumentCommand { get; }
         
         public bool ShowTablesList
         {

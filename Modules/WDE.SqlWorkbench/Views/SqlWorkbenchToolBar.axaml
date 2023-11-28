@@ -1,0 +1,55 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:WDE.SqlWorkbench.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:SqlWorkbenchViewModel"
+             x:Class="WDE.SqlWorkbench.Views.SqlWorkbenchToolBar">
+  <ToolbarPanel>
+    
+    <ButtonImage ToolTip.Tip="Open" Image="Icons/icon_open.png" />
+    <ButtonImage ToolTip.Tip="Save" Image="Icons/icon_save.png" />
+    
+    <Border Width="20" />
+    
+    <ButtonImage Command="{CompiledBinding ExecuteAllCommand}" ToolTip.Tip="Execute all queries" Image="Icons/icon_execute.png" />
+    <ButtonImage Command="{CompiledBinding ExecuteSelectedCommand}" ToolTip.Tip="Execute current query" Image="Icons/icon_execute_single.png" />
+    <ButtonImage Command="{CompiledBinding StopQueryExecutionCommand}" ToolTip.Tip="Stop execution" Image="Icons/icon_stop.png" />
+    
+    <Border Width="20" />
+    
+    <ToggleButton ToolTip.Tip="Continue On Error" IsChecked="{CompiledBinding ContinueOnError}">
+      <WdeImage ImageUri="Icons/icon_noise.png" />
+    </ToggleButton>
+    
+    <Border Width="20" />
+    
+    <ButtonImage ToolTip.Tip="Commit transaction" Image="Icons/icon_accept_transaction.png" Command="{CompiledBinding CommitCommand}" IsEnabled="{CompiledBinding !IsAutoCommit}" />
+    <ButtonImage ToolTip.Tip="Reject transaction" Image="Icons/icon_reject_transaction.png" Command="{CompiledBinding RollbackCommand}" IsEnabled="{CompiledBinding !IsAutoCommit}" />
+    <ToggleButton ToolTip.Tip="Auto commit after each query" IsChecked="{CompiledBinding IsAutoCommit}">
+      <WdeImage ImageUri="Icons/icon_auto_commit.png" />
+    </ToggleButton>
+    
+    <Border Width="20" />
+
+    <ComboBox Items="{CompiledBinding Limits}" SelectedItem="{CompiledBinding Limit}">
+      <ComboBox.ItemTemplate>
+        <DataTemplate>
+          <TextBlock Text="{CompiledBinding ., StringFormat=Limit to {0} rows}" />
+        </DataTemplate>
+      </ComboBox.ItemTemplate>
+    </ComboBox>
+
+    <Border Width="20" />
+    
+    <ButtonImage Command="{CompiledBinding BeautifyCommand}" ToolTip.Tip="Beautify the query" Image="Icons/icon_cleanup.png" />
+    <ToggleButton ToolTip.Tip="Toggle displaying non printable characters (spaces, tabs, new lines)" IsChecked="{CompiledBinding ShowNonPrintableChars}">
+      <WdeImage ImageUri="Icons/icon_paragraph.png" />
+    </ToggleButton>
+    <ToggleButton ToolTip.Tip="Toggle word wrap" IsChecked="{CompiledBinding WordWrap}">
+      <WdeImage ImageUri="Icons/icon_word_wrap.png" />
+    </ToggleButton>
+    
+  </ToolbarPanel>
+</UserControl>

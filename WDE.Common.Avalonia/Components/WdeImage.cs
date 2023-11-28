@@ -40,6 +40,8 @@ namespace WDE.Common.Avalonia.Components
             {
                 if (value != null)
                     Image = new ImageUri(value);
+                else
+                    Image = WDE.Common.Types.ImageUri.Empty;
                 var old = Image.Uri;
                 RaisePropertyChanged(ImageUriProperty, old, value);
             }

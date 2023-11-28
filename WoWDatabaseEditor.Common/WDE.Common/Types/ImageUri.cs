@@ -7,9 +7,9 @@ namespace WDE.Common.Types
     {
         public string? Uri { get; }
         
-        public ImageUri(string relativePath)
+        public ImageUri(string uri)
         {
-            Uri = relativePath;
+            Uri = uri;
         }
 
         public static ImageUri Empty { get; } = new ImageUri("Icons/empty.png");

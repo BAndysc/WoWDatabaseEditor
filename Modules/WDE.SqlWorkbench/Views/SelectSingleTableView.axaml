@@ -1,0 +1,46 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:WDE.SqlWorkbench.ViewModels"
+             xmlns:optimizedVeryFastTableView="clr-namespace:AvaloniaStyles.Controls.OptimizedVeryFastTableView;assembly=AvaloniaStyles"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:SelectSingleTableViewModel"
+             x:Class="WDE.SqlWorkbench.Views.SelectSingleTableView">
+  <DockPanel>
+    <Grid DockPanel.Dock="Bottom" ColumnDefinitions="*,Auto" Margin="0,5,0,0">
+      <TextBlock HorizontalAlignment="Center" Text="{CompiledBinding Count, StringFormat={}{0} Rows}" />
+      <StackPanel Orientation="Horizontal" Spacing="5" Grid.Column="1">
+        <Button Command="{CompiledBinding ApplyChangesCommand}">Apply</Button>
+        <Button Command="{CompiledBinding RevertChangesCommand}">Revert</Button>
+      </StackPanel>
+    </Grid>
+    
+    <ScrollViewer HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible" Offset="{CompiledBinding ScrollOffset, Mode=TwoWay}">
+      <optimizedVeryFastTableView:VirtualizedVeryFastTableView ItemsCount="{CompiledBinding  Count}"
+                                                               SelectedRowIndex="{CompiledBinding SelectedRowIndex, Mode=TwoWay}"
+                                                               SelectedCellIndex="{CompiledBinding SelectedCellIndex, Mode=TwoWay}"
+                                                               MultiSelection="{CompiledBinding Selection}"
+                                                               Controller="{CompiledBinding TableController}"
+                                                               InteractiveHeader="True"
+                                                               ColumnPressed="VirtualizedVeryFastTableView_OnColumnPressed"
+                                                               RequestRender="{CompiledBinding RequestRender}"
+                                                               ValueUpdateRequest="VirtualizedVeryFastTableView_OnValueUpdateRequest"
+                                                               Columns="{CompiledBinding Columns}">
+        <optimizedVeryFastTableView:VirtualizedVeryFastTableView.ContextMenu>
+          <ContextMenu>
+            <MenuItem Header="Set field to NULL" Command="{CompiledBinding SetSelectedToNullCommand}" />
+            <Separator />
+            <MenuItem Header="Add row" Command="{CompiledBinding AddRowCommand}" />
+            <MenuItem Header="Duplicate row" Command="{CompiledBinding DuplicateRowCommand}" />
+            <Separator />
+            <MenuItem Header="Delete" Command="{CompiledBinding DeleteRowCommand}" />
+            <Separator />
+            <MenuItem Header="Copy as insert" Command="{CompiledBinding CopyInsertCommand}" />
+            <MenuItem Header="Refresh" Command="{CompiledBinding RefreshCommand}" />
+          </ContextMenu>
+        </optimizedVeryFastTableView:VirtualizedVeryFastTableView.ContextMenu>
+      </optimizedVeryFastTableView:VirtualizedVeryFastTableView>
+    </ScrollViewer>
+  </DockPanel>
+</UserControl>

@@ -59,9 +59,9 @@
                                       IsFiltered2="{CompiledBinding SearchText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" 
                                       DoubleTapped="InputElement_OnDoubleTapped" KeyDown="SpawnsList_OnKeyDown">
                 <views:SpawnsFastTreeList.ContextMenu>
-                    <ContextMenu>
+                    <FixedContextMenu>
                         <MenuItem Header="Spawn" Command="{CompiledBinding AddSpawn}" CommandParameter="{CompiledBinding SelectedNode}" />
-                    </ContextMenu>
+                    </FixedContextMenu>
                 </views:SpawnsFastTreeList.ContextMenu>
             </views:SpawnsFastTreeList>
         </ScrollViewer>

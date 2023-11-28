@@ -362,7 +362,7 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
             }
         });
         
-        OpenLootConfigurationCommand = new DelegateCommand(configureService.ShowSettings<LootEditorConfiguration>);
+        OpenLootConfigurationCommand = new DelegateCommand(() => configureService.ShowSettings<LootEditorConfiguration>());
 
         ConvertGroupToButtonCommand = new DelegateCommand<LootGroup>(group =>
         {

@@ -14,7 +14,7 @@
         <converters:InverseBoolConverter x:Key="InverseBoolConverter" />
     </UserControl.Resources>
     <ScrollViewer>
-        <StackPanel>
+        <StackPanel Grid.IsSharedSizeScope="True">
             <SettingsHeader Text="Auto updates" />
             <StackPanel>
                 <SettingItem Header="Current version">

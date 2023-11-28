@@ -1,29 +1,24 @@
-using System;
-using Prism.Events;
-using Prism.Ioc;
-using WDE.Common.Events;
 using WDE.Common.Managers;
 using WDE.Common.Services;
-using WDE.DatabaseEditors.ViewModels;
 using WDE.Module.Attributes;
 using WDE.MVVM;
 using WDE.MVVM.Observable;
+using WoWDatabaseEditorCore.ViewModels;
 
-namespace WDE.DatabaseEditors.Services;
+namespace WoWDatabaseEditorCore.Services.TablesTool;
 
 [SingleInstance]
 [AutoRegister]
 public class TablesToolService : ObservableBase, ITablesToolService
 {
-    private readonly Lazy<IDocumentManager> documentManager;
-    private TablesListToolViewModel? tool;
+    private readonly IDocumentManager documentManager;
+    private TablesToolViewModel? tool;
     private bool visibility;
 
-    public TablesToolService(IContainerProvider containerProvider, 
-        IEventAggregator eventAggregator, Lazy<IDocumentManager> documentManager)
+    public TablesToolService(IDocumentManager documentManager)
     {
         this.documentManager = documentManager;
-        tool = documentManager.Value.GetTool<TablesListToolViewModel>();
+        tool = documentManager.GetTool<TablesToolViewModel>();
         tool.ToObservable(t => t.Visibility)
             .SubscribeAction(@is =>
             {
@@ -40,7 +35,7 @@ public class TablesToolService : ObservableBase, ITablesToolService
     public void Open()
     {
         if (!Visibility)
-            documentManager.Value.OpenTool<TablesListToolViewModel>();
+            documentManager.OpenTool<TablesToolViewModel>();
     }
 
     public void Close()

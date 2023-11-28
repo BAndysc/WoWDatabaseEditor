@@ -1493,8 +1493,10 @@ namespace WDE.MapRenderer.Managers
                 }
                 catch (Exception e)
                 {
-                    File.WriteAllBytes("/Users/bartek/Programowanie/temp/problematyczne modele/" + path, file.Result.AsArray().AsSpan(file.Result.Length).ToArray());
-                    File.WriteAllText("/Users/bartek/Programowanie/temp/problematyczne modele/" + path + ".txt", e.ToString());
+                    Console.WriteLine(e);
+                    //Directory.CreateDirectory("broken_models");
+                    //File.WriteAllBytes("broken_models/" + path, file.Result.AsArray().AsSpan(file.Result.Length).ToArray());
+                    //File.WriteAllText("broken_models/" + path + ".txt", e.ToString());
                 }
                 finally
                 {

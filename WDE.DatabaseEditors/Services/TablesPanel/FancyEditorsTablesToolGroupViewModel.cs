@@ -1,55 +1,52 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Threading.Tasks;
-using DynamicData;
 using Prism.Events;
 using PropertyChanged.SourceGenerator;
 using WDE.Common;
+using WDE.Common.Documents;
 using WDE.Common.Events;
-using WDE.Common.Managers;
 using WDE.Common.Types;
 using WDE.Common.Utils;
-using WDE.Common.Windows;
-using WDE.DatabaseEditors.Data;
 using WDE.DatabaseEditors.Data.Interfaces;
 using WDE.DatabaseEditors.Data.Structs;
-using WDE.DatabaseEditors.Services;
-using WDE.DatabaseEditors.Solution;
 using WDE.Module.Attributes;
 using WDE.MVVM;
 
-namespace WDE.DatabaseEditors.ViewModels;
+namespace WDE.DatabaseEditors.Services.TablesPanel;
 
 [AutoRegister]
 [SingleInstance]
-public partial class TablesListToolViewModel : ObservableBase, ITool
+public partial class FancyEditorsTablesToolGroupViewModel : ObservableBase, ITablesToolGroup
 {
     private readonly ITableOpenService tableOpenService;
     private readonly IEventAggregator eventAggregator;
-    private readonly Lazy<IDocumentManager> documentManager;
-    private bool visibility;
-    private bool isSelected;
     private List<TableItemViewModel> allTables = new();
     private string searchText = "";
     [Notify] private TableItemViewModel? selectedTable;
+    public ImageUri Icon => new ImageUri("Icons/icon_tables.png");
+    public string GroupName => "Editors";
+    public RgbColor? CustomColor => null;
+    public int Priority => 100;
+    
+    public void ToolOpened()
+    {
+    }
 
-    public string Title => "Tables";
-    public string UniqueId => "tables";
-    public ToolPreferedPosition PreferedPosition => ToolPreferedPosition.Left;
-    public bool OpenOnStart => true;
+    public void ToolClosed()
+    {
+    }
+
     public ObservableCollection<TableItemViewModel> FilteredTables { get; } = new();
 
-    public TablesListToolViewModel(ITableDefinitionProvider definitionProvider,
+    public FancyEditorsTablesToolGroupViewModel(ITableDefinitionProvider definitionProvider,
         ISolutionItemProvideService rawTableSolutionItemProviderService,
         ITableOpenService tableOpenService,
-        IEventAggregator eventAggregator,
-        Lazy<IDocumentManager> documentManager) 
+        IEventAggregator eventAggregator) 
     {
         this.tableOpenService = tableOpenService;
         this.eventAggregator = eventAggregator;
-        this.documentManager = documentManager;
         foreach (var defi in definitionProvider.Definitions)
         {
             allTables.Add(new TableItemViewModel(defi.TableName, defi));
@@ -134,18 +131,6 @@ public partial class TablesListToolViewModel : ObservableBase, ITool
     {
         get => searchText;
         set => SetProperty(ref searchText, value);
-    }
-
-    public bool Visibility
-    {
-        get => visibility;
-        set => SetProperty(ref visibility, value);
-    }
-
-    public bool IsSelected
-    {
-        get => isSelected;
-        set => SetProperty(ref isSelected, value);
     }
 }
 

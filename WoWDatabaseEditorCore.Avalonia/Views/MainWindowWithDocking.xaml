@@ -185,7 +185,11 @@
                         </ItemsPresenter.ItemsPanel>
                     </ItemsPresenter>
                     
-                    <Button ToolTip.Tip="Open game view" Classes="HideWin10" Command="{CompiledBinding Open3DCommand}" BorderThickness="1" Margin="20,0,0,0" Width="34" Height="34">
+                    <Button x:Name="OpenSQLDocument" ToolTip.Tip="New SQL document" Classes="HideWin10" Command="{CompiledBinding OpenSqlDocumentCommand}" BorderThickness="1" Margin="20,0,0,0" Width="34" Height="34">
+                        <Path Stretch="UniformToFill" Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="{Binding $parent[Button].Foreground}" StrokeThickness="1" Data="{StaticResource ToSqlIcon}" />
+                    </Button>
+                    
+                    <Button ToolTip.Tip="Open game view" Classes="HideWin10" Command="{CompiledBinding Open3DCommand}" BorderThickness="1" Margin="5,0,0,0" Width="34" Height="34">
                         <Path VerticalAlignment="Center" Width="16" Fill="{Binding $parent[Button].Foreground}" Data="{StaticResource Open3DIcon}" />
                     </Button>
                     

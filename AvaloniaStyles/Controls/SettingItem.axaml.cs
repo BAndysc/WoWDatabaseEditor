@@ -1,6 +1,8 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
+using Avalonia.Layout;
 
 namespace AvaloniaStyles.Controls;
 
@@ -21,5 +23,24 @@ public class SettingItem : ContentControl
     {
         get => header;
         set => SetAndRaise(HeaderProperty, ref header, value);
+    }
+}
+
+// Content presenter, but will stretch TextBox children and right align otherwise
+internal class SettingItemContentPresenter : ContentPresenter
+{
+    protected override Size ArrangeOverride(Size finalSize)
+    {
+        if (Child is TextBox || Child.HorizontalAlignment == HorizontalAlignment.Stretch)
+        {
+            if (HorizontalContentAlignment != HorizontalAlignment.Stretch)
+                HorizontalContentAlignment = HorizontalAlignment.Stretch;
+        }
+        else
+        {
+            if (HorizontalContentAlignment != HorizontalAlignment.Right)
+                HorizontalContentAlignment = HorizontalAlignment.Right;
+        }
+        return base.ArrangeOverride(finalSize);
     }
 }

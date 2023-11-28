@@ -139,29 +139,6 @@ namespace WDE.MapRenderer.Managers
             LightParamStore = new (gameFiles.WoWVersion, (dynamic)OpenDbc("LightParams"), LightIntParamStore, LightFloatParamStore, LightDataStore);
             LightStore = new ((dynamic)OpenDbc("Light"), LightParamStore);
             WorldMapAreaStore = new((dynamic)OpenDbc("WorldMapArea"), gameFiles.WoWVersion);
-
-            HashSet<uint> visited = new HashSet<uint>();
-            List<(uint, uint)> mapping = new();
-            foreach (var item in ItemStore)
-            {
-                if (item.InventoryIcon!.Value.FileDataId == 0)
-                    continue;
-                
-                mapping.Add((item.Id, item.InventoryIcon!.Value.FileDataId));
-                
-                if (!visited.Add(item.InventoryIcon!.Value.FileDataId))
-                    continue;
-
-                var bytes = gameFiles.ReadFileSync(item.InventoryIcon!.Value);
-                if (bytes == null)
-                    continue;
-
-                var blp = new BLP(bytes, 0, bytes.Length, 64);
-                blp.SaveToPng($"/Users/bartek/.local/share/WoWDatabaseEditor/common/item_icons/{item.InventoryIcon!.Value.FileDataId}.png", 0);
-            }
-            
-            mapping.Sort();
-            File.WriteAllText("/Users/bartek/.local/share/WoWDatabaseEditor/common/item_icons/icons.txt", string.Join("\n", mapping.Select(x => $"{x.Item1},{x.Item2}")));
         }
 
         public IEnumerable<(System.Type, object)> Stores()

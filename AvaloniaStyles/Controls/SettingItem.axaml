@@ -25,10 +25,7 @@
         <Setter Property="CornerRadius" Value="6,6,6,6" />
     </Style>
     
-    <Style Selector="controls|SettingItem > TextBox">
-        <Setter Property="MinWidth" Value="350" />
-    </Style>
-    <Style Selector="controls|SettingItem > ToggleSwitch">
+    <Style Selector="controls|SettingItem ToggleSwitch">
         <Setter Property="OnContent" Value="" />
         <Setter Property="OffContent" Value="" />
     </Style>
@@ -40,18 +37,17 @@
                 <Border CornerRadius="{TemplateBinding CornerRadius}" BorderThickness="1" BorderBrush="{TemplateBinding BorderBrush}" Background="{TemplateBinding Background}">
                     <Grid VerticalAlignment="Center" RowDefinitions="Auto,Auto" Margin="6">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" MinWidth="50" />
-                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" MinWidth="50" SharedSizeGroup="Left" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.Row="1" Grid.ColumnSpan="3" TextWrapping="WrapWithOverflow" 
+                        <TextBlock Grid.Row="1" Grid.ColumnSpan="2" TextWrapping="WrapWithOverflow" 
                                    Text="{TemplateBinding Help}"
                                    Margin="0,6,0,0" IsVisible="{TemplateBinding Help, Converter={x:Static ObjectConverters.IsNotNull}}"
                                    Opacity="0.5" />
-                        <ContentPresenter Grid.Column="2"
-                                          HorizontalContentAlignment="Right"
-                                          Content="{TemplateBinding Content}" />
+                        <SettingItemContentPresenter Grid.Column="1"
+                                                     Content="{TemplateBinding Content}" />
                         <TextBlock Text="{TemplateBinding Header}" 
+                                   Margin="0,0,50,0"
                                    VerticalAlignment="Center"
                                    TextWrapping="WrapWithOverflow" />
                     </Grid>
@@ -59,7 +55,10 @@
             </ControlTemplate>
         </Setter>
     </Style>
-    <Style Selector="ContentPresenter:nth-last-child(1) controls|SettingItem">
+    <Style Selector="StackPanel > ContentPresenter:nth-last-child(1) controls|SettingItem">
+        <Setter Property="Margin" Value="0" />
+    </Style>
+    <Style Selector="StackPanel > controls|SettingItem:nth-last-child(1)">
         <Setter Property="Margin" Value="0" />
     </Style>
 </Styles>

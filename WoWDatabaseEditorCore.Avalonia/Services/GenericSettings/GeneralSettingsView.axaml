@@ -7,7 +7,7 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="genericSettings:GeneralSettingsViewModel"
              x:Class="WoWDatabaseEditorCore.Avalonia.Services.GenericSettings.GeneralSettingsView">
-    <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled" Grid.IsSharedSizeScope="True">
         <ItemsPresenter Items="{CompiledBinding Groups}">
             <ItemsPresenter.ItemTemplate>
                 <DataTemplate DataType="genericSettings:GeneralSettingsGroupViewModel">

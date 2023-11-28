@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using WDE.Common.Services.MessageBox;
 using WDE.Common.Tasks;
 
 namespace WDE.Common.Utils
@@ -14,6 +15,27 @@ namespace WDE.Common.Utils
             }, TaskContinuationOptions.OnlyOnFaulted);
         }
         
+        public static Task ListenErrors(this Task t, IMessageBoxService messageBoxService)
+        {
+            async Task CoreAsync()
+            {
+                try
+                {
+                    await t;
+                }
+                catch (Exception e)
+                {
+                    await messageBoxService.ShowDialog(new MessageBoxFactory<bool>().SetTitle("Error")
+                        .SetMainInstruction("An error occured")
+                        .SetContent(e.Message)
+                        .WithOkButton(true)
+                        .Build());
+                    throw;
+                }
+            }
+            return CoreAsync().ListenErrors();
+        }
+
         public static async Task WrapSafe(this Task t, Action onBefore, Action onFinally)
         {
             onBefore();

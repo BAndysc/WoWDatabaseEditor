@@ -1,0 +1,167 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:WDE.SqlWorkbench.ViewModels"
+             xmlns:codeCompletion="clr-namespace:AvaloniaEdit.CodeCompletion;assembly=AvaloniaEdit"
+             xmlns:avaloniaEdit="https://github.com/avaloniaui/avaloniaedit"
+             xmlns:avalonia="clr-namespace:Markdown.Avalonia;assembly=Markdown.Avalonia"
+             xmlns:ctxt="clr-namespace:ColorTextBlock.Avalonia;assembly=ColorTextBlock.Avalonia"
+             xmlns:fastTableView="clr-namespace:AvaloniaStyles.Controls.FastTableView;assembly=AvaloniaStyles"
+             xmlns:optimizedVeryFastTableView="clr-namespace:AvaloniaStyles.Controls.OptimizedVeryFastTableView;assembly=AvaloniaStyles"
+             xmlns:avaloniaStyles="clr-namespace:AvaloniaStyles;assembly=AvaloniaStyles"
+             xmlns:views="clr-namespace:WDE.SqlWorkbench.Views"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:SqlWorkbenchViewModel"
+             Name="Root"
+             x:Class="WDE.SqlWorkbench.Views.SqlWorkbenchView">
+  <Grid RowDefinitions="*,5,0" Name="Grid">
+    <DockPanel>
+      <Border DockPanel.Dock="Bottom" Height="22">
+        <DockPanel LastChildFill="False" Margin="10,0">
+          <ButtonImage Image="Icons/icon_cog_mono.png" Command="{CompiledBinding OpenSettingsCommand}" BorderThickness="0" Background="Transparent" Width="22" Padding="0" Height="22" Margin="0,2,0,0" />
+          <TextBlock Opacity="0.5" Text="{CompiledBinding CursorStatus}" VerticalAlignment="Center" />
+ 
+          <TextBlock Opacity="0.5" DockPanel.Dock="Right" Text="{CompiledBinding ConnectedTo}"  
+                     Foreground="{CompiledBinding ConnectedToColor, Converter={x:Static RgbColorToBrushConverter.Instance}, TargetNullValue={x:Static avaloniaStyles:SystemTheme.ForegroundColor}}"
+                     VerticalAlignment="Center" />
+          <WdeImage DockPanel.Dock="Right" Image="{CompiledBinding ConnectedToIcon}" Margin="3,0,3,0" Width="16" Height="16" />
+          <TextBlock Opacity="0.5" DockPanel.Dock="Right" Text="Connected to:" IsVisible="{CompiledBinding IsSessionOpened}" VerticalAlignment="Center" />
+          <TextBlock Opacity="0.5" DockPanel.Dock="Right" Text="Disconnected from:" IsVisible="{CompiledBinding !IsSessionOpened}" VerticalAlignment="Center" />
+          
+          <Button DockPanel.Dock="Right" Width="22" Height="22" Padding="0" BorderThickness="0" Margin="0,2,0,0"
+                  Command="{CompiledBinding RestartLanguageServerCommand}"
+                  ToolTip.Tip="{CompiledBinding LanguageServerToolTipText}">
+            <Panel>
+              <WdeImage ImageUri="Icons/icon_flask_error_mono.png" IsVisible="{CompiledBinding !LanguageServerHealthy}" />
+              <WdeImage ImageUri="Icons/icon_flask_mono.png" IsVisible="{CompiledBinding LanguageServerHealthy}" />
+            </Panel>
+          </Button>
+        </DockPanel>
+      </Border>
+      
+      <avaloniaEdit:TextEditor Name="TextEditor" FontFamily="{DynamicResource MonoFont}"
+                               PointerHover="TextEditor_OnPointerHover"
+                               AvalonEditExtra.SyntaxExtension="sql" 
+                               IsModified="{CompiledBinding IsDocumentModified, Mode=TwoWay}"
+                               IsEnabled="{CompiledBinding IsEnabled}"
+                               WordWrap="{CompiledBinding WordWrap}"
+                               PointerHoverStopped="TextEditor_OnPointerHoverStopped"
+                               ShowLineNumbers="True">
+        <FlyoutBase.AttachedFlyout>
+          <Flyout>
+            <avalonia:MarkdownScrollViewer Name="MarkdownHoverViewer">
+              <avalonia:MarkdownScrollViewer.Styles>
+                <Style Selector="ctxt|CTextBlock">
+                  <Style.Setters>
+                    <Setter Property="FontSize" Value="10" />
+                    <Setter Property="Margin" Value="0,2" />
+                  </Style.Setters>
+                </Style>
+                <Style Selector="TextBlock">
+                  <Style.Setters>
+                    <Setter Property="FontSize" Value="10" />
+                  </Style.Setters>
+                </Style>
+
+                <Style Selector="ctxt|CTextBlock.Heading1">
+                  <Style.Setters>
+                    <Setter Property="FontSize" Value="12" />
+                    <Setter Property="FontWeight" Value="Bold" />
+                  </Style.Setters>
+                </Style>
+
+                <Style Selector="ctxt|CTextBlock.Heading2">
+                  <Style.Setters>
+                    <Setter Property="FontSize" Value="11" />
+                    <Setter Property="FontWeight" Value="Bold" />
+                  </Style.Setters>
+                </Style>
+
+                <Style Selector="ctxt|CTextBlock.Heading3">
+                  <Style.Setters>
+                    <Setter Property="FontSize" Value="10" />
+                    <Setter Property="FontWeight" Value="Bold" />
+                  </Style.Setters>
+                </Style>
+
+                <Style Selector="ctxt|CTextBlock.Heading4">
+                  <Style.Setters>
+                    <Setter Property="FontSize" Value="10" />
+                    <Setter Property="FontWeight" Value="Bold" />
+                  </Style.Setters>
+                </Style>
+                
+                <Style Selector="Border.Table">
+                  <Style.Setters>
+                    <Setter Property="Margin" Value="0,2"/>
+                  </Style.Setters>
+                </Style>
+                
+                <Style Selector="Grid.Table > Border">
+                  <Style.Setters>
+                    <Setter Property="Padding" Value="1"/>
+                  </Style.Setters>
+                </Style>
+              </avalonia:MarkdownScrollViewer.Styles>
+            </avalonia:MarkdownScrollViewer>
+          </Flyout>
+        </FlyoutBase.AttachedFlyout>
+        <avaloniaEdit:TextEditor.ContextMenu>
+          <FixedContextMenu>
+            <MenuItem Header="Cut" Command="{Binding #Root.CutCommand}" />
+            <MenuItem Header="Copy" Command="{Binding #Root.CopyCommand}" />
+            <MenuItem Header="Paste" Command="{Binding #Root.PasteCommand}" />
+            <Separator />
+            <MenuItem Header="Delete" Command="{Binding #Root.DeleteCommand}" />
+            <MenuItem Header="Select All" Command="{Binding #Root.SelectAllCommand}" />
+            <Separator />
+            <MenuItem Header="Undo" Command="{Binding #Root.UndoCommand}" />
+            <MenuItem Header="Redo" Command="{Binding #Root.RedoCommand}" />
+          </FixedContextMenu>
+        </avaloniaEdit:TextEditor.ContextMenu>
+      </avaloniaEdit:TextEditor>
+    </DockPanel>
+    
+    <GridSplitter Classes="horizontal" Grid.Row="1" />
+    
+    <TabControl Grid.Row="2" IsVisible="{CompiledBinding HasAnyResults}" Items="{CompiledBinding Results}" SelectedItem="{CompiledBinding SelectedResult}">
+      <TabControl.Styles>
+        <Style Selector="TabItem">
+          <Setter Property="ContextMenu">
+            <FixedContextMenu x:DataType="viewModels:SelectResultsViewModel">
+              <MenuItem Header="Close tab" Command="{CompiledBinding #Root.((viewModels:SqlWorkbenchViewModel)DataContext).CloseTabCommand}" CommandParameter="{CompiledBinding .}" />
+              <MenuItem Header="Close other tabs" Command="{CompiledBinding #Root.((viewModels:SqlWorkbenchViewModel)DataContext).CloseOtherTabsCommand}" CommandParameter="{CompiledBinding .}" />
+              <MenuItem Header="Close all tabs" Command="{CompiledBinding #Root.((viewModels:SqlWorkbenchViewModel)DataContext).CloseAllTabsCommand}" CommandParameter="{CompiledBinding .}" />
+              <MenuItem Header="Close tabs to the left" Command="{CompiledBinding #Root.((viewModels:SqlWorkbenchViewModel)DataContext).CloseLeftTabsCommand}" CommandParameter="{CompiledBinding .}" />
+              <MenuItem Header="Close tabs to the right" Command="{CompiledBinding #Root.((viewModels:SqlWorkbenchViewModel)DataContext).CloseRightTabsCommand}" CommandParameter="{CompiledBinding .}" />
+            </FixedContextMenu>
+          </Setter>
+        </Style>
+        <Style Selector="TabItem Button">
+          <Setter Property="Opacity" Value="0" />
+        </Style>
+        <Style Selector="TabItem:pointerover Button">
+          <Setter Property="Opacity" Value="1" />
+        </Style>
+      </TabControl.Styles>
+      <TabControl.ItemTemplate>
+        <DataTemplate x:DataType="viewModels:SelectResultsViewModel">
+          <DockPanel LastChildFill="False">
+            <WdeImage Image="{CompiledBinding Icon}" Width="16" Height="16" VerticalAlignment="Center" Margin="0,0,4,0" />
+            <TextBlock Text="{CompiledBinding Title}" />
+            <ButtonImage DockPanel.Dock="Right" Image="Icons/icon_delete_mono.png" Width="16" Height="16" Padding="0" Margin="0" BorderThickness="0" Command="{CompiledBinding #Root.((viewModels:SqlWorkbenchViewModel)DataContext).CloseTabCommand, Mode=OneTime}" CommandParameter="{CompiledBinding .}" />
+          </DockPanel>
+        </DataTemplate>
+      </TabControl.ItemTemplate>
+      <TabControl.DataTemplates>
+        <DataTemplate DataType="viewModels:SelectSingleTableViewModel" x:DataType="viewModels:SelectSingleTableViewModel">
+          <views:SelectSingleTableView />
+        </DataTemplate>
+        <DataTemplate DataType="viewModels:SelectResultsViewModel" x:DataType="viewModels:SelectResultsViewModel">
+          <views:SelectResultsView />
+        </DataTemplate>
+      </TabControl.DataTemplates>
+    </TabControl>
+  </Grid>
+</UserControl>

@@ -1,0 +1,26 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:WDE.SqlWorkbench.ViewModels"
+             xmlns:optimizedVeryFastTableView="clr-namespace:AvaloniaStyles.Controls.OptimizedVeryFastTableView;assembly=AvaloniaStyles"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:SelectResultsViewModel"
+             x:Class="WDE.SqlWorkbench.Views.SelectResultsView">
+  <DockPanel>
+    <TextBlock DockPanel.Dock="Bottom" HorizontalAlignment="Center" Text="{CompiledBinding Count, StringFormat={}{0} Rows}"></TextBlock>
+    
+    <ScrollViewer HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible" Offset="{CompiledBinding ScrollOffset, Mode=TwoWay}">
+      <optimizedVeryFastTableView:VirtualizedVeryFastTableView ItemsCount="{CompiledBinding  Count}"
+                                                               SelectedRowIndex="{CompiledBinding SelectedRowIndex, Mode=TwoWay}"
+                                                               SelectedCellIndex="{CompiledBinding SelectedCellIndex, Mode=TwoWay}"
+                                                               MultiSelection="{CompiledBinding Selection}"
+                                                               Controller="{CompiledBinding TableController}"
+                                                               InteractiveHeader="False"
+                                                               RequestRender="{CompiledBinding RequestRender}"
+                                                               ValueUpdateRequest="VirtualizedVeryFastTableView_OnValueUpdateRequest"
+                                                               Columns="{CompiledBinding Columns}">
+      </optimizedVeryFastTableView:VirtualizedVeryFastTableView>
+    </ScrollViewer>
+  </DockPanel>
+</UserControl>

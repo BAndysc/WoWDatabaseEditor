@@ -1,0 +1,202 @@
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
+using OmniSharp.Extensions.LanguageServer.Client;
+using OmniSharp.Extensions.LanguageServer.Protocol.Client;
+using OmniSharp.Extensions.LanguageServer.Protocol.Models;
+using OmniSharp.Extensions.LanguageServer.Protocol.Window;
+using OmniSharp.Extensions.LanguageServer.Protocol.Workspace;
+using WDE.Common.Services.Processes;
+using WDE.Common.Utils;
+using WDE.Module.Attributes;
+using WDE.SqlWorkbench.Models;
+using WDE.SqlWorkbench.Settings;
+
+namespace WDE.SqlWorkbench.Services.LanguageServer;
+
+[AutoRegister]
+[SingleInstance]
+internal class SqlsLanguageServer : ISqlLanguageServer
+{
+    private static readonly TimeSpan MaxCrashTimeWindow = TimeSpan.FromSeconds(60);
+    private static int MaxCrashCount = 5;
+    
+    private readonly ISqlWorkbenchPreferences preferences;
+    private readonly IProgramFinder programFinder;
+    private List<LanguageClient> clients = new();
+    private List<Process> processes = new();
+    private List<DatabaseCredentials> credentials = new();
+    private List<List<SqlsLanguageServerFile>> filesPerClient = new();
+    private Dictionary<DatabaseCredentials, DatabaseConnectionId> credentialsToId = new();
+    private Dictionary<DatabaseConnectionId, (DateTime lastCrash, int crashCount)> lastCrashStats = new();
+    private long fileId = 0;
+
+    public SqlsLanguageServer(ISqlWorkbenchPreferences preferences,
+        IProgramFinder programFinder)
+    {
+        this.preferences = preferences;
+        this.programFinder = programFinder;
+    }
+    
+    private async Task RecreateClientAsync(DatabaseConnectionId connectionId)
+    {
+        var newClient = await CreateClientAsync(connectionId);
+        foreach (var file in filesPerClient[connectionId.Id])
+        {
+            file.Reconnect(newClient);
+        }
+    }
+
+    private string? LocateSqls()
+    {
+        if (preferences.CustomSqlsPath != null &&
+            File.Exists(this.preferences.CustomSqlsPath))
+            return preferences.CustomSqlsPath;
+        
+        return programFinder.TryLocate("sqls", "sqls.exe");
+    }
+    
+    private void ForeachFile(DatabaseConnectionId connId, Action<SqlsLanguageServerFile> action)
+    {
+        foreach (var file in filesPerClient[connId.Id])
+        {
+            action(file);
+        }
+    }
+
+    private async Task<LanguageClient> CreateClientAsync(DatabaseConnectionId connectionId)
+    {
+        var sqlPath = LocateSqls();
+        
+        if (sqlPath == null)
+            throw new Exception("Can't find sqls executable");
+        
+        ForeachFile(connectionId, f => f.NotifyLanguageServerAlive());
+        
+        Process childProcess = Process.Start(new ProcessStartInfo(sqlPath)
+        {
+            RedirectStandardInput = true,
+            RedirectStandardOutput = true,
+        }) ?? throw new Exception("Can't start the Language Server");
+
+        childProcess.EnableRaisingEvents = true;
+        childProcess.Exited += (sender, args) =>
+        {
+            if (childProcess.ExitCode != 0)
+            {
+                if (!lastCrashStats.TryGetValue(connectionId, out var crashStats) ||
+                    crashStats.lastCrash + MaxCrashTimeWindow < DateTime.Now)
+                {
+                    lastCrashStats[connectionId] = (DateTime.Now, 1);
+                }
+                else
+                {
+                    lastCrashStats[connectionId] = (crashStats.lastCrash, crashStats.crashCount + 1);
+                }
+                
+                if (lastCrashStats[connectionId].crashCount > MaxCrashCount)
+                {
+                    ForeachFile(connectionId, f => f.NotifyLanguageServerDied());
+                    Console.WriteLine("SQLS has crashed too many times in a short period of time. Stopping the server!");
+                    return;
+                }
+                
+                Console.WriteLine("SQLS has crashed!!! Trying to restart the server!");
+                RecreateClientAsync(connectionId).ListenErrors();
+            }
+        };
+
+        var client = await LanguageClient.From(o =>
+            o.WithInput(new DebugStreamWrapper(childProcess.StandardOutput.BaseStream, Console.OpenStandardOutput()))
+                .WithOutput(new DebugStreamWrapper(childProcess.StandardInput.BaseStream, Console.OpenStandardOutput()))
+                .OnInitialized((c, r, rr, rc) =>
+                {
+                    Console.WriteLine("initialized");
+                    return Task.CompletedTask;
+                })
+                .OnLogMessage(x => Console.WriteLine((string?)x.Message))
+                .OnLogTrace(x => Console.WriteLine(x.Message + " " + x.Verbose)));
+
+        var credentials = this.credentials[connectionId.Id];
+        client.DidChangeConfiguration(new DidChangeConfigurationParams()
+        {
+            Settings = new JObject()
+            {
+                new JProperty("sqls", new JObject()
+                {
+                    new JProperty("connections", new JArray(new JObject()
+                    {
+                        new JProperty("alias", "db"),
+                        new JProperty("driver", "mysql"),
+                        new JProperty("proto", "tcp"),
+                        new JProperty("user", credentials.User),
+                        new JProperty("passwd", credentials.Passwd),
+                        new JProperty("host", credentials.Host),
+                        new JProperty("port", credentials.Port),
+                        new JProperty("dbName", credentials.SchemaName),
+                        new JProperty("params", new JObject()
+                        {
+                            new JProperty("autocommit", "false")
+                        })
+                    }))
+                })
+            }
+        });
+        
+        clients[connectionId.Id] = client;
+        processes[connectionId.Id] = childProcess;
+        return client;
+    }
+
+    public async Task<DatabaseConnectionId> ConnectAsync(DatabaseCredentials credentials)
+    {
+        if (credentialsToId.TryGetValue(credentials, out var id))
+            return id;
+        
+        credentialsToId[credentials] = id = new DatabaseConnectionId(clients.Count);
+        this.credentials.Add(credentials);
+        clients.Add(null!);
+        processes.Add(null!);
+        filesPerClient.Add(new List<SqlsLanguageServerFile>());
+
+        await CreateClientAsync(id);
+        
+        return id;
+    }
+
+    public async Task<ISqlLanguageServerFile> NewFileAsync(DatabaseConnectionId connectionId)
+    {
+        if (connectionId.Id < 0 || connectionId.Id >= clients.Count)
+            throw new Exception("Invalid connection id");
+
+        if (clients[connectionId.Id] == null)
+            throw new Exception("Language server failed to start");
+        
+        var file = new SqlsLanguageServerFile(this, connectionId, clients[connectionId.Id], fileId++);
+        filesPerClient[connectionId.Id].Add(file);
+        return file;
+    }
+    
+    internal void UnregisterFile(SqlsLanguageServerFile file)
+    {
+        filesPerClient[file.ConnectionId.Id].Remove(file);
+    }
+    
+    internal void KillProcess(DatabaseConnectionId connectionId)
+    {
+        processes[connectionId.Id].Kill();
+    }
+
+    public async Task RestartLanguageServerAsync(DatabaseConnectionId connectionId)
+    {
+        if (processes[connectionId.Id].HasExited)
+        {
+            await RecreateClientAsync(connectionId);
+        }
+        else
+            processes[connectionId.Id].Kill();
+    }
+}

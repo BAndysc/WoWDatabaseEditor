@@ -41,6 +41,7 @@ using WDE.LootEditor;
 using WDE.LootEditor.Models;
 using WDE.QueryGenerators;
 using WDE.Profiles;
+using WDE.SqlWorkbench;
 
 namespace LoaderAvalonia
 {
@@ -91,7 +92,8 @@ namespace LoaderAvalonia
                 typeof(FirstTimeWizardModule),
                 typeof(ProfilesModule),
                 typeof(DatabaseDefinitionEditorModule),
-                typeof(LootEditorModule)
+                typeof(LootEditorModule),
+                typeof(SqlWorkbenchModule)
             };
             WoWDatabaseEditorCore.Avalonia.Program.PreloadedModules = modules;
             WoWDatabaseEditorCore.Avalonia.Program.Main(args);

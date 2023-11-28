@@ -1,7 +1,6 @@
 using System;
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Utils;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -9,19 +8,19 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using WDE.Common.Avalonia;
-using WDE.DatabaseEditors.ViewModels;
+using WDE.DatabaseEditors.Services.TablesPanel;
 
-namespace WDE.DatabaseEditors.Avalonia.Views;
+namespace WDE.DatabaseEditors.Avalonia.Services.TablesPanel;
 
-public class TablesListToolView : UserControl
+public partial class FancyEditorsTablesToolGroupView : UserControl
 {
-    private ListBox TablesListBox = null!;
-    private ISelectionAdapter SelectionAdapter = null!;
-    
-    public TablesListToolView()
+    public FancyEditorsTablesToolGroupView()
     {
         InitializeComponent();
     }
+    
+    private ListBox TablesListBox = null!;
+    private ISelectionAdapter SelectionAdapter = null!;
 
     private void InitializeComponent()
     {
@@ -47,7 +46,7 @@ public class TablesListToolView : UserControl
         {
             if (visual.SelfOrVisualAncestor<ListBoxItem>() is { } item)
             {
-                (DataContext as TablesListToolViewModel)!.OpenTable((item.DataContext as TableItemViewModel)!);
+                (DataContext as FancyEditorsTablesToolGroupViewModel)!.OpenTable((item.DataContext as TableItemViewModel)!);
             }
         }
     }
@@ -58,7 +57,7 @@ public class TablesListToolView : UserControl
         {
             if (visual.SelfOrVisualAncestor<ListBoxItem>() is { } item)
             {
-                (DataContext as TablesListToolViewModel)!.OpenTable((item.DataContext as TableItemViewModel)!);
+                (DataContext as FancyEditorsTablesToolGroupViewModel)!.OpenTable((item.DataContext as TableItemViewModel)!);
             }
         }
     }
@@ -71,7 +70,7 @@ public class TablesListToolView : UserControl
             {
                 if (visual.SelfOrVisualAncestor<ListBoxItem>() is { } item)
                 {
-                    (DataContext as TablesListToolViewModel)!.OpenTable((item.DataContext as TableItemViewModel)!);
+                    (DataContext as FancyEditorsTablesToolGroupViewModel)!.OpenTable((item.DataContext as TableItemViewModel)!);
                 }
             }
         }
@@ -81,7 +80,7 @@ public class TablesListToolView : UserControl
     {
         if (e.Key == Key.Enter)
         {
-            e.Handled = (DataContext as TablesListToolViewModel)!.OpenSelected();
+            e.Handled = (DataContext as FancyEditorsTablesToolGroupViewModel)!.OpenSelected();
         }
         else if (e.Key is Key.Down or Key.Up)
         {
