@@ -30,9 +30,9 @@
                 Orientation="Horizontal" 
                 Value="{CompiledBinding Scale}">
             <Slider.ContextMenu>
-                <ContextMenu>
+                <FixedContextMenu>
                     <MenuItem Header="Set as the default scale" Command="{CompiledBinding SaveDefaultScaleCommand}" />
-                </ContextMenu>
+                </FixedContextMenu>
             </Slider.ContextMenu>
         </Slider>
         

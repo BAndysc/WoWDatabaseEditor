@@ -84,9 +84,9 @@
                     <Setter Property="ClipToBounds" Value="False" />
                     <Setter Property="Padding" Value="7,5,2,7"></Setter>
                     <Setter Property="ContextMenu">
-                        <ContextMenu>
+                        <FixedContextMenu>
                             <MenuItem Header="Toggle favourite" CommandParameter="{CompiledBinding}" Command="{Binding #Root.DataContext.ToggleFavouriteCommand}" />
-                        </ContextMenu>
+                        </FixedContextMenu>
                     </Setter>
                 </Style>
                 <Style Selector="ListBoxItem Path">

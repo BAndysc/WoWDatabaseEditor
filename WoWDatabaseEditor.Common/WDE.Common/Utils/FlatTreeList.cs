@@ -12,6 +12,10 @@ public class FlatTreeList<P, C> : IDisposable, IEnumerable, IEnumerable<INodeTyp
     private ObservableCollectionExtended<INodeType> innerList = new();
     private List<P> parents = new();
     private IReadOnlyList<P> roots;
+    // in order to keep expanded state in sync, we need to keep track of expanded parents here, not by checking IsExpanded
+    // because if there is an event bound to IsExpanded changes that changes the children, then this change can be fired before IsExpanded propery change
+    // is fired here
+    private HashSet<IParentType> expandedParents = new();
 
     public FlatTreeList(IReadOnlyList<P> roots)
     {
@@ -42,6 +46,8 @@ public class FlatTreeList<P, C> : IDisposable, IEnumerable, IEnumerable<INodeTyp
                 innerList.RemoveAt(index);
             }
         }
+
+        expandedParents.Remove(parent);
         parent.PropertyChanged -= OnParentPropChanged;
         parent.ChildrenChanged -= OnChildrenChanged;
         innerList.RemoveAt(index);
@@ -55,6 +61,7 @@ public class FlatTreeList<P, C> : IDisposable, IEnumerable, IEnumerable<INodeTyp
         innerList.Insert(index ?? innerList.Count, parent);
         if (parent.IsExpanded)
         {
+            expandedParents.Add(parent);
             foreach (var nestedParent in parent.NestedParents)
             {
                 addedElements += InstallParent((P)nestedParent, index + addedElements, level + 1);
@@ -114,6 +121,7 @@ public class FlatTreeList<P, C> : IDisposable, IEnumerable, IEnumerable<INodeTyp
         var startIndex = innerList.IndexOf(parent);
         if (parent.IsExpanded)
         {
+            expandedParents.Add(parent);
             int i = 0;
 
             if (parent.NestedParents.Count > 0)
@@ -140,6 +148,7 @@ public class FlatTreeList<P, C> : IDisposable, IEnumerable, IEnumerable<INodeTyp
         }
         else
         {
+            expandedParents.Remove(parent);
             if (parent.Children.Count + parent.NestedParents.Count > 0)
             {
                 var bulk = innerList.SuspendNotifications();
@@ -171,7 +180,7 @@ public class FlatTreeList<P, C> : IDisposable, IEnumerable, IEnumerable<INodeTyp
     private int CountVisibleItems(IParentType parent)
     {
         int count = 1;
-        if (parent.IsExpanded)
+        if (expandedParents.Contains(parent))
         {
             foreach (var nested in parent.NestedParents)
                 count += CountVisibleItems(nested);
@@ -185,7 +194,7 @@ public class FlatTreeList<P, C> : IDisposable, IEnumerable, IEnumerable<INodeTyp
     private void OnNestedParentsChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         P parent = (P)sender!;
-        if (!parent.IsExpanded)
+        if (!expandedParents.Contains(parent))
             return;
 
         var startIndex = innerList.IndexOf(parent);
@@ -212,7 +221,7 @@ public class FlatTreeList<P, C> : IDisposable, IEnumerable, IEnumerable<INodeTyp
     private void OnChildrenChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         P parent = (P)sender!;
-        if (!parent.IsExpanded)
+        if (!expandedParents.Contains(parent))
             return;
 
         var startIndex = innerList.IndexOf(parent);
@@ -366,11 +375,13 @@ public interface INodeType
 
 public interface IChildType : INodeType
 {
+    public bool CanBeExpanded => false;
 }
 
 public interface IParentType : INodeType, INotifyPropertyChanged
 {
     public bool IsExpanded { get; set; }
+    public bool CanBeExpanded => true;
     public IReadOnlyList<IParentType> NestedParents { get; }
     public IReadOnlyList<IChildType> Children { get; }
     event NotifyCollectionChangedEventHandler? ChildrenChanged;

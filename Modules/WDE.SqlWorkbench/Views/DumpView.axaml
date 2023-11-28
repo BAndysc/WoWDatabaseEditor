@@ -1,0 +1,52 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:WDE.SqlWorkbench.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:DumpViewModel"
+             x:Class="WDE.SqlWorkbench.Views.DumpView">
+  <UserControl.Styles>
+    <Style Selector="TextBlock">
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+  </UserControl.Styles>
+  <DockPanel KeyboardNavigation.TabNavigation="Local">
+    <OkCancelButtons TabIndex="10" DockPanel.Dock="Bottom" AcceptCommand="{CompiledBinding DumpCommand}" AcceptText="Dump" />
+    
+    <ProgressBar IsVisible="{CompiledBinding DumpInProgress}" IsIndeterminate="True" DockPanel.Dock="Bottom" />
+    
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+      <TwoColumnsPanel>
+      
+        <TextBlock Text="Database:" />
+        <TextBox Text="{CompiledBinding SchemaName}" IsReadOnly="True" />
+      
+        <TextBlock Text="Table:" />
+        <TextBox Text="{CompiledBinding TableName}" IsReadOnly="True" />
+        
+        <TextBlock Text="Output file:" />
+        <DockPanel KeyboardNavigation.TabNavigation="Local">
+          <Button TabIndex="1" Command="{CompiledBinding PickFileCommand}" DockPanel.Dock="Right" Content="  ...  "/>
+          <TextBox TabIndex="0" Text="{CompiledBinding OutputFile}" />
+        </DockPanel>
+    
+        <TextBlock Text="Options:" VerticalAlignment="Top" />
+        <ItemsControl Items="{CompiledBinding BoolOptions}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <CheckBox Margin="0,0,0,4" IsChecked="{CompiledBinding IsChecked}" ToolTip.Tip="{CompiledBinding Description}">
+                <TextBlock Text="{CompiledBinding Name}" />
+              </CheckBox>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <UniformGrid Columns="2" />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+        </ItemsControl>
+      </TwoColumnsPanel>
+    </ScrollViewer>
+  </DockPanel>
+</UserControl>

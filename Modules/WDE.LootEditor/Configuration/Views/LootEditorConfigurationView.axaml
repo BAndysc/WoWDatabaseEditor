@@ -123,9 +123,9 @@
               <views:CustomCellInteractor />
             </fastTableView:VeryFastTableView.CustomCellInteractor>
             <fastTableView:VeryFastTableView.ContextMenu>
-              <ContextMenu>
+              <FixedContextMenu>
                 <MenuItem Header="Delete selected loot items" Command="{CompiledBinding DeleteSelectedLootItemsCommand}" />
-              </ContextMenu>
+              </FixedContextMenu>
             </fastTableView:VeryFastTableView.ContextMenu>
           </fastTableView:VeryFastTableView>
         </ScrollViewer>

@@ -6,7 +6,7 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="serverExecutable:ServerExecutableConfigurationPanelViewModel"
              x:Class="WoWDatabaseEditorCore.Avalonia.Services.ServerExecutable.ServerExecutableConfigurationPanelView">
-    <ScrollViewer VerticalScrollBarVisibility="Auto">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.IsSharedSizeScope="True">
         <StackPanel>
             <SettingItem Header="World server path">
                 <DockPanel>

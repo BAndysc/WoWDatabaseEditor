@@ -1,0 +1,29 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:WoWDatabaseEditorCore.ViewModels;assembly=WoWDatabaseEditorCore"
+             xmlns:documents="clr-namespace:WDE.Common.Documents;assembly=WDE.Common"
+             xmlns:avaloniaStyles="clr-namespace:AvaloniaStyles;assembly=AvaloniaStyles"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:TablesToolViewModel"
+             x:Class="WoWDatabaseEditorCore.Avalonia.Views.TablesToolView">
+  <DockPanel LastChildFill="True" KeyboardNavigation.TabNavigation="Local">
+    <ComboBox Items="{CompiledBinding AllGroups}"
+              SelectedItem="{CompiledBinding SelectedGroup}"
+              DockPanel.Dock="Bottom"
+              TabIndex="2"
+              HorizontalAlignment="Stretch">
+      <ComboBox.ItemTemplate>
+        <DataTemplate x:DataType="documents:ITablesToolGroup">
+          <DockPanel>
+            <WdeImage Image="{CompiledBinding Icon}" Width="16" Height="16" Margin="0,0,5,0" />
+            <TextBlock Text="{CompiledBinding  GroupName}"
+                       Foreground="{CompiledBinding CustomColor, Converter={x:Static RgbColorToBrushConverter.Instance}, TargetNullValue={x:Static avaloniaStyles:SystemTheme.ForegroundColor}}" />
+          </DockPanel>
+        </DataTemplate>
+      </ComboBox.ItemTemplate>
+    </ComboBox>
+    <ContentControl TabIndex="0" Content="{CompiledBinding SelectedGroup}" />
+  </DockPanel>
+</UserControl>

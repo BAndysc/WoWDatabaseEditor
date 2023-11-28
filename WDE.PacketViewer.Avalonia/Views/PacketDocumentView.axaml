@@ -169,7 +169,7 @@
                                     <Setter Property="Background" Value="{CompiledBinding Entry, Converter={StaticResource EntryToNiceBackgroundConverter}}" />
                                     <Setter Property="ContextMenu">
                                         <Setter.Value>
-                                            <ContextMenu>
+                                            <FixedContextMenu>
                                                 <MenuItem Header="Exclude entry" CommandParameter="{CompiledBinding .}" Command="{Binding #Root.DataContext.ExcludeEntryCommand}" />
                                                 <MenuItem Header="Include entry" CommandParameter="{CompiledBinding .}" Command="{Binding #Root.DataContext.IncludeEntryCommand}" />
                                                 <MenuItem Header="-" />
@@ -180,7 +180,7 @@
                                                 <MenuItem Header="Include opcode" CommandParameter="{CompiledBinding .}" Command="{Binding #Root.DataContext.IncludeOpcodeCommand}" />
                                                 <MenuItem Header="-" />
                                                 <MenuItem Header="Find related packets" Command="{Binding #Root.DataContext.FindRelatedPacketsCommands}" />
-                                            </ContextMenu>
+                                            </FixedContextMenu>
                                         </Setter.Value>
                                     </Setter>
                                 </Style>

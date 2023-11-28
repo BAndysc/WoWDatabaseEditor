@@ -10,7 +10,7 @@
              mc:Ignorable="d"
              x:DataType="viewModels:CoreVersionConfigViewModel"
              d:DesignHeight="300" d:DesignWidth="300">
-    <StackPanel Margin="0,1,0,0">
+    <StackPanel Margin="0,1,0,0" Grid.IsSharedSizeScope="True">
         <SettingItem Header="Core version" Help="Depending on the core version, particular features will be enabled/disabled.">
             <ComboBox Items="{CompiledBinding CoreVersions}" 
                       SelectedItem="{CompiledBinding SelectedVersion, Mode=TwoWay}">

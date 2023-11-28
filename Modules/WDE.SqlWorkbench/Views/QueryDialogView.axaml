@@ -1,0 +1,21 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:WDE.SqlWorkbench.ViewModels"
+             xmlns:avaloniaEdit="https://github.com/avaloniaui/avaloniaedit"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:QueryDialogViewModel"
+             x:Class="WDE.SqlWorkbench.Views.QueryDialogView">
+  <DockPanel>
+    
+    <DockPanel DockPanel.Dock="Bottom">
+      <Button Command="{CompiledBinding CopyCommand}">Copy</Button>
+    </DockPanel>
+    
+    <avaloniaEdit:TextEditor Name="TextEditor" FontFamily="{DynamicResource MonoFont}"
+                             Document="{CompiledBinding Document}"
+                             AvalonEditExtra.SyntaxExtension="sql" 
+                             ShowLineNumbers="True" />
+  </DockPanel>
+</UserControl>

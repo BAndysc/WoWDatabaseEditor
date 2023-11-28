@@ -1,0 +1,78 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
+             xmlns:tablesPanel="clr-namespace:WDE.SqlWorkbench.Services.TablesPanel"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="tablesPanel:ConnectionListToolViewModel"
+             x:Name="Root"
+             x:Class="WDE.SqlWorkbench.Services.TablesPanel.ConnectionListToolView">
+    <UserControl.KeyBindings>
+        <KeyBinding Command="{Binding #Root.FocusTextBoxCommand}" Gesture="Ctrl+F" />
+        <KeyBinding Command="{Binding #Root.FocusTextBoxCommand}" Gesture="Cmd+F" />
+    </UserControl.KeyBindings>
+    
+    <DockPanel LastChildFill="True" KeyboardNavigation.TabNavigation="Local"> 
+        <TextBox TabIndex="0" Name="SearchTextBox" KeyDown="Search_KeyDown" DockPanel.Dock="Top" Watermark="Search" Text="{CompiledBinding SearchText}" />
+        <Panel>
+            <ScrollViewer>
+                <VirtualizedTreeView Items="{CompiledBinding FlatItems}"
+                                     SelectedNode="{CompiledBinding Selected}"
+                                     IsFiltered="True"
+                                     TabIndex="1"
+                                     x:Name="VirtualizedTreeView"
+                                     KeyDown="InputElement_OnKeyDown"
+                                     DoubleTapped="InputElement_OnDoubleTapped"
+                                     RequestRender="{CompiledBinding ListUpdated}"
+                >
+                    <VirtualizedTreeView.DataTemplates>
+                        <DataTemplate DataType="tablesPanel:SchemaViewModel" x:DataType="tablesPanel:SchemaViewModel">
+                            <DockPanel>
+                                <WdeImage Width="16" Height="16" Margin="0,0,5,0" Image="{CompiledBinding Icon}" />
+                                <TextBlock TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Text="{CompiledBinding SchemaName}" />
+                            </DockPanel>
+                        </DataTemplate>
+                        <DataTemplate DataType="tablesPanel:TableViewModel" x:DataType="tablesPanel:TableViewModel">
+                            <DockPanel>
+                                <WdeImage Width="16" Height="16" Margin="0,0,5,0" Image="{CompiledBinding Icon}" />
+                                <TextBlock TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Text="{CompiledBinding TableName}" />
+                            </DockPanel>
+                        </DataTemplate>
+                        <DataTemplate DataType="tablesPanel:RowLoadingViewModel" x:DataType="tablesPanel:RowLoadingViewModel">
+                            <DockPanel>
+                                <utils:LoadingSpinner VerticalAlignment="Center" Width="24" Height="24" Margin="0,0,5,0" />
+                                <TextBlock Opacity="0.5" Text="Loading..." VerticalAlignment="Center" />
+                            </DockPanel>
+                        </DataTemplate>
+                    </VirtualizedTreeView.DataTemplates>
+                    <VirtualizedTreeView.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Select rows" Command="{CompiledBinding SelectRowsCommand}" IsVisible="{CompiledBinding IsTableSelected}" />
+                            <MenuItem Header="Table inspector" Command="{CompiledBinding InspectTableComment}" IsVisible="{CompiledBinding IsTableSelected}" />
+                            <Separator IsVisible="{CompiledBinding IsTableSelected}" />
+                            <MenuItem Header="Copy name" Command="{CompiledBinding CopyNameCommand}" />
+                            <MenuItem Header="Copy" IsVisible="{CompiledBinding IsTableSelected}">
+                                <MenuItem Header="Select All Statement" Command="{CompiledBinding CopySelectAllCommand}" />
+                                <MenuItem Header="Insert Statement" Command="{CompiledBinding CopyInsertCommand}" />
+                                <MenuItem Header="Update Statement" Command="{CompiledBinding CopyUpdateCommand}" />
+                                <MenuItem Header="Delete Statement" Command="{CompiledBinding CopyDeleteCommand}" />
+                                <MenuItem Header="Create Statement" Command="{CompiledBinding CopyCreateCommand}" />
+                            </MenuItem>
+                            <Separator />
+                            <MenuItem Header="Dump Table" Command="{CompiledBinding DumpTableCommand}" IsVisible="{CompiledBinding IsTableSelected}" />
+                            <Separator IsVisible="{CompiledBinding IsTableSelected}" />
+                            <MenuItem Header="Drop Table" Command="{CompiledBinding DropTableCommand}" IsVisible="{CompiledBinding IsTableSelected}" />
+                            <MenuItem Header="Truncate Table" Command="{CompiledBinding  TruncateTableCommand}" IsVisible="{CompiledBinding IsTableSelected}" />
+                            <Separator IsVisible="{CompiledBinding IsTableSelected}" />
+                            <MenuItem Header="Refresh Database" Command="{CompiledBinding RefreshDatabaseCommand}" />
+                        </ContextMenu>
+                    </VirtualizedTreeView.ContextMenu>
+                </VirtualizedTreeView>
+            </ScrollViewer>
+            <utils:LoadingSpinner IsVisible="{CompiledBinding IsLoading}" />
+        </Panel>
+    </DockPanel>
+</UserControl>
+
+

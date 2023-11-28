@@ -57,7 +57,7 @@
               dnD:DragAndDrop.IsDropTarget="True" dnD:DragAndDrop.DropHandler="{CompiledBinding }" dnD:DragAndDrop.IsDragSource="True"
               DoubleTapped="Tv_OnDoubleTapped">
         <TreeView.ContextMenu>
-            <ContextMenu>
+            <FixedContextMenu>
                 <MenuItem Header="Add"
                           Command="{Binding #tv.DataContext.AddItem, Mode=OneTime}" />
                 <MenuItem Header="Quick add"
@@ -93,7 +93,7 @@
                           CommandParameter="{Binding #tv.SelectedItem}"
                           Command="{Binding #tv.DataContext.ExportToServer, Mode=OneTime}"
                           IsEnabled="{Binding IsExportable}" />
-            </ContextMenu>
+            </FixedContextMenu>
         </TreeView.ContextMenu>
         <TreeView.Styles>
             <Style Selector="TreeViewItem" x:DataType="viewModels:SolutionItemViewModel">

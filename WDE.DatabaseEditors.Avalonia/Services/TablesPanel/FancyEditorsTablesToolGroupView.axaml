@@ -1,0 +1,25 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:tablesPanel="clr-namespace:WDE.DatabaseEditors.Services.TablesPanel;assembly=WDE.DatabaseEditors"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="tablesPanel:FancyEditorsTablesToolGroupViewModel"
+             x:Class="WDE.DatabaseEditors.Avalonia.Services.TablesPanel.FancyEditorsTablesToolGroupView">
+  <DockPanel LastChildFill="True">
+    <TextBox Name="SearchTextBox" KeyDown="Search_KeyDown" DockPanel.Dock="Top" Watermark="Search" Text="{CompiledBinding SearchText}" />
+    <ListBox Name="TablesListBox" PointerReleased="InputElement_OnPointerReleased" KeyDown="InputElement_OnKeyDown" DoubleTapped="InputElement_OnDoubleTapped" 
+             VirtualizationMode="None" 
+             Items="{CompiledBinding FilteredTables}"
+             SelectedItem="{CompiledBinding SelectedTable, Mode=TwoWay}">
+      <ListBox.ItemTemplate>
+        <DataTemplate>
+          <DockPanel LastChildFill="True">
+            <WdeImage Width="16" Height="16" Margin="0,0,5,0" Image="{CompiledBinding Icon}" />
+            <TextBlock TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Text="{CompiledBinding TableName}" />
+          </DockPanel>
+        </DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
+  </DockPanel>
+</UserControl>

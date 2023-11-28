@@ -63,6 +63,7 @@
       <ProjectReference Include="..\Modules\WDE.Sessions\WDE.Sessions.csproj" />
       <ProjectReference Include="..\Modules\WDE.FirstTimeWizard\WDE.FirstTimeWizard.csproj" />
       <ProjectReference Include="..\Modules\WDE.Profiles\WDE.Profiles.csproj" />
+      <ProjectReference Include="..\Modules\WDE.SqlWorkbench\WDE.SqlWorkbench.csproj" />
     </ItemGroup>
 
 </Project>

@@ -17,6 +17,7 @@ namespace WDE.Common.Services.Processes
     public interface IProgramFinder
     {
         string? TryLocate(params string[] names);
+        string? TryLocateIncludingCurrentDir(params string[] names);
     }
 
     [UniqueProvider]

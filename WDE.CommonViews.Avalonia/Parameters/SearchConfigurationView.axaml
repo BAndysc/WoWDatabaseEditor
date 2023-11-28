@@ -7,7 +7,7 @@
              x:DataType="quickAccess:ParameterSearchConfiguration"
              x:Class="WDE.CommonViews.Avalonia.Parameters.SearchConfigurationView">
     <ScrollViewer>
-       <StackPanel>
+       <StackPanel Grid.IsSharedSizeScope="True">
            <SettingsHeader Text="Default quick access actions" />
            <ItemsControl Items="{CompiledBinding Parameters}">
                <ItemsControl.ItemTemplate>

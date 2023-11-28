@@ -9,7 +9,7 @@
              x:DataType="viewModels:DBCConfigViewModel"
              mc:Ignorable="d">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <StackPanel>
+        <StackPanel Grid.IsSharedSizeScope="True">
             <SettingItem Header="DBC Path">
                 <DockPanel>
                     <Button DockPanel.Dock="Right" Padding="5" VerticalAlignment="Center" Command="{CompiledBinding PickFolder}">...</Button>

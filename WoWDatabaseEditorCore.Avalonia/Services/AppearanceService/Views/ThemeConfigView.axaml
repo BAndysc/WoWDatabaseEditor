@@ -7,7 +7,7 @@
              xmlns:viewModels="clr-namespace:WoWDatabaseEditorCore.Avalonia.Services.AppearanceService.ViewModels"
              x:DataType="viewModels:ThemeConfigViewModel"
              prism:ViewModelLocator.AutoWireViewModel="False">
-    <ScrollViewer VerticalScrollBarVisibility="Auto">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.IsSharedSizeScope="True">
         <StackPanel>
             <controls:SettingsHeader Text="Themes" />
             <StackPanel>

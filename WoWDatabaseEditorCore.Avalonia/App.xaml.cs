@@ -274,6 +274,9 @@ namespace WoWDatabaseEditorCore.Avalonia
             splashScreenWindow = new SplashScreenWindow();
             splashScreenWindow.Show();
 
+            if (Design.IsDesignMode)
+                return;
+
             DispatcherTimer.RunOnce(() =>
             {
                 base.Initialize();

@@ -14,6 +14,7 @@ using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using AvaloniaStyles.Utils;
 using WDE.Common.Avalonia.Utils;
+using WDE.Common.Disposables;
 using WDE.Common.Utils;
 
 namespace WDE.Common.Avalonia.Controls;
@@ -26,7 +27,7 @@ public class ColorPicker : Control
     private int currentCalculateVersion = -1;
     private CancellationTokenSource? currentTaskSource;
 
-    public static readonly StyledProperty<double> LightnessProperty = AvaloniaProperty.Register<ColorPicker, double>(nameof(Lightness));
+    public static readonly StyledProperty<double> LightnessProperty = AvaloniaProperty.Register<ColorPicker, double>(nameof(Lightness), 0.5f);
 
     public double Lightness
     {
@@ -43,9 +44,15 @@ public class ColorPicker : Control
     }
 
     public static readonly StyledProperty<double> SelectedSaturationProperty = AvaloniaProperty.Register<ColorPicker, double>(nameof(SelectedSaturation));
-    public static readonly DirectProperty<ColorPicker, HslColor> SelectedColorProperty = AvaloniaProperty.RegisterDirect<ColorPicker, HslColor>("SelectedColor", o => o.SelectedColor, (o, v) => o.SelectedColor = v, default, BindingMode.TwoWay);
-    public static readonly StyledProperty<double> HueOffsetProperty = AvaloniaProperty.Register<ColorPicker, double>("HueOffset");
+    public static readonly DirectProperty<ColorPicker, HslColor> SelectedColorProperty = AvaloniaProperty.RegisterDirect<ColorPicker, HslColor>(nameof(SelectedColor), o => o.SelectedColor, (o, v) => o.SelectedColor = v, default, BindingMode.TwoWay);
+    public static readonly StyledProperty<double> HueOffsetProperty = AvaloniaProperty.Register<ColorPicker, double>(nameof(HueOffset));
+    public static readonly DirectProperty<ColorPicker, Color> RgbColorProperty = AvaloniaProperty.RegisterDirect<ColorPicker, Color>(nameof(RgbColor), o => o.RgbColor);
 
+    public Color RgbColor
+    {
+        get => SelectedColor.ToRgba();
+    }
+    
     public double SelectedSaturation
     {
         get => GetValue(SelectedSaturationProperty);
@@ -57,6 +64,7 @@ public class ColorPicker : Control
         get => new HslColor(SelectedHue, SelectedSaturation, Lightness);
         set
         {
+            using var _ = SuspendSelectedColorNotification();
             SelectedHue = value.H;
             SelectedSaturation = value.S;
             Lightness = value.L;
@@ -75,6 +83,7 @@ public class ColorPicker : Control
         if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
         {
             var pos = e.GetPosition(this);
+            using var _ = SuspendSelectedColorNotification();
             SelectedHue = pos.X / Bounds.Width;
             SelectedSaturation = 1 - pos.Y / Bounds.Height;
         }
@@ -86,6 +95,7 @@ public class ColorPicker : Control
         if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
         {
             var pos = e.GetPosition(this);
+            using var _ = SuspendSelectedColorNotification();
             SelectedHue = pos.X / Bounds.Width;
             SelectedSaturation = 1 - pos.Y / Bounds.Height;
         }
@@ -98,17 +108,39 @@ public class ColorPicker : Control
         {
             picker.requestVersion++;
             picker.InvalidateVisual();
+            if (picker.isSuspended)
+                return;
+            picker.RaisePropertyChanged(SelectedColorProperty, default, picker.SelectedColor);
+            picker.RaisePropertyChanged(RgbColorProperty, default, picker.RgbColor);
         });
         SelectedHueProperty.Changed.AddClassHandler<ColorPicker>((picker, e) =>
         {
+            if (picker.isSuspended)
+                return;
             picker.RaisePropertyChanged(SelectedColorProperty, default, picker.SelectedColor);
+            picker.RaisePropertyChanged(RgbColorProperty, default, picker.RgbColor);
         });
         SelectedSaturationProperty.Changed.AddClassHandler<ColorPicker>((picker, e) =>
         {
+            if (picker.isSuspended)
+                return;
             picker.RaisePropertyChanged(SelectedColorProperty, default, picker.SelectedColor);
+            picker.RaisePropertyChanged(RgbColorProperty, default, picker.RgbColor);
         });
         AffectsRender<ColorPicker>(SelectedHueProperty);
         AffectsRender<ColorPicker>(SelectedSaturationProperty);
+    }
+
+    private bool isSuspended = false;
+    private System.IDisposable SuspendSelectedColorNotification()
+    {
+        isSuspended = true;
+        return new ActionDisposable(() =>
+        {
+            isSuspended = false;
+            RaisePropertyChanged(SelectedColorProperty, default, SelectedColor);
+            RaisePropertyChanged(RgbColorProperty, default, RgbColor);
+        });
     }
 
     public override void Render(DrawingContext context)

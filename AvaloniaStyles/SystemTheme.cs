@@ -37,6 +37,8 @@ namespace AvaloniaStyles
         public static SystemThemeOptions EffectiveTheme { get; private set; }
         public static bool EffectiveThemeIsDark { get; private set; }
         
+        public static Avalonia.Media.Color ForegroundColor => EffectiveThemeIsDark ? Avalonia.Media.Colors.White : Avalonia.Media.Colors.Black;
+        
         public SystemTheme(IServiceProvider serviceProvider) : base(serviceProvider)
         {
         }

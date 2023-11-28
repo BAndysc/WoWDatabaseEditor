@@ -22,7 +22,7 @@
             <Setter Property="Width" Value="120" />
         </Style>
     </UserControl.Styles>
-    <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled"  Grid.IsSharedSizeScope="True">
         <StackPanel>
             <controls:SettingsHeader Text="Defaults" />
             <StackPanel Orientation="Vertical">

@@ -60,11 +60,11 @@
                             <GroupingHeader.CustomCenterContent>
                                 <ItemsControl Items="{CompiledBinding #Root.((viewModels:LootEditorViewModel)DataContext).Buttons}">
                                     <ItemsControl.ContextMenu>
-                                        <ContextMenu>
+                                        <FixedContextMenu>
                                             <MenuItem Header="Edit buttons" Command="{CompiledBinding #Root.((viewModels:LootEditorViewModel)DataContext).OpenLootConfigurationCommand}"/>
                                             <MenuItem Header="Convert group to a button" CommandParameter="{CompiledBinding  $parent[GroupingHeader].DataContext}" 
                                                       Command="{CompiledBinding #Root.((viewModels:LootEditorViewModel)DataContext).ConvertGroupToButtonCommand}"/>
-                                        </ContextMenu>
+                                        </FixedContextMenu>
                                     </ItemsControl.ContextMenu>
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
@@ -128,12 +128,12 @@
                     <views:CustomCellInteractor />
                 </fastTableView:VeryFastTableView.CustomCellInteractor>
                 <fastTableView:VeryFastTableView.ContextMenu>
-                    <ContextMenu>
+                    <FixedContextMenu>
                         <MenuItem Header="Copy" Command="{CompiledBinding Copy}" />
                         <MenuItem Header="Cut" Command="{CompiledBinding Cut}" />
                         <MenuItem Header="Paste" Command="{CompiledBinding Paste}" />
                         <MenuItem Header="Delete selected loot items" Command="{CompiledBinding DeleteSelectedLootItemsCommand}" />
-                    </ContextMenu>
+                    </FixedContextMenu>
                 </fastTableView:VeryFastTableView.ContextMenu>
             </fastTableView:VeryFastTableView>
         </ScrollViewer>

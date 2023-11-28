@@ -11,6 +11,7 @@
         <converters:NullConverter Inverted="True" x:Key="NullConverter" />
     </Styles.Resources>
     <StyleInclude Source="avares://WDE.Common.Avalonia/Controls/SettingsHeader.axaml"></StyleInclude>
+    <StyleInclude Source="avares://WDE.Common.Avalonia/Controls/VirtualizedTreeViewItem.axaml"></StyleInclude>
     <StyleInclude Source="avares://WDE.Common.Avalonia/Controls/EditorHeader.axaml"></StyleInclude>
     <Style Selector="controls|ParameterValueHolderView">
         <Setter Property="Focusable" Value="False"/>

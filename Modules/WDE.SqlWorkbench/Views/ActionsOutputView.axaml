@@ -1,0 +1,44 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:WDE.SqlWorkbench.ViewModels"
+             xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:ActionsOutputViewModel"
+             x:Class="WDE.SqlWorkbench.Views.ActionsOutputView">
+  <VirtualizedGridView
+    Name="GridView"
+    Selection="{CompiledBinding Selection}"
+    MultiSelect="True"
+    FocusedIndex="{CompiledBinding FocusedIndex, Mode=TwoWay}"
+    Items="{CompiledBinding Actions}"
+    ColumnWidthChanged="GridView_OnColumnWidthChanged">
+    <VirtualizedGridView.Columns>
+      <GridColumnDefinition Name="" PreferedWidth="25">
+        <GridColumnDefinition.DataTemplate>
+          <DataTemplate x:DataType="viewModels:ActionOutputViewModel">
+            <Panel>
+              <WdeImage ImageUri="Icons/icon_ok.png" Width="16" Height="16" IsVisible="{CompiledBinding IsSuccess}" />
+              <WdeImage ImageUri="Icons/icon_fail.png" Width="16" Height="16" IsVisible="{CompiledBinding IsFail}" />
+            </Panel>
+          </DataTemplate>
+        </GridColumnDefinition.DataTemplate>
+      </GridColumnDefinition>
+      <GridColumnDefinition Name="" PreferedWidth="25" Property="Index" />
+      <GridColumnDefinition Name="Time" PreferedWidth="60" Property="TimeAsString" />
+      <GridColumnDefinition Name="Query" PreferedWidth="300" Property="Query" />
+      <GridColumnDefinition Name="Response" PreferedWidth="230" Property="Response" />
+      <GridColumnDefinition Name="Duration" PreferedWidth="100" Property="DurationAsString" />
+    </VirtualizedGridView.Columns>
+    <VirtualizedGridView.ContextMenu>
+      <FixedContextMenu>
+        <MenuItem Header="Copy Query" Command="{CompiledBinding CopySelectedQueriesCommand}" />
+        <MenuItem Header="Copy Response" Command="{CompiledBinding CopySelectedResponsesCommand}" />
+        <MenuItem Header="Copy Duration" Command="{CompiledBinding CopySelectedDurationsCommand}" />
+        <Separator />
+        <MenuItem Header="Clear Console" Command="{CompiledBinding ClearConsoleCommand}" />
+      </FixedContextMenu>
+    </VirtualizedGridView.ContextMenu>
+  </VirtualizedGridView>
+</UserControl>

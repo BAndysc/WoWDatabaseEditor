@@ -11,9 +11,10 @@ namespace WoWDatabaseEditorCore.Services.Processes;
 [SingleInstance]
 public class ProgramFinder : IProgramFinder
 {
-    public string? TryLocate(params string[] names)
+    private string? TryLocateCore(bool includeCurDir, string[] names)
     {
         List<string> paths = new();
+        paths.AddIfNotNull(Environment.CurrentDirectory);
         paths.AddIfNotNull(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles));
         paths.AddIfNotNull(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86));
         paths.AddIfNotNull(Environment.GetEnvironmentVariable("PATH")?.Split(Path.PathSeparator));
@@ -32,5 +33,15 @@ public class ProgramFinder : IProgramFinder
         }
 
         return null;
+    }
+    
+    public string? TryLocate(params string[] names)
+    {
+        return TryLocateCore(false, names);
+    }
+
+    public string? TryLocateIncludingCurrentDir(params string[] names)
+    {
+        return TryLocateCore(true, names);
     }
 }

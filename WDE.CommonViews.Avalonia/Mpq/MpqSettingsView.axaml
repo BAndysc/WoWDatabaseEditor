@@ -10,7 +10,7 @@
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Orientation="Vertical">
             <controls:SettingsHeader Text="Client files" />
-            <StackPanel>
+            <StackPanel Grid.IsSharedSizeScope="True">
                 <SettingItem Header="WoW Path" Help="Please select a folder with Wrath's wow.exe in it.">
                     <DockPanel LastChildFill="True">
                         <Button DockPanel.Dock="Right" Command="{CompiledBinding PickFolder}">...</Button>

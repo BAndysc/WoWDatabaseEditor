@@ -89,7 +89,15 @@ build_script:
     curl -fsSL -o bin/wowdatabaseeditor-avalonia-linux/libstorm.so https://github.com/BAndysc/StormCascLibBinary/releases/download/linux/libstorm.so
   
     curl -fsSL -o bin/wowdatabaseeditor-avalonia-linux/libcasc.so https://github.com/BAndysc/StormCascLibBinary/releases/download/linux/libcasc.so
-  
+      
+    mkdir bin/wowdatabaseeditor-avalonia-win/sqls
+      
+    curl -fsSL -o bin/wowdatabaseeditor-avalonia-win/sqls/sqls.tar.gz https://github.com/BAndysc/sqls/releases/download/v0.2.22/sqls_0.2.22_Windows_x86_64.tar.gz
+      
+    7z x bin/wowdatabaseeditor-avalonia-win/sqls/sqls.tar.gz -so | 7z x -si -ttar -obin/wowdatabaseeditor-avalonia-win/sqls/
+      
+    del /f bin/wowdatabaseeditor-avalonia-win/sqls/sqls.tar.gz
+    
     Rem Mac OS Bundle
 
     mkdir "WoW Database Editor.app"
@@ -136,13 +144,17 @@ test_script:
     dotnet test WDE.SqlInterpreter.Test/WDE.SqlInterpreter.Test.csproj
 
     dotnet test WDE.Common.Test/WDE.Common.Test.csproj
+      
+    dotnet test Modules/WDE.SqlWorkbench.Test/WDE.SqlWorkbench.Test.csproj
 
     dotnet test Rendering/TheEngine.Test/TheEngine.Test.csproj
 
     dotnet test WDE.WoWHeadConnector.Test/WDE.WoWHeadConnector.Test.csproj
 
     dotnet test WoWDatabaseEditorCore.Test/WoWDatabaseEditorCore.Test.csproj
-
+      
+    dotnet test Modules/WDE.DatabaseEditors.Test/WDE.DatabaseEditors.Test.csproj
+      
     Rem dotnet test Modules/WDE.PacketViewer.Test/WDE.PacketViewer.Test.csproj
 artifacts:
 - path: WoWDatabaseEditorMacOs.zip

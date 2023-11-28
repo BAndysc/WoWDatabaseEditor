@@ -25,7 +25,7 @@ namespace WoWDatabaseEditorCore.Services.ConfigurationService
             this.settings = settings;
         }
 
-        private void ShowSettings(Type? panelToOpen)
+        private object? ShowSettings(Type? panelToOpen)
         {
             if (openedPanel == null)
             {
@@ -39,15 +39,20 @@ namespace WoWDatabaseEditorCore.Services.ConfigurationService
                 });
             }
 
+            object? configurablePanel = null;
             if (panelToOpen != null &&
                 openedPanel.ContainerTabItems.FirstOrDefault(x => x.GetType() == panelToOpen) is { } configurable)
+            {
+                configurablePanel = configurable;
                 openedPanel.SelectedTabItem = configurable;
+            }
             
             documentManager.OpenDocument(openedPanel);
+            return configurablePanel;
         }
 
         public void ShowSettings() => ShowSettings(null);
         
-        public void ShowSettings<T>() where T : IConfigurable => ShowSettings(typeof(T));
+        public T? ShowSettings<T>() where T : IConfigurable => (T?)ShowSettings(typeof(T));
     }
 }

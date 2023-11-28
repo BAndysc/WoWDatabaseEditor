@@ -2,12 +2,15 @@ using System;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using Avalonia.Media;
+using Avalonia.Threading;
 using Avalonia.VisualTree;
 using AvaloniaStyles;
 using AvaloniaStyles.Controls;
@@ -100,6 +103,12 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
             {
                 this.Classes.Add("win10");
             }
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                ExtendClientAreaToDecorationsHint = true;
+                Chrome = ExtendedWindowChrome.NoSystemChrome;
+            }
             PersistentDockDataTemplate.DocumentManager = documentManager;
         }
 
@@ -143,6 +152,41 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
                 }
             }
             WindowState = (lastSize.WasMaximized ?? false) ? WindowState.Maximized : WindowState.Normal;
+        }
+
+        protected override void OnOpened(EventArgs e)
+        {
+            base.OnOpened(e);
+            
+            DispatcherTimer.RunOnce(() =>
+            {
+                var btn = this.GetControl<Button>("OpenSQLDocument");
+                var flyout = new Flyout()
+                {
+                    Content = new DockPanel()
+                    {
+                        Width = 300,
+                        Children =
+                        {
+                            new TextBlock()
+                            {
+                                [DockPanel.DockProperty] = global::Avalonia.Controls.Dock.Top,
+                                TextWrapping = TextWrapping.WrapWithOverflow,
+                                FontWeight = FontWeight.Bold,
+                                Text = "SQL editor is now available!"
+                            },
+                            new TextBlock()
+                            {
+                                TextWrapping = TextWrapping.WrapWithOverflow,
+                                Text =
+                                "WoW Database Editor now features a complete SQL editor just like MySql Workbench, HeidiSQL or SQLyog. Press the button to open."
+                            }
+                        }
+                    },
+                    Placement = FlyoutPlacementMode.BottomEdgeAlignedLeft,
+                };
+                flyout.ShowAt(btn);
+            }, TimeSpan.FromSeconds(1));
         }
 
         private void OnKeyUpTunneled(object? sender, KeyEventArgs e)
@@ -224,6 +268,8 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
         protected override void OnClosed(EventArgs e)
         {
             base.OnClosed(e);
+            if (DataContext is MainWindowViewModel vm)
+                vm.SessionRestoreService.GracefulShutdown();
             GlobalApplication.IsRunning = false;
         }
         

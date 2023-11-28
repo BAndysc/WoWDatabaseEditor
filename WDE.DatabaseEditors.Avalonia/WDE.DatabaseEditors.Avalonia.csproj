@@ -14,9 +14,6 @@
         <ProjectReference Include="..\WDE.DatabaseEditors\WDE.DatabaseEditors.csproj" />
         <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />
     </ItemGroup>
-    <ItemGroup>
-      <Folder Include="Services\" />
-    </ItemGroup>
     <Import Project="..\Avalonia.props" />
     <PropertyGroup>
         <OutputPath>..\bin\$(Configuration)\</OutputPath>
