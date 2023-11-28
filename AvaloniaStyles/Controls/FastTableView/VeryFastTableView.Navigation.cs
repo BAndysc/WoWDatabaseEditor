@@ -64,7 +64,8 @@ public partial class VeryFastTableView
         
         for (int group = index.GroupIndex, row = index.RowIndex + diff; group < items.Count && group >= 0; group += diff)
         {
-            if (IsGroupIndexValid(new VerticalCursor(group, row)))
+            if (IsGroupIndexValid(new VerticalCursor(group, row)) &&
+                IsFilteredGroupVisible(items[group], rowFilter, rowFilterParameter))
             {
                 for (;row < items[group].Rows.Count && row >= 0;)
                 {

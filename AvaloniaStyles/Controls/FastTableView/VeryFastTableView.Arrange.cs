@@ -47,6 +47,10 @@ public partial class VeryFastTableView
         for (var index = 0; index < Items.Count; index++)
         {
             var group = Items[index];
+
+            if (!IsFilteredGroupVisible(group, rowFilter, rowFilterParameter))
+                continue;
+            
             y += group.MarginTop;
             var headerHeight = GetHeaderHeight(index);
             var subHeaderHeight = GetSubheaderHeight(index);

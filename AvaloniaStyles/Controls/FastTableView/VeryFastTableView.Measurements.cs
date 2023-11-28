@@ -13,6 +13,9 @@ public partial class VeryFastTableView
         if (!IsGroupingEnabled)
             return 0;
 
+        if (!IsFilteredGroupVisible(Items![index], RowFilter, RowFilterParameter))
+            return 0;
+        
         if (!IsDynamicHeaderHeight)
             return HeaderRowHeight + SubHeaderHeight;
 
@@ -24,6 +27,9 @@ public partial class VeryFastTableView
         if (!IsGroupingEnabled)
             return 0;
 
+        if (!IsFilteredGroupVisible(Items![index], RowFilter, RowFilterParameter))
+            return 0;
+        
         if (!IsDynamicHeaderHeight)
             return HeaderRowHeight;
 
@@ -35,6 +41,9 @@ public partial class VeryFastTableView
         if (!IsGroupingEnabled)
             return 0;
     
+        if (!IsFilteredGroupVisible(Items![index], RowFilter, RowFilterParameter))
+            return 0;
+        
         if (!IsDynamicHeaderHeight)
             return SubHeaderHeight;
     
@@ -52,6 +61,9 @@ public partial class VeryFastTableView
         int index = 0;
         foreach (var group in Items)
         {
+            if (!IsFilteredGroupVisible(group, rowFilter, rowFilterParameter))
+                continue;
+            
             height += group.MarginTop;
             height += GetTotalHeaderHeight(index++);
             if (group.IsExpanded)

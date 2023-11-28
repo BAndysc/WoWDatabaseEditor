@@ -31,6 +31,14 @@ public partial class VeryFastTableView
 
         return group.IsExpanded && filter.IsVisible(row, parameter);
     }
+    
+    protected bool IsFilteredGroupVisible(ITableRowGroup group, IRowFilterPredicate? filter, object? parameter)
+    {
+        if (filter == null)
+            return true;
+
+        return filter.IsVisible(group, parameter);
+    }
 
 
     private bool IsFilteredRowVisible(ITableRowGroup group, ITableRow row) => IsFilteredRowVisible(group, row, RowFilter, RowFilterParameter);
@@ -67,8 +75,11 @@ public partial class VeryFastTableView
         int groupIndex = 0;
         for (var index = 0; index < Items.Count; index++)
         {
-            y += Items[index].MarginTop;
             var group = Items[index];
+            if (!IsFilteredGroupVisible(group, rowFiler, rowFilterParameter))
+                continue;
+            
+            y += Items[index].MarginTop;
             var groupStartY = y;
             var headerHeight = GetTotalHeaderHeight(index);
             var groupHeight = headerHeight;

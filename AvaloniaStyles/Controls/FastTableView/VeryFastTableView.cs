@@ -159,7 +159,9 @@ public partial class VeryFastTableView : Panel, IKeyboardNavigationHandler, IFas
                 var cursor = new VerticalCursor(groupIndex, rowIndex);
                 var inSelection = containsIterator.Contains(cursor);
                 
-                if (inSelection && !IsFilteredRowVisible(group, row, rowFilter, rowFilterParameter))
+                if (inSelection && 
+                    !IsFilteredRowVisible(group, row, rowFilter, rowFilterParameter) || 
+                    !IsFilteredGroupVisible(group, rowFilter, rowFilterParameter))
                     toRemove.Add((groupIndex, rowIndex));
             }
         }
@@ -338,7 +340,8 @@ public partial class VeryFastTableView : Panel, IKeyboardNavigationHandler, IFas
                             while (cursor != max)
                             {
                                 if (IsRowIndexValid(cursor) &&
-                                    IsFilteredRowVisible(items[cursor.GroupIndex], items[cursor.GroupIndex].Rows[cursor.RowIndex], rowFilter, rowFilterParameter))
+                                    IsFilteredRowVisible(items[cursor.GroupIndex], items[cursor.GroupIndex].Rows[cursor.RowIndex], rowFilter, rowFilterParameter) &&
+                                    IsFilteredGroupVisible(items[cursor.GroupIndex], rowFilter, rowFilterParameter))
                                     MultiSelection.Add(cursor);
                                 cursor = cursor.AddRowIndex(1);
  
