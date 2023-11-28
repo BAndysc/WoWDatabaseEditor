@@ -182,7 +182,9 @@ public class LoadCommandQuickAccess : IQuickAccessCommand, IQuickAccessSearchPro
 
     private QuickAccessItem CreateListItem(ISolutionItemProvider item)
     {
-        if (item is INumberSolutionItemProvider)
+        if (item is INumberSolutionItemProvider numberedProvider && 
+            numberedProvider.ParameterName != "Parameter" &&
+            parameterFactory.IsRegisteredLong(numberedProvider.ParameterName))
         {
             var fullCommand = "/open " + GetProviderName(item) + " ";
             return new QuickAccessItem(item.GetImage(), item.GetName(), "", item.GetGroupName(), quickCommands.SetSearchCommand, fullCommand);
