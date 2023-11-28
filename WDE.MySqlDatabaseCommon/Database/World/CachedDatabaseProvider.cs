@@ -275,6 +275,10 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public Task<IList<IGameObject>> GetGameObjectsAsync() => WaitForCache(nonCachedDatabase.GetGameObjectsAsync());
 
+        public Task<IReadOnlyList<ICreature>> GetCreaturesAsync(IEnumerable<SpawnKey> guids) => nonCachedDatabase.GetCreaturesAsync(guids);
+
+        public Task<IReadOnlyList<IGameObject>> GetGameObjectsAsync(IEnumerable<SpawnKey> guids) => nonCachedDatabase.GetGameObjectsAsync(guids);
+
         public Task<IList<ICreature>> GetCreaturesByMapAsync(uint map) => WaitForCache(nonCachedDatabase.GetCreaturesByMapAsync(map));
         
         public Task<IList<IGameObject>> GetGameObjectsByMapAsync(uint map) => WaitForCache(nonCachedDatabase.GetGameObjectsByMapAsync(map));

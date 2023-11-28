@@ -199,5 +199,10 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public Task<List<IEventAiLine>> GetEventAi(int id) => impl.GetEventAi(id);
 
         public Task<IReadOnlyList<IQuestScriptName>> GetQuestScriptNames(uint questId) => impl.GetQuestScriptNames(questId);
+        
+        public Task<IReadOnlyList<ICreature>> GetCreaturesAsync(IEnumerable<SpawnKey> guids) => impl.GetCreaturesAsync(guids);
+
+        public Task<IReadOnlyList<IGameObject>> GetGameObjectsAsync(IEnumerable<SpawnKey> guids) => impl.GetGameObjectsAsync(guids);
+
     }
 }

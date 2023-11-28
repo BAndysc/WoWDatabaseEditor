@@ -228,6 +228,8 @@ namespace WDE.CMMySqlDatabase.Database
         public abstract Task<List<IGameObjectTemplate>> GetGameObjectTemplatesAsync();
         public abstract Task<IGameObjectTemplate?> GetGameObjectTemplate(uint entry);
         public abstract Task<IList<IGameObject>> GetGameObjectsAsync();
+        public abstract Task<IReadOnlyList<ICreature>> GetCreaturesAsync(IEnumerable<SpawnKey> guids);
+        public abstract Task<IReadOnlyList<IGameObject>> GetGameObjectsAsync(IEnumerable<SpawnKey> guids);
 
         protected virtual IQueryable<QuestTemplateWoTLK> GetQuestsQuery(BaseDatabaseTables model)
         {

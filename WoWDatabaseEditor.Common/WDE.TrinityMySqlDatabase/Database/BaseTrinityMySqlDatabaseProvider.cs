@@ -285,6 +285,8 @@ namespace WDE.TrinityMySqlDatabase.Database
         }
 
         public abstract Task<IList<IGameObject>> GetGameObjectsAsync();
+        public abstract Task<IReadOnlyList<ICreature>> GetCreaturesAsync(IEnumerable<SpawnKey> guids);
+        public abstract Task<IReadOnlyList<IGameObject>> GetGameObjectsAsync(IEnumerable<SpawnKey> guids);
 
         public abstract IReadOnlyList<IQuestTemplate> GetQuestTemplates();
         

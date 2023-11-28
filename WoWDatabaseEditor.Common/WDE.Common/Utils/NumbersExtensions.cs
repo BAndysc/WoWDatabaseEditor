@@ -5,7 +5,7 @@ namespace WDE.Common.Utils;
 
 public static class NumbersExtensions
 {
-    private static int maxLength = "18446744073709551615".Length + 1;
+    private static int maxLength = "18446744073709551615".Length + 2; // +2 for a sign
 
     /// <summary>
     /// Non alloc function which returns true if the number string representation contains the given string
@@ -44,7 +44,10 @@ public static class NumbersExtensions
     private static bool ContainsNonDigit(this string str)
     {
         int length = str.Length;
-        for (int i = 0; i < length; ++i)
+        int i = 0;
+        if (str[0] == '-')
+            i++;
+        for (; i < length; ++i)
         {
             if (!char.IsDigit(str[i]))
                 return true;

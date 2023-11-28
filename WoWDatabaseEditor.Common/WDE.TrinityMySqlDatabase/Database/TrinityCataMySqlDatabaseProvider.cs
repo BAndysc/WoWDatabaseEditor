@@ -129,6 +129,20 @@ public class TrinityCataMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvider
         return await model.Creature.OrderBy(t => t.Entry).ToListAsync<ICreature>();
     }
 
+    public override async Task<IReadOnlyList<ICreature>> GetCreaturesAsync(IEnumerable<SpawnKey> guids)
+    {
+        await using var model = Database();
+        var array = guids.Select(x => x.Guid).ToArray();
+        return await model.Creature.Where(c => array.Contains(c.Guid)).ToListAsync<ICreature>();
+    }
+        
+    public override async Task<IReadOnlyList<IGameObject>> GetGameObjectsAsync(IEnumerable<SpawnKey> guids)
+    {
+        await using var model = Database();
+        var array = guids.Select(x => x.Guid).ToArray();
+        return await model.GameObject.Where(c => array.Contains(c.Guid)).ToListAsync<IGameObject>();
+    }
+
     public override async Task<IList<ITrinityString>> GetStringsAsync()
     {
         await using var model = Database();

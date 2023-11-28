@@ -102,6 +102,9 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public Task<IList<IGameObject>> GetGameObjectsByEntryAsync(uint entry) => Task.FromResult<IList<IGameObject>>(new List<IGameObject>());
 
         public IReadOnlyList<ICreature> GetCreatures() => Array.Empty<ICreature>();
+        
+        public async Task<IReadOnlyList<IGameObject>> GetGameObjectsAsync(IEnumerable<SpawnKey> guids) => Array.Empty<IGameObject>();
+
         public Task<IList<ICreature>> GetCreaturesByMapAsync(uint map) => Task.FromResult<IList<ICreature>>(new List<ICreature>());
         
         public Task<IList<IGameObject>> GetGameObjectsByMapAsync(uint map) => Task.FromResult<IList<IGameObject>>(new List<IGameObject>());
@@ -127,6 +130,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public Task<IList<ICreature>> GetCreaturesAsync() => Task.FromResult<IList<ICreature>>(new List<ICreature>());
 
         public Task<IList<IGameObject>> GetGameObjectsAsync() => Task.FromResult<IList<IGameObject>>(new List<IGameObject>());
+        
+        public async Task<IReadOnlyList<ICreature>> GetCreaturesAsync(IEnumerable<SpawnKey> guids) => Array.Empty<ICreature>();
 
         public Task<List<IConversationTemplate>> GetConversationTemplatesAsync() => Task.FromResult(new List<IConversationTemplate>());
         
