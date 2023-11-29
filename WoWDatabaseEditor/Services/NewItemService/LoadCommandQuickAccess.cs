@@ -11,7 +11,6 @@ using WDE.Common.Events;
 using WDE.Common.Parameters;
 using WDE.Common.QuickAccess;
 using WDE.Common.Tasks;
-using WDE.Common.Types;
 using WDE.Common.Utils;
 using WDE.Module.Attributes;
 
@@ -97,17 +96,23 @@ public class LoadCommandQuickAccess : IQuickAccessCommand, IQuickAccessSearchPro
 
         ISolutionItemProvider? bestMatch = null;
         int matching = 0;
+        int containing = 0;
         
         foreach (var p in providers)
         {
-            if (p.GetName().ToLower().StartsWith(name))
+            if (p.GetName().StartsWith(name, StringComparison.OrdinalIgnoreCase))
             {
                 bestMatch = p;
                 matching++;
             }
+
+            if (p.GetName().Contains(name, StringComparison.OrdinalIgnoreCase))
+            {
+                containing++;
+            }
         }
 
-        if (matching == 1)
+        if (matching == 1 && containing == 1)
             return bestMatch;
         return null;
     }
@@ -145,6 +150,7 @@ public class LoadCommandQuickAccess : IQuickAccessCommand, IQuickAccessSearchPro
                         else
                             produce(new QuickAccessItem(longProvider.GetImage(), 
                                 "(non existing)", longValue.ToString(), "", DirectCreateCommand, (longProvider, longValue)));
+                        return Task.CompletedTask;
                     }
                     else
                     {
@@ -162,12 +168,13 @@ public class LoadCommandQuickAccess : IQuickAccessCommand, IQuickAccessSearchPro
                                 }
                             }
                         }
+                        if (total > 0)
+                            return Task.CompletedTask;
                     }
-                    return Task.CompletedTask;
                 }
             }
 
-            var sorted = FuzzySharp.Process.ExtractSorted(type.ToString(), names, p => p.ToLower(), null, 70);
+            var sorted = FuzzySharp.Process.ExtractSorted(text, names, p => p.ToLower(), null, 70);
             foreach (var s in sorted)
             {
                 var item = providers[s.Index];
