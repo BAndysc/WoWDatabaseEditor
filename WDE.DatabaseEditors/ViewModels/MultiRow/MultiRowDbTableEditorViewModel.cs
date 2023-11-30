@@ -311,7 +311,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                     foreach (var entity in deserialized)
                     {
                         if (key.HasValue)
-                            entity.SetTypedCellOrThrow(tableDefinition.PrimaryKey[0], key.Value[0]);
+                            entity.SetTypedCellOrThrow(tableDefinition.GroupByKeys[0], key.Value[0]);
                         ForceInsertEntity(entity, index++);
                     }
                 }
