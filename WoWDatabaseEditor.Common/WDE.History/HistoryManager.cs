@@ -81,17 +81,22 @@ namespace WDE.History
         {
             if (!acceptNew)
                 throw new Exception("Cannot do history action when not accepting new actions");
-            
-            acceptNew = false;
 
-            EnsureLimits();
-            Past.Add(action);
-            Future.Clear();
-            RecalculateValues();
+            try
+            {
+                acceptNew = false;
+
+                EnsureLimits();
+                Past.Add(action);
+                Future.Clear();
+                RecalculateValues();
             
-            action.Redo();
-            
-            acceptNew = true;
+                action.Redo();
+            }
+            finally
+            {
+                acceptNew = true;
+            }
         }
 
         private void HandlerOnActionPush(object? sender, IHistoryAction e)
