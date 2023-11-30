@@ -51,6 +51,28 @@ public partial class VeryFastTableView
         InvalidateMeasure();
         InvalidateVisual();
         InvalidateArrange();
+        FixSelectedRowIndexIfInvalid();
+        RemoveInvisibleFromSelection();
+    }
+    
+    private void FixSelectedRowIndexIfInvalid()
+    {
+        if (SelectedRowIndex == VerticalCursor.None)
+            return;
+        if (Items == null)
+        {
+            SelectedRowIndex = VerticalCursor.None;
+            return;
+        }
+
+        if (SelectedRowIndex.GroupIndex >= Items.Count)
+        {
+            SelectedRowIndex = VerticalCursor.None;
+            return;
+        }
+
+        if (SelectedRowIndex.RowIndex >= Items[SelectedRowIndex.GroupIndex].Rows.Count)
+            SelectedRowIndex = VerticalCursor.None;
     }
 
     private void ItemsChanged(object? sender, NotifyCollectionChangedEventArgs e)
