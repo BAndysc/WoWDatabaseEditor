@@ -98,11 +98,12 @@ namespace WDE.Spells
                         }
                     }
                     entry.Targets = string.Join(", ", distinctTargets);
-                    spellIdToIndex[spellId] = cachedSpells.Count;
                     cachedSpells.Add(entry);
                 }
             }
             cachedSpells.Sort((a, b) => a.Id.CompareTo(b.Id));
+            for (int i = 0; i < cachedSpells.Count; ++i)
+                spellIdToIndex[cachedSpells[i].Id] = i;
         }
 
         public bool ContainsSpell(uint spellId) => spellIdToIndex.ContainsKey(spellId);
