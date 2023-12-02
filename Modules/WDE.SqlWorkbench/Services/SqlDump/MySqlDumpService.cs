@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using WDE.Common.Services.Processes;
+using WDE.Common.Tasks;
 using WDE.Module.Attributes;
 using WDE.SqlWorkbench.Models;
 
@@ -15,14 +17,17 @@ namespace WDE.SqlWorkbench.Services.SqlDump;
 internal class MySqlDumpService : IMySqlDumpService
 {
     private readonly IProgramFinder programFinder;
+    private readonly IMainThread mainThread;
     private readonly IProcessService processService;
 
     private static byte[] NewLine = "\n"u8.ToArray();
     
     public MySqlDumpService(IProgramFinder programFinder,
+        IMainThread mainThread,
         IProcessService processService)
     {
         this.programFinder = programFinder;
+        this.mainThread = mainThread;
         this.processService = processService;
     }
 
@@ -54,7 +59,13 @@ internal class MySqlDumpService : IMySqlDumpService
         }
     }
     
-    public async Task DumpDatabaseAsync(DatabaseCredentials credentials, MySqlDumpOptions options, string[] tables, string output, CancellationToken token)
+    public async Task DumpDatabaseAsync(DatabaseCredentials credentials, 
+        MySqlDumpOptions options, 
+        string[] allTables,
+        string[] tables,
+        string output, 
+        Action<long> bytesWrittenCallback,
+        CancellationToken token)
     {
         List<string> arguments = new List<string>();
         AddOptions(options, arguments);
@@ -70,8 +81,14 @@ internal class MySqlDumpService : IMySqlDumpService
         else
             arguments.Add("--skip-password");
         
+        arguments.Add("--databases");
         arguments.Add(credentials.SchemaName);
-        arguments.AddRange(tables);
+        
+        foreach (var ignoredTable in allTables.Except(tables))
+        {
+            arguments.Add("--ignore-table");
+            arguments.Add($"{credentials.SchemaName}.{ignoredTable}");
+        }
 
         await using var f = File.Open(output, FileMode.Create, FileAccess.Write);
         
@@ -80,6 +97,7 @@ internal class MySqlDumpService : IMySqlDumpService
             var bytes = System.Text.Encoding.UTF8.GetBytes(x);
             f.Write(bytes);
             f.Write(NewLine);
+            mainThread.Dispatch(() => bytesWrittenCallback(bytes.Length + NewLine.Length));
         }, x =>
         {
             Console.WriteLine(x);

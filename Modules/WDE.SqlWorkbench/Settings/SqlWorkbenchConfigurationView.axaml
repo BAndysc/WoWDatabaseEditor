@@ -21,6 +21,9 @@
         <SettingItem Header="Code completion" Help="Note: code completion gets disabled if your document is over 500,000 chars for performance reasons">
           <ToggleSwitch IsChecked="{CompiledBinding UseCodeCompletion}" />
         </SettingItem>
+        <SettingItem Header="Open each database in a separate connection" Help="When enabled, each database, no matter if they are in the same group or not, will open a new database connection. When disabled, all databases in a single group will use the same connection (but different groups will still have separate connection)">
+          <ToggleSwitch IsChecked="{CompiledBinding EachDatabaseHasSeparateConnection}" />
+        </SettingItem>
         <SettingItem Header="Custom SQLS path" Help="The editor uses SQLS for code completion. If you built the editor manually, or if you are using Linux or macOS the SQLS is not bundled, you have to download it and provide the path here.">
           <DockPanel KeyboardNavigation.TabNavigation="Local">
             <CheckBox IsChecked="{CompiledBinding HasCustomSqlsPath}" TabIndex="0" />

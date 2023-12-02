@@ -23,7 +23,7 @@ public class TaskQueueTests
 
         Assert.IsTrue(taskExecuted);
     }
-
+    
     [Test]
     public async Task CancelAll_CancelsScheduledTask()
     {
@@ -54,7 +54,7 @@ public class TaskQueueTests
 
         Assert.ThrowsAsync<InvalidOperationException>(async () => await task);
     }
-
+    
     [Test]
     public async Task Schedule_MultipleTasks_ExecutesAll()
     {
@@ -161,5 +161,53 @@ public class TaskQueueTests
         tcs.SetResult();
         Assert.IsTrue(innerTaskFinished);
         Assert.IsTrue(innerTaskHadTokenCancelled);
+    }
+    
+    
+    // TYPED<T> variant tests
+    
+    [Test]
+    public async Task Schedule_ExecutesTypedTaskSuccessfully()
+    {
+        var queue = new TaskQueue();
+        bool taskExecuted = false;
+        var result = await queue.Schedule(async _ =>
+        {
+            taskExecuted = true;
+            return 5;
+        });
+
+        Assert.IsTrue(taskExecuted);
+        Assert.AreEqual(5, result);
+    }
+    
+    [Test]
+    public async Task Schedule_ThrowsException_Typed_PropagatesException()
+    {
+        var queue = new TaskQueue();
+        var task = queue.Schedule<int>(_ => throw new InvalidOperationException());
+
+        Assert.ThrowsAsync<InvalidOperationException>(async () => await task);
+    }
+
+    [Test]
+    public async Task CancelAll_TypedTasks()
+    {
+        TaskCompletionSource wait = new();
+        var queue = new TaskQueue();
+        
+        var t1 = queue.Schedule(async _ =>
+        {
+            await wait.Task;
+            return 5;
+        });
+        var t2 = queue.Schedule(async _ => 4);
+        
+        var cancel =  queue.CancelAll();
+        wait.SetResult();
+        await cancel;
+        
+        Assert.IsTrue(t1.IsCanceled);
+        Assert.IsTrue(t2.IsCanceled);
     }
 }

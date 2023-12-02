@@ -77,7 +77,7 @@ public partial class ActionsOutputViewModel : ObservableBase, ITool, IActionsOut
 
     public IActionOutput Create(string query)
     {
-        var action = new ActionOutputViewModel(actionIndex++, DateTime.Now, query);
+        var action = new ActionOutputViewModel(actionIndex++, query);
         actions.Add(action);
         FocusedIndex = actions.Count - 1;
         return action;

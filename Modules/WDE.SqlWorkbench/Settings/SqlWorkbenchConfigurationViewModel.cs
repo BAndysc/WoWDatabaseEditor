@@ -42,15 +42,19 @@ internal partial class SqlWorkbenchConfigurationViewModel : ObservableBase, ICon
                               ConnectionsContainerIsModified || 
                               (DefaultConnection?.Id ?? Guid.Empty) != originalDefaultConnection ||
                               originalUseCodeCompletion != UseCodeCompletion ||
-                              originalCustomSqlsPath != CustomSqlsPath;
+                              originalCustomSqlsPath != CustomSqlsPath ||
+                              originalEachDatabaseHasSeparateConnection != EachDatabaseHasSeparateConnection;
 
     private Guid originalDefaultConnection;
     private bool originalUseCodeCompletion;
     private string? originalCustomSqlsPath;
+    private bool originalEachDatabaseHasSeparateConnection;
     
     public ObservableCollection<ConnectionConfigViewModel> Connections { get; } = new();
 
     [Notify] private bool useCodeCompletion;
+    
+    [Notify] private bool eachDatabaseHasSeparateConnection;
 
     [Notify] [AlsoNotify(nameof(HasCustomSqlsPath))] private string? customSqlsPath;
 
@@ -108,11 +112,13 @@ internal partial class SqlWorkbenchConfigurationViewModel : ObservableBase, ICon
             preferences.DefaultConnection = DefaultConnection?.Id;
             preferences.UseCodeCompletion = UseCodeCompletion;
             preferences.CustomSqlsPath = CustomSqlsPath;
+            preferences.EachDatabaseHasSeparateConnection = EachDatabaseHasSeparateConnection;
             preferences.Save();
             
             originalDefaultConnection = preferences.DefaultConnection ?? Guid.Empty;
             originalUseCodeCompletion = preferences.UseCodeCompletion;
             originalCustomSqlsPath = preferences.CustomSqlsPath;
+            originalEachDatabaseHasSeparateConnection = preferences.EachDatabaseHasSeparateConnection;
             foreach (var connection in Connections)
                 connection.Original = connection.ToConnectionData();
             ConnectionsContainerIsModified = false;
@@ -202,6 +208,7 @@ internal partial class SqlWorkbenchConfigurationViewModel : ObservableBase, ICon
         DefaultConnection = Connections.FirstOrDefault(c => c.Id == preferences.DefaultConnection);
         SelectedConnection = DefaultConnection ?? Connections.FirstOrDefault();
         originalDefaultConnection = preferences.DefaultConnection ?? Guid.Empty;
+        originalEachDatabaseHasSeparateConnection = EachDatabaseHasSeparateConnection = preferences.EachDatabaseHasSeparateConnection;
         UseCodeCompletion = originalUseCodeCompletion = preferences.UseCodeCompletion;
         CustomSqlsPath = originalCustomSqlsPath = preferences.CustomSqlsPath;
         ConnectionsContainerIsModified = false;

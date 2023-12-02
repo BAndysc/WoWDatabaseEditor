@@ -1,17 +1,20 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Input;
 using Avalonia;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using AvaloniaStyles.Controls.FastTableView;
 using AvaloniaStyles.Controls.OptimizedVeryFastTableView;
+using Prism.Commands;
 using PropertyChanged.SourceGenerator;
 using WDE.Common.Avalonia.Components;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Types;
 using WDE.Common.Utils;
 using WDE.MVVM;
+using WDE.SqlWorkbench.Models;
 using WDE.SqlWorkbench.Services.Connection;
 
 namespace WDE.SqlWorkbench.ViewModels;
@@ -36,6 +39,8 @@ internal partial class SelectResultsViewModel : ObservableBase
     
     public virtual ImageUri Icon => new("Icons/icon_mini_view_big.png");
     
+    public ICommand CopyColumnNameCommand { get; }
+    
     public SelectResultsViewModel(SqlWorkbenchViewModel vm, string title, in SelectResult results)
     {
         this.vm = vm;
@@ -43,6 +48,14 @@ internal partial class SelectResultsViewModel : ObservableBase
         TableController = new TableController(this);
         Title = title;
         Columns = results.ColumnNames.Select(x => new TableTableColumnHeader(x)).Prepend(new TableTableColumnHeader("#", 50)).ToArray();
+        
+        CopyColumnNameCommand = new DelegateCommand(() =>
+        {
+            if (selectedCellIndex == -1 || selectedCellIndex >= Columns.Count)
+                return;
+            var name = Columns[selectedCellIndex].Header;
+            vm.ClipboardService.SetText(name);
+        });
     }
 
     protected void UpdateView()

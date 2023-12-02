@@ -14,6 +14,7 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="viewModels:SqlWorkbenchViewModel"
              Name="Root"
+             IsEnabled="{CompiledBinding !IsConnecting}"
              x:Class="WDE.SqlWorkbench.Views.SqlWorkbenchView">
   <Grid RowDefinitions="*,5,0" Name="Grid">
     <DockPanel>

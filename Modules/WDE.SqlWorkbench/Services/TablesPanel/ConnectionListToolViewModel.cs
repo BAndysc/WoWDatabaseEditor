@@ -17,32 +17,56 @@ using WDE.SqlWorkbench.Models;
 using WDE.SqlWorkbench.Services.Connection;
 using WDE.SqlWorkbench.Services.SqlDump;
 using WDE.SqlWorkbench.Services.TableUtils;
+using WDE.SqlWorkbench.Settings;
 using WDE.SqlWorkbench.ViewModels;
 
 namespace WDE.SqlWorkbench.Services.TablesPanel;
 
+internal interface INamedNodeType : INodeType
+{
+    string Name { get; }
+    ImageUri Icon { get; }
+}
+
+internal interface INamedParentType : IParentType, INamedNodeType
+{
+}
+
+internal interface INamedChildType : IChildType, INamedNodeType
+{
+}
+
+
 internal partial class ConnectionListToolViewModel : ObservableBase, ITablesToolGroup
 {
     public IMessageBoxService MessageBoxService { get; }
-    public IMySqlConnector SqlConnector { get; }
+    private readonly IConnection connection;
     private readonly Lazy<IExtendedSqlEditorService> sqlEditorService;
     [Notify] private bool isLoading;
     [Notify] private bool listUpdated;
     [Notify] private string searchText = "";
-    [Notify] [AlsoNotify(nameof(SelectedDatabase), nameof(SelectedTable), nameof(IsTableSelected))] private INodeType? selected;
+    [Notify] [AlsoNotify(nameof(SelectedDatabase), nameof(SelectedTable), nameof(SelectedRoutine), nameof(SelectedGroup),
+        nameof(IsTableSelected), nameof(IsDatabaseSelected), nameof(IsRoutineSelected))] private INodeType? selected;
     
-    public DatabaseConnectionData ConnectionData { get; set; }
+    public ISqlWorkbenchPreferences Preferences { get; }
     public SchemaViewModel? SelectedDatabase => selected as SchemaViewModel;
     public TableViewModel? SelectedTable => selected as TableViewModel;
+    public RoutineViewModel? SelectedRoutine => selected as RoutineViewModel;
+    public DatabaseObjectGroupViewModel? SelectedGroup => selected as DatabaseObjectGroupViewModel;
     
     public string? SelectedSchemaName => SelectedDatabase?.SchemaName ?? SelectedTable?.Schema.SchemaName;
     
-    private ObservableCollectionExtended<SchemaViewModel> roots = new();
-    public FlatTreeList<SchemaViewModel, IChildType> FlatItems { get; }
+    public IConnection? SelectedConnection => SelectedDatabase?.Connection 
+        ?? SelectedTable?.Schema.Connection
+        ?? SelectedRoutine?.Schema.Connection
+        ?? SelectedGroup?.Schema.Connection;
     
-    public ImageUri Icon => ConnectionData.Icon ?? ImageUri.Empty;
-    public string GroupName => ConnectionData.ConnectionName;
-    public RgbColor? CustomColor => ConnectionData.Color is { } col ? new RgbColor(col.R, col.G, col.B) : null;
+    private ObservableCollectionExtended<SchemaViewModel> roots = new();
+    public FlatTreeList<INamedParentType, INamedChildType> FlatItems { get; }
+    
+    public ImageUri Icon => connection.ConnectionData.Icon ?? ImageUri.Empty;
+    public string GroupName => connection.ConnectionData.ConnectionName;
+    public RgbColor? CustomColor => connection.ConnectionData.Color is { } col ? new RgbColor(col.R, col.G, col.B) : null;
     public int Priority => 0;
     
     private CancellationTokenSource? loadCancellationTokenSource;
@@ -55,49 +79,85 @@ internal partial class ConnectionListToolViewModel : ObservableBase, ITablesTool
     public AsyncAutoCommand CopyUpdateCommand { get; }
     public AsyncAutoCommand CopyDeleteCommand { get; }
     public AsyncAutoCommand CopyCreateCommand { get; }
+    public DelegateCommand DumpDatabaseCommand { get; }
     public DelegateCommand DumpTableCommand { get; }
     public DelegateCommand DropTableCommand { get; }
     public DelegateCommand TruncateTableCommand { get; }
     public DelegateCommand RefreshDatabaseCommand { get; }
+    public DelegateCommand AddNewTableCommand { get; }
+    public DelegateCommand AddNewViewCommand { get; }
+    public DelegateCommand AddNewProcedureCommand { get; }
+    public DelegateCommand AddNewFunctionCommand { get; }
     
     public ConnectionListToolViewModel(IMessageBoxService messageBoxService,
-        IMySqlConnector sqlConnector,
         Lazy<ITableUtility> utility,
         IClipboardService clipboardService,
         IQueryGenerator queryGenerator,
         IDatabaseDumpService databaseDumpService,
         IQueryDialogService queryDialogService,
+        IConnection connection,
+        ISqlWorkbenchPreferences preferences,
         Lazy<IExtendedSqlEditorService> sqlEditorService)
     {
         MessageBoxService = messageBoxService;
-        SqlConnector = sqlConnector;
+        Preferences = preferences;
+        this.connection = connection;
         this.sqlEditorService = sqlEditorService;
-        FlatItems = new FlatTreeList<SchemaViewModel, IChildType>(roots);
+        FlatItems = new FlatTreeList<INamedParentType, INamedChildType>(roots);
         
-        SelectRowsCommand = new DelegateCommand(() => utility.Value.OpenSelectRows(ConnectionData, SelectedSchemaName!, SelectedTable!.TableName), () => IsTableSelected);
-        InspectTableComment = new DelegateCommand(() => utility.Value.InspectTable(ConnectionData, SelectedSchemaName!, SelectedTable!.TableName), () => IsTableSelected);
-        CopyNameCommand = new DelegateCommand(() => clipboardService.SetText(SelectedTable?.TableName ?? SelectedSchemaName!), () => IsAnythingSelected);
+        SelectRowsCommand = new DelegateCommand(() => utility.Value.OpenSelectRows(SelectedConnection!, SelectedSchemaName!, SelectedTable!.TableName), () => IsTableSelected);
+        InspectTableComment = new DelegateCommand(() => utility.Value.InspectTable(SelectedConnection!, SelectedSchemaName!, SelectedTable!.TableName), () => IsTableSelected);
+        CopyNameCommand = new DelegateCommand(() => clipboardService.SetText(SelectedTable?.TableName ?? SelectedRoutine?.RoutineName ?? SelectedSchemaName!), () => IsAnythingSelected);
         CopySelectAllCommand = new AsyncAutoCommand(async () =>
         {
-            clipboardService.SetText(await queryGenerator.GenerateSelectAllAsync(ConnectionData.Credentials.WithSchemaName(SelectedSchemaName!), SelectedTable!.TableName));
+            await using var session = await SelectedConnection!.OpenSessionAsync();
+            clipboardService.SetText(await queryGenerator.GenerateSelectAllAsync(session, SelectedSchemaName!, SelectedTable!.TableName));
         }, () => IsTableSelected);
         CopyInsertCommand = new AsyncAutoCommand(async () =>
         {
-            clipboardService.SetText(await queryGenerator.GenerateInsertAsync(ConnectionData.Credentials.WithSchemaName(SelectedSchemaName!), SelectedTable!.TableName));
+            await using var session = await SelectedConnection!.OpenSessionAsync();
+            clipboardService.SetText(await queryGenerator.GenerateInsertAsync(session, SelectedSchemaName!, SelectedTable!.TableName));
         }, () => IsTableSelected);
         CopyUpdateCommand = new AsyncAutoCommand(async () =>
         {
-            clipboardService.SetText(await queryGenerator.GenerateUpdateAsync(ConnectionData.Credentials.WithSchemaName(SelectedSchemaName!), SelectedTable!.TableName));
+            await using var session = await SelectedConnection!.OpenSessionAsync();
+            clipboardService.SetText(await queryGenerator.GenerateUpdateAsync(session, SelectedSchemaName!, SelectedTable!.TableName));
         }, () => IsTableSelected);
         CopyDeleteCommand = new AsyncAutoCommand(async () =>
         {
-            clipboardService.SetText(await queryGenerator.GenerateDeleteAsync(ConnectionData.Credentials.WithSchemaName(SelectedSchemaName!), SelectedTable!.TableName));
+            await using var session = await SelectedConnection!.OpenSessionAsync();
+            clipboardService.SetText(await queryGenerator.GenerateDeleteAsync(session, SelectedSchemaName!, SelectedTable!.TableName));
         }, () => IsTableSelected);
         CopyCreateCommand = new AsyncAutoCommand(async () =>
         {
-            clipboardService.SetText(await queryGenerator.GenerateCreateAsync(ConnectionData.Credentials.WithSchemaName(SelectedSchemaName!), SelectedTable!.TableName));
+            await using var session = await SelectedConnection!.OpenSessionAsync();
+            clipboardService.SetText(await queryGenerator.GenerateCreateAsync(session, SelectedSchemaName!, SelectedTable!.TableName));
         }, () => IsTableSelected);
-        DumpTableCommand = new DelegateCommand(() => databaseDumpService.ShowDumpTableWindowAsync(ConnectionData.Credentials.WithSchemaName(SelectedSchemaName!), SelectedTable!.TableName).ListenErrors(),
+
+        AddNewTableCommand = new DelegateCommand(() =>
+        {
+            this.sqlEditorService.Value.NewDocumentWithQuery(SelectedConnection!, "CREATE TABLE <NAME> (\n    <COLUMN_NAME> <TYPE> <EXTRA>\n);");
+        }, () => Selected != null);
+        
+        AddNewViewCommand = new DelegateCommand(() =>
+        {
+            var tableName = (SelectedTable is { Type: TableType.Table } t) ? t.TableName : "<TABLE_NAME>";
+            this.sqlEditorService.Value.NewDocumentWithQuery(SelectedConnection!, $"CREATE VIEW <NAME> AS\nSELECT\n    *\nFROM\n    {tableName};");
+        }, () => Selected != null);
+        
+        AddNewProcedureCommand = new DelegateCommand(() =>
+        {
+            this.sqlEditorService.Value.NewDocumentWithQuery(SelectedConnection!, "delimiter //\nCREATE PROCEDURE <NAME> (<PARAMS>)\nBEGIN\n    ...\nEND //");
+        }, () => Selected != null);
+        
+        AddNewFunctionCommand = new DelegateCommand(() =>
+        {
+            this.sqlEditorService.Value.NewDocumentWithQuery(SelectedConnection!, "delimiter //\nCREATE FUNCTION <NAME> (<PARAMS>)\nRETURNS <TYPE>\nBEGIN\n    ...\nEND //");
+        }, () => Selected != null);
+        
+        DumpDatabaseCommand = new DelegateCommand(() => databaseDumpService.ShowDumpDatabaseWindowAsync(SelectedConnection!.ConnectionData.Credentials.WithSchemaName(SelectedSchemaName!)).ListenErrors(),
+            () => IsDatabaseSelected);
+        DumpTableCommand = new DelegateCommand(() => databaseDumpService.ShowDumpTableWindowAsync(SelectedConnection!.ConnectionData.Credentials.WithSchemaName(SelectedSchemaName!), SelectedTable!.TableName).ListenErrors(),
             () => IsTableSelected);
         DropTableCommand = new DelegateCommand(() =>
         {
@@ -109,13 +169,13 @@ internal partial class ConnectionListToolViewModel : ObservableBase, ITablesTool
         }, () => IsTableSelected);
         RefreshDatabaseCommand = new DelegateCommand(() =>
         {
-            var db = SelectedDatabase ?? SelectedTable?.Schema;
+            var db = SelectedDatabase ?? SelectedTable?.Schema ?? SelectedRoutine?.Schema ?? SelectedGroup?.Schema;
             if (db != null)
             {
                 db.IsExpanded = false;
                 db.IsExpanded = true;
             }
-        }, () => IsAnythingSelected);
+        }, () => Selected != null);
         
         On(() => SearchText, DoFilter);
         On(() => Selected, _ => RaiseCommandsCanExecuteChanged());
@@ -131,6 +191,11 @@ internal partial class ConnectionListToolViewModel : ObservableBase, ITablesTool
         CopyUpdateCommand.RaiseCanExecuteChanged();
         CopyDeleteCommand.RaiseCanExecuteChanged();
         CopyCreateCommand.RaiseCanExecuteChanged();
+        AddNewTableCommand.RaiseCanExecuteChanged();
+        AddNewViewCommand.RaiseCanExecuteChanged();
+        AddNewProcedureCommand.RaiseCanExecuteChanged();
+        AddNewFunctionCommand.RaiseCanExecuteChanged();
+        DumpDatabaseCommand.RaiseCanExecuteChanged();
         DumpTableCommand.RaiseCanExecuteChanged();
         DropTableCommand.RaiseCanExecuteChanged();
         TruncateTableCommand.RaiseCanExecuteChanged();
@@ -140,8 +205,10 @@ internal partial class ConnectionListToolViewModel : ObservableBase, ITablesTool
     public bool IsTableSelected => SelectedTable != null;
 
     public bool IsDatabaseSelected => SelectedDatabase != null;
+    
+    public bool IsRoutineSelected => SelectedRoutine != null;
 
-    public bool IsAnythingSelected => SelectedTable != null || SelectedDatabase != null;
+    public bool IsAnythingSelected => IsTableSelected || IsDatabaseSelected || IsRoutineSelected;
 
     public void ToolOpened()
     {
@@ -181,22 +248,29 @@ internal partial class ConnectionListToolViewModel : ObservableBase, ITablesTool
 
     private void DoFilter(string search)
     {
+        bool UpdateVisibility(DatabaseObjectGroupViewModel item)
+        {
+            bool anyChildVisible = false;
+            foreach (var child in item.Children)
+            {
+                var childMatched = string.IsNullOrEmpty(search);
+                if (child is INamedChildType namedChild)   
+                    childMatched |= namedChild.Name.Contains(search, StringComparison.OrdinalIgnoreCase);
+                child.IsVisible = childMatched;
+                anyChildVisible |= childMatched;
+            }
+            
+            return item.IsVisible = anyChildVisible;
+        }
+        
         bool UpdateVisibilityRecursive(SchemaViewModel item)
         {
             bool anyChildVisible = false;
             var matched = string.IsNullOrEmpty(search) || item.SchemaName.Contains(search, StringComparison.OrdinalIgnoreCase);
             item.IsVisible = matched;
-            foreach (var child in item.Children)
-            {
-                var childMatched = string.IsNullOrEmpty(search);
-                if (child is TableViewModel tableItem)   
-                     childMatched |= tableItem.TableName.Contains(search, StringComparison.OrdinalIgnoreCase);
-                child.IsVisible = childMatched;
-                anyChildVisible |= childMatched;
-            }
             
-            // foreach (var child in item.NestedParents.Cast<RawDatabaseItem>())
-            //     anyChildVisible |= UpdateVisibilityRecursive(child);
+            foreach (var nestedParent in item.NestedParents.Cast<DatabaseObjectGroupViewModel>())
+                anyChildVisible |= UpdateVisibility(nestedParent);
             
             if (anyChildVisible)
                 item.IsVisible = true;
@@ -214,12 +288,19 @@ internal partial class ConnectionListToolViewModel : ObservableBase, ITablesTool
     {
         if (node is SchemaViewModel databaseItem)
         {
-            sqlEditorService.Value.NewDocumentWithQueryAndExecute(ConnectionData.WithSchemaName(databaseItem.SchemaName),
-                $@"SELECT * FROM `information_schema`.`TABLES` WHERE `table_schema` = '{databaseItem.SchemaName}';");
+            sqlEditorService.Value.NewDocumentWithQueryAndExecute(databaseItem.Connection, "USE " + databaseItem.SchemaName);
         }
         else if (node is TableViewModel tableItem)
         {
-            sqlEditorService.Value.NewDocumentWithTableSelect(ConnectionData.WithSchemaName(tableItem.Schema.SchemaName), tableItem.TableName);
+            sqlEditorService.Value.NewDocumentWithTableSelect(tableItem.Schema.Connection, tableItem.Schema.SchemaName, tableItem.TableName);
+        }
+        else if (node is RoutineViewModel routineItem)
+        {
+            // todo
+        }
+        else if (node is DatabaseObjectGroupViewModel group)
+        {
+            // ignore
         }
         else if (node is RowLoadingViewModel _)
         {
@@ -249,19 +330,22 @@ internal partial class ConnectionListToolViewModel : ObservableBase, ITablesTool
     
     public async Task<IReadOnlyList<SchemaViewModel>> GetItemsAsync(CancellationToken token)
     {
-        await using var session = await SqlConnector.ConnectAsync(ConnectionData.Credentials);
+        await using var session = await connection.OpenSessionAsync();
         var databases = await session.GetDatabasesAsync(token);
 
-        if (ConnectionData.VisibleSchemas != null)
-            databases = databases.Intersect(ConnectionData.VisibleSchemas).ToList();
+        if (connection.ConnectionData.VisibleSchemas != null)
+            databases = databases.Intersect(connection.ConnectionData.VisibleSchemas).ToList();
         
         var databasesViewModel = databases
-            .Select(x => new SchemaViewModel(this, ConnectionData.Credentials, x))
+            .Select(x => new SchemaViewModel(this, Preferences.EachDatabaseHasSeparateConnection ? connection.Clone(x) : connection, x))
             .ToList();
 
-        if (ConnectionData.DefaultExpandSchemas)
+        if (connection.ConnectionData.DefaultExpandSchemas)
         {
-            databasesViewModel.ForEach(x => x.IsExpanded = true);
+            databasesViewModel.ForEach(x =>
+            {
+                x.IsExpanded = true;
+            });
         }
         
         return databasesViewModel;

@@ -29,6 +29,8 @@
                                                                Columns="{CompiledBinding Columns}">
         <optimizedVeryFastTableView:VirtualizedVeryFastTableView.ContextMenu>
           <ContextMenu>
+            <MenuItem Header="Copy column name" Command="{CompiledBinding CopyColumnNameCommand}" />  
+            <Separator />
             <MenuItem Header="Set field to NULL" Command="{CompiledBinding SetSelectedToNullCommand}" />
             <Separator />
             <MenuItem Header="Add row" Command="{CompiledBinding AddRowCommand}" />

@@ -1,4 +1,4 @@
-namespace WDE.SqlWorkbench.Services.Connection;
+namespace WDE.SqlWorkbench.Models;
 
 internal readonly struct ColumnInfo
 {

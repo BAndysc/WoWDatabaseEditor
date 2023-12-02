@@ -11,7 +11,7 @@ public interface IActionsOutputService
 public interface IActionOutput
 {
     int Index { get; }
-    DateTime TimeStarted { get; }
+    DateTime TimeStarted { get; set; }
     string Query { get; }
     
     DateTime? TimeFinished { get; set; }
@@ -21,7 +21,8 @@ public interface IActionOutput
 
 public enum ActionStatus
 {
-    Pending,
+    NotStarted,
+    Started,
     Success,
     Error,
     Canceled

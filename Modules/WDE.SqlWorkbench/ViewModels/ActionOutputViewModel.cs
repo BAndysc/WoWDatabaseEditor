@@ -9,7 +9,7 @@ namespace WDE.SqlWorkbench.ViewModels;
 public partial class ActionOutputViewModel : ObservableBase, IActionOutput
 {
     public int Index { get; }
-    public DateTime TimeStarted { get; }
+    public DateTime TimeStarted { get; set; }
     public string OriginalQuery { get; }
     [Notify] private string response = "";
     [Notify] [AlsoNotify(nameof(IsFail), nameof(IsSuccess), nameof(DurationAsString))] private ActionStatus status;
@@ -28,9 +28,10 @@ public partial class ActionOutputViewModel : ObservableBase, IActionOutput
     
     public string TimeAsString => TimeStarted.ToString("HH:mm:ss");
     public string DurationAsString =>
-        Duration.TotalMilliseconds > 1000
-            ? Duration.TotalSeconds.ToString("0.00") + "s"
-            : Duration.TotalMilliseconds.ToString("0.00") + "ms";
+        status == ActionStatus.NotStarted ? "" :
+            Duration.TotalMilliseconds > 1000
+                ? Duration.TotalSeconds.ToString("0.00") + "s"
+                : Duration.TotalMilliseconds.ToString("0.00") + "ms";
 
     public bool IsFail => status == ActionStatus.Error;
     public bool IsSuccess => status == ActionStatus.Success;
@@ -52,10 +53,9 @@ public partial class ActionOutputViewModel : ObservableBase, IActionOutput
         }
     }
     
-    public ActionOutputViewModel(int index, DateTime time, string query)
+    public ActionOutputViewModel(int index, string query)
     {
         Index = index;
-        TimeStarted = time;
         OriginalQuery = query;
         DispatcherTimer.Run(UpdateDuration, TimeSpan.FromMilliseconds(50));
     }
@@ -63,6 +63,6 @@ public partial class ActionOutputViewModel : ObservableBase, IActionOutput
     private bool UpdateDuration()
     {
         RaisePropertyChanged(nameof(DurationAsString));
-        return status == ActionStatus.Pending;
+        return status == ActionStatus.NotStarted || status == ActionStatus.Started;
     }
 }

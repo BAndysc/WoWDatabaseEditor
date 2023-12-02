@@ -1,6 +1,7 @@
 using WDE.Common.Services;
 using WDE.Module.Attributes;
 using WDE.SqlWorkbench.Models;
+using WDE.SqlWorkbench.Services.Connection;
 
 namespace WDE.SqlWorkbench.Services.TableUtils;
 
@@ -18,13 +19,13 @@ internal class TableUtility : ITableUtility
         this.editorService = editorService;
     }
 
-    public void OpenSelectRows(in DatabaseConnectionData connection, string schema, string table)
+    public void OpenSelectRows(IConnection connection, string schema, string table)
     {
-        editorService.NewDocumentWithTableSelect(connection.WithSchemaName(schema), table);
+        editorService.NewDocumentWithTableSelect(connection, schema, table);
     }
 
-    public void InspectTable(in DatabaseConnectionData connection, string schema, string table)
+    public void InspectTable(IConnection connection, string schema, string table)
     {
-        editorService.NewDocumentWithTableInfo(connection.WithSchemaName(schema), table);
+        editorService.NewDocumentWithTableInfo(connection, schema, table);
     }
 }

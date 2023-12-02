@@ -1,18 +1,17 @@
 using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MySqlConnector;
+using WDE.SqlWorkbench.Models;
 
 namespace WDE.SqlWorkbench.Services.Connection;
 
-internal class MySqlSession : IMySqlSession, IAsyncDisposable
+internal class RawMySqlConnection : IRawMySqlConnection, IAsyncDisposable
 {
     private readonly MySqlConnection conn;
 
-    public MySqlSession(MySqlConnection conn)
+    public RawMySqlConnection(MySqlConnection conn)
     {
         this.conn = conn;
     }
@@ -27,6 +26,9 @@ internal class MySqlSession : IMySqlSession, IAsyncDisposable
 
     public async Task<SelectResult> ExecuteSqlAsync(string query, int? rowsLimit, CancellationToken token)
     {
+        if (!IsSessionOpened)
+            await TryReconnectAsync();
+
         return await Task.Run(async () =>
         {
             await using MySqlCommand cmd = new(query, conn);
@@ -75,6 +77,8 @@ internal class MySqlSession : IMySqlSession, IAsyncDisposable
                         columnData[i] = new DoubleColumnData();
                     else if (dataType == typeof(float))
                         columnData[i] = new FloatColumnData();
+                    else if (dataType == typeof(MySqlDateTime))
+                        columnData[i] = new MySqlDateTimeColumnData();
                     else if (dataType == typeof(DateTime))
                         columnData[i] = new DateTimeColumnData();
                     else if (dataType == typeof(DateTimeOffset))
@@ -104,76 +108,9 @@ internal class MySqlSession : IMySqlSession, IAsyncDisposable
 
                 return SelectResult.Query(columnNames, columnTypes, rows, columnData);
             }
-            else
-            {
-                return SelectResult.NonQuery(affected);
-            }
+
+            return SelectResult.NonQuery(affected);
         }, token);
-    }
-
-    public async Task<IReadOnlyList<string>> GetDatabasesAsync(CancellationToken token = default)
-    {
-        var databases = await ExecuteSqlAsync("SHOW DATABASES", null, token);
-
-        if (databases.IsNonQuery || databases.Columns.Length == 0)
-            return Array.Empty<string>();
-
-        return Enumerable.Range(0, databases.AffectedRows)
-            .Select(x => databases.Columns[0]!.GetToString(x)!)
-            .ToList();
-    }
-
-    public async Task<IReadOnlyList<string>> GetTablesAsync(CancellationToken token)
-    {
-        var databases = await ExecuteSqlAsync("SHOW TABLES", null, token);
-
-        if (databases.IsNonQuery || databases.Columns.Length == 0)
-            return Array.Empty<string>();
-
-        return Enumerable.Range(0, databases.AffectedRows)
-            .Select(x => databases.Columns[0]!.GetToString(x)!)
-            .ToList();
-    }
-
-    public async Task<IReadOnlyList<ColumnInfo>> GetTableColumnsAsync(string tableName, CancellationToken token)
-    {
-        List<ColumnInfo> columns = new();
-        if (!tableName.StartsWith('`'))
-            tableName = $"`{tableName}`";
-        
-        var databases = await ExecuteSqlAsync($"SHOW COLUMNS FROM {tableName}", null, token);
-        if (token.IsCancellationRequested)
-            return columns;
-
-        var names = (StringColumnData)databases["Field"]!;
-        var types = (StringColumnData)databases["Type"]!;
-        var nullables = (StringColumnData)databases["Null"]!;
-        var keys = (StringColumnData)databases["Key"]!;
-        var defaults = (StringColumnData)databases["Default"]!;
-        var extras = (StringColumnData)databases["Extra"]!;
-        for (int i = 0; i < databases.AffectedRows; ++i)
-        {
-            var column = new ColumnInfo(
-                names[i]!,
-                types[i]!,
-                nullables[i] == "YES",
-                keys[i] == "PRI",
-                extras[i]!.Contains("auto_increment", StringComparison.OrdinalIgnoreCase),
-                defaults[i]);
-            columns.Add(column);
-        }
-
-        return columns;
-    }
-
-    public async Task<string> GetCreateTableAsync(string tableName, CancellationToken token = default)
-    {
-        var databases = await ExecuteSqlAsync($"SHOW CREATE TABLE `{tableName}`", null, token);
-        if (token.IsCancellationRequested)
-            return "";
-
-        var createTable = (StringColumnData)databases["Create Table"]!;
-        return createTable[0]!;
     }
 
     public async ValueTask DisposeAsync()

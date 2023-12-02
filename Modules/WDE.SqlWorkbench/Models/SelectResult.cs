@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using MySqlConnector;
 
-namespace WDE.SqlWorkbench.Services.Connection;
+namespace WDE.SqlWorkbench.Models;
 
 internal readonly struct SelectResult
 {
@@ -664,4 +664,33 @@ internal class BinaryColumnData : IColumnData
             return data.AsSpan((int)offset.start, offset.length);
         }
     }
+}
+
+internal class MySqlDateTimeColumnData : IColumnData
+{
+    private readonly List<MySqlDateTime> data = new ();
+    private readonly BitArray nulls = new (0);
+    
+    public void Append(MySqlDataReader reader, int ordinal)
+    {
+        if (data.Count == nulls.Length)
+            nulls.Length = nulls.Length * 2 + 1;
+
+        if (reader.IsDBNull(ordinal))
+        {
+            nulls[data.Count] = true;
+            data.Add(default);
+        }
+        else
+            data.Add(reader.GetMySqlDateTime(ordinal));
+    }
+
+    public string? GetToString(int rowIndex)
+    {
+        return nulls[rowIndex] ? null : data[rowIndex].ToString();
+    }
+
+    public bool IsNull(int rowIndex) => nulls[rowIndex];
+    
+    public MySqlDateTime this[int index] => data[index];
 }

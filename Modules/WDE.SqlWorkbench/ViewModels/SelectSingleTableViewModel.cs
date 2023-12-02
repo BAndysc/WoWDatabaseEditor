@@ -6,6 +6,7 @@ using Prism.Commands;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Types;
 using WDE.Common.Utils;
+using WDE.SqlWorkbench.Models;
 using WDE.SqlWorkbench.Services.Connection;
 using WDE.SqlWorkbench.Services.QueryUtils;
 

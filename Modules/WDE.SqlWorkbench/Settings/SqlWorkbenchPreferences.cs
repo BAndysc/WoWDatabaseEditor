@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.Linq;
 using Newtonsoft.Json;
 using WDE.Common.Services;
-using WDE.Common.Utils;
 using WDE.Module.Attributes;
 using WDE.SqlWorkbench.Models;
 
@@ -55,6 +54,12 @@ internal class SqlWorkbenchPreferences : ISqlWorkbenchPreferences
         set => settings.CustomSqlsPath = value;
     }
 
+    public bool EachDatabaseHasSeparateConnection
+    {
+        get => settings.EachDatabaseHasSeparateConnection;
+        set => settings.EachDatabaseHasSeparateConnection = value;
+    }
+
     public void Save()
     {
         userSettings.Update(settings);
@@ -71,5 +76,8 @@ internal class SqlWorkbenchPreferences : ISqlWorkbenchPreferences
         public bool UseCodeCompletion { get; set; } = true;
         
         public string? CustomSqlsPath { get; set; }
+        
+        [DefaultValue(true)]
+        public bool EachDatabaseHasSeparateConnection { get; set; } = true;
     }
 }

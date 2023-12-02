@@ -86,6 +86,7 @@ public partial class SqlWorkbenchView : UserControl
         if (DataContext is SqlWorkbenchViewModel vm)
         {
             boundVm = vm;
+            boundVm.IsViewBound = true;
             vm.Completions.CollectionChanged += OnCompletionsSetChanged;
             vm.PropertyChanged += OnViewModelPropertyChanged;
             editor.Document = vm.Document; // <-- this is required, because when we add the text marker service below, the document must be set already!
@@ -116,7 +117,8 @@ public partial class SqlWorkbenchView : UserControl
     {
         if (boundVm == null)
             return;
-        
+
+        boundVm.IsViewBound = false;
         boundVm.Completions.CollectionChanged -= OnCompletionsSetChanged;
         boundVm.PropertyChanged -= OnViewModelPropertyChanged;
         editor.TextArea.TextView.BackgroundRenderers.Remove(boundVm.TextMarkerService);
@@ -128,6 +130,18 @@ public partial class SqlWorkbenchView : UserControl
     {
         base.OnDataContextChanged(e);
         BindToDataContext();
+    }
+
+    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
+        BindToDataContext();
+    }
+
+    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnDetachedFromVisualTree(e);
+        UnbindFromDataContext();
     }
 
     private void OnCompletionsSetChanged(object? sender, NotifyCollectionChangedEventArgs e)

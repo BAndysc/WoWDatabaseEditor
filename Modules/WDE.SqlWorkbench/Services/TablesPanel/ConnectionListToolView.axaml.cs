@@ -78,6 +78,7 @@ public class ConnectionListToolView : UserControl
                     (DataContext as ConnectionListToolViewModel)!.OpenItem(item);
                 }
             }
+            e.Handled = true;
         }
     }
 
