@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,12 +15,13 @@ namespace WDE.Common.Utils;
 /// </summary>
 public partial class TaskQueue : INotifyPropertyChanged
 {
-    private List<(TaskCompletionSource, Func<CancellationToken, Task>)> tasks = new ();
+    private List<(TaskCompletionSource tcs, Func<CancellationToken, Task> task, object? groupId)> tasks = new ();
     private bool isRunning = false;
     public bool IsRunning => isRunning;
     private CancellationTokenSource? loopCancellationToken;
     private CancellationTokenSource? currentTaskToken;
     private Task<Task>? currentTask;
+    private object? currentGroupId;
 
     private int threadId;
     
@@ -34,15 +36,28 @@ public partial class TaskQueue : INotifyPropertyChanged
             throw new InvalidThreadAccessException(
                 $"Invalid thread access. The queue was created on thread {threadId} and is accessed from thread {Thread.CurrentThread.ManagedThreadId}.");
     }
-    
-    public Task Schedule(Func<CancellationToken, Task> task)
+
+    public async Task<T> Schedule<T>(Func<CancellationToken, Task<T>> task, object? groupId = null)
+    {
+        T[] result = new T[1];
+        async Task Wrapped(CancellationToken token)
+        {
+            result[0] = await task(token);
+        }
+        var scheduled = Schedule(Wrapped, groupId);
+        await scheduled;
+
+        return result[0];
+    }
+
+    public Task Schedule(Func<CancellationToken, Task> task, object? groupId = null)
     {
         VerifyAccess();
         var tcs = new TaskCompletionSource();
-        tasks.Add((tcs, task));
+        tasks.Add((tcs, task, groupId));
         if (!isRunning)
         {
-            isRunning = true;
+            SetField(ref isRunning, true, nameof(IsRunning));
             loopCancellationToken = new();
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
             Run(loopCancellationToken.Token).ListenErrors();
@@ -51,12 +66,48 @@ public partial class TaskQueue : INotifyPropertyChanged
         return tcs.Task;
     }
 
+    public async Task CancelGroup(object groupId)
+    {
+        VerifyAccess();
+        List<TaskCompletionSource> tasksToCancel = new();
+        for (var index = tasks.Count - 1; index >= 0; index--)
+        {
+            var task = tasks[index];
+            if (ReferenceEquals(task.groupId, groupId))
+            {
+                tasks.RemoveAt(index);
+                tasksToCancel.Add(task.Item1);
+            }
+        }
+
+        foreach (var task in tasksToCancel)
+            task.SetCanceled();
+
+        if (currentGroupId == groupId)
+        {
+            currentTaskToken?.Cancel();
+            if (currentTask == null)
+                return;
+            
+            try
+            {
+                await currentTask;
+            }
+            catch (Exception e)
+            {
+                // Todo: I think this can be safely ignored, because someone else already awaits this task, don't they?
+            }
+        }
+    }
+
     public async Task CancelAll()
     {
         VerifyAccess();
-        foreach (var task in tasks)
-            task.Item1.SetCanceled();
+        var copy = tasks.ToList();
         tasks.Clear();
+        foreach (var task in copy)
+            task.Item1.SetCanceled();
+
         currentTaskToken?.Cancel();
         if (currentTask == null)
             return;
@@ -65,17 +116,9 @@ public partial class TaskQueue : INotifyPropertyChanged
         {
             await currentTask;
         }
-        catch (TaskCanceledException)
-        {
-        }
-        catch (TaskKilledException)
-        {
-            
-        }
         catch (Exception e)
         {
-            // Todo: I think this can be safely ignored, because someone else already awaits this task, don't they?
-            Console.WriteLine(e);
+            // Todo: I think this can be safely ignored, because someone else already awaits the currentTask, don't they?
         }
     }
 
@@ -93,9 +136,10 @@ public partial class TaskQueue : INotifyPropertyChanged
             while (tasks.Count > 0)
             {
                 VerifyAccess();
-                var (tcs, task) = tasks[0];
+                var (tcs, task, groupId) = tasks[0];
                 tasks.RemoveAt(0);
                 var cancelToken = currentTaskToken = new CancellationTokenSource();
+                currentGroupId = groupId;
                 try
                 {
                     var startedTask = task(currentTaskToken.Token);
@@ -113,7 +157,12 @@ public partial class TaskQueue : INotifyPropertyChanged
                         if (cancelToken.IsCancellationRequested)
                             tcs.SetCanceled(cancelToken.Token);
                         else
-                            tcs.SetResult();   
+                        {
+                            if (startedTask.IsFaulted)
+                                tcs.SetException(startedTask.Exception!.InnerExceptions);
+                            else
+                                tcs.SetResult();
+                        }   
                     }
                 }
                 catch (Exception e)
@@ -124,6 +173,7 @@ public partial class TaskQueue : INotifyPropertyChanged
                 {
                     currentTaskToken = null;
                     currentTask = null;
+                    currentGroupId = null;
                 }
             }
         }
@@ -152,6 +202,16 @@ public partial class TaskQueue : INotifyPropertyChanged
         Debug.Assert(currentTaskToken == null);
         Debug.Assert(currentTask == null);
         Debug.Assert(loopCancellationToken == null);
+    }
+
+    public bool IsAnyTaskPendingOrRunning(object? groupId)
+    {
+        VerifyAccess();
+        
+        if (groupId == null)
+            return IsRunning;
+        
+        return ReferenceEquals(currentGroupId, groupId) || tasks.Any(t => ReferenceEquals(t.groupId, groupId));
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;

@@ -24,10 +24,10 @@ internal class DatabaseDumpService : IDatabaseDumpService
 
     public async Task ShowDumpDatabaseWindowAsync(DatabaseCredentials credentials)
     {
-        await ShowDumpTableWindowAsync(credentials, "");
+        await ShowDumpTableWindowAsync(credentials, null);
     }
 
-    public async Task ShowDumpTableWindowAsync(DatabaseCredentials credentials, string table)
+    public async Task ShowDumpTableWindowAsync(DatabaseCredentials credentials, string? table)
     {
         using var vm = containerProvider.Resolve<DumpViewModel>((typeof(DatabaseCredentials), credentials), (typeof(string), table));
         windowManager.Value.ShowWindow(vm, out var task);

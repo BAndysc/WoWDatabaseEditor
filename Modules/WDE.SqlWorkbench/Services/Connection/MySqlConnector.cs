@@ -11,14 +11,14 @@ namespace WDE.SqlWorkbench.Services.Connection;
 [AutoRegister]
 internal class MySqlConnector : IMySqlConnector
 {
-    public async Task<IMySqlSession> ConnectAsync(string connectionString)
+    public async Task<IRawMySqlConnection> ConnectAsync(string connectionString)
     {
         MySqlConnection conn = new(connectionString);
         await conn.OpenAsync();
-        return new MySqlSession(conn);
+        return new RawMySqlConnection(conn);
     }
 
-    public Task<IMySqlSession> ConnectAsync(DatabaseCredentials credentials)
+    public Task<IRawMySqlConnection> ConnectAsync(DatabaseCredentials credentials)
     {
         return ConnectAsync($"Server={credentials.Host};Port={credentials.Port};Database={credentials.SchemaName};Uid={credentials.User};Pwd={credentials.Passwd};AllowUserVariables=True;AllowZeroDateTime=True;ApplicationName=WoWDatabaseEditor;Pooling=False;ConnectionTimeout=30;DefaultCommandTimeout=0");
     }

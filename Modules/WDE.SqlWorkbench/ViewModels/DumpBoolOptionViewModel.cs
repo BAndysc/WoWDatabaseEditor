@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Reflection;
 using PropertyChanged.SourceGenerator;
+using WDE.Common.Utils;
 using WDE.MVVM;
 using WDE.SqlWorkbench.Services.SqlDump;
 
@@ -16,7 +17,7 @@ internal partial class DumpBoolOptionViewModel : ObservableBase
     public DumpBoolOptionViewModel(FieldInfo field)
     {
         this.field = field;
-        Name = field.Name;
+        Name = field.Name.ToTitleCase();
         Description = field.GetCustomAttribute<DescriptionAttribute>()?.Description ?? "";
     }
 

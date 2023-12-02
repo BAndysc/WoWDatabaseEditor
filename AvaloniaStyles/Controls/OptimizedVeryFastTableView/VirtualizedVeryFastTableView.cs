@@ -306,7 +306,19 @@ public partial class VirtualizedVeryFastTableView : Panel, IKeyboardNavigationHa
         }
         else if (IsOverColumn(e.GetPosition(this).X, out var pressedColumn, out var pressedColumnIndex))
         {
-            RaiseEvent(new ColumnPressedEventArgs(){RoutedEvent = ColumnPressedEvent, Column = pressedColumn, ColumnIndex = pressedColumnIndex, KeyModifiers = e.KeyModifiers});
+            if (leftMouseButton)
+                RaiseEvent(new ColumnPressedEventArgs(){RoutedEvent = ColumnPressedEvent, Column = pressedColumn, ColumnIndex = pressedColumnIndex, KeyModifiers = e.KeyModifiers});
+            else
+            {
+                // update SelectedCellIndex for context menu
+                {
+                    var index = GetColumnIndexByX(e.GetPosition(this).X);
+                    if (ItemsCount == 0 || !index.HasValue)
+                        SelectedCellIndex = -1;
+                    else
+                        SelectedCellIndex = Math.Clamp(index.Value, 0, ColumnsCount - 1);
+                }
+            }
             e.Handled = true;
         }
 

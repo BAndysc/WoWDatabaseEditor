@@ -189,11 +189,9 @@ public partial class VirtualizedVeryFastTableView
                 context.FillRectangle(lastMouseButtonPressed && !isMouseOverSplitter ? HeaderPressedBackground : HeaderHoverBackground, new Rect(x, y, column.Width, RowHeight));
 
             var cellRect = new Rect(x + ColumnSpacing, y, Math.Max(0, column.Width - ColumnSpacing * 2), RowHeight);
-            var state = context.PushClip(cellRect);
-
             controller.DrawHeader(i, context, this, ref cellRect);
+            var state = context.PushClip(cellRect);
             context.DrawText(BorderPen.Brush, new Point(cellRect.X, cellRect.Center.Y - ft.Bounds.Height / 2), ft);
-            
             state.Dispose();
             
             x += column.Width;

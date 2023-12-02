@@ -124,6 +124,10 @@ internal struct MySqlDumpOptions
     [Description("Dump stored routines (procedures and functions) from dumped databases")]
     public bool Routines = true;
 
+    [Argument("ignore-views")]
+    [Description("Skip dumping table views.")]
+    public bool IgnoreViews = false;
+    
     [Argument("set-charset")]
     [Description("Add SET NAMES default_character_set to output")]
     public bool SetCharset = false;

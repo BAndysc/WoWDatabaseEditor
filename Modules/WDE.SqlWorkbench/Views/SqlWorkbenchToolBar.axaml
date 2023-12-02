@@ -5,6 +5,7 @@
              xmlns:viewModels="clr-namespace:WDE.SqlWorkbench.ViewModels"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="viewModels:SqlWorkbenchViewModel"
+             IsEnabled="{CompiledBinding !IsConnecting}"
              x:Class="WDE.SqlWorkbench.Views.SqlWorkbenchToolBar">
   <ToolbarPanel>
     
@@ -15,7 +16,13 @@
     
     <ButtonImage Command="{CompiledBinding ExecuteAllCommand}" ToolTip.Tip="Execute all queries" Image="Icons/icon_execute.png" />
     <ButtonImage Command="{CompiledBinding ExecuteSelectedCommand}" ToolTip.Tip="Execute current query" Image="Icons/icon_execute_single.png" />
-    <ButtonImage Command="{CompiledBinding StopQueryExecutionCommand}" ToolTip.Tip="Stop execution" Image="Icons/icon_stop.png" />
+    <ButtonImage Command="{CompiledBinding StopQueryExecutionCommand}" ToolTip.Tip="Stop execution" Image="Icons/icon_stop.png">
+      <ButtonImage.ContextMenu>
+        <ContextMenu>
+          <MenuItem Header="Stop all tasks in this connection" Command="{CompiledBinding StopAllTasksInConnectionCommand}" />
+        </ContextMenu>
+      </ButtonImage.ContextMenu>
+    </ButtonImage>
     
     <Border Width="20" />
     
@@ -27,7 +34,7 @@
     
     <ButtonImage ToolTip.Tip="Commit transaction" Image="Icons/icon_accept_transaction.png" Command="{CompiledBinding CommitCommand}" IsEnabled="{CompiledBinding !IsAutoCommit}" />
     <ButtonImage ToolTip.Tip="Reject transaction" Image="Icons/icon_reject_transaction.png" Command="{CompiledBinding RollbackCommand}" IsEnabled="{CompiledBinding !IsAutoCommit}" />
-    <ToggleButton ToolTip.Tip="Auto commit after each query" IsChecked="{CompiledBinding IsAutoCommit}">
+    <ToggleButton ToolTip.Tip="Auto commit after each query" Command="{CompiledBinding ToggleIsAutoCommit}" IsChecked="{CompiledBinding IsAutoCommit, Mode=OneWay}">
       <WdeImage ImageUri="Icons/icon_auto_commit.png" />
     </ToggleButton>
     

@@ -11,6 +11,7 @@ internal interface ISqlWorkbenchPreferences
     IReadOnlyList<DatabaseConnectionData> Connections { get; set; }
     Guid? DefaultConnection { get; set; }
     bool UseCodeCompletion { get; set; }
+    bool EachDatabaseHasSeparateConnection { get; set; }
     string? CustomSqlsPath { get; set; }
     void Save();
 }

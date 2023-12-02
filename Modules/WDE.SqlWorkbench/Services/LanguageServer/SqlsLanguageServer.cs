@@ -26,12 +26,13 @@ internal class SqlsLanguageServer : ISqlLanguageServer
     
     private readonly ISqlWorkbenchPreferences preferences;
     private readonly IProgramFinder programFinder;
+    private List<bool> disposedClients = new();
     private List<LanguageClient> clients = new();
-    private List<Process> processes = new();
+    private List<Process?> processes = new();
     private List<DatabaseCredentials> credentials = new();
     private List<List<SqlsLanguageServerFile>> filesPerClient = new();
-    private Dictionary<DatabaseCredentials, DatabaseConnectionId> credentialsToId = new();
-    private Dictionary<DatabaseConnectionId, (DateTime lastCrash, int crashCount)> lastCrashStats = new();
+    private Dictionary<DatabaseCredentials, LanguageServerConnectionId> credentialsToId = new();
+    private Dictionary<LanguageServerConnectionId, (DateTime lastCrash, int crashCount)> lastCrashStats = new();
     private long fileId = 0;
 
     public SqlsLanguageServer(ISqlWorkbenchPreferences preferences,
@@ -41,8 +42,11 @@ internal class SqlsLanguageServer : ISqlLanguageServer
         this.programFinder = programFinder;
     }
     
-    private async Task RecreateClientAsync(DatabaseConnectionId connectionId)
+    private async Task RecreateClientAsync(LanguageServerConnectionId connectionId)
     {
+        if (disposedClients[connectionId.Id])
+            return;
+        
         var newClient = await CreateClientAsync(connectionId);
         foreach (var file in filesPerClient[connectionId.Id])
         {
@@ -56,10 +60,10 @@ internal class SqlsLanguageServer : ISqlLanguageServer
             File.Exists(this.preferences.CustomSqlsPath))
             return preferences.CustomSqlsPath;
         
-        return programFinder.TryLocate("sqls", "sqls.exe");
+        return programFinder.TryLocate("sqls", "sqls/sqls.exe");
     }
     
-    private void ForeachFile(DatabaseConnectionId connId, Action<SqlsLanguageServerFile> action)
+    private void ForeachFile(LanguageServerConnectionId connId, Action<SqlsLanguageServerFile> action)
     {
         foreach (var file in filesPerClient[connId.Id])
         {
@@ -67,7 +71,7 @@ internal class SqlsLanguageServer : ISqlLanguageServer
         }
     }
 
-    private async Task<LanguageClient> CreateClientAsync(DatabaseConnectionId connectionId)
+    private async Task<LanguageClient> CreateClientAsync(LanguageServerConnectionId connectionId)
     {
         var sqlPath = LocateSqls();
         
@@ -80,11 +84,15 @@ internal class SqlsLanguageServer : ISqlLanguageServer
         {
             RedirectStandardInput = true,
             RedirectStandardOutput = true,
+            CreateNoWindow = true
         }) ?? throw new Exception("Can't start the Language Server");
 
         childProcess.EnableRaisingEvents = true;
         childProcess.Exited += (sender, args) =>
         {
+            if (disposedClients[connectionId.Id])
+                return;
+            
             if (childProcess.ExitCode != 0)
             {
                 if (!lastCrashStats.TryGetValue(connectionId, out var crashStats) ||
@@ -120,6 +128,13 @@ internal class SqlsLanguageServer : ISqlLanguageServer
                 .OnLogMessage(x => Console.WriteLine((string?)x.Message))
                 .OnLogTrace(x => Console.WriteLine(x.Message + " " + x.Verbose)));
 
+        if (disposedClients[connectionId.Id])
+        {
+            childProcess.Kill();
+            childProcess.Dispose();
+            return client;
+        }
+        
         var credentials = this.credentials[connectionId.Id];
         client.DidChangeConfiguration(new DidChangeConfigurationParams()
         {
@@ -151,15 +166,16 @@ internal class SqlsLanguageServer : ISqlLanguageServer
         return client;
     }
 
-    public async Task<DatabaseConnectionId> ConnectAsync(DatabaseCredentials credentials)
+    public async Task<LanguageServerConnectionId> ConnectAsync(DatabaseCredentials credentials)
     {
         if (credentialsToId.TryGetValue(credentials, out var id))
             return id;
         
-        credentialsToId[credentials] = id = new DatabaseConnectionId(clients.Count);
+        credentialsToId[credentials] = id = new LanguageServerConnectionId(clients.Count);
         this.credentials.Add(credentials);
         clients.Add(null!);
         processes.Add(null!);
+        disposedClients.Add(false);
         filesPerClient.Add(new List<SqlsLanguageServerFile>());
 
         await CreateClientAsync(id);
@@ -167,7 +183,7 @@ internal class SqlsLanguageServer : ISqlLanguageServer
         return id;
     }
 
-    public async Task<ISqlLanguageServerFile> NewFileAsync(DatabaseConnectionId connectionId)
+    public async Task<ISqlLanguageServerFile> NewFileAsync(LanguageServerConnectionId connectionId)
     {
         if (connectionId.Id < 0 || connectionId.Id >= clients.Count)
             throw new Exception("Invalid connection id");
@@ -183,20 +199,32 @@ internal class SqlsLanguageServer : ISqlLanguageServer
     internal void UnregisterFile(SqlsLanguageServerFile file)
     {
         filesPerClient[file.ConnectionId.Id].Remove(file);
+        if (filesPerClient[file.ConnectionId.Id].Count == 0)
+        {
+            clients[file.ConnectionId.Id] = null!;
+            disposedClients[file.ConnectionId.Id] = true;
+            if (processes[file.ConnectionId.Id] is { } p)
+            {
+                p.Kill();
+                p.Dispose();
+                processes[file.ConnectionId.Id] = null!;   
+                credentialsToId.Remove(credentials[file.ConnectionId.Id]);
+            }
+        }
     }
     
-    internal void KillProcess(DatabaseConnectionId connectionId)
+    internal void KillProcess(LanguageServerConnectionId connectionId)
     {
-        processes[connectionId.Id].Kill();
+        processes[connectionId.Id]?.Kill();
     }
 
-    public async Task RestartLanguageServerAsync(DatabaseConnectionId connectionId)
+    public async Task RestartLanguageServerAsync(LanguageServerConnectionId connectionId)
     {
-        if (processes[connectionId.Id].HasExited)
+        if (processes[connectionId.Id]?.HasExited ?? false)
         {
             await RecreateClientAsync(connectionId);
         }
         else
-            processes[connectionId.Id].Kill();
+            processes[connectionId.Id]?.Kill();
     }
 }

@@ -15,37 +15,40 @@ namespace WDE.SqlWorkbench.Services.Connection;
 internal class ConnectionsManager : IConnectionsManager
 {
     private readonly ISqlWorkbenchPreferences preferences;
+    private readonly IMySqlConnector connector;
 
-    private IReadOnlyList<DatabaseConnectionData> connections = null!;
+    private IReadOnlyList<IConnection> connections = null!;
     
-    public IReadOnlyList<DatabaseConnectionData> Connections
+    public IReadOnlyList<IConnection> Connections
     {
         get => connections;
         set
         {
             connections = value;
-            preferences.Connections = value;
+            preferences.Connections = value.Select(x => x.ConnectionData).ToArray();
         }
     }
 
-    public DatabaseConnectionData? DefaultConnection
+    public IConnection? DefaultConnection
     {
-        get => Connections.FirstOrDefault(c => c.Id == preferences.DefaultConnection);
+        get => Connections.FirstOrDefault(c => c.ConnectionData.Id == preferences.DefaultConnection);
         set
         {
-            if (value.HasValue)
-                preferences.DefaultConnection = value.Value.Id;
+            if (value != null)
+                preferences.DefaultConnection = value.ConnectionData.Id;
             else
                 preferences.DefaultConnection = null;
         }
     }
-    
+
     public ConnectionsManager(IWorldDatabaseSettingsProvider worldSettings,
         IHotfixDatabaseSettingsProvider hotfixSettings,
         IAuthDatabaseSettingsProvider authSettings,
-        ISqlWorkbenchPreferences preferences)
+        ISqlWorkbenchPreferences preferences,
+        IMySqlConnector connector)
     {
         this.preferences = preferences;
+        this.connector = connector;
         HashSet<DatabaseCredentials> knownCredentials = new();
         List<DatabaseConnectionData> connectionsList = new();
 
@@ -101,7 +104,7 @@ internal class ConnectionsManager : IConnectionsManager
         }
 
         connectionsList.AddRange(savedConnections);
-        Connections = connectionsList;
+        Connections = connectionsList.Select(x => new Connection(connector, x)).ToList();
         DefaultConnection ??= Connections.FirstOrDefault();
     }
 }

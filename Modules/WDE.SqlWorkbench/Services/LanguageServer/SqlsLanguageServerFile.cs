@@ -13,16 +13,16 @@ namespace WDE.SqlWorkbench.Services.LanguageServer;
 internal class SqlsLanguageServerFile : ISqlLanguageServerFile
 {
     private readonly SqlsLanguageServer sqls;
-    private readonly DatabaseConnectionId connectionId;
+    private readonly LanguageServerConnectionId connectionId;
     private readonly string fileUri;
     private LanguageClient client;
     private readonly ReactiveProperty<bool> serverAlive = new(true); 
     
     public IReadOnlyReactiveProperty<bool> ServerAlive => serverAlive;
 
-    public DatabaseConnectionId ConnectionId => connectionId;
+    public LanguageServerConnectionId ConnectionId => connectionId;
     
-    public SqlsLanguageServerFile(SqlsLanguageServer sqls, DatabaseConnectionId connectionId,
+    public SqlsLanguageServerFile(SqlsLanguageServer sqls, LanguageServerConnectionId connectionId,
         LanguageClient client, long fileId)
     {
         this.sqls = sqls;

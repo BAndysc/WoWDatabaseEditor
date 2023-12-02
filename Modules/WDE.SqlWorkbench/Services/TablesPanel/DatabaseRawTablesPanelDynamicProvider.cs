@@ -5,6 +5,7 @@ using Prism.Ioc;
 using WDE.Common.Documents;
 using WDE.Module.Attributes;
 using WDE.SqlWorkbench.Services.Connection;
+using WDE.SqlWorkbench.ViewModels;
 
 namespace WDE.SqlWorkbench.Services.TablesPanel;
 
@@ -13,21 +14,20 @@ namespace WDE.SqlWorkbench.Services.TablesPanel;
 internal class ConnectionsTablesToolProvider : ITablesToolGroupsProvider
 {
     private readonly IConnectionsManager connectionsManager;
-    private readonly Func<ConnectionListToolViewModel> factory;
+    private readonly IContainerProvider containerProvider;
 
     public ConnectionsTablesToolProvider(IConnectionsManager connectionsManager,
-        Func<ConnectionListToolViewModel> factory)
+        IContainerProvider containerProvider)
     {
         this.connectionsManager = connectionsManager;
-        this.factory = factory;
+        this.containerProvider = containerProvider;
     }
     
     public IEnumerable<ITablesToolGroup> GetProviders()
     {
         return connectionsManager.Connections.Select(x =>
         {
-            var vm = factory();
-            vm.ConnectionData = x;
+            var vm = containerProvider.Resolve<ConnectionListToolViewModel>((typeof(IConnection), x));
             return vm;
         });
     }

@@ -1,4 +1,4 @@
-namespace WDE.SqlWorkbench.Services.LanguageServer;
+namespace WDE.SqlWorkbench.Services.Connection;
 
 internal readonly struct DatabaseConnectionId
 {

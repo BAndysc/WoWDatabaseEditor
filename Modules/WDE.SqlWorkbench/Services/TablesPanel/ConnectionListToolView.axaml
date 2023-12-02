@@ -27,16 +27,10 @@
                                      RequestRender="{CompiledBinding ListUpdated}"
                 >
                     <VirtualizedTreeView.DataTemplates>
-                        <DataTemplate DataType="tablesPanel:SchemaViewModel" x:DataType="tablesPanel:SchemaViewModel">
+                        <DataTemplate DataType="tablesPanel:INamedNodeType" x:DataType="tablesPanel:INamedNodeType">
                             <DockPanel>
                                 <WdeImage Width="16" Height="16" Margin="0,0,5,0" Image="{CompiledBinding Icon}" />
-                                <TextBlock TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Text="{CompiledBinding SchemaName}" />
-                            </DockPanel>
-                        </DataTemplate>
-                        <DataTemplate DataType="tablesPanel:TableViewModel" x:DataType="tablesPanel:TableViewModel">
-                            <DockPanel>
-                                <WdeImage Width="16" Height="16" Margin="0,0,5,0" Image="{CompiledBinding Icon}" />
-                                <TextBlock TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Text="{CompiledBinding TableName}" />
+                                <TextBlock TextTrimming="CharacterEllipsis" VerticalAlignment="Center" Text="{CompiledBinding Name}" />
                             </DockPanel>
                         </DataTemplate>
                         <DataTemplate DataType="tablesPanel:RowLoadingViewModel" x:DataType="tablesPanel:RowLoadingViewModel">
@@ -60,7 +54,14 @@
                                 <MenuItem Header="Create Statement" Command="{CompiledBinding CopyCreateCommand}" />
                             </MenuItem>
                             <Separator />
+                            <MenuItem Header="New">
+                                <MenuItem Header="Table" Command="{CompiledBinding AddNewTableCommand}" />
+                                <MenuItem Header="View" Command="{CompiledBinding AddNewViewCommand}" />
+                                <MenuItem Header="Procedure" Command="{CompiledBinding AddNewProcedureCommand}" />
+                                <MenuItem Header="Function" Command="{CompiledBinding AddNewFunctionCommand}" />
+                            </MenuItem>
                             <MenuItem Header="Dump Table" Command="{CompiledBinding DumpTableCommand}" IsVisible="{CompiledBinding IsTableSelected}" />
+                            <MenuItem Header="Dump Database" Command="{CompiledBinding DumpDatabaseCommand}" IsVisible="{CompiledBinding IsDatabaseSelected}" />
                             <Separator IsVisible="{CompiledBinding IsTableSelected}" />
                             <MenuItem Header="Drop Table" Command="{CompiledBinding DropTableCommand}" IsVisible="{CompiledBinding IsTableSelected}" />
                             <MenuItem Header="Truncate Table" Command="{CompiledBinding  TruncateTableCommand}" IsVisible="{CompiledBinding IsTableSelected}" />

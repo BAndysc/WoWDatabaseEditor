@@ -19,24 +19,22 @@ internal class QueryGenerator : IQueryGenerator
         this.mySqlConnector = mySqlConnector;
     }
 
-    public async Task<string> GenerateSelectAllAsync(DatabaseCredentials credentials, string table, CancellationToken token)
+    public async Task<string> GenerateSelectAllAsync(IMySqlQueryExecutor executor, string schema, string table, CancellationToken token)
     {
-        await using var session = await mySqlConnector.ConnectAsync(credentials);
-        var columns = await session.GetTableColumnsAsync(table, token);
+        var columns = await executor.GetTableColumnsAsync(schema, table, token);
         StringBuilder sb = new();
         sb.AppendLine("SELECT");
         sb.Append("    ");
         sb.AppendLine(string.Join(",\n    ", columns.Select(x => $"`{x.Name}`")));
-        sb.AppendLine($"FROM `{credentials.SchemaName}`.`{table}`");
+        sb.AppendLine($"FROM `{schema}`.`{table}`");
         return sb.ToString();
     }
 
-    public async Task<string> GenerateInsertAsync(DatabaseCredentials credentials, string table, CancellationToken token)
+    public async Task<string> GenerateInsertAsync(IMySqlQueryExecutor executor, string schema, string table, CancellationToken token)
     {
-        await using var session = await mySqlConnector.ConnectAsync(credentials);
-        var columns = await session.GetTableColumnsAsync(table, token);
+        var columns = await executor.GetTableColumnsAsync(schema, table, token);
         StringBuilder sb = new();
-        sb.AppendLine($"INSERT INTO `{credentials.SchemaName}`.`{table}`");
+        sb.AppendLine($"INSERT INTO `{schema}`.`{table}`");
         sb.Append("(");
         sb.Append(string.Join(", ", columns.Select(x => $"`{x.Name}`")));
         sb.AppendLine(")");
@@ -47,16 +45,15 @@ internal class QueryGenerator : IQueryGenerator
         return sb.ToString();
     }
 
-    public async Task<string> GenerateUpdateAsync(DatabaseCredentials credentials, string table, CancellationToken token)
+    public async Task<string> GenerateUpdateAsync(IMySqlQueryExecutor executor, string schema, string table, CancellationToken token)
     {
-        await using var session = await mySqlConnector.ConnectAsync(credentials);
-        var columns = await session.GetTableColumnsAsync(table, token);
+        var columns = await executor.GetTableColumnsAsync(schema, table, token);
 
         if (columns.All(x => !x.IsPrimaryKey))
             throw new NoPrimaryKeyColumnException(table);
         
         StringBuilder sb = new();
-        sb.AppendLine($"UPDATE `{credentials.SchemaName}`.`{table}`");
+        sb.AppendLine($"UPDATE `{schema}`.`{table}`");
         sb.AppendLine("SET");
         foreach (var col in columns)
             sb.AppendLine($"    `{col.Name}` = <{col.Name}>");
@@ -70,16 +67,15 @@ internal class QueryGenerator : IQueryGenerator
         return sb.ToString();
     }
 
-    public async Task<string> GenerateDeleteAsync(DatabaseCredentials credentials, string table, CancellationToken token)
+    public async Task<string> GenerateDeleteAsync(IMySqlQueryExecutor executor, string schema, string table, CancellationToken token)
     {
-        await using var session = await mySqlConnector.ConnectAsync(credentials);
-        var columns = await session.GetTableColumnsAsync(table, token);
+        var columns = await executor.GetTableColumnsAsync(schema, table, token);
 
         if (columns.All(x => !x.IsPrimaryKey))
             throw new NoPrimaryKeyColumnException(table);
         
         StringBuilder sb = new();
-        sb.AppendLine($"DELETE FROM `{credentials.SchemaName}`.`{table}`");
+        sb.AppendLine($"DELETE FROM `{schema}`.`{table}`");
 
         sb.AppendLine("WHERE");
         var pkColumns = columns.Where(x => x.IsPrimaryKey).ToList();
@@ -90,10 +86,9 @@ internal class QueryGenerator : IQueryGenerator
         return sb.ToString();
     }
 
-    public async Task<string> GenerateCreateAsync(DatabaseCredentials credentials, string table, CancellationToken token)
+    public async Task<string> GenerateCreateAsync(IMySqlQueryExecutor executor, string schema, string table, CancellationToken token)
     {
-        await using var session = await mySqlConnector.ConnectAsync(credentials);
-        return await session.GetCreateTableAsync(table, token) + ";";
+        return await executor.GetCreateTableAsync(schema, table, token) + ";";
     }
 
     public string GenerateDropTable(string? schemaName, string tableName)

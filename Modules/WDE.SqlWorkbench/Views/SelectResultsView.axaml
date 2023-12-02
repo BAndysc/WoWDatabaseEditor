@@ -20,6 +20,11 @@
                                                                RequestRender="{CompiledBinding RequestRender}"
                                                                ValueUpdateRequest="VirtualizedVeryFastTableView_OnValueUpdateRequest"
                                                                Columns="{CompiledBinding Columns}">
+        <optimizedVeryFastTableView:VirtualizedVeryFastTableView.ContextMenu>
+          <ContextMenu>
+            <MenuItem Header="Copy column name" Command="{CompiledBinding CopyColumnNameCommand}" />  
+          </ContextMenu>
+        </optimizedVeryFastTableView:VirtualizedVeryFastTableView.ContextMenu>
       </optimizedVeryFastTableView:VirtualizedVeryFastTableView>
     </ScrollViewer>
   </DockPanel>

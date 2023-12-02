@@ -36,7 +36,8 @@ namespace WDE.Common.Utils
                 e =>
                 {
                     IsBusy = false;
-                    Console.WriteLine(e);
+                    if (e is not TaskCanceledException)
+                        Console.WriteLine(e);
                     onException?.Invoke(e);
                 },
                 continueOnCapturedContext);

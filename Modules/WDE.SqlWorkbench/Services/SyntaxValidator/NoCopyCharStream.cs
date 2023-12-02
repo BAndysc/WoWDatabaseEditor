@@ -25,6 +25,8 @@ internal class NoCopyCharStream : BaseInputCharStream
     
     protected override int ValueAt(int i)
     {
+        if (i + offset >= n)
+            return 0;
         return view.GetCharAt(i + offset);
     }
 

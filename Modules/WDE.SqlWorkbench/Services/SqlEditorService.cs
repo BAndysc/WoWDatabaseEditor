@@ -1,11 +1,9 @@
-using System;
 using Prism.Ioc;
 using WDE.Common.Managers;
 using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Utils;
 using WDE.Module.Attributes;
-using WDE.SqlWorkbench.Models;
 using WDE.SqlWorkbench.Services.Connection;
 using WDE.SqlWorkbench.ViewModels;
 
@@ -15,10 +13,11 @@ namespace WDE.SqlWorkbench.Services;
 internal interface IExtendedSqlEditorService : ISqlEditorService
 {
     void NewDocument();
-    void NewDocument(DatabaseConnectionData connection);
-    void NewDocumentWithTableInfo(DatabaseConnectionData connection, string tableName);
-    void NewDocumentWithTableSelect(DatabaseConnectionData connection, string tableName);
-    void NewDocumentWithQueryAndExecute(DatabaseConnectionData connection, string query);
+    void NewDocument(IConnection connection);
+    void NewDocumentWithTableInfo(IConnection connection, string schema, string tableName);
+    void NewDocumentWithTableSelect(IConnection connection, string schema, string tableName);
+    void NewDocumentWithQueryAndExecute(IConnection connection, string query);
+    void NewDocumentWithQuery(IConnection connection, string query);
 }
 
 [AutoRegister]
@@ -43,23 +42,23 @@ internal class SqlEditorService : IExtendedSqlEditorService
 
     public void NewDocument()
     {
-        if (connectionsManager.DefaultConnection.HasValue)
-            NewDocument(connectionsManager.DefaultConnection.Value);
+        if (connectionsManager.DefaultConnection != null)
+            NewDocument(connectionsManager.DefaultConnection);
         else
             messageBoxService.SimpleDialog("Error", "Can't open an SQL document", "No default connection set. Please set it in SQL Editor settings.").ListenErrors();
     }
 
-    public void NewDocument(DatabaseConnectionData connection)
+    public void NewDocument(IConnection connection)
     {
-        var doc = containerProvider.Resolve<SqlWorkbenchViewModel>((typeof(DatabaseConnectionData), connection));
-        doc.Title = $"New query @ {connection.ConnectionName}";
+        var doc = containerProvider.Resolve<SqlWorkbenchViewModel>((typeof(IConnection), connection));
+        doc.Title = $"New query @ {connection.ConnectionData.ConnectionName}";
         documentManager.OpenDocument(doc);
     }
 
-    public void NewDocumentWithTableInfo(DatabaseConnectionData connection, string tableName)
+    public void NewDocumentWithTableInfo(IConnection connection, string schema, string tableName)
     {
-        var vm = containerProvider.Resolve<SqlWorkbenchViewModel>((typeof(DatabaseConnectionData), connection));
-        vm.Title = $"`{tableName}` @ {connection.Credentials.SchemaName}";
+        var vm = containerProvider.Resolve<SqlWorkbenchViewModel>((typeof(IConnection), connection));
+        vm.Title = $"{tableName} @ {schema}";
         vm.Document.Text = $@"SELECT
     `COLUMN_NAME`,
     `COLUMN_TYPE`,
@@ -71,7 +70,7 @@ internal class SqlEditorService : IExtendedSqlEditorService
 FROM
     `information_schema`.`COLUMNS`
 WHERE
-    `TABLE_SCHEMA` = '{connection.Credentials.SchemaName}'
+    `TABLE_SCHEMA` = '{schema}'
     AND `TABLE_NAME` = '{tableName}'
 ORDER BY
     `ORDINAL_POSITION`;";
@@ -80,23 +79,32 @@ ORDER BY
         documentManager.OpenDocument(vm);
     }
 
-    public void NewDocumentWithTableSelect(DatabaseConnectionData connection, string tableName)
+    public void NewDocumentWithTableSelect(IConnection connection, string schema, string tableName)
     {
-        var vm = containerProvider.Resolve<SqlWorkbenchViewModel>((typeof(DatabaseConnectionData), connection));
-        vm.Title = $"`{tableName}` @ {connection.Credentials.SchemaName}";
-        vm.Document.Text = $"SELECT * FROM `{tableName}`";
+        var vm = containerProvider.Resolve<SqlWorkbenchViewModel>((typeof(IConnection), connection));
+        vm.Title = $"{tableName} @ {schema}";
+        vm.Document.Text = $"SELECT * FROM `{schema}`.`{tableName}`";
         vm.Document.UndoStack.MarkAsOriginalFile();
         vm.ExecuteAllCommand.Execute(null);
         documentManager.OpenDocument(vm);
     }
 
-    public void NewDocumentWithQueryAndExecute(DatabaseConnectionData connection, string query)
+    public void NewDocumentWithQueryAndExecute(IConnection connection, string query)
     {
-        var vm = containerProvider.Resolve<SqlWorkbenchViewModel>((typeof(DatabaseConnectionData), connection));
-        vm.Title = $"New query @ {connection.Credentials.SchemaName}";
+        var vm = containerProvider.Resolve<SqlWorkbenchViewModel>((typeof(IConnection), connection));
+        vm.Title = $"New query @ {connection.ConnectionData.ConnectionName}";
         vm.Document.Text = query;
         vm.Document.UndoStack.MarkAsOriginalFile();
         vm.ExecuteAllCommand.Execute(null);
+        documentManager.OpenDocument(vm);
+    }
+
+    public void NewDocumentWithQuery(IConnection connection, string query)
+    {
+        var vm = containerProvider.Resolve<SqlWorkbenchViewModel>((typeof(IConnection), connection));
+        vm.Title = $"New query @ {connection.ConnectionData.ConnectionName}";
+        vm.Document.Text = query;
+        vm.Document.UndoStack.MarkAsOriginalFile();
         documentManager.OpenDocument(vm);
     }
 }

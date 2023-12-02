@@ -6,5 +6,5 @@ namespace WDE.SqlWorkbench.Services.SqlDump;
 internal interface IDatabaseDumpService
 {
     Task ShowDumpDatabaseWindowAsync(DatabaseCredentials credentials);
-    Task ShowDumpTableWindowAsync(DatabaseCredentials credentials, string table);
+    Task ShowDumpTableWindowAsync(DatabaseCredentials credentials, string? table);
 }
