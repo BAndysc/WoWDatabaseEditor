@@ -41,6 +41,7 @@ internal partial class ConnectionListToolViewModel : ObservableBase, ITablesTool
 {
     public IMessageBoxService MessageBoxService { get; }
     private readonly IConnection connection;
+    private readonly IConnectionsManager connectionsManager;
     private readonly Lazy<IExtendedSqlEditorService> sqlEditorService;
     [Notify] private bool isLoading;
     [Notify] private bool listUpdated;
@@ -53,6 +54,8 @@ internal partial class ConnectionListToolViewModel : ObservableBase, ITablesTool
     public TableViewModel? SelectedTable => selected as TableViewModel;
     public RoutineViewModel? SelectedRoutine => selected as RoutineViewModel;
     public DatabaseObjectGroupViewModel? SelectedGroup => selected as DatabaseObjectGroupViewModel;
+    
+    public SchemaViewModel? SelectedDatabaseOrParent => SelectedDatabase ?? SelectedTable?.Schema ?? SelectedRoutine?.Schema ?? SelectedGroup?.Schema;
     
     public string? SelectedSchemaName => SelectedDatabase?.SchemaName ?? SelectedTable?.Schema.SchemaName;
     
@@ -84,6 +87,7 @@ internal partial class ConnectionListToolViewModel : ObservableBase, ITablesTool
     public DelegateCommand DropTableCommand { get; }
     public DelegateCommand TruncateTableCommand { get; }
     public DelegateCommand RefreshDatabaseCommand { get; }
+    public DelegateCommand OpenSeparateConnectionCommand { get; }
     public DelegateCommand AddNewTableCommand { get; }
     public DelegateCommand AddNewViewCommand { get; }
     public DelegateCommand AddNewProcedureCommand { get; }
@@ -96,12 +100,14 @@ internal partial class ConnectionListToolViewModel : ObservableBase, ITablesTool
         IDatabaseDumpService databaseDumpService,
         IQueryDialogService queryDialogService,
         IConnection connection,
+        IConnectionsManager connectionsManager,
         ISqlWorkbenchPreferences preferences,
         Lazy<IExtendedSqlEditorService> sqlEditorService)
     {
         MessageBoxService = messageBoxService;
         Preferences = preferences;
         this.connection = connection;
+        this.connectionsManager = connectionsManager;
         this.sqlEditorService = sqlEditorService;
         FlatItems = new FlatTreeList<INamedParentType, INamedChildType>(roots);
         
@@ -175,6 +181,11 @@ internal partial class ConnectionListToolViewModel : ObservableBase, ITablesTool
                 db.IsExpanded = false;
                 db.IsExpanded = true;
             }
+        }, () => Selected != null);
+        OpenSeparateConnectionCommand = new DelegateCommand(() =>
+        {
+            var newConn = connectionsManager.Clone(SelectedDatabaseOrParent!.Connection, SelectedDatabaseOrParent.SchemaName);
+            sqlEditorService.Value.NewDocument(newConn);
         }, () => Selected != null);
         
         On(() => SearchText, DoFilter);
@@ -337,7 +348,7 @@ internal partial class ConnectionListToolViewModel : ObservableBase, ITablesTool
             databases = databases.Intersect(connection.ConnectionData.VisibleSchemas).ToList();
         
         var databasesViewModel = databases
-            .Select(x => new SchemaViewModel(this, Preferences.EachDatabaseHasSeparateConnection ? connection.Clone(x) : connection, x))
+            .Select(x => new SchemaViewModel(this, Preferences.EachDatabaseHasSeparateConnection ? connectionsManager.Clone(connection, x) : connection, x))
             .ToList();
 
         if (connection.ConnectionData.DefaultExpandSchemas)

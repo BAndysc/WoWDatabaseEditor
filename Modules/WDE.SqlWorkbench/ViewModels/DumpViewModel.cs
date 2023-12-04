@@ -2,6 +2,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;
@@ -19,7 +20,7 @@ using WDE.SqlWorkbench.Services.SqlDump;
 
 namespace WDE.SqlWorkbench.ViewModels;
 
-internal partial class DumpViewModel : ObservableBase, IWindowViewModel
+internal partial class DumpViewModel : ObservableBase, IWindowViewModel, IClosableDialog
 {
     private readonly IMySqlDumpService mySqlDumpService;
     private readonly IMySqlConnector mySqlConnector;
@@ -36,10 +37,20 @@ internal partial class DumpViewModel : ObservableBase, IWindowViewModel
 
     [Notify] private double progressValue;
     
+    [Notify] private string databaseVersion = "";
+    
+    [Notify] [AlsoNotify(nameof(HasAnyConsoleOutput))] private string consoleOutput = "";
+
+    private CancellationTokenSource? pendingDump;
+    
+    public bool HasAnyConsoleOutput => !string.IsNullOrEmpty(consoleOutput);
+    
     public ObservableCollection<DumpBoolOptionViewModel> BoolOptions { get; } = new();
     
     public IAsyncCommand DumpCommand { get; }
 
+    public ICommand CloseCommand { get; }
+    
     public IAsyncCommand PickFileCommand { get; }
     
     public ICommand SelectAllTablesCommand { get; }
@@ -49,6 +60,31 @@ internal partial class DumpViewModel : ObservableBase, IWindowViewModel
     public string SchemaName => credentials.SchemaName;
 
     public ObservableCollection<DumpTableViewModel> Tables { get; } = new();
+    
+    public void OnClose()
+    {
+        async Task AskToCancel()
+        {
+            if (await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
+                    .SetTitle("Question")
+                    .SetMainInstruction("Dump in progress")
+                    .SetContent("Do you want to cancel the dump?")
+                    .WithYesButton(true)
+                    .WithCancelButton(false)
+                    .Build()))
+            {
+                pendingDump?.Cancel();
+                Close?.Invoke();
+            }
+        }
+
+        if (pendingDump != null)
+        {
+            AskToCancel().ListenErrors();
+        }
+        else
+            Close?.Invoke();
+    }
     
     public DumpViewModel(IMySqlDumpService mySqlDumpService,
         IMySqlConnector mySqlConnector,
@@ -74,6 +110,8 @@ internal partial class DumpViewModel : ObservableBase, IWindowViewModel
             }
         }
 
+        CloseCommand = new DelegateCommand(OnClose);
+        
         PickFileCommand = new AsyncAutoCommand(async () =>
         {
             if (await windowManager.ShowSaveFileDialog("SQL file|sql|Text file|txt|All files|*") is { } file)
@@ -94,7 +132,8 @@ internal partial class DumpViewModel : ObservableBase, IWindowViewModel
                 table.IsChecked = false;
         });
         
-        DumpCommand = new AsyncAutoCommand(DumpAsync, () => OutputFile != null);
+        DumpCommand = new AsyncAutoCommand(DumpAsync, () => OutputFile != null)
+            .WrapMessageBox<Exception>(messageBoxService);
 
         ListTablesAsync(tableName).ListenErrors();
 
@@ -123,7 +162,7 @@ internal partial class DumpViewModel : ObservableBase, IWindowViewModel
         try
         {
             IsLoading = true;
-            var session = await mySqlConnector.ConnectAsync(credentials);
+            var session = await mySqlConnector.ConnectAsync(credentials, QueryExecutionSafety.AskUnlessSelect);
             var tables = await session.GetTablesAsync(credentials.SchemaName);
             
             foreach (var table in tables)
@@ -135,6 +174,24 @@ internal partial class DumpViewModel : ObservableBase, IWindowViewModel
             }
 
             OnTablePropertyValueChanged(default, default!);
+            
+            var versions = await session.ExecuteSqlAsync("SHOW VARIABLES LIKE \"%version%\"");
+            var variableNames = (StringColumnData)versions.Columns[0]!;
+            var variableValues = (StringColumnData)versions.Columns[1]!;
+
+            var indexOfVersion = Enumerable
+                .Range(0, versions.AffectedRows)
+                .FirstOrDefault(x => variableNames[x] == "version");
+
+            var isMaria = Enumerable
+                .Range(0, versions.AffectedRows)
+                .Any(x => variableValues[x]!.Contains("maria", StringComparison.OrdinalIgnoreCase));
+            
+            var version = variableValues[indexOfVersion]!;
+            
+            DatabaseVersion = isMaria ? 
+                (version.Contains("maria", StringComparison.OrdinalIgnoreCase) ? version : "Maria DB " + version) 
+                : "MySQL " + version;
         }
         catch (Exception e)
         {
@@ -157,17 +214,28 @@ internal partial class DumpViewModel : ObservableBase, IWindowViewModel
                 option.Apply(ref options);
 
             var selectedTables = Tables.Where(x => x.IsChecked).Select(x => x.Name).ToArray();
-            
+
+            pendingDump = new();
+            ConsoleOutput = "";
             await mySqlDumpService.DumpDatabaseAsync(credentials,
                 options,
+                DatabaseVersion.Contains("maria", StringComparison.OrdinalIgnoreCase) ? MySqlDumpVersion.MariaDb : MySqlDumpVersion.MySql,
                 Tables.Select(x => x.Name).ToArray(),
                 selectedTables, 
                 outputFile!, 
                 count => ProgressValue += count / 1024.0 / 1024.0,
-                default);
+                err =>
+                {
+                    if (err.Contains("[Warning] Using a password on the command line interface can be insecure."))
+                        return;
+                    Console.WriteLine(err);
+                    ConsoleOutput += err + "\n";
+                },
+                pendingDump.Token);
         }
         finally
         {
+            pendingDump = null;
             DumpInProgress = false;
         }
     }
@@ -177,6 +245,7 @@ internal partial class DumpViewModel : ObservableBase, IWindowViewModel
     public string Title => "Dump database";
     public bool Resizeable => true;
     public ImageUri? Icon => new ImageUri("Icons/icon_accept_transaction.png");
+    public event Action? Close;
 }
 
 internal partial class DumpTableViewModel : ObservableBase

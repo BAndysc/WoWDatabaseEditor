@@ -109,7 +109,7 @@ public class VirtualizedGridView : TemplatedControl
     private Grid? header;
 
     public VirtualizedGridViewItemPresenter? ItemPresenter => children;
-    
+
     protected override void OnKeyDown(KeyEventArgs e)
     {
         base.OnKeyDown(e);

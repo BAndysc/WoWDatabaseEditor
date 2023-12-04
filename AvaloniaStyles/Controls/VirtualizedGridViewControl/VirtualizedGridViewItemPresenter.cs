@@ -104,7 +104,12 @@ public class VirtualizedGridViewItemPresenter : Panel
         AffectsArrange<VirtualizedGridViewItemPresenter>(FocusedIndexProperty);
         AffectsMeasure<VirtualizedGridViewItemPresenter>(ItemsProperty);
         AffectsArrange<VirtualizedGridViewItemPresenter>(ItemsProperty);
-        FocusedIndexProperty.Changed.AddClassHandler<VirtualizedGridViewItemPresenter>((panel, e) => panel.AutoScrollToFocusedIndex());
+        FocusedIndexProperty.Changed.AddClassHandler<VirtualizedGridViewItemPresenter>((panel, e) =>
+        {
+            panel.InvalidateMeasure();
+            panel.InvalidateArrange();
+            DispatcherTimer.RunOnce(panel.AutoScrollToFocusedIndex, TimeSpan.FromMilliseconds(1));
+        });
         ItemsProperty.Changed.AddClassHandler<VirtualizedGridViewItemPresenter>((panel, e) =>
         {
             if (panel.attachedToVisualTree)

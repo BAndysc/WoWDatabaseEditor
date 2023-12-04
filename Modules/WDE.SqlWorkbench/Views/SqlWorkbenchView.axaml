@@ -16,11 +16,17 @@
              Name="Root"
              IsEnabled="{CompiledBinding !IsConnecting}"
              x:Class="WDE.SqlWorkbench.Views.SqlWorkbenchView">
+  <UserControl.KeyBindings>
+    <KeyBinding Gesture="Ctrl+Shift+Enter" Command="{CompiledBinding ExecuteAllCommand}" />
+    <KeyBinding Gesture="Ctrl+Enter" Command="{CompiledBinding ExecuteSelectedCommand}" />
+    <KeyBinding Gesture="F5" Command="{CompiledBinding ExecuteSelectedCommand}" />
+  </UserControl.KeyBindings>
   <Grid RowDefinitions="*,5,0" Name="Grid">
     <DockPanel>
       <Border DockPanel.Dock="Bottom" Height="22">
         <DockPanel LastChildFill="False" Margin="10,0">
-          <ButtonImage Image="Icons/icon_cog_mono.png" Command="{CompiledBinding OpenSettingsCommand}" BorderThickness="0" Background="Transparent" Width="22" Padding="0" Height="22" Margin="0,2,0,0" />
+          <ButtonImage ToolTip.Tip="Open Actions Output Tool" Image="Icons/icon_checks_mono.png" Command="{CompiledBinding ToggleActionsOutputViewCommand}" BorderThickness="0" Background="Transparent" Width="22" Padding="0" Height="22" Margin="0,2,0,0" />
+          <ButtonImage ToolTip.Tip="Open Settings" Image="Icons/icon_cog_mono.png" Command="{CompiledBinding OpenSettingsCommand}" BorderThickness="0" Background="Transparent" Width="22" Padding="0" Height="22" Margin="0,2,0,0" />
           <TextBlock Opacity="0.5" Text="{CompiledBinding CursorStatus}" VerticalAlignment="Center" />
  
           <TextBlock Opacity="0.5" DockPanel.Dock="Right" Text="{CompiledBinding ConnectedTo}"  
@@ -150,7 +156,7 @@
         <DataTemplate x:DataType="viewModels:SelectResultsViewModel">
           <DockPanel LastChildFill="False">
             <WdeImage Image="{CompiledBinding Icon}" Width="16" Height="16" VerticalAlignment="Center" Margin="0,0,4,0" />
-            <TextBlock Text="{CompiledBinding Title}" />
+            <TextBlock Text="{CompiledBinding TitleWithModifiedStatus}" FontWeight="{CompiledBinding IsModified, Converter={x:Static BoolToFontWeightConverter.Bold}}" />
             <ButtonImage DockPanel.Dock="Right" Image="Icons/icon_delete_mono.png" Width="16" Height="16" Padding="0" Margin="0" BorderThickness="0" Command="{CompiledBinding #Root.((viewModels:SqlWorkbenchViewModel)DataContext).CloseTabCommand, Mode=OneTime}" CommandParameter="{CompiledBinding .}" />
           </DockPanel>
         </DataTemplate>

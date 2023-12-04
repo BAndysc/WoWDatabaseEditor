@@ -38,7 +38,7 @@ internal struct MySqlDumpOptions
 
     [Argument("add-locks")]
     [Description("Surround each table dump with LOCK TABLES and UNLOCK TABLES statements")]
-    public bool AddLocks = false;
+    public bool AddLocks = true;
 
     [Argument("allow-keywords")]
     [Description("Allow creation of column names that are keywords")]
@@ -62,7 +62,7 @@ internal struct MySqlDumpOptions
 
     [Argument("disable-keys")]
     [Description("For each table, surround INSERT statements with statements to disable and enable keys")]
-    public bool DisableKeys = false;
+    public bool DisableKeys = true;
 
     [Argument("dump-date")]
     [Description("Include dump date as \"Dump completed on\" comment if --comments is given")]
@@ -94,7 +94,7 @@ internal struct MySqlDumpOptions
 
     [Argument("lock-tables")]
     [Description("Lock all tables before dumping them")]
-    public bool LockTables = false;
+    public bool LockTables = true;
 
     [Argument("no-autocommit")]
     [Description("Enclose the INSERT statements for each dumped table within SET autocommit = 0 and COMMIT statements")]
@@ -114,7 +114,7 @@ internal struct MySqlDumpOptions
 
     [Argument("quick")]
     [Description("Retrieve rows for a table from the server a row at a time")]
-    public bool Quick = false;
+    public bool Quick = true;
 
     [Argument("replace")]
     [Description("Write REPLACE statements rather than INSERT statements")]
@@ -124,13 +124,9 @@ internal struct MySqlDumpOptions
     [Description("Dump stored routines (procedures and functions) from dumped databases")]
     public bool Routines = true;
 
-    [Argument("ignore-views")]
-    [Description("Skip dumping table views.")]
-    public bool IgnoreViews = false;
-    
     [Argument("set-charset")]
     [Description("Add SET NAMES default_character_set to output")]
-    public bool SetCharset = false;
+    public bool SetCharset = true;
 
     [Argument("single-transaction")]
     [Description("Issue a BEGIN SQL statement before dumping data from server")]

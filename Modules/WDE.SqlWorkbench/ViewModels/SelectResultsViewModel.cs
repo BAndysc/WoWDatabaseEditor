@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using Avalonia;
 using Avalonia.Media;
@@ -25,13 +26,18 @@ internal partial class SelectResultsViewModel : ObservableBase
     [Notify] private Vector scrollOffset;
     [Notify] private int selectedRowIndex;
     [Notify] private int selectedCellIndex;
+    [Notify] [AlsoNotify(nameof(Count), nameof(IsModified))] private int additionalRowsCount;
     [Notify] private bool requestRender;
+    
+    public bool IsModified => overrides.Count > 0 || deletedRows.Count > 0 || additionalRowsCount > 0;
 
+    public string TitleWithModifiedStatus => IsModified ? Title + " *" : Title;
+    
     public IMultiIndexContainer Selection { get; } = new MultiIndexContainer();
     public string Title { get; }
     public IReadOnlyList<ITableColumnHeader> Columns { get; }
     
-    public int Count => Results.AffectedRows;
+    public int Count => Results.AffectedRows + AdditionalRowsCount;
     
     public TableController TableController { get; }
     
@@ -71,11 +77,70 @@ internal partial class SelectResultsViewModel : ObservableBase
             "You can't edit cells in this query, because this is not a simple SELECT query.").ListenErrors();
     }
 
-    public Dictionary<(int row, int cell), string?> overrides = new();
+    protected void MarkRowAsDeleted(int rowIndex)
+    {
+        deletedRows.Add(rowIndex);
+        RaisePropertyChanged(nameof(IsModified));
+        RaisePropertyChanged(nameof(TitleWithModifiedStatus));
+        UpdateView();
+    }
 
-    public virtual int VirtualIndexToResultsIndex(int rowIndex) => rowIndex;
+    public string? GetValue(int rowIndex, int cellIndex)
+    {
+        if (TryGetRowOverride(rowIndex, cellIndex, out var overrideString))
+            return overrideString;
+        
+        if (rowIndex >= Results.AffectedRows)
+            return null;
+
+        if (cellIndex == 0) // # column
+            return null;
+        
+        return Results.Columns[cellIndex - 1]!.GetToString(rowIndex);
+    }
     
-    public HashSet<int> deletedRows = new();
+    public bool TryGetRowOverride(int rowIndex, int cellIndex, out string? value)
+    {
+        if (overrides.TryGetValue(rowIndex, out var rowOverride) &&
+            rowOverride.TryGetValue(cellIndex, out var overrideString))
+        {
+            value = overrideString;
+            return true;
+        }
+
+        value = null;
+        return false;
+    }
+    
+    public bool IsRowMarkedAsDeleted(int rowIndex)
+    {
+        return deletedRows.Contains(rowIndex);
+    }
+    
+    public void OverrideValue(int rowIndex, int cellIndex, string? value)
+    {
+        if (!overrides.TryGetValue(rowIndex, out var rowOverride))
+            rowOverride = overrides[rowIndex] = new Dictionary<int, string?>();
+        rowOverride[cellIndex] = value;
+        RaisePropertyChanged(nameof(IsModified));
+        RaisePropertyChanged(nameof(TitleWithModifiedStatus));
+    }
+    
+    public void ResetChanges()
+    {
+        deletedRows.Clear();
+        overrides.Clear();
+        AdditionalRowsCount = 0;
+        UpdateView();
+        RaisePropertyChanged(nameof(IsModified));
+        RaisePropertyChanged(nameof(TitleWithModifiedStatus));
+    }
+
+    protected SortedDictionary<int, Dictionary<int, string?>> overrides = new();
+
+    protected SortedSet<int> deletedRows = new();
+
+    public virtual async Task<bool> SaveAsync() => true;
 }
 
 internal class TableController : BaseVirtualizedTableController
@@ -115,15 +180,12 @@ internal class TableController : BaseVirtualizedTableController
         if (cellIndex == 0)
             return (rowIndex + 1).ToString(); // row index
 
-        if (vm.overrides.TryGetValue((rowIndex, cellIndex), out var overrideString))
-            return overrideString;
-        
-        return vm.Results.Columns[cellIndex - 1]!.GetToString(rowIndex);
+        return vm.GetValue(rowIndex, cellIndex);
     }
 
     public override void DrawRow(int rowIndex, Rect rowRect, DrawingContext drawingContext, VirtualizedVeryFastTableView view)
     {
-        if (vm.deletedRows.Contains(rowIndex))
+        if (vm.IsRowMarkedAsDeleted(rowIndex))
         {
             drawingContext.DrawRectangle(new SolidColorBrush(Colors.Red, 0.2f), null, rowRect);
         }
@@ -137,13 +199,14 @@ internal class TableController : BaseVirtualizedTableController
             return true;
         }
 
-        var hasOverride = vm.overrides.TryGetValue((rowIndex, cellIndex), out var overrideString);
+        string? overrideString = null;
+        var hasOverride = vm.TryGetRowOverride(rowIndex, cellIndex, out overrideString);
         if (hasOverride)
         {
             drawingContext.DrawRectangle(null, new Pen(Brushes.Orange), rect.Deflate(1));
         }
 
-        if ((hasOverride && overrideString == null) || vm.Results.Columns[cellIndex - 1]!.IsNull(rowIndex))
+        if ((hasOverride && overrideString == null) || rowIndex < vm.Results.AffectedRows && vm.Results.Columns[cellIndex - 1]!.IsNull(rowIndex))
         {
             DrawText(drawingContext, rect, "(null)");
             return true;

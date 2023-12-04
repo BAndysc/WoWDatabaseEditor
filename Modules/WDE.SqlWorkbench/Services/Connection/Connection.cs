@@ -16,6 +16,7 @@ internal class Connection : ObservableBase, IConnection
     private Task<IRawMySqlConnection>? connectionTask;
     private TaskQueue taskQueue;
     private int refCount = 0;
+    private bool opened = false;
     private bool autoCommit = true; // mysql default
 
     public DatabaseConnectionData ConnectionData => data;
@@ -27,10 +28,14 @@ internal class Connection : ObservableBase, IConnection
         this.data = data;
         taskQueue = new();
         taskQueue.ToObservable(x => x.IsRunning).SubscribeAction(_ => RaisePropertyChanged(nameof(IsRunning)));
+        taskQueue.ToObservable(x => x.PendingTasksCount).SubscribeAction(_ => RaisePropertyChanged(nameof(PendingTasksCount)));
     }
 
     public bool IsRunning => taskQueue.IsRunning;
     public bool IsAutoCommit => autoCommit;
+    public bool IsOpened => opened;
+    public int PendingTasksCount => taskQueue.PendingTasksCount;
+    public string ConnectionName => data.ConnectionName;
 
     public async Task<IMySqlSession> OpenSessionAsync()
     {
@@ -51,7 +56,9 @@ internal class Connection : ObservableBase, IConnection
         connectionTask = tcs.Task;
         
         refCount++;
-        connection = await connector.ConnectAsync(data.Credentials);
+        connection = await connector.ConnectAsync(data.Credentials, data.SafeMode);
+        opened = true;
+        RaisePropertyChanged(nameof(IsOpened));
         autoCommit = true;
         tcs.SetResult(connection);
         connectionTask = null;
@@ -71,6 +78,8 @@ internal class Connection : ObservableBase, IConnection
         if (lastSession)
         {
             connection = null;
+            opened = false;
+            RaisePropertyChanged(nameof(IsOpened));
 
             await taskQueue.CancelAll();
             thisConnection.Dispose();                

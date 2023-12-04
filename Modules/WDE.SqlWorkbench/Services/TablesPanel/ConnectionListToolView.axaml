@@ -67,6 +67,7 @@
                             <MenuItem Header="Truncate Table" Command="{CompiledBinding  TruncateTableCommand}" IsVisible="{CompiledBinding IsTableSelected}" />
                             <Separator IsVisible="{CompiledBinding IsTableSelected}" />
                             <MenuItem Header="Refresh Database" Command="{CompiledBinding RefreshDatabaseCommand}" />
+                            <MenuItem Header="Open Separate Connection Tab" Command="{CompiledBinding OpenSeparateConnectionCommand}" />
                         </ContextMenu>
                     </VirtualizedTreeView.ContextMenu>
                 </VirtualizedTreeView>

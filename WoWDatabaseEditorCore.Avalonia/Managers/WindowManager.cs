@@ -4,6 +4,7 @@ using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
@@ -245,7 +246,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
 
                     async Task<bool> inner()
                     {
-                        var result = await mainWindowHolder.ShowDialog<bool>(view);
+                        var result = await view.ShowDialog<bool>(GetFocusedWindow());
                         view.DataContext = null;
                         return result;
                     }
@@ -275,7 +276,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
 
         public Task<string?> ShowFolderPickerDialog(string defaultDirectory)
         {
-            return new OpenFolderDialog() {Directory = defaultDirectory}.ShowAsync(mainWindowHolder.RootWindow);
+            return new OpenFolderDialog() {Directory = defaultDirectory}.ShowAsync(GetFocusedWindow());
         }
 
         public async Task<string?> ShowOpenFileDialog(string filter, string? defaultDirectory = null)
@@ -293,7 +294,7 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
                         Name = x.First,
                         Extensions = x.Second.Split(",").ToList()
                     }).ToList()
-            }.ShowAsync(mainWindowHolder.RootWindow);
+            }.ShowAsync(GetFocusedWindow());
             
             if (result == null || result.Length == 0)
                 return null;
@@ -316,12 +317,18 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
                         Name = x.First,
                         Extensions = x.Second.Split(",").ToList()
                     }).ToList()
-            }.ShowAsync(mainWindowHolder.RootWindow);
+            }.ShowAsync(GetFocusedWindow());
             
             if (string.IsNullOrEmpty(result))
                 return null;
             
             return result;
+        }
+
+        private Window GetFocusedWindow()
+        {
+            return ((IClassicDesktopStyleApplicationLifetime?)Application.Current!.ApplicationLifetime)?.Windows
+                .FirstOrDefault(x => x.IsActive) ?? mainWindowHolder.RootWindow;
         }
         
         public void OpenUrl(string url, string arguments)

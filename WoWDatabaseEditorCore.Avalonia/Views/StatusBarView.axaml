@@ -27,6 +27,7 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
         
         <StackPanel Orientation="Horizontal">
@@ -159,11 +160,14 @@
         </Panel>
         
         <Panel Grid.Column="5" VerticalAlignment="Stretch" Margin="0">
-            <Button BorderThickness="0" Foreground="White" Background="Transparent" Command="{CompiledBinding TasksViewModel.TogglePanelVisibility}">
-                <WrapPanel>
-                    <TextBlock Text="{CompiledBinding TasksViewModel.PendingTasksCount, Mode=OneWay}" IsHitTestVisible="False" Foreground="{DynamicResource StatusBarForeground}" />
-                    <TextBlock Text=" tasks running in background"></TextBlock>
-                </WrapPanel>
+            <Button BorderThickness="0" Foreground="White" Background="Transparent" Command="{CompiledBinding ToggleConnectionsPanelVisibility}">
+                <TextBlock Text="{CompiledBinding Connections.OpenedConnections, StringFormat={}{0} connections, Mode=OneWay}" IsHitTestVisible="False" Foreground="{DynamicResource StatusBarForeground}" />
+            </Button>
+        </Panel>
+        
+        <Panel Grid.Column="6" VerticalAlignment="Stretch" Margin="0">
+            <Button BorderThickness="0" Foreground="White" Background="Transparent" Command="{CompiledBinding ToggleTasksPanelVisibility}">
+                <TextBlock Text="{CompiledBinding TasksViewModel.PendingTasksCount, StringFormat={}{0} tasks running in background, Mode=OneWay}" IsHitTestVisible="False" Foreground="{DynamicResource StatusBarForeground}" />
             </Button>
         </Panel>
     </Grid>

@@ -7,7 +7,6 @@ namespace WDE.SqlWorkbench.Services.Connection;
 internal interface IRawMySqlConnection : IMySqlQueryExecutor, System.IDisposable, System.IAsyncDisposable
 {
     bool IsSessionOpened { get; }
-    Task<bool> TryReconnectAsync();
 }
 
 internal interface IMySqlQueryExecutor

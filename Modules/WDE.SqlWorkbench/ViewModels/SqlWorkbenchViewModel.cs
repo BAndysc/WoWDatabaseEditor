@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Reactive.Linq;
@@ -20,6 +21,7 @@ using WDE.SqlWorkbench.Services.QuerySplitter;
 using WDE.SqlWorkbench.Services.SyntaxValidator;
 using WDE.SqlWorkbench.Services.TextMarkers;
 using AvaloniaEdit.Document;
+using AvaloniaStyles;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using Prism.Commands;
 using WDE.Common.Disposables;
@@ -81,15 +83,16 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, IProblemSourceDoc
     public IAsyncCommand StopQueryExecutionCommand { get; }
     public IAsyncCommand StopAllTasksInConnectionCommand { get; }
     public IAsyncCommand BeautifyCommand { get; }
-    public DelegateCommand<SelectResultsViewModel> CloseTabCommand { get; }
-    public DelegateCommand CloseAllTabsCommand { get; }
-    public DelegateCommand<SelectResultsViewModel> CloseOtherTabsCommand { get; }
-    public DelegateCommand<SelectResultsViewModel> CloseLeftTabsCommand { get; }
-    public DelegateCommand<SelectResultsViewModel> CloseRightTabsCommand { get; }
+    public IAsyncCommand<SelectResultsViewModel> CloseTabCommand { get; }
+    public IAsyncCommand CloseAllTabsCommand { get; }
+    public IAsyncCommand<SelectResultsViewModel> CloseOtherTabsCommand { get; }
+    public IAsyncCommand<SelectResultsViewModel> CloseLeftTabsCommand { get; }
+    public IAsyncCommand<SelectResultsViewModel> CloseRightTabsCommand { get; }
     public IAsyncCommand CommitCommand { get; }
     public IAsyncCommand RollbackCommand { get; }
     public IAsyncCommand ToggleIsAutoCommit { get; }
     public ICommand OpenSettingsCommand { get; }
+    public ICommand ToggleActionsOutputViewCommand { get; }
     public IAsyncCommand RestartLanguageServerCommand { get; }
 
     [Notify] private bool isConnecting = true;
@@ -165,8 +168,17 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, IProblemSourceDoc
             .SubscribeAction(@is => IsDocumentModified = !@is);
 
         Results.CollectionChanged += (_, _) => RaisePropertyChanged(nameof(HasAnyResults));
-        connection.ToObservable(x => x.IsRunning).SubscribeAction(_ => RaisePropertyChanged(nameof(TaskRunning)));
-        connection.ToObservable(x => x.IsAutoCommit).SubscribeAction(_ => RaisePropertyChanged(nameof(IsAutoCommit)));
+        AutoDispose(connection.ToObservable(x => x.IsRunning).SubscribeAction(_ => RaisePropertyChanged(nameof(TaskRunning))));
+        AutoDispose(connection.ToObservable(x => x.IsAutoCommit).SubscribeAction(_ => RaisePropertyChanged(nameof(IsAutoCommit))));
+        
+        AutoDispose(Results.ToStream(true)
+            .SubscribeAction(x =>
+            {
+                if (x.Type == CollectionEventType.Add)
+                    x.Item.PropertyChanged += OnResultPropertyChanged;
+                else if (x.Type == CollectionEventType.Remove)
+                    x.Item.PropertyChanged -= OnResultPropertyChanged;
+            }));
         
         AutoDispose(DispatcherTimer.Run(() =>
         {
@@ -190,52 +202,84 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, IProblemSourceDoc
             
             configViewModel.SelectedConnection = configViewModel.Connections.FirstOrDefault(x => x.Id == connection.ConnectionData.Id);
         });
+
+        ToggleActionsOutputViewCommand = new DelegateCommand(() =>
+        {
+            actionsOutputService.Visibility = !actionsOutputService.Visibility;
+        });
         
-        CloseTabCommand = new DelegateCommand<SelectResultsViewModel>(r =>
+        CloseTabCommand = new AsyncAutoCommand<SelectResultsViewModel>(async r =>
         {
             var indexOf = Results.IndexOf(r);
             if (indexOf >= 0)
             {
                 var wasSelected = r == SelectedResult;
+                if (!await AskIfApplyAsync(r))
+                    return;
+                
                 Results.Remove(r);
                 if (wasSelected)
                     SelectedResult = Results.Count > indexOf ? Results[indexOf] : Results.LastOrDefault();
             }
         });
         
-        CloseAllTabsCommand = new DelegateCommand(() =>
+        CloseAllTabsCommand = new AsyncAutoCommand(async () =>
         {
-            Results.Clear();
+            for (int i = Results.Count - 1; i >= 0; --i)
+            {
+                if (!await AskIfApplyAsync(Results[i]))
+                    return;
+
+                Results.RemoveAt(i);
+            }
             SelectedResult = null;
         });
         
-        CloseOtherTabsCommand = new DelegateCommand<SelectResultsViewModel>(r =>
+        CloseOtherTabsCommand = new AsyncAutoCommand<SelectResultsViewModel>(async r =>
         {
-            Results.RemoveIf(x => x != r);
+            for (int i = Results.Count - 1; i >= 0; --i)
+            {
+                if (Results[i] == r)
+                    continue;
+                
+                if (!await AskIfApplyAsync(Results[i]))
+                    return;
+
+                Results.RemoveAt(i);
+            }
             SelectedResult = r;
         });
         
-        CloseLeftTabsCommand = new DelegateCommand<SelectResultsViewModel>(r =>
+        CloseLeftTabsCommand = new AsyncAutoCommand<SelectResultsViewModel>(async r =>
         {
             var index = Results.IndexOf(r);
             var selectedIndex = SelectedResult == null ? -1 : Results.IndexOf(SelectedResult);
             if (index >= 0)
             {
                 for (int i = index - 1; i >= 0; --i)
+                {
+                    if (!await AskIfApplyAsync(Results[i]))
+                        return;
+                 
                     Results.RemoveAt(i);
+                }
                 if (selectedIndex < index)
                     SelectedResult = Results.Count > 0 ? Results[0] : null;
             }
         });
         
-        CloseRightTabsCommand = new DelegateCommand<SelectResultsViewModel>(r =>
+        CloseRightTabsCommand = new AsyncAutoCommand<SelectResultsViewModel>(async r =>
         {
             var index = Results.IndexOf(r);
             var selectedIndex = SelectedResult == null ? -1 : Results.IndexOf(SelectedResult);
             if (index >= 0)
             {
                 while (Results.Count > index + 1)
+                {
+                    if (!await AskIfApplyAsync(Results[index + 1]))
+                        return;
                     Results.RemoveAt(index + 1);
+                }
                 if (selectedIndex > index)
                     SelectedResult = index < Results.Count ? Results[index] : null;
             }
@@ -329,6 +373,40 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, IProblemSourceDoc
         ConnectAsync().ListenErrors();
     }
 
+    private async Task<bool> AskIfApplyAsync(SelectResultsViewModel results)
+    {
+        if (!results.IsModified)
+            return true;
+
+        var result = await MessageBoxService.ShowDialog(new MessageBoxFactory<int>()
+            .SetTitle("Warning")
+            .SetMainInstruction($"{results.Title} has pending changes. Do you want to apply them?")
+            .SetContent("If you don't apply them, they will be lost.")
+            .WithYesButton(0)
+            .WithNoButton(1)
+            .WithCancelButton(2)
+            .Build());
+
+        if (result == 0)
+        {
+            if (!await results.SaveAsync())
+                return false;
+            return true;
+        }
+        else if (result == 1)
+        {
+            return true;
+        }
+        else
+            return false;
+    }
+
+    private void OnResultPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(SelectResultsViewModel.IsModified))
+            RaisePropertyChanged(nameof(IsModified));
+    }
+
     private Task? connectTask;
     
     private async Task ConnectAsync()
@@ -380,21 +458,13 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, IProblemSourceDoc
         await mySqlSession.ScheduleAsync((token, executor) => ExecuteSingleAsync(executor, query, token, action));
     }
 
-    private async Task ExecuteAllAsync()
+    public async Task ExecuteAsync(IReadOnlyList<string> queries, bool continueOnError, bool throwOnError, bool rollbackOnError)
     {
-        if (connectTask != null)
-            await connectTask;
-        
-        querySplitter.UpdateRangesNow(Document);
-        if (!querySplitter.AreRangesValid)
-            throw new Exception("Invalid ranges! Fatal error, canceling. Sorry, please report this.");
-
-        List<string> queries = new();
-        foreach (var range in querySplitter.Ranges)
-            queries.Add(Document.GetText(range.Start, range.Length));
-
         if (queries.Count == 0)
             return;
+
+        if (connectTask != null)
+            await connectTask;
         
         // we do it before schedule, so that the action is added to the UI list before the execution starts
         var action = actionsOutputService.Create(queries[0]);
@@ -414,13 +484,38 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, IProblemSourceDoc
                 }
                 catch (Exception e)
                 {
+                    if (rollbackOnError)
+                    {
+                        action = actionsOutputService.Create("ROLLBACK");
+                        await ExecuteSingleAsync(executor, "ROLLBACK", token, action);
+                    }
+                    
+                    if (throwOnError)
+                        throw;
+                    
                     if (!continueOnError)
                         break;
                 }
             }
         });
     }
-    
+
+    private async Task ExecuteAllAsync()
+    {
+        if (connectTask != null)
+            await connectTask;
+        
+        querySplitter.UpdateRangesNow(Document);
+        if (!querySplitter.AreRangesValid)
+            throw new Exception("Invalid ranges! Fatal error, canceling. Sorry, please report this.");
+
+        List<string> queries = new();
+        foreach (var range in querySplitter.Ranges)
+            queries.Add(Document.GetText(range.Start, range.Length));
+
+        await ExecuteAsync(queries, this.continueOnError, false, false);
+    }
+
     private async Task ExecuteSingleAsync(IMySqlQueryExecutor executor, 
         string query, 
         CancellationToken cancellationToken, 
@@ -453,14 +548,18 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, IProblemSourceDoc
                 var isSelect = queryUtility.IsSimpleSelect(query, out var select);
                 if (result == null)
                 {
-                    if (isSelect)
+                    var type = await executor.GetTableTypeAsync(select.From.Schema, select.From.Table, cancellationToken);
+                    if (CheckIfCancelled())
+                        return;
+
+                    if (isSelect && type == TableType.Table)
                     {
-                        var tableInfo = await executor.GetTableColumnsAsync(null, select.From, cancellationToken);
+                        var tableInfo = await executor.GetTableColumnsAsync(select.From.Schema, select.From.Table, cancellationToken);
                         
                         if (CheckIfCancelled())
                             return;
                         
-                        Results.Add(new SelectSingleTableViewModel(this, select.From, in res, select, tableInfo));
+                        Results.Add(new SelectSingleTableViewModel(this, select.From.Table, in res, select, tableInfo));
                     }
                     else
                         Results.Add(new SelectResultsViewModel(this, $"Query {action.Index}", in res));
@@ -599,13 +698,16 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, IProblemSourceDoc
             return;
         
         var marker = textMarkerService.Create(TextMarkerTypes.CircleInScrollBar, range.Value.Start, range.Value.Length);
-        marker.BackgroundBrush = new SolidColorBrush(new Color(30, 0, 0, 0));
+        var color = SystemTheme.EffectiveThemeIsDark ? new Color(22, 255, 255, 255) : new Color(22, 0, 0, 0);
+        marker.BackgroundBrush = new SolidColorBrush(color);
     }
 
     private async Task ProcessDataAsync(ITextSource snapshot, CancellationToken token)
     {
         if (!await querySplitter.UpdateRangesAsync(snapshot))
             return;
+        
+        UpdateQueryMarker();
         
         Debug.Assert(querySplitter.AreRangesValid);
 
@@ -762,7 +864,8 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, IProblemSourceDoc
     }
 
     [Notify] private string title;
-    public bool IsModified => isDocumentModified;
+    public bool IsModified => isDocumentModified || IsAnyResultModified;
+    private bool IsAnyResultModified => Results.Any(x => x.IsModified);
     [Notify] [AlsoNotify(nameof(IsModified))] private bool isDocumentModified;
     public ImageUri? Icon { get; } = new ImageUri("Icons/document_sql.png");
     public ICommand Undo => AlwaysDisabledCommand.Command;

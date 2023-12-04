@@ -6,6 +6,7 @@
              xmlns:settings="clr-namespace:WDE.SqlWorkbench.Settings"
              xmlns:avaloniaStyles="clr-namespace:AvaloniaStyles;assembly=AvaloniaStyles"
              xmlns:models="clr-namespace:WDE.SqlWorkbench.Models"
+             xmlns:connection="clr-namespace:WDE.SqlWorkbench.Services.Connection"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="settings:SqlWorkbenchConfigurationViewModel"
              x:Name="Root"
@@ -31,6 +32,23 @@
             <TextBox Text="{CompiledBinding CustomSqlsPath}" IsEnabled="{CompiledBinding HasCustomSqlsPath}" TabIndex="1" />
           </DockPanel>
         </SettingItem>
+        <SettingItem Header="Custom MariaDB-dump path" Help="If you want to dump MariaDB databases, you can provide mariadb-dump tool path here.">
+          <DockPanel KeyboardNavigation.TabNavigation="Local">
+            <CheckBox IsChecked="{CompiledBinding HasCustomMariaDumpPath}" TabIndex="0" />
+            <Button Margin="5,0,0,0" DockPanel.Dock="Right" TabIndex="3" Content="Download" Command="{CompiledBinding DownloadAndPickCustomMariaDumpCommand}" IsEnabled="{CompiledBinding HasCustomMariaDumpPath}"/>
+            <Button Margin="5,0,0,0" DockPanel.Dock="Right" TabIndex="2" Content=" ... " Command="{CompiledBinding PickCustomMariaDumpPath}" IsEnabled="{CompiledBinding HasCustomMariaDumpPath}"/>
+            <TextBox Text="{CompiledBinding CustomMariaDumpPath}" IsEnabled="{CompiledBinding HasCustomMariaDumpPath}" TabIndex="1" />
+          </DockPanel>
+        </SettingItem>
+        <SettingItem Header="Custom mysqldump path" Help="If you want to dump MySQL databases, you can provide mysqldump tool path here.">
+          <DockPanel KeyboardNavigation.TabNavigation="Local">
+            <CheckBox IsChecked="{CompiledBinding HasCustomMySqlDumpPath}" TabIndex="0" />
+            <Button Margin="5,0,0,0" DockPanel.Dock="Right" TabIndex="3" Content="Download" Command="{CompiledBinding DownloadAndPickCustomMySqlDumpCommand}" IsEnabled="{CompiledBinding HasCustomMySqlDumpPath}"/>
+            <Button Margin="5,0,0,0" DockPanel.Dock="Right" TabIndex="2" Content=" ... " Command="{CompiledBinding PickCustomMySqlDumpPath}" IsEnabled="{CompiledBinding HasCustomMySqlDumpPath}"/>
+            <TextBox Text="{CompiledBinding CustomMySqlDumpPath}" IsEnabled="{CompiledBinding HasCustomMySqlDumpPath}" TabIndex="1" />
+          </DockPanel>
+        </SettingItem>
+        
         <SettingItem Header="Default connection" Help="The default connection that will be open when you use the 'New SQL document' button">
           <ComboBox Items="{CompiledBinding Connections}" SelectedItem="{CompiledBinding DefaultConnection}">
             <ComboBox.ItemTemplate>
@@ -117,6 +135,19 @@
                   <Button Name="TogglePassword">Show</Button>
                 </TextBox.InnerRightContent>
               </TextBox>
+            </SettingItem>
+            
+            <SettingItem Header="Safety Mode" Help="The editor can ask you before execution of any query (any withing the raw SQL editor, not in the other table editors!!), useful if you edit a production database.">
+              <ComboBox SelectedItem="{CompiledBinding SafeMode}" Items="{x:Static settings:ConnectionConfigViewModel.SafeModes}">
+                <ComboBox.ItemTemplate>
+                  <DataTemplate x:DataType="connection:QueryExecutionSafety">
+                    <DockPanel>
+                      <TextBlock DockPanel.Dock="Top" Text="{CompiledBinding ., Converter={x:Static settings:SafeModeToNameConverter.Instance}}" FontWeight="Bold" />
+                      <TextBlock TextWrapping="Wrap" Text="{CompiledBinding ., Converter={x:Static settings:SafeModeToDescriptionConverter.Instance}}" />
+                    </DockPanel>
+                  </DataTemplate>
+                </ComboBox.ItemTemplate>
+              </ComboBox>
             </SettingItem>
             
             <SettingItem Header="Default database">

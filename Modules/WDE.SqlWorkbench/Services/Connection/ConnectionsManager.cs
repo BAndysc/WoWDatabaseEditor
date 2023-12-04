@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using WDE.Common.Types;
 using WDE.Common.Utils;
@@ -18,8 +19,10 @@ internal class ConnectionsManager : IConnectionsManager
     private readonly IMySqlConnector connector;
 
     private IReadOnlyList<IConnection> connections = null!;
-    
-    public IReadOnlyList<IConnection> Connections
+
+    public ObservableCollection<IConnection> AllConnections { get; } = new();
+
+    public IReadOnlyList<IConnection> StaticConnections
     {
         get => connections;
         set
@@ -31,7 +34,7 @@ internal class ConnectionsManager : IConnectionsManager
 
     public IConnection? DefaultConnection
     {
-        get => Connections.FirstOrDefault(c => c.ConnectionData.Id == preferences.DefaultConnection);
+        get => StaticConnections.FirstOrDefault(c => c.ConnectionData.Id == preferences.DefaultConnection);
         set
         {
             if (value != null)
@@ -39,6 +42,13 @@ internal class ConnectionsManager : IConnectionsManager
             else
                 preferences.DefaultConnection = null;
         }
+    }
+
+    public IConnection Clone(IConnection baseConnection, string schemaName)
+    {
+        var newConnection = new Connection(connector, baseConnection.ConnectionData.WithSchemaName(schemaName));
+        AllConnections.Add(newConnection);
+        return newConnection;
     }
 
     public ConnectionsManager(IWorldDatabaseSettingsProvider worldSettings,
@@ -69,12 +79,13 @@ internal class ConnectionsManager : IConnectionsManager
                 new ImageUri("Icons/icon_world.png"),
                 false,
                 null,
-                null));
+                null,
+                QueryExecutionSafety.ExecuteAll));
         }
         
-        AddConnection(worldSettings.Settings, CredentialsSource.WorldTable);
-        AddConnection(hotfixSettings.Settings, CredentialsSource.HotfixTable);
-        AddConnection(authSettings.Settings, CredentialsSource.AuthTable);
+        AddConnection(worldSettings.Settings, CredentialsSource.WorldDatabase);
+        AddConnection(hotfixSettings.Settings, CredentialsSource.HotfixDatabase);
+        AddConnection(authSettings.Settings, CredentialsSource.AuthDatabase);
         var savedConnections = preferences.Connections.ToList();
 
         for (var i = 0; i < savedConnections.Count; i++)
@@ -86,13 +97,13 @@ internal class ConnectionsManager : IConnectionsManager
                 DatabaseCredentials credentials;
                 switch (saveConnection.CredentialsSource)
                 {
-                    case CredentialsSource.WorldTable:
+                    case CredentialsSource.WorldDatabase:
                         credentials = DatabaseCredentials.FromDbAccess(worldSettings.Settings);
                         break;
-                    case CredentialsSource.AuthTable:
+                    case CredentialsSource.AuthDatabase:
                         credentials = DatabaseCredentials.FromDbAccess(authSettings.Settings);
                         break;
-                    case CredentialsSource.HotfixTable:
+                    case CredentialsSource.HotfixDatabase:
                         credentials = DatabaseCredentials.FromDbAccess(hotfixSettings.Settings);
                         break;
                     case CredentialsSource.Custom:
@@ -104,7 +115,8 @@ internal class ConnectionsManager : IConnectionsManager
         }
 
         connectionsList.AddRange(savedConnections);
-        Connections = connectionsList.Select(x => new Connection(connector, x)).ToList();
-        DefaultConnection ??= Connections.FirstOrDefault();
+        StaticConnections = connectionsList.Select(x => new Connection(connector, x)).ToList();
+        AllConnections.AddRange(StaticConnections);
+        DefaultConnection ??= StaticConnections.FirstOrDefault();
     }
 }

@@ -3,6 +3,7 @@ using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
 using MySqlConnector;
+using WDE.Common.Services.MessageBox;
 using WDE.SqlWorkbench.Models;
 
 namespace WDE.SqlWorkbench.Services.Connection;
@@ -10,10 +11,14 @@ namespace WDE.SqlWorkbench.Services.Connection;
 internal class RawMySqlConnection : IRawMySqlConnection, IAsyncDisposable
 {
     private readonly MySqlConnection conn;
+    private readonly IQuerySafetyService querySafetyService;
+    private readonly QueryExecutionSafety safety;
 
-    public RawMySqlConnection(MySqlConnection conn)
+    public RawMySqlConnection(MySqlConnection conn, IQuerySafetyService querySafetyService, QueryExecutionSafety safety)
     {
         this.conn = conn;
+        this.querySafetyService = querySafetyService;
+        this.safety = safety;
     }
 
     public bool IsSessionOpened => conn.State == ConnectionState.Open;
@@ -26,6 +31,11 @@ internal class RawMySqlConnection : IRawMySqlConnection, IAsyncDisposable
 
     public async Task<SelectResult> ExecuteSqlAsync(string query, int? rowsLimit, CancellationToken token)
     {
+        if (!await querySafetyService.CanExecuteAsync(query, safety))
+        {
+            throw new TaskCanceledException("The user canceled the query execution");
+        }
+        
         if (!IsSessionOpened)
             await TryReconnectAsync();
 
