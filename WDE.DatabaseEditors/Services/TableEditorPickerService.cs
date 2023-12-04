@@ -12,6 +12,7 @@ using WDE.Common.Tasks;
 using WDE.Common.Utils;
 using WDE.DatabaseEditors.Data.Interfaces;
 using WDE.DatabaseEditors.Data.Structs;
+using WDE.DatabaseEditors.Loaders;
 using WDE.DatabaseEditors.Models;
 using WDE.DatabaseEditors.Solution;
 using WDE.DatabaseEditors.ViewModels;
@@ -37,6 +38,7 @@ public class TableEditorPickerService : ITableEditorPickerService
     private readonly Lazy<IDocumentManager> documentManager;
     private readonly IMessageBoxService messageBoxService;
     private readonly IWindowManager windowManager;
+    private readonly IDatabaseTableDataProvider tableDataProvider;
     private readonly IStandaloneTableEditorSettings windowsSettings;
 
     internal TableEditorPickerService(ITableOpenService tableOpenService, 
@@ -47,6 +49,7 @@ public class TableEditorPickerService : ITableEditorPickerService
         Lazy<IDocumentManager> documentManager,
         IMessageBoxService messageBoxService,
         IWindowManager windowManager,
+        IDatabaseTableDataProvider tableDataProvider,
         IStandaloneTableEditorSettings windowsSettings)
     {
         this.tableOpenService = tableOpenService;
@@ -57,6 +60,7 @@ public class TableEditorPickerService : ITableEditorPickerService
         this.documentManager = documentManager;
         this.messageBoxService = messageBoxService;
         this.windowManager = windowManager;
+        this.tableDataProvider = tableDataProvider;
         this.windowsSettings = windowsSettings;
     }
     
@@ -209,7 +213,14 @@ public class TableEditorPickerService : ITableEditorPickerService
             Debug.Assert(definition.RecordMode == RecordMode.Template);
             Debug.Assert(condition == null);
             Debug.Assert(defaultPartialKey.HasValue);
-            var solutionItem = new DatabaseTableSolutionItem(defaultPartialKey.Value, true, false, definition.Id, false);
+            
+            bool existsInDatabase = false;
+            var data = await tableDataProvider.Load(definition.Id, null, null,null, new []{defaultPartialKey.Value});
+                
+            if (data != null && data.Entities.Count == 1)
+                existsInDatabase = data.Entities[0].ExistInDatabase;
+            
+            var solutionItem = new DatabaseTableSolutionItem(defaultPartialKey.Value, existsInDatabase, false, definition.Id, false);
             openIsNoSaveMode = await CheckIfItemIsOpened(solutionItem, definition);
             var template = containerProvider.Resolve<TemplateDbTableEditorViewModel>((typeof(DatabaseTableSolutionItem), solutionItem));
             template.AllowMultipleKeys = false;
