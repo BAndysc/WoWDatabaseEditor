@@ -14,8 +14,8 @@
     
     <Border Width="20" />
     
-    <ButtonImage Command="{CompiledBinding ExecuteAllCommand}" ToolTip.Tip="Execute all queries" Image="Icons/icon_execute.png" />
-    <ButtonImage Command="{CompiledBinding ExecuteSelectedCommand}" ToolTip.Tip="Execute current query" Image="Icons/icon_execute_single.png" />
+    <ButtonImage Command="{CompiledBinding ExecuteAllCommand}" ToolTip.Tip="Execute all queries (Ctrl + Shift + Enter)" Image="Icons/icon_execute.png" />
+    <ButtonImage Command="{CompiledBinding ExecuteSelectedCommand}" ToolTip.Tip="Execute current query (Ctrl + Enter   OR   F5)" Image="Icons/icon_execute_single.png" />
     <ButtonImage Command="{CompiledBinding StopQueryExecutionCommand}" ToolTip.Tip="Stop execution" Image="Icons/icon_stop.png">
       <ButtonImage.ContextMenu>
         <ContextMenu>

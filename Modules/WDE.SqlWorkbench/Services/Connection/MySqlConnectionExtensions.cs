@@ -41,7 +41,7 @@ internal static class MySqlConnectionExtensions
             .Select(i => new TableInfo(schemas[i]!, names[i]!, SqlParseUtils.ParseTableType(types[i]!), engines[i], rowFormats[i], collations[i], dataLengths[i], comments[i]))
             .ToList();
     }
-
+    
     public static async Task<IReadOnlyList<RoutineInfo>> GetRoutinesAsync(this IMySqlQueryExecutor conn, string schemaName, CancellationToken token)
     {
         var results = await conn.ExecuteSqlAsync($"SELECT `SPECIFIC_NAME`, `ROUTINE_SCHEMA`, `ROUTINE_TYPE`, `DATA_TYPE`, `DTD_IDENTIFIER`, `ROUTINE_DEFINITION`, `IS_DETERMINISTIC`, `SQL_DATA_ACCESS`, `SECURITY_TYPE`, `CREATED`, `LAST_ALTERED`, `ROUTINE_COMMENT`, `DEFINER` FROM `information_schema`.`routines` WHERE `ROUTINE_SCHEMA` = '{schemaName}' ORDER BY `SPECIFIC_NAME`;", null, token);
@@ -85,6 +85,22 @@ internal static class MySqlConnectionExtensions
         return routines;
     }
 
+    public static async Task<TableType?> GetTableTypeAsync(this IMySqlQueryExecutor conn, string? schema, string tableName, CancellationToken token)
+    {
+        string where = string.IsNullOrEmpty(schema) ? "" : $" IN `{schema}`";
+        var results = await conn.ExecuteSqlAsync($"SHOW FULL TABLES{where};", null, token);
+        var tableNames = (StringColumnData)results.Columns[0]!;
+        var tableTypes = (StringColumnData)results.Columns[1]!;
+        
+        for (int i = 0; i < results.AffectedRows; ++i)
+        {
+            if (tableNames[i] == tableName)
+                return SqlParseUtils.ParseTableType(tableTypes[i]!);
+        }
+
+        return null;
+    }
+    
     public static async Task<IReadOnlyList<ColumnInfo>> GetTableColumnsAsync(this IMySqlQueryExecutor conn, string? schema, string tableName, CancellationToken token)
     {
         List<ColumnInfo> columns = new();

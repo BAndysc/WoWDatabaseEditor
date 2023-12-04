@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using WDE.Module.Attributes;
 
 namespace WDE.SqlWorkbench.Services.Connection;
@@ -7,6 +8,14 @@ namespace WDE.SqlWorkbench.Services.Connection;
 [SingleInstance]
 internal interface IConnectionsManager
 {
-    IReadOnlyList<IConnection> Connections { get; set; }
+    /// <summary>
+    /// all connections, including predefined in the settings and dynamically created
+    /// </summary>
+    ObservableCollection<IConnection> AllConnections { get; }
+    /// <summary>
+    /// all connections which are predefined in the settings
+    /// </summary>
+    IReadOnlyList<IConnection> StaticConnections { get; set; }
     IConnection? DefaultConnection { get; set; }
+    IConnection Clone(IConnection baseConnection, string schemaName);
 }

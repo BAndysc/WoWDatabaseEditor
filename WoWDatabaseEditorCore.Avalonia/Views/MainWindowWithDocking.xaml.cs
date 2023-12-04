@@ -157,36 +157,40 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
         protected override void OnOpened(EventArgs e)
         {
             base.OnOpened(e);
-            
-            DispatcherTimer.RunOnce(() =>
+
+            if (DataContext is MainWindowViewModel vm &&
+                vm.ShowSqlEditorNotification())
             {
-                var btn = this.GetControl<Button>("OpenSQLDocument");
-                var flyout = new Flyout()
+                DispatcherTimer.RunOnce(() =>
                 {
-                    Content = new DockPanel()
+                    var btn = this.GetControl<Button>("OpenSQLDocument");
+                    var flyout = new Flyout()
                     {
-                        Width = 300,
-                        Children =
+                        Content = new DockPanel()
                         {
-                            new TextBlock()
+                            Width = 300,
+                            Children =
                             {
-                                [DockPanel.DockProperty] = global::Avalonia.Controls.Dock.Top,
-                                TextWrapping = TextWrapping.WrapWithOverflow,
-                                FontWeight = FontWeight.Bold,
-                                Text = "SQL editor is now available!"
-                            },
-                            new TextBlock()
-                            {
-                                TextWrapping = TextWrapping.WrapWithOverflow,
-                                Text =
-                                "WoW Database Editor now features a complete SQL editor just like MySql Workbench, HeidiSQL or SQLyog. Press the button to open."
+                                new TextBlock()
+                                {
+                                    [DockPanel.DockProperty] = global::Avalonia.Controls.Dock.Top,
+                                    TextWrapping = TextWrapping.WrapWithOverflow,
+                                    FontWeight = FontWeight.Bold,
+                                    Text = "SQL editor is now available!"
+                                },
+                                new TextBlock()
+                                {
+                                    TextWrapping = TextWrapping.WrapWithOverflow,
+                                    Text =
+                                        "WoW Database Editor now features a complete SQL editor just like MySql Workbench, HeidiSQL or SQLyog. Press the button to open."
+                                }
                             }
-                        }
-                    },
-                    Placement = FlyoutPlacementMode.BottomEdgeAlignedLeft,
-                };
-                flyout.ShowAt(btn);
-            }, TimeSpan.FromSeconds(1));
+                        },
+                        Placement = FlyoutPlacementMode.BottomEdgeAlignedLeft,
+                    };
+                    flyout.ShowAt(btn);
+                }, TimeSpan.FromSeconds(1));   
+            }
         }
 
         private void OnKeyUpTunneled(object? sender, KeyEventArgs e)

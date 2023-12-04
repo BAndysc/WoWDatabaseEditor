@@ -23,12 +23,16 @@ namespace WoWDatabaseEditorCore.Managers
             staticBinding.Add(typeof(T), typeof(R));
         }
 
-        public bool TryResolve(Type? viewModel, out Type view)
+        public bool TryResolve(Type? viewModel, out Type view, out string? failReason)
         {
+            failReason = null;
             view = null!;
 
             if (viewModel == null)
+            {
+                failReason = "ViewModel is null";
                 return false;
+            }
             
             if (staticBinding.TryGetValue(viewModel, out var view_))
             {
@@ -38,27 +42,32 @@ namespace WoWDatabaseEditorCore.Managers
 
             if (viewModel.AssemblyQualifiedName == null)
             {
+                failReason = "AssemblyQualifiedName is null";
                 staticBinding[viewModel] = null;
                 return false;
             }
 
             if (!viewModel.Name.EndsWith("ViewModel"))
             {
+                failReason = "ViewModel name does not end with ViewModel";
                 staticBinding[viewModel] = null;
                 return false;
             }
 
             var viewString = viewModel.AssemblyQualifiedName!.Replace("ViewModel", "View");
+            string viewString2 = "";
             view = Type.GetType(viewString)!;
 
             if (view == null) // try backend version
             {
                 var assemblyName = viewModel.Assembly.GetName().Name;
-                view = Type.GetType(viewString.Replace(assemblyName!, assemblyName + "." + GlobalApplication.Backend))!;
+                viewString2 = viewString.Replace(assemblyName!, assemblyName + "." + GlobalApplication.Backend);
+                view = Type.GetType(viewString2)!;
             }
             
             if (view == null) // try backend version + .GUI for main assembly
             {
+                failReason = $"{viewString} and {viewString2} not found";
                 var assemblyName = viewModel.Assembly.GetName().Name;
                 view = Type.GetType(viewString.Replace(assemblyName!, assemblyName + "." + GlobalApplication.Backend).Replace(", Version=", ".GUI, Version="))!;
             }

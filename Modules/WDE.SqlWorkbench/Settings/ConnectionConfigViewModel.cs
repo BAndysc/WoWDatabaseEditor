@@ -8,6 +8,7 @@ using PropertyChanged.SourceGenerator;
 using WDE.Common.Types;
 using WDE.MVVM;
 using WDE.SqlWorkbench.Models;
+using WDE.SqlWorkbench.Services.Connection;
 
 namespace WDE.SqlWorkbench.Settings;
 
@@ -26,7 +27,10 @@ internal partial class ConnectionConfigViewModel : ObservableBase
     [Notify]  private string? icon = "";
     [Notify]  private bool defaultExpandSchemas;
     [Notify] [AlsoNotify(nameof(Color))] private bool hasColor;
+    [Notify]  private QueryExecutionSafety safeMode;
     public Color? Color => hasColor ? hslColor.ToRgba() : null;
+    
+    public static List<QueryExecutionSafety> SafeModes { get; } = Enum.GetValues(typeof(QueryExecutionSafety)).Cast<QueryExecutionSafety>().ToList();
     
     private bool colorTouched;
     public HslColor HslColor
@@ -88,7 +92,8 @@ internal partial class ConnectionConfigViewModel : ObservableBase
                               original.DefaultExpandSchemas != DefaultExpandSchemas ||
                               original.Color.HasValue != hasColor || 
                               colorTouched ||
-                              visibleSchemasTouched;
+                              visibleSchemasTouched ||
+                              SafeMode != original.SafeMode;
 
     public DatabaseConnectionData Original
     {
@@ -123,6 +128,7 @@ internal partial class ConnectionConfigViewModel : ObservableBase
             HslColor = HslColor.FromRgba(data.Color.Value);
         colorTouched = false;
         visibleSchemasTouched = false;
+        safeMode = data.SafeMode;
         
         this.PropertyChanged += OnPropertyChanged;
     }
@@ -142,6 +148,7 @@ internal partial class ConnectionConfigViewModel : ObservableBase
             icon == null ? null : new ImageUri(icon),
             defaultExpandSchemas,
             hasColor ? hslColor.ToRgba() : null,
-            visibleSchemas?.ToArray());
+            visibleSchemas?.ToArray(),
+            safeMode);
     }
 }

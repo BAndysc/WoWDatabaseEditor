@@ -1,0 +1,53 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:WDE.SqlWorkbench.ViewModels"
+             xmlns:connection="clr-namespace:WDE.SqlWorkbench.Services.Connection"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:ConnectionsStatusBarItemViewModel"
+             x:Class="WDE.SqlWorkbench.Views.ConnectionsStatusBarItemView">
+  <UserControl.Resources>
+    <BoolToDoubleConverter WhenTrue="1" WhenFalse="0" x:Key="BoolToDoubleConverter" />
+  </UserControl.Resources>
+  <DockPanel LastChildFill="True" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+    <Label DockPanel.Dock="Top">Opened connections</Label>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+      <ItemsControl Items="{CompiledBinding OpenedConnectionsList}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="connection:IConnection">
+            <Button BorderThickness="0" HorizontalContentAlignment="Stretch" HorizontalAlignment="Stretch">
+              <DockPanel LastChildFill="True">
+                <StackPanel HorizontalAlignment="Stretch" Margin="0,0,5,0">
+                  <Label Content="{CompiledBinding ConnectionName}" FontWeight="Bold" />
+                  <ProgressBar Opacity="{CompiledBinding IsRunning, Converter={StaticResource BoolToDoubleConverter}}" IsIndeterminate="{CompiledBinding IsRunning}" />
+                  <Label Content="{CompiledBinding  PendingTasksCount, StringFormat={}{0} tasks}" />
+                </StackPanel>
+              </DockPanel>
+
+              <Button.Styles>
+                <Style Selector="Button">
+                  <Setter Property="Opacity" Value="0.5" />
+                  <Setter Property="Background" Value="Transparent" />
+                </Style>
+                <Style Selector="Button:pointerover">
+                  <Setter Property="Background" Value="#07000000" />
+                </Style>
+                <Style Selector="Button:pressed /template/ ContentPresenter">
+                  <Setter Property="Background" Value="#16000000" />
+                </Style>
+                <Style Selector="Button:disabled">
+                  <Setter Property="Opacity" Value="1" />
+                </Style>
+                <Style Selector="Button:disabled /template/ ContentPresenter#PART_ContentPresenter">
+                  <Setter Property="Background" Value="Transparent" />
+                  <Setter Property="TextBlock.Foreground" Value="Black" />
+                </Style>
+              </Button.Styles>
+            </Button>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </ScrollViewer>
+  </DockPanel>
+</UserControl>

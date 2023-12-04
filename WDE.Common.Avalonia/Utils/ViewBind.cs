@@ -3,6 +3,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Templates;
+using Avalonia.Media;
 using Prism.Ioc;
 using WDE.Common.Windows;
 
@@ -21,7 +22,7 @@ namespace WDE.Common.Avalonia.Utils
         public static bool TryResolve(object viewModel, out object? view)
         {
             view = null;
-            if (AppViewLocator != null && AppViewLocator.TryResolve(viewModel.GetType(), out var viewType))
+            if (AppViewLocator != null && AppViewLocator.TryResolve(viewModel.GetType(), out var viewType, out _))
                 view = Activator.CreateInstance(viewType);
             
             return view != null;
@@ -29,7 +30,7 @@ namespace WDE.Common.Avalonia.Utils
         
         public static bool CanResolve(object viewModel)
         {
-            return AppViewLocator != null && AppViewLocator.TryResolve(viewModel.GetType(), out _);
+            return AppViewLocator != null && AppViewLocator.TryResolve(viewModel.GetType(), out _, out _);
         }
     }
 
@@ -65,8 +66,9 @@ namespace WDE.Common.Avalonia.Utils
         public static IDataTemplate Template { get; } = new ViewDataTemplate();
         public IControl Build(object param)
         {
+            string? fail = null;
             if (ViewBind.AppViewLocator != null && param != null &&
-                ViewBind.AppViewLocator.TryResolve(param.GetType(), out var viewType))
+                ViewBind.AppViewLocator.TryResolve(param.GetType(), out var viewType, out fail))
             {
                 try
                 {
@@ -78,7 +80,11 @@ namespace WDE.Common.Avalonia.Utils
                     return new TextBlock() { Text = e.ToString() };
                 }
             }
-            return new Control();
+            return new TextBlock()
+            {
+                Text = "Couldn't find a View for " + param?.GetType().Name + ". " + (fail ?? ""),
+                Foreground = Brushes.Red
+            };
         }
 
         public bool Match(object data)

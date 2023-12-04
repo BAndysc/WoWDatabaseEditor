@@ -1,4 +1,5 @@
 using System;
+using Newtonsoft.Json;
 using WDE.MySqlDatabaseCommon.Providers;
 
 namespace WDE.SqlWorkbench.Models;
@@ -11,6 +12,7 @@ internal readonly struct DatabaseCredentials : IEquatable<DatabaseCredentials>
     public readonly int Port;
     public readonly string SchemaName;
 
+    [JsonConstructor]
     public DatabaseCredentials(string user, string passwd, string host, int port, string schemaName)
     {
         User = user;
@@ -18,6 +20,15 @@ internal readonly struct DatabaseCredentials : IEquatable<DatabaseCredentials>
         Host = host;
         Port = port;
         SchemaName = schemaName;
+    }
+
+    public DatabaseCredentials(IDbAccess dbAccess)
+    {
+        User = dbAccess.User ?? "";
+        Passwd = dbAccess.Password ?? "";
+        Host = dbAccess.Host ?? "";
+        Port = dbAccess.Port ?? 0;
+        SchemaName = dbAccess.Database ?? "";
     }
 
     public DatabaseCredentials WithSchemaName(string schemaName)

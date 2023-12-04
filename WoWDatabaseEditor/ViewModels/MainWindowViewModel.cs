@@ -28,6 +28,7 @@ using WoWDatabaseEditorCore.Services;
 using WoWDatabaseEditorCore.Services.FindAnywhere;
 using WoWDatabaseEditorCore.Services.Profiles;
 using WoWDatabaseEditorCore.Services.QuickAccess;
+using WoWDatabaseEditorCore.Services.Statistics;
 
 namespace WoWDatabaseEditorCore.ViewModels
 {
@@ -44,6 +45,8 @@ namespace WoWDatabaseEditorCore.ViewModels
         private readonly List<IProgramNameAddon> programNameAddons;
         private readonly ITablesToolService tablesToolService;
         private readonly IGlobalServiceRoot globalServiceRoot;
+        private readonly ITeachingTipService teachingTipService;
+        private readonly IStatisticsService statisticsService;
 
         private readonly Dictionary<string, ITool> toolById = new();
 
@@ -76,12 +79,16 @@ namespace WoWDatabaseEditorCore.ViewModels
             IGlobalServiceRoot globalServiceRoot,
             TopBarQuickAccessViewModel topBarQuickAccessViewModel,
             SessionRestoreService sessionRestoreService,
+            IConnectionsStatusBarItem connectionsViewModel,
+            ITeachingTipService teachingTipService,
+            IStatisticsService statisticsService,
             Func<IFindAnywhereDialogViewModel> findAnywhereCreator)
         {
             DocumentManager = documentManager;
             StatusBar = statusBar;
             TopBarQuickAccess = topBarQuickAccessViewModel;
             SessionRestoreService = sessionRestoreService;
+            ConnectionsViewModel = connectionsViewModel;
             this.messageBoxService = messageBoxService;
             this.aboutViewModelCreator = aboutViewModelCreator;
             this.quickStartCreator = quickStartCreator;
@@ -90,6 +97,8 @@ namespace WoWDatabaseEditorCore.ViewModels
             this.programNameService = programNameService;
             this.tablesToolService = tablesToolService;
             this.globalServiceRoot = globalServiceRoot;
+            this.teachingTipService = teachingTipService;
+            this.statisticsService = statisticsService;
             this.programNameAddons = nameAddons.ToList();
             Title = "";
             Subtitle = programNameService.Subtitle;
@@ -181,6 +190,11 @@ namespace WoWDatabaseEditorCore.ViewModels
                 .Subscribe(OpenFatalLogIfExists, ThreadOption.PublisherThread, true);
         }
 
+        public bool ShowSqlEditorNotification()
+        {
+            return statisticsService.RunCounter > 10 && teachingTipService.ShowTip("SqlEditorNotification");
+        }
+
         private void OpenFatalLogIfExists()
         {
             if (!FatalErrorHandler.HasFatalLog())
@@ -220,6 +234,7 @@ namespace WoWDatabaseEditorCore.ViewModels
         public ProfilesViewModel ProfilesViewModel { get; }
         public TopBarQuickAccessViewModel TopBarQuickAccess { get; }
         public SessionRestoreService SessionRestoreService { get; }
+        public IConnectionsStatusBarItem ConnectionsViewModel { get; }
 
         public List<IMainMenuItem> MenuItemProviders { get; }
 

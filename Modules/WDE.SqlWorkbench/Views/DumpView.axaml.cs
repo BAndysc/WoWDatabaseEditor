@@ -1,8 +1,10 @@
 using System.Linq;
+using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
+using Prism.Commands;
 using WDE.SqlWorkbench.ViewModels;
 
 namespace WDE.SqlWorkbench.Views;

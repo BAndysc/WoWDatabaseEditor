@@ -19,9 +19,12 @@ using WDE.Common.Utils;
 using WDE.Module.Attributes;
 using WDE.MVVM;
 using WDE.MVVM.Observable;
+using WDE.MySqlDatabaseCommon.Providers;
 using WDE.SqlWorkbench.Models;
 using WDE.SqlWorkbench.Services;
 using WDE.SqlWorkbench.Services.Connection;
+using WDE.SqlWorkbench.Services.Downloaders.MariaDb;
+using WDE.SqlWorkbench.Services.Downloaders.MySql;
 
 namespace WDE.SqlWorkbench.Settings;
 
@@ -31,6 +34,7 @@ internal partial class SqlWorkbenchConfigurationViewModel : ObservableBase, ICon
 {
     private readonly ISqlWorkbenchPreferences preferences;
     private readonly IConnectionsManager connectionsManager;
+    private readonly IMariaDumpDownloadService mariaDumpDownloadService;
     [Notify] [AlsoNotify(nameof(IsModified))] private bool connectionsContainerIsModified;
     
     public ICommand Save { get; }
@@ -43,11 +47,15 @@ internal partial class SqlWorkbenchConfigurationViewModel : ObservableBase, ICon
                               (DefaultConnection?.Id ?? Guid.Empty) != originalDefaultConnection ||
                               originalUseCodeCompletion != UseCodeCompletion ||
                               originalCustomSqlsPath != CustomSqlsPath ||
-                              originalEachDatabaseHasSeparateConnection != EachDatabaseHasSeparateConnection;
+                              originalEachDatabaseHasSeparateConnection != EachDatabaseHasSeparateConnection ||
+                              originalCustomMySqlDumpPath != CustomMySqlDumpPath ||
+                              originalCustomMariaDumpPath != CustomMariaDumpPath;
 
     private Guid originalDefaultConnection;
     private bool originalUseCodeCompletion;
     private string? originalCustomSqlsPath;
+    private string? originalCustomMariaDumpPath;
+    private string? originalCustomMySqlDumpPath;
     private bool originalEachDatabaseHasSeparateConnection;
     
     public ObservableCollection<ConnectionConfigViewModel> Connections { get; } = new();
@@ -70,6 +78,34 @@ internal partial class SqlWorkbenchConfigurationViewModel : ObservableBase, ICon
         }
     }
     
+    [Notify] [AlsoNotify(nameof(HasCustomMariaDumpPath))] private string? customMariaDumpPath;
+
+    public bool HasCustomMariaDumpPath
+    {
+        get => customMariaDumpPath != null;
+        set
+        {
+            if (value)
+                CustomMariaDumpPath = "";
+            else
+                CustomMariaDumpPath = null;
+        }
+    }
+    
+    [Notify] [AlsoNotify(nameof(HasCustomMySqlDumpPath))] private string? customMySqlDumpPath;
+
+    public bool HasCustomMySqlDumpPath
+    {
+        get => CustomMySqlDumpPath != null;
+        set
+        {
+            if (value)
+                CustomMySqlDumpPath = "";
+            else
+                CustomMySqlDumpPath = null;
+        }
+    }
+
     [Notify] private ConnectionConfigViewModel? selectedConnection;
 
     [Notify] [AlsoNotify(nameof(IsModified))] private ConnectionConfigViewModel? defaultConnection;
@@ -82,6 +118,14 @@ internal partial class SqlWorkbenchConfigurationViewModel : ObservableBase, ICon
     
     public IAsyncCommand PickCustomSqlsPath { get; }
     
+    public IAsyncCommand PickCustomMariaDumpPath { get; }
+
+    public IAsyncCommand DownloadAndPickCustomMariaDumpCommand { get; }
+
+    public IAsyncCommand PickCustomMySqlDumpPath { get; }
+
+    public IAsyncCommand DownloadAndPickCustomMySqlDumpCommand { get; }
+
     public DelegateCommand AddConnectionCommand { get; }
     
     public DelegateCommand DeleteSelectedConnectionCommand { get; }
@@ -93,10 +137,16 @@ internal partial class SqlWorkbenchConfigurationViewModel : ObservableBase, ICon
         IItemFromListProvider itemFromListProvider,
         IWindowManager windowManager,
         IMySqlConnector mySqlConnector,
-        IMessageBoxService messageBoxService)
+        IMessageBoxService messageBoxService,
+        IMariaDumpDownloadService mariaDumpDownloadService,
+        IMySqlDumpDownloadService mySqlDumpDownloadService,
+        IWorldDatabaseSettingsProvider worldDatabaseSettingsProvider,
+        IHotfixDatabaseSettingsProvider hotfixDatabaseSettingsProvider,
+        IAuthDatabaseSettingsProvider authDatabaseSettingsProvider)
     {
         this.preferences = preferences;
         this.connectionsManager = connectionsManager;
+        this.mariaDumpDownloadService = mariaDumpDownloadService;
         Connections.ToStream(true).SubscribeAction(e =>
         {
             if (e.Type == CollectionEventType.Add)
@@ -112,21 +162,38 @@ internal partial class SqlWorkbenchConfigurationViewModel : ObservableBase, ICon
             preferences.DefaultConnection = DefaultConnection?.Id;
             preferences.UseCodeCompletion = UseCodeCompletion;
             preferences.CustomSqlsPath = CustomSqlsPath;
+            preferences.CustomMariaDumpPath = CustomMariaDumpPath;
+            preferences.CustomMySqlDumpPath = CustomMySqlDumpPath;
             preferences.EachDatabaseHasSeparateConnection = EachDatabaseHasSeparateConnection;
             preferences.Save();
             
             originalDefaultConnection = preferences.DefaultConnection ?? Guid.Empty;
             originalUseCodeCompletion = preferences.UseCodeCompletion;
             originalCustomSqlsPath = preferences.CustomSqlsPath;
+            originalCustomMariaDumpPath = preferences.CustomMariaDumpPath;
+            originalCustomMySqlDumpPath = preferences.CustomMySqlDumpPath;
             originalEachDatabaseHasSeparateConnection = preferences.EachDatabaseHasSeparateConnection;
             foreach (var connection in Connections)
                 connection.Original = connection.ToConnectionData();
             ConnectionsContainerIsModified = false;
         });
+
+        DatabaseCredentials GetActualCredentials(ConnectionConfigViewModel vm)
+        {
+            if (vm.CredentialsSource == CredentialsSource.Custom)
+                return new DatabaseCredentials(vm.User, vm.Password, vm.Host, vm.Port, vm.DefaultDatabase);
+            if (vm.CredentialsSource == CredentialsSource.WorldDatabase)
+                return new DatabaseCredentials(worldDatabaseSettingsProvider.Settings);
+            if (vm.CredentialsSource == CredentialsSource.AuthDatabase)
+                return new DatabaseCredentials(authDatabaseSettingsProvider.Settings);
+            if (vm.CredentialsSource == CredentialsSource.HotfixDatabase)
+                return new DatabaseCredentials(hotfixDatabaseSettingsProvider.Settings);
+            return default;
+        }
         
         PickDatabaseCommand = new AsyncAutoCommand<ConnectionConfigViewModel>(async vm =>
         {
-            await using var session = await mySqlConnector.ConnectAsync(new DatabaseCredentials(vm.User, vm.Password, vm.Host, vm.Port, vm.DefaultDatabase));
+            await using var session = await mySqlConnector.ConnectAsync(GetActualCredentials(vm), QueryExecutionSafety.AskUnlessSelect);
             var databases = await session.GetDatabasesAsync();
             var selection = await itemFromListProvider.GetItemFromList(databases.ToDictionary(x => x, x => new SelectOption("")), false);
             if (selection != null)
@@ -135,7 +202,7 @@ internal partial class SqlWorkbenchConfigurationViewModel : ObservableBase, ICon
 
         PickVisibleDatabasesCommand = new AsyncAutoCommand<ConnectionConfigViewModel>(async vm =>
         {
-            await using var session = await mySqlConnector.ConnectAsync(new DatabaseCredentials(vm.User, vm.Password, vm.Host, vm.Port, vm.DefaultDatabase));
+            await using var session = await mySqlConnector.ConnectAsync(GetActualCredentials(vm), QueryExecutionSafety.AskUnlessSelect);
             var databases = await session.GetDatabasesAsync();
             var selection = await itemFromListProvider.GetItemFromList(databases.ToDictionary(x => x, x => new SelectOption("")), true, string.Join(' ', (IReadOnlyList<string>?)vm.VisibleSchemas ?? Array.Empty<string>()));
             if (selection != null)
@@ -157,6 +224,34 @@ internal partial class SqlWorkbenchConfigurationViewModel : ObservableBase, ICon
                 CustomSqlsPath = path;
         });
         
+        PickCustomMariaDumpPath = new AsyncAutoCommand(async () =>
+        {
+            var path = await windowManager.ShowOpenFileDialog(CustomMariaDumpPath ?? Environment.CurrentDirectory);
+            if (path != null)
+                CustomMariaDumpPath = path;
+        });
+        
+        DownloadAndPickCustomMariaDumpCommand = new AsyncAutoCommand(async () =>
+        {
+            var path = await mariaDumpDownloadService.AskToDownloadMariaDumpAsync();
+            if (path != null)
+                CustomMariaDumpPath = path;
+        });
+
+        PickCustomMySqlDumpPath = new AsyncAutoCommand(async () =>
+        {
+            var path = await windowManager.ShowOpenFileDialog(CustomMySqlDumpPath ?? Environment.CurrentDirectory);
+            if (path != null)
+                CustomMySqlDumpPath = path;
+        });
+        
+        DownloadAndPickCustomMySqlDumpCommand = new AsyncAutoCommand(async () =>
+        {
+            var path = await mySqlDumpDownloadService.AskToDownloadMySqlDumpAsync();
+            if (path != null)
+                CustomMySqlDumpPath = path;
+        });
+
         AddConnectionCommand = new DelegateCommand(() =>
         {
             var newConnection = new ConnectionConfigViewModel(new DatabaseConnectionData(Guid.NewGuid(), 
@@ -166,7 +261,8 @@ internal partial class SqlWorkbenchConfigurationViewModel : ObservableBase, ICon
                 null,
                 false,
                 null,
-                null));
+                null,
+                QueryExecutionSafety.AskUnlessSelect));
             Connections.Add(newConnection);
             SelectedConnection = newConnection;
         });
@@ -211,6 +307,8 @@ internal partial class SqlWorkbenchConfigurationViewModel : ObservableBase, ICon
         originalEachDatabaseHasSeparateConnection = EachDatabaseHasSeparateConnection = preferences.EachDatabaseHasSeparateConnection;
         UseCodeCompletion = originalUseCodeCompletion = preferences.UseCodeCompletion;
         CustomSqlsPath = originalCustomSqlsPath = preferences.CustomSqlsPath;
+        CustomMariaDumpPath = originalCustomMariaDumpPath = preferences.CustomMariaDumpPath;
+        CustomMySqlDumpPath = originalCustomMySqlDumpPath = preferences.CustomMySqlDumpPath;
         ConnectionsContainerIsModified = false;
     }
 }

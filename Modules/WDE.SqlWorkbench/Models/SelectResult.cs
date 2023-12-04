@@ -46,11 +46,20 @@ internal readonly struct SelectResult
     }
 }
 
+internal enum ColumnTypeCategory
+{
+    Unknown,
+    String,
+    Number,
+    DateTime,
+}
+
 internal interface IColumnData
 {
     void Append(MySqlDataReader reader, int ordinal);
     string? GetToString(int rowIndex);
     bool IsNull(int rowIndex);
+    ColumnTypeCategory Category { get; }
 }
 
 internal class ObjectColumnData : IColumnData
@@ -73,6 +82,8 @@ internal class ObjectColumnData : IColumnData
 
     public bool IsNull(int rowIndex) => data[rowIndex] == null;
     
+    public ColumnTypeCategory Category => ColumnTypeCategory.Unknown;
+
     public object? this[int index] => data[index];
 }
 
@@ -97,6 +108,8 @@ internal class StringColumnData : IColumnData
     public bool IsNull(int rowIndex) => data[rowIndex] == null;
     
     public string? this[int index] => data[index];
+    
+    public ColumnTypeCategory Category => ColumnTypeCategory.String;
 }
 
 internal class BooleanColumnData : IColumnData
@@ -129,6 +142,8 @@ internal class BooleanColumnData : IColumnData
     public bool IsNull(int rowIndex) => nulls[rowIndex];
     
     public bool this[int index] => data[index];
+    
+    public ColumnTypeCategory Category => ColumnTypeCategory.Number;
 }
 
 internal class ByteColumnData : IColumnData
@@ -158,6 +173,8 @@ internal class ByteColumnData : IColumnData
     public bool IsNull(int rowIndex) => nulls[rowIndex];
     
     public byte this[int index] => data[index];
+    
+    public ColumnTypeCategory Category => ColumnTypeCategory.Number;
 }
 
 internal class SByteColumnData : IColumnData
@@ -187,6 +204,8 @@ internal class SByteColumnData : IColumnData
     public bool IsNull(int rowIndex) => nulls[rowIndex];
     
     public sbyte this[int index] => data[index];
+    
+    public ColumnTypeCategory Category => ColumnTypeCategory.Number;
 }
 
 internal class Int16ColumnData : IColumnData
@@ -216,6 +235,8 @@ internal class Int16ColumnData : IColumnData
     public bool IsNull(int rowIndex) => nulls[rowIndex];
     
     public short this[int index] => data[index];
+    
+    public ColumnTypeCategory Category => ColumnTypeCategory.Number;
 }
 
 internal class UInt16ColumnData : IColumnData
@@ -245,6 +266,8 @@ internal class UInt16ColumnData : IColumnData
     public bool IsNull(int rowIndex) => nulls[rowIndex];
     
     public ushort this[int index] => data[index];
+    
+    public ColumnTypeCategory Category => ColumnTypeCategory.Number;
 }
 
 internal class Int32ColumnData : IColumnData
@@ -274,6 +297,8 @@ internal class Int32ColumnData : IColumnData
     public bool IsNull(int rowIndex) => nulls[rowIndex];
     
     public int this[int index] => data[index];
+    
+    public ColumnTypeCategory Category => ColumnTypeCategory.Number;
 }
 
 internal class UInt32ColumnData : IColumnData
@@ -303,6 +328,8 @@ internal class UInt32ColumnData : IColumnData
     public bool IsNull(int rowIndex) => nulls[rowIndex];
     
     public uint this[int index] => data[index];
+    
+    public ColumnTypeCategory Category => ColumnTypeCategory.Number;
 }
 
 internal class Int64ColumnData : IColumnData
@@ -332,6 +359,8 @@ internal class Int64ColumnData : IColumnData
     public bool IsNull(int rowIndex) => nulls[rowIndex];
     
     public long this[int index] => data[index];
+    
+    public ColumnTypeCategory Category => ColumnTypeCategory.Number;
 }
 
 internal class UInt64ColumnData : IColumnData
@@ -361,6 +390,8 @@ internal class UInt64ColumnData : IColumnData
     public bool IsNull(int rowIndex) => nulls[rowIndex];
     
     public ulong this[int index] => data[index];
+    
+    public ColumnTypeCategory Category => ColumnTypeCategory.Number;
 }
 
 internal class CharColumnData : IColumnData
@@ -390,6 +421,8 @@ internal class CharColumnData : IColumnData
     public bool IsNull(int rowIndex) => nulls[rowIndex];
     
     public char this[int index] => data[index];
+    
+    public ColumnTypeCategory Category => ColumnTypeCategory.Unknown;
 }
 
 internal class DecimalColumnData : IColumnData
@@ -419,6 +452,8 @@ internal class DecimalColumnData : IColumnData
     public bool IsNull(int rowIndex) => nulls[rowIndex];
     
     public decimal this[int index] => data[index];
+    
+    public ColumnTypeCategory Category => ColumnTypeCategory.Number;
 }
 
 internal class DoubleColumnData : IColumnData
@@ -448,6 +483,8 @@ internal class DoubleColumnData : IColumnData
     public bool IsNull(int rowIndex) => nulls[rowIndex];
     
     public double this[int index] => data[index];
+    
+    public ColumnTypeCategory Category => ColumnTypeCategory.Number;
 }
 
 internal class FloatColumnData : IColumnData
@@ -477,6 +514,8 @@ internal class FloatColumnData : IColumnData
     public bool IsNull(int rowIndex) => nulls[rowIndex];
     
     public float this[int index] => data[index];
+    
+    public ColumnTypeCategory Category => ColumnTypeCategory.Number;
 }
 
 internal class DateTimeColumnData : IColumnData
@@ -506,6 +545,8 @@ internal class DateTimeColumnData : IColumnData
     public bool IsNull(int rowIndex) => nulls[rowIndex];
     
     public DateTime this[int index] => data[index];
+    
+    public ColumnTypeCategory Category => ColumnTypeCategory.DateTime;
 }
 
 internal class DateTimeOffsetColumnData : IColumnData
@@ -535,6 +576,8 @@ internal class DateTimeOffsetColumnData : IColumnData
     public bool IsNull(int rowIndex) => nulls[rowIndex];
     
     public DateTimeOffset this[int index] => data[index];
+    
+    public ColumnTypeCategory Category => ColumnTypeCategory.Unknown;
 }
 
 internal class GuidColumnData : IColumnData
@@ -564,6 +607,8 @@ internal class GuidColumnData : IColumnData
     public bool IsNull(int rowIndex) => nulls[rowIndex];
     
     public Guid this[int index] => data[index];
+    
+    public ColumnTypeCategory Category => ColumnTypeCategory.Unknown;
 }
 
 internal class TimeSpanColumnData : IColumnData
@@ -593,6 +638,8 @@ internal class TimeSpanColumnData : IColumnData
     public bool IsNull(int rowIndex) => nulls[rowIndex];
     
     public TimeSpan this[int index] => data[index];
+    
+    public ColumnTypeCategory Category => ColumnTypeCategory.Unknown;
 }
 
 internal class BinaryColumnData : IColumnData
@@ -664,6 +711,8 @@ internal class BinaryColumnData : IColumnData
             return data.AsSpan((int)offset.start, offset.length);
         }
     }
+    
+    public ColumnTypeCategory Category => ColumnTypeCategory.Unknown;
 }
 
 internal class MySqlDateTimeColumnData : IColumnData
@@ -687,10 +736,20 @@ internal class MySqlDateTimeColumnData : IColumnData
 
     public string? GetToString(int rowIndex)
     {
-        return nulls[rowIndex] ? null : data[rowIndex].ToString();
+        if (nulls[rowIndex])
+            return null;
+        
+        var date = data[rowIndex];
+        
+        if (date.IsValidDateTime)
+            return date.GetDateTime().ToString("yyyy-MM-dd HH:mm:ss");
+        
+        return "0000-00-00";
     }
 
     public bool IsNull(int rowIndex) => nulls[rowIndex];
     
     public MySqlDateTime this[int index] => data[index];
+    
+    public ColumnTypeCategory Category => ColumnTypeCategory.DateTime;
 }

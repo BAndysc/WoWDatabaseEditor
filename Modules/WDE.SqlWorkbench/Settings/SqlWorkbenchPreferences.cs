@@ -54,6 +54,18 @@ internal class SqlWorkbenchPreferences : ISqlWorkbenchPreferences
         set => settings.CustomSqlsPath = value;
     }
 
+    public string? CustomMySqlDumpPath
+    {
+        get => settings.CustomMySqlDumpPath;
+        set => settings.CustomMySqlDumpPath = value;
+    }
+    
+    public string? CustomMariaDumpPath
+    {
+        get => settings.CustomMariaDumpPath;
+        set => settings.CustomMariaDumpPath = value;
+    }
+
     public bool EachDatabaseHasSeparateConnection
     {
         get => settings.EachDatabaseHasSeparateConnection;
@@ -76,6 +88,10 @@ internal class SqlWorkbenchPreferences : ISqlWorkbenchPreferences
         public bool UseCodeCompletion { get; set; } = true;
         
         public string? CustomSqlsPath { get; set; }
+        
+        public string? CustomMySqlDumpPath { get; set; }
+        
+        public string? CustomMariaDumpPath { get; set; }
         
         [DefaultValue(true)]
         public bool EachDatabaseHasSeparateConnection { get; set; } = true;

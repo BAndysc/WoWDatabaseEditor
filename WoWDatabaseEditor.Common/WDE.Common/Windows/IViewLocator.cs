@@ -8,7 +8,7 @@ namespace WDE.Common.Windows
     {
         void Bind(Type viewModel, Type view);
         void Bind<T, R>();
-        bool TryResolve(Type viewModel, out Type view);
+        bool TryResolve(Type viewModel, out Type view, out string? failReason);
         
         void BindToolBar<T, R>();
         bool TryResolveToolBar(Type viewModel, out Type toolBar);

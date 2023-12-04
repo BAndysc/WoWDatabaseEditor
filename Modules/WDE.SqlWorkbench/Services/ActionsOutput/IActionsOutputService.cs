@@ -1,9 +1,10 @@
 using System;
+using WDE.Common.Windows;
 using WDE.Module.Attributes;
 
 namespace WDE.SqlWorkbench.Services.ActionsOutput;
 
-public interface IActionsOutputService
+public interface IActionsOutputService : ITool
 {
     IActionOutput Create(string query);
 }

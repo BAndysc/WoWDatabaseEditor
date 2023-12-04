@@ -13,5 +13,7 @@ internal interface ISqlWorkbenchPreferences
     bool UseCodeCompletion { get; set; }
     bool EachDatabaseHasSeparateConnection { get; set; }
     string? CustomSqlsPath { get; set; }
+    string? CustomMySqlDumpPath { get; set; }
+    string? CustomMariaDumpPath { get; set; }
     void Save();
 }

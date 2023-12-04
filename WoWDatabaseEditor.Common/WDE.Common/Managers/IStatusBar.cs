@@ -1,4 +1,6 @@
-﻿using System.Windows.Input;
+﻿using System.ComponentModel;
+using System.Windows.Input;
+using WDE.Common.Utils;
 using WDE.Module.Attributes;
 
 namespace WDE.Common.Managers
@@ -36,5 +38,21 @@ namespace WDE.Common.Managers
         Warning,
         Success,
         Error
+    }
+    
+    // due to lack of dynamic status bar items, this is a workaround for now (to predefine the type)
+    [UniqueProvider]
+    public interface IConnectionsStatusBarItem : INotifyPropertyChanged
+    {
+        int OpenedConnections { get; }
+        bool IsPanelVisible { get; set; }
+    }
+    
+    [FallbackAutoRegister]
+    internal class NullConnectionsStatusBarItem : IConnectionsStatusBarItem
+    {
+        public int OpenedConnections => 0;
+        public bool IsPanelVisible { get; set; }
+        public event PropertyChangedEventHandler? PropertyChanged;
     }
 }

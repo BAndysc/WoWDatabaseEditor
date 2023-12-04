@@ -1,0 +1,65 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:mariaDb="clr-namespace:WDE.SqlWorkbench.Services.Downloaders.MariaDb"
+             xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
+             xmlns:mySql="clr-namespace:WDE.SqlWorkbench.Services.Downloaders.MySql"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="mySql:MySqlDownloadViewModel"
+             Padding="5"
+             x:Class="WDE.SqlWorkbench.Services.Downloaders.MySql.MySqlDownloadView">
+  <UserControl.Styles>
+    <Style Selector="TextBlock">
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+  </UserControl.Styles>
+  <DockPanel>
+    <OkCancelButtons DockPanel.Dock="Bottom" AcceptCommand="{CompiledBinding Accept}" CancelCommand="{CompiledBinding Cancel}" />
+    <TextBlock Margin="0,0,0,10" DockPanel.Dock="Top" TextWrapping="Wrap" Text="MySQL Dump Downloader" FontWeight="Bold" FontSize="16"/>
+    <TextBlock Margin="0,0,0,10" DockPanel.Dock="Top" TextWrapping="Wrap" Text="This small tool will help you download the mysqldump tool which is used if you want to dump a database in the editor." />
+    
+    <TextBlock Margin="0,0,0,10" DockPanel.Dock="Top" TextWrapping="Wrap"
+               x:Name="License"
+               Text="Note: the editor doesn't ship with mysqldump due to its license. If you decide to download the app, please make sure you accept the MySql GPL License. Press here to open the license.">
+      <TextBlock.Styles>
+        <Style Selector="TextBlock:pointerover">
+          <Setter Property="TextDecorations" Value="Underline" />
+          <Setter Property="Cursor" Value="Hand" />
+        </Style>
+      </TextBlock.Styles>
+      <Interaction.Behaviors>
+        <EventTriggerBehavior EventName="PointerPressed" SourceObject="{Binding #License}">
+          <InvokeCommandAction Command="{CompiledBinding OpenLicenseCommand}" />
+        </EventTriggerBehavior>
+      </Interaction.Behaviors>
+    </TextBlock>
+
+    <Panel>
+      <StackPanel>
+        <DockPanel Margin="0,0,0,10">
+          <TextBlock DockPanel.Dock="Left" Text="Version:" Margin="0,0,10,0" />
+          <ComboBox HorizontalAlignment="Stretch" Items="{CompiledBinding MariaDbVersions}" SelectedItem="{CompiledBinding SelectedMariaDbVersion}">
+            <ComboBox.ItemTemplate>
+              <DataTemplate>
+                <DockPanel LastChildFill="False">
+                  <TextBlock Text="{CompiledBinding Id}" DockPanel.Dock="Left" FontWeight="Bold" Margin="0,0,5,0" />
+                  <TextBlock Text="{CompiledBinding Name}" DockPanel.Dock="Top" FontWeight="Bold" />
+                </DockPanel>
+              </DataTemplate>
+            </ComboBox.ItemTemplate>
+          </ComboBox>
+        </DockPanel>
+  
+        <Button Command="{CompiledBinding DownloadSelectedVersionCommand}" Content="{CompiledBinding DownloadText}"/>
+  
+        <ProgressBar Value="{CompiledBinding DownloadProgress}" Maximum="{CompiledBinding DownloadLength}"
+                     IsVisible="{CompiledBinding IsDownloading}" />
+      </StackPanel>
+      <Panel Background="#01FFFFFF" IsVisible="{CompiledBinding IsFetchingVersions}"> 
+        <utils:LoadingSpinner />
+      </Panel>
+    </Panel>
+  </DockPanel>
+
+</UserControl>

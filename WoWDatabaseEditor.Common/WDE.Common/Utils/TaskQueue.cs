@@ -18,6 +18,7 @@ public partial class TaskQueue : INotifyPropertyChanged
     private List<(TaskCompletionSource tcs, Func<CancellationToken, Task> task, object? groupId)> tasks = new ();
     private bool isRunning = false;
     public bool IsRunning => isRunning;
+    public int PendingTasksCount => tasks.Count + (currentTask != null ? 1 : 0);
     private CancellationTokenSource? loopCancellationToken;
     private CancellationTokenSource? currentTaskToken;
     private Task<Task>? currentTask;
@@ -55,6 +56,7 @@ public partial class TaskQueue : INotifyPropertyChanged
         VerifyAccess();
         var tcs = new TaskCompletionSource();
         tasks.Add((tcs, task, groupId));
+        OnPropertyChanged(nameof(PendingTasksCount));
         if (!isRunning)
         {
             SetField(ref isRunning, true, nameof(IsRunning));
@@ -80,6 +82,8 @@ public partial class TaskQueue : INotifyPropertyChanged
             }
         }
 
+        OnPropertyChanged(nameof(PendingTasksCount));
+        
         foreach (var task in tasksToCancel)
             task.SetCanceled();
 
@@ -105,6 +109,8 @@ public partial class TaskQueue : INotifyPropertyChanged
         VerifyAccess();
         var copy = tasks.ToList();
         tasks.Clear();
+        OnPropertyChanged(nameof(PendingTasksCount));
+        
         foreach (var task in copy)
             task.Item1.SetCanceled();
 
@@ -144,6 +150,7 @@ public partial class TaskQueue : INotifyPropertyChanged
                 {
                     var startedTask = task(currentTaskToken.Token);
                     currentTask = Task.WhenAny(loopCancelTask, startedTask);
+                    OnPropertyChanged(nameof(PendingTasksCount));
                     var finished = await currentTask;
 
                     if (finished == loopCancelTask)
@@ -174,6 +181,7 @@ public partial class TaskQueue : INotifyPropertyChanged
                     currentTaskToken = null;
                     currentTask = null;
                     currentGroupId = null;
+                    OnPropertyChanged(nameof(PendingTasksCount));
                 }
             }
         }
@@ -197,6 +205,7 @@ public partial class TaskQueue : INotifyPropertyChanged
         foreach (var task in tasks)
             task.Item1.SetCanceled();
         tasks.Clear();
+        OnPropertyChanged(nameof(PendingTasksCount));
         currentTaskToken?.Cancel();
         loopCancellationToken?.Cancel();
         Debug.Assert(currentTaskToken == null);

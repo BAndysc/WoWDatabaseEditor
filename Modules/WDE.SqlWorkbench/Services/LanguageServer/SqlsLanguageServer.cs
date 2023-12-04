@@ -57,7 +57,7 @@ internal class SqlsLanguageServer : ISqlLanguageServer
     private string? LocateSqls()
     {
         if (preferences.CustomSqlsPath != null &&
-            File.Exists(this.preferences.CustomSqlsPath))
+            File.Exists(preferences.CustomSqlsPath))
             return preferences.CustomSqlsPath;
         
         return programFinder.TryLocate("sqls", "sqls/sqls.exe");
@@ -117,14 +117,19 @@ internal class SqlsLanguageServer : ISqlLanguageServer
             }
         };
 
+        var input = childProcess.StandardOutput.BaseStream;
+        var output = childProcess.StandardInput.BaseStream;
+        bool debugLanguageServer = false;
+
+        if (debugLanguageServer)
+        {
+            input = new DebugStreamWrapper(input, Console.OpenStandardOutput());
+            output = new DebugStreamWrapper(output, Console.OpenStandardOutput());
+        }
+        
         var client = await LanguageClient.From(o =>
-            o.WithInput(new DebugStreamWrapper(childProcess.StandardOutput.BaseStream, Console.OpenStandardOutput()))
-                .WithOutput(new DebugStreamWrapper(childProcess.StandardInput.BaseStream, Console.OpenStandardOutput()))
-                .OnInitialized((c, r, rr, rc) =>
-                {
-                    Console.WriteLine("initialized");
-                    return Task.CompletedTask;
-                })
+            o.WithInput(input)
+                .WithOutput(output)
                 .OnLogMessage(x => Console.WriteLine((string?)x.Message))
                 .OnLogTrace(x => Console.WriteLine(x.Message + " " + x.Verbose)));
 

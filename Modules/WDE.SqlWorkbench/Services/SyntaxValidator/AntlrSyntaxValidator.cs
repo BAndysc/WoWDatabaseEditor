@@ -31,9 +31,11 @@ internal class AntlrSyntaxValidator : ISyntaxValidator
             errorListener = new AntlrErrorListener();
             inputStream = new NoCopyCharStream(null!, 0, 0);
             lexer = new MySQLLexer(inputStream); // CaseChangingCharStream
+            lexer.RemoveErrorListeners();
             tokens = new CommonTokenStream(lexer);
             parser = new MySQLParser(tokens);
             listener = new MySQLParserBaseListener();
+            parser.RemoveErrorListeners();
             parser.AddErrorListener(errorListener);
         }
         

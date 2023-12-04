@@ -11,39 +11,47 @@ public class QueryUtilityTests
     public void Test_IsSimpleSelect()
     {
         Assert.IsTrue(util.IsSimpleSelect("SELECT * FROM `table`", out select));
-        Assert.AreEqual("`table`", select.From);
+        Assert.IsNull(select.From.Schema);
+        Assert.AreEqual("table", select.From.Table);
         Assert.AreEqual("*", select.SelectItems);
         
         Assert.IsTrue(util.IsSimpleSelect("SELECT * FROM `table` WHERE 1", out select));
-        Assert.AreEqual("`table`", select.From);
+        Assert.IsNull(select.From.Schema);
+        Assert.AreEqual("table", select.From.Table);
         Assert.AreEqual("*", select.SelectItems);
         
         Assert.IsTrue(util.IsSimpleSelect("SELECT * FROM `table` WHERE 1 ORDER BY a, b, c", out select));
-        Assert.AreEqual("`table`", select.From);
+        Assert.IsNull(select.From.Schema);
+        Assert.AreEqual("table", select.From.Table);
         Assert.AreEqual("*", select.SelectItems);
         
         Assert.IsTrue(util.IsSimpleSelect("SELECT * FROM `db`.`table`", out select));
-        Assert.AreEqual("`db`.`table`", select.From);
+        Assert.AreEqual("db", select.From.Schema);
+        Assert.AreEqual("table", select.From.Table);
         Assert.AreEqual("*", select.SelectItems);
         
         Assert.IsTrue(util.IsSimpleSelect("SELECT * FROM db.`table`", out select));
-        Assert.AreEqual("db.`table`", select.From);
+        Assert.AreEqual("db", select.From.Schema);
+        Assert.AreEqual("table", select.From.Table);
         Assert.AreEqual("*", select.SelectItems);
         
         Assert.IsTrue(util.IsSimpleSelect("SELECT * FROM `db`.table", out select));
-        Assert.AreEqual("`db`.table", select.From);
+        Assert.AreEqual("db", select.From.Schema);
+        Assert.AreEqual("table", select.From.Table);
         Assert.AreEqual("*", select.SelectItems);
         
         Assert.IsTrue(util.IsSimpleSelect("SELECT * FROM tab", out select));
-        Assert.AreEqual("tab", select.From);
+        Assert.AreEqual("tab", select.From.Table);
         Assert.AreEqual("*", select.SelectItems);
                 
         Assert.IsTrue(util.IsSimpleSelect("SELECT *, id FROM `db`.`table`", out select));
-        Assert.AreEqual("`db`.`table`", select.From);
+        Assert.AreEqual("db", select.From.Schema);
+        Assert.AreEqual("table", select.From.Table);
         Assert.AreEqual("*, id", select.SelectItems);
         
         Assert.IsTrue(util.IsSimpleSelect("SELECT *, id, `name` FROM `db`.`table`", out select));
-        Assert.AreEqual("`db`.`table`", select.From);
+        Assert.AreEqual("db", select.From.Schema);
+        Assert.AreEqual("table", select.From.Table);
         Assert.AreEqual("*, id, `name`", select.SelectItems);
     }
 

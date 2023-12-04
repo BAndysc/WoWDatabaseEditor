@@ -25,7 +25,7 @@ internal class ConnectionsTablesToolProvider : ITablesToolGroupsProvider
     
     public IEnumerable<ITablesToolGroup> GetProviders()
     {
-        return connectionsManager.Connections.Select(x =>
+        return connectionsManager.StaticConnections.Select(x =>
         {
             var vm = containerProvider.Resolve<ConnectionListToolViewModel>((typeof(IConnection), x));
             return vm;

@@ -21,6 +21,7 @@ namespace WoWDatabaseEditorCore.Managers
     [SingleInstance]
     public partial class StatusBar : ObservableBase, IStatusBar
     {
+        public IConnectionsStatusBarItem Connections { get; }
         private readonly TasksViewModel tasksViewModel;
         private readonly IMainThread mainThread;
         private readonly IPersonalGuidRangeService guidRangeService;
@@ -36,9 +37,11 @@ namespace WoWDatabaseEditorCore.Managers
             IMainThread mainThread,
             IPersonalGuidRangeService guidRangeService,
             IServerExecutableService serverExecutableService,
+            IConnectionsStatusBarItem connectionsStatusBarItem,
             Lazy<IClipboardService> clipboardService,
             Lazy<IMessageBoxService> messageBoxService)
         {
+            Connections = connectionsStatusBarItem;
             this.tasksViewModel = tasksViewModel;
             this.mainThread = mainThread;
             this.guidRangeService = guidRangeService;
@@ -54,6 +57,18 @@ namespace WoWDatabaseEditorCore.Managers
             
             OpenProblemTool = new DelegateCommand(() => documentManager.Value.OpenTool<ProblemsViewModel>());
 
+            ToggleConnectionsPanelVisibility = new DelegateCommand(() =>
+            {
+                tasksViewModel.IsPanelVisible = false;
+                Connections.IsPanelVisible = !Connections.IsPanelVisible;
+            });
+            
+            ToggleTasksPanelVisibility = new DelegateCommand(() =>
+            {
+                Connections.IsPanelVisible = false;
+                tasksViewModel.IsPanelVisible = !tasksViewModel.IsPanelVisible;
+            });
+            
             CopyNextCreatureGuidCommand = GenerateGuidCommand(GuidType.Creature);
             CopyNextGameobjectGuidCommand = GenerateGuidCommand(GuidType.GameObject);
             CopyCreatureGuidRangeCommand = GenerateGuidRangeCommand(GuidType.Creature, () => creatureGuidCount);
@@ -88,6 +103,10 @@ namespace WoWDatabaseEditorCore.Managers
                 }
             }, () => getter() > 0);
         }
+        
+        public ICommand ToggleConnectionsPanelVisibility { get; }
+        
+        public ICommand ToggleTasksPanelVisibility { get; }
 
         public ICommand CopyNextCreatureGuidCommand { get; }
         
