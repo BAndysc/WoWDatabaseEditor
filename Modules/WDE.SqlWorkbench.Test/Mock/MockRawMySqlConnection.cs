@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using System.Text;
 using System.Text.RegularExpressions;
 using Antlr4.Runtime;
 using MySqlConnector;
@@ -363,7 +364,18 @@ internal class MockSqlConnector : IMySqlConnector
                     return table.SelectColumns(columns, predicate);
                 }
 
-                Console.WriteLine(queryString);
+                if (queryString.StartsWith("insert", StringComparison.OrdinalIgnoreCase))
+                {
+                    Console.WriteLine("INSERT ignored in mock database, but mocked as a successful insert");
+                    return SelectResult.NonQuery(1);
+                }
+                
+                if (queryString.StartsWith("update", StringComparison.OrdinalIgnoreCase))
+                {
+                    Console.WriteLine("UPDATE ignored in mock database, but mocked as a successful insert");
+                    return SelectResult.NonQuery(1);
+                }
+
                 throw new NotImplementedException();
             }
 
@@ -457,9 +469,19 @@ internal class MockSqlConnector : IMySqlConnector
                     }
                     return columnName;
                 }
+
+                var expandedColumns = columns.ToList();
+                for (int i = expandedColumns.Count - 1; i >= 0; --i)
+                {
+                    if (expandedColumns[i] == "*")
+                    {
+                        expandedColumns.RemoveAt(i);
+                        expandedColumns.InsertRange(i, columnInfo.Select(x => x.Name));
+                    }
+                }
                 
-                var selectColumnIndices = columns.Select(ExtractColumnName).Select(GetColumnIndexByName).ToArray();
-                string[] columnNames = columns.Select(ExtractColumnAlias).ToArray();
+                var selectColumnIndices = expandedColumns.Select(ExtractColumnName).Select(GetColumnIndexByName).ToArray();
+                string[] columnNames = expandedColumns.Select(ExtractColumnAlias).ToArray();
                 Type?[] columnTypes = selectColumnIndices.Select(i => types[i]).ToArray();
                 List<int> selectRowIndices = new();
                 for (int i = 0; i < rows.Count; ++i)
@@ -526,7 +548,14 @@ internal class MockSqlConnector : IMySqlConnector
                 public DateTimeOffset GetDateTimeOffset(int ordinal) => (DateTimeOffset?)data[rowIndex, ordinal] ?? DateTimeOffset.MinValue;
                 public Guid GetGuid(int ordinal) => (Guid?)data[rowIndex, ordinal] ?? Guid.Empty;
                 public TimeSpan GetTimeSpan(int ordinal) => (TimeSpan?)data[rowIndex, ordinal] ?? TimeSpan.Zero;
-                public long GetBytes(int ordinal, long dataOffset, byte[]? buffer, int bufferOffset, int length) => throw new NotImplementedException();
+                public long GetBytes(int ordinal, long dataOffset, byte[]? buffer, int bufferOffset, int length)
+                {
+                    var bytes = (byte[])data[rowIndex, ordinal]!;
+                    if (buffer == null)
+                        return bytes.Length;
+                    Array.Copy(bytes, dataOffset, buffer, bufferOffset, length);
+                    return bytes.Length;
+                }
                 public MySqlDateTime GetMySqlDateTime(int ordinal) => (MySqlDateTime?)data[rowIndex, ordinal] ?? new MySqlDateTime();
             }
             
@@ -613,6 +642,33 @@ internal class MockSqlConnector : IMySqlConnector
         {
             var table = CreateTableInternal(tableName, tableType, types, columns);
             FinalizeCreateTableInternal(table);
+            var createInfo = new StringBuilder();
+            createInfo.Append("CREATE ");
+            if (tableType == TableType.View)
+                createInfo.Append("VIEW ");
+            else
+                createInfo.Append("TABLE ");
+            createInfo.AppendLine($"`{tableName}` (");
+
+            List<string> toCreate = new();
+            foreach (var col in columns)
+            {
+                var columnInfo = $"`{col.Name}` {col.Type}";
+                if (col.IsAutoIncrement)
+                    columnInfo += " AUTO_INCREMENT";
+                if (!col.IsNullable)
+                    columnInfo += " NOT NULL";
+                if (col.DefaultValue != null)
+                    columnInfo += $" DEFAULT '{col.DefaultValue}'";
+                toCreate.Add(columnInfo);
+            }
+            if (columns.Any(x => x.IsPrimaryKey))
+                toCreate.Add($"PRIMARY KEY ({string.Join(", ", columns.Where(x => x.IsPrimaryKey).Select(x => $"`{x.Name}`"))})");
+
+            createInfo.AppendLine(string.Join(",\n", toCreate.Select(x => $"    {x}")));
+            createInfo.AppendLine(");");
+            // Console.WriteLine(createInfo.ToString());
+            
             return table;
         }
 

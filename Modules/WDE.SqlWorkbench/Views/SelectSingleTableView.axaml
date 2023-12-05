@@ -7,6 +7,14 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="viewModels:SelectSingleTableViewModel"
              x:Class="WDE.SqlWorkbench.Views.SelectSingleTableView">
+  <UserControl.KeyBindings>
+    <KeyBinding Gesture="Ctrl+A" Command="{CompiledBinding SelectAllCommand}" />
+    <KeyBinding Gesture="Cmd+A" Command="{CompiledBinding SelectAllCommand}" />
+    <KeyBinding Gesture="Ctrl+C" Command="{CompiledBinding CopySelectedCommand}" />
+    <KeyBinding Gesture="Cmd+C" Command="{CompiledBinding CopySelectedCommand}" />
+    <KeyBinding Gesture="Ctrl+V" Command="{CompiledBinding PasteSelectedCommand}" />
+    <KeyBinding Gesture="Cmd+V" Command="{CompiledBinding PasteSelectedCommand}" />
+  </UserControl.KeyBindings>
   <DockPanel>
     <Grid DockPanel.Dock="Bottom" ColumnDefinitions="*,Auto" Margin="0,5,0,0">
       <TextBlock HorizontalAlignment="Center" Text="{CompiledBinding Count, StringFormat={}{0} Rows}" />
@@ -38,6 +46,7 @@
             <Separator />
             <MenuItem Header="Delete" Command="{CompiledBinding DeleteRowCommand}" />
             <Separator />
+            <MenuItem Header="Create view" Command="{CompiledBinding CreateViewCommand}" /> 
             <MenuItem Header="Copy as insert" Command="{CompiledBinding CopyInsertCommand}" />
             <MenuItem Header="Refresh" Command="{CompiledBinding RefreshCommand}" />
           </ContextMenu>

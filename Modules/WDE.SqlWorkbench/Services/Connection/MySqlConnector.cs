@@ -28,6 +28,6 @@ internal class MySqlConnector : IMySqlConnector
 
     public Task<IRawMySqlConnection> ConnectAsync(DatabaseCredentials credentials, QueryExecutionSafety safeMode)
     {
-        return ConnectAsync($"Server={credentials.Host};Port={credentials.Port};Database={credentials.SchemaName};Uid={credentials.User};Pwd={credentials.Passwd};AllowUserVariables=True;AllowZeroDateTime=True;ApplicationName=WoWDatabaseEditor;Pooling=False;ConnectionTimeout=30;DefaultCommandTimeout=0", safeMode);
+        return ConnectAsync($"Server={credentials.Host};Port={credentials.Port};Database={credentials.SchemaName};Uid={credentials.User};Pwd={credentials.Passwd};AllowUserVariables=True;AllowZeroDateTime=True;ApplicationName=WoWDatabaseEditor;Pooling=False;ConnectionTimeout=30;DefaultCommandTimeout=0;GuidFormat=None;TreatTinyAsBoolean=False", safeMode);
     }
 }

@@ -4,14 +4,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;
-using DynamicData;
 using MySqlConnector;
 using Prism.Commands;
-using WDE.Common.Services.MessageBox;
 using WDE.Common.Types;
 using WDE.Common.Utils;
 using WDE.SqlWorkbench.Models;
 using WDE.SqlWorkbench.Services.QueryUtils;
+using WDE.SqlWorkbench.Utils;
 
 namespace WDE.SqlWorkbench.ViewModels;
 
@@ -33,7 +32,9 @@ internal partial class SelectSingleTableViewModel : SelectResultsViewModel
     public IAsyncCommand RefreshCommand { get; }
     public IAsyncCommand ApplyChangesCommand { get; }
     public IAsyncCommand RevertChangesCommand { get; }
-    
+    public IAsyncCommand CreateViewCommand { get; }
+    public IAsyncCommand PasteSelectedCommand { get; }
+
     public override ImageUri Icon => new("Icons/icon_mini_table_big.png");
     
     private int sortByIndex = -1;
@@ -86,9 +87,31 @@ internal partial class SelectSingleTableViewModel : SelectResultsViewModel
             SelectedRowIndex = Count - 1;
             Selection.Clear();
             Selection.Add(SelectedRowIndex);
-            for (int i = 0; i < Columns.Count; ++i)
-                OverrideValue(SelectedRowIndex, i, GetValue(copyRowIndex, i));
+            for (int i = 1; i < Columns.Count; ++i) // skip # column
+                OverrideValue(SelectedRowIndex, i, GetFullValue(copyRowIndex, i));
         }, () => RowsHaveFullPrimaryKey);
+        PasteSelectedCommand = new AsyncAutoCommand(async () =>
+        {
+            var text = await vm.ClipboardService.GetText();
+            if (string.IsNullOrEmpty(text))
+                return;
+            
+            CsvTokenizer tokenizer = new CsvTokenizer(text);
+            while (tokenizer.HasNextLine())
+            {
+                tokenizer.NextLine();
+                int rowIndex = AdditionalRowsCount++;
+                
+                int index = 1;
+                while (tokenizer.HasNextToken())
+                {
+                    var token = tokenizer.NextToken();
+                    if (index >= Columns.Count)
+                        continue;
+                    OverrideValue(rowIndex, index++, token);
+                }
+            }
+        });
         DeleteRowCommand = new DelegateCommand(() =>
         {
             foreach (var row in Selection.All())
@@ -107,6 +130,7 @@ internal partial class SelectSingleTableViewModel : SelectResultsViewModel
             }
             catch (Exception e)
             {
+                Console.WriteLine(e);
                 await vm.UserQuestions.SaveErrorAsync(e);   
             }
         });
@@ -122,6 +146,25 @@ internal partial class SelectSingleTableViewModel : SelectResultsViewModel
             await RevertChangesCommand.ExecuteAsync();
             await vm.ExecuteAndOverrideResultsAsync(selectSpecs.ToString(), this);
         }, () => RowsHaveFullPrimaryKey);
+        CreateViewCommand = new AsyncAutoCommand(async () =>
+        {
+            var newViewName = await vm.UserQuestions.AskForNewViewNameAsync();
+            if (string.IsNullOrWhiteSpace(newViewName))
+                return;
+            
+            try
+            { 
+                if (!string.IsNullOrEmpty(selectSpecs.From.Schema))
+                    newViewName = $"`{selectSpecs.From.Schema}`.`{newViewName}`";
+                else
+                    newViewName = $"`{newViewName}`";
+                await vm.ExecuteAsync(new[] { $"CREATE VIEW {newViewName} AS {selectSpecs.ToString()}" }, false, true, false);
+            }
+            catch (Exception e)
+            {
+                await vm.UserQuestions.SaveErrorAsync(e);
+            }
+        });
 
         RowsHaveFullPrimaryKey = columnsInfo.Any(x => x.IsPrimaryKey) &&
                                  columnsInfo.Where(x => x.IsPrimaryKey)
@@ -141,8 +184,18 @@ internal partial class SelectSingleTableViewModel : SelectResultsViewModel
             throw new Exception($"The column {columnName} has type {Results.Columns[columnIndex - 1]?.GetType()} which editor can't edit right now. Please report this.");
         }
             
-        if (columnCategory is ColumnTypeCategory.String or ColumnTypeCategory.DateTime)
+        if (columnCategory is ColumnTypeCategory.String)
             return $"'{MySqlHelper.EscapeString(value)}'";
+        else if (columnCategory is ColumnTypeCategory.DateTime)
+        {
+            if (value.Contains('(') && value.Contains(')')) // contains a function call
+                return value;
+            return $"'{value}'";
+        }
+        else if (columnCategory is ColumnTypeCategory.Binary)
+        {
+            return $"X'{value}'";
+        }
             
         return value;
     }
@@ -157,7 +210,7 @@ internal partial class SelectSingleTableViewModel : SelectResultsViewModel
             
             List<string> columns = new();
             for (int columnIndex = 1; columnIndex < Columns.Count; ++columnIndex)
-                columns.Add(ColumnValueToMySqlRepresentation(columnIndex, GetValue(rowIndex, columnIndex)));
+                columns.Add(ColumnValueToMySqlRepresentation(columnIndex, GetFullValue(rowIndex, columnIndex)));
             inserts.Add("(" + string.Join(", ", columns) + ")");
         }
 
@@ -298,12 +351,20 @@ internal partial class SelectSingleTableViewModel : SelectResultsViewModel
         RaisePropertyChanged(nameof(Results));
     }
 
-    private bool CanBeEdited()
+    private bool CanEditRow(int rowIndex) => rowIndex >= Results.AffectedRows || RowsHaveFullPrimaryKey;
+
+    private bool CanEditSelectedRow()
     {
-        if (!RowsHaveFullPrimaryKey)
+        if (RowsHaveFullPrimaryKey)
+            return true;
+
+        foreach (var row in Selection.All())
         {
-            vm.UserQuestions.NoFullPrimaryKeyAsync().ListenErrors();
-            return false;
+            if (!CanEditRow(row))
+            {
+                vm.UserQuestions.NoFullPrimaryKeyAsync().ListenErrors();
+                return false;
+            }
         }
 
         return true;
@@ -311,7 +372,7 @@ internal partial class SelectSingleTableViewModel : SelectResultsViewModel
     
     public override void UpdateSelectedCells(string? value)
     {
-        if (!CanBeEdited())
+        if (!CanEditSelectedRow())
             return;
         
         foreach (var row in Selection.All())

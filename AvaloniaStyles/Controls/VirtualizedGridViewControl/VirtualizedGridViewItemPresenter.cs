@@ -133,18 +133,18 @@ public class VirtualizedGridViewItemPresenter : Panel
         {
             boundSelection = selection;
             boundSelection.Cleared += OnSelectionCleared;
-            boundSelection.Added += OnSelectionAdded;
-            boundSelection.Removed += OnSelectionRemoved;
+            boundSelection.Changed += OnSelectionChanged;
         }
     }
+
+    private void OnSelectionChanged() => InvalidateArrange();
 
     private void UnbindSelection()
     {
         if (boundSelection != null)
         {
             boundSelection.Cleared -= OnSelectionCleared;
-            boundSelection.Added -= OnSelectionAdded;
-            boundSelection.Removed -= OnSelectionRemoved;
+            boundSelection.Changed -= OnSelectionChanged;
             boundSelection = null;
         }
     }

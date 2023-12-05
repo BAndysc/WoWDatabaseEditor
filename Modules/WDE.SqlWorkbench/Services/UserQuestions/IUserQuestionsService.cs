@@ -16,4 +16,5 @@ internal interface IUserQuestionsService
     Task NoFullPrimaryKeyAsync();
     Task<bool> AskToRevertChangesAsync();
     Task<bool> ConfirmExecuteQueryAsync(string query);
+    Task<string?> AskForNewViewNameAsync();
 }

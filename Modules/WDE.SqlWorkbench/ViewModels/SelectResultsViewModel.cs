@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Avalonia;
@@ -8,6 +9,7 @@ using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using AvaloniaStyles.Controls.FastTableView;
 using AvaloniaStyles.Controls.OptimizedVeryFastTableView;
+using MySqlConnector;
 using Prism.Commands;
 using PropertyChanged.SourceGenerator;
 using WDE.Common.Avalonia.Components;
@@ -17,6 +19,7 @@ using WDE.Common.Utils;
 using WDE.MVVM;
 using WDE.SqlWorkbench.Models;
 using WDE.SqlWorkbench.Services.Connection;
+using WDE.SqlWorkbench.Utils;
 
 namespace WDE.SqlWorkbench.ViewModels;
 
@@ -47,6 +50,10 @@ internal partial class SelectResultsViewModel : ObservableBase
     
     public ICommand CopyColumnNameCommand { get; }
     
+    public ICommand SelectAllCommand { get; }
+    
+    public ICommand CopySelectedCommand { get; }
+    
     public SelectResultsViewModel(SqlWorkbenchViewModel vm, string title, in SelectResult results)
     {
         this.vm = vm;
@@ -61,6 +68,31 @@ internal partial class SelectResultsViewModel : ObservableBase
                 return;
             var name = Columns[selectedCellIndex].Header;
             vm.ClipboardService.SetText(name);
+        });
+        
+        SelectAllCommand = new DelegateCommand(() =>
+        {
+            Selection.Replace(0, Count - 1);
+        });
+        
+        CopySelectedCommand = new DelegateCommand(() =>
+        {
+            CsvWriter csv = new CsvWriter();
+            var selectionItr = Selection.ContainsIterator;
+            for (int i = 0; i < Count; ++i)
+            {
+                if (selectionItr.Contains(i))
+                {
+                    for (int j = 1; j < Columns.Count; ++j) // skip # column
+                    {
+                        var fullValue = GetFullValue(i, j);
+
+                        csv.Write(fullValue);
+                    }
+                    csv.WriteLine();
+                }
+            }
+            vm.ClipboardService.SetText(csv.ToString());
         });
     }
 
@@ -83,7 +115,30 @@ internal partial class SelectResultsViewModel : ObservableBase
         UpdateView();
     }
 
-    public string? GetValue(int rowIndex, int cellIndex)
+    /// <summary>
+    /// Returns full, not truncated, string representation of the value, not quoted, not escaped
+    /// </summary>
+    public string? GetFullValue(int rowIndex, int cellIndex)
+    {
+        if (TryGetRowOverride(rowIndex, cellIndex, out var overrideString))
+            return overrideString;
+        
+        if (rowIndex >= Results.AffectedRows)
+            return null;
+
+        if (cellIndex == 0) // # column
+            return null;
+        
+        return Results.Columns[cellIndex - 1]!.GetFullToString(rowIndex);
+    }
+    
+    /// <summary>
+    /// Returns short, maybe truncated, string representation of the value, not quoted, not escaped. I.e. binary data will be truncated
+    /// </summary>
+    /// <param name="rowIndex"></param>
+    /// <param name="cellIndex"></param>
+    /// <returns></returns>
+    public string? GetShortValue(int rowIndex, int cellIndex)
     {
         if (TryGetRowOverride(rowIndex, cellIndex, out var overrideString))
             return overrideString;
@@ -178,7 +233,7 @@ internal class TableController : BaseVirtualizedTableController
         if (cellIndex == 0)
             return (rowIndex + 1).ToString(); // row index
 
-        return vm.GetValue(rowIndex, cellIndex);
+        return vm.GetShortValue(rowIndex, cellIndex);
     }
 
     public override void DrawRow(int rowIndex, Rect rowRect, DrawingContext drawingContext, VirtualizedVeryFastTableView view)
