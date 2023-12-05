@@ -54,12 +54,84 @@ internal enum ColumnTypeCategory
     DateTime,
 }
 
+internal interface IMySqlDataReader
+{
+    bool IsDBNull(int ordinal);
+    object? GetValue(int ordinal);
+    string? GetString(int ordinal);
+    bool GetBoolean(int ordinal);
+    byte GetByte(int ordinal);
+    sbyte GetSByte(int ordinal);
+    short GetInt16(int ordinal);
+    ushort GetUInt16(int ordinal);
+    int GetInt32(int ordinal);
+    uint GetUInt32(int ordinal);
+    long GetInt64(int ordinal);
+    ulong GetUInt64(int ordinal);
+    char GetChar(int ordinal);
+    decimal GetDecimal(int ordinal);
+    double GetDouble(int ordinal);
+    float GetFloat(int ordinal);
+    DateTime GetDateTime(int ordinal);
+    DateTimeOffset GetDateTimeOffset(int ordinal);
+    Guid GetGuid(int ordinal);
+    TimeSpan GetTimeSpan(int ordinal);
+    long GetBytes(int ordinal, long dataOffset, byte[]? buffer, int bufferOffset, int length);
+    MySqlDateTime GetMySqlDateTime(int ordinal);
+}
+
 internal interface IColumnData
 {
-    void Append(MySqlDataReader reader, int ordinal);
+    void Append(IMySqlDataReader reader, int ordinal);
     string? GetToString(int rowIndex);
     bool IsNull(int rowIndex);
     ColumnTypeCategory Category { get; }
+
+    static IColumnData CreateTypedColumn(Type? dataType)
+    {
+        if (dataType == typeof(string))
+            return new StringColumnData();
+        else if (dataType == typeof(bool))
+            return new BooleanColumnData();
+        else if (dataType == typeof(byte))
+            return new ByteColumnData();
+        else if (dataType == typeof(sbyte))
+            return new SByteColumnData();
+        else if (dataType == typeof(short))
+            return new Int16ColumnData();
+        else if (dataType == typeof(ushort))
+            return new UInt16ColumnData();
+        else if (dataType == typeof(int))
+            return new Int32ColumnData();
+        else if (dataType == typeof(uint))
+            return new UInt32ColumnData();
+        else if (dataType == typeof(long))
+            return new Int64ColumnData();
+        else if (dataType == typeof(ulong))
+            return new UInt64ColumnData();
+        else if (dataType == typeof(char))
+            return new CharColumnData();
+        else if (dataType == typeof(decimal))
+            return new DecimalColumnData();
+        else if (dataType == typeof(double))
+            return new DoubleColumnData();
+        else if (dataType == typeof(float))
+            return new FloatColumnData();
+        else if (dataType == typeof(MySqlDateTime))
+            return new MySqlDateTimeColumnData();
+        else if (dataType == typeof(DateTime))
+            return new DateTimeColumnData();
+        else if (dataType == typeof(DateTimeOffset))
+            return new DateTimeOffsetColumnData();
+        else if (dataType == typeof(Guid))
+            return new GuidColumnData();
+        else if (dataType == typeof(TimeSpan))
+            return new TimeSpanColumnData();
+        else if (dataType == typeof(byte[]))
+            return new BinaryColumnData();
+        else
+            return new ObjectColumnData();
+    }
 }
 
 internal class ObjectColumnData : IColumnData
@@ -70,7 +142,7 @@ internal class ObjectColumnData : IColumnData
     {
     }
 
-    public void Append(MySqlDataReader reader, int ordinal)
+    public void Append(IMySqlDataReader reader, int ordinal)
     {
         data.Add(reader.IsDBNull(ordinal) ? null : reader.GetValue(ordinal));
     }
@@ -95,7 +167,7 @@ internal class StringColumnData : IColumnData
     {
     }
 
-    public void Append(MySqlDataReader reader, int ordinal)
+    public void Append(IMySqlDataReader reader, int ordinal)
     {
         data.Add(reader.IsDBNull(ordinal) ? null : reader.GetString(ordinal));
     }
@@ -119,7 +191,7 @@ internal class BooleanColumnData : IColumnData
     private int capacity;
     private int count;
     
-    public void Append(MySqlDataReader reader, int ordinal)
+    public void Append(IMySqlDataReader reader, int ordinal)
     {
         if (count == capacity)
         {
@@ -151,7 +223,7 @@ internal class ByteColumnData : IColumnData
     private readonly List<byte> data = new ();
     private readonly BitArray nulls = new (0);
     
-    public void Append(MySqlDataReader reader, int ordinal)
+    public void Append(IMySqlDataReader reader, int ordinal)
     {
         if (data.Count == nulls.Length)
             nulls.Length = nulls.Length * 2 + 1;
@@ -182,7 +254,7 @@ internal class SByteColumnData : IColumnData
     private readonly List<sbyte> data = new ();
     private readonly BitArray nulls = new (0);
     
-    public void Append(MySqlDataReader reader, int ordinal)
+    public void Append(IMySqlDataReader reader, int ordinal)
     {
         if (data.Count == nulls.Length)
             nulls.Length = nulls.Length * 2 + 1;
@@ -213,7 +285,7 @@ internal class Int16ColumnData : IColumnData
     private readonly List<short> data = new ();
     private readonly BitArray nulls = new (0);
     
-    public void Append(MySqlDataReader reader, int ordinal)
+    public void Append(IMySqlDataReader reader, int ordinal)
     {
         if (data.Count == nulls.Length)
             nulls.Length = nulls.Length * 2 + 1;
@@ -244,7 +316,7 @@ internal class UInt16ColumnData : IColumnData
     private readonly List<ushort> data = new ();
     private readonly BitArray nulls = new (0);
     
-    public void Append(MySqlDataReader reader, int ordinal)
+    public void Append(IMySqlDataReader reader, int ordinal)
     {
         if (data.Count == nulls.Length)
             nulls.Length = nulls.Length * 2 + 1;
@@ -275,7 +347,7 @@ internal class Int32ColumnData : IColumnData
     private readonly List<int> data = new ();
     private readonly BitArray nulls = new (0);
     
-    public void Append(MySqlDataReader reader, int ordinal)
+    public void Append(IMySqlDataReader reader, int ordinal)
     {
         if (data.Count == nulls.Length)
             nulls.Length = nulls.Length * 2 + 1;
@@ -306,7 +378,7 @@ internal class UInt32ColumnData : IColumnData
     private readonly List<uint> data = new ();
     private readonly BitArray nulls = new (0);
     
-    public void Append(MySqlDataReader reader, int ordinal)
+    public void Append(IMySqlDataReader reader, int ordinal)
     {
         if (data.Count == nulls.Length)
             nulls.Length = nulls.Length * 2 + 1;
@@ -337,7 +409,7 @@ internal class Int64ColumnData : IColumnData
     private readonly List<long> data = new ();
     private readonly BitArray nulls = new (0);
     
-    public void Append(MySqlDataReader reader, int ordinal)
+    public void Append(IMySqlDataReader reader, int ordinal)
     {
         if (data.Count == nulls.Length)
             nulls.Length = nulls.Length * 2 + 1;
@@ -368,7 +440,7 @@ internal class UInt64ColumnData : IColumnData
     private readonly List<ulong> data = new ();
     private readonly BitArray nulls = new (0);
     
-    public void Append(MySqlDataReader reader, int ordinal)
+    public void Append(IMySqlDataReader reader, int ordinal)
     {
         if (data.Count == nulls.Length)
             nulls.Length = nulls.Length * 2 + 1;
@@ -399,7 +471,7 @@ internal class CharColumnData : IColumnData
     private readonly List<char> data = new ();
     private readonly BitArray nulls = new (0);
     
-    public void Append(MySqlDataReader reader, int ordinal)
+    public void Append(IMySqlDataReader reader, int ordinal)
     {
         if (data.Count == nulls.Length)
             nulls.Length = nulls.Length * 2 + 1;
@@ -430,7 +502,7 @@ internal class DecimalColumnData : IColumnData
     private readonly List<decimal> data = new ();
     private readonly BitArray nulls = new (0);
     
-    public void Append(MySqlDataReader reader, int ordinal)
+    public void Append(IMySqlDataReader reader, int ordinal)
     {
         if (data.Count == nulls.Length)
             nulls.Length = nulls.Length * 2 + 1;
@@ -461,7 +533,7 @@ internal class DoubleColumnData : IColumnData
     private readonly List<double> data = new ();
     private readonly BitArray nulls = new (0);
     
-    public void Append(MySqlDataReader reader, int ordinal)
+    public void Append(IMySqlDataReader reader, int ordinal)
     {
         if (data.Count == nulls.Length)
             nulls.Length = nulls.Length * 2 + 1;
@@ -492,7 +564,7 @@ internal class FloatColumnData : IColumnData
     private readonly List<float> data = new ();
     private readonly BitArray nulls = new (0);
     
-    public void Append(MySqlDataReader reader, int ordinal)
+    public void Append(IMySqlDataReader reader, int ordinal)
     {
         if (data.Count == nulls.Length)
             nulls.Length = nulls.Length * 2 + 1;
@@ -523,7 +595,7 @@ internal class DateTimeColumnData : IColumnData
     private readonly List<DateTime> data = new ();
     private readonly BitArray nulls = new (0);
     
-    public void Append(MySqlDataReader reader, int ordinal)
+    public void Append(IMySqlDataReader reader, int ordinal)
     {
         if (data.Count == nulls.Length)
             nulls.Length = nulls.Length * 2 + 1;
@@ -554,7 +626,7 @@ internal class DateTimeOffsetColumnData : IColumnData
     private readonly List<DateTimeOffset> data = new ();
     private readonly BitArray nulls = new (0);
     
-    public void Append(MySqlDataReader reader, int ordinal)
+    public void Append(IMySqlDataReader reader, int ordinal)
     {
         if (data.Count == nulls.Length)
             nulls.Length = nulls.Length * 2 + 1;
@@ -585,7 +657,7 @@ internal class GuidColumnData : IColumnData
     private readonly List<Guid> data = new ();
     private readonly BitArray nulls = new (0);
     
-    public void Append(MySqlDataReader reader, int ordinal)
+    public void Append(IMySqlDataReader reader, int ordinal)
     {
         if (data.Count == nulls.Length)
             nulls.Length = nulls.Length * 2 + 1;
@@ -616,7 +688,7 @@ internal class TimeSpanColumnData : IColumnData
     private readonly List<TimeSpan> data = new ();
     private readonly BitArray nulls = new (0);
     
-    public void Append(MySqlDataReader reader, int ordinal)
+    public void Append(IMySqlDataReader reader, int ordinal)
     {
         if (data.Count == nulls.Length)
             nulls.Length = nulls.Length * 2 + 1;
@@ -651,7 +723,7 @@ internal class BinaryColumnData : IColumnData
     private int bytesCount = 0;
     private int bytesCapacity = 0;
     
-    public void Append(MySqlDataReader reader, int ordinal)
+    public void Append(IMySqlDataReader reader, int ordinal)
     {
         if (offsets.Count == nulls.Length)
             nulls.Length = nulls.Length * 2 + 1;
@@ -720,7 +792,7 @@ internal class MySqlDateTimeColumnData : IColumnData
     private readonly List<MySqlDateTime> data = new ();
     private readonly BitArray nulls = new (0);
     
-    public void Append(MySqlDataReader reader, int ordinal)
+    public void Append(IMySqlDataReader reader, int ordinal)
     {
         if (data.Count == nulls.Length)
             nulls.Length = nulls.Length * 2 + 1;

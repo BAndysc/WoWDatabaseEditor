@@ -3,7 +3,6 @@ using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
 using MySqlConnector;
-using WDE.Common.Services.MessageBox;
 using WDE.SqlWorkbench.Models;
 
 namespace WDE.SqlWorkbench.Services.Connection;
@@ -59,56 +58,16 @@ internal class RawMySqlConnection : IRawMySqlConnection, IAsyncDisposable
                     columnNames[i] = schema[i].ColumnName;
                     columnTypes[i] = schema[i].DataType;
                     var dataType = schema[i].DataType;
-                    if (dataType == typeof(string))
-                        columnData[i] = new StringColumnData();
-                    else if (dataType == typeof(bool))
-                        columnData[i] = new BooleanColumnData();
-                    else if (dataType == typeof(byte))
-                        columnData[i] = new ByteColumnData();
-                    else if (dataType == typeof(sbyte))
-                        columnData[i] = new SByteColumnData();
-                    else if (dataType == typeof(short))
-                        columnData[i] = new Int16ColumnData();
-                    else if (dataType == typeof(ushort))
-                        columnData[i] = new UInt16ColumnData();
-                    else if (dataType == typeof(int))
-                        columnData[i] = new Int32ColumnData();
-                    else if (dataType == typeof(uint))
-                        columnData[i] = new UInt32ColumnData();
-                    else if (dataType == typeof(long))
-                        columnData[i] = new Int64ColumnData();
-                    else if (dataType == typeof(ulong))
-                        columnData[i] = new UInt64ColumnData();
-                    else if (dataType == typeof(char))
-                        columnData[i] = new CharColumnData();
-                    else if (dataType == typeof(decimal))
-                        columnData[i] = new DecimalColumnData();
-                    else if (dataType == typeof(double))
-                        columnData[i] = new DoubleColumnData();
-                    else if (dataType == typeof(float))
-                        columnData[i] = new FloatColumnData();
-                    else if (dataType == typeof(MySqlDateTime))
-                        columnData[i] = new MySqlDateTimeColumnData();
-                    else if (dataType == typeof(DateTime))
-                        columnData[i] = new DateTimeColumnData();
-                    else if (dataType == typeof(DateTimeOffset))
-                        columnData[i] = new DateTimeOffsetColumnData();
-                    else if (dataType == typeof(Guid))
-                        columnData[i] = new GuidColumnData();
-                    else if (dataType == typeof(TimeSpan))
-                        columnData[i] = new TimeSpanColumnData();
-                    else if (dataType == typeof(byte[]))
-                        columnData[i] = new BinaryColumnData();
-                    else
-                        columnData[i] = new ObjectColumnData();
+                    columnData[i] = IColumnData.CreateTypedColumn(dataType);
                 }
 
                 int rows = 0;
+                var wrappedReader = new MySqlDataReaderWrapper(reader);
                 while (await reader.ReadAsync(token) && (rowsLimit == null || rows < rowsLimit))
                 {
                     for (int fieldIndex = 0; fieldIndex < reader.FieldCount; ++fieldIndex)
                     {
-                        columnData[fieldIndex].Append(reader, fieldIndex);
+                        columnData[fieldIndex].Append(wrappedReader, fieldIndex);
                     }
 
                     if (token.IsCancellationRequested)
@@ -131,5 +90,125 @@ internal class RawMySqlConnection : IRawMySqlConnection, IAsyncDisposable
     public void Dispose()
     {
         conn.Dispose();
+    }
+}
+
+internal class MySqlDataReaderWrapper : IMySqlDataReader
+{
+    private MySqlDataReader reader;
+
+    public MySqlDataReaderWrapper(MySqlDataReader reader)
+    {
+        this.reader = reader;
+    }
+
+    public bool IsDBNull(int ordinal)
+    {
+        return reader.IsDBNull(ordinal);
+    }
+
+    public object? GetValue(int ordinal)
+    {
+        return reader.GetValue(ordinal);
+    }
+
+    public string? GetString(int ordinal)
+    {
+        return reader.GetString(ordinal);
+    }
+
+    public bool GetBoolean(int ordinal)
+    {
+        return reader.GetBoolean(ordinal);
+    }
+
+    public byte GetByte(int ordinal)
+    {
+        return reader.GetByte(ordinal);
+    }
+
+    public sbyte GetSByte(int ordinal)
+    {
+        return reader.GetSByte(ordinal);
+    }
+
+    public short GetInt16(int ordinal)
+    {
+        return reader.GetInt16(ordinal);
+    }
+
+    public ushort GetUInt16(int ordinal)
+    {
+        return reader.GetUInt16(ordinal);
+    }
+
+    public int GetInt32(int ordinal)
+    {
+        return reader.GetInt32(ordinal);
+    }
+
+    public uint GetUInt32(int ordinal)
+    {
+        return reader.GetUInt32(ordinal);
+    }
+
+    public long GetInt64(int ordinal)
+    {
+        return reader.GetInt64(ordinal);
+    }
+
+    public ulong GetUInt64(int ordinal)
+    {
+        return reader.GetUInt64(ordinal);
+    }
+
+    public char GetChar(int ordinal)
+    {
+        return reader.GetChar(ordinal);
+    }
+
+    public decimal GetDecimal(int ordinal)
+    {
+        return reader.GetDecimal(ordinal);
+    }
+
+    public double GetDouble(int ordinal)
+    {
+        return reader.GetDouble(ordinal);
+    }
+
+    public float GetFloat(int ordinal)
+    {
+        return reader.GetFloat(ordinal);
+    }
+
+    public DateTime GetDateTime(int ordinal)
+    {
+        return reader.GetDateTime(ordinal);
+    }
+
+    public DateTimeOffset GetDateTimeOffset(int ordinal)
+    {
+        return reader.GetDateTimeOffset(ordinal);
+    }
+
+    public Guid GetGuid(int ordinal)
+    {
+        return reader.GetGuid(ordinal);
+    }
+
+    public TimeSpan GetTimeSpan(int ordinal)
+    {
+        return reader.GetTimeSpan(ordinal);
+    }
+
+    public long GetBytes(int ordinal, long dataOffset, byte[]? buffer, int bufferOffset, int length)
+    {
+        return reader.GetBytes(ordinal, dataOffset, buffer, bufferOffset, length);
+    }
+
+    public MySqlDateTime GetMySqlDateTime(int ordinal)
+    {
+        return reader.GetMySqlDateTime(ordinal);
     }
 }

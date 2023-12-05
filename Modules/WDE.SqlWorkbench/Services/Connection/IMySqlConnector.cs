@@ -7,7 +7,6 @@ namespace WDE.SqlWorkbench.Services.Connection;
 
 internal interface IMySqlConnector
 {
-    Task<IRawMySqlConnection> ConnectAsync(string connectionString, QueryExecutionSafety safeMode);
     Task<IRawMySqlConnection> ConnectAsync(DatabaseCredentials credentials, QueryExecutionSafety safeMode);
 }
 

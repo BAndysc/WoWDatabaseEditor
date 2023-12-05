@@ -32,6 +32,9 @@
       <None Update="DatabaseContextualParameters\*.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
+      <None Update="DbDefinitions\creature_text_master.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="Antlr4.Runtime.Standard">

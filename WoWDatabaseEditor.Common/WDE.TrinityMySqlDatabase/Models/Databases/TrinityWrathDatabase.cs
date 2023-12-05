@@ -21,4 +21,5 @@ public class TrinityWrathDatabase : BaseTrinityDatabase
     public ITable<MySqlWaypointScriptLine> WaypointScripts => GetTable<MySqlWaypointScriptLine>();
     public ITable<MySqlSpellScriptLine> SpellScripts => GetTable<MySqlSpellScriptLine>();
     public ITable<MySqlSmartScriptLine> SmartScript => GetTable<MySqlSmartScriptLine>();
+    public ITable<NonMasterWaypointData> WaypointData => GetTable<NonMasterWaypointData>();
 }

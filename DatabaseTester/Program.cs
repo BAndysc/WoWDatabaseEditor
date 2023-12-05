@@ -270,6 +270,8 @@ public class Program
             "FindSmartScriptLinesBy",
             "GetConditionsForAsync",
             "GetEventScript",
+            "GetCreaturesAsync",
+            "GetGameObjectsAsync"
         };
 
         foreach (var method in allMethods)
@@ -300,7 +302,11 @@ public class Program
         await worldDb.GetConditionsForAsync(IDatabaseProvider.ConditionKeyMask.All, new IDatabaseProvider.ConditionKey(0, 0, 0, 0));
         await worldDb.GetConditionsForAsync(IDatabaseProvider.ConditionKeyMask.All, new List<IDatabaseProvider.ConditionKey>(){new IDatabaseProvider.ConditionKey(0, 0, 0, 0)});
         await worldDb.FindSmartScriptLinesBy(new (IDatabaseProvider.SmartLinePropertyType what, int whatValue, int parameterIndex, long valueToSearch)[] { (IDatabaseProvider.SmartLinePropertyType.Action, 0, 0, 0) });
-
+        await worldDb.GetCreaturesAsync();
+        await worldDb.GetCreaturesAsync(new SpawnKey[]{new SpawnKey(0, 0)});
+        await worldDb.GetGameObjectsAsync();
+        await worldDb.GetGameObjectsAsync(new SpawnKey[]{new SpawnKey(0, 0)});
+        
         foreach (var type in Enum.GetValues<EventScriptType>())
         {
             Console.WriteLine($"GetEventScript({type})");

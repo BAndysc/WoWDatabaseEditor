@@ -398,4 +398,10 @@ public class TrinityWrathMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvide
         var creatures = await database.CreatureTemplate.Where(x => x.PickpocketLootId == lootId).ToListAsync();
         return (creatures, Array.Empty<ICreatureTemplateDifficulty>());
     }
+    
+    public override async Task<IReadOnlyList<IWaypointData>?> GetWaypointData(uint pathId)
+    {
+        await using var model = Database();
+        return await model.WaypointData.Where(wp => wp.PathId == pathId).OrderBy(wp => wp.PointId).ToListAsync<IWaypointData>();
+    }
 }

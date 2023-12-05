@@ -1,6 +1,7 @@
 using System;
 using Avalonia.Threading;
 using PropertyChanged.SourceGenerator;
+using WDE.Common.Tasks;
 using WDE.MVVM;
 using WDE.SqlWorkbench.Services.ActionsOutput;
 
@@ -25,7 +26,9 @@ public partial class ActionOutputViewModel : ObservableBase, IActionOutput
             timeFinished = value;
         }
     }
-    
+
+    public Exception? Exception { get; set; }
+
     public string TimeAsString => TimeStarted.ToString("HH:mm:ss");
     public string DurationAsString =>
         status == ActionStatus.NotStarted ? "" :
@@ -53,11 +56,11 @@ public partial class ActionOutputViewModel : ObservableBase, IActionOutput
         }
     }
     
-    public ActionOutputViewModel(int index, string query)
+    public ActionOutputViewModel(IMainThread mainThread, int index, string query)
     {
         Index = index;
         OriginalQuery = query;
-        DispatcherTimer.Run(UpdateDuration, TimeSpan.FromMilliseconds(50));
+        mainThread.StartTimer(UpdateDuration, TimeSpan.FromMilliseconds(50));
     }
 
     private bool UpdateDuration()

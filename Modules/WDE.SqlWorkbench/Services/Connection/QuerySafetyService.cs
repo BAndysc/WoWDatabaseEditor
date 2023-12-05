@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using WDE.Common.Services.MessageBox;
 using WDE.Module.Attributes;
+using WDE.SqlWorkbench.Services.UserQuestions;
 
 namespace WDE.SqlWorkbench.Services.Connection;
 
@@ -9,22 +10,16 @@ namespace WDE.SqlWorkbench.Services.Connection;
 [SingleInstance]
 internal class QuerySafetyService : IQuerySafetyService
 {
-    private readonly IMessageBoxService messageBoxService;
+    private readonly IUserQuestionsService userQuestionsService;
 
-    public QuerySafetyService(IMessageBoxService messageBoxService)
+    public QuerySafetyService(IUserQuestionsService userQuestionsService)
     {
-        this.messageBoxService = messageBoxService;
+        this.userQuestionsService = userQuestionsService;
     }
 
     private async Task<bool> AskAsync(string query)
     {
-        return await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
-            .SetTitle("Confirm?")
-            .SetMainInstruction("Do you want to execute the query?")
-            .SetContent("The following query will be executed:\n\n" + query)
-            .WithYesButton(true)
-            .WithCancelButton(false)
-            .Build());
+        return await userQuestionsService.ConfirmExecuteQueryAsync(query);
     }
 
     public async Task<bool> CanExecuteAsync(string query, QueryExecutionSafety safety)

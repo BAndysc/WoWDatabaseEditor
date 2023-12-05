@@ -52,6 +52,12 @@
           "read_only": true
         },
         {
+          "name": "Gossip Option ID",
+          "db_column_name": "GossipOptionID",
+          "value_type": "Parameter",
+          "preferred_width": 80
+        },
+        {
           "name": "ID",
           "db_column_name": "OptionID",
           "value_type": "uint",
@@ -77,6 +83,18 @@
           "value_type": "int"
         },
         {
+          "name": "Language",
+          "db_column_name": "Language",
+          "value_type": "LanguageParameter",
+          "zero_is_blank": true
+        },
+        {
+          "name": "Flags",
+          "db_column_name": "Flags",
+          "value_type": "int",
+          "zero_is_blank": true
+        },
+        {
           "name": "Submenu id",
           "db_column_name": "ActionMenuID",
           "value_type": "GossipMenuParameter",
@@ -92,6 +110,12 @@
           "db_column_name": "ActionPoiID",
           "value_type": "uint",
           "zero_is_blank": true
+        },
+        {
+          "name": "Gossip Npc Option ID",
+          "db_column_name": "GossipNpcOptionID",
+          "value_type": "int",
+          "can_be_null": true
         },
         {
           "name": "Box Coded",
@@ -116,6 +140,20 @@
           "db_column_name": "BoxBroadcastTextID",
           "value_type": "int",
           "zero_is_blank": true
+        },
+        {
+          "name": "Spell ID",
+          "db_column_name": "SpellID",
+          "value_type": "SpellParameter",
+          "zero_is_blank": true,
+          "can_be_null": true
+        },
+        {
+          "name": "Override Icon ID",
+          "db_column_name": "OverrideIconID",
+          "value_type": "int",
+          "zero_is_blank": true,
+          "can_be_null": true
         },
         {
           "name": "Verified Build",

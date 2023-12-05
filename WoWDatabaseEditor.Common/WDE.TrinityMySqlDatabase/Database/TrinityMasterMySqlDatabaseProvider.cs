@@ -397,7 +397,6 @@ public class TrinityMasterMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvid
             case EventScriptType.Spell:
                 return await model.SpellScripts.Where(s => s.Id == id).ToListAsync<IEventScriptLine>();
             case EventScriptType.Waypoint:
-                return await model.WaypointScripts.Where(s => s.Id == id).ToListAsync<IEventScriptLine>();
             case EventScriptType.Gossip:
             case EventScriptType.QuestStart:
             case EventScriptType.QuestEnd:
@@ -413,8 +412,7 @@ public class TrinityMasterMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvid
         await using var model = Database();
         var events = await model.EventScripts.Where(GenerateWhereConditionsForEventScript<MySqlEventScriptLine>(conditions)).ToListAsync<IEventScriptLine>();
         var spells = await model.SpellScripts.Where(GenerateWhereConditionsForEventScript<MySqlSpellScriptLine>(conditions)).ToListAsync<IEventScriptLine>();
-        var waypoints = await model.WaypointScripts.Where(GenerateWhereConditionsForEventScript<MySqlWaypointScriptLine>(conditions)).ToListAsync<IEventScriptLine>();
-        return events.Concat(spells).Concat(waypoints).ToList();
+        return events.Concat(spells).ToList();
     }
     
     public override IEnumerable<ISmartScriptLine> GetScriptFor(uint entry, int entryOrGuid, SmartScriptType type)
@@ -493,5 +491,11 @@ public class TrinityMasterMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvid
         await using var database = Database();
         var difficulties = await database.CreatureTemplateDifficulty.Where(x => x.PickpocketLootId == lootId).ToListAsync();
         return (Array.Empty<ICreatureTemplate>(), difficulties);
+    }
+    
+    public override async Task<IReadOnlyList<IWaypointData>?> GetWaypointData(uint pathId)
+    {
+        await using var model = Database();
+        return await model.WaypointData.Where(wp => wp.PathId == pathId).OrderBy(wp => wp.PointId).ToListAsync<IWaypointData>();
     }
 }

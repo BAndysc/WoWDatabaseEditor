@@ -17,6 +17,7 @@ using WDE.SqlWorkbench.Models;
 using WDE.SqlWorkbench.Services.Connection;
 using WDE.SqlWorkbench.Services.SqlDump;
 using WDE.SqlWorkbench.Services.TableUtils;
+using WDE.SqlWorkbench.Services.UserQuestions;
 using WDE.SqlWorkbench.Settings;
 using WDE.SqlWorkbench.ViewModels;
 
@@ -39,7 +40,6 @@ internal interface INamedChildType : IChildType, INamedNodeType
 
 internal partial class ConnectionListToolViewModel : ObservableBase, ITablesToolGroup
 {
-    public IMessageBoxService MessageBoxService { get; }
     private readonly IConnection connection;
     private readonly IConnectionsManager connectionsManager;
     private readonly Lazy<IExtendedSqlEditorService> sqlEditorService;
@@ -48,7 +48,8 @@ internal partial class ConnectionListToolViewModel : ObservableBase, ITablesTool
     [Notify] private string searchText = "";
     [Notify] [AlsoNotify(nameof(SelectedDatabase), nameof(SelectedTable), nameof(SelectedRoutine), nameof(SelectedGroup),
         nameof(IsTableSelected), nameof(IsDatabaseSelected), nameof(IsRoutineSelected))] private INodeType? selected;
-    
+
+    public IUserQuestionsService UserQuestionsService { get; }
     public ISqlWorkbenchPreferences Preferences { get; }
     public SchemaViewModel? SelectedDatabase => selected as SchemaViewModel;
     public TableViewModel? SelectedTable => selected as TableViewModel;
@@ -93,7 +94,7 @@ internal partial class ConnectionListToolViewModel : ObservableBase, ITablesTool
     public DelegateCommand AddNewProcedureCommand { get; }
     public DelegateCommand AddNewFunctionCommand { get; }
     
-    public ConnectionListToolViewModel(IMessageBoxService messageBoxService,
+    public ConnectionListToolViewModel(IUserQuestionsService userQuestionsService,
         Lazy<ITableUtility> utility,
         IClipboardService clipboardService,
         IQueryGenerator queryGenerator,
@@ -104,7 +105,7 @@ internal partial class ConnectionListToolViewModel : ObservableBase, ITablesTool
         ISqlWorkbenchPreferences preferences,
         Lazy<IExtendedSqlEditorService> sqlEditorService)
     {
-        MessageBoxService = messageBoxService;
+        UserQuestionsService = userQuestionsService;
         Preferences = preferences;
         this.connection = connection;
         this.connectionsManager = connectionsManager;
@@ -240,6 +241,11 @@ internal partial class ConnectionListToolViewModel : ObservableBase, ITablesTool
             }
             catch (TaskCanceledException) { }
             catch (OperationCanceledException) { }
+            catch (Exception e)
+            {
+                await UserQuestionsService.ConnectionsErrorAsync(e);
+                throw;
+            }
             finally
             {
                 IsLoading = false;
@@ -248,7 +254,7 @@ internal partial class ConnectionListToolViewModel : ObservableBase, ITablesTool
 
         loadCancellationTokenSource?.Cancel();
         loadCancellationTokenSource = new CancellationTokenSource();
-        LoadCoreAsync(loadCancellationTokenSource.Token).ListenErrors(MessageBoxService);    
+        LoadCoreAsync(loadCancellationTokenSource.Token).ListenErrors();    
     }
 
     public void ToolClosed()
