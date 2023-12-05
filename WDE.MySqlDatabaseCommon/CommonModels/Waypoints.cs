@@ -3,8 +3,7 @@ using WDE.Common.Database;
 
 namespace WDE.MySqlDatabaseCommon.CommonModels;
 
-[Table(Name = "waypoint_data")]
-public class WaypointData : IWaypointData, ISmartScriptWaypoint, IScriptWaypoint
+public abstract class BaseWaypointData : IWaypointData, ISmartScriptWaypoint, IScriptWaypoint
 {
     [PrimaryKey]
     [Column(Name = "id")]
@@ -40,11 +39,9 @@ public class WaypointData : IWaypointData, ISmartScriptWaypoint, IScriptWaypoint
     [Column(Name = "move_type")]
     public int MoveType { get; set; }
     
-    [Column(Name = "action")]
-    public int Action { get; set; }
+    public abstract int Action { get; set; }
     
-    [Column(Name = "action_chance")]
-    public byte ActionChance { get; set; }
+    public abstract byte ActionChance { get; set; }
 
     public UniversalWaypoint ToUniversal()
     {
@@ -66,7 +63,26 @@ public class WaypointData : IWaypointData, ISmartScriptWaypoint, IScriptWaypoint
     }
 }
 
-public class WaypointDataCata : WaypointData
+[Table(Name = "waypoint_data")]
+public class MasterWaypointData : BaseWaypointData
+{
+    public override int Action { get; set; }
+    
+    public override byte ActionChance { get; set; }
+}
+
+[Table(Name = "waypoint_data")]
+public class NonMasterWaypointData : BaseWaypointData
+{
+    [Column(Name = "action")]
+    public override int Action { get; set; }
+    
+    [Column(Name = "action_chance")]
+    public override byte ActionChance { get; set; }
+}
+
+
+public class WaypointDataCata : NonMasterWaypointData
 {
     [Column(Name = "velocity")]
     public override float? Velocity { get; set; }

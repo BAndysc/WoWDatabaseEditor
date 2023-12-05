@@ -8,6 +8,7 @@ using Avalonia.Input.Platform;
 using Prism.Commands;
 using PropertyChanged.SourceGenerator;
 using WDE.Common.Collections;
+using WDE.Common.Tasks;
 using WDE.Common.Utils;
 using WDE.Common.Windows;
 using WDE.MVVM;
@@ -17,6 +18,7 @@ namespace WDE.SqlWorkbench.ViewModels;
 
 public partial class ActionsOutputViewModel : ObservableBase, ITool, IActionsOutputService
 {
+    private readonly IMainThread mainThread;
     [Notify] private bool isSelected;
     [Notify] private bool visibility;
     [Notify] [AlsoNotify(nameof(FocusedItem))] private int focusedIndex = -1;
@@ -38,8 +40,9 @@ public partial class ActionsOutputViewModel : ObservableBase, ITool, IActionsOut
     public ICommand CopySelectedResponsesCommand { get; }
     public ICommand CopySelectedDurationsCommand { get; }
     
-    public ActionsOutputViewModel()
+    public ActionsOutputViewModel(IMainThread mainThread)
     {
+        this.mainThread = mainThread;
         Actions = actions.AsIndexedCollection();
         ClearConsoleCommand = new DelegateCommand(() => 
         {
@@ -77,7 +80,7 @@ public partial class ActionsOutputViewModel : ObservableBase, ITool, IActionsOut
 
     public IActionOutput Create(string query)
     {
-        var action = new ActionOutputViewModel(actionIndex++, query);
+        var action = new ActionOutputViewModel(mainThread, actionIndex++, query);
         actions.Add(action);
         FocusedIndex = actions.Count - 1;
         return action;

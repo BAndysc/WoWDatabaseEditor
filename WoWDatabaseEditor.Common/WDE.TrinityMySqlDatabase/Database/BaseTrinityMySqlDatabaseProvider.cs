@@ -505,12 +505,8 @@ namespace WDE.TrinityMySqlDatabase.Database
         public abstract Task<ICreatureAddon?> GetCreatureAddon(uint entry, uint guid);
 
         public abstract Task<ICreatureTemplateAddon?> GetCreatureTemplateAddon(uint entry);
-        
-        public virtual async Task<IReadOnlyList<IWaypointData>?> GetWaypointData(uint pathId)
-        {
-            await using var model = Database();
-            return await model.WaypointData.Where(wp => wp.PathId == pathId).OrderBy(wp => wp.PointId).ToListAsync<IWaypointData>();
-        }
+
+        public abstract Task<IReadOnlyList<IWaypointData>?> GetWaypointData(uint pathId);
 
         public virtual async Task<IReadOnlyList<ISmartScriptWaypoint>?> GetSmartScriptWaypoints(uint pathId)
         {

@@ -72,9 +72,7 @@ internal partial class SelectResultsViewModel : ObservableBase
 
     public virtual void UpdateSelectedCells(string value)
     {
-        vm.MessageBoxService.SimpleDialog("Error", 
-            "Can't edit this query", 
-            "You can't edit cells in this query, because this is not a simple SELECT query.").ListenErrors();
+        vm.UserQuestions.InformCantEditNonSelectAsync().ListenErrors();
     }
 
     protected void MarkRowAsDeleted(int rowIndex)
@@ -117,7 +115,7 @@ internal partial class SelectResultsViewModel : ObservableBase
         return deletedRows.Contains(rowIndex);
     }
     
-    public void OverrideValue(int rowIndex, int cellIndex, string? value)
+    protected void OverrideValue(int rowIndex, int cellIndex, string? value)
     {
         if (!overrides.TryGetValue(rowIndex, out var rowOverride))
             rowOverride = overrides[rowIndex] = new Dictionary<int, string?>();
@@ -126,7 +124,7 @@ internal partial class SelectResultsViewModel : ObservableBase
         RaisePropertyChanged(nameof(TitleWithModifiedStatus));
     }
     
-    public void ResetChanges()
+    protected void ResetChanges()
     {
         deletedRows.Clear();
         overrides.Clear();

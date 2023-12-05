@@ -61,7 +61,7 @@ internal partial class SchemaViewModel : ObservableBase, INamedParentType
             if (@is)
             {
                 loadToken = new CancellationTokenSource();
-                LoadTablesAsync(loadToken.Token).ListenErrors(ParentViewModel.MessageBoxService);
+                LoadTablesAsync(loadToken.Token).ListenErrors();
             }
             else
                 loadToken = null;
@@ -79,19 +79,24 @@ internal partial class SchemaViewModel : ObservableBase, INamedParentType
         try
         {
             await using var session = await connection.OpenSessionAsync();
-            
+
             if (token.IsCancellationRequested)
                 return;
-            
+
             tablesAndViews = await session.GetTablesAsync(SchemaName, token);
 
             if (token.IsCancellationRequested)
                 return;
-            
+
             routines = await session.GetRoutinesAsync(SchemaName, token);
-            
+
             if (token.IsCancellationRequested)
                 return;
+        }
+        catch (Exception e)
+        {
+            await ParentViewModel.UserQuestionsService.ConnectionsErrorAsync(e);
+            throw;
         }
         finally
         {

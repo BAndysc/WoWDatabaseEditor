@@ -17,6 +17,7 @@ public interface IActionOutput
     
     DateTime? TimeFinished { get; set; }
     string Response { get; set; }
+    Exception? Exception { get; set; }
     ActionStatus Status { get; set; }
 }
 

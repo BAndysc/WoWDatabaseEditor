@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Reactive.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -29,12 +28,14 @@ using WDE.Common.History;
 using WDE.Common.Managers;
 using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
+using WDE.Common.Tasks;
 using WDE.Common.Types;
 using WDE.MVVM.Observable;
 using WDE.SqlWorkbench.Models;
 using WDE.SqlWorkbench.Services.ActionsOutput;
 using WDE.SqlWorkbench.Services.Connection;
 using WDE.SqlWorkbench.Services.QueryUtils;
+using WDE.SqlWorkbench.Services.UserQuestions;
 using WDE.SqlWorkbench.Settings;
 using WDE.SqlWorkbench.Utils;
 using TextDocument = AvaloniaEdit.Document.TextDocument;
@@ -43,7 +44,7 @@ namespace WDE.SqlWorkbench.ViewModels;
 
 internal partial class SqlWorkbenchViewModel : ObservableBase, IProblemSourceDocument
 {
-    public IMessageBoxService MessageBoxService { get; }
+    public IUserQuestionsService UserQuestions { get; }
     public IClipboardService ClipboardService { get; }
     private const int MaxDocumentLength = 500_000;
     public enum LanguageServerStateEnum
@@ -103,8 +104,7 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, IProblemSourceDoc
     
     [Notify] private SelectResultsViewModel? selectedResult;
     
-    public ObservableCollection<SelectResultsViewModel> Results { get; } =
-        new ObservableCollection<SelectResultsViewModel>();
+    public ObservableCollection<SelectResultsViewModel> Results { get; } = new();
 
     public bool HasAnyResults => Results.Count > 0;
     
@@ -141,18 +141,19 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, IProblemSourceDoc
         _ => throw new ArgumentOutOfRangeException()
     };
     
-    private IMySqlSession mySqlSession = null!;
+    [Notify] private IMySqlSession? mySqlSession = null;
     
     public SqlWorkbenchViewModel(IActionsOutputService actionsOutputService,
         ISqlLanguageServer languageServer,
         IConfigureService configureService,
         IQueryUtility queryUtility,
-        IMessageBoxService messageBoxService,
+        IUserQuestionsService userQuestions,
         ISqlWorkbenchPreferences preferences,
         IClipboardService clipboardService,
+        IMainThread mainThread,
         IConnection connection)
     {
-        MessageBoxService = messageBoxService;
+        UserQuestions = userQuestions;
         ClipboardService = clipboardService;
         this.actionsOutputService = actionsOutputService;
         this.languageServer = languageServer;
@@ -180,7 +181,7 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, IProblemSourceDoc
                     x.Item.PropertyChanged -= OnResultPropertyChanged;
             }));
         
-        AutoDispose(DispatcherTimer.Run(() =>
+        AutoDispose(mainThread.StartTimer(() =>
         {
             RaisePropertyChanged(nameof(IsSessionOpened));
             return true;
@@ -290,23 +291,23 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, IProblemSourceDoc
         Task Execute(string query)
         {
             var action = actionsOutputService.Create(query);
-            return mySqlSession.ScheduleAsync((token, executor) => ExecuteSingleAsync(executor, query, token, action));
+            return mySqlSession!.ScheduleAsync((token, executor) => ExecuteSingleAsync(executor, query, token, action));
         }
 
         CommitCommand = new AsyncAutoCommand(async () =>
         {
             await Execute("COMMIT");
-        }, () => !TaskRunning);
+        }, () => !TaskRunning && mySqlSession != null);
         RollbackCommand = new AsyncAutoCommand(async () =>
         {
             await Execute("ROLLBACK");
-        }, () => !TaskRunning);
+        }, () => !TaskRunning && mySqlSession != null);
         ToggleIsAutoCommit = new AsyncAutoCommand(async () =>
         {
             await this.connection.SetAutoCommitAsync(!IsAutoCommit);
         }, () => !TaskRunning);
-        ExecuteAllCommand = new AsyncAutoCommand(ExecuteAllAsync, () => !TaskRunning);
-        ExecuteSelectedCommand = new AsyncAutoCommand(ExecuteSelectedAsync, () => !TaskRunning);
+        ExecuteAllCommand = new AsyncAutoCommand(ExecuteAllAsync, () => !TaskRunning && mySqlSession != null);
+        ExecuteSelectedCommand = new AsyncAutoCommand(ExecuteSelectedAsync, () => !TaskRunning && mySqlSession != null);
         BeautifyCommand = new AsyncAutoCommand(async () =>
         {
             if (languageServerInstance == null)
@@ -315,7 +316,7 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, IProblemSourceDoc
             try
             {
                 IsEnabled = false;
-                await mySqlSession.ScheduleAsync(async (token, _) =>
+                await mySqlSession!.ScheduleAsync(async (token, _) =>
                 {
                     var task = languageServerInstance.FormatAsync(token);
                     var edits = await task;
@@ -331,43 +332,43 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, IProblemSourceDoc
             {
                 IsEnabled = true;
             }
-        }, () => !TaskRunning);
+        }, () => !TaskRunning && mySqlSession != null);
         
         StopQueryExecutionCommand = new AsyncAutoCommand(async () =>
         {
-            if (mySqlSession.AnyTaskInSession())
+            if (mySqlSession!.AnyTaskInSession())
                 await mySqlSession.CancelAllAsync();
             else
             {
-                if (await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
-                        .SetTitle("Question")
-                        .SetMainInstruction("Do you want to cancel all tasks in the connection?")
-                        .SetContent("The current running task doesn't belong to this tab, however it does belong to some another tab which shares the same connection. Do you want to stop all tasks in the connection?")
-                        .WithYesButton(true)
-                        .WithCancelButton(false)
-                        .Build()))
-                {
+                if (await userQuestions.CancelAllTasksInConnectionsAsync())
                     await connection.CancelAllAsync();
-                
-                }
             }
-        }, () => TaskRunning);
+        }, () => TaskRunning && mySqlSession != null);
         
         StopAllTasksInConnectionCommand = new AsyncAutoCommand(async () =>
         {
             await connection.CancelAllAsync();
         }, () => TaskRunning);
+
+        void RaiseCommandsCanExecute()
+        {
+            ExecuteAllCommand!.RaiseCanExecuteChanged();
+            ExecuteSelectedCommand!.RaiseCanExecuteChanged();
+            BeautifyCommand!.RaiseCanExecuteChanged();
+            StopQueryExecutionCommand!.RaiseCanExecuteChanged();
+            StopAllTasksInConnectionCommand!.RaiseCanExecuteChanged();
+            CommitCommand!.RaiseCanExecuteChanged();
+            RollbackCommand!.RaiseCanExecuteChanged();
+            ToggleIsAutoCommit!.RaiseCanExecuteChanged();
+        }
         
         On(() => TaskRunning, _ =>
         {
-            ExecuteAllCommand.RaiseCanExecuteChanged();
-            ExecuteSelectedCommand.RaiseCanExecuteChanged();
-            BeautifyCommand.RaiseCanExecuteChanged();
-            StopQueryExecutionCommand.RaiseCanExecuteChanged();
-            StopAllTasksInConnectionCommand.RaiseCanExecuteChanged();
-            CommitCommand.RaiseCanExecuteChanged();
-            RollbackCommand.RaiseCanExecuteChanged();
-            ToggleIsAutoCommit.RaiseCanExecuteChanged();
+            RaiseCommandsCanExecute(); 
+        });
+        On(() => MySqlSession, _ =>
+        {
+            RaiseCommandsCanExecute(); 
         });
         
         ConnectAsync().ListenErrors();
@@ -378,22 +379,15 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, IProblemSourceDoc
         if (!results.IsModified)
             return true;
 
-        var result = await MessageBoxService.ShowDialog(new MessageBoxFactory<int>()
-            .SetTitle("Warning")
-            .SetMainInstruction($"{results.Title} has pending changes. Do you want to apply them?")
-            .SetContent("If you don't apply them, they will be lost.")
-            .WithYesButton(0)
-            .WithNoButton(1)
-            .WithCancelButton(2)
-            .Build());
+        var result = await UserQuestions.ApplyPendingChangesAsync(results.Title);
 
-        if (result == 0)
+        if (result == SaveDialogResult.Save)
         {
             if (!await results.SaveAsync())
                 return false;
             return true;
         }
-        else if (result == 1)
+        else if (result == SaveDialogResult.DontSave)
         {
             return true;
         }
@@ -415,16 +409,16 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, IProblemSourceDoc
         connectTask = tcs.Task;
         try
         {
-            mySqlSession = await connection.OpenSessionAsync();
+            MySqlSession = await connection.OpenSessionAsync();
             if (IsDisposed)
-                await mySqlSession.DisposeAsync();
+                await MySqlSession.DisposeAsync();
             else
-                AutoDispose(new ActionDisposable(() => mySqlSession.DisposeAsync().AsTask().ListenErrors()));
+                AutoDispose(new ActionDisposable(() => MySqlSession.DisposeAsync().AsTask().ListenErrors()));
             IsConnecting = false;
         }
         catch (Exception e)
         {
-            await MessageBoxService.SimpleDialog("Error", "Couldn't open MySQL connection", e.Message);
+            await UserQuestions.ConnectionsErrorAsync(e);
         }
         finally
         {
@@ -436,7 +430,7 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, IProblemSourceDoc
     public Task ExecuteAndOverrideResultsAsync(string query, SelectSingleTableViewModel result)
     {
         var action = actionsOutputService.Create(query);
-        return mySqlSession.ScheduleAsync((token, executor) => ExecuteSingleAsync(executor, query, token, action, result));
+        return mySqlSession!.ScheduleAsync((token, executor) => ExecuteSingleAsync(executor, query, token, action, result));
     }
 
     private async Task ExecuteSelectedAsync()
@@ -455,7 +449,7 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, IProblemSourceDoc
         var query = Document.GetText(range.Value.Start, range.Value.Length);
         var action = actionsOutputService.Create(query);
 
-        await mySqlSession.ScheduleAsync((token, executor) => ExecuteSingleAsync(executor, query, token, action));
+        await mySqlSession!.ScheduleAsync((token, executor) => ExecuteSingleAsync(executor, query, token, action));
     }
 
     public async Task ExecuteAsync(IReadOnlyList<string> queries, bool continueOnError, bool throwOnError, bool rollbackOnError)
@@ -469,7 +463,7 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, IProblemSourceDoc
         // we do it before schedule, so that the action is added to the UI list before the execution starts
         var action = actionsOutputService.Create(queries[0]);
 
-        await mySqlSession.ScheduleAsync(async (token, executor) =>
+        await mySqlSession!.ScheduleAsync(async (token, executor) =>
         {
             for (var index = 0; index < queries.Count; index++)
             {
@@ -588,6 +582,7 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, IProblemSourceDoc
         {
             action.TimeFinished = DateTime.Now;
             action.Response = "Error: " + e.Message;
+            action.Exception = e;
             action.Status = ActionStatus.Error;
             throw;
         }

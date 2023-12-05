@@ -96,13 +96,20 @@ internal partial class SelectSingleTableViewModel : SelectResultsViewModel
         }, () => RowsHaveFullPrimaryKey);
         CopyInsertCommand = new DelegateCommand(() =>
         {
-            if (TryGenerateInsert(Selection.All(), out var insert))
+            if (TryGenerateInsert(Selection.All(), false, out var insert))
                 vm.ClipboardService.SetText(insert);
         });
         ApplyChangesCommand = new AsyncAutoCommand(async () =>
         {
-            await ApplyChangesAsync();
-        }).WrapMessageBox<Exception>(vm.MessageBoxService);
+            try
+            {
+                await ApplyChangesAsync();
+            }
+            catch (Exception e)
+            {
+                await vm.UserQuestions.SaveErrorAsync(e);   
+            }
+        });
         RevertChangesCommand = new AsyncAutoCommand(async () =>
         {
             ResetChanges();
@@ -140,11 +147,14 @@ internal partial class SelectSingleTableViewModel : SelectResultsViewModel
         return value;
     }
 
-    private bool TryGenerateInsert(IEnumerable<int> rows, out string insert)
+    private bool TryGenerateInsert(IEnumerable<int> rows, bool skipDeleted, out string insert)
     {
         List<string> inserts = new();
         foreach (var rowIndex in rows)
         {
+            if (skipDeleted && IsRowMarkedAsDeleted(rowIndex))
+                continue;
+            
             List<string> columns = new();
             for (int columnIndex = 1; columnIndex < Columns.Count; ++columnIndex)
                 columns.Add(ColumnValueToMySqlRepresentation(columnIndex, GetValue(rowIndex, columnIndex)));
@@ -211,7 +221,7 @@ internal partial class SelectSingleTableViewModel : SelectResultsViewModel
             queries.Add($"UPDATE {selectSpecs.From} SET {set} WHERE {where}");
         }
 
-        if (TryGenerateInsert(Enumerable.Range(Results.AffectedRows, AdditionalRowsCount), out var insert))
+        if (TryGenerateInsert(Enumerable.Range(Results.AffectedRows, AdditionalRowsCount), true, out var insert))
             queries.Add(insert);
 
         return queries;
@@ -222,13 +232,7 @@ internal partial class SelectSingleTableViewModel : SelectResultsViewModel
         if (!IsModified)
             return true;
         
-        var result = await vm.MessageBoxService.ShowDialog(new MessageBoxFactory<bool>()
-            .SetTitle("Warning")
-            .SetMainInstruction("Do you want to revert changes?")
-            .SetContent("You have unsaved changes. Do you want to forget them?")
-            .WithYesButton(true)
-            .WithCancelButton(false)
-            .Build());
+        var result = await vm.UserQuestions.AskToRevertChangesAsync();
         return result;
     }
     
@@ -253,7 +257,7 @@ internal partial class SelectSingleTableViewModel : SelectResultsViewModel
         }
         catch (Exception e)
         {
-            await vm.MessageBoxService.SimpleDialog("Error", "Error while saving changes", e.Message).ListenErrors();
+            await vm.UserQuestions.SaveErrorAsync(e);
             return false;
         }
     }
@@ -298,9 +302,7 @@ internal partial class SelectSingleTableViewModel : SelectResultsViewModel
     {
         if (!RowsHaveFullPrimaryKey)
         {
-            vm.MessageBoxService.SimpleDialog("Error", 
-                "Can't edit this query", 
-                "You can't edit cells in this query, because this SELECT doesn't have a full primary key.").ListenErrors();
+            vm.UserQuestions.NoFullPrimaryKeyAsync().ListenErrors();
             return false;
         }
 

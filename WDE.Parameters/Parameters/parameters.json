@@ -2865,5 +2865,11 @@
 			"2": {"name": "GO_ACTIVATED"},
 			"3": {"name": "GO_JUST_DEACTIVATED"}
 		}
+	},
+	"SoundKitPlayTypeParameter": {
+		"values": {
+			"0": "normal",
+			"1": "object sound"
+		}
 	}
 }
