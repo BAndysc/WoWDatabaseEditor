@@ -49,6 +49,7 @@ internal readonly struct SelectResult
 internal enum ColumnTypeCategory
 {
     Unknown,
+    Binary,
     String,
     Number,
     DateTime,
@@ -73,11 +74,27 @@ internal interface IMySqlDataReader
     double GetDouble(int ordinal);
     float GetFloat(int ordinal);
     DateTime GetDateTime(int ordinal);
-    DateTimeOffset GetDateTimeOffset(int ordinal);
-    Guid GetGuid(int ordinal);
     TimeSpan GetTimeSpan(int ordinal);
     long GetBytes(int ordinal, long dataOffset, byte[]? buffer, int bufferOffset, int length);
     MySqlDateTime GetMySqlDateTime(int ordinal);
+}
+
+internal static class ColumnDataExtensions
+{
+    public static string? GetFullToString(this IColumnData columnData, int rowIndex)
+    {
+        if (columnData.IsNull(rowIndex))
+            return null;
+        
+        if (columnData is BinaryColumnData binary)
+        {
+            var bytes = binary[rowIndex];
+            var str = Convert.ToHexString(bytes);
+            return str;
+        }
+        
+        return columnData.GetToString(rowIndex);
+    }
 }
 
 internal interface IColumnData
@@ -109,8 +126,6 @@ internal interface IColumnData
             return new Int64ColumnData();
         else if (dataType == typeof(ulong))
             return new UInt64ColumnData();
-        else if (dataType == typeof(char))
-            return new CharColumnData();
         else if (dataType == typeof(decimal))
             return new DecimalColumnData();
         else if (dataType == typeof(double))
@@ -121,10 +136,6 @@ internal interface IColumnData
             return new MySqlDateTimeColumnData();
         else if (dataType == typeof(DateTime))
             return new DateTimeColumnData();
-        else if (dataType == typeof(DateTimeOffset))
-            return new DateTimeOffsetColumnData();
-        else if (dataType == typeof(Guid))
-            return new GuidColumnData();
         else if (dataType == typeof(TimeSpan))
             return new TimeSpanColumnData();
         else if (dataType == typeof(byte[]))
@@ -466,37 +477,6 @@ internal class UInt64ColumnData : IColumnData
     public ColumnTypeCategory Category => ColumnTypeCategory.Number;
 }
 
-internal class CharColumnData : IColumnData
-{
-    private readonly List<char> data = new ();
-    private readonly BitArray nulls = new (0);
-    
-    public void Append(IMySqlDataReader reader, int ordinal)
-    {
-        if (data.Count == nulls.Length)
-            nulls.Length = nulls.Length * 2 + 1;
-
-        if (reader.IsDBNull(ordinal))
-        {
-            nulls[data.Count] = true;
-            data.Add(default);
-        }
-        else
-            data.Add(reader.GetChar(ordinal));
-    }
-
-    public string? GetToString(int rowIndex)
-    {
-        return nulls[rowIndex] ? null : data[rowIndex].ToString();
-    }
-
-    public bool IsNull(int rowIndex) => nulls[rowIndex];
-    
-    public char this[int index] => data[index];
-    
-    public ColumnTypeCategory Category => ColumnTypeCategory.Unknown;
-}
-
 internal class DecimalColumnData : IColumnData
 {
     private readonly List<decimal> data = new ();
@@ -611,7 +591,7 @@ internal class DateTimeColumnData : IColumnData
 
     public string? GetToString(int rowIndex)
     {
-        return nulls[rowIndex] ? null : data[rowIndex].ToString();
+        return nulls[rowIndex] ? null : data[rowIndex].ToString("yyyy-MM-dd HH:mm:ss");
     }
 
     public bool IsNull(int rowIndex) => nulls[rowIndex];
@@ -619,68 +599,6 @@ internal class DateTimeColumnData : IColumnData
     public DateTime this[int index] => data[index];
     
     public ColumnTypeCategory Category => ColumnTypeCategory.DateTime;
-}
-
-internal class DateTimeOffsetColumnData : IColumnData
-{
-    private readonly List<DateTimeOffset> data = new ();
-    private readonly BitArray nulls = new (0);
-    
-    public void Append(IMySqlDataReader reader, int ordinal)
-    {
-        if (data.Count == nulls.Length)
-            nulls.Length = nulls.Length * 2 + 1;
-
-        if (reader.IsDBNull(ordinal))
-        {
-            nulls[data.Count] = true;
-            data.Add(default);
-        }
-        else
-            data.Add(reader.GetDateTimeOffset(ordinal));
-    }
-
-    public string? GetToString(int rowIndex)
-    {
-        return nulls[rowIndex] ? null : data[rowIndex].ToString();
-    }
-
-    public bool IsNull(int rowIndex) => nulls[rowIndex];
-    
-    public DateTimeOffset this[int index] => data[index];
-    
-    public ColumnTypeCategory Category => ColumnTypeCategory.Unknown;
-}
-
-internal class GuidColumnData : IColumnData
-{
-    private readonly List<Guid> data = new ();
-    private readonly BitArray nulls = new (0);
-    
-    public void Append(IMySqlDataReader reader, int ordinal)
-    {
-        if (data.Count == nulls.Length)
-            nulls.Length = nulls.Length * 2 + 1;
-
-        if (reader.IsDBNull(ordinal))
-        {
-            nulls[data.Count] = true;
-            data.Add(default);
-        }
-        else
-            data.Add(reader.GetGuid(ordinal));
-    }
-
-    public string? GetToString(int rowIndex)
-    {
-        return nulls[rowIndex] ? null : data[rowIndex].ToString();
-    }
-
-    public bool IsNull(int rowIndex) => nulls[rowIndex];
-    
-    public Guid this[int index] => data[index];
-    
-    public ColumnTypeCategory Category => ColumnTypeCategory.Unknown;
 }
 
 internal class TimeSpanColumnData : IColumnData
@@ -704,14 +622,18 @@ internal class TimeSpanColumnData : IColumnData
 
     public string? GetToString(int rowIndex)
     {
-        return nulls[rowIndex] ? null : data[rowIndex].ToString();
+        if (nulls[rowIndex])
+            return null;
+
+        var timeSpan = data[rowIndex];
+        return $"{(int)timeSpan.TotalHours:00}:{Math.Abs(timeSpan.Minutes):00}:{Math.Abs(timeSpan.Seconds):00}";
     }
 
     public bool IsNull(int rowIndex) => nulls[rowIndex];
     
     public TimeSpan this[int index] => data[index];
     
-    public ColumnTypeCategory Category => ColumnTypeCategory.Unknown;
+    public ColumnTypeCategory Category => ColumnTypeCategory.DateTime;
 }
 
 internal class BinaryColumnData : IColumnData
@@ -722,6 +644,8 @@ internal class BinaryColumnData : IColumnData
     private byte[] data = new byte[0];
     private int bytesCount = 0;
     private int bytesCapacity = 0;
+    
+    public const int MaxToStringLength = 32768;
     
     public void Append(IMySqlDataReader reader, int ordinal)
     {
@@ -763,9 +687,9 @@ internal class BinaryColumnData : IColumnData
             return cached;
         
         var span = this[rowIndex];
-        var str = Convert.ToHexString(span.Slice(0, Math.Min(span.Length, 32768)));
+        var str = Convert.ToHexString(span.Slice(0, Math.Min(span.Length, MaxToStringLength)));
         
-        if (span.Length > 32768)
+        if (span.Length > MaxToStringLength)
             str += "...";
         
         cachedStrings[rowIndex] = str;
@@ -784,7 +708,7 @@ internal class BinaryColumnData : IColumnData
         }
     }
     
-    public ColumnTypeCategory Category => ColumnTypeCategory.Unknown;
+    public ColumnTypeCategory Category => ColumnTypeCategory.Binary;
 }
 
 internal class MySqlDateTimeColumnData : IColumnData

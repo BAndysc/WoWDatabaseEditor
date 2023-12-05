@@ -90,13 +90,13 @@ build_script:
   
     curl -fsSL -o bin/wowdatabaseeditor-avalonia-linux/libcasc.so https://github.com/BAndysc/StormCascLibBinary/releases/download/linux/libcasc.so
       
-    mkdir bin/wowdatabaseeditor-avalonia-win/sqls
+    mkdir bin\wowdatabaseeditor-avalonia-win\sqls
       
     curl -fsSL -o bin/wowdatabaseeditor-avalonia-win/sqls/sqls.tar.gz https://github.com/BAndysc/sqls/releases/download/v0.2.22/sqls_0.2.22_Windows_x86_64.tar.gz
       
     7z x bin/wowdatabaseeditor-avalonia-win/sqls/sqls.tar.gz -so | 7z x -si -ttar -obin/wowdatabaseeditor-avalonia-win/sqls/
       
-    del /f bin/wowdatabaseeditor-avalonia-win/sqls/sqls.tar.gz
+    del /f bin\wowdatabaseeditor-avalonia-win\sqls\sqls.tar.gz
     
     Rem Mac OS Bundle
 

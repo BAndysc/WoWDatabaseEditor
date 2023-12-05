@@ -10,6 +10,7 @@ public interface IMultiIndexContainer
     void Remove(int index);
     bool Contains(int index);
     void Clear();
+    void Replace(int newStart, int newEnd);
     IEnumerable<int> All();
     IEnumerable<int> AllReversed();
     IEfficientContainsIterator ContainsIterator { get; }
@@ -210,6 +211,19 @@ public class MultiIndexContainer : IMultiIndexContainer
     {
         ranges.Clear();
         Cleared?.Invoke();
+        Changed?.Invoke();
+    }
+    
+    public void Replace(int newStart, int newEnd)
+    {
+        ranges.Clear();
+        Cleared?.Invoke();
+        ranges.Add((newStart, newEnd));
+        if (Added != null)
+        {
+            for (int i = newStart; i <= newEnd; ++i)
+                Added(i);
+        }
         Changed?.Invoke();
     }
 

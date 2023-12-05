@@ -7,6 +7,12 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="viewModels:SelectResultsViewModel"
              x:Class="WDE.SqlWorkbench.Views.SelectResultsView">
+  <UserControl.KeyBindings>
+    <KeyBinding Gesture="Ctrl+A" Command="{CompiledBinding SelectAllCommand}" />
+    <KeyBinding Gesture="Cmd+A" Command="{CompiledBinding SelectAllCommand}" />
+    <KeyBinding Gesture="Ctrl+C" Command="{CompiledBinding CopySelectedCommand}" />
+    <KeyBinding Gesture="Cmd+C" Command="{CompiledBinding CopySelectedCommand}" />
+  </UserControl.KeyBindings>
   <DockPanel>
     <TextBlock DockPanel.Dock="Bottom" HorizontalAlignment="Center" Text="{CompiledBinding Count, StringFormat={}{0} Rows}"></TextBlock>
     

@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using WDE.Common.Providers;
 using WDE.Common.Services.MessageBox;
 using WDE.Module.Attributes;
 
@@ -10,10 +11,13 @@ namespace WDE.SqlWorkbench.Services.UserQuestions;
 internal class UserQuestionsService : IUserQuestionsService
 {
     private readonly IMessageBoxService messageBoxService;
+    private readonly IInputBoxService inputBoxService;
 
-    public UserQuestionsService(IMessageBoxService messageBoxService)
+    public UserQuestionsService(IMessageBoxService messageBoxService,
+        IInputBoxService inputBoxService)
     {
         this.messageBoxService = messageBoxService;
+        this.inputBoxService = inputBoxService;
     }
     
     public async Task<bool> CancelAllTasksInConnectionsAsync()
@@ -84,5 +88,10 @@ internal class UserQuestionsService : IUserQuestionsService
             .WithYesButton(true)
             .WithCancelButton(false)
             .Build());
+    }
+
+    public Task<string?> AskForNewViewNameAsync()
+    {
+        return inputBoxService.GetString("New view name", "Enter new view name", "NewView");
     }
 }

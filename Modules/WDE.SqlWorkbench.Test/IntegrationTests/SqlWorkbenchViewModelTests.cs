@@ -111,8 +111,8 @@ internal class SqlWorkbenchViewModelTests
         Assert.AreEqual(2, results.Columns.Count);
         CollectionAssert.AreEqual(new string[]{"#", "Tables_in_world"}, results.Columns.Select(x => x.Header));
         Assert.AreEqual(1, results.Count);
-        Assert.AreEqual(null, results.GetValue(0, 0));
-        Assert.AreEqual("tab", results.GetValue(0, 1));
+        Assert.AreEqual(null, results.GetShortValue(0, 0));
+        Assert.AreEqual("tab", results.GetShortValue(0, 1));
         
         results.UpdateSelectedCells("abc");
         userQuestionsService.Received().InformCantEditNonSelectAsync();
@@ -146,14 +146,14 @@ internal class SqlWorkbenchViewModelTests
         Assert.AreEqual(2, results.Columns.Count);
         CollectionAssert.AreEqual(new []{"#", "b"}, results.Columns.Select(x => x.Header));
         Assert.AreEqual(1, results.Count);
-        Assert.AreEqual(null, results.GetValue(0, 0));
-        Assert.AreEqual("text", results.GetValue(0, 1));
+        Assert.AreEqual(null, results.GetShortValue(0, 0));
+        Assert.AreEqual("text", results.GetShortValue(0, 1));
 
         results.SelectedCellIndex = 1;
         results.Selection.Add(0);
         results.UpdateSelectedCells("newText");
         userQuestionsService.Received().NoFullPrimaryKeyAsync();
-        Assert.AreEqual("text", results.GetValue(0, 1));
+        Assert.AreEqual("text", results.GetShortValue(0, 1));
         
         CollectionAssert.AreEqual(new []
         {
@@ -184,25 +184,25 @@ internal class SqlWorkbenchViewModelTests
         Assert.AreEqual(2, results.Columns.Count);
         CollectionAssert.AreEqual(new []{"#", "a"}, results.Columns.Select(x => x.Header));
         Assert.AreEqual(1, results.Count);
-        Assert.AreEqual(null, results.GetValue(0, 0));
-        Assert.AreEqual("5", results.GetValue(0, 1));
+        Assert.AreEqual(null, results.GetShortValue(0, 0));
+        Assert.AreEqual("5", results.GetShortValue(0, 1));
         
         results.SelectedCellIndex = 1;
         results.Selection.Add(0);
         results.UpdateSelectedCells("3");
-        Assert.AreEqual("3", results.GetValue(0, 1));
+        Assert.AreEqual("3", results.GetShortValue(0, 1));
         Assert.IsTrue(results.IsModified);
         Assert.IsTrue(vm.IsModified);
         
         userQuestionsService.ConfirmExecuteQueryAsync("START TRANSACTION").Returns(true);
-        userQuestionsService.ConfirmExecuteQueryAsync("ROLLBACK").Returns(true);
+        userQuestionsService.ConfirmExecuteQueryAsync("COMMIT").Returns(true);
         userQuestionsService.ConfirmExecuteQueryAsync("UPDATE `tab` SET `a` = 3 WHERE `a` = 5").Returns(true);
         Assert.IsTrue(results.ApplyChangesCommand.CanExecute(null));
         await results.ApplyChangesCommand.ExecuteAsync();
-        Assert.IsTrue(actionsOutputService.Actions[2].IsFail);
+        Assert.IsTrue(actionsOutputService.Actions[2].IsSuccess);
         
         userQuestionsService.Received().ConfirmExecuteQueryAsync("START TRANSACTION");
-        userQuestionsService.Received().ConfirmExecuteQueryAsync("ROLLBACK");
+        userQuestionsService.Received().ConfirmExecuteQueryAsync("COMMIT");
         userQuestionsService.Received().ConfirmExecuteQueryAsync("UPDATE `tab` SET `a` = 3 WHERE `a` = 5");
         
         CollectionAssert.AreEqual(new []
@@ -212,7 +212,7 @@ internal class SqlWorkbenchViewModelTests
             "SHOW COLUMNS FROM `tab`",
             "START TRANSACTION",
             "UPDATE `tab` SET `a` = 3 WHERE `a` = 5",
-            "ROLLBACK"
+            "COMMIT"
         }, connector.ExecutedQueries);
     }
 
@@ -253,10 +253,10 @@ internal class SqlWorkbenchViewModelTests
         userQuestionsService.ConfirmExecuteQueryAsync(default).ReturnsForAnyArgs(true);
         Assert.IsTrue(results.ApplyChangesCommand.CanExecute(null));
         await results.ApplyChangesCommand.ExecuteAsync();
-        Assert.IsTrue(actionsOutputService.Actions[2].IsFail);
+        Assert.IsTrue(actionsOutputService.Actions[2].IsSuccess);
         
         userQuestionsService.Received().ConfirmExecuteQueryAsync("START TRANSACTION");
-        userQuestionsService.Received().ConfirmExecuteQueryAsync("ROLLBACK");
+        userQuestionsService.Received().ConfirmExecuteQueryAsync("COMMIT");
         userQuestionsService.Received().ConfirmExecuteQueryAsync("INSERT INTO `tab` (`b`, `a`) VALUES\n(NULL, NULL),\n('txt', 3)");
         
         CollectionAssert.AreEqual(new []
@@ -266,7 +266,7 @@ internal class SqlWorkbenchViewModelTests
             "SHOW COLUMNS FROM `tab`",
             "START TRANSACTION",
             "INSERT INTO `tab` (`b`, `a`) VALUES\n(NULL, NULL),\n('txt', 3)",
-            "ROLLBACK"
+            "COMMIT"
         }, connector.ExecutedQueries);
     }
     
@@ -307,10 +307,10 @@ internal class SqlWorkbenchViewModelTests
         userQuestionsService.ConfirmExecuteQueryAsync(default).ReturnsForAnyArgs(true);
         Assert.IsTrue(results.ApplyChangesCommand.CanExecute(null));
         await results.ApplyChangesCommand.ExecuteAsync();
-        Assert.IsTrue(actionsOutputService.Actions[2].IsFail);
+        Assert.IsTrue(actionsOutputService.Actions[2].IsSuccess);
         
         userQuestionsService.Received().ConfirmExecuteQueryAsync("START TRANSACTION");
-        userQuestionsService.Received().ConfirmExecuteQueryAsync("ROLLBACK");
+        userQuestionsService.Received().ConfirmExecuteQueryAsync("COMMIT");
         userQuestionsService.Received().ConfirmExecuteQueryAsync("INSERT INTO `tab` (`b`, `a`) VALUES\n('abc', 2)");
         
         CollectionAssert.AreEqual(new []
@@ -320,7 +320,171 @@ internal class SqlWorkbenchViewModelTests
             "SHOW COLUMNS FROM `tab`",
             "START TRANSACTION",
             "INSERT INTO `tab` (`b`, `a`) VALUES\n('abc', 2)",
+            "COMMIT"
+        }, connector.ExecutedQueries);
+    }
+    
+    [Test]
+    public async Task Test_Insert_NoConfirmCancelsTask()
+    {
+        using var vm = CreateConnectedViewModel();
+        var worldDb = mockServer.CreateDatabase("world");
+        var table = worldDb.CreateTable("tab", TableType.Table, new []{typeof(int), typeof(string)}, new ColumnInfo("a", "int", false, true, true, null),
+            new ColumnInfo("b", "varchar", false, false, false, null));
+        
+        vm.Document.Insert(0, "SELECT `b`, `a` FROM `tab`");
+        await vm.ExecuteAllCommand.ExecuteAsync();
+
+        var results = (SelectSingleTableViewModel)vm.Results[0];
+        results.AddRowCommand.Execute(null);
+        
+        userQuestionsService.ConfirmExecuteQueryAsync("START TRANSACTION").Returns(true);
+        userQuestionsService.ConfirmExecuteQueryAsync("ROLLBACK").Returns(true);
+        Assert.IsTrue(results.ApplyChangesCommand.CanExecute(null));
+        await results.ApplyChangesCommand.ExecuteAsync();
+        Assert.IsTrue(actionsOutputService.Actions[2].IsFail);
+        Assert.IsTrue(actionsOutputService.Actions[2].Response.Contains("cancel", StringComparison.OrdinalIgnoreCase));
+        Assert.IsTrue(actionsOutputService.Actions[3].IsSuccess);
+        Assert.AreEqual("ROLLBACK", actionsOutputService.Actions[3].OriginalQuery);
+        
+        userQuestionsService.Received().ConfirmExecuteQueryAsync("START TRANSACTION");
+        userQuestionsService.Received().ConfirmExecuteQueryAsync("ROLLBACK");
+        userQuestionsService.Received().ConfirmExecuteQueryAsync("INSERT INTO `tab` (`b`, `a`) VALUES\n(NULL, NULL)");
+        
+        CollectionAssert.AreEqual(new []
+        {
+            "SELECT `b`, `a` FROM `tab`",
+            "SHOW FULL TABLES;",
+            "SHOW COLUMNS FROM `tab`",
+            "START TRANSACTION",
             "ROLLBACK"
+        }, connector.ExecutedQueries);
+    }
+    
+    [Test]
+    public async Task Test_Insert_Formats()
+    {
+        using var vm = CreateConnectedViewModel();
+        var worldDb = mockServer.CreateDatabase("world");
+        var table = worldDb.CreateTable("tab", TableType.Table, new []
+            {
+                typeof(string),
+                typeof(bool),
+                typeof(byte),
+                typeof(sbyte),
+                typeof(short),
+                typeof(ushort),
+                typeof(int),
+                typeof(uint),
+                typeof(long),
+                typeof(ulong),
+                typeof(decimal),
+                typeof(double),
+                typeof(float),
+                typeof(MySqlDateTime),
+                typeof(DateTime),
+                typeof(TimeSpan),
+                typeof(byte[])
+            }, 
+            new ColumnInfo("a", "varchar(64)", false, false, false, null),
+            new ColumnInfo("b", "tinyint(1)", false, false, false, null),
+            new ColumnInfo("c", "tinyint unsigned", false, false, false, null),
+            new ColumnInfo("d", "tinyint", false, false, false, null),
+            new ColumnInfo("e", "smallint", false, false, false, null),
+            new ColumnInfo("f", "smallint unsigned", false, false, false, null),
+            new ColumnInfo("g", "int", false, false, false, null),
+            new ColumnInfo("h", "int unsigned", false, false, false, null),
+            new ColumnInfo("i", "bingint", false, false, false, null),
+            new ColumnInfo("j", "bigint unsigned", false, false, false, null),
+            new ColumnInfo("k", "decimal", false, false, false, null),
+            new ColumnInfo("l", "double", false, false, false, null),
+            new ColumnInfo("m", "float", false, false, false, null),
+            new ColumnInfo("n", "datetime", false, false, false, null),
+            new ColumnInfo("o", "TIMESTAMP", false, false, false, null),
+            new ColumnInfo("p", "time", false, false, false, null),
+            new ColumnInfo("q", "binary(64)", false, false, false, null));
+        
+        vm.Document.Insert(0, "SELECT * FROM `tab`");
+        await vm.ExecuteAllCommand.ExecuteAsync();
+
+        var results = (SelectSingleTableViewModel)vm.Results[0];
+
+        results.AddRowCommand.Execute(null);
+        results.AddRowCommand.Execute(null);
+        results.SelectedCellIndex = 1; results.UpdateSelectedCells("abc");
+        results.SelectedCellIndex = 2; results.UpdateSelectedCells("true");
+        results.SelectedCellIndex = 3; results.UpdateSelectedCells("255");
+        results.SelectedCellIndex = 4; results.UpdateSelectedCells("-127");
+        results.SelectedCellIndex = 5; results.UpdateSelectedCells("-32768");
+        results.SelectedCellIndex = 6; results.UpdateSelectedCells("65535");
+        results.SelectedCellIndex = 7; results.UpdateSelectedCells("-2147483648");
+        results.SelectedCellIndex = 8; results.UpdateSelectedCells("4294967295");
+        results.SelectedCellIndex = 9; results.UpdateSelectedCells("-9223372036854775808");
+        results.SelectedCellIndex = 10; results.UpdateSelectedCells("18446744073709551615");
+        results.SelectedCellIndex = 11; results.UpdateSelectedCells("1.1");
+        results.SelectedCellIndex = 12; results.UpdateSelectedCells("1.1");
+        results.SelectedCellIndex = 13; results.UpdateSelectedCells("1.1");
+        results.SelectedCellIndex = 14; results.UpdateSelectedCells("2021-01-01 00:00:00");
+        results.SelectedCellIndex = 15; results.UpdateSelectedCells("NOW()");
+        results.SelectedCellIndex = 16; results.UpdateSelectedCells("20:30:40");
+        results.SelectedCellIndex = 17; results.UpdateSelectedCells("DEADBEEF");
+        
+        userQuestionsService.ConfirmExecuteQueryAsync(default).ReturnsForAnyArgs(true);
+        await results.ApplyChangesCommand.ExecuteAsync();
+        
+        CollectionAssert.AreEqual(new []
+        {
+            "SELECT * FROM `tab`",
+            "SHOW FULL TABLES;",
+            "SHOW COLUMNS FROM `tab`",
+            "START TRANSACTION",
+            @"INSERT INTO `tab` (`a`, `b`, `c`, `d`, `e`, `f`, `g`, `h`, `i`, `j`, `k`, `l`, `m`, `n`, `o`, `p`, `q`) VALUES
+(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('abc', true, 255, -127, -32768, 65535, -2147483648, 4294967295, -9223372036854775808, 18446744073709551615, 1.1, 1.1, 1.1, '2021-01-01 00:00:00', NOW(), '20:30:40', X'DEADBEEF')",
+            "COMMIT"
+        }, connector.ExecutedQueries);
+    }
+    
+    [Test]
+    public async Task Test_Insert_VeryLongBinary()
+    {
+        using var vm = CreateConnectedViewModel();
+        var worldDb = mockServer.CreateDatabase("world");
+        var table = worldDb.CreateTable("tab", TableType.Table, new []
+            {
+                typeof(byte[])
+            }, 
+            new ColumnInfo("a", "binary(64)", false, false, false, null));
+        byte[] longBytes = Enumerable.Range(0, BinaryColumnData.MaxToStringLength + 10).Select(x => (byte)0xAA).ToArray();
+        table.Insert(longBytes);
+        var longBytesAsHex = Convert.ToHexString(longBytes);
+        
+        vm.Document.Insert(0, "SELECT * FROM `tab`");
+        await vm.ExecuteAllCommand.ExecuteAsync();
+
+        var results = (SelectSingleTableViewModel)vm.Results[0];
+        results.Selection.Add(0);
+        results.CopyInsertCommand.Execute(null);
+        clipboard.Received().SetText($@"INSERT INTO `tab` (`a`) VALUES
+(X'{longBytesAsHex}')");
+        results.DuplicateRowCommand.Execute(null);
+
+        results.AddRowCommand.Execute(null);
+        results.SelectedCellIndex = 1; results.UpdateSelectedCells(longBytesAsHex);
+        
+        userQuestionsService.ConfirmExecuteQueryAsync(default).ReturnsForAnyArgs(true);
+        await results.ApplyChangesCommand.ExecuteAsync();
+        
+        CollectionAssert.AreEqual(new []
+        {
+            "SELECT * FROM `tab`",
+            "SHOW FULL TABLES;",
+            "SHOW COLUMNS FROM `tab`",
+            "START TRANSACTION",
+            $@"INSERT INTO `tab` (`a`) VALUES
+(X'{longBytesAsHex}'),
+(X'{longBytesAsHex}')",
+            "COMMIT"
         }, connector.ExecutedQueries);
     }
     
@@ -386,8 +550,8 @@ internal class SqlWorkbenchViewModelTests
         Assert.AreEqual(2, results.Columns.Count);
         CollectionAssert.AreEqual(new string[]{"#", "Tables_in_world"}, results.Columns.Select(x => x.Header));
         Assert.AreEqual(1, results.Count);
-        Assert.AreEqual(null, results.GetValue(0, 0));
-        Assert.AreEqual("tab", results.GetValue(0, 1));
+        Assert.AreEqual(null, results.GetShortValue(0, 0));
+        Assert.AreEqual("tab", results.GetShortValue(0, 1));
         
         results.UpdateSelectedCells("abc");
         userQuestionsService.Received().InformCantEditNonSelectAsync();
