@@ -1734,7 +1734,10 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
         private static int GetDefaultTargetIdForType(SmartScriptType scriptSourceType, SmartGenericJsonData eventData)
         {
-            if (scriptSourceType == SmartScriptType.Creature)
+            if (scriptSourceType is SmartScriptType.Creature
+                or SmartScriptType.GameObject
+                or SmartScriptType.Template
+                or SmartScriptType.TimedActionList)
                 return SmartConstants.TargetSelf;
             
             if (eventData.Invoker != null)
