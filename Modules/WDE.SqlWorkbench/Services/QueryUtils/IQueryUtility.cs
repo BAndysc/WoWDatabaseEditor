@@ -1,4 +1,5 @@
 using System.Text;
+using WDE.SqlWorkbench.Models;
 
 namespace WDE.SqlWorkbench.Services.QueryUtils;
 

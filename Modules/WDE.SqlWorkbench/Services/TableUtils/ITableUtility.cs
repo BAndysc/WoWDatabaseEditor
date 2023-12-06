@@ -9,4 +9,5 @@ internal interface ITableUtility
 {
     void OpenSelectRows(IConnection connection, string schema, string table);
     void InspectTable(IConnection connection, string schema, string table);
+    void AlterTable(IConnection connection, string schema, string? table);
 }

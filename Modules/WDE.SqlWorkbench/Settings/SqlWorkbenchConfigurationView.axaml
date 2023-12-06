@@ -7,6 +7,7 @@
              xmlns:avaloniaStyles="clr-namespace:AvaloniaStyles;assembly=AvaloniaStyles"
              xmlns:models="clr-namespace:WDE.SqlWorkbench.Models"
              xmlns:connection="clr-namespace:WDE.SqlWorkbench.Services.Connection"
+             xmlns:dnD="clr-namespace:WDE.Common.Avalonia.DnD;assembly=WDE.Common.Avalonia"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="settings:SqlWorkbenchConfigurationViewModel"
              x:Name="Root"
@@ -70,7 +71,11 @@
             <ButtonImage Image="Icons/icon_copy.png" Command="{CompiledBinding DuplicateSelectedConnectionCommand}" />
             <ButtonImage Image="Icons/icon_delete.png" Command="{CompiledBinding DeleteSelectedConnectionCommand}" />
           </ToolbarPanel>
-          <ListBox Items="{CompiledBinding Connections}" SelectedItem="{CompiledBinding SelectedConnection}">
+          <ListBox 
+            dnD:DragAndDrop.IsDropTarget="True"
+            dnD:DragAndDrop.DropHandler="{CompiledBinding .}" 
+            dnD:DragAndDrop.IsDragSource="True"
+            Items="{CompiledBinding Connections}" SelectedItem="{CompiledBinding SelectedConnection}">
             <ListBox.ItemTemplate>
               <DataTemplate>
                 <DockPanel>

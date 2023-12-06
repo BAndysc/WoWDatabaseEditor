@@ -21,9 +21,12 @@ internal static class MySqlConnectionExtensions
             .ToList();
     }
 
-    public static async Task<IReadOnlyList<TableInfo>> GetTablesAsync(this IMySqlQueryExecutor conn, string schemaName, CancellationToken token = default)
+    public static async Task<IReadOnlyList<TableInfo>> GetTablesAsync(this IMySqlQueryExecutor conn, string schemaName, CancellationToken token = default, string? tableName = null)
     {
-        var results = await conn.ExecuteSqlAsync($"SELECT `TABLE_SCHEMA`, `TABLE_NAME`, `TABLE_TYPE`, `ENGINE`, `ROW_FORMAT`, `TABLE_COLLATION`, `DATA_LENGTH`, `TABLE_COMMENT` FROM `information_schema`.`TABLES` WHERE `TABLE_SCHEMA` = '{schemaName}';", null, token);
+        var where = $"`TABLE_SCHEMA` = '{schemaName}'";
+        if (tableName != null)
+            where += $" AND `TABLE_NAME` = '{tableName}'";
+        var results = await conn.ExecuteSqlAsync($"SELECT `TABLE_SCHEMA`, `TABLE_NAME`, `TABLE_TYPE`, `ENGINE`, `ROW_FORMAT`, `TABLE_COLLATION`, `DATA_LENGTH`, `TABLE_COMMENT` FROM `information_schema`.`TABLES` WHERE {where};", null, token);
 
         if (results.IsNonQuery || results.Columns.Length == 0)
             return Array.Empty<TableInfo>();
@@ -146,5 +149,66 @@ internal static class MySqlConnectionExtensions
 
         var createTable = (StringColumnData)databases["Create Table"]!;
         return createTable[0]!;
+    }
+    
+    public static async Task<IReadOnlyList<TableEngine>> GetEnginesAsync(this IMySqlQueryExecutor conn, CancellationToken token = default)
+    {
+        var databases = await conn.ExecuteSqlAsync("SELECT `ENGINE`, `SUPPORT`, `COMMENT`, `TRANSACTIONS`, `XA`, `SAVEPOINTS` FROM `information_schema`.`ENGINES`", null, token);
+
+        if (databases.IsNonQuery || databases.Columns.Length == 0)
+            return Array.Empty<TableEngine>();
+
+        List<TableEngine> engines = new();
+        var engineNames = (StringColumnData)databases["ENGINE"]!;
+        var engineSupports = (StringColumnData)databases["SUPPORT"]!;
+        var engineComments = (StringColumnData)databases["COMMENT"]!;
+        var engineTransactions = (StringColumnData)databases["TRANSACTIONS"]!;
+        var engineXa = (StringColumnData)databases["XA"]!;
+        var engineSavepoints = (StringColumnData)databases["SAVEPOINTS"]!;
+        
+        for (int i = 0; i < databases.AffectedRows; ++i)
+        {
+            engines.Add(new TableEngine(
+                engineNames[i]!,
+                engineSupports[i] == "DEFAULT",
+                engineSupports[i] != "NO",
+                engineComments[i]!,
+                engineTransactions.IsNull(i) ? null : engineTransactions[i] == "YES",
+                engineXa.IsNull(i) ? null : engineXa[i] == "YES",
+                engineSavepoints.IsNull(i) ? null : engineSavepoints[i] == "YES"
+            ));
+        }
+        return engines;
+    }
+    
+    public static async Task<IReadOnlyList<Collation>> GetCollationsAsync(this IMySqlQueryExecutor conn, CancellationToken token = default)
+    {
+        var databases = await conn.ExecuteSqlAsync("SELECT `COLLATION_NAME`, `CHARACTER_SET_NAME`, `ID`, `IS_DEFAULT`, `IS_COMPILED` FROM `information_schema`.`COLLATIONS`", null, token);
+
+        if (databases.IsNonQuery || databases.Columns.Length == 0)
+            return Array.Empty<Collation>();
+
+        List<Collation> collations = new();
+        var collationNames = (StringColumnData)databases["COLLATION_NAME"]!;
+        var collationCharsets = (StringColumnData)databases["CHARACTER_SET_NAME"]!;
+        var collationIdsMySql = databases["ID"] as UInt64ColumnData;
+        var collationIdsMaria = databases["ID"] as Int64ColumnData;
+        var collationIsDefault = (StringColumnData)databases["IS_DEFAULT"]!;
+        var collationIsCompiled = (StringColumnData)databases["IS_COMPILED"]!;
+        
+        for (int i = 0; i < databases.AffectedRows; ++i)
+        {
+            if (collationIdsMySql != null && collationIdsMySql[i] > long.MaxValue)
+                throw new Exception("Type sizes mismatch. Please report this error (MySQL returns id as ulong, MariaDB as long, therefore the editor keeps it as long, but apparently your MySql just returned an id higher than max long).");
+            
+            collations.Add(new Collation(
+                collationNames[i]!,
+                collationCharsets[i]!,
+                collationIdsMySql != null ? (long)collationIdsMySql[i] : (collationIdsMaria![i]),
+                collationIsDefault[i] == "Yes",
+                collationIsCompiled[i] == "Yes"
+            ));
+        }
+        return collations;
     }
 }

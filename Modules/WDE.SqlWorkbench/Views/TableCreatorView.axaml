@@ -1,0 +1,100 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:WDE.SqlWorkbench.ViewModels"
+             xmlns:avaloniaEdit="https://github.com/avaloniaui/avaloniaedit"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:TableCreatorViewModel"
+             x:Name="Root"
+             IsEnabled="{CompiledBinding !IsLoading}"
+             x:Class="WDE.SqlWorkbench.Views.TableCreatorView">
+  <UserControl.Styles>
+    <Style Selector="TextBlock">
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+  </UserControl.Styles>
+  <DockPanel>
+    <Grid ColumnDefinitions="3*,5,*" DockPanel.Dock="Top" Margin="10,5,10,5">
+      <TwoColumnsPanel Grid.Column="0" ColumnSpacing="5">
+        <TextBlock Text="Name:" />
+        <TextBox Text="{CompiledBinding TableName}" />
+        
+        <TextBlock Text="Charset/Collation:" />
+        <Grid ColumnDefinitions="*,5,*">
+          <ComboBox HorizontalAlignment="Stretch" Grid.Column="0" Items="{CompiledBinding Charsets}" SelectedItem="{CompiledBinding SelectedCharset}" />
+          <ComboBox HorizontalAlignment="Stretch" Grid.Column="2" Items="{CompiledBinding SelectedCharset.Collations}" SelectedItem="{CompiledBinding SelectedCollation}" />
+        </Grid>
+        
+        <TextBlock Text="Comment: "/>
+        <TextBox Text="{CompiledBinding TableComment}" />
+      </TwoColumnsPanel>
+      <TwoColumnsPanel Grid.Column="2" ColumnSpacing="5">
+        <TextBlock Text="Schema:" />
+        <TextBox Text="{CompiledBinding SchemaName}" IsReadOnly="True" />
+        
+        <TextBlock Text="Engine:" />
+        <CompletionComboBox Items="{CompiledBinding Engines}" SelectedItem="{CompiledBinding SelectedEngine}">
+          <CompletionComboBox.ItemTemplate>
+            <DataTemplate x:DataType="viewModels:EngineViewModel">
+              <StackPanel Orientation="Vertical">
+                <TextBlock FontWeight="Bold" Text="{CompiledBinding Name}" />
+                <TextBlock Text="{CompiledBinding Description}" IsVisible="{CompiledBinding !IsDefaultPlaceholder}" />
+                <TextBlock Text="{CompiledBinding SupportsTransactions, StringFormat=Transactions: {0}}" IsVisible="{CompiledBinding !IsDefaultPlaceholder}" />
+              </StackPanel>
+            </DataTemplate>
+          </CompletionComboBox.ItemTemplate>
+          <CompletionComboBox.ButtonItemTemplate>
+            <DataTemplate x:DataType="viewModels:EngineViewModel">
+              <TextBlock Text="{CompiledBinding Name}" />
+            </DataTemplate>
+          </CompletionComboBox.ButtonItemTemplate>
+        </CompletionComboBox>
+      </TwoColumnsPanel>
+    </Grid>
+    <TabControl SelectedIndex="{CompiledBinding SelectedTabIndex}">
+      <TabItem Header="Columns">
+        <DockPanel>
+          <ToolbarPanel DockPanel.Dock="Top">
+            <Button Command="{CompiledBinding AddColumnsCommand}">Add column</Button>
+          </ToolbarPanel>
+          <GridView Items="{CompiledBinding Columns}" SelectedItem="{CompiledBinding SelectedColumn}">
+            <GridView.Columns>
+              <GridColumnDefinition Name="Name" Property="" PreferedWidth="230">
+                <GridColumnDefinition.DataTemplate>
+                  <DataTemplate x:DataType="viewModels:ColumnViewModel">
+                    <EditableTextBlock Text="{CompiledBinding ColumnName}" />
+                  </DataTemplate>
+                </GridColumnDefinition.DataTemplate>
+              </GridColumnDefinition>
+              <GridColumnDefinition Name="Data type" Property="" PreferedWidth="230">
+                <GridColumnDefinition.DataTemplate>
+                  <DataTemplate x:DataType="viewModels:ColumnViewModel">
+                    <CompletionComboBox SelectedItem="{CompiledBinding DataType}" Items="{CompiledBinding #Root.((viewModels:TableCreatorViewModel)DataContext).DataTypes}" 
+                                        OnEnterPressed="CompletionComboBox_OnOnEnterPressed"/>
+                  </DataTemplate>
+                </GridColumnDefinition.DataTemplate>
+              </GridColumnDefinition>
+            
+              <GridColumnDefinition Name="Primary Key" Property="PrimaryKey" PreferedWidth="100" Checkable="True" />
+              <GridColumnDefinition Name="Not Null" Property="NotNull" PreferedWidth="100" Checkable="True" />
+              <GridColumnDefinition Name="Auto Increment" Property="AutoIncrement" PreferedWidth="100" Checkable="True" />
+            </GridView.Columns>
+          </GridView>
+        </DockPanel>
+      </TabItem>
+      <TabItem Header="Index">
+        <TextBlock>abc</TextBlock>
+      </TabItem>
+      <TabItem Header="Foreign Keys">
+        <TextBlock>Klucze</TextBlock>
+      </TabItem>
+      <TabItem Header="Query">
+        <avaloniaEdit:TextEditor Name="TextEditor" FontFamily="{DynamicResource MonoFont}"
+                                 AvalonEditExtra.SyntaxExtension="sql" 
+                                 Document="{CompiledBinding QueryDocument}"
+                                 ShowLineNumbers="True" />
+      </TabItem>
+    </TabControl>
+  </DockPanel>
+</UserControl>

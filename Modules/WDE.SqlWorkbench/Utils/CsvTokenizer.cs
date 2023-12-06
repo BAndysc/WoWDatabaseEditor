@@ -81,7 +81,7 @@ public class CsvTokenizer
         int start = startTokenIndex;
         var end = ScanNextToken(startTokenIndex);
         
-        if (source[end] == '\n')
+        if (end < source.Length && source[end] == '\n')
             startTokenIndex = end;
         else
             startTokenIndex = end + 1;
