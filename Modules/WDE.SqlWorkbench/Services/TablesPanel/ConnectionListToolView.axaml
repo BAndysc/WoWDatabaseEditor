@@ -43,6 +43,7 @@
                     <VirtualizedTreeView.ContextMenu>
                         <ContextMenu>
                             <MenuItem Header="Select rows" Command="{CompiledBinding SelectRowsCommand}" IsVisible="{CompiledBinding IsTableSelected}" />
+                            <MenuItem Header="Alter table" Command="{CompiledBinding AlterTableComment}" IsVisible="{CompiledBinding IsTableSelected}" />
                             <MenuItem Header="Table inspector" Command="{CompiledBinding InspectTableComment}" IsVisible="{CompiledBinding IsTableSelected}" />
                             <Separator IsVisible="{CompiledBinding IsTableSelected}" />
                             <MenuItem Header="Copy name" Command="{CompiledBinding CopyNameCommand}" />

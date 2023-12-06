@@ -1,3 +1,4 @@
+using WDE.SqlWorkbench.Models;
 using WDE.SqlWorkbench.Services.QueryUtils;
 
 namespace WDE.SqlWorkbench.Test.Services.QueryUtils;

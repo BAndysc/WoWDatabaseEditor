@@ -259,7 +259,7 @@ internal class TableController : BaseVirtualizedTableController
             drawingContext.DrawRectangle(null, new Pen(Brushes.Orange), rect.Deflate(1));
         }
 
-        if ((hasOverride && overrideString == null) || rowIndex < vm.Results.AffectedRows && vm.Results.Columns[cellIndex - 1]!.IsNull(rowIndex))
+        if ((hasOverride && overrideString == null) || (!hasOverride && rowIndex < vm.Results.AffectedRows && vm.Results.Columns[cellIndex - 1]!.IsNull(rowIndex)))
         {
             DrawText(drawingContext, rect, "(null)");
             return true;

@@ -16,6 +16,7 @@ using WDE.Common.Parameters;
 using WDE.Common.Providers;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Utils;
+using WDE.Common.Utils.DragDrop;
 using WDE.Module.Attributes;
 using WDE.MVVM;
 using WDE.MVVM.Observable;
@@ -30,7 +31,7 @@ namespace WDE.SqlWorkbench.Settings;
 
 [AutoRegister]
 [SingleInstance]
-internal partial class SqlWorkbenchConfigurationViewModel : ObservableBase, IConfigurable
+internal partial class SqlWorkbenchConfigurationViewModel : ObservableBase, IConfigurable, IDropTarget
 {
     private readonly ISqlWorkbenchPreferences preferences;
     private readonly IConnectionsManager connectionsManager;
@@ -310,5 +311,47 @@ internal partial class SqlWorkbenchConfigurationViewModel : ObservableBase, ICon
         CustomMariaDumpPath = originalCustomMariaDumpPath = preferences.CustomMariaDumpPath;
         CustomMySqlDumpPath = originalCustomMySqlDumpPath = preferences.CustomMySqlDumpPath;
         ConnectionsContainerIsModified = false;
+    }
+
+    public void DragOver(IDropInfo dropInfo)
+    {
+        dropInfo.DropTargetAdorner = DropTargetAdorners.Insert;
+        dropInfo.Effects = DragDropEffects.Move;
+    }
+
+    public void Drop(IDropInfo dropInfo)
+    {
+        IReadOnlyList<ConnectionConfigViewModel> dragged;
+
+        if (dropInfo.Data is IReadOnlyList<ConnectionConfigViewModel> dragged2)
+        {
+            dragged = dragged2;
+        }
+        else if (dropInfo.Data is ConnectionConfigViewModel drag)
+        {
+            dragged = new[] { drag };
+        }
+        else
+            return;
+
+        int dropIndex = dropInfo.InsertIndex;
+
+        foreach (var x in dragged)
+        {
+            int indexOf = Connections.IndexOf(x);
+            if (indexOf < dropIndex)
+                dropIndex--;
+        }
+
+        foreach (var x in dragged)
+        {
+            Connections.Remove(x);
+        }
+        
+        foreach (var x in dragged)
+        {
+            Connections.Insert(dropIndex++, x);
+            SelectedConnection = x;
+        }
     }
 }

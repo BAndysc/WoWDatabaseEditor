@@ -66,7 +66,7 @@ internal class ConnectionListToolViewModelTests
         var connection = new Connection(connector, connectionData);
 
         var vm = new ConnectionListToolViewModel(userQuestionsService,
-            new Lazy<ITableUtility>(new TableUtility(clipboard, extendedSqlEditorService)),
+            new Lazy<ITableUtility>(Substitute.For<ITableUtility>()),
             clipboard,
             new QueryGenerator(connector),
             databaseDumpService,

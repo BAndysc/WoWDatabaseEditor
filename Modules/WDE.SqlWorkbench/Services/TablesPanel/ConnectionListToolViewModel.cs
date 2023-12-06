@@ -58,7 +58,7 @@ internal partial class ConnectionListToolViewModel : ObservableBase, ITablesTool
     
     public SchemaViewModel? SelectedDatabaseOrParent => SelectedDatabase ?? SelectedTable?.Schema ?? SelectedRoutine?.Schema ?? SelectedGroup?.Schema;
     
-    public string? SelectedSchemaName => SelectedDatabase?.SchemaName ?? SelectedTable?.Schema.SchemaName;
+    public string? SelectedSchemaName => SelectedDatabase?.SchemaName ?? SelectedTable?.Schema.SchemaName ?? SelectedRoutine?.Schema.SchemaName ?? SelectedGroup?.Schema.SchemaName;
     
     public IConnection? SelectedConnection => SelectedDatabase?.Connection 
         ?? SelectedTable?.Schema.Connection
@@ -77,6 +77,7 @@ internal partial class ConnectionListToolViewModel : ObservableBase, ITablesTool
 
     public DelegateCommand SelectRowsCommand { get; }
     public DelegateCommand InspectTableComment { get; }
+    public DelegateCommand AlterTableComment { get; }
     public DelegateCommand CopyNameCommand { get; }
     public AsyncAutoCommand CopySelectAllCommand { get; }
     public AsyncAutoCommand CopyInsertCommand { get; }
@@ -113,6 +114,7 @@ internal partial class ConnectionListToolViewModel : ObservableBase, ITablesTool
         FlatItems = new FlatTreeList<INamedParentType, INamedChildType>(roots);
         
         SelectRowsCommand = new DelegateCommand(() => utility.Value.OpenSelectRows(SelectedConnection!, SelectedSchemaName!, SelectedTable!.TableName), () => IsTableSelected);
+        AlterTableComment = new DelegateCommand(() => utility.Value.AlterTable(SelectedConnection!, SelectedSchemaName!, SelectedTable!.TableName), () => IsTableSelected);
         InspectTableComment = new DelegateCommand(() => utility.Value.InspectTable(SelectedConnection!, SelectedSchemaName!, SelectedTable!.TableName), () => IsTableSelected);
         CopyNameCommand = new DelegateCommand(() => clipboardService.SetText(SelectedTable?.TableName ?? SelectedRoutine?.RoutineName ?? SelectedSchemaName!), () => IsAnythingSelected);
         CopySelectAllCommand = new AsyncAutoCommand(async () =>
@@ -143,7 +145,7 @@ internal partial class ConnectionListToolViewModel : ObservableBase, ITablesTool
 
         AddNewTableCommand = new DelegateCommand(() =>
         {
-            this.sqlEditorService.Value.NewDocumentWithQuery(SelectedConnection!, "CREATE TABLE <NAME> (\n    <COLUMN_NAME> <TYPE> <EXTRA>\n);");
+            utility.Value.AlterTable(SelectedConnection!, SelectedSchemaName!, null);
         }, () => Selected != null);
         
         AddNewViewCommand = new DelegateCommand(() =>
@@ -196,6 +198,7 @@ internal partial class ConnectionListToolViewModel : ObservableBase, ITablesTool
     private void RaiseCommandsCanExecuteChanged()
     {
         SelectRowsCommand.RaiseCanExecuteChanged();
+        AlterTableComment.RaiseCanExecuteChanged();
         InspectTableComment.RaiseCanExecuteChanged();
         CopyNameCommand.RaiseCanExecuteChanged();
         CopySelectAllCommand.RaiseCanExecuteChanged();
