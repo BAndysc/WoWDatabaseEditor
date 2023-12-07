@@ -782,7 +782,7 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, ISolutionItemDocu
         var color = SystemTheme.EffectiveThemeIsDark ? new Color(22, 255, 255, 255) : new Color(22, 0, 0, 0);
         marker.BackgroundBrush = new SolidColorBrush(color);
     }
-
+    
     private async Task ProcessDataAsync(ITextSource snapshot, CancellationToken token)
     {
         if (!await querySplitter.UpdateRangesAsync(snapshot))
@@ -804,7 +804,7 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, ISolutionItemDocu
             LanguageServerState = LanguageServerStateEnum.Healthy;
         
         languageServerInstance.UpdateText(Document.Text);
-        await ComputeCompletionAsync();
+        await ComputeCompletionAsync(false);
 
         var tasks = querySplitter.Ranges
             .Select(async r =>
@@ -836,25 +836,28 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, ISolutionItemDocu
         problems.Value = inspections;
     }
     
-    private async Task ComputeCompletionAsync()
+    public async Task ComputeCompletionAsync(bool force)
     {
         if (languageServerInstance == null)
             return;
         
         try
         {
-            if (CaretOffset - 1 >= 0 && Document.GetCharAt(CaretOffset - 1) is var ch && (ch == ';' || char.IsWhiteSpace(ch) || ch == ','))
+            if (!force)
             {
-                Completions.Clear();
-                return;
-            }
+                if (CaretOffset - 1 >= 0 && Document.GetCharAt(CaretOffset - 1) is var ch && (ch == ';' || char.IsWhiteSpace(ch) || ch == ','))
+                {
+                    Completions.Clear();
+                    return;
+                }
 
-            if (CaretOffset < Document.TextLength && Document.GetCharAt(CaretOffset) is not ' ' and not '\n' and not '\r' and not '\t')
-            {
-                Completions.Clear();
-                return;
+                if (CaretOffset < Document.TextLength && Document.GetCharAt(CaretOffset) is not ' ' and not '\n' and not '\r' and not '\t')
+                {
+                    Completions.Clear();
+                    return;
+                }
             }
-
+            
             var completions = await languageServerInstance.GetCompletionsAsync(CaretLine, CaretColumn);
 
             var lastWord = GetLastWord(CaretOffset - 1);

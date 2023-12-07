@@ -55,6 +55,7 @@
                                IsEnabled="{CompiledBinding IsEnabled}"
                                WordWrap="{CompiledBinding WordWrap}"
                                PointerHoverStopped="TextEditor_OnPointerHoverStopped"
+                               KeyDown="TextEditor_OnKeyDown"
                                ShowLineNumbers="True">
         <FlyoutBase.AttachedFlyout>
           <Flyout>

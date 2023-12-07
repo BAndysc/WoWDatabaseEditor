@@ -62,6 +62,21 @@ public partial class SqlWorkbenchView : UserControl
         AvaloniaXamlLoader.Load(this);
         editor = this.FindControl<TextEditor>("TextEditor");
         editor.TextArea.Caret.PositionChanged += CaretPositionChanged;
+        var commandBindings = editor.TextArea.DefaultInputHandler.Editing.CommandBindings;
+        var deleteLineBinding = commandBindings.FirstOrDefault(b => b.Command.Gesture == new KeyGesture(Key.D, KeyModifiers.Control));
+        if (deleteLineBinding != null)
+            commandBindings.Remove(deleteLineBinding);
+        commandBindings.Add(new RoutedCommandBinding(new RoutedCommand("Duplicate line", new KeyGesture(Key.D, KeyModifiers.Control)), (sender, args) =>
+        {
+            var document = editor.Document;
+            var caret = editor.TextArea.Caret;
+            var oldColumn = caret.Column;
+            var line = document.GetLineByNumber(caret.Line);
+            var lineText = document.GetText(line.Offset, line.Length);
+            document.Insert(line.Offset, lineText + Environment.NewLine);
+            caret.Offset = Math.Min(line.EndOffset + oldColumn, document.TextLength);
+        }));
+        
         editor.Options.AllowScrollBelowDocument = false;
         _completionWindow = new CompletionWindow(editor.TextArea);
         _completionWindow.Styles.Add(new StyleInclude(new Uri("resm:Styles?assembly=WDE.SqlWorkbench")){Source = new Uri("avares://WDE.SqlWorkbench/Generic.axaml")});
@@ -223,5 +238,17 @@ public partial class SqlWorkbenchView : UserControl
     {
         editor.SetValue(ToolTip.IsOpenProperty, false);
         editor.ClearValue(ToolTip.TipProperty);
+    }
+
+    private void TextEditor_OnKeyDown(object? sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Space && e.KeyModifiers.HasFlagFast(KeyModifiers.Control))
+        {
+            if (DataContext is SqlWorkbenchViewModel vm)
+            {
+                vm.ComputeCompletionAsync(true).ListenErrors();
+                e.Handled = true;
+            }
+        }
     }
 }
