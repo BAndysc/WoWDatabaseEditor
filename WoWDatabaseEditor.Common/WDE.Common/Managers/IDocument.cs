@@ -44,6 +44,12 @@ namespace WDE.Common.Managers
         bool IsLoading => false;
     }
 
+    public interface IPeriodicSnapshotDocument : IDocument
+    {
+        string TakeSnapshot();
+        void RestoreSnapshot(string snapshot);
+    }
+
     public interface ISplitSolutionItemQueryGenerator
     {
         Task<IList<(ISolutionItem, IQuery)>> GenerateSplitQuery();

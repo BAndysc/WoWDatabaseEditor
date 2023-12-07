@@ -31,16 +31,11 @@ namespace WoWDatabaseEditorCore.Providers
         private readonly IConfigureService settings;
         public IDocumentManager DocumentManager { get; }
         
-        private readonly Dictionary<ISolutionItem, IDocument> documents = new();
-
-        private readonly Dictionary<IDocument, ISolutionItem> documentToSolution = new();
-        
         public string ItemName { get; } = "_File";
         public List<IMenuItem> SubItems { get; }
         public MainMenuItemSortPriority SortPriority { get; } = MainMenuItemSortPriority.PriorityVeryHigh;
 
-        public EditorFileMenuItemProvider(ISolutionManager solutionManager, IEventAggregator eventAggregator, INewItemService newItemService, 
-            ISolutionItemEditorRegistry solutionEditorManager, IMessageBoxService messageBoxService, IDocumentManager documentManager, IConfigureService settings,
+        public EditorFileMenuItemProvider(ISolutionManager solutionManager, IEventAggregator eventAggregator, INewItemService newItemService,  IDocumentManager documentManager, IConfigureService settings,
             IApplication application, ISolutionTasksService solutionTasksService, ISolutionSqlService solutionSqlService)
         {
             this.solutionManager = solutionManager;
@@ -138,59 +133,6 @@ namespace WoWDatabaseEditorCore.Providers
             SubItems.Add(new ModuleMenuItem("Close all tabs", new AsyncAutoCommand(async () => 
                 await documentManager.TryCloseAllDocuments()), new MenuShortcut("Control+Shift+W")));
             SubItems.Add(new ModuleMenuItem("_Exit", new DelegateCommand(() => application.TryClose())));
-            
-            this.eventAggregator.GetEvent<DocumentManager.DocumentClosedEvent>()
-                .Subscribe(document =>
-                {
-                    if (!documentToSolution.ContainsKey(document))
-                        return;
-
-                    documents.Remove(documentToSolution[document]);
-                    documentToSolution.Remove(document);
-                });
-
-            this.eventAggregator.GetEvent<EventRequestOpenItem>()
-                .Subscribe(item =>
-                    {
-                        if (documents.ContainsKey(item))
-                            DocumentManager.OpenDocument(documents[item]);
-                        else
-                        {
-                            try
-                            {
-                                IDocument editor = solutionEditorManager.GetEditor(item);
-                                DocumentManager.OpenDocument(editor);
-                                documents[item] = editor;
-                                documentToSolution[editor] = item;
-                            }
-                            catch (SolutionItemEditorNotFoundException)
-                            {
-                                messageBoxService.ShowDialog(new MessageBoxFactory<bool>().SetTitle("Editor not found")
-                                    .SetMainInstruction(
-                                        "Couldn't open item, because there is no editor registered for type " +
-                                        item.GetType().Name)
-#if DEBUG
-                                    .SetContent(
-                                        $"There should be class that implements ISolutionItemEditorProvider<{item.GetType().Name}> and this class should be registered in containerRegister in module.")
-#endif
-                                    .SetIcon(MessageBoxIcon.Warning)
-                                    .WithOkButton(true)
-                                    .Build());
-                            }
-                            catch (Exception e)
-                            {
-                                Console.WriteLine(e);
-                                messageBoxService.ShowDialog(new MessageBoxFactory<bool>().SetTitle("Cannot open the editor")
-                                    .SetMainInstruction(
-                                        "Couldn't open item, because there was an error")
-                                    .SetContent(e.Message)
-                                    .SetIcon(MessageBoxIcon.Error)
-                                    .WithOkButton(true)
-                                    .Build());
-                            }
-                        }
-                    },
-                    true);
         }
 
         private async Task AddNewItemWindow()

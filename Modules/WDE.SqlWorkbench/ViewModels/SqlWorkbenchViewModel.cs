@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -23,6 +24,8 @@ using AvaloniaEdit.Document;
 using AvaloniaStyles;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using Prism.Commands;
+using WDE.Common;
+using WDE.Common.Database;
 using WDE.Common.Disposables;
 using WDE.Common.History;
 using WDE.Common.Managers;
@@ -31,22 +34,26 @@ using WDE.Common.Services.MessageBox;
 using WDE.Common.Tasks;
 using WDE.Common.Types;
 using WDE.MVVM.Observable;
+using WDE.SqlQueryGenerator;
 using WDE.SqlWorkbench.Models;
 using WDE.SqlWorkbench.Services.ActionsOutput;
 using WDE.SqlWorkbench.Services.Connection;
 using WDE.SqlWorkbench.Services.QueryUtils;
 using WDE.SqlWorkbench.Services.UserQuestions;
 using WDE.SqlWorkbench.Settings;
+using WDE.SqlWorkbench.Solutions;
 using WDE.SqlWorkbench.Utils;
 using TextDocument = AvaloniaEdit.Document.TextDocument;
 
 namespace WDE.SqlWorkbench.ViewModels;
 
-internal partial class SqlWorkbenchViewModel : ObservableBase, IProblemSourceDocument
+internal partial class SqlWorkbenchViewModel : ObservableBase, ISolutionItemDocument, IProblemSourceDocument, IPeriodicSnapshotDocument
 {
     public IUserQuestionsService UserQuestions { get; }
     public IClipboardService ClipboardService { get; }
-    private const int MaxDocumentLength = 500_000;
+    private const int MaxDocumentLengthForCompletions = 500_000;
+    private const int MaxDocumentLengthOpenWarning = 10_000_000;
+    private const int MaxDocumentLengthOpenError = 150_000_000;
     public enum LanguageServerStateEnum
     {
         NotStarted,
@@ -95,6 +102,8 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, IProblemSourceDoc
     public ICommand OpenSettingsCommand { get; }
     public ICommand ToggleActionsOutputViewCommand { get; }
     public IAsyncCommand RestartLanguageServerCommand { get; }
+    public IAsyncCommand OpenFileCommand { get; }
+    public IAsyncCommand SaveFileCommand { get; }
 
     [Notify] private bool isConnecting = true;
     [Notify] private bool showNonPrintableChars = false;
@@ -151,7 +160,9 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, IProblemSourceDoc
         ISqlWorkbenchPreferences preferences,
         IClipboardService clipboardService,
         IMainThread mainThread,
-        IConnection connection)
+        IWindowManager windowManager,
+        IConnection connection,
+        QueryDocumentSolutionItem solutionItem)
     {
         UserQuestions = userQuestions;
         ClipboardService = clipboardService;
@@ -164,9 +175,17 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, IProblemSourceDoc
         textMarkerService = new TextMarkerService(Document);
         Document.UpdateStarted += DocumentUpdateStarted;
         Document.UpdateFinished += DocumentUpdateFinished;
-        title = "New query";
+        title = solutionItem.IsTemporary ? "New query" : Path.GetFileName(solutionItem.FileName);
+        if (!solutionItem.IsTemporary && File.Exists(solutionItem.FileName))
+            Document.Text = File.ReadAllText(solutionItem.FileName);
+        SolutionItem = solutionItem;
         Document.UndoStack.ToObservable(x => x.IsOriginalFile)
-            .SubscribeAction(@is => IsDocumentModified = !@is);
+            .SubscribeAction(@is =>
+            {
+                RaisePropertyChanged(nameof(IsModified));                
+                RaisePropertyChanged(nameof(IsDocumentModified));
+            });
+        Document.UndoStack.MarkAsOriginalFile();
 
         Results.CollectionChanged += (_, _) => RaisePropertyChanged(nameof(HasAnyResults));
         AutoDispose(connection.ToObservable(x => x.IsRunning).SubscribeAction(_ => RaisePropertyChanged(nameof(TaskRunning))));
@@ -202,6 +221,68 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, IProblemSourceDoc
                 return;
             
             configViewModel.SelectedConnection = configViewModel.Connections.FirstOrDefault(x => x.Id == connection.ConnectionData.Id);
+        });
+
+        SaveFileCommand = new AsyncAutoCommand(async () =>
+        {
+            string? file = solutionItem.FileName;
+            if (solutionItem.IsTemporary)
+            {
+                file = await windowManager.ShowSaveFileDialog("SQL file|sql|Text file|txt|All files|*");
+                if (file == null)
+                    return;
+
+                SolutionItem = new QueryDocumentSolutionItem(file, connection.ConnectionData.Id, false);
+                Title = Path.GetFileName(file);
+            }
+
+            try
+            {
+                await File.WriteAllTextAsync(file, Document.Text);
+                Document.UndoStack.MarkAsOriginalFile();
+            }
+            catch (Exception e)
+            {
+                await userQuestions.SaveErrorAsync(e);
+                throw;
+            }
+        });
+        Save = SaveFileCommand;
+
+        OpenFileCommand = new AsyncAutoCommand(async () =>
+        {
+            if (IsDocumentModified)
+            {
+                var save = await userQuestions.AskSaveFileAsync();
+                if (save == SaveDialogResult.Cancel)
+                    return;
+                
+                if (save == SaveDialogResult.Save)
+                    await SaveFileCommand.ExecuteAsync();
+            }
+            
+            var file = await windowManager.ShowOpenFileDialog("SQL file|sql|Text file|txt|All files|*");
+            if (file == null || !File.Exists(file))
+                return;
+            
+            var fileSize = new FileInfo(file).Length;
+            
+            if (fileSize > MaxDocumentLengthOpenError)
+            {
+                await userQuestions.FileTooBigErrorAsync(fileSize, MaxDocumentLengthOpenError);
+                return;
+            }
+            
+            if (fileSize > MaxDocumentLengthOpenWarning)
+            {
+                if (!await userQuestions.FileTooBigWarningAsync(fileSize, MaxDocumentLengthOpenWarning))
+                    return;
+            }
+            
+            SolutionItem = new QueryDocumentSolutionItem(file, connection.ConnectionData.Id, false);
+            Title = Path.GetFileName(file);
+            Document.Text = await File.ReadAllTextAsync(file);
+            Document.UndoStack.MarkAsOriginalFile();
         });
 
         ToggleActionsOutputViewCommand = new DelegateCommand(() =>
@@ -714,7 +795,7 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, IProblemSourceDoc
         if (languageServerInstance == null)
             return;
 
-        if (Document.TextLength > MaxDocumentLength)
+        if (Document.TextLength > MaxDocumentLengthForCompletions)
         {
             LanguageServerState = LanguageServerStateEnum.PausedDueToTooLongDocument;
             return;
@@ -864,9 +945,9 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, IProblemSourceDoc
     }
 
     [Notify] private string title;
-    public bool IsModified => isDocumentModified || IsAnyResultModified;
+    public bool IsModified => IsDocumentModified || IsAnyResultModified;
     private bool IsAnyResultModified => Results.Any(x => x.IsModified);
-    [Notify] [AlsoNotify(nameof(IsModified))] private bool isDocumentModified;
+    public bool IsDocumentModified => !Document.UndoStack.IsOriginalFile;
     public ImageUri? Icon { get; } = new ImageUri("Icons/document_sql.png");
     public ICommand Undo => AlwaysDisabledCommand.Command;
     public ICommand Redo => AlwaysDisabledCommand.Command;
@@ -874,10 +955,23 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, IProblemSourceDoc
     public ICommand Copy => AlwaysDisabledCommand.Command;
     public ICommand Cut => AlwaysDisabledCommand.Command;
     public ICommand Paste => AlwaysDisabledCommand.Command;
-    public IAsyncCommand Save => AlwaysDisabledAsyncCommand.Command;
+    public IAsyncCommand Save { get; }
     public IAsyncCommand? CloseCommand { get; set; }
     public bool CanClose => true;
     public IObservable<IReadOnlyList<IInspectionResult>> Problems => problems;
     private ReactiveProperty<IReadOnlyList<IInspectionResult>> problems = new ReactiveProperty<IReadOnlyList<IInspectionResult>>(new List<IInspectionResult>());
     private DoubleBufferedValue<List<IInspectionResult>> problemsList = new DoubleBufferedValue<List<IInspectionResult>>();
+    public ISolutionItem SolutionItem { get; private set; }
+    public async Task<IQuery> GenerateQuery() => Queries.Empty(DataDatabaseType.World);
+    public bool ShowExportToolbarButtons => false;
+    
+    public string TakeSnapshot()
+    {
+        return Document.Text;
+    }
+
+    public void RestoreSnapshot(string snapshot)
+    {
+        Document.Text = snapshot;
+    }
 }

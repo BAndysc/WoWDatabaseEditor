@@ -94,4 +94,39 @@ internal class UserQuestionsService : IUserQuestionsService
     {
         return inputBoxService.GetString("New view name", "Enter new view name", "NewView");
     }
+
+    public async Task<SaveDialogResult> AskSaveFileAsync()
+    {
+        return await messageBoxService.ShowDialog(new MessageBoxFactory<SaveDialogResult>()
+            .SetTitle("Warning")
+            .SetMainInstruction("Do you want to save changes?")
+            .SetContent("You have unsaved changes. Do you want to save them?")
+            .WithYesButton(SaveDialogResult.Save)
+            .WithNoButton(SaveDialogResult.DontSave)
+            .WithCancelButton(SaveDialogResult.Cancel)
+            .Build());
+    }
+
+    public async Task<bool> FileTooBigWarningAsync(long fileSize, int limit)
+    {
+        return await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
+            .SetTitle("Warning")
+            .SetMainInstruction("The file is big. Do you want to load it anyway?")
+            .SetContent(
+                $"The file you are trying to load is {fileSize/1024/1024} MB big. It might lag the editor. Do you want to continue?")
+            .WithYesButton(true)
+            .WithNoButton(false)
+            .Build());
+    }
+
+    public async Task FileTooBigErrorAsync(long fileSize, int limit)
+    {
+        await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
+            .SetTitle("Error")
+            .SetMainInstruction("The file is too big")
+            .SetContent(
+                $"The file you are trying to load is {fileSize/1024/1024} MB big. The allowed limit is {limit/1024/1024} MB in order to prevent editor crashes and slowdowns.")
+            .WithOkButton(true)
+            .Build());
+    }
 }
