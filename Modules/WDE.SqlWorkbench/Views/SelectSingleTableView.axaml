@@ -33,6 +33,7 @@
                                                                InteractiveHeader="True"
                                                                ColumnPressed="VirtualizedVeryFastTableView_OnColumnPressed"
                                                                RequestRender="{CompiledBinding RequestRender}"
+                                                               DoubleTapped="InputElement_OnDoubleTapped"
                                                                ValueUpdateRequest="VirtualizedVeryFastTableView_OnValueUpdateRequest"
                                                                Columns="{CompiledBinding Columns}">
         <optimizedVeryFastTableView:VirtualizedVeryFastTableView.ContextMenu>
