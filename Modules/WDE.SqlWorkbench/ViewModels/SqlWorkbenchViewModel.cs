@@ -427,7 +427,7 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, IProblemSourceDoc
         }
     }
 
-    public Task ExecuteAndOverrideResultsAsync(string query, SelectSingleTableViewModel result)
+    public Task ExecuteAndOverrideResultsAsync(string query, SelectResultsViewModel result)
     {
         var action = actionsOutputService.Create(query);
         return mySqlSession!.ScheduleAsync((token, executor) => ExecuteSingleAsync(executor, query, token, action, result));
@@ -514,7 +514,7 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, IProblemSourceDoc
         string query, 
         CancellationToken cancellationToken, 
         IActionOutput action,
-        SelectSingleTableViewModel? result = null)
+        SelectResultsViewModel? result = null)
     {
         action.TimeStarted = DateTime.Now;
         action.Status = ActionStatus.Started;
@@ -548,15 +548,20 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, IProblemSourceDoc
 
                     if (isSelect && type == TableType.Table)
                     {
-                        var tableInfo = await executor.GetTableColumnsAsync(select.From.Schema, select.From.Table, cancellationToken);
+                        var schema = select.From.Schema;
+                        if (schema == null)
+                            schema = await executor.GetCurrentDatabaseAsync(cancellationToken);
+                        if (schema == null)
+                            throw new Exception("Weird error. Just invoked a SELECT, but current database is null, but the query didn't specify the database? Pls report that.");
+                        var tableInfo = await executor.GetTableColumnsAsync(schema, select.From.Table, cancellationToken);
                         
                         if (CheckIfCancelled())
                             return;
                         
-                        Results.Add(new SelectSingleTableViewModel(this, select.From.Table, in res, select, tableInfo));
+                        Results.Add(new SelectSingleTableViewModel(this, action, in res, select, tableInfo));
                     }
                     else
-                        Results.Add(new SelectResultsViewModel(this, $"Query {action.Index}", in res));
+                        Results.Add(new SelectResultsViewModel(this, action, in res));
                     SelectedResult = Results[^1];   
                 }
                 else
@@ -757,7 +762,7 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, IProblemSourceDoc
         
         try
         {
-            if (CaretOffset - 1 >= 0 && Document.GetCharAt(CaretOffset - 1) is var ch && (ch == ';' || char.IsWhiteSpace(ch)))
+            if (CaretOffset - 1 >= 0 && Document.GetCharAt(CaretOffset - 1) is var ch && (ch == ';' || char.IsWhiteSpace(ch) || ch == ','))
             {
                 Completions.Clear();
                 return;

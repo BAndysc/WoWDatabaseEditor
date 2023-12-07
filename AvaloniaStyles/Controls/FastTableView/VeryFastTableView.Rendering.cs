@@ -160,36 +160,41 @@ public partial class VeryFastTableView
                                 var rect = new Rect(x, y, columnWidth, RowHeight);
                                 var rectWidth = rect.Width;
                                 var state = context.PushClip(rect);
-                                if (cellDrawer == null || !cellDrawer.Draw(context, this, ref rect, cell))
+                                try
                                 {
-                                    var text = cell.ToString();
-                                    if (!string.IsNullOrEmpty(text))
+                                    if (cellDrawer == null || !cellDrawer.Draw(context, this, ref rect, cell))
                                     {
-                                        var indexOfEndOfLine = text.IndexOf('\n');
-                                        if (indexOfEndOfLine != -1)
-                                            text = text.Substring(0, indexOfEndOfLine);
+                                        var text = cell.ToString();
+                                        if (!string.IsNullOrEmpty(text))
+                                        {
+                                            var indexOfEndOfLine = text.IndexOf('\n');
+                                            if (indexOfEndOfLine != -1)
+                                                text = text.Substring(0, indexOfEndOfLine);
 
-                                        rect = rect.WithWidth(rect.Width - ColumnSpacing);
-                                        var ft = new FormattedText
-                                        {
-                                            Text = text,
-                                            Constraint = new Size(rect.Width, RowHeight),
-                                            Typeface = font,
-                                            FontSize = 12
-                                        };
-                                        if (Math.Abs(rectWidth - rect.Width) > 0.01)
-                                        {
-                                            state.Dispose();
-                                            state = context.PushClip(rect);
+                                            rect = rect.WithWidth(rect.Width - ColumnSpacing);
+                                            var ft = new FormattedText
+                                            {
+                                                Text = text,
+                                                Constraint = new Size(rect.Width, RowHeight),
+                                                Typeface = font,
+                                                FontSize = 12
+                                            };
+                                            if (Math.Abs(rectWidth - rect.Width) > 0.01)
+                                            {
+                                                state.Dispose();
+                                                state = context.PushClip(rect);
+                                            }
+
+                                            context.DrawText(textColor,
+                                                new Point(rect.X + ColumnSpacing, y + RowHeight / 2 - ft.Bounds.Height / 2),
+                                                ft);
                                         }
-
-                                        context.DrawText(textColor,
-                                            new Point(rect.X + ColumnSpacing, y + RowHeight / 2 - ft.Bounds.Height / 2),
-                                            ft);
                                     }
                                 }
-
-                                state.Dispose();
+                                finally
+                                {
+                                    state.Dispose();
+                                }
                             }
 
                             x += columnWidth;

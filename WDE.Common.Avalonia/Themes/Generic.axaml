@@ -113,6 +113,29 @@
         </Setter>
     </Style>
     
+    <Style Selector="EditableItemsTextBlock">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="VerticalAlignment" Value="Stretch" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <DockPanel Background="{TemplateBinding Background}" Name="PART_Panel" KeyboardNavigation.TabNavigation="Local">
+                    <Button DockPanel.Dock="Right" Background="Transparent" BorderThickness="0" Name="PART_OpenListButton">
+                        <Viewbox Margin="0,0,5,0"
+                                 Height="12"
+                                 Width="12"
+                                 DockPanel.Dock="Right"
+                                 VerticalAlignment="Center">
+                            <Path VerticalAlignment="Center" Fill="{DynamicResource ComboBoxDropDownGlyphForeground}" Data="M1939 486L2029 576L1024 1581L19 576L109 486L1024 1401L1939 486Z" Stretch="Uniform" />
+                        </Viewbox>
+                    </Button>
+                    <Border Background="Transparent" Cursor="IBeam" Padding="{TemplateBinding Padding}">
+                        <TextBlock Name="PART_TextBlock" HorizontalAlignment="Stretch" VerticalAlignment="Center" TextAlignment="Left" Text="{TemplateBinding SelectedItem, Converter={x:Static ObjectToStringConverter.Instance}}" />
+                    </Border>
+                </DockPanel>
+            </ControlTemplate>
+        </Setter>
+    </Style>
     
     <Style Selector="controls|OkCancelButtons">
         <Setter Property="HorizontalAlignment" Value="Stretch" />

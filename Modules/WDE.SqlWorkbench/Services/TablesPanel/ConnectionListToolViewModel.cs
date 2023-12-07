@@ -47,7 +47,7 @@ internal partial class ConnectionListToolViewModel : ObservableBase, ITablesTool
     [Notify] private bool listUpdated;
     [Notify] private string searchText = "";
     [Notify] [AlsoNotify(nameof(SelectedDatabase), nameof(SelectedTable), nameof(SelectedRoutine), nameof(SelectedGroup),
-        nameof(IsTableSelected), nameof(IsDatabaseSelected), nameof(IsRoutineSelected))] private INodeType? selected;
+        nameof(IsTableSelected), nameof(IsDatabaseSelected), nameof(IsRoutineSelected), nameof(IsTableNotViewSelected), nameof(IsViewSelected))] private INodeType? selected;
 
     public IUserQuestionsService UserQuestionsService { get; }
     public ISqlWorkbenchPreferences Preferences { get; }
@@ -75,8 +75,10 @@ internal partial class ConnectionListToolViewModel : ObservableBase, ITablesTool
     
     private CancellationTokenSource? loadCancellationTokenSource;
 
+    public DelegateCommand OpenTabCommand { get; }
     public DelegateCommand SelectRowsCommand { get; }
-    public DelegateCommand InspectTableComment { get; }
+    public DelegateCommand InspectTableCommand { get; }
+    public DelegateCommand InspectDatabaseCommand { get; }
     public DelegateCommand AlterTableComment { get; }
     public DelegateCommand CopyNameCommand { get; }
     public AsyncAutoCommand CopySelectAllCommand { get; }
@@ -113,9 +115,11 @@ internal partial class ConnectionListToolViewModel : ObservableBase, ITablesTool
         this.sqlEditorService = sqlEditorService;
         FlatItems = new FlatTreeList<INamedParentType, INamedChildType>(roots);
         
+        OpenTabCommand = new DelegateCommand(() => OpenItem(Selected!), () => IsDatabaseSelected);
         SelectRowsCommand = new DelegateCommand(() => utility.Value.OpenSelectRows(SelectedConnection!, SelectedSchemaName!, SelectedTable!.TableName), () => IsTableSelected);
         AlterTableComment = new DelegateCommand(() => utility.Value.AlterTable(SelectedConnection!, SelectedSchemaName!, SelectedTable!.TableName), () => IsTableSelected);
-        InspectTableComment = new DelegateCommand(() => utility.Value.InspectTable(SelectedConnection!, SelectedSchemaName!, SelectedTable!.TableName), () => IsTableSelected);
+        InspectTableCommand = new DelegateCommand(() => utility.Value.InspectTable(SelectedConnection!, SelectedSchemaName!, SelectedTable!.TableName), () => IsTableSelected);
+        InspectDatabaseCommand = new DelegateCommand(() => utility.Value.InspectDatabase(SelectedConnection!, SelectedSchemaName!), () => IsDatabaseSelected);
         CopyNameCommand = new DelegateCommand(() => clipboardService.SetText(SelectedTable?.TableName ?? SelectedRoutine?.RoutineName ?? SelectedSchemaName!), () => IsAnythingSelected);
         CopySelectAllCommand = new AsyncAutoCommand(async () =>
         {
@@ -170,7 +174,7 @@ internal partial class ConnectionListToolViewModel : ObservableBase, ITablesTool
             () => IsTableSelected);
         DropTableCommand = new DelegateCommand(() =>
         {
-            queryDialogService.ShowQueryDialog(queryGenerator.GenerateDropTable(SelectedSchemaName, SelectedTable!.TableName));
+            queryDialogService.ShowQueryDialog(queryGenerator.GenerateDropTable(SelectedSchemaName, SelectedTable!.TableName, SelectedTable!.Type));
         }, () => IsTableSelected);
         TruncateTableCommand = new DelegateCommand(() =>
         {
@@ -197,9 +201,11 @@ internal partial class ConnectionListToolViewModel : ObservableBase, ITablesTool
 
     private void RaiseCommandsCanExecuteChanged()
     {
+        OpenTabCommand.RaiseCanExecuteChanged();
         SelectRowsCommand.RaiseCanExecuteChanged();
         AlterTableComment.RaiseCanExecuteChanged();
-        InspectTableComment.RaiseCanExecuteChanged();
+        InspectDatabaseCommand.RaiseCanExecuteChanged();
+        InspectTableCommand.RaiseCanExecuteChanged();
         CopyNameCommand.RaiseCanExecuteChanged();
         CopySelectAllCommand.RaiseCanExecuteChanged();
         CopyInsertCommand.RaiseCanExecuteChanged();
@@ -217,7 +223,11 @@ internal partial class ConnectionListToolViewModel : ObservableBase, ITablesTool
         RefreshDatabaseCommand.RaiseCanExecuteChanged();
     }
 
+    public bool IsTableNotViewSelected => SelectedTable != null && SelectedTable.Type == TableType.Table;
+
     public bool IsTableSelected => SelectedTable != null;
+
+    public bool IsViewSelected => SelectedTable != null && SelectedTable.Type is TableType.View;
 
     public bool IsDatabaseSelected => SelectedDatabase != null;
     

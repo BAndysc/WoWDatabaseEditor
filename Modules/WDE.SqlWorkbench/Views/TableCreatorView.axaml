@@ -4,6 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:viewModels="clr-namespace:WDE.SqlWorkbench.ViewModels"
              xmlns:avaloniaEdit="https://github.com/avaloniaui/avaloniaedit"
+             xmlns:views="clr-namespace:WDE.SqlWorkbench.Views"
+             xmlns:dnD="clr-namespace:WDE.Common.Avalonia.DnD;assembly=WDE.Common.Avalonia"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="viewModels:TableCreatorViewModel"
              x:Name="Root"
@@ -50,15 +52,26 @@
             </DataTemplate>
           </CompletionComboBox.ButtonItemTemplate>
         </CompletionComboBox>
+        
+        <TextBlock Text="Row Format:" />
+        <CompletionComboBox Items="{x:Static viewModels:TableCreatorViewModel.RowFormats}" SelectedItem="{CompiledBinding SelectedRowFormat}" />
       </TwoColumnsPanel>
     </Grid>
+    <Button HorizontalAlignment="Right" Margin="0,0,5,5" Padding="30,5" DockPanel.Dock="Bottom" Content="Accept" Command="{CompiledBinding Save}" />
     <TabControl SelectedIndex="{CompiledBinding SelectedTabIndex}">
       <TabItem Header="Columns">
         <DockPanel>
           <ToolbarPanel DockPanel.Dock="Top">
-            <Button Command="{CompiledBinding AddColumnsCommand}">Add column</Button>
+            <ButtonImage Image="Icons/icon_add.png" Command="{CompiledBinding AddColumnCommand}" ToolTip.Tip="Add column" />
+            <ButtonImage Image="Icons/icon_delete.png" Command="{CompiledBinding RemoveSelectedColumnsCommand}" ToolTip.Tip="Delete column" />
+            <!-- <ToolbarSpacer /> -->
+            <!-- <Button Command="{CompiledBinding AddColumnsCommand}">[DEBUG] Add all column types</Button> -->
           </ToolbarPanel>
-          <GridView Items="{CompiledBinding Columns}" SelectedItem="{CompiledBinding SelectedColumn}">
+          <GridView Items="{CompiledBinding Columns}" 
+                    SelectedItem="{CompiledBinding SelectedColumn}"
+                    dnD:DragAndDrop.IsDropTarget="True" 
+                    dnD:DragAndDrop.DropHandler="{CompiledBinding }" 
+                    dnD:DragAndDrop.IsDragSource="True">
             <GridView.Columns>
               <GridColumnDefinition Name="Name" Property="" PreferedWidth="230">
                 <GridColumnDefinition.DataTemplate>
@@ -70,8 +83,9 @@
               <GridColumnDefinition Name="Data type" Property="" PreferedWidth="230">
                 <GridColumnDefinition.DataTemplate>
                   <DataTemplate x:DataType="viewModels:ColumnViewModel">
-                    <CompletionComboBox SelectedItem="{CompiledBinding DataType}" Items="{CompiledBinding #Root.((viewModels:TableCreatorViewModel)DataContext).DataTypes}" 
-                                        OnEnterPressed="CompletionComboBox_OnOnEnterPressed"/>
+                    <EditableItemsTextBlock SelectedItem="{CompiledBinding DataType}"
+                                            Items="{x:Static viewModels:TableCreatorViewModel.DataTypes}" 
+                                            OnNewItemRequest="EditableItemsTextBlock_OnOnNewItemRequest"/>
                   </DataTemplate>
                 </GridColumnDefinition.DataTemplate>
               </GridColumnDefinition>
@@ -79,16 +93,84 @@
               <GridColumnDefinition Name="Primary Key" Property="PrimaryKey" PreferedWidth="100" Checkable="True" />
               <GridColumnDefinition Name="Not Null" Property="NotNull" PreferedWidth="100" Checkable="True" />
               <GridColumnDefinition Name="Auto Increment" Property="AutoIncrement" PreferedWidth="100" Checkable="True" />
+              
+              <GridColumnDefinition Name="Charset" Property="" PreferedWidth="230">
+                <GridColumnDefinition.DataTemplate>
+                  <DataTemplate x:DataType="viewModels:ColumnViewModel">
+                    <EditableItemsTextBlock SelectedItem="{CompiledBinding Charset}"
+                                            Items="{CompiledBinding #Root.((viewModels:TableCreatorViewModel)DataContext).Charsets}" 
+                                            OnNewItemRequest="EditableItemsTextBlock_OnCharsetItemRequest"/>
+                  </DataTemplate>
+                </GridColumnDefinition.DataTemplate>
+              </GridColumnDefinition>
+              
+              <GridColumnDefinition Name="Collation" Property="" PreferedWidth="230">
+                <GridColumnDefinition.DataTemplate>
+                  <DataTemplate x:DataType="viewModels:ColumnViewModel">
+                    <EditableItemsTextBlock SelectedItem="{CompiledBinding Collation}"
+                                            Items="{CompiledBinding Charset.Collations}" 
+                                            OnNewItemRequest="EditableItemsTextBlock_OnCollationItemRequest"/>
+                  </DataTemplate>
+                </GridColumnDefinition.DataTemplate>
+              </GridColumnDefinition>
+              
             </GridView.Columns>
           </GridView>
         </DockPanel>
       </TabItem>
       <TabItem Header="Index">
-        <TextBlock>abc</TextBlock>
+        <DockPanel>
+          <ToolbarPanel DockPanel.Dock="Top">
+            <ButtonImage Image="Icons/icon_add.png" Command="{CompiledBinding AddIndexCommand}" ToolTip.Tip="Add index" />
+            <ButtonImage Image="Icons/icon_delete.png" Command="{CompiledBinding RemoveSelectedIndexesCommand}" ToolTip.Tip="Delete index" />
+          </ToolbarPanel>
+          <GridView Items="{CompiledBinding Indexes}" 
+                    SelectedItem="{CompiledBinding SelectedIndex}">
+            <GridView.Columns>
+              <GridColumnDefinition Name="Name" Property="" PreferedWidth="200">
+                <GridColumnDefinition.DataTemplate>
+                  <DataTemplate x:DataType="viewModels:IndexViewModel">
+                    <EditableTextBlock Text="{CompiledBinding IndexName}" />
+                  </DataTemplate>
+                </GridColumnDefinition.DataTemplate>
+              </GridColumnDefinition>
+              <GridColumnDefinition Name="Columns" Property="" PreferedWidth="300">
+                <GridColumnDefinition.DataTemplate>
+                  <DataTemplate x:DataType="viewModels:IndexViewModel">
+                    <Button Content="{CompiledBinding ColumnsAsText}" 
+                            HorizontalContentAlignment="Left"
+                            Command="{CompiledBinding #Root.((viewModels:TableCreatorViewModel)DataContext).EditIndexColumnsCommand}" 
+                            CommandParameter="{CompiledBinding .}"/>
+                  </DataTemplate>
+                </GridColumnDefinition.DataTemplate>
+              </GridColumnDefinition>
+              <GridColumnDefinition Name="Kind" Property="" PreferedWidth="130">
+                <GridColumnDefinition.DataTemplate>
+                  <DataTemplate x:DataType="viewModels:IndexViewModel">
+                    <ComboBox SelectedItem="{CompiledBinding Kind}" Items="{x:Static viewModels:IndexViewModel.Kinds}" />
+                  </DataTemplate>
+                </GridColumnDefinition.DataTemplate>
+              </GridColumnDefinition>
+              <GridColumnDefinition Name="Type" Property="" PreferedWidth="130">
+                <GridColumnDefinition.DataTemplate>
+                  <DataTemplate x:DataType="viewModels:IndexViewModel">
+                    <ComboBox IsEnabled="{CompiledBinding CanPickType}" SelectedItem="{CompiledBinding Type}" Items="{x:Static viewModels:IndexViewModel.Types}" />
+                  </DataTemplate>
+                </GridColumnDefinition.DataTemplate>
+              </GridColumnDefinition>
+              <GridColumnDefinition Name="Comment" Property="" PreferedWidth="200">
+                <GridColumnDefinition.DataTemplate>
+                  <DataTemplate x:DataType="viewModels:IndexViewModel">
+                    <EditableTextBlock Text="{CompiledBinding Comment}" />
+                  </DataTemplate>
+                </GridColumnDefinition.DataTemplate>
+              </GridColumnDefinition>
+            </GridView.Columns>
+          </GridView>
+        </DockPanel>
       </TabItem>
-      <TabItem Header="Foreign Keys">
-        <TextBlock>Klucze</TextBlock>
-      </TabItem>
+      <!-- <TabItem Header="Foreign Keys"> -->
+      <!-- </TabItem> -->
       <TabItem Header="Query">
         <avaloniaEdit:TextEditor Name="TextEditor" FontFamily="{DynamicResource MonoFont}"
                                  AvalonEditExtra.SyntaxExtension="sql" 

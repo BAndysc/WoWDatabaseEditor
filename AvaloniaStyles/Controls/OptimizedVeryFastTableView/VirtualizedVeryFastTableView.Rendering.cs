@@ -25,9 +25,41 @@ public partial class VirtualizedVeryFastTableView
         }
     }
 
+    private Exception? lastException;
+    
     public override void Render(DrawingContext context)
     {
         base.Render(context);
+        try
+        {
+            if (lastException != null)
+            {
+                context.DrawText(Brushes.Red, new Point(0, 0), new FormattedText
+                {
+                    Text = "Fatal error",
+                    Typeface = Typeface.Default,
+                    FontSize = 16
+                });            
+                context.DrawText(Brushes.Red, new Point(0, 24), new FormattedText
+                {
+                    Text = lastException.ToString(),
+                    Typeface = Typeface.Default,
+                    FontSize = 12,
+                    Constraint = Bounds.Size
+                });
+            }
+            else
+               RenderImpl(context);
+        }
+        catch (Exception e)
+        {
+            lastException = e;
+            Console.WriteLine(e);
+        }
+    }
+
+    private void RenderImpl(DrawingContext context)
+    {
 
         var font = new Typeface(TextBlock.GetFontFamily(this));
         
@@ -95,36 +127,41 @@ public partial class VirtualizedVeryFastTableView
                         var rect = new Rect(x, y, columnWidth, RowHeight);
                         var rectWidth = rect.Width;
                         var state = context.PushClip(rect);
-                        if (!controller.Draw(rowIndex, cellIndex, context, this, ref rect))
+                        try
                         {
-                            var text = controller.GetCellText(rowIndex, cellIndex);
-                            if (!string.IsNullOrEmpty(text))
+                            if (!controller.Draw(rowIndex, cellIndex, context, this, ref rect))
                             {
-                                var indexOfEndOfLine = text.IndexOf('\n');
-                                if (indexOfEndOfLine != -1)
-                                    text = text.Substring(0, indexOfEndOfLine);
+                                var text = controller.GetCellText(rowIndex, cellIndex);
+                                if (!string.IsNullOrEmpty(text))
+                                {
+                                    var indexOfEndOfLine = text.IndexOf('\n');
+                                    if (indexOfEndOfLine != -1)
+                                        text = text.Substring(0, indexOfEndOfLine);
 
-                                rect = rect.WithWidth(rect.Width - ColumnSpacing);
-                                var ft = new FormattedText
-                                {
-                                    Text = text,
-                                    Constraint = new Size(rect.Width, RowHeight),
-                                    Typeface = font,
-                                    FontSize = 12
-                                };
-                                if (Math.Abs(rectWidth - rect.Width) > 0.01)
-                                {
-                                    state.Dispose();
-                                    state = context.PushClip(rect);
+                                    rect = rect.WithWidth(rect.Width - ColumnSpacing);
+                                    var ft = new FormattedText
+                                    {
+                                        Text = text,
+                                        Constraint = new Size(rect.Width, RowHeight),
+                                        Typeface = font,
+                                        FontSize = 12
+                                    };
+                                    if (Math.Abs(rectWidth - rect.Width) > 0.01)
+                                    {
+                                        state.Dispose();
+                                        state = context.PushClip(rect);
+                                    }
+
+                                    context.DrawText(textColor,
+                                        new Point(rect.X + ColumnSpacing, y + RowHeight / 2 - ft.Bounds.Height / 2),
+                                        ft);
                                 }
-
-                                context.DrawText(textColor,
-                                    new Point(rect.X + ColumnSpacing, y + RowHeight / 2 - ft.Bounds.Height / 2),
-                                    ft);
                             }
                         }
-
-                        state.Dispose();
+                        finally
+                        {
+                            state.Dispose();
+                        }
                     }
 
                     x += columnWidth;

@@ -35,6 +35,8 @@ internal readonly struct SelectResult
         }
     }
     
+    public bool HasColumn(string columnName) => Array.IndexOf(ColumnNames, columnName) != -1;
+
     public static SelectResult NonQuery(int affectedRows)
     {
         return new SelectResult(null, null, null, affectedRows, true);

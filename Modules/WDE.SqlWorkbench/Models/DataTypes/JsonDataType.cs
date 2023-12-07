@@ -1,13 +1,18 @@
+using System;
 using System.Text.RegularExpressions;
+using Generator.Equals;
 
 namespace WDE.SqlWorkbench.Models.DataTypes;
 
-internal readonly struct JsonDataType
+[Equatable]
+internal readonly partial struct JsonDataType
 {
     public override string ToString()
     {
         return "JSON";
     }
+    
+    public Type ManagedType => typeof(string);
     
     private JsonDataType(string text)
     {

@@ -72,6 +72,9 @@ public class VirtualizedTreeView : Panel
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
         base.OnPointerPressed(e);
+
+        if (e.Handled)
+            return;
         
         if (e.Source is IVisual source)
         {
@@ -100,8 +103,10 @@ public class VirtualizedTreeView : Panel
         var obj = eventSource?.DataContext;
         if (obj is IParentType parent)
         {
-            if (clickCount == 2)
-                parent.IsExpanded = !parent.IsExpanded;
+            // commented, because ConnectionListToolView handles DoubleTapped event
+            // and it clashed with this code
+            //if (clickCount == 2)
+            //    parent.IsExpanded = !parent.IsExpanded;
             SelectedNode = parent;
             InvalidateArrange();
         }

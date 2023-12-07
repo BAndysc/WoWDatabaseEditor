@@ -11,7 +11,7 @@ internal static class SqlParseUtils
             "BASE TABLE" => TableType.Table,
             "VIEW" => TableType.View,
             "SYSTEM VIEW" => TableType.SystemView,
-            _ => throw new ArgumentOutOfRangeException($"Type {type} is not known.")
+            _ => throw new ArgumentOutOfRangeException($"Table type {type} is not known.")
         };
     }
     
@@ -21,7 +21,7 @@ internal static class SqlParseUtils
         {
             "PROCEDURE" => RoutineType.Procedure,
             "FUNCTION" => RoutineType.Function,
-            _ => throw new ArgumentOutOfRangeException($"Type {type} is not known.")
+            _ => throw new ArgumentOutOfRangeException($"Routine type {type} is not known.")
         };
     }
     
@@ -31,7 +31,7 @@ internal static class SqlParseUtils
         {
             "DEFINER" => SecurityType.Definer,
             "INVOKER" => SecurityType.Invoker,
-            _ => throw new ArgumentOutOfRangeException($"Type {type} is not known.")
+            _ => throw new ArgumentOutOfRangeException($"Security type {type} is not known.")
         };
     }
     
@@ -43,7 +43,22 @@ internal static class SqlParseUtils
             "NO SQL" => SqlDataAccessType.NoSql,
             "READS SQL DATA" => SqlDataAccessType.ReadsSqlData,
             "MODIFIES SQL DATA" => SqlDataAccessType.ModifiesSqlData,
-            _ => throw new ArgumentOutOfRangeException($"Type {type} is not known.")
+            _ => throw new ArgumentOutOfRangeException($"Data access type {type} is not known.")
+        };
+    }
+    
+    public static RowFormat? ParseRowFormat(string? rowFormat)
+    {
+        return rowFormat?.ToLower() switch
+        {
+            null => null,
+            "fixed" => RowFormat.Fixed,
+            "dynamic" => RowFormat.Dynamic,
+            "compressed" => RowFormat.Compressed,
+            "redundant" => RowFormat.Redundant,
+            "compact" => RowFormat.Compact,
+            "paged" => RowFormat.Paged,
+            _ => throw new ArgumentOutOfRangeException($"Row format {rowFormat} is not known.")
         };
     }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using AsyncAwaitBestPractices.MVVM;
 using Avalonia;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
@@ -18,6 +19,7 @@ using WDE.Common.Types;
 using WDE.Common.Utils;
 using WDE.MVVM;
 using WDE.SqlWorkbench.Models;
+using WDE.SqlWorkbench.Services.ActionsOutput;
 using WDE.SqlWorkbench.Services.Connection;
 using WDE.SqlWorkbench.Utils;
 
@@ -37,7 +39,7 @@ internal partial class SelectResultsViewModel : ObservableBase
     public string TitleWithModifiedStatus => IsModified ? Title + " *" : Title;
     
     public IMultiIndexContainer Selection { get; } = new MultiIndexContainer();
-    public string Title { get; }
+    public string Title { get; protected set; }
     public IReadOnlyList<ITableColumnHeader> Columns { get; }
     
     public int Count => Results.AffectedRows + AdditionalRowsCount;
@@ -49,18 +51,25 @@ internal partial class SelectResultsViewModel : ObservableBase
     public virtual ImageUri Icon => new("Icons/icon_mini_view_big.png");
     
     public ICommand CopyColumnNameCommand { get; }
-    
     public ICommand SelectAllCommand { get; }
-    
     public ICommand CopySelectedCommand { get; }
+    public ICommand CopyInsertCommand { get; }
+    public IAsyncCommand RefreshCommand { get; }
+    public IAsyncCommand CreateViewCommand { get; }
     
-    public SelectResultsViewModel(SqlWorkbenchViewModel vm, string title, in SelectResult results)
+    public SelectResultsViewModel(SqlWorkbenchViewModel vm, IActionOutput action, in SelectResult results)
     {
         this.vm = vm;
         Results = results;
         TableController = new TableController(this);
-        Title = title;
+        Title = $"Query {action.Index}";
         Columns = results.ColumnNames.Select(x => new TableTableColumnHeader(x)).Prepend(new TableTableColumnHeader("#", 50)).ToArray();
+        
+        CopyInsertCommand = new DelegateCommand(() =>
+        {
+            if (TryGenerateInsert(Selection.All(), false, out var insert))
+                vm.ClipboardService.SetText(insert);
+        });
         
         CopyColumnNameCommand = new DelegateCommand(() =>
         {
@@ -68,6 +77,11 @@ internal partial class SelectResultsViewModel : ObservableBase
                 return;
             var name = Columns[selectedCellIndex].Header;
             vm.ClipboardService.SetText(name);
+        });
+        
+        RefreshCommand = new AsyncAutoCommand(async () =>
+        {
+            await vm.ExecuteAndOverrideResultsAsync(action.Query, this);
         });
         
         SelectAllCommand = new DelegateCommand(() =>
@@ -94,7 +108,87 @@ internal partial class SelectResultsViewModel : ObservableBase
             }
             vm.ClipboardService.SetText(csv.ToString());
         });
+        
+        CreateViewCommand = new AsyncAutoCommand(async () =>
+        {
+            var newViewName = await vm.UserQuestions.AskForNewViewNameAsync();
+            if (string.IsNullOrWhiteSpace(newViewName))
+                return;
+            
+            try
+            { 
+                if (FromClause != null && !string.IsNullOrEmpty(FromClause.Value.Schema))
+                    newViewName = $"`{FromClause.Value.Schema}`.`{newViewName}`";
+                else
+                    newViewName = $"`{newViewName}`";
+                await vm.ExecuteAsync(new[] { $"CREATE VIEW {newViewName} AS {action.OriginalQuery}" }, false, true, false);
+            }
+            catch (Exception e)
+            {
+                await vm.UserQuestions.SaveErrorAsync(e);
+            }
+        });
     }
+
+    protected string ColumnValueToMySqlRepresentation(int columnIndex, string? value)
+    {
+        if (value == null)
+            return "NULL";
+
+        if (columnIndex - 1 >= Results.Columns.Length)
+            return "NULL";
+        
+        var columnCategory = Results.Columns[columnIndex - 1]?.Category ?? ColumnTypeCategory.Unknown;
+
+        if (columnCategory == ColumnTypeCategory.Unknown)
+        {
+            var columnName = Results.ColumnNames[columnIndex - 1];
+            throw new Exception($"The column {columnName} has type {Results.Columns[columnIndex - 1]?.GetType()} which editor can't edit right now. Please report this.");
+        }
+            
+        if (columnCategory is ColumnTypeCategory.String)
+            return $"'{MySqlHelper.EscapeString(value)}'";
+        else if (columnCategory is ColumnTypeCategory.DateTime)
+        {
+            if (value.Contains('(') && value.Contains(')')) // contains a function call
+                return value;
+            return $"'{value}'";
+        }
+        else if (columnCategory is ColumnTypeCategory.Binary)
+        {
+            return $"X'{value}'";
+        }
+            
+        return value;
+    }
+
+    protected bool TryGenerateInsert(IEnumerable<int> rows, bool skipDeleted, out string insert)
+    {
+        List<string> inserts = new();
+        foreach (var rowIndex in rows)
+        {
+            if (skipDeleted && IsRowMarkedAsDeleted(rowIndex))
+                continue;
+            
+            List<string> columns = new();
+            for (int columnIndex = 1; columnIndex < Columns.Count; ++columnIndex)
+                columns.Add(ColumnValueToMySqlRepresentation(columnIndex, GetFullValue(rowIndex, columnIndex)));
+            inserts.Add("(" + string.Join(", ", columns) + ")");
+        }
+
+        if (inserts.Count > 0)
+        {
+            var columns = string.Join(", ", Results.ColumnNames.Select(x => $"`{x}`"));
+            var into = FromClause?.ToString() ?? "?";
+            insert = $"INSERT INTO {into} ({columns}) VALUES\n" + string.Join(",\n", inserts);
+            return true;
+        }
+
+        insert = "";
+        return false;
+    }
+    
+    protected virtual SimpleFrom? FromClause => null;
 
     protected void UpdateView()
     {
@@ -115,6 +209,14 @@ internal partial class SelectResultsViewModel : ObservableBase
         UpdateView();
     }
 
+    public void UpdateResults(in SelectResult results)
+    {
+        Results = results;
+        UpdateView();
+        RaisePropertyChanged(nameof(Count));
+        RaisePropertyChanged(nameof(Results));
+    }
+
     /// <summary>
     /// Returns full, not truncated, string representation of the value, not quoted, not escaped
     /// </summary>
@@ -127,6 +229,9 @@ internal partial class SelectResultsViewModel : ObservableBase
             return null;
 
         if (cellIndex == 0) // # column
+            return null;
+        
+        if (cellIndex - 1 >= Results.Columns.Length)
             return null;
         
         return Results.Columns[cellIndex - 1]!.GetFullToString(rowIndex);
@@ -147,6 +252,9 @@ internal partial class SelectResultsViewModel : ObservableBase
             return null;
 
         if (cellIndex == 0) // # column
+            return null;
+
+        if (cellIndex - 1 >= Results.Columns.Length)
             return null;
         
         return Results.Columns[cellIndex - 1]!.GetToString(rowIndex);
@@ -259,7 +367,7 @@ internal class TableController : BaseVirtualizedTableController
             drawingContext.DrawRectangle(null, new Pen(Brushes.Orange), rect.Deflate(1));
         }
 
-        if ((hasOverride && overrideString == null) || (!hasOverride && rowIndex < vm.Results.AffectedRows && vm.Results.Columns[cellIndex - 1]!.IsNull(rowIndex)))
+        if ((hasOverride && overrideString == null) || (!hasOverride && rowIndex < vm.Results.AffectedRows && cellIndex - 1 < vm.Results.Columns.Length && vm.Results.Columns[cellIndex - 1]!.IsNull(rowIndex)))
         {
             DrawText(drawingContext, rect, "(null)");
             return true;

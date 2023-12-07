@@ -99,7 +99,7 @@ internal class SqlWorkbenchViewModelTests
         
         Assert.AreEqual("Error: Unknown database 'world'", actionsOutputService.Actions[0].Response);
         var worldDb = mockServer.CreateDatabase("world");
-        var table = worldDb.CreateTable("tab", TableType.Table, new[]{typeof(string)}, new ColumnInfo("a", "varchar", false, true, true, null));
+        var table = worldDb.CreateTable("tab", TableType.Table, new ColumnInfo("a", "varchar", false, true, true, null, null, null));
 
         await vm.ExecuteAllCommand.ExecuteAsync();
         Assert.IsTrue(actionsOutputService.Actions[1].IsSuccess);
@@ -130,8 +130,8 @@ internal class SqlWorkbenchViewModelTests
     {
         using var vm = CreateConnectedViewModel();
         var worldDb = mockServer.CreateDatabase("world");
-        var table = worldDb.CreateTable("tab", TableType.Table, new []{typeof(int), typeof(string)}, new ColumnInfo("a", "int", false, true, true, null),
-            new ColumnInfo("b", "varchar", false, false, false, null));
+        var table = worldDb.CreateTable("tab", TableType.Table, new ColumnInfo("a", "int", false, true, true, null, null, null),
+            new ColumnInfo("b", "varchar", false, false, false, null, null, null));
         table.Insert(5, "text");
         
         vm.Document.Insert(0, "SELECT `b` FROM `tab`");
@@ -159,7 +159,8 @@ internal class SqlWorkbenchViewModelTests
         {
             "SELECT `b` FROM `tab`",
             "SHOW FULL TABLES;",
-            "SHOW COLUMNS FROM `tab`"
+            "SELECT DATABASE()",
+            "SELECT * FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = 'world' AND `TABLE_NAME` = 'tab' ORDER BY `ORDINAL_POSITION`",
         }, connector.ExecutedQueries);
     }
     
@@ -168,8 +169,8 @@ internal class SqlWorkbenchViewModelTests
     {
         using var vm = CreateConnectedViewModel();
         var worldDb = mockServer.CreateDatabase("world");
-        var table = worldDb.CreateTable("tab", TableType.Table, new []{typeof(int), typeof(string)}, new ColumnInfo("a", "int", false, true, true, null),
-            new ColumnInfo("b", "varchar", false, false, false, null));
+        var table = worldDb.CreateTable("tab", TableType.Table, new ColumnInfo("a", "int", false, true, true, null, null, null),
+            new ColumnInfo("b", "varchar", false, false, false, null, null, null));
         table.Insert(5, "text");
         
         vm.Document.Insert(0, "SELECT `a` FROM `tab`");
@@ -209,7 +210,8 @@ internal class SqlWorkbenchViewModelTests
         {
             "SELECT `a` FROM `tab`",
             "SHOW FULL TABLES;",
-            "SHOW COLUMNS FROM `tab`",
+            "SELECT DATABASE()",
+            "SELECT * FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = 'world' AND `TABLE_NAME` = 'tab' ORDER BY `ORDINAL_POSITION`",
             "START TRANSACTION",
             "UPDATE `tab` SET `a` = 3 WHERE `a` = 5",
             "COMMIT"
@@ -221,8 +223,8 @@ internal class SqlWorkbenchViewModelTests
     {
         using var vm = CreateConnectedViewModel();
         var worldDb = mockServer.CreateDatabase("world");
-        var table = worldDb.CreateTable("tab", TableType.Table, new []{typeof(int), typeof(string)}, new ColumnInfo("a", "int", false, true, true, null),
-            new ColumnInfo("b", "varchar", false, false, false, null));
+        var table = worldDb.CreateTable("tab", TableType.Table, new ColumnInfo("a", "int", false, true, true, null, null, null),
+            new ColumnInfo("b", "varchar", false, false, false, null, null, null));
         
         vm.Document.Insert(0, "SELECT `b`, `a` FROM `tab`");
         await vm.ExecuteAllCommand.ExecuteAsync();
@@ -263,7 +265,8 @@ internal class SqlWorkbenchViewModelTests
         {
             "SELECT `b`, `a` FROM `tab`",
             "SHOW FULL TABLES;",
-            "SHOW COLUMNS FROM `tab`",
+            "SELECT DATABASE()",
+            "SELECT * FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = 'world' AND `TABLE_NAME` = 'tab' ORDER BY `ORDINAL_POSITION`",
             "START TRANSACTION",
             "INSERT INTO `tab` (`b`, `a`) VALUES\n(NULL, NULL),\n('txt', 3)",
             "COMMIT"
@@ -275,8 +278,8 @@ internal class SqlWorkbenchViewModelTests
     {
         using var vm = CreateConnectedViewModel();
         var worldDb = mockServer.CreateDatabase("world");
-        var table = worldDb.CreateTable("tab", TableType.Table, new []{typeof(int), typeof(string)}, new ColumnInfo("a", "int", false, true, true, null),
-            new ColumnInfo("b", "varchar", false, false, false, null));
+        var table = worldDb.CreateTable("tab", TableType.Table, new ColumnInfo("a", "int", false, true, true, null, null, null),
+            new ColumnInfo("b", "varchar", false, false, false, null, null, null));
         
         vm.Document.Insert(0, "SELECT `b`, `a` FROM `tab`");
         await vm.ExecuteAllCommand.ExecuteAsync();
@@ -317,7 +320,8 @@ internal class SqlWorkbenchViewModelTests
         {
             "SELECT `b`, `a` FROM `tab`",
             "SHOW FULL TABLES;",
-            "SHOW COLUMNS FROM `tab`",
+            "SELECT DATABASE()",
+            "SELECT * FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = 'world' AND `TABLE_NAME` = 'tab' ORDER BY `ORDINAL_POSITION`",
             "START TRANSACTION",
             "INSERT INTO `tab` (`b`, `a`) VALUES\n('abc', 2)",
             "COMMIT"
@@ -329,8 +333,8 @@ internal class SqlWorkbenchViewModelTests
     {
         using var vm = CreateConnectedViewModel();
         var worldDb = mockServer.CreateDatabase("world");
-        var table = worldDb.CreateTable("tab", TableType.Table, new []{typeof(int), typeof(string)}, new ColumnInfo("a", "int", false, true, true, null),
-            new ColumnInfo("b", "varchar", false, false, false, null));
+        var table = worldDb.CreateTable("tab", TableType.Table, new ColumnInfo("a", "int", false, true, true, null, null, null),
+            new ColumnInfo("b", "varchar", false, false, false, null, null, null));
         
         vm.Document.Insert(0, "SELECT `b`, `a` FROM `tab`");
         await vm.ExecuteAllCommand.ExecuteAsync();
@@ -355,7 +359,8 @@ internal class SqlWorkbenchViewModelTests
         {
             "SELECT `b`, `a` FROM `tab`",
             "SHOW FULL TABLES;",
-            "SHOW COLUMNS FROM `tab`",
+            "SELECT DATABASE()",
+            "SELECT * FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = 'world' AND `TABLE_NAME` = 'tab' ORDER BY `ORDINAL_POSITION`",
             "START TRANSACTION",
             "ROLLBACK"
         }, connector.ExecutedQueries);
@@ -366,43 +371,24 @@ internal class SqlWorkbenchViewModelTests
     {
         using var vm = CreateConnectedViewModel();
         var worldDb = mockServer.CreateDatabase("world");
-        var table = worldDb.CreateTable("tab", TableType.Table, new []
-            {
-                typeof(string),
-                typeof(bool),
-                typeof(byte),
-                typeof(sbyte),
-                typeof(short),
-                typeof(ushort),
-                typeof(int),
-                typeof(uint),
-                typeof(long),
-                typeof(ulong),
-                typeof(decimal),
-                typeof(double),
-                typeof(float),
-                typeof(MySqlDateTime),
-                typeof(DateTime),
-                typeof(TimeSpan),
-                typeof(byte[])
-            }, 
-            new ColumnInfo("a", "varchar(64)", false, false, false, null),
-            new ColumnInfo("b", "tinyint(1)", false, false, false, null),
-            new ColumnInfo("c", "tinyint unsigned", false, false, false, null),
-            new ColumnInfo("d", "tinyint", false, false, false, null),
-            new ColumnInfo("e", "smallint", false, false, false, null),
-            new ColumnInfo("f", "smallint unsigned", false, false, false, null),
-            new ColumnInfo("g", "int", false, false, false, null),
-            new ColumnInfo("h", "int unsigned", false, false, false, null),
-            new ColumnInfo("i", "bingint", false, false, false, null),
-            new ColumnInfo("j", "bigint unsigned", false, false, false, null),
-            new ColumnInfo("k", "decimal", false, false, false, null),
-            new ColumnInfo("l", "double", false, false, false, null),
-            new ColumnInfo("m", "float", false, false, false, null),
-            new ColumnInfo("n", "datetime", false, false, false, null),
-            new ColumnInfo("o", "TIMESTAMP", false, false, false, null),
-            new ColumnInfo("p", "time", false, false, false, null),
-            new ColumnInfo("q", "binary(64)", false, false, false, null));
+        var table = worldDb.CreateTable("tab", TableType.Table, 
+            new ColumnInfo("a", "varchar(64)", false, false, false, null, null, null),
+            new ColumnInfo("b", "tinyint(1)", false, false, false, null, null, null),
+            new ColumnInfo("c", "tinyint unsigned", false, false, false, null, null, null),
+            new ColumnInfo("d", "tinyint", false, false, false, null, null, null),
+            new ColumnInfo("e", "smallint", false, false, false, null, null, null),
+            new ColumnInfo("f", "smallint unsigned", false, false, false, null, null, null),
+            new ColumnInfo("g", "int", false, false, false, null, null, null),
+            new ColumnInfo("h", "int unsigned", false, false, false, null, null, null),
+            new ColumnInfo("i", "bigint", false, false, false, null, null, null),
+            new ColumnInfo("j", "bigint unsigned", false, false, false, null, null, null),
+            new ColumnInfo("k", "decimal", false, false, false, null, null, null),
+            new ColumnInfo("l", "double", false, false, false, null, null, null),
+            new ColumnInfo("m", "float", false, false, false, null, null, null),
+            new ColumnInfo("n", "datetime", false, false, false, null, null, null),
+            new ColumnInfo("o", "TIMESTAMP", false, false, false, null, null, null),
+            new ColumnInfo("p", "time", false, false, false, null, null, null),
+            new ColumnInfo("q", "binary(64)", false, false, false, null, null, null));
         
         vm.Document.Insert(0, "SELECT * FROM `tab`");
         await vm.ExecuteAllCommand.ExecuteAsync();
@@ -436,7 +422,8 @@ internal class SqlWorkbenchViewModelTests
         {
             "SELECT * FROM `tab`",
             "SHOW FULL TABLES;",
-            "SHOW COLUMNS FROM `tab`",
+            "SELECT DATABASE()",
+            "SELECT * FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = 'world' AND `TABLE_NAME` = 'tab' ORDER BY `ORDINAL_POSITION`",
             "START TRANSACTION",
             @"INSERT INTO `tab` (`a`, `b`, `c`, `d`, `e`, `f`, `g`, `h`, `i`, `j`, `k`, `l`, `m`, `n`, `o`, `p`, `q`) VALUES
 (NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
@@ -450,11 +437,7 @@ internal class SqlWorkbenchViewModelTests
     {
         using var vm = CreateConnectedViewModel();
         var worldDb = mockServer.CreateDatabase("world");
-        var table = worldDb.CreateTable("tab", TableType.Table, new []
-            {
-                typeof(byte[])
-            }, 
-            new ColumnInfo("a", "binary(64)", false, false, false, null));
+        var table = worldDb.CreateTable("tab", TableType.Table,new ColumnInfo("a", "binary(64)", false, false, false, null, null, null));
         byte[] longBytes = Enumerable.Range(0, BinaryColumnData.MaxToStringLength + 10).Select(x => (byte)0xAA).ToArray();
         table.Insert(longBytes);
         var longBytesAsHex = Convert.ToHexString(longBytes);
@@ -479,7 +462,8 @@ internal class SqlWorkbenchViewModelTests
         {
             "SELECT * FROM `tab`",
             "SHOW FULL TABLES;",
-            "SHOW COLUMNS FROM `tab`",
+            "SELECT DATABASE()",
+            "SELECT * FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = 'world' AND `TABLE_NAME` = 'tab' ORDER BY `ORDINAL_POSITION`",
             "START TRANSACTION",
             $@"INSERT INTO `tab` (`a`) VALUES
 (X'{longBytesAsHex}'),
@@ -493,8 +477,8 @@ internal class SqlWorkbenchViewModelTests
     {
         using var vm = CreateConnectedViewModel();
         var worldDb = mockServer.CreateDatabase("world");
-        var table = worldDb.CreateTable("tab", TableType.Table, new []{typeof(int), typeof(string)}, new ColumnInfo("a", "int", false, true, true, null),
-            new ColumnInfo("b", "varchar", false, false, false, null));
+        var table = worldDb.CreateTable("tab", TableType.Table, new ColumnInfo("a", "int", false, true, true, null, null, null),
+            new ColumnInfo("b", "varchar", false, false, false, null, null, null));
         table.Insert(1, "a");
         table.Insert(2, "b");
         table.Insert(3, "c");
@@ -522,7 +506,8 @@ internal class SqlWorkbenchViewModelTests
         {
             "SELECT `b`, `a` FROM `tab`",
             "SHOW FULL TABLES;",
-            "SHOW COLUMNS FROM `tab`"
+            "SELECT DATABASE()",
+            "SELECT * FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = 'world' AND `TABLE_NAME` = 'tab' ORDER BY `ORDINAL_POSITION`",
         }, connector.ExecutedQueries);
     }
 
@@ -531,11 +516,11 @@ internal class SqlWorkbenchViewModelTests
     {
         using var vm = CreateConnectedViewModel();
         var worldDb = mockServer.CreateDatabase("world");
-        var table = worldDb.CreateTable("tab", TableType.Table, new []{typeof(string), typeof(int), typeof(float), typeof(sbyte), typeof(string)}, new ColumnInfo("a", "varchar", false, true, true, null),
-            new ColumnInfo("b", "int", false, true, true, null),
-            new ColumnInfo("c", "float", false, true, true, null),
-            new ColumnInfo("d", "tinyint", false, true, true, null),
-            new ColumnInfo("e", "text", true, true, true, null));
+        var table = worldDb.CreateTable("tab", TableType.Table, new ColumnInfo("a", "varchar", false, true, true, null, null, null),
+            new ColumnInfo("b", "int", false, true, true, null, null, null),
+            new ColumnInfo("c", "float", false, true, true, null, null, null),
+            new ColumnInfo("d", "tinyint", false, true, true, null, null, null),
+            new ColumnInfo("e", "text", true, true, true, null, null, null));
 
         vm.Document.Insert(0, "SHOW TABLES");
         await vm.ExecuteAllCommand.ExecuteAsync();
@@ -561,5 +546,43 @@ internal class SqlWorkbenchViewModelTests
             "SHOW TABLES",
             "SHOW FULL TABLES;"
         }, connector.ExecutedQueries);
+    }
+    
+    [Test]
+    public async Task Test_CopyPaste_Rows()
+    {
+        using var vm = CreateConnectedViewModel();
+        var worldDb = mockServer.CreateDatabase("world");
+        var table = worldDb.CreateTable("tab", TableType.Table, 
+            new ColumnInfo("a", "varchar", true, true, true, null, null, null),
+            new ColumnInfo("b", "int", true, true, true, null, null, null));
+        table.Insert(new object?[]{"a\t\n\"bb\"c", 1});
+        table.Insert(new object?[]{"bcd", 2});
+        table.Insert(new object?[]{"efg", 3});
+        
+        vm.Document.Insert(0, "select * from tab");
+        await vm.ExecuteAllCommand.ExecuteAsync();
+        
+        Assert.IsTrue(actionsOutputService.Actions[0].IsSuccess);
+        Assert.AreEqual(1, vm.Results.Count);
+        
+        // results
+        var results = vm.Results[0] as SelectSingleTableViewModel;
+        Assert.IsNotNull(results);
+        
+        results!.Selection.Add(0);
+        results.Selection.Add(2);
+        
+        results.CopySelectedCommand.Execute(null);
+        
+        clipboard.Received().SetText("\"a\t\n\\\"bb\\\"c\"\t1\nefg\t3");
+        clipboard.GetText().ReturnsForAnyArgs(Task.FromResult("\"a\t\n\\\"bb\"c\"\t1\nefg\t3"));
+        await results.PasteSelectedCommand.ExecuteAsync();
+        
+        Assert.AreEqual(5, results.Count);
+        Assert.AreEqual("a\t\n\"bb\"c", results.GetShortValue(3, 1));
+        Assert.AreEqual("1", results.GetShortValue(3, 2));
+        Assert.AreEqual("efg", results.GetShortValue(4, 1));
+        Assert.AreEqual("3", results.GetShortValue(4, 2));
     }
 }

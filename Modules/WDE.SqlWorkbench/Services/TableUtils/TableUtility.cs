@@ -37,6 +37,11 @@ internal class TableUtility : ITableUtility
     {
         editorService.NewDocumentWithTableInfo(connection, schema, table);
     }
+    
+    public void InspectDatabase(IConnection connection, string schema)
+    {
+        editorService.NewDocumentWithDatabaseInfo(connection, schema);
+    }
 
     public void AlterTable(IConnection connection, string schema, string? table)
     {

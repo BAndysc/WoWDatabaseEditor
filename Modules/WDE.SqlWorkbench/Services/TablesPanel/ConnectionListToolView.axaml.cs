@@ -49,6 +49,7 @@ public class ConnectionListToolView : UserControl
             if (visual.SelfOrVisualAncestor<VirtualizedTreeViewItem>() is { } item)
             {
                 (DataContext as ConnectionListToolViewModel)!.OpenItem((item.DataContext as INodeType)!);
+                e.Handled = true;
             }
         }
     }
