@@ -1,3 +1,4 @@
+using System.IO;
 using Prism.Ioc;
 using WDE.Common.Managers;
 using WDE.Common.Services;
@@ -5,6 +6,7 @@ using WDE.Common.Services.MessageBox;
 using WDE.Common.Utils;
 using WDE.Module.Attributes;
 using WDE.SqlWorkbench.Services.Connection;
+using WDE.SqlWorkbench.Solutions;
 using WDE.SqlWorkbench.ViewModels;
 
 namespace WDE.SqlWorkbench.Services;
@@ -41,6 +43,12 @@ internal class SqlEditorService : IExtendedSqlEditorService
         this.messageBoxService = messageBoxService;
     }
 
+    private QueryDocumentSolutionItem CreateSolutionItem(IConnection connection)
+    {
+        var fileName = Path.GetRandomFileName();
+        return new QueryDocumentSolutionItem(fileName, connection.ConnectionData.Id, true);
+    }
+    
     public void NewDocument()
     {
         if (connectionsManager.DefaultConnection != null)
@@ -51,14 +59,14 @@ internal class SqlEditorService : IExtendedSqlEditorService
 
     public void NewDocument(IConnection connection)
     {
-        var doc = containerProvider.Resolve<SqlWorkbenchViewModel>((typeof(IConnection), connection));
+        var doc = containerProvider.Resolve<SqlWorkbenchViewModel>((typeof(IConnection), connection), (typeof(QueryDocumentSolutionItem), CreateSolutionItem(connection)));
         doc.Title = $"New query @ {connection.ConnectionData.ConnectionName}";
         documentManager.OpenDocument(doc);
     }
 
     public void NewDocumentWithTableInfo(IConnection connection, string schema, string tableName)
     {
-        var vm = containerProvider.Resolve<SqlWorkbenchViewModel>((typeof(IConnection), connection));
+        var vm = containerProvider.Resolve<SqlWorkbenchViewModel>((typeof(IConnection), connection), (typeof(QueryDocumentSolutionItem), CreateSolutionItem(connection)));
         vm.Title = $"{tableName} @ {schema}";
         vm.Document.Text = $@"SELECT
     `COLUMN_NAME`,
@@ -84,7 +92,7 @@ ORDER BY
 
     public void NewDocumentWithTableSelect(IConnection connection, string schema, string tableName)
     {
-        var vm = containerProvider.Resolve<SqlWorkbenchViewModel>((typeof(IConnection), connection));
+        var vm = containerProvider.Resolve<SqlWorkbenchViewModel>((typeof(IConnection), connection), (typeof(QueryDocumentSolutionItem), CreateSolutionItem(connection)));
         vm.Title = $"{tableName} @ {schema}";
         vm.Document.Text = $"SELECT * FROM `{schema}`.`{tableName}`";
         vm.Document.UndoStack.MarkAsOriginalFile();
@@ -94,7 +102,7 @@ ORDER BY
 
     public void NewDocumentWithQueryAndExecute(IConnection connection, string query)
     {
-        var vm = containerProvider.Resolve<SqlWorkbenchViewModel>((typeof(IConnection), connection));
+        var vm = containerProvider.Resolve<SqlWorkbenchViewModel>((typeof(IConnection), connection), (typeof(QueryDocumentSolutionItem), CreateSolutionItem(connection)));
         vm.Title = $"New query @ {connection.ConnectionData.ConnectionName}";
         vm.Document.Text = query;
         vm.Document.UndoStack.MarkAsOriginalFile();
@@ -104,7 +112,7 @@ ORDER BY
 
     public void NewDocumentWithQuery(IConnection connection, string query)
     {
-        var vm = containerProvider.Resolve<SqlWorkbenchViewModel>((typeof(IConnection), connection));
+        var vm = containerProvider.Resolve<SqlWorkbenchViewModel>((typeof(IConnection), connection), (typeof(QueryDocumentSolutionItem), CreateSolutionItem(connection)));
         vm.Title = $"New query @ {connection.ConnectionData.ConnectionName}";
         vm.Document.Text = query;
         vm.Document.UndoStack.MarkAsOriginalFile();
@@ -113,7 +121,7 @@ ORDER BY
 
     public void NewDocumentWithDatabaseInfo(IConnection connection, string schema)
     {
-        var vm = containerProvider.Resolve<SqlWorkbenchViewModel>((typeof(IConnection), connection));
+        var vm = containerProvider.Resolve<SqlWorkbenchViewModel>((typeof(IConnection), connection), (typeof(QueryDocumentSolutionItem), CreateSolutionItem(connection)));
         vm.Title = $"{schema}";
         vm.Document.Text = $@"SELECT
     `TABLE_NAME`,

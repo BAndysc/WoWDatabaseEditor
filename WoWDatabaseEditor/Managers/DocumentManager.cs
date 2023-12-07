@@ -8,10 +8,12 @@ using AsyncAwaitBestPractices.MVVM;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
+using WDE.Common;
 using WDE.Common.Events;
 using WDE.Common.Managers;
 using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
+using WDE.Common.Solution;
 using WDE.Common.Utils;
 using WDE.Common.Windows;
 using WDE.Module.Attributes;
@@ -26,6 +28,7 @@ namespace WoWDatabaseEditorCore.Managers
         private readonly IEventAggregator eventAggregator;
         private readonly IMessageBoxService messageBoxService;
         private readonly ISolutionTasksService solutionTasksService;
+        private readonly ISolutionItemEditorRegistry solutionEditorManager;
         private ISolutionItemDocument? activeSolutionItemDocument;
         private IDocument? activeDocument;
         private IFocusableTool? activeTool;
@@ -34,15 +37,21 @@ namespace WoWDatabaseEditorCore.Managers
         private Dictionary<Type, ITool> typeToToolInstance = new();
         private List<ITool> allTools = new ();
 
+        private readonly Dictionary<ISolutionItem, IDocument> documents = new();
+
+        private readonly Dictionary<IDocument, ISolutionItem> documentToSolution = new();
+
         public DocumentManager(IEventAggregator eventAggregator, 
             IMessageBoxService messageBoxService,
             ITextDocumentService textDocumentService,
             ISolutionTasksService solutionTasksService,
+            ISolutionItemEditorRegistry solutionEditorManager, 
             IEnumerable<ITool> tools)
         {
             this.eventAggregator = eventAggregator;
             this.messageBoxService = messageBoxService;
             this.solutionTasksService = solutionTasksService;
+            this.solutionEditorManager = solutionEditorManager;
             ActivateDocument = new DelegateCommand<IDocument>(doc => ActiveDocument = doc);
             foreach (var tool in tools)
             {
@@ -58,6 +67,24 @@ namespace WoWDatabaseEditorCore.Managers
                     disposable.Dispose();
             });
             //OpenDocument(textDocumentService.CreateDocument("DEMO DEMO", "", "sql", true));
+            
+            
+            this.eventAggregator.GetEvent<DocumentClosedEvent>()
+                .Subscribe(document =>
+                {
+                    if (!documentToSolution.ContainsKey(document))
+                        return;
+
+                    documents.Remove(documentToSolution[document]);
+                    documentToSolution.Remove(document);
+                });
+
+            this.eventAggregator.GetEvent<EventRequestOpenItem>()
+                .Subscribe(item =>
+                    {
+                        OpenDocument(item);
+                    },
+                    true);
         }
 
         public IReadOnlyList<ITool> AllTools => allTools;
@@ -337,6 +364,53 @@ namespace WoWDatabaseEditorCore.Managers
             }
 
             ActiveDocument = editor;
+        }
+
+        public IDocument? OpenDocument(ISolutionItem item)
+        {
+            if (documents.ContainsKey(item))
+            {
+                OpenDocument(documents[item]);
+                return documents[item];
+            }
+            else
+            {
+                try
+                {
+                    IDocument editor = solutionEditorManager.GetEditor(item);
+                    OpenDocument(editor);
+                    documents[item] = editor;
+                    documentToSolution[editor] = item;
+                    return editor;
+                }
+                catch (SolutionItemEditorNotFoundException)
+                {
+                    messageBoxService.ShowDialog(new MessageBoxFactory<bool>().SetTitle("Editor not found")
+                        .SetMainInstruction(
+                            "Couldn't open item, because there is no editor registered for type " +
+                            item.GetType().Name)
+#if DEBUG
+                        .SetContent(
+                            $"There should be class that implements ISolutionItemEditorProvider<{item.GetType().Name}> and this class should be registered in containerRegister in module.")
+#endif
+                        .SetIcon(MessageBoxIcon.Warning)
+                        .WithOkButton(true)
+                        .Build());
+                    return null;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    messageBoxService.ShowDialog(new MessageBoxFactory<bool>().SetTitle("Cannot open the editor")
+                        .SetMainInstruction(
+                            "Couldn't open item, because there was an error")
+                        .SetContent(e.Message)
+                        .SetIcon(MessageBoxIcon.Error)
+                        .WithOkButton(true)
+                        .Build());
+                    return null;
+                }
+            }
         }
 
         public void OpenTool<T>() where T : ITool

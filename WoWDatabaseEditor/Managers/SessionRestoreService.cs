@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Prism.Events;
@@ -22,7 +23,7 @@ namespace WoWDatabaseEditorCore.Managers;
 [SingleInstance]
 public class SessionRestoreService
 {
-    private const int SessionRestoreInterval = 10 * 1000;
+    private static readonly TimeSpan SessionRestoreInterval = TimeSpan.FromSeconds(60);
     private const string LastSessionFile = "~/last_session.json";
    
     private readonly IDocumentManager documentManager;
@@ -80,6 +81,8 @@ public class SessionRestoreService
     {
         if (settings.RestoreOpenTabsMode is RestoreOpenTabsMode.RestoreWhenCrashed or RestoreOpenTabsMode.NeverRestore)
             lastSessionFile.Delete();
+        else
+            Snapshot();
     }
 
     private void Restore()
@@ -87,15 +90,24 @@ public class SessionRestoreService
         try
         {
             var content = File.ReadAllText(lastSessionFile.FullName);
-            var items = JsonConvert.DeserializeObject<List<AbstractSmartScriptProjectItem>>(content);
-            if (items == null)
+            var snapshots = JsonConvert.DeserializeObject<List<SavedSnapshot>>(content);
+            if (snapshots == null)
                 return;
             
-            foreach (var item in items)
+            foreach (var snapshot in snapshots)
             {
-                if (deserializerRegistry.TryDeserialize(item, out var solutionItem))
+                if (deserializerRegistry.TryDeserialize(snapshot.Item, out var solutionItem) && solutionItem != null)
                 {
-                    eventAggregator.GetEvent<EventRequestOpenItem>().Publish(solutionItem!);
+                    try
+                    {
+                        var editor = documentManager.OpenDocument(solutionItem);
+                        if (editor is IPeriodicSnapshotDocument psd && snapshot.State != null)
+                            psd.RestoreSnapshot(snapshot.State);
+                    }
+                    catch (Exception _)
+                    {
+                        // ignore
+                    }
                 }
             }
         }
@@ -112,22 +124,38 @@ public class SessionRestoreService
         {
             await Task.Delay(SessionRestoreInterval);
 
-            if (settings.RestoreOpenTabsMode == RestoreOpenTabsMode.NeverRestore)
-                continue;
-            
-            List<AbstractSmartScriptProjectItem> items = new();
-            foreach (var doc in documentManager.OpenedDocuments)
-            {
-                if (doc is ISolutionItemDocument si)
-                {
-                    var serialized = serializerRegistry.Serialize(si.SolutionItem, true);
-                    var item = new AbstractSmartScriptProjectItem(serialized);
-                    items.Add(item);
-                }
-            }
-
-            await File.WriteAllTextAsync(lastSessionFile.FullName, JsonConvert.SerializeObject(items));
-            statusBar.PublishNotification(new PlainNotification(NotificationType.Info, "Session saved"));
+            Snapshot();
         }
+    }
+
+    private void Snapshot()
+    {
+        if (settings.RestoreOpenTabsMode == RestoreOpenTabsMode.NeverRestore)
+            return;
+            
+        List<SavedSnapshot> items = new();
+        foreach (var doc in documentManager.OpenedDocuments)
+        {
+            if (doc is ISolutionItemDocument si)
+            {
+                string? state = null;
+                if (doc is IPeriodicSnapshotDocument psd && psd.IsModified)
+                {
+                    state = psd.TakeSnapshot();
+                }
+                var serialized = serializerRegistry.Serialize(si.SolutionItem, true);
+                var item = new AbstractSmartScriptProjectItem(serialized);
+                items.Add(new SavedSnapshot(){Item = item, State = state});
+            }
+        }
+
+        File.WriteAllText(lastSessionFile.FullName, JsonConvert.SerializeObject(items));
+        statusBar.PublishNotification(new PlainNotification(NotificationType.Info, "Session saved"));
+    }
+
+    public struct SavedSnapshot
+    {
+        public AbstractSmartScriptProjectItem Item { get; set; }
+        public string? State { get; set; }
     }
 }

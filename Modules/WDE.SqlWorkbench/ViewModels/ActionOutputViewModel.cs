@@ -47,8 +47,8 @@ public partial class ActionOutputViewModel : ObservableBase, IActionOutput
             if (query != null)
                 return query;
             
-            if (OriginalQuery.Contains('\n'))
-                query = OriginalQuery.Replace("\n", " ");
+            if (OriginalQuery.Length > 1024 || OriginalQuery.Contains('\n'))
+                query = OriginalQuery.AsSpan(0, Math.Min(1024, OriginalQuery.Length)).ToString().Replace("\n", " ");
             else
                 query = OriginalQuery;
             

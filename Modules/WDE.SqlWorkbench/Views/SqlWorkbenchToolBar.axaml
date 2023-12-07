@@ -9,8 +9,8 @@
              x:Class="WDE.SqlWorkbench.Views.SqlWorkbenchToolBar">
   <ToolbarPanel>
     
-    <ButtonImage ToolTip.Tip="Open" Image="Icons/icon_open.png" />
-    <ButtonImage ToolTip.Tip="Save" Image="Icons/icon_save.png" />
+    <ButtonImage ToolTip.Tip="Open" Image="Icons/icon_open.png" Command="{CompiledBinding OpenFileCommand}" />
+    <ButtonImage ToolTip.Tip="Save" Image="Icons/icon_save.png" Command="{CompiledBinding SaveFileCommand}" />
     
     <Border Width="20" />
     

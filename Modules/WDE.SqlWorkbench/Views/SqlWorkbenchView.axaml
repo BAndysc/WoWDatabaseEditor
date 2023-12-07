@@ -17,6 +17,10 @@
     <KeyBinding Gesture="Ctrl+Shift+Enter" Command="{CompiledBinding ExecuteAllCommand}" />
     <KeyBinding Gesture="Ctrl+Enter" Command="{CompiledBinding ExecuteSelectedCommand}" />
     <KeyBinding Gesture="F5" Command="{CompiledBinding ExecuteSelectedCommand}" />
+    <KeyBinding Gesture="Ctrl+O" Command="{CompiledBinding OpenFileCommand}" />
+    <KeyBinding Gesture="Ctrl+S" Command="{CompiledBinding SaveFileCommand}" />
+    <KeyBinding Gesture="Cmd+O" Command="{CompiledBinding OpenFileCommand}" />
+    <KeyBinding Gesture="Cmd+S" Command="{CompiledBinding SaveFileCommand}" />
   </UserControl.KeyBindings>
   <Grid RowDefinitions="*,5,0" Name="Grid">
     <DockPanel>

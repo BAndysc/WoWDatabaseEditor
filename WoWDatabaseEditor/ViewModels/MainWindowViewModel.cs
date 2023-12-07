@@ -335,6 +335,7 @@ namespace WoWDatabaseEditorCore.ViewModels
             if (!await CanClose())
                 return false;
             
+            SessionRestoreService.GracefulShutdown();
             CloseRequest?.Invoke();
             return true;
         }

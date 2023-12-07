@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using MySqlConnector;
 using NSubstitute;
+using WDE.Common.Managers;
 using WDE.Common.Services;
 using WDE.Common.Tasks;
 using WDE.SqlWorkbench.Models;
@@ -10,6 +11,7 @@ using WDE.SqlWorkbench.Services.LanguageServer;
 using WDE.SqlWorkbench.Services.QueryUtils;
 using WDE.SqlWorkbench.Services.UserQuestions;
 using WDE.SqlWorkbench.Settings;
+using WDE.SqlWorkbench.Solutions;
 using WDE.SqlWorkbench.Test.Mock;
 using WDE.SqlWorkbench.ViewModels;
 
@@ -28,6 +30,7 @@ internal class SqlWorkbenchViewModelTests
     protected IQuerySafetyService querySafetyService = null!;
     protected MockSqlConnector connector = null!;
     protected IMainThread mainThread = null!;
+    protected IWindowManager windowManager = null!;
     protected MockSqlConnector.MockMemoryServer mockServer = null!;
     protected ManualSynchronizationContext synchronizationContext = null!;
     
@@ -44,6 +47,7 @@ internal class SqlWorkbenchViewModelTests
         preferences = Substitute.For<ISqlWorkbenchPreferences>();
         clipboard = Substitute.For<IClipboardService>();
         connector = new MockSqlConnector(querySafetyService);
+        windowManager = Substitute.For<IWindowManager>();
         GlobalApplication.InitializeApplication(mainThread, GlobalApplication.AppBackend.Avalonia);
 
         synchronizationContext = new ManualSynchronizationContext();
@@ -65,7 +69,8 @@ internal class SqlWorkbenchViewModelTests
     protected SqlWorkbenchViewModel CreateViewModel(DatabaseConnectionData connectionData)
     {
         var connection = new Connection(connector, connectionData);
-        var vm = new SqlWorkbenchViewModel(actionsOutputService, languageServer, configuration, queryUtility, userQuestionsService, preferences, clipboard, mainThread, connection);
+        var solutionItem = new QueryDocumentSolutionItem("test", connectionData.Id, true);
+        var vm = new SqlWorkbenchViewModel(actionsOutputService, languageServer, configuration, queryUtility, userQuestionsService, preferences, clipboard, mainThread, windowManager, connection, solutionItem);
         return vm;
     }
     

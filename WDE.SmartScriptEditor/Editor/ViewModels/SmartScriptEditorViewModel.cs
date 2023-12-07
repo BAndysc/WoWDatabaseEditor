@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;
@@ -14,8 +13,6 @@ using PropertyChanged.SourceGenerator;
 using WDE.Common;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;
-using WDE.Common.Disposables;
-using WDE.Common.Events;
 using WDE.Common.History;
 using WDE.Common.Managers;
 using WDE.Common.Outliner;
@@ -45,7 +42,7 @@ using WDE.SqlQueryGenerator;
 
 namespace WDE.SmartScriptEditor.Editor.ViewModels
 {
-    public partial class SmartScriptEditorViewModel : ObservableBase, ISolutionItemDocument, IProblemSourceDocument, IOutlinerSourceDocument
+    public partial class SmartScriptEditorViewModel : ObservableBase, ISolutionItemDocument, IProblemSourceDocument, IOutlinerSourceDocument, IPeriodicSnapshotDocument
     {
         private readonly ISmartScriptDatabaseProvider smartScriptDatabase;
         private readonly IItemFromListProvider itemFromListProvider;
@@ -112,6 +109,16 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             public List<AbstractSmartScriptLine> Lines { get; set; } = new();
             public List<AbstractConditionLine> Conditions { get; set; } = new();
             public List<AbstractConditionLine> TargetConditions { get; set; } = new();
+            public List<AbstractGlobalVariable> GlobalVariables { get; set; } = new();
+        }
+
+        private class AbstractGlobalVariable
+        {
+            public long Key { get; set; }
+            public GlobalVariableType VariableType { get; set; }
+            public uint Entry { get; set; }
+            public string Name { get; set; } = "";
+            public string? Comment { get; set; }
         }
         
         public IList<SmartExtensionCommand> ExtensionCommands { get; }
@@ -827,172 +834,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
                 if (content == null)
                     return;
-                
-                if (content.Lines.Count > 0)
-                {
-                    if (content.Lines[0].EventType == -1) // actions
-                    {
-                        Dictionary<int, List<ICondition>>? targetConditions = null;
-                        if (content.TargetConditions.Count > 0)
-                        {
-                            targetConditions = content.TargetConditions.GroupBy(c => c.SourceGroup)
-                                .ToDictionary(x => x.Key, x => x.ToList<ICondition>());
-                        }
-                        
-                        int? eventIndex = null;
-                        int? actionIndex = null;
-                        using (script.BulkEdit("Paste actions"))
-                        {
-                            for (var i = 0; i < Events.Count; ++i)
-                            {
-                                if (Events[i].IsSelected)
-                                    eventIndex = i;
 
-                                for (int j = Events[i].Actions.Count - 1; j >= 0; j--)
-                                {
-                                    if (Events[i].Actions[j].IsSelected)
-                                    {
-                                        eventIndex = i;
-                                        if (!actionIndex.HasValue)
-                                            actionIndex = j + 1;
-                                        //else
-                                        //    actionIndex--;
-                                        //Events[i].Actions.RemoveAt(j);
-                                    }
-                                }
-                            }
-
-                            if (!eventIndex.HasValue)
-                                eventIndex = Events.Count - 1;
-
-                            if (eventIndex < 0)
-                                return;
-
-                            if (!actionIndex.HasValue)
-                                actionIndex = Events[eventIndex.Value].Actions.Count - 1;
-
-                            if (actionIndex < 0)
-                                actionIndex = 0;
-
-                            DeselectAll.Execute();
-                            foreach (var smartLine in content.Lines)
-                            {
-                                var smartAction = script.SafeActionFactory(smartLine);
-                                if (smartAction == null)
-                                    continue;
-                                smartAction.Comment = smartLine.Comment.Contains(" // ")
-                                    ? smartLine.Comment.Substring(smartLine.Comment.IndexOf(" // ") + 4).Trim()
-                                    : "";
-
-                                if (smartLine.SourceConditionId > 0 &&
-                                    targetConditions != null &&
-                                    targetConditions.TryGetValue(smartLine.SourceConditionId, out var sourceConditions))
-                                    smartAction.Source.Conditions = sourceConditions;
-                                
-                                if (smartLine.TargetConditionId > 0 &&
-                                    targetConditions != null &&
-                                    targetConditions.TryGetValue(smartLine.TargetConditionId, out var sourceConditionsTarget))
-                                    smartAction.Target.Conditions = sourceConditionsTarget;
-                                
-                                Events[eventIndex.Value].Actions.Insert(actionIndex!.Value, smartAction);
-                                smartAction.IsSelected = true;
-                                actionIndex++;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        int? index = null;
-                        using (script.BulkEdit("Paste events"))
-                        {
-                            for (int i = Events.Count - 1; i >= 0; --i)
-                            {
-                                if (Events[i].IsSelected)
-                                {
-                                    if (!index.HasValue)
-                                        index = i + 1;
-                                    //else
-                                    //    index--;
-                                    //Events.RemoveAt(i);
-                                    Events[i].IsSelected = false;
-                                }
-                            }
-
-                            if (!index.HasValue)
-                                index = Events.Count;
-                            
-                            foreach (var e in script.InsertFromClipboard(index.Value, content.Lines, content.Conditions, content.TargetConditions))
-                                e.IsSelected = true;
-                        }
-                    }
-                }
-                else if (content.Conditions != null && content.Conditions.Count > 0)
-                {
-                    if (AnyConditionSelected)
-                    {
-                        int? eventIndex = null;
-                        int? conditionIndex = null;
-                        using (script!.BulkEdit("Paste conditions"))
-                        {
-                            for (var i = 0; i < Events.Count - 1; ++i)
-                            {
-                                if (Events[i].IsSelected)
-                                    eventIndex = i;
-
-                                for (int j = Events[i].Conditions.Count - 1; j >= 0; j--)
-                                {
-                                    if (Events[i].Conditions[j].IsSelected)
-                                    {
-                                        eventIndex = i;
-                                        if (!conditionIndex.HasValue)
-                                            conditionIndex = j;
-                                        else
-                                            conditionIndex--;
-                                    }
-                                }
-                            }
-
-                            if (!eventIndex.HasValue)
-                                eventIndex = Events.Count - 1;
-
-                            if (eventIndex < 0)
-                                return;
-
-                            if (!conditionIndex.HasValue)
-                                conditionIndex = Events[eventIndex.Value].Conditions.Count - 1;
-
-                            if (conditionIndex < 0)
-                                conditionIndex = 0;
-
-                            DeselectAll.Execute();
-                            foreach (var smartCondition in content.Conditions.Select(c => script.SafeConditionFactory(c)))
-                            {
-                                if (smartCondition != null)
-                                {
-                                    Events[eventIndex.Value].Conditions.Insert(conditionIndex!.Value, smartCondition);
-                                    smartCondition.IsSelected = true;
-                                    conditionIndex++;   
-                                }
-                            }
-                        }      
-                    }
-                    else if (AnyEventSelected)
-                    {
-                        using (script.BulkEdit("Paste conditions"))
-                        {
-                            var smartEvent = SelectedItem;
-                            DeselectAll.Execute();
-                            foreach (var smartCondition in content.Conditions.Select(c => script.SafeConditionFactory(c)))
-                            {
-                                if (smartCondition != null)
-                                {
-                                    smartEvent?.Conditions.Add(smartCondition);
-                                    smartCondition.IsSelected = true;
-                                }
-                            }
-                        }
-                    }
-                }
+                PasteClipboardEvents(content);
                 OnPaste?.Invoke();
             });
 
@@ -1483,6 +1326,191 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             HeaderViewModel = editorExtension.CreateHeader(this, item);
         }
 
+        private void PasteClipboardEvents(ClipboardEvents content)
+        {
+            if (content.GlobalVariables.Count > 0)
+            {
+                foreach (var variable in content.GlobalVariables)
+                {
+                    var newVariable = new GlobalVariable
+                    {
+                        Key = variable.Key,
+                        VariableType = variable.VariableType,
+                        Entry = variable.Entry,
+                        Name = variable.Name,
+                        Comment = variable.Comment
+                    };
+                    script.GlobalVariables.Add(newVariable);
+                }
+            }
+            
+            if (content.Lines.Count > 0)
+            {
+                if (content.Lines[0].EventType == -1) // actions
+                {
+                    Dictionary<int, List<ICondition>>? targetConditions = null;
+                    if (content.TargetConditions.Count > 0)
+                    {
+                        targetConditions = content.TargetConditions.GroupBy(c => c.SourceGroup)
+                            .ToDictionary(x => x.Key, x => x.ToList<ICondition>());
+                    }
+                    
+                    int? eventIndex = null;
+                    int? actionIndex = null;
+                    using (script.BulkEdit("Paste actions"))
+                    {
+                        for (var i = 0; i < Events.Count; ++i)
+                        {
+                            if (Events[i].IsSelected)
+                                eventIndex = i;
+
+                            for (int j = Events[i].Actions.Count - 1; j >= 0; j--)
+                            {
+                                if (Events[i].Actions[j].IsSelected)
+                                {
+                                    eventIndex = i;
+                                    if (!actionIndex.HasValue)
+                                        actionIndex = j + 1;
+                                    //else
+                                    //    actionIndex--;
+                                    //Events[i].Actions.RemoveAt(j);
+                                }
+                            }
+                        }
+
+                        if (!eventIndex.HasValue)
+                            eventIndex = Events.Count - 1;
+
+                        if (eventIndex < 0)
+                            return;
+
+                        if (!actionIndex.HasValue)
+                            actionIndex = Events[eventIndex.Value].Actions.Count - 1;
+
+                        if (actionIndex < 0)
+                            actionIndex = 0;
+
+                        DeselectAll.Execute();
+                        foreach (var smartLine in content.Lines)
+                        {
+                            var smartAction = script.SafeActionFactory(smartLine);
+                            if (smartAction == null)
+                                continue;
+                            smartAction.Comment = smartLine.Comment.Contains(" // ")
+                                ? smartLine.Comment.Substring(smartLine.Comment.IndexOf(" // ") + 4).Trim()
+                                : "";
+
+                            if (smartLine.SourceConditionId > 0 &&
+                                targetConditions != null &&
+                                targetConditions.TryGetValue(smartLine.SourceConditionId, out var sourceConditions))
+                                smartAction.Source.Conditions = sourceConditions;
+                            
+                            if (smartLine.TargetConditionId > 0 &&
+                                targetConditions != null &&
+                                targetConditions.TryGetValue(smartLine.TargetConditionId, out var sourceConditionsTarget))
+                                smartAction.Target.Conditions = sourceConditionsTarget;
+                            
+                            Events[eventIndex.Value].Actions.Insert(actionIndex!.Value, smartAction);
+                            smartAction.IsSelected = true;
+                            actionIndex++;
+                        }
+                    }
+                }
+                else
+                {
+                    int? index = null;
+                    using (script.BulkEdit("Paste events"))
+                    {
+                        for (int i = Events.Count - 1; i >= 0; --i)
+                        {
+                            if (Events[i].IsSelected)
+                            {
+                                if (!index.HasValue)
+                                    index = i + 1;
+                                //else
+                                //    index--;
+                                //Events.RemoveAt(i);
+                                Events[i].IsSelected = false;
+                            }
+                        }
+
+                        if (!index.HasValue)
+                            index = Events.Count;
+                        
+                        foreach (var e in script.InsertFromClipboard(index.Value, content.Lines, content.Conditions, content.TargetConditions))
+                            e.IsSelected = true;
+                    }
+                }
+            }
+            else if (content.Conditions != null && content.Conditions.Count > 0)
+            {
+                if (AnyConditionSelected)
+                {
+                    int? eventIndex = null;
+                    int? conditionIndex = null;
+                    using (script!.BulkEdit("Paste conditions"))
+                    {
+                        for (var i = 0; i < Events.Count - 1; ++i)
+                        {
+                            if (Events[i].IsSelected)
+                                eventIndex = i;
+
+                            for (int j = Events[i].Conditions.Count - 1; j >= 0; j--)
+                            {
+                                if (Events[i].Conditions[j].IsSelected)
+                                {
+                                    eventIndex = i;
+                                    if (!conditionIndex.HasValue)
+                                        conditionIndex = j;
+                                    else
+                                        conditionIndex--;
+                                }
+                            }
+                        }
+
+                        if (!eventIndex.HasValue)
+                            eventIndex = Events.Count - 1;
+
+                        if (eventIndex < 0)
+                            return;
+
+                        if (!conditionIndex.HasValue)
+                            conditionIndex = Events[eventIndex.Value].Conditions.Count - 1;
+
+                        if (conditionIndex < 0)
+                            conditionIndex = 0;
+
+                        DeselectAll.Execute();
+                        foreach (var smartCondition in content.Conditions.Select(c => script.SafeConditionFactory(c)))
+                        {
+                            if (smartCondition != null)
+                            {
+                                Events[eventIndex.Value].Conditions.Insert(conditionIndex!.Value, smartCondition);
+                                smartCondition.IsSelected = true;
+                                conditionIndex++;   
+                            }
+                        }
+                    }      
+                }
+                else if (AnyEventSelected)
+                {
+                    using (script.BulkEdit("Paste conditions"))
+                    {
+                        var smartEvent = SelectedItem;
+                        DeselectAll.Execute();
+                        foreach (var smartCondition in content.Conditions.Select(c => script.SafeConditionFactory(c)))
+                        {
+                            if (smartCondition != null)
+                            {
+                                smartEvent?.Conditions.Add(smartCondition);
+                                smartCondition.IsSelected = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         public Task<IQuery> GenerateQuery()
         {
             return Task.FromResult(smartScriptExporter.GenerateSql(item, script));
@@ -1706,9 +1734,20 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             var lines = (await smartScriptDatabase.GetScriptFor(item.Entry ?? 0, item.EntryOrGuid, item.SmartType)).ToList();
             var conditions = smartScriptDatabase.GetConditionsForScript(item.Entry, item.EntryOrGuid, item.SmartType).ToList();
             var targetSourceConditions = smartScriptDatabase.GetConditionsForSourceTarget(item.Entry, item.EntryOrGuid, item.SmartType).ToList();
-            await smartScriptImporter.Import(script, false, lines, conditions, targetSourceConditions);
+
+            if (!scriptRestored && sessionToRestore == null)
+                await smartScriptImporter.Import(script, false, lines, conditions, targetSourceConditions);
+
             IsLoading = false;
             History.AddHandler(new SaiHistoryHandler(script, smartFactory));
+            // to make sure it is added after the real loading so that the HistoryManager has the handler installed
+            if (sessionToRestore != null)
+            {
+                script.GlobalVariables.RemoveAll();
+                Events.RemoveAll();
+                scriptRestored = true;
+                PasteClipboardEvents(sessionToRestore);
+            }
             TeachingTips.Start();
             problems.Value = inspectorService.GenerateInspections(script);
             script.OriginalLines.AddRange(lines);
@@ -2786,6 +2825,79 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             }
             
             return null;
+        }
+
+        public string TakeSnapshot()
+        {
+            int targetIndex = 1;
+            var variables = script.GlobalVariables.Select(x => new AbstractGlobalVariable()
+            {
+                Comment = x.Comment,
+                Entry = x.Entry,
+                Key = x.Key,
+                Name = x.Name,
+                VariableType = x.VariableType
+            }).ToList();
+            var targetConditions = Events
+                .SelectMany(e => e.Actions)
+                .SelectMany(a => new[] { a.Source, a.Target })
+                .SelectMany(x =>
+                {
+                    if (x.Conditions != null && x.Conditions.Count > 0)
+                    {
+                        x.Condition.Value = targetIndex++;
+                        return x.Conditions!.Select(c => new AbstractConditionLine(0, targetIndex - 1, 0, 0, c));
+                    }
+                    else
+                    {
+                        x.Condition.Value = 0;
+                        return Array.Empty<AbstractConditionLine>();
+                    }
+                }).ToList();
+                    
+            var eventLines = Events
+                .SelectMany((e, index) => e.ToSmartScriptLines(script.Entry, script.EntryOrGuid, script.SourceType, index))
+                .ToList();
+
+            var conditionLines = Events
+                .SelectMany((e, index) => this.smartScriptExporter.ToDatabaseCompatibleConditions(script, e, index))
+                .ToList();
+
+            var clibpoardEvents = new ClipboardEvents() { 
+                Lines = eventLines, 
+                Conditions = conditionLines.Select(l => new AbstractConditionLine(l)).ToList(),
+                TargetConditions = targetConditions,
+                GlobalVariables = variables
+            };
+            
+            string serialized = JsonConvert.SerializeObject(clibpoardEvents);
+            return serialized;
+        }
+
+        private bool scriptRestored;
+        private ClipboardEvents? sessionToRestore;
+        public void RestoreSnapshot(string snapshot)
+        {
+            try
+            {
+                var content = JsonConvert.DeserializeObject<ClipboardEvents>(snapshot);
+                if (content == null)
+                    return;
+
+                if (IsLoading)
+                    sessionToRestore = content;
+                else
+                {
+                    script.GlobalVariables.RemoveAll();
+                    Events.RemoveAll();
+                    scriptRestored = true;
+                    PasteClipboardEvents(content);   
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
         }
     }
 }
