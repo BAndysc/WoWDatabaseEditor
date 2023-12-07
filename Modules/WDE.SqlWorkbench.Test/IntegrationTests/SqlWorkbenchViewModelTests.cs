@@ -432,7 +432,7 @@ internal class SqlWorkbenchViewModelTests
             "START TRANSACTION",
             @"INSERT INTO `tab` (`a`, `b`, `c`, `d`, `e`, `f`, `g`, `h`, `i`, `j`, `k`, `l`, `m`, `n`, `o`, `p`, `q`) VALUES
 (NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-('abc', true, 255, -127, -32768, 65535, -2147483648, 4294967295, -9223372036854775808, 18446744073709551615, 1.1, 1.1, 1.1, '2021-01-01 00:00:00', NOW(), '20:30:40', X'DEADBEEF')",
+('abc', true, 255, -127, -32768, 65535, -2147483648, 4294967295, -9223372036854775808, 18446744073709551615, 1.1, 1.1, 1.1, '2021-01-01 00:00:00', NOW(), '20:30:40', X'DEADBEEF')".Replace(Environment.NewLine, "\n"),
             "COMMIT"
         }, connector.ExecutedQueries);
     }
@@ -454,7 +454,7 @@ internal class SqlWorkbenchViewModelTests
         results.Selection.Add(0);
         results.CopyInsertCommand.Execute(null);
         clipboard.Received().SetText($@"INSERT INTO `tab` (`a`) VALUES
-(X'{longBytesAsHex}')");
+(X'{longBytesAsHex}')".Replace(Environment.NewLine, "\n"));
         results.DuplicateRowCommand.Execute(null);
 
         results.AddRowCommand.Execute(null);
@@ -472,7 +472,7 @@ internal class SqlWorkbenchViewModelTests
             "START TRANSACTION",
             $@"INSERT INTO `tab` (`a`) VALUES
 (X'{longBytesAsHex}'),
-(X'{longBytesAsHex}')",
+(X'{longBytesAsHex}')".Replace(Environment.NewLine, "\n"),
             "COMMIT"
         }, connector.ExecutedQueries);
     }
