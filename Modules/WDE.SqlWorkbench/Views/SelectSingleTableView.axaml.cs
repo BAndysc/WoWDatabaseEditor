@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using AvaloniaStyles.Controls.OptimizedVeryFastTableView;
 using WDE.SqlWorkbench.ViewModels;
@@ -34,6 +35,17 @@ public partial class SelectSingleTableView : UserControl
         if (DataContext is SelectResultsViewModel vm)
         {
             vm.UpdateSelectedCells(newValue);
+        }
+    }
+
+    private void InputElement_OnDoubleTapped(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is SelectSingleTableViewModel vm)
+        {
+            if (vm.Selection.Empty)
+            {
+                vm.AddRowCommand.Execute(null);
+            }
         }
     }
 }
