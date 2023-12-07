@@ -16,7 +16,7 @@ internal partial class ColumnViewModel : ObservableBase
     [Notify] private bool autoIncrement;
     [Notify] private bool notNull;
     [Notify] private DataTypeViewModel dataType = new DataTypeViewModel("");
-    [Notify] private string? defaultValue = null;
+    [Notify] [AlsoNotify(nameof(HasDefaultValue))] private string? defaultValue = null;
     [Notify] private CharsetViewModel? charset;
     [Notify] private CollationViewModel? collation;
 
@@ -24,6 +24,23 @@ internal partial class ColumnViewModel : ObservableBase
     
     public ColumnInfo? OriginalColumnInfo => originalColumnInfo;
 
+    public bool HasDefaultValue
+    {
+        get => defaultValue != null;
+        set
+        {
+            if (value)
+            {
+                if (defaultValue == null)
+                    DefaultValue = "";
+            }
+            else
+            {
+                DefaultValue = null;
+            }
+        }
+    }
+    
     public bool IsNew => originalColumnInfo == null;
 
     public bool IsModified => originalColumnInfo is { } info &&
@@ -32,7 +49,7 @@ internal partial class ColumnViewModel : ObservableBase
                                info.IsAutoIncrement != AutoIncrement ||
                                info.IsNullable != !NotNull ||
                                OriginalMySqlType != DataType.Type ||
-                               info.DefaultValue?.ToString() != DefaultValue ||
+                               info.DefaultValue != DefaultValue ||
                                info.Charset != CharsetToSqlValue(charset) ||
                                info.Collation != CollationToSqlValue(collation)) ||
                               IsPositionChanged;
@@ -58,7 +75,7 @@ internal partial class ColumnViewModel : ObservableBase
             throw new Exception("Unknown type " + columnInfo.Type);
         OriginalMySqlType = mysqlType;
         DataType = new DataTypeViewModel(mysqlType);
-        DefaultValue = columnInfo.DefaultValue?.ToString();
+        DefaultValue = columnInfo.DefaultValue;
         Charset = allCharsets.FirstOrDefault(c => c.Name == columnInfo.Charset);
         Collation = Charset?.Collations.FirstOrDefault(c => c.Name == columnInfo.Collation);
     }
