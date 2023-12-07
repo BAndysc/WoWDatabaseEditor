@@ -139,7 +139,7 @@ public class SessionRestoreService
             if (doc is ISolutionItemDocument si)
             {
                 string? state = null;
-                if (doc is IPeriodicSnapshotDocument psd && psd.IsModified)
+                if (doc is IPeriodicSnapshotDocument psd)
                 {
                     state = psd.TakeSnapshot();
                 }

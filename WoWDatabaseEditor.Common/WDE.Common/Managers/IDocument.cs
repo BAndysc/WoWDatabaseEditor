@@ -46,7 +46,7 @@ namespace WDE.Common.Managers
 
     public interface IPeriodicSnapshotDocument : IDocument
     {
-        string TakeSnapshot();
+        string? TakeSnapshot();
         void RestoreSnapshot(string snapshot);
     }
 

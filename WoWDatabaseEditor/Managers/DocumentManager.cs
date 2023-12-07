@@ -18,6 +18,7 @@ using WDE.Common.Utils;
 using WDE.Common.Windows;
 using WDE.Module.Attributes;
 using WDE.MVVM.Observable;
+using WoWDatabaseEditorCore.Settings;
 
 namespace WoWDatabaseEditorCore.Managers
 {
@@ -29,6 +30,7 @@ namespace WoWDatabaseEditorCore.Managers
         private readonly IMessageBoxService messageBoxService;
         private readonly ISolutionTasksService solutionTasksService;
         private readonly ISolutionItemEditorRegistry solutionEditorManager;
+        private readonly IGeneralEditorSettingsProvider generalEditorSettingsProvider;
         private ISolutionItemDocument? activeSolutionItemDocument;
         private IDocument? activeDocument;
         private IFocusableTool? activeTool;
@@ -45,13 +47,15 @@ namespace WoWDatabaseEditorCore.Managers
             IMessageBoxService messageBoxService,
             ITextDocumentService textDocumentService,
             ISolutionTasksService solutionTasksService,
-            ISolutionItemEditorRegistry solutionEditorManager, 
+            ISolutionItemEditorRegistry solutionEditorManager,
+            IGeneralEditorSettingsProvider generalEditorSettingsProvider,
             IEnumerable<ITool> tools)
         {
             this.eventAggregator = eventAggregator;
             this.messageBoxService = messageBoxService;
             this.solutionTasksService = solutionTasksService;
             this.solutionEditorManager = solutionEditorManager;
+            this.generalEditorSettingsProvider = generalEditorSettingsProvider;
             ActivateDocument = new DelegateCommand<IDocument>(doc => ActiveDocument = doc);
             foreach (var tool in tools)
             {
@@ -196,9 +200,13 @@ namespace WoWDatabaseEditorCore.Managers
                     }
                 }
             }
-            
-            while (OpenedDocuments.Count > 0)
-                OpenedDocuments.RemoveAt(OpenedDocuments.Count - 1);
+
+            // when always restore is enabled, don't close documents so that the session can be saved
+            if (generalEditorSettingsProvider.RestoreOpenTabsMode != RestoreOpenTabsMode.AlwaysRestore)
+            {
+                while (OpenedDocuments.Count > 0)
+                    OpenedDocuments.RemoveAt(OpenedDocuments.Count - 1);
+            }
             
             var modifiedTools = AllTools
                 .Select(t => t as ISavableTool)

@@ -2827,8 +2827,11 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             return null;
         }
 
-        public string TakeSnapshot()
+        public string? TakeSnapshot()
         {
+            if (!IsModified)
+                return null;
+            
             int targetIndex = 1;
             var variables = script.GlobalVariables.Select(x => new AbstractGlobalVariable()
             {

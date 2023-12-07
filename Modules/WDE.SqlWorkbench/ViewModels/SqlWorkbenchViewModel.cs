@@ -178,7 +178,7 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, ISolutionItemDocu
         title = solutionItem.IsTemporary ? "New query" : Path.GetFileName(solutionItem.FileName);
         if (!solutionItem.IsTemporary && File.Exists(solutionItem.FileName))
             Document.Text = File.ReadAllText(solutionItem.FileName);
-        SolutionItem = solutionItem;
+        DocumentSolutionItem = solutionItem;
         Document.UndoStack.ToObservable(x => x.IsOriginalFile)
             .SubscribeAction(@is =>
             {
@@ -232,7 +232,7 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, ISolutionItemDocu
                 if (file == null)
                     return;
 
-                SolutionItem = new QueryDocumentSolutionItem(file, connection.ConnectionData.Id, false);
+                DocumentSolutionItem = new QueryDocumentSolutionItem(file, connection.ConnectionData.Id, false);
                 Title = Path.GetFileName(file);
             }
 
@@ -279,7 +279,7 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, ISolutionItemDocu
                     return;
             }
             
-            SolutionItem = new QueryDocumentSolutionItem(file, connection.ConnectionData.Id, false);
+            DocumentSolutionItem = new QueryDocumentSolutionItem(file, connection.ConnectionData.Id, false);
             Title = Path.GetFileName(file);
             Document.Text = await File.ReadAllTextAsync(file);
             Document.UndoStack.MarkAsOriginalFile();
@@ -945,7 +945,7 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, ISolutionItemDocu
     }
 
     [Notify] private string title;
-    public bool IsModified => IsDocumentModified || IsAnyResultModified;
+    public bool IsModified => (!DocumentSolutionItem.IsTemporary && IsDocumentModified) || IsAnyResultModified;
     private bool IsAnyResultModified => Results.Any(x => x.IsModified);
     public bool IsDocumentModified => !Document.UndoStack.IsOriginalFile;
     public ImageUri? Icon { get; } = new ImageUri("Icons/document_sql.png");
@@ -961,13 +961,17 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, ISolutionItemDocu
     public IObservable<IReadOnlyList<IInspectionResult>> Problems => problems;
     private ReactiveProperty<IReadOnlyList<IInspectionResult>> problems = new ReactiveProperty<IReadOnlyList<IInspectionResult>>(new List<IInspectionResult>());
     private DoubleBufferedValue<List<IInspectionResult>> problemsList = new DoubleBufferedValue<List<IInspectionResult>>();
-    public ISolutionItem SolutionItem { get; private set; }
+    public QueryDocumentSolutionItem DocumentSolutionItem { get; private set; }
+    public ISolutionItem SolutionItem => DocumentSolutionItem;
     public async Task<IQuery> GenerateQuery() => Queries.Empty(DataDatabaseType.World);
     public bool ShowExportToolbarButtons => false;
     
-    public string TakeSnapshot()
+    public string? TakeSnapshot()
     {
-        return Document.Text;
+        if (DocumentSolutionItem.IsTemporary || IsDocumentModified)
+           return Document.Text;
+        
+        return null;
     }
 
     public void RestoreSnapshot(string snapshot)
