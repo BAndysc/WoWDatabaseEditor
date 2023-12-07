@@ -361,6 +361,18 @@ internal partial class TableCreatorViewModel : ObservableBase, IDocument, IDropT
         columnCreate += column.NotNull ? " NOT NULL" : " NULL";
         if (column.AutoIncrement)
             columnCreate += " AUTO_INCREMENT";
+        if (column.DefaultValue != null)
+        {
+            var defaultValue = column.DefaultValue;
+            if (column.DataType.Type is { } type &&
+                (type.Kind is MySqlTypeKind.Text || 
+                 type.Kind is MySqlTypeKind.Date && !defaultValue.StartsWith("CURRENT_TIMESTAMP", StringComparison.OrdinalIgnoreCase)) &&
+                !defaultValue.StartsWith('('))
+            {
+                defaultValue = $"'{MySqlHelper.EscapeString(defaultValue)}'";
+            }
+            columnCreate += $" DEFAULT {defaultValue}";
+        }
         return columnCreate;
     }
     

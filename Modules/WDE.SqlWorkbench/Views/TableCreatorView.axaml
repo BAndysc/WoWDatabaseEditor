@@ -80,7 +80,7 @@
                   </DataTemplate>
                 </GridColumnDefinition.DataTemplate>
               </GridColumnDefinition>
-              <GridColumnDefinition Name="Data type" Property="" PreferedWidth="230">
+              <GridColumnDefinition Name="Data type" Property="" PreferedWidth="200">
                 <GridColumnDefinition.DataTemplate>
                   <DataTemplate x:DataType="viewModels:ColumnViewModel">
                     <EditableItemsTextBlock SelectedItem="{CompiledBinding DataType}"
@@ -90,11 +90,22 @@
                 </GridColumnDefinition.DataTemplate>
               </GridColumnDefinition>
             
-              <GridColumnDefinition Name="Primary Key" Property="PrimaryKey" PreferedWidth="100" Checkable="True" />
-              <GridColumnDefinition Name="Not Null" Property="NotNull" PreferedWidth="100" Checkable="True" />
+              <GridColumnDefinition Name="Primary Key" Property="PrimaryKey" PreferedWidth="90" Checkable="True" />
+              <GridColumnDefinition Name="Not Null" Property="NotNull" PreferedWidth="80" Checkable="True" />
               <GridColumnDefinition Name="Auto Increment" Property="AutoIncrement" PreferedWidth="100" Checkable="True" />
               
-              <GridColumnDefinition Name="Charset" Property="" PreferedWidth="230">
+              <GridColumnDefinition Name="Default" Property="" PreferedWidth="180">
+                <GridColumnDefinition.DataTemplate>
+                  <DataTemplate x:DataType="viewModels:ColumnViewModel">
+                    <DockPanel>
+                      <CheckBox IsChecked="{CompiledBinding HasDefaultValue}" ToolTip.Tip="Is not null" />
+                      <EditableTextBlock Text="{CompiledBinding DefaultValue}" />
+                    </DockPanel>
+                  </DataTemplate>
+                </GridColumnDefinition.DataTemplate>
+              </GridColumnDefinition>
+              
+              <GridColumnDefinition Name="Charset" Property="" PreferedWidth="150">
                 <GridColumnDefinition.DataTemplate>
                   <DataTemplate x:DataType="viewModels:ColumnViewModel">
                     <EditableItemsTextBlock SelectedItem="{CompiledBinding Charset}"
@@ -104,7 +115,7 @@
                 </GridColumnDefinition.DataTemplate>
               </GridColumnDefinition>
               
-              <GridColumnDefinition Name="Collation" Property="" PreferedWidth="230">
+              <GridColumnDefinition Name="Collation" Property="" PreferedWidth="150">
                 <GridColumnDefinition.DataTemplate>
                   <DataTemplate x:DataType="viewModels:ColumnViewModel">
                     <EditableItemsTextBlock SelectedItem="{CompiledBinding Collation}"
