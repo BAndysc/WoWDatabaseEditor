@@ -28,7 +28,10 @@
                                                                Columns="{CompiledBinding Columns}">
         <optimizedVeryFastTableView:VirtualizedVeryFastTableView.ContextMenu>
           <ContextMenu>
-            <MenuItem Header="Copy column name" Command="{CompiledBinding CopyColumnNameCommand}" />  
+            <MenuItem Header="Copy column name" Command="{CompiledBinding CopyColumnNameCommand}" />
+            <MenuItem Header="Create view" Command="{CompiledBinding CreateViewCommand}" />
+            <MenuItem Header="Copy as insert" Command="{CompiledBinding CopyInsertCommand}" /> 
+            <MenuItem Header="Refresh" Command="{CompiledBinding RefreshCommand}" /> 
           </ContextMenu>
         </optimizedVeryFastTableView:VirtualizedVeryFastTableView.ContextMenu>
       </optimizedVeryFastTableView:VirtualizedVeryFastTableView>

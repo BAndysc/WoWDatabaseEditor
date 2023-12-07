@@ -136,7 +136,7 @@ internal class ConnectionListToolViewModelTests
     public void Test_Delete_OnlyOpensDialog()
     {
         var db = mockServer.CreateDatabase("world");
-        var table = db.CreateTable("table", TableType.Table, new Type[]{typeof(int)}, new ColumnInfo("a", "int", false, false, false, null));
+        var table = db.CreateTable("table", TableType.Table, new ColumnInfo("a", "int", false, false, false, null, null, null));
         
         using var vm = CreateConnectedViewModel(new[]{"world"});
         Assert.AreEqual(1, vm.FlatItems.Count);

@@ -1,15 +1,20 @@
 using System;
 using System.Text.RegularExpressions;
+using Generator.Equals;
 using MySqlConnector;
 
 namespace WDE.SqlWorkbench.Models.DataTypes;
 
-internal readonly struct DateDataType
+[Equatable]
+internal readonly partial struct DateDataType
 {
+    [DefaultEquality]
     public readonly DateTimeDataTypeKind Kind;
+    
+    [DefaultEquality]
     public readonly int? FractionalSecondsPrecision;
     
-    public Type Type
+    public Type ManagedType
     {
         get
         {
@@ -26,7 +31,7 @@ internal readonly struct DateDataType
                 case DateTimeDataTypeKind.Year:
                     return typeof(int);
                 default:
-                    throw new ArgumentOutOfRangeException(); //todo
+                    throw new ArgumentOutOfRangeException();
             }
         }
     }

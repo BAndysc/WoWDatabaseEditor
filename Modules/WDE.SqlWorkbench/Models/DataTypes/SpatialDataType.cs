@@ -1,9 +1,13 @@
+using System;
 using System.Text.RegularExpressions;
+using Generator.Equals;
 
 namespace WDE.SqlWorkbench.Models.DataTypes;
 
-internal readonly struct SpatialDataType
+[Equatable]
+internal readonly partial struct SpatialDataType
 {
+    [DefaultEquality]
     public readonly SpatialDataTypeKind Kind;
     
     public override string ToString()
@@ -11,6 +15,8 @@ internal readonly struct SpatialDataType
         var type = Kind.ToString().ToUpper();
         return type;
     }
+    
+    public Type ManagedType => typeof(byte[]);
     
     public SpatialDataType(SpatialDataTypeKind kind)
     {
@@ -31,6 +37,8 @@ internal readonly struct SpatialDataType
             "multilinestring" => SpatialDataTypeKind.MultiLineString,
             "multipolygon" => SpatialDataTypeKind.MultiPolygon,
             "geometrycollection" => SpatialDataTypeKind.GeometryCollection,
+            "geomcollection" => SpatialDataTypeKind.GeometryCollection,
+            "geom" => SpatialDataTypeKind.GeometryCollection,
             _ => null
         };
         

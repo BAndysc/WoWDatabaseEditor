@@ -91,9 +91,9 @@ internal class QueryGenerator : IQueryGenerator
         return await executor.GetCreateTableAsync(schema, table, token) + ";";
     }
 
-    public string GenerateDropTable(string? schemaName, string tableName)
+    public string GenerateDropTable(string? schemaName, string tableName, TableType tableType)
     {
-        return $"DROP TABLE `{schemaName}`.`{tableName}`;";
+        return $"DROP {(tableType == TableType.Table ? "TABLE" : "VIEW")} `{schemaName}`.`{tableName}`;";
     }
 
     public string GenerateTruncateTable(string? schemaName, string tableName)

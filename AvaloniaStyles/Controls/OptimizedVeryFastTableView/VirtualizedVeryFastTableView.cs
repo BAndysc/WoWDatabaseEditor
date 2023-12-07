@@ -98,6 +98,8 @@ public partial class VirtualizedVeryFastTableView : Panel, IKeyboardNavigationHa
         
         FocusableProperty.OverrideDefaultValue<VirtualizedVeryFastTableView>(true);
         BackgroundProperty.OverrideDefaultValue<VirtualizedVeryFastTableView>(Brushes.Transparent);
+
+        ItemsCountProperty.Changed.AddClassHandler<VirtualizedVeryFastTableView>((v, e) => v.lastException = null);
         
         IsReadOnlyProperty.Changed.AddClassHandler<VirtualizedVeryFastTableView>((table, e) =>
         {
@@ -397,9 +399,11 @@ public partial class VirtualizedVeryFastTableView : Panel, IKeyboardNavigationHa
             return;
         if (!Controller.SpawnEditorFor(SelectedRowIndex, SelectedCellIndex, SelectedCellRect, customText, this))
         {
-            editor.Spawn(this, SelectedCellRect, customText ?? Controller.GetCellText(SelectedRowIndex, SelectedCellIndex) ?? "", customText == null, (text, action) =>
+            var initialText = customText ?? Controller.GetCellText(SelectedRowIndex, SelectedCellIndex) ?? "";
+            editor.Spawn(this, SelectedCellRect, initialText, customText == null, (text, action) =>
             {
-                ValueUpdateRequest?.Invoke(text);
+                if (initialText != text)
+                    ValueUpdateRequest?.Invoke(text);
                 if (action != PhantomTextBox.ActionAfterSave.None)
                 {
                     switch (action)

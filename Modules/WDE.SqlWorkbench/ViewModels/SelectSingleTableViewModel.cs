@@ -4,12 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;
-using MySqlConnector;
 using Prism.Commands;
 using WDE.Common.Types;
 using WDE.Common.Utils;
 using WDE.SqlWorkbench.Models;
-using WDE.SqlWorkbench.Services.QueryUtils;
+using WDE.SqlWorkbench.Services.ActionsOutput;
 using WDE.SqlWorkbench.Utils;
 
 namespace WDE.SqlWorkbench.ViewModels;
@@ -28,30 +27,31 @@ internal partial class SelectSingleTableViewModel : SelectResultsViewModel
     public ICommand AddRowCommand { get; }
     public ICommand DuplicateRowCommand { get; }
     public ICommand DeleteRowCommand { get; }
-    public ICommand CopyInsertCommand { get; }
-    public IAsyncCommand RefreshCommand { get; }
+    public IAsyncCommand RefreshTableCommand { get; }
     public IAsyncCommand ApplyChangesCommand { get; }
     public IAsyncCommand RevertChangesCommand { get; }
-    public IAsyncCommand CreateViewCommand { get; }
     public IAsyncCommand PasteSelectedCommand { get; }
 
     public override ImageUri Icon => new("Icons/icon_mini_table_big.png");
     
     private int sortByIndex = -1;
-    
+
+    protected override SimpleFrom? FromClause => selectSpecs.From;
+
     public SelectSingleTableViewModel(SqlWorkbenchViewModel vm,
-        string title,
+        IActionOutput action,
         in SelectResult results,
         SimpleSelect selectSpecs, 
-        IReadOnlyList<ColumnInfo> tableColumnsInfo) : base(vm, title, results)
+        IReadOnlyList<ColumnInfo> tableColumnsInfo) : base(vm, action, results)
     {
         this.vm = vm;
         this.selectSpecs = selectSpecs;
         primaryKeyColumnsIndices = new List<int>();
         columnsInfo = new List<ColumnInfo>();
+        Title = this.selectSpecs.From.Table;
         
         var columnsDict = tableColumnsInfo.ToDictionary(c => c.Name);
-        columnsInfo.Add(new ColumnInfo("#", "", false, false, false, null));
+        columnsInfo.Add(new ColumnInfo("#", "", false, false, false, null, null, null));
         for (int i = 1; i < Columns.Count; ++i)
         {
             if (columnsDict.TryGetValue(Columns[i].Header, out var columnInfo))
@@ -97,10 +97,13 @@ internal partial class SelectSingleTableViewModel : SelectResultsViewModel
                 return;
             
             CsvTokenizer tokenizer = new CsvTokenizer(text);
+            Selection.Clear();
             while (tokenizer.HasNextLine())
             {
                 tokenizer.NextLine();
-                int rowIndex = AdditionalRowsCount++;
+                int rowIndex = AdditionalRowsCount++ + Results.AffectedRows;
+                Selection.Add(rowIndex);
+                SelectedRowIndex = rowIndex;
                 
                 int index = 1;
                 while (tokenizer.HasNextToken())
@@ -117,11 +120,6 @@ internal partial class SelectSingleTableViewModel : SelectResultsViewModel
             foreach (var row in Selection.All())
                 MarkRowAsDeleted(row);
         }, () => RowsHaveFullPrimaryKey);
-        CopyInsertCommand = new DelegateCommand(() =>
-        {
-            if (TryGenerateInsert(Selection.All(), false, out var insert))
-                vm.ClipboardService.SetText(insert);
-        });
         ApplyChangesCommand = new AsyncAutoCommand(async () =>
         {
             try
@@ -138,91 +136,18 @@ internal partial class SelectSingleTableViewModel : SelectResultsViewModel
         {
             ResetChanges();
         });
-        RefreshCommand = new AsyncAutoCommand(async () =>
+        RefreshTableCommand = new AsyncAutoCommand(async () =>
         {
             if (!await AskIfForgetChangesAsync())
                 return;
             
             await RevertChangesCommand.ExecuteAsync();
             await vm.ExecuteAndOverrideResultsAsync(selectSpecs.ToString(), this);
-        }, () => RowsHaveFullPrimaryKey);
-        CreateViewCommand = new AsyncAutoCommand(async () =>
-        {
-            var newViewName = await vm.UserQuestions.AskForNewViewNameAsync();
-            if (string.IsNullOrWhiteSpace(newViewName))
-                return;
-            
-            try
-            { 
-                if (!string.IsNullOrEmpty(selectSpecs.From.Schema))
-                    newViewName = $"`{selectSpecs.From.Schema}`.`{newViewName}`";
-                else
-                    newViewName = $"`{newViewName}`";
-                await vm.ExecuteAsync(new[] { $"CREATE VIEW {newViewName} AS {selectSpecs.ToString()}" }, false, true, false);
-            }
-            catch (Exception e)
-            {
-                await vm.UserQuestions.SaveErrorAsync(e);
-            }
         });
 
         RowsHaveFullPrimaryKey = columnsInfo.Any(x => x.IsPrimaryKey) &&
                                  columnsInfo.Where(x => x.IsPrimaryKey)
                                      .All(x => Columns.Skip(1).Any(col => col.Header == x.Name));
-    }
-    
-    private string ColumnValueToMySqlRepresentation(int columnIndex, string? value)
-    {
-        if (value == null)
-            return "NULL";
-
-        var columnCategory = Results.Columns[columnIndex - 1]?.Category ?? ColumnTypeCategory.Unknown;
-
-        if (columnCategory == ColumnTypeCategory.Unknown)
-        {
-            var columnName = Results.ColumnNames[columnIndex - 1];
-            throw new Exception($"The column {columnName} has type {Results.Columns[columnIndex - 1]?.GetType()} which editor can't edit right now. Please report this.");
-        }
-            
-        if (columnCategory is ColumnTypeCategory.String)
-            return $"'{MySqlHelper.EscapeString(value)}'";
-        else if (columnCategory is ColumnTypeCategory.DateTime)
-        {
-            if (value.Contains('(') && value.Contains(')')) // contains a function call
-                return value;
-            return $"'{value}'";
-        }
-        else if (columnCategory is ColumnTypeCategory.Binary)
-        {
-            return $"X'{value}'";
-        }
-            
-        return value;
-    }
-
-    private bool TryGenerateInsert(IEnumerable<int> rows, bool skipDeleted, out string insert)
-    {
-        List<string> inserts = new();
-        foreach (var rowIndex in rows)
-        {
-            if (skipDeleted && IsRowMarkedAsDeleted(rowIndex))
-                continue;
-            
-            List<string> columns = new();
-            for (int columnIndex = 1; columnIndex < Columns.Count; ++columnIndex)
-                columns.Add(ColumnValueToMySqlRepresentation(columnIndex, GetFullValue(rowIndex, columnIndex)));
-            inserts.Add("(" + string.Join(", ", columns) + ")");
-        }
-
-        if (inserts.Count > 0)
-        {
-            var columns = string.Join(", ", Results.ColumnNames.Select(x => $"`{x}`"));
-            insert = $"INSERT INTO {selectSpecs.From} ({columns}) VALUES\n" + string.Join(",\n", inserts);
-            return true;
-        }
-
-        insert = "";
-        return false;
     }
     
     private List<string> GenerateChanges()
@@ -231,6 +156,9 @@ internal partial class SelectSingleTableViewModel : SelectResultsViewModel
         {
             return string.Join(" AND ", primaryKeyColumnsIndices.Select(columnIndex =>
             {
+                if (columnIndex - 1 >= Results.Columns.Length)
+                    return "ERR_COLUMN_NOT_FOUND";
+                
                 // -1 because the first column is a special # column
                 var columnName = Results.ColumnNames[columnIndex - 1];
                 var value = Results.Columns[columnIndex - 1]!.GetToString(rowIndex);
@@ -341,14 +269,6 @@ internal partial class SelectSingleTableViewModel : SelectResultsViewModel
             await vm.ExecuteAndOverrideResultsAsync(query, this);
         }
         SortByAsync().ListenErrors();
-    }
-
-    public void UpdateResults(in SelectResult results)
-    {
-        Results = results;
-        UpdateView();
-        RaisePropertyChanged(nameof(Count));
-        RaisePropertyChanged(nameof(Results));
     }
 
     private bool CanEditRow(int rowIndex) => rowIndex >= Results.AffectedRows || RowsHaveFullPrimaryKey;

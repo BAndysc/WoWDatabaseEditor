@@ -48,7 +48,7 @@
             <Separator />
             <MenuItem Header="Create view" Command="{CompiledBinding CreateViewCommand}" /> 
             <MenuItem Header="Copy as insert" Command="{CompiledBinding CopyInsertCommand}" />
-            <MenuItem Header="Refresh" Command="{CompiledBinding RefreshCommand}" />
+            <MenuItem Header="Refresh" Command="{CompiledBinding RefreshTableCommand}" />
           </ContextMenu>
         </optimizedVeryFastTableView:VirtualizedVeryFastTableView.ContextMenu>
       </optimizedVeryFastTableView:VirtualizedVeryFastTableView>

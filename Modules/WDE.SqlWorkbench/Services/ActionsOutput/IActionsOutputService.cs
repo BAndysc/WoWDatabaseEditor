@@ -14,6 +14,7 @@ public interface IActionOutput
     int Index { get; }
     DateTime TimeStarted { get; set; }
     string Query { get; }
+    string OriginalQuery { get; }
     
     DateTime? TimeFinished { get; set; }
     string Response { get; set; }

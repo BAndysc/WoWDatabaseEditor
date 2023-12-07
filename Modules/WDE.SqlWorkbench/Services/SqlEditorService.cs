@@ -18,6 +18,7 @@ internal interface IExtendedSqlEditorService : ISqlEditorService
     void NewDocumentWithTableSelect(IConnection connection, string schema, string tableName);
     void NewDocumentWithQueryAndExecute(IConnection connection, string query);
     void NewDocumentWithQuery(IConnection connection, string query);
+    void NewDocumentWithDatabaseInfo(IConnection connection, string schema);
 }
 
 [AutoRegister]
@@ -66,6 +67,8 @@ internal class SqlEditorService : IExtendedSqlEditorService
     `COLUMN_KEY`,
     `EXTRA`,
     `COLUMN_DEFAULT`,
+    `CHARACTER_SET_NAME`,
+    `COLLATION_NAME`,
     `COLUMN_COMMENT`
 FROM
     `information_schema`.`COLUMNS`
@@ -105,6 +108,38 @@ ORDER BY
         vm.Title = $"New query @ {connection.ConnectionData.ConnectionName}";
         vm.Document.Text = query;
         vm.Document.UndoStack.MarkAsOriginalFile();
+        documentManager.OpenDocument(vm);
+    }
+
+    public void NewDocumentWithDatabaseInfo(IConnection connection, string schema)
+    {
+        var vm = containerProvider.Resolve<SqlWorkbenchViewModel>((typeof(IConnection), connection));
+        vm.Title = $"{schema}";
+        vm.Document.Text = $@"SELECT
+    `TABLE_NAME`,
+    `TABLE_TYPE`,
+    `ENGINE`,
+    `VERSION`,
+    `ROW_FORMAT`,
+    `TABLE_ROWS`,
+    `AUTO_INCREMENT`,
+    `TABLE_COLLATION`,
+    `CREATE_OPTIONS`,
+    `TABLE_COMMENT`,
+    `AVG_ROW_LENGTH`,
+    `DATA_LENGTH`,
+    `MAX_DATA_LENGTH`,
+    `INDEX_LENGTH`,
+    `CREATE_TIME`,
+    `UPDATE_TIME`
+FROM
+    `information_schema`.`TABLES`
+WHERE
+    `TABLE_SCHEMA` = '{schema}'
+ORDER BY
+    `TABLE_NAME`;";
+        vm.Document.UndoStack.MarkAsOriginalFile();
+        vm.ExecuteAllCommand.Execute(null);
         documentManager.OpenDocument(vm);
     }
 }

@@ -2,7 +2,7 @@ namespace WDE.SqlWorkbench.Models;
 
 internal readonly struct ColumnInfo
 {
-    public ColumnInfo(string name, string type, bool isNullable, bool isPrimaryKey, bool isAutoIncrement, object? defaultValue)
+    public ColumnInfo(string name, string type, bool isNullable, bool isPrimaryKey, bool isAutoIncrement, object? defaultValue, string? charset, string? collation)
     {
         Name = name;
         Type = type;
@@ -10,6 +10,8 @@ internal readonly struct ColumnInfo
         IsPrimaryKey = isPrimaryKey;
         IsAutoIncrement = isAutoIncrement;
         DefaultValue = defaultValue;
+        Charset = charset;
+        Collation = collation;
     }
 
     public readonly string Name;
@@ -18,4 +20,6 @@ internal readonly struct ColumnInfo
     public readonly bool IsPrimaryKey;
     public readonly bool IsAutoIncrement;
     public readonly object? DefaultValue;
+    public readonly string? Charset;
+    public readonly string? Collation;
 }

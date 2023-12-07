@@ -1,4 +1,5 @@
 using System;
+using Generator.Equals;
 
 namespace WDE.SqlWorkbench.Models.DataTypes;
 
@@ -11,13 +12,25 @@ internal enum MySqlTypeKind
     Json
 }
 
-internal readonly struct MySqlType
+[Equatable]
+internal readonly partial struct MySqlType
 {
+    [DefaultEquality]
     public readonly MySqlTypeKind Kind;
+    
+    [DefaultEquality]
     private readonly NumericDataType numeric;
+    
+    [DefaultEquality]
     private readonly TextDataType text;
+    
+    [DefaultEquality]
     private readonly DateDataType date;
+    
+    [DefaultEquality]
     private readonly SpatialDataType spatial;
+    
+    [DefaultEquality]
     private readonly JsonDataType json;
     
     private MySqlType(MySqlTypeKind kind, NumericDataType numeric, TextDataType text, DateDataType date, SpatialDataType spatial, JsonDataType json)
@@ -76,6 +89,15 @@ internal readonly struct MySqlType
         return false;
     }
 
+    public Type ManagedType => Kind switch {
+        MySqlTypeKind.Numeric => numeric.ManagedType,
+        MySqlTypeKind.Text => text.ManagedType,
+        MySqlTypeKind.Date => date.ManagedType,
+        MySqlTypeKind.Spatial => spatial.ManagedType,
+        MySqlTypeKind.Json => json.ManagedType,
+        _ => throw new ArgumentOutOfRangeException()
+    };
+    
     public override string ToString()
     {
         return Kind switch {

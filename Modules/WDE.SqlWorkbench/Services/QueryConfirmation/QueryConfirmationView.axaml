@@ -1,0 +1,19 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:queryConfirmation="clr-namespace:WDE.SqlWorkbench.Services.QueryConfirmation"
+             xmlns:avaloniaEdit="https://github.com/avaloniaui/avaloniaedit"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="queryConfirmation:QueryConfirmationViewModel"
+             x:Class="WDE.SqlWorkbench.Services.QueryConfirmation.QueryConfirmationView">
+  <DockPanel>
+    <OkCancelButtons DockPanel.Dock="Bottom" AcceptText="Apply" AcceptCommand="{CompiledBinding Apply}" CancelCommand="{CompiledBinding Cancel}" />
+    <TextBlock FontSize="16" DockPanel.Dock="Top" FontWeight="Bold">Please verify the query before applying to avoid data loss.</TextBlock>
+    <avaloniaEdit:TextEditor Name="TextEditor" FontFamily="{DynamicResource MonoFont}"
+                             Document="{CompiledBinding Document}"
+                             AvalonEditExtra.SyntaxExtension="sql" 
+                             Margin="0,5,0,5"
+                             ShowLineNumbers="True" />
+  </DockPanel>
+</UserControl>

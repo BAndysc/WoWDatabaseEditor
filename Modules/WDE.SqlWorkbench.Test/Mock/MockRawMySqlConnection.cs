@@ -6,6 +6,7 @@ using Antlr4.Runtime;
 using MySqlConnector;
 using WDE.SqlWorkbench.Antlr;
 using WDE.SqlWorkbench.Models;
+using WDE.SqlWorkbench.Models.DataTypes;
 using WDE.SqlWorkbench.Services.Connection;
 using WDE.SqlWorkbench.Services.QueryUtils;
 
@@ -81,99 +82,95 @@ internal class MockSqlConnector : IMySqlConnector
             InformationSchema = CreateDatabaseInternal("information_schema");
             ColumnsTable = InformationSchema.CreateTableInternal("COLUMNS",
                 TableType.View,
-                new Type[]{typeof(string), typeof(string), typeof(string), typeof(string), typeof(uint), typeof(string), typeof(string),  typeof(string), typeof(long), typeof(long), typeof(ulong), typeof(ulong), typeof(uint), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(uint)},
-                new ColumnInfo("TABLE_CATALOG", "varchar(64)", true, false, false, null),
-                new ColumnInfo("TABLE_SCHEMA", "varchar(64)", true, false, false, null),
-                new ColumnInfo("TABLE_NAME", "varchar(64)", true, false, false, null),
-                new ColumnInfo("COLUMN_NAME", "varchar(64)", true, false, false, null),
-                new ColumnInfo("ORDINAL_POSITION", "int unsigned", false, false, false, null),
-                new ColumnInfo("COLUMN_DEFAULT", "text", true, false, false, null),
-                new ColumnInfo("IS_NULLABLE", "varchar(3)", false, false, false, null),
-                new ColumnInfo("DATA_TYPE", "longtext", true, false, false, null),
-                new ColumnInfo("CHARACTER_MAXIMUM_LENGTH", "bigint", true, false, false, null),
-                new ColumnInfo("CHARACTER_OCTET_LENGTH", "bigint", true, false, false, null),
-                new ColumnInfo("NUMERIC_PRECISION", "bigint unsigned", true, false, false, null),
-                new ColumnInfo("NUMERIC_SCALE", "bigint unsigned", true, false, false, null),
-                new ColumnInfo("DATETIME_PRECISION", "int unsigned", true, false, false, null),
-                new ColumnInfo("CHARACTER_SET_NAME", "varchar(64)", true, false, false, null),
-                new ColumnInfo("COLLATION_NAME", "varchar(64)", true, false, false, null),
-                new ColumnInfo("COLUMN_TYPE", "mediumtext", false, false, false, null),
-                new ColumnInfo("COLUMN_KEY", "enum('','PRI','UNI','MUL')", false, false, false, null),
-                new ColumnInfo("EXTRA", "varchar(256)", true, false, false, null),
-                new ColumnInfo("PRIVILEGES", "varchar(154)", true, false, false, null),
-                new ColumnInfo("COLUMN_COMMENT", "text", false, false, false, null),
-                new ColumnInfo("GENERATION_EXPRESSION", "longtext", false, false, false, null),
-                new ColumnInfo("SRS_ID", "int unsigned", true, false, false, null));
+                new ColumnInfo("TABLE_CATALOG", "varchar(64)", true, false, false, null, null, null),
+                new ColumnInfo("TABLE_SCHEMA", "varchar(64)", true, false, false, null, null, null),
+                new ColumnInfo("TABLE_NAME", "varchar(64)", true, false, false, null, null, null),
+                new ColumnInfo("COLUMN_NAME", "varchar(64)", true, false, false, null, null, null),
+                new ColumnInfo("ORDINAL_POSITION", "int unsigned", false, false, false, null, null, null),
+                new ColumnInfo("COLUMN_DEFAULT", "text", true, false, false, null, null, null),
+                new ColumnInfo("IS_NULLABLE", "varchar(3)", false, false, false, null, null, null),
+                new ColumnInfo("DATA_TYPE", "longtext", true, false, false, null, null, null),
+                new ColumnInfo("CHARACTER_MAXIMUM_LENGTH", "bigint", true, false, false, null, null, null),
+                new ColumnInfo("CHARACTER_OCTET_LENGTH", "bigint", true, false, false, null, null, null),
+                new ColumnInfo("NUMERIC_PRECISION", "bigint unsigned", true, false, false, null, null, null),
+                new ColumnInfo("NUMERIC_SCALE", "bigint unsigned", true, false, false, null, null, null),
+                new ColumnInfo("DATETIME_PRECISION", "int unsigned", true, false, false, null, null, null),
+                new ColumnInfo("CHARACTER_SET_NAME", "varchar(64)", true, false, false, null, null, null),
+                new ColumnInfo("COLLATION_NAME", "varchar(64)", true, false, false, null, null, null),
+                new ColumnInfo("COLUMN_TYPE", "mediumtext", false, false, false, null, null, null),
+                new ColumnInfo("COLUMN_KEY", "enum('','PRI','UNI','MUL')", false, false, false, null, null, null),
+                new ColumnInfo("EXTRA", "varchar(256)", true, false, false, null, null, null),
+                new ColumnInfo("PRIVILEGES", "varchar(154)", true, false, false, null, null, null),
+                new ColumnInfo("COLUMN_COMMENT", "text", false, false, false, null, null, null),
+                new ColumnInfo("GENERATION_EXPRESSION", "longtext", false, false, false, null, null, null),
+                new ColumnInfo("SRS_ID", "int unsigned", true, false, false, null, null, null));
             
             TablesTable = InformationSchema.CreateTableInternal("TABLES",
                 TableType.View,
-                new[]{typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(int), typeof(string), typeof(ulong), typeof(ulong), typeof(ulong), typeof(ulong), typeof(ulong), typeof(ulong), typeof(ulong), typeof(MySqlDateTime), typeof(MySqlDateTime),  typeof(MySqlDateTime), typeof(string), typeof(long), typeof(string), typeof(string)},
-                new ColumnInfo("TABLE_CATALOG", "varchar(64)", true, false, false, null),
-                new ColumnInfo("TABLE_SCHEMA", "varchar(64)", true, false, false, null),
-                new ColumnInfo("TABLE_NAME", "varchar(64)", true, false, false, null),
-                new ColumnInfo("TABLE_TYPE", "enum('BASE TABLE','VIEW','SYSTEM VIEW')", false, false, false, null),
-                new ColumnInfo("ENGINE", "varchar(64)", true, false, false, null),
-                new ColumnInfo("VERSION", "int", true, false, false, null),
-                new ColumnInfo("ROW_FORMAT", "enum('Fixed','Dynamic','Compressed','Redundant','Compact','Paged')", true, false, false, null),
-                new ColumnInfo("TABLE_ROWS", "bigint unsigned", true, false, false, null),
-                new ColumnInfo("AVG_ROW_LENGTH", "bigint unsigned", true, false, false, null),
-                new ColumnInfo("DATA_LENGTH", "bigint unsigned", true, false, false, null),
-                new ColumnInfo("MAX_DATA_LENGTH", "bigint unsigned", true, false, false, null),
-                new ColumnInfo("INDEX_LENGTH", "bigint unsigned", true, false, false, null),
-                new ColumnInfo("DATA_FREE", "bigint unsigned", true, false, false, null),
-                new ColumnInfo("AUTO_INCREMENT", "bigint unsigned", true, false, false, null),
-                new ColumnInfo("CREATE_TIME", "timestamp", false, false, false, null),
-                new ColumnInfo("UPDATE_TIME", "datetime", true, false, false, null),
-                new ColumnInfo("CHECK_TIME", "datetime", true, false, false, null),
-                new ColumnInfo("TABLE_COLLATION", "varchar(64)", true, false, false, null),
-                new ColumnInfo("CHECKSUM", "bigint", true, false, false, null),
-                new ColumnInfo("CREATE_OPTIONS", "varchar(256)", true, false, false, null),
-                new ColumnInfo("TABLE_COMMENT", "text", true, false, false, null));
+                new ColumnInfo("TABLE_CATALOG", "varchar(64)", true, false, false, null, null, null),
+                new ColumnInfo("TABLE_SCHEMA", "varchar(64)", true, false, false, null, null, null),
+                new ColumnInfo("TABLE_NAME", "varchar(64)", true, false, false, null, null, null),
+                new ColumnInfo("TABLE_TYPE", "enum('BASE TABLE','VIEW','SYSTEM VIEW')", false, false, false, null, null, null),
+                new ColumnInfo("ENGINE", "varchar(64)", true, false, false, null, null, null),
+                new ColumnInfo("VERSION", "int", true, false, false, null, null, null),
+                new ColumnInfo("ROW_FORMAT", "enum('Fixed','Dynamic','Compressed','Redundant','Compact','Paged')", true, false, false, null, null, null),
+                new ColumnInfo("TABLE_ROWS", "bigint unsigned", true, false, false, null, null, null),
+                new ColumnInfo("AVG_ROW_LENGTH", "bigint unsigned", true, false, false, null, null, null),
+                new ColumnInfo("DATA_LENGTH", "bigint unsigned", true, false, false, null, null, null),
+                new ColumnInfo("MAX_DATA_LENGTH", "bigint unsigned", true, false, false, null, null, null),
+                new ColumnInfo("INDEX_LENGTH", "bigint unsigned", true, false, false, null, null, null),
+                new ColumnInfo("DATA_FREE", "bigint unsigned", true, false, false, null, null, null),
+                new ColumnInfo("AUTO_INCREMENT", "bigint unsigned", true, false, false, null, null, null),
+                new ColumnInfo("CREATE_TIME", "timestamp", false, false, false, null, null, null),
+                new ColumnInfo("UPDATE_TIME", "datetime", true, false, false, null, null, null),
+                new ColumnInfo("CHECK_TIME", "datetime", true, false, false, null, null, null),
+                new ColumnInfo("TABLE_COLLATION", "varchar(64)", true, false, false, null, null, null),
+                new ColumnInfo("CHECKSUM", "bigint", true, false, false, null, null, null),
+                new ColumnInfo("CREATE_OPTIONS", "varchar(256)", true, false, false, null, null, null),
+                new ColumnInfo("TABLE_COMMENT", "text", true, false, false, null, null, null));
 
             SchemataTable = InformationSchema.CreateTableInternal("SCHEMATA",
                 TableType.View,
-                new []{typeof(string), typeof(string), typeof(string), typeof(string), typeof(byte[]), typeof(string)},
-                new ColumnInfo("CATALOG_NAME", "varchar(64)", true, false, false, null),
-                new ColumnInfo("SCHEMA_NAME", "varchar(64)", true, false, false, null),
-                new ColumnInfo("DEFAULT_CHARACTER_SET_NAME", "varchar(64)", false, false, false, null),
-                new ColumnInfo("DEFAULT_COLLATION_NAME", "varchar(64)", false, false, false, null),
-                new ColumnInfo("SQL_PATH", "binary(0)", true, false, false, null),
-                new ColumnInfo("DEFAULT_ENCRYPTION", "enum('NO','YES')", false, false, false, null));
+                new ColumnInfo("CATALOG_NAME", "varchar(64)", true, false, false, null, null, null),
+                new ColumnInfo("SCHEMA_NAME", "varchar(64)", true, false, false, null, null, null),
+                new ColumnInfo("DEFAULT_CHARACTER_SET_NAME", "varchar(64)", false, false, false, null, null, null),
+                new ColumnInfo("DEFAULT_COLLATION_NAME", "varchar(64)", false, false, false, null, null, null),
+                new ColumnInfo("SQL_PATH", "binary(0)", true, false, false, null, null, null),
+                new ColumnInfo("DEFAULT_ENCRYPTION", "enum('NO','YES')", false, false, false, null, null, null));
 
             RoutinesTable = InformationSchema.CreateTable("ROUTINES",
                 TableType.View,
-                new Type[] { typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(long), typeof(long), typeof(int), typeof(int), typeof(int), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(byte[]), typeof(string), typeof(string), typeof(string), typeof(string), typeof(byte[]), typeof(string), typeof(MySqlDateTime), typeof(MySqlDateTime), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string), typeof(string) },
-                new ColumnInfo("SPECIFIC_NAME", "varchar", false, false, false, null),
-                new ColumnInfo("ROUTINE_CATALOG", "varchar", true, false, false, null),
-                new ColumnInfo("ROUTINE_SCHEMA", "varchar", true, false, false, null),
-                new ColumnInfo("ROUTINE_NAME", "varchar", false, false, false, null),
-                new ColumnInfo("ROUTINE_TYPE", "enum", false, false, false, null),
-                new ColumnInfo("DATA_TYPE", "longtext", true, false, false, null),
-                new ColumnInfo("CHARACTER_MAXIMUM_LENGTH", "bigint", true, false, false, null),
-                new ColumnInfo("CHARACTER_OCTET_LENGTH", "bigint", true, false, false, null),
-                new ColumnInfo("NUMERIC_PRECISION", "int", true, false, false, null),
-                new ColumnInfo("NUMERIC_SCALE", "int", true, false, false, null),
-                new ColumnInfo("DATETIME_PRECISION", "int", true, false, false, null),
-                new ColumnInfo("CHARACTER_SET_NAME", "varchar", true, false, false, null),
-                new ColumnInfo("COLLATION_NAME", "varchar", true, false, false, null),
-                new ColumnInfo("DTD_IDENTIFIER", "longtext", true, false, false, null),
-                new ColumnInfo("ROUTINE_BODY", "varchar", false, false, false, ""),
-                new ColumnInfo("ROUTINE_DEFINITION", "longtext", true, false, false, null),
-                new ColumnInfo("EXTERNAL_NAME", "binary", true, false, false, null),
-                new ColumnInfo("EXTERNAL_LANGUAGE", "varchar", false, false, false, "SQL"),
-                new ColumnInfo("PARAMETER_STYLE", "varchar", false, false, false, ""),
-                new ColumnInfo("IS_DETERMINISTIC", "varchar", false, false, false, ""),
-                new ColumnInfo("SQL_DATA_ACCESS", "enum", false, false, false, null),
-                new ColumnInfo("SQL_PATH", "binary", true, false, false, null),
-                new ColumnInfo("SECURITY_TYPE", "enum", false, false, false, null),
-                new ColumnInfo("CREATED", "timestamp", false, false, false, null),
-                new ColumnInfo("LAST_ALTERED", "timestamp", false, false, false, null),
-                new ColumnInfo("SQL_MODE", "set", false, false, false, null),
-                new ColumnInfo("ROUTINE_COMMENT", "text", false, false, false, null),
-                new ColumnInfo("DEFINER", "varchar", false, false, false, null),
-                new ColumnInfo("CHARACTER_SET_CLIENT", "varchar", false, false, false, null),
-                new ColumnInfo("COLLATION_CONNECTION", "varchar", false, false, false, null),
-                new ColumnInfo("DATABASE_COLLATION", "varchar", false, false, false, null));
+                new ColumnInfo("SPECIFIC_NAME", "varchar", false, false, false, null, null, null),
+                new ColumnInfo("ROUTINE_CATALOG", "varchar", true, false, false, null, null, null),
+                new ColumnInfo("ROUTINE_SCHEMA", "varchar", true, false, false, null, null, null),
+                new ColumnInfo("ROUTINE_NAME", "varchar", false, false, false, null, null, null),
+                new ColumnInfo("ROUTINE_TYPE", "enum", false, false, false, null, null, null),
+                new ColumnInfo("DATA_TYPE", "longtext", true, false, false, null, null, null),
+                new ColumnInfo("CHARACTER_MAXIMUM_LENGTH", "bigint", true, false, false, null, null, null),
+                new ColumnInfo("CHARACTER_OCTET_LENGTH", "bigint", true, false, false, null, null, null),
+                new ColumnInfo("NUMERIC_PRECISION", "int", true, false, false, null, null, null),
+                new ColumnInfo("NUMERIC_SCALE", "int", true, false, false, null, null, null),
+                new ColumnInfo("DATETIME_PRECISION", "int", true, false, false, null, null, null),
+                new ColumnInfo("CHARACTER_SET_NAME", "varchar", true, false, false, null, null, null),
+                new ColumnInfo("COLLATION_NAME", "varchar", true, false, false, null, null, null),
+                new ColumnInfo("DTD_IDENTIFIER", "longtext", true, false, false, null, null, null),
+                new ColumnInfo("ROUTINE_BODY", "varchar", false, false, false, "", null, null),
+                new ColumnInfo("ROUTINE_DEFINITION", "longtext", true, false, false, null, null, null),
+                new ColumnInfo("EXTERNAL_NAME", "binary", true, false, false, null, null, null),
+                new ColumnInfo("EXTERNAL_LANGUAGE", "varchar", false, false, false, "SQL", null, null),
+                new ColumnInfo("PARAMETER_STYLE", "varchar", false, false, false, "", null, null),
+                new ColumnInfo("IS_DETERMINISTIC", "varchar", false, false, false, "", null, null),
+                new ColumnInfo("SQL_DATA_ACCESS", "enum", false, false, false, null, null, null),
+                new ColumnInfo("SQL_PATH", "binary", true, false, false, null, null, null),
+                new ColumnInfo("SECURITY_TYPE", "enum", false, false, false, null, null, null),
+                new ColumnInfo("CREATED", "timestamp", false, false, false, null, null, null),
+                new ColumnInfo("LAST_ALTERED", "timestamp", false, false, false, null, null, null),
+                new ColumnInfo("SQL_MODE", "set", false, false, false, null, null, null),
+                new ColumnInfo("ROUTINE_COMMENT", "text", false, false, false, null, null, null),
+                new ColumnInfo("DEFINER", "varchar", false, false, false, null, null, null),
+                new ColumnInfo("CHARACTER_SET_CLIENT", "varchar", false, false, false, null, null, null),
+                new ColumnInfo("COLLATION_CONNECTION", "varchar", false, false, false, null, null, null),
+                new ColumnInfo("DATABASE_COLLATION", "varchar", false, false, false, null, null, null));
             
             InformationSchema.FinalizeCreateTableInternal(TablesTable);
             InformationSchema.FinalizeCreateTableInternal(SchemataTable);
@@ -259,6 +256,30 @@ internal class MockSqlConnector : IMySqlConnector
                 IsSessionOpened = false;
             }
 
+            private class MockDataReader(string? databaseName) : IMySqlDataReader
+            {
+                public bool IsDBNull(int ordinal) => databaseName == null;
+                public object? GetValue(int ordinal) => databaseName;
+                public string? GetString(int ordinal) => databaseName;
+                public bool GetBoolean(int ordinal) => throw new NotImplementedException();
+                public byte GetByte(int ordinal) => throw new NotImplementedException();
+                public sbyte GetSByte(int ordinal) => throw new NotImplementedException();
+                public short GetInt16(int ordinal) => throw new NotImplementedException();
+                public ushort GetUInt16(int ordinal) => throw new NotImplementedException();
+                public int GetInt32(int ordinal) => throw new NotImplementedException();
+                public uint GetUInt32(int ordinal) => throw new NotImplementedException();
+                public long GetInt64(int ordinal) => throw new NotImplementedException();
+                public ulong GetUInt64(int ordinal) => throw new NotImplementedException();
+                public char GetChar(int ordinal) => throw new NotImplementedException();
+                public decimal GetDecimal(int ordinal) => throw new NotImplementedException();
+                public double GetDouble(int ordinal) => throw new NotImplementedException();
+                public float GetFloat(int ordinal) => throw new NotImplementedException();
+                public DateTime GetDateTime(int ordinal) => throw new NotImplementedException();
+                public TimeSpan GetTimeSpan(int ordinal) => throw new NotImplementedException();
+                public long GetBytes(int ordinal, long dataOffset, byte[]? buffer, int bufferOffset, int length) => throw new NotImplementedException();
+                public MySqlDateTime GetMySqlDateTime(int ordinal) => throw new NotImplementedException();
+            }
+
             public async Task<SelectResult> ExecuteSqlAsync(string queryString, int? rowsLimit = null, CancellationToken token = default)
             {
                 if (!await querySafetyService.CanExecuteAsync(queryString, queryExecutionSafety))
@@ -296,7 +317,13 @@ internal class MockSqlConnector : IMySqlConnector
                 var commitTransactionMatch = commitTransactionRegex.Match(queryString);
                 var rollbackTransactionMatch = rollbackTransactionRegex.Match(queryString);
 
-                if (showTablesMatch.Success)
+                if (string.Equals(queryString, "SELECT DATABASE()", StringComparison.OrdinalIgnoreCase))
+                {
+                    var column = new StringColumnData();
+                    column.Append(new MockDataReader(currentDatabase), 0);
+                    return SelectResult.Query(new[]{"database()"}, new[]{typeof(string)}, 1, new IColumnData[1]{column});
+                }
+                else if (showTablesMatch.Success)
                 {
                     var database = server.GetDatabase(currentDatabase);
                     return server.TablesTable.SelectColumns(new[] { "TABLE_NAME AS " + "Tables_in_" + currentDatabase }, row => (string?)row["TABLE_SCHEMA"] == currentDatabase);
@@ -353,9 +380,20 @@ internal class MockSqlConnector : IMySqlConnector
                     var where = selectMatch.Groups[3].Value.Trim();
                     if (selectMatch.Groups[3].Success)
                     {
-                        var whereColumn = RemoveBackTicks(where.Split("=")[0].Trim());
-                        var whereValue = where.Split("=")[1].Trim().Replace("'", "");
-                        predicate = row => row[whereColumn].Equals(whereValue);
+                        var conditions = where.Split("AND").Select(x => x.Trim()).ToArray();
+                        foreach (var cond in conditions)
+                        {
+                            var whereColumn = RemoveBackTicks(cond.Split("=")[0].Trim());
+                            var whereValue = cond.Split("=")[1].Trim().Replace("'", "");
+                            Func<Dictionary<string, object?>, bool> newPred = row => row[whereColumn]!.Equals(whereValue);
+                            if (predicate == null)
+                                predicate = newPred;
+                            else
+                            {
+                                var p = predicate;
+                                predicate = row => p(row) && newPred(row);
+                            }
+                        }
                     }
                     
                     var database = server.GetDatabase(fromDatabase);
@@ -428,13 +466,11 @@ internal class MockSqlConnector : IMySqlConnector
             private readonly ColumnInfo[] columnInfo;
             private List<object?[]> rows = new();
 
-            public Table(string name, TableType tableType, Type[] types, ColumnInfo[] columnInfo)
+            public Table(string name, TableType tableType, ColumnInfo[] columnInfo)
             {
-                if (types.Length != columnInfo.Length)
-                    throw new ArgumentOutOfRangeException($"[{name}] Types and columnInfo must have same length ({types.Length} != {columnInfo.Length})");
                 TableType = tableType;
                 Name = name;
-                this.types = types;
+                this.types = columnInfo.Select(x => MySqlType.TryParse(x.Type, out var type) ? type.ManagedType : throw new Exception("Unable to parse type " + x.Type)).ToArray();
                 this.columnInfo = columnInfo;
             }
 
@@ -577,9 +613,9 @@ internal class MockSqlConnector : IMySqlConnector
             }
         }
         
-        internal Table CreateTableInternal(string tableName, TableType tableType, Type[] types, params ColumnInfo[] columns)
+        internal Table CreateTableInternal(string tableName, TableType tableType, params ColumnInfo[] columns)
         {
-            var table = tables[tableName] = new Table(tableName, tableType, types, columns);
+            var table = tables[tableName] = new Table(tableName, tableType, columns);
             return table;
         }
 
@@ -617,15 +653,15 @@ internal class MockSqlConnector : IMySqlConnector
                     databaseName,
                     table.Name,
                     column.Name,
-                    index + 1,
+                    (uint)(index + 1),
                     column.DefaultValue,
                     column.IsNullable ? "YES" : "NO",
                     column.Type,
-                    0,
-                    0,
-                    null,
-                    null,
-                    null,
+                    (long)0,
+                    (long)0,
+                    (ulong?)null,
+                    (ulong?)null,
+                    (uint?)null,
                     "utf8mb3",
                     "utf8mb3_tolower_ci",
                     column.Type,
@@ -634,13 +670,13 @@ internal class MockSqlConnector : IMySqlConnector
                     "select",
                     "comment here",
                     null,
-                    null);
+                    (uint?)null);
             }
         }
         
-        public Table CreateTable(string tableName, TableType tableType, Type[] types, params ColumnInfo[] columns)
+        public Table CreateTable(string tableName, TableType tableType, params ColumnInfo[] columns)
         {
-            var table = CreateTableInternal(tableName, tableType, types, columns);
+            var table = CreateTableInternal(tableName, tableType, columns);
             FinalizeCreateTableInternal(table);
             var createInfo = new StringBuilder();
             createInfo.Append("CREATE ");

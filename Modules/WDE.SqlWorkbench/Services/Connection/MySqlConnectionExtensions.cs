@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using WDE.SqlWorkbench.Models;
+using WDE.SqlWorkbench.Models.DataTypes;
 
 namespace WDE.SqlWorkbench.Services.Connection;
 
@@ -41,7 +42,7 @@ internal static class MySqlConnectionExtensions
         var comments = (StringColumnData)results.Columns[7]!;
         
         return Enumerable.Range(0, results.AffectedRows)
-            .Select(i => new TableInfo(schemas[i]!, names[i]!, SqlParseUtils.ParseTableType(types[i]!), engines[i], rowFormats[i], collations[i], dataLengths[i], comments[i]))
+            .Select(i => new TableInfo(schemas[i]!, names[i]!, SqlParseUtils.ParseTableType(types[i]!), engines[i], SqlParseUtils.ParseRowFormat(rowFormats[i]), collations[i], dataLengths[i], comments[i]))
             .ToList();
     }
     
@@ -104,28 +105,21 @@ internal static class MySqlConnectionExtensions
         return null;
     }
     
-    public static async Task<IReadOnlyList<ColumnInfo>> GetTableColumnsAsync(this IMySqlQueryExecutor conn, string? schema, string tableName, CancellationToken token)
+    public static async Task<IReadOnlyList<ColumnInfo>> GetTableColumnsAsync(this IMySqlQueryExecutor conn, string schema, string tableName, CancellationToken token)
     {
         List<ColumnInfo> columns = new();
-        if (!tableName.StartsWith('`'))
-            tableName = $"`{tableName}`";
-
-        var from = "";
-        if (schema != null)
-            from = $"`{schema}`.";
-
-        from += tableName;
-        
-        var databases = await conn.ExecuteSqlAsync($"SHOW COLUMNS FROM {from}", null, token);
+        var databases = await conn.ExecuteSqlAsync($"SELECT * FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = '{schema}' AND `TABLE_NAME` = '{tableName}' ORDER BY `ORDINAL_POSITION`", null, token);
         if (token.IsCancellationRequested)
             return columns;
 
-        var names = (StringColumnData)databases["Field"]!;
-        var types = (StringColumnData)databases["Type"]!;
-        var nullables = (StringColumnData)databases["Null"]!;
-        var keys = (StringColumnData)databases["Key"]!;
-        var defaults = (StringColumnData)databases["Default"]!;
-        var extras = (StringColumnData)databases["Extra"]!;
+        var names = (StringColumnData)databases["COLUMN_NAME"]!;
+        var types = (StringColumnData)databases["COLUMN_TYPE"]!;
+        var nullables = (StringColumnData)databases["IS_NULLABLE"]!;
+        var keys = (StringColumnData)databases["COLUMN_KEY"]!;
+        var defaults = (StringColumnData)databases["COLUMN_DEFAULT"]!;
+        var extras = (StringColumnData)databases["EXTRA"]!;
+        var charsets = (StringColumnData)databases["CHARACTER_SET_NAME"]!;
+        var collations = (StringColumnData)databases["COLLATION_NAME"]!;
         for (int i = 0; i < databases.AffectedRows; ++i)
         {
             var column = new ColumnInfo(
@@ -134,7 +128,9 @@ internal static class MySqlConnectionExtensions
                 nullables[i] == "YES",
                 keys[i] == "PRI",
                 extras[i]!.Contains("auto_increment", StringComparison.OrdinalIgnoreCase),
-                defaults[i]);
+                defaults[i],
+                charsets[i],
+                collations[i]);
             columns.Add(column);
         }
 
@@ -210,5 +206,81 @@ internal static class MySqlConnectionExtensions
             ));
         }
         return collations;
+    }
+
+    public static async Task<Dictionary<string, List<ShowIndexEntry>>> GetIndexesAsync(this IMySqlQueryExecutor conn, string? schema, string table, CancellationToken token = default)
+    {
+        var from = $"`{table}`";
+        if (schema != null)
+            from = $"`{schema}`.{from}";
+        
+        var results = await conn.ExecuteSqlAsync($"SHOW INDEX FROM {from}", null, token);
+
+        if (results.IsNonQuery || results.Columns.Length == 0)
+            return new Dictionary<string, List<ShowIndexEntry>>();
+        
+        //var tables = (StringColumnData)results["Table"]!;
+        var nonUniquesMySql = results["Non_unique"] as Int32ColumnData;
+        var nonUniquesMaria = results["Non_unique"] as Int64ColumnData;
+        var keyNames = (StringColumnData)results["Key_name"]!;
+        var seqInIndexesMySql = results["Seq_in_index"] as UInt32ColumnData;
+        var seqInIndexesMaria = results["Seq_in_index"] as Int64ColumnData;
+        var columnNames = (StringColumnData)results["Column_name"]!;
+        var collations = (StringColumnData)results["Collation"]!;
+        var subParts = (Int64ColumnData)results["Sub_part"]!;
+        //var packeds = (ObjectColumnData)results["Packed"]!;
+        var nulls = (StringColumnData)results["Null"]!;
+        var indexTypes = (StringColumnData)results["Index_type"]!;
+        var comments = (StringColumnData)results["Comment"]!;
+        var indexComments = (StringColumnData)results["Index_comment"]!;
+        var visibles = results.HasColumn("Visible") ? (StringColumnData)results["Visible"]! : null;
+        //var expressions = (StringColumnData)results["Expression"]!;
+        List<ShowIndexEntry> indexes = new();
+
+        for (int i = 0; i < results.AffectedRows; ++i)
+        {
+            bool nonUnique = (nonUniquesMySql != null && nonUniquesMySql[i] == 1) || (nonUniquesMaria != null && nonUniquesMaria[i] == 1);
+            string keyName = keyNames[i]!;
+            long seqInIndex = seqInIndexesMySql != null ? seqInIndexesMySql[i] : seqInIndexesMaria![i];
+            string columnName = columnNames[i]!;
+            bool? ascending = collations.IsNull(i) ? null : collations[i] == "A";
+            long? subPart = subParts.IsNull(i) ? null : subParts[i];
+            bool canContainNull = nulls[i] == "YES";
+            var indexType = indexTypes[i]!;
+            var comment = comments[i];
+            var indexComment = indexComments[i];
+            var visible = visibles == null || visibles[i] == "YES";
+            IndexKind kind = default;
+            IndexType type = default;
+
+            if (indexType == "BTREE" || indexType == "HASH")
+            {
+                type = indexType == "BTREE" ? IndexType.BTree : IndexType.Hash;
+                kind = nonUnique ? IndexKind.NonUnique : IndexKind.Unique;
+            }
+            else if (indexType == "FULLTEXT")
+                kind = IndexKind.FullText;
+            else if (indexType == "RTREE")
+                kind = IndexKind.Spatial;
+            else
+                throw new Exception("Unknown index type " + indexType);
+            
+            indexes.Add(new ShowIndexEntry(nonUnique, keyName, (int)seqInIndex, columnName, ascending, subPart!, canContainNull, kind, type, comment, indexComment, visible));
+        }
+
+        var grouped = indexes.GroupBy(x => x.KeyName)
+            .ToDictionary(x => x.Key, x => x.OrderBy(x => x.SeqInIndex).ToList());
+        
+        return grouped;
+    }
+    
+    public static async Task<string?> GetCurrentDatabaseAsync(this IMySqlQueryExecutor conn, CancellationToken token = default)
+    {
+        var databases = await conn.ExecuteSqlAsync("SELECT DATABASE()", null, token);
+        if (databases.IsNonQuery || databases.Columns.Length == 0)
+            return null;
+
+        var database = (StringColumnData)databases.Columns[0]!;
+        return database[0];
     }
 }

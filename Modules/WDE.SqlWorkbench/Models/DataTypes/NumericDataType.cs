@@ -1,16 +1,25 @@
 using System;
 using System.Text.RegularExpressions;
+using Generator.Equals;
 
 namespace WDE.SqlWorkbench.Models.DataTypes;
 
-internal readonly struct NumericDataType
+[Equatable]
+internal readonly partial struct NumericDataType
 {
+    [DefaultEquality]
     public readonly NumericDataTypeKind Kind;
+    
+    [DefaultEquality]
     public readonly int? M; // display width for ints, precision for floats
+    
+    [DefaultEquality]
     public readonly int? D; // scale for floats
+    
+    [DefaultEquality]
     public readonly bool Unsigned;
     
-    public Type Type
+    public Type ManagedType
     {
         get
         {
@@ -57,7 +66,7 @@ internal readonly struct NumericDataType
     
     private static Regex regex = new Regex(@"^(.*?)(?:\s*\(\s*(\d+)(?:\s*,\s*(\d+))?\s*\))?( unsigned)?$", RegexOptions.IgnoreCase);
 
-    public NumericDataType(NumericDataTypeKind kind) : this(kind, null, null, false) { }
+    public NumericDataType(NumericDataTypeKind kind, bool unsigned) : this(kind, null, null, unsigned) { }
     
     private NumericDataType(NumericDataTypeKind kind, int? m, int? d, bool unsigned)
     {

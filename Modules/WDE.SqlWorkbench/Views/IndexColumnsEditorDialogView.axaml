@@ -1,0 +1,41 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:WDE.SqlWorkbench.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Name="Root"
+             x:DataType="viewModels:IndexColumnsEditorDialogViewModel"
+             x:Class="WDE.SqlWorkbench.Views.IndexColumnsEditorDialogView">
+  <DockPanel>
+    <OkCancelButtons DockPanel.Dock="Bottom" Margin="0,5,0,0" AcceptCommand="{CompiledBinding Accept}" CancelCommand="{CompiledBinding Cancel}" />
+    <ToolbarPanel DockPanel.Dock="Top">
+      <ButtonImage Image="Icons/icon_add.png" Command="{CompiledBinding AddColumnCommand}" ToolTip.Tip="Add column to index" />
+      <ButtonImage Image="Icons/icon_delete.png" Command="{CompiledBinding RemoveSelectedCommand}" ToolTip.Tip="Delete selected column" />
+    </ToolbarPanel>
+    <GridView Items="{CompiledBinding Parts}" 
+              SelectedItem="{CompiledBinding SelectedPart}">
+      <GridView.Columns>
+        <GridColumnDefinition Name="Column" Property="" PreferedWidth="200">
+          <GridColumnDefinition.DataTemplate>
+            <DataTemplate x:DataType="viewModels:IndexPartViewModel">
+              <CompletionComboBox SelectedItem="{CompiledBinding Column}"
+                                    Items="{CompiledBinding  #Root.((viewModels:IndexColumnsEditorDialogViewModel)DataContext).Columns}"/>
+            </DataTemplate>
+          </GridColumnDefinition.DataTemplate>
+        </GridColumnDefinition>
+        <GridColumnDefinition Name="Length" Property="" PreferedWidth="100">
+          <GridColumnDefinition.DataTemplate>
+            <DataTemplate x:DataType="viewModels:IndexPartViewModel">
+              <DockPanel>
+                <CheckBox IsChecked="{CompiledBinding HasLength}" />
+                <EditableTextBlock Text="{CompiledBinding Length}" />
+              </DockPanel>
+            </DataTemplate>
+          </GridColumnDefinition.DataTemplate>
+        </GridColumnDefinition>
+        <GridColumnDefinition Name="Descending" Property="Descending" PreferedWidth="100" Checkable="True" />
+      </GridView.Columns>
+    </GridView>
+  </DockPanel>
+</UserControl>

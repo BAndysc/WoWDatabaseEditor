@@ -1,21 +1,32 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Generator.Equals;
 
 namespace WDE.SqlWorkbench.Models.DataTypes;
 
-internal readonly struct TextDataType
+[Equatable]
+internal readonly partial struct TextDataType
 {
+    [DefaultEquality]
     public readonly TextDataTypeKind Kind;
+    
+    [DefaultEquality]
     public readonly int? Length;
+    
+    [DefaultEquality]
     public readonly string? Charset;
+    
+    [DefaultEquality]
     public readonly string? Collate;
+    
+    [OrderedEquality]
     public readonly IReadOnlyList<string>? EnumValues;
+    
     public bool Binary => Kind is TextDataTypeKind.Binary or TextDataTypeKind.VarBinary or TextDataTypeKind.Blob or TextDataTypeKind.LongBlob or TextDataTypeKind.MediumBlob or TextDataTypeKind.TinyBlob;
 
     public static bool KindCanHaveLength(TextDataTypeKind kind) => kind is TextDataTypeKind.Char
-        or TextDataTypeKind.VarChar or TextDataTypeKind.Binary or TextDataTypeKind.VarBinary or TextDataTypeKind.Blob
-        or TextDataTypeKind.Text;
+        or TextDataTypeKind.VarChar or TextDataTypeKind.Binary or TextDataTypeKind.VarBinary;
     
     public TextDataType(TextDataTypeKind kind, int? length = null) : this(kind, length, null, null, null) { }
     
@@ -28,7 +39,7 @@ internal readonly struct TextDataType
         EnumValues = enumValues;
     }
     
-    public System.Type Type => Binary ? typeof(byte[]) : typeof(string);
+    public System.Type ManagedType => Binary ? typeof(byte[]) : typeof(string);
     
     public override string ToString()
     {
