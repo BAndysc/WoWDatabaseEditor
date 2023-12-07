@@ -18,6 +18,6 @@ public class SqlWorkbenchModule : ModuleBase
         base.RegisterTypes(containerRegistry);
         var tool = new ActionsOutputViewModel(((IContainerProvider)containerRegistry).Resolve<IMainThread>());
         containerRegistry.RegisterInstance<IActionsOutputService>(tool);
-        containerRegistry.RegisterInstance<ITool>(tool);
+        containerRegistry.RegisterInstance<ITool>(tool, nameof(ActionsOutputViewModel));
     }
 }
