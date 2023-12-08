@@ -1,0 +1,32 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:crashReport="clr-namespace:CrashReport"
+        mc:Ignorable="d" Width="600" Height="500"
+        x:Class="CrashReport.MainWindow"
+        x:DataType="crashReport:MainWindowViewModel"
+        ShowActivated="True"
+        Icon="../Icon.png"
+        Title="WoW Database Editor Crash Report">
+
+        <DockPanel LastChildFill="True">
+                
+                <StackPanel HorizontalAlignment="Right" Margin="5,5,5,5" Orientation="Horizontal" DockPanel.Dock="Bottom" Spacing="10">
+                        <Button Command="{CompiledBinding RestartEditorCommand}" Content="Restart the editor">
+                                <Button.ContextMenu>
+                                        <ContextMenu>
+                                                <MenuItem Command="{CompiledBinding RestartEditorWithConsoleCommand}" Header="Restart the editor with console"></MenuItem>
+                                        </ContextMenu>
+                                </Button.ContextMenu>
+                        </Button>
+                        <Button Command="{CompiledBinding DownloadEditorCommand}" IsEnabled="{CompiledBinding !IsDownloading}">Download the latest version</Button>
+                </StackPanel>
+                
+                <ProgressBar DockPanel.Dock="Bottom" Margin="20,5" ShowProgressText="True" IsVisible="{CompiledBinding IsDownloading}" Value="{CompiledBinding CurrentProgress}" Maximum="{CompiledBinding MaxProgress}">
+                </ProgressBar>
+
+                <ContentControl Content="{CompiledBinding MainContent}" />
+
+        </DockPanel>
+</Window>

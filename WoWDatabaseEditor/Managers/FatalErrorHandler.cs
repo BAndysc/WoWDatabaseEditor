@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 
 namespace WoWDatabaseEditorCore.Managers
@@ -22,6 +23,26 @@ namespace WoWDatabaseEditorCore.Managers
             
             var deploymentVersion = File.Exists("app.ini") ? File.ReadAllText("app.ini") : "unknown app data";
             File.WriteAllText(FATAL_LOG_FILE,  e + "\n\n" + deploymentVersion);
+
+            StartCrashReporter();
+        }
+
+        private static void StartCrashReporter()
+        {
+            string? exe = null;
+            if (File.Exists("CrashReport.exe"))
+                exe = "CrashReport.exe";
+            else if (File.Exists("CrashReport"))
+                exe = "CrashReport";
+
+            if (!string.IsNullOrEmpty(exe))
+            {
+                Process.Start(new ProcessStartInfo(exe)
+                {
+                    Arguments = "--crashed",
+                    UseShellExecute = true
+                });   
+            }
         }
 
         public static bool HasFatalLog()

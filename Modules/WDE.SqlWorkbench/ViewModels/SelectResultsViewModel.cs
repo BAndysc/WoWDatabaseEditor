@@ -356,7 +356,8 @@ internal class TableController : BaseVirtualizedTableController
     {
         if (cellIndex == 0)
         {
-            DrawText(drawingContext, rect, (rowIndex + 1).ToString());
+            rect = rect.Deflate(new Thickness(0, 0, 5, 0));
+            DrawText(drawingContext, rect, (rowIndex + 1).ToString(), alignment: TextAlignment.Right);
             return true;
         }
 

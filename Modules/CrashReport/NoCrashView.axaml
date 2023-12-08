@@ -1,0 +1,24 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:crashReport="clr-namespace:CrashReport"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="crashReport:NoCrashViewModel"
+             x:Class="CrashReport.NoCrashView">
+  <UserControl.Styles>
+    <Style Selector="TextBlock">
+      <Setter Property="TextWrapping" Value="Wrap"></Setter>
+    </Style>
+  </UserControl.Styles>
+  <DockPanel Margin="5" LastChildFill="False">
+      
+    <DockPanel DockPanel.Dock="Top" Margin="0,5,0,5" >
+      <Image Source="Icon.png" Width="32" Height="32" />
+      <TextBlock FontWeight="Bold" FontSize="16" DockPanel.Dock="Top">The editor has not crashed 🙂</TextBlock>
+    </DockPanel>
+      
+    <TextBlock Margin="0,5,0,5" DockPanel.Dock="Top">It looks like the editor hasn't crashed, it is just you who manually started this CrashReport app. You can use it to redownload the latest version.</TextBlock>
+
+  </DockPanel>
+</UserControl>

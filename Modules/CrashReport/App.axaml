@@ -1,0 +1,16 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:crashReport="clr-namespace:CrashReport"
+             x:Class="CrashReport.App"
+             >
+    <!-- RequestedThemeVariant="Default" -->
+    <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+
+    <Application.DataTemplates>
+      <crashReport:AvaloniaViewLocator />
+    </Application.DataTemplates>
+    
+    <Application.Styles>
+        <FluentTheme Mode="Dark" />
+    </Application.Styles>
+</Application>

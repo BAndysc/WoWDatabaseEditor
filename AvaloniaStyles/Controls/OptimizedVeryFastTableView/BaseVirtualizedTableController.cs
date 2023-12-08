@@ -54,14 +54,15 @@ public abstract class BaseVirtualizedTableController : IVirtualizedTableControll
     public abstract bool Draw(int rowIndex, int cellIndex, DrawingContext drawingContext, VirtualizedVeryFastTableView view, ref Rect rect);
     public abstract void DrawHeader(int cellIndex, DrawingContext context, VirtualizedVeryFastTableView view, ref Rect rect);
 
-    protected void DrawText(DrawingContext context, Rect rect, string text, Color? color = null, float opacity = 0.4f)
+    protected void DrawText(DrawingContext context, Rect rect, string text, Color? color = null, float opacity = 0.4f, TextAlignment alignment = TextAlignment.Left)
     {
         var ft = new FormattedText
         {
             Text = text,
             Constraint = new Size(rect.Width, rect.Height),
             Typeface = new Typeface(MonoFont),//Typeface.Default,
-            FontSize = 12
+            FontSize = 12,
+            TextAlignment = alignment
         };
         var textColor = new SolidColorBrush(color ?? TextBrush.Color, opacity);
         context.DrawText(textColor, new Point(rect.X, rect.Center.Y - ft.Bounds.Height / 2), ft);

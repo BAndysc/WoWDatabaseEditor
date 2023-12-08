@@ -88,7 +88,7 @@ namespace WDE.Updater.Test.Services
             var updateService = new UpdateService(data, clientFactory, applicationVersion, application, fileSystem,
                 standaloneUpdate, settings, platformService, updateVerifier);
 
-            Assert.IsNull(await updateService.CheckForUpdates());
+            Assert.IsNull(await updateService.CheckForUpdates(false));
         }
         
         [Test]
@@ -104,7 +104,7 @@ namespace WDE.Updater.Test.Services
             var updateService = new UpdateService(data, clientFactory, applicationVersion, application, fileSystem,
                 standaloneUpdate, settings, platformService, updateVerifier);
 
-            Assert.IsNull(await updateService.CheckForUpdates());
+            Assert.IsNull(await updateService.CheckForUpdates(false));
         }
         
         [Test]
@@ -119,7 +119,7 @@ namespace WDE.Updater.Test.Services
             var updateService = new UpdateService(data, clientFactory, applicationVersion, application, fileSystem,
                 standaloneUpdate, settings, platformService, updateVerifier);
 
-            Assert.AreEqual("localhost", await updateService.CheckForUpdates());
+            Assert.AreEqual("localhost", await updateService.CheckForUpdates(false));
         }
 
         [Test]

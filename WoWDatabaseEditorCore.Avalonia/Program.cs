@@ -52,7 +52,7 @@ namespace WoWDatabaseEditorCore.Avalonia
             TaskScheduler.UnobservedTaskException += (sender, eventArgs) => Console.WriteLine(eventArgs.Exception);
             GlobalApplication.Arguments.Init(args);
 
-            if (GlobalApplication.Arguments.GetValue("console") != null)
+            if (GlobalApplication.Arguments.IsArgumentSet("console"))
             {
                 if (OperatingSystem.IsWindows())
                 {

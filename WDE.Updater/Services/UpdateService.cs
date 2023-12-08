@@ -16,7 +16,7 @@ namespace WDE.Updater.Services
     public interface IUpdateService
     {
         bool CanCheckForUpdates();
-        Task<string?> CheckForUpdates();
+        Task<string?> CheckForUpdates(bool allowRedownload);
         Task<bool> DownloadLatestVersion(ITaskProgress taskProgress);
         Task CloseForUpdate();
     }
@@ -75,19 +75,20 @@ namespace WDE.Updater.Services
 
         public bool CanCheckForUpdates() => data.HasUpdateServerData && applicationVersion.VersionKnown;
 
-        private async Task<CheckVersionResponse?> InternalCheckForUpdates()
+        private async Task<CheckVersionResponse?> InternalCheckForUpdates(bool allowRedownload)
         {
             var response = await UpdateClient.CheckForUpdates(applicationVersion.Branch, applicationVersion.BuildVersion);
 
-            if (response.LatestVersion > applicationVersion.BuildVersion)
+            if (response.LatestVersion > applicationVersion.BuildVersion ||
+                allowRedownload)
                 return response;
 
             return null;
         }
         
-        public async Task<string?> CheckForUpdates()
+        public async Task<string?> CheckForUpdates(bool allowRedownload)
         {
-            cachedResponse = await InternalCheckForUpdates();
+            cachedResponse = await InternalCheckForUpdates(allowRedownload);
             var s = settings.Settings;
             s.LastCheckedForUpdates = DateTime.Now;
             settings.Settings = s;
@@ -96,7 +97,7 @@ namespace WDE.Updater.Services
 
         public async Task<bool> DownloadLatestVersion(ITaskProgress taskProgress)
         {
-            cachedResponse ??= await InternalCheckForUpdates();
+            cachedResponse ??= await InternalCheckForUpdates(false);
             
             if (cachedResponse != null)
             {

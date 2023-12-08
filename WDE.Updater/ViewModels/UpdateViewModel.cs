@@ -74,7 +74,7 @@ namespace WDE.Updater.ViewModels
         {
             try
             {
-                string? newUpdateUrl = await updateService.CheckForUpdates();
+                string? newUpdateUrl = await updateService.CheckForUpdates(false);
                 if (newUpdateUrl != null)
                 {
                     if (settingsProvider.Settings.EnableSilentUpdates)
