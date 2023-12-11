@@ -14,6 +14,9 @@
     </Application.DataTemplates>
 
     <Application.Resources>
+        <!-- unifont won't be required in avalonia 11, because it supports unicode 12 properly, unifont is a workaround
+        it contains many asian glyphs, therefore it more or less work in avalonia 0.10, but it is not perect --> 
+        <FontFamily x:Key="UniFont">/Fonts/#Unifont</FontFamily>
         <FontFamily x:Key="MonoFont">Consolas,Menlo,Courier,Courier New</FontFamily>
         <DrawingImage x:Key="StatusBarIconNotice">
         <DrawingImage.Drawing>

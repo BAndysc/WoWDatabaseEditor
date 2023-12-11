@@ -58,10 +58,33 @@ public partial class VirtualizedVeryFastTableView
         }
     }
 
+    // note: this won't be required in Avalonia 11 which has proper support for Unicode 12 
+    private void GetFonts(out FontFamily defaultFont, out FontFamily unicodeFallback)
+    {
+        defaultFont = TextBlock.GetFontFamily(this);
+        this.GetResource("UniFont", new FontFamily("Unifont"), out unicodeFallback);
+    }
+    private void GetTypefaces(out Typeface defaultFont, out Typeface unicodeFallback)
+    {
+        GetFonts(out var defaultFontFamily, out var unicodeFallbackFamily);
+        defaultFont = new Typeface(defaultFontFamily);
+        unicodeFallback = new Typeface(unicodeFallbackFamily);
+    }
+    private bool UseFallbackUnicodeFont(ReadOnlySpan<char> str)
+    {
+        var len = str.Length;
+        for (int i = 0; i < len; ++i)
+        {
+            if (str[i] >= 0x3FF)
+                return true;
+        }
+
+        return false;
+    }
+
     private void RenderImpl(DrawingContext context)
     {
-
-        var font = new Typeface(TextBlock.GetFontFamily(this));
+        GetTypefaces(out var font, out var unicodeFallback);
         
         var actualWidth = Bounds.Width;
 
@@ -143,7 +166,7 @@ public partial class VirtualizedVeryFastTableView
                                     {
                                         Text = text,
                                         Constraint = new Size(rect.Width, RowHeight),
-                                        Typeface = font,
+                                        Typeface = UseFallbackUnicodeFont(text) ? unicodeFallback : font,
                                         FontSize = 12
                                     };
                                     if (Math.Abs(rectWidth - rect.Width) > 0.01)

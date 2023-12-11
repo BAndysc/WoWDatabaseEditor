@@ -400,6 +400,7 @@ public partial class VirtualizedVeryFastTableView : Panel, IKeyboardNavigationHa
         if (!Controller.SpawnEditorFor(SelectedRowIndex, SelectedCellIndex, SelectedCellRect, customText, this))
         {
             var initialText = customText ?? Controller.GetCellText(SelectedRowIndex, SelectedCellIndex) ?? "";
+            GetFonts(out var defaultFont, out var unicodeFallback);
             editor.Spawn(this, SelectedCellRect, initialText, customText == null, (text, action) =>
             {
                 if (initialText != text)
@@ -421,7 +422,7 @@ public partial class VirtualizedVeryFastTableView : Panel, IKeyboardNavigationHa
                             throw new ArgumentOutOfRangeException(nameof(action), action, null);
                     }
                 }
-            });   
+            }, UseFallbackUnicodeFont(initialText) ? unicodeFallback : null);   
         }
     }
     

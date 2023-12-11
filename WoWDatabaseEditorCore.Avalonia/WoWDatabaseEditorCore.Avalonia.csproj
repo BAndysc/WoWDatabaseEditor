@@ -15,6 +15,7 @@
         <OutputPath>..\bin\$(Configuration)\</OutputPath>
     </PropertyGroup>
     <ItemGroup>
+        <AvaloniaResource Include="Fonts\Unifont.otf" />
         <AvaloniaResource Include="Icon.png" />
         <AvaloniaResource Include="IconSmall.png" />
     </ItemGroup>

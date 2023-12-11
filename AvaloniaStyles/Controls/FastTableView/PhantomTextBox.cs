@@ -108,7 +108,7 @@ public class PhantomTextBox : PhantomControlBase<TextBox>
     private Action<string, ActionAfterSave>? currentOnApply = null;
     private ActionAfterSave actionAfterSave;
 
-    public void Spawn(Visual parent, Rect position, string text, bool selectAll, Action<string, ActionAfterSave> onApply)
+    public void Spawn(Visual parent, Rect position, string text, bool selectAll, Action<string, ActionAfterSave> onApply, FontFamily? customFont = null)
     {
         currentOnApply = onApply;
         var textBox = new TextBox()
@@ -119,7 +119,7 @@ public class PhantomTextBox : PhantomControlBase<TextBox>
         textBox.Padding = new Thickness(5 + 3, -2, 0, 0);
         textBox.Margin = new Thickness(0,  0, 0, 0);
         textBox.Text = text;
-        textBox.FontFamily = new FontFamily("Consolas,Menlo,Courier,Courier New");
+        textBox.FontFamily = customFont ?? new FontFamily("Consolas,Menlo,Courier,Courier New");
         textBox.KeyBindings.Add(new KeyBinding()
         {
             Gesture = new KeyGesture(Key.Enter),
