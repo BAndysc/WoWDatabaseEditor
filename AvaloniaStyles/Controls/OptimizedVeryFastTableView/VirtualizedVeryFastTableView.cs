@@ -81,10 +81,21 @@ public partial class VirtualizedVeryFastTableView : Panel, IKeyboardNavigationHa
         });
         SelectedRowIndexProperty.Changed.AddClassHandler<VirtualizedVeryFastTableView>((view, e) =>
         {
+            // the problem justChangedDataContext solves is:
+            // scrolling to the selected row is very useful
+            // BUT! in the Sql Editor, there are tabs. When tabs are change, datacontext is changed
+            // that caused the SelectedRow to change and the view was scrolled.
+            // but the behaviour we want is to remember the scroll position.
+            // Despite Offset being bound, the offset was updated before the SelectedRow
+            // thus this workaround to skip the scroll when datacontext has just been changed
+            if (view.justChangedDataContext)
+                return;
             view.EnsureRowVisible((int)e.NewValue!);
         });
         SelectedCellIndexProperty.Changed.AddClassHandler<VirtualizedVeryFastTableView>((view, e) =>
         {
+            if (view.justChangedDataContext)
+                return;
             view.EnsureCellVisible((int)e.NewValue!);
         });
         AffectsRender<VirtualizedVeryFastTableView>(SelectedRowIndexProperty);
@@ -107,6 +118,15 @@ public partial class VirtualizedVeryFastTableView : Panel, IKeyboardNavigationHa
         });
     }
     
+    private bool justChangedDataContext = false;
+    
+    protected override void OnDataContextChanged(EventArgs e)
+    {
+        base.OnDataContextChanged(e);
+        justChangedDataContext = true;
+        DispatcherTimer.RunOnce(() => justChangedDataContext = false, TimeSpan.FromMilliseconds(1));
+    }
+
     public VirtualizedVeryFastTableView()
     {
         UpdateKeyBindings();

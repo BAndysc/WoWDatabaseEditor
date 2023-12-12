@@ -30,7 +30,17 @@ namespace WDE.SqlWorkbench.ViewModels;
 internal partial class SelectResultsViewModel : ObservableBase
 {
     private readonly SqlWorkbenchViewModel vm;
-    [Notify] private Vector scrollOffset;
+    private Vector scrollOffset;
+
+    public Vector ScrollOffset
+    {
+        get => scrollOffset;
+        set
+        {
+            scrollOffset = value;
+            RaisePropertyChanged(nameof(ScrollOffset));
+        }
+    }
     [Notify] private int selectedRowIndex;
     [Notify] private int selectedCellIndex;
     [Notify] [AlsoNotify(nameof(Count), nameof(IsModified))] private int additionalRowsCount;
