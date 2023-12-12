@@ -399,11 +399,12 @@ public partial class VirtualizedVeryFastTableView : Panel, IKeyboardNavigationHa
             return;
         if (!Controller.SpawnEditorFor(SelectedRowIndex, SelectedCellIndex, SelectedCellRect, customText, this))
         {
-            var initialText = customText ?? Controller.GetCellText(SelectedRowIndex, SelectedCellIndex) ?? "";
+            var originalText = Controller.GetCellText(SelectedRowIndex, SelectedCellIndex);
+            var initialText = customText ?? originalText ?? "";
             GetFonts(out var defaultFont, out var unicodeFallback);
             editor.Spawn(this, SelectedCellRect, initialText, customText == null, (text, action) =>
             {
-                if (initialText != text)
+                if (originalText != text)
                     ValueUpdateRequest?.Invoke(text);
                 if (action != PhantomTextBox.ActionAfterSave.None)
                 {
