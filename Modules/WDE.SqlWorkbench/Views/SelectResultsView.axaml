@@ -16,7 +16,7 @@
   <DockPanel>
     <TextBlock DockPanel.Dock="Bottom" HorizontalAlignment="Center" Text="{CompiledBinding Count, StringFormat={}{0} Rows}"></TextBlock>
     
-    <ScrollViewer HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible" Offset="{CompiledBinding ScrollOffset, Mode=TwoWay}">
+    <ScrollViewer HorizontalScrollBarVisibility="Visible" AllowAutoHide="False" VerticalScrollBarVisibility="Visible" Offset="{CompiledBinding ScrollOffset, Mode=TwoWay}">
       <optimizedVeryFastTableView:VirtualizedVeryFastTableView ItemsCount="{CompiledBinding  Count}"
                                                                SelectedRowIndex="{CompiledBinding SelectedRowIndex, Mode=TwoWay}"
                                                                SelectedCellIndex="{CompiledBinding SelectedCellIndex, Mode=TwoWay}"

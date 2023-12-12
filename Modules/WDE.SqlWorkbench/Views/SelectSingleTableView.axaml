@@ -24,7 +24,7 @@
       </StackPanel>
     </Grid>
     
-    <ScrollViewer HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible" Offset="{CompiledBinding ScrollOffset, Mode=TwoWay}">
+    <ScrollViewer HorizontalScrollBarVisibility="Visible" AllowAutoHide="False" VerticalScrollBarVisibility="Visible" Offset="{CompiledBinding ScrollOffset, Mode=TwoWay}">
       <optimizedVeryFastTableView:VirtualizedVeryFastTableView ItemsCount="{CompiledBinding  Count}"
                                                                SelectedRowIndex="{CompiledBinding SelectedRowIndex, Mode=TwoWay}"
                                                                SelectedCellIndex="{CompiledBinding SelectedCellIndex, Mode=TwoWay}"
