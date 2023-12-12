@@ -129,4 +129,14 @@ internal class UserQuestionsService : IUserQuestionsService
             .WithOkButton(true)
             .Build());
     }
+
+    public async Task ShowGenericErrorAsync(string header, string message)
+    {
+        await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
+            .SetTitle("Error")
+            .SetMainInstruction(header)
+            .SetContent(message)
+            .WithOkButton(true)
+            .Build());
+    }
 }

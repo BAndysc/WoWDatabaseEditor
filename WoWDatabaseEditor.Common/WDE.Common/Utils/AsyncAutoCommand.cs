@@ -151,7 +151,7 @@ namespace WDE.Common.Utils
     }
     
     
-    internal class AsyncCommandExceptionWrap<T> : ICommand, IAsyncCommand where T : Exception
+    public class AsyncCommandExceptionWrap<T> : ICommand, IAsyncCommand where T : Exception
     {
         private readonly IAsyncCommand parent;
         private readonly Action<T>? onError;
@@ -205,7 +205,7 @@ namespace WDE.Common.Utils
         }
     }
     
-    internal class AsyncCommandExceptionWrap<T, R> : ICommand, IAsyncCommand<R> where T : Exception
+    public class AsyncCommandExceptionWrap<T, R> : ICommand, IAsyncCommand<R> where T : Exception
     {
         private readonly IAsyncCommand<R> parent;
         private readonly Action<T>? onError;

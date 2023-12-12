@@ -30,10 +30,34 @@
           <ButtonImage ToolTip.Tip="Open Settings" Image="Icons/icon_cog_mono.png" Command="{CompiledBinding OpenSettingsCommand}" BorderThickness="0" Background="Transparent" Width="22" Padding="0" Height="22" Margin="0,2,0,0" />
           <TextBlock Opacity="0.5" Text="{CompiledBinding CursorStatus}" VerticalAlignment="Center" />
  
-          <TextBlock Opacity="0.5" DockPanel.Dock="Right" Text="{CompiledBinding ConnectedTo}"  
-                     Foreground="{CompiledBinding ConnectedToColor, Converter={x:Static RgbColorToBrushConverter.Instance}, TargetNullValue={x:Static avaloniaStyles:SystemTheme.ForegroundColor}}"
-                     VerticalAlignment="Center" />
-          <WdeImage DockPanel.Dock="Right" Image="{CompiledBinding ConnectedToIcon}" Margin="3,0,3,0" Width="16" Height="16" />
+          <Button DockPanel.Dock="Right" Height="22" Padding="0" BorderThickness="0">
+            <StackPanel Orientation="Horizontal">
+              <WdeImage Image="{CompiledBinding ConnectedToIcon}" Margin="3,0,3,0" Width="16" Height="16" />
+              <TextBlock Opacity="0.5" Text="{CompiledBinding ConnectedTo}"  
+                         Foreground="{CompiledBinding ConnectedToColor, Converter={x:Static RgbColorToBrushConverter.Instance}, TargetNullValue={x:Static avaloniaStyles:SystemTheme.ForegroundColor}}"
+                         VerticalAlignment="Center" />
+            </StackPanel>
+            <Button.Flyout>
+              <Flyout>
+                <DockPanel>
+                  <TextBlock FontWeight="Bold" DockPanel.Dock="Top">Change connection for this tab:</TextBlock>
+                  <ItemsControl Items="{CompiledBinding AllConnections}">
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate>
+                        <Button BorderThickness="0" Background="Transparent" HorizontalContentAlignment="Left" CommandParameter="{CompiledBinding .}" Command="{CompiledBinding #Root.((viewModels:SqlWorkbenchViewModel)DataContext).ChangeConnectionCommand}">
+                          <DockPanel>
+                            <WdeImage Image="{CompiledBinding Icon}" Width="16" Height="16" />
+                            <TextBlock Margin="5,0,0,0" Text="{CompiledBinding ConnectionName}" Foreground="{CompiledBinding Color, Converter={x:Static RgbColorToBrushConverter.Instance}, TargetNullValue={x:Static avaloniaStyles:SystemTheme.ForegroundColor}}" />
+                          </DockPanel>
+                        </Button>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                </DockPanel>
+              </Flyout>
+            </Button.Flyout>
+          </Button>
+
           <TextBlock Opacity="0.5" DockPanel.Dock="Right" Text="Connected to:" IsVisible="{CompiledBinding IsSessionOpened}" VerticalAlignment="Center" />
           <TextBlock Opacity="0.5" DockPanel.Dock="Right" Text="Disconnected from:" IsVisible="{CompiledBinding !IsSessionOpened}" VerticalAlignment="Center" />
           

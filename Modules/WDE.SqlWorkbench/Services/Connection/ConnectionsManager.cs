@@ -46,7 +46,7 @@ internal class ConnectionsManager : IConnectionsManager
 
     public IConnection Clone(IConnection baseConnection, string schemaName)
     {
-        var newConnection = new Connection(connector, baseConnection.ConnectionData.WithSchemaName(schemaName));
+        var newConnection = new Connection(connector, baseConnection.ConnectionData.WithId(Guid.NewGuid()).WithSchemaName(schemaName));
         AllConnections.Add(newConnection);
         return newConnection;
     }

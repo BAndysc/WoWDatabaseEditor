@@ -1,6 +1,8 @@
 using System;
 using System.Threading.Tasks;
+using AsyncAwaitBestPractices.MVVM;
 using WDE.Common.Services.MessageBox;
+using WDE.Common.Utils;
 using WDE.Module.Attributes;
 
 namespace WDE.SqlWorkbench.Services.UserQuestions;
@@ -26,4 +28,28 @@ internal interface IUserQuestionsService
     /// <returns>true to continue loading, false to stop loading</returns>
     Task<bool> FileTooBigWarningAsync(long fileSize, int limit);
     Task FileTooBigErrorAsync(long fileSize, int limit);
+    Task ShowGenericErrorAsync(string header, string message);
+}
+
+internal static class CommandExtensions
+{
+    public static IAsyncCommand WrapMessageBox<T>(this IAsyncCommand cmd, IUserQuestionsService userQuestions,
+        string? header = null) where T : Exception
+    {
+        return new AsyncCommandExceptionWrap<T>(cmd, async (e) =>
+        {
+            Console.WriteLine(e);
+            await userQuestions.ShowGenericErrorAsync(header ?? "Error occured while executing the command",
+                e.Message);
+        });
+    }
+    
+    public static IAsyncCommand<R> WrapMessageBox<T, R>(this IAsyncCommand<R> cmd, IUserQuestionsService userQuestions, string? header = null) where T : Exception
+    {
+        return new AsyncCommandExceptionWrap<T, R>(cmd, async (e) =>
+        {
+            Console.WriteLine(e);
+            await userQuestions.ShowGenericErrorAsync(header ?? "Error occured while executing the command", e.Message);
+        });
+    }
 }

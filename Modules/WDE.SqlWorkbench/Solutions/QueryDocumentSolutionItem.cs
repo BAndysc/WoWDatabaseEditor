@@ -52,4 +52,9 @@ public class QueryDocumentSolutionItem : ISolutionItem, IEquatable<QueryDocument
     {
         return !Equals(left, right);
     }
+
+    public QueryDocumentSolutionItem WithConnectionId(Guid connectionDataId)
+    {
+        return new QueryDocumentSolutionItem(FileName, connectionDataId, IsTemporary);
+    }
 }

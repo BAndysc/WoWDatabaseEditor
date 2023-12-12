@@ -9,6 +9,7 @@ using WDE.Common.Types;
 using WDE.Common.Utils;
 using WDE.SqlWorkbench.Models;
 using WDE.SqlWorkbench.Services.ActionsOutput;
+using WDE.SqlWorkbench.Services.UserQuestions;
 using WDE.SqlWorkbench.Utils;
 
 namespace WDE.SqlWorkbench.ViewModels;
@@ -124,6 +125,7 @@ internal partial class SelectSingleTableViewModel : SelectResultsViewModel
         {
             try
             {
+                ErrorIfConnectionChanged();
                 await ApplyChangesAsync();
             }
             catch (Exception e)
@@ -138,12 +140,13 @@ internal partial class SelectSingleTableViewModel : SelectResultsViewModel
         });
         RefreshTableCommand = new AsyncAutoCommand(async () =>
         {
+            ErrorIfConnectionChanged();
             if (!await AskIfForgetChangesAsync())
                 return;
             
             await RevertChangesCommand.ExecuteAsync();
             await vm.ExecuteAndOverrideResultsAsync(selectSpecs.ToString(), this);
-        });
+        }).WrapMessageBox<Exception>(vm.UserQuestions);
 
         RowsHaveFullPrimaryKey = columnsInfo.Any(x => x.IsPrimaryKey) &&
                                  columnsInfo.Where(x => x.IsPrimaryKey)
@@ -231,6 +234,8 @@ internal partial class SelectSingleTableViewModel : SelectResultsViewModel
     
     public override async Task<bool> SaveAsync()
     {
+        ErrorIfConnectionChanged();
+        
         try
         {
             await ApplyChangesAsync();

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Intrinsics.X86;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -21,6 +22,7 @@ using WDE.MVVM;
 using WDE.SqlWorkbench.Models;
 using WDE.SqlWorkbench.Services.ActionsOutput;
 using WDE.SqlWorkbench.Services.Connection;
+using WDE.SqlWorkbench.Services.UserQuestions;
 using WDE.SqlWorkbench.Utils;
 
 namespace WDE.SqlWorkbench.ViewModels;
@@ -33,6 +35,7 @@ internal partial class SelectResultsViewModel : ObservableBase
     [Notify] private int selectedCellIndex;
     [Notify] [AlsoNotify(nameof(Count), nameof(IsModified))] private int additionalRowsCount;
     [Notify] private bool requestRender;
+    private Guid originalConnectionId;
     
     public bool IsModified => overrides.Count > 0 || deletedRows.Count > 0 || additionalRowsCount > 0;
 
@@ -60,6 +63,7 @@ internal partial class SelectResultsViewModel : ObservableBase
     public SelectResultsViewModel(SqlWorkbenchViewModel vm, IActionOutput action, in SelectResult results)
     {
         this.vm = vm;
+        originalConnectionId = vm.Connection?.ConnectionData.Id ?? Guid.Empty;
         Results = results;
         TableController = new TableController(this);
         Title = $"Query {action.Index}";
@@ -78,11 +82,12 @@ internal partial class SelectResultsViewModel : ObservableBase
             var name = Columns[selectedCellIndex].Header;
             vm.ClipboardService.SetText(name);
         });
-        
+
         RefreshCommand = new AsyncAutoCommand(async () =>
         {
+            ErrorIfConnectionChanged();
             await vm.ExecuteAndOverrideResultsAsync(action.Query, this);
-        });
+        }).WrapMessageBox<Exception>(vm.UserQuestions);
         
         SelectAllCommand = new DelegateCommand(() =>
         {
@@ -111,6 +116,8 @@ internal partial class SelectResultsViewModel : ObservableBase
         
         CreateViewCommand = new AsyncAutoCommand(async () =>
         {
+            ErrorIfConnectionChanged();
+            
             var newViewName = await vm.UserQuestions.AskForNewViewNameAsync();
             if (string.IsNullOrWhiteSpace(newViewName))
                 return;
@@ -127,7 +134,13 @@ internal partial class SelectResultsViewModel : ObservableBase
             {
                 await vm.UserQuestions.SaveErrorAsync(e);
             }
-        });
+        }).WrapMessageBox<Exception>(vm.UserQuestions);
+    }
+
+    protected void ErrorIfConnectionChanged()
+    {
+        if (vm.Connection?.ConnectionData.Id != originalConnectionId)
+            throw new Exception("Connection changed, please re run the query as this tab is out of sync now.");
     }
 
     protected string ColumnValueToMySqlRepresentation(int columnIndex, string? value)

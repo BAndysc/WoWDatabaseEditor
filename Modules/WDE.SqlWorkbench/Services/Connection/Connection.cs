@@ -1,6 +1,8 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Avalonia.Media;
+using WDE.Common.Types;
 using WDE.Common.Utils;
 using WDE.MVVM;
 using WDE.MVVM.Observable;
@@ -31,11 +33,13 @@ internal class Connection : ObservableBase, IConnection
         taskQueue.ToObservable(x => x.PendingTasksCount).SubscribeAction(_ => RaisePropertyChanged(nameof(PendingTasksCount)));
     }
 
+    public Color? Color => data.Color;
     public bool IsRunning => taskQueue.IsRunning;
     public bool IsAutoCommit => autoCommit;
     public bool IsOpened => opened;
     public int PendingTasksCount => taskQueue.PendingTasksCount;
     public string ConnectionName => data.ConnectionName;
+    public ImageUri? Icon => data.Icon;
 
     public async Task<IMySqlSession> OpenSessionAsync()
     {

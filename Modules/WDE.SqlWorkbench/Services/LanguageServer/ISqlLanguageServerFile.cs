@@ -15,5 +15,6 @@ internal interface ISqlLanguageServerFile : System.IDisposable
     Task<IReadOnlyList<TextEdit>> FormatRangeAsync(int startLine, int startColumn, int endLine, int endColumn, CancellationToken cancellationToken);
     Task<IReadOnlyList<TextEdit>> FormatAsync(CancellationToken cancellationToken);
     Task RestartLanguageServerAsync();
+    Task ChangeDatabaseAsync(string databaseName);
     IReadOnlyReactiveProperty<bool> ServerAlive { get; }
 }

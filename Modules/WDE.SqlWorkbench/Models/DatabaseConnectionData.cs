@@ -31,7 +31,7 @@ internal readonly struct DatabaseConnectionData
     public readonly QueryExecutionSafety SafeMode;
 
     public bool IsTemporary => Id == Guid.Empty;
-
+    
     public DatabaseConnectionData(Guid id,
         CredentialsSource credentialsSource,
         DatabaseCredentials credentials,

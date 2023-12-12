@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 using OmniSharp.Extensions.LanguageServer.Client;
 using OmniSharp.Extensions.LanguageServer.Protocol.Document;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
+using OmniSharp.Extensions.LanguageServer.Protocol.Workspace;
 using WDE.MVVM.Observable;
 
 namespace WDE.SqlWorkbench.Services.LanguageServer;
@@ -16,8 +18,8 @@ internal class SqlsLanguageServerFile : ISqlLanguageServerFile
     private readonly LanguageServerConnectionId connectionId;
     private readonly string fileUri;
     private LanguageClient client;
-    private readonly ReactiveProperty<bool> serverAlive = new(true); 
-    
+    private readonly ReactiveProperty<bool> serverAlive = new(true);
+
     public IReadOnlyReactiveProperty<bool> ServerAlive => serverAlive;
 
     public LanguageServerConnectionId ConnectionId => connectionId;
@@ -160,6 +162,11 @@ internal class SqlsLanguageServerFile : ISqlLanguageServerFile
     public async Task RestartLanguageServerAsync()
     {
         await sqls.RestartLanguageServerAsync(connectionId);
+    }
+
+    public async Task ChangeDatabaseAsync(string databaseName)
+    {
+        await client.ExecuteCommand(new Command() { Name = "switchDatabase", Arguments = new JArray() { new JValue(databaseName) } });
     }
 
     public async Task<IReadOnlyList<TextEdit>> FormatRangeAsync(int startLine, int startColumn, int endLine, int endColumn, CancellationToken cancellationToken)

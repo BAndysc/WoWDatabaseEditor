@@ -33,6 +33,7 @@ internal class SqlWorkbenchViewModelTests
     protected IWindowManager windowManager = null!;
     protected MockSqlConnector.MockMemoryServer mockServer = null!;
     protected ManualSynchronizationContext synchronizationContext = null!;
+    protected IConnectionsManager connectionsManager = null!;
     
     [SetUp]
     public void Init()
@@ -48,6 +49,7 @@ internal class SqlWorkbenchViewModelTests
         clipboard = Substitute.For<IClipboardService>();
         connector = new MockSqlConnector(querySafetyService);
         windowManager = Substitute.For<IWindowManager>();
+        connectionsManager = Substitute.For<IConnectionsManager>();
         GlobalApplication.InitializeApplication(mainThread, GlobalApplication.AppBackend.Avalonia);
 
         synchronizationContext = new ManualSynchronizationContext();
@@ -70,7 +72,7 @@ internal class SqlWorkbenchViewModelTests
     {
         var connection = new Connection(connector, connectionData);
         var solutionItem = new QueryDocumentSolutionItem("test", connectionData.Id, true);
-        var vm = new SqlWorkbenchViewModel(actionsOutputService, languageServer, configuration, queryUtility, userQuestionsService, preferences, clipboard, mainThread, windowManager, connection, solutionItem);
+        var vm = new SqlWorkbenchViewModel(actionsOutputService, languageServer, configuration, queryUtility, userQuestionsService, preferences, clipboard, mainThread, windowManager, connectionsManager, connection, solutionItem);
         return vm;
     }
     

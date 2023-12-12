@@ -34,6 +34,7 @@ using WDE.Common.Services.MessageBox;
 using WDE.Common.Tasks;
 using WDE.Common.Types;
 using WDE.MVVM.Observable;
+using WDE.MVVM.Utils;
 using WDE.SqlQueryGenerator;
 using WDE.SqlWorkbench.Models;
 using WDE.SqlWorkbench.Services.ActionsOutput;
@@ -74,11 +75,12 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, ISolutionItemDocu
     private readonly ISqlLanguageServer languageServer;
     private readonly IQueryUtility queryUtility;
     private readonly ISqlWorkbenchPreferences preferences;
-    private readonly IConnection connection;
+    private readonly IConnectionsManager connectionsManager;
     private readonly IQuerySplitter querySplitter = new ThreadedQuerySplitter();
     private readonly ISyntaxValidator syntaxValidator = new AntlrSyntaxValidator();
     private readonly TextMarkerService textMarkerService;
     private ISqlLanguageServerFile? languageServerInstance;
+    private IDisposable? languageServerDisposable;
     private IDisposable? previousTimer;
     private CancellationTokenSource? currentProcessing;
     
@@ -104,6 +106,7 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, ISolutionItemDocu
     public IAsyncCommand RestartLanguageServerCommand { get; }
     public IAsyncCommand OpenFileCommand { get; }
     public IAsyncCommand SaveFileCommand { get; }
+    public IAsyncCommand<IConnection> ChangeConnectionCommand { get; }
 
     [Notify] private bool isConnecting = true;
     [Notify] private bool showNonPrintableChars = false;
@@ -112,6 +115,8 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, ISolutionItemDocu
     [Notify] private bool continueOnError = false;
     
     [Notify] private SelectResultsViewModel? selectedResult;
+
+    private IConnection connection = null!;
     
     public ObservableCollection<SelectResultsViewModel> Results { get; } = new();
 
@@ -130,6 +135,30 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, ISolutionItemDocu
     public Color? ConnectedToColor => connection.ConnectionData.Color;
     
     public List<int> Limits { get; } = new List<int>() { 100, 1_000, 5_000, 10_000, 50_000, 500_000 };
+
+    private IDisposable? connectionDisposable;
+    
+    public IConnection Connection
+    {
+        get => connection;
+        protected set
+        {
+            connectionDisposable?.Dispose();
+            connection = value;
+            RaisePropertyChanged(nameof(ConnectedToIcon));
+            RaisePropertyChanged(nameof(ConnectedTo));
+            RaisePropertyChanged(nameof(ConnectedToColor));
+            RaisePropertyChanged(nameof(IsAutoCommit));
+            RaisePropertyChanged(nameof(IsSessionOpened));
+            RaisePropertyChanged(nameof(TaskRunning));
+            connectionDisposable = new CompositeDisposable(
+                connection.ToObservable(x => x.IsRunning)
+                    .SubscribeAction(_ => RaisePropertyChanged(nameof(TaskRunning))),
+                connection.ToObservable(x => x.IsAutoCommit)
+                    .SubscribeAction(_ => RaisePropertyChanged(nameof(IsAutoCommit)))
+            );
+        }
+    }
     
     [Notify] private bool isEnabled = true;
 
@@ -138,6 +167,8 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, ISolutionItemDocu
     public bool LanguageServerHealthy => languageServerState is LanguageServerStateEnum.Healthy or LanguageServerStateEnum.NotStarted;
     
     public bool TaskRunning => connection.IsRunning;
+
+    public IReadOnlyList<IConnection> AllConnections => connectionsManager.StaticConnections;
     
     public string LanguageServerToolTipText => languageServerState switch
     {
@@ -161,6 +192,7 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, ISolutionItemDocu
         IClipboardService clipboardService,
         IMainThread mainThread,
         IWindowManager windowManager,
+        IConnectionsManager connectionsManager,
         IConnection connection,
         QueryDocumentSolutionItem solutionItem)
     {
@@ -170,7 +202,8 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, ISolutionItemDocu
         this.languageServer = languageServer;
         this.queryUtility = queryUtility;
         this.preferences = preferences;
-        this.connection = connection;
+        this.connectionsManager = connectionsManager;
+        Connection = connection;
         Document = new TextDocument();
         textMarkerService = new TextMarkerService(Document);
         Document.UpdateStarted += DocumentUpdateStarted;
@@ -188,8 +221,12 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, ISolutionItemDocu
         Document.UndoStack.MarkAsOriginalFile();
 
         Results.CollectionChanged += (_, _) => RaisePropertyChanged(nameof(HasAnyResults));
-        AutoDispose(connection.ToObservable(x => x.IsRunning).SubscribeAction(_ => RaisePropertyChanged(nameof(TaskRunning))));
-        AutoDispose(connection.ToObservable(x => x.IsAutoCommit).SubscribeAction(_ => RaisePropertyChanged(nameof(IsAutoCommit))));
+
+        AutoDispose(new ActionDisposable(() => connectionDisposable?.Dispose()));
+        
+        AutoDispose(new ActionDisposable(() => MySqlSession?.DisposeAsync().AsTask().ListenErrors()));
+
+        AutoDispose(new ActionDisposable(() => languageServerDisposable?.Dispose()));
         
         AutoDispose(Results.ToStream(true)
             .SubscribeAction(x =>
@@ -303,7 +340,7 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, ISolutionItemDocu
                 if (wasSelected)
                     SelectedResult = Results.Count > indexOf ? Results[indexOf] : Results.LastOrDefault();
             }
-        });
+        }).WrapMessageBox<Exception, SelectResultsViewModel>(userQuestions);
         
         CloseAllTabsCommand = new AsyncAutoCommand(async () =>
         {
@@ -315,7 +352,7 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, ISolutionItemDocu
                 Results.RemoveAt(i);
             }
             SelectedResult = null;
-        });
+        }).WrapMessageBox<Exception>(userQuestions);
         
         CloseOtherTabsCommand = new AsyncAutoCommand<SelectResultsViewModel>(async r =>
         {
@@ -330,7 +367,7 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, ISolutionItemDocu
                 Results.RemoveAt(i);
             }
             SelectedResult = r;
-        });
+        }).WrapMessageBox<Exception, SelectResultsViewModel>(userQuestions);
         
         CloseLeftTabsCommand = new AsyncAutoCommand<SelectResultsViewModel>(async r =>
         {
@@ -348,7 +385,7 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, ISolutionItemDocu
                 if (selectedIndex < index)
                     SelectedResult = Results.Count > 0 ? Results[0] : null;
             }
-        });
+        }).WrapMessageBox<Exception, SelectResultsViewModel>(userQuestions);
         
         CloseRightTabsCommand = new AsyncAutoCommand<SelectResultsViewModel>(async r =>
         {
@@ -365,7 +402,7 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, ISolutionItemDocu
                 if (selectedIndex > index)
                     SelectedResult = index < Results.Count ? Results[index] : null;
             }
-        });
+        }).WrapMessageBox<Exception, SelectResultsViewModel>(userQuestions);
         
         RestartLanguageServerCommand = new AsyncAutoCommand(RestartLanguageServerAsync);
         
@@ -431,6 +468,21 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, ISolutionItemDocu
             await connection.CancelAllAsync();
         }, () => TaskRunning);
 
+        ChangeConnectionCommand = new AsyncAutoCommand<IConnection>(async conn =>
+        {
+            try
+            {
+                Connection = conn;
+                await ConnectAsync();
+                await ConnectLanguageServerAsync();
+                DocumentSolutionItem = DocumentSolutionItem.WithConnectionId(conn.ConnectionData.Id);
+            }
+            catch (Exception e)
+            {
+                await UserQuestions.ConnectionsErrorAsync(e);
+            }
+        });
+
         void RaiseCommandsCanExecute()
         {
             ExecuteAllCommand!.RaiseCanExecuteChanged();
@@ -486,15 +538,19 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, ISolutionItemDocu
     
     private async Task ConnectAsync()
     {
+        if (connectTask != null)
+            await connectTask;
+        
         var tcs = new TaskCompletionSource();
         connectTask = tcs.Task;
         try
         {
+            if (MySqlSession != null)
+                await MySqlSession.DisposeAsync();
+            
             MySqlSession = await connection.OpenSessionAsync();
             if (IsDisposed)
                 await MySqlSession.DisposeAsync();
-            else
-                AutoDispose(new ActionDisposable(() => MySqlSession.DisposeAsync().AsTask().ListenErrors()));
             IsConnecting = false;
         }
         catch (Exception e)
@@ -647,7 +703,6 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, ISolutionItemDocu
                 }
                 else
                 {
-                    Debug.Assert(isSelect);
                     result.UpdateResults(in res);
                 }
                 action.Response = $"{res.AffectedRows} row(s) returned";
@@ -655,6 +710,12 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, ISolutionItemDocu
             else
             {
                 Debug.Assert(result == null);
+
+                if (queryUtility.IsUseDatabase(query, out var useDatabase) &&
+                    languageServerInstance != null)
+                {
+                    await languageServerInstance.ChangeDatabaseAsync(useDatabase);
+                }
                 
                 if (res.AffectedRows == 1)
                     action.Response = $"{res.AffectedRows} row affected";
@@ -698,10 +759,16 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, ISolutionItemDocu
         try
         {
             languageServerStarting = true;
-            var connId = await languageServer.ConnectAsync(connection.ConnectionData.Credentials);
+            var connId = await languageServer.ConnectAsync(connection.ConnectionData.Id, connection.ConnectionData.Credentials);
             
             if (IsDisposed)
                 return;
+
+            if (languageServerDisposable != null)
+            {
+                languageServerDisposable.Dispose();
+                languageServerDisposable = null;
+            }
             
             languageServerInstance = await languageServer.NewFileAsync(connId);
 
@@ -711,20 +778,20 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, ISolutionItemDocu
                 return;
             }
 
-            AutoDispose(languageServerInstance);
-            
-            AutoDispose(languageServerInstance.ServerAlive.SubscribeAction(isAlive =>
-            {
-                if (!isAlive)
+            languageServerDisposable = new CompositeDisposable(languageServerInstance.ServerAlive.SubscribeAction(
+                isAlive =>
                 {
-                    LanguageServerState = LanguageServerStateEnum.Crashed;
-                }
-                else
-                {
-                    if (LanguageServerState is LanguageServerStateEnum.Crashed or LanguageServerStateEnum.NotStarted)
-                        LanguageServerState = LanguageServerStateEnum.Healthy;
-                }
-            }));
+                    if (!isAlive)
+                    {
+                        LanguageServerState = LanguageServerStateEnum.Crashed;
+                    }
+                    else
+                    {
+                        if (LanguageServerState is LanguageServerStateEnum.Crashed
+                            or LanguageServerStateEnum.NotStarted)
+                            LanguageServerState = LanguageServerStateEnum.Healthy;
+                    }
+                }), languageServerInstance);
         }
         catch (Exception e)
         {

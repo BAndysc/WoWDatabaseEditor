@@ -30,8 +30,10 @@ internal class SqlsLanguageServer : ISqlLanguageServer
     private List<LanguageClient> clients = new();
     private List<Process?> processes = new();
     private List<DatabaseCredentials> credentials = new();
+    private List<Guid> guids = new();
     private List<List<SqlsLanguageServerFile>> filesPerClient = new();
-    private Dictionary<DatabaseCredentials, LanguageServerConnectionId> credentialsToId = new();
+    private Dictionary<Guid, LanguageServerConnectionId> guidToConnId = new();
+    private Dictionary<LanguageServerConnectionId, Task> connectionTasks = new(); 
     private Dictionary<LanguageServerConnectionId, (DateTime lastCrash, int crashCount)> lastCrashStats = new();
     private long fileId = 0;
 
@@ -171,19 +173,30 @@ internal class SqlsLanguageServer : ISqlLanguageServer
         return client;
     }
 
-    public async Task<LanguageServerConnectionId> ConnectAsync(DatabaseCredentials credentials)
+    public async Task<LanguageServerConnectionId> ConnectAsync(Guid connectionGuid, DatabaseCredentials credentials)
     {
-        if (credentialsToId.TryGetValue(credentials, out var id))
-            return id;
+        var hasId = guidToConnId.TryGetValue(connectionGuid, out var id);
         
-        credentialsToId[credentials] = id = new LanguageServerConnectionId(clients.Count);
+        if (hasId)
+        {
+            if (connectionTasks.TryGetValue(id, out var pendingTask))
+                await pendingTask;
+            return id;
+        }
+        
+        var taskCompletionSource = new TaskCompletionSource();
+        guidToConnId[connectionGuid] = id = new LanguageServerConnectionId(clients.Count);
+        connectionTasks[id] = taskCompletionSource.Task;
         this.credentials.Add(credentials);
         clients.Add(null!);
         processes.Add(null!);
+        guids.Add(connectionGuid);
         disposedClients.Add(false);
         filesPerClient.Add(new List<SqlsLanguageServerFile>());
 
         await CreateClientAsync(id);
+        connectionTasks.Remove(id);
+        taskCompletionSource.SetResult();
         
         return id;
     }
@@ -213,7 +226,7 @@ internal class SqlsLanguageServer : ISqlLanguageServer
                 p.Kill();
                 p.Dispose();
                 processes[file.ConnectionId.Id] = null!;   
-                credentialsToId.Remove(credentials[file.ConnectionId.Id]);
+                guidToConnId.Remove(guids[file.ConnectionId.Id]);
             }
         }
     }
