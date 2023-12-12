@@ -9,6 +9,7 @@ using WDE.Common.Types;
 using WDE.Common.Utils;
 using WDE.SqlWorkbench.Models;
 using WDE.SqlWorkbench.Services.ActionsOutput;
+using WDE.SqlWorkbench.Services.QueryConfirmation;
 using WDE.SqlWorkbench.Services.UserQuestions;
 using WDE.SqlWorkbench.Utils;
 
@@ -128,6 +129,10 @@ internal partial class SelectSingleTableViewModel : SelectResultsViewModel
                 ErrorIfConnectionChanged();
                 await ApplyChangesAsync();
             }
+            catch (TaskCanceledException e)
+            {
+                // ignore on purpose, because it means user canceled the operation
+            }
             catch (Exception e)
             {
                 Console.WriteLine(e);
@@ -227,19 +232,34 @@ internal partial class SelectSingleTableViewModel : SelectResultsViewModel
             return;
         changes.Insert(0, "START TRANSACTION");
         changes.Add("COMMIT");
-        await vm.ExecuteAsync(changes, false, true, true);
-        ResetChanges();
-        Console.WriteLine( string.Join(";\n", changes));
+        var combined = string.Join(";\n", changes);
+        var execute = async () =>
+        {
+            Console.WriteLine(combined);
+            await vm.ExecuteAsync(changes, false, true, true);
+            ResetChanges();
+        };
+        if (vm.Preferences.AskBeforeApplyingChanges)
+        {
+            if (await vm.QueryConfirmationService.QueryConfirmationAsync(combined, execute) == QueryConfirmationResult.DontExecute)
+                throw new TaskCanceledException();
+        }
+        else
+            await execute();
     }
     
     public override async Task<bool> SaveAsync()
     {
         ErrorIfConnectionChanged();
-        
+
         try
         {
             await ApplyChangesAsync();
             return true;
+        }
+        catch (TaskCanceledException e)
+        {
+            return false; // ignore on purpose, because it means user canceled the operation
         }
         catch (Exception e)
         {

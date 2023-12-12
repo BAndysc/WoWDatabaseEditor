@@ -5,9 +5,9 @@ using WDE.Common.Managers;
 using WDE.Common.Services;
 using WDE.Common.Tasks;
 using WDE.SqlWorkbench.Models;
-using WDE.SqlWorkbench.Services.ActionsOutput;
 using WDE.SqlWorkbench.Services.Connection;
 using WDE.SqlWorkbench.Services.LanguageServer;
+using WDE.SqlWorkbench.Services.QueryConfirmation;
 using WDE.SqlWorkbench.Services.QueryUtils;
 using WDE.SqlWorkbench.Services.UserQuestions;
 using WDE.SqlWorkbench.Settings;
@@ -34,6 +34,7 @@ internal class SqlWorkbenchViewModelTests
     protected MockSqlConnector.MockMemoryServer mockServer = null!;
     protected ManualSynchronizationContext synchronizationContext = null!;
     protected IConnectionsManager connectionsManager = null!;
+    protected IQueryConfirmationService confirmationService = null!;
     
     [SetUp]
     public void Init()
@@ -50,6 +51,7 @@ internal class SqlWorkbenchViewModelTests
         connector = new MockSqlConnector(querySafetyService);
         windowManager = Substitute.For<IWindowManager>();
         connectionsManager = Substitute.For<IConnectionsManager>();
+        confirmationService = Substitute.For<IQueryConfirmationService>();
         GlobalApplication.InitializeApplication(mainThread, GlobalApplication.AppBackend.Avalonia);
 
         synchronizationContext = new ManualSynchronizationContext();
@@ -72,7 +74,7 @@ internal class SqlWorkbenchViewModelTests
     {
         var connection = new Connection(connector, connectionData);
         var solutionItem = new QueryDocumentSolutionItem("test", connectionData.Id, true);
-        var vm = new SqlWorkbenchViewModel(actionsOutputService, languageServer, configuration, queryUtility, userQuestionsService, preferences, clipboard, mainThread, windowManager, connectionsManager, connection, solutionItem);
+        var vm = new SqlWorkbenchViewModel(actionsOutputService, languageServer, configuration, queryUtility, userQuestionsService, preferences, clipboard, mainThread, windowManager, connectionsManager, confirmationService, connection, solutionItem);
         return vm;
     }
     
@@ -201,7 +203,8 @@ internal class SqlWorkbenchViewModelTests
         Assert.AreEqual("3", results.GetShortValue(0, 1));
         Assert.IsTrue(results.IsModified);
         Assert.IsTrue(vm.IsModified);
-        
+
+        confirmationService.QueryConfirmationAsync(default, default).ReturnsForAnyArgs(Task.FromResult(QueryConfirmationResult.AlreadyExecuted));
         userQuestionsService.ConfirmExecuteQueryAsync("START TRANSACTION").Returns(true);
         userQuestionsService.ConfirmExecuteQueryAsync("COMMIT").Returns(true);
         userQuestionsService.ConfirmExecuteQueryAsync("UPDATE `tab` SET `a` = 3 WHERE `a` = 5").Returns(true);
@@ -259,6 +262,7 @@ internal class SqlWorkbenchViewModelTests
         Assert.IsTrue(results.IsModified);
         Assert.IsTrue(vm.IsModified);
         
+        confirmationService.QueryConfirmationAsync(default, default).ReturnsForAnyArgs(Task.FromResult(QueryConfirmationResult.AlreadyExecuted));
         userQuestionsService.ConfirmExecuteQueryAsync(default).ReturnsForAnyArgs(true);
         Assert.IsTrue(results.ApplyChangesCommand.CanExecute(null));
         await results.ApplyChangesCommand.ExecuteAsync();
@@ -314,6 +318,7 @@ internal class SqlWorkbenchViewModelTests
 
         results.DeleteRowCommand.Execute(null);
         
+        confirmationService.QueryConfirmationAsync(default, default).ReturnsForAnyArgs(Task.FromResult(QueryConfirmationResult.AlreadyExecuted));
         userQuestionsService.ConfirmExecuteQueryAsync(default).ReturnsForAnyArgs(true);
         Assert.IsTrue(results.ApplyChangesCommand.CanExecute(null));
         await results.ApplyChangesCommand.ExecuteAsync();
@@ -349,6 +354,7 @@ internal class SqlWorkbenchViewModelTests
         var results = (SelectSingleTableViewModel)vm.Results[0];
         results.AddRowCommand.Execute(null);
         
+        confirmationService.QueryConfirmationAsync(default, default).ReturnsForAnyArgs(Task.FromResult(QueryConfirmationResult.AlreadyExecuted));
         userQuestionsService.ConfirmExecuteQueryAsync("START TRANSACTION").Returns(true);
         userQuestionsService.ConfirmExecuteQueryAsync("ROLLBACK").Returns(true);
         Assert.IsTrue(results.ApplyChangesCommand.CanExecute(null));
@@ -422,6 +428,7 @@ internal class SqlWorkbenchViewModelTests
         results.SelectedCellIndex = 16; results.UpdateSelectedCells("20:30:40");
         results.SelectedCellIndex = 17; results.UpdateSelectedCells("DEADBEEF");
         
+        confirmationService.QueryConfirmationAsync(default, default).ReturnsForAnyArgs(Task.FromResult(QueryConfirmationResult.AlreadyExecuted));
         userQuestionsService.ConfirmExecuteQueryAsync(default).ReturnsForAnyArgs(true);
         await results.ApplyChangesCommand.ExecuteAsync();
         
@@ -462,6 +469,7 @@ internal class SqlWorkbenchViewModelTests
         results.AddRowCommand.Execute(null);
         results.SelectedCellIndex = 1; results.UpdateSelectedCells(longBytesAsHex);
         
+        confirmationService.QueryConfirmationAsync(default, default).ReturnsForAnyArgs(Task.FromResult(QueryConfirmationResult.AlreadyExecuted));
         userQuestionsService.ConfirmExecuteQueryAsync(default).ReturnsForAnyArgs(true);
         await results.ApplyChangesCommand.ExecuteAsync();
         
@@ -591,5 +599,46 @@ internal class SqlWorkbenchViewModelTests
         Assert.AreEqual("1", results.GetShortValue(3, 2));
         Assert.AreEqual("efg", results.GetShortValue(4, 1));
         Assert.AreEqual("3", results.GetShortValue(4, 2));
+    }
+    
+    [Test]
+    public async Task Test_InsertAsksForConfirmation()
+    {
+        using var vm = CreateConnectedViewModel();
+        var worldDb = mockServer.CreateDatabase("world");
+        var table = worldDb.CreateTable("tab", TableType.Table, 
+            new ColumnInfo("a", "int", false, true, true, null, null, null),
+            new ColumnInfo("b", "varchar", false, false, false, null, null, null));
+        table.Insert(new object?[]{1, "abc"});
+        
+        vm.Document.Insert(0, "SELECT `b`, `a` FROM `tab`");
+        await vm.ExecuteAllCommand.ExecuteAsync();
+
+        Assert.IsTrue(actionsOutputService.Actions[0].IsSuccess);
+        Assert.AreEqual(1, vm.Results.Count);
+        
+        // results
+        Assert.IsTrue(vm.Results[0] is SelectSingleTableViewModel);
+        var results = (SelectSingleTableViewModel)vm.Results[0];
+        
+        results.Selection.Add(0);
+        results.SelectedCellIndex = 1;
+        results.UpdateSelectedCells("a");
+
+        preferences.AskBeforeApplyingChanges.ReturnsForAnyArgs(true);
+        
+        userQuestionsService.ConfirmExecuteQueryAsync(default).ReturnsForAnyArgs(true);
+        Assert.IsTrue(results.ApplyChangesCommand.CanExecute(null));
+        await results.ApplyChangesCommand.ExecuteAsync();
+
+        await confirmationService.Received().QueryConfirmationAsync("START TRANSACTION;\nUPDATE `tab` SET `b` = 'a' WHERE `a` = 1;\nCOMMIT", Arg.Any<Func<Task>>());
+        
+        CollectionAssert.AreEqual(new []
+        {
+            "SELECT `b`, `a` FROM `tab`",
+            "SHOW FULL TABLES;",
+            "SELECT DATABASE()",
+            "SELECT * FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = 'world' AND `TABLE_NAME` = 'tab' ORDER BY `ORDINAL_POSITION`",
+        }, connector.ExecutedQueries);
     }
 }

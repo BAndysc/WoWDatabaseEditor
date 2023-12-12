@@ -351,7 +351,7 @@ namespace WoWDatabaseEditorCore.Managers
                             if (close)
                             {
                                 if (editor is ISolutionItemDocument solutionItemDocument)
-                                    solutionTasksService.Save(solutionItemDocument).ListenErrors();
+                                    await solutionTasksService.Save(solutionItemDocument);
                                 else
                                     editor.Save.Execute(null);
                             }

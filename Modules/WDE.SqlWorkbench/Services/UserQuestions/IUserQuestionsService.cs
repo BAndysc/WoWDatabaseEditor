@@ -38,6 +38,9 @@ internal static class CommandExtensions
     {
         return new AsyncCommandExceptionWrap<T>(cmd, async (e) =>
         {
+            if (e is TaskCanceledException)
+                return; // this is ok, user cancelled the task, no need to inform him again
+            
             Console.WriteLine(e);
             await userQuestions.ShowGenericErrorAsync(header ?? "Error occured while executing the command",
                 e.Message);
@@ -48,6 +51,9 @@ internal static class CommandExtensions
     {
         return new AsyncCommandExceptionWrap<T, R>(cmd, async (e) =>
         {
+            if (e is TaskCanceledException)
+                return; // this is ok, user cancelled the task, no need to inform him again
+            
             Console.WriteLine(e);
             await userQuestions.ShowGenericErrorAsync(header ?? "Error occured while executing the command", e.Message);
         });

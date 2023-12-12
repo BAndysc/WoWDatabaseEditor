@@ -15,5 +15,7 @@ internal interface ISqlWorkbenchPreferences
     string? CustomSqlsPath { get; set; }
     string? CustomMySqlDumpPath { get; set; }
     string? CustomMariaDumpPath { get; set; }
+    bool AskBeforeApplyingChanges { get; set; }
+    bool CloseNonModifiedTabsOnExecute { get; set; }
     void Save();
 }

@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Prism.Ioc;
 using WDE.Common.Managers;
@@ -20,9 +22,11 @@ internal class QueryConfirmationService : IQueryConfirmationService
         this.containerProvider = containerProvider;
     }
 
-    public async Task<bool> QueryConfirmationAsync(IConnection connection, string query)
+    public async Task<QueryConfirmationResult> QueryConfirmationAsync(string query, Func<Task> execute)
     {
-        using var vm = containerProvider.Resolve<QueryConfirmationViewModel>((typeof(IConnection), connection), (typeof(string), query));
-        return await windowManager.ShowDialog(vm);
+        using var vm = containerProvider.Resolve<QueryConfirmationViewModel>((typeof(Func<Task>), execute), (typeof(string), query));
+        if (await windowManager.ShowDialog(vm))
+            return QueryConfirmationResult.AlreadyExecuted;
+        return QueryConfirmationResult.DontExecute;
     }
 }

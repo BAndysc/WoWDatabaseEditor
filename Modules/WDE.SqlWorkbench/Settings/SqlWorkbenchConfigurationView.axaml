@@ -26,6 +26,12 @@
         <SettingItem Header="Open each database in a separate connection" Help="When enabled, each database, no matter if they are in the same group or not, will open a new database connection. When disabled, all databases in a single group will use the same connection (but different groups will still have separate connection)">
           <ToggleSwitch IsChecked="{CompiledBinding EachDatabaseHasSeparateConnection}" />
         </SettingItem>
+        <SettingItem Header="Ask before applying changes in SELECT results" Help="When enabled, before applying changes to SELECT results, a window will be opened to verify changes. This is a separate setting to the 'Safety Mode' below (this is only for table value edits in the GUI, Safety is a global setting for any query executed.">
+          <ToggleSwitch IsChecked="{CompiledBinding AskBeforeApplyingChanges}" />
+        </SettingItem>
+        <SettingItem Header="Close SELECT result tabs on query execute" Help="When enabled, before query execution, existing results tabs will be closed (of course unless they have pending changes).">
+          <ToggleSwitch IsChecked="{CompiledBinding AskBeforeApplyingChanges}" />
+        </SettingItem>
         <SettingItem Header="Custom SQLS path" Help="The editor uses SQLS for code completion. If you built the editor manually, or if you are using Linux or macOS the SQLS is not bundled, you have to download it and provide the path here.">
           <DockPanel KeyboardNavigation.TabNavigation="Local">
             <CheckBox IsChecked="{CompiledBinding HasCustomSqlsPath}" TabIndex="0" />

@@ -147,7 +147,7 @@ internal partial class TableCreatorViewModel : ObservableBase, IDocument, IDropT
         Save = new AsyncAutoCommand(async () =>
         {
             UpdateQuery();
-            await queryConfirmationService.QueryConfirmationAsync(connection, QueryDocument.Text);
+            await queryConfirmationService.QueryConfirmationAndExecuteAsync(connection, QueryDocument.Text);
         });
         
         AddColumnCommand = new DelegateCommand(() =>

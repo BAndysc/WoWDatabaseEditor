@@ -66,6 +66,18 @@ internal class SqlWorkbenchPreferences : ISqlWorkbenchPreferences
         set => settings.CustomMariaDumpPath = value;
     }
 
+    public bool AskBeforeApplyingChanges 
+    {
+        get => settings.AskBeforeApplyingChanges;
+        set => settings.AskBeforeApplyingChanges = value;
+    }
+
+    public bool CloseNonModifiedTabsOnExecute
+    {
+        get => settings.CloseNonModifiedTabsOnExecute;
+        set => settings.CloseNonModifiedTabsOnExecute = value;
+    }
+
     public bool EachDatabaseHasSeparateConnection
     {
         get => settings.EachDatabaseHasSeparateConnection;
@@ -95,5 +107,11 @@ internal class SqlWorkbenchPreferences : ISqlWorkbenchPreferences
         
         [DefaultValue(true)]
         public bool EachDatabaseHasSeparateConnection { get; set; } = true;
+        
+        [DefaultValue(true)]
+        public bool AskBeforeApplyingChanges { get; set; } = true;
+        
+        [DefaultValue(true)]
+        public bool CloseNonModifiedTabsOnExecute { get; set; } = true;
     }
 }

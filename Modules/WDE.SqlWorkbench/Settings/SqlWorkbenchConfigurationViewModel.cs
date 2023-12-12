@@ -50,20 +50,27 @@ internal partial class SqlWorkbenchConfigurationViewModel : ObservableBase, ICon
                               originalCustomSqlsPath != CustomSqlsPath ||
                               originalEachDatabaseHasSeparateConnection != EachDatabaseHasSeparateConnection ||
                               originalCustomMySqlDumpPath != CustomMySqlDumpPath ||
-                              originalCustomMariaDumpPath != CustomMariaDumpPath;
+                              originalCustomMariaDumpPath != CustomMariaDumpPath ||
+                              originalAskBeforeApplyingChanges != AskBeforeApplyingChanges;
 
     private Guid originalDefaultConnection;
     private bool originalUseCodeCompletion;
+    private bool originalAskBeforeApplyingChanges;
     private string? originalCustomSqlsPath;
     private string? originalCustomMariaDumpPath;
     private string? originalCustomMySqlDumpPath;
     private bool originalEachDatabaseHasSeparateConnection;
+    private bool originalCloseNonModifiedTabsOnExecute;
     
     public ObservableCollection<ConnectionConfigViewModel> Connections { get; } = new();
 
     [Notify] private bool useCodeCompletion;
     
     [Notify] private bool eachDatabaseHasSeparateConnection;
+
+    [Notify] private bool closeNonModifiedTabsOnExecute;
+
+    [Notify] private bool askBeforeApplyingChanges;
 
     [Notify] [AlsoNotify(nameof(HasCustomSqlsPath))] private string? customSqlsPath;
 
@@ -166,13 +173,17 @@ internal partial class SqlWorkbenchConfigurationViewModel : ObservableBase, ICon
             preferences.CustomMariaDumpPath = CustomMariaDumpPath;
             preferences.CustomMySqlDumpPath = CustomMySqlDumpPath;
             preferences.EachDatabaseHasSeparateConnection = EachDatabaseHasSeparateConnection;
+            preferences.AskBeforeApplyingChanges = AskBeforeApplyingChanges;
+            preferences.CloseNonModifiedTabsOnExecute = CloseNonModifiedTabsOnExecute;
             preferences.Save();
             
             originalDefaultConnection = preferences.DefaultConnection ?? Guid.Empty;
             originalUseCodeCompletion = preferences.UseCodeCompletion;
+            originalAskBeforeApplyingChanges = preferences.AskBeforeApplyingChanges;
             originalCustomSqlsPath = preferences.CustomSqlsPath;
             originalCustomMariaDumpPath = preferences.CustomMariaDumpPath;
             originalCustomMySqlDumpPath = preferences.CustomMySqlDumpPath;
+            originalCloseNonModifiedTabsOnExecute = preferences.CloseNonModifiedTabsOnExecute;
             originalEachDatabaseHasSeparateConnection = preferences.EachDatabaseHasSeparateConnection;
             foreach (var connection in Connections)
                 connection.Original = connection.ToConnectionData();
@@ -306,7 +317,9 @@ internal partial class SqlWorkbenchConfigurationViewModel : ObservableBase, ICon
         SelectedConnection = DefaultConnection ?? Connections.FirstOrDefault();
         originalDefaultConnection = preferences.DefaultConnection ?? Guid.Empty;
         originalEachDatabaseHasSeparateConnection = EachDatabaseHasSeparateConnection = preferences.EachDatabaseHasSeparateConnection;
+        originalCloseNonModifiedTabsOnExecute = CloseNonModifiedTabsOnExecute = preferences.CloseNonModifiedTabsOnExecute;
         UseCodeCompletion = originalUseCodeCompletion = preferences.UseCodeCompletion;
+        AskBeforeApplyingChanges = originalAskBeforeApplyingChanges = preferences.AskBeforeApplyingChanges;
         CustomSqlsPath = originalCustomSqlsPath = preferences.CustomSqlsPath;
         CustomMariaDumpPath = originalCustomMariaDumpPath = preferences.CustomMariaDumpPath;
         CustomMySqlDumpPath = originalCustomMySqlDumpPath = preferences.CustomMySqlDumpPath;
