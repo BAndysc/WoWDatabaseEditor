@@ -262,8 +262,8 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, ISolutionItemDocu
 
         SaveFileCommand = new AsyncAutoCommand(async () =>
         {
-            string? file = solutionItem.FileName;
-            if (solutionItem.IsTemporary)
+            string? file = DocumentSolutionItem.FileName;
+            if (DocumentSolutionItem.IsTemporary)
             {
                 file = await windowManager.ShowSaveFileDialog("SQL file|sql|Text file|txt|All files|*");
                 if (file == null)
