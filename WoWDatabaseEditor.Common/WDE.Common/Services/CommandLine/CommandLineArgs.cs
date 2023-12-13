@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace WDE.Common.Services.CommandLine
@@ -6,6 +8,7 @@ namespace WDE.Common.Services.CommandLine
     {
         private HashSet<string> setArgs = new();
         private Dictionary<string, string> keyValueArgs = new();
+        private string[] arguments = Array.Empty<string>();
 
         public bool IsArgumentSet(string argument) => setArgs.Contains(argument.ToLower());
 
@@ -18,6 +21,7 @@ namespace WDE.Common.Services.CommandLine
         
         public void Init(string[] args)
         {
+            arguments = args;
             for (int i = 0; i < args.Length; ++i)
             {
                 if (args[i].StartsWith("--"))
@@ -31,6 +35,16 @@ namespace WDE.Common.Services.CommandLine
                     }
                 }
             }
+        }
+
+        public IEnumerator<string> GetEnumerator()
+        {
+            return ((IEnumerable<string>) arguments).GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }

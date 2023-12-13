@@ -2,13 +2,12 @@
 using System;
 using System.IO;
 using System.Reflection;
+using WDE.Common.Tasks;
 
 namespace CrashReport;
 
 class Program
 {
-    public static string[] Arguments = Array.Empty<string>();
-    
     // Initialization code. Don't use any Avalonia, third-party APIs or any
     // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
     // yet and stuff might break.
@@ -16,7 +15,7 @@ class Program
     public static void Main(string[] args)
     {
         FixCurrentDirectory();
-        Arguments = args;
+        GlobalApplication.Arguments.Init(args);
         BuildAvaloniaApp()
             .StartWithClassicDesktopLifetime(args);
     }

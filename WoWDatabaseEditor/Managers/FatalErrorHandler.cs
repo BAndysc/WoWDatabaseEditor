@@ -1,4 +1,5 @@
 using System;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 
@@ -14,7 +15,7 @@ namespace WoWDatabaseEditorCore.Managers
         private static string FATAL_LOG_FILE => Path.Join(WDE_DATA_FOLDER, LOG_FILE);
         private static string FATAL_LOG_FILE_OLD => Path.Join(WDE_DATA_FOLDER, LOG_FILE_OLD);
         
-        public static void ExceptionOccured(Exception e)
+        public static void ExceptionOccured(Exception e, string[] args)
         {
             Console.WriteLine(e.ToString());
 
@@ -24,10 +25,10 @@ namespace WoWDatabaseEditorCore.Managers
             var deploymentVersion = File.Exists("app.ini") ? File.ReadAllText("app.ini") : "unknown app data";
             File.WriteAllText(FATAL_LOG_FILE,  e + "\n\n" + deploymentVersion);
 
-            StartCrashReporter();
+            StartCrashReporter(args);
         }
 
-        private static void StartCrashReporter()
+        private static void StartCrashReporter(string[] args)
         {
             string? exe = null;
             if (File.Exists("CrashReport.exe"))
@@ -37,11 +38,13 @@ namespace WoWDatabaseEditorCore.Managers
 
             if (!string.IsNullOrEmpty(exe))
             {
-                Process.Start(new ProcessStartInfo(exe)
+                var info = new ProcessStartInfo(exe)
                 {
-                    Arguments = "--crashed",
                     UseShellExecute = true
-                });   
+                };
+                info.ArgumentList.Add("--crashed");
+                info.ArgumentList.AddRange(args);
+                Process.Start(info);
             }
         }
 

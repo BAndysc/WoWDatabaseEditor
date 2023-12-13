@@ -1,8 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using WDE.Common.Profiles;
 using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
+using WDE.Common.Tasks;
 using WDE.Common.Utils;
 using WDE.Module.Attributes;
 
@@ -16,7 +19,9 @@ namespace WDE.Updater.Services
         private readonly IFileSystem fs;
         private readonly IMessageBoxService messageBoxService;
 
-        public StandaloneUpdater(IAutoUpdatePlatformService platform, IFileSystem fs, IMessageBoxService messageBoxService)
+        public StandaloneUpdater(IAutoUpdatePlatformService platform, 
+            IFileSystem fs,
+            IMessageBoxService messageBoxService)
         {
             this.platform = platform;
             this.fs = fs;
@@ -66,7 +71,7 @@ namespace WDE.Updater.Services
             {
                 try
                 {
-                    Process.Start(file);
+                    Process.Start(file, GlobalApplication.Arguments);
                     return true;
                 }
                 catch (Exception e)

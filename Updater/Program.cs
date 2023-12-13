@@ -33,13 +33,13 @@ namespace Updater
             
             if (!updateFile.Exists)
             {
-                LaunchWowDatabaseEditor(executable);
+                LaunchWowDatabaseEditor(executable, args);
                 return;
             }
 
             if (!WaitUntilCantWriteExecutable(executable))
             {
-                LaunchWowDatabaseEditor(executable);
+                LaunchWowDatabaseEditor(executable, args);
                 Console.WriteLine("Cannot overwrite executable. Canceling update");
                 return;
             }
@@ -82,7 +82,7 @@ namespace Updater
             ZipFile.ExtractToDirectory(updateFile.FullName, dir.FullName, true);
             File.Delete("update.zip");
 
-            LaunchWowDatabaseEditor(executable);
+            LaunchWowDatabaseEditor(executable, args);
         }
         
         private static bool WaitUntilCantWriteExecutable(string executable)
@@ -128,9 +128,9 @@ namespace Updater
             return null;
         }
         
-        private static void LaunchWowDatabaseEditor(string executable)
+        private static void LaunchWowDatabaseEditor(string executable, string[] args)
         {
-            Process.Start(executable);
+            Process.Start(executable, args);
         }
     }
 }

@@ -29,9 +29,7 @@ public class MainWindowViewModel : ITaskProgress, INotifyPropertyChanged
     
     public MainWindowViewModel()
     {
-        bool isCrashed = Program.Arguments.Any(x => x == "--crashed");
-        
-        if (isCrashed)
+        if (GlobalApplication.Arguments.IsArgumentSet("crashed"))
         {
             MainContent = new CrashReportViewModel();
         }

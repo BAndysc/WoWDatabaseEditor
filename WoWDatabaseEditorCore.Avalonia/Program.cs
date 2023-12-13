@@ -37,7 +37,7 @@ namespace WoWDatabaseEditorCore.Avalonia
             }
             catch (Exception e)
             {
-                FatalErrorHandler.ExceptionOccured(e);
+                FatalErrorHandler.ExceptionOccured(e, args);
             }
             TheEngine.TheEngine.Deinit();
         }
