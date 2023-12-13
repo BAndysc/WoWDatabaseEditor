@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
@@ -44,11 +45,13 @@ public class MainWindowViewModel : ITaskProgress, INotifyPropertyChanged
             if (locator.TryLocateIncludingCurrentDir("WoWDatabaseEditorCore.Avalonia.exe",
                     "WoWDatabaseEditorCore.Avalonia") is { } exe)
             {
-                Process.Start(new ProcessStartInfo(exe)
+                var info = new ProcessStartInfo(exe)
                 {
-                    UseShellExecute = true,
-                    Arguments = "--console"
-                });
+                    UseShellExecute = true
+                };
+                info.ArgumentList.Add("--console");
+                info.ArgumentList.AddRange(GlobalApplication.Arguments);
+                Process.Start(info);
                 ((IClassicDesktopStyleApplicationLifetime?)Application.Current?.ApplicationLifetime)?.Shutdown();
             }
         });
@@ -59,10 +62,12 @@ public class MainWindowViewModel : ITaskProgress, INotifyPropertyChanged
             if (locator.TryLocateIncludingCurrentDir("WoWDatabaseEditorCore.Avalonia.exe",
                     "WoWDatabaseEditorCore.Avalonia") is { } exe)
             {
-                Process.Start(new ProcessStartInfo(exe)
+                var info = new ProcessStartInfo(exe)
                 {
                     UseShellExecute = true
-                });
+                };
+                info.ArgumentList.AddRange(GlobalApplication.Arguments);
+                Process.Start(info);
                 ((IClassicDesktopStyleApplicationLifetime?)Application.Current?.ApplicationLifetime)?.Shutdown();
             }
         });
