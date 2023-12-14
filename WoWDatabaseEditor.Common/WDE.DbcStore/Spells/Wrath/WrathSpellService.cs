@@ -17,6 +17,7 @@ namespace WDE.DbcStore.Spells.Wrath
         public WrathSpellService(DatabaseClientFileOpener opener)
         {
             this.opener = opener;
+            spells = Array.Empty<SpellStructure>();
         }
         
         public void Load(string path)
