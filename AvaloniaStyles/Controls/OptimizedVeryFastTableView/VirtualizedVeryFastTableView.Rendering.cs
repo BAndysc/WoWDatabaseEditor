@@ -26,7 +26,7 @@ public partial class VirtualizedVeryFastTableView
     }
 
     private Exception? lastException;
-    
+
     public override void Render(DrawingContext context)
     {
         base.Render(context);
@@ -82,6 +82,54 @@ public partial class VirtualizedVeryFastTableView
         return false;
     }
 
+    public void AutoFitColumnsWidth()
+    {
+        if (Columns is not { } columns)
+            return;
+        
+        var controller = Controller;
+        GetFonts(out var defaultFont, out _);
+        var defaultTypeface = new Typeface(defaultFont);
+        var boldTypeface = new Typeface(defaultFont,default, FontWeight.Bold);
+        Span<double> columnWidths = stackalloc double[columns.Count];
+        var (firstVisibleIndex, lastVisibleIndex) = GetFirstAndLastVisibleRows();
+        for (int i = 0; i < columns.Count; i++)
+        {
+            var ft = new FormattedText(columns[i].Header, boldTypeface, 12, TextAlignment.Left, TextWrapping.NoWrap, new Size(100000, 10000));
+            columnWidths[i] = ft.Bounds.Width + ColumnSpacing * 2 + 20; // this +20 is only for SqlEditor which displays a key icon for primary key columns.
+                                                                        // If this control is reused for another editor, then it might be changed, but still pls keep
+                                                                        // the space in case of SqlEditor.
+        }
+        
+        for (var rowIndex = firstVisibleIndex; rowIndex <= lastVisibleIndex; rowIndex++)
+        {
+            for (int cellIndex = 0; cellIndex < columnWidths.Length; ++cellIndex)
+            {
+                var cellText = controller.GetCellText(rowIndex, cellIndex);
+                var ft = new FormattedText(cellText, defaultTypeface, 12, TextAlignment.Left, TextWrapping.NoWrap, new Size(100000, 10000));
+                columnWidths[cellIndex] = Math.Max(columnWidths[cellIndex], ft.Bounds.Width + ColumnSpacing * 2);
+            }
+        }
+
+        for (int i = 0; i < columns.Count; i++)
+            Columns[i].Width = columnWidths[i];
+        InvalidateMeasure();
+        InvalidateArrange();
+    }
+
+    private (int first, int last) GetFirstAndLastVisibleRows()
+    {
+        var viewPort = DataViewport;
+        var itemsCount = ItemsCount;
+        if (itemsCount == 0)
+            return (0, -1);
+        var firstVisibleIndex = (int)((viewPort.Top - DrawingStartOffsetY) / RowHeight);
+        var lastVisibleIndex = (int)((viewPort.Bottom - DrawingStartOffsetY) / RowHeight + 1);
+        firstVisibleIndex = Math.Clamp(firstVisibleIndex, 0, itemsCount - 1);
+        lastVisibleIndex = Math.Clamp(lastVisibleIndex, 0, itemsCount - 1);
+        return (firstVisibleIndex, lastVisibleIndex);
+    }
+    
     private void RenderImpl(DrawingContext context)
     {
         GetTypefaces(out var font, out var unicodeFallback);
@@ -109,11 +157,8 @@ public partial class VirtualizedVeryFastTableView
             RenderHeaders(context);
             return;
         }
-        
-        var firstVisibleIndex = (int)((viewPort.Top - DrawingStartOffsetY) / RowHeight);
-        var lastVisibleIndex = (int)((viewPort.Bottom - DrawingStartOffsetY) / RowHeight + 1);
-        firstVisibleIndex = Math.Clamp(firstVisibleIndex, 0, itemsCount - 1);
-        lastVisibleIndex = Math.Clamp(lastVisibleIndex, 0, itemsCount - 1);
+
+        var (firstVisibleIndex, lastVisibleIndex) = GetFirstAndLastVisibleRows();
         var odd = (firstVisibleIndex % 2) == 1;
         y += firstVisibleIndex * RowHeight;
         for (var rowIndex = firstVisibleIndex; rowIndex <= lastVisibleIndex; rowIndex++)

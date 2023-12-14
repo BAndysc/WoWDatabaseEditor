@@ -38,6 +38,26 @@ public partial class SelectResultsView : UserControl
             }
             timer = null;
         }, TimeSpan.FromMilliseconds(1));
+        SetColumnsWidthToContent();
+    }
+
+    protected override void OnDataContextChanged(EventArgs e)
+    {
+        base.OnDataContextChanged(e);
+        SetColumnsWidthToContent();
+    }
+    
+    private void SetColumnsWidthToContent()
+    {
+        DispatcherTimer.RunOnce(() =>
+        {
+            if (DataContext is SelectResultsViewModel vm &&
+                !vm.ColumnsHeaderAlreadySetAutoSizeWidth)
+            {
+                vm.ColumnsHeaderAlreadySetAutoSizeWidth = true;
+                this.GetControl<VirtualizedVeryFastTableView>("Table").AutoFitColumnsWidth();
+            }
+        }, TimeSpan.FromMilliseconds(1));
     }
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)

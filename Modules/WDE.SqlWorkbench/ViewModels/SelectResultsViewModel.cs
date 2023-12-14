@@ -55,6 +55,8 @@ internal partial class SelectResultsViewModel : ObservableBase
     public string Title { get; protected set; }
     public IReadOnlyList<ITableColumnHeader> Columns { get; }
     
+    public bool ColumnsHeaderAlreadySetAutoSizeWidth { get; set; }
+    
     public int Count => Results.AffectedRows + AdditionalRowsCount;
     
     public TableController TableController { get; }

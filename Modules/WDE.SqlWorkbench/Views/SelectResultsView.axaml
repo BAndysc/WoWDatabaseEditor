@@ -25,7 +25,8 @@
                                                                InteractiveHeader="False"
                                                                RequestRender="{CompiledBinding RequestRender}"
                                                                ValueUpdateRequest="VirtualizedVeryFastTableView_OnValueUpdateRequest"
-                                                               Columns="{CompiledBinding Columns}">
+                                                               Columns="{CompiledBinding Columns}"
+                                                               x:Name="Table">
         <optimizedVeryFastTableView:VirtualizedVeryFastTableView.ContextMenu>
           <ContextMenu>
             <MenuItem Header="Copy column name" Command="{CompiledBinding CopyColumnNameCommand}" />

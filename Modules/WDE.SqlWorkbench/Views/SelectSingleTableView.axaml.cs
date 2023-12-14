@@ -39,6 +39,7 @@ public partial class SelectSingleTableView : UserControl
             }
             timer = null;
         }, TimeSpan.FromMilliseconds(1));
+        SetColumnsWidthToContent();
     }
 
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
@@ -46,6 +47,25 @@ public partial class SelectSingleTableView : UserControl
         base.OnDetachedFromVisualTree(e);
         timer?.Dispose();
         timer = null;
+    }
+
+    protected override void OnDataContextChanged(EventArgs e)
+    {
+        base.OnDataContextChanged(e);
+        SetColumnsWidthToContent();
+    }
+    
+    private void SetColumnsWidthToContent()
+    {
+        DispatcherTimer.RunOnce(() =>
+        {
+            if (DataContext is SelectResultsViewModel vm &&
+                !vm.ColumnsHeaderAlreadySetAutoSizeWidth)
+            {
+                vm.ColumnsHeaderAlreadySetAutoSizeWidth = true;
+                this.GetControl<VirtualizedVeryFastTableView>("Table").AutoFitColumnsWidth();
+            }
+        }, TimeSpan.FromMilliseconds(1));
     }
 
     private void VirtualizedVeryFastTableView_OnColumnPressed(object? sender, ColumnPressedEventArgs e)
