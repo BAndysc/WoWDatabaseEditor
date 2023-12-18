@@ -145,9 +145,11 @@ public partial class VirtualizedVeryFastTableView
         var bottom = top + RowHeight;
         if (top < viewRect.Top)
             ScrollViewer.Offset = ScrollViewer.Offset.WithY(top - (DrawingStartOffsetY));
-        else if (bottom > viewRect.Bottom)
-            ScrollViewer.Offset = ScrollViewer.Offset.WithY(bottom - ScrollViewer.Viewport.Height);
+        else if (bottom > viewRect.Bottom - ScrollBarHeight)
+            ScrollViewer.Offset = ScrollViewer.Offset.WithY(bottom - ScrollViewer.Viewport.Height + ScrollBarHeight);
     }
+
+    private const int ScrollBarHeight = 20;
 
     private void EnsureCellVisible(int cell)
     {

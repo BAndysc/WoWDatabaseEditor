@@ -4,56 +4,131 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:viewModels="clr-namespace:WDE.SqlWorkbench.ViewModels"
              xmlns:optimizedVeryFastTableView="clr-namespace:AvaloniaStyles.Controls.OptimizedVeryFastTableView;assembly=AvaloniaStyles"
+             xmlns:avaloniaEdit="https://github.com/avaloniaui/avaloniaedit"
+             xmlns:behaviors="clr-namespace:WDE.Common.Avalonia.Behaviors;assembly=WDE.Common.Avalonia"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="viewModels:SelectSingleTableViewModel"
              x:Class="WDE.SqlWorkbench.Views.SelectSingleTableView">
   <UserControl.KeyBindings>
-    <KeyBinding Gesture="Ctrl+A" Command="{CompiledBinding SelectAllCommand}" />
-    <KeyBinding Gesture="Cmd+A" Command="{CompiledBinding SelectAllCommand}" />
-    <KeyBinding Gesture="Ctrl+C" Command="{CompiledBinding CopySelectedCommand}" />
-    <KeyBinding Gesture="Cmd+C" Command="{CompiledBinding CopySelectedCommand}" />
-    <KeyBinding Gesture="Ctrl+V" Command="{CompiledBinding PasteSelectedCommand}" />
-    <KeyBinding Gesture="Cmd+V" Command="{CompiledBinding PasteSelectedCommand}" />
+    <BetterKeyBinding Gesture="Ctrl+A" CustomCommand="{CompiledBinding SelectAllCommand}" />
+    <BetterKeyBinding Gesture="Cmd+A" CustomCommand="{CompiledBinding SelectAllCommand}" />
+    <BetterKeyBinding Gesture="Ctrl+C" CustomCommand="{CompiledBinding CopySelectedCommand}" />
+    <BetterKeyBinding Gesture="Cmd+C" CustomCommand="{CompiledBinding CopySelectedCommand}" />
+    <BetterKeyBinding Gesture="Ctrl+V" CustomCommand="{CompiledBinding PasteSelectedCommand}" />
+    <BetterKeyBinding Gesture="Cmd+V" CustomCommand="{CompiledBinding PasteSelectedCommand}" />
   </UserControl.KeyBindings>
-  <DockPanel>
-    <Grid DockPanel.Dock="Bottom" ColumnDefinitions="*,Auto" Margin="0,5,0,0">
-      <TextBlock HorizontalAlignment="Center" Text="{CompiledBinding Count, StringFormat={}{0} Rows}" />
-      <StackPanel Orientation="Horizontal" Spacing="5" Grid.Column="1">
-        <Button Command="{CompiledBinding ApplyChangesCommand}">Apply</Button>
-        <Button Command="{CompiledBinding RevertChangesCommand}">Revert</Button>
-      </StackPanel>
-    </Grid>
+  <Grid ColumnDefinitions="*,5,*">
     
-    <ScrollViewer HorizontalScrollBarVisibility="Visible" AllowAutoHide="False" VerticalScrollBarVisibility="Visible" Offset="{CompiledBinding ScrollOffset, Mode=TwoWay}">
-      <optimizedVeryFastTableView:VirtualizedVeryFastTableView ItemsCount="{CompiledBinding  Count}"
-                                                               SelectedRowIndex="{CompiledBinding SelectedRowIndex, Mode=TwoWay}"
-                                                               SelectedCellIndex="{CompiledBinding SelectedCellIndex, Mode=TwoWay}"
-                                                               MultiSelection="{CompiledBinding Selection}"
-                                                               Controller="{CompiledBinding TableController}"
-                                                               InteractiveHeader="True"
-                                                               ColumnPressed="VirtualizedVeryFastTableView_OnColumnPressed"
-                                                               RequestRender="{CompiledBinding RequestRender}"
-                                                               DoubleTapped="InputElement_OnDoubleTapped"
-                                                               ValueUpdateRequest="VirtualizedVeryFastTableView_OnValueUpdateRequest"
-                                                               Columns="{CompiledBinding Columns}"
-                                                               x:Name="Table">
-        <optimizedVeryFastTableView:VirtualizedVeryFastTableView.ContextMenu>
-          <ContextMenu>
-            <MenuItem Header="Copy column name" Command="{CompiledBinding CopyColumnNameCommand}" />  
-            <Separator />
-            <MenuItem Header="Set field to NULL" Command="{CompiledBinding SetSelectedToNullCommand}" />
-            <Separator />
-            <MenuItem Header="Add row" Command="{CompiledBinding AddRowCommand}" />
-            <MenuItem Header="Duplicate row" Command="{CompiledBinding DuplicateRowCommand}" />
-            <Separator />
-            <MenuItem Header="Delete" Command="{CompiledBinding DeleteRowCommand}" />
-            <Separator />
-            <MenuItem Header="Create view" Command="{CompiledBinding CreateViewCommand}" /> 
-            <MenuItem Header="Copy as insert" Command="{CompiledBinding CopyInsertCommand}" />
-            <MenuItem Header="Refresh" Command="{CompiledBinding RefreshTableCommand}" />
-          </ContextMenu>
-        </optimizedVeryFastTableView:VirtualizedVeryFastTableView.ContextMenu>
-      </optimizedVeryFastTableView:VirtualizedVeryFastTableView>
-    </ScrollViewer>
-  </DockPanel>
+    <DockPanel>
+      <Grid DockPanel.Dock="Bottom" ColumnDefinitions="*,Auto" Margin="0,5,0,0">
+        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{CompiledBinding Count, StringFormat={}{0} Rows}" />
+        <StackPanel Orientation="Horizontal" Spacing="5" Grid.Column="1">
+          <Button Command="{CompiledBinding ApplyChangesCommand}">Apply</Button>
+          <Button Command="{CompiledBinding RevertChangesCommand}">Revert</Button>
+        </StackPanel>
+      </Grid>
+      
+      <ScrollViewer HorizontalScrollBarVisibility="Visible" AllowAutoHide="False" VerticalScrollBarVisibility="Visible" Offset="{CompiledBinding ScrollOffset, Mode=TwoWay}">
+        <optimizedVeryFastTableView:VirtualizedVeryFastTableView ItemsCount="{CompiledBinding  Count}"
+                                                                 SelectedRowIndex="{CompiledBinding SelectedRowIndex, Mode=TwoWay}"
+                                                                 SelectedCellIndex="{CompiledBinding SelectedCellIndex, Mode=TwoWay}"
+                                                                 MultiSelection="{CompiledBinding Selection}"
+                                                                 Controller="{CompiledBinding TableController}"
+                                                                 InteractiveHeader="True"
+                                                                 ColumnPressed="VirtualizedVeryFastTableView_OnColumnPressed"
+                                                                 RequestRender="{CompiledBinding RequestRender}"
+                                                                 DoubleTapped="InputElement_OnDoubleTapped"
+                                                                 ValueUpdateRequest="VirtualizedVeryFastTableView_OnValueUpdateRequest"
+                                                                 Columns="{CompiledBinding Columns}"
+                                                                 x:Name="Table">
+          <optimizedVeryFastTableView:VirtualizedVeryFastTableView.ContextMenu>
+            <ContextMenu>
+              <MenuItem Header="Copy column name" Command="{CompiledBinding CopyColumnNameCommand}" />  
+              <Separator />
+              <MenuItem Header="Set field to NULL" Command="{CompiledBinding SetSelectedToNullCommand}" />
+              <Separator />
+              <MenuItem Header="Add row" Command="{CompiledBinding AddRowCommand}" />
+              <MenuItem Header="Duplicate row" Command="{CompiledBinding DuplicateRowCommand}" />
+              <Separator />
+              <MenuItem Header="Delete" Command="{CompiledBinding DeleteRowCommand}" />
+              <Separator />
+              <MenuItem Header="Create view" Command="{CompiledBinding CreateViewCommand}" /> 
+              <MenuItem Header="Copy as insert" Command="{CompiledBinding CopyInsertCommand}" />
+              <MenuItem Header="Refresh" Command="{CompiledBinding RefreshTableCommand}" />
+            </ContextMenu>
+          </optimizedVeryFastTableView:VirtualizedVeryFastTableView.ContextMenu>
+        </optimizedVeryFastTableView:VirtualizedVeryFastTableView>
+      </ScrollViewer>
+    </DockPanel>
+    
+    <GridSplitter Grid.Column="1" Classes="vertical" />
+    
+    <DockPanel Grid.Column="2" DataContext="{CompiledBinding CellEditor}" Margin="5">
+      
+      <TextBlock Margin="0,0,0,5" DockPanel.Dock="Top" Text="{CompiledBinding Type, StringFormat=Column type: {0}}" FontWeight="Bold" IsVisible="{CompiledBinding Type, Converter={x:Static NullConverter.IsNotNull}}" />
+      
+      <CheckBox Margin="0,0,0,5" DockPanel.Dock="Top" IsChecked="{CompiledBinding IsNull}" IsVisible="{CompiledBinding CanBeNull}">Is null</CheckBox>
+      
+      <ContentControl Content="{CompiledBinding .}" IsEnabled="{CompiledBinding !IsNull}" Name="EditControlBox">
+        <Interaction.Behaviors>
+          <EventTriggerBehavior EventName="LostFocus" SourceObject="{Binding #EditControlBox}">
+            <CallMethodAction TargetObject="{Binding}" MethodName="ApplyChanges"/>
+          </EventTriggerBehavior>
+        </Interaction.Behaviors>
+        <ContentControl.DataTemplates>
+          <DataTemplate x:DataType="viewModels:SignedIntegerCellEditorViewModel" DataType="viewModels:SignedIntegerCellEditorViewModel">
+            <DockPanel LastChildFill="False">
+              <TextBlock Opacity="0.5" Text="{CompiledBinding MinValue, StringFormat=Minimum: {0}}" DockPanel.Dock="Top" Margin="0,0,0,5"/>
+              <TextBlock Opacity="0.5" Text="{CompiledBinding MaxValue, StringFormat=Maximum: {0}}" DockPanel.Dock="Top" Margin="0,0,0,5"/>
+              <TextBlock Margin="0,0,0,5" DockPanel.Dock="Top">Value:</TextBlock>
+              <TextBox Text="{CompiledBinding Value}"  DockPanel.Dock="Top"/>
+            </DockPanel>
+          </DataTemplate>
+          <DataTemplate x:DataType="viewModels:UnsignedIntegerCellEditorViewModel" DataType="viewModels:UnsignedIntegerCellEditorViewModel">
+            <DockPanel LastChildFill="False">
+              <TextBlock Opacity="0.5" Text="{CompiledBinding MinValue, StringFormat=Minimum: {0}}" DockPanel.Dock="Top" Margin="0,0,0,5"/>
+              <TextBlock Opacity="0.5" Text="{CompiledBinding MaxValue, StringFormat=Maximum: {0}}" DockPanel.Dock="Top" Margin="0,0,0,5"/>
+              <TextBlock Margin="0,0,0,5" DockPanel.Dock="Top">Value:</TextBlock>
+              <TextBox Text="{CompiledBinding Value}"  DockPanel.Dock="Top"/>
+              
+              <TextBlock Margin="0,0,0,5" DockPanel.Dock="Top">Hex:</TextBlock>
+              <TextBox Text="{CompiledBinding HexValue}"  DockPanel.Dock="Top"/>
+            </DockPanel>
+          </DataTemplate>
+          <DataTemplate x:DataType="viewModels:StringCellEditorViewModel" DataType="viewModels:StringCellEditorViewModel">
+            <DockPanel>
+              <TextBlock Margin="0,0,0,5" DockPanel.Dock="Top">Value:</TextBlock>
+
+              <DockPanel DockPanel.Dock="Bottom" LastChildFill="False">
+                <TextBlock DockPanel.Dock="Right" Text="{CompiledBinding Length, StringFormat=Length: {0}}" />
+                <TextBlock DockPanel.Dock="Left" Text="Looks like text is too long" TextWrapping="WrapWithOverflow" IsVisible="{CompiledBinding IsTooLong}" />
+              </DockPanel>
+              
+              <avaloniaEdit:TextEditor Document="{CompiledBinding Document}" />
+            </DockPanel>
+          </DataTemplate>
+          <DataTemplate x:DataType="viewModels:BinaryCellEditorViewModel" DataType="viewModels:BinaryCellEditorViewModel">
+            <DockPanel KeyboardNavigation.TabNavigation="Local">
+              <TextBlock Margin="0,0,0,5" DockPanel.Dock="Top">Value:</TextBlock>
+
+              <DockPanel TabIndex="2" DockPanel.Dock="Bottom" LastChildFill="False">
+                <Button DockPanel.Dock="Left">Load</Button>
+                <Button DockPanel.Dock="Left">Save</Button>
+                <NumericUpDown DockPanel.Dock="Right" Text="{CompiledBinding}">
+                  <Interaction.Behaviors>
+                    <behaviors:NumericUpDownLostFocusUpdateBindingBehavior Value="{CompiledBinding Length}" />
+                  </Interaction.Behaviors>
+                </NumericUpDown>
+              </DockPanel>
+              
+              <HexViewControl TabIndex="1" TextBlock.FontFamily="{DynamicResource MonoFont}" Bytes="{CompiledBinding Bytes}" />
+            </DockPanel>
+          </DataTemplate>
+        </ContentControl.DataTemplates>
+        
+      </ContentControl>
+      
+    </DockPanel>
+    
+  </Grid>
 </UserControl>

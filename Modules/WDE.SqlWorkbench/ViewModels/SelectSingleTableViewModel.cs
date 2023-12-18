@@ -70,6 +70,7 @@ internal partial class SelectSingleTableViewModel : SelectResultsViewModel
         AddRowCommand = new DelegateCommand(() =>
         {
             AdditionalRowsCount++;
+            ColumnsOverride.Each(x => x.TryOverride(Count - 1, null, out _));
             SelectedRowIndex = Count - 1;
             Selection.Clear();
             Selection.Add(SelectedRowIndex);
@@ -86,11 +87,11 @@ internal partial class SelectSingleTableViewModel : SelectResultsViewModel
             var copyRowIndex = SelectedRowIndex;
             
             AdditionalRowsCount++;
+            for (int i = 1; i < Columns.Count; ++i) // skip # column
+                OverrideValue(Count - 1, i, GetFullValue(copyRowIndex, i));
             SelectedRowIndex = Count - 1;
             Selection.Clear();
             Selection.Add(SelectedRowIndex);
-            for (int i = 1; i < Columns.Count; ++i) // skip # column
-                OverrideValue(SelectedRowIndex, i, GetFullValue(copyRowIndex, i));
         }, () => RowsHaveFullPrimaryKey);
         PasteSelectedCommand = new AsyncAutoCommand(async () =>
         {
@@ -158,6 +159,10 @@ internal partial class SelectSingleTableViewModel : SelectResultsViewModel
                                      .All(x => Columns.Skip(1).Any(col => col.Header == x.Name));
     }
     
+    protected override bool IsColumnNullable(int columnIndex) => columnsInfo[columnIndex].IsNullable;
+
+    protected override string? ColumnType(int columnIndex) => columnsInfo[columnIndex].Type;
+
     private List<string> GenerateChanges()
     {
         string GenerateWhere(int rowIndex)
@@ -187,7 +192,7 @@ internal partial class SelectSingleTableViewModel : SelectResultsViewModel
             queries.Add(delete.ToString());
         }
 
-        foreach (var (alteredRow, values) in overrides)
+        foreach (var alteredRow in alteredRows)
         {
             if (IsRowMarkedAsDeleted(alteredRow))
                 continue;
@@ -197,13 +202,16 @@ internal partial class SelectSingleTableViewModel : SelectResultsViewModel
             
             var where = GenerateWhere(alteredRow);
 
-            var set = string.Join(", ", values.Select(pair =>
+            var set = string.Join(", ", ColumnsOverride
+                .Select((col, index) => (col, index))
+                .Where(pair => pair.col.HasRow(alteredRow))
+                .Select(pair =>
             {
-                var cellIndex = pair.Key;
-                var value = pair.Value;
+                var cellIndex = pair.index;
+                var value = pair.col.GetFullToString(alteredRow);
 
-                var columnName = Results.ColumnNames[cellIndex - 1];
-                value = ColumnValueToMySqlRepresentation(cellIndex, value);
+                var columnName = Results.ColumnNames[cellIndex];
+                value = ColumnValueToMySqlRepresentation(cellIndex + 1, value);
                 return $"`{columnName}` = {value}";
             }));
             
@@ -235,7 +243,6 @@ internal partial class SelectSingleTableViewModel : SelectResultsViewModel
         var combined = string.Join(";\n", changes);
         var execute = async () =>
         {
-            Console.WriteLine(combined);
             await vm.ExecuteAsync(changes, false, true, true);
             ResetChanges();
         };

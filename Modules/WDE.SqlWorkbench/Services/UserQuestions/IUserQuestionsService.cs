@@ -28,7 +28,8 @@ internal interface IUserQuestionsService
     /// <returns>true to continue loading, false to stop loading</returns>
     Task<bool> FileTooBigWarningAsync(long fileSize, int limit);
     Task FileTooBigErrorAsync(long fileSize, int limit);
-    Task ShowGenericErrorAsync(string header, string message);
+    Task ShowGenericErrorAsync(string header, string message); 
+    Task InformEditErrorAsync(string message);
 }
 
 internal static class CommandExtensions

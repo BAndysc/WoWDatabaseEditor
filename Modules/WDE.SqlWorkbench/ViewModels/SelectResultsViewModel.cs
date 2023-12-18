@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Intrinsics.X86;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;
@@ -15,13 +13,11 @@ using MySqlConnector;
 using Prism.Commands;
 using PropertyChanged.SourceGenerator;
 using WDE.Common.Avalonia.Components;
-using WDE.Common.Services.MessageBox;
 using WDE.Common.Types;
 using WDE.Common.Utils;
 using WDE.MVVM;
 using WDE.SqlWorkbench.Models;
 using WDE.SqlWorkbench.Services.ActionsOutput;
-using WDE.SqlWorkbench.Services.Connection;
 using WDE.SqlWorkbench.Services.UserQuestions;
 using WDE.SqlWorkbench.Utils;
 
@@ -45,9 +41,10 @@ internal partial class SelectResultsViewModel : ObservableBase
     [Notify] private int selectedCellIndex;
     [Notify] [AlsoNotify(nameof(Count), nameof(IsModified))] private int additionalRowsCount;
     [Notify] private bool requestRender;
+    [Notify] private BaseCellEditorViewModel? cellEditor;
     private Guid originalConnectionId;
     
-    public bool IsModified => overrides.Count > 0 || deletedRows.Count > 0 || additionalRowsCount > 0;
+    public bool IsModified => alteredRows.Count > 0 || deletedRows.Count > 0 || additionalRowsCount > 0;
 
     public string TitleWithModifiedStatus => IsModified ? Title + " *" : Title;
     
@@ -63,6 +60,8 @@ internal partial class SelectResultsViewModel : ObservableBase
     
     public SelectResult Results { get; protected set; }
     
+    public ISparseColumnData[] ColumnsOverride { get; }
+    
     public virtual ImageUri Icon => new("Icons/icon_mini_view_big.png");
     
     public ICommand CopyColumnNameCommand { get; }
@@ -77,6 +76,19 @@ internal partial class SelectResultsViewModel : ObservableBase
         this.vm = vm;
         originalConnectionId = vm.Connection?.ConnectionData.Id ?? Guid.Empty;
         Results = results;
+        ColumnsOverride = new ISparseColumnData[results.Columns.Length];
+        for (int i = 0; i < results.Columns.Length; ++i)
+        {
+            int cellIndex = i + 1; // +1, because 0 is # column
+            ColumnsOverride[i] = ISparseColumnData.Create(results.Columns[i]!.CloneEmpty());
+            ColumnsOverride[i].OnRowOverriden += rowIndex =>
+            {
+                alteredRows.Add(rowIndex);
+                overridenCells.Add((rowIndex, cellIndex));
+                UpdateView();
+            };
+        }
+        
         TableController = new TableController(this);
         Title = $"Query {action.Index}";
         Columns = results.ColumnNames.Select(x => new TableTableColumnHeader(x)).Prepend(new TableTableColumnHeader("#", 50)).ToArray();
@@ -147,6 +159,67 @@ internal partial class SelectResultsViewModel : ObservableBase
                 await vm.UserQuestions.SaveErrorAsync(e);
             }
         }).WrapMessageBox<Exception>(vm.UserQuestions);
+        
+        On(() => SelectedRowIndex, _ => UpdateCellEditor());
+        On(() => SelectedCellIndex, _ => UpdateCellEditor());
+    }
+
+    protected virtual bool IsColumnNullable(int columnIndex) => false;
+
+    protected virtual string? ColumnType(int columnIndex) => null;
+
+    private void UpdateCellEditor()
+    {
+        if (selectedCellIndex <= 0 || selectedCellIndex - 1 >= Results.Columns.Length)
+        {
+            CellEditor = null;
+            return;
+        }
+        
+        if (selectedRowIndex < 0 || selectedRowIndex >= Results.AffectedRows + additionalRowsCount)
+        {
+            CellEditor = null;
+            return;
+        }
+
+        var isNullable = IsColumnNullable(selectedCellIndex);
+        var type = ColumnType(selectedCellIndex);
+        var column = Results.Columns[selectedCellIndex - 1];
+        var overrideColumn = ColumnsOverride[selectedCellIndex - 1];
+        BaseCellEditorViewModel? cellEditor = null;
+
+        if (column is ByteColumnData b)
+            cellEditor = new UnsignedIntegerCellEditorViewModel(type, (ByteSparseColumnData)overrideColumn, b, selectedRowIndex, isNullable);
+        else if (column is UInt16ColumnData u)
+            cellEditor = new UnsignedIntegerCellEditorViewModel(type, (UInt16SparseColumnData)overrideColumn, u, selectedRowIndex, isNullable);
+        else if (column is UInt32ColumnData u32)
+            cellEditor = new UnsignedIntegerCellEditorViewModel(type, (UInt32SparseColumnData)overrideColumn, u32, selectedRowIndex, isNullable);
+        else if (column is UInt64ColumnData u64)
+            cellEditor = new UnsignedIntegerCellEditorViewModel(type, (UInt64SparseColumnData)overrideColumn, u64, selectedRowIndex, isNullable);
+        else if (column is SByteColumnData sb)
+            cellEditor = new SignedIntegerCellEditorViewModel(type, (SByteSparseColumnData)overrideColumn, sb, selectedRowIndex, isNullable);
+        else if (column is Int16ColumnData i16)
+            cellEditor = new SignedIntegerCellEditorViewModel(type, (Int16SparseColumnData)overrideColumn, i16, selectedRowIndex, isNullable);
+        else if (column is Int32ColumnData i32)
+            cellEditor = new SignedIntegerCellEditorViewModel(type, (Int32SparseColumnData)overrideColumn, i32, selectedRowIndex, isNullable);
+        else if (column is Int64ColumnData i64)
+            cellEditor = new SignedIntegerCellEditorViewModel(type, (Int64SparseColumnData)overrideColumn, i64, selectedRowIndex, isNullable);
+        // else if (column is FloatColumnData f)
+        //     cellEditor = new FloatCellEditorViewModel(f, selectedRowIndex, isNullable);
+        // else if (column is DoubleColumnData d)
+        //     cellEditor = new FloatCellEditorViewModel(d, selectedRowIndex, isNullable);
+        else if (column is StringColumnData s)
+            cellEditor = new StringCellEditorViewModel(type, (StringSparseColumnData)overrideColumn, s, selectedRowIndex, isNullable);
+        // else if (column is DateTimeColumnData dt)
+        //     cellEditor = new DateTimeCellEditorViewModel(dt, selectedRowIndex, isNullable);
+        else if (column is BinaryColumnData bin)
+            cellEditor = new BinaryCellEditorViewModel(type, (BinarySparseColumnData)overrideColumn, bin, selectedRowIndex, isNullable);
+        // else if (column is GuidColumnData guid)
+        //     cellEditor = new GuidCellEditorViewModel(guid, selectedRowIndex, isNullable);
+        else
+            cellEditor = null;
+
+        CellEditor = cellEditor;
     }
 
     protected void ErrorIfConnectionChanged()
@@ -237,6 +310,7 @@ internal partial class SelectResultsViewModel : ObservableBase
     public void UpdateResults(in SelectResult results)
     {
         Results = results;
+        UpdateCellEditor();
         UpdateView();
         RaisePropertyChanged(nameof(Count));
         RaisePropertyChanged(nameof(Results));
@@ -247,13 +321,13 @@ internal partial class SelectResultsViewModel : ObservableBase
     /// </summary>
     public string? GetFullValue(int rowIndex, int cellIndex)
     {
-        if (TryGetRowOverride(rowIndex, cellIndex, out var overrideString))
-            return overrideString;
-        
-        if (rowIndex >= Results.AffectedRows)
+        if (cellIndex == 0) // # column
             return null;
 
-        if (cellIndex == 0) // # column
+        if (ColumnsOverride[cellIndex - 1].HasRow(rowIndex))
+            return ColumnsOverride[cellIndex - 1].GetFullToString(rowIndex);
+        
+        if (rowIndex >= Results.AffectedRows)
             return null;
         
         if (cellIndex - 1 >= Results.Columns.Length)
@@ -270,13 +344,13 @@ internal partial class SelectResultsViewModel : ObservableBase
     /// <returns></returns>
     public string? GetShortValue(int rowIndex, int cellIndex)
     {
-        if (TryGetRowOverride(rowIndex, cellIndex, out var overrideString))
-            return overrideString;
-        
-        if (rowIndex >= Results.AffectedRows)
+        if (cellIndex == 0) // # column
             return null;
 
-        if (cellIndex == 0) // # column
+        if (ColumnsOverride[cellIndex - 1].HasRow(rowIndex))
+            return ColumnsOverride[cellIndex - 1].GetToString(rowIndex);
+
+        if (rowIndex >= Results.AffectedRows)
             return null;
 
         if (cellIndex - 1 >= Results.Columns.Length)
@@ -285,18 +359,6 @@ internal partial class SelectResultsViewModel : ObservableBase
         return Results.Columns[cellIndex - 1]!.GetToString(rowIndex);
     }
     
-    public bool TryGetRowOverride(int rowIndex, int cellIndex, out string? value)
-    {
-        if (overrides.TryGetValue(rowIndex, out var rowOverride) &&
-            rowOverride.TryGetValue(cellIndex, out var overrideString))
-        {
-            value = overrideString;
-            return true;
-        }
-
-        value = null;
-        return false;
-    }
     
     public bool IsRowMarkedAsDeleted(int rowIndex)
     {
@@ -305,9 +367,21 @@ internal partial class SelectResultsViewModel : ObservableBase
     
     protected void OverrideValue(int rowIndex, int cellIndex, string? value)
     {
-        if (!overrides.TryGetValue(rowIndex, out var rowOverride))
-            rowOverride = overrides[rowIndex] = new Dictionary<int, string?>();
-        rowOverride[cellIndex] = value;
+        if (cellIndex == 0) // # column
+            return;
+        
+        if (!ColumnsOverride[cellIndex - 1]!.TryOverride(rowIndex, value, out var message))
+        {
+            vm.UserQuestions.InformEditErrorAsync(message!).ListenErrors();
+        }
+        else
+        {
+            alteredRows.Add(rowIndex);
+            overridenCells.Add((rowIndex, cellIndex));
+            if (rowIndex == selectedRowIndex &&
+                cellIndex == selectedCellIndex)
+                UpdateCellEditor();
+        }
         RaisePropertyChanged(nameof(IsModified));
         RaisePropertyChanged(nameof(TitleWithModifiedStatus));
     }
@@ -315,18 +389,36 @@ internal partial class SelectResultsViewModel : ObservableBase
     protected void ResetChanges()
     {
         deletedRows.Clear();
-        overrides.Clear();
+        overridenCells.Clear();
+        alteredRows.Clear();
         AdditionalRowsCount = 0;
+        ColumnsOverride.Each(x => x.Clear());
         UpdateView();
         RaisePropertyChanged(nameof(IsModified));
         RaisePropertyChanged(nameof(TitleWithModifiedStatus));
     }
 
-    protected SortedDictionary<int, Dictionary<int, string?>> overrides = new();
+    //protected SortedDictionary<int, Dictionary<int, string?>> overrides = new();
 
+    protected SortedSet<int> alteredRows = new();
+    
+    protected HashSet<(int row, int cell)> overridenCells = new();
+    
     protected SortedSet<int> deletedRows = new();
 
     public virtual async Task<bool> SaveAsync() => true;
+
+    public bool TryGetRowOverride(int rowIndex, int cellIndex, out string? overrideString)
+    {
+        if (overridenCells.Contains((rowIndex, cellIndex)))
+        {
+            overrideString = ColumnsOverride[cellIndex - 1].GetToString(rowIndex);
+            return true;
+        }
+
+        overrideString = null;
+        return false;
+    }
 }
 
 internal class TableController : BaseVirtualizedTableController

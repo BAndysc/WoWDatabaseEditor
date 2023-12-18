@@ -65,7 +65,7 @@ internal partial class TableCreatorViewModel : ObservableBase, IDocument, IDropT
     private List<ColumnViewModel> deletedColumns = new();
     private List<ColumnViewModel> originalPrimaryKey = new();
     private List<IndexViewModel> deletedIndexes = new();
-
+    
     static TableCreatorViewModel()
     {
         RowFormats.AddRange(new RowFormatViewModel[]
@@ -230,7 +230,9 @@ internal partial class TableCreatorViewModel : ObservableBase, IDocument, IDropT
                 // and it will reset SelectedCollation to null, because the collation we just set belongs to a new charset, which combobox doesn't know yet
                 mainThread.Delay(() =>
                 {
-                    SelectedCollation = charset.Collations.FirstOrDefault(x => x.IsDefault) ?? charset.Collations[0];
+                    // we check again, because the user might have changed the charset in the meantime
+                    if (selectedCollation == null || !charset.Collations.Contains(selectedCollation))
+                        SelectedCollation = charset.Collations.FirstOrDefault(x => x.IsDefault) ?? charset.Collations[0];
                 }, TimeSpan.FromMilliseconds(1));
             }
         });

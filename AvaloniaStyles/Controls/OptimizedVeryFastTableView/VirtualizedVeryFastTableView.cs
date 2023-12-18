@@ -98,6 +98,7 @@ public partial class VirtualizedVeryFastTableView : Panel, IKeyboardNavigationHa
                 return;
             view.EnsureCellVisible((int)e.NewValue!);
         });
+        AffectsRender<VirtualizedVeryFastTableView>(IsFocusedProperty);
         AffectsRender<VirtualizedVeryFastTableView>(SelectedRowIndexProperty);
         AffectsRender<VirtualizedVeryFastTableView>(SelectedCellIndexProperty);
         

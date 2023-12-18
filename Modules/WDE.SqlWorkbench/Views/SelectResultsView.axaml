@@ -8,13 +8,13 @@
              x:DataType="viewModels:SelectResultsViewModel"
              x:Class="WDE.SqlWorkbench.Views.SelectResultsView">
   <UserControl.KeyBindings>
-    <KeyBinding Gesture="Ctrl+A" Command="{CompiledBinding SelectAllCommand}" />
-    <KeyBinding Gesture="Cmd+A" Command="{CompiledBinding SelectAllCommand}" />
-    <KeyBinding Gesture="Ctrl+C" Command="{CompiledBinding CopySelectedCommand}" />
-    <KeyBinding Gesture="Cmd+C" Command="{CompiledBinding CopySelectedCommand}" />
+    <BetterKeyBinding Gesture="Ctrl+A" CustomCommand="{CompiledBinding SelectAllCommand}" />
+    <BetterKeyBinding Gesture="Cmd+A" CustomCommand="{CompiledBinding SelectAllCommand}" />
+    <BetterKeyBinding Gesture="Ctrl+C" CustomCommand="{CompiledBinding CopySelectedCommand}" />
+    <BetterKeyBinding Gesture="Cmd+C" CustomCommand="{CompiledBinding CopySelectedCommand}" />
   </UserControl.KeyBindings>
   <DockPanel>
-    <TextBlock DockPanel.Dock="Bottom" HorizontalAlignment="Center" Text="{CompiledBinding Count, StringFormat={}{0} Rows}"></TextBlock>
+    <TextBlock DockPanel.Dock="Bottom" HorizontalAlignment="Center" VerticalAlignment="Center" Text="{CompiledBinding Count, StringFormat={}{0} Rows}"></TextBlock>
     
     <ScrollViewer HorizontalScrollBarVisibility="Visible" AllowAutoHide="False" VerticalScrollBarVisibility="Visible" Offset="{CompiledBinding ScrollOffset, Mode=TwoWay}">
       <optimizedVeryFastTableView:VirtualizedVeryFastTableView ItemsCount="{CompiledBinding  Count}"
