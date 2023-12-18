@@ -53,8 +53,13 @@ internal readonly partial struct MySqlType
     
     public static MySqlType Json(JsonDataType json) => new(MySqlTypeKind.Json, default, default, default, default, json);
 
-    public static bool TryParse(string text, out MySqlType type)
+    public static bool TryParse(string? text, out MySqlType type)
     {
+        if (text == null)
+        {
+            type = default;
+            return false;
+        }
         if (NumericDataType.TryParse(text, out var numeric))
         {
             type = Numeric(numeric);
@@ -109,4 +114,10 @@ internal readonly partial struct MySqlType
             _ => throw new ArgumentOutOfRangeException()
         };
     }
+    
+    public NumericDataType? AsNumeric() => Kind == MySqlTypeKind.Numeric ? numeric : null;
+    public TextDataType? AsText() => Kind == MySqlTypeKind.Text ? text : null;
+    public DateDataType? AsDate() => Kind == MySqlTypeKind.Date ? date : null;
+    public SpatialDataType? AsSpatial() => Kind == MySqlTypeKind.Spatial ? spatial : null;
+    public JsonDataType? AsJson() => Kind == MySqlTypeKind.Json ? json : null;
 }

@@ -139,4 +139,14 @@ internal class UserQuestionsService : IUserQuestionsService
             .WithOkButton(true)
             .Build());
     }
+
+    public async Task InformEditErrorAsync(string message)
+    {
+        await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
+            .SetTitle("Error")
+            .SetMainInstruction("Error while editing")
+            .SetContent(message)
+            .WithOkButton(true)
+            .Build());
+    }
 }

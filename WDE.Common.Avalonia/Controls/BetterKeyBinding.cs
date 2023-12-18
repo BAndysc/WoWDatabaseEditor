@@ -3,6 +3,7 @@ using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using AvaloniaEdit;
 
 namespace WDE.Common.Avalonia.Controls
 {
@@ -33,13 +34,15 @@ namespace WDE.Common.Avalonia.Controls
 
         public void Execute(object? parameter)
         {
-            if (FocusManager.Instance!.Current is TextBox tb)
+            var currentAsTextBox = FocusManager.Instance!.Current as TextBox;
+            var currentAsTextEditor = FocusManager.Instance!.Current as TextEditor;
+            if (currentAsTextBox != null || currentAsTextEditor != null)
             {
                 var ev = Activator.CreateInstance<KeyEventArgs>();
                 ev.Key = Gesture.Key;
                 ev.KeyModifiers = Gesture.KeyModifiers;
                 ev.RoutedEvent = InputElement.KeyDownEvent;
-                tb.RaiseEvent(ev);
+                ((Control?)currentAsTextBox ?? currentAsTextEditor)!.RaiseEvent(ev);
                 if (!ev.Handled && CanExecute(parameter))
                     CustomCommand.Execute(parameter);
             }

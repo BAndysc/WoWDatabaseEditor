@@ -13,7 +13,7 @@ public partial class VirtualizedVeryFastTableView
         var height = DrawingStartOffsetY;
         height += ItemsCount * RowHeight;
 
-        availableSize = new Size(0, height + RowHeight); // always add an extra row height for scrollbar
+        availableSize = new Size(0, height + ScrollBarHeight * 2);
         if (Columns != null)
         {
             availableSize = availableSize.WithWidth(Columns.Where(c=>c.IsVisible).Select(c => c.Width).Sum());

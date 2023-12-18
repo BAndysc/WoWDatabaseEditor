@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Reactive.Disposables;
+using System.Reflection;
 using NSubstitute;
 using Prism.Events;
 using Prism.Ioc;
@@ -36,10 +37,11 @@ public class Program
 {
     public class SyncMainThread : IMainThread
     {
-        public void Delay(Action action, TimeSpan delay)
+        public System.IDisposable Delay(Action action, TimeSpan delay)
         {
             Console.Write(" -- no waiting -- ");
             action();
+            return Disposable.Empty;
         }
 
         public void Dispatch(Action action)

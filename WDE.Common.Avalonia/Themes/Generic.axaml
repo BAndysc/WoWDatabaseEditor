@@ -159,4 +159,57 @@
             </ControlTemplate>
         </Setter>
     </Style>
+    
+    <Style Selector="HexViewControl">
+        <Setter Property="Foreground" Value="{DynamicResource TextControlForeground}" />
+        <Setter Property="Background" Value="{DynamicResource TextControlBackground}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource TextControlBorderBrush}" />
+        <Setter Property="SelectionBrush" Value="{DynamicResource TextControlSelectionHighlightColor}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
+        <Setter Property="FontSize" Value="{DynamicResource ControlContentThemeFontSize}" />
+        <Setter Property="MinHeight" Value="{DynamicResource TextControlThemeMinHeight}" />
+        <Setter Property="MinWidth" Value="{DynamicResource TextControlThemeMinWidth}" />
+        <Setter Property="Padding" Value="{DynamicResource TextControlThemePadding}" />
+        <Setter Property="FocusAdorner" Value="{x:Null}" />
+        <!-- <Setter Property="ScrollViewer.IsScrollChainingEnabled" Value="True" /> -->
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border
+                    Name="PART_BorderElement"
+                    Background="{TemplateBinding Background}"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}"
+                    CornerRadius="{TemplateBinding CornerRadius}"
+                    MinWidth="{TemplateBinding MinWidth}"
+                    Padding="{TemplateBinding Padding}"
+                    MinHeight="{TemplateBinding MinHeight}">
+                    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                        <HexViewPresenter
+                            Name="PART_ContentHost"
+                            Bytes="{TemplateBinding Bytes}"
+                            SelectionStart="{TemplateBinding SelectionStart, Mode=TwoWay}"
+                            SelectionEnd="{TemplateBinding SelectionEnd, Mode=TwoWay}"
+                            SelectionBrush="{TemplateBinding SelectionBrush}"
+                            CaretIndex="{TemplateBinding CaretIndex, Mode=TwoWay}"
+                            CaretBlinkInterval="{TemplateBinding CaretBlinkInterval}"
+                            CaretInAscii="{TemplateBinding CaretInAscii, Mode=TwoWay}"
+                            TextBlock.Foreground="{TemplateBinding Foreground}"
+                            TextBlock.FontSize="{TemplateBinding FontSize}"
+                            TextBlock.FontFamily="{TemplateBinding FontFamily}"
+                        />
+                    </ScrollViewer>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    
+    <Style Selector="HexViewControl:disabled">
+        <Setter Property="Foreground" Value="{DynamicResource TextControlForegroundDisabled}" />
+    </Style>
+    
+    <Style Selector="HexViewControl /template/ Border#PART_BorderElement">
+        <Setter Property="Background" Value="{DynamicResource TextControlBackgroundDisabled}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource TextControlBorderBrushDisabled}" />
+    </Style>
 </Styles>

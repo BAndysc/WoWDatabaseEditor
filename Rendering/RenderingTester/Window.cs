@@ -6,6 +6,7 @@ using Unity.Extension;
 using Unity.Resolution;
 using WDE.Common.Database;
 using WDE.Common.Database.Counters;
+using WDE.Common.Disposables;
 using WDE.Common.Managers;
 using WDE.Common.Modules;
 using WDE.Common.Services;
@@ -78,16 +79,23 @@ public class DummyMessageBox : IMessageBoxService
 public class MainThread : IMainThread
 {
     private readonly SingleThreadSynchronizationContext context;
-    private List<(TimeSpan delay, Action action)> delayed = new();
+    private List<(TimeSpan delay, Action action, long delayId)> delayed = new();
+    private long delayId = 0;
 
     public MainThread(SingleThreadSynchronizationContext context)
     {
         this.context = context;
     }
 
-    public void Delay(Action action, TimeSpan delay)
+    public System.IDisposable Delay(Action action, TimeSpan delay)
     {
-        delayed.Add((delay, action));
+        var id = delayId;
+        delayed.Add((delay, action, id));
+        delayId++;
+        return new ActionDisposable(() =>
+        {
+            delayed.RemoveIf(x => x.delayId == delayId);
+        });
     }
 
     public void Dispatch(Action action)
@@ -125,7 +133,7 @@ public class MainThread : IMainThread
             else
             {
                 var newDelay = delayed[i].delay - time;
-                delayed[i] = (newDelay, delayed[i].action);
+                delayed[i] = (newDelay, delayed[i].action, delayed[i].delayId);
             }
         }
     }

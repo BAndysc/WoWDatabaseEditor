@@ -331,9 +331,9 @@ namespace WoWDatabaseEditorCore.Avalonia
             Profiler.SetupMainThread(this);
         }
         
-        public void Delay(Action action, TimeSpan delay)
+        public System.IDisposable Delay(Action action, TimeSpan delay)
         {
-            DispatcherTimer.RunOnce(action, delay);
+            return DispatcherTimer.RunOnce(action, delay);
         }
 
         public void Dispatch(Action action)

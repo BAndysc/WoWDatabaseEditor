@@ -1,0 +1,101 @@
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Data;
+using Avalonia.Interactivity;
+using Avalonia.Xaml.Interactivity;
+using WDE.MVVM.Observable;
+
+namespace WDE.Common.Avalonia.Behaviors;
+
+public class LostFocusUpdateBindingBehavior : Behavior<TextBox>
+{
+    static LostFocusUpdateBindingBehavior()
+    {
+        TextProperty.Changed.SubscribeAction(e =>
+        {
+            ((LostFocusUpdateBindingBehavior) e.Sender).OnBindingValueChanged();
+        });
+    }
+    
+    public static readonly StyledProperty<string> TextProperty = AvaloniaProperty.Register<LostFocusUpdateBindingBehavior, string>(
+        nameof(Text), defaultBindingMode: BindingMode.TwoWay);
+
+    public string Text
+    {
+        get => GetValue(TextProperty);
+        set => SetValue(TextProperty, value);
+    }
+
+    protected override void OnAttached()
+    {
+        if (AssociatedObject != null)
+            AssociatedObject.LostFocus += OnLostFocus;
+        base.OnAttached();
+    }
+
+    protected override void OnDetaching()
+    {
+        if (AssociatedObject != null)
+            AssociatedObject.LostFocus -= OnLostFocus;
+        base.OnDetaching();
+    }
+        
+    private void OnLostFocus(object? sender, RoutedEventArgs e)
+    {
+        if (AssociatedObject != null)
+            Text = AssociatedObject.Text;
+    }
+        
+    private void OnBindingValueChanged()
+    {
+        if (AssociatedObject != null)
+            AssociatedObject.Text = Text;
+    }
+}
+
+
+public class NumericUpDownLostFocusUpdateBindingBehavior : Behavior<NumericUpDown>
+{
+    static NumericUpDownLostFocusUpdateBindingBehavior()
+    {
+        ValueProperty.Changed.SubscribeAction(e =>
+        {
+            ((NumericUpDownLostFocusUpdateBindingBehavior) e.Sender).OnBindingValueChanged();
+        });
+    }
+    
+    public static readonly StyledProperty<double> ValueProperty = AvaloniaProperty.Register<NumericUpDownLostFocusUpdateBindingBehavior, double>(
+        nameof(Value), defaultBindingMode: BindingMode.TwoWay);
+
+    public double Value
+    {
+        get => GetValue(ValueProperty);
+        set => SetValue(ValueProperty, value);
+    }
+
+    protected override void OnAttached()
+    {
+        if (AssociatedObject != null)
+            AssociatedObject.LostFocus += OnLostFocus;
+        base.OnAttached();
+    }
+
+    protected override void OnDetaching()
+    {
+        if (AssociatedObject != null)
+            AssociatedObject.LostFocus -= OnLostFocus;
+        base.OnDetaching();
+    }
+        
+    private void OnLostFocus(object? sender, RoutedEventArgs e)
+    {
+        if (AssociatedObject != null)
+            Value = AssociatedObject.Value;
+    }
+        
+    private void OnBindingValueChanged()
+    {
+        if (AssociatedObject != null)
+            AssociatedObject.Value = Value;
+    }
+}

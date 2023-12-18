@@ -411,7 +411,7 @@ internal class SqlWorkbenchViewModelTests
         results.AddRowCommand.Execute(null);
         results.AddRowCommand.Execute(null);
         results.SelectedCellIndex = 1; results.UpdateSelectedCells("abc");
-        results.SelectedCellIndex = 2; results.UpdateSelectedCells("true");
+        results.SelectedCellIndex = 2; results.UpdateSelectedCells("1");
         results.SelectedCellIndex = 3; results.UpdateSelectedCells("255");
         results.SelectedCellIndex = 4; results.UpdateSelectedCells("-127");
         results.SelectedCellIndex = 5; results.UpdateSelectedCells("-32768");
@@ -441,7 +441,7 @@ internal class SqlWorkbenchViewModelTests
             "START TRANSACTION",
             @"INSERT INTO `tab` (`a`, `b`, `c`, `d`, `e`, `f`, `g`, `h`, `i`, `j`, `k`, `l`, `m`, `n`, `o`, `p`, `q`) VALUES
 (NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-('abc', true, 255, -127, -32768, 65535, -2147483648, 4294967295, -9223372036854775808, 18446744073709551615, 1.1, 1.1, 1.1, '2021-01-01 00:00:00', NOW(), '20:30:40', X'DEADBEEF')".Replace(Environment.NewLine, "\n"),
+('abc', 1, 255, -127, -32768, 65535, -2147483648, 4294967295, -9223372036854775808, 18446744073709551615, 1.1, 1.1, 1.1, '2021-01-01 00:00:00', NOW(), '20:30:40', X'DEADBEEF')".Replace(Environment.NewLine, "\n"),
             "COMMIT"
         }, connector.ExecutedQueries);
     }
@@ -640,5 +640,144 @@ internal class SqlWorkbenchViewModelTests
             "SELECT DATABASE()",
             "SELECT * FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = 'world' AND `TABLE_NAME` = 'tab' ORDER BY `ORDINAL_POSITION`",
         }, connector.ExecutedQueries);
+    }
+    
+    [Test]
+    public async Task Test_EditViaEditPanel()
+    {
+        using var vm = CreateConnectedViewModel();
+        var worldDb = mockServer.CreateDatabase("world");
+        var table = worldDb.CreateTable("tab", TableType.Table, 
+            new ColumnInfo("a", "int", false, true, true, null, null, null),
+            new ColumnInfo("b", "varchar", false, false, false, null, null, null));
+        table.Insert(new object?[]{1, "abc"});
+        
+        vm.Document.Insert(0, "SELECT `a`, `b` FROM `tab`");
+        await vm.ExecuteAllCommand.ExecuteAsync();
+
+        Assert.IsTrue(actionsOutputService.Actions[0].IsSuccess);
+        Assert.AreEqual(1, vm.Results.Count);
+        
+        // results
+        Assert.IsTrue(vm.Results[0] is SelectSingleTableViewModel);
+        var results = (SelectSingleTableViewModel)vm.Results[0];
+
+        await results.RefreshTableCommand.ExecuteAsync();
+        
+        results.SelectedRowIndex = 0;
+        results.SelectedCellIndex = 1;
+
+        var editor = (SignedIntegerCellEditorViewModel)results.CellEditor!;
+        editor.Value = 3;
+        editor.ApplyChanges();
+        
+        Assert.AreEqual("3", results.GetShortValue(0, 1));
+        
+        results.SelectedCellIndex = 2;
+        var strEditor = (StringCellEditorViewModel)results.CellEditor!;
+        strEditor.Document.Text = "def";
+        strEditor.ApplyChanges();
+        
+        Assert.AreEqual("def", results.GetShortValue(0, 2));
+    }
+    
+    [Test]
+    public async Task Test_UpdateValueOutOfBounds_WillNotCrash()
+    {
+        using var vm = CreateConnectedViewModel();
+        var worldDb = mockServer.CreateDatabase("world");
+        var table = worldDb.CreateTable("tab", TableType.Table, 
+            new ColumnInfo("a", "bit(2)", false, true, true, null, null, null));
+        table.Insert(new object?[]{1UL});
+        
+        vm.Document.Insert(0, "SELECT `a` FROM `tab`");
+        await vm.ExecuteAllCommand.ExecuteAsync();
+
+        Assert.IsTrue(actionsOutputService.Actions[0].IsSuccess);
+        Assert.AreEqual(1, vm.Results.Count);
+        
+        // results
+        Assert.IsTrue(vm.Results[0] is SelectSingleTableViewModel);
+        var results = (SelectSingleTableViewModel)vm.Results[0];
+
+        await results.RefreshTableCommand.ExecuteAsync();
+        
+        results.Selection.Add(0);
+        results.SelectedCellIndex = 1;
+        results.UpdateSelectedCells("4");
+
+        Assert.Pass();
+    }
+    
+    [Test]
+    public async Task Test_BinaryEditor()
+    {
+        using var vm = CreateConnectedViewModel();
+        var worldDb = mockServer.CreateDatabase("world");
+        var table = worldDb.CreateTable("tab", TableType.Table, 
+            new ColumnInfo("a", "varbinary(20)", false, true, true, null, null, null));
+        table.Insert(new object?[]{new byte[]{}});
+        
+        vm.Document.Insert(0, "SELECT `a` FROM `tab`");
+        await vm.ExecuteAllCommand.ExecuteAsync();
+
+        Assert.IsTrue(actionsOutputService.Actions[0].IsSuccess);
+        Assert.AreEqual(1, vm.Results.Count);
+        
+        // results
+        Assert.IsTrue(vm.Results[0] is SelectSingleTableViewModel);
+        var results = (SelectSingleTableViewModel)vm.Results[0];
+        
+        results.SelectedCellIndex = 1;
+        
+        var editor = (BinaryCellEditorViewModel)results.CellEditor!;
+        editor.Length = 5;
+
+        Assert.AreEqual("0000000000", results.GetShortValue(0, 1));
+        
+        editor.Bytes[0] = 0xAA;
+        
+        Assert.AreEqual("0000000000", results.GetShortValue(0, 1));
+        Assert.IsTrue(results.TryGetRowOverride(0, 1, out var value));
+        Assert.AreEqual("0000000000", value);
+        
+        editor.ApplyChanges();
+        
+        Assert.AreEqual("AA00000000", results.GetShortValue(0, 1));
+    }
+    
+    [Test]
+    public async Task Test_BinaryEditor_SetNull()
+    {
+        using var vm = CreateConnectedViewModel();
+        var worldDb = mockServer.CreateDatabase("world");
+        var table = worldDb.CreateTable("tab", TableType.Table, 
+            new ColumnInfo("a", "varbinary(20)", false, true, true, null, null, null));
+        table.Insert(new object?[]{new byte[]{0x11, 0x22, 0x33, 0x44}});
+        
+        vm.Document.Insert(0, "SELECT `a` FROM `tab`");
+        await vm.ExecuteAllCommand.ExecuteAsync();
+
+        Assert.IsTrue(actionsOutputService.Actions[0].IsSuccess);
+        Assert.AreEqual(1, vm.Results.Count);
+        
+        // results
+        Assert.IsTrue(vm.Results[0] is SelectSingleTableViewModel);
+        var results = (SelectSingleTableViewModel)vm.Results[0];
+        
+        results.SelectedCellIndex = 1;
+        
+        var editor = (BinaryCellEditorViewModel)results.CellEditor!;
+        editor.Bytes[0] = 0x55;
+        editor.ApplyChanges();
+
+        Assert.AreEqual("55223344", results.GetShortValue(0, 1));
+        
+        results.Selection.Add(0);
+        results.SetSelectedToNullCommand.Execute(null);
+        
+        Assert.IsNull(results.TableController.GetCellText(0, 1));
+        Assert.IsTrue(results.TryGetRowOverride(0, 1, out var overrideString));
+        Assert.IsNull(overrideString);
     }
 }
