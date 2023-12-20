@@ -180,7 +180,11 @@ namespace WDE.DbcStore
             }
 
             IsConfigured = true;
-            taskRunner.ScheduleTask(new DbcLoadTask(parameterFactory, dataPicker, dbcSettingsProvider, this));
+
+            Task LoadAsync() 
+                => taskRunner.ScheduleTask(new DbcLoadTask(parameterFactory, dataPicker, dbcSettingsProvider, this));
+
+            messageBoxService.WrapError(LoadAsync).ListenErrors();
         }
 
         private class DbcLoadTask : IThreadedTask
