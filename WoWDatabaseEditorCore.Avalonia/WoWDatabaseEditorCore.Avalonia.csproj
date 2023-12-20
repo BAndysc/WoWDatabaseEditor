@@ -18,6 +18,8 @@
         <AvaloniaResource Include="Fonts\Unifont.otf" />
         <AvaloniaResource Include="Icon.png" />
         <AvaloniaResource Include="IconSmall.png" />
+        <None Remove="logo.png" />
+        <AvaloniaResource Include="logo.png" />
     </ItemGroup>
     <Import Project="..\Avalonia.props" />
     <ItemGroup>
