@@ -1,8 +1,12 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows.Input;
+using Prism.Commands;
 using PropertyChanged.SourceGenerator;
 using WDE.Common.Documents;
+using WDE.Common.Managers;
 using WDE.Common.Windows;
 using WDE.Module.Attributes;
 using WDE.MVVM;
@@ -30,7 +34,7 @@ public partial class TablesToolViewModel : ObservableBase, ITool
                      .Concat(dynamicProviders.SelectMany(x => x.GetProviders()))
                      .OrderByDescending(x => x.Priority))
             AllGroups.Add(provider);
-
+        
         SelectedGroup = AllGroups.FirstOrDefault();
     }
     

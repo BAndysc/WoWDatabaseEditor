@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using WDE.Common.Managers;
 using WDE.Common.Types;
 using WDE.Common.Utils;
 using WDE.Module.Attributes;

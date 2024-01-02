@@ -7,10 +7,12 @@ using PropertyChanged.SourceGenerator;
 using WDE.Common;
 using WDE.Common.Documents;
 using WDE.Common.Events;
+using WDE.Common.Managers;
 using WDE.Common.Types;
 using WDE.Common.Utils;
 using WDE.DatabaseEditors.Data.Interfaces;
 using WDE.DatabaseEditors.Data.Structs;
+using WDE.DatabaseEditors.ViewModels;
 using WDE.Module.Attributes;
 using WDE.MVVM;
 
