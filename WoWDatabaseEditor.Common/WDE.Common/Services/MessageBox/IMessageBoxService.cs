@@ -36,10 +36,14 @@ namespace WDE.Common.Services.MessageBox
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
-                var msg = e.Message;
-                if (e.InnerException != null)
-                    msg += "\n\n --> " + e.InnerException.Message;
+                Exception ex = e;
+                if (ex is AggregateException ae && ae.InnerExceptions.Count == 1)
+                    ex = ae.InnerExceptions[0];
+                
+                Console.WriteLine(ex);
+                var msg = ex.Message;
+                if (ex.InnerException != null)
+                    msg += "\n\n --> " + ex.InnerException.Message;
 
                 await service.ShowDialog(new MessageBoxFactory<bool>()
                     .SetTitle("Error")

@@ -1,3 +1,4 @@
+using System;
 using System.Text;
 using WDE.Common.DBC;
 using WDE.Common.DBC.Structs;
