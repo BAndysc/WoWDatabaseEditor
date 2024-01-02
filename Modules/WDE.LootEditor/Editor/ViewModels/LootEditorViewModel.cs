@@ -1121,12 +1121,51 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
     
     public ISolutionItem SolutionItem => ((ISolutionItem?)perDbSolutionItem ?? perEntitySolutionItem)!;
     
-    public void SortElements()
+    public void SortElements(int sortByCellIndex, bool ascending)
     {
         using var bulk = HistoryHandler.WithinBulk("Sort loot");
         foreach (var group in Loots)
         {
-            var copy = group.LootItems.OrderBy(x => x.GroupId.Value)
+            var source = group.LootItems;
+            if (source.Count == 0)
+                continue;
+            
+            var firstRow = source[0];
+            IOrderedEnumerable<LootItemViewModel> ordered;
+            if (firstRow.CellsList[sortByCellIndex] is LootItemParameterCellLong)
+            {
+                if (ascending)
+                    ordered = source.OrderBy(x => ((LootItemParameterCellLong)x.CellsList[sortByCellIndex]).Value);
+                else
+                    ordered = source.OrderByDescending(x => ((LootItemParameterCellLong)x.CellsList[sortByCellIndex]).Value);
+            }
+            else if (firstRow.CellsList[sortByCellIndex] is ItemNameStringCell)
+            {
+                if (ascending)
+                    ordered = source.OrderBy(x => ((ItemNameStringCell)x.CellsList[sortByCellIndex]).StringValue);
+                else
+                    ordered = source.OrderByDescending(x => ((ItemNameStringCell)x.CellsList[sortByCellIndex]).StringValue);
+            }
+            else if (firstRow.CellsList[sortByCellIndex] is LootItemParameterCell<float>)
+            {
+                if (ascending)
+                    ordered = source.OrderBy(x => ((LootItemParameterCell<float>)x.CellsList[sortByCellIndex]).Value);
+                else
+                    ordered = source.OrderByDescending(x => ((LootItemParameterCell<float>)x.CellsList[sortByCellIndex]).Value);
+            }
+            else if (firstRow.CellsList[sortByCellIndex] is ActionCell)
+            {
+                continue;
+            }
+            else
+            {
+                messageBoxService.SimpleDialog("Error", "Non critical error - can't sort by this column",
+                    "This is an internal error, please report it. Can't sort the loot, because " +
+                    LootColumns[sortByCellIndex].Header + " is not sortable");
+                continue;
+            }
+            
+            var copy = ordered
                 .ThenBy(x => x.ItemOrCurrencyId.Value)
                 .ToList();
             group.LootItems.RemoveAll();

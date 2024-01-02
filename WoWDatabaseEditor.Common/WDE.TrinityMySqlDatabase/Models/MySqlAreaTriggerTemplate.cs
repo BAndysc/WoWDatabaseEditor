@@ -11,7 +11,7 @@ namespace WDE.TrinityMySqlDatabase.Models
         public uint Id { get; set; }
 
         [PrimaryKey]
-        [Column(Name = "IsServerSide")]
+        [Column(Name = "IsCustom")]
         public bool IsServerSide { get; set; }
 
         public string? Name => null;

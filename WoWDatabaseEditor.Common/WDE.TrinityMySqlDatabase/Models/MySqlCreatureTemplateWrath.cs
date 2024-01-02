@@ -225,7 +225,7 @@ namespace WDE.TrinityMySqlDatabase.Models
         [Column(Name = "RequiredExpansion")] 
         public short RequiredExpansion { get; set; }
         
-        [Column(Name = "rank")] 
+        [Column(Name = "Classification")] 
         public byte Rank { get; set; }
         
         [Column(Name = "unit_class")] 
