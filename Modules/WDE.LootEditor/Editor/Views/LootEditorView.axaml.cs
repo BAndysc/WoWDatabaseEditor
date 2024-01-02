@@ -22,11 +22,23 @@ public partial class LootEditorView : UserControl
         (DataContext as LootEditorViewModel)!.UpdateSelectedCells(text);
     }
 
+    private int lastSortByColumnIndex = -1;
+    private bool lastAscending = true;
+
     private void VeryFastTableView_OnColumnPressed(object? sender, ColumnPressedEventArgs e)
     {
         if (DataContext is LootEditorViewModel vm)
         {
-            vm.SortElements();
+            if (lastSortByColumnIndex != e.ColumnIndex)
+            {
+                lastSortByColumnIndex = e.ColumnIndex;
+                lastAscending = true;
+            }
+            else
+            {
+                lastAscending = !lastAscending;
+            }
+            vm.SortElements(e.ColumnIndex, lastAscending);
         }
     }
 }
