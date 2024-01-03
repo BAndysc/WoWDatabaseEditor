@@ -1,11 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
+using MySqlConnector;
 
 namespace WDE.SqlWorkbench.Models;
 
 internal class DecimalColumnData : IColumnData
 {
-    private readonly List<decimal> data = new ();
+    private readonly List<PublicMySqlDecimal> data = new ();
     private readonly BitArray nulls = new (0);
     
     public bool HasRow(int rowIndex) => rowIndex < data.Count;
@@ -45,9 +46,9 @@ internal class DecimalColumnData : IColumnData
 
     public bool IsNull(int rowIndex) => nulls[rowIndex];
     
-    public decimal this[int index] => data[index];
+    public PublicMySqlDecimal this[int index] => data[index];
     
-    public void Override(int rowIndex, decimal? value)
+    public void Override(int rowIndex, PublicMySqlDecimal? value)
     {
         nulls[rowIndex] = !value.HasValue;
         data[rowIndex] = value ?? default;
@@ -64,7 +65,7 @@ internal class DecimalColumnData : IColumnData
             return true;
         }
         
-        if (decimal.TryParse(str, out var value))
+        if (PublicMySqlDecimal.TryParse(str, out var value))
         {
             Override(rowIndex, value);
             error = null;

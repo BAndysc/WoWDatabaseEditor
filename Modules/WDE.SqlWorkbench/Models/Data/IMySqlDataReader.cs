@@ -18,7 +18,7 @@ internal interface IMySqlDataReader
     long GetInt64(int ordinal);
     ulong GetUInt64(int ordinal);
     char GetChar(int ordinal);
-    decimal GetDecimal(int ordinal);
+    PublicMySqlDecimal GetDecimal(int ordinal);
     double GetDouble(int ordinal);
     float GetFloat(int ordinal);
     DateTime GetDateTime(int ordinal);

@@ -220,9 +220,11 @@ public class ColumnDataTests
     [Test]
     public void TestDecimal()
     {
-        var d = decimal.Parse("0.1");
+        var d = PublicMySqlDecimal.Parse("0000.1");
+        var d2 = PublicMySqlDecimal.Parse("-99999.9900");
+        var d3 = PublicMySqlDecimal.Parse("1000");
         reader.GetDecimal(default).ReturnsForAnyArgs(x => data[x.Arg<int>()]);
-        data.AddRange(new object?[]{ null, d + d + d, null, d });
+        data.AddRange(new object?[]{ null, d2, null, d, d3 });
         var column = new DecimalColumnData();
         for (int i = 0; i < data.Count; ++i)
             column.Append(reader, i);
@@ -231,7 +233,9 @@ public class ColumnDataTests
         Assert.IsFalse(column.IsNull(1));
         Assert.IsTrue(column.IsNull(2));
         Assert.IsFalse(column.IsNull(3));
-        Assert.AreEqual("0.3", column.GetToString(1));
+        Assert.IsFalse(column.IsNull(4));
+        Assert.AreEqual("1000", column.GetToString(4));
+        Assert.AreEqual("-99999.99", column.GetToString(1));
         Assert.AreEqual("0.1", column.GetToString(3));
         Assert.AreEqual(ColumnTypeCategory.Number, column.Category);
     }

@@ -167,9 +167,9 @@ internal class MySqlDataReaderWrapper : IMySqlDataReader
         return reader.GetChar(ordinal);
     }
 
-    public decimal GetDecimal(int ordinal)
+    public PublicMySqlDecimal GetDecimal(int ordinal)
     {
-        return reader.GetDecimal(ordinal);
+        return PublicMySqlDecimal.FromDecimal(reader.GetMySqlDecimal(ordinal));
     }
 
     public double GetDouble(int ordinal)

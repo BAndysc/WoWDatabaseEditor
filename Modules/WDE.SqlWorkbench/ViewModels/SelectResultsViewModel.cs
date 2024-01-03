@@ -204,10 +204,12 @@ internal partial class SelectResultsViewModel : ObservableBase
             cellEditor = new SignedIntegerCellEditorViewModel(type, (Int32SparseColumnData)overrideColumn, i32, selectedRowIndex, isNullable);
         else if (column is Int64ColumnData i64)
             cellEditor = new SignedIntegerCellEditorViewModel(type, (Int64SparseColumnData)overrideColumn, i64, selectedRowIndex, isNullable);
-        // else if (column is FloatColumnData f)
-        //     cellEditor = new FloatCellEditorViewModel(f, selectedRowIndex, isNullable);
-        // else if (column is DoubleColumnData d)
-        //     cellEditor = new FloatCellEditorViewModel(d, selectedRowIndex, isNullable);
+        else if (column is DecimalColumnData dec)
+            cellEditor = new DecimalCellEditorViewModel(type, (DecimalSparseColumnData)overrideColumn, dec, selectedRowIndex, isNullable);
+        else if (column is FloatColumnData f)
+            cellEditor = new FloatCellEditorViewModel(type, (FloatSparseColumnData)overrideColumn, f, selectedRowIndex, isNullable);
+        else if (column is DoubleColumnData d)
+            cellEditor = new DoubleCellEditorViewModel(type, (DoubleSparseColumnData)overrideColumn, d, selectedRowIndex, isNullable);
         else if (column is StringColumnData s)
             cellEditor = new StringCellEditorViewModel(type, (StringSparseColumnData)overrideColumn, s, selectedRowIndex, isNullable);
         // else if (column is DateTimeColumnData dt)

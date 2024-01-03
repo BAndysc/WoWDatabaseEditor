@@ -38,7 +38,7 @@ internal readonly partial struct NumericDataType
                 case NumericDataTypeKind.BigInt:
                     return Unsigned ? typeof(ulong) : typeof(long);
                 case NumericDataTypeKind.Decimal:
-                    return typeof(decimal);
+                    return typeof(PublicMySqlDecimal);
                 case NumericDataTypeKind.Float:
                     return typeof(float);
                 case NumericDataTypeKind.Double:
