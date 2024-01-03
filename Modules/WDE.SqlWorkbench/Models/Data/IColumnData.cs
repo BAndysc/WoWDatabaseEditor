@@ -104,8 +104,8 @@ internal class DateTimeSparseColumnData(DateTimeColumnData impl) : SparseColumnD
 
 internal class DecimalSparseColumnData(DecimalColumnData impl) : SparseColumnData(impl)
 {
-    public decimal this[int index] => impl[GetActualIndex(index)];
-    public void Override(int rowIndex, decimal? value)
+    public PublicMySqlDecimal this[int index] => impl[GetActualIndex(index)];
+    public void Override(int rowIndex, PublicMySqlDecimal? value)
     {
         impl.Override(GetOrCreateActualIndex(rowIndex), value);
         RaiseOnRowOverriden(rowIndex);

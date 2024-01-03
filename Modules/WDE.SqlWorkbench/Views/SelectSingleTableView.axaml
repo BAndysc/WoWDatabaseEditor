@@ -81,7 +81,11 @@
               <TextBlock Opacity="0.5" Text="{CompiledBinding MinValue, StringFormat=Minimum: {0}}" DockPanel.Dock="Top" Margin="0,0,0,5"/>
               <TextBlock Opacity="0.5" Text="{CompiledBinding MaxValue, StringFormat=Maximum: {0}}" DockPanel.Dock="Top" Margin="0,0,0,5"/>
               <TextBlock Margin="0,0,0,5" DockPanel.Dock="Top">Value:</TextBlock>
-              <TextBox Text="{CompiledBinding Value}"  DockPanel.Dock="Top"/>
+              <TextBox Text="{CompiledBinding Value}"  DockPanel.Dock="Top">
+                <TextBox.KeyBindings>
+                  <KeyBinding Gesture="Enter" Command="{CompiledBinding ApplyChangesCommand}" />
+                </TextBox.KeyBindings>
+              </TextBox>
             </DockPanel>
           </DataTemplate>
           <DataTemplate x:DataType="viewModels:UnsignedIntegerCellEditorViewModel" DataType="viewModels:UnsignedIntegerCellEditorViewModel">
@@ -89,10 +93,51 @@
               <TextBlock Opacity="0.5" Text="{CompiledBinding MinValue, StringFormat=Minimum: {0}}" DockPanel.Dock="Top" Margin="0,0,0,5"/>
               <TextBlock Opacity="0.5" Text="{CompiledBinding MaxValue, StringFormat=Maximum: {0}}" DockPanel.Dock="Top" Margin="0,0,0,5"/>
               <TextBlock Margin="0,0,0,5" DockPanel.Dock="Top">Value:</TextBlock>
-              <TextBox Text="{CompiledBinding Value}"  DockPanel.Dock="Top"/>
+              <TextBox Text="{CompiledBinding Value}"  DockPanel.Dock="Top">
+                <TextBox.KeyBindings>
+                  <KeyBinding Gesture="Enter" Command="{CompiledBinding ApplyChangesCommand}" />
+                </TextBox.KeyBindings>
+              </TextBox>
               
               <TextBlock Margin="0,0,0,5" DockPanel.Dock="Top">Hex:</TextBlock>
-              <TextBox Text="{CompiledBinding HexValue}"  DockPanel.Dock="Top"/>
+              <TextBox Text="{CompiledBinding HexValue}"  DockPanel.Dock="Top">
+                <TextBox.KeyBindings>
+                  <KeyBinding Gesture="Enter" Command="{CompiledBinding ApplyChangesCommand}" />
+                </TextBox.KeyBindings>
+              </TextBox>
+            </DockPanel>
+          </DataTemplate>
+          <DataTemplate x:DataType="viewModels:DecimalCellEditorViewModel" DataType="viewModels:DecimalCellEditorViewModel">
+            <DockPanel LastChildFill="False">
+              <TextBlock Opacity="0.5" Text="{CompiledBinding DecimalPlaces, StringFormat=Decimal digits: {0}}" DockPanel.Dock="Top" Margin="0,0,0,5"/>
+              <TextBlock Opacity="0.5" IsVisible="{CompiledBinding HasMinMaxValues}" Text="{CompiledBinding MinValue, StringFormat=Minimum: {0}}" DockPanel.Dock="Top" Margin="0,0,0,5"/>
+              <TextBlock Opacity="0.5" IsVisible="{CompiledBinding HasMinMaxValues}" Text="{CompiledBinding MaxValue, StringFormat=Maximum: {0}}" DockPanel.Dock="Top" Margin="0,0,0,5"/>
+              <TextBlock Margin="0,0,0,5" DockPanel.Dock="Top">Value:</TextBlock>
+              <TextBox Text="{CompiledBinding ValueAsString}"  DockPanel.Dock="Top">
+                <TextBox.KeyBindings>
+                  <KeyBinding Gesture="Enter" Command="{CompiledBinding ApplyChangesCommand}" />
+                </TextBox.KeyBindings>
+              </TextBox>
+            </DockPanel>
+          </DataTemplate>
+          <DataTemplate x:DataType="viewModels:FloatCellEditorViewModel" DataType="viewModels:FloatCellEditorViewModel">
+            <DockPanel LastChildFill="False">
+              <TextBlock Margin="0,0,0,5" DockPanel.Dock="Top">Value:</TextBlock>
+              <TextBox Text="{CompiledBinding Value}"  DockPanel.Dock="Top">
+                <TextBox.KeyBindings>
+                  <KeyBinding Gesture="Enter" Command="{CompiledBinding ApplyChangesCommand}" />
+                </TextBox.KeyBindings>
+              </TextBox>
+            </DockPanel>
+          </DataTemplate>
+          <DataTemplate x:DataType="viewModels:DoubleCellEditorViewModel" DataType="viewModels:DoubleCellEditorViewModel">
+            <DockPanel LastChildFill="False">
+              <TextBlock Margin="0,0,0,5" DockPanel.Dock="Top">Value:</TextBlock>
+              <TextBox Text="{CompiledBinding Value}"  DockPanel.Dock="Top">
+                <TextBox.KeyBindings>
+                  <KeyBinding Gesture="Enter" Command="{CompiledBinding ApplyChangesCommand}" />
+                </TextBox.KeyBindings>
+              </TextBox>
             </DockPanel>
           </DataTemplate>
           <DataTemplate x:DataType="viewModels:StringCellEditorViewModel" DataType="viewModels:StringCellEditorViewModel">

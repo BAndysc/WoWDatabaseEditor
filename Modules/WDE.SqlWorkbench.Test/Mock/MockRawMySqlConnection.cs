@@ -271,7 +271,7 @@ internal class MockSqlConnector : IMySqlConnector
                 public long GetInt64(int ordinal) => throw new NotImplementedException();
                 public ulong GetUInt64(int ordinal) => throw new NotImplementedException();
                 public char GetChar(int ordinal) => throw new NotImplementedException();
-                public decimal GetDecimal(int ordinal) => throw new NotImplementedException();
+                public PublicMySqlDecimal GetDecimal(int ordinal) => throw new NotImplementedException();
                 public double GetDouble(int ordinal) => throw new NotImplementedException();
                 public float GetFloat(int ordinal) => throw new NotImplementedException();
                 public DateTime GetDateTime(int ordinal) => throw new NotImplementedException();
@@ -577,7 +577,7 @@ internal class MockSqlConnector : IMySqlConnector
                 public long GetInt64(int ordinal) => (long?)data[rowIndex, ordinal] ?? 0;
                 public ulong GetUInt64(int ordinal) => (ulong?)data[rowIndex, ordinal] ?? 0;
                 public char GetChar(int ordinal) => (char?)data[rowIndex, ordinal] ?? '\0';
-                public decimal GetDecimal(int ordinal) => (decimal?)data[rowIndex, ordinal] ?? 0;
+                public PublicMySqlDecimal GetDecimal(int ordinal) => (PublicMySqlDecimal?)data[rowIndex, ordinal] ?? PublicMySqlDecimal.Zero;
                 public double GetDouble(int ordinal) => (double?)data[rowIndex, ordinal] ?? 0;
                 public float GetFloat(int ordinal) => (float?)data[rowIndex, ordinal] ?? 0;
                 public DateTime GetDateTime(int ordinal) => (DateTime?)data[rowIndex, ordinal] ?? DateTime.MinValue;
