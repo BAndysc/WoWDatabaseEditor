@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
+using WDE.SqlWorkbench.Utils;
 
 namespace WDE.SqlWorkbench.Models;
 
@@ -11,6 +13,8 @@ internal class TimeSpanColumnData : IColumnData
     
     public bool HasRow(int rowIndex) => rowIndex < data.Count;
         
+    private static readonly Regex TimeRegex = new Regex(@"^(-)?(\d+):(\d{2}):(\d{2})(?:\.(\d+))?$");
+
     public int AppendNull()
     {
         if (data.Count == nulls.Length)
@@ -45,7 +49,7 @@ internal class TimeSpanColumnData : IColumnData
             return null;
 
         var timeSpan = data[rowIndex];
-        return $"{(int)timeSpan.TotalHours:00}:{Math.Abs(timeSpan.Minutes):00}:{Math.Abs(timeSpan.Seconds):00}";
+        return timeSpan.ToPrettyString();
     }
 
     public bool IsNull(int rowIndex) => nulls[rowIndex];
@@ -59,6 +63,29 @@ internal class TimeSpanColumnData : IColumnData
     }
     
     public ColumnTypeCategory Category => ColumnTypeCategory.DateTime;
+
+    public static bool TryParseTime(string str, out TimeSpan ts)
+    {
+        if (TimeRegex.Match(str) is { Success: true } m)
+        {
+            var negative = m.Groups[1].Success;
+            var hours = int.Parse(m.Groups[2].Value);
+            var minutes = int.Parse(m.Groups[3].Value);
+            var seconds = int.Parse(m.Groups[4].Value);
+            var microSeconds = m.Groups[5].Success ? int.Parse(m.Groups[5].Value.PadRight(6, '0')) : 0;
+            if (negative)
+            {
+                hours = -hours;
+                minutes = -minutes;
+                seconds = -seconds;
+                microSeconds = -microSeconds;
+            }
+            ts = new TimeSpan(0, hours, minutes, seconds, 0, microSeconds);
+            return true;
+        }
+        ts = default;
+        return false;
+    }
     
     public bool TryOverride(int rowIndex, string? str, out string? error)
     {
@@ -68,10 +95,10 @@ internal class TimeSpanColumnData : IColumnData
             error = null;
             return true;
         }
-        
-        if (TimeSpan.TryParse(str, out var value))
+
+        if (TryParseTime(str, out var time))
         {
-            Override(rowIndex, value);
+            Override(rowIndex, time);
             error = null;
             return true;
         }

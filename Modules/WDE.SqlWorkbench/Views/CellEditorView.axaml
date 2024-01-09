@@ -1,0 +1,136 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:WDE.SqlWorkbench.ViewModels"
+             xmlns:avaloniaEdit="https://github.com/avaloniaui/avaloniaedit"
+             xmlns:behaviors="clr-namespace:WDE.Common.Avalonia.Behaviors;assembly=WDE.Common.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:BaseCellEditorViewModel"
+             x:Name="Root"
+             x:Class="WDE.SqlWorkbench.Views.CellEditorView">
+  <Panel>
+    <TextBlock IsVisible="{CompiledBinding #Root.DataContext, Converter={x:Static NullConverter.IsNull}}">Select a single cell to edit.</TextBlock>
+    <DockPanel IsVisible="{CompiledBinding #Root.DataContext, Converter={x:Static NullConverter.IsNotNull}}">
+      <TextBlock Margin="0,0,0,5" DockPanel.Dock="Top" Text="{CompiledBinding Type, StringFormat=Column type: {0}}" FontWeight="Bold" IsVisible="{CompiledBinding Type, Converter={x:Static NullConverter.IsNotNull}}" />
+          
+      <CheckBox Margin="0,0,0,5" DockPanel.Dock="Top" IsChecked="{CompiledBinding IsNull}" IsVisible="{CompiledBinding CanBeNull}">Is null</CheckBox>
+      
+      <ContentControl Content="{CompiledBinding .}" IsEnabled="{CompiledBinding !IsNull}" Name="EditControlBox">
+        <Interaction.Behaviors>
+          <EventTriggerBehavior EventName="LostFocus" SourceObject="{Binding #EditControlBox}">
+            <CallMethodAction TargetObject="{Binding}" MethodName="ApplyChanges"/>
+          </EventTriggerBehavior>
+        </Interaction.Behaviors>
+        <ContentControl.DataTemplates>
+          <DataTemplate x:DataType="viewModels:SignedIntegerCellEditorViewModel" DataType="viewModels:SignedIntegerCellEditorViewModel">
+            <DockPanel LastChildFill="False">
+              <TextBlock Opacity="0.5" Text="{CompiledBinding MinValue, StringFormat=Minimum: {0}}" DockPanel.Dock="Top" Margin="0,0,0,5"/>
+              <TextBlock Opacity="0.5" Text="{CompiledBinding MaxValue, StringFormat=Maximum: {0}}" DockPanel.Dock="Top" Margin="0,0,0,5"/>
+              <TextBlock Margin="0,0,0,5" DockPanel.Dock="Top">Value:</TextBlock>
+              <TextBox Text="{CompiledBinding Value}" IsReadOnly="{CompiledBinding IsReadOnly}" DockPanel.Dock="Top">
+                <TextBox.KeyBindings>
+                  <KeyBinding Gesture="Enter" Command="{CompiledBinding ApplyChangesCommand}" />
+                </TextBox.KeyBindings>
+              </TextBox>
+            </DockPanel>
+          </DataTemplate>
+          <DataTemplate x:DataType="viewModels:UnsignedIntegerCellEditorViewModel" DataType="viewModels:UnsignedIntegerCellEditorViewModel">
+            <DockPanel LastChildFill="False">
+              <TextBlock Opacity="0.5" Text="{CompiledBinding MinValue, StringFormat=Minimum: {0}}" DockPanel.Dock="Top" Margin="0,0,0,5"/>
+              <TextBlock Opacity="0.5" Text="{CompiledBinding MaxValue, StringFormat=Maximum: {0}}" DockPanel.Dock="Top" Margin="0,0,0,5"/>
+              <TextBlock Margin="0,0,0,5" DockPanel.Dock="Top">Value:</TextBlock>
+              <TextBox Text="{CompiledBinding Value}" IsReadOnly="{CompiledBinding IsReadOnly}" DockPanel.Dock="Top">
+                <TextBox.KeyBindings>
+                  <KeyBinding Gesture="Enter" Command="{CompiledBinding ApplyChangesCommand}" />
+                </TextBox.KeyBindings>
+              </TextBox>
+              
+              <TextBlock Margin="0,0,0,5" DockPanel.Dock="Top">Hex:</TextBlock>
+              <TextBox Text="{CompiledBinding HexValue}" IsReadOnly="{CompiledBinding IsReadOnly}" DockPanel.Dock="Top">
+                <TextBox.KeyBindings>
+                  <KeyBinding Gesture="Enter" Command="{CompiledBinding ApplyChangesCommand}" />
+                </TextBox.KeyBindings>
+              </TextBox>
+            </DockPanel>
+          </DataTemplate>
+          <DataTemplate x:DataType="viewModels:DecimalCellEditorViewModel" DataType="viewModels:DecimalCellEditorViewModel">
+            <DockPanel LastChildFill="False">
+              <TextBlock Opacity="0.5" Text="{CompiledBinding DecimalPlaces, StringFormat=Decimal digits: {0}}" DockPanel.Dock="Top" Margin="0,0,0,5"/>
+              <TextBlock Opacity="0.5" IsVisible="{CompiledBinding HasMinMaxValues}" Text="{CompiledBinding MinValue, StringFormat=Minimum: {0}}" DockPanel.Dock="Top" Margin="0,0,0,5"/>
+              <TextBlock Opacity="0.5" IsVisible="{CompiledBinding HasMinMaxValues}" Text="{CompiledBinding MaxValue, StringFormat=Maximum: {0}}" DockPanel.Dock="Top" Margin="0,0,0,5"/>
+              <TextBlock Margin="0,0,0,5" DockPanel.Dock="Top">Value:</TextBlock>
+              <TextBox Text="{CompiledBinding ValueAsString}" IsReadOnly="{CompiledBinding IsReadOnly}" DockPanel.Dock="Top">
+                <TextBox.KeyBindings>
+                  <KeyBinding Gesture="Enter" Command="{CompiledBinding ApplyChangesCommand}" />
+                </TextBox.KeyBindings>
+              </TextBox>
+            </DockPanel>
+          </DataTemplate>
+          <DataTemplate x:DataType="viewModels:FloatCellEditorViewModel" DataType="viewModels:FloatCellEditorViewModel">
+            <DockPanel LastChildFill="False">
+              <TextBlock Margin="0,0,0,5" DockPanel.Dock="Top">Value:</TextBlock>
+              <TextBox Text="{CompiledBinding Value}" IsReadOnly="{CompiledBinding IsReadOnly}" DockPanel.Dock="Top">
+                <TextBox.KeyBindings>
+                  <KeyBinding Gesture="Enter" Command="{CompiledBinding ApplyChangesCommand}" />
+                </TextBox.KeyBindings>
+              </TextBox>
+            </DockPanel>
+          </DataTemplate>
+          <DataTemplate x:DataType="viewModels:DoubleCellEditorViewModel" DataType="viewModels:DoubleCellEditorViewModel">
+            <DockPanel LastChildFill="False">
+              <TextBlock Margin="0,0,0,5" DockPanel.Dock="Top">Value:</TextBlock>
+              <TextBox Text="{CompiledBinding Value}" IsReadOnly="{CompiledBinding IsReadOnly}" DockPanel.Dock="Top">
+                <TextBox.KeyBindings>
+                  <KeyBinding Gesture="Enter" Command="{CompiledBinding ApplyChangesCommand}" />
+                </TextBox.KeyBindings>
+              </TextBox>
+            </DockPanel>
+          </DataTemplate>
+          <DataTemplate x:DataType="viewModels:MySqlDateTimeCellEditorViewModel" DataType="viewModels:MySqlDateTimeCellEditorViewModel">
+            <DockPanel LastChildFill="False">
+              <TextBlock Margin="0,0,0,5" DockPanel.Dock="Top">Value:</TextBlock>
+              <TextBox DockPanel.Dock="Top" IsReadOnly="{CompiledBinding IsReadOnly}" Text="{CompiledBinding DateTimeAsString}" />
+            </DockPanel>
+          </DataTemplate>
+          <DataTemplate x:DataType="viewModels:TimeSpanCellEditorViewModel" DataType="viewModels:TimeSpanCellEditorViewModel">
+            <DockPanel LastChildFill="False">
+              <TextBlock Margin="0,0,0,5" DockPanel.Dock="Top">Value:</TextBlock>
+              <TextBox DockPanel.Dock="Top" IsReadOnly="{CompiledBinding IsReadOnly}" Text="{CompiledBinding TimeAsString}" />
+            </DockPanel>
+          </DataTemplate>
+          <DataTemplate x:DataType="viewModels:StringCellEditorViewModel" DataType="viewModels:StringCellEditorViewModel">
+            <DockPanel>
+              <TextBlock Margin="0,0,0,5" DockPanel.Dock="Top">Value:</TextBlock>
+
+              <DockPanel DockPanel.Dock="Bottom" LastChildFill="False">
+                <TextBlock DockPanel.Dock="Right" Text="{CompiledBinding Length, StringFormat=Length: {0}}" />
+                <TextBlock DockPanel.Dock="Left" Text="Looks like text is too long" TextWrapping="WrapWithOverflow" IsVisible="{CompiledBinding IsTooLong}" />
+              </DockPanel>
+              
+              <avaloniaEdit:TextEditor IsReadOnly="{CompiledBinding IsReadOnly}" Document="{CompiledBinding Document}" />
+            </DockPanel>
+          </DataTemplate>
+          <DataTemplate x:DataType="viewModels:BinaryCellEditorViewModel" DataType="viewModels:BinaryCellEditorViewModel">
+            <DockPanel KeyboardNavigation.TabNavigation="Local">
+              <TextBlock Margin="0,0,0,5" DockPanel.Dock="Top">Value:</TextBlock>
+
+              <DockPanel TabIndex="2" DockPanel.Dock="Bottom" LastChildFill="False">
+                <Button DockPanel.Dock="Left" Command="{CompiledBinding LoadCommand}">Load</Button>
+                <Button DockPanel.Dock="Left" Command="{CompiledBinding SaveCommand}">Save</Button>
+                <NumericUpDown DockPanel.Dock="Right" IsReadOnly="{CompiledBinding IsReadOnly}" Text="{CompiledBinding}">
+                  <Interaction.Behaviors>
+                    <behaviors:NumericUpDownLostFocusUpdateBindingBehavior Value="{CompiledBinding Length}" />
+                  </Interaction.Behaviors>
+                </NumericUpDown>
+              </DockPanel>
+              
+              <HexViewControl TabIndex="1" IsReadOnly="{CompiledBinding IsReadOnly}" TextBlock.FontFamily="{DynamicResource MonoFont}" Bytes="{CompiledBinding Bytes}" />
+            </DockPanel>
+          </DataTemplate>
+        </ContentControl.DataTemplates>
+        
+      </ContentControl>
+    </DockPanel>
+  </Panel>
+</UserControl>

@@ -1,4 +1,5 @@
 using System;
+using System.Reflection.Metadata;
 using AvaloniaEdit.Document;
 using WDE.SqlWorkbench.Models;
 using WDE.SqlWorkbench.Models.DataTypes;
@@ -16,7 +17,8 @@ internal class StringCellEditorViewModel : BaseCellEditorViewModel
     
     public int Length => Document.TextLength;
     
-    public StringCellEditorViewModel(string? mySqlType, StringSparseColumnData overrideData, StringColumnData data, int rowIndex, bool nullable) : base(mySqlType, overrideData, data, rowIndex, nullable)
+    public StringCellEditorViewModel(string? mySqlType, StringSparseColumnData overrideData, StringColumnData data, int rowIndex, bool nullable, bool readOnly) 
+        : base(mySqlType, overrideData, data, rowIndex, nullable, readOnly)
     {
         this.overrideData = overrideData;
         if (MySqlType.TryParse(mySqlType, out var type)

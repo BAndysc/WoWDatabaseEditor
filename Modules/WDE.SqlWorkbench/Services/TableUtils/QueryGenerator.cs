@@ -26,7 +26,7 @@ internal class QueryGenerator : IQueryGenerator
         sb.AppendLine("SELECT");
         sb.Append("    ");
         sb.AppendLine(string.Join(",\n    ", columns.Select(x => $"`{x.Name}`")));
-        sb.AppendLine($"FROM `{schema}`.`{table}`");
+        sb.AppendLine($"FROM `{schema}`.`{table}`;");
         return sb.ToString();
     }
 

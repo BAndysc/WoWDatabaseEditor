@@ -19,13 +19,17 @@
                 HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
                 VerticalAlignment="{TemplateBinding VerticalAlignment}">
           <DockPanel>
-            <ItemsPresenter Name="PART_ItemsPresenter"
-                            Items="{TemplateBinding Items}"
-                            ItemsPanel="{TemplateBinding ItemsPanel}"
-                            ItemTemplate="{TemplateBinding ItemTemplate}"
-                            Margin="0,0,0,-1"
-                            ZIndex="1"
-                            DockPanel.Dock="{TemplateBinding TabStripPlacement}"/>
+            <DockPanel DockPanel.Dock="{TemplateBinding TabStripPlacement}" KeyboardNavigation.TabNavigation="Local">
+              <!-- Used in MySqlWorkbench -->
+              <ContentControl DockPanel.Dock="Right" Content="{TemplateBinding Tag}" TabIndex="2" />
+              <ItemsPresenter Name="PART_ItemsPresenter"
+                              Items="{TemplateBinding Items}"
+                              ItemsPanel="{TemplateBinding ItemsPanel}"
+                              ItemTemplate="{TemplateBinding ItemTemplate}"
+                              Margin="0,0,0,-1"
+                              ZIndex="1"
+                              TabIndex="1"/>
+            </DockPanel>
             <Border Name="PART_SelectedContentHostBorder" ZIndex="0" 
                     BorderBrush="{DynamicResource TabControlBorder}"
                     BorderThickness="0,1,0,0"

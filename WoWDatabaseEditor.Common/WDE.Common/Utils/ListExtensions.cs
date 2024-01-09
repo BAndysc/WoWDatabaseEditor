@@ -94,17 +94,19 @@ namespace WDE.Common.Utils
             return ((IList<T>)list).IndexIf(pred);
         }
 
-        public static T? RemoveIf<T>(this IList<T> list, Func<T, bool> pred)
+        public static int RemoveIf<T>(this IList<T> list, Func<T, bool> pred)
         {
+            int removed = 0;
             for (int i = list.Count - 1; i >= 0; i--)
             {
                 if (pred(list[i]))
                 {
                     list.RemoveAt(i);
+                    removed++;
                 }
             }
 
-            return default;
+            return removed;
         }
 
         public static int IndexOf<T>(this IReadOnlyList<T> list, T item)

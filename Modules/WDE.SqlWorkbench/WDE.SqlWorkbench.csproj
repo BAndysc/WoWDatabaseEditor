@@ -21,7 +21,7 @@
         </PackageReference>
         <PackageReference Include="Markdown.Avalonia" Version="0.10.14" />
         <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="8.0.0" />
-        <PackageReference Include="MySqlConnector" Version="2.1.0" />
+        <PackageReference Include="MySqlConnector" Version="2.1.7" />
         <PackageReference Include="OmniSharp.Extensions.LanguageClient" Version="0.19.9" />
         <PackageReference Include="OmniSharp.Extensions.LanguageProtocol" Version="0.19.9" />
     </ItemGroup>

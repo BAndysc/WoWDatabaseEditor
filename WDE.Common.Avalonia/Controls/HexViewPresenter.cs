@@ -101,6 +101,9 @@ public class HexViewControl : TemplatedControl
     public static readonly StyledProperty<bool> CaretInAsciiProperty =
         AvaloniaProperty.Register<HexViewControl, bool>(nameof(CaretInAscii), defaultBindingMode: BindingMode.TwoWay);
     
+    public static readonly StyledProperty<bool> IsReadOnlyProperty =
+        AvaloniaProperty.Register<HexViewControl, bool>(nameof(IsReadOnly));
+
     public CopyOnWriteMemory<byte> Bytes
     {
         get => GetValue(BytesProperty);
@@ -141,6 +144,12 @@ public class HexViewControl : TemplatedControl
     {
         get => GetValue(CaretInAsciiProperty);
         set => SetValue(CaretInAsciiProperty, value);
+    }
+    
+    public bool IsReadOnly
+    {
+        get => GetValue(IsReadOnlyProperty);
+        set => SetValue(IsReadOnlyProperty, value);
     }
 
     static HexViewControl()
@@ -218,6 +227,9 @@ public class HexViewPresenter : Control, ILogicalScrollable
     
     public static readonly StyledProperty<bool> CaretInAsciiProperty =
         HexViewControl.CaretInAsciiProperty.AddOwner<HexViewPresenter>();
+    
+    public static readonly StyledProperty<bool> IsReadOnlyProperty =
+        HexViewControl.IsReadOnlyProperty.AddOwner<HexViewPresenter>();
 
     private volatile bool updating;
     private DispatcherTimer? caretTimer;
@@ -282,6 +294,12 @@ public class HexViewPresenter : Control, ILogicalScrollable
     {
         get => GetValue(CaretInAsciiProperty);
         set => SetValue(CaretInAsciiProperty, value);
+    }
+    
+    public bool IsReadOnly
+    {
+        get => GetValue(IsReadOnlyProperty);
+        set => SetValue(IsReadOnlyProperty, value);
     }
 
     static HexViewPresenter()
@@ -441,6 +459,9 @@ public class HexViewPresenter : Control, ILogicalScrollable
 
         var pasteCommand = new AsyncAutoCommand(async () =>
         {
+            if (IsReadOnly)
+                return;
+            
             var text = await AvaloniaLocator.Current.GetRequiredService<IClipboard>().GetTextAsync();
             if (text == null)
                 return;
@@ -473,7 +494,7 @@ public class HexViewPresenter : Control, ILogicalScrollable
                 if (SelectionStart == SelectionEnd || caretIndex >= SelectionEnd)
                     SelectionStart = SelectionEnd = caretIndex;
             }
-        });
+        }, () => !IsReadOnly);
         
         var selectAllCommand = new DelegateCommand(() =>
         {
@@ -871,6 +892,9 @@ public class HexViewPresenter : Control, ILogicalScrollable
     {
         base.OnTextInput(e);
 
+        if (IsReadOnly)
+            return;
+
         if (CaretInAscii && e.Text != null)
         {
             var bytes = Encoding.UTF8.GetBytes(e.Text);
@@ -977,6 +1001,9 @@ public class HexViewPresenter : Control, ILogicalScrollable
                 
                 if (b.HasValue)
                 {
+                    if (IsReadOnly)
+                        return;
+
                     var currentByte = Bytes[caretIndex];
                     if (!updatedLowNibble)
                     {
@@ -988,6 +1015,7 @@ public class HexViewPresenter : Control, ILogicalScrollable
                     {
                         currentByte = (byte)(currentByte << 4 | b.Value);
                         Bytes[caretIndex] = currentByte;
+                        InvalidateVisual();
                         CaretIndex++;
                         if (SelectionStart == SelectionEnd || caretIndex >= SelectionEnd)
                             SelectionStart = SelectionEnd = caretIndex;

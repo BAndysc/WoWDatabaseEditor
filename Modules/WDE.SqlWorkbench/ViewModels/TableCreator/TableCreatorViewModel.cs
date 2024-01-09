@@ -263,7 +263,7 @@ internal partial class TableCreatorViewModel : ObservableBase, IDocument, IDropT
         var tableInfo = originalTableInfo.Value;
         List<string> alterOptions = new();
 
-        var currentPrimaryKey = Columns.Where(x => x.PrimaryKey).ToList();
+        var currentPrimaryKey = Columns.Where(x => x.PrimaryKey).OrderByDescending(x => x.AutoIncrement).ToList();
         bool primaryKeyChanged = !currentPrimaryKey.SequenceEqual(originalPrimaryKey);
         
         foreach (var deleted in deletedColumns)
@@ -392,7 +392,7 @@ internal partial class TableCreatorViewModel : ObservableBase, IDocument, IDropT
         }
 
         if (Columns.Any(x => x.PrimaryKey))
-            features.Add("PRIMARY KEY (" + string.Join(", ", Columns.Where(x => x.PrimaryKey).Select(x => $"`{x.ColumnName}`")) + ")");
+            features.Add("PRIMARY KEY (" + string.Join(", ", Columns.Where(x => x.PrimaryKey).OrderByDescending(x => x.AutoIncrement).Select(x => $"`{x.ColumnName}`")) + ")");
 
         foreach (var index in Indexes)
         {
@@ -447,8 +447,6 @@ internal partial class TableCreatorViewModel : ObservableBase, IDocument, IDropT
             var vm = new ColumnViewModel(columnDef, Charsets);
             Columns.Add(vm);
         }
-        originalPrimaryKey.AddRange(Columns.Where(x => x.PrimaryKey));
-        
         var indexes = await session.GetIndexesAsync(schema.Name, tableName, default);
         foreach (var (name, entries) in indexes)
         {
@@ -460,6 +458,9 @@ internal partial class TableCreatorViewModel : ObservableBase, IDocument, IDropT
             Indexes.Add(index);
             SelectedIndex = index;
         }
+
+        if (indexes.TryGetValue("PRIMARY", out var primaryKey))
+            originalPrimaryKey.AddRange(primaryKey.OrderBy(x => x.SeqInIndex).Select(x => Columns.First(col => col.ColumnName == x.ColumnName)));
     }
     
     private async Task LoadEnginesAndCharsetsAsync(IMySqlSession session)

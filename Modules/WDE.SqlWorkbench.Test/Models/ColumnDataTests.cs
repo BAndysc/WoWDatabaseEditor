@@ -349,9 +349,31 @@ public class ColumnDataTests
         data.AddRange(new object?[]{ null, 
             new MySqlDateTime(0, 0, 0, 0, 0, 0, 0), 
             null, 
-            new MySqlDateTime(2020, 5, 12, 23, 59, 59, 0)
+            new MySqlDateTime(2020, 5, 12, 23, 59, 59, 1)
         });
-        var column = new MySqlDateTimeColumnData();
+        var column = new MySqlDateTimeColumnData("datetime");
+        for (int i = 0; i < data.Count; ++i)
+            column.Append(reader, i);
+        
+        Assert.IsTrue(column.IsNull(0));
+        Assert.IsFalse(column.IsNull(1));
+        Assert.IsTrue(column.IsNull(2));
+        Assert.IsFalse(column.IsNull(3));
+        Assert.AreEqual("0000-00-00 00:00:00", column.GetToString(1));
+        Assert.AreEqual("2020-05-12 23:59:59.000001", column.GetToString(3));
+        Assert.AreEqual(ColumnTypeCategory.DateTime, column.Category);
+    }
+    
+    [Test]
+    public void TestMySqlDate()
+    {
+        reader.GetMySqlDateTime(default).ReturnsForAnyArgs(x => data[x.Arg<int>()]);
+        data.AddRange(new object?[]{ null, 
+            new MySqlDateTime(0, 0, 0, 0, 0, 0, 0), 
+            null, 
+            new MySqlDateTime(2020, 5, 12, 23, 59, 59, 1)
+        });
+        var column = new MySqlDateTimeColumnData("date");
         for (int i = 0; i < data.Count; ++i)
             column.Append(reader, i);
         
@@ -360,7 +382,7 @@ public class ColumnDataTests
         Assert.IsTrue(column.IsNull(2));
         Assert.IsFalse(column.IsNull(3));
         Assert.AreEqual("0000-00-00", column.GetToString(1));
-        Assert.AreEqual("2020-05-12 23:59:59", column.GetToString(3));
+        Assert.AreEqual("2020-05-12", column.GetToString(3));
         Assert.AreEqual(ColumnTypeCategory.DateTime, column.Category);
     }
 }

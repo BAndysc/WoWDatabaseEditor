@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using MySqlConnector;
+using WDE.SqlWorkbench.Models.DataTypes;
+using WDE.SqlWorkbench.Utils;
 
 namespace WDE.SqlWorkbench.Models;
 
@@ -11,7 +13,10 @@ internal class MySqlDateTimeColumnData : IColumnData
     private readonly BitArray nulls = new (0);
     
     public bool HasRow(int rowIndex) => rowIndex < data.Count;
-        
+
+    private bool dateOnly;
+    private string? mySqlDataType;
+    
     public int AppendNull()
     {
         if (data.Count == nulls.Length)
@@ -46,11 +51,8 @@ internal class MySqlDateTimeColumnData : IColumnData
             return null;
         
         var date = data[rowIndex];
-        
-        if (date.IsValidDateTime)
-            return date.GetDateTime().ToString("yyyy-MM-dd HH:mm:ss");
-        
-        return "0000-00-00";
+
+        return date.ToPrettyString(dateOnly);
     }
 
     public bool IsNull(int rowIndex) => nulls[rowIndex];
@@ -65,6 +67,37 @@ internal class MySqlDateTimeColumnData : IColumnData
     
     public ColumnTypeCategory Category => ColumnTypeCategory.DateTime;
     
+    private static readonly Regex DateTimeRegex = new Regex(@"^(\d{4})-(\d{2})-(\d{2})(?: +(\d{2}):(\d{2})(?::(\d{2})(?:\.(\d+))?)?)?$");
+
+    public MySqlDateTimeColumnData(string? mySqlDataType)
+    {
+        this.mySqlDataType = mySqlDataType;
+        if (mySqlDataType != null && MySqlType.TryParse(mySqlDataType, out var type) && type.Kind == MySqlTypeKind.Date)
+        {
+            dateOnly = type.AsDate()!.Value.Kind == DateTimeDataTypeKind.Date;
+        }
+    }
+
+    public static bool TryParse(string str, out MySqlDateTime dateTime)
+    {
+        if (DateTimeRegex.Match(str) is {Success: true} match)
+        {
+            var year = int.Parse(match.Groups[1].Value);
+            var month = int.Parse(match.Groups[2].Value);
+            var day = int.Parse(match.Groups[3].Value);
+            var hour = match.Groups[4].Success ? int.Parse(match.Groups[4].Value) : 0;
+            var minute = match.Groups[5].Success ? int.Parse(match.Groups[5].Value) : 0;
+            var second = match.Groups[6].Success ? int.Parse(match.Groups[6].Value) : 0;
+            var microSecond = match.Groups[7].Success ? int.Parse(match.Groups[7].Value.PadRight(6, '0')) : 0;
+            
+            dateTime = new MySqlDateTime(year, month, day, hour, minute, second, microSecond);
+            return true;
+        }
+
+        dateTime = default;
+        return false;
+    }
+    
     public bool TryOverride(int rowIndex, string? str, out string? error)
     {
         if (str == null)
@@ -74,27 +107,16 @@ internal class MySqlDateTimeColumnData : IColumnData
             return true;
         }
 
-        var datetime = new Regex(@"^(\d{4})-(\d{2})-(\d{2})(?: (\d{2}):(\d{2}):(\d{2})(?:\.(\d+))?)?$");
-        var match = datetime.Match(str);
-        
-        if (match.Success)
+        if (TryParse(str, out var dateTime))
         {
-            var year = int.Parse(match.Groups[1].Value);
-            var month = int.Parse(match.Groups[2].Value);
-            var day = int.Parse(match.Groups[3].Value);
-            var hour = match.Groups[4].Success ? int.Parse(match.Groups[4].Value) : 0;
-            var minute = match.Groups[5].Success ? int.Parse(match.Groups[5].Value) : 0;
-            var second = match.Groups[6].Success ? int.Parse(match.Groups[6].Value) : 0;
-            var microSecond = match.Groups[7].Success ? int.Parse(match.Groups[7].Value) : 0;
-            
-            Override(rowIndex, new MySqlDateTime(year, month, day, hour, minute, second, microSecond));
+            Override(rowIndex, dateTime);
             error = null;
             return true;
         }
-        
-        error = "Invalid datetime format";
+
+        error = "Invalid datetime format: YYYY-MM-DD HH:MM:SS";
         return false;
     }
     
-    public IColumnData CloneEmpty() => new MySqlDateTimeColumnData();
+    public IColumnData CloneEmpty() => new MySqlDateTimeColumnData(mySqlDataType);
 }

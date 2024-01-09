@@ -138,7 +138,9 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, ISolutionItemDocu
     public List<int> Limits { get; } = new List<int>() { 100, 1_000, 5_000, 10_000, 50_000, 500_000 };
 
     private IDisposable? connectionDisposable;
-    
+
+    public IWindowManager WindowManager { get; }
+
     public IConnection Connection
     {
         get => connection;
@@ -205,6 +207,7 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, ISolutionItemDocu
         this.queryUtility = queryUtility;
         Preferences = preferences;
         this.connectionsManager = connectionsManager;
+        WindowManager = windowManager;
         Connection = connection;
         Document = new TextDocument();
         textMarkerService = new TextMarkerService(Document);
@@ -735,7 +738,17 @@ internal partial class SqlWorkbenchViewModel : ObservableBase, ISolutionItemDocu
                 }
                 else
                 {
-                    result.UpdateResults(in res);
+                    IReadOnlyList<ColumnInfo>? columns = null;
+                    if (isSelect && result is SelectSingleTableViewModel singleTable)
+                    {
+                        var schema = select.From.Schema;
+                        if (schema == null)
+                            schema = await executor.GetCurrentDatabaseAsync(cancellationToken);
+                        if (schema == null)
+                            throw new Exception("Weird error. Just invoked a SELECT, but current database is null, but the query didn't specify the database? Pls report that.");
+                        columns = await executor.GetTableColumnsAsync(schema, select.From.Table, cancellationToken);
+                    }
+                    result.UpdateResults(in res, columns);
                 }
                 action.Response = $"{res.AffectedRows} row(s) returned";
             }

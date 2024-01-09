@@ -27,7 +27,8 @@ internal class FloatCellEditorViewModel : BaseCellEditorViewModel
         }
     }
 
-    public FloatCellEditorViewModel(string? mySqlType, FloatSparseColumnData overrideData, FloatColumnData data, int rowIndex, bool nullable) : base(mySqlType, overrideData, data, rowIndex, nullable)
+    public FloatCellEditorViewModel(string? mySqlType, FloatSparseColumnData overrideData, FloatColumnData data, int rowIndex, bool nullable, bool readOnly) 
+        : base(mySqlType, overrideData, data, rowIndex, nullable, readOnly)
     {
         this.overrideData = overrideData;
         value = overrideData.HasRow(rowIndex) ? overrideData[rowIndex] : data[rowIndex];

@@ -51,7 +51,8 @@ internal class DecimalCellEditorViewModel : BaseCellEditorViewModel
     
     public bool HasMinMaxValues => maxValue.HasValue || minValue.HasValue;
 
-    public DecimalCellEditorViewModel(string? mySqlType, DecimalSparseColumnData overrideData, DecimalColumnData data, int rowIndex, bool nullable) : base(mySqlType, overrideData, data, rowIndex, nullable)
+    public DecimalCellEditorViewModel(string? mySqlType, DecimalSparseColumnData overrideData, DecimalColumnData data, int rowIndex, bool nullable, bool readOnly) 
+        : base(mySqlType, overrideData, data, rowIndex, nullable, readOnly)
     {
         this.overrideData = overrideData;
         DecimalPlaces = 0;

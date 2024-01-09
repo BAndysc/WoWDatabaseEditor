@@ -58,7 +58,7 @@ internal class RawMySqlConnection : IRawMySqlConnection, IAsyncDisposable
                     columnNames[i] = schema[i].ColumnName;
                     columnTypes[i] = schema[i].DataType;
                     var dataType = schema[i].DataType;
-                    columnData[i] = IColumnData.CreateTypedColumn(dataType);
+                    columnData[i] = IColumnData.CreateTypedColumn(dataType, schema[i].DataTypeName);
                 }
 
                 int rows = 0;

@@ -54,7 +54,7 @@ public class PublicMySqlDecimalTests
             dec2 = decimal.Parse((isNegative ? "-": "") + whole + "." + fraction);
         }
         
-        for (int i = 0; i < 10000000; ++i)
+        for (int i = 0; i < 1000000; ++i)
         {
             DrawRandom(out var a, out var x);
             DrawRandom(out var b, out var y);

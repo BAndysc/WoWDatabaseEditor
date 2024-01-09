@@ -158,7 +158,7 @@
     
     <GridSplitter Classes="horizontal" Grid.Row="1" />
     
-    <TabControl Grid.Row="2" IsVisible="{CompiledBinding HasAnyResults}" Items="{CompiledBinding Results}" SelectedItem="{CompiledBinding SelectedResult}">
+    <TabControl Padding="0" Grid.Row="2" IsVisible="{CompiledBinding HasAnyResults}" Items="{CompiledBinding Results}" SelectedItem="{CompiledBinding SelectedResult}">
       <TabControl.Styles>
         <Style Selector="TabItem">
           <Setter Property="ContextMenu">
@@ -178,6 +178,9 @@
           <Setter Property="Opacity" Value="1" />
         </Style>
       </TabControl.Styles>
+      <TabControl.Tag>
+        <ImageToggleButton ImageChecked="Icons/icon_collapse_mono.png" ImageUnchecked="Icons/icon_expand_mono.png" ToolTip.Tip="Toggle cell editor" IsChecked="{CompiledBinding SelectedResult.ShowCellEditor, FallbackValue=False}" VerticalAlignment="Center" Width="20" Height="20" Padding="1" />
+      </TabControl.Tag>
       <TabControl.ItemTemplate>
         <DataTemplate x:DataType="viewModels:SelectResultsViewModel">
           <DockPanel LastChildFill="False">

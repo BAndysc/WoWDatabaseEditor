@@ -149,4 +149,14 @@ internal class UserQuestionsService : IUserQuestionsService
             .WithOkButton(true)
             .Build());
     }
+
+    public async Task InformLoadedFileTrimmedAsync(int trimmedLength)
+    {
+        await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
+            .SetTitle("Warning")
+            .SetMainInstruction("The file was trimmed")
+            .SetContent($"The file was trimmed to {trimmedLength} bytes, because that's the column width.")
+            .WithOkButton(true)
+            .Build());
+    }
 }

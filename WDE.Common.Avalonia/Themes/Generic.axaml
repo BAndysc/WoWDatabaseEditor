@@ -194,6 +194,7 @@
                             CaretIndex="{TemplateBinding CaretIndex, Mode=TwoWay}"
                             CaretBlinkInterval="{TemplateBinding CaretBlinkInterval}"
                             CaretInAscii="{TemplateBinding CaretInAscii, Mode=TwoWay}"
+                            IsReadOnly="{TemplateBinding IsReadOnly}"
                             TextBlock.Foreground="{TemplateBinding Foreground}"
                             TextBlock.FontSize="{TemplateBinding FontSize}"
                             TextBlock.FontFamily="{TemplateBinding FontFamily}"

@@ -94,7 +94,7 @@ ORDER BY
     {
         var vm = containerProvider.Resolve<SqlWorkbenchViewModel>((typeof(IConnection), connection), (typeof(QueryDocumentSolutionItem), CreateSolutionItem(connection)));
         vm.Title = $"{tableName} @ {schema}";
-        vm.Document.Text = $"SELECT * FROM `{schema}`.`{tableName}`";
+        vm.Document.Text = $"SELECT * FROM `{schema}`.`{tableName}`;";
         vm.Document.UndoStack.MarkAsOriginalFile();
         vm.ExecuteAllCommand.Execute(null);
         documentManager.OpenDocument(vm);

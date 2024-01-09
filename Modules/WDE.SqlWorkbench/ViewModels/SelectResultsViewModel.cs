@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -42,6 +43,7 @@ internal partial class SelectResultsViewModel : ObservableBase
     [Notify] [AlsoNotify(nameof(Count), nameof(IsModified))] private int additionalRowsCount;
     [Notify] private bool requestRender;
     [Notify] private BaseCellEditorViewModel? cellEditor;
+    [Notify] private bool showCellEditor;
     private Guid originalConnectionId;
     
     public bool IsModified => alteredRows.Count > 0 || deletedRows.Count > 0 || additionalRowsCount > 0;
@@ -50,17 +52,41 @@ internal partial class SelectResultsViewModel : ObservableBase
     
     public IMultiIndexContainer Selection { get; } = new MultiIndexContainer();
     public string Title { get; protected set; }
-    public IReadOnlyList<ITableColumnHeader> Columns { get; }
+    public IReadOnlyList<ITableColumnHeader> Columns { get; private set; } = Array.Empty<ITableColumnHeader>();
     
     public bool ColumnsHeaderAlreadySetAutoSizeWidth { get; set; }
     
     public int Count => Results.AffectedRows + AdditionalRowsCount;
     
     public TableController TableController { get; }
-    
-    public SelectResult Results { get; protected set; }
-    
-    public ISparseColumnData[] ColumnsOverride { get; }
+
+    private SelectResult results;
+    public SelectResult Results
+    {
+        get => results;
+        protected set
+        {
+            results = value;
+            var previousWidths = Columns.Select(x => x.Width).ToArray();
+            Columns = results.ColumnNames.Select((x, index) => new TableTableColumnHeader(x, index + 1 < previousWidths.Length ? previousWidths[index + 1] : 120)).Prepend(new TableTableColumnHeader("#", previousWidths.Length > 0 ? previousWidths[0] : 50)).ToArray();
+            RaisePropertyChanged(nameof(Columns));
+            ColumnsOverride = new ISparseColumnData[Results.Columns.Length];
+            for (int i = 0; i < Results.Columns.Length; ++i)
+            {
+                int cellIndex = i + 1; // +1, because 0 is # column
+                ColumnsOverride[i] = ISparseColumnData.Create(Results.Columns[i]!.CloneEmpty());
+                ColumnsOverride[i].OnRowOverriden += rowIndex =>
+                {
+                    alteredRows.Add(rowIndex);
+                    overridenCells.Add((rowIndex, cellIndex));
+                    UpdateView();
+                };
+            }
+            Debug.Assert(ColumnsOverride != null);
+        }
+    }
+
+    public ISparseColumnData[] ColumnsOverride { get; private set; } = null!;
     
     public virtual ImageUri Icon => new("Icons/icon_mini_view_big.png");
     
@@ -70,28 +96,15 @@ internal partial class SelectResultsViewModel : ObservableBase
     public ICommand CopyInsertCommand { get; }
     public IAsyncCommand RefreshCommand { get; }
     public IAsyncCommand CreateViewCommand { get; }
-    
+
     public SelectResultsViewModel(SqlWorkbenchViewModel vm, IActionOutput action, in SelectResult results)
     {
         this.vm = vm;
         originalConnectionId = vm.Connection?.ConnectionData.Id ?? Guid.Empty;
         Results = results;
-        ColumnsOverride = new ISparseColumnData[results.Columns.Length];
-        for (int i = 0; i < results.Columns.Length; ++i)
-        {
-            int cellIndex = i + 1; // +1, because 0 is # column
-            ColumnsOverride[i] = ISparseColumnData.Create(results.Columns[i]!.CloneEmpty());
-            ColumnsOverride[i].OnRowOverriden += rowIndex =>
-            {
-                alteredRows.Add(rowIndex);
-                overridenCells.Add((rowIndex, cellIndex));
-                UpdateView();
-            };
-        }
         
         TableController = new TableController(this);
         Title = $"Query {action.Index}";
-        Columns = results.ColumnNames.Select(x => new TableTableColumnHeader(x)).Prepend(new TableTableColumnHeader("#", 50)).ToArray();
         
         CopyInsertCommand = new DelegateCommand(() =>
         {
@@ -167,9 +180,17 @@ internal partial class SelectResultsViewModel : ObservableBase
     protected virtual bool IsColumnNullable(int columnIndex) => false;
 
     protected virtual string? ColumnType(int columnIndex) => null;
-
+    
+    protected virtual bool CanEditRow(int rowIndex) => false;
+    
     private void UpdateCellEditor()
     {
+        if (Selection.MoreThanOne)
+        {
+            CellEditor = null;
+            return;
+        }
+        
         if (selectedCellIndex <= 0 || selectedCellIndex - 1 >= Results.Columns.Length)
         {
             CellEditor = null;
@@ -188,36 +209,38 @@ internal partial class SelectResultsViewModel : ObservableBase
         var overrideColumn = ColumnsOverride[selectedCellIndex - 1];
         BaseCellEditorViewModel? cellEditor = null;
 
+        var isReadOnly = !CanEditRow(selectedRowIndex);
+        
         if (column is ByteColumnData b)
-            cellEditor = new UnsignedIntegerCellEditorViewModel(type, (ByteSparseColumnData)overrideColumn, b, selectedRowIndex, isNullable);
+            cellEditor = new UnsignedIntegerCellEditorViewModel(type, (ByteSparseColumnData)overrideColumn, b, selectedRowIndex, isNullable, isReadOnly);
         else if (column is UInt16ColumnData u)
-            cellEditor = new UnsignedIntegerCellEditorViewModel(type, (UInt16SparseColumnData)overrideColumn, u, selectedRowIndex, isNullable);
+            cellEditor = new UnsignedIntegerCellEditorViewModel(type, (UInt16SparseColumnData)overrideColumn, u, selectedRowIndex, isNullable, isReadOnly);
         else if (column is UInt32ColumnData u32)
-            cellEditor = new UnsignedIntegerCellEditorViewModel(type, (UInt32SparseColumnData)overrideColumn, u32, selectedRowIndex, isNullable);
+            cellEditor = new UnsignedIntegerCellEditorViewModel(type, (UInt32SparseColumnData)overrideColumn, u32, selectedRowIndex, isNullable, isReadOnly);
         else if (column is UInt64ColumnData u64)
-            cellEditor = new UnsignedIntegerCellEditorViewModel(type, (UInt64SparseColumnData)overrideColumn, u64, selectedRowIndex, isNullable);
+            cellEditor = new UnsignedIntegerCellEditorViewModel(type, (UInt64SparseColumnData)overrideColumn, u64, selectedRowIndex, isNullable, isReadOnly);
         else if (column is SByteColumnData sb)
-            cellEditor = new SignedIntegerCellEditorViewModel(type, (SByteSparseColumnData)overrideColumn, sb, selectedRowIndex, isNullable);
+            cellEditor = new SignedIntegerCellEditorViewModel(type, (SByteSparseColumnData)overrideColumn, sb, selectedRowIndex, isNullable, isReadOnly);
         else if (column is Int16ColumnData i16)
-            cellEditor = new SignedIntegerCellEditorViewModel(type, (Int16SparseColumnData)overrideColumn, i16, selectedRowIndex, isNullable);
+            cellEditor = new SignedIntegerCellEditorViewModel(type, (Int16SparseColumnData)overrideColumn, i16, selectedRowIndex, isNullable, isReadOnly);
         else if (column is Int32ColumnData i32)
-            cellEditor = new SignedIntegerCellEditorViewModel(type, (Int32SparseColumnData)overrideColumn, i32, selectedRowIndex, isNullable);
+            cellEditor = new SignedIntegerCellEditorViewModel(type, (Int32SparseColumnData)overrideColumn, i32, selectedRowIndex, isNullable, isReadOnly);
         else if (column is Int64ColumnData i64)
-            cellEditor = new SignedIntegerCellEditorViewModel(type, (Int64SparseColumnData)overrideColumn, i64, selectedRowIndex, isNullable);
+            cellEditor = new SignedIntegerCellEditorViewModel(type, (Int64SparseColumnData)overrideColumn, i64, selectedRowIndex, isNullable, isReadOnly);
         else if (column is DecimalColumnData dec)
-            cellEditor = new DecimalCellEditorViewModel(type, (DecimalSparseColumnData)overrideColumn, dec, selectedRowIndex, isNullable);
+            cellEditor = new DecimalCellEditorViewModel(type, (DecimalSparseColumnData)overrideColumn, dec, selectedRowIndex, isNullable, isReadOnly);
         else if (column is FloatColumnData f)
-            cellEditor = new FloatCellEditorViewModel(type, (FloatSparseColumnData)overrideColumn, f, selectedRowIndex, isNullable);
+            cellEditor = new FloatCellEditorViewModel(type, (FloatSparseColumnData)overrideColumn, f, selectedRowIndex, isNullable, isReadOnly);
         else if (column is DoubleColumnData d)
-            cellEditor = new DoubleCellEditorViewModel(type, (DoubleSparseColumnData)overrideColumn, d, selectedRowIndex, isNullable);
+            cellEditor = new DoubleCellEditorViewModel(type, (DoubleSparseColumnData)overrideColumn, d, selectedRowIndex, isNullable, isReadOnly);
         else if (column is StringColumnData s)
-            cellEditor = new StringCellEditorViewModel(type, (StringSparseColumnData)overrideColumn, s, selectedRowIndex, isNullable);
-        // else if (column is DateTimeColumnData dt)
-        //     cellEditor = new DateTimeCellEditorViewModel(dt, selectedRowIndex, isNullable);
+            cellEditor = new StringCellEditorViewModel(type, (StringSparseColumnData)overrideColumn, s, selectedRowIndex, isNullable, isReadOnly);
+        else if (column is MySqlDateTimeColumnData dt)
+            cellEditor = new MySqlDateTimeCellEditorViewModel(type, (MySqlDateTimeSparseColumnData)overrideColumn, dt, selectedRowIndex, isNullable, isReadOnly);
+        else if (column is TimeSpanColumnData ts)
+             cellEditor = new TimeSpanCellEditorViewModel(type, (TimeSpanSparseColumnData)overrideColumn, ts, selectedRowIndex, isNullable, isReadOnly);
         else if (column is BinaryColumnData bin)
-            cellEditor = new BinaryCellEditorViewModel(type, (BinarySparseColumnData)overrideColumn, bin, selectedRowIndex, isNullable);
-        // else if (column is GuidColumnData guid)
-        //     cellEditor = new GuidCellEditorViewModel(guid, selectedRowIndex, isNullable);
+            cellEditor = new BinaryCellEditorViewModel(vm.WindowManager, vm.UserQuestions, type, (BinarySparseColumnData)overrideColumn, bin, selectedRowIndex, isNullable, isReadOnly);
         else
             cellEditor = null;
 
@@ -309,14 +332,17 @@ internal partial class SelectResultsViewModel : ObservableBase
         UpdateView();
     }
 
-    public void UpdateResults(in SelectResult results)
+    public void UpdateResults(in SelectResult results, IReadOnlyList<ColumnInfo>? tableColumnsInfo)
     {
         Results = results;
+        ResultsUpdated(tableColumnsInfo);
         UpdateCellEditor();
         UpdateView();
         RaisePropertyChanged(nameof(Count));
         RaisePropertyChanged(nameof(Results));
     }
+    
+    protected virtual void ResultsUpdated(IReadOnlyList<ColumnInfo>? tableColumnsInfo) { }
 
     /// <summary>
     /// Returns full, not truncated, string representation of the value, not quoted, not escaped

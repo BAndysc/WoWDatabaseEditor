@@ -36,7 +36,8 @@ internal class SignedIntegerCellEditorViewModel : BaseCellEditorViewModel
     public long MaxValue => maxValue;
     public long MinValue => minValue;
 
-    public SignedIntegerCellEditorViewModel(string? mySqlType, SByteSparseColumnData overrideData, SByteColumnData data, int rowIndex, bool nullable) : base(mySqlType, overrideData, data, rowIndex, nullable)
+    public SignedIntegerCellEditorViewModel(string? mySqlType, SByteSparseColumnData overrideData, SByteColumnData data, int rowIndex, bool nullable, bool readOnly) 
+        : base(mySqlType, overrideData, data, rowIndex, nullable, readOnly)
     {
         overrideByte = overrideData;
         maxValue = sbyte.MaxValue;
@@ -44,7 +45,8 @@ internal class SignedIntegerCellEditorViewModel : BaseCellEditorViewModel
         value = overrideData.HasRow(rowIndex) ? overrideData[rowIndex] : data[rowIndex];
     }
     
-    public SignedIntegerCellEditorViewModel(string? mySqlType, Int16SparseColumnData overrideData, Int16ColumnData data, int rowIndex, bool nullable) : base(mySqlType, overrideData, data, rowIndex, nullable)
+    public SignedIntegerCellEditorViewModel(string? mySqlType, Int16SparseColumnData overrideData, Int16ColumnData data, int rowIndex, bool nullable, bool readOnly) 
+        : base(mySqlType, overrideData, data, rowIndex, nullable, readOnly)
     {
         overrideInt16 = overrideData;
         maxValue = short.MaxValue;
@@ -52,7 +54,8 @@ internal class SignedIntegerCellEditorViewModel : BaseCellEditorViewModel
         value = overrideData.HasRow(rowIndex) ? overrideData[rowIndex] : data[rowIndex];
     }
     
-    public SignedIntegerCellEditorViewModel(string? mySqlType, Int32SparseColumnData overrideData, Int32ColumnData data, int rowIndex, bool nullable) : base(mySqlType, overrideData, data, rowIndex, nullable)
+    public SignedIntegerCellEditorViewModel(string? mySqlType, Int32SparseColumnData overrideData, Int32ColumnData data, int rowIndex, bool nullable, bool readOnly) 
+        : base(mySqlType, overrideData, data, rowIndex, nullable, readOnly)
     {
         overrideInt32 = overrideData;
         maxValue = int.MaxValue;
@@ -60,7 +63,8 @@ internal class SignedIntegerCellEditorViewModel : BaseCellEditorViewModel
         value = overrideData.HasRow(rowIndex) ? overrideData[rowIndex] : data[rowIndex];
     }
     
-    public SignedIntegerCellEditorViewModel(string? mySqlType, Int64SparseColumnData overrideData, Int64ColumnData data, int rowIndex, bool nullable) : base(mySqlType, overrideData, data, rowIndex, nullable)
+    public SignedIntegerCellEditorViewModel(string? mySqlType, Int64SparseColumnData overrideData, Int64ColumnData data, int rowIndex, bool nullable, bool readOnly) 
+        : base(mySqlType, overrideData, data, rowIndex, nullable, readOnly)
     {
         overrideInt64 = overrideData;
         maxValue = long.MaxValue;

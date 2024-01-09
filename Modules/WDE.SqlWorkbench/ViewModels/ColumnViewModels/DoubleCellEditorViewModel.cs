@@ -27,7 +27,8 @@ internal class DoubleCellEditorViewModel : BaseCellEditorViewModel
         }
     }
 
-    public DoubleCellEditorViewModel(string? mySqlType, DoubleSparseColumnData overrideData, DoubleColumnData data, int rowIndex, bool nullable) : base(mySqlType, overrideData, data, rowIndex, nullable)
+    public DoubleCellEditorViewModel(string? mySqlType, DoubleSparseColumnData overrideData, DoubleColumnData data, int rowIndex, bool nullable, bool readOnly) 
+        : base(mySqlType, overrideData, data, rowIndex, nullable, readOnly)
     {
         this.overrideData = overrideData;
         value = overrideData.HasRow(rowIndex) ? overrideData[rowIndex] : data[rowIndex];

@@ -52,28 +52,32 @@ internal class UnsignedIntegerCellEditorViewModel : BaseCellEditorViewModel
     public ulong MaxValue => maxValue;
     public ulong MinValue => 0;
     
-    public UnsignedIntegerCellEditorViewModel(string? mySqlType, ByteSparseColumnData overrideData, ByteColumnData data, int rowIndex, bool nullable) : base(mySqlType, overrideData, data, rowIndex, nullable)
+    public UnsignedIntegerCellEditorViewModel(string? mySqlType, ByteSparseColumnData overrideData, ByteColumnData data, int rowIndex, bool nullable, bool readOnly) 
+        : base(mySqlType, overrideData, data, rowIndex, nullable, readOnly)
     {
         this.overrideByte = overrideData;
         maxValue = byte.MaxValue;
         value = overrideData.HasRow(rowIndex) ? overrideData[rowIndex] : data[rowIndex];
     }
     
-    public UnsignedIntegerCellEditorViewModel(string? mySqlType, UInt16SparseColumnData overrideData, UInt16ColumnData data, int rowIndex, bool nullable) : base(mySqlType, overrideData, data, rowIndex, nullable)
+    public UnsignedIntegerCellEditorViewModel(string? mySqlType, UInt16SparseColumnData overrideData, UInt16ColumnData data, int rowIndex, bool nullable, bool readOnly) 
+        : base(mySqlType, overrideData, data, rowIndex, nullable, readOnly)
     {
         overrideInt16 = overrideData;
         maxValue = ushort.MaxValue;
         value = overrideData.HasRow(rowIndex) ? overrideData[rowIndex] : data[rowIndex];
     }
     
-    public UnsignedIntegerCellEditorViewModel(string? mySqlType, UInt32SparseColumnData overrideData, UInt32ColumnData data, int rowIndex, bool nullable) : base(mySqlType, overrideData, data, rowIndex, nullable)
+    public UnsignedIntegerCellEditorViewModel(string? mySqlType, UInt32SparseColumnData overrideData, UInt32ColumnData data, int rowIndex, bool nullable, bool readOnly) 
+        : base(mySqlType, overrideData, data, rowIndex, nullable, readOnly)
     {
         overrideInt32 = overrideData;
         maxValue = uint.MaxValue;
         value = overrideData.HasRow(rowIndex) ? overrideData[rowIndex] : data[rowIndex];
     }
     
-    public UnsignedIntegerCellEditorViewModel(string? mySqlType, UInt64SparseColumnData overrideData, UInt64ColumnData data, int rowIndex, bool nullable) : base(mySqlType, overrideData, data, rowIndex, nullable)
+    public UnsignedIntegerCellEditorViewModel(string? mySqlType, UInt64SparseColumnData overrideData, UInt64ColumnData data, int rowIndex, bool nullable, bool readOnly) 
+        : base(mySqlType, overrideData, data, rowIndex, nullable, readOnly)
     {
         maxValue = ulong.MaxValue;
         // MySqlConnector returns bit(x) as ulong, so we need to handle it here
