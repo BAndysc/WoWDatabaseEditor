@@ -13,6 +13,8 @@ internal abstract class BaseCellEditorViewModel : ObservableBase
     
     public ICommand ApplyChangesCommand { get; }
 
+    public bool IsReadOnly { get; }
+    
     private bool isNull;
     public bool IsNull
     {
@@ -30,9 +32,10 @@ internal abstract class BaseCellEditorViewModel : ObservableBase
 
     public string? Type { get; }
 
-    public BaseCellEditorViewModel(string? mySqlType, ISparseColumnData overrideData, IColumnData columnData, int rowIndex, bool nullable)
+    public BaseCellEditorViewModel(string? mySqlType, ISparseColumnData overrideData, IColumnData columnData, int rowIndex, bool nullable, bool readOnly)
     {
         this.rowIndex = rowIndex;
+        IsReadOnly = readOnly;
         Type = mySqlType;
         CanBeNull = nullable;
         ApplyChangesCommand = new DelegateCommand(ApplyChanges);

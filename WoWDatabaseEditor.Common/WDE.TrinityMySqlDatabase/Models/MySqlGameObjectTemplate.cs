@@ -29,7 +29,7 @@ namespace WDE.TrinityMySqlDatabase.Models
         public string ScriptName { get; set; } = "";
 
         [Column(Name = "Data0")]
-        public uint Data0 { get; set; }
+        public int Data0 { get; set; }
 
         [Column(Name = "Data1")]
         public int Data1 { get; set; }
@@ -39,7 +39,7 @@ namespace WDE.TrinityMySqlDatabase.Models
             get
             {
                 if (dataIndex == 0)
-                    return Data0;
+                    return Data0 < 0 ? 0 : (uint)Data0;
                 if (dataIndex == 1)
                     return Data1 < 0 ? 0 : (uint)Data1;
                 return 0;

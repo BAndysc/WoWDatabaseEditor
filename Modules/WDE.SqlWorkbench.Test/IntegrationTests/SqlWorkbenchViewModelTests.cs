@@ -4,6 +4,7 @@ using NSubstitute;
 using WDE.Common.Managers;
 using WDE.Common.Services;
 using WDE.Common.Tasks;
+using WDE.Common.Utils;
 using WDE.SqlWorkbench.Models;
 using WDE.SqlWorkbench.Services.Connection;
 using WDE.SqlWorkbench.Services.LanguageServer;
@@ -224,7 +225,10 @@ internal class SqlWorkbenchViewModelTests
             "SELECT * FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = 'world' AND `TABLE_NAME` = 'tab' ORDER BY `ORDINAL_POSITION`",
             "START TRANSACTION",
             "UPDATE `tab` SET `a` = 3 WHERE `a` = 5",
-            "COMMIT"
+            "COMMIT",
+            "SELECT `a` FROM `tab`",
+            "SELECT DATABASE()",
+            "SELECT * FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = 'world' AND `TABLE_NAME` = 'tab' ORDER BY `ORDINAL_POSITION`",
         }, connector.ExecutedQueries);
     }
 
@@ -280,7 +284,10 @@ internal class SqlWorkbenchViewModelTests
             "SELECT * FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = 'world' AND `TABLE_NAME` = 'tab' ORDER BY `ORDINAL_POSITION`",
             "START TRANSACTION",
             "INSERT INTO `tab` (`b`, `a`) VALUES\n(NULL, NULL),\n('txt', 3)",
-            "COMMIT"
+            "COMMIT",
+            "SELECT `b`, `a` FROM `tab`",
+            "SELECT DATABASE()",
+            "SELECT * FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = 'world' AND `TABLE_NAME` = 'tab' ORDER BY `ORDINAL_POSITION`",
         }, connector.ExecutedQueries);
     }
     
@@ -336,7 +343,10 @@ internal class SqlWorkbenchViewModelTests
             "SELECT * FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = 'world' AND `TABLE_NAME` = 'tab' ORDER BY `ORDINAL_POSITION`",
             "START TRANSACTION",
             "INSERT INTO `tab` (`b`, `a`) VALUES\n('abc', 2)",
-            "COMMIT"
+            "COMMIT",
+            "SELECT `b`, `a` FROM `tab`",
+            "SELECT DATABASE()",
+            "SELECT * FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = 'world' AND `TABLE_NAME` = 'tab' ORDER BY `ORDINAL_POSITION`",
         }, connector.ExecutedQueries);
     }
     
@@ -359,6 +369,7 @@ internal class SqlWorkbenchViewModelTests
         userQuestionsService.ConfirmExecuteQueryAsync("ROLLBACK").Returns(true);
         Assert.IsTrue(results.ApplyChangesCommand.CanExecute(null));
         await results.ApplyChangesCommand.ExecuteAsync();
+        Assert.AreEqual(1, results.Count);
         Assert.IsTrue(actionsOutputService.Actions[2].IsFail);
         Assert.IsTrue(actionsOutputService.Actions[2].Response.Contains("cancel", StringComparison.OrdinalIgnoreCase));
         Assert.IsTrue(actionsOutputService.Actions[3].IsSuccess);
@@ -375,7 +386,7 @@ internal class SqlWorkbenchViewModelTests
             "SELECT DATABASE()",
             "SELECT * FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = 'world' AND `TABLE_NAME` = 'tab' ORDER BY `ORDINAL_POSITION`",
             "START TRANSACTION",
-            "ROLLBACK"
+            "ROLLBACK",
         }, connector.ExecutedQueries);
     }
     
@@ -442,7 +453,10 @@ internal class SqlWorkbenchViewModelTests
             @"INSERT INTO `tab` (`a`, `b`, `c`, `d`, `e`, `f`, `g`, `h`, `i`, `j`, `k`, `l`, `m`, `n`, `o`, `p`, `q`) VALUES
 (NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 ('abc', 1, 255, -127, -32768, 65535, -2147483648, 4294967295, -9223372036854775808, 18446744073709551615, 1.1, 1.1, 1.1, '2021-01-01 00:00:00', '2021-01-01 00:00:00', '20:30:40', X'DEADBEEF')".Replace(Environment.NewLine, "\n"),
-            "COMMIT"
+            "COMMIT",
+            "SELECT * FROM `tab`",
+            "SELECT DATABASE()",
+            "SELECT * FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = 'world' AND `TABLE_NAME` = 'tab' ORDER BY `ORDINAL_POSITION`",
         }, connector.ExecutedQueries);
     }
     
@@ -487,7 +501,10 @@ internal class SqlWorkbenchViewModelTests
             "START TRANSACTION",
             @"INSERT INTO `tab` (`g`, `dt`, `d`, `t`, `ts`) VALUES
 (1, NULL, NULL, NULL, NULL)".Replace(Environment.NewLine, "\n"),
-            "COMMIT"
+            "COMMIT",
+            "SELECT * FROM `tab`",
+            "SELECT DATABASE()",
+            "SELECT * FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = 'world' AND `TABLE_NAME` = 'tab' ORDER BY `ORDINAL_POSITION`",
         }, connector.ExecutedQueries);
     }
     
@@ -528,7 +545,10 @@ internal class SqlWorkbenchViewModelTests
             $@"INSERT INTO `tab` (`a`) VALUES
 (X'{longBytesAsHex}'),
 (X'{longBytesAsHex}')".Replace(Environment.NewLine, "\n"),
-            "COMMIT"
+            "COMMIT",
+            "SELECT * FROM `tab`",
+            "SELECT DATABASE()",
+            "SELECT * FROM `information_schema`.`COLUMNS` WHERE `TABLE_SCHEMA` = 'world' AND `TABLE_NAME` = 'tab' ORDER BY `ORDINAL_POSITION`",
         }, connector.ExecutedQueries);
     }
     
@@ -752,6 +772,139 @@ internal class SqlWorkbenchViewModelTests
         results.UpdateSelectedCells("4");
 
         Assert.Pass();
+    }
+    
+    [Test]
+    public async Task Bug_UpdateValueOutOfBounds_WillKeepPreviousValue()
+    {
+        using var vm = CreateConnectedViewModel();
+        var worldDb = mockServer.CreateDatabase("world");
+        var table = worldDb.CreateTable("tab", TableType.Table, new ColumnInfo("a", "int", false, true, true));
+        table.Insert(new object?[]{1});
+        
+        vm.Document.Insert(0, "SELECT `a` FROM `tab`");
+        await vm.ExecuteAllCommand.ExecuteAsync();
+
+        Assert.IsTrue(actionsOutputService.Actions[0].IsSuccess);
+        Assert.AreEqual(1, vm.Results.Count);
+        
+        // results
+        Assert.IsTrue(vm.Results[0] is SelectSingleTableViewModel);
+        var results = (SelectSingleTableViewModel)vm.Results[0];
+        Assert.AreEqual("1", results.GetShortValue(0, 1));
+        
+        results.Selection.Add(0);
+        results.SelectedCellIndex = 1;
+        results.UpdateSelectedCells("a");
+
+        await userQuestionsService.Received().InformEditErrorAsync(Arg.Any<string>());
+
+        Assert.AreEqual("1", results.GetShortValue(0, 1));
+        
+        Assert.Pass();
+    }
+    
+    [Test]
+    public async Task Bug_RefreshWorksAfterTableStructureChange()
+    {
+        using var vm = CreateConnectedViewModel();
+        var worldDb = mockServer.CreateDatabase("world");
+        var table = worldDb.CreateTable("tab", TableType.Table, new ColumnInfo("a", "int", false, true, true));
+        table.Insert(new object?[]{1});
+        
+        vm.Document.Insert(0, "SELECT `a` FROM `tab`");
+        await vm.ExecuteAllCommand.ExecuteAsync();
+
+        Assert.IsTrue(actionsOutputService.Actions[0].IsSuccess);
+        Assert.AreEqual(1, vm.Results.Count);
+        
+        // results
+        Assert.IsTrue(vm.Results[0] is SelectSingleTableViewModel);
+        var results = (SelectSingleTableViewModel)vm.Results[0];
+
+        worldDb.Drop(table);
+        
+        table = worldDb.CreateTable("tab", TableType.Table, new ColumnInfo("a", "varchar(255)", false, true, true));
+        table.Insert(new object?[]{"abc"});
+        
+        await results.RefreshTableCommand.ExecuteAsync();
+        Assert.AreEqual("abc", results.GetShortValue(0, 1));
+        
+        results.Selection.Add(0);
+        results.SelectedCellIndex = 1;
+        results.SelectedRowIndex = 0;
+        
+        Assert.IsTrue(results.CellEditor is StringCellEditorViewModel);
+        ((StringCellEditorViewModel)results.CellEditor)!.Document.Text = "def";
+        results.CellEditor.ApplyChangesCommand.Execute(null);
+
+        Assert.AreEqual("def", results.GetShortValue(0, 1));
+        Assert.Pass();
+    }
+    
+    [Test]
+    public async Task Bug_TimeColumns_PadMicroseconds()
+    {
+        using var vm = CreateConnectedViewModel();
+        var worldDb = mockServer.CreateDatabase("world");
+        var table = worldDb.CreateTable("tab", TableType.Table, new ColumnInfo("a", "int", false, true, true),
+            new ColumnInfo("b", "time(6)"),
+            new ColumnInfo("c", "datetime(6)"));
+        table.Insert(new object?[]{1, new TimeSpan(0, 0, 0, 0, 0, 1), new MySqlDateTime(2000, 1, 1, 0, 0, 0, 1)});
+        
+        vm.Document.Insert(0, "SELECT * FROM `tab`");
+        await vm.ExecuteAllCommand.ExecuteAsync();
+
+        Assert.IsTrue(actionsOutputService.Actions[0].IsSuccess);
+        Assert.AreEqual(1, vm.Results.Count);
+        
+        // results
+        Assert.IsTrue(vm.Results[0] is SelectSingleTableViewModel);
+        var results = (SelectSingleTableViewModel)vm.Results[0];
+
+        Assert.AreEqual("00:00:00.000001", results.GetShortValue(0, 2));
+        
+        results.Selection.Add(0);
+        results.SelectedCellIndex = 2;
+        
+        results.UpdateSelectedCells("00:00:00.1");
+        
+        Assert.AreEqual("00:00:00.100000", results.GetShortValue(0, 2));
+    }
+
+    [Test]
+    public async Task Bug_IncorrectColumnNameAndTypeAfterRefresh()
+    {
+        using var vm = CreateConnectedViewModel();
+        var worldDb = mockServer.CreateDatabase("world");
+        var table = worldDb.CreateTable("tab", TableType.Table, new ColumnInfo("a", "int", false, true, true));
+        table.Insert(new object?[]{1});
+        
+        vm.Document.Insert(0, "SELECT * FROM `tab`");
+        await vm.ExecuteAllCommand.ExecuteAsync();
+
+        Assert.IsTrue(actionsOutputService.Actions[0].IsSuccess);
+        Assert.AreEqual(1, vm.Results.Count);
+        
+        // results
+        Assert.IsTrue(vm.Results[0] is SelectSingleTableViewModel);
+        var results = (SelectSingleTableViewModel)vm.Results[0];
+
+        Assert.AreEqual("a", results.Columns[1].Header);
+        worldDb.Drop(table);
+        
+        table = worldDb.CreateTable("tab", TableType.Table, new ColumnInfo("b", "varchar(255)", false, true, true));
+        table.Insert(new object?[]{"abc"});
+        
+        await results.RefreshTableCommand.ExecuteAsync();
+        Assert.AreEqual("b", results.Columns[1].Header);
+
+        results.Selection.Add(0);
+        results.SelectedCellIndex = 1;
+        results.SelectedRowIndex = 0;
+        
+        Assert.IsTrue(results.CellEditor is StringCellEditorViewModel);
+        Assert.AreEqual("varchar(255)", results.CellEditor.Type);
     }
     
     [Test]

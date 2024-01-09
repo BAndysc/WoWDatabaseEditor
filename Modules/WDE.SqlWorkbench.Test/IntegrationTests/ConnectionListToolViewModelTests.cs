@@ -118,9 +118,9 @@ internal class ConnectionListToolViewModelTests
 
         var visible = vm.FlatItems.Where(x => x.IsVisible).Cast<INamedNodeType>().ToList();
         
-        Assert.AreEqual(6, visible.Count);
+        Assert.AreEqual(8, visible.Count);
         Assert.AreEqual("Views", visible[1].Name);
-        CollectionAssert.AreEquivalent(new[] {"TABLES", "ROUTINES", "SCHEMATA", "COLUMNS"}, visible.Skip(2).Select(x => x.Name));
+        CollectionAssert.AreEquivalent(new[] {"TABLES", "ROUTINES", "ENGINES", "COLLATIONS", "SCHEMATA", "COLUMNS"}, visible.Skip(2).Select(x => x.Name));
         
         userQuestionsService.DidNotReceiveWithAnyArgs().ConnectionsErrorAsync(default);
         

@@ -167,6 +167,8 @@ public partial class TaskQueue : INotifyPropertyChanged
                         {
                             if (startedTask.IsFaulted)
                                 tcs.SetException(startedTask.Exception!.InnerExceptions);
+                            else if (startedTask.IsCanceled)
+                                tcs.SetCanceled();
                             else
                                 tcs.SetResult();
                         }   

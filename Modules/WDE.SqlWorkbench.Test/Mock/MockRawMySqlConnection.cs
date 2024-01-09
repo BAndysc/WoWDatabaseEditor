@@ -1,9 +1,11 @@
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using Antlr4.Runtime;
 using MySqlConnector;
+using WDE.Common.Utils;
 using WDE.SqlWorkbench.Antlr;
 using WDE.SqlWorkbench.Models;
 using WDE.SqlWorkbench.Models.DataTypes;
@@ -68,6 +70,8 @@ internal class MockSqlConnector : IMySqlConnector
         public readonly MockMemoryDatabase.Table SchemataTable;
         public readonly MockMemoryDatabase.Table ColumnsTable;
         public readonly MockMemoryDatabase.Table RoutinesTable;
+        public readonly MockMemoryDatabase.Table EnginesTable;
+        public readonly MockMemoryDatabase.Table CollationsTable;
 
         public MockMemoryServer(
             MockSqlConnector mockSqlConnector,
@@ -172,6 +176,27 @@ internal class MockSqlConnector : IMySqlConnector
                 new ColumnInfo("COLLATION_CONNECTION", "varchar", false, false, false, null, null, null),
                 new ColumnInfo("DATABASE_COLLATION", "varchar", false, false, false, null, null, null));
             
+            EnginesTable = InformationSchema.CreateTable("ENGINES",
+                TableType.View,
+                new ColumnInfo("ENGINE", "varchar(64)", false, false, false, null, null, null),
+                new ColumnInfo("SUPPORT", "varchar(8)", false, false, false, null, null, null),
+                new ColumnInfo("COMMENT", "varchar(80)", false, false, false, null, null, null),
+                new ColumnInfo("TRANSACTIONS", "varchar(3)", true, false, false, null, null, null),
+                new ColumnInfo("XA", "varchar(3)", true, false, false, null, null, null),
+                new ColumnInfo("SAVEPOINTS", "varchar(3)", true, false, false, null, null, null));
+            EnginesTable.Insert(new object?[]{"MEMORY", "YES", "Hash based, stored in memory, useful for temporary tables", "NO", "NO", "NO"});
+            
+            CollationsTable = InformationSchema.CreateTable("COLLATIONS", TableType.View,
+                new ColumnInfo("COLLATION_NAME", "varchar(64)", false, false, false, null, null, null),
+                new ColumnInfo("CHARACTER_SET_NAME", "varchar(64)", false, false, false, null, null, null),
+                new ColumnInfo("ID", "bigint", false, false, false, null, null, null),
+                new ColumnInfo("IS_DEFAULT", "varchar(3)", false, false, false, null, null, null),
+                new ColumnInfo("IS_COMPILED", "varchar(3)", false, false, false, null, null, null),
+                new ColumnInfo("SORTLEN", "int unsigned", false, false, false, null, null, null),
+                new ColumnInfo("PAD_ATTRIBUTE", "enum('PAD SPACE','NO PAD')", false, false, false, null, null, null));
+            
+            CollationsTable.Insert(new object?[]{"utf8mb4_general_ci", "utf8mb4", 45L, "", "Yes", 1, "PAD SPACE"});
+            
             InformationSchema.FinalizeCreateTableInternal(TablesTable);
             InformationSchema.FinalizeCreateTableInternal(SchemataTable);
             InformationSchema.FinalizeCreateTableInternal(ColumnsTable);
@@ -208,7 +233,7 @@ internal class MockSqlConnector : IMySqlConnector
                 "def",
                 database.Name,
                 "utf8mb4",
-                "utf8mb4_0900_ai_ci",
+                "utf8mb4_general_ci",
                 null,
                 "NO"
             });
@@ -305,6 +330,7 @@ internal class MockSqlConnector : IMySqlConnector
                 var showFullTablesRegex = new Regex(@"SHOW\s+FULL\s+TABLES", RegexOptions.IgnoreCase);
                 var showDatabasesRegex = new Regex(@"SHOW\s+DATABASES", RegexOptions.IgnoreCase);
                 var showColumnsRegex = new Regex(@"SHOW\s+COLUMNS\s+FROM\s+`?(.*?)`?$", RegexOptions.IgnoreCase);
+                var showIndex = new Regex(@"SHOW\s+INDEX\s+FROM\s+`?(.*?)`?$", RegexOptions.IgnoreCase);
                 var beginTransactionRegex = new Regex(@"(BEGIN|START TRANSACTION)", RegexOptions.IgnoreCase);
                 var commitTransactionRegex = new Regex(@"COMMIT", RegexOptions.IgnoreCase);
                 var rollbackTransactionRegex = new Regex(@"ROLLBACK", RegexOptions.IgnoreCase);
@@ -313,6 +339,7 @@ internal class MockSqlConnector : IMySqlConnector
                 var showFullTablesMatch = showFullTablesRegex.Match(queryString);
                 var showDatabasesMatch = showDatabasesRegex.Match(queryString);
                 var showColumnsMatch = showColumnsRegex.Match(queryString);
+                var showIndexMatch = showIndex.Match(queryString);
                 var beginTransactionMatch = beginTransactionRegex.Match(queryString);
                 var commitTransactionMatch = commitTransactionRegex.Match(queryString);
                 var rollbackTransactionMatch = rollbackTransactionRegex.Match(queryString);
@@ -321,7 +348,7 @@ internal class MockSqlConnector : IMySqlConnector
                 {
                     var column = new StringColumnData();
                     column.Append(new MockDataReader(currentDatabase), 0);
-                    return SelectResult.Query(new[]{"database()"}, new[]{typeof(string)}, 1, new IColumnData[1]{column});
+                    return SelectResult.Query(new[]{"database()"}, new[]{typeof(string)}, 1, new IReadOnlyColumnData[1]{column});
                 }
                 else if (showTablesMatch.Success)
                 {
@@ -341,6 +368,60 @@ internal class MockSqlConnector : IMySqlConnector
                 {
                     return server.ColumnsTable.SelectColumns(new[] { "COLUMN_NAME AS Field", "COLUMN_TYPE AS Type", "IS_NULLABLE AS Null", "COLUMN_KEY AS Key", "COLUMN_DEFAULT AS Default", "EXTRA AS Extra" }, 
                         row => (string?)row["TABLE_SCHEMA"] == currentDatabase && (string?)row["TABLE_NAME"] == showColumnsMatch.Groups[1].Value);
+                }
+                else if (showIndexMatch.Success)
+                {
+                    var columns = new IReadOnlyColumnData[]
+                    {
+                        new StringColumnData(),
+                        new Int64ColumnData(),
+                        new StringColumnData(),
+                        new Int64ColumnData(),
+                        new StringColumnData(),
+                        new StringColumnData(),
+                        new Int64ColumnData(),
+                        new ObjectColumnData(),
+                        new StringColumnData(),
+                        new StringColumnData(),
+                        new StringColumnData(),
+                        new StringColumnData(),
+                        new StringColumnData(),
+                        new StringColumnData()
+                    };
+                    return SelectResult.Query(new[]
+                    {
+                        "Table",
+                        "Non_unique",
+                        "Key_name",
+                        "Seq_in_index",
+                        "Column_name",
+                        "Collation",
+                        "Sub_part",
+                        "Packed",
+                        "Null",
+                        "Index_type",
+                        "Comment",
+                        "Index_comment",
+                        "Visible",
+                        "Expression"
+                    }, 
+                    new[]
+                    {
+                        typeof(string),
+                        typeof(long),
+                        typeof(string),
+                        typeof(long),
+                        typeof(string),
+                        typeof(string),
+                        typeof(long),
+                        typeof(object),
+                        typeof(string),
+                        typeof(string),
+                        typeof(string),
+                        typeof(string),
+                        typeof(string),
+                        typeof(string)
+                    }, 0, columns);
                 }
                 else if (beginTransactionMatch.Success)
                 {
@@ -474,6 +555,18 @@ internal class MockSqlConnector : IMySqlConnector
                 this.columnInfo = columnInfo;
             }
 
+            public int DeleteWhere(Func<object?[], bool> where)
+            {
+                return rows.RemoveIf(where);
+            }
+
+            public int DeleteWhereColumnEquals(string[] columnNames, object?[] values)
+            {
+                var columnIndices = columnNames.Select(GetColumnIndexByName).ToArray();
+                return DeleteWhere(row => columnIndices.Select((columnIndex, i) => (columnIndex, i))
+                    .All(pair => row[pair.columnIndex] == values[pair.i]));
+            }
+            
             public void Insert(params object?[] columnValues)
             {
                 if (columnValues.Length != columnInfo.Length)
@@ -519,6 +612,7 @@ internal class MockSqlConnector : IMySqlConnector
                 var selectColumnIndices = expandedColumns.Select(ExtractColumnName).Select(GetColumnIndexByName).ToArray();
                 string[] columnNames = expandedColumns.Select(ExtractColumnAlias).ToArray();
                 Type?[] columnTypes = selectColumnIndices.Select(i => types[i]).ToArray();
+                string?[] columnSqlTypes = selectColumnIndices.Select(i => columnInfo[i].Type).ToArray();
                 List<int> selectRowIndices = new();
                 for (int i = 0; i < rows.Count; ++i)
                 {
@@ -541,7 +635,7 @@ internal class MockSqlConnector : IMySqlConnector
                     }
                 }
                 
-                return SelectResult.Query(columnNames, columnTypes, selectRowIndices.Count, ConvertData(columnTypes, data));
+                return SelectResult.Query(columnNames, columnTypes, selectRowIndices.Count, ConvertData(columnSqlTypes, columnTypes, data));
             }
 
             private int GetColumnIndexByName(string columnName)
@@ -595,7 +689,7 @@ internal class MockSqlConnector : IMySqlConnector
                 public MySqlDateTime GetMySqlDateTime(int ordinal) => (MySqlDateTime?)data[rowIndex, ordinal] ?? new MySqlDateTime();
             }
             
-            private IColumnData[] ConvertData(Type?[] types, object?[,] data)
+            private IColumnData[] ConvertData(string?[] sqlTypes, Type?[] types, object?[,] data)
             {
                 IColumnData[] columns = new IColumnData[types.Length];
                 MockMySqlDataReader[] rows = new MockMySqlDataReader[data.GetLength(0)];
@@ -604,7 +698,7 @@ internal class MockSqlConnector : IMySqlConnector
                 
                 for (int i = 0; i < columns.Length; ++i)
                 {
-                    columns[i] = IColumnData.CreateTypedColumn(types[i]);
+                    columns[i] = IColumnData.CreateTypedColumn(types[i], sqlTypes[i]);
                     for (int j = 0; j < data.GetLength(0); ++j)
                         columns[i].Append(rows[j], i);
                 }
@@ -627,7 +721,7 @@ internal class MockSqlConnector : IMySqlConnector
                 databaseName,
                 table.Name,
                 table.TableType == TableType.Table ? "BASE TABLE" : "VIEW",
-                "InnoDB",
+                "MEMORY",
                 10,
                 "FIXED",
                 0ul,
@@ -640,7 +734,7 @@ internal class MockSqlConnector : IMySqlConnector
                 new MySqlDateTime(DateTime.Now),
                 null,
                 null,
-                null,
+                "utf8mb4_general_ci",
                 null,
                 null,
                 null
@@ -662,8 +756,8 @@ internal class MockSqlConnector : IMySqlConnector
                     (ulong?)null,
                     (ulong?)null,
                     (uint?)null,
-                    "utf8mb3",
-                    "utf8mb3_tolower_ci",
+                    "utf8mb4",
+                    "utf8mb4_general_ci",
                     column.Type,
                     column.IsPrimaryKey ? "PRI" : "",
                     column.IsAutoIncrement ? "auto_increment" : "",
@@ -718,6 +812,13 @@ internal class MockSqlConnector : IMySqlConnector
             if (!tables.TryGetValue(tableName, out var table))
                 throw MySqlExceptions.Create(MySqlErrorCode.UnknownTable, $"Unknown table '{tableName}'");
             return table;
+        }
+
+        public void Drop(Table table)
+        {
+            tables.Remove(table.Name);
+            Debug.Assert(server.TablesTable.DeleteWhereColumnEquals(new []{"TABLE_SCHEMA", "TABLE_NAME"}, new object?[]{Name, table.Name}) == 1);
+            Debug.Assert(server.ColumnsTable.DeleteWhereColumnEquals(new []{"TABLE_SCHEMA", "TABLE_NAME"}, new object?[]{Name, table.Name}) == table.ColumnInfos.Count);
         }
     }
 }

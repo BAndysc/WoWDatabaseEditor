@@ -245,6 +245,7 @@ internal class UInt64SparseColumnData(UInt64ColumnData impl) : SparseColumnData(
 internal abstract class SparseColumnData : ISparseColumnData
 {
     private Dictionary<int, int> rowIndexToIndex = new ();
+    private List<int>? freeActualIndices;
     private IColumnData impl;
     
     public SparseColumnData(IColumnData impl)
@@ -263,11 +264,27 @@ internal abstract class SparseColumnData : ISparseColumnData
     {
         if (!rowIndexToIndex.TryGetValue(rowIndex, out var i))
         {
-            var newIndex = impl.AppendNull();
-            rowIndexToIndex[rowIndex] = i = rowIndexToIndex.Count;
-            Debug.Assert(newIndex == i);
+            int newIndex;
+            if (freeActualIndices != null && freeActualIndices.Count > 0)
+            {
+                newIndex = freeActualIndices[^1];
+                freeActualIndices.RemoveAt(freeActualIndices.Count - 1);
+            }
+            else
+                newIndex = impl.AppendNull();
+            rowIndexToIndex[rowIndex] = i = newIndex;
         }
         return i;
+    }
+
+    private void RemoveIndex(int rowIndex)
+    {
+        if (rowIndexToIndex.TryGetValue(rowIndex, out var i))
+        {
+            rowIndexToIndex.Remove(rowIndex);
+            freeActualIndices ??= new List<int>();
+            freeActualIndices.Add(i);
+        }
     }
     
     public string? GetToString(int rowIndex)
@@ -294,7 +311,20 @@ internal abstract class SparseColumnData : ISparseColumnData
 
     public bool TryOverride(int rowIndex, string? str, out string? error)
     {
-        return impl.TryOverride(GetOrCreateActualIndex(rowIndex), str, out error);
+        var hasRow = HasRow(rowIndex);
+        if (!impl.TryOverride(GetOrCreateActualIndex(rowIndex), str, out error))
+        {
+            if (!hasRow)
+            {
+                // is hasRow is False, then we have just created the index in GetOrCreateActualIndex
+                // but since the override failed, we need to remove it
+                RemoveIndex(rowIndex);
+            }
+
+            return false;
+        }
+
+        return true;
     }
 
     public void Clear()
@@ -324,7 +354,7 @@ internal interface IColumnData : IReadOnlyColumnData
     int AppendNull();
     void Clear();
     
-    static IColumnData CreateTypedColumn(Type? dataType)
+    static IColumnData CreateTypedColumn(Type? dataType, string? mySqlDataType)
     {
         if (dataType == typeof(string))
             return new StringColumnData();
@@ -346,14 +376,14 @@ internal interface IColumnData : IReadOnlyColumnData
             return new Int64ColumnData();
         else if (dataType == typeof(ulong))
             return new UInt64ColumnData();
-        else if (dataType == typeof(decimal))
+        else if (dataType == typeof(decimal) || dataType == typeof(PublicMySqlDecimal) || dataType == typeof(MySqlDecimal))
             return new DecimalColumnData();
         else if (dataType == typeof(double))
             return new DoubleColumnData();
         else if (dataType == typeof(float))
             return new FloatColumnData();
         else if (dataType == typeof(MySqlDateTime))
-            return new MySqlDateTimeColumnData();
+            return new MySqlDateTimeColumnData(mySqlDataType);
         else if (dataType == typeof(DateTime))
             return new DateTimeColumnData();
         else if (dataType == typeof(TimeSpan))

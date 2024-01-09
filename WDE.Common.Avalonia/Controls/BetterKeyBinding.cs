@@ -4,6 +4,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using AvaloniaEdit;
+using AvaloniaEdit.Editing;
 
 namespace WDE.Common.Avalonia.Controls
 {
@@ -36,13 +37,14 @@ namespace WDE.Common.Avalonia.Controls
         {
             var currentAsTextBox = FocusManager.Instance!.Current as TextBox;
             var currentAsTextEditor = FocusManager.Instance!.Current as TextEditor;
-            if (currentAsTextBox != null || currentAsTextEditor != null)
+            var currentAsTextArea = FocusManager.Instance!.Current as TextArea;
+            if (currentAsTextBox != null || currentAsTextEditor != null || currentAsTextArea != null)
             {
                 var ev = Activator.CreateInstance<KeyEventArgs>();
                 ev.Key = Gesture.Key;
                 ev.KeyModifiers = Gesture.KeyModifiers;
                 ev.RoutedEvent = InputElement.KeyDownEvent;
-                ((Control?)currentAsTextBox ?? currentAsTextEditor)!.RaiseEvent(ev);
+                ((Control?)currentAsTextBox ?? (Control?)currentAsTextEditor ?? currentAsTextArea)!.RaiseEvent(ev);
                 if (!ev.Handled && CanExecute(parameter))
                     CustomCommand.Execute(parameter);
             }

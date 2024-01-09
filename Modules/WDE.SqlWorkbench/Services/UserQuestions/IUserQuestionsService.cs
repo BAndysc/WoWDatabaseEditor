@@ -30,6 +30,7 @@ internal interface IUserQuestionsService
     Task FileTooBigErrorAsync(long fileSize, int limit);
     Task ShowGenericErrorAsync(string header, string message); 
     Task InformEditErrorAsync(string message);
+    Task InformLoadedFileTrimmedAsync(int trimmedLength);
 }
 
 internal static class CommandExtensions

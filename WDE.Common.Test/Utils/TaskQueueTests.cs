@@ -33,6 +33,17 @@ public class TaskQueueTests
         await queue.CancelAll();
         Assert.ThrowsAsync<TaskCanceledException>(async () => await task);
     }
+    
+    [Test]
+    public async Task CancelledTask_ReturnsCancelledTask()
+    {
+        var queue = new TaskQueue();
+        var cancelledTask = new TaskCompletionSource();
+        cancelledTask.SetCanceled();
+        var task = queue.Schedule(_ => cancelledTask.Task);
+        Assert.IsTrue(task.IsCompleted);
+        Assert.IsTrue(task.IsCanceled);
+    }
 
     [Test]
     public async Task CancelAll_CancelsAllScheduledTask()

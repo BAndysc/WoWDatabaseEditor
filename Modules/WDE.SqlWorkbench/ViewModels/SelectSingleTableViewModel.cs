@@ -50,21 +50,8 @@ internal partial class SelectSingleTableViewModel : SelectResultsViewModel
         this.selectSpecs = selectSpecs;
         primaryKeyColumnsIndices = new List<int>();
         columnsInfo = new List<ColumnInfo>();
+        UpdateResultsSchema(tableColumnsInfo);
         Title = this.selectSpecs.From.Table;
-        
-        var columnsDict = tableColumnsInfo.ToDictionary(c => c.Name);
-        columnsInfo.Add(new ColumnInfo("#", "", false, false, false, null, null, null));
-        for (int i = 1; i < Columns.Count; ++i)
-        {
-            if (columnsDict.TryGetValue(Columns[i].Header, out var columnInfo))
-            {
-                columnsInfo.Add(columnInfo);
-                if (columnInfo.IsPrimaryKey)
-                    primaryKeyColumnsIndices.Add(i);
-            }
-            else
-                throw new Exception($"Columns {Columns[i].Header} not found in the table");
-        }
         
         SetSelectedToNullCommand = new DelegateCommand(() => UpdateSelectedCells(null), () => RowsHaveFullPrimaryKey);
         AddRowCommand = new DelegateCommand(() =>
@@ -123,23 +110,6 @@ internal partial class SelectSingleTableViewModel : SelectResultsViewModel
             foreach (var row in Selection.All())
                 MarkRowAsDeleted(row);
         }, () => RowsHaveFullPrimaryKey);
-        ApplyChangesCommand = new AsyncAutoCommand(async () =>
-        {
-            try
-            {
-                ErrorIfConnectionChanged();
-                await ApplyChangesAsync();
-            }
-            catch (TaskCanceledException e)
-            {
-                // ignore on purpose, because it means user canceled the operation
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                await vm.UserQuestions.SaveErrorAsync(e);   
-            }
-        });
         RevertChangesCommand = new AsyncAutoCommand(async () =>
         {
             ResetChanges();
@@ -154,11 +124,57 @@ internal partial class SelectSingleTableViewModel : SelectResultsViewModel
             await vm.ExecuteAndOverrideResultsAsync(selectSpecs.ToString(), this);
         }).WrapMessageBox<Exception>(vm.UserQuestions);
 
+        ApplyChangesCommand = new AsyncAutoCommand(async () =>
+        {
+            try
+            {
+                ErrorIfConnectionChanged();
+                await ApplyChangesAsync(true);
+            }
+            catch (TaskCanceledException e)
+            {
+                // ignore on purpose, because it means user canceled the operation
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                await vm.UserQuestions.SaveErrorAsync(e);   
+            }
+        });
+        
         RowsHaveFullPrimaryKey = columnsInfo.Any(x => x.IsPrimaryKey) &&
                                  columnsInfo.Where(x => x.IsPrimaryKey)
                                      .All(x => Columns.Skip(1).Any(col => col.Header == x.Name));
     }
     
+    private void UpdateResultsSchema(IReadOnlyList<ColumnInfo> tableColumnsInfo)
+    {
+        var columnsDict = tableColumnsInfo.ToDictionary(c => c.Name);
+        columnsInfo.Clear();
+        primaryKeyColumnsIndices.Clear();
+        
+        columnsInfo.Add(new ColumnInfo("#", "", false, false, false, null, null, null));
+        for (int i = 1; i < Columns.Count; ++i)
+        {
+            if (columnsDict.TryGetValue(Columns[i].Header, out var columnInfo))
+            {
+                columnsInfo.Add(columnInfo);
+                if (columnInfo.IsPrimaryKey)
+                    primaryKeyColumnsIndices.Add(i);
+            }
+            else
+                throw new Exception($"Columns {Columns[i].Header} not found in the table");
+        }
+    }
+
+    protected override void ResultsUpdated(IReadOnlyList<ColumnInfo>? tableColumnsInfo)
+    {
+        if (tableColumnsInfo == null)
+            throw new Exception("Cannot refresh results, because this query no longer returns a valid table.");
+
+        UpdateResultsSchema(tableColumnsInfo);
+    }
+
     protected override bool IsColumnNullable(int columnIndex) => columnsInfo[columnIndex].IsNullable;
 
     protected override string? ColumnType(int columnIndex) => columnsInfo[columnIndex].Type;
@@ -233,7 +249,7 @@ internal partial class SelectSingleTableViewModel : SelectResultsViewModel
         return result;
     }
     
-    private async Task ApplyChangesAsync()
+    private async Task ApplyChangesAsync(bool refreshOnSuccess)
     {
         var changes = GenerateChanges();
         if (changes.Count == 0)
@@ -245,6 +261,8 @@ internal partial class SelectSingleTableViewModel : SelectResultsViewModel
         {
             await vm.ExecuteAsync(changes, false, true, true);
             ResetChanges();
+            if (refreshOnSuccess)
+                await RefreshTableCommand.ExecuteAsync();
         };
         if (vm.Preferences.AskBeforeApplyingChanges)
         {
@@ -261,7 +279,7 @@ internal partial class SelectSingleTableViewModel : SelectResultsViewModel
 
         try
         {
-            await ApplyChangesAsync();
+            await ApplyChangesAsync(true);
             return true;
         }
         catch (TaskCanceledException e)
@@ -303,7 +321,7 @@ internal partial class SelectSingleTableViewModel : SelectResultsViewModel
         SortByAsync().ListenErrors();
     }
 
-    private bool CanEditRow(int rowIndex) => rowIndex >= Results.AffectedRows || RowsHaveFullPrimaryKey;
+    protected override bool CanEditRow(int rowIndex) => rowIndex >= Results.AffectedRows || RowsHaveFullPrimaryKey;
 
     private bool CanEditSelectedRow()
     {
