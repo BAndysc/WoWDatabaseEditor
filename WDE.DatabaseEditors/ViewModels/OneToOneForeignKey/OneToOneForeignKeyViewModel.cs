@@ -373,8 +373,19 @@ public partial class OneToOneForeignKeyViewModel : ObservableBase, IDialog, ISol
                 }
                 else if (column.IsMetaColumn)
                 {
-                    var (cmd, name) = metaColumnsSupportService.GenerateCommand(null, tableDefinition.DataDatabaseType, column.Meta!, entity, key);
-                    cellViewModel = new SingleRecordDatabaseCellViewModel(columnIndex, column.Name, cmd, row, entity, name);
+                    if (column.Meta!.StartsWith("expression:"))
+                    {
+                        throw new NotImplementedException();
+                    }
+                    else if (column.Meta!.StartsWith("customfield:"))
+                    {
+                        throw new NotImplementedException();
+                    }
+                    else
+                    {
+                        var (cmd, name) = metaColumnsSupportService.GenerateCommand(null, tableDefinition.DataDatabaseType, column.Meta!, entity, key);
+                        cellViewModel = new SingleRecordDatabaseCellViewModel(columnIndex, column.Name, cmd, row, entity, name);
+                    }
                 }
                 else
                 {

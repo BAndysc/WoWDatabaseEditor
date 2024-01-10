@@ -40,7 +40,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
 
         public event Action<ITableRow>? Changed;
 
-        public void RaiseChanged(DatabaseCellViewModel cell, string fieldName)
+        public void RaiseChanged(DatabaseCellViewModel cell, string? fieldName)
         {
             Changed?.Invoke(this);
         }

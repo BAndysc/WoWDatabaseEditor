@@ -204,7 +204,7 @@ public class Program
             
             
             var columnsByTables = definition.Groups.SelectMany(g => g.Fields)
-                .Where(g => !g.IsMetaColumn && ! g.IsConditionColumn)
+                .Where(g => g.IsActualDatabaseColumn)
                 .GroupBy(g => g.ForeignTable ?? definition.TableName)
                 .ToDictionary(g => g.Key, g => g.ToList());
 

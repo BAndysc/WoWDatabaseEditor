@@ -721,8 +721,19 @@ namespace WDE.DatabaseEditors.ViewModels.SingleRow
                 }
                 else if (column.IsMetaColumn)
                 {
-                    var (command, title) = metaColumnsSupportService.GenerateCommand(this, tableDefinition.DataDatabaseType, column.Meta!, entity, entity.GenerateKey(TableDefinition));
-                    cellViewModel = AutoDisposeEntity(new SingleRecordDatabaseCellViewModel(columnIndex, column.Name, command, row, entity, title));
+                    if (column.Meta!.StartsWith("expression:"))
+                    {
+                        throw new NotImplementedException();
+                    }
+                    else if (column.Meta!.StartsWith("customfield:"))
+                    {
+                        throw new NotImplementedException();
+                    }
+                    else
+                    {
+                        var (command, title) = metaColumnsSupportService.GenerateCommand(this, tableDefinition.DataDatabaseType, column.Meta!, entity, entity.GenerateKey(TableDefinition));
+                        cellViewModel = AutoDisposeEntity(new SingleRecordDatabaseCellViewModel(columnIndex, column.Name, command, row, entity, title));
+                    }
                 }
                 else
                 {

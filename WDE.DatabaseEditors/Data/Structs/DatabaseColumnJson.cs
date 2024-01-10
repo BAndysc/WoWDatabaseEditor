@@ -74,6 +74,10 @@ namespace WDE.DatabaseEditors.Data.Structs
         [IgnoreEquality]
         [JsonIgnore]
         public bool IsMetaColumn => !string.IsNullOrEmpty(Meta);
+
+        [IgnoreEquality]
+        [JsonIgnore]
+        public bool IsActualDatabaseColumn => !string.IsNullOrEmpty(DbColumnName) && !IsMetaColumn && !IsConditionColumn;
         
         [IgnoreEquality] [JsonIgnore] public bool IsTypeString => ValueType is "string" || ValueType.EndsWith("StringParameter");
         [IgnoreEquality] [JsonIgnore] public bool IsTypeLong => ValueType is "long" or "uint" or "int" || (ValueType.EndsWith("Parameter") && !IsTypeString);

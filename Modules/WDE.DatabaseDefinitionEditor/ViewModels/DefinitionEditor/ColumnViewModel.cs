@@ -56,9 +56,7 @@ public partial class ColumnViewModel : ObservableBase, ITableColumnHeader, ITabl
         columnIdForUi = model.ColumnIdForUi;
         intWidth = (int?)model.PreferredWidth ?? 100;
         if (model.IsMetaColumn)
-        {
             ColumnType = ColumnType.Meta;
-        }
         else if (model.IsConditionColumn)
             ColumnType = ColumnType.Condition;
         else

@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Input;
 using AvaloniaStyles.Controls.FastTableView;
+using WDE.Common.Database;
+using WDE.Common.Disposables;
 using WDE.DatabaseEditors.Data;
 using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Models;
@@ -27,7 +30,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         public string ColumnName { get; }
         public string? DbColumnName { get; }
 
-        public DatabaseCellViewModel(int columnIndex, DatabaseColumnJson columnDefinition, DatabaseEntityViewModel parent, DatabaseEntity parentEntity, IDatabaseField tableField, IParameterValue parameterValue) : base(parentEntity)
+        public DatabaseCellViewModel(int columnIndex, DatabaseColumnJson columnDefinition, DatabaseEntityViewModel parent, DatabaseEntity parentEntity, IDatabaseField? tableField, IParameterValue parameterValue) : base(parentEntity)
         {
             ColumnIndex = columnIndex * 2;
             CanBeNull = columnDefinition.CanBeNull;
@@ -50,27 +53,46 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
 
             AutoDispose(parameterValue.ToObservable().SubscribeAction(_ =>
             {
-                Parent.RaiseChanged(this, tableField.FieldName);
-                OriginalValueTooltip =
-                    tableField.IsModified ? "Original value: " + parameterValue.OriginalString : null;
+                Parent.RaiseChanged(this, tableField?.FieldName);
+                if (tableField != null)
+                {
+                    OriginalValueTooltip =
+                        tableField.IsModified ? "Original value: " + parameterValue.OriginalString : null;
+                }
                 RaisePropertyChanged(nameof(OriginalValueTooltip));
                 RaisePropertyChanged(nameof(AsBoolValue));
             }));
             if (parameterValue.BaseParameter is ITableAffectedByParameter contextual)
             {
-                var other = parent.Cells.FirstOrDefault(c => c.DbColumnName == contextual.AffectedByColumn);
-                if (other != null)
+                if (contextual.AffectedByConditions)
                 {
-                    AutoDispose(other.ParameterValue!.ToObservable().Subscribe(_ =>
+                    parentEntity.OnConditionsChanged += OnConditionsChanged;
+                    AutoDispose(new ActionDisposable(() =>
                     {
-                        parameterValue.RaiseChanged();
-                    }));                    
+                        parentEntity.OnConditionsChanged -= OnConditionsChanged;
+                    }));
                 }
                 else
                 {
-                    Console.WriteLine("Couldn't find column " + contextual.AffectedByColumn);
+                    var other = parent.Cells.FirstOrDefault(c => c.DbColumnName == contextual.AffectedByColumn);
+                    if (other != null)
+                    {
+                        AutoDispose(other.ParameterValue!.ToObservable().Subscribe(_ =>
+                        {
+                            parameterValue.RaiseChanged();
+                        }));                    
+                    }
+                    else
+                    {
+                        Console.WriteLine("Couldn't find column " + contextual.AffectedByColumn);
+                    }   
                 }
             }
+        }
+
+        private void OnConditionsChanged(DatabaseEntity arg1, IReadOnlyList<ICondition>? arg2, IReadOnlyList<ICondition>? arg3)
+        {
+            ParameterValue?.RaiseChanged();
         }
 
         public DatabaseCellViewModel(int columnIndex, string columnName, ICommand action, DatabaseEntityViewModel parent, DatabaseEntity entity, string label) : base(entity)

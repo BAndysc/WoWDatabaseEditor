@@ -76,7 +76,13 @@ namespace WDE.DatabaseEditors.Models
 
         public void UpdateFromString(string newValue)
         {
-            if (parameter is IParameterFromString<long?> fromString)
+            if (parameter is IContextualParameterFromString<long?, TContext> contextualFromString)
+            {
+                var newVal = contextualFromString.FromString(newValue, context);
+                if (newVal.HasValue)
+                    Value = (T)(object)(newVal.Value);
+            }
+            else if (parameter is IParameterFromString<long?> fromString)
             {
                 var newVal = fromString.FromString(newValue);
                 if (newVal.HasValue)
@@ -103,7 +109,17 @@ namespace WDE.DatabaseEditors.Models
             }
         }
 
-        public string? ValueAsString => Value?.ToString();
+        public string? ValueAsString
+        {
+            get
+            {
+                if (parameter is IContextualInterceptValueParameter<T, TContext> contextualInterceptValueParameter)
+                    if (contextualInterceptValueParameter.TryInterceptValue(Value, context, out var interceptedValue))
+                        return interceptedValue;
+                return Value?.ToString();
+            }
+        }
+
         public void RaiseChanged()
         {
             hasCachedStringValue = false;

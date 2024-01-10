@@ -56,7 +56,7 @@ public class TextEntitySerializer : ITextEntitySerializer
 
             foreach (var column in definition.TableColumns)
             {
-                if (column.Value.IsMetaColumn || column.Value.IsConditionColumn)
+                if (!column.Value.IsActualDatabaseColumn)
                     continue;
                 
                 if (!row.values.TryGetValue(column.Key, out var value))

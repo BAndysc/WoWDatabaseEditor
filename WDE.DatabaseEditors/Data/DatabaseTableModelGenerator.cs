@@ -40,7 +40,7 @@ namespace WDE.DatabaseEditors.Data
                 throw new Exception($"Trying to create entity with a partial key! (expected: {definition.GroupByKeys.Count} elements in key, got {key.Count})");
             
             foreach (var column in definition.Groups.SelectMany(t => t.Fields)
-                .Where(x => !x.IsMetaColumn)
+                .Where(x => x.IsActualDatabaseColumn) // todo: not sure about IsCondition? this method used to create fields with IsCondition even though it makes no sense
                 .Distinct(
                     EqualityComparerFactory.Create<DatabaseColumnJson>(
                         f => f.DbColumnName.GetHashCode(),

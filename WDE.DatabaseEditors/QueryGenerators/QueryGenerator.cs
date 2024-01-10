@@ -222,7 +222,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
 
             var columns = tableData.TableDefinition.TableColumns
                 .Select(c => c.Value)
-                .Where(col => !col.IsMetaColumn && !col.IsConditionColumn)
+                .Where(col => col.IsActualDatabaseColumn)
                 .GroupBy(columns => columns.ForeignTable != null ? new DatabaseTable(tableData.TableDefinition.DataDatabaseType, columns.ForeignTable) : tableData.TableDefinition.Id)
                 .ToDictionary(g => g.Key, g => g.ToList());
 
@@ -483,7 +483,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
             IMultiQuery query = Queries.BeginTransaction(definition.DataDatabaseType);
             Dictionary<DatabaseTable, List<IDatabaseField>> fieldsByTable = entity.Fields
                 .Select(ef => (ef, definition.TableColumns[ef.FieldName]))
-                .Where(pair => !pair.Item2.IsMetaColumn && !pair.Item2.IsConditionColumn)
+                .Where(pair => pair.Item2.IsActualDatabaseColumn)
                 .GroupBy(pair => new DatabaseTable(definition.DataDatabaseType, pair.Item2.ForeignTable ?? definition.TableName))
                 .ToDictionary(g => g.Key, g => g.Select(f => f.ef).ToList());
 

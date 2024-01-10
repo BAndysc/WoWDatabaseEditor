@@ -33,6 +33,18 @@ namespace WDE.Common.Parameters
         T? FromString(string value);
     }
 
+    public interface IContextualParameterFromString<T, TContext>
+    {
+        T? FromString(string value, TContext context);
+    }
+    
+    // a very specific interface for a very specific case.
+    // in DatabaseEditors, for custom fields, when trying to edit a field, this can be used to provide custom text in the editor field
+    public interface IContextualInterceptValueParameter<T, TContext>
+    {
+        bool TryInterceptValue(T? value, TContext context, out string? newValue);
+    }
+
     public struct ToStringOptions
     {
         public bool withNumber;

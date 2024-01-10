@@ -185,6 +185,7 @@ public class AsyncDatabaseContextualParameter : DatabaseContextualParameter, IAs
 public interface ITableAffectedByParameter
 {
     public string AffectedByColumn { get; }
+    public bool AffectedByConditions => false;
 }
 
 public class DatabaseStringContextualParameter : IContextualParameter<string, DatabaseEntity>, ICustomPickerContextualParameter<string>, ITableAffectedByParameter

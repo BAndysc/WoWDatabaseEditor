@@ -338,6 +338,10 @@ namespace WDE.DatabaseEditors.ViewModels.Template
                         entity.OnAction += _ => parameterValue.Value = evaluator.Evaluate(entity)!.ToString();
                         cellViewModel = AutoDispose(new DatabaseCellViewModel(row, entity, parameterValue));   
                     }
+                    else if (column.Meta!.StartsWith("customfield:"))
+                    {
+                        throw new NotImplementedException();
+                    }
                     else
                     {
                         var (command, title) = metaColumnsSupportService.GenerateCommand(this, tableDefinition.DataDatabaseType, column.Meta!, entity, entity.GenerateKey(TableDefinition));

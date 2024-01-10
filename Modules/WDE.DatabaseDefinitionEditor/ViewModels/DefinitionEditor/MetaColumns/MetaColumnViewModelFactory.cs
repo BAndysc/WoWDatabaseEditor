@@ -36,6 +36,11 @@ public class MetaColumnViewModelFactory : IMetaColumnViewModelFactory
             "An evaluated expression using JavaScript like syntax.", 
             p => new ExpressionMetaColumnViewModel(p)),
 
+        new MetaColumnTypeViewModel("customfield",
+            "Custom field",
+            "A custom field which is not stored in the database, it is up the parameter implementation to decide where the data is stored. \nUnlike expression, this is read-write (expression is read only) and the implementation belongs to the C# code.",
+            p => new CustomFieldMetaColumnViewModel(p)),
+        
         new MetaColumnTypeViewModel("invoke",
             "Invoke command",
             "A button which invokes a remote command via SOAP or another chosen remote connection method.",
@@ -53,6 +58,8 @@ public class MetaColumnViewModelFactory : IMetaColumnViewModelFactory
         // maybe one day I shall rewrite it in this manner
         if (description.StartsWith("expression:"))
             return new ExpressionMetaColumnViewModel(parent, description);
+        if (description.StartsWith("customfield:"))
+            return new CustomFieldMetaColumnViewModel(parent, description);
         if (description.StartsWith("invoke:"))
             return new InvokeRemoteCommandMetaColumnViewModel(parent, description);
         if (description.StartsWith("command:"))

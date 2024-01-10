@@ -45,10 +45,7 @@ public partial class MySqlFilterViewModel : ObservableBase
         {
             foreach (var column in tableDefinition.Groups.SelectMany(x => x.Fields))
             {
-                if (column.IsMetaColumn)
-                    continue;
-                
-                if (column.IsConditionColumn)
+                if (!column.IsActualDatabaseColumn)
                     continue;
 
                 var tableName = column.ForeignTable ?? tableDefinition.TableName;

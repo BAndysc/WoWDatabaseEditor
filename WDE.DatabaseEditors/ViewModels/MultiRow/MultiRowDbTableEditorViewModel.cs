@@ -649,8 +649,23 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                 }
                 else if (column.IsMetaColumn)
                 {
-                    var (command, title) = metaColumnsSupportService.GenerateCommand(this, tableDefinition.DataDatabaseType, column.Meta!, entity, entity.GenerateKey(TableDefinition));
-                    cellViewModel = AutoDispose(new DatabaseCellViewModel(columnIndex, column.Name, command, row, entity, title));
+                    if (column.Meta!.StartsWith("expression:"))
+                    {
+                        throw new NotImplementedException();
+                    }
+                    else if (column.Meta!.StartsWith("customfield:"))
+                    {
+                        var parameterName = parameterFactory.Factory(column.Meta.Substring("customfield:".Length));
+                        var parameterValue = new ParameterValue<long, DatabaseEntity>(entity, new ValueHolder<long>(0, false),
+                            new ValueHolder<long>(0, false), parameterName);
+                        //entity.OnAction += _ => parameterValue.Value = evaluator.Evaluate(entity)!.ToString();
+                        cellViewModel = AutoDispose(new DatabaseCellViewModel(columnIndex, column, row, entity, null, parameterValue));
+                    }
+                    else
+                    {
+                        var (command, title) = metaColumnsSupportService.GenerateCommand(this, tableDefinition.DataDatabaseType, column.Meta!, entity, entity.GenerateKey(TableDefinition));
+                        cellViewModel = AutoDispose(new DatabaseCellViewModel(columnIndex, column.Name, command, row, entity, title));
+                    }
                 }
                 else
                 {

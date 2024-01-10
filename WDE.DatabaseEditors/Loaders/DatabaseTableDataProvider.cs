@@ -43,7 +43,7 @@ namespace WDE.DatabaseEditors.Loaders
             var tableName = tableDefinitionJson.TableName;
             var columns = tableDefinitionJson.Groups
                 .SelectMany(x => x.Fields)
-                .Where(x => !x.IsConditionColumn && !x.IsMetaColumn)
+                .Where(x => x.IsActualDatabaseColumn)
                 .Select(x =>
                 {
                     var column =  $"`{x.ForeignTable ?? tableName}`.`{x.DbColumnName}`";
@@ -75,7 +75,7 @@ namespace WDE.DatabaseEditors.Loaders
             var tablePrimaryKey = tableDefinitionJson.TablePrimaryKeyColumnName;
             var columns = tableDefinitionJson.Groups
                 .SelectMany(x => x.Fields)
-                .Where(x => !x.IsConditionColumn && !x.IsMetaColumn)
+                .Where(x => x.IsActualDatabaseColumn)
                 .Select(x =>
                 {
                     var column =  $"`{x.ForeignTable ?? tableName}`.`{x.DbColumnName}`";
