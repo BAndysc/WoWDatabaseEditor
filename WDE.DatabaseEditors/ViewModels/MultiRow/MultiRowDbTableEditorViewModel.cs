@@ -758,12 +758,12 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
 
         private void AddEntities(IReadOnlyList<DatabaseEntity> tableDataEntities)
         {
-            int index = 0;
-            if (tableDataEntities.Count > 0 && byEntryGroups.TryGetValue(tableDataEntities[0].Key, out var group))
-                index = group.Count;
-            
             foreach (var entity in tableDataEntities)
-                AddEntity(entity, index++);
+            {
+                byEntryGroups.TryGetValue(entity.Key, out var group);
+                var index = group?.Count ?? 0;
+                AddEntity(entity, index);
+            }
         }
         
         protected override List<EntityOrigianlField>? GetOriginalFields(DatabaseEntity entity)
