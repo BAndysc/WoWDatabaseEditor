@@ -63,12 +63,59 @@ public abstract class BaseWaypointData : IWaypointData, ISmartScriptWaypoint, IS
     }
 }
 
-[Table(Name = "waypoint_data")]
-public class MasterWaypointData : BaseWaypointData
+[Table(Name = "waypoint_path_node")]
+public class MasterWaypointData : IWaypointData
 {
-    public override int Action { get; set; }
+    [Column(Name = "PositionX")]
+    public float X { get; set; }
     
-    public override byte ActionChance { get; set; }
+    [Column(Name = "PositionY")]
+    public float Y { get; set; }
+    
+    [Column(Name = "PositionZ")]
+    public float Z { get; set; }
+    
+    public UniversalWaypoint ToUniversal()
+    {
+        return new UniversalWaypoint()
+        {
+            PathId = PathId,
+            PointId = PointId,
+            Delay = Delay,
+            X = X,
+            Y = Y,
+            Z = Z,
+            Orientation = Orientation
+        };
+    }
+    
+    [PrimaryKey]
+    [Column(Name = "PathId")]
+    public uint PathId { get; set; }
+    
+    [PrimaryKey]
+    [Column(Name = "NodeId")]
+    public uint PointId { get; set; }
+
+    public uint WaitTime { get; set; }
+
+    [Column(Name = "Orientation")]
+    public float? Orientation { get; set; }
+
+    public float? Velocity { get; set; }
+    
+    [Column(Name = "Delay")]
+    public uint Delay { get; set; }
+    
+    public bool? SmoothTransition { get; set; }
+    
+    public string? Comment { get; set; }
+
+    public int MoveType { get; set; }
+    
+    public int Action { get; set; }
+    
+    public byte ActionChance { get; set; }
 }
 
 [Table(Name = "waypoint_data")]

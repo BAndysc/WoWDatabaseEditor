@@ -83,7 +83,7 @@ namespace WDE.Common.CoreVersion
     [Flags]
     public enum WaypointTables
     {
-        WaypointData = 1,  // waypoint_data
+        WaypointData = 1,  // waypoint_data or waypoint_path
         SmartScriptWaypoint = 2, // waypoints
         ScriptWaypoint = 4, // script_waypoint
         MangosWaypointPath = 8, // waypoint_path

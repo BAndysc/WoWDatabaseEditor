@@ -117,7 +117,7 @@ public class MySqlCreatureAddonMaster : MySqlBaseCreatureAddonTrinity, ICreature
     [Column(Name = "guid")]
     public uint Guid { get; set; }
     
-    [Column(Name = "path_id")]
+    [Column(Name = "PathId")]
     public override uint PathId { get; set; }
 
     [Column(Name = "MountCreatureID")]
@@ -132,7 +132,7 @@ public class MySqlCreatureTemplateAddonMaster : MySqlBaseCreatureAddonTrinity, I
     [Column(Name = "entry")]
     public uint Entry { get; set; }
     
-    [Column(Name = "path_id")]
+    [Column(Name = "PathId")]
     public override uint PathId { get; set; }
 
     [Column(Name = "MountCreatureID")]
