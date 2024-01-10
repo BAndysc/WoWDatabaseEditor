@@ -20,6 +20,7 @@ public partial class CustomLootItemSettingViewModel : ObservableBase, ITableRow
     [Notify] private long groupId;
     [Notify] private long minCountOrRef = 1;
     [Notify] private long maxCount = 1;
+    [Notify] private long badLuckProtectionId = 0;
     [Notify] private IReadOnlyList<ICondition>? conditions;
     [Notify] private long conditionId;
     [Notify] private string? comment;
@@ -44,6 +45,8 @@ public partial class CustomLootItemSettingViewModel : ObservableBase, ITableRow
             cells.Add(new TableCell<long>(this, Parameter.Instance, () => ConditionId, x => ConditionId = x));
         else
             cells.Add(new ActionCell(parent.Parent.EditConditionsCommand, this, () => $"Conditions ({conditions?.CountActualConditions() ?? 0})"));
+        if (parent.Parent.EditorFeatures.HasBadLuckProtectionId)
+            cells.Add(new TableCell<long>(this, Parameter.Instance, () => BadLuckProtectionId, x => BadLuckProtectionId = x));
         cells.Add(new TableCell<string>(this, StringParameter.Instance, () => Comment ?? "", x => Comment = x));
 
         this.PropertyChanged += (_, __) =>
@@ -62,6 +65,7 @@ public partial class CustomLootItemSettingViewModel : ObservableBase, ITableRow
         groupId = def.GroupId;
         minCountOrRef = def.MinCountOrRef;
         maxCount = def.MaxCount;
+        badLuckProtectionId = def.BadLuckProtectionId;
         conditionId = def.ConditionId;
         comment = def.Comment;
         if (def.Conditions != null)
@@ -149,6 +153,7 @@ public partial class CustomLootItemSettingViewModel : ObservableBase, ITableRow
             GroupId = (int)groupId,
             MinCountOrRef = (int)minCountOrRef,
             MaxCount = (int)maxCount,
+            BadLuckProtectionId = (int)badLuckProtectionId,
             Conditions = conditions?.Select(x => new AbstractCondition(x)).ToList(),
             ConditionId = (uint)conditionId,
             Comment = comment

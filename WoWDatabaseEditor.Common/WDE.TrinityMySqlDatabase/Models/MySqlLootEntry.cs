@@ -34,6 +34,8 @@ public abstract class BaseMySqlLootEntry : ILootEntry
     [Column(Name = "MaxCount")]
     public uint MaxCount { get; set; }
 
+    public int BadLuckProtectionId => 0;
+
     public uint Build => 0;
 
     [Column(Name = "Comment")]

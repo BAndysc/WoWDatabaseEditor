@@ -59,6 +59,8 @@ public class CmangosLootEditorFeatures : ILootEditorFeatures
     
     public bool HasConditionId => true;
     
+    public bool HasBadLuckProtectionId => false;
+
     public bool ItemCanBeCurrency => false;
     
     public bool LootGroupHasName(LootSourceType lootType) => lootType == LootSourceType.Reference;

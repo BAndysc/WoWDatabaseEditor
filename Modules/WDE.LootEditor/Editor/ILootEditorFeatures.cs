@@ -9,6 +9,7 @@ public interface ILootEditorFeatures
     bool HasCommentField(LootSourceType lootType);
     bool HasLootModeField { get; }
     bool HasConditionId { get; }
+    bool HasBadLuckProtectionId { get; }
     bool ItemCanBeCurrency { get; }
     bool LootGroupHasName(LootSourceType lootType);
     bool LootGroupHasFlags(LootSourceType lootType);

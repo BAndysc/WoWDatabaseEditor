@@ -43,6 +43,7 @@ public partial class LootItemViewModel : ObservableBase, ITableRow
     internal LootItemParameterCell<long> GroupId { get; }
     internal LootItemParameterCell<long> MinCountOrRef { get; }
     internal LootItemParameterCell<long> MaxCount { get; }
+    internal LootItemParameterCell<long> BadLuckProtectionId { get; }
     internal LootItemParameterCell<string> Comment { get; }
     internal LootItemParameterCell<long> Build { get; }
     internal LootItemParameterCell<long> MinPatch { get; }
@@ -83,6 +84,7 @@ public partial class LootItemViewModel : ObservableBase, ITableRow
         LootMode = new LootItemParameterCellLong(this, ParentVm.ParameterFactory.Factory("LootModeParameter"));
         GroupId = new LootItemParameterCellLong(this, Parameter.Instance, zeroIsBlank: true);
         MinCountOrRef = new LootItemParameterCellLong(this, ParentVm.ParameterFactory.Factory("MinValueOrLootReferenceParameter"));
+        BadLuckProtectionId = new LootItemParameterCellLong(this, ParentVm.ParameterFactory.Factory("BadLuckProtectionTemplateParameter"), zeroIsBlank: true);
         MaxCount = new LootItemParameterCellLong(this, Parameter.Instance, zeroIsBlank: true);
         Comment = new LootItemParameterCell<string>(this, StringParameter.Instance);
         Build = new LootItemParameterCellLong(this, Parameter.Instance);
@@ -113,6 +115,9 @@ public partial class LootItemViewModel : ObservableBase, ITableRow
         cells.Add(GroupId);
         cells.Add(MinCountOrRef);
         cells.Add(MaxCount);
+        
+        if (ParentVm.LootEditorFeatures.HasBadLuckProtectionId)
+            cells.Add(BadLuckProtectionId);
     
         if (ParentVm.LootEditorFeatures.HasConditionId)
             cells.Add(ConditionId);
@@ -176,6 +181,7 @@ public partial class LootItemViewModel : ObservableBase, ITableRow
         GroupId.SetValueFromHistory(loot.Loot.GroupId);
         MinCountOrRef.SetValueFromHistory(loot.Loot.IsReference() ? -(int)loot.Loot.Reference : loot.Loot.MinCount);
         MaxCount.SetValueFromHistory(loot.Loot.MaxCount);
+        BadLuckProtectionId.SetValueFromHistory(loot.Loot.BadLuckProtectionId);
         Build.SetValueFromHistory(loot.Loot.Build);
         Comment.SetValueFromHistory(loot.Loot.Comment ?? "");
         MinPatch.SetValueFromHistory(loot.Loot.MinPatch);
@@ -250,6 +256,7 @@ public partial class LootItemViewModel : ObservableBase, ITableRow
             Reference = IsReference ? ReferenceEntry : 0,
             MinCount = IsReference ? 1 : (int)MinCountOrRef.Value,
             MaxCount = (uint)MaxCount.Value,
+            BadLuckProtectionId = (int)BadLuckProtectionId.Value,
             MinPatch = (ushort)MinPatch.Value,
             MaxPatch = (ushort)MaxPatch.Value,
             ConditionId = (uint)ConditionId.Value,

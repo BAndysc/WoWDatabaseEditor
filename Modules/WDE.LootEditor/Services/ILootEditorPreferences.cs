@@ -30,6 +30,7 @@ public struct LootButtonDefinition
         public int GroupId { get; set; }
         public int MinCountOrRef { get; set; }
         public int MaxCount { get; set; }
+        public int BadLuckProtectionId { get; set; }
         public string? Comment { get; set; }
         public uint ConditionId { get; set; }
         public List<AbstractCondition>? Conditions { get; set; }

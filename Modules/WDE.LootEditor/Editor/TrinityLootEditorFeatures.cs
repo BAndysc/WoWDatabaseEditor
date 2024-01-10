@@ -16,6 +16,8 @@ public abstract class BaseTrinityLootEditorFeatures : ILootEditorFeatures
     
     public bool HasConditionId => false;
     
+    public bool HasBadLuckProtectionId => false;
+
     public abstract bool ItemCanBeCurrency { get; }
 
     public bool HasCommentField(LootSourceType lootType) => true;

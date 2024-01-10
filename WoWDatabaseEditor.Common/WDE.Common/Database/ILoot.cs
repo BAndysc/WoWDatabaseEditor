@@ -14,6 +14,7 @@ public interface ILootEntry
     ushort GroupId { get; }
     int MinCount { get; }
     uint MaxCount { get; }
+    int BadLuckProtectionId { get; }
     uint Build { get; }
     uint ConditionId { get; }
     string? Comment { get; }
@@ -37,6 +38,7 @@ public struct AbstractLootEntry : ILootEntry
     public uint MaxCount { get; set; }
     public uint Build { get; set; }
     public uint ConditionId { get; set; }
+    public int BadLuckProtectionId { get; set; }
     public string? Comment { get; set; }
     public ushort MinPatch { get; set; }
     public ushort MaxPatch { get; set; }
@@ -53,6 +55,7 @@ public struct AbstractLootEntry : ILootEntry
         GroupId = x.GroupId;
         MinCount = x.MinCount;
         MaxCount = x.MaxCount;
+        BadLuckProtectionId = x.BadLuckProtectionId;
         Build = x.Build;
         ConditionId = x.ConditionId;
         Comment = x.Comment;

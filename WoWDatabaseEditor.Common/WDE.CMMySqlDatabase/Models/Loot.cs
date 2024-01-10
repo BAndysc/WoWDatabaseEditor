@@ -31,6 +31,8 @@ public abstract class BaseLootTemplate : ILootEntry
     [Column(Name = "maxcount")]
     public uint MaxCount { get; set; }
 
+    public int BadLuckProtectionId => 0;
+
     public uint Build => 0;
 
     public virtual string? Comment { get; set; }

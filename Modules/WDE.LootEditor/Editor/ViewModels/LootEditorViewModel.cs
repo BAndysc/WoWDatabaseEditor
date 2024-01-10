@@ -282,6 +282,8 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
         indexOfReferenceCell = LootColumns.Count;
         LootColumns.Add(new TableTableColumnHeader("Min count or ref"){Width = 100});
         LootColumns.Add(new TableTableColumnHeader("Max count"){Width = 100});
+        if (LootEditorFeatures.HasBadLuckProtectionId)
+            LootColumns.Add(new TableTableColumnHeader("Bad luck protection"){Width = 100});
         LootColumns.Add(new TableTableColumnHeader(lootEditorFeatures.HasConditionId ? "Condition id" : "Conditions"){Width = 120});
         if (LootEditorFeatures.HasCommentField(LootSourceType))
             LootColumns.Add(new TableTableColumnHeader("Comment"){Width = 300});
@@ -406,6 +408,7 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
                     GroupId = (int)item.GroupId.Value,
                     MinCountOrRef = (int)item.MinCountOrRef.Value,
                     MaxCount = (int)item.MaxCount.Value,
+                    BadLuckProtectionId = (int)item.BadLuckProtectionId.Value,
                     Conditions = item.Conditions?.Select(x => new AbstractCondition(x)).ToList()
                 }).ToList()
             });
@@ -545,6 +548,7 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
                             vm.GroupId.SetValue(def.GroupId).ListenErrors();
                             vm.MinCountOrRef.SetValue(def.MinCountOrRef).ListenErrors();
                             vm.MaxCount.SetValue(def.MaxCount).ListenErrors();
+                            vm.BadLuckProtectionId.SetValue(def.BadLuckProtectionId).ListenErrors();
                             vm.Comment.SetValue(def.Comment ?? "").ListenErrors();
                             if (def.Conditions != null)
                                 vm.Conditions = def.Conditions.ToList();

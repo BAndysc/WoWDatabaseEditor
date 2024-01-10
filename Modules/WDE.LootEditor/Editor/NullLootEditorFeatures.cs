@@ -14,6 +14,8 @@ public class NullLootEditorFeatures : ILootEditorFeatures
     
     public bool HasConditionId => false;
     
+    public bool HasBadLuckProtectionId => false;
+
     public bool ItemCanBeCurrency => false;
 
     public bool HasCommentField(LootSourceType lootType) => false;
