@@ -149,7 +149,7 @@ namespace WDE.Common.Database
     }
     
     // KEEP it POCO
-    public class AbstractCondition : ICondition
+    public class AbstractCondition : ICondition, IEquatable<AbstractCondition>
     {
         public AbstractCondition() { }
 
@@ -189,5 +189,37 @@ namespace WDE.Common.Database
         public int NegativeCondition { get; set; }
 
         public string? Comment { get; set; }
+
+        public override string ToString()
+        {
+            return $"Condition[Else={ElseGroup}, Index={ConditionIndex}, Parent={ConditionParent}, Type={ConditionType}, Target={ConditionTarget}, Value1={ConditionValue1}, Value2={ConditionValue2}, Value3={ConditionValue3}, Value4={ConditionValue4}, Negative={NegativeCondition}, Comment={Comment}]";
+        }
+        
+        public bool Equals(AbstractCondition? other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return ElseGroup == other.ElseGroup && ConditionIndex == other.ConditionIndex && ConditionParent == other.ConditionParent && ConditionType == other.ConditionType && ConditionTarget == other.ConditionTarget && ConditionValue1 == other.ConditionValue1 && ConditionValue2 == other.ConditionValue2 && ConditionValue3 == other.ConditionValue3 && ConditionValue4 == other.ConditionValue4 && NegativeCondition == other.NegativeCondition && Comment == other.Comment;
+        }
+
+        public override bool Equals(object? obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((AbstractCondition)obj);
+        }
+
+        public override int GetHashCode() => 0;
+
+        public static bool operator ==(AbstractCondition? left, AbstractCondition? right)
+        {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(AbstractCondition? left, AbstractCondition? right)
+        {
+            return !Equals(left, right);
+        }
     }
 }
