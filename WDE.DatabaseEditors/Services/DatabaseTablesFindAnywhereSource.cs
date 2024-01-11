@@ -190,7 +190,7 @@ public class DatabaseTablesFindAnywhereSource : IFindAnywhereSource
                         resultContext.AddResult(new FindAnywhereResult(
                             new ImageUri(definition.IconPath!),
                             key[0],
-                            tableName.ToString(),
+                            tableName.Table,
                             string.Join(", ", row.Select(pair => pair.Key + ": " + pair.Value.Item2)),
                             item,
                             commad
