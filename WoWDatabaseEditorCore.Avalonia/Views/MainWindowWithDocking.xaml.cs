@@ -197,7 +197,8 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
         {
             // I can't do it in KeyBindings, because it needs to be handled in tunnel handler
             // also don't do it in OnKeyDown, because it is not fired for control + tab
-            if (e.KeyModifiers.HasFlagFast(KeyModifiers.Control) &&
+            if ((e.KeyModifiers.HasFlagFast(KeyModifiers.Control) ||
+                 e.KeyModifiers.HasFlagFast(KeyModifiers.Meta)) &&
                 e.Key == Key.Tab)
             {
                 var documentControl = FocusManager.Instance!.Current?.FindAncestorOfType<DocumentControl>() ?? this.FindDescendantOfType<DocumentControl>();
