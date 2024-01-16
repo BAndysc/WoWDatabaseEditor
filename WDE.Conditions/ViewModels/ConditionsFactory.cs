@@ -36,6 +36,9 @@ namespace WDE.Conditions.ViewModels
 
             for (int i = 0; i < ConditionViewModel.ParametersCount; ++i)
                 viewModel.GetParameter(i).IsUsed = false;
+            
+            for (int i = 0; i < ConditionViewModel.StringParametersCount; ++i)
+                viewModel.GetStringParameter(i).IsUsed = false;
 
             if (data.Parameters != null)
             {
@@ -45,6 +48,16 @@ namespace WDE.Conditions.ViewModels
                     viewModel.GetParameter(j).IsUsed = true;
                     viewModel.GetParameter(j).Name = param.Name;
                     viewModel.GetParameter(j++).Parameter = parameterFactory.Factory(param.Type);
+                }
+            }
+            if (data.StringParameters != null)
+            {
+                int j = 0;
+                foreach (var param in data.StringParameters)
+                {
+                    viewModel.GetStringParameter(j).IsUsed = true;
+                    viewModel.GetStringParameter(j).Name = param.Name;
+                    viewModel.GetStringParameter(j++).Parameter = parameterFactory.FactoryString(param.Type);
                 }
             }
             
@@ -84,6 +97,7 @@ namespace WDE.Conditions.ViewModels
             vm.ConditionValue1.Value = condition.ConditionValue1;
             vm.ConditionValue2.Value = condition.ConditionValue2;
             vm.ConditionValue3.Value = condition.ConditionValue3;
+            vm.ConditionStringValue1.Value = condition.ConditionStringValue1;
             vm.ConditionTarget.Value = vm.ConditionTarget.IsUsed ? condition.ConditionTarget : 0;
             return vm;
         }

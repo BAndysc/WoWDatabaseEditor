@@ -8,6 +8,7 @@ namespace WDE.Common.Database
         uint DisplayId { get; }
         float Size { get; }
         GameobjectType Type { get; }
+        uint Flags { get; }
         public uint FlagsExtra => 0;
         string Name { get; }
         string AIName { get; }
@@ -22,6 +23,7 @@ namespace WDE.Common.Database
         public uint DisplayId { get; init; }
         public float Size { get; init; }
         public GameobjectType Type { get; init; }
+        public uint Flags { get; init; }
         public string Name { get; init; } = "";
         public string AIName { get; init; } = "";
         public string ScriptName { get; init; } = "";

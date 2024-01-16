@@ -18,6 +18,8 @@ namespace WDE.Conditions.ViewModels
                 {
                     foreach (var val in  a.Item.Values())
                         val.OnValueChanged += OnChanged;
+                    foreach (var val in  a.Item.StringValues())
+                        val.OnValueChanged += OnStringChanged;
                     a.Item.ConditionChanged += OnConditionChanged;
                     PushAction(new ConditionAddedAction(viewModel, a.Item, a.Index));
                 }
@@ -26,6 +28,8 @@ namespace WDE.Conditions.ViewModels
                     a.Item.ConditionChanged -= OnConditionChanged;
                     foreach (var val in  a.Item.Values())
                         val.OnValueChanged -= OnChanged;
+                    foreach (var val in  a.Item.StringValues())
+                        val.OnValueChanged -= OnStringChanged;
                     PushAction(new ConditionRemovedAction(viewModel, a.Item, a.Index));
                 }
             });
@@ -38,7 +42,12 @@ namespace WDE.Conditions.ViewModels
 
         private void OnChanged(ParameterValueHolder<long> param, long old, long nnew)
         {
-            PushAction(new ParameterValueChangedAction(param, old, nnew));
+            PushAction(new ParameterValueChangedAction<long>(param, old, nnew));
+        }
+
+        private void OnStringChanged(ParameterValueHolder<string> param, string old, string nnew)
+        {
+            PushAction(new ParameterValueChangedAction<string>(param, old, nnew));
         }
 
         public System.IDisposable BulkEdit(string name)
@@ -119,14 +128,14 @@ namespace WDE.Conditions.ViewModels
         public string GetDescription() => "Condition removed";
     }
     
-    internal class ParameterValueChangedAction : IHistoryAction
+    internal class ParameterValueChangedAction<T> : IHistoryAction where T : notnull
     {
-        private readonly ParameterValueHolder<long> holder;
-        private readonly long old;
-        private readonly long nnew;
+        private readonly ParameterValueHolder<T> holder;
+        private readonly T old;
+        private readonly T nnew;
         private readonly string name;
 
-        public ParameterValueChangedAction(ParameterValueHolder<long> holder, long old, long nnew)
+        public ParameterValueChangedAction(ParameterValueHolder<T> holder, T old, T nnew)
         {
             this.holder = holder;
             name = holder.Name;

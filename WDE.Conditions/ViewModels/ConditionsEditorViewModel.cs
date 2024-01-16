@@ -65,14 +65,27 @@ namespace WDE.Conditions.ViewModels
 
             Accept = new DelegateCommand(() => CloseOk?.Invoke());
             Cancel = new DelegateCommand(() => CloseCancel?.Invoke());
-            PickCommand = new AsyncAutoCommand<ParameterValueHolder<long>>(async prh =>
+            PickCommand = new AsyncAutoCommand<IParameterValueHolder>(async prh =>
             {
-                if (!prh.HasItems) 
-                    return;
+                if (prh is ParameterValueHolder<long> longParam)
+                {
+                    if (!longParam.HasItems) 
+                        return;
 
-                var (newItem, ok) = await parameterPickerService.PickParameter(prh.Parameter, prh.Value);
-                if (ok)
-                    prh.Value = newItem;
+                    var (newItem, ok) = await parameterPickerService.PickParameter(longParam.Parameter, longParam.Value);
+                    if (ok)
+                        longParam.Value = newItem;   
+                }
+                
+                if (prh is ParameterValueHolder<string> stringParam)
+                {
+                    if (!stringParam.HasItems) 
+                        return;
+
+                    var (newItem, ok) = await parameterPickerService.PickParameter(stringParam.Parameter, stringParam.Value);
+                    if (ok)
+                        stringParam.Value = newItem ?? "";   
+                }
             });
             AddItemCommand = new DelegateCommand(() =>
             {

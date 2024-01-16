@@ -154,6 +154,8 @@ namespace WDE.SmartScriptEditor.Data
             condition.ConditionTarget.Value = line.ConditionTarget;
             for (int i = 0; i < condition.ParametersCount; ++i)
                 condition.GetParameter(i).Value = line.GetConditionValue(i);
+            for (int i = 0; i < condition.StringParametersCount; ++i)
+                condition.GetStringParameter(i).Value = line.GetConditionValueString(i);
 
             return condition;
         }
@@ -483,19 +485,37 @@ namespace WDE.SmartScriptEditor.Data
             for (var i = 0; i < element.ParametersCount; ++i)
                 element.GetParameter(i).IsUsed = false;
 
-            if (data.Parameters == null)
-                return;
-
-            for (var i = 0; i < data.Parameters.Count; ++i)
+            for (var i = 0; i < element.StringParametersCount; ++i)
+                element.GetStringParameter(i).IsUsed = false;
+            
+            if (data.Parameters != null)
             {
-                string key = data.Parameters[i].Type;
-                if (!parameterFactory.IsRegisteredLong(key))
-                    Console.WriteLine("Parameter type " + key + " is not registered");
-                IParameter<long> parameter = parameterFactory.Factory(key);
+                for (var i = 0; i < data.Parameters.Count; ++i)
+                {
+                    string key = data.Parameters[i].Type;
+                    if (!parameterFactory.IsRegisteredLong(key))
+                        Console.WriteLine("Parameter type " + key + " is not registered");
+                    IParameter<long> parameter = parameterFactory.Factory(key);
 
-                element.GetParameter(i).Name = data.Parameters[i].Name;
-                element.GetParameter(i).IsUsed = true;
-                element.GetParameter(i).Parameter = parameter;
+                    element.GetParameter(i).Name = data.Parameters[i].Name;
+                    element.GetParameter(i).IsUsed = true;
+                    element.GetParameter(i).Parameter = parameter;
+                }   
+            }
+
+            if (data.StringParameters != null)
+            {
+                for (var i = 0; i < data.StringParameters.Count; ++i)
+                {
+                    string? key = data.StringParameters[i].Type;
+                    if (key != null && !parameterFactory.IsRegisteredString(key))
+                        Console.WriteLine("Parameter type " + key + " is not registered");
+                    IParameter<string> parameter = parameterFactory.FactoryString(key);
+
+                    element.GetStringParameter(i).Name = data.StringParameters[i].Name;
+                    element.GetStringParameter(i).IsUsed = true;
+                    element.GetStringParameter(i).Parameter = parameter;
+                }
             }
         }
     }

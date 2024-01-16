@@ -290,7 +290,7 @@ namespace WDE.TrinityMySqlDatabase.Database
 
         public abstract IReadOnlyList<IQuestTemplate> GetQuestTemplates();
         
-        public virtual async Task<IList<IQuestObjective>> GetQuestObjectives(uint questId) => new List<IQuestObjective>();
+        public virtual async Task<IReadOnlyList<IQuestObjective>> GetQuestObjectives(uint questId) => new List<IQuestObjective>();
 
         public virtual async Task<IQuestObjective?> GetQuestObjective(uint questId, int storageIndex) => null;
         
@@ -310,44 +310,7 @@ namespace WDE.TrinityMySqlDatabase.Database
         protected abstract Task<IGameObject?> GetGameObjectByGuidAsync(T model, uint guid);
         protected abstract Task SetCreatureTemplateAI(T model, uint entry, string ainame, string scriptname);
 
-        public async Task InstallConditions(IEnumerable<IConditionLine> conditionLines,
-            IDatabaseProvider.ConditionKeyMask keyMask,
-            IDatabaseProvider.ConditionKey? manualKey = null)
-        {
-            using var writeLock = await DatabaseLock.WriteLock();
-            await using var model = Database();
-
-            var conditions = conditionLines?.ToList() ?? new List<IConditionLine>();
-            List<(int SourceType, int? SourceGroup, int? SourceEntry, int? SourceId)> keys = conditions.Select(c =>
-                    (c.SourceType, keyMask.HasFlagFast(IDatabaseProvider.ConditionKeyMask.SourceGroup) ? (int?) c.SourceGroup : null,
-                        keyMask.HasFlagFast(IDatabaseProvider.ConditionKeyMask.SourceEntry) ? (int?) c.SourceEntry : null,
-                        keyMask.HasFlagFast(IDatabaseProvider.ConditionKeyMask.SourceId) ? (int?) c.SourceId : null))
-                .Union(manualKey.HasValue
-                    ? new[]
-                    {
-                        (manualKey.Value.SourceType, manualKey.Value.SourceGroup, manualKey.Value.SourceEntry,
-                            manualKey.Value.SourceId)
-                    }
-                    : Array.Empty<(int, int?, int?, int?)>())
-                .Distinct()
-                .ToList();
-
-            await model.BeginTransactionAsync(IsolationLevel.ReadCommitted);
-
-            foreach (var key in keys)
-                await model.Conditions.Where(x => x.SourceType == key.SourceType &&
-                                                  (!key.SourceGroup.HasValue || x.SourceGroup == key.SourceGroup.Value) &&
-                                                  (!key.SourceEntry.HasValue || x.SourceEntry == key.SourceEntry.Value) &&
-                                                  (!key.SourceId.HasValue || x.SourceId == key.SourceId.Value))
-                    .DeleteAsync();
-
-            if (conditions.Count > 0)
-                await model.Conditions.BulkCopyAsync(conditions.Select(line => new MySqlConditionLine(line)));
-
-            await model.CommitTransactionAsync();
-        }
-
-        public IEnumerable<IConditionLine> GetConditionsFor(int sourceType, int sourceEntry, int sourceId)
+        public virtual IEnumerable<IConditionLine> GetConditionsFor(int sourceType, int sourceEntry, int sourceId)
         {
             using var model = Database();
 
@@ -356,7 +319,7 @@ namespace WDE.TrinityMySqlDatabase.Database
                 .ToList();
         }
 
-        public async Task<IList<IConditionLine>> GetConditionsForAsync(IDatabaseProvider.ConditionKeyMask keyMask, IDatabaseProvider.ConditionKey key)
+        public virtual async Task<IList<IConditionLine>> GetConditionsForAsync(IDatabaseProvider.ConditionKeyMask keyMask, IDatabaseProvider.ConditionKey key)
         {
             await using var model = Database();
 
@@ -367,7 +330,7 @@ namespace WDE.TrinityMySqlDatabase.Database
                 .ToListAsync<IConditionLine>();
         }
 
-        public async Task<IList<IConditionLine>> GetConditionsForAsync(IDatabaseProvider.ConditionKeyMask keyMask, ICollection<IDatabaseProvider.ConditionKey> manualKeys)
+        public virtual async Task<IList<IConditionLine>> GetConditionsForAsync(IDatabaseProvider.ConditionKeyMask keyMask, ICollection<IDatabaseProvider.ConditionKey> manualKeys)
         {
             if (manualKeys.Count == 0)
                 return new List<IConditionLine>();

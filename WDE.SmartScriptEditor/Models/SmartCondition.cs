@@ -7,6 +7,7 @@ using WDE.Common.Parameters;
 using WDE.Parameters;
 using WDE.Parameters.Models;
 using WDE.SmartScriptEditor.Editor;
+using WDE.SmartScriptEditor.Models.Helpers;
 
 namespace WDE.SmartScriptEditor.Models
 {
@@ -134,7 +135,7 @@ namespace WDE.SmartScriptEditor.Models
                     pram2comp = (isNegative, GetParameter(1).Value),
                     pram3comp = (isNegative, GetParameter(2).Value),
                     pram4comp = (isNegative, ParametersCount >= 4 ? GetParameter(3).Value : 0),
-                    
+                    spram1 = "[p]" + this.GetStringValueOrDefault(0) + "[/p]",
                     negate = inverted.Value == 0
                 });
                 return result;
@@ -160,6 +161,10 @@ namespace WDE.SmartScriptEditor.Models
             for (var i = 0; i < ParametersCount; ++i)
             {
                 se.GetParameter(i).Copy(GetParameter(i));
+            }
+            for (var i = 0; i < StringParametersCount; ++i)
+            {
+                se.GetStringParameter(i).Copy(GetStringParameter(i));
             }
             return se;
         }

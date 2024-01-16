@@ -14,8 +14,8 @@ namespace WDE.Common.Parameters
     [UniqueProvider]
     public interface IParameterFactory
     {
-        IParameter<long> Factory(string type);
-        IParameter<string> FactoryString(string type);
+        IParameter<long> Factory(string? type);
+        IParameter<string> FactoryString(string? type);
         bool IsRegisteredLong(string? type);
         bool IsRegisteredString(string? type);
         T Register<T>(string key, T parameter, QuickAccessMode quickAccessMode = QuickAccessMode.None) where T : IParameter<long>;

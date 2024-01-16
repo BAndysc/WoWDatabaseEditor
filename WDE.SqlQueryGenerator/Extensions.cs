@@ -275,6 +275,11 @@ namespace WDE.SqlQueryGenerator
         {
             return new UpdateQuery(query, key, value.ToSql(), comment, IUpdateQuery.Operator.SetOr);
         }
+
+        public static IUpdateQuery SetAndNot<T>(this IUpdateQuery query, string key, T? value, string? comment = null)
+        {
+            return new UpdateQuery(query, key, value.ToSql(), comment, IUpdateQuery.Operator.SetAndNot);
+        }
         
         public static IQuery Update(this IUpdateQuery query, string? comment = null)
         {
@@ -302,6 +307,8 @@ namespace WDE.SqlQueryGenerator
                     value = update.value;
                 else if (update.op == IUpdateQuery.Operator.SetOr)
                     value = $"`{update.column}` | {update.value}";
+                else if (update.op == IUpdateQuery.Operator.SetAndNot)
+                    value = $"`{update.column}` & ~{update.value}";
                 else
                     throw new ArgumentOutOfRangeException(nameof(update.op));
                     

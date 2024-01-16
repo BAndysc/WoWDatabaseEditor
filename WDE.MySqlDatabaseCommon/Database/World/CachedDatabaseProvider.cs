@@ -296,7 +296,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
             return nonCachedDatabase.GetQuestTemplates();
         }
 
-        public Task<IList<IQuestObjective>> GetQuestObjectives(uint questId) => WaitForCache(nonCachedDatabase.GetQuestObjectives(questId));
+        public Task<IReadOnlyList<IQuestObjective>> GetQuestObjectives(uint questId) => WaitForCache(nonCachedDatabase.GetQuestObjectives(questId));
 
         public Task<IQuestObjective?> GetQuestObjective(uint questId, int storageIndex) => WaitForCache(nonCachedDatabase.GetQuestObjective(questId, storageIndex));
 

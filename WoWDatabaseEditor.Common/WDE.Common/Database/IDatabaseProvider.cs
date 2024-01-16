@@ -28,7 +28,7 @@ namespace WDE.Common.Database
 
         Task<IQuestTemplate?> GetQuestTemplate(uint entry);
         IReadOnlyList<IQuestTemplate> GetQuestTemplates();
-        Task<IList<IQuestObjective>> GetQuestObjectives(uint questId);
+        Task<IReadOnlyList<IQuestObjective>> GetQuestObjectives(uint questId);
         Task<IQuestObjective?> GetQuestObjective(uint questId, int storageIndex);
         Task<IQuestObjective?> GetQuestObjectiveById(uint objectiveId);
         Task<IQuestRequestItem?> GetQuestRequestItem(uint entry);

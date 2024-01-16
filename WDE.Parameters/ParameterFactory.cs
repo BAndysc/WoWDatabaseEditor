@@ -36,8 +36,11 @@ namespace WDE.Parameters
             Register("Parameter", new Parameter());
         }
 
-        public IParameter<long> Factory(string type)
+        public IParameter<long> Factory(string? type)
         {
+            if (type == null)
+                return Parameter.Instance;
+            
             if (parameters.TryGetValue(type, out var parameter))
                 return parameter;
 
@@ -56,10 +59,14 @@ namespace WDE.Parameters
             return Parameter.Instance;
         }
 
-        public IParameter<string> FactoryString(string type)
+        public IParameter<string> FactoryString(string? type)
         {
+            if (type == null)
+                return StringParameter.Instance;
+            
             if (stringParameters.TryGetValue(type, out var parameter))
                 return parameter;
+            
             return StringParameter.Instance;
         }
 

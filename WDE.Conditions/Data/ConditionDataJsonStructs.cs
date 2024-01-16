@@ -21,6 +21,20 @@ namespace WDE.Conditions.Data
         [JsonProperty(PropertyName = "values")]
         public Dictionary<long, SelectOption> Values { get; set; }
     }
+    
+    [ExcludeFromCodeCoverage]
+    public struct ConditionStringParameterJsonData
+    {
+        [JsonProperty(PropertyName = "type")]
+        public string? Type { get; set; }
+
+        [JsonProperty(PropertyName = "name")]
+        public string Name { get; set; }
+
+        [JsonProperty(PropertyName = "description")]
+        public string Description { get; set; }
+    }
+
 
     [ExcludeFromCodeCoverage]
     public struct ConditionSourceTargetJsonData
@@ -93,6 +107,9 @@ namespace WDE.Conditions.Data
 
         [JsonProperty(PropertyName = "parameters")]
         public IList<ConditionParameterJsonData>? Parameters { get; set; }
+        
+        [JsonProperty(PropertyName = "sparameters")]
+        public IList<ConditionStringParameterJsonData>? StringParameters { get; set; }
 
         [JsonProperty(PropertyName = "description")]
         public string Description { get; set; } = "Missing description";

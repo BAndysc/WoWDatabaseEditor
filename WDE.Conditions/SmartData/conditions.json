@@ -940,6 +940,41 @@
 			}
 		],
 		"description": "{target} {negate:has|has not} Scene {pram1} in progress"
+	},
+
+	{
+		"id": 56,
+		"name": "CONDITION_PLAYER_CONDITION",
+		"name_readable": "Player Condition met",
+		"help": "Condition is met if target has a player condition met",
+		"parameters": [
+			{
+				"type": "Parameter",
+				"name": "Condition id"
+			}
+		],
+		"description": "{target} {negate:meets|does not meet} player condition {pram1}"
+	},
+
+	{
+		"id": 57,
+		"name": "CONDITION_PRIVATE_OBJECT",
+		"name_readable": "Is Private Object",
+		"help": "Condition is met if the target is a private object",
+		"description": "{target} {negate:is|is not} a private object"
+	},
+
+	{
+		"id": 58,
+		"name": "CONDITION_STRING_ID",
+		"name_readable": "Has StringId",
+		"help": "Condition is met if target has a specific string id",
+		"sparameters": [
+			{
+				"name": "String id"
+			}
+		],
+		"description": "{target} {negate:is|is not} {spram1}"
 	}
 
 ]

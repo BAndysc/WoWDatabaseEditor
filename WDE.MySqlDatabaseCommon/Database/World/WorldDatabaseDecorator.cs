@@ -36,7 +36,7 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public Task<IList<IAreaTriggerTemplate>> GetAreaTriggerTemplatesAsync() => impl.GetAreaTriggerTemplatesAsync();
 
         public IReadOnlyList<IQuestTemplate> GetQuestTemplates() => impl.GetQuestTemplates();
-        public async Task<IList<IQuestObjective>> GetQuestObjectives(uint questId) => await impl.GetQuestObjectives(questId);
+        public async Task<IReadOnlyList<IQuestObjective>> GetQuestObjectives(uint questId) => await impl.GetQuestObjectives(questId);
         public async Task<IQuestObjective?> GetQuestObjective(uint questId, int storageIndex) => await impl.GetQuestObjective(questId, storageIndex);
         public async Task<IQuestObjective?> GetQuestObjectiveById(uint objectiveId) => await impl.GetQuestObjectiveById(objectiveId);
 

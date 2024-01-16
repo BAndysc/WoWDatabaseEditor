@@ -78,6 +78,7 @@ namespace WDE.Common.CoreVersion
         string ConditionsFile { get; }
         string ConditionGroupsFile { get; }
         string ConditionSourcesFile { get; }
+        bool HasConditionStringValue => false;
     }
 
     [Flags]

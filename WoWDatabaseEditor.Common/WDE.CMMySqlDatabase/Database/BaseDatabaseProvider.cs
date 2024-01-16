@@ -64,7 +64,7 @@ namespace WDE.CMMySqlDatabase.Database
             return new List<ISmartScriptLine>();
         }
 
-        public async Task<IList<IQuestObjective>> GetQuestObjectives(uint questId) => new List<IQuestObjective>();
+        public async Task<IReadOnlyList<IQuestObjective>> GetQuestObjectives(uint questId) => new List<IQuestObjective>();
 
         public async Task<IQuestObjective?> GetQuestObjective(uint questId, int storageIndex) => null;
         

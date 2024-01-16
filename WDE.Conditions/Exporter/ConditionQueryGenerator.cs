@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using WDE.Common.CoreVersion;
 using WDE.Common.Database;
 using WDE.Module.Attributes;
 using WDE.SqlQueryGenerator;
@@ -9,6 +10,13 @@ namespace WDE.Conditions.Exporter
     [AutoRegister]
     public class ConditionQueryGenerator : IConditionQueryGenerator
     {
+        private readonly ICurrentCoreVersion currentCoreVersion;
+
+        public ConditionQueryGenerator(ICurrentCoreVersion currentCoreVersion)
+        {
+            this.currentCoreVersion = currentCoreVersion;
+        }
+        
         public IQuery BuildDeleteQuery(IDatabaseProvider.ConditionKey key)
         {
             return Queries.Table(DatabaseTable.WorldTable("conditions"))
@@ -22,7 +30,12 @@ namespace WDE.Conditions.Exporter
         public IQuery BuildInsertQuery(IReadOnlyList<IConditionLine> conditions)
         {
             return Queries.Table(DatabaseTable.WorldTable("conditions"))
-                .BulkInsert(conditions.Select(c => c.ToSqlObject()));
+                .BulkInsert(conditions.Select(c =>
+                {
+                    if (currentCoreVersion.Current.ConditionFeatures.HasConditionStringValue)
+                        return c.ToSqlObjectMaster();
+                    return c.ToSqlObject();
+                }));
         }
     }
 }

@@ -47,12 +47,23 @@
         int Amount { get; }
         string? Description { get; }
     }
+
+    public class AbstractQuestObjective : IQuestObjective
+    {
+        public uint ObjectiveId { get; set; }
+        public uint QuestId { get; set; }
+        public QuestObjectiveType Type { get; set; }
+        public int StorageIndex { get; set; }
+        public int ObjectId { get; set; }
+        public int Amount { get; set; }
+        public string? Description { get; set; }
+    }
     
     public enum QuestObjectiveType : ushort
     {
         Monster = 0,
         Item = 1,
-        GamObject = 2,
+        GameObject = 2,
         TalkTo = 3,
         Currency = 4,
         LearnSpell = 5,

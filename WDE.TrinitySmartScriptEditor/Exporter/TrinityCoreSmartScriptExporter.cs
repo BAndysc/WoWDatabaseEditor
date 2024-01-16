@@ -14,6 +14,7 @@ using WDE.SmartScriptEditor.Editor;
 using WDE.SmartScriptEditor.Editor.UserControls;
 using WDE.SmartScriptEditor.Exporter;
 using WDE.SmartScriptEditor.Models;
+using WDE.SmartScriptEditor.Models.Helpers;
 using WDE.SqlQueryGenerator;
 
 namespace WDE.TrinitySmartScriptEditor.Exporter
@@ -83,6 +84,7 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
                     ConditionValue1 = (int)c.GetParameter(0).Value,
                     ConditionValue2 = (int)c.GetParameter(1).Value,
                     ConditionValue3 = (int)c.GetParameter(2).Value,
+                    ConditionStringValue1 = c.GetStringValueOrDefault(0) ?? "",
                     NegativeCondition = (int)c.Inverted.Value,
                     Comment = c.Readable.RemoveTags()
                 });

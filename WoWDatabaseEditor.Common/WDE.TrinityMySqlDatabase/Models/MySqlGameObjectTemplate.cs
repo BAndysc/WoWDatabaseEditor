@@ -19,6 +19,8 @@ namespace WDE.TrinityMySqlDatabase.Models
         [Column(Name = "type")]
         public GameobjectType Type { get; set; }
 
+        public uint Flags => 0;
+
         [Column(Name = "name")]
         public string Name { get; set; } = "";
 

@@ -44,7 +44,9 @@
             "CONDITION_CREATURE_FAMILY",
             "CONDITION_CREATURE_TYPE",
             "CONDITION_STAND_STATE",
-            "CONDITION_CHARMED"
+            "CONDITION_CHARMED",
+            "CONDITION_PRIVATE_OBJECT",
+            "CONDITION_STRING_ID"
         ]
     },
     {
@@ -77,7 +79,8 @@
             "CONDITION_SPELL",
             "CONDITION_PET_TYPE",
             "CONDITION_TAXI",
-            "CONDITION_GAMEMASTER"
+            "CONDITION_GAMEMASTER",
+            "CONDITION_PLAYER_CONDITION"
         ]
     },
     {

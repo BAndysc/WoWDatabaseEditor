@@ -73,6 +73,12 @@ namespace WDE.Common.Avalonia.Controls
                     if (result.ok)
                         context.Value = result.value;
                 }
+                if (DataContext is IParameterValueHolder<string> stringContext)
+                {
+                    var result = await pickerService.PickParameter(stringContext.Parameter, stringContext.Value);
+                    if (result.ok)
+                        stringContext.Value = result.value ?? "";
+                }
             });
             PickSpecial = new AsyncAutoCommand(async () =>
             {

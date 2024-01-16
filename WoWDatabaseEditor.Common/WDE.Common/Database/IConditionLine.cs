@@ -24,6 +24,8 @@ namespace WDE.Common.Database
 
         long ConditionValue4 { get; set; }
 
+        string ConditionStringValue1 { get; set; }
+        
         int NegativeCondition { get; set; }
 
         string? Comment { get; set; }
@@ -69,6 +71,16 @@ namespace WDE.Common.Database
 
             throw new ArgumentOutOfRangeException();
         }
+        
+        public static string GetConditionValueString(this ICondition line, int i)
+        {
+            switch (i)
+            {
+                case 0: return line.ConditionStringValue1.ToString();
+            }
+
+            throw new ArgumentOutOfRangeException();
+        }
     }
     
     // KEEP IT POCO!
@@ -91,6 +103,7 @@ namespace WDE.Common.Database
             ConditionValue2 = line.ConditionValue2;
             ConditionValue3 = line.ConditionValue3;
             ConditionValue4 = line.ConditionValue4;
+            ConditionStringValue1 = line.ConditionStringValue1;
             NegativeCondition = line.NegativeCondition;
             Comment = line.Comment;
         }
@@ -113,6 +126,7 @@ namespace WDE.Common.Database
             ConditionValue2 = condition.ConditionValue2;
             ConditionValue3 = condition.ConditionValue3;
             ConditionValue4 = condition.ConditionValue4;
+            ConditionStringValue1 = condition.ConditionStringValue1;
             NegativeCondition = condition.NegativeCondition;
             Comment = condition.Comment;
         }
@@ -143,6 +157,8 @@ namespace WDE.Common.Database
         
         public long ConditionValue4 { get; set; }
 
+        public string ConditionStringValue1 { get; set; } = "";
+
         public int NegativeCondition { get; set; }
 
         public string? Comment { get; set; }
@@ -164,6 +180,7 @@ namespace WDE.Common.Database
             ConditionValue2 = line.ConditionValue2;
             ConditionValue3 = line.ConditionValue3;
             ConditionValue4 = line.ConditionValue4;
+            ConditionStringValue1 = line.ConditionStringValue1;
             NegativeCondition = line.NegativeCondition;
             Comment = line.Comment;
         }
@@ -186,6 +203,8 @@ namespace WDE.Common.Database
         
         public long ConditionValue4 { get; set; }
 
+        public string ConditionStringValue1 { get; set; } = "";
+
         public int NegativeCondition { get; set; }
 
         public string? Comment { get; set; }
@@ -199,7 +218,7 @@ namespace WDE.Common.Database
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return ElseGroup == other.ElseGroup && ConditionIndex == other.ConditionIndex && ConditionParent == other.ConditionParent && ConditionType == other.ConditionType && ConditionTarget == other.ConditionTarget && ConditionValue1 == other.ConditionValue1 && ConditionValue2 == other.ConditionValue2 && ConditionValue3 == other.ConditionValue3 && ConditionValue4 == other.ConditionValue4 && NegativeCondition == other.NegativeCondition && Comment == other.Comment;
+            return ElseGroup == other.ElseGroup && ConditionIndex == other.ConditionIndex && ConditionParent == other.ConditionParent && ConditionType == other.ConditionType && ConditionTarget == other.ConditionTarget && ConditionValue1 == other.ConditionValue1 && ConditionValue2 == other.ConditionValue2 && ConditionValue3 == other.ConditionValue3 && ConditionValue4 == other.ConditionValue4 && ConditionStringValue1 == other.ConditionStringValue1 && NegativeCondition == other.NegativeCondition && Comment == other.Comment;
         }
 
         public override bool Equals(object? obj)

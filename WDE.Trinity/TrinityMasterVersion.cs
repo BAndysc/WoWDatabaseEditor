@@ -44,6 +44,7 @@ namespace WDE.Trinity
         public string ConditionsFile => "SmartData/conditions.json";
         public string ConditionGroupsFile => "SmartData/conditions_groups.json";
         public string ConditionSourcesFile => "SmartData/condition_sources.json";
+        public bool HasConditionStringValue => true;
         public CharacterRaces AllRaces => CharacterRaces.AllDragonflight;
         public CharacterClasses AllClasses => CharacterClasses.AllDragonflight;
         public EventScriptType SupportedEventScripts => EventScriptType.Event | EventScriptType.Waypoint | EventScriptType.Spell;

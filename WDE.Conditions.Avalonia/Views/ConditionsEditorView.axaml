@@ -79,6 +79,9 @@
                 <views:LabeledControl Header="{CompiledBinding Name}" IsVisible="{CompiledBinding IsUsed}" DataContext="{CompiledBinding ConditionValue3, Mode=OneWay}">
                     <controls:ParameterValueHolderView PickCommand="{Binding #Root.DataContext.PickCommand}" />
                 </views:LabeledControl>
+                <views:LabeledControl Header="{CompiledBinding Name}" IsVisible="{CompiledBinding IsUsed}" DataContext="{CompiledBinding ConditionStringValue1, Mode=OneWay}">
+                    <controls:ParameterValueHolderView PickCommand="{Binding #Root.DataContext.PickCommand}" />
+                </views:LabeledControl>
             </StackPanel>
         </Border>
         

@@ -54,6 +54,8 @@ namespace WDE.TrinityMySqlDatabase.Models
         
         public long ConditionValue4 { get; set; }
 
+        public virtual string ConditionStringValue1 { get; set; } = "";
+
         [Column(Name = "NegativeCondition")]
         [PrimaryKey]
         public int NegativeCondition { get; set; }
@@ -62,22 +64,17 @@ namespace WDE.TrinityMySqlDatabase.Models
         public string? Comment { get; set; } = "";
 
         public MySqlConditionLine() { }
+    }
 
-        public MySqlConditionLine(IConditionLine otherLine)
+    [ExcludeFromCodeCoverage]
+    [Table(Name = "conditions")]
+    public class MySqlConditionLineMaster : MySqlConditionLine
+    {
+        [Column(Name = "ConditionStringValue1")]
+        public override string ConditionStringValue1
         {
-            SourceType = otherLine.SourceType;
-            SourceGroup = otherLine.SourceGroup;
-            SourceEntry = otherLine.SourceEntry;
-            SourceId = otherLine.SourceId;
-            ElseGroup = otherLine.ElseGroup;
-            ConditionType = otherLine.ConditionType;
-            ConditionTarget = otherLine.ConditionTarget;
-            ConditionValue1 = otherLine.ConditionValue1;
-            ConditionValue2 = otherLine.ConditionValue2;
-            ConditionValue3 = otherLine.ConditionValue3;
-            ConditionValue4 = otherLine.ConditionValue4;
-            NegativeCondition = otherLine.NegativeCondition;
-            Comment = otherLine.Comment;
-        }
+            get;
+            set;
+        } = "";
     }
 }

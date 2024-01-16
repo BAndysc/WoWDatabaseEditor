@@ -1999,8 +1999,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 SmartCondition ev = smartFactory.ConditionFactory(conditionId.Value);
                 ev.Parent = e;
             
-                if ((conditionData.Parameters?.Count ?? 0) == 0 || await EditConditionCommand(new []{ev}))
-                    e.Conditions.Add(ev);   
+                if (((conditionData.Parameters?.Count ?? 0) == 0 && (conditionData.StringParameters?.Count ?? 0) == 0) || await EditConditionCommand(new []{ev}))
+                    e.Conditions.Add(ev);
             }
         }
 

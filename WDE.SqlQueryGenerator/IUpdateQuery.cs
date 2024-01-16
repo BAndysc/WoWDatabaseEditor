@@ -9,7 +9,8 @@ namespace WDE.SqlQueryGenerator
         public enum Operator
         {
             Set,
-            SetOr
+            SetOr,
+            SetAndNot
         }
         
         public IWhere Condition { get; }

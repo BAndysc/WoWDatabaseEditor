@@ -333,7 +333,7 @@ public class TrinityMasterMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvid
         return await model.PlayerChoiceResponse.Where(x => x.ChoiceId == choiceId).ToListAsync<IPlayerChoiceResponse>();
     }
 
-    public override async Task<IList<IQuestObjective>> GetQuestObjectives(uint questId)
+    public override async Task<IReadOnlyList<IQuestObjective>> GetQuestObjectives(uint questId)
     {
         await using var model = Database();
         return await model.QuestObjective.Where(x => x.QuestId == questId).ToListAsync<IQuestObjective>();
@@ -489,5 +489,42 @@ public class TrinityMasterMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvid
     {
         await using var model = Database();
         return await model.WaypointData.Where(wp => wp.PathId == pathId).OrderBy(wp => wp.PointId).ToListAsync<IWaypointData>();
+    }
+    
+    public override IEnumerable<IConditionLine> GetConditionsFor(int sourceType, int sourceEntry, int sourceId)
+    {
+        using var model = Database();
+
+        return model.ConditionsMaster.Where(line =>
+                line.SourceType == sourceType && line.SourceEntry == sourceEntry && line.SourceId == sourceId)
+            .ToList();
+    }
+
+    public override async Task<IList<IConditionLine>> GetConditionsForAsync(IDatabaseProvider.ConditionKeyMask keyMask, IDatabaseProvider.ConditionKey key)
+    {
+        await using var model = Database();
+
+        return await model.ConditionsMaster.Where(x => x.SourceType == key.SourceType &&
+                                                       (!keyMask.HasFlagFast(IDatabaseProvider.ConditionKeyMask.SourceGroup) || x.SourceGroup == (key.SourceGroup ?? 0)) &&
+                                                       (!keyMask.HasFlagFast(IDatabaseProvider.ConditionKeyMask.SourceEntry)  || x.SourceEntry == (key.SourceEntry ?? 0)) &&
+                                                       (!keyMask.HasFlagFast(IDatabaseProvider.ConditionKeyMask.SourceId)  || x.SourceId == (key.SourceId ?? 0)))
+            .ToListAsync<IConditionLine>();
+    }
+
+    public override async Task<IList<IConditionLine>> GetConditionsForAsync(IDatabaseProvider.ConditionKeyMask keyMask, ICollection<IDatabaseProvider.ConditionKey> manualKeys)
+    {
+        if (manualKeys.Count == 0)
+            return new List<IConditionLine>();
+            
+        await using var model = Database();
+        var predicate = PredicateBuilder.New<MySqlConditionLineMaster>();
+        foreach (var key in manualKeys)
+        {
+            predicate = predicate.Or(x => x.SourceType == key.SourceType &&
+                                          (!keyMask.HasFlagFast(IDatabaseProvider.ConditionKeyMask.SourceGroup) || x.SourceGroup == (key.SourceGroup ?? 0)) &&
+                                          (!keyMask.HasFlagFast(IDatabaseProvider.ConditionKeyMask.SourceEntry)  || x.SourceEntry == (key.SourceEntry ?? 0)) &&
+                                          (!keyMask.HasFlagFast(IDatabaseProvider.ConditionKeyMask.SourceId)  || x.SourceId == (key.SourceId ?? 0)));
+        }
+        return await model.ConditionsMaster.Where(predicate).ToListAsync<IConditionLine>();
     }
 }

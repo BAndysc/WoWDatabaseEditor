@@ -14,6 +14,7 @@ namespace WDE.CMMySqlDatabase.Models.TBC
         [Column("data1"                               )] public int    Data1          { get; set; } // int(10)
         [Column("size"                                )] public float  Size           { get; set; } // float
         [Column("displayId"                           )] public uint   DisplayId      { get; set; } // mediumint(8) unsigned
+        [Column(Name = "flags"                                   )] public uint   Flags          { get; set; }
 
         public uint this[int dataIndex]
         {
