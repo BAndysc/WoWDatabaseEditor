@@ -40,7 +40,7 @@ public class CustomCellDrawer : BaseCustomCellDrawer, ICustomCellDrawer
         return false;
     }
 
-    public override bool Draw(DrawingContext context, IFastTableContext table, ref Rect rect, ITableCell c)
+    public override bool Draw(DrawingContext context, IFastTableContext table, ref Rect rect, ITableCell c, ITableRow row)
     {
         if (c is ActionCell actionCell)
         {

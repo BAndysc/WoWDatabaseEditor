@@ -15,9 +15,7 @@ namespace AvaloniaStyles.Controls.FastTableView;
 public partial class VeryFastTableView : Panel, IKeyboardNavigationHandler, IFastTableContext
 {
     protected static double ColumnSpacing = 10;
-    protected static double RowHeight = 28;
     protected static double HeaderRowHeight = 36;
-    protected static double DrawingStartOffsetY = RowHeight;
     protected static ISolidColorBrush OddRowBackground = new SolidColorBrush(Colors.White);
     protected static ISolidColorBrush SelectedRowBackground = new SolidColorBrush(Color.FromRgb(87, 124, 219));
     protected static ISolidColorBrush EvenRowBackground = new SolidColorBrush(Color.FromRgb(240, 240, 240));
@@ -306,7 +304,7 @@ public partial class VeryFastTableView : Panel, IKeyboardNavigationHandler, IFas
         {
             // row
             {
-                var index = GetRowIndexByY(e.GetPosition(this).Y);
+                var index = GetRowIndexByY(e.GetPosition(this));
                 if (!index.HasValue || !IsRowIndexValid(index.Value))
                 {
                     SelectedRowIndex = VerticalCursor.None;
@@ -364,11 +362,16 @@ public partial class VeryFastTableView : Panel, IKeyboardNavigationHandler, IFas
             }
             // cell
             {
-                var index = GetColumnIndexByX(e.GetPosition(this).X);
-                if (Items?.Count == 0 || !index.HasValue)
+                var columnIndex = GetColumnIndexByX(e.GetPosition(this).X);
+                if (Items?.Count == 0 || !columnIndex.HasValue)
                     SelectedCellIndex = -1;
                 else
-                    SelectedCellIndex = Math.Clamp(index.Value, 0, ColumnsCount - 1);
+                {
+                    if (TableSpan is { } span && span.IsMerged(SelectedRowIndex.GroupIndex, SelectedRowIndex.RowIndex, columnIndex.Value, out var _, out var firstColumn))
+                        columnIndex = firstColumn;
+                    
+                    SelectedCellIndex = Math.Clamp(columnIndex.Value, 0, ColumnsCount - 1);
+                }
             }
         }
         else if (IsOverColumnSplitter(e.GetPosition(this).X, out var columnIndex))
@@ -389,8 +392,10 @@ public partial class VeryFastTableView : Panel, IKeyboardNavigationHandler, IFas
             var properties = e.GetCurrentPoint(this).Properties;
             if (SelectedCellIndex >= Items[SelectedRowIndex.GroupIndex].Rows[SelectedRowIndex.RowIndex].CellsList.Count)
                 throw new Exception();
-            var cell = Items[SelectedRowIndex.GroupIndex].Rows[SelectedRowIndex.RowIndex].CellsList[SelectedCellIndex];
-            if (CustomCellInteractor != null && CustomCellInteractor.PointerDown(cell,
+            var row = Items[SelectedRowIndex.GroupIndex].Rows[SelectedRowIndex.RowIndex];
+            var cell = row.CellsList[SelectedCellIndex];
+            if (CustomCellInteractor != null && CustomCellInteractor.PointerDown(row,
+                    cell,
                     SelectedCellRect,
                     e.GetPosition(this),
                     properties.IsLeftButtonPressed, 
@@ -436,8 +441,10 @@ public partial class VeryFastTableView : Panel, IKeyboardNavigationHandler, IFas
         }
         else if (IsSelectedCellValid && Items != null)
         {
-            var cell = Items[SelectedRowIndex.GroupIndex].Rows[SelectedRowIndex.RowIndex].CellsList[SelectedCellIndex];
-            if (CustomCellInteractor != null && CustomCellInteractor.PointerUp(cell,
+            var row = Items[SelectedRowIndex.GroupIndex].Rows[SelectedRowIndex.RowIndex];
+            var cell = row.CellsList[SelectedCellIndex];
+            if (CustomCellInteractor != null && CustomCellInteractor.PointerUp(row,
+                    cell,
                     SelectedCellRect,
                     e.GetPosition(this),
                     e.GetCurrentPoint(this).Properties.PointerUpdateKind == PointerUpdateKind.LeftButtonReleased,
@@ -465,10 +472,13 @@ public partial class VeryFastTableView : Panel, IKeyboardNavigationHandler, IFas
             return;
         if (Items == null)
             return;
+
+        var row = Items[SelectedRowIndex.GroupIndex].Rows[SelectedRowIndex.RowIndex];
+
         if (CustomCellInteractor == null ||
-            !CustomCellInteractor.SpawnEditorFor(customText, this, SelectedCellRect, Items[SelectedRowIndex.GroupIndex].Rows[SelectedRowIndex.RowIndex].CellsList[SelectedCellIndex]))
+            !CustomCellInteractor.SpawnEditorFor(row, customText, this, SelectedCellRect, row.CellsList[SelectedCellIndex]))
         {
-            editor.Spawn(this, SelectedCellRect, customText ?? Items[SelectedRowIndex.GroupIndex].Rows[SelectedRowIndex.RowIndex].CellsList[SelectedCellIndex].StringValue ?? "", customText == null, (text, action) =>
+            editor.Spawn(this, SelectedCellRect, customText ?? row.CellsList[SelectedCellIndex].StringValue ?? "", customText == null, (text, action) =>
             {
                 ValueUpdateRequest?.Invoke(text);
                 if (action != PhantomTextBox.ActionAfterSave.None)
@@ -500,7 +510,15 @@ public partial class VeryFastTableView : Panel, IKeyboardNavigationHandler, IFas
     {
         var widthRect = GetColumnRect(column);
         var width = Math.Max(0, widthRect.width);
-        return new Rect(widthRect.x, GetRowY(row), width, RowHeight);
+        var height = RowHeight;
+        if (TableSpan is { } span)
+        {
+            span.GetCellSpan(row.GroupIndex, row.RowIndex, column, out var rowSpan, out var colSpan);
+            for (int i = 1; i < colSpan; ++i)
+                width += GetColumnRect(column + i).width;
+            height = RowHeight * rowSpan;
+        }
+        return new Rect(widthRect.x, GetRowY(row), width, height);
     }
 
     public double GetRowY(VerticalCursor cursor)

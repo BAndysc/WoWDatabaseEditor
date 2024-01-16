@@ -22,7 +22,7 @@ public class CustomCellDrawer : BaseCustomCellDrawer, ICustomCellDrawer
     {
     }
     
-    public override bool Draw(DrawingContext context, IFastTableContext table, ref Rect rect, ITableCell c)
+    public override bool Draw(DrawingContext context, IFastTableContext table, ref Rect rect, ITableCell c, ITableRow row)
     {
         if (c is ItemViewModel.ItemNameCell itemCell &&
             itemCell.Item.MinCountOrRef >= 0)

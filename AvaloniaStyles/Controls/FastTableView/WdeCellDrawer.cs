@@ -11,7 +11,7 @@ public class WdeCellDrawer : ICustomCellDrawer
     private static IPen ButtonBorderPen = new Pen(new SolidColorBrush(Color.FromRgb(245, 245, 245)), 1);
     private static IPen ButtonBackgroundPen = new Pen(new SolidColorBrush(Colors.White), 0);
     
-    public bool Draw(DrawingContext context, IFastTableContext table, ref Rect rect, ITableCell cell)
+    public bool Draw(DrawingContext context, IFastTableContext table, ref Rect rect, ITableCell cell, ITableRow row)
     {
         if (cell is not WdeCell wde)
             return false;

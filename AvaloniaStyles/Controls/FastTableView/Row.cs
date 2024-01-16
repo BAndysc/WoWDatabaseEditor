@@ -123,6 +123,43 @@ public class IntCell : ITableCell
     public override string ToString() => StringValue ?? "(null)";
 }
     
+public class BoolCell : ITableCell
+{
+    private readonly Func<bool> getter;
+    private readonly Action<bool> setter;
+    public event PropertyChangedEventHandler? PropertyChanged;
+        
+    public BoolCell(Func<bool> getter, Action<bool> setter)
+    {
+        this.getter = getter;
+        this.setter = setter;
+    }
+
+    public void UpdateFromString(string newValue)
+    {
+        if (int.TryParse(newValue, out var i))
+            setter(i != 0);
+        if (newValue.Equals("yes", StringComparison.OrdinalIgnoreCase) ||
+            newValue.Equals("y", StringComparison.OrdinalIgnoreCase) ||
+            newValue.Equals("true", StringComparison.OrdinalIgnoreCase))
+            setter(true);
+        if (newValue.Equals("no", StringComparison.OrdinalIgnoreCase) ||
+            newValue.Equals("n", StringComparison.OrdinalIgnoreCase) ||
+            newValue.Equals("false", StringComparison.OrdinalIgnoreCase))
+            setter(false);
+    }
+
+    public bool Value
+    {
+        get => getter();
+        set => setter(value);
+    }
+
+    public string? StringValue => getter().ToString();
+
+    public override string ToString() => StringValue ?? "(null)";
+}
+
 public class UIntCell : ITableCell
 {
     private readonly Func<uint> getter;

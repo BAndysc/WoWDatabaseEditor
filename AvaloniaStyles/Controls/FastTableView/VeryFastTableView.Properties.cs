@@ -5,6 +5,7 @@ using Avalonia.Controls.Templates;
 using Avalonia.Data;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using WDE.Common.TableData;
 using WDE.Common.Utils;
 
 namespace AvaloniaStyles.Controls.FastTableView;
@@ -19,6 +20,7 @@ public class ColumnPressedEventArgs : RoutedEventArgs
 public partial class VeryFastTableView
 {
     public event System.Action<string>? ValueUpdateRequest;
+    public static readonly DirectProperty<VeryFastTableView, double> RowHeightProperty = AvaloniaProperty.RegisterDirect<VeryFastTableView, double>(nameof(RowHeight), o => o.RowHeight, (o, v) => o.RowHeight = v, 28); 
     public static readonly StyledProperty<IReadOnlyList<int>?> HiddenColumnsProperty = AvaloniaProperty.Register<VeryFastTableView, IReadOnlyList<int>?>(nameof(HiddenColumns));
     public static readonly StyledProperty<IReadOnlyList<ITableColumnHeader>?> ColumnsProperty = AvaloniaProperty.Register<VeryFastTableView, IReadOnlyList<ITableColumnHeader>?>(nameof(Columns));
     public static readonly StyledProperty<IReadOnlyList<ITableRowGroup>?> ItemsProperty = AvaloniaProperty.Register<VeryFastTableView, IReadOnlyList<ITableRowGroup>?>(nameof(Items));
@@ -43,6 +45,16 @@ public partial class VeryFastTableView
     public static readonly StyledProperty<IRowFilterPredicate?> RowFilterProperty = AvaloniaProperty.Register<VeryFastTableView, IRowFilterPredicate?>("RowFilter");
     public static readonly StyledProperty<bool> IsReadOnlyProperty = AvaloniaProperty.Register<VeryFastTableView, bool>("IsReadOnly");
 
+    public static readonly StyledProperty<IGroupedReadOnlyTableSpan?> TableSpanProperty = AvaloniaProperty.Register<VeryFastTableView, IGroupedReadOnlyTableSpan?>(nameof(TableSpan));
+
+    private double rowHeight = 28;
+    protected double DrawingStartOffsetY => RowHeight;
+    public double RowHeight
+    {
+        get => rowHeight;
+        set => SetAndRaise(RowHeightProperty, ref rowHeight, value);
+    }
+    
     public bool IsDynamicHeaderHeight
     {
         get => GetValue(IsDynamicHeaderHeightProperty);
@@ -148,5 +160,11 @@ public partial class VeryFastTableView
     {
         get => GetValue(SubHeaderHeightProperty);
         set => SetValue(SubHeaderHeightProperty, value);
+    }
+    
+    public IGroupedReadOnlyTableSpan? TableSpan
+    {
+        get => GetValue(TableSpanProperty);
+        set => SetValue(TableSpanProperty, value);
     }
 }

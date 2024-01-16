@@ -20,7 +20,7 @@ public class CustomCellInteractor : ICustomCellInteractor
     private PhantomCompletionComboBox comboBox = new();
     private PhantomTextBox textBox = new();
 
-    public bool SpawnEditorFor(string? initialText, Visual parent, Rect rect, ITableCell c)
+    public bool SpawnEditorFor(ITableRow row, string? initialText, Visual parent, Rect rect, ITableCell c)
     {
         if (c is not SingleRecordDatabaseCellViewModel cell)
             return false;
@@ -57,7 +57,7 @@ public class CustomCellInteractor : ICustomCellInteractor
         return false;
     }
 
-    public bool PointerDown(ITableCell c, Rect cellRect, Point mouse, bool leftButton, bool rightButton, int clickCount)
+    public bool PointerDown(ITableRow row, ITableCell c, Rect cellRect, Point mouse, bool leftButton, bool rightButton, int clickCount)
     {
         if (c is not SingleRecordDatabaseCellViewModel cell)
             return false;
@@ -65,7 +65,7 @@ public class CustomCellInteractor : ICustomCellInteractor
         return false;
     }
     
-    public bool PointerUp(ITableCell c, Rect cellRect, Point mouse, bool leftButton, bool rightButton)
+    public bool PointerUp(ITableRow row, ITableCell c, Rect cellRect, Point mouse, bool leftButton, bool rightButton)
     {
         if (c is not SingleRecordDatabaseCellViewModel cell)
             return false;

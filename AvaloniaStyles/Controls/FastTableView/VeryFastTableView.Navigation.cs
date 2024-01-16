@@ -6,15 +6,23 @@ namespace AvaloniaStyles.Controls.FastTableView;
 
 public partial class VeryFastTableView
 {
-    private int? GetNextColumnInDirection(int start, int direction)
+    private int? GetNextColumnInDirection(VerticalCursor currentRow, int start, int direction)
     {
         if (Columns == null)
             return null;
 
+        var span = TableSpan;
+        
         int result = start;
         do
         {
-            result += direction;
+            if (span != null)
+            {
+                span.GetCellSpan(currentRow.GroupIndex, currentRow.RowIndex, result, out _, out var colSpan);
+                result += direction * colSpan;
+            }
+            else
+                result += direction;
         } while (result > 0 && result < Columns.Count - 1 && !IsColumnVisible(result));
 
         if (result != start && result >= 0 && result <= Columns.Count - 1 && IsColumnVisible(result))
@@ -24,18 +32,32 @@ public partial class VeryFastTableView
     
     private bool MoveCursorRight()
     {
-        var next = GetNextColumnInDirection(SelectedCellIndex, 1);
+        var next = GetNextColumnInDirection(SelectedRowIndex, SelectedCellIndex, 1);
         if (!next.HasValue)
             return false;
+        
+        if (TableSpan is { } span && span.IsMerged(SelectedRowIndex.GroupIndex, SelectedRowIndex.RowIndex, next.Value, out var firstRow, out var firstColumn))
+        {
+            next = firstColumn;
+            SelectedRowIndex = new VerticalCursor(SelectedRowIndex.GroupIndex, firstRow);
+        }
+
         SelectedCellIndex = next.Value;
         return true;
     }
 
     private bool MoveCursorLeft()
     {
-        var prev = GetNextColumnInDirection(SelectedCellIndex, -1);
+        var prev = GetNextColumnInDirection(SelectedRowIndex, SelectedCellIndex, -1);
         if (!prev.HasValue)
             return false;
+        
+        if (TableSpan is { } span && span.IsMerged(SelectedRowIndex.GroupIndex, SelectedRowIndex.RowIndex, prev.Value, out var firstRow, out var firstColumn))
+        {
+            prev = firstColumn;
+            SelectedRowIndex = new VerticalCursor(SelectedRowIndex.GroupIndex, firstRow);
+        }
+
         SelectedCellIndex = prev.Value;
         return true;
     }
@@ -55,14 +77,37 @@ public partial class VeryFastTableView
     private bool MoveCursorUpDown(int diff)
     {
         var index = SelectedRowIndex;
+        var cellIndex = SelectedCellIndex;
         if (Items == null)
             return false;
 
         var rowFilter = RowFilter;
         var rowFilterParameter = RowFilterParameter;
         var items = Items;
+
+        var span = TableSpan;
         
-        for (int group = index.GroupIndex, row = index.RowIndex + diff; group < items.Count && group >= 0; group += diff)
+        int MoveCursor(int group, int startRow, int dir)
+        {
+            if (span == null)
+                return startRow + dir;
+            
+            span.GetCellSpan(group, startRow, cellIndex, out var rowSpan, out _);
+            return startRow + dir * rowSpan;
+        }
+
+        int FixRowToFirstMerged(int group, int row)
+        {
+            if (span == null)
+                return row;
+
+            if (span.IsMerged(group, row, cellIndex, out var firstRow, out _))
+                return firstRow;
+
+            return row;
+        }
+        
+        for (int group = index.GroupIndex, row = MoveCursor(group, index.RowIndex, diff); group < items.Count && group >= 0; group += diff)
         {
             if (IsGroupIndexValid(new VerticalCursor(group, row)) &&
                 IsFilteredGroupVisible(items[group], rowFilter, rowFilterParameter))
@@ -77,10 +122,11 @@ public partial class VeryFastTableView
                             return true;
                         }
                     }
-                    
-                    row += diff;
+
+                    row = MoveCursor(group, row, diff);
                 }
                 row = diff > 0 ? 0 : (IsGroupIndexValid(new VerticalCursor(group + diff, 0)) ? items[group + diff].Rows.Count - 1 : 0);
+                row = FixRowToFirstMerged(group, row);
             }
         }
 

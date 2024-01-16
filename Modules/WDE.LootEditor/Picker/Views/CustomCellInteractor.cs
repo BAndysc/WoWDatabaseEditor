@@ -10,17 +10,17 @@ public class CustomCellInteractor : ICustomCellInteractor
         return true;
     }
 
-    public bool SpawnEditorFor(string? initialText, Visual parent, Rect rect, ITableCell c)
+    public bool SpawnEditorFor(ITableRow row, string? initialText, Visual parent, Rect rect, ITableCell c)
     {
         return IsReadOnly(c);
     }
 
-    public bool PointerDown(ITableCell c, Rect cellRect, Point mouse, bool leftButton, bool rightButton, int clickCount)
+    public bool PointerDown(ITableRow row, ITableCell c, Rect cellRect, Point mouse, bool leftButton, bool rightButton, int clickCount)
     {
         return false;
     }
     
-    public bool PointerUp(ITableCell c, Rect cellRect, Point mouse, bool leftButton, bool rightButton)
+    public bool PointerUp(ITableRow row, ITableCell c, Rect cellRect, Point mouse, bool leftButton, bool rightButton)
     {
         return false;
     }

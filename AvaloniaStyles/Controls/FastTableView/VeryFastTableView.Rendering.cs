@@ -68,6 +68,7 @@ public partial class VeryFastTableView
         var cellDrawer = CustomCellDrawer;
         var rowFiler = RowFilter;
         var rowFilterParameter = RowFilterParameter;
+        var span = TableSpan;
 
         // we draw only the visible rows
         DrawingContext.PushedState? viewPortClip = IsGroupingEnabled ? context.PushClip(viewPort.Deflate(new Thickness(0, lastStickyHeaderHeight, 0, 0))) : null;
@@ -131,9 +132,7 @@ public partial class VeryFastTableView
                     {
                         // background
                         bool isSelected = selectionIterator.Contains(new VerticalCursor(groupIndex, rowIndex));
-                        context.FillRectangle(
-                            isSelected ? (SelectedRowBackground) : (odd ? OddRowBackground : EvenRowBackground),
-                            rowRect);
+                        DrawRowBackground(context, rowRect, ref isSelected, odd, groupIndex, rowIndex);
 
                         cellDrawer?.DrawRow(context, this, row, rowRect);
 
@@ -153,16 +152,24 @@ public partial class VeryFastTableView
 
                             var columnWidth = columnWidths[cellIndex];
 
+                            if (span != null && span.IsMerged(groupIndex, rowIndex, cellIndex, out var firstRow, out var firstColumn) &&
+                                (firstRow != rowIndex || firstColumn != cellIndex))
+                            {
+                                x += columnWidth;
+                                cellIndex++;
+                                continue;
+                            }
+
                             // we draw only the visible columns
                             // todo: could be optimized so we don't iterate through all columns when we know we don't need to
                             if (x + columnWidth > DataViewport.Left && x < DataViewport.Right)
                             {
-                                var rect = new Rect(x, y, columnWidth, RowHeight);
+                                var rect = span == null ? new Rect(x, y, columnWidth, RowHeight) : CellRect(cellIndex, new VerticalCursor(groupIndex, rowIndex));
                                 var rectWidth = rect.Width;
                                 var state = context.PushClip(rect);
                                 try
                                 {
-                                    if (cellDrawer == null || !cellDrawer.Draw(context, this, ref rect, cell))
+                                    if (cellDrawer == null || !cellDrawer.Draw(context, this, ref rect, cell, row))
                                     {
                                         var text = cell.ToString();
                                         if (!string.IsNullOrEmpty(text))
@@ -175,7 +182,7 @@ public partial class VeryFastTableView
                                             var ft = new FormattedText
                                             {
                                                 Text = text,
-                                                Constraint = new Size(rect.Width, RowHeight),
+                                                Constraint = new Size(rect.Width, rect.Height),
                                                 Typeface = font,
                                                 FontSize = 12
                                             };
@@ -186,7 +193,7 @@ public partial class VeryFastTableView
                                             }
 
                                             context.DrawText(textColor,
-                                                new Point(rect.X + ColumnSpacing, y + RowHeight / 2 - ft.Bounds.Height / 2),
+                                                new Point(rect.X + ColumnSpacing, y + rect.Height / 2 - ft.Bounds.Height / 2),
                                                 ft);
                                         }
                                     }
@@ -219,6 +226,13 @@ public partial class VeryFastTableView
             viewPortClip.Value.Dispose();
 
         RenderHeaders(context);
+    }
+
+    protected virtual void DrawRowBackground(DrawingContext context, Rect rowRect, ref bool isSelected, bool odd, int groupIndex, int rowIndex)
+    {
+        context.FillRectangle(
+            isSelected ? (SelectedRowBackground) : (odd ? OddRowBackground : EvenRowBackground),
+            rowRect);
     }
 
     private void RenderHeaders(DrawingContext context)
@@ -318,7 +332,7 @@ public partial class VeryFastTableView
         return columnVisibility[index];
     }
     
-    private VerticalCursor? GetRowIndexByY(double mouseY)
+    private VerticalCursor? GetRowIndexByY(Avalonia.Point mouse)
     {
         if (Items == null)
             return null;
@@ -328,6 +342,8 @@ public partial class VeryFastTableView
         var rowFilter = RowFilter;
         var rowFilterParameter = RowFilterParameter;
 
+        var columnIndex = GetColumnIndexByX(mouse.X);
+        
         for (var index = 0; index < Items.Count; index++)
         {
             var group = Items[index];
@@ -349,7 +365,7 @@ public partial class VeryFastTableView
                 }
             }
 
-            if (groupStartY + groupHeight < mouseY)
+            if (groupStartY + groupHeight < mouse.Y)
                 y += groupHeight;
             else
             {
@@ -364,8 +380,12 @@ public partial class VeryFastTableView
                         continue;
 
                     var rowEnd = y + RowHeight;
-                    if (mouseY >= y && mouseY < rowEnd)
+                    if (mouse.Y >= y && mouse.Y < rowEnd)
+                    {
+                        if (columnIndex.HasValue && TableSpan is { } span && span.IsMerged(groupIndex, rowIndex, columnIndex.Value, out var firstRow, out var firstColumn))
+                            return new VerticalCursor(groupIndex, firstRow);
                         return new VerticalCursor(groupIndex, rowIndex);
+                    }
                     y = rowEnd;
                 }
             }

@@ -2,7 +2,7 @@ using Avalonia;
 
 namespace AvaloniaStyles.Controls.FastTableView;
 
-internal static class Extensions
+internal static partial class Extensions
 {
     public static bool GetResource<T>(this object? _, string key, T defaultVal, out T outT)
     {
