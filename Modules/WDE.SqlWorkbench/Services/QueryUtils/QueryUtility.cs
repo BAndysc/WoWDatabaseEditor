@@ -250,7 +250,7 @@ internal class QueryUtility : IQueryUtility
 
     public bool IsUseDatabase(string query, out string databaseName)
     {
-        var useRegex = new System.Text.RegularExpressions.Regex(@"\s*use\s+`?([^`]+)`?\s*", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        var useRegex = new System.Text.RegularExpressions.Regex(@"^\s*use\s+`?([^`]+)`?\s*", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
         var match = useRegex.Match(query);
         if (match.Success)
         {
