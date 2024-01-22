@@ -209,7 +209,7 @@ public abstract class BaseCustomCellDrawer : ICustomCellDrawer
         return innerRectangle.Contains(mouse);
     }
     
-    protected void DrawCheckBox(DrawingContext context, Rect rect, bool state, int margin = 0)
+    protected void DrawCheckBox(DrawingContext context, Rect rect, bool state, int margin = 0, bool disabled = false)
     {
         rect = rect.Deflate(margin);
         const float cornerRadius = 4;
@@ -228,6 +228,13 @@ public abstract class BaseCustomCellDrawer : ICustomCellDrawer
             (leftPressed && isOver ? CheckBoxCheckGlyphForegroundCheckedPressedPen : (isOver ? CheckBoxCheckGlyphForegroundCheckedPointerOverPen : CheckBoxCheckGlyphForegroundCheckedPen)) :
             (leftPressed && isOver ? CheckBoxCheckGlyphForegroundUncheckedPressedPen : (isOver ? CheckBoxCheckGlyphForegroundUncheckedPointerOverPen : CheckBoxCheckGlyphForegroundUncheckedPen));
 
+        if (disabled)
+        {
+            background = state ? CheckBoxCheckBackgroundFillCheckedDisabled : CheckBoxCheckBackgroundFillUncheckedDisabled;
+            border = state ? CheckBoxCheckBackgroundStrokeCheckedDisabledPen : CheckBoxCheckBackgroundStrokeUncheckedDisabledPen;
+            glyph = state ? CheckBoxCheckGlyphForegroundCheckedDisabledPen : CheckBoxCheckGlyphForegroundUncheckedDisabledPen;
+        }
+        
         context.DrawRectangle(background, border, innerRectangle, cornerRadius, cornerRadius);
 
         if (state)

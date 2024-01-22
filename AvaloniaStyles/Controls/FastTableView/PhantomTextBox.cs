@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Diagnostics;
 using System.Windows.Input;
 using Avalonia;
@@ -207,4 +208,36 @@ internal class DelegateCommand : ICommand
     }
 
     public event EventHandler? CanExecuteChanged;
+}
+
+public abstract class BasePhantomCompletionComboBox : PhantomControlBase<CompletionComboBox>
+{
+    protected void Spawn(Visual parent, Rect position, string? searchText, IEnumerable? items, object? value)
+    {
+        var flagsComboBox = new CompletionComboBox();
+        flagsComboBox.Items = items;
+        flagsComboBox.SelectedItem = value;
+        flagsComboBox.HideButton = true;
+        flagsComboBox.IsLightDismissEnabled = false; // we are handling it ourselves, without doing .Handled = true so that as soon as user press outside of popup, the click is treated as actual click
+        flagsComboBox.Closed += CompletionComboBoxOnClosed;
+        
+        if (!AttachAsAdorner(parent, position, flagsComboBox))
+            return;
+
+        DispatcherTimer.RunOnce(() =>
+        {
+            flagsComboBox.IsDropDownOpen = true;
+            flagsComboBox.SearchText = searchText ?? "";
+        }, TimeSpan.FromMilliseconds(1));
+    }
+
+    private void CompletionComboBoxOnClosed()
+    {
+        Despawn(true);
+    }
+
+    protected override void Cleanup(CompletionComboBox element)
+    {
+        element.Closed -= CompletionComboBoxOnClosed;
+    }
 }

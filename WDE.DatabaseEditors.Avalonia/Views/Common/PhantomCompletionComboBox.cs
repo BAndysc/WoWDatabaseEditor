@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using Avalonia;
 using Avalonia.Threading;
 using AvaloniaStyles.Controls;
@@ -8,41 +9,23 @@ using WDE.DatabaseEditors.ViewModels;
 
 namespace WDE.DatabaseEditors.Avalonia.Views.Common;
 
-public class PhantomCompletionComboBox : PhantomControlBase<CompletionComboBox>
+public class PhantomCompletionComboBox : BasePhantomCompletionComboBox
 {
     private BaseDatabaseCellViewModel cellModel = null!;
     private string column = null!;
     private ITableContext context = null!;
 
-    public void Spawn(Visual parent, Rect position, BaseDatabaseCellViewModel cellModel, ITableContext context, string column)
+    public void Spawn(Visual parent, Rect position, string? initialText, BaseDatabaseCellViewModel cellModel, ITableContext context, string column)
     {
         this.cellModel = cellModel;
         this.column = column;
         this.context = context;
-        var flagsComboBox = new CompletionComboBox();
-        flagsComboBox.Items = cellModel.Items;
-        flagsComboBox.SelectedItem = cellModel.OptionValue;
-        flagsComboBox.HideButton = true;
-        flagsComboBox.IsLightDismissEnabled = false; // we are handling it ourselves, without doing .Handled = true so that as soon as user press outside of popup, the click is treated as actual click
-        flagsComboBox.Closed += CompletionComboBoxOnClosed;
-        
-        if (!AttachAsAdorner(parent, position, flagsComboBox))
-            return;
-
-        DispatcherTimer.RunOnce(() =>
-        {
-            flagsComboBox.IsDropDownOpen = true;
-        }, TimeSpan.FromMilliseconds(1));
-    }
-
-    private void CompletionComboBoxOnClosed()
-    {
-        Despawn(true);
+        Spawn(parent, position, initialText, cellModel.Items, cellModel.OptionValue);
     }
 
     protected override void Cleanup(CompletionComboBox element)
     {
-        element.Closed -= CompletionComboBoxOnClosed;
+        base.Cleanup(element);
         cellModel = null!;
         column = null!;
         context = null!;

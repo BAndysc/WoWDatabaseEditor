@@ -81,7 +81,7 @@ public partial class VeryFastTableView
             }
         }
 
-        availableSize = new Size(0, height + RowHeight); // always add an extra row height for scrollbar
+        availableSize = new Size(0, height + RowHeight * 2); // always add an extra row height for scrollbar
         if (Columns != null)
         {
             availableSize = availableSize.WithWidth(Columns.Where(c=>c.IsVisible).Select(c => c.Width).Sum());

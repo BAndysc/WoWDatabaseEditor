@@ -96,7 +96,9 @@ public readonly struct VerticalCursor : IEquatable<VerticalCursor>, IComparable<
         return !left.Equals(right);
     }
 
-    public bool IsValid => GroupIndex != -1 && RowIndex != -1;
+    public bool IsGroupValid => GroupIndex != -1;
+    
+    public bool IsValid => IsGroupValid && RowIndex != -1;
 }
 
 
@@ -113,6 +115,7 @@ public interface ITableMultiSelection
     bool Empty { get; }
     event Action? SelectionChanged;
     IDisposable PauseNotifications();
+    void Set(VerticalCursor index);
 }
 
 public interface ITableEfficientContainsIterator : System.IDisposable
@@ -200,6 +203,12 @@ public class TableMultiSelection : ITableMultiSelection
             if (notificationsBlockedStack == 0 && pendingNotification)
                 SelectionChanged?.Invoke();
         });
+    }
+
+    public void Set(VerticalCursor index)
+    {
+        Clear();
+        Add(index);
     }
 
     private void Notify()

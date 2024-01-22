@@ -12,7 +12,9 @@ using Avalonia.Data;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Styling;
+using Avalonia.Threading;
 using AvaloniaStyles.Controls;
+using AvaloniaStyles.Controls.FastTableView;
 using AvaloniaStyles.Converters;
 using FuzzySharp;
 using WDE.Common.Parameters;
@@ -220,6 +222,38 @@ namespace WDE.Common.Avalonia.Controls
             {
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
             }
+        }
+    }
+    
+    public abstract class BasePhantomFlagsComboBox : PhantomControlBase<FlagComboBox>
+    {
+        protected void Spawn(Visual parent, Rect position, string? initialText, Dictionary<long, SelectOption>? flags, long value)
+        {
+            var flagsComboBox = new FlagComboBox();
+            flagsComboBox.Flags = flags;
+            flagsComboBox.SelectedValue = value;
+            flagsComboBox.HideButton = true;
+            flagsComboBox.IsLightDismissEnabled = false; // we are handling it ourselves, without doing .Handled = true so that as soon as user press outside of popup, the click is treated as actual click
+            flagsComboBox.Closed += CompletionComboBoxOnClosed;
+
+            if (!AttachAsAdorner(parent, position, flagsComboBox))
+                return;
+
+            DispatcherTimer.RunOnce(() =>
+            {
+                flagsComboBox.IsDropDownOpen = true;
+                flagsComboBox.SearchText = initialText ?? "";
+            }, TimeSpan.FromMilliseconds(1));
+        }
+
+        private void CompletionComboBoxOnClosed()
+        {
+            Despawn(true);
+        }
+
+        protected override void Cleanup(FlagComboBox element)
+        {
+            element.Closed -= CompletionComboBoxOnClosed;
         }
     }
 }

@@ -39,12 +39,12 @@ public class CustomCellInteractor : ICustomCellInteractor
         var longValue = cell.ParameterValue as IParameterValue<long>;
         if (cell.UseFlagsPicker && longValue != null)
         {
-            flagPicker.Spawn(parent, rect, longValue, context, cell.DbColumnName!);
+            flagPicker.Spawn(parent, rect, initialText, longValue, context, cell.DbColumnName!);
             return true;
         }
         if (cell.UseItemPicker)
         {
-            comboBox.Spawn(parent, rect, cell, context, cell.DbColumnName!);
+            comboBox.Spawn(parent, rect, initialText, cell, context, cell.DbColumnName!);
             return true;
         }
         // if (cell.HasItems && longValue != null)

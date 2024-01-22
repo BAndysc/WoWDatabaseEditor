@@ -9,6 +9,12 @@ namespace WDE.Common.Services.MessageBox
         Task<T?> ShowDialog<T>(IMessageBox<T> messageBox);
     }
 
+    public enum CancelDialogResult
+    {
+        Continue,
+        Cancel
+    }
+
     public enum SaveDialogResult
     {
         Save,

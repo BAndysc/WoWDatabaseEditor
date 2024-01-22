@@ -214,7 +214,7 @@ public partial class VeryFastTableView
         if (ScrollViewer == null)
             return;
 
-        if (!row.IsValid)
+        if (!row.IsGroupValid)
             return;
         
         var viewRect = DataViewport;
@@ -222,6 +222,12 @@ public partial class VeryFastTableView
         var headerHeight = GetTotalHeaderHeight(row.GroupIndex);
         var top = GetRowY(row);
         var bottom = top + RowHeight;
+        if (TableSpan is { } span && row.IsValid)
+        {
+            span.GetCellSpan(row.GroupIndex, row.RowIndex, SelectedCellIndex, out var rowSpan, out _);
+            bottom = top + rowSpan * RowHeight;
+        }
+
         if (top < viewRect.Top + headerHeight)
             ScrollViewer.Offset = ScrollViewer.Offset.WithY(top - (DrawingStartOffsetY + headerHeight));
         else if (bottom > viewRect.Bottom)
