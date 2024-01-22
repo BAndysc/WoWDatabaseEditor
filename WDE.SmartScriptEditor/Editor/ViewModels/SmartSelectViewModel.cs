@@ -110,16 +110,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             MakeItems(type, predicate, customItems, smartDataManager, conditionDataManager).ListenErrors();
 
             AutoDispose(this.WhenValueChanged(t => t.SearchBox)!
-                .SubscribeAction(text =>
-                {
-                    if (currentToken != null)
-                    {
-                        Console.WriteLine("Searching in progress, canceling");
-                    }
-                    currentToken?.Cancel();
-                    var token = new CancellationTokenSource();
-                    FilterAndSort(text, token, token.Token).ListenErrors();
-                }));
+                .SubscribeAction(DoFilterNow));
 
             Cancel = new DelegateCommand(() => CloseCancel?.Invoke());
             _accept = new DelegateCommand(() =>
@@ -136,6 +127,18 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             {
                 item.IsFavourite = !item.IsFavourite;
             });
+        }
+
+        private void DoFilterNow(string? text)
+        {
+            if (currentToken != null)
+            {
+                Console.WriteLine("Searching in progress, canceling");
+            }
+
+            currentToken?.Cancel();
+            var token = new CancellationTokenSource();
+            FilterAndSort(text, token, token.Token).ListenErrors();
         }
 
         private SmartItem? FindExactMatching()
@@ -271,6 +274,9 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             
             if (Items.Count > 0 && SelectedItem == null)
                 SelectFirstVisible();
+            
+            if (!string.IsNullOrEmpty(searchBox))
+                DoFilterNow(searchBox);
         }
 
         public DelegateCommand<SmartItem> ToggleFavouriteCommand { get; }
