@@ -163,7 +163,7 @@ public class LegionSpellService : IDbcSpellService, IDbcSpellLoader
             var spellId = row.GetUInt(29);
             var miscValueA = row.GetInt(26, 0);
             var miscValueB = row.GetInt(26, 1);
-            var triggerSpell = row.GetUInt(17);
+            var triggerSpell = row.GetUInt(16);
 
             if (spells.TryGetValue(spellId, out var spell))
             {
