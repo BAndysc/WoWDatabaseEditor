@@ -108,6 +108,7 @@ public class QuestEntryProviderService : IQuestEntryProviderService
                     return true;
                 return false;
             })
+            .SetNumberPredicate((template, num) => template.Entry == num)
             .SetExactMatchPredicate((template, search) => template.Entry.Is(search))
             .SetExactMatchCreator(search =>
             {

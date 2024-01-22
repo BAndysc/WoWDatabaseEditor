@@ -100,6 +100,7 @@ public class CreatureEntryOrGuidProviderService : ICreatureEntryOrGuidProviderSe
                                            template.Name.Contains(text, StringComparison.OrdinalIgnoreCase) ||
                                            (template.SubName?.Contains(text, StringComparison.OrdinalIgnoreCase) ??
                                             false))
+            .SetNumberPredicate((template, num) => template.Entry == num)
             .SetExactMatchPredicate((template, search) => template.Entry.Is(search))
             .SetExactMatchCreator(search =>
             {

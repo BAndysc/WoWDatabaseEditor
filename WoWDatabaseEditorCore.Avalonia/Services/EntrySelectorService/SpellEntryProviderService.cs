@@ -81,6 +81,7 @@ public class SpellEntryProviderService : ISpellEntryProviderService
             .SetFilter((entry, text) =>
                 entry.Id.Contains(text) || entry.Name.Contains(text, StringComparison.OrdinalIgnoreCase))
             .SetExactMatchPredicate((entry, text) => entry.Id.Is(text))
+            .SetNumberPredicate((template, num) => template.Id == num)
             .SetExactMatchCreator((text) =>
             {
                 if (uint.TryParse(text, out var entry))

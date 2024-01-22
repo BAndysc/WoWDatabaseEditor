@@ -81,6 +81,7 @@ public class GameObjectEntryProviderService : IGameobjectEntryOrGuidProviderServ
             .SetColumns(columns)
             .SetFilter((template, text) => template.Entry.Contains(text) ||
                                            template.Name.Contains(text, StringComparison.OrdinalIgnoreCase))
+            .SetNumberPredicate((template, num) => template.Entry == num)
             .SetExactMatchPredicate((template, search) => template.Entry.Is(search))
             .SetExactMatchCreator(search =>
             {

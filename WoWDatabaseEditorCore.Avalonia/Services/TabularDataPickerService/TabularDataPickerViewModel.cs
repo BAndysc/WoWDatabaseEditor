@@ -302,13 +302,20 @@ public partial class TabularDataPickerViewModel : ObservableBase, IDialog
         
         List<object> filtered = new();
         var numberFilter = long.TryParse(searchInput.Text, out var number);
+        var commasAmount = searchInput.Text.Count(x => x == ',');
+        IReadOnlyList<long> multipleNumbers = commasAmount > 0 ? searchInput.Text.Split(',').Where(x => long.TryParse(x, out _)).Select(long.Parse).ToList() : Array.Empty<long>();
+        if (commasAmount > 0 && multipleNumbers.Count != commasAmount + (searchInput.Text.EndsWith(',') ? 0 : 1))
+            multipleNumbers = Array.Empty<long>();
+        
         bool hasExactMatch = false;
-        if (numberFilter && numberPredicate != null)
+        // used to use numberPredicate if the number is present, but I think it is better to always utilize text searcher
+        // if (( numberFilter || multipleNumbers.Count > 0) && numberPredicate != null)
+        if ((multipleNumbers.Count > 0) && numberPredicate != null)
         {
             for (int i = 0, count = allItems.Count; i < count; i++)
             {
                 object item = allItems[i];
-                var accept = numberPredicate(item, number);
+                var accept = numberFilter ? numberPredicate(item, number) : multipleNumbers.Any(x => numberPredicate(item, x));
                 if (accept && advancedFilter != null)
                     accept &= advancedFilter(item, searchInput.Value!);
                 
