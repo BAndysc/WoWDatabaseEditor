@@ -80,6 +80,9 @@
             <Setter Property="Height" Value="20" />
         </Style>
         
+        <Style Selector="FlyoutPresenter.no-horiz-scroll">
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+        </Style>
         
         <Style Selector="TextBox.noErrors DataValidationErrors">
             <!-- I don't want to display data validation errors here -->

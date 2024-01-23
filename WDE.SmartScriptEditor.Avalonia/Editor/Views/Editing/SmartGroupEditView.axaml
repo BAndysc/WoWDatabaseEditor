@@ -12,7 +12,7 @@
         <TextBox Name="GroupName" UseFloatingWatermark="True" Watermark="Group name" Text="{CompiledBinding Header}" />
         <Grid ColumnDefinitions="Auto,10,*">
             <TextBlock VerticalAlignment="Center">Description:</TextBlock>
-            <TextBox AcceptsReturn="True" Grid.Column="2" Text="{CompiledBinding Description}" />
+            <TextBox TextWrapping="Wrap" AcceptsReturn="True" Grid.Column="2" Text="{CompiledBinding Description}" />
         </Grid>
         <OkCancelButtons CancelCommand="{CompiledBinding Cancel}" AcceptCommand="{CompiledBinding Accept}" HorizontalAlignment="Right" />
     </StackPanel>

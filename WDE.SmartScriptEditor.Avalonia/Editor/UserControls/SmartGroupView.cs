@@ -1,6 +1,7 @@
 using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using WDE.Common.Utils;
 using WDE.SmartScriptEditor.Avalonia.Editor.Views.Editing;
 using WDE.SmartScriptEditor.Editor.ViewModels.Editing;
@@ -41,6 +42,7 @@ public class SmartGroupView : SelectableTemplatedControl
     private void OpenEditFlyout(SmartGroup group)
     {
         var flyout = new Flyout();
+        flyout.FlyoutPresenterClasses.Add("no-horiz-scroll");
         var view = new SmartGroupEditView();
         var vm = new SmartGroupEditViewModel(group);
         view.DataContext = vm;
