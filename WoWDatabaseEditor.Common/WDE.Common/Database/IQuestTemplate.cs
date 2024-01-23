@@ -43,6 +43,7 @@
         uint QuestId { get; }
         QuestObjectiveType Type { get; }
         int StorageIndex { get; }
+        int OrderIndex { get; }
         int ObjectId { get; }
         int Amount { get; }
         string? Description { get; }
@@ -54,6 +55,7 @@
         public uint QuestId { get; set; }
         public QuestObjectiveType Type { get; set; }
         public int StorageIndex { get; set; }
+        public int OrderIndex { get; set; }
         public int ObjectId { get; set; }
         public int Amount { get; set; }
         public string? Description { get; set; }

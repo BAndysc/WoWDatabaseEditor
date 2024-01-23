@@ -3,7 +3,6 @@ using WDE.Common.Database;
 
 namespace WDE.MySqlDatabaseCommon.CommonModels;
 
-[Table(Name = "quest_objectives")]
 public class MySqlQuestObjective : IQuestObjective
 {
     [PrimaryKey]
@@ -18,7 +17,10 @@ public class MySqlQuestObjective : IQuestObjective
 
     [Column(Name = "StorageIndex")]
     public int StorageIndex { get; set; }
-    
+
+    [Column(Name = "Order")]
+    public int OrderIndex { get; set; }
+
     [Column(Name = "ObjectID")]
     public int ObjectId { get; set; }
     

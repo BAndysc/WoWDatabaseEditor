@@ -149,6 +149,7 @@ public abstract class BaseQuestObjectiveParameter : ICustomPickerContextualParam
                 new TabularDataColumn(nameof(IQuestObjective.Type), "Type", 80),
                 new TabularDataColumn(nameof(IQuestObjective.ObjectId), "Object id", 80),
                 new TabularDataSyncColumn<IQuestObjective>(".", "Object name", GetObjectName),
+                new TabularDataColumn(nameof(IQuestObjective.StorageIndex), "Storage index", 80)
             })
             .SetFilter((x, s) => x.ObjectiveId.Contains(s) ||
                                  (x.Description?.Contains(s, StringComparison.OrdinalIgnoreCase) ?? false) ||

@@ -133,6 +133,7 @@ public class PhantomTextBox : PhantomControlBase<TextBox>
             {
                 actionAfterSave = ActionAfterSave.MoveNext;
                 Despawn(true);
+                actionAfterSave = ActionAfterSave.None;
             })
         });
         textBox.KeyBindings.Add(new KeyBinding()
@@ -142,6 +143,7 @@ public class PhantomTextBox : PhantomControlBase<TextBox>
             {
                 actionAfterSave = ActionAfterSave.MoveUp;
                 Despawn(true);
+                actionAfterSave = ActionAfterSave.None;
             })
         });
         textBox.KeyBindings.Add(new KeyBinding()
@@ -151,6 +153,7 @@ public class PhantomTextBox : PhantomControlBase<TextBox>
             {
                 actionAfterSave = ActionAfterSave.MoveDown;
                 Despawn(true);
+                actionAfterSave = ActionAfterSave.None;
             })
         });
         textBox.KeyBindings.Add(new KeyBinding()
