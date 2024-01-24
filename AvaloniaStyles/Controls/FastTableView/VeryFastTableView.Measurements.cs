@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
@@ -24,10 +25,15 @@ public partial class VeryFastTableView
     
     protected double GetHeaderHeight(int index)
     {
+        return GetHeaderHeight(index, Items!, RowFilter, RowFilterParameter);   
+    }
+
+    protected double GetHeaderHeight(int index, IReadOnlyList<ITableRowGroup> items, IRowFilterPredicate? rowFilter, object? rowFilterParameter)
+    {
         if (!IsGroupingEnabled)
             return 0;
 
-        if (!IsFilteredGroupVisible(Items![index], RowFilter, RowFilterParameter))
+        if (!IsFilteredGroupVisible(items![index], rowFilter, rowFilterParameter))
             return 0;
         
         if (!IsDynamicHeaderHeight)

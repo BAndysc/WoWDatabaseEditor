@@ -42,17 +42,19 @@ public partial class VeryFastTableView
         var rowFilter = RowFilter;
         var rowFilterParameter = RowFilterParameter;
 
+        var items = Items;
+        
         bool hasSticky = false;
         double y = -viewPort.Y; // DrawingStartOffsetY is already added in the parents' y position
-        for (var index = 0; index < Items.Count; index++)
+        for (var index = 0; index < items.Count; index++)
         {
-            var group = Items[index];
+            var group = items[index];
 
             if (!IsFilteredGroupVisible(group, rowFilter, rowFilterParameter))
                 continue;
             
             y += group.MarginTop;
-            var headerHeight = GetHeaderHeight(index);
+            var headerHeight = GetHeaderHeight(index, items, rowFilter, rowFilterParameter);
             var subHeaderHeight = GetSubheaderHeight(index);
             var totalHeaderHeight = headerHeight + subHeaderHeight;
             var groupHeight = totalHeaderHeight;

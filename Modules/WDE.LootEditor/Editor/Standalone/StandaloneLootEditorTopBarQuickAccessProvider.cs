@@ -13,7 +13,7 @@ namespace WDE.LootEditor.Editor.Standalone;
 public class StandaloneLootEditorTopBarQuickAccessProvider : ITopBarQuickAccessProvider
 {
     public IEnumerable<ITopBarQuickAccessItem> Items { get; set; }
-    public int Order => -1;
+    public int Order => -2;
     
     public StandaloneLootEditorTopBarQuickAccessProvider(ILootService lootService)
     {
