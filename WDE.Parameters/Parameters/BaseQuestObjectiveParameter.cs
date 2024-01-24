@@ -163,7 +163,7 @@ public abstract class BaseQuestObjectiveParameter : ICustomPickerContextualParam
                 return null;
             })
             .SetTitle("Pick quest objective")
-            .Build(), defaultSelection, value.ToString());
+            .Build(), defaultSelection, value == 0 ? "" : value.ToString());
 
         if (result != null)
             return (byIndex ? result.StorageIndex : result.ObjectiveId, true);
