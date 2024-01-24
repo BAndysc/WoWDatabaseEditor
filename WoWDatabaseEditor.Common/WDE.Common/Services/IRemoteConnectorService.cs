@@ -12,6 +12,14 @@ namespace WDE.Common.Services
         Debug
     }
     
+    public class RemoteConnectorException : Exception
+    {
+        public RemoteConnectorException(string error, Exception? innerException) : base(error, innerException)
+        {
+        
+        }
+    }
+    
     [UniqueProvider]
     public interface IRemoteConnectorService
     {

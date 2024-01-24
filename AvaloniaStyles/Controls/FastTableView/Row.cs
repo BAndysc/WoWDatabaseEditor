@@ -219,6 +219,12 @@ public class StringCell : ITableCell
         this.getter = getter;
         this.setter = setter;
     }
+    
+    public string? Value
+    {
+        get => getter();
+        set => setter(value);
+    }
 
     public void UpdateFromString(string newValue)
     {
