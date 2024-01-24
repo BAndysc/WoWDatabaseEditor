@@ -92,6 +92,7 @@ internal partial class SelectSingleTableViewModel : SelectResultsViewModel
             {
                 tokenizer.NextLine();
                 int rowIndex = AdditionalRowsCount++ + Results.AffectedRows;
+                ColumnsOverride.Each(x => x.TryOverride(Count - 1, null, out _));
                 Selection.Add(rowIndex);
                 SelectedRowIndex = rowIndex;
                 

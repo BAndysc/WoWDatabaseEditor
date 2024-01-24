@@ -652,6 +652,7 @@ internal class SqlWorkbenchViewModelTests
         
         results!.Selection.Add(0);
         results.Selection.Add(2);
+        results.SelectedCellIndex = 1;
         
         results.CopySelectedCommand.Execute(null);
         
