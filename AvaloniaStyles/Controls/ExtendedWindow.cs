@@ -126,14 +126,20 @@ namespace AvaloniaStyles.Controls
         }
 
         private Brush? _backgroundBrush;
-        
-        private void BindBackgroundBrush(Brush? brush)
+
+        private void UnbindBackgroundBrush()
         {
             if (_backgroundBrush != null)
             {
                 _backgroundBrush.Invalidated -= BackgroundBrushOnInvalidated;
+                _backgroundBrush = null;
             }
-
+        }
+        
+        private void BindBackgroundBrush(Brush? brush)
+        {
+            UnbindBackgroundBrush();
+            
             _backgroundBrush = brush;
             
             if (brush != null)
@@ -142,10 +148,10 @@ namespace AvaloniaStyles.Controls
                 BackgroundBrushOnInvalidated(null, EventArgs.Empty);
             }
         }
-
+        
         private void BackgroundBrushOnInvalidated(object? sender, EventArgs e)
         {
-            if (Background is ISolidColorBrush brush)
+            if (Background is ISolidColorBrush brush && PlatformImpl != null)
                 Win32.SetTitleBarColor(PlatformImpl.Handle.Handle, brush.Color);
         }
 
@@ -220,6 +226,7 @@ namespace AvaloniaStyles.Controls
 
         protected override void OnClosed(EventArgs e)
         {
+            UnbindBackgroundBrush();
             SystemTheme.CustomScalingUpdated -= SystemThemeOnCustomScalingUpdated;
             base.OnClosed(e);
         }
