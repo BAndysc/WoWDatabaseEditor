@@ -143,9 +143,17 @@ public class SessionRestoreService
                 {
                     state = psd.TakeSnapshot();
                 }
-                var serialized = serializerRegistry.Serialize(si.SolutionItem, true);
-                var item = new AbstractSmartScriptProjectItem(serialized);
-                items.Add(new SavedSnapshot(){Item = item, State = state});
+
+                try
+                {
+                    var serialized = serializerRegistry.Serialize(si.SolutionItem, true);
+                    var item = new AbstractSmartScriptProjectItem(serialized);
+                    items.Add(new SavedSnapshot() { Item = item, State = state });
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Couldn't serialize " + si.SolutionItem + " " + e.Message);
+                }
             }
         }
 

@@ -194,7 +194,7 @@ namespace WDE.Parameters
         }
         
         private T AddAsyncDatabaseParameter<T>(T t) where T : LateAsyncLoadParameter
-        {
+         {
             if (t is IDatabaseObserver databaseObserver)
             {
                 if (!reloadable.TryGetValue(databaseObserver.ObservedType, out var list))
