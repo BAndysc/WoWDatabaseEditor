@@ -131,6 +131,7 @@ namespace WDE.Parameters
             factory.Register("PlayerChoiceResponseParameter", AddAsyncDatabaseParameter(new PlayerChoiceResponseParameter(database)));
             factory.Register("ServersideAreatriggerParameter", AddAsyncDatabaseParameter(new ServersideAreatriggerParameter(database)));
             factory.Register("DatabasePhaseParameter", AddAsyncDatabaseParameter(new DatabasePhaseParameter(database)), QuickAccessMode.Limited);
+            factory.RegisterDepending("SceneTemplateParameter", "SceneScriptParameter", sceneScript =>AddAsyncDatabaseParameter(new SceneTemplateParameter(database, sceneScript)));
             factory.Register("ConversationTemplateParameter", new ConversationTemplateParameter(database));
             factory.Register("BoolParameter", new BoolParameter());
             factory.Register("FlagParameter", new FlagParameter());
@@ -558,6 +559,34 @@ namespace WDE.Parameters
                 Items.Add(item.Entry, new SelectOption(item.Name));
             foreach (IGameObjectTemplate item in database.GetGameObjectTemplates())
                 Items.Add(-item.Entry, new SelectOption(item.Name));
+        }
+    }
+
+    public class SceneTemplateParameter : LateAsyncLoadParameter
+    {
+        private readonly IDatabaseProvider databaseProvider;
+        private readonly IParameter<long> sceneScriptParameter;
+
+        public SceneTemplateParameter(IDatabaseProvider databaseProvider,
+            IParameter<long> sceneScriptParameter)
+        {
+            this.databaseProvider = databaseProvider;
+            this.sceneScriptParameter = sceneScriptParameter;
+        }
+        
+        public override async Task LateLoad()
+        {
+            Items = new Dictionary<long, SelectOption>();
+            if (await databaseProvider.GetSceneTemplatesAsync() is { } list)
+            {
+                foreach (ISceneTemplate item in list)
+                {
+                    if (sceneScriptParameter.Items?.TryGetValue(item.ScriptPackageId, out var name) ?? false)
+                        Items.Add(item.SceneId, name);
+                    else
+                        Items.Add(item.SceneId, new SelectOption("Unknown scene template"));
+                }
+            }
         }
     }
     
