@@ -19,7 +19,7 @@ public class StandaloneLootEditorTopBarQuickAccessProvider : ITopBarQuickAccessP
     {
         Items = new List<ITopBarQuickAccessItem>()
         {
-            new TopBarQuickAccessItem("Loot editor", new ImageUri("Icons/document_loot.png"),
+            new TopBarQuickAccessItem("Loot", new ImageUri("Icons/document_loot.png"),
                 new DelegateCommand(
                     () =>
                     {

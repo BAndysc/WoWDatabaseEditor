@@ -66,6 +66,12 @@
         <Style Selector="ExtendedWindow.win11 :is(Control).HideWin11">
             <Setter Property="IsVisible" Value="False" />
         </Style>
+        <Style Selector="ExtendedWindow.ToolbarStyleIcon TextBlock.ButtonText">
+            <Setter Property="IsVisible" Value="False" />
+        </Style>
+        <Style Selector="ExtendedWindow.ToolbarStyleText WdeImage.ButtonIcon">
+            <Setter Property="IsVisible" Value="False" />
+        </Style>
     </ExtendedWindow.Styles>
     
     <ManagedMenu.Menu>
@@ -75,9 +81,12 @@
     
     <controls:ExtendedWindow.ToolBar>
         <controls:ToolBar>
+            <controls:ToolBar.TopLeftContent>
+                <views:TopBarQuickAccessView DataContext="{CompiledBinding TopBarQuickAccess}" />
+            </controls:ToolBar.TopLeftContent>
             <controls:ToolBar.TopContent>
-                <StackPanel Orientation="Horizontal">
-                    <controls:ToolbarPanel Classes="TopBar HideWin10">
+                <DockPanel>
+                    <controls:ToolbarPanel Classes="TopBar HideWin10" DockPanel.Dock="Left">
                         <Button ToolTip.Tip="Save to the database"
                                 Command="{CompiledBinding ExecuteChangedCommand}">
                             <Path Stretch="UniformToFill" Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center" Fill="White" Data="{StaticResource PlayIcon}" />
@@ -94,14 +103,10 @@
                         </Button>
                     </controls:ToolbarPanel>
                     
-                    <Border Width="30" />
+                    <Border Width="30"  DockPanel.Dock="Left"/>
                     
-                    <profiles1:ProfilesControl DataContext="{CompiledBinding ProfilesViewModel}"/>
-                    
-                    <Border Width="30" />
-                    
-                    <views:TopBarQuickAccessView DataContext="{CompiledBinding TopBarQuickAccess}" />
-                </StackPanel>
+                    <profiles1:ProfilesControl DataContext="{CompiledBinding ProfilesViewModel}" DockPanel.Dock="Left"/>
+                </DockPanel>
             </controls:ToolBar.TopContent>
             <controls:ToolBar.LeftContent>
                 <ToolbarPanel>
@@ -169,21 +174,17 @@
             </controls:ToolBar.MiddleContent>
             <controls:ToolBar.RightContent>
                 <ToolbarPanel>
-                    <ItemsPresenter Items="{CompiledBinding RelatedSolutionItems.List}">
-                        <ItemsPresenter.ItemTemplate>
+                    <ToolbarItemsControl IsVisible="{CompiledBinding ShowRelatedItems}" Items="{CompiledBinding RelatedSolutionItems.List}">
+                        <ToolbarItemsControl.ItemTemplate>
                             <DataTemplate DataType="viewModels:RelatedSolutionItemViewModel">
-                                <Button Command="{CompiledBinding CreateCommand}"
-                                        ToolTip.Tip="{CompiledBinding Name}">
-                                    <components:WdeImage Image="{CompiledBinding Icon}" />
-                                </Button>
+                                <ButtonImage Command="{CompiledBinding CreateCommand}"
+                                             Image="{CompiledBinding Icon}"
+                                             Text="{CompiledBinding Name}"
+                                             ToolTip.Tip="{CompiledBinding Name}">
+                                </ButtonImage>
                             </DataTemplate>
-                        </ItemsPresenter.ItemTemplate>
-                        <ItemsPresenter.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <controls:ToolbarPanel />
-                            </ItemsPanelTemplate>
-                        </ItemsPresenter.ItemsPanel>
-                    </ItemsPresenter>
+                        </ToolbarItemsControl.ItemTemplate>
+                    </ToolbarItemsControl>
                     
                     <Button x:Name="OpenSQLDocument" ToolTip.Tip="New SQL document" Command="{CompiledBinding OpenSqlDocumentCommand}" BorderThickness="1" Margin="20,0,0,0" Width="34" Height="34">
                         <Path Stretch="UniformToFill" Width="14" Height="14" HorizontalAlignment="Center" VerticalAlignment="Center" Stroke="{Binding $parent[Button].Foreground}" StrokeThickness="1" Data="{StaticResource ToSqlIcon}" />

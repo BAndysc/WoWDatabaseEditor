@@ -8,6 +8,31 @@
     <Style Selector="controls|ToolbarControl FlyoutPresenter">
         <Setter Property="Padding" Value="0" />
         <Setter Property="MinWidth" Value="0" />
+        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+    </Style>
+    <Style Selector="ToolbarItemsControl">
+        <Setter Property="ItemsPanel">
+            <ItemsPanelTemplate>
+                <ToolbarControl />
+            </ItemsPanelTemplate>
+        </Setter>
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="{TemplateBinding CornerRadius}"
+                        Padding="{TemplateBinding Padding}">
+                    <ItemsPresenter Name="PART_ItemsPresenter"
+                                    Items="{TemplateBinding Items}"
+                                    ItemsPanel="{TemplateBinding ItemsPanel}"
+                                    ItemTemplate="{TemplateBinding ItemTemplate}"/>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    <Style Selector="ToolbarItemsControl > ContentPresenter">
+        <Setter Property="HorizontalAlignment" Value="Left" />
     </Style>
     <Style Selector="controls|ToolbarControl">
         <Setter Property="Template">
@@ -23,18 +48,22 @@
                             </Button.Content>
                             <Button.Flyout>
                                 <Flyout>
-                                    <ToolbarPanel Name="OverflowPanel">
+                                    <ToolbarPanel WrapOnOverflow="True" Name="OverflowPanel">
                                     
                                     </ToolbarPanel>
                                 </Flyout>
                             </Button.Flyout>
                         </Button>
                     </ToolbarPanel>
-                    <controls:ToolbarPanel OutOfBoundsPanel="{Binding #OverflowPanel}" IsOverflow="{TemplateBinding IsOverflow, Mode=OneWayToSource}" Name="PART_ChildrenHost">
+                    <controls:ToolbarPanel ClipToBounds="True" OutOfBoundsPanel="{Binding #OverflowPanel}" IsOverflow="{TemplateBinding IsOverflow, Mode=OneWayToSource}" Name="PART_ChildrenHost">
                         
                     </controls:ToolbarPanel>
                 </DockPanel>
             </ControlTemplate>
         </Setter>
+    </Style>
+    
+    <Style Selector="controls|ToolbarControl FlyoutPresenter">
+        <Setter Property="Background" Value="{DynamicResource TitleBarBackground}" />
     </Style>
 </Styles>

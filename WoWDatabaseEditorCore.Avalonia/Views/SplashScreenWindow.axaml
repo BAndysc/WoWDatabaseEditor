@@ -14,7 +14,7 @@
         WindowStartupLocation="CenterScreen"
         ShowInTaskbar="True"
         ShowActivated="True"
-        Title="TestWindow">
+        Title="WoW Database Editor Splash Screen">
     <Panel>
         <Image Source="avares://WoWDatabaseEditorCore.Avalonia.GUI/logo.png" />
     </Panel>

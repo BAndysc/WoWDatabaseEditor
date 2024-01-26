@@ -6,6 +6,7 @@
           xmlns:demo="clr-namespace:AvaloniaStyles.Demo"
           mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
           SizeToContent="Manual"
+          x:DataType="demo:MainWindow"
           x:Class="AvaloniaStyles.Demo.MainWindow"
           Title="Demo">
     <controls:ExtendedWindow.SideBar>
@@ -30,24 +31,20 @@
             </controls:ToolBar.LeftContent>
             <controls:ToolBar.RightContent>
                 <ToolbarPanel>
-                    <Button>
-                        <Border Background="Transparent"
-                                Width="12"
-                                Height="12"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center">
-                            <Path Fill="{Binding $parent[Button].Foreground}"
-                                  HorizontalAlignment="Center"
-                                  VerticalAlignment="Center"
-                                  Data="M 0 0 L 6 3.5 L 0 7 Z"/>
-                        </Border>
-                    </Button>
-                    <Button>SQL</Button>
+                    
+                    <ToolbarItemsControl Items="{CompiledBinding Items}">
+                        <ToolbarItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <demo:ButtonImageDemo Text="{CompiledBinding Name}"></demo:ButtonImageDemo>
+                            </DataTemplate>
+                        </ToolbarItemsControl.ItemTemplate>
+                    </ToolbarItemsControl>
                 </ToolbarPanel>
             </controls:ToolBar.RightContent>
             <controls:ToolBar.MiddleContent>
                 <ToolbarPanel>
                     <Button>Search</Button>
+
                 </ToolbarPanel>
             </controls:ToolBar.MiddleContent>
         </controls:ToolBar>
@@ -80,21 +77,37 @@
             <Border BorderThickness="1" BorderBrush="Black">
                 <Grid ColumnDefinitions="100,5,20">
                     <ToolbarControl>
-                        <Button>A</Button>
-                        <Button>B</Button>
-                        <Button>C</Button>
-                        <Button>D</Button>
-                        <Button>E</Button>
-                        <Button>F</Button>
-                        <Button>G</Button>
-                        <Button>H</Button>
-                        <Button>I</Button>
-                        <Button>K</Button>
+                        <demo:ButtonImageDemo Text="A" />
+                        <demo:ButtonImageDemo Text="B" />
+                        <demo:ButtonImageDemo Text="C" />
+                        <demo:ButtonImageDemo Text="D" />
+                        <demo:ButtonImageDemo Text="E" />
+                        <demo:ButtonImageDemo Text="F" />
+                        <demo:ButtonImageDemo Text="G" />
+                        <demo:ButtonImageDemo Text="H" />
+                        <demo:ButtonImageDemo Text="I" />
+                        <demo:ButtonImageDemo Text="K" />
                     </ToolbarControl>
                     <GridSplitter Grid.Column="1" />
                     <Border Grid.Column="2" />
                 </Grid>
             </Border>
+            
+            <ToolbarItemsControl Items="abcdefgjijkklmo">
+                <ToolbarItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <demo:ButtonImageDemo Text="{Binding .}"></demo:ButtonImageDemo>
+                    </DataTemplate>
+                </ToolbarItemsControl.ItemTemplate>
+            </ToolbarItemsControl>
+            
+            <ToolbarItemsControl Items="abcdefgjijkklmo">
+                <ToolbarItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Button Content="{Binding .}"></Button>
+                    </DataTemplate>
+                </ToolbarItemsControl.ItemTemplate>
+            </ToolbarItemsControl>
             
             <controls:CompletionComboBox SelectedItem="{Binding EnumValue, Mode=TwoWay}" controls:Extensions.EnumType="{x:Type demo:ExampleEnum}" />
             <Button>Button</Button>

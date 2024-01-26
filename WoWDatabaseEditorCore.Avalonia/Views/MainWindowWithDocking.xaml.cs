@@ -21,8 +21,11 @@ using WDE.Common.Services;
 using WDE.Common.Tasks;
 using WDE.Common.Types;
 using WDE.Common.Utils;
+using WDE.MVVM;
+using WDE.MVVM.Observable;
 using WoWDatabaseEditorCore.Avalonia.Docking;
 using WoWDatabaseEditorCore.Avalonia.Docking.Serialization;
+using WoWDatabaseEditorCore.Settings;
 using WoWDatabaseEditorCore.ViewModels;
 
 namespace WoWDatabaseEditorCore.Avalonia.Views
@@ -82,7 +85,8 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
             IDocumentManager documentManager, 
             ILayoutViewModelResolver layoutViewModelResolver,
             IFileSystem fileSystem,
-            IUserSettings userSettings)
+            IUserSettings userSettings,
+            TempToolbarButtonStyleService tempToolbarButtonStyleService)
         {
             this.fileSystem = fileSystem;
             this.userSettings = userSettings;
@@ -110,6 +114,22 @@ namespace WoWDatabaseEditorCore.Avalonia.Views
                 Chrome = ExtendedWindowChrome.NoSystemChrome;
             }
             PersistentDockDataTemplate.DocumentManager = documentManager;
+
+            tempToolbarButtonStyleService.ToObservable(x => x.Style)
+                .SubscribeAction(style =>
+                {
+                    Classes.Remove("ToolbarStyleIcon");
+                    Classes.Remove("ToolbarStyleText");
+                    switch (style)
+                    {
+                        case ToolBarButtonStyle.Icon:
+                            Classes.Add("ToolbarStyleIcon");
+                            break;
+                        case ToolBarButtonStyle.Text:
+                            Classes.Add("ToolbarStyleText");
+                            break;
+                    }
+                });
         }
 
         public static ImageUri DocumentIcon => new ImageUri("Icons/document.png");

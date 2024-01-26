@@ -23,6 +23,7 @@ namespace WDE.Common.CoreVersion
         EventScriptType SupportedEventScripts => 0;
         PhasingType PhasingType { get; }
         GameVersion Version { get; }
+        bool HideRelatedItems => false;
         LootEditingMode LootEditingMode => LootEditingMode.PerLogicalEntity;
         // todo: this can be moved to settings as a configurable option
         IEnumerable<(DatabaseTable id, bool enabled)> TopBarQuickTableEditors => Array.Empty<(DatabaseTable, bool)>();

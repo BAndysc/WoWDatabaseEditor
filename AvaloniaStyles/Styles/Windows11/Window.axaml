@@ -48,30 +48,31 @@
                                     <StackPanel>
                                         <DockPanel Classes="xxx" Margin="6,0,0,0" Height="39">
                                             <NativeMenuBar DockPanel.Dock="Left" Margin="0,0,30,0" />
-                                            <ContentPresenter DockPanel.Dock="Left" HorizontalAlignment="Left" Content="{Binding ToolBar.TopContent, RelativeSource={RelativeSource Mode=TemplatedParent}}">
-                                            </ContentPresenter>
+                                            <ContentPresenter DockPanel.Dock="Left" HorizontalAlignment="Left" Content="{Binding ToolBar.TopContent, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
 
                                             <WindowControlButtons IsVisible="{TemplateBinding Chrome, Converter={StaticResource ChromeToBoolConverter}}" DockPanel.Dock="Right"/>
                                             <ContentPresenter DockPanel.Dock="Right" HorizontalAlignment="Left" Content="{Binding ToolBar.RightContent, RelativeSource={RelativeSource Mode=TemplatedParent}}" />           
 
-                                            
-                                            <StackPanel ClipToBounds="True" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                                <TextBlock 
-                                                    IsVisible="{TemplateBinding Chrome, Converter={StaticResource ChromeToBoolConverter}}"
-                                                    IsHitTestVisible="False" 
-                                                    VerticalAlignment="Center" 
-                                                    Opacity="0.9"
-                                                    Foreground="{DynamicResource TitleBarForeground}"
-                                                    Text="{TemplateBinding Title}" />
-                                                <TextBlock 
-                                                    IsVisible="{TemplateBinding Chrome, Converter={StaticResource ChromeToBoolConverter}}"
-                                                    IsHitTestVisible="False" 
-                                                    VerticalAlignment="Center" 
-                                                    Margin="10,0,0,0"
-                                                    Opacity="0.5"
-                                                    Foreground="{DynamicResource TitleBarForeground}"
-                                                    Text="{TemplateBinding SubTitle}" />
-                                            </StackPanel>
+                                            <DockPanel ClipToBounds="True">
+                                                <ContentPresenter DockPanel.Dock="Left" HorizontalAlignment="Left" Content="{Binding ToolBar.TopLeftContent, RelativeSource={RelativeSource Mode=TemplatedParent}}" />
+                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                    <TextBlock 
+                                                        IsVisible="{TemplateBinding Chrome, Converter={StaticResource ChromeToBoolConverter}}"
+                                                        IsHitTestVisible="False" 
+                                                        VerticalAlignment="Center" 
+                                                        Opacity="0.9"
+                                                        Foreground="{DynamicResource TitleBarForeground}"
+                                                        Text="{TemplateBinding Title}" />
+                                                    <TextBlock 
+                                                        IsVisible="{TemplateBinding Chrome, Converter={StaticResource ChromeToBoolConverter}}"
+                                                        IsHitTestVisible="False" 
+                                                        VerticalAlignment="Center" 
+                                                        Margin="10,0,0,0"
+                                                        Opacity="0.5"
+                                                        Foreground="{DynamicResource TitleBarForeground}"
+                                                        Text="{TemplateBinding SubTitle}" />
+                                                </StackPanel>
+                                            </DockPanel>
                                         </DockPanel>
                                         <ToolbarPanel HorizontalAlignment="Stretch" DockPanel.Dock="Top" Margin="5,2,2,2">
                                             <ContentPresenter HorizontalAlignment="Left" Content="{Binding ToolBar.LeftContent, RelativeSource={RelativeSource Mode=TemplatedParent}}" />

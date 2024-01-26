@@ -8,25 +8,20 @@
              x:DataType="viewModels:TopBarQuickAccessViewModel"
              x:Name="Root"
              x:Class="WoWDatabaseEditorCore.Avalonia.Views.TopBarQuickAccessView">
-    <ItemsControl Items="{CompiledBinding Editors}">
-        <ItemsControl.ItemsPanel>
-            <ItemsPanelTemplate>
-                <ToolbarPanel />
-            </ItemsPanelTemplate>
-        </ItemsControl.ItemsPanel>
-        <ItemsControl.ItemTemplate>
+    <ToolbarItemsControl Items="{CompiledBinding Editors}">
+        <ToolbarItemsControl.ItemTemplate>
             <DataTemplate x:DataType="quickAccess:ITopBarQuickAccessItem">
-                <Button ToolTip.Tip="{CompiledBinding Name}"
+                <ButtonImage ToolTip.Tip="{CompiledBinding Name}"
                         Command="{CompiledBinding Command}"
-                        Width="30"
                         Height="30"
+                        MinWidth="30"
                         Padding="4"
                         Background="Transparent"
                         BorderThickness="0"
-                        CommandParameter="{CompiledBinding .}">
-                    <WdeImage Image="{CompiledBinding Icon}"></WdeImage>
-                </Button>
+                        Text="{CompiledBinding Name}"
+                        Image="{CompiledBinding Icon}"
+                        CommandParameter="{CompiledBinding .}" />
             </DataTemplate>
-        </ItemsControl.ItemTemplate>
-    </ItemsControl>
+        </ToolbarItemsControl.ItemTemplate>
+    </ToolbarItemsControl>
 </UserControl>

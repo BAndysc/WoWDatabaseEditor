@@ -7,6 +7,7 @@ using AsyncAwaitBestPractices.MVVM;
 using Prism.Commands;
 using Prism.Events;
 using ReactiveUI;
+using WDE.Common.CoreVersion;
 using WDE.Common.Events;
 using WDE.Common.Managers;
 using WDE.Common.Services.MessageBox;
@@ -82,6 +83,7 @@ namespace WoWDatabaseEditorCore.ViewModels
             IConnectionsStatusBarItem connectionsViewModel,
             ITeachingTipService teachingTipService,
             IStatisticsService statisticsService,
+            ICurrentCoreVersion currentCoreVersion,
             Func<IFindAnywhereDialogViewModel> findAnywhereCreator)
         {
             DocumentManager = documentManager;
@@ -102,6 +104,7 @@ namespace WoWDatabaseEditorCore.ViewModels
             this.programNameAddons = nameAddons.ToList();
             Title = "";
             Subtitle = programNameService.Subtitle;
+            ShowRelatedItems = !currentCoreVersion.Current.HideRelatedItems;
             foreach (var titleAddon in programNameAddons)
                 titleAddon.ToObservable(x => x.Addon).SubscribeAction(_ => UpdateTitle());
             UpdateTitle();
@@ -241,6 +244,8 @@ namespace WoWDatabaseEditorCore.ViewModels
         public string Title { get; private set; }
         
         public string Subtitle { get; }
+        
+        public bool ShowRelatedItems { get; }
 
         public DelegateCommand<IMenuDocumentItem> OpenDocument { get; }
 

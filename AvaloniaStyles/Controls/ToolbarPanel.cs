@@ -11,8 +11,9 @@ namespace AvaloniaStyles.Controls
     public class ToolbarPanel : Panel
     {
         public static readonly StyledProperty<Panel?> OutOfBoundsPanelProperty = AvaloniaProperty.Register<ToolbarPanel, Panel?>(nameof(OutOfBoundsPanel));
-        public static readonly StyledProperty<bool> IsOverflowProperty = AvaloniaProperty.Register<ToolbarPanel, bool>("IsOverflow");
-        public static readonly StyledProperty<double> SpacingProperty = AvaloniaProperty.Register<ToolbarPanel, double>("Spacing", 4);
+        public static readonly StyledProperty<bool> IsOverflowProperty = AvaloniaProperty.Register<ToolbarPanel, bool>(nameof(IsOverflow));
+        public static readonly StyledProperty<bool> WrapOnOverflowProperty = AvaloniaProperty.Register<ToolbarPanel, bool>(nameof(WrapOnOverflow));
+        public static readonly StyledProperty<double> SpacingProperty = AvaloniaProperty.Register<ToolbarPanel, double>(nameof(Spacing), 4);
 
         private List<IControl> _overflowControls = new List<IControl>();
         
@@ -28,6 +29,12 @@ namespace AvaloniaStyles.Controls
             set => SetValue(IsOverflowProperty, value);
         }
         
+        public bool WrapOnOverflow
+        {
+            get => (bool)GetValue(WrapOnOverflowProperty);
+            set => SetValue(WrapOnOverflowProperty, value);
+        }
+
         public double Spacing
         {
             get => GetValue(SpacingProperty);
@@ -52,7 +59,9 @@ namespace AvaloniaStyles.Controls
         private void NewPanelOnAttachedToVisualTree(object? sender, VisualTreeAttachmentEventArgs e)
         {
             foreach (var child in _overflowControls)
-                OutOfBoundsPanel!.Children.Add(child);
+            {
+                OutOfBoundsPanel!.Children.Insert(0, child);
+            }
             _overflowControls.Clear();
         }
 
@@ -79,9 +88,15 @@ namespace AvaloniaStyles.Controls
         
         protected override Size MeasureOverride(Size availableSize)
         {
+            if (WrapOnOverflow)
+                return MeasureWithWrapOverride(availableSize);
+            var wrap = WrapOnOverflow;
             var spacing = Spacing;
             double desiredWidth = 0;
             double desiredHeight = 0;
+            double maxDesiredWidth = 0;
+            double maxDesiredHeight = 0;
+            int rows = 1;
             var children = Children;
             bool any = false;
             for (int i = 0, count = children.Count; i < count; ++i)
@@ -104,24 +119,90 @@ namespace AvaloniaStyles.Controls
                 child.Measure(availableSize.WithWidth(double.PositiveInfinity));
                 desiredWidth += child.DesiredSize.Width + spacing;
                 desiredHeight = Math.Max(desiredHeight, child.DesiredSize.Height);
+                if (wrap && desiredWidth > availableSize.Width)
+                {
+                    maxDesiredWidth = Math.Max(maxDesiredWidth, desiredWidth - spacing);
+                    maxDesiredHeight = Math.Max(maxDesiredHeight, desiredHeight);
+                    desiredWidth = 0;
+                    desiredHeight = 0;
+                    rows++;
+                }
+            }
+
+            if (desiredWidth > 0)
+            {
+                maxDesiredWidth = Math.Max(maxDesiredWidth, desiredWidth);
+                maxDesiredHeight = Math.Max(maxDesiredHeight, desiredHeight);
             }
 
             foreach (var child in _overflowControls)
             {
-                desiredWidth += child.DesiredSize.Width + spacing;
+                maxDesiredWidth += child.DesiredSize.Width + spacing;
             }
             
             if (OutOfBoundsPanel != null)
             {
                 OutOfBoundsPanel.Measure(availableSize.WithWidth(double.PositiveInfinity));
-                desiredWidth += OutOfBoundsPanel.DesiredSize.Width + spacing;
+                maxDesiredWidth += OutOfBoundsPanel.DesiredSize.Width + spacing;
             }
 
-            return new Size(any ? desiredWidth - spacing : 0, desiredHeight);
+            return new Size(any ? maxDesiredWidth : 0, maxDesiredHeight * rows);
         }
+        
+        private Size MeasureWithWrapOverride(Size availableSize)
+        {
+            var children = Children;
+            double x = 0;
+            double y = 0;
+            double maxWidth = availableSize.Width;
+            double maxDesiredHeight = 0;
+            double maxEffectiveWidth = maxWidth;
+            int rows = 1;
+            bool anyInRow = false;
 
+            for (int i = 0, count = children.Count; i < count; ++i)
+            {
+                var child = children[i];
+
+                if (child == null || !child.IsVisible)
+                    continue;
+                
+                child.Measure(availableSize.WithWidth(double.PositiveInfinity));
+                
+                maxDesiredHeight = Math.Max(maxDesiredHeight, child.DesiredSize.Height);
+            }
+            
+            for (int i = 0, count = children.Count; i < count; ++i)
+            {
+                var child = children[i];
+
+                if (child == null || !child.IsVisible)
+                    continue;
+
+                var desiredSize = child.DesiredSize;
+                if (anyInRow && x + desiredSize.Width > maxWidth)
+                {
+                    maxEffectiveWidth = Math.Max(maxEffectiveWidth, x);
+                    anyInRow = false;
+                    x = 0;
+                    y += maxDesiredHeight;
+                    rows++;
+                }
+                else
+                    anyInRow = true;
+                
+                var finalChildWidth = Math.Max(1, Math.Min(desiredSize.Width, maxWidth - x));
+                x += finalChildWidth;
+            }
+            
+            return new Size(rows == 1 ? x : maxEffectiveWidth, rows * maxDesiredHeight);
+        }
+        
         protected override Size ArrangeOverride(Size finalSize)
         {
+            if (WrapOnOverflow)
+                return ArrangeWithWrapOverride(finalSize);
+            
             var children = Children;
             Rect rcChild = new Rect(finalSize);
             double previousChildSize = 0.0;
@@ -158,6 +239,8 @@ namespace AvaloniaStyles.Controls
                 if (child == null || !child.IsVisible)
                     continue;
 
+                child.ApplyTemplate();
+                
                 rcChild = rcChild.WithX(rcChild.X + previousChildSize);
                 rcChild = rcChild.WithHeight(Math.Max(finalSize.Height, child.DesiredSize.Height));
                 // we want to stretch only content presenters, not buttons
@@ -182,20 +265,25 @@ namespace AvaloniaStyles.Controls
                 if (rcChild.Right > finalSize.Width)
                     rcChild = rcChild.WithWidth(Math.Max(0, finalSize.Width - rcChild.X));
 
-                if (rcChild.Right > finalSize.Width && OutOfBoundsPanel is { } panel)
+                if (rcChild.Right > finalSize.Width)
                 {
-                    for (var j = i; j < count; ++j)
+                    if (OutOfBoundsPanel is { } panel)
                     {
-                        var c = children[^1];
-                        Children.RemoveAt(Children.Count - 1);
-                        if (((IVisual)panel).IsAttachedToVisualTree)
-                            panel.Children.Insert(0, c);
-                        else
-                            _overflowControls.Insert(0, c);
+                        for (var j = i; j < count; ++j)
+                        {
+                            var c = children[^1];
+                            Children.RemoveAt(Children.Count - 1);
+                            if (((IVisual)panel).IsAttachedToVisualTree)
+                            {
+                                panel.Children.Insert(0, c);
+                                ((ISetInheritanceParent)c).SetParent(this);
+                            }
+                            else
+                                _overflowControls.Add(c);
+                        }                        
+                        IsOverflow = true;
+                        return finalSize;
                     }
-
-                    IsOverflow = true;
-                    return finalSize;
                 }
                 ArrangeChild(child, rcChild, finalSize);
             }
@@ -207,7 +295,7 @@ namespace AvaloniaStyles.Controls
                     IControl? child = null;
                     if (_overflowControls.Count > 0)
                     {
-                        child = _overflowControls[0];
+                        child = _overflowControls[^1];
                     }
                     else if (OutOfBoundsPanel.Children.Count > 0)
                     {
@@ -219,7 +307,7 @@ namespace AvaloniaStyles.Controls
                         if (leftSpace > child.Bounds.Width + spacing)
                         {
                             if (_overflowControls.Count > 0)
-                                _overflowControls.RemoveAt(0);
+                                _overflowControls.RemoveAt(_overflowControls.Count - 1);
                             else
                                 OutOfBoundsPanel.Children.RemoveAt(0);
                             Children.Add(child);
@@ -230,6 +318,54 @@ namespace AvaloniaStyles.Controls
             }
 
             return finalSize;
+        }
+
+        private Size ArrangeWithWrapOverride(Size finalSize)
+        {
+            var children = Children;
+            double x = 0;
+            double y = 0;
+            double maxWidth = finalSize.Width;
+            double maxDesiredHeight = 0;
+            double maxEffectiveWidth = maxWidth;
+            int rows = 1;
+            bool anyInRow = false;
+
+            for (int i = 0, count = children.Count; i < count; ++i)
+            {
+                var child = children[i];
+
+                if (child == null || !child.IsVisible)
+                    continue;
+                
+                maxDesiredHeight = Math.Max(maxDesiredHeight, child.DesiredSize.Height);
+            }
+            
+            for (int i = 0, count = children.Count; i < count; ++i)
+            {
+                var child = children[i];
+
+                if (child == null || !child.IsVisible)
+                    continue;
+
+                var desiredSize = child.DesiredSize;
+                if (anyInRow && x + desiredSize.Width > maxWidth)
+                {
+                    maxEffectiveWidth = Math.Max(maxEffectiveWidth, x);
+                    anyInRow = false;
+                    x = 0;
+                    y += maxDesiredHeight;
+                    rows++;
+                }
+                else
+                    anyInRow = true;
+                
+                var finalChildWidth = Math.Max(1, Math.Min(desiredSize.Width, maxWidth - x));
+                child.Arrange(new Rect(x, y, finalChildWidth, maxDesiredHeight));
+                x += finalChildWidth;
+            }
+            
+            return new Size(rows == 1 ? x : maxEffectiveWidth, rows * maxDesiredHeight);
         }
 
         internal virtual void ArrangeChild(

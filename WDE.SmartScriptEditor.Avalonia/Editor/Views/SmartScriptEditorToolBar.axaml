@@ -13,7 +13,7 @@
             <WdeImage ImageUri="Icons/icon_remove_comment.png"></WdeImage>
         </ToggleButton>
         <ToggleButton IsChecked="{CompiledBinding HideConditions}" ToolTip.Tip="Hide conditions (doesn't remove)" >
-            Hide conditions
+            <TextBlock Text="Hide conditions" VerticalAlignment="Center" />
         </ToggleButton>
         <ItemsPresenter Items="{CompiledBinding ExtensionCommands}">
             <ItemsPresenter.ItemTemplate>
