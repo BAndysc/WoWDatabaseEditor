@@ -236,7 +236,7 @@ namespace WDE.Common.Avalonia.Controls
             flagsComboBox.IsLightDismissEnabled = false; // we are handling it ourselves, without doing .Handled = true so that as soon as user press outside of popup, the click is treated as actual click
             flagsComboBox.Closed += CompletionComboBoxOnClosed;
 
-            if (!AttachAsAdorner(parent, position, flagsComboBox))
+            if (!AttachAsAdorner(parent, position, flagsComboBox, true))
                 return;
 
             DispatcherTimer.RunOnce(() =>

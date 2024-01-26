@@ -10,6 +10,7 @@ using Avalonia.LogicalTree;
 using Avalonia.VisualTree;
 using WDE.Common.Avalonia.Utils;
 using WDE.Common.Utils;
+using WDE.MVVM.Observable;
 
 namespace WDE.DatabaseEditors.Avalonia.Controls
 {
@@ -20,6 +21,7 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
         protected TextBlock? partText;
 
         private System.IDisposable? subscriptionsOnOpen;
+        private System.IDisposable? focusDisposable = null;
         private AdornerLayer? adornerLayer;
         protected System.IDisposable? textBoxDisposable;
         private Control? editingControl;
@@ -30,6 +32,8 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
             set => SetValue(DisableDoubleClickProperty, value);
         }
         public static readonly StyledProperty<bool> DisableDoubleClickProperty = AvaloniaProperty.Register<OpenableFastCellViewBase, bool>("DisableDoubleClick", false);
+        
+        protected virtual bool DismissOnWindowFocusLost => false;
         
         static OpenableFastCellViewBase()
         {
@@ -113,6 +117,8 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
 
             subscriptionsOnOpen?.Dispose();
             subscriptionsOnOpen = null;
+            focusDisposable?.Dispose();
+            focusDisposable = null;
             adornerLayer = null;
             opened = false;
             editingControl = null;
@@ -160,6 +166,15 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
                     if (!hitTextbox)
                         EndEditing();
                 }, RoutingStrategies.Tunnel);
+                if (DismissOnWindowFocusLost && toplevel is Window w)
+                {
+                    focusDisposable = w.GetObservable(WindowBase.IsActiveProperty)
+                        .SubscribeAction(@is =>
+                        {
+                            if (!@is)
+                                EndEditing();
+                        });
+                }
             }
 
             return true;

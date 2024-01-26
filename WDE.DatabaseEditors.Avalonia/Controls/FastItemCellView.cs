@@ -42,6 +42,8 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
             set => SetAndRaise(SelectedItemProperty, ref selectedItem, value);
         }
 
+        protected override bool DismissOnWindowFocusLost => true;
+
         Type IStyleable.StyleKey => typeof(FastCellView);
         
         private CompletionComboBox? completionComboBox;

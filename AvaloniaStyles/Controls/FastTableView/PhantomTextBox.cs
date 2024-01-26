@@ -12,6 +12,7 @@ using Avalonia.LogicalTree;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using WDE.MVVM.Observable;
 
 namespace AvaloniaStyles.Controls.FastTableView;
 
@@ -21,6 +22,7 @@ public abstract class PhantomControlBase<T> where T : Control
     private Panel panel = null!;
     private Visual? parent = null!;
     private IDisposable? clickDisposable = null;
+    private IDisposable? focusDisposable = null;
     private T? element = null;
     
     public bool IsOpened { get; private set; }
@@ -28,7 +30,7 @@ public abstract class PhantomControlBase<T> where T : Control
     protected virtual void Cleanup(T element) {}
     protected abstract void Save(T element);
     
-    protected bool AttachAsAdorner(Visual parent, Rect position, T element)
+    protected bool AttachAsAdorner(Visual parent, Rect position, T element, bool despawnOnWindowLostFocus = false)
     {
         Debug.Assert(element != null);
         this.parent = parent;
@@ -67,6 +69,15 @@ public abstract class PhantomControlBase<T> where T : Control
                 if (!hitTextbox)
                     Despawn(true);
             }, RoutingStrategies.Tunnel);
+            if (despawnOnWindowLostFocus && toplevel is Window w)
+            {
+                focusDisposable = w.GetObservable(WindowBase.IsActiveProperty)
+                    .SubscribeAction(@is =>
+                    {
+                        if (!@is)
+                            Despawn(false);
+                    });
+            }
         }
 
         IsOpened = true;
@@ -87,6 +98,8 @@ public abstract class PhantomControlBase<T> where T : Control
 
         clickDisposable?.Dispose();
         clickDisposable = null;
+        focusDisposable?.Dispose();
+        focusDisposable = null;
         
         if (parent is IInputElement inputElement)
             FocusManager.Instance!.Focus(inputElement);
