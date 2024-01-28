@@ -2871,5 +2871,386 @@
 			"0": "normal",
 			"1": "object sound"
 		}
+	},
+
+	"ItemSpelltriggerParameter": {
+		"quickaccess": "Full",
+		"name": "Item Spell Triggers",
+		"values": {
+			"0": { "name": "Use" },
+			"1": { "name": "On Equip" },
+			"2": { "name": "Chance on Hit" },
+			"4": { "name": "Soulstone" },
+			"5": { "name": "Use with no delay" },
+			"6": { "name": "Learn Spell ID" }
+		}
+	},
+
+	"ItemStatParameter": {
+		"quickaccess": "Full",
+		"name": "Item Stats",
+		"values": {
+			"0": { "name": "ITEM_MOD_MANA" },
+			"1": { "name": "ITEM_MOD_HEALTH" },
+			"3": { "name": "ITEM_MOD_AGILITY" },
+			"4": { "name": "ITEM_MOD_STRENGTH" },
+			"5": { "name": "ITEM_MOD_INTELLECT" },
+			"6": { "name": "ITEM_MOD_SPIRIT" },
+			"6": { "name": "ITEM_MOD_SPIRIT" },
+			"7": { "name": "ITEM_MOD_STAMINA" },
+			"12": { "name": "ITEM_MOD_DEFENSE_SKILL_RATING" },
+			"13": { "name": "ITEM_MOD_DODGE_RATING" },
+			"14": { "name": "ITEM_MOD_PARRY_RATING" },
+			"15": { "name": "ITEM_MOD_BLOCK_RATING" },
+			"16": { "name": "ITEM_MOD_HIT_MELEE_RATING" },
+			"17": { "name": "ITEM_MOD_HIT_RANGED_RATING" },
+			"18": { "name": "ITEM_MOD_HIT_SPELL_RATING" },
+			"19": { "name": "ITEM_MOD_CRIT_MELEE_RATING" },
+			"20": { "name": "ITEM_MOD_CRIT_RANGED_RATING" },
+			"21": { "name": "ITEM_MOD_CRIT_SPELL_RATING" },
+			"22": { "name": "ITEM_MOD_HIT_TAKEN_MELEE_RATING" },
+			"23": { "name": "ITEM_MOD_HIT_TAKEN_RANGED_RATING" },
+			"24": { "name": "ITEM_MOD_HIT_TAKEN_SPELL_RATING" },
+			"25": { "name": "ITEM_MOD_CRIT_TAKEN_MELEE_RATING" },
+			"26": { "name": "ITEM_MOD_CRIT_TAKEN_RANGED_RATING" },
+			"27": { "name": "ITEM_MOD_CRIT_TAKEN_SPELL_RATING" },
+			"28": { "name": "ITEM_MOD_HASTE_MELEE_RATING" },
+			"29": { "name": "ITEM_MOD_HASTE_RANGED_RATING" },
+			"30": { "name": "ITEM_MOD_HASTE_SPELL_RATING" },
+			"31": { "name": "ITEM_MOD_HIT_RATING" },
+			"32": { "name": "ITEM_MOD_CRIT_RATING" },
+			"33": { "name": "ITEM_MOD_HIT_TAKEN_RATING" },
+			"34": { "name": "ITEM_MOD_CRIT_TAKEN_RATING" },
+			"35": { "name": "ITEM_MOD_RESILIENCE_RATING" },
+			"36": { "name": "ITEM_MOD_HASTE_RATING" },
+			"37": { "name": "ITEM_MOD_EXPERTISE_RATING" },
+			"38": { "name": "ITEM_MOD_ATTACK_POWER" },
+			"39": { "name": "ITEM_MOD_RANGED_ATTACK_POWER" },
+			"40": { "name": "ITEM_MOD_FERAL_ATTACK_POWER (not used as of 3.3)" },
+			"41": { "name": "ITEM_MOD_SPELL_HEALING_DONE" },
+			"42": { "name": "ITEM_MOD_SPELL_DAMAGE_DONE" },
+			"43": { "name": "ITEM_MOD_MANA_REGENERATION" },
+			"44": { "name": "ITEM_MOD_ARMOR_PENETRATION_RATING" },
+			"45": { "name": "ITEM_MOD_SPELL_POWER" },
+			"46": { "name": "ITEM_MOD_HEALTH_REGEN" },
+			"47": { "name": "ITEM_MOD_SPELL_PENETRATION" },
+			"48": { "name": "ITEM_MOD_BLOCK_VALUE" }
+		}
+	},
+
+	"ItemFlagParameter": {
+		"isflag": true,
+		"values": {
+			"1": { "name": "ITEM_FLAG_NO_PICKUP (NOT IMPLEMENTED)" },
+			"2": { "name": "Conjured item" },
+			"4": { "name": "Openable (can be opened by right-click)" },
+			"8": { "name": "ITEM_FLAG_HEROIC_TOOLTIP (NOT IMPLEMENTED) - Makes green 'Heroic' text appear on item" },
+			"16": { "name": "ITEM_FLAG_DEPRECATED (NOT IMPLEMENTED) - Deprecated Item" },
+			"32": { "name": "Item can not be destroyed, except by using spell (item can be reagent for spell)" },
+			"64": { "name": "ITEM_FLAG_PLAYERCAST (NOT IMPLEMENTED) - Item's spells are castable by players" },
+			"128": { "name": "No default 30 seconds cooldown when equipped (for 'On use' items)" },
+			"256": { "name": "ITEM_FLAG_MULTI_LOOT_QUEST (NOT IMPLEMENTED)" },
+			"512": { "name": "Wrapper : Item can wrap other items" },
+			"1024": { "name": "ITEM_FLAG_USES_RESOURCES (NOT IMPLEMENTED)" },
+			"2048": { "name": "Item is party loot and can be looted by all" },
+			"4096": { "name": "Item is refundable" },
+			"8192": { "name": "Charter (Arena or Guild)" },
+			"16384": { "name": "ITEM_FLAG_HAS_TEXT (NOT IMPLEMENTED) - Only readable items have this (but not all)" },
+			"32768": { "name": "ITEM_FLAG_NO_DISENCHANT (NOT IMPLEMENTED) - If enabled, prevent disenchanting. Implemented in another column RequiredDisenchantSkill" },
+			"65536": { "name": "ITEM_FLAG_REAL_DURATION (NOT IMPLEMENTED) - Probably real time duration. Implemented in another column flagsCustom" },
+			"131072": { "name": "ITEM_FLAG_NO_CREATOR (NOT IMPLEMENTED OR PARTIALLY) - Maybe to remove the 'Made by XX' message on crafted/summoned item or for signing charters" },
+			"262144": { "name": "Item can be prospected" },
+			"524288": { "name": "Unique equipped (player can only have one equipped at the same time but as many as he wants in his bags, if maxcount = 1, it will still display Unique-Equipped)" },
+			"1048576": { "name": "ITEM_FLAG_IGNORE_FOR_AURAS (NOT IMPLEMENTED) - ??" },
+			"2097152": { "name": "Item can be used during arena match" },
+			"4194304": { "name": "Throwable (for tooltip ingame)" },
+			"8388608": { "name": "Item can be used in shapeshift forms" },
+			"16777216": { "name": "ITEM_FLAG_HAS_QUEST_GLOW (NOT IMPLEMENTED)" },
+			"33554432": { "name": "Profession recipes: can only be looted if you meet requirements and don't already know it" },
+			"67108864": { "name": "Item cannot be used in arena" },
+			"134217728": { "name": "Bind to Account (Requires to set Bonding > 0)" },
+			"268435456": { "name": "Spell is cast with triggered flag (in code it's written Spell is cast ignoring reagents and the flag is called ITEM_FLAG_NO_REAGENT_COST)" },
+			"536870912": { "name": "Millable" },
+			"1073741824": { "name": "ITEM_FLAG_REPORT_TO_GUILD_CHAT (NOT IMPLEMENTED)" },
+			"2147483648": { "name": "ITEM_FLAG_NO_PROGRESSIVE_LOOT (NOT IMPLEMENTED)" }
+		}
+	},
+
+	"ItemFlagExtraParameter": {
+		"isflag": true,
+		"values": {
+			"1": { "name": "Horde Only" },
+			"2": { "name": "Alliance Onlym" },
+			"4": { "name": "When item uses ExtendedCost in npc_vendor, gold is also required" },
+			"256": { "name": "Makes need roll for this item disabled" },
+			"512": { "name": "NEED_ROLL_DISABLED" },
+			"16384": { "name": "HAS_NORMAL_PRICE" },
+			"131072": { "name": "BNET_ACCOUNT_BOUND (seems useless on 3.3.5a)" },
+			"2097152": { "name": "CANNOT_BE_TRANSMOG" },
+			"4194304": { "name": "CANNOT_TRANSMOG" },
+			"8388608": { "name": "CAN_TRANSMOG" }
+		}
+	},
+
+	"ItemQualityParameter": {
+		"isflag": false,
+		"values": {
+			"0": { "name": "Poor" },
+			"1": { "name": "Common" },
+			"2": { "name": "Uncommon" },
+			"3": { "name": "Rare" },
+			"4": { "name": "Epic" },
+			"5": { "name": "Legendary" },
+			"6": { "name": "Artifact" },
+			"7": { "name": "Heirlooms (or some Bind to Account items)" }
+		}
+	},
+
+	"ItemInventoryTypeParameter": {
+		"isflag": false,
+		"values": {
+			"0": { "name": "Non equipable" },
+			"1": { "name": "Head" },
+			"2": { "name": "Neck" },
+			"3": { "name": "Shoulder" },
+			"4": { "name": "Shirt" },
+			"5": { "name": "Chest (See also Robe = 20)" },
+			"6": { "name": "Waist" },
+			"7": { "name": "Legs" },
+			"8": { "name": "Feet" },
+			"9": { "name": "Wrists" },
+			"10": { "name": "Hands" },
+			"11": { "name": "Finger" },
+			"12": { "name": "Trinket" },
+			"13": { "name": "One-Hand (not to confuse with Off-Hand = 22)" },
+			"14": { "name": "Shield (class = armor, not weapon even if in weapon slot)" },
+			"15": { "name": "Ranged (Bows) (see also Ranged right = 26)" },
+			"16": { "name": "Back" },
+			"17": { "name": "Two-Hand" },
+			"18": { "name": "Bag" },
+			"19": { "name": "Tabard" },
+			"20": { "name": "Robe (see also chest = 5" },
+			"21": { "name": "Main hand" },
+			"22": { "name": "Off Hand weapons (see also One-Hand = 13)" },
+			"23": { "name": "Held in Off-Hand (tome, cane, flowers, torches, orbs etc... See also Off-Hand = 22) (class = armor, not weapon even if in weapon slot)" },
+			"24": { "name": "Ammo" },
+			"25": { "name": "Thrown" },
+			"26": { "name": "Ranged right (Wands, Guns) (see also Ranged = 15)" },
+			"27": { "name": "Quiver" },
+			"28": { "name": "Relic (class = armor, not weapon even if in weapon slot)" }
+		}
+	},
+
+	"ItemRequiredReputationRankParameter": {
+		"isflag": false,
+		"values": {
+			"0": { "name": "Hated" },
+			"1": { "name": "Hostile" },
+			"2": { "name": "Unfriendly" },
+			"3": { "name": "Neutral" },
+			"4": { "name": "Friendly" },
+			"5": { "name": "Honored" },
+			"6": { "name": "Revered" },
+			"7": { "name": "Exalted" }
+		}
+	},
+
+	"Itemdmg_typeParameter": {
+		"isflag": false,
+		"values": {
+			"0": { "name": "Physical" },
+			"1": { "name": "Holy" },
+			"2": { "name": "Fire" },
+			"3": { "name": "Nature" },
+			"4": { "name": "Frost" },
+			"5": { "name": "Shadow" },
+			"6": { "name": "Arcane" }
+		}
+	},
+
+	"ItemBondingParameter": {
+		"isflag": false,
+		"values": {
+			"0": { "name": "No bounds" },
+			"1": { "name": "Binds when picked up" },
+			"2": { "name": "Binds when equipped" },
+			"3": { "name": "Binds when used" },
+			"4": { "name": "Quest item" },
+			"5": { "name": "Quest Item1" }
+		}
+	},
+
+	"ItemMaterialParameter": {
+		"isflag": false,
+		"values": {
+			"-1": { "name": "Consumables" },
+			"0": { "name": "Not Defined" },
+			"1": { "name": "Metal" },
+			"2": { "name": "Wood" },
+			"3": { "name": "Liquid" },
+			"4": { "name": "Jewelery" },
+			"5": { "name": "Chain" },
+			"6": { "name": "Plate" },
+			"7": { "name": "Cloth" },
+			"8": { "name": "Leather" }
+		}
+	},
+
+	"ItemSheathParameter": {
+		"isflag": false,
+		"values": {
+			"1": {
+				"name": "Two Handed Weapon",
+				"description": "Diagonally across the back pointing downwards."
+			},
+			"2": {
+				"name": "Staff",
+				"description": "Diagonally across the back pointing upwards."
+			},
+			"3": {
+				"name": "One Handed",
+				"description": "On the left-hand side of the character's waist."
+			},
+			"4": {
+				"name": "Shield",
+				"description": "On the middle of the character's back."
+			},
+			"5": {
+				"name": "Enchanter's Rod",
+				"description": "Who the hell knows?"
+			},
+			"6": {
+				"name": "Off hand",
+				"description": "On the right-hand side of the character's waist."
+			}
+		}
+	},
+
+	"ItemClassParameter": {
+		"isflag": false,
+		"values": {
+			"0": { "name": "Consumable" },
+			"1": { "name": "Container" },
+			"2": { "name": "Weapon" },
+			"3": { "name": "Gem" },
+			"4": { "name": "Armor" },
+			"5": { "name": "Reagent" },
+			"6": { "name": "Projectile" },
+			"7": { "name": "Trade Goods" },
+			"8": { "name": "Generic(OBSOLETE)" },
+			"9": { "name": "Recipe" },
+			"10": { "name": "Money(OBSOLETE)" },
+			"11": { "name": "Quiver" },
+			"12": { "name": "Quest" },
+			"13": { "name": "Key" },
+			"14": { "name": "Permanent(OBSOLETE)" },
+			"15": { "name": "Miscellaneous" },
+			"16": { "name": "Glyph" }
+		}
+	},
+
+	"ItemFoodTypeParameter": {
+		"isflag": false,
+		"values": {
+			"1": { "name": "Meat" },
+			"2": { "name": "Fish" },
+			"3": { "name": "Cheese" },
+			"4": { "name": "Bread" },
+			"5": { "name": "Fungus" },
+			"6": { "name": "Fruit" },
+			"7": { "name": "Raw Meat" },
+			"8": { "name": "Raw Fish" }
+		}
+	},
+
+	"ItemBagFamilyParameter": {
+		"isflag": true,
+		"values": {
+			"0": { "name": "None" },
+			"1": { "name": "Arrows" },
+			"2": { "name": "Bullets" },
+			"4": { "name": "Soul Shards" },
+			"8": { "name": "Leatherworking Supplies" },
+			"16": { "name": "Inscription Supplies" },
+			"32": { "name": "Herbs" },
+			"64": { "name": "Enchanting Supplies" },
+			"128": { "name": "Engineering Supplies" },
+			"256": { "name": "Keys" },
+			"512": { "name": "Gems" },
+			"1024": { "name": "Mining Supplies" },
+			"2048": { "name": "Soulbounf Equiptment" },
+			"4096": { "name": "Vanity pets" },
+			"8192": { "name": "Currency Tokens" },
+			"16384": { "name": "Quest Items" }
+		}
+	},
+
+	"ItemTotemCategoryParameter": {
+		"isflag": false,
+		"values": {
+			"1": { "name": "Skinning Knife (OLD)" },
+			"2": { "name": "Earth Totem" },
+			"3": { "name": "Air Totem" },
+			"4": { "name": "Fire Totem" },
+			"5": { "name": "Water Totem" },
+			"6": { "name": "Runed Copper Rod" },
+			"7": { "name": "Runed Silver Rod" },
+			"8": { "name": "Runed Golden Rod" },
+			"9": { "name": "Runed Truesilver Rod" },
+			"10": { "name": "Runed Arcanite Rod" },
+			"11": { "name": "Mining Pick (OLD)" },
+			"12": { "name": "Philosopher's Stone" },
+			"13": { "name": "Blacksmith Hammer (OLD)" },
+			"14": { "name": "Arclight Spanner" },
+			"15": { "name": "Gyromatic Micro-Adjustor" },
+			"21": { "name": "Master Totem" },
+			"41": { "name": "Runed Fel Iron Rod" },
+			"62": { "name": "Runed Adamantite Rod" },
+			"63": { "name": "Runed Eternium Rod" },
+			"81": { "name": "Hollow Quill" },
+			"101": { "name": "Runed Azurite Rod" },
+			"121": { "name": "Virtuoso Inking Set" },
+			"141": { "name": "Drums" },
+			"161": { "name": "Gnomish Army Knife" },
+			"162": { "name": "Blacksmith Hammer" },
+			"165": { "name": "Mining Pick" },
+			"166": { "name": "Skinning Knife" },
+			"167": { "name": "Hammer Pick" },
+			"168": { "name": "Bladed Pickaxe" },
+			"169": { "name": "Flint and Tinder" },
+			"189": { "name": "Runed Cobalt Rod" },
+			"190": { "name": "Runed Titanium Rod" }
+		}
+	},
+
+	"ItemSocketBonusCategoryParameter": {
+		"isflag": false,
+		"values": {
+			"3312": { "name": "+8 Strength" },
+			"3313": { "name": "+8 Agility" },
+			"3305": { "name": "+12 Stamina" },
+			"3": { "name": "+8 Intellect" },
+			"2872": { "name": "+9 Healing" },
+			"3753": { "name": "+9 Spell Power" },
+			"3877": { "name": "+16 Attack Power" }
+		}
+	},
+
+	"ItemFlagsCustomParameter": {
+		"isflag": true,
+		"values": {
+			"1": {
+				"name": "ITEM_FLAGS_CU_DURATION_REAL_TIME",
+				"description": "Item duration will tick even if player is offline"
+			},
+			"2": {
+				"name": "ITEM_FLAGS_CU_IGNORE_QUEST_STATUS",
+				"description": "No quest status will be checked when this item drops"
+			},
+			"4": {
+				"name": "ITEM_FLAGS_CU_FOLLOW_LOOT_RULES",
+				"description": "Item will always follow group/master/need before greed looting rules"
+			}
+		}
 	}
 }
