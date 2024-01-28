@@ -88,6 +88,10 @@ namespace WDE.DatabaseEditors.Data
                     {
                         valueHolder = new ValueHolder<float>(column.Value.value as float? ?? 0, column.Value.value is DBNull);
                     }
+                    else if (column.Value.type == typeof(decimal))
+                    {
+                        valueHolder = new ValueHolder<float>(column.Value.value as float? ?? 0, column.Value.value is DBNull);
+                    }
                     else if (column.Value.type == typeof(uint))
                     {
                         valueHolder = new ValueHolder<long>(column.Value.value as uint? ?? 0, column.Value.value is DBNull);

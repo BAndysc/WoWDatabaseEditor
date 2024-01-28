@@ -3,6 +3,7 @@ using WDE.Common.Database;
 
 namespace WDE.MySqlDatabaseCommon.CommonModels;
 
+[Table(Name = "quest_objectives")]
 public class MySqlQuestObjective : IQuestObjective
 {
     [PrimaryKey]
