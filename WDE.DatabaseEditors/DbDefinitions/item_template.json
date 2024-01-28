@@ -1,0 +1,927 @@
+{
+  "compatibility": [
+    "Azeroth"
+  ],
+  "name": "Item Template",
+  "single_solution_name": "{name} Item Template",
+  "multi_solution_name": "Multiple Item Template",
+  "description": "Edit existing item templates",
+  "table_name": "item_template",
+  "table_index_name": "entry",
+  "record_mode": "Template",
+  "group_name": "Templates",
+  "icon_path": "Icons/document_bg.png",
+  "reload_command": "reload item_template",
+  "picker": "ItemParameter",
+  "primary_key": [
+    "entry"
+  ],
+  "groups": [
+    {
+      "group_name": "Basic",
+      "fields": [
+        {
+          "name": "Entry",
+          "help": "The unique ID of the item.",
+          "db_column_name": "entry",
+          "value_type": "uint",
+          "read_only": true
+        },
+        {
+          "name": "Displayid",
+          "help": "The model ID of the item. Each model has its own icon assigned so this field controls both the model appearance and the icon.",
+          "db_column_name": "displayid",
+          "value_type": "uint"
+        },
+        {
+          "name": "Name",
+          "help": "The name of the item.",
+          "db_column_name": "name",
+          "value_type": "string",
+          "default": ""
+        },
+        {
+          "name": "Quality",
+          "help": "The quality of the item.",
+          "db_column_name": "Quality",
+          "value_type": "ItemQualityParameter"
+        },
+        {
+          "name": "Bonding",
+          "help": "The bonding for the item.\r\n\r\nNote: To use the \"Bind to Account\" bonding, the item must have its flags set to 134217728 (minimum) and a bonding > 0 (ex: 1,2,3).",
+          "db_column_name": "bonding",
+          "value_type": "ItemBondingParameter"
+        },
+        {
+          "name": "Class",
+          "help": "The class of the item. e.g. Consumable, weapon, gem, armor.",
+          "db_column_name": "class",
+          "value_type": "ItemClassParameter"
+        },
+        {
+          "name": "Subclass",
+          "help": "The following table lists all available subclass and class combinations and the subclass name.",
+          "db_column_name": "subclass",
+          "value_type": "uint"
+        },
+        {
+          "name": "Inventory Type",
+          "help": "In what slot the item can be equipped.",
+          "db_column_name": "InventoryType",
+          "value_type": "ItemInventoryTypeParameter"
+        },
+        {
+          "name": "Sound Override Subclass",
+          "help": "Weapons have special sounds on impact. This column is used to override these sounds by specifying another subclass.\r\n\r\nFor example an item with misc subclass can sound like a stave on impact by overriding the subclass here.",
+          "db_column_name": "SoundOverrideSubclass",
+          "value_type": "int",
+          "default": -1
+        },
+        {
+          "name": "Durability",
+          "help": "The maximum durability of this item.",
+          "db_column_name": "MaxDurability",
+          "value_type": "uint"
+        },
+        {
+          "name": "Item Level",
+          "help": "Base item level.",
+          "db_column_name": "ItemLevel",
+          "value_type": "uint"
+        },
+        {
+          "name": "Description",
+          "help": "The description that appears in orange letters at the bottom of the item tooltip.",
+          "db_column_name": "description",
+          "value_type": "string",
+          "default": ""
+        },
+        {
+          "name": "Sheath",
+          "help": "Controls how the item is put away on the character. Press the 'Z' hotkey to sheath and unsheathe your weapons.",
+          "db_column_name": "sheath",
+          "value_type": "ItemSheathParameter"
+        },
+        {
+          "name": "Flags",
+          "help": "Bitmask field that contains flags that the item has on it. As all other such fields, just add the flags together to combine them. Possible flags are listed below.",
+          "db_column_name": "Flags",
+          "value_type": "ItemFlagParameter"
+        },
+        {
+          "name": "Flags Extra",
+          "help": "FlagsExtra",
+          "db_column_name": "FlagsExtra",
+          "value_type": "ItemFlagExtraParameter"
+        },
+        {
+          "name": "Itemset",
+          "help": "The ID of the item set that this item belongs to. To save you some time, you CAN NOT make up new item sets. Item sets are defined in the ItemSet DBC file.",
+          "db_column_name": "itemset",
+          "value_type": "uint"
+        },
+        {
+          "name": "Material",
+          "help": "The material that the item is made of. The value here affects the sound that the item makes when moved. Use -1 for consumable items like food, reagents, etc.",
+          "db_column_name": "Material",
+          "value_type": "ItemMaterialParameter"
+        },
+        {
+          "name": "Ranged Mod Range",
+          "help": "Range Modifier for bows/guns/crossbows:\r\n\r\nDefault range is somewhere between 0.3 and 0.4 yards,\r\n\r\nall blizzard ranged weapons have RangedModRange100",
+          "db_column_name": "RangedModRange",
+          "value_type": "float"
+        },
+        {
+          "name": "Ammo Type",
+          "help": "The type of ammunition the item uses. Arrows = 2; Bullets = 3",
+          "db_column_name": "ammo_type",
+          "value_type": "uint"
+        }
+      ]
+    },
+    {
+      "group_name": "Stats",
+      "fields": [
+        {
+          "name": "Dmg Min 1",
+          "help": "The minimum damage of the item.",
+          "db_column_name": "dmg_min1",
+          "value_type": "float"
+        },
+        {
+          "name": "Dmg Max 1",
+          "help": "The maximum damage of the item.",
+          "db_column_name": "dmg_max1",
+          "value_type": "float"
+        },
+        {
+          "name": "Dmg Type 1",
+          "help": "The damage type that the item uses.",
+          "db_column_name": "dmg_type1",
+          "value_type": "Itemdmg_typeParameter"
+        },
+        {
+          "name": "Dmg Min 2",
+          "help": "The minimum damage of the item.",
+          "db_column_name": "dmg_min2",
+          "value_type": "float"
+        },
+        {
+          "name": "Dmg Max 2",
+          "help": "The maximum damage of the item.",
+          "db_column_name": "dmg_max2",
+          "value_type": "float"
+        },
+        {
+          "name": "Dmg Type 2",
+          "help": "The damage type that the item uses.",
+          "db_column_name": "dmg_type2",
+          "value_type": "Itemdmg_typeParameter"
+        },
+        {
+          "name": "Speed",
+          "help": "The time in milliseconds between successive hits.",
+          "db_column_name": "delay",
+          "value_type": "uint",
+          "default": 1000
+        },
+        {
+          "name": "Stats Count",
+          "help": "When an item has entries in stat_type, this must be updated to display those entries (Unknown how this works)",
+          "db_column_name": "StatsCount",
+          "value_type": "uint"
+        },
+        {
+          "name": "Scaling Stat Distribution",
+          "help": "Similar to Static Stats these are the Stats that grow along with the users level (mainly heirloom leveling gear) use like static stats",
+          "db_column_name": "ScalingStatDistribution",
+          "value_type": "int"
+        },
+        {
+          "name": "Scaling Stat Value",
+          "help": "Final (level 80) value of the scaling-stat",
+          "db_column_name": "ScalingStatValue",
+          "value_type": "uint"
+        },
+        {
+          "name": "Stat Type 1",
+          "help": "The type of stat to modify.",
+          "db_column_name": "stat_type1",
+          "value_type": "ItemStatParameter"
+        },
+        {
+          "name": "Stat Value 1",
+          "help": "The value to change the stat type to.",
+          "db_column_name": "stat_value1",
+          "value_type": "int"
+        },
+        {
+          "name": "Stat Type 2",
+          "help": "The type of stat to modify.",
+          "db_column_name": "stat_type2",
+          "value_type": "ItemStatParameter"
+        },
+        {
+          "name": "Stat Value 2",
+          "help": "The value to change the stat type to.",
+          "db_column_name": "stat_value2",
+          "value_type": "int"
+        },
+        {
+          "name": "Stat Type 3",
+          "help": "The type of stat to modify.",
+          "db_column_name": "stat_type3",
+          "value_type": "ItemStatParameter"
+        },
+        {
+          "name": "Stat Value 3",
+          "help": "The value to change the stat type to.",
+          "db_column_name": "stat_value3",
+          "value_type": "int"
+        },
+        {
+          "name": "Stat Type 4",
+          "help": "The type of stat to modify.",
+          "db_column_name": "stat_type4",
+          "value_type": "ItemStatParameter"
+        },
+        {
+          "name": "Stat Value 4",
+          "help": "The value to change the stat type to.",
+          "db_column_name": "stat_value4",
+          "value_type": "int"
+        },
+        {
+          "name": "Stat Type 5",
+          "help": "The type of stat to modify.",
+          "db_column_name": "stat_type5",
+          "value_type": "ItemStatParameter"
+        },
+        {
+          "name": "Stat Value 5",
+          "help": "The value to change the stat type to.",
+          "db_column_name": "stat_value5",
+          "value_type": "int"
+        },
+        {
+          "name": "Stat Type 6",
+          "help": "The type of stat to modify.",
+          "db_column_name": "stat_type6",
+          "value_type": "ItemStatParameter"
+        },
+        {
+          "name": "Stat Value 6",
+          "help": "The value to change the stat type to.",
+          "db_column_name": "stat_value6",
+          "value_type": "int"
+        },
+        {
+          "name": "Stat Type 7",
+          "help": "The type of stat to modify.",
+          "db_column_name": "stat_type7",
+          "value_type": "ItemStatParameter"
+        },
+        {
+          "name": "Stat Value 7",
+          "help": "The value to change the stat type to.",
+          "db_column_name": "stat_value7",
+          "value_type": "int"
+        },
+        {
+          "name": "Stat Type 8",
+          "help": "The type of stat to modify.",
+          "db_column_name": "stat_type8",
+          "value_type": "ItemStatParameter"
+        },
+        {
+          "name": "Stat Value 8",
+          "help": "The value to change the stat type to.",
+          "db_column_name": "stat_value8",
+          "value_type": "int"
+        },
+        {
+          "name": "Stat Type 9",
+          "help": "The type of stat to modify.",
+          "db_column_name": "stat_type9",
+          "value_type": "ItemStatParameter"
+        },
+        {
+          "name": "Stat Value 9",
+          "help": "The value to change the stat type to.",
+          "db_column_name": "stat_value9",
+          "value_type": "int"
+        },
+        {
+          "name": "Stat Type 10",
+          "help": "The type of stat to modify.",
+          "db_column_name": "stat_type10",
+          "value_type": "ItemStatParameter"
+        },
+        {
+          "name": "Stat Value 10",
+          "help": "The value to change the stat type to.",
+          "db_column_name": "stat_value10",
+          "value_type": "int"
+        }
+      ]
+    },
+    {
+      "group_name": "Sockets",
+      "fields": [
+        {
+          "name": "Socket Bonus",
+          "help": "Commonly used socket bonus IDs",
+          "db_column_name": "socketBonus",
+          "value_type": "ItemSocketBonusCategoryParameter"
+        },
+        {
+          "name": "Socket Color 1",
+          "db_column_name": "socketColor_1",
+          "value_type": "int"
+        },
+        {
+          "name": "Socket Content 1",
+          "db_column_name": "socketContent_1",
+          "value_type": "int"
+        },
+        {
+          "name": "Socket Color 2",
+          "db_column_name": "socketColor_2",
+          "value_type": "int"
+        },
+        {
+          "name": "Socket Content 2",
+          "db_column_name": "socketContent_2",
+          "value_type": "int"
+        },
+        {
+          "name": "Socket Color 3",
+          "db_column_name": "socketColor_3",
+          "value_type": "int"
+        },
+        {
+          "name": "Socket Content 3",
+          "db_column_name": "socketContent_3",
+          "value_type": "int"
+        }
+      ]
+    },
+    {
+      "group_name": "Damage Reduction",
+      "fields": [
+        {
+          "name": "Armor",
+          "help": "The armor value of the item.",
+          "db_column_name": "armor",
+          "value_type": "uint"
+        },
+        {
+          "name": "Block",
+          "help": "If the item is a shield, the block chance of the shield.",
+          "db_column_name": "block",
+          "value_type": "uint"
+        },
+        {
+          "name": "Holy Res",
+          "help": "Resistance math is convoluted. It is not a direct reduction, but a CHANCE to reduce. At level 80, 54 resist has a 20% chance to resist NOTHING, a 47% chance to reduce 10% damage a 30% chance to resists 20% damage and a  3% chance to reduce 30%.\r\nAt level 80 for 100 resist for 0%, 10%, 20% etc: 0 \t0.2751 \t0.4988 \t0.2261 \t0\r\nAt level 80 for 300 resist for 0%, 10%, 20% etc: 0 \t0 \t\t0 \t\t0.1735 \t0.4534 \t0.2985 \t0.0746  0\r\nAt level 80 for 429 resist for 0%, 10%, 20% etc: 0 \t0 \t\t0 \t\t0 \t\t0.2379 \t0.4368 \t0.2862 \t0.0390\r\n\r\nSo lvl 80 with 429 resits can resists. It can resists 60% damage 28.62% of the time. 50% damage 43.68% of the time etc.\r\n\r\n-------\r\n\r\nYou can get a rough calculation with this -->> Resistance/(400+Resistance)\r\nTo get a rough estimate per level, simply multiply your level by 5 and replace the \"400\". \r\n\r\nEx. Level 10 with 54 resist: 54/(10+54) =  84% *average* resistance/damage reduction *over time*.",
+          "db_column_name": "holy_res",
+          "value_type": "int",
+          "can_be_null": true
+        },
+        {
+          "name": "Fire Res",
+          "help": "Resistance math is convoluted. It is not a direct reduction, but a CHANCE to reduce. At level 80, 54 resist has a 20% chance to resist NOTHING, a 47% chance to reduce 10% damage a 30% chance to resists 20% damage and a  3% chance to reduce 30%.\r\nAt level 80 for 100 resist for 0%, 10%, 20% etc: 0 \t0.2751 \t0.4988 \t0.2261 \t0\r\nAt level 80 for 300 resist for 0%, 10%, 20% etc: 0 \t0 \t\t0 \t\t0.1735 \t0.4534 \t0.2985 \t0.0746  0\r\nAt level 80 for 429 resist for 0%, 10%, 20% etc: 0 \t0 \t\t0 \t\t0 \t\t0.2379 \t0.4368 \t0.2862 \t0.0390\r\n\r\nSo lvl 80 with 429 resits can resists. It can resists 60% damage 28.62% of the time. 50% damage 43.68% of the time etc.\r\n\r\n-------\r\n\r\nYou can get a rough calculation with this -->> Resistance/(400+Resistance)\r\nTo get a rough estimate per level, simply multiply your level by 5 and replace the \"400\". \r\n\r\nEx. Level 10 with 54 resist: 54/(10+54) =  84% *average* resistance/damage reduction *over time*.",
+          "db_column_name": "fire_res",
+          "value_type": "int",
+          "can_be_null": true
+        },
+        {
+          "name": "Nature Res",
+          "help": "Resistance math is convoluted. It is not a direct reduction, but a CHANCE to reduce. At level 80, 54 resist has a 20% chance to resist NOTHING, a 47% chance to reduce 10% damage a 30% chance to resists 20% damage and a  3% chance to reduce 30%.\r\nAt level 80 for 100 resist for 0%, 10%, 20% etc: 0 \t0.2751 \t0.4988 \t0.2261 \t0\r\nAt level 80 for 300 resist for 0%, 10%, 20% etc: 0 \t0 \t\t0 \t\t0.1735 \t0.4534 \t0.2985 \t0.0746  0\r\nAt level 80 for 429 resist for 0%, 10%, 20% etc: 0 \t0 \t\t0 \t\t0 \t\t0.2379 \t0.4368 \t0.2862 \t0.0390\r\n\r\nSo lvl 80 with 429 resits can resists. It can resists 60% damage 28.62% of the time. 50% damage 43.68% of the time etc.\r\n\r\n-------\r\n\r\nYou can get a rough calculation with this -->> Resistance/(400+Resistance)\r\nTo get a rough estimate per level, simply multiply your level by 5 and replace the \"400\". \r\n\r\nEx. Level 10 with 54 resist: 54/(10+54) =  84% *average* resistance/damage reduction *over time*.",
+          "db_column_name": "nature_res",
+          "value_type": "int",
+          "can_be_null": true
+        },
+        {
+          "name": "Frost Res",
+          "help": "Resistance math is convoluted. It is not a direct reduction, but a CHANCE to reduce. At level 80, 54 resist has a 20% chance to resist NOTHING, a 47% chance to reduce 10% damage a 30% chance to resists 20% damage and a  3% chance to reduce 30%.\r\nAt level 80 for 100 resist for 0%, 10%, 20% etc: 0 \t0.2751 \t0.4988 \t0.2261 \t0\r\nAt level 80 for 300 resist for 0%, 10%, 20% etc: 0 \t0 \t\t0 \t\t0.1735 \t0.4534 \t0.2985 \t0.0746  0\r\nAt level 80 for 429 resist for 0%, 10%, 20% etc: 0 \t0 \t\t0 \t\t0 \t\t0.2379 \t0.4368 \t0.2862 \t0.0390\r\n\r\nSo lvl 80 with 429 resits can resists. It can resists 60% damage 28.62% of the time. 50% damage 43.68% of the time etc.\r\n\r\n-------\r\n\r\nYou can get a rough calculation with this -->> Resistance/(400+Resistance)\r\nTo get a rough estimate per level, simply multiply your level by 5 and replace the \"400\". \r\n\r\nEx. Level 10 with 54 resist: 54/(10+54) =  84% *average* resistance/damage reduction *over time*.",
+          "db_column_name": "frost_res",
+          "value_type": "int",
+          "can_be_null": true
+        },
+        {
+          "name": "Shadow Res",
+          "help": "Resistance math is convoluted. It is not a direct reduction, but a CHANCE to reduce. At level 80, 54 resist has a 20% chance to resist NOTHING, a 47% chance to reduce 10% damage a 30% chance to resists 20% damage and a  3% chance to reduce 30%.\r\nAt level 80 for 100 resist for 0%, 10%, 20% etc: 0 \t0.2751 \t0.4988 \t0.2261 \t0\r\nAt level 80 for 300 resist for 0%, 10%, 20% etc: 0 \t0 \t\t0 \t\t0.1735 \t0.4534 \t0.2985 \t0.0746  0\r\nAt level 80 for 429 resist for 0%, 10%, 20% etc: 0 \t0 \t\t0 \t\t0 \t\t0.2379 \t0.4368 \t0.2862 \t0.0390\r\n\r\nSo lvl 80 with 429 resits can resists. It can resists 60% damage 28.62% of the time. 50% damage 43.68% of the time etc.\r\n\r\n-------\r\n\r\nYou can get a rough calculation with this -->> Resistance/(400+Resistance)\r\nTo get a rough estimate per level, simply multiply your level by 5 and replace the \"400\". \r\n\r\nEx. Level 10 with 54 resist: 54/(10+54) =  84% *average* resistance/damage reduction *over time*.",
+          "db_column_name": "shadow_res",
+          "value_type": "int",
+          "can_be_null": true
+        },
+        {
+          "name": "Arcane Res",
+          "help": "Resistance math is convoluted. It is not a direct reduction, but a CHANCE to reduce. At level 80, 54 resist has a 20% chance to resist NOTHING, a 47% chance to reduce 10% damage a 30% chance to resists 20% damage and a  3% chance to reduce 30%.\r\nAt level 80 for 100 resist for 0%, 10%, 20% etc: 0 \t0.2751 \t0.4988 \t0.2261 \t0\r\nAt level 80 for 300 resist for 0%, 10%, 20% etc: 0 \t0 \t\t0 \t\t0.1735 \t0.4534 \t0.2985 \t0.0746  0\r\nAt level 80 for 429 resist for 0%, 10%, 20% etc: 0 \t0 \t\t0 \t\t0 \t\t0.2379 \t0.4368 \t0.2862 \t0.0390\r\n\r\nSo lvl 80 with 429 resits can resists. It can resists 60% damage 28.62% of the time. 50% damage 43.68% of the time etc.\r\n\r\n-------\r\n\r\nYou can get a rough calculation with this -->> Resistance/(400+Resistance)\r\nTo get a rough estimate per level, simply multiply your level by 5 and replace the \"400\". \r\n\r\nEx. Level 10 with 54 resist: 54/(10+54) =  84% *average* resistance/damage reduction *over time*.",
+          "db_column_name": "arcane_res",
+          "value_type": "int",
+          "can_be_null": true
+        }
+      ]
+    },
+    {
+      "group_name": "Vendor",
+      "fields": [
+        {
+          "name": "Buy Price",
+          "help": "The price required to pay to buy this item from a vendor, in copper.",
+          "db_column_name": "BuyPrice",
+          "value_type": "string"
+        },
+        {
+          "name": "Sell Price",
+          "help": "The price that the vendor will pay you for the item when you sell it and if it is possible to be sold, in copper. Put in 0 if the item cannot be sold to a vendor.",
+          "db_column_name": "SellPrice",
+          "value_type": "uint"
+        },
+        {
+          "name": "Buy Count",
+          "help": "The size of the item stack when sold by vendors. Also if a vendor has limited copies of this item available, everytime the vendor list is refreshed (See npc_vendor.incrtime), the number of copies increases by this number.",
+          "db_column_name": "BuyCount",
+          "value_type": "uint",
+          "default": 1
+        }
+      ]
+    },
+    {
+      "group_name": "Requirements",
+      "fields": [
+        {
+          "name": "Item Limit Category",
+          "help": "This is related to ItemLimitCategory.dbc. It is a property that defines if an item belongs to a \"category\", like \"Mana Gems\" or \"Healthstone\" and it defines how many items of the category you can have in the bag (this is the \"limit\"). For example, for Healthstone, there are several items like \"Lesser Healthstone, Greater Healthstone, etc.\" but you can have only one in your bag (check as example value 3 or 4).",
+          "db_column_name": "ItemLimitCategory",
+          "value_type": "int"
+        },
+        {
+          "name": "Maxcount",
+          "help": "Maximum number of copies of this item which a player can have. Use 0 for infinite.",
+          "db_column_name": "maxcount",
+          "value_type": "int"
+        },
+        {
+          "name": "Stackable",
+          "help": "The number of copies of this item that can be stacked in the same slot.",
+          "db_column_name": "stackable",
+          "value_type": "int",
+          "default": 1,
+          "can_be_null": true
+        },
+        {
+          "name": "Allowable Class",
+          "help": "Bitmask controlling which classes can use this item. Add ids together to combine class possibilities. Use -1 if all classes can use it.\r\n\r\nSee the ChrClasses DBC file for the IDs of the classes.",
+          "db_column_name": "AllowableClass",
+          "value_type": "int",
+          "default": -1
+        },
+        {
+          "name": "Allowable Race",
+          "help": "Bitmask controlling which races can use this item. Add ids together to combine race possibilities. Use -1 for all races.\r\n\r\nSee the ChrRaces DBC file for the IDs of the races.",
+          "db_column_name": "AllowableRace",
+          "value_type": "int",
+          "default": -1
+        },
+        {
+          "name": "Required Level",
+          "help": "The level that a player must be to equip the item.",
+          "db_column_name": "RequiredLevel",
+          "value_type": "uint"
+        },
+        {
+          "name": "Required Skill",
+          "help": "The skill required to use this item. See the SkillLine DBC file for IDs which can be used here.",
+          "db_column_name": "RequiredSkill",
+          "value_type": "uint"
+        },
+        {
+          "name": "Required Skill Rank",
+          "help": "The required skill rank the player needs to have to use this item.",
+          "db_column_name": "RequiredSkillRank",
+          "value_type": "uint"
+        },
+        {
+          "name": "Requiredspell",
+          "help": "The required spell that the player needs to have to use this item.",
+          "db_column_name": "requiredspell",
+          "value_type": "uint"
+        },
+        {
+          "name": "Requiredhonorrank",
+          "help": "The honor rank the player needs to have to use this item.",
+          "db_column_name": "requiredhonorrank",
+          "value_type": "uint"
+        },
+        {
+          "name": "Required City Rank",
+          "help": "Its use is unknown. All items have 0.",
+          "db_column_name": "RequiredCityRank",
+          "value_type": "uint"
+        },
+        {
+          "name": "Required Reputation Faction",
+          "help": "The faction template ID  of the faction that the player has to have a certain ranking with. If this value is 0, the faction of the seller of the item is used.\r\n\r\nSee the Faction DBC file for the IDs of all of the factions.",
+          "db_column_name": "RequiredReputationFaction",
+          "value_type": "uint"
+        },
+        {
+          "name": "Required Reputation Rank",
+          "help": "The rank the player has to have with the faction from RequiredReputationFaction.",
+          "db_column_name": "RequiredReputationRank",
+          "value_type": "ItemRequiredReputationRankParameter"
+        },
+        {
+          "name": "Map",
+          "help": "The ID of the map in which this item can be used. If you leave the map, the item will be deleted from the inventory.",
+          "db_column_name": "Map",
+          "value_type": "MapParameter"
+        },
+        {
+          "name": "Area",
+          "help": "The ID of the zone in which this item can be used. If you leave the area, the item will be deleted from the inventory.",
+          "db_column_name": "area",
+          "value_type": "WorldMapAreaParameter"
+        }
+      ]
+    },
+    {
+      "group_name": "Spell Triggers",
+      "fields": [
+        {
+          "name": "Spellid 1",
+          "help": "The spell ID of the spell that the item can cast or trigger.",
+          "db_column_name": "spellid_1",
+          "value_type": "int"
+        },
+        {
+          "name": "Spelltrigger 1",
+          "help": "The type of trigger for the spell.",
+          "db_column_name": "spelltrigger_1",
+          "value_type": "ItemSpelltriggerParameter"
+        },
+        {
+          "name": "Spellcharges 1",
+          "help": "The number of times that the item can cast the spell. If 0, then infinite charges are possible. If negative, then after the number of charges is depleted, the item is deleted as well. If positive, then the item is not deleted after all the charges are spent.",
+          "db_column_name": "spellcharges_1",
+          "value_type": "int"
+        },
+        {
+          "name": "Spellppm Rate 1",
+          "help": "The proc per minute rate controlling how often the spell is triggered (if #spelltrigger == 2).",
+          "db_column_name": "spellppmRate_1",
+          "value_type": "float"
+        },
+        {
+          "name": "Spellcooldown 1",
+          "help": "The cooldown in milliseconds for the specific spell controlling how often the spell can be used. Use -1 to use the default spell cooldown.\r\nNote: this is not the \"internal cooldown\" of procs commonly found on items such as trinkets with \"Chance on hit\" effects.",
+          "db_column_name": "spellcooldown_1",
+          "value_type": "int",
+          "default": -1
+        },
+        {
+          "name": "Spellcategory 1",
+          "help": "The category that the spell is in. You can choose one from the DBC SpellCategory.dbc or invent a new one (> 1260) for your custom item.",
+          "db_column_name": "spellcategory_1",
+          "value_type": "uint"
+        },
+        {
+          "name": "Spellcategorycooldown 1",
+          "help": "The cooldown time in milliseconds that is applied to all other spells in the category that the triggered spell is also in. Use -1 to use the default spell cooldown.\r\nNote: you can have a spellcooldown and a spellcategorycooldown, they're not mutually exclusive.",
+          "db_column_name": "spellcategorycooldown_1",
+          "value_type": "int",
+          "default": -1
+        },
+        {
+          "name": "Spellid 2",
+          "help": "The spell ID of the spell that the item can cast or trigger.",
+          "db_column_name": "spellid_2",
+          "value_type": "int"
+        },
+        {
+          "name": "Spelltrigger 2",
+          "help": "The type of trigger for the spell.",
+          "db_column_name": "spelltrigger_2",
+          "value_type": "ItemSpelltriggerParameter"
+        },
+        {
+          "name": "Spellcharges 2",
+          "help": "The number of times that the item can cast the spell. If 0, then infinite charges are possible. If negative, then after the number of charges is depleted, the item is deleted as well. If positive, then the item is not deleted after all the charges are spent.",
+          "db_column_name": "spellcharges_2",
+          "value_type": "int"
+        },
+        {
+          "name": "Spellppm Rate 2",
+          "help": "The proc per minute rate controlling how often the spell is triggered (if #spelltrigger == 2).",
+          "db_column_name": "spellppmRate_2",
+          "value_type": "float"
+        },
+        {
+          "name": "Spellcooldown 2",
+          "help": "The cooldown in milliseconds for the specific spell controlling how often the spell can be used. Use -1 to use the default spell cooldown.\r\nNote: this is not the \"internal cooldown\" of procs commonly found on items such as trinkets with \"Chance on hit\" effects.",
+          "db_column_name": "spellcooldown_2",
+          "value_type": "int",
+          "default": -1
+        },
+        {
+          "name": "Spellcategory 2",
+          "help": "The category that the spell is in. You can choose one from the DBC SpellCategory.dbc or invent a new one (> 1260) for your custom item.",
+          "db_column_name": "spellcategory_2",
+          "value_type": "uint"
+        },
+        {
+          "name": "Spellcategorycooldown 2",
+          "help": "The cooldown time in milliseconds that is applied to all other spells in the category that the triggered spell is also in. Use -1 to use the default spell cooldown.\r\nNote: you can have a spellcooldown and a spellcategorycooldown, they're not mutually exclusive.",
+          "db_column_name": "spellcategorycooldown_2",
+          "value_type": "int",
+          "default": -1
+        },
+        {
+          "name": "Spellid 3",
+          "help": "The spell ID of the spell that the item can cast or trigger.",
+          "db_column_name": "spellid_3",
+          "value_type": "int"
+        },
+        {
+          "name": "Spelltrigger 3",
+          "help": "The type of trigger for the spell.",
+          "db_column_name": "spelltrigger_3",
+          "value_type": "ItemSpelltriggerParameter"
+        },
+        {
+          "name": "Spellcharges 3",
+          "help": "The number of times that the item can cast the spell. If 0, then infinite charges are possible. If negative, then after the number of charges is depleted, the item is deleted as well. If positive, then the item is not deleted after all the charges are spent.",
+          "db_column_name": "spellcharges_3",
+          "value_type": "int"
+        },
+        {
+          "name": "Spellppm Rate 3",
+          "help": "The proc per minute rate controlling how often the spell is triggered (if #spelltrigger == 2).",
+          "db_column_name": "spellppmRate_3",
+          "value_type": "float"
+        },
+        {
+          "name": "Spellcooldown 3",
+          "help": "The cooldown in milliseconds for the specific spell controlling how often the spell can be used. Use -1 to use the default spell cooldown.\r\nNote: this is not the \"internal cooldown\" of procs commonly found on items such as trinkets with \"Chance on hit\" effects.",
+          "db_column_name": "spellcooldown_3",
+          "value_type": "int",
+          "default": -1
+        },
+        {
+          "name": "Spellcategory 3",
+          "help": "The category that the spell is in. You can choose one from the DBC SpellCategory.dbc or invent a new one (> 1260) for your custom item.",
+          "db_column_name": "spellcategory_3",
+          "value_type": "uint"
+        },
+        {
+          "name": "Spellcategorycooldown 3",
+          "help": "The cooldown time in milliseconds that is applied to all other spells in the category that the triggered spell is also in. Use -1 to use the default spell cooldown.\r\nNote: you can have a spellcooldown and a spellcategorycooldown, they're not mutually exclusive.",
+          "db_column_name": "spellcategorycooldown_3",
+          "value_type": "int",
+          "default": -1
+        },
+        {
+          "name": "Spellid 4",
+          "help": "The spell ID of the spell that the item can cast or trigger.",
+          "db_column_name": "spellid_4",
+          "value_type": "int"
+        },
+        {
+          "name": "Spelltrigger 4",
+          "help": "The type of trigger for the spell.",
+          "db_column_name": "spelltrigger_4",
+          "value_type": "ItemSpelltriggerParameter"
+        },
+        {
+          "name": "Spellcharges 4",
+          "help": "The number of times that the item can cast the spell. If 0, then infinite charges are possible. If negative, then after the number of charges is depleted, the item is deleted as well. If positive, then the item is not deleted after all the charges are spent.",
+          "db_column_name": "spellcharges_4",
+          "value_type": "int"
+        },
+        {
+          "name": "Spellppm Rate 4",
+          "help": "The proc per minute rate controlling how often the spell is triggered (if #spelltrigger == 2).",
+          "db_column_name": "spellppmRate_4",
+          "value_type": "float"
+        },
+        {
+          "name": "Spellcooldown 4",
+          "help": "The cooldown in milliseconds for the specific spell controlling how often the spell can be used. Use -1 to use the default spell cooldown.\r\nNote: this is not the \"internal cooldown\" of procs commonly found on items such as trinkets with \"Chance on hit\" effects.",
+          "db_column_name": "spellcooldown_4",
+          "value_type": "int",
+          "default": -1
+        },
+        {
+          "name": "Spellcategory 4",
+          "help": "The category that the spell is in. You can choose one from the DBC SpellCategory.dbc or invent a new one (> 1260) for your custom item.",
+          "db_column_name": "spellcategory_4",
+          "value_type": "uint"
+        },
+        {
+          "name": "Spellcategorycooldown 4",
+          "help": "The cooldown time in milliseconds that is applied to all other spells in the category that the triggered spell is also in. Use -1 to use the default spell cooldown.\r\nNote: you can have a spellcooldown and a spellcategorycooldown, they're not mutually exclusive.",
+          "db_column_name": "spellcategorycooldown_4",
+          "value_type": "int",
+          "default": -1
+        },
+        {
+          "name": "Spellid 5",
+          "help": "The spell ID of the spell that the item can cast or trigger.",
+          "db_column_name": "spellid_5",
+          "value_type": "int"
+        },
+        {
+          "name": "Spelltrigger 5",
+          "help": "The type of trigger for the spell.",
+          "db_column_name": "spelltrigger_5",
+          "value_type": "ItemSpelltriggerParameter"
+        },
+        {
+          "name": "Spellcharges 5",
+          "help": "The number of times that the item can cast the spell. If 0, then infinite charges are possible. If negative, then after the number of charges is depleted, the item is deleted as well. If positive, then the item is not deleted after all the charges are spent.",
+          "db_column_name": "spellcharges_5",
+          "value_type": "int"
+        },
+        {
+          "name": "Spellppm Rate 5",
+          "help": "The proc per minute rate controlling how often the spell is triggered (if #spelltrigger == 2).",
+          "db_column_name": "spellppmRate_5",
+          "value_type": "float"
+        },
+        {
+          "name": "Spellcooldown 5",
+          "help": "The cooldown in milliseconds for the specific spell controlling how often the spell can be used. Use -1 to use the default spell cooldown.\r\nNote: this is not the \"internal cooldown\" of procs commonly found on items such as trinkets with \"Chance on hit\" effects.",
+          "db_column_name": "spellcooldown_5",
+          "value_type": "int",
+          "default": -1
+        },
+        {
+          "name": "Spellcategory 5",
+          "help": "The category that the spell is in. You can choose one from the DBC SpellCategory.dbc or invent a new one (> 1260) for your custom item.",
+          "db_column_name": "spellcategory_5",
+          "value_type": "uint"
+        },
+        {
+          "name": "Spellcategorycooldown 5",
+          "help": "The cooldown time in milliseconds that is applied to all other spells in the category that the triggered spell is also in. Use -1 to use the default spell cooldown.\r\nNote: you can have a spellcooldown and a spellcategorycooldown, they're not mutually exclusive.",
+          "db_column_name": "spellcategorycooldown_5",
+          "value_type": "int",
+          "default": -1
+        }
+      ]
+    },
+    {
+      "group_name": "Random Mods",
+      "fields": [
+        {
+          "name": "Random Suffix",
+          "help": "The number in this field points to item_enchantment_template.entry and ties in an item's chance at having a random suffix attached to it when it shows up for the first time. This field and the RandomProperty field CANNOT both have non-zero values. Either one is filled, or the other. Also, the primary source for the number in this field are WDBs.",
+          "db_column_name": "RandomSuffix",
+          "value_type": "uint"
+        },
+        {
+          "name": "Random Property",
+          "help": "The number in this field points to item_enchantment_template.entry and ties in an item's chance at having a random property attached to it when it shows up for the first time. This field and the RandomSuffix field CANNOT both have non-zero values. Either one is filled, or the other. Also, the primary source for the number in this field are WDBs.",
+          "db_column_name": "RandomProperty",
+          "value_type": "int"
+        }
+      ]
+    },
+    {
+      "group_name": "Other",
+      "fields": [
+        {
+          "name": "Flags Custom",
+          "help": "Special Flags",
+          "db_column_name": "flagsCustom",
+          "value_type": "ItemFlagsCustomParameter"
+        },
+        {
+          "name": "Duration",
+          "help": "The duration of the item in seconds ingame time. Set ITEM_FLAGS_CU_DURATION_REAL_TIME in flagsCustom for real time. In that case the item duration will tick even if player is offline.",
+          "db_column_name": "duration",
+          "value_type": "uint"
+        },
+        {
+          "name": "Verified Build",
+          "help": "This field was used to determine whether a template has been verified from WDB files.\r\n\r\n    If value is 0 then it has not been parsed yet.\r\n    If value is above 0 then it has been parsed with WDB files from that specific client build.\r\n    If value is -1 then it is just a place holder until proper data are found on WDBs.\r\n",
+          "db_column_name": "VerifiedBuild",
+          "value_type": "int",
+          "can_be_null": true
+        },
+        {
+          "name": "Disenchant ID",
+          "help": "The disenchant loot template ID. See disenchant_loot_template.entry",
+          "db_column_name": "DisenchantID",
+          "value_type": "uint"
+        },
+        {
+          "name": "Required Disenchant Skill",
+          "help": "The required proficiency in disenchanting that the player needs to have to be able to disenchant this item. If set to -1, the item can't be disenchanted.",
+          "db_column_name": "RequiredDisenchantSkill",
+          "value_type": "int",
+          "default": -1
+        },
+        {
+          "name": "Script Name",
+          "help": "The name of the script that the item should use. There is no 'internalitemhandler' or 'internalitemhanler' script so trinity will ignore any such values in this field.",
+          "db_column_name": "ScriptName",
+          "value_type": "string",
+          "default": ""
+        },
+        {
+          "name": "Holiday Id",
+          "help": "See the Holidays DBC file for the IDs of all of the holidays.",
+          "db_column_name": "HolidayId",
+          "value_type": "uint"
+        },
+        {
+          "name": "Armor Damage Modifier",
+          "help": "???",
+          "db_column_name": "ArmorDamageModifier",
+          "value_type": "float"
+        },
+        {
+          "name": "Gem Properties",
+          "help": "The value here corresponds to the ID in GemProperties.dbc.",
+          "db_column_name": "GemProperties",
+          "value_type": "int"
+        },
+        {
+          "name": "Lockid",
+          "help": "The lock entry ID that this item (which serves as a key) is tied to. This field is used in key-door mechanics.\r\n\r\nSee the Lock DBC file.",
+          "db_column_name": "lockid",
+          "value_type": "uint"
+        },
+        {
+          "name": "Startquest",
+          "help": "The ID of the quest that this item will start if right-clicked. See quest_template.id",
+          "db_column_name": "startquest",
+          "value_type": "uint"
+        },
+        {
+          "name": "Language ID",
+          "help": "The language that the item text is written in.\r\n\r\nSee the Languages DBC file for the IDs of all of the languages.",
+          "db_column_name": "LanguageID",
+          "value_type": "uint"
+        },
+        {
+          "name": "Totem Category",
+          "help": "Corresponds to the ID in the TotemCategory DBC file.",
+          "db_column_name": "TotemCategory",
+          "value_type": "ItemTotemCategoryParameter"
+        }
+      ]
+    },
+    {
+      "group_name": "Food / Books / Containers",
+      "fields": [
+        {
+          "name": "Food Type",
+          "db_column_name": "FoodType",
+          "value_type": "ItemFoodTypeParameter"
+        },
+        {
+          "name": "Bag Family",
+          "help": "If the item is a bag, this field is a bitmask controlling what types of items can be put in this bag. You can combine different types by adding up the bit numbers.",
+          "db_column_name": "BagFamily",
+          "value_type": "ItemBagFamilyParameter"
+        },
+        {
+          "name": "Container Slots",
+          "help": "If the item is a bag, this field controls the number of slots the bag has.",
+          "db_column_name": "ContainerSlots",
+          "value_type": "uint"
+        },
+        {
+          "name": "Page Text",
+          "help": "The ID referring to the text that the item will show (if it is a book or a letter, etc). The item will have a magnifying glass cursor in the game and will show the text when right-clicked. See page_text.entry",
+          "db_column_name": "PageText",
+          "value_type": "uint"
+        },
+        {
+          "name": "Page Material",
+          "help": "The background texture that appears in the page text window.\r\n\r\nSee the PageTextMaterial DBC file for the IDs of all of the material types.",
+          "db_column_name": "PageMaterial",
+          "value_type": "PageTextMaterialParameter"
+        },
+        {
+          "name": "Min Money Loot",
+          "help": "If the item is a container that can contain money, then this field defines the minimum coinage held in this container, in copper.",
+          "db_column_name": "minMoneyLoot",
+          "value_type": "uint"
+        },
+        {
+          "name": "Max Money Loot",
+          "help": "If the item is a container that can contain money, then this field defines the maximum coinage held in this container, in copper.",
+          "db_column_name": "maxMoneyLoot",
+          "value_type": "uint"
+        }
+      ]
+    }
+  ]
+}
