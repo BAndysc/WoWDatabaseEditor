@@ -1,6 +1,7 @@
 {
   "compatibility": [
-    "Azeroth"
+    "Azeroth",
+    "TrinityWrath"
   ],
   "name": "Item Template",
   "single_solution_name": "{name} Item Template",
@@ -460,7 +461,7 @@
           "value_type": "int"
         },
         {
-          "name": "Maxcount",
+          "name": "Max count",
           "help": "Maximum number of copies of this item which a player can have. Use 0 for infinite.",
           "db_column_name": "maxcount",
           "value_type": "int"
@@ -477,14 +478,14 @@
           "name": "Allowable Class",
           "help": "Bitmask controlling which classes can use this item. Add ids together to combine class possibilities. Use -1 if all classes can use it.\r\n\r\nSee the ChrClasses DBC file for the IDs of the classes.",
           "db_column_name": "AllowableClass",
-          "value_type": "int",
+          "value_type": "ClassMaskParameter",
           "default": -1
         },
         {
           "name": "Allowable Race",
           "help": "Bitmask controlling which races can use this item. Add ids together to combine race possibilities. Use -1 for all races.\r\n\r\nSee the ChrRaces DBC file for the IDs of the races.",
           "db_column_name": "AllowableRace",
-          "value_type": "int",
+          "value_type": "RaceMaskParameter",
           "default": -1
         },
         {
@@ -497,7 +498,7 @@
           "name": "Required Skill",
           "help": "The skill required to use this item. See the SkillLine DBC file for IDs which can be used here.",
           "db_column_name": "RequiredSkill",
-          "value_type": "uint"
+          "value_type": "SkillParameter"
         },
         {
           "name": "Required Skill Rank",
@@ -506,13 +507,13 @@
           "value_type": "uint"
         },
         {
-          "name": "Requiredspell",
+          "name": "Required Spell",
           "help": "The required spell that the player needs to have to use this item.",
           "db_column_name": "requiredspell",
-          "value_type": "uint"
+          "value_type": "SpellParameter"
         },
         {
-          "name": "Requiredhonorrank",
+          "name": "Required honor rank",
           "help": "The honor rank the player needs to have to use this item.",
           "db_column_name": "requiredhonorrank",
           "value_type": "uint"
@@ -527,7 +528,7 @@
           "name": "Required Reputation Faction",
           "help": "The faction template ID  of the faction that the player has to have a certain ranking with. If this value is 0, the faction of the seller of the item is used.\r\n\r\nSee the Faction DBC file for the IDs of all of the factions.",
           "db_column_name": "RequiredReputationFaction",
-          "value_type": "uint"
+          "value_type": "FactionParameter"
         },
         {
           "name": "Required Reputation Rank",
@@ -545,7 +546,7 @@
           "name": "Area",
           "help": "The ID of the zone in which this item can be used. If you leave the area, the item will be deleted from the inventory.",
           "db_column_name": "area",
-          "value_type": "WorldMapAreaParameter"
+          "value_type": "ZoneAreaParameter"
         }
       ]
     },
@@ -553,220 +554,220 @@
       "group_name": "Spell Triggers",
       "fields": [
         {
-          "name": "Spellid 1",
+          "name": "Spell id 1",
           "help": "The spell ID of the spell that the item can cast or trigger.",
           "db_column_name": "spellid_1",
-          "value_type": "int"
+          "value_type": "SpellParameter"
         },
         {
-          "name": "Spelltrigger 1",
+          "name": "Spell trigger 1",
           "help": "The type of trigger for the spell.",
           "db_column_name": "spelltrigger_1",
           "value_type": "ItemSpelltriggerParameter"
         },
         {
-          "name": "Spellcharges 1",
+          "name": "Spell charges 1",
           "help": "The number of times that the item can cast the spell. If 0, then infinite charges are possible. If negative, then after the number of charges is depleted, the item is deleted as well. If positive, then the item is not deleted after all the charges are spent.",
           "db_column_name": "spellcharges_1",
           "value_type": "int"
         },
         {
-          "name": "Spellppm Rate 1",
+          "name": "Spell ppm Rate 1",
           "help": "The proc per minute rate controlling how often the spell is triggered (if #spelltrigger == 2).",
           "db_column_name": "spellppmRate_1",
           "value_type": "float"
         },
         {
-          "name": "Spellcooldown 1",
+          "name": "Spell cooldown 1",
           "help": "The cooldown in milliseconds for the specific spell controlling how often the spell can be used. Use -1 to use the default spell cooldown.\r\nNote: this is not the \"internal cooldown\" of procs commonly found on items such as trinkets with \"Chance on hit\" effects.",
           "db_column_name": "spellcooldown_1",
           "value_type": "int",
           "default": -1
         },
         {
-          "name": "Spellcategory 1",
+          "name": "Spell category 1",
           "help": "The category that the spell is in. You can choose one from the DBC SpellCategory.dbc or invent a new one (> 1260) for your custom item.",
           "db_column_name": "spellcategory_1",
-          "value_type": "uint"
+          "value_type": "SpellCategoryParameter"
         },
         {
-          "name": "Spellcategorycooldown 1",
+          "name": "Spell category cooldown 1",
           "help": "The cooldown time in milliseconds that is applied to all other spells in the category that the triggered spell is also in. Use -1 to use the default spell cooldown.\r\nNote: you can have a spellcooldown and a spellcategorycooldown, they're not mutually exclusive.",
           "db_column_name": "spellcategorycooldown_1",
           "value_type": "int",
           "default": -1
         },
         {
-          "name": "Spellid 2",
+          "name": "Spell id 2",
           "help": "The spell ID of the spell that the item can cast or trigger.",
           "db_column_name": "spellid_2",
-          "value_type": "int"
+          "value_type": "SpellParameter"
         },
         {
-          "name": "Spelltrigger 2",
+          "name": "Spell trigger 2",
           "help": "The type of trigger for the spell.",
           "db_column_name": "spelltrigger_2",
           "value_type": "ItemSpelltriggerParameter"
         },
         {
-          "name": "Spellcharges 2",
+          "name": "Spell charges 2",
           "help": "The number of times that the item can cast the spell. If 0, then infinite charges are possible. If negative, then after the number of charges is depleted, the item is deleted as well. If positive, then the item is not deleted after all the charges are spent.",
           "db_column_name": "spellcharges_2",
           "value_type": "int"
         },
         {
-          "name": "Spellppm Rate 2",
+          "name": "Spell ppm Rate 2",
           "help": "The proc per minute rate controlling how often the spell is triggered (if #spelltrigger == 2).",
           "db_column_name": "spellppmRate_2",
           "value_type": "float"
         },
         {
-          "name": "Spellcooldown 2",
+          "name": "Spell cooldown 2",
           "help": "The cooldown in milliseconds for the specific spell controlling how often the spell can be used. Use -1 to use the default spell cooldown.\r\nNote: this is not the \"internal cooldown\" of procs commonly found on items such as trinkets with \"Chance on hit\" effects.",
           "db_column_name": "spellcooldown_2",
           "value_type": "int",
           "default": -1
         },
         {
-          "name": "Spellcategory 2",
+          "name": "Spell category 2",
           "help": "The category that the spell is in. You can choose one from the DBC SpellCategory.dbc or invent a new one (> 1260) for your custom item.",
           "db_column_name": "spellcategory_2",
-          "value_type": "uint"
+          "value_type": "SpellCategoryParameter"
         },
         {
-          "name": "Spellcategorycooldown 2",
+          "name": "Spell category cooldown 2",
           "help": "The cooldown time in milliseconds that is applied to all other spells in the category that the triggered spell is also in. Use -1 to use the default spell cooldown.\r\nNote: you can have a spellcooldown and a spellcategorycooldown, they're not mutually exclusive.",
           "db_column_name": "spellcategorycooldown_2",
           "value_type": "int",
           "default": -1
         },
         {
-          "name": "Spellid 3",
+          "name": "Spell id 3",
           "help": "The spell ID of the spell that the item can cast or trigger.",
           "db_column_name": "spellid_3",
-          "value_type": "int"
+          "value_type": "SpellParameter"
         },
         {
-          "name": "Spelltrigger 3",
+          "name": "Spell trigger 3",
           "help": "The type of trigger for the spell.",
           "db_column_name": "spelltrigger_3",
           "value_type": "ItemSpelltriggerParameter"
         },
         {
-          "name": "Spellcharges 3",
+          "name": "Spell charges 3",
           "help": "The number of times that the item can cast the spell. If 0, then infinite charges are possible. If negative, then after the number of charges is depleted, the item is deleted as well. If positive, then the item is not deleted after all the charges are spent.",
           "db_column_name": "spellcharges_3",
           "value_type": "int"
         },
         {
-          "name": "Spellppm Rate 3",
+          "name": "Spell ppm Rate 3",
           "help": "The proc per minute rate controlling how often the spell is triggered (if #spelltrigger == 2).",
           "db_column_name": "spellppmRate_3",
           "value_type": "float"
         },
         {
-          "name": "Spellcooldown 3",
+          "name": "Spell cooldown 3",
           "help": "The cooldown in milliseconds for the specific spell controlling how often the spell can be used. Use -1 to use the default spell cooldown.\r\nNote: this is not the \"internal cooldown\" of procs commonly found on items such as trinkets with \"Chance on hit\" effects.",
           "db_column_name": "spellcooldown_3",
           "value_type": "int",
           "default": -1
         },
         {
-          "name": "Spellcategory 3",
+          "name": "Spell category 3",
           "help": "The category that the spell is in. You can choose one from the DBC SpellCategory.dbc or invent a new one (> 1260) for your custom item.",
           "db_column_name": "spellcategory_3",
-          "value_type": "uint"
+          "value_type": "SpellCategoryParameter"
         },
         {
-          "name": "Spellcategorycooldown 3",
+          "name": "Spell category cooldown 3",
           "help": "The cooldown time in milliseconds that is applied to all other spells in the category that the triggered spell is also in. Use -1 to use the default spell cooldown.\r\nNote: you can have a spellcooldown and a spellcategorycooldown, they're not mutually exclusive.",
           "db_column_name": "spellcategorycooldown_3",
           "value_type": "int",
           "default": -1
         },
         {
-          "name": "Spellid 4",
+          "name": "Spell id 4",
           "help": "The spell ID of the spell that the item can cast or trigger.",
           "db_column_name": "spellid_4",
-          "value_type": "int"
+          "value_type": "SpellParameter"
         },
         {
-          "name": "Spelltrigger 4",
+          "name": "Spell trigger 4",
           "help": "The type of trigger for the spell.",
           "db_column_name": "spelltrigger_4",
           "value_type": "ItemSpelltriggerParameter"
         },
         {
-          "name": "Spellcharges 4",
+          "name": "Spell charges 4",
           "help": "The number of times that the item can cast the spell. If 0, then infinite charges are possible. If negative, then after the number of charges is depleted, the item is deleted as well. If positive, then the item is not deleted after all the charges are spent.",
           "db_column_name": "spellcharges_4",
           "value_type": "int"
         },
         {
-          "name": "Spellppm Rate 4",
+          "name": "Spell ppm Rate 4",
           "help": "The proc per minute rate controlling how often the spell is triggered (if #spelltrigger == 2).",
           "db_column_name": "spellppmRate_4",
           "value_type": "float"
         },
         {
-          "name": "Spellcooldown 4",
+          "name": "Spell cooldown 4",
           "help": "The cooldown in milliseconds for the specific spell controlling how often the spell can be used. Use -1 to use the default spell cooldown.\r\nNote: this is not the \"internal cooldown\" of procs commonly found on items such as trinkets with \"Chance on hit\" effects.",
           "db_column_name": "spellcooldown_4",
           "value_type": "int",
           "default": -1
         },
         {
-          "name": "Spellcategory 4",
+          "name": "Spell category 4",
           "help": "The category that the spell is in. You can choose one from the DBC SpellCategory.dbc or invent a new one (> 1260) for your custom item.",
           "db_column_name": "spellcategory_4",
-          "value_type": "uint"
+          "value_type": "SpellCategoryParameter"
         },
         {
-          "name": "Spellcategorycooldown 4",
+          "name": "Spell category cooldown 4",
           "help": "The cooldown time in milliseconds that is applied to all other spells in the category that the triggered spell is also in. Use -1 to use the default spell cooldown.\r\nNote: you can have a spellcooldown and a spellcategorycooldown, they're not mutually exclusive.",
           "db_column_name": "spellcategorycooldown_4",
           "value_type": "int",
           "default": -1
         },
         {
-          "name": "Spellid 5",
+          "name": "Spell id 5",
           "help": "The spell ID of the spell that the item can cast or trigger.",
           "db_column_name": "spellid_5",
-          "value_type": "int"
+          "value_type": "SpellParameter"
         },
         {
-          "name": "Spelltrigger 5",
+          "name": "Spell trigger 5",
           "help": "The type of trigger for the spell.",
           "db_column_name": "spelltrigger_5",
           "value_type": "ItemSpelltriggerParameter"
         },
         {
-          "name": "Spellcharges 5",
+          "name": "Spell charges 5",
           "help": "The number of times that the item can cast the spell. If 0, then infinite charges are possible. If negative, then after the number of charges is depleted, the item is deleted as well. If positive, then the item is not deleted after all the charges are spent.",
           "db_column_name": "spellcharges_5",
           "value_type": "int"
         },
         {
-          "name": "Spellppm Rate 5",
+          "name": "Spell ppm Rate 5",
           "help": "The proc per minute rate controlling how often the spell is triggered (if #spelltrigger == 2).",
           "db_column_name": "spellppmRate_5",
           "value_type": "float"
         },
         {
-          "name": "Spellcooldown 5",
+          "name": "Spell cooldown 5",
           "help": "The cooldown in milliseconds for the specific spell controlling how often the spell can be used. Use -1 to use the default spell cooldown.\r\nNote: this is not the \"internal cooldown\" of procs commonly found on items such as trinkets with \"Chance on hit\" effects.",
           "db_column_name": "spellcooldown_5",
           "value_type": "int",
           "default": -1
         },
         {
-          "name": "Spellcategory 5",
+          "name": "Spell category 5",
           "help": "The category that the spell is in. You can choose one from the DBC SpellCategory.dbc or invent a new one (> 1260) for your custom item.",
           "db_column_name": "spellcategory_5",
-          "value_type": "uint"
+          "value_type": "SpellCategoryParameter"
         },
         {
-          "name": "Spellcategorycooldown 5",
+          "name": "Spell category cooldown 5",
           "help": "The cooldown time in milliseconds that is applied to all other spells in the category that the triggered spell is also in. Use -1 to use the default spell cooldown.\r\nNote: you can have a spellcooldown and a spellcategorycooldown, they're not mutually exclusive.",
           "db_column_name": "spellcategorycooldown_5",
           "value_type": "int",
@@ -837,7 +838,7 @@
           "name": "Holiday Id",
           "help": "See the Holidays DBC file for the IDs of all of the holidays.",
           "db_column_name": "HolidayId",
-          "value_type": "uint"
+          "value_type": "HolidaysParameter"
         },
         {
           "name": "Armor Damage Modifier",
@@ -852,22 +853,22 @@
           "value_type": "int"
         },
         {
-          "name": "Lockid",
+          "name": "Lock id",
           "help": "The lock entry ID that this item (which serves as a key) is tied to. This field is used in key-door mechanics.\r\n\r\nSee the Lock DBC file.",
           "db_column_name": "lockid",
-          "value_type": "uint"
+          "value_type": "LockParameter"
         },
         {
-          "name": "Startquest",
+          "name": "Start quest",
           "help": "The ID of the quest that this item will start if right-clicked. See quest_template.id",
           "db_column_name": "startquest",
-          "value_type": "uint"
+          "value_type": "QuestParameter"
         },
         {
-          "name": "Language ID",
+          "name": "Language",
           "help": "The language that the item text is written in.\r\n\r\nSee the Languages DBC file for the IDs of all of the languages.",
           "db_column_name": "LanguageID",
-          "value_type": "uint"
+          "value_type": "LanguageParameter"
         },
         {
           "name": "Totem Category",
@@ -913,13 +914,13 @@
           "name": "Min Money Loot",
           "help": "If the item is a container that can contain money, then this field defines the minimum coinage held in this container, in copper.",
           "db_column_name": "minMoneyLoot",
-          "value_type": "uint"
+          "value_type": "MoneyParameter"
         },
         {
           "name": "Max Money Loot",
           "help": "If the item is a container that can contain money, then this field defines the maximum coinage held in this container, in copper.",
           "db_column_name": "maxMoneyLoot",
-          "value_type": "uint"
+          "value_type": "MoneyParameter"
         }
       ]
     }
