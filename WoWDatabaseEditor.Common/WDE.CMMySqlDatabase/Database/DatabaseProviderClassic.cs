@@ -307,4 +307,6 @@ public class DatabaseProviderClassic : BaseDatabaseProvider<ClassicDatabase>
             template.Type == GameobjectType.Chest && template.Data1 == lootId ||
             template.Type == GameobjectType.FishingHole && template.Data1 == lootId).ToListAsync();
     }
+
+    protected override bool SupportsProspectingLootTemplate => false;
 }

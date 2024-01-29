@@ -522,6 +522,8 @@ namespace WDE.CMMySqlDatabase.Database
 
         public abstract Task<(IReadOnlyList<ICreatureTemplate>, IReadOnlyList<ICreatureTemplateDifficulty>)> GetCreaturePickPocketLootCrossReference(uint lootId);
 
+        protected virtual bool SupportsProspectingLootTemplate => true;
+        
         public async Task<IReadOnlyList<ILootEntry>> GetReferenceLootCrossReference(uint lootId)
         {
             if (lootId == 0)
@@ -536,7 +538,7 @@ namespace WDE.CMMySqlDatabase.Database
                 await database.FishingLootTemplate.Where(x => x.MinCountOrReference == minCountOrRef).ToListAsync<ILootEntry>(),
                 await database.SkinningLootTemplate.Where(x => x.MinCountOrReference == minCountOrRef).ToListAsync<ILootEntry>(),
                 await database.DisenchantLootTemplate.Where(x => x.MinCountOrReference == minCountOrRef).ToListAsync<ILootEntry>(),
-                await database.ProspectingLootTemplate.Where(x => x.MinCountOrReference == minCountOrRef).ToListAsync<ILootEntry>(),
+                SupportsProspectingLootTemplate ? await database.ProspectingLootTemplate.Where(x => x.MinCountOrReference == minCountOrRef).ToListAsync<ILootEntry>() : new List<ILootEntry>(),
                 await database.MailLootTemplate.Where(x => x.MinCountOrReference == minCountOrRef).ToListAsync<ILootEntry>(),
                 await database.ReferenceLootTemplate.Where(x => x.MinCountOrReference == minCountOrRef).ToListAsync<ILootEntry>()
             };
@@ -574,6 +576,8 @@ namespace WDE.CMMySqlDatabase.Database
                         .ThenBy(x => x.ItemOrCurrencyId)
                         .ToListAsync<ILootEntry>();
                 case LootSourceType.Prospecting:
+                    if (!SupportsProspectingLootTemplate)
+                        return Array.Empty<ILootEntry>();
                     return await database.ProspectingLootTemplate.OrderBy(x => x.Entry)
                         .ThenBy(x => x.GroupId)
                         .ThenBy(x => x.ItemOrCurrencyId)
@@ -614,6 +618,8 @@ namespace WDE.CMMySqlDatabase.Database
                 case LootSourceType.Disenchant:
                     return await database.DisenchantLootTemplate.Where(x => x.Entry == entry).ToListAsync<ILootEntry>();
                 case LootSourceType.Prospecting:
+                    if (!SupportsProspectingLootTemplate)
+                        return Array.Empty<ILootEntry>();
                     return await database.ProspectingLootTemplate.Where(x => x.Entry == entry).ToListAsync<ILootEntry>();
                 case LootSourceType.Reference:
                     return await database.ReferenceLootTemplate.Where(x => x.Entry == entry).ToListAsync<ILootEntry>();

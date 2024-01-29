@@ -34,6 +34,22 @@ public class CmangosLootEditorFeatures : ILootEditorFeatures
                 LootSourceType.Pickpocketing
             };
         }
+        else if (this.currentCoreVersion.Current.Version.Build == 5875)
+        {
+            SupportedTypes = new[]
+            {
+                LootSourceType.Creature,
+                LootSourceType.GameObject,
+                LootSourceType.Item,
+                LootSourceType.Mail,
+                LootSourceType.Fishing,
+                LootSourceType.Skinning,
+                LootSourceType.Spell,
+                LootSourceType.Reference,
+                LootSourceType.Disenchant,
+                LootSourceType.Pickpocketing
+            };
+        }
         else
         {
             SupportedTypes = new[]
