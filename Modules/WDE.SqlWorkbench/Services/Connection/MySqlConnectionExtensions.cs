@@ -27,7 +27,7 @@ internal static class MySqlConnectionExtensions
         var where = $"`TABLE_SCHEMA` = '{schemaName}'";
         if (tableName != null)
             where += $" AND `TABLE_NAME` = '{tableName}'";
-        var results = await conn.ExecuteSqlAsync($"SELECT `TABLE_SCHEMA`, `TABLE_NAME`, `TABLE_TYPE`, `ENGINE`, `ROW_FORMAT`, `TABLE_COLLATION`, `DATA_LENGTH`, `TABLE_COMMENT` FROM `information_schema`.`TABLES` WHERE {where};", null, token);
+        var results = await conn.ExecuteSqlAsync($"SELECT `TABLE_SCHEMA`, `TABLE_NAME`, `TABLE_TYPE`, `ENGINE`, `ROW_FORMAT`, `TABLE_COLLATION`, `DATA_LENGTH`, `TABLE_COMMENT` FROM `information_schema`.`TABLES` WHERE {where} ORDER BY `TABLE_NAME`;", null, token);
 
         if (results.IsNonQuery || results.Columns.Length == 0)
             return Array.Empty<TableInfo>();

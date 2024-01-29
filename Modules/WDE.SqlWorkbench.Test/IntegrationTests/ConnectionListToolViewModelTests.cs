@@ -127,7 +127,7 @@ internal class ConnectionListToolViewModelTests
         CollectionAssert.AreEqual(new string[]
         {
             "SHOW DATABASES",
-            "SELECT `TABLE_SCHEMA`, `TABLE_NAME`, `TABLE_TYPE`, `ENGINE`, `ROW_FORMAT`, `TABLE_COLLATION`, `DATA_LENGTH`, `TABLE_COMMENT` FROM `information_schema`.`TABLES` WHERE `TABLE_SCHEMA` = 'information_schema';",
+            "SELECT `TABLE_SCHEMA`, `TABLE_NAME`, `TABLE_TYPE`, `ENGINE`, `ROW_FORMAT`, `TABLE_COLLATION`, `DATA_LENGTH`, `TABLE_COMMENT` FROM `information_schema`.`TABLES` WHERE `TABLE_SCHEMA` = 'information_schema' ORDER BY `TABLE_NAME`;",
             "SELECT `SPECIFIC_NAME`, `ROUTINE_SCHEMA`, `ROUTINE_TYPE`, `DATA_TYPE`, `DTD_IDENTIFIER`, `ROUTINE_DEFINITION`, `IS_DETERMINISTIC`, `SQL_DATA_ACCESS`, `SECURITY_TYPE`, `CREATED`, `LAST_ALTERED`, `ROUTINE_COMMENT`, `DEFINER` FROM `information_schema`.`routines` WHERE `ROUTINE_SCHEMA` = 'information_schema' ORDER BY `SPECIFIC_NAME`;"
         }, connector.ExecutedQueries);
     }
@@ -162,7 +162,7 @@ internal class ConnectionListToolViewModelTests
         CollectionAssert.AreEqual(new string[]
         {
             "SHOW DATABASES",
-            "SELECT `TABLE_SCHEMA`, `TABLE_NAME`, `TABLE_TYPE`, `ENGINE`, `ROW_FORMAT`, `TABLE_COLLATION`, `DATA_LENGTH`, `TABLE_COMMENT` FROM `information_schema`.`TABLES` WHERE `TABLE_SCHEMA` = 'world';",
+            "SELECT `TABLE_SCHEMA`, `TABLE_NAME`, `TABLE_TYPE`, `ENGINE`, `ROW_FORMAT`, `TABLE_COLLATION`, `DATA_LENGTH`, `TABLE_COMMENT` FROM `information_schema`.`TABLES` WHERE `TABLE_SCHEMA` = 'world' ORDER BY `TABLE_NAME`;",
             "SELECT `SPECIFIC_NAME`, `ROUTINE_SCHEMA`, `ROUTINE_TYPE`, `DATA_TYPE`, `DTD_IDENTIFIER`, `ROUTINE_DEFINITION`, `IS_DETERMINISTIC`, `SQL_DATA_ACCESS`, `SECURITY_TYPE`, `CREATED`, `LAST_ALTERED`, `ROUTINE_COMMENT`, `DEFINER` FROM `information_schema`.`routines` WHERE `ROUTINE_SCHEMA` = 'world' ORDER BY `SPECIFIC_NAME`;"
         }, connector.ExecutedQueries);
     }
