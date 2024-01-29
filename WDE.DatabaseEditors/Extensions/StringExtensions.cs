@@ -9,6 +9,8 @@ namespace WDE.DatabaseEditors.Extensions
         {
             if (string.IsNullOrEmpty(comment))
                 return str;
+            if (string.IsNullOrEmpty(str))
+                return comment ?? "";
             var existingComment = str.IndexOf(" // ", StringComparison.Ordinal);
             if (existingComment == -1)
                 return str + " // " + comment;
