@@ -42,75 +42,40 @@ namespace WoWDatabaseEditorCore.Services.ServerIntegration
              
                 commands.Add(new(){Name = atr.Name, Command = command});
             }
-            
-            if (currentCoreVersion.Current.SupportsReverseCommands)
-                new Thread(BeginFetchLoop).Start();
+
+            remoteConnectorService.EditorCommandReceived += RemoteConnectorService_EditorCommandReceived;
         }
 
-        private void BeginFetchLoop()
+        private void RemoteConnectorService_EditorCommandReceived(string line)
         {
-            while (GlobalApplication.IsRunning)
+            async Task ProcessAsync()
             {
-                var task = SilentInvoke(FetchEditorCommandsRemoteCommand.Instance);
-                task.Wait();
-                string? resp = task.Result;
-
-                if (!string.IsNullOrEmpty(resp))
+                bool anyCmd = false;
+                bool broughtEditorToFront = false;
+                foreach (var cmd in commands)
                 {
-                    bool any = false;
-                    var split = resp.Split("\n");
-                    bool broughtEditorToFront = false;
-                    foreach (var line in split)
+                    if (line.StartsWith(cmd.Name))
                     {
-                        bool anyCmd = false;
-                        foreach (var cmd in commands)
+                        if (line.Length == cmd.Name.Length || line[cmd.Name.Length] == ' ')
                         {
-                            if (line.StartsWith(cmd.Name))
+                            var args = line.Substring(cmd.Name.Length).Trim();
+                            if (cmd.Command.BringEditorToFront && !broughtEditorToFront)
                             {
-                                if (line.Length == cmd.Name.Length || line[cmd.Name.Length] == ' ')
-                                {
-                                    var args = line.Substring(cmd.Name.Length).Trim();
-                                    if (cmd.Command.BringEditorToFront && !broughtEditorToFront)
-                                    {
-                                        mainThread.Dispatch(() => windowManager.Value.Activate());
-                                        broughtEditorToFront = true;
-                                    }
-                                    mainThread.Dispatch(() => cmd.Command.Invoke(new CommandArguments(args))).Wait();
-                                    any = true;
-                                    anyCmd = true;
-                                    break;
-                                }
+                                mainThread.Dispatch(() => windowManager.Value.Activate());
+                                broughtEditorToFront = true;
                             }
+                            await cmd.Command.Invoke(new CommandArguments(args));
+                            anyCmd = true;
+                            break;
                         }
-                        if (!anyCmd)
-                            Console.WriteLine("Got command " + line + " but didn't found any command to process this");
                     }
                 }
-
-                Thread.Sleep(50);
+                if (!anyCmd)
+                    Console.WriteLine("Got command " + line + " but didn't found any command to process this");
             }
+            ProcessAsync().ListenErrors();
         }
 
-        private async Task<string?> SilentInvoke(IRemoteCommand remoteCommand)
-        {
-            if (!remoteConnectorService.IsConnected)
-                return null;
-            
-            try
-            {
-                var response = (await remoteConnectorService.ExecuteCommand(remoteCommand)).Trim();
-
-                if (response.StartsWith("### USAGE:"))
-                    return null;
-                
-                return response;
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
-        
         private async Task<string?> Invoke(IRemoteCommand remoteCommand)
         {
             if (!remoteConnectorService.IsConnected)

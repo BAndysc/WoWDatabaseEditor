@@ -29,6 +29,8 @@ namespace WDE.Common.Services
         Task<string> ExecuteCommand(IRemoteCommand command);
         Task ExecuteCommands(IList<IRemoteCommand> commands);
 
+        event Action<string> EditorCommandReceived;
+
         IList<IRemoteCommand> Merge(IList<IRemoteCommand> commands);
     }
 
