@@ -15,6 +15,7 @@ namespace WDE.Common
         bool IsExportable { get; }
 
         ISolutionItem Clone();
+        ISolutionItem Clone(System.Guid guid) => Clone();
     }
 
     public interface IRenameableSolutionItem : ISolutionItem
