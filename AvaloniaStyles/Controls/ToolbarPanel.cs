@@ -245,7 +245,8 @@ namespace AvaloniaStyles.Controls
                 rcChild = rcChild.WithHeight(Math.Max(finalSize.Height, child.DesiredSize.Height));
                 // we want to stretch only content presenters, not buttons
                 // if it doesn't work for future toolbars, it can be changed 
-                if (child.HorizontalAlignment == HorizontalAlignment.Stretch && child is ContentPresenter)
+                if (child.HorizontalAlignment == HorizontalAlignment.Stretch && child is ContentPresenter cp &&
+                    cp.Child is not Button)
                 {
                     previousChildSize = child.DesiredSize.Width + Math.Max(0, leftSpace);
                     rcChild = rcChild.WithWidth(previousChildSize);
