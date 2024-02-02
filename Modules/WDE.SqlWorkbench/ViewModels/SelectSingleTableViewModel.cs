@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;
 using Prism.Commands;
+using PropertyChanged.SourceGenerator;
 using WDE.Common.Types;
 using WDE.Common.Utils;
 using WDE.SqlWorkbench.Models;
@@ -17,6 +18,8 @@ namespace WDE.SqlWorkbench.ViewModels;
 
 internal partial class SelectSingleTableViewModel : SelectResultsViewModel
 {
+    [Notify] private bool refreshInProgress;
+
     private readonly SqlWorkbenchViewModel vm;
 
     private SimpleSelect selectSpecs;
@@ -25,10 +28,10 @@ internal partial class SelectSingleTableViewModel : SelectResultsViewModel
     
     public bool RowsHaveFullPrimaryKey { get; }
     
-    public ICommand SetSelectedToNullCommand { get; }
-    public ICommand AddRowCommand { get; }
-    public ICommand DuplicateRowCommand { get; }
-    public ICommand DeleteRowCommand { get; }
+    public DelegateCommand SetSelectedToNullCommand { get; }
+    public DelegateCommand AddRowCommand { get; }
+    public DelegateCommand DuplicateRowCommand { get; }
+    public DelegateCommand DeleteRowCommand { get; }
     public IAsyncCommand RefreshTableCommand { get; }
     public IAsyncCommand ApplyChangesCommand { get; }
     public IAsyncCommand RevertChangesCommand { get; }
@@ -65,7 +68,7 @@ internal partial class SelectSingleTableViewModel : SelectResultsViewModel
             {
                 OverrideValue(SelectedRowIndex, i, columnsInfo[i].DefaultValue?.ToString());
             }
-        }, () => RowsHaveFullPrimaryKey);
+        }, () => RowsHaveFullPrimaryKey && !RefreshInProgress);
         DuplicateRowCommand = new DelegateCommand(() =>
         {
             if (SelectedRowIndex < 0 || SelectedRowIndex >= Count)
@@ -79,7 +82,7 @@ internal partial class SelectSingleTableViewModel : SelectResultsViewModel
             SelectedRowIndex = Count - 1;
             Selection.Clear();
             Selection.Add(SelectedRowIndex);
-        }, () => RowsHaveFullPrimaryKey);
+        }, () => RowsHaveFullPrimaryKey && !RefreshInProgress);
         PasteSelectedCommand = new AsyncAutoCommand(async () =>
         {
             var text = await vm.ClipboardService.GetText();
@@ -105,16 +108,16 @@ internal partial class SelectSingleTableViewModel : SelectResultsViewModel
                     OverrideValue(rowIndex, index++, token);
                 }
             }
-        });
+        }, () => !RefreshInProgress);
         DeleteRowCommand = new DelegateCommand(() =>
         {
             foreach (var row in Selection.All())
                 MarkRowAsDeleted(row);
-        }, () => RowsHaveFullPrimaryKey);
+        }, () => RowsHaveFullPrimaryKey && !RefreshInProgress);
         RevertChangesCommand = new AsyncAutoCommand(async () =>
         {
             ResetChanges();
-        });
+        }, () => !RefreshInProgress);
         RefreshTableCommand = new AsyncAutoCommand(async () =>
         {
             ErrorIfConnectionChanged();
@@ -122,8 +125,16 @@ internal partial class SelectSingleTableViewModel : SelectResultsViewModel
                 return;
             
             await RevertChangesCommand.ExecuteAsync();
-            await vm.ExecuteAndOverrideResultsAsync(selectSpecs.ToString(), this);
-        }).WrapMessageBox<Exception>(vm.UserQuestions);
+            RefreshInProgress = true;
+            try
+            {
+                await vm.ExecuteAndOverrideResultsAsync(selectSpecs.ToString(), this);
+            }
+            finally
+            {
+                RefreshInProgress = false;
+            }
+        }, () => !RefreshInProgress).WrapMessageBox<Exception>(vm.UserQuestions);
 
         ApplyChangesCommand = new AsyncAutoCommand(async () =>
         {
@@ -141,11 +152,23 @@ internal partial class SelectSingleTableViewModel : SelectResultsViewModel
                 Console.WriteLine(e);
                 await vm.UserQuestions.SaveErrorAsync(e);   
             }
-        });
+        }, () => !RefreshInProgress);
         
         RowsHaveFullPrimaryKey = columnsInfo.Any(x => x.IsPrimaryKey) &&
                                  columnsInfo.Where(x => x.IsPrimaryKey)
                                      .All(x => Columns.Skip(1).Any(col => col.Header == x.Name));
+
+        On(() => RefreshInProgress, _ =>
+        {
+            SetSelectedToNullCommand.RaiseCanExecuteChanged();
+            AddRowCommand.RaiseCanExecuteChanged();
+            DuplicateRowCommand.RaiseCanExecuteChanged();
+            DeleteRowCommand.RaiseCanExecuteChanged();
+            RefreshTableCommand.RaiseCanExecuteChanged();
+            ApplyChangesCommand.RaiseCanExecuteChanged();
+            RevertChangesCommand.RaiseCanExecuteChanged();
+            PasteSelectedCommand.RaiseCanExecuteChanged();
+        });
     }
     
     private void UpdateResultsSchema(IReadOnlyList<ColumnInfo> tableColumnsInfo)
@@ -343,6 +366,9 @@ internal partial class SelectSingleTableViewModel : SelectResultsViewModel
     
     public override void UpdateSelectedCells(string? value)
     {
+        if (RefreshInProgress)
+            throw new Exception("Refresh is in progress!");
+
         if (!CanEditSelectedRow())
             return;
         

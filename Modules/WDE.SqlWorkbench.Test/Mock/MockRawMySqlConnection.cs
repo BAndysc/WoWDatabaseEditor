@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Antlr4.Runtime;
 using MySqlConnector;
+using WDE.Common.Disposables;
 using WDE.Common.Utils;
 using WDE.SqlWorkbench.Antlr;
 using WDE.SqlWorkbench.Models;
@@ -72,6 +73,22 @@ internal class MockSqlConnector : IMySqlConnector
         public readonly MockMemoryDatabase.Table RoutinesTable;
         public readonly MockMemoryDatabase.Table EnginesTable;
         public readonly MockMemoryDatabase.Table CollationsTable;
+
+        private TaskCompletionSource? globalLock;
+
+        /// <summary>
+        /// to simulate long pending tasks, this can create an infinite delay in commands execution until released
+        /// </summary>
+        /// <returns></returns>
+        public System.IDisposable CreateGlobalLock()
+        {
+            globalLock = new TaskCompletionSource();
+            return new ActionDisposable(() =>
+            {
+                globalLock.SetResult();
+                globalLock = null;
+            });
+        }
 
         public MockMemoryServer(
             MockSqlConnector mockSqlConnector,
@@ -307,6 +324,9 @@ internal class MockSqlConnector : IMySqlConnector
 
             public async Task<SelectResult> ExecuteSqlAsync(string queryString, int? rowsLimit = null, CancellationToken token = default)
             {
+                if (server.globalLock != null)
+                    await server.globalLock.Task;
+
                 if (!await querySafetyService.CanExecuteAsync(queryString, queryExecutionSafety))
                     throw new TaskCanceledException("The user canceled the query execution");
                 

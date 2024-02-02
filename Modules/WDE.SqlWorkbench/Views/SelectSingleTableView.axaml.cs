@@ -93,7 +93,7 @@ public partial class SelectSingleTableView : UserControl
         {
             if (vm.Selection.Empty)
             {
-                vm.AddRowCommand.Execute(null);
+                vm.AddRowCommand.Execute();
             }
         }
     }

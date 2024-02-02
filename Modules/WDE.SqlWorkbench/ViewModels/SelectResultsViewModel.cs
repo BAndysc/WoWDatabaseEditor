@@ -83,6 +83,7 @@ internal partial class SelectResultsViewModel : ObservableBase
                 };
             }
             Debug.Assert(ColumnsOverride != null);
+            Debug.Assert(AdditionalRowsCount == 0);
         }
     }
 
@@ -334,6 +335,7 @@ internal partial class SelectResultsViewModel : ObservableBase
 
     public void UpdateResults(in SelectResult results, IReadOnlyList<ColumnInfo>? tableColumnsInfo)
     {
+        ResetChanges();
         Results = results;
         ResultsUpdated(tableColumnsInfo);
         UpdateCellEditor();

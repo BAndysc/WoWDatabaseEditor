@@ -256,8 +256,8 @@ internal class SqlWorkbenchViewModelTests
         Assert.IsTrue(results.IsColumnPrimaryKey(2));
         Assert.AreEqual(0, results.Count);
         
-        results.AddRowCommand.Execute(null);
-        results.AddRowCommand.Execute(null);
+        results.AddRowCommand.Execute();
+        results.AddRowCommand.Execute();
         results.SelectedCellIndex = 1;
         results.UpdateSelectedCells("txt");
         results.SelectedCellIndex = 2;
@@ -311,19 +311,19 @@ internal class SqlWorkbenchViewModelTests
         Assert.AreEqual(3, results.Columns.Count);
         CollectionAssert.AreEqual(new []{"#", "b", "a"}, results.Columns.Select(x => x.Header));
 
-        results.AddRowCommand.Execute(null);
+        results.AddRowCommand.Execute();
         results.SelectedCellIndex = 1;
         results.UpdateSelectedCells("abc");
         results.SelectedCellIndex = 2;
         results.UpdateSelectedCells("2");
 
-        results.AddRowCommand.Execute(null);
+        results.AddRowCommand.Execute();
         results.SelectedCellIndex = 1;
         results.UpdateSelectedCells("txt");
         results.SelectedCellIndex = 2;
         results.UpdateSelectedCells("3");
 
-        results.DeleteRowCommand.Execute(null);
+        results.DeleteRowCommand.Execute();
         
         confirmationService.QueryConfirmationAsync(default, default).ReturnsForAnyArgs(Task.FromResult(QueryConfirmationResult.AlreadyExecuted));
         userQuestionsService.ConfirmExecuteQueryAsync(default).ReturnsForAnyArgs(true);
@@ -362,7 +362,7 @@ internal class SqlWorkbenchViewModelTests
         await vm.ExecuteAllCommand.ExecuteAsync();
 
         var results = (SelectSingleTableViewModel)vm.Results[0];
-        results.AddRowCommand.Execute(null);
+        results.AddRowCommand.Execute();
         
         confirmationService.QueryConfirmationAsync(default, default).ReturnsForAnyArgs(Task.FromResult(QueryConfirmationResult.AlreadyExecuted));
         userQuestionsService.ConfirmExecuteQueryAsync("START TRANSACTION").Returns(true);
@@ -419,8 +419,8 @@ internal class SqlWorkbenchViewModelTests
 
         var results = (SelectSingleTableViewModel)vm.Results[0];
 
-        results.AddRowCommand.Execute(null);
-        results.AddRowCommand.Execute(null);
+        results.AddRowCommand.Execute();
+        results.AddRowCommand.Execute();
         results.SelectedCellIndex = 1; results.UpdateSelectedCells("abc");
         results.SelectedCellIndex = 2; results.UpdateSelectedCells("1");
         results.SelectedCellIndex = 3; results.UpdateSelectedCells("255");
@@ -477,7 +477,7 @@ internal class SqlWorkbenchViewModelTests
 
         var results = (SelectSingleTableViewModel)vm.Results[0];
 
-        results.AddRowCommand.Execute(null);
+        results.AddRowCommand.Execute();
         results.SelectedCellIndex = 1; results.UpdateSelectedCells("1");
         results.SelectedCellIndex = 2; results.UpdateSelectedCells("NOW()");
         results.SelectedCellIndex = 3; results.UpdateSelectedCells("NOW()");
@@ -526,9 +526,9 @@ internal class SqlWorkbenchViewModelTests
         results.CopyInsertCommand.Execute(null);
         clipboard.Received().SetText($@"INSERT INTO `tab` (`a`) VALUES
 (X'{longBytesAsHex}')".Replace(Environment.NewLine, "\n"));
-        results.DuplicateRowCommand.Execute(null);
+        results.DuplicateRowCommand.Execute();
 
-        results.AddRowCommand.Execute(null);
+        results.AddRowCommand.Execute();
         results.SelectedCellIndex = 1; results.UpdateSelectedCells(longBytesAsHex);
         
         confirmationService.QueryConfirmationAsync(default, default).ReturnsForAnyArgs(Task.FromResult(QueryConfirmationResult.AlreadyExecuted));
@@ -842,7 +842,37 @@ internal class SqlWorkbenchViewModelTests
         Assert.AreEqual("def", results.GetShortValue(0, 1));
         Assert.Pass();
     }
-    
+
+    [Test]
+    public async Task Bug_Delayed_Refresh_Will_Reset_State()
+    {
+        using var vm = CreateConnectedViewModel();
+        var worldDb = mockServer.CreateDatabase("world");
+        var table = worldDb.CreateTable("tab", TableType.Table, new ColumnInfo("a", "int", false, true, true));
+        table.Insert(new object?[]{1});
+
+        vm.Document.Insert(0, "SELECT `a` FROM `tab`");
+        await vm.ExecuteAllCommand.ExecuteAsync();
+
+        Assert.IsTrue(actionsOutputService.Actions[0].IsSuccess);
+        Assert.AreEqual(1, vm.Results.Count);
+
+        // results
+        Assert.IsTrue(vm.Results[0] is SelectSingleTableViewModel);
+        var results = (SelectSingleTableViewModel)vm.Results[0];
+
+        var @lock = mockServer.CreateGlobalLock();
+
+        var refresh = results.RefreshTableCommand.ExecuteAsync();
+        results.AddRowCommand.Execute();
+        Assert.IsFalse(results.AddRowCommand.CanExecute());
+
+        @lock.Dispose();
+        await refresh;
+
+        Assert.AreEqual(1, results.Count);
+    }
+
     [Test]
     public async Task Bug_TimeColumns_PadMicroseconds()
     {
@@ -973,7 +1003,7 @@ internal class SqlWorkbenchViewModelTests
         Assert.AreEqual("55223344", results.GetShortValue(0, 1));
         
         results.Selection.Add(0);
-        results.SetSelectedToNullCommand.Execute(null);
+        results.SetSelectedToNullCommand.Execute();
         
         Assert.IsNull(results.TableController.GetCellText(0, 1));
         Assert.IsTrue(results.TryGetRowOverride(0, 1, out var overrideString));

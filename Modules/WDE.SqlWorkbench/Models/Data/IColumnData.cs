@@ -331,6 +331,7 @@ internal abstract class SparseColumnData : ISparseColumnData
     {
         rowIndexToIndex.Clear();
         impl.Clear();
+        freeActualIndices?.Clear();
     }
 
     protected void RaiseOnRowOverriden(int rowIndex) => OnRowOverriden?.Invoke(rowIndex);
