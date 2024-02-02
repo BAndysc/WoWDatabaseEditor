@@ -33,11 +33,11 @@ namespace WDE.Conditions.Services
             this.databaseProvider = databaseProvider;
         }
     
-        public async Task<IEnumerable<ICondition>?> EditConditions(int conditionSourceType, IReadOnlyList<ICondition>? conditions, string? customTitle)
+        public async Task<IEnumerable<ICondition>?> EditConditions(IDatabaseProvider.ConditionKey conditionKey, IReadOnlyList<ICondition>? conditions, string? customTitle)
         {
             using var vm = containerProvider.Resolve<ConditionsEditorViewModel>(
                 (typeof(IEnumerable<ICondition>), conditions ?? Enumerable.Empty<ICondition>()),
-                (typeof(int), conditionSourceType));
+                (typeof(int), conditionKey.SourceType));
             vm.Title = customTitle ?? vm.Title;
             
             if (await windowManager.ShowDialog(vm))
@@ -51,7 +51,7 @@ namespace WDE.Conditions.Services
         public async Task EditConditions(IDatabaseProvider.ConditionKeyMask conditionKeyMask, IDatabaseProvider.ConditionKey conditionKey, string? customTitle)
         {
             var conditions = await databaseProvider.GetConditionsForAsync(conditionKeyMask, conditionKey);
-            var edited = await EditConditions(conditionKey.SourceType, (IReadOnlyList<ICondition>)conditions, customTitle);
+            var edited = await EditConditions(conditionKey.WithMask(conditionKeyMask), (IReadOnlyList<ICondition>)conditions, customTitle);
             if (edited == null)
                 return;
 

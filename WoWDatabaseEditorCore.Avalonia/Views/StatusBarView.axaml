@@ -2,10 +2,11 @@
              xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:system="clr-namespace:System;assembly=mscorlib"
-             x:DataType="managers:StatusBar"
+             x:DataType="viewModels:StatusBarViewModel"
              xmlns:converters="clr-namespace:WDE.Common.Avalonia.Converters;assembly=WDE.Common.Avalonia"
              xmlns:managers="clr-namespace:WoWDatabaseEditorCore.Managers;assembly=WoWDatabaseEditorCore"
-             xmlns:managers1="clr-namespace:WDE.Common.Managers;assembly=WDE.Common">
+             xmlns:managers1="clr-namespace:WDE.Common.Managers;assembly=WDE.Common"
+             xmlns:viewModels="clr-namespace:WoWDatabaseEditorCore.ViewModels;assembly=WoWDatabaseEditorCore">
     <UserControl.Resources>
         <converters:NullConverter Inverted="True" x:Key="NullConverter" />
         
@@ -23,6 +24,7 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
@@ -94,8 +96,8 @@
         
         <Panel Grid.Column="2" VerticalAlignment="Stretch" Margin="0,0,10,0" DataContext="{CompiledBinding ServerExecutableService}">
             <Button BorderThickness="0" Foreground="White" Background="Transparent" Command="{CompiledBinding ToggleWorldServer}">
-                <WrapPanel>
-                    <WdeImage Width="13" Height="13" Margin="0,0,3,0" VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal" Spacing="3">
+                    <WdeImage Width="13" Height="13" VerticalAlignment="Center">
                         <Interaction.Behaviors>
                             <DataTriggerBehavior Binding="{CompiledBinding IsWorldServerRunning}" ComparisonCondition="Equal" Value="True">
                                 <ChangePropertyAction TargetObject="{Binding #WdeImage}" 
@@ -110,13 +112,13 @@
                         </Interaction.Behaviors>
                     </WdeImage>
                     <TextBlock>World server</TextBlock>
-                </WrapPanel>
+                </StackPanel>
             </Button>
         </Panel>
         
-        <Panel Grid.Column="3" VerticalAlignment="Stretch" Margin="0,0,10,0" DataContext="{CompiledBinding ServerExecutableService}">
+        <Panel Grid.Column="3" VerticalAlignment="Stretch" DataContext="{CompiledBinding ServerExecutableService}">
             <Button BorderThickness="0" Foreground="White" Background="Transparent" Command="{CompiledBinding ToggleAuthServer}">
-                <WrapPanel>
+                <StackPanel Orientation="Horizontal" Spacing="3">
                     <WdeImage Width="13" Height="13" Margin="0,0,3,0" VerticalAlignment="Center">
                         <Interaction.Behaviors>
                             <DataTriggerBehavior Binding="{CompiledBinding IsAuthServerRunning}" ComparisonCondition="Equal" Value="True">
@@ -132,14 +134,24 @@
                         </Interaction.Behaviors>
                     </WdeImage>
                     <TextBlock>Auth server</TextBlock>
-                </WrapPanel>
+                </StackPanel>
             </Button>
         </Panel>
-        
-        <Panel Grid.Column="4" VerticalAlignment="Stretch" Margin="0,0,10,0">
+
+        <Panel Grid.Column="4" VerticalAlignment="Stretch" IsVisible="{CompiledBinding SupportsBreakpoints}" ToolTip.Tip="View Breakpoints (Ctrl + B)">
+            <Button BorderThickness="0" Foreground="White" Background="Transparent" Command="{CompiledBinding OpenBreakpointsWindow}">
+                <StackPanel Orientation="Horizontal" Spacing="3">
+                    <WdeImage ImageUri="Icons/icon_breakpoint_mono_all.png" Width="13" Height="13" />
+                    <TextBlock Text="{CompiledBinding TotalBreakpoints}" />
+                    <TextBlock Text=" Breakpoints" />
+                </StackPanel>
+            </Button>
+        </Panel>
+
+        <Panel Grid.Column="5" VerticalAlignment="Stretch">
             <Button BorderThickness="0" Foreground="White" Background="Transparent" Command="{CompiledBinding OpenProblemTool}">
-                <WrapPanel>
-                    <Image Width="13" Height="13" Margin="0,0,3,0" VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal" Spacing="3">
+                    <Image Width="13" Height="13" VerticalAlignment="Center">
                         <Interaction.Behaviors>
                             <DataTriggerBehavior Binding="{CompiledBinding TotalProblems}" ComparisonCondition="Equal" Value="0">
                                 <ChangePropertyAction TargetObject="{Binding #Image}" 
@@ -155,17 +167,17 @@
                     </Image>
                     <TextBlock Text="{CompiledBinding TotalProblems, Mode=OneWay}" IsHitTestVisible="False" Foreground="{DynamicResource StatusBarForeground}" />
                     <TextBlock Text=" problems found"></TextBlock>
-                </WrapPanel>
+                </StackPanel>
             </Button>
         </Panel>
         
-        <Panel Grid.Column="5" VerticalAlignment="Stretch" Margin="0">
+        <Panel Grid.Column="6" VerticalAlignment="Stretch" Margin="0">
             <Button BorderThickness="0" Foreground="White" Background="Transparent" Command="{CompiledBinding ToggleConnectionsPanelVisibility}">
                 <TextBlock Text="{CompiledBinding Connections.OpenedConnections, StringFormat={}{0} connections, Mode=OneWay}" IsHitTestVisible="False" Foreground="{DynamicResource StatusBarForeground}" />
             </Button>
         </Panel>
         
-        <Panel Grid.Column="6" VerticalAlignment="Stretch" Margin="0">
+        <Panel Grid.Column="7" VerticalAlignment="Stretch" Margin="0">
             <Button BorderThickness="0" Foreground="White" Background="Transparent" Command="{CompiledBinding ToggleTasksPanelVisibility}">
                 <TextBlock Text="{CompiledBinding TasksViewModel.PendingTasksCount, StringFormat={}{0} tasks running in background, Mode=OneWay}" IsHitTestVisible="False" Foreground="{DynamicResource StatusBarForeground}" />
             </Button>

@@ -29,6 +29,12 @@ namespace WDE.TrinitySmartScriptEditor
             containerRegistry.Register(typeof(IQueryParserProvider), typeof(SmartScriptQueryParser), nameof(SmartScriptQueryParser));
         }
 
+        public override void RegisterFallbackTypes(IContainerRegistry container)
+        {
+            base.RegisterFallbackTypes(container);
+            AutoRegisterFallbackTypesByConvention(typeof(SmartFactory).Assembly, container);
+        }
+
         public override void FinalizeRegistration(IContainerRegistry container)
         {
             base.FinalizeRegistration(container);

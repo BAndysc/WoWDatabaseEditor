@@ -14,7 +14,7 @@ namespace WDE.Common.Services
     
     public class RemoteConnectorException : Exception
     {
-        public RemoteConnectorException(string error, Exception? innerException) : base(error, innerException)
+        public RemoteConnectorException(string error, Exception? innerException = null) : base(error, innerException)
         {
         
         }
@@ -35,6 +35,13 @@ namespace WDE.Common.Services
         event Action EditorDisconnected;
 
         IList<IRemoteCommand> Merge(IList<IRemoteCommand> commands);
+    }
+
+    public class DebuggingFeaturesDisabledException : Exception
+    {
+        public DebuggingFeaturesDisabledException(string msg) : base(msg)
+        {
+        }
     }
 
     public class CouldNotConnectToRemoteServer : Exception

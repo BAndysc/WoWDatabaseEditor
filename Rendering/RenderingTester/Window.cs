@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.ComponentModel;
+using System.Diagnostics;
 using System.Reactive.Disposables;
 using Prism.Ioc;
 using Unity;
@@ -31,6 +32,10 @@ public class DummyStatusBar : IStatusBar
     public void PublishNotification(INotification notification)
     {
     }
+
+    public INotification? CurrentNotification { get; set; }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
 }
 
 public class DummyGameView : IGameView
@@ -332,6 +337,11 @@ public class DummyWindowManager : IWindowManager
     }
 
     public void Activate()
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task OpenPopupMenu<T>(T menuViewModel, object? control) where T : IPopupMenuViewModel
     {
         throw new NotImplementedException();
     }

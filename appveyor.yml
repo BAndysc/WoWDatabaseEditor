@@ -161,6 +161,8 @@ test_script:
       
     dotnet test Modules/WDE.DatabaseEditors.Test/WDE.DatabaseEditors.Test.csproj
       
+    dotnet test Modules/WDE.Debugger.Test/WDE.Debugger.Test.csproj
+      
     Rem dotnet test Modules/WDE.PacketViewer.Test/WDE.PacketViewer.Test.csproj
 artifacts:
 - path: WoWDatabaseEditorMacOs.zip

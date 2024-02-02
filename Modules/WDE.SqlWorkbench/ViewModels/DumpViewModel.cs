@@ -1,6 +1,7 @@
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ using AsyncAwaitBestPractices.MVVM;
 using Prism.Commands;
 using PropertyChanged.SourceGenerator;
 using WDE.Common.Managers;
+using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Types;
 using WDE.Common.Utils;
@@ -26,6 +28,7 @@ internal partial class DumpViewModel : ObservableBase, IWindowViewModel, IClosab
     private readonly IMySqlConnector mySqlConnector;
     private readonly DatabaseCredentials credentials;
     private readonly IMessageBoxService messageBoxService;
+    private readonly IClipboardService clipboardService;
 
     [Notify] private bool isLoading;
     
@@ -40,6 +43,8 @@ internal partial class DumpViewModel : ObservableBase, IWindowViewModel, IClosab
     [Notify] private string databaseVersion = "";
     
     [Notify] [AlsoNotify(nameof(HasAnyConsoleOutput))] private string consoleOutput = "";
+
+    [Notify] private bool dumpToClipboardOnly;
 
     private CancellationTokenSource? pendingDump;
     
@@ -91,13 +96,15 @@ internal partial class DumpViewModel : ObservableBase, IWindowViewModel, IClosab
         IWindowManager windowManager,
         DatabaseCredentials credentials, 
         IMessageBoxService messageBoxService,
+        IClipboardService clipboardService,
         string? tableName)
     {
         this.mySqlDumpService = mySqlDumpService;
         this.mySqlConnector = mySqlConnector;
         this.credentials = credentials;
         this.messageBoxService = messageBoxService;
-        
+        this.clipboardService = clipboardService;
+
         var fields = typeof(MySqlDumpOptions).GetFields();
         MySqlDumpOptions defaultOptions = new MySqlDumpOptions();
         foreach (var field in fields)
@@ -132,7 +139,7 @@ internal partial class DumpViewModel : ObservableBase, IWindowViewModel, IClosab
                 table.IsChecked = false;
         });
         
-        DumpCommand = new AsyncAutoCommand(DumpAsync, () => OutputFile != null)
+        DumpCommand = new AsyncAutoCommand(DumpAsync, () => OutputFile != null || DumpToClipboardOnly)
             .WrapMessageBox<Exception>(messageBoxService);
 
         ListTablesAsync(tableName).ListenErrors();
@@ -147,6 +154,7 @@ internal partial class DumpViewModel : ObservableBase, IWindowViewModel, IClosab
             }));
         
         On(() => OutputFile, _ => DumpCommand.RaiseCanExecuteChanged());
+        On(() => DumpToClipboardOnly, _ => DumpCommand.RaiseCanExecuteChanged());
     }
 
     private void OnTablePropertyValueChanged(object? sender, PropertyChangedEventArgs e)
@@ -206,6 +214,8 @@ internal partial class DumpViewModel : ObservableBase, IWindowViewModel, IClosab
 
     private async Task DumpAsync()
     {
+        var outFile = outputFile;
+        bool temporaryFile = false;
         try
         {
             DumpInProgress = true;
@@ -215,6 +225,13 @@ internal partial class DumpViewModel : ObservableBase, IWindowViewModel, IClosab
 
             var selectedTables = Tables.Where(x => x.IsChecked).Select(x => x.Name).ToArray();
 
+            if (outFile == null || DumpToClipboardOnly)
+            {
+                temporaryFile = true;
+                outFile = Path.GetTempFileName();
+                File.Delete(outFile);
+            }
+
             pendingDump = new();
             ConsoleOutput = "";
             await mySqlDumpService.DumpDatabaseAsync(credentials,
@@ -222,7 +239,7 @@ internal partial class DumpViewModel : ObservableBase, IWindowViewModel, IClosab
                 DatabaseVersion.Contains("maria", StringComparison.OrdinalIgnoreCase) ? MySqlDumpVersion.MariaDb : MySqlDumpVersion.MySql,
                 Tables.Select(x => x.Name).ToArray(),
                 selectedTables, 
-                outputFile!, 
+                outFile,
                 count => ProgressValue += count / 1024.0 / 1024.0,
                 err =>
                 {
@@ -232,11 +249,19 @@ internal partial class DumpViewModel : ObservableBase, IWindowViewModel, IClosab
                     ConsoleOutput += err + "\n";
                 },
                 pendingDump.Token);
+
+            if (DumpToClipboardOnly)
+            {
+                var content = await File.ReadAllTextAsync(outFile);
+                clipboardService.SetText(content);
+            }
         }
         finally
         {
             pendingDump = null;
             DumpInProgress = false;
+            if (temporaryFile)
+                File.Delete(outFile!);
         }
     }
 

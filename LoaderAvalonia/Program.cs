@@ -31,6 +31,7 @@ using WDE.WorldMap;
 using WDE.WoWHeadConnector;
 using WDE.AnniversaryInfo;
 using WDE.DatabaseDefinitionEditor;
+using WDE.Debugger;
 using WDE.EventAiEditor.Avalonia;
 using WDE.EventScriptsEditor;
 using WDE.MangosEventAiEditor;
@@ -93,7 +94,8 @@ namespace LoaderAvalonia
                 typeof(ProfilesModule),
                 typeof(DatabaseDefinitionEditorModule),
                 typeof(LootEditorModule),
-                typeof(SqlWorkbenchModule)
+                typeof(SqlWorkbenchModule),
+                typeof(DebuggerModule)
             };
             WoWDatabaseEditorCore.Avalonia.Program.PreloadedModules = modules;
             WoWDatabaseEditorCore.Avalonia.Program.Main(args);

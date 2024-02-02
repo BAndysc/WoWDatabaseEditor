@@ -1,0 +1,45 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:sourceCode="clr-namespace:WDE.SourceCodeIntegrationEditor.SourceCode"
+             xmlns:settings="clr-namespace:WDE.SourceCodeIntegrationEditor.Settings"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="settings:SourceCodeConfigurationViewModel"
+             Name="Root"
+             x:Class="WDE.SourceCodeIntegrationEditor.Settings.SourceCodeConfigurationView">
+  <ScrollViewer>
+    <StackPanel>
+      <SettingItem Header="Source code folders" Help="The editor will search in those folders when using Find Anywhere feature">
+        <Button HorizontalAlignment="Right" Command="{CompiledBinding AddDirectoryCommand}">Add folder</Button>
+      </SettingItem>
+      <ItemsControl Items="{CompiledBinding Paths}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate>
+            <SettingItem Padding="20,0,0,0" Header="{CompiledBinding .}">
+              <Button HorizontalAlignment="Right" Content="Delete"
+                      CommandParameter="{CompiledBinding .}"
+                      Command="{CompiledBinding  #Root.((settings:SourceCodeConfigurationViewModel)DataContext).DeleteCommand}" />
+            </SettingItem>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+
+      <SettingItem Header="Enable Visual Studio integration [Experimental]" Help="The editor can connect to a running Visual Studio instance for additional integration with debugger">
+        <ToggleSwitch IsChecked="{CompiledBinding EnableVisualStudioIntegration}" />
+      </SettingItem>
+
+      <SettingItem IsVisible="{CompiledBinding SupportsRemoteVisualStudio}" Header="Enable Remote Visual Studio Connection" Help="(this is only a debug feature for now)">
+        <ToggleSwitch IsChecked="{CompiledBinding EnableRemoteVisualStudioConnection}" />
+      </SettingItem>
+
+      <SettingItem IsVisible="{CompiledBinding SupportsRemoteVisualStudio}" Header="Remote Visual Studio Address" IsEnabled="{CompiledBinding EnableRemoteVisualStudioConnection}">
+        <TextBox HorizontalAlignment="Right" Text="{CompiledBinding RemoteVisualStudioAddress}" />
+      </SettingItem>
+
+      <SettingItem IsVisible="{CompiledBinding SupportsRemoteVisualStudio}" Header="Remote Visual Studio Key" IsEnabled="{CompiledBinding EnableRemoteVisualStudioConnection}">
+        <TextBox HorizontalAlignment="Right" Text="{CompiledBinding RemoteVisualStudioKey}" />
+      </SettingItem>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

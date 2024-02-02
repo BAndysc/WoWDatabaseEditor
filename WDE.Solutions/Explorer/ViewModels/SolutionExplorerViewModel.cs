@@ -18,6 +18,8 @@ using WDE.Common.Utils;
 using WDE.Common.Utils.DragDrop;
 using WDE.Common.Windows;
 using WDE.Module.Attributes;
+using WDE.MVVM;
+using WDE.MVVM.Observable;
 
 namespace WDE.Solutions.Explorer.ViewModels
 {
@@ -212,12 +214,16 @@ namespace WDE.Solutions.Explorer.ViewModels
                 if (vm != null)
                     solutionTasksService.SaveAndReloadSolutionTask(vm.Item);
             }, vm => vm != null && solutionTasksService.CanSaveAndReloadRemotely);
+            solutionTasksService.ToObservable(x => x.CanSaveAndReloadRemotely)
+                .SubscribeAction(_ => ExportToServer.RaiseCanExecuteChanged());
 
             ExportToServerItem = new DelegateCommand<object>(item =>
             {
                 if (item is SolutionItemViewModel si)
                     solutionTasksService.SaveAndReloadSolutionTask(si.Item);
             }, item => solutionTasksService.CanSaveAndReloadRemotely);
+            solutionTasksService.ToObservable(x => x.CanSaveAndReloadRemotely)
+                .SubscribeAction(_ => ExportToServerItem.RaiseCanExecuteChanged());
         }
 
         private void DeleteSolutionItem(SolutionItemViewModel item)

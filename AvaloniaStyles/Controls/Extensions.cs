@@ -164,7 +164,7 @@ namespace AvaloniaStyles.Controls
                 if (args.NewValue is not Type type)
                     return;
 
-                var values = Enum.GetValues(type).Cast<object>().Zip(Enum.GetNames(type), (val, name) => new Option(val, type, combo, name)).ToList();
+                var values = Enum.GetValuesAsUnderlyingType(type).Cast<object>().Zip(Enum.GetNames(type), (val, name) => new Option(val, type, combo, name)).ToList();
                 combo.AsyncPopulator = async (items, str, _) =>
                 {
                     if (string.IsNullOrEmpty(str))

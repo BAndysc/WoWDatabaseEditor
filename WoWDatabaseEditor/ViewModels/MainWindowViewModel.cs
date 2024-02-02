@@ -38,6 +38,7 @@ namespace WoWDatabaseEditorCore.ViewModels
     [AutoRegister]
     public class MainWindowViewModel : ObservableBase, ILayoutViewModelResolver, ICloseAwareViewModel
     {
+        private readonly IStatusBar statusBar;
         private readonly IMessageBoxService messageBoxService;
         private readonly Func<AboutViewModel> aboutViewModelCreator;
         private readonly Func<QuickStartViewModel> quickStartCreator;
@@ -54,6 +55,7 @@ namespace WoWDatabaseEditorCore.ViewModels
         private readonly Dictionary<string, ITool> toolById = new();
 
         public MainWindowViewModel(IDocumentManager documentManager,
+            StatusBarViewModel statusBarViewModel,
             IStatusBar statusBar,
             IMessageBoxService messageBoxService,
             TasksViewModel tasksViewModel,
@@ -87,13 +89,16 @@ namespace WoWDatabaseEditorCore.ViewModels
             IStatisticsService statisticsService,
             ICurrentCoreVersion currentCoreVersion,
             IUpdateViewModel updateViewModel,
+            IVisualStudioManagerViewModel visualStudioManagerViewModel,
             Func<IFindAnywhereDialogViewModel> findAnywhereCreator)
         {
             DocumentManager = documentManager;
-            StatusBar = statusBar;
+            StatusBar = statusBarViewModel;
             TopBarQuickAccess = topBarQuickAccessViewModel;
             SessionRestoreService = sessionRestoreService;
             ConnectionsViewModel = connectionsViewModel;
+            VisualStudioManagerViewModel = visualStudioManagerViewModel;
+            this.statusBar = statusBar;
             this.messageBoxService = messageBoxService;
             this.aboutViewModelCreator = aboutViewModelCreator;
             this.quickStartCreator = quickStartCreator;
@@ -139,7 +144,7 @@ namespace WoWDatabaseEditorCore.ViewModels
                         {
                             var sql = await queryGeneratorRegistry.GenerateSql(sid.SolutionItem);
                             clipboardService.SetText(sql.QueryString);
-                            statusBar.PublishNotification(new PlainNotification(NotificationType.Success, "SQL copied!"));
+                            this.statusBar.PublishNotification(new PlainNotification(NotificationType.Success, "SQL copied!"));
                         });
                 }
             }, () => DocumentManager.ActiveDocument != null && DocumentManager.ActiveDocument is ISolutionItemDocument);
@@ -235,7 +240,7 @@ namespace WoWDatabaseEditorCore.ViewModels
             RaisePropertyChanged(nameof(Title));
         }
 
-        public IStatusBar StatusBar { get; }
+        public StatusBarViewModel StatusBar { get; }
         public IDocumentManager DocumentManager { get; }
 
         public TasksViewModel TasksViewModel { get; }
@@ -246,6 +251,7 @@ namespace WoWDatabaseEditorCore.ViewModels
         public TopBarQuickAccessViewModel TopBarQuickAccess { get; }
         public SessionRestoreService SessionRestoreService { get; }
         public IConnectionsStatusBarItem ConnectionsViewModel { get; }
+        public IVisualStudioManagerViewModel VisualStudioManagerViewModel { get; }
 
         public List<IMainMenuItem> MenuItemProviders { get; }
 

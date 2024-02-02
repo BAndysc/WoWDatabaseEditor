@@ -32,7 +32,8 @@ namespace WoWDatabaseEditorCore.ViewModels
             IDbcStore dbcStore,
             IConfigureService settings,
             ICurrentCoreVersion coreVersion,
-            IRemoteConnectorService remoteConnectorService)
+            IRemoteConnectorService remoteConnectorService,
+            ISourceCodePathService sourceCodePathService)
         {
             this.applicationVersion = applicationVersion;
             this.databaseProvider = databaseProvider;
@@ -54,6 +55,10 @@ namespace WoWDatabaseEditorCore.ViewModels
             ConfigurationChecks.Add(new ConfigurationCheckup(remoteConnectorService.HasValidSettings,
                 "Remote connection",
                 "WDE can invoke reload commands for you for faster work. To enable that, you have to enable remote connection in your worldserver configuration and provide details in the settings."));
+
+            ConfigurationChecks.Add(new ConfigurationCheckup(sourceCodePathService.SourceCodePaths.Count > 0,
+                "Source code integration",
+                "WDE can integrate with source code of your server. Find Anywhere can search in the source code."));
 
             AllConfigured = ConfigurationChecks.All(s => s.Fulfilled);
 

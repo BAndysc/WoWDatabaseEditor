@@ -30,4 +30,10 @@
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
     </ItemGroup>
+    <ItemGroup>
+      <Compile Update="Controls\CodeCompletionTextEditor\CodeCompletionTextEditor.axaml.cs">
+        <DependentUpon>BreakpointLogTextBox.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+    </ItemGroup>
 </Project>

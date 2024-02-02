@@ -416,5 +416,15 @@ namespace WDE.TrinitySmartScriptEditor.Exporter
         {
             return new ExporterHelper(script, databaseProvider, item, this, currentCoreVersion, nameRegistry, conditionQueryGenerator).GetSql();
         }
+
+        public int GetDatabaseScriptTypeId(SmartScriptType type)
+        {
+            return (int)type;
+        }
+
+        public SmartScriptType GetScriptTypeFromId(int id)
+        {
+            return (SmartScriptType)id;
+        }
     }
 }

@@ -1,0 +1,26 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:inspectorVm="clr-namespace:WDE.Debugger.ViewModels.Inspector"
+             xmlns:inspector="clr-namespace:WDE.Debugger.Views.Inspector"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="inspectorVm:SelectedDebugPointViewModel"
+             Name="Root"
+             MinWidth="550"
+             MaxWidth="700"
+             x:Class="WDE.Debugger.Views.Inspector.EditDebugPointPopup">
+  <Border Background="{DynamicResource MenuFlyoutPresenterBackground}"
+          BorderBrush="{DynamicResource MenuFlyoutPresenterBorderBrush}"
+          BorderThickness="{DynamicResource MenuFlyoutPresenterBorderThemeThickness}"
+          CornerRadius="{DynamicResource OverlayCornerRadius}"
+          Padding="10,10"
+  >
+    <DockPanel KeyboardNavigation.TabNavigation="Local">
+      <StackPanel Spacing="15" Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Bottom" TabIndex="2" >
+        <Button IsDefault="True" Classes="primary" MinWidth="90" MinHeight="30" Command="{CompiledBinding #Root.OkCommand}"><TextBlock Text="Done" /></Button>
+      </StackPanel>
+      <inspector:SelectedDebugPointView />
+    </DockPanel>
+  </Border>
+</UserControl>

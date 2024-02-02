@@ -422,7 +422,11 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
         
         EditConditionsCommand = new AsyncAutoCommand<LootItemViewModel>(async loot =>
         {
-            var newConditions = await conditionEditService.EditConditions(lootEditorFeatures.GetConditionSourceTypeFor(loot.Parent.LootSourceType), loot.Conditions);
+            var key = new IDatabaseProvider.ConditionKey(
+                    lootEditorFeatures.GetConditionSourceTypeFor(loot.Parent.LootSourceType))
+                .WithGroup((int)(uint)loot.Parent.LootEntry)
+                .WithEntry((int)loot.ItemOrCurrencyId.Value);
+            var newConditions = await conditionEditService.EditConditions(key, loot.Conditions);
             if (newConditions != null)
                 loot.Conditions = newConditions.ToList();
         });

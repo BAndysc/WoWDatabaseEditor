@@ -77,7 +77,7 @@ public class SimpleGraph : Control
             geom.Points.Add(new Point(x, (1 - y) * graphHeight + startY));
             x += widthPerPoint;
         }
-        
+
         geom.Points.Add(new Point(x - widthPerPoint, Bounds.Height));
         context.DrawGeometry(Foreground, null, geom);
     }

@@ -81,6 +81,8 @@ namespace WDE.Module
             {
                 if (checkIfRegistered && unityContainer.IsRegistered(@interface, UnityContainer.All))
                     continue;
+                else if (checkIfRegistered)
+                    Console.WriteLine("Registering " + @interface + " as " + register + " because it's not registered yet");
 
                 bool isUnique = !@interface.IsDefined(typeof(NonUniqueProviderAttribute), false);
 
@@ -101,14 +103,19 @@ namespace WDE.Module
             }
         }
 
-        public void RegisterFallbackTypes(IContainerRegistry container)
+        protected void AutoRegisterFallbackTypesByConvention(Assembly assembly, IContainerRegistry container)
         {
-            var fallbackRegisters = GetType().Assembly.GetTypes().Where(t => !t.IsAbstract && t.IsDefined(typeof(FallbackAutoRegisterAttribute), true));
+            var fallbackRegisters = assembly.GetTypes().Where(t => !t.IsAbstract && t.IsDefined(typeof(FallbackAutoRegisterAttribute), true));
 
             foreach (Type register in fallbackRegisters)
             {
                 RegisterType(register, container, true);
-            }   
+            }
+        }
+
+        public virtual void RegisterFallbackTypes(IContainerRegistry container)
+        {
+            AutoRegisterFallbackTypesByConvention(GetType().Assembly, container);
         }
         
         public virtual void FinalizeRegistration(IContainerRegistry container)

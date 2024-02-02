@@ -160,5 +160,53 @@ namespace WDE.Common.Utils
                 sb.Append($"{milliseconds}ms");
             return sb.ToString();
         }
+
+        private static bool TryConsumeWordInternal(this string s, ref int startIndex, out ReadOnlySpan<char> str)
+        {
+            var nextSpace = s.IndexOf(' ', startIndex);
+            if (nextSpace == -1)
+            {
+                str = s.AsSpan(startIndex);
+                return true;
+            }
+            else
+            {
+                str = s.AsSpan(startIndex, nextSpace - startIndex);
+                startIndex = nextSpace + 1;
+                return true;
+            }
+        }
+
+        public static bool TryConsumeWord(this string s, ref int startIndex, out string str)
+        {
+            if (s.TryConsumeWordInternal(ref startIndex, out var span))
+            {
+                str = span.ToString();
+                return true;
+            }
+            else
+            {
+                str = "";
+                return false;
+            }
+        }
+
+        public static bool TryConsumeInt(this string s, ref int startIndex, out int number)
+        {
+            number = 0;
+            return s.TryConsumeWordInternal(ref startIndex, out var word) && int.TryParse(word, out number);
+        }
+
+        public static bool TryConsumeUInt(this string s, ref int startIndex, out uint number)
+        {
+            number = 0;
+            return s.TryConsumeWordInternal(ref startIndex, out var word) && uint.TryParse(word, out number);
+        }
+
+        public static bool TryConsumeLong(this string s, ref int startIndex, out long number)
+        {
+            number = 0;
+            return s.TryConsumeWordInternal(ref startIndex, out var word) && long.TryParse(word, out number);
+        }
     }
 }

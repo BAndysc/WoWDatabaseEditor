@@ -135,6 +135,10 @@ namespace WDE.SmartScriptEditor.Models
 
         public SmartTarget Target => target;
 
+        public override SmartScriptBase? Script => Parent?.Script;
+
+        public override SmartType SmartType => SmartType.SmartAction;
+
         protected override string ReadableImpl
         {
             get
@@ -238,6 +242,7 @@ namespace WDE.SmartScriptEditor.Models
             //se.Conditions = Conditions?.ToList();
             se.VirtualLineId = VirtualLineId;
             se.DestinationEventId = DestinationEventId;
+            se.DestinationTimedActionListId = DestinationTimedActionListId;
             se.IsInInlineActionList = IsInInlineActionList;
             se.CopyParameters(this);
             se.comment.Copy(comment);

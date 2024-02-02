@@ -11,5 +11,7 @@ namespace WDE.SmartScriptEditor.Editor
         IReadOnlyList<IConditionLine> ToDatabaseCompatibleConditions(SmartScript script, SmartEvent @event, int eventId);
         (ISmartScriptLine[], IConditionLine[]?) ToDatabaseCompatibleSmartScript(SmartScript script);
         IQuery GenerateSql(ISmartScriptSolutionItem item, SmartScript script);
+        int GetDatabaseScriptTypeId(SmartScriptType type);
+        SmartScriptType GetScriptTypeFromId(int id);
     }
 }

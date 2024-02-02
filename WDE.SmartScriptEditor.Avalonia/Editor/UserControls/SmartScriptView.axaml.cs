@@ -10,7 +10,11 @@ using Avalonia.Markup.Xaml;
 using Avalonia.VisualTree;
 using Prism.Commands;
 using WDE.Common.Avalonia.Controls;
+using WDE.Common.Avalonia.Utils;
+using WDE.Common.Services;
+using WDE.Common.Services.MessageBox;
 using WDE.Common.Utils;
+using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Editor.ViewModels;
 using WDE.SmartScriptEditor.Models;
 
@@ -34,6 +38,15 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
         
         private void Control_OnContextRequested(object? sender, ContextRequestedEventArgs e)
         {
+            var panel = this.FindControl<VirtualizedSmartScriptPanel>("SmartPanel");
+            e.TryGetPosition(panel, out var point);
+
+            if (point.X < VirtualizedSmartScriptPanel.BreakpointsMargin)
+            {
+                e.Handled = true;
+                return;
+            }
+
             var dataContext = DataContext as SmartScriptEditorViewModel;
             var control = sender as Control;
             var contextMenu = control?.ContextMenu;
@@ -41,6 +54,7 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
             if (contextMenu == null || dataContext == null)
                 return;
 
+            var smartDataManager = dataContext.SmartDataManager;
             var topLevel = control.GetVisualRoot() as TopLevel;
             var pointerOverElement = topLevel?.GetValue(TopLevel.PointerOverElementProperty);
 
@@ -81,6 +95,24 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
             {
                 if (ftb.OverContext is ParameterWithContext context)
                 {
+                    if (smartDataManager.TryGetRawData(context.Context.SmartType, context.Context.Id, out var data) &&
+                        data.Parameters != null &&
+                        context.ParameterIndex.HasValue &&
+                        context.ParameterIndex.Value >= 0 &&
+                        context.ParameterIndex.Value < data.Parameters.Count &&
+                        data.Parameters[context.ParameterIndex.Value].Type == "SpellParameter")
+                    {
+                        var spellDebugger = ViewBind.ResolveViewModel<IBaseSpellDebugger>();
+                        if (spellDebugger.Enabled)
+                        {
+                            var spellId = (uint)context.Parameter.Value;
+                            var header = spellDebugger.IsDebuggingSpell(spellId) ? "Remove spell from debugger" : "Add spell to debugger";
+                            AddMenuItem(header, new AsyncAutoCommand(async () =>
+                            {
+                                await spellDebugger.ToggleSpellDebugging(spellId);
+                            }).WrapMessageBox<Exception>(ViewBind.ResolveViewModel<IMessageBoxService>()));
+                        }
+                    }
                     AddMenuItem("Copy parameter value", new DelegateCommand(() =>
                     {
                         AvaloniaLocator.Current.GetRequiredService<IClipboard>().SetTextAsync(context.Parameter.Value.ToString()).ListenErrors();

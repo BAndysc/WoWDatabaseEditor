@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Editor;
 
 namespace WDE.SmartScriptEditor.Models
@@ -26,5 +27,7 @@ namespace WDE.SmartScriptEditor.Models
             
             return se;
         }
+
+        public override SmartType SmartType => SmartType.SmartTarget;
     }
 }

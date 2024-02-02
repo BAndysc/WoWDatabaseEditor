@@ -23,6 +23,7 @@ namespace WDE.TrinitySmartScriptEditor.Editor
         public ParametersCount TargetParametersCount { get; } = new ParametersCount(3, 4, 0);
         public IParameter<long> ConditionTargetParameter { get; }
         public IParameter<long> EventFlagsParameter => SmartEventFlagParameter.Instance;
+        public int TargetConditionId => -1;
 
         public TrinityEditorFeatures(ICurrentCoreVersion coreVersion)
         {
@@ -48,6 +49,7 @@ namespace WDE.TrinitySmartScriptEditor.Editor
         public ParametersCount TargetParametersCount { get; } = new ParametersCount(3, 4, 0);
         public IParameter<long> ConditionTargetParameter { get; }
         public IParameter<long> EventFlagsParameter => SmartEventFlagParameter.Instance;
+        public int TargetConditionId => -1;
 
         public AzerothEditorFeatures(ICurrentCoreVersion coreVersion)
         {
@@ -82,5 +84,6 @@ namespace WDE.TrinitySmartScriptEditor.Editor
         public ParametersCount TargetParametersCount => current.TargetParametersCount;
         public IParameter<long> ConditionTargetParameter => current.ConditionTargetParameter;
         public IParameter<long> EventFlagsParameter => current.EventFlagsParameter;
+        public int TargetConditionId => current.TargetConditionId;
     }
 }

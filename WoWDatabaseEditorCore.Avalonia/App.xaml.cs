@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -127,6 +128,8 @@ namespace WoWDatabaseEditorCore.Avalonia
         private class DummyStatusBar : IStatusBar
         {
             public void PublishNotification(INotification notification) { }
+            public INotification? CurrentNotification { get; set; }
+            public event PropertyChangedEventHandler? PropertyChanged;
         }
 
         protected override void RegisterRequiredTypes(IContainerRegistry containerRegistry)

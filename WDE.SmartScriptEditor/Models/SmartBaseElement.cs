@@ -7,6 +7,7 @@ using Unity.Injection;
 using WDE.Common.Parameters;
 using WDE.Conditions.Shared;
 using WDE.Parameters.Models;
+using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Editor;
 using WDE.SmartScriptEditor.Parameters;
 
@@ -20,6 +21,10 @@ namespace WDE.SmartScriptEditor.Models
         public event EventHandler OnChanged = delegate { };
         public event Action<SmartBaseElement, int, int> OnIdChanged = delegate { };
 
+        public abstract SmartScriptBase? Script { get; }
+
+        public abstract SmartType SmartType { get; }
+
         /// <summary>
         /// a line id, used only within the editor (doesn't match exported EventId). Unique within a script,
         /// even when using begin inline actionlist
@@ -31,7 +36,22 @@ namespace WDE.SmartScriptEditor.Models
         /// Can also repeat within a single script when using inline timed action lists (because they generate few output scripts)
         /// </summary>
         public virtual int? DestinationEventId { get; set; }
-        
+
+        /// <summary>
+        /// currently saved database event id (smart_script.id). Can be null when the action/event is not yet in the database
+        /// </summary>
+        public virtual int? SavedDatabaseEventId { get; set; }
+
+        /// <summary>
+        /// For 'inline timed actionlist' actions, this will keep the destination actionlist id
+        /// </summary>
+        public virtual int? DestinationTimedActionListId { get; set; }
+
+        /// <summary>
+        /// For 'inline timed actionlist' actions, this will keep the saved destination actionlist id
+        /// </summary>
+        public virtual int? SavedTimedActionListId { get; set; }
+
         /// <summary>
         /// True for actions which will be exported into a timed actionlists.
         /// </summary>
@@ -121,7 +141,7 @@ namespace WDE.SmartScriptEditor.Models
                 }
             }
 
-            Context = @params.Select(p => (object?)new ParameterWithContext(p, this)).ToList();
+            Context = @params.Select((p, index) => (object?)new ParameterWithContext(p, index, this)).ToList();
             OnChanged += (_, _) => InvalidateReadable();
         }
 
@@ -229,13 +249,15 @@ namespace WDE.SmartScriptEditor.Models
 
     public class ParameterWithContext
     {
-        public ParameterWithContext(ParameterValueHolder<long> parameter, SmartBaseElement context)
+        public ParameterWithContext(ParameterValueHolder<long> parameter, int? parameterIndex, SmartBaseElement context)
         {
             Parameter = parameter;
+            ParameterIndex = parameterIndex;
             Context = context;
         }
 
         public ParameterValueHolder<long> Parameter { get; }
+        public int? ParameterIndex { get; }
         public SmartBaseElement Context { get; }
     }
 }

@@ -6,9 +6,10 @@ using WDE.Module.Attributes;
 namespace WDE.Common.Managers
 {
     [UniqueProvider]
-    public interface IStatusBar
+    public interface IStatusBar : INotifyPropertyChanged
     {
         void PublishNotification(INotification notification);
+        INotification? CurrentNotification { get; }
     }
 
     public interface INotification

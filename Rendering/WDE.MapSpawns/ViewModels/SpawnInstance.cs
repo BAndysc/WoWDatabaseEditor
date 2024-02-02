@@ -17,6 +17,7 @@ public abstract class SpawnInstance : IChildType, IManagedComponentData
     public abstract bool IsVisibleInPhase(IGamePhaseService gamePhaseService);
     
     public bool IsSpawned => WorldObject != null;
+    public bool CanBeExpanded => false;
     public abstract void Dispose();
     public uint NestLevel { get; set; }
     public bool IsVisible { get; set; }

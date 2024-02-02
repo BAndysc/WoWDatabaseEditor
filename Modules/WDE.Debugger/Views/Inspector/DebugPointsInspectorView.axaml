@@ -1,0 +1,44 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:inspector="clr-namespace:WDE.Debugger.ViewModels.Inspector"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="inspector:DebugPointsInspectorViewModel"
+             x:Class="WDE.Debugger.Views.Inspector.DebugPointsInspectorView">
+  <Grid ColumnDefinitions="350,5,*">
+    <Border
+      Background="{DynamicResource ThemeBackgroundBrush}"
+      BorderBrush="{DynamicResource ThemeBorderMidBrush}"
+      BorderThickness="{DynamicResource ThemeBorderThickness}">
+      <ScrollViewer HorizontalScrollBarVisibility="Auto">
+        <VirtualizedTreeView Items="{CompiledBinding FlatItems}" SelectedNode="{CompiledBinding SelectedNode, Mode=TwoWay}">
+          <VirtualizedTreeView.DataTemplates>
+            <DataTemplate x:DataType="inspector:InspectorDebugSourceViewModel" DataType="inspector:InspectorDebugSourceViewModel">
+              <TextBlock VerticalAlignment="Center" Text="{CompiledBinding Name }" />
+            </DataTemplate>
+            <DataTemplate x:DataType="inspector:InspectorDebugPointViewModel" DataType="inspector:InspectorDebugPointViewModel">
+              <StackPanel Orientation="Horizontal">
+                <CheckBox IsChecked="{CompiledBinding IsEnabled}" />
+                <BreakpointIcon IsConnected="{CompiledBinding IsConnected}"
+                                IsDisabled="{CompiledBinding !IsEnabled}"
+                                IsDeactivated="{CompiledBinding IsDeactivated}"
+                                State="{CompiledBinding State}"
+                                SuspendsExecution="{CompiledBinding SuspendExecution}"
+                                Width="16"
+                                Height="16"
+                                Margin="0,0,8,0"
+                                VerticalAlignment="Center" />
+                <TextBlock Text="{CompiledBinding Header}" VerticalAlignment="Center" />
+              </StackPanel>
+            </DataTemplate>
+          </VirtualizedTreeView.DataTemplates>
+        </VirtualizedTreeView>
+      </ScrollViewer>
+    </Border>
+
+    <GridSplitter Classes="horizontal" Grid.Column="1" />
+
+    <ContentControl Grid.Column="2" Margin="10" Content="{CompiledBinding SelectedDebugPointViewModel}" />
+  </Grid>
+</UserControl>

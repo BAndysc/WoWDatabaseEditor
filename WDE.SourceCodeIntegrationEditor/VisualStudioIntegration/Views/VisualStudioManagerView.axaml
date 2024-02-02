@@ -1,0 +1,21 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:WDE.SourceCodeIntegrationEditor.VisualStudioIntegration.ViewModels"
+             xmlns:views="clr-namespace:WDE.SourceCodeIntegrationEditor.VisualStudioIntegration.Views"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:VisualStudioManagerViewModel"
+             ClipToBounds="False"
+             x:Class="WDE.SourceCodeIntegrationEditor.VisualStudioIntegration.Views.VisualStudioManagerView">
+  <UserControl.Styles>
+    <StyleInclude Source="avares://WDE.SourceCodeIntegrationEditor/VisualStudioIntegration/Views/BalloonPopup.axaml" />
+  </UserControl.Styles>
+  <ItemsControl ClipToBounds="False" Items="{CompiledBinding LoosePopups}">
+    <ItemsControl.ItemTemplate>
+      <DataTemplate>
+        <views:BreakpointHitPopupView />
+      </DataTemplate>
+    </ItemsControl.ItemTemplate>
+  </ItemsControl>
+</UserControl>

@@ -22,7 +22,7 @@ namespace WDE.SmartScriptEditor.Editor
         ParametersCount TargetParametersCount { get; }
         IParameter<long> ConditionTargetParameter { get; }
         IParameter<long> EventFlagsParameter { get; }
-        int TargetConditionId => -1;
+        int TargetConditionId { get; }
     }
 
     public readonly struct ParametersCount

@@ -1,45 +1,46 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
+using Generator.Equals;
 
 namespace WDE.Common.Database
 {
     public interface ICondition
     {
-        int ElseGroup { get; set; }
-        
-        int ConditionIndex { get; set; }
-        
-        int ConditionParent { get; set; }
+        int ElseGroup { get; }
 
-        int ConditionType { get; set; }
+        int ConditionIndex { get; }
 
-        byte ConditionTarget { get; set; }
+        int ConditionParent { get; }
 
-        long ConditionValue1 { get; set; }
+        int ConditionType { get; }
 
-        long ConditionValue2 { get; set; }
+        byte ConditionTarget { get; }
 
-        long ConditionValue3 { get; set; }
+        long ConditionValue1 { get; }
 
-        long ConditionValue4 { get; set; }
+        long ConditionValue2 { get; }
 
-        string ConditionStringValue1 { get; set; }
-        
-        int NegativeCondition { get; set; }
+        long ConditionValue3 { get; }
 
-        string? Comment { get; set; }
+        long ConditionValue4 { get; }
+
+        string ConditionStringValue1 { get; }
+
+        int NegativeCondition { get; }
+
+        string? Comment { get; }
     }
 
     public interface IConditionLine : ICondition
     {
-        int SourceType { get; set; }
+        int SourceType { get; }
 
-        int SourceGroup { get; set; }
+        int SourceGroup { get; }
 
-        int SourceEntry { get; set; }
+        int SourceEntry { get; }
 
-        int SourceId { get; set; }
+        int SourceId { get; }
     }
 
     public static class ConditionLineExtensions
@@ -84,7 +85,8 @@ namespace WDE.Common.Database
     }
     
     // KEEP IT POCO!
-    public class AbstractConditionLine : IConditionLine
+    [Equatable] // keep equatable only for primary key columns
+    public partial class AbstractConditionLine : IConditionLine
     {
         public AbstractConditionLine() { }
 
@@ -130,42 +132,59 @@ namespace WDE.Common.Database
             NegativeCondition = condition.NegativeCondition;
             Comment = condition.Comment;
         }
-        
-        public int SourceType { get; set; }
 
-        public int SourceGroup { get; set; }
+        [DefaultEquality]
+        public int SourceType { get; init; }
 
-        public int SourceEntry { get; set; }
+        [DefaultEquality]
+        public int SourceGroup { get; init; }
 
-        public int SourceId { get; set; }
+        [DefaultEquality]
+        public int SourceEntry { get; init; }
 
-        public int ElseGroup { get; set; }
+        [DefaultEquality]
+        public int SourceId { get; init; }
 
-        public int ConditionIndex { get; set; }
-        
-        public int ConditionParent { get; set; }
+        [DefaultEquality]
+        public int ElseGroup { get; init; }
 
-        public int ConditionType { get; set; }
+        [DefaultEquality]
+        public int ConditionIndex { get; init; }
 
-        public byte ConditionTarget { get; set; }
+        [DefaultEquality]
+        public int ConditionParent { get; init; }
 
-        public long ConditionValue1 { get; set; }
+        [DefaultEquality]
+        public int ConditionType { get; init; }
 
-        public long ConditionValue2 { get; set; }
+        [DefaultEquality]
+        public byte ConditionTarget { get; init; }
 
-        public long ConditionValue3 { get; set; }
-        
-        public long ConditionValue4 { get; set; }
+        [DefaultEquality]
+        public long ConditionValue1 { get; init; }
 
-        public string ConditionStringValue1 { get; set; } = "";
+        [DefaultEquality]
+        public long ConditionValue2 { get; init; }
 
-        public int NegativeCondition { get; set; }
+        [DefaultEquality]
+        public long ConditionValue3 { get; init; }
 
-        public string? Comment { get; set; }
+        [DefaultEquality]
+        public long ConditionValue4 { get; init; }
+
+        [IgnoreEquality]
+        public string ConditionStringValue1 { get; init; } = "";
+
+        [DefaultEquality]
+        public int NegativeCondition { get; init; }
+
+        [IgnoreEquality]
+        public string? Comment { get; init; }
     }
     
     // KEEP it POCO
-    public class AbstractCondition : ICondition, IEquatable<AbstractCondition>
+    [Equatable] // keep equatable for primary key columns only
+    public partial class AbstractCondition : ICondition
     {
         public AbstractCondition() { }
 
@@ -185,60 +204,71 @@ namespace WDE.Common.Database
             Comment = line.Comment;
         }
         
-        public int ElseGroup { get; set; }
+        [DefaultEquality] public int ElseGroup { get; init; }
         
-        public int ConditionIndex { get; set; }
+        [DefaultEquality] public int ConditionIndex { get; init; }
         
-        public int ConditionParent { get; set; }
+        [DefaultEquality] public int ConditionParent { get; init; }
 
-        public int ConditionType { get; set; }
+        [DefaultEquality] public int ConditionType { get; init; }
 
-        public byte ConditionTarget { get; set; }
+        [DefaultEquality] public byte ConditionTarget { get; init; }
 
-        public long ConditionValue1 { get; set; }
+        [DefaultEquality] public long ConditionValue1 { get; init; }
 
-        public long ConditionValue2 { get; set; }
+        [DefaultEquality] public long ConditionValue2 { get; init; }
 
-        public long ConditionValue3 { get; set; }
+        [DefaultEquality] public long ConditionValue3 { get; init; }
         
-        public long ConditionValue4 { get; set; }
+        [DefaultEquality] public long ConditionValue4 { get; init; }
 
-        public string ConditionStringValue1 { get; set; } = "";
+        [DefaultEquality] public string ConditionStringValue1 { get; init; } = "";
 
-        public int NegativeCondition { get; set; }
+        [DefaultEquality] public int NegativeCondition { get; init; }
 
-        public string? Comment { get; set; }
+        [IgnoreEquality] public string? Comment { get; init; }
 
         public override string ToString()
         {
             return $"Condition[Else={ElseGroup}, Index={ConditionIndex}, Parent={ConditionParent}, Type={ConditionType}, Target={ConditionTarget}, Value1={ConditionValue1}, Value2={ConditionValue2}, Value3={ConditionValue3}, Value4={ConditionValue4}, Negative={NegativeCondition}, Comment={Comment}]";
         }
-        
-        public bool Equals(AbstractCondition? other)
+
+        public AbstractCondition WithConditionIndex(int newConditionIndex)
         {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
-            return ElseGroup == other.ElseGroup && ConditionIndex == other.ConditionIndex && ConditionParent == other.ConditionParent && ConditionType == other.ConditionType && ConditionTarget == other.ConditionTarget && ConditionValue1 == other.ConditionValue1 && ConditionValue2 == other.ConditionValue2 && ConditionValue3 == other.ConditionValue3 && ConditionValue4 == other.ConditionValue4 && ConditionStringValue1 == other.ConditionStringValue1 && NegativeCondition == other.NegativeCondition && Comment == other.Comment;
+            return new AbstractCondition
+            {
+                ElseGroup = ElseGroup,
+                ConditionIndex = newConditionIndex,
+                ConditionParent = ConditionParent,
+                ConditionType = ConditionType,
+                ConditionTarget = ConditionTarget,
+                ConditionValue1 = ConditionValue1,
+                ConditionValue2 = ConditionValue2,
+                ConditionValue3 = ConditionValue3,
+                ConditionValue4 = ConditionValue4,
+                ConditionStringValue1 = ConditionStringValue1,
+                NegativeCondition = NegativeCondition,
+                Comment = Comment
+            };
         }
 
-        public override bool Equals(object? obj)
+        public AbstractCondition WithConditionParent(int newConditionParent)
         {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((AbstractCondition)obj);
-        }
-
-        public override int GetHashCode() => 0;
-
-        public static bool operator ==(AbstractCondition? left, AbstractCondition? right)
-        {
-            return Equals(left, right);
-        }
-
-        public static bool operator !=(AbstractCondition? left, AbstractCondition? right)
-        {
-            return !Equals(left, right);
+            return new AbstractCondition
+            {
+                ElseGroup = ElseGroup,
+                ConditionIndex = ConditionIndex,
+                ConditionParent = newConditionParent,
+                ConditionType = ConditionType,
+                ConditionTarget = ConditionTarget,
+                ConditionValue1 = ConditionValue1,
+                ConditionValue2 = ConditionValue2,
+                ConditionValue3 = ConditionValue3,
+                ConditionValue4 = ConditionValue4,
+                ConditionStringValue1 = ConditionStringValue1,
+                NegativeCondition = NegativeCondition,
+                Comment = Comment
+            };
         }
     }
 }

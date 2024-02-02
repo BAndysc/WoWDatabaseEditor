@@ -183,7 +183,22 @@ public class FlatTreeListTests
         Assert.AreEqual(1, p.children[1].Value);
     }
 
-    
+    [Test]
+    public void Test_ParentCanBeRemoved()
+    {
+        var p = new ParentType(true, new ParentType(true, new Child(3)), new Child(2));
+        var p2 = new ParentType(true, new ParentType(true, new Child(3)), new Child(2));
+        ObservableCollection<ParentType> parents = new() { p, p2 };
+        FlatTreeList<ParentType, Child> flat = new FlatTreeList<ParentType, Child>(parents);
+
+        parents.RemoveAt(1);
+        parents.RemoveAt(0);
+
+        CollectionAssert.AreEqual(new object[]
+        {
+        }, flat);
+    }
+
     private class ParentType : IParentType, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -192,10 +207,10 @@ public class FlatTreeListTests
 
         private bool isExpanded;
 
+        public bool CanBeExpanded => true;
         public uint NestLevel { get; set; }
         public bool IsVisible { get; set; }
         public IParentType? Parent { get; set; }
-        public bool CanBeExpanded => true;
 
         public bool IsExpanded
         {
@@ -236,9 +251,9 @@ public class FlatTreeListTests
         }
 
         public readonly int Value;
+        public bool CanBeExpanded => false;
         public uint NestLevel { get; set; }
         public bool IsVisible { get; set; }
         public IParentType? Parent { get; set; }
-        public bool CanBeExpanded => false;
     }
 }

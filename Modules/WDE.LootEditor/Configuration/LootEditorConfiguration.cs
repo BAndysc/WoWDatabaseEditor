@@ -83,7 +83,10 @@ public partial class LootEditorConfiguration : ObservableBase, IConfigurable, ID
 
         EditConditionsCommand = new AsyncAutoCommand<CustomLootItemSettingViewModel>(async item =>
         {
-            var newConditions = await conditionEditService.EditConditions(editorFeatures.GetConditionSourceTypeFor(LootSourceType.Creature), item.Conditions);
+            var key = new IDatabaseProvider.ConditionKey(editorFeatures.GetConditionSourceTypeFor(LootSourceType.Creature))
+                .WithGroup(0)
+                .WithEntry((int)item.ItemOrCurrencyId);
+            var newConditions = await conditionEditService.EditConditions(key, item.Conditions);
             if (newConditions != null)
                 item.Conditions = newConditions.ToList();
         });

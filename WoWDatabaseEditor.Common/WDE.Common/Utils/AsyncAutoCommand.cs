@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;
 using Prism.Commands;
 using WDE.Common.Annotations;
+using WDE.Common.Exceptions;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Tasks;
 
@@ -270,8 +272,7 @@ namespace WDE.Common.Utils
         {
             return new AsyncCommandExceptionWrap<T>(cmd, async (e) =>
             {
-                Console.WriteLine(e);
-                await messageBoxService.SimpleDialog("Error", header ?? "Error occured while executing the command", e.Message);
+                await ShowError(messageBoxService, e, header);
             });
         }
         
@@ -279,9 +280,34 @@ namespace WDE.Common.Utils
         {
             return new AsyncCommandExceptionWrap<T, R>(cmd, async (e) =>
             {
+                await ShowError(messageBoxService, e, header);
+            });
+        }
+
+        private static async Task ShowError(IMessageBoxService messageBoxService, Exception e, string? header)
+        {
+            if (e is UserException userException)
+            {
+                await messageBoxService.SimpleDialog("Error", userException.Header ?? header ?? "Error occured while executing the command", e.Message);
+            }
+            else if (e is AggregateException aggregateException)
+            {
+                if (aggregateException.InnerExceptions.Count == 1)
+                {
+                    Console.WriteLine(aggregateException.InnerExceptions[0]);
+                    await messageBoxService.SimpleDialog("Error", header ?? "Error occured while executing the command", aggregateException.InnerExceptions[0].Message);
+                }
+                else
+                {
+                    Console.WriteLine(aggregateException);
+                    await messageBoxService.SimpleDialog("Error", header ?? "Errors occured while executing the command", string.Join("\n", aggregateException.InnerExceptions.Select(x => "*) " + x.Message)));
+                }
+            }
+            else
+            {
                 Console.WriteLine(e);
                 await messageBoxService.SimpleDialog("Error", header ?? "Error occured while executing the command", e.Message);
-            });
+            }
         }
     }
 }

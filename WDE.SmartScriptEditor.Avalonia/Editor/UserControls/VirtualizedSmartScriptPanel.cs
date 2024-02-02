@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls;
@@ -11,11 +12,21 @@ using Avalonia.Input.Platform;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using JetBrains.Profiler.Api;
+using Microsoft.CodeAnalysis.Operations;
+using Prism.Events;
+using WDE.Common.Avalonia.Debugging;
 using WDE.Common.Avalonia.Utils;
+using WDE.Common.Database;
+using WDE.Common.Debugging;
 using WDE.Common.Managers;
+using WDE.Common.Services.MessageBox;
 using WDE.Common.Utils;
 using WDE.MVVM.Observable;
+using WDE.SmartScriptEditor.Avalonia.Debugging;
+using WDE.SmartScriptEditor.Data;
+using WDE.SmartScriptEditor.Debugging;
 using WDE.SmartScriptEditor.Editor.UserControls;
+using WDE.SmartScriptEditor.Editor.ViewModels;
 using WDE.SmartScriptEditor.Models;
 using WDE.SmartScriptEditor.Settings;
 
@@ -68,14 +79,23 @@ public partial class VirtualizedSmartScriptPanel : Panel
         get => (ICommand?) GetValue(DropConditionsProperty) ?? AlwaysDisabledCommand.Command;
         set => SetValue(DropConditionsProperty, value);
     }
-    
+
     public Dictionary<int, DiagnosticSeverity>? Problems
     {
         get => (Dictionary<int, DiagnosticSeverity>?) GetValue(ProblemsProperty);
         set => SetValue(ProblemsProperty, value);
     }
     public static readonly AvaloniaProperty ProblemsProperty = AvaloniaProperty.Register<VirtualizedSmartScriptPanel, Dictionary<int, DiagnosticSeverity>?>(nameof(Problems));
-    
+
+    public IScriptBreakpoints? Breakpoints
+    {
+        get => (IScriptBreakpoints?)GetValue(BreakpointsProperty);
+        set => SetValue(BreakpointsProperty, value);
+    }
+
+    public static readonly AvaloniaProperty BreakpointsProperty =
+        AvaloniaProperty.Register<VirtualizedSmartScriptPanel, IScriptBreakpoints?>(nameof(Breakpoints));
+
     private bool hideComments;
     public static readonly DirectProperty<VirtualizedSmartScriptPanel, bool> HideCommentsProperty = AvaloniaProperty.RegisterDirect<VirtualizedSmartScriptPanel, bool>("HideComments", o => o.HideComments, (o, v) => o.HideComments = v);
 
@@ -84,7 +104,7 @@ public partial class VirtualizedSmartScriptPanel : Panel
         get => hideComments;
         set => SetAndRaise(HideCommentsProperty, ref hideComments, value);
     }
-    
+
     private bool hideConditions;
     public static readonly DirectProperty<VirtualizedSmartScriptPanel, bool> HideConditionsProperty = AvaloniaProperty.RegisterDirect<VirtualizedSmartScriptPanel, bool>("HideConditions", o => o.HideConditions, (o, v) => o.HideConditions = v);
     public bool HideConditions
@@ -105,8 +125,10 @@ public partial class VirtualizedSmartScriptPanel : Panel
     private const double PaddingRight = 5;
     private const double PaddingTop = 5;
     private const double EventPaddingLeft = 20;
+    public const double BreakpointsMargin = EventPaddingLeft + PaddingLeft;
     private const double ActionSpacing = 2;
     private const double ConditionSpacing = 2;
+    private const double BreakpointRadius = 8;
     private static readonly Thickness Padding = new (PaddingLeft, PaddingTop, PaddingRight, PaddingBottom);
     private double GroupSpacing => 4;
     private double EventSpacing => compactView ? 2 : 10;
@@ -262,6 +284,8 @@ public partial class VirtualizedSmartScriptPanel : Panel
     }
 
     private SmartScriptBase? attachedScript;
+    private IScriptBreakpoints? attachedBreakpoints;
+    private System.IDisposable? attachedBreakpointPopupRequest;
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
@@ -272,6 +296,13 @@ public partial class VirtualizedSmartScriptPanel : Panel
             Dispatcher.UIThread.Post(InvalidateScript); // <- not sure why it is needed. Without it sometimes the script is not rendered initially
             attachedScript = newScript;
         }
+
+        if (Breakpoints is { } breakpoints)
+        {
+            breakpoints.BreakpointsModified += InvalidateScript;
+            attachedBreakpointPopupRequest = ViewBind.ResolveViewModel<IEventAggregator>().GetEvent<IdeBreakpointRequestPopupEvent>().Subscribe(OnPopupOpenRequest);
+            attachedBreakpoints = breakpoints;
+        }
         if (ScrollView is { } sc)
         {
             sc.GetObservable(ScrollViewer.OffsetProperty).SubscribeAction(_ =>
@@ -281,11 +312,50 @@ public partial class VirtualizedSmartScriptPanel : Panel
         }
     }
 
+    private void OnPopupOpenRequest(IdeBreakpointRequestPopupEventArgs obj)
+    {
+        if (script is not SmartScript { } s)
+            return;
+
+        if (Breakpoints is not { } breakpoints)
+            return;
+
+        if (breakpoints.GetElement(obj.HitDebugPoint) is { } element)
+        {
+            if (element is SmartEvent ev)
+            {
+                obj.Handled = true;
+                obj.AttachPopupToObject = this;
+                obj.PopupOffsetX = ev.EventPosition.X;
+                obj.PopupOffsetY = ev.EventPosition.Bottom;
+            }
+            else if (element is SmartAction a)
+            {
+                obj.Handled = true;
+                obj.AttachPopupToObject = this;
+                obj.PopupOffsetX = a.Position.X + 50; // 50 offset to make it more look like it is attached to the action
+                obj.PopupOffsetY = a.Position.Bottom;
+            }
+            else if (element is SmartSource source && source.Parent is { } sourceParent)
+            {
+                obj.Handled = true;
+                obj.AttachPopupToObject = this;
+                obj.PopupOffsetX = sourceParent.Position.X;
+                obj.PopupOffsetY = sourceParent.Position.Bottom;
+            }
+        }
+    }
+
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
         if (attachedScript is { })
             attachedScript.InvalidateVisual -= InvalidateScript;
+        if (attachedBreakpoints is { })
+            attachedBreakpoints.BreakpointsModified -= InvalidateScript;
+        attachedBreakpointPopupRequest?.Dispose();
+        attachedBreakpointPopupRequest = null;
         attachedScript = null;
+        attachedBreakpoints = null;
         base.OnDetachedFromVisualTree(e);
         MeasureProfiler.SaveData();
     }
@@ -407,10 +477,10 @@ public partial class VirtualizedSmartScriptPanel : Panel
         }
     }
 
-    private bool AnyActionSelected() => 
+    private bool AnyActionSelected() =>
         script != null && script.Events.SelectMany(e => e.Actions).Any(a => a.IsSelected);
 
-    private bool AnyEventSelected() => 
+    private bool AnyEventSelected() =>
         script != null && script.Events.Any(a => a.IsSelected && a.IsEvent);
 
     private bool AnyGroupSelected() =>
@@ -418,16 +488,156 @@ public partial class VirtualizedSmartScriptPanel : Panel
 
     private bool mouseStartPositionValid = false;
     private bool leftMouseButtonPressed = false;
-    
+
+    private void CollectSmartElementBreakpointsAtPoint(Point point, List<SmartBaseElement> outputList)
+    {
+        var smartDataManager = ViewBind.ResolveViewModel<ISmartDataManager>();
+        foreach (var tuple in ScriptIterator)
+        {
+            if (!tuple.groupIsExpanded)
+                continue;
+
+            if (tuple.@event == null)
+                continue;
+
+            var eventDestinationId = tuple!.@event!.DestinationEventId;
+
+            var eventBreakPointRect = GetBreakpointRect(tuple!.@event);
+            if (eventBreakPointRect.Contains(point) &&
+                eventDestinationId.HasValue)
+            {
+                outputList.Add(tuple!.@event);
+            }
+
+            foreach (var action in tuple!.@event!.Actions)
+            {
+                if (action.Id == SmartConstants.ActionComment && HideComments)
+                    continue;
+
+                var breakPointRect = GetBreakpointRect(action);
+
+                if (breakPointRect.Contains(point))
+                {
+                    if (action.DestinationEventId is { } eventId)
+                    {
+                        outputList.Add(action);
+                        outputList.Add(action.Source);
+                        if (!smartDataManager.TryGetRawData(SmartType.SmartAction, action.Id, out var data) || data.TargetTypes != 0)
+                            outputList.Add(action.Target);
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
         base.OnPointerPressed(e);
 
         UpdateIsCopying(e.KeyModifiers);
-        if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed && e.ClickCount == 1 && script != null)
+        var point = e.GetPosition(this);
+        var rightMouseButton = e.GetCurrentPoint(this).Properties.IsRightButtonPressed;
+        var leftMouseButton = e.GetCurrentPoint(this).Properties.IsLeftButtonPressed;
+
+        if (e.ClickCount != 1 || script == null)
+            return;
+
+        foreach (SmartEvent ev in script.Events)
+            ev.IsSelected = false;
+
+        if (Breakpoints == null ||
+            point.X > PaddingLeft + EventPaddingLeft)
+            return;
+
+        List<SmartBaseElement> possibleTypes = new();
+        CollectSmartElementBreakpointsAtPoint(point, possibleTypes);
+
+        if (possibleTypes.Count == 0)
+            return;
+
+        if (possibleTypes.Any(x => Breakpoints.GetBreakpoint(x).HasValue))
         {
-            foreach (SmartEvent ev in script.Events)
-                ev.IsSelected = false;
+            if (rightMouseButton)
+            {
+                var placedBreakpoints = new List<(SmartBaseElement, DebugPointId)>();
+                foreach (var possibleType in possibleTypes)
+                {
+                    var placedBreakpoint = Breakpoints.GetBreakpoint(possibleType);
+                    if (placedBreakpoint.HasValue)
+                        placedBreakpoints.Add((possibleType, placedBreakpoint.Value));
+                }
+
+                if (placedBreakpoints.Count > 0)
+                {
+                    ViewBind.ResolveViewModel<IEditDebugPointService>().EditDebugPointInPopup(this, placedBreakpoints.Select(x => x.Item2).ToArray()).ListenErrors();
+                    e.Handled = true;
+                    return;
+                }
+            }
+            else
+            {
+                foreach (var possible in possibleTypes)
+                {
+                    Breakpoints.RemoveBreakpoint(possible).ListenErrors(ViewBind.ResolveViewModel<IMessageBoxService>());
+                }
+            }
+        }
+        else
+        {
+            var addBreakpointCommand = new AsyncAutoCommand<SmartBaseElement>(async element =>
+            {
+                if (rightMouseButton)
+                {
+                    var debugPoint = await Breakpoints.AddBreakpoint(element, SmartBreakpointFlags.None, null, true);
+                    await ViewBind.ResolveViewModel<IEditDebugPointService>().EditDebugPointInPopup(this, debugPoint);
+                    await Breakpoints.Synchronize(element);
+                }
+                else
+                {
+                    await Breakpoints.AddBreakpoint(element, SmartBreakpointFlags.None, null);
+                }
+            }).WrapMessageBox<Exception, SmartBaseElement>(ViewBind.ResolveViewModel<IMessageBoxService>());
+
+            var addAllBreakpointCommand = new AsyncAutoCommand(async () =>
+            {
+                if (rightMouseButton)
+                {
+                    List<DebugPointId> debugPoints = new();
+                    foreach (var pos in possibleTypes)
+                        debugPoints.Add(await Breakpoints.AddBreakpoint(pos, SmartBreakpointFlags.None, null));
+
+                    await ViewBind.ResolveViewModel<IEditDebugPointService>().EditDebugPointInPopup(this, debugPoints.ToArray());
+
+                    foreach (var pos in possibleTypes)
+                        await Breakpoints.Synchronize(pos);
+                }
+                else
+                {
+                    foreach (var pos in possibleTypes)
+                        await Breakpoints.AddBreakpoint(pos, SmartBreakpointFlags.None, null);
+                }
+            }).WrapMessageBox<Exception>(ViewBind.ResolveViewModel<IMessageBoxService>());
+
+            if (possibleTypes.Count > 1)
+            {
+                var menu = new BreakpointMenuViewModel();
+                foreach (var element in possibleTypes)
+                {
+                    menu.MenuItems.Add(new BreakpointMenuItemViewModel(element, addBreakpointCommand));
+                }
+                menu.MenuItems.Add(new BreakpointMenuItemViewModel(SmartBreakpointType.Any, "All", addAllBreakpointCommand, null));
+
+                var popup = new BreakpointMenuView()
+                {
+                    DataContext = menu
+                };
+                popup.Open(this);
+            }
+            else if (possibleTypes.Count == 1)
+            {
+                addBreakpointCommand.Execute(possibleTypes[0]);
+            }
         }
     }
 
@@ -450,12 +660,16 @@ public partial class VirtualizedSmartScriptPanel : Panel
         var point = e.GetPosition(this);
         mouseX = (float) point.X;
         mouseY = (float) point.Y;
+
+        if (mouseX < PaddingLeft + EventPaddingLeft + 50) // 50 is extra margin
+            InvalidateVisual(); // hover breakpoint might have changed
+
         if (!state.Properties.IsLeftButtonPressed)
         {
             mouseStartPosition = e.GetPosition(this);
             mouseStartPositionValid = true;
         }
-        if (mouseStartPositionValid && 
+        if (mouseStartPositionValid &&
             state.Properties.IsLeftButtonPressed &&
             !AnyDragging)
         {
@@ -483,6 +697,7 @@ public partial class VirtualizedSmartScriptPanel : Panel
             }
         }
 
+        UpdateBreakpointTooltip();
         UpdateOverElement();
 
         // scroll 
@@ -523,6 +738,162 @@ public partial class VirtualizedSmartScriptPanel : Panel
         }
 
         return false;
+    }
+
+    private (double y, double height, int actionIndex, int eventIndex)? GetActionFromY()
+    {
+        bool found = false;
+        foreach (var tuple in ScriptIterator)
+        {
+            if (tuple is (null, var ev, var inGroup, var groupExpanded, var eventIndex))
+            {
+                if (!groupExpanded)
+                    continue;
+
+                if (ev == null)
+                    continue;
+
+                int actionIndex = 0;
+                double actionsHeights = 0;
+                foreach (var action in ev!.Actions)
+                {
+                    if (action.Id == SmartConstants.ActionComment && HideComments)
+                        continue;
+
+                    var overTuple = (y: action.Position.Y + (action.Position.Height + ActionSpacing) / 2, action.Position.Height + ActionSpacing, actionIndex, eventIndex);
+                    actionsHeights += action.Position.Height + ActionSpacing;
+                    if (overTuple.y > mouseY)
+                    {
+                        return overTuple;
+                    }
+
+                    actionIndex++;
+                }
+
+                if (found)
+                    break;
+
+                var rest = (y: ev.Position.Y + actionsHeights + (ev.Position.Height - actionsHeights) / 2, ev.Position.Height - actionsHeights, ev.Actions.Count, eventIndex);
+                if (rest.y > mouseY)
+                {
+                    return rest;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private void UpdateBreakpointTooltip()
+    {
+        void DisableTooltip()
+        {
+            if (ToolTip.GetIsOpen(this))
+            {
+                ToolTip.SetIsOpen(this, false);
+            }
+            ToolTip.SetTip(this, null);
+        }
+        if (mouseX >= PaddingLeft + EventPaddingLeft)
+        {
+            DisableTooltip();
+            return;
+        }
+
+        if (script == null)
+            return;
+
+        var breakpoints = Breakpoints;
+
+        if (breakpoints == null)
+            return;
+
+        List<string>? breakpointsText = null;
+
+        string GetBreakpointStateText(BreakpointState state)
+        {
+            if (!breakpoints!.IsConnected)
+                return "The editor is not connected to the server. The breakpoint will be synced once you start the server.";
+
+            switch (state)
+            {
+                case BreakpointState.Pending:
+                    return "The breakpoint is being sent to the server";
+                case BreakpointState.PendingRemoval:
+                    return "The breakpoint is being removed from the server";
+                case BreakpointState.Synced:
+                    return "The breakpoint is enabled and synchronized";
+                case BreakpointState.WaitingForSync:
+                    return "The breakpoint is out of sync and will be synced after the document is saved";
+                case BreakpointState.SynchronizationError:
+                    return "The breakpoint couldn't be synced due to an error";
+            }
+
+            return state.ToString();
+        }
+
+        foreach (var tuple in ScriptIterator)
+        {
+            if (!tuple.groupIsExpanded)
+                continue;
+
+            if (tuple.@event == null)
+                continue;
+
+            var eventBreakpointRect = GetBreakpointRect(tuple.@event!);
+            if (eventBreakpointRect.Contains(new Point(mouseX, mouseY)))
+            {
+                if (breakpoints.GetBreakpoint(tuple.@event!) is { } eventBreakpoint)
+                {
+                    breakpointsText ??= new();
+                    breakpointsText.Add($"{tuple.@event!.Readable.RemoveTags()}\n{GetBreakpointStateText(breakpoints.GetState(eventBreakpoint))}");
+                }
+            }
+
+            foreach (var action in tuple.@event!.Actions)
+            {
+                if (action.Id == SmartConstants.ActionComment &&
+                    hideComments)
+                    continue;
+
+                var actionBreakpointRect = GetBreakpointRect(action);
+                if (actionBreakpointRect.Contains(new Point(mouseX, mouseY)))
+                {
+                    var actionReadable = action.Readable.RemoveTags();
+                    var sourceReadable = action.Source.Readable.RemoveTags();
+
+                    if (breakpoints.GetBreakpoint(action) is { } actionBreakpoint)
+                    {
+                        breakpointsText ??= new();
+                        actionReadable = actionReadable.Replace(sourceReadable + ": ", "");
+                        breakpointsText.Add($"{actionReadable}\n{GetBreakpointStateText(breakpoints.GetState(actionBreakpoint))}");
+                    }
+
+                    if (breakpoints.GetBreakpoint(action.Source) is { } sourceBreakpoint)
+                    {
+                        breakpointsText ??= new();
+                        breakpointsText.Add($"{sourceReadable}\n{GetBreakpointStateText(breakpoints.GetState(sourceBreakpoint))}");
+                    }
+
+                    if (breakpoints.GetBreakpoint(action.Target) is { } targetBreakpoint)
+                    {
+                        var targetReadable = action.Target.Readable.RemoveTags();
+                        breakpointsText ??= new();
+                        breakpointsText.Add($"{targetReadable}\n{GetBreakpointStateText(breakpoints.GetState(targetBreakpoint))}");
+                    }
+                }
+            }
+        }
+
+        if (breakpointsText == null)
+        {
+            DisableTooltip();
+        }
+        else
+        {
+            ToolTip.SetTip(this, string.Join("\n\n", breakpointsText));
+            ToolTip.SetIsOpen(this, true);
+        }
     }
 
     private void UpdateOverElement()
@@ -630,44 +1001,8 @@ public partial class VirtualizedSmartScriptPanel : Panel
         }
         else if (draggingActions)
         {
-            bool found = false;
-            foreach (var tuple in ScriptIterator)
-            {
-                if (tuple is (null, var ev, var inGroup, var groupExpanded, var eventIndex))
-                {
-                    if (!groupExpanded)
-                        continue;
-                    
-                    int actionIndex = 0;
-                    double actionsHeights = 0;
-                    foreach (var action in ev!.Actions)
-                    {
-                        if (action.Id == SmartConstants.ActionComment && HideComments)
-                            continue;
-                        
-                        var overTuple = (y: action.Position.Y + (action.Position.Height + ActionSpacing) / 2, action.Position.Height + ActionSpacing, actionIndex, eventIndex);
-                        actionsHeights += action.Position.Height + ActionSpacing;
-                        if (overTuple.y > mouseY)
-                        {
-                            overIndexAction = overTuple;
-                            found = true;
-                            break;
-                        }
-
-                        actionIndex++;
-                    }
-
-                    if (found)
-                        break;
-                
-                    var rest = (y: ev.Position.Y + actionsHeights + (ev.Position.Height - actionsHeights) / 2, ev.Position.Height - actionsHeights, ev.Actions.Count, eventIndex);
-                    if (rest.y > mouseY)
-                    {
-                        overIndexAction = rest;
-                        break;
-                    }
-                }
-            }
+            if (GetActionFromY() is { } action)
+                overIndexAction = action;
 
             InvalidateVisual();
         }
@@ -724,6 +1059,9 @@ public partial class VirtualizedSmartScriptPanel : Panel
     {
         base.OnPointerLeave(e);
         mouseStartPositionValid = false;
+        mouseY = -1;
+        mouseY = -1;
+        InvalidateVisual();
     }
 
     #endregion

@@ -6,6 +6,7 @@ using SmartFormat;
 using WDE.Common.Parameters;
 using WDE.Parameters;
 using WDE.Parameters.Models;
+using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Editor;
 using WDE.SmartScriptEditor.Models.Helpers;
 
@@ -51,7 +52,7 @@ namespace WDE.SmartScriptEditor.Models
             conditionTarget.PropertyChanged += ((sender, value) => CallOnChanged(sender));
             while (Context.Count < 9)
                 Context.Add(null);
-            Context.Add(new ParameterWithContext(conditionTarget, this));
+            Context.Add(new ParameterWithContext(conditionTarget, null, this));
         }
 
         public event Action<SmartCondition, int, int>? OnIndentChanged;
@@ -110,6 +111,10 @@ namespace WDE.SmartScriptEditor.Models
                 OnPropertyChanged();
             }
         }
+
+        public override SmartScriptBase? Script => Parent?.Script;
+
+        public override SmartType SmartType => SmartType.SmartCondition;
 
         protected override string ReadableImpl
         {

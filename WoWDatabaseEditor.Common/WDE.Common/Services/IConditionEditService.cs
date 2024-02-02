@@ -8,7 +8,7 @@ namespace WDE.Common.Services
     [UniqueProvider]
     public interface IConditionEditService
     {
-        Task<IEnumerable<ICondition>?> EditConditions(int conditionSourceType, IReadOnlyList<ICondition>? conditions, string? customTitle = null);
+        Task<IEnumerable<ICondition>?> EditConditions(IDatabaseProvider.ConditionKey conditionKey, IReadOnlyList<ICondition>? conditions, string? customTitle = null);
 
         /// <summary>
         /// Opens the conditions editor for exact condition key and mask 

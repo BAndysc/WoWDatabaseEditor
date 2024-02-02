@@ -27,4 +27,18 @@ public static class Extensions
         }
         return false;
     }
+
+    public static T GetResourceOrDefault<T>(this object? _, string key, T defaultVal)
+    {
+        if (Application.Current!.Styles.TryGetResource(key, out var res) && res is T t)
+        {
+            return t;
+        }
+        if (Application.Current.Resources.TryGetResource(key, out var res2) && res2 is T t2)
+        {
+            return t2;
+        }
+
+        return defaultVal;
+    }
 }

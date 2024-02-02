@@ -1,0 +1,37 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:inspector="clr-namespace:WDE.Debugger.ViewModels.Inspector"
+             xmlns:codeCompletionTextEditor="clr-namespace:WDE.Common.Avalonia.Controls.CodeCompletionTextEditor;assembly=WDE.Common.Avalonia"
+             xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="inspector:SelectedDebugPointViewModel"
+             x:Class="WDE.Debugger.Views.Inspector.SelectedDebugPointView">
+  <ScrollViewer>
+    <StackPanel Spacing="10" TabIndex="1">
+      <TextBlock FontWeight="Bold" Text="{CompiledBinding Header}" TextWrapping="WrapWithOverflow" />
+
+      <InfoBar IsOpen="{CompiledBinding IsDeactivated}" Title="This breakpoint is deactivated"
+               Message="This breakpoint is active only when a document is opened (i.e. a smart script or condition editor)." Severity="Informational" IsIconVisible="True" IsClosable="False" />
+
+      <!-- why explicit TextBlocks? Idk, but in Avalonia 0.10.0 the texts were missing when they were directly as the Content property and the popup was opened in the condition editor -->
+      <CheckBox IsChecked="{CompiledBinding IsEnabled}"><TextBlock Text="Enabled" /></CheckBox>
+      <CheckBox IsEnabled="{CompiledBinding CanChangeSuspendExecution}" IsChecked="{CompiledBinding SuspendExecution}"><TextBlock Text="Suspend execution" /></CheckBox>
+      <CheckBox IsChecked="{CompiledBinding Log}"><TextBlock Text="Log" /></CheckBox>
+      <StackPanel IsVisible="{CompiledBinding Log}">
+        <TwoColumnsPanel>
+          <TextBlock VerticalAlignment="Center" Text="Evaluate expression:" Margin="0,0,5,0"/>
+          <codeCompletionTextEditor:CodeCompletionTextEditor CodeCompletionRootKey="{CompiledBinding CodeCompletionRootKey}" PlaceholderText="i.e. $.script" Text="{CompiledBinding LogFormat}" />
+
+          <CheckBox IsChecked="{CompiledBinding UseLogCondition}" Margin="0,0,5,0"><TextBlock Text="Log if condition met:" /></CheckBox>
+          <codeCompletionTextEditor:CodeCompletionTextEditor IsEnabled="{CompiledBinding UseLogCondition}" CodeCompletionRootKey="{CompiledBinding CodeCompletionRootKey}" PlaceholderText="i.e. $.script.entry != 1000" Text="{CompiledBinding LogCondition}" />
+        </TwoColumnsPanel>
+      </StackPanel>
+      <CheckBox IsEnabled="{CompiledBinding CanChangeGenerateStacktrace}" IsChecked="{CompiledBinding NoStacktrace}" IsVisible="{CompiledBinding Log}"><TextBlock Text="Don't log stacktrace" /></CheckBox>
+      <Panel IsVisible="{CompiledBinding PayloadViewModel, Converter={x:Static NullConverter.IsNotNull}}" >
+        <ContentControl Content="{CompiledBinding PayloadViewModel}" ContentTemplate="{x:Static utils:ViewDataTemplate.Template}" />
+      </Panel>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

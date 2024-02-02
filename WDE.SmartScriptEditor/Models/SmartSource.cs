@@ -8,6 +8,7 @@ using SmartFormat.Core.Parsing;
 using WDE.Common.Database;
 using WDE.Common.Parameters;
 using WDE.Parameters.Models;
+using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Editor;
 using WDE.SmartScriptEditor.Models.Helpers;
 
@@ -40,6 +41,10 @@ namespace WDE.SmartScriptEditor.Models
             set => parent = value;
         }
 
+        public override SmartScriptBase? Script => parent?.Script;
+
+        public override SmartType SmartType => SmartType.SmartSource;
+
         public override int VirtualLineId
         {
             get => parent?.VirtualLineId ?? -1;
@@ -51,6 +56,26 @@ namespace WDE.SmartScriptEditor.Models
             get => parent?.DestinationEventId;
             set { }
         }
+
+        public override int? SavedDatabaseEventId
+        {
+            get => parent?.SavedDatabaseEventId;
+            set { }
+        }
+
+        public override int? DestinationTimedActionListId
+        {
+            get => parent?.DestinationTimedActionListId;
+            set { }
+        }
+
+        public override int? SavedTimedActionListId
+        {
+            get => parent?.SavedTimedActionListId;
+            set { }
+        }
+
+        public int? DestinationConditionId { get; set; }
 
         public float X
         {

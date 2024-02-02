@@ -298,11 +298,18 @@ internal class MockSqlConnector : IMySqlConnector
                 IsSessionOpened = false;
             }
 
-            private class MockDataReader(string? databaseName) : IMySqlDataReader
+            private class MockDataReader : IMySqlDataReader
             {
-                public bool IsDBNull(int ordinal) => databaseName == null;
-                public object? GetValue(int ordinal) => databaseName;
-                public string? GetString(int ordinal) => databaseName;
+                private readonly string? databaseName1;
+
+                public MockDataReader(string? databaseName)
+                {
+                    databaseName1 = databaseName;
+                }
+
+                public bool IsDBNull(int ordinal) => databaseName1 == null;
+                public object? GetValue(int ordinal) => databaseName1;
+                public string? GetString(int ordinal) => databaseName1;
                 public bool GetBoolean(int ordinal) => throw new NotImplementedException();
                 public byte GetByte(int ordinal) => throw new NotImplementedException();
                 public sbyte GetSByte(int ordinal) => throw new NotImplementedException();

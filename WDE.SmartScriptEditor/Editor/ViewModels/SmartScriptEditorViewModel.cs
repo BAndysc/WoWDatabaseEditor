@@ -13,6 +13,8 @@ using PropertyChanged.SourceGenerator;
 using WDE.Common;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;
+using WDE.Common.Debugging;
+using WDE.Common.Disposables;
 using WDE.Common.History;
 using WDE.Common.Managers;
 using WDE.Common.Outliner;
@@ -29,6 +31,7 @@ using WDE.MVVM;
 using WDE.MVVM.Observable;
 using WDE.Parameters.Models;
 using WDE.SmartScriptEditor.Data;
+using WDE.SmartScriptEditor.Debugging;
 using WDE.SmartScriptEditor.Editor.UserControls;
 using WDE.SmartScriptEditor.Editor.ViewModels.Editing;
 using WDE.SmartScriptEditor.Exporter;
@@ -72,6 +75,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
 
         private ISmartScriptSolutionItem item;
         private SmartScript script;
+
+        public ISmartDataManager SmartDataManager => smartDataManager;
 
         public SmartTeachingTips TeachingTips { get; private set; }
         
@@ -158,7 +163,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             IOutlinerService outlinerService,
             ISmartScriptOutlinerModel outlinerData,
             ISmartHighlighter highlighter,
-            IDynamicContextMenuService dynamicContextMenuService)
+            IDynamicContextMenuService dynamicContextMenuService,
+            IScriptBreakpointsFactory breakpointsFactory)
         {
             History = history;
             this.smartScriptDatabase = smartScriptDatabase;
@@ -189,6 +195,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             this.outlinerData = outlinerData;
             this.highlighter = highlighter;
             this.dynamicContextMenuService = dynamicContextMenuService;
+            this.breakpointsFactory = breakpointsFactory;
             this.eventAggregator = eventAggregator;
             selectedHighlighter = highlighter.Highlighters[0];
             script = null!;
@@ -207,7 +214,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     RecolorEvent(e);
                 }
             });
-            
+
             ClearSearchCommand = new DelegateCommand(() => 
             {
                 SearchText = "";
@@ -601,6 +608,12 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                             {
                                 if (deleteGroupContent)
                                 {
+                                    foreach (var a in Events[i].Actions)
+                                    {
+                                        Breakpoints?.RemoveBreakpoint(a).ListenErrors();
+                                        Breakpoints?.RemoveBreakpoint(a.Source).ListenErrors();
+                                    }
+                                    Breakpoints?.RemoveBreakpoint(Events[i]).ListenErrors();
                                     Events.RemoveAt(i);
                                 }
                                 else
@@ -631,7 +644,15 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                         for (int i = Events.Count - 1; i >= 0; --i)
                         {
                             if (Events[i].IsSelected)
+                            {
+                                foreach (var a in Events[i].Actions)
+                                {
+                                    Breakpoints?.RemoveBreakpoint(a).ListenErrors();
+                                    Breakpoints?.RemoveBreakpoint(a.Source).ListenErrors();
+                                }
+                                Breakpoints?.RemoveBreakpoint(Events[i]).ListenErrors();
                                 Events.RemoveAt(i);
+                            }
                         }
 
                         DeselectAll.Execute();
@@ -659,7 +680,11 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                             for (int j = e.Actions.Count - 1; j >= 0; --j)
                             {
                                 if (e.Actions[j].IsSelected)
+                                {
+                                    Breakpoints?.RemoveBreakpoint(e.Actions[j]).ListenErrors();
+                                    Breakpoints?.RemoveBreakpoint(e.Actions[j].Source).ListenErrors();
                                     e.Actions.RemoveAt(j);
+                                }
                             }
                         }
 
@@ -1087,7 +1112,11 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     for (int i = e.Actions.Count - 1; i >= 0; --i)
                     {
                         if (e.Actions[i].Id == SmartConstants.ActionComment)
+                        {
+                            Breakpoints?.RemoveBreakpoint(e.Actions[i]).ListenErrors();
+                            Breakpoints?.RemoveBreakpoint(e.Actions[i].Source).ListenErrors();
                             e.Actions.RemoveAt(i);
+                        }
                     }
                 }
             });
@@ -1321,8 +1350,9 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 ProblematicLines = lines;
             }));
 
+            AutoDispose(new ActionDisposable(() => Breakpoints?.DisposeAsync().AsTask().ListenErrors()));
             SetSolutionItem(item);
-            // after Script is ready
+            // after the Script is ready
             HeaderViewModel = editorExtension.CreateHeader(this, item);
         }
 
@@ -1664,6 +1694,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 itemNameRegistry.GetName(newItem) + $" ({number})";
             
             Script = new SmartScript(this.item, smartFactory, smartDataManager, messageBoxService, editorFeatures, smartScriptImporter);
+            Breakpoints = breakpointsFactory.Create(script);
 
             bool updateInspections = false;
             AutoDispose(mainThread.StartTimer(() =>
@@ -1751,6 +1782,9 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             TeachingTips.Start();
             problems.Value = inspectorService.GenerateInspections(script);
             script.OriginalLines.AddRange(lines);
+            ApplySavedDatabaseEventId();
+            // no await so that fetch breakpoints doesn't block the task execution
+            Breakpoints?.FetchBreakpoints().ListenErrors();
         }
         
         private async Task SaveAllToDb()
@@ -1762,12 +1796,32 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             await mySqlExecutor.ExecuteSql(query);
 
             statusbar.PublishNotification(new PlainNotification(NotificationType.Success, "Saved to database"));
-            
+
+            ApplySavedDatabaseEventId();
+
             History.MarkAsSaved();
+
+            if (Breakpoints != null)
+                await Breakpoints.ResyncBreakpoints();
+        }
+
+        private void ApplySavedDatabaseEventId()
+        {
+            foreach (var e in Events)
+            {
+                e.SavedDatabaseEventId = e.DestinationEventId;
+                foreach (var a in e.Actions)
+                {
+                    a.SavedDatabaseEventId = a.DestinationEventId;
+                    a.SavedTimedActionListId = a.DestinationTimedActionListId;
+                }
+            }
         }
 
         private void DeleteActionCommand(SmartAction obj)
         {
+            Breakpoints?.RemoveBreakpoint(obj).ListenErrors();
+            Breakpoints?.RemoveBreakpoint(obj.Source).ListenErrors();
             obj.Parent?.Actions.Remove(obj);
         }
 
@@ -1959,7 +2013,11 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 return;
             
             var conditions = smartScriptExporter.ToDatabaseCompatibleConditions(script, events[0]);
-            var result = await conditionEditService.EditConditions(SmartConstants.ConditionSourceSmartScript, conditions);
+            var key = new IDatabaseProvider.ConditionKey(SmartConstants.ConditionSourceSmartScript)
+                .WithGroup((events[0].DestinationEventId ?? 0))
+                .WithEntry(script.EntryOrGuid)
+                .WithId(smartScriptExporter.GetDatabaseScriptTypeId(script.SourceType));
+            var result = await conditionEditService.EditConditions(key, conditions);
             if (result == null)
                 return;
 
@@ -2388,7 +2446,11 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     var sourceConditions = new ReactiveProperty<string>(editingMultipleSourceConditions ? "Conditions (warning: multiple actions)" : $"Conditions ({actionsToEdit[0].Source.Conditions.CountActualConditions()})");
                     editableGroup.Add(new EditableActionData("Conditions", "Source", async () =>
                     {
-                        var newConditions = await conditionEditService.EditConditions(editorFeatures.TargetConditionId, actionsToEdit[0].Source.Conditions);
+                        var key = new IDatabaseProvider.ConditionKey(editorFeatures.TargetConditionId)
+                            .WithGroup(actionsToEdit[0].Source.DestinationConditionId ?? 0)
+                            .WithEntry(script.EntryOrGuid)
+                            .WithId(smartScriptExporter.GetDatabaseScriptTypeId(script.SourceType));
+                        var newConditions = await conditionEditService.EditConditions(key, actionsToEdit[0].Source.Conditions);
                         if (newConditions != null)
                         {
                             var conditions = newConditions.ToList();
@@ -2402,7 +2464,11 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     var targetConditions = new ReactiveProperty<string>(editingMultipleTargetConditions ? "Conditions (warning: multiple actions)" : $"Conditions ({actionsToEdit[0].Target.Conditions.CountActualConditions()})");
                     editableGroup.Add(new EditableActionData("Conditions", "Target", async () =>
                     {
-                        var newConditions = await conditionEditService.EditConditions(editorFeatures.TargetConditionId, actionsToEdit[0].Target.Conditions);
+                        var key = new IDatabaseProvider.ConditionKey(editorFeatures.TargetConditionId)
+                            .WithGroup(actionsToEdit[0].Target.DestinationConditionId ?? 0)
+                            .WithEntry(script.EntryOrGuid)
+                            .WithId(smartScriptExporter.GetDatabaseScriptTypeId(script.SourceType));
+                        var newConditions = await conditionEditService.EditConditions(key, actionsToEdit[0].Target.Conditions);
                         if (newConditions != null)
                         {
                             var conditions = newConditions.ToList();
@@ -2627,7 +2693,11 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             editableGroup.Add(new EditableActionData("Conditions", "General", async () =>
             {
                 var oldConditions = smartScriptExporter.ToDatabaseCompatibleConditions(script, eventsToEdit[0]);
-                var newConditions = await conditionEditService.EditConditions(22, oldConditions);
+                var key = new IDatabaseProvider.ConditionKey(SmartConstants.ConditionSourceSmartScript)
+                    .WithGroup((originalEvents[0].DestinationEventId ?? 0))
+                    .WithEntry(script.EntryOrGuid)
+                    .WithId(smartScriptExporter.GetDatabaseScriptTypeId(script.SourceType));
+                var newConditions = await conditionEditService.EditConditions(key, oldConditions);
                 if (newConditions != null)
                 {
                     var conditions = newConditions.ToList();
@@ -2743,6 +2813,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
         private ISmartScriptOutlinerModel outlinerData;
         private readonly ISmartHighlighter highlighter;
         private readonly IDynamicContextMenuService dynamicContextMenuService;
+        private readonly IScriptBreakpointsFactory breakpointsFactory;
         private readonly IEventAggregator eventAggregator;
         private ValuePublisher<IOutlinerModel> outlinerModel = new ValuePublisher<IOutlinerModel>();
         public IObservable<IOutlinerModel> OutlinerModel => outlinerModel;
@@ -2757,6 +2828,8 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             get => problematicLines;
             set => SetProperty(ref problematicLines, value);
         }
+
+        public IScriptBreakpoints? Breakpoints { get; private set; }
 
         public ObservableCollection<SmartExtensionNotification> Notifications { get; } = new();
 
@@ -2891,6 +2964,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                     sessionToRestore = content;
                 else
                 {
+                    Breakpoints?.RemoveAll().ListenErrors();
                     script.GlobalVariables.RemoveAll();
                     Events.RemoveAll();
                     scriptRestored = true;
@@ -2901,6 +2975,13 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
             {
                 Console.WriteLine(e);
             }
+        }
+        
+        public void ClearScript()
+        {
+            Breakpoints?.RemoveAll().ListenErrors();
+            script.GlobalVariables.RemoveAll();
+            script.Events.RemoveAll();
         }
 
         public long SpecialCopyValue => script.SourceType is SmartScriptType.Template or SmartScriptType.TimedActionList

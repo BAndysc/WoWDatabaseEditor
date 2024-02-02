@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Prism.Events;
 using Prism.Ioc;
@@ -8,12 +9,19 @@ using WDE.Common.Services.MessageBox;
 using WDE.Common.Services.Statistics;
 using WDE.Common.Utils;
 using WDE.Module;
+using WDE.Module.Attributes;
 using WDE.SourceCodeIntegrationEditor.SourceCode;
+using WDE.SourceCodeIntegrationEditor.VisualStudioIntegration;
+using WDE.SourceCodeIntegrationEditor.VisualStudioIntegration.ViewModels;
+using SourceCodeConfigurationViewModel = WDE.SourceCodeIntegrationEditor.Settings.SourceCodeConfigurationViewModel;
 
 namespace WDE.SourceCodeIntegrationEditor
 {
+    [AutoRegister]
     public class SourceCodeIntegrationEditorModule : ModuleBase
     {
+        private VisualStudioManagerViewModel? manager;
+
         public override void OnInitialized(IContainerProvider containerProvider)
         {
             base.OnInitialized(containerProvider);
@@ -22,6 +30,7 @@ namespace WDE.SourceCodeIntegrationEditor
                 .GetEvent<AllModulesLoaded>()
                 .Subscribe(() =>
                     {
+                        manager = containerProvider.Resolve<VisualStudioManagerViewModel>();
                         async Task CheckAndAsk()
                         {
                             var statisticsService = containerProvider.Resolve<IStatisticsService>();

@@ -9,6 +9,18 @@ namespace WDE.Common.Utils
     {
         public static Task ListenErrors(this Task t)
         {
+            if (t.IsCompleted)
+            {
+                if (t.IsFaulted && t.Exception is { } aggregateException)
+                {
+                    if (aggregateException.InnerExceptions.Count == 1)
+                        Console.WriteLine(aggregateException.InnerExceptions[0]);
+                    else
+                        Console.WriteLine(aggregateException);
+                }
+                return Task.CompletedTask;
+            }
+
             return t.ContinueWith(e =>
             {
                 Console.WriteLine(e.Exception);
@@ -17,6 +29,18 @@ namespace WDE.Common.Utils
         
         public static Task ListenErrors(this Task t, IMessageBoxService messageBoxService)
         {
+            if (t.IsCompleted)
+            {
+                if (t.IsFaulted && t.Exception is { } aggregateException)
+                {
+                    if (aggregateException.InnerExceptions.Count == 1)
+                        Console.WriteLine(aggregateException.InnerExceptions[0]);
+                    else
+                        Console.WriteLine(aggregateException);
+                }
+                return Task.CompletedTask;
+            }
+
             async Task CoreAsync()
             {
                 try
@@ -25,15 +49,16 @@ namespace WDE.Common.Utils
                 }
                 catch (Exception e)
                 {
+                    Console.WriteLine(e);
                     await messageBoxService.ShowDialog(new MessageBoxFactory<bool>().SetTitle("Error")
                         .SetMainInstruction("An error occured")
                         .SetContent(e.Message)
                         .WithOkButton(true)
                         .Build());
-                    throw;
                 }
             }
-            return CoreAsync().ListenErrors();
+
+            return CoreAsync();
         }
 
         public static async Task WrapSafe(this Task t, Action onBefore, Action onFinally)

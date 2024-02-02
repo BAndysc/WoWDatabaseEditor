@@ -1,0 +1,34 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:popups="clr-namespace:WDE.Common.Avalonia.Controls.Popups"
+             xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils"
+             xmlns:managers="clr-namespace:WDE.Common.Managers;assembly=WDE.Common"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="managers:IPopupMenuViewModel"
+             x:Class="WDE.Common.Avalonia.Controls.Popups.PopupMenu">
+    <Border Background="{DynamicResource MenuFlyoutPresenterBackground}"
+          BorderBrush="{DynamicResource MenuFlyoutPresenterBorderBrush}"
+          BorderThickness="{DynamicResource MenuFlyoutPresenterBorderThemeThickness}"
+          CornerRadius="{DynamicResource OverlayCornerRadius}"
+          Padding="2,6"
+    >
+    <StackPanel>
+      <TextBlock Text="{CompiledBinding Title}" FontWeight="Bold" TextAlignment="Center" />
+      <popups:PopupContextMenu Items="{CompiledBinding MenuItems}"
+                             BorderThickness="0"
+                             Padding="0"
+                             Margin="0">
+        <ContextMenu.Styles>
+          <Style Selector="MenuItem">
+            <Setter Property="(utils:MenuBind.IconUri)" Value="{CompiledBinding Icon}" x:DataType="managers:IPopupMenuItem" />
+            <Setter Property="Header" Value="{CompiledBinding Header}" x:DataType="managers:IPopupMenuItem" />
+            <Setter Property="Command" Value="{CompiledBinding Command}" x:DataType="managers:IPopupMenuItem" />
+            <Setter Property="CommandParameter" Value="{CompiledBinding CommandParameter}" x:DataType="managers:IPopupMenuItem" />
+          </Style>
+        </ContextMenu.Styles>
+      </popups:PopupContextMenu>
+    </StackPanel>
+  </Border>
+</UserControl>

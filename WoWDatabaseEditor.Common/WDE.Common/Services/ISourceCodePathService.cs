@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using WDE.Module.Attributes;
 
-namespace WDE.SourceCodeIntegrationEditor.SourceCode;
+namespace WDE.Common.Services;
 
 [UniqueProvider]
 public interface ISourceCodePathService

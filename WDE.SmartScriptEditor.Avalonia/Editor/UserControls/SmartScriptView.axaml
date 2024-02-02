@@ -42,7 +42,7 @@
         <KeyBinding Gesture="Ctrl+G" Command="{CompiledBinding GroupSelectedEventsCommand}" />
 
     </UserControl.KeyBindings>
-    
+
     <UserControl.Styles>
         <Style Selector="Button.FlatButton">
             <Setter Property="Cursor" Value="Hand" />
@@ -98,8 +98,9 @@
                                                           DropItems="{CompiledBinding OnDropItems}"
                                                           DropActions="{CompiledBinding OnDropActions}"
                                                           DropConditions="{CompiledBinding OnDropConditions}"
-                                                          Script="{CompiledBinding Script}" 
-                                                          Problems="{CompiledBinding ProblematicLines}" 
+                                                          Script="{CompiledBinding Script}"
+                                                          Problems="{CompiledBinding ProblematicLines}"
+                                                          Breakpoints="{CompiledBinding Breakpoints}"
                                                           HideComments="{CompiledBinding HideComments}"
                                                           HideConditions="{CompiledBinding HideConditions}"
                                                           Name="SmartPanel"
@@ -147,8 +148,8 @@
                     </userControls:VirtualizedSmartScriptPanel.ConditionItemTemplate>
                     <userControls:VirtualizedSmartScriptPanel.GroupItemTemplate>
                         <DataTemplate x:DataType="models:SmartGroup">
-                            <userControls:SmartGroupView IsExpanded="{CompiledBinding IsExpanded, Mode=TwoWay}" 
-                                                         Header="{CompiledBinding Header}" 
+                            <userControls:SmartGroupView IsExpanded="{CompiledBinding IsExpanded, Mode=TwoWay}"
+                                                         Header="{CompiledBinding Header}"
                                                          IsSelected="{CompiledBinding IsSelected, Mode=TwoWay}"
                                                          DeselectAllButGroupsRequest="{Binding DataContext.DeselectAllButGroups, ElementName=Rooot}"
                                                          DeselectAllRequest="{Binding DataContext.DeselectAll, ElementName=Rooot}"
@@ -191,7 +192,7 @@
                     </userControls:VirtualizedSmartScriptPanel.NewConditionItemTemplate>
                 </userControls:VirtualizedSmartScriptPanel>
                 <Button
-                    Grid.Row="1" 
+                    Grid.Row="1"
                     Classes="FlatButton"
                     Opacity="0.5"
                     Width="{Binding #SmartPanel.EventsWidth}"
@@ -199,7 +200,7 @@
                     Command="{CompiledBinding AddEvent}">
                 </Button>
             </DockPanel>
-            <userControls:SmartScriptOverlay 
+            <userControls:SmartScriptOverlay
                 HideConditions="{CompiledBinding HideConditions}"
                 FindText="{CompiledBinding SearchText}"
                 Script="{CompiledBinding Script}" />

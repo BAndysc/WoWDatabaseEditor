@@ -27,7 +27,8 @@ namespace WoWDatabaseEditorCore.Services.ServerIntegration
             IStatusBar statusBar, Lazy<IWindowManager> windowManager,
             IMainThread mainThread,
             ICurrentCoreVersion currentCoreVersion,
-            IEnumerable<IReverseRemoteCommand> reverseRemoteCommands)
+            IEnumerable<IReverseRemoteCommand> reverseRemoteCommands,
+            IEnumerable<IRawReverseRemoteCommand> rawReverseRemoteCommands)
         {
             this.remoteConnectorService = remoteConnectorService;
             this.statusBar = statusBar;
@@ -41,6 +42,15 @@ namespace WoWDatabaseEditorCore.Services.ServerIntegration
                     throw new Exception($"Found new ReverseRemoteCommand {command.GetType()}, but it doesn't have ReverseRemoteCommandAttribute, skipping");
              
                 commands.Add(new(){Name = atr.Name, Command = command});
+            }
+
+            foreach (var command in rawReverseRemoteCommands)
+            {
+                var atr = command.GetType().GetCustomAttribute(typeof(ReverseRemoteCommandAttribute), true) as ReverseRemoteCommandAttribute;
+                if (atr == null)
+                    throw new Exception($"Found new ReverseRemoteCommand {command.GetType()}, but it doesn't have ReverseRemoteCommandAttribute, skipping");
+
+                commands.Add(new(){Name = atr.Name, RawCommand = command});
             }
 
             remoteConnectorService.EditorCommandReceived += RemoteConnectorService_EditorCommandReceived;
@@ -59,12 +69,16 @@ namespace WoWDatabaseEditorCore.Services.ServerIntegration
                         if (line.Length == cmd.Name.Length || line[cmd.Name.Length] == ' ')
                         {
                             var args = line.Substring(cmd.Name.Length).Trim();
-                            if (cmd.Command.BringEditorToFront && !broughtEditorToFront)
+                            var bringToFront = (cmd.Command?.BringEditorToFront ?? cmd.RawCommand?.BringEditorToFront) ?? false;
+                            if (bringToFront && !broughtEditorToFront)
                             {
                                 mainThread.Dispatch(() => windowManager.Value.Activate());
                                 broughtEditorToFront = true;
                             }
-                            await cmd.Command.Invoke(new CommandArguments(args));
+                            if (cmd.Command != null)
+                               await cmd.Command.Invoke(new CommandArguments(args));
+                            if (cmd.RawCommand != null)
+                                await cmd.RawCommand.Invoke(args);
                             anyCmd = true;
                             break;
                         }
@@ -167,7 +181,12 @@ namespace WoWDatabaseEditorCore.Services.ServerIntegration
         private struct ReverseRemoteCommandHolder
         {
             public string Name { get; init; }
-            public IReverseRemoteCommand Command
+            public IReverseRemoteCommand? Command
+            {
+                get;
+                init;
+            }
+            public IRawReverseRemoteCommand? RawCommand
             {
                 get;
                 init;

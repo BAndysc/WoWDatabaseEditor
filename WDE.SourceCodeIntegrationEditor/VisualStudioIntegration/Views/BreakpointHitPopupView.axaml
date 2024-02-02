@@ -1,0 +1,65 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:WDE.SourceCodeIntegrationEditor.VisualStudioIntegration.ViewModels"
+             xmlns:views="clr-namespace:WDE.SourceCodeIntegrationEditor.VisualStudioIntegration.Views"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:BreakpointHitPopupViewModel"
+             Name="Root"
+             ClipToBounds="False"
+             x:Class="WDE.SourceCodeIntegrationEditor.VisualStudioIntegration.Views.BreakpointHitPopupView">
+  <UserControl.Styles>
+    <StyleInclude Source="avares://WDE.SourceCodeIntegrationEditor/VisualStudioIntegration/Views/BalloonPopup.axaml" />
+  </UserControl.Styles>
+  <views:BalloonPopup ShowTail="{CompiledBinding ShowTail}">
+    <DockPanel LastChildFill="False">
+      <DockPanel DockPanel.Dock="Top" >
+        <WdeImage Width="20" Height="20" ImageUri="Icons/icon_ide_visual_studio.png" Margin="0,0,4,0" />
+
+        <Button ToolTip.Tip="Close" Click="ClosePressed" DockPanel.Dock="Right" Padding="2" BorderThickness="0" Background="Transparent" Width="20" Height="20">
+          <WdeImage ImageUri="Icons/icon_remove_mono.png" />
+        </Button>
+        <ButtonImage DockPanel.Dock="Right" ToolTip.Tip="Pause execution" Width="20" Height="20" Padding="2" BorderThickness="0" Background="Transparent" Image="Icons/icon_pause.png" Command="{CompiledBinding DebugPauseCommand}" />
+        <ButtonImage DockPanel.Dock="Right" ToolTip.Tip="Continue execution" Width="20" Height="20" Padding="2" BorderThickness="0" Background="Transparent" Image="Icons/icon_play.png" Command="{CompiledBinding DebugUnpauseCommand}" />
+
+        <!-- spacing -->
+        <Border Width="50" DockPanel.Dock="Right" />
+
+        <TextBlock VerticalAlignment="Center" Text="{CompiledBinding IdeName}" FontWeight="Bold" />
+      </DockPanel>
+
+      <DockPanel Dock="Top" IsVisible="{CompiledBinding IsBreakpoint}">
+        <WrapPanel DockPanel.Dock="Top" Margin="0,0,0,3">
+          <TextBlock Text="{CompiledBinding HitModuleName, StringFormat=Breakpoint hit in {0}}" Margin="0,0,4,0" FontWeight="Bold" />
+          <TextBlock Text="{CompiledBinding SolutionName, StringFormat=({0})}" FontWeight="Bold" />
+        </WrapPanel>
+        <Button DockPanel.Dock="Bottom" Margin="0,6,0,0" Command="{CompiledBinding GoToBreakpointCommand}">
+          <StackPanel Orientation="Horizontal" Spacing="5">
+            <WdeImage ImageUri="Icons/icon_ide_visual_studio_mono.png" Width="16" Height="16" />
+            <TextBlock Text="Go To File" />
+          </StackPanel>
+        </Button>
+        <TwoColumnsPanel RowSpacing="3" ColumnSpacing="2">
+          <TextBlock Opacity="0.6" Text="Function: " TextAlignment="Right" />
+          <TextBlock Margin="0,1,0,0" Text="{CompiledBinding CurrentBreakpoint.FunctionName}" FontFamily="{DynamicResource MonoFont}" FontWeight="Bold" />
+
+          <TextBlock Opacity="0.6" Text="File: " TextAlignment="Right" />
+          <TextBlock Margin="0,1,0,0" Text="{CompiledBinding HitFileName}" FontFamily="{DynamicResource MonoFont}" FontWeight="Bold" />
+
+          <TextBlock Opacity="0.6" Text="Action source: " TextAlignment="Right" IsVisible="{CompiledBinding Source, Converter={x:Static NullConverter.IsNotNull}}" />
+          <TextBlock Margin="0,1,0,0" Text="{CompiledBinding Source}" FontFamily="{DynamicResource MonoFont}" FontWeight="Bold"  IsVisible="{CompiledBinding Source, Converter={x:Static NullConverter.IsNotNull}}"/>
+
+          <TextBlock Opacity="0.6" Text="Invoker: " TextAlignment="Right" IsVisible="{CompiledBinding Invoker, Converter={x:Static NullConverter.IsNotNull}}" />
+          <TextBlock Margin="0,1,0,0" Text="{CompiledBinding Invoker}" FontFamily="{DynamicResource MonoFont}" FontWeight="Bold"  IsVisible="{CompiledBinding Invoker, Converter={x:Static NullConverter.IsNotNull}}"/>
+
+          <TextBlock Opacity="0.6" Text="Event args: " TextAlignment="Right" IsVisible="{CompiledBinding HasEventArgs}" />
+          <TextBlock Margin="0,1,0,0" Text="{CompiledBinding HitEventArgs}" FontFamily="{DynamicResource MonoFont}" FontWeight="Bold"  IsVisible="{CompiledBinding HasEventArgs}"/>
+
+          <TextBlock Opacity="0.6" Text="Event string args: " TextAlignment="Right"  IsVisible="{CompiledBinding HasEventArgs}"/>
+          <TextBlock Margin="0,1,0,0" Text="{CompiledBinding HitEventStringArgs}" FontFamily="{DynamicResource MonoFont}" FontWeight="Bold"  IsVisible="{CompiledBinding HasEventArgs}"/>
+        </TwoColumnsPanel>
+      </DockPanel>
+    </DockPanel>
+  </views:BalloonPopup>
+</UserControl>

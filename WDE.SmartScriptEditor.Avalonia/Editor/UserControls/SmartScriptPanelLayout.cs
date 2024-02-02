@@ -447,6 +447,8 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
                     cache[i].Text = $"{i}";
                     cache[i].FontSize = 10;
                     cache[i].Typeface = Typeface.Default;
+                    cache[i].TextAlignment = TextAlignment.Right;
+                    cache[i].Constraint = new Size(20, 10000);
                 }
             }
         }

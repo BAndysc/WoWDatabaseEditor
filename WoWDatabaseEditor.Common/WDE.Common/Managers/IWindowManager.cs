@@ -26,6 +26,8 @@ namespace WDE.Common.Managers
         void OpenUrl(string url, string arguments = "");
 
         void Activate();
+
+        Task OpenPopupMenu<T>(T menuViewModel, object? control = null) where T : IPopupMenuViewModel;
     }
 
     public interface IAbstractWindowView

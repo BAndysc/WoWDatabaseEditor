@@ -186,12 +186,27 @@ namespace WDE.Common.Database
             public readonly int? SourceEntry;
             public readonly int? SourceId;
 
-            public ConditionKey(int sourceType, int? sourceGroup, int? sourceEntry, int? sourceId)
+            public ConditionKey(int sourceType, int? sourceGroup = null, int? sourceEntry = null, int? sourceId = null)
             {
                 SourceType = sourceType;
                 SourceGroup = sourceGroup;
                 SourceEntry = sourceEntry;
                 SourceId = sourceId;
+            }
+
+            public ConditionKey WithGroup(int group)
+            {
+                return new ConditionKey(SourceType, group, SourceEntry, SourceId);
+            }
+
+            public ConditionKey WithEntry(int entry)
+            {
+                return new ConditionKey(SourceType, SourceGroup, entry, SourceId);
+            }
+
+            public ConditionKey WithId(int id)
+            {
+                return new ConditionKey(SourceType, SourceGroup, SourceEntry, id);
             }
 
             public ConditionKey WithMask(ConditionKeyMask mask)

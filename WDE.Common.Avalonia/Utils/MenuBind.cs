@@ -14,6 +14,7 @@ using Prism.Commands;
 using WDE.Common.Avalonia.Components;
 using WDE.Common.Avalonia.Controls;
 using WDE.Common.Menu;
+using WDE.Common.Types;
 using WDE.Common.Utils;
 using WDE.MVVM;
 using WDE.MVVM.Observable;
@@ -22,19 +23,29 @@ namespace WDE.Common.Avalonia.Utils
 {
     public static class MenuBind
     {
-        public static readonly AvaloniaProperty IconProperty = AvaloniaProperty.RegisterAttached<MenuItem, string?>("Icon",
-            typeof(MenuBind));
+        public static readonly AvaloniaProperty<string> IconProperty = AvaloniaProperty.RegisterAttached<MenuItem, string>("Icon", typeof(MenuBind));
         public static string? GetIcon(MenuItem control) => (string?)control.GetValue(IconProperty);
-        public static void SetIcon(MenuItem control, string? value) => control.SetValue(IconProperty, value);
+        public static void SetIcon(MenuItem control, string value) => control.SetValue(IconProperty, value);
+
+        public static readonly AvaloniaProperty<ImageUri> IconUriProperty = AvaloniaProperty.RegisterAttached<MenuItem, ImageUri>("IconUri", typeof(MenuBind));
+        public static ImageUri? GetIconUri(MenuItem control) => (ImageUri?)control.GetValue(IconUriProperty);
+        public static void SetIconUri(MenuItem control, ImageUri? value) => control.SetValue(IconUriProperty, value);
+
         private static IDisposable iconSubscription;
+        private static IDisposable iconUriSubscription;
         static MenuBind()
         {
             iconSubscription = IconProperty.Changed.SubscribeAction(args =>
             {
                 var menuItem = (MenuItem)args.Sender!;
-                var newIcon = (string?)args.NewValue;
-                if (newIcon != null)
-                    menuItem.Icon = new WdeImage() { ImageUri = newIcon };
+                if (args.NewValue.HasValue)
+                    menuItem.Icon = new WdeImage() { ImageUri = args.NewValue.Value };
+            });
+            iconUriSubscription = IconUriProperty.Changed.SubscribeAction(args =>
+            {
+                var menuItem = (MenuItem)args.Sender!;
+                if (args.NewValue.HasValue)
+                    menuItem.Icon = new WdeImage() { Image = args.NewValue.Value };
             });
         }
 

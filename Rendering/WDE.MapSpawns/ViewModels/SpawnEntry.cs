@@ -45,8 +45,8 @@ public partial class SpawnEntry : IParentType
     public IReadOnlyList<IParentType> NestedParents { get; } = new List<IParentType>();
     public IReadOnlyList<IChildType> Children => Spawns;
     public ObservableCollection<SpawnInstance> Spawns { get; } = new();
+    public bool CanBeExpanded => true;
     public uint NestLevel { get; set; }
     public bool IsVisible { get; set; }
     public IParentType? Parent { get; set; }
-    public bool CanBeExpanded => true;
 }

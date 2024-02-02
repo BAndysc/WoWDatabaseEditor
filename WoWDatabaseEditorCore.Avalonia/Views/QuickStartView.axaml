@@ -234,7 +234,6 @@
                         </ItemsControl>
                         <Button Margin="0,10,0,0" IsVisible="{CompiledBinding AllConfigured, Converter={StaticResource InversedBoolConverter}}" Command="{Binding OpenSettingsCommand}">Open settings to configure</Button>
                     </StackPanel>
-                    
                 </StackPanel>
             </Grid>
         </StackPanel>

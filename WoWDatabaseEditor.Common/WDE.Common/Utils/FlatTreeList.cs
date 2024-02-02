@@ -104,10 +104,10 @@ public class FlatTreeList<P, C> : IDisposable, IEnumerable, IEnumerable<INodeTyp
         }
         else if (e.Action == NotifyCollectionChangedAction.Remove)
         {
-            throw new Exception("not supported thing");
             foreach (P oldParent in e.OldItems!)
             {
-                
+                var startIndex = innerList.IndexOf(oldParent);
+                UninstallParent(oldParent, startIndex);
             }
         }
     }
@@ -216,7 +216,7 @@ public class FlatTreeList<P, C> : IDisposable, IEnumerable, IEnumerable<INodeTyp
 
         bulk.Dispose();
         //CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, (IList)parent.Children, startIndex + 1));                
-        }
+    }
 
     private void OnChildrenChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
@@ -332,7 +332,7 @@ public class FlatTreeList<P, C> : IDisposable, IEnumerable, IEnumerable<INodeTyp
     
     public void CopyTo(INodeType[] array, int arrayIndex)
     {
-        throw new Exception("not supported!");
+        innerList.CopyTo(array, arrayIndex);
     }
 
     public int IndexOf(INodeType? value) => ((IList)innerList).IndexOf(value);

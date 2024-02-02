@@ -9,40 +9,43 @@ using WDE.Common.Managers;
 using WDE.Module.Attributes;
 using WDE.MVVM;
 
-namespace WDE.SourceCodeIntegrationEditor.SourceCode;
+namespace WDE.SourceCodeIntegrationEditor.Settings;
 
 [AutoRegister]
 internal partial class SourceCodeConfigurationViewModel : ObservableBase, IConfigurable, IFirstTimeWizardConfigurable
 {
-    [Notify] private string? selectedPath;
-
     public ObservableCollection<string> Paths { get; } = new();
 
     public IAsyncCommand AddDirectoryCommand { get; }
-    public DelegateCommand DeleteSelectedCommand { get; }
+    public DelegateCommand<string> DeleteCommand { get; }
+
+    [Notify] private bool enableVisualStudioIntegration;
+    [Notify] private bool enableRemoteVisualStudioConnection;
+    [Notify] private string remoteVisualStudioAddress = "";
+    [Notify] private string remoteVisualStudioKey = "";
+
+    public bool SupportsRemoteVisualStudio { get; }
 
     public SourceCodeConfigurationViewModel(ISourceCodeConfiguration sourceCodeConfiguration,
         Lazy<IWindowManager> windowManager)
     {
         Paths.AddRange(sourceCodeConfiguration.SourceCodePaths);
+        enableVisualStudioIntegration = sourceCodeConfiguration.EnableVisualStudioIntegration;
+        enableRemoteVisualStudioConnection = sourceCodeConfiguration.EnableRemoteVisualStudioConnection;
+        remoteVisualStudioAddress = sourceCodeConfiguration.RemoteVisualStudioAddress;
+        remoteVisualStudioKey = sourceCodeConfiguration.RemoteVisualStudioKey;
 
-        DeleteSelectedCommand = new DelegateCommand(() =>
+        SupportsRemoteVisualStudio = !OperatingSystem.IsWindows();
+
+        DeleteCommand = new DelegateCommand<string>(s =>
         {
-            if (selectedPath == null)
-                return;
-
-            var indexOfSelected = Paths.IndexOf(selectedPath);
+            var indexOfSelected = Paths.IndexOf(s);
             if (indexOfSelected != -1)
             {
                 Paths.RemoveAt(indexOfSelected);
                 IsModified = true;
-                indexOfSelected = Math.Clamp(indexOfSelected - 1, 0, Paths.Count - 1);
-                if (Paths.Count > 0)
-                    SelectedPath = Paths[indexOfSelected];
-                else
-                    SelectedPath = null;
             }
-        }, () => selectedPath != null).ObservesProperty<string?>(() => SelectedPath);
+        });
 
         AddDirectoryCommand = new AsyncCommand(async () =>
         {
@@ -57,8 +60,19 @@ internal partial class SourceCodeConfigurationViewModel : ObservableBase, IConfi
         Save = new DelegateCommand(() =>
         {
             sourceCodeConfiguration.SourceCodePaths = Paths;
+            sourceCodeConfiguration.EnableVisualStudioIntegration = enableVisualStudioIntegration;
+            sourceCodeConfiguration.EnableRemoteVisualStudioConnection = enableRemoteVisualStudioConnection;
+            sourceCodeConfiguration.RemoteVisualStudioAddress = remoteVisualStudioAddress;
+            sourceCodeConfiguration.RemoteVisualStudioKey = remoteVisualStudioKey;
+            sourceCodeConfiguration.Save();
             IsModified = false;
         });
+
+        On(() => EnableVisualStudioIntegration, _ => IsModified = true);
+        On(() => EnableRemoteVisualStudioConnection, _ => IsModified = true);
+        On(() => RemoteVisualStudioAddress, _ => IsModified = true);
+        On(() => RemoteVisualStudioKey, _ => IsModified = true);
+        IsModified = false;
     }
 
     public ICommand Save { get; }

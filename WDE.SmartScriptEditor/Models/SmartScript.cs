@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using WDE.Common.Database;
 using WDE.Common.Services.MessageBox;
 using WDE.SmartScriptEditor.Data;
@@ -28,5 +30,8 @@ namespace WDE.SmartScriptEditor.Models
         public readonly uint? Entry;
         public readonly int EntryOrGuid;
         public override SmartScriptType SourceType { get; }
+
+        public override int GetFirstPossibleTimedActionListId() =>
+            Math.Abs(EntryOrGuid) * 100;
     }
 }

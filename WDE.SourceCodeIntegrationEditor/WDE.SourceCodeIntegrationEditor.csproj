@@ -20,6 +20,12 @@
     <ItemGroup>
       <PackageReference Include="envdte" Version="17.9.37000" />
     </ItemGroup>
+    <ItemGroup>
+      <Compile Update="Settings\SourceCodeConfigurationView.axaml.cs">
+        <DependentUpon>SourceCodeConfigurationView.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+    </ItemGroup>
     <PropertyGroup>
         <OutputPath>..\bin\$(Configuration)\</OutputPath>
     </PropertyGroup>

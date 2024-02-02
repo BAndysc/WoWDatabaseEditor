@@ -64,8 +64,9 @@
       
         <TextBlock Text="Output file:" />
         <DockPanel KeyboardNavigation.TabNavigation="Local">
-          <Button TabIndex="1" Command="{CompiledBinding PickFileCommand}" DockPanel.Dock="Right" Content="  ...  "/>
-          <TextBox TabIndex="0" Text="{CompiledBinding OutputFile}" />
+          <CheckBox Margin="0,0,5,0" DockPanel.Dock="Bottom" TabIndex="2" IsChecked="{CompiledBinding DumpToClipboardOnly}">Copy to clipboard</CheckBox>
+          <Button IsEnabled="{CompiledBinding !DumpToClipboardOnly}" TabIndex="1" Command="{CompiledBinding PickFileCommand}" DockPanel.Dock="Right" Content="  ...  "/>
+          <TextBox IsEnabled="{CompiledBinding !DumpToClipboardOnly}" TabIndex="0" Text="{CompiledBinding OutputFile}" />
         </DockPanel>
     
         <TextBlock Text="Database version:" />
@@ -75,7 +76,7 @@
         <TextBlock Text="{CompiledBinding EstimatedSize, StringFormat={}{0:0.00} MB}" />
         
         <TextBlock Text="Options:" VerticalAlignment="Top" />
-        <ItemsControl Items="{CompiledBinding BoolOptions}">
+        <ItemsControl Items="{CompiledBinding BoolOptions}" KeyboardNavigation.TabNavigation="Continue">
           <ItemsControl.ItemTemplate>
             <DataTemplate>
               <CheckBox Margin="0,0,0,4" IsChecked="{CompiledBinding IsChecked}" ToolTip.Tip="{CompiledBinding Description}">

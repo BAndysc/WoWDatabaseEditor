@@ -10,6 +10,7 @@ using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Parsing;
 using WDE.Common.Parameters;
 using WDE.Parameters.Models;
+using WDE.SmartScriptEditor.Data;
 using WDE.SmartScriptEditor.Editor;
 using WDE.SmartScriptEditor.Models.Helpers;
 
@@ -137,6 +138,10 @@ namespace WDE.SmartScriptEditor.Models
 
         public ObservableCollection<SmartAction> Actions { get; }
         public ObservableCollection<SmartCondition> Conditions { get; }
+
+        public override SmartScriptBase? Script => Parent;
+
+        public override SmartType SmartType => SmartType.SmartEvent;
 
         protected override string ReadableImpl
         {
@@ -291,6 +296,7 @@ namespace WDE.SmartScriptEditor.Models
             se.CooldownMin.Value = CooldownMin.Value;
             se.CooldownMax.Value = CooldownMax.Value;
             se.TimerId.Value = TimerId.Value;
+            se.DestinationEventId = DestinationEventId;
             se.CopyParameters(this);
 
             return se;

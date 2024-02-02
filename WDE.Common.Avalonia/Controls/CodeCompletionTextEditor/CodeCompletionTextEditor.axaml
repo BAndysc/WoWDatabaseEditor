@@ -1,0 +1,44 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:avaloniaEdit="https://github.com/avaloniaui/avaloniaedit"
+        xmlns:codeCompletion="clr-namespace:AvaloniaEdit.CodeCompletion;assembly=AvaloniaEdit"
+        xmlns:codeCompletionTextEditor="clr-namespace:WDE.Common.Avalonia.Controls.CodeCompletionTextEditor">
+  <Design.PreviewWith>
+    <codeCompletionTextEditor:CodeCompletionTextEditor />
+  </Design.PreviewWith>
+
+  <Style Selector="codeCompletionTextEditor|CodeCompletionTextEditor">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Panel>
+          <avaloniaEdit:TextEditor FontFamily="{DynamicResource MonoFont}" Name="PART_Editor" />
+          <TextBlock Margin="15,0,0,0" FontFamily="{DynamicResource MonoFont}" VerticalAlignment="Center" Opacity="0.5" FontStyle="Italic" IsHitTestVisible="False" Name="PART_Placeholder" Text="{TemplateBinding PlaceholderText}" />
+        </Panel>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+
+  <Style Selector="codeCompletion|CompletionList">
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border CornerRadius="5" ClipToBounds="True" Background="{DynamicResource ContentBackground}" BorderThickness="1" BorderBrush="{DynamicResource ContentBorderBrush}">
+          <codeCompletion:CompletionListBox CornerRadius="5" Background="Transparent" Name="PART_ListBox"
+                                            FontSize="10" HorizontalAlignment="Stretch">
+            <codeCompletion:CompletionListBox.ItemTemplate>
+              <DataTemplate x:DataType="codeCompletionTextEditor:BreakpointLogCompletionViewModel">
+                <DockPanel>
+                  <TextBlock DockPanel.Dock="Right" Opacity="0.5" Text="{CompiledBinding  Type}" />
+                  <TextBlock Text="{CompiledBinding  Text}" />
+                </DockPanel>
+              </DataTemplate>
+            </codeCompletion:CompletionListBox.ItemTemplate>
+          </codeCompletion:CompletionListBox>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+  <Style Selector="codeCompletion|CompletionList > Border > ListBox > ListBoxItem">
+    <Setter Property="Padding" Value="8, 0, 8, 0" />
+    <Setter Property="Height" Value="20" />
+  </Style>
+</Styles>

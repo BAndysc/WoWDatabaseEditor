@@ -1,9 +1,10 @@
 using System;
-using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
+using WDE.Common.Avalonia.Controls;
 using WDE.Common.Avalonia.Utils;
+using WDE.Common.Debugging;
 using WDE.Common.Managers;
 using WDE.SmartScriptEditor.Avalonia.Extensions;
 using WDE.SmartScriptEditor.Models;
@@ -77,6 +78,7 @@ public partial class VirtualizedSmartScriptPanel
         }
         
         var visibleRect = VisibleRect;
+        var breakpoints = Breakpoints;
 
         bool inGroup = false;
         bool groupIsExpanded = false;
@@ -118,10 +120,65 @@ public partial class VirtualizedSmartScriptPanel
                         double yPos = a.Position.Y;
 
                         float x = a.IsInInlineActionList ? 10 : 0;
-                        if (a.DestinationEventId is { } eventId)
+                        int? eventId = a.DestinationEventId;
+
+                        if (a.Id == SmartConstants.ActionComment && a == e.Actions[0])
+                            eventId = e.DestinationEventId;
+
+                        DebugPointId? breakpoint = null;
+                        bool isAnyHit = false;
+                        bool drawBreakpoint = false;
+                        if (breakpoints != null)
                         {
-                            var ft = NumberCache.Get(eventId);
-                            context.DrawText(Brushes.DarkGray, new Point(PaddingLeft + x, yPos + 5), ft);
+                            if (breakpoints.GetBreakpoint(a) is { } actionBreakpoint)
+                            {
+                                breakpoint ??= actionBreakpoint;
+                                isAnyHit |= breakpoints.IsHit(actionBreakpoint);
+                            }
+
+                            if (breakpoints.GetBreakpoint(a.Source) is { } sourceBreakpoint)
+                            {
+                                breakpoint ??= sourceBreakpoint;
+                                isAnyHit |= breakpoints.IsHit(sourceBreakpoint);
+                            }
+
+                            if (breakpoints.GetBreakpoint(a.Target) is { } targetBreakpoint)
+                            {
+                                breakpoint ??= targetBreakpoint;
+                                isAnyHit |= breakpoints.IsHit(targetBreakpoint);
+                            }
+
+                            if (a == e.Actions[0] && breakpoints.GetBreakpoint(e) is { } eventBreakpoint)
+                            {
+                                breakpoint ??= eventBreakpoint;
+                                isAnyHit |= breakpoints.IsHit(eventBreakpoint);
+                            }
+
+                            var breakPointRect = GetBreakpointRect(a);
+                            if (breakpoint.HasValue)
+                            {
+                                BreakpointIcon.DrawIcon(context,
+                                    breakpoints.IsConnected,
+                                    breakpoints.IsDeactivated(breakpoint.Value),
+                                    breakpoints.IsDisabled(breakpoint.Value),
+                                    breakpoints.GetState(breakpoint.Value),
+                                    breakpoints.IsSuspendExecution(breakpoint.Value),
+                                    isAnyHit,
+                                    breakPointRect);
+                            }
+                            else if (breakPointRect.Contains(new Point(mouseX, mouseY)))
+                            {
+                                context.DrawEllipse(new SolidColorBrush(new Color(120, 242, 78, 91)), null, breakPointRect.Center, BreakpointRadius, BreakpointRadius);
+                            }
+                            else
+                            {
+                                drawBreakpoint = true;
+                            }
+                        }
+                        if ((breakpoints == null || drawBreakpoint) && eventId.HasValue)
+                        {
+                            var ft = NumberCache.Get(eventId.Value);
+                            context.DrawText(Brushes.DarkGray, new Point(x, yPos + 6), ft);
                         }
                         DrawProblems(context, a.VirtualLineId, new Point(x, yPos));
                     }
@@ -129,12 +186,17 @@ public partial class VirtualizedSmartScriptPanel
             }
         }
     }
-    
+
+    private Rect GetBreakpointRect(VisualSmartBaseElement e)
+    {
+        return new Rect(PaddingLeft, e.Position.Y + 2, BreakpointRadius * 2, BreakpointRadius * 2);
+    }
+
     private void DrawProblems(DrawingContext dc, int index, Point pos)
     {
         if (Problems != null && Problems.TryGetValue(index, out var severity))
-        { 
-            dc.DrawText(severity is DiagnosticSeverity.Error or DiagnosticSeverity.Critical ? Brushes.Red : Brushes.Orange, new Point(PaddingLeft + pos.X, pos.Y + 5 + 10), vvvvText);   
+        {
+            dc.DrawText(severity is DiagnosticSeverity.Error or DiagnosticSeverity.Critical ? Brushes.Red : Brushes.Orange, new Point(PaddingLeft + pos.X, pos.Y + 5 + 10), vvvvText);
         }
     }
 

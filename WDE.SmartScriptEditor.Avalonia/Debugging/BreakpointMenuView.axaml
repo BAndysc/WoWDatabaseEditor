@@ -1,0 +1,36 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:WDE.SmartScriptEditor.Editor.ViewModels;assembly=WDE.SmartScriptEditor"
+             xmlns:utils="clr-namespace:WDE.Common.Avalonia.Utils;assembly=WDE.Common.Avalonia"
+             xmlns:converters="clr-namespace:WDE.SmartScriptEditor.Avalonia.Editor.Converters"
+             xmlns:userControls="clr-namespace:WDE.SmartScriptEditor.Avalonia.Editor.UserControls"
+             xmlns:debugging="clr-namespace:WDE.SmartScriptEditor.Avalonia.Debugging"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewModels:BreakpointMenuViewModel"
+             x:Class="WDE.SmartScriptEditor.Avalonia.Debugging.BreakpointMenuView">
+  <Border Background="{DynamicResource MenuFlyoutPresenterBackground}"
+          BorderBrush="{DynamicResource MenuFlyoutPresenterBorderBrush}"
+          BorderThickness="{DynamicResource MenuFlyoutPresenterBorderThemeThickness}"
+          CornerRadius="{DynamicResource OverlayCornerRadius}"
+          Padding="2,6"
+    >
+    <StackPanel>
+      <TextBlock Text="Set breakpoint" FontWeight="Bold" TextAlignment="Center" />
+      <debugging:BreakpointContextMenu Items="{CompiledBinding MenuItems}"
+                             BorderThickness="0"
+                             Padding="0"
+                             Margin="0">
+        <ContextMenu.Styles>
+          <Style Selector="MenuItem">
+            <Setter Property="(utils:MenuBind.IconUri)" Value="{CompiledBinding Type, Converter={x:Static converters:BreakpointTypeToIconConverter.Instance}}" x:DataType="viewModels:BreakpointMenuItemViewModel" />
+            <Setter Property="Header" Value="{CompiledBinding Header}" x:DataType="viewModels:BreakpointMenuItemViewModel" />
+            <Setter Property="Command" Value="{CompiledBinding Command}" x:DataType="viewModels:BreakpointMenuItemViewModel" />
+            <Setter Property="CommandParameter" Value="{CompiledBinding CommandParameter}" x:DataType="viewModels:BreakpointMenuItemViewModel" />
+          </Style>
+        </ContextMenu.Styles>
+      </debugging:BreakpointContextMenu>
+    </StackPanel>
+  </Border>
+</UserControl>

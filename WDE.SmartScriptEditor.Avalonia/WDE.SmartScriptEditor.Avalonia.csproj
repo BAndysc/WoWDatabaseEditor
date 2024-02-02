@@ -18,6 +18,12 @@
         <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />
         <ProjectReference Include="..\WDE.SmartScriptEditor\WDE.SmartScriptEditor.csproj" />
     </ItemGroup>
+    <ItemGroup>
+      <Compile Update="Debugging\BreakpointMenuView.axaml.cs">
+        <DependentUpon>BreakpointMenuView.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
+    </ItemGroup>
     <PropertyGroup>
         <OutputPath>..\bin\$(Configuration)\</OutputPath>
     </PropertyGroup>

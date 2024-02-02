@@ -48,7 +48,11 @@ namespace WoWDatabaseEditorCore.Avalonia
             if (ProgramBootstrap.TryLaunchUpdaterIfNeeded(args))
                 return false;
             System.Threading.Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
-            SafeFireAndForgetExtensions.SetDefaultExceptionHandling(Console.WriteLine);
+            SafeFireAndForgetExtensions.SetDefaultExceptionHandling(e =>
+            {
+
+                Console.WriteLine(e);
+            });
             TaskScheduler.UnobservedTaskException += (sender, eventArgs) => Console.WriteLine(eventArgs.Exception);
             GlobalApplication.Arguments.Init(args);
 

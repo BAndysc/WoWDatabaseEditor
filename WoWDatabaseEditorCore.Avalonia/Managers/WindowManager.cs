@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
@@ -11,6 +12,7 @@ using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.VisualTree;
 using WDE.Common.Avalonia.Components;
+using WDE.Common.Avalonia.Controls.Popups;
 using WDE.Common.Avalonia.Utils;
 using WDE.Common.Managers;
 using WDE.Module.Attributes;
@@ -26,10 +28,12 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
     {
         private readonly bool UseExperimentalPopup = false;
         private readonly IMainWindowHolder mainWindowHolder;
+        private readonly PopupMenu popupMenu;
 
         public WindowManager(IMainWindowHolder mainWindowHolder)
         {
             this.mainWindowHolder = mainWindowHolder;
+            popupMenu = new PopupMenu();
         }
 
         private class WindowWrapper : IAbstractWindowView
@@ -345,6 +349,23 @@ namespace WoWDatabaseEditorCore.Avalonia.Managers
         public void Activate()
         {
             mainWindowHolder.RootWindow?.ActivateWorkaround();
+        }
+
+        public async Task OpenPopupMenu<T>(T menuViewModel, object? control) where T : IPopupMenuViewModel
+        {
+            popupMenu.DataContext = menuViewModel;
+            if (control is Control c)
+                await popupMenu.Open(c);
+            else
+            {
+                if (Application.Current!.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime dekstopLifetime &&
+                    dekstopLifetime.Windows.FirstOrDefault(x => x.IsActive) is { } activeWindow)
+                {
+                    await popupMenu.Open(activeWindow);
+                }
+                else
+                    throw new Exception("No active window, couldn't open popup menu");
+            }
         }
     }
 }

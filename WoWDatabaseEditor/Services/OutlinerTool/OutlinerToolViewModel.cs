@@ -109,6 +109,8 @@ public partial class OutlinerToolViewModel : ObservableBase, ITool
         {
             if (@is)
                 AnalyseDocument(documentManager.Value.ActiveDocument);
+            else
+                AnalyseDocument(null);
         });
         
         AutoDispose(eventAggregator.GetEvent<AllModulesLoaded>().Subscribe(Bind, true));
@@ -118,6 +120,11 @@ public partial class OutlinerToolViewModel : ObservableBase, ITool
     {
         currentSubscription?.Dispose();
         currentSubscription = null;
+        if (currentCancellationTokenSource != null)
+        {
+            currentCancellationTokenSource.Cancel();
+            currentCancellationTokenSource = null;
+        }
         ClearGroups();
         ClearReferences();
 
@@ -126,13 +133,8 @@ public partial class OutlinerToolViewModel : ObservableBase, ITool
             if (document is IOutlinerSourceDocument outlinerSource)
                 currentSubscription = outlinerSource.OutlinerModel.SubscribeAction(Update);
 
-            if (currentCancellationTokenSource != null)
-            {
-                currentCancellationTokenSource.Cancel();
-                currentCancellationTokenSource = null;
-            }
-                
-            RefreshReferencedBy(solutionDocument).ListenErrors();
+            currentCancellationTokenSource = new CancellationTokenSource();
+            RefreshReferencedBy(solutionDocument, currentCancellationTokenSource.Token).ListenErrors();
         }
     }
     
@@ -145,11 +147,14 @@ public partial class OutlinerToolViewModel : ObservableBase, ITool
         });
     }
 
-    private async Task RefreshReferencedBy(ISolutionItemDocument document)
+    private async Task RefreshReferencedBy(ISolutionItemDocument document, CancellationToken token)
     {
         ClearReferences();
         var related = await relatedRegistry.Value.GetRelated(document.SolutionItem);
         if (related == null)
+            return;
+
+        if (token.IsCancellationRequested)
             return;
         
         string type;
@@ -167,12 +172,13 @@ public partial class OutlinerToolViewModel : ObservableBase, ITool
             type = "SpellParameter";
         else
             return;
-        var token = new CancellationTokenSource();
-        currentCancellationTokenSource = token;
+
         referencedBy.IsRefreshing = true;
-        await findAnywhereService.Value.Find(new FindRelatedContext(this, token), FindAnywhereSourceType.All &~ settings.SkipSources, new[] { type }, new[] { related.Value.Entry }, token.Token);
-        if (token == currentCancellationTokenSource)
-            currentCancellationTokenSource = null;
+        await findAnywhereService.Value.Find(new FindRelatedContext(this, token), FindAnywhereSourceType.All &~ settings.SkipSources, new[] { type }, new[] { related.Value.Entry }, token);
+
+        if (token.IsCancellationRequested)
+            return;
+
         referencedBy.IsRefreshing = false;
         UpdateGroupsVisibility();
     }
@@ -180,9 +186,9 @@ public partial class OutlinerToolViewModel : ObservableBase, ITool
     private class FindRelatedContext : IFindAnywhereResultContext
     {
         private readonly OutlinerToolViewModel that;
-        private readonly CancellationTokenSource token;
+        private readonly CancellationToken token;
 
-        public FindRelatedContext(OutlinerToolViewModel that, CancellationTokenSource token)
+        public FindRelatedContext(OutlinerToolViewModel that, CancellationToken token)
         {
             this.that = that;
             this.token = token;
@@ -190,7 +196,7 @@ public partial class OutlinerToolViewModel : ObservableBase, ITool
 
         public void AddResult(IFindAnywhereResult result)
         {
-            if (token != that.currentCancellationTokenSource)
+            if (token.IsCancellationRequested)
                 return;
             
             ICommand? customCommand = result.CustomCommand;

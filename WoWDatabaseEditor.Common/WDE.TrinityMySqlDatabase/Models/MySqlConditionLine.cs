@@ -26,7 +26,7 @@ namespace WDE.TrinityMySqlDatabase.Models
 
         [Column(Name = "ElseGroup")]
         [PrimaryKey]
-        public int ElseGroup { get; set; }
+        public int ElseGroup { get; init; }
 
         public int ConditionIndex { get; set; }
 

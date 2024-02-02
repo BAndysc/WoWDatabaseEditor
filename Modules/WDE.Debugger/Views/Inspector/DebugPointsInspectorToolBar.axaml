@@ -1,0 +1,30 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:inspector="clr-namespace:WDE.Debugger.ViewModels.Inspector"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="inspector:DebugPointsInspectorViewModel"
+             Name="Root"
+             x:Class="WDE.Debugger.Views.Inspector.DebugPointsInspectorToolBar">
+  <ToolbarControl> <!-- Command="{CompiledBinding #Root.OpenAddFlyoutCommand}"  -->
+    <ButtonImage Text="Add" Image="Icons/icon_add.png">
+      <ButtonImage.Flyout>
+        <MenuFlyout Placement="BottomEdgeAlignedLeft" Items="{CompiledBinding SourceAddList}" />
+      </ButtonImage.Flyout>
+      <ButtonImage.Styles>
+        <Style Selector="MenuItem" x:DataType="inspector:AddDebugPointViewModel">
+          <Setter Property="Command" Value="{CompiledBinding #Root.((inspector:DebugPointsInspectorViewModel)DataContext).AddDebugPointCommand}" />
+          <Setter Property="CommandParameter" Value="{CompiledBinding .}" />
+          <Setter Property="Header" Value="{CompiledBinding Name}" />
+        </Style>
+      </ButtonImage.Styles>
+    </ButtonImage>
+    <ButtonImage Command="{CompiledBinding DeleteSelectedDebugPointsCommand}" Text="Delete selected" Image="Icons/icon_delete.png" />
+    <ButtonImage Command="{CompiledBinding FetchDebugPointsCommand}" Text="Fetch from the server" Image="Icons/icon_down.png" />
+
+    <ToolbarSpacer />
+
+    <ButtonImage Command="{CompiledBinding ClearAllDebugPointsCommand}" Text="Clear all debug points" Image="Icons/icon_cleanup.png" />
+  </ToolbarControl>
+</UserControl>

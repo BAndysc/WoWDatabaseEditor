@@ -22,6 +22,7 @@
         public const int EventMovementInform = 34;
         public const int EventAiInitialize = 37;
         public const int EventUpdateInCombat = 0;
+        public const int EventUpdateOutOfCombat = 1;
         public const int EventWaypointsEnded = 58;
         public const int EventLink = 61;
         public const int ActionStartWaypointsPath = 53;

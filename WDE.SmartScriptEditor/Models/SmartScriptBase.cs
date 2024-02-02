@@ -165,10 +165,28 @@ namespace WDE.SmartScriptEditor.Models
             }
         }
 
+        public virtual int GetFirstPossibleTimedActionListId() => 0;
+
         private void RenumerateEvents()
         {
             int virtualLineId = 1;
+            int specialConditionId = 1;
             NestedEventIds eventId = new NestedEventIds(GlobalVariables.Count + 1);
+
+            HashSet<int> usedTimedActionLists = CollectUsedTimedActionListIds().ToHashSet();
+
+            int firstUnusedActionList = GetFirstPossibleTimedActionListId() -1;
+            int GetNextUnusedTimedActionList()
+            {
+                do
+                {
+                    firstUnusedActionList++;
+                } while (usedTimedActionLists.Contains(firstUnusedActionList));
+
+                usedTimedActionLists.Add(firstUnusedActionList);
+                return firstUnusedActionList;
+            }
+
             foreach (var e in Events)
             {
                 if (e.IsGroup)
@@ -187,9 +205,12 @@ namespace WDE.SmartScriptEditor.Models
                 {
                     int indent = 0;
                     bool inInlineActionList = false;
+                    int? inlineActionListId = null;
+                    int? firstId = null;
                     foreach (var a in e.Actions)
                     {
                         a.IsInInlineActionList = inInlineActionList;
+                        a.DestinationTimedActionListId = inlineActionListId;
                         
                         if (a.ActionFlags.HasFlagFast(ActionFlags.DecreaseIndent) && indent > 0)
                             indent--;
@@ -205,11 +226,15 @@ namespace WDE.SmartScriptEditor.Models
                             (inInlineActionList && a.Id == SmartConstants.ActionAfter))
                         {
                             a.DestinationEventId = null;
+                            a.DestinationTimedActionListId = null;
                         }
                         else if (a.Id == SmartConstants.ActionBeginInlineActionList)
                         {
                             eventId.PopAll();
                             a.DestinationEventId = eventId.Next();
+                            firstId ??= a.DestinationEventId;
+                            inlineActionListId = GetNextUnusedTimedActionList();
+                            a.DestinationTimedActionListId = inlineActionListId;
                             eventId.AddNestLevel();
                             inInlineActionList = true;
                         }
@@ -229,8 +254,15 @@ namespace WDE.SmartScriptEditor.Models
                         else
                         {
                             a.DestinationEventId = eventId.Next();
+                            firstId ??= a.DestinationEventId;
                         }
+
+                        if (a.Source.Conditions != null && a.Source.Conditions.Count > 0)
+                            a.Source.DestinationConditionId = specialConditionId++;
+                        if (a.Target.Conditions != null && a.Target.Conditions.Count > 0)
+                            a.Target.DestinationConditionId = specialConditionId++;
                     }
+                    e.DestinationEventId = firstId;
                     eventId.PopAll();
                 }
             }
@@ -240,12 +272,6 @@ namespace WDE.SmartScriptEditor.Models
         {
             ScriptSelectedChanged?.Invoke();
             InvalidateVisual?.Invoke();
-        }
-        
-        public void Clear()
-        {
-            GlobalVariables.RemoveAll();
-            Events.RemoveAll();
         }
 
         public bool TryGetEventGroup(SmartEvent e, out SmartGroup group, out SmartEvent endGroup)
@@ -538,6 +564,26 @@ namespace WDE.SmartScriptEditor.Models
             }
 
             return null;
+        }
+
+        public IEnumerable<int> CollectUsedTimedActionListIds()
+        {
+            return Events
+                .SelectMany(e => e.Actions)
+                .Where(a => a.Id == SmartConstants.ActionCallTimedActionList ||
+                            a.Id == SmartConstants.ActionCallRandomTimedActionList ||
+                            a.Id == SmartConstants.ActionCallRandomRangeTimedActionList)
+                .SelectMany(a =>
+                {
+                    if (a.Id == SmartConstants.ActionCallRandomTimedActionList)
+                        return Enumerable.Range(0, a.ParametersCount).Select(i => (int)a.GetParameter(i).Value);
+                    if (a.Id == SmartConstants.ActionCallRandomRangeTimedActionList &&
+                        a.GetParameter(1).Value - a.GetParameter(0).Value < 20)
+                        return Enumerable.Range((int)a.GetParameter(0).Value,
+                            (int)(a.GetParameter(1).Value - a.GetParameter(0).Value + 1));
+                    return new int[] { (int)a.GetParameter(0).Value };
+                })
+                .Where(id => id != 0);
         }
 
         public event Action BulkEditingStarted = delegate { };

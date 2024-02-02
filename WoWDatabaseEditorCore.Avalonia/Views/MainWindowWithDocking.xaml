@@ -216,6 +216,11 @@
     
     <controls:ExtendedWindow.Overlay>
         <Panel>
+            <ContentControl Content="{CompiledBinding VisualStudioManagerViewModel}"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Bottom"
+                            ClipToBounds="False"/>
+
             <views:TasksPanel DataContext="{CompiledBinding TasksViewModel}"
                               Margin="0,0,5,0"
                               HorizontalAlignment="Right"

@@ -13,6 +13,7 @@
     <StyleInclude Source="avares://WDE.Common.Avalonia/Controls/SettingsHeader.axaml"></StyleInclude>
     <StyleInclude Source="avares://WDE.Common.Avalonia/Controls/VirtualizedTreeViewItem.axaml"></StyleInclude>
     <StyleInclude Source="avares://WDE.Common.Avalonia/Controls/EditorHeader.axaml"></StyleInclude>
+    <StyleInclude Source="avares://WDE.Common.Avalonia/Controls/CodeCompletionTextEditor/CodeCompletionTextEditor.axaml" />
     <Style Selector="controls|ParameterValueHolderView">
         <Setter Property="Focusable" Value="False"/>
         <Setter Property="Template">

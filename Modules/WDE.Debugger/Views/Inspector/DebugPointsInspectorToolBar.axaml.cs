@@ -1,11 +1,13 @@
+using System.Windows.Input;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
-namespace WDE.SourceCodeIntegrationEditor.SourceCode;
+namespace WDE.Debugger.Views.Inspector;
 
-public partial class SourceCodeConfigurationView : UserControl
+internal partial class DebugPointsInspectorToolBar : UserControl
 {
-    public SourceCodeConfigurationView()
+    public DebugPointsInspectorToolBar()
     {
         InitializeComponent();
     }

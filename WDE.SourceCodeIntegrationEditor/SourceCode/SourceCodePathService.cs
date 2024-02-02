@@ -1,7 +1,10 @@
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using Newtonsoft.Json;
 using WDE.Common.Services;
 using WDE.Module.Attributes;
+using WDE.SourceCodeIntegrationEditor.Settings;
 
 namespace WDE.SourceCodeIntegrationEditor.SourceCode;
 
@@ -10,26 +13,52 @@ namespace WDE.SourceCodeIntegrationEditor.SourceCode;
 internal class SourceCodePathService : ISourceCodePathService, ISourceCodeConfiguration
 {
     private readonly IUserSettings userSettings;
-    private IReadOnlyList<string> paths;
 
-    public IReadOnlyList<string> SourceCodePaths
+    public IReadOnlyList<string> SourceCodePaths { get; set; }
+
+    public bool EnableVisualStudioIntegration { get; set; }
+
+    public bool EnableRemoteVisualStudioConnection { get; set; }
+
+    public string RemoteVisualStudioAddress { get; set; }
+
+    public string RemoteVisualStudioKey { get; set; }
+
+    public void Save()
     {
-        get => paths;
-        set
+        userSettings.Update(new Data()
         {
-            paths = value;
-            userSettings.Update(new Data() {Paths = value.ToList()});
-        }
+            Paths = SourceCodePaths.ToList(),
+            EnableVisualStudioIntegration = EnableVisualStudioIntegration,
+            EnableRemoteVisualStudioConnection = EnableRemoteVisualStudioConnection,
+            RemoteVisualStudioAddress = RemoteVisualStudioAddress,
+            RemoteVisualStudioKey = RemoteVisualStudioKey
+        });
     }
 
     public SourceCodePathService(IUserSettings userSettings)
     {
         this.userSettings = userSettings;
-        paths = userSettings.Get<Data>()?.Paths ?? new List<string>();
+        var data = userSettings.Get<Data>();
+        SourceCodePaths = data?.Paths ?? new List<string>();
+        EnableVisualStudioIntegration = data?.EnableVisualStudioIntegration ?? true;
+        EnableRemoteVisualStudioConnection = data?.EnableRemoteVisualStudioConnection ?? false;
+        RemoteVisualStudioAddress = data?.RemoteVisualStudioAddress ?? "";
+        RemoteVisualStudioKey = data?.RemoteVisualStudioKey ?? "";
     }
 
     private class Data : ISettings
     {
         public List<string> Paths { get; set; } = new();
+
+        [DefaultValue(true)]
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Populate)]
+        public bool EnableVisualStudioIntegration { get; set; } = true;
+
+        public bool EnableRemoteVisualStudioConnection { get; set; }
+
+        public string RemoteVisualStudioAddress { get; set; } = "";
+
+        public string RemoteVisualStudioKey { get; set; } = "";
     }
 }
