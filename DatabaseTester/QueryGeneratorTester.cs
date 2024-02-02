@@ -152,7 +152,7 @@ public class QueryGeneratorTester
         });
         yield return () => creatureText.Delete(new AbstractCreatureText()
         {
-            CreatureId = 0xFFFFFF - 1
+            CreatureId = 1
         });
         yield return () => creatureTemplateDiff.Update(new CreatureGossipUpdate()
         {

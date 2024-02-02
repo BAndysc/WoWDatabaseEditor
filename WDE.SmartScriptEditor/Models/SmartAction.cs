@@ -6,6 +6,7 @@ using System.Linq;
 using SmartFormat;
 using SmartFormat.Core.Formatting;
 using SmartFormat.Core.Parsing;
+using WDE.Common.Database;
 using WDE.Common.Parameters;
 using WDE.Parameters.Models;
 using WDE.SmartScriptEditor.Data;
@@ -27,7 +28,7 @@ namespace WDE.SmartScriptEditor.Models
 
         private ParameterValueHolder<string> comment;
 
-        // public event Action<SmartAction, IList<ICondition>?, IList<ICondition>?> OnConditionsChanged = delegate { };
+        public event Action<SmartAction, IList<ICondition>?, IList<ICondition>?> OnConditionsChanged = delegate { };
         
         public SmartAction(int id, IEditorFeatures features, SmartSource source, SmartTarget target) : 
             base(id,
@@ -84,7 +85,7 @@ namespace WDE.SmartScriptEditor.Models
 
         public SmartSource Source => source;
 
-        /*private string conditionReadable = "true";
+        private string conditionReadable = "true";
 
         private IList<ICondition>? conditions;
         public IList<ICondition>? Conditions
@@ -105,7 +106,7 @@ namespace WDE.SmartScriptEditor.Models
                 }
                 InvalidateReadable();
             }
-        }*/
+        }
         
         public bool IsSelected
         {
