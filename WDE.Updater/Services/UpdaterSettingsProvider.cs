@@ -10,17 +10,20 @@ namespace WDE.Updater.Services
     public class UpdaterSettingsProvider : IUpdaterSettingsProvider
     {
         private readonly IUserSettings userSettings;
+        private UpdaterSettings settings;
 
         public UpdaterSettingsProvider(IUserSettings userSettings)
         {
             this.userSettings = userSettings;
+            settings = userSettings.Get<UpdaterSettings>(UpdaterSettings.Defaults);
         }
 
         public UpdaterSettings Settings
         {
-            get => userSettings.Get<UpdaterSettings>();
+            get => settings;
             set
             {
+                settings = value;
                 userSettings.Update(value); 
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Settings)));
             }

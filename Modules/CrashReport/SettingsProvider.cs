@@ -11,6 +11,7 @@ public class SettingsProvider : IUpdaterSettingsProvider
     {
         DisableAutoUpdates = false,
         EnableSilentUpdates = true,
+        EnableReadyToInstallPopup = true,
         LastCheckedForUpdates = default,
         LastShowedChangelog = default
     };

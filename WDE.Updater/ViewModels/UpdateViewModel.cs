@@ -36,6 +36,7 @@ namespace WDE.Updater.ViewModels
             IFileSystem fileSystem,
             IStandaloneUpdater standaloneUpdater,
             IApplication application,
+            IMainThread mainThread,
             IMessageBoxService messageBoxService)
         {
             this.updateService = updateService;
@@ -50,9 +51,16 @@ namespace WDE.Updater.ViewModels
                 if (updateService.CanCheckForUpdates())
                     taskRunner.ScheduleTask(new UpdateTask(this));
             }, updateService.CanCheckForUpdates);
-            
+
             if (!settingsProvider.Settings.DisableAutoUpdates)
+            {
                 CheckForUpdatesCommand.Execute(null);
+                mainThread.StartTimer(() =>
+                {
+                    CheckForUpdatesCommand.Execute(null);
+                    return true;
+                }, TimeSpan.FromHours(1));
+            }
         }
         
         private class UpdateTask : IAsyncTask
@@ -142,32 +150,55 @@ namespace WDE.Updater.ViewModels
                         "Failed to download the update, update file got corrupted. Please try later."));
                     return;
                 }
-                statusBar.PublishNotification(new PlainNotification(NotificationType.Info, 
-                    "Update ready to install. It will be installed on the next editor restart or when you click here",
-                    new AsyncAutoCommand(async () =>
-                    {
-                        if (platformService.PlatformSupportsSelfInstall)
-                            await updateService.CloseForUpdate();
-                        else
-                        {
-                            await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
-                                .SetTitle("Your platform doesn't support self updates")
-                                .SetContent("Sadly, self updater is not available on your operating system yet.\n\nA new version of WoW Database Editor has been downloaded, but you have to manually copy new version to the Applications folder")
-                                .Build());
-                            var physPath = fileSystem.ResolvePhysicalPath(platformService.UpdateZipFilePath);
 
-                            using Process open = new Process
+                var restartCommand = new AsyncAutoCommand(async () =>
+                {
+                    if (platformService.PlatformSupportsSelfInstall)
+                        await updateService.CloseForUpdate();
+                    else
+                    {
+                        await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
+                            .SetTitle("Your platform doesn't support self updates")
+                            .SetContent(
+                                "Sadly, self updater is not available on your operating system yet.\n\nA new version of WoW Database Editor has been downloaded, but you have to manually copy new version to the Applications folder")
+                            .Build());
+                        var physPath = fileSystem.ResolvePhysicalPath(platformService.UpdateZipFilePath);
+
+                        using Process open = new Process
+                        {
+                            StartInfo =
                             {
-                                StartInfo =
-                                {
-                                    FileName = "open",
-                                    Arguments = "-R " + physPath.FullName,
-                                    UseShellExecute = true
-                                }
-                            };
-                            open.Start();
-                        }
-                    })));
+                                FileName = "open",
+                                Arguments = "-R " + physPath.FullName,
+                                UseShellExecute = true
+                            }
+                        };
+                        open.Start();
+                    }
+                });
+                bool showNotification = true;
+                if (settingsProvider.Settings.EnableReadyToInstallPopup)
+                {
+                    if (await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
+                            .SetTitle("Update ready to install")
+                            .SetMainInstruction("Do you want to restart the editor now to install the update?")
+                            .SetContent(
+                                "The update has been downloaded and is ready to be installed. If you select 'YES' the editor will restart to install the update. If you select 'NO' the editor will update upon the next editor start.")
+                            .WithYesButton(true)
+                            .WithNoButton(false)
+                            .Build()))
+                    {
+                        showNotification = false;
+                        await restartCommand.ExecuteAsync();
+                    }
+                }
+
+                if (showNotification)
+                {
+                    statusBar.PublishNotification(new PlainNotification(NotificationType.Info,
+                        "Update ready to install. It will be installed on the next editor restart or when you click here",
+                        restartCommand));
+                }
             }
             catch (Exception e)
             {

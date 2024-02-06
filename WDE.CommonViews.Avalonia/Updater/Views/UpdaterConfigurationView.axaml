@@ -39,10 +39,16 @@
                                   OnContent="" OffContent="" />
                 </SettingItem>
                 
-                <SettingItem Header="Enable silent updates" Help="With 'silent updates' enabled, updates are downloaded and installed automatically, without asking.">
+                <SettingItem Header="Enable silent updates" Help="With 'silent updates' enabled, updates are downloaded automatically without asking.">
                     <ToggleSwitch IsChecked="{CompiledBinding EnableSilentUpdates}" 
                               IsEnabled="{CompiledBinding DisableAutoUpdates, Converter={StaticResource InverseBoolConverter}}"
                               OnContent="" OffContent=""/>
+                </SettingItem>
+
+                <SettingItem Header="Show a popup when a new version is ready to install" Help="After the update is downloaded, you have to restart the editor. By default a message box will pop up. You can disable the message box here.">
+                    <ToggleSwitch IsChecked="{CompiledBinding EnableReadyToInstallPopup}"
+                                  IsEnabled="{CompiledBinding DisableAutoUpdates, Converter={StaticResource InverseBoolConverter}}"
+                                  OnContent="" OffContent=""/>
                 </SettingItem>
             </StackPanel>
         </StackPanel>
