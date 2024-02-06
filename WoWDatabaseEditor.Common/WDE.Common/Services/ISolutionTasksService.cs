@@ -1,11 +1,12 @@
-﻿using System.Threading.Tasks;
+﻿using System.ComponentModel;
+using System.Threading.Tasks;
 using WDE.Common.Managers;
 using WDE.Module.Attributes;
 
 namespace WDE.Common.Services
 {
     [UniqueProvider]
-    public interface ISolutionTasksService
+    public interface ISolutionTasksService : INotifyPropertyChanged
     {
         Task SaveSolutionToDatabaseTask(ISolutionItem item);
         Task SaveSolutionToDatabaseTask(ISolutionItemDocument document);

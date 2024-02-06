@@ -123,6 +123,8 @@ namespace WoWDatabaseEditorCore.ViewModels
             }, () => (DocumentManager.ActiveSolutionItemDocument != null &&
                      (solutionTasksService.CanSaveAndReloadRemotely || solutionTasksService.CanSaveToDatabase)) ||
                      (DocumentManager.ActiveDocument is {} doc && doc.Save.CanExecute(null)));
+            solutionTasksService.ToObservable(x => x.CanSaveAndReloadRemotely)
+                .SubscribeAction(_ => ExecuteChangedCommand.RaiseCanExecuteChanged());
 
             CopyCurrentSqlCommand = new AsyncAutoCommand(async () =>
             {

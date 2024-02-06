@@ -9,13 +9,14 @@ using WDE.Common.Sessions;
 using WDE.Common.Solution;
 using WDE.Common.Tasks;
 using WDE.Module.Attributes;
+using WDE.MVVM;
 using WDE.SqlQueryGenerator;
 
 namespace WoWDatabaseEditor.Services.SolutionService
 {
     [AutoRegister]
     [SingleInstance]
-    public class SolutionTasksService : ISolutionTasksService
+    public class SolutionTasksService : ObservableBase, ISolutionTasksService
     {
         private readonly ITaskRunner taskRunner;
         private readonly ISolutionItemSqlGeneratorRegistry sqlGenerator;
@@ -46,6 +47,14 @@ namespace WoWDatabaseEditor.Services.SolutionService
             this.databaseProvider = databaseProvider;
             this.statusBar = statusBar;
             this.sessionService = sessionService;
+            this.remoteConnectorService.EditorConnected += RemoteConnectorStateChanged;
+            this.remoteConnectorService.EditorDisconnected += RemoteConnectorStateChanged;
+        }
+
+        private void RemoteConnectorStateChanged()
+        {
+            RaisePropertyChanged(nameof(CanReloadRemotely));
+            RaisePropertyChanged(nameof(CanSaveAndReloadRemotely));
         }
 
         private Task SaveSolutionToDatabaseTask(ISolutionItem item, ISolutionItemDocument? document, Func<ISolutionItem, ISolutionItemDocument?, Task<IQuery>> queryGenerator)

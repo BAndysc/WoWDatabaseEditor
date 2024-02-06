@@ -17,6 +17,8 @@ using WDE.Common.Solution;
 using WDE.Common.Utils;
 using WDE.Common.Windows;
 using WDE.Module.Attributes;
+using WDE.MVVM;
+using WDE.MVVM.Observable;
 using WDE.Solutions;
 using WoWDatabaseEditorCore.Managers;
 
@@ -114,11 +116,14 @@ namespace WoWDatabaseEditorCore.Providers
                         () => solutionSqlService.OpenDocumentWithSqlFor(DocumentManager.ActiveSolutionItemDocument!.SolutionItem),
                     () => DocumentManager.ActiveSolutionItemDocument != null)
                 .ObservesProperty(() => DocumentManager.ActiveSolutionItemDocument), new("F4")));
-            
-            SubItems.Add(new ModuleMenuItem("_Save to database and reload server", new DelegateCommand(
+
+            var cmd = new DelegateCommand(
                     () => solutionTasksService.SaveAndReloadSolutionTask(DocumentManager.ActiveSolutionItemDocument!.SolutionItem),
                     () => DocumentManager.ActiveSolutionItemDocument != null && solutionTasksService.CanSaveAndReloadRemotely)
-                .ObservesProperty(() => DocumentManager.ActiveSolutionItemDocument), new("F5")));
+                .ObservesProperty(() => DocumentManager.ActiveSolutionItemDocument);
+            SubItems.Add(new ModuleMenuItem("_Save to database and reload server", cmd, new("F5")));
+            solutionTasksService.ToObservable(x => x.CanSaveAndReloadRemotely)
+                .SubscribeAction(_ => cmd.RaiseCanExecuteChanged());
             
             SubItems.Add(new ModuleMenuItem("_Generate query for all opened", 
                 new DelegateCommand(

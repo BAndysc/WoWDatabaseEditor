@@ -18,6 +18,8 @@ namespace WDE.RemoteSOAP.Services
         private readonly TrinitySoapClient? trinitySoapClient;
         public event Action<string, TimeSpan, RemoteCommandType>? OnLog;
         public event Action<string>? EditorCommandReceived;
+        public event Action? EditorConnected;
+        public event Action? EditorDisconnected;
 
         public bool IsConnected => trinitySoapClient != null;
 
