@@ -29,28 +29,38 @@ public class SmartScenarioStepParameter : IContextualParameter<long, SmartBaseEl
         if (context == null)
             return null;
 
+        if (context is SmartAction)
+            return null;
+
         return context.GetParameter(0).Value;
     }
     
     public async Task<(long, bool)> PickValue(long value, object context)
     {
         var scenarioId = GetScenarioIdFromContext(context as SmartBaseElement);
-        
-        if (!scenarioId.HasValue || !dbcStore.ScenarioToStepStore.TryGetValue(scenarioId.Value, out var steps))
-            return await parameterPickerService.PickParameter(Parameter.Instance, value);
 
         Dictionary<long, SelectOption> options = new();
-        foreach (var (index, stepId) in steps)
+
+        if (!scenarioId.HasValue || !dbcStore.ScenarioToStepStore.TryGetValue(scenarioId.Value, out var steps))
         {
-            if (dbcStore.ScenarioStepStore.TryGetValue(stepId, out var step))
+            foreach (var step in dbcStore.ScenarioStepStore)
+                options.Add(step.Key, new SelectOption(step.Value));
+        }
+        else
+        {
+            foreach (var (index, stepId) in steps)
             {
-                options.Add(index, new SelectOption(step));
-            }
-            else
-            {
-                options.Add(index, new SelectOption("Unknown step " + index));
+                if (dbcStore.ScenarioStepStore.TryGetValue(stepId, out var step))
+                {
+                    options.Add(index, new SelectOption(step));
+                }
+                else
+                {
+                    options.Add(index, new SelectOption("Unknown step " + index));
+                }
             }
         }
+
 
         var result = await itemFromListProvider.GetItemFromList(options.OrderBy(x => x.Key).ToDictionary(x => x.Key, x => x.Value), false, value, "Pick scenario step");
         if (result.HasValue)
@@ -68,8 +78,13 @@ public class SmartScenarioStepParameter : IContextualParameter<long, SmartBaseEl
     public string ToString(long value, SmartBaseElement context)
     {
         var scenarioId = GetScenarioIdFromContext(context);
-        if (!scenarioId.HasValue || 
-            !dbcStore.ScenarioToStepStore.TryGetValue(scenarioId.Value, out var steps) ||
+        if (!scenarioId.HasValue || scenarioId.Value == 0)
+        {
+            if (!dbcStore.ScenarioStepStore.TryGetValue(value, out var stepName2))
+                return ToString(value);
+            return stepName2 + " (" + value + ")";
+        }
+        if (!dbcStore.ScenarioToStepStore.TryGetValue(scenarioId.Value, out var steps) ||
             !steps.TryGetValue(value, out var stepId) ||
             !dbcStore.ScenarioStepStore.TryGetValue(stepId, out var stepName))
             return ToString(value);
