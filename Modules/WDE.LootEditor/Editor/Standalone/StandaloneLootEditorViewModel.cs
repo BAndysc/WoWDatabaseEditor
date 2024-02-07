@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;
@@ -118,7 +119,7 @@ public partial class StandaloneLootEditorViewModel : ObservableBase, IDialog, IW
     public bool IsPerEntityLootEditingMode => EditingMode == LootEditingMode.PerLogicalEntity;
     public bool IsPerDatabaseTableLootEditingMode => EditingMode == LootEditingMode.PerDatabaseTable;
 
-    private async Task UpdateAvailableDifficulties(LootSourceType lootType, uint solutionEntry)
+    private async Task UpdateAvailableDifficulties(LootSourceType lootType, uint solutionEntry, CancellationToken token)
     {
         if (this.lootType != LootSourceType.Creature)
         {
@@ -128,7 +129,13 @@ public partial class StandaloneLootEditorViewModel : ObservableBase, IDialog, IW
         else
         {
             var template = await databaseProvider.GetCreatureTemplate(solutionEntry);
+            if (token.IsCancellationRequested)
+                return;
+            
             var difficulties = await databaseProvider.GetCreatureTemplateDifficulties(solutionEntry);
+            if (token.IsCancellationRequested)
+                return;
+
             Difficulties.Clear();
             
             Difficulties.Add(legacyDifficulties[0]);
@@ -276,15 +283,20 @@ public partial class StandaloneLootEditorViewModel : ObservableBase, IDialog, IW
         
         On(() => LootType, lootType =>
         {
-            UpdateAvailableDifficulties(lootType, solutionEntry).ListenErrors();
+            difficultyLoadToken?.Cancel();
+            difficultyLoadToken = new CancellationTokenSource();
+            UpdateAvailableDifficulties(lootType, solutionEntry, difficultyLoadToken.Token).ListenErrors();
         });
         On(() => SolutionEntry, solutionEntry =>
         {
-            UpdateAvailableDifficulties(lootType, solutionEntry).ListenErrors();
+            difficultyLoadToken?.Cancel();
+            difficultyLoadToken = new CancellationTokenSource();
+            UpdateAvailableDifficulties(lootType, solutionEntry, difficultyLoadToken.Token).ListenErrors();
         });
         On(() => ViewModel, BindViewModelUndoRedo);
     }
 
+    private CancellationTokenSource? difficultyLoadToken;
     private System.IDisposable? boundUndoRedo;
     private LootEditorViewModel? boundCopyCutPaste;
     
