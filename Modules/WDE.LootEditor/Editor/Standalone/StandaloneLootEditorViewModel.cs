@@ -243,6 +243,15 @@ public partial class StandaloneLootEditorViewModel : ObservableBase, IDialog, IW
             viewModel.BeginLoad().ListenErrors();
             LoadLootCommand = new AsyncAutoCommand(async () =>
             {
+                if (viewModel.LootSourceType != lootType)
+                {
+                    if (!await AskToSave())
+                        return;
+
+                    ViewModel = containerProvider.Resolve<LootEditorViewModel>((typeof(PerDatabaseTableLootSolutionItem), solutionItem ?? new PerDatabaseTableLootSolutionItem(lootType)), (typeof(PerEntityLootSolutionItem), null));
+                    await ViewModel.BeginLoad();
+                }
+
                 var (actualEntryToLoad, difficultyId) = await GetActualEntryAndDifficulty();
                 await viewModel!.AddLootFromEntity(lootType, actualEntryToLoad, difficultyId);
             }).WrapMessageBox<Exception>(messageBoxService);

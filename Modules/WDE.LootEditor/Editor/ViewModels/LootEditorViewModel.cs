@@ -21,6 +21,7 @@ using WDE.Common.Parameters;
 using WDE.Common.Providers;
 using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
+using WDE.Common.Sessions;
 using WDE.Common.Solution;
 using WDE.Common.Tasks;
 using WDE.Common.Types;
@@ -63,6 +64,7 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
     private readonly IFileSystem fileSystem;
     private readonly IMySqlExecutor mySqlExecutor;
     private readonly ICurrentCoreVersion currentCoreVersion;
+    private readonly ISessionService sessionService;
 
     public LootEditingMode LootEditingMode => currentCoreVersion.Current.LootEditingMode;
     public ICommand Undo { get; }
@@ -152,6 +154,7 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
         IClipboardService clipboardService,
         ICurrentCoreVersion currentCoreVersion,
         ILootCrossReferencesService crossReferencesService,
+        ISessionService sessionService,
         PerDatabaseTableLootSolutionItem? perDbSolutionItem = null,
         PerEntityLootSolutionItem? perEntitySolutionItem = null)
     {
@@ -182,6 +185,7 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
         this.fileSystem = fileSystem;
         this.mySqlExecutor = mySqlExecutor;
         this.currentCoreVersion = currentCoreVersion;
+        this.sessionService = sessionService;
 
         Debug.Assert(perEntitySolutionItem != null && LootEditingMode == LootEditingMode.PerLogicalEntity ||
                      perEntitySolutionItem == null && LootEditingMode == LootEditingMode.PerDatabaseTable);
@@ -228,6 +232,7 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
         
         Save = new AsyncAutoCommand(async () =>
         {
+            await WarnIfSessionActive();
             await taskRunner.ScheduleTask($"Export {Title} to database",
                 async progress =>
                 {
@@ -524,7 +529,15 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
             Title = $"{LootSourceType} loot editor";
         IsInitialLoading = true;
     }
-    
+
+    async Task WarnIfSessionActive()
+    {
+        if (sessionService.IsOpened && !sessionService.IsPaused)
+        {
+            await messageBoxService.SimpleDialog("Warning", "No session support", "The loot editor doesn't support sessions, but you have a session opened. This means when you save this window, it won't get saved to the current session.\n\nThis is because I didn't know people use this feature with sessions enabled.\n\nPlease let me know that you use both the loot editor and sessions and I'll do my best to add support for sessions.\n\n\n(but this will be saved to your database anyway)");
+        }
+    }
+
     public Task BeginLoad()
     {
         return taskRunner.ScheduleTask("Loading loot", Load);
