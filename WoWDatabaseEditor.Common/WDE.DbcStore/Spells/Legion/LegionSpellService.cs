@@ -63,7 +63,7 @@ public class LegionSpellService : IDbcSpellService, IDbcSpellLoader
         this.opener = opener;
     }
 
-    public void Load(string path)
+    public void Load(string path, DBCLocales dbcLocales)
     {
         Dictionary<uint, SpellCastTime> spellCastTimes = new();
         Dictionary<uint, SpellDuration> spellDuration = new();

@@ -19,7 +19,7 @@ namespace WDE.DbcStore.Spells.Tbc
             this.opener = opener;
         }
         
-        public void Load(string path)
+        public void Load(string path, DBCLocales dbcLocales)
         {
             foreach (var row in opener.Open(Path.Join(path, "SpellCastTimes.dbc")))
             {
@@ -162,10 +162,21 @@ namespace WDE.DbcStore.Spells.Tbc
                 spell.SpellIconId = row.GetUInt(i++);
                 spell.ActiveIconId = row.GetUInt(i++);
                 spell.SpellPriority = row.GetUInt(i++);
-                spell.Name = row.GetString(i++);
-                spell.NameSubtext = row.GetString(i++);
-                spell.Description = row.GetString(i++);
-                spell.AuraDescription = row.GetString(i++);
+                spell.Name = row.GetString(i + (int)dbcLocales);
+                i += 16;
+                spell.NameLangMask = row.GetUInt(i++);
+
+                spell.NameSubtext = row.GetString(i + (int)dbcLocales);
+                i += 16;
+                spell.NameLangMask = row.GetUInt(i++);
+
+                spell.Description = row.GetString(i + (int)dbcLocales);
+                i += 16;
+                spell.NameLangMask = row.GetUInt(i++);
+
+                spell.AuraDescription = row.GetString(i + (int)dbcLocales);
+                i += 16;
+                spell.NameLangMask = row.GetUInt(i++);
                 spell.ManaCostPct = row.GetUInt(i++);
                 spell.StartRecoveryCategory = row.GetUInt(i++);
                 spell.StartRecoveryTime = row.GetUInt(i++);

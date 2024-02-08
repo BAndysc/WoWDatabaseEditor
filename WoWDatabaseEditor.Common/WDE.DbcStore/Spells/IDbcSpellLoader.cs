@@ -7,5 +7,5 @@ namespace WDE.DbcStore.Spells;
 public interface IDbcSpellLoader : IDbcSpellService
 {
     DBCVersions Version { get; }
-    void Load(string path);
+    void Load(string path, DBCLocales dbcLocale);
 }

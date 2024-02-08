@@ -90,6 +90,10 @@ namespace WDE.DbcStore.Spells.Tbc
         public string NameSubtext;
         public string Description;
         public string AuraDescription;
+        public uint NameLangMask;
+        public uint NameSubtextLangMask;
+        public uint DescriptionLangMask;
+        public uint AuraDescriptionLangMask;
         public uint ManaCostPct;
         public uint StartRecoveryCategory;
         public uint StartRecoveryTime;

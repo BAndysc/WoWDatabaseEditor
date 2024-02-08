@@ -46,7 +46,7 @@ namespace WDE.DbcStore.Spells
 
         public DBCVersions Version => 0;
         
-        public void Load(string path)
+        public void Load(string path, DBCLocales dbcLocales)
         {
             
         }

@@ -447,7 +447,7 @@ namespace WDE.DbcStore
                 if (loader == null)
                     throw new Exception("Couldn't find loader for DBC version. If you are a developer, there is some bug in new code. If you are a user, please report this issue.");
 
-                spellLoader.Load(dbcSettingsProvider.GetSettings().Path);
+                spellLoader.Load(dbcSettingsProvider.GetSettings().Path, dbcSettingsProvider.GetSettings().DBCLocale);
                 
                 int locale = (int) dbcSettingsProvider.GetSettings().DBCLocale;
                 

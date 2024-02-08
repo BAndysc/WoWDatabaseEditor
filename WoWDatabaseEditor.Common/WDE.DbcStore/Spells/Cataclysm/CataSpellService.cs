@@ -93,7 +93,7 @@ namespace WDE.DbcStore.Spells.Cataclysm
             this.opener = opener;
         }
         
-        public void Load(string path)
+        public void Load(string path, DBCLocales dbcLocales)
         {
             foreach (var row in opener.Open(Path.Join(path, "SpellCastingRequirements.dbc")))
             {
