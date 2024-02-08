@@ -5,7 +5,7 @@
             https://nuget-feed-all.avaloniaui.net/v3/index.json
         </RestoreAdditionalProjectSources>
         <NoWarn>CS0067,CS3021,CS1998,CA1416,CS1591</NoWarn>
-        <AvaloniaVersion>0.10.22</AvaloniaVersion>
+        <AvaloniaVersion>0.10.999-cibuild0044575-beta</AvaloniaVersion>
         <LangVersion>preview</LangVersion>
     </PropertyGroup>
     <PropertyGroup>

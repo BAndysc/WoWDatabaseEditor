@@ -20,7 +20,7 @@
     <ItemGroup>
       <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
       <PackageReference Include="SixLabors.ImageSharp" Version="1.0.4" />
-      <PackageReference Include="Avalonia" Version="0.10.22" />
+      <PackageReference Include="Avalonia" Version="0.10.999-cibuild0044575-beta" />
     </ItemGroup>
 
 </Project>
