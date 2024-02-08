@@ -21,6 +21,7 @@ public class CreatureTextParameter : IContextualParameter<long, SmartBaseElement
     private readonly string columnName;
 
     private Dictionary<int, int> targetIdToCreatureEntryParameter = new();
+    private Dictionary<int, int> actionIdToTalkTarget;
 
     public CreatureTextParameter(ISmartDataManager smartDataManager,
         IDatabaseProvider databaseProvider,
@@ -33,6 +34,11 @@ public class CreatureTextParameter : IContextualParameter<long, SmartBaseElement
         this.itemFromListProvider = itemFromListProvider;
         this.tableName = tableName;
         this.columnName = columnName;
+
+        actionIdToTalkTarget = smartDataManager.GetAllData(SmartType.SmartAction)
+            .Where(x => x.Parameters != null && x.Parameters.Any(p => p.Name == "UseTalkTarget"))
+            .Select(x => (x.Id, x.Parameters!.IndexIf(p => p.Name == "UseTalkTarget")))
+            .ToDictionary(x => x.Id, x => x.Item2);
 
         foreach (var data in smartDataManager.GetAllData(SmartType.SmartTarget))
         {
@@ -94,7 +100,8 @@ public class CreatureTextParameter : IContextualParameter<long, SmartBaseElement
         }
         if (element is SmartAction action)
         {
-            if ((action.GetParameter(2).Value != 0 ||
+            if (((actionIdToTalkTarget.TryGetValue(action.Id, out var talkTargetIndex)
+                  && action.GetParameter(talkTargetIndex).Value != 0) ||
                 action.Source.Id == SmartConstants.SourceNone ||
                 action.Source.Id == SmartConstants.SourceSelf))
             {
