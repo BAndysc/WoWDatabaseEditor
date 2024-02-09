@@ -48,6 +48,7 @@ namespace WoWDatabaseEditorCore.ViewModels
         private readonly IGlobalServiceRoot globalServiceRoot;
         private readonly ITeachingTipService teachingTipService;
         private readonly IStatisticsService statisticsService;
+        private readonly IUpdateViewModel updateViewModel;
 
         private readonly Dictionary<string, ITool> toolById = new();
 
@@ -84,6 +85,7 @@ namespace WoWDatabaseEditorCore.ViewModels
             ITeachingTipService teachingTipService,
             IStatisticsService statisticsService,
             ICurrentCoreVersion currentCoreVersion,
+            IUpdateViewModel updateViewModel,
             Func<IFindAnywhereDialogViewModel> findAnywhereCreator)
         {
             DocumentManager = documentManager;
@@ -101,6 +103,7 @@ namespace WoWDatabaseEditorCore.ViewModels
             this.globalServiceRoot = globalServiceRoot;
             this.teachingTipService = teachingTipService;
             this.statisticsService = statisticsService;
+            this.updateViewModel = updateViewModel;
             this.programNameAddons = nameAddons.ToList();
             Title = "";
             Subtitle = programNameService.Subtitle;
@@ -160,7 +163,7 @@ namespace WoWDatabaseEditorCore.ViewModels
             {
                 sqlEditorService.Value.NewDocument();
             });
-            
+
             DocumentManager.ToObservable(dm => dm.ActiveDocument)
                 .SubscribeAction(_ =>
                 {
@@ -186,7 +189,9 @@ namespace WoWDatabaseEditorCore.ViewModels
                     mainThread.Dispatch(ShowStartPage);
             });
             //LoadDefault();
-            
+
+            Watch(this.updateViewModel, x => x.HasPendingUpdate, nameof(HasUpdateToDownload));
+            Watch(this.updateViewModel, x => x.InstallPendingCommandUpdate, nameof(DownloadUpdateCommand));
             Watch(DocumentManager, dm => dm.ActiveSolutionItemDocument, nameof(ShowExportButtons));
             Watch(DocumentManager, dm => dm.ActiveDocument, nameof(ShowPlayButtons));
             Watch(tablesToolService, serv => serv.Visibility, nameof(ShowTablesList));
@@ -243,6 +248,8 @@ namespace WoWDatabaseEditorCore.ViewModels
 
         public List<IMainMenuItem> MenuItemProviders { get; }
 
+        public bool HasUpdateToDownload => updateViewModel.HasPendingUpdate;
+
         public string Title { get; private set; }
         
         public string Subtitle { get; }
@@ -267,7 +274,9 @@ namespace WoWDatabaseEditorCore.ViewModels
         public ICommand Open3DCommand { get; }
         
         public ICommand OpenSqlDocumentCommand { get; }
-        
+
+        public ICommand DownloadUpdateCommand => updateViewModel.InstallPendingCommandUpdate;
+
         public bool ShowTablesList
         {
             get => tablesToolService.Visibility;

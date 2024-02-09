@@ -2,8 +2,10 @@ using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using AsyncAwaitBestPractices.MVVM;
 using Prism.Commands;
 using Prism.Mvvm;
+using PropertyChanged.SourceGenerator;
 using WDE.Common.Managers;
 using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
@@ -16,7 +18,7 @@ namespace WDE.Updater.ViewModels
 {
     [AutoRegister]
     [SingleInstance]
-    public class UpdateViewModel : BindableBase
+    public partial class UpdateViewModel : BindableBase, IUpdateViewModel
     {
         private readonly IUpdateService updateService;
         private readonly ITaskRunner taskRunner;
@@ -27,7 +29,11 @@ namespace WDE.Updater.ViewModels
         private readonly IMessageBoxService messageBoxService;
 
         public ICommand CheckForUpdatesCommand { get; }
-        
+
+        [Notify] private bool hasPendingUpdate;
+
+        [Notify] private ICommand installPendingCommandUpdate;
+
         public UpdateViewModel(IUpdateService updateService, 
             ITaskRunner taskRunner, 
             IStatusBar statusBar,
@@ -46,18 +52,21 @@ namespace WDE.Updater.ViewModels
             this.platformService = platformService;
             this.fileSystem = fileSystem;
             this.messageBoxService = messageBoxService;
+            installPendingCommandUpdate = AlwaysDisabledCommand.Command;
+
             CheckForUpdatesCommand = new DelegateCommand(() =>
             {
                 if (updateService.CanCheckForUpdates())
                     taskRunner.ScheduleTask(new UpdateTask(this));
             }, updateService.CanCheckForUpdates);
 
-            if (!settingsProvider.Settings.DisableAutoUpdates)
+            if (!settingsProvider.Settings.DisableAutoUpdates &&
+                updateService.CanCheckForUpdates())
             {
                 CheckForUpdatesCommand.Execute(null);
                 mainThread.StartTimer(() =>
                 {
-                    CheckForUpdatesCommand.Execute(null);
+                    taskRunner.ScheduleTask(new UpdateTask(this));
                     return true;
                 }, TimeSpan.FromHours(1));
             }
@@ -87,27 +96,38 @@ namespace WDE.Updater.ViewModels
                 {
                     if (settingsProvider.Settings.EnableSilentUpdates)
                     {
-                        DownloadUpdate();
                         statusBar.PublishNotification(new PlainNotification(NotificationType.Info,"Downloading update..."));
+                        ScheduleDownloadUpdate(settingsProvider.Settings.EnableReadyToInstallPopup);
                     }
                     else
                     {
-                        if (await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
-                            .SetTitle("New update")
-                            .SetMainInstruction("A new update is ready to be downloaded")
-                            .SetContent("Do you want to download the update now?")
-                            .WithYesButton(true)
-                            .WithNoButton(false)
-                            .SetIcon(MessageBoxIcon.Information)
-                            .Build()))
+                        Task<bool> AskToDownload()
                         {
-                            DownloadUpdate();
+                            return messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
+                                .SetTitle("New update")
+                                .SetMainInstruction("A new update is ready to be downloaded")
+                                .SetContent("Do you want to download the update now?")
+                                .WithYesButton(true)
+                                .WithNoButton(false)
+                                .SetIcon(MessageBoxIcon.Information)
+                                .Build());
+                        }
+
+                        if (await AskToDownload())
+                        {
+                            ScheduleDownloadUpdate(settingsProvider.Settings.EnableReadyToInstallPopup);
                         }
                         else
                         {
+                            HasPendingUpdate = true;
+                            InstallPendingCommandUpdate = new AsyncAutoCommand(async () =>
+                            {
+                                if (await AskToDownload())
+                                    await DownloadUpdate(true);
+                            });
                             statusBar.PublishNotification(new PlainNotification(NotificationType.Info, 
                                 "New updates are ready to download. Click to download.",
-                                new DelegateCommand(DownloadUpdate)));
+                                new DelegateCommand(() => DownloadUpdate(true))));
                         }
                     }
                 }
@@ -118,29 +138,36 @@ namespace WDE.Updater.ViewModels
             }
         }
 
-        private void DownloadUpdate()
+        private void ScheduleDownloadUpdate(bool askToRestartOrOnlyNotification)
+        {
+            DownloadUpdate(askToRestartOrOnlyNotification).ListenErrors();
+        }
+
+        private Task DownloadUpdate(bool askToRestartOrOnlyNotification)
         {
             statusBar.PublishNotification(
                 new PlainNotification(NotificationType.Info, "Downloading..."));
-            taskRunner.ScheduleTask(new DownloadUpdateTask(this));
+            return taskRunner.ScheduleTask(new DownloadUpdateTask(this, askToRestartOrOnlyNotification));
         }
         
         private class DownloadUpdateTask : IAsyncTask
         {
             private readonly UpdateViewModel parent;
+            private readonly bool askToRestartOrOnlyNotification;
             public string Name => "Downloading update";
             
             public bool WaitForOtherTasks => false;
 
-            public DownloadUpdateTask(UpdateViewModel parent)
+            public DownloadUpdateTask(UpdateViewModel parent, bool askToRestartOrOnlyNotification)
             {
                 this.parent = parent;
+                this.askToRestartOrOnlyNotification = askToRestartOrOnlyNotification;
             }
             
-            public Task Run(ITaskProgress progress) => parent.DownloadUpdateTaskImpl(progress);
+            public Task Run(ITaskProgress progress) => parent.DownloadUpdateTaskImpl(progress, askToRestartOrOnlyNotification);
         }
         
-        private async Task DownloadUpdateTaskImpl(ITaskProgress taskProgress)
+        private async Task DownloadUpdateTaskImpl(ITaskProgress taskProgress, bool askToRestartOrOnlyNotification)
         {
             try
             {
@@ -176,8 +203,8 @@ namespace WDE.Updater.ViewModels
                         open.Start();
                     }
                 });
-                bool showNotification = true;
-                if (settingsProvider.Settings.EnableReadyToInstallPopup)
+
+                IAsyncCommand askToRestartCommand = new AsyncAutoCommand(async () =>
                 {
                     if (await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
                             .SetTitle("Update ready to install")
@@ -188,12 +215,22 @@ namespace WDE.Updater.ViewModels
                             .WithNoButton(false)
                             .Build()))
                     {
-                        showNotification = false;
                         await restartCommand.ExecuteAsync();
                     }
-                }
+                });
 
-                if (showNotification)
+                InstallPendingCommandUpdate = new AsyncAutoCommand(async () =>
+                {
+                    // check for EnableReadyToInstallPopup?
+                    // idk, better always ask here, because the user has pressed the button and he might not know what it does
+                    await askToRestartCommand.ExecuteAsync();
+                });
+                HasPendingUpdate = true;
+                if (askToRestartOrOnlyNotification)
+                {
+                    await askToRestartCommand.ExecuteAsync();
+                }
+                else
                 {
                     statusBar.PublishNotification(new PlainNotification(NotificationType.Info,
                         "Update ready to install. It will be installed on the next editor restart or when you click here",
