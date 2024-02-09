@@ -22,12 +22,14 @@ namespace WDE.RemoteSOAP.Services
         public event Action? EditorDisconnected;
 
         public bool IsConnected => trinitySoapClient != null;
+        public bool HasValidSettings { get; set; }
 
         public SoapRemoteConnectorService(IConnectionSettingsProvider connectionSettings,
             ISoapClientFactory soapClientFactory)
         {
             this.connectionSettings = connectionSettings;
             var settings = connectionSettings.GetSettings();
+            HasValidSettings = !settings.IsEmpty;
 
             if (settings.IsEmpty)
                 trinitySoapClient = null;

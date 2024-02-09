@@ -51,9 +51,9 @@ namespace WoWDatabaseEditorCore.ViewModels
                 "Database connection", 
                 "WoW Database Editor is database editor by design. It stores all data and loads things from wow database. Therefore to activate all features you have to provide wow compatible database connection settings."));
 
-            ConfigurationChecks.Add(new ConfigurationCheckup(remoteConnectorService.IsConnected, 
-                "Remote SOAP connection", 
-                "WDE can invoke reload commands for you for faster work. To enable that, you have to enable SOAP connection in your worldserver configuration and provide details in the settings."));
+            ConfigurationChecks.Add(new ConfigurationCheckup(remoteConnectorService.HasValidSettings,
+                "Remote connection",
+                "WDE can invoke reload commands for you for faster work. To enable that, you have to enable remote connection in your worldserver configuration and provide details in the settings."));
 
             AllConfigured = ConfigurationChecks.All(s => s.Fulfilled);
 

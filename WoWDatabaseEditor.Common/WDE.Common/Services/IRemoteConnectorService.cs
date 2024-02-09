@@ -25,6 +25,7 @@ namespace WDE.Common.Services
     {
         event Action<string, TimeSpan, RemoteCommandType> OnLog;
         bool IsConnected { get; }
+        bool HasValidSettings { get; }
         
         Task<string> ExecuteCommand(IRemoteCommand command);
         Task ExecuteCommands(IList<IRemoteCommand> commands);
