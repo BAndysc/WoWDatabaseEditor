@@ -102,27 +102,20 @@ namespace WDE.SmartScriptEditor.Models
         {
             get
             {
-                switch (VariableType)
+                return VariableType switch
                 {
-                    case GlobalVariableType.StoredTarget:
-                        return $"Define storedTarget[{Key}] as {Name}";
-                    case GlobalVariableType.DataVariable:
-                        return $"Define objectData[{Key}] as {Name}";
-                    case GlobalVariableType.TimedEvent:
-                        return $"Define timedEvent[{Key}] as {Name}";
-                    case GlobalVariableType.Action:
-                        return $"Define doAction({Key}) as {Name}";
-                    case GlobalVariableType.Function:
-                        return $"Define function({Key}) as {Name}";
-                    case GlobalVariableType.StoredPoint:
-                        return $"Define storedPoint[{Key}] as {Name}";
-                    case GlobalVariableType.DatabasePoint:
-                        return $"Define databasePoint[{Key}] as {Name}";
-                    case GlobalVariableType.Actor:
-                        return $"Define actor[{Key}] as {Name}";
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
+                    GlobalVariableType.StoredTarget => $"Define storedTarget[{Key}] as {Name}",
+                    GlobalVariableType.DataVariable => $"Define objectData[{Key}] as {Name}",
+                    GlobalVariableType.TimedEvent => $"Define timedEvent[{Key}] as {Name}",
+                    GlobalVariableType.Action => $"Define doAction({Key}) as {Name}",
+                    GlobalVariableType.Function => $"Define function({Key}) as {Name}",
+                    GlobalVariableType.StoredPoint => $"Define storedPoint[{Key}] as {Name}",
+                    GlobalVariableType.DatabasePoint => $"Define databasePoint[{Key}] as {Name}",
+                    GlobalVariableType.Actor => $"Define actor[{Key}] as {Name}",
+                    GlobalVariableType.Repeated => $"Define repeated[{Key}] as {Name}",
+                    GlobalVariableType.MapEvent => $"Define mapEvent[{Key}] as {Name}",
+                    _ => throw new ArgumentOutOfRangeException()
+                };
             }
         }
 
@@ -156,6 +149,7 @@ namespace WDE.SmartScriptEditor.Models
         StoredPoint,
         DatabasePoint,
         Actor,
-        Repeated
+        Repeated,
+        MapEvent
     }
 }

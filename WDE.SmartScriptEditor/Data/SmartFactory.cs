@@ -74,6 +74,8 @@ namespace WDE.SmartScriptEditor.Data
                     (typeof(GlobalVariableType), GlobalVariableType.DatabasePoint), (typeof(string), "databasePoint")));
                 parameterFactory.Register("RepatedParameter", containerProvider.Resolve<VariableContextualParameter>(
                     (typeof(GlobalVariableType), GlobalVariableType.Repeated), (typeof(string), "repeated")));
+                parameterFactory.Register("MapEventParameter", containerProvider.Resolve<VariableContextualParameter>(
+                    (typeof(GlobalVariableType), GlobalVariableType.MapEvent), (typeof(string), "map event")));
                 var actor = parameterFactory.Register("ActorParameter", containerProvider.Resolve<VariableContextualParameter>(
                     (typeof(GlobalVariableType), GlobalVariableType.Actor), (typeof(string), "actor")));
                 parameterFactory.Register("StoredTargetOrActorParameter", new StoredTargetOrActorParameter(storedTarget, actor));
