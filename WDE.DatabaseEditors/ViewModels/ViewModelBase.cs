@@ -379,7 +379,6 @@ namespace WDE.DatabaseEditors.ViewModels
         public ISolutionItem SolutionItem => solutionItem;
         public virtual DatabaseEntity? FocusedEntity { get; }
         public abstract DatabaseEntity AddRow(DatabaseKey key, int? index = null);
-        public abstract DatabaseKey? SelectedTableKey { get; }
         public abstract IReadOnlyList<DatabaseEntity>? MultiSelectionEntities { get; }
         public abstract bool SupportsMultiSelect { get; }
 

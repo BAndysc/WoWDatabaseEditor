@@ -226,7 +226,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
                 .GroupBy(columns => columns.ForeignTable != null ? new DatabaseTable(tableData.TableDefinition.DataDatabaseType, columns.ForeignTable) : tableData.TableDefinition.Id)
                 .ToDictionary(g => g.Key, g => g.ToList());
 
-            HashSet<EntityKey> entityKeys = new();
+            HashSet<HashedEntityPrimaryKey> entityKeys = new();
             Dictionary<DatabaseTable, List<Dictionary<string, object?>>> inserts = new(tableData.Entities.Count);
             
             List<string> duplicates = new List<string>();
@@ -236,7 +236,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
                 if (!entity.Phantom && !keys.Contains(entity.Key))
                     continue;
                 
-                bool duplicate = tableData.TableDefinition.PrimaryKey != null && !entityKeys.Add(new EntityKey(entity, tableData.TableDefinition));
+                bool duplicate = tableData.TableDefinition.PrimaryKey != null && !entityKeys.Add(new HashedEntityPrimaryKey(entity, tableData.TableDefinition));
                 foreach (var table in columns)
                 {
                     bool isDefault = true;
@@ -639,40 +639,6 @@ namespace WDE.DatabaseEditors.QueryGenerators
 
                 return where;
             }
-        }
-
-        private class EntityKey
-        {
-            private readonly IList<IDatabaseField> fields;
-            private readonly int hash;
-            
-            public EntityKey(DatabaseEntity entity, DatabaseTableDefinitionJson table)
-            {
-                fields = table.PrimaryKey!.Select(key => entity.GetCell(key)!).ToList();
-                hash = 0;
-                foreach (var field in fields)
-                    hash = HashCode.Combine(hash, field.GetHashCode());
-            }
-
-            private bool Equals(EntityKey other)
-            {
-                if (other.fields.Count != fields.Count)
-                    return false;
-                for (int i = 0; i < fields.Count; ++i)
-                    if (!fields[i].Equals(other.fields[i]))
-                        return false;
-                return true;
-            }
-
-            public override bool Equals(object? obj)
-            {
-                if (ReferenceEquals(null, obj)) return false;
-                if (ReferenceEquals(this, obj)) return true;
-                if (obj.GetType() != this.GetType()) return false;
-                return Equals((EntityKey) obj);
-            }
-
-            public override int GetHashCode() => hash;
         }
     }
 }

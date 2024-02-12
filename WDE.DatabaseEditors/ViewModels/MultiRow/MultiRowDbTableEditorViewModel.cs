@@ -88,8 +88,6 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             => MultiSelection.All().Select(idx => Rows[idx.GroupIndex][idx.RowIndex].Entity).ToList();
 
         public override DatabaseEntity? FocusedEntity => SelectedRow?.Entity;
-        
-        public override DatabaseKey? SelectedTableKey => FocusedEntity?.ForceGenerateKey(tableDefinition);
 
         private MultiRowSplitMode splitMode;
         public bool SplitView => splitMode != MultiRowSplitMode.None;
@@ -849,14 +847,14 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         // we're gonna check for duplicate keys before saving the data to prevent data loss
         protected override async Task<bool> BeforeSaveData()
         {
-            HashSet<DatabaseKey> keys = new HashSet<DatabaseKey>();
+            HashSet<HashedEntityPrimaryKey> keys = new HashSet<HashedEntityPrimaryKey>();
             bool anyDuplicate = false;
             foreach (var group in Rows)
             {
                 keys.Clear();
                 foreach (var row in group)
                 {
-                    var uniqueKey = row.Entity.ForceGenerateKey(tableDefinition);
+                    var uniqueKey = new HashedEntityPrimaryKey(row.Entity, tableDefinition);
                     if (!keys.Add(uniqueKey))
                     {
                         row.Duplicate = true;

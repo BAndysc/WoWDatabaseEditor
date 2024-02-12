@@ -71,7 +71,6 @@ namespace WDE.DatabaseEditors.ViewModels.Template
         public DelegateCommand<DatabaseCellViewModel?> SetNullCommand { get; }
         public AsyncAutoCommand<DatabaseCellViewModel> OpenParameterWindow { get; }
         private readonly Dictionary<string, ReactiveProperty<bool>> groupVisibilityByName = new();
-        public override DatabaseKey? SelectedTableKey => null;
         public override bool SupportsMultiSelect => false;
         public override IReadOnlyList<DatabaseEntity>? MultiSelectionEntities => null;
 
