@@ -57,7 +57,7 @@ namespace WDE.Updater.ViewModels
             CheckForUpdatesCommand = new DelegateCommand(() =>
             {
                 if (updateService.CanCheckForUpdates())
-                    taskRunner.ScheduleTask(new UpdateTask(this));
+                    taskRunner.ScheduleTask(new UpdateTask(this, true));
             }, updateService.CanCheckForUpdates);
 
             if (!settingsProvider.Settings.DisableAutoUpdates &&
@@ -66,7 +66,7 @@ namespace WDE.Updater.ViewModels
                 CheckForUpdatesCommand.Execute(null);
                 mainThread.StartTimer(() =>
                 {
-                    taskRunner.ScheduleTask(new UpdateTask(this));
+                    taskRunner.ScheduleTask(new UpdateTask(this, false));
                     return true;
                 }, TimeSpan.FromHours(1));
             }
@@ -75,19 +75,21 @@ namespace WDE.Updater.ViewModels
         private class UpdateTask : IAsyncTask
         {
             private readonly UpdateViewModel parent;
+            private readonly bool initialCheck;
             public string Name => "Check for updates";
             
             public bool WaitForOtherTasks => false;
 
-            public UpdateTask(UpdateViewModel parent)
+            public UpdateTask(UpdateViewModel parent, bool initialCheck)
             {
                 this.parent = parent;
+                this.initialCheck = initialCheck;
             }
             
-            public Task Run(ITaskProgress progress) => parent.UpdatesCheck();
+            public Task Run(ITaskProgress progress) => parent.UpdatesCheck(initialCheck);
         }
 
-        private async Task UpdatesCheck()
+        private async Task UpdatesCheck(bool initialCheck)
         {
             try
             {
@@ -113,7 +115,7 @@ namespace WDE.Updater.ViewModels
                                 .Build());
                         }
 
-                        if (await AskToDownload())
+                        if (initialCheck && await AskToDownload())
                         {
                             ScheduleDownloadUpdate(settingsProvider.Settings.EnableReadyToInstallPopup);
                         }
