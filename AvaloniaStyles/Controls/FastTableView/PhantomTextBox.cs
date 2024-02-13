@@ -124,6 +124,8 @@ public class PhantomTextBox : PhantomControlBase<TextBox>
 
     public void Spawn(Visual parent, Rect position, string text, bool selectAll, Action<string, ActionAfterSave> onApply, FontFamily? customFont = null)
     {
+        Despawn(false);
+
         currentOnApply = onApply;
         var textBox = new TextBox()
         {
@@ -174,10 +176,11 @@ public class PhantomTextBox : PhantomControlBase<TextBox>
             Gesture = new KeyGesture(Key.Escape),
             Command = new DelegateCommand(() => Despawn(false))
         });
-        textBox.LostFocus += ElementLostFocus;
 
         if (!AttachAsAdorner(parent, position, textBox))
             return;
+
+        textBox.LostFocus += ElementLostFocus;
 
         DispatcherTimer.RunOnce(textBox.Focus, TimeSpan.FromMilliseconds(1));
         if (selectAll)

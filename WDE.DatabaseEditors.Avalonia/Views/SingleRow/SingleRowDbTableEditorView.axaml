@@ -169,6 +169,8 @@
                         ValueUpdateRequest="VeryFastTableView_OnValueUpdateRequest"
                         IsGroupingEnabled="True"
                         RowFilterParameter="{CompiledBinding SearchText}"
+                        AttachedToVisualTree="Visual_OnAttachedToVisualTree"
+                        DetachedFromVisualTree="Visual_OnDetachedFromVisualTree"
                         Items="{CompiledBinding OnlyGroup}">
                         <fastTableView:VeryFastTableView.CustomCellInteractor>
                             <singleRow1:CustomCellInteractor />
@@ -188,8 +190,8 @@
                                 </controls1:GroupingHeader>
                             </DataTemplate>
                         </fastTableView:VeryFastTableView.GroupHeaderTemplate>
-                        <fastTableView:VeryFastTableView.ContextFlyout>
-                            <MenuFlyout>
+                        <fastTableView:VeryFastTableView.ContextMenu>
+                            <FixedContextMenu>
                                 <MenuItem Header="Revert value" Command="{CompiledBinding RevertSelectedCommand}" />
                                 <MenuItem Header="Set to null" Command="{CompiledBinding SetNullSelectedCommand}" />
                                 <MenuItem Header="-"></MenuItem>
@@ -197,8 +199,8 @@
                                 <MenuItem Header="Duplicate row"  Command="{CompiledBinding DuplicateSelectedCommand}"/>
                                 <MenuItem Header="-"></MenuItem>
                                 <MenuItem Header="Generate insert query"  Command="{CompiledBinding GenerateInsertQueryForSelectedCommand}"/>
-                            </MenuFlyout>
-                        </fastTableView:VeryFastTableView.ContextFlyout>
+                            </FixedContextMenu>
+                        </fastTableView:VeryFastTableView.ContextMenu>
                     </fastTableView:VeryFastTableView>
                 </ScrollViewer>
             </DockPanel>
