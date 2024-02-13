@@ -131,6 +131,7 @@ public class ParameterPickerService : IParameterPickerService
                         return null;
                     return new LongPickerItem(entry, "Pick non existing", null);
                 })
+                .SetNumberPredicate((item, val) => item.Key == val)
                 .Build());
             
             return values == null ? Array.Empty<T>() : values.Select(x => (T)(object)x.Key).ToList();

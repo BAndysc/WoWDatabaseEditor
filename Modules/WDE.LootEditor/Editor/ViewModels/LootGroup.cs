@@ -70,7 +70,8 @@ public partial class LootGroup : ObservableBase, ITableRowGroup
                                                 (ParentVm.PerEntityLootSolutionItem == null && !ParentVm.PerDatabaseSolutionItems.Contains(LootEntry)));
     
     public LootEntry LootEntry { get; }
-    
+    public uint? SourceEntityEntry { get; }
+
     public IReadOnlyList<ITableRow> Rows => LootItems;
 
     public string Header => (LootSourceType == LootSourceType.Reference ? "Reference" : "Loot id") + " " + (uint)LootEntry + (groupName == null ? "" : $": {groupName}");
@@ -114,10 +115,11 @@ public partial class LootGroup : ObservableBase, ITableRowGroup
         LootItems.Add(vm);
     }
     
-    public LootGroup(LootEditorViewModel parentVM, LootSourceType type, LootEntry lootEntry, ILootTemplateName? name) : this(parentVM)
+    public LootGroup(LootEditorViewModel parentVM, LootSourceType type, LootEntry lootEntry, uint? sourceEntityEntry, ILootTemplateName? name) : this(parentVM)
     {
         LootSourceType = type;
         LootEntry = lootEntry;
+        SourceEntityEntry = sourceEntityEntry;
         CanHaveName = parentVM.LootEditorFeatures.LootGroupHasName(type);
         groupName = name?.Name;
         dontLoadRecursively = name?.DontLoadRecursively ?? false;

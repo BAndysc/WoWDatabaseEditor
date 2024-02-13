@@ -432,7 +432,7 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
             var lootIds = await lootPickerService.PickLoots(LootSourceType);
 
             foreach (var lootId in lootIds)
-               await AddLootId(new LootEntry(lootId));
+               await AddLootId(new LootEntry(lootId), null);
         }, () => 
             LootEditingMode == LootEditingMode.PerDatabaseTable ||
             perEntitySolutionItem!.Type.CanUpdateSourceLootEntry() &&
@@ -630,9 +630,9 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
     {
         IList<AbstractLootEntry> loot;
         if (LootSourceType == LootSourceType.Creature)
-            loot = await woWHeadLootImporter.GetCreatureLoot(perEntitySolutionItem?.Entry ?? (uint)group.LootEntry, onlyQuestItems);
+            loot = await woWHeadLootImporter.GetCreatureLoot(perEntitySolutionItem?.Entry ?? group.SourceEntityEntry ?? (uint)group.LootEntry, onlyQuestItems);
         else if (LootSourceType == LootSourceType.GameObject)
-            loot = await woWHeadLootImporter.GetGameObjectLoot(perEntitySolutionItem?.Entry ?? throw new NotImplementedException(), onlyQuestItems);
+            loot = await woWHeadLootImporter.GetGameObjectLoot(perEntitySolutionItem?.Entry ?? group.SourceEntityEntry ?? throw new NotImplementedException(), onlyQuestItems);
         else
             throw new Exception($"Loot type ({LootSourceType}) not supported");
 
@@ -795,7 +795,7 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
             foreach (var entry in entries)
             {
                 if ((uint)entry > 0)
-                    await LoadLoot(perEntitySolutionItem.Type, entry);
+                    await LoadLoot(perEntitySolutionItem.Type, entry, perEntitySolutionItem.Entry);
             }
 
             await LoadRecursively();
@@ -819,7 +819,7 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
 
     private HashSet<(LootSourceType, LootEntry)> lootToNeverLoadAgain = new();
     
-    private async Task LoadLoot(LootSourceType type, LootEntry entry)
+    private async Task LoadLoot(LootSourceType type, LootEntry entry, uint? sourceEntityEntry)
     {
         if (HasLootEntry(type, entry))
             return;
@@ -842,7 +842,7 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
         
         var lootModels = await lootLoader.FetchLoot(type, entry);
 
-        var lootGroup = new LootGroup(this, type, entry, name);
+        var lootGroup = new LootGroup(this, type, entry, sourceEntityEntry, name);
         lootGroup.LootItems.AddRange(lootModels.Select(o => new LootItemViewModel(lootGroup, o)));
         lootGroup.SetAsSaved();
 
@@ -999,7 +999,7 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
         
             foreach (var menu in looseReferences)
             {
-                await LoadLoot(LootSourceType.Reference, menu);
+                await LoadLoot(LootSourceType.Reference, menu, null);
             }
 
             foreach (var menu in notRequiredReferences)
@@ -1209,7 +1209,7 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
         var entries = await lootLoader.GetLootEntries(lootType, entityEntry, difficultyId);
         var bulk = HistoryHandler.WithinBulk("Add loot");
         foreach (var entry in entries)
-            await AddLootId(entry);
+            await AddLootId(entry, entityEntry);
         ReorderOptionGroups();
         
         bulk.Dispose();
@@ -1217,13 +1217,13 @@ public partial class LootEditorViewModel : ObservableBase, ISolutionItemDocument
             historyManager.MarkAsSaved();
     }
 
-    public async Task AddLootId(LootEntry lootEntry)
+    public async Task AddLootId(LootEntry lootEntry, uint? sourceEntityEntry)
     {
         var wasSavedBeforeLoading = historyManager.IsSaved;
         
         if (perEntitySolutionItem == null && !PerDatabaseSolutionItems.Contains(lootEntry))
             PerDatabaseSolutionItems.Add(lootEntry);
-        await LoadLoot(LootSourceType, lootEntry);
+        await LoadLoot(LootSourceType, lootEntry, sourceEntityEntry);
         await LoadRecursively();
         
         if (perEntitySolutionItem == null && wasSavedBeforeLoading)

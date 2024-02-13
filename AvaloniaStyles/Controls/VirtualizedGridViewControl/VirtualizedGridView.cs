@@ -256,7 +256,7 @@ public class VirtualizedGridView : TemplatedControl
         rangeModifier &= MultiSelect;
         toggleModifier &= MultiSelect;
 
-        if (!toggleModifier)
+        if (!toggleModifier && !rangeModifier)
             selection.Clear();
 
         if (rangeModifier)
@@ -272,6 +272,7 @@ public class VirtualizedGridView : TemplatedControl
                 for (int i = index; i <= oldFocusedIndex; ++i)
                     selection.Add(i);
             }
+            FocusedIndex = index;
         }
         else
         {
