@@ -358,11 +358,12 @@ public class VirtualizedTreeView : Panel
     }
 
     private IDisposable? visualTreeSubscription;
-    
+    public static readonly StyledProperty<bool> NeverShrinkWidthProperty = AvaloniaProperty.Register<VirtualizedTreeView, bool>("NeverShrinkWidth");
+
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
-        
+
         if (ScrollViewer is { } sc)
         {
             visualTreeSubscription = new CompositeDisposable(
@@ -387,29 +388,42 @@ public class VirtualizedTreeView : Panel
     public override void Render(DrawingContext context)
     {
         base.Render(context);
-        
+
         if (Items == null)
             return;
-        
+
         if (ScrollViewer is not { } scrollViewer)
         {
-            context.DrawText(Brushes.Red, default, 
-                new FormattedText("VirtualizedTreeView must be wrapped in ScrollViewer!", 
-                    Typeface.Default, 
+            context.DrawText(Brushes.Red, default,
+                new FormattedText("VirtualizedTreeView must be wrapped in ScrollViewer!",
+                    Typeface.Default,
                     14,
                     TextAlignment.Left,
-                    TextWrapping.Wrap, 
+                    TextWrapping.Wrap,
                     Bounds.Size));
             return;
         }
-        
+
         context.FillRectangle(Brushes.Transparent, new Rect(scrollViewer.Offset.X, scrollViewer.Offset.Y, scrollViewer.Viewport.Width, scrollViewer.Viewport.Height));
     }
 
     protected ScrollViewer? ScrollViewer => this.FindAncestorOfType<ScrollViewer>();
 
+    protected double lastDesiredWidth = 0;
+
     protected override Size MeasureOverride(Size availableSize)
     {
+        double desiredWidth = 0;
+        foreach (var child in Children)
+        {
+            child.Measure(availableSize.WithHeight(RowHeight));
+            desiredWidth = Math.Max(desiredWidth, child.DesiredSize.Width);
+        }
+
+        if (NeverShrinkWidth)
+            desiredWidth = Math.Max(lastDesiredWidth, desiredWidth);
+        lastDesiredWidth = desiredWidth;
+
         if (IsFiltered)
         {
             int visibleCount = 0;
@@ -420,10 +434,10 @@ public class VirtualizedTreeView : Panel
                     if (items[i].IsVisible)
                         visibleCount++;
             }
-            return new Size(availableSize.Width, RowHeight * visibleCount);
+            return new Size(desiredWidth, RowHeight * visibleCount);
         }
         else
-            return new Size(availableSize.Width, RowHeight * (Items?.Count ?? 0));
+            return new Size(desiredWidth, RowHeight * (Items?.Count ?? 0));
     }
 
     public bool IsFiltered
@@ -431,7 +445,7 @@ public class VirtualizedTreeView : Panel
         get => GetValue(IsFilteredProperty);
         set => SetValue(IsFilteredProperty, value);
     }
-    
+
     public bool RequestRender
     {
         get => GetValue(RequestRenderProperty);
@@ -443,10 +457,16 @@ public class VirtualizedTreeView : Panel
         get => GetValue(ItemsProperty);
         set => SetValue(ItemsProperty, value);
     }
-    
+
     public INodeType? SelectedNode
     {
         get => GetValue(SelectedNodeProperty);
         set => SetValue(SelectedNodeProperty, value);
+    }
+
+    public bool NeverShrinkWidth
+    {
+        get => GetValue(NeverShrinkWidthProperty);
+        set => SetValue(NeverShrinkWidthProperty, value);
     }
 }

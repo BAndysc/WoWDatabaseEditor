@@ -7,31 +7,42 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="outlinerTool:OutlinerToolViewModel"
              x:Class="WoWDatabaseEditorCore.Avalonia.Services.OutlinerTool.OutlinerToolView">
-    <ScrollViewer>
-        <outlinerViews:OutlinerFastTreeView 
-            IsFiltered="True"
-            Name="TreeView"
-            DoubleTapped="InputElement_OnDoubleTapped"
-            Items2="{CompiledBinding FlatItems}"
-            SelectedNode2="{CompiledBinding SelectedNode}"
-        >
-            <outlinerViews:OutlinerFastTreeView.ContextFlyout>
+    <ScrollViewer HorizontalScrollBarVisibility="Auto">
+        <VirtualizedTreeView Items="{CompiledBinding FlatItems}" SelectedNode="{CompiledBinding SelectedNode}"
+                             DoubleTapped="InputElement_OnDoubleTapped"
+                             Name="TreeView"
+                             IsFiltered="True"
+                             NeverShrinkWidth="True"
+                             >
+            <VirtualizedTreeView.DataTemplates>
+                <DataTemplate x:DataType="outlinerTool:OutlinerGroupViewModel" DataType="outlinerTool:OutlinerGroupViewModel">
+                    <TextBlock VerticalAlignment="Center" Text="{CompiledBinding Name}" />
+                </DataTemplate>
+                <DataTemplate x:DataType="outlinerTool:OutlinerItemViewModel" DataType="outlinerTool:OutlinerItemViewModel">
+                    <StackPanel Orientation="Horizontal" Spacing="5">
+                        <WdeImage Image="{CompiledBinding Icon}" Width="16" Height="16" />
+                        <TextBlock VerticalAlignment="Center" Text="{CompiledBinding Entry}" FontWeight="Bold" />
+                        <TextBlock VerticalAlignment="Center" Text="{CompiledBinding Name}" />
+                    </StackPanel>
+                </DataTemplate>
+            </VirtualizedTreeView.DataTemplates>
+            <VirtualizedTreeView.ContextFlyout>
                 <Flyout>
                     <StackPanel>
                         <SettingsHeader>Select where to search:</SettingsHeader>
                         <ItemsControl Items="{CompiledBinding Sources}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <CheckBox HorizontalAlignment="Stretch" 
+                                    <CheckBox HorizontalAlignment="Stretch"
                                               Padding="4,8"
-                                              IsChecked="{CompiledBinding Include}" 
+                                              IsChecked="{CompiledBinding Include}"
                                               Content="{CompiledBinding Name}" />
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
                     </StackPanel>
                 </Flyout>
-            </outlinerViews:OutlinerFastTreeView.ContextFlyout>
-        </outlinerViews:OutlinerFastTreeView>
+            </VirtualizedTreeView.ContextFlyout>
+        </VirtualizedTreeView>
     </ScrollViewer>
 </UserControl>

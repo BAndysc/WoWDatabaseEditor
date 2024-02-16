@@ -26,4 +26,5 @@ public abstract class SpawnInstance : IChildType, IManagedComponentData
     public uint NestLevel { get; set; }
     public bool IsVisible { get; set; }
     public IParentType? Parent { get; set; }
+    public bool CanBeExpanded => false;
 }

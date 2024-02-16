@@ -15,6 +15,7 @@ using WDE.Common.History;
 using WDE.Common.Managers;
 using WDE.Common.Parameters;
 using WDE.Common.Services;
+using WDE.Common.Services.Statistics;
 using WDE.Common.Solution;
 using WDE.Common.Tasks;
 using WDE.Common.Types;

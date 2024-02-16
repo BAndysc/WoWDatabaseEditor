@@ -74,7 +74,9 @@ namespace WDE.Module
             
             if (singleton)
                 unityContainer.RegisterSingleton(register);
-                    
+
+            IUnityContainer uc = ((IContainerExtension<IUnityContainer>)unityContainer).Instance;
+
             foreach (Type @interface in register.GetInterfaces())
             {
                 if (checkIfRegistered && unityContainer.IsRegistered(@interface, UnityContainer.All))
@@ -86,11 +88,16 @@ namespace WDE.Module
 
                 if (singleton && isUnique)
                 {
-                    unityContainer.RegisterSingleton(@interface, register);
-                    //unityContainer.RegisterFactory(@interface, c => unityContainer.Resolve(register), new ContainerControlledLifetimeManager());
+                    //unityContainer.RegisterSingleton(@interface, register);
+                    uc.RegisterFactory(@interface, c => c.Resolve(register), new ContainerControlledLifetimeManager());
                 }
                 else
-                    unityContainer.Register(@interface, register, isUnique ? null : name);
+                {
+                    if (singleton)
+                        uc.RegisterFactory(@interface, isUnique ? null : name, c => c.Resolve(register), new ContainerControlledLifetimeManager());
+                    else
+                        unityContainer.Register(@interface, register, isUnique ? null : name);
+                }
             }
         }
 

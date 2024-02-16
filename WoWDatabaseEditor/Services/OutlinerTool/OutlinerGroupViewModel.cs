@@ -56,6 +56,7 @@ public partial class OutlinerGroupViewModel : IParentType
     public uint NestLevel { get; set; }
     public bool IsVisible { get; set; } = true;
     public IParentType? Parent { get; set; }
+    public bool CanBeExpanded => true;
     public IReadOnlyList<IParentType> NestedParents => Array.Empty<IParentType>();
     public IReadOnlyList<IChildType> Children => Items;
 

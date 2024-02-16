@@ -371,17 +371,16 @@ public interface INodeType
     public uint NestLevel { get; set; }
     public bool IsVisible { get; set; } // used internally for fast filtering
     public IParentType? Parent { get; set; }
+    public bool CanBeExpanded { get; }
 }
 
 public interface IChildType : INodeType
 {
-    public bool CanBeExpanded => false;
 }
 
 public interface IParentType : INodeType, INotifyPropertyChanged
 {
     public bool IsExpanded { get; set; }
-    public bool CanBeExpanded => true;
     public IReadOnlyList<IParentType> NestedParents { get; }
     public IReadOnlyList<IChildType> Children { get; }
     event NotifyCollectionChangedEventHandler? ChildrenChanged;

@@ -41,6 +41,6 @@ public class OutlinerGeneralSettings : IGeneralSettingsGroup
             if (include)
                 result |= (FindAnywhereSourceType)values[i];
         }
-        settingsService.SkipSources = ~result;
+        settingsService.SkipSources = FindAnywhereSourceType.All &~ result;
     }
 }

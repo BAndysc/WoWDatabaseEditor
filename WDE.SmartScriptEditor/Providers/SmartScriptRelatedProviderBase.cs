@@ -29,6 +29,9 @@ namespace WDE.SmartScriptEditor.Providers
                     return RelatedSolutionItem.RelatedType.TimedActionList;
                 case SmartScriptType.Quest:
                     return RelatedSolutionItem.RelatedType.QuestEntry;
+                case SmartScriptType.StaticSpell:
+                case SmartScriptType.Spell:
+                    return RelatedSolutionItem.RelatedType.Spell;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type), $"{type} is not expected to be invoked here");
             }
@@ -40,7 +43,9 @@ namespace WDE.SmartScriptEditor.Providers
                 item.SmartType != SmartScriptType.GameObject &&
                 item.SmartType != SmartScriptType.Template &&
                 item.SmartType != SmartScriptType.TimedActionList &&
-                item.SmartType != SmartScriptType.Quest)
+                item.SmartType != SmartScriptType.Quest &&
+                item.SmartType != SmartScriptType.Spell &&
+                item.SmartType != SmartScriptType.StaticSpell)
                 return Task.FromResult<RelatedSolutionItem?>(null);
 
             if (item.Entry.HasValue)

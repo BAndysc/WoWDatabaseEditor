@@ -107,8 +107,13 @@ public class EnumMaskConverter : JsonConverter
     public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
     {
         var enumType = GetEnumType(objectType);
-        
-        if (reader.TokenType == JsonToken.String)
+
+        if (reader.TokenType == JsonToken.Integer)
+        {
+            var value = (long)reader.Value!;
+            return Enum.ToObject(enumType, value);
+        }
+        else if (reader.TokenType == JsonToken.String)
         {
             var value = GetEnumValue(enumType, (string)reader.Value!);
             return Enum.ToObject(enumType, value);

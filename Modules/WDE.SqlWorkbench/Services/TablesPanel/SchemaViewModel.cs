@@ -136,6 +136,7 @@ internal partial class SchemaViewModel : ObservableBase, INamedParentType
     public IParentType? Parent { get; set; }
     public IReadOnlyList<IParentType> NestedParents => groups;
     public IReadOnlyList<IChildType> Children => children;
+    public bool CanBeExpanded => true;
 
     public event NotifyCollectionChangedEventHandler? ChildrenChanged;
     public event NotifyCollectionChangedEventHandler? NestedParentsChanged;

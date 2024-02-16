@@ -58,7 +58,8 @@ namespace WDE.Common.Solution
             GossipMenu,
             QuestEntry,
             Template,
-            TimedActionList
+            TimedActionList,
+            Spell
         }
     }
     

@@ -1,16 +1,11 @@
 using System;
 using WDE.Common.Factories.Http;
 using WDE.Common.Services;
+using WDE.Common.Services.Statistics;
 using WDE.Module.Attributes;
 
 namespace WoWDatabaseEditorCore.Services.Statistics
 {
-    [UniqueProvider]
-    public interface IStatisticsService
-    {
-        public ulong RunCounter { get; }
-    }
-    
     [SingleInstance]
     [AutoRegister]
     public class StatisticsService : IStatisticsService

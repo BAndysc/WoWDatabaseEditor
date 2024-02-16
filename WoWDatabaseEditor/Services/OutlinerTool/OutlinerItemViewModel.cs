@@ -25,4 +25,5 @@ public partial class OutlinerItemViewModel : IChildType, IOutlinerItemViewModel
     public uint NestLevel { get; set; }
     public bool IsVisible { get; set; } = true;
     public IParentType? Parent { get; set; }
+    public bool CanBeExpanded => false;
 }

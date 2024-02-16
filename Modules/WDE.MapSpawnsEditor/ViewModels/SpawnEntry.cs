@@ -46,4 +46,5 @@ public partial class SpawnGroup : IParentType
     public ObservableCollection<SpawnGroup> Nested { get; } = new();
     public ObservableCollection<SpawnInstance> Spawns { get; } = new();
     public IParentType? Parent { get; set; }
+    public bool CanBeExpanded => true;
 }

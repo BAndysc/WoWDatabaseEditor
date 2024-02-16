@@ -3,18 +3,19 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using WDE.Common.Avalonia.Controls;
 using WoWDatabaseEditorCore.Services.OutlinerTool;
 
 namespace WoWDatabaseEditorCore.Avalonia.Services.OutlinerTool;
 
 public class OutlinerToolView : UserControl
 {
-    private OutlinerFastTreeView treeView;
+    private VirtualizedTreeView treeView;
     
     public OutlinerToolView()
     {
         InitializeComponent();
-        treeView = this.FindControl<OutlinerFastTreeView>("TreeView");
+        treeView = this.FindControl<VirtualizedTreeView>("TreeView");
     }
 
     private void InitializeComponent()

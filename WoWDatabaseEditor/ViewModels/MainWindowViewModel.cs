@@ -16,6 +16,7 @@ using WDE.Common.Menu;
 using WDE.Common.Providers;
 using WDE.Common.QuickAccess;
 using WDE.Common.Services;
+using WDE.Common.Services.Statistics;
 using WDE.Common.Sessions;
 using WDE.Common.Solution;
 using WDE.Common.Tasks;

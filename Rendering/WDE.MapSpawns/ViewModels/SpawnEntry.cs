@@ -48,4 +48,5 @@ public partial class SpawnEntry : IParentType
     public uint NestLevel { get; set; }
     public bool IsVisible { get; set; }
     public IParentType? Parent { get; set; }
+    public bool CanBeExpanded => true;
 }

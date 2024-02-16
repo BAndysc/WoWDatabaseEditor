@@ -163,12 +163,14 @@ public partial class OutlinerToolViewModel : ObservableBase, ITool
             type = "AITemplateParameter";
         else if (related.Value.Type == RelatedSolutionItem.RelatedType.QuestEntry)
             type = "QuestParameter";
+        else if (related.Value.Type == RelatedSolutionItem.RelatedType.Spell)
+            type = "SpellParameter";
         else
             return;
         var token = new CancellationTokenSource();
         currentCancellationTokenSource = token;
         referencedBy.IsRefreshing = true;
-        await findAnywhereService.Value.Find(new FindRelatedContext(this, token), ~settings.SkipSources, new[] { type }, new[] { related.Value.Entry }, token.Token);
+        await findAnywhereService.Value.Find(new FindRelatedContext(this, token), FindAnywhereSourceType.All &~ settings.SkipSources, new[] { type }, new[] { related.Value.Entry }, token.Token);
         if (token == currentCancellationTokenSource)
             currentCancellationTokenSource = null;
         referencedBy.IsRefreshing = false;

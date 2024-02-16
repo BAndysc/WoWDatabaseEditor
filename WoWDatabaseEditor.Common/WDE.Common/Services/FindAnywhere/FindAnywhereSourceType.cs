@@ -1,4 +1,6 @@
 using System;
+using Newtonsoft.Json;
+using WDE.Common.Parameters;
 
 namespace WDE.Common.Services.FindAnywhere;
 
@@ -14,5 +16,6 @@ public enum FindAnywhereSourceType
     Dbc = 32,
     EventAi = 64,
     Other = 128,
-    All = Other | SmartScripts | EventAi | Spawns | Tables | Conditions | Sniffs | Dbc
+    SourceCode = 256,
+    All = Other | SmartScripts | EventAi | Spawns | Tables | Conditions | Sniffs | Dbc | SourceCode
 }

@@ -195,6 +195,7 @@ public class FlatTreeListTests
         public uint NestLevel { get; set; }
         public bool IsVisible { get; set; }
         public IParentType? Parent { get; set; }
+        public bool CanBeExpanded => true;
 
         public bool IsExpanded
         {
@@ -238,5 +239,6 @@ public class FlatTreeListTests
         public uint NestLevel { get; set; }
         public bool IsVisible { get; set; }
         public IParentType? Parent { get; set; }
+        public bool CanBeExpanded => false;
     }
 }
