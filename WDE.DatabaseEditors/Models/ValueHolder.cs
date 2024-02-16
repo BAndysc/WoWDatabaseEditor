@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Threading.Tasks;
 using WDE.Common.Annotations;
 using WDE.Common.Parameters;
 using WDE.Common.Utils;
@@ -81,6 +82,23 @@ namespace WDE.DatabaseEditors.Models
                 var newVal = contextualFromString.FromString(newValue, context);
                 if (newVal.HasValue)
                     Value = (T)(object)(newVal.Value);
+            }
+            else if (parameter is IContextualParameterFromStringAsync<string?, TContext> contextualFromStringStringAsync)
+            {
+                async Task UpdateTask()
+                {
+                    var newVal = await contextualFromStringStringAsync.FromString(newValue, context);
+                    if (newVal != null)
+                        Value = (T)(object)newVal;
+                }
+
+                UpdateTask().ListenErrors();
+            }
+            else if (parameter is IContextualParameterFromString<string?, TContext> contextualFromStringString)
+            {
+                var newVal = contextualFromStringString.FromString(newValue, context);
+                if (newVal != null)
+                    Value = (T)(object)newVal;
             }
             else if (parameter is IParameterFromString<long?> fromString)
             {

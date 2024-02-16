@@ -653,9 +653,18 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                     }
                     else if (column.Meta!.StartsWith("customfield:"))
                     {
-                        var parameterName = parameterFactory.Factory(column.Meta.Substring("customfield:".Length));
-                        var parameterValue = new ParameterValue<long, DatabaseEntity>(entity, new ValueHolder<long>(0, false),
-                            new ValueHolder<long>(0, false), parameterName);
+                        var parameterName = column.Meta.Substring("customfield:".Length);
+                        IParameterValue parameterValue;
+                        if (parameterFactory.IsRegisteredString(parameterName))
+                        {
+                             parameterValue = new ParameterValue<string, DatabaseEntity>(entity, new ValueHolder<string>("", false),
+                                 new ValueHolder<string>("", false), parameterFactory.FactoryString(parameterName));
+                        }
+                        else
+                        {
+                            parameterValue = new ParameterValue<long, DatabaseEntity>(entity, new ValueHolder<long>(0, false),
+                                new ValueHolder<long>(0, false), parameterFactory.Factory(parameterName));
+                        }
                         //entity.OnAction += _ => parameterValue.Value = evaluator.Evaluate(entity)!.ToString();
                         cellViewModel = AutoDispose(new DatabaseCellViewModel(columnIndex, column, row, entity, null, parameterValue));
                     }
