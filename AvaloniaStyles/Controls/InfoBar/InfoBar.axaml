@@ -1,0 +1,375 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls1="clr-namespace:AvaloniaStyles.Controls">
+  <Styles.Resources>
+    <Color x:Key="SolidBackgroundFillColorBase">#F3F3F3</Color>
+    <Color x:Key="SolidBackgroundFillColorSecondary">#EEEEEE</Color>
+    <Color x:Key="SolidBackgroundFillColorTertiary">#F9F9F9</Color>
+    <Color x:Key="SolidBackgroundFillColorQuarternary">#FFFFFF</Color>
+    <Color x:Key="SolidBackgroundFillColorTransparent">#00F3F3F3</Color>
+
+    <Color x:Key="SubtleFillColorTransparent">#00FFFFFF</Color>
+    <Color x:Key="SubtleFillColorSecondary">#0FFFFFFF</Color>
+    <Color x:Key="SubtleFillColorTertiary">#0AFFFFFF</Color>
+    <Color x:Key="SubtleFillColorDisabled">#00FFFFFF</Color>
+
+    <Color x:Key="SystemFillColorSuccess">#0F7B0F</Color>
+    <Color x:Key="SystemFillColorCaution">#9D5D00</Color>
+    <Color x:Key="SystemFillColorCritical">#C42B1C</Color>
+    <Color x:Key="SystemFillColorNeutral">#72000000</Color>
+    <Color x:Key="SystemFillColorSolidNeutral">#8A8A8A</Color>
+    <Color x:Key="SystemFillColorAttentionBackground">#80F6F6F6</Color>
+    <Color x:Key="SystemFillColorSuccessBackground">#DFF6DD</Color>
+    <Color x:Key="SystemFillColorCautionBackground">#FFF4CE</Color>
+    <Color x:Key="SystemFillColorCriticalBackground">#FDE7E9</Color>
+    <Color x:Key="SystemFillColorNeutralBackground">#06000000</Color>
+    <Color x:Key="SystemFillColorSolidAttentionBackground">#F7F7F7</Color>
+    <Color x:Key="SystemFillColorSolidNeutralBackground">#F3F3F3</Color>
+    <Color x:Key="TextFillColorPrimary">#E4000000</Color>
+    <Color x:Key="TextFillColorSecondary">#9E000000</Color>
+    <Color x:Key="TextFillColorTertiary">#72000000</Color>
+    <Color x:Key="TextFillColorDisabled">#5C000000</Color>
+    <Color x:Key="TextFillColorInverse">#FFFFFF</Color>
+
+    <Color x:Key="AccentTextFillColorDisabled">#5C000000</Color>
+    <Color x:Key="CardStrokeColorDefault">#0F000000</Color>
+    <Color x:Key="CardStrokeColorDefaultSolid">#EBEBEB</Color>
+
+    <Thickness x:Key="ButtonPadding">11,5,11,6</Thickness>
+
+    <SolidColorBrush x:Key="SystemFillColorAttentionBrush" Color="{DynamicResource SystemAccentColor}" />
+    <SolidColorBrush x:Key="SystemFillColorSuccessBrush" Color="{StaticResource SystemFillColorSuccess}" />
+    <SolidColorBrush x:Key="SystemFillColorCautionBrush" Color="{StaticResource SystemFillColorCaution}" />
+    <SolidColorBrush x:Key="SystemFillColorCriticalBrush" Color="{StaticResource SystemFillColorCritical}" />
+    <SolidColorBrush x:Key="SystemFillColorNeutralBrush" Color="{StaticResource SystemFillColorNeutral}" />
+    <SolidColorBrush x:Key="SystemFillColorSolidNeutralBrush" Color="{StaticResource SystemFillColorSolidNeutral}" />
+    <SolidColorBrush x:Key="SystemFillColorAttentionBackgroundBrush" Color="{StaticResource SystemFillColorAttentionBackground}" />
+    <SolidColorBrush x:Key="SystemFillColorSuccessBackgroundBrush" Color="{StaticResource SystemFillColorSuccessBackground}" />
+    <SolidColorBrush x:Key="SystemFillColorCautionBackgroundBrush" Color="{StaticResource SystemFillColorCautionBackground}" />
+    <SolidColorBrush x:Key="SystemFillColorCriticalBackgroundBrush" Color="{StaticResource SystemFillColorCriticalBackground}" />
+    <SolidColorBrush x:Key="SystemFillColorNeutralBackgroundBrush" Color="{StaticResource SystemFillColorNeutralBackground}" />
+    <SolidColorBrush x:Key="SystemFillColorSolidAttentionBackgroundBrush" Color="{StaticResource SystemFillColorSolidAttentionBackground}" />
+    <SolidColorBrush x:Key="SystemFillColorSolidNeutralBackgroundBrush" Color="{StaticResource SystemFillColorSolidNeutralBackground}" />
+    <SolidColorBrush x:Key="TextFillColorPrimaryBrush" Color="{StaticResource TextFillColorPrimary}" />
+    <SolidColorBrush x:Key="TextFillColorSecondaryBrush" Color="{StaticResource TextFillColorSecondary}" />
+    <SolidColorBrush x:Key="TextFillColorTertiaryBrush" Color="{StaticResource TextFillColorTertiary}" />
+    <SolidColorBrush x:Key="TextFillColorDisabledBrush" Color="{StaticResource TextFillColorDisabled}" />
+    <SolidColorBrush x:Key="TextFillColorInverseBrush" Color="{StaticResource TextFillColorInverse}" />
+    <SolidColorBrush x:Key="AccentTextFillColorPrimaryBrush" Color="{DynamicResource SystemAccentColorDark2}" />
+    <SolidColorBrush x:Key="AccentTextFillColorSecondaryBrush" Color="{DynamicResource SystemAccentColorDark3}" />
+    <SolidColorBrush x:Key="AccentTextFillColorTertiaryBrush" Color="{DynamicResource SystemAccentColorDark1}" />
+    <SolidColorBrush x:Key="AccentTextFillColorDisabledBrush" Color="{StaticResource AccentTextFillColorDisabled}" />
+    <SolidColorBrush x:Key="CardStrokeColorDefaultBrush" Color="{StaticResource CardStrokeColorDefault}" />
+
+    <SolidColorBrush x:Key="SubtleFillColorTransparentBrush" Color="{StaticResource SubtleFillColorTransparent}" />
+    <SolidColorBrush x:Key="SubtleFillColorSecondaryBrush" Color="{StaticResource SubtleFillColorSecondary}" />
+    <SolidColorBrush x:Key="SubtleFillColorTertiaryBrush" Color="{StaticResource SubtleFillColorTertiary}" />
+    <SolidColorBrush x:Key="SubtleFillColorDisabledBrush" Color="{StaticResource SubtleFillColorDisabled}" />
+
+    <StaticResource x:Key="InfoBarErrorSeverityBackgroundBrush" ResourceKey="SystemFillColorCriticalBackgroundBrush" />
+    <StaticResource x:Key="InfoBarWarningSeverityBackgroundBrush" ResourceKey="SystemFillColorCautionBackgroundBrush" />
+    <StaticResource x:Key="InfoBarSuccessSeverityBackgroundBrush" ResourceKey="SystemFillColorSuccessBackgroundBrush" />
+    <StaticResource x:Key="InfoBarInformationalSeverityBackgroundBrush" ResourceKey="SystemFillColorAttentionBackgroundBrush" />
+
+    <StaticResource x:Key="InfoBarErrorSeverityIconBackground" ResourceKey="SystemFillColorCriticalBrush" />
+    <StaticResource x:Key="InfoBarWarningSeverityIconBackground" ResourceKey="SystemFillColorCautionBrush" />
+    <StaticResource x:Key="InfoBarSuccessSeverityIconBackground" ResourceKey="SystemFillColorSuccessBrush" />
+    <StaticResource x:Key="InfoBarInformationalSeverityIconBackground" ResourceKey="SystemFillColorAttentionBrush" />
+
+    <StaticResource x:Key="InfoBarErrorSeverityIconForeground" ResourceKey="TextFillColorInverseBrush" />
+    <StaticResource x:Key="InfoBarWarningSeverityIconForeground" ResourceKey="TextFillColorInverseBrush" />
+    <StaticResource x:Key="InfoBarSuccessSeverityIconForeground" ResourceKey="TextFillColorInverseBrush" />
+    <StaticResource x:Key="InfoBarInformationalSeverityIconForeground" ResourceKey="TextFillColorInverseBrush" />
+
+    <StaticResource x:Key="InfoBarTitleForeground" ResourceKey="TextFillColorPrimaryBrush" />
+    <StaticResource x:Key="InfoBarMessageForeground" ResourceKey="TextFillColorPrimaryBrush" />
+    <StaticResource x:Key="InfoBarHyperlinkButtonForeground" ResourceKey="AccentTextFillColorPrimaryBrush" />
+
+    <StaticResource x:Key="InfoBarBorderBrush" ResourceKey="CardStrokeColorDefaultBrush" />
+    <Thickness x:Key="InfoBarBorderThickness">1</Thickness>
+
+    <FontFamily x:Key="SymbolThemeFontFamily">/Fonts/#Symbols</FontFamily>
+    <x:Double x:Key="InfoBarTitleFontSize">12</x:Double>
+    <FontWeight x:Key="InfoBarTitleFontWeight">SemiBold</FontWeight>
+    <x:Double x:Key="InfoBarMessageFontSize">12</x:Double>
+    <FontWeight x:Key="InfoBarMessageFontWeight">Normal</FontWeight>
+    <x:Double x:Key="InfoBarMinHeight">36</x:Double>
+    <x:Double x:Key="InfoBarCloseButtonSize">32</x:Double>
+    <x:Double x:Key="InfoBarCloseButtonGlyphSize">16</x:Double>
+    <!-- This negative margin makes the link visually line up with the title/message -->
+    <Thickness x:Key="InfoBarHyperlinkButtonMargin">-12,0,0,0</Thickness>
+    <!-- Glyph code points updated for FluentIcons
+        In doing so, the background glyph also updates to work with icons in FluentIcons
+        which don't match Segoe MDL2 Assets
+
+        We also have to set them in code b/c setting them in style handlers like WinUI
+        does wasn't working. The style was applying (per DevTools) but the Text was showing
+        as null. I suspect this is because Text on TextBlock is a DirectProperty and is
+        probably just not playing nice with the styling system???
+        -->
+    <!--<x:String x:Key="InfoBarInformationalBackgroundGlyph">&#xF4AC;</x:String>-->
+    <!--<x:String x:Key="InfoBarErrorBackgroundGlyph">&#xF3F1;</x:String>-->
+    <!--<x:String x:Key="InfoBarWarningBackgroundGlyph">&#xF882;</x:String>-->
+    <!--<x:String x:Key="InfoBarSuccessBackgroundGlyph">&#xF29A;</x:String>-->
+
+    <!--<x:String x:Key="InfoBarInformationalIconGlyph">&#xF4A5;</x:String>-->
+    <!--<x:String x:Key="InfoBarErrorIconGlyph">&#xF3F2;</x:String>-->
+    <!--<x:String x:Key="InfoBarWarningIconGlyph">&#xF86A;</x:String>-->
+    <!--<x:String x:Key="InfoBarSuccessIconGlyph">&#xF29A;</x:String>-->
+    <Thickness x:Key="InfoBarContentRootPadding">16,0,0,0</Thickness>
+    <Thickness x:Key="InfoBarIconMargin">0,16,14,16</Thickness>
+    <x:Double x:Key="InfoBarIconFontSize">16</x:Double>
+    <Thickness x:Key="InfoBarPanelMargin">0,0,16,0</Thickness>
+    <Thickness x:Key="InfoBarPanelHorizontalOrientationPadding">0,0,0,0</Thickness>
+    <Thickness x:Key="InfoBarPanelVerticalOrientationPadding">0,14,0,18</Thickness>
+    <Thickness x:Key="InfoBarTitleHorizontalOrientationMargin">0,14,0,0</Thickness>
+    <Thickness x:Key="InfoBarTitleVerticalOrientationMargin">0,14,0,0</Thickness>
+    <Thickness x:Key="InfoBarMessageHorizontalOrientationMargin">12,14,0,0</Thickness>
+    <Thickness x:Key="InfoBarMessageVerticalOrientationMargin">0,4,0,0</Thickness>
+    <Thickness x:Key="InfoBarActionHorizontalOrientationMargin">16,8,0,0</Thickness>
+    <Thickness x:Key="InfoBarActionVerticalOrientationMargin">0,12,0,0</Thickness>
+    <Symbol x:Key="InfoBarCloseButtonSymbol">Dismiss</Symbol>
+  </Styles.Resources>
+
+  <Style Selector="InfoBar">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
+    <Setter Property="Template">
+      <ControlTemplate>
+        <Border Name="ContentRoot"
+                VerticalAlignment="Top"
+                BorderBrush="{DynamicResource InfoBarBorderBrush}"
+                BorderThickness="{DynamicResource InfoBarBorderThickness}"
+                CornerRadius="{TemplateBinding CornerRadius}">
+
+          <!-- Background is used here so that it overrides the severity status color if set.
+                    Padding="{StaticResource InfoBarContentRootPadding}" applied as margin on grid b/c no Padding
+                    -->
+          <Panel>
+            <!-- use separate border for Background b/c no margin -->
+            <Border Background="{TemplateBinding Background}"
+                    CornerRadius="{TemplateBinding CornerRadius}" />
+            <Grid HorizontalAlignment="Stretch"
+                  MinHeight="{DynamicResource InfoBarMinHeight}"
+                  Margin="{StaticResource InfoBarContentRootPadding}"
+                  ColumnDefinitions="Auto,*,Auto"
+                  RowDefinitions="Auto,Auto">
+
+              <Panel Name="StandardIconArea"
+                     Width="16" Height="16"
+                     VerticalAlignment="Top"
+                     Margin="{StaticResource InfoBarIconMargin}">
+                <Ellipse Name="IconBackground" />
+                <FontIcon FontFamily="{StaticResource SymbolThemeFontFamily}"
+                          Name="StandardIcon" />
+              </Panel>
+
+              <Viewbox Name="UserIconBox"
+                       Grid.Column="0"
+                       VerticalAlignment="Top"
+                       MaxWidth="{DynamicResource InfoBarIconFontSize}"
+                       MaxHeight="{DynamicResource InfoBarIconFontSize}"
+                       Margin="{DynamicResource InfoBarIconMargin}">
+                <IconSourceElement IconSource="{TemplateBinding IconSource}" />
+              </Viewbox>
+
+              <InfoBarPanel Grid.Column="1"
+                            Margin="{StaticResource InfoBarPanelMargin}"
+                            HorizontalOrientationPadding="{StaticResource InfoBarPanelHorizontalOrientationPadding}"
+                            VerticalOrientationPadding="{StaticResource InfoBarPanelVerticalOrientationPadding}">
+
+                <TextBlock Name="Title"
+                           Foreground="{DynamicResource InfoBarTitleForeground}"
+                           Text="{TemplateBinding Title}"
+                           InfoBarPanel.HorizontalOrientationMargin="{StaticResource InfoBarTitleHorizontalOrientationMargin}"
+                           InfoBarPanel.VerticalOrientationMargin="{StaticResource InfoBarTitleVerticalOrientationMargin}"
+                           TextWrapping="Wrap"
+                           FontWeight="{StaticResource InfoBarTitleFontWeight}"
+                           FontSize="{StaticResource InfoBarTitleFontSize}" />
+
+                <TextBlock x:Name="Message"
+                           Foreground="{DynamicResource InfoBarMessageForeground}"
+                           Text="{TemplateBinding Message}"
+                           InfoBarPanel.HorizontalOrientationMargin="{StaticResource InfoBarMessageHorizontalOrientationMargin}"
+                           InfoBarPanel.VerticalOrientationMargin="{StaticResource InfoBarMessageVerticalOrientationMargin}"
+                           TextWrapping="Wrap"
+                           FontWeight="{StaticResource InfoBarMessageFontWeight}"
+                           FontSize="{StaticResource InfoBarMessageFontSize}" />
+
+                <ContentPresenter
+                  InfoBarPanel.HorizontalOrientationMargin="{StaticResource InfoBarActionHorizontalOrientationMargin}"
+                  InfoBarPanel.VerticalOrientationMargin="{StaticResource InfoBarActionVerticalOrientationMargin}"
+                  VerticalAlignment="Top"
+                  Content="{TemplateBinding ActionButton}"
+                  HorizontalContentAlignment="Stretch"
+                  VerticalContentAlignment="Center" />
+
+              </InfoBarPanel>
+
+              <ContentPresenter Grid.Column="1"
+                                Grid.Row="1"
+                                Content="{TemplateBinding Content}"
+                                ContentTemplate="{TemplateBinding ContentTemplate}"
+                                HorizontalContentAlignment="Stretch"
+                                VerticalContentAlignment="Stretch"
+                                Name="ContentPresenter" />
+
+              <Button Name="CloseButton"
+                      VerticalAlignment="Center"
+                      Grid.Column="2"
+                      Command="{TemplateBinding CloseButtonCommand}"
+                      CommandParameter="{TemplateBinding CloseButtonCommandParameter}">
+                <Button.Styles>
+                  <Style Selector="Button">
+                    <Setter Property="Width" Value="{StaticResource InfoBarCloseButtonSize}" />
+                    <Setter Property="Height" Value="{StaticResource InfoBarCloseButtonSize}" />
+                    <Setter Property="VerticalAlignment" Value="Top" />
+                    <Setter Property="Margin" Value="5" />
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                    <Setter Property="VerticalContentAlignment" Value="Stretch" />
+                    <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="Foreground" Value="{DynamicResource ButtonForeground}" />
+                    <Setter Property="BorderBrush" Value="Transparent" />
+                    <Setter Property="BorderThickness" Value="0" />
+                    <Setter Property="Padding" Value="{StaticResource ButtonPadding}" />
+                    <Setter Property="HorizontalAlignment" Value="Left" />
+                    <Setter Property="FontFamily" Value="{DynamicResource ContentControlThemeFontFamily}" />
+                    <Setter Property="FontWeight" Value="Normal" />
+                    <Setter Property="FontSize" Value="{DynamicResource ControlContentThemeFontSize}" />
+                    <Setter Property="CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
+                    <Setter Property="Template">
+                      <ControlTemplate>
+                        <ContentPresenter x:Name="PART_ContentPresenter"
+                                          Background="{TemplateBinding Background}"
+                                          BorderBrush="{TemplateBinding BorderBrush}"
+                                          BorderThickness="{TemplateBinding BorderThickness}"
+                                          CornerRadius="{TemplateBinding CornerRadius}"
+                                          Content="{TemplateBinding Content}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                                          Padding="{TemplateBinding Padding}"
+                                          RecognizesAccessKey="True"
+                                          HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+                      </ControlTemplate>
+                    </Setter>
+                  </Style>
+                  <Style Selector="Button /template/ ContentPresenter#PART_ContentPresenter">
+                    <Setter Property="Transitions">
+                      <Transitions>
+                        <BrushTransition Duration="00:00:00.083" Property="Background" />
+                      </Transitions>
+                    </Setter>
+                  </Style>
+
+                  <Style Selector="Button:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                    <Setter Property="Background" Value="{DynamicResource SubtleFillColorSecondaryBrush}" />
+                    <Setter Property="TextBlock.Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}" />
+                  </Style>
+
+                  <Style Selector="Button:pressed /template/ ContentPresenter#PART_ContentPresenter">
+                    <Setter Property="Background" Value="{DynamicResource SubtleFillColorTertiaryBrush}" />
+                    <Setter Property="TextBlock.Foreground" Value="{DynamicResource TextFillColorSecondaryBrush}" />
+                  </Style>
+
+                  <Style Selector="Button:disabled /template/ ContentPresenter#PART_ContentPresenter">
+                    <Setter Property="Background" Value="{DynamicResource SubtleFillColorDisabledBrush}" />
+                    <Setter Property="TextBlock.Foreground" Value="{DynamicResource TextFillColorDisabledBrush}" />
+                  </Style>
+                </Button.Styles>
+
+                <Viewbox Width="{StaticResource InfoBarCloseButtonGlyphSize}"
+                         Height="{StaticResource InfoBarCloseButtonGlyphSize}"
+                         HorizontalAlignment="Center"
+                         VerticalAlignment="Center">
+                  <SymbolIcon Symbol="{StaticResource InfoBarCloseButtonSymbol}" />
+                </Viewbox>
+              </Button>
+            </Grid>
+          </Panel>
+        </Border>
+      </ControlTemplate>
+    </Setter>
+  </Style>
+
+  <Style Selector="InfoBar:informational /template/ Border#ContentRoot">
+    <Setter Property="Background" Value="{DynamicResource InfoBarInformationalSeverityBackgroundBrush}" />
+  </Style>
+  <Style Selector="InfoBar:informational /template/ Ellipse#IconBackground">
+    <Setter Property="Fill" Value="{DynamicResource InfoBarInformationalSeverityIconBackground}" />
+  </Style>
+  <Style Selector="InfoBar:informational /template/ FontIcon#StandardIcon">
+    <Setter Property="Glyph" Value="&#x0069;" />
+    <Setter Property="FontSize" Value="10" />
+    <Setter Property="Foreground" Value="{DynamicResource InfoBarInformationalSeverityIconForeground}" />
+  </Style>
+
+  <Style Selector="InfoBar:error /template/ Border#ContentRoot">
+    <Setter Property="Background" Value="{DynamicResource InfoBarErrorSeverityBackgroundBrush}" />
+  </Style>
+  <Style Selector="InfoBar:error /template/ Ellipse#IconBackground">
+    <Setter Property="Fill" Value="{DynamicResource InfoBarErrorSeverityIconBackground}" />
+  </Style>
+  <Style Selector="InfoBar:error /template/ FontIcon#StandardIcon">
+    <Setter Property="Glyph" Value="&#xE10A;" />
+    <Setter Property="FontSize" Value="10" />
+    <Setter Property="Foreground" Value="{DynamicResource InfoBarInformationalSeverityIconForeground}" />
+    <Setter Property="Margin" Value="0,19,14,0" />
+  </Style>
+
+  <Style Selector="InfoBar:warning /template/ Border#ContentRoot">
+    <Setter Property="Background" Value="{DynamicResource InfoBarWarningSeverityBackgroundBrush}" />
+  </Style>
+  <Style Selector="InfoBar:warning /template/ Ellipse#IconBackground">
+    <Setter Property="Fill" Value="{DynamicResource InfoBarWarningSeverityIconBackground}" />
+  </Style>
+  <Style Selector="InfoBar:warning /template/ FontIcon#StandardIcon">
+    <Setter Property="Glyph" Value="&#x0021;" />
+    <Setter Property="FontSize" Value="10" />
+    <Setter Property="Foreground" Value="{DynamicResource InfoBarInformationalSeverityIconForeground}" />
+  </Style>
+
+  <Style Selector="InfoBar:success /template/ Border#ContentRoot">
+    <Setter Property="Background" Value="{DynamicResource InfoBarSuccessSeverityBackgroundBrush}" />
+  </Style>
+  <Style Selector="InfoBar:success /template/ Ellipse#IconBackground">
+    <Setter Property="Fill" Value="{DynamicResource InfoBarSuccessSeverityIconBackground}" />
+  </Style>
+  <Style Selector="InfoBar:success /template/ FontIcon#StandardIcon">
+    <Setter Property="Glyph" Value="&#xE10B;" />
+    <Setter Property="FontSize" Value="10" />
+    <Setter Property="Foreground" Value="{DynamicResource InfoBarInformationalSeverityIconForeground}" />
+    <Setter Property="Margin" Value="0,19,14,0" />
+  </Style>
+
+
+  <Style Selector="InfoBar:standardIcon /template/ Panel#StandardIconArea">
+    <Setter Property="IsVisible" Value="True" />
+  </Style>
+  <Style Selector="InfoBar:standardIcon /template/ Viewbox#UserIconBox">
+    <Setter Property="IsVisible" Value="False" />
+  </Style>
+
+  <Style Selector="InfoBar:icon /template/ Panel#StandardIconArea">
+    <Setter Property="IsVisible" Value="False" />
+  </Style>
+  <Style Selector="InfoBar:icon /template/ Viewbox#UserIconBox">
+    <Setter Property="IsVisible" Value="True" />
+  </Style>
+
+  <!-- CloseButton, visible is default -->
+  <Style Selector="InfoBar:closehidden /template/ Button#CloseButton">
+    <Setter Property="IsVisible" Value="False" />
+  </Style>
+
+  <!-- Visible -->
+  <Style Selector="InfoBar:hidden /template/ Border#ContentRoot">
+    <Setter Property="IsVisible" Value="False" />
+  </Style>
+
+  <Style Selector="InfoBar:foregroundset /template/ TextBlock#Title">
+    <Setter Property="Foreground" Value="{TemplateBinding Foreground}" />
+  </Style>
+  <Style Selector="InfoBar:foregroundset /template/ TextBlock#Message">
+    <Setter Property="Foreground" Value="{TemplateBinding Foreground}" />
+  </Style>
+</Styles>

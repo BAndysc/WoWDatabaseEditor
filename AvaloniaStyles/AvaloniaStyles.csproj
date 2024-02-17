@@ -24,6 +24,8 @@
     </ItemGroup>
     <ItemGroup>
       <AvaloniaResource Include="Styles\Assets\Lato\*.ttf" />
+      <None Remove="Fonts\Symbols.ttf" />
+      <AvaloniaResource Include="Fonts\Symbols.ttf" />
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\AvaloniaEdit\src\AvaloniaEdit\AvaloniaEdit.csproj" />

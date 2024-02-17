@@ -1,0 +1,1 @@
+This is ported from https://github.com/amwx/FluentAvalonia/tree/master/src/FluentAvalonia/UI/Controls/InfoBar

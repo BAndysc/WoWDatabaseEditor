@@ -12,6 +12,7 @@
     <StyleInclude Source="avares://AvaloniaStyles/Controls/WizardPanel.axaml" />
     <StyleInclude Source="avares://AvaloniaStyles/Controls/DropDownButton.axaml" />
     <StyleInclude Source="avares://AvaloniaStyles/Controls/ToolbarControl.axaml" />
+    <StyleInclude Source="avares://AvaloniaStyles/Controls/InfoBar/InfoBar.axaml" />
     
     <StyleInclude Source="avares://AvaloniaStyles/Styles/Catalina/PopupRoot.xaml"/>
     <StyleInclude Source="avares://AvaloniaStyles/Styles/Catalina/TreeView.xaml"/>
