@@ -24,6 +24,8 @@
         <KeyBinding Gesture="Enter" Command="{CompiledBinding EditSelected}" />
         <KeyBinding Gesture="Ctrl+Shift+N" Command="{CompiledBinding NewActionAboveCommand}" />
         <KeyBinding Gesture="Ctrl+N" Command="{CompiledBinding NewActionBelowCommand}" />
+        <KeyBinding Gesture="Ctrl+Shift+E" Command="{CompiledBinding NewEventAboveCommand}" />
+        <KeyBinding Gesture="Ctrl+E" Command="{CompiledBinding NewEventBelowCommand}" />
         <KeyBinding Gesture="Ctrl+A" Command="{CompiledBinding SelectAll}" />
         <KeyBinding Gesture="Ctrl+Up" Command="{CompiledBinding SelectionUp}"
                     CommandParameter="{StaticResource TrueValue}" />
