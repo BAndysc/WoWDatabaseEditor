@@ -42,11 +42,20 @@ namespace WDE.Common.Avalonia.Controls
                 justHandledS = true;
             }
             // ctrl + num: set value to TAG + num
-            else if (e.Key >= Key.D0 && e.Key <= Key.D9  &&
-                     e.KeyModifiers is KeyModifiers.Control or KeyModifiers.Meta)
+            else if (
+                (
+                    (e.Key >= Key.D0 && e.Key <= Key.D9) || 
+                    (e.Key >= Key.NumPad0 && e.Key <= Key.NumPad9)
+                ) && 
+                e.KeyModifiers is KeyModifiers.Control or KeyModifiers.Meta)
             {
-                var num = (int)(e.Key - Key.D0);
-                if (Tag != null && long.TryParse(Tag.ToString(), out var tagNumber))
+                int num = -1;
+                if (e.Key >= Key.D0 && e.Key <= Key.D9)
+                    num = (int)(e.Key - Key.D0);
+                else if (e.Key >= Key.NumPad0 && e.Key <= Key.NumPad9)
+                    num = (int)(e.Key - Key.NumPad0);
+
+                if (num != -1 && Tag != null && long.TryParse(Tag.ToString(), out var tagNumber))
                 {
                     Text = (tagNumber * 100 + num).ToString();
                     SelectionStart = SelectionEnd = Text.Length;
