@@ -26,13 +26,13 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
 
         public List<CommandKeyBinding> KeyBindings { get; } = new List<CommandKeyBinding>();
         
-        public long EntryOrGuid { get; }
+        public long SpecialCopyValue { get; }
         
         public ParametersEditViewModel(IItemFromListProvider itemFromListProvider,
             ICurrentCoreVersion currentCoreVersion,
             IParameterPickerService parameterPickerService,
             IMainThread mainThread,
-            long entryOrGuid,
+            long specialCopyValue,
             string title,
             SmartBaseElement? element,
             bool focusFirst,
@@ -41,7 +41,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels.Editing
             string? focusFirstGroup = null)
         {
             Title = title;
-            EntryOrGuid = entryOrGuid;
+            SpecialCopyValue = specialCopyValue;
             this.parameterPickerService = parameterPickerService;
             HashSet<IEditableParameterViewModel> visible = new();
             SourceList<IEditableParameterViewModel> visibleParameters = new();

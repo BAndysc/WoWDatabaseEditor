@@ -2424,7 +2424,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 currentCoreVersion,
                 parameterPickerService,
                 mainThread,
-                script.EntryOrGuid,
+                SpecialCopyValue,
                 actionsToEdit.Count == 1 ? "Edit action" : "Edit many actions",
                 actionsToEdit.Count == 1 ? actionsToEdit[0] : null,
                 !editOriginal,
@@ -2530,7 +2530,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 currentCoreVersion,
                 parameterPickerService,
                 mainThread,
-                script.EntryOrGuid,
+                SpecialCopyValue,
                 conditionsToEdit.Count == 1 ? "Edit condition" : "Edit many conditions",
                 conditionsToEdit.Count == 1 ? conditionsToEdit[0] : null,
                 !editOriginal,
@@ -2661,7 +2661,7 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 currentCoreVersion,
                 parameterPickerService,
                 mainThread,
-                script.EntryOrGuid,
+                SpecialCopyValue,
                 eventsToEdit.Count == 1 ? "Edit event" : "Edit many events",
                 eventsToEdit.Count == 1 ? eventsToEdit[0] : null,
                 !editOriginal,
@@ -2902,5 +2902,9 @@ namespace WDE.SmartScriptEditor.Editor.ViewModels
                 Console.WriteLine(e);
             }
         }
+
+        public long SpecialCopyValue => script.SourceType is SmartScriptType.Template or SmartScriptType.TimedActionList
+            ? script.EntryOrGuid / 100
+            : script.EntryOrGuid;
     }
 }
