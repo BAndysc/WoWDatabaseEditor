@@ -37,7 +37,7 @@
         <Button DockPanel.Dock="Bottom" Margin="0,6,0,0" Command="{CompiledBinding GoToBreakpointCommand}">
           <StackPanel Orientation="Horizontal" Spacing="5">
             <WdeImage ImageUri="Icons/icon_ide_visual_studio_mono.png" Width="16" Height="16" />
-            <TextBlock Text="Go To File" />
+            <TextBlock Text="Go To the File" />
           </StackPanel>
         </Button>
         <TwoColumnsPanel RowSpacing="3" ColumnSpacing="2">

@@ -95,24 +95,6 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
             {
                 if (ftb.OverContext is ParameterWithContext context)
                 {
-                    if (smartDataManager.TryGetRawData(context.Context.SmartType, context.Context.Id, out var data) &&
-                        data.Parameters != null &&
-                        context.ParameterIndex.HasValue &&
-                        context.ParameterIndex.Value >= 0 &&
-                        context.ParameterIndex.Value < data.Parameters.Count &&
-                        data.Parameters[context.ParameterIndex.Value].Type == "SpellParameter")
-                    {
-                        var spellDebugger = ViewBind.ResolveViewModel<IBaseSpellDebugger>();
-                        if (spellDebugger.Enabled)
-                        {
-                            var spellId = (uint)context.Parameter.Value;
-                            var header = spellDebugger.IsDebuggingSpell(spellId) ? "Remove spell from debugger" : "Add spell to debugger";
-                            AddMenuItem(header, new AsyncAutoCommand(async () =>
-                            {
-                                await spellDebugger.ToggleSpellDebugging(spellId);
-                            }).WrapMessageBox<Exception>(ViewBind.ResolveViewModel<IMessageBoxService>()));
-                        }
-                    }
                     AddMenuItem("Copy parameter value", new DelegateCommand(() =>
                     {
                         AvaloniaLocator.Current.GetRequiredService<IClipboard>().SetTextAsync(context.Parameter.Value.ToString()).ListenErrors();
@@ -139,6 +121,36 @@ namespace WDE.SmartScriptEditor.Avalonia.Editor.UserControls
                 foreach (var menu in dynamicMenuItems)
                     AddMenuItem(menu.Name, menu);
                 anythingAdded = true;
+            }
+
+
+            if (pointerOverElement is FormattedTextBlock ftb2 &&
+                ftb2.OverContext is ParameterWithContext context2)
+            {
+                if (smartDataManager.TryGetRawData(context2.Context.SmartType, context2.Context.Id, out var data) &&
+                    data.Parameters != null &&
+                    context2.ParameterIndex.HasValue &&
+                    context2.ParameterIndex.Value >= 0 &&
+                    context2.ParameterIndex.Value < data.Parameters.Count &&
+                    data.Parameters[context2.ParameterIndex.Value].Type == "SpellParameter")
+                {
+                    var spellDebugger = ViewBind.ResolveViewModel<IBaseSpellDebugger>();
+                    if (spellDebugger.Enabled)
+                    {
+                        var spellId = (uint)context2.Parameter.Value;
+                        var header = spellDebugger.IsDebuggingSpell(spellId)
+                            ? "Remove spell from the debugger"
+                            : "Add spell to the debugger";
+
+                        if (anythingAdded)
+                            AddSeparator();
+
+                        AddMenuItem(header,
+                            new AsyncAutoCommand(async () => { await spellDebugger.ToggleSpellDebugging(spellId); })
+                                .WrapMessageBox<Exception>(ViewBind.ResolveViewModel<IMessageBoxService>()));
+                        anythingAdded = true;
+                    }
+                }
             }
 
             if (anythingAdded)
