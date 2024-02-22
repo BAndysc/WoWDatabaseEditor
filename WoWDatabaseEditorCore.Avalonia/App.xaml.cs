@@ -33,6 +33,7 @@ using WoWDatabaseEditorCore.Avalonia.Services.AppearanceService;
 using WoWDatabaseEditorCore.Avalonia.Services.AppearanceService.Providers;
 using WoWDatabaseEditorCore.Avalonia.Views;
 using WoWDatabaseEditorCore.CoreVersion;
+using WoWDatabaseEditorCore.Managers;
 using WoWDatabaseEditorCore.Services.FileSystemService;
 using WoWDatabaseEditorCore.Services.UserSettingsService;
 using WoWDatabaseEditorCore.ModulesManagement;
@@ -282,29 +283,36 @@ namespace WoWDatabaseEditorCore.Avalonia
 
             DispatcherTimer.RunOnce(() =>
             {
-                base.Initialize();
-                if (AvaloniaThemeStyle.UseDock)
+                try
                 {
-                    ((IContainerRegistry)Container).RegisterSingleton<MainWindowWithDocking>();
-                    MainApp = Container.Resolve<MainWindowWithDocking>();
+                    base.Initialize();
+                    if (AvaloniaThemeStyle.UseDock)
+                    {
+                        ((IContainerRegistry)Container).RegisterSingleton<MainWindowWithDocking>();
+                        MainApp = Container.Resolve<MainWindowWithDocking>();
+                    }
+                    else
+                    {
+                        ((IContainerRegistry)Container).RegisterSingleton<MainWindow>();
+                        MainApp = Container.Resolve<MainWindow>();
+                    }
+
+                    MainApp.DataContext = Container.Resolve<MainWindowViewModel>();
+                    this.InitializeShell(MainApp);
+
+                    globalServiceRoot = Container.Resolve<IGlobalServiceRoot>();
+
+                    IEventAggregator? eventAggregator = Container.Resolve<IEventAggregator>();
+                    eventAggregator.GetEvent<AllModulesLoaded>().Publish();
+                    Container.Resolve<ILoadingEventAggregator>().Publish<EditorLoaded>();
+                    MainApp.ShowActivated = true;
+                    MainApp.Show();
+                    splashScreenWindow.Close();
                 }
-                else
+                catch (Exception e)
                 {
-                    ((IContainerRegistry)Container).RegisterSingleton<MainWindow>();
-                    MainApp = Container.Resolve<MainWindow>();
+                    FatalErrorHandler.ExceptionOccured(e, Program.Arguments);
                 }
-
-                MainApp.DataContext = Container.Resolve<MainWindowViewModel>();
-                this.InitializeShell(MainApp);
-
-                globalServiceRoot = Container.Resolve<IGlobalServiceRoot>();
-
-                IEventAggregator? eventAggregator = Container.Resolve<IEventAggregator>();
-                eventAggregator.GetEvent<AllModulesLoaded>().Publish();
-                Container.Resolve<ILoadingEventAggregator>().Publish<EditorLoaded>();
-                MainApp.ShowActivated = true;
-                MainApp.Show();
-                splashScreenWindow.Close();
             }, TimeSpan.FromMilliseconds(160));
         }
 
