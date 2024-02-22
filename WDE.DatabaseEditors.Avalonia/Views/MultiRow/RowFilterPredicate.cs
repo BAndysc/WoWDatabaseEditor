@@ -23,20 +23,17 @@ public class RowFilterPredicate : IRowFilterPredicate
 
         foreach (var cell in entity.Cells)
         {
-            if (searchTextNum.HasValue)
+            if (searchTextNum.HasValue && cell.ParameterValue is IParameterValue<long> value)
             {
-                if (cell.ParameterValue is not IParameterValue<long> value)
-                    continue;
-                
                 if (value.Value.Contains(searchText))
                     return true;
             }
             else
             {
-                if (cell.ToString() is not { } value)
+                if (cell.ToString() is not { } value2)
                     continue;
 
-                if (value.Contains(searchText, StringComparison.InvariantCultureIgnoreCase))
+                if (value2.Contains(searchText, StringComparison.InvariantCultureIgnoreCase))
                     return true;
             }
         }
