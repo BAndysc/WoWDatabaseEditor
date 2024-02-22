@@ -62,7 +62,7 @@ namespace WDE.DbcStore
 
     [AutoRegister]
     [SingleInstance]
-    public class DbcStore : IDbcStore, IDbcSpellService, IMapAreaStore, IFactionTemplateStore, IGarrMissionStore, IItemStore
+    public class DbcStore : IDbcStore, IDbcSpellService, IMapAreaStore, IFactionTemplateStore, IGarrMissionStore, IItemStore, IConversationLineStore
     {
         private readonly IDbcSettingsProvider dbcSettingsProvider;
         private readonly IMessageBoxService messageBoxService;
@@ -144,7 +144,11 @@ namespace WDE.DbcStore
         public IReadOnlyList<IGarrMission> Missions { get; internal set; } = Array.Empty<IGarrMission>();
         public Dictionary<int, IGarrMission> GarrMissionById { get; internal set; } = new();
         public IGarrMission? GetMissionById(int id) => GarrMissionById.TryGetValue(id, out var mission) ? mission : null;
-        
+
+        public IReadOnlyList<IConversationLine> ConversationLines { get; internal set; } = Array.Empty<IConversationLine>();
+        public Dictionary<uint, IConversationLine> ConversationLineById { get; internal set; } = new();
+        public IConversationLine? GetConversationLineById(uint id) => ConversationLineById.TryGetValue(id, out var line) ? line : null;
+
         public IArea? GetAreaById(uint id) => AreaById.TryGetValue(id, out var area) ? area : null;
         public IMap? GetMapById(uint id) => MapById.TryGetValue(id, out var map) ? map : null;
         public FactionTemplate? GetFactionTemplate(uint templateId) => FactionTemplateById.TryGetValue(templateId, out var faction) ? faction : null;
@@ -235,6 +239,8 @@ namespace WDE.DbcStore
                 store.AreaById = data.Areas.ToDictionary(a => a.Id, a => (IArea)a);
                 store.Missions = data.Missions;
                 store.GarrMissionById = data.Missions.ToDictionary(a => a.Id, a => (IGarrMission)a);
+                store.ConversationLines = data.ConversationLines;
+                store.ConversationLineById = data.ConversationLines.ToDictionary(a => a.Id, a => (IConversationLine)a);
                 store.Maps = data.Maps;
                 store.ItemStore = data.ItemStore;
                 store.MapById = data.Maps.ToDictionary(a => a.Id, a => (IMap)a);
@@ -364,6 +370,7 @@ namespace WDE.DbcStore
                 parameterFactory.Register("WorldMapAreaParameter", new DbcParameter(data.WorldMapAreaStore));
                 parameterFactory.Register("ConversationLineParameter", new DbcParameter(data.ConversationLineStore));
                 parameterFactory.Register("ItemVisualParameter", new ItemVisualParameter(store));
+                parameterFactory.Register("ScenarioEventParameter", Parameter.Instance);
 
                 parameterFactory.RegisterCombined("CharShipmentParameter", "SpellParameter", "CreatureParameter", "ItemParameter",
                     (spells, creatures, items) => new CharShipmentParameter(dataPicker, store.CharShipments, spells, creatures, items), QuickAccessMode.Limited);

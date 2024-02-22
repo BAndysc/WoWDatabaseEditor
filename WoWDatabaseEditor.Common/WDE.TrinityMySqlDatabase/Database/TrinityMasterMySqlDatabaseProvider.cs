@@ -527,4 +527,10 @@ public class TrinityMasterMySqlDatabaseProvider : BaseTrinityMySqlDatabaseProvid
         }
         return await model.ConditionsMaster.Where(predicate).ToListAsync<IConditionLine>();
     }
+
+    public override async Task<IReadOnlyList<IConversationActor>> GetConversationActors()
+    {
+        await using var model = Database();
+        return await model.ConversationActor.OrderBy(x => x.ConversationId).ThenBy(x => x.Idx).ToListAsync<IConversationActor>();
+    }
 }

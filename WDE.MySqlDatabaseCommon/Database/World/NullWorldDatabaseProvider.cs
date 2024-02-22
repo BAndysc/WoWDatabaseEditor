@@ -206,6 +206,8 @@ namespace WDE.MySqlDatabaseCommon.Database.World
         public async Task<(IReadOnlyList<ICreatureTemplate>, IReadOnlyList<ICreatureTemplateDifficulty>)> GetCreaturePickPocketLootCrossReference(uint lootId) => (Array.Empty<ICreatureTemplate>(), Array.Empty<ICreatureTemplateDifficulty>());
         public async Task<IReadOnlyList<IGameObjectTemplate>> GetGameObjectLootCrossReference(uint lootId) => Array.Empty<IGameObjectTemplate>();
         public async Task<IReadOnlyList<ILootEntry>> GetReferenceLootCrossReference(uint lootId) => Array.Empty<ILootEntry>();
+        public async Task<IReadOnlyList<IConversationActor>> GetConversationActors() => Array.Empty<IConversationActor>();
+        public async Task<IReadOnlyList<IConversationActorTemplate>> GetConversationActorTemplates() => Array.Empty<IConversationActorTemplate>();
 
         public Task<IList<ISpawnGroupTemplate>> GetSpawnGroupTemplatesAsync() => Task.FromResult<IList<ISpawnGroupTemplate>>(new List<ISpawnGroupTemplate>());
         public Task<IList<ISpawnGroupSpawn>> GetSpawnGroupSpawnsAsync() => Task.FromResult<IList<ISpawnGroupSpawn>>(new List<ISpawnGroupSpawn>());

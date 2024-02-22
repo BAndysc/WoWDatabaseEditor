@@ -219,6 +219,13 @@ internal class LegionDbcLoader : BaseDbcLoader
                 EnvGarrMechanicId = row.GetUInt(27),
                 GarrMissionSetId = row.GetUInt(28),
             });
+        Load("ConversationLine.db2", data.ConversationLines, row =>
+            new ConversationLine()
+            {
+                Id = row.GetUInt(0),
+                BroadcastTextId = row.GetUInt(1),
+                NextLineId = row.GetUInt(4)
+            });
         Load("UiTextureKit.db2", data.UiTextureKits, row =>
             new UiTextureKit()
             {

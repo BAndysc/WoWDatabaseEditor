@@ -157,6 +157,9 @@ namespace WDE.Common.Database
         Task<(IReadOnlyList<ICreatureTemplate>, IReadOnlyList<ICreatureTemplateDifficulty>)> GetCreaturePickPocketLootCrossReference(uint lootId);
         Task<IReadOnlyList<IGameObjectTemplate>> GetGameObjectLootCrossReference(uint lootId);
         Task<IReadOnlyList<ILootEntry>> GetReferenceLootCrossReference(uint lootId);
+
+        Task<IReadOnlyList<IConversationActor>> GetConversationActors();
+        Task<IReadOnlyList<IConversationActorTemplate>> GetConversationActorTemplates();
         
         public enum SmartLinePropertyType
         {

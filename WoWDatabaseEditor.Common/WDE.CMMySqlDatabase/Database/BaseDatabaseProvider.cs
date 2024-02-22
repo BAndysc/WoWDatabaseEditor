@@ -544,7 +544,11 @@ namespace WDE.CMMySqlDatabase.Database
             };
             return loot.SelectMany(x => x).ToList();
         }
-        
+
+        public async Task<IReadOnlyList<IConversationActor>> GetConversationActors() => Array.Empty<IConversationActor>();
+
+        public async Task<IReadOnlyList<IConversationActorTemplate>> GetConversationActorTemplates() => Array.Empty<IConversationActorTemplate>();
+
         public async Task<IReadOnlyList<ILootEntry>> GetLoot(LootSourceType type)
         {
             await using var database = Database();

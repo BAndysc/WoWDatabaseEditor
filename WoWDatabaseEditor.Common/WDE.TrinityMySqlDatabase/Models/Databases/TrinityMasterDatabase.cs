@@ -26,4 +26,5 @@ public class TrinityMasterDatabase : BaseTrinityDatabase
     public ITable<MasterMySqlSmartScriptLine> SmartScript => GetTable<MasterMySqlSmartScriptLine>();
     public ITable<MasterWaypointData> WaypointData => GetTable<MasterWaypointData>();
     public ITable<MySqlConditionLineMaster> ConditionsMaster => GetTable<MySqlConditionLineMaster>();
+    public ITable<MySqlConversationActor> ConversationActor => GetTable<MySqlConversationActor>();
 }

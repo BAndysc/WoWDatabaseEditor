@@ -78,6 +78,11 @@ namespace WDE.SmartScriptEditor.Providers
                     if (param.Items?.TryGetValue(entryOrGuid, out var name) ?? false)
                         return name.Name;
                     break;
+                case SmartScriptType.Conversation:
+                    var conversation = parameterFactory.Factory("ConversationParameter");
+                    if (conversation.Items?.TryGetValue(entryOrGuid, out var conversationName) ?? false)
+                        return conversationName.Name;
+                    break;
                 default:
                     return null;
             }

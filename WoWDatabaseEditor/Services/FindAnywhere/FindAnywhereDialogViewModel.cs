@@ -58,6 +58,9 @@ public partial class FindAnywhereDialogViewModel : ObservableBase, IFindAnywhere
         Sources.Add(new FindSourceDialog("Skill", "SkillParameter"));
         Sources.Add(new FindSourceDialog("Event", "EventScriptParameter"));
         Sources.Add(new FindSourceDialog("Timed action list", "TimedActionListParameter"));
+        Sources.Add(new FindSourceDialog("Trigger Map Event", "MapEventParameter"));
+        Sources.Add(new FindSourceDialog("Scenario Event", "ScenarioEventParameter"));
+        Sources.Add(new FindSourceDialog("Conversation", "ConversationParameter"));
         
         selectedSource = Sources[0];
         

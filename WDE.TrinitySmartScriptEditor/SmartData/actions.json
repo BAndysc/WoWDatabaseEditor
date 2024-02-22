@@ -3328,7 +3328,7 @@
         "parameters": [
             {
                 "name": "Conversation template id",
-                "type": "ConversationTemplateParameter"
+                "type": "ConversationParameter"
             }
         ],
         "description": "{source}: Start conversation {pram1}",

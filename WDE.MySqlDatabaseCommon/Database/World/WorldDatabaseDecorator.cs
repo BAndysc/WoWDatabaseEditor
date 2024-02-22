@@ -194,6 +194,10 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public Task<IReadOnlyList<ILootEntry>> GetReferenceLootCrossReference(uint lootId) => impl.GetReferenceLootCrossReference(lootId);
 
+        public Task<IReadOnlyList<IConversationActor>> GetConversationActors() => impl.GetConversationActors();
+
+        public Task<IReadOnlyList<IConversationActorTemplate>> GetConversationActorTemplates() => impl.GetConversationActorTemplates();
+
         public Task<List<IEventScriptLine>> GetEventScript(EventScriptType type, uint id) => impl.GetEventScript(type, id);
         
         public Task<List<IEventAiLine>> GetEventAi(int id) => impl.GetEventAi(id);

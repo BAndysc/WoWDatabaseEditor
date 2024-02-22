@@ -699,6 +699,16 @@ namespace WDE.TrinityMySqlDatabase.Database
             return loot.SelectMany(x => x).ToList();
         }
 
+        public virtual async Task<IReadOnlyList<IConversationActor>> GetConversationActors()
+        {
+            return Array.Empty<IConversationActor>();
+        }
+
+        public virtual async Task<IReadOnlyList<IConversationActorTemplate>> GetConversationActorTemplates()
+        {
+            return Array.Empty<IConversationActorTemplate>();
+        }
+
         public virtual async Task<IReadOnlyList<ILootEntry>> GetLoot(LootSourceType type, uint entry)
         {
             await using var database = Database();

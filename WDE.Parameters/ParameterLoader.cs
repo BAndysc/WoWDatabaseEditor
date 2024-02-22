@@ -10,6 +10,7 @@ using WDE.Common;
 using WDE.Common.Collections;
 using WDE.Common.CoreVersion;
 using WDE.Common.Database;
+using WDE.Common.DBC;
 using WDE.Common.Events;
 using WDE.Common.Managers;
 using WDE.Common.Parameters;
@@ -28,7 +29,7 @@ namespace WDE.Parameters
 {
     public class ParameterLoader
     {
-        private readonly IDatabaseProvider database;
+        private readonly ICachedDatabaseProvider database;
         private readonly IParameterDefinitionProvider parameterDefinitionProvider;
         private readonly IServerIntegration serverIntegration;
         private readonly IItemFromListProvider itemFromListProvider;
@@ -38,6 +39,7 @@ namespace WDE.Parameters
         private readonly ICreatureEntryOrGuidProviderService creaturePicker;
         private readonly IQuestEntryProviderService questEntryProviderService;
         private readonly ICurrentCoreVersion currentCoreVersion;
+        private readonly IConversationLineStore conversationLineStore;
         private readonly Lazy<IWindowManager> windowManager;
         private readonly Lazy<IParameterPickerService> parameterPickerService;
         private readonly IQuickAccessRegisteredParameters quickAccessRegisteredParameters;
@@ -45,7 +47,7 @@ namespace WDE.Parameters
         private Dictionary<Type, List<IDatabaseObserver>> reloadable = new();
         private List<LateAsyncLoadParameter> asyncDatabaseParameters = new();
         private List<LateLoadParameter> databaseParameters = new();
-        internal ParameterLoader(IDatabaseProvider database, 
+        internal ParameterLoader(ICachedDatabaseProvider database,
             IParameterDefinitionProvider parameterDefinitionProvider,
             IServerIntegration serverIntegration,
             IItemFromListProvider itemFromListProvider,
@@ -55,6 +57,7 @@ namespace WDE.Parameters
             ICreatureEntryOrGuidProviderService creaturePicker,
             IQuestEntryProviderService questEntryProviderService,
             ICurrentCoreVersion currentCoreVersion,
+            IConversationLineStore conversationLineStore,
             Lazy<IWindowManager> windowManager,
             Lazy<IParameterPickerService> parameterPickerService,
             IQuickAccessRegisteredParameters quickAccessRegisteredParameters)
@@ -69,6 +72,7 @@ namespace WDE.Parameters
             this.creaturePicker = creaturePicker;
             this.questEntryProviderService = questEntryProviderService;
             this.currentCoreVersion = currentCoreVersion;
+            this.conversationLineStore = conversationLineStore;
             this.windowManager = windowManager;
             this.parameterPickerService = parameterPickerService;
             this.quickAccessRegisteredParameters = quickAccessRegisteredParameters;
@@ -131,8 +135,8 @@ namespace WDE.Parameters
             factory.Register("PlayerChoiceResponseParameter", AddAsyncDatabaseParameter(new PlayerChoiceResponseParameter(database)));
             factory.Register("ServersideAreatriggerParameter", AddAsyncDatabaseParameter(new ServersideAreatriggerParameter(database)));
             factory.Register("DatabasePhaseParameter", AddAsyncDatabaseParameter(new DatabasePhaseParameter(database)), QuickAccessMode.Limited);
+            factory.Register("ConversationParameter", AddAsyncDatabaseParameter(new ConversationParameter(conversationLineStore, database)));
             factory.RegisterDepending("SceneTemplateParameter", "SceneScriptParameter", sceneScript =>AddAsyncDatabaseParameter(new SceneTemplateParameter(database, sceneScript)));
-            factory.Register("ConversationTemplateParameter", new ConversationTemplateParameter(database));
             factory.Register("BoolParameter", new BoolParameter());
             factory.Register("FlagParameter", new FlagParameter());
             factory.Register("PercentageParameter", new PercentageParameter());
@@ -775,29 +779,6 @@ namespace WDE.Parameters
                 Items.Add(item.Entry, new SelectOption(item.Name));
         }
     }
-    
-    
-    public class ConversationTemplateParameter : LazyLoadParameter
-    {
-        private readonly IDatabaseProvider database;
-
-        public ConversationTemplateParameter(IDatabaseProvider database)
-        {
-            this.database = database;
-        }
-        
-        protected override void LazyLoad()
-        {
-            Items = new Dictionary<long, SelectOption>();
-            foreach (IConversationTemplate item in database.GetConversationTemplates())
-            {
-                var name = $"conversation with first line id: {item.FirstLineId}";
-                if (!string.IsNullOrEmpty(item.ScriptName))
-                    name += $", script name: {item.ScriptName}";
-                Items.Add(item.Id, new SelectOption(name));
-            }
-        }
-    }
 
     public class PlayerChoiceParameter : LateAsyncLoadParameter
     {
@@ -947,5 +928,94 @@ namespace WDE.Parameters
         }
 
         public event Action<IParameter<long>>? ItemsChanged;
+    }
+
+    public class ConversationParameter : LateAsyncLoadParameter
+    {
+        private readonly IConversationLineStore conversationLineStore;
+        private readonly ICachedDatabaseProvider databaseProvider;
+
+        public ConversationParameter(IConversationLineStore conversationLineStore,
+            ICachedDatabaseProvider databaseProvider)
+        {
+            this.conversationLineStore = conversationLineStore;
+            this.databaseProvider = databaseProvider;
+        }
+
+        private async Task<string?> FirsNonEmptyLine(uint lineId)
+        {
+            while (lineId != 0)
+            {
+                if (conversationLineStore.GetConversationLineById(lineId) is not { } line)
+                    return null;
+
+                if (line.BroadcastTextId > 0)
+                {
+                    var broadcastText = await databaseProvider.GetBroadcastTextByIdAsync(line.BroadcastTextId);
+                    if (broadcastText != null)
+                        return broadcastText.FirstText();
+                }
+
+                lineId = line.NextLineId;
+            }
+
+            return null;
+        }
+
+        // todo: it should fire only if conversationLineStore is loaded
+        public override async Task LateLoad()
+        {
+            var conversationTemplates = databaseProvider.GetConversationTemplates();
+            var actorTemplates = (await databaseProvider.GetConversationActorTemplates())
+                .GroupBy(x => x.Id)
+                .ToDictionary(x => x.Key, x => x.ToList());
+            var actors = (await databaseProvider.GetConversationActors())
+                .GroupBy(x => x.ConversationId)
+                .ToDictionary(x => x.Key, x => x.ToList());
+
+            Items = new Dictionary<long, SelectOption>();
+            var sb = new StringBuilder();
+            foreach (var conversation in conversationTemplates)
+            {
+                sb.Clear();
+                if (actors.TryGetValue(conversation.Id, out var actorList))
+                {
+                    sb.Append("Actors<");
+                    for (var index = 0; index < actorList.Count; index++)
+                    {
+                        var isLast = index == actorList.Count - 1;
+                        var actor = actorList[index];
+
+                        actorTemplates.TryGetValue(actor.ConversationActorId, out var creatures);
+                        uint creatureId = 0;
+                        if (creatures != null && creatures.Count > 0)
+                            creatureId = creatures[0].CreatureId;
+                        if (actor.CreatureId != 0)
+                            creatureId = (uint)Math.Abs(actor.CreatureId);
+
+                        if (creatureId == 0)
+                            continue;
+
+                        var creatureName = databaseProvider.GetCachedCreatureTemplate(creatureId)?.Name ?? "(unknown)";
+                        sb.Append(creatureName);
+                        sb.Append(" (");
+                        sb.Append(actor.ConversationActorId);
+                        sb.Append(")");
+                        if (!isLast)
+                            sb.Append(", ");
+                    }
+                    sb.Append("> ");
+                }
+
+                var broadcastText = await FirsNonEmptyLine(conversation.FirstLineId);
+
+                if (!string.IsNullOrEmpty(broadcastText))
+                    sb.Append(broadcastText);
+                else
+                    sb.Append($"(first line {conversation.FirstLineId})");
+
+                Items.Add(conversation.Id, new SelectOption(sb.ToString()));
+            }
+        }
     }
 }

@@ -533,6 +533,10 @@ namespace WDE.MySqlDatabaseCommon.Database.World
 
         public Task<IReadOnlyList<ILootEntry>> GetReferenceLootCrossReference(uint lootId) => nonCachedDatabase.GetReferenceLootCrossReference(lootId);
 
+        public Task<IReadOnlyList<IConversationActor>> GetConversationActors() => nonCachedDatabase.GetConversationActors();
+
+        public Task<IReadOnlyList<IConversationActorTemplate>> GetConversationActorTemplates() => nonCachedDatabase.GetConversationActorTemplates();
+
         public Task<List<IEventScriptLine>> GetEventScript(EventScriptType type, uint id) => WaitForCache(nonCachedDatabase.GetEventScript(type, id));
 
         public Task<List<IEventAiLine>> GetEventAi(int id) => WaitForCache(nonCachedDatabase.GetEventAi(id));
