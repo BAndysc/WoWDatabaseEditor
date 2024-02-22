@@ -130,7 +130,13 @@ namespace WDE.SmartScriptEditor.Data
 
         public bool TryGetRawData(SmartType type, int id, out SmartGenericJsonData data)
         {
-            if (smartIdData[type].TryGetValue(id, out var data_))
+            if (!smartIdData.TryGetValue(type, out var smartList))
+            {
+                data = null!;
+                return false;
+            }
+
+            if (smartList.TryGetValue(id, out var data_))
             {
                 data = data_;
                 return true;
